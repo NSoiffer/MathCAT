@@ -1,0 +1,14 @@
+# some values for testing
+[
+{0x0021: {t: "factorial"}},
+{0x0022: {t: "quotation mark"}},
+{0x0023: {t: "number"}},
+{0x0024: {t: "dollars"}},
+{0x0025: {t: "percent"}},
+{0x0026: {t: "ampersand"}},
+{0x0027: {t: "apostraphe"}},
+{0x0028: {t: "open"}},
+{0x0029: {t: "close"}},
+{0x002A: {t: "times"}},
+{0x002B: {t: "plus"}}
+]

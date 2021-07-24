@@ -1,0 +1,965 @@
+---
+
+-
+   name: absolute-value
+   tag: mrow
+   match: "count(*)=3 and not(*[2][self::m:mtable]) and IsBracketed(., '|', '|')"
+   replace: 
+      - test: 
+         if: "$Verbosity!='terse'"
+         then: {t: the}
+      - t: absolute value of 
+      - x: "*[2]"
+-
+   name: open-interval
+   tag: mrow
+   match: "count(*)=3 and IsBracketed(., '(', ')', 'true')"
+   replace: 
+    - t: the interval from
+    - x: "*[2]/*[1]"
+    - t: to
+    - x: "*[2]/*[3]"
+    - t: not including
+    - x: "*[2]/*[1]"
+    - t: or
+    - x: "*[2]/*[3]"
+-
+   name: binomial-frac
+   tag: mrow
+   match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac] and *[2][@linethickness=0]"
+   replace: 
+    - x: "*[2]/*[1]"
+    - t: choose
+    - x: "*[2]/*[2]"
+-
+   name: complex-nums
+   tag: mi
+   match: "text()='ℂ'"
+   replace: [t: the complex numbers]
+-
+   name: natural-nums
+   tag: mi
+   match: "text()='ℕ'"
+   replace: [t: the natural numbers]
+-
+   name: rational-nums
+   tag: mi
+   match: "text()='ℚ'"
+   replace: [t: the rational numbers]
+-
+   name: real-nums
+   tag: mi
+   match: "text()='ℝ'"
+   replace: [t: the real numbers]
+-
+   name: integer-nums
+   tag: mi
+   match: "text()='ℤ'"
+   replace: [t: the integers]
+-
+   name: natural-nums-sup-pos
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℤ'] and *[2][self::m:mo][text()='+']"
+   replace: [t: the positive integers]
+-
+   name: natural-nums-sup-pos
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℤ'] and *[2][self::m:mo][text()='+']"
+   replace: [t: the positive integers]
+-
+   name: natural-nums-sup-neg
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℤ'] and *[2][self::m:mo][text()='-']"
+   replace: [t: the negative integers]
+-
+   name: rational-nums-sup-pos
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℚ'] and *[2][self::m:mo][text()='+']"
+   replace: [t: the positive rational numbers]
+-
+   name: rational-nums-sup-neg
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℚ'] and *[2][self::m:mo][text()='-']"
+   replace: [t: the negative rational numbers]
+-
+   name: complex-nums-sup
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℂ']"
+   replace: 
+    - t: c
+    - x: "*[2]"
+-
+   name: natural-nums-sup
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℕ']"
+   replace: 
+    - t: n
+    - x: "*[2]"
+-
+   name: rational-nums-sup
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℚ']"
+   replace: 
+    - t: q
+    - x: "*[2]"
+-
+   name: real-nums-sup
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℝ']"
+   replace: 
+    - t: r
+    - x: "*[2]"
+-
+   name: natural-nums-sup
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℤ']"
+   replace: 
+    - t: z
+    - x: "*[2]"
+
+-
+   name: negative
+   tag: mrow
+   match: "count(*)=2 and *[1][self::m:mo][text()='-']"
+   replace: 
+    - t: negative
+    - x: "*[2]"
+
+-
+   name: default
+   tag: msqrt
+   match: "."
+   replace: 
+    - test: 
+         if: "$Verbosity!='terse'"
+         then: {t: the}
+    - test: 
+         if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+         then: {t: positive}
+    - t: square root
+    - test: 
+         if: "$Verbosity!='terse'"
+         then: {t: of}
+         else: {pause: short}
+    - x: "*[1]"
+    - test: 
+         if: $ClearSpeak_Roots = 'EndRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+         then:
+            - pause: short
+            - t: end root
+            - pause: medium
+         else:
+            test:
+               if: IsNode(*[1], 'simple')
+               then: [pause: short]
+               else: [pause: long]
+
+-
+   name: default
+   tag: mroot
+   match: "."
+   replace: 
+      - test: 
+         if: "$Verbosity!='terse'"
+         then: {t: the}
+      - test: 
+         if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+         then: {t: positive}
+      - test:
+         if: "*[2][self::m:mn]"
+         then:
+            - test:
+               if: "*[2][text()='2']"
+               then: {t: square root}
+               else_if:
+                  if: "*[2][text()='3']"
+                  then: {t: cube root}
+                  else_if:
+                     if: "*[2][not(contains(., '.'))]"
+                     then: [x: "ToOrdinal(*[2])", t: root]
+         else:
+            - test:
+               if: "*[2][self::m:mi][string-length(.)=1]"
+               then: [x: "*[2]", ct: "-th"]
+               else: {x: "*[2]"}
+            - t: root
+      - test: 
+            if: "$Verbosity!='terse'"
+            then: {t: of}
+      - x: "*[1]"
+      - test: 
+         if: $ClearSpeak_Roots = 'EndRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+         then:
+            - pause: short
+            - t: end root
+            - pause: medium
+         else:
+            test:
+               if: IsNode(*[1], 'simple')
+               then: [pause: short]
+               else: [pause: long]
+            
+
+# Fraction rules
+# Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
+-
+   name: common-fraction
+   tag: mfrac
+   match:
+      - "*[1][self::m:mn][not(contains(., '.')) and text()<20]   and" 
+      - "*[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]"
+   replace: [x: ToCommonFraction(.)]
+-
+   name: common-fraction-mixed-number
+   tag: mfrac
+   match:
+      - "preceding-sibling::*[1][self::m:mo][text()='\u2064'] and" # preceding element is invisible plus
+      - "*[1][self::m:mn][not(contains(., '.'))]   and" 
+      - "*[2][self::m:mn][not(contains(., '.'))]"
+   replace: [x: ToCommonFraction(.)]
+-
+   name: fraction-over-simple
+   tag: mfrac
+   match: "(IsNode(*[1],'simple') and IsNode(*[2],'simple'))"  # simple fraction in ClearSpeak spec
+   replace: 
+    - x: "*[1]"
+    - t: over
+    - x: "*[2]"
+-
+   # fraction with text or numbers followed by text in both numerator and denominator
+   name: fraction-over-text
+   tag: mfrac
+   match:
+      - "( "
+      - "  ((*[1][self::m:mi or self::m:mtext][string-length(.)>1]) or " # fractions with text
+      - "   (*[1][self::m:mrow][count(*)=3][ "
+      - "        *[1][self::m:mn] and "
+      - "        *[2][self::m:mo][text()='\u2062'] and "            # invisible times
+      - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) ) and"
+      - "  ((*[2][self::m:mi or self::m:mtext][string-length(.)>1]) or " # fractions with text
+      - "   (*[2][self::m:mrow][count(*)=3][ "
+      - "        *[1][self::m:mn] and "
+      - "        *[2][self::m:mo][text()='\u2062'] and "            # invisible times
+      - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) )"
+      - ")"
+   replace: 
+    - x: "*[1]"
+    - t: over
+    - x: "*[2]"
+-
+   name: default
+   tag: mfrac
+   match: "."
+   replace: 
+    - ot: the
+    - t: fraction with numerator
+    - test:
+       if: not(IsNode(*[1], 'simple'))
+       then: {pause: medium}
+    - x: "*[1]"
+    - pause: medium
+    - t: and denominator
+    - x: "*[2]"
+    - pause: long
+
+
+# rules for functions raised to a power
+# these could have been written on 'mrow' but putting them on msup seems more specific
+# to see if it is a function, we look right to see if the following sibling is apply-function
+-
+   name: function-inverse
+   tag: msup
+   match:
+    - "*[2][self::m:mrow][count(*)=2] and"                        # exponent is an mrow with children...
+    - "*[2]/*[1][self::m:mo][text()='-'] and"                     #   '-'
+    - "*[2]/*[2][self::m:mn][text()=1] and"                       #  and '1'
+    - "*[1][self::m:mi] and IsNode(*[1], 'trig_name') and"       # base is a trig function name (e.g, sin, sinh)
+    - "following-sibling::*[1][self::m:mo][text()='\u2061']"  # and msup is followed by invisible function apply
+   replace: 
+    - x: "*[1]"
+    - t: inverse
+-
+   name: function-squared-or-cubed
+   tag: msup
+   match:
+    - "*[2][self::m:mn][text()=2 or text()=3] and"
+    - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
+   replace:
+    - x: "*[1]"
+    - test: 
+         if: "*[2][text()=2]"
+         then: {t: squared}
+         else: {t: cubed}
+-
+   name: function-integer-power
+   tag: msup
+   match:
+    - "*[2][self::m:mn][not(contains(., '.'))] and"
+    - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
+   replace:
+    - test: 
+         if: "$Verbosity!='terse'"
+         then: {t: the}
+    - x: "ToOrdinal(*[2])"
+    - t: power of
+    - pause: short
+    - x: "*[1]"
+-
+   name: function-other-power
+   tag: msup
+   match:
+    - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
+   replace:
+    - test: 
+         if: "$Verbosity!='terse'"
+         then: {t: the}
+    - x: "*[2]"
+    - t: power of
+    - pause: short
+    - x: "*[1]"
+
+-
+   name: squared
+   tag: msup
+   match: "*[2][self::m:mn][text()='2']"
+   replace: 
+    - x: "*[1]"
+    - t: squared
+-
+   name: cubed
+   tag: msup
+   match: "*[2][self::m:mn][text()='3']"
+   replace: 
+    - x: "*[1]"
+    - t: cubed
+-
+   name: simple-integer
+   tag: msup
+   match: "*[2][self::m:mn][not(contains(., '.'))]"
+   replace: 
+    - x: "*[1]"
+    - t: to the
+    - test: 
+         if: "*[2][.>0]"
+         then: {x: "ToOrdinal(*[2])"}
+         else: {x: "*[2]"}
+    - t: power
+-
+   name: simple-negative-integer
+   tag: msup
+   match: 
+    - "*[2][self::m:mrow][count(*)=2]"
+    - "[*[1][self::m:mo][text()='-'] and"
+    - "*[2][self::m:mn][not(contains(., '.'))]]"
+   replace: 
+    - x: "*[1]"
+    - t: to the
+    - x: "*[2]"
+    - t: power
+-
+   name: simple-var
+   tag: msup
+   match: "*[2][self::m:mi][string-length(.)=1]"
+   replace: 
+    - x: "*[1]"
+    - t: to the
+    - x: "*[2]"
+    - ct: "-th power"
+
+
+-
+   # match nested exponent, where the nested exponent is has the power 2 or 3 (n below)
+   #   [xxx]^n, - [xxx]^n, [xxx] var^n, -[xxx] var^n
+   # where xxx is a number, variable, or common fraction
+   # short of creating a specialized built-in function, I don't see a way to eliminate a lot of repetition in the matches
+   # also really bad is that the test of a common fraction is replicated here (four times!)
+   name: nested-squared-or-cubed
+   tag: msup
+   match:
+    - "*[2][self::m:msup]["
+    - "     *[2][self::m:mn][text()='2' or text()='3'] and "  # exp is 2 or 3
+    - ""    # base is mn, mi, common fraction ([xxx] case)
+    - "     *[1][self::m:mn or self::m:mi or "
+    - "          self::m:mfrac[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and" 
+    - "                        *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
+    - "         ]"
+    - "    ]"
+   replace: 
+    - x: "*[1]"
+    - t: raised to the
+    - x: "*[2]"
+    - t: power
+-
+   name: nested-negative-squared-or-cubed  # - [xxx]^n
+   tag: msup
+   match:
+    - " *[2][self::m:mrow][count(*)=2][ "
+    - "      *[1][self::m:mo][text()='-'] and "
+    - "      *[2][self::m:msup]["
+    - "           *[2][self::m:mn][text()='2' or text()='3'] and "  # exp is 2 or 3"
+    - "           *[1][self::m:mn or self::m:mi or "
+    - "                self::m:mfrac[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and" 
+    - "                              *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
+    - "               ]"
+    - "          ]"
+    - "     ]"
+   replace: 
+    - x: "*[1]"
+    - t: raised to the
+    - x: "*[2]"
+    - t: power
+-
+   name: nested-var-squared-or-cubed  # [xxx] var^n
+   tag: msup
+   match:
+    - "  *[2][self::m:mrow][count(*)=3][ "
+    - "       *[3][self::m:msup]["
+    - "            *[2][self::m:mn][text()='2' or text()='3'] and "  # exp is 2 or 3
+    - "            *[1][self::m:mi]"
+    - "           ] and "
+    - "       *[2][self::m:mo][text()='\u2062'] and "     # invisible times
+    - "       *[1][self::m:mn or self::m:mi or "
+    - "            self::m:mfrac[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and" 
+    - "                          *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
+    - "           ]"
+    - "      ]"
+   replace: 
+    - x: "*[1]"
+    - t: raised to the
+    - x: "*[2]"
+    - t: power
+-
+   name: nested-negative-var-squared-or-cubed  # -[xxx] var^n
+   tag: msup
+   match:
+    - "  *[2][self::m:mrow][count(*)=3][ "
+    - "       *[3][self::m:msup]["
+    - "            *[2][self::m:mn][text()='2' or text()='3'] and "  # exp is 2 or 3
+    - "            *[1][self::m:mi]"
+    - "           ] and "
+    - "       *[2][self::m:mo][text()='\u2062'] and "     # invisible times
+    - "       *[1][self::m:mrow][count(*)=2][ "
+    - "            *[1][self::m:mo][text()='-'] and "
+    - "            *[2][self::m:mn or self::m:mi or "
+    - "                 self::m:mfrac[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and" 
+    - "                               *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
+    - "                ]"
+    - "           ]"
+    - "      ]"
+   replace: 
+    - x: "*[1]"
+    - t: raised to the
+    - x: "*[2]"
+    - t: power
+-
+   name: default-exponent-power
+   tag: msup
+   match:  # directly a superscript or an mrow that contains a superscript
+    - "*[2][self::m:msup or "
+    - "     self::m:mrow[m:msup]"
+    - "    ]"
+   replace: 
+    - x: "*[1]"
+    - t: raised to the exponent
+    - pause: short
+    - x: "*[2]"
+    - pause: short
+    - t: end exponent
+-
+   name: default
+   tag: msup
+   match: "."
+   replace: 
+    - x: "*[1]"
+    - t: raised to the
+    - x: "*[2]"
+    - t: power
+-
+   name: bigop
+   tag: [msubsup, munderover]
+   match: "IsLargeOp(*[1])"
+   replace: 
+    - x: "*[1]"
+    - t: from
+    - x: "*[2]"
+    - t: to
+    - x: "*[3]"
+    - t: of
+  
+  
+  
+#
+# Matrix/Determinant rules
+# matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
+# the pausing logic is pushed down to the <mtd>
+# the rules either speak the <mtr>s (to get "row n") or the <mtd>s. "column n" spoken if $IsColumnSilent is false
+-
+   name: 1x1-matrix
+   tag: mrow
+   variables: [IsColumnSilent: true]
+   match:
+   - "*[2][self::m:mtable] and"
+   - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
+   - count(*[2]/*)=1 and count(*[2]/*[1]/*)=1
+   replace:
+    - ot: the
+    - t: 1 by 1
+    - test:
+        if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+        then: {t: determinant}
+        else: {t: matrix}
+    - t: with entry
+    - x: "*[2]/*[1]/*"
+
+# simpler reading methods for smaller matrices if the entries are simple
+-
+  name: 2-or-3x1-matrix
+  tag: mrow
+  variables: [IsColumnSilent: true]
+  match:
+    - "*[2][self::m:mtable] and"
+    - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
+    - count(*[2]/*[1]/*)=1 and    # one column
+    - (count(*[2]/*)=2 or count(*[2]/*)=3) and   # at least two rows
+    - IsNode(*[2]/*/*/*,'simple')   # IsNode() returns true if all the nodes are simple
+  replace: 
+    - t: the
+    - x: count(*[2]/*)
+    - t: by 1 column
+    - test:
+        if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+        then: {t: determinant}
+        else: {t: matrix}
+    - pause: long
+    - x: "*[2]/*/*"
+-
+  name: default-column-matrix
+  tag: mrow
+  variables: [IsColumnSilent: true]
+  match:
+    - "*[2][self::m:mtable] and"
+    - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
+    - count(*[2]/*[1]/*)=1
+  replace: 
+    - t: the
+    - x: "count(*[2]/*)"
+    - t: by 1 column
+    - test:
+        if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+        then: {t: determinant}
+        else: {t: matrix}
+    - pause: long
+    - x: "*[2]/*"     # select the rows (mtr)
+  
+-
+  name: 1x2-or-3-matrix
+  tag: mrow
+  variables: [IsColumnSilent: true]
+  match:
+    - "*[2][self::m:mtable] and"
+    - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
+    - count(*[2]/*)=1  and          # one row
+    - (count(*[2]/*[1]/*)=2 or count(*[2]/*[1]/*)=3) and   # at least two cols
+    - IsNode(*[2]/*/*/*,'simple')   # IsNode() returns true if all the nodes are simple
+  replace: 
+    - t: the 1 by
+    - x: count(*[2]/*/*)
+    - t: row
+    - test:
+        if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+        then: {t: determinant}
+        else: {t: matrix}
+    - pause: long
+    - x: "*[2]/*/*"
+ 
+-
+  name: default-row-matrix
+  tag: mrow
+  variables: [IsColumnSilent: false]
+  match:
+    - "*[2][self::m:mtable] and"
+    - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
+    - count(*[2]/*)=1         # one row
+  replace: 
+    - t: the 1 by
+    - x: "count(*[2]/*/*)"
+    - t: row
+    - test:
+        if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+        then: {t: determinant}
+        else: {t: matrix}
+    - pause: long
+      # hack to speak "column 1" -- isn't normally spoken but since "row #" not spoken, we want to here
+    - t: column 1
+    - pause: medium
+    - x: "*[2]/*/*"     # select the cols (mtd)
+  
+-
+  name: simple-small-matrix
+  tag: mrow
+  match:
+    - "*[2][self::m:mtable] and"
+    - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
+    - (count(*[2]/*)<=3 and count(*[2]/*[1]/*)<=3) and       # no bigger than a 3x3 matrix
+    - IsNode(*[2]/*/*/*,'simple')         # IsNode() returns true if all the nodes are simple
+  variables: [IsColumnSilent: true]
+  replace: 
+    - t: the
+    - x: count(*[2]/*)
+    - t: by
+    - x: count(*[2]/*[1]/*)
+    - test:
+        if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+        then: {t: determinant}
+        else: {t: matrix}
+    - pause: long
+    - x: "*[2]/*"
+ 
+-
+   name: default-matrix
+   tag: mrow
+   variables: [IsColumnSilent: false]
+   match:
+   - "*[2][self::m:mtable] and"
+   - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
+   replace: 
+    - t: the
+    - x: "count(*[2]/*)"
+    - t: by
+    - x: "count(*[2]/*[1]/*)"
+    - test:
+        if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+        then: {t: determinant}
+        else: {t: matrix}
+    - pause: long
+    - x: "*[2]/*"
+
+-
+  name: default
+  tag: mtr
+  match: "."
+  replace:
+    - t: row
+    - x: "count(preceding-sibling::*)+1"
+    - pause: medium
+    - {x: "*"}
+-
+  name: default
+  tag: mtd
+  match: "."
+  replace:
+   - test: 
+      if: not($IsColumnSilent or count(preceding-sibling::*) = 0)
+      then:
+         - t: column
+         - x: "count(preceding-sibling::*)+1"
+         - pause: medium
+   - x: "*"
+   - test:
+      # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
+      if:  count(following-sibling::*) > 0
+      then: {pause: short}
+      else:
+         test:
+            if: count(../following-sibling::*) > 0
+            then: {pause: medium}
+            else: {pause: long}
+ 
+
+
+-
+   name: sin
+   tag: mi
+   match: "text()='sin'"
+   replace: [t: "sine"]
+-
+   name: cos
+   tag: mi
+   match: "text()='cos'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: cos}
+         else: {t: cosine}
+-
+   name: tan
+   tag: mi
+   match: "text()='tan'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: tan}
+         else: {t: tangent}
+-
+   name: sec
+   tag: mi
+   match: "text()='sec'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: seek}
+         else: {t: secant}
+-
+   name: csc
+   tag: mi
+   match: "text()='csc'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: co-seek}
+         else: {t: co-secant}
+-
+   name: cot
+   tag: mi
+   match: "text()='cot'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: co-tan}
+         else: {t: co-tangent}
+
+-
+   name: sinh
+   tag: mi
+   match: "text()='sinh'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: sinch}
+         else: {t: hyperbolic sine}
+-
+   name: cosh
+   tag: mi
+   match: "text()='cosh'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: cosh}
+         else: {t: hyperbolic cosine}
+-
+   name: tanh
+   tag: mi
+   match: "text()='tanh'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: tanch}
+         else: {t: hyperbolic tangent}
+-
+   name: sech
+   tag: mi
+   match: "text()='sech'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: sheck}
+         else: {t: hyperbolic secant}
+-
+   name: csch
+   tag: mi
+   match: "text()='csch'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: co-sheck}
+         else: {t: hyperbolic co-secant}
+-
+   name: coth
+   tag: mi
+   match: "text()='coth'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: co-tanch}
+         else: {t: hyperbolic co-tangent}
+
+-
+   name: simple-log
+   tag: mrow
+   match:
+      - "count(*)=3 and"
+      - "*[1][self::m:mi][text()='log'] and"
+      - "*[2][self::m:mo][text()='\u2061'] and"
+      - "IsNode(*[3],'simple')"
+   replace:
+      - t: log
+      - x: "*[3]"
+
+-
+   name: log
+   tag: mrow
+   match:
+      - "count(*)=3 and"
+      - "*[1][self::m:mi][text()='log'] and"
+      - "*[2][self::m:mo][text()='\u2061']"
+   replace:
+      - test: 
+         if: "$Verbosity!='terse'"
+         then: {t: the}
+      - t: log of
+      - pause: short
+      - x: "*[3]"
+
+-
+   name: simple-log-base
+   tag: msub
+   match:
+    - "*[1][self::m:mi][text()='log'] and"
+    - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
+   replace:
+    - test: 
+         if: "$Verbosity!='terse'"
+         then: {t: the}
+    - t: log base
+    - x: "*[2]"
+
+-
+   name: simple-ln
+   tag: mrow
+   match:
+      - "*[1][self::m:mi][text()='ln'] and"
+      - "*[2][self::m:mo][text()='\u2061'] and"
+      - "IsNode(*[3],'simple')"
+   replace:
+      - spell: ln
+      - x: "*[3]"
+
+-
+   name: ln
+   tag: mrow
+   match:
+      - "*[1][self::m:mi][text()='ln'] and"
+      - "*[2][self::m:mo][text()='\u2061']"
+   replace:
+      - spell: ln
+      - t: of     # the argument is *not* simple
+      - pause: short
+      - x: "*[3]"
+
+
+-
+   name: times
+   tag: mo
+   match:
+      - "text()='\u2062' and ("
+      - "  following-sibling::*[1][" 
+      - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|') or "  # followed by parens
+      - "    ( (self::m:msup or self::m:msub or self::m:msubsup) and "                                # followed by msup, etc.
+      - "       *[1][self::m:mrow][IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|')]"  # base has parens
+      - "    )"
+      - "  ]"
+      - " or "
+      - "  preceding-sibling::*[1][" 
+      - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|')]"  # followed by parens
+      - " )"
+   replace:
+      - t: times
+
+-
+   name: no-say-parens
+   tag: mrow
+   match:
+      - "parent::*[not(self::m:msup) and not(self::m:msub) and not(self::m:msubsup)] and "
+      - "( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) and "
+      - "( IsNode(*[2], 'simple')  )"
+         # missing clause: 'a positive fraction that is spoken as an ordinal
+         #   (either by the Ordinal preference or by the default rules_'
+   replace:
+      - x: "*[2]"
+
+-
+   name: default
+   tag: math
+   match: "."
+   replace: [x: "*"]
+-
+   name: default
+   tag: mrow
+   match: "."
+   replace: 
+      - insert:
+         nodes: "*"
+         replace: [pause: auto]
+
+-
+   name: default
+   tag: [mi, mn, mo, mtext]
+   match: "."
+   replace: [x: text()]
+-
+   name: default
+   tag: ms
+   match: "."
+   replace: 
+    - t: the string
+    - pause: short
+    - x: text()
+-
+   name: default
+   tag: mstyle
+   match: "."
+   replace: [x: "*"]
+-
+   name: default
+   tag: msubsup
+   match: "."
+   replace: 
+    - x: "*[1]"
+    - t: sub
+    - x: "*[2]"
+    - t: raised to the
+    - x: "*[3]"
+    - t: power
+-
+   name: default
+   tag: munderover
+   match: "."
+   replace: 
+    - t: modified
+    - x: "*[1]"
+    - t: with
+    - x: "*[2]"
+    - t: below and
+    - x: "*[3]"
+    - t: above
+-
+   name: default
+   tag: mtable
+   variables: [IsColumnSilent: false]
+   match: "."
+   replace: 
+    - t: table with
+    - x: count(*)
+    - test: 
+         if: count(*)=1
+         then: {t: row}
+         else: {t: rows}
+    - t: and
+    - x: "count(*[1]/*)"
+    - test: 
+         if: "count(*[1]/*)=1"
+         then: {t: column}
+         else: {t: columns}
+    - pause: long
+    - x: "* "
+-
+   name: default-children
+   tag: unknown
+   match: count(*)>1
+   replace: 
+    - t: unknown math m l element
+    - x: "*"
+-
+   name: default-empty
+   tag: unknown
+   match: "*[not(text())]"
+   replace: 
+    - t: empty unknown math m l element
+    - x: text()
+-
+   name: default-text
+   tag: unknown
+   match: "."
+   replace: 
+    - t: unknown math m l element
+    - x: text()

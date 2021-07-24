@@ -1,0 +1,10 @@
+
+# ----------------  Cardinal and Oridnal Numbers  --------------------------
+# The following definitions are used to convert numbers (typically ordinal ones) to words
+# These first two should extend until a regular pattern begins (always multiples of ten)
+# For English, this starts at twenty
+OrdinalNumbersOnes: [
+    "", "a first", "a second", "a third", "a fourth", "a fifth", "a sixth", "a seventh", "a eight", "a ninth",
+    "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth",
+    "seventeenth", "eighteenth", "nineteenth"
+]

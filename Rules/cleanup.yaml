@@ -1,0 +1,86 @@
+---
+
+# big nums 1,234,456 (need to reject 1,2,345)
+# big decimal nums 1,234.56
+#
+# various elementary forms
+#   repeating decimal
+#
+# capture what should be msubsup -- msub followed by msup with empty mrow base
+# capture scripted variables with empty mrows as the base and convert to mmultiscripts
+
+-
+  name: same-minus
+  tag: mo
+  match: "text()='−'" # U+2212
+  replace:
+      tree:
+        node: self 
+        text: "-"
+-
+  # MathType puts out 10' and 10" (where ' and " are 0x2032 and 0x2033) as mn msup with base 0
+  name: prime-fix
+  tag: msup
+  match:
+    - "*[1][self::mn] and"                       # mn in base
+    - "*[2][(text()='′' or text()='″') and"      # 0x2032/0x2033
+    - "preceding-sibling::*[last()][self::mn]"
+  replace: 
+    - tree:
+        node: "*[1]"
+        text: concat(preceding-sibling::*[last()][text()], *[1][text()])
+    - delete: preceding-sibling::*[last()]
+
+-
+  #/ In MathType, repeating decimals look like:
+  #    number   <mover> number <mo">&#xaf;</mo> </mover>
+  #  Convert these to MathML3's mstack
+  name: repeating-decimal
+  tag: <mover>
+  match:
+    - "*[1][self::mn] and *[2][self::mo][text()='_']"
+    - "preceding-sibling::*[last()][self::mn]"
+  variables: 
+    - LineLength:
+      - x: "*[1][string-length(text())]"
+    - MnText:
+      - x: preceding-sibling::*[last()][text()]
+    - BaseText:
+      - x: "*[1][text()]"
+  replace:
+    - tree:
+      node: self
+      xml: >-
+          <mstack stackalign='right align='baseline' position='0'> 
+            <msline length='$LineLength' position='0'/>
+            <msrow>
+              <mn>$MnText$BaseText</mn>
+            </msrow>
+          </mstack>
+    - delete: preceding-sibling::*[last()]
+
+-
+  #/ In MathType, repeating decimal like above except base is wrapped in an mrow
+  name: repeating-decimal-with-mrow-base
+  tag: <mover>
+  match:
+    - "*[1][self::mn] and *[2][self::mo][text()='_']"
+    - "preceding-sibling::*[last()][self::mn]"
+  variables: 
+    - LineLength:
+      - x: "*[1]/*[2][string-length(text())]"
+    - MnText:
+      - x: preceding-sibling::*[last()][text()]
+    - BaseText:
+      - x: "*[1]/*[2][text()]"
+  replace:
+    - tree:
+      node: self
+      xml: >-
+          <mstack stackalign='right align='baseline' position='0'> 
+            <msline length='$LineLength' position='0'/>
+            <msrow>
+              <mn>$MnText$BaseText</mn>
+            </msrow>
+          </mstack>
+    - delete: preceding-sibling::*[last()]

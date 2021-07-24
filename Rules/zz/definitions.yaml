@@ -1,0 +1,99 @@
+---
+[
+# Lines starting with "#" are a comment
+# Each definition in this file is of the form
+#   name: [ "...", "..." "..." ],
+
+
+# ----------------  Cardinal and Oridnal Numbers  --------------------------
+# The following definitions are used to convert numbers to words
+# The are mainly used for ordinals, of which there are two cases:
+# 1. Regular ordinals: first, second, third, ...
+# 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
+#    When used in the denominator of fractions, a plural version might be
+#    used (e.g., two halves, two thirds)
+# Although a lot of languages are regular after a few entries, for generality,
+# the following lists should be filled out even though they are the same
+# or easily derived from others in many languages (e.g, an 's' is added for plurals).
+# The larger ordinal numbers (e.g, millionth) is used when there are only
+# '0's after that decimal place (e.g., 23000000).:w
+
+# All definitions start 0, 10, 100, etc.
+
+# The definitions for the "ones" should extend until a regular pattern begins
+#   The minimum length is 10.
+
+# For English, a regular pattern starts at twenty
+    NumbersOnes: [
+        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
+        "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
+        "seventeen", "eighteen", "nineteen"
+    ],
+
+    NumbersOrdinalOnes: [
+        "zeroth", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth",
+        "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth",
+        "seventeenth", "eighteenth", "nineteenth"
+    ],
+
+    NumbersOrdinalPluralOnes: [
+        "zeroth", "first", "seconds", "thirds", "fourths", "fifths", "sixths", "sevenths", "eights", "ninths",
+        "tenths", "elevenths", "twelfths", "thirteenths", "fourteenths", "fifteenths", "sixteenths",
+        "seventeenths", "eighteenths", "nineteenths"
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalOnes: [
+        "zero", "first", "half"
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalPluralOnes: [
+        "zeros", "firsts", "halves"
+    ],
+
+
+    # What to use for multiples of 10
+    NumbersTens: [
+        "", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"
+    ],
+
+    NumbersOrdinalTens: [
+        "", "tenth", "twentieth", "thirtieth", "fortieth", "fiftieth", "sixtieth", "seventieth", "eightieth", "ninetieth"
+    ],
+
+    NumbersOrdinalPluralTens: [
+        "", "tenths", "twentieths", "thirtieths", "fortieths", "fiftieths", "sixtieths", "seventieths", "eightieths", "ninetieths"
+    ],
+
+
+    NumbersHundreds: ["", "one hundred", "two hundred", "three hundred", "four hundred", "five hundred",
+        "six hundred", "seven hundred", "eight hundred", "nine hundred"
+    ],
+
+    NumbersOrdinalHundreds: ["", "one hundredth", "two hundredth", "three hundredth", "four hundredth", "five hundredth",
+        "six hundredth", "seven hundredth", "eight hundredth", "nine hundredth"
+    ],
+
+    NumbersOrdinalPluralHundreds: ["", "one hundredths", "two hundredths", "three hundredths", "four hundredths", "five hundredths",
+        "six hundredths", "seven hundredths", "eight hundredths", "nine hundredths"
+    ],
+      
+
+    # At this point, hopefully the language is regular. If not, code needs to be written
+    NumbersLarge: [
+        "", "thousand", "million", "billion", "trillion", "quadrillion",
+        "quintillion", "sextillion", "septillion", "octillion", "nonillion",
+    ],
+      
+    NumbersOrdinalLarge: [
+        "", "thousandth", "millionth", "billionth", "trillionth", "quadrillionth",
+        "quintillionth", "sextillionth", "septillionth", "octillionth", "nonillionth"
+    ],
+      
+    NumbersOrdinalPluralLarge: [
+        "", "thousandths", "millionths", "billionths", "trillionths", "quadrillionths",
+        "quintillionths", "sextillionths", "septillionths", "octillionths", "nonillionths"
+    ]
+
+]

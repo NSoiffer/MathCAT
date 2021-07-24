@@ -1,0 +1,40 @@
+---
+# Each definition in this file is of the form
+#   name: [ "...", "..." "..." ]
+
+[
+    # ---------------- Large Operators  ----------------------------------
+    LargeOperators: [
+        "⅀", # double struck
+        "∏", "∐", "∑", "⋀", "⋁", "⋂", "⋃", "⨀", "⨁", "⨂", "⨃", "⨄", "⨅",
+        "⨆", "⨇", "⨈", "⨉", "⨊", "⨋", "⫼", "⫿",
+        "∫", "∬", "∭", "∮", "∯", "∰", "∱", "∲", "∳", "⨌", "⨍", "⨎", "⨏",
+        "⨐", "⨑", "⨒", "⨓", "⨔", "⨕", "⨖", "⨗", "⨘", "⨙", "⨚", "⨛", "⨜"
+    ],
+
+
+    # ----------------  Function Names  ------------------------------------
+    # these are always considered to be function names, so "sin x" will be interpreted as "sin" applied to "x", not times
+    TrigFunctionNames: [
+        "cos", "cosec", "cosech", "cosh", "cot", "cotan", "cotanh", "coth", "csc", "csch",
+        "sec", "sech", "sin", "sinh", "tan", "tang", "tanh", "tg"    
+    ],
+
+    AdditionalFunctionNames: [
+        // the arcXXX functions aren't really trig functions (they are already inverse functions)
+        "arccos", "arccosec", "arccosech", "arccosh",
+        "arccot", "arccotan", "arccotanh", "arccoth",
+        "arccsc", "arccsch", "arcsec", "arcsech", "arcsin", "arcsinh",
+        "arctan", "arctang", "arctanh",
+        "exp", "im", "ln", "log", "re"
+    ],
+
+    # common names of functions along with a capital letter followed more one or more letters
+    # these will be interpreted as functions when followed by parens as in f(x+y)
+    # other variables will be interpreted as functions when there is a "," in the parens as in t(x,a)
+    LikelyFunctionNames: [
+        "f", "g", "h", "F", "G", "H", "[A-Za-z]+"
+    ]
+
+]
+

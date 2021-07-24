@@ -1,0 +1,53 @@
+---
+  Speech:
+    Impairment: blindness       # LearningDisability, LowVision, Blindness
+    Language: en                # any known language code and sub-code -- could be en-uk, etc
+    Verbosity: medium           # Terse, Medium, Verbose
+    Rate: 100                   # Change from text speech rate (%)
+    SpeechStyle: ClearSpeak     # Any known speech style (falls back to ClearSpeak)
+    SubjectArea: general        # FIX: still working on this
+    Chemistry: spell_out        # SpellOut (H 2 0), AsCompound (Water), Off (H sub 2 O)
+
+    ClearSpeak:                 # see ClearSpeak speak for meanings
+      CapitalLetters: Auto      # SayCaps or use pitch
+      AbsoluteValue: Auto       # AbsEnd, Cardinality, Determinant
+      Fraction: Auto            # Ordinal, Over, FracOver, General, EndFrac, GeneralEndFrac, OverEndFrac, Per
+      Exponent: Auto            # Ordinal, OrdinalPower, AfterPower
+      Roots: Auto               # PosNegSqRoot, RootEnd, PosNegSqRootEnd
+      Functions: Auto           # None
+      Trigonometry: Auto        # TrigInverse, ArcTrig
+      Log: Auto                 # LnAsNaturalLog 
+      ImpliedTimes: Auto        # MoreImpliedTimes , None
+      Parentheses: Auto         # Speak, SpeakNestingLevel, Silent, CoordPoint, Interval
+      Matrix: Auto              # SpeakColNum, SilentColNum, EndMatrix, Vector, EndVector, Combinatorics
+      MultiLineLabel: Auto      # Case, Constraint, Equation, None, Row, Step 
+      MultiLineOverview: Auto   # None, 
+      MultiLinePausesBetweenColumns: Short  # Long
+      Sets: Auto                # woAll, SilentBracket
+      MultSymbolX: Auto         # By, Cross
+      MultSymbolDot: Auto       # Dot
+      TriangleSymbol: Auto      # Delta
+      Ellipses: Auto            # AndSoOn, 
+      VerticalLine: Auto        # SuchThat, Divides, Given
+      SetMemberSymbol: Auto     # Belongs, Element, Member
+      Prime: Auto               # Angle, Length
+      CombinationPermutation: Auto  # ChoosePermute
+      Bar: Auto                 # Bar, Conjugate, Mean
+
+    MathSpeak: Verbose          # Brief, SuperBrief
+
+    SpeechOverrides:
+      CapitalLetters: "cap"     # word to say as a prefix for capital letters unless in unicode.yaml; empty string leaves it to screen reader
+      LeftParen: ""             # word used as override (not implemented)
+      RightParen: ""            # word used as override (not implemented)
+
+  Navigation:
+    StartMode: enhanced         # Enhanced, Simple, Character
+    ResetStartMode: true        # remember previous value and use it
+    Overview: false             # speak the expression or give a description/overview
+    ResetOverView: true         # remember previous value and use it
+    NavVerbosity: medium        # Terse, Medium, Full (words to say for nav command)
+    AutoZoomOut: true           # Auto zoom out of 2D exprs (use shift-arrow to force zoom out if unchecked)
+
+  Braille:
+    Code: Nemeth                # Any supported braille code
