@@ -1,2 +1,6 @@
 target
 Python/libmathcat.pyd
+src/*.bak
+*.swp
+*/*.swp
+*/*/*.swp
