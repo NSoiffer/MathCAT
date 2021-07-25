@@ -635,7 +635,7 @@ struct Debug;
                         })    
                 }
             },
-            _ => println!(" is '{:?}'", eval_result),
+            _ => println!("'{:?}'", eval_result),
         }
         return Ok( eval_result.clone() );
     }
