@@ -32,8 +32,10 @@
     # common names of functions along with a capital letter followed more one or more letters
     # these will be interpreted as functions when followed by parens as in f(x+y)
     # other variables will be interpreted as functions when there is a "," in the parens as in t(x,a)
+    # FIX: Also useful to define are multi-letter function names that start with a capital letter: "[A-Za-z]+"
+    # FIX: That's not currently possible, so the canonicalize function builds that in. Should be externally-definable
     LikelyFunctionNames: [
-        "f", "g", "h", "F", "G", "H", "[A-Za-z]+"
+        "f", "g", "h", "F", "G", "H"
     ]
 
 ]
