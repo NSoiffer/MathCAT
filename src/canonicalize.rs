@@ -728,7 +728,7 @@ impl CanonicalizeContext {
 			// Names like "Tr" are likely function names, single letter names like "M" or "J" are iffy
 			// This needs to be after the chemical state check above to rule out Cl(g), etc
 			// This would be better if if were part of 'likely_names' as "[A-Za-z]+", but reg exprs don't work in HashSets.
-			// FIX: create our own struct and write apporpriate traits for it and then it could work
+			// FIX: create our own struct and write appropriate traits for it and then it could work
 			let mut chars = node_str.chars();
 			let first_char = chars.next().unwrap();		// we know there is at least one byte in it, hence one char
 			if chars.next().is_some() && first_char.is_uppercase() {
