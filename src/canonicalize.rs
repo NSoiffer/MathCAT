@@ -669,11 +669,12 @@ impl CanonicalizeContext {
 	//   - multi-char names that begin with a capital letter (e.g, "Tr")
 	//   - there is a single token inside the parens (why else would someone use parens), any name (e.g, a(x))
 	//
-	// 2. If there are no pares, then only names on the known function list are used (e.g., "sin x") 
+	// 2. If there are no parens, then only names on the known function list are used (e.g., "sin x") 
 	fn is_function_name<'a>(&self, node: Element<'a>, right_siblings: Option<&[ChildOfElement<'a>]>) -> bool {
 		let base_of_name = get_possible_embellished_node(node);
 	
 		// actually only 'mi' should be legal here, but some systems used 'mtext' for multi-char variables
+		// FIX: need to allow for composition of function names. E.g, (f+g)(x) and (f^2/g)'(x)
 		let node_name = name(&base_of_name);
 		if node_name != "mi" && node_name != "mtext" {
 			return false;
@@ -685,6 +686,7 @@ impl CanonicalizeContext {
 		}
 		// println!("    is_function_name({}), {} following nodes", node_str, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
 		return crate::definitions::DEFINITIONS.with(|defs| {
+			// names that are always function names (e.g, "sin" and "log")
 			let names = defs.function_names.as_hashset().borrow();
 			if names.contains(node_str) {
 				return true;	// always treated as function names
@@ -693,11 +695,18 @@ impl CanonicalizeContext {
 			if right_siblings.is_none() {
 				return false;	// only accept known names, which is tested above
 			}
+
+			// make sure that what follows starts and ends with parens/brackets
 			assert_eq!(name(&node.parent().unwrap().element().unwrap()), "mrow");
 			let right_siblings = right_siblings.unwrap();
-			if right_siblings.len() == 0 ||
-				name(&as_element(right_siblings[0])) != "mo"  ||
-				!is_left_paren(as_element(right_siblings[0]))
+			if right_siblings.len() < 2 {
+				return false;
+			}
+
+			// at least two siblings are this point -- check that they are parens/brackets
+			// we can only check the open paren/bracket because the right side is unparsed and we don't know the close location
+			let first_sibling = as_element(right_siblings[0]);
+			if name(&first_sibling) != "mo"  || !is_left_paren(first_sibling)  // '(' or '['
 			{
 				return false;
 			}
@@ -718,6 +727,8 @@ impl CanonicalizeContext {
 	
 			// Names like "Tr" are likely function names, single letter names like "M" or "J" are iffy
 			// This needs to be after the chemical state check above to rule out Cl(g), etc
+			// This would be better if if were part of 'likely_names' as "[A-Za-z]+", but reg exprs don't work in HashSets.
+			// FIX: create our own struct and write apporpriate traits for it and then it could work
 			let mut chars = node_str.chars();
 			let first_char = chars.next().unwrap();		// we know there is at least one byte in it, hence one char
 			if chars.next().is_some() && first_char.is_uppercase() {
