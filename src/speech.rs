@@ -796,13 +796,11 @@ struct Test {
     then_part: ReplacementArray,
     else_part: Option<ReplacementArray>,
     else_if_part: Option<Box<Test>>,
-    // the following is for error reporting
-    condition_str: String,
 }
 impl fmt::Display for Test {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "test: {{ ")?;
-        write!(f, "  if: '{}'", self.condition_str)?;
+        write!(f, "  if: '{}'", self.condition)?;
         write!(f, "  then '{}'", self.then_part)?;
         if let Some(else_part) = &self.else_part {
             write!(f, "  else: '{}'", else_part)?;
@@ -823,7 +821,6 @@ impl Test {
                   Suggestion: add 'if:' or if present, indent so it is contained in 'test'");
         }
 
-        let if_part = as_str_checked(&if_part)?;
         let then_part = &test["then"];
         if then_part.is_badvalue() { 
             bail!("Missing 'then' as part of 'test'.\n    \
@@ -841,8 +838,7 @@ impl Test {
         }
 
         return Ok( Box::new( Test {
-            condition: MyXPath::new(if_part.to_string())?,
-            condition_str: if_part.to_string(),
+            condition: MyXPath::build(if_part)?,
             then_part: ReplacementArray::build(then_part).chain_err(|| "'then:'")?,
             else_part: if else_part.is_badvalue() {
                     None
@@ -858,7 +854,7 @@ impl Test {
     }
 
     fn replace(&self, rules: &SpeechRules, mathml: &Element) -> Result<String> {
-        // println!("in replace, testing condition: \"{}\"", replacement.condition_str);
+        // println!("in replace, testing condition: \"{}\"", replacement.condition);
         if self.condition.is_true(mathml)
                     .chain_err(||"Failure in conditional test")? {
             //println!("..in replace: {:?}", self.replacement);
