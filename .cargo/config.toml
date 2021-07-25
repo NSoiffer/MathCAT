@@ -1,0 +1,6 @@
+# first run "rustup target add i686-pc-windows-msvc" to download needed files
+[build]
+# switch this and python version in cargo.toml to build 32 bit python
+#target = "i686-pc-windows-msvc"
+target = "x86_64-pc-windows-msvc"
+
