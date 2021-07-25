@@ -1,6 +1,7 @@
 # MathCAT: Math Capable Assistive Technology
-![MathCat Logo](logo.png)
- is a library that supports conversion of MathML to:
+<img src="logo.png" style="position: relative; top: 16px; z-index: -1;">
+is a library that supports conversion of MathML to:
+
 * Speech strings with embedded speech engine commands
 * Braille (Nemeth and eventually other braille math codes)
 * Navigation of math (in multiple ways including overviews)
