@@ -118,14 +118,6 @@
     - x: "*[2]"
 
 -
-   name: negative
-   tag: mrow
-   match: "count(*)=2 and *[1][self::m:mo][text()='-']"
-   replace: 
-    - t: negative
-    - x: "*[2]"
-
--
    name: default
    tag: msqrt
    match: "."
@@ -135,7 +127,11 @@
          then: {t: the}
     - test: 
          if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
-         then: {t: positive}
+         then: 
+            - test: 
+               if: parent::*[self::m:mrow and count(*)=2 and *[1][self::m:mo][text()='-']]
+               then: {t: negative}
+               else: {t: positive}
     - t: square root
     - test: 
          if: "$Verbosity!='terse'"
@@ -164,7 +160,11 @@
          then: {t: the}
       - test: 
          if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
-         then: {t: positive}
+         then: 
+            - test: 
+               if: parent::*[self::m:mrow and count(*)=2 and *[1][self::m:mo][text()='-']]
+               then: {t: negative}
+               else: {t: positive}
       - test:
          if: "*[2][self::m:mn]"
          then:
@@ -198,8 +198,22 @@
                if: IsNode(*[1], 'simple')
                then: [pause: short]
                else: [pause: long]
-            
-
+  
+               
+# The 'negative' rule interacts with the msqrt/mroot rules as those might pick off this case ("the negative square root of x")
+-
+   name: negative
+   tag: mrow
+   match: "count(*)=2 and *[1][self::m:mo][text()='-']"
+   replace:
+      - test:
+         if:
+            - "*[2][self::m:msqrt or self::m:mroot] and"
+            - "($ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd')"
+         then: {t: ""}
+         else: {t: negative}
+      - x: "*[2]"
+               
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
 -
@@ -899,6 +913,24 @@
    tag: mstyle
    match: "."
    replace: [x: "*"]
+-
+   name: simple-sub
+   tag: msub
+   match: "IsNode(*[2], 'simple')"
+   replace:
+      - x: "*[1]"
+      - t: "sub" 
+      - x: "*[2]"
+-
+   name: default
+   tag: msub
+   match: "."
+   replace:
+      - x: "*[1]"
+      - t: "sub" 
+      - x: "*[2]"
+      - t: "end sub"
+      - pause: short
 -
    name: default
    tag: msubsup

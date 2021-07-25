@@ -60,6 +60,35 @@ mod mroot {
     }
 
     #[test]
+    fn msqrt_simple_pos_end_with_neg_root() {
+        let expr = "<math>
+                        <mo>-</mo> <msqrt> <mi>x</mi> </msqrt>
+                        <mo>-</mo> <mroot> <mi>x</mi> <mn>3</mn></mroot>
+                    </math>";
+        test_ClearSpeak("ClearSpeak_Roots", "PosNegSqRootEnd", expr, 
+        "the negative square root of x, end root; minus, the positive cube root of x, end root;");
+    }
+
+    #[test]
+    fn mroot_simple_pos_end_with_neg_root() {
+        let expr = "<math>
+                        <mo>-</mo> <mroot> <mi>x</mi> <mn>3</mn></mroot>
+                        <mo>-</mo> <msqrt> <mi>x</mi> </msqrt>
+
+                    </math>";
+        test_ClearSpeak("ClearSpeak_Roots", "PosNegSqRoot", expr, 
+        "the negative cube root of x; minus the positive square root of x,");
+    }
+
+    #[test]
+    fn neg_without_root() {
+        let expr = "<math>
+                        <mo>-</mo> <mi>x</mi> <mo>-</mo> <mi>y</mi>
+                    </math>";
+        test(expr, "negative x minus y");
+    }
+
+    #[test]
     fn msqrt() {
         let expr = "<math>
                         <msqrt>
