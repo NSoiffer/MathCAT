@@ -565,38 +565,40 @@ impl MyXPath {
                 return "\nmissing '\"'".to_string();
             }
 
+            let mut i_bytes = 0;      // keep track of # of bytes into string for error reporting
             let mut paren_count = 0;    // counter to make sure they are balanced
             let mut i_paren = 0;      // position of the outermost open paren
             let mut bracket_count = 0;
             let mut i_bracket = 0;
-            for (i, ch) in xpath.chars().enumerate() {
+            for ch in xpath.chars() {
                 if ch == '(' {
                     if paren_count == 0 {
-                        i_paren = i;
+                        i_paren = i_bytes;
                     }
                     paren_count += 1;
                 } else if ch == '[' {
                     if bracket_count == 0 {
-                        i_bracket = i;
+                        i_bracket = i_bytes;
                     }
                     bracket_count += 1;
                 } else if ch == ')' {
                     if paren_count == 0 {
-                        return format!("\nExtra ')' found after '{}'", &xpath[i_paren..i]);
+                        return format!("\nExtra ')' found after '{}'", &xpath[i_paren..i_bytes]);
                     }
                     paren_count -= 1;
                     if paren_count == 0 && bracket_count > 0 && i_bracket > i_paren {
-                        return format!("\nUnclosed brackets found at '{}'", &xpath[i_paren..i]);
+                        return format!("\nUnclosed brackets found at '{}'", &xpath[i_paren..i_bytes]);
                     }
                 } else if ch == ']' {
                     if bracket_count == 0 {
-                        return format!("\nExtra ']' found after '{}'", &xpath[i_bracket..i]);
+                        return format!("\nExtra ']' found after '{}'", &xpath[i_bracket..i_bytes]);
                     }
                     bracket_count -= 1;
                     if bracket_count == 0 && paren_count > 0 && i_paren > i_bracket {
-                        return format!("\nUnclosed parens found at '{}'", &xpath[i_bracket..i]);
+                        return format!("\nUnclosed parens found at '{}'", &xpath[i_bracket..i_bytes]);
                     }
                 }
+                i_bytes += ch.len_utf8();
             }
             return "".to_string();
         }
