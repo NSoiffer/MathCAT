@@ -16,7 +16,7 @@ MathCAT is a follow-on to MathPlayer. I developed MathPlayer's accessibility whi
 
 In 2016, I left Design Science. In 2017, WIRIS bought Design Science. I volunteered to add bug fixes for free to MathPlayer and initially they were supportive of that. But when it came time to do a release, a number of the people around at the time of the buyout had left and the remaining team was not interested in supporting MathPlayer. That decision waas not finalized until late 2020. In 2021, I started work on a replacement to MathPlayer. As a challenge, I decided to learn Rust and did the implementation in Rust. For those not familiar with Rust, it is a low level language that is type safe and memory safe, but not automatically garbage collected or reference counted. It is often touted as a safer replacement to C/C++.
 
-Rust is quite efficient. On a Core I7-770K machine, the moderately large expression
+Rust is quite efficient. On a Core I7-770K machine, the moderately-size expression
 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
   <mrow>
     <msup>
@@ -50,8 +50,9 @@ Rust is quite efficient. On a Core I7-770K machine, the moderately large express
     </msup>
   </mrow>
 </math>
-whose MathML is:
-
+takes about 1ms and generates the ClearSpeak string
+"_e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren squared, end exponent_".
+The MathML for this expression is:
 ```
 <math>
   <mrow>
@@ -87,10 +88,10 @@ whose MathML is:
   </mrow>
 </math>
 ```
-which produces the ClearSpeak string
-"_e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren squared, end exponent_"
-takes about 1ms.
-MathPlayer uses externals rules to produce speech, these take about 50ms to load; this load only happens the first time the rules are used or if the speech style, language, or other external preference is changed. The library is about 2.6mb.
+
+MathPlayer uses externals rules to generate speech and braille.
+These take about 50ms to load; this load only happens the first time the rules are used or if the speech style, language, or other external preference is changed.
+The library is about 2.6mb in size.
 
 If you are working on an in-browser solution (i.e, you are using JavaScript or some other browser-based language), MathCAT will not work for you. Instead, take a look at [Speech rule engine](https://github.com/zorkow/speech-rule-engine) (SRE) by Volker Sorge. It is written in TypeScript and will likely meet your needs.
 
