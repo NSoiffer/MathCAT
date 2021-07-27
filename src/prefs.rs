@@ -178,7 +178,12 @@ impl Preferences{
                             yaml_to_string(yaml_name, 0), yaml_to_string(yaml_value, 0), file_name);
                     return;
                 } else {
-                    map.insert(name_prefix.to_string() + name.unwrap(), yaml_value.to_owned());
+                    let trimmed_name = name_prefix.to_string() + name.unwrap().trim();
+                    let mut trimmed_yaml_value = yaml_value.to_owned();
+                    if let Some(value) = trimmed_yaml_value.as_str() {
+                        trimmed_yaml_value = Yaml::String(value.trim().to_string());
+                    }
+                    map.insert(trimmed_name, trimmed_yaml_value);
                 }
             }
         }
@@ -201,7 +206,7 @@ impl Preferences{
 
     #[allow(dead_code)]     // used in testing
     fn set_string_value(&mut self, name: &str, value: &str) {
-        self.prefs.insert(name.to_string(), Yaml::String(value.to_string()));
+        self.prefs.insert(name.to_string(), Yaml::String(value.trim().to_string()));
     }
 
     #[allow(dead_code)]     // used in testing
@@ -669,7 +674,7 @@ mod tests {
         assert_eq!(prefs.to_string("Language").as_str(), "en");
         assert_eq!(prefs.to_string("SubjectArea").as_str(), "general");
         assert_eq!(prefs.to_string("ClearSpeak_AbsoluteValue").as_str(), "Auto");
-        assert_eq!(prefs.to_string("ResetStartMode").as_str(), "true");
+        assert_eq!(prefs.to_string("ResetStartMode").as_str(), "false");
         assert_eq!(prefs.to_string("Code").as_str(), "Nemeth");
         assert_eq!(prefs.to_string("X_Y_Z").as_str(), "");
     }

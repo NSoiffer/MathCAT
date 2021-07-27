@@ -15,7 +15,7 @@
       Exponent: Auto            # Ordinal, OrdinalPower, AfterPower
       Roots: Auto               # PosNegSqRoot, RootEnd, PosNegSqRootEnd
       Functions: Auto           # None
-      Trigonometry: Auto        # TrigInverse, ArcTrig
+      Trig: Auto                # TrigInverse, ArcTrig
       Log: Auto                 # LnAsNaturalLog 
       ImpliedTimes: Auto        # MoreImpliedTimes , None
       Parentheses: Auto         # Speak, SpeakNestingLevel, Silent, CoordPoint, Interval
@@ -43,9 +43,9 @@
 
   Navigation:
     StartMode: enhanced         # Enhanced, Simple, Character
-    ResetStartMode: true        # remember previous value and use it
+    ResetStartMode: false       # remember previous value and use it
     Overview: false             # speak the expression or give a description/overview
-    ResetOverView: true         # remember previous value and use it
+    ResetOverView: false        # remember previous value and use it
     NavVerbosity: medium        # Terse, Medium, Full (words to say for nav command)
     AutoZoomOut: true           # Auto zoom out of 2D exprs (use shift-arrow to force zoom out if unchecked)
 
