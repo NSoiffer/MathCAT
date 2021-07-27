@@ -1,5 +1,7 @@
 target
 Python/libmathcat.pyd
+Cargo.lock
+foo
 src/*.bak
 *.swp
 */*.swp
