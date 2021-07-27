@@ -14,7 +14,7 @@ MathCAT is written in Rust and can be built to interface with C/C++. It can also
 
 MathCAT is a follow-on to MathPlayer. I developed MathPlayer's accessibility while at Design Science starting back in 2004 after I joined Design Science. At the time, MathPlayer was chiefly designed to be a C++ plugin to Internet Explorer (IE) that displayed MathML on web pages. For quite some time, it was the most complete MathML implementation available. The original work for display of math was done by Design Science's founder Paul Topping and their chief technology officer, the late Robert Miner. Eventually, for numerous reasons, IE withdrew the interface that MathPlayer used for display and did not implement a replacement as the world was moving towards using JavaScript in the browser and not allowing security threats posed by external code. This left MathPlayer as an accessibility-only library called by other programs (chiefly NVDA). MathPlayer was proprietary, but was given away for free.
 
-In 2016, I left Design Science. In 2017, WIRIS bought Design Science. I volunteered to add bug fixes for free to MathPlayer and initially they were supportive of that. But when it came time to do a release, a number of the people around at the time of the buyout had left and the remaining team was not interested in supporting MathPlayer. That decision waas not finalized until late 2020. In 2021, I started work on a replacement to MathPlayer. As a challenge, I decided to learn Rust and did the implementation in Rust. For those not familiar with Rust, it is a low level language that is type safe and memory safe, but not automatically garbage collected or reference counted. It is often touted as a safer replacement to C/C++.
+In 2016, I left Design Science. In 2017, WIRIS bought Design Science. I volunteered to add bug fixes for free to MathPlayer and initially they were supportive of that. But when it came time to do a release, a number of the people around at the time of the buyout had left and the remaining team was not interested in supporting MathPlayer. That decision was not finalized until late 2020. In 2021, I started work on a replacement to MathPlayer. As a challenge, I decided to learn Rust and did the implementation in Rust. For those not familiar with Rust, it is a low level language that is type safe and memory safe, but not automatically garbage collected or reference counted. It is often touted as a safer replacement to C/C++.
 
 Rust is quite efficient. On a Core I7-770K machine, the moderate-size expression
 <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
@@ -185,41 +185,45 @@ Note: all YAML files begin with "---". That indicates the beginning of a "docume
 # rule:
 #     name: <string> # name of the rule (name+tag should be unique)
 #     tag: <string>
-#     variables: [{name: value}, ...]   #optional
+#     variables: [{name: value}, ...]
+#      - name is a string, value is an XPath expr that evaluates to a string, number, or boolean
+#      - inside the rule, the value is accessed as $name
+#      - the variable's value is set _before_ testing "match", so it can be used in match
 #     match: <string>  # xpath for the match
-#     - can be a single string or
-#     - an array of strings (for readability) that are joined together
+#      - can be a single string or
+#      - an array of strings (for readability) that are joined together
 #     replace:  [replacements] where replacements are one of the following
-#     - t: some text
+#      - t: some text
 #          'T' is used to indicate text has been translated.
-#     - ct: concatenate text without space in front
+#      - ct: concatenate text without space in front
 #           'CT' is used to indicate text has been translated
-#     - ot: optional text (don't use text if it results in repeated words)
+#      - ot: optional text (don't use text if it results in repeated words)
 #           'OT' to indicate text has been translated
 #           E.g., we don't want "t raised to the the fraction with ...."
 #           Making "the" optional in the fraction rule prevents the repetition
-#     - x: some xpath (as string)
-#     - test:
+#      - x: some xpath (as string)
+#      - test:
 #         if: <string> some xpath
 #         then: [replacements]
 #         else: [replacements] # optional
-#     - pause: string or number  # "short", "medium", "long", "auto", or number in milliseconds
-#     - rate:  string/number or dict with 1 or 2 entries
+#         else_test # optional, used in place of 'else:' -- avoids needing to use 'test:' after the 'else:'
+#      - pause: string or number  # "short", "medium", "long", "auto", or number in milliseconds
+#      - rate:  string/number or dict with 1 or 2 entries
 #         value: float number with optional %
 #         replace: [replacements]  # tts values need to scope contents 
-#     - volume:  string/number or dict with 1 or 2 entries
+#      - volume:  string/number or dict with 1 or 2 entries
 #         value: float number with optional %
 #         replace: [replacements]  # tts values need to scope contents 
-#     - pitch:  string/number or dict with 1 or 2 entries
+#      - pitch:  string/number or dict with 1 or 2 entries
 #         value: float number with optional %
 #         replace: [replacements]  # tts values need to scope contents 
-#     - gender:  string/number or dict with 1 or 2 entries
+#      - gender:  string/number or dict with 1 or 2 entries
 #         value: "male" # or "female"
 #         replace: [replacements]  # tts values need to scope contents 
-#     - voice:  string/number or dict with 1 or 2 entries
+#      - voice:  string/number or dict with 1 or 2 entries
 #         value: string
 #         replace: [replacements]  # tts values need to scope contents 
-#     - spell:  string (usually a single letter to be pronounced as the letter)
+#      - spell:  string (usually a single letter to be pronounced as the letter)
 ```
 
 Note: for "pause", the "auto" value will calculate a pausing amount based on the complexity of the surrounding parts. The more complex they are, the longer the pause (up to a limit). The basic idea is that you want to give the listener time to digest and separate out the two parts when one or both are more complicated.
