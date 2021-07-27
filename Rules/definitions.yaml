@@ -15,9 +15,10 @@
 
     # ----------------  Function Names  ------------------------------------
     # these are always considered to be function names, so "sin x" will be interpreted as "sin" applied to "x", not times
+    # Note: the log functions follow the same syntax rules as trig functions, so they are included here
     TrigFunctionNames: [
         "cos", "cosec", "cosech", "cosh", "cot", "cotan", "cotanh", "coth", "csc", "csch",
-        "sec", "sech", "sin", "sinh", "tan", "tang", "tanh", "tg"    
+        "sec", "sech", "sin", "sinh", "tan", "tang", "tanh", "tg", "ln", "log"    
     ],
 
     AdditionalFunctionNames: [
@@ -26,7 +27,7 @@
         "arccot", "arccotan", "arccotanh", "arccoth",
         "arccsc", "arccsch", "arcsec", "arcsech", "arcsin", "arcsinh",
         "arctan", "arctang", "arctanh",
-        "exp", "im", "ln", "log", "re"
+        "exp", "im", "re"
     ],
 
     # common names of functions along with a capital letter followed more one or more letters
