@@ -1,5 +1,6 @@
 ---
-
+# Status:
+# ClearSpeak Preferences Implemented:  Roots, Trig, Log, Functions
 -
    name: absolute-value
    tag: mrow
@@ -171,10 +172,10 @@
             - test:
                if: "*[2][text()='2']"
                then: {t: square root}
-               else_if:
+               else_test:
                   if: "*[2][text()='3']"
                   then: {t: cube root}
-                  else_if:
+                  else_test:
                      if: "*[2][not(contains(., '.'))]"
                      then: [x: "ToOrdinal(*[2])", t: root]
          else:
@@ -287,11 +288,16 @@
     - "*[2][self::m:mrow][count(*)=2] and"                        # exponent is an mrow with children...
     - "*[2]/*[1][self::m:mo][text()='-'] and"                     #   '-'
     - "*[2]/*[2][self::m:mn][text()=1] and"                       #  and '1'
-    - "*[1][self::m:mi] and IsNode(*[1], 'trig_name') and"       # base is a trig function name (e.g, sin, sinh)
-    - "following-sibling::*[1][self::m:mo][text()='\u2061']"  # and msup is followed by invisible function apply
-   replace: 
-    - x: "*[1]"
-    - t: inverse
+    - "*[1][self::m:mi] and IsNode(*[1], 'trig_name') and"        # base is a trig function name (e.g, sin, sinh)
+    - "following-sibling::*[1][self::m:mo][text()='\u2061']"      # and msup is followed by invisible function apply
+   replace:
+      - test:
+         if: $ClearSpeak_Trig = 'TrigInverse'
+         then: [x: "*[1]", t: inverse]
+         else_test:
+            if: $ClearSpeak_Trig = 'ArcTrig'
+            then: [t: arc, x: "*[1]"]
+            else: [t: inverse, x: "*[1]"]       # default/Auto
 -
    name: function-squared-or-cubed
    tag: msup
@@ -510,7 +516,7 @@
 -
    name: 1x1-matrix
    tag: mrow
-   variables: [IsColumnSilent: true]
+   variables: [IsColumnSilent: "true()"]
    match:
    - "*[2][self::m:mtable] and"
    - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
@@ -529,7 +535,7 @@
 -
   name: 2-or-3x1-matrix
   tag: mrow
-  variables: [IsColumnSilent: true]
+  variables: [IsColumnSilent: true()]
   match:
     - "*[2][self::m:mtable] and"
     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
@@ -549,7 +555,7 @@
 -
   name: default-column-matrix
   tag: mrow
-  variables: [IsColumnSilent: true]
+  variables: [IsColumnSilent: true()]
   match:
     - "*[2][self::m:mtable] and"
     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
@@ -568,7 +574,7 @@
 -
   name: 1x2-or-3-matrix
   tag: mrow
-  variables: [IsColumnSilent: true]
+  variables: [IsColumnSilent: true()]
   match:
     - "*[2][self::m:mtable] and"
     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
@@ -589,7 +595,7 @@
 -
   name: default-row-matrix
   tag: mrow
-  variables: [IsColumnSilent: false]
+  variables: [IsColumnSilent: false()]
   match:
     - "*[2][self::m:mtable] and"
     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
@@ -616,7 +622,7 @@
     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
     - (count(*[2]/*)<=3 and count(*[2]/*[1]/*)<=3) and       # no bigger than a 3x3 matrix
     - IsNode(*[2]/*/*/*,'simple')         # IsNode() returns true if all the nodes are simple
-  variables: [IsColumnSilent: true]
+  variables: [IsColumnSilent: true()]
   replace: 
     - t: the
     - x: count(*[2]/*)
@@ -632,7 +638,7 @@
 -
    name: default-matrix
    tag: mrow
-   variables: [IsColumnSilent: false]
+   variables: [IsColumnSilent: false()]
    match:
    - "*[2][self::m:mtable] and"
    - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
@@ -787,35 +793,42 @@
          then: {t: co-tanch}
          else: {t: hyperbolic co-tangent}
 
--
-   name: simple-log
-   tag: mrow
-   match:
-      - "count(*)=3 and"
-      - "*[1][self::m:mi][text()='log'] and"
-      - "*[2][self::m:mo][text()='\u2061'] and"
-      - "IsNode(*[3],'simple')"
-   replace:
-      - t: log
-      - x: "*[3]"
-
--
+-  # handle both log and ln
    name: log
    tag: mrow
+   variables: [log_is_simple: "IsNode(*[3],'simple')"]
    match:
       - "count(*)=3 and"
-      - "*[1][self::m:mi][text()='log'] and"
+      - "*[1][self::m:mi][text()='log' or text()='ln'] and"
       - "*[2][self::m:mo][text()='\u2061']"
    replace:
-      - test: 
-         if: "$Verbosity!='terse'"
-         then: {t: the}
-      - t: log of
-      - pause: short
+      - test:
+         if: "DEBUG($log_is_simple)"
+         then:
+            test:
+               if: "*[1][text()='log']"
+               then: [t: log]
+               else_test:
+                  if: $ClearSpeak_Log = 'LnAsNaturalLog'
+                  then: [t: natural log]
+                  else: [spell: ln]
+         else:
+          - test: 
+             if: "$Verbosity!='terse' and not(log_is_simple)"
+             then: {t: the}
+          - test:
+             if: "*[1][text()='log']"
+             then: [t: log]
+             else_test:
+               if: $ClearSpeak_Log = 'LnAsNaturalLog'
+               then: [t: natural log]
+               else: [spell: ln]
+          - t: of
+          - pause: short
       - x: "*[3]"
 
 -
-   name: simple-log-base
+   name: log-base
    tag: msub
    match:
     - "*[1][self::m:mi][text()='log'] and"
@@ -828,28 +841,12 @@
     - x: "*[2]"
 
 -
-   name: simple-ln
-   tag: mrow
+   name: ClearSpeak_Functions_None
+   tag: mo
    match:
-      - "*[1][self::m:mi][text()='ln'] and"
-      - "*[2][self::m:mo][text()='\u2061'] and"
-      - "IsNode(*[3],'simple')"
-   replace:
-      - spell: ln
-      - x: "*[3]"
-
--
-   name: ln
-   tag: mrow
-   match:
-      - "*[1][self::m:mi][text()='ln'] and"
-      - "*[2][self::m:mo][text()='\u2061']"
-   replace:
-      - spell: ln
-      - t: of     # the argument is *not* simple
-      - pause: short
-      - x: "*[3]"
-
+      - "text()='\u2061' and $ClearSpeak_Functions = 'None' and"
+      - not(preceding-sibling::*[1][IsNode(., 'trig_name')])
+   replace: [t: times]
 
 -
    name: times
@@ -957,7 +954,7 @@
 -
    name: default
    tag: mtable
-   variables: [IsColumnSilent: false]
+   variables: [IsColumnSilent: false()]
    match: "."
    replace: 
     - t: table with

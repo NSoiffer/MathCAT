@@ -21,6 +21,17 @@ mod functions {
         assert_eq!(speech, strip_spaces(libmathcat::interface::speak_mathml(mathml)));
     }
 
+    #[allow(non_snake_case)]
+    fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: &str) {
+        libmathcat::speech::SPEECH_RULES.with(|rules| {
+            let mut rules = rules.borrow_mut();
+            let pref_manager = rules.pref_manager.as_mut();
+            pref_manager.set_user_prefs(pref_name, pref_value);
+        });
+        assert_eq!(speech, strip_spaces(libmathcat::interface::speak_mathml(mathml)));
+    }
+
+
     #[test]
     fn trig_names() {
         let expr = "<math><mrow>
@@ -56,7 +67,21 @@ mod functions {
     #[test]
     fn inverse_trig() {
         let expr = "<math><msup><mi>sin</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
-        test(expr, "sine inverse of x");
+        test(expr, "inverse sine of x");
+    }
+ 
+    #[test]
+    fn inverse_trig_trig_inverse() {
+        let expr = "<math><msup><mi>tan</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
+       test_ClearSpeak("ClearSpeak_Trig", "TrigInverse",expr,
+           "tangent inverse of x");
+    }
+ 
+    #[test]
+    fn inverse_trig_arc() {
+        let expr = "<math><msup><mi>cosh</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
+       test_ClearSpeak("ClearSpeak_Trig", "ArcTrig",expr,
+           "arc hyperbolic cosine of x");
     }
 
     #[test]
@@ -117,8 +142,25 @@ mod functions {
     #[test]
     fn normal_ln() {
         let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-        test(expr, "l n of, open paren x plus y close paren");
+        test(expr, "the l n of, open paren x plus y close paren");
     }
+
+     
+    #[test]
+    fn simple_natural_log() {
+        let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
+       test_ClearSpeak("ClearSpeak_Log", "LnAsNaturalLog ",expr,
+           "natural log x");
+    }
+
+     
+    #[test]
+    fn natural_log() {
+        let expr = "<math><mi>ln</mi><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></math>";
+       test_ClearSpeak("ClearSpeak_Log", "LnAsNaturalLog ",expr,
+           "the natural log of, open paren x plus y close paren");
+    }
+
 
     #[test]
     fn explicit_function_call_with_parens() {
@@ -255,6 +297,17 @@ mod functions {
              <mo>)</mo></mrow></mrow>
         </mrow></math>";
          test(expr, "1 half");
+     }
+ 
+     #[test]
+     fn test_none_pref() {
+        let expr = "<math>
+        <mi>log</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
+        <mo>+</mo>
+        <mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
+        </math>";
+        test_ClearSpeak("ClearSpeak_Functions", "None",expr,
+            "the log of, open paren x plus y close paren; plus, f times, open paren x plus y close paren");
      }
  
  

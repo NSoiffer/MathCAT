@@ -655,15 +655,45 @@ impl MyXPath {
 
 // Used for speech rules with "variables: ..."
 #[derive(Debug)]
-struct VariableDefinition{
-    name: String,  // name of variable
-    value: Yaml,   // value, typically a constant like "true" or "0", but could be "*/*[1]" to store some nodes   
+struct VariableDefinition {
+    name: String,       // name of variable
+    value: MyXPath,     // value, typically a constant like "true" or "0", but could be "*/*[1]" to store some nodes   
 }
 
 impl fmt::Display for VariableDefinition {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "{{name: {}, value: {}}}", self.name, yaml_to_string(&self.value, 0));
+        return write!(f, "{{name: {}, value: {}}}", self.name, self.value);
     }   
+}
+
+#[derive(Debug)]
+struct VariableDefinitions {
+    defs: Vec<VariableDefinition>
+}
+
+impl VariableDefinitions {
+    fn new() -> VariableDefinitions {
+        return VariableDefinitions{ defs: Vec::new() };
+    }
+
+    fn push(&mut self, var_def: VariableDefinition) {
+        self.defs.push(var_def);
+    }
+
+    fn len(&self) -> usize {
+        return self.defs.len();
+    }
+
+    fn evaluate_to_yaml(&self, mathml: &Element) -> Result<PreferenceHashMap> {
+        let mut new_prefs = HashMap::with_capacity(self.defs.len());
+        for var_def in &self.defs {
+            new_prefs.insert(
+                var_def.name.clone(),
+                value_to_yaml(&var_def.value.evaluate(mathml)?)
+                    .chain_err(|| format!("while evaluating variable '{}'", var_def.name))?);
+        };
+        return Ok( new_prefs );
+    }
 }
 
 
@@ -676,15 +706,15 @@ struct SpeechPattern {
     pattern_name: String,
     tag_name: String,
     file_name: String,
-    pattern: MyXPath,               // the xpath expr to attempt to match
-    var_defs: PreferenceHashMap,    // any variable definitions [can be and probably is an empty vector most of the time]
-    replacements: ReplacementArray, // the replacements in case there is a match
+    pattern: MyXPath,                     // the xpath expr to attempt to match
+    var_defs: VariableDefinitions,    // any variable definitions [can be and probably is an empty vector most of the time]
+    replacements: ReplacementArray,       // the replacements in case there is a match
 }
 
 impl fmt::Display for SpeechPattern {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "{{name: {}, tag: {}, pattern: {}, replacement: {}}}",
-                self.pattern_name, self.tag_name, self.pattern,
+        return write!(f, "{{name: {}, tag: {}, variables: {:?}, pattern: {}, replacement: {}}}",
+                self.pattern_name, self.tag_name, self.var_defs, self.pattern,
                 self.replacements.pretty_print_replacements());
     }
 }
@@ -797,7 +827,7 @@ struct Test {
     condition: MyXPath,
     then_part: ReplacementArray,
     else_part: Option<ReplacementArray>,
-    else_if_part: Option<Box<Test>>,
+    else_test_part: Option<Box<Test>>,
 }
 impl fmt::Display for Test {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -829,14 +859,14 @@ impl Test {
                   Suggestion: add 'then:' or if present, indent so it is contained in 'test'");
         }
         
-        // at most one of 'else:' or 'else_if:' should be present
+        // at most one of 'else:' or 'else_test:' should be present
         let else_part = &test["else"];
-        let else_if_part = &test["else_if"];
+        let else_test_part = &test["else_test"];
         let num_entries = test.as_hash().unwrap().len();
-        // error if more than 3 entries or exactly 3 entries and third entry isn't 'else' or 'else_if'
+        // error if more than 3 entries or exactly 3 entries and third entry isn't 'else' or 'else_test'
         if num_entries > 3 ||
-           (num_entries == 3 && else_part.is_badvalue() && else_if_part.is_badvalue()) {
-            bail!("A key other than 'if', 'then', 'else', or 'else_if' was found in 'test'");
+           (num_entries == 3 && else_part.is_badvalue() && else_test_part.is_badvalue()) {
+            bail!("A key other than 'if', 'then', 'else', or 'else_test' was found in 'test'");
         }
 
         return Ok( Box::new( Test {
@@ -847,10 +877,10 @@ impl Test {
                 } else {
                     Some( ReplacementArray::build(else_part).chain_err(|| "'else:'")? )
                 },
-            else_if_part: if else_if_part.is_badvalue() {
+            else_test_part: if else_test_part.is_badvalue() {
                     None
                 } else {
-                    Some( Test::build(else_if_part).chain_err(|| "'else_if:'")? )
+                    Some( Test::build(else_test_part).chain_err(|| "'else_test:'")? )
                 },
         } ) );
     }
@@ -863,8 +893,8 @@ impl Test {
             return self.then_part.replace(rules, mathml);
         } else if let Some(else_part) = &self.else_part {
             return else_part.replace(rules, mathml);
-        } else if let Some(else_if_part) = &self.else_if_part {
-            return else_if_part.replace(rules, mathml);
+        } else if let Some(else_test_part) = &self.else_test_part {
+            return else_test_part.replace(rules, mathml);
         } else {
             // println!("... replace returns '{}'", speech_string);
             return Ok("".to_string());
@@ -897,11 +927,16 @@ impl<'c> ContextStack<'static>{
         crate::xpath_functions::add_builtin_functions(&mut context);
         for (key, value) in var_defs {
             context.set_variable(key.as_str(), yaml_to_value(value));
+            // if let Some(str_value) = value.as_str() {
+            //     if str_value != "Auto" {
+            //         println!("Set {}='{}'", key.as_str(), str_value);
+            //     }
+            // }
         };
         return Rc::new( context );
     }
 
-    fn new_def(name_value_def: &Yaml) -> Result<(String, Yaml)> {
+    fn new_def(name_value_def: &Yaml) -> Result<(String, MyXPath)> {
         match name_value_def.as_hash() {
             Some(map) => {
                 if map.len() != 1 {
@@ -917,23 +952,23 @@ impl<'c> ContextStack<'static>{
                     _ => bail!("definition value is not a string, boolean, or number. Found {}",
                             yaml_to_string(value, 1) )
                 };
-                return Ok( (name, value.to_owned()) );
+                return Ok( (name, MyXPath::build(value)? ) );
             },
             None => bail!("definition is not a key/value pair. Found {}",
                             yaml_to_string(name_value_def, 1) )
         }
     }
 
-    fn build(defs: &Yaml) -> Result<PreferenceHashMap> {
+    fn build(defs: &Yaml) -> Result<VariableDefinitions> {
         if defs.is_badvalue() {
-            return Ok( HashMap::with_capacity(0) );
+            return Ok( VariableDefinitions::new() );
         };
         if defs.is_array() {
-            let mut definitions = HashMap::new();
+            let mut definitions = VariableDefinitions::new();
             for def in defs.as_vec().unwrap() {
                 let (name, value) = ContextStack::new_def(def)
                         .chain_err(|| "definition of 'variables'")?;
-                definitions.insert(name, value);
+                definitions.push( VariableDefinition{ name, value} );
             };
             return Ok (definitions );
         }
@@ -941,8 +976,9 @@ impl<'c> ContextStack<'static>{
                 yaml_to_string(defs, 1) );
     }
 
-    fn push(&mut self, var_defs: &PreferenceHashMap) {
-        self.new_defs.push(var_defs.clone());       // do first so they are included in context
+    fn push(&mut self, new_prefs: &PreferenceHashMap) {
+        // evaluate the XPath's into 
+        self.new_defs.push(new_prefs.clone());                  // do first so they are included in context
         let mut context  = Context::new();
         context.set_namespace("m", "http://www.w3.org/1998/Math/MathML");
         crate::xpath_functions::add_builtin_functions(&mut context);
@@ -976,6 +1012,15 @@ fn yaml_to_value<'a, 'b>(yaml: &'a Yaml) -> Value<'b> {
             Value::String("".to_string())
         },
     }
+}
+
+fn value_to_yaml<'a, 'b>(value: &'a Value) -> Result<Yaml> {
+    return Ok( match value {
+        Value::String(s) => Yaml::String(s.clone()),
+        Value::Boolean(b)  => Yaml::Boolean(*b),
+        Value::Number(n) => Yaml::Real(n.to_string()),
+        Value::Nodeset(_)=> bail!("value_to_yaml: nodes found where string, number, or boolean expected"),
+    })
 }
 
 
@@ -1197,23 +1242,18 @@ impl SpeechRules {
                 for pattern in rule_vector {
                     // println!("Pattern: {}", pattern);
                     if pattern.is_match(mathml)
-                        .chain_err(||
-                            format!(
-                                "error during pattern match using: \"{}\" for \"{}\".\n\
-                                Pattern is \n{}\nMathML for the match:\n\
-                                {}\
-                                The patterns are in {}.\n",
-                                pattern.pattern_name, pattern.tag_name,
-                                pattern.pattern,
-                                pretty_print::mml_to_string(mathml),
-                                pattern.file_name
-                            )
-                    )? {
+                            .chain_err(|| error_string(pattern, mathml) )? {
                         if pattern.var_defs.len() > 0 {
                             CONTEXT_STACK.with(|context_stack| {
-                                let mut context = context_stack.borrow_mut();
-                                context.push(&pattern.var_defs);
-                            });
+                                match pattern.var_defs.evaluate_to_yaml(mathml).chain_err(|| error_string(pattern, mathml)) {
+                                    Err(e) => Err(e),
+                                    Ok(prefs) => {
+                                        let mut context = context_stack.borrow_mut();
+                                        context.push(&prefs);
+                                        Ok( () )     
+                                    },
+                                }                      
+                            })?
                         }
                         let result = pattern.replacements.replace(self, mathml);
                         if pattern.var_defs.len() > 0 {
@@ -1250,6 +1290,19 @@ impl SpeechRules {
         } else {
             // FIX: handle error appropriately
             bail!("\nNo match found!\nMissing patterns in {} or bad MathML.\n{}", file_name, crate::pretty_print::mml_to_string(mathml)); 
+        }
+
+        fn error_string(pattern: &Box<SpeechPattern>, mathml: &Element) -> String {
+            return format!(
+                "error during pattern match using: \"{}\" for \"{}\".\n\
+                Pattern is \n{}\nMathML for the match:\n\
+                {}\
+                The patterns are in {}.\n",
+                pattern.pattern_name, pattern.tag_name,
+                pattern.pattern,
+                pretty_print::mml_to_string(mathml),
+                pattern.file_name
+            );
         }
     }
     
