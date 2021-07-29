@@ -848,7 +848,7 @@ mod tests {
         .expect("failed to parse XML");
         let mathml = get_element(&package);
         trim_element(&mathml);
-        assert!(IsNode::is_simple(&mathml), message);
+        assert!(IsNode::is_simple(&mathml), "{}", message);
     }
     fn test_is_not_simple(message: &'static str, mathml_str: &'static str) {
 		// this forces initialization
@@ -857,7 +857,7 @@ mod tests {
         .expect("failed to parse XML");
         let mathml = get_element(&package);
         trim_element(&mathml);
-        assert!(!IsNode::is_simple(&mathml), message);
+        assert!(!IsNode::is_simple(&mathml), "{}", message);
     }
     #[test]
     fn is_simple() {
