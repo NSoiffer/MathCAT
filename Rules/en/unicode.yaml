@@ -1194,7 +1194,7 @@
          if: "$Verbosity!='terse'"
          then: {t: is}
      - t: proportional to
- - "∞": [t: infinity]                            # 0x221e
+ - "∞": [t: "infinity"]                            # 0x221e
  - "∟": [t: right angle]                         # 0x221f
  - "∠": [t: angle]                               # 0x2220
  - "∡": [t: measured angle]                      # 0x2221
