@@ -20,15 +20,15 @@
  - "&": [t: ampersand]                           # 0x26
  - "'": [t: apostrophe]                          # 0x27
  - "(":                                          # 0x28
-    - test: 
-        if: "$Verbosity='terse'"
-        then: {t: open}
-        else: {t: open paren}
+    - test:
+        if: $SpeechStyle = 'ClearSpeak'
+        then: [test: {if: "$Verbosity='terse'", then: {t: open}, else: {t: open paren}}]
+        else: [t: left paren]                            
  - ")":                                          # 0x29
-    - test: 
-        if: "$Verbosity='terse'"
-        then: {t: close}
-        else: {t: close paren}
+    - test:
+        if: $SpeechStyle = 'ClearSpeak'
+        then: [test: {if: "$Verbosity='terse'", then: {t: close}, else: {t: close paren}}]
+        else: [t: right paren]                            
 
  - "*": [t: times]                               # 0x2a
  - "+": [t: plus]                                # 0x2b
@@ -51,15 +51,31 @@
      - t: greater than
  - "?": [t: question mark]                       # 0x3f
  - "@": [t: at sign]                             # 0x40
- - "[": [t: left bracket]                        # 0x5b
+ - "[":                                          # 0x5b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak'
+        then: [t: open bracket]
+        else: [t: left bracket]                            
  - "\\": [t: back slash]                         # 0x5c
- - "]": [t: right bracket]                       # 0x5d
+ - "]":                                          # 0x5d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak'
+        then: [t: close bracket]
+        else: [t: right bracket]
  - "^": [t: to the]                              # 0x5e
  - "_": [t: under bar]                           # 0x5f
  - "`": [t: grave accent]                        # 0x60
- - "{": [t: left brace]                          # 0x7b
+ - "{":                                          # 0x7b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak'
+        then: [t: open brace]
+        else: [t: left brace]                            
  - "|": [t: vertical line]                       # 0x7c
- - "}": [t: right brace]                         # 0x7d
+ - "}":                                          # 0x7d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak'
+        then: [t: close brace]
+        else: [t: right brace]                            
  - "~": [t: tilde]                               # 0x7e
  - " ": [t: ""]                                  # 0xa0
  - "¢": [t: cents]                               # 0xa2
