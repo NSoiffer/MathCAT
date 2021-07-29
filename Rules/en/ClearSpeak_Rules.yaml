@@ -2,37 +2,6 @@
 # Status:
 # ClearSpeak Preferences Implemented:  Roots, Trig, Log, Functions
 -
-   name: absolute-value
-   tag: mrow
-   match: "count(*)=3 and not(*[2][self::m:mtable]) and IsBracketed(., '|', '|')"
-   replace: 
-      - test: 
-         if: "$Verbosity!='terse'"
-         then: {t: the}
-      - t: absolute value of 
-      - x: "*[2]"
--
-   name: open-interval
-   tag: mrow
-   match: "count(*)=3 and IsBracketed(., '(', ')', 'true')"
-   replace: 
-    - t: the interval from
-    - x: "*[2]/*[1]"
-    - t: to
-    - x: "*[2]/*[3]"
-    - t: not including
-    - x: "*[2]/*[1]"
-    - t: or
-    - x: "*[2]/*[3]"
--
-   name: binomial-frac
-   tag: mrow
-   match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac] and *[2][@linethickness=0]"
-   replace: 
-    - x: "*[2]/*[1]"
-    - t: choose
-    - x: "*[2]/*[2]"
--
    name: complex-nums
    tag: mi
    match: "text()='ℂ'"
@@ -506,8 +475,80 @@
     - x: "*[3]"
     - t: of
   
-  
-  
+#
+# Some rules on mrows
+#
+-
+   name: absolute-value
+   tag: mrow
+   match: "count(*)=3 and not(*[2][self::m:mtable]) and IsBracketed(., '|', '|')"
+   replace: 
+   - test: 
+      if: "$Verbosity!='terse'"
+      then: {t: the}
+   - t: absolute value of 
+   - x: "*[2]"
+-
+# intervals are controlled by a ClearSpeak Preference -- parens/brackets don't have to match, so we avoid IsBracketed
+# alternatively, we could have four (or ten) rules, but there is a lot of duplication if we do that
+# this one rule handles all ten cases listed as part $ClearSpeak_Paren = 'Interval'
+# note that *[2] is an mrow with X, ",", Y, so getting X or Y is a double index
+   name: intervals
+   variables:
+   - is_intervals_start_infinity: "*[1][self::m:mo][text()='∞'] or *[1][self::m:mrow][text()='+∞' or text()='-∞']"
+   - is_intervals_end_infinity: "*[3][self::m:mo][text()='∞'] or *[3][self::m:mrow][text()='+∞' or text()='-∞']"
+   tag: mrow
+   match:
+   - "count(*)=3 and $ClearSpeak_Paren = 'Interval' and"
+   - "*[1][text()='(' or text()='['] and *[3][text()=')' or text()=']']"
+   replace: 
+   - t: the interval from
+   - x: "*[2]/*[1]"
+   - t: to
+   - x: "*[2]/*[3]"
+   - pause: short
+   # logic to deal with [not] arg #1
+   - test:
+      if: "*[1][text()='(' and not($is_intervals_start_infinity)]"
+      then: [t: "not"]
+   - test:
+      if: "not($is_intervals_start_infinity)"
+      then:
+         - t: "including"
+         - x: "*[2]/*[1]"
+   # some ugly logic dealing with connectives: or, but, but, and
+   - test:
+      if: "not($is_intervals_start_infinity or $is_intervals_end_infinity)"
+      then:
+         - test:
+            if: "IsBracketed(., '(', ')')"
+            then: [t: or]
+            else_test:
+               if: "IsBracketed(., '[', ']')"
+               then: [t: and]
+               else: [t: but]
+   # onto the [not] [including]... part
+   - test:
+      if: "*[3][text()=')'] and not($is_intervals_end_infinity) and not($is_intervals_start_infinity) and *[1][text()='[']"
+      then: [t: "not"]
+   # finally generate arg #2 (if required)
+   - test:
+      if: "not($is_intervals_end_infinity)"
+      then:
+         - test:
+            if: "IsBracketed(., '(', ']') or IsBracketed(., '[', ')')"
+            then: [t: "including"]
+         - x: "*[2]/*[3]"
+
+-
+   name: binomial-frac
+   tag: mrow
+   match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac] and *[2][@linethickness=0]"
+   replace: 
+   - x: "*[2]/*[1]"
+   - t: choose
+   - x: "*[2]/*[2]"
+
 #
 # Matrix/Determinant rules
 # matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
@@ -803,7 +844,7 @@
       - "*[2][self::m:mo][text()='\u2061']"
    replace:
       - test:
-         if: "DEBUG($log_is_simple)"
+         if: "$log_is_simple"
          then:
             test:
                if: "*[1][text()='log']"
@@ -845,21 +886,39 @@
    tag: mo
    match:
       - "text()='\u2061' and $ClearSpeak_Functions = 'None' and"
-      - not(preceding-sibling::*[1][IsNode(., 'trig_name')])
-   replace: [t: times]
+      - not(preceding-sibling::*[1][IsNode(., 'trig_name')]) # Functions=None does not apply to "trig" functions
+   replace: 
+      test:
+         if: "$ClearSpeak_ImpliedTimes = 'None'"
+         then: [t: ""]
+         else: [t: times]
 
+-
+   name: no-times
+   tag: mo
+   match:
+      # Note: this rule is also part of the paren rule so that the parens speak
+      - "text()='\u2062' and $ClearSpeak_ImpliedTimes = 'None'"
+   replace:
+      - t: ""
+   
 -
    name: times
    tag: mo
    match:
+      # say "times" when invisible times is followed by parens or a superscript that has a base with parens or "|"s
       - "text()='\u2062' and ("
+      - "  $ClearSpeak_ImpliedTimes = 'MoreImpliedTimes'"
+      - " or "
       - "  following-sibling::*[1][" 
       - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|') or "  # followed by parens
       - "    ( (self::m:msup or self::m:msub or self::m:msubsup) and "                                # followed by msup, etc.
       - "       *[1][self::m:mrow][IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|')]"  # base has parens
       - "    )"
       - "  ]"
-      - " or "
+       # other possibility is the preceding element has parens (but not the following)
+       # this is not mentioned in the ClearSpeak rules or examples but seems like it should say "times". E.g, |x| y
+      - " or "  
       - "  preceding-sibling::*[1][" 
       - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|')]"  # followed by parens
       - " )"
@@ -872,6 +931,10 @@
    match:
       - "parent::*[not(self::m:msup) and not(self::m:msub) and not(self::m:msubsup)] and "
       - "( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) and "
+      - "not( $ClearSpeak_Functions = 'None' and "
+      - "     (preceding-sibling::*[1][text()='\u2061'] or following-sibling::*[1][text()='\u2061']) ) and "
+      - "not( $ClearSpeak_ImpliedTimes = 'None' and "
+      - "     (preceding-sibling::*[1][text()='\u2062'] or following-sibling::*[1][text()='\u2062']) ) and "
       - "( IsNode(*[2], 'simple')  )"
          # missing clause: 'a positive fraction that is spoken as an ordinal
          #   (either by the Ordinal preference or by the default rules_'

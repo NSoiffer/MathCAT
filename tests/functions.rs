@@ -3,9 +3,10 @@ extern crate lazy_static;
 
 #[cfg(test)]
 /// Tests for:
-///   functions including trig functions, logs, and functions to powers
-///   implied times/functional call and explicit times/function call
-///   silent parens
+/// *  functions including trig functions, logs, and functions to powers
+/// *  implied times/functional call and explicit times/function call
+/// *  parens
+/// These are all intertwined, so they are in one file
 mod functions {
     extern crate regex;
     use regex::Regex;
@@ -27,6 +28,18 @@ mod functions {
             let mut rules = rules.borrow_mut();
             let pref_manager = rules.pref_manager.as_mut();
             pref_manager.set_user_prefs(pref_name, pref_value);
+        });
+        assert_eq!(speech, strip_spaces(libmathcat::interface::speak_mathml(mathml)));
+    }
+
+    #[allow(non_snake_case)]
+    fn test_ClearSpeak_prefs(prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
+        libmathcat::speech::SPEECH_RULES.with(|rules| {
+            let mut rules = rules.borrow_mut();
+            let pref_manager = rules.pref_manager.as_mut();
+            for (pref_name, pref_value) in prefs {
+                pref_manager.set_user_prefs(pref_name, pref_value);
+            }
         });
         assert_eq!(speech, strip_spaces(libmathcat::interface::speak_mathml(mathml)));
     }
@@ -187,6 +200,26 @@ mod functions {
         test(expr, "t x");
     }
 
+ 
+    #[test]
+    fn test_functions_none_pref() {
+       let expr = "<math>
+       <mi>log</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
+       <mo>+</mo>
+       <mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
+       </math>";
+       test_ClearSpeak("ClearSpeak_Functions", "None",expr,
+           "the log of, open paren x plus y close paren; plus, f times, open paren x plus y close paren");
+    }
+
+    #[test]
+    fn test_functions_none_pref_multiple_args() {
+       let expr = "<math>
+         <mi>B</mi> <mrow><mo>(</mo> <mrow> <mn>2</mn><mo>,</mo><mn>6</mn></mrow> <mo>)</mo></mrow>
+       </math>";
+       test_ClearSpeak("ClearSpeak_Functions", "None",expr,
+           "B times, open paren 2 comma 6 close paren");
+    }
 
 
     /*
@@ -225,6 +258,60 @@ mod functions {
             <msqrt> <mrow>  <mi>a</mi><mi>b</mi></mrow> </msqrt>
           </mrow></math>";
         test(expr, "the square root of eigh; the square root of b; equals, the square root of eigh b,");
+    }
+ 
+    #[test]
+    fn more_implied_times() {
+       let expr = "<math><mrow>
+       <mrow>
+        <msup>
+         <mrow>
+          <mrow><mo>(</mo>
+           <mrow> <mn>2</mn><mi>x</mi></mrow>
+          <mo>)</mo></mrow></mrow>
+         <mn>2</mn>
+        </msup>
+        </mrow>
+     </mrow></math>";
+     test_ClearSpeak("ClearSpeak_ImpliedTimes", "MoreImpliedTimes",expr,
+           "open paren 2 times x close paren squared");
+    }
+
+    #[test]
+    fn explicit_times_more_implied_times() {
+        let expr = "<math><mrow><mi>t</mi><mo>&#x2062;</mo><mrow><mi>x</mi></mrow></mrow></math>";
+        test_ClearSpeak("ClearSpeak_ImpliedTimes", "MoreImpliedTimes",expr, "t times x");
+    }
+
+    #[test]
+    fn explicit_times_none_simple_right() {
+        let expr = "<math><mn>2</mn><mo>[</mo><mn>3</mn> <mo>]</mo></math>";
+        test_ClearSpeak("ClearSpeak_ImpliedTimes", "None",
+          expr, "2 open bracket 3 close bracket");
+    }
+
+    #[test]
+    fn explicit_times_none_simple_left() {
+        let expr = "<math><mo>(</mo><mn>2</mn><mo>&#x2212;</mo><mn>1</mn><mo>)</mo><mi>x</mi></math>";
+        test_ClearSpeak("ClearSpeak_ImpliedTimes", "None",
+          expr, "open paren 2 minus 1 close paren; x");
+    }
+
+    #[test]
+    fn explicit_times_none_superscript() {
+        let expr = "<math> 
+        <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><msup>
+   <mi>x</mi>
+   <mn>2</mn>
+  </msup>
+  <mrow><mo>(</mo>
+   <mrow>
+    <mi>x</mi><mo>+</mo><mn>1</mn></mrow>
+  <mo>)</mo></mrow>
+      </math>";
+        test_ClearSpeak_prefs(
+            vec![("ClearSpeak_ImpliedTimes", "None"), ("ClearSpeak_Functions", "None")],
+          expr, "f open paren x close paren, equals, x squared, open paren x plus 1 close paren");
     }
 
     /*
@@ -298,17 +385,28 @@ mod functions {
         </mrow></math>";
          test(expr, "1 half");
      }
+
+     // a bunch of tests for the ten types of intervals in ClearSpeak
+     #[test]
+     fn parens_interval_open_open() {
+         let expr = "<math> 
+         <mrow><mo>(</mo>
+            <mrow> <mi>c</mi><mo>,</mo><mtext>&#x2009;</mtext><mi>d</mi></mrow>
+           <mo>)</mo></mrow>
+        </math>";
+        test_ClearSpeak("ClearSpeak_Paren", "Interval ",expr,
+        "the interval from c to d, not including c or d");
+  }
  
      #[test]
-     fn test_none_pref() {
-        let expr = "<math>
-        <mi>log</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
-        <mo>+</mo>
-        <mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
+     fn parens_interval_closed_open() {
+         let expr = "<math> 
+         <mrow><mo>[</mo>
+            <mrow> <mi>c</mi><mo>,</mo><mtext>&#x2009;</mtext><mi>d</mi></mrow>
+           <mo>)</mo></mrow>
         </math>";
-        test_ClearSpeak("ClearSpeak_Functions", "None",expr,
-            "the log of, open paren x plus y close paren; plus, f times, open paren x plus y close paren");
-     }
+        test_ClearSpeak("ClearSpeak_Paren", "Interval ",expr,
+        "the interval from c to d, including c but not including d");
+  }
  
- 
-}
+ }
