@@ -18,7 +18,7 @@
       Trig: Auto                # TrigInverse, ArcTrig
       Log: Auto                 # LnAsNaturalLog 
       ImpliedTimes: Auto        # MoreImpliedTimes , None
-      Parentheses: Auto         # Speak, SpeakNestingLevel, Silent, CoordPoint, Interval
+      Paren: Auto               # Speak, SpeakNestingLevel, Silent, CoordPoint, Interval
       Matrix: Auto              # SpeakColNum, SilentColNum, EndMatrix, Vector, EndVector, Combinatorics
       MultiLineLabel: Auto      # Case, Constraint, Equation, None, Row, Step 
       MultiLineOverview: Auto   # None, 
