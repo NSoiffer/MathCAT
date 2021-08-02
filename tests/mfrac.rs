@@ -213,4 +213,15 @@ mod mfrac {
                       ";
         test(expr, "the fraction with numerator; the fraction with numerator; n plus 10; and denominator n; and denominator 2 over n;");
     }
+
+    #[test]
+    fn binomial() {
+        let expr = "<math>
+                        <mn>2</mn>
+                        <mo>(</mo>
+                        <mfrac linethickness='0'> <mn>7</mn> <mn>3</mn> </mfrac>
+                        <mo>)</mo>
+                    </math>";
+        test(expr, "2 times 7 choose 3");
+    }
 }
