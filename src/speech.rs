@@ -510,49 +510,13 @@ impl MyXPath {
     fn compile_xpath(xpath: &str) -> Result<XPath> {
         let factory = Factory::new();
         //let xpath = convert_hex(xpath);
-        let xpath_with_debug_info = add_debug_string_arg(xpath)?;
+        let xpath_with_debug_info = MyXPath::add_debug_string_arg(xpath)?;
         let xpath = factory.build(&xpath_with_debug_info)
                         .chain_err(|| format!(
                             "Could not compile XPath for pattern:\n{}{}",
                             &xpath, more_details(&xpath)))?;
         return Ok(xpath.unwrap());
 
-        fn add_debug_string_arg(xpath: &str) -> Result<String> {
-            // Find all the DEBUG(...) commands in 'xpath' and adds a string argument.
-            // The DEBUG function that is used internally takes two arguments, the second one being a string version of the DEBUG arg.
-            //   Being a string, any quotes need to be escaped, and DEBUGs inside of DEBUGs need more escaping.
-            //   This is done via recursive calls to this function.
-            let debug_start = xpath.find("DEBUG(");
-            if debug_start.is_none() {
-                return Ok( xpath.to_string() );
-            }
-            let debug_start = debug_start.unwrap();
-            let string_start = xpath[..debug_start+6].to_string();   // includes "DEBUG("
-            let mut count = 1;  // open/close count -- starting after "(" in "DEBUG("
-            let mut remainder: &str = &xpath[debug_start+6..];
-             
-            loop {
-                let next = remainder.find(|c| c=='(' || c==')');
-                match next {
-                    None => bail!("Did not find closing paren for DEBUG in\n{}", xpath),
-                    Some(i_paren) => {
-                        if remainder.as_bytes()[i_paren] == b'(' {
-                            count += 1;
-                        } else {            // must be ')'
-                            count -= 1;
-                            if count == 0 {
-                                let i_end = xpath.len() - remainder.len() + i_paren; 
-                                let escaped_arg = &xpath[debug_start+6..i_end].to_string().replace("\"", "\\\"");
-                                let contents = add_debug_string_arg(&xpath[debug_start+6..i_end])?;
-                                return Ok( string_start + &contents + ", \"" + &escaped_arg + "\" "
-                                             + &add_debug_string_arg(&xpath[i_end..])? );
-                            }
-                        }
-                        remainder = &remainder[i_paren+1..];
-                    }
-                }
-            }
-        }
         
         fn more_details(xpath: &str) -> String {
             // try to give a better error message by counting [], (), 's, and "s
@@ -604,6 +568,51 @@ impl MyXPath {
         }
     }
 
+    fn add_debug_string_arg(xpath: &str) -> Result<String> {
+        // lazy_static! {
+        //     static ref OPEN_OR_CLOSE_PAREN: Regex = Regex::new("^['\"][()]").unwrap();    // match paren that doesn't follow a quote
+        // }
+        // Find all the DEBUG(...) commands in 'xpath' and adds a string argument.
+        // The DEBUG function that is used internally takes two arguments, the second one being a string version of the DEBUG arg.
+        //   Being a string, any quotes need to be escaped, and DEBUGs inside of DEBUGs need more escaping.
+        //   This is done via recursive calls to this function.
+        // FIX: this doesn't handle parens in strings correctly -- it only catches the common case of quoted parens
+        // FIX: to do this right, one has to be careful about escape chars, so it gets ugly for nesting
+        let debug_start = xpath.find("DEBUG(");
+        if debug_start.is_none() {
+            return Ok( xpath.to_string() );
+        }
+        let debug_start = debug_start.unwrap();
+        let string_start = xpath[..debug_start+6].to_string();   // includes "DEBUG("
+        let mut count = 1;  // open/close count -- starting after "(" in "DEBUG("
+        let mut remainder: &str = &xpath[debug_start+6..];
+            
+        loop {
+            let next = remainder.find(|c| c=='(' || c==')');
+            match next {
+                None => bail!("Did not find closing paren for DEBUG in\n{}", xpath),
+                Some(i_paren) => {
+                    if i_paren == 0 || remainder.as_bytes()[i_paren-1] != b'\'' {
+                        if remainder.as_bytes()[i_paren] == b'(' {
+                            // if the paren is inside of quote (' or "), don't count it
+                            // FIX: this could be on a non-char boundary
+                            count += 1;
+                        } else {            // must be ')'
+                            count -= 1;
+                            if count == 0 {
+                                let i_end = xpath.len() - remainder.len() + i_paren; 
+                                let escaped_arg = &xpath[debug_start+6..i_end].to_string().replace("\"", "\\\"");
+                                let contents = MyXPath::add_debug_string_arg(&xpath[debug_start+6..i_end])?;
+                                return Ok( string_start + &contents + ", \"" + &escaped_arg + "\" "
+                                                + &MyXPath::add_debug_string_arg(&xpath[i_end..])? );
+                            }
+                        }    
+                    }
+                    remainder = &remainder[i_paren+1..];
+                }
+            }
+        }
+    }
 
     fn is_true(&self, mathml: &Element) -> Result<bool> {
         // return true if there is no condition or if the condition evaluates to true
@@ -1019,8 +1028,7 @@ fn value_to_yaml<'a, 'b>(value: &'a Value) -> Result<Yaml> {
         Value::String(s) => Yaml::String(s.clone()),
         Value::Boolean(b)  => Yaml::Boolean(*b),
         Value::Number(n) => Yaml::Real(n.to_string()),
-        Value::Nodeset(_)=> bail!("value_to_yaml: nodes found where string, number, or boolean expected"),
-    })
+        Value::Nodeset(nodes) => Yaml::Boolean(nodes.size() > 0),    })
 }
 
 
@@ -1387,4 +1395,45 @@ mod tests {
         assert_eq!(speech_pattern.replacements.replacements.len(), 1, "\nreplacement failure");
         assert_eq!(speech_pattern.replacements.replacements[0].to_string(), r#"{x: "./*"}"#, "\nreplacement failure");
     }
+
+    #[test]
+    fn test_debug_no_debug() {
+        let str = r#"*[2]/*[3][text()='3']"#;
+        let result = MyXPath::add_debug_string_arg(str);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), str);
+    }
+
+    #[test]
+    fn test_debug_no_debug_with_quote() {
+        let str = r#"*[2]/*[3][text()='(']"#;
+        let result = MyXPath::add_debug_string_arg(str);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), str);
+    }
+
+    #[test]
+    fn test_debug_no_quoted_paren() {
+        let str = r#"DEBUG(*[2]/*[3][text()='3'])"#;
+        let result = MyXPath::add_debug_string_arg(str);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), r#"DEBUG(*[2]/*[3][text()='3'], "*[2]/*[3][text()='3']" )"#);
+    }
+
+    #[test]
+    fn test_debug_quoted_paren() {
+        let str = r#"DEBUG(*[2]/*[3][text()='('])"#;
+        let result = MyXPath::add_debug_string_arg(str);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), r#"DEBUG(*[2]/*[3][text()='('], "*[2]/*[3][text()='(']" )"#);
+    }
+
+    #[test]
+    fn test_nested_debug_quoted_paren() {
+        let str = r#"DEBUG(*[2]/*[3][DEBUG(text()='(')])"#;
+        let result = MyXPath::add_debug_string_arg(str);
+        assert!(result.is_ok());
+        assert_eq!(result.unwrap(), r#"DEBUG(*[2]/*[3][DEBUG(text()='(')], "DEBUG(*[2]/*[3][DEBUG(text()='(')], \"text()='(')]\")"#);
+    }
+
 }
