@@ -174,14 +174,17 @@
 -
    name: negative
    tag: mrow
-   match: "count(*)=2 and *[1][self::m:mo][text()='-']"
+   match: "count(*)=2 and *[1][self::m:mo][text()='-' or text()='+']"
    replace:
       - test:
          if:
             - "*[2][self::m:msqrt or self::m:mroot] and"
             - "($ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd')"
          then: {t: ""}
-         else: {t: negative}
+         else_test:
+            if: "*[1][text()='-']"
+            then: {t: negative}
+            else: {t: positive}
       - x: "*[2]"
                
 # Fraction rules
@@ -495,8 +498,8 @@
 # note that *[2] is an mrow with X, ",", Y, so getting X or Y is a double index
    name: intervals
    variables:
-   - is_intervals_start_infinity: "*[1][self::m:mo][text()='∞'] or *[1][self::m:mrow][text()='+∞' or text()='-∞']"
-   - is_intervals_end_infinity: "*[3][self::m:mo][text()='∞'] or *[3][self::m:mrow][text()='+∞' or text()='-∞']"
+   - is_intervals_start_infinity: "*[2]/*[1][*[1][text()='-'] and *[2][text()='∞']]"
+   - is_intervals_end_infinity: "*[2]/*[3][text()='∞'or (*[1][text()='+'] and *[2][text()='∞'])]"
    tag: mrow
    match:
    - "count(*)=3 and $ClearSpeak_Paren = 'Interval' and"
@@ -509,7 +512,7 @@
    - pause: short
    # logic to deal with [not] arg #1
    - test:
-      if: "*[1][text()='(' and not($is_intervals_start_infinity)]"
+      if: "*[1][text()='('] and not($is_intervals_start_infinity)"
       then: [t: "not"]
    - test:
       if: "not($is_intervals_start_infinity)"
@@ -529,14 +532,14 @@
                else: [t: but]
    # onto the [not] [including]... part
    - test:
-      if: "*[3][text()=')'] and not($is_intervals_end_infinity) and not($is_intervals_start_infinity) and *[1][text()='[']"
+      if: "DEBUG(*[3][text()=')']) and not($is_intervals_end_infinity) and not(not($is_intervals_start_infinity) and IsBracketed(., '(', ')'))"
       then: [t: "not"]
    # finally generate arg #2 (if required)
    - test:
       if: "not($is_intervals_end_infinity)"
       then:
          - test:
-            if: "IsBracketed(., '(', ']') or IsBracketed(., '[', ')')"
+            if: "not((not($is_intervals_start_infinity) and IsBracketed(., '(', ')')) or IsBracketed(., '[', ']')) and not($is_intervals_end_infinity)"
             then: [t: "including"]
          - x: "*[2]/*[3]"
 
@@ -588,11 +591,20 @@
     - x: count(*[2]/*)
     - t: by 1 column
     - test:
-        if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+        if: "ClearSpeak_Matrix = 'Vector'"    # just need to check the first bracket since we know it must be (, [, or |
         then: {t: determinant}
         else: {t: matrix}
     - pause: long
     - x: "*[2]/*/*"
+    - test:
+        if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
+        then:
+         - t: "end"
+         - test:
+            if: $ClearSpeak_Matrix = 'EndMatrix'
+            then: {t: matrix}
+            else: {t: vector}
+
 -
   name: default-column-matrix
   tag: mrow
@@ -611,11 +623,19 @@
         else: {t: matrix}
     - pause: long
     - x: "*[2]/*"     # select the rows (mtr)
-  
+    - test:
+        if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
+        then:
+         - t: "end"
+         - test:
+            if: $ClearSpeak_Matrix = 'EndMatrix'
+            then: {t: matrix}
+            else: {t: vector}
+ 
 -
   name: 1x2-or-3-matrix
   tag: mrow
-  variables: [IsColumnSilent: true()]
+  variables: [IsColumnSilent: not($ClearSpeak_Matrix = 'SpeakColNum')]
   match:
     - "*[2][self::m:mtable] and"
     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
@@ -632,11 +652,19 @@
         else: {t: matrix}
     - pause: long
     - x: "*[2]/*/*"
+    - test:
+        if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
+        then:
+         - t: "end"
+         - test:
+            if: $ClearSpeak_Matrix = 'EndMatrix'
+            then: {t: matrix}
+            else: {t: vector}
  
 -
   name: default-row-matrix
   tag: mrow
-  variables: [IsColumnSilent: false()]
+  variables: [IsColumnSilent: "$ClearSpeak_Matrix = 'SilentColNum'"]
   match:
     - "*[2][self::m:mtable] and"
     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
@@ -654,7 +682,15 @@
     - t: column 1
     - pause: medium
     - x: "*[2]/*/*"     # select the cols (mtd)
-  
+    - test:
+        if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
+        then:
+         - t: "end"
+         - test:
+            if: $ClearSpeak_Matrix = 'EndMatrix'
+            then: {t: matrix}
+            else: {t: vector}
+
 -
   name: simple-small-matrix
   tag: mrow
@@ -663,7 +699,7 @@
     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
     - (count(*[2]/*)<=3 and count(*[2]/*[1]/*)<=3) and       # no bigger than a 3x3 matrix
     - IsNode(*[2]/*/*/*,'simple')         # IsNode() returns true if all the nodes are simple
-  variables: [IsColumnSilent: true()]
+  variables: [IsColumnSilent: not($ClearSpeak_Matrix = 'SpeakColNum')]
   replace: 
     - t: the
     - x: count(*[2]/*)
@@ -675,11 +711,19 @@
         else: {t: matrix}
     - pause: long
     - x: "*[2]/*"
+    - test:
+       if: "$ClearSpeak_Matrix = 'EndMatrix'"
+       then:
+         - t: end
+         - test:
+            if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+            then: {t: determinant}
+            else: {t: matrix}
  
 -
    name: default-matrix
    tag: mrow
-   variables: [IsColumnSilent: false()]
+   variables: [IsColumnSilent: $ClearSpeak_Matrix = 'SilentColNum']
    match:
    - "*[2][self::m:mtable] and"
    - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
@@ -694,7 +738,14 @@
         else: {t: matrix}
     - pause: long
     - x: "*[2]/*"
-
+    - test:
+       if: "$ClearSpeak_Matrix = 'EndMatrix'"
+       then:
+         - t: end
+         - test:
+            if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+            then: {t: determinant}
+            else: {t: matrix}
 -
   name: default
   tag: mtr
