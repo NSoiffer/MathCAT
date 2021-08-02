@@ -386,27 +386,119 @@ mod functions {
          test(expr, "1 half");
      }
 
-     // a bunch of tests for the ten types of intervals in ClearSpeak
+
+     // Tests for the ten types of intervals in ClearSpeak
      #[test]
      fn parens_interval_open_open() {
          let expr = "<math> 
          <mrow><mo>(</mo>
-            <mrow> <mi>c</mi><mo>,</mo><mtext>&#x2009;</mtext><mi>d</mi></mrow>
+            <mrow> <mi>c</mi><mo>,</mo><mi>d</mi></mrow>
            <mo>)</mo></mrow>
         </math>";
         test_ClearSpeak("ClearSpeak_Paren", "Interval ",expr,
         "the interval from c to d, not including c or d");
   }
- 
-     #[test]
+
+  #[test]
      fn parens_interval_closed_open() {
          let expr = "<math> 
          <mrow><mo>[</mo>
-            <mrow> <mi>c</mi><mo>,</mo><mtext>&#x2009;</mtext><mi>d</mi></mrow>
+            <mrow> <mi>c</mi><mo>,</mo><mi>d</mi></mrow>
            <mo>)</mo></mrow>
         </math>";
         test_ClearSpeak("ClearSpeak_Paren", "Interval ",expr,
         "the interval from c to d, including c but not including d");
   }
  
- }
+ 
+  #[test]
+  fn parens_interval_open_closed() {
+      let expr = "<math> 
+      <mrow><mo>(</mo>
+         <mrow> <mi>c</mi><mo>,</mo><mi>d</mi></mrow>
+        <mo>]</mo></mrow>
+     </math>";
+     test_ClearSpeak("ClearSpeak_Paren", "Interval ",expr,
+     "the interval from c to d, not including c but including d");
+}
+  
+
+    #[test]
+    fn parens_interval_closed_closed() {
+        let expr = "<math> 
+        <mrow><mo>[</mo>
+        <mrow> <mi>c</mi><mo>,</mo><mi>d</mi></mrow>
+        <mo>]</mo></mrow>
+    </math>";
+    test_ClearSpeak("ClearSpeak_Paren", "Interval ",expr,
+    "the interval from c to d, including c and d");
+    }
+
+     #[test]
+     fn parens_interval_neg_infinity_open_open() {
+         let expr = "<math> 
+         <mrow><mo>(</mo>
+            <mrow><mo>-</mo> <mi>∞</mi><mo>,</mo><mi>d</mi></mrow>
+           <mo>)</mo></mrow>
+        </math>";
+        test_ClearSpeak("ClearSpeak_Paren", "Interval ",expr,
+        "the interval from negative infinity to d, not including d");
+  }
+ 
+     #[test]
+     fn parens_interval_neg_infinity_closed_open() {
+         let expr = "<math> 
+         <mrow><mo>(</mo>
+            <mrow> <mo>-</mo> <mi>∞</mi><mo>,</mo><mi>d</mi></mrow>
+           <mo>]</mo></mrow>
+        </math>";
+        test_ClearSpeak("ClearSpeak_Paren", "Interval ",expr,
+        "the interval from negative infinity to d, including d");
+  }
+ 
+  
+  #[test]
+    fn parens_interval_open_open_infinity() {
+        let expr = "<math> 
+        <mrow><mo>(</mo>
+            <mrow> <mi>c</mi><mo>,</mo><mi>∞</mi></mrow>
+        <mo>)</mo></mrow>
+        </math>";
+        test_ClearSpeak("ClearSpeak_Paren", "Interval ",expr,
+        "the interval from c to infinity, not including c");
+    }
+
+
+    #[test]
+    fn parens_interval_closed_open_infinity() {
+        let expr = "<math> 
+            <mrow><mo>[</mo>
+            <mrow> <mi>c</mi><mo>,</mo><mi>∞</mi></mrow>
+            <mo>)</mo></mrow>
+        </math>";
+        test_ClearSpeak("ClearSpeak_Paren", "Interval ",expr,
+    "the interval from c to infinity, including c");
+    }
+
+    #[test]
+    fn parens_interval_neg_infinity_to_infinity() {
+        let expr = "<math> 
+        <mrow><mo>(</mo>
+           <mrow><mo>-</mo> <mi>∞</mi><mo>,</mo><mi>∞</mi></mrow>
+          <mo>)</mo></mrow>
+       </math>";
+       test_ClearSpeak("ClearSpeak_Paren", "Interval ",expr,
+       "the interval from negative infinity to infinity,");
+    }
+
+    #[test]
+    fn parens_interval_neg_infinity_to_pos_infinity() {
+        let expr = "<math> 
+        <mrow><mo>(</mo>
+            <mrow><mo>-</mo> <mi>∞</mi><mo>,</mo><mo>+</mo><mi>∞</mi></mrow>
+        <mo>)</mo></mrow>
+        </math>";
+        test_ClearSpeak("ClearSpeak_Paren", "Interval ",expr,
+        "the interval from negative infinity to positive infinity,");
+    }
+}
