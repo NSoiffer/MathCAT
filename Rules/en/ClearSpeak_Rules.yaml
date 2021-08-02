@@ -512,14 +512,14 @@
    - pause: short
    # logic to deal with [not] arg #1
    - test:
-      if: "*[1][text()='('] and not($is_intervals_start_infinity)"
-      then: [t: "not"]
-   - test:
       if: "not($is_intervals_start_infinity)"
       then:
+         - test:
+            if: "*[1][text()='(']"
+            then: [t: "not"]
          - t: "including"
          - x: "*[2]/*[1]"
-   # some ugly logic dealing with connectives: or, but, but, and
+   # some ugly logic dealing with connectives: or, but, but, and (cleaner to be part of next clause?)
    - test:
       if: "not($is_intervals_start_infinity or $is_intervals_end_infinity)"
       then:
@@ -532,21 +532,22 @@
                else: [t: but]
    # onto the [not] [including]... part
    - test:
-      if: "DEBUG(*[3][text()=')']) and not($is_intervals_end_infinity) and not(not($is_intervals_start_infinity) and IsBracketed(., '(', ')'))"
-      then: [t: "not"]
-   # finally generate arg #2 (if required)
-   - test:
-      if: "not($is_intervals_end_infinity)"
+      if: not($is_intervals_end_infinity)
       then:
          - test:
-            if: "not((not($is_intervals_start_infinity) and IsBracketed(., '(', ')')) or IsBracketed(., '[', ']')) and not($is_intervals_end_infinity)"
-            then: [t: "including"]
+            # there is some asymmetry to the test because of the and/or/but logic above
+            if: not( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) or $is_intervals_start_infinity
+            then: 
+               - test:
+                     if: "*[3][text()=')'] "
+                     then: [t: "not"]
+               - t: "including"
          - x: "*[2]/*[3]"
 
 -
    name: binomial-frac
    tag: mrow
-   match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac] and *[2][@linethickness=0]"
+   match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][@linethickness=0]"
    replace: 
    - x: "*[2]/*[1]"
    - t: choose
