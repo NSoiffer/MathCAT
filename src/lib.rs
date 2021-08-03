@@ -27,3 +27,4 @@ pub mod tts;
 pub mod xpath_functions;
 pub mod definitions;
 pub mod pretty_print;
+pub mod test;

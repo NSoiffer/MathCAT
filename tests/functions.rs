@@ -1,6 +1,3 @@
-#[macro_use]
-extern crate lazy_static;
-
 #[cfg(test)]
 /// Tests for:
 /// *  functions including trig functions, logs, and functions to powers
@@ -8,42 +5,7 @@ extern crate lazy_static;
 /// *  parens
 /// These are all intertwined, so they are in one file
 mod functions {
-    extern crate regex;
-    use regex::Regex;
-    
-    fn strip_spaces(str: String) -> String {
-        lazy_static! {
-           static ref SPACES: Regex = Regex::new(r"  +").unwrap();
-        }
-        return String::from( SPACES.replace_all(&str, " ") );
-    }
-
-    fn test(mathml: &str, speech: &str) {
-        assert_eq!(speech, strip_spaces(libmathcat::interface::speak_mathml(mathml)));
-    }
-
-    #[allow(non_snake_case)]
-    fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: &str) {
-        libmathcat::speech::SPEECH_RULES.with(|rules| {
-            let mut rules = rules.borrow_mut();
-            let pref_manager = rules.pref_manager.as_mut();
-            pref_manager.set_user_prefs(pref_name, pref_value);
-        });
-        assert_eq!(speech, strip_spaces(libmathcat::interface::speak_mathml(mathml)));
-    }
-
-    #[allow(non_snake_case)]
-    fn test_ClearSpeak_prefs(prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
-        libmathcat::speech::SPEECH_RULES.with(|rules| {
-            let mut rules = rules.borrow_mut();
-            let pref_manager = rules.pref_manager.as_mut();
-            for (pref_name, pref_value) in prefs {
-                pref_manager.set_user_prefs(pref_name, pref_value);
-            }
-        });
-        assert_eq!(speech, strip_spaces(libmathcat::interface::speak_mathml(mathml)));
-    }
-
+    use libmathcat::test::*;
 
     #[test]
     fn trig_names() {

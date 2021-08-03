@@ -80,25 +80,10 @@ fn main() {
 
     let expr = "
 <math xmlns='http://www.w3.org/1998/Math/MathML'>
-     <mrow><mo>[</mo>
-      <mtable>
-       <mtr>
-        <mtd>
-         <mn>1</mn>
-        </mtd>
-       </mtr>
-       <mtr>
-        <mtd>
-         <mn>2</mn>
-        </mtd>
-       </mtr>
-       <mtr>
-        <mtd>
-         <mn>3</mn>
-        </mtd>
-       </mtr>           
-      </mtable> <mo>]</mo></mrow>
-   </math>
+<mi>log</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
+<mo>+</mo>
+<mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
+</math>
 ";
     let instant = Instant::now();
     let speech_string = libmathcat::interface::speak_mathml(expr);

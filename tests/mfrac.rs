@@ -1,24 +1,9 @@
-#[macro_use]
-extern crate lazy_static;
-
 #[cfg(test)]
 /// Tests for fractions
 ///   includes simple fractions and more complex fractions
 ///   also tests mixed fractions (implicit and explicit)
 mod mfrac {
-    extern crate regex;
-    use regex::Regex;
-    
-    fn strip_spaces(str: String) -> String {
-        lazy_static! {
-           static ref SPACES: Regex = Regex::new(r"  +").unwrap();
-        }
-        return String::from( SPACES.replace_all(&str, " ") );
-    }
-
-    fn test(mathml: &str, speech: &str) {
-        assert_eq!(speech, strip_spaces(libmathcat::interface::speak_mathml(mathml)));
-    }
+    use libmathcat::test::*;
 
     #[test]
     fn common_fraction_half() {

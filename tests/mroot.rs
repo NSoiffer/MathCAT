@@ -1,32 +1,7 @@
-#[macro_use]
-extern crate lazy_static;
-
 #[cfg(test)]
 mod mroot {
-    extern crate regex;
-    use regex::Regex;
+    use libmathcat::test::*;
     
-    fn strip_spaces(str: String) -> String {
-        lazy_static! {
-           static ref SPACES: Regex = Regex::new(r"  +").unwrap();
-        }
-        return String::from( SPACES.replace_all(&str, " ") );
-    }
-
-    fn test(mathml: &str, speech: &str) {
-        assert_eq!(speech, strip_spaces(libmathcat::interface::speak_mathml(mathml)));
-    }
-
-    #[allow(non_snake_case)]
-    fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: &str) {
-        libmathcat::speech::SPEECH_RULES.with(|rules| {
-            let mut rules = rules.borrow_mut();
-            let pref_manager = rules.pref_manager.as_mut();
-            pref_manager.set_user_prefs(pref_name, pref_value);
-        });
-        assert_eq!(speech, strip_spaces(libmathcat::interface::speak_mathml(mathml)));
-    }
-
     #[test]
     fn msqrt_simple() {
         let expr = "<math>

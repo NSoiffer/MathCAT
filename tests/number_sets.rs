@@ -1,11 +1,13 @@
 #[cfg(test)]
 mod number_sets {
+    use libmathcat::test::*;
+
     #[test]
     fn complex() {
         let expr = "<math>
                         <mi>ℂ</mi>
                     </math>";
-        assert_eq!("the complex numbers", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
+        test(expr, "the complex numbers");
     }
 
     #[test]
@@ -14,6 +16,7 @@ mod number_sets {
                         <mi>ℕ</mi>
                     </math>";
         assert_eq!("the natural numbers", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
+        test(expr, "the natural numbers");
     }
 
     #[test]
@@ -21,7 +24,7 @@ mod number_sets {
         let expr = "<math>
                         <mi>ℚ</mi>
                     </math>";
-        assert_eq!("the rational numbers", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
+        test(expr, "the rational numbers");
     }
 
     #[test]
@@ -29,7 +32,7 @@ mod number_sets {
         let expr = "<math>
                         <mi>ℝ</mi>
                     </math>";
-        assert_eq!("the real numbers", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
+        test(expr, "the real numbers");
     }
 
     #[test]
@@ -37,7 +40,7 @@ mod number_sets {
         let expr = "<math>
                         <mi>ℤ</mi>
                     </math>";
-        assert_eq!("the integers", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
+        test(expr, "the integers");
     }
 
 
@@ -50,7 +53,7 @@ mod number_sets {
                         <mn>2</mn>
                     </msup>
                     </math>";
-        assert_eq!("c 2", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
+        test(expr, "c 2");
     }
 
     #[test]
@@ -61,7 +64,7 @@ mod number_sets {
                         <mn>2</mn>
                     </msup>
                 </math>";
-        assert_eq!("n 2", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
+        test(expr, "n 2");
     }
 
     #[test]
@@ -72,7 +75,7 @@ mod number_sets {
                         <mn>2</mn>
                     </msup>
                 </math>";
-        assert_eq!("q 2", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
+        test(expr, "q 2");
     }
 
     #[test]
@@ -83,7 +86,7 @@ mod number_sets {
                         <mn>3</mn>
                     </msup>
                 </math>";
-        assert_eq!("r 3", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
+        test(expr, "r 3");
     }
 
     #[test]
@@ -94,7 +97,7 @@ mod number_sets {
                         <mn>4</mn>
                     </msup>
                 </math>";
-        assert_eq!("z 4", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
+        test(expr, "z 4");
     }
 
     #[test]
@@ -105,7 +108,7 @@ mod number_sets {
                         <mo>+</mo>
                     </msup>
                 </math>";
-        assert_eq!("the positive integers", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
+        test(expr, "the positive integers");
     }
 
     #[test]
@@ -116,7 +119,7 @@ mod number_sets {
                         <mo>-</mo>
                     </msup>
                 </math>";
-        assert_eq!("the negative integers", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
+        test(expr, "the negative integers");
     }
 
     #[test]
@@ -127,7 +130,7 @@ mod number_sets {
                         <mo>+</mo>
                     </msup>
                 </math>";
-        assert_eq!("the positive rational numbers", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
+        test(expr, "the positive rational numbers");
     }
 
     #[test]
@@ -138,7 +141,6 @@ mod number_sets {
                         <mo>-</mo>
                     </msup>
                 </math>";
-        assert_eq!("the negative rational numbers", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
+        test(expr, "the negative rational numbers");
     }
-
 }
