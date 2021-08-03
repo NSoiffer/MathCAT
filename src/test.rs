@@ -18,7 +18,13 @@ fn strip_spaces(str: String) -> String {
 // Compare the result of speaking the mathml input to the output 'speech'
 // This uses default preferences
 #[allow(dead_code)]     // used in testing
-pub fn test(mathml: &str, speech: &str) {
+pub fn test(style: &str, mathml: &str, speech: &str) {
+    crate::speech::SPEECH_RULES.with(|rules| {
+        let mut rules = rules.borrow_mut();
+        let pref_manager = rules.pref_manager.as_mut();
+        pref_manager.set_user_prefs("SpeechStyle", style);
+    });
+
     assert_eq!(speech, strip_spaces(speak_mathml(mathml)));
 }
 
@@ -30,6 +36,7 @@ pub fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: 
     crate::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let pref_manager = rules.pref_manager.as_mut();
+        pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
         pref_manager.set_user_prefs(pref_name, pref_value);
     });
     assert_eq!(speech, strip_spaces(speak_mathml(mathml)));
@@ -43,6 +50,7 @@ pub fn test_ClearSpeak_prefs(prefs: Vec<(&str, &str)>, mathml: &str, speech: &st
     crate::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let pref_manager = rules.pref_manager.as_mut();
+        pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
         for (pref_name, pref_value) in prefs {
             pref_manager.set_user_prefs(pref_name, pref_value);
         }

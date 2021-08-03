@@ -10,7 +10,7 @@ mod msup {
         let expr = "<math>
                         <msup> <mi>x</mi> <mn>2</mn> </msup>
                     </math>";
-        test(expr, "x squared");
+        test("ClearSpeak", expr, "x squared");
     }
 
     #[test]
@@ -18,7 +18,7 @@ mod msup {
         let expr = "<math>
                         <msup> <mi>x</mi> <mn>3</mn> </msup>
                     </math>";
-        test(expr, "x cubed");
+        test("ClearSpeak", expr, "x cubed");
     }
 
     #[test]
@@ -26,7 +26,7 @@ mod msup {
             let expr = "<math>
                             <msup> <mi>x</mi> <mn>4</mn> </msup>
                         </math>";
-            test(expr, "x to the fourth power");
+            test("ClearSpeak", expr, "x to the fourth power");
         }
 
     #[test]
@@ -34,7 +34,7 @@ mod msup {
         let expr = "<math>
                         <msup> <mi>x</mi> <mi>n</mi> </msup>
                     </math>";
-    test(expr, "x to the n-th power");
+    test("ClearSpeak", expr, "x to the n-th power");
     }
 
     #[test]
@@ -42,7 +42,7 @@ mod msup {
         let expr = "<math>
                         <msup> <mi>x</mi> <mn>0</mn> </msup>
                     </math>";
-        test(expr, "x to the 0 power");
+        test("ClearSpeak", expr, "x to the 0 power");
     }
 
 
@@ -51,7 +51,7 @@ mod msup {
         let expr = "<math>
                         <msup> <mi>x</mi> <mn>2.0</mn> </msup>
                     </math>";
-        test(expr, "x raised to the 2.0 power");
+        test("ClearSpeak", expr, "x raised to the 2.0 power");
     }
 
     #[test]
@@ -65,7 +65,7 @@ mod msup {
           </msup>
           </mrow>
                     </math>";
-        test(expr, "3 raised to the y plus 2 power");
+        test("ClearSpeak", expr, "3 raised to the y plus 2 power");
     }
 
     #[test]
@@ -76,7 +76,7 @@ mod msup {
                            <mrow> <mo>-</mo> <mn>2</mn> </mrow>
                         </msup>
                     </math>";
-        test(expr, "x to the negative 2 power");
+        test("ClearSpeak", expr, "x to the negative 2 power");
     }
 
     #[test]
@@ -87,7 +87,7 @@ mod msup {
                            <mfrac><mn>1</mn><mn>3</mn></mfrac>
                         </msup>
                     </math>";
-    test(expr, "x raised to the 1 third power");
+    test("ClearSpeak", expr, "x raised to the 1 third power");
     }
 
   #[test]
@@ -106,7 +106,7 @@ mod msup {
           </msup>
           </mrow>
          </math>";
-    test(expr, "3 raised to the 2 x squared power");
+    test("ClearSpeak", expr, "3 raised to the 2 x squared power");
     }
 
   #[test]
@@ -126,7 +126,7 @@ mod msup {
         </msup>
         </mrow>
       </math>";
-    test(expr, "3 raised to the negative 2 x squared power");
+    test("ClearSpeak", expr, "3 raised to the negative 2 x squared power");
     }
 
 
@@ -141,7 +141,7 @@ mod msup {
         </msup>
      </msup>
     </math>";
-    test(expr, "y raised to the 4 fifths cubed power");
+    test("ClearSpeak", expr, "y raised to the 4 fifths cubed power");
     }
 
   #[test]
@@ -158,7 +158,7 @@ mod msup {
           </mrow>
       </msup>
       </math>";
-    test(expr, "y raised to the negative 4 fifths cubed power");
+    test("ClearSpeak", expr, "y raised to the negative 4 fifths cubed power");
     }
 
   #[test]
@@ -180,7 +180,7 @@ mod msup {
           </msup>
           </mrow>
          </math>";
-    test(expr, "e raised to the 1 half x squared power");
+    test("ClearSpeak", expr, "e raised to the 1 half x squared power");
     }
 
   #[test]
@@ -202,7 +202,7 @@ mod msup {
           </msup>
           </mrow>
          </math>";
-    test(expr, "e raised to the negative 1 half x squared power");
+    test("ClearSpeak", expr, "e raised to the negative 1 half x squared power");
     }
 
   #[test]
@@ -221,7 +221,7 @@ mod msup {
           </msup>
           </mrow>
          </math>";
-    test(expr, "3 raised to the exponent, 3 to the tenth power, end exponent");
+    test("ClearSpeak", expr, "3 raised to the exponent, 3 to the tenth power, end exponent");
     }
 
   #[test]
@@ -243,7 +243,7 @@ mod msup {
           </msup>
           </mrow>
          </math>";
-    test(expr, "3 raised to the exponent, open paren x plus 1 close paren squared, end exponent");
+    test("ClearSpeak", expr, "3 raised to the exponent, open paren x plus 1 close paren squared, end exponent");
     }
 
     #[test]
@@ -257,7 +257,7 @@ mod msup {
         </msup>
      </msup>
     </math>";
-    test(expr, "t raised to the exponent, 4 fifths to the n-th power, end exponent");
+    test("ClearSpeak", expr, "t raised to the exponent, 4 fifths to the n-th power, end exponent");
     }
 
     #[test]
@@ -288,7 +288,7 @@ mod msup {
           </msup>
           </mrow>
          </math>";
-    test(expr, "e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren squared, end exponent");
+    test("ClearSpeak", expr, "e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren squared, end exponent");
     }
 
    #[test]
@@ -302,6 +302,6 @@ mod msup {
         </mfrac>
      </msup>
     </math>";
-    test(expr, "t raised to the fraction with numerator; b plus 1; and denominator 3; power");
+    test("ClearSpeak", expr, "t raised to the fraction with numerator; b plus 1; and denominator 3; power");
     }
 }

@@ -10,7 +10,7 @@ mod mfrac {
         let expr = "<math>
                         <mfrac> <mn>1</mn> <mn>2</mn> </mfrac>
                     </math>";
-        test(expr, "1 half");
+        test("ClearSpeak", expr, "1 half");
     }
 
     #[test]
@@ -18,7 +18,7 @@ mod mfrac {
         let expr = "<math>
                         <mfrac> <mn>2</mn> <mn>3</mn> </mfrac>
                     </math>";
-        test(expr, "2 thirds");
+        test("ClearSpeak", expr, "2 thirds");
     }
 
     #[test]
@@ -26,7 +26,7 @@ mod mfrac {
         let expr = "<math>
                         <mfrac> <mn>17</mn> <mn>10</mn> </mfrac>
                     </math>";
-        test(expr, "17 tenths");
+        test("ClearSpeak", expr, "17 tenths");
     }
 
     #[test]
@@ -35,7 +35,7 @@ mod mfrac {
         let expr = "<math>
                         <mfrac> <mn>89</mn> <mn>10</mn> </mfrac>
                     </math>";
-        test(expr, "89 over 10");
+        test("ClearSpeak", expr, "89 over 10");
     }
 
     #[test]
@@ -52,7 +52,7 @@ mod mfrac {
           </mrow>
         </math>
                               ";
-        test(expr, "the fraction with numerator; x plus y; and denominator x minus y;");
+        test("ClearSpeak", expr, "the fraction with numerator; x plus y; and denominator x minus y;");
     }
 
     
@@ -62,7 +62,7 @@ mod mfrac {
                         <mn>3</mn>
                         <mfrac> <mn>1</mn> <mn>2</mn> </mfrac>
                     </math>";
-        test(expr, "3 and 1 half");
+        test("ClearSpeak", expr, "3 and 1 half");
     }
     
     #[test]
@@ -72,7 +72,7 @@ mod mfrac {
                         <mo>&#x2064;</mo>
                         <mfrac> <mn>1</mn> <mn>8</mn> </mfrac>
                     </math>";
-        test(expr, "3 and 1 eighth");
+        test("ClearSpeak", expr, "3 and 1 eighth");
     }
 
     #[test]
@@ -81,7 +81,7 @@ mod mfrac {
                         <mn>3</mn>
                         <mfrac> <mn>7</mn> <mn>83</mn> </mfrac>
                     </math>";
-        test(expr, "3 and 7 eighty thirds");
+        test("ClearSpeak", expr, "3 and 7 eighty thirds");
     }
 
     #[test]
@@ -89,7 +89,7 @@ mod mfrac {
         let expr = "<math>
         <mfrac> <mi>rise</mi> <mi>run</mi> </mfrac>
                     </math>";
-        test(expr, "rise over run");
+        test("ClearSpeak", expr, "rise over run");
     }
 
     #[test]
@@ -102,7 +102,7 @@ mod mfrac {
                     <mn>3</mn><mtext>gallons</mtext></mrow>
                 </mfrac>
             </math>";
-        test(expr, "2 miles over 3 gallons");
+        test("ClearSpeak", expr, "2 miles over 3 gallons");
     }
 
 
@@ -126,7 +126,7 @@ mod mfrac {
                     </mfrac>
                     </mrow>
                 </math>";
-        test(expr, "1 half over 2 thirds");
+        test("ClearSpeak", expr, "1 half over 2 thirds");
     }
 
 
@@ -146,7 +146,7 @@ mod mfrac {
                         </mfrac>
                     </mrow>
                     </math>";
-        test(expr, "2 thirds x over 6");
+        test("ClearSpeak", expr, "2 thirds x over 6");
     }
 
     #[test]
@@ -171,7 +171,7 @@ mod mfrac {
          </mrow>
        </math>
                       ";
-        test(expr, "the fraction with numerator; 10 over n; and denominator 2 over n;");
+        test("ClearSpeak", expr, "the fraction with numerator; 10 over n; and denominator 2 over n;");
     }
 
     #[test]
@@ -196,7 +196,7 @@ mod mfrac {
          </mrow>
        </math>
                       ";
-        test(expr, "the fraction with numerator; the fraction with numerator; n plus 10; and denominator n; and denominator 2 over n;");
+        test("ClearSpeak", expr, "the fraction with numerator; the fraction with numerator; n plus 10; and denominator n; and denominator 2 over n;");
     }
 
     #[test]
@@ -207,6 +207,6 @@ mod mfrac {
                         <mfrac linethickness='0'> <mn>7</mn> <mn>3</mn> </mfrac>
                         <mo>)</mo>
                     </math>";
-        test(expr, "2 times 7 choose 3");
+        test("ClearSpeak", expr, "2 times 7 choose 3");
     }
 }

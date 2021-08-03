@@ -7,7 +7,7 @@ mod mroot {
         let expr = "<math>
                         <msqrt> <mi>x</mi> </msqrt>
                     </math>";
-        test(expr, "the square root of x,");
+        test("ClearSpeak", expr, "the square root of x,");
     }
 
     #[test]
@@ -60,7 +60,7 @@ mod mroot {
         let expr = "<math>
                         <mo>-</mo> <mi>x</mi> <mo>-</mo> <mi>y</mi>
                     </math>";
-        test(expr, "negative x minus y");
+        test("ClearSpeak", expr, "negative x minus y");
     }
 
     #[test]
@@ -70,7 +70,7 @@ mod mroot {
                           <mrow> <mi>x</mi> <mo>+</mo> <mi>y</mi> </mrow>
                         </msqrt>
                     </math>";
-        test(expr, "the square root of x plus y;");
+        test("ClearSpeak", expr, "the square root of x plus y;");
     }
 
     #[test]
@@ -78,7 +78,7 @@ mod mroot {
         let expr = "<math>
                         <mroot> <mi>x</mi> <mn>2</mn> </mroot>
                     </math>";
-        test(expr, "the square root of x,");
+        test("ClearSpeak", expr, "the square root of x,");
     }
 
     #[test]
@@ -86,7 +86,7 @@ mod mroot {
         let expr = "<math>
                         <mroot> <mi>x</mi> <mn>3</mn> </mroot>
                     </math>";
-        test(expr, "the cube root of x,");
+        test("ClearSpeak", expr, "the cube root of x,");
     }
 
     #[test]
@@ -94,7 +94,7 @@ mod mroot {
             let expr = "<math>
                             <mroot> <mi>x</mi> <mn>9</mn> </mroot>
                         </math>";
-            test(expr, "the ninth root of x,");
+            test("ClearSpeak", expr, "the ninth root of x,");
         }
 
     #[test]
@@ -102,7 +102,7 @@ mod mroot {
         let expr = "<math>
                         <mroot> <mi>x</mi> <mi>n</mi> </mroot>
                     </math>";
-    test(expr, "the n-th root of x,");
+    test("ClearSpeak", expr, "the n-th root of x,");
     }
 
     #[test]
@@ -130,7 +130,7 @@ mod mroot {
                            <mfrac><mn>1</mn><mn>3</mn></mfrac>
                         </mroot>
                     </math>";
-    test(expr, "the 1 third root of x,");
+    test("ClearSpeak", expr, "the 1 third root of x,");
     }
 
 }

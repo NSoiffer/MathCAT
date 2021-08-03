@@ -15,7 +15,7 @@ mod mtable {
            <mo>)</mo></mrow></mrow>
         </math>
                                     ";
-        test(expr, "the 1 by 1 matrix with entry 3;");
+        test("ClearSpeak", expr, "the 1 by 1 matrix with entry 3;");
     }
 
     #[test]
@@ -30,7 +30,7 @@ mod mtable {
            <mo>|</mo></mrow></mrow>
         </math>
                                     ";
-        test(expr, "the 1 by 1 determinant with entry 3;");
+        test("ClearSpeak", expr, "the 1 by 1 determinant with entry 3;");
     }
 
   
@@ -53,7 +53,7 @@ mod mtable {
           <mo>)</mo></mrow></mrow>
         </math>
                                     ";
-        test(expr, "the 1 by 2 row matrix; 3, 5;");
+        test("ClearSpeak", expr, "the 1 by 2 row matrix; 3, 5;");
     }
 
   
@@ -79,7 +79,7 @@ mod mtable {
           <mo>)</mo></mrow></mrow>
         </math>
                                     ";
-        test(expr, "the 1 by 3 row matrix; negative x, 5, 12;");
+        test("ClearSpeak", expr, "the 1 by 3 row matrix; negative x, 5, 12;");
     }
 
     #[test]
@@ -106,7 +106,7 @@ mod mtable {
           <mo>)</mo></mrow></mrow>
         </math>
                                     ";
-        test(expr, "the 2 by 1 column matrix; row 1; x plus 1; row 2; x minus 1;");
+        test("ClearSpeak", expr, "the 2 by 1 column matrix; row 1; x plus 1; row 2; x minus 1;");
     }
     #[test]
     fn matrix_3x1_not_simple() {
@@ -143,7 +143,7 @@ mod mtable {
           <mo>)</mo></mrow></mrow>
         </math>
                                     ";
-        test(expr, "the 3 by 1 column matrix; \
+        test("ClearSpeak", expr, "the 3 by 1 column matrix; \
                 row 1; x; \
                 row 2; eigh; \
                 row 3; the fraction with numerator x; and denominator x plus 1;");
@@ -175,7 +175,7 @@ mod mtable {
             </mtable>
           <mo>|</mo></mrow></mrow>
                             </math>";
-        test(expr, "the 2 by 2 determinant; row 1; 2, 1; row 2; 7, 5;");
+        test("ClearSpeak", expr, "the 2 by 2 determinant; row 1; 2, 1; row 2; 7, 5;");
     }
     
     #[test]
@@ -211,7 +211,7 @@ mod mtable {
           <mo>]</mo></mrow></mrow>
         </math>
                                     ";
-        test(expr, "the 2 by 3 matrix; row 1; 3, 1, 4; row 2; 0, 2, 6;");
+        test("ClearSpeak", expr, "the 2 by 3 matrix; row 1; 3, 1, 4; row 2; 0, 2, 6;");
     }
 
     #[test]
@@ -239,7 +239,7 @@ mod mtable {
            </mtable> <mo>]</mo></mrow></mrow>
         </math>
                                     ";
-        test(expr, "the 3 by 1 column matrix; 1; 2; 3;");
+        test("ClearSpeak", expr, "the 3 by 1 column matrix; 1; 2; 3;");
     }
 
     #[test]
@@ -273,7 +273,7 @@ mod mtable {
           <mo>)</mo></mrow></mrow>
         </math>
                                     ";
-        test(expr, "the 4 by 1 column matrix; row 1; 3; row 2; 6; row 3; 1; row 4; 2;");
+        test("ClearSpeak", expr, "the 4 by 1 column matrix; row 1; 3; row 2; 6; row 3; 1; row 4; 2;");
     }
 
     #[test]
@@ -301,7 +301,7 @@ mod mtable {
           <mo>)</mo></mrow></mrow>
         </math>
                                     ";
-        test(expr, "the 1 by 4 row matrix; column 1; 3, column 2; 6, column 3; 1, column 4; 2;");
+        test("ClearSpeak", expr, "the 1 by 4 row matrix; column 1; 3, column 2; 6, column 3; 1, column 4; 2;");
     }
 
     #[test]
@@ -371,7 +371,7 @@ mod mtable {
           <mo>)</mo></mrow></mrow>
         </math>
                                     ";
-        test(expr, "the 4 by 4 matrix; \
+        test("ClearSpeak", expr, "the 4 by 4 matrix; \
               row 1; 0, column 2; 3, column 3; 4, column 4; 3; \
               row 2; 2, column 2; 1, column 3; 0, column 4; 9; \
               row 3; 3, column 2; 0, column 3; 2, column 4; 1; \
@@ -422,7 +422,7 @@ mod mtable {
          <mo>)</mo></mrow></mrow>
        </math>
           ";
-        test(expr, "the 4 by 2 matrix; \
+        test("ClearSpeak", expr, "the 4 by 2 matrix; \
                   row 1; 1, column 2; 3; \
                   row 2; 4, column 2; 2; \
                   row 3; 2, column 2; 1; \
@@ -436,7 +436,7 @@ mod mtable {
         let expr = "<math>
             <mrow><mrow><mo>|</mo> <mi>x</mi> <mo>|</mo></mrow></mrow>
           </math>";
-          test(expr, "the absolute value of x");
+          test("ClearSpeak", expr, "the absolute value of x");
       }
       
   #[test]
@@ -446,7 +446,7 @@ mod mtable {
               <mrow><mi>x</mi><mo>+</mo><mn>1</mn> </mrow>
             <mo>|</mo></mrow></mrow>
           </math>";
-          test(expr, "the absolute value of x plus 1");
+          test("ClearSpeak", expr, "the absolute value of x plus 1");
       }
     
     }

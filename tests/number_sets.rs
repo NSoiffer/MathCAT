@@ -7,7 +7,7 @@ mod number_sets {
         let expr = "<math>
                         <mi>ℂ</mi>
                     </math>";
-        test(expr, "the complex numbers");
+        test("ClearSpeak", expr, "the complex numbers");
     }
 
     #[test]
@@ -16,7 +16,7 @@ mod number_sets {
                         <mi>ℕ</mi>
                     </math>";
         assert_eq!("the natural numbers", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
-        test(expr, "the natural numbers");
+        test("ClearSpeak", expr, "the natural numbers");
     }
 
     #[test]
@@ -24,7 +24,7 @@ mod number_sets {
         let expr = "<math>
                         <mi>ℚ</mi>
                     </math>";
-        test(expr, "the rational numbers");
+        test("ClearSpeak", expr, "the rational numbers");
     }
 
     #[test]
@@ -32,7 +32,7 @@ mod number_sets {
         let expr = "<math>
                         <mi>ℝ</mi>
                     </math>";
-        test(expr, "the real numbers");
+        test("ClearSpeak", expr, "the real numbers");
     }
 
     #[test]
@@ -40,7 +40,7 @@ mod number_sets {
         let expr = "<math>
                         <mi>ℤ</mi>
                     </math>";
-        test(expr, "the integers");
+        test("ClearSpeak", expr, "the integers");
     }
 
 
@@ -53,7 +53,7 @@ mod number_sets {
                         <mn>2</mn>
                     </msup>
                     </math>";
-        test(expr, "c 2");
+        test("ClearSpeak", expr, "c 2");
     }
 
     #[test]
@@ -64,7 +64,7 @@ mod number_sets {
                         <mn>2</mn>
                     </msup>
                 </math>";
-        test(expr, "n 2");
+        test("ClearSpeak", expr, "n 2");
     }
 
     #[test]
@@ -75,7 +75,7 @@ mod number_sets {
                         <mn>2</mn>
                     </msup>
                 </math>";
-        test(expr, "q 2");
+        test("ClearSpeak", expr, "q 2");
     }
 
     #[test]
@@ -86,7 +86,7 @@ mod number_sets {
                         <mn>3</mn>
                     </msup>
                 </math>";
-        test(expr, "r 3");
+        test("ClearSpeak", expr, "r 3");
     }
 
     #[test]
@@ -97,7 +97,7 @@ mod number_sets {
                         <mn>4</mn>
                     </msup>
                 </math>";
-        test(expr, "z 4");
+        test("ClearSpeak", expr, "z 4");
     }
 
     #[test]
@@ -108,7 +108,7 @@ mod number_sets {
                         <mo>+</mo>
                     </msup>
                 </math>";
-        test(expr, "the positive integers");
+        test("ClearSpeak", expr, "the positive integers");
     }
 
     #[test]
@@ -119,7 +119,7 @@ mod number_sets {
                         <mo>-</mo>
                     </msup>
                 </math>";
-        test(expr, "the negative integers");
+        test("ClearSpeak", expr, "the negative integers");
     }
 
     #[test]
@@ -130,7 +130,7 @@ mod number_sets {
                         <mo>+</mo>
                     </msup>
                 </math>";
-        test(expr, "the positive rational numbers");
+        test("ClearSpeak", expr, "the positive rational numbers");
     }
 
     #[test]
@@ -141,6 +141,6 @@ mod number_sets {
                         <mo>-</mo>
                     </msup>
                 </math>";
-        test(expr, "the negative rational numbers");
+        test("ClearSpeak", expr, "the negative rational numbers");
     }
 }
