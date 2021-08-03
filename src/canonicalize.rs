@@ -33,9 +33,10 @@ lazy_static!{
 	// lowest priority operator so it is never popped off the stack
 	static ref LEFT_FENCEPOST: OperatorInfo = OperatorInfo{ op_type: OperatorTypes::LEFT_FENCE, priority: 0, next: &None };
 
-	static ref IMPLIED_TIMES: &'static OperatorInfo = OPERATORS.get(&"\u{2062}").unwrap();
-	static ref IMPLIED_INVISIBLE_PLUS: &'static OperatorInfo = OPERATORS.get(&"\u{2064}").unwrap();
 	static ref INVISIBLE_FUNCTION_APPLICATION: &'static OperatorInfo = OPERATORS.get(&"\u{2061}").unwrap();
+	static ref IMPLIED_TIMES: &'static OperatorInfo = OPERATORS.get(&"\u{2062}").unwrap();
+	static ref IMPLIED_INVISIBLE_COMMA: &'static OperatorInfo = OPERATORS.get(&"\u{2063}").unwrap();
+	static ref IMPLIED_INVISIBLE_PLUS: &'static OperatorInfo = OPERATORS.get(&"\u{2064}").unwrap();
 
 	// FIX: any other operators that should act the same (e.g, plus-minus and minus-plus)?
 	static ref PLUS: &'static OperatorInfo = OPERATORS.get(&"+").unwrap();
@@ -800,6 +801,21 @@ impl CanonicalizeContext {
 	
 		return true;		// the only thing left is a mixed fraction
 	}
+
+	// implied comma when two numbers are adjacent and are in a script position
+	fn is_implied_comma<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>) -> bool {
+		if name(prev) != "mn" || name(current) != "mn" {
+			return false;
+		}
+
+		let mrow = current.parent().unwrap().element().unwrap();
+		assert_eq!(name(&mrow), "mrow");
+		let container = mrow.parent().unwrap().element().unwrap();
+		let name = name(&container);
+
+		// test for script position is that it is not the base and hence has a preceding sibling
+		return (name == "msub" || name == "msubsup" || name == "msup") && mrow.preceding_siblings().len() > 0;
+	}
 	
 	// Add the current operator if it's not n-ary to the stack
 	// 'current_child' and it the operator to the stack.
@@ -1001,6 +1017,8 @@ impl CanonicalizeContext {
 								OperatorPair{ ch: "\u{2061}", op: &*INVISIBLE_FUNCTION_APPLICATION }
 							} else if self.is_mixed_fraction(&previous_child, &current_child) {
 								OperatorPair{ ch: "\u{2064}", op: &*IMPLIED_INVISIBLE_PLUS }
+							} else if self.is_implied_comma(&previous_child, &current_child) {
+								OperatorPair{ch: "\u{2063}", op: &*IMPLIED_INVISIBLE_COMMA }				  
 							} else if self.is_trig_arg(base_of_previous_child, base_of_child, &parse_stack) {
 								OperatorPair{ch: "\u{2062}", op: &*IMPLIED_TIMES_HIGH_PRIORITY }				  
 							} else {
@@ -1416,18 +1434,35 @@ mod tests {
     <mn>2</mn><mfrac><mn>3</mn><mn>4</mn></mfrac>
     </mrow></math>";
         let target_str = "<math>
-		<mrow>
-			<mn>2</mn>
-			<mo data-changed='added'>&#x2064;</mo>
-			<mfrac>
-				<mn>3</mn>
-				<mn>4</mn>
-			</mfrac>
-		</mrow>
-	</math>";
+			<mrow>
+				<mn>2</mn>
+				<mo data-changed='added'>&#x2064;</mo>
+				<mfrac>
+					<mn>3</mn>
+					<mn>4</mn>
+				</mfrac>
+			</mrow>
+		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
     }
 
+    #[test]
+    fn implied_comma() {
+        let test_str = "<math><msub><mi>b</mi><mrow><mn>1</mn><mn>2</mn></mrow></msub></math>";
+        let target_str = "<math>
+			 <msub><mi>b</mi><mrow><mn>1</mn><mo data-changed='added'>&#x2063;</mo><mn>2</mn></mrow></msub>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
+    fn no_implied_comma() {
+        let test_str = "<math><mfrac><mi>b</mi><mrow><mn>1</mn><mn>2</mn></mrow></mfrac></math>";
+        let target_str = "<math>
+			 <mfrac><mi>b</mi><mrow><mn>1</mn><mo data-changed='added'>&#x2062;</mo><mn>2</mn></mrow></mfrac>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
 
     #[test]
     fn vertical_bars() {
