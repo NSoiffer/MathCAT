@@ -30,11 +30,16 @@ pub fn format_element(e: &Element, indent: usize) -> String {
     let has_element = children.iter().find(|&&c| if let ChildOfElement::Element(_x) = c {true} else {false});
     if has_element == None {
         // print text content
-        for child in children {
-            if let ChildOfElement::Text(t) = child {
-                return format!("{}{}</{}{}>\n", answer, &make_invisible_chars_visible(t.text()), namespace, e.name().local_part());
-            }
-        };
+        let content = children.iter()
+                .map(|c| if let ChildOfElement::Text(t) = c {t.text()} else {""})
+                .collect::<Vec<&str>>()
+                .join("");
+        return format!("{}{}</{}{}>\n", answer, &make_invisible_chars_visible(&content), namespace, e.name().local_part());
+        // for child in children {
+        //     if let ChildOfElement::Text(t) = child {
+        //         return format!("{}{}</{}{}>\n", answer, &make_invisible_chars_visible(t.text()), namespace, e.name().local_part());
+        //     }
+        // };
     } else {
        answer += "\n";        // tag with children should start on new line
         // recurse on each Element child
