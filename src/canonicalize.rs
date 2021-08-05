@@ -491,10 +491,10 @@ impl CanonicalizeContext {
 		}
 	}
 	
-	fn n_vertical_bars_on_right<'a>(&self, children: Vec<ChildOfElement>, vert_bar_ch: &'a str) -> usize {
+	fn n_vertical_bars_on_right<'a>(&self, remaining_children: &[ChildOfElement], vert_bar_ch: &'a str) -> usize {
 		// return the number of children that match 'vert_bar_op' not counting the first element
 		let mut n = 0;
-		for child_of_element in &children[1..] {
+		for child_of_element in remaining_children {
 			let child = as_element(*child_of_element);
 			if name(&child) == "mo" {
 				let operator_str = as_text(child);
@@ -520,7 +520,7 @@ impl CanonicalizeContext {
 		}
 		let op = found_op_info.unwrap();
 		if !AMBIGUOUS_OPERATORS.contains(operator_str) {
-			// println!("   op is not ambiguous");
+			println!("   op is not ambiguous");
 			return original_op;
 		};
 	
@@ -998,6 +998,8 @@ impl CanonicalizeContext {
 					op: &self.find_operator(base_of_child, previous_op,
 							top(&parse_stack).last_child_in_mrow(), next_node)
 				};
+				println!("base_of_child: {}",mml_to_string(&base_of_child));
+				println!("current_op: {:?}", current_op);
 	
 				// deal with vertical bars which might be infix, open, or close fences
 				// note: mrow shrinks as we iterate through it (removing children from it)
@@ -1006,7 +1008,7 @@ impl CanonicalizeContext {
 					base_of_child,
 					next_node,
 					&mut parse_stack,
-					self.n_vertical_bars_on_right(mrow.children(), current_op.ch)
+					self.n_vertical_bars_on_right(&children[i_child+1..], current_op.ch)
 				);
 			} else if top(&parse_stack).last_child_in_mrow().is_some() {
 				let previous_child = top(&parse_stack).last_child_in_mrow().unwrap();
@@ -1513,6 +1515,25 @@ mod tests {
 		</mrow>
 	  </mrow>
 	 </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
+    fn vertical_bar_such_that() {
+        let test_str = "<math>
+            <mo>{</mo> <mrow><mi>x</mi></mrow> <mo>|</mo><mi>a</mi><mo>}</mo>
+            </math>";
+        let target_str = "<math>
+				<mrow data-changed='added'>
+					<mo>{</mo>
+					<mrow data-changed='added'>
+						<mi>x</mi>
+						<mo>|</mo>
+						<mi>a</mi>
+					</mrow>
+					<mo>}</mo>
+				</mrow>
+			</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
     }
 
