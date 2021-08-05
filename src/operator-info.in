@@ -1,5 +1,7 @@
 phf_map! {
 	","=> OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 40, next: &None },
+	"∈"=> OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 240, next: &None },
+	":"=> OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 60, next: &None },
 	"+" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 280,
 				next: &Some( OperatorInfo{ op_type: OperatorTypes::PREFIX, priority: 690, next: &None }) },
 	"-" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 280,
@@ -15,6 +17,8 @@ phf_map! {
 	")"=> OperatorInfo{ op_type: OperatorTypes::RIGHT_FENCE, priority: 20, next: &None },
 	"["=> OperatorInfo{ op_type: OperatorTypes::LEFT_FENCE, priority: 20, next: &None },
 	"]"=> OperatorInfo{ op_type: OperatorTypes::RIGHT_FENCE, priority: 20, next: &None },
+	"{"=> OperatorInfo{ op_type: OperatorTypes::LEFT_FENCE, priority: 20, next: &None },
+	"}"=> OperatorInfo{ op_type: OperatorTypes::RIGHT_FENCE, priority: 20, next: &None },
 	"\u{2308}"=> OperatorInfo{ op_type: OperatorTypes::LEFT_FENCE, priority: 20, next: &None },
 	"\u{2309}"=> OperatorInfo{ op_type: OperatorTypes::RIGHT_FENCE, priority: 20, next: &None },
 
