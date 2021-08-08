@@ -520,7 +520,7 @@ impl CanonicalizeContext {
 		}
 		let op = found_op_info.unwrap();
 		if !AMBIGUOUS_OPERATORS.contains(operator_str) {
-			println!("   op is not ambiguous");
+			// println!("   op is not ambiguous");
 			return original_op;
 		};
 	
@@ -998,8 +998,6 @@ impl CanonicalizeContext {
 					op: &self.find_operator(base_of_child, previous_op,
 							top(&parse_stack).last_child_in_mrow(), next_node)
 				};
-				println!("base_of_child: {}",mml_to_string(&base_of_child));
-				println!("current_op: {:?}", current_op);
 	
 				// deal with vertical bars which might be infix, open, or close fences
 				// note: mrow shrinks as we iterate through it (removing children from it)
