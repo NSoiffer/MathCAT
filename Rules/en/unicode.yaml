@@ -1146,35 +1146,74 @@
      - t: gradient of
  - "∈":                                          # 0x2208
      - test:
-         if: $SpeechStyle = 'ClearSpeak'
-         then:
-            - test:
-                if: "IsBracketed(../.., '{', '}') or IsBracketed(../../.., '{', '}')"
-                then: {t: in}
-                else: {t: is a member of}
-         else: [t: is an element of]                            
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [t: is an element of]
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "IsBracketed(../.., '{', '}') or IsBracketed(../../.., '{', '}')" # inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [t: in]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [t: member of]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [t: element of]
+              - else: [t: belonging to]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [t: is a member of]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [t: is an element of]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [t: is in]
+              - else : [t: belongs to]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
  - "∉":                                          # 0x2209
-     - t: not
+    # rule is identical to 0x2208
      - test:
-         if: $SpeechStyle = 'ClearSpeak'
-         then:
-            - test:
-                if: "IsBracketed(../.., '{', '}') or IsBracketed(../../.., '{', '}')"
-                then: {t: in}
-                else: {t: is a member of}
-         else: [t: is an element of]                            
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [t: is not an element of]
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "IsBracketed(../.., '{', '}') or IsBracketed(../../.., '{', '}')" # inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [t: not in]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [t: not member of]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [t: not element of]
+              - else: [t: not belonging to]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [t: is not a member of]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [t: is not an element of]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [t: is not in]
+              - else : [t: does not belong to]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
  - "∊":                                          # 0x220a
-     - test: 
-         if: "$Verbosity!='terse'"
-         then: {t: is}
      - test:
-         if: $SpeechStyle = 'ClearSpeak'
-         then:
-            - test:
-                if: "IsBracketed(../.., '{', '}') or IsBracketed(../../.., '{', '}')"
-                then: {t: in}
-                else: {t: a member of}
-         else: [t: an element of]                            
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [t: is an element of]
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "IsBracketed(../.., '{', '}') or IsBracketed(../../.., '{', '}')" # inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [t: in]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [t: member of]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [t: element of]
+              - else: [t: belonging to]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [t: is a member of]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [t: is an element of]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [t: is in]
+              - else : [t: belongs to]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
  - "∋": [t: contains the member]                 # 0x220b
  - "∌": [t: does not contain the member]         # 0x220c
  - "∍": [t: contains the member]                 # 0x220d

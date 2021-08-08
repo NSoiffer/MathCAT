@@ -166,7 +166,7 @@ pub fn compile_rule<F>(str: &str, mut build_fn: F) -> Result<()> where
 #[derive(Debug, Clone)]
 enum Replacement {
     // Note: all of these are pointer types
-    Test(Box<Test>),
+    Test(Box<TestArray>),
     Text(String),
     XPath(MyXPath),
     TTS(Box<TTSCommandRule>),
@@ -226,7 +226,7 @@ impl Replacement {
                 return Ok( Replacement::TTS( TTS::build(key, value)? ) );
             },
             "test" => {
-                return Ok( Replacement::Test( Test::build(value)? ) );
+                return Ok( Replacement::Test( Box::new( TestArray::build(value)? ) ) );
             },
             "insert" => {
                 return Ok( Replacement::Insert( InsertChildren::build(value)? ) );
@@ -588,14 +588,19 @@ impl MyXPath {
         let mut remainder: &str = &xpath[debug_start+6..];
             
         loop {
+            // println!("  add_debug_string_arg: count={}, remainder='{}'", count, remainder);
             let next = remainder.find(|c| c=='(' || c==')');
             match next {
                 None => bail!("Did not find closing paren for DEBUG in\n{}", xpath),
                 Some(i_paren) => {
-                    if i_paren == 0 || remainder.as_bytes()[i_paren-1] != b'\'' {
-                        if remainder.as_bytes()[i_paren] == b'(' {
-                            // if the paren is inside of quote (' or "), don't count it
-                            // FIX: this could be on a non-char boundary
+                    let remainder_as_bytes = remainder.as_bytes();
+
+                    // if the paren is inside of quote (' or "), don't count it
+                    // FIX: this could be on a non-char boundary
+                    if i_paren == 0 || remainder_as_bytes[i_paren-1] != b'\'' ||
+                       i_paren+1 >= remainder.len() || remainder_as_bytes[i_paren+1] != b'\'' {
+                        // println!("     found '{}'", remainder_as_bytes[i_paren].to_string());
+                        if remainder_as_bytes[i_paren] == b'(' {
                             count += 1;
                         } else {            // must be ')'
                             count -= 1;
@@ -831,85 +836,177 @@ impl SpeechPattern  {
 
 // 'Test' holds information used if the replacement is a "test:" clause.
 // The condition is an xpath expr and the "else:" part is optional.
+
+#[derive(Debug, Clone)]
+struct TestArray {
+    tests: Vec<Test>
+}
+
+impl fmt::Display for TestArray {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for test in &self.tests {
+            write!(f, "{}\n", test)?;
+        }
+        return Ok( () );
+    }
+}
+
+impl TestArray {
+    fn build(test: &Yaml) -> Result<TestArray> {
+        // 'test:' for convenience takes either a dictionary with keys if/else_if/then/then_test/else/else_test or
+        //      or an array of those values (there should be at most one else/else_test)
+
+        // if 'test' is a dictionary ('Hash'), we convert it to an array with one entry and proceed
+        let tests = if test.as_hash().is_some() {
+            vec![test.to_owned()]
+        } else if let Some(vec) = test.as_vec() {
+            vec.to_owned()
+        } else {
+            bail!("Value for 'test:' is neither a dictionary or an array.")
+        };
+
+        // each entry in 'tests' should be a dictionary with keys if/then/then_test/else/else_test
+        // a valid entry is one of:
+        //   if:/else_if:, then:/then_test: and optional else:/else_test:
+        //   else:/else_test: -- if this case, it should be the last entry in 'tests'
+        // 'if:' should only be the first entry in the array; 'else_if' should never be the first entry. Otherwise, they are the same
+        let mut test_array = vec![];
+        for test in tests {
+            if test.as_hash().is_none() {
+                bail!("Value for array entry in 'test:' must be a dictionary/contain keys");
+            }
+            let if_part = &test[if test_array.is_empty() {"if"} else {"else_if"}];
+            if !if_part.is_badvalue() {
+                // first case: if:, then:, optional else:
+                let condition = Some( MyXPath::build(if_part)? );
+                let then_part = TestOrReplacements::build(&test, "then", "then_test", true)?; 
+                let else_part = TestOrReplacements::build(&test, "else", "else_test", false)?;
+                let n_keys = if else_part.is_none() {2} else {3};
+                if test.as_hash().unwrap().len() > n_keys {
+                    bail!("A key other than 'if', 'else_if', 'then', 'then_test', 'else', or 'else_test' was found in an else clause of 'test'");
+                };
+                test_array.push(
+                    Test { condition, then_part, else_part }
+                );
+            } else {
+                // second case: should be else/else_test
+                let else_part = TestOrReplacements::build(&test, "else", "else_test", true)?;
+                if test.as_hash().unwrap().len() > 1 {
+                    bail!("A key other than 'if', 'else_if', 'then', 'then_test', 'else', or 'else_test' was found in an else clause of 'test'");
+                };
+                test_array.push(
+                    Test { condition: None, then_part: None, else_part }
+                );
+                
+                // there shouldn't be any trailing tests
+                if test_array.len() < test.as_hash().unwrap().len() {
+                    bail!("'else'/'else_test' key is not last key in 'test:'");
+                }
+            }
+        };
+
+        if test_array.len() == 0 {
+            bail!("No entries for 'test:'");
+        }
+
+        return Ok( TestArray { tests: test_array } );
+    }
+
+    fn replace(&self, rules: &SpeechRules, mathml: &Element) -> Result<String> {
+        for test in &self.tests {
+            if test.is_true(mathml)? {
+                assert!(test.then_part.is_some());
+                return test.then_part.as_ref().unwrap().replace(rules, mathml);
+            } else if let Some(else_part) = test.else_part.as_ref() {
+                return else_part.replace(rules, mathml);
+            }
+        }
+        return Ok( "".to_string() );
+    }
+}
+
+#[derive(Debug, Clone)]
+// Used to hold then/then_test and also else/else_test -- only one of these can be present at a time
+enum TestOrReplacements {
+    Replacements(ReplacementArray),     // replacements to use when a test is true
+    Test(TestArray),                    // the array of if/then/else tests
+}
+
+impl fmt::Display for TestOrReplacements {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        if let TestOrReplacements::Test(_) = self {
+            write!(f, "  _test")?;
+        }
+        write!(f, ":")?;
+        return match self {
+            TestOrReplacements::Test(t) => write!(f, "{}", t),
+            TestOrReplacements::Replacements(r) => write!(f, "{}", r),
+        };
+    }
+}
+
+impl TestOrReplacements {
+    fn build(test: &Yaml, replace_key: &str, test_key: &str, key_required: bool) -> Result<Option<TestOrReplacements>> {
+        let part = &test[replace_key];
+        let test_part = &test[test_key];
+        if !part.is_badvalue() && !test_part.is_badvalue() { 
+            bail!(format!("Only one of '{}' or '{}' is allowed as part of 'test'.\n    \
+                  Suggestion: delete one or adjust indentation", replace_key, test_key));
+        }
+        if part.is_badvalue() && test_part.is_badvalue() {
+            if key_required {
+                bail!(format!("Missing 'if:' or missing '{}'/'{}:' as part of 'test:'\n    \
+                    Suggestion: add 'if:' or if present, indent so it is contained in 'test'", replace_key, test_key));    
+            } else {
+                return Ok( None );
+            }
+        }
+        // at this point, we have only one of the two options
+        if test_part.is_badvalue() {
+            return Ok( Some( TestOrReplacements::Replacements( ReplacementArray::build(part)? ) ) );
+        } else {
+            return Ok( Some( TestOrReplacements::Test( TestArray::build(test_part)? ) ) );
+        }
+    }
+
+    fn replace(&self, rules: &SpeechRules, mathml: &Element) -> Result<String> {
+        return match self {
+            TestOrReplacements::Replacements(r) => r.replace(rules, mathml),
+            TestOrReplacements::Test(t) => t.replace(rules, mathml),
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 struct Test {
-    condition: MyXPath,
-    then_part: ReplacementArray,
-    else_part: Option<ReplacementArray>,
-    else_test_part: Option<Box<Test>>,
+    condition: Option<MyXPath>,
+    then_part: Option<TestOrReplacements>,
+    else_part: Option<TestOrReplacements>,
 }
 impl fmt::Display for Test {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "test: {{ ")?;
-        write!(f, "  if: '{}'", self.condition)?;
-        write!(f, "  then '{}'", self.then_part)?;
+        if let Some(if_part) = &self.condition {
+            write!(f, "  if: '{}'", if_part)?;
+        }
+        if let Some(then_part) = &self.then_part {
+            write!(f, "  then{}", then_part)?;
+        }
         if let Some(else_part) = &self.else_part {
-            write!(f, "  else: '{}'", else_part)?;
+            write!(f, "  else{}", else_part)?;
         }
         return write!(f, "}}");
     }
 }
 
 impl Test {
-    fn build(test: &Yaml) -> Result<Box<Test>> {
-        // 'test:' -- 'if': xxx 'then': xxx optional 'else': xxx
-        if test.as_hash().is_none() {
-            bail!("")
-        }
-        let if_part = &test["if"];
-        if if_part.is_badvalue() { 
-            bail!("Missing 'if' as part of 'test'.\n    \
-                  Suggestion: add 'if:' or if present, indent so it is contained in 'test'");
-        }
-
-        let then_part = &test["then"];
-        if then_part.is_badvalue() { 
-            bail!("Missing 'then' as part of 'test'.\n    \
-                  Suggestion: add 'then:' or if present, indent so it is contained in 'test'");
-        }
-        
-        // at most one of 'else:' or 'else_test:' should be present
-        let else_part = &test["else"];
-        let else_test_part = &test["else_test"];
-        let num_entries = test.as_hash().unwrap().len();
-        // error if more than 3 entries or exactly 3 entries and third entry isn't 'else' or 'else_test'
-        if num_entries > 3 ||
-           (num_entries == 3 && else_part.is_badvalue() && else_test_part.is_badvalue()) {
-            bail!("A key other than 'if', 'then', 'else', or 'else_test' was found in 'test'");
-        }
-
-        return Ok( Box::new( Test {
-            condition: MyXPath::build(if_part)?,
-            then_part: ReplacementArray::build(then_part).chain_err(|| "'then:'")?,
-            else_part: if else_part.is_badvalue() {
-                    None
-                } else {
-                    Some( ReplacementArray::build(else_part).chain_err(|| "'else:'")? )
-                },
-            else_test_part: if else_test_part.is_badvalue() {
-                    None
-                } else {
-                    Some( Test::build(else_test_part).chain_err(|| "'else_test:'")? )
-                },
-        } ) );
-    }
-
-    fn replace(&self, rules: &SpeechRules, mathml: &Element) -> Result<String> {
-        // println!("in replace, testing condition: \"{}\"", replacement.condition);
-        if self.condition.is_true(mathml)
-                    .chain_err(||"Failure in conditional test")? {
-            //println!("..in replace: {:?}", self.replacement);
-            return self.then_part.replace(rules, mathml);
-        } else if let Some(else_part) = &self.else_part {
-            return else_part.replace(rules, mathml);
-        } else if let Some(else_test_part) = &self.else_test_part {
-            return else_test_part.replace(rules, mathml);
-        } else {
-            // println!("... replace returns '{}'", speech_string);
-            return Ok("".to_string());
+    fn is_true(&self, mathml: &Element) -> Result<bool> {
+        return match self.condition.as_ref() {
+            None => Ok( false ),     // trivially false -- want to do else part
+            Some(condition) => condition.is_true(mathml)
+                                .chain_err(||"Failure in conditional test"),
         }
     }
-
 }
 
 
@@ -1429,11 +1526,19 @@ mod tests {
     }
 
     #[test]
-    fn test_nested_debug_quoted_paren() {
-        let str = r#"DEBUG(*[2]/*[3][DEBUG(text()='(')])"#;
+    fn test_debug_quoted_paren_before_paren() {
+        let str = r#"DEBUG(ClearSpeak_Matrix = 'Combinatorics') and IsBracketed(., '(', ')')"#;
         let result = MyXPath::add_debug_string_arg(str);
         assert!(result.is_ok());
-        assert_eq!(result.unwrap(), r#"DEBUG(*[2]/*[3][DEBUG(text()='(')], "DEBUG(*[2]/*[3][DEBUG(text()='(')], \"text()='(')]\")"#);
+        assert_eq!(result.unwrap(), r#"DEBUG(ClearSpeak_Matrix = 'Combinatorics', "ClearSpeak_Matrix = 'Combinatorics'" ) and IsBracketed(., '(', ')')"#);
     }
+
+    // #[test]
+    // fn test_nested_debug_quoted_paren() {
+    //     let str = r#"DEBUG(*[2]/*[3][DEBUG(text()='(')])"#;
+    //     let result = MyXPath::add_debug_string_arg(str);
+    //     assert!(result.is_ok());
+    //     assert_eq!(result.unwrap(), r#"DEBUG(*[2]/*[3][DEBUG(text()='(')], "DEBUG(*[2]/*[3][DEBUG(text()='(')], \"text()='(')]\")"#);
+    // }
 
 }

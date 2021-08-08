@@ -202,9 +202,17 @@ Note: all YAML files begin with "---". That indicates the beginning of a "docume
 #           E.g., we don't want "t raised to the the fraction with ...."
 #           Making "the" optional in the fraction rule prevents the repetition
 #      - x: some xpath (as string)
-#      - test:
+#      - test:  values are conventional if/then/else with two twists:
+#                the first twist is that there is an option to use either 'then_test:' or 'else_test'
+#                  This avoids another level of 'test:'
+#                the second twist is that any number of if/else_if pairs can be given;
+#                  these are tested in order until one is true
+#            The value of "test:" can either be an array of if/else_if/else keys or a single if/then/else key for convenience.
+#              If an array, then the first entry should be 'if', the middle (and maybe last) 'else_if', and the optional
+#              last one can be 'else'/'else_test'
 #         if: <string> some xpath
 #         then: [replacements]
+#         then_test [replacements] used in place of 'then:' -- avoids needing to use 'test:' after the 'then:'
 #         else: [replacements] # optional
 #         else_test # optional, used in place of 'else:' -- avoids needing to use 'test:' after the 'else:'
 #      - pause: string or number  # "short", "medium", "long", "auto", or number in milliseconds

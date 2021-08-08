@@ -97,11 +97,10 @@
          then: {t: the}
     - test: 
          if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
-         then: 
-            - test: 
-               if: parent::*[self::m:mrow and count(*)=2 and *[1][self::m:mo][text()='-']]
-               then: {t: negative}
-               else: {t: positive}
+         then_test: 
+            if: parent::*[self::m:mrow and count(*)=2 and *[1][self::m:mo][text()='-']]
+            then: {t: negative}
+            else: {t: positive}
     - t: square root
     - test: 
          if: "$Verbosity!='terse'"
@@ -109,16 +108,14 @@
          else: {pause: short}
     - x: "*[1]"
     - test: 
-         if: $ClearSpeak_Roots = 'EndRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+       - if: $ClearSpeak_Roots = 'EndRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
          then:
             - pause: short
             - t: end root
             - pause: medium
-         else:
-            test:
-               if: IsNode(*[1], 'simple')
-               then: [pause: short]
-               else: [pause: long]
+       - else_if: IsNode(*[1], 'simple')
+         then: [pause: short]
+         else: [pause: long]
 
 -
    name: default
@@ -130,23 +127,19 @@
          then: {t: the}
       - test: 
          if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
-         then: 
-            - test: 
-               if: parent::*[self::m:mrow and count(*)=2 and *[1][self::m:mo][text()='-']]
-               then: {t: negative}
-               else: {t: positive}
+         then_test: 
+            if: parent::*[self::m:mrow and count(*)=2 and *[1][self::m:mo][text()='-']]
+            then: {t: negative}
+            else: {t: positive}
       - test:
          if: "*[2][self::m:mn]"
-         then:
-            - test:
-               if: "*[2][text()='2']"
-               then: {t: square root}
-               else_test:
-                  if: "*[2][text()='3']"
-                  then: {t: cube root}
-                  else_test:
-                     if: "*[2][not(contains(., '.'))]"
-                     then: [x: "ToOrdinal(*[2])", t: root]
+         then_test:
+            - if: "*[2][text()='2']"
+              then: {t: square root}
+            - else_if: "*[2][text()='3']"
+              then: {t: cube root}
+            - else_if: "*[2][not(contains(., '.'))]"
+              then: [x: "ToOrdinal(*[2])", t: root]
          else:
             - test:
                if: "*[2][self::m:mi][string-length(.)=1]"
@@ -163,11 +156,10 @@
             - pause: short
             - t: end root
             - pause: medium
-         else:
-            test:
-               if: IsNode(*[1], 'simple')
-               then: [pause: short]
-               else: [pause: long]
+         else_test:
+            if: IsNode(*[1], 'simple')
+            then: [pause: short]
+            else: [pause: long]
   
                
 # The 'negative' rule interacts with the msqrt/mroot rules as those might pick off this case ("the negative square root of x")
@@ -471,6 +463,9 @@
    tag: [msubsup, munderover]
    match: "IsLargeOp(*[1])"
    replace: 
+    - test: 
+       if: "$Verbosity!='terse'"
+       then: {t: the}
     - x: "*[1]"
     - t: from
     - x: "*[2]"
@@ -478,6 +473,20 @@
     - x: "*[3]"
     - t: of
   
+-
+   name: bigop
+   tag: munder
+   match: "IsLargeOp(*[1])"
+   replace: 
+    - test: 
+       if: "$Verbosity!='terse'"
+       then: {t: the}
+    - x: "*[1]"
+    - t: over
+    - x: "*[2]"
+    - t: of
+
+
 #
 # Some rules on mrows
 #
@@ -491,6 +500,30 @@
       then: {t: the}
    - t: absolute value of 
    - x: "*[2]"
+
+-
+   name: set
+   tag: mrow
+   match: "IsBracketed(., '{', '}')"
+   replace: 
+   - test: 
+      if: "$Verbosity!='terse'"
+      then: {t: the}
+   - test: 
+       - if: "count(*)=2"
+         then: {t: empty set}
+       - else_if: "count(*[2]/*)=3 and *[2]/*[2][self::m:mo][text()=':' or text()='|']"
+         then:
+            - t: set of all
+            - x: "*[2]/*[1]"
+            - t: such that
+            - x: "*[2]/*[3]"
+         else:
+            - t: set
+            - x: "*[2]"
+
+
+
 -
 # intervals are controlled by a ClearSpeak Preference -- parens/brackets don't have to match, so we avoid IsBracketed
 # alternatively, we could have four (or ten) rules, but there is a lot of duplication if we do that
@@ -522,14 +555,12 @@
    # some ugly logic dealing with connectives: or, but, but, and (cleaner to be part of next clause?)
    - test:
       if: "not($is_intervals_start_infinity or $is_intervals_end_infinity)"
-      then:
-         - test:
-            if: "IsBracketed(., '(', ')')"
+      then_test:
+          - if: "IsBracketed(., '(', ')')"
             then: [t: or]
-            else_test:
-               if: "IsBracketed(., '[', ']')"
-               then: [t: and]
-               else: [t: but]
+          - else_if: "IsBracketed(., '[', ']')"
+            then: [t: and]
+            else: [t: but]
    # onto the [not] [including]... part
    - test:
       if: not($is_intervals_end_infinity)
@@ -781,13 +812,11 @@
    - x: "*"
    - test:
       # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
-      if:  count(following-sibling::*) > 0
-      then: {pause: short}
-      else:
-         test:
-            if: count(../following-sibling::*) > 0
-            then: {pause: medium}
-            else: {pause: long}
+      - if: count(following-sibling::*) > 0
+        then: {pause: short}
+      - else_if: count(../following-sibling::*) > 0
+        then: {pause: medium}
+        else: {pause: long}
  
 
 
@@ -908,25 +937,22 @@
    replace:
       - test:
          if: "$log_is_simple"
-         then:
-            test:
-               if: "*[1][text()='log']"
-               then: [t: log]
-               else_test:
-                  if: $ClearSpeak_Log = 'LnAsNaturalLog'
-                  then: [t: natural log]
-                  else: [spell: ln]
+         then_test:
+            - if: "*[1][text()='log']"
+              then: [t: log]
+            - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
+              then: [t: natural log]
+              else: [spell: ln]
          else:
           - test: 
              if: "$Verbosity!='terse' and not(log_is_simple)"
              then: {t: the}
           - test:
-             if: "*[1][text()='log']"
-             then: [t: log]
-             else_test:
-               if: $ClearSpeak_Log = 'LnAsNaturalLog'
-               then: [t: natural log]
-               else: [spell: ln]
+            - if: "*[1][text()='log']"
+              then: [t: log]
+            - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
+              then: [t: natural log]
+              else: [spell: ln]
           - t: of
           - pause: short
       - x: "*[3]"
@@ -1070,6 +1096,28 @@
     - t: power
 -
    name: default
+   tag: munder
+   match: "."
+   replace: 
+    - t: modified
+    - x: "*[1]"
+    - t: with
+    - x: "*[2]"
+    - t: below
+    
+-
+   name: default
+   tag: mover
+   match: "."
+   replace: 
+    - t: modified
+    - x: "*[1]"
+    - t: with
+    - x: "*[2]"
+    - t: above
+    
+-
+   name: default
    tag: munderover
    match: "."
    replace: 
@@ -1080,6 +1128,7 @@
     - t: below and
     - x: "*[3]"
     - t: above
+
 -
    name: default
    tag: mtable
@@ -1101,12 +1150,18 @@
     - pause: long
     - x: "* "
 -
+   name: default
+   tag: mtext
+   match: "."
+   replace:
+      - x: "*"
+-
    name: default-children
    tag: unknown
    match: count(*)>1
    replace: 
     - t: unknown math m l element
-    - x: "*"
+    - x: text()
 -
    name: default-empty
    tag: unknown
