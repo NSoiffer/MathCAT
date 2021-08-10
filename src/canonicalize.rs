@@ -620,27 +620,28 @@ impl CanonicalizeContext {
 		// println!("    ....found chemical element");
 	
 		let left_paren = as_element(right_siblings[0]);
-		let right_paren = as_element(right_siblings[2]);
+		if name(&left_paren) != "mo" {
+			return false;
+		}
 	
 		// take care of special case of bad MathML for "aq" (split across two tokens)
 		if right_siblings.len() > 3 {
 			// check to make sure right kind of leaves then check the contents
-			let l_paren = as_element(right_siblings[0]);
 			let a = as_element(right_siblings[1]);
 			let q = as_element(right_siblings[2]);
-			let r_paren = as_element(right_siblings[3]);
-			if name(&l_paren) == "mo" &&
-			   name(&a) == "mi" && as_text(a) == "a" && 
+			let right_paren = as_element(right_siblings[3]);
+			if name(&a) == "mi" && as_text(a) == "a" && 
 			   name(&q) == "mi" && as_text(a) == "q" &&
-			   name(&r_paren) == "mo" {
-				let l_paren = as_text(l_paren);
-				let r_paren = as_text(r_paren);
+			   name(&right_paren) == "mo" {
+				let left_paren = as_text(left_paren);
+				let right_paren = as_text(right_paren);
 				// since we matched 'a' and 'q' -- either is or isn't chem state
-				return (l_paren == "(" && r_paren == ")") || (l_paren == "[" && r_paren == "]");
+				return (left_paren == "(" && right_paren == ")") || (left_paren == "[" && right_paren == "]");
 			}
 		}
 	
-		if name(&left_paren) != "mo" || name(&right_paren) != "mo" {
+		let right_paren = as_element(right_siblings[2]);
+		if name(&right_paren) != "mo" {
 			return false;
 		}
 	
@@ -651,6 +652,9 @@ impl CanonicalizeContext {
 	
 		// have (xxx) or [xxx] -- check for "s, "l", "g", "aq"
 		let state_node = as_element(right_siblings[1]);
+		if name(&state_node) != "mi" {
+			return false;
+		}
 		let state = as_text(state_node);
 		if state == "s" || state == "l" || state == "g" || state == "aq" {
 			return true;
@@ -700,8 +704,17 @@ impl CanonicalizeContext {
 			// make sure that what follows starts and ends with parens/brackets
 			assert_eq!(name(&node.parent().unwrap().element().unwrap()), "mrow");
 			let right_siblings = right_siblings.unwrap();
-			if right_siblings.len() < 2 {
+			if right_siblings.is_empty() {
 				return false;
+			}
+
+			let first_child = as_element(right_siblings[0]);
+			if name(&first_child) == "mrow" && is_left_paren(as_element(first_child.children()[0])) {
+				return self.is_function_name(node, Some(&first_child.children()));
+			}
+
+			if right_siblings.len() < 2 {
+				return false;	// can't be (...)
 			}
 
 			// at least two siblings are this point -- check that they are parens/brackets
@@ -744,19 +757,30 @@ impl CanonicalizeContext {
 				return true;		// "a(" might or might not be a function call -- treat as "is" because we can't see more 
 			}
 	
-			if is_right_paren(as_element(following_nodes[1])) {
+			let next_child = as_element(following_nodes[1]);
+			if is_right_paren(next_child) {
 				return true;		// no-arg case "a()"
 			}
 	
-			return following_nodes.len() > 2 && is_right_paren(as_element(following_nodes[2]));
+			// could be really picky and restrict to checking for only mi/mn
+			// that might make more sense in stranger cases, but mfrac, msqrt, etc., probably shouldn't have parens if times 
+			return following_nodes.len() > 2 && 
+					name(&next_child) != "mrow" &&
+					is_right_paren(as_element(following_nodes[2]));
 		}
 	
 		fn is_left_paren<'a>(node: Element<'a>) -> bool {
+			if name(&node) != "mo" {
+				return false;
+			}
 			let text = as_text(node);
 			return text == "(" || text == "[";
 		}
 	
 		fn is_right_paren<'a>(node: Element<'a>) -> bool {
+			if name(&node) != "mo" {
+				return false;
+			}
 			let text = as_text(node);
 			return text == ")" || text == "]";
 		}
@@ -980,12 +1004,13 @@ impl CanonicalizeContext {
 		// 2. if the mrow starts or ends with a fence, don't merge into parent (parse children only) -- allows for "]a,b["
 		let mut parse_stack = vec![];
 		parse_stack.push(StackInfo::new(mrow.document()));
-		let children = mrow.children();
+		let mut children = mrow.children();
 		let num_children = children.len();
 	
 		for i_child in 0..num_children {
 			// println!("\nDealing with child #{}: {}", i_child, mml_to_string(&as_element(children[i_child])));
 			let mut current_child = self.canonicalize_mrows(as_element(children[i_child]))?;
+			children[i_child] = ChildOfElement::Element( current_child );
 			let base_of_child = get_possible_embellished_node(current_child);
 
 			let mut current_op = OperatorPair::new();
@@ -1324,7 +1349,7 @@ mod tests {
 		  <mo>+</mo>
 		  <mrow data-changed='added'>
 			<mi>t</mi>
-			<mo data-changed='added'>&#x2062;</mo>
+			<mo data-changed='added'>&#x2061;</mo>
 			<mrow>
 			  <mo>(</mo>
 			  <mi>x</mi>
