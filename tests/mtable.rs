@@ -214,6 +214,47 @@ fn matrix_2x3() {
 }
 
 #[test]
+fn matrix_2x3_labeled() {
+    let expr = "
+    <math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+      <mrow>
+      <mrow><mo>[</mo>
+        <mtable>
+          <mlabeledtr>
+          <mtd>
+            <mtext>(3.1)</mtext>
+          </mtd>
+          <mtd>
+            <mn>3</mn>
+          </mtd>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+          <mtd>
+            <mn>4</mn>
+          </mtd>
+          </mlabeledtr>
+          <mtr>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          <mtd>
+            <mn>2</mn>
+          </mtd>
+          <mtd>
+            <mn>6</mn>
+          </mtd>
+          </mtr>
+        </mtable>
+      <mo>]</mo></mrow></mrow>
+    </math>
+                                ";
+    test("ClearSpeak", expr,
+        "the 2 by 3 matrix; row 1 with label (3.1); column 2; 3, column 3; 1, column 4; 4; \
+                                   row 2; column 1; 0, column 2; 2, column 3; 6;");
+}
+
+#[test]
 fn matrix_3x1() {
     let expr = "
     <math xmlns='http://www.w3.org/1998/Math/MathML'>
@@ -273,6 +314,44 @@ fn matrix_4x1() {
     </math>
                                 ";
     test("ClearSpeak", expr, "the 4 by 1 column matrix; row 1; 3; row 2; 6; row 3; 1; row 4; 2;");
+}
+
+#[test]
+fn matrix_4x1_labeled() {
+    let expr = "
+    <math xmlns='http://www.w3.org/1998/Math/MathML'>
+      <mrow>
+      <mrow><mo>(</mo>
+        <mtable>
+          <mtr>
+          <mtd>
+            <mn>3</mn>
+          </mtd>
+          </mtr>
+          <mtr>
+          <mtd>
+            <mn>6</mn>
+          </mtd>
+          </mtr>
+          <mtr>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+          </mtr>
+          <mlabeledtr>
+          <mtd>
+            <mtext>(3.1)</mtext>
+          </mtd>
+          <mtd>
+            <mn>2</mn>
+          </mtd>
+          </mlabeledtr>            
+        </mtable>
+      <mo>)</mo></mrow></mrow>
+    </math>
+                                ";
+    test("ClearSpeak", expr,
+        "the 4 by 1 column matrix; row 1; 3; row 2; 6; row 3; 1; row 4 with label (3.1); 2;");
 }
 
 #[test]
