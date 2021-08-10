@@ -4,7 +4,8 @@
 extern crate regex;
 use regex::Regex;
 extern crate lazy_static;
-use crate::interface::speak_mathml;
+use lazy_static::lazy_static;
+use libmathcat::interface::speak_mathml;
 
 // Strip spaces from 'str' so comparison doesn't need to worry about spacing
 #[allow(dead_code)]     // used in testing
@@ -19,7 +20,7 @@ fn strip_spaces(str: String) -> String {
 // This uses default preferences
 #[allow(dead_code)]     // used in testing
 pub fn test(style: &str, mathml: &str, speech: &str) {
-    crate::speech::SPEECH_RULES.with(|rules| {
+    libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let pref_manager = rules.pref_manager.as_mut();
         pref_manager.set_user_prefs("SpeechStyle", style);
@@ -33,7 +34,7 @@ pub fn test(style: &str, mathml: &str, speech: &str) {
 #[allow(dead_code)]     // used in testing
 #[allow(non_snake_case)]
 pub fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: &str) {
-    crate::speech::SPEECH_RULES.with(|rules| {
+    libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let pref_manager = rules.pref_manager.as_mut();
         pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
@@ -47,7 +48,7 @@ pub fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: 
 #[allow(dead_code)]     // used in testing
 #[allow(non_snake_case)]
 pub fn test_ClearSpeak_prefs(prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
-    crate::speech::SPEECH_RULES.with(|rules| {
+    libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let pref_manager = rules.pref_manager.as_mut();
         pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
