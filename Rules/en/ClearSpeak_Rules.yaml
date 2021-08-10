@@ -475,7 +475,7 @@
   
 -
    name: bigop
-   tag: munder
+   tag: [msub, munder]
    match: "IsLargeOp(*[1])"
    replace: 
     - test: 
@@ -485,6 +485,18 @@
     - t: over
     - x: "*[2]"
     - t: of
+  
+-
+   name: bigop
+   tag: mrow
+   match: "count(*)=2 and IsLargeOp(*[1])"
+   replace: 
+    - test: 
+       if: "$Verbosity!='terse'"
+       then: {t: the}
+    - x: "*[1]"
+    - t: of
+    - x: "*[2]"
 
 
 #
@@ -507,19 +519,32 @@
    match: "IsBracketed(., '{', '}')"
    replace: 
    - test: 
-      if: "$Verbosity!='terse'"
-      then: {t: the}
-   - test: 
        - if: "count(*)=2"
-         then: {t: empty set}
+         then:
+            - test: 
+               if: "$Verbosity!='terse'"
+               then: {t: the}
+            - t: empty set
        - else_if: "count(*[2]/*)=3 and *[2]/*[2][self::m:mo][text()=':' or text()='|']"
          then:
-            - t: set of all
+            - test: 
+               if: "$Verbosity!='terse'"
+               then: {t: the}
+            - t: set of
+            - test:
+               if: $ClearSpeak_Sets != 'woAll'
+               then: [t: all]
             - x: "*[2]/*[1]"
             - t: such that
             - x: "*[2]/*[3]"
          else:
-            - t: set
+            - test: 
+               if: $ClearSpeak_Sets != 'SilentBracket'
+               then:
+                  - test: 
+                     if: "$Verbosity!='terse'"
+                     then: {t: the}
+                  - t: set
             - x: "*[2]"
 
 

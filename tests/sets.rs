@@ -408,4 +408,48 @@ mod sets {
         test_ClearSpeak("ClearSpeak_SetMemberSymbol", "Belongs",
                     expr, "the sum over i belongs to the integers of; the fraction with numerator 1; and denominator i squared;");
     }
+
+    
+    #[test]
+    fn set_member_woall() {
+        let expr = "<math>
+                <mo>{</mo>
+                <mi>x</mi>
+                <mo>∈</mo>
+                <mi>ℤ</mi>
+                <mo>:</mo>
+                <mi>x</mi>
+                <mo>&#x003E;</mo>
+                <mn>5</mn>
+                <mo>}</mo>
+                </math>";
+                test_ClearSpeak_prefs(vec![("ClearSpeak_SetMemberSymbol", "Member"), ("ClearSpeak_Sets", "woAll")],
+                    expr, "the set of x member of the integers such that x is greater than 5");
+    }
+
+    #[test]
+    fn multiple_element_set_woall() {
+        let expr = "<math>
+                    <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
+                </math>";
+        test_ClearSpeak("ClearSpeak_Sets", "woAll", expr, "the set 5 comma 10 comma 15");
+    }
+
+    #[test]
+    fn multiple_element_set_silent_bracket() {
+        let expr = "<math>
+                    <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
+                </math>";
+                test_ClearSpeak("ClearSpeak_Sets", "SilentBracket", expr, "5 comma 10 comma 15");
+            }
+
+    #[test]
+    fn silent_bracket() {
+        let expr = "<math>
+                    <mo>{</mo><mrow><mi>x</mi><mo>|</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow><mo>}</mo>
+                </math>";
+                test_ClearSpeak("ClearSpeak_Sets", "SilentBracket", expr,
+                     "the set of all x such that x is greater than 2");
+            }
+
 }
