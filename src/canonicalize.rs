@@ -13,6 +13,7 @@ extern crate lazy_static;
 use crate::xpath_functions::IsBracketed;
 use std::{ptr::eq as ptr_eq};
 use crate::pretty_print::*;
+use regex::Regex;
 
 // FIX: DECIMAL_SEPARATOR should be set by env, or maybe language
 const DECIMAL_SEPARATOR: &'static str = ".";
@@ -304,6 +305,7 @@ impl CanonicalizeContext {
 			math_element.append_child(converted_mathml);
 		}
 		converted_mathml.set_name(QName::with_namespace_uri(Some("http://www.w3.org/1998/Math/MathML"), "math"));
+		self.clean_mathml(converted_mathml);
 		let children = converted_mathml.children();
 		if children.len() > 1 {
 			// start canonicalization by adding an mrow -- then the rest flows
@@ -325,6 +327,71 @@ impl CanonicalizeContext {
 		};
 	}
 	
+	// This function does some cleanup of MathML (mostly fixing bad MathML)
+	// Unlike the main canonicalization routine, significant tree changes happen here
+	// Changes to "good" MathML:
+	// 1. mfenced -> mrow
+	// 2. mspace and mtext with only whitespace are thrown out unless in a required element position
+	fn clean_mathml<'a>(&self, mathml: Element<'a>) -> Option<Element<'a>> {
+		lazy_static! {
+            static ref IS_WHITESPACE: Regex = Regex::new(r"^\s+$").unwrap();    // only Unicode whitespace
+        }
+		const ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN: [&str; 10] =
+				["mfrac", "mroot", "msub", "msup", "msupsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv"];
+		let parent_requires_child = 
+			if name(&mathml) == "math" {
+				false
+			} else {
+				ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(
+					&name(&mathml.parent().unwrap().element().unwrap())
+				)
+			};
+		match name(&mathml) {
+			"mi" | "mo" | "mn" | "ms" | "mglyph" => {return Some(mathml);},
+			"mtext" => {
+				let text = as_text(mathml);
+				println!("mtext value: '{}'", text);
+				return if parent_requires_child || (text.len() > 0 && !IS_WHITESPACE.is_match(&text)) {Some(mathml)} else {None};
+			},
+			"mfenced" => {return Some( convert_mfenced_to_mrow(mathml) )} ,
+			"mspace" | "mphantom" => {
+				return if parent_requires_child {Some(mathml)} else {None};
+			},
+			_  => {
+				let mut new_children = Vec::with_capacity(mathml.children().len());
+				for child in mathml.children() {
+					let child = as_element(child);			
+					if let Some(new_child) = self.clean_mathml(child) {
+						new_children.push(new_child);
+					}
+				}
+
+				// Throw out mstyle -- to do this, we need to avoid mstyle being the arg of clean_mathml
+				// FIX: should probably push the attrs down to the children (set in 'self')
+				if name(&mathml) == "mstyle" {
+					if new_children.len() == 1 {
+						return Some( new_children[0] );
+					} else {
+						// wrap the children in an mrow
+						let mrow = create_mathml_element(&mathml.document(), "mrow");
+						mrow.append_children(new_children);
+						return Some(mrow);
+					}
+				} else {
+					mathml.clear_children();
+					mathml.append_children(new_children);
+					println!("after cleaning: {}", mml_to_string(&mathml));
+					return Some(mathml);				
+				}
+			}
+		}
+
+		fn convert_mfenced_to_mrow<'a>(mathml: Element<'a>) -> Element<'a> {
+			// FIX: implement this
+			return mathml;
+		}
+	}
+
 	fn canonicalize_mrows<'a>(&self, mathml: Element<'a>) -> Result<Element<'a>> {
 		let tag_name = name(&mathml);
 		mathml.set_name(QName::with_namespace_uri(Some("http://www.w3.org/1998/Math/MathML"), tag_name));
@@ -364,7 +431,7 @@ impl CanonicalizeContext {
 	
 	fn canonicalize_mo_text<'a>(&self, mo: Element<'a>) {
 		let parent_name = name(&mo);		// guaranteed to exist
-		let mut mo_text = as_text(mo);
+		let mut mo_text = as_simple_text(mo);
 		if parent_name == "mover" || parent_name == "munder" || parent_name == "munderover" {
 			// canonicalize various diacritics for munder, mover, munderover
 			mo_text = match mo_text {
@@ -415,7 +482,7 @@ impl CanonicalizeContext {
 			}
 		};	
 	
-		let operator_str = as_text(mo_node);
+		let operator_str = as_simple_text(mo_node);
 		let found_op_info = OPERATORS.get(operator_str);
 		if found_op_info.is_none() {
 			// no known operator -- return the unknown operator with the correct "fix" type
@@ -497,7 +564,7 @@ impl CanonicalizeContext {
 		for child_of_element in remaining_children {
 			let child = as_element(*child_of_element);
 			if name(&child) == "mo" {
-				let operator_str = as_text(child);
+				let operator_str = as_simple_text(child);
 				if operator_str == vert_bar_ch {
 					n += 1;
 				}
@@ -513,7 +580,7 @@ impl CanonicalizeContext {
 				n_vertical_bars_on_right: usize) -> &'static OperatorInfo {
 		// if in a prefix location, it is a left fence
 		// note:  if there is an operator on the top of the stack, it wants an operand (otherwise it would have been reduced)
-		let operator_str = as_text(mo_node);
+		let operator_str = as_simple_text(mo_node);
 		let found_op_info = OPERATORS.get(operator_str);
 		if found_op_info.is_none() {
 			return original_op;
@@ -630,11 +697,11 @@ impl CanonicalizeContext {
 			let a = as_element(right_siblings[1]);
 			let q = as_element(right_siblings[2]);
 			let right_paren = as_element(right_siblings[3]);
-			if name(&a) == "mi" && as_text(a) == "a" && 
-			   name(&q) == "mi" && as_text(a) == "q" &&
+			if name(&a) == "mi" && as_simple_text(a)== "a" && 
+			   name(&q) == "mi" && as_simple_text(q) == "q" &&
 			   name(&right_paren) == "mo" {
-				let left_paren = as_text(left_paren);
-				let right_paren = as_text(right_paren);
+				let left_paren = as_simple_text(left_paren);
+				let right_paren = as_simple_text(right_paren);
 				// since we matched 'a' and 'q' -- either is or isn't chem state
 				return (left_paren == "(" && right_paren == ")") || (left_paren == "[" && right_paren == "]");
 			}
@@ -645,8 +712,8 @@ impl CanonicalizeContext {
 			return false;
 		}
 	
-		if !( (as_text(left_paren) == "(" && as_text(right_paren) == ")") ||
-			  (as_text(left_paren) == "[" && as_text(right_paren) == "]") ) {
+		if !( (as_simple_text(left_paren) == "(" && as_simple_text(right_paren) == ")") ||
+			  (as_simple_text(left_paren)== "[" && as_simple_text(right_paren) == "]") ) {
 			return false;
 		}
 	
@@ -685,7 +752,8 @@ impl CanonicalizeContext {
 			return false;
 		}
 	
-		let node_str = as_text(base_of_name);
+		let node_string = as_text(base_of_name);
+		let node_str = node_string.as_str();
 		if node_str.len() == 0 {
 			return false;
 		}
@@ -773,7 +841,7 @@ impl CanonicalizeContext {
 			if name(&node) != "mo" {
 				return false;
 			}
-			let text = as_text(node);
+			let text = as_simple_text(node);
 			return text == "(" || text == "[";
 		}
 	
@@ -781,7 +849,7 @@ impl CanonicalizeContext {
 			if name(&node) != "mo" {
 				return false;
 			}
-			let text = as_text(node);
+			let text = as_simple_text(node);
 			return text == ")" || text == "]";
 		}
 	}
@@ -797,7 +865,7 @@ impl CanonicalizeContext {
 			let children = integer_part.children();
 			if children.len() == 2 &&
 				name(&as_element(children[0])) == "mo" &&
-				as_text(as_element(children[0])) == "-" {
+				as_simple_text(as_element(children[0])) == "-" {
 					let integer_part = as_element(children[1]);
 					if name(&integer_part) != "mn"  || as_text(integer_part).contains(DECIMAL_SEPARATOR) {
 						return false;
@@ -1019,7 +1087,7 @@ impl CanonicalizeContext {
 				let previous_op = if top(&mut parse_stack).is_operand {None} else {Some( top(&parse_stack).op_pair.op )};
 				let next_node = if i_child + 1 < num_children {Some(as_element(children[i_child+1]))} else {None};
 				current_op = OperatorPair{
-					ch: as_text(base_of_child),
+					ch: as_simple_text(base_of_child),
 					op: &self.find_operator(base_of_child, previous_op,
 							top(&parse_stack).last_child_in_mrow(), next_node)
 				};
@@ -1153,24 +1221,40 @@ fn as_element<'a>(child: ChildOfElement<'a>) -> Element<'a> {
 }
 
 // The child of a leaf element must be text (previously trimmed)
-// Note: can't use references as that results in 'returning use of local variable'
-fn as_text<'a>(leaf_child: Element<'a>) -> &'a str {
+// Note: if there is whitespace in 'leaf_child', then there are multiple children
+fn as_text<'a>(leaf_child: Element<'a>) -> String {
 	assert!(name(&leaf_child) == "mi" || name(&leaf_child) == "mo" || name(&leaf_child) == "mn" || name(&leaf_child) == "mtext" ||
 			name(&leaf_child) == "ms" || name(&leaf_child) == "mspace" || name(&leaf_child) == "mglyph");
 	let children = leaf_child.children();
-	if children.len() == 0 {
-		return "";
-	};
-	if children.len() == 1 {
-		return match children[0] {
-			ChildOfElement::Text(t) => t.text(),
-			_ => panic!("as_text: internal error -- found non-text child of leaf element"),	
-		}
-	};
 
-	// can have mglyph and a few other things inside a leaf -- not sure what should happen.
-	// FIX: is returning an empty string always ok???
-	return "";
+	return children.iter()
+		.map(|c|
+			match c {
+				ChildOfElement::Text(t) => t.text(),
+				_ => panic!("as_text: internal error -- found non-text child of leaf element"),	
+				}
+			)			
+		.collect::<Vec<&str>>()
+		.join("");
+}
+
+// The child of a leaf element must be text (previously trimmed)
+// Similar to 'as_text', but only returns the first child. This is likely the same for mo, mi, and mn
+// This is faster, but more importantly, needed in at least one case where a string gets dropped.
+// Warning: this function should be used with caution as it may return too small an answer.
+fn as_simple_text<'a>(leaf_child: Element<'a>) -> &'a str {
+	assert!(name(&leaf_child) == "mi" || name(&leaf_child) == "mo" || name(&leaf_child) == "mn" || name(&leaf_child) == "mtext" ||
+			name(&leaf_child) == "ms" || name(&leaf_child) == "mspace" || name(&leaf_child) == "mglyph");
+	let children = leaf_child.children();
+
+	if children.is_empty() {
+		return "";
+	}
+
+	return match children[0] {
+		ChildOfElement::Text(t) => t.text(),
+		_ => panic!("as_text: internal error -- found non-text child of leaf element"),
+	}
 }
 
 #[allow(dead_code)] // for debugging with println
@@ -1242,13 +1326,13 @@ fn show_invisible_op_char<'a>(ch: &'a str) -> &'a str {
 		}
 	
 		let text = as_text(node);
-		return CHEMICAL_ELEMENTS.contains(text);
+		return CHEMICAL_ELEMENTS.contains(text.as_str());
 	}
 	
 
 
 #[cfg(test)]
-mod tests {
+mod canonicalize_tests {
     use super::*;
     use sxd_document::parser;
 
@@ -1632,6 +1716,96 @@ mod tests {
         assert!(are_strs_canonically_equal(test_str, target_str));
     }
 
+	
+	#[test]
+    fn mtext_whitespace_string() {
+        let test_str = "<math><mi>t</mi><mtext>&#x00A0;&#x205F;</mtext></math>";
+        let target_str = "<math><mi>t</mi></math>";
+		assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+	
+	#[test]
+    fn remove_mtext_whitespace_1() {
+        let test_str = "<math><mi>t</mi><mtext>&#x00A0;&#x205F;</mtext>
+				<mrow><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></mrow></math>";
+        let target_str = " <math>
+		<mrow data-changed='added'>
+		  <mi>t</mi>
+		  <mo data-changed='added'>&#x2062;</mo>
+		  <mrow>
+			<mo>(</mo>
+			<mrow data-changed='added'>
+			  <mi>x</mi>
+			  <mo>+</mo>
+			  <mi>y</mi>
+			</mrow>
+			<mo>)</mo>
+		  </mrow>
+		</mrow>
+	   </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
 
+	#[test]
+    fn remove_mtext_whitespace_2() {
+        let test_str = "<math><mi>t</mi>
+				<mrow><mtext>&#x2009;</mtext><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></mrow></math>";
+        let target_str = " <math>
+		<mrow data-changed='added'>
+		  <mi>t</mi>
+		  <mo data-changed='added'>&#x2062;</mo>
+		  <mrow>
+			<mo>(</mo>
+			<mrow data-changed='added'>
+			  <mi>x</mi>
+			  <mo>+</mo>
+			  <mi>y</mi>
+			</mrow>
+			<mo>)</mo>
+		  </mrow>
+		</mrow>
+	   </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn do_not_remove_all_whitespace() {
+        let test_str = "<math><mfrac>
+					<mrow><mspace width='3em'/></mrow>
+					<mtext>&#x2009;</mtext>
+				</mfrac></math>";
+        let target_str = "<math><mfrac>
+				<mspace width='3em'/>
+				<mtext>&#x2009;</mtext>
+			</mfrac></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn do_not_remove_some_whitespace() {
+        let test_str = "<math><mroot>
+					<mrow><mi>b</mi><mphantom><mi>y</mi></mphantom></mrow>
+					<mtext>&#x2009;</mtext>
+				</mroot></math>";
+        let target_str = "<math><mroot>
+				<mi>b</mi>
+				<mtext>&#x2009;</mtext>
+			</mroot></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn remove_all_extra_elements() {
+        let test_str = "<math><msqrt>
+					<mstyle> <mi>b</mi> </mstyle>
+					<mphantom><mi>y</mi></mphantom>
+					<mtext>&#x2009;</mtext>
+					<mspace width='3em'/>
+				</msqrt></math>";
+        let target_str = "<math><msqrt>
+				<mi>b</mi>
+			</msqrt></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
 }
 
