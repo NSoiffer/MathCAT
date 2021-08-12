@@ -336,7 +336,7 @@ impl Function for IsNode {
                         if let Node::Element(e) = node {
                             match kind.as_str() {
                                 "simple" => IsNode::is_simple(&e),
-                                "leaf"   => MATHML_LEAF_NODES.iter().any(|&leaf| leaf == e.name().local_part()),
+                                "leaf"   => MATHML_LEAF_NODES.contains(&e.name().local_part()),
                                 "trig_name" => IsNode::is_trig_name(&e),
                                 "common_fraction" => IsNode::is_common_fraction(&e, usize::MAX, usize::MAX), 
                                 _        => true,       // can't happen due to check above
