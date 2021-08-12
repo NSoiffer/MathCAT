@@ -10,6 +10,13 @@ Todo: incorporation of third party libraries to support a common subset of TeX m
 
 MathCAT is written in Rust and can be built to interface with C/C++. It can also be built with a Python interface. The Python interface is used by NVDA and by Orca. 
 
+## Current Status
+MathCAT is under active development and I expect that by the end of September, it will be usable as a MathPlayer replacement for those using the English version. It will not be quite as complete or polished in some was as MathPlayer though.
+
+By the end of the year, I expect MathCAT to be ready for all English users and hope to have a good start on some of the translations. Initial translations will be based on programmatic translations from MathPlayer's (public) files and are likely to be very buggy until volunteers step forward to fix them.
+
+The MathML Working Group has begun work on allowing authors to express their intent as to the meaning of certain content and how it might be spoken. My goal is to use MathCAT as a testing ground for those ideas once they become solid enough for implementation.
+
 ## Why MathCAT?
 
 MathCAT is a follow-on to MathPlayer. I developed MathPlayer's accessibility while at Design Science starting back in 2004 after I joined Design Science. At the time, MathPlayer was chiefly designed to be a C++ plugin to Internet Explorer (IE) that displayed MathML on web pages. For quite some time, it was the most complete MathML implementation available. The original work for display of math was done by Design Science's founder Paul Topping and their chief technology officer, the late Robert Miner. Eventually, for numerous reasons, IE withdrew the interface that MathPlayer used for display and did not implement a replacement as the world was moving towards using JavaScript in the browser and not allowing security threats posed by external code. This left MathPlayer as an accessibility-only library called by other programs (chiefly NVDA). MathPlayer was proprietary, but was given away for free.
@@ -50,7 +57,7 @@ Rust is quite efficient. On a Core I7-770K machine, the moderate-size expression
     </msup>
   </mrow>
 </math>
-takes about 1ms and generates the ClearSpeak string
+takes about 1ms to generate the ClearSpeak string
 "_e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren squared, end exponent_".
 The MathML for this expression is:
 ```
@@ -89,8 +96,8 @@ The MathML for this expression is:
 </math>
 ```
 
-MathPlayer uses externals rules to generate speech and braille.
-These take about 50ms to load; this load only happens the first time the rules are used or if the speech style, language, or other external preference is changed.
+MathCAT uses external rules to generate speech and braille.
+These take about 50ms to load; this load only happens the first time the rules are used, or if the speech style, language, or other external preference is changed.
 The library is about 2.6mb in size.
 
 If you are working on an in-browser solution (i.e, you are using JavaScript or some other browser-based language), MathCAT will not work for you. Instead, take a look at [Speech rule engine](https://github.com/zorkow/speech-rule-engine) (SRE) by Volker Sorge. It is written in TypeScript and will likely meet your needs.
@@ -131,7 +138,7 @@ In the more verbose form of YAML syntax, indentation is used instead of brackets
  - b
  - c
 ```
-Notice that the strings don't need to be quoted in this form.
+Notice that the strings don't need to be quoted in this form (although some text requires quotes).
 
 The dictionary in the more verbose form looks like:
 ```
@@ -143,11 +150,11 @@ Here is a more real life example from the Unicode definitions showing various al
 Pay attention to the indentation: all entries that are indented to the right of the line above are subentries in that array/dictionary.
 Pay attention to the indentation: all entries that are indented to the right of the line above are subentries in that array/dictionary.
 ```
-# Two options for defining a simple replacement for the letter 'd'.
+# Two options for defining a simple replacement for the symbol '∞'.
 # For brevity and clarity, the first form is preferred.
-- 'd': {t: "d"}
-- 'd':
-    t: d
+- '∞': {t: "infinity"}
+- '∞':
+    t: infinity
 
 # Here are a few options for a more complex definition that involves a test
 # This compact form is (compact) JSON syntax for the value
@@ -179,7 +186,7 @@ In case it wasn't obvious, "#" indicates a comment and the rest of the line is i
 
 Note: all YAML files begin with "---". That indicates the beginning of a "document".
 
-## The Basic Parts of a Rule
+## The Basic Parts of a Speech Rule
 
 ```
 # rule:
@@ -236,7 +243,34 @@ Note: all YAML files begin with "---". That indicates the beginning of a "docume
 
 Note: for "pause", the "auto" value will calculate a pausing amount based on the complexity of the surrounding parts. The more complex they are, the longer the pause (up to a limit). The basic idea is that you want to give the listener time to digest and separate out the two parts when one or both are more complicated.
 
+In addition to having a named rule, the speech rule file supports including other speech rules files. This lets various speech speech rule styles share common features. Inclusion is done via an entry in place of a speech rule:
+```
+  -include: file_name
+```
+Any number of includes can occur in a file. They are processed as if the contents of the included file were in the original file. The file name may be located in the current directory of the rule file being processed in or some relative directory to the current directory.
 ## The Unicode Files
+
+Unicode files are simplified versions of the speech rules. This makes it easier to specify rules for Unicode characters and also results in a significant speed boost. Rules on leaf elements such as `mo` will override any definition in the Unicode files. In general however, speech rules for Unicode characters should be in a Unicode file.
+
+Like speech rules, Unicode files are YAML files. The main difference is that only the character is used for defining the rule. There is no need to specify a rule name, tag name, match expression, etc. The value of a rule can be anything that is value as a "replace:" value for speech rules.
+
+Most rules are very simple. Here is an example:
+```
+ - "+": [t: plus]                                # 0x2b
+```
+This rule will translate the "+" character int the string "plus".
+
+A more complicated rule is:
+```
+ - "[":                                          # 0x5b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak'
+        then: [t: open bracket]
+        else: [t: left bracket]                            
+```
+This rule produces different speech depending on the current preference for the speech style.
+
+It is also possible to share Unicode files via `- include: file_name` just as it is possible to do so with speech rules.
 
 
 ## The Prefs Files
