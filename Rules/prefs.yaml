@@ -1,6 +1,6 @@
 ---
   Speech:
-    Impairment: blindness       # LearningDisability, LowVision, Blindness
+    Impairment: Blindness       # LearningDisability, LowVision, Blindness
     Language: en                # any known language code and sub-code -- could be en-uk, etc
     Verbosity: medium           # Terse, Medium, Verbose
     Rate: 100                   # Change from text speech rate (%)
