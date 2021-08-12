@@ -18,6 +18,7 @@ use crate::prefs::*;
 use yaml_rust::{YamlLoader, Yaml, yaml::Hash};
 use crate::tts::*;
 use crate::pretty_print::yaml_to_string;
+use std::path::Path;
 
 /// The main external call, `speak_mathml` returns a string for the speech associated with the `mathml`.
 ///   It matches against the rules that are computed by user prefs such as "Language" and "SpeechStyle".
@@ -143,7 +144,7 @@ fn remove_optional_indicators(str: &str) -> String {
 /// Given a string that should be Yaml, it calls `build_fn` with that string.
 /// The build function/closure should process the Yaml as appropriate and capture any errors and write them to `std_err`.
 pub fn compile_rule<F>(str: &str, mut build_fn: F) -> Result<()> where
-    F: FnMut(&Yaml) {
+            F: FnMut(&Yaml) {
     let docs = YamlLoader::load_from_str(str);
     match docs {
         Err(e) => {
@@ -159,6 +160,22 @@ pub fn compile_rule<F>(str: &str, mut build_fn: F) -> Result<()> where
     }
 }
 
+fn process_include<F>(current_file: &Path, new_file_name: &str, mut read_new_file: F) -> Result<()> where F: FnMut(&Path) {
+    let parent_path = current_file.parent();
+    if let None = parent_path {
+        bail!("Internal error: {:?} is not a valid file name", current_file);
+    }
+    let mut new_file = parent_path.unwrap().to_path_buf();
+    new_file.push(new_file_name);
+    let new_file = match new_file.as_path().canonicalize() {
+        Ok(buf) => buf,
+        Err(msg) => bail!("-include: constructed file name '{}' causes error '{}'",
+                                 new_file.to_str().unwrap(), msg),
+    };
+
+    read_new_file(new_file.as_path());
+    return Ok( () );
+}
 
 
 // 'Replacement' is an enum that contains all the potential replacement types/structs
@@ -734,10 +751,21 @@ impl fmt::Display for SpeechPattern {
 }
 
 impl SpeechPattern  {
-    fn build(dict: &Yaml, file_name: &str) -> Result<Vec<SpeechPattern>> {
+    fn build(dict: &Yaml, file: &Path, rules: &mut RuleTable) -> Result<()> {
         // Rule::SpeechPattern
-        // build { "pattern_name", "tag_name", "pattern", "replacement" }
+        //   build { "pattern_name", "tag_name", "pattern", "replacement" }
+        // or recurse via include: file_name
+
         // println!("\nbuild_speech_pattern: dict:\n{}", yaml_to_string(dict, 0));
+
+        if let Ok(include_file_name) = find_str(dict, "include") {
+            let do_include_fn = |new_file: &Path| {
+                SpeechRules::read_patterns(&[Some(new_file.to_path_buf()), None, None], rules);
+            };
+
+            return process_include(file, include_file_name, do_include_fn);
+        }
+
         let pattern_name = find_str(dict, "name");
 
         // tag_named can be either a string (most common) or an array of strings
@@ -775,7 +803,7 @@ impl SpeechPattern  {
                 bail!("Errors trying to find 'name' in:\n{}", &yaml_to_string(dict, 1));
             };
         };
-        let pattern_name = pattern_name.unwrap();
+        let pattern_name = pattern_name.unwrap().to_string();
 
         // FIX: add check to make sure tag_name is a valid MathML tag name
         if dict["match"].is_badvalue() {
@@ -786,13 +814,13 @@ impl SpeechPattern  {
         }
     
         // xpath's can't be cloned, so we need to do a 'build_xxx' for each tag name
-        let mut patterns = Vec::new();
         for tag_name in tag_names {
-            patterns.push(
-                SpeechPattern{
-                    pattern_name: pattern_name.to_string(),
-                    tag_name: tag_name.to_string(),
-                    file_name: file_name.to_string(),
+            let tag_name = tag_name.to_string();
+            let speech_pattern = 
+                Box::new( SpeechPattern{
+                    pattern_name: pattern_name.clone(),
+                    tag_name: tag_name.clone(),
+                    file_name: file.to_str().unwrap().to_string(),
                     pattern: MyXPath::build(&dict["match"])
                         .chain_err(|| {
                             format!("value for 'match' in rule ({}: {}):\n{}",
@@ -807,14 +835,15 @@ impl SpeechPattern  {
                         .chain_err(|| {
                             format!("value for 'replace' in rule ({}: {}). Replacements:\n{}",
                                     tag_name, pattern_name, yaml_to_string(&dict["replace"], 1))
-                    })?,
-                }
-            )
+                    })?
+                } );
+                let rule_value = rules.entry(tag_name).or_insert( Vec::new());
+                rule_value.push(speech_pattern);
         }
 
-        return Ok( patterns );
+        return Ok( () );
     }
-    
+
     fn is_match(&self, mathml: &Element) -> Result<bool> {
         if self.tag_name != mathml.name().local_part() && self.tag_name != "unknown" {
             return Ok( false );
@@ -1142,26 +1171,35 @@ impl  fmt::Display for UnicodeDef {
 }
 
 impl UnicodeDef {
-    fn build(unicode_def: &Yaml) -> Result<UnicodeDef> {
+    fn build(unicode_def: &Yaml, file_name: &Path, unicode_chars: &mut UnicodeTable) -> Result<()> {
+        if let Ok(include_file_name) = find_str(unicode_def, "include") {
+            let do_include_fn = |new_file: &Path| {
+                SpeechRules::read_unicode(&[Some(new_file.to_path_buf()), None, None], unicode_chars);
+            };
+
+            return process_include(file_name, include_file_name, do_include_fn);
+        }
+
         // key: char, value is replacement or array of replacements
         let dictionary = unicode_def.as_hash();
         if dictionary.is_none() {
             bail!("Expected a unicode definition (e.g, '+':{{t: plus}}'), found {}", yaml_to_string(unicode_def, 0));
         }
+        
         let dictionary = dictionary.unwrap();
-        assert!(dictionary.len()==1);
+        if dictionary.len() != 1 {
+            bail!("Expected a unicode definition (e.g, '+':{{t: plus}}'), found {}", yaml_to_string(unicode_def, 0));
+        }
+
         let (ch, replacements) = dictionary.iter().next().ok_or_else(||  format!("Expected a unicode definition (e.g, '+':{{t: plus}}'), found {}", yaml_to_string(unicode_def, 0)))?;
         let ch = UnicodeDef::get_unicode_char(ch)?;
-        return Ok( UnicodeDef{
-            ch,
-            speech: ReplacementArray::build(replacements)?
-        });
+        unicode_chars.insert(ch, ReplacementArray::build(replacements)?.replacements);
+        return Ok( () )
     }
     
     fn get_unicode_char(ch: &Yaml) -> Result<u32> {
         // either "a" or 0x1234 (number)
-        let ch_as_str = ch.as_str();
-        if let Some(ch) = ch_as_str {
+        if let Some(ch) = ch.as_str() {
             let mut ch_iter = ch.chars();
             let unicode_ch = ch_iter.next();
             if unicode_ch.is_none() || ch_iter.next().is_some() {
@@ -1244,39 +1282,39 @@ impl SpeechRules {
             print_errors(&e);
             exit(1);
         };
+        let mut speech_rules: RuleTable = HashMap::with_capacity(31);
+        SpeechRules::read_patterns(pref_manager.get_style_file(), &mut speech_rules);
+
+        let mut unicode_chars: UnicodeTable = HashMap::with_capacity(6997);
+        SpeechRules::read_unicode(pref_manager.get_unicode_file(), &mut unicode_chars);
+
         let rules = SpeechRules{
             name: String::from(name),
-            rules: SpeechRules::read_patterns(pref_manager.get_style_file()),  // rules before prefs to borrow/move problem
-            unicode: SpeechRules::read_unicode(pref_manager.get_unicode_file()),
+            rules: speech_rules,
+            unicode: unicode_chars,
             pref_manager: pref_manager,
         };
         return rules;
     }
 
-    fn read_patterns(path: &Locations) -> RuleTable {
+    fn read_patterns(path: &Locations, rules: &mut RuleTable) {
         // FIX: should read first (lang), then supplement with second (region)
         use std::fs;
         if let Some(p) = &path[0] {
             let rule_file_contents = fs::read_to_string(p).expect("cannot read file");
-            let mut hashmap: RuleTable = HashMap::new();
             let rules_build_fn = |pattern: &Yaml| {
-                match SpeechRules::build_speech_patterns(pattern, p.to_str().unwrap()) {
-                    Ok(patterns) => { hashmap = patterns; },
-                    Err(e)       => { print_errors(&e.chain_err(||format!("in file {:?}", p.to_str().unwrap()))); }
+                if let Err(e) = SpeechRules::build_speech_patterns(pattern, p, rules) {
+                    print_errors(&e.chain_err(||format!("in file {:?}", p.to_str().unwrap())));
                 }    
             };
             if let Err(e) = compile_rule(&rule_file_contents, rules_build_fn) {
                 print_errors(&e.chain_err(||format!("in file {:?}", p.to_str().unwrap())));
             }
-            return hashmap;    
-        } else {
-            return HashMap::new();
         }
     }
 
-    fn build_speech_patterns(patterns: &Yaml, file_name: &str) -> Result<RuleTable> {
+    fn build_speech_patterns(patterns: &Yaml, file_name: &Path, rules: &mut RuleTable) -> Result<()> {
         // Rule::SpeechPatternList
-        let mut rules: RuleTable = HashMap::with_capacity(31);
         let patterns_vec = patterns.as_vec();
         if patterns_vec.is_none() {
             bail!(yaml_type_err(patterns, "array"));
@@ -1284,7 +1322,7 @@ impl SpeechRules {
         let patterns_vec = patterns.as_vec().unwrap();
 
         for (i, entry) in patterns_vec.iter().enumerate() {
-            let built_patterns = SpeechPattern::build(entry, file_name);
+            let built_patterns = SpeechPattern::build(entry, file_name, rules);
             if let Err(e) = built_patterns {
                 if e.description().contains("name:") {
                     return Err(e);
@@ -1295,44 +1333,31 @@ impl SpeechRules {
                     );
                 }
             }
-
-            for pattern in built_patterns.unwrap() {
-                // println!("Pattern = {}", pattern);
-                let pattern = Box::new( pattern );
-                let value = rules.entry(pattern.tag_name.clone()).or_insert( Vec::new());
-                value.push(pattern);
-            }
         }
-        return Ok(rules);  
+        return Ok( () );  
     }
     
-        fn read_unicode(path: &Locations) -> UnicodeTable {
+    fn read_unicode(path: &Locations, unicode_chars: &mut UnicodeTable) {
         // FIX: should read first (lang), then supplement with second (region)
         if let Some(p) = &path[0] {
             use std::fs;    
             let unicode_file_contents = fs::read_to_string(p).expect("cannot read file");
-            let mut unicode_chars: UnicodeTable = HashMap::with_capacity(6997);
             let unicode_build_fn = |unicode_def_list: &Yaml| {
                 let unicode_defs = unicode_def_list.as_vec();
                 if unicode_defs == None {
                    format!("File '{}' does not being with an array", yaml_to_type(unicode_def_list));
                 };
                 for unicode_def in unicode_defs.unwrap() {
-                    match UnicodeDef::build(unicode_def) {
-                        Ok(def) => { unicode_chars.insert(def.ch, def.speech.replacements); },
-                        Err(e)       => { print_errors(&e.chain_err(|| {
-                            format!("In file {:?}", p)
-                        })); }
+                    if let Err(e) = UnicodeDef::build(unicode_def, p, unicode_chars) {
+                        print_errors(&e.chain_err(|| {format!("In file {:?}", p)}));
                     }        
-                }
+                };
             };
             if let Err(e) =compile_rule(&unicode_file_contents, unicode_build_fn) {
                 print_errors(&e.chain_err(||format!("in file {:?}", p.to_str().unwrap())));
             }
             println!("Hashmap has {} entries", unicode_chars.len());
-            return unicode_chars;  
         }
-        return HashMap::with_capacity(1);
     }
 
     fn match_pattern(&self, mathml: &Element) -> Result<String> {
@@ -1483,9 +1508,10 @@ mod tests {
         {name: default, tag: math, match: ".", replace: [x: "./*"] }"#;
         let doc = YamlLoader::load_from_str(str).unwrap();
         assert_eq!(doc.len(), 1);
+        let mut rules: RuleTable = HashMap::new();
 
-        let speech_patterns = SpeechPattern::build(&doc[0], "testing").unwrap();
-        let speech_pattern = &speech_patterns[0];
+        SpeechPattern::build(&doc[0], Path::new("testing"), &mut rules).unwrap();
+        let speech_pattern = &rules["math"][0];
         assert_eq!(speech_pattern.pattern_name, "default", "\npattern name failure");
         assert_eq!(speech_pattern.tag_name, "math", "\ntag name failure");
         assert_eq!(speech_pattern.pattern.string, ".", "\npattern failure");
