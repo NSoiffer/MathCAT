@@ -254,7 +254,7 @@ pub fn trim_element(e: &Element) {
             ChildOfElement::Text(t) => {
                 let trimmed_text = t.text().trim();
                 if trimmed_text.len() > 0 {     // don't throw out Text() that is only whitespace as that is meaningful in mtext
-                    t.set_text( t.text().trim());
+                    t.set_text(trimmed_text);
                 }
             },
             _ => {
