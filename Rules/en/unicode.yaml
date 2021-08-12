@@ -1249,18 +1249,18 @@
          if: "$Verbosity!='terse'"
          then: {t: is}
      - t: proportional to
- - "∞": [t: "infinity"]                            # 0x221e
+ - "∞": [t: "infinity"]                          # 0x221e
  - "∟": [t: right angle]                         # 0x221f
  - "∠": [t: angle]                               # 0x2220
  - "∡": [t: measured angle]                      # 0x2221
  - "∢": [t: spherical angle]                     # 0x2222
- - "∣": [t: divides]                             # 0x2223
- - "∤": [t: does not divide]                     # 0x2224
- - "∥":                                          # 0x2225
+ - "∣": [t: divides]                              # 0x2223
+ - "∤": [t: does not divide]                      # 0x2224
+ - "∥":                                           # 0x2225
      - test: 
          if: "$Verbosity!='terse'"
          then: {t: is parallel to}
- - "∦":                                          # 0x2226
+ - "∦":                                           # 0x2226
      - test: 
          if: "$Verbosity!='terse'"
          then: {t: is}
