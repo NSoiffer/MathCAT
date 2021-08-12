@@ -237,8 +237,9 @@ fn trim_doc(doc: &Document) {
 
 /// Not really meant to be public -- used by tests in some packages
 pub fn trim_element(e: &Element) {
-    // assume 'e' doesn't have element children until proven otherwise
-    // this means we keep Text children until we are proven they aren't needed
+    // "<mtext>this is text</mtext" results in 3 text children
+    //   these are combined into one child as it makes code downstream simpler
+    let mut single_text = "".to_string();
     for child in e.children() {
         match child {
             ChildOfElement::Element(_) => {
@@ -252,15 +253,24 @@ pub fn trim_element(e: &Element) {
                 return;
             },
             ChildOfElement::Text(t) => {
-                let trimmed_text = t.text().trim();
-                if trimmed_text.len() > 0 {     // don't throw out Text() that is only whitespace as that is meaningful in mtext
-                    t.set_text(trimmed_text);
-                }
+                single_text += t.text();
+                e.remove_child(child);
             },
             _ => {
                 e.remove_child(child);
             }
         }
+    }
+
+    let trimmed_text = single_text.trim();
+    if !e.children().is_empty() && trimmed_text.len() > 0 {
+        // FIX: we have a problem -- what should happen???
+        // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash
+        eprintln!("mathml and both element and textual children which shouldn't happen -- ignoring text '{}'", single_text);
+    }
+    if e.children().is_empty() && single_text.len() > 0 {
+        // println!("Combining text in {}: '{}' -> '{}'", e.name().local_part(), single_text, trimmed_text);
+        e.set_text(trimmed_text);
     }
 }
 

@@ -350,7 +350,6 @@ impl CanonicalizeContext {
 			"mi" | "mo" | "mn" | "ms" | "mglyph" => {return Some(mathml);},
 			"mtext" => {
 				let text = as_text(mathml);
-				println!("mtext value: '{}'", text);
 				return if parent_requires_child || (text.len() > 0 && !IS_WHITESPACE.is_match(&text)) {Some(mathml)} else {None};
 			},
 			"mfenced" => {return Some( convert_mfenced_to_mrow(mathml) )} ,
@@ -380,7 +379,6 @@ impl CanonicalizeContext {
 				} else {
 					mathml.clear_children();
 					mathml.append_children(new_children);
-					println!("after cleaning: {}", mml_to_string(&mathml));
 					return Some(mathml);				
 				}
 			}
@@ -431,7 +429,7 @@ impl CanonicalizeContext {
 	
 	fn canonicalize_mo_text<'a>(&self, mo: Element<'a>) {
 		let parent_name = name(&mo);		// guaranteed to exist
-		let mut mo_text = as_simple_text(mo);
+		let mut mo_text = as_text(mo);
 		if parent_name == "mover" || parent_name == "munder" || parent_name == "munderover" {
 			// canonicalize various diacritics for munder, mover, munderover
 			mo_text = match mo_text {
@@ -482,7 +480,7 @@ impl CanonicalizeContext {
 			}
 		};	
 	
-		let operator_str = as_simple_text(mo_node);
+		let operator_str = as_text(mo_node);
 		let found_op_info = OPERATORS.get(operator_str);
 		if found_op_info.is_none() {
 			// no known operator -- return the unknown operator with the correct "fix" type
@@ -564,7 +562,7 @@ impl CanonicalizeContext {
 		for child_of_element in remaining_children {
 			let child = as_element(*child_of_element);
 			if name(&child) == "mo" {
-				let operator_str = as_simple_text(child);
+				let operator_str = as_text(child);
 				if operator_str == vert_bar_ch {
 					n += 1;
 				}
@@ -580,7 +578,7 @@ impl CanonicalizeContext {
 				n_vertical_bars_on_right: usize) -> &'static OperatorInfo {
 		// if in a prefix location, it is a left fence
 		// note:  if there is an operator on the top of the stack, it wants an operand (otherwise it would have been reduced)
-		let operator_str = as_simple_text(mo_node);
+		let operator_str = as_text(mo_node);
 		let found_op_info = OPERATORS.get(operator_str);
 		if found_op_info.is_none() {
 			return original_op;
@@ -697,11 +695,11 @@ impl CanonicalizeContext {
 			let a = as_element(right_siblings[1]);
 			let q = as_element(right_siblings[2]);
 			let right_paren = as_element(right_siblings[3]);
-			if name(&a) == "mi" && as_simple_text(a)== "a" && 
-			   name(&q) == "mi" && as_simple_text(q) == "q" &&
+			if name(&a) == "mi" && as_text(a)== "a" && 
+			   name(&q) == "mi" && as_text(q) == "q" &&
 			   name(&right_paren) == "mo" {
-				let left_paren = as_simple_text(left_paren);
-				let right_paren = as_simple_text(right_paren);
+				let left_paren = as_text(left_paren);
+				let right_paren = as_text(right_paren);
 				// since we matched 'a' and 'q' -- either is or isn't chem state
 				return (left_paren == "(" && right_paren == ")") || (left_paren == "[" && right_paren == "]");
 			}
@@ -712,8 +710,8 @@ impl CanonicalizeContext {
 			return false;
 		}
 	
-		if !( (as_simple_text(left_paren) == "(" && as_simple_text(right_paren) == ")") ||
-			  (as_simple_text(left_paren)== "[" && as_simple_text(right_paren) == "]") ) {
+		if !( (as_text(left_paren) == "(" && as_text(right_paren) == ")") ||
+			  (as_text(left_paren)== "[" && as_text(right_paren) == "]") ) {
 			return false;
 		}
 	
@@ -752,8 +750,7 @@ impl CanonicalizeContext {
 			return false;
 		}
 	
-		let node_string = as_text(base_of_name);
-		let node_str = node_string.as_str();
+		let node_str = as_text(base_of_name);
 		if node_str.len() == 0 {
 			return false;
 		}
@@ -841,7 +838,7 @@ impl CanonicalizeContext {
 			if name(&node) != "mo" {
 				return false;
 			}
-			let text = as_simple_text(node);
+			let text = as_text(node);
 			return text == "(" || text == "[";
 		}
 	
@@ -849,7 +846,7 @@ impl CanonicalizeContext {
 			if name(&node) != "mo" {
 				return false;
 			}
-			let text = as_simple_text(node);
+			let text = as_text(node);
 			return text == ")" || text == "]";
 		}
 	}
@@ -865,7 +862,7 @@ impl CanonicalizeContext {
 			let children = integer_part.children();
 			if children.len() == 2 &&
 				name(&as_element(children[0])) == "mo" &&
-				as_simple_text(as_element(children[0])) == "-" {
+				as_text(as_element(children[0])) == "-" {
 					let integer_part = as_element(children[1]);
 					if name(&integer_part) != "mn"  || as_text(integer_part).contains(DECIMAL_SEPARATOR) {
 						return false;
@@ -1087,7 +1084,7 @@ impl CanonicalizeContext {
 				let previous_op = if top(&mut parse_stack).is_operand {None} else {Some( top(&parse_stack).op_pair.op )};
 				let next_node = if i_child + 1 < num_children {Some(as_element(children[i_child+1]))} else {None};
 				current_op = OperatorPair{
-					ch: as_simple_text(base_of_child),
+					ch: as_text(base_of_child),
 					op: &self.find_operator(base_of_child, previous_op,
 							top(&parse_stack).last_child_in_mrow(), next_node)
 				};
@@ -1221,39 +1218,18 @@ fn as_element<'a>(child: ChildOfElement<'a>) -> Element<'a> {
 }
 
 // The child of a leaf element must be text (previously trimmed)
-// Note: if there is whitespace in 'leaf_child', then there are multiple children
-fn as_text<'a>(leaf_child: Element<'a>) -> String {
+// Note: trim() combines all the Text children into a single string
+fn as_text<'a>(leaf_child: Element<'a>) -> &'a str {
 	assert!(name(&leaf_child) == "mi" || name(&leaf_child) == "mo" || name(&leaf_child) == "mn" || name(&leaf_child) == "mtext" ||
 			name(&leaf_child) == "ms" || name(&leaf_child) == "mspace" || name(&leaf_child) == "mglyph");
 	let children = leaf_child.children();
-
-	return children.iter()
-		.map(|c|
-			match c {
-				ChildOfElement::Text(t) => t.text(),
-				_ => panic!("as_text: internal error -- found non-text child of leaf element"),	
-				}
-			)			
-		.collect::<Vec<&str>>()
-		.join("");
-}
-
-// The child of a leaf element must be text (previously trimmed)
-// Similar to 'as_text', but only returns the first child. This is likely the same for mo, mi, and mn
-// This is faster, but more importantly, needed in at least one case where a string gets dropped.
-// Warning: this function should be used with caution as it may return too small an answer.
-fn as_simple_text<'a>(leaf_child: Element<'a>) -> &'a str {
-	assert!(name(&leaf_child) == "mi" || name(&leaf_child) == "mo" || name(&leaf_child) == "mn" || name(&leaf_child) == "mtext" ||
-			name(&leaf_child) == "ms" || name(&leaf_child) == "mspace" || name(&leaf_child) == "mglyph");
-	let children = leaf_child.children();
-
 	if children.is_empty() {
 		return "";
 	}
-
+	assert!(children.len() == 1);
 	return match children[0] {
 		ChildOfElement::Text(t) => t.text(),
-		_ => panic!("as_text: internal error -- found non-text child of leaf element"),
+		_ => panic!("as_text: internal error -- found non-text child of leaf element"),	
 	}
 }
 
@@ -1326,7 +1302,7 @@ fn show_invisible_op_char<'a>(ch: &'a str) -> &'a str {
 		}
 	
 		let text = as_text(node);
-		return CHEMICAL_ELEMENTS.contains(text.as_str());
+		return CHEMICAL_ELEMENTS.contains(text);
 	}
 	
 
