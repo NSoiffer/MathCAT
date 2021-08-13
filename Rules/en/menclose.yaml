@@ -1,0 +1,116 @@
+---
+
+-
+  # Note: @notation can contain more than one value
+  # The ordering below is the order in which words come out when there is more than one value
+  # 
+   name: default
+   tag: menclose
+   match: "."
+   replace:
+    - test:
+        if: ". [contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
+        then: [t: box, pause: short]
+    - test:
+        if: ".[contains(@notation,'roundedbox')]"
+        then: [t: round box, pause: short]
+    - test:
+        if: ".[contains(@notation,'circle')]"
+        then: [t: circle, pause: short]
+    - test:
+        if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or 
+                contains(concat(' ', normalize-space(@notation), ' '), ' right ') or 
+                contains(@notation,'top') or contains(@notation,'bottom') ]"
+        then:
+          - t: line on
+          - test:
+              if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
+              then: [t: left, pause: short]
+          - test:
+              if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"
+              then: [t: right, pause: short]
+          - test:
+              if: ".[contains(@notation,'top')]"
+              then: [t: top, pause: short]
+          - test:
+              if: ".[contains(@notation,'bottom')]"
+              then: [t: bottom, pause: short]
+    - test:
+        if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
+                contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
+        then:
+          - test:
+              if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
+              then: [spell: x, pause: short]  # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+              else:
+                - test:
+                    if: ".[contains(@notation,'updiagonalstrike')]"
+                    then: [t: up diagonal, pause: short]
+                - test:
+                    if: ".[contains(@notation,'downdiagonalstrike')]"
+                    then: [t: down diagonal, pause: short]
+          - test:
+              if: ".[contains(@notation,'verticalstrike')]"
+              then: [t: vertical, pause: short]
+          - test:
+              if: ".[contains(@notation,'horizontalstrike')]"
+              then: [t: horizontal, pause: short]
+          - t: cross out
+          - pause: short
+    - test:
+        if: ".[contains(@notation,'uparrow')]"
+        then: [t: up arrow, pause: short]
+    - test:
+        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
+        then: [t: down arrow, pause: short]
+    - test:
+        if: ".[contains(@notation,'leftarrow')]"
+        then: [t: left arrow, pause: short]
+    - test:
+        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
+        then: [t: right arrow, pause: short]
+    - test:
+        if: ".[contains(@notation,'northeastarrow')]"
+        then: [t: northeast arrow, pause: short]
+    - test:
+        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
+        then: [t: southeast arrow, pause: short]
+    - test:
+        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
+        then: [t: southwest arrow, pause: short]
+    - test:
+        if: ".[contains(@notation,'northwestarrow')]"
+        then: [t: northwest arrow, pause: short]
+    - test:
+        if: ".[contains(@notation,'updownarrow')]"
+        then: [t: double ended vertical arrow, pause: short]
+    - test:
+        if: ".[contains(@notation,'leftrightarrow')]"
+        then: [t: double ended horizontal arrow, pause: short]
+    - test:
+        if: ".[contains(@notation,'northeastsouthwestarrow')]"
+        then: [t: double ended up diagonal arrow, pause: short]
+    - test:
+        if: ".[contains(@notation,'northwestsoutheastarrow')]"
+        then: [t: double ended down diagonal arrow, pause: short]
+    - test:
+        if: ".[contains(@notation,'actuarial')]"
+        then: [t: actuarial symbol, pause: short]
+    - test:
+        if: ".[contains(@notation,'madrub')]"
+        then: [t: arabic factorial symbol, pause: short]
+    - test:
+        if: ".[contains(@notation,'phasorangle')]"
+        then: [t: phasor angle, pause: short]
+    - test:
+        if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']"      # default
+        then: [t: long division symbol, pause: short]
+    - test:
+        if: ".[contains(@notation,'radical')]"
+        then: [t: square root, pause: short]
+    - t: enclosing
+    - x: "*"
+    - test:
+        if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
+        then: [t: end enclosure]
+    - pause: short

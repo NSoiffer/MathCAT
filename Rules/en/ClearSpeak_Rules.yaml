@@ -1,6 +1,4 @@
 ---
-# Status:
-# ClearSpeak Preferences Implemented:  Roots, Trig, Log, Functions
 -
    name: complex-nums
    tag: mi
@@ -1189,6 +1187,10 @@
    match: "."
    replace:
       - x: "*"
+
+-
+   include: menclose.yaml
+
 -
    name: default-children
    tag: unknown
