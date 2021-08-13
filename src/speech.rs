@@ -979,13 +979,15 @@ impl TestOrReplacements {
         let part = &test[replace_key];
         let test_part = &test[test_key];
         if !part.is_badvalue() && !test_part.is_badvalue() { 
-            bail!(format!("Only one of '{}' or '{}' is allowed as part of 'test'.\n    \
-                  Suggestion: delete one or adjust indentation", replace_key, test_key));
+            bail!(format!("Only one of '{}' or '{}' is allowed as part of 'test'.\n{}\n    \
+                  Suggestion: delete one or adjust indentation",
+                    replace_key, test_key, yaml_to_string(test, 2)));
         }
         if part.is_badvalue() && test_part.is_badvalue() {
             if key_required {
-                bail!(format!("Missing 'if:' or missing '{}'/'{}:' as part of 'test:'\n    \
-                    Suggestion: add 'if:' or if present, indent so it is contained in 'test'", replace_key, test_key));    
+                bail!(format!("Missing one of '{}'/'{}:' as part of 'test:'\n{}\n   \
+                    Suggestion: add the missing key or indent so it is contained in 'test'",
+                    replace_key, test_key, yaml_to_string(test, 2)));    
             } else {
                 return Ok( None );
             }
@@ -1185,7 +1187,7 @@ impl UnicodeDef {
         if dictionary.is_none() {
             bail!("Expected a unicode definition (e.g, '+':{{t: plus}}'), found {}", yaml_to_string(unicode_def, 0));
         }
-        
+
         let dictionary = dictionary.unwrap();
         if dictionary.len() != 1 {
             bail!("Expected a unicode definition (e.g, '+':{{t: plus}}'), found {}", yaml_to_string(unicode_def, 0));
