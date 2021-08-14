@@ -93,11 +93,6 @@ pub fn pp_xpath_value(value: Value) {
 
 /// Convert YAML to a string using with `indent` amount of space.
 pub fn yaml_to_string(yaml: &Yaml, indent: usize) -> String {
-    use regex::Regex;
-
-    lazy_static!{
-        static ref START_OF_LINE: Regex = Regex::new(r"^(?m)").unwrap();
-    }
     let mut result = String::new();
     {
         let mut emitter = YamlEmitter::new(&mut result);
@@ -105,9 +100,8 @@ pub fn yaml_to_string(yaml: &Yaml, indent: usize) -> String {
         emitter.emit_node(yaml).unwrap(); // dump the YAML object to a String
     }
     let indent_str = format!("{:in$}", " ", in=2*indent);
-    return START_OF_LINE.replace_all(
-                &result,
-                indent_str.as_str()).to_string();
+    result = result.replace("\n",&("\n".to_string() + &indent_str)); // add indentation to all but first line
+    return indent_str + result.trim_end();  // add indent to first line and remove an extra indent at end
 }
 
 /* --------------------- Tweaked pretty printer for YAML (from YAML code) --------------------- */
