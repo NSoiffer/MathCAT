@@ -249,7 +249,7 @@ impl<'a, 'op:'a> StackInfo<'a, 'op> {
 
 	fn remove_last_operand_from_mrow(&mut self) -> Element<'a> {
 		let children = self.mrow.children();
-		assert!( children.len() > 0 );
+		assert!( !children.is_empty() );
 		assert!( self.is_operand || children.len()==1 );		// could be operator that is forced to be interpreted as operand -- eg, bad input like "x+("
 		self.is_operand = false;
 		let last_operand = as_element(children[children.len()-1]);
@@ -272,9 +272,9 @@ fn create_mathml_element<'a>(doc: &Document<'a>, name: &str) -> Element<'a> {
 /// 2. normalize the characters
 /// 3. clean up "bad" MathML based on known output from some converters (TODO: still a work in progress)
 /// 4. the tree is "parsed" based on the mo (priority)/mi/mn's in an mrow
-///		*  this adds mrows mrows and some invisible operators (implied times, function app, ...)
-///		* extra mrows are removed
-///		* implicit mrows are turned into explicit mrows (e.g, there will be a single child of 'math')
+///    *  this adds mrows mrows and some invisible operators (implied times, function app, ...)
+///    * extra mrows are removed
+///    * implicit mrows are turned into explicit mrows (e.g, there will be a single child of 'math')
 ///
 /// Canonicalize is pretty conservative in adding new mrows and won't do it if:
 /// * there is an intent attr
@@ -350,7 +350,7 @@ impl CanonicalizeContext {
 			"mi" | "mo" | "mn" | "ms" | "mglyph" => {return Some(mathml);},
 			"mtext" => {
 				let text = as_text(mathml);
-				return if parent_requires_child || (text.len() > 0 && !IS_WHITESPACE.is_match(&text)) {Some(mathml)} else {None};
+				return if parent_requires_child || (!text.is_empty() && !IS_WHITESPACE.is_match(&text)) {Some(mathml)} else {None};
 			},
 			"mfenced" => {return Some( convert_mfenced_to_mrow(mathml) )} ,
 			"mspace" | "mphantom" => {
@@ -1077,7 +1077,7 @@ impl CanonicalizeContext {
 
 			let mut current_op = OperatorPair::new();
 			// figure what the current operator is -- it either comes from the 'mo' (if we have an 'mo') or it is implied
-			if name(&base_of_child) == "mo" && base_of_child.children().len() > 0 { // shouldn't have empty mo node, but...
+			if name(&base_of_child) == "mo" && !base_of_child.children().is_empty() { // shouldn't have empty mo node, but...
 				let previous_op = if top(&parse_stack).is_operand {None} else {Some( top(&parse_stack).op_pair.op )};
 				let next_node = if i_child + 1 < num_children {Some(as_element(children[i_child+1]))} else {None};
 				current_op = OperatorPair{

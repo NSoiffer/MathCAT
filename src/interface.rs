@@ -263,12 +263,12 @@ pub fn trim_element(e: &Element) {
     }
 
     let trimmed_text = single_text.trim();
-    if !e.children().is_empty() && trimmed_text.len() > 0 {
+    if !e.children().is_empty() && !trimmed_text.is_empty() {
         // FIX: we have a problem -- what should happen???
         // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash
         eprintln!("mathml and both element and textual children which shouldn't happen -- ignoring text '{}'", single_text);
     }
-    if e.children().is_empty() && single_text.len() > 0 {
+    if e.children().is_empty() && !single_text.is_empty() {
         // println!("Combining text in {}: '{}' -> '{}'", e.name().local_part(), single_text, trimmed_text);
         e.set_text(trimmed_text);
     }
