@@ -2,6 +2,7 @@
 //!
 //! Navigation is controlled by a `Navigation_Rules.yaml` file in conjunction with preferences.
 //! See preference documentation for more info on navigation preferences.
+#![allow(clippy::needless_return)]
 
 //use sxd_document::dom::*;
 /*

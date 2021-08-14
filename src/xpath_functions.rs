@@ -15,6 +15,7 @@
 //! * `DEBUG(xpath)` -- _Very_ useful function for debugging speech rules.
 //!    This can be used to surround a whole or part of an xpath expression in a match or output.
 //!    The result will be printed to standard output and the result returned so that `DEBUG` does not affect the computation.    
+#![allow(clippy::needless_return)]
 
 use sxd_document::dom::{Element, ChildOfElement};
 use sxd_xpath::{Value, Context, context, function::*, nodeset::*};
@@ -84,7 +85,7 @@ impl IsNode {
             return true;
         }
 
-        if !is_tag(elem, "mrow") || elem.children().len() == 0 {
+        if !is_tag(elem, "mrow") || elem.children().is_empty() {
             return false;
         }
 
@@ -94,6 +95,7 @@ impl IsNode {
         }
 
         // x y or -x or -3 x or -x y or -3 x y or x° or n° or -x° or -n°
+        #[allow(clippy::if_same_then_else)]
         if is_times_mi(elem) {
             return true;    // x y
         } else if is_degrees(elem) {
@@ -174,7 +176,7 @@ impl IsNode {
 
         // return true if ChildOfElement has exactly text 'ch'
         fn is_equal(coe: &ChildOfElement, ch: char) -> bool {
-            return coe_to_str(coe).chars().next() == Some(ch);
+            return coe_to_str(coe).starts_with(ch);
         }
 
         // true if mrow(xxx, &it;, mi) or mrow(xxx, &it; mi, &it;, mi) where mi's have len==1
@@ -269,8 +271,7 @@ impl IsNode {
         }
 
         fn is_small_enough(val: &str, upper_bound: usize) -> bool {
-            let value = val.parse::<usize>();
-            return if value.is_ok() { value.unwrap() <= upper_bound  } else { false };
+            return if let Ok(value) = val.parse::<usize>() { value <= upper_bound } else { false };
         }
 
         if !is_tag(frac, "mfrac") {
@@ -295,7 +296,7 @@ impl IsNode {
 
         let num = get_text_from_element(&num);
         let denom = get_text_from_element(&denom);
-        if num.len() == 0 || denom.len() == 0 {
+        if num.is_empty() || denom.is_empty() {
             return false;
         }
 
@@ -360,18 +361,18 @@ impl ToOrdinal {
      *   plural -- true if answer should be plural
      * Returns the string representation of that number or an error message
      */
-    fn to_ordinal(number: &str, fractional: bool, plural: bool) -> String {
+    fn convert(number: &str, fractional: bool, plural: bool) -> String {
         lazy_static! {
             static ref NO_DIGIT: Regex = Regex::new(r"[^\d]").unwrap();    // match anything except a digit
         }
         DEFINITIONS.with(|definitions| {
             // check to see if the number is too big or is not an integer or has non-digits
-            if number.len() == 0 || number.len() > 3*definitions.numbers_large.as_vec().borrow().len() || number.contains(".,") {
+            if number.is_empty() || number.len() > 3*definitions.numbers_large.as_vec().borrow().len() || number.contains(".,") {
                 return String::from(number);
             }
             if NO_DIGIT.is_match(number) {
                 // this shouldn't have been part of an mn, so likely an error. Log a warning
-                // FIX: log a warning that a non-number was passed to to_ordinal()
+                // FIX: log a warning that a non-number was passed to convert()
                 return String::from(number);
             }
 
@@ -399,14 +400,14 @@ impl ToOrdinal {
             let number = match number.len() % 3 {
                 0 => "".to_string() + number,
                 1 => "00".to_string() + number,
-                2  | _=> "0".to_string() + number, // compiler doesn't know there aren't other options (hence "_")
+                _ => "0".to_string() + number, // can only be "2" -- compiler doesn't know there aren't other options
             };
 
             // At this point we have at least three "digits", and length is a multiple of 3
             // We have already verified that there are only ASCII digits, so we can subtract '0' to get an index
             const ASCII_0: usize = 48;
             let digits = number.as_bytes()
-                        .into_iter()
+                        .iter()
                         .map(|&byte| byte as usize - ASCII_0)
                         .collect::<Vec<usize>>();
 
@@ -494,7 +495,7 @@ impl ToOrdinal {
             }
 
             let mut hundreds = definitions.numbers_hundreds.as_vec().borrow()[number[0]].clone();
-            if hundreds.len() > 0 {
+            if !hundreds.is_empty() {
                 hundreds += " ";
             }
 
@@ -523,8 +524,8 @@ impl Function for ToOrdinal {
         args.exactly(1)?;
         let node = validate_one_node(args.pop_nodeset()?)?;
         return match node {
-            Node::Text(t) =>  Ok( Value::String( ToOrdinal::to_ordinal(t.text(), false, false) ) ),
-            Node::Element(e) => Ok( Value::String( ToOrdinal::to_ordinal(&get_text_from_element(&e), false, false) ) ),
+            Node::Text(t) =>  Ok( Value::String( ToOrdinal::convert(t.text(), false, false) ) ),
+            Node::Element(e) => Ok( Value::String( ToOrdinal::convert(&get_text_from_element(&e), false, false) ) ),
             _   =>  Err( Error::ArgumentNotANodeset{actual: ArgumentType::String} ),
         }
     }
@@ -557,10 +558,10 @@ impl Function for ToCommonFraction {
             let denom = children[1].element().unwrap();
             let denom = get_text_from_element( &denom );
             let mut answer = num.clone() + " ";
-            answer += &ToOrdinal::to_ordinal(&denom, true, num!="1");
+            answer += &ToOrdinal::convert(&denom, true, num!="1");
             return Ok( Value::String( answer ) );    
         } else {
-            return Err( Error::Other( format!("ToCommonFraction -- argument is not an element")) );
+            return Err( Error::Other( "ToCommonFraction -- argument is not an element".to_string()) );
         }
     }
 }
@@ -587,7 +588,7 @@ struct IsLargeOp;
             }
             return DEFINITIONS.with(|definitions| {
                 let text = get_text_from_element(&e);
-                return Ok( Value::Boolean(definitions.large_operators.as_hashset().borrow().get(&text.to_string()).is_some()) );
+                return Ok( Value::Boolean(definitions.large_operators.as_hashset().borrow().get(&text).is_some()) );
             });
         } else {
             // xpath is something besides an element, so no match
@@ -652,14 +653,14 @@ impl IsBracketed {
         }
         let children = element.children();
         let n_children = children.len();
-        if (left.len() > 0 && right.len() > 0 && n_children < 2) ||
+        if (!left.is_empty() && !right.is_empty() && n_children < 2) ||
            requires_comma && element.children().len() < 3 {
             // not enough argument for there to be a match
             return false;
         }
 
-        if left.len() > 0 && get_text_from_COE(&children[0]) != left ||
-           right.len() > 0 && get_text_from_COE(&children[children.len()-1]) != right {
+        if !left.is_empty() && get_text_from_COE(&children[0]) != left ||
+           !right.is_empty() && get_text_from_COE(&children[children.len()-1]) != right {
             // left or right don't match
             return false;
         }
@@ -751,93 +752,93 @@ mod tests {
     #[test]
     fn ordinal_one_digit() {
         init_word_list();
-        assert_eq!("zeroth", ToOrdinal::to_ordinal("0", false, false));
-        assert_eq!("second", ToOrdinal::to_ordinal("2", false, false));
-        assert_eq!("ninth", ToOrdinal::to_ordinal("9", false, false));
+        assert_eq!("zeroth", ToOrdinal::convert("0", false, false));
+        assert_eq!("second", ToOrdinal::convert("2", false, false));
+        assert_eq!("ninth", ToOrdinal::convert("9", false, false));
 
-        assert_eq!("zeroth", ToOrdinal::to_ordinal("0", false, true));
-        assert_eq!("seconds", ToOrdinal::to_ordinal("2", false, true));
-        assert_eq!("ninths", ToOrdinal::to_ordinal("9", false, true));
+        assert_eq!("zeroth", ToOrdinal::convert("0", false, true));
+        assert_eq!("seconds", ToOrdinal::convert("2", false, true));
+        assert_eq!("ninths", ToOrdinal::convert("9", false, true));
 
-        assert_eq!("first", ToOrdinal::to_ordinal("1", true, false));
-        assert_eq!("half", ToOrdinal::to_ordinal("2", true, false));
-        assert_eq!("half", ToOrdinal::to_ordinal("02", true, false));
-        assert_eq!("ninth", ToOrdinal::to_ordinal("9", true, false));
+        assert_eq!("first", ToOrdinal::convert("1", true, false));
+        assert_eq!("half", ToOrdinal::convert("2", true, false));
+        assert_eq!("half", ToOrdinal::convert("02", true, false));
+        assert_eq!("ninth", ToOrdinal::convert("9", true, false));
 
-        assert_eq!("halves", ToOrdinal::to_ordinal("2", true, true));
-        assert_eq!("halves", ToOrdinal::to_ordinal("002", true, true));
-        assert_eq!("ninths", ToOrdinal::to_ordinal("9", true, true));
+        assert_eq!("halves", ToOrdinal::convert("2", true, true));
+        assert_eq!("halves", ToOrdinal::convert("002", true, true));
+        assert_eq!("ninths", ToOrdinal::convert("9", true, true));
     }
 
     #[test]
     fn ordinal_two_digit() {
         init_word_list();
-        assert_eq!("tenth", ToOrdinal::to_ordinal("10", false, false));
-        assert_eq!("seventeenth", ToOrdinal::to_ordinal("17", false, false));
-        assert_eq!("thirty second", ToOrdinal::to_ordinal("32", false, false));
-        assert_eq!("fortieth", ToOrdinal::to_ordinal("40", false, false));
+        assert_eq!("tenth", ToOrdinal::convert("10", false, false));
+        assert_eq!("seventeenth", ToOrdinal::convert("17", false, false));
+        assert_eq!("thirty second", ToOrdinal::convert("32", false, false));
+        assert_eq!("fortieth", ToOrdinal::convert("40", false, false));
 
-        assert_eq!("tenths", ToOrdinal::to_ordinal("10", false, true));
-        assert_eq!("sixteenths", ToOrdinal::to_ordinal("16", false, true));
-        assert_eq!("eighty eights", ToOrdinal::to_ordinal("88", false, true));
-        assert_eq!("fiftieths", ToOrdinal::to_ordinal("50", false, true));
+        assert_eq!("tenths", ToOrdinal::convert("10", false, true));
+        assert_eq!("sixteenths", ToOrdinal::convert("16", false, true));
+        assert_eq!("eighty eights", ToOrdinal::convert("88", false, true));
+        assert_eq!("fiftieths", ToOrdinal::convert("50", false, true));
 
-        assert_eq!("eleventh", ToOrdinal::to_ordinal("11", true, false));
-        assert_eq!("forty fourth", ToOrdinal::to_ordinal("44", true, false));
-        assert_eq!("ninth", ToOrdinal::to_ordinal("9", true, false));
-        assert_eq!("ninth", ToOrdinal::to_ordinal("00000009", true, false));
-        assert_eq!("sixtieth", ToOrdinal::to_ordinal("60", true, false));
+        assert_eq!("eleventh", ToOrdinal::convert("11", true, false));
+        assert_eq!("forty fourth", ToOrdinal::convert("44", true, false));
+        assert_eq!("ninth", ToOrdinal::convert("9", true, false));
+        assert_eq!("ninth", ToOrdinal::convert("00000009", true, false));
+        assert_eq!("sixtieth", ToOrdinal::convert("60", true, false));
 
-        assert_eq!("tenths", ToOrdinal::to_ordinal("10", true, true));
-        assert_eq!("tenths", ToOrdinal::to_ordinal("0010", true, true));
-        assert_eq!("elevenths", ToOrdinal::to_ordinal("11", true, true));
-        assert_eq!("nineteenths", ToOrdinal::to_ordinal("19", true, true));
-        assert_eq!("twentieths", ToOrdinal::to_ordinal("20", true, true));
+        assert_eq!("tenths", ToOrdinal::convert("10", true, true));
+        assert_eq!("tenths", ToOrdinal::convert("0010", true, true));
+        assert_eq!("elevenths", ToOrdinal::convert("11", true, true));
+        assert_eq!("nineteenths", ToOrdinal::convert("19", true, true));
+        assert_eq!("twentieths", ToOrdinal::convert("20", true, true));
     }
 
     #[test]
     fn ordinal_three_digit() {
         init_word_list();
-        assert_eq!("one hundred first", ToOrdinal::to_ordinal("101", false, false));
-        assert_eq!("two hundred tenth", ToOrdinal::to_ordinal("210", false, false));
-        assert_eq!("four hundred thirty second", ToOrdinal::to_ordinal("432", false, false));
-        assert_eq!("four hundred second", ToOrdinal::to_ordinal("402", false, false));
+        assert_eq!("one hundred first", ToOrdinal::convert("101", false, false));
+        assert_eq!("two hundred tenth", ToOrdinal::convert("210", false, false));
+        assert_eq!("four hundred thirty second", ToOrdinal::convert("432", false, false));
+        assert_eq!("four hundred second", ToOrdinal::convert("402", false, false));
 
-        assert_eq!("one hundred first", ToOrdinal::to_ordinal("101", true, false));
-        assert_eq!("two hundred second", ToOrdinal::to_ordinal("202", true, false));
-        assert_eq!("four hundred thirty second", ToOrdinal::to_ordinal("432", true, false));
-        assert_eq!("five hundred third", ToOrdinal::to_ordinal("503", true, false));
+        assert_eq!("one hundred first", ToOrdinal::convert("101", true, false));
+        assert_eq!("two hundred second", ToOrdinal::convert("202", true, false));
+        assert_eq!("four hundred thirty second", ToOrdinal::convert("432", true, false));
+        assert_eq!("five hundred third", ToOrdinal::convert("503", true, false));
 
-        assert_eq!("three hundred elevenths", ToOrdinal::to_ordinal("311", false, true));
-        assert_eq!("four hundred ninety ninths", ToOrdinal::to_ordinal("499", false, true));
-        assert_eq!("nine hundred ninetieths", ToOrdinal::to_ordinal("990", false, true));
-        assert_eq!("six hundred seconds", ToOrdinal::to_ordinal("602", false, true));
+        assert_eq!("three hundred elevenths", ToOrdinal::convert("311", false, true));
+        assert_eq!("four hundred ninety ninths", ToOrdinal::convert("499", false, true));
+        assert_eq!("nine hundred ninetieths", ToOrdinal::convert("990", false, true));
+        assert_eq!("six hundred seconds", ToOrdinal::convert("602", false, true));
 
-        assert_eq!("seven hundredths", ToOrdinal::to_ordinal("700", true, true));
-        assert_eq!("one hundredths", ToOrdinal::to_ordinal("100", true, true));
-        assert_eq!("eight hundred seventeenths", ToOrdinal::to_ordinal("817", true, true));
+        assert_eq!("seven hundredths", ToOrdinal::convert("700", true, true));
+        assert_eq!("one hundredths", ToOrdinal::convert("100", true, true));
+        assert_eq!("eight hundred seventeenths", ToOrdinal::convert("817", true, true));
     }
     #[test]
     fn ordinal_large() {
         init_word_list();
-        assert_eq!("one thousandth", ToOrdinal::to_ordinal("1000", false, false));
-        assert_eq!("two thousand one hundredth", ToOrdinal::to_ordinal("2100", false, false));
-        assert_eq!("thirty thousandth", ToOrdinal::to_ordinal("30000", false, false));
-        assert_eq!("four hundred thousandth", ToOrdinal::to_ordinal("400000", false, false));
+        assert_eq!("one thousandth", ToOrdinal::convert("1000", false, false));
+        assert_eq!("two thousand one hundredth", ToOrdinal::convert("2100", false, false));
+        assert_eq!("thirty thousandth", ToOrdinal::convert("30000", false, false));
+        assert_eq!("four hundred thousandth", ToOrdinal::convert("400000", false, false));
 
-        assert_eq!("four hundred thousandth", ToOrdinal::to_ordinal("400000", true, false));
-        assert_eq!("five hundred thousand second", ToOrdinal::to_ordinal("500002", true, false));
-        assert_eq!("six millionth", ToOrdinal::to_ordinal("6000000", true, false));
-        assert_eq!("sixty millionth", ToOrdinal::to_ordinal("60000000", true, false));
+        assert_eq!("four hundred thousandth", ToOrdinal::convert("400000", true, false));
+        assert_eq!("five hundred thousand second", ToOrdinal::convert("500002", true, false));
+        assert_eq!("six millionth", ToOrdinal::convert("6000000", true, false));
+        assert_eq!("sixty millionth", ToOrdinal::convert("60000000", true, false));
 
-        assert_eq!("seven billionths", ToOrdinal::to_ordinal("7000000000", false, true));
-        assert_eq!("eight trillionths", ToOrdinal::to_ordinal("8000000000000", false, true));
-        assert_eq!("nine quadrillionths", ToOrdinal::to_ordinal("9000000000000000", false, true));
-        assert_eq!("one quintillionth", ToOrdinal::to_ordinal("1000000000000000000", false, false));
+        assert_eq!("seven billionths", ToOrdinal::convert("7000000000", false, true));
+        assert_eq!("eight trillionths", ToOrdinal::convert("8000000000000", false, true));
+        assert_eq!("nine quadrillionths", ToOrdinal::convert("9000000000000000", false, true));
+        assert_eq!("one quintillionth", ToOrdinal::convert("1000000000000000000", false, false));
 
-        assert_eq!("nine billion eight hundred seventy six million five hundred forty three thousand two hundred tenths", ToOrdinal::to_ordinal("9876543210", true, true));
-        assert_eq!("nine billion five hundred forty three thousand two hundred tenths", ToOrdinal::to_ordinal("9000543210", true, true));
-        assert_eq!("zeroth", ToOrdinal::to_ordinal("00000", false, false));
+        assert_eq!("nine billion eight hundred seventy six million five hundred forty three thousand two hundred tenths", ToOrdinal::convert("9876543210", true, true));
+        assert_eq!("nine billion five hundred forty three thousand two hundred tenths", ToOrdinal::convert("9000543210", true, true));
+        assert_eq!("zeroth", ToOrdinal::convert("00000", false, false));
     }
 
 

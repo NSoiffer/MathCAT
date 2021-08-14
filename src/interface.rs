@@ -15,6 +15,7 @@
 
 // for Python interfaces --#[...] doesn't help on name mangled python function names
 #![allow(non_snake_case)]
+#![allow(clippy::needless_return)]
 use std::cell::{RefCell};
 
 use sxd_document::parser;
@@ -54,7 +55,7 @@ thread_local!{
 pub static MATHML_INSTANCE: RefCell<Package> = init_mathml_instance();
 }
 
-fn init_mathml_instance<'a>() -> RefCell<Package> {
+fn init_mathml_instance() -> RefCell<Package> {
     let package = parser::parse("<math></math>")
         .expect("Internal error in 'init_mathml_instance;: didn't parse initializer string");
     return RefCell::new( package );
@@ -71,7 +72,7 @@ use pyo3::exceptions::{PyTypeError, PyValueError};
 pub fn SetMathML(_py: Python, mathml_str: String) -> PyResult<()> {
     return MATHML_INSTANCE.with(|old_package| {
         let new_package = parser::parse(&mathml_str);    
-        if let Err(_) = new_package {
+        if new_package.is_err() {
             panic!("MathML input was not valid"); // FIX: improve error
         } 
         let new_package = new_package.unwrap();
@@ -117,7 +118,7 @@ pub fn SetPreference(_py: Python, name: String, value: &PyAny) -> PyResult<()> {
                 let value_as_string = to_string(&name, value)?;
                 // check the format
                 if !( value_as_string.len() == 2 ||
-                      (value_as_string.len() == 5 && value_as_string.as_bytes()[2] == '-' as u8) ) {
+                      (value_as_string.len() == 5 && value_as_string.as_bytes()[2] == b'-') ) {
                         return Err( PyValueError::new_err(
                             format!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value_as_string)));
                       }
@@ -211,7 +212,7 @@ fn mathcat(_py: Python, m: &PyModule) -> PyResult<()> {
 
 
 /// Not really meant to be public -- used by tests in some packages
-pub fn get_element<'d>(package: &'d Package) -> Element<'d> {
+pub fn get_element(package: &Package) -> Element {
     let doc = package.as_document();
     let mut result = None;
     for root_child in doc.root().children() {
@@ -220,8 +221,7 @@ pub fn get_element<'d>(package: &'d Package) -> Element<'d> {
            result = Some(e);
         }
     };
-    let element = result.unwrap();
-    element
+    return result.unwrap();
 }
 
 #[allow(dead_code)]

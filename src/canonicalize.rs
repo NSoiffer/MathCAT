@@ -5,20 +5,20 @@
 //! * "equivalent" characters are converted to a chosen character.
 //! * known "bad" MathML is cleaned up (this will likely be an ongoing effort)
 //! * mrows are added based on operator priorities from the MathML Operator Dictionary
+#![allow(clippy::needless_return)]
 use crate::errors::*;
 use sxd_document::dom::*;
 use sxd_document::QName;
 use phf::{phf_map, phf_set};
-extern crate lazy_static;
 use crate::xpath_functions::IsBracketed;
 use std::{ptr::eq as ptr_eq};
 use crate::pretty_print::*;
 use regex::Regex;
 
 // FIX: DECIMAL_SEPARATOR should be set by env, or maybe language
-const DECIMAL_SEPARATOR: &'static str = ".";
-const CHANGED_ATTR: &'static str = "data-changed";
-const ADDED_ATTR_VALUE: &'static str = "added";
+const DECIMAL_SEPARATOR: &str = ".";
+const CHANGED_ATTR: &str = "data-changed";
+const ADDED_ATTR_VALUE: &str = "added";
 
 // (perfect) hash of operators built from MathML's operator dictionary
 static OPERATORS: phf::Map<&str, OperatorInfo> = include!("operator-info.in");
@@ -227,7 +227,7 @@ impl<'a, 'op:'a> StackInfo<'a, 'op> {
 
 	fn last_child_in_mrow(&self) -> Option<Element<'a>> {
 		let children = self.mrow.children();
-		if children.len() == 0 {
+		if children.is_empty() {
 			return None
 		} else {
 			return Some( as_element(children[children.len() - 1]) );
@@ -272,16 +272,16 @@ fn create_mathml_element<'a>(doc: &Document<'a>, name: &str) -> Element<'a> {
 /// 2. normalize the characters
 /// 3. clean up "bad" MathML based on known output from some converters (TODO: still a work in progress)
 /// 4. the tree is "parsed" based on the mo (priority)/mi/mn's in an mrow
-///	   *  this adds mrows mrows and some invisible operators (implied times, function app, ...)
-///    * extra mrows are removed
-///    * implicit mrows are turned into explicit mrows (e.g, there will be a single child of 'math')
+///		*  this adds mrows mrows and some invisible operators (implied times, function app, ...)
+///		* extra mrows are removed
+///		* implicit mrows are turned into explicit mrows (e.g, there will be a single child of 'math')
 ///
 /// Canonicalize is pretty conservative in adding new mrows and won't do it if:
 /// * there is an intent attr
 /// * if the mrow starts and ends with a fence (e.g, French open interval "]0,1[")
 ///
 /// An mrow is never deleted unless it is redundant.
-pub fn canonicalize<'a>(mathml: Element<'a>) -> Element<'a> {
+pub fn canonicalize(mathml: Element) -> Element {
 	let context = CanonicalizeContext::new();
 	return context.canonicalize(mathml);
 }
@@ -296,7 +296,7 @@ impl CanonicalizeContext {
 
 	fn canonicalize<'a>(&self, mathml: Element<'a>) -> Element<'a> {
 		// println!("MathML before canonicalize:\n{}", mml_to_string(&mathml));
-		let converted_mathml = mathml.clone();
+		let converted_mathml = mathml;
 	
 		if name(&mathml) != "math" {
 			// println!("Didn't start with <math> element -- attempting repair");
@@ -384,7 +384,7 @@ impl CanonicalizeContext {
 			}
 		}
 
-		fn convert_mfenced_to_mrow<'a>(mathml: Element<'a>) -> Element<'a> {
+		fn convert_mfenced_to_mrow(mathml: Element) -> Element {
 			// FIX: implement this
 			return mathml;
 		}
@@ -590,11 +590,10 @@ impl CanonicalizeContext {
 		};
 	
 		let operator_versions = OperatorVersions::new(op);
-		if operator_versions.prefix.is_some() {
-			if top(&parse_stack).last_child_in_mrow().is_none() || !top(&parse_stack).is_operand {
-				// println!("   is prefix");
-				return operator_versions.prefix.unwrap();
-			}
+		if operator_versions.prefix.is_some() &&
+		   top(&parse_stack).last_child_in_mrow().is_none() || !top(&parse_stack).is_operand {
+			// println!("   is prefix");
+			return operator_versions.prefix.unwrap();
 		}
 		
 		// We have either a right fence or an infix operand at the top of the stack
@@ -634,7 +633,7 @@ impl CanonicalizeContext {
 				None
 			} else {
 				let next_next_children = next_child.following_siblings();
-				let next_next_child = if next_next_children.len() == 0 { None } else { Some( as_element(next_next_children[0]) )};
+				let next_next_child = if next_next_children.is_empty() { None } else { Some( as_element(next_next_children[0]) )};
 				Some( self.find_operator(next_child, operator_versions.infix,
 									top(&parse_stack).last_child_in_mrow(), next_next_child) )
 			};
@@ -645,11 +644,9 @@ impl CanonicalizeContext {
 				// println!("   is postfix");
 				return operator_versions.postfix.unwrap();	
 			}
-		} else {
-			if operator_versions.infix.is_some() {
-				// println!("   is infix");
-				return operator_versions.infix.unwrap();	
-			}
+		} else if operator_versions.infix.is_some() {
+			// println!("   is infix");
+			return operator_versions.infix.unwrap();	
 		}
 	
 		// nothing good to match
@@ -670,7 +667,7 @@ impl CanonicalizeContext {
 			return self.is_likely_chemical_state(node, next_sibling.children().as_slice());
 		}
 	
-		if right_siblings.len() == 0 {
+		if right_siblings.is_empty() {
 			return false;
 		}
 	
@@ -751,7 +748,7 @@ impl CanonicalizeContext {
 		}
 	
 		let node_str = as_text(base_of_name);
-		if node_str.len() == 0 {
+		if node_str.is_empty() {
 			return false;
 		}
 		// println!("    is_function_name({}), {} following nodes", node_str, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
@@ -834,7 +831,7 @@ impl CanonicalizeContext {
 					is_right_paren(as_element(following_nodes[2]));
 		}
 	
-		fn is_left_paren<'a>(node: Element<'a>) -> bool {
+		fn is_left_paren(node: Element) -> bool {
 			if name(&node) != "mo" {
 				return false;
 			}
@@ -842,7 +839,7 @@ impl CanonicalizeContext {
 			return text == "(" || text == "[";
 		}
 	
-		fn is_right_paren<'a>(node: Element<'a>) -> bool {
+		fn is_right_paren(node: Element) -> bool {
 			if name(&node) != "mo" {
 				return false;
 			}
@@ -903,7 +900,7 @@ impl CanonicalizeContext {
 		let name = name(&container);
 
 		// test for script position is that it is not the base and hence has a preceding sibling
-		return (name == "msub" || name == "msubsup" || name == "msup") && mrow.preceding_siblings().len() > 0;
+		return (name == "msub" || name == "msubsup" || name == "msup") && !mrow.preceding_siblings().is_empty();
 	}
 	
 	// Add the current operator if it's not n-ary to the stack
@@ -923,7 +920,7 @@ impl CanonicalizeContext {
 			// grab operand on top of stack (if there is one) and make it part of the new mrow since current op has higher precedence
 			// if operators are the same and are binary, then this push makes them act as left associative
 			let mut top_of_stack = parse_stack.pop().unwrap();
-			if top_of_stack.mrow.children().len() == 0 || (!top_of_stack.is_operand && !current_op.op.is_right_fence()) {
+			if top_of_stack.mrow.children().is_empty() || (!top_of_stack.is_operand && !current_op.op.is_right_fence()) {
 				// "bad" syntax - no operand on left -- don't grab operand (there is none)
 				//   just start a new mrow beginning with operator
 				// FIX -- check this shouldn't happen:  parse_stack.push(top_of_stack);
@@ -1003,7 +1000,7 @@ impl CanonicalizeContext {
 		};
 	}
 	
-	fn is_trig_arg<'s, 'a:'s, 'op:'a>(&self, previous_child: Element<'a>, current_child: Element<'a>, parse_stack: &'s Vec<StackInfo<'a, 'op>>) -> bool {
+	fn is_trig_arg<'a, 'op:'a>(&self, previous_child: Element<'a>, current_child: Element<'a>, parse_stack: &[StackInfo<'a, 'op>]) -> bool {
 		// We have operand-operand and know we want multiplication at this point. 
 		// Check for special case where we want multiplication to bind more tightly than function app (e.g, sin 2x, sin -2xy)
 		// We only want to do this for simple args
@@ -1028,7 +1025,7 @@ impl CanonicalizeContext {
 		// Two cases:
 		// 1. First operand-operand (e.g, sin 2x, where 'current_child' is 'x') -- top of stack is 'sin' 'apply func' '2'
 		// 2. Subsequent operand-operand (e.g, sin 2xy, where 'current_child' is 'y') -- top of stack is '2' 'times' 'x'
-		let op_on_top = &top(&parse_stack).op_pair;
+		let op_on_top = &top(parse_stack).op_pair;
 		return ptr_eq(op_on_top.op, *INVISIBLE_FUNCTION_APPLICATION) || ptr_eq(op_on_top.op, &*IMPLIED_TIMES_HIGH_PRIORITY);
 	}
 	
@@ -1081,7 +1078,7 @@ impl CanonicalizeContext {
 			let mut current_op = OperatorPair::new();
 			// figure what the current operator is -- it either comes from the 'mo' (if we have an 'mo') or it is implied
 			if name(&base_of_child) == "mo" && base_of_child.children().len() > 0 { // shouldn't have empty mo node, but...
-				let previous_op = if top(&mut parse_stack).is_operand {None} else {Some( top(&parse_stack).op_pair.op )};
+				let previous_op = if top(&parse_stack).is_operand {None} else {Some( top(&parse_stack).op_pair.op )};
 				let next_node = if i_child + 1 < num_children {Some(as_element(children[i_child+1]))} else {None};
 				current_op = OperatorPair{
 					ch: as_text(base_of_child),
@@ -1199,7 +1196,7 @@ impl CanonicalizeContext {
 }
 
 // ---------------- useful utility functions --------------------
-fn top<'s, 'a:'s, 'op:'a>(vec: &'s Vec<StackInfo<'a, 'op>>) -> &'s StackInfo<'a, 'op> {
+fn top<'s, 'a:'s, 'op:'a>(vec: &'s[StackInfo<'a, 'op>]) -> &'s StackInfo<'a, 'op> {
 	return &vec[vec.len()-1];
 }
 
@@ -1210,7 +1207,7 @@ fn name<'a>(node: &'a Element<'a>) -> &str {
 
 // The child of a non-leaf element must be an element
 // Note: can't use references as that results in 'returning use of local variable'
-fn as_element<'a>(child: ChildOfElement<'a>) -> Element<'a> {
+fn as_element(child: ChildOfElement) -> Element {
 	return match child {
 		ChildOfElement::Element(e) => e,
 		_ => panic!("as_element: internal error -- found non-element child"),
@@ -1219,7 +1216,7 @@ fn as_element<'a>(child: ChildOfElement<'a>) -> Element<'a> {
 
 // The child of a leaf element must be text (previously trimmed)
 // Note: trim() combines all the Text children into a single string
-fn as_text<'a>(leaf_child: Element<'a>) -> &'a str {
+fn as_text(leaf_child: Element) -> &str {
 	assert!(name(&leaf_child) == "mi" || name(&leaf_child) == "mo" || name(&leaf_child) == "mn" || name(&leaf_child) == "mtext" ||
 			name(&leaf_child) == "ms" || name(&leaf_child) == "mspace" || name(&leaf_child) == "mglyph");
 	let children = leaf_child.children();
@@ -1234,13 +1231,13 @@ fn as_text<'a>(leaf_child: Element<'a>) -> &'a str {
 }
 
 #[allow(dead_code)] // for debugging with println
-fn is_leaf<'a>(leaf_child: Element<'a>) -> bool {
+fn is_leaf(leaf_child: Element) -> bool {
 	return  name(&leaf_child) == "mi" || name(&leaf_child) == "mo" || name(&leaf_child) == "mn" || name(&leaf_child) == "mtext" ||
 			name(&leaf_child) == "ms" || name(&leaf_child) == "mspace" || name(&leaf_child) == "mglyph";
 }
 
 #[allow(dead_code)] // for debugging with println
-fn element_summary<'a>(mathml: Element<'a>) -> String {
+fn element_summary(mathml: Element) -> String {
 	return format!("{}<{}>", name(&mathml), if is_leaf(mathml) {as_text(mathml).to_string()} else {mathml.children().len().to_string()});
 }
 
@@ -1260,7 +1257,7 @@ fn is_adorned_node<'a>(node: &'a Element<'a>) -> bool {
 }
 
 
-fn get_possible_embellished_node<'a>(node: Element<'a>) -> Element<'a> {
+fn get_possible_embellished_node(node: Element) -> Element {
 	let mut node = node;
 	while is_adorned_node(&node) {
 		node = as_element(node.children()[0]);
@@ -1269,7 +1266,7 @@ fn get_possible_embellished_node<'a>(node: Element<'a>) -> Element<'a> {
 }		
 
 #[allow(dead_code)] // for debugging with println
-fn show_invisible_op_char<'a>(ch: &'a str) -> &'a str {
+fn show_invisible_op_char(ch: &str) -> &str {
 	return match ch.chars().next().unwrap() {
 		'\u{2061}' => "&#x2061;",
 		'\u{2062}' => "&#x2062;",
@@ -1294,7 +1291,7 @@ fn show_invisible_op_char<'a>(ch: &'a str) -> &'a str {
 		"Ta", "Tb", "Tc", "Te", "Th", "Ti", "Tl", "Tm", "Ts", 
 		"U", "V", "W", "Xe", "Y", "Yb", "Zn", "Zr"};
 	
-	fn is_chemical_element<'a>(node: Element<'a>) -> bool {
+	fn is_chemical_element(node: Element) -> bool {
 		// FIX: allow name to be in an mrow (e.g., <mi>N</mi><mi>a</mi>
 		let name = name(&node);
 		if name != "mi" && name != "mtext" {

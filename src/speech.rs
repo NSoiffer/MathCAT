@@ -5,6 +5,7 @@
 //!
 //! The speech rules call out to the preferences and tts modules and the dividing line is not always clean.
 //! A number of useful utility functions used by other modules are defined here.
+#![allow(clippy::needless_return)]
 
 use std::{collections::HashMap, process::exit};
 use std::cell::RefCell;
@@ -63,12 +64,12 @@ pub fn yaml_to_type(yaml: &Yaml) -> String {
         Yaml::Boolean(v)=> format!("boolean='{:#}'", v),
         Yaml::Array(v)=> match v.len() {
             0 => "array with no entries".to_string(),
-            1 => format!("array with the entry: {}", yaml_to_type(&v[0]).to_string()),
-            _ => format!("array with {} entries. First entry: {}", v.len(), yaml_to_type(&v[0]).to_string()),
+            1 => format!("array with the entry: {}", yaml_to_type(&v[0])),
+            _ => format!("array with {} entries. First entry: {}", v.len(), yaml_to_type(&v[0])),
         }
         Yaml::Hash(h)=> {
             let first_pair = 
-                if h.len()==0 {
+                if h.is_empty() {
                     "no pairs".to_string()
                 } else {
                     let (key, val) = h.iter().next().unwrap();
@@ -76,9 +77,9 @@ pub fn yaml_to_type(yaml: &Yaml) -> String {
                 };
             format!("dictionary with {} pair{}. A pair: {}", h.len(), if h.len()==1 {""} else {"s"}, first_pair)
         }
-        Yaml::Alias(_)=> format!("Alias"),
-        Yaml::Null=> format!("Null"),
-        Yaml::BadValue=> format!("BadValue"),       
+        Yaml::Alias(_)=> "Alias".to_string(),
+        Yaml::Null=> "Null".to_string(),
+        Yaml::BadValue=> "BadValue".to_string(),       
     }
 }
 
@@ -105,14 +106,14 @@ fn find_str<'a>(dict: &'a Yaml, key: &'a str) -> Result<&'a str> {
 }
 
 /// Returns the Yaml as a `Hash` or an error if it isn't.
-pub fn as_hash_checked<'a>(value: &Yaml) -> Result<&Hash> {
+pub fn as_hash_checked(value: &Yaml) -> Result<&Hash> {
     let result = value.as_hash();
     let result = result.ok_or_else(|| yaml_type_err(value, "hashmap"))?;
     return Ok( result );
 }
 
 /// Returns the Yaml as a `Vec` or an error if it isn't.
-pub fn as_vec_checked<'a>(value: &Yaml) -> Result<&Vec<Yaml>> {
+pub fn as_vec_checked(value: &Yaml) -> Result<&Vec<Yaml>> {
     let result = value.as_vec();
     let result = result.ok_or_else(|| yaml_type_err(value, "array"))?;
     return Ok( result );
@@ -162,7 +163,7 @@ pub fn compile_rule<F>(str: &str, mut build_fn: F) -> Result<()> where
 
 fn process_include<F>(current_file: &Path, new_file_name: &str, mut read_new_file: F) -> Result<()> where F: FnMut(&Path) {
     let parent_path = current_file.parent();
-    if let None = parent_path {
+    if parent_path.is_none() {
         bail!("Internal error: {:?} is not a valid file name", current_file);
     }
     let mut new_file = parent_path.unwrap().to_path_buf();
@@ -212,7 +213,7 @@ impl Replacement {
             bail!("  expected a key/value pair. Found {}.",  yaml_to_string(replacement, 0));
         };
         let dictionary = dictionary.unwrap();
-        if dictionary.len() == 0 { 
+        if dictionary.is_empty() { 
             bail!("No key/value pairs found for key 'replace'.\n\
                 Suggestion: are the following lines indented properly?");
         }
@@ -224,7 +225,7 @@ impl Replacement {
 
         // get the single value
         let (key, value) = dictionary.iter().next().unwrap();
-        let key = key.as_str().ok_or_else(|| format!("replacement key(e.g, 't') is not a string"))?;
+        let key = key.as_str().ok_or("replacement key(e.g, 't') is not a string")?;
         match key {
             "t" | "T" => {
                 return Ok( Replacement::Text( as_str_checked(value)?.to_string() ) );
@@ -384,10 +385,10 @@ impl ReplacementArray {
         let mut replacement_strings =
             self.replacements.iter()
                         .map(|group| rules.replace(group, mathml))
-                        .filter(|result| if let Ok(str) = result {str.len() > 0} else {true})
+                        .filter(|result| if let Ok(str) = result {!str.is_empty()} else {true})
                         .collect::<Result<Vec<String>>>()?;
 
-        if replacement_strings.len() == 0 {
+        if replacement_strings.is_empty() {
             return Ok( "".to_string() );
         }
         // delete an optional text that is repetitive
@@ -455,7 +456,7 @@ impl ReplacementArray {
 
     /// Return true if there are no replacements.
     pub fn is_empty(&self) -> bool {
-        return self.replacements.len() == 0;
+        return self.replacements.is_empty();
     }
     
     fn pretty_print_replacements(&self) -> String {
@@ -777,8 +778,7 @@ impl SpeechPattern  {
                 let tag_array  = &dict["tag"];
                 tag_names = vec![];
                 if tag_array.is_array() {
-                    let mut i = 0;
-                    for name in tag_array.as_vec().unwrap() {
+                    for (i, name) in tag_array.as_vec().unwrap().iter().enumerate() {
                         match as_str_checked(name) {
                             Err(e) => return Err(
                                 e.chain_err(||
@@ -788,7 +788,6 @@ impl SpeechPattern  {
                             ),
                             Ok(str) => tag_names.push(str),
                         };
-                        i += 1;
                     }
                 } else {
                     bail!("Errors trying to find 'tag' in:\n{}", &yaml_to_string(dict, 1));
@@ -874,7 +873,7 @@ struct TestArray {
 impl fmt::Display for TestArray {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for test in &self.tests {
-            write!(f, "{}\n", test)?;
+            writeln!(f, "{}", test)?;
         }
         return Ok( () );
     }
@@ -934,7 +933,7 @@ impl TestArray {
             }
         };
 
-        if test_array.len() == 0 {
+        if test_array.is_empty() {
             bail!("No entries for 'test:'");
         }
 
@@ -1151,7 +1150,7 @@ fn yaml_to_value<'a, 'b>(yaml: &'a Yaml) -> Value<'b> {
     }
 }
 
-fn value_to_yaml<'a, 'b>(value: &'a Value) -> Result<Yaml> {
+fn value_to_yaml<'a>(value: &'a Value) -> Result<Yaml> {
     return Ok( match value {
         Value::String(s) => Yaml::String(s.clone()),
         Value::Boolean(b)  => Yaml::Boolean(*b),
@@ -1294,7 +1293,7 @@ impl SpeechRules {
             name: String::from(name),
             rules: speech_rules,
             unicode: unicode_chars,
-            pref_manager: pref_manager,
+            pref_manager,
         };
         return rules;
     }
@@ -1369,50 +1368,48 @@ impl SpeechRules {
             tag_name = "unknown";       // should be rules for 'unknown'
         }
         let rule_value = self.rules.get(tag_name);
-        match rule_value {
-            Some(rule_vector) => {
-                for pattern in rule_vector {
-                    // println!("Pattern: {}", pattern);
-                    if pattern.is_match(mathml)
-                            .chain_err(|| error_string(pattern, mathml) )? {
-                        if pattern.var_defs.len() > 0 {
-                            CONTEXT_STACK.with(|context_stack| {
-                                match pattern.var_defs.evaluate_to_yaml(mathml).chain_err(|| error_string(pattern, mathml)) {
-                                    Err(e) => Err(e),
-                                    Ok(prefs) => {
-                                        let mut context = context_stack.borrow_mut();
-                                        context.push(&prefs);
-                                        Ok( () )     
-                                    },
-                                }                      
-                            })?
-                        }
-                        let result = pattern.replacements.replace(self, mathml);
-                        if pattern.var_defs.len() > 0 {
-                            CONTEXT_STACK.with(|context_stack| {
-                                let mut context = context_stack.borrow_mut();
-                                context.pop();
-                            });
-                        }
-                        return result.chain_err(||
-                                format!(
-                                    "attempting replacement pattern: \"{}\" for \"{}\".\n\
-                                    Replacement \"{}\" due to matching the following MathML with the pattern \"{}\".\n\
-                                    {}\
-                                    The patterns are in {}.\n",
-                                    pattern.pattern_name, pattern.tag_name,
-                                    pattern.replacements.pretty_print_replacements(),pattern.pattern,
-                                    pretty_print::mml_to_string(mathml),
-                                    pattern.file_name
-                                )
-                            );
+
+        if let Some(rule_vector) = rule_value {
+            for pattern in rule_vector {
+                // println!("Pattern: {}", pattern);
+                if pattern.is_match(mathml)
+                        .chain_err(|| error_string(pattern, mathml) )? {
+                    if pattern.var_defs.len() > 0 {
+                        CONTEXT_STACK.with(|context_stack| {
+                            match pattern.var_defs.evaluate_to_yaml(mathml).chain_err(|| error_string(pattern, mathml)) {
+                                Err(e) => Err(e),
+                                Ok(prefs) => {
+                                    let mut context = context_stack.borrow_mut();
+                                    context.push(&prefs);
+                                    Ok( () )     
+                                },
+                            }                      
+                        })?
                     }
+                    let result = pattern.replacements.replace(self, mathml);
+                    if pattern.var_defs.len() > 0 {
+                        CONTEXT_STACK.with(|context_stack| {
+                            let mut context = context_stack.borrow_mut();
+                            context.pop();
+                        });
+                    }
+                    return result.chain_err(||
+                            format!(
+                                "attempting replacement pattern: \"{}\" for \"{}\".\n\
+                                Replacement \"{}\" due to matching the following MathML with the pattern \"{}\".\n\
+                                {}\
+                                The patterns are in {}.\n",
+                                pattern.pattern_name, pattern.tag_name,
+                                pattern.replacements.pretty_print_replacements(),pattern.pattern,
+                                pretty_print::mml_to_string(mathml),
+                                pattern.file_name
+                            )
+                        );
                 }
-            },
-            None => {
-                // unknown element -- should have rules to handle this -- let flow through to default error
-            }    
+            }
         }
+
+        // unknown element -- should have rules to handle this -- let flow through to default error
         let mut file_name = "unknown";
         if let Some(path) = &self.pref_manager.get_style_file()[0] {
             file_name= path.to_str().unwrap();
@@ -1424,7 +1421,7 @@ impl SpeechRules {
             bail!("\nNo match found!\nMissing patterns in {} or bad MathML.\n{}", file_name, crate::pretty_print::mml_to_string(mathml)); 
         }
 
-        fn error_string(pattern: &Box<SpeechPattern>, mathml: &Element) -> String {
+        fn error_string(pattern: &SpeechPattern, mathml: &Element) -> String {
             return format!(
                 "error during pattern match using: \"{}\" for \"{}\".\n\
                 Pattern is \n{}\nMathML for the match:\n\

@@ -17,7 +17,7 @@
 //!
 //! Note: there are a number of public 'get_xxx' functions that really are meant to be public only to the [crate::speech] module as speech needs access
 //! to the preferences to generate the speech.
-
+#![allow(clippy::needless_return)]
 use yaml_rust::{Yaml, YamlLoader};
 use crate::pretty_print::yaml_to_string;
 use crate::tts::TTS;
@@ -347,7 +347,7 @@ impl PreferenceManager {
         let mut default_lang = default_lang;
         if lang_dir.is_none() {
             // try again with the default lang if there is one
-            if !default_lang.is_some() {
+            if default_lang.is_none() {
                 lang_dir = PreferenceManager::get_language_dir(&rules_dir, default_lang.unwrap());
                 if lang_dir.is_none() {
                     // We are done for -- MathCAT can't do anything without the required files!
@@ -385,10 +385,10 @@ impl PreferenceManager {
             return result;     // found at least one file
         }
 
-        if default_lang.is_some() {
+        if let Some(default_lang) = default_lang {
             // didn't find a file -- retry with default
             // FIX: give a warning that default dir is being used
-            return PreferenceManager::get_files(rules_dir, default_lang.unwrap(), None, file_name);
+            return PreferenceManager::get_files(rules_dir, default_lang, None, file_name);
         }
         
         // We are done for -- MathCAT can't do anything without the required files!
@@ -405,7 +405,7 @@ impl PreferenceManager {
         // return 'Rules/fr', 'Rules/en/gb', etc, if they exist.
         // fall back to main language, and then to default_dir if language dir doesn't exist
         let mut full_path = rules_dir.clone();
-        let lang_parts = lang.split("-");
+        let lang_parts = lang.split('-');
         for part in lang_parts {
             full_path.push(Path::new(part));
             if !full_path.is_dir() {

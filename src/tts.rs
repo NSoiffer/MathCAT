@@ -8,8 +8,8 @@
 //!  Note: no range is specified by the spec
 //! ### SAPI5: Relative pitch
 //! * Number is in range -24 to 24
-//!	* -24 is one octave below the default/current pitch, +24 is one octave above
-//!	* changes are logarithmic -- a change of +/-1 corresponds to multiplying/dividing by 24th root of 2
+//! * -24 is one octave below the default/current pitch, +24 is one octave above
+//! * changes are logarithmic -- a change of +/-1 corresponds to multiplying/dividing by 24th root of 2
 //! ### SSML: Relative pitch
 //! * pitch in hertz (default/current man's voice is about 100hz, woman's 180hz)
 //!
@@ -24,8 +24,8 @@
 //! Note: no range is specified by the spec
 //! ### SAPI5: Relative rate
 //! * Number is in range -10 to 10
-//!	* -10 is 1/3 of the default/current speed; 10 3 times the default/current speech
-//!	* changes are logarithmic -- a change of +/-1 corresponds to multiplying/dividing by 10th root of 3
+//! * -10 is 1/3 of the default/current speed; 10 3 times the default/current speech
+//! * changes are logarithmic -- a change of +/-1 corresponds to multiplying/dividing by 10th root of 3
 //! ### SSML: Relative rate
 //! * 0.5 is 1/2 of the default/current rate, 2.0 is 2 times the default/current rate
 //!
@@ -58,6 +58,7 @@
 //! * All systems -- pauses are given in milliseconds
 //!
 //! Note: Pauses on output are scaled based on the ratio of the current rate to the default rate (180 wpm)
+#![allow(clippy::needless_return)]
 
 use crate::{errors::*, prefs::PreferenceManager, speech::ReplacementArray};
 use sxd_document::dom::Element;
@@ -73,7 +74,7 @@ pub const PAUSE_SHORT:f64 = 150.0;  // ms
 pub const PAUSE_MEDIUM:f64 = 300.0; // ms
 pub const PAUSE_LONG:f64 = 600.0;   // ms
 pub const PAUSE_AUTO:f64 = 987654321.5;   // ms -- hopefully unique
-pub const PAUSE_AUTO_STR: &'static str = "\u{F8FA}\u{F8FA}";
+pub const PAUSE_AUTO_STR: &str = "\u{F8FA}\u{F8FA}";
 
 /// TTSCommand are the supported TTS commands
 /// When parsing the YAML rule files, they are converted to these enums
@@ -169,7 +170,7 @@ impl TTS {
         let hashmap = values.as_hash();
         let tts_value;
         let replacements;
-        if let Some(_) = hashmap {
+        if hashmap.is_some() {
             tts_value = &values["value"];
             if tts_value.is_badvalue() {
                 bail!("{} key is missing a 'value' sub-key. Found\n{}", tts_command, yaml_to_string(values, 1));
@@ -233,7 +234,7 @@ impl TTS {
 
 
         if !command.replacements.is_empty()  {
-            if result.len() > 0 {
+            if result.is_empty() {
                 result += " ";
             }
             result += &command.replacements.replace(rules, mathml)?;    
@@ -245,8 +246,8 @@ impl TTS {
             TTS::SSML  => self.get_string_ssml(command, prefs, false),
         };
 
-        if end_tag.len() > 0 {
-            return Ok( String::from(result + " " + &end_tag) );
+        if !end_tag.is_empty() {
+            return Ok( result + " " + &end_tag );
         } else {
             return Ok( result ); // avoids adding in " "
         }

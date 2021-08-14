@@ -78,14 +78,16 @@ fn main() {
 //    </math>
 // ";
 
-    let expr = "
-<math xmlns='http://www.w3.org/1998/Math/MathML'>
-<mi>log</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
-<mo>+</mo>
-<mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
-</math>
+//     let expr = "
+// <math xmlns='http://www.w3.org/1998/Math/MathML'>
+// <mi>log</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
+// <mo>+</mo>
+// <mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
+// </math>
+// ";
+let expr = "<math><mi>t</mi><mtext>&#x2009;&#x2009;</mtext><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></mrow></math>
 ";
-    let instant = Instant::now();
+let instant = Instant::now();
     let speech_string = libmathcat::interface::speak_mathml(expr);
     println!("Computed speech string:\n   '{}'", speech_string);
     println!("Time taken: {}ms", instant.elapsed().as_millis());

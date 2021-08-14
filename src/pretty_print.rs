@@ -1,4 +1,5 @@
 //! Useful functions for debugging and error messages.
+#![allow(clippy::needless_return)]
 
 use sxd_document::dom::*;
 
@@ -27,7 +28,7 @@ pub fn format_element(e: &Element, indent: usize) -> String {
     };
     let mut answer = format!("{:in$}<{ns}{name}{attrs}>", " ", in=2*indent, ns=namespace, name=e.name().local_part(), attrs=format_attrs(&e.attributes()));
     let children = e.children();
-    let has_element = children.iter().find(|&&c| if let ChildOfElement::Element(_x) = c {true} else {false});
+    let has_element = children.iter().find(|&&c| matches!(c, ChildOfElement::Element(_x)));
     if has_element == None {
         // print text content
         let content = children.iter()
@@ -64,7 +65,7 @@ pub fn format_element(e: &Element, indent: usize) -> String {
 }
 
 /// Format a vector of attributes as a string with a leading space
-pub fn format_attrs(attrs: &Vec<Attribute>) -> String {
+pub fn format_attrs(attrs: &[Attribute]) -> String {
     let mut result = String::new();
     for attr in attrs {
         result += format!(" {}='{}'", attr.name().local_part(), attr.value()).as_str();
@@ -95,7 +96,7 @@ pub fn yaml_to_string(yaml: &Yaml, indent: usize) -> String {
     use regex::Regex;
 
     lazy_static!{
-        static ref START_OF_LINE: Regex = Regex::new(r"(?m)^").unwrap();
+        static ref START_OF_LINE: Regex = Regex::new(r"^(?m)").unwrap();
     }
     let mut result = String::new();
     {
@@ -115,10 +116,7 @@ pub fn yaml_to_string(yaml: &Yaml, indent: usize) -> String {
 // -foo [bar: bletch]
 // -foo {bar: bletch}
 fn is_scalar(v: &Yaml) -> bool {
-    return match v {
-        Yaml::Hash(_) | Yaml::Array(_) => false,
-        _ => true,
-    }
+    return !matches!(v, Yaml::Hash(_) | Yaml::Array(_));
 }
 
 fn is_complex(v: &Yaml) -> bool {
@@ -138,8 +136,7 @@ fn is_complex(v: &Yaml) -> bool {
                 0 => false,
                 1 => {
                     let hash = v[0].as_hash();
-                    if hash.is_some() {
-                        let hash = hash.unwrap();
+                    if let Some(hash) = hash {
                         return match hash.len() {
                             0 => false,
                             1 => {
@@ -473,11 +470,9 @@ fn need_quotes(string: &str) -> bool {
 
     string == ""
         || need_quotes_spaces(string)
-        || string.starts_with(|character: char| match character {
-            '&' | '*' | '?' | '|' | '-' | '<' | '>' | '=' | '!' | '%' | '@' => true,
-            _ => false,
-        })
-        || string.contains(|character: char| match character {
+        || string.starts_with(|character: char| matches!(character,
+            '&' | '*' | '?' | '|' | '-' | '<' | '>' | '=' | '!' | '%' | '@') )
+        || string.contains(|character: char| matches!(character,
             ':'
             | '{'
             | '}'
@@ -494,9 +489,7 @@ fn need_quotes(string: &str) -> bool {
             | '\n'
             | '\r'
             | '\x0e'..='\x1a'
-            | '\x1c'..='\x1f' => true,
-            _ => false,
-        })
+            | '\x1c'..='\x1f') )
         || [
             // http://yaml.org/type/bool.html
             // Note: 'y', 'Y', 'n', 'N', is not quoted deliberately, as in libyaml. PyYAML also parse

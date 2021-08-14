@@ -31,6 +31,7 @@
 //! naming conventions, snake case is used (e.g, "function_names"). 
 //!
 //! See the struct [`Definitions`] for the variables that are read in.
+#![allow(clippy::needless_return)]
 
 extern crate yaml_rust;
 use yaml_rust::{Yaml};
@@ -258,7 +259,7 @@ fn verify_definitions() -> Result<()> {
                 match collection {
                     Contains::Vec(v) => {
                         let v = v.borrow();
-                        if v.len() == 0 || v.len() % 10 != 0 {
+                        if v.is_empty() || v.len() % 10 != 0 {
                             bail!("{} has wrong number of values: {}", name, v.len());
                         }
                     },
