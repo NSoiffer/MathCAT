@@ -27,7 +27,8 @@
         "arccot", "arccotan", "arccotanh", "arccoth",
         "arccsc", "arccsch", "arcsec", "arcsech", "arcsin", "arcsinh",
         "arctan", "arctang", "arctanh",
-        "exp", "im", "re"
+        "exp", "Exp", "im", "Im", "re", "Re",
+        "lim", "det", 
     ],
 
     # common names of functions along with a capital letter followed more one or more letters
