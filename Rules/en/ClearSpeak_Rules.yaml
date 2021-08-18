@@ -30,11 +30,6 @@
    match: "*[1][self::m:mi][text()='ℤ'] and *[2][self::m:mo][text()='+']"
    replace: [t: the positive integers]
 -
-   name: natural-nums-sup-pos
-   tag: msup
-   match: "*[1][self::m:mi][text()='ℤ'] and *[2][self::m:mo][text()='+']"
-   replace: [t: the positive integers]
--
    name: natural-nums-sup-neg
    tag: msup
    match: "*[1][self::m:mi][text()='ℤ'] and *[2][self::m:mo][text()='-']"
@@ -273,21 +268,7 @@
          then: {t: squared}
          else: {t: cubed}
 -
-   name: function-integer-power
-   tag: msup
-   match:
-    - "*[2][self::m:mn][not(contains(., '.'))] and"
-    - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
-   replace:
-    - test: 
-         if: "$Verbosity!='terse'"
-         then: {t: the}
-    - x: "ToOrdinal(*[2])"
-    - t: power of
-    - pause: short
-    - x: "*[1]"
--
-   name: function-other-power
+   name: function-power
    tag: msup
    match:
     - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
@@ -295,7 +276,10 @@
     - test: 
          if: "$Verbosity!='terse'"
          then: {t: the}
-    - x: "*[2]"
+    - test:
+         if: "*[2][self::m:mn][not(contains(., '.'))]"
+         then: [x: "ToOrdinal(*[2])"]
+         else: [x: "*[2]"]
     - t: power of
     - pause: short
     - x: "*[1]"
