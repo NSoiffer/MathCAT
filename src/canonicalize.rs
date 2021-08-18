@@ -1099,7 +1099,9 @@ impl CanonicalizeContext {
 				let previous_child = top(&parse_stack).last_child_in_mrow().unwrap();
 				let base_of_previous_child = get_possible_embellished_node(previous_child);
 				if name(&base_of_previous_child) != "mo" {
-					// consecutive operands -- choose either implicit multiplication or implicit function application
+					// consecutive operands -- add an invisible operator as appropriate
+					// note: in Geometry, AB or ABC are common and would be more properly represented with an invisible op
+					//    other than times (maybe with a super high priority). Rather than make up a new operator, we stick with times.
 					current_op = if self.is_function_name(previous_child, Some(&children[i_child..])) {
 								OperatorPair{ ch: "\u{2061}", op: &*INVISIBLE_FUNCTION_APPLICATION }
 							} else if self.is_mixed_fraction(&previous_child, &current_child) {
