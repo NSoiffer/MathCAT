@@ -1147,7 +1147,7 @@
  - "∈":                                          # 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: is an element of]
+        then: [t: an element of]
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "IsBracketed(../.., '{', '}') or IsBracketed(../../.., '{', '}')" # inside a set
