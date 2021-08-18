@@ -30,4 +30,10 @@ phf_map! {
 				next: &Some( OperatorInfo{ op_type: OperatorTypes::RIGHT_FENCE, priority: 20, next: &None  } )}) },
 	"\u{2016}" => OperatorInfo{  op_type: OperatorTypes::LEFT_FENCE, priority: 20,
 				next: &Some( OperatorInfo{ op_type: OperatorTypes::RIGHT_FENCE, priority: 20, next: &None  } ) },
+
+	// the following are not in the operator dictionary and should get added "manually"
+	
+	// mod should take its priority from '%'s priority
+	"mod"=> OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 800, next: &None },
+
 }
