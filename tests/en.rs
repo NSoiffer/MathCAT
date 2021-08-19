@@ -13,5 +13,15 @@ mod en {
         mod mtable;
         mod sets;
     }
+    mod SimpleSpeak {
+        mod functions;
+        mod large_ops;
+        // mod menclose;
+        mod mfrac;
+        // mod mroot;
+        mod msup;
+        // mod mtable;
+        mod sets;
+    }
 }
 

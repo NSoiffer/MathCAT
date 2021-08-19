@@ -1,0 +1,353 @@
+---
+-
+   name: complex-nums
+   tag: mi
+   match: "text()='ℂ'"
+   replace: [t: the complex numbers]
+-
+   name: natural-nums
+   tag: mi
+   match: "text()='ℕ'"
+   replace: [t: the natural numbers]
+-
+   name: rational-nums
+   tag: mi
+   match: "text()='ℚ'"
+   replace: [t: the rational numbers]
+-
+   name: real-nums
+   tag: mi
+   match: "text()='ℝ'"
+   replace: [t: the real numbers]
+-
+   name: integer-nums
+   tag: mi
+   match: "text()='ℤ'"
+   replace: [t: the integers]
+-
+   name: natural-nums-sup-pos
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℤ'] and *[2][self::m:mo][text()='+']"
+   replace: [t: the positive integers]
+-
+   name: natural-nums-sup-neg
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℤ'] and *[2][self::m:mo][text()='-']"
+   replace: [t: the negative integers]
+-
+   name: rational-nums-sup-pos
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℚ'] and *[2][self::m:mo][text()='+']"
+   replace: [t: the positive rational numbers]
+-
+   name: rational-nums-sup-neg
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℚ'] and *[2][self::m:mo][text()='-']"
+   replace: [t: the negative rational numbers]
+-
+   name: complex-nums-sup
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℂ']"
+   replace: 
+    - t: c
+    - x: "*[2]"
+-
+   name: natural-nums-sup
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℕ']"
+   replace: 
+    - t: n
+    - x: "*[2]"
+-
+   name: rational-nums-sup
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℚ']"
+   replace: 
+    - t: q
+    - x: "*[2]"
+-
+   name: real-nums-sup
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℝ']"
+   replace: 
+    - t: r
+    - x: "*[2]"
+-
+   name: integer-nums-sup
+   tag: msup
+   match: "*[1][self::m:mi][text()='ℤ']"
+   replace: 
+    - t: z
+    - x: "*[2]"
+
+-
+   name: binomial-frac
+   tag: mrow
+   match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][@linethickness=0]"
+   replace: 
+   - x: "*[2]/*[1]"
+   - t: choose
+   - x: "*[2]/*[2]"
+
+        
+-
+   name: negative
+   tag: mrow
+   match: "count(*)=2 and *[1][self::m:mo][text()='-' or text()='+']"
+   replace:
+      - test:
+         if: "*[1][text()='-']"
+         then: {t: negative}
+         else: {t: positive}
+      - x: "*[2]"
+               
+# rules for functions raised to a power
+# these could have been written on 'mrow' but putting them on msup seems more specific
+# to see if it is a function, we look right to see if the following sibling is apply-function
+-
+   name: function-inverse
+   tag: msup
+   match:
+    - "*[2][self::m:mrow][count(*)=2] and"                        # exponent is an mrow with children...
+    - "*[2]/*[1][self::m:mo][text()='-'] and"                     #   '-'
+    - "*[2]/*[2][self::m:mn][text()=1] and"                       #  and '1'
+    - "*[1][self::m:mi] and IsNode(*[1], 'trig_name') and"        # base is a trig function name (e.g, sin, sinh)
+    - "following-sibling::*[1][self::m:mo][text()='\u2061']"      # and msup is followed by invisible function apply
+   replace:
+      - t: inverse
+      - x: "*[1]"
+-
+   name: function-squared-or-cubed
+   tag: msup
+   match:
+    - "*[2][self::m:mn][text()=2 or text()=3] and"
+    - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
+   replace:
+    - x: "*[1]"
+    - test: 
+         if: "*[2][text()=2]"
+         then: {t: squared}
+         else: {t: cubed}
+-
+   name: function-power
+   tag: msup
+   match:
+    - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
+   replace:
+    - test: 
+         if: "$Verbosity!='terse'"
+         then: {t: the}
+    - test:
+         if: "*[2][self::m:mn][not(contains(., '.'))]"
+         then: [x: "ToOrdinal(*[2])"]
+         else: [x: "*[2]"]
+    - t: power of
+    - pause: short
+    - x: "*[1]"
+
+-
+   name: squared
+   tag: msup
+   match: "*[2][self::m:mn][text()='2']"
+   replace: 
+    - x: "*[1]"
+    - t: squared
+-
+   name: cubed
+   tag: msup
+   match: "*[2][self::m:mn][text()='3']"
+   replace: 
+    - x: "*[1]"
+    - t: cubed
+
+-
+   name: bigop
+   tag: [msubsup, munderover]
+   match: "IsLargeOp(*[1])"
+   replace: 
+    - test: 
+       if: "$Verbosity!='terse'"
+       then: {t: the}
+    - x: "*[1]"
+    - t: from
+    - x: "*[2]"
+    - t: to
+    - x: "*[3]"
+    - t: of
+  
+-
+   name: bigop
+   tag: [msub, munder]
+   match: "IsLargeOp(*[1])"
+   replace: 
+    - test: 
+       if: "$Verbosity!='terse'"
+       then: {t: the}
+    - x: "*[1]"
+    - t: over
+    - x: "*[2]"
+    - t: of
+  
+-
+   name: bigop
+   tag: mrow
+   match: "count(*)=2 and IsLargeOp(*[1])"
+   replace: 
+    - test: 
+       if: "$Verbosity!='terse'"
+       then: {t: the}
+    - x: "*[1]"
+    - t: of
+    - x: "*[2]"
+
+
+-
+   name: sin
+   tag: mi
+   match: "text()='sin'"
+   replace: [t: "sine"]
+-
+   name: cos
+   tag: mi
+   match: "text()='cos'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: cos}
+         else: {t: cosine}
+-
+   name: tan
+   tag: mi
+   match: "text()='tan'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: tan}
+         else: {t: tangent}
+-
+   name: sec
+   tag: mi
+   match: "text()='sec'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: seek}
+         else: {t: secant}
+-
+   name: csc
+   tag: mi
+   match: "text()='csc'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: co-seek}
+         else: {t: co-secant}
+-
+   name: cot
+   tag: mi
+   match: "text()='cot'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: co-tan}
+         else: {t: co-tangent}
+
+-
+   name: sinh
+   tag: mi
+   match: "text()='sinh'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: sinch}
+         else: {t: hyperbolic sine}
+-
+   name: cosh
+   tag: mi
+   match: "text()='cosh'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: cosh}
+         else: {t: hyperbolic cosine}
+-
+   name: tanh
+   tag: mi
+   match: "text()='tanh'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: tanch}
+         else: {t: hyperbolic tangent}
+-
+   name: sech
+   tag: mi
+   match: "text()='sech'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: sheck}
+         else: {t: hyperbolic secant}
+-
+   name: csch
+   tag: mi
+   match: "text()='csch'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: co-sheck}
+         else: {t: hyperbolic co-secant}
+-
+   name: coth
+   tag: mi
+   match: "text()='coth'"
+   replace:
+      - test: 
+         if: "$Verbosity='terse'"
+         then: {t: co-tanch}
+         else: {t: hyperbolic co-tangent}
+
+-  # handle both log and ln
+   name: log
+   tag: mrow
+   variables: [log_is_simple: "IsNode(*[3],'simple')"]
+   match:
+      - "count(*)=3 and"
+      - "*[1][self::m:mi][text()='log' or text()='ln'] and"
+      - "*[2][self::m:mo][text()='\u2061']"
+   replace:
+      - test:
+         if: "$log_is_simple"
+         then_test:
+            - if: "*[1][text()='log']"
+              then: [t: log]
+            - else_if: "$Verbosity='terse'"
+              then: [spell: ln]
+              else: [t: natural log]
+         else:
+          - test: 
+             if: "$Verbosity!='terse' and not(log_is_simple)"
+             then: {t: the}
+          - test:
+            - if: "*[1][text()='log']"
+              then: [t: log]
+            - else_if: "$Verbosity='terse'"
+              then: [spell: ln]
+              else: [t: natural log]
+          - t: of
+          - pause: short
+      - x: "*[3]"
+
+-
+   name: log-base
+   tag: msub
+   match:
+    - "*[1][self::m:mi][text()='log'] and"
+    - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
+   replace:
+    - test: 
+         if: "$Verbosity!='terse'"
+         then: {t: the}
+    - t: log base
+    - x: "*[2]"
+

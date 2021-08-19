@@ -11,12 +11,6 @@
     - test: 
          if: "$Verbosity!='terse'"
          then: {t: the}
-    - test: 
-         if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
-         then_test: 
-            if: parent::*[self::m:mrow and count(*)=2 and *[1][self::m:mo][text()='-']]
-            then: {t: negative}
-            else: {t: positive}
     - t: square root
     - test: 
          if: "$Verbosity!='terse'"
@@ -24,14 +18,9 @@
          else: {pause: short}
     - x: "*[1]"
     - test: 
-       - if: $ClearSpeak_Roots = 'EndRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
-         then:
-            - pause: short
-            - t: end root
-            - pause: medium
-       - else_if: IsNode(*[1], 'simple')
+         if: IsNode(*[1], 'leaf')
          then: [pause: short]
-         else: [pause: long]
+         else: [t: end root, pause: short]
 
 -
    name: default
@@ -41,12 +30,6 @@
       - test: 
          if: "$Verbosity!='terse'"
          then: {t: the}
-      - test: 
-         if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
-         then_test: 
-            if: parent::*[self::m:mrow and count(*)=2 and *[1][self::m:mo][text()='-']]
-            then: {t: negative}
-            else: {t: positive}
       - test:
          if: "*[2][self::m:mn]"
          then_test:
@@ -67,33 +50,10 @@
             then: {t: of}
       - x: "*[1]"
       - test: 
-         if: $ClearSpeak_Roots = 'EndRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
-         then:
-            - pause: short
-            - t: end root
-            - pause: medium
-         else_test:
-            if: IsNode(*[1], 'simple')
-            then: [pause: short]
-            else: [pause: long]
-  
-               
-# The 'negative' rule interacts with the msqrt/mroot rules as those might pick off this case ("the negative square root of x")
--
-   name: negative
-   tag: mrow
-   match: "count(*)=2 and *[1][self::m:mo][text()='-' or text()='+']"
-   replace:
-      - test:
-         if:
-            - "*[2][self::m:msqrt or self::m:mroot] and"
-            - "($ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd')"
-         then: {t: ""}
-         else_test:
-            if: "*[1][text()='-']"
-            then: {t: negative}
-            else: {t: positive}
-      - x: "*[2]"
+         if: IsNode(*[1], 'leaf')
+         then: [pause: short]
+         else: [t: end root, pause: short]
+        
                
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
@@ -113,71 +73,39 @@
       - "*[2][self::m:mn][not(contains(., '.'))]"
    replace: [x: ToCommonFraction(.)]
 -
-   name: fraction-over-simple
-   tag: mfrac
-   match: "(IsNode(*[1],'simple') and IsNode(*[2],'simple'))"  # simple fraction in ClearSpeak spec
-   replace: 
-    - x: "*[1]"
-    - t: over
-    - x: "*[2]"
--
-   # fraction with text or numbers followed by text in both numerator and denominator
-   name: fraction-over-text
+   # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
+   # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
+   # are never simple, then any 'over' applies only to enclosing "fraction...end fraction" pair.
+   name: simple
    tag: mfrac
    match:
-      - "( "
-      - "  ((*[1][self::m:mi or self::m:mtext][string-length(.)>1]) or " # fractions with text
-      - "   (*[1][self::m:mrow][count(*)=3][ "
-      - "        *[1][self::m:mn] and "
-      - "        *[2][self::m:mo][text()='\u2062'] and "            # invisible times
-      - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) ) and"
-      - "  ((*[2][self::m:mi or self::m:mtext][string-length(.)>1]) or " # fractions with text
-      - "   (*[2][self::m:mrow][count(*)=3][ "
-      - "        *[1][self::m:mn] and "
-      - "        *[2][self::m:mo][text()='\u2062'] and "            # invisible times
-      - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) )"
-      - ")"
+    - "(IsNode(*[1],'leaf') and IsNode(*[2],'leaf')) and"
+    - "not(ancestor::*[name() != 'mrow'][1]/self::m:mfrac)"
    replace: 
     - x: "*[1]"
     - t: over
     - x: "*[2]"
+    - pause: short
+
 -
    name: default
    tag: mfrac
    match: "."
    replace: 
-    - ot: the
-    - t: fraction with numerator
-    - test:
-       if: not(IsNode(*[1], 'simple'))
-       then: {pause: medium}
+    - t: fraction
+    - pause: short
     - x: "*[1]"
-    - pause: medium
-    - t: and denominator
+    - test:
+         if: "not(IsNode(*[1],'leaf'))"
+         then: [pause: short]
+    - t: over
+    - test:
+         if: "not(IsNode(*[2],'leaf'))"
+         then: [pause: short]
     - x: "*[2]"
-    - pause: long
-
-
-# rules for functions raised to a power
-# these could have been written on 'mrow' but putting them on msup seems more specific
-# to see if it is a function, we look right to see if the following sibling is apply-function
--
-   name: function-inverse
-   tag: msup
-   match:
-    - "*[2][self::m:mrow][count(*)=2] and"                        # exponent is an mrow with children...
-    - "*[2]/*[1][self::m:mo][text()='-'] and"                     #   '-'
-    - "*[2]/*[2][self::m:mn][text()=1] and"                       #  and '1'
-    - "*[1][self::m:mi] and IsNode(*[1], 'trig_name') and"        # base is a trig function name (e.g, sin, sinh)
-    - "following-sibling::*[1][self::m:mo][text()='\u2061']"      # and msup is followed by invisible function apply
-   replace:
-      - test:
-         if: $ClearSpeak_Trig = 'TrigInverse'
-         then: [x: "*[1]", t: inverse]
-         else_test:
-            if: $ClearSpeak_Trig = 'ArcTrig'
-            then: [t: arc, x: "*[1]"]
-            else: [t: inverse, x: "*[1]"]       # default/Auto
+    - pause: short
+    - t: end fraction
+    - pause: medium
 
 -
    name: simple-integer
@@ -190,7 +118,6 @@
          if: "*[2][.>0]"
          then: {x: "ToOrdinal(*[2])"}
          else: {x: "*[2]"}
-    - t: power
 -
    name: simple-negative-integer
    tag: msup
@@ -202,7 +129,6 @@
     - x: "*[1]"
     - t: to the
     - x: "*[2]"
-    - t: power
 -
    name: simple-var
    tag: msup
@@ -211,104 +137,30 @@
     - x: "*[1]"
     - t: to the
     - x: "*[2]"
-    - ct: "-th power"
-
+    - ct: "-th"
 
 -
-   # match nested exponent, where the nested exponent is has the power 2 or 3 (n below)
-   #   [xxx]^n, - [xxx]^n, [xxx] var^n, -[xxx] var^n
-   # where xxx is a number, variable, or common fraction
-   # short of creating a specialized built-in function, I don't see a way to eliminate a lot of repetition in the matches
-   # also really bad is that the test of a common fraction is replicated here (four times!)
-   name: nested-squared-or-cubed
+   name: simple
+   tag: msup
+   match: "IsNode(*[2], 'leaf')"
+   replace: 
+    - x: "*[1]"
+    - t: to the
+    - x: "*[2]"
+-
+   # ending nested exponents with "...power power" sounds bad
+   # it won't end in "power" if the exponent is simple enough
+   # FIX: not that important, but this misses the case where the nested exp is a negative integer (change test if this is fixed)
+   name: nested
    tag: msup
    match:
-    - "*[2][self::m:msup]["
-    - "     *[2][self::m:mn][text()='2' or text()='3'] and "  # exp is 2 or 3
-    - ""    # base is mn, mi, common fraction ([xxx] case)
-    - "     *[1][self::m:mn or self::m:mi or "
-    - "          self::m:mfrac[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and" 
-    - "                        *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
-    - "         ]"
+    - "*[2]["
+    - "     (self::m:msup and not(IsNode(*[2], 'leaf'))) or"                  # non-simple nested superscript
+    - "     self::m:mrow[*[last()][self::m:msup[not(IsNode(*[2], 'leaf'))]]]" # same as above but at the end of an mrow
     - "    ]"
    replace: 
     - x: "*[1]"
     - t: raised to the
-    - x: "*[2]"
-    - t: power
--
-   name: nested-negative-squared-or-cubed  # - [xxx]^n
-   tag: msup
-   match:
-    - " *[2][self::m:mrow][count(*)=2][ "
-    - "      *[1][self::m:mo][text()='-'] and "
-    - "      *[2][self::m:msup]["
-    - "           *[2][self::m:mn][text()='2' or text()='3'] and "  # exp is 2 or 3"
-    - "           *[1][self::m:mn or self::m:mi or "
-    - "                self::m:mfrac[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and" 
-    - "                              *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
-    - "               ]"
-    - "          ]"
-    - "     ]"
-   replace: 
-    - x: "*[1]"
-    - t: raised to the
-    - x: "*[2]"
-    - t: power
--
-   name: nested-var-squared-or-cubed  # [xxx] var^n
-   tag: msup
-   match:
-    - "  *[2][self::m:mrow][count(*)=3][ "
-    - "       *[3][self::m:msup]["
-    - "            *[2][self::m:mn][text()='2' or text()='3'] and "  # exp is 2 or 3
-    - "            *[1][self::m:mi]"
-    - "           ] and "
-    - "       *[2][self::m:mo][text()='\u2062'] and "     # invisible times
-    - "       *[1][self::m:mn or self::m:mi or "
-    - "            self::m:mfrac[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and" 
-    - "                          *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
-    - "           ]"
-    - "      ]"
-   replace: 
-    - x: "*[1]"
-    - t: raised to the
-    - x: "*[2]"
-    - t: power
--
-   name: nested-negative-var-squared-or-cubed  # -[xxx] var^n
-   tag: msup
-   match:
-    - "  *[2][self::m:mrow][count(*)=3][ "
-    - "       *[3][self::m:msup]["
-    - "            *[2][self::m:mn][text()='2' or text()='3'] and "  # exp is 2 or 3
-    - "            *[1][self::m:mi]"
-    - "           ] and "
-    - "       *[2][self::m:mo][text()='\u2062'] and "     # invisible times
-    - "       *[1][self::m:mrow][count(*)=2][ "
-    - "            *[1][self::m:mo][text()='-'] and "
-    - "            *[2][self::m:mn or self::m:mi or "
-    - "                 self::m:mfrac[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and" 
-    - "                               *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
-    - "                ]"
-    - "           ]"
-    - "      ]"
-   replace: 
-    - x: "*[1]"
-    - t: raised to the
-    - x: "*[2]"
-    - t: power
--
-   name: default-exponent-power
-   tag: msup
-   match:  # directly a superscript or an mrow that contains a superscript
-    - "*[2][self::m:msup or "
-    - "     self::m:mrow[m:msup]"
-    - "    ]"
-   replace: 
-    - x: "*[1]"
-    - t: raised to the exponent
-    - pause: short
     - x: "*[2]"
     - pause: short
     - t: end exponent
@@ -335,6 +187,10 @@
       then: {t: the}
    - t: absolute value of 
    - x: "*[2]"
+   - test:
+         if: IsNode(*[2], 'leaf')
+         then: [pause: short]
+         else: [pause: short, t: end absolute value, pause: short]
 
 -
    name: set
@@ -353,87 +209,41 @@
             - test: 
                if: "$Verbosity!='terse'"
                then: {t: the}
-            - t: set of
-            - test:
-               if: $ClearSpeak_Sets != 'woAll'
-               then: [t: all]
+            - t: set of all
             - x: "*[2]/*[1]"
             - t: such that
             - x: "*[2]/*[3]"
          else:
             - test: 
-               if: $ClearSpeak_Sets != 'SilentBracket'
-               then:
-                  - test: 
-                     if: "$Verbosity!='terse'"
-                     then: {t: the}
-                  - t: set
+               if: "$Verbosity!='terse'"
+               then: {t: the}
+            - t: set 
             - x: "*[2]"
 
 
 
 -
-# intervals are controlled by a ClearSpeak Preference -- parens/brackets don't have to match, so we avoid IsBracketed
-# alternatively, we could have four (or ten) rules, but there is a lot of duplication if we do that
-# this one rule handles all ten cases listed as part $ClearSpeak_Paren = 'Interval'
-# note that *[2] is an mrow with X, ",", Y, so getting X or Y is a double index
    name: intervals
-   variables:
-   - is_intervals_start_infinity: "*[2]/*[1][*[1][text()='-'] and *[2][text()='∞']]"
-   - is_intervals_end_infinity: "*[2]/*[3][text()='∞'or (*[1][text()='+'] and *[2][text()='∞'])]"
    tag: mrow
-   match:
-   - "count(*)=3 and $ClearSpeak_Paren = 'Interval' and"
-   - "*[1][text()='(' or text()='['] and *[3][text()=')' or text()=']']"
+   match: ".[starts-with(@intent, 'interval(')]"
    replace: 
-   - t: the interval from
-   - x: "*[2]/*[1]"
-   - t: to
-   - x: "*[2]/*[3]"
-   - pause: short
-   # logic to deal with [not] arg #1
+   - test: 
+      if: "$Verbosity!='terse'"
+      then: {t: the}
    - test:
-      if: "not($is_intervals_start_infinity)"
-      then:
-         - test:
-            if: "*[1][text()='(']"
-            then: [t: "not"]
-         - t: "including"
-         - x: "*[2]/*[1]"
-   # some ugly logic dealing with connectives: or, but, but, and (cleaner to be part of next clause?)
-   - test:
-      if: "not($is_intervals_start_infinity or $is_intervals_end_infinity)"
+      if: "*[1][text()='(']"
       then_test:
-          - if: "IsBracketed(., '(', ')')"
-            then: [t: or]
-          - else_if: "IsBracketed(., '[', ']')"
-            then: [t: and]
-            else: [t: but]
-   # onto the [not] [including]... part
-   - test:
-      if: not($is_intervals_end_infinity)
-      then:
-         - test:
-            # there is some asymmetry to the test because of the and/or/but logic above
-            if: not( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) or $is_intervals_start_infinity
-            then: 
-               - test:
-                     if: "*[3][text()=')'] "
-                     then: [t: "not"]
-               - t: "including"
-         - x: "*[2]/*[3]"
+         if: "*[3][text()=')']"
+         then: [t: "open"]
+         else: [t: "open closed"]
+      else_test:
+         if: "*[3][text()=')']"
+         then: [t: "closed open"]
+         else: [t: "closed"]
+   - t: interval
+   - x: "*[2]"
+   - pause: short
 
--
-   name: binomial-frac-vector
-   tag: mrow
-   match:
-   - "$ClearSpeak_Matrix = 'Combinatorics' and "
-   - "IsBracketed(., '(', ')') and "
-   - "*[2][self::m:mtable][count(*[1]/*)=1 and count(*)=2]"
-   replace: 
-   - x: "*[2]/*[1]/*[1]/*"   # mtable/mtr/mtd
-   - t: choose
-   - x: "*[2]/*[2]/*[1]/*"
 
 #
 # Matrix/Determinant rules
@@ -667,66 +477,12 @@
         else: {pause: long}
  
 
--  # handle both log and ln
-   name: log
-   tag: mrow
-   variables: [log_is_simple: "IsNode(*[3],'simple')"]
-   match:
-      - "count(*)=3 and"
-      - "*[1][self::m:mi][text()='log' or text()='ln'] and"
-      - "*[2][self::m:mo][text()='\u2061']"
-   replace:
-      - test:
-         if: "$log_is_simple"
-         then_test:
-            - if: "*[1][text()='log']"
-              then: [t: log]
-            - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
-              then: [t: natural log]
-              else: [spell: ln]
-         else:
-          - test: 
-             if: "$Verbosity!='terse' and not(log_is_simple)"
-             then: {t: the}
-          - test:
-            - if: "*[1][text()='log']"
-              then: [t: log]
-            - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
-              then: [t: natural log]
-              else: [spell: ln]
-          - t: of
-          - pause: short
-      - x: "*[3]"
-
--
-   name: ClearSpeak_Functions_None
-   tag: mo
-   match:
-      - "text()='\u2061' and $ClearSpeak_Functions = 'None' and"
-      - not(preceding-sibling::*[1][IsNode(., 'trig_name')]) # Functions=None does not apply to "trig" functions
-   replace: 
-      test:
-         if: "$ClearSpeak_ImpliedTimes = 'None'"
-         then: [t: ""]
-         else: [t: times]
-
--
-   name: no-times
-   tag: mo
-   match:
-      # Note: this rule is also part of the paren rule so that the parens speak
-      - "text()='\u2062' and $ClearSpeak_ImpliedTimes = 'None'"
-   replace:
-      - t: ""
-   
 -
    name: times
    tag: mo
    match:
       # say "times" when invisible times is followed by parens or a superscript that has a base with parens or "|"s
       - "text()='\u2062' and ("
-      - "  $ClearSpeak_ImpliedTimes = 'MoreImpliedTimes'"
-      - " or "
       - "  following-sibling::*[1][" 
       - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|') or "  # followed by parens
       - "    ( (self::m:msup or self::m:msub or self::m:msubsup) and "                                # followed by msup, etc.
@@ -748,13 +504,9 @@
    match:
       - "parent::*[not(self::m:msup) and not(self::m:msub) and not(self::m:msubsup)] and "
       - "( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) and "
-      - "not( $ClearSpeak_Functions = 'None' and "
-      - "     (preceding-sibling::*[1][text()='\u2061'] or following-sibling::*[1][text()='\u2061']) ) and "
-      - "not( $ClearSpeak_ImpliedTimes = 'None' and "
-      - "     (preceding-sibling::*[1][text()='\u2062'] or following-sibling::*[1][text()='\u2062']) ) and "
       - "( IsNode(*[2], 'simple')  )"
          # missing clause: 'a positive fraction that is spoken as an ordinal
-         #   (either by the Ordinal preference or by the default rules)'
+         #   (either by the Ordinal preference or by the default rules_'
    replace:
       - x: "*[2]"
 

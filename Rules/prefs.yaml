@@ -4,7 +4,7 @@
     Language: en                # any known language code and sub-code -- could be en-uk, etc
     Verbosity: medium           # Terse, Medium, Verbose
     Rate: 100                   # Change from text speech rate (%)
-    SpeechStyle: ClearSpeak     # Any known speech style (falls back to ClearSpeak)
+    SpeechStyle: SimpleSpeak #ClearSpeak     # Any known speech style (falls back to ClearSpeak)
     SubjectArea: general        # FIX: still working on this
     Chemistry: spell_out        # SpellOut (H 2 0), AsCompound (Water), Off (H sub 2 O)
 

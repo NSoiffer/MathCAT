@@ -23,9 +23,28 @@ pub fn test(style: &str, mathml: &str, speech: &str) {
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let pref_manager = rules.pref_manager.as_mut();
-        pref_manager.set_user_prefs("SpeechStyle", style);
+        let changes = pref_manager.set_user_prefs("SpeechStyle", style);
+        rules.invalidate(changes);
     });
 
+    assert_eq!(speech, strip_spaces(speak_mathml(mathml)));
+}
+
+
+// Compare the result of speaking the mathml input to the output 'speech'
+// This takes the speech style along with a vector of (pref_name, pref_value)
+#[allow(dead_code)]     // used in testing
+#[allow(non_snake_case)]
+pub fn test_prefs(speech_style: &str, prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
+    libmathcat::speech::SPEECH_RULES.with(|rules| {
+        let mut rules = rules.borrow_mut();
+        let pref_manager = rules.pref_manager.as_mut();
+        let mut changes = pref_manager.set_user_prefs("SpeechStyle", speech_style);
+        for (pref_name, pref_value) in prefs {
+            changes.add_changes(pref_manager.set_user_prefs(pref_name, pref_value));
+        };
+        rules.invalidate(changes);
+    });
     assert_eq!(speech, strip_spaces(speak_mathml(mathml)));
 }
 
@@ -37,8 +56,9 @@ pub fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: 
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let pref_manager = rules.pref_manager.as_mut();
-        pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
-        pref_manager.set_user_prefs(pref_name, pref_value);
+        let mut changes = pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
+        changes.add_changes( pref_manager.set_user_prefs(pref_name, pref_value) );
+        rules.invalidate(changes);
     });
     assert_eq!(speech, strip_spaces(speak_mathml(mathml)));
 }
@@ -51,10 +71,11 @@ pub fn test_ClearSpeak_prefs(prefs: Vec<(&str, &str)>, mathml: &str, speech: &st
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let pref_manager = rules.pref_manager.as_mut();
-        pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
+        let mut changes = pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
         for (pref_name, pref_value) in prefs {
-            pref_manager.set_user_prefs(pref_name, pref_value);
-        }
+            changes.add_changes(pref_manager.set_user_prefs(pref_name, pref_value));
+        };
+        rules.invalidate(changes);
     });
     assert_eq!(speech, strip_spaces(speak_mathml(mathml)));
 }

@@ -21,12 +21,12 @@
  - "'": [t: apostrophe]                          # 0x27
  - "(":                                          # 0x28
     - test:
-        if: $SpeechStyle = 'ClearSpeak'
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [test: {if: "$Verbosity='terse'", then: {t: open}, else: {t: open paren}}]
         else: [t: left paren]                            
  - ")":                                          # 0x29
     - test:
-        if: $SpeechStyle = 'ClearSpeak'
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [test: {if: "$Verbosity='terse'", then: {t: close}, else: {t: close paren}}]
         else: [t: right paren]                            
 
