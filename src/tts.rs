@@ -173,7 +173,7 @@ impl TTS {
         if hashmap.is_some() {
             tts_value = &values["value"];
             if tts_value.is_badvalue() {
-                bail!("{} key is missing a 'value' sub-key. Found\n{}", tts_command, yaml_to_string(values, 1));
+                bail!("{} TTS command is missing a 'value' sub-key. Found\n{}", tts_command, yaml_to_string(values, 1));
             };
             replacements = ReplacementArray::build(&values["replace"])?;
         }else {
@@ -190,7 +190,7 @@ impl TTS {
             "gender" => TTSCommand::Gender,
             "voice"  => TTSCommand::Voice,
             "spell"  => TTSCommand::Spell,
-            _                    => panic!("Internal error in build_tts: unexpected rule ({:?}) encountered", tts_command)    
+            _        => panic!("Internal error in build_tts: unexpected rule ({:?}) encountered", tts_command)    
         };
     
         let tts_command_value;
