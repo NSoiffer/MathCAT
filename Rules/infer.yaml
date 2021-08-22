@@ -1,0 +1,128 @@
+---
+-
+  name: separate-subscripts
+  tag: msub
+        # probably should also test table/mtr/mtd first location to see it if is <mn>11</mn>
+        # and also that the position in the table is in first 10 rows/cols.
+  match: "parent::[self::m:mtd] and *[2][self::m:mn or self::m:mi][string-length(text())=2]"
+  xpath-tree: "<msub>
+                  <xpath>*[1]</xpath>
+                  <mrow>
+                    <xpath xpath-name='*[2][name()' xpath-attrs='*[2][@*]'>  *[2][substring(text(), 0, 1)] </xpath>
+                    <mo>\u2063</mo>
+                    <xpath xpath-name='*[2][name()' xpath-attrs='*[2][@*]'>  *[2][substring(text(), 1, 1)] </xpath>
+                  </mrow>
+                </msub>"
+  replace-tree:
+      name: msub
+      attrs: ".[@*]"
+      children:
+          - tree: "*[1]"
+          - tree:
+            name: "mrow"
+            children:
+              - tree:
+                name: "*[2][name()]"
+                attrs: "*[2][@*]"
+                text: "*[2][substring(text(), 0, 1)]"
+              - tree:
+                name: "mo"
+                text: "'\u2063'"
+              - tree:
+                name: "*[2][name()]"
+                attrs: "*[2][@*]"
+                text: "*[2][substring(text(), 1, 1)]"
+
+
+-
+  name: geometry-line-segment
+  tag: mover
+  match:
+    - "*[2][self::m:mo][text()='_'] and"
+    - "*[1][self::m:mrow][count(*)=3 and "
+    - "     *[1][self::m:mi and string-length(text()) and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())] and"
+    - "     *[2][self::m:mo and text()='\u2064'] and"
+    - "     *[3][self::m:mi and string-length(text()) and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]"
+  add-intent:
+    name: "line-segment"
+    args: "*[1]/*[1] | *[1]/*[3]"
+-
+  name: geometry-ray
+  tag: mover
+  match:
+    - "*[2][self::m:mo][text()='→'] and"  # u2192
+    - "*[1][self::m:mrow][count(*)=3 and "
+    - "     *[1][self::m:mi and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())] and"
+    - "     *[2][self::m:mo and text()='\u2064'] and"
+    - "     *[3][self::m:mi and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]"
+  add-intent:
+    name: "ray"
+    args: "*[1]/*[1] | *[1]/*[3]"
+-
+  name: measure-of-angle
+  tag: mrow
+  match:
+    - "count(*)=3 and *[1][text()='m'] and *[2][text()='\u2062'] and"
+      # check third child to be an mrow with ∠ ABC (or whatever)
+      # note that ABC is interpreted with invisible times between, so count is 5
+      # we could refine this further to make sure A, B, and C are all uppercase
+    - "*[3][self::m:mrow][count(*)=2 and *[1][text()='∠'] and *[2][count(*)=5]]"
+  add-intent:
+    name: "measure-of-angle"
+    args: "*[1]/*[1] | *[1]/*[3] | *[1]/*[5]"
+
+-
+  # (a,b) has many interpretations; (a, b] (etc) have fewer interpretations.
+  # as an interval, it represents a set and hence a clue that it is an interval is that a set operator comes
+  #   before or after it. '=' is also common.
+  # They also commonly stand by themselves, but so does the interpretation as a point or gcd.
+  name: interval
+  tag: mrow
+  match: 
+    - "count(*)=3 and "
+       # FIX: consider adding ]...[ versions
+    - "*[1][text()='(' or text()='['] and *[3][text()=')' or text()=']' and"   # match bracketing
+    - "*[2][len(*)=3 and *[2][text()=',']] and"                                # inside should have ','
+    - "( parent::self::m:math or "  # all by itself
+    - "  preceding-siblings::*[1][self::m:mo and text()='=' or IsDefinedIn('Subset', text())] or "
+    - "  following-siblings::*[1][self::m:mo and text()='=' or IsDefinedIn('Subset', text())]   )"
+  add-intent:
+      name: "interval"
+      args: "*[2]/*[1] | *[2]/*[3]"
+
+-
+  # vertical bars around an mtable or around a capital letter
+  # could add a check to make sure it was a square mtable
+  name: determinant
+  tag: mrow
+  match: 
+    - "IsBracketed(., '|', '|') and "
+    - "( *[2][self::m:mtable or "
+    - "  self::m:mi[self::m:mi and string-length(text()) and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]]"
+    - ")"
+  add-intent:
+      name: "determinant"
+      args: "*[2]"
+-
+  # vertical bars otherwise
+  # could also be cardinality, length, ...
+  name: determinant
+  tag: mrow
+  match: 
+    - "IsBracketed(., '|', '|') "
+  add-intent:
+      name: "absolute-value"
+      args: "*[2]"
+
+-
+  # vertical bars otherwise
+  # could also be cardinality, length, ...
+  name: vector-magnitude
+  tag: mrow
+  match: 
+    - "IsBracketed(., '‖', '‖') "
+  add-intent:
+      name: "magnitude"
+      args: "*[2]"
+
+
