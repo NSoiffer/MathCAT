@@ -38,6 +38,18 @@ struct Preferences {
     prefs: PreferenceHashMap        // FIX: pub so can get at iterator, should add iterator to Preferences instead
 }
 
+use std::fmt; 
+impl fmt::Display for Preferences {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut pref_vec: Vec<(&String, &Yaml)> = self.prefs.iter().collect();
+        pref_vec.sort();
+        for (name, value) in pref_vec {
+            writeln!(f, "    {}: {}", name, yaml_to_string(&value, 0))?;
+        }
+        return Ok(());
+    }
+}
+
 impl Preferences{
     // default values needed in case nothing else gets set 
     fn user_defaults() -> Preferences {
@@ -216,20 +228,6 @@ impl Preferences{
 }
 
 
-use std::fmt; 
-impl fmt::Display for Preferences {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "{:?}", self);
-    }
-}
-
-impl fmt::Display for PreferenceManager {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "{:?}", self);
-    }
-}
-
-
 /// When looking for a file, there are up to three possible locations tracked by this type
 /// in a non-error situation, at least the first slot should be Some(...).
 ///
@@ -248,6 +246,14 @@ struct FileAndTime {
     files: Locations,
     time: Option<SystemTime>       // ~time file was read (used to see if it was updated and needs to be re-read) 
 }
+
+impl PartialEq for FileAndTime {
+    fn eq(&self, other: &Self) -> bool {
+        // FIX: anticipating changing Locations to single PathBuf
+        return self.files[0] == other.files[0] && self.time == other.time;
+    }
+}
+impl Eq for FileAndTime {}
 
 thread_local!{
     static DEFAULT_USER_PREFERENCES: Preferences = Preferences::user_defaults();
@@ -275,6 +281,41 @@ pub struct PreferenceManager {
     defs: FileAndTime,              // the definition.yaml file(s)
 }
 
+
+
+impl fmt::Display for PreferenceManager {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "PreferenceManager:")?;
+        writeln!(f, "  user prefs:\n{}", self.user_prefs)?;
+        writeln!(f, "  api prefs:\n{}", self.api_prefs)?;
+        writeln!(f, "  style files: {:?}", self.style.files)?;
+        writeln!(f, "  unicode files: {:?}", self.unicode.files)?;
+        writeln!(f, "  definition files: {:?}", self.defs.files)?;
+        return Ok(());
+    }
+}
+
+pub struct FilesChanged {
+    pub style: bool,
+    pub unicode: bool,
+    pub defs: bool
+}
+
+impl FilesChanged {
+    fn none() -> FilesChanged {
+        return FilesChanged {
+            style: false,
+            unicode: false,
+            defs: false
+        }
+    }
+
+    pub fn add_changes(&mut self, additional_changes: FilesChanged) {
+        self.style |= additional_changes.style;
+        self.unicode |= additional_changes.unicode;
+        self.defs |= additional_changes.defs;
+    }
+}
 
 impl PreferenceManager {
     /// Create (the) PreferenceManager on the heap. 
@@ -543,16 +584,23 @@ impl PreferenceManager {
 
     #[allow(dead_code)]
     /// Used in testing, sets the user preference `name` to `value`
-    pub fn set_user_prefs(&mut self, name: &str, value: &str) {
+    pub fn set_user_prefs(&mut self, name: &str, value: &str) -> FilesChanged {
         self.user_prefs.set_string_value(name, value);
         if name == "Language" || name == "SpeechStyle" {
             let rules_dir = PreferenceManager::get_rules_dir();   
             let [style, unicode, defs] =
                     PreferenceManager::get_all_files(&rules_dir, &self.user_prefs);
+            let changed = FilesChanged {
+                style: style != self.style,
+                unicode: unicode != self.unicode,
+                defs: defs != self.defs,
+            };
             self.style = style;
             self.unicode = unicode;
             self.defs = defs;
+            return changed;
         }
+        return FilesChanged::none();
     }
 }
 
@@ -682,9 +730,12 @@ mod tests {
     #[test]
     fn test_language_change() {
         let mut pref_manager = PreferenceManager::new();
+        pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
+
         assert_eq!(rel_path(&pref_manager.get_style_file()[0]), Some(PathBuf::from("en/ClearSpeak_Rules.yaml")));
 
         pref_manager.set_user_prefs("Language", "zz");
+        
         assert_eq!(rel_path(&pref_manager.get_style_file()[0]), Some(PathBuf::from("zz/ClearSpeak_Rules.yaml")));
     }
 

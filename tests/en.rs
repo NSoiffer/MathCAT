@@ -12,6 +12,7 @@ mod en {
         mod msup;
         mod mtable;
         mod sets;
+        mod symbols_and_adornments;
     }
     mod SimpleSpeak {
         mod functions;

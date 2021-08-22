@@ -80,6 +80,26 @@
     - t: z
     - x: "*[2]"
 
+
+# rules on scripted vertical bars ('evaluated at')
+-
+   name: evaluated-at
+   tag: msub
+   match: "*[1][self::m:mo][text()='|']"
+   replace: 
+    - t: evaluated at
+    - x: "*[2]"
+
+-
+   name: evaluated-at
+   tag: msubsup
+   match: "*[1][self::m:mo][text()='|']"
+   replace: 
+    - t: evaluated at
+    - x: "*[3]"
+    - t: "minus the same expression evaluated at"
+    - x: "*[2]"
+
 -
    name: binomial-frac
    tag: mrow

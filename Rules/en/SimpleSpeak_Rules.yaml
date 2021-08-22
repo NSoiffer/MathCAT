@@ -225,7 +225,7 @@
 -
    name: intervals
    tag: mrow
-   match: ".[starts-with(@intent, 'interval(')]"
+   match: ".[starts-with(@intent, 'interval')]  "
    replace: 
    - test: 
       if: "$Verbosity!='terse'"

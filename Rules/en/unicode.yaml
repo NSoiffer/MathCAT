@@ -6,11 +6,16 @@
         then: {t: eigh}                          # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
         else: {spell: a}                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
  - "A":
-    - t: cap
     - test: 
         if: "$TTS='none'"
-        then: {t: eigh}                          # long "a" sound in all speech engines I tested (see above)
+        then: {t: cap eigh}                      # long "a" sound in all speech engines I tested (see above)
         else: {spell: a}
+
+ - "B-Z":
+    - test: 
+        if: "$TTS='none'"
+        then: [t: cap]                
+    - spell: "."                                 # note: "." is a hack for ranges to indicate 'current character'
 
  - "!": [t: factorial]                           # 0x21
  - "\"": [t: quotation mark]                     # 0x22
@@ -32,7 +37,20 @@
 
  - "*": [t: times]                               # 0x2a
  - "+": [t: plus]                                # 0x2b
- - ",": [t: comma]                               # 0x2c
+ - ",":                                          # 0x2c
+    # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
+    # that this test is here and not with "…" is not ideal, but seems simplest
+     test:
+        if:
+            - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or "
+               # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
+               # speak "comma" when not adjacent to '…'
+            - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
+               # except if expression starts with '…'
+            - " ../*[1][text()='…'] "
+        then: [t: comma]
+        # else silent
+
  - "-": [t: minus]                               # 0x2d
  - ".": [t: point]                               # 0x2e
  - "/": [t: divided by]                          # 0x2f
@@ -53,13 +71,13 @@
  - "@": [t: at sign]                             # 0x40
  - "[":                                          # 0x5b
     - test:
-        if: $SpeechStyle = 'ClearSpeak'
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [t: open bracket]
         else: [t: left bracket]                            
  - "\\": [t: back slash]                         # 0x5c
  - "]":                                          # 0x5d
     - test:
-        if: $SpeechStyle = 'ClearSpeak'
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [t: close bracket]
         else: [t: right bracket]
  - "^": [t: to the]                              # 0x5e
@@ -67,15 +85,26 @@
  - "`": [t: grave accent]                        # 0x60
  - "{":                                          # 0x7b
     - test:
-        if: $SpeechStyle = 'ClearSpeak'
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [t: open brace]
         else: [t: left brace]                            
- - "|": [t: vertical line]                       # 0x7c
+ - "|":                                          # 0x7c
+    # note: for ClearSpeak and SimpleSpeak, "|" in side of sets is handled at the mrow level, same for 'sets'
+     - test:
+        - if: $SpeechStyle != 'ClearSpeak'
+          then: [t: vertical line]
+        - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+          then: [t: such that]
+        - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
+          then: [t: given] 
+        - else: [t: divides]                   
+
  - "}":                                          # 0x7d
     - test:
-        if: $SpeechStyle = 'ClearSpeak'
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [t: close brace]
         else: [t: right brace]                            
+
  - "~": [t: tilde]                               # 0x7e
  - " ": [t: ""]                                  # 0xa0
  - "¢": [t: cents]                               # 0xa2
@@ -87,9 +116,23 @@
  - "¨": [t: diaeresis]                           # 0xa8
  - "©": [t: copyright]                           # 0xa9
  - "ª": [t: feminine ordinal indicator]          # 0xaa
- - "«": [t: left-pointing double angle quote mark] # 0xab
  - "¬": [t: not]                                 # 0xac
- - "×": [t: times]                               # 0xd7
+ - "«": [t: left-pointing double angle quote mark] # 0xab
+ - "±": [t: plus or minus]                       # 0xb1
+ - "µ": [t: micro]                               # 0xb5
+ - "·":
+    - test:
+        if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
+        then: [t: times]
+        else: [t: dot]
+ - "×":                                          # 0xd7
+    - test:
+        if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
+        then: [t: times]
+        else_test:
+            if: $ClearSpeak_MultSymbolX = 'By'
+            then: [t: by]
+            else: [t: cross]
  - "÷": [t: divided by]                          # 0xf7
  - "ʰ": [t: modifier small h]                    # 0x2b0
  - "ʱ": [t: modifier small h with hook]          # 0x2b1
@@ -257,6 +300,8 @@
          if: "($Blind or $Verbosity!='terse')"
          then: {t: cap}
      - t: gamma
+
+    # Note: ClearSpeak has pref TriangleSymbol for this character, but that is wrong
  - "Δ":                                          # 0x394
      - test: 
          if: "($Blind or $Verbosity!='terse')"
@@ -617,7 +662,19 @@
  - "―": [t: horizontal bar]                      # 0x2015
  - "‖": [t: double vertical line]                # 0x2016
  - "•": [t: bullet]                              # 0x2022
- - "…": [t: dot dot dot]                         # 0x2026
+ - "…":                                          # 0x2026
+    test:
+        if:
+            - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
+               # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
+               # speak '…' as 'and so on...' unless expr starts with '…'
+            - "../*[1][text()='…']"
+        then: [t: dot dot dot]
+        else_test:  # must have $ClearSpeak_Ellipses = 'AndSoOn'
+            if: "count(following-sibling::*) = 0"
+            then: [t: and so on]
+            else: [t: and so on up to]
+
  - "‰": [t: per mille]                           # 0x2030
  - "‱": [t: per ten thousand]                    # 0x2031
  - "′": [t: prime]                               # 0x2032
@@ -1166,7 +1223,7 @@
                 then: [t: is an element of]
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [t: is in]
-              - else : [t: belongs to]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+              - else: [t: belongs to]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
  - "∉":                                          # 0x2209
     # rule is identical to 0x2208
      - test:
@@ -1190,7 +1247,7 @@
                 then: [t: is not an element of]
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [t: is not in]
-              - else : [t: does not belong to]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+              - else: [t: does not belong to]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
  - "∊":                                          # 0x220a
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
@@ -1213,7 +1270,7 @@
                 then: [t: is an element of]
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [t: is in]
-              - else : [t: belongs to]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+              - else: [t: belongs to]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
  - "∋": [t: contains the member]                 # 0x220b
  - "∌": [t: does not contain the member]         # 0x220c
  - "∍": [t: contains the member]                 # 0x220d
