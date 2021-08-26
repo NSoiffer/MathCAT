@@ -347,7 +347,21 @@ impl CanonicalizeContext {
 				)
 			};
 		match name(&mathml) {
-			"mi" | "mo" | "mn" | "ms" | "mglyph" => {return Some(mathml);},
+			"mi" | "mn" | "ms" | "mglyph" => {return Some(mathml);},
+			"mo" => {
+				// common bug: trig functions, lim should be mi
+				let text = as_text(mathml);
+				return crate::definitions::DEFINITIONS.with(|definitions| {
+					if text == "lim" ||
+					   definitions.trig_function_names.as_hashset().borrow().contains(text) {
+						let mi = create_mathml_element(&mathml.document(), "mi");
+						mi.set_text(text);
+						return Some(mi);
+					} else {
+						return Some(mathml);
+					}
+				});
+			},
 			"mtext" => {
 				let text = as_text(mathml);
 				return if parent_requires_child || (!text.is_empty() && !IS_WHITESPACE.is_match(&text)) {Some(mathml)} else {None};
@@ -1621,28 +1635,32 @@ mod canonicalize_tests {
 
 
     #[test]
-    fn trig_args() {
-        let test_str = "<math><mi>sin</mi><mn>2</mn><mi>x</mi><mi>cos</mi><mn>3</mn><mi>y</mi></math>";
+    fn trig_mo() {
+        let test_str = "<math><mo>sin</mo><mi>x</mi>
+				<mo>+</mo><mo>cos</mo><mi>y</mi>
+				<mo>+</mo><munder><mo>lim</mo><mi>D</mi></munder><mi>y</mi>
+			</math>";
         let target_str = "<math>
 		<mrow data-changed='added'>
 		  <mrow data-changed='added'>
 			<mi>sin</mi>
 			<mo data-changed='added'>&#x2061;</mo>
-			<mrow data-changed='added'>
-			  <mn>2</mn>
-			  <mo data-changed='added'>&#x2062;</mo>
-			  <mi>x</mi>
-			</mrow>
+			<mi>x</mi>
 		  </mrow>
-		  <mo data-changed='added'>&#x2062;</mo>
+		  <mo>+</mo>
 		  <mrow data-changed='added'>
 			<mi>cos</mi>
 			<mo data-changed='added'>&#x2061;</mo>
-			<mrow data-changed='added'>
-			  <mn>3</mn>
-			  <mo data-changed='added'>&#x2062;</mo>
-			  <mi>y</mi>
-			</mrow>
+			<mi>y</mi>
+		  </mrow>
+		  <mo>+</mo>
+		  <mrow data-changed='added'>
+			<munder>
+			  <mi>lim</mi>
+			  <mi>D</mi>
+			</munder>
+			<mo data-changed='added'>&#x2061;</mo>
+			<mi>y</mi>
 		  </mrow>
 		</mrow>
 	   </math>";
