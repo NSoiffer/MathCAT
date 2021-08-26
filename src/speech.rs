@@ -1372,7 +1372,7 @@ impl SpeechRules {
     }
 
     fn update(&mut self) {
-        if self.rules.is_empty() || self.pref_manager.is_up_to_date() {
+        if self.rules.is_empty() || !self.pref_manager.is_up_to_date() {
             let style_file = self.pref_manager.get_style_file().clone();
             self.read_patterns(&style_file);
         }
