@@ -275,7 +275,6 @@
   variables: [IsColumnSilent: true()]
   match:
     - "*[2][self::m:mtable] and"
-    - "$ClearSpeak_Matrix != 'SpeakColNum' and "    # "simple" isn't used for this preference
     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
     - count(*[2]/*[1]/*)=1 and    # one column
     - count(*[2]/*)<=3 and   # at least two rows
@@ -283,21 +282,10 @@
   replace: 
     - t: the
     - x: count(*[2]/*)
-    - t: by 1 column
-    - test:
-        if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-        then: {t: vector}
-        else: {t: matrix}
+    - t: by 1 column matrix
     - pause: long
     - x: "*[2]/*/*"
-    - test:
-        if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
-        then:
-         - t: "end"
-         - test:
-            if: $ClearSpeak_Matrix = 'EndVector'
-            then: {t: vector}
-            else: {t: matrix}
+    - t: end matrix
 
 -
   name: default-column-matrix
@@ -310,24 +298,17 @@
   replace: 
     - t: the
     - x: "count(*[2]/*)"
-    - t: by 1 column
-    - test:
-        if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-        then: {t: vector}
-        else: {t: matrix}
+    - t: by 1 column matrix
     - pause: long
     - x: "*[2]/*"     # select the rows (mtr)
-    - test:
-        if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
-        then: [t: "end matrix"]
- 
+    - t: "end matrix"
+
 -
   name: 1x2-or-3-matrix
   tag: mrow
-  variables: [IsColumnSilent: $ClearSpeak_Matrix != 'SpeakColNum']
+  variables: [IsColumnSilent: true()]
   match:
     - "*[2][self::m:mtable] and"
-    - "$ClearSpeak_Matrix != 'SpeakColNum' and "    # "simple" isn't used for this preference
     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
     - count(*[2]/*)=1  and          # one row
     - count(*[2]/*[1]/*)<=3 and   # at least two cols
@@ -335,26 +316,15 @@
   replace: 
     - t: the 1 by
     - x: count(*[2]/*/*)
-    - t: row
-    - test:
-        if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-        then: {t: vector}
-        else: {t: matrix}
+    - t: row matrix
     - pause: long
     - x: "*[2]/*/*"
-    - test:
-        if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
-        then:
-         - t: "end"
-         - test:
-            if: $ClearSpeak_Matrix = 'EndMatrix'
-            then: {t: matrix}
-            else: {t: vector}
+    - t: end matrix
  
 -
   name: default-row-matrix
   tag: mrow
-  variables: [IsColumnSilent: "$ClearSpeak_Matrix = 'SilentColNum'"]
+  variables: [IsColumnSilent: false()]
   match:
     - "*[2][self::m:mtable] and"
     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
@@ -362,33 +332,21 @@
   replace: 
     - t: the 1 by
     - x: "count(*[2]/*/*)"
-    - t: row
-    - test:
-        if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-        then: {t: vector}
-        else: {t: matrix}
+    - t: row matrix
     - pause: long
     - pause: medium
     - x: "*[2]/*/*"     # select the cols (mtd)
-    - test:
-        if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
-        then:
-         - t: "end"
-         - test:
-            if: $ClearSpeak_Matrix = 'EndMatrix'
-            then: {t: matrix}
-            else: {t: vector}
+    - t: "end matrix"
 
 -
   name: simple-small-matrix
   tag: mrow
   match:
     - "*[2][self::m:mtable] and"
-    - "$ClearSpeak_Matrix != 'SpeakColNum' and "    # "simple" isn't used for this preference
     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
     - (count(*[2]/*)<=3 and count(*[2]/*[1]/*)<=3) and       # no bigger than a 3x3 matrix
     - IsNode(*[2]/*/*/*,'simple')         # IsNode() returns true if all the nodes are simple
-  variables: [IsColumnSilent: $ClearSpeak_Matrix != 'SpeakColNum']
+  variables: [IsColumnSilent: true()]
   replace: 
     - t: the
     - x: count(*[2]/*)
@@ -400,19 +358,12 @@
         else: {t: matrix}
     - pause: long
     - x: "*[2]/*"
-    - test:
-       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
-       then:
-         - t: end
-         - test:
-            if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
-            then: {t: determinant}
-            else: {t: matrix}
+    - t: end matrix
  
 -
    name: default-matrix
    tag: mrow
-   variables: [IsColumnSilent: $ClearSpeak_Matrix = 'SilentColNum']
+   variables: [IsColumnSilent: false()]
    match:
    - "*[2][self::m:mtable] and"
    - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
@@ -427,14 +378,11 @@
         else: {t: matrix}
     - pause: long
     - x: "*[2]/*"
+    - t: end
     - test:
-       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
-       then:
-         - t: end
-         - test:
-            if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
-            then: {t: determinant}
-            else: {t: matrix}
+        if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+        then: {t: determinant}
+        else: {t: matrix}
 -
   name: default
   tag: [mtr, mlabeledtr]
@@ -459,9 +407,6 @@
   match: "."
   replace:
    - test: 
-   #  ClearSpeak normally speaks "column 1" even though it says the row number, which is a waste...
-   #  The following is commented out but the count(...)!=0 probably belongs in other rule sets
-   #   if: not($IsColumnSilent) and ($ClearSpeak_Matrix = 'SpeakColNum' or count(preceding-sibling::*) != 0)
       if: "not($IsColumnSilent)"
       then:
          - t: column
@@ -490,7 +435,6 @@
       - "    )"
       - "  ]"
        # other possibility is the preceding element has parens (but not the following)
-       # this is not mentioned in the ClearSpeak rules or examples but seems like it should say "times". E.g, |x| y
       - " or "  
       - "  preceding-sibling::*[1][" 
       - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|')]"  # followed by parens
