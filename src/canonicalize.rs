@@ -446,21 +446,34 @@ impl CanonicalizeContext {
 	}
 	
 	fn canonicalize_plane1<'a>(&self, mi: Element<'a>) -> Element<'a> {
+		// map names to start of Unicode blocks (lower case, upper case, digits)
+		static MATH_VARIANTS: phf::Map<&str, (u32, u32, u32)> = phf_map! {
+			// "normal" -- nothing to do
+			// "italic" -- nothing to do
+			"bold" => (0x1D41A, 0x1D400, 0x1D7CE),
+			"bold-italic" => (0x1D482, 0x1D468, '0' as u32),
+			"double-struck" => (0x1D552, 0x1D538, 0x1D7D8),
+			"bold-fraktur" => (0x1D586, 0x1D56C, '0' as u32),
+			"script" => (0x1D4B6, 0x1D49C, '0' as u32),
+			"bold-script" => (0x1D4EA, 0x1D4D0, '0' as u32),
+			"fraktur" => (0x1D51E, 0x1D504, '0' as u32),
+			"sans-serif" => (0x1D51E, 0x1D5BA, 0x1D7E2),
+			"bold-sans-serif" => (0x1D5EE, 0x1D5D4, 0x1D7EC),
+			"sans-serif-italic" => (0x1D622, 0x1D608, 0x1D7E2),
+			"sans-serif-bold-italic" => (0x1D656, 0x1D63C, 0x1D7EC),
+			"monospace" => (0x1D68A, 0x1D670, 0x1D7F6),
+		};
+
 		let variant = mi.attribute_value("mathvariant");
 		if variant.is_none() {
 			return mi;
 		}
 
 		let mi_text = as_text(mi);
-		let new_text = match variant.unwrap() {
-			"bold" => shift_text(mi_text, 0x1D41A, 0x1D400, 0x1D7CE),
-			"bold-italic" => shift_text(mi_text, 0x1D482, 0x1D468, '0' as u32),
-			"double-struck" => shift_text(mi_text, 0x1D552, 0x1D538, 0x1D7D8),
-			"fraktur" => shift_text(mi_text, 0x1D51E, 0x1D504, '0' as u32),
-			"bold-fraktur" => shift_text(mi_text, 0x1D586, 0x1D56C, '0' as u32),
-			"script" => shift_text(mi_text, 0x1D4B6, 0x1D49C, '0' as u32),
-			"bold-script" => shift_text(mi_text, 0x1D4EA, 0x1D4D0, '0' as u32),
-			_ => mi_text.to_string(),
+		let new_text = match MATH_VARIANTS.get(variant.unwrap()) {
+			None => mi_text.to_string(),
+			Some(start) => 
+				shift_text(mi_text, start.0, start.1, start.2),
 		};
 		mi.remove_attribute("mathvariant");
 		mi.set_text(&new_text);
@@ -1437,36 +1450,39 @@ mod canonicalize_tests {
 	#[test]
     fn plane1() {
         let test_str = "<math>
-				<mi mathvariant='italic'>bB4</mi> <mo>,</mo>
-				<mi mathvariant='bold'>a</mi> <mo>,</mo>
+				<mi mathvariant='italic'>bB4</mi> <mo>,</mo>		<!-- shouldn't change -->
+				<mi mathvariant='bold'>a</mi> <mo>,</mo>			<!-- single char id tests -->
 				<mi mathvariant='bold'>Z</mi> <mo>,</mo>
-				<mi mathvariant='bold'>19=&#x1D7D7;</mi> <mo>,</mo>
+				<mn mathvariant='bold'>19=&#x1D7D7;</mn> <mo>,</mo>	<!-- '=' and plane1 shouldn't change -->
+				<mn mathvariant='double-struck'>024689</mn> <mo>,</mo>	<!-- '=' and plane1 shouldn't change -->
 				<mi mathvariant='double-struck'>yzCHNPQRZ</mi> <mo>,</mo>
-				<mi mathvariant='fraktur'>0yACHIRZ</mi> <mo>,</mo>
+				<mi mathvariant='fraktur'>0yACHIRZ</mi> <mo>,</mo>	<!-- 0 stays as ASCII -->
 				<mi mathvariant='bold-fraktur'>nC</mi> <mo>,</mo>
-				<mi mathvariant='script'>ABEFIHLMRegow</mi> <mo>,</mo>
-				<mi mathvariant='bold-script'>fG*</mi>
+				<mi mathvariant='script'>ABEFHILMRegow</mi> <mo>,</mo>
+				<mi mathvariant='bold-script'>fG*</mi>				<!-- '*' shouldn't change -->
 			</math>";
         let target_str = "<math>
-			<mrow data-changed='added'>
-				<mi>bB4</mi>
-				<mo>,</mo>
-				<mi>&#x1D41A;</mi>
-				<mo>,</mo>
-				<mi>&#x1D419;</mi>
-				<mo>,</mo>
-				<mi>&#x1D7CF;&#x1D7D7;=&#x1D7D7;</mi>
-				<mo>,</mo>
-				<mi>&#x1D56A;&#x1D56B;&#x2102;&#x210D;&#x2115;&#x2119;&#x211A;&#x211D;&#x2124;</mi>
-				<mo>,</mo>
-				<mi>0&#x1D536;&#x1D504;&#x212D;&#x210C;&#x2111;&#x211C;&#x2128;</mi>
-				<mo>,</mo>
-				<mi>&#x1D593;&#x1D56E;</mi>
-				<mo>,</mo>
-				<mi>&#x1D49C;&#x212C;&#x2130;&#x2131;&#x210B;&#x2110;&#x2112;&#x2133;&#x211B;&#x1D4AF;&#x212F;&#x210A;&#x2134;&#x1D4CC;</mi>
-				<mo>,</mo>
-				<mi>&#x1D4BB;&#x1D4D6;*</mi>
-			</mrow>
+				<mrow data-changed='added'>
+					<mi>bB4</mi>
+					<mo>,</mo>
+					<mi>𝐚</mi>
+					<mo>,</mo>
+					<mi>𝐙</mi>
+					<mo>,</mo>
+					<mn>𝟏𝟗=𝟗</mn>
+					<mo>,</mo>
+					<mn>𝟘𝟚𝟜𝟞𝟠𝟡</mn>
+					<mo>,</mo>
+					<mi>𝕪𝕫ℂℍℕℙℚℝℤ</mi>
+					<mo>,</mo>
+					<mi>0𝔶𝔄ℭℌℑℜℨ</mi>
+					<mo>,</mo>
+					<mi>𝖓𝕮</mi>
+					<mo>,</mo>
+					<mi>𝒜ℬℰℱℋℐℒℳℛℯℊℴ𝓌</mi>
+					<mo>,</mo>
+					<mi>𝓯𝓖*</mi>
+				</mrow>
 			</math>";
 assert!(are_strs_canonically_equal(test_str, target_str));
 	}
