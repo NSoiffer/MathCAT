@@ -408,8 +408,11 @@ impl CanonicalizeContext {
 		let tag_name = name(&mathml);
 		mathml.set_name(QName::with_namespace_uri(Some("http://www.w3.org/1998/Math/MathML"), tag_name));
 		match tag_name {
-			"mi" | "ms" | "mtext" | "mspace" | "mglyph" => { return Ok( mathml ); },
+			"mi" | "ms" | "mtext" | "mspace" | "mglyph" => {
+				self.canonicalize_plane1(mathml);
+				return Ok( mathml ); },
 			"mo" => {
+				self.canonicalize_plane1(mathml);
 				self.canonicalize_mo_text(mathml);
 				return Ok( mathml );
 			},
@@ -419,6 +422,7 @@ impl CanonicalizeContext {
 				// if input->GetAttrValue(L"isBigNumber", bigNumValue)) {
 				// 	return StripLeafNodes(input->Copy(True));
 				// }
+				self.canonicalize_plane1(mathml);
 				return Ok( mathml );
 			},
 			"mrow" => {
@@ -441,6 +445,86 @@ impl CanonicalizeContext {
 		}
 	}
 	
+	fn canonicalize_plane1<'a>(&self, mi: Element<'a>) -> Element<'a> {
+		let variant = mi.attribute_value("mathvariant");
+		if variant.is_none() {
+			return mi;
+		}
+
+		let mi_text = as_text(mi);
+		let new_text = match variant.unwrap() {
+			"bold" => shift_text(mi_text, 0x1D41A, 0x1D400, 0x1D7CE),
+			"bold-italic" => shift_text(mi_text, 0x1D482, 0x1D468, '0' as u32),
+			"double-struck" => shift_text(mi_text, 0x1D552, 0x1D538, 0x1D7D8),
+			"fraktur" => shift_text(mi_text, 0x1D51E, 0x1D504, '0' as u32),
+			"bold-fraktur" => shift_text(mi_text, 0x1D586, 0x1D56C, '0' as u32),
+			"script" => shift_text(mi_text, 0x1D4B6, 0x1D49C, '0' as u32),
+			"bold-script" => shift_text(mi_text, 0x1D4EA, 0x1D4D0, '0' as u32),
+			_ => mi_text.to_string(),
+		};
+		mi.remove_attribute("mathvariant");
+		mi.set_text(&new_text);
+		return mi;
+
+		fn shift_text(old_text: &str, lower_start: u32, upper_start: u32, digit_start: u32) -> String {
+			// if there is no block for something, use 'a', 'A', '0' as u32 as that will be a no-op
+			let mut new_text = String::new();
+			for ch in old_text.chars() {
+				new_text.push(
+					if ch.is_ascii_lowercase() {
+						shift_char(ch, lower_start - 'a' as u32)
+					} else if ch.is_uppercase() {
+						shift_char(ch, upper_start - 'A' as u32)
+					} else if ch.is_ascii_digit() {
+						shift_char(ch, digit_start - '0' as u32)
+					} else {
+						ch
+					}
+				)
+			}
+			return new_text;
+
+			fn shift_char(ch: char, shift: u32) -> char {
+				// there are "holes" in the math alphanumerics due to legacy issues
+				// this table maps the holes to their legacy location
+				static EXCEPTIONS: phf::Map<u32, u32> = phf_map! {
+					0x1D455u32 => 0x210Eu32,
+					0x1D49Du32 => 0x212Cu32,
+					0x1D4A0u32 => 0x2130u32,
+					0x1D4A1u32 => 0x2131u32,
+					0x1D4A3u32 => 0x210Bu32,
+					0x1D4A4u32 => 0x2110u32,
+					0x1D4A7u32 => 0x2112u32,
+					0x1D4A8u32 => 0x2133u32,
+					0x1D4ADu32 => 0x211Bu32,
+					0x1D4BAu32 => 0x212Fu32,
+					0x1D4BCu32 => 0x210Au32,
+					0x1D4C4u32 => 0x2134u32,
+					0x1D506u32 => 0x212Du32,
+					0x1D50Bu32 => 0x210Cu32,
+					0x1D50Cu32 => 0x2111u32,
+					0x1D515u32 => 0x211Cu32,
+					0x1D51Du32 => 0x2128u32,
+					0x1D53Au32 => 0x2102u32,
+					0x1D53Fu32 => 0x210Du32,
+					0x1D545u32 => 0x2115u32,
+					0x1D547u32 => 0x2119u32,
+					0x1D548u32 => 0x211Au32,
+					0x1D549u32 => 0x211Du32,
+					0x1D551u32 => 0x2124u32,
+				};
+								
+				let shifted_ch = ch as u32 + shift;
+				return unsafe { char::from_u32_unchecked(
+					match EXCEPTIONS.get(&shifted_ch) {
+						None => shifted_ch,
+						Some(exception_value) => *exception_value,
+					}
+				) }
+			}
+		}
+	}
+
 	fn canonicalize_mo_text<'a>(&self, mo: Element<'a>) {
 		let parent_name = name(&mo);		// guaranteed to exist
 		let mut mo_text = as_text(mo);
@@ -1293,31 +1377,31 @@ fn show_invisible_op_char(ch: &str) -> &str {
 	};
 }
 
-	
-	static CHEMICAL_ELEMENTS: phf::Set<&str> = phf_set! {
-		"Ac", "Ag", "Al", "Am", "Ar", "As", "At", "Au", "B", "Ba", "Be", "Bh", "Bi", "Bk", "Br",
-		"C", "Ca", "Cd", "Ce", "Cf", "Cl", "Cm", "Cn", "Co", "Cr", "Cs", "Cu", "Db", "Ds", "Dy", 
-		"Er", "Es", "Eu", "F", "Fe", "Fl", "Fm", "Fr", "Ga", "Gd", "Ge",
-		"H", "He", "Hf", "Hg", "Ho", "Hs", "I", "In", "Ir", "K", "Kr",
-		"La", "Li", "Lr", "Lu", "Lv", "Mc", "Md", "Mg", "Mn", "Mo", "Mt", 
-		"N", "Na", "Nb", "Nd", "Ne", "Nh", "Ni", "No", "Np", "O", "Og", "Os", 
-		"P", "Pa", "Pb", "Pd", "Pm", "Po", "Pr", "Pt", "Pu",
-		"Ra", "Rb", "Re", "Rf", "Rg", "Rh", "Rn", "Ru", 
-		"S", "Sb", "Sc", "Se", "Sg", "Si", "Sm", "Sn", "Sr",
-		"Ta", "Tb", "Tc", "Te", "Th", "Ti", "Tl", "Tm", "Ts", 
-		"U", "V", "W", "Xe", "Y", "Yb", "Zn", "Zr"};
-	
-	fn is_chemical_element(node: Element) -> bool {
-		// FIX: allow name to be in an mrow (e.g., <mi>N</mi><mi>a</mi>
-		let name = name(&node);
-		if name != "mi" && name != "mtext" {
-			return false;
-		}
-	
-		let text = as_text(node);
-		return CHEMICAL_ELEMENTS.contains(text);
+
+static CHEMICAL_ELEMENTS: phf::Set<&str> = phf_set! {
+	"Ac", "Ag", "Al", "Am", "Ar", "As", "At", "Au", "B", "Ba", "Be", "Bh", "Bi", "Bk", "Br",
+	"C", "Ca", "Cd", "Ce", "Cf", "Cl", "Cm", "Cn", "Co", "Cr", "Cs", "Cu", "Db", "Ds", "Dy", 
+	"Er", "Es", "Eu", "F", "Fe", "Fl", "Fm", "Fr", "Ga", "Gd", "Ge",
+	"H", "He", "Hf", "Hg", "Ho", "Hs", "I", "In", "Ir", "K", "Kr",
+	"La", "Li", "Lr", "Lu", "Lv", "Mc", "Md", "Mg", "Mn", "Mo", "Mt", 
+	"N", "Na", "Nb", "Nd", "Ne", "Nh", "Ni", "No", "Np", "O", "Og", "Os", 
+	"P", "Pa", "Pb", "Pd", "Pm", "Po", "Pr", "Pt", "Pu",
+	"Ra", "Rb", "Re", "Rf", "Rg", "Rh", "Rn", "Ru", 
+	"S", "Sb", "Sc", "Se", "Sg", "Si", "Sm", "Sn", "Sr",
+	"Ta", "Tb", "Tc", "Te", "Th", "Ti", "Tl", "Tm", "Ts", 
+	"U", "V", "W", "Xe", "Y", "Yb", "Zn", "Zr"};
+
+fn is_chemical_element(node: Element) -> bool {
+	// FIX: allow name to be in an mrow (e.g., <mi>N</mi><mi>a</mi>
+	let name = name(&node);
+	if name != "mi" && name != "mtext" {
+		return false;
 	}
-	
+
+	let text = as_text(node);
+	return CHEMICAL_ELEMENTS.contains(text);
+}
+
 
 
 #[cfg(test)]
@@ -1348,6 +1432,44 @@ mod canonicalize_tests {
         let target_str = "<math><mrow><mo>-</mo><mi>a</mi></mrow></math>";
         assert!(are_strs_canonically_equal(target_str, target_str));
     }
+
+	
+	#[test]
+    fn plane1() {
+        let test_str = "<math>
+				<mi mathvariant='italic'>bB4</mi> <mo>,</mo>
+				<mi mathvariant='bold'>a</mi> <mo>,</mo>
+				<mi mathvariant='bold'>Z</mi> <mo>,</mo>
+				<mi mathvariant='bold'>19=&#x1D7D7;</mi> <mo>,</mo>
+				<mi mathvariant='double-struck'>yzCHNPQRZ</mi> <mo>,</mo>
+				<mi mathvariant='fraktur'>0yACHIRZ</mi> <mo>,</mo>
+				<mi mathvariant='bold-fraktur'>nC</mi> <mo>,</mo>
+				<mi mathvariant='script'>ABEFIHLMRegow</mi> <mo>,</mo>
+				<mi mathvariant='bold-script'>fG*</mi>
+			</math>";
+        let target_str = "<math>
+			<mrow data-changed='added'>
+				<mi>bB4</mi>
+				<mo>,</mo>
+				<mi>&#x1D41A;</mi>
+				<mo>,</mo>
+				<mi>&#x1D419;</mi>
+				<mo>,</mo>
+				<mi>&#x1D7CF;&#x1D7D7;=&#x1D7D7;</mi>
+				<mo>,</mo>
+				<mi>&#x1D56A;&#x1D56B;&#x2102;&#x210D;&#x2115;&#x2119;&#x211A;&#x211D;&#x2124;</mi>
+				<mo>,</mo>
+				<mi>0&#x1D536;&#x1D504;&#x212D;&#x210C;&#x2111;&#x211C;&#x2128;</mi>
+				<mo>,</mo>
+				<mi>&#x1D593;&#x1D56E;</mi>
+				<mo>,</mo>
+				<mi>&#x1D49C;&#x212C;&#x2130;&#x2131;&#x210B;&#x2110;&#x2112;&#x2133;&#x211B;&#x1D4AF;&#x212F;&#x210A;&#x2134;&#x1D4CC;</mi>
+				<mo>,</mo>
+				<mi>&#x1D4BB;&#x1D4D6;*</mi>
+			</mrow>
+			</math>";
+assert!(are_strs_canonically_equal(test_str, target_str));
+	}
 
     #[test]
     fn canonical_one_element_mrow_around_mrow() {
