@@ -1,10 +1,14 @@
 {
     "cSpell.words": [
+        "ABEFHILM",
+        "ACHIRZ",
+        "CHNPQRZ",
         "Coord",
         "MATHML",
         "ML's",
         "Mult",
         "Nemeth",
+        "Regow",
         "airity",
         "axisname",
         "backtrace",
@@ -41,6 +45,8 @@
         "longdiv",
         "madrub",
         "mathcat",
+        "mathsize",
+        "mathvariant",
         "member",
         "mfenced",
         "mfrac",
@@ -48,6 +54,7 @@
         "mlabeledtr",
         "mlongdiv",
         "mmultiscripts",
+        "monospace",
         "mpadded",
         "mphantom",
         "mroot",
@@ -114,7 +121,8 @@
         "usize",
         "verticalstrike",
         "woall",
-        "xpath's"
+        "xpath's",
+        "ℬℰℱℋℐℒℳ"
     ],
     "cSpell.ignoreWords": [
         "eigh",
