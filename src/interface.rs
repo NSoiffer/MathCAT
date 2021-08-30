@@ -354,10 +354,16 @@ pub fn is_same_element(e1: &Element, e2: &Element) -> bool {
                     if t1.text() == t2.text() {
                         continue;
                     }
+                    // println!("#1 '{}[{}]', #2 '{}[{}]'", t1.text(), t1.text().len(),
+                    //         t2.text(), t2.text().len());
+                    // t1.text().chars().enumerate()
+                    //     .for_each(|(i, ch1)| {
+                    //         let ch2 = t2.text().chars().nth(i).unwrap();
+                    //         println!("  {}: {}/{}, {}", i, ch1,  ch2, ch1==ch2)
+                    //     })
                 }
                 return false;
             }
-
         }
     };
     return true;
