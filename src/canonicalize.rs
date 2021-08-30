@@ -446,22 +446,23 @@ impl CanonicalizeContext {
 	}
 	
 	fn canonicalize_plane1<'a>(&self, mi: Element<'a>) -> Element<'a> {
-		// map names to start of Unicode blocks (lower case, upper case, digits)
-		static MATH_VARIANTS: phf::Map<&str, (u32, u32, u32)> = phf_map! {
+		// map names to start of Unicode alphanumeric blocks (Roman, digits, Greek)
+		// if the character shouldn't be mapped, use 0 -- don't use 'A' as ASCII and Greek aren't contiguous
+		static MATH_VARIANTS: phf::Map<&str, [u32; 3]> = phf_map! {
 			// "normal" -- nothing to do
-			// "italic" -- nothing to do
-			"bold" => (0x1D41A, 0x1D400, 0x1D7CE),
-			"bold-italic" => (0x1D482, 0x1D468, '0' as u32),
-			"double-struck" => (0x1D552, 0x1D538, 0x1D7D8),
-			"bold-fraktur" => (0x1D586, 0x1D56C, '0' as u32),
-			"script" => (0x1D4B6, 0x1D49C, '0' as u32),
-			"bold-script" => (0x1D4EA, 0x1D4D0, '0' as u32),
-			"fraktur" => (0x1D51E, 0x1D504, '0' as u32),
-			"sans-serif" => (0x1D51E, 0x1D5BA, 0x1D7E2),
-			"bold-sans-serif" => (0x1D5EE, 0x1D5D4, 0x1D7EC),
-			"sans-serif-italic" => (0x1D622, 0x1D608, 0x1D7E2),
-			"sans-serif-bold-italic" => (0x1D656, 0x1D63C, 0x1D7EC),
-			"monospace" => (0x1D68A, 0x1D670, 0x1D7F6),
+			"italic" => [0, 0, 0x1D6E2],
+			"bold" => [0x1D400, 0x1D7CE, 0x1D6A8],
+			"bold-italic" => [0x1D468, 0x1D7CE, 0x1D71C],
+			"double-struck" => [0x1D538, 0x1D7D8, 0],
+			"bold-fraktur" => [0x1D56C, 0, 0x1D6A8],
+			"script" => [0x1D49C, 0, 0],
+			"bold-script" => [0x1D4D0, 0, 0x1D6A8],
+			"fraktur" => [0x1D504, 0, 0],
+			"sans-serif" => [0x1D5A0, 0x1D7E2, 0],
+			"bold-sans-serif" => [0x1D5D4, 0x1D7EC, 0x1D756],
+			"sans-serif-italic" => [0x1D608, 0x1D7E2, 0],
+			"sans-serif-bold-italic" => [0x1D63C, 0x1D7EC, 0x1D790],
+			"monospace" => [0x1D670, 0x1D7F6, 0],
 		};
 
 		let variant = mi.attribute_value("mathvariant");
@@ -472,32 +473,155 @@ impl CanonicalizeContext {
 		let mi_text = as_text(mi);
 		let new_text = match MATH_VARIANTS.get(variant.unwrap()) {
 			None => mi_text.to_string(),
-			Some(start) => 
-				shift_text(mi_text, start.0, start.1, start.2),
+			Some(start) => shift_text(mi_text, start),
 		};
 		mi.remove_attribute("mathvariant");
 		mi.set_text(&new_text);
 		return mi;
 
-		fn shift_text(old_text: &str, lower_start: u32, upper_start: u32, digit_start: u32) -> String {
-			// if there is no block for something, use 'a', 'A', '0' as u32 as that will be a no-op
+		fn shift_text(old_text: &str, char_mapping: &[u32; 3]) -> String {
+			// if there is no block for something, use 'a', 'A', 0 as that will be a no-op
+			struct Offsets {
+				ch: u32,
+				table: usize, 
+			}
+			static SHIFT_AMOUNTS: phf::Map<char, Offsets> = phf_map! {
+				'A' => Offsets{ ch: 0, table: 0},
+				'B' => Offsets{ ch: 1, table: 0},
+				'C' => Offsets{ ch: 2, table: 0},
+				'D' => Offsets{ ch: 3, table: 0},
+				'E' => Offsets{ ch: 4, table: 0},
+				'F' => Offsets{ ch: 5, table: 0},
+				'G' => Offsets{ ch: 6, table: 0},
+				'H' => Offsets{ ch: 7, table: 0},
+				'I' => Offsets{ ch: 8, table: 0},
+				'J' => Offsets{ ch: 9, table: 0},
+				'K' => Offsets{ ch: 10, table: 0},
+				'L' => Offsets{ ch: 11, table: 0},
+				'M' => Offsets{ ch: 12, table: 0},
+				'N' => Offsets{ ch: 13, table: 0},
+				'O' => Offsets{ ch: 14, table: 0},
+				'P' => Offsets{ ch: 15, table: 0},
+				'Q' => Offsets{ ch: 16, table: 0},
+				'R' => Offsets{ ch: 17, table: 0},
+				'S' => Offsets{ ch: 18, table: 0},
+				'T' => Offsets{ ch: 19, table: 0},
+				'U' => Offsets{ ch: 20, table: 0},
+				'V' => Offsets{ ch: 21, table: 0},
+				'W' => Offsets{ ch: 22, table: 0},
+				'X' => Offsets{ ch: 23, table: 0},
+				'Y' => Offsets{ ch: 24, table: 0},
+				'Z' => Offsets{ ch: 25, table: 0},
+				'a' => Offsets{ ch: 26, table: 0},
+				'b' => Offsets{ ch: 27, table: 0},
+				'c' => Offsets{ ch: 28, table: 0},
+				'd' => Offsets{ ch: 29, table: 0},
+				'e' => Offsets{ ch: 30, table: 0},
+				'f' => Offsets{ ch: 31, table: 0},
+				'g' => Offsets{ ch: 32, table: 0},
+				'h' => Offsets{ ch: 33, table: 0},
+				'i' => Offsets{ ch: 34, table: 0},
+				'j' => Offsets{ ch: 35, table: 0},
+				'k' => Offsets{ ch: 36, table: 0},
+				'l' => Offsets{ ch: 37, table: 0},
+				'm' => Offsets{ ch: 38, table: 0},
+				'n' => Offsets{ ch: 39, table: 0},
+				'o' => Offsets{ ch: 40, table: 0},
+				'p' => Offsets{ ch: 41, table: 0},
+				'q' => Offsets{ ch: 42, table: 0},
+				'r' => Offsets{ ch: 43, table: 0},
+				's' => Offsets{ ch: 44, table: 0},
+				't' => Offsets{ ch: 45, table: 0},
+				'u' => Offsets{ ch: 46, table: 0},
+				'v' => Offsets{ ch: 47, table: 0},
+				'w' => Offsets{ ch: 48, table: 0},
+				'x' => Offsets{ ch: 49, table: 0},
+				'y' => Offsets{ ch: 50, table: 0},
+				'z' => Offsets{ ch: 51, table: 0},
+				'0' => Offsets{ ch: 0, table: 1},
+				'1' => Offsets{ ch: 1, table: 1},
+				'2' => Offsets{ ch: 2, table: 1},
+				'3' => Offsets{ ch: 3, table: 1},
+				'4' => Offsets{ ch: 4, table: 1},
+				'5' => Offsets{ ch: 5, table: 1},
+				'6' => Offsets{ ch: 6, table: 1},
+				'7' => Offsets{ ch: 7, table: 1},
+				'8' => Offsets{ ch: 8, table: 1},
+				'9' => Offsets{ ch: 9, table: 1},
+				'Α' => Offsets{ ch: 0, table: 2},
+				'Β' => Offsets{ ch: 1, table: 2},
+				'Γ' => Offsets{ ch: 2, table: 2},
+				'Δ' => Offsets{ ch: 3, table: 2},
+				'Ε' => Offsets{ ch: 4, table: 2},
+				'Ζ' => Offsets{ ch: 5, table: 2},
+				'Η' => Offsets{ ch: 6, table: 2},
+				'Θ' => Offsets{ ch: 7, table: 2},
+				'Ι' => Offsets{ ch: 8, table: 2},
+				'Κ' => Offsets{ ch: 9, table: 2},
+				'Λ' => Offsets{ ch: 10, table: 2},
+				'Μ' => Offsets{ ch: 11, table: 2},
+				'Ν' => Offsets{ ch: 12, table: 2},
+				'Ξ' => Offsets{ ch: 13, table: 2},
+				'Ο' => Offsets{ ch: 14, table: 2},
+				'Π' => Offsets{ ch: 15, table: 2},
+				'Ρ' => Offsets{ ch: 16, table: 2},
+				'ϴ' => Offsets{ ch: 17, table: 2},
+				'Σ' => Offsets{ ch: 18, table: 2},
+				'Τ' => Offsets{ ch: 19, table: 2},
+				'Υ' => Offsets{ ch: 20, table: 2},
+				'Φ' => Offsets{ ch: 21, table: 2},
+				'Χ' => Offsets{ ch: 22, table: 2},
+				'Ψ' => Offsets{ ch: 23, table: 2},
+				'Ω' => Offsets{ ch: 24, table: 2},
+				'∇' => Offsets{ ch: 25, table: 2},								
+				'α' => Offsets{ ch: 26, table: 2},
+				'β' => Offsets{ ch: 27, table: 2},
+				'γ' => Offsets{ ch: 28, table: 2},
+				'δ' => Offsets{ ch: 29, table: 2},
+				'ε' => Offsets{ ch: 30, table: 2},
+				'ζ' => Offsets{ ch: 31, table: 2},
+				'η' => Offsets{ ch: 32, table: 2},
+				'θ' => Offsets{ ch: 33, table: 2},
+				'ι' => Offsets{ ch: 34, table: 2},
+				'κ' => Offsets{ ch: 35, table: 2},
+				'λ' => Offsets{ ch: 36, table: 2},
+				'μ' => Offsets{ ch: 37, table: 2},
+				'ν' => Offsets{ ch: 38, table: 2},
+				'ξ' => Offsets{ ch: 39, table: 2},
+				'ο' => Offsets{ ch: 40, table: 2},
+				'π' => Offsets{ ch: 41, table: 2},
+				'ρ' => Offsets{ ch: 42, table: 2},
+				'ς' => Offsets{ ch: 43, table: 2},
+				'σ' => Offsets{ ch: 44, table: 2},
+				'τ' => Offsets{ ch: 45, table: 2},
+				'υ' => Offsets{ ch: 46, table: 2},
+				'φ' => Offsets{ ch: 47, table: 2},
+				'χ' => Offsets{ ch: 48, table: 2},
+				'ψ' => Offsets{ ch: 49, table: 2},
+				'ω' => Offsets{ ch: 50, table: 2},
+				'∂' => Offsets{ ch: 51, table: 2},
+				'ϵ' => Offsets{ ch: 52, table: 2},
+				'ϑ' => Offsets{ ch: 53, table: 2},
+				'ϰ' => Offsets{ ch: 54, table: 2},
+				'ϕ' => Offsets{ ch: 55, table: 2},
+				'ϱ' => Offsets{ ch: 56, table: 2},
+				'ϖ' => Offsets{ ch: 57, table: 2},
+			};
 			let mut new_text = String::new();
 			for ch in old_text.chars() {
 				new_text.push(
-					if ch.is_ascii_lowercase() {
-						shift_char(ch, lower_start - 'a' as u32)
-					} else if ch.is_uppercase() {
-						shift_char(ch, upper_start - 'A' as u32)
-					} else if ch.is_ascii_digit() {
-						shift_char(ch, digit_start - '0' as u32)
-					} else {
-						ch
+					match SHIFT_AMOUNTS.get(&ch) {
+						None => ch,
+						Some(offsets) => {
+							let start = char_mapping[offsets.table];
+							if start == 0 {ch} else {shift_char(start + offsets.ch)}
+						}
 					}
 				)
 			}
 			return new_text;
 
-			fn shift_char(ch: char, shift: u32) -> char {
+			fn shift_char(ch: u32) -> char {
 				// there are "holes" in the math alphanumerics due to legacy issues
 				// this table maps the holes to their legacy location
 				static EXCEPTIONS: phf::Map<u32, u32> = phf_map! {
@@ -527,10 +651,9 @@ impl CanonicalizeContext {
 					0x1D551u32 => 0x2124u32,
 				};
 								
-				let shifted_ch = ch as u32 + shift;
 				return unsafe { char::from_u32_unchecked(
-					match EXCEPTIONS.get(&shifted_ch) {
-						None => shifted_ch,
+					match EXCEPTIONS.get(&ch) {
+						None => ch,
 						Some(exception_value) => *exception_value,
 					}
 				) }
@@ -1448,8 +1571,9 @@ mod canonicalize_tests {
 
 	
 	#[test]
-    fn plane1() {
+    fn plane1_common() {
         let test_str = "<math>
+				<mi mathvariant='normal'>sin</mi> <mo>,</mo>		<!-- shouldn't change -->
 				<mi mathvariant='italic'>bB4</mi> <mo>,</mo>		<!-- shouldn't change -->
 				<mi mathvariant='bold'>a</mi> <mo>,</mo>			<!-- single char id tests -->
 				<mi mathvariant='bold'>Z</mi> <mo>,</mo>
@@ -1463,6 +1587,8 @@ mod canonicalize_tests {
 			</math>";
         let target_str = "<math>
 				<mrow data-changed='added'>
+					<mi>sin</mi>
+					<mo>,</mo>
 					<mi>bB4</mi>
 					<mo>,</mo>
 					<mi>𝐚</mi>
@@ -1484,7 +1610,91 @@ mod canonicalize_tests {
 					<mi>𝓯𝓖*</mi>
 				</mrow>
 			</math>";
-assert!(are_strs_canonically_equal(test_str, target_str));
+		assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+	
+	#[test]
+    fn plane1_font_styles() {
+        let test_str = "<math>
+				<mi mathvariant='sans-serif'>aA09=</mi> <mo>,</mo>			<!-- '=' shouldn't change -->
+				<mi mathvariant='bold-sans-serif'>zZ09</mi> <mo>,</mo>	
+				<mi mathvariant='sans-serif-italic'>azAZ09</mi> <mo>,</mo>	<!-- italic digits don't exist: revert to sans-serif -->
+				<mi mathvariant='sans-serif-bold-italic'>AZaz09</mi> <mo>,</mo>	<!--  italic digits don't exist: revert to just bold -->
+				<mi mathvariant='monospace'>aA09</mi>
+			</math>";
+        let target_str = "<math>
+				<mrow data-changed='added'>
+					<mi>𝖺𝖠𝟢𝟫=</mi>
+					<mo>,</mo>
+					<mi>𝘇𝗭𝟬𝟵</mi>
+					<mo>,</mo>
+					<mi>𝘢𝘻𝘈𝘡𝟢𝟫</mi>
+					<mo>,</mo>
+					<mi>𝘼𝙕𝙖𝙯𝟬𝟵</mi>
+					<mo>,</mo>
+					<mi>𝚊𝙰𝟶𝟿</mi>
+				</mrow>
+			</math>";
+		assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+	
+	#[test]
+    fn plane1_greek() {
+        let test_str = "<math>
+				<mi mathvariant='normal'>ΑΩαω∇∂ϵ=</mi> <mo>,</mo>		<!-- shouldn't change -->
+				<mi mathvariant='italic'>ϴΑΩαω∇∂ϵ</mi> <mo>,</mo>
+				<mi mathvariant='bold'>ΑΩαωϝ</mi> <mo>,</mo>	
+				<mi mathvariant='double-struck'>Σβ∇</mi> <mo>,</mo>		<!-- shouldn't change -->
+				<mi mathvariant='fraktur'>ΞΦλϱ</mi> <mo>,</mo>			<!-- shouldn't change -->
+				<mi mathvariant='bold-fraktur'>ψΓ</mi> <mo>,</mo>		<!-- shouldn't change -->
+				<mi mathvariant='script'>μΨ</mi> <mo>,</mo>	<!-- shouldn't change -->
+				<mi mathvariant='bold-script'>Σπ</mi>					<!-- shouldn't change -->
+			</math>";
+        let target_str = "<math>
+				<mrow data-changed='added'>
+					<mi>ΑΩαω∇∂ϵ=</mi>
+					<mo>,</mo>
+					<mi>𝛳𝛢𝛺𝛼𝜔𝛻𝜕𝜖</mi>
+					<mo>,</mo>
+					<mi>𝚨𝛀𝛂𝛚𝟋</mi>
+					<mo>,</mo>
+					<mi>Σβ∇</mi>
+					<mo>,</mo>
+					<mn>ΞΦλϱ</mn>
+					<mo>,</mo>
+					<mn>ψΓ</mn>
+					<mo>,</mo>
+					<mi>μΨ</mi>
+					<mo>,</mo>
+					<mi>Σπ</mi>
+				</mrow>
+			</math>";
+		assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+	
+	#[test]
+    fn plane1_greek_font_styles() {
+        let test_str = "<math>
+				<mi mathvariant='sans-serif'>ΑΩαω∇∂ϵ=</mi> <mo>,</mo>			<!-- '=' shouldn't change -->
+				<mi mathvariant='bold-sans-serif'>ϴ0ΑΩαω∇∂ϵ</mi> <mo>,</mo>	
+				<mi mathvariant='sans-serif-italic'>aΑΩαω∇∂ϵ</mi> <mo>,</mo>	<!-- italic digits don't exist: revert to sans-serif -->
+				<mi mathvariant='sans-serif-bold-italic'>ZΑΩαωϰϕϱϖ</mi> <mo>,</mo>	<!--  italic digits don't exist: revert to just bold -->
+				<mi mathvariant='monospace'>zΑΩαω∇∂</mi>
+			</math>";
+        let target_str = "<math>
+				<mrow data-changed='added'>
+					<mi>ΑΩαω∇∂ϵ=</mi>
+					<mo>,</mo>
+					<mi>𝝧𝟬𝝖𝝮𝝰𝞈𝝯𝞉𝞊</mi>
+					<mo>,</mo>
+					<mi>𝘢ΑΩαω∇∂ϵ</mi>
+					<mo>,</mo>
+					<mi>𝙕𝞐𝞨𝞪𝟂𝟆𝟇𝟈𝟉</mi>
+					<mo>,</mo>
+					<mi>𝚣ΑΩαω∇∂</mi>
+				</mrow>
+			</math>";
+		assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
     #[test]
