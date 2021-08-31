@@ -955,7 +955,11 @@
          if: "($Blind or $Verbosity!='terse')"
          then: {t: cap}
      - t: m
- - "ℴ": [t: script o]                            # 0x2134
+ - "ℴ": [t: script o]                             # 0x2134
+ - "ℵ": [t: first transfinite cardinal]           # 0x2135
+ - "ℶ": [t: second transfinite cardinal]          # 0x2136
+ - "ℷ": [t: third transfinite cardinal]           # 0x2137
+ - "ℸ": [t: fourth transfinite cardinal]          # 0x2138
  - "℺":                                          # 0x213a
      - t: rotated
      - test: 
