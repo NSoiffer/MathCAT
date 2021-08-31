@@ -611,10 +611,21 @@ impl CanonicalizeContext {
 			for ch in old_text.chars() {
 				new_text.push(
 					match SHIFT_AMOUNTS.get(&ch) {
-						None => ch,
+						None => {
+							// there are two digamma chars only in the bold mapping. Handled here
+							if char_mapping[2] == 0x1D6A8 {
+								match ch {
+									'Ϝ' => '𝟊',
+									'ϝ' => '𝟋',
+									_   => ch,
+								}
+							} else {
+								ch
+							}
+						},
 						Some(offsets) => {
-							let start = char_mapping[offsets.table];
-							if start == 0 {ch} else {shift_char(start + offsets.ch)}
+							let start_of_mapping = char_mapping[offsets.table];
+							if start_of_mapping == 0 {ch} else {shift_char(start_of_mapping + offsets.ch)}
 						}
 					}
 				)
@@ -1643,12 +1654,12 @@ mod canonicalize_tests {
         let test_str = "<math>
 				<mi mathvariant='normal'>ΑΩαω∇∂ϵ=</mi> <mo>,</mo>		<!-- shouldn't change -->
 				<mi mathvariant='italic'>ϴΑΩαω∇∂ϵ</mi> <mo>,</mo>
-				<mi mathvariant='bold'>ΑΩαωϝ</mi> <mo>,</mo>	
+				<mi mathvariant='bold'>ΑΩαωϝϜ</mi> <mo>,</mo>	
 				<mi mathvariant='double-struck'>Σβ∇</mi> <mo>,</mo>		<!-- shouldn't change -->
 				<mi mathvariant='fraktur'>ΞΦλϱ</mi> <mo>,</mo>			<!-- shouldn't change -->
-				<mi mathvariant='bold-fraktur'>ψΓ</mi> <mo>,</mo>		<!-- shouldn't change -->
-				<mi mathvariant='script'>μΨ</mi> <mo>,</mo>	<!-- shouldn't change -->
-				<mi mathvariant='bold-script'>Σπ</mi>					<!-- shouldn't change -->
+				<mi mathvariant='bold-fraktur'>ψΓ</mi> <mo>,</mo>		<!-- map to bold -->
+				<mi mathvariant='script'>μΨ</mi> <mo>,</mo>				<!-- shouldn't change -->
+				<mi mathvariant='bold-script'>Σπ</mi>					<!-- map to bold -->
 			</math>";
         let target_str = "<math>
 				<mrow data-changed='added'>
@@ -1656,17 +1667,17 @@ mod canonicalize_tests {
 					<mo>,</mo>
 					<mi>𝛳𝛢𝛺𝛼𝜔𝛻𝜕𝜖</mi>
 					<mo>,</mo>
-					<mi>𝚨𝛀𝛂𝛚𝟋</mi>
+					<mi>𝚨𝛀𝛂𝛚𝟋𝟊</mi>
 					<mo>,</mo>
 					<mi>Σβ∇</mi>
 					<mo>,</mo>
 					<mn>ΞΦλϱ</mn>
 					<mo>,</mo>
-					<mn>ψΓ</mn>
+					<mn>𝛙𝚪</mn>
 					<mo>,</mo>
 					<mi>μΨ</mi>
 					<mo>,</mo>
-					<mi>Σπ</mi>
+					<mi>𝚺𝛑</mi>
 				</mrow>
 			</math>";
 		assert!(are_strs_canonically_equal(test_str, target_str));
