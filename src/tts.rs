@@ -67,7 +67,6 @@ use yaml_rust::Yaml;
 use std::{fmt};
 use crate::speech::{SpeechRules};
 use strum_macros::IntoStaticStr;
-extern crate regex;
 use regex::Regex;
 
 pub const PAUSE_SHORT:f64 = 150.0;  // ms
