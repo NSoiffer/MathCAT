@@ -349,11 +349,11 @@ impl CanonicalizeContext {
 		match name(&mathml) {
 			"mi" | "mn" | "ms" | "mglyph" => {return Some(mathml);},
 			"mo" => {
-				// common bug: trig functions, lim should be mi
+				// common bug: trig functions, lim, etc., should be mi
 				let text = as_text(mathml);
 				return crate::definitions::DEFINITIONS.with(|definitions| {
 					if text == "lim" ||
-					   definitions.trig_function_names.as_hashset().borrow().contains(text) {
+					   definitions.function_names.as_hashset().borrow().contains(text) {
 						let mi = create_mathml_element(&mathml.document(), "mi");
 						mi.set_text(text);
 						return Some(mi);
@@ -363,7 +363,20 @@ impl CanonicalizeContext {
 				});
 			},
 			"mtext" => {
+				lazy_static!{
+					// cases insensitive pattern for matching valid roman numerals
+					static ref ROMAN_NUMERAL: Regex = Regex::new(r"(?i)^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$").unwrap();
+				}				
 				let text = as_text(mathml);
+				if ROMAN_NUMERAL.is_match(text) {
+					// people tend to set them in a non-italic font and software makes that 'mtext'
+					let mn = create_mathml_element(&mathml.document(), "mn");
+					mn.set_text(text);
+					mn.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+					return Some(mn);
+				}
+				// FIX: check for a roman numeral and turn into an mn
+				//  regexp:  ^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$
 				return if parent_requires_child || (!text.is_empty() && !IS_WHITESPACE.is_match(&text)) {Some(mathml)} else {None};
 			},
 			"mfenced" => {return Some( convert_mfenced_to_mrow(mathml) )} ,
@@ -1448,13 +1461,13 @@ fn top<'s, 'a:'s, 'op:'a>(vec: &'s[StackInfo<'a, 'op>]) -> &'s StackInfo<'a, 'op
 }
 
 
-fn name<'a>(node: &'a Element<'a>) -> &str {
+pub fn name<'a>(node: &'a Element<'a>) -> &str {
 	return node.name().local_part();
 }
 
 // The child of a non-leaf element must be an element
 // Note: can't use references as that results in 'returning use of local variable'
-fn as_element(child: ChildOfElement) -> Element {
+pub fn as_element(child: ChildOfElement) -> Element {
 	return match child {
 		ChildOfElement::Element(e) => e,
 		_ => panic!("as_element: internal error -- found non-element child"),
@@ -1463,7 +1476,7 @@ fn as_element(child: ChildOfElement) -> Element {
 
 // The child of a leaf element must be text (previously trimmed)
 // Note: trim() combines all the Text children into a single string
-fn as_text(leaf_child: Element) -> &str {
+pub fn as_text(leaf_child: Element) -> &str {
 	assert!(name(&leaf_child) == "mi" || name(&leaf_child) == "mo" || name(&leaf_child) == "mn" || name(&leaf_child) == "mtext" ||
 			name(&leaf_child) == "ms" || name(&leaf_child) == "mspace" || name(&leaf_child) == "mglyph");
 	let children = leaf_child.children();
@@ -2157,6 +2170,15 @@ mod canonicalize_tests {
         let target_str = "<math><msqrt>
 				<mi>b</mi>
 			</msqrt></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn roman_numeral() {
+        let test_str = "<math><mrow><mtext>XLVIII</mtext> <mo>+</mo>><mtext>mmxxvi</mtext></mrow></math>";
+        let target_str = "<math><mrow>
+			<mn data-roman-numeral='true'>XLVIII</mn> <mo>+</mo>><mn data-roman-numeral='true'>mmxxvi</mn>
+			</mrow></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 }
