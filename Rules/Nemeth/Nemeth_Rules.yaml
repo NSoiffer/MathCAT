@@ -1,0 +1,692 @@
+# {
+#   "kind": "messages",
+#   "locale": "nemeth",
+#   "messages": {
+#     "MS": {
+#       "FRACTION_REPEAT": "⠠",
+#       "FRACTION_START": "⠹",
+#       "FRAC_V": "⠹",
+#       "END": "⠠",
+#       "FRACTION_OVER": "⠌",
+#       "ENDFRAC": "⠼",
+#       "FRACTION_END": "⠼",
+#       "SUPER": "⠘",
+#       "SUB": "⠰",
+#       "SUP": "⠘",
+#       "SUPERSCRIPT": "⠘",
+#       "SUBSCRIPT": "⠰",
+#       "BASELINE": "⠐",
+#       "BASE": "⠐",
+#       "NESTED": "⠨",
+#       "STARTROOT": "⠜",
+#       "ENDROOT": "⠻",
+#       "ROOTINDEX": "⠣",
+#       "ROOT": "⠨",
+#       "INDEX": "⠣",
+#       "UNDER": "⠩",
+#       "UNDERSCRIPT": "⠩",
+#       "OVER": "⠣",
+#       "OVERSCRIPT": "⠣"
+#     },
+#     "MSroots": {},
+#     "font": {
+#       "bold": "⠸",
+#       "bold-fraktur": [
+#         "⠸⠀⠸",
+#         "germanCombiner"
+#       ],
+#       "bold-italic": "⠸⠨",
+#       "bold-script": "⠸⠈",
+#       "caligraphic": "⠈",
+#       "caligraphic-bold": "⠈⠸",
+#       "double-struck": "⠈",
+#       "double-struck-italic": "⠸⠨",
+#       "fraktur": [
+#         "⠸",
+#         "germanCombiner"
+#       ],
+#       "fullwidth": "",
+#       "italic": "⠨",
+#       "monospace": "",
+#       "normal": "",
+#       "oldstyle": "",
+#       "oldstyle-bold": "⠸",
+#       "script": "⠈",
+#       "sans-serif": "⠠⠨",
+#       "sans-serif-italic": "⠠⠨⠨",
+#       "sans-serif-bold": "⠠⠨⠸",
+#       "sans-serif-bold-italic": "⠠⠨⠸⠨",
+#       "unknown": ""
+#     },
+#     "embellish": {
+#       "super": [
+#         "⠘",
+#         "germanCombiner"
+#       ],
+#       "sub": [
+#         "⠰",
+#         "germanCombiner"
+#       ],
+#       "circled": [
+#         "⠫⠉⠸⠫",
+#         "embellishCombiner"
+#       ],
+#       "parenthesized": [
+#         "⠷",
+#         "parensCombiner"
+#       ],
+#       "period": [
+#         "⠸⠲",
+#         "postfixCombiner"
+#       ],
+#       "negative-circled": [
+#         "⠫⠸⠉⠸⠫",
+#         "embellishCombiner"
+#       ],
+#       "double-circled": [
+#         "⠫⠉⠸⠫⠫⠉⠸⠫",
+#         "doubleEmbellishCombiner"
+#       ],
+#       "circled-sans-serif": [
+#         "⠫⠉⠸⠫⠠⠨",
+#         "embellishCombiner"
+#       ],
+#       "negative-circled-sans-serif": [
+#         "⠫⠸⠉⠸⠫⠠⠨",
+#         "embellishCombiner"
+#       ],
+#       "comma": [
+#         "⠠",
+#         "postfixCombiner"
+#       ],
+#       "squared": [
+#         "⠫⠲⠸⠫",
+#         "embellishCombiner"
+#       ],
+#       "negative-squared": [
+#         "⠫⠸⠲⠸⠫",
+#         "embellishCombiner"
+#       ]
+#     },
+#     "regexp": {
+#       "TEXT": "a-zA-Z",
+#       "NUMBER": "((\\d{1,3})(?=(,| ))((,| )\\d{3})*(\\.\\d+)?)|^\\d*\\.\\d+|^\\d+",
+#       "DECIMAL_MARK": ".",
+#       "DIGIT_GROUP": ",",
+#       "JOINER_SUBSUPER": "",
+#       "JOINER_FRAC": ""
+#     },
+#     "unitTimes": ""
+#   }
+# }
+
+---
+# -
+#    include: "common-rules.yaml"
+
+
+-
+   name: default
+   tag: msqrt
+   match: "."
+   variables: [NestingChars: "NestingChars(., '⠨')"]
+   replace: 
+    - x: $NestingChars                      # start root indicator(s)
+    - t: "⠜"
+    - x: "*"
+    - x: $NestingChars                      # end root indicator(s)
+    - t: "⠻"
+
+-
+   name: default
+   tag: mroot
+   match: "."
+   variables: [NestingChars: "NestingChars(., '⠨')"]
+   replace: 
+    - x: $NestingChars                      # start root indicator(s)
+    - t: "⠣"
+    - x: "*[2]"
+    - t: "⠜"                                # end of index
+    - x: "*[1]"
+    - x: $NestingChars                      # end root indicator(s)
+    - t: "⠻"
+        
+               
+# Fraction rules
+-
+   # The fraction part of a mixed number is always simple
+   # They also differ because a two character sequence is needed to bracket the fraction
+   # The invisible plus should produce an empty string
+
+   name: common-fraction-mixed-number
+   tag: mfrac
+   match:
+      - "preceding-sibling::*[1][self::m:mo][text()='\u2064'] and" # preceding element is invisible plus
+      - "*[1][self::m:mn][not(contains(., '.'))]   and" 
+      - "*[2][self::m:mn][not(contains(., '.'))]"
+   replace: 
+    - t: "⠸⠹"
+    - x: "*[1]"
+    - test:
+         if: "@bevelled"
+         then: [t: "⠸⠌"]
+         else: [t: "⠌"]
+    - x: "*[2]"
+    - t: "⠸⠼"
+
+-
+   name: default
+   tag: mfrac
+   match: "."
+   variables: [NestingChars: "NestingChars(., '⠠')"]
+   replace: 
+    - x: $NestingChars                      # start fraction indicator(s)
+    - t: "⠹"
+    - x: "*[1]"
+    - x: $NestingChars                      # over indicator(s)
+    - test:
+         if: "@bevelled"
+         then: [t: "⠸⠌"]
+         else: [t: "⠌"]
+    - x: "*[2]"
+    - x: $NestingChars                      # end fraction indicator(s)
+    - t: "⠼"
+
+
+#
+# Matrix/Determinant rules
+# matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
+# the pausing logic is pushed down to the <mtd>
+# the rules either speak the <mtr>s (to get "row n") or the <mtd>s. "column n" spoken if $IsColumnSilent is false
+# -
+#    name: 1x1-matrix
+#    tag: mrow
+#    variables: [IsColumnSilent: "true()"]
+#    match:
+#    - "*[2][self::m:mtable] and"
+#    - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
+#    - count(*[2]/*)=1 and count(*[2]/*[self::m:mtr][1]/*)=1
+#    replace:
+#     - ot: the
+#     - t: 1 by 1
+#     - test:
+#         if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+#         then: {t: determinant}
+#         else: {t: matrix}
+#     - t: with entry
+#     - x: "*[2]/*[1]/*"
+
+# # simpler reading methods for smaller matrices if the entries are simple
+# -
+#   name: 2-or-3x1-matrix
+#   tag: mrow
+#   variables: [IsColumnSilent: true()]
+#   match:
+#     - "*[2][self::m:mtable] and"
+#     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
+#     - count(*[2]/*[1]/*)=1 and    # one column
+#     - count(*[2]/*)<=3 and   # at least two rows
+#     - IsNode(*[2]/*/*/*,'simple')   # IsNode() returns true if all the nodes are simple
+#   replace: 
+#     - t: the
+#     - x: count(*[2]/*)
+#     - t: by 1 column matrix
+#     - pause: long
+#     - x: "*[2]/*/*"
+#     - t: end matrix
+
+# -
+#   name: default-column-matrix
+#   tag: mrow
+#   variables: [IsColumnSilent: true()]
+#   match:
+#     - "*[2][self::m:mtable] and"
+#     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
+#     - count(*[2]/*[1]/*)=1
+#   replace: 
+#     - t: the
+#     - x: "count(*[2]/*)"
+#     - t: by 1 column matrix
+#     - pause: long
+#     - x: "*[2]/*"     # select the rows (mtr)
+#     - t: "end matrix"
+
+# -
+#   name: 1x2-or-3-matrix
+#   tag: mrow
+#   variables: [IsColumnSilent: true()]
+#   match:
+#     - "*[2][self::m:mtable] and"
+#     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
+#     - count(*[2]/*)=1  and          # one row
+#     - count(*[2]/*[1]/*)<=3 and   # at least two cols
+#     - IsNode(*[2]/*/*/*,'simple')   # IsNode() returns true if all the nodes are simple
+#   replace: 
+#     - t: the 1 by
+#     - x: count(*[2]/*/*)
+#     - t: row matrix
+#     - pause: long
+#     - x: "*[2]/*/*"
+#     - t: end matrix
+ 
+# -
+#   name: default-row-matrix
+#   tag: mrow
+#   variables: [IsColumnSilent: false()]
+#   match:
+#     - "*[2][self::m:mtable] and"
+#     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
+#     - count(*[2]/*)=1         # one row
+#   replace: 
+#     - t: the 1 by
+#     - x: "count(*[2]/*/*)"
+#     - t: row matrix
+#     - pause: long
+#     - pause: medium
+#     - x: "*[2]/*/*"     # select the cols (mtd)
+#     - t: "end matrix"
+
+# -
+#   name: simple-small-matrix
+#   tag: mrow
+#   match:
+#     - "*[2][self::m:mtable] and"
+#     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')) and
+#     - (count(*[2]/*)<=3 and count(*[2]/*[1]/*)<=3) and       # no bigger than a 3x3 matrix
+#     - IsNode(*[2]/*/*/*,'simple')         # IsNode() returns true if all the nodes are simple
+#   variables: [IsColumnSilent: true()]
+#   replace: 
+#     - t: the
+#     - x: count(*[2]/*)
+#     - t: by
+#     - x: count(*[2]/*[self::m:mtr][1]/*)
+#     - test:
+#         if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+#         then: {t: determinant}
+#         else: {t: matrix}
+#     - pause: long
+#     - x: "*[2]/*"
+#     - t: end matrix
+ 
+# -
+#    name: default-matrix
+#    tag: mrow
+#    variables: [IsColumnSilent: false()]
+#    match:
+#    - "*[2][self::m:mtable] and"
+#    - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
+#    replace: 
+#     - t: the
+#     - x: "count(*[2]/*)"
+#     - t: by
+#     - x: "count(*[2]/*[self::m:mtr][1]/*)"
+#     - test:
+#         if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+#         then: {t: determinant}
+#         else: {t: matrix}
+#     - pause: long
+#     - x: "*[2]/*"
+#     - t: end
+#     - test:
+#         if: "*[1][text()='|']"    # just need to check the first bracket since we know it must be (, [, or |
+#         then: {t: determinant}
+#         else: {t: matrix}
+# -
+#   name: default
+#   tag: [mtr, mlabeledtr]
+#   match: "."
+#   replace:
+#    - t: row
+#    - x: "count(preceding-sibling::*)+1"
+#    - test:
+#       if: .[self::m:mlabeledtr]
+#       then:
+#          - t: with label
+#          - x: "*[1]/*"
+#          - pause: short
+#    - pause: medium
+#    - test:
+#       if: .[self::m:mlabeledtr]
+#       then: [x: "*[position()>1]"]
+#       else: {x: "*"}
+# -
+#   name: default
+#   tag: mtd
+#   match: "."
+#   replace:
+#    - test: 
+#       if: "not($IsColumnSilent)"
+#       then:
+#          - t: column
+#          - x: "count(preceding-sibling::*)+1"
+#          - pause: medium
+#    - x: "*"
+#    - test:
+#       # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
+#       - if: count(following-sibling::*) > 0
+#         then: {pause: short}
+#       - else_if: count(../following-sibling::*) > 0
+#         then: {pause: medium}
+#         else: {pause: long}
+ 
+
+-
+   name: default
+   tag: math
+   match: "."
+   variables: [NewScriptContext: "''"]    # empty string -- it needs to be set
+   replace: [x: "*"]
+-
+   name: default
+   tag: mrow
+   match: "."
+   replace: [x: "*"]
+
+-
+   # need to deal with numeric indicator
+   # part of SRE test
+      # "not(@font) or @font=\"normal\" or @font=\"fullwidth\" or @font=\"monospace\"",
+      # "not(ancestor::sqrt)",
+      # "not(ancestor::root)",
+      # "not(ancestor::fraction)",
+   name: default
+   tag: mn
+   match: "."
+   replace: [x: text()]
+-
+   # Rule 138 a.2 -- space after a function name
+   # most functions will have an invisible apply that adds the space, but "mod" is infix, so different
+   name: mod
+   tag: [mi, mo, mtext]    # should really only be 'mo', but others are used
+   match: "text()='mod'"
+   replace:
+      - x: text()
+      - t: "⠀"
+-
+   name: default
+   tag: [mi, mo, mtext]
+   match: "."
+   replace: [x: text()]
+
+# -
+#    name: default
+#    tag: ms
+#    match: "."
+#    replace: 
+#     - t: the string
+#     - pause: short
+#     - x: text()
+-
+   name: default
+   tag: mstyle
+   match: "."
+   replace: [x: "*"]
+
+-
+   # primes don't get a superscript indicator
+   name: prime
+   tag: msup
+   match: "*[2][self::m:mo][text()='′']"
+   replace: 
+    - x: "*"
+-
+   name: default
+   tag: msup
+   match: "."
+   variables:
+    - OldScriptContext: "$NewScriptContext"
+    - NewScriptContext: "concat($NewScriptContext, '⠘')"
+   replace: 
+    - x: "*[1]"
+    - x: "$NewScriptContext"
+    - x: "*[2]"
+    - test:
+         # emit level indicator if something follows or the closest non-mrow is an element with a close tag [80(a)]
+         if: "count(following-sibling::*) > 0 or ancestor::*[name() != 'mrow'][1]/.[self::m:mfrac or self::m:msqrt or self::m:mroot]"
+         then_test:
+            if: "$OldScriptContext = ''"
+            then: [t: "⠐"]
+            else: [x: "$OldScriptContext"]
+
+-
+   # implement rule 77 -- simple numeric (non-nested) subscript: don't use a subscript indicator
+   #   must be a subscript at level 1
+   name: numeric-sub
+   tag: msub
+      # FIX: match condition needs refinement in testing of base
+   match: "*[2][self::m:mn] and not($NewScriptContext) and 
+           *[1][ self::m:mi or self::m:msup[*[1][self::m:mi] and *[2][self::m:mo]] ]"
+   replace:
+      - x: "*"
+-
+   name: default
+   tag: msub
+   match: "."
+   variables:
+    - OldScriptContext: "$NewScriptContext"
+    - NewScriptContext: "concat($NewScriptContext, '⠰')"
+   replace: 
+    - x: "*[1]"
+    - x: "$NewScriptContext"
+    - x: "*[2]"
+    - test:
+         if: "count(following-sibling::*) > 0"
+         then_test:
+            if: "$OldScriptContext"
+            then: [x: "$OldScriptContext"]
+            else: [t: "⠐"]
+
+-
+   name: default
+   tag: msubsup
+   match: "."
+   variables:
+    - OldScriptContext: "$NewScriptContext"
+    - NewScriptContext: "concat($NewScriptContext, '⠰')"
+   replace: 
+    - x: "*[1]"
+    - x: "$NewScriptContext"
+    - x: "*[2]"
+    - x: "concat($OldScriptContext, '⠘')"            # FIX: this should *set* NewScriptContext
+    - x: "*[3]"
+    - test:
+         if: "count(following-sibling::*) > 0"
+         then_test:
+            if: "$OldScriptContext"
+            then: [x: "$OldScriptContext"]
+            else: [t: "⠐"]
+
+-
+   name: default
+   tag: munder
+   match: "."
+   replace: 
+    - t: modified
+    - x: "*[1]"
+    - t: with
+    - x: "*[2]"
+    - t: below
+    
+-
+   name: default
+   tag: mover
+   match: "."
+   replace: 
+    - t: modified
+    - x: "*[1]"
+    - t: with
+    - x: "*[2]"
+    - t: above
+    
+-
+   name: default
+   tag: munderover
+   match: "."
+   replace: 
+    - t: modified
+    - x: "*[1]"
+    - t: with
+    - x: "*[2]"
+    - t: below and
+    - x: "*[3]"
+    - t: above
+
+# -
+#    name: default
+#    tag: mtable
+#    variables: [IsColumnSilent: false()]
+#    match: "."
+#    replace: 
+#     - t: table with
+#     - x: count(*)
+#     - test: 
+#          if: count(*)=1
+#          then: {t: row}
+#          else: {t: rows}
+#     - t: and
+#     - x: "count(*[1]/*)"
+#     - test: 
+#          if: "count(*[1]/*)=1"
+#          then: {t: column}
+#          else: {t: columns}
+#     - pause: long
+#     - x: "* "
+
+# -
+  # Note: @notation can contain more than one value
+  # The ordering below is the order in which words come out when there is more than one value
+  # 
+  #  name: default
+  #  tag: menclose
+  #  match: "."
+  #  replace:
+  #   - test:
+  #       if: ". [contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
+  #       then: [t: box, pause: short]
+  #   - test:
+  #       if: ".[contains(@notation,'roundedbox')]"
+  #       then: [t: round box, pause: short]
+  #   - test:
+  #       if: ".[contains(@notation,'circle')]"
+  #       then: [t: circle, pause: short]
+  #   - test:
+  #       if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or 
+  #               contains(concat(' ', normalize-space(@notation), ' '), ' right ') or 
+  #               contains(@notation,'top') or contains(@notation,'bottom') ]"
+  #       then:
+  #         - t: line on
+  #         - test:
+  #             if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
+  #             then: [t: left, pause: short]
+  #         - test:
+  #             if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"
+  #             then: [t: right, pause: short]
+  #         - test:
+  #             if: ".[contains(@notation,'top')]"
+  #             then: [t: top, pause: short]
+  #         - test:
+  #             if: ".[contains(@notation,'bottom')]"
+  #             then: [t: bottom, pause: short]
+  #   - test:
+  #       if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
+  #               contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
+  #       then:
+  #         - test:
+  #             if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
+  #             then: [spell: x, pause: short]  # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+  #             else:
+  #               - test:
+  #                   if: ".[contains(@notation,'updiagonalstrike')]"
+  #                   then: [t: up diagonal, pause: short]
+  #               - test:
+  #                   if: ".[contains(@notation,'downdiagonalstrike')]"
+  #                   then: [t: down diagonal, pause: short]
+  #         - test:
+  #             if: ".[contains(@notation,'verticalstrike')]"
+  #             then: [t: vertical, pause: short]
+  #         - test:
+  #             if: ".[contains(@notation,'horizontalstrike')]"
+  #             then: [t: horizontal, pause: short]
+  #         - t: cross out
+  #         - pause: short
+  #   - test:
+  #       if: ".[contains(@notation,'uparrow')]"
+  #       then: [t: up arrow, pause: short]
+  #   - test:
+  #       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
+  #       then: [t: down arrow, pause: short]
+  #   - test:
+  #       if: ".[contains(@notation,'leftarrow')]"
+  #       then: [t: left arrow, pause: short]
+  #   - test:
+  #       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
+  #       then: [t: right arrow, pause: short]
+  #   - test:
+  #       if: ".[contains(@notation,'northeastarrow')]"
+  #       then: [t: northeast arrow, pause: short]
+  #   - test:
+  #       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
+  #       then: [t: southeast arrow, pause: short]
+  #   - test:
+  #       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
+  #       then: [t: southwest arrow, pause: short]
+  #   - test:
+  #       if: ".[contains(@notation,'northwestarrow')]"
+  #       then: [t: northwest arrow, pause: short]
+  #   - test:
+  #       if: ".[contains(@notation,'updownarrow')]"
+  #       then: [t: double ended vertical arrow, pause: short]
+  #   - test:
+  #       if: ".[contains(@notation,'leftrightarrow')]"
+  #       then: [t: double ended horizontal arrow, pause: short]
+  #   - test:
+  #       if: ".[contains(@notation,'northeastsouthwestarrow')]"
+  #       then: [t: double ended up diagonal arrow, pause: short]
+  #   - test:
+  #       if: ".[contains(@notation,'northwestsoutheastarrow')]"
+  #       then: [t: double ended down diagonal arrow, pause: short]
+  #   - test:
+  #       if: ".[contains(@notation,'actuarial')]"
+  #       then: [t: actuarial symbol, pause: short]
+  #   - test:
+  #       if: ".[contains(@notation,'madrub')]"
+  #       then: [t: arabic factorial symbol, pause: short]
+  #   - test:
+  #       if: ".[contains(@notation,'phasorangle')]"
+  #       then: [t: phasor angle, pause: short]
+  #   - test:
+  #       if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']"      # default
+  #       then: [t: long division symbol, pause: short]
+  #   - test:
+  #       if: ".[contains(@notation,'radical')]"
+  #       then: [t: square root, pause: short]
+  #   - t: enclosing
+  #   - x: "*"
+  #   - test:
+  #       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
+  #       then: [t: end enclosure]
+  #   - pause: short
+
+
+
+-
+   name: default-children
+   tag: unknown
+   match: count(*)>1
+   replace: 
+    - t: unknown math m l element
+    - x: text()
+-
+   name: default-empty
+   tag: unknown
+   match: "*[not(text())]"
+   replace: 
+    - t: empty unknown math m l element
+    - x: text()
+-
+   name: default-text
+   tag: unknown
+   match: "."
+   replace: 
+    - t: unknown math m l element
+    - x: text()
