@@ -12,10 +12,19 @@ def write_nemeth_yaml(in_file, out_file):
             write_letters_and_digits(out_stream)
             # entries are a list of numeric code point, char, full name, Nemeth, UEB
             for entry in csv_reader:
-                # we do the write in two parts so that the comment is aligned
-                first_part = ' - "{}": [t: {}]'.format(unicode_char(entry), nemeth(entry))
-                out_stream.write('{:32}# 0x{} ({})\n'.format(
-                        first_part, code_point(entry), unicode_name(entry)))
+                write_yaml_line(out_stream, unicode_char(entry), nemeth(entry), code_point(entry), unicode_name(entry))
+
+            # add space and non-breaking space
+            write_yaml_line(out_stream, " ", "⠀","0020", "space")
+            write_yaml_line(out_stream, " ", "⠀","00A0", "non-breaking space")
+
+            # add invisible chars inserted by canonicalization
+            write_comma_line(out_stream)
+            write_yaml_line(out_stream, "⁡", "","2061⁡", "invisible function apply")
+            write_yaml_line(out_stream, "⁢", "","2062⁡", "invisible times")
+            write_yaml_line(out_stream, "⁣", "","2063⁡", "invisible separator")
+            write_yaml_line(out_stream, "⁤", "","2064", "invisible plus")
+
 
 def code_point(list):
     return list[0]
@@ -36,12 +45,18 @@ def nemeth(list):
 def ueb(list):
     return list[4]
 
+def write_yaml_line(out_stream, char, nemeth, hex, unicode_name):
+    # we do the write in two parts so that the comment is aligned
+    first_part = ' - "{}": [t: "{}"]'.format(char, nemeth)
+    out_stream.write('{:32}# 0x{} ({})\n'.format(
+            first_part, hex, unicode_name))
+
 def write_letters_and_digits(out_stream):
     digits = ["⠴", "⠂","⠆","⠒","⠲","⠢","⠖","⠶","⠦","⠔"]
-    small_latin = ["⠰⠁", "⠰⠃", "⠰⠉", "⠰⠙", "⠰⠑", "⠰⠋", "⠰⠛", "⠰⠓", "⠰⠊", "⠰⠚", "⠰⠅", "⠰⠇", "⠰⠍",
-                 "⠰⠝", "⠰⠕", "⠰⠏", "⠰⠟", "⠰⠗", "⠰⠎", "⠰⠞", "⠰⠥", "⠰⠧", "⠰⠺", "⠰⠭", "⠰⠽", "⠰⠵" ]
-    cap_latin = ["⠰⠠⠁", "⠰⠠⠃", "⠰⠠⠉", "⠰⠠⠙", "⠰⠠⠑", "⠰⠠⠋", "⠰⠠⠛", "⠰⠠⠓", "⠰⠠⠊", "⠰⠠⠚", "⠰⠠⠅",
-                 "⠰⠠⠇", "⠰⠠⠍", "⠰⠠⠝", "⠰⠠⠕", "⠰⠠⠏", "⠰⠠⠟", "⠰⠠⠗", "⠰⠠⠎", "⠰⠠⠞", "⠰⠠⠥", "⠰⠠⠧", "⠰⠠⠺", "⠰⠠⠭", "⠰⠠⠽", "⠰⠠⠵" ]
+    small_latin = ["⠁", "⠃", "⠉", "⠙", "⠑", "⠋", "⠛", "⠓", "⠊", "⠚", "⠅", "⠇", "⠍",
+                 "⠝", "⠕", "⠏", "⠟", "⠗", "⠎", "⠞", "⠥", "⠧", "⠺", "⠭", "⠽", "⠵" ]
+    cap_latin = ["⠠⠁", "⠠⠃", "⠠⠉", "⠠⠙", "⠠⠑", "⠠⠋", "⠠⠛", "⠠⠓", "⠠⠊", "⠠⠚", "⠠⠅",
+                 "⠠⠇", "⠠⠍", "⠠⠝", "⠠⠕", "⠠⠏", "⠠⠟", "⠠⠗", "⠠⠎", "⠠⠞", "⠠⠥", "⠠⠧", "⠠⠺", "⠠⠭", "⠠⠽", "⠠⠵" ]
     write_range(out_stream, digits, '0')
     write_range(out_stream, small_latin, 'a')
     write_range(out_stream, cap_latin, 'A')
@@ -50,8 +65,15 @@ def write_letters_and_digits(out_stream):
 def write_range(out_stream, list, first_char):
     for i in range(0,len(list)):
         unicode = ord(first_char) + i
-        first_part = ' - "{}": [t: {}]'.format(chr(unicode), list[i])
-        out_stream.write('{:32}# 0x{}\n'.format(first_part, unicode))
+        write_yaml_line(out_stream, chr(unicode), list[i], hex(unicode)[2:], "")
+
+def write_comma_line(out_stream):
+    # comma needs a special test when in a script
+    out_stream.write('{:32}# 0x{} ({})\n'.format(' - ",":', "002C", "Comma"))
+    out_stream.write('     - test:\n')
+    out_stream.write('         if: "parent::*[self::m:msub or self::m:msup or self::m:msubsup]"\n')
+    out_stream.write('         then: [t: "⠪"]\n')
+    out_stream.write('         else: [t: "⠂"]\n')
 
 
 write_nemeth_yaml("braille.csv", "unicode.yaml")

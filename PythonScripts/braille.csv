@@ -10,15 +10,14 @@
 29,),Right parenthesis,⠾,⠐⠜
 002A,*,Asterisk,⠈⠼,⠐⠔
 002B,+,Plus sign,⠬,⠐⠖
-002C,",",Comma,⠠,⠂
 002D,-,Hyphen,⠸⠤,⠤
 002E,.,Full stop,⠸⠲,⠼⠲
 002F,/,Solidus,⠸⠌,⠸⠌
 003A,:,Colon,⠸⠒,⠒
 003B,;,Semicolon,⠸⠆,⠆
-003C,< ,Less-than sign,⠀⠐⠅⠀,⠈⠣
+003C,<,Less-than sign,⠀⠐⠅⠀,⠈⠣
 003D,=,Equals sign,⠀⠨⠅⠀,⠐⠶
-003E,> ,Greater-than sign,⠀⠨⠂⠀,⠈⠜
+003E,>,Greater-than sign,⠀⠨⠂⠀,⠈⠜
 003F,?,Question mark,⠸⠦,⠦
 40,@,Commercial at,⠈⠁,⠈⠁
 005B,[,Left square bracket,⠈⠷,⠨⠣
@@ -105,7 +104,7 @@
 2020,†,Dagger,⠸⠻,⠈⠠⠹
 2021,‡,Double dagger,⠸⠸⠻,⠈⠠⠻
 2022,•,Bullet,⠔⠔,⠸⠲
-2026,…,Ellipsis,⠀⠄⠄⠄,
+2026,…,Ellipsis,⠄⠄⠄,
 2032,′,Prime,⠄,⠶
 2033,″,Double prime,⠄⠄,⠶⠶
 210F,ℏ,Planck constant over two pi,⠈⠓,
