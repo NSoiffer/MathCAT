@@ -17,7 +17,7 @@ strum = "0.20"
 strum_macros = "0.20"
 structopt = "*"
 error-chain = "*"
-regex = "1.4"
+regex = "1.5"
 dirs = "3.0"
 bitflags = "1.2.1"
 phf = { version = "0.8.0", features = ["macros"] }
