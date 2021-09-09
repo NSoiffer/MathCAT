@@ -194,6 +194,8 @@
  - "‰": [t: "`00"]
  - "′": [t: "⠄"]                # 0x2032 (Prime)
  - "″": [t: "⠄⠄"]               # 0x2033 (Double prime)
+ - "‴": [t: "⠄⠄."]               # 0x2034 (Triple prime)
+ - "⁗": [t: "⠄⠄.."]               # 0x2057 (Quadruple prime)
  - "ℏ": [t: "⠈⠓"]               # 0x210F (Planck constant over two pi)
  - "ℓ": [t: "⠈⠇"]               # 0x2113 (Script small l (differs from 1d4c1: 4-56-123))
  - "ℝ": [t: ""]                 # 0x211D (Double-struck capital R (no nemeth double struck))
