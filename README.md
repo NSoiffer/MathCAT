@@ -132,7 +132,7 @@ The basic types in YAML are:
 * arrays (used inline as `["a", "b", "c"]`)
 * dictionaries/maps (used inline as `{key: value, foo: bar}`)
 
-In the more verbose form of YAML syntax, indentation is used instead of brackets so the above array becomes
+In the more verbose form of YAML syntax for arrays, indentation is used instead of brackets so the above array becomes
 ```
  - a
  - b
@@ -286,7 +286,7 @@ This is what should be used when setting its value via the API and when accessin
 
 
 ## XPath
-Many parts of a speech rule make use of xpath. This is a popular and well documented method for selecting parts on an XML document. A web search will turn up many tutorials. Those not familiar with xpath are encouraged to read some.
+Many parts of a speech rule make use of xpath. This is a popular and well documented method for selecting parts on an XML document. A web search will turn up many tutorials. Those not familiar with xpath are encouraged to read some. The implementation of xpath used by MathCAT is a slightly extended version of XPATH 1.0.
 
 MathCAT usage tends to use only a few features of xpath. It also makes use of some custom functions. Here is a short explanation of common xpath usage:
 
