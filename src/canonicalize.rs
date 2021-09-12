@@ -49,6 +49,9 @@ lazy_static!{
 	static ref IMPLIED_TIMES_HIGH_PRIORITY: OperatorInfo = OperatorInfo{
 		op_type: OperatorTypes::INFIX, priority: 851, next: &None
 	};
+	static ref IMPLIED_PLUS_SLASH_HIGH_PRIORITY: OperatorInfo = OperatorInfo{	// (linear) mixed fraction 2 3/4
+		op_type: OperatorTypes::INFIX, priority: 881, next: &None
+	};
 
 	// Useful static defaults to have available if there is no character match
 	static ref DEFAULT_OPERATOR_INFO_PREFIX: &'static OperatorInfo = &OperatorInfo{
@@ -169,6 +172,10 @@ impl OperatorInfo {
 		return self.op_type.bits & OperatorTypes::RIGHT_FENCE.bits ==OperatorTypes::RIGHT_FENCE.bits;
 	}
 
+	fn is_fence(&self) -> bool {
+		return self.op_type.bits & (OperatorTypes::RIGHT_FENCE.bits | OperatorTypes::RIGHT_FENCE.bits) != OperatorTypes::NONE.bits;
+	}
+
 	fn is_operator_type(&self, op_type: OperatorTypes) -> bool {
 		return self.op_type.bits & op_type.bits != 0;
 	}
@@ -267,6 +274,11 @@ fn create_mathml_element<'a>(doc: &Document<'a>, name: &str) -> Element<'a> {
 		name));
 }
 
+pub fn is_fence(mo: Element) -> bool {
+	return CanonicalizeContext::new()
+			.find_operator(mo, None, None, None).is_fence();
+}
+
 /// Canonicalize does several things:
 /// 1. cleans up the tree so all extra white space is removed (should only have element and text nodes)
 /// 2. normalize the characters
@@ -350,10 +362,10 @@ impl CanonicalizeContext {
 			"mi" | "mn" | "ms" | "mglyph" => {return Some(mathml);},
 			"mo" => {
 				// common bug: trig functions, lim, etc., should be mi
+				// same for ellipsis ("…")
 				let text = as_text(mathml);
 				return crate::definitions::DEFINITIONS.with(|definitions| {
-					if text == "lim" ||
-					   definitions.function_names.as_hashset().borrow().contains(text) {
+					if text == "…" || definitions.function_names.as_hashset().borrow().contains(text) {
 						let mi = create_mathml_element(&mathml.document(), "mi");
 						mi.set_text(text);
 						return Some(mi);
@@ -394,7 +406,9 @@ impl CanonicalizeContext {
 
 				// Throw out mstyle -- to do this, we need to avoid mstyle being the arg of clean_mathml
 				// FIX: should probably push the attrs down to the children (set in 'self')
-				if name(&mathml) == "mstyle" {
+				let name = name(&mathml);
+				// Also throw out mpadded
+				if  name == "mstyle" || name == "mpadded" {
 					if new_children.len() == 1 {
 						return Some( new_children[0] );
 					} else {
@@ -488,7 +502,7 @@ impl CanonicalizeContext {
 			None => mi_text.to_string(),
 			Some(start) => shift_text(mi_text, start),
 		};
-		mi.remove_attribute("mathvariant");
+		// mi.remove_attribute("mathvariant");  // leave attr -- for Nemeth, there are italic digits etc that don't have Unicode points
 		mi.set_text(&new_text);
 		return mi;
 
@@ -686,12 +700,13 @@ impl CanonicalizeContext {
 	}
 
 	fn canonicalize_mo_text<'a>(&self, mo: Element<'a>) {
-		let parent_name = name(&mo);		// guaranteed to exist
 		let mut mo_text = as_text(mo);
+		let parent = mo.parent().unwrap().element().unwrap();
+		let parent_name = name(&parent);
 		if parent_name == "mover" || parent_name == "munder" || parent_name == "munderover" {
 			// canonicalize various diacritics for munder, mover, munderover
 			mo_text = match mo_text {
-				"\u{02C9}"| "\u{0304}"| "\u{0305}"| "\u{2212}" => "_",
+				"_" | "\u{02C9}"| "\u{0304}"| "\u{0305}"| "\u{2212}" => "\u{00AF}",
 				"\u{02BC}" => "`",
 				"\u{02DC}" => "~",
 				"\u{02C6}"| "\u{0302}" => "^",
@@ -700,10 +715,14 @@ impl CanonicalizeContext {
 				_ => mo_text,
 			}
 			// FIX: MathType generates the wrong version of union and intersection ops (binary instead of unary)
-		}
+		} else {
+			mo_text = match mo_text {
+				"\u{00AF}"| "\u{02C9}"| "\u{0304}"| "\u{0305}" => "_",
+				_ => mo_text,
+			};
+		};
 		mo_text = match mo_text {
 			"\u{2212}" => "-",
-			"\u{00AF}"| "\u{02C9}"| "\u{0304}"| "\u{0305}" => "_",
 			_ => mo_text,
 		};
 		mo.set_text(mo_text);
@@ -1106,44 +1125,91 @@ impl CanonicalizeContext {
 		}
 	}
 	
-	fn is_mixed_fraction<'a>(&self, integer_part: &'a Element<'a>, fraction_part: &'a Element<'a>) -> bool {
-		if name(fraction_part) != "mfrac" {
-			return false;
+	fn is_mixed_fraction<'a>(&self, integer_part: &'a Element<'a>, fraction_children: &[ChildOfElement<'a>]) -> Result<bool> {
+		// do some simple disqualifying checks on the fraction part
+		if fraction_children.is_empty() {
+			return Ok( false );
 		}
-	
-		// integer part must be either 'n' or '-n' (in an mrow)
-		let integer_part_name = name(integer_part);
-		if integer_part_name == "mrow" {
-			let children = integer_part.children();
-			if children.len() == 2 &&
-				name(&as_element(children[0])) == "mo" &&
-				as_text(as_element(children[0])) == "-" {
-					let integer_part = as_element(children[1]);
-					if name(&integer_part) != "mn"  || as_text(integer_part).contains(DECIMAL_SEPARATOR) {
-						return false;
-					}
-			}
+		let right_child = as_element(fraction_children[0]);
+		let right_child_name = name(&right_child);
+		if ! (right_child_name == "mfrac" ||
+			 (right_child_name == "mrow" && right_child.children().len() == 3) ||
+		     (right_child_name == "mn" && fraction_children.len() >= 3) ) {
+			return Ok( false );
 		};
-	
-		if name(integer_part) != "mn"  || as_text(*integer_part).contains(DECIMAL_SEPARATOR) {
-			return false;
+
+		if !is_integer_part_ok(integer_part) {
+			return Ok( false );
 		}
-	
-		// fraction_part needs to have integer numerator and denominator (already tested it is a frac)
-		let fraction_children = fraction_part.children();
-		if fraction_children.len() != 2 {
-			return false;
+		
+		if right_child_name == "mfrac" {
+			return Ok( is_mfrac_ok(&right_child) );
 		}
-		let numerator = as_element(fraction_children[0]);
-		if name(&numerator) != "mn" || as_text(numerator).contains(DECIMAL_SEPARATOR) {
-			return false;
+
+		return is_linear_fraction(self, fraction_children);
+
+
+		fn is_int<'a>(integer_part: &'a Element<'a>) -> bool {
+			return name(integer_part) == "mn"  && !as_text(*integer_part).contains(DECIMAL_SEPARATOR);
 		}
-		let denominator = as_element(fraction_children[1]);
-		if name(&denominator) != "mn" || as_text(denominator).contains(DECIMAL_SEPARATOR) {
-			return false;
+
+		fn is_integer_part_ok<'a>(integer_part: &'a Element<'a>) -> bool {
+			// integer part must be either 'n' or '-n' (in an mrow)
+			let integer_part_name = name(integer_part);
+			if integer_part_name == "mrow" {
+				let children = integer_part.children();
+				if children.len() == 2 &&
+				   name(&as_element(children[0])) == "mo" &&
+				   as_text(as_element(children[0])) == "-" {
+					let integer_part = as_element(children[1]);
+					return is_int(&integer_part);
+				}
+				return false;
+			};
+		
+			return is_int(&integer_part);
 		}
-	
-		return true;		// the only thing left is a mixed fraction
+
+		fn is_mfrac_ok<'a>(fraction_part: &'a Element<'a>) -> bool {
+			// fraction_part needs to have integer numerator and denominator (already tested it is a frac)
+			let fraction_children = fraction_part.children();
+			if fraction_children.len() != 2 {
+				return false;
+			}
+			let numerator = as_element(fraction_children[0]);
+			if name(&numerator) != "mn" || as_text(numerator).contains(DECIMAL_SEPARATOR) {
+				return false;
+			}
+			let denominator = as_element(fraction_children[1]);
+			return is_int(&denominator);
+		}
+
+		fn is_linear_fraction<'a>(canonicalize: &CanonicalizeContext, fraction_children: &[ChildOfElement<'a>]) -> Result<bool> {
+			// two possibilities
+			// 1. '3 / 4' is in an mrow
+			// 2. '3 / 4' are three separate elements
+			let first_child = as_element(fraction_children[0]);
+			if name(&first_child) == "mrow" {
+				if first_child.children().len() != 3 {
+					return Ok( false );
+				}
+				return is_linear_fraction(canonicalize, &first_child.children())
+			}
+			
+			
+			// the length has been checked
+			assert!(fraction_children.len() >= 3);
+			
+			if !is_int(&first_child) {
+				return Ok( false );
+			}
+			let slash_part = canonicalize.canonicalize_mrows(as_element(fraction_children[1]))?;
+			if name(&slash_part) == "mo" && as_text(slash_part) == "/" {
+				let denom = canonicalize.canonicalize_mrows(as_element(fraction_children[2]))?;
+				return Ok( is_int(&denom) );
+			}
+			return Ok( false );
+		}
 	}
 
 	// implied comma when two numbers are adjacent and are in a script position
@@ -1328,7 +1394,7 @@ impl CanonicalizeContext {
 		let num_children = children.len();
 	
 		for i_child in 0..num_children {
-			// println!("\nDealing with child #{}: {}", i_child, mml_to_string(&as_element(children[i_child])));
+			println!("\nDealing with child #{}: {}", i_child, mml_to_string(&as_element(children[i_child])));
 			let mut current_child = self.canonicalize_mrows(as_element(children[i_child]))?;
 			children[i_child] = ChildOfElement::Element( current_child );
 			let base_of_child = get_possible_embellished_node(current_child);
@@ -1362,7 +1428,7 @@ impl CanonicalizeContext {
 					//    other than times (maybe with a super high priority). Rather than make up a new operator, we stick with times.
 					current_op = if self.is_function_name(previous_child, Some(&children[i_child..])) {
 								OperatorPair{ ch: "\u{2061}", op: &*INVISIBLE_FUNCTION_APPLICATION }
-							} else if self.is_mixed_fraction(&previous_child, &current_child) {
+							} else if self.is_mixed_fraction(&previous_child, &children[i_child..])? {
 								OperatorPair{ ch: "\u{2064}", op: &*IMPLIED_INVISIBLE_PLUS }
 							} else if self.is_implied_comma(&previous_child, &current_child) {
 								OperatorPair{ch: "\u{2063}", op: &*IMPLIED_INVISIBLE_COMMA }				  
@@ -1415,6 +1481,11 @@ impl CanonicalizeContext {
 				} else {
 					// One of infix, postfix, or right fence -- all should have a left operand
 					// pop the stack if it is lower precedence (it forms an mrow)
+					
+					// hack to get linear mixed fractions to parse correctly
+					if current_op.ch == "/" && top(&parse_stack).op_pair.ch == "\u{2064}" {
+							current_op.op = &IMPLIED_PLUS_SLASH_HIGH_PRIORITY;
+					}
 					self.reduce_stack(&mut parse_stack, current_op.op.priority, false);
 					// push new operator on stack (already handled n-ary case)
 					let shift_result = self.shift_stack(&mut parse_stack, current_child, current_op);
@@ -1911,6 +1982,44 @@ mod canonicalize_tests {
 					<mn>3</mn>
 					<mn>4</mn>
 				</mfrac>
+			</mrow>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
+    fn implied_plus_linear() {
+        let test_str = "<math><mrow>
+    <mn>2</mn><mn>3</mn><mo>/</mo><mn>4</mn>
+    </mrow></math>";
+        let target_str = "<math>
+			<mrow>
+				<mn>2</mn>
+				<mo data-changed='added'>&#x2064;</mo>
+				<mrow data-changed='added'>>
+					<mn>3</mn>
+					<mo>/</mo>
+					<mn>4</mn>
+				</mrow>
+			</mrow>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
+    fn implied_plus_linear2() {
+        let test_str = "<math><mrow>
+    <mn>2</mn><mrow><mn>3</mn><mo>/</mo><mn>4</mn></mrow>
+    </mrow></math>";
+        let target_str = "<math>
+			<mrow>
+				<mn>2</mn>
+				<mo data-changed='added'>&#x2064;</mo>
+				<mrow data-changed='added'>>
+					<mn>3</mn>
+					<mo>/</mo>
+					<mn>4</mn>
+				</mrow>
 			</mrow>
 		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));

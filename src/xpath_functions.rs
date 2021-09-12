@@ -17,13 +17,13 @@
 //!    The result will be printed to standard output and the result returned so that `DEBUG` does not affect the computation.    
 #![allow(clippy::needless_return)]
 
-use sxd_document::dom::{Element, ChildOfElement};
+use sxd_document::dom::{Element, ChildOfElement, ParentOfChild};
 use sxd_xpath::{Value, Context, context, function::*, nodeset::*};
 use crate::{definitions::{ DEFINITIONS}};
-extern crate regex;
 use regex::Regex;
 use crate::pretty_print::mml_to_string;
 use std::cell::Ref;
+use crate::canonicalize::{as_element, name};
 
 // useful utility functions
 // note: child of an element is a ChildOfElement, so sometimes it is useful to have parallel functions,
@@ -306,6 +306,7 @@ impl IsNode {
 
 }
 
+const MATHML_LEAF_NODES: &[&str] = &["mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph"];
 impl Function for IsNode {
     // eval function for IsNode
     // errors happen for wrong number/kind of arg
@@ -314,7 +315,6 @@ impl Function for IsNode {
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
-        const MATHML_LEAF_NODES: &[&str] = &["mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph"];
 
         let mut args = Args(args);
         args.exactly(2)?;
@@ -566,6 +566,147 @@ impl Function for ToCommonFraction {
     }
 }
 
+struct Min;
+/**
+ * Returns true the smallest of the two args
+ * @param(num1) 
+ * @param(num2)
+ */
+ impl Function for Min {
+
+    fn evaluate<'c, 'd>(&self,
+                        _context: &context::Evaluation<'c, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(2)?;
+        let num1 = args.pop_number()?;
+        let num2 = args.pop_number()?;
+        return Ok( Value::Number( num1.min(num2) ) );
+    }
+}
+
+struct Max;
+
+impl Function for Max {
+
+    fn evaluate<'c, 'd>(&self,
+                        _context: &context::Evaluation<'c, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(2)?;
+        let num1 = args.pop_number()?;
+        let num2 = args.pop_number()?;
+        return Ok( Value::Number( num1.max(num2) ) );
+    }
+}
+
+
+struct NestingChars;
+const NEMETH_FRAC_LEVEL: &'static str = "nemeth-frac-level";    // name of attr where value is cached
+const FIRST_CHILD_ONLY: &[&str] = &["mroot", "msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts"];
+impl NestingChars {
+    // returns a 'repeat_char' corresponding to the Nemeth rules for nesting
+    // note: this value is likely one char too long because the starting fraction is counted
+    fn nemeth_frac_value<'a>(node: &'a Element, repeat_char: &'a str) -> String {
+        let children = node.children();
+        let name = name(&node);
+        if MATHML_LEAF_NODES.contains(&name) {
+            return "".to_string();
+        } else if name == "mfrac" {
+            // have we already computed the value?
+            if let Some(value) = node.attribute_value(NEMETH_FRAC_LEVEL) {
+                return value.to_string();
+            }
+
+            let num_value = NestingChars::nemeth_frac_value(&as_element(children[0]), repeat_char);
+            let denom_value = NestingChars::nemeth_frac_value(&as_element(children[1]), repeat_char);
+            let mut max_value = if num_value.len() > denom_value.len() {num_value} else {denom_value};
+            max_value += repeat_char;
+            node.set_attribute_value(NEMETH_FRAC_LEVEL, &max_value);
+            return max_value;
+        } else if FIRST_CHILD_ONLY.contains(&name) {
+            // only look at the base -- ignore scripts/index
+            return NestingChars::nemeth_frac_value(&as_element(children[0]), repeat_char);
+        } else {
+            let mut result = "".to_string();
+            for child in children {
+                let value = NestingChars::nemeth_frac_value(&as_element(child), repeat_char);
+                if value.len() > result.len() {
+                    result = value;
+                }
+            }
+            return result;
+        }
+    }
+
+    fn nemeth_root_value<'a>(node: &'a Element, repeat_char: &'a str) -> Result<String, Error> {
+        // returns the correct number of repeat_chars to use
+        // note: because the highest count is toward the leaves and
+        //    because this is a loop and not recursive, caching doesn't work without a lot of overhead
+        let parent = node.parent().unwrap();
+        if let ParentOfChild::Element(e) =  parent {
+            let mut parent = e;
+            let mut result = "".to_string();
+            loop {
+                let name = name(&parent);
+                if name == "math" {
+                    return Ok( result );
+                }
+                if name == "msqrt" || name == "mroot" {
+                    result += repeat_char;
+                }
+                let parent_of_child = parent.parent().unwrap();
+                if let ParentOfChild::Element(e) =  parent_of_child {
+                    parent = e;
+                } else {
+                    return Err( Error::Other("Internal error in nemeth_root_value: didn't find 'math' tag".to_string()) );
+                }
+            }
+        }
+        return Err( Error::Other("Internal error in nemeth_root_value: didn't find 'math' tag".to_string()) );
+    }
+}
+
+impl Function for NestingChars {
+/**
+ * Returns a string with the correct number of nesting chars (could be an empty string)
+ * @param(node) -- current node
+ * @param(char) -- char (string) that should be repeated
+ * Note: as a side effect, an attribute with the value so repeated calls to this or a child will be fast
+ */
+ fn evaluate<'c, 'd>(&self,
+                        _context: &context::Evaluation<'c, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(2)?;
+        let repeat_char = args.pop_string()?;
+        let node = validate_one_node(args.pop_nodeset()?)?;
+        if let Node::Element(el) = node {
+            let name = name(&el);
+            // it is likely a bug to call this one a non mfrac
+            if name == "mfrac" {
+                // because it is called on itself, the fraction is counted one too many times -- chop one off
+                // this is slightly messy because we are chopping off a char, not a byte
+                const BRAILLE_BYTE_LEN: usize = "⠹".len();      // all Unicode braille symbols have the same number of bytes
+                return Ok( Value::String( NestingChars::nemeth_frac_value(&el, &repeat_char)[BRAILLE_BYTE_LEN..].to_string() ) );
+            } else if name == "msqrt" || name == "mroot" {
+                return Ok( Value::String( NestingChars::nemeth_root_value(&el, &repeat_char)? ) );
+            } else {
+                panic!("NestingChars chars should be used only on 'mfrac'. '{}' was passed in", name);
+            }
+        } else {
+            // not an element, so nothing to do
+            return Ok( Value::String("".to_string()) );
+        }
+    }
+}
+
 
 struct IsLargeOp;
 /**
@@ -648,6 +789,7 @@ struct Debug;
 pub struct IsBracketed;
 impl IsBracketed {
     pub fn is_bracketed(element: &Element, left: &str, right: &str, requires_comma: bool) -> bool {
+        use crate::canonicalize::is_fence;
         if !is_tag(&element, "mrow") {
             return false;
         }
@@ -656,6 +798,13 @@ impl IsBracketed {
         if (!left.is_empty() && !right.is_empty() && n_children < 2) ||
            requires_comma && element.children().len() < 3 {
             // not enough argument for there to be a match
+            return false;
+        }
+
+        let first_child = as_element(children[0]);
+        let last_child = as_element(children[children.len()-1]);
+        if (left.is_empty()  && (name(&first_child) != "mo" || !is_fence(first_child))) ||
+           (right.is_empty() && (name(&last_child) != "mo"  || !is_fence(last_child))) {
             return false;
         }
 
@@ -721,6 +870,9 @@ impl IsBracketed {
 /// Add all the functions defined in this module to `context`.
 pub fn add_builtin_functions(context: &mut Context) {
     // FIX: should be a static cache that gets regenerated on update
+    context.set_function("min", Min);       // missing in xpath 1.0
+    context.set_function("max", Max);       // missing in xpath 1.0
+    context.set_function("NestingChars", NestingChars);       // missing in xpath 1.0
     context.set_function("IsNode", IsNode);
     context.set_function("ToOrdinal", ToOrdinal);
     context.set_function("ToCommonFraction", ToCommonFraction);

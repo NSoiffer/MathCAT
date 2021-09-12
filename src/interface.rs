@@ -26,7 +26,7 @@ use crate::prefs::PreferenceManager;
 use crate::navigate::*;
 
 // wrap up some common functionality between the call from 'main' and AT
-fn prepare_mathml_for_speech(package: &Package) {
+fn cleanup_mathml(package: &Package) {
     let mathml = get_element(package);
     trim_element(&mathml);
     let mathml = crate::canonicalize::canonicalize(mathml);
@@ -45,14 +45,31 @@ pub fn speak_mathml(mathml_str: &str) -> String {
         return "Invalid MathML. Unable to speak math.".to_string();
     };
     let package = package.unwrap();
-    prepare_mathml_for_speech(&package);
+    cleanup_mathml(&package);
     let mathml = get_element(&package);
     return crate::speech::speak_mathml(&mathml);
 }
 
+/// Given MathML, a Unicode braille string is return.
+///
+/// If there is an error, the string will give a general message (e.g., "MathML error" if the MathML is bad)
+pub fn braille_mathml(mathml_str: &str) -> String {
+    // this forces initialization
+    crate::speech::BRAILLE_RULES.with(|_| true);
+    let package = parser::parse(mathml_str);
+    if let Err(e) = package {
+        eprintln!("Error in parsing MathML: {}.\nThe MathML is:\n{}", e.to_string(), mathml_str);       // FIX: log 
+        return "Invalid MathML. Unable to braille math.".to_string();
+    };
+    let package = package.unwrap();
+    cleanup_mathml(&package);
+    let mathml = get_element(&package);
+    return crate::speech::braille_mathml(&mathml);
+}
+
 thread_local!{
-/// The current node being navigated (also spoken and brailled) is stored in `MATHML_INSTANCE`.
-pub static MATHML_INSTANCE: RefCell<Package> = init_mathml_instance();
+    /// The current node being navigated (also spoken and brailled) is stored in `MATHML_INSTANCE`.
+    pub static MATHML_INSTANCE: RefCell<Package> = init_mathml_instance();
 }
 
 fn init_mathml_instance() -> RefCell<Package> {
@@ -76,7 +93,7 @@ pub fn SetMathML(_py: Python, mathml_str: String) -> PyResult<()> {
             panic!("MathML input was not valid"); // FIX: improve error
         } 
         let new_package = new_package.unwrap();
-        prepare_mathml_for_speech(&new_package);
+        cleanup_mathml(&new_package);
         old_package.replace(new_package);
         return Ok( () );
     })
@@ -262,7 +279,9 @@ pub fn trim_element(e: &Element) {
         }
     }
 
-    let trimmed_text = single_text.trim();
+    // hack to avoid non-breaking whitespace from being removed -- move to a unique non-whitespace char then back
+    const TEMP_NBSP: &str = "\u{F8FB}";
+    let trimmed_text = single_text.replace(" ", TEMP_NBSP).trim().replace(TEMP_NBSP, " ");
     if !e.children().is_empty() && !trimmed_text.is_empty() {
         // FIX: we have a problem -- what should happen???
         // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash
@@ -270,7 +289,7 @@ pub fn trim_element(e: &Element) {
     }
     if e.children().is_empty() && !single_text.is_empty() {
         // println!("Combining text in {}: '{}' -> '{}'", e.name().local_part(), single_text, trimmed_text);
-        e.set_text(trimmed_text);
+        e.set_text(&trimmed_text);
     }
 }
 
@@ -395,6 +414,13 @@ mod tests {
     fn trim_whitespace() {
         let trimmed_str = "<math><mrow><mo>-</mo><mi>a</mi></mrow></math>";
         let whitespace_str = "<math> <mrow ><mo>-</mo><mi> a </mi></mrow ></math>";
+        assert!(are_parsed_strs_equal(trimmed_str, whitespace_str));
+    }
+
+    #[test]
+    fn no_trim_whitespace_nbsp() {
+        let trimmed_str = "<math><mrow><mo>-</mo><mtext>&#x00A0;a</mtext></mrow></math>";
+        let whitespace_str = "<math> <mrow ><mo>-</mo><mtext> &#x00A0;a </mtext></mrow ></math>";
         assert!(are_parsed_strs_equal(trimmed_str, whitespace_str));
     }
 

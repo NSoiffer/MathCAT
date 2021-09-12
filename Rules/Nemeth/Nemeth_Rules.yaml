@@ -153,11 +153,23 @@
         
                
 # Fraction rules
--
    # The fraction part of a mixed number is always simple
    # They also differ because a two character sequence is needed to bracket the fraction
    # The invisible plus should produce an empty string
 
+   # Mixed numbers can also use linear form. E.g., 3 1/2
+-
+   name: linear-mixed-number
+   tag: mrow
+   match:
+      - "preceding-sibling::*[1][self::m:mo][text()='\u2064'] and" # preceding element is invisible plus
+      - "*[2][self::m:mo][text() = '/']"                          # not really needed because invisible plus added only if true, but checking
+   replace: 
+    - t: "⠸⠹"
+    - x: "*"
+    - t: "⠸⠼"
+
+-
    name: common-fraction-mixed-number
    tag: mfrac
    match:
@@ -374,7 +386,10 @@
    name: default
    tag: math
    match: "."
-   variables: [NewScriptContext: "''"]    # empty string -- it needs to be set
+   variables:
+      - NewScriptContext: "''"    # empty string -- it needs to be set
+      - NewUnderContext:  "''"    # empty string -- it needs to be set
+      - NewOverContext:   "''"    # empty string -- it needs to be set
    replace: [x: "*"]
 -
    name: default
@@ -392,7 +407,20 @@
    name: default
    tag: mn
    match: "."
-   replace: [x: text()]
+   replace: 
+      - test:
+         # roman numerals are not "digits" -- no indicator
+         # Rule 11a: no numeric indicator at start of item (following a comma) in a 'list'
+         # because of canonicalization, we will have 'open' item ',' item ... 'close'
+         # IsBracketed() test is wrong for 10.ii (must not contain a word, abbrev, ordinal or plural ending)
+         # FIX: need to write special code -- leading term could be buried: '3+x' or '3a+x' or ...
+         if:
+            - "not( @data-roman-numeral or "
+            - "(name(..)='mrow' and ( IsBracketed(.., '', '', true()) or "
+            - "    (name(../..)='mrow' and ( IsBracketed(../.., '', '', true()) or "
+            - "    (name(../../..)='mrow' and ( IsBracketed(../../.., '', '', true()) )) )) )) ) "
+         then: [t: "N"]       # temp numeric indicator -- can't be confused with other uses of "⠼" (replaced later)
+      - x: text()
 -
    # Rule 138 a.2 -- space after a function name
    # most functions will have an invisible apply that adds the space, but "mod" is infix, so different
@@ -500,36 +528,69 @@
    name: default
    tag: munder
    match: "."
+   variables:
+    - NotNested: "$NewUnderContext='' and $NewOverContext=''"
+    - OldUnderContext: "$NewUnderContext"
+    - NewUnderContext: "concat($NewUnderContext, '⠩')"
    replace: 
-    - t: modified
+    - test:
+         if: "$NotNested"
+         then: [t: "⠐"]
     - x: "*[1]"
-    - t: with
+    - x: "$NewUnderContext"
     - x: "*[2]"
-    - t: below
-    
+    - test:
+         if: "$NotNested"
+         then: [t: "⠻"]
+
+-
+   name: contracted-form #rule 86.b
+   tag: mover
+   match: "*[1][count(text())=1] and *[2][text()='¯']"
+   replace: 
+    - x: "*"
+
 -
    name: default
    tag: mover
    match: "."
+   variables:
+    - NotNested: "$NewUnderContext='' and $NewOverContext=''"
+    - OldOverContext: "$NewOverContext"
+    - NewOverContext: "concat($NewOverContext, '⠣')"
    replace: 
-    - t: modified
+    - test:
+         if: "$NotNested"
+         then: [t: "⠐"]
     - x: "*[1]"
-    - t: with
+    - x: "$NewOverContext"
     - x: "*[2]"
-    - t: above
+    - test:
+         if: "$NotNested"
+         then: [t: "⠻"]
     
 -
    name: default
    tag: munderover
    match: "."
+   variables:
+    - NotNested: "$NewUnderContext='' and $NewOverContext=''"
+    - OldUnderContext: "$NewUnderContext"
+    - NewUnderContext: "concat($NewUnderContext, '⠩')"
+    - OldOverContext: "$NewOverContext"
+    - NewOverContext: "concat($NewOverContext, '⠣')"
    replace: 
-    - t: modified
+    - test:
+         if: "$NotNested"
+         then: [t: "⠐"]
     - x: "*[1]"
-    - t: with
+    - x: "$NewUnderContext"
     - x: "*[2]"
-    - t: below and
+    - x: "$NewOverContext"
     - x: "*[3]"
-    - t: above
+    - test:
+         if: "$NotNested"
+         then: [t: "⠻"]
 
 # -
 #    name: default

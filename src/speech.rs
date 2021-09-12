@@ -14,12 +14,15 @@ use sxd_document::dom::Element;
 use sxd_xpath::{Context, Factory, Value, XPath, nodeset};
 use sxd_xpath::nodeset::Node;
 use std::fmt;
+use std::borrow::{Cow};
 use crate::{errors::*, pretty_print};
 use crate::prefs::*;
 use yaml_rust::{YamlLoader, Yaml, yaml::Hash};
 use crate::tts::*;
 use crate::pretty_print::yaml_to_string;
 use std::path::Path;
+use regex::{Regex};
+
 
 /// The main external call, `speak_mathml` returns a string for the speech associated with the `mathml`.
 ///   It matches against the rules that are computed by user prefs such as "Language" and "SpeechStyle".
@@ -34,7 +37,7 @@ use std::path::Path;
 pub fn speak_mathml(mathml: &Element) -> String {
     SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
-        rules.update();
+        rules.update(true);
         CONTEXT_STACK.with(|cs| {
             let mut cs = cs.borrow_mut();
             cs.init(&rules.pref_manager)
@@ -46,13 +49,135 @@ pub fn speak_mathml(mathml: &Element) -> String {
                                 &speech_string.replace(CONCAT_STRING, "")
                                                   .replace(CONCAT_INDICATOR, "")                            
                                           )
-                            .trim()); },
+                            .trim());
+            },
             Err(e)             => { 
                 print_errors(&e.chain_err(|| "Pattern match/replacement failure!"));
                 return String::from("Error in speaking math; see error log.")
             }
         }
     })
+}
+
+pub fn braille_mathml(mathml: &Element) -> String {
+    BRAILLE_RULES.with(|rules| {
+        let mut rules = rules.borrow_mut();
+        rules.update(false);
+        CONTEXT_STACK.with(|cs| {
+            let mut cs = cs.borrow_mut();
+            cs.init(&rules.pref_manager)
+        });
+        match rules.match_pattern(mathml) {
+            // FIX: need to set name of speech rules so test Nemeth/UEB clean for
+            Ok(speech_string) => {
+                return nemeth_cleanup(speech_string.replace(" ", ""));
+            },
+            Err(e)             => { 
+                print_errors(&e.chain_err(|| "Pattern match/replacement failure!"));
+                return String::from("Error in speaking math; see error log.")
+            }
+        }
+    })
+}
+
+fn nemeth_cleanup(raw_nemeth: String) -> String {
+    lazy_static! {
+        // 
+        // Pattern for rule II.9a (add numeric indicator at start of line or after a space) and 9a (add after typeface)
+        // 1. start of line
+        // 2. optional minus sign (⠤)
+        // 3. optional typeface indicator (list comes from SRE)
+        //      bold: "⠸",
+        //      bold-fraktur: "⠸⠀⠸",
+        //      bold-italic: "⠸⠨",
+        //      bold-script: "⠸⠈",
+        //      caligraphic: "⠈",
+        //      caligraphic-bold: "⠈⠸",
+        //      double-struck: "⠈",
+        //      double-struck-italic: "⠸⠨",
+        //      fraktur: "⠸" 
+        //      fullwidth: "",
+        //      italic: "⠨",
+        //      monospace: "",  -- nothing
+        //      normal: "",     -- nothing
+        //      oldstyle: "",   -- nothing
+        //      oldstyle-bold: "⠸",
+        //      script: "⠈",
+        //      sans-serif: "⠠⠨",
+        //      sans-serif-italic: "⠠⠨⠨",
+        //      sans-serif-bold: "⠠⠨⠸",
+        //      sans-serif-bold-italic: "⠠⠨⠸⠨",
+        //    pattern is f(⠸|⠸⠀⠸|⠸⠨|⠸⠈|⠈|⠈⠸|⠈|⠸⠨|⠸|⠨|⠸|⠈|⠠⠨|⠠⠨⠨|⠠⠨⠸|⠠⠨⠸⠨)
+        //      ⠨⠒ could be either .3 or italic 3 -- adding 'f' to font changes makes it be .3
+        // 4. optional decimal point (⠨)
+        // 5. (unicode) digit ([⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔])
+        // Note: '(?:...)' is non-capturing grouping.
+        static ref NUM_IND_9A: Regex = 
+            Regex::new(r"(?P<start>^|⠀)(?P<minus>⠤?)(?P<face>(?:f(?:⠸|⠸⠀⠸|⠸⠨|⠸⠈|⠈|⠈⠸|⠈|⠸⠨|⠸|⠨|⠸|⠈|⠠⠨|⠠⠨⠨|⠠⠨⠸|⠠⠨⠸⠨))?)N").unwrap();  
+
+        // FIX  add rule II.9d chars and 9e type-forms
+        // Punctuation chars (Rule 38.6 says don't use before ",", "hyphen", "-", "…")
+        //      "'": "⠸⠄"
+        //      ":": "⠸⠒"
+        //      "!": "⠸⠖"
+        //      "?": "⠸⠦"
+        //      "‘": "⠸⠠⠦"      
+        //      "’": "⠸⠴⠠"     
+        //      "“": "⠸⠦"    
+        //      "”": "⠸⠴"      
+        //      ";": "⠸⠆"
+        //      ".": "⠸⠲"
+        // Never use punctuation indicator before these (38-6)
+        //      "…": "⠀⠄⠄⠄"
+        //      "-": "⠸⠤" (hyphen and dash)
+        //      ",": "⠠⠀"     -- spacing already add
+        // Rule II.9b (add numeric indicator after punctuation [optional minus[optional .][digit]
+        //  because this is run after the above rule, some cases are already caught, so don't
+        //  match if there is already a numeric indicator
+        static ref NUM_IND_AFTER_PUNCT: Regex =
+            Regex::new(r"(?P<punct>(⠸⠄|⠸⠒|⠸⠖|⠸⠠⠦|⠸⠴⠠|⠸⠦|⠸⠴|⠸⠆|⠸⠲|⠀⠄⠄⠄|⠸⠤))(?P<minus>⠤?)N").unwrap();  
+
+        // Except for the four chars above, the unicode rules always include a punctuation indicator.
+        // The cases to remove them (that seem relevant to MathML) are:
+        //   Beginning of line or after a space (V 38.1)
+        //   After a word (38.4)
+        //   2nd or subsequent punctuation (includes, "-", etc) (38.7)
+        static ref REMOVE_PUNCT_IND: Regex =
+            Regex::new(r"(^|⠀|\w|⠸⠄|⠸⠒|⠸⠖|⠸⠠⠦|⠸⠴⠠|⠸⠦|⠸⠴|⠸⠆|⠸⠲|⠀⠄⠄⠄|⠤)⠸(⠄|⠒|⠖|⠠⠦|⠴⠠|⠦|⠴|⠆|⠲|⠀⠄⠄⠄|⠤)").unwrap();  
+
+        static ref LEVEL_IND_BEFORE_SPACE: Regex = Regex::new(r"(?:[⠘⠰]+|⠐)(⠀)").unwrap();
+
+        static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
+    }
+
+    println!("Before:  \"{}\"", raw_nemeth);
+    // Note: "⠼" is numeric indicator
+    let result = NUM_IND_9A.replace_all(&raw_nemeth, "$start$minus${face}n");
+    println!("IND_9A:  \"{}\"", result);
+
+    // 9b: insert after punctuation (optional minus sign)
+    // common punctuation adds a space, so 9a handled it. Here we deal with other "punctuation" 
+    // FIX other punctuation and reference symbols (9d)
+    let result = NUM_IND_AFTER_PUNCT.replace_all(result.as_ref(), "$punct${minus}n");
+    println!("A PUNCT: \"{}\"", result.as_ref());
+
+    // FIX: consolidate into a regexp set replace for speed
+    let result = result.as_ref().replace("n", "⠼");  // replace temp with real numeric indicator
+    let result = result.replace("N", "");  // delete remaining temps
+
+    let result = REMOVE_PUNCT_IND.replace_all(&result, "$1$2");
+
+    // strip level indicators before a space
+    let result = do_replace_all(result.as_ref(), &LEVEL_IND_BEFORE_SPACE, "");
+
+    let result = COLLAPSE_SPACES.replace_all(result.as_ref(), "⠀");
+
+    return result.to_string();
+
+    fn do_replace_all<'a>(old: &'a str, regex: &Regex, replace: &str) -> Cow<'a, str> {
+        let replace = replace.to_string() + "$1";
+        return regex.replace_all(old, replace.as_str());    
+    }
 }
 
 
@@ -740,7 +865,7 @@ struct SpeechPattern {
     tag_name: String,
     file_name: String,
     pattern: MyXPath,                     // the xpath expr to attempt to match
-    var_defs: VariableDefinitions,    // any variable definitions [can be and probably is an empty vector most of the time]
+    var_defs: VariableDefinitions,        // any variable definitions [can be and probably is an empty vector most of the time]
     replacements: ReplacementArray,       // the replacements in case there is a match
 }
 
@@ -1264,7 +1389,7 @@ impl UnicodeDef {
             let mut ch_iter = ch.chars();
             let unicode_ch = ch_iter.next();
             if unicode_ch.is_none() || ch_iter.next().is_some() {
-                bail!("Wanted unicode char, found string {}", ch);
+                bail!("Wanted unicode char, found string '{}')", ch);
             };
             return Ok( unicode_ch.unwrap() as u32 );
         }
@@ -1314,6 +1439,7 @@ pub struct SpeechRules{
     name: String,
     pub pref_manager: Box<PreferenceManager>,
     rules: RuleTable,           // the speech rules used (partitioned into MathML tags in hashmap, then linearly searched)
+    translate_single_chars_only: bool,  // strings like "half" don't want 'a's translated, but braille does
     unicode: UnicodeTable,      // the speech rules used for Unicode characters
 }
 
@@ -1333,14 +1459,17 @@ thread_local!{
     /// The current set of speech rules
     // maybe this should be a small cache of rules in case people switch rules/prefs?
     pub static SPEECH_RULES: RefCell<SpeechRules> =
-            RefCell::new( SpeechRules::new("initial") );
+            RefCell::new( SpeechRules::new("speech", true) );
+
+    pub static BRAILLE_RULES: RefCell<SpeechRules> =
+            RefCell::new( SpeechRules::new("braille", false) );
 
     static CONTEXT_STACK: RefCell<ContextStack<'static>> = RefCell::new( ContextStack{ new_defs: vec![], contexts: vec![] } );
 }
 
 use crate::prefs::FilesChanged;
 impl SpeechRules {
-    fn new(name: &str) -> SpeechRules {
+    fn new(name: &str, translate_single_chars_only: bool) -> SpeechRules {
         let pref_manager = PreferenceManager::new();
         if let Err(e) = crate::definitions::read_definitions_file(pref_manager.get_definitions_file()) {
             print_errors(&e);
@@ -1351,6 +1480,7 @@ impl SpeechRules {
             name: String::from(name),
             rules: HashMap::with_capacity(31),           // lazy load them
             unicode: HashMap::with_capacity(6997),       // lazy load them
+            translate_single_chars_only,
             pref_manager,
         };
         return rules;
@@ -1371,14 +1501,21 @@ impl SpeechRules {
         // };
     }
 
-    fn update(&mut self) {
+    fn update(&mut self, speech_files: bool) {
         if self.rules.is_empty() || !self.pref_manager.is_up_to_date() {
-            let style_file = self.pref_manager.get_style_file().clone();
-            self.read_patterns(&style_file);
+            let rule_file = 
+                if speech_files
+                    {self.pref_manager.get_style_file()}
+                else {self.pref_manager.get_braille_file()}
+                .clone();
+            self.read_patterns(&rule_file);
         }
 
         if self.unicode.is_empty() {
-            let unicode_file = self.pref_manager.get_unicode_file().clone();
+            let unicode_file = if speech_files
+                     {self.pref_manager.get_speech_unicode_file()}
+                else {self.pref_manager.get_braille_unicode_file()}
+                .clone();
             self.read_unicode(&unicode_file);
         }
     }
@@ -1523,7 +1660,7 @@ impl SpeechRules {
     fn replace(&self, replacement: &Replacement, mathml: &Element) -> Result<String> {
         return Ok(
             match &*replacement {
-                Replacement::Text(t) => t.trim().to_string(),
+                Replacement::Text(t) => t.clone(),
                 Replacement::XPath(path) => path.replace(&self, mathml)?,
                 Replacement::TTS(tts) => {
                     self.pref_manager.get_tts().replace(&tts, &self.pref_manager, self, mathml)?
@@ -1558,26 +1695,41 @@ impl SpeechRules {
         // This is only done for a single char; longer strings are untouched.
         // Note: TTS is not supported here (not needed and a little less efficient)
         let mut chars = str.chars();
-        let ch_as_u32 = chars.next().unwrap_or(' ') as u32;
-        if chars.next().is_some() {
-            // more than one char (don't use str.len() since that is bytes, not chars)
-            return Ok(String::from(str));
-        };
-        let replacements = self.unicode.get( &ch_as_u32 );
-        if replacements.is_none() {
-            return Ok(String::from(str));   // no replacement, so just return the char and hope for the best
+        if self.translate_single_chars_only {
+            let ch = chars.next().unwrap_or(' ');
+            if chars.next().is_none() {
+                // single char
+                return replace_single_char(&self, ch, mathml)
+            } else {
+                // more than one char (don't use str.len() since that is bytes, not chars)
+                return Ok(String::from(str));
+            }
         };
 
-        // map across all the parts of the replacement, collect them up into a Vec, and then concat them together
-        return Ok(
-            replacements.unwrap()
-                           .iter()
-                           .map(|replacement|
-                                self.replace(replacement, mathml)
-                                    .chain_err(|| format!("Unicode replacement error: {}", replacement)) )
-                           .collect::<Result<Vec<String>>>()?
-                           .join(" ")
-        );
+        let result = chars
+            .map(|ch| replace_single_char(&self, ch, mathml))
+            .collect::<Result<Vec<String>>>()?
+            .join("");
+        return Ok( result );
+
+        fn replace_single_char(rules: &SpeechRules, ch: char, mathml: & Element) -> Result<String> {
+            let ch_as_u32 = ch as u32;
+            let replacements = rules.unicode.get( &ch_as_u32 );
+            if replacements.is_none() {
+                return Ok(String::from(ch));   // no replacement, so just return the char and hope for the best
+            };
+
+            // map across all the parts of the replacement, collect them up into a Vec, and then concat them together
+            return Ok(
+                replacements.unwrap()
+                            .iter()
+                            .map(|replacement|
+                                    rules.replace(replacement, mathml)
+                                        .chain_err(|| format!("Unicode replacement error: {}", replacement)) )
+                            .collect::<Result<Vec<String>>>()?
+                            .join(" ")
+            );
+        }
     }
 }
 
@@ -1592,7 +1744,7 @@ mod tests {
         {name: default, tag: math, match: ".", replace: [x: "./*"] }"#;
         let doc = YamlLoader::load_from_str(str).unwrap();
         assert_eq!(doc.len(), 1);
-        let mut rules = SpeechRules::new("testing");
+        let mut rules = SpeechRules::new("testing", true);
 
         SpeechPattern::build(&doc[0], Path::new("testing"), &mut rules).unwrap();
         assert_eq!(rules.rules["math"].len(), 1, "\nshould only be one rule");
@@ -1611,7 +1763,7 @@ mod tests {
         {name: default, tag: math, match: ".", replace: [x: "./*"] }"#;
         let doc = YamlLoader::load_from_str(str).unwrap();
         assert_eq!(doc.len(), 1);
-        let mut rules = SpeechRules::new("testing");
+        let mut rules = SpeechRules::new("testing", true);
         SpeechPattern::build(&doc[0], Path::new("testing"), &mut rules).unwrap();
 
         let str = r#"---
@@ -1634,7 +1786,7 @@ mod tests {
         {name: default, tag: math, match: ".", replace: [x: "./*"] }"#;
         let doc = YamlLoader::load_from_str(str).unwrap();
         assert_eq!(doc.len(), 1);
-        let mut rules = SpeechRules::new("testing");
+        let mut rules = SpeechRules::new("testing", true);
         SpeechPattern::build(&doc[0], Path::new("testing"), &mut rules).unwrap();
 
         let str = r#"---
