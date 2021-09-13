@@ -243,7 +243,7 @@ impl<'a, 'op:'a> StackInfo<'a, 'op> {
 
 	fn add_child_to_mrow(&mut self, child: Element<'a>, child_op: OperatorPair<'op>) {
 		// println!("  adding '{}' to mrow[{}], operator '{}/{}'",
-		// 			element_summary(child), self.mrow.children().len(), show_invisible_op_char(child_op), child_op.priority);
+		// 			element_summary(child), self.mrow.children().len(), show_invisible_op_char(child_op.ch), child_op.op.priority);
 		self.mrow.append_child(child);
 		if ptr_eq(child_op.op, *ILLEGAL_OPERATOR_INFO) {
 			assert!(!self.is_operand); 	// should not have two operands in a row
@@ -1248,6 +1248,7 @@ impl CanonicalizeContext {
 				// "bad" syntax - no operand on left -- don't grab operand (there is none)
 				//   just start a new mrow beginning with operator
 				// FIX -- check this shouldn't happen:  parse_stack.push(top_of_stack);
+				parse_stack.push( top_of_stack );		// put top back on
 				parse_stack.push( StackInfo::new(current_child.document()) );
 			} else if current_op.op.is_right_fence() {
 				// likely, but not necessarily, there is a left fence to start the mrow
@@ -1394,7 +1395,7 @@ impl CanonicalizeContext {
 		let num_children = children.len();
 	
 		for i_child in 0..num_children {
-			println!("\nDealing with child #{}: {}", i_child, mml_to_string(&as_element(children[i_child])));
+			// println!("\nDealing with child #{}: {}", i_child, mml_to_string(&as_element(children[i_child])));
 			let mut current_child = self.canonicalize_mrows(as_element(children[i_child]))?;
 			children[i_child] = ChildOfElement::Element( current_child );
 			let base_of_child = get_possible_embellished_node(current_child);
