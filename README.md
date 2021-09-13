@@ -11,7 +11,7 @@ Todo: incorporation of third party libraries to support a common subset of TeX m
 MathCAT is written in Rust and can be built to interface with C/C++. It can also be built with a Python interface. The Python interface is used by NVDA and by Orca. 
 
 ## Current Status
-MathCAT is under active development and I expect that by the end of September, it will be usable as a MathPlayer replacement for those using the English version. It will not be as complete or polished in some was as MathPlayer though.
+MathCAT is under active development and I expect that by the end of September, it will be usable as a MathPlayer replacement for those using the English version. It will not be as complete or polished in some ways as MathPlayer though.
 
 By the end of the year, I expect MathCAT to be ready for all English users and hope to have a good start on some of the translations. Initial translations will be based on programmatic translations from MathPlayer's (public) files and are likely to be very buggy until volunteers step forward to fix them.
 
@@ -147,7 +147,6 @@ The dictionary in the more verbose form looks like:
 ```
 
 Here is a more real life example from the Unicode definitions showing various alternatives.
-Pay attention to the indentation: all entries that are indented to the right of the line above are subentries in that array/dictionary.
 Pay attention to the indentation: all entries that are indented to the right of the line above are subentries in that array/dictionary.
 ```
 # Two options for defining a simple replacement for the symbol '∞'.
@@ -286,6 +285,7 @@ This is what should be used when setting its value via the API and when accessin
 
 
 ## XPath
+Many parts of a speech rule make use of xpath. This is a popular and well documented method for selecting parts on an XML document. A web search will turn up many tutorials. Those not familiar with xpath are encouraged to read some. The implementation of xpath used by MathCAT is a slightly extended version of XPATH 1.0.
 Many parts of a speech rule make use of xpath. This is a popular and well documented method for selecting parts on an XML document. A web search will turn up many tutorials. Those not familiar with xpath are encouraged to read some. The implementation of xpath used by MathCAT is a slightly extended version of XPATH 1.0.
 
 MathCAT usage tends to use only a few features of xpath. It also makes use of some custom functions. Here is a short explanation of common xpath usage:
