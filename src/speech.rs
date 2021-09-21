@@ -21,7 +21,8 @@ use yaml_rust::{YamlLoader, Yaml, yaml::Hash};
 use crate::tts::*;
 use crate::pretty_print::yaml_to_string;
 use std::path::Path;
-use regex::{Regex};
+use regex::{Regex, Captures};
+use phf::phf_map;
 
 
 /// The main external call, `speak_mathml` returns a string for the speech associated with the `mathml`.
@@ -81,52 +82,67 @@ pub fn braille_mathml(mathml: &Element) -> String {
 }
 
 fn nemeth_cleanup(raw_nemeth: String) -> String {
+    // Typeface: S: sans-serif, B: bold, T: script/blackboard, I: italic, R: Roman
+    // Language: E: English, D: German, G: Greek, V: Greek variants, H: Hebrew, U: Russian
+    // Indicators: N: number, P: punctuation, M: multipurpose
+    // SRE doesn't have H: Hebrew or U: Russian, so not encoded (yet)
+    // Note: some "positive" patterns find cases to keep the char and transform them to the lower case version
+    static INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
+        "S" => "⠈⠰",
+        "B" => "⠸",
+        "T" => "⠈",
+        "I" => "⠨",
+        "R" => "",
+        "E" => "⠰",
+        "D" => "⠸",
+        "G" => "⠨",
+        "V" => "⠨⠈",
+        "H" => "⠠⠠",
+        "U" => "⠈⠈",
+        "P" => "⠸",
+        "M" => "",
+        "m" => "⠐",
+        "N" => "",
+        "n" => "⠼"
+    };
+
     lazy_static! {
-        // 
+        // Trim braille spaces before and after braille indicators
+        // FIX: these lists are not complete
+        static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex = 
+            Regex::new(r"(⠄⠄⠄)|(⠤⠤⠤)⠀+([⠼⠸⠌⠪])").unwrap();
+        // In order: fraction, /, cancellation, capitalization, baseline
+        static ref REMOVE_SPACE_AFTER_BRAILLE_INDICATORS: Regex = 
+            Regex::new(r"([⠹⠌⠻⠠⠐])⠀+⠄⠄⠄").unwrap();
+
+        // Multipurpose indicator insertion
+        // 177.2 -- add after a letter and before a digit (or decimal pt) -- these will start with N
+        static ref MULTI_177_2: Regex = 
+            Regex::new(r"([⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵])N").unwrap();
+
+        // keep between numeric subscript and digit ('M' added by subscript rule)
+        static ref MULTI_177_3: Regex = 
+            Regex::new(r"(N.)M(N.)").unwrap(); 
+
+        // add after decimal pt for non-digits except for comma and punctuation
+        static ref MULTI_177_5: Regex = 
+            Regex::new(r"N⠨([^N⠠P])").unwrap(); 
+
+
         // Pattern for rule II.9a (add numeric indicator at start of line or after a space) and 9a (add after typeface)
         // 1. start of line
         // 2. optional minus sign (⠤)
-        // 3. optional typeface indicator (list comes from SRE)
-        //      bold: "⠸",
-        //      bold-fraktur: "⠸⠀⠸",
-        //      bold-italic: "⠸⠨",
-        //      bold-script: "⠸⠈",
-        //      caligraphic: "⠈",
-        //      caligraphic-bold: "⠈⠸",
-        //      double-struck: "⠈",
-        //      double-struck-italic: "⠸⠨",
-        //      fraktur: "⠸" 
-        //      fullwidth: "",
-        //      italic: "⠨",
-        //      monospace: "",  -- nothing
-        //      normal: "",     -- nothing
-        //      oldstyle: "",   -- nothing
-        //      oldstyle-bold: "⠸",
-        //      script: "⠈",
-        //      sans-serif: "⠠⠨",
-        //      sans-serif-italic: "⠠⠨⠨",
-        //      sans-serif-bold: "⠠⠨⠸",
-        //      sans-serif-bold-italic: "⠠⠨⠸⠨",
-        //    pattern is f(⠸|⠸⠀⠸|⠸⠨|⠸⠈|⠈|⠈⠸|⠈|⠸⠨|⠸|⠨|⠸|⠈|⠠⠨|⠠⠨⠨|⠠⠨⠸|⠠⠨⠸⠨)
-        //      ⠨⠒ could be either .3 or italic 3 -- adding 'f' to font changes makes it be .3
-        // 4. optional decimal point (⠨)
-        // 5. (unicode) digit ([⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔])
-        // Note: '(?:...)' is non-capturing grouping.
+        // 3. optional typeface indicator
+        // 4. number (N)
         static ref NUM_IND_9A: Regex = 
-            Regex::new(r"(?P<start>^|⠀)(?P<minus>⠤?)(?P<face>(?:f(?:⠸|⠸⠀⠸|⠸⠨|⠸⠈|⠈|⠈⠸|⠈|⠸⠨|⠸|⠨|⠸|⠈|⠠⠨|⠠⠨⠨|⠠⠨⠸|⠠⠨⠸⠨))?)N").unwrap();  
+            Regex::new(r"(?P<start>^|⠀)(?P<minus>⠤?)(?P<face>[SBTIR]*?)N").unwrap();  
 
-        // FIX  add rule II.9d chars and 9e type-forms
+        // FIX  add rule 9d after section mark, etc
+
+        // Needed after a typeface change
+        static ref NUM_IND_9E: Regex = Regex::new(r"(?P<face>[SBTIR]+?)N").unwrap();  
+
         // Punctuation chars (Rule 38.6 says don't use before ",", "hyphen", "-", "…")
-        //      "'": "⠸⠄"
-        //      ":": "⠸⠒"
-        //      "!": "⠸⠖"
-        //      "?": "⠸⠦"
-        //      "‘": "⠸⠠⠦"      
-        //      "’": "⠸⠴⠠"     
-        //      "“": "⠸⠦"    
-        //      "”": "⠸⠴"      
-        //      ";": "⠸⠆"
-        //      ".": "⠸⠲"
         // Never use punctuation indicator before these (38-6)
         //      "…": "⠀⠄⠄⠄"
         //      "-": "⠸⠤" (hyphen and dash)
@@ -135,7 +151,7 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         //  because this is run after the above rule, some cases are already caught, so don't
         //  match if there is already a numeric indicator
         static ref NUM_IND_AFTER_PUNCT: Regex =
-            Regex::new(r"(?P<punct>(⠸⠄|⠸⠒|⠸⠖|⠸⠠⠦|⠸⠴⠠|⠸⠦|⠸⠴|⠸⠆|⠸⠲|⠀⠄⠄⠄|⠸⠤))(?P<minus>⠤?)N").unwrap();  
+            Regex::new(r"(?P<punct>P.)(?P<minus>⠤?)N").unwrap();  
 
         // Except for the four chars above, the unicode rules always include a punctuation indicator.
         // The cases to remove them (that seem relevant to MathML) are:
@@ -143,34 +159,62 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         //   After a word (38.4)
         //   2nd or subsequent punctuation (includes, "-", etc) (38.7)
         static ref REMOVE_PUNCT_IND: Regex =
-            Regex::new(r"(^|⠀|\w|⠸⠄|⠸⠒|⠸⠖|⠸⠠⠦|⠸⠴⠠|⠸⠦|⠸⠴|⠸⠆|⠸⠲|⠀⠄⠄⠄|⠤)⠸(⠄|⠒|⠖|⠠⠦|⠴⠠|⠦|⠴|⠆|⠲|⠀⠄⠄⠄|⠤)").unwrap();  
+            Regex::new(r"(^|⠀|\w)P(.)").unwrap();  
 
-        static ref LEVEL_IND_BEFORE_SPACE: Regex = Regex::new(r"(?:[⠘⠰]+|⠐)(⠀)").unwrap();
+        // To greatly simplify typeface/language generation, the chars have unique ASCII chars for them:
+        // Typeface: S: sans-serif, B: bold, T: script/blackboard, I: italic, R: Roman
+        // Language: E: English, D: German, G: Greek, V: Greek variants, H: Hebrew, U: Russian
+        // Indicators: N: number, P: punctuation, M: multipurpose
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SBTIREDGVHPMmNn])").unwrap();  
+            
+        static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[⠘⠰]+⠐)").unwrap();
+        static ref REMOVE_LEVEL_IND_BEFORE_SPACE: Regex = Regex::new(r"(?:[⠘⠰]+⠐?|⠐)(⠀|$)").unwrap();
 
         static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
 
     println!("Before:  \"{}\"", raw_nemeth);
-    // Note: "⠼" is numeric indicator
-    let result = NUM_IND_9A.replace_all(&raw_nemeth, "$start$minus${face}n");
+    // Remove unicode blanks at start and end
+    let result = raw_nemeth.trim_start_matches('⠀').trim_end_matches('⠀');
+
+    // Remove blanks before and after braille indicators
+    let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(result, "$1$2$3");
+    let result = REMOVE_SPACE_AFTER_BRAILLE_INDICATORS.replace_all(&result, "$1⠄⠄⠄");
+    println!("spaces:  \"{}\"", result);
+
+    // Multipurpose indicator
+    let result = MULTI_177_2.replace_all(&result, "${1}mN");
+    let result = MULTI_177_3.replace_all(&result, "${1}m$2");
+    let result = MULTI_177_5.replace_all(&result, "N⠨m$1");
+    println!("MULTI:   \"{}\"", result);
+
+    let result = NUM_IND_9A.replace_all(&result, "$start$minus${face}n");
     println!("IND_9A:  \"{}\"", result);
+
+    let result = NUM_IND_9E.replace_all(&result, "${face}n");
+    println!("IND_9E:  \"{}\"", result);
 
     // 9b: insert after punctuation (optional minus sign)
     // common punctuation adds a space, so 9a handled it. Here we deal with other "punctuation" 
     // FIX other punctuation and reference symbols (9d)
-    let result = NUM_IND_AFTER_PUNCT.replace_all(result.as_ref(), "$punct${minus}n");
-    println!("A PUNCT: \"{}\"", result.as_ref());
-
-    // FIX: consolidate into a regexp set replace for speed
-    let result = result.as_ref().replace("n", "⠼");  // replace temp with real numeric indicator
-    let result = result.replace("N", "");  // delete remaining temps
+    let result = NUM_IND_AFTER_PUNCT.replace_all(&result, "$punct${minus}n");
+    println!("A PUNCT: \"{}\"", &result);
 
     let result = REMOVE_PUNCT_IND.replace_all(&result, "$1$2");
+    println!("Punct38: \"{}\"", &result);
+
+    let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
+        match INDICATOR_REPLACEMENTS.get(&cap[0]) {
+            None => panic!("REPLACE_INDICATORS and INDICATOR_REPLACEMENTS are not in sync"),
+            Some(&ch) => ch,
+        }
+    });
 
     // strip level indicators before a space
-    let result = do_replace_all(result.as_ref(), &LEVEL_IND_BEFORE_SPACE, "");
+    let result = do_replace_all(&result, &REMOVE_LEVEL_IND_BEFORE_SPACE, "$1");
+    let result = do_replace_all(&result, &REMOVE_LEVEL_IND_BEFORE_BASELINE, "⠐");
 
-    let result = COLLAPSE_SPACES.replace_all(result.as_ref(), "⠀");
+    let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
 
     return result.to_string();
 
@@ -785,7 +829,8 @@ impl MyXPath {
                 }
                 return rules.replace_nodes(nodes, mathml);
             },
-            Value::String(t) => { return rules.replace_chars(&t, mathml); },
+            // Value::String(t) => { return rules.replace_chars(&t, mathml); },
+            Value::String(t) => { answer = t; },
             Value::Number(num) => { answer = num.to_string(); },
             Value::Boolean(b) => { answer = b.to_string(); },          // FIX: is this right???
         }
@@ -1171,7 +1216,7 @@ impl Test {
         return match self.condition.as_ref() {
             None => Ok( false ),     // trivially false -- want to do else part
             Some(condition) => condition.is_true(mathml)
-                                .chain_err(||"Failure in conditional test"),
+                                .chain_err(|| "Failure in conditional test"),
         }
     }
 }
@@ -1690,9 +1735,8 @@ impl SpeechRules {
         return Ok( result );
     }
 
-    fn replace_chars(&self, str: &str, mathml: & Element) -> Result<String> {
+    pub fn replace_chars(&self, str: &str, mathml: & Element) -> Result<String> {
         // Lookup unicode "pronunciation" of char
-        // This is only done for a single char; longer strings are untouched.
         // Note: TTS is not supported here (not needed and a little less efficient)
         let mut chars = str.chars();
         if self.translate_single_chars_only {

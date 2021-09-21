@@ -4,7 +4,7 @@ mod common;
 
 mod braille {
     mod Nemeth {
-        mod tags;
+        mod rules;
         mod SRE_Nemeth72;
         mod SRE_NemethBase;
         mod AataNemeth;

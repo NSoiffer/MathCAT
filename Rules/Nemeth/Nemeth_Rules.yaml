@@ -391,6 +391,33 @@
       - NewUnderContext:  "''"    # empty string -- it needs to be set
       - NewOverContext:   "''"    # empty string -- it needs to be set
    replace: [x: "*"]
+
+-
+   name: binomial-frac
+   tag: mrow
+   match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][@linethickness=0]"
+   replace: 
+   - x: "*[1]"
+   - x: "*[2]/*[1]"
+   - t: "⠩"
+   - x: "*[2]/*[2]"
+   - x: "*[3]"
+
+-
+   name: vertical bars
+   # 177.vii requires a multipurpose indicator between consecutive vertical bars
+   tag: mrow
+   match:
+      - "( IsBracketed(., '', '|') or IsBracketed(., '', '‖') or IsBracketed(., '', '⦀') ) and "   # ends with single, double, or triple vertical bar
+      - "following-sibling::*[1][self::m:mo and text()='\u2062'] and"
+      - "(  IsBracketed(following-sibling::*[2], '|', '') or " # starts with ... vertical bar
+      - "   IsBracketed(following-sibling::*[2], '‖', '') or "
+      - "   IsBracketed(following-sibling::*[2], '⦀', '')  "
+      - ")"
+   replace:
+      - x: "*"
+      - t: "m"
+
 -
    name: default
    tag: mrow
@@ -407,20 +434,8 @@
    name: default
    tag: mn
    match: "."
-   replace: 
-      - test:
-         # roman numerals are not "digits" -- no indicator
-         # Rule 11a: no numeric indicator at start of item (following a comma) in a 'list'
-         # because of canonicalization, we will have 'open' item ',' item ... 'close'
-         # IsBracketed() test is wrong for 10.ii (must not contain a word, abbrev, ordinal or plural ending)
-         # FIX: need to write special code -- leading term could be buried: '3+x' or '3a+x' or ...
-         if:
-            - "not( @data-roman-numeral or "
-            - "(name(..)='mrow' and ( IsBracketed(.., '', '', true()) or "
-            - "    (name(../..)='mrow' and ( IsBracketed(../.., '', '', true()) or "
-            - "    (name(../../..)='mrow' and ( IsBracketed(../../.., '', '', true()) )) )) )) ) "
-         then: [t: "N"]       # temp numeric indicator -- can't be confused with other uses of "⠼" (replaced later)
-      - x: text()
+   replace: [x: "NemethChars(.)"]
+
 -
    # Rule 138 a.2 -- space after a function name
    # most functions will have an invisible apply that adds the space, but "mod" is infix, so different
@@ -428,13 +443,13 @@
    tag: [mi, mo, mtext]    # should really only be 'mo', but others are used
    match: "text()='mod'"
    replace:
-      - x: text()
+      - x: "NemethChars(.)"
       - t: "⠀"
 -
    name: default
    tag: [mi, mo, mtext]
    match: "."
-   replace: [x: text()]
+   replace: [x: "NemethChars(.)"]
 
 # -
 #    name: default
@@ -454,7 +469,7 @@
    # primes don't get a superscript indicator
    name: prime
    tag: msup
-   match: "*[2][self::m:mo][text()='′']"
+   match: "*[2][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
    replace: 
     - x: "*"
 -
@@ -470,7 +485,8 @@
     - x: "*[2]"
     - test:
          # emit level indicator if something follows or the closest non-mrow is an element with a close tag [80(a)]
-         if: "count(following-sibling::*) > 0 or ancestor::*[name() != 'mrow'][1]/.[self::m:mfrac or self::m:msqrt or self::m:mroot]"
+         # if: "count(following-sibling::*) > 0 or ancestor::*[name() != 'mrow'][1]/.[self::m:mfrac or self::m:msqrt or self::m:mroot]"
+         if: "true()"   # FIX 
          then_test:
             if: "$OldScriptContext = ''"
             then: [t: "⠐"]
@@ -479,13 +495,20 @@
 -
    # implement rule 77 -- simple numeric (non-nested) subscript: don't use a subscript indicator
    #   must be a subscript at level 1
+   # also rule 177.3 for multipurpose indicator (might be removed)
    name: numeric-sub
    tag: msub
       # FIX: match condition needs refinement in testing of base
    match: "*[2][self::m:mn] and not($NewScriptContext) and 
            *[1][ self::m:mi or self::m:msup[*[1][self::m:mi] and *[2][self::m:mo]] ]"
    replace:
-      - x: "*"
+      - x: "*[1]"
+      - t: "M"                # hack actually prevents the 'letter digit' substitution (177.2) from kicking in
+      - x: "*[2]"
+      - test:
+         if: "count(following-sibling::*) > 0 and not($NewScriptContext)"
+         then: [t: "M"]
+
 -
    name: default
    tag: msub
@@ -498,7 +521,7 @@
     - x: "$NewScriptContext"
     - x: "*[2]"
     - test:
-         if: "count(following-sibling::*) > 0"
+         if: "true()"   # FIX 
          then_test:
             if: "$OldScriptContext"
             then: [x: "$OldScriptContext"]
@@ -518,7 +541,7 @@
     - x: "concat($OldScriptContext, '⠘')"            # FIX: this should *set* NewScriptContext
     - x: "*[3]"
     - test:
-         if: "count(following-sibling::*) > 0"
+         if: "true()"   # FIX 
          then_test:
             if: "$OldScriptContext"
             then: [x: "$OldScriptContext"]
@@ -546,7 +569,7 @@
 -
    name: contracted-form #rule 86.b
    tag: mover
-   match: "*[1][count(text())=1] and *[2][text()='¯']"
+   match: "*[1][string-length(text())=1] and *[2][text()='¯']"
    replace: 
     - x: "*"
 

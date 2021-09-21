@@ -79,17 +79,20 @@ fn main() {
 // ";
 
 //     let expr = "
-// <math xmlns='http://www.w3.org/1998/Math/MathML'>
-// <mi>log</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
-// <mo>+</mo>
-// <mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
-// </math>
-// ";
-let expr = "<math><mi>t</mi><mtext>&#x2009;&#x2009;</mtext><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></mrow></math>
-";
+//      <math xmlns='http://www.w3.org/1998/Math/MathML'>
+//      <mi>log</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
+//      <mo>+</mo>
+//      <mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
+// </math>"";
+// let expr = "<math><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></math>";
+let expr = "<math><mn>𝟏𝟐𝟑</mn></math>";
+// let expr = "<math><mtext>A</mtext><mo>=</mo><mn>00</mn><mo>,</mo><mtext>B</mtext><mo>=</mo>
+//                 <mn>01</mn><mo>,</mo><mo>…</mo><mo>,</mo><mtext>Z</mtext><mo>=</mo><mn>25</mn></math>";
 let instant = Instant::now();
     let speech_string = libmathcat::interface::speak_mathml(expr);
     println!("Computed speech string:\n   '{}'", speech_string);
+    let braille_string = libmathcat::interface::braille_mathml(expr);
+    println!("Computed braille string:\n   '{}'", braille_string);
     println!("Time taken: {}ms", instant.elapsed().as_millis());
     // let instant = Instant::now();
     // let _speech_string = libmathcat::interface::speak_mathml(expr);

@@ -68,6 +68,9 @@ lazy_static!{
 	static ref ILLEGAL_OPERATOR_INFO: &'static OperatorInfo = &OperatorInfo{
 		op_type: OperatorTypes::INFIX, priority: 999, next: &None
 	};
+
+	// used to tell if an operator is a relational operator
+	static ref EQUAL_PRIORITY: usize = OPERATORS.get("=").unwrap().priority;
 }
 
 // Operators are either PREFIX, INFIX, or POSTFIX, but can also have other properties such as LEFT_FENCE
@@ -279,6 +282,11 @@ pub fn is_fence(mo: Element) -> bool {
 			.find_operator(mo, None, None, None).is_fence();
 }
 
+pub fn is_relational_op(mo: Element) -> bool {
+	return CanonicalizeContext::new()
+			.find_operator(mo, None, None, None).priority == *EQUAL_PRIORITY;
+}
+
 /// Canonicalize does several things:
 /// 1. cleans up the tree so all extra white space is removed (should only have element and text nodes)
 /// 2. normalize the characters
@@ -380,7 +388,7 @@ impl CanonicalizeContext {
 					static ref ROMAN_NUMERAL: Regex = Regex::new(r"(?i)^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$").unwrap();
 				}				
 				let text = as_text(mathml);
-				if ROMAN_NUMERAL.is_match(text) {
+				if !text.is_empty() && ROMAN_NUMERAL.is_match(text) {
 					// people tend to set them in a non-italic font and software makes that 'mtext'
 					let mn = create_mathml_element(&mathml.document(), "mn");
 					mn.set_text(text);

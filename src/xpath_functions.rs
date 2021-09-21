@@ -19,8 +19,8 @@
 
 use sxd_document::dom::{Element, ChildOfElement, ParentOfChild};
 use sxd_xpath::{Value, Context, context, function::*, nodeset::*};
-use crate::{definitions::{ DEFINITIONS}};
-use regex::Regex;
+use crate::{canonicalize::as_text, definitions::{ DEFINITIONS}};
+use regex::{Regex, Captures};
 use crate::pretty_print::mml_to_string;
 use std::cell::Ref;
 use crate::canonicalize::{as_element, name};
@@ -270,10 +270,6 @@ impl IsNode {
             static ref ALL_DIGITS: Regex = Regex::new(r"\d+").unwrap();    // match one or more digits
         }
 
-        fn is_small_enough(val: &str, upper_bound: usize) -> bool {
-            return if let Ok(value) = val.parse::<usize>() { value <= upper_bound } else { false };
-        }
-
         if !is_tag(frac, "mfrac") {
             return false;
         }
@@ -302,8 +298,21 @@ impl IsNode {
 
         return ALL_DIGITS.is_match(&num)   && is_small_enough(&num, num_limit) &&
                ALL_DIGITS.is_match(&denom) && is_small_enough(&denom, denom_limit);
+
+        fn is_small_enough(val: &str, upper_bound: usize) -> bool {
+            return if let Ok(value) = val.parse::<usize>() { value <= upper_bound } else { false };
+        }
     }
 
+    fn is_punctuation(node:  &Element) -> bool {
+        lazy_static! {
+            // list of chars from rule VI (p41) [various dashes are from Unicode, not green book]
+            static ref PUNCTUATION: Regex = Regex::new(r"':,–—―⸺⸻—…!-.?‘’“”;'").unwrap();    // match one or more digits
+        }
+
+        let text = get_text_from_element(node);
+        return PUNCTUATION.is_match(&text);
+    }
 }
 
 const MATHML_LEAF_NODES: &[&str] = &["mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph"];
@@ -322,7 +331,7 @@ impl Function for IsNode {
         // FIX: there is some conflict problem with xpath errors and error-chain
         //                .chain_err(|e| format!("Second arg to is_leaf is not a string: {}", e.to_string()))?;
         match kind.as_str() {
-            "simple" | "leaf" | "common_fraction" | "trig_name" => (), 
+            "simple" | "leaf" | "common_fraction" | "trig_name" | "nemeth_punctuation" => (), 
             _ => return Err( Error::ArgumentMissing ),
         };
 
@@ -340,6 +349,7 @@ impl Function for IsNode {
                                 "leaf"   => MATHML_LEAF_NODES.contains(&e.name().local_part()),
                                 "trig_name" => IsNode::is_trig_name(&e),
                                 "common_fraction" => IsNode::is_common_fraction(&e, usize::MAX, usize::MAX), 
+                                "nemeth_punctuation" => IsNode::is_punctuation(&e),
                                 _        => true,       // can't happen due to check above
                             }    
                         } else {
@@ -707,6 +717,157 @@ impl Function for NestingChars {
     }
 }
 
+struct NemethChars;
+impl NemethChars {
+    // returns a string for the chars in the *leaf* node.
+    // this string follows the Nemeth rules typefaces and deals with mathvariant
+    //  which has partially turned chars to the alphanumeric block
+    fn get_nemeth_chars<'a>(node: &'a Element) -> Result<String, Error> {
+        lazy_static! {
+            // To greatly simplify typeface/language generation, the chars have unique ASCII chars for them:
+            // Typeface: S: sans-serif, B: bold, T: script/blackboard, I: italic, R: Roman
+            // Language: E: English, D: German, G: Greek, V: Greek variants, H: Hebrew, U: Russian
+            // Indicators: N: number, P: punctuation, M: multipurpose
+            static ref PICK_APART_CHAR: Regex = 
+                Regex::new(r"(?P<face>[SBTIR]*)(?P<lang>[EDGVHU]??)(?P<cap>[⠠]??)(?P<num>[N]??)(?P<char>[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵])").unwrap();
+        }
+    
+        let math_variant = node.attribute_value("mathvariant");
+        // FIX: cover all the options -- use phf::Map
+        let  attr_typeface = match math_variant {
+            None => "R",
+            Some(variant) => match variant {
+                "bold" => "B",
+                "italic" => "I",
+                "double-struck" | "script"=> "S",
+                "fraktur" => "G",
+                "sans-serif" => "T",
+                _ => "R",       // normal and unknown
+            },
+        };
+        return crate::speech::BRAILLE_RULES.with(|rules| {
+            let text = as_text(*node);
+            // start of pattern matching mutably borrows BRAILLE_RULES, so we can't use borrow.
+            //   instead hack to get around borrow rules because we know no changes happen during call
+            let braille_chars = unsafe {
+                rules.as_ptr().as_ref().unwrap()
+                    .replace_chars(text, node).unwrap_or("".to_string())
+            };
+            println!("braille_chars: '{}'", braille_chars);
+            
+            // we want to pull the prefix (typeface, language) out to the front until a change happens
+            // the same is true for number indicator
+            // also true (sort of) for capitalization -- if all caps, use double cap in front (assume abbr or Roman Numeral)
+            let is_in_enclosed_list = name(node) == "mn" && NemethChars::is_in_enclosed_list(*node);
+            let mut typeface = "".to_string();     // illegal value to force first value
+            let mut is_all_caps = true;
+            let result = PICK_APART_CHAR.replace_all(&braille_chars, |caps: &Captures| {
+                println!("  face: {:?}, lang: {:?}, num {:?}, cap: {:?}, char: {:?}",
+                        &caps["face"], &caps["lang"], &caps["num"], &caps["cap"], &caps["char"]);
+                let mut nemeth_chars = "".to_string();
+                let typeface_changed =  &typeface != &caps["face"];
+                if typeface_changed {
+                    typeface = caps["face"].to_string();   // needs to outlast this instance of the loop
+                    nemeth_chars += if typeface.is_empty() {attr_typeface} else {&typeface};
+                    nemeth_chars +=  &caps["lang"];
+                }
+                println!("is_in_list: {}; num: {}", is_in_enclosed_list, caps["num"].is_empty());
+                if typeface_changed || !(is_in_enclosed_list || caps["num"].is_empty()) {
+                    nemeth_chars += "N";
+                }
+                is_all_caps &= !&caps["cap"].is_empty();
+                nemeth_chars += &caps["cap"];       // will be stripped later if all caps
+                nemeth_chars += &caps["char"];
+                return nemeth_chars;
+            });
+            let mut text_chars = text.chars();     // see if more than one char
+            if is_all_caps && text_chars.next().is_some() &&  text_chars.next().is_some() {
+                return Ok( "⠠⠠".to_string() + &result.replace("⠠", ""));
+            } else {
+                return Ok( result.to_string() );
+            }
+        });
+    }
+
+    fn is_in_enclosed_list(node: Element) -> bool {
+        // Nemeth Rule 10 defines an enclosed list:
+        // 1: begins and ends with fence
+        // 2: FIX: not implemented -- must contain no word, abbreviation, ordinal or plural ending
+        // 3: function names or signs of shape and the signs which follow them are a single item (not a word)
+        // 4: an item of the list may be an ellipsis or any sign used for mission
+        // 5: no relational operator may appear within the list
+        // 6: the list must have at least 2 items.
+        //       Items are separated by commas, can not have other punctuation (except ellipsis and dash)
+        let mut parent = node.parent().unwrap().element().unwrap(); // safe since 'math' is always at root
+        while name(&parent) == "mrow" {
+            if IsBracketed::is_bracketed(&parent, "", "", true) {
+                for child in parent.children() {
+                    if !child_meets_conditions(as_element(child)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            parent = parent.parent().unwrap().element().unwrap();
+        }
+        return false;
+
+        fn child_meets_conditions(node: Element) -> bool {
+            let name = name(&node);
+            return match name {
+                "mi" | "mn" => true,
+                "mo"  => !crate::canonicalize::is_relational_op(node),
+                "mtext" => false, // FIX -- should be more nuanced,
+                "mrow" => {
+                    if IsBracketed::is_bracketed(&node, "", "", false) {
+                        return child_meets_conditions(as_element(node.children()[1]));
+                    } else {
+                        for child in node.children() {
+                            if !child_meets_conditions(as_element(child)) {
+                                return false;
+                            }
+                        }
+                    }  
+                    true      
+                },
+                _ => {
+                    for child in node.children() {
+                        if !child_meets_conditions(as_element(child)) {
+                            return false;
+                        }
+                    }
+                    true
+                },
+            }
+        }
+    }
+}
+
+impl Function for NemethChars {
+    /**
+     * Returns a string with the correct number of nesting chars (could be an empty string)
+     * @param(node) -- current node
+     * @param(char) -- char (string) that should be repeated
+     * Note: as a side effect, an attribute with the value so repeated calls to this or a child will be fast
+     */
+     fn evaluate<'c, 'd>(&self,
+                            _context: &context::Evaluation<'c, 'd>,
+                            args: Vec<Value<'d>>)
+                            -> Result<Value<'d>, Error>
+        {
+            let mut args = Args(args);
+            args.exactly(1)?;
+            let node = validate_one_node(args.pop_nodeset()?)?;
+            if let Node::Element(el) = node {
+                assert!( MATHML_LEAF_NODES.contains(&name(&el)) );
+                return Ok( Value::String( NemethChars::get_nemeth_chars(&el)? ) );
+            } else {
+                // not an element, so nothing to do
+                return Ok( Value::String("".to_string()) );
+            }
+        }
+    }
+    
 
 struct IsLargeOp;
 /**
@@ -872,7 +1033,8 @@ pub fn add_builtin_functions(context: &mut Context) {
     // FIX: should be a static cache that gets regenerated on update
     context.set_function("min", Min);       // missing in xpath 1.0
     context.set_function("max", Max);       // missing in xpath 1.0
-    context.set_function("NestingChars", NestingChars);       // missing in xpath 1.0
+    context.set_function("NestingChars", NestingChars);
+    context.set_function("NemethChars", NemethChars);
     context.set_function("IsNode", IsNode);
     context.set_function("ToOrdinal", ToOrdinal);
     context.set_function("ToCommonFraction", ToCommonFraction);
