@@ -231,11 +231,11 @@ fn complicated_set_with_mtext() {
         <mo>{</mo>
         <mrow> <mi>x</mi><mo>∈</mo><mi>ℕ</mi></mrow>
         <mo>|</mo>
-        <mrow><mi>x</mi> <mtext>&#x00A0;is&#x00A0;an&#x00A0;even&#x00A0;number</mtext> </mrow>
+        <mrow><mi>x</mi> <mtext>is an even number</mtext> </mrow>
         <mo>}</mo>
         </math>";
     test("ClearSpeak", expr, 
-            "the set of all x in the natural numbers such that x is\u{a0}an\u{a0}even\u{a0}number");
+            "the set of all x in the natural numbers such that x is an even number");
 }
 
 
