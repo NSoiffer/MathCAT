@@ -2741,3 +2741,6 @@
  - "⁢": [t: ""]                 # 0x2062⁡ (invisible times)
  - "⁣": [t: ""]                 # 0x2063⁡ (invisible separator)
  - "⁤": [t: ""]                 # 0x2064 (invisible plus)
+
+ # SRE lists this as a custom transcription
+ - "⋊": [t: "⠈⠡⠳"]                 # 0x22ca (RIGHT NORMAL FACTOR SEMIDIRECT PRODUCT)
