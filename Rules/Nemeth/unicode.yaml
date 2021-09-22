@@ -2164,7 +2164,7 @@
  - ",":                         # 0x002C (Comma)
     - test:
           # test if first ancestor that isn't an mrow is a script tag (rule 78)
-      - if: "ancestor::*[name() != 'mrow'][1]/.[self::m:msub or self::m:msup or self::m:msubsup]"
+      - if: "ancestor::*[not(parent::m:mrow)][1][parent::m:msub or parent::m:msup or parent::m:msubsup][preceding-sibling::*]"
         then: [t: "⠪"]        # Rule 78
       - else_if: "self::m:mn"
         then: [t: "⠠"]
@@ -2302,7 +2302,7 @@
  - "‴": [t: "⠄⠄."]               # 0x2034 (Triple prime)
  - "⁗": [t: "⠄⠄.."]               # 0x2057 (Quadruple prime)
  - "ℏ": [t: "⠈⠓"]               # 0x210F (Planck constant over two pi)
- - "ℓ": [t: "⠈⠇"]               # 0x2113 (Script small l (differs from 1d4c1: 4-56-123))
+ - "ℓ": [t: "TE⠇"]               # 0x2113 (Script small l (differs from 1d4c1: 4-56-123))
 #  - "ℝ": [t: ""]                 # 0x211D (Double-struck capital R (no nemeth double struck))
 #  - "ⅆ": [t: ""]                 # 0x2146 (Double-struck italic small d)
 #  - "ⅇ": [t: ""]                 # 0x2147 (Double-struck italic small e)
