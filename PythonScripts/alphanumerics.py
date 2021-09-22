@@ -2,9 +2,9 @@
 from bs4 import BeautifulSoup
 
 def create_unicode_from_html(in_file: str, out_file):
-    with open(in_file, encoding='utf8') as _in_stream:
+    with open(in_file, encoding='utf8') as in_stream:
         with open(out_file, 'a', encoding='utf8') as out_stream:
-            file_contents = BeautifulSoup(_in_stream, features="html.parser")
+            file_contents = BeautifulSoup(in_stream, features="html.parser")
             for row in file_contents.find_all('tr'):
                 cols = row.find_all('td')
                 if len(cols) > 0:
@@ -25,6 +25,80 @@ def generate_digits(out_file, prefix: str, hex: str, description: str):
             i += 1
 
 
+
+# get the JSON versions -- the HTML versions seem wrong in many places (e.g., bold or numbers)
+import json
+def create_unicode_from_json(in_file: str, out_file):
+    with open(in_file, encoding='utf8') as in_stream:
+        with open(out_file, 'a', encoding='utf8') as out_stream:
+            file_contents = json.load(in_stream)
+            info = file_contents["information"].replace("tests", "chars")
+            out_stream.write('\n  # --- {} ---\n'.format(info))
+            for char, braille in file_contents['tests'].items():
+                if braille["expected"] != "":
+                    generate_char_line(out_stream, char, braille["expected"])
+
+import re
+MATCH_FACE_LANG_CHAR = re.compile(
+    ("("
+       "(?P<prefix>^)"
+       "(?P<sans>⠠⠨)?"
+       "(?P<bold>⠸(?=[^⠠⠔⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵⠯⠫⠱⠹]))?"
+       "(?P<script>⠈(?=[^⠠⠔⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵⠯⠫⠱⠹]))?"
+       "(?P<italic>⠨(?=[^⠠⠔⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵⠯⠫⠱⠹]))?"
+       "((((?P<en>⠰)|(?P<de>⠸)|(?P<el>⠨)|(?P<el_var>⠨⠈))?"
+       "(?P<cap>⠠)?(?P<char>[⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵⠯⠫⠱⠹]))|"
+       "((?P<num>⠼?)(?P<digit>[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔])))"
+       "(?P<postfix>$)"
+      ")")
+)
+
+def generate_char_line(out_stream, char: str, braille: str):
+    # format to generate
+    #  - "⬟": [t: "⠫⠸⠢"]              # 0x2B1F
+    # escape quotes and backslashes
+    if (char == '"' or char == '\\'):
+        char = "\\" + char
+
+    # pick the braille apart, looking for one or more typefaces, alphabet, (cap? letter) | (numeric? digit) | char
+    
+    result = ""
+    matched = MATCH_FACE_LANG_CHAR.match(braille)
+    if matched:
+        dict = matched.groupdict()
+        if dict["prefix"]:
+            result += dict["prefix"]
+        if dict["sans"]:
+            result += "S"
+        if dict["bold"]:
+            result += "B"
+        if dict["script"]:
+            result += "T"
+        if dict["italic"]:
+            result += "I"
+        if dict["en"]:
+            result += "E"
+        if dict["de"]:
+            result += "D"
+        if dict["el"]:
+            result += "G"
+        if dict["el_var"]:
+            result += "V"
+        if dict["char"]:
+            if dict["cap"]:
+                result += "C"
+            result += dict["char"]
+        if dict["digit"]:
+            result += "N" + dict["digit"]
+        if dict["postfix"]:
+            result += dict["postfix"]
+    else:
+        result = braille
+    first_part = ' - "{}": [t: "{}"]'.format(char, result)
+    out_stream.write('{:32}# {}\n'.format(first_part, hex(ord(char[-1])) ))
+
+
+
 import os
 # if os.path.exists("alphanumerics.txt"):
 #   os.remove("alphanumerics.txt")
@@ -34,6 +108,16 @@ import os
 if os.path.exists("out"):
   os.remove("out")
 
-generate_digits("out", "⠸", "1D7CE", "bold")
-generate_digits("out", "⠈", "1D7D8", "double struck (as script)")
-generate_digits("out", "⠠", "1D7E2", "sans-serif")
+path = "C:/Dev/speech-rule-engine/sre-tests/expected/nemeth/symbols/"
+# file = "default_alphabet_bold.json"
+if os.path.exists("alphanumerics.txt"):
+  os.remove("alphanumerics.txt")
+for filename in os.listdir(path):
+    # these have multi char entries and aren't character definitions
+    if not(filename == 'default_functions.json' or filename == 'default_si_units.json' or filename == 'default_units.json'):
+        create_unicode_from_json(path+filename, "alphanumerics.txt")
+
+# with open("out", 'a', encoding='utf8') as out_stream:
+#     generate_char_line(out_stream, "𝐅", "⠸⠰⠠⠋")
+# generate_digits("out", "⠈", "1D7D8", "double struck (as script)")
+# generate_digits("out", "⠠", "1D7E2", "sans-serif")
