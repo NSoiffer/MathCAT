@@ -11,7 +11,7 @@ Todo: incorporation of third party libraries to support a common subset of TeX m
 MathCAT is written in Rust and can be built to interface with C/C++. It can also be built with a Python interface. The Python interface can be used by NVDA and by Orca. 
 
 ## Current Status
-MathCAT is under active development and I expect that by the end of September, it will be usable as a MathPlayer replacement for those using the English version. It will not be as complete or polished in some ways as MathPlayer though.
+MathCAT is under active development and I expect that by the end of September, it will be usable as a MathPlayer replacement for those using the English version. It will not be as complete or polished in some ways as MathPlayer though. The Nemth braille generation will be substantially better.
 
 By the end of the year, I expect MathCAT to be ready for all English users and hope to have a good start on some of the translations. Initial translations will be based on programmatic translations from MathPlayer's (public) files and are likely to be very buggy until volunteers step forward to fix them.
 
@@ -97,7 +97,7 @@ The MathML for this expression is:
 ```
 
 MathCAT uses external rules to generate speech and braille.
-These take about 75 to load; this load only happens the first time the rules are used, or if the speech style, language, or other external preference is changed.
+These take about 75ms to load; this load only happens the first time the rules are used, or if the speech style, language, or other external preference is changed. I expect to be able to cut the initial load time by at least half with some tweaks to load the large unicode files in stages.
 The library is about 2.6mb in size.
 
 If you are working on an in-browser solution (i.e, you are using JavaScript or some other browser-based language), MathCAT will not work for you. Instead, take a look at [Speech rule engine](https://github.com/zorkow/speech-rule-engine) (SRE) by Volker Sorge. It is written in TypeScript and will likely meet your needs.
