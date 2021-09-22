@@ -964,6 +964,8 @@ impl IsBracketed {
 
         let first_child = as_element(children[0]);
         let last_child = as_element(children[children.len()-1]);
+        // println!("first_child: {}", crate::pretty_print::mml_to_string(&first_child));
+        // println!("last_child: {}", crate::pretty_print::mml_to_string(&last_child));
         if (left.is_empty()  && (name(&first_child) != "mo" || !is_fence(first_child))) ||
            (right.is_empty() && (name(&last_child) != "mo"  || !is_fence(last_child))) {
             return false;
