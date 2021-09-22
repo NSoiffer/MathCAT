@@ -109,11 +109,18 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
     lazy_static! {
         // Trim braille spaces before and after braille indicators
         // FIX: these lists are not complete
+        // ellipsis, dashes, {parens, brackets, braces}
+        static ref REMOVE_SPACE_AFTER_PARENS: Regex = 
+            Regex::new(r"(⠷)⠀+").unwrap();
+        // In order: fraction, /, cancellation, capitalization, baseline
+        static ref REMOVE_SPACE_BEFORE_PARENS: Regex = 
+            Regex::new(r"⠀+(⠾)|(⠈⠾)|(⠨⠾)").unwrap();
+        // ellipsis, dashes, {parens, brackets, braces}
         static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex = 
             Regex::new(r"(⠄⠄⠄)|(⠤⠤⠤)⠀+([⠼⠸⠌⠪])").unwrap();
         // In order: fraction, /, cancellation, capitalization, baseline
         static ref REMOVE_SPACE_AFTER_BRAILLE_INDICATORS: Regex = 
-            Regex::new(r"([⠹⠌⠻⠠⠐])⠀+⠄⠄⠄").unwrap();
+            Regex::new(r"([⠹⠌⠻⠠⠐])⠀+(⠄⠄⠄)").unwrap();
 
         // Multipurpose indicator insertion
         // 177.2 -- add after a letter and before a digit (or decimal pt) -- these will start with N
@@ -177,9 +184,13 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
     // Remove unicode blanks at start and end
     let result = raw_nemeth.trim_start_matches('⠀').trim_end_matches('⠀');
 
+    // Remove blanks before and after "parens"
+    let result = REMOVE_SPACE_BEFORE_PARENS.replace_all(result, "$1$2$3");
+    let result = REMOVE_SPACE_AFTER_PARENS.replace_all(&result, "$1");
+
     // Remove blanks before and after braille indicators
-    let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(result, "$1$2$3");
-    let result = REMOVE_SPACE_AFTER_BRAILLE_INDICATORS.replace_all(&result, "$1⠄⠄⠄");
+    let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&result, "$1$2$3");
+    let result = REMOVE_SPACE_AFTER_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
     println!("spaces:  \"{}\"", result);
 
     // Multipurpose indicator
