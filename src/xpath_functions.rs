@@ -307,7 +307,7 @@ impl IsNode {
     fn is_punctuation(node:  &Element) -> bool {
         lazy_static! {
             // list of chars from rule VI (p41) [various dashes are from Unicode, not green book]
-            static ref PUNCTUATION: Regex = Regex::new(r"':,–—―⸺⸻—…!-.?‘’“”;'").unwrap();    // match one or more digits
+            static ref PUNCTUATION: Regex = Regex::new(r"[':,–—―⸺⸻—…!-.?‘’“”;']").unwrap();    // match one or more digits
         }
 
         let text = get_text_from_element(node);
@@ -729,7 +729,7 @@ impl NemethChars {
             // Language: E: English, D: German, G: Greek, V: Greek variants, H: Hebrew, U: Russian
             // Indicators: N: number, P: punctuation, M: multipurpose
             static ref PICK_APART_CHAR: Regex = 
-                Regex::new(r"(?P<face>[SBTIR]*)(?P<lang>[EDGVHU]??)(?P<cap>[⠠]??)(?P<num>[N]??)(?P<char>[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵])").unwrap();
+                Regex::new(r"(?P<face>[SBTIR]*)(?P<lang>[EDGVHU]??)(?P<cap>C??)(?P<num>[N]??)(?P<char>[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵])").unwrap();
         }
     
         let math_variant = node.attribute_value("mathvariant");
@@ -770,6 +770,8 @@ impl NemethChars {
                     typeface = caps["face"].to_string();   // needs to outlast this instance of the loop
                     nemeth_chars += if typeface.is_empty() {attr_typeface} else {&typeface};
                     nemeth_chars +=  &caps["lang"];
+                } else {
+                    nemeth_chars +=  &caps["lang"];
                 }
                 println!("is_in_list: {}; num: {}", is_in_enclosed_list, caps["num"].is_empty());
                 if !caps["num"].is_empty() && (typeface_changed || !is_in_enclosed_list) {
@@ -782,7 +784,7 @@ impl NemethChars {
             });
             let mut text_chars = text.chars();     // see if more than one char
             if is_all_caps && text_chars.next().is_some() &&  text_chars.next().is_some() {
-                return Ok( "⠠⠠".to_string() + &result.replace("⠠", ""));
+                return Ok( "CC".to_string() + &result.replace("C", ""));
             } else {
                 return Ok( result.to_string() );
             }

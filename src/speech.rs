@@ -84,7 +84,7 @@ pub fn braille_mathml(mathml: &Element) -> String {
 fn nemeth_cleanup(raw_nemeth: String) -> String {
     // Typeface: S: sans-serif, B: bold, T: script/blackboard, I: italic, R: Roman
     // Language: E: English, D: German, G: Greek, V: Greek variants, H: Hebrew, U: Russian
-    // Indicators: N: number, P: punctuation, M: multipurpose
+    // Indicators: C: capital, N: number, P: punctuation, M: multipurpose
     // SRE doesn't have H: Hebrew or U: Russian, so not encoded (yet)
     // Note: some "positive" patterns find cases to keep the char and transform them to the lower case version
     static INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
@@ -99,6 +99,7 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         "V" => "⠨⠈",
         "H" => "⠠⠠",
         "U" => "⠈⠈",
+        "C" => "⠠",
         "P" => "⠸",
         "M" => "",
         "m" => "⠐",
@@ -115,12 +116,12 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         // In order: fraction, /, cancellation, capitalization, baseline
         static ref REMOVE_SPACE_BEFORE_PARENS: Regex = 
             Regex::new(r"⠀+(⠾)|(⠈⠾)|(⠨⠾)").unwrap();
-        // ellipsis, dashes, {parens, brackets, braces}
+
+        // In order: fraction, /, cancellation, capitalization, baseline
         static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex = 
             Regex::new(r"(⠄⠄⠄)|(⠤⠤⠤)⠀+([⠼⠸⠌⠪])").unwrap();
-        // In order: fraction, /, cancellation, capitalization, baseline
         static ref REMOVE_SPACE_AFTER_BRAILLE_INDICATORS: Regex = 
-            Regex::new(r"([⠹⠌⠻⠠⠐])⠀+(⠄⠄⠄)").unwrap();
+            Regex::new(r"([⠹⠌⠻C⠐])⠀+(⠄⠄⠄)").unwrap();
 
         // Multipurpose indicator insertion
         // 177.2 -- add after a letter and before a digit (or decimal pt) -- these will start with N
@@ -172,7 +173,7 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         // Typeface: S: sans-serif, B: bold, T: script/blackboard, I: italic, R: Roman
         // Language: E: English, D: German, G: Greek, V: Greek variants, H: Hebrew, U: Russian
         // Indicators: N: number, P: punctuation, M: multipurpose
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SBTIREDGVHPMmNn])").unwrap();  
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SBTIREDGVHPCMmNn])").unwrap();  
             
         static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[⠘⠰]+⠐)").unwrap();
         static ref REMOVE_LEVEL_IND_BEFORE_SPACE: Regex = Regex::new(r"(?:[⠘⠰]+⠐?|⠐)(⠀|$)").unwrap();

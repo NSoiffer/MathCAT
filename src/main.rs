@@ -85,9 +85,10 @@ fn main() {
 //      <mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
 // </math>"";
 // let expr = "<math><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></math>";
-let expr = "<math><mn>𝟏𝟐𝟑</mn></math>";
+// let expr = "<math><mn>𝟏𝟐𝟑</mn></math>";
 // let expr = "<math><mtext>A</mtext><mo>=</mo><mn>00</mn><mo>,</mo><mtext>B</mtext><mo>=</mo>
 //                 <mn>01</mn><mo>,</mo><mo>…</mo><mo>,</mo><mtext>Z</mtext><mo>=</mo><mn>25</mn></math>";
+let expr = "<math><mo>{</mo><mi>x</mi><mo>|</mo><mo>|</mo><mi>x</mi><mo>|</mo><mo>&lt;</mo><mn>10</mn><mo>}</mo></math>";
 let instant = Instant::now();
     let speech_string = libmathcat::interface::speak_mathml(expr);
     println!("Computed speech string:\n   '{}'", speech_string);

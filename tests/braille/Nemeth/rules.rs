@@ -140,21 +140,21 @@ fn hyper_complex_frac_rule_68_a_1() {
 }
 
 #[test]
-fn numeric_sub() {
-    let expr = "<math><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></math>";
-    test_braille("Nemeth", expr, "⠭⠘⠆⠐⠬⠂");
-}
-
-#[test]
-fn comma_sub() {
-    let expr = "<math><msub><mi>x</mi><mrow><mn>1</mn><mo>,</mo><mn>2</mn></mrow></msub></math>";
-    test_braille("Nemeth", expr, "⠭⠰⠂⠪⠆");
-}
-
-#[test]
 fn primed_numeric_sub() {
     let expr = "<math><msub><mi>x</mi><mn>2</mn></msub><mo>+</mo><msub><msup><mi>x</mi><mo>&#x2032;</mo></msup><mn>1</mn></msub></math>";
     test_braille("Nemeth", expr, "⠭⠆⠬⠭⠄⠂");
+}
+
+#[test]
+fn comma_78_2() {
+    let expr = "<math><msub><mi>x</mi><mrow><mo>(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo>)</mo></mrow></msub></math>";
+    test_braille("Nemeth", expr, "⠭⠰⠷⠁⠪⠃⠾");
+}
+
+#[test]
+fn comma_78_3() {
+    let expr = "<math><msub><mi>x</mi><mrow><mn>1</mn><mo>,</mo><mn>2</mn></mrow></msub></math>";
+    test_braille("Nemeth", expr, "⠭⠰⠂⠪⠆");
 }
 
 #[test]
@@ -167,6 +167,12 @@ fn nested_super_79_a_3() {
 fn nested_super_space_79_d_7() {
     let expr = "<math><mrow><msup><mi>e</mi><mrow><msup><mi>cos</mi><mn>2</mn></msup><mi>x</mi></mrow></msup></mrow></math>";
     test_braille("Nemeth", expr, "⠑⠘⠉⠕⠎⠘⠘⠆⠀⠭");
+}
+
+#[test]
+fn numeric_sub_81_a_1() {
+    let expr = "<math><mo>(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn><mo>)</mo></math>";
+    test_braille("Nemeth", expr, "⠷⠭⠘⠆⠐⠬⠂⠾");
 }
 
 #[test]
@@ -296,6 +302,19 @@ fn order2_overbar_rule_87_a_1() {
 fn binomial_90_1() {
     let expr = "<math><mo>(</mo><mfrac linethickness='0'><mi>n</mi><mi>k</mi></mfrac><mo>)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠝⠩⠅⠾");
+}
+
+#[test]
+fn set_vertical_bar_145_1() {
+    let expr = "<math><mo>{</mo><mi>x</mi><mo>|</mo><mo>|</mo><mi>x</mi><mo>|</mo><mo>&lt;</mo><mn>10</mn><mo>}</mo></math>";
+    test_braille("Nemeth", expr, "⠨⠷⠭⠀⠳⠀⠳⠭⠳⠀⠐⠅⠀⠼⠂⠴⠨⠾");
+}
+
+#[test]
+fn vertical_bar_145_4() {
+    // this test was added in an addendum
+    let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
+    test_braille("Nemeth", expr, "⠠⠏⠷⠠⠁⠀⠳⠀⠠⠃⠾");
 }
 
 #[test]

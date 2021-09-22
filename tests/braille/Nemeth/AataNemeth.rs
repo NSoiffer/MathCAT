@@ -1646,7 +1646,8 @@ fn test_247() {
         <mrow><mi mathvariant=\"script\">L</mi></mrow></mrow><mi>H</mi></msub><mo stretchy=\"false\">→<!-- → --></mo><msub>
         <mrow>
         <mrow><mi mathvariant=\"script\">R</mi></mrow></mrow><mi>H</mi></msub></math>";
-    test_braille("Nemeth", expr, "⠨⠋⠸⠒⠀⠈⠰⠠⠇⠰⠠⠓⠀⠫⠕⠀⠈⠰⠠⠗⠰⠠⠓");
+    // corrected: removed extra space after "⠸⠒"
+    test_braille("Nemeth", expr, "⠨⠋⠸⠒⠈⠰⠠⠇⠰⠠⠓⠀⠫⠕⠀⠈⠰⠠⠗⠰⠠⠓");
 }
 
 #[test]
@@ -1960,7 +1961,10 @@ fn test_291() {
         <mrow>
         <mrow><mi mathvariant=\"bold\">b</mi></mrow></mrow><mo>=</mo><mo stretchy=\"false\">(</mo><mn>2</mn><mo>,</mo><mn>2</mn>
         <msup><mo stretchy=\"false\">)</mo><mtext>t</mtext></msup></math>";
-    test_braille("Nemeth", expr, "⠸⠰⠃⠀⠨⠅⠀⠷⠆⠠⠀⠆⠾⠘⠞");
+        // should be corrected
+        // <mi mathvariant=\"bold\">b</mi></mrow><mo>=</mo><msup><mrow><mo stretchy=\"false\">(</mo><mn>2</mn><mo>,</mo><mn>2</mn>
+        // <mo stretchy=\"false\">)</mo></mrow><mtext>t</mtext></msup></math>";
+test_braille("Nemeth", expr, "⠸⠰⠃⠀⠨⠅⠀⠷⠆⠠⠀⠆⠾⠘⠞");
 }
 
 #[test]
@@ -2084,7 +2088,8 @@ fn test_307() {
 #[test]
 fn test_308() {
     let expr = "<math><mi>π<!-- π --></mi><mo>:</mo><mi>S</mi><mo stretchy=\"false\">→<!-- → --></mo><mi>S</mi></math>";
-    test_braille("Nemeth", expr, "⠨⠏⠸⠒⠀⠠⠎⠀⠫⠕⠀⠠⠎");
+    // corrected: removed extra space after "⠸⠒"
+    test_braille("Nemeth", expr, "⠨⠏⠸⠒⠠⠎⠀⠫⠕⠀⠠⠎");
 }
 
 #[test]
@@ -2120,13 +2125,15 @@ fn test_313() {
 #[test]
 fn test_314() {
     let expr = "<math><mi>f</mi><mo>:</mo><mi>A</mi><mo stretchy=\"false\">→<!-- → --></mo><mi>B</mi></math>";
-    test_braille("Nemeth", expr, "⠋⠸⠒⠀⠠⠁⠀⠫⠕⠀⠠⠃");
+    // corrected: removed extra space
+    test_braille("Nemeth", expr, "⠋⠸⠒⠠⠁⠀⠫⠕⠀⠠⠃");
 }
 
 #[test]
 fn test_315() {
     let expr = "<math><mi>f</mi><mo>:</mo><mi>a</mi><mo stretchy=\"false\">↦<!-- ↦ --></mo><mi>b</mi></math>";
-    test_braille("Nemeth", expr, "⠋⠸⠒⠀⠁⠀⠫⠳⠒⠒⠕⠀⠃");
+    // corrected: removed extra space
+    test_braille("Nemeth", expr, "⠋⠸⠒⠁⠀⠫⠳⠒⠒⠕⠀⠃");
 }
 
 #[test]
