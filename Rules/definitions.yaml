@@ -28,7 +28,8 @@
         "arccsc", "arccsch", "arcsec", "arcsech", "arcsin", "arcsinh",
         "arctan", "arctang", "arctanh",
         "exp", "Exp", "im", "Im", "re", "Re",
-        "lim", "det", 
+        "lim", "det",
+        "gcd", "lcm",
     ],
 
     # common names of functions along with a capital letter followed more one or more letters
@@ -38,7 +39,46 @@
     # FIX: That's not currently possible, so the canonicalize function builds that in. Should be externally-definable
     LikelyFunctionNames: [
         "f", "g", "h", "F", "G", "H"
-    ]
+    ],
 
+    # NemethFunctionName: [
+    #     "amp", "amplitude",
+    #     "antilog", "antilogarithm",
+    #     "arc",
+    #     "arg", "argument",
+    #     "colog", "cologarithm",
+    #     "cos", "cosine",
+    #     "cosh", "hyperbolic cosine",
+    #     "cot", "cotangent",
+    #     "coth", "hyperbolic cotangent",
+    #     "covers", "coversine",
+    #     "csc", "cosecant",
+    #     "csch", "hyperbolic cosecant",
+    #     "ctn",
+    #     "ctnh",
+    #     "det", "determinant",
+    #     "erf", "error function",
+    #     "exp", "exponential",
+    #     "exsec", "exsecant",
+    #     "grad", "gradient",
+    #     "hav", "haversine",
+    #     "lim", "limit",
+    #     "upper limit",
+    #     "lower limit",
+    #     "ln", "natural logarithm",
+    #     "log", "logarithm",
+    #     "max", "maximum",
+    #     "min", "minimum",
+    #     "mod", "modulo",
+    #     "re", "real part",
+    #     "sec", "secant",
+    #     "sech", "hyperbolic secant",
+    #     "sin", "sine",
+    #     "sinh", "hyperbolic sine",
+    #     "sup", "supremum",
+    #     "tan", "tangent",
+    #     "tanh", "hyperbolic tangent",
+    #     "vers", "versine",
+    # ]
 ]
 

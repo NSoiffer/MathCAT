@@ -1,11 +1,10 @@
 //!  Useful functionality for testing
 #[cfg(test)]
 
-extern crate regex;
 use regex::Regex;
 extern crate lazy_static;
 use lazy_static::lazy_static;
-use libmathcat::interface::speak_mathml;
+use libmathcat::interface::{speak_mathml, braille_mathml};
 
 // Strip spaces from 'str' so comparison doesn't need to worry about spacing
 #[allow(dead_code)]     // used in testing
@@ -78,4 +77,17 @@ pub fn test_ClearSpeak_prefs(prefs: Vec<(&str, &str)>, mathml: &str, speech: &st
         rules.invalidate(changes);
     });
     assert_eq!(speech, strip_spaces(speak_mathml(mathml)));
+}
+
+// Compare the result of brailling the mathml input to the output (Unicode) 'braille'
+#[allow(dead_code)]     // used in testing
+#[allow(non_snake_case)]
+pub fn test_braille(code: &str, mathml: &str, braille: &str) {
+    libmathcat::speech::BRAILLE_RULES.with(|rules| {
+        let mut rules = rules.borrow_mut();
+        let pref_manager = rules.pref_manager.as_mut();
+        let changes = pref_manager.set_user_prefs("Code", code);
+        rules.invalidate(changes);
+    });
+    assert_eq!(braille, strip_spaces(braille_mathml(mathml)));
 }

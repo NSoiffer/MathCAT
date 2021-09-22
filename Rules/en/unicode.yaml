@@ -8,14 +8,8 @@
  - "A":
     - test: 
         if: "$TTS='none'"
-        then: {t: cap eigh}                      # long "a" sound in all speech engines I tested (see above)
+        then: {t: Eigh}                          # long "a" sound in all speech engines I tested (see above)
         else: {spell: a}
-
- - "B-Z":
-    - test: 
-        if: "$TTS='none'"
-        then: [t: cap]                
-    - spell: "."                                 # note: "." is a hack for ranges to indicate 'current character'
 
  - "!": [t: factorial]                           # 0x21
  - "\"": [t: quotation mark]                     # 0x22

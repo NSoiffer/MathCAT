@@ -1,0 +1,542 @@
+﻿21,!,Exclamation mark,⠸⠖,⠖
+21,!,Factorial,⠯,⠖
+22,"""",Quotation mark,,⠠⠶
+23,#,Number sign,⠨⠼,⠸⠹
+24,$,Dollar sign,⠈⠎,⠈⠎
+25,%,Percent sign,⠈⠴,⠨⠴
+26,&,Ampersand,⠸⠯,⠈⠯
+27,',Apostrophe,⠄,⠄
+28,(,Left parenthesis,⠷,⠐⠣
+29,),Right parenthesis,⠾,⠐⠜
+002A,*,Asterisk,⠈⠼,⠐⠔
+002B,+,Plus sign,⠬,⠐⠖
+002D,-,Hyphen,⠸⠤,⠤
+002E,.,Full stop,⠸⠲,⠼⠲
+002F,/,Solidus,⠸⠌,⠸⠌
+003A,:,Colon,⠸⠒,⠒
+003B,;,Semicolon,⠸⠆,⠆
+003C,<,Less-than sign,⠀⠐⠅⠀,⠈⠣
+003D,=,Equals sign,⠀⠨⠅⠀,⠐⠶
+003E,>,Greater-than sign,⠀⠨⠂⠀,⠈⠜
+003F,?,Question mark,⠸⠦,⠦
+40,@,Commercial at,⠈⠁,⠈⠁
+005B,[,Left square bracket,⠈⠷,⠨⠣
+005C,\,Reverse solidus,⠸⠡,⠸⠡
+005D,],Right square bracket,⠈⠾,⠨⠜
+005E,^,Circumflex accent,⠸⠣,⠈⠢
+005F,_,Low line,,⠨⠤
+007B,{,Left curly bracket,⠨⠷,⠸⠣
+007C,|,Vertical line,⠡,⠸⠳
+007D,},Right curly bracket,⠨⠾,⠸⠜
+007E,~,Tilde,⠈⠱,⠈⠔
+00A2,¢,Cent sign,⠈⠉,⠈⠉
+00A3,£,Pound sterling,⠈⠇,⠈⠇
+00A7,§,Section sign,⠈⠠⠎,⠘⠎
+00A9,©,Copyright sign,⠷⠠⠉⠾,⠘⠉
+00AC,¬,Not sign,,⠈⠹
+00AE,®,Registered sign,⠷⠠r⠾,⠘⠗
+00B0,°,Degree sign,⠘⠨⠡,⠘⠚
+00B1,±,Plus-minus sign,⠬⠤,⠸⠖
+00B6,¶,Pilcrow sign,⠈⠠⠏,⠘⠏
+00B7,·,Middle dot,⠡,
+00D7,×,Multiplication sign,⠈⠡,⠐⠦
+00F7,÷,Division sign,⠨⠌,⠐⠌
+391,Α,Greek capital letter alpha,⠨⠠⠁,⠠⠨⠁
+392,Β,Greek capital letter beta ,⠨⠠⠃,⠠⠨⠃
+393,Γ,Greek capital letter gamma,⠨⠠⠛,⠠⠨⠛
+394,Δ,Greek capital letter delta,⠨⠠⠙,⠠⠨⠙
+395,Ε,Greek capital letter epsilon,⠨⠠⠑,⠠⠨⠑
+396,Ζ,Greek capital letter zeta,⠨⠠⠵,⠠⠨⠵
+397,Η,Greek capital letter eta,⠨⠠⠱,⠠⠨⠱
+398,Θ,Greek capital letter theta,⠨⠠⠹,⠠⠨⠹
+399,Ι,Greek capital letter iota,⠨⠠⠊,⠠⠨⠊
+039A,Κ,Greek capital letter kappa,⠨⠠⠅,⠠⠨⠅
+039B,Λ,Greek capital letter lambda,⠨⠠⠇,⠠⠨⠇
+039C,Μ,Greek capital letter mu,⠨⠠⠍,⠠⠨⠍
+039D,Ν,Greek capital letter nu,⠨⠠⠝,⠠⠨⠝
+039E,Ξ,Greek capital letter xi,⠨⠠⠭,⠠⠨⠭
+039F,Ο,Greek capital letter omicron,⠨⠠⠕,⠠⠨⠕
+03A0,Π,Greek capital letter pi,⠨⠠⠏,⠠⠨⠏
+03A1,Ρ,Greek capital letter rho,⠨⠠⠗,⠠⠨⠗
+03A3,Σ,Greek capital letter sigma,⠨⠠⠎,⠠⠨⠎
+03A4,Τ,Greek capital letter tau,⠨⠠⠞,⠠⠨⠞
+03A5,Υ,Greek capital letter upsilon,⠨⠠⠥,⠠⠨⠥
+03A6,Φ,Greek capital letter phi,⠨⠠⠋,⠠⠨⠋
+03A7,Χ,Greek capital letter chi,⠨⠠⠯,⠠⠨⠯
+03A8,Ψ,Greek capital letter psi,⠨⠠⠽,⠠⠨⠽
+03A9,Ω,Greek capital letter omega,⠨⠠⠺,⠠⠨⠺
+03B1,α,Greek small letter alpha,⠨⠁,⠨⠁
+03B2,β,Greek small letter beta,⠨⠃,⠨⠃
+03B3,γ,Greek small letter gamma,⠨⠛,⠨⠛
+03B4,δ,Greek small letter delta,⠨⠙,⠨⠙
+03B5,ε,Greek small letter epsilon (alternative epsilon),⠨⠈⠑,⠨⠑
+03B6,ζ,Greek small letter zeta,⠨⠵,⠨⠵
+03B7,η,Greek small letter eta,⠨⠱,⠨⠱
+03B8,θ,Greek small letter theta,⠨⠹,⠨⠹
+03B9,ι,Greek small letter iota,⠨⠊,⠨⠊
+03BA,κ,Greek small letter kappa,⠨⠅,⠨⠅
+03BB,λ,Greek small letter lambda,⠨⠇,⠨⠇
+03BC,μ,Greek small letter mu,⠨⠍,⠨⠍
+03BD,ν,Greek small letter nu,⠨⠝,⠨⠝
+03BE,ξ,Greek small letter xi,⠨⠭,⠨⠭
+03BF,ο,Greek small letter omicron,⠨⠕,⠨⠕
+03C0,π,Greek small letter pi,⠨⠏,⠨⠏
+03C1,ρ,Greek small letter rho,⠨⠗,⠨⠗
+03C2,ς,Greek small letter final sigma,⠨⠒,⠨⠎
+03C3,σ,Greek small letter sigma,⠨⠎,⠨⠎
+03C4,τ,Greek small letter tau,⠨⠞,⠨⠞
+03C5,υ,Greek small letter upsilon,⠨⠥,⠨⠥
+03C6,φ,Greek small letter phi (alternative phi),⠨⠈⠋,⠨⠋
+03C7,χ,Greek small letter chi,⠨⠯,⠨⠯
+03C8,ψ,Greek small letter psi,⠨⠽,⠨⠽
+03C9,ω,Greek small letter omega,⠨⠺,⠨⠺
+03D1,ϑ,Greek theta symbol,⠨⠈⠹,
+03D5,ϕ,Greek phi symbol,⠨⠋,
+03D6,ϖ,Greek pi symbol,⠨⠈⠏,
+03F0,ϰ,Greek kappa symbol,⠨⠈⠅,
+03F5,ϵ,Greek lunate epsilon symbol,⠨⠑,
+2014,—,Em dash,⠤⠤,⠠⠤
+2015,―,Horizontal bar,⠤⠤⠤⠤,⠐⠠⠤
+2018,‘,Left single quotation mark,⠠⠦,⠠⠦
+2019,’,Right single quotation mark,⠴⠠,⠠⠴
+201C,“,Left double quotation mark,⠦,⠘⠦
+201D,”,Right double quotation mark,⠴,⠘⠴
+2020,†,Dagger,⠸⠻,⠈⠠⠹
+2021,‡,Double dagger,⠸⠸⠻,⠈⠠⠻
+2022,•,Bullet,⠔⠔,⠸⠲
+2026,…,Ellipsis,⠄⠄⠄,
+2032,′,Prime,⠄,⠶
+2033,″,Double prime,⠄⠄,⠶⠶
+210F,ℏ,Planck constant over two pi,⠈⠓,
+2113,ℓ,Script small l (differs from 1d4c1: 4-56-123),⠈⠇,
+211D,ℝ,Double-struck capital R (no nemeth double struck),,212B,Å,Angstrom sign,⠈⠠⠁,
+2146,ⅆ,Double-struck italic small d,,
+2147,ⅇ,Double-struck italic small e,,
+2190,←,Leftwards arrow ,⠀⠫⠪⠒⠒⠀,⠳⠪
+2191,↑,Upwards arrow,⠀⠫⠣⠒⠒⠕⠀,⠳⠬
+2192,→,Rightwards arrow,⠀⠫⠕⠀,⠳⠕
+2192,→,Rightwards arrow,⠀⠫⠒⠒⠕⠀,
+2193,↓,Downwards arrow,⠀⠫⠩⠒⠒⠕⠀,⠳⠩
+2194,↔,Left right arrow,⠀⠫⠪⠒⠒⠕⠀,⠰⠳⠺⠗⠕
+2195,↕,Up down arrow,⠀⠫⠣⠪⠒⠒⠕⠀,
+2196,↖,North west arrow,⠀⠫⠘⠪⠒⠒⠀,⠳⠱
+2197,↗,North east arrow,⠀⠫⠘⠒⠒⠕⠀,⠳⠎
+2198,↘,South east arrow,⠀⠫⠰⠒⠒⠕⠀,⠳⠣
+2199,↙,South west arrow,⠀⠫⠰⠪⠒⠒⠀,⠳⠜
+219A,↚,Leftwards arrow w stroke,⠀⠳⠈⠫⠪⠒⠒⠻⠀,
+219B,↛,Rightwards arrow w stroke,⠀⠳⠈⠫⠒⠒⠕⠻⠀,
+219C,↜,Leftwards wave arrow,⠀⠫⠪⠔⠒⠢⠀,
+219D,↝,Rightwards wave arrow,⠀⠫⠔⠒⠢⠕⠀,
+219E,↞,Leftwards two headed arrow,⠀⠫⠪⠪⠒⠒⠀,
+219F,↟,Upwards two headed arrow,⠀⠫⠣⠒⠒⠕⠕⠀,
+21A0,↠,Rightwards two headed arrow,⠀⠫⠒⠒⠕⠕⠀,
+21A1,↡,Downwards two headed arrow,⠀⠫⠩⠒⠒⠕⠕⠀,
+21A2,↢,Leftwards arrow w tail,⠀⠫⠪⠒⠒⠠⠽⠀,
+21A3,↣,Rightwards arrow w tail,⠀⠫⠠⠯⠒⠒⠕⠀,
+21A4,↤,Leftwards arrow from bar,⠀⠫⠪⠒⠒⠳⠀,
+21A5,↥,Upwards arrow from bar,⠀⠫⠣⠳⠒⠒⠕⠀,
+21A6,↦,Rightwards arrow from bar,⠀⠫⠳⠒⠒⠕⠀,
+21A7,↧,Downwards arrow from bar,⠀⠫⠩⠳⠒⠒⠕⠀,
+21A8,↨,Up down arrow w base,⠀⠫⠣⠪⠒⠒⠕⠳⠀,
+21A9,↩,Leftwards arrow w hook,⠀⠫⠪⠒⠒⠈⠽⠀,
+21AA,↪,Rightwards arrow w hook,⠀⠫⠈⠯⠒⠒⠕⠀,
+21AB,↫,Leftwards arrow w loop,,
+21AC,↬,Rightwards arrow w loop,,
+21AD,↭,Left right wave arrow,⠀⠫⠪⠔⠒⠢⠕⠀,
+21AE,↮,Left right arrow w stroke,⠀⠳⠈⠫⠪⠒⠒⠕⠻⠀,
+21AF,↯,Downwards zigzag arrow,⠀⠫⠩⠔⠢⠔⠕⠀,
+21B4,↴,Rightwards arrow w corner downwards,⠀⠫⠩⠠⠳⠒⠕⠀,
+21B5,↵,Downwards arrow w corner leftwards,⠀⠫⠪⠒⠈⠳⠀,
+21B6,↶,Anticlockwise top semicircle arrow,,
+21B7,↷,Clockwise top semicircle arrow,,
+21BA,↺,Anticlockwise open circle arrow,⠀⠫⠢⠔⠕⠀,
+21BB,↻,Clockwise open circle arrow,⠀⠫⠪⠢⠔⠀,
+21BC,↼,Leftwards harpoon w barb upwards,⠀⠫⠈⠪⠒⠒⠀,
+21BD,↽,Leftwards harpoon w barb downwards,⠀⠫⠠⠪⠒⠒⠀,
+21BE,↾,Upwards harpoon w barb rightwards,⠀⠫⠣⠒⠒⠠⠕⠀,
+21BF,↿,Upwards harpoon w barb leftwards,⠀⠫⠣⠒⠒⠈⠕⠀,
+21C0,⇀,Rightwards harpoon w barb upwards,⠀⠫⠒⠒⠈⠕⠀,
+21C1,⇁,Rightwards harpoon w barb downwards,⠀⠫⠒⠒⠠⠕⠀,
+21C2,⇂,Downwards harpoon w barb rightwards,⠀⠫⠩⠒⠒⠈⠕⠀,
+21C3,⇃,Downwards harpoon w barb leftwards,⠀⠫⠩⠒⠒⠠⠕⠀,
+21C4,⇄,Rightwards arrow over leftwards arrow,⠀⠫⠒⠒⠕⠫⠪⠒⠒⠀,
+21C5,⇅,Upwards arrow leftwards of downwards arrow,⠀⠫⠣⠒⠒⠕⠐⠫⠩⠒⠒⠕⠀,
+21C6,⇆,Leftwards arrow over rightwards arrow,⠀⠫⠪⠒⠒⠫⠒⠒⠕⠀,
+21C7,⇇,Leftwards paired arrows,⠀⠫⠪⠒⠒⠫⠪⠒⠒⠀,
+21C8,⇈,Upwards paired arrows,⠀⠫⠣⠒⠒⠕⠐⠫⠣⠒⠒⠕⠀,
+21C9,⇉,Rightwards paired arrows,⠀⠫⠒⠒⠕⠫⠒⠒⠕⠀,
+21CA,⇊,Downwards paired arrows,⠀⠫⠩⠒⠒⠕⠐⠫⠩⠒⠒⠕⠀,
+21CB,⇋,Leftwards harpoon over rightwards harpoon,⠀⠫⠈⠪⠒⠒⠫⠒⠒⠠⠕⠀,
+21CC,⇌,Rightwards harpoon over leftwards harpoon,⠀⠫⠒⠒⠈⠕⠫⠠⠪⠒⠒⠀,
+21CD,⇍,Leftwards double arrow w stroke,⠀⠳⠈⠫⠪⠶⠶⠻⠀,
+21CE,⇎,Left right double arrow w stroke,⠀⠳⠈⠫⠪⠶⠶⠕⠻⠀,
+21CF,⇏,Rightwards double arrow w stroke,⠀⠳⠈⠫⠶⠶⠕⠻⠀,
+21D0,⇐,Leftwards double arrow,⠀⠫⠪⠶⠶⠀,⠰⠳⠶⠶⠪
+21D1,⇑,Upwards double arrow,⠀⠫⠣⠶⠶⠕⠀,⠰⠳⠶⠶⠬
+21D2,⇒,Rightwards double arrow,⠀⠫⠶⠶⠕⠀,⠰⠳⠶⠶⠕
+21D3,⇓,Downwards double arrow,⠀⠫⠩⠶⠶⠕⠀,⠰⠳⠶⠶⠩
+21D4,⇔,Left right double arrow,⠀⠫⠪⠶⠶⠕⠀,
+21D5,⇕,Up down double arrow,⠀⠫⠣⠪⠶⠶⠕⠀,
+21D6,⇖,North west double arrow,⠀⠫⠘⠪⠶⠶⠀,
+21D7,⇗,North east double arrow,⠀⠫⠘⠶⠶⠕⠀,
+21D8,⇘,South east double arrow,⠀⠫⠰⠶⠶⠕⠀,
+21D9,⇙,South west double arrow ,⠀⠫⠰⠪⠶⠶⠀,
+21DA,⇚,Leftwards triple arrow,⠀⠫⠪⠸⠸⠀,
+21DB,⇛,Rightwards triple arrow,⠀⠫⠸⠸⠕⠀,
+21DC,⇜,Leftwards squiggle arrow,⠀⠫⠪⠢⠤⠔⠒⠢⠀,
+21DD,⇝,Rightwards squiggle arrow,⠀⠫⠢⠤⠔⠒⠢⠕⠀,
+21DE,⇞,Upwards arrow w double stroke,⠀⠳⠳⠈⠫⠣⠒⠒⠕⠻⠀,
+21DF,⇟,Downwards arrow w double stroke,⠀⠳⠳⠈⠫⠩⠒⠒⠕⠻⠀,
+21E0,⇠,Leftwards dashed arrow,⠀⠫⠪⠒⠀⠒⠀,
+21E1,⇡,Upwards dashed arrow,⠀⠫⠣⠒⠀⠒⠕⠀,
+21E2,⇢,Rightwards dashed arrow,⠀⠫⠒⠀⠒⠕⠀,
+21E3,⇣,Downwards dashed arrow,⠀⠫⠩⠒⠀⠒⠕⠀,
+21E4,⇤,Leftwards arrow to bar,⠀⠳⠫⠪⠒⠒⠀,
+21E5,⇥,Rightwards arrow to bar,⠀⠫⠒⠒⠕⠳⠀,
+21E6,⇦,Leftwards white arrow,,
+21E7,⇧,Upwards white arrow,,
+21E8,⇨,Rightwards white arrow,,
+21E9,⇩,Downwards white arrow,,
+21F3,⇳,Up down white arrow,,
+21F4,⇴,Right arrow w small circle,⠀⠨⠡⠈⠫⠒⠒⠕⠻⠀,
+21F5,⇵,Downwards arrow leftwards of upwards arrow,⠀⠫⠩⠒⠒⠕⠐⠫⠣⠒⠒⠕⠀,
+21F6,⇶,Three rightwards arrows,⠀⠫⠒⠒⠕⠫⠒⠒⠕⠫⠒⠒⠕⠀,
+21F7,⇷,Leftwards arrow w vertical stroke,⠀⠳⠈⠫⠪⠒⠒⠻⠀,
+21F8,⇸,Rightwards arrow w vertical stroke,⠀⠳⠈⠫⠒⠒⠕⠻⠀,
+21F9,⇹,Left right arrow w vertical stroke,⠀⠳⠈⠫⠪⠒⠒⠕⠻⠀,
+21FA,⇺,Leftwards arrow w double vertical stroke,⠀⠳⠳⠈⠫⠪⠒⠒⠻⠀,
+21FB,⇻,Rightwards arrow w double vertical stroke,⠀⠳⠳⠈⠫⠒⠒⠕⠻⠀,
+21FC,⇼,Left right arrow w double vertical stroke,⠀⠳⠳⠈⠫⠪⠒⠒⠕⠻⠀,
+21FD,⇽,Leftwards open-headed arrow,,
+21FE,⇾,Rightwards open-headed arrow,,
+21FF,⇿,Left right open-headed arrow,,
+2200,∀,For all,⠈⠯,⠘⠁
+2202,∂,Partial differential,⠈⠙,⠈⠙
+2203,∃,There exists,⠈⠿,⠘⠢
+2204,∄,There does not exist,⠌⠈⠿,
+2205,∅,Empty set,⠸⠴,⠈⠚
+2207,∇,Nabla,⠨⠫,⠘⠙
+2208,∈,Element of,⠀⠈⠑⠀,⠘⠑
+2209,∉,Not an element of,⠀⠌⠈⠑⠀,
+220B,∋,Contains as member,⠀⠈⠢⠀,⠈⠘⠑
+220C,∌,Does not contain as member,⠀⠌⠈⠢⠀,
+220E,∎,End of proof,⠸⠳,
+2211,∑,N-ary summation,⠨⠠⠎,
+2212,−,Minus sign,⠤,⠐⠤
+2213,∓,Minus-or-plus sign,⠤⠬,⠸⠤
+2214,∔,Dot plus,⠐⠬⠣⠡⠻,
+2215,∕,Division slash ,⠸⠌,
+2217,∗,Asterisk operator,⠈⠼,
+2218,∘,Ring operator,⠨⠡,⠐⠴
+221A,√,Square root,⠜,⠐⠩
+221B,∛,Cube root,⠣⠒⠜,
+221C,∜,Fourth root,⠣⠲⠜,
+221D,∝,Proportional to,⠀⠸⠿⠀,⠸⠐⠶
+221E,∞,Infinity,⠠⠿,⠼⠿
+221F,∟,Right angle,⠫⠪⠨⠗⠻,
+2220,∠,Angle,⠫⠪,⠸⠪
+2221,∡,Measured angle,⠫⠪⠈⠫⠁⠻,⠨⠸⠪
+2223,∣,Divides,⠀⠳⠀,
+2224,∤,Does not divide,⠀⠌⠳⠀,
+2225,∥,Parallel to,⠀⠫⠇⠀,⠼⠇
+2226,∦,Not parallel to,⠀⠌⠫⠇⠀,
+2227,∧,Logical AND,⠈⠩,⠈⠦
+2228,∨,Logical OR,⠈⠬,⠈⠖
+2229,∩,Intersection,⠨⠩,⠨⠦
+222A,∪,Union,⠨⠬,⠨⠖
+222B,∫,Integral,⠮,⠮
+222C,∬,Double integral,⠮⠮,⠮⠮
+222D,∭,Triple integral,⠮⠮⠮,⠮⠮⠮
+222E,∮,Contour integral,⠮⠈⠫⠉⠻,⠈⠮
+2232,∲,Clockwise contour integral ??? §156 has half arcs,⠮⠈⠫⠪⠢⠔⠻,
+2233,∳,Anticlockwise contour integral ???,⠮⠈⠫⠢⠔⠕⠻,
+2234,∴,Therefore,⠀⠠⠡⠀,⠠⠡
+2235,∵,Because,⠀⠈⠌⠀,⠈⠌
+2236,∶,Ratio,⠀⠐⠂⠀,⠒
+2237,∷,Proportion,⠀⠰⠆⠀,⠒⠒
+2238,∸,Dot minus,⠨⠤,
+2239,∹,Excess,⠀⠤⠐⠂⠀,
+223A,∺,Geometric proportion,⠀⠐⠤⠩⠡⠡⠣⠡⠡⠻⠀,
+223B,∻,Homothetic,⠀⠐⠈⠱⠩⠡⠣⠡⠻⠀,
+223C,∼,Tilde operator,⠀⠈⠱⠀,
+223D,∽,Reversed tilde,⠀⠠⠱⠀,
+2242,≂,Minus tilde,⠀⠱⠈⠱⠀,
+2243,≃,Asymptotically equal to,⠀⠈⠱⠱⠀,⠸⠔
+2245,≅,Approximately equal to,⠀⠈⠱⠨⠅⠀,⠐⠸⠔
+2248,≈,Almost equal to,⠀⠈⠱⠈⠱⠀,⠘⠔
+224A,≊,Almost equal or equal to,⠀⠈⠱⠈⠱⠱⠀,
+224B,≋,Triple tilde,⠀⠈⠱⠈⠱⠈⠱⠀,
+224C,≌,All equal to,⠀⠠⠱⠨⠅⠀,
+224D,≍,Equivalent to,⠀⠫⠠⠫⠈⠀,
+224E,≎,Geometrically equivalent to,⠀⠈⠣⠠⠣⠀,
+224F,≏,Difference between,⠀⠈⠣⠱⠀,⠘⠐⠶
+2250,≐,Approaches the limit,⠀⠐⠨⠅⠣⠡⠻⠀,
+2251,≑,Geometrically equal to,⠀⠐⠨⠅⠩⠡⠣⠡⠻⠀,⠨⠐⠶
+2254,≔,Colon equals,⠀⠐⠂⠨⠅⠀,
+2255,≕,Equals colon,⠀⠨⠅⠐⠂⠀,
+2256,≖,Ring in equal to,⠀⠨⠡⠈⠨⠅⠻⠀,
+2257,≗,Ring equal to,⠀⠐⠨⠅⠣⠨⠡⠻⠀,
+2258,≘,Corresponds to,⠀⠐⠨⠅⠣⠫⠁⠻⠀,
+2259,≙,Estimates,⠀⠐⠨⠅⠣⠸⠣⠻⠀,
+225A,≚,Equiangular to,⠀⠐⠨⠅⠣⠸⠩⠻⠀,
+225B,≛,Star equals,⠀⠐⠨⠅⠣⠫⠎⠻⠀,
+225C,≜,Delta equal to,⠀⠐⠨⠅⠣⠫⠞⠻⠀,
+225D,≝,Equal to by definition,⠀⠐⠨⠅⠣⠙⠑⠋⠻⠀,
+225E,≞,Measured by,⠀⠐⠨⠅⠣⠍⠻⠀,
+225F,≟,Questioned equal to,⠀⠐⠨⠅⠣⠸⠢⠻⠀,
+2260,≠,Not equal to,⠀⠌⠨⠅⠀,⠐⠶⠈⠱
+2261,≡,Identical to,⠀⠸⠇⠀,⠸⠿
+2262,≢,Not identical to,⠀⠌⠸⠇⠀,
+2264,≤,Less-than or equal to,⠀⠐⠅⠱⠀,⠸⠈⠣
+2265,≥,Greater-than or equal to,⠀⠨⠂⠱⠀,⠸⠈⠜
+2266,≦,Less-than over equal to,⠀⠐⠅⠨⠅⠀,
+2267,≧,Greater-than over equal to,⠀⠨⠂⠨⠅⠀,
+2268,≨,Less-than but not equal to,⠀⠐⠅⠌⠨⠅⠀,
+2269,≩,Greater-than but not equal to,⠀⠨⠂⠌⠨⠅⠀,
+226A,≪,Much less-than,⠀⠐⠅⠈⠐⠅⠻⠀,⠨⠈⠣
+226B,≫,Much greater-than,⠀⠨⠂⠈⠨⠂⠻⠀,⠨⠈⠜
+226D,≭,Not equivalent to,⠀⠌⠈⠣⠠⠣⠀,
+226E,≮,Not less-than,⠀⠌⠐⠅⠀,
+226F,≯,Not greater-than,⠀⠌⠨⠂⠀,
+2270,≰,Neither less-than nor equal to,⠀⠌⠐⠅⠱⠀,
+2271,≱,Neither greater-than nor equal to,⠀⠌⠨⠂⠱⠀,
+2272,≲,Less-than or equivalent to,⠀⠐⠅⠈⠱⠀,
+2273,≳,Greater-than or equivalent to,⠀⠨⠂⠈⠱⠀,
+2274,≴,Neither less-than nor equivalent to,⠀⠌⠐⠅⠈⠱⠀,
+2275,≵,Neither greater-than nor equivalent to,⠀⠌⠨⠂⠈⠱⠀,
+2276,≶,Less-than or greater-than,⠀⠐⠅⠨⠂⠀,
+2277,≷,Greater-than or less-than,⠀⠨⠂⠐⠅⠀,
+2278,≸,Neither less-than nor greater-than,⠀⠌⠐⠅⠨⠂⠀,
+2279,≹,Neither greater-than nor less-than,⠀⠌⠨⠂⠐⠅⠀,
+227A,≺,Precedes,⠀⠨⠐⠅⠀,
+227B,≻,Succeeds,⠀⠨⠨⠂⠀,
+227E,≾,Precedes or equivalent to,⠀⠨⠐⠅⠈⠱⠀,
+227F,≿,Succeeds or equivalent to,⠀⠨⠨⠂⠈⠱⠀,
+2282,⊂,Subset of,⠀⠸⠐⠅⠀,⠘⠣
+2283,⊃,Superset of,⠀⠸⠨⠂⠀,⠘⠜
+2284,⊄,Not a subset of,⠀⠌⠸⠐⠅⠀,
+2285,⊅,Not a superset of,⠀⠌⠸⠨⠂⠀,
+2286,⊆,Subset of or equal to,⠀⠸⠐⠅⠱⠀,⠸⠘⠣
+2287,⊇,Superset of or equal to,⠀⠸⠨⠂⠱⠀,⠸⠘⠜
+2288,⊈,Neither a subset of nor equal to,⠀⠌⠸⠐⠅⠱⠀,
+2289,⊉,Neither a superset of nor equal to,⠀⠌⠸⠨⠂⠱⠀,
+228A,⊊,Subset of w not equal to,⠀⠸⠐⠅⠌⠱⠀,⠨⠘⠣
+228B,⊋,Superset of w not equal to,⠀⠸⠨⠂⠌⠱⠀,⠨⠘⠜
+228C,⊌,Multiset,⠨⠬⠈⠫⠪⠒⠻,
+228D,⊍,Multiset multiplication,⠡⠈⠨⠬⠻,
+228E,⊎,Multiset union,⠬⠈⠨⠬⠻,
+2295,⊕,Circled plus,⠫⠉⠸⠫⠬⠻,⠰⠫⠿⠪⠐⠖⠱
+2296,⊖,Circled minus,⠫⠉⠸⠫⠤⠻,
+2297,⊗,Circled times,⠫⠉⠸⠫⠈⠡⠻,
+2298,⊘,Circled division slash,⠫⠉⠸⠫⠸⠌⠻,
+2299,⊙,Circled dot operator,⠫⠉⠸⠫⠡⠻,
+229B,⊛,Circled asterisk operator,⠫⠉⠸⠫⠈⠼⠻,
+229C,⊜,Circled equals,⠫⠉⠸⠫⠨⠅⠻,
+229D,⊝,Circled dash,⠫⠉⠸⠫⠤⠤⠻,
+229E,⊞,Squared plus,⠫⠲⠸⠫⠬⠻,
+229F,⊟,Squared minus,⠫⠲⠸⠫⠤⠻,
+22A0,⊠,Squared times,⠫⠲⠸⠫⠈⠡⠻,
+22A1,⊡,Squared dot operator,⠫⠲⠸⠫⠡⠻,
+22A2,⊢,Right tack,⠀⠫⠳⠒⠀,
+22A3,⊣,Left tack,⠀⠫⠒⠳⠀,⠈⠸⠒
+22A4,⊤,Down tack,⠀⠫⠩⠳⠒⠀,
+22A5,⊥,Up tack (See also 27C2),⠀⠫⠏⠀ or ⠀⠫⠣⠳⠒⠀,⠼⠤
+22A6,⊦,Assertion,,⠸⠒
+22A8,⊨,TRUE,,⠘⠸⠒
+22B2,⊲,Normal subgroup of,,⠈⠸⠣
+22B3,⊳,Contains as normal subgroup,,⠈⠸⠜
+22B4,⊴,Normal subgroup of or equal to,,⠸⠸⠣
+22B5,⊵,Contains as normal subgroup or equal to,,⠸⠸⠜
+22B6,⊶,Original of,⠀⠫⠨⠡⠒⠡⠀,
+22B7,⊷,Image of,⠀⠫⠡⠒⠨⠡⠀,
+22B8,⊸,Multimap,⠀⠫⠒⠨⠡⠀,
+22BE,⊾,Right angle w arc,,⠼⠸⠪
+22BF,⊿,Right triangle,⠫⠞⠨⠗⠻,
+22C5,⋅,Dot operator,⠡,⠐⠲
+22C6,⋆,Star operator,⠫⠎,
+22CD,⋍,Reversed tilde equals,⠀⠠⠱⠱⠀,
+22D6,⋖,Less-than w dot,⠀⠡⠈⠐⠅⠻⠀,
+22D7,⋗,Greater-than w dot,⠀⠡⠈⠨⠂⠻⠀,
+22D8,⋘,Much less-than,⠀⠐⠅⠈⠐⠅⠈⠐⠅⠻⠀,
+22D9,⋙,Much greater-than,⠀⠨⠂⠈⠨⠂⠈⠨⠂⠻⠀,
+22DC,⋜,Equal to or less-than,⠀⠱⠐⠅⠀,
+22DD,⋝,Equal to or greater-than,⠀⠱⠨⠂⠀,
+22EE,⋮,Vertical ellipsis,⠀⠩⠒⠒⠒⠀,
+22EF,⋯,Midline horizontal ellipsis,⠀⠒⠒⠒,
+22F0,⋰,Up right diagonal ellipsis,⠀⠘⠒⠒⠒⠀,
+22F1,⋱,Down right diagonal ellipsis,⠀⠰⠒⠒⠒⠀,
+22F2,⋲,Element of w long horizontal stroke,⠀⠱⠈⠈⠑⠻⠀,
+22F5,⋵,Element of w dot above,⠀⠐⠈⠑⠣⠡⠻⠀,
+22F6,⋶,Element of w overbar,⠀⠱⠈⠑⠀,
+22FA,⋺,Contains w long horizontal stroke,⠀⠱⠈⠈⠢⠻⠀,
+22FD,⋽,Contains w overbar,⠀⠱⠈⠢⠀,
+2308,⌈,Left ceiling,⠈⠘⠷,
+2309,⌉,Right ceiling,⠈⠘⠾,
+230A,⌊,Left floor,⠈⠰⠷,
+230B,⌋,Right floor,⠈⠰⠾,
+2322,⌢,Frown,⠀⠫⠁⠀,
+2323,⌣,Smile,⠀⠫⠄⠀,
+25A0,■,Filled square,⠫⠸⠲,
+25A1,□,Square,⠫⠲,
+25AC,▬,Filled rectangle,⠫⠸⠗,
+25AD,▭,Rectangle,⠫⠗,
+25B2,▲,Black up-pointing triangle,⠫⠸⠞,
+25B3,△,White up-pointing triangle,⠫⠞,
+25BC,▼,Black down-pointing triangle,⠸⠨⠫,
+25CB,○,White circle,⠫⠉,⠿
+25CF,●,Black circle,⠫⠸⠉,
+25EB,◫,White square w vertical bisecting line,⠫⠲⠸⠫⠳⠻,
+27C2,⊥,Perpendicular,⠀⠫⠏⠀,
+27C3,⟃,Open subset,⠀⠨⠡⠈⠸⠐⠅⠻⠀,
+27C4,⟄,Open superset,⠀⠨⠡⠈⠸⠨⠂⠻⠀,
+27DC,⟜,Left multimap,⠀⠫⠨⠡⠒⠒⠀,
+27DD,⟝,Long right tack,⠀⠫⠳⠒⠒⠀,
+27DE,⟞,Long left tack,⠀⠫⠒⠒⠳⠀,
+27DF,⟟,Up tack w circle above,⠫⠣⠳⠒⠒⠨⠡,
+27E6,⟦,Mathematical left white square bracket,⠈⠸⠷,
+27E7,⟧,Mathematical right white square bracket,⠈⠸⠾,
+27E8,⟨,Mathematical left angle bracket,⠨⠨⠷,
+27E9,⟩,Mathematical right angle bracket,⠨⠨⠾,
+27F5,⟵,Long leftwards arrow ,⠀⠫⠪⠒⠒⠒⠀,
+27F6,⟶,Long rightwards arrow,⠀⠫⠒⠒⠒⠕⠀,
+27F7,⟷,Long left right arrow,⠀⠫⠪⠒⠒⠒⠕⠀,
+27F8,⟸,Long leftwards arrow ,⠀⠫⠪⠶⠶⠶⠀,
+27F9,⟹,Long rightwards arrow,⠀⠫⠶⠶⠶⠕⠀,
+27FA,⟺,Long left right arrow,⠀⠫⠪⠶⠶⠶⠕⠀,
+27FB,⟻,Long leftwards arrow from bar,⠀⠫⠪⠒⠒⠒⠳⠀,
+27FC,⟼,Long rightwards arrow from bar,⠀⠫⠳⠒⠒⠒⠕⠀,
+27FD,⟽,Long leftwards double arrow from bar,⠀⠫⠪⠶⠶⠶⠳⠀,
+27FE,⟾,Long rightwards double arrow from bar,⠀⠫⠳⠶⠶⠶⠕⠀,
+27FF,⟿,Long rightwards squiggle arrow,⠀⠫⠢⠤⠔⠒⠢⠤⠔⠒⠢⠕⠀,
+2921,⤡,North west and south east arrow,⠀⠫⠘⠪⠒⠒⠕⠀,
+2922,⤢,North east and south west arrow,⠀⠫⠰⠪⠒⠒⠕⠀,
+2983,⦃,Left white curly bracket,⠨⠸⠷,
+2984,⦄,Right white curly bracket,⠨⠸⠾,
+2991,⦑,Left angle bracket w dot,⠡⠈⠨⠨⠷⠻,
+2992,⦒,Right angle bracket w dot,⠡⠈⠨⠨⠾⠻,
+29C4,⧄,Square rising diagonal slash,⠫⠲⠸⠫⠔⠻,
+29C5,⧅,Square falling diagonal slash,⠫⠲⠸⠫⠢⠻,
+29C6,⧆,Squared asterisk,⠫⠲⠸⠫⠈⠼⠻,
+29CA,⧊,Triangle w dot above,⠐⠫⠞⠣⠡⠻,
+29CB,⧋,Triangle w underbar,⠫⠞⠱,
+29CC,⧌,s in triangle §114,⠫⠞⠎,
+29E6,⧦,Gleich stark,⠫⠳⠶⠶⠳,
+2A0C,⨌,Quadruple integral operator,⠮⠮⠮⠮,⠮⠮⠮⠮
+2A0D,⨍,Finite part integral,⠮⠈⠱⠻,
+2A0E,⨎,Integral w double stroke,⠮⠈⠱⠱⠻,
+2A16,⨖,Quaternion integral operator,⠮⠈⠫⠲⠻,
+2A18,⨘,Integral w times sign,⠮⠈⠈⠡⠻,
+2A19,⨙,Integral w intersection,⠮⠈⠨⠩⠻,
+2A1A,⨚,Integral w union,⠮⠈⠨⠬⠻,
+2A1B,⨛,Integral w overbar (upper),⠣⠮,
+2A1C,⨜,Integral w underbar (lower),⠩⠮,
+2A22,⨢,Plus sign w small circle above,⠐⠬⠣⠨⠡⠻,
+2A23,⨣,Plus sign w circumflex accent above,⠐⠬⠣⠸⠣⠻,
+2A24,⨤,Plus sign w tilde above,⠐⠬⠣⠈⠱⠻,
+2A25,⨥,Plus sign w dot below,⠐⠬⠩⠡⠻,
+2A2A,⨪,Minus sign w dot below,⠐⠱⠩⠡⠻,
+2A30,⨰,Multiplication sign w dot above,⠐⠈⠡⠣⠡⠻,
+2A31,⨱,Multiplication sign w underbar,⠈⠡⠱,
+2A38,⨸,Circled division sign,⠫⠉⠸⠫⠨⠌⠻,
+2A39,⨹,Plus sign in triangle,⠫⠞⠸⠫⠬⠻,
+2A3A,⨺,Minus sign in triangle,⠫⠞⠸⠫⠤⠻,
+2A3B,⨻,Multiplication sign in triangle,⠫⠞⠸⠫⠈⠡⠻,
+2A40,⩀,Intersection w dot,⠡⠈⠨⠩⠻,
+2A41,⩁,Union w minus sign,⠤⠈⠨⠬⠻,
+2A42,⩂,Union w overbar,⠱⠨⠬,
+2A43,⩃,Intersection w overbar,⠱⠨⠩,
+2A51,⩑,Logical AND w dot above,⠐⠈⠩⠣⠡⠻,
+2A52,⩒,Logical OR w dot above,⠐⠈⠬⠣⠡⠻,
+2A5C,⩜,Logical AND with horizontal dash,⠱⠈⠈⠩⠻,
+2A5D,⩝,Logical OR with horizontal dash,⠱⠈⠈⠬⠻,
+2A5E,⩞,Logical AND w double overbar,⠱⠱⠈⠩,
+2A5F,⩟,Logical AND w underbar,⠈⠩⠱,
+2A60,⩠,Logical AND w double underbar,⠈⠩⠱⠱,
+2A62,⩢,Logical OR w double overbar,⠱⠱⠈⠬,
+2A63,⩣,Logical OR w double underbar,⠈⠬⠱⠱,
+2A66,⩦,Equals sign w dot below,⠀⠐⠨⠅⠩⠡⠻⠀,
+2A67,⩧,Identical w dot above,⠀⠐⠸⠇⠣⠡⠻⠀,
+2A6A,⩪,Tilde operator w dot above,⠀⠐⠈⠱⠣⠡⠻⠀,
+2A6C,⩬,Similar minus similar,⠀⠈⠱⠱⠈⠱⠀,
+2A6D,⩭,Congruent w dot above,⠀⠐⠈⠱⠨⠅⠣⠡⠻⠀,
+2A6E,⩮,Equals w asterisk,⠀⠐⠨⠅⠣⠈⠼⠻⠀,
+2A6F,⩯,Almost equal to w circumflex,⠀⠐⠈⠱⠈⠱⠣⠸⠣⠻⠀,
+2A70,⩰,Approximately equal or equal to,⠀⠈⠱⠈⠱⠨⠅⠀,
+2A71,⩱,Equals sign above plus sign,⠀⠨⠅⠬⠀,
+2A72,⩲,Plus sign above equals sign,⠀⠬⠨⠅⠀,
+2A73,⩳,Equals sign above tilde operator,⠀⠨⠅⠈⠱⠀,
+2A74,⩴,Double colon equal,⠀⠐⠂⠐⠂⠨⠅⠀,
+2A75,⩵,Two consecutive equals signs,⠀⠨⠅⠨⠅⠀,
+2A76,⩶,Three consecutive equals signs,⠀⠨⠅⠨⠅⠨⠅⠀,
+2A77,⩷,Equals sign w two dots above and two dots below,⠀⠐⠨⠅⠩⠡⠡⠣⠡⠡⠻⠀,
+2A78,⩸,Equivalent w four dots above,⠀⠐⠸⠇⠣⠡⠡⠡⠡⠻⠀,
+2A79,⩹,Less than w circle inside,⠀⠐⠅⠈⠨⠡⠻⠀,
+2A7A,⩺,Greater than w circle inside,⠀⠨⠂⠈⠨⠡⠻⠀,
+2A7B,⩻,Less-than w question mark above,⠀⠐⠐⠅⠣⠸⠦⠻⠀,
+2A7C,⩼,Greater-than w question mark above,⠀⠐⠨⠂⠣⠸⠦⠻⠀,
+2A85,⪅,Less-than or approximate,⠀⠐⠅⠈⠱⠈⠱⠀,
+2A86,⪆,Greater-than or approximate,⠀⠨⠂⠈⠱⠈⠱⠀,
+2A8B,⪋,Less-than above double-line equal above greater-than,⠀⠐⠅⠨⠅⠨⠂⠀,
+2A8C,⪌,Greater-than above double-line equal above less-than,⠀⠨⠂⠨⠅⠐⠅⠀,
+2A8D,⪍,Less-than above similar or equal to,⠀⠐⠅⠈⠱⠱⠀,
+2A8E,⪎,Greater-than above similar or equal to,⠀⠨⠂⠈⠱⠱⠀,
+2A8F,⪏,Less-than above similar above greater-than,⠀⠐⠅⠈⠱⠨⠂⠀,
+2A90,⪐,Greater-than above similar above less-than,⠀⠨⠂⠈⠱⠐⠅⠀,
+2A91,⪑,Less-than above greater-than above double-line equal,⠀⠐⠅⠨⠂⠨⠅⠀,
+2A92,⪒,Greater-than above less-than above double-line equal,⠀⠨⠂⠐⠅⠨⠅⠀,
+2A99,⪙,Double-line equal to or less-than,⠀⠨⠅⠐⠅⠀,
+2A9A,⪚,Double-line equal to or greater-than,⠀⠨⠅⠨⠂⠀,
+2A9D,⪝,Similar or less-than,⠀⠈⠱⠐⠅⠀,
+2A9E,⪞,Similar or greater-than,⠀⠈⠱⠨⠂⠀,
+2A9F,⪟,Similar above less-than above equals sign,⠀⠈⠱⠐⠅⠨⠅⠀,
+2AA0,⪠,Similar above greater-than above equals sign,⠀⠈⠱⠨⠂⠨⠅⠀,
+2AAE,⪮,Equals sign with bumpy above,⠀⠈⠣⠨⠅⠀,
+2AAF,⪯,Precedes above single-line equals sign,⠀⠨⠐⠅⠱⠀,
+2AB0,⪰,Succeeds above single-line equals sign,⠀⠨⠨⠂⠱⠀,
+2AB1,⪱,Precedes above single-line not equal to,⠀⠨⠐⠅⠌⠱⠀,
+2AB2,⪲,Succeeds above single-line not equal to,⠀⠨⠨⠂⠌⠱⠀,
+2AB3,⪳,Precedes above equals sign,⠀⠨⠐⠅⠨⠅⠀,
+2AB4,⪴,Succeeds above equals sign,⠀⠨⠨⠂⠨⠅⠀,
+2AB5,⪵,Precedes above not equal to,⠀⠨⠐⠅⠌⠨⠅⠀,
+2AB6,⪶,Succeeds above not equal to,⠀⠨⠨⠂⠌⠨⠅⠀,
+2AB7,⪷,Precedes above almost equals to,⠀⠨⠐⠅⠈⠱⠈⠱⠀,
+2AB8,⪸,Succeeds above almost equals to,⠀⠨⠨⠂⠈⠱⠈⠱⠀,
+2AB9,⪹,Precedes above not almost equals to,⠀⠨⠐⠅⠌⠈⠱⠈⠱⠀,
+2ABA,⪺,Succeeds above not almost equals to,⠀⠨⠨⠂⠌⠈⠱⠈⠱⠀,
+2ABB,⪻,Double precedes,⠀⠨⠐⠅⠈⠨⠐⠅⠻⠀,
+2ABC,⪼,Double succeeds,⠀⠨⠨⠂⠈⠨⠨⠂⠻⠀,
+2ABD,⪽,Subset w dot,⠀⠡⠈⠸⠐⠅⠻⠀,
+2ABE,⪾,Superset w dot,⠀⠡⠈⠸⠨⠂⠻⠀,
+2ABF,⪿,Subset with plus sign below,⠀⠐⠸⠐⠅⠩⠬⠻⠀,
+2AC0,⫀,Superset with plus sign below,⠀⠐⠸⠨⠂⠩⠬⠻⠀,
+2AC1,⫁,Subset with multiplication sign below,⠀⠐⠸⠐⠅⠩⠈⠡⠻⠀,
+2AC2,⫂,Superset with multiplication sign below,⠀⠐⠸⠨⠂⠩⠈⠡⠻⠀,
+2AC5,⫅,Subset of above equals sign,⠀⠸⠐⠅⠨⠅⠀,
+2AC6,⫆,Superset of above equals sign,⠀⠸⠨⠂⠨⠅⠀,
+2AC7,⫇,Subset of above tilde operator,⠀⠸⠐⠅⠈⠱⠀,
+2AC8,⫈,Superset of above tilde operator,⠀⠸⠨⠂⠈⠱⠀,
+2AC9,⫉,Subset of above almost equal to,⠀⠸⠐⠅⠈⠱⠈⠱⠀,
+2ACA,⫊,Superset of above almost equal to,⠀⠸⠨⠂⠈⠱⠈⠱⠀,
+2ACB,⫋,Subset of above not equals sign,⠀⠸⠐⠅⠌⠨⠅⠀,
+2ACC,⫌,Superset of above not equals sign,⠀⠸⠨⠂⠌⠨⠅⠀,
+2AD3,⫓,Subset above superset,⠀⠸⠐⠅⠸⠨⠂⠀,
+2AD4,⫔,Superset above subset,⠀⠸⠨⠂⠸⠐⠅⠀,
+2AD5,⫕,Subset above subset,⠀⠸⠐⠅⠸⠐⠅⠀,
+2AD6,⫖,Superset above superset,⠀⠸⠨⠂⠸⠨⠂⠀,
+2AD7,⫗,Superset beside subset,⠀⠸⠨⠂⠐⠸⠐⠅⠀,
+2AEF,⫯,Vertical line w circle above,⠀⠫⠩⠨⠡⠒⠒⠀,
+2AF0,⫰,Vertical line w circle below,⠀⠫⠣⠨⠡⠒⠒⠀,
+2AF1,⫱,Down tack w circle below,⠀⠫⠣⠨⠡⠒⠒⠳⠀,
+2AF2,⫲,Parallel w horizontal stroke,⠀⠱⠈⠫⠇⠻⠀,
+2AF3,⫳,Parallel w tilde operator,⠀⠈⠱⠈⠫⠇⠻⠀,
+2AF4,⫴,Triple vertical bar binary relation,⠀⠳⠳⠳⠀,
+2B1F,⬟,Black pentagon,⠫⠸⠢,
+2B20,⬠,White pentagon,⠫⠢,
+2B21,⬡,White hexagon,⠫⠖,
+2B22,⬢,Black hexagon,⠫⠸⠖,
+2B2C,⬬,Black ellipse,⠫⠸⠑,
+2B2D,⬭,White ellipse,⠫⠑,
+2B30,⬰,Left arrow w small circle,⠀⠨⠡⠈⠫⠪⠒⠒⠻⠀,
+2B31,⬱,Three leftwards arrows,⠀⠫⠪⠒⠒⠫⠪⠒⠒⠫⠪⠒⠒⠀,
+2B32,⬲,Left arrow w circled plus,⠀⠫⠪⠒⠒⠈⠫⠉⠸⠫⠬⠻⠀,
+2BC3,⯃,Horizontal black octagon,⠫⠸⠦,
