@@ -8,7 +8,7 @@ is a library that supports conversion of MathML to:
 
 Todo: incorporation of third party libraries to support a common subset of TeX math commands along with ASCIIMath.
 
-MathCAT is written in Rust and can be built to interface with C/C++. It can also be built with a Python interface. The Python interface is used by NVDA and by Orca. 
+MathCAT is written in Rust and can be built to interface with C/C++. It can also be built with a Python interface. The Python interface can be used by NVDA and by Orca. 
 
 ## Current Status
 MathCAT is under active development and I expect that by the end of September, it will be usable as a MathPlayer replacement for those using the English version. It will not be as complete or polished in some ways as MathPlayer though.
