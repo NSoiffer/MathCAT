@@ -772,7 +772,7 @@ impl NemethChars {
                     nemeth_chars +=  &caps["lang"];
                 }
                 println!("is_in_list: {}; num: {}", is_in_enclosed_list, caps["num"].is_empty());
-                if typeface_changed || !(is_in_enclosed_list || caps["num"].is_empty()) {
+                if !caps["num"].is_empty() && (typeface_changed || !is_in_enclosed_list) {
                     nemeth_chars += "N";
                 }
                 is_all_caps &= !&caps["cap"].is_empty();
