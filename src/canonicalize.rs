@@ -352,21 +352,25 @@ impl CanonicalizeContext {
 	// Changes to "good" MathML:
 	// 1. mfenced -> mrow
 	// 2. mspace and mtext with only whitespace are thrown out unless in a required element position
+	// Note: mspace that is potentially part of a number that was split apart is merged into a number as a single space char
 	fn clean_mathml<'a>(&self, mathml: Element<'a>) -> Option<Element<'a>> {
 		lazy_static! {
             static ref IS_WHITESPACE: Regex = Regex::new(r"^\s+$").unwrap();    // only Unicode whitespace
         }
-		const ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN: [&str; 10] =
-				["mfrac", "mroot", "msub", "msup", "msupsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv"];
+		static ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN: phf::Set<&str> = phf_set! {
+			"mfrac", "mroot", "msub", "msup", "msupsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv"
+		};
+		
+		let element_name = name(&mathml);
 		let parent_requires_child = 
-			if name(&mathml) == "math" {
+			if element_name == "math" {
 				false
 			} else {
-				ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(
-					&name(&mathml.parent().unwrap().element().unwrap())
-				)
+				let parent = mathml.parent().unwrap().element().unwrap();
+				let parent_name = name(&parent).to_string();
+				ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(parent_name.as_str())
 			};
-		match name(&mathml) {
+		match element_name {
 			"mi" | "mn" | "ms" | "mglyph" => {return Some(mathml);},
 			"mo" => {
 				// common bug: trig functions, lim, etc., should be mi
@@ -404,6 +408,8 @@ impl CanonicalizeContext {
 				return if parent_requires_child {Some(mathml)} else {None};
 			},
 			_  => {
+				let mathml = if element_name == "mrow" || element_name == "math"
+										 {merge_number_blocks(mathml)} else {mathml};
 				let mut new_children = Vec::with_capacity(mathml.children().len());
 				for child in mathml.children() {
 					let child = as_element(child);			
@@ -414,9 +420,8 @@ impl CanonicalizeContext {
 
 				// Throw out mstyle -- to do this, we need to avoid mstyle being the arg of clean_mathml
 				// FIX: should probably push the attrs down to the children (set in 'self')
-				let name = name(&mathml);
 				// Also throw out mpadded
-				if  name == "mstyle" || name == "mpadded" {
+				if element_name == "mstyle" || element_name == "mpadded" {
 					if new_children.len() == 1 {
 						return Some( new_children[0] );
 					} else {
@@ -436,6 +441,112 @@ impl CanonicalizeContext {
 		fn convert_mfenced_to_mrow(mathml: Element) -> Element {
 			// FIX: implement this
 			return mathml;
+		}
+
+		fn is_digit_block(mathml: Element) -> bool {
+			// returns true if an 'mn' with exactly three digits
+			lazy_static! {
+				static ref IS_DIGIT_BLOCK: Regex = Regex::new(r"^\d\d\d$").unwrap();    // only Unicode whitespace
+			}
+			return name(&mathml) == "mn" && IS_DIGIT_BLOCK.is_match(as_text(mathml));
+		}
+
+		fn merge_number_blocks<'a>(mrow: Element<'a>) -> Element<'a> {
+			// FIX: be more cautious if inside parens 
+			//   in particular, don't do this for fence d , ddd fence because likely to be be point, interval, etc
+			// since needing to merge digit blocks is unlikely, we don't do a copy until we find something
+			let mut children = mrow.children();
+			let mut i = 0;
+			while i < children.len() {
+				let child = as_element(children[i]);
+				if name(&child) == "mn" {
+					let mut looking_for_separator = true;
+					let mut end = children.len() - i;
+					for (j, sibling) in children[i+1..].iter().enumerate() {
+						let sibling = as_element(*sibling);
+						let sibling_name = name(&sibling);
+						// FIX: generalize to more types of spacing (e.g., mtext with space)
+						// FIX: generalize to include locale ("." vs ",")
+						if !(looking_for_separator &&
+							  (sibling_name == "mspace" || (sibling_name == "mo" && as_text(sibling) == ","))) &&
+						   (looking_for_separator || !is_digit_block(sibling)) {
+							end = j;
+							break;
+						}
+						looking_for_separator = !looking_for_separator;
+					}
+					if is_likely_a_number(mrow, i, i+end) {
+						merge_block(mrow, i, i+end);
+						children = mrow.children();		// mrow has changed, so we need a new children array
+						}
+				}
+				i += 1;
+			}
+			return mrow;
+		}
+
+		fn is_likely_a_number<'a>(mrow: Element<'a>, start: usize, end: usize) -> bool {
+			// be a little careful about merging the numbers	
+			if end - start < 3 {
+				return false;		// need at least digit separator digit-block
+			}
+
+			let children = mrow.children();
+			if name(&as_element(children[end-1])) != "mn" {
+				return false;		// end with a digit block
+			}
+			if name(&as_element(children[start+1])) == "mspace" || 
+			   IS_WHITESPACE.is_match(as_text(as_element(children[start+1]))) {
+				return true;		// digit block separated by whitespace
+			}
+
+			// If surrounded by fences, and commas are used, leave as is (e.g, "{1,234}")
+			// We have already checked for whitespace as separators, so it must be a comma. Just check the fences.
+			// This is not yet in canonical form, so the fences may be siblings or siblings of the parent 
+			let first_child;
+			let last_child;
+			if start == 0 && end == children.len() {
+				let parent = mrow.parent().unwrap();
+				if parent.root().is_some() {
+					// mrow could really be a math element, so we could hit the root
+					// if we are at the root, then there aren't parens around this
+					return true;
+				} 
+				let parent = parent.element().unwrap();
+				let preceding = parent.preceding_siblings();
+				first_child = as_element(preceding[preceding.len()-1]);
+				last_child = as_element(parent.following_siblings()[0]);
+			} else if start > 0 && end < children.len()-1 {
+				first_child = as_element(children[start-1]);
+				last_child = as_element(children[end]);
+			} else {
+				return true; // can't be fences around it
+			}
+			// println!("first_child: {}", crate::pretty_print::mml_to_string(&first_child));
+			// println!("last_child: {}", crate::pretty_print::mml_to_string(&last_child));
+			return name(&first_child) == "mo" && is_fence(first_child) &&
+				   name(&last_child) == "mo" && is_fence(last_child);
+		}
+
+		fn merge_block<'a>(mrow: Element<'a>, start: usize, end: usize) {
+			let children = mrow.children();
+			let mut mn_text = String::with_capacity(4*(end-start)-1);		// true size less than #3 digit blocks + separator
+			for i in start..end {
+				let child = as_element(children[i]);
+				if name(&child) == "mspace" {
+					mn_text.push(' ');
+				} else {
+					mn_text.push_str(as_text(child));
+				}
+			}
+			let child = as_element(children[start]);
+			child.set_text(&mn_text);
+
+			// not very efficient since this is probably causing an array shift each time (array is probably not big though)
+			for i in start+1..end {
+				let child = as_element(children[i]);
+				child.remove_from_parent();
+			}
 		}
 	}
 

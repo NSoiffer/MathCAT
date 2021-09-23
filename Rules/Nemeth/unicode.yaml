@@ -3,6 +3,7 @@
 # Typeface: S: sans-serif, B: bold, T: script/blackboard, I: italic, R: Roman
 # Language: E: English, D: German, G: Greek, V: Greek variants, H: Hebrew, U: Russian
 # Indicators: C: capital, N: number, P: punctuation, M: multipurpose
+# Others: W -- whitespace that should be kept (e.g, in a numeral)
 #  SRE doesn't have H: Hebrew or U: Russian, so not encoded (yet)
 
 
@@ -2144,9 +2145,19 @@
 
 
 
- # overwrites from Murray
- - " ": [t: "⠀"]                 # 0x20 (space)
- - " ": [t: "⠀"]                 # 0xA0 (non-breaking space)
+ # overwrites from MS
+   # space inside of numbers has special treatment
+ - " ":                        # 0x20 (space)
+    - test:
+        if: "self::m:mn"
+        then: [t: "W"]
+        else: [t: "⠀"]
+
+ - " ":                        # 0xA0 (non-breaking space)
+    - test:
+        if: "self::m:mn"
+        then: [t: "W"]
+        else: [t: "⠀"]
  - "!":                          # 0x21 (Factorial)
     - test:
         if: "self::m:mo"

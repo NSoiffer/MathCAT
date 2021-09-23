@@ -85,6 +85,7 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
     // Typeface: S: sans-serif, B: bold, T: script/blackboard, I: italic, R: Roman
     // Language: E: English, D: German, G: Greek, V: Greek variants, H: Hebrew, U: Russian
     // Indicators: C: capital, N: number, P: punctuation, M: multipurpose
+    // Others: W -- whitespace that should be kept (e.g, in a numeral)
     // SRE doesn't have H: Hebrew or U: Russian, so not encoded (yet)
     // Note: some "positive" patterns find cases to keep the char and transform them to the lower case version
     static INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
@@ -104,7 +105,8 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         "M" => "",
         "m" => "⠐",
         "N" => "",
-        "n" => "⠼"
+        "n" => "⠼",
+        "W" => "⠀"
     };
 
     lazy_static! {
@@ -169,11 +171,7 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         static ref REMOVE_PUNCT_IND: Regex =
             Regex::new(r"(^|⠀|\w)P(.)").unwrap();  
 
-        // To greatly simplify typeface/language generation, the chars have unique ASCII chars for them:
-        // Typeface: S: sans-serif, B: bold, T: script/blackboard, I: italic, R: Roman
-        // Language: E: English, D: German, G: Greek, V: Greek variants, H: Hebrew, U: Russian
-        // Indicators: N: number, P: punctuation, M: multipurpose
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SBTIREDGVHPCMmNn])").unwrap();  
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SBTIREDGVHPCMmNnW])").unwrap();  
             
         static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[⠘⠰]+⠐)").unwrap();
         static ref REMOVE_LEVEL_IND_BEFORE_SPACE: Regex = Regex::new(r"(?:[⠘⠰]+⠐?|⠐)(⠀|$)").unwrap();

@@ -750,7 +750,8 @@ fn test_107() {
 fn test_108() {
     let expr = "<math>
         <msup><mn>128</mn><mn>4</mn></msup><mo>=</mo><mn>268</mn><mo>,</mo><mn>435</mn><mo>,</mo><mn>456</mn></math>";
-    test_braille("Nemeth", expr, "⠼⠂⠆⠦⠘⠲⠀⠨⠅⠀⠼⠆⠖⠦⠠⠀⠼⠲⠒⠢⠠⠀⠼⠲⠢⠖");
+    // corrected to remove spaces and numeric indicators
+    test_braille("Nemeth", expr, "⠼⠂⠆⠦⠘⠲⠀⠨⠅⠀⠼⠆⠖⠦⠠⠲⠒⠢⠠⠲⠢⠖");
 }
 
 #[test]
@@ -2059,7 +2060,8 @@ fn test_303() {
 fn test_304() {
     let expr = "<math><mi>η<!-- η --></mi><mo>:</mo><mi>G</mi>
         <mrow><mo>/</mo></mrow><mi>K</mi><mo stretchy=\"false\">→<!-- → --></mo><mi>ψ<!-- ψ --></mi><mo stretchy=\"false\">(</mo><mi>G</mi><mo stretchy=\"false\">)</mo></math>";
-    test_braille("Nemeth", expr, "⠨⠱⠸⠒⠀⠠⠛⠸⠌⠠⠅⠀⠫⠕⠀⠨⠽⠷⠠⠛⠾");
+    // corrected: removed extra space after "⠸⠒"
+    test_braille("Nemeth", expr, "⠨⠱⠸⠒⠠⠛⠸⠌⠠⠅⠀⠫⠕⠀⠨⠽⠷⠠⠛⠾");
 }
 
 #[test]
