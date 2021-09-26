@@ -2177,10 +2177,10 @@
  - ",":                         # 0x002C (Comma)
     - test:
           # test if first ancestor that isn't an mrow is a script tag (rule 78)
-      - if: "ancestor-or-self::*[not(parent::m:mrow)][1][parent::m:msub or parent::m:msup or parent::m:msubsup][preceding-sibling::*]"
-        then: [t: "⠪"]        # Rule 78
-      - else_if: "self::m:mn"
+      - if: "self::m:mn"
         then: [t: "⠠"]
+      - else_if: "ancestor-or-self::*[not(parent::m:mrow)][1][parent::m:msub or DEBUG(parent::m:msup )or parent::m:msubsup][preceding-sibling::*]"
+        then: [t: "⠪"]        # Rule 78
         else: [t: "⠠⠀"]
  - "-":                         # 0x002D (Hyphen)  (0x2212 normalized to here)
     - test:
@@ -2190,8 +2190,11 @@
 
  - ".":                          # 0x002E (Full stop or decimal pt)
     - test:
-        if: "self::m:mn"
-        then: [t: "N⠨"]          # decimal point
+        if: "DEBUG(self::m:mn)"
+        then_test:
+          if: "DEBUG(string-length(text()) = 1)"
+          then: [t: "𝑁⠨"]      # example 8c(4) -- lone "." is not considered numeric, but not a period
+          else: [t: "N⠨"]
         else: [t: "P⠲"]         # period
  - "/": [t: "⠸⠌"]               # 0x002F (Solidus)
  - ":": [t: "P⠒"]               # 0x003A (Colon)
