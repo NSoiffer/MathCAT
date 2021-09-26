@@ -47,7 +47,7 @@ pub fn speak_mathml(mathml_str: &str) -> String {
     let package = package.unwrap();
     cleanup_mathml(&package);
     let mathml = get_element(&package);
-    return crate::speech::speak_mathml(&mathml);
+    return crate::speech::speak_mathml(mathml);
 }
 
 /// Given MathML, a Unicode braille string is return.
@@ -64,7 +64,7 @@ pub fn braille_mathml(mathml_str: &str) -> String {
     let package = package.unwrap();
     cleanup_mathml(&package);
     let mathml = get_element(&package);
-    return crate::speech::braille_mathml(&mathml);
+    return crate::speech::braille_mathml(mathml);
 }
 
 thread_local!{
@@ -108,7 +108,7 @@ pub fn GetSpokenText(_py: Python) -> PyResult<String> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
-        let speech = crate::speech::speak_mathml(&mathml);
+        let speech = crate::speech::speak_mathml(mathml);
         eprintln!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( speech );
     });
@@ -196,8 +196,15 @@ fn set_speech_tags(pref_manager: &mut PreferenceManager, speech_tags: String ) -
 /// Get the braille associated with the MathML that was set by [`SetMathML`].
 /// The braille returned depends upon the preference for braille output.
 pub fn GetBraille(_py: Python) -> PyResult<String> {
-    // FIX: not yet implemented (basically what the braille says)
-    return Ok("⠠⠃⠗⠁⠊⠇⠇⠑ ⠛⠑⠝⠑⠗⠁⠞⠊⠕⠝ ⠝⠕⠞ ⠽⠑⠞ ⠊⠍⠏⠇⠑⠍⠑⠝⠞".to_string());
+    use std::time::{Instant};
+    let instant = Instant::now();
+    return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&*package_instance);
+        let braille = crate::speech::braille_mathml(mathml);
+        eprintln!("Time taken: {}ms", instant.elapsed().as_millis());
+        return Ok( braille );
+    });
 }
 
 #[pyfunction]
