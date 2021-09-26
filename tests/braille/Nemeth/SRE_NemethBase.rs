@@ -1,63 +1,63 @@
 use crate::common::*;
 
 #[test]
-fn test_0() {
+fn test_00() {
     let expr = "<math><mo>∗<!-- ∗ --></mo></math>";
     test_braille("Nemeth", expr, "⠈⠼");
 }
 
 #[test]
-fn test_1() {
+fn test_01() {
     let expr = "<math><mo>†<!-- † --></mo></math>";
     test_braille("Nemeth", expr, "⠸⠻");
 }
 
 #[test]
-fn test_2() {
+fn test_02() {
     let expr = "<math><mo>‡<!-- ‡ --></mo></math>";
     test_braille("Nemeth", expr, "⠸⠸⠻");
 }
 
 #[test]
-fn test_3() {
+fn test_03() {
     let expr = "<math><mi mathvariant=\"normal\">§<!-- § --></mi></math>";
     test_braille("Nemeth", expr, "⠈⠠⠎");
 }
 
 #[test]
-fn test_4() {
+fn test_04() {
     let expr = "<math><mi mathvariant=\"normal\">§<!-- § --></mi><mi mathvariant=\"normal\">§<!-- § --></mi></math>";
     test_braille("Nemeth", expr, "⠈⠠⠎⠀⠈⠠⠎");
 }
 
 #[test]
-fn test_5() {
+fn test_05() {
     let expr = "<math><mo>☆</mo></math>";
     test_braille("Nemeth", expr, "⠫⠎");
 }
 
 #[test]
-fn test_6() {
+fn test_06() {
     let expr = "<math>
         <msup><mtext>A Cantor</mtext><mo>∗<!-- ∗ --></mo></msup><mtext> set is</mtext><mo>…<!-- … --></mo></math>";
     test_braille("Nemeth", expr, "⠠⠁⠀⠠⠉⠁⠝⠞⠕⠗⠘⠈⠼⠐⠀⠎⠑⠞⠀⠊⠎⠀⠄⠄⠄");
 }
 
 #[test]
-fn test_7() {
+fn test_07() {
     let expr = "<math><mi>f</mi><mo>∗<!-- ∗ --></mo><mi>g</mi></math>";
     test_braille("Nemeth", expr, "⠋⠈⠼⠛");
 }
 
 #[test]
-fn test_8() {
+fn test_08() {
     let expr = "<math>
         <msup><mtext>Find the index</mtext><mn>1</mn></msup><mtext> of the radical.</mtext></math>";
     test_braille("Nemeth", expr, "⠠⠋⠊⠝⠙⠀⠞⠓⠑⠀⠊⠝⠙⠑⠭⠘⠂⠐⠀⠕⠋⠀⠞⠓⠑⠀⠗⠁⠙⠊⠉⠁⠇⠨");
 }
 
 #[test]
-fn test_9() {
+fn test_09() {
     let expr = "<math>
         <msup><mi></mi><mo>∗<!-- ∗ --></mo></msup><mtext>Irrational numbers</mtext><mo>…<!-- … --></mo></math>";
     test_braille("Nemeth", expr, "⠘⠈⠼⠐⠠⠊⠗⠗⠁⠞⠊⠕⠝⠁⠇⠀⠝⠥⠍⠃⠑⠗⠎⠀⠄⠄⠄");

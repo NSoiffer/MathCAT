@@ -1,20 +1,20 @@
 use crate::common::*;
 
 #[test]
-fn test_0() {
+fn test_000() {
     let expr = "<math><mi>r</mi><mo>≡<!-- ≡ --></mo><mi>s</mi><mspace width=\"0.444em\"></mspace><mo stretchy=\"false\">(</mo><mi>mod</mi><mspace width=\"0.333em\"></mspace><mi>n</mi><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠗⠀⠸⠇⠀⠎⠷⠍⠕⠙⠀⠝⠾");
 }
 
 #[test]
-fn test_1() {
+fn test_001() {
     let expr = "<math><mi>y</mi><mo>=</mo>
         <msup><mi>x</mi><mi>E</mi></msup><mspace width=\"0.667em\"></mspace><mi>mod</mi><mspace width=\"thinmathspace\"></mspace><mspace width=\"thinmathspace\"></mspace><mi>n</mi></math>";
     test_braille("Nemeth", expr, "⠽⠀⠨⠅⠀⠭⠘⠠⠑⠐⠍⠕⠙⠀⠝");
 }
 
 #[test]
-fn test_2() {
+fn test_002() {
     let expr = "<math>
         <mrow><mo stretchy=\"false\">|</mo></mrow>
         <mrow><mover><mi>X</mi><mo>~<!-- ~ --></mo></mover></mrow>
@@ -24,20 +24,20 @@ fn test_2() {
 }
 
 #[test]
-fn test_3() {
+fn test_003() {
     let expr = "<math><mrow><mi mathvariant=\"script\">S</mi></mrow></math>";
     test_braille("Nemeth", expr, "⠈⠰⠠⠎");
 }
 
 #[test]
-fn test_4() {
+fn test_004() {
     let expr = "<math><mi>a</mi>
         <msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mi>b</mi><mi>x</mi><mo>+</mo><mi>c</mi><mo>=</mo><mn>0</mn></math>";
     test_braille("Nemeth", expr, "⠁⠭⠘⠆⠐⠬⠃⠭⠬⠉⠀⠨⠅⠀⠼⠴");
 }
 
 #[test]
-fn test_5() {
+fn test_005() {
     let expr = "<math><mi>A</mi>
         <mrow><mover>
         <mrow><mo stretchy=\"false\">→<!-- → --></mo></mrow>
@@ -46,14 +46,14 @@ fn test_5() {
 }
 
 #[test]
-fn test_6() {
+fn test_006() {
     let expr = "<math><mi>g</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo><mo>=</mo>
         <mroot><mi>x</mi><mn>3</mn></mroot></math>";
     test_braille("Nemeth", expr, "⠛⠷⠭⠾⠀⠨⠅⠀⠣⠒⠜⠭⠻");
 }
 
 #[test]
-fn test_7() {
+fn test_007() {
     let expr = "<math><msubsup><mi>T</mi><mi>A</mi>
         <mrow><mo>−<!-- − --></mo><mn>1</mn></mrow></msubsup><mo>=</mo><msub><mi>T</mi>
         <mrow>
@@ -63,13 +63,13 @@ fn test_7() {
 }
 
 #[test]
-fn test_8() {
+fn test_008() {
     let expr = "<math><munder><mo>⋃<!-- ⋃ --></mo><mi>k</mi></munder><msub><mi>X</mi><mi>k</mi></msub><mo>=</mo><mi>X</mi></math>";
     test_braille("Nemeth", expr, "⠐⠨⠬⠩⠅⠻⠠⠭⠰⠅⠀⠨⠅⠀⠠⠭");
 }
 
 #[test]
-fn test_9() {
+fn test_009() {
     let expr = "<math><mstyle displaystyle=\"true\" scriptlevel=\"0\"><mi>f</mi><mo stretchy=\"false\">(</mo><mi>p</mi>
         <mrow><mo>/</mo></mrow><mi>q</mi><mo stretchy=\"false\">)</mo><mo>=</mo>
         <mfrac>
@@ -79,7 +79,7 @@ fn test_9() {
 }
 
 #[test]
-fn test_10() {
+fn test_010() {
     let expr = "<math><mi>X</mi><mo>=</mo>
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">N</mi></mrow></mrow><mo>∪<!-- ∪ --></mo><mo fence=\"false\" stretchy=\"false\">{</mo>
@@ -88,13 +88,13 @@ fn test_10() {
 }
 
 #[test]
-fn test_11() {
+fn test_011() {
     let expr = "<math><mover><mi>z</mi><mo accent=\"false\">¯<!-- ¯ --></mo></mover><mo>=</mo><mi>a</mi><mo>−<!-- − --></mo><mi>b</mi><mi>i</mi></math>";
     test_braille("Nemeth", expr, "⠵⠱⠀⠨⠅⠀⠁⠤⠃⠊");
 }
 
 #[test]
-fn test_12() {
+fn test_012() {
     let expr = "<math>
         <mrow><msub>
         <mrow><mi mathvariant=\"double-struck\">Z</mi></mrow><mn>8</mn></msub></mrow></math>";
@@ -102,7 +102,7 @@ fn test_12() {
 }
 
 #[test]
-fn test_13() {
+fn test_013() {
     let expr = "<math><mi>C</mi><mo>=</mo>
         <mrow><mo>{</mo>
         <mrow>
@@ -119,13 +119,13 @@ fn test_13() {
 }
 
 #[test]
-fn test_14() {
+fn test_014() {
     let expr = "<math><msqrt><mn>2</mn><mo>+</mo><msqrt><mn>3</mn></msqrt></msqrt></math>";
     test_braille("Nemeth", expr, "⠜⠆⠬⠨⠜⠒⠨⠻⠻");
 }
 
 #[test]
-fn test_15() {
+fn test_015() {
     let expr = "<math>
         <msqrt>
         <mroot><mn>2</mn><mn>3</mn></mroot><mo>−<!-- − --></mo><mi>i</mi></msqrt></math>";
@@ -133,7 +133,7 @@ fn test_15() {
 }
 
 #[test]
-fn test_16() {
+fn test_016() {
     let expr = "<math>
         <msup>
         <mrow>
@@ -142,7 +142,7 @@ fn test_16() {
 }
 
 #[test]
-fn test_17() {
+fn test_017() {
     let expr = "<math><msub>
         <mrow><mover><mi>X</mi><mo>~<!-- ~ --></mo></mover></mrow>
         <mrow><mo stretchy=\"false\">(</mo><mn>1</mn><mo stretchy=\"false\">)</mo></mrow></msub><mo>=</mo>
@@ -151,25 +151,25 @@ fn test_17() {
 }
 
 #[test]
-fn test_18() {
+fn test_018() {
     let expr = "<math><msub><mi>G</mi><mn>0</mn></msub><mo>=</mo><mo fence=\"false\" stretchy=\"false\">{</mo><mi>A</mi><mo>:</mo><mo stretchy=\"false\">(</mo><mi>A</mi><mo>,</mo><mi>b</mi><mo stretchy=\"false\">)</mo><mo>∈<!-- ∈ --></mo><mi>G</mi><mtext>for some</mtext><mi>b</mi><mo fence=\"false\" stretchy=\"false\">}</mo></math>";
     test_braille("Nemeth", expr, "⠠⠛⠴⠀⠨⠅⠀⠨⠷⠠⠁⠸⠒⠷⠠⠁⠠⠀⠃⠾⠀⠈⠑⠀⠠⠛⠋⠕⠗⠀⠎⠕⠍⠑⠃⠨⠾");
 }
 
 #[test]
-fn test_19() {
+fn test_019() {
     let expr = "<math><mn>300</mn><mo>!</mo></math>";
     test_braille("Nemeth", expr, "⠼⠒⠴⠴⠯");
 }
 
 #[test]
-fn test_20() {
+fn test_020() {
     let expr = "<math><mi>A</mi><mo>∪<!-- ∪ --></mo><mo stretchy=\"false\">(</mo><mi>B</mi><mo>∪<!-- ∪ --></mo><mi>C</mi><mo stretchy=\"false\">)</mo><mo>=</mo><mo stretchy=\"false\">(</mo><mi>A</mi><mo>∪<!-- ∪ --></mo><mi>B</mi><mo stretchy=\"false\">)</mo><mo>∪<!-- ∪ --></mo><mi>C</mi></math>";
     test_braille("Nemeth", expr, "⠠⠁⠨⠬⠷⠠⠃⠨⠬⠠⠉⠾⠀⠨⠅⠀⠷⠠⠁⠨⠬⠠⠃⠾⠨⠬⠠⠉");
 }
 
 #[test]
-fn test_21() {
+fn test_021() {
     let expr = "<math>
         <mrow><mstyle scriptlevel=\"0\">
         <mrow><mo maxsize=\"1.2em\" minsize=\"1.2em\">(</mo></mrow></mstyle><mfrac linethickness=\"0\"><mi>n</mi><mi>k</mi></mfrac><mstyle scriptlevel=\"0\">
@@ -179,14 +179,14 @@ fn test_21() {
 }
 
 #[test]
-fn test_22() {
+fn test_022() {
     let expr = "<math><mn>3</mn><mo>+</mo><mn>56</mn><mo>−<!-- − --></mo><mn>13</mn><mo>+</mo><mn>8</mn>
         <mrow><mo>/</mo></mrow><mn>2</mn></math>";
     test_braille("Nemeth", expr, "⠼⠒⠬⠢⠖⠤⠂⠒⠬⠦⠸⠌⠆");
 }
 
 #[test]
-fn test_23() {
+fn test_023() {
     let expr = "<math><mi>w</mi><mo stretchy=\"false\">(</mo>
         <mrow>
         <mrow><mi mathvariant=\"bold\">x</mi></mrow></mrow><mo stretchy=\"false\">)</mo><mo>=</mo><mi>d</mi><mo stretchy=\"false\">(</mo>
@@ -198,55 +198,55 @@ fn test_23() {
 }
 
 #[test]
-fn test_24() {
+fn test_024() {
     let expr = "<math><mn>6.00000</mn><mo>+</mo><mn>0.00000</mn><mi>i</mi></math>";
     test_braille("Nemeth", expr, "⠼⠖⠨⠴⠴⠴⠴⠴⠬⠴⠨⠴⠴⠴⠴⠴⠊");
 }
 
 #[test]
-fn test_25() {
+fn test_025() {
     let expr = "<math><mi>p</mi><mo>=</mo><mn>0.0001</mn></math>";
     test_braille("Nemeth", expr, "⠏⠀⠨⠅⠀⠼⠴⠨⠴⠴⠴⠂");
 }
 
 #[test]
-fn test_26() {
+fn test_026() {
     let expr = "<math><mi>p</mi><mo>=</mo><mn>0.01</mn></math>";
     test_braille("Nemeth", expr, "⠏⠀⠨⠅⠀⠼⠴⠨⠴⠂");
 }
 
 #[test]
-fn test_27() {
+fn test_027() {
     let expr = "<math><mi>p</mi><mo>=</mo><mn>0.995</mn></math>";
     test_braille("Nemeth", expr, "⠏⠀⠨⠅⠀⠼⠴⠨⠔⠔⠢");
 }
 
 #[test]
-fn test_28() {
+fn test_028() {
     let expr = "<math><mi>p</mi><mo>=</mo><mn>0.999</mn></math>";
     test_braille("Nemeth", expr, "⠏⠀⠨⠅⠀⠼⠴⠨⠔⠔⠔");
 }
 
 #[test]
-fn test_29() {
+fn test_029() {
     let expr = "<math><mtext>A</mtext><mo>=</mo><mn>00</mn><mo>,</mo><mtext>B</mtext><mo>=</mo><mn>01</mn><mo>,</mo><mo>…<!-- … --></mo><mo>,</mo><mtext>Z</mtext><mo>=</mo><mn>25</mn></math>";
     test_braille("Nemeth", expr, "⠠⠁⠀⠨⠅⠀⠼⠴⠴⠠⠀⠠⠃⠀⠨⠅⠀⠼⠴⠂⠠⠀⠄⠄⠄⠠⠀⠠⠵⠀⠨⠅⠀⠼⠆⠢");
 }
 
 #[test]
-fn test_30() {
+fn test_030() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>000</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠴⠾");
 }
 
 #[test]
-fn test_31() {
+fn test_031() {
     let expr = "<math><mn>0000</mn></math>";
     test_braille("Nemeth", expr, "⠼⠴⠴⠴⠴");
 }
 
 #[test]
-fn test_32() {
+fn test_032() {
     let expr = "<math><msub>
         <mrow>
         <mrow><mi mathvariant=\"bold\">c</mi></mrow></mrow><mn>1</mn></msub><mo>=</mo><mo stretchy=\"false\">(</mo><mn>00000</mn><mo stretchy=\"false\">)</mo></math>";
@@ -254,25 +254,25 @@ fn test_32() {
 }
 
 #[test]
-fn test_33() {
+fn test_033() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>00001</mn><mo stretchy=\"false\">)</mo><mo>+</mo><mi>C</mi></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠴⠴⠂⠾⠬⠠⠉");
 }
 
 #[test]
-fn test_34() {
+fn test_034() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>0000101100</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠴⠴⠂⠴⠂⠂⠴⠴⠾");
 }
 
 #[test]
-fn test_35() {
+fn test_035() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>00010</mn><mo stretchy=\"false\">)</mo><mo>+</mo><mi>C</mi></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠴⠂⠴⠾⠬⠠⠉");
 }
 
 #[test]
-fn test_36() {
+fn test_036() {
     let expr = "<math>
         <mrow>
         <mrow><mi mathvariant=\"bold\">z</mi></mrow></mrow><mo>=</mo><mo stretchy=\"false\">(</mo><mn>00011</mn><mo stretchy=\"false\">)</mo></math>";
@@ -280,49 +280,49 @@ fn test_36() {
 }
 
 #[test]
-fn test_37() {
+fn test_037() {
     let expr = "<math><mn>001</mn></math>";
     test_braille("Nemeth", expr, "⠼⠴⠴⠂");
 }
 
 #[test]
-fn test_38() {
+fn test_038() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>00100</mn><mo stretchy=\"false\">)</mo><mo>+</mo><mi>C</mi></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠂⠴⠴⠾⠬⠠⠉");
 }
 
 #[test]
-fn test_39() {
+fn test_039() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>0010000101</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠂⠴⠴⠴⠴⠂⠴⠂⠾");
 }
 
 #[test]
-fn test_40() {
+fn test_040() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>001001</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠂⠴⠴⠂⠾");
 }
 
 #[test]
-fn test_41() {
+fn test_041() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>01000</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>00101</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>11011</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>10110</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠂⠴⠴⠴⠾⠷⠴⠴⠂⠴⠂⠾⠷⠂⠂⠴⠂⠂⠾⠷⠂⠴⠂⠂⠴⠾");
 }
 
 #[test]
-fn test_42() {
+fn test_042() {
     let expr = "<math><mn>0011</mn></math>";
     test_braille("Nemeth", expr, "⠼⠴⠴⠂⠂");
 }
 
 #[test]
-fn test_43() {
+fn test_043() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>00110</mn><mo stretchy=\"false\">)</mo><mo>+</mo><mi>C</mi></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠂⠂⠴⠾⠬⠠⠉");
 }
 
 #[test]
-fn test_44() {
+fn test_044() {
     let expr = "<math><msub>
         <mrow>
         <mrow><mi mathvariant=\"bold\">c</mi></mrow></mrow><mn>2</mn></msub><mo>=</mo><mo stretchy=\"false\">(</mo><mn>00111</mn><mo stretchy=\"false\">)</mo></math>";
@@ -330,31 +330,31 @@ fn test_44() {
 }
 
 #[test]
-fn test_45() {
+fn test_045() {
     let expr = "<math><mn>010</mn></math>";
     test_braille("Nemeth", expr, "⠼⠴⠂⠴");
 }
 
 #[test]
-fn test_46() {
+fn test_046() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>0100</mn><mspace width=\"thickmathspace\"></mspace><mn>0101</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠼⠴⠂⠴⠴⠀⠼⠴⠂⠴⠂⠾");
 }
 
 #[test]
-fn test_47() {
+fn test_047() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>01000</mn><mo stretchy=\"false\">)</mo><mo>+</mo><mi>C</mi></math>";
     test_braille("Nemeth", expr, "⠷⠴⠂⠴⠴⠴⠾⠬⠠⠉");
 }
 
 #[test]
-fn test_48() {
+fn test_048() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>00100</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>01001</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>10111</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>11010</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠂⠴⠴⠾⠷⠴⠂⠴⠴⠂⠾⠷⠂⠴⠂⠂⠂⠾⠷⠂⠂⠴⠂⠴⠾");
 }
 
 #[test]
-fn test_49() {
+fn test_049() {
     let expr = "<math>
         <mrow>
         <mrow><mi mathvariant=\"bold\">x</mi></mrow></mrow><mo>=</mo><mo stretchy=\"false\">(</mo><mn>010011</mn>
@@ -363,25 +363,25 @@ fn test_49() {
 }
 
 #[test]
-fn test_50() {
+fn test_050() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>00111</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>01010</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>10100</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>11001</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠂⠂⠂⠾⠷⠴⠂⠴⠂⠴⠾⠷⠂⠴⠂⠴⠴⠾⠷⠂⠂⠴⠴⠂⠾");
 }
 
 #[test]
-fn test_51() {
+fn test_051() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>011100</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>011011</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>111011</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>100011</mn><mo stretchy=\"false\">)</mo><mspace linebreak=\"newline\"></mspace><mo stretchy=\"false\">(</mo><mn>000000</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>010101</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>110100</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>110011</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠂⠂⠂⠴⠴⠾⠷⠴⠂⠂⠴⠂⠂⠾⠷⠂⠂⠂⠴⠂⠂⠾⠷⠂⠴⠴⠴⠂⠂⠾⠷⠴⠴⠴⠴⠴⠴⠾⠷⠴⠂⠴⠂⠴⠂⠾⠷⠂⠂⠴⠂⠴⠴⠾⠷⠂⠂⠴⠴⠂⠂⠾");
 }
 
 #[test]
-fn test_52() {
+fn test_052() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>11110101</mn><mo stretchy=\"false\">)</mo><mo>,</mo><mo stretchy=\"false\">(</mo><mn>01010100</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠂⠂⠂⠂⠴⠂⠴⠂⠾⠠⠀⠷⠴⠂⠴⠂⠴⠂⠴⠴⠾");
 }
 
 #[test]
-fn test_53() {
+fn test_053() {
     let expr = "<math>
         <mrow>
         <mrow><mi mathvariant=\"bold\">z</mi></mrow></mrow><mo>=</mo><mo stretchy=\"false\">(</mo><mn>010111</mn>
@@ -390,25 +390,25 @@ fn test_53() {
 }
 
 #[test]
-fn test_54() {
+fn test_054() {
     let expr = "<math><mn>011</mn></math>";
     test_braille("Nemeth", expr, "⠼⠴⠂⠂");
 }
 
 #[test]
-fn test_55() {
+fn test_055() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>0110</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠂⠂⠴⠾");
 }
 
 #[test]
-fn test_56() {
+fn test_056() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>00001</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>01100</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>10010</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>11111</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠴⠴⠂⠾⠷⠴⠂⠂⠴⠴⠾⠷⠂⠴⠴⠂⠴⠾⠷⠂⠂⠂⠂⠂⠾");
 }
 
 #[test]
-fn test_57() {
+fn test_057() {
     let expr = "<math>
         <mrow>
         <mrow><mi mathvariant=\"bold\">x</mi></mrow></mrow><mo>=</mo><mo stretchy=\"false\">(</mo><mn>011001</mn>
@@ -417,61 +417,61 @@ fn test_57() {
 }
 
 #[test]
-fn test_58() {
+fn test_058() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>011010</mn><mo stretchy=\"false\">)</mo><mo>,</mo><mo stretchy=\"false\">(</mo><mn>011100</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠂⠂⠴⠂⠴⠾⠠⠀⠷⠴⠂⠂⠂⠴⠴⠾");
 }
 
 #[test]
-fn test_59() {
+fn test_059() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>0110110</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>0111100</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>1110000</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>1111111</mn><mo stretchy=\"false\">)</mo><mspace linebreak=\"newline\"></mspace><mo stretchy=\"false\">(</mo><mn>1001001</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>1000011</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>0001111</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>0000000</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠂⠂⠴⠂⠂⠴⠾⠷⠴⠂⠂⠂⠂⠴⠴⠾⠷⠂⠂⠂⠴⠴⠴⠴⠾⠷⠂⠂⠂⠂⠂⠂⠂⠾⠷⠂⠴⠴⠂⠴⠴⠂⠾⠷⠂⠴⠴⠴⠴⠂⠂⠾⠷⠴⠴⠴⠂⠂⠂⠂⠾⠷⠴⠴⠴⠴⠴⠴⠴⠾");
 }
 
 #[test]
-fn test_60() {
+fn test_060() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>1001</mn><mo stretchy=\"false\">)</mo><mo>,</mo><mo stretchy=\"false\">(</mo><mn>0111</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠂⠴⠴⠂⠾⠠⠀⠷⠴⠂⠂⠂⠾");
 }
 
 #[test]
-fn test_61() {
+fn test_061() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>10000</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>11101</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>00011</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>01110</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠂⠴⠴⠴⠴⠾⠷⠂⠂⠂⠴⠂⠾⠷⠴⠴⠴⠂⠂⠾⠷⠴⠂⠂⠂⠴⠾");
 }
 
 #[test]
-fn test_62() {
+fn test_062() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>00010</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>01111</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>10001</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>11100</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠴⠂⠴⠾⠷⠴⠂⠂⠂⠂⠾⠷⠂⠴⠴⠴⠂⠾⠷⠂⠂⠂⠴⠴⠾");
 }
 
 #[test]
-fn test_63() {
+fn test_063() {
     let expr = "<math><mtext>A</mtext><mo>=</mo><mn>00</mn><mo>,</mo><mtext>B</mtext><mo>=</mo><mn>02</mn><mo>,</mo><mo>…<!-- … --></mo><mo>,</mo><mtext>Z</mtext><mo>=</mo><mn>25</mn></math>";
     test_braille("Nemeth", expr, "⠠⠁⠀⠨⠅⠀⠼⠴⠴⠠⠀⠠⠃⠀⠨⠅⠀⠼⠴⠆⠠⠀⠄⠄⠄⠠⠀⠠⠵⠀⠨⠅⠀⠼⠆⠢");
 }
 
 #[test]
-fn test_64() {
+fn test_064() {
     let expr = "<math><mi>c</mi><mo>=</mo><mn>4</mn><mspace width=\"thinmathspace\"></mspace><mn>598</mn><mspace width=\"thinmathspace\"></mspace><mn>037</mn><mspace width=\"thinmathspace\"></mspace><mn>234</mn></math>";
     test_braille("Nemeth", expr, "⠉⠀⠨⠅⠀⠼⠲⠀⠢⠔⠦⠀⠴⠒⠶⠀⠆⠒⠲");
 }
 
 #[test]
-fn test_65() {
+fn test_065() {
     let expr = "<math><mtext>E</mtext><mo>=</mo><mn>04</mn></math>";
     test_braille("Nemeth", expr, "⠠⠑⠀⠨⠅⠀⠼⠴⠲");
 }
 
 #[test]
-fn test_66() {
+fn test_066() {
     let expr = "<math><mn>10</mn><mrow><mo>/</mo></mrow><mn>5</mn><mo>=</mo><mn>2</mn></math>";
     test_braille("Nemeth", expr, "⠼⠂⠴⠸⠌⠢⠀⠨⠅⠀⠼⠆");
 }
 
 #[test]
-fn test_67() {
+fn test_067() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>1254</mn>
         <msup><mo stretchy=\"false\">)</mo>
         <mrow><mn>100</mn></mrow></msup></math>";
@@ -479,31 +479,31 @@ fn test_67() {
 }
 
 #[test]
-fn test_68() {
+fn test_068() {
     let expr = "<math><mn>1000</mn></math>";
     test_braille("Nemeth", expr, "⠼⠂⠴⠴⠴");
 }
 
 #[test]
-fn test_69() {
+fn test_069() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>10000</mn><mo stretchy=\"false\">)</mo><mo>+</mo><mi>C</mi></math>";
     test_braille("Nemeth", expr, "⠷⠂⠴⠴⠴⠴⠾⠬⠠⠉");
 }
 
 #[test]
-fn test_70() {
+fn test_070() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>1001</mn><mspace width=\"thickmathspace\"></mspace><mn>1000</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠼⠂⠴⠴⠂⠀⠼⠂⠴⠴⠴⠾");
 }
 
 #[test]
-fn test_71() {
+fn test_071() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>101</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠂⠴⠂⠾");
 }
 
 #[test]
-fn test_72() {
+fn test_072() {
     let expr = "<math>
         <mrow>
         <mrow><mi mathvariant=\"bold\">y</mi></mrow></mrow><mo>=</mo><mo stretchy=\"false\">(</mo><mn>1010</mn><mo stretchy=\"false\">)</mo></math>";
@@ -511,13 +511,13 @@ fn test_72() {
 }
 
 #[test]
-fn test_73() {
+fn test_073() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>10100</mn><mo stretchy=\"false\">)</mo><mo>+</mo><mi>C</mi></math>";
     test_braille("Nemeth", expr, "⠷⠂⠴⠂⠴⠴⠾⠬⠠⠉");
 }
 
 #[test]
-fn test_74() {
+fn test_074() {
     let expr = "<math>
         <mrow>
         <mrow><mi mathvariant=\"bold\">x</mi></mrow></mrow><mo>=</mo><mo stretchy=\"false\">(</mo><mn>10101</mn><mo stretchy=\"false\">)</mo></math>";
@@ -525,43 +525,43 @@ fn test_74() {
 }
 
 #[test]
-fn test_75() {
+fn test_075() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>101011</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠂⠴⠂⠴⠂⠂⠾");
 }
 
 #[test]
-fn test_76() {
+fn test_076() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>1011</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠂⠴⠂⠂⠾");
 }
 
 #[test]
-fn test_77() {
+fn test_077() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>000000</mn><mo stretchy=\"false\">)</mo><mo>,</mo><mo stretchy=\"false\">(</mo><mn>010111</mn><mo stretchy=\"false\">)</mo><mo>,</mo><mo stretchy=\"false\">(</mo><mn>101101</mn><mo stretchy=\"false\">)</mo><mo>,</mo><mo stretchy=\"false\">(</mo><mn>111010</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠴⠴⠴⠴⠾⠠⠀⠷⠴⠂⠴⠂⠂⠂⠾⠠⠀⠷⠂⠴⠂⠂⠴⠂⠾⠠⠀⠷⠂⠂⠂⠴⠂⠴⠾");
 }
 
 #[test]
-fn test_78() {
+fn test_078() {
     let expr = "<math><mo form=\"prefix\" movablelimits=\"true\">gcd</mo><mo stretchy=\"false\">(</mo><mn>120</mn><mo>,</mo><mn>102</mn><mo stretchy=\"false\">)</mo><mo>=</mo><mn>6</mn></math>";
     test_braille("Nemeth", expr, "⠛⠉⠙⠀⠷⠂⠆⠴⠠⠀⠂⠴⠆⠾⠀⠨⠅⠀⠼⠖");
 }
 
 #[test]
-fn test_79() {
+fn test_079() {
     let expr = "<math><mn>108</mn></math>";
     test_braille("Nemeth", expr, "⠼⠂⠴⠦");
 }
 
 #[test]
-fn test_80() {
+fn test_080() {
     let expr = "<math><mn>110</mn></math>";
     test_braille("Nemeth", expr, "⠼⠂⠂⠴");
 }
 
 #[test]
-fn test_81() {
+fn test_081() {
     let expr = "<math>
         <mrow>
         <mrow><mi mathvariant=\"bold\">y</mi></mrow></mrow><mo>=</mo><mo stretchy=\"false\">(</mo><mn>1100</mn><mo stretchy=\"false\">)</mo></math>";
@@ -569,25 +569,25 @@ fn test_81() {
 }
 
 #[test]
-fn test_82() {
+fn test_082() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>00110</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>01011</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>10101</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">(</mo><mn>11000</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠂⠂⠴⠾⠷⠴⠂⠴⠂⠂⠾⠷⠂⠴⠂⠴⠂⠾⠷⠂⠂⠴⠴⠴⠾");
 }
 
 #[test]
-fn test_83() {
+fn test_083() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>011010</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>011100</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>110111</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>110000</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠂⠂⠴⠂⠴⠾⠷⠴⠂⠂⠂⠴⠴⠾⠷⠂⠂⠴⠂⠂⠂⠾⠷⠂⠂⠴⠴⠴⠴⠾");
 }
 
 #[test]
-fn test_84() {
+fn test_084() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>000000</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>011100</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>110101</mn><mo stretchy=\"false\">)</mo><mspace width=\"thickmathspace\"></mspace><mo stretchy=\"false\">(</mo><mn>110001</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠴⠴⠴⠴⠴⠴⠾⠷⠴⠂⠂⠂⠴⠴⠾⠷⠂⠂⠴⠂⠴⠂⠾⠷⠂⠂⠴⠴⠴⠂⠾");
 }
 
 #[test]
-fn test_85() {
+fn test_085() {
     let expr = "<math>
         <mrow>
         <mrow><mi mathvariant=\"bold\">x</mi></mrow></mrow><mo>=</mo><mo stretchy=\"false\">(</mo><mn>1101</mn><mo stretchy=\"false\">)</mo></math>";
@@ -595,7 +595,7 @@ fn test_85() {
 }
 
 #[test]
-fn test_86() {
+fn test_086() {
     let expr = "<math>
         <mrow>
         <mrow><mi mathvariant=\"bold\">y</mi></mrow></mrow><mo>=</mo><mo stretchy=\"false\">(</mo><mn>11010</mn><mo stretchy=\"false\">)</mo></math>";
@@ -603,7 +603,7 @@ fn test_86() {
 }
 
 #[test]
-fn test_87() {
+fn test_087() {
     let expr = "<math>
         <mrow>
         <mrow><mi mathvariant=\"bold\">y</mi></mrow></mrow><mo>=</mo><mo stretchy=\"false\">(</mo><mn>110101</mn>
@@ -612,7 +612,7 @@ fn test_87() {
 }
 
 #[test]
-fn test_88() {
+fn test_088() {
     let expr = "<math><msub>
         <mrow>
         <mrow><mi mathvariant=\"bold\">c</mi></mrow></mrow><mn>4</mn></msub><mo>=</mo><mo stretchy=\"false\">(</mo><mn>11011</mn><mo stretchy=\"false\">)</mo></math>";
@@ -620,25 +620,25 @@ fn test_88() {
 }
 
 #[test]
-fn test_89() {
+fn test_089() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>110110</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠂⠂⠴⠂⠂⠴⠾");
 }
 
 #[test]
-fn test_90() {
+fn test_090() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>111</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠂⠂⠂⠾");
 }
 
 #[test]
-fn test_91() {
+fn test_091() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>0110</mn><mspace width=\"thickmathspace\"></mspace><mn>1110</mn><mspace width=\"thickmathspace\"></mspace><mn>0110</mn><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠼⠴⠂⠂⠴⠀⠼⠂⠂⠂⠴⠀⠼⠴⠂⠂⠴⠾");
 }
 
 #[test]
-fn test_92() {
+fn test_092() {
     let expr = "<math><msub>
         <mrow>
         <mrow><mi mathvariant=\"bold\">c</mi></mrow></mrow><mn>3</mn></msub><mo>=</mo><mo stretchy=\"false\">(</mo><mn>11100</mn><mo stretchy=\"false\">)</mo></math>";
@@ -646,13 +646,13 @@ fn test_92() {
 }
 
 #[test]
-fn test_93() {
+fn test_093() {
     let expr = "<math><mn>1111</mn></math>";
     test_braille("Nemeth", expr, "⠼⠂⠂⠂⠂");
 }
 
 #[test]
-fn test_94() {
+fn test_094() {
     let expr = "<math>
         <mrow>
         <mrow><mi mathvariant=\"bold\">x</mi></mrow></mrow><mo>=</mo><mo stretchy=\"false\">(</mo><mn>111110</mn>
@@ -661,7 +661,7 @@ fn test_94() {
 }
 
 #[test]
-fn test_95() {
+fn test_095() {
     let expr = "<math>
         <mrow>
         <mrow><mi mathvariant=\"bold\">y</mi></mrow></mrow><mo>=</mo><mo stretchy=\"false\">(</mo><mn>111111</mn>
@@ -670,26 +670,26 @@ fn test_95() {
 }
 
 #[test]
-fn test_96() {
+fn test_096() {
     let expr = "<math><mn>112135</mn><mn>25032</mn><mn>442</mn></math>";
     test_braille("Nemeth", expr, "⠼⠂⠂⠆⠂⠒⠢⠆⠢⠴⠒⠆⠲⠲⠆");
 }
 
 #[test]
-fn test_97() {
+fn test_097() {
     let expr = "<math>
         <msup><mn>7</mn><mn>6</mn></msup><mo>=</mo><mn>117</mn><mspace width=\"thinmathspace\"></mspace><mn>649</mn></math>";
     test_braille("Nemeth", expr, "⠼⠶⠘⠖⠀⠨⠅⠀⠼⠂⠂⠶⠀⠖⠲⠔");
 }
 
 #[test]
-fn test_98() {
+fn test_098() {
     let expr = "<math><mo form=\"prefix\" movablelimits=\"true\">gcd</mo><mo stretchy=\"false\">(</mo><mn>24</mn><mo>,</mo><mn>36</mn><mo stretchy=\"false\">)</mo><mo>=</mo><mn>12</mn></math>";
     test_braille("Nemeth", expr, "⠛⠉⠙⠀⠷⠆⠲⠠⠀⠒⠖⠾⠀⠨⠅⠀⠼⠂⠆");
 }
 
 #[test]
-fn test_99() {
+fn test_099() {
     let expr = "<math><mi>n</mi><mo>=</mo><mn>120979</mn><mo>,</mo><mi>E</mi><mo>=</mo><mn>13251</mn><mo>,</mo><mi>x</mi><mo>=</mo><mn>142371</mn></math>";
     test_braille("Nemeth", expr, "⠝⠀⠨⠅⠀⠼⠂⠆⠴⠔⠶⠔⠠⠀⠠⠑⠀⠨⠅⠀⠼⠂⠒⠆⠢⠂⠠⠀⠭⠀⠨⠅⠀⠼⠂⠲⠆⠒⠶⠂");
 }

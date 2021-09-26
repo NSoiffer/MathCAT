@@ -1,182 +1,182 @@
 use crate::common::*;
 
 #[test]
-fn test_0() {
+fn test_000() {
     let expr = "<math><mo>-</mo><mn>1</mn></math>";
     test_braille("Nemeth", expr, "⠤⠼⠂");
 }
 
 #[test]
-fn test_1() {
+fn test_001() {
     let expr = "<math><mo>-</mo><mn>.3</mn></math>";
     test_braille("Nemeth", expr, "⠤⠼⠨⠒");
 }
 
 #[test]
-fn test_2() {
+fn test_002() {
     let expr = "<math><mi>n</mi><mo>!</mo></math>";
     test_braille("Nemeth", expr, "⠝⠯");
 }
 
 #[test]
-fn test_3() {
+fn test_003() {
     let expr = "<math><mn>1,378</mn></math>";
     test_braille("Nemeth", expr, "⠼⠂⠠⠒⠶⠦");
 }
 
 #[test]
-fn test_4() {
+fn test_004() {
     let expr = "<math><mn>3.76</mn></math>";
     test_braille("Nemeth", expr, "⠼⠒⠨⠶⠖");
 }
 
 #[test]
-fn test_5() {
+fn test_005() {
     let expr = "<math><mn>1,478</mn></math>";
     test_braille("Nemeth", expr, "⠼⠂⠠⠲⠶⠦");
 }
 
 #[test]
-fn test_6() {
+fn test_006() {
     let expr = "<math><mn>100</mn><mo>,</mo><mn>200</mn><mo>,</mo><mn>300</mn></math>";
     test_braille("Nemeth", expr, "⠼⠂⠴⠴⠠⠀⠼⠆⠴⠴⠠⠀⠼⠒⠴⠴");
 }
 
 #[test]
-fn test_7() {
+fn test_007() {
     let expr = "<math><mn>.35</mn></math>";
     test_braille("Nemeth", expr, "⠼⠨⠒⠢");
 }
 
 #[test]
-fn test_8() {
+fn test_008() {
     let expr = "<math><mn>3.14</mn></math>";
     test_braille("Nemeth", expr, "⠼⠒⠨⠂⠲");
 }
 
 #[test]
-fn test_9() {
+fn test_009() {
     let expr = "<math><mn>.2</mn><msub><mi>a</mi><mn>1</mn></msub><msub><mi>a</mi><mn>2</mn></msub><msub><mi>a</mi><mn>3</mn></msub></math>";
     test_braille("Nemeth", expr, "⠼⠨⠆⠁⠂⠁⠆⠁⠒");
 }
 
 #[test]
-fn test_10() {
+fn test_010() {
     let expr = "<math><mn>.</mn><msub><mi>a</mi><mn>1</mn></msub><msub><mi>a</mi><mn>2</mn></msub><msub><mi>a</mi><mn>3</mn></msub></math>";
     test_braille("Nemeth", expr, "⠨⠐⠁⠂⠁⠆⠁⠒");
 }
 
 #[test]
-fn test_11() {
+fn test_011() {
     let expr = "<math><mn>.1</mn><mo>+</mo><mn>.2</mn><mo>=</mo><mo>.</mo><mo>----</mo></math>";
     test_braille("Nemeth", expr, "⠼⠨⠂⠬⠨⠆⠀⠨⠅⠀⠨⠐⠤⠤⠤⠤");
 }
 
 #[test]
-fn test_12() {
+fn test_012() {
     let expr = "<math><mn>27</mn></math>";
     test_braille("Nemeth", expr, "⠼⠆⠶");
 }
 
 #[test]
-fn test_13() {
+fn test_013() {
     let expr = "<math><mn>1</mn><mo>+</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>=</mo><mn>0</mn></math>";
     test_braille("Nemeth", expr, "⠼⠂⠬⠭⠬⠽⠀⠨⠅⠀⠼⠴");
 }
 
 #[test]
-fn test_14() {
+fn test_014() {
     let expr = "<math><mi>y</mi><mo>=</mo><mn>2</mn><mi>sin</mi><mo>⁡</mo><mi>x</mi></math>";
     test_braille("Nemeth", expr, "⠽⠀⠨⠅⠀⠼⠆⠎⠊⠝⠀⠭");
 }
 
 #[test]
-fn test_15() {
+fn test_015() {
     let expr = "<math><mi>sin</mi><mo>⁡</mo><mn>1</mn></math>";
     test_braille("Nemeth", expr, "⠎⠊⠝⠀⠼⠂");
 }
 
 #[test]
-fn test_16() {
+fn test_016() {
     let expr = "<math><msup><mi>sin</mi><mn>2</mn></msup><mo>⁡</mo><mn>2</mn><mi>x</mi></math>";
     test_braille("Nemeth", expr, "⠎⠊⠝⠘⠆⠀⠼⠆⠭");
 }
 
 #[test]
-fn test_17() {
+fn test_017() {
     let expr = "<math><mn>0.333</mn><mo>…</mo><mn>3</mn><mo>…</mo></math>";
     test_braille("Nemeth", expr, "⠼⠴⠨⠒⠒⠒⠀⠄⠄⠄⠀⠼⠒⠀⠄⠄⠄");
 }
 
 #[test]
-fn test_18() {
+fn test_018() {
     let expr = "<math><msub><mi>log</mi>
         <mrow><mn>10</mn></mrow></msub><mo>⁡</mo><mn>2</mn></math>";
     test_braille("Nemeth", expr, "⠇⠕⠛⠂⠴⠀⠼⠆");
 }
 
 #[test]
-fn test_19() {
+fn test_019() {
     let expr = "<math><mo>(</mo><mi>x</mi><mo>=</mo><mn>0</mn><mo>)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠭⠀⠨⠅⠀⠼⠴⠾");
 }
 
 #[test]
-fn test_20() {
+fn test_020() {
     let expr = "<math><mfrac><mn>11</mn><mn>5</mn></mfrac></math>";
     test_braille("Nemeth", expr, "⠹⠂⠂⠌⠢⠼");
 }
 
 #[test]
-fn test_21() {
+fn test_021() {
     let expr = "<math><mo>-</mo><mn>1</mn></math>";
     test_braille("Nemeth", expr, "⠤⠼⠂");
 }
 
 #[test]
-fn test_22() {
+fn test_022() {
     let expr = "<math><mo>-</mo><mn>.3</mn></math>";
     test_braille("Nemeth", expr, "⠤⠼⠨⠒");
 }
 
 #[test]
-fn test_23() {
+fn test_023() {
     let expr = "<math><mtext>“</mtext><mn>3</mn><mtext>&#xA0;dogs”</mtext></math>";
     test_braille("Nemeth", expr, "⠦⠼⠒⠀⠙⠕⠛⠎⠴");
 }
 
 #[test]
-fn test_24() {
+fn test_024() {
     let expr = "<math><mtext>Probability</mtext><mo>--</mo><mn>0</mn></math>";
     test_braille("Nemeth", expr, "⠠⠏⠗⠕⠃⠁⠃⠊⠇⠊⠞⠽⠤⠤⠼⠴");
 }
 
 #[test]
-fn test_25() {
+fn test_025() {
     let expr = "<math><mtext>“</mtext><mn>.5</mn></math>";
     test_braille("Nemeth", expr, "⠦⠼⠨⠢");
 }
 
 #[test]
-fn test_26() {
+fn test_026() {
     let expr = "<math><mtext>“</mtext><mo>-</mo><mn>4</mn></math>";
     test_braille("Nemeth", expr, "⠦⠤⠼⠲");
 }
 
 #[test]
-fn test_27() {
+fn test_027() {
     let expr = "<math><mfrac><mn>1</mn><mn>3</mn></mfrac></math>";
     test_braille("Nemeth", expr, "⠹⠂⠌⠒⠼");
 }
 
 #[test]
-fn test_28() {
+fn test_028() {
     let expr = "<math><msup><mi>x</mi><mfrac><mn>1</mn><mn>2</mn></mfrac></msup></math>";
     test_braille("Nemeth", expr, "⠭⠘⠹⠂⠌⠆⠼");
 }
 
 #[test]
-fn test_29() {
+fn test_029() {
     let expr = "<math>
         <mfrac>
         <mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mi>c</mi></mfrac></math>";
@@ -184,7 +184,7 @@ fn test_29() {
 }
 
 #[test]
-fn test_30() {
+fn test_030() {
     let expr = "<math>
         <mfrac>
         <msup><mi>x</mi>
@@ -193,14 +193,14 @@ fn test_30() {
 }
 
 #[test]
-fn test_31() {
+fn test_031() {
     let expr = "<math><mtext>rate</mtext><mo>=</mo>
         <mfrac><mtext>distance</mtext><mtext>time</mtext></mfrac></math>";
     test_braille("Nemeth", expr, "⠗⠁⠞⠑⠀⠨⠅⠀⠹⠙⠊⠎⠞⠁⠝⠉⠑⠌⠞⠊⠍⠑⠼");
 }
 
 #[test]
-fn test_32() {
+fn test_032() {
     let expr = "<math><mfrac bevelled=\"true\">
         <mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow>
         <mrow><mi>c</mi><mo>+</mo><mi>d</mi></mrow></mfrac></math>";
@@ -208,13 +208,13 @@ fn test_32() {
 }
 
 #[test]
-fn test_33() {
+fn test_033() {
     let expr = "<math><mfrac><mfrac><mn>3</mn><mn>8</mn></mfrac><mn>5</mn></mfrac></math>";
     test_braille("Nemeth", expr, "⠠⠹⠹⠒⠌⠦⠼⠠⠌⠢⠠⠼");
 }
 
 #[test]
-fn test_34() {
+fn test_034() {
     let expr = "<math>
         <mfrac>
         <mrow><mn>1</mn>
@@ -225,7 +225,7 @@ fn test_34() {
 }
 
 #[test]
-fn test_35() {
+fn test_035() {
     let expr = "<math>
         <mfrac><mn>5</mn>
         <mrow><mn>4</mn>
@@ -234,7 +234,7 @@ fn test_35() {
 }
 
 #[test]
-fn test_36() {
+fn test_036() {
     let expr = "<math><mfrac bevelled=\"true\">
         <mfrac><mn>1</mn><mn>2</mn></mfrac>
         <mfrac><mn>3</mn><mn>4</mn></mfrac></mfrac></math>";
@@ -242,7 +242,7 @@ fn test_36() {
 }
 
 #[test]
-fn test_37() {
+fn test_037() {
     let expr = "<math>
         <mfrac><mi>a</mi>
         <msup><mi>b</mi>
@@ -254,7 +254,7 @@ fn test_37() {
 }
 
 #[test]
-fn test_38() {
+fn test_038() {
     let expr = "<math>
         <mfrac>
         <mfrac>
@@ -266,7 +266,7 @@ fn test_38() {
 }
 
 #[test]
-fn test_39() {
+fn test_039() {
     let expr = "<math>
         <mfrac>
         <mfrac>
@@ -285,7 +285,7 @@ fn test_39() {
 }
 
 #[test]
-fn test_40() {
+fn test_040() {
     let expr = "<math>
         <msqrt><mn>2</mn></msqrt><mo>=</mo>
         <mrow><mn>1</mn><mo>+</mo>
@@ -301,19 +301,19 @@ fn test_40() {
 }
 
 #[test]
-fn test_41() {
+fn test_041() {
     let expr = "<math><msqrt><mn>2</mn></msqrt></math>";
     test_braille("Nemeth", expr, "⠜⠆⠻");
 }
 
 #[test]
-fn test_42() {
+fn test_042() {
     let expr = "<math><msqrt><mi>x</mi><mo>+</mo><mi>y</mi></msqrt></math>";
     test_braille("Nemeth", expr, "⠜⠭⠬⠽⠻");
 }
 
 #[test]
-fn test_43() {
+fn test_043() {
     let expr = "<math>
         <msqrt>
         <msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn></msqrt></math>";
@@ -321,7 +321,7 @@ fn test_43() {
 }
 
 #[test]
-fn test_44() {
+fn test_044() {
     let expr = "<math>
         <msqrt>
         <msup><mi>x</mi><mn>2</mn></msup><mo>+</mo>
@@ -330,19 +330,19 @@ fn test_44() {
 }
 
 #[test]
-fn test_45() {
+fn test_045() {
     let expr = "<math><msqrt><mfrac><mi>x</mi><mi>y</mi></mfrac></msqrt></math>";
     test_braille("Nemeth", expr, "⠜⠹⠭⠌⠽⠼⠻");
 }
 
 #[test]
-fn test_46() {
+fn test_046() {
     let expr = "<math><mn>3</mn><msqrt><mi>a</mi></msqrt></math>";
     test_braille("Nemeth", expr, "⠼⠒⠜⠁⠻");
 }
 
 #[test]
-fn test_47() {
+fn test_047() {
     let expr = "<math><msup><msqrt><mi>x</mi></msqrt><mn>3</mn></msup></math>";
     test_braille("Nemeth", expr, "⠜⠭⠻⠘⠒");
 }
