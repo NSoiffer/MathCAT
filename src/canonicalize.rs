@@ -513,6 +513,10 @@ impl CanonicalizeContext {
 					return true;
 				} 
 				let parent = parent.element().unwrap();
+				if name(&parent) != "mrow" {
+				// if parent is not an mrow, then there aren't parens around this
+					return true;
+				}
 				let preceding = parent.preceding_siblings();
 				first_child = as_element(preceding[preceding.len()-1]);
 				last_child = as_element(parent.following_siblings()[0]);
