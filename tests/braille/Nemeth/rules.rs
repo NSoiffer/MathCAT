@@ -164,9 +164,58 @@ fn nested_super_79_a_3() {
 }
 
 #[test]
+fn punctuation_after_sup_79_b_2() {
+    let expr = "<math><msup><mi>x</mi><mn>2</mn></msup><mo>,</mo><msup><mi>x</mi><mn>3</mn></msup></math>";
+    test_braille("Nemeth", expr, "⠭⠘⠆⠠⠀⠭⠘⠒");
+}
+
+#[test]
+fn comma_in_number_in_sup_79_b_3() {
+    // bad mn from Wiris
+    let expr = "<math><msup><mi>x</mi><mrow><mn>10</mn><mo>,</mo><mn>000</mn></mrow></msup></math>";
+    test_braille("Nemeth", expr, "⠭⠘⠂⠴⠠⠴⠴⠴");
+}
+
+#[test]
+fn comma_in_sup_79_b_4() {
+    let expr = "<math><msub><mi>x</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow></msub></math>";
+    test_braille("Nemeth", expr, "⠭⠰⠊⠪⠚");
+}
+
+#[test]
+fn text_after_sup_79_c_3() {
+    // bad mn from Wiris
+    let expr = "<math><mn>6</mn><mo>.</mo><mn>696</mn><mo>×</mo><msup><mn>10</mn><mn>8</mn></msup><mtext>mph</mtext></math>";
+    test_braille("Nemeth", expr, "⠼⠖⠨⠖⠔⠖⠈⠡⠂⠴⠘⠦⠀⠍⠏⠓");
+}
+
+#[test]
+fn table_entry_after_sup_79_c_4() {
+    let expr = "<math><mrow><mo>(</mo>
+        <mtable><mtr>
+          <mtd><msup><mi>x</mi><mn>2</mn></msup></mtd>
+          <mtd><msup><mi>y</mi><mn>2</mn></msup></mtd>
+        </mtr></mtable>
+        <mo>)</mo></mrow></math>";
+    test_braille("Nemeth", expr, "⠷⠭⠘⠆⠀⠽⠘⠆⠐⠾");
+}
+
+#[test]
+fn nested_super_space_79_d_3() {
+    let expr = "<math><msup><mi>cos</mi><mn>2</mn></msup><mi>x</mi></math>";
+    test_braille("Nemeth", expr, "⠉⠕⠎⠘⠆⠀⠭");
+}
+
+#[test]
 fn nested_super_space_79_d_7() {
     let expr = "<math><mrow><msup><mi>e</mi><mrow><msup><mi>cos</mi><mn>2</mn></msup><mi>x</mi></mrow></msup></mrow></math>";
     test_braille("Nemeth", expr, "⠑⠘⠉⠕⠎⠘⠘⠆⠀⠭");
+}
+
+#[test]
+fn nested_sup_sup_space_79_d_() {
+    let expr = "<math><msup><mi>q</mi><mrow><msub><mi>log</mi><mi>q</mi></msub><mi>a</mi></mrow></msup></math>";
+    test_braille("Nemeth", expr, "⠟⠘⠇⠕⠛⠘⠰⠟⠀⠁");
 }
 
 #[test]
