@@ -221,7 +221,7 @@ impl TTS {
     /// A string is returned for the speech engine.
     ///
     /// `auto` pausing is handled at a later phase and a special char is used for it
-    pub fn replace<'c>(&self, command: &TTSCommandRule, prefs: &PreferenceManager, rules_with_context: &'c mut SpeechRulesWithContext<'c>, mathml: Element<'c>) -> Result<String> {
+    pub fn replace<'c, 's:'c, 'r>(&self, command: &TTSCommandRule, prefs: &PreferenceManager, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
         // The general idea is we handle the begin tag, the contents, and then the end tag
         // For the begin/end tag, we dispatch off to specialized code for each TTS engine
         let mut result = String::with_capacity(255);

@@ -46,37 +46,37 @@ fn main() {
     // let logger = builder.build().unwrap();
     // info!(logger, "Hello World!");
 
-//     let expr = "
-//     <math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
-//     <mrow>
-//      <mrow><mo>[</mo>
-//        <mtable>
-//         <mtr>
-//          <mtd>
-//           <mn>3</mn>
-//          </mtd>
-//          <mtd>
-//           <mn>1</mn>
-//          </mtd>
-//          <mtd>
-//           <mn>4</mn>
-//          </mtd>
-//         </mtr>
-//         <mtr>
-//          <mtd>
-//           <mn>0</mn>
-//          </mtd>
-//          <mtd>
-//           <mn>2</mn>
-//          </mtd>
-//          <mtd>
-//           <mn>6</mn>
-//          </mtd>
-//         </mtr>
-//        </mtable>
-//      <mo>]</mo></mrow></mrow>
-//    </math>
-// ";
+ let expr = "
+    <math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+    <mrow>
+     <mrow><mo>[</mo>
+       <mtable>
+        <mtr>
+         <mtd>
+          <mn>3</mn>
+         </mtd>
+         <mtd>
+          <mn>1</mn>
+         </mtd>
+         <mtd>
+          <mn>4</mn>
+         </mtd>
+        </mtr>
+        <mtr>
+         <mtd>
+          <mn>0</mn>
+         </mtd>
+         <mtd>
+          <mn>2</mn>
+         </mtd>
+         <mtd>
+          <mn>6</mn>
+         </mtd>
+        </mtr>
+       </mtable>
+     <mo>]</mo></mrow></mrow>
+   </math>
+";
 
 //     let expr = "
 //      <math xmlns='http://www.w3.org/1998/Math/MathML'>
@@ -84,9 +84,9 @@ fn main() {
 //      <mo>+</mo>
 //      <mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
 // </math>"";
-let expr = "<math><mi>c</mi><mo>=</mo><mn>4</mn><mspace width=\"thinmathspace\"></mspace><mn>598</mn>
-                <mspace width=\"thinmathspace\"></mspace><mn>037</mn>
-                <mspace width=\"thinmathspace\"></mspace><mn>234</mn></math>";
+// let expr = "<math><mi>c</mi><mo>=</mo><mn>4</mn><mspace width=\"thinmathspace\"></mspace><mn>598</mn>
+//                 <mspace width=\"thinmathspace\"></mspace><mn>037</mn>
+//                 <mspace width=\"thinmathspace\"></mspace><mn>234</mn></math>";
 // let expr = "<math><mn>𝟏𝟐𝟑</mn></math>";
 // let expr = "<math><mtext>A</mtext><mo>=</mo><mn>00</mn><mo>,</mo><mtext>B</mtext><mo>=</mo>
 //                 <mn>01</mn><mo>,</mo><mo>…</mo><mo>,</mo><mtext>Z</mtext><mo>=</mo><mn>25</mn></math>";
