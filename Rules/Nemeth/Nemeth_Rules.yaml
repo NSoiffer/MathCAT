@@ -214,7 +214,7 @@
    tag: mrow
    variables:
       - RowStart: "*[1]"
-      - RowEnd: "DEBUG(*[3])"
+      - RowEnd: "*[3]"
    match:
       - "*[2][self::m:mtable] and"
       - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
@@ -230,9 +230,9 @@
   match: "."
   replace:
    - test: 
-      if: "preceding-sibling::*"
-      then: [t: "⠀"]
-   - t: "⠠"
+      if: "count(parent::*) > 1"
+      then: [t: "⠠"]
+   - t: ""
    - x: $RowStart
    - test:
       if: .[self::m:mlabeledtr]
@@ -243,7 +243,9 @@
       if: .[self::m:mlabeledtr]
       then: [x: "*[position()>1]"]
       else: {x: "*"}
-   - t: "⠠"
+   - test: 
+      if: "count(parent::*) > 1"
+      then: [t: "⠠"]
    - x: $RowEnd
 -
   name: default
