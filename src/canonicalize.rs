@@ -309,6 +309,14 @@ pub fn canonicalize(mathml: Element) -> Element {
 struct CanonicalizeContext {
 }
 
+#[derive(PartialEq)]
+#[allow(non_camel_case_types)] 
+enum DigitBlockType {
+	None,
+	DecimalBlock_3,
+	BinaryBlock_4,
+}
+
 impl CanonicalizeContext {
 	fn new() -> CanonicalizeContext {
 		return CanonicalizeContext{}
@@ -443,12 +451,22 @@ impl CanonicalizeContext {
 			return mathml;
 		}
 
-		fn is_digit_block(mathml: Element) -> bool {
+		fn is_digit_block(mathml: Element) -> DigitBlockType {
 			// returns true if an 'mn' with exactly three digits
 			lazy_static! {
-				static ref IS_DIGIT_BLOCK: Regex = Regex::new(r"^\d\d\d$").unwrap();    // only Unicode whitespace
+				static ref IS_DIGIT_BLOCK: Regex = Regex::new(r"^\d\d\d$").unwrap();
+				static ref IS_BINARY_DIGIT_BLOCK: Regex = Regex::new(r"^[01]{4}$").unwrap();
 			}
-			return name(&mathml) == "mn" && IS_DIGIT_BLOCK.is_match(as_text(mathml));
+			if name(&mathml) == "mn"  {
+				let text = as_text(mathml);
+				if IS_DIGIT_BLOCK.is_match(text) {
+					return DigitBlockType::DecimalBlock_3;
+				}
+				if IS_BINARY_DIGIT_BLOCK.is_match(text) {
+					return DigitBlockType::BinaryBlock_4;
+				}
+			}
+			return DigitBlockType::None;
 		}
 
 		fn merge_number_blocks<'a>(mrow: Element<'a>) -> Element<'a> {
@@ -459,6 +477,8 @@ impl CanonicalizeContext {
 			let mut i = 0;
 			while i < children.len() {
 				let child = as_element(children[i]);
+				let mut is_comma = false;
+				let mut is_decimal_pt = false;
 				if name(&child) == "mn" {
 					let mut looking_for_separator = true;
 					let mut end = children.len() - i;
@@ -467,14 +487,28 @@ impl CanonicalizeContext {
 						let sibling_name = name(&sibling);
 						// FIX: generalize to more types of spacing (e.g., mtext with space)
 						// FIX: generalize to include locale ("." vs ",")
+						if looking_for_separator {
+							if sibling_name == "mo" {
+								let leaf_text = as_text(sibling);
+								is_comma = leaf_text == ",";
+								is_decimal_pt = leaf_text == ".";
+							} else {
+								is_comma = false;
+								is_decimal_pt = false;
+							}
+						};
+						println!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
+								 i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
 						if !(looking_for_separator &&
-							  (sibling_name == "mspace" || (sibling_name == "mo" && as_text(sibling) == ","))) &&
-						   (looking_for_separator || !is_digit_block(sibling)) {
-							end = j;
+							 (sibling_name == "mspace" || is_comma || is_decimal_pt)) &&
+						   ( looking_for_separator ||
+						   	 !(is_decimal_pt || is_digit_block(sibling) != DigitBlockType::None)) {
+							end = j+1;
 							break;
 						}
 						looking_for_separator = !looking_for_separator;
 					}
+					println!("start={}, end={}", i, i+end);
 					if is_likely_a_number(mrow, i, i+end) {
 						merge_block(mrow, i, i+end);
 						children = mrow.children();		// mrow has changed, so we need a new children array
@@ -497,6 +531,18 @@ impl CanonicalizeContext {
 			}
 			if name(&as_element(children[start+1])) == "mspace" || 
 			   IS_WHITESPACE.is_match(as_text(as_element(children[start+1]))) {
+			    // make sure all the digit blocks are of the same type
+				let mut digit_block = DigitBlockType::None;		// initial "illegal" value (we know it is not NONE)
+				for child in children {
+					let child = as_element(child);
+					if name(&child) == "mn" {
+						if digit_block == DigitBlockType::None {
+							digit_block = is_digit_block(child);
+						} else if is_digit_block(child) != digit_block {
+							return false;		// differing digit block types
+						}
+					}
+				}
 				return true;		// digit block separated by whitespace
 			}
 
@@ -514,7 +560,7 @@ impl CanonicalizeContext {
 				} 
 				let parent = parent.element().unwrap();
 				if name(&parent) != "mrow" {
-				// if parent is not an mrow, then there aren't parens around this
+					// if parent is not an mrow, then there aren't parens around this
 					return true;
 				}
 				let preceding = parent.preceding_siblings();
