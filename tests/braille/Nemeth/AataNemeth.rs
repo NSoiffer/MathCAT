@@ -338,7 +338,8 @@ fn test_045() {
 #[test]
 fn test_046() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>0100</mn><mspace width=\"thickmathspace\"></mspace><mn>0101</mn><mo stretchy=\"false\">)</mo></math>";
-    test_braille("Nemeth", expr, "⠷⠼⠴⠂⠴⠴⠀⠼⠴⠂⠴⠂⠾");
+    // Corrected: no numeric indicators should be used after space as this is a single number; also none after paren
+    test_braille("Nemeth", expr, "⠷⠴⠂⠴⠴⠀⠴⠂⠴⠂⠾");
 }
 
 #[test]
@@ -493,7 +494,8 @@ fn test_069() {
 #[test]
 fn test_070() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>1001</mn><mspace width=\"thickmathspace\"></mspace><mn>1000</mn><mo stretchy=\"false\">)</mo></math>";
-    test_braille("Nemeth", expr, "⠷⠼⠂⠴⠴⠂⠀⠼⠂⠴⠴⠴⠾");
+    // Corrected: no numeric indicators should be used after space as this is a single number; also none after paren
+    test_braille("Nemeth", expr, "⠷⠂⠴⠴⠂⠀⠂⠴⠴⠴⠾");
 }
 
 #[test]
@@ -634,7 +636,8 @@ fn test_090() {
 #[test]
 fn test_091() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mn>0110</mn><mspace width=\"thickmathspace\"></mspace><mn>1110</mn><mspace width=\"thickmathspace\"></mspace><mn>0110</mn><mo stretchy=\"false\">)</mo></math>";
-    test_braille("Nemeth", expr, "⠷⠼⠴⠂⠂⠴⠀⠼⠂⠂⠂⠴⠀⠼⠴⠂⠂⠴⠾");
+    // Corrected: no numeric indicators should be used after space as this is a single number; also none after paren
+    test_braille("Nemeth", expr, "⠷⠴⠂⠂⠴⠀⠂⠂⠂⠴⠀⠴⠂⠂⠴⠾");
 }
 
 #[test]
@@ -993,7 +996,8 @@ fn test_147() {
 #[test]
 fn test_148() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mi>n</mi><mo>,</mo><mi>E</mi><mo stretchy=\"false\">)</mo><mo>=</mo><mo stretchy=\"false\">(</mo><mn>451</mn><mo>,</mo><mn>231</mn><mo stretchy=\"false\">)</mo></math>";
-    test_braille("Nemeth", expr, "⠷⠝⠠⠀⠠⠑⠾⠀⠨⠅⠀⠷⠲⠢⠂⠠⠀⠆⠒⠂⠾");
+    // correct: 8b(1) -- no space after the comma
+    test_braille("Nemeth", expr, "⠷⠝⠠⠀⠠⠑⠾⠀⠨⠅⠀⠷⠲⠢⠂⠠⠆⠒⠂⠾");
 }
 
 #[test]
@@ -2084,7 +2088,8 @@ fn test_307() {
         <msqrt><mn>3</mn></msqrt><mspace width=\"thinmathspace\"></mspace><mi>i</mi><mo stretchy=\"false\">]</mo><mo stretchy=\"false\">→<!-- → --></mo>
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">N</mi></mrow></mrow><mo>∪<!-- ∪ --></mo><mo fence=\"false\" stretchy=\"false\">{</mo><mn>0</mn><mo fence=\"false\" stretchy=\"false\">}</mo></math>";
-    test_braille("Nemeth", expr, "⠨⠝⠸⠒⠀⠈⠰⠠⠵⠈⠷⠜⠒⠻⠊⠈⠾⠀⠫⠕⠀⠈⠰⠠⠝⠨⠬⠨⠷⠴⠨⠾");
+    // corrected: removed extra space after "⠸⠒"
+    test_braille("Nemeth", expr, "⠨⠝⠸⠒⠈⠰⠠⠵⠈⠷⠜⠒⠻⠊⠈⠾⠀⠫⠕⠀⠈⠰⠠⠝⠨⠬⠨⠷⠴⠨⠾");
 }
 
 #[test]
