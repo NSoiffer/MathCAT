@@ -184,8 +184,8 @@ fn comma_in_sup_79_b_4() {
 
 #[test]
 fn text_after_sup_79_c_3() {
-    // bad mn from Wiris
-    let expr = "<math><mn>6</mn><mo>.</mo><mn>696</mn><mo>×</mo><msup><mn>10</mn><mn>8</mn></msup><mtext>mph</mtext></math>";
+    // bad mn from Wiris; also &ao;
+    let expr = "<math><mn>6</mn><mo>.</mo><mn>696</mn><mo>×</mo><msup><mn>10</mn><mn>8</mn></msup><mo>&#xA0;</mo><mtext>mph</mtext></math>";
     test_braille("Nemeth", expr, "⠼⠖⠨⠖⠔⠖⠈⠡⠂⠴⠘⠦⠀⠍⠏⠓");
 }
 

@@ -745,50 +745,43 @@ impl NemethChars {
                 _ => "R",       // normal and unknown
             },
         };
-        return crate::speech::BRAILLE_RULES.with(|rules| {
-            let text = as_text(*node);
-            // start of pattern matching mutably borrows BRAILLE_RULES, so we can't use borrow.
-            //   instead hack to get around borrow rules because we know no changes happen during call
-            let braille_chars = unsafe {
-                rules.as_ptr().as_ref().unwrap()
-                    .replace_chars(text, node).unwrap_or("".to_string())
-            };
-            println!("braille_chars: '{}'", braille_chars);
-            
-            // we want to pull the prefix (typeface, language) out to the front until a change happens
-            // the same is true for number indicator
-            // also true (sort of) for capitalization -- if all caps, use double cap in front (assume abbr or Roman Numeral)
-            let is_in_enclosed_list = name(node) == "mn" && NemethChars::is_in_enclosed_list(*node);
-            let mut typeface = "".to_string();     // illegal value to force first value
-            let mut is_all_caps = true;
-            let result = PICK_APART_CHAR.replace_all(&braille_chars, |caps: &Captures| {
-                println!("  face: {:?}, lang: {:?}, num {:?}, cap: {:?}, char: {:?}",
-                        &caps["face"], &caps["lang"], &caps["num"], &caps["cap"], &caps["char"]);
-                let mut nemeth_chars = "".to_string();
-                let typeface_changed =  &typeface != &caps["face"];
-                if typeface_changed {
-                    typeface = caps["face"].to_string();   // needs to outlast this instance of the loop
-                    nemeth_chars += if typeface.is_empty() {attr_typeface} else {&typeface};
-                    nemeth_chars +=  &caps["lang"];
-                } else {
-                    nemeth_chars +=  &caps["lang"];
-                }
-                println!("is_in_list: {}; num: {}", is_in_enclosed_list, caps["num"].is_empty());
-                if !caps["num"].is_empty() && (typeface_changed || !is_in_enclosed_list) {
-                    nemeth_chars += "N";
-                }
-                is_all_caps &= !&caps["cap"].is_empty();
-                nemeth_chars += &caps["cap"];       // will be stripped later if all caps
-                nemeth_chars += &caps["char"];
-                return nemeth_chars;
-            });
-            let mut text_chars = text.chars();     // see if more than one char
-            if is_all_caps && text_chars.next().is_some() &&  text_chars.next().is_some() {
-                return Ok( "CC".to_string() + &result.replace("C", ""));
+        let text = as_text(*node);
+        let braille_chars = crate::speech::braille_replace_chars(text, *node).unwrap_or("".to_string());
+        println!("braille_chars: '{}'", braille_chars);
+        
+        // we want to pull the prefix (typeface, language) out to the front until a change happens
+        // the same is true for number indicator
+        // also true (sort of) for capitalization -- if all caps, use double cap in front (assume abbr or Roman Numeral)
+        let is_in_enclosed_list = name(node) == "mn" && NemethChars::is_in_enclosed_list(*node);
+        let mut typeface = "".to_string();     // illegal value to force first value
+        let mut is_all_caps = true;
+        let result = PICK_APART_CHAR.replace_all(&braille_chars, |caps: &Captures| {
+            println!("  face: {:?}, lang: {:?}, num {:?}, cap: {:?}, char: {:?}",
+                    &caps["face"], &caps["lang"], &caps["num"], &caps["cap"], &caps["char"]);
+            let mut nemeth_chars = "".to_string();
+            let typeface_changed =  &typeface != &caps["face"];
+            if typeface_changed {
+                typeface = caps["face"].to_string();   // needs to outlast this instance of the loop
+                nemeth_chars += if typeface.is_empty() {attr_typeface} else {&typeface};
+                nemeth_chars +=  &caps["lang"];
             } else {
-                return Ok( result.to_string() );
+                nemeth_chars +=  &caps["lang"];
             }
+            println!("is_in_list: {}; num: {}", is_in_enclosed_list, caps["num"].is_empty());
+            if !caps["num"].is_empty() && (typeface_changed || !is_in_enclosed_list) {
+                nemeth_chars += "N";
+            }
+            is_all_caps &= !&caps["cap"].is_empty();
+            nemeth_chars += &caps["cap"];       // will be stripped later if all caps
+            nemeth_chars += &caps["char"];
+            return nemeth_chars;
         });
+        let mut text_chars = text.chars();     // see if more than one char
+        if is_all_caps && text_chars.next().is_some() &&  text_chars.next().is_some() {
+            return Ok( "CC".to_string() + &result.replace("C", ""));
+        } else {
+            return Ok( result.to_string() );
+        }
     }
 
     fn is_in_enclosed_list(node: Element) -> bool {

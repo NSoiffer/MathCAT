@@ -2179,9 +2179,9 @@
           # test if first ancestor that isn't an mrow is a script tag (rule 78)
       - if: "self::m:mn"
         then: [t: "⠠"]
-      - else_if: "ancestor-or-self::*[not(parent::m:mrow)][1][parent::m:msub or DEBUG(parent::m:msup )or parent::m:msubsup][preceding-sibling::*]"
+      - else_if: "ancestor-or-self::*[not(parent::m:mrow)][1][parent::m:msub or parent::m:msup or parent::m:msubsup][preceding-sibling::*]"
         then: [t: "⠪"]        # Rule 78
-        else: [t: "⠠⠀"]
+        else: [t: ","]        # ',' used for matching purposes, converted to "⠠⠀"
  - "-":                         # 0x002D (Hyphen)  (0x2212 normalized to here)
     - test:
         if: "self::m:mtext"
@@ -2190,9 +2190,9 @@
 
  - ".":                          # 0x002E (Full stop or decimal pt)
     - test:
-        if: "DEBUG(self::m:mn)"
+        if: "self::m:mn"
         then_test:
-          if: "DEBUG(string-length(text()) = 1)"
+          if: "string-length(text()) = 1"
           then: [t: "𝑁⠨"]      # example 8c(4) -- lone "." is not considered numeric, but not a period
           else: [t: "N⠨"]
         else: [t: "P⠲"]         # period
@@ -2210,7 +2210,11 @@
  - "^": [t: "⠸⠣"]               # 0x005E (Circumflex accent)
  - "_": [t: ""]                 # 0x005F (Low line)
  - "{": [t: "⠨⠷"]               # 0x007B (Left curly bracket)
- - "|": [t: "⠳"]                # 0x007C (Vertical line)
+ - "|":                # 0x007C (Vertical line)
+     - test:
+        if: "preceding-sibling::* and following-sibling::*"
+        then: [t: "⠀⠳⠀"]        # comparison (e.g., such that -- rule 145)
+        else: [t: "⠳"]          # absolute value, others???
  - "}": [t: "⠨⠾"]               # 0x007D (Right curly bracket)
  - "~": [t: "⠈⠱"]               # 0x007E (Tilde)
  - "¢": [t: "⠈⠉"]               # 0x00A2 (Cent sign)
@@ -2446,8 +2450,8 @@
  - "∟": [t: "⠫⠪⠨⠗⠻"]            # 0x221F (Right angle)
  - "∠": [t: "⠫⠪"]               # 0x2220 (Angle)
  - "∡": [t: "⠫⠪⠈⠫⠁⠻"]           # 0x2221 (Measured angle)
- - "∣": [t: "⠀⠳⠀"]              # 0x2223 (Divides)
- - "∤": [t: "⠀⠌⠳⠀"]             # 0x2224 (Does not divide)
+ - "∣": [t: "⠳"]              # 0x2223 (Divides)
+ - "∤": [t: "⠌⠳"]             # 0x2224 (Does not divide)
  - "∥": [t: "⠀⠫⠇⠀"]             # 0x2225 (Parallel to)
  - "∦": [t: "⠀⠌⠫⠇⠀"]            # 0x2226 (Not parallel to)
  - "∧": [t: "⠈⠩"]               # 0x2227 (Logical AND)

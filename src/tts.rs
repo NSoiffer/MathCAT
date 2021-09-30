@@ -65,7 +65,7 @@ use sxd_document::dom::Element;
 use yaml_rust::Yaml;
 
 use std::{fmt};
-use crate::speech::{SpeechRules};
+use crate::speech::{SpeechRulesWithContext};
 use strum_macros::IntoStaticStr;
 use regex::Regex;
 
@@ -221,7 +221,7 @@ impl TTS {
     /// A string is returned for the speech engine.
     ///
     /// `auto` pausing is handled at a later phase and a special char is used for it
-    pub fn replace(&self, command: &TTSCommandRule, prefs: &PreferenceManager, rules: &SpeechRules, mathml: &Element) -> Result<String> {
+    pub fn replace<'c, 's:'c, 'r>(&self, command: &TTSCommandRule, prefs: &PreferenceManager, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
         // The general idea is we handle the begin tag, the contents, and then the end tag
         // For the begin/end tag, we dispatch off to specialized code for each TTS engine
         let mut result = String::with_capacity(255);
@@ -236,7 +236,7 @@ impl TTS {
             if result.is_empty() {
                 result += " ";
             }
-            result += &command.replacements.replace(rules, mathml)?;    
+            result += &command.replacements.replace(rules_with_context, mathml)?;    
         }
 
         let end_tag = match self {
