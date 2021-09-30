@@ -304,9 +304,26 @@ MathCAT usage tends to use only a few features of xpath. It also makes use of so
 MathCAT adds some custom functions to make writing rules easier:
 | function | meaning |
 | ----- | ---- |
-| `IsNode(nodes, type)   | Returns true if all of the nodes are of the same type. Type can be one of:<br/>  "simple" -- a defined set of elements in ClearSpeak <br/> "leaf" -- one of the MathML leaf elements <br/> "common_fraction" -- integer numerator and denominator<br/> "trig_name" -- sin, cos, tan, sinh, cosh, etc
+| `IsNode(nodes, type)   | Returns true if all of the nodes are of the same type. Type can be one of:<br/>  "simple" -- a defined set of elements in ClearSpeak <br/> "leaf" -- one of the MathML leaf elements <br/> "common_fraction" -- integer numerator and denominator<br/> "trig_name" -- sin, cos, tan, sinh, cosh, etc |
 | ToOrdinal |  |
 | ToCommonFraction | |
-| IsLargeOp | |
+| IsLargeOp(nodes) | Returns true if all of the nodes are large operators |
 | IsBracketed | |
-| DEBUG | |
+| BaseNode(node) | Returns the base (recursively) of a scripted node |
+| IsInDefinition(node, name) | Returns true if node is a member of the list 'name' (defined in definitions.yaml) |
+| DEBUG(xpath) | |
+
+These are used by Nemeth Rules
+| function | meaning |
+| NestingChars | Used by mfrac, msqrt, and mroot rules to repeat the chars the appropriate number of times |
+| NemethChars | Used by token elements to deal with the complicated rearrangement of various Nemeth indicators such as capitalization and font face |
+
+# Acknowledgements
+Several people helped out in various ways with the project:
+
+* David Carlisle -- provided invaluable help figuring out some xpath matches
+* Susan Jolly -- provided lots of guidance on Nemeth generation and feedback on what is right and wrong.
+* Murray Sargent and Volker Sorge -- provided tables of Nemeth translations of characters
+
+Translators:
+This has yet to be done, but initial translations will come from MathPlayer. I hope others will help out so I can list you here...
