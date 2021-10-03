@@ -49,7 +49,7 @@ fn letter_26_b_19() {
             <mi mathvariant='normal'>l</mi><mo>,</mo>
             <mi mathvariant='normal'>m</mi><mo>,</mo>
             <mi mathvariant='normal'>n</mi><mo>,</mo>
-            <mtext>are in set &#xa0;</mtext>
+            <mtext>are in set&#xa0;</mtext>
             <mi mathvariant='normal'>R</mi>
         <mo>)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠇⠠⠀⠍⠠⠀⠝⠠⠀⠁⠗⠑⠀⠊⠝⠀⠎⠑⠞⠀⠠⠗⠾");
@@ -225,90 +225,35 @@ fn numeric_sub_81_a_1() {
 }
 
 #[test]
-fn simple_sqrt() {
-    let expr = "<math><msqrt><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></msqrt></math>";
-    test_braille("Nemeth", expr, "⠜⠭⠬⠽⠻");
+fn subsup_82_a_1() {
+    let expr = "<math><msubsup><mi>x</mi><mi>a</mi><mi>n</mi></msubsup></math>";
+    test_braille("Nemeth", expr, "⠭⠰⠁⠘⠝");
 }
 
 #[test]
-fn simple_sqrt_with_sup() {
-    let expr = "<math><msqrt>
-            <msup><mi>x</mi><mn>2</mn></msup>
-            <mo>+</mo>
-            <msup><mi>y</mi><mn>2</mn></msup>
-        </msqrt></math>";
-    test_braille("Nemeth", expr, "⠜⠭⠘⠆⠐⠬⠽⠘⠆⠐⠻");
+fn subsup_82_a_3() {
+    let expr = "<math><msubsup><mi>x</mi><mn>1</mn><mn>2</mn></msubsup></math>";
+    test_braille("Nemeth", expr, "⠭⠂⠘⠆");
 }
 
 #[test]
-fn square_root_symbol() {
-    let expr = "<math><mo>√</mo><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></math>";
-    test_braille("Nemeth", expr, "⠜⠷⠭⠬⠽⠾");
+fn sub_sup_82_b_1() {
+    let expr = "<math><msub><msup><mi>a</mi><mi>n</mi></msup><mi>m</mi></msub></math>";
+    test_braille("Nemeth", expr, "⠁⠘⠝⠐⠰⠍");
 }
 
 #[test]
-fn simple_cube_root() {
-    let expr = "<math><mroot><mn>2</mn><mn>3</mn></mroot></math>";
-    test_braille("Nemeth", expr, "⠣⠒⠜⠆⠻");
+fn sub_sup_82_b_2() {
+    let expr = "<math><msup><msub><mi>a</mi><mi>m</mi></msub><mi>n</mi></msup></math>";
+    test_braille("Nemeth", expr, "⠁⠰⠍⠐⠘⠝");
 }
 
 #[test]
-fn mroot_non_trivial_index() {
-    let expr = "<math><mroot>
-            <mrow><mi>p</mi><mo>+</mo><mi>q</mi></mrow>
-            <mrow><mi>m</mi><mo>+</mo><mi>n</mi></mrow>
-        </mroot></math>";
-    test_braille("Nemeth", expr, "⠣⠍⠬⠝⠜⠏⠬⠟⠻");
+fn prime_83_b_1() {
+    let expr = "<math><msubsup><mi>x</mi><mi>a</mi><mo>'</mo></msubsup></math>";
+    test_braille("Nemeth", expr, "⠭⠄⠰⠁");
 }
 
-#[test]
-fn nested_sqrt() {
-    let expr = "<math><msqrt><mi>x</mi><mo>+</mo>
-            <msqrt><mi>x</mi><mo>+</mo><mi>y</mi></msqrt>
-            <mo>+</mo><mi>z</mi></msqrt></math>";
-    test_braille("Nemeth", expr, "⠜⠭⠬⠨⠜⠭⠬⠽⠨⠻⠬⠵⠻");
-}
-
-#[test]
-fn nested_cube_root() {
-    let expr = "<math><mroot>
-    <mrow>
-        <msup> <mi>x</mi><mn>2</mn> </msup>
-        <mo>+</mo>
-        <mroot>
-            <mrow>
-                <msup> <mi>x</mi> <mn>2</mn> </msup>
-                <mo>+</mo>
-                <msup> <mi>y</mi> <mn>2</mn>  </msup>
-            </mrow>
-            <mn>3</mn>
-        </mroot>
-        <mo>+</mo>
-        <msup> <mi>y</mi> <mn>2</mn> </msup>
-    </mrow>
-    <mn>3</mn>
-</mroot></math>";
-    test_braille("Nemeth", expr, "⠣⠒⠜⠭⠘⠆⠐⠬⠨⠣⠒⠜⠭⠘⠆⠐⠬⠽⠘⠆⠐⠨⠻⠬⠽⠘⠆⠐⠻");
-}
-
-
-#[test]
-fn nested_sqrt_cube_root() {
-    let expr = "<math>
-        <msqrt> <mroot> <mi>x</mi><mn>3</mn> </mroot> </msqrt>
-        <mo>=</mo>
-        <mroot> <msqrt><mi>x</mi></msqrt> <mn>3</mn></mroot>
-    </math>";
-    test_braille("Nemeth", expr, "⠜⠨⠣⠒⠜⠭⠨⠻⠻⠀⠨⠅⠀⠣⠒⠜⠨⠜⠭⠨⠻⠻");
-}
-
-#[test]
-fn nested_3_sqrt() {
-    let expr = "<math>
-            <msqrt><mi>x</mi><mo>+</mo><msqrt><mi>y</mi><mo>+</mo><msqrt><mi>z</mi></msqrt></msqrt></msqrt>
-        </math>";
-    test_braille("Nemeth", expr, "⠜⠭⠬⠨⠜⠽⠬⠨⠨⠜⠵⠨⠨⠻⠨⠻⠻");
-}
 
 #[test]
 fn underbar_rule_86_a_1() {
@@ -333,6 +278,13 @@ fn overbar_rule_86_b_1() {
     let expr = "<math><mover><mi>x</mi><mo>&#xAF;</mo></mover></math>";
     test_braille("Nemeth", expr, "⠭⠱");
 }
+
+#[test]
+fn overbar_rule_86_b_10() {
+    let expr = "<math><mn>3</mn><mo>.</mo><mn>5</mn><mover><mn>4</mn><mo>&#xAF;</mo></mover></math>";
+    test_braille("Nemeth", expr, "⠼⠒⠨⠢⠲⠱");
+}
+
 #[test]
 fn order2_overbar_rule_87_a_1() {
     let expr = "<math><mover>
@@ -354,6 +306,140 @@ fn binomial_90_1() {
 }
 
 #[test]
+fn modifier_in_script_91_1() {
+    let expr = "<math><msub><mi>A</mi><mover><mi>x</mi><mo>~</mo></mover></msub></math>";
+    test_braille("Nemeth", expr, "⠠⠁⠰⠐⠭⠣⠈⠱⠻");
+}
+
+#[test]
+fn arrow_96_1() {
+    let expr = "<math>
+        <mover>
+        <mrow><mi mathvariant='normal'>A</mi> <mi mathvariant='normal'>B</mi></mrow>
+        <mo>→</mo>
+        </mover>
+    </math>";
+    test_braille("Nemeth", expr, "⠐⠠⠁⠠⠃⠣⠫⠕⠻");
+}
+
+#[test]
+fn arrow_96_4() {
+    let expr = "<math>
+        <mi>X</mi>
+        <mover>
+        <mo>→</mo>
+        <mrow><mi>f</mi> <mo>∘</mo><mi>g</mi></mrow>
+        </mover>
+        <mi>Y</mi>
+    </math>";
+    test_braille("Nemeth", expr, "⠠⠭⠀⠐⠫⠒⠒⠕⠣⠋⠨⠡⠛⠻⠀⠠⠽");
+}
+
+#[test]
+fn bar_97_b_1() {
+    let expr = "<math><mo>.</mo><mover><mn>3</mn><mo>&#xAF;</mo></mover></math>";
+    test_braille("Nemeth", expr, "⠼⠨⠒⠱");
+}
+
+#[test]
+fn menclose_bar_97_b_1() {
+    let expr = "<math><mo>.</mo><menclose notation='top'><mn>3</mn></menclose></math>";
+    test_braille("Nemeth", expr, "⠼⠨⠒⠱");
+}
+
+#[test]
+fn sqrt_103_a_2() {
+    let expr = "<math><msqrt><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></msqrt></math>";
+    test_braille("Nemeth", expr, "⠜⠭⠬⠽⠻");
+}
+
+#[test]
+fn sqrt_103_a_4() {
+    let expr = "<math><msqrt>
+            <msup><mi>x</mi><mn>2</mn></msup>
+            <mo>+</mo>
+            <msup><mi>y</mi><mn>2</mn></msup>
+        </msqrt></math>";
+    test_braille("Nemeth", expr, "⠜⠭⠘⠆⠐⠬⠽⠘⠆⠐⠻");
+}
+
+#[test]
+fn sqrt_103_b_2() {
+    let expr = "<math><mo>√</mo><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></math>";
+    test_braille("Nemeth", expr, "⠜⠷⠭⠬⠽⠾");
+}
+
+#[test]
+fn root_104_iii_1() {
+    let expr = "<math><mroot><mn>2</mn><mn>3</mn></mroot></math>";
+    test_braille("Nemeth", expr, "⠣⠒⠜⠆⠻");
+}
+
+#[test]
+fn root_104_iii_4() {
+    let expr = "<math><mroot>
+            <mrow><mi>p</mi><mo>+</mo><mi>q</mi></mrow>
+            <mrow><mi>m</mi><mo>+</mo><mi>n</mi></mrow>
+        </mroot></math>";
+    test_braille("Nemeth", expr, "⠣⠍⠬⠝⠜⠏⠬⠟⠻");
+}
+
+#[test]
+fn nested_sqrt_105_1() {
+    let expr = "<math><msqrt><mi>x</mi><mo>+</mo>
+            <msqrt><mi>x</mi><mo>+</mo><mi>y</mi></msqrt>
+            <mo>+</mo><mi>z</mi></msqrt></math>";
+    test_braille("Nemeth", expr, "⠜⠭⠬⠨⠜⠭⠬⠽⠨⠻⠬⠵⠻");
+}
+
+#[test]
+fn nested_root_105_2() {
+    let expr = "<math><mroot>
+    <mrow>
+        <msup> <mi>x</mi><mn>2</mn> </msup>
+        <mo>+</mo>
+        <mroot>
+            <mrow>
+                <msup> <mi>x</mi> <mn>2</mn> </msup>
+                <mo>+</mo>
+                <msup> <mi>y</mi> <mn>2</mn>  </msup>
+            </mrow>
+            <mn>3</mn>
+        </mroot>
+        <mo>+</mo>
+        <msup> <mi>y</mi> <mn>2</mn> </msup>
+    </mrow>
+    <mn>3</mn>
+</mroot></math>";
+    test_braille("Nemeth", expr, "⠣⠒⠜⠭⠘⠆⠐⠬⠨⠣⠒⠜⠭⠘⠆⠐⠬⠽⠘⠆⠐⠨⠻⠬⠽⠘⠆⠐⠻");
+}
+
+
+#[test]
+fn nested_sqrt_105_3() {
+    let expr = "<math>
+        <msqrt> <mroot> <mi>x</mi><mn>3</mn> </mroot> </msqrt>
+        <mo>=</mo>
+        <mroot> <msqrt><mi>x</mi></msqrt> <mn>3</mn></mroot>
+    </math>";
+    test_braille("Nemeth", expr, "⠜⠨⠣⠒⠜⠭⠨⠻⠻⠀⠨⠅⠀⠣⠒⠜⠨⠜⠭⠨⠻⠻");
+}
+
+#[test]
+fn nested_sqrt_105_4() {
+    let expr = "<math>
+            <msqrt><mi>x</mi><mo>+</mo><msqrt><mi>y</mi><mo>+</mo><msqrt><mi>z</mi></msqrt></msqrt></msqrt>
+        </math>";
+    test_braille("Nemeth", expr, "⠜⠭⠬⠨⠜⠽⠬⠨⠨⠜⠵⠨⠨⠻⠨⠻⠻");
+}
+
+#[test]
+fn shape_115_a_1() {
+    let expr = "<math><mo>∠</mo><mn>1</mn></math>";
+    test_braille("Nemeth", expr, "⠫⠪⠀⠼⠂");
+}
+
+#[test]
 fn set_vertical_bar_145_1() {
     let expr = "<math><mo>{</mo><mi>x</mi><mo>|</mo><mo>|</mo><mi>x</mi><mo>|</mo><mo>&lt;</mo><mn>10</mn><mo>}</mo></math>";
     test_braille("Nemeth", expr, "⠨⠷⠭⠀⠳⠀⠳⠭⠳⠀⠐⠅⠀⠼⠂⠴⠨⠾");
@@ -364,6 +450,42 @@ fn vertical_bar_145_4() {
     // this test was added in an addendum
     let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
     test_braille("Nemeth", expr, "⠠⠏⠷⠠⠁⠀⠳⠀⠠⠃⠾");
+}
+
+#[test]
+fn ratio_151_11() {
+    let expr = "<math><mi>a</mi><mo>:</mo><mi>b</mi></math>";
+    test_braille("Nemeth", expr, "⠁⠀⠐⠂⠀⠃");
+}
+
+#[test]
+fn trilinear_not_ratio_151_11() {
+    let expr = "<math><mi>a</mi><mo>:</mo><mi>b</mi><mo>:</mo><mi>c</mi></math>";
+    test_braille("Nemeth", expr, "⠁⠸⠒⠀⠃⠸⠒⠀⠉");
+}
+
+#[test]
+fn extension_field_not_ratio_151_11() {
+    let expr = "<math><mo>[</mo><mi>K</mi><mo>:</mo><mi>F</mi><mo>]</mo></math>";
+    test_braille("Nemeth", expr, "⠈⠷⠠⠅⠸⠒⠀⠠⠋⠈⠾");
+}
+
+#[test]
+fn multipurpose_172_6() {
+    let expr = "<math><msubsup><mi>x</mi><mn>1</mn><mo>'</mo></msubsup></math>";
+    test_braille("Nemeth", expr, "⠭⠄⠂");
+}
+
+#[test]
+fn multipurpose_172_8() {
+    let expr = "<math><msup><mover><mi>x</mi><mo>&#xAF;</mo></mover><mo>'</mo></msup></math>";
+    test_braille("Nemeth", expr, "⠭⠱⠄");
+}
+
+#[test]
+fn multipurpose_172_9() {
+    let expr = "<math><msup><mn>5</mn><mo>'</mo></msup><msup><mn>8</mn><mrow><mo>'</mo><mo>'</mo></mrow></msup></math>";
+    test_braille("Nemeth", expr, "⠼⠢⠄⠦⠄⠄");
 }
 
 #[test]

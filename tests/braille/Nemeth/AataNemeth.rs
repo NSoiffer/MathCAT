@@ -115,7 +115,8 @@ fn test_013() {
         <mrow><mi mathvariant=\"bold\">x</mi></mrow></mrow><mo>∈<!-- ∈ --></mo><msubsup>
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">Z</mi></mrow></mrow><mn>2</mn><mi>k</mi></msubsup><mo>}</mo></mrow></math>";
-    test_braille("Nemeth", expr, "⠠⠉⠀⠨⠅⠀⠨⠷⠸⠰⠽⠸⠒⠠⠛⠸⠰⠭⠀⠨⠅⠀⠸⠰⠽⠋⠕⠗⠸⠰⠭⠀⠈⠑⠀⠈⠰⠠⠵⠆⠘⠅⠐⠨⠾");
+    // corrected: added space after ":"
+    test_braille("Nemeth", expr, "⠠⠉⠀⠨⠅⠀⠨⠷⠸⠰⠽⠸⠒⠀⠠⠛⠸⠰⠭⠀⠨⠅⠀⠸⠰⠽⠋⠕⠗⠸⠰⠭⠀⠈⠑⠀⠈⠰⠠⠵⠆⠘⠅⠐⠨⠾");
 }
 
 #[test]
@@ -153,7 +154,8 @@ fn test_017() {
 #[test]
 fn test_018() {
     let expr = "<math><msub><mi>G</mi><mn>0</mn></msub><mo>=</mo><mo fence=\"false\" stretchy=\"false\">{</mo><mi>A</mi><mo>:</mo><mo stretchy=\"false\">(</mo><mi>A</mi><mo>,</mo><mi>b</mi><mo stretchy=\"false\">)</mo><mo>∈<!-- ∈ --></mo><mi>G</mi><mtext>for some</mtext><mi>b</mi><mo fence=\"false\" stretchy=\"false\">}</mo></math>";
-    test_braille("Nemeth", expr, "⠠⠛⠴⠀⠨⠅⠀⠨⠷⠠⠁⠸⠒⠷⠠⠁⠠⠀⠃⠾⠀⠈⠑⠀⠠⠛⠋⠕⠗⠀⠎⠕⠍⠑⠃⠨⠾");
+    // corrected: added space after ":"
+    test_braille("Nemeth", expr, "⠠⠛⠴⠀⠨⠅⠀⠨⠷⠠⠁⠸⠒⠀⠷⠠⠁⠠⠀⠃⠾⠀⠈⠑⠀⠠⠛⠋⠕⠗⠀⠎⠕⠍⠑⠃⠨⠾");
 }
 
 #[test]
@@ -1436,7 +1438,8 @@ fn test_214() {
 #[test]
 fn test_215() {
     let expr = "<math><mo stretchy=\"false\">[</mo><mi>GF</mi><mo>⁡<!-- ⁡ --></mo><mo stretchy=\"false\">(</mo><mn>625</mn><mo stretchy=\"false\">)</mo><mo>:</mo><mi>GF</mi><mo>⁡<!-- ⁡ --></mo><mo stretchy=\"false\">(</mo><mn>25</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">]</mo></math>";
-    test_braille("Nemeth", expr, "⠈⠷⠠⠠⠛⠋⠷⠖⠆⠢⠾⠀⠐⠂⠀⠠⠠⠛⠋⠷⠆⠢⠾⠈⠾");
+    // corrected: field extension, not ratio so "⠸⠒" not "⠐⠂"
+    test_braille("Nemeth", expr, "⠈⠷⠠⠠⠛⠋⠷⠖⠆⠢⠾⠸⠒⠀⠠⠠⠛⠋⠷⠆⠢⠾⠈⠾");
 }
 
 #[test]
@@ -1595,8 +1598,7 @@ fn test_238() {
 #[test]
 fn test_239() {
     let expr = "<math><mi>h</mi><mo>:</mo><mi>C</mi><mo stretchy=\"false\">→<!-- → --></mo><mi>D</mi></math>";
-    // corrected: removed extra space after "⠸⠒"
-    test_braille("Nemeth", expr, "⠓⠸⠒⠠⠉⠀⠫⠕⠀⠠⠙");
+    test_braille("Nemeth", expr, "⠓⠸⠒⠀⠠⠉⠀⠫⠕⠀⠠⠙");
 }
 
 #[test]
@@ -1651,8 +1653,7 @@ fn test_247() {
         <mrow><mi mathvariant=\"script\">L</mi></mrow></mrow><mi>H</mi></msub><mo stretchy=\"false\">→<!-- → --></mo><msub>
         <mrow>
         <mrow><mi mathvariant=\"script\">R</mi></mrow></mrow><mi>H</mi></msub></math>";
-    // corrected: removed extra space after "⠸⠒"
-    test_braille("Nemeth", expr, "⠨⠋⠸⠒⠈⠰⠠⠇⠰⠠⠓⠀⠫⠕⠀⠈⠰⠠⠗⠰⠠⠓");
+    test_braille("Nemeth", expr, "⠨⠋⠸⠒⠀⠈⠰⠠⠇⠰⠠⠓⠀⠫⠕⠀⠈⠰⠠⠗⠰⠠⠓");
 }
 
 #[test]
@@ -1742,8 +1743,7 @@ fn test_259() {
         <msup>
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">R</mi></mrow></mrow><mn>2</mn></msup></math>";
-    // corrected: removed extra space after "⠸⠒"
-    test_braille("Nemeth", expr, "⠠⠞⠰⠠⠁⠸⠒⠈⠰⠠⠗⠘⠆⠀⠫⠕⠀⠈⠰⠠⠗⠘⠆");
+    test_braille("Nemeth", expr, "⠠⠞⠰⠠⠁⠸⠒⠀⠈⠰⠠⠗⠘⠆⠀⠫⠕⠀⠈⠰⠠⠗⠘⠆");
 }
 
 #[test]
@@ -1756,7 +1756,8 @@ fn test_260() {
         <mrow><mi mathvariant=\"double-struck\">C</mi></mrow></mrow><mo>∗<!-- ∗ --></mo></msup><mo>:</mo>
         <mrow><mo stretchy=\"false\">|</mo></mrow><mi>z</mi>
         <mrow><mo stretchy=\"false\">|</mo></mrow><mo>=</mo><mn>1</mn><mo fence=\"false\" stretchy=\"false\">}</mo></math>";
-    test_braille("Nemeth", expr, "⠈⠰⠠⠞⠀⠨⠅⠀⠨⠷⠵⠀⠈⠑⠀⠈⠰⠠⠉⠘⠈⠼⠸⠒⠳⠵⠳⠀⠨⠅⠀⠼⠂⠨⠾");
+    // corrected: added space after ":"
+    test_braille("Nemeth", expr, "⠈⠰⠠⠞⠀⠨⠅⠀⠨⠷⠵⠀⠈⠑⠀⠈⠰⠠⠉⠘⠈⠼⠸⠒⠀⠳⠵⠳⠀⠨⠅⠀⠼⠂⠨⠾");
 }
 
 #[test]
@@ -1780,8 +1781,7 @@ fn test_263() {
 #[test]
 fn test_264() {
     let expr = "<math><mi>f</mi><mo>:</mo><mi>X</mi><mo stretchy=\"false\">→<!-- → --></mo><mi>Y</mi></math>";
-    // corrected: removed extra space after "⠸⠒"
-    test_braille("Nemeth", expr, "⠋⠸⠒⠠⠭⠀⠫⠕⠀⠠⠽");
+    test_braille("Nemeth", expr, "⠋⠸⠒⠀⠠⠭⠀⠫⠕⠀⠠⠽");
 }
 
 #[test]
@@ -1796,7 +1796,8 @@ fn test_265() {
 #[test]
 fn test_266() {
     let expr = "<math><mo stretchy=\"false\">[</mo><mi>x</mi><mo stretchy=\"false\">]</mo><mo>=</mo><mo fence=\"false\" stretchy=\"false\">{</mo><mi>y</mi><mo>∈<!-- ∈ --></mo><mi>X</mi><mo>:</mo><mi>y</mi><mo>∼<!-- ∼ --></mo><mi>x</mi><mo fence=\"false\" stretchy=\"false\">}</mo></math>";
-    test_braille("Nemeth", expr, "⠈⠷⠭⠈⠾⠀⠨⠅⠀⠨⠷⠽⠀⠈⠑⠀⠠⠭⠸⠒⠽⠀⠈⠱⠀⠭⠨⠾");
+    // corrected: added space after ":"
+    test_braille("Nemeth", expr, "⠈⠷⠭⠈⠾⠀⠨⠅⠀⠨⠷⠽⠀⠈⠑⠀⠠⠭⠸⠒⠀⠽⠀⠈⠱⠀⠭⠨⠾");
 }
 
 #[test]
@@ -1866,8 +1867,8 @@ fn test_276() {
 #[test]
 fn test_277() {
     let expr = "<math><mi>d</mi><mo>=</mo><mo form=\"prefix\" movablelimits=\"true\">gcd</mo><mo stretchy=\"false\">(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo stretchy=\"false\">)</mo></math>";
-    // corrected -- removed space after gcd
-    test_braille("Nemeth", expr, "⠙⠨⠅⠀⠛⠉⠙⠀⠷⠁⠠⠀⠃⠾");
+    // corrected: missing space before '='
+    test_braille("Nemeth", expr, "⠙⠀⠨⠅⠀⠛⠉⠙⠀⠷⠁⠠⠀⠃⠾");
 }
 
 #[test]
@@ -1891,8 +1892,7 @@ fn test_280() {
 #[test]
 fn test_281() {
     let expr = "<math><mi>lcm</mi><mo>⁡<!-- ⁡ --></mo><mo stretchy=\"false\">(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo stretchy=\"false\">)</mo></math>";
-    // corrected -- removed space after lcm
-    test_braille("Nemeth", expr, "⠇⠉⠍⠷⠁⠠⠀⠃⠾");
+    test_braille("Nemeth", expr, "⠇⠉⠍⠀⠷⠁⠠⠀⠃⠾");
 }
 
 #[test]
@@ -2064,8 +2064,7 @@ fn test_303() {
 fn test_304() {
     let expr = "<math><mi>η<!-- η --></mi><mo>:</mo><mi>G</mi>
         <mrow><mo>/</mo></mrow><mi>K</mi><mo stretchy=\"false\">→<!-- → --></mo><mi>ψ<!-- ψ --></mi><mo stretchy=\"false\">(</mo><mi>G</mi><mo stretchy=\"false\">)</mo></math>";
-    // corrected: removed extra space after "⠸⠒"
-    test_braille("Nemeth", expr, "⠨⠱⠸⠒⠠⠛⠸⠌⠠⠅⠀⠫⠕⠀⠨⠽⠷⠠⠛⠾");
+    test_braille("Nemeth", expr, "⠨⠱⠸⠒⠀⠠⠛⠸⠌⠠⠅⠀⠫⠕⠀⠨⠽⠷⠠⠛⠾");
 }
 
 #[test]
@@ -2088,15 +2087,13 @@ fn test_307() {
         <msqrt><mn>3</mn></msqrt><mspace width=\"thinmathspace\"></mspace><mi>i</mi><mo stretchy=\"false\">]</mo><mo stretchy=\"false\">→<!-- → --></mo>
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">N</mi></mrow></mrow><mo>∪<!-- ∪ --></mo><mo fence=\"false\" stretchy=\"false\">{</mo><mn>0</mn><mo fence=\"false\" stretchy=\"false\">}</mo></math>";
-    // corrected: removed extra space after "⠸⠒"
-    test_braille("Nemeth", expr, "⠨⠝⠸⠒⠈⠰⠠⠵⠈⠷⠜⠒⠻⠊⠈⠾⠀⠫⠕⠀⠈⠰⠠⠝⠨⠬⠨⠷⠴⠨⠾");
+    test_braille("Nemeth", expr, "⠨⠝⠸⠒⠀⠈⠰⠠⠵⠈⠷⠜⠒⠻⠊⠈⠾⠀⠫⠕⠀⠈⠰⠠⠝⠨⠬⠨⠷⠴⠨⠾");
 }
 
 #[test]
 fn test_308() {
     let expr = "<math><mi>π<!-- π --></mi><mo>:</mo><mi>S</mi><mo stretchy=\"false\">→<!-- → --></mo><mi>S</mi></math>";
-    // corrected: removed extra space after "⠸⠒"
-    test_braille("Nemeth", expr, "⠨⠏⠸⠒⠠⠎⠀⠫⠕⠀⠠⠎");
+    test_braille("Nemeth", expr, "⠨⠏⠸⠒⠀⠠⠎⠀⠫⠕⠀⠠⠎");
 }
 
 #[test]
@@ -2132,15 +2129,13 @@ fn test_313() {
 #[test]
 fn test_314() {
     let expr = "<math><mi>f</mi><mo>:</mo><mi>A</mi><mo stretchy=\"false\">→<!-- → --></mo><mi>B</mi></math>";
-    // corrected: removed extra space
-    test_braille("Nemeth", expr, "⠋⠸⠒⠠⠁⠀⠫⠕⠀⠠⠃");
+    test_braille("Nemeth", expr, "⠋⠸⠒⠀⠠⠁⠀⠫⠕⠀⠠⠃");
 }
 
 #[test]
 fn test_315() {
     let expr = "<math><mi>f</mi><mo>:</mo><mi>a</mi><mo stretchy=\"false\">↦<!-- ↦ --></mo><mi>b</mi></math>";
-    // corrected: removed extra space
-    test_braille("Nemeth", expr, "⠋⠸⠒⠁⠀⠫⠳⠒⠒⠕⠀⠃");
+    test_braille("Nemeth", expr, "⠋⠸⠒⠀⠁⠀⠫⠳⠒⠒⠕⠀⠃");
 }
 
 #[test]
@@ -2281,14 +2276,14 @@ fn test_337() {
 #[test]
 fn test_338() {
     let expr = "<math><mi>a</mi><mo>⪯<!-- ⪯ --></mo><mi>b</mi></math>";
-     // Fixed precedes part
-     test_braille("Nemeth", expr, "⠁⠀⠨⠂⠅⠱⠀⠃");
+     // corrected: precedes part
+     test_braille("Nemeth", expr, "⠁⠀⠨⠐⠅⠱⠀⠃");
 }
 
 #[test]
 fn test_339() {
     let expr = "<math><mo>⪰<!-- ⪰ --></mo></math>";
-    // Fixed succeeds part
+    // corrected: succeeds part
     test_braille("Nemeth", expr, "⠨⠨⠂⠱");
 }
 

@@ -1,130 +1,4 @@
-# {
-#   "kind": "messages",
-#   "locale": "nemeth",
-#   "messages": {
-#     "MS": {
-#       "FRACTION_REPEAT": "⠠",
-#       "FRACTION_START": "⠹",
-#       "FRAC_V": "⠹",
-#       "END": "⠠",
-#       "FRACTION_OVER": "⠌",
-#       "ENDFRAC": "⠼",
-#       "FRACTION_END": "⠼",
-#       "SUPER": "⠘",
-#       "SUB": "⠰",
-#       "SUP": "⠘",
-#       "SUPERSCRIPT": "⠘",
-#       "SUBSCRIPT": "⠰",
-#       "BASELINE": "⠐",
-#       "BASE": "⠐",
-#       "NESTED": "⠨",
-#       "STARTROOT": "⠜",
-#       "ENDROOT": "⠻",
-#       "ROOTINDEX": "⠣",
-#       "ROOT": "⠨",
-#       "INDEX": "⠣",
-#       "UNDER": "⠩",
-#       "UNDERSCRIPT": "⠩",
-#       "OVER": "⠣",
-#       "OVERSCRIPT": "⠣"
-#     },
-#     "MSroots": {},
-#     "font": {
-#       "bold": "⠸",
-#       "bold-fraktur": [
-#         "⠸⠀⠸",
-#         "germanCombiner"
-#       ],
-#       "bold-italic": "⠸⠨",
-#       "bold-script": "⠸⠈",
-#       "caligraphic": "⠈",
-#       "caligraphic-bold": "⠈⠸",
-#       "double-struck": "⠈",
-#       "double-struck-italic": "⠸⠨",
-#       "fraktur": [
-#         "⠸",
-#         "germanCombiner"
-#       ],
-#       "fullwidth": "",
-#       "italic": "⠨",
-#       "monospace": "",
-#       "normal": "",
-#       "oldstyle": "",
-#       "oldstyle-bold": "⠸",
-#       "script": "⠈",
-#       "sans-serif": "⠠⠨",
-#       "sans-serif-italic": "⠠⠨⠨",
-#       "sans-serif-bold": "⠠⠨⠸",
-#       "sans-serif-bold-italic": "⠠⠨⠸⠨",
-#       "unknown": ""
-#     },
-#     "embellish": {
-#       "super": [
-#         "⠘",
-#         "germanCombiner"
-#       ],
-#       "sub": [
-#         "⠰",
-#         "germanCombiner"
-#       ],
-#       "circled": [
-#         "⠫⠉⠸⠫",
-#         "embellishCombiner"
-#       ],
-#       "parenthesized": [
-#         "⠷",
-#         "parensCombiner"
-#       ],
-#       "period": [
-#         "⠸⠲",
-#         "postfixCombiner"
-#       ],
-#       "negative-circled": [
-#         "⠫⠸⠉⠸⠫",
-#         "embellishCombiner"
-#       ],
-#       "double-circled": [
-#         "⠫⠉⠸⠫⠫⠉⠸⠫",
-#         "doubleEmbellishCombiner"
-#       ],
-#       "circled-sans-serif": [
-#         "⠫⠉⠸⠫⠠⠨",
-#         "embellishCombiner"
-#       ],
-#       "negative-circled-sans-serif": [
-#         "⠫⠸⠉⠸⠫⠠⠨",
-#         "embellishCombiner"
-#       ],
-#       "comma": [
-#         "⠠",
-#         "postfixCombiner"
-#       ],
-#       "squared": [
-#         "⠫⠲⠸⠫",
-#         "embellishCombiner"
-#       ],
-#       "negative-squared": [
-#         "⠫⠸⠲⠸⠫",
-#         "embellishCombiner"
-#       ]
-#     },
-#     "regexp": {
-#       "TEXT": "a-zA-Z",
-#       "NUMBER": "((\\d{1,3})(?=(,| ))((,| )\\d{3})*(\\.\\d+)?)|^\\d*\\.\\d+|^\\d+",
-#       "DECIMAL_MARK": ".",
-#       "DIGIT_GROUP": ",",
-#       "JOINER_SUBSUPER": "",
-#       "JOINER_FRAC": ""
-#     },
-#     "unitTimes": ""
-#   }
-# }
-
 ---
-# -
-#    include: "common-rules.yaml"
-
-
 -
    name: default
    tag: msqrt
@@ -315,18 +189,48 @@
 
 -
    # Rule 138 a.2 -- space after a function name
-   # most functions will have an invisible apply that adds the space, but "mod" is infix, so different
-   name: mod
+   # most functions will have an invisible apply that adds the space, but "mod" and "rem" are infix, so different
+   name: mod_and_rem
    tag: [mi, mo, mtext]    # should really only be 'mo', but others are used
-   match: "text()='mod'"
+   match: "text()='mod' or text()='rem'"
    replace:
       - x: "NemethChars(.)"
       - t: "⠀"
+
+-
+   name: prefix-geometry-ops
+   tag: mo
+     # add space after these ops when they are prefix operators
+   match:
+      - "parent::*[count(*) = 2 and name()='mrow' and not(preceding-sibling::*)] and"
+      - "IsInDefinition(., 'GeometryPrefixOperators')"
+   replace:
+      - x: "text()"
+      - t: "⠀"
+
 -
    name: default
-   tag: [mi, mo, mtext]
+   tag: mo
+     # add spaces around comparison operators,
+     # but if "modified", they are moved outside of munder, etc, and handled by those rules
+   variables: [AddSpaces: "parent::*[self::m:mrow] and IsInDefinition(., 'NemethComparisonOps')"]
    match: "."
-   replace: [x: "NemethChars(.)"]
+   replace:
+      - test:
+         if: "$AddSpaces and preceding-sibling::*"
+         then: [t: "⠀"]
+      - x: "NemethChars(.)"
+      - test:
+         if: "$AddSpaces and following-sibling::*"
+         then: [t: "⠀"]
+
+-
+   name: default
+   tag: [mi, mtext]
+   match: "."
+   replace:
+      - x: "NemethChars(.)"
+      
 
 # -
 #    name: default
@@ -366,7 +270,7 @@
          if: "true()"   # FIX 
          then_test:
             if: "$OldScriptContext = ''"
-            then: [t: "⠐"]
+            then: [t: "b"]
             else: [x: "$OldScriptContext"]
 
 -
@@ -375,12 +279,11 @@
    # also rule 177.3 for multipurpose indicator (might be removed)
    name: numeric-sub
    tag: msub
-      # FIX: match condition needs refinement in testing of base
-   match: "*[2][self::m:mn] and not($NewScriptContext) and 
-           *[1][ self::m:mi or self::m:msup[*[1][self::m:mi] and *[2][self::m:mo]] ]"
+   match: "*[2][self::m:mn] and ($NewScriptContext = '') and 
+           *[1][BaseNode(.)[self::m:mi]]"
    replace:
       - x: "*[1]"
-      - t: "M"                # hack actually prevents the 'letter digit' substitution (177.2) from kicking in
+      - t: "M"                # multipurpose indicator prevents the 'letter digit' substitution (177.2) from kicking in
       - x: "*[2]"
       - test:
          if: "count(following-sibling::*) > 0 and not($NewScriptContext)"
@@ -402,15 +305,54 @@
          then_test:
             if: "$OldScriptContext"
             then: [x: "$OldScriptContext"]
-            else: [t: "⠐"]
+            else: [t: "b"]
 
 -
+   # primes don't get a superscript indicator and come before the subscript
+   name: prime
+   tag: msubsup
+   variables:
+    - OldScriptContext: "$NewScriptContext"
+    - NewScriptContext: "concat($NewScriptContext, '⠰')"
+   match: "DEBUG(*[3][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗'])"
+   replace: 
+    - x: "*[1]"
+    - x: "*[3]"
+    - test:
+         if: "*[2][self::m:mn] and ($NewScriptContext = '') and 
+              *[1][BaseNode(.)[self::m:mi]]"
+         then:
+            - x: "*[2]"
+            - test:
+               if: "count(following-sibling::*) > 0 and not($NewScriptContext)"
+               then: [t: "M"]
+         else:
+            - x: "$NewScriptContext"
+            - x: "*[2]"
+            - test:
+                  if: "true()"   # FIX 
+                  then_test:
+                     if: "$OldScriptContext"
+                     then: [x: "$OldScriptContext"]
+                     else: [t: "b"]
+
+
+-
+   # FIX: there is a problem here...
+   #  We need NewScriptContext to reflect the status for subscripts and then again for superscripts.
+   #  However, the value can only be set when setting "variables".
+   #  Possible solution: add a function "SetVariable" so could write:
+   #    [x: SetVariable('NewScriptContext',concat($NewScriptContext, '⠰')) 
+   #  Unfortunately, while trivial, it requires modifying the xpath library
    name: default
    tag: msubsup
    match: "."
    variables:
     - OldScriptContext: "$NewScriptContext"
     - NewScriptContext: "concat($NewScriptContext, '⠰')"
+    - IsPrime: "*[3][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
+    - IsNumericSubscript: "*[2][self::m:mn] and ($NewScriptContext = '') and 
+                           *[1][BaseNode(.)[self::m:mi]]"
    replace: 
     - x: "*[1]"
     - x: "$NewScriptContext"
@@ -422,7 +364,7 @@
          then_test:
             if: "$OldScriptContext"
             then: [x: "$OldScriptContext"]
-            else: [t: "⠐"]
+            else: [t: "b"]
 
 -
    name: default
@@ -458,7 +400,12 @@
     - NotNested: "$NewUnderContext='' and $NewOverContext=''"
     - OldOverContext: "$NewOverContext"
     - NewOverContext: "concat($NewOverContext, '⠣')"
+    - AddSpaces: "IsInDefinition(BaseNode(.), 'NemethComparisonOps')"
+
    replace: 
+    - test:
+         if: "$AddSpaces"
+         then: [t: "⠀"]
     - test:
          if: "$NotNested"
          then: [t: "⠐"]
@@ -468,6 +415,9 @@
     - test:
          if: "$NotNested"
          then: [t: "⠻"]
+    - test:
+         if: "$AddSpaces"
+         then: [t: "⠀"]
     
 -
    name: default
@@ -491,27 +441,6 @@
     - test:
          if: "$NotNested"
          then: [t: "⠻"]
-
-# -
-#    name: default
-#    tag: mtable
-#    variables: [IsColumnSilent: false()]
-#    match: "."
-#    replace: 
-#     - t: table with
-#     - x: count(*)
-#     - test: 
-#          if: count(*)=1
-#          then: {t: row}
-#          else: {t: rows}
-#     - t: and
-#     - x: "count(*[1]/*)"
-#     - test: 
-#          if: "count(*[1]/*)=1"
-#          then: {t: column}
-#          else: {t: columns}
-#     - pause: long
-#     - x: "* "
 
 # -
   # Note: @notation can contain more than one value

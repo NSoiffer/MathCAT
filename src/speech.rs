@@ -106,6 +106,7 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         "P" => "⠸",
         "M" => "",
         "m" => "⠐",
+        "b" => "⠐",
         "N" => "",
         "n" => "⠼",
         "𝑁" => "",
@@ -139,8 +140,9 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
             Regex::new(r"([N𝑁].)M([N𝑁].)").unwrap(); 
 
         // add after decimal pt for non-digits except for comma and punctuation
+        // note: since "." can be in the middle of a number, there is not necessarily a "N"
         static ref MULTI_177_5: Regex = 
-            Regex::new(r"([N𝑁]⠨)([^N𝑁,P])").unwrap(); 
+            Regex::new(r"([N𝑁]⠨)([^⠂⠆⠒⠲⠢⠖⠶⠦⠔N𝑁,P])").unwrap(); 
 
 
         // Pattern for rule II.9a (add numeric indicator at start of line or after a space) and 9a (add after typeface)
@@ -175,12 +177,12 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         static ref REMOVE_PUNCT_IND: Regex =
             Regex::new(r"(^|⠀|\w)P(.)").unwrap();  
 
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SBTIREDGVHPCMmNn𝑁W,])").unwrap();  
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SBTIREDGVHPCMmbNn𝑁W,])").unwrap();  
             
-        static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[⠘⠰]+⠐)").unwrap();
+        static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[⠘⠰]+b)").unwrap();
 
         // Before 79b (punctuation)
-        static ref REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: Regex = Regex::new(r"(?:[⠘⠰]+⠐?|⠐)([⠀,P]|$)").unwrap();
+        static ref REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: Regex = Regex::new(r"(?:[⠘⠰]+b?|b)([⠀,P]|$)").unwrap();
 
         static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
@@ -221,7 +223,7 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
     
     let result = REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT.replace_all(&result, "$1");
     println!("Punct  : \"{}\"", &result);
-    let result = REMOVE_LEVEL_IND_BEFORE_BASELINE.replace_all(&result, "⠐");
+    let result = REMOVE_LEVEL_IND_BEFORE_BASELINE.replace_all(&result, "b");
     println!("Bseline: \"{}\"", &result);
 
     let result = REMOVE_PUNCT_IND.replace_all(&result, "$1$2");
@@ -721,7 +723,6 @@ impl<'r> MyXPath {
 
     fn compile_xpath(xpath: &str) -> Result<XPath> {
         let factory = Factory::new();
-        //let xpath = convert_hex(xpath);
         let xpath_with_debug_info = MyXPath::add_debug_string_arg(xpath)?;
         let xpath = factory.build(&xpath_with_debug_info)
                         .chain_err(|| format!(

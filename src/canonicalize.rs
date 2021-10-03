@@ -176,7 +176,7 @@ impl OperatorInfo {
 	}
 
 	fn is_fence(&self) -> bool {
-		return self.op_type.bits & (OperatorTypes::RIGHT_FENCE.bits | OperatorTypes::RIGHT_FENCE.bits) != OperatorTypes::NONE.bits;
+		return (self.op_type.bits & (OperatorTypes::LEFT_FENCE.bits | OperatorTypes::RIGHT_FENCE.bits)) != 0;
 	}
 
 	fn is_operator_type(&self, op_type: OperatorTypes) -> bool {
@@ -364,6 +364,7 @@ impl CanonicalizeContext {
 	fn clean_mathml<'a>(&self, mathml: Element<'a>) -> Option<Element<'a>> {
 		lazy_static! {
             static ref IS_WHITESPACE: Regex = Regex::new(r"^\s+$").unwrap();    // only Unicode whitespace
+			static ref IS_PRIME: Regex = Regex::new(r"['′″‴⁗]").unwrap(); 
         }
 		static ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN: phf::Set<&str> = phf_set! {
 			"mfrac", "mroot", "msub", "msup", "msupsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv"
@@ -385,13 +386,16 @@ impl CanonicalizeContext {
 				// same for ellipsis ("…")
 				let text = as_text(mathml);
 				return crate::definitions::DEFINITIONS.with(|definitions| {
-					if text == "…" || definitions.function_names.as_hashset().borrow().contains(text) {
+					if text == "…" || definitions.borrow().get_hashset("FunctionNames").unwrap().contains(text) {
 						let mi = create_mathml_element(&mathml.document(), "mi");
 						mi.set_text(text);
 						return Some(mi);
-					} else {
-						return Some(mathml);
 					}
+					if IS_PRIME.is_match(text) {
+						let new_text = merge_prime_text(text);
+						mathml.set_text(&new_text);
+					}
+					return Some(mathml);
 				});
 			},
 			"mtext" => {
@@ -416,8 +420,13 @@ impl CanonicalizeContext {
 				return if parent_requires_child {Some(mathml)} else {None};
 			},
 			_  => {
-				let mathml = if element_name == "mrow" || element_name == "math"
-										 {merge_number_blocks(mathml)} else {mathml};
+				let mathml = if element_name == "mrow" || element_name == "math" {
+					let merged = merge_number_blocks(mathml);
+					let merged = merge_primes(merged);
+					merged
+				} else {
+					mathml
+				};
 				let mut new_children = Vec::with_capacity(mathml.children().len());
 				for child in mathml.children() {
 					let child = as_element(child);			
@@ -470,9 +479,7 @@ impl CanonicalizeContext {
 		}
 
 		fn merge_number_blocks<'a>(mrow: Element<'a>) -> Element<'a> {
-			// FIX: be more cautious if inside parens 
-			//   in particular, don't do this for fence d , ddd fence because likely to be be point, interval, etc
-			// since needing to merge digit blocks is unlikely, we don't do a copy until we find something
+			// look for potential numbers by looking for sequences with commas, spaces, and decimal points
 			let mut children = mrow.children();
 			let mut i = 0;
 			while i < children.len() {
@@ -480,6 +487,7 @@ impl CanonicalizeContext {
 				let mut is_comma = false;
 				let mut is_decimal_pt = false;
 				if name(&child) == "mn" {
+					// potential start of a number
 					let mut looking_for_separator = true;
 					let mut end = children.len() - i;
 					for (j, sibling) in children[i+1..].iter().enumerate() {
@@ -497,8 +505,8 @@ impl CanonicalizeContext {
 								is_decimal_pt = false;
 							}
 						};
-						println!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
-								 i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
+						// println!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
+								//  i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
 						if !(looking_for_separator &&
 							 (sibling_name == "mspace" || is_comma || is_decimal_pt)) &&
 						   ( looking_for_separator ||
@@ -508,7 +516,7 @@ impl CanonicalizeContext {
 						}
 						looking_for_separator = !looking_for_separator;
 					}
-					println!("start={}, end={}", i, i+end);
+					// println!("start={}, end={}", i, i+end);
 					if is_likely_a_number(mrow, i, i+end) {
 						merge_block(mrow, i, i+end);
 						children = mrow.children();		// mrow has changed, so we need a new children array
@@ -527,8 +535,9 @@ impl CanonicalizeContext {
 
 			let children = mrow.children();
 			if name(&as_element(children[end-1])) != "mn" {
-				return false;		// end with a digit block
+				return false;		// end with a digit block (always starts with a number)
 			}
+
 			if name(&as_element(children[start+1])) == "mspace" || 
 			   IS_WHITESPACE.is_match(as_text(as_element(children[start+1]))) {
 			    // make sure all the digit blocks are of the same type
@@ -544,6 +553,16 @@ impl CanonicalizeContext {
 					}
 				}
 				return true;		// digit block separated by whitespace
+			}
+
+			// if we have 1,23,456 we don't want to consider 23,456 a number
+			// so we check in front of 23,456 for d,
+			// we don't need to check the symmetric case '1,234,56' because calling logic won't flag this as a potential number
+			if start > 1 && name(&as_element(children[0])) == "mn" {
+				let potential_comma = as_element(children[1]);
+				if name(&potential_comma) == "mo" && as_text(potential_comma) == "," {
+					return false;
+				}
 			}
 
 			// If surrounded by fences, and commas are used, leave as is (e.g, "{1,234}")
@@ -572,10 +591,10 @@ impl CanonicalizeContext {
 			} else {
 				return true; // can't be fences around it
 			}
-			// println!("first_child: {}", crate::pretty_print::mml_to_string(&first_child));
-			// println!("last_child: {}", crate::pretty_print::mml_to_string(&last_child));
-			return name(&first_child) == "mo" && is_fence(first_child) &&
-				   name(&last_child) == "mo" && is_fence(last_child);
+			println!("first_child: {}", crate::pretty_print::mml_to_string(&first_child));
+			println!("last_child: {}", crate::pretty_print::mml_to_string(&last_child));
+			return !(name(&first_child) == "mo" && is_fence(first_child) &&
+				     name(&last_child) == "mo" && is_fence(last_child) );
 		}
 
 		fn merge_block<'a>(mrow: Element<'a>, start: usize, end: usize) {
@@ -597,6 +616,77 @@ impl CanonicalizeContext {
 				let child = as_element(children[i]);
 				child.remove_from_parent();
 			}
+		}
+
+		fn merge_primes<'a>(mrow: Element<'a>) -> Element<'a> {
+			// merge consecutive <mo>s containing primes (in various forms)
+			let mut children = mrow.children();
+			let mut i = 0;
+			let mut n_primes = 0;		// number of consecutive mo's containing primes
+			while i < children.len() {
+				let child = as_element(children[i]);
+				if name(&child) == "mo" {
+					let text = as_text(child);
+					// FIX: should we be more restrictive and change (apostrophe) only in a superscript?
+					if IS_PRIME.is_match(text) {
+						n_primes += 1;
+					} else if n_primes > 0{
+						merge_prime_elements(&mut children, i - n_primes, i);
+						n_primes = 0;
+					}
+				} else if n_primes > 0 {
+					merge_prime_elements(&mut children, i - n_primes, i);
+					n_primes = 0;
+				}
+				i += 1;
+			}
+			if n_primes > 0 {
+				merge_prime_elements(&mut children, i - n_primes, i);
+			}
+			return mrow;
+		}
+
+		fn merge_prime_elements(children: &mut [ChildOfElement], start: usize, end: usize) {
+			// not very efficient since this is probably causing an array shift each time (array is probably not big though)
+			let first_child = as_element(children[start]);
+			let mut new_text = String::with_capacity(end+3-start);	// one per element plus a little extra
+			new_text.push_str(as_text(first_child));
+			for i in start+1..end {
+				let child = as_element(children[i]);
+				let text = as_text(child); 		// only in this function because it is an <mo>
+				new_text.push_str(text);
+				child.remove_from_parent();
+			}
+			first_child.set_text(&merge_prime_text(&new_text));
+		}
+	
+		fn merge_prime_text(text: &str) -> String {
+			// merge together single primes into double primes, etc.
+			let mut n_primes = 0;
+			for ch in text.chars() {
+				match ch {
+					'\'' | '′' => n_primes += 1,
+					'″' => n_primes += 2,
+					'‴' => n_primes += 3,
+					'⁗' => n_primes += 4,
+					_ => {
+						eprint!("merge_prime_text: unexpected char '{}' found", ch);
+						return text.to_string();
+					}
+				}
+			}
+			// it would be very rare to have more than a quadruple prime, so the inefficiency in the won't likely happen
+			let mut result = String::with_capacity(n_primes);	// likely 4x too big, but string is short-lived and small
+			for _ in 0..n_primes/4 {
+				result.push('⁗');
+			}
+			match n_primes % 4 {
+				1 => result.push('′'),
+				2 => result.push('″'),
+				3 => result.push('‴'),
+				_ => ()	// can't happen
+			}
+			return result;
 		}
 	}
 
@@ -1200,7 +1290,8 @@ impl CanonicalizeContext {
 		// println!("    is_function_name({}), {} following nodes", node_str, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
 		return crate::definitions::DEFINITIONS.with(|defs| {
 			// names that are always function names (e.g, "sin" and "log")
-			let names = defs.function_names.as_hashset().borrow();
+			let defs = defs.borrow();
+			let names = defs.get_hashset("FunctionNames").unwrap();
 			if names.contains(node_str) {
 				return true;	// always treated as function names
 			}
@@ -1238,7 +1329,7 @@ impl CanonicalizeContext {
 				return true;
 			}
 	
-			let likely_names = defs.likely_function_names.as_hashset().borrow();
+			let likely_names = defs.get_hashset("LikelyFunctionNames").unwrap();
 			if likely_names.contains(node_str) {
 				return true;	// don't bother checking contents of parens, consider these as function names
 			}
@@ -2458,6 +2549,116 @@ mod canonicalize_tests {
         let target_str = "<math><mrow>
 			<mn data-roman-numeral='true'>XLVIII</mn> <mo>+</mo>><mn data-roman-numeral='true'>mmxxvi</mn>
 			</mrow></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn digit_block_binary() {
+        let test_str = "<math><mo>(</mo><mn>0110</mn><mspace width=\"thickmathspace\"></mspace><mn>1110</mn><mspace width=\"thickmathspace\"></mspace><mn>0110</mn><mo>)</mo></math>";
+        let target_str = " <math>
+				<mrow data-changed='added'>
+				<mo>(</mo>
+				<mn>0110 1110 0110</mn>
+				<mo>)</mo>
+				</mrow>
+			</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn digit_block_decimal() {
+        let test_str = "<math><mn>8</mn><mo>,</mo><mn>123</mn><mo>,</mo><mn>456</mn><mo>+</mo>
+								    <mn>4</mn><mo>.</mo><mn>32</mn></math>";
+        let target_str = " <math>
+				<mrow data-changed='added'>
+				<mn>8,123,456</mn>
+				<mo>+</mo>
+				<mn>4.32</mn>
+				</mrow>
+			</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn not_digit_block_decimal() {
+        let test_str = "<math><mn>8</mn><mo>,</mo><mn>49</mn><mo>,</mo><mn>456</mn><mo>+</mo>
+								    <mn>4</mn><mtext> </mtext><mn>32</mn><mo>+</mo>
+									<mn>1</mn><mo>,</mo><mn>234</mn><mo>,</mo><mn>56</mn></math>";
+        let target_str = "  <math>
+				<mrow data-changed='added'>
+				<mn>8</mn>
+				<mo>,</mo>
+				<mn>49</mn>
+				<mo>,</mo>
+				<mrow data-changed='added'>
+					<mn>456</mn>
+					<mo>+</mo>
+					<mrow data-changed='added'>
+					<mn>4</mn>
+					<mo data-changed='added'>&#x2062;</mo>
+					<mn>32</mn>
+					</mrow>
+					<mo>+</mo>
+					<mn>1</mn>
+				</mrow>
+				<mo>,</mo>
+				<mn>234</mn>
+				<mo>,</mo>
+				<mn>56</mn>
+				</mrow>
+			</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn primes_common() {
+        let test_str = "<math><msup><mn>5</mn><mo>'</mo></msup>
+							<msup><mn>5</mn><mo>''</mo></msup>
+							<msup><mn>8</mn><mrow><mo>'</mo><mo>'</mo></mrow></msup></math>";
+        let target_str = "<math>
+				<mrow data-changed='added'>
+				<msup>
+					<mn>5</mn>
+					<mo>′</mo>
+				</msup>
+				<mo data-changed='added'>&#x2062;</mo>
+				<msup>
+					<mn>5</mn>
+					<mo>″</mo>
+				</msup>
+				<mo data-changed='added'>&#x2062;</mo>
+				<msup>
+					<mn>8</mn>
+					<mo>″</mo>
+				</msup>
+				</mrow>
+			</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn primes_uncommon() {
+        let test_str = "<math><msup><mn>5</mn><mo>''′</mo></msup>
+							<msup><mn>5</mn><mo>''''</mo></msup>
+							<msup><mn>8</mn><mrow><mo>′</mo><mo>⁗</mo></mrow></msup></math>";
+        let target_str = " <math>
+				<mrow data-changed='added'>
+				<msup>
+					<mn>5</mn>
+					<mo>‴</mo>
+				</msup>
+				<mo data-changed='added'>&#x2062;</mo>
+				<msup>
+					<mn>5</mn>
+					<mo>⁗</mo>
+				</msup>
+				<mo data-changed='added'>&#x2062;</mo>
+				<msup>
+					<mn>8</mn>
+					<mo>⁗′</mo>
+				</msup>
+				</mrow>
+			</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 }

@@ -18,7 +18,7 @@
     # Note: the log functions follow the same syntax rules as trig functions, so they are included here
     TrigFunctionNames: [
         "cos", "cosec", "cosech", "cosh", "cot", "cotan", "cotanh", "coth", "csc", "csch",
-        "sec", "sech", "sin", "sinh", "tan", "tang", "tanh", "tg", "ln", "log"    
+        "sec", "sech", "sin", "sinh", "tan", "tang", "tanh", "tg", "ln", "log", "lg"    
     ],
 
     AdditionalFunctionNames: [
@@ -27,9 +27,49 @@
         "arccot", "arccotan", "arccotanh", "arccoth",
         "arccsc", "arccsch", "arcsec", "arcsech", "arcsin", "arcsinh",
         "arctan", "arctang", "arctanh",
-        "exp", "Exp", "im", "Im", "re", "Re",
-        "lim", "det",
+        "exp", "Exp", "expt", "arg", "im", "Im", "re", "Re", "Pr", "cis",
         "gcd", "lcm",
+        "min", "max", "deg", "det",
+        "dim", "hom", "ker", "tr", "Tr",
+        "inf", "lim", "liminf", "limsup", "max", "min", "sup",
+        "injlim", "projlim", "inj lim", "proj lim",
+
+        # these come from the nemeth book (Rule XVII)
+        "amp", "amplitude",
+        "antilog", "antilogarithm",
+        "arg", "argument",
+        "colog", "cologarithm",
+        "cosine",
+        "hyperbolic cosine",
+        "cotangent",
+        "hyperbolic cotangent",
+        "covers", "coversine",
+        "cosecant",
+        "hyperbolic cosecant",
+        "ctn",
+        "ctnh",
+        "determinant",
+        "erf", "error function",
+        "exponential",
+        "exsec", "exsecant",
+        "grad", "gradient",
+        "hav", "haversine",
+        "limit",
+        "upper limit",
+        "lower limit",
+        "natural logarithm",
+        "logarithm",
+        "maximum",
+        "minimum",
+        "real part",
+        "secant",
+        "hyperbolic secant",
+        "sine",
+        "hyperbolic sine",
+        "supremum",
+        "tangent",
+        "hyperbolic tangent",
+        "vers", "versine"
     ],
 
     # common names of functions along with a capital letter followed more one or more letters
@@ -41,44 +81,71 @@
         "f", "g", "h", "F", "G", "H"
     ],
 
-    # NemethFunctionName: [
-    #     "amp", "amplitude",
-    #     "antilog", "antilogarithm",
-    #     "arc",
-    #     "arg", "argument",
-    #     "colog", "cologarithm",
-    #     "cos", "cosine",
-    #     "cosh", "hyperbolic cosine",
-    #     "cot", "cotangent",
-    #     "coth", "hyperbolic cotangent",
-    #     "covers", "coversine",
-    #     "csc", "cosecant",
-    #     "csch", "hyperbolic cosecant",
-    #     "ctn",
-    #     "ctnh",
-    #     "det", "determinant",
-    #     "erf", "error function",
-    #     "exp", "exponential",
-    #     "exsec", "exsecant",
-    #     "grad", "gradient",
-    #     "hav", "haversine",
-    #     "lim", "limit",
-    #     "upper limit",
-    #     "lower limit",
-    #     "ln", "natural logarithm",
-    #     "log", "logarithm",
-    #     "max", "maximum",
-    #     "min", "minimum",
-    #     "mod", "modulo",
-    #     "re", "real part",
-    #     "sec", "secant",
-    #     "sech", "hyperbolic secant",
-    #     "sin", "sine",
-    #     "sinh", "hyperbolic sine",
-    #     "sup", "supremum",
-    #     "tan", "tangent",
-    #     "tanh", "hyperbolic tangent",
-    #     "vers", "versine",
-    # ]
+    # probably need to expand, but these are ones that have braille codes and are in the op dict
+    GeometryPrefixOperators: [
+        '∟', '∠', '∡', '∢', '⊾', '⊿',
+        '△', '▷', '▽', '◁'
+    ],
+
+  # these come from SRE's ts\semantic_tree\semantic_attr.ts file
+  NemethComparisonOps: [
+      '=', '~', '⁼', '₌', '∼', '∽', '≃', '≅',  '≈',  '≊', '≋', '≌', '≍', '≎',
+    '≑', '≒', '≓', '≔', '≕', '≖', '≗', '≘',  '≙',  '≚', '≛', '≜', '≝', '≞',
+    '≟', '≡', '≣', '⧤', '⩦', '⩮', '⩯', '⩰',  '⩱',  '⩲', '⩳', '⩴', '⩵', '⩶',
+    '⩷', '⩸', '⋕', '⩭', '⩪', '⩫', '⩬', '﹦', '＝', '⩬', '⊜', '∷',
+
+    "<", ">", "≁", "≂", "≄", "≆", "≇",  "≉",  "≏",  "≐", "≠", "≢", "≤", "≥",
+    "≦", "≧", "≨", "≩", "≪", "≫", "≬",  "≭",  "≮",  "≯", "≰", "≱", "≲", "≳",
+    "≴", "≵", "≶", "≷", "≸", "≹", "≺",  "≻",  "≼",  "≽", "≾", "≿", "⊀", "⊁",
+    "⋖", "⋗", "⋘", "⋙", "⋚", "⋛", "⋜",  "⋝",  "⋞",  "⋟", "⋠", "⋡", "⋦", "⋧",
+    "⋨", "⋩", "⩹", "⩺", "⩻", "⩼", "⩽",  "⩾",  "⩿",  "⪀", "⪁", "⪂", "⪃", "⪄",
+    "⪅", "⪆", "⪇", "⪈", "⪉", "⪊", "⪋",  "⪌",  "⪍",  "⪎", "⪏", "⪐", "⪑", "⪒",
+    "⪓", "⪔", "⪕", "⪖", "⪗", "⪘", "⪙",  "⪚",  "⪛",  "⪜", "⪝", "⪞", "⪟", "⪠",
+    "⪡", "⪢", "⪣", "⪤", "⪥", "⪦", "⪧",  "⪨",  "⪩",  "⪪", "⪫", "⪬", "⪭", "⪮",
+    "⪯", "⪰", "⪱", "⪲", "⪳", "⪴", "⪵",  "⪶",  "⪷",  "⪸", "⪹", "⪺", "⪻", "⪼",
+    "⫷", "⫸", "⫹", "⫺", "⧀", "⧁", "﹤", "﹥", "＜", "＞",
+
+    "⋢", "⋣", "⋤", "⋥", "⊂", "⊃", "⊄", "⊅", "⊆", "⊇", "⊈", "⊉", "⊊", "⊋",
+    "⊏", "⊐", "⊑", "⊒", "⪽", "⪾", "⪿", "⫀", "⫁", "⫂", "⫃", "⫄", "⫅", "⫆",
+    "⫇", "⫈", "⫉", "⫊", "⫋", "⫌", "⫍", "⫎", "⫏", "⫐", "⫑", "⫒", "⫓", "⫔",
+    "⫕", "⫖", "⫗", "⫘", "⋐", "⋑", "⋪", "⋫", "⋬", "⋭", "⊲", "⊳", "⊴", "⊵",
+
+    "∈", "∊", "⋲", "⋳", "⋴", "⋵", "⋶", "⋷", "⋸", "⋹", "⋿",
+
+    "∋", "∍", "⋺", "⋻", "⋼", "⋽", "⋾",
+
+    "⊢", "⊣", "⊦", "⊧", "⊨", "⊩", "⊪", "⊫", "⊬", "⊭", "⊮", "⊯", "⫞", "⫟",
+    "⫠", "⫡", "⫢", "⫣", "⫤", "⫥", "⫦", "⫧", "⫨", "⫩", "⫪", "⫫", "⫬", "⫭",
+
+    "←", "↑", "→", "↓", "↔", "↕", "↖", "↗", "↘", "↙", "↚", "↛", "↜", "↝", "↞",
+    "↟", "↠", "↡", "↢", "↣", "↤", "↥", "↦", "↧", "↨", "↩", "↪", "↫", "↬", "↭",
+    "↮", "↯", "↰", "↱", "↲", "↳", "↴", "↵", "↶", "↷", "↸", "↹", "↺", "↻", "⇄",
+    "⇅", "⇆", "⇇", "⇈", "⇉", "⇊", "⇍", "⇎", "⇏", "⇐", "⇑", "⇒", "⇓", "⇔", "⇕",
+    "⇖", "⇗", "⇘", "⇙", "⇚", "⇛", "⇜", "⇝", "⇞", "⇟", "⇠", "⇡", "⇢", "⇣", "⇤",
+    "⇥", "⇦", "⇧", "⇨", "⇩", "⇪", "⇫", "⇬", "⇭", "⇮", "⇯", "⇰", "⇱", "⇲", "⇳",
+    "⇴", "⇵", "⇶", "⇷", "⇸", "⇹", "⇺", "⇻", "⇼", "⇽", "⇾", "⇿", "⌁", "⌃", "⌄",
+    "⌤", "⎋", "➔", "➘", "➙", "➚", "➛", "➜", "➝", "➞", "➟", "➠", "➡", "➢", "➣",
+    "➤", "➥", "➦", "➧", "➨", "➩", "➪", "➫", "➬", "➭", "➮", "➯", "➱", "➲", "➳",
+    "➴", "➵", "➶", "➷", "➸", "➹", "➺", "➻", "➼", "➽", "➾", "⟰", "⟱", "⟲", "⟳",
+    "⟴", "⟵", "⟶", "⟷", "⟸", "⟹", "⟺", "⟻", "⟼", "⟽", "⟾", "⟿", "⤀", "⤁", "⤂",
+    "⤃", "⤄", "⤅", "⤆", "⤇", "⤈", "⤉", "⤊", "⤋", "⤌", "⤍", "⤎", "⤏", "⤐", "⤑",
+    "⤒", "⤓", "⤔", "⤕", "⤖", "⤗", "⤘", "⤙", "⤚", "⤛", "⤜", "⤝", "⤞", "⤟", "⤠",
+    "⤡", "⤢", "⤣", "⤤", "⤥", "⤦", "⤧", "⤨", "⤩", "⤪", "⤭", "⤮", "⤯", "⤰", "⤱",
+    "⤲", "⤳", "⤴", "⤵", "⤶", "⤷", "⤸", "⤹", "⤺", "⤻", "⤼", "⤽", "⤾", "⤿", "⥀",
+    "⥁", "⥂", "⥃", "⥄", "⥅", "⥆", "⥇", "⥈", "⥉", "⥰", "⥱", "⥲", "⥳", "⥴", "⥵",
+    "⥶", "⥷", "⥸", "⥹", "⥺", "⥻", "⦳", "⦴", "⦽", "⧪", "⧬", "⧭", "⨗", "⬀", "⬁",
+    "⬂", "⬃", "⬄", "⬅", "⬆", "⬇", "⬈", "⬉", "⬊", "⬋", "⬌", "⬍", "⬎", "⬏", "⬐",
+    "⬑", "⬰", "⬱", "⬲", "⬳", "⬴", "⬵", "⬶", "⬷", "⬸", "⬹", "⬺", "⬻", "⬼", "⬽",
+    "⬾", "⬿", "⭀", "⭁", "⭂", "⭃", "⭄", "⭅", "⭆", "⭇", "⭈", "⭉", "⭊", "⭋", "⭌",
+    "￩", "￪", "￫", "￬",
+    # Harpoons
+    "↼", "↽", "↾", "↿", "⇀", "⇁", "⇂", "⇃", "⇋", "⇌", "⥊", "⥋", "⥌", "⥍", "⥎",
+    "⥏", "⥐", "⥑", "⥒", "⥓", "⥔", "⥕", "⥖", "⥗", "⥘", "⥙", "⥚", "⥛", "⥜", "⥝",
+    "⥞", "⥟", "⥠", "⥡", "⥢", "⥣", "⥤", "⥥", "⥦", "⥧", "⥨", "⥩", "⥪", "⥫", "⥬",
+    "⥭", "⥮", "⥯", "⥼", "⥽", "⥾", "⥿",
+
+    # chars not from SRE
+    "∝", "∉"
+  ]
 ]
 

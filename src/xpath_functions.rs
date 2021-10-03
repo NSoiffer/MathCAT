@@ -259,7 +259,8 @@ impl IsNode {
 
         let mi_text = get_text_from_element(e);
         return DEFINITIONS.with(|definitions| {
-            return definitions.trig_function_names.as_hashset().borrow().contains(&mi_text);
+            let definitions = definitions.borrow();
+            return definitions.get_hashset("TrigFunctionNames").unwrap().contains(&mi_text);
         });
     }
 
@@ -364,6 +365,25 @@ impl Function for IsNode {
 
 struct ToOrdinal;
 impl ToOrdinal {
+    // ordinals often have an irregular start (e.g., "half") before becoming regular.
+    // if the number is irregular, return the ordinal form, otherwise return 'None'.
+    fn compute_irregular_fractional_speech(number: &str, plural: bool) -> Option<String> {
+        DEFINITIONS.with(|definitions| {
+            let definitions = definitions.borrow();
+            let words = if plural {
+                definitions.get_vec("NumbersOrdinalFractionalPluralOnes").unwrap()
+            } else {
+                definitions.get_vec("NumbersOrdinalFractionalOnes").unwrap()
+            };
+            let number_as_int: usize = number.parse().unwrap(); // already verified it is only digits
+            if number_as_int < words.len() {
+                // use the words associated with this irregular pattern.
+                return Some( words[number_as_int].clone() );
+            };
+            return None;
+        })
+    }
+
     /**
      * Translates a number of up to twelve digits into a string representation.
      *   number -- the number to translate
@@ -376,8 +396,10 @@ impl ToOrdinal {
             static ref NO_DIGIT: Regex = Regex::new(r"[^\d]").unwrap();    // match anything except a digit
         }
         DEFINITIONS.with(|definitions| {
+            let definitions = definitions.borrow();
+            let numbers_large = definitions.get_vec("NumbersLarge").unwrap();
             // check to see if the number is too big or is not an integer or has non-digits
-            if number.is_empty() || number.len() > 3*definitions.numbers_large.as_vec().borrow().len() || number.contains(".,") {
+            if number.is_empty() || number.len() > 3*numbers_large.len() || number.contains(".,") {
                 return String::from(number);
             }
             if NO_DIGIT.is_match(number) {
@@ -422,13 +444,13 @@ impl ToOrdinal {
                         .collect::<Vec<usize>>();
 
             let mut answer = String::with_capacity(255);  // reasonable max most of the time
-            let large_words = definitions.numbers_large.as_vec().borrow();
+            let large_words = numbers_large;
             if digits.len() > 3 { 
                 // speak this first groups as cardinal numbers
                 let words = [
-                    definitions.numbers_hundreds.as_vec().borrow(),
-                    definitions.numbers_tens.as_vec().borrow(),
-                    definitions.numbers_ones.as_vec().borrow()
+                    definitions.get_vec("NumbersHundreds").unwrap(),
+                    definitions.get_vec("NumbersTens").unwrap(),
+                    definitions.get_vec("NumbersOnes").unwrap(),
                 ];
                 answer = digits[0..digits.len()-3]
                             .chunks(3)
@@ -445,66 +467,55 @@ impl ToOrdinal {
                             .join("");  // can't use " " because 1000567 would get extra space in the middle
                 if num_thousands_at_end > 0 {
                     // add on "billionths", etc and we are done
-                    let large_words = if plural {&definitions.numbers_ordinal_plural_large} else {&definitions.numbers_ordinal_large};
-                    let large_words = large_words.as_vec().borrow();
-                        return answer + &large_words[num_thousands_at_end];
+                    let large_words = if plural {
+                        definitions.get_vec("NumbersOrdinalPluralLarge")
+                    } else {
+                        definitions.get_vec("NumbersOrdinalLarge")
+                    };
+                    return answer + &large_words.unwrap()[num_thousands_at_end];
                 }
             };
 
             // all that is left is to speak the hundreds part, possibly followed by "thousands", "billions", etc
             let words = match (num_thousands_at_end > 0, plural) {
                 (true, _) => [
-                    definitions.numbers_hundreds.as_vec().borrow(),
-                    definitions.numbers_tens.as_vec().borrow(),
-                    definitions.numbers_ones.as_vec().borrow()
+                    definitions.get_vec("NumbersHundreds").unwrap(),
+                    definitions.get_vec("NumbersTens").unwrap(),
+                    definitions.get_vec("NumbersOnes").unwrap(),
                 ],
                 (false, true) => [
-                    definitions.numbers_ordinal_plural_hundreds.as_vec().borrow(),
-                    definitions.numbers_ordinal_plural_tens.as_vec().borrow(),
-                    definitions.numbers_ordinal_plural_ones.as_vec().borrow()
+                    definitions.get_vec("NumbersOrdinalPluralHundreds").unwrap(),
+                    definitions.get_vec("NumbersOrdinalPluralTens").unwrap(),
+                    definitions.get_vec("NumbersOrdinalPluralOnes").unwrap(),
                 ],
                 (false, false) => [
-                    definitions.numbers_ordinal_hundreds.as_vec().borrow(),
-                    definitions.numbers_ordinal_tens.as_vec().borrow(),
-                    definitions.numbers_ordinal_ones.as_vec().borrow()
+                    definitions.get_vec("NumbersOrdinalHundreds").unwrap(),
+                    definitions.get_vec("NumbersOrdinalTens").unwrap(),
+                    definitions.get_vec("NumbersOrdinalOnes").unwrap(),
                 ],
             };
             answer += &ToOrdinal::hundreds_to_words(&digits[digits.len()-3..], &words);
             if num_thousands_at_end > 0 {
-                let large_words = if plural {&definitions.numbers_ordinal_plural_large} else {&definitions.numbers_ordinal_large};
-                let large_words = large_words.as_vec().borrow();
+                let large_words = if plural {
+                    definitions.get_vec("NumbersOrdinalPluralLarge").unwrap()
+                } else {
+                    definitions.get_vec("NumbersOrdinalLarge").unwrap()
+                };
                 answer = answer + " " + &large_words[num_thousands_at_end];
             }
             return answer;
         })
     }
 
-    // ordinals often have an irregular start (e.g., "half") before becoming regular.
-    // if the number is irregular, return the ordinal form, otherwise return 'None'.
-    fn compute_irregular_fractional_speech(number: &str, plural: bool) -> Option<String> {
-        DEFINITIONS.with(|definitions| {
-            let words = if plural {
-                definitions.numbers_ordinal_fractional_plural_ones.as_vec().borrow()
-            } else {
-                definitions.numbers_ordinal_fractional_ones.as_vec().borrow()
-            };
-            let number_as_int: usize = number.parse().unwrap(); // already verified it is only digits
-            if number_as_int < words.len() {
-                // use the words associated with this irregular pattern.
-                return Some( words[number_as_int].clone() );
-            };
-            return None;
-        })
-    }
-
     fn hundreds_to_words(number: &[usize], words: &[Ref<Vec<String>>; 3]) -> String {
         assert!( number.len() == 3 );
         return DEFINITIONS.with(|definitions| {
+            let definitions = definitions.borrow();
             if number[0] != 0 && number[1] == 0 && number[2] == 0 {
                 return words[0][number[0]].clone();
             }
 
-            let mut hundreds = definitions.numbers_hundreds.as_vec().borrow()[number[0]].clone();
+            let mut hundreds = definitions.get_vec("NumbersHundreds").unwrap()[number[0]].clone();
             if !hundreds.is_empty() {
                 hundreds += " ";
             }
@@ -517,7 +528,7 @@ impl ToOrdinal {
                 // usurp regular ordering to handle something like '14'
                 return hundreds + &words[2][10*number[1] + number[2]];
             } else {
-                return hundreds + &definitions.numbers_tens.as_vec().borrow()[number[1]] + " " + &words[2][number[2]];
+                return hundreds + &definitions.get_vec("NumbersTens").unwrap()[number[1]] + " " + &words[2][number[2]];
             }
         });
     }
@@ -884,8 +895,9 @@ struct IsLargeOp;
                 return Ok( Value::Boolean(false) );
             }
             return DEFINITIONS.with(|definitions| {
+                let definitions = definitions.borrow();
                 let text = get_text_from_element(&e);
-                return Ok( Value::Boolean(definitions.large_operators.as_hashset().borrow().get(&text).is_some()) );
+                return Ok( Value::Boolean(definitions.get_hashset("LargeOperators").unwrap().get(&text).is_some()) );
             });
         } else {
             // xpath is something besides an element, so no match
@@ -893,6 +905,69 @@ struct IsLargeOp;
         }
     }
 }
+
+
+struct BaseNode;
+/**
+ * Returns true if the node is a large op
+ * @param(node)     -- node(s) to test -- should be an <mo>
+ */
+
+ impl BaseNode {
+    /// Recursively find the base node
+    /// The base node of a non scripted element is the element itself
+    fn base_node(node: Element) -> Element {
+        let name = name(&node);
+        if ["msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts"].contains(&name) {
+            return BaseNode::base_node(as_element(node.children()[0]));
+        } else {
+            return node;
+        }
+    }
+ }
+ impl Function for BaseNode {
+
+    fn evaluate<'c, 'd>(&self,
+                        _context: &context::Evaluation<'c, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(1)?;
+        let node = validate_one_node(args.pop_nodeset()?)?;
+        if let Node::Element(e) = node {
+            let mut node_set = Nodeset::new();
+            node_set.add(BaseNode::base_node(e));
+            return Ok( Value::Nodeset(node_set) );
+        } else {
+            // xpath is something besides an element, so no match
+            return Err( Error::Other("Argument other than a node given to BaseNode".to_string()) );
+        }
+    }
+}
+
+// Need to add SetVariable to context::Evaluation. It's trivial but requires modifying the library
+// struct SetVariable;
+// /**
+//  * Set a variable value in the context
+//  * @param(name)     -- name of variable
+//  * @param(value)     -- new value of variable
+//  */
+// impl Function for SetVariable {
+
+//     fn evaluate<'c, 'd>(&self,
+//                         _context: &context::Evaluation<'c, 'd>,
+//                         args: Vec<Value<'d>>)
+//                         -> Result<Value<'d>, Error>
+//     {
+//         let mut args = Args(args);
+//         args.exactly(2)?;
+//         let value = args.0.pop().ok_or(Error::ArgumentMissing)?;
+//         let name = args.pop_string();
+//         _context.set_variable(name, value);
+//         return Ok( Value::Boolean(true) );
+//     }
+// }
 
 struct Debug;
 /**
@@ -1023,6 +1098,47 @@ impl IsBracketed {
     }
 }
 
+pub struct IsInDefinition;
+impl IsInDefinition {
+    fn is_defined_in(element: &Element, set_name: &str) -> bool {
+        let text = get_text_from_element(element);
+        if text.is_empty() {
+            return false;
+        }
+        return DEFINITIONS.with(|definitions| {
+            let definitions = definitions.borrow();
+            return definitions.get_hashset(set_name).unwrap().contains(&text);
+        });
+    }
+}
+
+/**
+ * Returns true if the node is a bracketed expr with the indicated left/right chars
+ * node -- node(s) to test
+ * left -- string (like "[") or empty
+ * right -- string (like "]") or empty
+ * requires_comma - boolean, optional (check the top level of 'node' for commas
+ */
+// 'requiresComma' is useful for checking parenthesized expressions vs function arg lists and other lists
+ impl Function for IsInDefinition {
+    fn evaluate<'c, 'd>(&self,
+                        _context: &context::Evaluation<'c, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(2)?;
+        let set_name = args.pop_string()?;
+        let node = validate_one_node(args.pop_nodeset()?)?;
+        if let Node::Element(e) = node {
+            return Ok( Value::Boolean( IsInDefinition::is_defined_in(&e, &set_name) ) );
+        }
+
+        // FIX: should having a non-element be an error instead??
+        return Ok( Value::Boolean(false) );
+    }
+}
+
 
 
 /// Add all the functions defined in this module to `context`.
@@ -1037,6 +1153,9 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("ToCommonFraction", ToCommonFraction);
     context.set_function("IsLargeOp", IsLargeOp);
     context.set_function("IsBracketed", IsBracketed);
+    context.set_function("IsInDefinition", IsInDefinition);
+    context.set_function("BaseNode", BaseNode);
+    // context.set_function("SetVariable", SetVariable);
     context.set_function("DEBUG", Debug);
 }
 
@@ -1052,7 +1171,7 @@ mod tests {
     fn init_word_list() {
         let result = crate::definitions::read_definitions_file(&[
             Some(PathBuf::from("Rules/en/definitions.yaml")),
-            None,
+            Some(PathBuf::from("Rules/definitions.yaml")),
             None
         ]);
         if let Err(e) = result {

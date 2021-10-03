@@ -12,8 +12,6 @@ thread_local!{
     /// The current set of navigation rules
     pub static NAV_RULES: RefCell<NavRules> =
             RefCell::new( NavRules::new("initial") );
-
-    static CONTEXT_STACK: RefCell<ContextStack<'static>> = RefCell::new( ContextStack{ new_defs: vec![], contexts: vec![] } );
 }
 */
 
