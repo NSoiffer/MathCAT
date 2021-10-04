@@ -257,13 +257,14 @@
    name: default
    tag: msup
    match: "."
-   variables:
-    - OldScriptContext: "$NewScriptContext"
-    - NewScriptContext: "concat($NewScriptContext, '⠘')"
+   variables: [OldScriptContext: "$NewScriptContext"]
    replace: 
     - x: "*[1]"
-    - x: "$NewScriptContext"
-    - x: "*[2]"
+    - with:
+         variables: [NewScriptContext: "concat($OldScriptContext, '⠘')"]
+         replace:
+            - x: "$NewScriptContext"
+            - x: "*[2]"
     - test:
          # emit level indicator if something follows or the closest non-mrow is an element with a close tag [80(a)]
          # if: "count(following-sibling::*) > 0 or ancestor::*[name() != 'mrow'][1]/.[self::m:mfrac or self::m:msqrt or self::m:mroot]"
@@ -293,13 +294,14 @@
    name: default
    tag: msub
    match: "."
-   variables:
-    - OldScriptContext: "$NewScriptContext"
-    - NewScriptContext: "concat($NewScriptContext, '⠰')"
+   variables: [OldScriptContext: "$NewScriptContext"]
    replace: 
     - x: "*[1]"
-    - x: "$NewScriptContext"
-    - x: "*[2]"
+    - with:
+         variables: [NewScriptContext: "concat($OldScriptContext, '⠰')"]
+         replace:
+            - x: "$NewScriptContext"
+            - x: "*[2]"
     - test:
          if: "true()"   # FIX 
          then_test:
@@ -311,10 +313,8 @@
    # primes don't get a superscript indicator and come before the subscript
    name: prime
    tag: msubsup
-   variables:
-    - OldScriptContext: "$NewScriptContext"
-    - NewScriptContext: "concat($NewScriptContext, '⠰')"
-   match: "DEBUG(*[3][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗'])"
+   variables: [OldScriptContext: "$NewScriptContext"]
+   match: "*[3][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
    replace: 
     - x: "*[1]"
     - x: "*[3]"
@@ -327,8 +327,11 @@
                if: "count(following-sibling::*) > 0 and not($NewScriptContext)"
                then: [t: "M"]
          else:
-            - x: "$NewScriptContext"
-            - x: "*[2]"
+            - with:
+                  variables: [NewScriptContext: "concat($OldScriptContext, '⠰')"]
+                  replace:
+                     - x: "$NewScriptContext"
+                     - x: "*[2]"
             - test:
                   if: "true()"   # FIX 
                   then_test:
@@ -338,27 +341,29 @@
 
 
 -
-   # FIX: there is a problem here...
-   #  We need NewScriptContext to reflect the status for subscripts and then again for superscripts.
-   #  However, the value can only be set when setting "variables".
-   #  Possible solution: add a function "SetVariable" so could write:
-   #    [x: SetVariable('NewScriptContext',concat($NewScriptContext, '⠰')) 
-   #  Unfortunately, while trivial, it requires modifying the xpath library
    name: default
    tag: msubsup
    match: "."
    variables:
     - OldScriptContext: "$NewScriptContext"
-    - NewScriptContext: "concat($NewScriptContext, '⠰')"
     - IsPrime: "*[3][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
     - IsNumericSubscript: "*[2][self::m:mn] and ($NewScriptContext = '') and 
                            *[1][BaseNode(.)[self::m:mi]]"
    replace: 
     - x: "*[1]"
-    - x: "$NewScriptContext"
-    - x: "*[2]"
-    - x: "concat($OldScriptContext, '⠘')"            # FIX: this should *set* NewScriptContext
-    - x: "*[3]"
+    - with:
+         variables: [NewScriptContext: "concat($OldScriptContext, '⠰')"]
+         replace:
+            - test:
+               if: "$IsNumericSubscript"
+               then: [t: "M"]      # multipurpose indicator prevents the 'letter digit' substitution (177.2) from kicking in
+               else: [x: "$NewScriptContext"]
+            - x: "*[2]"
+    - with:
+         variables: [NewScriptContext: "concat($OldScriptContext, '⠘')"]
+         replace:
+            - x: "$NewScriptContext"
+            - x: "*[3]"
     - test:
          if: "true()"   # FIX 
          then_test:

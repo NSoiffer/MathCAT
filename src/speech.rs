@@ -376,6 +376,7 @@ enum Replacement {
     Text(String),
     XPath(MyXPath),
     TTS(Box<TTSCommandRule>),
+    With(Box<With>),
     Insert(Box<InsertChildren>),
 }
 
@@ -387,6 +388,7 @@ impl fmt::Display for Replacement {
                 Replacement::Text(t) => format!("{{t: \"{}}}\"", t),
                 Replacement::XPath(x) => x.to_string(),
                 Replacement::TTS(t) => t.to_string(),
+                Replacement::With(w) => w.to_string(),
                 Replacement::Insert(ic) => ic.to_string(),
             }
         );
@@ -433,6 +435,9 @@ impl Replacement {
             },
             "test" => {
                 return Ok( Replacement::Test( Box::new( TestArray::build(value)? ) ) );
+            },
+            "with" => {
+                return Ok( Replacement::With( With::build(value)? ) );
             },
             "insert" => {
                 return Ok( Replacement::Insert( InsertChildren::build(value)? ) );
@@ -524,6 +529,53 @@ impl<'r> InsertChildren {
         
     }    
 }
+
+
+// structure used when "insert:" is encountered in a rule
+// the 'replacements' are inserted between each node in the 'xpath'
+#[derive(Debug, Clone)]
+struct With {
+    variables: VariableDefinitions,     // variables and values
+    replacements: ReplacementArray,     // what to do with these vars
+}
+
+impl fmt::Display for With {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        return write!(f, "With:\n  variables {}\n  replacements {}", &self.variables, &self.replacements);
+    }
+}
+
+impl<'r> With {
+    fn build(insert: &Yaml) -> Result<Box<With>> {
+        // 'with:' -- 'variables': xxx 'replace': xxx
+        if insert.as_hash().is_none() {
+            bail!("Array found for contents of 'with' -- should be dictionary with keys 'variables and 'replace'")
+        }
+        let var_defs = &insert["variables"];
+        if var_defs.is_badvalue() { 
+            bail!("Missing 'variables' as part of 'with'.\n    \
+                  Suggestion: add 'variables:' or if present, indent so it is contained in 'with'");
+        }
+        let replace = &insert["replace"];
+        if replace.is_badvalue() { 
+            bail!("Missing 'replace' as part of 'with'.\n    \
+                  Suggestion: add 'replace:' or if present, indent so it is contained in 'with'");
+        }
+        return Ok( Box::new( With {
+            variables: VariableDefinitions::build(var_defs).chain_err(|| "'variables'")?,
+            replacements: ReplacementArray::build(replace).chain_err(|| "'replace:'")?,
+        } ) );
+    }
+        
+    fn replace<'c, 's:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
+        rules_with_context.context_stack.push(self.variables.clone(), mathml)?;
+        let result = self.replacements.replace(rules_with_context, mathml)
+                    .chain_err(||"replacing inside 'with'")?;
+        rules_with_context.context_stack.pop();
+        return Ok( result );
+    }    
+}
+
 
 /// An array of rule `Replacement`s (text, xpath, tts commands, etc)
 #[derive(Debug, Clone)]
@@ -1200,7 +1252,7 @@ impl Test {
 }
 
 // Used for speech rules with "variables: ..."
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct VariableDefinition {
     name: String,       // name of variable
     value: MyXPath,   // xpath value, typically a constant like "true" or "0", but could be "*/*[1]" to store some nodes   
@@ -1215,7 +1267,7 @@ impl fmt::Display for VariableDefinition {
 // Used for speech rules with "variables: ..."
 #[derive(Debug)]
 struct VariableValue<'v> {
-    name: &'v str,       // name of variable
+    name: String,       // name of variable
     value: Option<Value<'v>>,   // xpath value, typically a constant like "true" or "0", but could be "*/*[1]" to store some nodes   
 }
 
@@ -1260,9 +1312,18 @@ impl VariableDefinition {
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct VariableDefinitions {
     defs: Vec<VariableDefinition>
+}
+
+impl fmt::Display for VariableDefinitions {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for def in &self.defs {
+            write!(f, "  {}={}", &def.name, &def.value)?;
+        }
+        return Ok( () );
+    }
 }
 
 #[derive(Debug)]
@@ -1338,7 +1399,7 @@ impl<'c, 'r> ContextStack<'c> {
         return context;
     }
 
-    fn push<'a:'c>(&'r mut self, new_vars: &'a VariableDefinitions, mathml: &'r Element<'c>) -> Result<()> {
+    fn push<'a:'c>(&'r mut self, new_vars: VariableDefinitions, mathml: &'r Element<'c>) -> Result<()> {
         // store the old value and set the new one 
         let mut old_values = VariableValues {defs: Vec::with_capacity(new_vars.defs.len()) };
         let evaluation = Evaluation::new(&self.base, Node::Element(*mathml));
@@ -1349,7 +1410,7 @@ impl<'c, 'r> ContextStack<'c> {
                 Some(val) => Some( val.clone() ),   // &Value -> Value
                 None => None,
             };
-            old_values.defs.push( VariableValue{ name: &def.name, value: old_value} );
+            old_values.defs.push( VariableValue{ name: def.name.clone(), value: old_value} );
         }
 
         // use a second loop because of borrow problem with self.base and 'evaluation'
@@ -1370,7 +1431,7 @@ impl<'c, 'r> ContextStack<'c> {
         const MISSING_VALUE: &str = "-- unset value --";     // can't remove a variable from context, so use this value
         let old_values = self.old_values.pop().unwrap();
         for variable in old_values.defs {
-            let qname = QName::new(variable.name);
+            let qname = QName::new(&variable.name);
             let old_value = match variable.value {
                 None => Value::String(MISSING_VALUE.to_string()),
                 Some(val) => val,
@@ -1558,12 +1619,12 @@ impl fmt::Display for SpeechRules {
 /// `SpeechRulesWithContext` encapsulates a named group of speech rules (e.g, "ClearSpeak")
 /// along with the preferences to be used for speech.
 /// Because speech rules can define variables, there is also a context that is carried with them
-pub struct SpeechRulesWithContext<'c, 's> {
+pub struct SpeechRulesWithContext<'c, 's:'c> {
     speech_rules: &'s SpeechRules,
     context_stack: ContextStack<'c>,   // current value of (context) variables
 }
 
-impl<'c, 's> fmt::Display for SpeechRulesWithContext<'c, 's> {
+impl<'c, 's:'c> fmt::Display for SpeechRulesWithContext<'c, 's> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "SpeechRulesWithContext \n{})", self.speech_rules)?;
         return writeln!(f, "   {} context  entries", &self.context_stack);
@@ -1725,7 +1786,7 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
                 if pattern.is_match(&self.context_stack.base, mathml)
                         .chain_err(|| error_string(pattern, *mathml) )? {
                     if pattern.var_defs.len() > 0 {
-                        self.context_stack.push(&pattern.var_defs, mathml)?;
+                        self.context_stack.push(pattern.var_defs.clone(), mathml)?;
                     }
                     let result = pattern.replacements.replace(self, mathml);
                     if pattern.var_defs.len() > 0 {
@@ -1784,6 +1845,9 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
                 },
                 Replacement::Test(test) => {
                     test.replace(self, mathml)?                     
+                },
+                Replacement::With(with) => {
+                    with.replace(self, mathml)?                     
                 },
                 Replacement::Insert(ic) => {
                     ic.replace(self, mathml)?                     
