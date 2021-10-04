@@ -946,28 +946,6 @@ struct BaseNode;
     }
 }
 
-// Need to add SetVariable to context::Evaluation. It's trivial but requires modifying the library
-// struct SetVariable;
-// /**
-//  * Set a variable value in the context
-//  * @param(name)     -- name of variable
-//  * @param(value)     -- new value of variable
-//  */
-// impl Function for SetVariable {
-
-//     fn evaluate<'c, 'd>(&self,
-//                         _context: &context::Evaluation<'c, 'd>,
-//                         args: Vec<Value<'d>>)
-//                         -> Result<Value<'d>, Error>
-//     {
-//         let mut args = Args(args);
-//         args.exactly(2)?;
-//         let value = args.0.pop().ok_or(Error::ArgumentMissing)?;
-//         let name = args.pop_string();
-//         _context.set_variable(name, value);
-//         return Ok( Value::Boolean(true) );
-//     }
-// }
 
 struct Debug;
 /**
