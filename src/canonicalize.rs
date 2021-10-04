@@ -505,8 +505,8 @@ impl CanonicalizeContext {
 								is_decimal_pt = false;
 							}
 						};
-						// println!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
-								//  i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
+						println!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
+								 i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
 						if !(looking_for_separator &&
 							 (sibling_name == "mspace" || is_comma || is_decimal_pt)) &&
 						   ( looking_for_separator ||
@@ -520,7 +520,10 @@ impl CanonicalizeContext {
 					if is_likely_a_number(mrow, i, i+end) {
 						merge_block(mrow, i, i+end);
 						children = mrow.children();		// mrow has changed, so we need a new children array
-						}
+						// note: i..i+end has been collapsed, so just inc 'i' by one
+					} else {
+						i += end-1;	// start looking at the end of the block we just rejected
+					}
 				}
 				i += 1;
 			}
@@ -2607,6 +2610,24 @@ mod canonicalize_tests {
 				<mn>56</mn>
 				</mrow>
 			</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn not_digit_block_ellipsis() {
+        let test_str = "<math><mrow><mn>8</mn><mo>,</mo><mn>123</mn><mo>,</mo><mn>456</mn><mo>,</mo>
+								    <mi>…</mi></mrow></math>";
+        let target_str = "<math>
+		<mrow>
+		  <mn>8</mn>
+		  <mo>,</mo>
+		  <mn>123</mn>
+		  <mo>,</mo>
+		  <mn>456</mn>
+		  <mo>,</mo>
+		  <mi>…</mi>
+		</mrow>
+	   </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
