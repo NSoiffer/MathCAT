@@ -237,6 +237,12 @@ fn subsup_82_a_3() {
 }
 
 #[test]
+fn subsup_82_a_5() {
+    let expr = "<math><mover><msup><mi>x</mi><mn>2</mn></msup><mo>&#xAF;</mo></mover></math>";
+    test_braille("Nemeth", expr, "⠐⠭⠘⠆⠐⠣⠱⠻");
+}
+
+#[test]
 fn sub_sup_82_b_1() {
     let expr = "<math><msub><msup><mi>a</mi><mi>n</mi></msup><mi>m</mi></msub></math>";
     test_braille("Nemeth", expr, "⠁⠘⠝⠐⠰⠍");
