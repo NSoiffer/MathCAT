@@ -287,6 +287,11 @@ pub fn is_relational_op(mo: Element) -> bool {
 			.find_operator(mo, None, None, None).priority == *EQUAL_PRIORITY;
 }
 
+fn set_mathml_name(element: Element, new_name: &str) {
+	element.set_name(QName::with_namespace_uri(Some("http://www.w3.org/1998/Math/MathML"), new_name));
+}
+
+
 /// Canonicalize does several things:
 /// 1. cleans up the tree so all extra white space is removed (should only have element and text nodes)
 /// 2. normalize the characters
@@ -332,7 +337,7 @@ impl CanonicalizeContext {
 			math_element.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
 			math_element.append_child(converted_mathml);
 		}
-		converted_mathml.set_name(QName::with_namespace_uri(Some("http://www.w3.org/1998/Math/MathML"), "math"));
+		set_mathml_name(converted_mathml, "math");
 		self.clean_mathml(converted_mathml);
 		let children = converted_mathml.children();
 		if children.len() > 1 {
@@ -380,7 +385,29 @@ impl CanonicalizeContext {
 				ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(parent_name.as_str())
 			};
 		match element_name {
-			"mi" | "mn" | "ms" | "mglyph" => {return Some(mathml);},
+			"mn" | "ms" | "mglyph" => {return Some(mathml);},
+			"mi" => {
+				// change <mi>s that are likely <mo>s to <mo>s
+				let text = as_text(mathml);
+				if OPERATORS.get(text).is_some() {
+					set_mathml_name(mathml, "mo");
+				} else {
+					crate::definitions::DEFINITIONS.with(|definitions| {
+						// change "arc" "cos" to "arccos" -- we look backward because "arc" might be mtext or m
+						if text == "…" || definitions.borrow().get_hashset("TrigFunctionNames").unwrap().contains(text) {
+							let mi = create_mathml_element(&mathml.document(), "mi");
+							mi.set_text(text);
+							return Some(mi);
+						}
+						if IS_PRIME.is_match(text) {
+							let new_text = merge_prime_text(text);
+							mathml.set_text(&new_text);
+						}
+						return Some(mathml);
+					});				
+				};
+				return Some(mathml);
+			}
 			"mo" => {
 				// common bug: trig functions, lim, etc., should be mi
 				// same for ellipsis ("…")
@@ -415,12 +442,14 @@ impl CanonicalizeContext {
 				//  regexp:  ^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$
 				return if parent_requires_child || (!text.is_empty() && !IS_WHITESPACE.is_match(&text)) {Some(mathml)} else {None};
 			},
-			"mfenced" => {return Some( convert_mfenced_to_mrow(mathml) )} ,
+			"mfenced" => {return self.clean_mathml( convert_mfenced_to_mrow(mathml) )} ,
 			"mspace" | "mphantom" => {
 				return if parent_requires_child {Some(mathml)} else {None};
 			},
 			_  => {
-				let mathml = if element_name == "mrow" || element_name == "math" {
+				let mathml = if element_name == "mrow" && mathml.children().is_empty(){
+					return if parent_requires_child {Some(mathml)} else {None}
+				} else if element_name == "mrow" || element_name == "math" {
 					let merged = merge_number_blocks(mathml);
 					let merged = merge_primes(merged);
 					merged
@@ -455,9 +484,34 @@ impl CanonicalizeContext {
 			}
 		}
 
-		fn convert_mfenced_to_mrow(mathml: Element) -> Element {
+		fn convert_mfenced_to_mrow(mfenced: Element) -> Element {
 			// FIX: implement this
-			return mathml;
+			let open = mfenced.attribute_value("open").unwrap_or("(");
+			let close = mfenced.attribute_value("close").unwrap_or(")");
+			let mut separators= mfenced.attribute_value("separators").unwrap_or(",").chars();
+			set_mathml_name(mfenced, "mrow");
+			mfenced.remove_attribute("open");
+			mfenced.remove_attribute("close");
+			mfenced.remove_attribute("separators");
+			let children = mfenced.children();
+			let mut new_children = Vec::with_capacity(2*children.len() + 1);
+			if !open.is_empty() {
+				new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), open)) );
+			}
+			if !children.is_empty() {
+				new_children.push(children[0]);
+				for child in &children[1..] {
+					println!("sep '{:?}'", separators);
+					let sep = separators.next().unwrap_or(',').to_string();
+					new_children.push( ChildOfElement::Element( create_mo(mfenced.document(), &sep)) );
+					new_children.push(*child);
+				}
+			}
+			if !close.is_empty() {
+				new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), close)) );
+			}
+			mfenced.replace_children(new_children);
+			return mfenced;
 		}
 
 		fn is_digit_block(mathml: Element) -> DigitBlockType {
@@ -695,7 +749,7 @@ impl CanonicalizeContext {
 
 	fn canonicalize_mrows<'a>(&self, mathml: Element<'a>) -> Result<Element<'a>> {
 		let tag_name = name(&mathml);
-		mathml.set_name(QName::with_namespace_uri(Some("http://www.w3.org/1998/Math/MathML"), tag_name));
+		set_mathml_name(mathml, tag_name);	// add namespace
 		match tag_name {
 			"mi" | "ms" | "mtext" | "mspace" | "mglyph" => {
 				self.canonicalize_plane1(mathml);
@@ -2057,6 +2111,91 @@ mod canonicalize_tests {
 	}
 
     #[test]
+    fn mfenced_no_children() {
+        let test_str = "<math><mi>f</mi><mfenced><mrow/></mfenced></math>";
+        let target_str = "<math>
+			<mrow data-changed='added'>
+				<mi>f</mi>
+				<mo data-changed='added'>&#x2061;</mo>
+				<mrow>
+					<mo data-changed='added'>(</mo>
+					<mo data-changed='added'>)</mo>
+				</mrow>
+			</mrow>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
+    fn mfenced_one_child() {
+        let test_str = "<math><mi>f</mi><mfenced open='[' close=']'><mi>x</mi></mfenced></math>";
+        let target_str = " <math>
+			<mrow data-changed='added'>
+			<mi>f</mi>
+			<mo data-changed='added'>&#x2061;</mo>
+			<mrow>
+				<mo data-changed='added'>[</mo>
+				<mi>x</mi>
+				<mo data-changed='added'>]</mo>
+			</mrow>
+			</mrow>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
+    fn mfenced_no_attrs() {
+        let test_str = "<math><mi>f</mi><mfenced><mrow><mi>x</mi><mo>,</mo><mi>y</mi><mo>,</mo><mi>z</mi></mrow></mfenced></math>";
+        let target_str = " <math>
+			<mrow data-changed='added'>
+			<mi>f</mi>
+			<mo data-changed='added'>&#x2061;</mo>
+			<mrow>
+				<mo data-changed='added'>(</mo>
+				<mrow>
+				<mi>x</mi>
+				<mo>,</mo>
+				<mi>y</mi>
+				<mo>,</mo>
+				<mi>z</mi>
+				</mrow>
+				<mo data-changed='added'>)</mo>
+			</mrow>
+			</mrow>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
+    fn mfenced_with_separators() {
+        let test_str = "<math><mi>f</mi><mfenced separators=',;'><mi>x</mi><mi>y</mi><mi>z</mi><mi>a</mi></mfenced></math>";
+        let target_str = "<math>
+			<mrow data-changed='added'>
+			<mi>f</mi>
+			<mo data-changed='added'>&#x2061;</mo>
+			<mrow>
+				<mo data-changed='added'>(</mo>
+				<mrow data-changed='added'>
+				<mrow data-changed='added'>
+					<mi>x</mi>
+					<mo data-changed='added'>,</mo>
+					<mi>y</mi>
+				</mrow>
+				<mo data-changed='added'>;</mo>
+				<mrow data-changed='added'>
+					<mi>z</mi>
+					<mo data-changed='added'>,</mo>
+					<mi>a</mi>
+				</mrow>
+				</mrow>
+				<mo data-changed='added'>)</mo>
+			</mrow>
+			</mrow>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
     fn canonical_one_element_mrow_around_mrow() {
         let test_str = "<math><mrow><mrow><mo>-</mo><mi>a</mi></mrow></mrow></math>";
         let target_str = "<math><mrow><mo>-</mo><mi>a</mi></mrow></math>";
@@ -2543,6 +2682,33 @@ mod canonicalize_tests {
         let target_str = "<math><msqrt>
 				<mi>b</mi>
 			</msqrt></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn clean_up_mi_operator() {
+        let test_str = "<math><mrow><mi>∠</mi><mi>A</mi><mi>B</mi><mi>C</mi></mrow></math>";
+        let target_str = " <math>
+				<mrow>
+				<mo>∠</mo>
+				<mrow data-changed='added'>
+					<mi>A</mi>
+					<mo data-changed='added'>&#x2062;</mo>
+					<mi>B</mi>
+					<mo data-changed='added'>&#x2062;</mo>
+					<mi>C</mi>
+				</mrow>
+				</mrow>
+			</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+
+	#[test]
+    fn clean_up_arc() {
+        let test_str = "<math><mtext>arc</mtext><mo>&#xA0;</mo><mi>cos</mi><mo>&#xA0;</mo><mi>a</mi></math>";
+        let target_str = "
+		";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
