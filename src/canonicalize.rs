@@ -71,6 +71,9 @@ lazy_static!{
 
 	// used to tell if an operator is a relational operator
 	static ref EQUAL_PRIORITY: usize = OPERATORS.get("=").unwrap().priority;
+
+	// useful for detecting whitespace
+	static ref IS_WHITESPACE: Regex = Regex::new(r"^\s+$").unwrap();    // only Unicode whitespace
 }
 
 // Operators are either PREFIX, INFIX, or POSTFIX, but can also have other properties such as LEFT_FENCE
@@ -368,7 +371,6 @@ impl CanonicalizeContext {
 	// Note: mspace that is potentially part of a number that was split apart is merged into a number as a single space char
 	fn clean_mathml<'a>(&self, mathml: Element<'a>) -> Option<Element<'a>> {
 		lazy_static! {
-            static ref IS_WHITESPACE: Regex = Regex::new(r"^\s+$").unwrap();    // only Unicode whitespace
 			static ref IS_PRIME: Regex = Regex::new(r"['′″‴⁗]").unwrap(); 
         }
 		static ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN: phf::Set<&str> = phf_set! {
@@ -1748,14 +1750,15 @@ impl CanonicalizeContext {
 		let num_children = children.len();
 	
 		for i_child in 0..num_children {
-			// println!("\nDealing with child #{}: {}", i_child, mml_to_string(&as_element(children[i_child])));
+			println!("\nDealing with child #{}: {}", i_child, mml_to_string(&as_element(children[i_child])));
 			let mut current_child = self.canonicalize_mrows(as_element(children[i_child]))?;
 			children[i_child] = ChildOfElement::Element( current_child );
 			let base_of_child = get_possible_embellished_node(current_child);
 
 			let mut current_op = OperatorPair::new();
 			// figure what the current operator is -- it either comes from the 'mo' (if we have an 'mo') or it is implied
-			if name(&base_of_child) == "mo" && !base_of_child.children().is_empty() { // shouldn't have empty mo node, but...
+			if name(&base_of_child) == "mo" &&
+			   !( base_of_child.children().is_empty() || IS_WHITESPACE.is_match(&as_text(base_of_child)) ) { // shouldn't have empty mo node, but...
 				let previous_op = if top(&parse_stack).is_operand {None} else {Some( top(&parse_stack).op_pair.op )};
 				let next_node = if i_child + 1 < num_children {Some(as_element(children[i_child+1]))} else {None};
 				current_op = OperatorPair{
@@ -1792,20 +1795,24 @@ impl CanonicalizeContext {
 								OperatorPair{ ch: "\u{2062}", op: &*IMPLIED_TIMES }
 							};
 	
-	
-					// println!("  Found implicit op {}/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
-					self.reduce_stack(&mut parse_stack, current_op.op.priority, !self.is_function_name(base_of_child, None));
-	
-					let implied_mo = create_mo(current_child.document(), current_op.ch);
-					let shift_result = self.shift_stack(&mut parse_stack, implied_mo, current_op.clone());
-					// ignore shift_result.0 which is just 'implied_mo'
-					assert_eq!(implied_mo, shift_result.0);
-					assert!( ptr_eq(current_op.op, shift_result.1.op) );
-					let mut top_of_stack = parse_stack.pop().unwrap();
-					top_of_stack.add_child_to_mrow(implied_mo, current_op);
-					parse_stack.push(top_of_stack);
+					if name(&base_of_child) == "mo" {
+						current_op.ch = as_text(base_of_child);
+						println!("  Found whitespace op '{}'/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
+					} else {
+						println!("  Found implicit op {}/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
+						self.reduce_stack(&mut parse_stack, current_op.op.priority, !self.is_function_name(base_of_child, None));
+		
+						let implied_mo = create_mo(current_child.document(), current_op.ch);
+						let shift_result = self.shift_stack(&mut parse_stack, implied_mo, current_op.clone());
+						// ignore shift_result.0 which is just 'implied_mo'
+						assert_eq!(implied_mo, shift_result.0);
+						assert!( ptr_eq(current_op.op, shift_result.1.op) );
+						let mut top_of_stack = parse_stack.pop().unwrap();
+						top_of_stack.add_child_to_mrow(implied_mo, current_op);
+						parse_stack.push(top_of_stack);
+						current_op = OperatorPair::new();	
+					}
 				}
-				current_op = OperatorPair::new();
 			}
 	
 			if !ptr_eq(current_op.op, *ILLEGAL_OPERATOR_INFO) {
@@ -2691,6 +2698,19 @@ mod canonicalize_tests {
 				<mspace width='3em'/>
 				<mtext>&#x2009;</mtext>
 			</mfrac></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn remove_mo_whitespace() {
+        let test_str = "<math><mi>cos</mi><mo>&#xA0;</mo><mi>x</mi></math>";
+        let target_str = "<math>
+				<mrow data-changed='added'>
+					<mi>cos</mi>
+					<mo> </mo>>
+					<mi>x</mi>
+				</mrow>
+			</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
