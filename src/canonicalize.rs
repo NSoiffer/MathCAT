@@ -392,31 +392,29 @@ impl CanonicalizeContext {
 				if OPERATORS.get(text).is_some() {
 					set_mathml_name(mathml, "mo");
 				} else {
-					crate::definitions::DEFINITIONS.with(|definitions| {
-						// change "arc" "cos" to "arccos" -- we look backward because "arc" might be mtext or m
-						if text == "…" || definitions.borrow().get_hashset("TrigFunctionNames").unwrap().contains(text) {
-							let mi = create_mathml_element(&mathml.document(), "mi");
-							mi.set_text(text);
-							return Some(mi);
-						}
-						if IS_PRIME.is_match(text) {
-							let new_text = merge_prime_text(text);
-							mathml.set_text(&new_text);
-						}
-						return Some(mathml);
-					});				
+					if let Some(result) = merge_arc_trig(mathml) {
+						return Some(result);
+					};
+					if IS_PRIME.is_match(text) {
+						let new_text = merge_prime_text(text);
+						mathml.set_text(&new_text);
+					}
+					return Some(mathml);
 				};
 				return Some(mathml);
 			}
 			"mo" => {
 				// common bug: trig functions, lim, etc., should be mi
 				// same for ellipsis ("…")
+				if let Some(result) = merge_arc_trig(mathml) {
+					return Some(result);
+				};
+
 				let text = as_text(mathml);
 				return crate::definitions::DEFINITIONS.with(|definitions| {
 					if text == "…" || definitions.borrow().get_hashset("FunctionNames").unwrap().contains(text) {
-						let mi = create_mathml_element(&mathml.document(), "mi");
-						mi.set_text(text);
-						return Some(mi);
+						set_mathml_name(mathml, "mi");
+						return Some(mathml);
 					}
 					if IS_PRIME.is_match(text) {
 						let new_text = merge_prime_text(text);
@@ -429,14 +427,17 @@ impl CanonicalizeContext {
 				lazy_static!{
 					// cases insensitive pattern for matching valid roman numerals
 					static ref ROMAN_NUMERAL: Regex = Regex::new(r"(?i)^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$").unwrap();
-				}				
+				}
+				if let Some(result) = merge_arc_trig(mathml) {
+					return Some(result);
+				};
+			
 				let text = as_text(mathml);
 				if !text.is_empty() && ROMAN_NUMERAL.is_match(text) {
 					// people tend to set them in a non-italic font and software makes that 'mtext'
-					let mn = create_mathml_element(&mathml.document(), "mn");
-					mn.set_text(text);
-					mn.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
-					return Some(mn);
+					set_mathml_name(mathml, "mn");
+					mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+					return Some(mathml);
 				}
 				// FIX: check for a roman numeral and turn into an mn
 				//  regexp:  ^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$
@@ -456,32 +457,67 @@ impl CanonicalizeContext {
 				} else {
 					mathml
 				};
-				let mut new_children = Vec::with_capacity(mathml.children().len());
 				for child in mathml.children() {
 					let child = as_element(child);			
-					if let Some(new_child) = self.clean_mathml(child) {
-						new_children.push(new_child);
+					match self.clean_mathml(child) {
+						None => mathml.remove_child(child),
+						Some(new_child) => {
+							if child != new_child {
+								// replace() doesn't exist, so change 'child' itself
+								child.set_name(new_child.name());
+								child.replace_children(new_child.children());
+							}
+						}
 					}
 				}
+
+				// some elements might have been deleted, so get a new vector
+				let children = mathml.children();
 
 				// Throw out mstyle -- to do this, we need to avoid mstyle being the arg of clean_mathml
 				// FIX: should probably push the attrs down to the children (set in 'self')
 				// Also throw out mpadded
 				if element_name == "mstyle" || element_name == "mpadded" {
-					if new_children.len() == 1 {
-						return Some( new_children[0] );
+					if children.len() == 1 {
+						return Some( as_element(children[0]) );
 					} else {
 						// wrap the children in an mrow
 						let mrow = create_mathml_element(&mathml.document(), "mrow");
-						mrow.append_children(new_children);
+						mrow.append_children(children);
 						return Some(mrow);
 					}
 				} else {
-					mathml.clear_children();
-					mathml.append_children(new_children);
 					return Some(mathml);				
 				}
 			}
+		}
+
+		fn merge_arc_trig(leaf: Element) -> Option<Element> {
+			let preceding_siblings = leaf.preceding_siblings();
+			if !preceding_siblings.is_empty() {
+				let preceding_sibling = as_element(preceding_siblings[preceding_siblings.len()-1]);
+				let preceding_sibling_name = name(&preceding_sibling);
+				if preceding_sibling_name == "mi" || preceding_sibling_name == "mo" || preceding_sibling_name == "mtext" {
+					let preceding_text = as_text(preceding_sibling);
+					if preceding_text == "arc" || preceding_text == "arc " || preceding_text == "arc " /* non-breaking space */ {
+						return crate::definitions::DEFINITIONS.with(|definitions| {
+							// change "arc" "cos" to "arccos" -- we look forward because calling loop stores previous node
+							let leaf_name = name(&leaf);
+							if leaf_name == "mi" || leaf_name == "mo" || leaf_name == "mtext" {
+								let leaf_text = as_text(leaf);
+								if definitions.borrow().get_hashset("TrigFunctionNames").unwrap().contains(leaf_text) {
+									let new_text = preceding_text.to_string() + leaf_text;
+									leaf.set_text(&new_text);
+									preceding_sibling.remove_from_parent();
+									return Some(leaf);
+								}
+							}
+							return None;
+						})
+					}
+				}
+			}
+			return None;
 		}
 
 		fn convert_mfenced_to_mrow(mfenced: Element) -> Element {
@@ -2706,9 +2742,27 @@ mod canonicalize_tests {
 
 	#[test]
     fn clean_up_arc() {
-        let test_str = "<math><mtext>arc</mtext><mo>&#xA0;</mo><mi>cos</mi><mo>&#xA0;</mo><mi>a</mi></math>";
-        let target_str = "
-		";
+        let test_str = "<math><mtext>arc&#xA0;</mtext><mi>cos</mi><mi>x</mi></math>";
+        let target_str = "<math>
+			<mrow data-changed='added'>
+			<mi>arc cos</mi>
+			<mo data-changed='added'>&#x2062;</mo>
+			<mi>x</mi>
+			</mrow>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn clean_up_arc_nospace() {
+        let test_str = "<math><mtext>arc</mtext><mi>cos</mi><mi>x</mi></math>";
+        let target_str = "<math>
+			<mrow data-changed='added'>
+			<mi>arccos</mi>
+			<mo data-changed='added'>&#x2062;</mo>
+			<mi>x</mi>
+			</mrow>
+		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
