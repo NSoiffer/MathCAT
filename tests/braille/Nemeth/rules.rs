@@ -268,6 +268,12 @@ fn underbar_rule_86_a_1() {
 }
 
 #[test]
+fn menclose_rule_86_a_1() {
+    let expr = "<math><menclose notation='bottom'><mi>x</mi></menclose></math>";
+    test_braille("Nemeth", expr, "⠐⠭⠩⠱⠻");
+}
+
+#[test]
 fn lim_rule_86_a_3() {
     let expr = "<math><munder><mi>lim</mi><mrow><mi>x</mi><mo>&#x2192;</mo><mn>0</mn></mrow></munder><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></math>";
     test_braille("Nemeth", expr, "⠐⠇⠊⠍⠩⠭⠀⠫⠕⠀⠼⠴⠻⠀⠋⠷⠭⠾");
@@ -303,6 +309,22 @@ fn order2_overbar_rule_87_a_1() {
     //         <mrow><mi>a</mi><mo>=</mo><mn>3</mn></mrow>
     //      </mover></math>";
     test_braille("Nemeth", expr, "⠐⠭⠬⠽⠣⠱⠣⠣⠁⠀⠨⠅⠀⠼⠒⠻");
+}
+
+#[test]
+fn bar_above_and_below_88_1() {
+    let expr = "<math><munderover>
+            <mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow>
+            <mo>&#xAF;</mo>
+            <mo>&#xAF;</mo>
+        </munderover></math>";
+    test_braille("Nemeth", expr, "⠐⠭⠬⠽⠩⠱⠣⠱⠻");
+}
+
+#[test]
+fn menclose_top_bottom_88_1() {
+    let expr = "<math><menclose notation='top bottom'><mi>x</mi><mo>+</mo><mi>y</mi></menclose></math>";
+    test_braille("Nemeth", expr, "⠐⠭⠬⠽⠩⠱⠣⠱⠻");
 }
 
 #[test]
@@ -440,9 +462,21 @@ fn nested_sqrt_105_4() {
 }
 
 #[test]
-fn shape_115_a_1() {
+fn shape_110_1() {
     let expr = "<math><mo>∠</mo><mn>1</mn></math>";
     test_braille("Nemeth", expr, "⠫⠪⠀⠼⠂");
+}
+
+#[test]
+fn menclose_111_a_4() {
+    let expr = "<math><menclose notation='phasorangle'><mrow><mn>30</mn><mo>&#xB0;</mo></mrow></menclose></math>";
+    test_braille("Nemeth", expr, "⠫⠪⠸⠫⠼⠒⠴⠘⠨⠡⠐⠻");
+}
+
+#[test]
+fn menclose_115_1() {
+    let expr = "<math><menclose notation='circle'><mi>A</mi></menclose></math>";
+    test_braille("Nemeth", expr, "⠫⠉⠸⠫⠠⠁⠻");
 }
 
 #[test]
