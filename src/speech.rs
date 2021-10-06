@@ -155,8 +155,9 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
 
         // FIX  add rule 9d after section mark, etc
 
-        // Needed after a typeface change
+        // Needed after a typeface change or interior shape modifier indicator
         static ref NUM_IND_9E: Regex = Regex::new(r"(?P<face>[SBTIR]+?)N").unwrap();  
+        static ref NUM_IND_9E_SHAPE: Regex = Regex::new(r"(?P<mod>⠸⠫)N").unwrap();  
 
         // Punctuation chars (Rule 38.6 says don't use before ",", "hyphen", "-", "…")
         // Never use punctuation indicator before these (38-6)
@@ -210,6 +211,7 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
     println!("IND_9A:  \"{}\"", result);
 
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
+    let result = NUM_IND_9E_SHAPE.replace_all(&result, "${mod}n");
     println!("IND_9E:  \"{}\"", result);
 
     // 9b: insert after punctuation (optional minus sign)
