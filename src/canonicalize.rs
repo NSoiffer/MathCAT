@@ -1750,7 +1750,7 @@ impl CanonicalizeContext {
 		let num_children = children.len();
 	
 		for i_child in 0..num_children {
-			println!("\nDealing with child #{}: {}", i_child, mml_to_string(&as_element(children[i_child])));
+			// println!("\nDealing with child #{}: {}", i_child, mml_to_string(&as_element(children[i_child])));
 			let mut current_child = self.canonicalize_mrows(as_element(children[i_child]))?;
 			children[i_child] = ChildOfElement::Element( current_child );
 			let base_of_child = get_possible_embellished_node(current_child);
@@ -1797,9 +1797,9 @@ impl CanonicalizeContext {
 	
 					if name(&base_of_child) == "mo" {
 						current_op.ch = as_text(base_of_child);
-						println!("  Found whitespace op '{}'/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
+						// println!("  Found whitespace op '{}'/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
 					} else {
-						println!("  Found implicit op {}/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
+						// println!("  Found implicit op {}/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
 						self.reduce_stack(&mut parse_stack, current_op.op.priority, !self.is_function_name(base_of_child, None));
 		
 						let implied_mo = create_mo(current_child.document(), current_op.ch);
