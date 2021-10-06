@@ -376,6 +376,10 @@ impl CanonicalizeContext {
 		static ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN: phf::Set<&str> = phf_set! {
 			"mfrac", "mroot", "msub", "msup", "msupsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv"
 		};
+
+		static ELEMENTS_WITH_ONE_CHILD: phf::Set<&str> = phf_set! {
+			"math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd"
+		};
 		
 		let element_name = name(&mathml);
 		let parent_requires_child = 
@@ -450,9 +454,10 @@ impl CanonicalizeContext {
 				return if parent_requires_child {Some(mathml)} else {None};
 			},
 			_  => {
-				let mathml = if element_name == "mrow" && mathml.children().is_empty(){
+				if element_name == "mrow" && mathml.children().is_empty() {
 					return if parent_requires_child {Some(mathml)} else {None}
-				} else if element_name == "mrow" || element_name == "math" {
+				}
+				let mathml =  if element_name == "mrow" || element_name == "math" {
 					let merged = merge_number_blocks(mathml);
 					let merged = merge_primes(merged);
 					merged
@@ -485,12 +490,18 @@ impl CanonicalizeContext {
 					} else {
 						// wrap the children in an mrow
 						let mrow = create_mathml_element(&mathml.document(), "mrow");
+						mrow.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
 						mrow.append_children(children);
 						return Some(mrow);
 					}
-				} else {
-					return Some(mathml);				
-				}
+				} else if children.len() > 1 && ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
+						// wrap the children in an mrow
+						let mrow = create_mathml_element(&mathml.document(), "mrow");
+						mrow.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
+						mrow.append_children(children);
+						mathml.replace_children(vec![ChildOfElement::Element(mrow)]);
+				} 
+				return Some(mathml);				
 			}
 		}
 
@@ -539,7 +550,6 @@ impl CanonicalizeContext {
 			if !children.is_empty() {
 				new_children.push(children[0]);
 				for child in &children[1..] {
-					println!("sep '{:?}'", separators);
 					let sep = separators.next().unwrap_or(',').to_string();
 					new_children.push( ChildOfElement::Element( create_mo(mfenced.document(), &sep)) );
 					new_children.push(*child);

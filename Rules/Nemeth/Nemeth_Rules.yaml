@@ -372,6 +372,13 @@
             else: [t: "b"]
 
 -
+   name: contracted-form # NFB Lesson 12.5.1.b
+   tag: munder
+   match: "*[1][string-length(text())=1] and *[2][text()='¯']"
+   replace: 
+    - x: "*[1]"
+    - t: "⠩⠱"
+-
    name: default
    tag: munder
    match: "."
@@ -461,79 +468,90 @@
    name: default
    tag: menclose
    match: "."
-   variables: [AddSpaces: "parent::*[self::m:mrow] and *[1][ self::m:mo and count(*)=1 and IsInDefinition(., 'NemethComparisonOps')]"]
+   variables: [AddSpaces: "parent::*[self::m:mrow] and *[1][ self::m:mo and IsInDefinition(., 'NemethComparisonOps')]"]
    replace:
     - test:
-        if: ". [contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"                  #avoid 'leftarrow'
+        if: "contains(concat(' ', normalize-space(@notation), ' '), ' left ')"                  #avoid 'leftarrow'
         then: [t: "⠳"]
     - test:
-        if: ".[contains(@notation,'box')]"                  #both box and roundedbox
+        if: "contains(concat(' ', normalize-space(@notation), ' '), ' box ')"                  # box, not roundedbox
         then:
          - test:
                if: "$AddSpaces"
                then: [t: " "]
          - test:
-            if: "count(*)=1"
-            then: [t: "⠫⠲⠸⠫"]                                  # square
-            else: [t: "⠫⠗⠸⠫"]                                  # rectangle
+            if: "*[1][self::m:mrow]"
+            then: [t: "⠫⠗⠸⠫"]                                  # rectangle
+            else: [t: "⠫⠲⠸⠫"]                                  # square
     - test:
-        if: ".[contains(@notation,'circle')]"
+        if: "contains(@notation,'circle')"
         then:
          - test:
             if: "$AddSpaces"
             then: [t: " "]
          - test:
-            if: "count(*)=1"
-            then: [t: "⠫⠉⠸⠫"]                                  # circle
-            else: [t: "⠫⠑⠸⠫"]                                  # ellipse
+            if: "*[1][self::m:mrow]"
+            then: [t: "⠫⠑⠸⠫"]                                  # ellipse
+            else: [t: "⠫⠉⠸⠫"]                                  # circle
     - test:
-        if: ".[contains(@notation,'phasorangle')]"
+        if: "contains(@notation,'phasorangle')"
         then: [t: "⠫⠪⠸⠫"]
     - test:
-        if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
-                contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
+        # going out on a limb and considering this used for keyboard indicator (NFB lesson 11.23)
+        if: "contains(@notation,'roundedbox')" 
+        then: [t: "⠫⠅"]
+    - test:
+        if: "contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
+            contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike')"
         then:
           - t: "⠪"                        # start cancellation
     - test:
-        if: "contains(@notation,'bottom') or 
-             (contains(@notation,'top') and count(*)=1 and *[1][string-length(text())>1])"   # not contracted-form #rule 86.b (equiv to mover with "¯")
+        if: "(contains(@notation,'bottom') or contains(@notation,'top')) and 
+             *[1][self::m:mrow or string-length(text())>1]"   # not contracted-form #rule 86.b (equiv to mover with "¯")
         then: [t: "⠐"]
     - test:
-        if: ".[contains(@notation,'uparrow')]"
+        if: "contains(@notation,'uparrow')"
         then: [t: up arrow, pause: short]
     - test:
-        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
+        if: "contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')"
         then: [t: down arrow, pause: short]
-    - test:
-        if: ".[contains(@notation,'leftarrow')]"
-        then: [t: left arrow, pause: short]
-    - test:
-        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
-        then: [t: right arrow, pause: short]
-    - test:
-        if: ".[contains(@notation,'northeastarrow')]"
-        then: [t: northeast arrow, pause: short]
-    - test:
-        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
-        then: [t: southeast arrow, pause: short]
-    - test:
-        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
-        then: [t: southwest arrow, pause: short]
-    - test:
-        if: ".[contains(@notation,'northwestarrow')]"
-        then: [t: northwest arrow, pause: short]
-    - test:
-        if: ".[contains(@notation,'updownarrow')]"
-        then: [t: double ended vertical arrow, pause: short]
-    - test:
-        if: ".[contains(@notation,'leftrightarrow')]"
-        then: [t: double ended horizontal arrow, pause: short]
-    - test:
-        if: ".[contains(@notation,'northeastsouthwestarrow')]"
-        then: [t: double ended up diagonal arrow, pause: short]
-    - test:
-        if: ".[contains(@notation,'northwestsoutheastarrow')]"
-        then: [t: double ended down diagonal arrow, pause: short]
+
+   # ??? What should happen with arrow?
+   #  If there is a box/circle with arrows only and an empty child,
+   #     then it acts like the arrow is the child
+   #  If there are only arrows for 'notation', then maybe rule 112 applies (superposition),
+   #     but the examples aren't similar. In that case, the arrow acts like 'box' and the child is the content... maybe  
+   # 
+   #  - test:
+   #      if: "contains(@notation,'leftarrow')"
+   #      then: [t: left arrow, pause: short]
+   #  - test:
+   #      if: "contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')"
+   #      then: [t: right arrow, pause: short]
+   #  - test:
+   #      if: "contains(@notation,'northeastarrow')"
+   #      then: [t: northeast arrow, pause: short]
+   #  - test:
+   #      if: "contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')"
+   #      then: [t: southeast arrow, pause: short]
+   #  - test:
+   #      if: "contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')"
+   #      then: [t: southwest arrow, pause: short]
+   #  - test:
+   #      if: "contains(@notation,'northwestarrow')"
+   #      then: [t: northwest arrow, pause: short]
+   #  - test:
+   #      if: "contains(@notation,'updownarrow')"
+   #      then: [t: double ended vertical arrow, pause: short]
+   #  - test:
+   #      if: "contains(@notation,'leftrightarrow')"
+   #      then: [t: double ended horizontal arrow, pause: short]
+   #  - test:
+   #      if: "contains(@notation,'northeastsouthwestarrow')"
+   #      then: [t: double ended up diagonal arrow, pause: short]
+   #  - test:
+   #      if: "contains(@notation,'northwestsoutheastarrow')"
+   #      then: [t: double ended down diagonal arrow, pause: short]
    #  - test:
    #      if: ".[contains(@notation,'actuarial')]"
    #      then: [t: actuarial symbol, pause: short]
@@ -551,31 +569,34 @@
 
     - test:
          if: "contains(@notation,'bottom')"                                   # bar underneath
-         then: [t: "⠩⠱"]
+         then_test:
+            if: "*[1][not(self::m:mrow) and string-length(text())=1]"          # bar over
+            then: [t: "⠩⠱"]
+            else: [t: "⠩⠱"]
     - test:
          if: "contains(@notation,'top')"
          then_test:
-            if: "count(*)=1 and *[1][string-length(text())=1]"                               # bar over
+            if: "*[1][not(self::m:mrow) and string-length(text())=1]"         # bar over
             then: [t: "⠱"]
             else: [t: "⠣⠱"]
     - test:
-         if: "contains(@notation,'bottom') or
-              (contains(@notation,'top') and count(*)=1 and *[1][string-length(text())>1])"   # end modification
-         then: [t: "⠻"]
+         if: "(contains(@notation,'bottom') or contains(@notation,'top')) and
+              *[1][self::m:mrow or string-length(text())>1]"
+         then: [t: "⠻"]                                                       # only emit once for top and bottom                                                                 
     - test:
-         if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
-                contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
+         if: "contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
+              contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike')"
          then:
           - t: "⠻"                        # end cancellation
     - test:
-        if: ".[contains(@notation,'box') or contains(@notation,'circle') or contains(@notation,'phasorangle')]"                  #both box and roundedbox
+        if: "contains(@notation,'box') or contains(@notation,'circle') or contains(@notation,'phasorangle')"                  #both box and roundedbox
         then:
          - t: "⠻"                   # terminate shape
          - test:
             if: "$AddSpaces"
             then: [t: " "]
     - test:
-        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"                  #avoid 'rightarrow'
+        if: "contains(concat(' ', normalize-space(@notation), ' '), ' right ')"                  #avoid 'rightarrow'
         then: [t: "⠳"]
  
 

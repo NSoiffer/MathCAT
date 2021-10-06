@@ -225,19 +225,19 @@ fn numeric_sub_81_a_1() {
 }
 
 #[test]
-fn subsup_82_a_1() {
+fn msubsup_82_a_1() {
     let expr = "<math><msubsup><mi>x</mi><mi>a</mi><mi>n</mi></msubsup></math>";
     test_braille("Nemeth", expr, "⠭⠰⠁⠘⠝");
 }
 
 #[test]
-fn subsup_82_a_3() {
+fn msubsup_82_a_3() {
     let expr = "<math><msubsup><mi>x</mi><mn>1</mn><mn>2</mn></msubsup></math>";
     test_braille("Nemeth", expr, "⠭⠂⠘⠆");
 }
 
 #[test]
-fn subsup_82_a_5() {
+fn msubsup_82_a_5() {
     let expr = "<math><mover><msup><mi>x</mi><mn>2</mn></msup><mo>&#xAF;</mo></mover></math>";
     test_braille("Nemeth", expr, "⠐⠭⠘⠆⠐⠣⠱⠻");
 }
@@ -263,14 +263,15 @@ fn prime_83_b_1() {
 
 #[test]
 fn underbar_rule_86_a_1() {
+    // Note: NFB lessons added a contracted form (lesson 12.5.1.b)
     let expr = "<math><munder><mi>x</mi><mo>&#xAF;</mo></munder></math>";
-    test_braille("Nemeth", expr, "⠐⠭⠩⠱⠻");
+    test_braille("Nemeth", expr, "⠭⠩⠱");
 }
 
 #[test]
 fn menclose_rule_86_a_1() {
     let expr = "<math><menclose notation='bottom'><mi>x</mi></menclose></math>";
-    test_braille("Nemeth", expr, "⠐⠭⠩⠱⠻");
+    test_braille("Nemeth", expr, "⠭⠩⠱");
 }
 
 #[test]
@@ -286,6 +287,19 @@ fn overbar_rule_86_a_5() {
 }
 
 #[test]
+fn menclose_lesson_12_5_5_5() {
+    // this is what WIRIS exports
+    let expr = "<math><mi>A</mi><mo>(</mo><menclose notation='bottom'><mi>s</mi></menclose><mi>n</mi><mo>)</mo></math>";
+    test_braille("Nemeth", expr, "⠠⠁⠷⠎⠩⠱⠝⠾");
+}
+
+#[test]
+fn munder_lesson_12_5_5_5() {
+    let expr = "<math><mi>A</mi><mo>(</mo><munder><mi>s</mi><mo>&#xAF;</mo></munder><mi>n</mi><mo>)</mo></math>";
+    test_braille("Nemeth", expr, "⠠⠁⠷⠎⠩⠱⠝⠾");
+}
+
+#[test]
 fn overbar_rule_86_b_1() {
     let expr = "<math><mover><mi>x</mi><mo>&#xAF;</mo></mover></math>";
     test_braille("Nemeth", expr, "⠭⠱");
@@ -295,6 +309,24 @@ fn overbar_rule_86_b_1() {
 fn overbar_rule_86_b_10() {
     let expr = "<math><mn>3</mn><mo>.</mo><mn>5</mn><mover><mn>4</mn><mo>&#xAF;</mo></mover></math>";
     test_braille("Nemeth", expr, "⠼⠒⠨⠢⠲⠱");
+}
+
+#[test]
+fn overbar_rule_86_b_11() {
+    let expr = "<math><mover><mfenced>
+            <mrow><mover><mi>a</mi><mo>&#xAF;</mo></mover><mi mathvariant='bold'>A</mi><mo>+</mo>
+                <mover><mi>b</mi><mo>&#xAF;</mo></mover><mi mathvariant='bold'>B</mi></mrow>
+        </mfenced><mo>&#xAF;</mo></mover></math>";
+    test_braille("Nemeth", expr, "⠐⠷⠁⠱⠸⠰⠠⠁⠬⠃⠱⠸⠰⠠⠃⠾⠣⠱⠻");
+}
+
+#[test]
+fn menclose_rule_86_b_11() {
+    let expr = "<math><menclose notation='top'><mfenced>
+            <mrow><menclose notation='top'><mi>a</mi></menclose><mi mathvariant='bold'>A</mi><mo>+</mo>
+            <menclose notation='top'><mi>b</mi></menclose><mi mathvariant='bold'>B</mi></mrow>
+        </mfenced></menclose></math>";
+    test_braille("Nemeth", expr, "⠐⠷⠁⠱⠸⠰⠠⠁⠬⠃⠱⠸⠰⠠⠃⠾⠣⠱⠻");
 }
 
 #[test]
@@ -563,4 +595,10 @@ fn multipurpose_177_5_1() {
 fn multipurpose_177_7_1() {
     let expr = "<math><mrow><mo>|</mo><mi>x</mi><mo>|</mo></mrow><mrow><mo>|</mo><mi>y</mi><mo>|</mo></mrow></math>";
     test_braille("Nemeth", expr, "⠳⠭⠳⠐⠳⠽⠳");
+}
+
+#[test]
+fn lesson_11_24_1() {
+    let expr = "<math><menclose notation='roundedbox'><msup><mi>x</mi><mn>2</mn></msup></menclose></math>";
+    test_braille("Nemeth", expr, "⠫⠅⠭⠘⠆⠐⠻");
 }
