@@ -129,7 +129,7 @@
    match: "."
    replace:
     - test:
-        if: ". [contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
+        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
         then: [t: box, pause: short]
     - test:
         if: ".[contains(@notation,'roundedbox')]"
