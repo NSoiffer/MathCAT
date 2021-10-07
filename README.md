@@ -11,7 +11,9 @@ Todo: incorporation of third party libraries to support a common subset of TeX m
 MathCAT is written in Rust and can be built to interface with C/C++. It can also be built with a Python interface. The Python interface can be used by NVDA and by Orca. 
 
 ## Current Status
-MathCAT is under active development and I expect that by the end of September, it will be usable as a MathPlayer replacement for those using the English version. It will not be as complete or polished in some ways as MathPlayer though. The Nemth braille generation will be substantially better.
+MathCAT is under active development and I expect that by the end of September, it will be usable as a MathPlayer replacement for those using the English version. It will not be as complete or polished in some ways as MathPlayer though. The Nemeth braille generation will be substantially better.
+
+_Update_: I now expect end of October to have a usable version. I still need to do navigation. I've spent more time on Nemeth generation than planned, but my expectations for it have gone from it being acceptable quality to it being among the best available MathML->Nemeth translators.
 
 By the end of the year, I expect MathCAT to be ready for all English users and hope to have a good start on some of the translations. Initial translations will be based on programmatic translations from MathPlayer's (public) files and are likely to be very buggy until volunteers step forward to fix them.
 
@@ -195,6 +197,7 @@ Note: all YAML files begin with "---". That indicates the beginning of a "docume
 #      - name is a string, value is an XPath expr that evaluates to a string, number, or boolean
 #      - inside the rule, the value is accessed as $name
 #      - the variable's value is set _before_ testing "match", so it can be used in match
+#      -   they are valid for the duration of the match
 #     match: <string>  # xpath for the match
 #      - can be a single string or
 #      - an array of strings (for readability) that are joined together
@@ -221,6 +224,9 @@ Note: all YAML files begin with "---". That indicates the beginning of a "docume
 #         then_test [replacements] used in place of 'then:' -- avoids needing to use 'test:' after the 'then:'
 #         else: [replacements] # optional
 #         else_test # optional, used in place of 'else:' -- avoids needing to use 'test:' after the 'else:'
+#      - with:
+#         variables: [{name: value}, ...] variables whose values are set during the execution of this clause
+#         replace: [replacements]
 #      - pause: string or number  # "short", "medium", "long", "auto", or number in milliseconds
 #      - rate:  string/number or dict with 1 or 2 entries
 #         value: float number with optional %
