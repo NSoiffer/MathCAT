@@ -8,6 +8,8 @@ is a library that supports conversion of MathML to:
 * Braille (Nemeth and eventually other braille math codes)
 * Navigation of math (in multiple ways including overviews)
 
+MathCAT has a number of heuristics that try to repair poor mathml and put it in a recommended format. For example, TeX converts and WYSIWYG editors will take "1,234+1" and break the number "1,234" apart at the comma. MathCAT recognizes that and folds it into a single `mn`. Other repairs are structural such as creating `mrow`s based on information from MathML's operator dictionary and adding invisible function application, multiplication, addition (mixed fractions), and separators (e.g, between the $i$ and $j$ in $a_{ij}$). This simplifies speech and Nemeth generation and may be useful to other apps. Currently the cleanup is not exposed, but potentially that could be another service of MathCAT. In general, MathCAT is somewhat conservative in its repair, but still likely will do the wrong thing in some cases, but the hope is it does the right thing much, much more frequently. Finding common mistakes of translators and patching them is an ongoing project.
+
 Todo: incorporation of third party libraries to support a common subset of TeX math commands along with ASCIIMath.
 
 MathCAT is written in Rust and can be built to interface with C/C++. It can also be built with a Python interface. The Python interface can be used by NVDA and by Orca. 
