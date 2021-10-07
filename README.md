@@ -1,3 +1,5 @@
+[Nicely formatted version](https://nsoiffer.github.io/MathCAT/)
+
 # MathCAT: Math Capable Assistive Technology
 <img src="logo.png" style="position: relative; top: 16px; z-index: -1;">
 is a library that supports conversion of MathML to:
