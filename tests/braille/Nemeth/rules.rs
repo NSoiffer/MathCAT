@@ -83,6 +83,22 @@ fn punct_37_2_2() {
 }
 
 #[test]
+fn dash_42_6() {
+    let expr = "<math><mo>$</mo><mn>2</mn><mo>+</mo><mo>$</mo><mn>3</mn><mo>=</mo><mo>$</mo><mo>&#x2015;</mo></math>";
+    test_braille("Nemeth", expr, "⠈⠎⠆⠬⠈⠎⠒⠀⠨⠅⠀⠈⠎⠤⠤⠤⠤");
+}
+
+#[test]
+fn ellipsis_43_b_3() {
+    let expr = "<math>
+        <msubsup><mi>p</mi><mn>1</mn><msub><mi>&#x3B1;</mi><mn>1</mn></msub></msubsup>
+        <mo>&#x2026;</mo>
+        <msubsup><mi>p</mi><mi>r</mi><msub><mi>&#x3B1;</mi><mi>r</mi></msub></msubsup>
+        </math>";
+    test_braille("Nemeth", expr, "⠏⠂⠘⠨⠁⠘⠰⠂⠐⠄⠄⠄⠀⠏⠰⠗⠘⠨⠁⠘⠰⠗");
+}
+
+#[test]
 fn simple_frac_rule_62_a_3() {
     let expr = "<math><mfrac><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mi>c</mi></mfrac></math>";
     test_braille("Nemeth", expr, "⠹⠁⠬⠃⠌⠉⠼");
@@ -182,6 +198,17 @@ fn comma_in_sup_79_b_4() {
     test_braille("Nemeth", expr, "⠭⠰⠊⠪⠚");
 }
 
+
+#[test]
+fn comma_ellipsis_in_sub_79_b_5() {
+    let expr = "<math> <msub><mi>P</mi>
+        <mrow><msub><mi>n</mi><mn>1</mn></msub>
+          <mo>,</mo>
+          <msub><mi>n</mi><mn>2</mn></msub>
+          <mo>,</mo><mo>&#x2026;</mo>
+          </mrow></msub></math>";
+    test_braille("Nemeth", expr, "⠠⠏⠰⠝⠰⠰⠂⠰⠪⠝⠰⠰⠆⠰⠪⠀⠄⠄⠄");
+}
 #[test]
 fn text_after_sup_79_c_3() {
     // bad mn from Wiris; also &ao;
@@ -213,9 +240,29 @@ fn nested_super_space_79_d_7() {
 }
 
 #[test]
-fn nested_sup_sup_space_79_d_() {
+fn nested_sup_sup_space_79_d_9() {
     let expr = "<math><msup><mi>q</mi><mrow><msub><mi>log</mi><mi>q</mi></msub><mi>a</mi></mrow></msup></math>";
     test_braille("Nemeth", expr, "⠟⠘⠇⠕⠛⠘⠰⠟⠀⠁");
+}
+
+#[test]
+fn whitespace_in_sup_79_e_1() {
+    let expr = "<math><msup><mi>e</mi><mn>3.14159 26535</mn></msup></math>";
+    test_braille("Nemeth", expr, "⠑⠘⠒⠨⠂⠲⠂⠢⠔⠀⠆⠖⠢⠒⠢");
+}
+
+#[test]
+fn ellipsis_level_79_f_1() {
+    let expr = "<math><msup><mi>x</mi>
+        <mrow><mn>1</mn><mo>+</mo><mn>1</mn><mo>/</mo><mn>2</mn><mo>+</mo><mn>1</mn><mo>/</mo><mn>3</mn><mo>+</mo>
+        <mo>…</mo><mo>+</mo><mn>1</mn><mo>/</mo><mi>n</mi></mrow></msup></math>";
+    test_braille("Nemeth", expr, "⠭⠘⠂⠬⠂⠸⠌⠆⠬⠂⠸⠌⠒⠬⠀⠄⠄⠄⠀⠬⠂⠸⠌⠝");
+}
+
+#[test]
+fn comparison_79_g_2() {
+    let expr = "<math><msup><mn>2</mn><mi>x</mi></msup><mo>&lt;</mo><msup><mn>3</mn><mi>x</mi></msup></math>";
+    test_braille("Nemeth", expr, "⠼⠆⠘⠭⠀⠐⠅⠀⠼⠒⠘⠭");
 }
 
 #[test]
@@ -601,4 +648,11 @@ fn multipurpose_177_7_1() {
 fn lesson_11_24_1() {
     let expr = "<math><menclose notation='roundedbox'><msup><mi>x</mi><mn>2</mn></msup></menclose></math>";
     test_braille("Nemeth", expr, "⠫⠅⠭⠘⠆⠐⠻");
+}
+
+#[test]
+fn ms() {
+    let expr = "<math><ms>a string</ms><mo>,</mo><ms lquote='‘' rquote='’'>another string</ms></math>";
+    // Not 100% sure this is the right output -- I am a little skeptical of "⠄⠄" being the braille for '"'
+    test_braille("Nemeth", expr, "⠄⠄⠁⠀⠎⠞⠗⠊⠝⠛⠄⠄⠠⠀⠸⠠⠦⠁⠝⠕⠞⠓⠑⠗⠀⠎⠞⠗⠊⠝⠛⠸⠴⠠");
 }
