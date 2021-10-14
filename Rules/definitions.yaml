@@ -89,7 +89,7 @@
     ],
 
   # these come from SRE's ts\semantic_tree\semantic_attr.ts file
-  NemethComparisonOps: [
+  NemethComparisonOperators: [
       '=', '~', '⁼', '₌', '∼', '∽', '≃', '≅',  '≈',  '≊', '≋', '≌', '≍', '≎',
     '≑', '≒', '≓', '≔', '≕', '≖', '≗', '≘',  '≙',  '≚', '≛', '≜', '≝', '≞',
     '≟', '≡', '≣', '⧤', '⩦', '⩮', '⩯', '⩰',  '⩱',  '⩲', '⩳', '⩴', '⩵', '⩶',
@@ -147,6 +147,13 @@
 
     # chars not from SRE
     "∝", "∉"
+  ],
+
+  # no space is used when ellipsis or long dash are adjacent (lesson 2.13, differs slightly from rule 42)
+  NemethEllipsisNoSpaceSymbols: [
+    "'", ":", ",", "!", ".", "?", "‘", "’", "“", "”",   # punctuation -- 42(i)
+    "$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿", # 42(iv) could add more currencies...
+    "%", "′"
   ]
 ]
 

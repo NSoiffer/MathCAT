@@ -104,6 +104,7 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         "U" => "⠈⠈",
         "C" => "⠠",
         "P" => "⠸",
+        "L" => "",
         "M" => "",
         "m" => "⠐",
         "b" => "⠐",
@@ -118,22 +119,23 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         // Trim braille spaces before and after braille indicators
         // FIX: these lists are not complete
         // ellipsis, dashes, {parens, brackets, braces}
+        // FIX: can the space rules be removed if NemethEllipsisNoSpaceSymbols is expanded to include 42(ii) and 42(iii)?
         static ref REMOVE_SPACE_AFTER_PARENS: Regex = 
-            Regex::new(r"(⠷)⠀+").unwrap();
+            Regex::new(r"(⠷)W+").unwrap();
         // In order: fraction, /, cancellation, capitalization, baseline
         static ref REMOVE_SPACE_BEFORE_PARENS: Regex = 
-            Regex::new(r"⠀+(⠾)|(⠈⠾)|(⠨⠾)").unwrap();
+            Regex::new(r"W+(⠾)|(⠈⠾)|(⠨⠾)").unwrap();
 
-        // In order: fraction, /, cancellation, capitalization, baseline
+        // In order: fraction, /, cancellation, letter, baseline
         static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex = 
-            Regex::new(r"(⠄⠄⠄)|(⠤⠤⠤)⠀+([⠼⠸⠌⠪])").unwrap();
+            Regex::new(r"(⠄⠄⠄)|(⠤⠤⠤)W+([⠼⠸⠌⠪])").unwrap();
         static ref REMOVE_SPACE_AFTER_BRAILLE_INDICATORS: Regex = 
-            Regex::new(r"([⠹⠌⠻C⠐])⠀+(⠄⠄⠄)").unwrap();
+            Regex::new(r"([⠹⠌⠻Lb])W+(⠄⠄⠄)").unwrap();
 
         // Multipurpose indicator insertion
-        // 177.2 -- add after a letter and before a digit (or decimal pt) -- these will start with N
+        // 177.2 -- add after a letter and before a digit (or decimal pt) -- digits will start with N
         static ref MULTI_177_2: Regex = 
-            Regex::new(r"([⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵])[N𝑁]").unwrap();
+            Regex::new(r"(L.)[N𝑁]").unwrap();
 
         // keep between numeric subscript and digit ('M' added by subscript rule)
         static ref MULTI_177_3: Regex = 
@@ -151,7 +153,7 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         // 3. optional typeface indicator
         // 4. number (N)
         static ref NUM_IND_9A: Regex = 
-            Regex::new(r"(?P<start>^|[,⠀])(?P<minus>⠤?)(?P<face>[SBTIR]*?)N").unwrap();  
+            Regex::new(r"(?P<start>^|[,W])(?P<minus>⠤?)(?P<face>[SBTIR]*?)N").unwrap();  
 
         // FIX  add rule 9d after section mark, etc
 
@@ -176,24 +178,22 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         //   After a word (38.4)
         //   2nd or subsequent punctuation (includes, "-", etc) (38.7)
         static ref REMOVE_PUNCT_IND: Regex =
-            Regex::new(r"(^|⠀|\w)P(.)").unwrap();  
+            Regex::new(r"(^|W|\w)P(.)").unwrap();  
 
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SBTIREDGVHPCMmbNn𝑁W,])").unwrap();  
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SBTIREDGVHPCLMmbNn𝑁W,])").unwrap();  
             
         static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[⠘⠰]+b)").unwrap();
 
         // Before 79b (punctuation)
-        static ref REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: Regex = Regex::new(r"(?:[⠘⠰]+b?|b)([⠀,P]|$)").unwrap();
+        static ref REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: Regex = Regex::new(r"(?:[⠘⠰]+b?|b)([W,P]|$)").unwrap();
 
         static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
 
     println!("Before:  \"{}\"", raw_nemeth);
-    // Remove unicode blanks at start and end
-    let result = raw_nemeth.trim_start_matches('⠀').trim_end_matches('⠀');
 
     // Remove blanks before and after "parens"
-    let result = REMOVE_SPACE_BEFORE_PARENS.replace_all(result, "$1$2$3");
+    let result = REMOVE_SPACE_BEFORE_PARENS.replace_all(&raw_nemeth, "$1$2$3");
     let result = REMOVE_SPACE_AFTER_PARENS.replace_all(&result, "$1");
 
     // Remove blanks before and after braille indicators
@@ -231,7 +231,6 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
     let result = REMOVE_PUNCT_IND.replace_all(&result, "$1$2");
     println!("Punct38: \"{}\"", &result);
 
-    
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         match INDICATOR_REPLACEMENTS.get(&cap[0]) {
             None => panic!("REPLACE_INDICATORS and INDICATOR_REPLACEMENTS are not in sync"),
@@ -239,8 +238,10 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         }
     });
 
+    // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces
+    let result = result.trim_start_matches('⠀').trim_end_matches('⠀');
     let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
-
+   
     return result.to_string();
 }
 
@@ -1870,20 +1871,11 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
             let matched = match node {
                 Node::Element(n) => self.match_pattern(&n)?,
                 Node::Text(t) =>  self.replace_chars(&t.text(), mathml)?,
+                Node::Attribute(attr) => self.replace_chars(&attr.value(), mathml)?,
                 _ => {eprintln!("replace_nodes: found unexpected node type!!! (ignored)"); "".to_string() }
             };
             result += &matched;
         }
-        // let result = nodes.document_order()
-        //     .iter()
-        //     .map(|node: &'r Node<'c>|
-        //         match node {
-        //             Node::Element(n) => self.match_pattern(n),
-        //             Node::Text(t) =>  self.replace_chars(&t.text(), mathml),
-        //             _ => {eprintln!("replace_nodes: found unexpected node type!!! (ignored)"); Ok( "".to_string() )}
-        //         })
-        //     .collect::<Result<Vec<String>>>()?
-        //     .join(" ");
         return Ok( result );
     }
 

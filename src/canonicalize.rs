@@ -380,6 +380,10 @@ impl CanonicalizeContext {
 		static ELEMENTS_WITH_ONE_CHILD: phf::Set<&str> = phf_set! {
 			"math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd"
 		};
+
+		static CURRENCY_SYMBOLS: phf::Set<&str> = phf_set! {
+			"$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿" // could add more currencies...
+		};
 		
 		let element_name = name(&mathml);
 		let parent_requires_child = 
@@ -425,6 +429,11 @@ impl CanonicalizeContext {
 					if IS_PRIME.is_match(text) {
 						let new_text = merge_prime_text(text);
 						mathml.set_text(&new_text);
+						return Some(mathml);
+					}
+					if CURRENCY_SYMBOLS.contains(text) {
+						set_mathml_name(mathml, "mi");
+						return Some(mathml);
 					}
 					return Some(mathml);
 				});
@@ -607,8 +616,8 @@ impl CanonicalizeContext {
 								is_decimal_pt = false;
 							}
 						};
-						println!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
-								 i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
+						// println!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
+						// 		 i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
 						if !(looking_for_separator &&
 							 (sibling_name == "mspace" || is_comma || is_decimal_pt)) &&
 						   ( looking_for_separator ||

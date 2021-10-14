@@ -88,7 +88,10 @@ fn main() {
 //                 <mspace width=\"thinmathspace\"></mspace><mn>037</mn>
 //                 <mspace width=\"thinmathspace\"></mspace><mn>234</mn></math>";
 // let expr = "<math><mn>𝟏𝟐𝟑</mn></math>";
-let expr = "<math><mo>.</mo><mover><mn>3</mn><mo>&#xAF;</mo></mover></math>";
+let expr = "<math>
+<mover> <mi>velocity</mi> <mo>_</mo> </mover>
+<mtext>.</mtext>
+</math>";
 // let expr = "<math><mo>{</mo><mi>x</mi><mo>|</mo><mo>|</mo><mi>x</mi><mo>|</mo><mo>&lt;</mo><mn>10</mn><mo>}</mo></math>";
 let instant = Instant::now();
     // let speech_string = libmathcat::interface::speak_mathml(expr);

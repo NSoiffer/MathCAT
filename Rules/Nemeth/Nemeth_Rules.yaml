@@ -111,7 +111,7 @@
    - test:
       if: .[self::m:mlabeledtr]
       then:
-         - t: "⠗⠕⠺⠀⠇⠁⠃⠑⠇⠸⠒"  # "row label:"
+         - t: "⠗⠕⠺W⠇⠁⠃⠑⠇⠸⠒"  # "row label:"
          - x: "*[1]/*"           # contents of row label
    - test:
       if: .[self::m:mlabeledtr]
@@ -128,7 +128,7 @@
   replace:
    - test: 
       if: "preceding-sibling::*"
-      then: [t: "⠀"]
+      then: [t: "W"]
    - x: "*"
 
 -
@@ -195,7 +195,7 @@
    match: "text()='mod' or text()='rem'"
    replace:
       - x: "NemethChars(.)"
-      - t: "⠀"
+      - t: "W"
 
 -
    name: prefix-geometry-ops
@@ -206,23 +206,23 @@
       - "IsInDefinition(., 'GeometryPrefixOperators')"
    replace:
       - x: "text()"
-      - t: "⠀"
+      - t: "W"
 
 -
    name: default
    tag: mo
      # add spaces around comparison operators,
      # but if "modified", they are moved outside of munder, etc, and handled by those rules
-   variables: [AddSpaces: "parent::*[self::m:mrow] and IsInDefinition(., 'NemethComparisonOps')"]
+   variables: [AddSpaces: "parent::*[self::m:mrow] and IsInDefinition(., 'NemethComparisonOperators')"]
    match: "."
    replace:
       - test:
          if: "$AddSpaces and preceding-sibling::*"
-         then: [t: "⠀"]
+         then: [t: "W"]
       - x: "NemethChars(.)"
       - test:
          if: "$AddSpaces and following-sibling::*"
-         then: [t: "⠀"]
+         then: [t: "W"]
 
 -
    name: default
@@ -270,9 +270,11 @@
          # if: "count(following-sibling::*) > 0 or ancestor::*[name() != 'mrow'][1]/.[self::m:mfrac or self::m:msqrt or self::m:mroot]"
          if: "true()"   # FIX 
          then_test:
-            if: "$OldScriptContext = ''"
-            then: [t: "b"]
-            else: [x: "$OldScriptContext"]
+            if: "$OldScriptContext != ''"
+            then: [x: "$OldScriptContext"]
+            else_test:
+               if: "not( parent::*[self::m:msubsup] )"           # msupsup will generate baseline indicator
+               then: [t: "b"]
 
 -
    # implement rule 77 -- simple numeric (non-nested) subscript: don't use a subscript indicator
@@ -305,7 +307,7 @@
     - test:
          if: "true()"   # FIX 
          then_test:
-            if: "$OldScriptContext"
+            if: "$OldScriptContext !=''"
             then: [x: "$OldScriptContext"]
             else: [t: "b"]
 
@@ -335,7 +337,7 @@
             - test:
                   if: "true()"   # FIX 
                   then_test:
-                     if: "$OldScriptContext"
+                     if: "$OldScriptContext != ''"
                      then: [x: "$OldScriptContext"]
                      else: [t: "b"]
 
@@ -367,7 +369,7 @@
     - test:
          if: "true()"   # FIX 
          then_test:
-            if: "$OldScriptContext"
+            if: "$OldScriptContext != ''"
             then: [x: "$OldScriptContext"]
             else: [t: "b"]
 
@@ -412,12 +414,12 @@
     - NotNested: "$NewUnderContext='' and $NewOverContext=''"
     - OldOverContext: "$NewOverContext"
     - NewOverContext: "concat($NewOverContext, '⠣')"
-    - AddSpaces: "IsInDefinition(BaseNode(.), 'NemethComparisonOps')"
+    - AddSpaces: "IsInDefinition(BaseNode(.), 'NemethComparisonOperators')"
 
    replace: 
     - test:
          if: "$AddSpaces"
-         then: [t: "⠀"]
+         then: [t: "W"]
     - test:
          if: "$NotNested"
          then: [t: "⠐"]
@@ -429,7 +431,7 @@
          then: [t: "⠻"]
     - test:
          if: "$AddSpaces"
-         then: [t: "⠀"]
+         then: [t: "W"]
     
 -
    name: default
@@ -468,7 +470,7 @@
    name: default
    tag: menclose
    match: "."
-   variables: [AddSpaces: "parent::*[self::m:mrow] and *[1][ self::m:mo and IsInDefinition(., 'NemethComparisonOps')]"]
+   variables: [AddSpaces: "parent::*[self::m:mrow] and *[1][ self::m:mo and IsInDefinition(., 'NemethComparisonOperators')]"]
    replace:
     - test:
         if: "contains(concat(' ', normalize-space(@notation), ' '), ' left ')"                  #avoid 'leftarrow'
@@ -601,6 +603,28 @@
  
 
 
+
+-
+   name: default
+   tag: ms
+   match: "."
+   replace:
+      - test:
+         if: "string(@lquote)!=''"
+         then: [x: "@lquote"]
+         else: [t: "⠄⠄"]
+      - x: "text()"
+      - test:
+         if: "string(DEBUG(@rquote))!=''"
+         then: [x: "@rquote"]
+         else: [t: "⠄⠄"]
+
+-
+   name: default
+   tag: semantics
+   match: "."
+   replace: 
+      - x: "*[1]"             #/ FIX: should prioritize @encoding="MathML-Presentation" and @encoding="application/mathml-presentation+xml"
 
 -
    name: default-children

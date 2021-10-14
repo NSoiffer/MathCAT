@@ -36,7 +36,7 @@ def create_unicode_from_json(in_file: str, out_file):
             out_stream.write('\n  # --- {} ---\n'.format(info))
             for char, braille in file_contents['tests'].items():
                 if braille["expected"] != "":
-                    generate_char_line(out_stream, char, braille["expected"])
+                    generate_char_line(out_stream, char, braille["expected"], "default_alphabet" in in_file)
 
 import re
 MATCH_FACE_LANG_CHAR = re.compile(
@@ -53,9 +53,26 @@ MATCH_FACE_LANG_CHAR = re.compile(
       ")")
 )
 
-def generate_char_line(out_stream, char: str, braille: str):
+# fix some translations that SRE has wrong
+SRE_CHAR_FIXES = {
+    "⪼": "⠨⠨⠂⠈⠨⠨⠂⠻",
+    "≻": "⠨⠨⠂", 
+    "≿": "⠨⠨⠂⠈⠱",
+    "⪺": "⠨⠨⠂⠌⠈⠱⠈⠱",
+    "⪸": "⠨⠨⠂⠈⠱⠈⠱",
+    "⪶": "⠨⠨⠂⠌⠨⠅",
+    "⪴": "⠨⠨⠂⠨⠅",
+    "⪲": "⠨⠨⠂⠌⠱",
+    "⪰": "⠨⠨⠂⠱",
+}
+
+def generate_char_line(out_stream, char: str, braille: str, is_letter: bool):
     # format to generate
     #  - "⬟": [t: "⠫⠸⠢"]              # 0x2B1F
+
+    if braille == "⠀":
+        braille = "W"
+    braille = SRE_CHAR_FIXES.get(char, braille)
     # escape quotes and backslashes
     if (char == '"' or char == '\\'):
         char = "\\" + char
@@ -64,7 +81,8 @@ def generate_char_line(out_stream, char: str, braille: str):
     
     result = ""
     matched = MATCH_FACE_LANG_CHAR.match(braille)
-    if matched:
+
+    if is_letter and matched:
         dict = matched.groupdict()
         if dict["prefix"]:
             result += dict["prefix"]
@@ -87,7 +105,7 @@ def generate_char_line(out_stream, char: str, braille: str):
         if dict["char"]:
             if dict["cap"]:
                 result += "C"
-            result += dict["char"]
+            result += "L" + dict["char"]
         if dict["digit"]:
             result += "N" + dict["digit"]
         if dict["postfix"]:
