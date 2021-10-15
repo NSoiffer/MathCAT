@@ -468,6 +468,7 @@ impl CanonicalizeContext {
 				}
 				let mathml =  if element_name == "mrow" || element_name == "math" {
 					let merged = merge_number_blocks(mathml);
+					let merged = merge_dots(merged);
 					let merged = merge_primes(merged);
 					merged
 				} else {
@@ -732,6 +733,35 @@ impl CanonicalizeContext {
 			}
 		}
 
+		fn merge_dots<'a>(mrow: Element<'a>) -> Element<'a> {
+			// merge consecutive <mo>s containing '.' into ellipsis
+			let children = mrow.children();
+			let mut i = 0;
+			let mut n_dots = 0;		// number of consecutive mo's containing primes
+			while i < children.len() {
+				let child = as_element(children[i]);
+				if name(&child) == "mo" {
+					let text = as_text(child);
+					if text == "." {
+						n_dots += 1;
+						if n_dots == 3 {
+							let first_child = as_element(children[i-2]);
+							first_child.set_text("…");
+							as_element(children[i-1]).remove_from_parent();
+							child.remove_from_parent();
+							n_dots = 0;
+						}
+					} else {
+						n_dots = 0;
+					}
+				} else {
+					n_dots = 0;
+				}
+				i += 1;
+			}
+			return mrow;
+		}
+
 		fn merge_primes<'a>(mrow: Element<'a>) -> Element<'a> {
 			// merge consecutive <mo>s containing primes (in various forms)
 			let mut children = mrow.children();
@@ -744,7 +774,7 @@ impl CanonicalizeContext {
 					// FIX: should we be more restrictive and change (apostrophe) only in a superscript?
 					if IS_PRIME.is_match(text) {
 						n_primes += 1;
-					} else if n_primes > 0{
+					} else if n_primes > 0 {
 						merge_prime_elements(&mut children, i - n_primes, i);
 						n_primes = 0;
 					}
@@ -2887,6 +2917,20 @@ mod canonicalize_tests {
 		  <mi>…</mi>
 		</mrow>
 	   </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn ellipsis() {
+        let test_str = "<math><mn>5</mn><mo>,</mo><mo>.</mo><mo>.</mo><mo>.</mo><mo>,</mo><mn>8</mn><mo>,</mo>
+				<mn>9</mn><mo>,</mo><mo>.</mo><mo>.</mo><mo>.</mo><mo>,</mo><mn>11</mn><mo>,</mo>
+				<mn>5</mn><mo>,</mo><mo>.</mo><mo>.</mo><mo>,</mo><mn>8</mn>
+			</math>";
+        let target_str = "<math><mrow data-changed='added'>
+			<mn>5</mn><mo>,</mo><mi>…</mi><mo>,</mo><mn>8</mn><mo>,</mo>
+			<mn>9</mn><mo>,</mo><mi>…</mi><mo>,</mo><mn>11</mn><mo>,</mo>
+			<mn>5</mn><mo>,</mo><mrow data-changed='added'><mo>.</mo><mo>.</mo></mrow>
+			<mo>,</mo><mn>8</mn></mrow></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
