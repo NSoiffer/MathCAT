@@ -83,6 +83,11 @@ fn punct_37_2_2() {
 }
 
 #[test]
+fn dash_42_4() {
+    let expr = "<math><mfrac><mo>&#x2015;</mo><mn>15</mn></mfrac><mo>=</mo><mfrac><mn>2</mn><mn>3</mn></mfrac></math>";
+    test_braille("Nemeth", expr, "⠹⠤⠤⠤⠤⠀⠌⠂⠢⠼⠀⠨⠅⠀⠹⠆⠌⠒⠼");
+}
+#[test]
 fn dash_42_6() {
     let expr = "<math><mo>$</mo><mn>2</mn><mo>+</mo><mo>$</mo><mn>3</mn><mo>=</mo><mo>$</mo><mo>&#x2015;</mo></math>";
     test_braille("Nemeth", expr, "⠈⠎⠆⠬⠈⠎⠒⠀⠨⠅⠀⠈⠎⠤⠤⠤⠤");
@@ -156,9 +161,41 @@ fn hyper_complex_frac_rule_68_a_1() {
 }
 
 #[test]
-fn primed_numeric_sub() {
-    let expr = "<math><msub><mi>x</mi><mn>2</mn></msub><mo>+</mo><msub><msup><mi>x</mi><mo>&#x2032;</mo></msup><mn>1</mn></msub></math>";
-    test_braille("Nemeth", expr, "⠭⠆⠬⠭⠄⠂");
+fn nested_sub_sup_74_c_5() {
+    let expr = "<math><msup><mi>n</mi><msub><mi>x</mi><msub><mi>a</mi><mi>j</mi></msub></msub></msup></math>";
+    test_braille("Nemeth", expr, "⠝⠘⠭⠘⠰⠁⠘⠰⠰⠚");
+}
+
+#[test]
+fn as_multiscript_nested_sub_sup_74_c_5() {
+    let expr = "<math><mmultiscripts><mi>n</mi><none/><msub><mi>x</mi><msub><mi>a</mi><mi>j</mi></msub></msub></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠝⠘⠭⠘⠰⠁⠘⠰⠰⠚");
+}
+
+#[test]
+fn left_sup_75_1() {
+    let expr = "<math><mmultiscripts><mi>n</mi><mprescripts/><none/><mi>x</mi></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠘⠭⠐⠝");
+}
+
+#[test]
+fn left_sup_75_4() {
+    let expr = "<math><mmultiscripts><mi>n</mi><mi>y</mi><none/><mprescripts/><mi>x</mi><none/></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠰⠭⠐⠝⠰⠽");
+}
+
+#[test]
+fn left_sup_75_7() {
+    let expr = "<math><mmultiscripts><mi>x</mi><mprescripts/><none/>
+            <mmultiscripts><mi>n</mi><mprescripts/><mi>a</mi><none/></mmultiscripts>
+        </mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠘⠰⠁⠘⠝⠐⠭");
+}
+
+#[test]
+fn left_sup_75_12() {
+    let expr = "<math><msup><mi>p</mi><mi>b</mi></msup><mmultiscripts><mi>x</mi><mprescripts/><none/><mi>c</mi></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠏⠘⠃⠘⠉⠐⠭");
 }
 
 #[test]
@@ -263,6 +300,31 @@ fn ellipsis_level_79_f_1() {
 fn comparison_79_g_2() {
     let expr = "<math><msup><mn>2</mn><mi>x</mi></msup><mo>&lt;</mo><msup><mn>3</mn><mi>x</mi></msup></math>";
     test_braille("Nemeth", expr, "⠼⠆⠘⠭⠀⠐⠅⠀⠼⠒⠘⠭");
+}
+
+
+#[test]
+fn sub_ind_79_g_4() {
+    let expr = "<math><msub><mo>∫</mo><mrow><mi>u</mi><mo>=</mo><mi>a</mi></mrow></msub></math>";
+    test_braille("Nemeth", expr, "⠮⠰⠥⠀⠰⠨⠅⠀⠁");
+}
+#[test]
+fn sub_ind_80_b_3() {
+    let expr = "<math><msub><mi>P</mi><mn>1</mn></msub><mmultiscripts><mi>Q</mi><mprescripts/><mn>2</mn><none/></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠠⠏⠂⠰⠆⠐⠠⠟");
+}
+
+#[test]
+fn sub_ind_mmultiscripts_80_b_3() {
+    let expr = "<math><mmultiscripts><mi>P</mi><mn>1</mn><none/></mmultiscripts>
+                           <mmultiscripts><mi>Q</mi><mprescripts/><mn>2</mn><none/></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠠⠏⠂⠰⠆⠐⠠⠟");
+}
+
+#[test]
+fn sub_ind_80_b_4() {
+    let expr = "<math><msub><mi>A</mi><mrow><mover><mi>x</mi><mo>~</mo></mover><mo>+</mo><mover><mi>y</mi><mo>~</mo></mover></mrow></msub></math>";
+    test_braille("Nemeth", expr, "⠠⠁⠰⠐⠭⠣⠈⠱⠻⠬⠰⠐⠽⠣⠈⠱⠻");
 }
 
 #[test]

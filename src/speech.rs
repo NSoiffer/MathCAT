@@ -91,46 +91,40 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
     // SRE doesn't have H: Hebrew or U: Russian, so not encoded (yet)
     // Note: some "positive" patterns find cases to keep the char and transform them to the lower case version
     static INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
-        "S" => "⠈⠰",
-        "B" => "⠸",
-        "T" => "⠈",
-        "I" => "⠨",
-        "R" => "",
-        "E" => "⠰",
-        "D" => "⠸",
-        "G" => "⠨",
-        "V" => "⠨⠈",
-        "H" => "⠠⠠",
-        "U" => "⠈⠈",
-        "C" => "⠠",
-        "P" => "⠸",
-        "L" => "",
-        "M" => "",
-        "m" => "⠐",
-        "b" => "⠐",
-        "N" => "",
-        "n" => "⠼",
-        "𝑁" => "",
-        "W" => "⠀",
-        "," => "⠠⠀"
+        "S" => "⠈⠰",    // sans-serif
+        "B" => "⠸",     // bold
+        "T" => "⠈",     // script/blackboard
+        "I" => "⠨",     // italic
+        "R" => "",      // roman
+        "E" => "⠰",     // English
+        "D" => "⠸",     // German (Deutsche)
+        "G" => "⠨",     // Greek
+        "V" => "⠨⠈",    // Greek Variants
+        "H" => "⠠⠠",    // Hebrew
+        "U" => "⠈⠈",    // Russian
+        "C" => "⠠",     // capital
+        "P" => "⠸",     // punctuation
+        "L" => "",      // letter
+        "M" => "",      // multipurpose indicator
+        "m" => "⠐",     // required multipurpose indicator
+        "N" => "",       // digit
+        "n" => "⠼",     // required number indicator
+        "𝑁" => "",      // long "." treated as a digit
+        "W" => "⠀",     // whitespace
+        "," => "⠠⠀",     // comma
+        "b" => "⠐",     // baseline
+        "↑" => "⠘",     // superscript
+        "↓" => "⠰",     // supscript
     };
 
     lazy_static! {
         // Trim braille spaces before and after braille indicators
-        // FIX: these lists are not complete
-        // ellipsis, dashes, {parens, brackets, braces}
-        // FIX: can the space rules be removed if NemethEllipsisNoSpaceSymbols is expanded to include 42(ii) and 42(iii)?
-        static ref REMOVE_SPACE_AFTER_PARENS: Regex = 
-            Regex::new(r"(⠷)W+").unwrap();
-        // In order: fraction, /, cancellation, capitalization, baseline
-        static ref REMOVE_SPACE_BEFORE_PARENS: Regex = 
-            Regex::new(r"W+(⠾)|(⠈⠾)|(⠨⠾)").unwrap();
-
         // In order: fraction, /, cancellation, letter, baseline
+        // Note: fraction over is not listed due to example 42(4) which shows a space before the "/"
         static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex = 
-            Regex::new(r"(⠄⠄⠄)|(⠤⠤⠤)W+([⠼⠸⠌⠪])").unwrap();
+            Regex::new(r"(⠄⠄⠄)|(⠤⠤⠤)W+([⠼⠸⠪])").unwrap();
         static ref REMOVE_SPACE_AFTER_BRAILLE_INDICATORS: Regex = 
-            Regex::new(r"([⠹⠌⠻Lb])W+(⠄⠄⠄)").unwrap();
+            Regex::new(r"([⠹⠻Lb])W+(⠄⠄⠄)").unwrap();
 
         // Multipurpose indicator insertion
         // 177.2 -- add after a letter and before a digit (or decimal pt) -- digits will start with N
@@ -180,24 +174,20 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         static ref REMOVE_PUNCT_IND: Regex =
             Regex::new(r"(^|W|\w)P(.)").unwrap();  
 
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SBTIREDGVHPCLMmbNn𝑁W,])").unwrap();  
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SBTIREDGVHPCLMmb↑↓Nn𝑁W,])").unwrap();  
             
-        static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[⠘⠰]+b)").unwrap();
+        static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[↑↓]+b)").unwrap();
 
         // Before 79b (punctuation)
-        static ref REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: Regex = Regex::new(r"(?:[⠘⠰]+b?|b)([W,P]|$)").unwrap();
+        static ref REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: Regex = Regex::new(r"(?:[↑↓]+b?|b)([W,P]|$)").unwrap();
 
         static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
 
     println!("Before:  \"{}\"", raw_nemeth);
 
-    // Remove blanks before and after "parens"
-    let result = REMOVE_SPACE_BEFORE_PARENS.replace_all(&raw_nemeth, "$1$2$3");
-    let result = REMOVE_SPACE_AFTER_PARENS.replace_all(&result, "$1");
-
     // Remove blanks before and after braille indicators
-    let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&result, "$1$2$3");
+    let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&raw_nemeth, "$1$2$3");
     let result = REMOVE_SPACE_AFTER_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
     println!("spaces:  \"{}\"", result);
 

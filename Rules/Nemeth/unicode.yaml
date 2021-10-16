@@ -2183,8 +2183,8 @@
           # test if first ancestor that isn't an mrow is a script tag (rule 78)
       - if: "self::m:mn"
         then: [t: "⠠"]
-      - else_if: "ancestor-or-self::*[not(parent::m:mrow)][1][parent::m:msub or parent::m:msup or parent::m:msubsup][preceding-sibling::*]"
-        then: [t: "⠪W"]        # Rule 78
+      - else_if: "ancestor-or-self::*[not(parent::m:mrow)][1][parent::m:msub or parent::m:msup or parent::m:msubsup or parent::m:mmultiscripts][preceding-sibling::*]"
+        then: [t: "⠪"]        # Rule 78
         else: [t: ","]        # ',' used for matching purposes, converted to "⠠⠀"
  - "-":                         # 0x002D (Hyphen)  (0x2212 normalized to here)
     - test:
@@ -2314,12 +2314,12 @@
  - "―":                          # 0x2015 (Horizontal bar)
     - test:
         if:
+          - "preceding-sibling::* and"
           - "not("
-          - "  preceding-sibling::* and "
           - "  preceding-sibling::*[1][ "
-          - "    (text() != '\u2062' and IsInDefinition(., 'NemethEllipsisNoSpaceSymbols')) or "
+          - "    (text() != '\u2062' and (IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols') or IsInDefinition(., 'NemethCurrencyBeforeSymbols')) ) or "
           - "    (text() = '\u2062' and preceding-sibling::* and "
-          - "       preceding-sibling::*[2][IsInDefinition(., 'NemethEllipsisNoSpaceSymbols')] "
+          - "       preceding-sibling::*[2][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols') or IsInDefinition(., 'NemethCurrencyBeforeSymbols')] "
           - "    ) ] )"
         then: [t: "W"]
     - t: "⠤⠤⠤⠤"
@@ -2328,9 +2328,9 @@
           - "not("
           - "  following-sibling::* and "
           - "  following-sibling::*[1][ "
-          - "    (text() != '\u2062' and IsInDefinition(., 'NemethEllipsisNoSpaceSymbols')) or "
+          - "    (text() != '\u2062' and (IsInDefinition(., 'NemethPunctAndOpenAfterSymbols') or IsInDefinition(., 'NemethCurrencyAfterSymbols'))) or "
           - "    (text() = '\u2062' and following-sibling::* and "
-          - "       following-sibling::*[2][IsInDefinition(., 'NemethEllipsisNoSpaceSymbols')] "
+          - "       following-sibling::*[2][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols') or IsInDefinition(., 'NemethCurrencyAfterSymbols')] "
           - "    ) ]  )"
         then: [t: "W"]
 
@@ -2349,9 +2349,9 @@
           - "not("
           - "  preceding-sibling::* and "
           - "  preceding-sibling::*[1][ "
-          - "    (text() != '\u2062' and IsInDefinition(., 'NemethEllipsisNoSpaceSymbols')) or "
+          - "    (text() != '\u2062' and (IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols') or IsInDefinition(., 'NemethCurrencyBeforeSymbols'))) or "
           - "    (text() = '\u2062' and preceding-sibling::* and "
-          - "       preceding-sibling::*[2][IsInDefinition(., 'NemethEllipsisNoSpaceSymbols')] "
+          - "       preceding-sibling::*[2][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols') or IsInDefinition(., 'NemethCurrencyBeforeSymbols')] "
           - "    ) ] )"
         then: [t: "W"]
     - t: "⠄⠄⠄"
@@ -2360,9 +2360,9 @@
           - "not("
           - "  following-sibling::* and "
           - "  following-sibling::*[1][ "
-          - "    (text() != '\u2062' and IsInDefinition(., 'NemethEllipsisNoSpaceSymbols')) or "
+          - "    (text() != '\u2062' and (IsInDefinition(., 'NemethPunctAndOpenAfterSymbols') or IsInDefinition(., 'NemethCurrencyAfterSymbols'))) or "
           - "    (text() = '\u2062' and following-sibling::* and "
-          - "       following-sibling::*[2][IsInDefinition(., 'NemethEllipsisNoSpaceSymbols')] "
+          - "       following-sibling::*[2][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols') or IsInDefinition(., 'NemethCurrencyAfterSymbols')] "
           - "    ) ]  )"
         then: [t: "W"]
  - "‰": [t: "`00"]

@@ -149,11 +149,25 @@
     "∝", "∉"
   ],
 
-  # no space is used when ellipsis or long dash are adjacent (lesson 2.13, differs slightly from rule 42)
-  NemethEllipsisNoSpaceSymbols: [
-    "'", ":", ",", "!", ".", "?", "‘", "’", "“", "”",   # punctuation -- 42(i)
-    "$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿", # 42(iv) could add more currencies...
-    "%", "′"
+  # no space is used when these chars "apply" to ellipsis or long dash (lesson 2.13, differs slightly from rule 42)
+  # can't do 42(ii) which is braille indicators because they are not input (they are output) -- handle by regexp later
+  # also used for comparison operators (Rule 151)
+  NemethPunctAndOpenBeforeSymbols: [
+    "‘", "“",                                                       # punctuation -- 42(i)
+    "(", "[", "{", "⟨", "⟦", "⦃", "⟪", "⌈", "⌊",                      # 42(iii) open
+  ],
+
+  NemethPunctAndOpenAfterSymbols: [
+    "'", ":", ",", "!", ".", "?", "’", "”",                          # punctuation -- 42(i)
+    ")", "]", "}", "⟩", "⟧", "⦄", "⟫", "⌉", "⌋",                       # 42(iii) close
+  ],
+
+  NemethCurrencyBeforeSymbols: [
+    "$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿" # 42(iv) could add more currencies...
+  ],
+
+  NemethCurrencyAfterSymbols: [
+    "$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿", # 42(iv) most are dubious as applying after...
+    "%", "′", "″", "‴", "⁗"
   ]
 ]
-

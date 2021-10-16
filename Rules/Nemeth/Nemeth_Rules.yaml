@@ -213,15 +213,23 @@
    tag: mo
      # add spaces around comparison operators,
      # but if "modified", they are moved outside of munder, etc, and handled by those rules
-   variables: [AddSpaces: "parent::*[self::m:mrow] and IsInDefinition(., 'NemethComparisonOperators')"]
+   variables: [MaybeAddSpaces: "parent::*[self::m:mrow] and IsInDefinition(., 'NemethComparisonOperators')"]
    match: "."
    replace:
       - test:
-         if: "$AddSpaces and preceding-sibling::*"
-         then: [t: "W"]
+         if: "$MaybeAddSpaces"
+         then:
+            - test:
+               if: "preceding-sibling::* and 
+                    not(IsInDefinition(preceding-sibling::*[1], 'NemethPunctAndOpenBeforeSymbols'))" #Rule 151
+               then: [t: "W"]
+            - test:
+               if: "$NewScriptContext!=''"  # Rule 79g
+               then: [x: "$NewScriptContext"]
       - x: "NemethChars(.)"
       - test:
-         if: "$AddSpaces and following-sibling::*"
+         if: "$MaybeAddSpaces and following-sibling::* and 
+              not(IsInDefinition(following-sibling::*[1], 'NemethPunctAndOpenAfterSymbols'))" #Rule 151"
          then: [t: "W"]
 
 -
@@ -261,14 +269,14 @@
    replace: 
     - x: "*[1]"
     - with:
-         variables: [NewScriptContext: "concat($OldScriptContext, '⠘')"]
+         variables: [NewScriptContext: "concat($OldScriptContext, '↑')"]
          replace:
             - x: "$NewScriptContext"
             - x: "*[2]"
     - test:
          # emit level indicator if something follows or the closest non-mrow is an element with a close tag [80(a)]
          # if: "count(following-sibling::*) > 0 or ancestor::*[name() != 'mrow'][1]/.[self::m:mfrac or self::m:msqrt or self::m:mroot]"
-         if: "true()"   # FIX 
+         if: "not( following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
          then_test:
             if: "$OldScriptContext != ''"
             then: [x: "$OldScriptContext"]
@@ -300,12 +308,12 @@
    replace: 
     - x: "*[1]"
     - with:
-         variables: [NewScriptContext: "concat($OldScriptContext, '⠰')"]
+         variables: [NewScriptContext: "concat($OldScriptContext, '↓')"]
          replace:
             - x: "$NewScriptContext"
             - x: "*[2]"
     - test:
-         if: "true()"   # FIX 
+         if: "not( following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
          then_test:
             if: "$OldScriptContext !=''"
             then: [x: "$OldScriptContext"]
@@ -316,7 +324,7 @@
    name: prime
    tag: msubsup
    variables: [OldScriptContext: "$NewScriptContext"]
-   match: "*[3][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
+   match: "count(*)=3 and *[3][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
    replace: 
     - x: "*[1]"
     - x: "*[3]"
@@ -330,12 +338,12 @@
                then: [t: "M"]
          else:
             - with:
-                  variables: [NewScriptContext: "concat($OldScriptContext, '⠰')"]
+                  variables: [NewScriptContext: "concat($OldScriptContext, '↓')"]
                   replace:
                      - x: "$NewScriptContext"
                      - x: "*[2]"
             - test:
-                  if: "true()"   # FIX 
+                  if: "not( following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
                   then_test:
                      if: "$OldScriptContext != ''"
                      then: [x: "$OldScriptContext"]
@@ -343,35 +351,117 @@
 
 
 -
-   name: default
-   tag: msubsup
-   match: "."
+   name: msubsup_default_mmultiscripts_equiv
+   tag: [msubsup, mmultiscripts] # mmultiscripts with only sub/sup postscript
+   match: "count(*)=3"
    variables:
     - OldScriptContext: "$NewScriptContext"
-    - IsPrime: "*[3][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
     - IsNumericSubscript: "*[2][self::m:mn] and ($NewScriptContext = '') and 
                            *[1][BaseNode(.)[self::m:mi]]"
    replace: 
     - x: "*[1]"
     - with:
-         variables: [NewScriptContext: "concat($OldScriptContext, '⠰')"]
+         variables: [NewScriptContext: "concat($OldScriptContext, '↓')"]
          replace:
             - test:
-               if: "$IsNumericSubscript"
-               then: [t: "M"]      # multipurpose indicator prevents the 'letter digit' substitution (177.2) from kicking in
-               else: [x: "$NewScriptContext"]
-            - x: "*[2]"
+               if: "not(*[2][self::m:none])"
+               then:
+                  - test:
+                     if: "$IsNumericSubscript"
+                     then: [t: "M"]      # multipurpose indicator prevents the 'letter digit' substitution (177.2) from kicking in
+                     else: [x: "$NewScriptContext"]
+                  - x: "*[2]"
     - with:
-         variables: [NewScriptContext: "concat($OldScriptContext, '⠘')"]
+         variables: [NewScriptContext: "concat($OldScriptContext, '↑')"]
          replace:
-            - x: "$NewScriptContext"
-            - x: "*[3]"
+            - test:
+               if: "not(*[3][self::m:none])"
+               then:
+                  - x: "$NewScriptContext"
+                  - x: "*[3]"
     - test:
-         if: "true()"   # FIX 
+         if: "not( following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
          then_test:
             if: "$OldScriptContext != ''"
             then: [x: "$OldScriptContext"]
             else: [t: "b"]
+
+-
+   # implement rule 75
+   # Note: special cases for numeric subscript/primes can't apply for a prescript because 'base' being a letter can't apply
+   #   The same is true for second, third, etc., postscripts
+   name: default
+   tag: mmultiscripts
+   match: "."
+   variables: [OldScriptContext: "$NewScriptContext"]
+   replace:
+      - with:
+         variables: [Prescripts: "m:mprescripts/following-sibling::*"]
+         replace:
+            # there isn't an easy way to deal with an arbitrary number of prescripts, so we handle three which probably works for 99.9999% of the cases
+            - test:
+               if: "count($Prescripts) > 0"
+               then:
+                  - test:
+                     if: "not($Prescripts[1][self::m:none])"
+                     then:
+                        - with:
+                           variables:
+                              - OldScriptContext: "$NewScriptContext"
+                              - NewScriptContext: "concat($OldScriptContext, '↓')"
+                           replace:
+                              - test:
+                                 if: "not($Prescripts[1][self::m:mmultiscripts])" # avoid repeating level indicator
+                                 then: [x: "$NewScriptContext"]
+                              - x: "$Prescripts[1]"
+                  - test:
+                     if: "not($Prescripts[2][self::m:none])"
+                     then:
+                        - with:
+                           variables: [NewScriptContext: "concat($OldScriptContext, '↑')"]
+                           replace:
+                              - test:
+                                 if: "not($Prescripts[2][self::m:mmultiscripts])" # avoid repeating level indicator
+                                 then: [x: "$NewScriptContext"]
+                              - x: "$Prescripts[2]"
+                  - test:
+                     if: "$OldScriptContext != ''"
+                     then: [x: "$OldScriptContext"]
+                     else: [t: "b"]
+      - t: "M"                # multipurpose indicator prevents the 'letter digit' substitution (177.2) from kicking in
+      - x: "*[1]"
+      - with:
+         variables: [Postscripts: "*[position()>1][not(preceding-sibling::m:mprescripts)][not(self::m:mprescripts)]"]
+         replace:
+            # there isn't an easy way to deal with an arbitrary number of postscripts, so we handle four which probably works for 99.9999% of the cases
+            - test:
+               if: "count($Postscripts) >= 2"
+               then:
+                  - test:
+                     if: "not($Postscripts[1][self::m:none])"
+                     then:
+                        - with:
+                           variables:
+                              - OldScriptContext: "$NewScriptContext"
+                              - NewScriptContext: "concat($OldScriptContext, '↓')"
+                           replace:
+                              - x: "$NewScriptContext"
+                              - x: "$Postscripts[1]"
+                  - test:
+                     if: "not($Postscripts[2][self::m:none])"
+                     then:
+                        - with:
+                           variables: [NewScriptContext: "concat($OldScriptContext, '↑')"]
+                           replace:
+                              - x: "$NewScriptContext"
+                              - x: "$Postscripts[2]"
+      - test:
+         if: "not( DEBUG(following-sibling::*[2][self::m:mmultiscripts and DEBUG(*[self::m:mprescripts])] ))" # first child is likely invisible times
+         then_test:
+            if: "$OldScriptContext != ''"
+            then: [x: "$OldScriptContext"]
+            else: [t: "b"]
+                  
 
 -
    name: contracted-form # NFB Lesson 12.5.1.b
@@ -391,7 +481,14 @@
    replace: 
     - test:
          if: "$NotNested"
-         then: [t: "⠐"]
+         then:
+            - test:
+               # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
+               if: "parent::*[self::m:mrow] and
+                    ancestor-or-self::*[not(preceding-sibling::*)][1]
+                                       [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts]"
+               then: [x: "$NewScriptContext"]
+            - t: "⠐"
     - x: "*[1]"
     - x: "$NewUnderContext"
     - x: "*[2]"
@@ -422,7 +519,14 @@
          then: [t: "W"]
     - test:
          if: "$NotNested"
-         then: [t: "⠐"]
+         then:
+            - test:
+               # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
+               if: "parent::*[self::m:mrow] and
+                    ancestor-or-self::*[not(preceding-sibling::*)][1]
+                                       [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts]"
+               then: [x: "$NewScriptContext"]
+            - t: "⠐"
     - x: "*[1]"
     - x: "$NewOverContext"
     - x: "*[2]"
@@ -444,17 +548,22 @@
     - OldOverContext: "$NewOverContext"
     - NewOverContext: "concat($NewOverContext, '⠣')"
    replace: 
-    - test:
-         if: "$NotNested"
-         then: [t: "⠐"]
-    - x: "*[1]"
-    - x: "$NewUnderContext"
-    - x: "*[2]"
-    - x: "$NewOverContext"
-    - x: "*[3]"
-    - test:
+      - test:
+         # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
+         if: "parent::*[self::m:mrow] and
+               ancestor-or-self::*[not(preceding-sibling::*)][1]
+                                 [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts]"
+         then: [x: "$NewScriptContext"]
+      - t: "⠐"
+      - x: "*[1]"
+      - x: "$NewUnderContext"
+      - x: "*[2]"
+      - x: "$NewOverContext"
+      - x: "*[3]"
+      - test:
          if: "$NotNested"
          then: [t: "⠻"]
+
 
 -
   # Note: @notation can contain more than one value
@@ -615,7 +724,7 @@
          else: [t: "⠄⠄"]
       - x: "text()"
       - test:
-         if: "string(DEBUG(@rquote))!=''"
+         if: "string(@rquote)!=''"
          then: [x: "@rquote"]
          else: [t: "⠄⠄"]
 
