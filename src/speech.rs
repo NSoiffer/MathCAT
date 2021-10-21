@@ -163,24 +163,22 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         // Rule II.9b (add numeric indicator after punctuation [optional minus[optional .][digit]
         //  because this is run after the above rule, some cases are already caught, so don't
         //  match if there is already a numeric indicator
-        static ref NUM_IND_AFTER_PUNCT: Regex =
-            Regex::new(r"(?P<punct>P.)(?P<minus>⠤?)N").unwrap();  
+        static ref NUM_IND_AFTER_PUNCT: Regex = Regex::new(r"(?P<punct>P.)(?P<minus>⠤?)N").unwrap();  
+
+        // Before 79b (punctuation)
+        static ref REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: Regex = Regex::new(r"(?:[↑↓]+b?|b)([W,P]|$)").unwrap();
+
+        static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[↑↓]+b)").unwrap();
 
         // Except for the four chars above, the unicode rules always include a punctuation indicator.
         // The cases to remove them (that seem relevant to MathML) are:
         //   Beginning of line or after a space (V 38.1)
         //   After a word (38.4)
         //   2nd or subsequent punctuation (includes, "-", etc) (38.7)
-        static ref REMOVE_PUNCT_IND: Regex =
-            Regex::new(r"(^|W|\w)P(.)").unwrap();  
+        static ref REMOVE_PUNCT_IND: Regex = Regex::new(r"(^|W|\w)P(.)").unwrap();  
 
         static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SBTIREDGVHPCLMmb↑↓Nn𝑁W,])").unwrap();  
             
-        static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[↑↓]+b)").unwrap();
-
-        // Before 79b (punctuation)
-        static ref REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: Regex = Regex::new(r"(?:[↑↓]+b?|b)([W,P]|$)").unwrap();
-
         static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
 
