@@ -2197,8 +2197,9 @@
       # if it is numeric, it might be a on it's own or part of a number.
       # normally, it is merged with the digits if part of a number, but if the adjacent digit(s) are modified
       #  by something (e.g., a bar over the digit to signify that it repeats), then it is really part of the number
+      # If it is the last part of the expr, then it is punctuation (for typographic reasons, punctuation is often included in the math)
     - test:
-        if: "self::m:mn or self::m:mo"
+        if: "self::m:mn or (self::m:mo and following-sibling::*)"
         then_test:
           if: "string-length(text()) = 1 and not(
                   following-sibling::*[1][BaseNode(.)[self::m:mn]] or
