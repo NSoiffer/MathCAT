@@ -276,7 +276,7 @@
     - test:
          # emit level indicator if something follows or the closest non-mrow is an element with a close tag [80(a)]
          # if: "count(following-sibling::*) > 0 or ancestor::*[name() != 'mrow'][1]/.[self::m:mfrac or self::m:msqrt or self::m:mroot]"
-         if: "not( following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
+         if: "not( (parent::m:msubsup and count(following-sibling::*)=1) or following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
          then_test:
             if: "$OldScriptContext != ''"
             then: [x: "$OldScriptContext"]
@@ -313,7 +313,7 @@
             - x: "$NewScriptContext"
             - x: "*[2]"
     - test:
-         if: "not( following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
+         if: "not( (parent::m:msubsup and count(following-sibling::*)=1) or following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
          then_test:
             if: "$OldScriptContext !=''"
             then: [x: "$OldScriptContext"]
@@ -343,7 +343,7 @@
                      - x: "$NewScriptContext"
                      - x: "*[2]"
             - test:
-                  if: "not( following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
+                  if: "not( (parent::m:msubsup and count(following-sibling::*)=1) or following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
                   then_test:
                      if: "$OldScriptContext != ''"
                      then: [x: "$OldScriptContext"]
@@ -380,7 +380,7 @@
                   - x: "$NewScriptContext"
                   - x: "*[3]"
     - test:
-         if: "not( following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
+         if: "not( (parent::m:msubsup and count(following-sibling::*)=1) or following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
          then_test:
             if: "$OldScriptContext != ''"
             then: [x: "$OldScriptContext"]
@@ -456,7 +456,7 @@
                               - x: "$NewScriptContext"
                               - x: "$Postscripts[2]"
       - test:
-         if: "not( DEBUG(following-sibling::*[2][self::m:mmultiscripts and DEBUG(*[self::m:mprescripts])] ))" # first child is likely invisible times
+         if: "not( (parent::m:msubsup and count(following-sibling::*)=1) or following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
          then_test:
             if: "$OldScriptContext != ''"
             then: [x: "$OldScriptContext"]
