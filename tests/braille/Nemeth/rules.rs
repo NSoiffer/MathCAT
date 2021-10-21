@@ -621,6 +621,14 @@ fn menclose_115_1() {
 }
 
 #[test]
+fn function_space_119_c_3() {
+    // this depends upon a canonicalization to get the degree sign into a superscript position
+    let expr = "<math><mi>sin</mi><mn>30</mn><mo>&#xB0;</mo><mi>cos</mi><mn>45</mn><mo>&#xB0;</mo>
+           <mo>+</mo><mi>cos</mi><mn>30</mn><mo>&#xB0;</mo><mi>sin</mi><mn>45</mn><mo>&#xB0;</mo></math>";
+    test_braille("Nemeth", expr, "⠎⠊⠝⠀⠼⠒⠴⠘⠨⠡⠐⠉⠕⠎⠀⠼⠲⠢⠘⠨⠡⠐⠬⠉⠕⠎⠀⠼⠒⠴⠘⠨⠡⠐⠎⠊⠝⠀⠼⠲⠢⠘⠨⠡");
+}
+
+#[test]
 fn set_vertical_bar_145_1() {
     let expr = "<math><mo>{</mo><mi>x</mi><mo>|</mo><mo>|</mo><mi>x</mi><mo>|</mo><mo>&lt;</mo><mn>10</mn><mo>}</mo></math>";
     test_braille("Nemeth", expr, "⠨⠷⠭⠀⠳⠀⠳⠭⠳⠀⠐⠅⠀⠼⠂⠴⠨⠾");
@@ -717,4 +725,79 @@ fn ms() {
     let expr = "<math><ms>a string</ms><mo>,</mo><ms lquote='‘' rquote='’'>another string</ms></math>";
     // Not 100% sure this is the right output -- I am a little skeptical of "⠄⠄" being the braille for '"'
     test_braille("Nemeth", expr, "⠄⠄⠁⠀⠎⠞⠗⠊⠝⠛⠄⠄⠠⠀⠸⠠⠦⠁⠝⠕⠞⠓⠑⠗⠀⠎⠞⠗⠊⠝⠛⠸⠴⠠");
+}
+
+#[test]
+fn full_binomial() {
+    let expr = "<math>
+    <mo stretchy='false'>(</mo>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mi>a</mi>
+    <msup>
+        <mo stretchy='false'>)</mo>
+        <mrow>
+            <mi>n</mi>
+        </mrow>
+    </msup>
+    <mo>=</mo>
+    <munderover>
+        <mo>∑</mo>
+        <mrow>
+            <mi>k</mi>
+            <mo>=</mo>
+            <mn>0</mn>
+        </mrow>
+        <mrow>
+            <mi>n</mi>
+        </mrow>
+    </munderover>
+    <mrow>
+        <mo>(</mo>
+        <mfrac linethickness='0'>
+            <mi>n</mi>
+            <mi>k</mi>
+        </mfrac>
+        <mo>)</mo>
+    </mrow>
+    <msup>
+        <mi>x</mi>
+        <mrow>
+            <mi>k</mi>
+        </mrow>
+    </msup>
+    <msup>
+        <mi>a</mi>
+        <mrow>
+            <mi>n</mi>
+            <mo>−</mo>
+            <mi>k</mi>
+        </mrow>
+    </msup>
+</math>
+";
+    test_braille("Nemeth", expr, "⠷⠭⠬⠁⠾⠘⠝⠀⠨⠅⠀⠐⠨⠠⠎⠩⠅⠀⠨⠅⠀⠼⠴⠣⠝⠻⠷⠝⠩⠅⠾⠭⠘⠅⠐⠁⠘⠝⠤⠅");
+}
+
+
+#[test]
+fn braille2print_example() {
+        let expr = "<math>
+        <munder><mrow>
+        <mo>&#x222B;</mo></mrow><mrow>
+        <mi>C</mi></mrow></munder>
+        <mi>d</mi> <mi>s</mi> <mspace/> <mo>=</mo><msubsup><mrow>
+        <mo>&#x222B;</mo></mrow><mrow><msub><mrow> <mi>t</mi></mrow><mrow><mrow>
+        <mn>1</mn></mrow></mrow></msub></mrow><mrow><msub><mrow>
+        <mi>t</mi></mrow><mrow><mrow>
+        <mn>2</mn></mrow></mrow></msub></mrow></msubsup><msqrt><mrow>
+        <msup><mrow> <mo>(</mo><mfrac><mrow> <mi>d</mi> <mi>x</mi></mrow><mrow>
+        <mi>d</mi> <mi>t</mi></mrow></mfrac>
+        <mo>)</mo></mrow><mrow><mrow> <mn>2</mn></mrow></mrow></msup>
+        <mo>+</mo><msup><mrow> <mo>(</mo><mfrac><mrow> <mi>d</mi>
+        <mi>y</mi></mrow><mrow> <mi>d</mi> <mi>t</mi></mrow></mfrac>
+        <mo>)</mo></mrow><mrow><mrow>
+        <mn>2</mn></mrow></mrow></msup></mrow></msqrt>
+        <mi>d</mi> <mi>t</mi> <mo>.</mo></math>";
+    test_braille("Nemeth", expr, "⠐⠮⠩⠠⠉⠻⠙⠎⠀⠨⠅⠀⠮⠰⠞⠰⠰⠂⠘⠞⠘⠰⠆⠐⠜⠷⠹⠙⠭⠌⠙⠞⠼⠾⠘⠆⠐⠬⠷⠹⠙⠽⠌⠙⠞⠼⠾⠘⠆⠐⠻⠙⠞⠸⠲");
 }
