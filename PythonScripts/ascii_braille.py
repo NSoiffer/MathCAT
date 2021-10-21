@@ -12,6 +12,7 @@ def u2a(unicode:str):
 ASCII_TO_UNICODE = "⠀⠮⠐⠼⠫⠩⠯⠄⠷⠾⠡⠬⠠⠤⠨⠌⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠱⠰⠣⠿⠜⠹⠈⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵⠪⠳⠻⠘⠸"
 def ascii_to_unicode(ascii: str):
     result = "";
+    ascii = ascii.upper()
     for ch in ascii:
         i = ord(ch) - 32
         result += ASCII_TO_UNICODE[i]
