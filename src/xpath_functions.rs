@@ -766,6 +766,7 @@ impl NemethChars {
         let is_in_enclosed_list = name(node) == "mn" && NemethChars::is_in_enclosed_list(*node);
         let mut typeface = "".to_string();     // illegal value to force first value
         let mut is_all_caps = true;
+        let mut is_all_caps_valid = false;      // all_caps only valid if we did a replacement
         let result = PICK_APART_CHAR.replace_all(&braille_chars, |caps: &Captures| {
             // println!("  face: {:?}, lang: {:?}, num {:?}, cap: {:?}, char: {:?}",
             //        &caps["face"], &caps["lang"], &caps["num"], &caps["cap"], &caps["char"]);
@@ -782,6 +783,7 @@ impl NemethChars {
             if !caps["num"].is_empty() && (typeface_changed || !is_in_enclosed_list) {
                 nemeth_chars += "N";
             }
+            is_all_caps_valid = true;
             is_all_caps &= !&caps["cap"].is_empty();
             nemeth_chars += &caps["cap"];       // will be stripped later if all caps
             nemeth_chars += &caps["letter"];
@@ -789,7 +791,7 @@ impl NemethChars {
             return nemeth_chars;
         });
         let mut text_chars = text.chars();     // see if more than one char
-        if is_all_caps && text_chars.next().is_some() &&  text_chars.next().is_some() {
+        if is_all_caps_valid && is_all_caps && text_chars.next().is_some() &&  text_chars.next().is_some() {
             return Ok( "CC".to_string() + &result.replace("C", ""));
         } else {
             return Ok( result.to_string() );
