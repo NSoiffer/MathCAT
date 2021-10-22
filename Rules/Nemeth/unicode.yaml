@@ -2249,7 +2249,7 @@
  - "¬": [t: ""]                 # 0x00AC (Not sign)
  - "®": [t: "⠷⠠r⠾"]             # 0x00AE (Registered sign)
  - "¯": [t: "⠱"]                # 0x00AF (bar)
- - "°": [t: "⠘⠨⠡b"]              # 0x00B0 (Degree sign)
+ - "°": [t: "⠨⠡"]              # 0x00B0 (Degree sign)
  - "±": [t: "⠬⠤"]               # 0x00B1 (Plus-minus sign)
  - "¶": [t: "⠈⠠⠏"]              # 0x00B6 (Pilcrow sign)
  - "·": [t: "⠡"]                # 0x00B7 (Middle dot)

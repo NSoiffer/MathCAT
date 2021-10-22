@@ -454,8 +454,6 @@ impl CanonicalizeContext {
 					mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
 					return Some(mathml);
 				}
-				// FIX: check for a roman numeral and turn into an mn
-				//  regexp:  ^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$
 				return if parent_requires_child || (!text.is_empty() && !IS_WHITESPACE.is_match(&text)) {Some(mathml)} else {None};
 			},
 			"mfenced" => {return self.clean_mathml( convert_mfenced_to_mrow(mathml) )} ,
@@ -470,6 +468,7 @@ impl CanonicalizeContext {
 					let merged = merge_number_blocks(mathml);
 					let merged = merge_dots(merged);
 					let merged = merge_primes(merged);
+					let merged = handle_pseudo_scripts(merged);
 					merged
 				} else {
 					mathml
@@ -831,6 +830,38 @@ impl CanonicalizeContext {
 				_ => ()	// can't happen
 			}
 			return result;
+		}
+
+		fn handle_pseudo_scripts<'a>(mrow: Element<'a>) -> Element<'a> {
+			// from https://www.w3.org/TR/MathML3/chapter7.html#chars.pseudo-scripts
+			static PSEUDO_SCRIPTS: phf::Set<&str> = phf_set! {
+				"\"", "'", "*", "`", "ª", "°", "²", "³", "´", "¹", "º",
+				"‘", "’", "“", "”", "„", "‟",
+				"′", "″", "‴", "‵", "‶", "‷", "⁗",
+			};
+	
+			// merge consecutive <mo>s containing primes (in various forms)
+			let mut children = mrow.children();
+			let mut i = 1;
+			let mut found = false;
+			while i < children.len() {
+				let child = as_element(children[i]);
+				if name(&child) == "mo" && PSEUDO_SCRIPTS.contains(as_text(child)) {
+					let msup = create_mathml_element(&child.document(), "msup");
+					msup.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
+					msup.append_child(children[i-1]);
+					msup.append_child(child);
+					children[i-1] = ChildOfElement::Element(msup);
+					children.remove(i);
+					found = true;
+				} else {
+					i += 1;
+				}
+			}
+			if found {
+				mrow.replace_children(children)
+			}
+			return mrow;
 		}
 	}
 
@@ -2983,6 +3014,30 @@ mod canonicalize_tests {
 				</msup>
 				</mrow>
 			</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn pseudo_scripts() {
+        let test_str = "<math><mrow>
+				<mi>cos</mi><mn>30</mn><mo>º</mo>
+				<mi>sin</mi><mn>60</mn><mo>′</mo>
+				</mrow></math>";
+        let target_str = "<math>
+		<mrow>
+		  <mrow data-changed='added'>
+			<mi>cos</mi>
+			<mo data-changed='added'>&#x2061;</mo>
+			<msup data-changed='added'><mn>30</mn><mo>º</mo></msup>
+		  </mrow>
+		  <mo data-changed='added'>&#x2062;</mo>
+		  <mrow data-changed='added'>
+			<mi>sin</mi>
+			<mo data-changed='added'>&#x2061;</mo>
+			<msup data-changed='added'><mn>60</mn><mo>′</mo></msup>
+		  </mrow>
+		</mrow>
+	   </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 }
