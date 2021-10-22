@@ -122,7 +122,7 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         // In order: fraction, /, cancellation, letter, baseline
         // Note: fraction over is not listed due to example 42(4) which shows a space before the "/"
         static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex = 
-            Regex::new(r"(⠄⠄⠄)|(⠤⠤⠤)W+([⠼⠸⠪])").unwrap();
+            Regex::new(r"(⠄⠄⠄|⠤⠤⠤)W+([⠼⠸⠪])").unwrap();
         static ref REMOVE_SPACE_AFTER_BRAILLE_INDICATORS: Regex = 
             Regex::new(r"([⠹⠻Lb])W+(⠄⠄⠄)").unwrap();
 
@@ -185,7 +185,7 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
     println!("Before:  \"{}\"", raw_nemeth);
 
     // Remove blanks before and after braille indicators
-    let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&raw_nemeth, "$1$2$3");
+    let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&raw_nemeth, "$1$2");
     let result = REMOVE_SPACE_AFTER_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
     println!("spaces:  \"{}\"", result);
 
