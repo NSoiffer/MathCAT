@@ -317,6 +317,10 @@ impl IsNode {
 }
 
 const MATHML_LEAF_NODES: &[&str] = &["mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph"];
+pub fn is_leaf(element: Element) -> bool {
+    return MATHML_LEAF_NODES.contains(&name(&element));
+}
+
 impl Function for IsNode {
     // eval function for IsNode
     // errors happen for wrong number/kind of arg
