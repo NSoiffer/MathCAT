@@ -17,11 +17,13 @@ MathCAT is written in Rust and can be built to interface with C/C++. It can also
 ## Current Status
 MathCAT is under active development and I expect that by the end of September, it will be usable as a MathPlayer replacement for those using the English version. It will not be as complete or polished in some ways as MathPlayer though. The Nemeth braille generation will be substantially better.
 
-_Update_: I now expect end of October to have a usable version. I still need to do navigation. I've spent more time on Nemeth generation than planned, but my expectations for it have gone from it being acceptable quality to it being among the best available MathML->Nemeth translators.
+_Update_: I now expect end of November to have a usable version and will ask a limited number of people to test it out. I have started work on navigation, the last big missing piece. I spent much more time on Nemeth generation than planned, but my expectations for it have gone from it being acceptable quality to it being among the best available MathML->Nemeth translators.
 
 By the end of the year, I expect MathCAT to be ready for all English users and hope to have a good start on some of the translations. Initial translations will be based on programmatic translations from MathPlayer's (public) files and are likely to be very buggy until volunteers step forward to fix them.
 
 The MathML Working Group has begun work on allowing authors to express their intent as to the meaning of certain content and how it might be spoken. My goal is to use MathCAT as a testing ground for those ideas once they become solid enough for implementation.
+
+In the spring, I hope to implement UEB math.
 
 ## Why MathCAT?
 
