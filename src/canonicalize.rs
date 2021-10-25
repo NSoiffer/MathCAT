@@ -10,7 +10,7 @@ use crate::errors::*;
 use sxd_document::dom::*;
 use sxd_document::QName;
 use phf::{phf_map, phf_set};
-use crate::xpath_functions::IsBracketed;
+use crate::xpath_functions::{IsBracketed, is_leaf};
 use std::{ptr::eq as ptr_eq};
 use crate::pretty_print::*;
 use regex::Regex;
@@ -456,7 +456,7 @@ impl CanonicalizeContext {
 				}
 				return if parent_requires_child || (!text.is_empty() && !IS_WHITESPACE.is_match(&text)) {Some(mathml)} else {None};
 			},
-			"mfenced" => {return self.clean_mathml( convert_mfenced_to_mrow(mathml) )} ,
+			"mfenced" => {return self.clean_mathml( convert_mfenced_to_mrow(mathml) )},
 			"mspace" | "mphantom" => {
 				return if parent_requires_child {Some(mathml)} else {None};
 			},
@@ -473,17 +473,35 @@ impl CanonicalizeContext {
 				} else {
 					mathml
 				};
-				for child in mathml.children() {
-					let child = as_element(child);			
+
+				// cleaning children can "eat" subsequent children, so the children vector isn't reliable
+				// instead we constantly get a new vector by asking for the following siblings until there aren't any
+				let mut children = mathml.children();
+				let mut i = 0;
+				while i < children.len() {
+					let child = as_element(children[i]);
 					match self.clean_mathml(child) {
-						None => mathml.remove_child(child),
+						None => {
+							mathml.remove_child(child);
+							i += 1;
+						},
 						Some(new_child) => {
 							if child != new_child {
 								// replace() doesn't exist, so change 'child' itself
 								child.set_name(new_child.name());
 								child.replace_children(new_child.children());
 							}
+							children = child.following_siblings();
+							i = 0;
 						}
+					}
+				}
+
+				if element_name == "msub" || element_name == "msup" || element_name == "msubsup" {
+					let base = as_element(mathml.children()[0]);
+					if (is_leaf(base) && as_text(base).is_empty()) ||
+					   (name(&base) == "mrow" && base.children().is_empty()) {
+						convert_to_mmultiscripts(mathml);
 					}
 				}
 
@@ -685,28 +703,23 @@ impl CanonicalizeContext {
 			let first_child;
 			let last_child;
 			if start == 0 && end == children.len() {
-				let parent = mrow.parent().unwrap();
-				if parent.root().is_some() {
-					// mrow could really be a math element, so we could hit the root
-					// if we are at the root, then there aren't parens around this
-					return true;
-				} 
-				let parent = parent.element().unwrap();
-				if name(&parent) != "mrow" {
-					// if parent is not an mrow, then there aren't parens around this
-					return true;
+				let preceding_children = mrow.preceding_siblings();
+				let following_children = mrow.following_siblings();
+				if preceding_children.is_empty() || following_children.is_empty() {
+					return true;	// doesn't have left or right fence
 				}
-				let preceding = parent.preceding_siblings();
-				first_child = as_element(preceding[preceding.len()-1]);
-				last_child = as_element(parent.following_siblings()[0]);
-			} else if start > 0 && end < children.len()-1 {
-				first_child = as_element(children[start-1]);
-				last_child = as_element(children[end]);
+				first_child = preceding_children[preceding_children.len()-1];
+				last_child = following_children[0];
+			} else if start > 0 && end < children.len() {
+				first_child = children[start-1];
+				last_child = children[end];
 			} else {
 				return true; // can't be fences around it
 			}
-			println!("first_child: {}", crate::pretty_print::mml_to_string(&first_child));
-			println!("last_child: {}", crate::pretty_print::mml_to_string(&last_child));
+			let first_child = as_element(first_child);
+			let last_child = as_element(last_child);
+			// println!("first_child: {}", crate::pretty_print::mml_to_string(&first_child));
+			// println!("last_child: {}", crate::pretty_print::mml_to_string(&last_child));
 			return !(name(&first_child) == "mo" && is_fence(first_child) &&
 				     name(&last_child) == "mo" && is_fence(last_child) );
 		}
@@ -863,6 +876,99 @@ impl CanonicalizeContext {
 			}
 			return mrow;
 		}
+
+		fn convert_to_mmultiscripts<'a>(script: Element<'a>) {
+			let script_name = name(&script);
+			let mut prescripts = vec![];
+			if script_name == "msub" {
+				add_pair(&mut prescripts, Some(script.children()[1]), None);
+			} else if script_name == "msup" {
+				add_pair(&mut prescripts, None, Some(script.children()[1]));
+			} else {  // msubsup
+				add_pair(&mut prescripts, Some(script.children()[1]), Some(script.children()[2]));
+			};
+			let mut postscripts = vec![];
+			let mut base = script.children()[0];			// hopefully reset
+			for child in script.following_siblings() {
+				let child = as_element(child);
+				// if we haven't encountered a non-empty base yet, 'postscripts' is empty
+				//   in that case, just keep adding prescripts, otherwise, add to postscripts
+				// if we encounter a non empty base:
+				//   1. if we haven't seen this before (i.e, 'postscripts' is empty), we set the base
+				//   2. we are done -- create the mmultiscripts
+				let script_children = child.children();
+				match name(&child) {
+					"msub" => {
+						if is_empty_base(script_children[0]) {
+							add_pair( if postscripts.is_empty() {&mut prescripts} else {&mut postscripts}, Some(script_children[1]), None);
+						} else if postscripts.is_empty() {
+							base = script_children[0];
+							add_pair( &mut postscripts, Some(script_children[1]), None);
+						}
+					},
+					"msup" => {
+						if is_empty_base(script_children[0]) {
+							add_pair( if postscripts.is_empty() {&mut prescripts} else {&mut postscripts}, None, Some(script_children[1]));
+						} else if postscripts.is_empty() {
+							base = script_children[0];
+							add_pair( &mut postscripts, None, Some(script_children[1]));
+						}
+					},
+					"msubsup" => {
+						if is_empty_base(script_children[0]) {
+							add_pair(&mut prescripts, Some(script.children()[1]), Some(script.children()[2]));
+						} else if postscripts.is_empty() {
+							base = script_children[0];
+							add_pair(&mut postscripts, Some(script.children()[1]), Some(script.children()[2]));
+						}
+					},
+					_ => {
+						if postscripts.is_empty() {
+							base = ChildOfElement::Element(child);			// have now found base
+							child.remove_from_parent();
+						};
+						break;
+					},
+				};
+				child.remove_from_parent();				
+			}
+			script.set_name("mmultiscripts");
+			let mut num_children = 1+postscripts.len();
+			if !prescripts.is_empty() {
+				num_children += 1 + prescripts.len();
+			}
+			let mut children = Vec::with_capacity(num_children);
+			children.push(base);
+			children.append(&mut postscripts);
+			if !prescripts.is_empty() {
+				children.push( ChildOfElement::Element( create_mathml_element(&script.document(), "mprescripts") ) );
+				children.append(&mut prescripts);	
+			}
+			script.replace_children(children);
+
+			fn is_empty_base(base: ChildOfElement) -> bool {
+				let base = as_element(base);
+				return (is_leaf(base) && as_text(base).is_empty()) ||
+					   (name(&base) == "mrow" && base.children().is_empty());
+			}
+		}
+
+		fn add_pair<'v, 'a:'v>(script_vec: &'v mut Vec<ChildOfElement<'a>>, subscript: Option<ChildOfElement<'a>>, superscript: Option<ChildOfElement<'a>>) {
+			let child_of_element = if subscript.is_some() {subscript.unwrap()} else {superscript.unwrap()};
+			let doc = as_element(child_of_element).document();
+			let subscript = if subscript.is_some() {
+				subscript.unwrap()
+			} else {
+				ChildOfElement::Element(create_mathml_element(&doc, "none"))
+			};
+			let superscript = if superscript.is_some() {
+				superscript.unwrap()
+			} else {
+				ChildOfElement::Element(create_mathml_element(&doc, "none"))
+			};
+			script_vec.push(subscript);
+			script_vec.push(superscript);
+		}
 	}
 
 	fn canonicalize_mrows<'a>(&self, mathml: Element<'a>) -> Result<Element<'a>> {
@@ -878,11 +984,6 @@ impl CanonicalizeContext {
 				return Ok( mathml );
 			},
 			"mn" => {
-				// FIX: hack cleanup for mn's that are big numbers composed of digit blocks and ","s (still have mn's and mo's -- see canonicalize.tdl)
-				// let bigNumValue;
-				// if input->GetAttrValue(L"isBigNumber", bigNumValue)) {
-				// 	return StripLeafNodes(input->Copy(True));
-				// }
 				self.canonicalize_plane1(mathml);
 				return Ok( mathml );
 			},
@@ -2003,12 +2104,6 @@ pub fn as_text(leaf_child: Element) -> &str {
 }
 
 #[allow(dead_code)] // for debugging with println
-fn is_leaf(leaf_child: Element) -> bool {
-	return  name(&leaf_child) == "mi" || name(&leaf_child) == "mo" || name(&leaf_child) == "mn" || name(&leaf_child) == "mtext" ||
-			name(&leaf_child) == "ms" || name(&leaf_child) == "mspace" || name(&leaf_child) == "mglyph";
-}
-
-#[allow(dead_code)] // for debugging with println
 fn element_summary(mathml: Element) -> String {
 	return format!("{}<{}>", name(&mathml), if is_leaf(mathml) {as_text(mathml).to_string()} else {mathml.children().len().to_string()});
 }
@@ -2903,6 +2998,32 @@ mod canonicalize_tests {
 	}
 
 	#[test]
+    fn not_digit_block_parens() {
+        let test_str = "<math><mo>(</mo><mn>451</mn><mo>,</mo><mn>231</mn><mo>)</mo></math>";
+        let target_str = " <math> <mrow data-changed='added'>
+				<mo>(</mo>
+				<mrow data-changed='added'>
+				<mn>451</mn> <mo>,</mo> <mn>231</mn>
+				</mrow>
+				<mo>)</mo>
+			</mrow></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn not_digit_block_parens_mrow() {
+        let test_str = "<math><mo>(</mo><mrow><mn>451</mn><mo>,</mo><mn>231</mn></mrow><mo>)</mo></math>";
+        let target_str = " <math> <mrow data-changed='added'>
+				<mo>(</mo>
+				<mrow>
+				<mn>451</mn> <mo>,</mo> <mn>231</mn>
+				</mrow>
+				<mo>)</mo>
+			</mrow></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
     fn not_digit_block_decimal() {
         let test_str = "<math><mn>8</mn><mo>,</mo><mn>49</mn><mo>,</mo><mn>456</mn><mo>+</mo>
 								    <mn>4</mn><mtext> </mtext><mn>32</mn><mo>+</mo>
@@ -3038,6 +3159,77 @@ mod canonicalize_tests {
 		  </mrow>
 		</mrow>
 	   </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn prescript_only() {
+        let test_str = "<math><msub><mtext/><mn>92</mn></msub><mi>U</mi></math>";
+        let target_str = "<math><mmultiscripts><mi>U</mi><mprescripts/> <mn>92</mn><none/> </mmultiscripts></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn pre_and_postscript_only() {
+        let test_str = "<math>
+			<msub><mrow/><mn>0</mn></msub>
+			<msub><mi>F</mi><mn>1</mn></msub>
+			<mo stretchy='false'>(</mo>
+			<mi>a</mi><mo>,</mo><mi>b</mi><mo>;</mo><mi>c</mi><mo>;</mo><mi>z</mi>
+			<mo stretchy='false'>)</mo>
+		</math>";
+			let target_str = " <math>
+			<mrow data-changed='added'>
+			<mmultiscripts>
+				<mi>F</mi>
+				<mn>1</mn>
+				<none></none>
+				<mprescripts></mprescripts>
+				<mn>0</mn>
+				<none></none>
+			</mmultiscripts>
+			<mo data-changed='added'>&#x2061;</mo>
+			<mrow data-changed='added'>
+				<mo stretchy='false'>(</mo>
+				<mrow data-changed='added'>
+				<mrow data-changed='added'>
+					<mi>a</mi>
+					<mo>,</mo>
+					<mi>b</mi>
+				</mrow>
+				<mo>;</mo>
+				<mi>c</mi>
+				<mo>;</mo>
+				<mi>z</mi>
+				</mrow>
+				<mo stretchy='false'>)</mo>
+			</mrow>
+			</mrow>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn tensor() {
+        let test_str = "<math>
+				<msub><mi>R</mi><mi>i</mi></msub>
+				<msup><mrow/><mi>j</mi></msup>
+				<msub><mrow/><mi>k</mi></msub>
+				<msub><mrow/><mi>l</mi></msub>
+			</math>";
+		let target_str = "<math>
+			<mmultiscripts>
+				<mi> R </mi>
+				<mi> i </mi>
+				<none/>
+				<none/>
+				<mi> j </mi>
+				<mi> k </mi>
+				<none/>
+				<mi> l </mi>
+				<none/>
+			</mmultiscripts>
+		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 }

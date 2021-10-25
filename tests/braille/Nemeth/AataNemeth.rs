@@ -998,8 +998,7 @@ fn test_147() {
 #[test]
 fn test_148() {
     let expr = "<math><mo stretchy=\"false\">(</mo><mi>n</mi><mo>,</mo><mi>E</mi><mo stretchy=\"false\">)</mo><mo>=</mo><mo stretchy=\"false\">(</mo><mn>451</mn><mo>,</mo><mn>231</mn><mo stretchy=\"false\">)</mo></math>";
-    // correct: 8b(1) -- no space after the comma
-    test_braille("Nemeth", expr, "⠷⠝⠠⠀⠠⠑⠾⠀⠨⠅⠀⠷⠲⠢⠂⠠⠆⠒⠂⠾");
+    test_braille("Nemeth", expr, "⠷⠝⠠⠀⠠⠑⠾⠀⠨⠅⠀⠷⠲⠢⠂⠠⠀⠆⠒⠂⠾");
 }
 
 #[test]
