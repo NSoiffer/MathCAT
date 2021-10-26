@@ -744,7 +744,7 @@ impl NemethChars {
             // Language: E: English, D: German, G: Greek, V: Greek variants, H: Hebrew, U: Russian
             // Indicators: C: capital, L: letter, N: number, P: punctuation, M: multipurpose
             static ref PICK_APART_CHAR: Regex = 
-                Regex::new(r"(?P<face>[SBTIR]*)(?P<lang>[EDGVHU]??)(?P<cap>C??)(?P<letter>L??)(?P<num>[N]??)(?P<char>[⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵])").unwrap();
+                Regex::new(r"(?P<face>[SBTIR]*)(?P<lang>[EDGVHU]?)(?P<cap>C?)(?P<letter>L?)(?P<num>[N]?)(?P<char>.)").unwrap();
         }
     
         let math_variant = node.attribute_value("mathvariant");
@@ -754,9 +754,9 @@ impl NemethChars {
             Some(variant) => match variant {
                 "bold" => "B",
                 "italic" => "I",
-                "double-struck" | "script"=> "S",
+                "double-struck" | "script" => "T",
                 "fraktur" => "G",
-                "sans-serif" => "T",
+                "sans-serif" => "S",
                 _ => "R",       // normal and unknown
             },
         };
@@ -768,22 +768,23 @@ impl NemethChars {
         // the same is true for number indicator
         // also true (sort of) for capitalization -- if all caps, use double cap in front (assume abbr or Roman Numeral)
         let is_in_enclosed_list = name(node) == "mn" && NemethChars::is_in_enclosed_list(*node);
-        let mut typeface = "".to_string();     // illegal value to force first value
+        let mut typeface = "R".to_string();     // assumption is "R" and if attr or letter is different, something happens
         let mut is_all_caps = true;
         let mut is_all_caps_valid = false;      // all_caps only valid if we did a replacement
         let result = PICK_APART_CHAR.replace_all(&braille_chars, |caps: &Captures| {
             // println!("  face: {:?}, lang: {:?}, num {:?}, cap: {:?}, char: {:?}",
             //        &caps["face"], &caps["lang"], &caps["num"], &caps["cap"], &caps["char"]);
             let mut nemeth_chars = "".to_string();
-            let typeface_changed =  &typeface != &caps["face"];
+            let char_face = if caps["face"].is_empty() {attr_typeface} else {&caps["face"]};
+            let typeface_changed =  &typeface != char_face;
             if typeface_changed {
-                typeface = caps["face"].to_string();   // needs to outlast this instance of the loop
-                nemeth_chars += if typeface.is_empty() {attr_typeface} else {&typeface};
+                typeface = char_face.to_string();   // needs to outlast this instance of the loop
+                nemeth_chars += &typeface;
                 nemeth_chars +=  &caps["lang"];
             } else {
                 nemeth_chars +=  &caps["lang"];
             }
-            // println!("is_in_list: {}; num: {}", is_in_enclosed_list, caps["num"].is_empty());
+            // println!("  typeface changed: {}, is_in_list: {}; num: {}", typeface_changed, is_in_enclosed_list, !caps["num"].is_empty());
             if !caps["num"].is_empty() && (typeface_changed || !is_in_enclosed_list) {
                 nemeth_chars += "N";
             }
@@ -794,6 +795,7 @@ impl NemethChars {
             nemeth_chars += &caps["char"];
             return nemeth_chars;
         });
+        // println!("  result: {}", &result);
         let mut text_chars = text.chars();     // see if more than one char
         if is_all_caps_valid && is_all_caps && text_chars.next().is_some() &&  text_chars.next().is_some() {
             return Ok( "CC".to_string() + &result.replace("C", ""));

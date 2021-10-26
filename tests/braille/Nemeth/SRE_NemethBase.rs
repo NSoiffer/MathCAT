@@ -473,7 +473,8 @@ fn test_71() {
 #[test]
 fn test_72() {
     let expr = "<math><mn mathvariant=\"italic\">.3</mn></math>";
-    test_braille("Nemeth", expr, "⠨⠼⠒");
+    // corrected -- added '.' after numeric indicator
+    test_braille("Nemeth", expr, "⠨⠼⠨⠒");
 }
 
 #[test]
