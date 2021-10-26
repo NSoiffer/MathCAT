@@ -2,7 +2,7 @@
 use crate::common::*;
 
 #[test]
-fn non_list_10_6_4() {
+fn non_list_10_4() {
     let expr = "<math><mo>(</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mtext>and&#xA0;</mtext><mn>3</mn><mo>)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠂⠠⠀⠼⠆⠠⠀⠁⠝⠙⠀⠼⠒⠾");
 }
