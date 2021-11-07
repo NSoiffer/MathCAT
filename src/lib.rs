@@ -17,6 +17,9 @@ extern crate lazy_static;
 #[macro_use]
 extern crate bitflags;
 
+#[macro_use]
+extern crate log;
+
 pub mod interface;
 pub mod canonicalize;
 pub mod infer_intent;

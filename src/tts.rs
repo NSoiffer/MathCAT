@@ -361,7 +361,7 @@ impl TTS {
             return "".to_string(); 
         }
         let pause = std::cmp::min(3000, ((2 * before_len + after_len)/48) * 128);
-        // println!("auto pause={}: {}/{}, [{}/{}]", pause, before_len, after_len, before, after);
+        // debug!("auto pause={}: {}/{}, [{}/{}]", pause, before_len, after_len, before, after);
         if pause <= 50 {
             // don't put out a lot of short pauses which probably can't be heard
             return "".to_string();

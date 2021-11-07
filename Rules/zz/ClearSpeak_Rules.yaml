@@ -45,7 +45,7 @@
   match: "."
   replace:
     - test:
-        if: "$Verbosity!='terse'"
+        if: "$Verbosity!='Terse'"
         then: [t: the]
     - t: square root of
     - x: "*[1]"

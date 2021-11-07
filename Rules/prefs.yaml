@@ -2,7 +2,7 @@
   Speech:
     Impairment: Blindness       # LearningDisability, LowVision, Blindness
     Language: en                # any known language code and sub-code -- could be en-uk, etc
-    Verbosity: medium           # Terse, Medium, Verbose
+    Verbosity: Medium           # Terse, Medium, Verbose
     Rate: 100                   # Change from text speech rate (%)
     SpeechStyle: ClearSpeak #ClearSpeak     # Any known speech style (falls back to ClearSpeak)
     SubjectArea: general        # FIX: still working on this
@@ -42,11 +42,11 @@
       RightParen: ""            # word used as override (not implemented)
 
   Navigation:
-    StartMode: enhanced         # Enhanced, Simple, Character
-    ResetStartMode: false       # remember previous value and use it
+    NavMode: Enhanced         # Enhanced, Simple, Character
+    ResetNavMode: false       # remember previous value and use it
     Overview: false             # speak the expression or give a description/overview
-    ResetOverView: false        # remember previous value and use it
-    NavVerbosity: medium        # Terse, Medium, Full (words to say for nav command)
+    ResetOverView: true        # remember previous value and use it
+    NavVerbosity: Medium        # Terse, Medium, Full (words to say for nav command)
     AutoZoomOut: true           # Auto zoom out of 2D exprs (use shift-arrow to force zoom out if unchecked)
 
   Braille:

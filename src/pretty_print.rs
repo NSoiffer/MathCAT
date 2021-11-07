@@ -79,13 +79,13 @@ use sxd_xpath::nodeset::Node;
 /// Pretty print an xpath value.
 /// If the value is a `NodeSet`, the MathML for the node/element is returned.
 pub fn pp_xpath_value(value: Value) {
-    println!("XPath value:");
+    debug!("XPath value:");
     if let Value::Nodeset(nodeset) = &value {
         for node in nodeset {
             match node {
-                Node::Element(el) => {println!("{}", crate::pretty_print::format_element(&el, 1))},
-                Node::Text(t) =>  {println!("found Text value: {}", t.text())},
-                _ => {println!("found unexpected node type")}
+                Node::Element(el) => {debug!("{}", crate::pretty_print::format_element(&el, 1))},
+                Node::Text(t) =>  {debug!("found Text value: {}", t.text())},
+                _ => {debug!("found unexpected node type")}
             }
         }
     }

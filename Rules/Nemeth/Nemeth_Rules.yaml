@@ -515,18 +515,18 @@
 
    replace: 
     - test:
-      if: "$AddSpaces"
-      then: [t: "W"]
+         if: "$AddSpaces"
+         then: [t: "W"]
     - test:
-      if: "$NotNested"
-      then:
-         - test:
-            # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
-            if: "parent::*[self::m:mrow] and
-                  ancestor-or-self::*[not(preceding-sibling::*)][1]
-                                    [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts]"
-            then: [x: "$NewScriptContext"]
-         - t: "⠐"
+         if: "$NotNested"
+         then:
+            - test:
+               # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
+               if: "parent::*[self::m:mrow] and
+                    ancestor-or-self::*[not(preceding-sibling::*)][1]
+                                       [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts]"
+               then: [x: "$NewScriptContext"]
+            - t: "⠐"
     - x: "*[1]"
     - x: "$NewOverContext"
     - x: "*[2]"
@@ -737,21 +737,21 @@
 
 -
    name: default-children
-   tag: unknown
+   tag: "*"
    match: count(*)>1
    replace: 
     - t: unknown math m l element
     - x: text()
 -
    name: default-empty
-   tag: unknown
+   tag: "*"
    match: "*[not(text())]"
    replace: 
     - t: empty unknown math m l element
     - x: text()
 -
    name: default-text
-   tag: unknown
+   tag: "*"
    match: "."
    replace: 
     - t: unknown math m l element

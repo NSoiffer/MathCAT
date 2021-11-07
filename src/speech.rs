@@ -15,14 +15,15 @@ use sxd_xpath::context::Evaluation;
 use sxd_xpath::{Context, Factory, Value, XPath, nodeset};
 use sxd_xpath::nodeset::Node;
 use std::fmt;
-use crate::{errors::*, pretty_print};
+use crate::errors::*;
 use crate::prefs::*;
 use yaml_rust::{YamlLoader, Yaml, yaml::Hash};
 use crate::tts::*;
-use crate::pretty_print::yaml_to_string;
+use crate::pretty_print::{mml_to_string, yaml_to_string};
 use std::path::Path;
 use regex::{Regex, Captures};
 use phf::phf_map;
+use std::rc::Rc;
 
 
 /// The main external call, `speak_mathml` returns a string for the speech associated with the `mathml`.
@@ -36,10 +37,18 @@ use phf::phf_map;
 /// A string is returned in call cases.
 /// If there is an error, the speech string will indicate an error.
 pub fn speak_mathml(mathml: Element) -> String {
-    SPEECH_RULES.with(|rules| {
+    return speak_rules(&SPEECH_RULES, mathml);
+}
+
+pub fn overview_mathml(mathml: Element) -> String {
+    return speak_rules(&OVERVIEW_RULES, mathml);
+}
+
+fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, mathml: Element) -> String {
+    rules.with(|rules| {
         {
             let mut mut_rules = rules.borrow_mut();
-            mut_rules.update(true);    
+            mut_rules.update();    
         }
         let rules = rules.borrow();
         let mut rules_with_context = SpeechRulesWithContext::new(&rules);
@@ -64,7 +73,7 @@ pub fn braille_mathml(mathml: Element) -> String {
     BRAILLE_RULES.with(|rules| {
         {
             let mut mut_rules = rules.borrow_mut();
-            mut_rules.update(false);    
+            mut_rules.update();    
         }
         let rules = rules.borrow();
         let mut rules_with_context = SpeechRulesWithContext::new(&rules);
@@ -182,42 +191,42 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
 
-    println!("Before:  \"{}\"", raw_nemeth);
+    debug!("Before:  \"{}\"", raw_nemeth);
 
     // Remove blanks before and after braille indicators
     let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&raw_nemeth, "$1$2");
     let result = REMOVE_SPACE_AFTER_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
-    println!("spaces:  \"{}\"", result);
+    debug!("spaces:  \"{}\"", result);
 
     // Multipurpose indicator
     let result = MULTI_177_2.replace_all(&result, "${1}m${2}");
     let result = MULTI_177_3.replace_all(&result, "${1}m$2");
     let result = MULTI_177_5.replace_all(&result, "${1}m$2");
-    println!("MULTI:   \"{}\"", result);
+    debug!("MULTI:   \"{}\"", result);
 
     let result = NUM_IND_9A.replace_all(&result, "$start$minus${face}n");
-    println!("IND_9A:  \"{}\"", result);
+    debug!("IND_9A:  \"{}\"", result);
 
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
     let result = NUM_IND_9E_SHAPE.replace_all(&result, "${mod}n");
-    println!("IND_9E:  \"{}\"", result);
+    debug!("IND_9E:  \"{}\"", result);
 
     // 9b: insert after punctuation (optional minus sign)
     // common punctuation adds a space, so 9a handled it. Here we deal with other "punctuation" 
     // FIX other punctuation and reference symbols (9d)
     let result = NUM_IND_AFTER_PUNCT.replace_all(&result, "$punct${minus}n");
-    println!("A PUNCT: \"{}\"", &result);
+    debug!("A PUNCT: \"{}\"", &result);
 
     // strip level indicators
     // checks for punctuation char, so needs to before punctuation is stripped.
     
     let result = REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT.replace_all(&result, "$1");
-    println!("Punct  : \"{}\"", &result);
+    debug!("Punct  : \"{}\"", &result);
     let result = REMOVE_LEVEL_IND_BEFORE_BASELINE.replace_all(&result, "b");
-    println!("Bseline: \"{}\"", &result);
+    debug!("Bseline: \"{}\"", &result);
 
     let result = REMOVE_PUNCT_IND.replace_all(&result, "$1$2");
-    println!("Punct38: \"{}\"", &result);
+    debug!("Punct38: \"{}\"", &result);
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         match INDICATOR_REPLACEMENTS.get(&cap[0]) {
@@ -310,14 +319,14 @@ pub fn as_str_checked<'a>(yaml: &'a Yaml) -> Result<&'a str> {
 pub const CONCAT_INDICATOR: &str = "\u{F8FE}";
 
 // This is the pattern that needs to be matched (and deleted)
-const CONCAT_STRING: &str = " \u{F8FE}";
+pub const CONCAT_STRING: &str = " \u{F8FE}";
 
 // a similar hack to potentially delete (repetitive) optional replacements
 // the OPTIONAL_INDICATOR is added by "ot:" before and after the optional string
 const OPTIONAL_INDICATOR: &str  = "\u{F8FD}";
 const OPTIONAL_INDICATOR_LEN: usize = OPTIONAL_INDICATOR.len();
 
-fn remove_optional_indicators(str: &str) -> String {
+pub fn remove_optional_indicators(str: &str) -> String {
     return str.replace(OPTIONAL_INDICATOR, "");
 }
 
@@ -368,6 +377,7 @@ enum Replacement {
     XPath(MyXPath),
     TTS(Box<TTSCommandRule>),
     With(Box<With>),
+    SetVariables(Box<SetVariables>),
     Insert(Box<InsertChildren>),
 }
 
@@ -380,6 +390,7 @@ impl fmt::Display for Replacement {
                 Replacement::XPath(x) => x.to_string(),
                 Replacement::TTS(t) => t.to_string(),
                 Replacement::With(w) => w.to_string(),
+                Replacement::SetVariables(v) => v.to_string(),
                 Replacement::Insert(ic) => ic.to_string(),
             }
         );
@@ -418,7 +429,7 @@ impl Replacement {
                 return Ok( Replacement::Text( OPTIONAL_INDICATOR.to_string() + as_str_checked(value)? + OPTIONAL_INDICATOR ) );
             },
             "x" => {
-            return Ok( Replacement::XPath( MyXPath::build(value)
+                return Ok( Replacement::XPath( MyXPath::build(value)
                     .chain_err(|| "while trying to evaluate value of 'x:'")? ) );
             },
             "pause" | "rate" | "pitch" | "volume" | "gender" | "voice" | "spell" => {
@@ -429,6 +440,9 @@ impl Replacement {
             },
             "with" => {
                 return Ok( Replacement::With( With::build(value)? ) );
+            },
+            "set_variables" => {
+                return Ok( Replacement::SetVariables( SetVariables::build(value)? ) );
             },
             "insert" => {
                 return Ok( Replacement::Insert( InsertChildren::build(value)? ) );
@@ -522,8 +536,8 @@ impl<'r> InsertChildren {
 }
 
 
-// structure used when "insert:" is encountered in a rule
-// the 'replacements' are inserted between each node in the 'xpath'
+// structure used when "with:" is encountered in a rule
+// the variables are placed on (and later) popped of a variable stack before/after the replacement
 #[derive(Debug, Clone)]
 struct With {
     variables: VariableDefinitions,     // variables and values
@@ -537,17 +551,17 @@ impl fmt::Display for With {
 }
 
 impl<'r> With {
-    fn build(insert: &Yaml) -> Result<Box<With>> {
+    fn build(vars_replacements: &Yaml) -> Result<Box<With>> {
         // 'with:' -- 'variables': xxx 'replace': xxx
-        if insert.as_hash().is_none() {
+        if vars_replacements.as_hash().is_none() {
             bail!("Array found for contents of 'with' -- should be dictionary with keys 'variables and 'replace'")
         }
-        let var_defs = &insert["variables"];
+        let var_defs = &vars_replacements["variables"];
         if var_defs.is_badvalue() { 
             bail!("Missing 'variables' as part of 'with'.\n    \
                   Suggestion: add 'variables:' or if present, indent so it is contained in 'with'");
         }
-        let replace = &insert["replace"];
+        let replace = &vars_replacements["replace"];
         if replace.is_badvalue() { 
             bail!("Missing 'replace' as part of 'with'.\n    \
                   Suggestion: add 'replace:' or if present, indent so it is contained in 'with'");
@@ -564,6 +578,36 @@ impl<'r> With {
                     .chain_err(||"replacing inside 'with'")?;
         rules_with_context.context_stack.pop();
         return Ok( result );
+    }    
+}
+
+// structure used when "set_variables:" is encountered in a rule
+// the variables are global and are placed in the base context and never popped off
+#[derive(Debug, Clone)]
+struct SetVariables {
+    variables: VariableDefinitions,     // variables and values
+}
+
+impl fmt::Display for SetVariables {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        return write!(f, "SetVariables: variables {}", &self.variables);
+    }
+}
+
+impl<'r> SetVariables {
+    fn build(vars: &Yaml) -> Result<Box<SetVariables>> {
+        // 'set_variables:' -- 'variables': xxx (array)
+        if vars.as_vec().is_none() {
+            bail!("'set_variables' -- should be an of variable name, xpath value");
+        }
+        return Ok( Box::new( SetVariables {
+            variables: VariableDefinitions::build(vars).chain_err(|| "'set_variables'")?
+        } ) );
+    }
+        
+    fn replace<'c, 's:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
+        rules_with_context.context_stack.set_globals(self.variables.clone(), mathml)?;
+        return Ok( "".to_string() );
     }    
 }
 
@@ -645,7 +689,7 @@ impl<'r> ReplacementArray {
                         
         // find the replacement for 'pause: auto' and compute the real value based on its neighbors
         // if replacement_strings.len() > 1 {
-        //     println!("Strings({})", replacement_strings.len());
+        //     debug!("Strings({})", replacement_strings.len());
         // };
         for i in 0..replacement_strings.len() {
             if replacement_strings[i].contains(PAUSE_AUTO_STR) {
@@ -678,8 +722,8 @@ impl<'r> ReplacementArray {
                         None => panic!("Internal error: missing end optional char -- text handling is corrupted!"),
                         Some(end_index) => {
                             let optional_word = &optional_word_start_slice[..end_index];
-                            // println!("check if '{}' is repetitive",  optional_word);
-                            // println!("   prev: '{}', next '{}'", prev, optional);
+                            // debug!("check if '{}' is repetitive",  optional_word);
+                            // debug!("   prev: '{}', next '{}'", prev, optional);
                             let prev = prev.trim_end().as_bytes();
                             if &prev[prev.len()-optional_word.len()..] == optional_word.as_bytes() {
                                 return Some( optional_word_start_slice[optional_word.len() + OPTIONAL_INDICATOR_LEN..].trim_start() );
@@ -844,7 +888,7 @@ impl<'r> MyXPath {
         let mut remainder: &str = &xpath[debug_start+6..];
             
         loop {
-            // println!("  add_debug_string_arg: count={}, remainder='{}'", count, remainder);
+            // debug!("  add_debug_string_arg: count={}, remainder='{}'", count, remainder);
             let next = remainder.find(|c| c=='(' || c==')');
             match next {
                 None => bail!("Did not find closing paren for DEBUG in\n{}", xpath),
@@ -855,7 +899,7 @@ impl<'r> MyXPath {
                     // FIX: this could be on a non-char boundary
                     if i_paren == 0 || remainder_as_bytes[i_paren-1] != b'\'' ||
                        i_paren+1 >= remainder.len() || remainder_as_bytes[i_paren+1] != b'\'' {
-                        // println!("     found '{}'", remainder_as_bytes[i_paren].to_string());
+                        // debug!("     found '{}'", remainder_as_bytes[i_paren].to_string());
                         if remainder_as_bytes[i_paren] == b'(' {
                             count += 1;
                         } else {            // must be ')'
@@ -903,11 +947,11 @@ impl<'r> MyXPath {
     }
     
     fn evaluate<'a, 'c>(&'a self, context: &'r Context<'c>, mathml: &'r Element<'c>) -> Result<Value<'c>> {
-        // println!("evaluate: {}", self);
+        // debug!("evaluate: {}", self);
         let result = self.xpath.evaluate(context, *mathml);
         return match result {
             Ok(val) => {
-                // println!("  result: '{:?}'", val);
+                // debug!("  result: '{:?}'", val);
                 Ok( val )
             },
             Err(e) => {
@@ -949,7 +993,7 @@ impl SpeechPattern  {
         //   build { "pattern_name", "tag_name", "pattern", "replacement" }
         // or recurse via include: file_name
 
-        // println!("\nbuild_speech_pattern: dict:\n{}", yaml_to_string(dict, 0));
+        // debug!("\nbuild_speech_pattern: dict:\n{}", yaml_to_string(dict, 0));
 
         if let Ok(include_file_name) = find_str(dict, "include") {
             let do_include_fn = |new_file: &Path| {
@@ -1036,7 +1080,7 @@ impl SpeechPattern  {
                 None => rule_value.push(speech_pattern),
                 Some((i, _old_pattern)) => {
                     let old_rule = &rule_value[i];
-                    eprintln!("Warning: replacing {}/'{}' in {} with rule from {}",
+                    info!("Warning: replacing {}/'{}' in {} with rule from {}",
                             old_rule.tag_name, old_rule.pattern_name, old_rule.file_name, speech_pattern.file_name);
                     rule_value[i] = speech_pattern;
                 },
@@ -1047,13 +1091,13 @@ impl SpeechPattern  {
     }
 
     fn is_match(&self, context: &Context, mathml: &Element) -> Result<bool> {
-        if self.tag_name != mathml.name().local_part() && self.tag_name != "unknown" {
+        if self.tag_name != mathml.name().local_part() && self.tag_name != "*" {
             return Ok( false );
         }
 
-        // println!("\nis_match: pattern='{}'", self.pattern_name);
-        // println!("    pattern_expr {:?}", self.pattern_expr);
-        // print!("is_match: mathml is\n{}", crate::pretty_print::mml_to_string(mathml));
+        // debug!("\nis_match: pattern='{}'", self.pattern_name);
+        // debug!("    pattern_expr {:?}", self.pattern_expr);
+        // print!("is_match: mathml is\n{}", mml_to_string(mathml));
         return Ok(
             match self.pattern.evaluate(context, mathml)? {
                 Value::Boolean(b)       => b,
@@ -1383,11 +1427,25 @@ impl<'c, 'r> ContextStack<'c> {
             context.set_variable(key.as_str(), yaml_to_value(&value));
             // if let Some(str_value) = value.as_str() {
             //     if str_value != "Auto" {
-            //         println!("Set {}='{}'", key.as_str(), str_value);
+            //         debug!("Set {}='{}'", key.as_str(), str_value);
             //     }
             // }
         };
         return context;
+    }
+
+    fn set_globals<'a:'c>(&'r mut self, new_vars: VariableDefinitions, mathml: &'r Element<'c>) -> Result<()> {
+        // for each var/value pair, evaluate the value and add the var/value to the base context
+        for def in &new_vars.defs {
+            // set the new value
+            let new_value = match def.value.evaluate(&self.base, mathml) {
+                Ok(val) => val,
+                Err(_) => bail!(format!("Can't evaluate variable def for {}", def)),
+            };
+            let qname = QName::new(def.name.as_str());
+            self.base.set_variable(qname, new_value);
+        }
+        return Ok( () );
     }
 
     fn push<'a:'c>(&'r mut self, new_vars: VariableDefinitions, mathml: &'r Element<'c>) -> Result<()> {
@@ -1440,7 +1498,7 @@ fn yaml_to_value<'a, 'b>(yaml: &'a Yaml) -> Value<'b> {
         Yaml::Integer(i)   => Value::Number(*i as f64),
         Yaml::Real(s)   => Value::Number(s.parse::<f64>().unwrap()),
         _  => {
-            eprintln!("yaml_to_value: illegal type found in Yaml value: {}", yaml_to_string(yaml, 1));
+            error!("yaml_to_value: illegal type found in Yaml value: {}", yaml_to_string(yaml, 1));
             Value::String("".to_string())
         },
     }
@@ -1488,7 +1546,7 @@ impl UnicodeDef {
         }
 
         let ch = UnicodeDef::get_unicode_char(ch)?;
-        rules.unicode.insert(ch, ReplacementArray::build(replacements)
+        rules.unicode.borrow_mut().insert(ch, ReplacementArray::build(replacements)
                                         .chain_err(|| format!("In definition of char: '{}' (0x{})",
                                                                         char::from_u32(ch).unwrap(), ch))?.replacements);
         return Ok( () );
@@ -1505,7 +1563,7 @@ impl UnicodeDef {
 
             for ch in first..last+1 {
                 let ch_as_str = char::from_u32(ch).unwrap().to_string();
-                rules.unicode.insert(ch, ReplacementArray::build(&substitute_ch(replacements, &ch_as_str))
+                rules.unicode.borrow_mut().insert(ch, ReplacementArray::build(&substitute_ch(replacements, &ch_as_str))
                                         .chain_err(|| format!("In definition of char: '{}'", def_range))?.replacements);
             };
 
@@ -1582,12 +1640,32 @@ pub fn print_errors(e:&Error) {
 //   If this turns out to be something that others actually do, then a cache > 1 would be good
 
  type RuleTable = HashMap<String, Vec<Box<SpeechPattern>>>;
- type UnicodeTable = HashMap<u32,Vec<Replacement>>;
+ type UnicodeTable = Rc<RefCell<HashMap<u32,Vec<Replacement>>>>;
+
+ #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+ pub enum RulesFor {
+     Speech,
+     OverView,
+     Navigation,
+     Braille,
+ }
+
+ impl fmt::Display for RulesFor {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let name = match self {
+            RulesFor::Speech => "Speech",
+            RulesFor::OverView => "OverView",
+            RulesFor::Navigation => "Navigation",
+            RulesFor::Braille => "Braille",
+        };
+       return write!(f, "{}", name);
+    }
+ }
 
 /// `SpeechRulesWithContext` encapsulates a named group of speech rules (e.g, "ClearSpeak")
 /// along with the preferences to be used for speech.
 pub struct SpeechRules {
-    name: String,
+    name: RulesFor,
     pub pref_manager: Box<PreferenceManager>,
     rules: RuleTable,                       // the speech rules used (partitioned into MathML tags in hashmap, then linearly searched)
     translate_single_chars_only: bool,      // strings like "half" don't want 'a's translated, but braille does
@@ -1602,7 +1680,7 @@ impl fmt::Display for SpeechRules {
         for (tag_name, rules) in rules_vec {
             writeln!(f, "   {}: #patterns {}", tag_name, rules.len())?;
         };
-        return writeln!(f, "   {} unicode entries", &self.unicode.len());
+        return writeln!(f, "   {} unicode entries", &self.unicode.borrow().len());
     }
 }
 
@@ -1623,27 +1701,45 @@ impl<'c, 's:'c> fmt::Display for SpeechRulesWithContext<'c, 's> {
 }
 
 thread_local!{
+    static SPEECH_UNICODE: UnicodeTable =
+        Rc::new( RefCell::new( HashMap::with_capacity(6997) ) );
+        
+    // static BRAILLE_UNICODE: UnicodeTable =
+    //     Rc::new( RefCell::new( HashMap::with_capacity(2997) ) );
+
     /// The current set of speech rules
     // maybe this should be a small cache of rules in case people switch rules/prefs?
     pub static SPEECH_RULES: RefCell<SpeechRules> =
-            RefCell::new( SpeechRules::new("speech", true) );
+            RefCell::new( SpeechRules::new(RulesFor::Speech, true) );
+
+    pub static OVERVIEW_RULES: RefCell<SpeechRules> =
+            RefCell::new( SpeechRules::new(RulesFor::OverView, true) );
+
+    pub static NAVIGATION_RULES: RefCell<SpeechRules> =
+            RefCell::new( SpeechRules::new(RulesFor::Navigation, true) );
 
     pub static BRAILLE_RULES: RefCell<SpeechRules> =
-            RefCell::new( SpeechRules::new("braille", false) );
+            RefCell::new( SpeechRules::new(RulesFor::Braille, false) );
 }
 
 impl SpeechRules {
-    fn new(name: &str, translate_single_chars_only: bool) -> SpeechRules {
+    pub fn new(name: RulesFor, translate_single_chars_only: bool) -> SpeechRules {
         let pref_manager = PreferenceManager::new();
         if let Err(e) = crate::definitions::read_definitions_file(pref_manager.get_definitions_file()) {
             print_errors(&e);
             exit(1);
         };
 
+        let unicode = if name == RulesFor::Braille {
+            Rc::new( RefCell::new (HashMap::with_capacity(2997)) )
+        } else {
+            SPEECH_UNICODE.with( |unicode| Rc::clone( unicode) )
+        };
+
         let rules = SpeechRules {
-            name: String::from(name),
-            rules: HashMap::with_capacity(31),           // lazy load them
-            unicode: HashMap::with_capacity(6997),       // lazy load them
+            name,
+            rules: HashMap::with_capacity(31),                       // lazy load them
+            unicode,       // lazy load them
             translate_single_chars_only,
             pref_manager,
         };
@@ -1651,12 +1747,12 @@ impl SpeechRules {
     }
 
     pub fn invalidate(&mut self, changes: FilesChanged) {
-        if changes.style {
+        if changes.rules {
             self.rules.clear();
         };
 
         if changes.unicode {
-            self.unicode.clear();
+            self.unicode.borrow_mut().clear();
         };
 
         // FIX: figure out flow of 'DEFINITIONS' setting/clearing
@@ -1665,27 +1761,22 @@ impl SpeechRules {
         // };
     }
 
-    fn update(&mut self, speech_files: bool) {
+    pub fn update(&mut self) {
         if self.rules.is_empty() || !self.pref_manager.is_up_to_date() {
-            let rule_file = 
-                if speech_files
-                    {self.pref_manager.get_style_file()}
-                else {self.pref_manager.get_braille_file()}
-                .clone();
+            let rule_file = self.pref_manager.get_rule_file(&self.name).clone();
             self.read_patterns(&rule_file);
         }
-
-        if self.unicode.is_empty() {
-            let unicode_file = if speech_files
-                     {self.pref_manager.get_speech_unicode_file()}
-                else {self.pref_manager.get_braille_unicode_file()}
-                .clone();
+        if self.unicode.borrow().is_empty() {
+            let unicode_file = if self.name == RulesFor::Braille {
+                self.pref_manager.get_braille_unicode_file()
+            } else {
+                self.pref_manager.get_speech_unicode_file()
+            }.clone();
             self.read_unicode(&unicode_file);
         }
     }
 
     fn read_patterns(&mut self, path: &Locations) {
-        // FIX: should read first (lang), then supplement with second (region)
         use std::fs;
         if let Some(p) = &path[0] {
             let rule_file_contents = fs::read_to_string(p).expect("cannot read file");
@@ -1708,17 +1799,18 @@ impl SpeechRules {
         }
         let patterns_vec = patterns.as_vec().unwrap();
 
-        for (i, entry) in patterns_vec.iter().enumerate() {
+        for entry in patterns_vec.iter() {
             let built_patterns = SpeechPattern::build(entry, file_name, self);
             if let Err(e) = built_patterns {
-                if e.description().contains("name:") {
-                    return Err(e);
-                } else {
-                    return Err( e.chain_err(|| format!("rule #{}. Previous rule is:\n{}",
-                        i+1, 
-                        if i==0 {"none".to_string()} else {yaml_to_string(&patterns_vec[i-1], 1)}))
-                    );
-                }
+                return Err(e);
+                // if e.description().contains("name:") {
+                //     return Err(e);
+                // } else {
+                //     return Err( e.chain_err(|| format!("rule #{}. Previous rule is:\n{}",
+                //         i+1, 
+                //         if i==0 {"none".to_string()} else {yaml_to_string(&patterns_vec[i-1], 1)}))
+                //     );
+                // }
             }
         }
         return Ok( () );  
@@ -1743,7 +1835,7 @@ impl SpeechRules {
             if let Err(e) =compile_rule(&unicode_file_contents, unicode_build_fn) {
                 print_errors(&e.chain_err(||format!("in file {:?}", p.to_str().unwrap())));
             }
-            println!("Hashmap has {} entries", self.unicode.len());
+            info!("Hashmap has {} entries", self.unicode.borrow().len());
         }
     }
 
@@ -1755,35 +1847,60 @@ use crate::prefs::FilesChanged;
 ///   's -- the lifetime of the speech rules (which is static)
 ///   'r -- the lifetime of the reference (this seems to be key to keep the rust memory checker happy)
 impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
-    fn new(speech_rules: &'s SpeechRules) -> SpeechRulesWithContext {
+    pub fn new(speech_rules: &'s SpeechRules) -> SpeechRulesWithContext {
         return SpeechRulesWithContext {
             speech_rules,
             context_stack: ContextStack::new(&speech_rules.pref_manager)
         }
     }
 
-    fn match_pattern(&'r mut self, mathml: &'r Element<'c>) -> Result<String> {
-        // println!("Looking for a match for: \n{}", crate::pretty_print::mml_to_string(mathml));
-        let mut tag_name = mathml.name().local_part();
-        let rules = &self.speech_rules.rules;
-        if !rules.contains_key(tag_name) {
-            tag_name = "unknown";       // should be rules for 'unknown'
-        }
-        let rule_value = rules.get(tag_name);
+    pub fn get_context(&mut self) -> &mut Context<'c> {
+        return &mut self.context_stack.base;
+    }
 
-        if let Some(rule_vector) = rule_value {
-            for pattern in rule_vector {
-                // println!("Pattern: {}", pattern);
-                if pattern.is_match(&self.context_stack.base, mathml)
-                        .chain_err(|| error_string(pattern, *mathml) )? {
-                    if pattern.var_defs.len() > 0 {
-                        self.context_stack.push(pattern.var_defs.clone(), mathml)?;
-                    }
-                    let result = pattern.replacements.replace(self, mathml);
-                    if pattern.var_defs.len() > 0 {
-                        self.context_stack.pop();
-                    }
-                    return result.chain_err(||
+    pub fn match_pattern(&'r mut self, mathml: &'r Element<'c>) -> Result<String> {
+        // debug!("Looking for a match for: \n{}", mml_to_string(mathml));
+        let tag_name = mathml.name().local_part();
+        let rules = &self.speech_rules.rules;
+
+        if let Some(rule_vector) = rules.get(tag_name) {
+            if let Some(result) = self.find_match(rule_vector, mathml)? {
+                return Ok(result);      // found a match
+            }
+        }
+
+        // no rules for specific element, fall back to rules for "*" which *should* be present in all rule files as fallback
+        if let Some(rule_vector) = rules.get("*") {
+            if let Some(result) = self.find_match(rule_vector, mathml)? {
+                return Ok(result);      // found a match
+            }
+        }
+
+        // no rules matched -- poorly written rule file -- let flow through to default error
+        // report error message with file name
+        let mut file_name = "unknown";
+        if let Some(path) = &self.speech_rules.pref_manager.get_rule_file(&self.speech_rules.name)[0] {
+            file_name= path.to_str().unwrap();
+        }
+        // FIX: handle error appropriately 
+        bail!("\nNo match found!\nMissing patterns in {} for MathML.\n{}", file_name, mml_to_string(&mathml)); 
+    }
+
+    fn find_match(&'r mut self, rule_vector: &[Box<SpeechPattern>], mathml: &'r Element<'c>) -> Result<Option<String>> {
+        for pattern in rule_vector {
+            // debug!("Pattern: {}", pattern);
+            if pattern.is_match(&self.context_stack.base, mathml)
+                    .chain_err(|| error_string(pattern, *mathml) )? {
+                if pattern.var_defs.len() > 0 {
+                    self.context_stack.push(pattern.var_defs.clone(), mathml)?;
+                }
+                let result = pattern.replacements.replace(self, mathml);
+                if pattern.var_defs.len() > 0 {
+                    self.context_stack.pop();
+                }
+                return match result {
+                    Ok(s) => Ok( Some(s) ),
+                    Err(e) => Err( e.chain_err(||
                         format!(
                             "attempting replacement pattern: \"{}\" for \"{}\".\n\
                             Replacement \"{}\" due to matching the following MathML with the pattern \"{}\".\n\
@@ -1791,26 +1908,14 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
                             The patterns are in {}.\n",
                             pattern.pattern_name, pattern.tag_name,
                             pattern.replacements.pretty_print_replacements(),pattern.pattern,
-                            pretty_print::mml_to_string(&mathml),
+                            mml_to_string(&mathml),
                             pattern.file_name
                         )
-                    );
+                    ))
                 }
             }
-        }
-
-        // unknown element -- should have rules to handle this -- let flow through to default error
-        let mut file_name = "unknown";
-        if let Some(path) = &self.speech_rules.pref_manager.get_style_file()[0] {
-            file_name= path.to_str().unwrap();
-        }
-        if rules.get("math").is_none() {
-            bail!("No rules found for any matches!!! See the error log.");
-        } else {
-            // FIX: handle error appropriately
-            bail!("\nNo match found!\nMissing patterns in {} or bad MathML.\n{}",
-                    file_name, crate::pretty_print::mml_to_string(&mathml)); 
-        }
+        };
+        return Ok(None);    // no matches
 
         fn error_string(pattern: &SpeechPattern, mathml: Element) -> String {
             return format!(
@@ -1820,7 +1925,7 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
                 The patterns are in {}.\n",
                 pattern.pattern_name, pattern.tag_name,
                 pattern.pattern,
-                pretty_print::mml_to_string(&mathml),
+                mml_to_string(&mathml),
                 pattern.file_name
             );
         }
@@ -1840,6 +1945,9 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
                 Replacement::With(with) => {
                     with.replace(self, mathml)?                     
                 },
+                Replacement::SetVariables(vars) => {
+                    vars.replace(self, mathml)?                     
+                },
                 Replacement::Insert(ic) => {
                     ic.replace(self, mathml)?                     
                 },
@@ -1848,7 +1956,7 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
     }
 
     fn replace_nodes(&'r mut self, nodes: nodeset::Nodeset<'c>, mathml: &'r Element<'c>) -> Result<String> {
-        //println!("replace_nodes: working on {} nodes", nodes.size());
+        // debug!("replace_nodes: working on {} nodes", nodes.size());
         let mut result = String::with_capacity(3*nodes.size());   // guess (2 chars/node + space)
         let mut not_first_time = false;
         for node in nodes.document_order() {
@@ -1860,7 +1968,7 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
                 Node::Element(n) => self.match_pattern(&n)?,
                 Node::Text(t) =>  self.replace_chars(&t.text(), mathml)?,
                 Node::Attribute(attr) => self.replace_chars(&attr.value(), mathml)?,
-                _ => {eprintln!("replace_nodes: found unexpected node type!!! (ignored)"); "".to_string() }
+                _ => {error!("replace_nodes: found unexpected node type!!! (ignored)"); "".to_string() }
             };
             result += &matched;
         }
@@ -1891,7 +1999,8 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
 
         fn replace_single_char<'c, 's:'c, 'r>(rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, ch: char, mathml: &'r Element<'c>) -> Result<String> {
             let ch_as_u32 = ch as u32;
-            let replacements = rules_with_context.speech_rules.unicode.get( &ch_as_u32 );
+            let unicode = rules_with_context.speech_rules.unicode.borrow();
+            let replacements = unicode.get( &ch_as_u32 );
             if replacements.is_none() {
                 return Ok(String::from(ch));   // no replacement, so just return the char and hope for the best
             };
@@ -1931,7 +2040,7 @@ mod tests {
         {name: default, tag: math, match: ".", replace: [x: "./*"] }"#;
         let doc = YamlLoader::load_from_str(str).unwrap();
         assert_eq!(doc.len(), 1);
-        let mut rules = SpeechRules::new("testing", true);
+        let mut rules = SpeechRules::new(RulesFor::Speech, true);
 
         SpeechPattern::build(&doc[0], Path::new("testing"), &mut rules).unwrap();
         assert_eq!(rules.rules["math"].len(), 1, "\nshould only be one rule");
@@ -1950,7 +2059,7 @@ mod tests {
         {name: default, tag: math, match: ".", replace: [x: "./*"] }"#;
         let doc = YamlLoader::load_from_str(str).unwrap();
         assert_eq!(doc.len(), 1);
-        let mut rules = SpeechRules::new("testing", true);
+        let mut rules = SpeechRules::new(RulesFor::Speech, true);
         SpeechPattern::build(&doc[0], Path::new("testing"), &mut rules).unwrap();
 
         let str = r#"---
@@ -1973,7 +2082,7 @@ mod tests {
         {name: default, tag: math, match: ".", replace: [x: "./*"] }"#;
         let doc = YamlLoader::load_from_str(str).unwrap();
         assert_eq!(doc.len(), 1);
-        let mut rules = SpeechRules::new("testing", true);
+        let mut rules = SpeechRules::new(RulesFor::Speech, true);
         SpeechPattern::build(&doc[0], Path::new("testing"), &mut rules).unwrap();
 
         let str = r#"---

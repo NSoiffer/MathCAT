@@ -155,7 +155,7 @@
     - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
    replace:
     - test: 
-         if: "$Verbosity!='terse'"
+         if: "$Verbosity!='Terse'"
          then: {t: the}
     - test:
          if: "*[2][self::m:mn][not(contains(., '.'))]"
@@ -186,7 +186,7 @@
    match: "IsLargeOp(*[1])"
    replace: 
     - test: 
-       if: "$Verbosity!='terse'"
+       if: "$Verbosity!='Terse'"
        then: {t: the}
     - x: "*[1]"
     - t: from
@@ -201,7 +201,7 @@
    match: "IsLargeOp(*[1])"
    replace: 
     - test: 
-       if: "$Verbosity!='terse'"
+       if: "$Verbosity!='Terse'"
        then: {t: the}
     - x: "*[1]"
     - t: over
@@ -214,7 +214,7 @@
    match: "count(*)=2 and IsLargeOp(*[1])"
    replace: 
     - test: 
-       if: "$Verbosity!='terse'"
+       if: "$Verbosity!='Terse'"
        then: {t: the}
     - x: "*[1]"
     - t: of
@@ -232,7 +232,7 @@
    match: "text()='cos'"
    replace:
       - test: 
-         if: "$Verbosity='terse'"
+         if: "$Verbosity='Terse'"
          then: {t: cos}
          else: {t: cosine}
 -
@@ -241,7 +241,7 @@
    match: "text()='tan'"
    replace:
       - test: 
-         if: "$Verbosity='terse'"
+         if: "$Verbosity='Terse'"
          then: {t: tan}
          else: {t: tangent}
 -
@@ -250,7 +250,7 @@
    match: "text()='sec'"
    replace:
       - test: 
-         if: "$Verbosity='terse'"
+         if: "$Verbosity='Terse'"
          then: {t: seek}
          else: {t: secant}
 -
@@ -259,7 +259,7 @@
    match: "text()='csc'"
    replace:
       - test: 
-         if: "$Verbosity='terse'"
+         if: "$Verbosity='Terse'"
          then: {t: co-seek}
          else: {t: co-secant}
 -
@@ -268,7 +268,7 @@
    match: "text()='cot'"
    replace:
       - test: 
-         if: "$Verbosity='terse'"
+         if: "$Verbosity='Terse'"
          then: {t: co-tan}
          else: {t: co-tangent}
 
@@ -278,7 +278,7 @@
    match: "text()='sinh'"
    replace:
       - test: 
-         if: "$Verbosity='terse'"
+         if: "$Verbosity='Terse'"
          then: {t: sinch}
          else: {t: hyperbolic sine}
 -
@@ -287,7 +287,7 @@
    match: "text()='cosh'"
    replace:
       - test: 
-         if: "$Verbosity='terse'"
+         if: "$Verbosity='Terse'"
          then: {t: cosh}
          else: {t: hyperbolic cosine}
 -
@@ -296,7 +296,7 @@
    match: "text()='tanh'"
    replace:
       - test: 
-         if: "$Verbosity='terse'"
+         if: "$Verbosity='Terse'"
          then: {t: tanch}
          else: {t: hyperbolic tangent}
 -
@@ -305,7 +305,7 @@
    match: "text()='sech'"
    replace:
       - test: 
-         if: "$Verbosity='terse'"
+         if: "$Verbosity='Terse'"
          then: {t: sheck}
          else: {t: hyperbolic secant}
 -
@@ -314,7 +314,7 @@
    match: "text()='csch'"
    replace:
       - test: 
-         if: "$Verbosity='terse'"
+         if: "$Verbosity='Terse'"
          then: {t: co-sheck}
          else: {t: hyperbolic co-secant}
 -
@@ -323,7 +323,7 @@
    match: "text()='coth'"
    replace:
       - test: 
-         if: "$Verbosity='terse'"
+         if: "$Verbosity='Terse'"
          then: {t: co-tanch}
          else: {t: hyperbolic co-tangent}
 
@@ -341,17 +341,17 @@
          then_test:
             - if: "*[1][text()='log']"
               then: [t: log]
-            - else_if: "$Verbosity='terse'"
+            - else_if: "$Verbosity='Terse'"
               then: [spell: ln]
               else: [t: natural log]
          else:
           - test: 
-             if: "$Verbosity!='terse' and not(log_is_simple)"
+             if: "$Verbosity!='Terse' and not(log_is_simple)"
              then: {t: the}
           - test:
             - if: "*[1][text()='log']"
               then: [t: log]
-            - else_if: "$Verbosity='terse'"
+            - else_if: "$Verbosity='Terse'"
               then: [spell: ln]
               else: [t: natural log]
           - t: of
@@ -366,7 +366,7 @@
     - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
    replace:
     - test: 
-         if: "$Verbosity!='terse'"
+         if: "$Verbosity!='Terse'"
          then: {t: the}
     - t: log base
     - x: "*[2]"

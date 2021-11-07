@@ -3,7 +3,7 @@
 //! The variables defined are all the preferences and also variables set in speech rules via the `variables` keyword.
 //! The function defined here are:
 //! * `IsNode(node, kind)`:  returns true if the node matches the "kind".
-//!    Valid values are "leaf", "simple", "common_fraction", "trig_name".
+//!    Valid values are "leaf", "2D", "simple", "common_fraction", "trig_name".
 //! * `ToOrdinal(number, fractional, plural)`: converts the number to an ordinal (e.g, third)
 //!   * `number` -- the number to translate
 //!   * `fractional` -- true if this is a fractional ordinal (e.g, "half")
@@ -23,6 +23,8 @@ use crate::{canonicalize::as_text, definitions::{ DEFINITIONS}};
 use regex::{Regex, Captures};
 use crate::pretty_print::mml_to_string;
 use std::cell::Ref;
+use phf::phf_set;
+
 use crate::canonicalize::{as_element, name};
 
 // useful utility functions
@@ -50,12 +52,12 @@ fn get_text_from_COE(coe: &ChildOfElement) -> String {
 }
 
 // make sure that there is only one node in the NodeSet
-// Returns the node or either Error::ArgumentMissing or Error::TooManyArguments
-fn validate_one_node(nodes: Nodeset) -> Result<Node, Error> {
+// Returns the node or an Error
+fn validate_one_node<'n>(nodes: Nodeset<'n>, func_name: &str) -> Result<Node<'n>, Error> {
     if nodes.size() == 0 {
-        return Err(Error::ArgumentMissing{});
+        return Err(Error::Other(format!("Missing argument for {}", func_name)));
     } else if nodes.size() > 1 {
-        return Err( Error::TooManyArguments{expected:1, actual: nodes.size()} );
+        return Err( Error::Other(format!("{} arguments for {}; expected 1 argument", nodes.size(), func_name)) );
     }
     return Ok( nodes.iter().next().unwrap() );
 }
@@ -316,7 +318,16 @@ impl IsNode {
     }
 }
 
-const MATHML_LEAF_NODES: &[&str] = &["mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph"];
+const MATHML_LEAF_NODES: &[&'static str] = &["mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph"];
+
+// Should mstack and mlongdiv be included here?
+// Hmm... tried using phf::Set, but rust complained about lifetime mismatch when I did MATHML_2D_NODES.contains(str)
+static MATHML_2D_NODES: &[&'static str] = &[
+    "mfrac", "msqrt", "mroot", "menclose",
+    "msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts",
+    "mtable"
+];
+
 pub fn is_leaf(element: Element) -> bool {
     return MATHML_LEAF_NODES.contains(&name(&element));
 }
@@ -336,13 +347,13 @@ impl Function for IsNode {
         // FIX: there is some conflict problem with xpath errors and error-chain
         //                .chain_err(|e| format!("Second arg to is_leaf is not a string: {}", e.to_string()))?;
         match kind.as_str() {
-            "simple" | "leaf" | "common_fraction" | "trig_name" | "nemeth_punctuation" => (), 
-            _ => return Err( Error::ArgumentMissing ),
+            "simple" | "leaf" | "common_fraction" | "trig_name" | "2D" | "nemeth_punctuation" => (), 
+            _ => return Err( Error::Other(format!("Unknown argument value '{}' for IsNode",  kind.as_str())) ),
         };
 
         let nodes = args.pop_nodeset()?;
         if nodes.size() == 0 {
-            return Err(Error::ArgumentMissing{});
+            return Err(Error::Other(format!("Missing argument for IsNode") ));
         };
         return Ok(
             Value::Boolean( 
@@ -351,7 +362,8 @@ impl Function for IsNode {
                         if let Node::Element(e) = node {
                             match kind.as_str() {
                                 "simple" => IsNode::is_simple(&e),
-                                "leaf"   => MATHML_LEAF_NODES.contains(&e.name().local_part()),
+                                "leaf"   => MATHML_LEAF_NODES.contains(&name(&e)),
+                                "2D" => MATHML_2D_NODES.contains(&name(&e)),
                                 "trig_name" => IsNode::is_trig_name(&e),
                                 "common_fraction" => IsNode::is_common_fraction(&e, usize::MAX, usize::MAX), 
                                 "nemeth_punctuation" => IsNode::is_punctuation(&e),
@@ -547,7 +559,7 @@ impl Function for ToOrdinal {
     {
         let mut args = Args(args);
         args.exactly(1)?;
-        let node = validate_one_node(args.pop_nodeset()?)?;
+        let node = validate_one_node(args.pop_nodeset()?, "ToOrdinal")?;
         return match node {
             Node::Text(t) =>  Ok( Value::String( ToOrdinal::convert(t.text(), false, false) ) ),
             Node::Element(e) => Ok( Value::String( ToOrdinal::convert(&get_text_from_element(&e), false, false) ) ),
@@ -570,7 +582,7 @@ impl Function for ToCommonFraction {
         args.exactly(1)?;
 
         // FIX: should probably handle errors by logging them and then trying to evaluate any children
-        let node = validate_one_node(args.pop_nodeset()?)?;
+        let node = validate_one_node(args.pop_nodeset()?, "ToCommonFraction")?;
         if let Node::Element(frac) = node {
             if !IsNode::is_common_fraction(&frac, usize::MAX, usize::MAX) {
                 return Err( Error::Other( format!("ToCommonFraction -- argument is not an 'mfrac': {}': ", mml_to_string(&frac))) );
@@ -711,7 +723,7 @@ impl Function for NestingChars {
         let mut args = Args(args);
         args.exactly(2)?;
         let repeat_char = args.pop_string()?;
-        let node = validate_one_node(args.pop_nodeset()?)?;
+        let node = validate_one_node(args.pop_nodeset()?, "NestingChars")?;
         if let Node::Element(el) = node {
             let name = name(&el);
             // it is likely a bug to call this one a non mfrac
@@ -762,7 +774,7 @@ impl NemethChars {
         };
         let text = as_text(*node);
         let braille_chars = crate::speech::braille_replace_chars(text, *node).unwrap_or("".to_string());
-        // println!("braille_chars: '{}'", braille_chars);
+        // debug!("braille_chars: '{}'", braille_chars);
         
         // we want to pull the prefix (typeface, language) out to the front until a change happens
         // the same is true for number indicator
@@ -772,7 +784,7 @@ impl NemethChars {
         let mut is_all_caps = true;
         let mut is_all_caps_valid = false;      // all_caps only valid if we did a replacement
         let result = PICK_APART_CHAR.replace_all(&braille_chars, |caps: &Captures| {
-            // println!("  face: {:?}, lang: {:?}, num {:?}, cap: {:?}, char: {:?}",
+            // debug!("  face: {:?}, lang: {:?}, num {:?}, cap: {:?}, char: {:?}",
             //        &caps["face"], &caps["lang"], &caps["num"], &caps["cap"], &caps["char"]);
             let mut nemeth_chars = "".to_string();
             let char_face = if caps["face"].is_empty() {attr_typeface} else {&caps["face"]};
@@ -784,7 +796,7 @@ impl NemethChars {
             } else {
                 nemeth_chars +=  &caps["lang"];
             }
-            // println!("  typeface changed: {}, is_in_list: {}; num: {}", typeface_changed, is_in_enclosed_list, !caps["num"].is_empty());
+            // debug!("  typeface changed: {}, is_in_list: {}; num: {}", typeface_changed, is_in_enclosed_list, !caps["num"].is_empty());
             if !caps["num"].is_empty() && (typeface_changed || !is_in_enclosed_list) {
                 nemeth_chars += "N";
             }
@@ -795,7 +807,7 @@ impl NemethChars {
             nemeth_chars += &caps["char"];
             return nemeth_chars;
         });
-        // println!("  result: {}", &result);
+        // debug!("  result: {}", &result);
         let mut text_chars = text.chars();     // see if more than one char
         if is_all_caps_valid && is_all_caps && text_chars.next().is_some() &&  text_chars.next().is_some() {
             return Ok( "CC".to_string() + &result.replace("C", ""));
@@ -872,7 +884,7 @@ impl Function for NemethChars {
         {
             let mut args = Args(args);
             args.exactly(1)?;
-            let node = validate_one_node(args.pop_nodeset()?)?;
+            let node = validate_one_node(args.pop_nodeset()?, "NemethChars")?;
             if let Node::Element(el) = node {
                 assert!( MATHML_LEAF_NODES.contains(&name(&el)) );
                 return Ok( Value::String( NemethChars::get_nemeth_chars(&el)? ) );
@@ -898,7 +910,7 @@ struct IsLargeOp;
     {
         let mut args = Args(args);
         args.exactly(1)?;
-        let node = validate_one_node(args.pop_nodeset()?)?;
+        let node = validate_one_node(args.pop_nodeset()?, "IsLargeOp")?;
         if let Node::Element(e) = node {
             if !is_tag(&e, "mo") {
                 return Ok( Value::Boolean(false) );
@@ -943,7 +955,7 @@ struct BaseNode;
     {
         let mut args = Args(args);
         args.exactly(1)?;
-        let node = validate_one_node(args.pop_nodeset()?)?;
+        let node = validate_one_node(args.pop_nodeset()?, "BaseNode")?;
         if let Node::Element(e) = node {
             let mut node_set = Nodeset::new();
             node_set.add(BaseNode::base_node(e));
@@ -972,15 +984,14 @@ struct Debug;
         args.exactly(2)?;
         let xpath_str = args.pop_string()?;
         let eval_result = &args[0];
-        // print!("  -- Debug: value of '{}' is '{:?}'", xpath_str, eval_result);
-        print!("  -- Debug: value of '{}' is ", xpath_str);
+        debug!("  -- Debug: value of '{}' is ", xpath_str);
         match eval_result {
             Value::Nodeset(nodes) => {
                 if nodes.size() == 0 {
-                    println!("0 nodes (false)");
+                    debug!("0 nodes (false)");
                 } else {
                     let singular = nodes.size()==1;
-                    println!("{} node{}. {}:", nodes.size(),
+                    debug!("{} node{}. {}:", nodes.size(),
                         if singular {""} else {"s"},
                         if singular {"Node is"} else {"Nodes are"});
                     nodes.document_order()
@@ -988,14 +999,14 @@ struct Debug;
                         .enumerate()
                         .for_each(|(i, node)| {
                             match node {
-                                Node::Element(mathml) => println!("#{}:\n{}",
+                                Node::Element(mathml) => debug!("#{}:\n{}",
                                         i, mml_to_string(mathml)),
-                                _ => println!("'{:?}'", node),
+                                _ => debug!("'{:?}'", node),
                             }   
                         })    
                 }
             },
-            _ => println!("'{:?}'", eval_result),
+            _ => debug!("'{:?}'", eval_result),
         }
         return Ok( eval_result.clone() );
     }
@@ -1021,8 +1032,8 @@ impl IsBracketed {
 
         let first_child = as_element(children[0]);
         let last_child = as_element(children[children.len()-1]);
-        // println!("first_child: {}", crate::pretty_print::mml_to_string(&first_child));
-        // println!("last_child: {}", crate::pretty_print::mml_to_string(&last_child));
+        // debug!("first_child: {}", crate::pretty_print::mml_to_string(&first_child));
+        // debug!("last_child: {}", crate::pretty_print::mml_to_string(&last_child));
         if (left.is_empty()  && (name(&first_child) != "mo" || !is_fence(first_child))) ||
            (right.is_empty() && (name(&last_child) != "mo"  || !is_fence(last_child))) {
             return false;
@@ -1075,7 +1086,7 @@ impl IsBracketed {
         }
         let right = args.pop_string()?;
         let left = args.pop_string()?;
-        let node = validate_one_node(args.pop_nodeset()?)?;
+        let node = validate_one_node(args.pop_nodeset()?, "IsBracketed")?;
         if let Node::Element(e) = node {
             return Ok( Value::Boolean( IsBracketed::is_bracketed(&e, &left, &right, requires_comma) ) );
         }
@@ -1116,7 +1127,7 @@ impl IsInDefinition {
         let mut args = Args(args);
         args.exactly(2)?;
         let set_name = args.pop_string()?;
-        let node = validate_one_node(args.pop_nodeset()?)?;
+        let node = validate_one_node(args.pop_nodeset()?, "IsInDefinition")?;
         if let Node::Element(e) = node {
             return Ok( Value::Boolean( IsInDefinition::is_defined_in(&e, &set_name) ) );
         }

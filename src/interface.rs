@@ -21,16 +21,18 @@ use std::cell::{RefCell};
 use sxd_document::parser;
 use sxd_document::Package;
 use sxd_document::dom::*;
+use crate::errors::*;
 
 use crate::prefs::PreferenceManager;
 use crate::navigate::*;
+use crate::pretty_print::mml_to_string;
 
 // wrap up some common functionality between the call from 'main' and AT
-fn cleanup_mathml(package: &Package) {
-    let mathml = get_element(package);
+fn cleanup_mathml(mathml: Element) -> Element {
     trim_element(&mathml);
     let mathml = crate::canonicalize::canonicalize(mathml);
-    crate::infer_intent::infer_intent(&mathml);
+    let mathml = add_ids(mathml);
+    return crate::infer_intent::infer_intent(mathml);
 }
 
 /// Given MathML, a string is return.
@@ -45,7 +47,7 @@ pub fn speak_mathml(mathml_str: &str) -> String {
         return "Invalid MathML. Unable to speak math.".to_string();
     };
     let package = package.unwrap();
-    cleanup_mathml(&package);
+    cleanup_mathml(get_element(&package));
     let mathml = get_element(&package);
     return crate::speech::speak_mathml(mathml);
 }
@@ -62,8 +64,7 @@ pub fn braille_mathml(mathml_str: &str) -> String {
         return "Invalid MathML. Unable to braille math.".to_string();
     };
     let package = package.unwrap();
-    cleanup_mathml(&package);
-    let mathml = get_element(&package);
+    let mathml = cleanup_mathml(get_element(&package));
     return crate::speech::braille_mathml(mathml);
 }
 
@@ -78,50 +79,68 @@ fn init_mathml_instance() -> RefCell<Package> {
     return RefCell::new( package );
 }
 
-use pyo3::prelude::*;
-use pyo3::wrap_pyfunction;
-use pyo3::exceptions::{PyTypeError, PyValueError};
-
-#[pyfunction]
 /// The MathML to be spoken, brailled, or navigated.
 ///
 /// This will override any previous MathML that was set.
-pub fn SetMathML(_py: Python, mathml_str: String) -> PyResult<()> {
+pub fn SetMathML(mathml_str: String) -> Result<String> {
+    NAVIGATION_STATE.with(|nav_stack| {
+        nav_stack.borrow_mut().reset();
+    });
     return MATHML_INSTANCE.with(|old_package| {
         let new_package = parser::parse(&mathml_str);    
         if new_package.is_err() {
-            panic!("MathML input was not valid"); // FIX: improve error
-        } 
+            bail!("MathML input was not valid");
+        }
+
+        // this forces initialization of things beyond just the speech rules (e.g, the defs.yaml files get read)
+        crate::speech::SPEECH_RULES.with(|_| true);
         let new_package = new_package.unwrap();
-        cleanup_mathml(&new_package);
+        let mathml = cleanup_mathml(get_element(&new_package));
+        let mathml_string = mml_to_string(&mathml);
         old_package.replace(new_package);
-        return Ok( () );
+
+        return Ok( mathml_string );
     })
 }
 
-#[pyfunction]
 /// Get the spoken text of the MathML that was set.
 /// The speech takes into account any AT or user preferences.
-pub fn GetSpokenText(_py: Python) -> PyResult<String> {
+pub fn GetSpokenText() -> Result<String> {
     use std::time::{Instant};
     let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
         let speech = crate::speech::speak_mathml(mathml);
-        eprintln!("Time taken: {}ms", instant.elapsed().as_millis());
+        info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( speech );
     });
 }
 
-#[pyfunction]
+/// Get the spoken text of the MathML that was set.
+/// The speech takes into account any AT or user preferences.
+pub fn GetOverviewText() -> Result<String> {
+    use std::time::{Instant};
+    let instant = Instant::now();
+    return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&*package_instance);
+        let speech = crate::speech::overview_mathml(mathml);
+        info!("Time taken: {}ms", instant.elapsed().as_millis());
+        return Ok( speech );
+    });
+}
+
 /// Set an API preference. The preference name should be a known preference name.
 /// The value should either be a string or a number (depending upon the preference being set)
 ///
 /// This function can be called multiple times to set different values.
 /// The values are persistent but can be overwritten by setting a preference with the same name and a different value.
-pub fn SetPreference(_py: Python, name: String, value: &PyAny) -> PyResult<()> {
-
+pub enum StringOrFloat {
+    AsString(String),
+    AsFloat(f64),
+}
+pub fn SetPreference(name: String, value: StringOrFloat) -> Result<()> {
     return crate::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let pref_manager = rules.pref_manager.as_mut();
@@ -136,8 +155,7 @@ pub fn SetPreference(_py: Python, name: String, value: &PyAny) -> PyResult<()> {
                 // check the format
                 if !( value_as_string.len() == 2 ||
                       (value_as_string.len() == 5 && value_as_string.as_bytes()[2] == b'-') ) {
-                        return Err( PyValueError::new_err(
-                            format!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value_as_string)));
+                        bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value_as_string);
                       }
                 pref_manager.set_api_string_pref("Language".to_string(), value_as_string);    
             },
@@ -157,24 +175,22 @@ pub fn SetPreference(_py: Python, name: String, value: &PyAny) -> PyResult<()> {
         return Ok( () );
     });
 
-    fn to_string(name: &str, value: &PyAny) -> PyResult<String>{
-        return match value.extract::<String>() {
-            Ok(s) => Ok( s ),
-            Err(_) => Err( PyTypeError::new_err(
-                format!("SetPreference: preference'{}'s value '{}' must be a string", name, value))),
+    fn to_string(name: &str, value: StringOrFloat) -> Result<String> {
+        return match value {
+            StringOrFloat::AsString(s) => Ok(s),
+            StringOrFloat::AsFloat(f) => bail!("SetPreference: preference'{}'s value '{}' must be a string", name, f),
         };
     }
 
-    fn to_float(name: &str, value: &PyAny) -> PyResult<f64>{
-        return match value.extract::<f64>() {
-            Ok(f) => Ok( f ),
-            Err(_) => Err( PyTypeError::new_err(
-                format!("SetPreference: preference'{}'s value '{}' must be a number", name, value))),
+    fn to_float(name: &str, value: StringOrFloat) -> Result<f64> {
+        return match value {
+            StringOrFloat::AsString(s) => bail!("SetPreference: preference'{}'s value '{}' must be a float", name, s),
+            StringOrFloat::AsFloat(f) => Ok(f),
         };
     }
 }
 
-fn set_speech_tags(pref_manager: &mut PreferenceManager, speech_tags: String ) -> PyResult<()> {
+fn set_speech_tags(pref_manager: &mut PreferenceManager, speech_tags: String ) -> Result<()> {
     let tts = match speech_tags.to_lowercase().as_str() {
         "0" | "none" => "none",
         // 1 => "sapi4",
@@ -182,61 +198,94 @@ fn set_speech_tags(pref_manager: &mut PreferenceManager, speech_tags: String ) -
         // 3 => "Mac",
         "4" | "ssml" => "ssml",
         // 6 => "eloquence",
-        _ => return Err( PyValueError::new_err(
-                    format!("Unknown value '{}' for SetSpeechTags", speech_tags))),
-        // Err(),
+        _ => bail!("Unknown value '{}' for SetSpeechTags", speech_tags),
     };
     pref_manager.set_api_string_pref("TTS".to_string(), tts.to_string());
     return Ok( () );
 }
 
 
-#[pyfunction]
-#[allow(unused_variables)]
 /// Get the braille associated with the MathML that was set by [`SetMathML`].
 /// The braille returned depends upon the preference for braille output.
-pub fn GetBraille(_py: Python) -> PyResult<String> {
+pub fn GetBraille() -> Result<String> {
     use std::time::{Instant};
     let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
         let braille = crate::speech::braille_mathml(mathml);
-        eprintln!("Time taken: {}ms", instant.elapsed().as_millis());
+        info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( braille );
     });
 }
 
-#[pyfunction]
 /// Given a key code along with the modifier keys, the current node is moved accordingly (or value reported in some cases).
 ///
 /// The spoken text for the new current node is returned.
-pub fn DoNavigateKeyPress(_py: Python, key: usize, shift_key: bool, control_key: bool, alt_key: bool, meta_key: bool) -> PyResult<String> {
-    return Ok( do_navigate_key_press(key, shift_key, control_key, alt_key, meta_key) );
+pub fn DoNavigateKeyPress(key: usize, shift_key: bool, control_key: bool, alt_key: bool, meta_key: bool) -> Result<String> {
+    return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&*package_instance);
+        return do_navigate_key_press(mathml, key, shift_key, control_key, alt_key, meta_key);
+    });
 }
 
-#[pyfunction]
 /// Return the MathML associated with the current (navigation) node.
-pub fn GetNavigationMathML(_py: Python) -> PyResult<String> {
-    // FIX: not yet implemented (basically what the braille says)
-    return Ok( get_navigation_mathml() );
+pub fn GetNavigationMathML() -> Result<(String, usize)> {
+    return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&*package_instance);
+        return NAVIGATION_STATE.with(|nav_stack| {
+            return match nav_stack.borrow_mut().get_navigation_mathml(mathml) {
+                Err(e) => Err(e),
+                Ok( (found, offset) ) => Ok( (mml_to_string(&found), offset) ),
+            }
+        } )
+    });
 }
 
-#[pymodule]
-fn mathcat(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(SetMathML, m)?).unwrap();
-    m.add_function(wrap_pyfunction!(GetSpokenText, m)?).unwrap();
-    m.add_function(wrap_pyfunction!(SetPreference, m)?).unwrap();
-    m.add_function(wrap_pyfunction!(GetBraille, m)?).unwrap();
-    m.add_function(wrap_pyfunction!(DoNavigateKeyPress, m)?).unwrap();
-    m.add_function(wrap_pyfunction!(GetNavigationMathML, m)?).unwrap();
-
-    return Ok( () );
+pub fn GetNavigationMathMLId() -> Result<(String, usize)> {
+    return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&*package_instance);
+        return Ok( NAVIGATION_STATE.with(|nav_stack| {
+            return nav_stack.borrow().get_navigation_mathml_id(mathml);
+        }) )
+    });
 }
 
+
+fn add_ids<'a>(mathml: Element<'a>) -> Element<'a> {
+    use std::time::SystemTime;
+    let time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis().to_string();
+    let time_part = time[time.len()-2..].to_string();
+    let random_part = radix_fmt::radix(rand::random::<usize>(), 36).to_string();
+    let prefix = time_part + &random_part + "-";
+    add_ids_to_all(mathml, &prefix, 0);
+    return mathml;
+
+    fn add_ids_to_all<'a>(mathml: Element<'a>, id_prefix: &str, count: usize) -> usize {
+        let mut count = count;
+        if mathml.attribute("id").is_none() {
+            mathml.set_attribute_value("id", &count.to_string());
+            mathml.set_attribute_value("data-id-added", "true");
+            count += 1;
+        };
+
+        if crate::xpath_functions::is_leaf(mathml) {
+            return count;
+        }
+        
+        for child in mathml.children() {
+            let child = crate::canonicalize::as_element(child);
+            count = add_ids_to_all(child, id_prefix, count+1);
+        }
+        return count;
+    }
+}
 
 /// Not really meant to be public -- used by tests in some packages
-pub fn get_element(package: &Package) -> Element {
+pub fn get_element<'a>(package: &'a Package) -> Element<'a> {
     let doc = package.as_document();
     let mut result = None;
     for root_child in doc.root().children() {
@@ -295,7 +344,7 @@ pub fn trim_element(e: &Element) {
         eprintln!("mathml and both element and textual children which shouldn't happen -- ignoring text '{}'", single_text);
     }
     if e.children().is_empty() && !single_text.is_empty() {
-        // println!("Combining text in {}: '{}' -> '{}'", e.name().local_part(), single_text, trimmed_text);
+        // debug!("Combining text in {}: '{}' -> '{}'", e.name().local_part(), single_text, trimmed_text);
         e.set_text(&trimmed_text);
     }
 }
@@ -380,12 +429,12 @@ pub fn is_same_element(e1: &Element, e2: &Element) -> bool {
                     if t1.text() == t2.text() {
                         continue;
                     }
-                    // println!("#1 '{}[{}]', #2 '{}[{}]'", t1.text(), t1.text().len(),
+                    // debug!("#1 '{}[{}]', #2 '{}[{}]'", t1.text(), t1.text().len(),
                     //         t2.text(), t2.text().len());
                     // t1.text().chars().enumerate()
                     //     .for_each(|(i, ch1)| {
                     //         let ch2 = t2.text().chars().nth(i).unwrap();
-                    //         println!("  {}: {}/{}, {}", i, ch1,  ch2, ch1==ch2)
+                    //         debug!("  {}: {}/{}, {}", i, ch1,  ch2, ch1==ch2)
                     //     })
                 }
                 return false;

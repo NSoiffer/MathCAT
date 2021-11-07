@@ -40,7 +40,7 @@
    replace:
       - x: "*[1]"
       - test:
-         if: "$Verbosity!='terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
+         if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
          then: [t: sub]
       - x: "*[2]"
 -
@@ -239,21 +239,21 @@
 
 -
    name: default-children
-   tag: unknown
+   tag: "*"
    match: count(*)>1
    replace: 
     - t: unknown math m l element
     - x: text()
 -
    name: default-empty
-   tag: unknown
+   tag: "*"
    match: "*[not(text())]"
    replace: 
     - t: empty unknown math m l element
     - x: text()
 -
    name: default-text
-   tag: unknown
+   tag: "*"
    match: "."
    replace: 
     - t: unknown math m l element

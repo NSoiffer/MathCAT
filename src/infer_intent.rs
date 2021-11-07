@@ -6,7 +6,7 @@
 
 use sxd_document::dom::*;
 
-pub fn infer_intent<'a>(mathml: &'a Element<'a>) -> &'a Element<'a> {
+pub fn infer_intent<'a>(mathml: Element<'a>) -> Element<'a> {
     // FIX: not yet implemented
     mathml
 }

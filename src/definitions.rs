@@ -226,7 +226,7 @@ fn read_one_definitions_file(path: &PathBuf) -> Result<()> {
     // callback to do the work of building up the defined vectors/hashmaps (in 'build_values') from YAML
     let defs_build_fn = |variable_def_list: &Yaml| {
         // Rule::DefinitionList
-        // println!("variable_def_list {} is\n{}", yaml_to_type(variable_def_list), yaml_to_string(variable_def_list));
+        // debug!("variable_def_list {} is\n{}", yaml_to_type(variable_def_list), yaml_to_string(variable_def_list));
         match crate::speech::as_vec_checked(&variable_def_list) {
             Err(e) => {
                 crate::speech::print_errors(&e.chain_err(||format!("in file {:?}", path.to_str())));
@@ -293,7 +293,7 @@ mod tests {
         let str = r#"[LikelyFunctionNames: ["f", "g", "h", "F", "G", "H", "[A-Za-z]+"]]"#;
         let defs_build_fn = |variable_def_list: &Yaml| {
             // Rule::DefinitionList
-            //println!("variable_def_list {} is\n{}", yaml_to_type(variable_def_list), yaml_to_string(variable_def_list, 0));
+            //debug!("variable_def_list {} is\n{}", yaml_to_type(variable_def_list), yaml_to_string(variable_def_list, 0));
             for variable_def in variable_def_list.as_vec().unwrap() {
                 if let Err(e) = build_values(variable_def) {
                     crate::speech::print_errors(&e.chain_err(||format!("in file {:?}", str)));

@@ -9,11 +9,11 @@
    match: "."
    replace: 
     - test: 
-         if: "$Verbosity!='terse'"
+         if: "$Verbosity!='Terse'"
          then: {t: the}
     - t: square root
     - test: 
-         if: "$Verbosity!='terse'"
+         if: "$Verbosity!='Terse'"
          then: {t: of}
          else: {pause: short}
     - x: "*[1]"
@@ -28,7 +28,7 @@
    match: "."
    replace: 
       - test: 
-         if: "$Verbosity!='terse'"
+         if: "$Verbosity!='Terse'"
          then: {t: the}
       - test:
          if: "*[2][self::m:mn]"
@@ -46,7 +46,7 @@
                else: {x: "*[2]"}
             - t: root
       - test: 
-            if: "$Verbosity!='terse'"
+            if: "$Verbosity!='Terse'"
             then: {t: of}
       - x: "*[1]"
       - test: 
@@ -183,7 +183,7 @@
    match: "count(*)=3 and not(*[2][self::m:mtable]) and IsBracketed(., '|', '|')"
    replace: 
    - test: 
-      if: "$Verbosity!='terse'"
+      if: "$Verbosity!='Terse'"
       then: {t: the}
    - t: absolute value of 
    - x: "*[2]"
@@ -201,13 +201,13 @@
        - if: "count(*)=2"
          then:
             - test: 
-               if: "$Verbosity!='terse'"
+               if: "$Verbosity!='Terse'"
                then: {t: the}
             - t: empty set
        - else_if: "count(*[2]/*)=3 and *[2]/*[2][self::m:mo][text()=':' or text()='|']"
          then:
             - test: 
-               if: "$Verbosity!='terse'"
+               if: "$Verbosity!='Terse'"
                then: {t: the}
             - t: set of all
             - x: "*[2]/*[1]"
@@ -215,7 +215,7 @@
             - x: "*[2]/*[3]"
          else:
             - test: 
-               if: "$Verbosity!='terse'"
+               if: "$Verbosity!='Terse'"
                then: {t: the}
             - t: set 
             - x: "*[2]"
@@ -228,7 +228,7 @@
    match: ".[starts-with(@intent, 'interval')]  "
    replace: 
    - test: 
-      if: "$Verbosity!='terse'"
+      if: "$Verbosity!='Terse'"
       then: {t: the}
    - test:
       if: "*[1][text()='(']"
