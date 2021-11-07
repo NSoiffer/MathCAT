@@ -21,19 +21,15 @@ regex = "1.5"
 dirs = "3.0"
 bitflags = "1.2.1"
 phf = { version = "0.8.0", features = ["macros"] }
+rand = "0.8.0"
+radix_fmt = "1.0.0"
 internment = "0.5.4"
+log = "0.4.0"
+env_logger = "0.8.4"
 
 [build-dependencies]
 bitflags = "1.2.1"
 phf = { version = "0.8.0", features = ["macros"] }
-
-# slog = "2.7"
-# sloggers = "1.0.1"
-# slog-term = "2.8"
-# slog-async = "2.6"
-# slog-envlogger = "0.4.2"
-# slog-stdlog = "4.1.0"
-# log = "0.4.14"
 
 # intercom = "0.3.0"
 # com = "0.4.0"
@@ -50,11 +46,3 @@ path = "src/main.rs"
 [lib]
 name = "libmathcat"
 crate-type = ["rlib", "cdylib"]
-
-[dependencies.pyo3]
-version = "0.13.2"
-features = ["extension-module", "abi3"]
-
-# 32 bit target stable-i686-pc-windows-msvc
-# if changing to building 32 bit python version, change .cargo/config.toml
-#  along with changing env variable PYO3_PYTHON
