@@ -115,13 +115,15 @@ MathCAT reads the following files for critical information:
 * Rules
   * intent.yaml -- rules that infer author intent from MathML. These are used by various speech styles (in various languages) to avoid duplicating the inference process. They add an `intent` attribute to the MathML.
   * definitions.yaml -- these define various lists used by MathCAT for canonicalization (inferring proper structure) and also rule matching. E.g., `TrigFunctionNames` is a list of names of trig functions such as `tan` and `lim`.
-  * prefs.yaml -- system defaults for various preferences that are settable. MathCAT will also look for this file in a platform-specific user location so that individual users can set the values.
+  * prefs.yaml -- system defaults for various preferences that are settable. MathCAT will also look for this file in a platform-specific user location so that individual users can set the values. Eventually, there will be make changes.
     * Windows: %AppData%\\prefs.yaml|
     * Linux:  $XDG_CONFIG_HOME or $HOME/.config
+  * definitions.yaml -- language independent definitions (e.g., trig function names).
 * Rules/[lang]
   * Unicode.yaml -- a (long) list for how to pronounce each Unicode character that is encountered (not used for multi-char strings).
   * XXX_rules.yaml -- the rules used to speak math. MathCAT will scan every subdirectory of the `Rules` directory for files that have the suffix `_rules.yaml` and add them to the list of options for people to choose. The `XXX` should reflect the speech style. E.g., `ClearSpeak_rules.yaml` and `MathSpeak_rules.yaml` will result in user options to choose "ClearSpeak" and "MathSpeak" for the speech style.
   * definitions.yaml -- language specific definitions such as how to speak ordinal numbers ("first", "half", etc).
+  * navigate.yaml -- rules that define what happens for each navigation command along with the speech that is said
 
 The `lang` subdirectory should follow the two letter language and language-region [ISO naming convention](https://en.wikipedia.org/wiki/Language_localisation#Language_tags_and_codes). E.g, there is a `en` subdirectory of the `Rules` directory. If region-specific speech is needed, there can be a region subdirectory such as `gb` that will be used if the language specified is `en-gb`.
 
@@ -231,8 +233,10 @@ Note: all YAML files begin with "---". That indicates the beginning of a "docume
 #         else: [replacements] # optional
 #         else_test # optional, used in place of 'else:' -- avoids needing to use 'test:' after the 'else:'
 #      - with:
-#         variables: [{name: value}, ...] variables whose values are set during the execution of this clause
+#         variables: [name: value, ...] variables whose values are set during the execution of this clause
 #         replace: [replacements]
+#      - set_variables: [var: value, ...] global variable definitions.
+#         These are available to the program after the rules have run; currently used for navigation which can change state.
 #      - pause: string or number  # "short", "medium", "long", "auto", or number in milliseconds
 #      - rate:  string/number or dict with 1 or 2 entries
 #         value: float number with optional %
