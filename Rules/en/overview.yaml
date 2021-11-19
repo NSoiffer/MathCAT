@@ -1,3 +1,16 @@
+# Provide an overview/outline/description of the math
+# MathPlayer just tried to shorten things like "mfrac" by just saying "fraction"
+#   For mrow, it say up to 5 operands and just say "and n more things" for the rest
+# This results in strings of varying length. Given human memory is about 7 words long,
+#   it would be better to aim for 7 words (maybe aim for a range of 6-10 words).
+# Idea:
+#   Start by generating a terse form of the speech
+#   At every step when the strings are being joined
+#     a) if the #words <= 7, return the joined string
+#     b) otherwise, set verbosity to 'overview' and regenerate the expression and use that
+# There is a balance that you want to maximize the info given, so 10 words is likely better then 3.
+#   That might mean that at the top level, we may want to allow the first few children to expand
+
 ---
 -
   name: default
