@@ -10,15 +10,13 @@ edition = "2018"
 [dependencies]
 sxd-document = "0.3.2"
 sxd-xpath = "0.4.2"
-#sxd-xpath = {path = "../sxd-xpath-0.4.2"}
-yaml-rust = "0.4"
+yaml-rust = "0.4.5"
 lazy_static = "1.4.0"
-strum = "0.20"
-strum_macros = "0.20"
-structopt = "*"
-error-chain = "*"
-regex = "1.5"
-dirs = "3.0"
+strum = "0.21.0"
+strum_macros = "0.21.0"
+error-chain = "0.12.4"
+regex = "1.5.4"
+dirs = "4.0"
 bitflags = "1.2.1"
 phf = { version = "0.8.0", features = ["macros"] }
 rand = "0.8.0"
@@ -26,18 +24,35 @@ radix_fmt = "1.0.0"
 internment = "0.5.4"
 log = "0.4.0"
 env_logger = "0.8.4"
+cfg-if = "1.0"
+zip = { version = "0.5.8", default-features = false, features = ["deflate"] }
+getrandom = { version = "0.2.3", features = ["js"] }
+
+# # dependencies because of need to build wasm version for file i/o
+# yew = "0.18.0"
+# wasm-bindgen = "0.2.78"
+# wasm-bindgen-futures = "0.4.28"
+# js-sys = "0.3.35"
+# futures = "0.3.15"
+
+# [dependencies.web-sys]
+# version = "0.3.35"
+# features = [
+#     "HtmlInputElement",
+#     # probably not all of these are needed -- copied from an example
+#     "Headers",
+#     "Request",
+#     "RequestInit",
+#     "RequestMode",
+#     "Response",
+#     "Window",
+# ]
+
+
 
 [build-dependencies]
 bitflags = "1.2.1"
 phf = { version = "0.8.0", features = ["macros"] }
-
-# intercom = "0.3.0"
-# com = "0.4.0"
-# windows = "0.3.1"
-# bindings = { package = "windows_bindings", path = "bindings" }
-
-# [build-dependencies]
-# windows = "0.3.1"
 
 [[bin]]
 name = "mathcat"

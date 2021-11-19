@@ -8,7 +8,12 @@ extern crate error_chain;
 // `error_chain!` creates.
 mod errors {
     // Create the Error, ErrorKind, ResultExt, and Result types
-    error_chain! { }
+    error_chain! {
+        // foreign_links {
+        //     Io(std::io::Error);
+        //     HttpRequest(reqwest::Error);
+        // }
+    }
 }
 
 #[macro_use]
@@ -20,6 +25,10 @@ extern crate bitflags;
 #[macro_use]
 extern crate log;
 
+#[macro_use]
+extern crate cfg_if;
+
+
 pub mod interface;
 pub mod canonicalize;
 pub mod infer_intent;
@@ -30,3 +39,5 @@ pub mod tts;
 pub mod xpath_functions;
 pub mod definitions;
 pub mod pretty_print;
+
+pub mod shim_filesystem;

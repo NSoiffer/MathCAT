@@ -16,7 +16,7 @@
 // for Python interfaces --#[...] doesn't help on name mangled python function names
 #![allow(non_snake_case)]
 #![allow(clippy::needless_return)]
-use std::cell::{RefCell};
+use std::cell::RefCell;
 
 use sxd_document::parser;
 use sxd_document::Package;
@@ -106,13 +106,13 @@ pub fn SetMathML(mathml_str: String) -> Result<String> {
 /// Get the spoken text of the MathML that was set.
 /// The speech takes into account any AT or user preferences.
 pub fn GetSpokenText() -> Result<String> {
-    use std::time::{Instant};
-    let instant = Instant::now();
+    // use std::time::{Instant};
+    // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
         let speech = crate::speech::speak_mathml(mathml);
-        info!("Time taken: {}ms", instant.elapsed().as_millis());
+        // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( speech );
     });
 }
@@ -120,13 +120,13 @@ pub fn GetSpokenText() -> Result<String> {
 /// Get the spoken text of the MathML that was set.
 /// The speech takes into account any AT or user preferences.
 pub fn GetOverviewText() -> Result<String> {
-    use std::time::{Instant};
-    let instant = Instant::now();
+    // use std::time::{Instant};
+    // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
         let speech = crate::speech::overview_mathml(mathml);
-        info!("Time taken: {}ms", instant.elapsed().as_millis());
+        // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( speech );
     });
 }
@@ -147,6 +147,20 @@ pub fn SetPreference(name: String, value: StringOrFloat) -> Result<()> {
         //let value_as_py_float = value.downcast::<PyFloat>();
 
         match name.to_lowercase().as_str() {
+            "speechstyle" => {
+                let files_changed = pref_manager.set_user_prefs("SpeechStyle", to_string(&name, value)?.as_str());
+                rules.invalidate(files_changed);
+            },
+            "verbosity" => {
+                let value = match to_string(&name, value)?.to_lowercase().as_str() {
+                    "terse" => "Terse".to_string(),
+                    "medium" => "Medium".to_string(),
+                    "verbose" => "Verbose".to_string(),
+                    _ => pref_manager.get_user_prefs().to_string("Verbosity"),
+                    };
+
+                pref_manager.set_user_prefs("Verbosity", value.as_str());
+            },
             "speechtags" | "tts" => {
                 return set_speech_tags(pref_manager, to_string(&name, value)?);
             },
@@ -157,7 +171,8 @@ pub fn SetPreference(name: String, value: StringOrFloat) -> Result<()> {
                       (value_as_string.len() == 5 && value_as_string.as_bytes()[2] == b'-') ) {
                         bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value_as_string);
                       }
-                pref_manager.set_api_string_pref("Language".to_string(), value_as_string);    
+                let files_changed = pref_manager.set_user_prefs("Language", value_as_string.as_str());  
+                rules.invalidate(files_changed);  
             },
             "pitch" => {
                 pref_manager.set_api_float_pref("Pitch".to_string(), to_float(&name, value)?);    
@@ -208,13 +223,13 @@ fn set_speech_tags(pref_manager: &mut PreferenceManager, speech_tags: String ) -
 /// Get the braille associated with the MathML that was set by [`SetMathML`].
 /// The braille returned depends upon the preference for braille output.
 pub fn GetBraille() -> Result<String> {
-    use std::time::{Instant};
-    let instant = Instant::now();
+    // use std::time::{Instant};
+    // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
         let braille = crate::speech::braille_mathml(mathml);
-        info!("Time taken: {}ms", instant.elapsed().as_millis());
+        // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( braille );
     });
 }
@@ -257,7 +272,11 @@ pub fn GetNavigationMathMLId() -> Result<(String, usize)> {
 
 fn add_ids<'a>(mathml: Element<'a>) -> Element<'a> {
     use std::time::SystemTime;
-    let time = SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis().to_string();
+    let time = if cfg!(target_family = "wasm") {
+        rand::random::<usize>().to_string()
+    } else {
+        SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis().to_string()
+    };
     let time_part = time[time.len()-2..].to_string();
     let random_part = radix_fmt::radix(rand::random::<usize>(), 36).to_string();
     let prefix = time_part + &random_part + "-";
@@ -284,7 +303,6 @@ fn add_ids<'a>(mathml: Element<'a>) -> Element<'a> {
     }
 }
 
-/// Not really meant to be public -- used by tests in some packages
 pub fn get_element<'a>(package: &'a Package) -> Element<'a> {
     let doc = package.as_document();
     let mut result = None;

@@ -58,7 +58,11 @@ pub struct NavigationState {
     command_stack: Vec<&'static str>,                 // all commands, so we can undo them
     place_markers: Vec<NavigationPosition>,
     where_am_i: NavigationPosition,             // current 'where am i' location
-    where_am_i_start_time: Instant,             // 'now' when starting to do a 'where am i'
+
+    #[cfg(target_family = "wasm")]
+    where_am_i_start_time: usize,           // FIX: for web
+    #[cfg(not(target_family = "wasm"))]
+    where_am_i_start_time: Instant,
     mode: &'static str,                         // one of "Character", "Simple", or "Enhanced"
     speak_overview: bool,                       // true => describe after move; false => (standard) speech rules
 }
@@ -70,12 +74,12 @@ impl fmt::Display for NavigationState {
         for (i, nav_state) in self.position_stack.iter().enumerate() {
             write!(f, "{}{}", if i==0 {""} else {", "}, nav_state)?;
         }
-        writeln!(f, "")?;
+        writeln!(f)?;
         write!(f, "  Command Stack: ")?;
         for (i, nav_state) in self.command_stack.iter().enumerate() {
             write!(f, "{}{}", if i==0 {""} else {", "}, *nav_state)?;
         }
-        writeln!(f, "")?;
+        writeln!(f)?;
         writeln!(f, "  where_am_i: {}, start_time: {:?}", self.where_am_i, self.where_am_i_start_time)?;
         writeln!(f, "  mode: {}, speak_overview: {}", self.mode, self.speak_overview)?;
         writeln!(f, "}}")?;
@@ -90,6 +94,10 @@ impl NavigationState {
             command_stack: Vec::with_capacity(1024),
             place_markers: Vec::with_capacity(MAX_PLACE_MARKERS),
             where_am_i: NavigationPosition::default(),
+            // FIX: figure this out for the web
+            #[cfg(target_family = "wasm")]
+            where_am_i_start_time: 0,           // FIX: for web
+            #[cfg(not(target_family = "wasm"))]
             where_am_i_start_time: Instant::now(),      // need to give it some value, and "default()" isn't an option
             mode: "enhanced",                           // FIX: should be 'if $RestartMode then $StartMode else stored previous mode		
             speak_overview: false,                      // FIX should be $Overview
@@ -569,7 +577,7 @@ fn navigation_command_string(command: NavigationCommand, param: NavigationParam)
                     if param < NavigationParam::Placemarker0 || param > NavigationParam::Placemarker9 {
                         panic!("Internal Error: Found illegal value for param of NavigationCommand::Move");
                     }
-                    static MOVE_TO: &[&'static str] = &["MoveTo0","MoveTo1","MoveTo2","MoveTo3","MoveTo4","MoveTo5","MoveTo6","MoveTo7","MoveTo8","MoveTo9"];
+                    static MOVE_TO: &[&str] = &["MoveTo0","MoveTo1","MoveTo2","MoveTo3","MoveTo4","MoveTo5","MoveTo6","MoveTo7","MoveTo8","MoveTo9"];
                     return MOVE_TO[(param as usize) - (NavigationParam::Placemarker0 as usize)];
                 }
             }
@@ -600,7 +608,7 @@ fn navigation_command_string(command: NavigationCommand, param: NavigationParam)
                     if param < NavigationParam::Placemarker0 || param > NavigationParam::Placemarker9 {
                         panic!("Internal Error: Found illegal value for param of NavigationCommand::Move");
                     }
-                    static READ_PLACE_MARKERS: &[&'static str] = &["Read0","Read1","Read2","Read3","Read4","Read5","Read6","Read7","Read8","Read9"];
+                    static READ_PLACE_MARKERS: &[&str] = &["Read0","Read1","Read2","Read3","Read4","Read5","Read6","Read7","Read8","Read9"];
                     return READ_PLACE_MARKERS[(param as usize) - (NavigationParam::Placemarker0 as usize)];
                 },
             }
@@ -614,7 +622,7 @@ fn navigation_command_string(command: NavigationCommand, param: NavigationParam)
                     if param < NavigationParam::Placemarker0 || param > NavigationParam::Placemarker9 {
                         panic!("Internal Error: Found illegal value for param of NavigationCommand::Describe");
                     }
-                    static DESCRIBE_PLACE_MARKERS: &[&'static str] = &["Describe0","Describe1","Describe2","Describe3","Describe4","Describe5","Describe6","Describe7","Describe8","Describe9"];
+                    static DESCRIBE_PLACE_MARKERS: &[&str] = &["Describe0","Describe1","Describe2","Describe3","Describe4","Describe5","Describe6","Describe7","Describe8","Describe9"];
                     return DESCRIBE_PLACE_MARKERS[(param as usize) - (NavigationParam::Placemarker0 as usize)];
                 }
             }
@@ -644,7 +652,7 @@ fn navigation_command_string(command: NavigationCommand, param: NavigationParam)
             if param < NavigationParam::Placemarker0 || param > NavigationParam::Placemarker9 {
                 panic!("Internal Error: Found illegal value for param of NavigationCommand::SetPlacemarker");
             }
-            static SET_PLACE_MARKER: &[&'static str] = &["SetPlacemarker0","SetPlacemarker1","SetPlacemarker2","SetPlacemarker3","SetPlacemarker4","SetPlacemarker5","SetPlacemarker6","SetPlacemarker7","SetPlacemarker8","SetPlacemarker9"];
+            static SET_PLACE_MARKER: &[&str] = &["SetPlacemarker0","SetPlacemarker1","SetPlacemarker2","SetPlacemarker3","SetPlacemarker4","SetPlacemarker5","SetPlacemarker6","SetPlacemarker7","SetPlacemarker8","SetPlacemarker9"];
             return SET_PLACE_MARKER[(param as usize) - (NavigationParam::Placemarker0 as usize)];
         },
         NavigationCommand::Exit => {

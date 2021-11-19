@@ -27,13 +27,13 @@ use std::time::{SystemTime};
 use std::env;
 use crate::speech::{as_str_checked, print_errors, RulesFor};
 use std::collections::HashMap;
-
+use crate::shim_filesystem::*;
 
 // Preferences are recorded here
 /// Preferences are stored in a HashMap. It maps the name of the pref (a String) to its value (stored as YAML string/float)
 pub type PreferenceHashMap = HashMap<String, Yaml>;
 #[derive(Debug, Clone)]
-struct Preferences {
+pub struct Preferences {
     prefs: PreferenceHashMap        // FIX: pub so can get at iterator, should add iterator to Preferences instead
 }
 
@@ -92,7 +92,7 @@ impl Preferences{
         system_prefs_file.push("prefs.yaml");
 
         let mut result: [Option<PathBuf>; 3] = [None, None, None];
-        if system_prefs_file.is_file() {
+        if is_file_shim(&system_prefs_file) {
             result[0] = Some( system_prefs_file );
         } else {
             error!("Couldn't open file {}.\nUsing fallback defaults which may be inappropriate.",
@@ -102,19 +102,18 @@ impl Preferences{
         let user_dir = dirs::config_dir();
         if let Some(mut user_prefs_file) = user_dir {
             user_prefs_file.push("prefs.yaml");
-            if user_prefs_file.is_file() {
+            if is_file_shim(&user_prefs_file) {
                 result[1] = Some( user_prefs_file );
             }            
         }
 
         return FileAndTime {
-            time: Some( SystemTime::now() ),
+            time: if cfg!(target_family = "wasm") {None} else {Some( SystemTime::now() )},
             files: result
         }
     }
 
     fn read_file(file: &Option<PathBuf>, base_prefs: Preferences) -> Preferences {
-        use std::fs;
         let unwrapped_file = match file {
             None => return base_prefs,
             Some(f) => f,
@@ -122,7 +121,7 @@ impl Preferences{
 
         let file_name = unwrapped_file.to_str().unwrap();
         let docs;
-        match fs::read_to_string(unwrapped_file) {
+        match read_to_string_shim(unwrapped_file) {
             Err(e) => {
                 eprint!("Couldn't read file {}\n{}", file_name, e);
                 return base_prefs;
@@ -200,7 +199,7 @@ impl Preferences{
     }
 
     /// returns value associated with 'name' or ""
-    fn to_string(&self, name: &str) -> String {
+    pub fn to_string(&self, name: &str) -> String {
         let value = self.prefs.get(name);
         return match value {
             None => "".to_string(),
@@ -325,6 +324,7 @@ impl PreferenceManager {
         // the prefs files are in the rules dir and the user dir; differs from other files
         let rules_dir = PreferenceManager::get_rules_dir();
         let (user_prefs, pref_files) = Preferences::from_file(&rules_dir);
+        debug!("In PreferenceManager::new");
 
        return PreferenceManager::get_all_files(&rules_dir, user_prefs, pref_files);
     }
@@ -386,7 +386,7 @@ impl PreferenceManager {
     fn get_file_and_time(rules_dir: &PathBuf, lang: &str, default_lang: Option<&str>, file_name: &str) -> FileAndTime {
         let files = PreferenceManager::get_files(rules_dir, lang, default_lang, file_name);
         return FileAndTime {
-            time: Some( SystemTime::now() ),
+            time: if cfg!(target_family = "wasm") {None} else {Some( SystemTime::now() )},
             files
         }
     }
@@ -426,7 +426,7 @@ impl PreferenceManager {
         let mut i = 3;
         for os_path in lang_dir.unwrap().ancestors() {
             let path = PathBuf::from(os_path).join(file_name);
-            if path.is_file() {
+            if is_file_shim(&path) {
                 i -= 1;
                 result[i] =  Some(path);
             };
@@ -465,7 +465,7 @@ impl PreferenceManager {
         let lang_parts = lang.split('-');
         for part in lang_parts {
             full_path.push(Path::new(part));
-            if !full_path.is_dir() {
+            if !is_dir_shim(&full_path) {
                 break;
             }
         }
@@ -483,10 +483,10 @@ impl PreferenceManager {
             Ok(dir) => PathBuf::from(dir),
             Err(_) => match env::current_exe() {
                 Ok(dir) => dir,
-                Err(_) => PathBuf::from("./"),      // hopefully this only leaves the web
+                Err(_) => PathBuf::from(""),      // hopefully this only leaves the web
             }.join("Rules")
         };
-        if !rules_dir.is_dir() {
+        if !is_dir_shim(&rules_dir) {
             // FIX: handle errors
             cannot_go_on(&format!("Could not find rules dir in {} or lacking permissions to read the dir!",
                                         rules_dir.display()));
@@ -599,13 +599,11 @@ impl PreferenceManager {
         return self.user_prefs.to_string("Language");
     }
 
-    #[allow(dead_code)]     // used in testing
-    fn get_api_prefs(&self) -> &Preferences {
+    pub fn get_api_prefs(&self) -> &Preferences {
         return &self.api_prefs;
     }
 
-    #[allow(dead_code)]     // used in testing
-    fn get_user_prefs(&self) -> &Preferences {
+    pub fn get_user_prefs(&self) -> &Preferences {
         return &self.user_prefs;
     }
 
@@ -617,6 +615,7 @@ impl PreferenceManager {
     #[allow(dead_code)]
     /// Used in testing, sets the user preference `name` to `value`
     pub fn set_user_prefs(&mut self, name: &str, value: &str) -> FilesChanged {
+        debug!("In set_user_prefs");
         self.user_prefs.set_string_value(name, value);
         if name == "Language" || name == "SpeechStyle" {
             let rules_dir = PreferenceManager::get_rules_dir();

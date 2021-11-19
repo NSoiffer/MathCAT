@@ -24,6 +24,7 @@ use std::path::Path;
 use regex::{Regex, Captures};
 use phf::phf_map;
 use std::rc::Rc;
+use crate::shim_filesystem::read_to_string_shim;
 
 
 /// The main external call, `speak_mathml` returns a string for the speech associated with the `mathml`.
@@ -356,7 +357,8 @@ fn process_include<F>(current_file: &Path, new_file_name: &str, mut read_new_fil
     }
     let mut new_file = parent_path.unwrap().to_path_buf();
     new_file.push(new_file_name);
-    let new_file = match new_file.as_path().canonicalize() {
+    debug!("Process include: {}", new_file_name);
+    let new_file = match crate::shim_filesystem::canonicalize_shim(new_file.as_path()) {
         Ok(buf) => buf,
         Err(msg) => bail!("-include: constructed file name '{}' causes error '{}'",
                                  new_file.to_str().unwrap(), msg),
@@ -1614,21 +1616,9 @@ impl UnicodeDef {
 ///
 /// Useful functionality that had to had a home in some crate, so it is here.
 pub fn print_errors(e:&Error) {
-    use std::io::Write;
-    let stderr = &mut ::std::io::stderr();
-    let error_message = "Error writing to stderr";
-
-    writeln!(stderr, "\nError: {}", e).expect(error_message);
-
     for e in e.iter().skip(1) {
-        writeln!(stderr, "caused by: {}", e).expect(error_message);
+        error!("caused by: {}", e);
     }
-
-    // The backtrace is not always generated. Try to run this example
-    // with `RUST_BACKTRACE=1`.
-    // if let Some(backtrace) = e.backtrace() {
-    //     writeln!(stderr, "backtrace: {:?}", backtrace).expect(error_message);
-    // }
 }
 
 
@@ -1777,9 +1767,8 @@ impl SpeechRules {
     }
 
     fn read_patterns(&mut self, path: &Locations) {
-        use std::fs;
         if let Some(p) = &path[0] {
-            let rule_file_contents = fs::read_to_string(p).expect("cannot read file");
+            let rule_file_contents = read_to_string_shim(p).expect("cannot read file");
             let rules_build_fn = |pattern: &Yaml| {
                 if let Err(e) = self.build_speech_patterns(pattern, p) {
                     print_errors(&e.chain_err(||format!("in file {:?}", p.to_str().unwrap())));
@@ -1819,8 +1808,7 @@ impl SpeechRules {
     fn read_unicode(&mut self, path: &Locations) {
         // FIX: should read first (lang), then supplement with second (region)
         if let Some(p) = &path[0] {
-            use std::fs;    
-            let unicode_file_contents = fs::read_to_string(p).expect("cannot read file");
+            let unicode_file_contents = read_to_string_shim(p).expect("cannot read file");
             let unicode_build_fn = |unicode_def_list: &Yaml| {
                 let unicode_defs = unicode_def_list.as_vec();
                 if unicode_defs == None {
