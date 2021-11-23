@@ -89,7 +89,7 @@ pub fn SetMathML(mathml_str: String) -> Result<String> {
     return MATHML_INSTANCE.with(|old_package| {
         let new_package = parser::parse(&mathml_str);    
         if new_package.is_err() {
-            bail!("MathML input was not valid");
+            bail!("Invalid MathML input:\n{}", &mathml_str);
         }
 
         // this forces initialization of things beyond just the speech rules (e.g, the defs.yaml files get read)
@@ -183,7 +183,16 @@ pub fn SetPreference(name: String, value: StringOrFloat) -> Result<()> {
             "volume" => {
                 pref_manager.set_api_float_pref("Volume".to_string(), to_float(&name, value)?);    
             },
-            _ => {
+            "gender" => {
+                pref_manager.set_api_string_pref("Gender".to_string(), to_string(&name, value)?);    
+            },
+            "voice" => {
+                pref_manager.set_api_string_pref("Voice".to_string(), to_string(&name, value)?);    
+            },
+            "bookmark" => {
+                pref_manager.set_api_boolean_pref("Bookmark".to_string(), to_string(&name, value)?.to_lowercase()=="true");    
+            },
+                _ => {
 
             }
         }
@@ -273,20 +282,20 @@ pub fn GetNavigationMathMLId() -> Result<(String, usize)> {
 fn add_ids<'a>(mathml: Element<'a>) -> Element<'a> {
     use std::time::SystemTime;
     let time = if cfg!(target_family = "wasm") {
-        rand::random::<usize>().to_string()
+        rand::random::<usize>()
     } else {
-        SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis().to_string()
+        SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_millis() as usize
     };
-    let time_part = time[time.len()-2..].to_string();
+    let time_part = radix_fmt::radix(time, 36).to_string();
     let random_part = radix_fmt::radix(rand::random::<usize>(), 36).to_string();
-    let prefix = time_part + &random_part + "-";
+    let prefix = "M".to_string() + &time_part[time_part.len()-3..] + &random_part[random_part.len()-4..] + "-"; // begin with letter
     add_ids_to_all(mathml, &prefix, 0);
     return mathml;
 
     fn add_ids_to_all<'a>(mathml: Element<'a>, id_prefix: &str, count: usize) -> usize {
         let mut count = count;
         if mathml.attribute("id").is_none() {
-            mathml.set_attribute_value("id", &count.to_string());
+            mathml.set_attribute_value("id", (id_prefix.to_string() + &count.to_string()).as_str());
             mathml.set_attribute_value("data-id-added", "true");
             count += 1;
         };
@@ -297,7 +306,7 @@ fn add_ids<'a>(mathml: Element<'a>) -> Element<'a> {
         
         for child in mathml.children() {
             let child = crate::canonicalize::as_element(child);
-            count = add_ids_to_all(child, id_prefix, count+1);
+            count = add_ids_to_all(child, id_prefix, count);
         }
         return count;
     }

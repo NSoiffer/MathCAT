@@ -86,6 +86,7 @@ pub enum TTSCommand {
     Gender,
     Voice,
     Spell,
+    Bookmark,
 }
 
 /// TTSCommands are either numbers (f64 because of YAML) or strings
@@ -182,18 +183,20 @@ impl TTS {
         let tts_value = yaml_to_string(&tts_value, 0);
         let tts_value = tts_value.trim(); // if not a number or string, value is bogus
         let tts_enum = match tts_command {
-            "pause"  => TTSCommand::Pause,
-            "rate"   => TTSCommand::Rate,
-            "volume" => TTSCommand::Volume,
-            "pitch"  => TTSCommand::Pitch,
-            "gender" => TTSCommand::Gender,
-            "voice"  => TTSCommand::Voice,
-            "spell"  => TTSCommand::Spell,
-            _        => panic!("Internal error in build_tts: unexpected rule ({:?}) encountered", tts_command)    
+            "pause"    => TTSCommand::Pause,
+            "rate"     => TTSCommand::Rate,
+            "volume"   => TTSCommand::Volume,
+            "pitch"    => TTSCommand::Pitch,
+            "gender"   => TTSCommand::Gender,
+            "voice"    => TTSCommand::Voice,
+            "spell"    => TTSCommand::Spell,
+            "bookmark" => TTSCommand::Bookmark,
+            _          => panic!("Internal error in build_tts: unexpected rule ({:?}) encountered", tts_command)    
         };
     
         let tts_command_value;
-        if !(tts_enum == TTSCommand::Gender || tts_enum == TTSCommand::Voice || tts_enum == TTSCommand::Spell) {
+        if !(tts_enum == TTSCommand::Gender || tts_enum == TTSCommand::Voice ||
+             tts_enum == TTSCommand::Spell || tts_enum == TTSCommand::Bookmark) {
             let val = match tts_value {
                 "short" => Ok( PAUSE_SHORT ),
                 "medium" => Ok( PAUSE_MEDIUM ),
@@ -224,11 +227,18 @@ impl TTS {
     pub fn replace<'c, 's:'c, 'r>(&self, command: &TTSCommandRule, prefs: &PreferenceManager, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
         // The general idea is we handle the begin tag, the contents, and then the end tag
         // For the begin/end tag, we dispatch off to specialized code for each TTS engine
+        let mut command = command.clone();
+        if command.command == TTSCommand::Bookmark && command.value.get_string() == "auto" {
+            match mathml.attribute_value("id") {
+                None => return Ok("".to_string()),
+                Some(id_val) => command.value = TTSCommandValue::String(id_val.to_string()),
+            };
+        }
         let mut result = String::with_capacity(255);
         result += &match self {
-            TTS::None  => self.get_string_none(command, prefs, true),
-            TTS::SAPI5 => self.get_string_sapi5(command, prefs, true),
-            TTS::SSML  => self.get_string_ssml(command, prefs, true),
+            TTS::None  => self.get_string_none(&command, prefs, true),
+            TTS::SAPI5 => self.get_string_sapi5(&command, prefs, true),
+            TTS::SSML  => self.get_string_ssml(&command, prefs, true),
         };
 
 
@@ -240,15 +250,15 @@ impl TTS {
         }
 
         let end_tag = match self {
-            TTS::None  => self.get_string_none(command, prefs, false),
-            TTS::SAPI5 => self.get_string_sapi5(command, prefs, false),
-            TTS::SSML  => self.get_string_ssml(command, prefs, false),
+            TTS::None  => self.get_string_none(&command, prefs, false),
+            TTS::SAPI5 => self.get_string_sapi5(&command, prefs, false),
+            TTS::SSML  => self.get_string_ssml(&command, prefs, false),
         };
 
-        if !end_tag.is_empty() {
-            return Ok( result + " " + &end_tag );
-        } else {
+        if end_tag.is_empty() {
             return Ok( result ); // avoids adding in " "
+        } else {
+            return Ok( result + &end_tag );
         }
     }
 
@@ -295,7 +305,7 @@ impl TTS {
                 if amount == PAUSE_AUTO {
                     PAUSE_AUTO_STR.to_string()
                 } else {
-                    format!("<silence msec=='{}ms'>", amount * 180.0/prefs.get_rate())
+                    format!("<silence msec=='{}ms'/>", amount * 180.0/prefs.get_rate())
                 }
             } else {
                 "".to_string()
@@ -306,6 +316,7 @@ impl TTS {
             TTSCommand::Gender =>if is_start_tag {format!("<prosody gender='XXX{}%'>", command.value.get_string())} else {String::from("</prosody>")},
             TTSCommand::Voice =>if is_start_tag {format!("<prosody voice='XXX{}%'>", command.value.get_string())} else {String::from("</prosody>")},
             TTSCommand::Spell =>if is_start_tag {format!("<spell>{}", command.value.get_string())} else {String::from("</spell>")},
+            TTSCommand::Bookmark =>if is_start_tag {format!("<bookmark mark='{}'/>", command.value.get_string())} else {"".to_string()},
         };
     }
 
@@ -316,7 +327,7 @@ impl TTS {
                 if amount == PAUSE_AUTO {
                     PAUSE_AUTO_STR.to_string()
                 } else {
-                    format!("<break time='{}ms'>", amount * 180.0/prefs.get_rate())
+                    format!("<break time='{}ms'/>", amount * 180.0/prefs.get_rate())
                 }
             } else {
                 "".to_string()
@@ -327,6 +338,7 @@ impl TTS {
             TTSCommand::Gender =>if is_start_tag {format!("<voice required='gender=\"{}\"'>", command.value.get_string())} else {String::from("</voice>")},
             TTSCommand::Voice =>if is_start_tag {format!("<voice required='{}'>", command.value.get_string())} else {String::from("</voice>")},
             TTSCommand::Spell =>if is_start_tag {format!("<say-as interpret-as='characters'>{}", command.value.get_string())} else {String::from("</say-as>")},
+            TTSCommand::Bookmark =>if is_start_tag {format!("<mark name='{}'/>", command.value.get_string())} else {"".to_string()},
         }
     }
 
@@ -361,7 +373,6 @@ impl TTS {
             return "".to_string(); 
         }
         let pause = std::cmp::min(3000, ((2 * before_len + after_len)/48) * 128);
-        // debug!("auto pause={}: {}/{}, [{}/{}]", pause, before_len, after_len, before, after);
         if pause <= 50 {
             // don't put out a lot of short pauses which probably can't be heard
             return "".to_string();
@@ -409,7 +420,8 @@ impl TTS {
         return merges_string;
     }
 
-    fn merge_pauses_xml(str: &str, full_attr_re: &Regex, sub_attr_re: &Regex) -> String {
+    fn merge_pauses_xml<F>(str: &str, full_attr_re: &Regex, sub_attr_re: &Regex, replace_with: F) -> String 
+            where F: Fn(usize) -> String {
         // we reduce all sequences of two or more pauses to the max pause amount
         // other options would be the sum or an average
         // maybe some amount a little longer than the max would be best???
@@ -419,24 +431,26 @@ impl TTS {
             for c in sub_attr_re.captures_iter(&cap[0]) {
                 amount = std::cmp::max(amount, c[1].parse::<usize>().unwrap());
             };
-            merges_string = merges_string.replace(&cap[0], &format!("<break time='{}ms'> ", amount));
+            merges_string = merges_string.replace(&cap[0], &replace_with(amount));
         }
         return merges_string;
     }
 
     fn merge_pauses_sapi5(&self, str: &str) -> String {
         lazy_static! {
-            static ref CONSECUTIVE_BREAKS: Regex = Regex::new(r"(<silence msec.*?> *){2,}").unwrap();   // two or more pauses
+            static ref CONSECUTIVE_BREAKS: Regex = Regex::new(r"(<silence msec[^>]+?> *){2,}").unwrap();   // two or more pauses
             static ref PAUSE_AMOUNT: Regex = Regex::new(r"msec=.*?(\d+)").unwrap();   // amount after 'time'
         }
-        return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT);
+        let replacement = |amount: usize| format!("<silence msec=='{}ms'/>", amount);
+        return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement);
     }
 
     fn merge_pauses_ssml(&self, str: &str) -> String {
         lazy_static! {
-            static ref CONSECUTIVE_BREAKS: Regex = Regex::new(r"(<break time=.*?> *){2,}").unwrap();   // two or more pauses
+            static ref CONSECUTIVE_BREAKS: Regex = Regex::new(r"(<break time=[^>]+?> *){2,}").unwrap();   // two or more pauses
             static ref PAUSE_AMOUNT: Regex = Regex::new(r"time=.*?(\d+)").unwrap();   // amount after 'time'
         }
-        return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT);
+        let replacement = |amount: usize| format!("<break time='{}ms'/>", amount);
+        return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement);
     }
 }

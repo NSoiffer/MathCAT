@@ -38,6 +38,7 @@ struct Cli {
 // Maybe also have this speak to test the TTS generation.
 // There is a rust winapi crate that mirrors the WinPAI and has "Speak(...)" in it
 fn main() {
+  use libmathcat::interface::*;
   use log::*;
   use std::time::{Instant};
   env_logger::builder()
@@ -90,15 +91,31 @@ fn main() {
   //                 <mspace width=\"thinmathspace\"></mspace><mn>234</mn></math>";
   // let expr = "<math><mn>𝟏𝟐𝟑</mn></math>";
   // let expr = "<math><mo>(</mo><mrow><mn>451</mn><mo>,</mo><mn>231</mn></mrow><mo>)</mo></math>";
-  let expr = "<math><mo>{</mo><mi>x</mi><mo>|</mo><mo>|</mo><mi>x</mi><mo>|</mo><mo>&lt;</mo><mn>10</mn><mo>}</mo></math>";
+  let expr = "<math display='block' id='M8frgf4y-0' data-id-added='true'>
+  <mrow data-changed='added' id='M8frgf4y-1' data-id-added='true'>
+    <mi id='M8frgf4y-2' data-id-added='true'>x</mi>
+    <mo id='M8frgf4y-3' data-id-added='true'>=</mo>
+    <mfrac data-mjx-texclass='ORD' id='M8frgf4y-4' data-id-added='true'>
+      <mi id='M8frgf4y-5' data-id-added='true'>t</mi>
+      <mrow id='M8frgf4y-6' data-id-added='true'>
+        <mn id='M8frgf4y-7' data-id-added='true'>2</mn>
+        <mo data-changed='added' id='M8frgf4y-8' data-id-added='true'>&#x2062;</mo>
+        <mi id='M8frgf4y-9' data-id-added='true'>a</mi>
+      </mrow>
+    </mfrac>
+  </mrow>
+ </math>";
   let instant = Instant::now();
-  libmathcat::interface::SetMathML(expr.to_string()).unwrap();
-  let speech_string = libmathcat::interface::GetOverviewText().unwrap();
+  SetMathML(expr.to_string()).unwrap();
+  SetPreference("TTS".to_string(), StringOrFloat::AsString("SSML".to_string())).unwrap();
+  SetPreference("Bookmark".to_string(), StringOrFloat::AsString("true".to_string())).unwrap();
+
+  let speech_string = GetSpokenText().unwrap();
   info!("Computed speech string:\n   '{}'", speech_string);
-  let braille_string = libmathcat::interface::GetBraille().unwrap();
-  info!("Computed braille string:\n   '{}'", braille_string);
+  // let braille_string = GetBraille().unwrap();
+  // info!("Computed braille string:\n   '{}'", braille_string);
   info!("Time taken: {}ms", instant.elapsed().as_millis());
   // let instant = Instant::now();
-  // let _speech_string = libmathcat::interface::speak_mathml(expr);
+  // let _speech_string = speak_mathml(expr);
   // info!("Time taken (second time): {}ms", instant.elapsed().as_millis());
 }

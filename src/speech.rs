@@ -52,6 +52,7 @@ fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, math
             mut_rules.update();    
         }
         let rules = rules.borrow();
+        // debug!("speak_rules:\n{}", mml_to_string(&mathml));
         let mut rules_with_context = SpeechRulesWithContext::new(&rules);
         match rules_with_context.match_pattern(&mathml) {
             Ok(speech_string) => {
@@ -434,7 +435,7 @@ impl Replacement {
                 return Ok( Replacement::XPath( MyXPath::build(value)
                     .chain_err(|| "while trying to evaluate value of 'x:'")? ) );
             },
-            "pause" | "rate" | "pitch" | "volume" | "gender" | "voice" | "spell" => {
+            "pause" | "rate" | "pitch" | "volume" | "gender" | "voice" | "spell" | "bookmark" => {
                 return Ok( Replacement::TTS( TTS::build(key, value)? ) );
             },
             "test" => {

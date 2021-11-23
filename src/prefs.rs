@@ -73,6 +73,7 @@ impl Preferences{
         prefs.insert("Volume".to_string(), Yaml::Real("100.0".to_string()));
         prefs.insert("Voice".to_string(), Yaml::String("none".to_string()));
         prefs.insert("Gender".to_string(), Yaml::String("none".to_string()));
+        prefs.insert("Bookmark".to_string(), Yaml::Boolean(false));
         return Preferences{ prefs };
     }
 
@@ -581,6 +582,10 @@ impl PreferenceManager {
     /// All number-valued preferences are stored with type `f64`.
     pub fn set_api_float_pref(&mut self, key: String, value: f64) {
         self.api_prefs.prefs.insert(key, Yaml::Real(value.to_string()));
+    }
+
+    pub fn set_api_boolean_pref(&mut self, key: String, value: bool) {
+        self.api_prefs.prefs.insert(key, Yaml::Boolean(value));
     }
 
     /// Return the current speech rate.
