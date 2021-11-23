@@ -21,11 +21,12 @@ pub fn mml_to_string(e: &Element) -> String {
 /// Pretty-print the MathML represented by `element`.
 /// * `indent` -- the amount of indentation to start with
 pub fn format_element(e: &Element, indent: usize) -> String {
-    let ns = e.name().namespace_uri();
-    let namespace = match ns {
-        None => "",
-        _ => "m:",
-    };
+    // let ns = e.name().namespace_uri();
+    // let namespace = match ns {
+    //     None => "",
+    //     _ => "m:",
+    // };
+    let namespace = "";
     let mut answer = format!("{:in$}<{ns}{name}{attrs}>", " ", in=2*indent, ns=namespace, name=e.name().local_part(), attrs=format_attrs(&e.attributes()));
     let children = e.children();
     let has_element = children.iter().find(|&&c| matches!(c, ChildOfElement::Element(_x)));
