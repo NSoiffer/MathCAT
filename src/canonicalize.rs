@@ -353,7 +353,7 @@ impl CanonicalizeContext {
 		let converted_mathml = self.canonicalize_mrows(converted_mathml);
 		match converted_mathml {
 			Ok(e) => {
-				debug!("\nMathML after canonicalize:\n{}", mml_to_string(&e));
+				// debug!("\nMathML after canonicalize:\n{}", mml_to_string(&e));
 				return e;
 			},
 			Err(e)  => {
