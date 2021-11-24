@@ -18,7 +18,9 @@
    name: default
    tag: [mi, mn, mo, mtext]
    match: "."
-   replace: [x: text()]
+   replace:
+    - bookmark: "@id"
+    - x: text()
 -
    name: default
    tag: ms

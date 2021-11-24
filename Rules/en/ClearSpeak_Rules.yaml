@@ -13,10 +13,12 @@
          then: {t: the}
     - test: 
          if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
-         then_test: 
-            if: parent::*[self::m:mrow and count(*)=2 and *[1][self::m:mo][text()='-']]
-            then: {t: negative}
-            else: {t: positive}
+         then:
+          - bookmark: "*[1]/@id"
+          - test:
+               if: parent::*[self::m:mrow and count(*)=2 and *[1][self::m:mo][text()='-']]
+               then: {t: negative}
+               else: {t: positive}
     - t: square root
     - test: 
          if: "$Verbosity!='Terse'"
@@ -43,10 +45,12 @@
          then: {t: the}
       - test: 
          if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
-         then_test: 
-            if: parent::*[self::m:mrow and count(*)=2 and *[1][self::m:mo][text()='-']]
-            then: {t: negative}
-            else: {t: positive}
+         then:
+          - bookmark: "*[1]/@id"
+          - test:
+               if: parent::*[self::m:mrow and count(*)=2 and *[1][self::m:mo][text()='-']]
+               then: {t: negative}
+               else: {t: positive}
       - test:
          if: "*[2][self::m:mn]"
          then_test:
@@ -89,10 +93,12 @@
             - "*[2][self::m:msqrt or self::m:mroot] and"
             - "($ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd')"
          then: {t: ""}
-         else_test:
-            if: "*[1][text()='-']"
-            then: {t: negative}
-            else: {t: positive}
+         else:
+            - bookmark: "*[1]/@id"
+            - test:
+                  if: "*[1][text()='-']"
+                  then: {t: negative}
+                  else: {t: positive}
       - x: "*[2]"
                
 # Fraction rules
@@ -173,11 +179,11 @@
    replace:
       - test:
          if: $ClearSpeak_Trig = 'TrigInverse'
-         then: [x: "*[1]", t: inverse]
+         then: [x: "*[1]", bookmark: "*[2]/@id", t: inverse]
          else_test:
             if: $ClearSpeak_Trig = 'ArcTrig'
-            then: [t: arc, x: "*[1]"]
-            else: [t: inverse, x: "*[1]"]       # default/Auto
+            then: [bookmark: "*[2]/@id", t: arc, x: "*[1]"]
+            else: [bookmark: "*[2]/@id", t: inverse, x: "*[1]"]       # default/Auto
 
 -
    name: simple-integer

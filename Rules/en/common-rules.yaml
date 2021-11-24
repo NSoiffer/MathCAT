@@ -3,47 +3,65 @@
    name: complex-nums
    tag: mi
    match: "text()='ℂ'"
-   replace: [t: the complex numbers]
+   replace:
+      - bookmark: "@id"
+      - t: the complex numbers
 -
    name: natural-nums
    tag: mi
    match: "text()='ℕ'"
-   replace: [t: the natural numbers]
+   replace:
+      - bookmark: "@id"
+      - t: the natural numbers
 -
    name: rational-nums
    tag: mi
    match: "text()='ℚ'"
-   replace: [t: the rational numbers]
+   replace:
+      - bookmark: "@id"
+      - t: the rational numbers
 -
    name: real-nums
    tag: mi
    match: "text()='ℝ'"
-   replace: [t: the real numbers]
+   replace:
+      - bookmark: "@id"
+      - t: the real numbers
 -
    name: integer-nums
    tag: mi
    match: "text()='ℤ'"
-   replace: [t: the integers]
+   replace:
+      - bookmark: "@id"
+      - t: the integers
 -
    name: natural-nums-sup-pos
    tag: msup
    match: "*[1][self::m:mi][text()='ℤ'] and *[2][self::m:mo][text()='+']"
-   replace: [t: the positive integers]
+   replace:
+      - bookmark: "@id"
+      - t: the positive integers
 -
    name: natural-nums-sup-neg
    tag: msup
    match: "*[1][self::m:mi][text()='ℤ'] and *[2][self::m:mo][text()='-']"
-   replace: [t: the negative integers]
+   replace:
+      - bookmark: "@id"
+      - t: the negative integers
 -
    name: rational-nums-sup-pos
    tag: msup
    match: "*[1][self::m:mi][text()='ℚ'] and *[2][self::m:mo][text()='+']"
-   replace: [t: the positive rational numbers]
+   replace:
+      - bookmark: "@id"
+      - t: the positive rational numbers
 -
    name: rational-nums-sup-neg
    tag: msup
    match: "*[1][self::m:mi][text()='ℚ'] and *[2][self::m:mo][text()='-']"
-   replace: [t: the negative rational numbers]
+   replace:
+      - bookmark: "@id"
+      - t: the negative rational numbers
 -
    name: complex-nums-sup
    tag: msup
@@ -115,6 +133,7 @@
    tag: mrow
    match: "count(*)=2 and *[1][self::m:mo][text()='-' or text()='+']"
    replace:
+      - bookmark: "*[1]/@id"
       - test:
          if: "*[1][text()='-']"
          then: {t: negative}
@@ -134,6 +153,7 @@
     - "*[1][self::m:mi] and IsNode(*[1], 'trig_name') and"        # base is a trig function name (e.g, sin, sinh)
     - "following-sibling::*[1][self::m:mo][text()='\u2061']"      # and msup is followed by invisible function apply
    replace:
+      - bookmark: "*[2]/@id"
       - t: inverse
       - x: "*[1]"
 -
@@ -144,6 +164,7 @@
     - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
    replace:
     - x: "*[1]"
+    - bookmark: "*[2]/@id"
     - test: 
          if: "*[2][text()=2]"
          then: {t: squared}
@@ -157,6 +178,7 @@
     - test: 
          if: "$Verbosity!='Terse'"
          then: {t: the}
+    - bookmark: "*[2]/@id"     
     - test:
          if: "*[2][self::m:mn][not(contains(., '.'))]"
          then: [x: "ToOrdinal(*[2])"]
@@ -171,6 +193,7 @@
    match: "*[2][self::m:mn][text()='2']"
    replace: 
     - x: "*[1]"
+    - bookmark: "*[2]/@id"
     - t: squared
 -
    name: cubed
@@ -178,6 +201,7 @@
    match: "*[2][self::m:mn][text()='3']"
    replace: 
     - x: "*[1]"
+    - bookmark: "*[2]/@id"
     - t: cubed
 
 -
@@ -225,12 +249,15 @@
    name: sin
    tag: mi
    match: "text()='sin'"
-   replace: [t: "sine"]
+   replace:
+      - bookmark: "@id"
+      - t: "sine"
 -
    name: cos
    tag: mi
    match: "text()='cos'"
    replace:
+      - bookmark: "@id"
       - test: 
          if: "$Verbosity='Terse'"
          then: {t: cos}
@@ -240,6 +267,7 @@
    tag: mi
    match: "text()='tan'"
    replace:
+      - bookmark: "@id"
       - test: 
          if: "$Verbosity='Terse'"
          then: {t: tan}
@@ -249,6 +277,7 @@
    tag: mi
    match: "text()='sec'"
    replace:
+      - bookmark: "@id"
       - test: 
          if: "$Verbosity='Terse'"
          then: {t: seek}
@@ -258,6 +287,7 @@
    tag: mi
    match: "text()='csc'"
    replace:
+      - bookmark: "@id"
       - test: 
          if: "$Verbosity='Terse'"
          then: {t: co-seek}
@@ -267,6 +297,7 @@
    tag: mi
    match: "text()='cot'"
    replace:
+      - bookmark: "@id"
       - test: 
          if: "$Verbosity='Terse'"
          then: {t: co-tan}
@@ -277,6 +308,7 @@
    tag: mi
    match: "text()='sinh'"
    replace:
+      - bookmark: "@id"
       - test: 
          if: "$Verbosity='Terse'"
          then: {t: sinch}
@@ -286,6 +318,7 @@
    tag: mi
    match: "text()='cosh'"
    replace:
+      - bookmark: "@id"
       - test: 
          if: "$Verbosity='Terse'"
          then: {t: cosh}
@@ -295,6 +328,7 @@
    tag: mi
    match: "text()='tanh'"
    replace:
+      - bookmark: "@id"
       - test: 
          if: "$Verbosity='Terse'"
          then: {t: tanch}
@@ -304,6 +338,7 @@
    tag: mi
    match: "text()='sech'"
    replace:
+      - bookmark: "@id"
       - test: 
          if: "$Verbosity='Terse'"
          then: {t: sheck}
@@ -313,6 +348,7 @@
    tag: mi
    match: "text()='csch'"
    replace:
+      - bookmark: "@id"
       - test: 
          if: "$Verbosity='Terse'"
          then: {t: co-sheck}
@@ -322,6 +358,7 @@
    tag: mi
    match: "text()='coth'"
    replace:
+      - bookmark: "@id"
       - test: 
          if: "$Verbosity='Terse'"
          then: {t: co-tanch}
@@ -336,6 +373,7 @@
       - "*[1][self::m:mi][text()='log' or text()='ln'] and"
       - "*[2][self::m:mo][text()='\u2061']"
    replace:
+      - bookmark: "*[1]/@id"
       - test:
          if: "$log_is_simple"
          then_test:
@@ -345,17 +383,17 @@
               then: [spell: ln]
               else: [t: natural log]
          else:
-          - test: 
-             if: "$Verbosity!='Terse' and not(log_is_simple)"
-             then: {t: the}
-          - test:
-            - if: "*[1][text()='log']"
-              then: [t: log]
-            - else_if: "$Verbosity='Terse'"
-              then: [spell: ln]
-              else: [t: natural log]
-          - t: of
-          - pause: short
+            - test: 
+               if: "$Verbosity!='Terse' and not(log_is_simple)"
+               then: {t: the}
+            - test:
+               - if: "*[1][text()='log']"
+                 then: [t: log]
+               - else_if: "$Verbosity='Terse'"
+                 then: [spell: ln]
+                 else: [t: natural log]
+            - t: of
+            - pause: short
       - x: "*[3]"
 
 -
@@ -365,9 +403,10 @@
     - "*[1][self::m:mi][text()='log'] and"
     - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
    replace:
-    - test: 
+      - bookmark: "@id"
+      - test: 
          if: "$Verbosity!='Terse'"
          then: {t: the}
-    - t: log base
-    - x: "*[2]"
+      - t: log base
+      - x: "*[2]"
 
