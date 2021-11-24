@@ -765,7 +765,7 @@ impl<'r> ReplacementArray {
 // MyXPath is a wrapper around an 'XPath' that keeps around the original xpath expr (as a string) so it can be used in error reporting.
 // It supports the standard SpeechRule functionality of building and replacing.
 #[derive(Debug)]
-struct MyXPath {
+pub struct MyXPath {
     xpath: XPath,
     string: String,        // store for error reporting
 }
@@ -794,7 +794,7 @@ impl<'r> MyXPath {
         );
     }
 
-    fn build(xpath: &Yaml) -> Result<MyXPath> {
+    pub fn build(xpath: &Yaml) -> Result<MyXPath> {
         let xpath = match xpath {
             Yaml::String(s) => s.to_string(),
             Yaml::Integer(i) => i.to_string(),
@@ -933,7 +933,7 @@ impl<'r> MyXPath {
         )
     }
 
-    fn replace<'c, 's:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
+    pub fn replace<'c, 's:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
         let result = self.evaluate(&rules_with_context.context_stack.base, mathml)
                 .chain_err(||"replacing after pattern match" )?;
         return match result {

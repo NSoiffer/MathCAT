@@ -65,7 +65,7 @@ use sxd_document::dom::Element;
 use yaml_rust::Yaml;
 
 use std::{fmt};
-use crate::speech::{SpeechRulesWithContext};
+use crate::speech::{SpeechRulesWithContext, MyXPath};
 use strum_macros::IntoStaticStr;
 use regex::Regex;
 
@@ -93,7 +93,8 @@ pub enum TTSCommand {
 #[derive(Debug, Clone)]
 pub enum TTSCommandValue {
     Number(f64),
-    String(String)
+    String(String),
+    XPath(MyXPath),
 }
 
 impl TTSCommandValue {
@@ -107,7 +108,7 @@ impl TTSCommandValue {
     fn get_string(&self) -> &String {
         match self {
             TTSCommandValue::String(s) => return &s,
-            _                               => panic!("Internal error: TTSCommandValue is not a string"),
+            _                                  => panic!("Internal error: TTSCommandValue is not a string"),
         }
     }
 }
@@ -125,7 +126,8 @@ impl fmt::Display for TTSCommandRule {
         let command: &'static str = "rate";
         let value = match &self.value {
             TTSCommandValue::String(s) => s.to_string(),
-            TTSCommandValue::Number(f) => f.to_string()
+            TTSCommandValue::Number(f) => f.to_string(),
+            TTSCommandValue::XPath(p) => p.to_string(),
         };
         if self.command == TTSCommand::Pause {
             return write!(f, "pause: {{value: {}}}", value);
@@ -195,8 +197,11 @@ impl TTS {
         };
     
         let tts_command_value;
-        if !(tts_enum == TTSCommand::Gender || tts_enum == TTSCommand::Voice ||
-             tts_enum == TTSCommand::Spell || tts_enum == TTSCommand::Bookmark) {
+        if tts_enum == TTSCommand::Bookmark {
+            tts_command_value = TTSCommandValue::XPath(
+                MyXPath::build(values).chain_err(|| "while trying to evaluate value of 'bookmark:'")?
+            );
+        } else if !(tts_enum == TTSCommand::Gender || tts_enum == TTSCommand::Voice || tts_enum == TTSCommand::Spell) {
             let val = match tts_value {
                 "short" => Ok( PAUSE_SHORT ),
                 "medium" => Ok( PAUSE_MEDIUM ),
@@ -212,7 +217,6 @@ impl TTS {
             tts_command_value = TTSCommandValue::Number(val.unwrap());
         } else {
             tts_command_value = TTSCommandValue::String(tts_value.to_string());
-    
         }
         return Ok( Box::new( TTSCommandRule::new(tts_enum, tts_command_value, replacements) ) );
     }
@@ -227,13 +231,24 @@ impl TTS {
     pub fn replace<'c, 's:'c, 'r>(&self, command: &TTSCommandRule, prefs: &PreferenceManager, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
         // The general idea is we handle the begin tag, the contents, and then the end tag
         // For the begin/end tag, we dispatch off to specialized code for each TTS engine
-        let mut command = command.clone();
-        if command.command == TTSCommand::Bookmark && command.value.get_string() == "auto" {
-            match mathml.attribute_value("id") {
-                None => return Ok("".to_string()),
-                Some(id_val) => command.value = TTSCommandValue::String(id_val.to_string()),
-            };
+
+        // bookmarks are special in that we need to eval the xpath
+        // rather than pass a bunch of extra info into the generic handling routines, we just deal with them here
+        if command.command == TTSCommand::Bookmark {
+           // if we aren't suppose to generate bookmarks, short circuit and just return
+           if prefs.get_api_prefs().to_string("Bookmark") != "true"{
+            return Ok("".to_string());
+           }
+           return Ok( match self {
+                TTS::None  => "".to_string(),
+                TTS::SAPI5 => compute_bookmark_element(&command.value, "bookmark mark", rules_with_context, mathml)?,
+                TTS::SSML => compute_bookmark_element(&command.value, "mark name", rules_with_context, mathml)?,
+            } );
         }
+        if command.command == TTSCommand::Bookmark && prefs.get_api_prefs().to_string("Bookmark") != "true" {
+            return Ok("".to_string());
+        }
+
         let mut result = String::with_capacity(255);
         result += &match self {
             TTS::None  => self.get_string_none(&command, prefs, true),
@@ -260,6 +275,18 @@ impl TTS {
         } else {
             return Ok( result + &end_tag );
         }
+
+
+        fn compute_bookmark_element<'c, 's:'c, 'r>(value: &TTSCommandValue, tag_and_attr: &str, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
+            match value {
+                TTSCommandValue::XPath(xpath) => {
+                    let id = xpath.replace(rules_with_context, mathml)?;
+                    return Ok( format!("<{}='{}'/>", tag_and_attr, id) );
+                },
+                _ => bail!("Implementation error: found non-xpath value for bookmark"),
+            }
+        }
+    
     }
 
     // auto pausing can't be known until neighboring strings are computed
@@ -316,21 +343,23 @@ impl TTS {
             TTSCommand::Gender =>if is_start_tag {format!("<prosody gender='XXX{}%'>", command.value.get_string())} else {String::from("</prosody>")},
             TTSCommand::Voice =>if is_start_tag {format!("<prosody voice='XXX{}%'>", command.value.get_string())} else {String::from("</prosody>")},
             TTSCommand::Spell =>if is_start_tag {format!("<spell>{}", command.value.get_string())} else {String::from("</spell>")},
-            TTSCommand::Bookmark =>if is_start_tag {format!("<bookmark mark='{}'/>", command.value.get_string())} else {"".to_string()},
+            TTSCommand::Bookmark => panic!("Internal error: bookmarks should have been handled earlier"),
         };
     }
 
     fn get_string_ssml(&self, command: &TTSCommandRule, prefs: &PreferenceManager, is_start_tag: bool) -> String  {
         return match &command.command {
-            TTSCommand::Pause => if is_start_tag {
-                let amount = command.value.get_num();
-                if amount == PAUSE_AUTO {
-                    PAUSE_AUTO_STR.to_string()
+            TTSCommand::Pause => {
+                if is_start_tag {
+                    let amount = command.value.get_num();
+                    if amount == PAUSE_AUTO {
+                        PAUSE_AUTO_STR.to_string()
+                    } else {
+                        format!("<break time='{}ms'/>", amount * 180.0/prefs.get_rate())
+                    }
                 } else {
-                    format!("<break time='{}ms'/>", amount * 180.0/prefs.get_rate())
+                    "".to_string()
                 }
-            } else {
-                "".to_string()
             },
             TTSCommand::Pitch => if is_start_tag {format!("<prosody pitch='{}%'>", command.value.get_num())} else {String::from("</prosody>")},
             TTSCommand::Rate =>  if is_start_tag {format!("<prosody rate='{}%'>", command.value.get_num())} else {String::from("</prosody>")},
@@ -338,7 +367,7 @@ impl TTS {
             TTSCommand::Gender =>if is_start_tag {format!("<voice required='gender=\"{}\"'>", command.value.get_string())} else {String::from("</voice>")},
             TTSCommand::Voice =>if is_start_tag {format!("<voice required='{}'>", command.value.get_string())} else {String::from("</voice>")},
             TTSCommand::Spell =>if is_start_tag {format!("<say-as interpret-as='characters'>{}", command.value.get_string())} else {String::from("</say-as>")},
-            TTSCommand::Bookmark =>if is_start_tag {format!("<mark name='{}'/>", command.value.get_string())} else {"".to_string()},
+            TTSCommand::Bookmark => panic!("Internal error: bookmarks should have been handled earlier"),
         }
     }
 
