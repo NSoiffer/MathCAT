@@ -8,16 +8,20 @@ is a library that supports conversion of MathML to:
 * Braille (Nemeth and eventually other braille math codes)
 * Navigation of math (in multiple ways including overviews)
 
-MathCAT uses a number of heuristics that try to repair poor mathml and put it in a recommended format. For example, TeX converters and WYSIWYG editors will take "1,234+1" and break the number "1,234" apart at the comma. MathCAT recognizes that and folds the number into a single `mn`. Other repairs are structural such as creating `mrow`s based on information from MathML's operator dictionary and adding invisible function application, multiplication, addition (mixed fractions), and separators (e.g, between the _$i$ and $j$_ in $a_{ij}$) when it seems appropriate. This simplifies speech and Nemeth generation and may be useful to other apps. Currently the cleanup is not exposed in an API, but potentially it could be another service of MathCAT. In general, MathCAT is somewhat conservative in its repair. However, it likely will do the wrong thing in some cases, but the hope is it does the right thing much, much more frequently. Finding common mistakes of translators and patching them is an ongoing project.
+A goal of MathCAT is to be an easy to use library for screen readers and other assistive technology to use to produce high quality speech and/or braille from MathML. It is a follow-on project from MathPlayer (see below) and uses lessons learned from it to do to produce even higher quality speech, navigation, and braille. MathCAT will take advantage of some new ideas the [MathML Working Group](https://mathml-refresh.github.io/charter-drafts/math-2020.html) is developing that allows authors to express their intent when they use a notation. E.g., $(3, 6)$ could be a point in the plane or an open interval, or even a shorthand notation for the greatest common divisor. When that information is conveyed in the MathML, MathCAT will use it to generate more natural sounding speech.
 
 Todo: incorporation of third party libraries to support a common subset of TeX math commands along with ASCIIMath.
 
 MathCAT is written in Rust and can be built to interface with C/C++. It can also be built with a Python interface. The Python interface can be used by NVDA and by Orca. 
 
+MathCAT uses a number of heuristics that try to repair poor MathML and put it in a recommended format. For example, TeX converters and WYSIWYG editors will take "1,234+1" and break the number "1,234" apart at the comma. MathCAT recognizes that and folds the number into a single `mn`. Other repairs are structural such as creating `mrow`s based on information from MathML's operator dictionary and adding invisible function application, multiplication, addition (mixed fractions), and separators (e.g, between the _$i$ and $j$_ in $a_{ij}$) when it seems appropriate. This simplifies speech and Nemeth generation and may be useful to other apps. Currently the cleanup is not exposed in an API, but potentially it could be another service of MathCAT. In general, MathCAT is somewhat conservative in its repair. However, it likely will do the wrong thing in some cases, but the hope is it does the right thing much, much more frequently. Finding common mistakes of translators and patching them is an ongoing project.
+
 ## Current Status
 MathCAT is under active development and I expect that by the end of September, it will be usable as a MathPlayer replacement for those using the English version. It will not be as complete or polished in some ways as MathPlayer though. The Nemeth braille generation will be substantially better.
 
 _Update_: I now expect end of November to have a usable version and will ask a limited number of people to test it out. I have started work on navigation, the last big missing piece. I spent much more time on Nemeth generation than planned, but my expectations for it have gone from it being acceptable quality to it being among the best available MathML->Nemeth translators.
+
+_Update_: In order to help debug navigation, I decided I needed an interface to MathCAT so I could interact with MathCAT and not just write static tests. This turned out to involve learning a lot of new bleeding edge technologies and playing with different libraries and tools to find something that works. This all could have been done easily in two days with JavaScript, but that wouldn't have been able to call my code. Every step was pulling teeth, but I'm happy to say I finally have a web assembly version running in a browser and when I get navigation mostly working, I'll provide a link to it on this page so that if you are interested in the current status of MathCAT, you can try out a few things. While the page is accessible, this demo is just read individual expressions and is not meant to be useful beyond a demo.
 
 By the end of the year, I expect MathCAT to be ready for all English users and hope to have a good start on some of the translations. Initial translations will be based on programmatic translations from MathPlayer's (public) files and are likely to be very buggy until volunteers step forward to fix them.
 
@@ -254,6 +258,7 @@ Note: all YAML files begin with "---". That indicates the beginning of a "docume
 #         value: string
 #         replace: [replacements]  # tts values need to scope contents 
 #      - spell:  string (usually a single letter to be pronounced as the letter)
+#      - bookmark: some xpath (as string) returns an 'id' that can be used for synchronized highlighting
 ```
 
 Note: for "pause", the "auto" value will calculate a pausing amount based on the complexity of the surrounding parts. The more complex they are, the longer the pause (up to a limit). The basic idea is that you want to give the listener time to digest and separate out the two parts when one or both are more complicated.
