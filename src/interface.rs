@@ -143,12 +143,18 @@ pub enum StringOrFloat {
 pub fn SetPreference(name: String, value: StringOrFloat) -> Result<()> {
     return crate::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
-        let pref_manager = rules.pref_manager.as_mut();
+        // note: Rust complains if I set
+        //    pref_manager = rules.pref_manager.borrow_mut()
+        // here/upfront, so it is borrowed separately below. That way its borrowed lifetime is small
         //let value_as_py_float = value.downcast::<PyFloat>();
 
         match name.to_lowercase().as_str() {
             "speechstyle" => {
-                let files_changed = pref_manager.set_user_prefs("SpeechStyle", to_string(&name, value)?.as_str());
+                let files_changed;
+                { 
+                    let mut pref_manager = rules.pref_manager.borrow_mut();
+                    files_changed = pref_manager.set_user_prefs("SpeechStyle", to_string(&name, value)?.as_str());
+                };
                 rules.invalidate(files_changed);
             },
             "verbosity" => {
@@ -156,13 +162,13 @@ pub fn SetPreference(name: String, value: StringOrFloat) -> Result<()> {
                     "terse" => "Terse".to_string(),
                     "medium" => "Medium".to_string(),
                     "verbose" => "Verbose".to_string(),
-                    _ => pref_manager.get_user_prefs().to_string("Verbosity"),
+                    _ => rules.pref_manager.borrow().get_user_prefs().to_string("Verbosity"),
                     };
 
-                pref_manager.set_user_prefs("Verbosity", value.as_str());
+                rules.pref_manager.borrow_mut().set_user_prefs("Verbosity", value.as_str());
             },
             "speechtags" | "tts" => {
-                return set_speech_tags(pref_manager, to_string(&name, value)?);
+                return set_speech_tags(&mut rules.pref_manager.borrow_mut(), to_string(&name, value)?);
             },
             "language" => {
                 let value_as_string = to_string(&name, value)?;
@@ -171,26 +177,26 @@ pub fn SetPreference(name: String, value: StringOrFloat) -> Result<()> {
                       (value_as_string.len() == 5 && value_as_string.as_bytes()[2] == b'-') ) {
                         bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value_as_string);
                       }
-                let files_changed = pref_manager.set_user_prefs("Language", value_as_string.as_str());  
+                let files_changed = rules.pref_manager.borrow_mut().set_user_prefs("Language", value_as_string.as_str());  
                 rules.invalidate(files_changed);  
             },
             "pitch" => {
-                pref_manager.set_api_float_pref("Pitch".to_string(), to_float(&name, value)?);    
+                rules.pref_manager.borrow_mut().set_api_float_pref("Pitch".to_string(), to_float(&name, value)?);    
             },
             "rate" => {
-                pref_manager.set_api_float_pref("Rate".to_string(), to_float(&name, value)?);    
+                rules.pref_manager.borrow_mut().set_api_float_pref("Rate".to_string(), to_float(&name, value)?);    
             },
             "volume" => {
-                pref_manager.set_api_float_pref("Volume".to_string(), to_float(&name, value)?);    
+                rules.pref_manager.borrow_mut().set_api_float_pref("Volume".to_string(), to_float(&name, value)?);    
             },
             "gender" => {
-                pref_manager.set_api_string_pref("Gender".to_string(), to_string(&name, value)?);    
+                rules.pref_manager.borrow_mut().set_api_string_pref("Gender".to_string(), to_string(&name, value)?);    
             },
             "voice" => {
-                pref_manager.set_api_string_pref("Voice".to_string(), to_string(&name, value)?);    
+                rules.pref_manager.borrow_mut().set_api_string_pref("Voice".to_string(), to_string(&name, value)?);    
             },
             "bookmark" => {
-                pref_manager.set_api_boolean_pref("Bookmark".to_string(), to_string(&name, value)?.to_lowercase()=="true");    
+                rules.pref_manager.borrow_mut().set_api_boolean_pref("Bookmark".to_string(), to_string(&name, value)?.to_lowercase()=="true");    
             },
                 _ => {
 

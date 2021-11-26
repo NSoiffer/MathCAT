@@ -56,7 +56,7 @@ fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, math
         let mut rules_with_context = SpeechRulesWithContext::new(&rules);
         match rules_with_context.match_pattern(&mathml) {
             Ok(speech_string) => {
-                return rules.pref_manager.get_tts()
+                return rules.pref_manager.borrow().get_tts()
                             .merge_pauses(remove_optional_indicators(
                                 &speech_string.replace(CONCAT_STRING, "")
                                                   .replace(CONCAT_INDICATOR, "")                            
@@ -700,7 +700,7 @@ impl<'r> ReplacementArray {
                 let after = if i+1 == replacement_strings.len() {""} else {&replacement_strings[i+1]};
                 replacement_strings[i] = replacement_strings[i].replace(
                     PAUSE_AUTO_STR,
-                    &rules_with_context.speech_rules.pref_manager.get_tts().compute_auto_pause(&rules_with_context.speech_rules.pref_manager, before, after));
+                    &rules_with_context.speech_rules.pref_manager.borrow().get_tts().compute_auto_pause(&rules_with_context.speech_rules.pref_manager.borrow(), before, after));
             }
         }
 
@@ -1657,7 +1657,7 @@ pub fn print_errors(e:&Error) {
 /// along with the preferences to be used for speech.
 pub struct SpeechRules {
     name: RulesFor,
-    pub pref_manager: Box<PreferenceManager>,
+    pub pref_manager: Rc<RefCell<PreferenceManager>>,
     rules: RuleTable,                       // the speech rules used (partitioned into MathML tags in hashmap, then linearly searched)
     translate_single_chars_only: bool,      // strings like "half" don't want 'a's translated, but braille does
     unicode: UnicodeTable,                  // the speech rules used for Unicode characters
@@ -1665,7 +1665,7 @@ pub struct SpeechRules {
 
 impl fmt::Display for SpeechRules {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        writeln!(f, "SpeechRules '{}'\n{})", self.name, self.pref_manager)?;
+        writeln!(f, "SpeechRules '{}'\n{})", self.name, self.pref_manager.borrow())?;
         let mut rules_vec: Vec<(&String, &Vec<Box<SpeechPattern>>)> = self.rules.iter().collect();
         rules_vec.sort_by(|(tag_name1, _), (tag_name2, _)| tag_name1.cmp(tag_name2));
         for (tag_name, rules) in rules_vec {
@@ -1715,12 +1715,14 @@ thread_local!{
 
 impl SpeechRules {
     pub fn new(name: RulesFor, translate_single_chars_only: bool) -> SpeechRules {
-        let pref_manager = PreferenceManager::new();
-        if let Err(e) = crate::definitions::read_definitions_file(pref_manager.get_definitions_file()) {
+        use crate::definitions::read_definitions_file;
+        let pref_manager = PreferenceManager::get();
+        if let Err(e) = read_definitions_file(pref_manager.borrow().get_definitions_file()) {
             print_errors(&e);
             exit(1);
         };
 
+        debug!("SpeechRules new for {}, tts {}", name, pref_manager.borrow().get_api_prefs().to_string("TTS"));
         let unicode = if name == RulesFor::Braille {
             Rc::new( RefCell::new (HashMap::with_capacity(2997)) )
         } else {
@@ -1753,16 +1755,21 @@ impl SpeechRules {
     }
 
     pub fn update(&mut self) {
-        if self.rules.is_empty() || !self.pref_manager.is_up_to_date() {
-            let rule_file = self.pref_manager.get_rule_file(&self.name).clone();
+        if self.rules.is_empty() || !self.pref_manager.borrow().is_up_to_date() {
+            let rule_file = self.pref_manager.borrow().get_rule_file(&self.name).clone();
             self.read_patterns(&rule_file);
         }
-        if self.unicode.borrow().is_empty() {
-            let unicode_file = if self.name == RulesFor::Braille {
-                self.pref_manager.get_braille_unicode_file()
-            } else {
-                self.pref_manager.get_speech_unicode_file()
-            }.clone();
+        if self.unicode.borrow_mut().is_empty() {
+            let unicode_file;
+            {
+                // Rust complains about the borrow conflicting with the read_unicode() below if it doesn't end first
+                let pref_manager = self.pref_manager.borrow();
+                unicode_file = if self.name == RulesFor::Braille {
+                    pref_manager.get_braille_unicode_file()
+                } else {
+                    pref_manager.get_speech_unicode_file()
+                }.clone();    
+            }
             self.read_unicode(&unicode_file);
         }
     }
@@ -1839,7 +1846,7 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
     pub fn new(speech_rules: &'s SpeechRules) -> SpeechRulesWithContext {
         return SpeechRulesWithContext {
             speech_rules,
-            context_stack: ContextStack::new(&speech_rules.pref_manager)
+            context_stack: ContextStack::new(&speech_rules.pref_manager.borrow())
         }
     }
 
@@ -1868,7 +1875,8 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
         // no rules matched -- poorly written rule file -- let flow through to default error
         // report error message with file name
         let mut file_name = "unknown";
-        if let Some(path) = &self.speech_rules.pref_manager.get_rule_file(&self.speech_rules.name)[0] {
+        let speech_manager = self.speech_rules.pref_manager.borrow();
+        if let Some(path) = &speech_manager.get_rule_file(&self.speech_rules.name)[0] {
             file_name= path.to_str().unwrap();
         }
         // FIX: handle error appropriately 
@@ -1926,7 +1934,7 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
                 Replacement::Text(t) => t.clone(),
                 Replacement::XPath(path) => path.replace(self, mathml)?,
                 Replacement::TTS(tts) => {
-                    self.speech_rules.pref_manager.get_tts().replace(&tts, &self.speech_rules.pref_manager, self, mathml)?
+                    self.speech_rules.pref_manager.borrow().get_tts().replace(&tts, &self.speech_rules.pref_manager.borrow(), self, mathml)?
                 },
                 Replacement::Test(test) => {
                     test.replace(self, mathml)?                     

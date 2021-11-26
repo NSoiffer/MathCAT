@@ -37,10 +37,11 @@ impl fmt::Display for NavigationPosition {
     }
 }
 
+const ILLEGAL_NODE_ID: &'static str = "!not set";     // an illegal 'id' value
 impl Default for NavigationPosition {
     fn default() -> Self {
         NavigationPosition {
-            current_node: "!not set".to_string(),   // an illegal 'id' value
+            current_node: ILLEGAL_NODE_ID.to_string(), 
             current_node_offset: 0    
         }
      }
@@ -285,9 +286,13 @@ fn do_navigate_command<'a>(mathml: Element<'a>, command: NavigationCommand, para
 }
 
 fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str) -> Result<String> {
-    debug!("NavCommand = {}", nav_command);
+    if mathml.children().is_empty() {
+        bail!("MathML has not been set -- can't navigate");
+    }
+    
     NAVIGATION_STATE.with(|nav_state| {
         let mut nav_state = nav_state.borrow_mut();
+        debug!("MathML: {}", mml_to_string(&mathml));
         if nav_state.position_stack.is_empty() {
             // initialize to root node
             nav_state.push(NavigationPosition{
@@ -318,10 +323,16 @@ fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str
                 }
             };
 
-            let start_node = get_node_by_id(mathml, &start_node_id).unwrap();
+            let start_node = match get_node_by_id(mathml, &start_node_id) {
+                Some(node) => node,
+                None => {
+                    error!("Didn't find id '{}'", &start_node_id);
+                    bail!("No node found");
+                }
+            };
             let speech = match rules_with_context.match_pattern(&start_node) {
                 Ok(speech_string) => {
-                    rules.pref_manager.get_tts()
+                    rules.pref_manager.borrow().get_tts()
                         .merge_pauses(crate::speech::remove_optional_indicators(
                             &speech_string.replace(CONCAT_STRING, "")
                                                 .replace(CONCAT_INDICATOR, "")                            
@@ -357,7 +368,10 @@ fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str
 
             if nav_command != "MoveLastLocation" {
                 if let Some(new_node_id) = context_get_variable(&context, "NavNode", mathml) {
-                    nav_state.push(NavigationPosition{ current_node: new_node_id, current_node_offset: 0}, nav_command);
+                    debug!("nav_state: pushing on id '{}'", new_node_id);
+                    if &new_node_id != ILLEGAL_NODE_ID {
+                        nav_state.push(NavigationPosition{ current_node: new_node_id, current_node_offset: 0}, nav_command);
+                    }
                 }
             }
             debug!("{}", &nav_state);

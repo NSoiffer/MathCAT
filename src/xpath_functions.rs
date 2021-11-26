@@ -23,7 +23,6 @@ use crate::{canonicalize::as_text, definitions::{ DEFINITIONS}};
 use regex::{Regex, Captures};
 use crate::pretty_print::mml_to_string;
 use std::cell::Ref;
-use phf::phf_set;
 
 use crate::canonicalize::{as_element, name};
 

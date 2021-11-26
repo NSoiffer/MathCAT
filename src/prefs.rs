@@ -22,6 +22,8 @@ use yaml_rust::{Yaml, YamlLoader};
 use crate::pretty_print::yaml_to_string;
 use crate::tts::TTS;
 extern crate dirs;
+use std::cell::RefCell;
+use std::rc::Rc;
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime};
 use std::env;
@@ -256,6 +258,9 @@ impl Eq for FileAndTime {}
 thread_local!{
     static DEFAULT_USER_PREFERENCES: Preferences = Preferences::user_defaults();
     static DEFAULT_API_PREFERENCES: Preferences = Preferences::api_defaults();
+    static PREF_MANAGER: Rc<RefCell<PreferenceManager>> = 
+            Rc::new( RefCell::new( PreferenceManager::new() ) );
+
 }
 
 fn cannot_go_on(message: &str) {
@@ -320,7 +325,8 @@ impl FilesChanged {
 
 impl PreferenceManager {
     /// Create (the) PreferenceManager on the heap. 
-    pub fn new() -> Box<PreferenceManager> {
+    fn new() -> PreferenceManager {
+
         // first, read in the preferences -- need to determine which files to read next
         // the prefs files are in the rules dir and the user dir; differs from other files
         let rules_dir = PreferenceManager::get_rules_dir();
@@ -330,6 +336,10 @@ impl PreferenceManager {
        return PreferenceManager::get_all_files(&rules_dir, user_prefs, pref_files);
     }
 
+    pub fn get() -> Rc<RefCell<PreferenceManager>> {
+        return PREF_MANAGER.with( |pf| pf.clone() );
+    }
+
     /// Return a `PreferenceHashMap` that is the merger of the api prefs into the user prefs.
     pub fn merge_prefs(&self) -> PreferenceHashMap {
         let mut merged_prefs = self.user_prefs.prefs.clone();
@@ -337,7 +347,7 @@ impl PreferenceManager {
         return merged_prefs;
     }
 
-    fn get_all_files(rules_dir: &PathBuf, prefs: Preferences, pref_files: FileAndTime) -> Box<PreferenceManager> {
+    fn get_all_files(rules_dir: &PathBuf, prefs: Preferences, pref_files: FileAndTime) -> PreferenceManager {
         // try to find ./Rules/lang/style.yaml and ./Rules/lang/style.yaml
         // we go through a series of fallbacks -- we try to maintain the language if possible
 
@@ -367,20 +377,18 @@ impl PreferenceManager {
         let defs_files = PreferenceManager::get_file_and_time(
             &rules_dir, language, Some("en"), "definitions.yaml");
 
-        return Box::new(
-            PreferenceManager {
-                user_prefs: prefs,
-                api_prefs: Preferences{ prefs: DEFAULT_API_PREFERENCES.with(|defaults| defaults.prefs.clone()) },
-                pref_files,
-                speech: speech_files,
-                overview: overview_files,
-                navigation: navigation_files,
-                speech_unicode,
-                braille: braille_files,
-                braille_unicode,
-                defs: defs_files,
-            }
-        );
+        return PreferenceManager {
+            user_prefs: prefs,
+            api_prefs: Preferences{ prefs: DEFAULT_API_PREFERENCES.with(|defaults| defaults.prefs.clone()) },
+            pref_files,
+            speech: speech_files,
+            overview: overview_files,
+            navigation: navigation_files,
+            speech_unicode,
+            braille: braille_files,
+            braille_unicode,
+            defs: defs_files,
+        };
     }
 
 
