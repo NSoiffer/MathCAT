@@ -21,8 +21,7 @@ fn strip_spaces(str: String) -> String {
 pub fn test(style: &str, mathml: &str, speech: &str) {
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
-        let pref_manager = rules.pref_manager.as_mut();
-        let changes = pref_manager.set_user_prefs("SpeechStyle", style);
+        let changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", style);
         rules.invalidate(changes);
     });
 
@@ -37,10 +36,9 @@ pub fn test(style: &str, mathml: &str, speech: &str) {
 pub fn test_prefs(speech_style: &str, prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
-        let pref_manager = rules.pref_manager.as_mut();
-        let mut changes = pref_manager.set_user_prefs("SpeechStyle", speech_style);
+        let mut changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", speech_style);
         for (pref_name, pref_value) in prefs {
-            changes.add_changes(pref_manager.set_user_prefs(pref_name, pref_value));
+            changes.add_changes(rules.pref_manager.borrow_mut().set_user_prefs(pref_name, pref_value));
         };
         rules.invalidate(changes);
     });
@@ -54,9 +52,8 @@ pub fn test_prefs(speech_style: &str, prefs: Vec<(&str, &str)>, mathml: &str, sp
 pub fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: &str) {
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
-        let pref_manager = rules.pref_manager.as_mut();
-        let mut changes = pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
-        changes.add_changes( pref_manager.set_user_prefs(pref_name, pref_value) );
+        let mut changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", "ClearSpeak");
+        changes.add_changes( rules.pref_manager.borrow_mut().set_user_prefs(pref_name, pref_value) );
         rules.invalidate(changes);
     });
     assert_eq!(speech, strip_spaces(speak_mathml(mathml)));
@@ -69,10 +66,9 @@ pub fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: 
 pub fn test_ClearSpeak_prefs(prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
-        let pref_manager = rules.pref_manager.as_mut();
-        let mut changes = pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
+        let mut changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", "ClearSpeak");
         for (pref_name, pref_value) in prefs {
-            changes.add_changes(pref_manager.set_user_prefs(pref_name, pref_value));
+            changes.add_changes(rules.pref_manager.borrow_mut().set_user_prefs(pref_name, pref_value));
         };
         rules.invalidate(changes);
     });
@@ -85,8 +81,7 @@ pub fn test_ClearSpeak_prefs(prefs: Vec<(&str, &str)>, mathml: &str, speech: &st
 pub fn test_braille(code: &str, mathml: &str, braille: &str) {
     libmathcat::speech::BRAILLE_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
-        let pref_manager = rules.pref_manager.as_mut();
-        let changes = pref_manager.set_user_prefs("Code", code);
+        let changes = rules.pref_manager.borrow_mut().set_user_prefs("Code", code);
         rules.invalidate(changes);
     });
     assert_eq!(braille, strip_spaces(braille_mathml(mathml)));
