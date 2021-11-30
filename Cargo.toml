@@ -18,7 +18,7 @@ error-chain = "0.12.4"
 regex = "1.5.4"
 dirs = "4.0"
 bitflags = "1.2.1"
-phf = { version = "0.8.0", features = ["macros"] }
+phf = { version = "0.10.0", features = ["macros"] }
 rand = "0.8.0"
 radix_fmt = "1.0.0"
 internment = "0.5.4"

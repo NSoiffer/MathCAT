@@ -16,6 +16,7 @@
         "bindgen",
         "bitand",
         "bitflags",
+        "braillenavhighlight",
         "Bseline",
         "caligraphic",
         "canonicalization",

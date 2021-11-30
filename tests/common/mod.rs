@@ -84,5 +84,5 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
         let changes = rules.pref_manager.borrow_mut().set_user_prefs("Code", code);
         rules.invalidate(changes);
     });
-    assert_eq!(braille, strip_spaces(braille_mathml(mathml)));
+    assert_eq!(braille, strip_spaces(braille_mathml(mathml, "".to_string())));
 }
