@@ -87,7 +87,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> String {
                 let highlight_style =  rules_with_context.speech_rules.pref_manager.borrow().get_user_prefs().to_string("BrailleNavHighlight");
                 let nemeth =  nemeth_cleanup(speech_string.replace(" ", ""));
                 if highlight_style != "Off" {
-                    return highlight_braille_chars(nemeth, highlight_style == "Off");
+                    return highlight_braille_chars(nemeth, highlight_style == "All");
                 } else {
                     return nemeth;
                 }
@@ -117,11 +117,10 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> String {
         let start = start.unwrap();
         let end = end.unwrap();
 
-        highlight_indicators(&mut braille, start);
+        highlight_first_indicator(&mut braille, start);
         if start == end {
             return braille;
         }
-        highlight_indicators(&mut braille, end);
         if !fill_range {
             return braille;
         }
@@ -144,46 +143,53 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> String {
             return unsafe{char::from_u32_unchecked(ch as u32 | 0xC0)};      
         }
 
-        fn highlight_indicators(braille: &mut String, ch_index: usize) {
-            // need to highlight (optional) cap, language, and style also in that (rev) order
+        fn unhighlight(ch: char) -> char {
+            return unsafe{char::from_u32_unchecked(ch as u32 & 0x283F)};      
+        }
+
+        fn highlight_first_indicator(braille: &mut String, ch_index: usize) {
+            // need to highlight (optional) capital/number, language, and style also in that (rev) order
             // chars in the braille block range use 3 bytes
+            let mut n_bytes = ch_index;     // how far to move back
             let prefix_ch_index = std::cmp::max(0, ch_index as isize - 12) as usize;
             let indicators = &braille[prefix_ch_index..ch_index];   // chars to be examined
             let prefix = &mut indicators.chars().rev().peekable();
-            let mut reversed_replacement = String::with_capacity(4*3);
             if prefix.peek() == Some(&&'⠠') { // cap indicator
-                reversed_replacement.push( highlight(*prefix.peek().unwrap()) );
+                n_bytes -= 3;
                 prefix.next();
             } else if prefix.peek() == Some(&&'⠼') { // number indicator
-                reversed_replacement.push( highlight(*prefix.peek().unwrap()) );
+                n_bytes -= 3;
                 prefix.next();
             } 
             if [Some(&'⠸'), Some(&'⠈'), Some(&'⠨')].contains(&prefix.peek()) { // bold, script/blackboard, italic indicator
-                reversed_replacement.push( highlight(*prefix.peek().unwrap()) );
+                n_bytes -= 3;
                 prefix.next();
             }
 
-            // we crate a copy so that we can have two mutable borrows (note: the copy tracks the state of the original)
-            let mut prefix_copy = prefix.clone();
             if [Some(&'⠰'), Some(&'⠸'), Some(&'⠨')].contains(&prefix.peek()) {   // English, German, Greek
-                reversed_replacement.push( highlight(*prefix.peek().unwrap()) );
+                n_bytes -= 3;
             } else if prefix.peek() == Some(&&'⠈') {  
-                let last_char = *prefix_copy.peek().unwrap();
                 let ch = prefix.next();                              // Russian/Greek Variant
                 if ch == Some('⠈') || ch == Some('⠨') {
-                    reversed_replacement.push( highlight(last_char) );
-                    reversed_replacement.push( highlight(*prefix.peek().unwrap()) );
+                    n_bytes -= 6;
                 }
             } else if prefix.peek() == Some(&&'⠠')  { // Hebrew 
-                let last_char = prefix_copy.peek().unwrap();
                 let ch = prefix.next();                              // Russian/Greek Variant
                 if ch == Some('⠠') {
-                    reversed_replacement.push( highlight(*last_char) );
-                    reversed_replacement.push( highlight(*prefix.peek().unwrap()) );
+                    n_bytes -= 6;
                 }
             };
-            let replacement = reversed_replacement.chars().rev().collect::<String>();
-            braille.replace_range(ch_index-replacement.len()..ch_index, &replacement);
+            if n_bytes < ch_index {
+                // remove old highlight
+                let replacement_range = ch_index..ch_index+3;
+                let replacement_str = unhighlight(braille[replacement_range.clone()].chars().next().unwrap()).to_string();
+                braille.replace_range(replacement_range, &replacement_str);
+
+                // add new highlight
+                let replacement_range = n_bytes..n_bytes+3;
+                let replacement_str = highlight(braille[replacement_range.clone()].chars().next().unwrap()).to_string();
+                braille.replace_range(replacement_range, &replacement_str);
+            }
         }
 
     }

@@ -632,7 +632,6 @@ impl PreferenceManager {
     #[allow(dead_code)]
     /// Used in testing, sets the user preference `name` to `value`
     pub fn set_user_prefs(&mut self, name: &str, value: &str) -> FilesChanged {
-        debug!("In set_user_prefs");
         self.user_prefs.set_string_value(name, value);
         if name == "Language" || name == "SpeechStyle" {
             let rules_dir = PreferenceManager::get_rules_dir();
