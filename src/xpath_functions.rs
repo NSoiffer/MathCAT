@@ -1137,6 +1137,53 @@ impl IsInDefinition {
 }
 
 
+pub struct DistanceFromLeaf;
+impl DistanceFromLeaf {
+    fn distance(element: Element, use_left_side: bool, treat_2d_elements_as_tokens: bool) -> usize {
+        let mut element = element;
+        let distance = 0;
+        loop {
+            if is_leaf(element) {
+                return distance;
+            }
+            if treat_2d_elements_as_tokens && MATHML_2D_NODES.contains(&name(&element)) {
+                return distance;
+            }
+            let children = element.children();
+            assert!(!children.is_empty());
+            element = as_element( if use_left_side {children[0]} else {children[children.len()-1]} );
+        }
+    }
+}
+
+/**
+ * Returns distance from the current node to the leftmost/rightmost leaf.
+  if the node is a bracketed expr with the indicated left/right chars
+ * node -- node(s) to test
+ * left_side -- (bool) traverse leftmost child to leaf
+ * treat2D_elements_as_tokens -- (bool) 2D notations such as fractions are treated like leaves 
+ */
+impl Function for DistanceFromLeaf {
+    fn evaluate<'c, 'd>(&self,
+                        _context: &context::Evaluation<'c, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(3)?;
+        let treat_2d_elements_as_tokens = args.pop_boolean()?;
+        let use_left_side = args.pop_boolean()?;
+        let node = validate_one_node(args.pop_nodeset()?, "DistanceFromLeaf")?;
+        if let Node::Element(e) = node {
+            return Ok( Value::Number( DistanceFromLeaf::distance(e, use_left_side, treat_2d_elements_as_tokens) as f64) );
+        }
+
+        // FIX: should having a non-element be an error instead??
+        return Err(Error::Other(format!("DistanceFromLeaf: first arg '{:?}' is not a node", node)));
+    }
+}
+
+
 
 /// Add all the functions defined in this module to `context`.
 pub fn add_builtin_functions(context: &mut Context) {
@@ -1152,6 +1199,7 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("IsBracketed", IsBracketed);
     context.set_function("IsInDefinition", IsInDefinition);
     context.set_function("BaseNode", BaseNode);
+    context.set_function("DistanceFromLeaf", DistanceFromLeaf);
     // context.set_function("SetVariable", SetVariable);
     context.set_function("DEBUG", Debug);
 }

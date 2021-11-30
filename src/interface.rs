@@ -55,7 +55,7 @@ pub fn speak_mathml(mathml_str: &str) -> String {
 /// Given MathML, a Unicode braille string is return.
 ///
 /// If there is an error, the string will give a general message (e.g., "MathML error" if the MathML is bad)
-pub fn braille_mathml(mathml_str: &str) -> String {
+pub fn braille_mathml(mathml_str: &str, nav_node_id: String) -> String {
     // this forces initialization
     crate::speech::BRAILLE_RULES.with(|_| true);
     let package = parser::parse(mathml_str);
@@ -65,7 +65,7 @@ pub fn braille_mathml(mathml_str: &str) -> String {
     };
     let package = package.unwrap();
     let mathml = cleanup_mathml(get_element(&package));
-    return crate::speech::braille_mathml(mathml);
+    return crate::speech::braille_mathml(mathml, nav_node_id);
 }
 
 thread_local!{
@@ -180,6 +180,9 @@ pub fn SetPreference(name: String, value: StringOrFloat) -> Result<()> {
                 let files_changed = rules.pref_manager.borrow_mut().set_user_prefs("Language", value_as_string.as_str());  
                 rules.invalidate(files_changed);  
             },
+            "braillenavhighlight" => {
+                rules.pref_manager.borrow_mut().set_user_prefs("BrailleNavHighlight", to_string(&name, value)?.as_str());    
+            },
             "pitch" => {
                 rules.pref_manager.borrow_mut().set_api_float_pref("Pitch".to_string(), to_float(&name, value)?);    
             },
@@ -237,13 +240,13 @@ fn set_speech_tags(pref_manager: &mut PreferenceManager, speech_tags: String ) -
 
 /// Get the braille associated with the MathML that was set by [`SetMathML`].
 /// The braille returned depends upon the preference for braille output.
-pub fn GetBraille() -> Result<String> {
+pub fn GetBraille(nav_node_id: String) -> Result<String> {
     // use std::time::{Instant};
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
-        let braille = crate::speech::braille_mathml(mathml);
+        let braille = crate::speech::braille_mathml(mathml, nav_node_id);
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( braille );
     });

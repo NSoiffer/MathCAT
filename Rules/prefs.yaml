@@ -50,4 +50,6 @@
     AutoZoomOut: true           # Auto zoom out of 2D exprs (use shift-arrow to force zoom out if unchecked)
 
   Braille:
+    BrailleNavHighlight: EndPoints   # Highlight with dots 7 & 8 the current nav node -- values are Off, FirstChar, EndPoints, All
     Code: Nemeth                # Any supported braille code
+

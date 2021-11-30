@@ -169,6 +169,8 @@ impl NavigationState {
             context.set_variable("NavNodeOffset", self.where_am_i.current_node_offset as f64);
         }
 
+        context.set_variable("PlaceMarkerIndex", self.mode );
+
         // get the index from command (e.g., '0' in 'SetPlacemarker3')
         if command.starts_with("SetPlacemarker") {
             context.set_variable("PlaceMarkerIndex", convert_last_char_to_number(command) );
@@ -220,31 +222,33 @@ fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> {
     return None;
 }
 
-fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>) -> Option<String> {
-    // This is ridiculously complicated for what in the end is a hashmap lookup
+fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>) -> (Option<String>, Option<f64>) {
+   // First return tuple value is string-value (if string, bool, or single node) or None
+   // Second return tuple value is f64 if variable is a number or None
+   // This is ridiculously complicated for what in the end is a hashmap lookup
     // There isn't an API that lets us get at the value, so we have to setup/build/evaluate an xpath
     // Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate() 
     let factory = Factory::new();
     return match factory.build(&("$".to_string() + var_name)) {
         Err(_) => {
             error!("Could not compile XPath for variable: {}", var_name);
-            None
+            (None, None)
         },
         Ok(xpath) => {
             let xpath = xpath.unwrap();
             return match xpath.evaluate(context, mathml) {
                 Ok(val) => {
                     match val {
-                        Value::String(s) => Some(s),
-                        Value::Number(f) => Some(format!("{}", f)),
-                        Value::Boolean(b) => Some(format!("{}", b)),
+                        Value::String(s) => (Some(s), None),
+                        Value::Number(f) => (None, Some(f)),
+                        Value::Boolean(b) => (Some(format!("{}", b)), None),
                         Value::Nodeset(nodes) => {
                             if nodes.size() == 1 {
                                 if let Some(attr) = nodes.document_order_first().unwrap().attribute() {
-                                    return Some(attr.value().to_string());
+                                    return (Some(attr.value().to_string()), None);
                                 }
                             };
-                            error!("Variable '{}' set in navigate.yaml is nodeset and not an attribute (correct by using '.../@{}'??):\n", var_name, var_name);
+                            error!("Variable '{}' set in navigate.yaml is nodeset and not an attribute (correct by using '.../@id'??):\n", var_name);
                             if nodes.size() == 0 {
                                 debug!("0 nodes (false)");
                             } else {
@@ -263,11 +267,11 @@ fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Eleme
                                             }   
                                         })    
                             };
-                            None
+                            (None, None)
                         },
                     }
                 },
-                Err(_) => None,
+                Err(_) => (None, None),
             }
         }
     }
@@ -289,10 +293,10 @@ fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str
     if mathml.children().is_empty() {
         bail!("MathML has not been set -- can't navigate");
     }
-    
+    debug!("Nav Command: {}", nav_command);
     NAVIGATION_STATE.with(|nav_state| {
         let mut nav_state = nav_state.borrow_mut();
-        debug!("MathML: {}", mml_to_string(&mathml));
+        // debug!("MathML: {}", mml_to_string(&mathml));
         if nav_state.position_stack.is_empty() {
             // initialize to root node
             nav_state.push(NavigationPosition{
@@ -306,7 +310,7 @@ fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str
                 mut_rules.update();    
             }
             let rules = rules.borrow();
-            let mut rules_with_context = crate::speech::SpeechRulesWithContext::new(&rules); 
+            let mut rules_with_context = crate::speech::SpeechRulesWithContext::new(&rules, "".to_string()); 
             let nav_state_top = nav_state.top();
             nav_state.init_navigation_context(rules_with_context.get_context(), nav_command, nav_state_top);
     
@@ -361,16 +365,17 @@ fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str
             } else {
                 !nav_state.speak_overview
             };
-            if let Some(val) = context_get_variable(context, "DescribeAfterMove", mathml) {
+            if let Some(val) = context_get_variable(context, "DescribeAfterMove", mathml).0 {
                 nav_state.speak_overview = val == "true";
                 use_read_rules = nav_state.speak_overview;
             };
 
-            if nav_command != "MoveLastLocation" {
-                if let Some(new_node_id) = context_get_variable(&context, "NavNode", mathml) {
-                    debug!("nav_state: pushing on id '{}'", new_node_id);
+            if !(nav_command == "MoveLastLocation" || nav_command.starts_with("Read") || nav_command.starts_with("Describe")) {
+                if let Some(new_node_id) = context_get_variable(&context, "NavNode", mathml).0 {
+                    let offset = context_get_variable(&context, "NavNodeOffset", mathml).1.unwrap() as usize;
+                    debug!("nav_state: pushing on id '{}/{}'", new_node_id, offset);
                     if &new_node_id != ILLEGAL_NODE_ID {
-                        nav_state.push(NavigationPosition{ current_node: new_node_id, current_node_offset: 0}, nav_command);
+                        nav_state.push(NavigationPosition{ current_node: new_node_id, current_node_offset: offset}, nav_command);
                     }
                 }
             }
@@ -392,7 +397,8 @@ fn speak(mathml: Element, full_read: bool) -> String {
 
 
 // MathPlayer's interface mentions these, so we keep them.
-// FIX: these need to be different values (I think) for linux
+// These (KeyboardEvent.keyCode) are consistent across platforms (mostly?) but are deprecated.
+//   KeyboardEvent.code is recommended instead (a string)
 const VK_LEFT: usize = 0x25;
 const VK_RIGHT: usize = 0x27;
 const VK_UP: usize = 0x26;
@@ -686,17 +692,18 @@ mod tests {
 
     #[cfg(test)]
     pub fn init_logger() {
-        env_logger::builder()
-        .format_timestamp(None)
-        .format_module_path(false)
-        .format_indent(None)
-        .format_level(false)
-        .init();
+        env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug"))
+            .is_test(true)
+            .format_timestamp(None)
+            .format_module_path(false)
+            .format_indent(None)
+            .format_level(false)
+            .init();
     }
     
     #[test]
     fn zoom_in() -> Result<()> {
-        init_logger();
+        // init_logger();
         let mathml_str = "<math id='math'><mfrac id='mfrac'>
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
@@ -717,6 +724,126 @@ mod tests {
             NAVIGATION_STATE.with(|nav_stack| {
                 let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
                 assert!(id == "base");
+            });
+            return Ok( () );
+        });
+    }
+    
+    #[test]
+    fn zoom_in_all() -> Result<()> {
+        // init_logger();
+        let mathml_str = "<math id='math'><mfrac id='mfrac'>
+                <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
+                <mi id='denom'>d</mi>
+            </mfrac></math>";
+        SetMathML(mathml_str.to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            let nav_speech = do_navigate_command_string(mathml, "ZoomInAll")?;
+            debug!("Full speech: {}", nav_speech);
+            NAVIGATION_STATE.with(|nav_stack| {
+                let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
+                assert!(id == "base");
+            });
+            return Ok( () );
+        });
+    }
+
+    
+    #[test]
+    fn zoom_out() -> Result<()> {
+        // init_logger();
+        let mathml_str = "<math id='math'><mfrac id='mfrac'>
+                <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
+                <mi id='denom'>d</mi>
+            </mfrac></math>";
+        SetMathML(mathml_str.to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            NAVIGATION_STATE.with(|nav_stack| {
+                nav_stack.borrow_mut().push(NavigationPosition{
+                    current_node: "base".to_string(),
+                    current_node_offset: 0
+                }, "None")
+            });
+
+            let nav_speech = do_navigate_command_string(mathml, "ZoomOut")?;
+            debug!("Full speech (first zoom): {}", nav_speech);
+            NAVIGATION_STATE.with(|nav_stack| {
+                let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
+                assert!(id == "msup");
+            });
+
+            let nav_speech = do_navigate_command(mathml, NavigationCommand::Zoom, NavigationParam::Previous)?;
+            debug!("Full speech (second zoom): {}", nav_speech);
+            NAVIGATION_STATE.with(|nav_stack| {
+                let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
+                assert!(id == "mfrac");
+            });
+            return Ok( () );
+        });
+    }
+    
+    #[test]
+    fn zoom_out_all() -> Result<()> {
+        // init_logger();
+        let mathml_str = "<math id='math'><mfrac id='mfrac'>
+                <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
+                <mi id='denom'>d</mi>
+            </mfrac></math>";
+        SetMathML(mathml_str.to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            NAVIGATION_STATE.with(|nav_stack| {
+                nav_stack.borrow_mut().push(NavigationPosition{
+                    current_node: "base".to_string(),
+                    current_node_offset: 0
+                }, "None")
+            });
+
+            let nav_speech = do_navigate_command_string(mathml, "ZoomOutAll")?;
+            debug!("Full speech (first zoom): {}", nav_speech);
+            NAVIGATION_STATE.with(|nav_stack| {
+                let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
+                assert!(id == "math");
+            });
+            return Ok( () );
+        });
+    }
+    
+    #[test]
+    fn move_to_start() -> Result<()> {
+        init_logger();
+        let mathml_str = "<math id='math'><mfrac id='mfrac'>
+                <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
+                <mi id='denom'>d</mi>
+            </mfrac></math>";
+        SetMathML(mathml_str.to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            NAVIGATION_STATE.with(|nav_stack| {
+                nav_stack.borrow_mut().push(NavigationPosition{
+                    current_node: "denom".to_string(),
+                    current_node_offset: 0
+                }, "None")
+            });
+
+            let nav_speech = do_navigate_command_string(mathml, "MoveLineStart")?;
+            debug!("Full speech (first move): {}", nav_speech);
+            NAVIGATION_STATE.with(|nav_stack| {
+                let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
+                assert!(id == "denom");
+            });
+
+            let nav_speech = do_navigate_command(mathml, NavigationCommand::Move, NavigationParam::Start)?;
+            debug!("Full speech (second move): {}", nav_speech);
+            NAVIGATION_STATE.with(|nav_stack| {
+                let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
+                assert!(id == "mfrac");
             });
             return Ok( () );
         });

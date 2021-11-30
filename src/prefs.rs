@@ -60,9 +60,13 @@ impl Preferences{
         prefs.insert("Verbosity".to_string(), Yaml::String("medium".to_string()));
         prefs.insert("Blind".to_string(), Yaml::Boolean(true));
         prefs.insert("NavMode".to_string(), Yaml::String("enhanced".to_string()));
-        prefs.insert("NavigationSpeech".to_string(), Yaml::String("read".to_string()));
+        prefs.insert("Overview".to_string(), Yaml::String("read".to_string()));
+        prefs.insert("ResetOverView".to_string(), Yaml::Boolean(true));
+        prefs.insert("NavVerbosity".to_string(), Yaml::String("verbose".to_string()));
+        prefs.insert("AutoZoomOut".to_string(), Yaml::Boolean(true));
         prefs.insert("Code".to_string(), Yaml::String("Nemeth".to_string()));
-
+        prefs.insert("BrailleNavHighlight".to_string(), Yaml::String("EndPoints".to_string()));
+    
         return Preferences{ prefs };
     }
 

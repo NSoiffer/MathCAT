@@ -21,7 +21,7 @@ use yaml_rust::{YamlLoader, Yaml, yaml::Hash};
 use crate::tts::*;
 use crate::pretty_print::{mml_to_string, yaml_to_string};
 use std::path::Path;
-use regex::{Regex, Captures};
+use regex::{Captures, Regex};
 use phf::phf_map;
 use std::rc::Rc;
 use crate::shim_filesystem::read_to_string_shim;
@@ -53,7 +53,7 @@ fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, math
         }
         let rules = rules.borrow();
         // debug!("speak_rules:\n{}", mml_to_string(&mathml));
-        let mut rules_with_context = SpeechRulesWithContext::new(&rules);
+        let mut rules_with_context = SpeechRulesWithContext::new(&rules, "".to_string());
         match rules_with_context.match_pattern(&mathml) {
             Ok(speech_string) => {
                 return rules.pref_manager.borrow().get_tts()
@@ -71,25 +71,122 @@ fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, math
     })
 }
 
-pub fn braille_mathml(mathml: Element) -> String {
-    BRAILLE_RULES.with(|rules| {
+/// braille the MathML
+/// If 'nav_node_id' is not an empty string, then the element with that id will have dots 7 & 8 turned on as per the pref
+pub fn braille_mathml(mathml: Element, nav_node_id: String) -> String {
+    return BRAILLE_RULES.with(|rules| {
         {
             let mut mut_rules = rules.borrow_mut();
             mut_rules.update();    
         }
         let rules = rules.borrow();
-        let mut rules_with_context = SpeechRulesWithContext::new(&rules);
-        match rules_with_context.match_pattern(&&mathml) {
+        let mut rules_with_context = SpeechRulesWithContext::new(&rules, nav_node_id);
+        match rules_with_context.match_pattern(&mathml) {
             // FIX: need to set name of speech rules so test Nemeth/UEB clean for
             Ok(speech_string) => {
-                return nemeth_cleanup(speech_string.replace(" ", ""));
+                let highlight_style =  rules_with_context.speech_rules.pref_manager.borrow().get_user_prefs().to_string("BrailleNavHighlight");
+                let nemeth =  nemeth_cleanup(speech_string.replace(" ", ""));
+                if highlight_style != "Off" {
+                    return highlight_braille_chars(nemeth, highlight_style == "Off");
+                } else {
+                    return nemeth;
+                }
             },
             Err(e)             => { 
                 print_errors(&e.chain_err(|| "Pattern match/replacement failure!"));
                 return String::from("Error in speaking math; see error log.")
             }
         }
-    })
+    });
+
+    // highlight with dots 7 & 8 the appropriately
+    // both the start and stop points will be extended to deal with indicators such as capitalization
+    // if 'fill_range' is true, the interior will be highlighted
+    fn highlight_braille_chars(braille: String, fill_range: bool) -> String {
+        let mut braille = braille;
+        // some special chars weren't converted to having dots 7 & 8 to indicate navigation position -- add them
+
+        // find start and end indexes
+        let start = braille.find(|ch| is_highlighted(ch));
+        let end = braille.rfind(|ch| is_highlighted(ch));
+        if start.is_none() {
+            assert!(end.is_none());
+            return braille;
+        };
+
+        let start = start.unwrap();
+        let end = end.unwrap();
+
+        highlight_indicators(&mut braille, start);
+        if start == end {
+            return braille;
+        }
+        highlight_indicators(&mut braille, end);
+        if !fill_range {
+            return braille;
+        }
+
+        let mut result = String::with_capacity(braille.len());
+        result.push_str(&braille[..start]);
+        let highlight_region =&mut braille[start..end];
+        for ch in highlight_region.chars() {
+            result.push( highlight(ch) );
+        };
+        result.push_str(&braille[end..]);
+        return result;
+
+        fn is_highlighted(ch: char) -> bool {
+            let ch_as_u32 = ch as u32;
+            return 0x28C0 <= ch_as_u32 && ch_as_u32 <= 0x28FF;
+        }
+
+        fn highlight(ch: char) -> char {
+            return unsafe{char::from_u32_unchecked(ch as u32 | 0xC0)};      
+        }
+
+        fn highlight_indicators(braille: &mut String, ch_index: usize) {
+            // need to highlight (optional) cap, language, and style also in that (rev) order
+            // chars in the braille block range use 3 bytes
+            let prefix_ch_index = std::cmp::max(0, ch_index as isize - 12) as usize;
+            let indicators = &braille[prefix_ch_index..ch_index];   // chars to be examined
+            let prefix = &mut indicators.chars().rev().peekable();
+            let mut reversed_replacement = String::with_capacity(4*3);
+            if prefix.peek() == Some(&&'⠠') { // cap indicator
+                reversed_replacement.push( highlight(*prefix.peek().unwrap()) );
+                prefix.next();
+            } else if prefix.peek() == Some(&&'⠼') { // number indicator
+                reversed_replacement.push( highlight(*prefix.peek().unwrap()) );
+                prefix.next();
+            } 
+            if [Some(&'⠸'), Some(&'⠈'), Some(&'⠨')].contains(&prefix.peek()) { // bold, script/blackboard, italic indicator
+                reversed_replacement.push( highlight(*prefix.peek().unwrap()) );
+                prefix.next();
+            }
+
+            // we crate a copy so that we can have two mutable borrows (note: the copy tracks the state of the original)
+            let mut prefix_copy = prefix.clone();
+            if [Some(&'⠰'), Some(&'⠸'), Some(&'⠨')].contains(&prefix.peek()) {   // English, German, Greek
+                reversed_replacement.push( highlight(*prefix.peek().unwrap()) );
+            } else if prefix.peek() == Some(&&'⠈') {  
+                let last_char = *prefix_copy.peek().unwrap();
+                let ch = prefix.next();                              // Russian/Greek Variant
+                if ch == Some('⠈') || ch == Some('⠨') {
+                    reversed_replacement.push( highlight(last_char) );
+                    reversed_replacement.push( highlight(*prefix.peek().unwrap()) );
+                }
+            } else if prefix.peek() == Some(&&'⠠')  { // Hebrew 
+                let last_char = prefix_copy.peek().unwrap();
+                let ch = prefix.next();                              // Russian/Greek Variant
+                if ch == Some('⠠') {
+                    reversed_replacement.push( highlight(*last_char) );
+                    reversed_replacement.push( highlight(*prefix.peek().unwrap()) );
+                }
+            };
+            let replacement = reversed_replacement.chars().rev().collect::<String>();
+            braille.replace_range(ch_index-replacement.len()..ch_index, &replacement);
+        }
+
+    }
 }
 
 fn nemeth_cleanup(raw_nemeth: String) -> String {
@@ -193,42 +290,42 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
 
-    debug!("Before:  \"{}\"", raw_nemeth);
+    // debug!("Before:  \"{}\"", raw_nemeth);
 
     // Remove blanks before and after braille indicators
     let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&raw_nemeth, "$1$2");
     let result = REMOVE_SPACE_AFTER_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
-    debug!("spaces:  \"{}\"", result);
+    // debug!("spaces:  \"{}\"", result);
 
     // Multipurpose indicator
     let result = MULTI_177_2.replace_all(&result, "${1}m${2}");
     let result = MULTI_177_3.replace_all(&result, "${1}m$2");
     let result = MULTI_177_5.replace_all(&result, "${1}m$2");
-    debug!("MULTI:   \"{}\"", result);
+    // debug!("MULTI:   \"{}\"", result);
 
     let result = NUM_IND_9A.replace_all(&result, "$start$minus${face}n");
-    debug!("IND_9A:  \"{}\"", result);
+    // debug!("IND_9A:  \"{}\"", result);
 
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
     let result = NUM_IND_9E_SHAPE.replace_all(&result, "${mod}n");
-    debug!("IND_9E:  \"{}\"", result);
+    // debug!("IND_9E:  \"{}\"", result);
 
     // 9b: insert after punctuation (optional minus sign)
     // common punctuation adds a space, so 9a handled it. Here we deal with other "punctuation" 
     // FIX other punctuation and reference symbols (9d)
     let result = NUM_IND_AFTER_PUNCT.replace_all(&result, "$punct${minus}n");
-    debug!("A PUNCT: \"{}\"", &result);
+    // debug!("A PUNCT: \"{}\"", &result);
 
     // strip level indicators
     // checks for punctuation char, so needs to before punctuation is stripped.
     
     let result = REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT.replace_all(&result, "$1");
-    debug!("Punct  : \"{}\"", &result);
+    // debug!("Punct  : \"{}\"", &result);
     let result = REMOVE_LEVEL_IND_BEFORE_BASELINE.replace_all(&result, "b");
-    debug!("Bseline: \"{}\"", &result);
+    // debug!("Bseline: \"{}\"", &result);
 
     let result = REMOVE_PUNCT_IND.replace_all(&result, "$1$2");
-    debug!("Punct38: \"{}\"", &result);
+    // debug!("Punct38: \"{}\"", &result);
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         match INDICATOR_REPLACEMENTS.get(&cap[0]) {
@@ -242,6 +339,7 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
     let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
    
     return result.to_string();
+
 }
 
 
@@ -549,7 +647,7 @@ struct With {
 
 impl fmt::Display for With {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "With:\n  variables {}\n  replacements {}", &self.variables, &self.replacements);
+        return write!(f, "with:\n  variables {}\n  replacements {}", &self.variables, &self.replacements);
     }
 }
 
@@ -1682,12 +1780,13 @@ impl fmt::Display for SpeechRules {
 pub struct SpeechRulesWithContext<'c, 's:'c> {
     speech_rules: &'s SpeechRules,
     context_stack: ContextStack<'c>,   // current value of (context) variables
+    nav_node_id: String,
 }
 
 impl<'c, 's:'c> fmt::Display for SpeechRulesWithContext<'c, 's> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "SpeechRulesWithContext \n{})", self.speech_rules)?;
-        return writeln!(f, "   {} context  entries", &self.context_stack);
+        return writeln!(f, "   {} context entries, nav node id '{}'", &self.context_stack, &self.nav_node_id);
     }
 }
 
@@ -1843,10 +1942,11 @@ use crate::prefs::FilesChanged;
 ///   's -- the lifetime of the speech rules (which is static)
 ///   'r -- the lifetime of the reference (this seems to be key to keep the rust memory checker happy)
 impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
-    pub fn new(speech_rules: &'s SpeechRules) -> SpeechRulesWithContext {
+    pub fn new(speech_rules: &'s SpeechRules, nav_node_id: String) -> SpeechRulesWithContext {
         return SpeechRulesWithContext {
             speech_rules,
-            context_stack: ContextStack::new(&speech_rules.pref_manager.borrow())
+            context_stack: ContextStack::new(&speech_rules.pref_manager.borrow()),
+            nav_node_id: nav_node_id.to_string(),
         }
     }
 
@@ -1896,7 +1996,21 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
                     self.context_stack.pop();
                 }
                 return match result {
-                    Ok(s) => Ok( Some(s) ),
+                    Ok(s) => {
+                        // for all except braille, nav_node_id will be an empty string and will not match
+                        if !self.nav_node_id.is_empty() {
+                            match mathml.attribute_value("id") {
+                                None => {},
+                                Some(id) => {
+                                    if self.nav_node_id == id {
+                                        let highlight_style =  self.speech_rules.pref_manager.borrow().get_user_prefs().to_string("BrailleNavHighlight");
+                                        return Ok( Some( highlight_braille(s, highlight_style) ) );
+                                    }
+                                }
+                            }
+                        }
+                        Ok( Some(s) )
+                    },
                     Err(e) => Err( e.chain_err(||
                         format!(
                             "attempting replacement pattern: \"{}\" for \"{}\".\n\
@@ -1925,6 +2039,57 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
                 mml_to_string(&mathml),
                 pattern.file_name
             );
+        }
+
+        fn highlight_braille(braille: String, highlight: String) -> String {
+            // add dots 7 & 8 to the Unicode braille (28xx)
+            if &highlight == "Off" || braille.is_empty() {
+                return braille;
+            }
+            
+            // FIX: this seems needlessly complex. It is much simpler if the char can be changed in place...
+            // find first char that can get the dots and add them
+            let mut result = String::with_capacity(braille.len());
+            let mut i_bytes = 0;
+            let mut chars = braille.chars();
+            while let Some(ch) = chars.next() {
+                let modified_ch = add_dots_to_braille_char(ch);
+                i_bytes += ch.len_utf8();
+                result.push(modified_ch);
+                if ch != modified_ch {
+                    break;
+                };
+            };
+
+            let mut i_end = braille.len();
+            if &highlight != "FirstChar" {
+                // find last char so that we know when to modify the char
+                let mut rev_chars = braille.chars().rev();
+                while let Some(ch) = rev_chars.next() {
+                    let modified_ch = add_dots_to_braille_char(ch);
+                    i_end -= ch.len_utf8();
+                    if ch !=  modified_ch {
+                        break;
+                    }
+                }
+            }
+
+            // finish going through the string
+            while let Some(ch) = chars.next() {
+                result.push( if i_bytes == i_end {add_dots_to_braille_char(ch)} else {ch} );
+                i_bytes += ch.len_utf8();
+            };
+
+            return result;
+
+            fn add_dots_to_braille_char(ch: char) -> char {
+                let as_u32 = ch as u32;
+                if 0x2800 <= as_u32 && as_u32 <= 0x28FF {
+                    return unsafe {char::from_u32_unchecked(as_u32 | 0xC0)};
+                } else {
+                    return ch;
+                }
+            }
         }
     }
     
@@ -2020,7 +2185,7 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
 pub fn braille_replace_chars(str: &str, mathml: Element) -> Result<String> {
     return BRAILLE_RULES.with(|rules| {
         let rules = rules.borrow();
-        let mut rules_with_context = SpeechRulesWithContext::new(&rules);
+        let mut rules_with_context = SpeechRulesWithContext::new(&rules, "".to_string());
         return rules_with_context.replace_chars(str, &mathml);
     })
 }

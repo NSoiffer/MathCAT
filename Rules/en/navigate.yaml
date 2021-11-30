@@ -69,7 +69,7 @@
   name: skip-punct-at-end-zoom-in
   tag: mrow
   match:
-    - "($NavCommand = 'ZoomIn' or $NavCommand = 'ZoomInAll') and"
+    - "($NavCommand = 'ZoomIn' or $NavCommand = 'ZoomInAll' or $NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and"
     - " parent::m:math and count(*)=2 and"
     - " *[2][text()=',' or text()='.' or text()=';' or text()='?']"
   replace: 
@@ -79,14 +79,24 @@
   name: skip-punct-at-end-zoom-out
   tag: mrow
   match:
-    - "($NavCommand = 'ZoomOut' or $NavCommand = 'ZoomInOut') and"
+    - "($NavCommand = 'ZoomOut' or $NavCommand = 'ZoomOutAll') and"
     - " parent::m:math and count(*)=2 and"
     - " *[2][text()=',' or text()='.' or text()=';' or text()='?']"
   replace: 
-    - x: "parent::*"
-
+    - x: ".."
 
 # ********* ZoomIn  ***************
+
+-
+  name: zoom-in-leaf
+  tag: "*"
+  match: "($NavCommand = 'ZoomIn' or $NavCommand = 'ZoomInAll') and IsNode(., 'leaf')"
+  replace:
+    - test:
+        if: "$MatchCounter = 0"
+        then: [t: "zoomed in all of the way", pause: "long"]
+    - set_variables: [NavNode: "@id"]
+    
 
 # special case of zooming into a matrix or determinant -- move to the first element
 -
@@ -113,121 +123,139 @@
     - set_variables: [NavNode: "*[1]/*[1]/@id"]
 
 -
-  name: zoom-in-leaf
-  tag: "*"
-  match: "$NavCommand = 'ZoomIn' and IsNode(., 'leaf')"
+  # Moving to first or last is meaningless the 'math' has only an 'mrow' inside -- dig inside and do it again 
+  name: zoom-in-mrow-in-math
+  tag: "mrow"
+  match: "parent::m:math and count(parent::*)=1 and ($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom')"
   replace: 
     - test:
-        if: "$MatchCounter = 0"
-        then: [t: "zoomed in all of the way", pause: "long"]
+        if: "$NavCommand = 'MoveNextZoom'"
+        then: [x: "*[1]"]
+        else: [x: "*[last()]"]
 
 -
+# If there is only one child, this isn't an interesting move -- zoom in again
+# For msqrt and menclose, if the single child isn't an mrow, don't zoom in
   name: zoom-in-again
   tag: "*"
-  match: "$NavCommand = 'ZoomIn' and count(*)=1 and (*[1][self::m:mrow] or not(self::m:msqrt or self::m:menclose))"
+  match:
+    - "DEBUG($NavCommand = 'ZoomIn' or "
+    - "  (($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and $NavMode='Enhanced') ) and "
+    - "count(*)=1 and (*[1][self::m:mrow] or not(self::m:msqrt or self::m:menclose))"
   replace: 
     with:
       variables: [MatchCounter: "$MatchCounter + 1"]
-      replace: [x: "*[1]"]
+      replace:
+        test:
+            if: "$NavCommand = 'MovePreviousZoom'"
+            then: [x: "*[last()]"]
+            else: [x: "*[1]"]
+      
 
 -
-  name: zoom-in-enhanced
+  name: move-previous-zoom-locked-level
   tag: "*"
-  match: "$NavCommand = 'ZoomIn' and $NavMode='Enhanced'"
-  variables: [AutoZoom: "$NavMode='Enhanced' and self::m:mrow and *[1][IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"]
+  match: "$NavCommand = 'MovePreviousZoom' and $ReadZoomLevel >= DistanceFromLeaf(., true(), $NavMode!='Character')"
+  replace: 
+    - set_variables: [NavNode: "@id"]
+
+
+-
+  name: zoom-in-do-it-all
+  tag: "*"
+  match: "$NavCommand = 'ZoomIn' or $NavCommand = 'ZoomInAll' or $NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom'"
+  variables: [Distance: "DistanceFromLeaf(., true(), $NavMode!='Character')"]
   replace:
     - test:
         if: "$MatchCounter = 0"
         then: [t: "zoom in", pause: "long"]
     - test:
-        if: "$AutoZoom"
+        # AutoZoom
+        if: "$NavMode='Enhanced' and self::m:mrow and *[1][IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"
         then:
           with:
             variables: [MatchCounter: "$MatchCounter + 1"]
             replace: [x: "*[2]"]
         else:       
           - test:
-            - if: "self::m:mfrac"
-              then: [t: "in numerator", pause: long]
-            - else_if: "self::m:msqrt"
+            - if: "parent::m:mfrac"
+              then_test:
+                if: "position()=1"
+                then: [t: "in numerator", pause: long]
+                else: [t: in denominator, pause: long]
+            - else_if: "parent::m:msqrt"
               then: [t: "inside square root", pause: long]
-            - else_if: "self::m:mroot"
+            - else_if: "parent::m:mroot"
               then: [t: "inside root", pause: long]
-            - else_if: "self::m:msup or self::m:sub or self::m:msubsup or self::m:mmultiscripts"
-              then: [t: "in base", pause: long]
-          - set_variables: [NavNode: "*[1]/@id"]
+            - else_if: "parent::m:msup or parent::m:sub or parent::m:msubsup or parent::m:mmultiscripts"
+              then_test:
+                - if: "position()=1"
+                  then: [t: "in base", pause: long]
+                - else_if: "parent::m:msup or (parent::m:msubsup and position()=3)"
+                  then: [t: "in superscript", pause: long]
+                - else_if: "position()=2 and parent::m:msub"
+                  then: [t: "in subscript", pause: long]
+                - else:
+                  # FIX: mmultiscripts - super/sup depending on odd/even and before or after <mprescripts>. Also none
+                  - t: "in script"
+                  - pause: long
+            - else_if: "parent::m:munder or parent::m:mover or parent::m:munderover"
+              then_test:
+                - if: "position()=1"
+                  then: [t: "in base", pause: long]
+                - else_if: "parent::m:msup or (parent::m:msubsup and position()=3)"
+                  then: [t: "in upper limit", pause: long]
+                - else_if: "position()=2 and parent::m:msub"
+                  then: [t: "in lower limit", pause: long]
+                - else:
+                  # FIX: mmultiscripts - super/sup depending on odd/even and before or after <mprescripts>. Also none
+                  - t: "in script"
+                  - pause: long
+          - test:
+            - if:
+              - "$NavCommand = 'ZoomInAll' or "
+              - "( ($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and "
+              - "   $ReadZoomLevel >= 0 and $ReadZoomLevel < $Distance )" 
+              then:
+                - with:
+                    variables: [MatchCounter: "$MatchCounter + 1"]
+                    replace:
+                      test:
+                          if: "$NavCommand = 'MovePreviousZoom'"
+                          then: [x: "*[last()]"]
+                          else: [x: "*[1]"]
+            - else_if: "DEBUG(($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom')) and
+                        DEBUG($ReadZoomLevel) < DEBUG($Distance)"
+              then:
+                - test:
+                    if: "$NavMode='Enhanced'"
+                    then:
+                      - set_variables: [ReadZoomLevel: -1]
+                - set_variables: [NavNode: "@id"]
+            - else_if: "$NavMode!='Enhanced' and IsNode(., '2D')"
+              then_test:
+                if: "$NavCommand = 'MoveNextZoom'"
+                then:
+                  - set_variables: [NavCommand: "'MoveNextZoom'"]
+                  - with:
+                      variables: [MatchCounter: "$MatchCounter + 1"]
+                      replace: [x: "*[1]"]
+                else:
+                  - set_variables: [NavCommand: "'MovePreviousZoom'"]
+                  - with:
+                      variables: [MatchCounter: "$MatchCounter + 1"]
+                      replace: [x: "*[last()]"]
+            - else_if: "($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and $NavMode!='Enhanced'"
+              then:
+                - set_variables: [NavNode: "@id"]
+            - else: 
+                - test:
+                    if: "$ReadZoomLevel!=-1"
+                    then:
+                      - set_variables: [ReadZoomLevel: "DistanceFromLeaf(*[1], true, $NavMode!='Character')"]
+                - set_variables: [NavNode: "*[1]/@id"]
 
-# In non-Enhanced mode, zooming into a 2d expr should leave the zoom level unchanged
--
-  name: zoom-in-simple
-  tag: "*"
-  match: "$NavCommand = 'ZoomIn' and $NavMode!='Enhanced' and IsNode(., '2D')"
-  replace:
-    - test:
-        if: "$MatchCounter = 0"
-        then: [t: "zoom in", pause: "long"]
-
-
-# FIX: MoveNextZoom needs implementation
--
-  name: XXX
-  tag: "*"
-  match: "$NavCommand = 'MoveNextZoom'"
-  replace:
-    - t: "move next zoom command"
-
--
-  name: zoom-in-default
-  tag: "*"
-  match: "$NavCommand = 'ZoomIn'"
-  replace:
-    - test:
-        if: "$MatchCounter = 0"
-        then: [t: "zoom in", pause: "long"]
-    - test:
-        if: "$ReadZoomLevel=-1"
-        then:
-          - set_variables: [ReadZoomLevel: "-1"]
-        else:
-          - set_variables: [ReadZoomLevel: "DistanceFromLeaf(*[1], true, $NavMode!='Character')"]
-    - set_variables: [NavNode: "*[1]/@id"]
-
--
-  name: zoom-in-all-default
-  tag: "*"
-  match: "$NavCommand = 'ZoomInAll'"
-  replace:
-    - test:
-        if: "$MatchCounter = 0"
-        then: [t: "zoom in", pause: "long"]
-    - test:
-        - if: "self::m:mfrac"
-          then: [t: "in numerator", pause: long]
-        - else_if: "self::m:msqrt"
-          then: [t: "inside square root", pause: long]
-        - else_if: "self::m:mroot"
-          then: [t: "inside root", pause: long]
-        - else_if: "self::m:msup or self::m:sub or self::m:msubsup or self::m:mmultiscripts"
-          then: [t: "in base", pause: long]
-    - x: "*[1]"
-
-# FIX: ******* This rule is in a position where it was never used in MathPlayer -- remove it???
-# In Simple mode, zooming out of a 2d expr should set the zoom level back to one
-# The "DistanceFromLeaf" test is a way to tell if 'match' is a 2D element
-# any ? (::NavCommand=="ZoomIn" && ::NavMode=="Simple" &&
-# 		  DistanceFromLeaf(match, true, true)==1 && 		# at 2d structure or leaf
-# 		  DistanceFromLeaf(match, true, false) > 1)		# not a leaf
-# => ZoomIn {
-#       ruleRef = name(match);
-#       childIndex = index(match);                   # key to know what to say for each notation
-# 		atLeaf = false;
-# 		sayCommand = ::_match_counter==0;
-# 		::StartPosition = ^match.dfs;
-# 		::EndPosition = ^match.offset;
-# 		::ReadZoomLevel = 1;
-# 	};
-
-
+  
 # ********* ZoomOut  ***************
 -
   name: zoom-out
@@ -264,98 +292,67 @@
               - else_if: "self::m:msub"
                 then: [t: "out of subscript", pause: long]
               - else_if: "self::m:msup "
-                then: [t: "out of power", pause: long]  # FIX: needs to tie into 'intent'
+                then: [t: "out of superscript", pause: long]  # FIX: needs to tie into 'intent'
               - else_if: "self::m:msubsup or self::m:mmultiscripts"
                 then: [t: "out of scripts", pause: long]  # FIX: this should be better
+              - else_if: "parent::m:munder or parent::m:mover or parent::m:munderover"
+                then_test:
+                  - if: "position()=1"
+                    then: [t: "out of base", pause: long]
+                  - else_if: "parent::m:msup or (parent::m:msubsup and position()=3)"
+                    then: [t: "out of upper limit", pause: long]
+                  - else_if: "position()=2 and parent::m:msub"
+                    then: [t: "out of lower limit", pause: long]
           - test:
               if: "$NavCommand = 'ZoomOutAll'"
               then: [x: parent::*]
               else:
                 - test:
-                    if: "$ReadZoomLevel=-1"
+                    if: "$ReadZoomLevel!=-1"
                     then:
-                      - set_variables: [ReadZoomLevel: "-1"]
-                    else:
-                      - set_variables: [ReadZoomLevel: "DistanceFromLeaf(*[1], true, $NavMode!='Character')"]
+                      - set_variables: [ReadZoomLevel: "DistanceFromLeaf(.., true, $NavMode!='Character')"]
                 - set_variables: [NavNode: "parent::*/@id"]
 
 
-# ********* WhereAmI  ***************
-# We act a bit like "ReadCurrent" and a bit like "ZoomOut"/"ZoomOutAll"
 
-# any ? ( (::NavCommand=="WhereAmI" || ::NavCommand=="WhereAmIAll") && ::_match_counter==0)
-# => WhereAmIStart {
-# 		::_rematch= true;		# want to speak current expression first before doing other things (like saying "inside")
-# 	};
+# ********* MoveStart/End  ***************
+-
+  name: math-move-to-start-or-end
+  tag: math
+  match: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart' or 
+          $NavCommand = 'MoveEnd' or $NavCommand = 'MoveLineEnd'"
+  replace:
+    with:
+      variables: [MatchCounter: "$MatchCounter + 1"]
+      replace:
+        - test:
+            if: "DEBUG($NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart')"
+            then: 
+              - set_variables: [NavCommand: "'MoveNextZoom'"]
+              - x: "*[1]"
+            else:
+              - set_variables: [NavCommand: "'MovePreviousZoom'"]
+              - x: "DEBUG(*[last()])"
 
-# any ? ( ( name(match)=="math" || (name(^match)=="math" && count(^match)==1) ) &&
-# 		  (::NavCommand=="WhereAmI" || ::NavCommand=="WhereAmIAll") &&
-# 		  ::_match_counter==1)
-# => WhereAmI {
-# 		# don't change StartPosition
-# 		ruleRef = "math";
-# 		wordRef = "AtRoot";
-#  		::SpeakAfterMove = false;
-#   };
+-
+  name: move-to-start-or-end-2d
+  tag: "*"
+  match: "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and DEBUG(IsNode(.., '2D'))"
+  replace:
+    test:
+        if: "$NavCommand = 'MoveLineStart'"
+        then: [set_variables: [NavNode: "*[1]/@id"]]
+        else: [set_variables: [NavNode: "*[last()]/@id"]]
 
-# any ? ( (::NavCommand=="WhereAmI" || ::NavCommand=="WhereAmIAll") && has_parent(match))
-# => WhereAmI {
-# 		ruleRef = name(^match);
-# 		childIndex = index(^match);                   # key to know what to say for each notation
-# 		::StartPosition = ^match.dfs;
-# 		::EndPosition = ^match.offset;
-# 		::SpeakAfterMove = !( IsBracketed(^match, "(", ")") || IsBracketed(^match, "[", "]") );# autozoom;
-# 		sayCommand = ::SpeakAfterMove;
-# 		::_rematch= (
-# 			  ( ::NavCommand=="WhereAmIAll" || !::SpeakAfterMove ) &&
-# 			  !( name(^match)=="math" || (name(^^match)=="math" && count(^^match)==1) )
-# 		   );
-#    };
-
-
-
-# # ********* MoveStart/End  ***************
-# # We keep the NavMode and zoom level if not Enhanced
-# # For Enhanced mode, we zoom in once
-# math ? (::NavCommand=="MoveStart" || ::NavCommand=="MoveLineStart" ||
-# 		  ::NavCommand=="MoveEnd" || ::NavCommand=="MoveLineEnd")
-# => MoveToEdge {
-# 		ruleRef = "math";
-# 		moveStart = (::NavCommand=="MoveStart" || ::NavCommand=="MoveLineStart");
-# 		childIndex = 0;                   # key to know what to say for each
-# 		sayCommand = false;
-# 		node = ( count($0)==2 &&
-# 				  (MatchString($0[1], "mo", ",") || MatchString($0[1], "mo", ".") || MatchString($0[1], "mo", "?")) ) ? $0[0] : $0;
-# 		::StartPosition = moveStart ? node[0].dfs : node[-1].dfs;
-#  		::EndPosition = moveStart ? node[0].offset : node[-1].offset;
-# 		::NavCommand = moveStart ?  "MoveNextZoom" : "MovePreviousZoom";
-# 		::SpeakAfterMove = false;
-# 		::_rematch = true;
-#  };
-
-# any ? (::NavCommand=="MoveLineStart" && IsNode(^match, "2D"))
-# => MoveToLineStart {
-# 		ruleRef = name(match);
-# 		childIndex = index(match);                   # key to know what to say for each
-# 		sayCommand = false;
-# 		::StartPosition = match[0].dfs;
-#  		::EndPosition = match[0].offset;
-# 		::NavCommand = "MoveNextZoom";
-# 		::SpeakAfterMove = false;
-# 		::_rematch=true;
-#  };
-
-#  any ? (::NavCommand=="MoveLineEnd" && IsNode(^match, "2D"))
-# => MoveToLineEnd {
-# 		ruleRef = name(match);
-# 		childIndex = index(match);                   # key to know what to say for each
-# 		sayCommand = false;
-# 		::StartPosition = match[-1].dfs;
-#  		::EndPosition = match[-1].offset;
-# 		::NavCommand = "MovePreviousZoom";
-# 		::SpeakAfterMove = false;
-# 		::_rematch=true;
-#  };
+-
+  name: move-to-start-or-end-default
+  tag: "*"
+  match: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart' or 
+          $NavCommand = 'MoveEnd'   or $NavCommand = 'MoveLineEnd'"
+  replace:
+    with:
+      variables: [MatchCounter: "DEBUG($MatchCounter) + 1"]
+      replace: [x: "DEBUG(..)"]
 
 # # Table-related movement
 # # Typically, we need to zoom out to the mtd level, then we move the appropriate direction
@@ -680,18 +677,6 @@
 # 			::NavCommand=="MoveColumnStart" || ::NavCommand=="MoveColumnEnd" ||
 # 			::NavCommand=="ReadCellCurrent") &&
 # 		  has_parent(match) )
-# => ZoomOutForMove {											# avoid saying things "ZoomOut" would say
-# 		ruleRef = name(match);
-# 		childIndex = index(match);                   # key to know what to say for each
-# 		sayCommand = false;
-# 		::StartPosition = ^match.dfs;
-#  		::EndPosition = ^match.offset;
-# 		::SpeakAfterMove = false;
-# 		::_rematch=true;
-#  };
-
-# any ? ( ::NavCommand=="MoveStart" || ::NavCommand=="MoveLineStart" ||
-# 		  ::NavCommand=="MoveEnd" || ::NavCommand=="MoveLineEnd" )
 # => ZoomOutForMove {											# avoid saying things "ZoomOut" would say
 # 		ruleRef = name(match);
 # 		childIndex = index(match);                   # key to know what to say for each
@@ -1137,56 +1122,6 @@
 # 		::_rematch = true;                     # need to potentially zoom the sibling
 #   };
 
-# any ? ( ::NavCommand=="MoveNextZoom"  &&
-# 		  ::ReadZoomLevel >= 0 && 
-# 		  ::ReadZoomLevel<DistanceFromLeaf(match, true, ::NavMode!="Character") )
-# => ZoomIn {
-#       ruleRef = name(match);
-#       childIndex = 0;                   # key to know what to say for each notation
-# 		atLeaf = false;
-# 		sayCommand = false;
-#       ::StartPosition = $0.dfs;
-# 		::EndPosition = $0.offset;
-# 		::SpeakAfterMove = false;
-# 		::_rematch = true;                     # need to potentially zoom the sibling
-#   };
-
-
-# any ? ( ::NavCommand=="MoveNextZoom"  &&
-# 		  ::ReadZoomLevel>=DistanceFromLeaf(match, true, ::NavMode!="Character") )
-# => MoveNextZoom {
-# 		ruleRef = name(^match);
-# 		childIndex = index(match);                   # key to know what to say for each notation
-#  		atLeaf = false;										# don't say "zoomed in all the way"
-# 		sayCommand = false;
-# 		::ReadZoomLevel = ::NavMode=="Enhanced" ? -1 : ::ReadZoomLevel;	# reset ReadZoomLevel if it was changed
-#  }; 
-
-# # Zooming when in Enhanced mode 
-# # If there is only one child, this isn't an interesting move -- zoom in again
-# any ? (::NavCommand=="MoveNextZoom" &&
-# 		 count(match)==1 && !IsNode(match, "Leaf") &&
-# 		 ::NavMode=="Enhanced" &&
-# 		 name(match)!="msqrt" && name(match)!="menclose")
-# => ZoomIn {
-# 		ruleRef = name(^match);
-# 		childIndex = index(match);                   # key to know what to say for each notation
-# 		atLeaf = false;
-# 		sayCommand = false;
-#       ::StartPosition = $0.dfs;
-# 		::EndPosition = $0.offset;
-# 		::SpeakAfterMove = false;
-# 		::_rematch = true;                     # need to potentially zoom the sibling
-#   };
-
-
-# any ? ((::NavCommand=="MoveNextZoom" || ::NavCommand=="MovePreviousZoom") && ::NavMode=="Enhanced")
-# => ZoomIn {
-# 		ruleRef = name(^match);
-# 		childIndex = index(match);                   # key to know what to say for each notation
-#  		atLeaf = false;										# don't say "zoomed in all the way"
-# 		sayCommand = false;
-#  };
 
 
 # any ? (::NavCommand=="ReadCurrent" || ::NavCommand=="DescribeCurrent")
@@ -1320,3 +1255,37 @@
 # 	placemarkerSet = SetPlacemarker(::PlaceMarkerIndex, ::StartPosition, ::EndPosition);
 # 	::SpeakAfterMove = false;
 # };
+
+
+# ********* WhereAmI  ***************
+# We act a bit like "ReadCurrent" and a bit like "ZoomOut"/"ZoomOutAll"
+
+# any ? ( (::NavCommand=="WhereAmI" || ::NavCommand=="WhereAmIAll") && ::_match_counter==0)
+# => WhereAmIStart {
+# 		::_rematch= true;		# want to speak current expression first before doing other things (like saying "inside")
+# 	};
+
+# any ? ( ( name(match)=="math" || (name(^match)=="math" && count(^match)==1) ) &&
+# 		  (::NavCommand=="WhereAmI" || ::NavCommand=="WhereAmIAll") &&
+# 		  ::_match_counter==1)
+# => WhereAmI {
+# 		# don't change StartPosition
+# 		ruleRef = "math";
+# 		wordRef = "AtRoot";
+#  		::SpeakAfterMove = false;
+#   };
+
+# any ? ( (::NavCommand=="WhereAmI" || ::NavCommand=="WhereAmIAll") && has_parent(match))
+# => WhereAmI {
+# 		ruleRef = name(^match);
+# 		childIndex = index(^match);                   # key to know what to say for each notation
+# 		::StartPosition = ^match.dfs;
+# 		::EndPosition = ^match.offset;
+# 		::SpeakAfterMove = !( IsBracketed(^match, "(", ")") || IsBracketed(^match, "[", "]") );# autozoom;
+# 		sayCommand = ::SpeakAfterMove;
+# 		::_rematch= (
+# 			  ( ::NavCommand=="WhereAmIAll" || !::SpeakAfterMove ) &&
+# 			  !( name(^match)=="math" || (name(^^match)=="math" && count(^^match)==1) )
+# 		   );
+#    };
+
