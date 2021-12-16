@@ -91,27 +91,19 @@ fn main() {
   //                 <mspace width=\"thinmathspace\"></mspace><mn>234</mn></math>";
   // let expr = "<math><mn>𝟏𝟐𝟑</mn></math>";
   // let expr = "<math><mo>(</mo><mrow><mn>451</mn><mo>,</mo><mn>231</mn></mrow><mo>)</mo></math>";
-  let expr = "<math display='block' id='Mqky319r-0' data-id-added='true'>
-  <mrow data-changed='added' id='Mqky319r-1' data-id-added='true'>
-    <mrow data-changed='added' id='Mqky319r-2' data-id-added='true'>
-      <mi id='Mqky319r-3' data-id-added='true'>sin</mi>
-      <mo data-mjx-texclass='NONE' id='Mqky319r-4' data-id-added='true'>&#x2061;</mo>
-      <mi id='Mqky319r-5' data-id-added='true'>x</mi>
-    </mrow>
-    <mo id='Mqky319r-6' data-id-added='true'>+</mo>
-    <mrow data-changed='added' id='Mqky319r-7' data-id-added='true'>
-      <msup id='Mqky319r-8' data-id-added='true'>
-        <mi id='Mqky319r-9' data-id-added='true'>cos</mi>
-        <mn id='Mqky319r-10' data-id-added='true'>2</mn>
-      </msup>
-      <mo data-mjx-texclass='NONE' id='Mqky319r-11' data-id-added='true'>&#x2061;</mo>
-      <mi id='Mqky319r-12' data-id-added='true'>ϕ</mi>
-    </mrow>
-  </mrow>
- </math>";
+  let expr = "
+  <math display='block' id='x0'> <semantics>
+   <mrow displaystyle='true' id='x1'>
+     <mn id='x2'>1<span> foo </span>9</mn>
+     <mo id='x3'>+</mo>
+     <mn id='x4'>2</mn>
+   </mrow>
+   </semantics></math>";
   let instant = Instant::now();
-  SetMathML(expr.to_string()).unwrap();
-  SetPreference("TTS".to_string(), StringOrFloat::AsString("SSML".to_string())).unwrap();
+  if let Err(e) = SetMathML(expr.to_string()) {
+    panic!("Error: exiting -- {}", e);
+  };
+  // SetPreference("TTS".to_string(), StringOrFloat::AsString("SSML".to_string())).unwrap();
   SetPreference("Bookmark".to_string(), StringOrFloat::AsString("true".to_string())).unwrap();
 
   let speech_string = GetSpokenText().unwrap();

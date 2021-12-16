@@ -486,6 +486,7 @@ enum Replacement {
     With(Box<With>),
     SetVariables(Box<SetVariables>),
     Insert(Box<InsertChildren>),
+    Speak(SpeakExpression),
 }
 
 impl fmt::Display for Replacement {
@@ -493,12 +494,13 @@ impl fmt::Display for Replacement {
         return write!(f, "{}",
             match self {
                 Replacement::Test(c) => c.to_string(),
-                Replacement::Text(t) => format!("{{t: \"{}}}\"", t),
+                Replacement::Text(t) => format!("[t: \"{}]\"", t),
                 Replacement::XPath(x) => x.to_string(),
                 Replacement::TTS(t) => t.to_string(),
                 Replacement::With(w) => w.to_string(),
                 Replacement::SetVariables(v) => v.to_string(),
                 Replacement::Insert(ic) => ic.to_string(),
+                Replacement::Speak(x) => x.to_string(),
             }
         );
     }
@@ -539,7 +541,7 @@ impl Replacement {
                 return Ok( Replacement::XPath( MyXPath::build(value)
                     .chain_err(|| "while trying to evaluate value of 'x:'")? ) );
             },
-            "pause" | "rate" | "pitch" | "volume" | "gender" | "voice" | "spell" | "bookmark" => {
+            "pause" | "rate" | "pitch" | "volume" | "gender" | "voice" | "spell" | "bookmark" | "pronounce"=> {
                 return Ok( Replacement::TTS( TTS::build(key, value)? ) );
             },
             "test" => {
@@ -553,6 +555,10 @@ impl Replacement {
             },
             "insert" => {
                 return Ok( Replacement::Insert( InsertChildren::build(value)? ) );
+            },
+            "speak" => {
+                return Ok( Replacement::Speak( SpeakExpression::build(value)
+                    .chain_err(|| "while trying to evaluate value of 'speak:'")? ) );
             },
             _ => {
                 bail!("Unknown 'replace' command ({}) with value: {}", key, yaml_to_string(value, 0));
@@ -653,7 +659,7 @@ struct With {
 
 impl fmt::Display for With {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "with:\n  variables {}\n  replacements {}", &self.variables, &self.replacements);
+        return write!(f, "with:\n      variables: {}\n      replace: {}", &self.variables, &self.replacements);
     }
 }
 
@@ -715,6 +721,55 @@ impl<'r> SetVariables {
     fn replace<'c, 's:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
         rules_with_context.context_stack.set_globals(self.variables.clone(), mathml)?;
         return Ok( "".to_string() );
+    }    
+}
+
+
+// allow speech of an expression (used by "WhereAmI" for navigation)
+#[derive(Debug, Clone)]
+struct SpeakExpression {
+    id: MyXPath,     // variables and values
+}
+
+impl fmt::Display for SpeakExpression {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        return write!(f, "speak: {}", &self.id);
+    }
+}
+impl<'r> SpeakExpression {
+    fn build(vars: &Yaml) -> Result<SpeakExpression> {
+        // 'speak:' -- xpath (should evaluate to an id)
+        return Ok( SpeakExpression { id: MyXPath::build(vars).chain_err(|| "'set_variables'")? } );
+    }
+        
+    fn replace<'c, 's:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
+        let xpath_value = self.id.evaluate(rules_with_context.get_context(), mathml)?;
+        let id = match xpath_value {
+            Value::String(s) => Some(s),
+            Value::Nodeset(nodes) => {
+                if nodes.size() == 1 {
+                    if let Some(attr) = nodes.document_order_first().unwrap().attribute() {
+                        Some(attr.value().to_string())
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            },
+            _ => None,
+        };
+        let speech = match id {
+            None => bail!("'speak' value '{}' is not a string or an attribute value (correct by using '@id'??):\n", self.id),
+            Some(id) => {
+                match crate::navigate::get_node_by_id(*mathml, &id) { // FIX: should use root of MathML
+                    None => bail!("'speak' value '{}' was not an 'id' found in {}", &id, mml_to_string(mathml)),
+                    Some(element) => speak_mathml(element),
+                }
+            }
+        };
+
+        return Ok(speech);
     }    
 }
 
@@ -876,7 +931,7 @@ pub struct MyXPath {
 
 impl fmt::Display for MyXPath {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "{{x: \"{}\"}}", self.string);
+        return write!(f, "[x: \"{}\"]", self.string);
     }
 }
 
@@ -918,15 +973,22 @@ impl<'r> MyXPath {
     fn compile_xpath(xpath: &str) -> Result<XPath> {
         let factory = Factory::new();
         let xpath_with_debug_info = MyXPath::add_debug_string_arg(xpath)?;
-        let xpath = factory.build(&xpath_with_debug_info)
+        let compiled_xpath = factory.build(&xpath_with_debug_info)
                         .chain_err(|| format!(
                             "Could not compile XPath for pattern:\n{}{}",
                             &xpath, more_details(&xpath)))?;
-        return Ok(xpath.unwrap());
+        return match compiled_xpath {
+            Some(xpath) => Ok(xpath),
+            None => bail!("Problem compiling Xpath for pattern:\n{}{}",
+                            &xpath, more_details(&xpath)),
+        };
 
         
         fn more_details(xpath: &str) -> String {
             // try to give a better error message by counting [], (), 's, and "s
+            if xpath.is_empty() {
+                return "xpath is empty string".to_string();
+            }
             let as_bytes = xpath.trim().as_bytes();
             if as_bytes[0] == b'\'' && as_bytes[as_bytes.len()-1] != b'\'' {
                 return "\nmissing \"'\"".to_string();
@@ -1088,7 +1150,7 @@ struct SpeechPattern {
 
 impl<'a> fmt::Display for SpeechPattern {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "{{name: {}, tag: {}, variables: {:?}, pattern: {}, replacement: {}}}",
+        return write!(f, "[name: {}, tag: {}, variables: {:?}, pattern: {}, replacement: {}]",
                 self.pattern_name, self.tag_name, self.var_defs, self.pattern,
                 self.replacements.pretty_print_replacements());
     }
@@ -1369,7 +1431,7 @@ struct Test {
 }
 impl fmt::Display for Test {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "test: {{ ")?;
+        write!(f, "test: [ ")?;
         if let Some(if_part) = &self.condition {
             write!(f, "  if: '{}'", if_part)?;
         }
@@ -1379,7 +1441,7 @@ impl fmt::Display for Test {
         if let Some(else_part) = &self.else_part {
             write!(f, "  else{}", else_part)?;
         }
-        return write!(f, "}}");
+        return write!(f, "]");
     }
 }
 
@@ -1402,7 +1464,7 @@ struct VariableDefinition {
 
 impl fmt::Display for VariableDefinition {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "{{name: {}, value: {}}}", self.name, self.value);
+        return write!(f, "[name: {}, value: {}]", self.name, self.value);
     }   
 }
 
@@ -1419,7 +1481,7 @@ impl<'v> fmt::Display for VariableValue<'v> {
             None => "unset".to_string(),
             Some(val) => format!("{:?}", val)
         };
-        return write!(f, "{{name: {}, value: {}}}", self.name, value);
+        return write!(f, "[name: {}, value: {}]", self.name, value);
     }   
 }
 
@@ -2020,7 +2082,7 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
                     Err(e) => Err( e.chain_err(||
                         format!(
                             "attempting replacement pattern: \"{}\" for \"{}\".\n\
-                            Replacement \"{}\" due to matching the following MathML with the pattern \"{}\".\n\
+                            Replacement\n{}\n...due to matching the following MathML with the pattern\n{}\n\
                             {}\
                             The patterns are in {}.\n",
                             pattern.pattern_name, pattern.tag_name,
@@ -2103,7 +2165,7 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
         return Ok(
             match &*replacement {
                 Replacement::Text(t) => t.clone(),
-                Replacement::XPath(path) => path.replace(self, mathml)?,
+                Replacement::XPath(xpath) => xpath.replace(self, mathml)?,
                 Replacement::TTS(tts) => {
                     self.speech_rules.pref_manager.borrow().get_tts().replace(&tts, &self.speech_rules.pref_manager.borrow(), self, mathml)?
                 },
@@ -2118,6 +2180,9 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
                 },
                 Replacement::Insert(ic) => {
                     ic.replace(self, mathml)?                     
+                },
+                Replacement::Speak(id) => {
+                    id.replace(self, mathml)?                     
                 },
             }
         )

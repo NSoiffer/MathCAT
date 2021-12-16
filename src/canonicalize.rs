@@ -395,7 +395,9 @@ impl CanonicalizeContext {
 				ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(parent_name.as_str())
 			};
 		match element_name {
-			"mn" | "ms" | "mglyph" => {return Some(mathml);},
+			"mn" | "ms" | "mglyph" => {
+				return Some(mathml);
+			},
 			"mi" => {
 				// change <mi>s that are likely <mo>s to <mo>s
 				let text = as_text(mathml);
@@ -1610,7 +1612,13 @@ impl CanonicalizeContext {
 				return true;	// don't bother checking contents of parens, consider these as function names
 			}
 	
-			if is_single_arg(right_siblings) {
+			if is_single_arg(as_text(first_sibling), &right_siblings[1..]) {
+				// debug!("      ...is single arg");
+				return true;	// if there is only a single arg, why else would you use parens?
+			};
+
+			if is_comma_arg(as_text(first_sibling), &right_siblings[1..]) {
+				// debug!("      ...is comma arg");
 				return true;	// if there is only a single arg, why else would you use parens?
 			};
 	
@@ -1623,25 +1631,54 @@ impl CanonicalizeContext {
 			if chars.next().is_some() && first_char.is_uppercase() {
 				return true;
 			}
-	
+
+			// debug!("      ...didn't match options to be a function");
 			return false;		// didn't fit one of the above categories
 		});
 	
-		fn is_single_arg<'a>(following_nodes: &[ChildOfElement<'a>]) -> bool {
-			if following_nodes.len() == 1 {
+		fn is_single_arg<'a>(open: &str, following_nodes: &[ChildOfElement<'a>]) -> bool {
+			// following_nodes are nodes after "("
+			if following_nodes.is_empty() {
 				return true;		// "a(" might or might not be a function call -- treat as "is" because we can't see more 
 			}
 	
-			let next_child = as_element(following_nodes[1]);
-			if is_right_paren(next_child) {
+			let first_child = as_element(following_nodes[0]);
+			if is_matching_right_paren(open, first_child) {
 				return true;		// no-arg case "a()"
 			}
 	
 			// could be really picky and restrict to checking for only mi/mn
 			// that might make more sense in stranger cases, but mfrac, msqrt, etc., probably shouldn't have parens if times 
-			return following_nodes.len() > 2 && 
-					name(&next_child) != "mrow" &&
-					is_right_paren(as_element(following_nodes[2]));
+			return following_nodes.len() > 1 && 
+					name(&first_child) != "mrow" &&
+					is_matching_right_paren(open, as_element(following_nodes[1]));
+		}
+	
+		fn is_comma_arg<'a>(open: &str, following_nodes: &[ChildOfElement<'a>]) -> bool {
+			// following_nodes are nodes after "("
+			if following_nodes.len() == 1 {
+				return false; 
+			}
+
+			let first_child = as_element(following_nodes[1]);
+			if name(&first_child) == "mrow" {
+				return is_comma_arg(open, &first_child.children()[..]);
+			}
+
+			// FIX: this loop is very simplistic and could be improved to count parens, etc., to make sure "," is at top-level
+			for child in following_nodes {
+				let child = as_element(*child);
+				if name(&child) == "mo" {
+					if as_text(child) == "," {
+						return true;
+					}
+					if is_matching_right_paren(open, child) {
+						return false;
+					}
+				}
+			}
+			
+			return false;
 		}
 	
 		fn is_left_paren(node: Element) -> bool {
@@ -1652,12 +1689,13 @@ impl CanonicalizeContext {
 			return text == "(" || text == "[";
 		}
 	
-		fn is_right_paren(node: Element) -> bool {
+		fn is_matching_right_paren(open: &str, node: Element) -> bool {
 			if name(&node) != "mo" {
 				return false;
 			}
 			let text = as_text(node);
-			return text == ")" || text == "]";
+			// debug!("         is_matching_right_paren: open={}, close={}", open, text);
+			return (open == "(" && text == ")") || (open == "[" && text == "]");
 		}
 	}
 	
@@ -2099,7 +2137,7 @@ pub fn as_text(leaf_child: Element) -> &str {
 	assert!(children.len() == 1);
 	return match children[0] {
 		ChildOfElement::Text(t) => t.text(),
-		_ => panic!("as_text: internal error -- found non-text child of leaf element"),	
+		_ => panic!("as_text: internal error -- found non-text child of leaf element"),
 	}
 }
 
@@ -2506,7 +2544,9 @@ mod canonicalize_tests {
 			<mo>+</mo>
 		 <mi>f</mi><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo>
 			<mo>+</mo>
-		 <mi>t</mi><mrow><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></mrow>
+		 <mi>t</mi><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo>
+			<mo>+</mo>
+		 <mi>w</mi><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo>
 		</math>";
         let target_str = " <math>
 		<mrow data-changed='added'>
@@ -2541,7 +2581,7 @@ mod canonicalize_tests {
 		<mrow data-changed='added'>
 		  <mi>t</mi>
 		  <mo data-changed='added'>&#x2062;</mo>
-		  <mrow>
+		  <mrow data-changed='added'>
 			<mo>(</mo>
 			<mrow data-changed='added'>
 			  <mi>x</mi>
@@ -2549,10 +2589,24 @@ mod canonicalize_tests {
 			  <mi>y</mi>
 			</mrow>
 			<mo>)</mo>
-			</mrow>
 		  </mrow>
 		</mrow>
-	   </math>";
+		<mo>+</mo>
+		<mrow data-changed='added'>
+		  <mi>w</mi>
+		  <mo data-changed='added'>&#x2061;</mo>
+		  <mrow data-changed='added'>
+			<mo>(</mo>
+			<mrow data-changed='added'>
+			  <mi>x</mi>
+			  <mo>,</mo>
+			  <mi>y</mi>
+			</mrow>
+			<mo>)</mo>
+		  </mrow>
+		</mrow>
+	  </mrow>
+      </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
     }
 

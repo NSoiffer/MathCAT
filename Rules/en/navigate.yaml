@@ -1,40 +1,174 @@
 ---
 # Documentation:
+#
+# The general form for many rules is:
+# 1. Say the command if this is first rule to fire (MatchCounter)
+# 2. Say info about moving into/out of 2D structures
+# 3. Set some variables and possibly recurse.
+#    If recursing, "MatchCounter" should be incremented.
+#    If stopping, "NavNode" should be set.
+#
+# For the second item, a common set of rules is used. These rules require the variable "Move2D"
+# to be set along with "Child2D", where "Move2D" is potentially the parent 2D structure.
+#
+# In addition, the navigation rules make use of two functions:
+#
 # int DistanceFromLeaf(node, leftSide, treat2DElementsAsTokens)
 #   Returns the distance (number of children) until a leaf is reached by traversing the leftmost/rightmost child
 #   If 'treat2DElementsAsTokens' is true, then 2D notations such as fractions are treated like leaves 
 #   A leaf has distance == 0
 #
 # EdgeNode(node, "left"/"right", stopNodeName)
-# 		-- returns the stopNode if at left/right edge of named ancestor node. 'stopNodeName' can also be "2D'
-# 		   returns original node match isn't found
+#   Returns the stopNode if at left/right edge of named ancestor node. 'stopNodeName' can also be "2D'
+# 	If the stopNode isn't found, the original node is returned
 #  Note: if stopNodeName=="math", then punctuation is taken into account since it isn't really part of the math
-
-# The following globals are used for navigation.
-# Note: some names are historical and when everything settles down,
-#   they should be updated here and in the C code
-# NavCommand:  the command being executed (e.g, "ZoomIn")
-# StartPosition, EndPosition: the start and end positions of the current node(s) in the (canonicalized) input tree 
-# NavMode: the navigation mode (Enhanced, Simple, Character)
-# DescribeAfterMove: either read the result or describe it
-# ReadZoomLevel: distance from leaf to maintain; -1 for "Enhanced" mode
-# SpeakAfterMove: true if the position should be read/described.
-#    This is different than speaking navigation (e.g, "zoom in", "in denominator")
-# PlaceMarkerIndex: which placemarker (0-9) is specified. '10' means not set
-# SetNewPosition: 'true' if the new position should be recorded
-#   default value is probably right, but if the command might need to change it in some special cases
-# _rematch: true if the match should be repeated, false if done.
-#    The value is set to false after speaking, so it only needs to be set true if
-#    continued matching is desired.
-# _match_counter: the number of times through the loop, 0-based (read only)
 #
-# In addition to these globals the following attributes are commonly set for use in the next
-#   navigation phase
-# ruleRef:  used as a key to help determine which rule to file -- usually the matched node's name
-# childIndex: typically the index of the child in that node
-# sayCommand: whether the nav command should be spoken
+# A few other variables are of importance to Navigation
+# NavMode -- Enhanced, Simple, Character
+# ReadZoomLevel -- -1 for Enhanced, otherwise the distance from leaf the rules should maintain
+# PlaceMarkerIndex
 
-# **********************  COMMON RULES FOR NAVIGATION ****************************** //
+
+# Rules for speaking what happens when moving into or out of a notation
+-
+  name: into
+  tag: mfrac
+  match: "$Move2D != ''"
+  replace:
+    - x: "$Move2D"
+    - test:
+        if: "count($Child2D/preceding-sibling::*)=0"
+        then: [t: "numerator"]
+        else: [t: "denominator"]
+    - pause: "medium"
+
+-
+  name: into
+  tag: msqrt
+  match: "$Move2D != ''"
+  replace: 
+    - x: "$Move2D"
+    - t: "square root"
+    - pause: "medium"
+
+-
+  name: into
+  tag: mroot
+  match: "$Move2D != ''"
+  replace: 
+    - x: "$Move2D"
+    - test:
+        if: "count($Child2D/preceding-sibling::*)=0"
+        then: [t: "root"]
+        else: [t: "root index"]
+    - pause: "medium"
+
+-
+  name: into
+  tag: msub
+  match: "$Move2D != ''"
+  replace: 
+    - x: "$Move2D"
+    - test:
+        if: "count($Child2D/preceding-sibling::*)=0"
+        then: [t: "base"]
+        else: [t: "subscript"]
+    - pause: "medium"
+
+-
+  name: into
+  tag: msup
+  match: "$Move2D != ''"
+  replace: 
+    - x: "$Move2D"
+    - test:
+        if: "count($Child2D/preceding-sibling::*)=0"
+        then: [t: "base"]
+        else: [t: "superscript"] # FIX: it would be better to use the word used when reading (power, exponent, ...)
+    - pause: "medium"
+
+-
+  name: into
+  tag: msubsup
+  match: "$Move2D != ''"
+  replace: 
+    - x: "$Move2D"
+    - test:
+        - if: "count($Child2D/preceding-sibling::*)=0"
+          then: [t: "base"]
+        - else_if: "count($Child2D/preceding-sibling::*)=1"
+          then: [t: "subscript"]
+          else: [t: "superscript"] # FIX: it would be better to use the word used when reading (power, exponent, ...)
+    - pause: "medium"
+
+-
+  name: into
+  tag: munder
+  match: "$Move2D != ''"
+  replace: 
+    - x: "$Move2D"
+    - test:
+        if: "count($Child2D/preceding-sibling::*)=0"
+        then: [t: "base"]
+        else: [t: "lower limit"]
+    - pause: "medium"
+
+-
+  name: into
+  tag: mover
+  match: "$Move2D != ''"
+  replace: 
+    - x: "$Move2D"
+    - test:
+        if: "count($Child2D/preceding-sibling::*)=0"
+        then: [t: "base"]
+        else: [t: "upper limit"]
+    - pause: "medium"
+
+-
+  name: into
+  tag: munderover
+  match: "$Move2D != ''"
+  replace: 
+    - x: "$Move2D"
+    - test:
+        - if: "count($Child2D/preceding-sibling::*)=0"
+          then: [t: "base"]
+        - else_if: "count($Child2D/preceding-sibling::*)=1"
+          then: [t: "lower limit"]
+          else: [t: "upper limit "]
+    - pause: "medium"
+
+-
+  name: into
+  tag: mmultiscripts
+  match: "$Move2D != ''"
+  replace: 
+    - x: "$Move2D"
+    - test:
+        - if: "count($Child2D/preceding-sibling::*)=0"
+          then: [t: "base"]
+        - else_if: "$Child2D/following-sibling::*[self::m:mprescripts]" # are we before mprescripts and hence are postscripts
+          then:
+            - test:
+                if: [count($Child2D/preceding-sibling::*) mod 2 != 0]
+                then: [t: "subscript"]
+                else: [t: "superscript"]
+          else:
+            - test:
+                if: [count($Child2D/preceding-sibling::*) mod 2 = 0]
+                then: [t: "subscript"]
+                else: [t: "superscript"]
+    - pause: "medium"
+
+-
+  # nothing to do (not 2D) -- need to catch $Move2D though so rules based on NavCommand don't trigger
+  name: default-move
+  tag: "*"
+  match: "$Move2D != ''"
+  replace: []
+
+
 
 # ********* Go back to last position ***************
 # This is first since start/end position shouldn't matter
@@ -86,7 +220,6 @@
     - x: ".."
 
 # ********* ZoomIn  ***************
-
 -
   name: zoom-in-leaf
   tag: "*"
@@ -95,7 +228,11 @@
     - test:
         if: "$MatchCounter = 0"
         then: [t: "zoomed in all of the way", pause: "long"]
-    - set_variables: [NavNode: "@id"]
+    - test:
+        if: "$ReadZoomLevel!=-1"
+        then:
+          - set_variables: [ReadZoomLevel: "0"]
+    - set_variables: [NavNode: "@id", ]
     
 
 # special case of zooming into a matrix or determinant -- move to the first element
@@ -125,13 +262,13 @@
 -
   # Moving to first or last is meaningless the 'math' has only an 'mrow' inside -- dig inside and do it again 
   name: zoom-in-mrow-in-math
-  tag: "mrow"
-  match: "parent::m:math and count(parent::*)=1 and ($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom')"
+  tag: "math"
+  match: "count(*)=1 and ($NavCommand = 'ZoomIn' or $NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom')"
   replace: 
     - test:
-        if: "$NavCommand = 'MoveNextZoom'"
-        then: [x: "*[1]"]
-        else: [x: "*[last()]"]
+        if: "$NavCommand = 'MovePreviousZoom'"
+        then: [x: "*[last()]"]
+        else: [x: "*[1]"]
 
 -
 # If there is only one child, this isn't an interesting move -- zoom in again
@@ -139,179 +276,200 @@
   name: zoom-in-again
   tag: "*"
   match:
-    - "DEBUG($NavCommand = 'ZoomIn' or "
+    - "($NavCommand = 'ZoomIn' or "
     - "  (($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and $NavMode='Enhanced') ) and "
-    - "count(*)=1 and (*[1][self::m:mrow] or not(self::m:msqrt or self::m:menclose))"
+    - "count(*)=1 and (*[1][self::m:mrow] and not(self::m:msqrt or self::m:menclose))"
   replace: 
-    with:
-      variables: [MatchCounter: "$MatchCounter + 1"]
-      replace:
-        test:
-            if: "$NavCommand = 'MovePreviousZoom'"
-            then: [x: "*[last()]"]
-            else: [x: "*[1]"]
-      
-
--
-  name: move-previous-zoom-locked-level
-  tag: "*"
-  match: "$NavCommand = 'MovePreviousZoom' and $ReadZoomLevel >= DistanceFromLeaf(., true(), $NavMode!='Character')"
-  replace: 
-    - set_variables: [NavNode: "@id"]
-
-
--
-  name: zoom-in-do-it-all
-  tag: "*"
-  match: "$NavCommand = 'ZoomIn' or $NavCommand = 'ZoomInAll' or $NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom'"
-  variables: [Distance: "DistanceFromLeaf(., true(), $NavMode!='Character')"]
-  replace:
     - test:
         if: "$MatchCounter = 0"
         then: [t: "zoom in", pause: "long"]
-    - test:
-        # AutoZoom
-        if: "$NavMode='Enhanced' and self::m:mrow and *[1][IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"
-        then:
-          with:
-            variables: [MatchCounter: "$MatchCounter + 1"]
-            replace: [x: "*[2]"]
-        else:       
-          - test:
-            - if: "parent::m:mfrac"
-              then_test:
-                if: "position()=1"
-                then: [t: "in numerator", pause: long]
-                else: [t: in denominator, pause: long]
-            - else_if: "parent::m:msqrt"
-              then: [t: "inside square root", pause: long]
-            - else_if: "parent::m:mroot"
-              then: [t: "inside root", pause: long]
-            - else_if: "parent::m:msup or parent::m:sub or parent::m:msubsup or parent::m:mmultiscripts"
-              then_test:
-                - if: "position()=1"
-                  then: [t: "in base", pause: long]
-                - else_if: "parent::m:msup or (parent::m:msubsup and position()=3)"
-                  then: [t: "in superscript", pause: long]
-                - else_if: "position()=2 and parent::m:msub"
-                  then: [t: "in subscript", pause: long]
-                - else:
-                  # FIX: mmultiscripts - super/sup depending on odd/even and before or after <mprescripts>. Also none
-                  - t: "in script"
-                  - pause: long
-            - else_if: "parent::m:munder or parent::m:mover or parent::m:munderover"
-              then_test:
-                - if: "position()=1"
-                  then: [t: "in base", pause: long]
-                - else_if: "parent::m:msup or (parent::m:msubsup and position()=3)"
-                  then: [t: "in upper limit", pause: long]
-                - else_if: "position()=2 and parent::m:msub"
-                  then: [t: "in lower limit", pause: long]
-                - else:
-                  # FIX: mmultiscripts - super/sup depending on odd/even and before or after <mprescripts>. Also none
-                  - t: "in script"
-                  - pause: long
-          - test:
-            - if:
-              - "$NavCommand = 'ZoomInAll' or "
-              - "( ($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and "
-              - "   $ReadZoomLevel >= 0 and $ReadZoomLevel < $Distance )" 
-              then:
-                - with:
-                    variables: [MatchCounter: "$MatchCounter + 1"]
-                    replace:
-                      test:
-                          if: "$NavCommand = 'MovePreviousZoom'"
-                          then: [x: "*[last()]"]
-                          else: [x: "*[1]"]
-            - else_if: "DEBUG(($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom')) and
-                        DEBUG($ReadZoomLevel) < DEBUG($Distance)"
-              then:
-                - test:
-                    if: "$NavMode='Enhanced'"
-                    then:
-                      - set_variables: [ReadZoomLevel: -1]
-                - set_variables: [NavNode: "@id"]
-            - else_if: "$NavMode!='Enhanced' and IsNode(., '2D')"
-              then_test:
-                if: "$NavCommand = 'MoveNextZoom'"
-                then:
-                  - set_variables: [NavCommand: "'MoveNextZoom'"]
-                  - with:
-                      variables: [MatchCounter: "$MatchCounter + 1"]
-                      replace: [x: "*[1]"]
-                else:
-                  - set_variables: [NavCommand: "'MovePreviousZoom'"]
-                  - with:
-                      variables: [MatchCounter: "$MatchCounter + 1"]
-                      replace: [x: "*[last()]"]
-            - else_if: "($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and $NavMode!='Enhanced'"
-              then:
-                - set_variables: [NavNode: "@id"]
-            - else: 
-                - test:
-                    if: "$ReadZoomLevel!=-1"
-                    then:
-                      - set_variables: [ReadZoomLevel: "DistanceFromLeaf(*[1], true, $NavMode!='Character')"]
-                - set_variables: [NavNode: "*[1]/@id"]
+    - with:
+        variables: [MatchCounter: "$MatchCounter + 1"]
+        replace:
+          test:
+              if: "$NavCommand = 'MovePreviousZoom'"
+              then: [x: "*[last()]"]
+              else: [x: "*[1]"]
+      
 
-  
-# ********* ZoomOut  ***************
+-
+  name: zoom-in-enhanced
+  tag: "*"
+  match: "$NavCommand = 'ZoomIn' and $NavMode='Enhanced'"
+  replace: 
+    - test:
+        if: "$MatchCounter = 0"
+        then: [t: "zoom in", pause: "long"]
+    - with:
+        variables: [Move2D:  "'in'", Child2D: "*[1]"]
+        replace: [x: "."]
+    - test:
+        if: "*[1][self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]" # auto zoom
+        then: [set_variables: [NavNode: "*[1]/*[2]/@id"]]  # FIX: should this zoom again?
+        else: [set_variables: [NavNode: "*[1]/@id"]]
+
+-
+  name: zoom-in-2D-not-enhanced
+  tag: "*"
+  match: "$NavCommand = 'ZoomIn' and $NavMode!='Enhanced' and IsNode(., '2D')"
+  replace: 
+    - test:
+        if: "$MatchCounter = 0"
+        then: [t: "zoom in", pause: "long"]
+    - with:
+        variables: [Move2D:  "'in'", Child2D: "*[1]"]
+        replace: [x: "."]
+    - with:
+        variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNextZoom'"]
+        replace: [x: "*[1]"]
+
+-
+  name: zoom-in-default
+  tag: "*"
+  match: "$NavCommand = 'ZoomIn'"
+  replace: 
+    - test:
+        if: "$MatchCounter = 0"
+        then: [t: "zoom in", pause: "long"]
+    - with:
+        variables: [Move2D:  "'in'", Child2D: "*[1]"]
+        replace: [x: "."]
+    - test:
+        if: "$ReadZoomLevel!=-1"
+        then:
+          - set_variables: [ReadZoomLevel: "DistanceFromLeaf(*[1], true, $NavMode!='Character')"]
+    - set_variables: [NavNode: "*[1]/@id"]
+
+-
+  name: zoom-in-all-default
+  tag: "*"
+  match: "$NavCommand = 'ZoomInAll'"
+  replace: 
+    - test:
+        if: "$MatchCounter = 0"
+        then: [t: "zoom in all", pause: "medium"]
+    - with:
+        variables: [Move2D:  "'in'", Child2D: "*[1]"]
+        replace: [x: "."]
+    - with:
+        variables: [MatchCounter: "$MatchCounter + 1"]
+        replace: [x: "*[1]"]
+
 -
   name: zoom-out
   tag: math
   match: "$NavCommand = 'ZoomOut' or $NavCommand = 'ZoomOutAll'"
   replace:
-    - t: "zoomed out all the way"
-    - pause: "long"
-    - set_variables: [NavNode: "self::*/@id"]   # no-op for $NavCommand = 'ZoomOut'
+    - test:
+        if: "$MatchCounter = 0"
+        then: [t: "zoom out", pause: "long"]
+    - set_variables: [NavNode: "self::*[1]/@id"]   # no-op for $NavCommand = 'ZoomOut'
 
+-
+  name: zoom-out-all-default
+  tag: "*"
+  match: "$NavCommand = 'ZoomOutAll'"
+  replace: 
+    - test:
+        if: "$MatchCounter = 0"
+        then: [t: "zoom out all", pause: "medium"]
+    - with:
+        variables: [Move2D:  "'out of'", Child2D: "."]
+        replace: [x: ".."]
+    - with:
+        variables: [MatchCounter: "$MatchCounter + 1"]
+        replace: [x: ".."]
+
+# deal with internal zooming: MoveNextZoom and MovePreviousZoom
+
+# start with Enhanced mode
+-
+  name: move-zoom-enhanced
+  tag: "*"
+  match: 
+    - "($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and "
+    - "$NavMode = 'Enhanced'" 
+  replace:
+    # don't bother with MatchCounter since we only get here if > 1
+      - with:
+          variables: [Move2D:  "'in'", Child2D: "*[1]"]
+          replace: [x: "."]
+      - test:
+        - if: "count(*)> 1 or IsNode(., 'leaf') or self::m:msqrt or self::m:menclose"
+          then:
+            - set_variables: [NavNode: "@id"]
+          else:
+            - x: "*[1]"
+
+-
+  # $ReadZoomLevel must be >= 0
+  name: move-next-zoom-not-enhanced
+  tag: "*"
+  match: 
+    - "$NavCommand = 'MoveNextZoom'"
+  replace:
+    #don't bother with MatchCounter since we only get here if > 1
+    - test:
+        if: "$ReadZoomLevel >= DistanceFromLeaf(., false, $NavMode!='Character')"
+        then: 
+          # - with:
+          #     variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]
+          #     replace: [x: ".."]
+          - set_variables: [NavNode: "@id"]
+        else:
+            - with:
+                variables: [Move2D: "'in'", Child2D: "*[1]"]
+                replace: [x: "."]
+            - x: "*[1]"
+
+-
+  # $ReadZoomLevel must be >= 0
+  name: move-previous-zoom-not-enhanced
+  tag: "*"
+  match: 
+    - "$NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom'"
+  replace:
+    #don't bother with MatchCounter since we only get here if > 1
+    - test:
+        if: "$ReadZoomLevel >= DistanceFromLeaf(., true, $NavMode!='Character')"
+        then: 
+          # - with:
+          #     variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]
+          #     replace: [x: ".."]
+          - set_variables: [NavNode: "@id"]
+        else:
+          - with:
+              variables: [Move2D:  "'in'", Child2D: "*[last()]"]
+              replace: [x: "."]
+          - x: "*[last()]"
+
+
+  
+# ********* ZoomOut  ***************
 -
   # a row around a single element -- these might duplicate the position/offset, so we jump an extra level here	
   name: zoom-out
   tag: "*"
-  match: "$NavCommand = 'ZoomOut' or $NavCommand = 'ZoomOutAll'"
+  match: "$NavCommand = 'ZoomOut'"
   replace:
     - test:
         if: "$MatchCounter = 0"
         then: [t: "zoom out", pause: "long"]
     - test:
-        if: "$NavMode='Enhanced' and parent::m:mrow and parent::*[IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"
-        then:
-            with:
+        if: "$NavMode='Enhanced' and parent::*[self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"
+        then:  # auto-zoom: move out a level and retry
+          - with:
               variables: [MatchCounter: "$MatchCounter + 1"]
-              replace: [x: "../.."]
-        else:       
+              replace: [x: ".."]
+        else:
+          - with:
+              variables: [Move2D:  "'out of'", Child2D: "."]
+              replace: [x: ".."]
           - test:
-              - if: "self::m:mfrac"
-                then: [t: "out of fraction", pause: long]
-              - else_if: "self::m:msqrt"
-                then: [t: "out of square root", pause: long]
-              - else_if: "self::m:mroot"
-                then: [t: "out of root", pause: long]
-              - else_if: "self::m:msub"
-                then: [t: "out of subscript", pause: long]
-              - else_if: "self::m:msup "
-                then: [t: "out of superscript", pause: long]  # FIX: needs to tie into 'intent'
-              - else_if: "self::m:msubsup or self::m:mmultiscripts"
-                then: [t: "out of scripts", pause: long]  # FIX: this should be better
-              - else_if: "parent::m:munder or parent::m:mover or parent::m:munderover"
-                then_test:
-                  - if: "position()=1"
-                    then: [t: "out of base", pause: long]
-                  - else_if: "parent::m:msup or (parent::m:msubsup and position()=3)"
-                    then: [t: "out of upper limit", pause: long]
-                  - else_if: "position()=2 and parent::m:msub"
-                    then: [t: "out of lower limit", pause: long]
-          - test:
-              if: "$NavCommand = 'ZoomOutAll'"
-              then: [x: parent::*]
-              else:
-                - test:
-                    if: "$ReadZoomLevel!=-1"
-                    then:
-                      - set_variables: [ReadZoomLevel: "DistanceFromLeaf(.., true, $NavMode!='Character')"]
-                - set_variables: [NavNode: "parent::*/@id"]
+              if: "$ReadZoomLevel!=-1"
+              then:
+                - set_variables: [ReadZoomLevel: "DistanceFromLeaf(.., true, $NavMode!='Character')"]
+          - set_variables: [NavNode: "../@id"]
 
 
 
@@ -322,22 +480,22 @@
   match: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart' or 
           $NavCommand = 'MoveEnd' or $NavCommand = 'MoveLineEnd'"
   replace:
-    with:
-      variables: [MatchCounter: "$MatchCounter + 1"]
-      replace:
-        - test:
-            if: "DEBUG($NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart')"
-            then: 
-              - set_variables: [NavCommand: "'MoveNextZoom'"]
-              - x: "*[1]"
-            else:
-              - set_variables: [NavCommand: "'MovePreviousZoom'"]
-              - x: "DEBUG(*[last()])"
+    - with:
+        variables: [MatchCounter: "$MatchCounter + 1"]
+        replace:
+          - test:
+              if: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart'"
+              then: 
+                - set_variables: [NavCommand: "'MoveNextZoom'"]
+                - x: "*[1]"
+              else:
+                - set_variables: [NavCommand: "'MovePreviousZoom'"]
+                - x: "*[last()]"
 
 -
   name: move-to-start-or-end-2d
   tag: "*"
-  match: "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and DEBUG(IsNode(.., '2D'))"
+  match: "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and IsNode(.., '2D')"
   replace:
     test:
         if: "$NavCommand = 'MoveLineStart'"
@@ -350,9 +508,9 @@
   match: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart' or 
           $NavCommand = 'MoveEnd'   or $NavCommand = 'MoveLineEnd'"
   replace:
-    with:
-      variables: [MatchCounter: "DEBUG($MatchCounter) + 1"]
-      replace: [x: "DEBUG(..)"]
+    - with:
+        variables: [MatchCounter: "$MatchCounter + 1"]
+        replace: [x: ".."]
 
 # # Table-related movement
 # # Typically, we need to zoom out to the mtd level, then we move the appropriate direction
@@ -688,604 +846,535 @@
 #  };
 
 
-# # ********* MovePrevious/Next  ***************
-# # the following two rules deal with moving right when there aren't any more children to the right
-# # if you are at the top node, we need to flag that we are leaving the math expr
 
-# # First child or in autozoom'd in-- move up a level and try again 
-# any ? (	(::NavCommand=="MovePrevious" || ::NavCommand=="ReadPrevious" || ::NavCommand=="DescribePrevious") &&
-# 		   has_parent(match) && name(^match)=="msrow" && count(^match)==1 && !has_previous(^match) )
-# => MovePrevious {
-# 		ruleRef = name(^^match);
-# 		childIndex = index(match);                   # key to know what to say for each (2D) notation
-# 		sayCommand = ::_match_counter==0;
-# 		command = ::NavCommand;						# save before changing
-# 		::StartPosition = ^^match.dfs;
-# 		::EndPosition = ^^match.offset;
-# 		::SpeakAfterMove = false;
-# 		::_rematch = true;                     # need to try again for the parent
-#    };
+# ========  Move/Read/Describe Next rules =================
+# two rules for when can't move right
+-
+  # at edge of 2D and in a mode where moving right isn't an option
+  name: move-next-no-auto-zoom-at-edge
+  tag: "*"
+  variables: [EdgeNode: "EdgeNode(., 'right', '2D')"]
+  match: "$NavCommand = 'MoveNext' and $NavMode!='Character' and not($AutoZoomOut) and $EdgeNode/@id!=@id"
+  replace:
+    - test:
+        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose' and $NavCommand = 'MoveNext'"
+        then:
+          - t: "can't move right"
+    - with:
+        variables: [Move2D:  "'end of'", Child2D: "$EdgeNode/*[last()]"]
+        replace: [x: "$EdgeNode"]
+    - pause: long
 
-# any ? ( (::NavCommand=="MovePrevious" || ::NavCommand=="ReadPrevious" || ::NavCommand=="DescribePrevious") &&
-# 		  has_parent(match) && name(^match)=="msrow" && count(^match)==1 )
-# => MovePrevious {
-# 		ruleRef = name(^^match);
-# 		childIndex = index(^match);                   # key to know what to say for each notation
-# 		sayCommand = ::_match_counter==0;
-# 		command = ::NavCommand;						# save before changing
-# 		::StartPosition = previous(^match).dfs;
-# 		::EndPosition = previous(^match).offset;
-#   };
-
-# # Check for start of math
-# any ? ( (::NavCommand=="MovePrevious" || ::NavCommand=="ReadPrevious" || ::NavCommand=="DescribePrevious") &&
-# 		  # on left edge, but not inside of a 2D node
-# 		  EdgeNode(match, "left", "2D")==match && EdgeNode(match, "left", "math")!=match
-# 		)
-# => CanNotMove {
-# 		ruleRef = "math";
-# 		childIndex = 0;                   # key to know what to say for each (2D) notation
-# 		moveNext = false;
-# 		sayCommand = ::_match_counter==0;
-# 		command = ::NavCommand;
-# 		::SpeakAfterMove = false;
-# 		::SetNewPosition = false;
-#    };
-
-# # First/last child of structure and no autozoom out 
-# any ? ( (::NavCommand=="MovePrevious") &&
-# 		  ::NavMode!="Character" && !::nav_auto_zoom_out && EdgeNode(match, "left", "2D")!=match
-# 		)
-# => CanNotMove {
-# 		twoDParentNode = EdgeNode(match, "left", "2D");
-# 		ruleRef = name(twoDParentNode);
-# 		childIndex = 0;   							 # key to know what to say for each (2D) notation
-# 		moveNext = false;
-# 		sayCommand = ::_match_counter==0;
-# 		command = ::NavCommand;
-# 		::SpeakAfterMove = false;
-#    };
-
-# # First child or in autozoom'd in-- move up a level and try again 
-# any ? (	(::NavCommand=="MovePrevious" || ::NavCommand=="ReadPrevious" || ::NavCommand=="DescribePrevious") &&
-# 			has_parent(match) && 
-# 			(  !has_previous(match) ||
-# 				(  ::NavMode=="Enhanced" &&
-# 					index(match)==1 &&				# could be on close paren if nav mode was changed
-# 					( IsBracketed(^match, "(", ")") || IsBracketed(^match, "[", "]") )
-# 				)
-# 			)
-# 		)
-# => MovePrevious {
-# 		# override Read/Describe if no autozoom out
-# 		twoDParentNode = EdgeNode(match, "left", "2D");
-# 		edgeMove = ::NavMode!="Character" && !::nav_auto_zoom_out && twoDParentNode!=match;
-
-# 		ruleRef = edgeMove ? name(twoDParentNode) : name(^match);
-# 		childIndex = edgeMove ? 0 : index(match);    # key to know what to say for each (2D) notation
-# 		sayCommand = ::_match_counter==0;
-# 		command = edgeMove ? "MovePrevious" : ::NavCommand;		# override Read/DescribePrevious
-# 		sayZoomOut = (!has_previous(match) || ::_match_counter==0) ? 0 : ^match[0][0].unicode;	# 0 or opening fence
-
-# 		::StartPosition = edgeMove? twoDParentNode.dfs : ^match.dfs;
-# 		::EndPosition = edgeMove? twoDParentNode.offset : ^match.offset;
-# 		::SpeakAfterMove = false;
-# 		::NavCommand = command;
-# 		::SetNewPosition = edgeMove ? true : ::SetNewPosition;	# override Read/DescribePrevious
-# 		::_rematch = true;                     # need to try again for the parent
-#    };
-
-# # AutoZoom into Previous sibling
-# any ? ( (::NavCommand=="MovePrevious" || ::NavCommand=="ReadPrevious" || ::NavCommand=="DescribePrevious") && 
-# 		  ::NavMode=="Enhanced" &&
-# 		  has_previous(match) &&
-# 		  has_parent(match) && 						# shouldn't really be needed, but being safe
-# 		  name(^match)=="mrow" &&					# not in mrow -> not syntactic
-# 		  ( IsBracketed(match, "(", ")") || IsBracketed(match, "[", "]") ) # autozoom
-# 	)
-# => MovePrevious {
-# # Start with the function call "of" rules since it is more specific than the times rule.
-# # See comment in run-first-rules-base.tdl -- this should be kept in sync with that
-# 		ruleRef = name(^match);
-# 		childIndex = index(match); 	                 # key to know what to say for each notation
-# 		sayCommand = ::_match_counter==0;
-# 		command = ::NavCommand;						# save before changing
-# 		isFunctionName = (
-# 				 # don't say "of" for chemical formulas
-# 			 !IsChemicalFormula(^match) &&
-
-# 			 # dont' say "of" if there is exact speech right before this (someone overrides?)
-# 			 !is_range_start(previous(match).exact::SpeechText) &&
-
-# 			 # don't say "of" when the "function name" is a unit
-# 			 !( (exists(previous(match).class) && previous(match).class=="MathML-Unit") ||
-# 				  # check for adorned unit
-# 				 (( name(previous(match))=="msqrt" || name(previous(match))=="mroot" || 
-# 						name(previous(match))=="msub" || name(previous(match))=="msup" || name(previous(match))=="msubsup" ||
-# 						name(previous(match))=="munder" || name(previous(match))=="mover" || name(previous(match))=="munderover" ) && 
-# 					exists($0.class) && $0.class=="MathML-Unit") ) &&
-# 			 (
-# 				 MatchString(previous(match),"mo", "\x2061") ||
-
-# 				 # xxx is defined as function, or a multi-char mi whose first char is a capital letter
-# 				 (
-# 					( IsInList("DefaultFunctions", previous(match)) ||
-# 					  IsInList("TrigFunctions", previous(match)) ||
-# 					  IsInList("ArcTrigFunctions", previous(match)) ||
-# 					  ( name(previous(match))=="mi" && count(previous(match))>1 &&
-# 						 'A'<=previous(match)[0].unicode && previous(match)[0].unicode<='Z') )	||	# >1 char names that start with a capital letter are considered functions
-
-# 					# As above, but adorned
-# 					  ( ( name(previous(match))=="msqrt" || name(previous(match))=="mroot" || 
-# 							name(previous(match))=="msub" || name(previous(match))=="msup" || name(previous(match))=="msubsup" ||
-# 							name(previous(match))=="munder" || name(previous(match))=="mover" || name(previous(match))=="munderover" ) &&
-# 						 ( IsInList("DefaultFunctions", previous(match)[0]) ||
-# 							IsInList("TrigFunctions", previous(match)[0]) ||
-# 							IsInList("ArcTrigFunctions", previous(match)[0]) ||
-# 							( name(previous(match)[0])=="mi" && count(previous(match)[0])>1 &&
-# 							 'A'<=previous(match)[0][0].unicode && previous(match)[0][0].unicode<='Z') ) )
-# 				 ) ||	
-# 					# Case 2: xxx is (adorned) mi and yyy is (adorned) mi/mn or has a comma
-# 				 (		 
-# 					# xxx is mi or adorned/mi
-# 					( name(previous(match))=="mi" ||
-# 					  ( ( name(previous(match))=="msqrt" || name(previous(match))=="mroot" || 
-# 							name(previous(match))=="msub" || name(previous(match))=="msup" || name(previous(match))=="msubsup" ||
-# 							name(previous(match))=="munder" || name(previous(match))=="mover" || name(previous(match))=="munderover" ) &&
-# 						  name(previous(match)[0])=="mi") ) &&
-# 					(
-# 						 # Case 2a: yyy is mi/mn or adorned mi/mn
-# 						( name($1)=="mi" || name($1)=="mn" ||
-# 						  ( ( name($1)=="msqrt" || name($1)=="mroot" || 
-# 								name($1)=="msub" || name($1)=="msup" || name($1)=="msubsup" ||
-# 								name($1)=="munder" || name($1)=="mover" || name($1)=="munderover" ) &&
-# 							 ( name($1[0])=="mi" || name($1[0])=="mn" ) ) ) ||
-# 						 # Case 2b: yyy has a comma
-# 						( IsBracketed(match, "(", ")", true) || IsBracketed(match, "[", "]", true) )
-# 					)
-# 				 )
-# 			 )
-# 		  );
-# 		isTimes = !( this.isFunctionName || name(match)=="mo" );
-# 		::NavCommand = "MovePreviousZoom";
-# 		::StartPosition = previous(match).dfs;
-# 		::EndPosition = previous(match).offset;
-# 		::_rematch = IsBracketed(previous(match), "(", ")") || IsBracketed(previous(match), "[", "]"); # need to zoom into the child
-# 		::SpeakAfterMove = !(::_rematch || MatchString(previous(match),"mo", "\x2061"));
-#   };
+-
+  # at edge of math -- no where to go (must be after we rule out being at the edge of 2D) because we want to speak that
+  name: move-next-no-auto-zoom-at-edge-math
+  tag: "*"
+  match:
+    - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
+    - "EdgeNode(., 'right', 'math')/@id!=@id"
+  replace:
+    - t: "end of math"
+    - pause: long
+    - set_variables: [SpeakExpression: "'false'"]
 
 
+-
+  name: move-next-at-end
+  tag: "*"
+  match:
+    - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
+    - "EdgeNode(., 'right', 'math')/@id!=@id"   # at edge of math
+  replace:
+    - test:
+        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+        then:
+          - t: "can't move right, end of math"
+          - pause: long
+    - set_variables: [SpeakExpression: "'false'"]
 
-# # normal case rule for most notations
-# # first the rules for dealing with locked zoom level
-# # For that case, we create a fake command because we might need to zoom up/down after moving,
-# #   but we don't want to do the same things as Zoom (e.g., saying "zooming in")
-# any ? ( (::NavCommand=="MovePrevious" || ::NavCommand=="ReadPrevious" || ::NavCommand=="DescribePrevious") &&
-# 			::ReadZoomLevel>=0 &&
-# 			has_parent(match) )
-# => MovePrevious {
-# 		ruleRef = name(^match);
-# 		childIndex = index(match);                   # key to know what to say for each notation
-# 		sayCommand = ::_match_counter==0;
-# 		command = ::NavCommand;						# save before changing
-# 		::StartPosition = previous(match).dfs;
-# 		::EndPosition = previous(match).offset;
-# 		::NavCommand = "MovePreviousZoom";
-# 		::SpeakAfterMove = false;
-# 		::_rematch = true;                     # need to potentially zoom the sibling
-#   };
+-
+# Last child or in auto-zoom'd in-- move up a level and try again 
+  name: move-next-auto-zoom-up-one-level
+  tag: "*"
+  match:
+    - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
+    - "( not(following-sibling::*) or"
+    - "  ( $NavMode='Enhanced' and "
+    - "    count(preceding-sibling::*)=1 and IsBracketed(.., '(', ')') or IsBracketed(.., '[', ']')"
+    - "  )"
+    - ")"
+  replace:
+    - with:
+        variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNext'"]
+        replace:
+          - test:
+              if: "$MatchCounter = 1 and $NavVerbosity = 'Verbose'"
+              then:
+                - test:
+                  - if: "$NavCommand = 'MoveNext'"
+                    then: [t:  move]
+                  - else_if: "$NavCommand = 'ReadNext'"
+                    then: [t: "read"]
+                    else: [t: "describe"]
+                - t: "right"
+                - pause: short
+          - test:
+                if: following-sibling::*
+                then:
+                  - with:
+                      variables: [Move2D: "'in'", Child2D: "."]
+                      replace: [x: ".."]
+                else:
+                  - with:
+                      variables: [Move2D: "'out of'", Child2D: "."]
+                      replace: [x: ".."]
+          - test:
+                if: following-sibling::*
+                then:
+                  - x: ..  # move out of parens
+                else:
+                  - x: ".."
 
+# At this point, if XXXNext, then we know there is must be a right sibling
+-
+# auto-zoom into next child if next child is parenthesized expr
+  name: move-next-auto-zoom-parens
+  tag: "*"
+  match:
+    - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
+    - "$NavMode='Enhanced' and"
+    - "parent::m:mrow and following-sibling::* and"
+    - "following-sibling::*[1][self::m:mrow and count(*)=3 and "  #exclude empty parens
+    - "       (IsBracketed(., '(', ')') or IsBracketed(., '[', ']'))"
+    - "   ]"
+  replace:
+    - test:
+        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+        then:
+          - test:
+            - if: "$NavCommand = 'MoveNext'"
+              then: [t:  move]
+            - else_if: "$NavCommand = 'ReadNext'"
+              then: [t: "read"]
+              else: [t: "describe"]
+          - t: "right"
+          - pause: short
+    - set_variables: [NavNode: "following-sibling::*[1]/*[2]/@id"]
 
-# any ? ( ::NavCommand=="MovePreviousZoom"  &&
-# 		  ::ReadZoomLevel >= 0 && 
-# 		  ::ReadZoomLevel<DistanceFromLeaf(match, false, ::NavMode!="Character") )
-# => ZoomIn {
-#       ruleRef = name(match);
-#       childIndex = count(match)-1;           # key to know what to say for each notation
-# 		atLeaf = false;
-# 		sayCommand = false;
-#       ::StartPosition = $(-1).dfs;
-# 		::EndPosition = $(-1).offset;
-# 		::SpeakAfterMove = false;
-# 		::_rematch = true;                     # need to potentially zoom the sibling
-#   };
+# normal cases for MoveNext
+-
+# locked zoom level
+  name: move-next-locked-zoom-level
+  tag: "*"
+  match:
+    - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
+    - "$ReadZoomLevel>=0"
+  replace:
+    - test:
+        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+        then:
+          - test:
+            - if: "$NavCommand = 'MoveNext'"
+              then: [t:  move]
+            - else_if: "$NavCommand = 'ReadNext'"
+              then: [t: "read"]
+              else: [t: "describe"]
+          - t: "right"
+          - pause: short
+    - with:
+        variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]
+        replace: [x: ".."]
+    - with:
+        variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNextZoom'"]
+        replace: [x: "following-sibling::*[1]"]
 
-# # If there is only one child, this isn't an interesting move -- zoom in again
-# any ? (::NavCommand=="MovePreviousZoom" &&
-# 		 count(match)==1 && !IsNode(match, "Leaf") &&
-# 		 ::NavMode=="Enhanced" &&
-# 		 name(match)!="msqrt" && name(match)!="menclose")
-# => ZoomIn {
-#       ruleRef = name(match);
-#       childIndex = count(match)-1;           # key to know what to say for each notation
-# 		atLeaf = false;
-# 		sayCommand = false;
-#       ::StartPosition = $(-1).dfs;
-# 		::EndPosition = $(-1).offset;
-# 		::SpeakAfterMove = false;
-# 		::_rematch = true;                     # need to potentially zoom the sibling
-#   };
-
-# # AutoZoom into parens
-# any ? (::NavCommand=="MovePreviousZoom" &&
-# 		 ::NavMode=="Enhanced" &&
-# 		 ( IsBracketed(match, "(", ")") || IsBracketed(match, "[", "]") ) )
-# => ZoomIn {
-#       ruleRef = name(match);
-#       childIndex = count(match)-1;           # key to know what to say for each notation
-# 		atLeaf = IsNode($1, "Leaf");
-# 		sayCommand = false;
-#       ::StartPosition = $(1).dfs;
-# 		::EndPosition = $(1).offset;
-# 		::SpeakAfterMove = true;
-#   };
-
-# any ? ( ::NavCommand=="MovePreviousZoom"  &&
-# 		  ::ReadZoomLevel>=DistanceFromLeaf(match, false, ::NavMode!="Character") )
-# => MovePreviousZoom {
-# 		ruleRef = name(^match);
-# 		childIndex = index(match);                   # key to know what to say for each notation
-#  		atLeaf = count(match)==0;
-# 		sayCommand = false;
-#  };
-
-# any ? ( (::NavCommand=="MovePrevious" || ::NavCommand=="ReadPrevious" || ::NavCommand=="DescribePrevious")
-# 		&& has_parent(match) )
-# => MovePrevious {
-# 		ruleRef = name(^match);
-# 		childIndex = index(match);                   # key to know what to say for each notation
-# 		sayCommand = ::_match_counter==0;
-# 		command = ::NavCommand;						# save before changing
-# 		::StartPosition = previous(match).dfs;
-# 		::EndPosition = previous(match).offset;
-#   };
-
-
-# # Last child or in autozoom'd in-- move up a level and try again 
-# any ? (	(::NavCommand=="MoveNext" || ::NavCommand=="ReadNext" || ::NavCommand=="DescribeNext") &&
-# 		   has_parent(match) && name(^match)=="msrow" && count(^match)==1 && !has_next(^match) )
-# => MoveNext {
-# 		ruleRef = name(^^match);
-# 		childIndex = index(match);                   # key to know what to say for each (2D) notation
-# 		sayCommand = ::_match_counter==0;
-# 		command = ::NavCommand;						# save before changing
-# 		::StartPosition = ^^match.dfs;
-# 		::EndPosition = ^^match.offset;
-# 		::SpeakAfterMove = false;
-# 		::_rematch = true;                     # need to try again for the parent
-#    };
-
-
-# # normal case rule for most notations
-# any ? ( (::NavCommand=="MoveNext" || ::NavCommand=="ReadNext" || ::NavCommand=="DescribeNext") &&
-# 		  has_parent(match) && name(^match)=="msrow" && count(^match)==1 )
-# => MoveNext {
-# 		ruleRef = name(^^match);
-# 		childIndex = index(^match);                   # key to know what to say for each notation
-# 		sayCommand = ::_match_counter==0;
-# 		command = ::NavCommand;						# save before changing
-# 		::StartPosition = next(^match).dfs;
-# 		::EndPosition = next(^match).offset;
-#   };
-
-# any ? ( (::NavCommand=="MoveNext") &&
-# 		  ::NavMode!="Character" && !::nav_auto_zoom_out && EdgeNode(match, "right", "2D")!=match
-# 		)
-# => CanNotMove {
-# 		twoDParentNode = EdgeNode(match, "right", "2D");
-# 		ruleRef = name(twoDParentNode);
-# 		childIndex = count(twoDParentNode)-1;    # key to know what to say for each (2D) notation
-# 		moveNext = true;
-# 		sayCommand = ::_match_counter==0;
-# 		command = ::NavCommand;
-# 		::SpeakAfterMove = false;
-#    };
-
-# any ? ( (::NavCommand=="MoveNext" || ::NavCommand=="ReadNext" || ::NavCommand=="DescribeNext") &&
-# 		  EdgeNode(match, "right", "2D")==match && EdgeNode(match, "right", "math")!=match
-# 		)
-# => CanNotMove {
-# 		ruleRef = "math";
-# 		childIndex = index(match);                   # key to know what to say for each (2D) notation
-# 		moveNext = true;
-# 		sayCommand = ::_match_counter==0;
-# 		command = ::NavCommand;
-# 		::SpeakAfterMove = false;
-#  		::SetNewPosition = false;
-#   };
-
-# # Last child or in autozoom'd in-- move up a level and try again 
-# any ? (	(::NavCommand=="MoveNext" || ::NavCommand=="ReadNext" || ::NavCommand=="DescribeNext") &&
-# 			has_parent(match) &&
-# 			(  !has_next(match) ||
-# 				(  ::NavMode=="Enhanced" &&
-# 					index(match)==1 &&				# could be on open paren if nav mode was changed
-# 					( IsBracketed(^match, "(", ")") || IsBracketed(^match, "[", "]") )
-# 				)
-# 			)
-# 		)
-# => MoveNext {
-# 		twoDParentNode = EdgeNode(match, "right", "2D");
-# 		edgeMove = ::NavMode!="Character" && !::nav_auto_zoom_out && twoDParentNode!=match;
-
-# 		ruleRef = edgeMove ? name(twoDParentNode) : name(^match);
-# 		childIndex = edgeMove ? count(twoDParentNode)-1 : index(match);    # key to know what to say for each (2D) notation
-# 		sayCommand = ::_match_counter==0;
-# 		command = edgeMove ? "MoveNext" : ::NavCommand;				# override Read/DescribeNext
-# 		sayZoomOut = (!has_next(match) || ::_match_counter==0) ? 0 : ^match[0][0].unicode;	# 0 or opening fence
-
-# 		::StartPosition = edgeMove ? twoDParentNode.dfs : ^match.dfs;
-# 		::EndPosition = edgeMove ? twoDParentNode.offset : ^match.offset;
-# 		::SpeakAfterMove = false;
-# 		::NavCommand = command;
-# 		::SetNewPosition = edgeMove ? true : ::SetNewPosition;	# override Read/DescribeNext
-# 		::_rematch = true;                     # need to try again for the parent
-#    };
-
-
-# # AutoZoom into next sibling
-# any ? ( (::NavCommand=="MoveNext" || ::NavCommand=="ReadNext" || ::NavCommand=="DescribeNext") && 
-# 		  ::NavMode=="Enhanced" &&
-# 		  has_next(match) &&
-# 		  has_parent(match) && 						# shouldn't really be needed, but being safe
-# 		  name(^match)=="mrow" &&					# not in mrow -> not syntactic
-# 		  count(next(match))==3 &&					# exclude empty brackets
-# 		  ( IsBracketed(next(match), "(", ")") || IsBracketed(next(match), "[", "]") ) # autozoom
-# 	)
-# //*** These come from the run-first rule files -- changes here likely should be reflected in those rules ***
-# # See that file for details (modified to look at next rather than previous)
-# # Start with the function call "of" rules since it is more specific than the times rule.
-# => MoveNext {
-# 		ruleRef = name(^match);
-# 		childIndex = index(match); 	                 # key to know what to say for each notation
-# 		sayCommand = ::_match_counter==0;
-# 		command = ::NavCommand;						# save before changing
-# 		isFunctionName = (
-# 			 !IsChemicalFormula(^match) &&
-
-# 			 # dont' say "of" if there is exact speech right before this (someone overrides?)
-# 			 !is_range_start(match.exact::SpeechText) &&
-
-# 			 # don't say "of" when the "function name" is a unit
-# 			 !( (exists(match.class) && match.class=="MathML-Unit") ||
-# 				  # check for adorned unit
-# 				 (( name(match)=="msqrt" || name(match)=="mroot" || 
-# 						name(match)=="msub" || name(match)=="msup" || name(match)=="msubsup" ||
-# 						name(match)=="munder" || name(match)=="mover" || name(match)=="munderover" ) && 
-# 					exists(next(match)[0].class) && next(match)[0].class=="MathML-Unit") ) &&
-# 			 (
-# 				 MatchString(next(match),"mo", "\x2061") ||
-
-# 				 # xxx is f,g,h, or a multi-char mi whose first char is a capital letter
-# 				 (
-# 					( IsInList("DefaultFunctions", match) ||
-# 					  IsInList("TrigFunctions", match) ||
-# 					  IsInList("ArcTrigFunctions", match) ||
-# 					    # >1 char names that start with a capital letter are considered functions
-# 					  ( name(match)=="mi" && count(match)>1 &&
-# 						 'A'<=match[0].unicode && match[0].unicode<='Z') )	||	
-
-# 					# As above, but adorned
-# 					  ( ( name(match)=="msqrt" || name(match)=="mroot" || 
-# 							name(match)=="msub" || name(match)=="msup" || name(match)=="msubsup" ||
-# 							name(match)=="munder" || name(match)=="mover" || name(match)=="munderover" ) &&
-# 						 ( IsInList("DefaultFunctions", match[0]) ||
-# 							IsInList("TrigFunctions", match[0]) ||
-# 							IsInList("ArcTrigFunctions", match[0]) ||
-# 							( name(match[0])=="mi" && count(match[0])>1 &&
-# 							 'A'<=match[0][0].unicode && match[0][0].unicode<='Z') ) )
-# 				 ) ||	
-# 					# Case 2: xxx is (adorned) mi and yyy is (adorned) mi/mn or has a comma
-# 				 (		 
-# 					# xxx is mi or adorned/mi
-# 					( name(match)=="mi" ||
-# 					  ( ( name(match)=="msqrt" || name(match)=="mroot" || 
-# 							name(match)=="msub" || name(match)=="msup" || name(match)=="msubsup" ||
-# 							name(match)=="munder" || name(match)=="mover" || name(match)=="munderover" ) &&
-# 						  name(match[0])=="mi") ) &&
-# 					(
-# 						 # Case 2a: yyy is mi/mn or adorned mi/mn
-# 						( name(next(match)[1])=="mi" || name(next(match)[1])=="mn" ||
-# 						  ( ( name(next(match)[1])=="msqrt" || name(next(match)[1])=="mroot" || 
-# 								name(next(match)[1])=="msub" || name(next(match)[1])=="msup" || name(next(match)[1])=="msubsup" ||
-# 								name(next(match)[1])=="munder" || name(next(match)[1])=="mover" || name(next(match)[1])=="munderover" ) &&
-# 							 ( name(next(match)[1][0])=="mi" || name(next(match)[1][0])=="mn" ) ) ) ||
-# 						 # Case 2b: yyy has a comma
-# 						( IsBracketed(next(match), "(", ")", true) || IsBracketed(next(match), "[", "]", true) )
-# 					)
-# 				 )
-# 			 )
-# 		 );
-# 		istrig = IsInList("TrigFunctions", match);
-# 		isTimes = !( this.isFunctionName || name(match)=="mo" );
-# 		::StartPosition = child(next(match),1).dfs;
-# 		::EndPosition = child(next(match),1).offset;
-#   };
-
-
-# # normal case rule for most notations
-# # first the rules for dealing with locked zoom level
-# # For that case, we create a fake command because we might need to zoom up/down after moving,
-# #   but we don't want to do the same things as Zoom (e.g., saying "zooming in")
-# any ? ( (::NavCommand=="MoveNext" || ::NavCommand=="ReadNext" || ::NavCommand=="DescribeNext") &&
-# 			::ReadZoomLevel>=0 &&
-# 			has_parent(match) )
-# => MoveNext {
-# 		ruleRef = name(^match);
-# 		childIndex = index(match);                   # key to know what to say for each notation
-# 		sayCommand = ::_match_counter==0;
-# 		command = ::NavCommand;						# save before changing
-# 		::StartPosition = next(match).dfs;
-# 		::EndPosition = next(match).offset;
-# 		::NavCommand = "MoveNextZoom";
-# 		::SpeakAfterMove = false;
-# 		::_rematch = true;                     # need to potentially zoom the sibling
-#   };
+-
+  name: move-next-default
+  tag: "*"
+  match:
+    - "$NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext'"
+  replace:
+    - test:
+        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+        then:
+          - test:
+            - if: "$NavCommand = 'MoveNext'"
+              then: [t:  move]
+            - else_if: "$NavCommand = 'ReadNext'"
+              then: [t: "read"]
+              else: [t: "describe"]
+          - t: "right"
+          - pause: short
+          - test:
+              if: "IsNode(.., '2D')"
+              then:
+                - with:
+                    variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]
+                    replace: [x: ".."]
+    - set_variables: [NavNode: "following-sibling::*[1]/@id"]
 
 
 
-# any ? (::NavCommand=="ReadCurrent" || ::NavCommand=="DescribeCurrent")
-# => ;		# nothing to do other than read/describe
 
-# # normal case rule for most notations
-# any ? ( (::NavCommand=="MoveNext" || ::NavCommand=="ReadNext" || ::NavCommand=="DescribeNext") &&
-# 		  has_parent(match) )
-# => MoveNext {
-# 		ruleRef = name(^match);
-# 		childIndex = index(match);                   # key to know what to say for each notation
-# 		sayCommand = ::_match_counter==0;
-# 		command = ::NavCommand;						# save before changing
-# 		::StartPosition = next(match).dfs;
-# 		::EndPosition = next(match).offset;
-#   };
+# ========  Move/Read/Describe Previous rules =================
+# two rules for when can't move right
+-
+  # at edge of 2D and in a mode where moving right isn't an option
+  name: move-previous-no-auto-zoom-at-edge
+  tag: "*"
+  variables: [EdgeNode: "EdgeNode(., 'left', '2D')"]
+  match: "$NavCommand = 'MovePrevious' and $NavMode!='Character' and not($AutoZoomOut) and $EdgeNode/@id!=@id"
+  replace:
+    - test:
+        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose' and $NavCommand = 'MovePrevious'"
+        then:
+          - t: "can't move left"
+    - with:
+        variables: [Move2D:  "'end of'", Child2D: "$EdgeNode/*[1]"]
+        replace: [x: "$EdgeNode"]
+    - pause: long
 
-# any ? (::NavCommand=="ReadCurrent" || ::NavCommand=="DescribeCurrent")
-# => ;		# nothing to do other than read/describe
-
-
-
-# # ********* ReadZoomLevel toggle ***************
-# # These set ::NavMode
-# any ? (::NavCommand=="ToggleZoomLockUp")
-# => ToggleZoomLock {
-# 		ruleRef = name(^match);
-# 		childIndex = index(match);                   # key to know what to say for each notation
-# 		::NavMode = (::NavMode=="Enhanced") ? "Character" : 
-# 								 (::NavMode=="Character") ? "Simple" : "Enhanced";
-# 		::ReadZoomLevel = (::NavMode=="Enhanced") ? -1 : 1;
-#  		::NavCommand = "MoveNextZoom";
-# 		::_rematch = (::NavMode!="Enhanced");		# need to potentially zoom the sibling
-#  		::SpeakAfterMove = !::_rematch;					# Note: this uses the value *after* it is set below
-# };
-
-# any ? (::NavCommand=="ToggleZoomLockDown")
-# => ToggleZoomLock {
-# 		ruleRef = name(^match);
-# 		childIndex = index(match);                   # key to know what to say for each notation
-# 		::NavMode = (::NavMode=="Enhanced") ? "Simple" : 
-# 								 (::NavMode=="Simple") ? "Character" : "Enhanced";
-# 		::ReadZoomLevel = (::NavMode=="Enhanced") ? -1 : 1;
-#  		::NavCommand = "MoveNextZoom";
-# 		::_rematch = (::NavMode!="Enhanced");		# need to potentially zoom the sibling
-#  		::SpeakAfterMove = !::_rematch;					# Note: this uses the value *after* it is set below
-# };
+-
+  # at edge of math -- no where to go (must be after we rule out being at the edge of 2D) because we want to speak that
+  name: move-previous-no-auto-zoom-at-edge
+  tag: "*"
+  match:
+    - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
+    - "EdgeNode(., 'left', 'math')/@id!=@id"
+  replace:
+    - t: "start of math"
+    - pause: long
+    - set_variables: [SpeakExpression: "'false'"]
 
 
-# # ********* Describe toggle ***************
-# any ? (::NavCommand=="ToggleSpeakMode")
-# => ToggleSpeakMode {
-# 		ruleRef = name(^match);
-# 		childIndex = index(match);                   # key to know what to say for each notation
-# 		::DescribeAfterMove = !::DescribeAfterMove;
-#  };
+-
+  name: move-previous-at-end
+  tag: "*"
+  match:
+    - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
+    - "EdgeNode(., 'left', 'math')/@id!=@id"   # at edge of math
+  replace:
+    - test:
+        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+        then:
+          - t: "can't move left, start of math"
+          - pause: long
+    - set_variables: [SpeakExpression: "'false'"]
+
+-
+# Last child or in auto-zoom'd in-- move up a level and try again 
+  name: move-previous-auto-zoom-up-one-level
+  tag: "*"
+  match:
+    - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
+    - "( not(preceding-sibling::*) or"
+    - "  ( $NavMode='Enhanced' and "
+    - "    count(preceding-sibling::*)=1 and IsBracketed(.., '(', ')') or IsBracketed(.., '[', ']')"
+    - "  )"
+    - ")"
+  replace:
+    - with:
+        variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MovePrevious'"]
+        replace:
+          - test:
+              if: "$MatchCounter = 1 and $NavVerbosity = 'Verbose'"
+              then:
+                - test:
+                  - if: "$NavCommand = 'MovePrevious'"
+                    then: [t:  move]
+                  - else_if: "$NavCommand = 'ReadPrevious'"
+                    then: [t: "read"]
+                    else: [t: "describe"]
+                - t: "left"
+                - pause: short
+          - test:
+                if: preceding-sibling::*
+                then:
+                  - with:
+                      variables: [Move2D: "'in'", Child2D: "."]
+                      replace: [x: ".."]
+                else:
+                  - with:
+                      variables: [Move2D: "'out of'", Child2D: "."]
+                      replace: [x: ".."]
+          - test:
+                if: preceding-sibling::*
+                then:
+                  - x: ..  # move out of parens
+                else:
+                  - x: ".."
+
+-
+# auto-zoom into next child if next child is parenthesized expr
+  name: move-previous-auto-zoom-parens
+  tag: "*"
+  match:
+    - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
+    - "$NavMode='Enhanced' and"
+    - "parent::m:mrow and preceding-sibling::* and"
+    - "preceding-sibling::*[1][self::m:mrow and count(*)=3 and "  #exclude empty parens
+    - "       (IsBracketed(., '(', ')') or IsBracketed(., '[', ']'))"
+    - "   ]"
+  replace:
+    - test:
+        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+        then:
+          - test:
+            - if: "$NavCommand = 'MovePrevious'"
+              then: [t:  move]
+            - else_if: "$NavCommand = 'ReadPrevious'"
+              then: [t: "read"]
+              else: [t: "describe"]
+          - t: "left"
+          - pause: short
+    - set_variables: [NavNode: "preceding-sibling::*[1]/*[2]/@id"]
+
+# normal cases for MovePrevious
+-
+# locked zoom level
+  name: move-previous-locked-zoom-level
+  tag: "*"
+  match:
+    - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
+    - "$ReadZoomLevel>=0"
+  replace:
+    - test:
+        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+        then:
+          - test:
+            - if: "$NavCommand = 'MovePrevious'"
+              then: [t:  move]
+            - else_if: "$NavCommand = 'ReadPrevious'"
+              then: [t: "read"]
+              else: [t: "describe"]
+          - t: "left"
+          - pause: short
+    - with:
+        variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]
+        replace: [x: ".."]
+    - with:
+        variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MovePreviousZoom'"]
+        replace: [x: "preceding-sibling::*[1]"]
+
+-
+  name: move-previous-default
+  tag: "*"
+  match:
+    - "$NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious'"
+  replace:
+    - test:
+        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+        then:
+          - test:
+            - if: "$NavCommand = 'MovePrevious'"
+              then: [t:  move]
+            - else_if: "$NavCommand = 'ReadPrevious'"
+              then: [t: "read"]
+              else: [t: "describe"]
+          - t: "left"
+          - pause: short
+          - test:
+              if: "IsNode(.., '2D')"
+              then:
+                - with:
+                    variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]
+                    replace: [x: ".."]
+    - set_variables: [NavNode: "preceding-sibling::*[1]/@id"]
 
 
-# # ********* SetPlacemarker position  ***************
-# any ? (::NavCommand=="Read0" ||
-# 	   ::NavCommand=="Read1" ||
-# 	   ::NavCommand=="Read2" ||
-# 	   ::NavCommand=="Read3" ||
-# 	   ::NavCommand=="Read4" ||
-# 	   ::NavCommand=="Read5" ||
-# 	   ::NavCommand=="Read6" ||
-# 	   ::NavCommand=="Read7" ||
-# 	   ::NavCommand=="Read8" ||
-# 	   ::NavCommand=="Read9"
-# 	  )
-# => ReadPlacemarker {
-# 	ruleRef = name(^match);
-# 	childIndex = index(match);                   # key to know what to say for each notation
-# 	placemarkerSet = GetPlacemarker(::PlaceMarkerIndex);	# sets ::StartPosition, ::EndPosition, but not pushed on stack
-# 	::SpeakAfterMove = placemarkerSet;
-# };
 
-# any ? (::NavCommand=="Describe0" ||
-# 	   ::NavCommand=="Describe1" ||
-# 	   ::NavCommand=="Describe2" ||
-# 	   ::NavCommand=="Describe3" ||
-# 	   ::NavCommand=="Describe4" ||
-# 	   ::NavCommand=="Describe5" ||
-# 	   ::NavCommand=="Describe6" ||
-# 	   ::NavCommand=="Describe7" ||
-# 	   ::NavCommand=="Describe8" ||
-# 	   ::NavCommand=="Describe9"
-# 	  )
-# => DescribePlacemarker {
-# 	ruleRef = name(^match);
-# 	childIndex = index(match);                   # key to know what to say for each notation
-# 	placemarkerSet = GetPlacemarker(::PlaceMarkerIndex);	# sets ::StartPosition, ::EndPosition, but not pushed on stack
-# 	::SpeakAfterMove = placemarkerSet;
-# };
+# ********* ReadZoomLevel toggle ***************
+# These set ::NavMode
+
+-
+  name: toggle-mode-up
+  tag: "*"
+  match:
+    - "$NavCommand = 'ToggleZoomLockUp'"
+  replace:
+    - test:
+        - if: "$NavMode = 'Enhanced'"
+          then:
+            - t: "character"
+            - set_variables: [NavMode: "'Character'", ReadZoomLevel: "1"]
+        - else_if: "$NavMode = 'Character'"
+          then:
+            - t: "simple"
+            - set_variables: [NavMode: "'Simple'", ReadZoomLevel: "1"]
+        - else:
+            - t: "enhanced"
+            - set_variables: [NavMode: "'Enhanced'", ReadZoomLevel: "-1"]
+    - t: "mode"
+    - pause: long
+    - test:
+        - if: "$NavMode != 'Enhanced'"  # potentially need to zoom to the sibling
+          then:
+            - with:
+                variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNextZoom'"]
+                replace: [x: "."]
+
+-
+  name: toggle-mode-down
+  tag: "*"
+  match:
+    - "$NavCommand = 'ToggleZoomLockDown'"
+  replace:
+    - test:
+        - if: "$NavMode = 'Enhanced'"
+          then:
+            - t: "simple"
+            - set_variables: [NavMode: "'Simple'", ReadZoomLevel: "1"]
+        - else_if: "$NavMode = 'Character'"
+          then:
+            - t: "enhanced"
+            - set_variables: [NavMode: "'Enhanced'", ReadZoomLevel: "-1"]
+        - else:
+            - t: "character"
+            - set_variables: [NavMode: "'Character'", ReadZoomLevel: "1"]
+    - t: "mode"
+    - pause: long
+    - test:
+        - if: "$NavMode != 'Enhanced'"  # potentially need to zoom to the sibling
+          then:
+            - with:
+                variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNextZoom'"]
+                replace: [x: "."]
+
+-
+  name: toggle-speech-describe
+  tag: "*"
+  match:
+    - "$NavCommand = 'ToggleSpeakMode'"
+  replace:
+    - test:
+          if: "$Overview = 'true'"
+          then:
+            - t: "speak expression after move"
+            - set_variables: [Overview: "'false'"]
+          else:
+            - t: "overview of expression after move"
+            - set_variables: [Overview: "'true'"]
+    - pause: long
+
+-
+  name: current
+  tag: "*"
+  match:
+    - "$NavCommand = 'ReadCurrent' or $NavCommand = 'DescribeCurrent'"
+  replace:
+    - test:
+        if: "$NavVerbosity != 'Terse'"
+        then:
+          - test:
+            - if: "$NavCommand = 'ReadCurrent'"
+              then: [t: "read "]
+              else: [t: "describe"]
+          - t: "current"
+    - set_variables: [NavNode: "@id"]
+    - pause: long
 
 
+# this needs to be near the end because we only test for 'Describe', "Read", etc., and we don't want to get 'DescribeNext', etc.
+-
+  name: placemarker
+  tag: "*"
+  match:
+        starts-with($NavCommand, 'Read') or
+        starts-with($NavCommand, 'Describe') or
+        starts-with($NavCommand, 'MoveTo')
+  replace:
+    - test:
+        if: "$NavVerbosity != 'Terse'"
+        then:
+          - test:
+            - if: "starts-with($NavCommand, 'Read')"
+              then: [t: "read"]
+            - else_if: "starts-with($NavCommand, 'Describe')"
+              then: [t: "describe"]
+            - else_if: "starts-with($NavCommand, 'MoveTo')"
+              then: [t: "move to "]
+              else: [t: "set"]
+          - t: "placeholder"
+          - x: "$PlaceMarkerIndex"
+          - pause: long
+    - set_variables: [NavNode: "$PlaceMarker"]
 
-# # ********* SetPlacemarker position  ***************
-# any ? (::NavCommand=="MoveTo0" ||
-# 	   ::NavCommand=="MoveTo1" ||
-# 	   ::NavCommand=="MoveTo2" ||
-# 	   ::NavCommand=="MoveTo3" ||
-# 	   ::NavCommand=="MoveTo4" ||
-# 	   ::NavCommand=="MoveTo5" ||
-# 	   ::NavCommand=="MoveTo6" ||
-# 	   ::NavCommand=="MoveTo7" ||
-# 	   ::NavCommand=="MoveTo8" ||
-# 	   ::NavCommand=="MoveTo9"
-# 	  )
-# => GetPlacemarker {
-# 	ruleRef = name(^match);
-# 	childIndex = index(match);                   # key to know what to say for each notation
-# 	placemarkerSet = GetPlacemarker(::PlaceMarkerIndex);	# sets ::StartPosition, ::EndPosition
-# 	::SpeakAfterMove = placemarkerSet;
-# };
+-
+  name: set-placemarker
+  tag: "*"
+  match:
+        starts-with($NavCommand, 'SetPlacemarker')
+  replace:
+    - test:
+        if: "$NavVerbosity != 'Terse'"
+        then:
+          - t: "set placeholder"
+          - x: "$PlaceMarkerIndex"
+          - pause: long
 
-# any ? (::NavCommand=="SetPlacemarker0" ||
-# 	   ::NavCommand=="SetPlacemarker1" ||
-# 	   ::NavCommand=="SetPlacemarker2" ||
-# 	   ::NavCommand=="SetPlacemarker3" ||
-# 	   ::NavCommand=="SetPlacemarker4" ||
-# 	   ::NavCommand=="SetPlacemarker5" ||
-# 	   ::NavCommand=="SetPlacemarker6" ||
-# 	   ::NavCommand=="SetPlacemarker7" ||
-# 	   ::NavCommand=="SetPlacemarker8" ||
-# 	   ::NavCommand=="SetPlacemarker9"
-# 	  )
-# => SetPlacemarker {
-# 	ruleRef = name(^match);
-# 	childIndex = index(match);                   # key to know what to say for each notation
-# 	placemarkerSet = SetPlacemarker(::PlaceMarkerIndex, ::StartPosition, ::EndPosition);
-# 	::SpeakAfterMove = false;
-# };
+    - set_variables: [NavNode: "@id"]
+
 
 
 # ********* WhereAmI  ***************
-# We act a bit like "ReadCurrent" and a bit like "ZoomOut"/"ZoomOutAll"
 
-# any ? ( (::NavCommand=="WhereAmI" || ::NavCommand=="WhereAmIAll") && ::_match_counter==0)
-# => WhereAmIStart {
-# 		::_rematch= true;		# want to speak current expression first before doing other things (like saying "inside")
-# 	};
+# FIX: WhereAmI needs support from the Rust code to loop around and do speech at each iteration.
+#      Alternatively, it could insert a special token that Rust code does a "replace" on with the speech (e.g. SPEECH_AT{id})
+#      or a new command "speak" which takes a node id
+-
+  name: where-am-i-start
+  tag: "*"
+  match:
+    - "DEBUG(
+        ($NavCommand = 'WhereAmI' or $NavCommand = 'WhereAmIAll') and $MatchCounter = 0
+      )"
+  replace:
+    - speak: "@id"
+    - pause: long
+    - with:
+        variables: [MatchCounter: "$MatchCounter + 1"]
+        replace: [x: ".."]
 
-# any ? ( ( name(match)=="math" || (name(^match)=="math" && count(^match)==1) ) &&
-# 		  (::NavCommand=="WhereAmI" || ::NavCommand=="WhereAmIAll") &&
-# 		  ::_match_counter==1)
-# => WhereAmI {
-# 		# don't change StartPosition
-# 		ruleRef = "math";
-# 		wordRef = "AtRoot";
-#  		::SpeakAfterMove = false;
-#   };
+-
+  name: where-am-i-stop
+  tag: "*"
+  match:
+    - "DEBUG("
+    - "($NavCommand = 'WhereAmI' or $NavCommand = 'WhereAmIAll') and $MatchCounter > 0 and"
+      # stopping conditions
+    - "(self::m:math or "
+    - " parent::*[self::m:math and (count(*)=1 or (count(*)=2 and *[2][text()=',' or text()='.' or text()=';' or text()='?']) ) ] "
+    - ")"
+    - ")"
+  replace:
+    - test:
+        if: "$NavCommand = 'WhereAmI'"
+        then:
+          - t: "inside of nothing more"
+          - pause: long
+          - set_variables: [SpeakExpression: "'false'"]
+        else:
+          - t: "inside"
+          - pause: long
+    - set_variables: [NavNode: "@id"]
 
-# any ? ( (::NavCommand=="WhereAmI" || ::NavCommand=="WhereAmIAll") && has_parent(match))
-# => WhereAmI {
-# 		ruleRef = name(^match);
-# 		childIndex = index(^match);                   # key to know what to say for each notation
-# 		::StartPosition = ^match.dfs;
-# 		::EndPosition = ^match.offset;
-# 		::SpeakAfterMove = !( IsBracketed(^match, "(", ")") || IsBracketed(^match, "[", "]") );# autozoom;
-# 		sayCommand = ::SpeakAfterMove;
-# 		::_rematch= (
-# 			  ( ::NavCommand=="WhereAmIAll" || !::SpeakAfterMove ) &&
-# 			  !( name(^match)=="math" || (name(^^match)=="math" && count(^^match)==1) )
-# 		   );
-#    };
-
+-
+  name: where-am-i-middle
+  tag: "*"
+  match:
+    - "$NavCommand = 'WhereAmI' or $NavCommand = 'WhereAmIAll'"
+  replace:
+    - test:
+        if: "$NavVerbosity != 'Terse'"
+        then:
+          - t: "inside"
+          - pause: long
+    - test:
+        - if: "$NavMode='Enhanced' and parent::*[self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"
+          then: [x: ".."]   # auto-zoom up
+        - else_if: "$NavCommand = 'WhereAmI'"
+          then: [set_variables: [NavNode: "@id"]]
+          else:
+            - speak: "@id"
+            - pause: long
+            - x: '..'

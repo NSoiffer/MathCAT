@@ -26,6 +26,7 @@ use crate::errors::*;
 use crate::prefs::PreferenceManager;
 use crate::navigate::*;
 use crate::pretty_print::mml_to_string;
+use crate::xpath_functions::is_leaf;
 
 // wrap up some common functionality between the call from 'main' and AT
 fn cleanup_mathml(mathml: Element) -> Element {
@@ -140,6 +141,26 @@ pub enum StringOrFloat {
     AsString(String),
     AsFloat(f64),
 }
+
+pub fn GetPreference(name: String) -> Option<String> {
+    use yaml_rust::Yaml;
+    return crate::speech::SPEECH_RULES.with(|rules| {
+        let rules = rules.borrow();
+        let pref_manager = rules.pref_manager.borrow();
+        let prefs = pref_manager.merge_prefs();
+        return match prefs.get(&name) {
+            None => None,
+            Some(yaml) => match yaml {
+                Yaml::String(s) => Some(s.clone()),
+                Yaml::Boolean(b)  => Some( (if *b {"true"} else {"false"}).to_string() ),
+                Yaml::Integer(i)   => Some( format!("{}", *i)),
+                Yaml::Real(s)   => Some(s.clone()),
+                _                      => None,            
+            },
+        }
+    });
+}
+
 pub fn SetPreference(name: String, value: StringOrFloat) -> Result<()> {
     return crate::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
@@ -157,15 +178,26 @@ pub fn SetPreference(name: String, value: StringOrFloat) -> Result<()> {
                 };
                 rules.invalidate(files_changed);
             },
-            "verbosity" => {
+            "verbosity" | "navverbosity" => {
+                let pref_name = if name.to_lowercase().as_str()=="verbosity" {"Verbosity"} else {"NavVerbosity"};
                 let value = match to_string(&name, value)?.to_lowercase().as_str() {
                     "terse" => "Terse".to_string(),
                     "medium" => "Medium".to_string(),
                     "verbose" => "Verbose".to_string(),
-                    _ => rules.pref_manager.borrow().get_user_prefs().to_string("Verbosity"),
+                    _ => rules.pref_manager.borrow().get_user_prefs().to_string(pref_name),
                     };
 
-                rules.pref_manager.borrow_mut().set_user_prefs("Verbosity", value.as_str());
+                rules.pref_manager.borrow_mut().set_user_prefs(pref_name, value.as_str());
+            },
+            "navmode" => {
+                let value = match to_string(&name, value)?.to_lowercase().as_str() {
+                    "enhanced" => "Enhanced".to_string(),
+                    "simple" => "Simple".to_string(),
+                    "character" => "Character".to_string(),
+                    _ => rules.pref_manager.borrow().get_user_prefs().to_string("NavMode"),
+                    };
+
+                rules.pref_manager.borrow_mut().set_user_prefs("NavMode", value.as_str());
             },
             "speechtags" | "tts" => {
                 return set_speech_tags(&mut rules.pref_manager.borrow_mut(), to_string(&name, value)?);
@@ -347,19 +379,18 @@ fn trim_doc(doc: &Document) {
 /// Not really meant to be public -- used by tests in some packages
 pub fn trim_element(e: &Element) {
     // "<mtext>this is text</mtext" results in 3 text children
-    //   these are combined into one child as it makes code downstream simpler
+    // these are combined into one child as it makes code downstream simpler
+    if is_leaf(*e) {
+        // Assume it is HTML inside of the leaf -- turn the HTML into a string
+        make_leaf_element(*e);
+        return;
+    }
+
     let mut single_text = "".to_string();
     for child in e.children() {
         match child {
-            ChildOfElement::Element(_) => {
-                for child in e.children() {
-                    if let ChildOfElement::Element(el) = child {
-                        trim_element(&el);
-                    } else {
-                        e.remove_child(child);        // text, comment, or processing instruction
-                    }
-                }
-                return;
+            ChildOfElement::Element(c) => {
+                    trim_element(&c);
             },
             ChildOfElement::Text(t) => {
                 single_text += t.text();
@@ -377,11 +408,42 @@ pub fn trim_element(e: &Element) {
     if !e.children().is_empty() && !trimmed_text.is_empty() {
         // FIX: we have a problem -- what should happen???
         // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash
-        eprintln!("mathml and both element and textual children which shouldn't happen -- ignoring text '{}'", single_text);
+        error!("trim_element: both element and textual children which shouldn't happen -- ignoring text '{}'", single_text);
     }
     if e.children().is_empty() && !single_text.is_empty() {
         // debug!("Combining text in {}: '{}' -> '{}'", e.name().local_part(), single_text, trimmed_text);
         e.set_text(&trimmed_text);
+    }
+
+    fn make_leaf_element(mathml_leaf: Element) {
+        // MathML leaves like <mn> really shouldn't have non-textual content, but you could have embedded HTML
+        // Here, we take convert them to leaves by grabbing up all the text and making that the content
+        // Potentially, we leave them and let (default) rules do something, but it makes other parts of the code
+        //   messier because checking the text of a leaf becomes Option<&str> rather than just &str
+        let children = mathml_leaf.children();
+        if children.is_empty() {
+            return;
+        }
+
+        // gather up the text
+        let mut text ="".to_string();
+        for child in children {
+            match child {
+                ChildOfElement::Element(e) => {
+                    make_leaf_element(e);
+                    match e.children()[0] {
+                        ChildOfElement::Text(t) => text += t.text(),
+                        _ => panic!("as_text: internal error -- make_leaf_element found non-text child"),
+                    }
+                }
+                ChildOfElement::Text(t) => text += t.text(),
+                _ => (),
+            }
+        }
+
+        // get rid of the old children and replace with the text we just built
+        mathml_leaf.clear_children();
+        mathml_leaf.set_text(&text);
     }
 }
 

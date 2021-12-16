@@ -66,7 +66,9 @@ use yaml_rust::Yaml;
 
 use std::{fmt};
 use crate::speech::{SpeechRulesWithContext, MyXPath};
-use strum_macros::IntoStaticStr;
+use std::string::ToString;
+use std::str::FromStr;
+use strum_macros::{Display, EnumString};
 use regex::Regex;
 
 pub const PAUSE_SHORT:f64 = 150.0;  // ms
@@ -77,7 +79,8 @@ pub const PAUSE_AUTO_STR: &str = "\u{F8FA}\u{F8FA}";
 
 /// TTSCommand are the supported TTS commands
 /// When parsing the YAML rule files, they are converted to these enums
-#[derive(Debug, Clone, PartialEq, IntoStaticStr)]
+#[derive(Debug, Clone, PartialEq, Display, EnumString)]
+#[strum(serialize_all = "snake_case")]  // allows lower case
 pub enum TTSCommand {
     Pause,
     Rate,
@@ -87,14 +90,93 @@ pub enum TTSCommand {
     Voice,
     Spell,
     Bookmark,
+    Pronounce,
 }
 
+#[derive(Debug, Clone)]
+pub struct Pronounce {
+    text: String,       // plain text
+    ipa: String,        // ipa 
+    sapi5: String,
+    eloquence: String,
+}
+
+
+impl fmt::Display for Pronounce {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut comma = "";     // comma separator so it looks right
+        write!(f, "pronounce: [")?;
+        if !self.text.is_empty() {
+            write!(f, "text: '{}'", self.text)?;
+            comma = ",";
+        }
+        write!(f, "pronounce: [")?;
+        if !self.ipa.is_empty() {
+            write!(f, "{}ipa: '{}'", comma, self.ipa)?;
+            comma = ",";
+        }
+        write!(f, "pronounce: [")?;
+        if !self.sapi5.is_empty() {
+            write!(f, "{}sapi5: '{}'", comma, self.sapi5)?;
+            comma = ",";
+        }
+        write!(f, "pronounce: [")?;
+        if !self.eloquence.is_empty() {
+            write!(f, "{}eloquence: '{}'", comma, self.eloquence)?;
+        }
+        return writeln!(f, "]");
+    }
+}
+
+impl Pronounce {
+    fn build(values: &Yaml) -> Result<Pronounce> {
+        use crate::speech::{as_str_checked, yaml_to_type};
+        use crate::pretty_print::yaml_to_string;
+
+        let mut text = "";
+        let mut ipa = "";
+        let mut sapi5 = "";
+        let mut eloquence = "";
+        // values should be an array with potential values for Pronounce
+        let values = values.as_vec().ok_or_else(||
+                                        format!("'pronounce' value '{}' is not an array", yaml_to_type(values)))?;
+        for key_value in values {
+            let key_value_hash = key_value.as_hash().ok_or_else(|| 
+                                        format!("pronounce value '{}' is not key/value pair", yaml_to_string(key_value, 0)))?;
+            if key_value_hash.len() != 1 {
+                error!("pronounce value {:?} is not a single key/value pair", key_value_hash);
+            }
+        
+            for (key, value) in key_value_hash {
+                match as_str_checked(key)? {
+                    "text" => text = as_str_checked(value)?,
+                    "ipa" => ipa = as_str_checked(value)?,
+                    "sapi5" => sapi5 = as_str_checked(value)?,
+                    "eloquence" => eloquence = as_str_checked(value)?,
+                    _ => bail!("unknown pronounce type: {} with value {}", yaml_to_string(key, 0), yaml_to_string(value, 0)),
+                }
+            }
+        }
+        if text.is_empty() {
+            bail!("'text' key/value is required for 'pronounce' -- it is used is the speech engine is unknown.")
+        }
+        return Ok( Pronounce{
+            text: text.to_string(),
+            ipa: ipa.to_string(),
+            sapi5: sapi5.to_string(),
+            eloquence: eloquence.to_string()
+        } );
+    
+
+    }
+}
 /// TTSCommands are either numbers (f64 because of YAML) or strings
 #[derive(Debug, Clone)]
 pub enum TTSCommandValue {
     Number(f64),
     String(String),
     XPath(MyXPath),
+    Pronounce(Box<Pronounce>),
 }
 
 impl TTSCommandValue {
@@ -111,6 +193,14 @@ impl TTSCommandValue {
             _                                  => panic!("Internal error: TTSCommandValue is not a string"),
         }
     }
+
+    fn get_pronounce(&self) -> &Pronounce {
+        match self {
+            TTSCommandValue::Pronounce(p) => return &p,
+            _                               => panic!("Internal error: TTSCommandValue is not a 'pronounce' command'"),
+        }
+        
+    }
 }
 
 /// A TTS rule consists of the command, the value, and its replacement
@@ -123,17 +213,16 @@ pub struct TTSCommandRule {
 
 impl fmt::Display for TTSCommandRule {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let command: &'static str = "rate";
         let value = match &self.value {
             TTSCommandValue::String(s) => s.to_string(),
             TTSCommandValue::Number(f) => f.to_string(),
             TTSCommandValue::XPath(p) => p.to_string(),
+            TTSCommandValue::Pronounce(p) => p.to_string(),
         };
         if self.command == TTSCommand::Pause {
-            return write!(f, "pause: {{value: {}}}", value);
+            return write!(f, "pause: {}", value);
         } else {
-            return write!(f, "{}:\n  value: {}{}", 
-                    command, value, self.replacements);
+            return write!(f, "{}: {}{}", self.command.to_string(), value, self.replacements);
         };
     }
 }
@@ -178,30 +267,19 @@ impl TTS {
                 bail!("{} TTS command is missing a 'value' sub-key. Found\n{}", tts_command, yaml_to_string(values, 1));
             };
             replacements = ReplacementArray::build(&values["replace"])?;
-        }else {
+        } else {
             tts_value = values;
             replacements = ReplacementArray::build_empty();
         }
         let tts_value = yaml_to_string(&tts_value, 0);
         let tts_value = tts_value.trim(); // if not a number or string, value is bogus
-        let tts_enum = match tts_command {
-            "pause"    => TTSCommand::Pause,
-            "rate"     => TTSCommand::Rate,
-            "volume"   => TTSCommand::Volume,
-            "pitch"    => TTSCommand::Pitch,
-            "gender"   => TTSCommand::Gender,
-            "voice"    => TTSCommand::Voice,
-            "spell"    => TTSCommand::Spell,
-            "bookmark" => TTSCommand::Bookmark,
-            _          => panic!("Internal error in build_tts: unexpected rule ({:?}) encountered", tts_command)    
+        let tts_enum = match TTSCommand::from_str(tts_command) {
+            Ok(t) => t,
+            Err(_) => bail!("Internal error in build_tts: unexpected rule ({:?}) encountered", tts_command),
         };
     
         let tts_command_value;
-        if tts_enum == TTSCommand::Bookmark {
-            tts_command_value = TTSCommandValue::XPath(
-                MyXPath::build(values).chain_err(|| "while trying to evaluate value of 'bookmark:'")?
-            );
-        } else if !(tts_enum == TTSCommand::Gender || tts_enum == TTSCommand::Voice || tts_enum == TTSCommand::Spell) {
+        if tts_enum == TTSCommand::Pause || tts_enum == TTSCommand::Rate || tts_enum == TTSCommand::Volume || tts_enum == TTSCommand::Pitch {
             let val = match tts_value {
                 "short" => Ok( PAUSE_SHORT ),
                 "medium" => Ok( PAUSE_MEDIUM ),
@@ -215,6 +293,12 @@ impl TTS {
             }
     
             tts_command_value = TTSCommandValue::Number(val.unwrap());
+        } else if tts_enum == TTSCommand::Bookmark {
+            tts_command_value = TTSCommandValue::XPath(
+                MyXPath::build(values).chain_err(|| "while trying to evaluate value of 'bookmark:'")?
+            );
+        } else if tts_enum == TTSCommand::Pronounce {
+            tts_command_value = TTSCommandValue::Pronounce( Box::new( Pronounce::build(values)? ) );
         } else {
             tts_command_value = TTSCommandValue::String(tts_value.to_string());
         }
@@ -320,6 +404,8 @@ impl TTS {
                     chars_with_spaces.push(ch);
                 }
                 return chars_with_spaces.into_iter().collect();
+            } else if let TTSCommandValue::Pronounce(p) = &command.value {
+                return p.text.clone();
             }
         };
         return "".to_string();
@@ -343,6 +429,11 @@ impl TTS {
             TTSCommand::Gender =>if is_start_tag {format!("<prosody gender='XXX{}%'>", command.value.get_string())} else {String::from("</prosody>")},
             TTSCommand::Voice =>if is_start_tag {format!("<prosody voice='XXX{}%'>", command.value.get_string())} else {String::from("</prosody>")},
             TTSCommand::Spell =>if is_start_tag {format!("<spell>{}", command.value.get_string())} else {String::from("</spell>")},
+            TTSCommand::Pronounce =>if is_start_tag {
+                    format!("<pron sym='{}'>{}", &command.value.get_pronounce().sapi5, &command.value.get_pronounce().text)
+                } else {
+                    String::from("</pron>")
+                },
             TTSCommand::Bookmark => panic!("Internal error: bookmarks should have been handled earlier"),
         };
     }
@@ -367,7 +458,12 @@ impl TTS {
             TTSCommand::Gender =>if is_start_tag {format!("<voice required='gender=\"{}\"'>", command.value.get_string())} else {String::from("</voice>")},
             TTSCommand::Voice =>if is_start_tag {format!("<voice required='{}'>", command.value.get_string())} else {String::from("</voice>")},
             TTSCommand::Spell =>if is_start_tag {format!("<say-as interpret-as='characters'>{}", command.value.get_string())} else {String::from("</say-as>")},
-            TTSCommand::Bookmark => panic!("Internal error: bookmarks should have been handled earlier"),
+            TTSCommand::Pronounce =>if is_start_tag {
+                format!("<phoneme alphabet='ipa' ph='{}'>{}", &command.value.get_pronounce().ipa, &command.value.get_pronounce().text)
+            } else {
+                String::from("</phoneme>")
+            },
+        TTSCommand::Bookmark => panic!("Internal error: bookmarks should have been handled earlier"),
         }
     }
 

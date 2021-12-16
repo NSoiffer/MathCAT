@@ -51,20 +51,20 @@ impl NavigationPosition {
     
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NavigationState {
     // it might be better to use a linked for the stacks, with the first node being the top
     // these two stacks should be kept in sync.
     position_stack: Vec<NavigationPosition>,    // all positions, so we can go back to them
     command_stack: Vec<&'static str>,                 // all commands, so we can undo them
-    place_markers: Vec<NavigationPosition>,
+    place_markers: [NavigationPosition; MAX_PLACE_MARKERS],
     where_am_i: NavigationPosition,             // current 'where am i' location
 
     #[cfg(target_family = "wasm")]
     where_am_i_start_time: usize,           // FIX: for web
     #[cfg(not(target_family = "wasm"))]
     where_am_i_start_time: Instant,
-    mode: &'static str,                         // one of "Character", "Simple", or "Enhanced"
+    mode: String,                         // one of "Character", "Simple", or "Enhanced"
     speak_overview: bool,                       // true => describe after move; false => (standard) speech rules
 }
 
@@ -93,14 +93,14 @@ impl NavigationState {
         return NavigationState {
             position_stack: Vec::with_capacity(1024),
             command_stack: Vec::with_capacity(1024),
-            place_markers: Vec::with_capacity(MAX_PLACE_MARKERS),
+            place_markers: Default::default(),
             where_am_i: NavigationPosition::default(),
             // FIX: figure this out for the web
             #[cfg(target_family = "wasm")]
             where_am_i_start_time: 0,           // FIX: for web
             #[cfg(not(target_family = "wasm"))]
             where_am_i_start_time: Instant::now(),      // need to give it some value, and "default()" isn't an option
-            mode: "enhanced",                           // FIX: should be 'if $RestartMode then $StartMode else stored previous mode		
+            mode: "".to_string(),                       // set latter when we have some context
             speak_overview: false,                      // FIX should be $Overview
         };
     }
@@ -169,22 +169,16 @@ impl NavigationState {
             context.set_variable("NavNodeOffset", self.where_am_i.current_node_offset as f64);
         }
 
-        context.set_variable("PlaceMarkerIndex", self.mode );
-
-        // get the index from command (e.g., '0' in 'SetPlacemarker3')
-        if command.starts_with("SetPlacemarker") {
-            context.set_variable("PlaceMarkerIndex", convert_last_char_to_number(command) );
-        } else if command.len()==7 && command.starts_with("MoveTo") {
-            context.set_variable("PlaceMarkerIndex", convert_last_char_to_number(command) );
-        } else if command.len()==5 && command.starts_with("Read") {
-            context.set_variable("PlaceMarkerIndex", convert_last_char_to_number(command) );
-        } else if command.len()==9 && command.starts_with("Describe") {
-            context.set_variable("PlaceMarkerIndex", convert_last_char_to_number(command) );        
-        } else {
-            context.set_variable("PlaceMarkerIndex", 10 as f64);				// an illegal value
+        // get the index from command (e.g., '3' in 'SetPlacemarker3 or MoveTo3' and set 'PlaceMarker' to it's position)
+        if command.ends_with(|ch: char| ch.is_ascii_digit()) {
+            let index = convert_last_char_to_number(command);
+            let position = &self.place_markers[index];
+            context.set_variable("PlaceMarkerIndex", index as f64);
+            context.set_variable("PlaceMarker", position.current_node.as_str());
+            context.set_variable("PlaceMarkerOffset", position.current_node_offset as f64);
         }
            
-        context.set_variable("ReadZoomLevel", (if self.mode == "enhanced" {-1} else {1}) as f64);
+        context.set_variable("ReadZoomLevel", (if self.mode == "Enhanced" {-1} else {1}) as f64);
         context.set_variable("MatchCounter", 0 as f64);						// default is to speak the expr after navigation
 
         if command == "MoveLastLocation" {
@@ -194,17 +188,30 @@ impl NavigationState {
             };
             context.set_variable("PreviousNavCommand", previous_command);
         }
+
+        // used by nav rules for speech -- needs an initial value so tests don't fail
+        context.set_variable("Move2D", "" );
+        context.set_variable("SpeakExpression","true" );
+
         return;
 
-        fn convert_last_char_to_number(str: &str) -> f64 {
+        fn convert_last_char_to_number(str: &str) -> usize {
             let last_char = str.as_bytes()[str.len()-1];
             assert!( '0' as u8 <= last_char && last_char <= '9' as u8);
-            return (last_char - '0' as u8) as f64;
+            return (last_char - '0' as u8) as usize;
         }
     }
 }
 
-fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> {
+// convert the last digit of a Placemarker command to an integer
+fn convert_last_char_to_number(str: &str) -> usize {
+    let last_char = str.as_bytes()[str.len()-1];
+    assert!( '0' as u8 <= last_char && last_char <= '9' as u8);
+    return (last_char - '0' as u8) as usize;
+}
+
+
+pub fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> {
     if mathml.attribute_value("id").unwrap() == id {
         return Some(mathml);
     }
@@ -290,100 +297,176 @@ fn do_navigate_command<'a>(mathml: Element<'a>, command: NavigationCommand, para
 }
 
 fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str) -> Result<String> {
-    if mathml.children().is_empty() {
-        bail!("MathML has not been set -- can't navigate");
-    }
-    debug!("Nav Command: {}", nav_command);
-    NAVIGATION_STATE.with(|nav_state| {
-        let mut nav_state = nav_state.borrow_mut();
-        // debug!("MathML: {}", mml_to_string(&mathml));
-        if nav_state.position_stack.is_empty() {
-            // initialize to root node
-            nav_state.push(NavigationPosition{
-                current_node: mathml.attribute_value("id").unwrap().to_string(),
-                current_node_offset: 0
-            }, "None")
+    // If no speech happened for some calls, we try the call the call again (e.g, no speech for invisible times).
+    // To prevent to infinite loop, we limit the number of tries
+    const LOOP_LIMIT: usize = 3;
+    static TRY_AGAIN: &'static str = "try again";
+
+    for loop_count in 0..LOOP_LIMIT {
+        if mathml.children().is_empty() {
+            bail!("MathML has not been set -- can't navigate");
         };
-        NAVIGATION_RULES.with(|rules| {
-            {
-                let mut mut_rules = rules.borrow_mut();
-                mut_rules.update();    
-            }
-            let rules = rules.borrow();
-            let mut rules_with_context = crate::speech::SpeechRulesWithContext::new(&rules, "".to_string()); 
-            let nav_state_top = nav_state.top();
-            nav_state.init_navigation_context(rules_with_context.get_context(), nav_command, nav_state_top);
     
-            // start navigation off at the right node
-            let start_node_id = if nav_command == "MoveLastLocation" {
-                match nav_state.pop() {
-                    None => mathml.attribute_value("id)").unwrap().to_string(),
-                    Some( (position, _) ) => position.current_node.clone(),
-                }
-            } else {
-                match nav_state.top() {
-                    None => mathml.attribute_value("id").unwrap().to_string(),
-                    Some( (position, _) ) => position.current_node.clone(),
-                }
+        let result: Result<String> = NAVIGATION_STATE.with(|nav_state| {
+            let mut nav_state = nav_state.borrow_mut();
+            // debug!("MathML: {}", mml_to_string(&mathml));
+            if nav_state.position_stack.is_empty() {
+                // initialize to root node
+                nav_state.push(NavigationPosition{
+                    current_node: mathml.attribute_value("id").unwrap().to_string(),
+                    current_node_offset: 0
+                }, "None")
             };
+    
+            return NAVIGATION_RULES.with(|rules| {
+                {
+                    let mut mut_rules = rules.borrow_mut();
+                    mut_rules.update();    
+                }
+                let rules = rules.borrow();
+                let mut rules_with_context = crate::speech::SpeechRulesWithContext::new(&rules, "".to_string()); 
+                
+                // if nav_state.mode.is_empty() {
+                    nav_state.mode = rules.pref_manager.as_ref().borrow().get_user_prefs().to_string("NavMode");
+                // }
 
-            let start_node = match get_node_by_id(mathml, &start_node_id) {
-                Some(node) => node,
-                None => {
-                    error!("Didn't find id '{}'", &start_node_id);
-                    bail!("No node found");
-                }
-            };
-            let speech = match rules_with_context.match_pattern(&start_node) {
-                Ok(speech_string) => {
-                    rules.pref_manager.borrow().get_tts()
-                        .merge_pauses(crate::speech::remove_optional_indicators(
-                            &speech_string.replace(CONCAT_STRING, "")
-                                                .replace(CONCAT_INDICATOR, "")                            
-                                        )
-                        .trim())
-                },
-                Err(e)             => { 
-                    crate::speech::print_errors(&e.chain_err(|| "Pattern match/replacement failure!"));
-                    bail!("Error in speaking math navigation; see error log.")
-                }
-            };
-            debug!("Nav Speech: {}", speech);
+                nav_state.init_navigation_context(rules_with_context.get_context(), nav_command, nav_state.top());
+                
+                debug!("NavCommand: {}, NavMode {}", nav_command, nav_state.mode);
 
-            // FIX: add things that need to do
-            // context_get_variable
-            // if SpeakAfterMove do speech/overview for current node
-            // do a speech replacement based on some marker for "where am i" and others that loop ([Speak: id])???
-            // what else needs to be done/set???
-            let context = rules_with_context.get_context();
-                    // after a command, we either read or describe the new location (part of state)
-            // also some commands are DescribeXXX/ReadXXX, so we need to look at the commands also
-            let mut use_read_rules = if nav_command.starts_with("Read") {
-                true
-            } else if nav_command.starts_with("Describe") {
-                false
-            } else {
-                !nav_state.speak_overview
-            };
-            if let Some(val) = context_get_variable(context, "DescribeAfterMove", mathml).0 {
-                nav_state.speak_overview = val == "true";
-                use_read_rules = nav_state.speak_overview;
-            };
+                // start navigation off at the right node
+                let start_node_id = if nav_command == "MoveLastLocation" {
+                    match nav_state.pop() {
+                        None => mathml.attribute_value("id)").unwrap().to_string(),
+                        Some( (position, _) ) => position.current_node.clone(),
+                    }
+                } else {
+                    match nav_state.top() {
+                        None => mathml.attribute_value("id").unwrap().to_string(),
+                        Some( (position, _) ) => position.current_node.clone(),
+                    }
+                };
+    
+                let start_node = match get_node_by_id(mathml, &start_node_id) {
+                    Some(node) => node,
+                    None => {
+                        error!("Didn't find id '{}'", &start_node_id);
+                        bail!("No node found");
+                    }
+                };
 
-            if !(nav_command == "MoveLastLocation" || nav_command.starts_with("Read") || nav_command.starts_with("Describe")) {
-                if let Some(new_node_id) = context_get_variable(&context, "NavNode", mathml).0 {
-                    let offset = context_get_variable(&context, "NavNodeOffset", mathml).1.unwrap() as usize;
-                    debug!("nav_state: pushing on id '{}/{}'", new_node_id, offset);
-                    if &new_node_id != ILLEGAL_NODE_ID {
-                        nav_state.push(NavigationPosition{ current_node: new_node_id, current_node_offset: offset}, nav_command);
+                // Finally, apply the navigation rules
+                let speech = match rules_with_context.match_pattern(&start_node) {
+                    Ok(speech_string) => {
+                        rules.pref_manager.borrow().get_tts()
+                            .merge_pauses(crate::speech::remove_optional_indicators(
+                                &speech_string.replace(CONCAT_STRING, "")
+                                                    .replace(CONCAT_INDICATOR, "")                            
+                                            )
+                            .trim())
+                    },
+                    Err(e)             => { 
+                        crate::speech::print_errors(&e.chain_err(|| "Pattern match/replacement failure!"));
+                        bail!("Error in speaking math navigation; see error log.")
+                    }
+                };
+                debug!("Nav Speech: {}", speech);
+    
+                // FIX: add things that need to do
+                // do a speech replacement based on some marker for "where am i" and others that loop ([Speak: id])???
+                // what else needs to be done/set???
+                let context = rules_with_context.get_context();
+    
+                // transfer some values that might have been set into the prefs
+                nav_state.mode = context_get_variable(context, "NavMode", mathml).0.unwrap();
+                rules.pref_manager.as_ref().borrow_mut().set_user_prefs("NavMode", &nav_state.mode);
+
+                let nav_position = match context_get_variable(&context, "NavNode", mathml).0 {
+                    None => NavigationPosition::default(),
+                    Some(node) => NavigationPosition {
+                        current_node: node,
+                        current_node_offset: context_get_variable(&context, "NavNodeOffset", mathml).1.unwrap() as usize
+                    }
+                };
+    
+                // after a command, we either read or describe the new location (part of state)
+                // also some commands are DescribeXXX/ReadXXX, so we need to look at the commands also
+                let use_read_rules = if nav_command.starts_with("Read") {
+                    true
+                } else if nav_command.starts_with("Describe") {
+                    false
+                } else {
+                    let overview = context_get_variable(context, "Overview", mathml).0.unwrap();
+                    overview == "false"
+                };
+    
+                if (nav_command.starts_with("Move") || nav_command.starts_with("Zoom")) && nav_command != "MoveLastLocation" {
+                    // push the new location on the stack
+                    if &nav_position != &NavigationPosition::default() {
+                        debug!("nav_state: pushing on {}", &nav_position);
+                        if &nav_position.current_node != ILLEGAL_NODE_ID {
+                            nav_state.push(nav_position.clone(), nav_command);
+                        }
                     }
                 }
+
+                if nav_command.starts_with("SetPlacemarker") {
+                    if let Some(new_node_id) = context_get_variable(&context, "NavNode", mathml).0 {
+                        let offset = context_get_variable(&context, "NavNodeOffset", mathml).1.unwrap() as usize;
+                        nav_state.place_markers[convert_last_char_to_number(nav_command)] = NavigationPosition{ current_node: new_node_id, current_node_offset: offset};
+                    }
+                }
+    
+                debug!("{}", &nav_state);
+                let nav_mathml = get_node_by_id(mathml, &nav_position.current_node);
+                if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", mathml).0.unwrap() == "true" {
+                    // Speak/Overview of where we landed (if we are supposed to speak it)
+                    let node_speech = speak(nav_mathml.unwrap(), use_read_rules);
+                    if !node_speech.is_empty() {
+                        pop_stack(&mut nav_state, loop_count);
+                        return Ok( speech + &node_speech );
+                    } else {
+                        // try again in loop
+                        bail!(TRY_AGAIN);
+                    }
+                } else {
+                    pop_stack(&mut nav_state, loop_count);
+                    return Ok( speech );
+                };
+            });
+        });
+        match result {
+            Ok(speech) => return Ok( speech ),
+            Err(e) => {
+                if e.to_string().as_str() != TRY_AGAIN {
+                    return Err(e);
+                }
             }
-            debug!("{}", &nav_state);
-            let (nav_mathml, _) = nav_state.get_navigation_mathml(mathml)?;
-            return Ok( speech + &speak(nav_mathml, use_read_rules) );
-        })
-    })
+        }
+    }
+    bail!("Internal error: Navigation exceeded limit of number of times no speech generated.");
+
+    fn pop_stack(nav_state: &mut NavigationState, count: usize) {
+        // save the final state and pop the intermediate states that did nothing
+        if count == 0 {
+            return;
+        }
+
+        let (top_position, top_command) = nav_state.pop().unwrap();
+        let mut count = count-1;
+        loop {
+            debug!("  ... loop count={}", count);
+            let (_, nav_command) = nav_state.top().unwrap();
+            if (nav_command.starts_with("Move") || nav_command.starts_with("Zoom")) && nav_command != "MoveLastLocation" {
+                nav_state.pop();
+            }
+            if count == 0 {
+                break;
+            };
+            count -= 1;
+        };
+        nav_state.push(top_position, top_command);
+    }
 }
 
 fn speak(mathml: Element, full_read: bool) -> String {
@@ -691,7 +774,7 @@ mod tests {
     use crate::interface::*;
 
     #[cfg(test)]
-    pub fn init_logger() {
+    fn init_logger() {
         env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug"))
             .is_test(true)
             .format_timestamp(None)
@@ -701,6 +784,17 @@ mod tests {
             .init();
     }
     
+    fn test_command(command: &'static str, mathml: Element, result_id: &str) -> Result<String> {
+        let nav_speech = do_navigate_command_string(mathml, command)?;
+        debug!("Full speech: {}", nav_speech);
+        NAVIGATION_STATE.with(|nav_stack| {
+            let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
+            assert_eq!(id, result_id);
+        });
+
+        return Ok( nav_speech );
+    }
+
     #[test]
     fn zoom_in() -> Result<()> {
         // init_logger();
@@ -712,19 +806,58 @@ mod tests {
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            let nav_speech = do_navigate_command_string(mathml, "ZoomIn")?;
-            debug!("Full speech (first zoom): {}", nav_speech);
-            NAVIGATION_STATE.with(|nav_stack| {
-                let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
-                assert!(id == "msup");
-            });
-
-            let nav_speech = do_navigate_command(mathml, NavigationCommand::Zoom, NavigationParam::Next)?;
-            debug!("Full speech (second zoom): {}", nav_speech);
-            NAVIGATION_STATE.with(|nav_stack| {
-                let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
-                assert!(id == "base");
-            });
+            test_command("ZoomIn", mathml, "msup")?;
+            test_command("ZoomIn", mathml, "base")?;
+            return Ok( () );
+        });
+    }
+    
+    #[test]
+    fn zoom_in_parens() -> Result<()> {
+        // init_logger();
+        // (a+b)(c+d) + 1
+        let mathml_str = " <math display='block' id='Ml2f6pjt-0' data-id-added='true'>
+        <mrow data-changed='added' id='Ml2f6pjt-1' data-id-added='true'>
+          <mrow data-changed='added' id='Ml2f6pjt-2' data-id-added='true'>
+            <mrow data-changed='added' id='Ml2f6pjt-3' data-id-added='true'>
+              <mo stretchy='false' id='Ml2f6pjt-4' data-id-added='true'>(</mo>
+              <mrow data-changed='added' id='Ml2f6pjt-5' data-id-added='true'>
+                <mi id='Ml2f6pjt-6' data-id-added='true'>a</mi>
+                <mo id='Ml2f6pjt-7' data-id-added='true'>+</mo>
+                <mi id='Ml2f6pjt-8' data-id-added='true'>b</mi>
+              </mrow>
+              <mo stretchy='false' id='Ml2f6pjt-9' data-id-added='true'>)</mo>
+            </mrow>
+            <mo data-changed='added' id='Ml2f6pjt-10' data-id-added='true'>&#x2062;</mo>
+            <mrow data-changed='added' id='Ml2f6pjt-11' data-id-added='true'>
+              <mo stretchy='false' id='Ml2f6pjt-12' data-id-added='true'>(</mo>
+              <mrow data-changed='added' id='Ml2f6pjt-13' data-id-added='true'>
+                <mi id='Ml2f6pjt-14' data-id-added='true'>c</mi>
+                <mo id='Ml2f6pjt-15' data-id-added='true'>+</mo>
+                <mi id='Ml2f6pjt-16' data-id-added='true'>d</mi>
+              </mrow>
+              <mo stretchy='false' id='Ml2f6pjt-17' data-id-added='true'>)</mo>
+            </mrow>
+          </mrow>
+          <mo id='Ml2f6pjt-18' data-id-added='true'>+</mo>
+          <mn id='Ml2f6pjt-19' data-id-added='true'>1</mn>
+        </mrow>
+       </math>";
+        SetMathML(mathml_str.to_string()).unwrap();
+        SetPreference("NavMode".to_string(), StringOrFloat::AsString("Enhanced".to_string()))?;
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomIn", mathml, "Ml2f6pjt-2")?;
+            test_command("ZoomIn", mathml, "Ml2f6pjt-5")?;
+            test_command("ZoomIn", mathml, "Ml2f6pjt-6")?;
+            
+            // repeat, but this time with "Simple
+            SetPreference("NavMode".to_string(), StringOrFloat::AsString("Simple".to_string()))?;
+            test_command("ZoomOutAll", mathml, "Ml2f6pjt-0")?;
+            test_command("ZoomIn", mathml, "Ml2f6pjt-2")?;
+            test_command("ZoomIn", mathml, "Ml2f6pjt-3")?;
+            test_command("ZoomIn", mathml, "Ml2f6pjt-4")?;
             return Ok( () );
         });
     }
@@ -740,12 +873,7 @@ mod tests {
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            let nav_speech = do_navigate_command_string(mathml, "ZoomInAll")?;
-            debug!("Full speech: {}", nav_speech);
-            NAVIGATION_STATE.with(|nav_stack| {
-                let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
-                assert!(id == "base");
-            });
+            test_command("ZoomInAll", mathml, "base")?;
             return Ok( () );
         });
     }
@@ -768,19 +896,13 @@ mod tests {
                     current_node_offset: 0
                 }, "None")
             });
-
-            let nav_speech = do_navigate_command_string(mathml, "ZoomOut")?;
-            debug!("Full speech (first zoom): {}", nav_speech);
-            NAVIGATION_STATE.with(|nav_stack| {
-                let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
-                assert!(id == "msup");
-            });
+            test_command("ZoomOut", mathml, "msup")?;
 
             let nav_speech = do_navigate_command(mathml, NavigationCommand::Zoom, NavigationParam::Previous)?;
-            debug!("Full speech (second zoom): {}", nav_speech);
+            debug!("Full speech: {}", nav_speech);
             NAVIGATION_STATE.with(|nav_stack| {
                 let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
-                assert!(id == "mfrac");
+                assert_eq!(id, "mfrac");
             });
             return Ok( () );
         });
@@ -804,19 +926,14 @@ mod tests {
                 }, "None")
             });
 
-            let nav_speech = do_navigate_command_string(mathml, "ZoomOutAll")?;
-            debug!("Full speech (first zoom): {}", nav_speech);
-            NAVIGATION_STATE.with(|nav_stack| {
-                let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
-                assert!(id == "math");
-            });
+            test_command("ZoomOutAll", mathml, "math")?;
             return Ok( () );
         });
     }
     
     #[test]
     fn move_to_start() -> Result<()> {
-        init_logger();
+        // init_logger();
         let mathml_str = "<math id='math'><mfrac id='mfrac'>
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
@@ -831,20 +948,167 @@ mod tests {
                     current_node_offset: 0
                 }, "None")
             });
-
-            let nav_speech = do_navigate_command_string(mathml, "MoveLineStart")?;
-            debug!("Full speech (first move): {}", nav_speech);
-            NAVIGATION_STATE.with(|nav_stack| {
-                let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
-                assert!(id == "denom");
-            });
-
+            test_command("MoveLineStart", mathml, "denom")?;
             let nav_speech = do_navigate_command(mathml, NavigationCommand::Move, NavigationParam::Start)?;
-            debug!("Full speech (second move): {}", nav_speech);
+            debug!("Full speech: {}", nav_speech);
             NAVIGATION_STATE.with(|nav_stack| {
                 let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
-                assert!(id == "mfrac");
+                assert_eq!(id, "mfrac");
             });
+            return Ok( () );
+        });
+    }
+    
+    #[test]
+    fn move_right_sup() -> Result<()> {
+        init_logger();
+        let mathml_str = "<math display='block' id='Msowudr8-0' data-id-added='true'>
+        <mrow data-changed='added' id='Msowudr8-1' data-id-added='true'>
+          <msup id='Msowudr8-2' data-id-added='true'>
+            <mn id='Msowudr8-3' data-id-added='true'>2</mn>
+            <mi id='Msowudr8-4' data-id-added='true'>q</mi>
+          </msup>
+          <mo id='Msowudr8-5' data-id-added='true'>-</mo>
+          <mi id='Msowudr8-6' data-id-added='true'>x</mi>
+        </mrow>
+       </math>";
+        SetMathML(mathml_str.to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            NAVIGATION_STATE.with(|nav_stack| {
+                nav_stack.borrow_mut().push(NavigationPosition{
+                    current_node: "Msowudr8-2".to_string(),
+                    current_node_offset: 0
+                }, "None")
+            });
+            SetPreference("NavMode".to_string(), StringOrFloat::AsString("Enhanced".to_string()))?;
+            test_command("MoveNext", mathml, "Msowudr8-5")?;
+
+            // reset start and test Simple
+            NAVIGATION_STATE.with(|nav_stack| {
+                nav_stack.borrow_mut().push(NavigationPosition{
+                    current_node: "Msowudr8-2".to_string(),
+                    current_node_offset: 0
+                }, "None")
+            });
+            SetPreference("NavMode".to_string(), StringOrFloat::AsString("Simple".to_string()))?;
+            test_command("MoveNext", mathml, "Msowudr8-5")?;
+
+            // reset start and test Character
+            NAVIGATION_STATE.with(|nav_stack| {
+                nav_stack.borrow_mut().push(NavigationPosition{
+                    current_node: "Msowudr8-3".to_string(),
+                    current_node_offset: 0
+                }, "None")
+            });
+            SetPreference("NavMode".to_string(), StringOrFloat::AsString("Character".to_string()))?;
+            test_command("MoveNext", mathml, "Msowudr8-4")?;
+
+            SetPreference("NavMode".to_string(), StringOrFloat::AsString("Character".to_string()))?;
+            test_command("MoveNext", mathml, "Msowudr8-5")?;
+            return Ok( () );
+        });
+    }
+
+    
+    #[test]
+    fn move_right_char() -> Result<()> {
+        // init_logger();
+        let mathml_str = "<math id='Myt3m7mx-0' data-id-added='true'>
+        <mrow displaystyle='true' id='Myt3m7mx-1' data-id-added='true'>
+          <mi id='Myt3m7mx-2' data-id-added='true'>x</mi>
+          <mo id='Myt3m7mx-3' data-id-added='true'>=</mo>
+          <mrow data-changed='added' id='Myt3m7mx-4' data-id-added='true'>
+            <mfrac id='Myt3m7mx-5' data-id-added='true'>
+              <mn id='Myt3m7mx-6' data-id-added='true'>1</mn>
+              <mrow id='Myt3m7mx-7' data-id-added='true'>
+                <mi id='Myt3m7mx-8' data-id-added='true'>a</mi>
+                <mo id='Myt3m7mx-9' data-id-added='true'>+</mo>
+                <mn id='Myt3m7mx-10' data-id-added='true'>2</mn>
+              </mrow>
+            </mfrac>
+            <mo id='Myt3m7mx-11' data-id-added='true'>+</mo>
+            <mrow data-changed='added' id='Myt3m7mx-12' data-id-added='true'>
+              <mn id='Myt3m7mx-13' data-id-added='true'>3</mn>
+              <mo data-changed='added' id='Myt3m7mx-14' data-id-added='true'>&#x2062;</mo>
+              <mi id='Myt3m7mx-15' data-id-added='true'>b</mi>
+            </mrow>
+          </mrow>
+        </mrow>
+       </math>";
+        SetMathML(mathml_str.to_string()).unwrap();
+        SetPreference("NavMode".to_string(), StringOrFloat::AsString("Character".to_string()))?;
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomInAll", mathml, "Myt3m7mx-2")?;
+            test_command("MoveNext", mathml, "Myt3m7mx-3")?;
+            test_command("MoveNext", mathml, "Myt3m7mx-6")?;
+            test_command("MoveNext", mathml, "Myt3m7mx-8")?;
+            test_command("MoveNext", mathml, "Myt3m7mx-9")?;
+            test_command("MoveNext", mathml, "Myt3m7mx-10")?;
+            test_command("MoveNext", mathml, "Myt3m7mx-11")?;
+            test_command("MoveNext", mathml, "Myt3m7mx-13")?;
+            test_command("MoveNext", mathml, "Myt3m7mx-15")?;
+            test_command("MoveNext", mathml, "Myt3m7mx-15")?;
+
+            return Ok( () );
+        });
+    }
+    
+    #[test]
+    fn placemarker() -> Result<()> {
+        // init_logger();
+        let mathml_str = "<math display='block' id='math'>
+        <mrow displaystyle='true' id='mrow'>
+          <mi id='a'>a</mi>
+          <mo id='plus-1'>+</mo>
+          <mi id='b'>b</mi>
+          <mo id='plus-2'>+</mo>
+          <mi id='c'>c</mi>
+        </mrow>
+       </math>";
+        SetMathML(mathml_str.to_string()).unwrap();
+        SetPreference("NavMode".to_string(), StringOrFloat::AsString("Character".to_string()))?;
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("MoveStart", mathml, "a")?;
+            test_command("SetPlacemarker0", mathml, "a")?;
+            test_command("MoveEnd", mathml, "c")?;
+            test_command("Read0", mathml, "c")?;
+            test_command("Describe0", mathml, "c")?;
+            test_command("SetPlacemarker1", mathml, "c")?;
+            test_command("MoveTo0", mathml, "a")?;
+            test_command("MoveTo1", mathml, "c")?;
+            test_command("MoveLastLocation", mathml, "a")?;
+            
+            return Ok( () );
+        });
+    }
+
+    #[test]
+    fn where_am_i_all() -> Result<()> {
+        // init_logger();
+        let mathml_str = "<math id='math'><mfrac id='mfrac'>
+                <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
+                <mi id='denom'>d</mi>
+            </mfrac></math>";
+        SetMathML(mathml_str.to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            NAVIGATION_STATE.with(|nav_stack| {
+                nav_stack.borrow_mut().push(NavigationPosition{
+                    current_node: "exp".to_string(),
+                    current_node_offset: 0
+                }, "None")
+            });
+            // WhereAmIAll doesn't change the stack
+            let speech =test_command("WhereAmIAll", mathml, "exp")?;
+            // should be 2 "inside" strings corresponding to steps to the root
+            assert_eq!(speech.matches("inside").map(|_| 1).sum::<i32>(), 2);
             return Ok( () );
         });
     }

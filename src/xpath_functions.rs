@@ -1140,8 +1140,9 @@ impl IsInDefinition {
 pub struct DistanceFromLeaf;
 impl DistanceFromLeaf {
     fn distance(element: Element, use_left_side: bool, treat_2d_elements_as_tokens: bool) -> usize {
+        // FIX: need to handle char level (i.e., chars in a leaf element)
         let mut element = element;
-        let distance = 0;
+        let mut distance = 1;
         loop {
             if is_leaf(element) {
                 return distance;
@@ -1152,12 +1153,13 @@ impl DistanceFromLeaf {
             let children = element.children();
             assert!(!children.is_empty());
             element = as_element( if use_left_side {children[0]} else {children[children.len()-1]} );
+            distance += 1;
         }
     }
 }
 
 /**
- * Returns distance from the current node to the leftmost/rightmost leaf.
+ * Returns distance from the current node to the leftmost/rightmost leaf (if char, then = 0, if token, then 1).
   if the node is a bracketed expr with the indicated left/right chars
  * node -- node(s) to test
  * left_side -- (bool) traverse leftmost child to leaf
@@ -1185,6 +1187,82 @@ impl Function for DistanceFromLeaf {
 
 
 
+pub struct EdgeNode;
+impl EdgeNode {
+    // Return the root of the ancestor tree if we are at the left/right side of a path from that to 'element'
+    fn edge_node<'a, 'b>(element: Element<'a>, use_left_side: bool, stop_node_name: &'b str) -> Option<Element<'a>> {
+        let element_name = name(&element);
+        if element_name == "math" {
+            return Some(element);
+        };
+
+        let parent = element.parent().unwrap().element().unwrap();   // there is always a "math" node
+        let parent_name = name(&parent);
+
+        // first check to see if we have the special case of punctuation as last child of math/mrow element
+        // it only matters if we are looking at the right edge
+
+        // debug!("EdgeNode: there are {} preceding siblings",element.preceding_siblings().len() );
+        if use_left_side  && !element.preceding_siblings().is_empty() {// not at left side
+            return None;
+        };
+
+        if !use_left_side && !element.following_siblings().is_empty() {  // not at right side
+            // check for the special case that the parent is an mrow and the grandparent is <math> and we have punctuation
+            let grandparent = parent.parent().unwrap().element().unwrap();
+            if name(&grandparent) == "math" &&
+               parent_name == "mrow" && parent.children().len() == 2 {      // right kind of mrow
+                let text = get_text_from_element( &as_element(parent.children()[1]) );
+                if text == "," || text == "." || text == ";" || text == "?" {
+                    return Some(grandparent);
+                }
+            }
+             return None;
+        };
+
+        // at an edge -- check to see the parent is desired root
+        if parent_name == stop_node_name || 
+           (stop_node_name == "2D" && MATHML_2D_NODES.contains(&name(&parent))) {
+            return Some(parent);
+        };
+        
+        // debug!("EdgeNode: recurse to {}", parent_name);
+        return EdgeNode::edge_node(parent, use_left_side, stop_node_name)
+    }
+}
+
+// EdgeNode(node, "left"/"right", stopNodeName)
+// 		-- returns the stopNode if at left/right edge of named ancestor node. "stopNodeName' can also be "2D'
+// 		   returns original node match isn't found
+//  Note: if stopNodeName=="math", then punctuation is taken into account since it isn't really part of the math
+impl Function for EdgeNode {
+    fn evaluate<'c, 'd>(&self,
+                        _context: &context::Evaluation<'c, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(3)?;
+        let stop_node_name = args.pop_string()?;
+        let use_left_side = args.pop_string()?.to_lowercase() == "left";
+        let node = validate_one_node(args.pop_nodeset()?, "EdgeNode")?;
+        if let Node::Element(e) = node {
+            let result = match EdgeNode::edge_node(e, use_left_side, &stop_node_name) {
+                Some(found) => found,
+                None => e,
+            };
+            let mut node_set = Nodeset::new();
+            node_set.add(result);
+            return Ok( Value::Nodeset(node_set) );
+        }
+
+        // FIX: should having a non-element be an error instead??
+        return Err(Error::Other(format!("EdgeNode: first arg '{:?}' is not a node", node)));
+    }
+}
+
+
+
 /// Add all the functions defined in this module to `context`.
 pub fn add_builtin_functions(context: &mut Context) {
     // FIX: should be a static cache that gets regenerated on update
@@ -1200,7 +1278,7 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("IsInDefinition", IsInDefinition);
     context.set_function("BaseNode", BaseNode);
     context.set_function("DistanceFromLeaf", DistanceFromLeaf);
-    // context.set_function("SetVariable", SetVariable);
+    context.set_function("EdgeNode", EdgeNode);
     context.set_function("DEBUG", Debug);
 }
 
@@ -1326,6 +1404,7 @@ mod tests {
         trim_element(&mathml);
         assert!(IsNode::is_simple(&mathml), "{}", message);
     }
+
     fn test_is_not_simple(message: &'static str, mathml_str: &'static str) {
 		// this forces initialization
 		crate::speech::SPEECH_RULES.with(|_| true);
@@ -1366,5 +1445,36 @@ mod tests {
         test_is_not_simple("-x y z", 
                 "<mrow><mrow><mo>-</mo><mi>x</mi></mrow>
                             <mo>&#x2062;</mo><mi>y</mi><mo>&#x2062;</mo><mi>z</mi></mrow>");
+    }
+
+    #[test]
+    fn at_left_edge() {
+        let mathml = "<math><mfrac><mrow><mn>30</mn><mi>x</mi></mrow><mn>4</mn></mfrac></math>";
+        let package = parser::parse(mathml).expect("failed to parse XML");
+        let mathml = get_element(&package);
+        trim_element(&mathml);
+        let fraction = as_element(mathml.children()[0]);
+        let mn = as_element(as_element(fraction.children()[0]).children()[0]);
+        assert_eq!(EdgeNode::edge_node(mn, true, "2D"), Some(fraction));
+        assert_eq!(EdgeNode::edge_node(mn, false, "2D"), None);
+
+        let mi = as_element(as_element(fraction.children()[0]).children()[1]);
+        assert_eq!(EdgeNode::edge_node(mi, true, "2D"), None);
+    }
+
+    #[test]
+    fn at_right_edge() {
+        let mathml = "<math><mrow><mfrac><mn>4</mn><mrow><mn>30</mn><mi>x</mi></mrow></mfrac><mo>.</mo></mrow></math>";
+        let package = parser::parse(mathml).expect("failed to parse XML");
+        let mathml = get_element(&package);
+        trim_element(&mathml);
+        let fraction = as_element(as_element(mathml.children()[0]).children()[0]);
+        let mi = as_element(as_element(fraction.children()[1]).children()[1]);
+        assert_eq!(EdgeNode::edge_node(mi, true, "2D"), None);
+        assert_eq!(EdgeNode::edge_node(mi, false, "2D"), Some(fraction));
+        assert_eq!(EdgeNode::edge_node(mi, false, "math"), Some(mathml));
+
+        let mn = as_element(as_element(fraction.children()[1]).children()[0]);
+        assert_eq!(EdgeNode::edge_node(mn, true, "2D"), None);
     }
 }

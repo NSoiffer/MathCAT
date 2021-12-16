@@ -137,7 +137,7 @@
     - x: "*[1]"
     - t: to the
     - x: "*[2]"
-    - ct: "-th"
+    - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
 
 -
    name: simple

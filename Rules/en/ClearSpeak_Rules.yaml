@@ -63,7 +63,9 @@
          else:
             - test:
                if: "*[2][self::m:mi][string-length(.)=1]"
-               then: [x: "*[2]", ct: "-th"]
+               then:
+                  - x: "*[2]"
+                  - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
                else: {x: "*[2]"}
             - t: root
       - test: 
@@ -217,7 +219,8 @@
     - x: "*[1]"
     - t: to the
     - x: "*[2]"
-    - ct: "-th power"
+    - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
+    - t: "power"
 
 
 -
