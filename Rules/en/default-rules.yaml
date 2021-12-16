@@ -237,26 +237,34 @@
         then: [t: end enclosure]
     - pause: short
 
+-
+   name: semantics
+   tag: "semantics"
+   match: "*[@encoding='MathML-Presentation']"
+   replace: 
+    - x: "*[@encoding='MathML-Presentation']/*[1]" 
 
+-
+   name: semantics-default
+   tag: "semantics"
+   match: .
+   replace: 
+    - x: "*[1]"
 
 -
    name: default-children
    tag: "*"
-   match: count(*)>1
+   match: count(*)>0
    replace: 
     - t: unknown math m l element
-    - x: text()
--
-   name: default-empty
-   tag: "*"
-   match: "*[not(text())]"
-   replace: 
-    - t: empty unknown math m l element
-    - x: text()
+    - x: "name(.)"
+    - x: "*"
+
 -
    name: default-text
    tag: "*"
    match: "."
    replace: 
     - t: unknown math m l element
+    - x: "name(.)"
     - x: text()
