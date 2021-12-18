@@ -474,8 +474,8 @@ fn process_include<F>(current_file: &Path, new_file_name: &str, mut read_new_fil
 }
 
 
-// 'Replacement' is an enum that contains all the potential replacement types/structs
-// Hence there are fields 'Test' ("test:"), 'Text" ("t:"), etc
+/// 'Replacement' is an enum that contains all the potential replacement types/structs
+/// Hence there are fields 'Test' ("test:"), 'Text" ("t:"), "XPath", etc
 #[derive(Debug, Clone)]
 enum Replacement {
     // Note: all of these are pointer types
@@ -725,7 +725,7 @@ impl<'r> SetVariables {
 }
 
 
-// allow speech of an expression (used by "WhereAmI" for navigation)
+/// Allow speech of an expression in the middle of a rule (used by "WhereAmI" for navigation)
 #[derive(Debug, Clone)]
 struct SpeakExpression {
     id: MyXPath,     // variables and values
@@ -2188,6 +2188,9 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
         )
     }
 
+    /// Iterate over all the nodes, concatenating the result strings together with a ' ' between them
+    /// If the node is an element, pattern match it
+    /// For 'Text' and 'Attribute' nodes, convert them to strings
     fn replace_nodes(&'r mut self, nodes: nodeset::Nodeset<'c>, mathml: &'r Element<'c>) -> Result<String> {
         // debug!("replace_nodes: working on {} nodes", nodes.size());
         let mut result = String::with_capacity(3*nodes.size());   // guess (2 chars/node + space)
@@ -2208,9 +2211,9 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
         return Ok( result );
     }
 
-    fn replace_chars(&'r mut self, str: &str, mathml: &'r Element<'c>) -> Result<String> {
-        // Lookup unicode "pronunciation" of char
-        // Note: TTS is not supported here (not needed and a little less efficient)
+        /// Lookup unicode "pronunciation" of char.
+        /// Note: TTS is not supported here (not needed and a little less efficient)
+        fn replace_chars(&'r mut self, str: &str, mathml: &'r Element<'c>) -> Result<String> {
         let rules = self.speech_rules;
         let mut chars = str.chars();
         if rules.translate_single_chars_only {

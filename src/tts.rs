@@ -306,8 +306,8 @@ impl TTS {
     }
     
     /// The rule called to execute the TTSCommand `command`
-    /// * `prefs` are used for scaling the speech rate
-    /// * some rules have MathML nested inside, so we need to do replacements on them (hence `rules` and `mathml` are needed)
+    /// `prefs` are used for scaling the speech rate
+    /// some rules have MathML nested inside, so we need to do replacements on them (hence `rules` and `mathml` are needed)
     ///
     /// A string is returned for the speech engine.
     ///
