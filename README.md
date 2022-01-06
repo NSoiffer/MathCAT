@@ -42,6 +42,7 @@ There are many different audiences for MathCAT and each audience has different i
 * Translators: information about the files that need to be translated
 * MathCAT developers: information about MathCAT's design
 
+_TODO: split the text after the next section in the various components above and link them_
 
 ## Why MathCAT?
 
@@ -125,7 +126,7 @@ The MathML for this expression is:
 MathCAT uses external rules to generate speech and braille.
 These take about 35ms to load; this load only happens the first time the rules are used, or if the speech style, language, or other external preference is changed. An additional 50ms are required to load the full Unicode files for speech and braille,
 but studies have shown that a vast majority of English K-14 math material uses a surprisingly few number of characters.
-Using open source math books, the initial load should cover at least 99.99% of expressions encountered in English K-14 math textbooks.
+Using open source math books, the initial load should cover at least 99.99% of the characters used in expressions encountered in English K-14 math textbooks.
 
 The library is about 2.6mb in size.
 
