@@ -198,9 +198,10 @@
       - t: "W"
 
 -
+   # add space after these ops when they are prefix operators
+   # note: other shapes are <mi>s and canonicalization turns them into function calls (which will include spaces after them)
    name: prefix-geometry-ops
    tag: mo
-     # add space after these ops when they are prefix operators
    match:
       - "parent::*[count(*) = 2 and name()='mrow' and not(preceding-sibling::*)] and"
       - "IsInDefinition(., 'GeometryPrefixOperators')"

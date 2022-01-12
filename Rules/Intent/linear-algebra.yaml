@@ -1,0 +1,113 @@
+---
+
+-
+  # vertical bars around an mtable or around a capital letter
+  # could add a check to make sure it was a square mtable
+  name: determinant
+  tag: mrow
+  match: 
+    - "IsBracketed(., '|', '|') and "
+    - "( *[2][self::m:mtable or "
+    - "  self::m:mi[self::m:mi and string-length(text()) and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]]"
+    - ")"
+  replace:
+  - intent:
+      name: "determinant"
+      children: [x: "*[2]"]
+
+-
+  name: norm
+  tag: mrow
+  match: 
+    - "IsBracketed(., '∥', '∥')"
+  replace:
+  - intent:
+      name: "norm"
+      children: [x: "*[2]"]
+
+
+-
+  name: norm
+  tag: msub
+  match: 
+    - "IsBracketed(*[1], '∥', '∥')"
+  replace:
+  - intent:
+      name: "subscripted-norm"
+      children:
+      - x: "*[1]/*[2]"   # grab the contents of the bracketed expr
+      - x: "*[2]"
+
+-
+  name: vector-magnitude
+  tag: mrow
+  match: "IsBracketed(., '‖', '‖')"
+  replace:
+  - intent:
+      name: "magnitude"
+      children: [x: "*[2]"]
+
+
+-
+  # parens or brackets around an mtable
+  name: matrix
+  tag: mrow
+  match: 
+    - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']')) and *[2][self::m:mtable]"
+  replace:
+  - intent:
+      name: "matrix"
+      children: [x: "*[2]"]
+
+-
+  name: transpose
+  tag: msup
+  match: 
+    - "*[2][text()='T']"
+  replace:
+  - intent:
+      name: "transpose"
+      children: [x: "*[1]"]
+
+-
+  name: trace
+  tag: mrow
+  match: 
+    - "count(*)=3 and (*[1][text()='tr' or text()='Tr']) and *[2][text()='\u2061']"
+  replace:
+  - intent:
+      name: "trace"
+      children: [x: "*[3]"]
+
+-
+  name: dimension
+  tag: mrow
+  match: 
+    - "count(*)=3 and (*[1][text()='dim' or text()='Dim']) and *[2][text()='\u2061']"
+  replace:
+  - intent:
+      name: "dimension"
+      children: [x: "*[3]"]
+
+-
+  name: homomorphism
+  tag: mrow
+  match: 
+    - "count(*)=3 and (*[1][text()='hom' or text()='Hom']) and *[2][text()='\u2061']"
+  replace:
+  - intent:
+      name: "homomorphism"
+      children: [x: "*[3]"]
+
+-
+  name: kernel
+  tag: mrow
+  match: 
+    - "count(*)=3 and (*[1][text()='ker' or text()='Ker']) and *[2][text()='\u2061']"
+  replace:
+  - intent:
+      name: "kernel"
+      children: [x: "*[3]"]
+
+
+

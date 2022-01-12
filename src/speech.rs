@@ -6,13 +6,13 @@
 //! The speech rules call out to the preferences and tts modules and the dividing line is not always clean.
 //! A number of useful utility functions used by other modules are defined here.
 #![allow(clippy::needless_return)]
-
+use std::path::PathBuf;
 use std::{collections::HashMap, process::exit};
-use std::cell::RefCell;
-use sxd_document::dom::Element;
-use sxd_document::QName;
+use std::cell::{RefCell, RefMut};
+use sxd_document::dom::{ChildOfElement, Document, Element};
+use sxd_document::{Package, QName};
 use sxd_xpath::context::Evaluation;
-use sxd_xpath::{Context, Factory, Value, XPath, nodeset};
+use sxd_xpath::{Context, Factory, Value, XPath};
 use sxd_xpath::nodeset::Node;
 use std::fmt;
 use crate::errors::*;
@@ -25,6 +25,7 @@ use regex::{Captures, Regex};
 use phf::phf_map;
 use std::rc::Rc;
 use crate::shim_filesystem::read_to_string_shim;
+use crate::canonicalize::{as_element, create_mathml_element, set_mathml_name, name};
 
 
 /// The main external call, `speak_mathml` returns a string for the speech associated with the `mathml`.
@@ -37,12 +38,47 @@ use crate::shim_filesystem::read_to_string_shim;
 ///
 /// A string is returned in call cases.
 /// If there is an error, the speech string will indicate an error.
-pub fn speak_mathml(mathml: Element) -> String {
+pub fn intent_from_mathml<'a, 'm>(mathml: Element<'a>, doc: Document<'m>) -> Element<'m> {
+    let intent_tree = intent_rules(&INTENT_RULES, doc, mathml);
+    doc.root().append_child(intent_tree);
+    return intent_tree;
+}
+
+pub fn speak_intent(mathml: Element) -> String {
     return speak_rules(&SPEECH_RULES, mathml);
 }
 
 pub fn overview_mathml(mathml: Element) -> String {
     return speak_rules(&OVERVIEW_RULES, mathml);
+}
+
+
+fn intent_rules<'c, 'm>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, doc: Document<'m>, mathml: Element<'c>) -> Element<'m> {
+    rules.with(|rules| {
+        {
+            let mut mut_rules = rules.borrow_mut();
+            mut_rules.update();    
+        }
+        let rules = rules.borrow();
+        // debug!("speak_rules:\n{}", mml_to_string(&mathml));
+        let mut rules_with_context = SpeechRulesWithContext::new(&rules, doc, "".to_string());
+        match rules_with_context.match_pattern::<Element<'m>>(mathml) {
+            Ok(intent) => {
+                if name(&intent) == "TEMP_NAME" {   // unneeded extra layer
+                    assert_eq!(intent.children().len(), 1);
+                    return as_element(intent.children()[0]);
+                } else {
+                    return intent;
+                }
+            },
+            Err(e) => { 
+                print_errors(&e.chain_err(|| "Pattern match/replacement failure!"));
+                let intent_error = create_mathml_element(&rules_with_context.doc, "merror");
+                intent_error.set_text("Error in speaking math; see error log.");
+                return intent_error;
+            }
+        }
+    })
 }
 
 fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, mathml: Element) -> String {
@@ -53,8 +89,9 @@ fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, math
         }
         let rules = rules.borrow();
         // debug!("speak_rules:\n{}", mml_to_string(&mathml));
-        let mut rules_with_context = SpeechRulesWithContext::new(&rules, "".to_string());
-        match rules_with_context.match_pattern(&mathml) {
+        let new_package = Package::new();
+        let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), "".to_string());
+        match rules_with_context.match_pattern::<String>(mathml) {
             Ok(speech_string) => {
                 return rules.pref_manager.borrow().get_tts()
                             .merge_pauses(remove_optional_indicators(
@@ -80,8 +117,9 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> String {
             mut_rules.update();    
         }
         let rules = rules.borrow();
-        let mut rules_with_context = SpeechRulesWithContext::new(&rules, nav_node_id);
-        match rules_with_context.match_pattern(&mathml) {
+        let new_package = Package::new();
+        let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id);
+        match rules_with_context.match_pattern::<String>(mathml) {
             // FIX: need to set name of speech rules so test Nemeth/UEB clean for
             Ok(speech_string) => {
                 let highlight_style =  rules_with_context.speech_rules.pref_manager.borrow().get_user_prefs().to_string("BrailleNavHighlight");
@@ -99,7 +137,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> String {
         }
     });
 
-    // highlight with dots 7 & 8 the appropriately
+    // highlight with dots 7 & 8 based on the highlight style
     // both the start and stop points will be extended to deal with indicators such as capitalization
     // if 'fill_range' is true, the interior will be highlighted
     fn highlight_braille_chars(braille: String, fill_range: bool) -> String {
@@ -296,42 +334,42 @@ fn nemeth_cleanup(raw_nemeth: String) -> String {
         static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
 
-    // debug!("Before:  \"{}\"", raw_nemeth);
+  // debug!("Before:  \"{}\"", raw_nemeth);
 
     // Remove blanks before and after braille indicators
     let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&raw_nemeth, "$1$2");
     let result = REMOVE_SPACE_AFTER_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
-    // debug!("spaces:  \"{}\"", result);
+  // debug!("spaces:  \"{}\"", result);
 
     // Multipurpose indicator
     let result = MULTI_177_2.replace_all(&result, "${1}m${2}");
     let result = MULTI_177_3.replace_all(&result, "${1}m$2");
     let result = MULTI_177_5.replace_all(&result, "${1}m$2");
-    // debug!("MULTI:   \"{}\"", result);
+  // debug!("MULTI:   \"{}\"", result);
 
     let result = NUM_IND_9A.replace_all(&result, "$start$minus${face}n");
-    // debug!("IND_9A:  \"{}\"", result);
+  // debug!("IND_9A:  \"{}\"", result);
 
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
     let result = NUM_IND_9E_SHAPE.replace_all(&result, "${mod}n");
-    // debug!("IND_9E:  \"{}\"", result);
+  // debug!("IND_9E:  \"{}\"", result);
 
     // 9b: insert after punctuation (optional minus sign)
     // common punctuation adds a space, so 9a handled it. Here we deal with other "punctuation" 
     // FIX other punctuation and reference symbols (9d)
     let result = NUM_IND_AFTER_PUNCT.replace_all(&result, "$punct${minus}n");
-    // debug!("A PUNCT: \"{}\"", &result);
+  // debug!("A PUNCT: \"{}\"", &result);
 
     // strip level indicators
     // checks for punctuation char, so needs to before punctuation is stripped.
     
     let result = REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT.replace_all(&result, "$1");
-    // debug!("Punct  : \"{}\"", &result);
+  // debug!("Punct  : \"{}\"", &result);
     let result = REMOVE_LEVEL_IND_BEFORE_BASELINE.replace_all(&result, "b");
-    // debug!("Bseline: \"{}\"", &result);
+  // debug!("Bseline: \"{}\"", &result);
 
     let result = REMOVE_PUNCT_IND.replace_all(&result, "$1$2");
-    // debug!("Punct38: \"{}\"", &result);
+  // debug!("Punct38: \"{}\"", &result);
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         match INDICATOR_REPLACEMENTS.get(&cap[0]) {
@@ -462,7 +500,7 @@ fn process_include<F>(current_file: &Path, new_file_name: &str, mut read_new_fil
     }
     let mut new_file = parent_path.unwrap().to_path_buf();
     new_file.push(new_file_name);
-    debug!("Process include: {}", new_file_name);
+    info!("...processing include: {}...", new_file_name);
     let new_file = match crate::shim_filesystem::canonicalize_shim(new_file.as_path()) {
         Ok(buf) => buf,
         Err(msg) => bail!("-include: constructed file name '{}' causes error '{}'",
@@ -473,15 +511,81 @@ fn process_include<F>(current_file: &Path, new_file_name: &str, mut read_new_fil
     return Ok( () );
 }
 
+/// As the name says, TreeOrString is either a Tree (Element) or a String
+/// It is used to share code during pattern matching
+pub trait TreeOrString<'c, 'm:'c, T> {
+    fn from_element(e: Element<'m>) -> Result<T>;
+    fn from_string(s: String, doc: Document<'m>) -> Result<T>;
+    fn replace_tts<'s:'c, 'r>(tts: &TTS, command: &TTSCommandRule, prefs: &PreferenceManager, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T>;
+    fn replace<'s:'c, 'r>(ra: &ReplacementArray, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T>;
+    fn replace_nodes<'s:'c, 'r>(rules: &'r mut SpeechRulesWithContext<'c, 's,'m>, nodes: Vec<Node<'c>>, mathml: Element<'c>) -> Result<T>;
+    fn highlight_braille(braille: T, highlight_style: String) -> T;
+}
+
+impl<'c, 'm:'c> TreeOrString<'c, 'm, String> for String {
+    fn from_element(_e: Element<'m>) -> Result<String> {
+         bail!("from_element not allowed for strings");
+    }
+
+    fn from_string(s: String, _doc: Document<'m>) -> Result<String> {
+        return Ok(s);
+    }
+
+    fn replace_tts<'s:'c, 'r>(tts: &TTS, command: &TTSCommandRule, prefs: &PreferenceManager, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<String> {
+        return tts.replace_string(command, prefs, rules_with_context, mathml);
+    }
+
+    fn replace<'s:'c, 'r>(ra: &ReplacementArray, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<String> {
+        return ra.replace_array_string(rules_with_context, mathml);
+    }
+
+    fn replace_nodes<'s:'c, 'r>(rules: &'r mut SpeechRulesWithContext<'c, 's,'m>, nodes: Vec<Node<'c>>, mathml: Element<'c>) -> Result<String> {
+        return rules.replace_nodes_string(nodes, mathml);
+    }
+
+    fn highlight_braille(braille: String, highlight_style: String) -> String {
+        return SpeechRulesWithContext::highlight_braille_string(braille, highlight_style);
+    }
+}
+
+impl<'c, 'm:'c> TreeOrString<'c, 'm, Element<'m>> for Element<'m> {
+    fn from_element(e: Element<'m>) -> Result<Element<'m>> {
+         return Ok(e);
+    }
+
+    fn from_string(s: String, doc: Document<'m>) -> Result<Element<'m>> {
+        // FIX: is 'mi' really ok?  Don't want to use TEMP_NAME because this name needs to move to the outside world
+        let leaf = create_mathml_element(&doc, "mi");
+        leaf.set_text(&s);
+        return Ok(leaf);
+}
+
+    fn replace_tts<'s:'c, 'r>(_tts: &TTS, _command: &TTSCommandRule, _prefs: &PreferenceManager, _rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, _mathml: Element<'c>) -> Result<Element<'m>> {
+        bail!("Internal error: applying a TTS rule to a tree");
+    }
+
+    fn replace<'s:'c, 'r>(ra: &ReplacementArray, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<Element<'m>> {
+        return ra.replace_array_tree(rules_with_context, mathml);
+    }
+
+    fn replace_nodes<'s:'c, 'r>(rules: &'r mut SpeechRulesWithContext<'c, 's,'m>, nodes: Vec<Node<'c>>, mathml: Element<'c>) -> Result<Element<'m>> {
+        return rules.replace_nodes_tree(nodes, mathml);
+    }
+
+    fn highlight_braille(_braille: Element<'c>, _highlight_style: String) -> Element<'m> {
+        panic!("Internal error: highlight_braille called on a tree");
+    }
+}
 
 /// 'Replacement' is an enum that contains all the potential replacement types/structs
 /// Hence there are fields 'Test' ("test:"), 'Text" ("t:"), "XPath", etc
 #[derive(Debug, Clone)]
 enum Replacement {
     // Note: all of these are pointer types
-    Test(Box<TestArray>),
     Text(String),
     XPath(MyXPath),
+    Intent(Box<Intent>),
+    Test(Box<TestArray>),
     TTS(Box<TTSCommandRule>),
     With(Box<With>),
     SetVariables(Box<SetVariables>),
@@ -494,8 +598,9 @@ impl fmt::Display for Replacement {
         return write!(f, "{}",
             match self {
                 Replacement::Test(c) => c.to_string(),
-                Replacement::Text(t) => format!("[t: \"{}]\"", t),
+                Replacement::Text(t) => format!("t: \"{}\"", t),
                 Replacement::XPath(x) => x.to_string(),
+                Replacement::Intent(i) => i.to_string(),
                 Replacement::TTS(t) => t.to_string(),
                 Replacement::With(w) => w.to_string(),
                 Replacement::SetVariables(v) => v.to_string(),
@@ -543,6 +648,9 @@ impl Replacement {
             },
             "pause" | "rate" | "pitch" | "volume" | "gender" | "voice" | "spell" | "bookmark" | "pronounce"=> {
                 return Ok( Replacement::TTS( TTS::build(key, value)? ) );
+            },
+            "intent" => {
+                return Ok( Replacement::Intent( Intent::build(value)? ) );
             },
             "test" => {
                 return Ok( Replacement::Test( Box::new( TestArray::build(value)? ) ) );
@@ -612,7 +720,7 @@ impl<'r> InsertChildren {
     // The solution adopted is to find out the number of nodes and build up MyXPaths with each node selected (e.g, "*" => "*[3]")
     //    and put those nodes into a flat ReplacementArray and then do a standard replace on that.
     //    This is slower than the alternatives, but reuses a bunch of code and hence is less complicated.
-    fn replace<'c, 's:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
+    fn replace<'c, 's:'c, 'm: 'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
         let result = self.xpath.evaluate(&rules_with_context.context_stack.base, mathml)
                 .chain_err(||"replacing after pattern match" )?;
         match result {
@@ -640,14 +748,106 @@ impl<'r> InsertChildren {
             },
 
             // FIX: should the options be errors???
-            Value::String(t) => { return rules_with_context.replace_chars(&t, mathml); },
-            Value::Number(num)  => { return Ok( num.to_string() ); },
-            Value::Boolean(b)  => { return Ok( b.to_string() ); },          // FIX: is this right???
+            Value::String(t) => { return T::from_string(rules_with_context.replace_chars(&t, mathml)?, rules_with_context.doc); },
+            Value::Number(num)  => { return T::from_string( num.to_string(), rules_with_context.doc ); },
+            Value::Boolean(b)  => { return T::from_string( b.to_string(), rules_with_context.doc ); },          // FIX: is this right???
         }
         
     }    
 }
 
+
+// structure used when "intent:" is encountered in a rule
+// the name is either a string or an xpath that needs evaluation. 99% of the time it is a string
+#[derive(Debug, Clone)]
+struct Intent {
+    name: Option<String>,           // name of node
+    xpath: Option<MyXPath>,         // alternative to directly using the string
+    children: ReplacementArray,     // children of node
+}
+
+impl fmt::Display for Intent {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let name = if self.name.is_some() {
+            self.name.as_ref().unwrap().to_string()
+        } else {
+            self.xpath.as_ref().unwrap().to_string()
+        };
+        return write!(f, "intent:  {}: {}\n      children: {}",
+                        if self.name.is_some() {"name"} else {"xpath-name"}, name, &self.children);
+    }
+}
+
+impl<'r> Intent {
+    fn build(yaml_dict: &Yaml) -> Result<Box<Intent>> {
+        // 'intent:' -- 'name': xxx 'children': xxx
+        if yaml_dict.as_hash().is_none() {
+            bail!("Array found for contents of 'intent' -- should be dictionary with keys 'name' and 'children'")
+        }
+        let name = &yaml_dict["name"];
+        let xpath_name = &yaml_dict["xpath-name"];
+        if name.is_badvalue() && xpath_name.is_badvalue(){ 
+            bail!("Missing 'name' or 'xpath-name' as part of 'intent'.\n    \
+                  Suggestion: add 'name:' or if present, indent so it is contained in 'intent'");
+        }
+        let replace = &yaml_dict["children"];
+        if replace.is_badvalue() { 
+            bail!("Missing 'children' as part of 'intent'.\n    \
+                  Suggestion: add 'children:' or if present, indent so it is contained in 'intent'");
+        }
+        return Ok( Box::new( Intent {
+            name: if name.is_badvalue() {None} else {Some(as_str_checked(name).chain_err(|| "'name'")?.to_string())},
+            xpath: if xpath_name.is_badvalue() {None} else {Some(MyXPath::build(xpath_name).chain_err(|| "'intent'")?)},
+            children: ReplacementArray::build(replace).chain_err(|| "'children:'")?,
+        } ) );
+    }
+        
+    fn replace<'c, 's:'c, 'm: 'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
+        let result = self.children.replace::<Element<'m>>(rules_with_context, mathml)
+                    .chain_err(||"replacing inside 'intent'")?;
+        let result = lift_children(result);
+        if let Some(name) = &self.name {
+            set_mathml_name(result, name.as_str());
+        } else if let Some(my_xpath) = &self.xpath{    // self.xpath_name must be != None
+            let xpath_value = my_xpath.evaluate(rules_with_context.get_context(), mathml)?;
+            match xpath_value {
+                Value::String(name) => {
+                    // debug!("replace name: '{}'", &name);
+                    set_mathml_name(result, name.as_str())
+                },
+                _ => bail!("'xpath-name' value '{}' was not a string", &my_xpath),
+            }
+        } else {
+            panic!("Intent::replace: internal error -- neither 'name' nor 'xpath' is set");
+        };
+        
+        for attr in mathml.attributes() {
+            result.set_attribute_value(attr.name(), attr.value());           
+        }
+
+        // debug!("Result from 'intent:'\n{}", mml_to_string(&result));
+        return T::from_element(result);
+
+        /// "lift" up the children any "TEMP_NAME" child -- could short circuit when only one child
+        fn lift_children<'c>(result: Element<'c>) -> Element<'c> {
+            // debug!("lift_children:\n{}", mml_to_string(&result));
+            result.replace_children(
+                result.children().iter()
+                    .map(|&child_of_element| {
+                        let child = as_element(child_of_element);
+                        if name(&child) == "TEMP_NAME" {
+                            assert_eq!(child.children().len(), 1);
+                            child.children()[0]
+                        } else {
+                            child_of_element
+                        }
+                    })
+                    .collect::<Vec<ChildOfElement>>()
+            );
+            return result;
+        }
+    }    
+}
 
 // structure used when "with:" is encountered in a rule
 // the variables are placed on (and later) popped of a variable stack before/after the replacement
@@ -667,7 +867,7 @@ impl<'r> With {
     fn build(vars_replacements: &Yaml) -> Result<Box<With>> {
         // 'with:' -- 'variables': xxx 'replace': xxx
         if vars_replacements.as_hash().is_none() {
-            bail!("Array found for contents of 'with' -- should be dictionary with keys 'variables and 'replace'")
+            bail!("Array found for contents of 'with' -- should be dictionary with keys 'variables' and 'replace'")
         }
         let var_defs = &vars_replacements["variables"];
         if var_defs.is_badvalue() { 
@@ -685,7 +885,7 @@ impl<'r> With {
         } ) );
     }
         
-    fn replace<'c, 's:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
+    fn replace<'c, 's:'c, 'm: 'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
         rules_with_context.context_stack.push(self.variables.clone(), mathml)?;
         let result = self.replacements.replace(rules_with_context, mathml)
                     .chain_err(||"replacing inside 'with'")?;
@@ -718,9 +918,9 @@ impl<'r> SetVariables {
         } ) );
     }
         
-    fn replace<'c, 's:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
+    fn replace<'c, 's:'c, 'm: 'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
         rules_with_context.context_stack.set_globals(self.variables.clone(), mathml)?;
-        return Ok( "".to_string() );
+        return T::from_string( "".to_string(), rules_with_context.doc );
     }    
 }
 
@@ -742,7 +942,7 @@ impl<'r> SpeakExpression {
         return Ok( SpeakExpression { id: MyXPath::build(vars).chain_err(|| "'set_variables'")? } );
     }
         
-    fn replace<'c, 's:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
+    fn replace<'c, 's:'c, 'm:'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
         let xpath_value = self.id.evaluate(rules_with_context.get_context(), mathml)?;
         let id = match xpath_value {
             Value::String(s) => Some(s),
@@ -762,14 +962,14 @@ impl<'r> SpeakExpression {
         let speech = match id {
             None => bail!("'speak' value '{}' is not a string or an attribute value (correct by using '@id'??):\n", self.id),
             Some(id) => {
-                match crate::navigate::get_node_by_id(*mathml, &id) { // FIX: should use root of MathML
-                    None => bail!("'speak' value '{}' was not an 'id' found in {}", &id, mml_to_string(mathml)),
-                    Some(element) => speak_mathml(element),
+                match crate::navigate::get_node_by_id(mathml, &id) { // FIX: should use root of MathML
+                    None => bail!("'speak' value '{}' was not an 'id' found in {}", &id, mml_to_string(&mathml)),
+                    Some(element) => speak_intent(element),
                 }
             }
         };
 
-        return Ok(speech);
+        return T::from_string(speech, rules_with_context.doc);
     }    
 }
 
@@ -815,23 +1015,22 @@ impl<'r> ReplacementArray {
     }
 
     /// Do all the replacements in `mathml` using `rules`.
-    pub fn replace<'c, 's:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
-        // do the replacements
-        //   remove the empty strings (the later 'join' would add extraneous spaces)
-        //  collect the strings together into an array
-        let mut replacement_strings = Vec::with_capacity(32);   // probably conservative guess
+    pub fn replace<'c, 's:'c, 'm:'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
+        return T::replace(self, rules_with_context, mathml);
+    }
+
+    pub fn replace_array_string<'c, 's:'c, 'm:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<String> {
+        // loop over the replacements and build up a vector of strings, excluding empty ones.
+        // * eliminate any redundance
+        // * add/replace auto-pauses
+        // * join the remaining vector together
+        let mut replacement_strings = Vec::with_capacity(self.replacements.len());   // probably conservative guess
         for replacement in self.replacements.iter() {
-            let string = rules_with_context.replace(replacement, mathml)?;
+            let string: String = rules_with_context.replace(replacement, mathml)?;
             if !string.is_empty() {
                 replacement_strings.push(string);
             }
         }
-
-        // let mut replacement_strings =
-        //     self.replacements.iter()
-        //                 .map(|group| rules_with_context.replace(group, mathml))
-        //                 .filter(|result| if let Ok(str) = result {!str.is_empty()} else {true})
-        //                 .collect::<Result<Vec<String>>>()?;
 
         if replacement_strings.is_empty() {
             return Ok( "".to_string() );
@@ -849,10 +1048,6 @@ impl<'r> ReplacementArray {
             } 
         }
                         
-        // find the replacement for 'pause: auto' and compute the real value based on its neighbors
-        // if replacement_strings.len() > 1 {
-        //     debug!("Strings({})", replacement_strings.len());
-        // };
         for i in 0..replacement_strings.len() {
             if replacement_strings[i].contains(PAUSE_AUTO_STR) {
                 let before = if i == 0 {""} else {&replacement_strings[i-1]};
@@ -887,7 +1082,8 @@ impl<'r> ReplacementArray {
                             // debug!("check if '{}' is repetitive",  optional_word);
                             // debug!("   prev: '{}', next '{}'", prev, optional);
                             let prev = prev.trim_end().as_bytes();
-                            if &prev[prev.len()-optional_word.len()..] == optional_word.as_bytes() {
+                            if prev.len() > optional_word.len() &&
+                               &prev[prev.len()-optional_word.len()..] == optional_word.as_bytes() {
                                 return Some( optional_word_start_slice[optional_word.len() + OPTIONAL_INDICATOR_LEN..].trim_start() );
                             } else {
                                 return None;
@@ -898,6 +1094,23 @@ impl<'r> ReplacementArray {
             }
         }
     }
+
+    pub fn replace_array_tree<'c, 's:'c, 'm:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<Element<'m>> {
+        // shortcut for common case (don't build a new tree node)
+        if self.replacements.len() == 1 {
+            return rules_with_context.replace::<Element<'m>>(&self.replacements[0], mathml);
+        }
+
+        let new_element = create_mathml_element(&rules_with_context.doc, "Unknown");  // Hopefully set later (in Intent::Replace())
+        let mut new_children = Vec::with_capacity(self.replacements.len());
+        for child in self.replacements.iter() {
+            let child = rules_with_context.replace::<Element<'m>>(child, mathml)?;
+            new_children.push(ChildOfElement::Element(child));
+        };
+        new_element.append_children(new_children);
+        return Ok(new_element);
+    }
+
 
     /// Return true if there are no replacements.
     pub fn is_empty(&self) -> bool {
@@ -931,7 +1144,7 @@ pub struct MyXPath {
 
 impl fmt::Display for MyXPath {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "[x: \"{}\"]", self.string);
+        return write!(f, "x: \"{}\"", self.string);
     }
 }
 
@@ -1088,7 +1301,7 @@ impl<'r> MyXPath {
         }
     }
 
-    fn is_true(&self, context: &Context, mathml: &Element) -> Result<bool> {
+    fn is_true(&self, context: &Context, mathml: Element) -> Result<bool> {
         // return true if there is no condition or if the condition evaluates to true
         return Ok(
             match self.evaluate(context, mathml)? {
@@ -1099,7 +1312,11 @@ impl<'r> MyXPath {
         )
     }
 
-    pub fn replace<'c, 's:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
+    pub fn replace<'c, 's:'c, 'm:'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
+        if self.string == "process-intent(.)" {
+            return T::from_element( crate::infer_intent::infer_intent(rules_with_context, mathml)? );
+        }
+        
         let result = self.evaluate(&rules_with_context.context_stack.base, mathml)
                 .chain_err(||"replacing after pattern match" )?;
         return match result {
@@ -1107,22 +1324,19 @@ impl<'r> MyXPath {
                     if nodes.size() == 0 {
                         bail!("During replacement, no matching element found");
                     }
-                    rules_with_context.replace_nodes(nodes, mathml)
+                    rules_with_context.replace_nodes(nodes.document_order(), mathml)
                 },
-                Value::String(t) => Ok( t ),
-                Value::Number(num) => Ok( num.to_string() ),
-                Value::Boolean(b) => Ok( b.to_string() ),          // FIX: is this right???
-        }
+                Value::String(t) => T::from_string(t, rules_with_context.doc),
+                Value::Number(num) => T::from_string(num.to_string(), rules_with_context.doc ),
+                Value::Boolean(b) => T::from_string(b.to_string(), rules_with_context.doc ),          // FIX: is this right???
+        };
     }
     
-    fn evaluate<'a, 'c>(&'a self, context: &'r Context<'c>, mathml: &'r Element<'c>) -> Result<Value<'c>> {
+    fn evaluate<'a, 'c>(&'a self, context: &'r Context<'c>, mathml: Element<'c>) -> Result<Value<'c>> {
         // debug!("evaluate: {}", self);
-        let result = self.xpath.evaluate(context, *mathml);
+        let result = self.xpath.evaluate(context, mathml);
         return match result {
-            Ok(val) => {
-                // debug!("  result: '{:?}'", val);
-                Ok( val )
-            },
+            Ok(val) => Ok( val ),
             Err(e) => {
                 bail!( "{}\n\n",
                 e.to_string()           // remove confusing parts of error message from xpath
@@ -1132,7 +1346,6 @@ impl<'r> MyXPath {
         };
     }
 }
-
 
 // 'SpeechPattern' holds a single pattern.
 // Some info is not needed beyond converting the Yaml to the SpeechPattern, but is useful for error reporting.
@@ -1150,7 +1363,7 @@ struct SpeechPattern {
 
 impl<'a> fmt::Display for SpeechPattern {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "[name: {}, tag: {}, variables: {:?}, pattern: {}, replacement: {}]",
+        return write!(f, "[name: {}, tag: {},\n  variables: {:?}, pattern: {},\n  replacement: {}]",
                 self.pattern_name, self.tag_name, self.var_defs, self.pattern,
                 self.replacements.pretty_print_replacements());
     }
@@ -1259,8 +1472,8 @@ impl SpeechPattern  {
         return Ok( () );
     }
 
-    fn is_match(&self, context: &Context, mathml: &Element) -> Result<bool> {
-        if self.tag_name != mathml.name().local_part() && self.tag_name != "*" {
+    fn is_match(&self, context: &Context, mathml: Element) -> Result<bool> {
+        if self.tag_name != mathml.name().local_part() && self.tag_name != "*" && self.tag_name != "!*" {
             return Ok( false );
         }
 
@@ -1356,7 +1569,7 @@ impl<'r> TestArray {
         return Ok( TestArray { tests: test_array } );
     }
 
-    fn replace<'c, 's:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
+    fn replace<'c, 's:'c, 'm:'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
         for test in &self.tests {
             if test.is_true(&rules_with_context.context_stack.base, mathml)? {
                 assert!(test.then_part.is_some());
@@ -1365,7 +1578,7 @@ impl<'r> TestArray {
                 return else_part.replace(rules_with_context, mathml);
             }
         }
-        return Ok( "".to_string() );
+        return T::from_string("".to_string(), rules_with_context.doc);
     }
 }
 
@@ -1415,7 +1628,7 @@ impl<'r> TestOrReplacements {
         }
     }
 
-    fn replace<'c, 's:'c>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
+    fn replace<'c, 's:'c, 'm:'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
         return match self {
             TestOrReplacements::Replacements(r) => r.replace(rules_with_context, mathml),
             TestOrReplacements::Test(t) => t.replace(rules_with_context, mathml),
@@ -1433,20 +1646,20 @@ impl fmt::Display for Test {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "test: [ ")?;
         if let Some(if_part) = &self.condition {
-            write!(f, "  if: '{}'", if_part)?;
+            write!(f, " if: '{}'", if_part)?;
         }
         if let Some(then_part) = &self.then_part {
-            write!(f, "  then{}", then_part)?;
+            write!(f, " then{}", then_part)?;
         }
         if let Some(else_part) = &self.else_part {
-            write!(f, "  else{}", else_part)?;
+            write!(f, " else{}", else_part)?;
         }
         return write!(f, "]");
     }
 }
 
 impl Test {
-    fn is_true(&self, context: &Context, mathml: &Element) -> Result<bool> {
+    fn is_true(&self, context: &Context, mathml: Element) -> Result<bool> {
         return match self.condition.as_ref() {
             None => Ok( false ),     // trivially false -- want to do else part
             Some(condition) => condition.is_true(context, mathml)
@@ -1580,12 +1793,14 @@ impl<'c> fmt::Display for ContextStack<'c> {
 }
 
 impl<'c, 'r> ContextStack<'c> {
-    fn new<'a>(pref_manager: &'a PreferenceManager) -> ContextStack<'c> {
+    fn new<'a, 'm:'c>(pref_manager: &'a PreferenceManager) -> ContextStack<'c> {
         let prefs = pref_manager.merge_prefs();
-        return ContextStack {
+        let context_stack = ContextStack {
             base: ContextStack::base_context(prefs),
             old_values: Vec::with_capacity(31)      // should avoid allocations
-        }
+        };
+
+        return context_stack;
     }
 
     fn base_context(var_defs: PreferenceHashMap) -> Context<'c> {
@@ -1603,7 +1818,7 @@ impl<'c, 'r> ContextStack<'c> {
         return context;
     }
 
-    fn set_globals<'a:'c>(&'r mut self, new_vars: VariableDefinitions, mathml: &'r Element<'c>) -> Result<()> {
+    fn set_globals<'a:'c>(&'r mut self, new_vars: VariableDefinitions, mathml: Element<'c>) -> Result<()> {
         // for each var/value pair, evaluate the value and add the var/value to the base context
         for def in &new_vars.defs {
             // set the new value
@@ -1617,10 +1832,10 @@ impl<'c, 'r> ContextStack<'c> {
         return Ok( () );
     }
 
-    fn push<'a:'c>(&'r mut self, new_vars: VariableDefinitions, mathml: &'r Element<'c>) -> Result<()> {
+    fn push<'a:'c>(&'r mut self, new_vars: VariableDefinitions, mathml: Element<'c>) -> Result<()> {
         // store the old value and set the new one 
         let mut old_values = VariableValues {defs: Vec::with_capacity(new_vars.defs.len()) };
-        let evaluation = Evaluation::new(&self.base, Node::Element(*mathml));
+        let evaluation = Evaluation::new(&self.base, Node::Element(mathml));
         for def in &new_vars.defs {
             // get the old value (might not be defined)
             let qname = QName::new(def.name.as_str());
@@ -1687,12 +1902,11 @@ impl  fmt::Display for UnicodeDef {
 }
 
 impl UnicodeDef {
-    fn build(unicode_def: &Yaml, file_name: &Path, rules: &mut SpeechRules) -> Result<()> {
+    fn build(unicode_def: &Yaml, file_name: &Path, speech_rules: &SpeechRules, use_short: bool) -> Result<()> {
         if let Ok(include_file_name) = find_str(unicode_def, "include") {
             let do_include_fn = |new_file: &Path| {
-                rules.read_unicode(&[Some(new_file.to_path_buf()), None, None]);
+                speech_rules.read_unicode(Some(new_file.to_path_buf()), use_short);
             };
-
             return process_include(file_name, include_file_name, do_include_fn);
         }
 
@@ -1708,19 +1922,24 @@ impl UnicodeDef {
         }
 
         let (ch, replacements) = dictionary.iter().next().ok_or_else(||  format!("Expected a unicode definition (e.g, '+':{{t: plus}}'), found {}", yaml_to_string(unicode_def, 0)))?;
+        let mut unicode_table = if use_short {
+            speech_rules.unicode_short.borrow_mut()
+        } else {
+            speech_rules.unicode_full.borrow_mut()
+        };
         if let Some(str) = ch.as_str() {
             if str.len() > 1 && str.contains('-') {
-                return process_range(str, replacements, rules);
+                return process_range(str, replacements, unicode_table);
             }
         }
 
         let ch = UnicodeDef::get_unicode_char(ch)?;
-        rules.unicode.borrow_mut().insert(ch, ReplacementArray::build(replacements)
+        unicode_table.insert(ch, ReplacementArray::build(replacements)
                                         .chain_err(|| format!("In definition of char: '{}' (0x{})",
                                                                         char::from_u32(ch).unwrap(), ch))?.replacements);
         return Ok( () );
 
-        fn process_range(def_range: &str, replacements: &Yaml, rules: &mut SpeechRules) -> Result<()> {
+        fn process_range(def_range: &str, replacements: &Yaml, mut unicode_table: RefMut<HashMap<u32,Vec<Replacement>>>) -> Result<()> {
             // should be a character range (e.g., "A-Z")
             // iterate over that range and also substitute the char for '.' in the 
             let mut range = def_range.split('-');
@@ -1732,7 +1951,7 @@ impl UnicodeDef {
 
             for ch in first..last+1 {
                 let ch_as_str = char::from_u32(ch).unwrap().to_string();
-                rules.unicode.borrow_mut().insert(ch, ReplacementArray::build(&substitute_ch(replacements, &ch_as_str))
+                unicode_table.insert(ch, ReplacementArray::build(&substitute_ch(replacements, &ch_as_str))
                                         .chain_err(|| format!("In definition of char: '{}'", def_range))?.replacements);
             };
 
@@ -1801,6 +2020,7 @@ pub fn print_errors(e:&Error) {
 
  #[derive(Debug, Clone, Copy, PartialEq, Eq)]
  pub enum RulesFor {
+     Intent,
      Speech,
      OverView,
      Navigation,
@@ -1810,6 +2030,7 @@ pub fn print_errors(e:&Error) {
  impl fmt::Display for RulesFor {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let name = match self {
+            RulesFor::Intent => "Intent",
             RulesFor::Speech => "Speech",
             RulesFor::OverView => "OverView",
             RulesFor::Navigation => "Navigation",
@@ -1826,7 +2047,8 @@ pub struct SpeechRules {
     pub pref_manager: Rc<RefCell<PreferenceManager>>,
     rules: RuleTable,                       // the speech rules used (partitioned into MathML tags in hashmap, then linearly searched)
     translate_single_chars_only: bool,      // strings like "half" don't want 'a's translated, but braille does
-    unicode: UnicodeTable,                  // the speech rules used for Unicode characters
+    unicode_short: UnicodeTable,            // the short list of rules used for Unicode characters
+    unicode_full:  UnicodeTable,            // the long remaining rules used for Unicode characters
 }
 
 impl fmt::Display for SpeechRules {
@@ -1837,7 +2059,7 @@ impl fmt::Display for SpeechRules {
         for (tag_name, rules) in rules_vec {
             writeln!(f, "   {}: #patterns {}", tag_name, rules.len())?;
         };
-        return writeln!(f, "   {} unicode entries", &self.unicode.borrow().len());
+        return writeln!(f, "   {}+{} unicode entries", &self.unicode_short.borrow().len(), &self.unicode_full.borrow().len());
     }
 }
 
@@ -1845,13 +2067,14 @@ impl fmt::Display for SpeechRules {
 /// `SpeechRulesWithContext` encapsulates a named group of speech rules (e.g, "ClearSpeak")
 /// along with the preferences to be used for speech.
 /// Because speech rules can define variables, there is also a context that is carried with them
-pub struct SpeechRulesWithContext<'c, 's:'c> {
+pub struct SpeechRulesWithContext<'c, 's:'c, 'm:'c> {
     speech_rules: &'s SpeechRules,
     context_stack: ContextStack<'c>,   // current value of (context) variables
+    doc: Document<'m>,
     nav_node_id: String,
 }
 
-impl<'c, 's:'c> fmt::Display for SpeechRulesWithContext<'c, 's> {
+impl<'c, 's:'c, 'm:'c> fmt::Display for SpeechRulesWithContext<'c, 's,'m> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "SpeechRulesWithContext \n{})", self.speech_rules)?;
         return writeln!(f, "   {} context entries, nav node id '{}'", &self.context_stack, &self.nav_node_id);
@@ -1859,14 +2082,17 @@ impl<'c, 's:'c> fmt::Display for SpeechRulesWithContext<'c, 's> {
 }
 
 thread_local!{
-    static SPEECH_UNICODE: UnicodeTable =
+    static SPEECH_UNICODE_SHORT: UnicodeTable =
         Rc::new( RefCell::new( HashMap::with_capacity(6997) ) );
         
-    // static BRAILLE_UNICODE: UnicodeTable =
-    //     Rc::new( RefCell::new( HashMap::with_capacity(2997) ) );
-
+    static SPEECH_UNICODE_FULL: UnicodeTable =
+        Rc::new( RefCell::new( HashMap::with_capacity(497) ) );
+        
     /// The current set of speech rules
     // maybe this should be a small cache of rules in case people switch rules/prefs?
+    pub static INTENT_RULES: RefCell<SpeechRules> =
+            RefCell::new( SpeechRules::new(RulesFor::Intent, true) );
+
     pub static SPEECH_RULES: RefCell<SpeechRules> =
             RefCell::new( SpeechRules::new(RulesFor::Speech, true) );
 
@@ -1889,17 +2115,24 @@ impl SpeechRules {
             exit(1);
         };
 
-        debug!("SpeechRules new for {}, tts {}", name, pref_manager.borrow().get_api_prefs().to_string("TTS"));
+        // debug!("SpeechRules new for {}, tts {}", name, pref_manager.borrow().get_api_prefs().to_string("TTS"));
         let unicode = if name == RulesFor::Braille {
-            Rc::new( RefCell::new (HashMap::with_capacity(2997)) )
+            (
+                Rc::new( RefCell::new (HashMap::with_capacity(497)) ),
+                Rc::new( RefCell::new (HashMap::with_capacity(2497)) )
+            )
         } else {
-            SPEECH_UNICODE.with( |unicode| Rc::clone( unicode) )
+            (
+                SPEECH_UNICODE_SHORT.with( |unicode| Rc::clone( unicode) ),
+                SPEECH_UNICODE_FULL. with( |unicode| Rc::clone( unicode) )
+            )
         };
 
         let rules = SpeechRules {
             name,
-            rules: HashMap::with_capacity(31),                       // lazy load them
-            unicode,       // lazy load them
+            rules: HashMap::with_capacity(if name == RulesFor::Intent {1023} else {31}),                       // lazy load them
+            unicode_short: unicode.0,       // lazy load them
+            unicode_full: unicode.1,        // lazy load them
             translate_single_chars_only,
             pref_manager,
         };
@@ -1911,8 +2144,12 @@ impl SpeechRules {
             self.rules.clear();
         };
 
-        if changes.unicode {
-            self.unicode.borrow_mut().clear();
+        if changes.unicode_short {
+            self.unicode_short.borrow_mut().clear();
+        };
+
+        if changes.unicode_full {
+            self.unicode_full.borrow_mut().clear();
         };
 
         // FIX: figure out flow of 'DEFINITIONS' setting/clearing
@@ -1926,24 +2163,14 @@ impl SpeechRules {
             let rule_file = self.pref_manager.borrow().get_rule_file(&self.name).clone();
             self.read_patterns(&rule_file);
         }
-        if self.unicode.borrow_mut().is_empty() {
-            let unicode_file;
-            {
-                // Rust complains about the borrow conflicting with the read_unicode() below if it doesn't end first
-                let pref_manager = self.pref_manager.borrow();
-                unicode_file = if self.name == RulesFor::Braille {
-                    pref_manager.get_braille_unicode_file()
-                } else {
-                    pref_manager.get_speech_unicode_file()
-                }.clone();    
-            }
-            self.read_unicode(&unicode_file);
+        if self.unicode_short.borrow_mut().is_empty() {
+            self.read_unicode(None, true);
         }
     }
 
     fn read_patterns(&mut self, path: &Locations) {
         if let Some(p) = &path[0] {
-            let rule_file_contents = read_to_string_shim(p).expect("cannot read file");
+            let rule_file_contents = read_to_string_shim(p.as_path()).expect("cannot read file");
             let rules_build_fn = |pattern: &Yaml| {
                 if let Err(e) = self.build_speech_patterns(pattern, p) {
                     print_errors(&e.chain_err(||format!("in file {:?}", p.to_str().unwrap())));
@@ -1980,28 +2207,39 @@ impl SpeechRules {
         return Ok( () );  
     }
     
-    fn read_unicode(&mut self, path: &Locations) {
-        // FIX: should read first (lang), then supplement with second (region)
-        if let Some(p) = &path[0] {
-            let unicode_file_contents = read_to_string_shim(p).expect("cannot read file");
-            let unicode_build_fn = |unicode_def_list: &Yaml| {
-                let unicode_defs = unicode_def_list.as_vec();
-                if unicode_defs == None {
-                   format!("File '{}' does not being with an array", yaml_to_type(unicode_def_list));
+    fn read_unicode(&self, path: Option<PathBuf>, use_short: bool) {
+        let path = match path {
+            Some(p) => p,
+            None => {
+                // get the path to either the short or long unicode file
+                let pref_manager = self.pref_manager.borrow();
+                let unicode_files = if self.name == RulesFor::Braille {
+                    pref_manager.get_braille_unicode_file()
+                } else {
+                    pref_manager.get_speech_unicode_file()
                 };
-                for unicode_def in unicode_defs.unwrap() {
-                    if let Err(e) = UnicodeDef::build(unicode_def, p, self) {
-                        print_errors(&e.chain_err(|| {format!("In file {:?}", p)}));
-                    }        
-                };
-            };
-            if let Err(e) =compile_rule(&unicode_file_contents, unicode_build_fn) {
-                print_errors(&e.chain_err(||format!("in file {:?}", p.to_str().unwrap())));
+                if use_short {unicode_files.0} else {unicode_files.1}
             }
-            info!("Hashmap has {} entries", self.unicode.borrow().len());
+        };
+
+        // FIX: should read first (lang), then supplement with second (region)
+        let unicode_file_contents = read_to_string_shim(&path).expect("cannot read file");
+        let unicode_build_fn = |unicode_def_list: &Yaml| {
+            let unicode_defs = unicode_def_list.as_vec();
+            if unicode_defs == None {
+                format!("File '{}' does not being with an array", yaml_to_type(unicode_def_list));
+            };
+            for unicode_def in unicode_defs.unwrap() {
+                if let Err(e) = UnicodeDef::build(unicode_def, &path, self, use_short) {
+                    print_errors(&e.chain_err(|| {format!("In file {:?}", path.to_str())}));
+                }        
+            };
+        };
+
+        if let Err(e) =compile_rule(&unicode_file_contents, unicode_build_fn) {
+            print_errors(&e.chain_err(||format!("in file {:?}", path.to_str().unwrap())));
         }
     }
-
 }
 
 use crate::prefs::FilesChanged;
@@ -2009,12 +2247,13 @@ use crate::prefs::FilesChanged;
 ///   'c -- the lifetime of the context and mathml
 ///   's -- the lifetime of the speech rules (which is static)
 ///   'r -- the lifetime of the reference (this seems to be key to keep the rust memory checker happy)
-impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
-    pub fn new(speech_rules: &'s SpeechRules, nav_node_id: String) -> SpeechRulesWithContext {
+impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
+    pub fn new(speech_rules: &'s SpeechRules, doc: Document<'m>, nav_node_id: String) -> SpeechRulesWithContext<'c, 's, 'm> {
         return SpeechRulesWithContext {
             speech_rules,
             context_stack: ContextStack::new(&speech_rules.pref_manager.borrow()),
-            nav_node_id: nav_node_id.to_string(),
+            doc,
+            nav_node_id,
         }
     }
 
@@ -2022,11 +2261,22 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
         return &mut self.context_stack.base;
     }
 
-    pub fn match_pattern(&'r mut self, mathml: &'r Element<'c>) -> Result<String> {
-        // debug!("Looking for a match for: \n{}", mml_to_string(mathml));
+    pub fn get_document(&mut self) -> Document<'m> {
+        return self.doc;
+    }
+
+    pub fn match_pattern<T:TreeOrString<'c, 'm, T>>(&'r mut self, mathml: Element<'c>) -> Result<T> {
+        // debug!("Looking for a match for: \n{}", mml_to_string(&mathml));
         let tag_name = mathml.name().local_part();
         let rules = &self.speech_rules.rules;
 
+        // start with priority rules that apply to any node (should be a very small number)
+        if let Some(rule_vector) = rules.get("!*") {
+            if let Some(result) = self.find_match(rule_vector, mathml)? {
+                return Ok(result);      // found a match
+            }
+        }
+        
         if let Some(rule_vector) = rules.get(tag_name) {
             if let Some(result) = self.find_match(rule_vector, mathml)? {
                 return Ok(result);      // found a match
@@ -2051,15 +2301,15 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
         bail!("\nNo match found!\nMissing patterns in {} for MathML.\n{}", file_name, mml_to_string(&mathml)); 
     }
 
-    fn find_match(&'r mut self, rule_vector: &[Box<SpeechPattern>], mathml: &'r Element<'c>) -> Result<Option<String>> {
+    fn find_match<T:TreeOrString<'c, 'm, T>>(&'r mut self, rule_vector: &[Box<SpeechPattern>], mathml: Element<'c>) -> Result<Option<T>> {
         for pattern in rule_vector {
             // debug!("Pattern: {}", pattern);
             if pattern.is_match(&self.context_stack.base, mathml)
-                    .chain_err(|| error_string(pattern, *mathml) )? {
+                    .chain_err(|| error_string(pattern, mathml) )? {
                 if pattern.var_defs.len() > 0 {
                     self.context_stack.push(pattern.var_defs.clone(), mathml)?;
                 }
-                let result = pattern.replacements.replace(self, mathml);
+                let result: Result<T> = pattern.replacements.replace(self, mathml);
                 if pattern.var_defs.len() > 0 {
                     self.context_stack.pop();
                 }
@@ -2072,7 +2322,7 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
                                 Some(id) => {
                                     if self.nav_node_id == id {
                                         let highlight_style =  self.speech_rules.pref_manager.borrow().get_user_prefs().to_string("BrailleNavHighlight");
-                                        return Ok( Some( highlight_braille(s, highlight_style) ) );
+                                        return Ok( Some( T::highlight_braille(s, highlight_style) ) );
                                     }
                                 }
                             }
@@ -2109,65 +2359,72 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
             );
         }
 
-        fn highlight_braille(braille: String, highlight: String) -> String {
-            // add dots 7 & 8 to the Unicode braille (28xx)
-            if &highlight == "Off" || braille.is_empty() {
-                return braille;
-            }
-            
-            // FIX: this seems needlessly complex. It is much simpler if the char can be changed in place...
-            // find first char that can get the dots and add them
-            let mut result = String::with_capacity(braille.len());
-            let mut i_bytes = 0;
-            let mut chars = braille.chars();
-            while let Some(ch) = chars.next() {
+    }
+    
+    fn highlight_braille_string(braille: String, highlight_style: String) -> String {
+        // add dots 7 & 8 to the Unicode braille (28xx)
+        if &highlight_style == "Off" || braille.is_empty() {
+            return braille;
+        }
+        
+        // FIX: this seems needlessly complex. It is much simpler if the char can be changed in place...
+        // find first char that can get the dots and add them
+        let mut result = String::with_capacity(braille.len());
+        let mut i_bytes = 0;
+        let mut chars = braille.chars();
+        while let Some(ch) = chars.next() {
+            let modified_ch = add_dots_to_braille_char(ch);
+            i_bytes += ch.len_utf8();
+            result.push(modified_ch);
+            if ch != modified_ch {
+                break;
+            };
+        };
+
+        let mut i_end = braille.len();
+        if &highlight_style != "FirstChar" {
+            // find last char so that we know when to modify the char
+            let mut rev_chars = braille.chars().rev();
+            while let Some(ch) = rev_chars.next() {
                 let modified_ch = add_dots_to_braille_char(ch);
-                i_bytes += ch.len_utf8();
-                result.push(modified_ch);
-                if ch != modified_ch {
+                i_end -= ch.len_utf8();
+                if ch !=  modified_ch {
                     break;
-                };
-            };
-
-            let mut i_end = braille.len();
-            if &highlight != "FirstChar" {
-                // find last char so that we know when to modify the char
-                let mut rev_chars = braille.chars().rev();
-                while let Some(ch) = rev_chars.next() {
-                    let modified_ch = add_dots_to_braille_char(ch);
-                    i_end -= ch.len_utf8();
-                    if ch !=  modified_ch {
-                        break;
-                    }
-                }
-            }
-
-            // finish going through the string
-            while let Some(ch) = chars.next() {
-                result.push( if i_bytes == i_end {add_dots_to_braille_char(ch)} else {ch} );
-                i_bytes += ch.len_utf8();
-            };
-
-            return result;
-
-            fn add_dots_to_braille_char(ch: char) -> char {
-                let as_u32 = ch as u32;
-                if 0x2800 <= as_u32 && as_u32 <= 0x28FF {
-                    return unsafe {char::from_u32_unchecked(as_u32 | 0xC0)};
-                } else {
-                    return ch;
                 }
             }
         }
+
+        // finish going through the string
+        while let Some(ch) = chars.next() {
+            result.push( if i_bytes == i_end {add_dots_to_braille_char(ch)} else {ch} );
+            i_bytes += ch.len_utf8();
+        };
+
+        return result;
+
+        fn add_dots_to_braille_char(ch: char) -> char {
+            let as_u32 = ch as u32;
+            if 0x2800 <= as_u32 && as_u32 <= 0x28FF {
+                return unsafe {char::from_u32_unchecked(as_u32 | 0xC0)};
+            } else {
+                return ch;
+            }
+        }
     }
-    
-    fn replace(&'r mut self, replacement: &Replacement, mathml: &'r Element<'c>) -> Result<String> {
+
+    fn replace<T:TreeOrString<'c, 'm, T>>(&'r mut self, replacement: &Replacement, mathml: Element<'c>) -> Result<T> {
         return Ok(
             match &*replacement {
-                Replacement::Text(t) => t.clone(),
+                Replacement::Text(t) => T::from_string(t.clone(), self.doc)?,
                 Replacement::XPath(xpath) => xpath.replace(self, mathml)?,
                 Replacement::TTS(tts) => {
-                    self.speech_rules.pref_manager.borrow().get_tts().replace(&tts, &self.speech_rules.pref_manager.borrow(), self, mathml)?
+                    T::from_string(
+                        self.speech_rules.pref_manager.borrow().get_tts().replace(&tts, &self.speech_rules.pref_manager.borrow(), self, mathml)?,
+                        self.doc
+                    )?
+                },
+                Replacement::Intent(intent) => {
+                    intent.replace(self, mathml)?                     
                 },
                 Replacement::Test(test) => {
                     test.replace(self, mathml)?                     
@@ -2191,17 +2448,55 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
     /// Iterate over all the nodes, concatenating the result strings together with a ' ' between them
     /// If the node is an element, pattern match it
     /// For 'Text' and 'Attribute' nodes, convert them to strings
-    fn replace_nodes(&'r mut self, nodes: nodeset::Nodeset<'c>, mathml: &'r Element<'c>) -> Result<String> {
+    fn replace_nodes<T:TreeOrString<'c, 'm, T>>(&'r mut self, nodes: Vec<Node<'c>>, mathml: Element<'c>) -> Result<T> {
+        return T::replace_nodes(self, nodes, mathml);
+    }
+
+    /// Iterate over all the nodes finding matches for the elements
+    /// For this case of returning MathML, everything else is an error
+    fn replace_nodes_tree(&'r mut self, nodes: Vec<Node<'c>>, _mathml: Element<'c>) -> Result<Element<'m>> {
         // debug!("replace_nodes: working on {} nodes", nodes.size());
-        let mut result = String::with_capacity(3*nodes.size());   // guess (2 chars/node + space)
-        let mut not_first_time = false;
-        for node in nodes.document_order() {
-            if not_first_time {
-                result.push(' ');
-                not_first_time = true;
-            }
+
+        let mut children = Vec::with_capacity(3*nodes.len());   // guess (2 chars/node + space)
+        for node in nodes {
             let matched = match node {
-                Node::Element(n) => self.match_pattern(&n)?,
+                Node::Element(n) => self.match_pattern::<Element<'m>>(n)?,
+                Node::Text(t) =>  {
+                    let leaf = create_mathml_element(&self.doc, "TEMP_NAME");
+                    // debug!("  from leaf with text '{}'", &t.text());
+                    leaf.set_text(&t.text());
+                    leaf
+                },
+                Node::Attribute(attr) => {
+                    let leaf = create_mathml_element(&self.doc, "TEMP_NAME");
+                    leaf.set_text(&attr.value());
+                    leaf
+                },
+                _ => {
+                    bail!("replace_nodes: found unexpected node type!!!");
+                },
+            };
+            children.push(matched);
+        }
+
+        let result = create_mathml_element(&self.doc, "TEMP_NAME");    // FIX: what name should be used?
+        result.append_children(children);
+        // debug!("replace_nodes_tree\n{}", mml_to_string(&result));
+        return Ok( result );
+    }
+
+    fn replace_nodes_string(&'r mut self, nodes: Vec<Node<'c>>, mathml: Element<'c>) -> Result<String> {
+        // debug!("replace_nodes: working on {} nodes", nodes.len());
+        let mut result = String::with_capacity(3*nodes.len());   // guess (2 chars/node + space)
+        let mut first_time = true;
+        for node in nodes {
+            if first_time {
+                first_time = false;
+            } else {
+                result.push(' ');
+            };
+            let matched = match node {
+                Node::Element(n) => self.match_pattern::<String>(n)?,
                 Node::Text(t) =>  self.replace_chars(&t.text(), mathml)?,
                 Node::Attribute(attr) => self.replace_chars(&attr.value(), mathml)?,
                 _ => {error!("replace_nodes: found unexpected node type!!! (ignored)"); "".to_string() }
@@ -2211,9 +2506,9 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
         return Ok( result );
     }
 
-        /// Lookup unicode "pronunciation" of char.
-        /// Note: TTS is not supported here (not needed and a little less efficient)
-        fn replace_chars(&'r mut self, str: &str, mathml: &'r Element<'c>) -> Result<String> {
+    /// Lookup unicode "pronunciation" of char.
+    /// Note: TTS is not supported here (not needed and a little less efficient)
+    fn replace_chars(&'r mut self, str: &str, mathml: Element<'c>) -> Result<String> {
         let rules = self.speech_rules;
         let mut chars = str.chars();
         if rules.translate_single_chars_only {
@@ -2233,12 +2528,22 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
             .join("");
         return Ok( result );
 
-        fn replace_single_char<'c, 's:'c, 'r>(rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, ch: char, mathml: &'r Element<'c>) -> Result<String> {
+        fn replace_single_char<'c, 's:'c, 'm, 'r>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, ch: char, mathml: Element<'c>) -> Result<String> {
             let ch_as_u32 = ch as u32;
-            let unicode = rules_with_context.speech_rules.unicode.borrow();
-            let replacements = unicode.get( &ch_as_u32 );
+            let mut unicode = rules_with_context.speech_rules.unicode_short.borrow();
+            let mut replacements = unicode.get( &ch_as_u32 );
             if replacements.is_none() {
-                return Ok(String::from(ch));   // no replacement, so just return the char and hope for the best
+                // see if it in the full unicode table (if it isn't loaded already)
+                if rules_with_context.speech_rules.unicode_full.borrow().is_empty() {
+                    info!("*** Loading full unicode {} for char '{}'/{:#06x}", rules_with_context.speech_rules.name, ch, ch_as_u32);
+                    rules_with_context.speech_rules.read_unicode(None, false);
+                }
+                unicode = rules_with_context.speech_rules.unicode_full.borrow();
+                replacements = unicode.get( &ch_as_u32 );
+                if replacements.is_none() {
+                    // debug!("*** Did not find unicode {} for char '{}'/{:#06x}", rules_with_context.speech_rules.name, ch, ch_as_u32);
+                    return Ok(String::from(ch));   // no replacement, so just return the char and hope for the best
+                }
             };
 
             // map across all the parts of the replacement, collect them up into a Vec, and then concat them together
@@ -2259,8 +2564,9 @@ impl<'c, 's:'c, 'r> SpeechRulesWithContext<'c, 's> {
 pub fn braille_replace_chars(str: &str, mathml: Element) -> Result<String> {
     return BRAILLE_RULES.with(|rules| {
         let rules = rules.borrow();
-        let mut rules_with_context = SpeechRulesWithContext::new(&rules, "".to_string());
-        return rules_with_context.replace_chars(str, &mathml);
+        let new_package = Package::new();
+        let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), "".to_string());
+        return rules_with_context.replace_chars(str, mathml);
     })
 }
 
@@ -2286,7 +2592,7 @@ mod tests {
         assert_eq!(speech_pattern.tag_name, "math", "\ntag name failure");
         assert_eq!(speech_pattern.pattern.string, ".", "\npattern failure");
         assert_eq!(speech_pattern.replacements.replacements.len(), 1, "\nreplacement failure");
-        assert_eq!(speech_pattern.replacements.replacements[0].to_string(), r#"{x: "./*"}"#, "\nreplacement failure");
+        assert_eq!(speech_pattern.replacements.replacements[0].to_string(), r#"x: "./*""#, "\nreplacement failure");
     }
 
     #[test]

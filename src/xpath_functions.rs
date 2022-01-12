@@ -86,13 +86,13 @@ impl IsNode {
             return true;
         }
 
-        if !is_tag(elem, "mrow") || elem.children().is_empty() {
-            return false;
-        }
-
         if is_negative_of_trivially_simple(elem) {
             // -3 or -x
             return true;
+        }
+
+        if !is_tag(elem, "mrow") || elem.children().is_empty() {
+            return false;
         }
 
         // x y or -x or -3 x or -x y or -3 x y or x° or n° or -x° or -n°
@@ -172,6 +172,13 @@ impl IsNode {
                     return true;
                 }
             }
+            if is_tag(elem, "negative") && elem.children().len() == 1 {
+                let child = elem.children()[0];
+                if let Some(e) = child.element() {
+                    return is_trivially_simple(&e);
+                }
+            }
+
             return false;
         }
 
@@ -244,7 +251,7 @@ impl IsNode {
                 return false;
             }
             let function_arg = children[2].element().unwrap();
-            if IsBracketed::is_bracketed(&function_arg, "(", ")", false) {
+            if IsBracketed::is_bracketed(&function_arg, "(", ")", false, false) {
                 return IsNode::is_simple(&function_arg.children()[1].element().unwrap());
             } else {
                 return IsNode::is_simple(&function_arg);
@@ -272,7 +279,7 @@ impl IsNode {
             static ref ALL_DIGITS: Regex = Regex::new(r"\d+").unwrap();    // match one or more digits
         }
 
-        if !is_tag(frac, "mfrac") {
+        if !is_tag(frac, "mfrac") &&  !is_tag(frac, "fraction"){
             return false;
         }
         let children = frac.children();
@@ -826,7 +833,7 @@ impl NemethChars {
         //       Items are separated by commas, can not have other punctuation (except ellipsis and dash)
         let mut parent = node.parent().unwrap().element().unwrap(); // safe since 'math' is always at root
         while name(&parent) == "mrow" {
-            if IsBracketed::is_bracketed(&parent, "", "", true) {
+            if IsBracketed::is_bracketed(&parent, "", "", true, false) {
                 for child in parent.children() {
                     if !child_meets_conditions(as_element(child)) {
                         return false;
@@ -845,7 +852,7 @@ impl NemethChars {
                 "mo"  => !crate::canonicalize::is_relational_op(node),
                 "mtext" => false, // FIX -- should be more nuanced,
                 "mrow" => {
-                    if IsBracketed::is_bracketed(&node, "", "", false) {
+                    if IsBracketed::is_bracketed(&node, "", "", false, false) {
                         return child_meets_conditions(as_element(node.children()[1]));
                     } else {
                         for child in node.children() {
@@ -1016,9 +1023,9 @@ struct Debug;
 /// This should probably be restructured slightly.
 pub struct IsBracketed;
 impl IsBracketed {
-    pub fn is_bracketed(element: &Element, left: &str, right: &str, requires_comma: bool) -> bool {
+    pub fn is_bracketed(element: &Element, left: &str, right: &str, requires_comma: bool, requires_mrow: bool) -> bool {
         use crate::canonicalize::is_fence;
-        if !is_tag(&element, "mrow") {
+        if requires_mrow && !is_tag(&element, "mrow") {
             return false;
         }
         let children = element.children();
@@ -1067,7 +1074,7 @@ impl IsBracketed {
  * node -- node(s) to test
  * left -- string (like "[") or empty
  * right -- string (like "]") or empty
- * requires_comma - boolean, optional (check the top level of 'node' for commas
+ * requires_comma - boolean, optional (check the top level of 'node' for commas)
  */
 // 'requiresComma' is useful for checking parenthesized expressions vs function arg lists and other lists
  impl Function for IsBracketed {
@@ -1078,16 +1085,20 @@ impl IsBracketed {
     {
         let mut args = Args(args);
         args.at_least(3)?;
-        args.at_most(4)?;
+        args.at_most(5)?;
         let mut requires_comma = false;
-        if args.len() == 4 {
+        let mut requires_mrow = true;
+        if args.len() == 5 {
+            requires_mrow = args.pop_boolean()?;
+        }
+        if args.len() >= 4 {
             requires_comma = args.pop_boolean()?;
         }
         let right = args.pop_string()?;
         let left = args.pop_string()?;
         let node = validate_one_node(args.pop_nodeset()?, "IsBracketed")?;
         if let Node::Element(e) = node {
-            return Ok( Value::Boolean( IsBracketed::is_bracketed(&e, &left, &right, requires_comma) ) );
+            return Ok( Value::Boolean( IsBracketed::is_bracketed(&e, &left, &right, requires_comma, requires_mrow) ) );
         }
 
         // FIX: should having a non-element be an error instead??
@@ -1097,14 +1108,18 @@ impl IsBracketed {
 
 pub struct IsInDefinition;
 impl IsInDefinition {
-    fn is_defined_in(element: &Element, set_name: &str) -> bool {
+    fn is_defined_in(element: &Element, set_name: &str) -> Result<bool, Error> {
         let text = get_text_from_element(element);
         if text.is_empty() {
-            return false;
+            return Ok(false);
         }
         return DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
-            return definitions.get_hashset(set_name).unwrap().contains(&text);
+            if let Some(set) = definitions.get_hashset(set_name) {
+                return Ok( set.contains(&text) );
+            }
+            return Err( Error::Other( format!("\n  IsInDefinition: '{}' is not defined in definitions.yaml", set_name) ) );
+
         });
     }
 }
@@ -1128,7 +1143,10 @@ impl IsInDefinition {
         let set_name = args.pop_string()?;
         let node = validate_one_node(args.pop_nodeset()?, "IsInDefinition")?;
         if let Node::Element(e) = node {
-            return Ok( Value::Boolean( IsInDefinition::is_defined_in(&e, &set_name) ) );
+            return match IsInDefinition::is_defined_in(&e, &set_name) {
+                Ok(result) => Ok( Value::Boolean( result ) ),
+                Err(e) => Err(e)
+            };
         }
 
         // FIX: should having a non-element be an error instead??
@@ -1260,8 +1278,6 @@ impl Function for EdgeNode {
         return Err(Error::Other(format!("EdgeNode: first arg '{:?}' is not a node", node)));
     }
 }
-
-
 
 /// Add all the functions defined in this module to `context`.
 pub fn add_builtin_functions(context: &mut Context) {

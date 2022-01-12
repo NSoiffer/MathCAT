@@ -1,0 +1,80 @@
+---
+-
+  name: intent-exists
+  tag: "!*"     # matches any tag -- runs before specific rules
+  match: "@intent"
+  replace: [x: "process-intent(.)"]     # Warning: this is a special case hack and only "." is allowed
+
+-
+  name: turn-off
+  tag: "!*"     # turn off matching -- runs before specific rules
+  match: "ancestor-or-self::*[@subject][1][@subject='None']"    # do this only if there isn't some other subject first
+  replace:
+  - test:
+      if: "count(*) > 0"
+      then:
+      - intent:
+          xpath-name: "name(.)"
+          children: [x: "*"]
+      else:
+      - intent:
+          xpath-name: "name(.)"
+          children: [x: "text()"]
+
+-
+   include: "Intent/geometry.yaml"
+
+-
+   include: "Intent/linear-algebra.yaml"
+
+-
+  # this is last because other rules are/should be(???) more specific
+   include: "Intent/general.yaml"
+
+-
+  # we need to leave "math" here so that there is a parent to all the rules (otherwise we have a special case tests)
+  name: default
+  tag: math
+  match: "."
+  replace:
+  - intent:
+      name: "math"
+      children: [x: "*"]
+
+
+-
+  name: default
+  tag: mstyle
+  match: "."
+  replace: [x: "*"]
+
+-
+  name: semantics
+  tag: "semantics"
+  match: "*[@encoding='MathML-Presentation']"
+  replace: 
+  - x: "*[@encoding='MathML-Presentation']/*[1]" 
+
+-
+  name: semantics-default
+  tag: "semantics"
+  match: .
+  replace: 
+  - x: "*[1]"
+
+-
+  # pass uncaught MathML through to the speech rules -- no point to renaming them
+  name: default
+  tag: "*"
+  match: "."
+  replace:
+  - test:
+      if: "count(*) > 0"
+      then:
+      - intent:
+          xpath-name: "name(.)"
+          children: [x: "*"]
+      else:
+      - intent:
+          xpath-name: "name(.)"
+          children: [x: "text()"]

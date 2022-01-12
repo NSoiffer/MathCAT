@@ -49,6 +49,10 @@ lazy_static!{
 	static ref IMPLIED_TIMES_HIGH_PRIORITY: OperatorInfo = OperatorInfo{
 		op_type: OperatorTypes::INFIX, priority: 851, next: &None
 	};
+	// IMPLIED_SEPARATOR_HIGH_PRIORITY -- used for Geometry points like ABC
+	static ref IMPLIED_SEPARATOR_HIGH_PRIORITY: OperatorInfo = OperatorInfo{
+		op_type: OperatorTypes::INFIX, priority: 901, next: &None
+	};
 	static ref IMPLIED_PLUS_SLASH_HIGH_PRIORITY: OperatorInfo = OperatorInfo{	// (linear) mixed fraction 2 3/4
 		op_type: OperatorTypes::INFIX, priority: 881, next: &None
 	};
@@ -274,7 +278,7 @@ impl<'a, 'op:'a> StackInfo<'a, 'op> {
 }
 
 
-fn create_mathml_element<'a>(doc: &Document<'a>, name: &str) -> Element<'a> {
+pub fn create_mathml_element<'a>(doc: &Document<'a>, name: &str) -> Element<'a> {
 	return doc.create_element(sxd_document::QName::with_namespace_uri(
 		Some("http://www.w3.org/1998/Math/MathML"),
 		name));
@@ -290,7 +294,7 @@ pub fn is_relational_op(mo: Element) -> bool {
 			.find_operator(mo, None, None, None).priority == *EQUAL_PRIORITY;
 }
 
-fn set_mathml_name(element: Element, new_name: &str) {
+pub fn set_mathml_name(element: Element, new_name: &str) {
 	element.set_name(QName::with_namespace_uri(Some("http://www.w3.org/1998/Math/MathML"), new_name));
 }
 
@@ -339,6 +343,9 @@ impl CanonicalizeContext {
 			let math_element = create_mathml_element(&converted_mathml.document(), "math");
 			math_element.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
 			math_element.append_child(converted_mathml);
+			let root = math_element.document().root();
+			root.clear_children();
+			root.append_child(math_element);
 		}
 		set_mathml_name(converted_mathml, "math");
 		self.clean_mathml(converted_mathml);
@@ -353,7 +360,7 @@ impl CanonicalizeContext {
 		let converted_mathml = self.canonicalize_mrows(converted_mathml);
 		match converted_mathml {
 			Ok(e) => {
-				// debug!("\nMathML after canonicalize:\n{}", mml_to_string(&e));
+				debug!("\nMathML after canonicalize:\n{}", mml_to_string(&e));
 				return e;
 			},
 			Err(e)  => {
@@ -410,6 +417,8 @@ impl CanonicalizeContext {
 					if IS_PRIME.is_match(text) {
 						let new_text = merge_prime_text(text);
 						mathml.set_text(&new_text);
+					} else if let Some(result) = split_points(mathml) {
+						return Some(result);
 					}
 					return Some(mathml);
 				};
@@ -424,7 +433,9 @@ impl CanonicalizeContext {
 
 				let text = as_text(mathml);
 				return crate::definitions::DEFINITIONS.with(|definitions| {
-					if text == "…" || definitions.borrow().get_hashset("FunctionNames").unwrap().contains(text) {
+					if text == "…" || 
+					   definitions.borrow().get_hashset("FunctionNames").unwrap().contains(text) ||
+					   definitions.borrow().get_hashset("GeometryShapes").unwrap().contains(text) {
 						set_mathml_name(mathml, "mi");
 						return Some(mathml);
 					}
@@ -449,6 +460,10 @@ impl CanonicalizeContext {
 					return Some(result);
 				};
 			
+				if let Some(result) = split_points(mathml) {
+					return Some(result);
+				}
+				
 				let text = as_text(mathml);
 				if !text.is_empty() && ROMAN_NUMERAL.is_match(text) {
 					// people tend to set them in a non-italic font and software makes that 'mtext'
@@ -660,6 +675,68 @@ impl CanonicalizeContext {
 			}
 			return mrow;
 		}
+
+		/// if we have something like 'shape' ABC, we split the ABC and add IMPLIED_SEPARATOR_HIGH_PRIORITY between them
+		/// under some specific conditions (trying to be a little cautious)
+		fn split_points(leaf: Element) -> Option<Element> {
+			lazy_static!{
+				static ref IS_UPPERCASE: Regex = Regex::new(r"^[A-Z]+$").unwrap(); 
+			}
+
+			if !IS_UPPERCASE.is_match(as_text(leaf)) {
+				return None;
+			}
+
+			// check to see if there is a bar, arrow, etc over the letters (line-segment, arc, ...)
+			let parent = leaf.parent().unwrap().element().unwrap();
+			if name(&parent) == "mover" {
+				// look for likely overscripts (basically just rule out some definite 'no's)
+				let over = as_element(leaf.following_siblings()[0]);
+				if is_leaf(over) {
+					let mut over_chars = as_text(over).chars();
+					let first_char = over_chars.next();
+					if first_char.is_some() && over_chars.next().is_none() && !first_char.unwrap().is_alphanumeric(){
+						// only one char and it isn't alphanumeric
+						return Some( split_element(leaf) );
+					}
+				}
+			}
+	
+			// check to see if it is preceded by a geometric shape (e.g, ∠ABC)
+			let preceding_siblings = leaf.preceding_siblings();
+			if !preceding_siblings.is_empty() {
+				let preceding_sibling = as_element(preceding_siblings[preceding_siblings.len()-1]);
+				let preceding_sibling_name = name(&preceding_sibling);
+				if preceding_sibling_name == "mi" || preceding_sibling_name == "mo" || preceding_sibling_name == "mtext" {
+					let preceding_text = as_text(preceding_sibling);
+					return crate::definitions::DEFINITIONS.with(|definitions| {
+						let defs = definitions.borrow();
+						let prefix_ops = defs.get_hashset("GeometryPrefixOperators").unwrap();
+						let shapes = defs.get_hashset("GeometryShapes").unwrap();
+						if prefix_ops.contains(preceding_text) || shapes.contains(preceding_text) {
+							// split leaf
+							return Some( split_element(leaf) );	// always treated as function names
+						} else {
+							return None;
+						}
+					})
+				}
+			}
+			return None;
+
+			fn split_element(leaf: Element) -> Element {
+				let mut children = Vec::with_capacity(leaf.children().len());
+				for ch in as_text(leaf).chars() {
+					let new_leaf = create_mathml_element(&leaf.document(), "mi");
+					new_leaf.set_text(&ch.to_string());
+					children.push(new_leaf);
+				}
+				set_mathml_name(leaf, "mrow");
+				leaf.replace_children(children);
+				return leaf;
+			}
+		}
+
 
 		fn is_likely_a_number<'a>(mrow: Element<'a>, start: usize, end: usize) -> bool {
 			// be a little careful about merging the numbers	
@@ -934,7 +1011,7 @@ impl CanonicalizeContext {
 				};
 				child.remove_from_parent();				
 			}
-			script.set_name("mmultiscripts");
+			set_mathml_name(script, "mmultiscripts");
 			let mut num_children = 1+postscripts.len();
 			if !prescripts.is_empty() {
 				num_children += 1 + prescripts.len();
@@ -1405,7 +1482,7 @@ impl CanonicalizeContext {
 	
 		let operator_versions = OperatorVersions::new(op);
 		if operator_versions.prefix.is_some() &&
-		   top(&parse_stack).last_child_in_mrow().is_none() || !top(&parse_stack).is_operand {
+		   (top(&parse_stack).last_child_in_mrow().is_none() || !top(&parse_stack).is_operand) {
 			// debug!("   is prefix");
 			return operator_versions.prefix.unwrap();
 		}
@@ -1419,14 +1496,22 @@ impl CanonicalizeContext {
 		// It seems like the case where it could be paired with a matching vertical bar as what most people would choose, so we favor that.
 	
 		// If there is a matching open vertical bar, it is either at the top of the stack or the entry just below the top
-		let mut has_left_match = ptr_eq(top(&parse_stack).op_pair.op, operator_versions.prefix.unwrap());						// match at top of stack? (empty matching bars)
-		if !has_left_match && parse_stack.len() > 2 {
-			// matching op is below top (operand between matching bars) -- pop, peek, push
-			let old_top = parse_stack.pop().unwrap();																			// can only access top, so we need to pop off top and push back later
-			has_left_match = ptr_eq(top(&parse_stack).op_pair.op, operator_versions.prefix.unwrap());
-			parse_stack.push(old_top);
-		}
-	
+
+		let has_left_match = if let Some(op_prefix) = operator_versions.prefix {
+			if ptr_eq(top(&parse_stack).op_pair.op, op_prefix) { 	// match at top of stack? (empty matching bars)
+				true
+			} else if parse_stack.len() > 2 {
+				// matching op is below top (operand between matching bars) -- pop, peek, push
+				let old_top = parse_stack.pop().unwrap();		
+				let top_op = top(&parse_stack).op_pair.op;																	// can only access top, so we need to pop off top and push back later
+				parse_stack.push(old_top);
+				ptr_eq(top_op, op_prefix)
+			} else {
+				false
+			}
+		} else {
+			false
+		};
 		if operator_versions.postfix.is_some() && (next_child.is_none() || has_left_match) {
 			// last child in row (must be a close) or we have a left match
 			// debug!("   is postfix");
@@ -1571,6 +1656,13 @@ impl CanonicalizeContext {
 			let defs = defs.borrow();
 			let names = defs.get_hashset("FunctionNames").unwrap();
 			if names.contains(node_str) {
+				return true;	// always treated as function names
+			}
+
+			// We include shapes as function names so that △ABC makes sense since △ and
+			//   the other shapes are not in the operator dictionary
+			let shapes = defs.get_hashset("GeometryShapes").unwrap();
+			if shapes.contains(node_str) {
 				return true;	// always treated as function names
 			}
 	
@@ -1800,6 +1892,24 @@ impl CanonicalizeContext {
 		// test for script position is that it is not the base and hence has a preceding sibling
 		return (name == "msub" || name == "msubsup" || name == "msup") && !mrow.preceding_siblings().is_empty();
 	}
+
+	// implied separator when two capital letters are adjacent
+	fn is_implied_separator<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>) -> bool {
+		if name(prev) != "mi" || name(current) != "mi" {
+			return false;
+		}
+
+		let prev_text = as_text(*prev);
+		let current_text = as_text(*current);
+		return prev_text.len() == 1 && current_text.len() == 1 &&
+			   is_cap(prev_text) && is_cap(current_text);
+
+
+		fn is_cap(str: &str) -> bool {
+			assert_eq!(str.len(), 1);
+			return str.chars().next().unwrap().is_ascii_uppercase();
+		}
+	}
 	
 	// Add the current operator if it's not n-ary to the stack
 	// 'current_child' and it the operator to the stack.
@@ -1911,8 +2021,8 @@ impl CanonicalizeContext {
 			return false;
 		}
 		// This only matters if we are not inside of parens
-		if IsBracketed::is_bracketed(&previous_child, "(", ")", false) ||
-		   IsBracketed::is_bracketed(&previous_child, "[", "]", false) {
+		if IsBracketed::is_bracketed(&previous_child, "(", ")", false, false) ||
+		   IsBracketed::is_bracketed(&previous_child, "[", "]", false, false) {
 			return false;
 		}
 	
@@ -2000,14 +2110,14 @@ impl CanonicalizeContext {
 				let base_of_previous_child = get_possible_embellished_node(previous_child);
 				if name(&base_of_previous_child) != "mo" {
 					// consecutive operands -- add an invisible operator as appropriate
-					// note: in Geometry, AB or ABC are common and would be more properly represented with an invisible op
-					//    other than times (maybe with a super high priority). Rather than make up a new operator, we stick with times.
 					current_op = if self.is_function_name(previous_child, Some(&children[i_child..])) {
 								OperatorPair{ ch: "\u{2061}", op: &*INVISIBLE_FUNCTION_APPLICATION }
 							} else if self.is_mixed_fraction(&previous_child, &children[i_child..])? {
 								OperatorPair{ ch: "\u{2064}", op: &*IMPLIED_INVISIBLE_PLUS }
 							} else if self.is_implied_comma(&previous_child, &current_child) {
 								OperatorPair{ch: "\u{2063}", op: &*IMPLIED_INVISIBLE_COMMA }				  
+							} else if self.is_implied_separator(&previous_child, &current_child) {
+								OperatorPair{ch: "\u{2063}", op: &*IMPLIED_SEPARATOR_HIGH_PRIORITY }				  
 							} else if self.is_trig_arg(base_of_previous_child, base_of_child, &parse_stack) {
 								OperatorPair{ch: "\u{2062}", op: &*IMPLIED_TIMES_HIGH_PRIORITY }				  
 							} else {
@@ -2128,8 +2238,7 @@ pub fn as_element(child: ChildOfElement) -> Element {
 // The child of a leaf element must be text (previously trimmed)
 // Note: trim() combines all the Text children into a single string
 pub fn as_text(leaf_child: Element) -> &str {
-	assert!(name(&leaf_child) == "mi" || name(&leaf_child) == "mo" || name(&leaf_child) == "mn" || name(&leaf_child) == "mtext" ||
-			name(&leaf_child) == "ms" || name(&leaf_child) == "mspace" || name(&leaf_child) == "mglyph");
+	assert!(is_leaf(leaf_child) || name(&leaf_child) == crate::infer_intent::LITERAL_NAME);
 	let children = leaf_child.children();
 	if children.is_empty() {
 		return "";
@@ -2211,6 +2320,8 @@ fn is_chemical_element(node: Element) -> bool {
 
 #[cfg(test)]
 mod canonicalize_tests {
+	#[allow(unused_imports)]
+	use super::super::init_logger;
     use super::*;
     use sxd_document::parser;
 
@@ -2224,12 +2335,13 @@ mod canonicalize_tests {
 		let mathml = get_element(package1);
 		trim_element(&mathml);
 		let mathml_test = canonicalize(mathml);
-		println!("test: {}", mml_to_string(&mathml));
+		debug!("test:\n{}", mml_to_string(&mathml));
         
         let package2 = &parser::parse(target).expect("Failed to parse target input");
 		let mathml_target = get_element(package2);
 		trim_element(&mathml_target);
-            
+		debug!("target:\n{}", mml_to_string(&mathml_target));
+    
         return is_same_element(&mathml_test, &mathml_target);
     }
 
@@ -2979,9 +3091,9 @@ mod canonicalize_tests {
 				<mo>∠</mo>
 				<mrow data-changed='added'>
 					<mi>A</mi>
-					<mo data-changed='added'>&#x2062;</mo>
+					<mo data-changed='added'>&#x2063;</mo>
 					<mi>B</mi>
-					<mo data-changed='added'>&#x2062;</mo>
+					<mo data-changed='added'>&#x2063;</mo>
 					<mi>C</mi>
 				</mrow>
 				</mrow>

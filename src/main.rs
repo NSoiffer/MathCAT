@@ -80,38 +80,55 @@ fn main() {
   //    </math>
   // ";
 
-  //     let expr = "
-  //      <math xmlns='http://www.w3.org/1998/Math/MathML'>
-  //      <mi>log</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
-  //      <mo>+</mo>
-  //      <mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
-  // </math>"";
+  // let expr = "
+  //     <math><mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⌒</mo></mover></math>
+  //   ";
+  // let expr = "
+  // <math><mo>&#x25B3;</mo><mi>ABC</mi></math>
+  //   ";
   // let expr = "<math><mi>c</mi><mo>=</mo><mn>4</mn><mspace width=\"thinmathspace\"></mspace><mn>598</mn>
   //                 <mspace width=\"thinmathspace\"></mspace><mn>037</mn>
   //                 <mspace width=\"thinmathspace\"></mspace><mn>234</mn></math>";
   // let expr = "<math><mn>𝟏𝟐𝟑</mn></math>";
   // let expr = "<math><mo>(</mo><mrow><mn>451</mn><mo>,</mo><mn>231</mn></mrow><mo>)</mo></math>";
+  // let expr = "
+  // <math display='block' id='x0'> <semantics>
+  //  <mrow displaystyle='true' id='x1'>
+  //    <mn id='x2'>1<span> foo </span>9</mn>
+  //    <mo id='x3'>+</mo>
+  //    <mn id='x4'>2</mn>
+  //  </mrow>
+  //  </semantics></math>";
   let expr = "
-  <math display='block' id='x0'> <semantics>
-   <mrow displaystyle='true' id='x1'>
-     <mn id='x2'>1<span> foo </span>9</mn>
-     <mo id='x3'>+</mo>
-     <mn id='x4'>2</mn>
-   </mrow>
-   </semantics></math>";
+  <math>
+  <msub>
+  <mrow>
+      <mo fence='true' stretchy='false'>∥</mo>
+  <mo>⁢</mo>
+  <mi>f</mi>
+  <mo>⁢</mo>
+      <mo fence='true' stretchy='false'>∥</mo>
+      </mrow> <mi>max</mi></msub>
+</math>
+  ";
+  // let expr = "
+  // <math display='block'><mrow><mrow><mrow><mover accent='true'><mo fence='true' stretchy='false'>∥</mo><mo stretchy='false'>^</mo></mover><mo>⁢</mo><mi>f</mi><mo>⁢</mo><msub><mover accent='true'><mo fence='true' stretchy='false'>∥</mo><mo stretchy='false'>^</mo></mover><mi>p</mi></msub></mrow><mo>=</mo><msup><mrow><mo>(</mo><mrow><munder><mo largeop='true' movablelimits='false' symmetric='true'>∑</mo><mrow><mi>γ</mi><mo>∈</mo><mover accent='true'><msubsup><mi>𝔽</mi><mn>𝟚</mn><mi>𝕟</mi></msubsup><mo>^</mo></mover></mrow></munder><msup><mrow><mo stretchy='false'>|</mo><mrow><mover accent='true'><mi>f</mi><mo>^</mo></mover><mo>⁢</mo><mrow><mo stretchy='false'>(</mo><mi>γ</mi><mo stretchy='false'>)</mo></mrow></mrow><mo stretchy='false'>|</mo></mrow><mi>p</mi></msup></mrow><mo>)</mo></mrow><mrow><mn>1</mn><mo>/</mo><mi>p</mi></mrow></msup></mrow><mo>.</mo></mrow></math>
+  //   ";
   let instant = Instant::now();
   if let Err(e) = SetMathML(expr.to_string()) {
     panic!("Error: exiting -- {}", e);
   };
   // SetPreference("TTS".to_string(), StringOrFloat::AsString("SSML".to_string())).unwrap();
-  SetPreference("Bookmark".to_string(), StringOrFloat::AsString("true".to_string())).unwrap();
+  // SetPreference("Bookmark".to_string(), StringOrFloat::AsString("true".to_string())).unwrap();
+  SetPreference("SpeechStyle".to_string(), StringOrFloat::AsString("SimpleSpeak".to_string())).unwrap();
 
   let speech_string = GetSpokenText().unwrap();
   info!("Computed speech string:\n   '{}'", speech_string);
-  // let braille_string = GetBraille().unwrap();
-  // info!("Computed braille string:\n   '{}'", braille_string);
+  let braille_string = GetBraille("".to_string()).unwrap();
+  info!("Computed braille string:\n   '{}'", braille_string);
   info!("Time taken: {}ms", instant.elapsed().as_millis());
   // let instant = Instant::now();
   // let _speech_string = speak_mathml(expr);
+  // let _braille_string = GetBraille("".to_string()).unwrap();
   // info!("Time taken (second time): {}ms", instant.elapsed().as_millis());
 }

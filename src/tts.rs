@@ -65,7 +65,7 @@ use sxd_document::dom::Element;
 use yaml_rust::Yaml;
 
 use std::{fmt};
-use crate::speech::{SpeechRulesWithContext, MyXPath};
+use crate::speech::{SpeechRulesWithContext, MyXPath, TreeOrString};
 use std::string::ToString;
 use std::str::FromStr;
 use strum_macros::{Display, EnumString};
@@ -312,7 +312,11 @@ impl TTS {
     /// A string is returned for the speech engine.
     ///
     /// `auto` pausing is handled at a later phase and a special char is used for it
-    pub fn replace<'c, 's:'c, 'r>(&self, command: &TTSCommandRule, prefs: &PreferenceManager, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
+    pub fn replace<'c, 's:'c, 'm:'c, 'r, T:TreeOrString<'c, 'm, T>>(&self, command: &TTSCommandRule, prefs: &PreferenceManager, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's, 'm>, mathml: Element<'c>) -> Result<T> {
+        return T::replace_tts(self, command, prefs, rules_with_context, mathml);
+    }
+
+    pub fn replace_string<'c, 's:'c, 'm, 'r>(&self, command: &TTSCommandRule, prefs: &PreferenceManager, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's, 'm>, mathml: Element<'c>) -> Result<String> {
         // The general idea is we handle the begin tag, the contents, and then the end tag
         // For the begin/end tag, we dispatch off to specialized code for each TTS engine
 
@@ -345,7 +349,7 @@ impl TTS {
             if result.is_empty() {
                 result += " ";
             }
-            result += &command.replacements.replace(rules_with_context, mathml)?;    
+            result += &command.replacements.replace::<String>(rules_with_context, mathml)?;    
         }
 
         let end_tag = match self {
@@ -361,10 +365,10 @@ impl TTS {
         }
 
 
-        fn compute_bookmark_element<'c, 's:'c, 'r>(value: &TTSCommandValue, tag_and_attr: &str, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's>, mathml: &'r Element<'c>) -> Result<String> {
+        fn compute_bookmark_element<'c, 's:'c, 'm, 'r>(value: &TTSCommandValue, tag_and_attr: &str, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's, 'm>, mathml: Element<'c>) -> Result<String> {
             match value {
                 TTSCommandValue::XPath(xpath) => {
-                    let id = xpath.replace(rules_with_context, mathml)?;
+                    let id = xpath.replace::<String>(rules_with_context, mathml)?;
                     return Ok( format!("<{}='{}'/>", tag_and_attr, id) );
                 },
                 _ => bail!("Implementation error: found non-xpath value for bookmark"),
@@ -405,7 +409,7 @@ impl TTS {
                 }
                 return chars_with_spaces.into_iter().collect();
             } else if let TTSCommandValue::Pronounce(p) = &command.value {
-                return p.text.clone();
+                return crate::speech::CONCAT_INDICATOR.to_string() + &p.text;
             }
         };
         return "".to_string();

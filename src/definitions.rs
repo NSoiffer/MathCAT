@@ -38,7 +38,7 @@ use yaml_rust::{Yaml};
 use crate::errors::*; 
 use crate::prefs::*;
 use std::{cell::RefCell, cell::Ref, cell::RefMut, collections::HashSet,  rc::Rc};
-use std::{collections::HashMap, path::PathBuf};
+use std::{collections::HashMap, path::Path};
 use crate::shim_filesystem::read_to_string_shim;
 
 /// An enum to paper over the different types of data access needed.
@@ -218,7 +218,7 @@ fn verify_definitions() -> Result<()> {
 }
 
 use crate::speech::*;
-fn read_one_definitions_file(path: &PathBuf) -> Result<()> {
+fn read_one_definitions_file(path: &Path) -> Result<()> {
     // read in the file contents   
     let definition_file_contents = read_to_string_shim(path)
             .chain_err(|| format!("trying to read {}", path.to_str().unwrap()))?;
