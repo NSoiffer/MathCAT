@@ -1,0 +1,287 @@
+---
+-
+  name: simple-number-set
+  tag: mi
+  match: "string-length(text())=1 and translate(text(), 'ℂℕℚℝℤ', '')=''"  # tricky way to match any of the letters instead of using 'or'
+  replace:
+  - intent:
+      name: number-sets
+      children: [x: "text()"]
+
+-
+  name: sup-number-set
+  tag: msup
+  match:
+  - "*[1][string-length(text())=1 and translate(text(), 'ℂℕℚℝℤ', '')=''] and" 
+  - "*[2][string-length(text())=1 and (text()='+' or text()='-' or self::m:mn)]" 
+  replace:
+  - intent:
+      name: number-sets
+      children:
+      - x: "*[1]"
+      - x: "*[2]"
+
+-
+  name: real-part
+  tag: mi
+  match: "(text()='Re' or text()='re' or text()='ℜ') and following-sibling::*[1][text()='\u2061']" # before function apply
+  replace:
+  - intent:
+      name: real-part
+      children: []
+  
+-
+  name: imaginary-part
+  tag: mi
+  match: "(text()='Im' or text()='im' or text()='ℑ') and following-sibling::*[1][text()='\u2061']" # before function apply
+  replace: 
+  - intent:
+      name: imaginary-part
+      children: []
+
+-
+  name: negative
+  tag: mrow
+  match: "count(*)=2 and *[1][self::m:mo][text()='-']"
+  replace:
+  - intent:
+      name: "negative"
+      children:
+      - x: "*[2]"
+               
+-
+  name: positive
+  tag: mrow
+  match: "count(*)=2 and *[1][self::m:mo][text()='+']"
+  replace:
+  - intent:
+      name: "positive"
+      children:
+      - x: "*[2]"
+               
+
+-
+  # (a,b) has many interpretations; (a, b] (etc) have fewer interpretations.
+  # as an interval, it represents a set and hence a clue that it is an interval is that a set operator comes
+  #   before or after it. '=' is also common.
+  # They also commonly stand by themselves, but so does the interpretation as a point or gcd.
+  name: interval
+  tag: mrow
+  match: 
+    - "count(*)=3 and "
+       # FIX: consider adding ]...[ versions
+    - "*[1][text()='(' or text()='['] and *[3][text()=')' or text()=']'] and"   # match bracketing
+    - "*[2][count(*)=3 and *[2][text()=',']] and"                                # inside should have ','
+      # FIX: if both the first and third children of *[2] are mn, then make sure first <= third
+    - "( parent::m:math or "  # all by itself
+    - "  preceding-sibling::*[1][self::m:mo and ( text()='=' or IsInDefinition(., 'SubsetOperators') )] or "  # context hint
+    - "  following-sibling::*[1][self::m:mo and ( text()='=' or IsInDefinition(., 'SubsetOperators') )]"      # context hint
+    - ")"
+  replace:
+  - intent:
+      name: "interval"
+      children:
+      - x: "*[1]"           # from symbol
+      - x: "*[2]/*[1]"
+      - x: "*[2]/*[3]"
+      - x: "*[3]"           # to symbol
+
+
+-
+  name: binomial-frac
+  tag: mrow
+  match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][@linethickness=0]"
+  replace:
+  - intent:
+      name: binomial
+      children:
+      - x: "*[2]/*[1]"
+      - x: "*[2]/*[2]"
+
+
+# rules on scripted vertical bars ('evaluated at')
+-
+  name: evaluated-at-msub
+  tag: mrow
+  match: "count(*)=2 and *[2][self::m:msub and *[1][self::m:mo][text()='|']]"
+  replace:
+  - intent:
+      name: "evaluate"
+      children:
+      - x: "*[1]"
+      - x: "*[2]/*[2]"
+
+-
+  name: evaluated-at-msubsup
+  tag: mrow
+  match: "count(*)=2 and *[2][self::m:msubsup and *[1][self::m:mo][text()='|']]"
+  replace: 
+  - intent:
+      name: "evaluate"
+      children:
+      - x: "*[1]"
+      - x: "*[2]/*[2]"
+      - x: "*[2]/*[3]"
+
+# it is also used outside of brackets
+-
+  name: bracketed-evaluated-at
+  tag: msubsup
+  match: "IsBracketed(*[1], '[', ']')"
+  replace: 
+  - intent:
+      name: "evaluate"
+      children:
+      - x: "*[1]/*[1]"
+      - x: "*[2]"
+      - x: "*[3]"
+
+
+-
+  # vertical bars otherwise
+  # could also be cardinality, length, ...
+  name: absolute-value
+  tag: mrow
+  match: "IsBracketed(., '|', '|')"
+  replace:
+  - intent:
+      name: "absolute-value"
+      children: [x: "*[2]"]
+
+-
+  name: default
+  tag: msqrt
+  match: "."
+  replace:
+  - intent:
+      name: "square-root"
+      children: [x: "*[1]"]
+
+
+-
+  name: default
+  tag: mroot
+  match: "."
+  replace:
+  - intent:
+      name: "root"
+      children:
+      - x: "*[1]"
+      - x: "*[2]"
+
+
+-
+  name: log-base
+  tag: msub
+  match:
+  - "*[1][self::m:mi][text()='log'] and"
+  - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
+  replace:
+  - intent:
+      name: log-base
+      children: [x: "*[2]"]
+
+-
+  name: bigop
+  tag: [msub, munder]
+  match: "IsLargeOp(*[1])"
+  replace: 
+  - intent:
+      name: "large-op"    # Fix: the name in the spreadsheet needs updating/fixing
+      children:
+      - x: "*[1]"
+      - x: "*[2]"
+
+
+# rules for functions raised to a power
+# these could have been written on 'mrow' but putting them on msup seems more specific
+# to see if it is a function, we look right to see if the following sibling is apply-function
+-
+  name: function-inverse
+  tag: msup
+  match:
+  - "*[2][self::m:mrow][count(*)=2] and"                        # exponent is an mrow with children...
+  - "*[2]/*[1][self::m:mo][text()='-'] and"                     #   '-'
+  - "*[2]/*[2][self::m:mn][text()=1] and"                       #  and '1'
+  - "*[1][self::m:mi] and IsNode(*[1], 'trig_name') and"        # base is a trig function name (e.g, sin, sinh)
+  - "following-sibling::*[1][self::m:mo][text()='\u2061']"      # and msup is followed by invisible function apply
+  replace:
+  - intent:
+      name: "inverse-function"
+      children:
+      - x: "*[1]"
+
+
+-
+  name: bigop
+  tag: [msubsup, munderover]
+  match: "IsLargeOp(*[1])"
+  replace: 
+  - intent:
+      name: "large-op"    # Fix: the name in the spreadsheet needs updating/fixing
+      children:
+      - x: "*[1]"
+      - x: "*[2]"
+      - x: "*[3]"
+
+- 
+  name: set
+  tag: mrow
+  match: "IsBracketed(., '{', '}')"
+  replace: 
+  - intent:
+      name: "set"
+      children:
+      - test:
+          if: count(*) = 2
+          then: []
+          else: [x: "*[2]"]
+
+-
+  name: default
+  tag: msub
+  match: "."
+  replace:
+  - intent:
+      name: "particular-value-of"
+      children:
+      - x: "*[1]"
+      - x: "*[2]"
+
+-
+  name: default
+  tag: msup
+  match: "."
+  replace:
+  - intent:
+      name: "power"
+      children:
+      - x: "*[1]"
+      - x: "*[2]"
+
+
+-
+  name: default
+  tag: msubsup
+  match: "."
+  replace: 
+  - intent:
+      name: "power"
+      children:
+      - intent:
+          name: "msub"
+          children:
+            - x: "*[1]"
+            - x: "*[2]"
+      - x: "*[3]"
+
+-
+  name: default
+  tag: mfrac
+  match: "."
+  replace:
+  - intent:
+      name: "fraction"
+      children:
+      - x: "*[1]"
+      - x: "*[2]"

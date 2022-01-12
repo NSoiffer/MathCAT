@@ -23,6 +23,8 @@ mod en {
         mod msup;
         // mod mtable;
         mod sets;
+        mod geometry;
+        mod linear_algebra;
     }
 }
 

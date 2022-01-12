@@ -123,7 +123,7 @@ impl Preferences{
     fn read_file(file: &Option<PathBuf>, base_prefs: Preferences) -> Preferences {
         let unwrapped_file = match file {
             None => return base_prefs,
-            Some(f) => f,
+            Some(f) => f.as_path(),
         };
 
         let file_name = unwrapped_file.to_str().unwrap();
@@ -281,14 +281,17 @@ fn cannot_go_on(message: &str) {
 pub struct PreferenceManager {
     user_prefs: Preferences,
     api_prefs: Preferences,
-    pref_files: FileAndTime,        // the "raw" user preference files (converted to 'user_prefs')
-    speech: FileAndTime,            // the speech rule style file(s)
-    overview: FileAndTime,          // the overview rule file(s)
-    navigation: FileAndTime,        // the navigation rule file(s)
-    speech_unicode: FileAndTime,    // unicode.yaml file(s)
-    braille: FileAndTime,           // the braille rule file
-    braille_unicode: FileAndTime,   // the braille unicode file
-    defs: FileAndTime,              // the definition.yaml file(s)
+    pref_files: FileAndTime,            // the "raw" user preference files (converted to 'user_prefs')
+    intent: FileAndTime,                // the intent rule style file(s)
+    speech: FileAndTime,                // the speech rule style file(s)
+    overview: FileAndTime,              // the overview rule file(s)
+    navigation: FileAndTime,            // the navigation rule file(s)
+    speech_unicode: FileAndTime,        // short unicode.yaml file(s)
+    speech_unicode_full: FileAndTime,   // full unicode.yaml file(s)
+    braille: FileAndTime,               // the braille rule file
+    braille_unicode: FileAndTime,       // short braille unicode file
+    braille_unicode_full: FileAndTime,  // full braille unicode file
+    defs: FileAndTime,                  // the definition.yaml file(s)
 }
 
 
@@ -307,7 +310,8 @@ impl fmt::Display for PreferenceManager {
 
 pub struct FilesChanged {
     pub rules: bool,
-    pub unicode: bool,
+    pub unicode_short: bool,
+    pub unicode_full: bool,
     pub defs: bool
 }
 
@@ -315,14 +319,16 @@ impl FilesChanged {
     fn none() -> FilesChanged {
         return FilesChanged {
             rules: false,
-            unicode: false,
+            unicode_short: false,
+            unicode_full: false,
             defs: false
         }
     }
 
     pub fn add_changes(&mut self, additional_changes: FilesChanged) {
         self.rules |= additional_changes.rules;
-        self.unicode |= additional_changes.unicode;
+        self.unicode_short |= additional_changes.unicode_short;
+        self.unicode_full  |= additional_changes.unicode_full;
         self.defs |= additional_changes.defs;
     }
 }
@@ -360,6 +366,8 @@ impl PreferenceManager {
         
         let language = prefs.to_string("Language");
         let language = language.as_str();       // avoid 'temp value dropped while borrowed' error
+        let intent_files = PreferenceManager::get_file_and_time(
+                            &rules_dir, language, Some("en"), "intent.yaml");
         let speech_files = PreferenceManager::get_file_and_time(
                             &rules_dir, language, Some("en"), &style_file_name);
         let overview_files = PreferenceManager::get_file_and_time(
@@ -369,6 +377,8 @@ impl PreferenceManager {
 
         let speech_unicode = PreferenceManager::get_file_and_time(
                             &rules_dir, language, Some("en"), "unicode.yaml");
+        let speech_unicode_full = PreferenceManager::get_file_and_time(
+                            &rules_dir, language, Some("en"), "unicode-full.yaml");
 
         let braille = prefs.to_string("Code") + "_Rules.yaml";
         let braille = braille.as_str();
@@ -377,6 +387,8 @@ impl PreferenceManager {
 
         let braille_unicode = PreferenceManager::get_file_and_time(
                             &rules_dir, braille, Some("Nemeth"), "unicode.yaml");
+        let braille_unicode_full = PreferenceManager::get_file_and_time(
+                            &rules_dir, braille, Some("Nemeth"), "unicode-full.yaml");
 
         let defs_files = PreferenceManager::get_file_and_time(
             &rules_dir, language, Some("en"), "definitions.yaml");
@@ -385,12 +397,15 @@ impl PreferenceManager {
             user_prefs: prefs,
             api_prefs: Preferences{ prefs: DEFAULT_API_PREFERENCES.with(|defaults| defaults.prefs.clone()) },
             pref_files,
+            intent: intent_files,
             speech: speech_files,
             overview: overview_files,
             navigation: navigation_files,
             speech_unicode,
+            speech_unicode_full,
             braille: braille_files,
             braille_unicode,
+            braille_unicode_full,
             defs: defs_files,
         };
     }
@@ -545,6 +560,7 @@ impl PreferenceManager {
     /// Return the speech rule style file locations.
     pub fn get_rule_file(&self, name: &RulesFor) -> &Locations {
         return match name {
+            RulesFor::Intent => &self.intent.files,
             RulesFor::Speech => &self.speech.files,
             RulesFor::OverView => &self.overview.files,
             RulesFor::Navigation => &self.navigation.files,
@@ -553,8 +569,8 @@ impl PreferenceManager {
     }
 
     /// Return the unicode.yaml file locations.
-    pub fn get_speech_unicode_file(&self) -> &Locations {
-        return &self.speech_unicode.files;
+    pub fn get_speech_unicode_file(&self) ->(PathBuf, PathBuf) {
+        return (self.speech_unicode.files[0].as_ref().unwrap().to_path_buf(), self.speech_unicode_full.files[0].as_ref().unwrap().to_path_buf());
     }
 
     /// Return the speech rule style file locations.
@@ -563,8 +579,8 @@ impl PreferenceManager {
     }
 
     /// Return the unicode.yaml file locations.
-    pub fn get_braille_unicode_file(&self) -> &Locations {
-        return &self.braille_unicode.files;
+    pub fn get_braille_unicode_file(&self) -> (PathBuf, PathBuf) {
+        return (self.braille_unicode.files[0].as_ref().unwrap().to_path_buf(), self.braille_unicode_full.files[0].as_ref().unwrap().to_path_buf());
     }
 
     /// Return the definitions.yaml file locations.
@@ -638,7 +654,8 @@ impl PreferenceManager {
             let new_prefs = PreferenceManager::get_all_files(&rules_dir, self.user_prefs.clone(), self.pref_files.clone());
             let changed = FilesChanged {
                 rules: new_prefs.speech != self.speech,
-                unicode: new_prefs.speech_unicode != self.speech_unicode,
+                unicode_short: new_prefs.speech_unicode != self.speech_unicode,
+                unicode_full: new_prefs.speech_unicode != self.speech_unicode_full,
                 defs: new_prefs.defs != self.defs,
             };
             self.speech = new_prefs.speech;

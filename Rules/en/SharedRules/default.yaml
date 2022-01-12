@@ -1,65 +1,70 @@
 ---
 #default rules shared among several speech rules
 -
-   name: default
-   tag: math
-   match: "."
-   replace: [x: "*"]
+    name: default
+    tag: math
+    match: "."
+    replace: [x: "*"]
 -
-   name: default
-   tag: mrow
-   match: "."
-   replace: 
-      - insert:
-         nodes: "*"
-         replace: [pause: auto]
+    name: default
+    tag: mrow
+    match: "."
+    replace: 
+    - insert:
+        nodes: "*"
+        replace: [pause: auto]
 
 -
-   name: default
-   tag: [mi, mn, mo, mtext]
-   match: "."
-   replace:
+    name: default
+    tag: [mi, mn, mo, mtext]
+    match: "."
+    replace:
     - bookmark: "@id"
     - x: text()
+
 -
-   name: default
-   tag: ms
-   match: "."
-   replace: 
+    name: default
+    tag: ms
+    match: "."
+    replace: 
     - t: the string
     - pause: short
     - x: text()
+
 -
-   name: default
-   tag: mstyle
-   match: "."
-   replace: [x: "*"]
+    name: default
+    tag: mstyle
+    match: "."
+    replace: [x: "*"]
+
 -
-   name: simple-sub
-   tag: msub
-         # invisible comma -- want "x sub 1 1" without "end sub"
-   match: "IsNode(*[2], 'simple') or *[2][self::m:mrow][*[2][text()='\u2063']]"
-   replace:
-      - x: "*[1]"
-      - test:
-         if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
-         then: [t: sub]
-      - x: "*[2]"
+    name: simple-sub
+    tag:  particular-value-of
+            # invisible comma -- want "x sub 1 1" without "end sub"
+    match: "IsNode(*[2], 'simple') or *[2][self::m:mrow][*[2][text()='\u2063']]"
+    replace:
+        - x: "*[1]"
+        - test:
+            if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
+            then: [t: sub]
+        - x: "*[2]"
+
 -
-   name: default
-   tag: msub
-   match: "."
-   replace:
-      - x: "*[1]"
-      - t: "sub" 
-      - x: "*[2]"
-      - t: "end sub"
-      - pause: short
+    name: default
+    tag:  particular-value-of
+    match: "."
+    replace:
+        - x: "*[1]"
+        - t: "sub" 
+        - x: "*[2]"
+        - t: "end sub"
+        - pause: short
+
 -
-   name: default
-   tag: msubsup
-   match: "."
-   replace: 
+    name: default
+    tag: msubsup
+    match: "."
+    replace: 
     - x: "*[1]"
     - t: sub
     - x: "*[2]"
@@ -67,10 +72,10 @@
     - x: "*[3]"
     - t: power
 -
-   name: default
-   tag: munder
-   match: "."
-   replace: 
+    name: default
+    tag: munder
+    match: "."
+    replace: 
     - t: modified
     - x: "*[1]"
     - t: with
@@ -78,10 +83,10 @@
     - t: below
     
 -
-   name: default
-   tag: mover
-   match: "."
-   replace: 
+    name: default
+    tag: mover
+    match: "."
+    replace: 
     - t: modified
     - x: "*[1]"
     - t: with
@@ -89,10 +94,10 @@
     - t: above
     
 -
-   name: default
-   tag: munderover
-   match: "."
-   replace: 
+    name: default
+    tag: munderover
+    match: "."
+    replace: 
     - t: modified
     - x: "*[1]"
     - t: with
@@ -102,11 +107,11 @@
     - t: above
 
 -
-   name: default
-   tag: mtable
-   variables: [IsColumnSilent: false()]
-   match: "."
-   replace: 
+    name: default
+    tag: mtable
+    variables: [IsColumnSilent: false()]
+    match: "."
+    replace: 
     - t: table with
     - x: count(*)
     - test: 
@@ -126,10 +131,10 @@
   # Note: @notation can contain more than one value
   # The ordering below is the order in which words come out when there is more than one value
   # 
-   name: default
-   tag: menclose
-   match: "."
-   replace:
+    name: default
+    tag: menclose
+    match: "."
+    replace:
     - test:
         if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
         then: [t: box, pause: short]
@@ -238,33 +243,36 @@
     - pause: short
 
 -
-   name: semantics
-   tag: "semantics"
-   match: "*[@encoding='MathML-Presentation']"
-   replace: 
+    name: semantics
+    tag: "semantics"
+    match: "*[@encoding='MathML-Presentation']"
+    replace: 
     - x: "*[@encoding='MathML-Presentation']/*[1]" 
 
 -
-   name: semantics-default
-   tag: "semantics"
-   match: .
-   replace: 
+    name: semantics-default
+    tag: "semantics"
+    match: .
+    replace: 
     - x: "*[1]"
 
 -
-   name: default-children
-   tag: "*"
-   match: count(*)>0
-   replace: 
-    - t: unknown math m l element
-    - x: "name(.)"
-    - x: "*"
+    # uncaught intent -- speak as foo of arg1 comma arg2 ....
+    name: default-children
+    tag: "*"
+    match: count(*)>0
+    replace: 
+    - x: "translate(name(.), '-', ' ')"
+    - t: "of"
+    - pause: short
+    - insert:
+        nodes: "*"
+        replace: [t: "comma", pause: auto]
 
 -
-   name: default-text
-   tag: "*"
-   match: "."
-   replace: 
-    - t: unknown math m l element
-    - x: "name(.)"
-    - x: text()
+    # unknown leaf -- just speak the text -- could be a literal intent
+    name: default-text
+    tag: "*"
+    match: "."
+    replace: 
+    - x: translate(text(), '-', ' ')

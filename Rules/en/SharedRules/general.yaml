@@ -1,0 +1,399 @@
+---
+
+# number-sets are a little messy in that the base was converted to a number-set, so we have to match that (simple) case last
+-
+   name: pos-neg-number-sets
+   tag: number-sets
+   match: "*[2][text()='+' or text()='-']"
+   replace:
+   - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "the" 
+   - bookmark: "*[2]/@id"
+   - test:
+      - if: "*[2][text()='+']"
+        then: [t: "positive"]
+        else: [t: "negative"]
+   - bookmark: "*[1]/@id"
+   - test:
+      - if: "*[1][text()='ℂ']"
+        then: [t: complex numbers]
+      - else_if: "*[1][text()='ℕ']"
+        then: [t: natural numbers]
+      - else_if: "*[1][text()='ℚ']"
+        then: [t: rational numbers]
+      - else_if: "*[1][text()='ℝ']"
+        then: [t:  real numbers]
+      - else_if: "*[1][text()='ℤ']"
+        then: [t: integers]
+        else: [x: "*[1][text()]"]     # shouldn't happen
+
+
+-
+   # should be single digit integer at this point (e.g, R^3)
+   name: dimension-number-sets
+   tag: number-sets
+   match: "count(*)=2"
+   replace:
+   - bookmark: "*[1]/@id"
+   - test:
+      - if: "*[1][text()='ℂ']"
+        then: [t: "C"]
+      - else_if: "*[1][text()='ℕ']"
+        then: [t: "N"]
+      - else_if: "*[1][text()='ℚ']"
+        then: [t: "Q"]
+      - else_if: "*[1][text()='ℝ']"
+        then: [t:  "R"]
+      - else_if: "*[1][text()='ℤ']"
+        then: [t: "Z"]
+        else: [x: "*[1][text()]"]     # shouldn't happen
+   - bookmark: "*[2]/@id"
+   - x: "*[2]"
+
+-
+   name: simple-number-sets
+   tag: number-sets
+   match: "count(*)=0"
+   replace:
+   - bookmark: "@id"
+   - test:
+      - if: "text()='ℂ'"
+        then: [t: the complex numbers]
+      - else_if: "text()='ℕ'"
+        then: [t: the natural numbers]
+      - else_if: "text()='ℚ'"
+        then: [t: the rational numbers]
+      - else_if: "text()='ℝ'"
+        then: [t: the real numbers]
+      - else_if: "text()='ℤ'"
+        then: [t: the integers]
+        else: [x: text()]     # shouldn't happen
+
+
+-
+   name: real-part
+   tag: real-part
+   match: "."
+   replace: 
+   - bookmark: "@id"
+   - t: the real part
+
+-
+   name: imaginary-part
+   tag: imaginary-part
+   match: "."
+   replace: 
+   - bookmark: "@id"
+   - t: the imaginary part
+
+
+# rules on scripted vertical bars ('evaluated at')
+-
+   name: evaluated-at-2
+   tag: evaluate
+   match: "count(*)=2"
+   replace: 
+   - x: "*[1]"
+   - pause: auto
+   - t: evaluated at
+   - pause: auto
+   - x: "*[2]"
+
+-
+   name: evaluated-at-3
+   tag: evaluate
+   match: "count(*)=3"
+   replace: 
+   - x: "*[1]"
+   - pause: auto
+   - t: evaluated at
+   - pause: auto
+   - x: "*[3]"
+   - t: "minus the same expression evaluated at"
+   - x: "*[2]"
+
+-
+   name: binomial
+   tag: binomial
+   match: "."
+   replace: 
+   - x: "*[1]"
+   - t: choose
+   - x: "*[2]"
+
+-
+   name: default-interval
+   tag: interval
+   match: "."
+   replace:
+   - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "the" 
+   - test:
+      if: "*[1][text()='(']"
+      then_test:
+         if: "*[4][text()=')']"
+         then: [t: "open"] 
+         else: [t: "open closed"] 
+      else_test:
+         if: "*[4][text()=')']"
+         then: [t: "closed open"] 
+         else: [t: "closed"] 
+   - t: "interval" 
+   - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "from"
+      - x: "*[2]"
+      - t: "to"
+      - x: "*[3]"
+      else:
+      - x: "*[2]"
+      - t: "comma"
+      - x: "*[3]"
+
+
+-
+   name: absolute-value
+   tag: absolute-value
+   match: "."
+   replace: 
+   - test: 
+      if: "$Verbosity='Terse'"
+      then: [t: "absolute value"]
+      else: [t: "the absolute value of"]
+   - x: "*[1]"
+   - test:
+         if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
+         then: [pause: short]
+         else: [pause: short, t: end absolute value, pause: short]
+
+-
+   name: negative
+   tag: negative
+   match: "."
+   replace:
+      - bookmark: "./@id"
+      - t: "negative"
+      - x: "*[1]"
+
+-
+   name: positive
+   tag: positive
+   match: "."
+   replace:
+      - bookmark: "./@id"
+      - t: "positive"
+      - x: "*[1]"
+               
+-
+   name: bigop-both
+   tag: large-op
+   match: "count(*) = 3"
+   replace: 
+   - test: 
+      if: "$Verbosity!='Terse'"
+      then: {t: the}
+   - x: "*[1]"
+   - t: from
+   - x: "*[2]"
+   - t: to
+   - x: "*[3]"
+   - test:
+      if: "following-sibling::*"
+      then: [t: of]
+  
+-
+   name: bigop-under
+   tag: large-op
+   match: "."
+   replace: 
+   - test: 
+      if: "$Verbosity!='Terse'"
+      then: {t: the}
+   - x: "*[1]"
+   - t: over
+   - x: "*[2]"
+   - test:
+      if: "following-sibling::*"
+      then: [t: of]
+  
+-
+   name: bigop
+   tag: mrow
+   match: "count(*)=2 and IsLargeOp(*[1])"
+   replace: 
+    - test: 
+       if: "$Verbosity!='Terse'"
+       then: {t: the}
+    - x: "*[1]"
+    - t: of
+    - x: "*[2]"
+
+
+-
+   name: sin
+   tag: mi
+   match: "text()='sin'"
+   replace:
+      - bookmark: "@id"
+      - t: "sine"
+-
+   name: cos
+   tag: mi
+   match: "text()='cos'"
+   replace:
+      - bookmark: "@id"
+      - test: 
+         if: "$Verbosity='Terse'"
+         then: {t: cos}
+         else: {t: cosine}
+-
+   name: tan
+   tag: mi
+   match: "text()='tan'"
+   replace:
+      - bookmark: "@id"
+      - test: 
+         if: "$Verbosity='Terse'"
+         then: {t: tan}
+         else: {t: tangent}
+-
+   name: sec
+   tag: mi
+   match: "text()='sec'"
+   replace:
+      - bookmark: "@id"
+      - test: 
+         if: "$Verbosity='Terse'"
+         then: {t: seek}
+         else: {t: secant}
+-
+   name: csc
+   tag: mi
+   match: "text()='csc'"
+   replace:
+      - bookmark: "@id"
+      - test: 
+         if: "$Verbosity='Terse'"
+         then: {t: co-seek}
+         else: {t: co-secant}
+-
+   name: cot
+   tag: mi
+   match: "text()='cot'"
+   replace:
+      - bookmark: "@id"
+      - test: 
+         if: "$Verbosity='Terse'"
+         then: {t: co-tan}
+         else: {t: co-tangent}
+
+-
+   name: sinh
+   tag: mi
+   match: "text()='sinh'"
+   replace:
+      - bookmark: "@id"
+      - test: 
+         if: "$Verbosity='Terse'"
+         then: {t: sinch}
+         else: {t: hyperbolic sine}
+-
+   name: cosh
+   tag: mi
+   match: "text()='cosh'"
+   replace:
+      - bookmark: "@id"
+      - test: 
+         if: "$Verbosity='Terse'"
+         then: {t: cosh}
+         else: {t: hyperbolic cosine}
+-
+   name: tanh
+   tag: mi
+   match: "text()='tanh'"
+   replace:
+      - bookmark: "@id"
+      - test: 
+         if: "$Verbosity='Terse'"
+         then: {t: tanch}
+         else: {t: hyperbolic tangent}
+-
+   name: sech
+   tag: mi
+   match: "text()='sech'"
+   replace:
+      - bookmark: "@id"
+      - test: 
+         if: "$Verbosity='Terse'"
+         then: {t: sheck}
+         else: {t: hyperbolic secant}
+-
+   name: csch
+   tag: mi
+   match: "text()='csch'"
+   replace:
+      - bookmark: "@id"
+      - test: 
+         if: "$Verbosity='Terse'"
+         then: {t: co-sheck}
+         else: {t: hyperbolic co-secant}
+-
+   name: coth
+   tag: mi
+   match: "text()='coth'"
+   replace:
+      - bookmark: "@id"
+      - test: 
+         if: "$Verbosity='Terse'"
+         then: {t: co-tanch}
+         else: {t: hyperbolic co-tangent}
+
+-  # handle both log and ln
+   name: log
+   tag: mrow
+   variables: [log_is_simple: "IsNode(*[3],'simple')"]
+   match:
+      - "count(*)=3 and"
+      - "*[1][self::m:mi][text()='log' or text()='ln'] and"
+      - "*[2][self::m:mo][text()='\u2061']"
+   replace:
+      - bookmark: "*[1]/@id"
+      - test:
+         if: "$log_is_simple"
+         then_test:
+            - if: "*[1][text()='log']"
+              then: [t: log]
+            - else_if: "$Verbosity='Terse'"
+              then: [spell: ln]
+              else: [t: natural log]
+         else:
+            - test: 
+               if: "$Verbosity!='Terse' and not(log_is_simple)"
+               then: {t: the}
+            - test:
+               - if: "*[1][text()='log']"
+                 then: [t: log]
+               - else_if: "$Verbosity='Terse'"
+                 then: [spell: ln]
+                 else: [t: natural log]
+            - t: of
+            - pause: short
+      - x: "*[3]"
+
+-
+   name: log-base
+   tag: log-base
+   match: "."
+   replace:
+      - bookmark: "@id"
+      - test: 
+         if: "$Verbosity!='Terse'"
+         then: {t: the}
+      - t: log base
+      - x: "*[1]"
+

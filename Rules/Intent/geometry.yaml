@@ -1,0 +1,53 @@
+---
+# Geometry related intent inferences
+-
+  name: geometry-line-segment
+  tag: mover
+  match:
+    - "*[2][self::m:mo][text()='¯'] and"
+    - "*[1][self::m:mrow][count(*)=3 and "
+    - "     *[1][self::m:mi and string-length(text()) and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())] and"
+    - "     *[2][self::m:mo and (text()='\u2062' or text()='\u2063')] and"
+    - "     *[3][self::m:mi and string-length(text()) and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]"
+    - "                  ]"
+  replace:
+  - intent:
+      name: "line-segment"
+      children:
+      - x: "*[1]/*[1]"
+      - x: "*[1]/*[3]"
+
+-
+  name: geometry-ray
+  tag: mover
+  match:
+    - "*[2][self::m:mo][text()='→'] and"  # u2192
+    - "*[1][self::m:mrow][count(*)=3 and "
+    - "     *[1][self::m:mi and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())] and"
+    - "     *[2][self::m:mo and (text()='\u2062' or text()='\u2063')] and"
+    - "     *[3][self::m:mi and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]"
+    - "                  ]"
+  replace:
+  - intent:
+      name: "ray"
+      children:
+      - x: "*[1]/*[1]"
+      - x: "*[1]/*[3]"
+
+-
+  name: geometry-arc
+  tag: mover
+  match:
+    - "*[2][self::m:mo][text()='⌒'] and"  # u2192
+    - "*[1][self::m:mrow][count(*)=3 and "
+    - "     *[1][self::m:mi and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())] and"
+    - "     *[2][self::m:mo and (text()='\u2062' or text()='\u2063')] and"
+    - "     *[3][self::m:mi and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]"
+    - "    ]"
+  replace:
+  - intent:
+      name: "arc"
+      children:
+      - x: "*[1]/*[1]"
+      - x: "*[1]/*[3]"
+

@@ -51,7 +51,7 @@ fn msup_complex() {
                     <mn>2</mn>
                 </msup>
                 </math>";
-    test("SimpleSpeak", expr, "c 2");
+    test("SimpleSpeak", expr, "C 2");
 }
 
 #[test]
@@ -62,7 +62,7 @@ fn msup_natural() {
                     <mn>2</mn>
                 </msup>
             </math>";
-    test("SimpleSpeak", expr, "n 2");
+    test("SimpleSpeak", expr, "N 2");
 }
 
 #[test]
@@ -73,7 +73,7 @@ fn msup_rationals() {
                     <mn>2</mn>
                 </msup>
             </math>";
-    test("SimpleSpeak", expr, "q 2");
+    test("SimpleSpeak", expr, "Q 2");
 }
 
 #[test]
@@ -84,7 +84,7 @@ fn msup_reals() {
                     <mn>3</mn>
                 </msup>
             </math>";
-    test("SimpleSpeak", expr, "r 3");
+    test("SimpleSpeak", expr, "R 3");
 }
 
 #[test]
@@ -95,7 +95,7 @@ fn msup_integers() {
                     <mn>4</mn>
                 </msup>
             </math>";
-    test("SimpleSpeak", expr, "z 4");
+    test("SimpleSpeak", expr, "Z 4");
 }
 
 #[test]
@@ -235,5 +235,5 @@ fn complicated_set_with_mtext() {
         <mo>}</mo>
         </math>";
     test("SimpleSpeak", expr, 
-            "the set of all x an element of the natural numbers such that x is\u{a0}an\u{a0}even\u{a0}number");
+            "the set of all x an element of the natural numbers such that x \u{a0}is\u{a0}an\u{a0}even\u{a0}number");
 }

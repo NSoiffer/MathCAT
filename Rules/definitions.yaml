@@ -3,90 +3,112 @@
 #   name: [ "...", "..." "..." ]
 
 [
-    # ---------------- Large Operators  ----------------------------------
-    LargeOperators: [
-        "⅀", # double struck
-        "∏", "∐", "∑", "⋀", "⋁", "⋂", "⋃", "⨀", "⨁", "⨂", "⨃", "⨄", "⨅",
-        "⨆", "⨇", "⨈", "⨉", "⨊", "⨋", "⫼", "⫿",
-        "∫", "∬", "∭", "∮", "∯", "∰", "∱", "∲", "∳", "⨌", "⨍", "⨎", "⨏",
-        "⨐", "⨑", "⨒", "⨓", "⨔", "⨕", "⨖", "⨗", "⨘", "⨙", "⨚", "⨛", "⨜"
-    ],
+  # ---------------- Large Operators  ----------------------------------
+  LargeOperators: [
+    "⅀", # double struck
+    "∏", "∐", "∑", "⋀", "⋁", "⋂", "⋃", "⨀", "⨁", "⨂", "⨃", "⨄", "⨅",
+    "⨆", "⨇", "⨈", "⨉", "⨊", "⨋", "⫼", "⫿",
+    "∫", "∬", "∭", "∮", "∯", "∰", "∱", "∲", "∳", "⨌", "⨍", "⨎", "⨏",
+    "⨐", "⨑", "⨒", "⨓", "⨔", "⨕", "⨖", "⨗", "⨘", "⨙", "⨚", "⨛", "⨜"
+  ],
 
 
-    # ----------------  Function Names  ------------------------------------
-    # these are always considered to be function names, so "sin x" will be interpreted as "sin" applied to "x", not times
-    # Note: the log functions follow the same syntax rules as trig functions, so they are included here
-    TrigFunctionNames: [
-        "cos", "cosec", "cosech", "cosh", "cot", "cotan", "cotanh", "coth", "csc", "csch",
-        "sec", "sech", "sin", "sinh", "tan", "tang", "tanh", "tg", "ln", "log", "lg"    
-    ],
+  # ----------------  Function Names  ------------------------------------
+  # these are always considered to be function names, so "sin x" will be interpreted as "sin" applied to "x", not times
+  # Note: the log functions follow the same syntax rules as trig functions, so they are included here
+  TrigFunctionNames: [
+    "cos", "cosec", "cosech", "cosh", "cot", "cotan", "cotanh", "coth", "csc", "csch",
+    "sec", "sech", "sin", "sinh", "tan", "tang", "tanh", "tg", "ln", "log", "lg"    
+  ],
 
-    AdditionalFunctionNames: [
-        // the arcXXX functions aren't really trig functions (they are inverse functions)
-        "arccos", "arccosec", "arccosech", "arccosh",
-        "arccot", "arccotan", "arccotanh", "arccoth",
-        "arccsc", "arccsch", "arcsec", "arcsech", "arcsin", "arcsinh",
-        "arctan", "arctang", "arctanh",
-        "exp", "Exp", "expt", "arg", "im", "Im", "re", "Re", "Pr", "cis",
-        "gcd", "lcm",
-        "min", "max", "deg", "det",
-        "dim", "hom", "ker", "tr", "Tr",
-        "inf", "lim", "liminf", "limsup", "max", "min", "sup",
-        "injlim", "projlim", "inj lim", "proj lim",
+  AdditionalFunctionNames: [
+    // the arcXXX functions aren't really trig functions (they are inverse functions)
+    "arccos", "arccosec", "arccosech", "arccosh",
+    "arccot", "arccotan", "arccotanh", "arccoth",
+    "arccsc", "arccsch", "arcsec", "arcsech", "arcsin", "arcsinh",
+    "arctan", "arctang", "arctanh",
+    "exp", "Exp", "expt", "arg", "im", "Im", "ℑ", re", "Re", "ℜ", "Pr", "cis",
+    "gcd", "lcm",
+    "min", "max", "deg", "det",
+    "dim", "hom", "ker", "tr",
+    "Dim", "Hom", "Ker", "Tr",
+    "inf", "lim", "liminf", "limsup", "max", "min", "sup",
+    "injlim", "projlim", "inj lim", "proj lim",
 
-        # these come from the nemeth book (Rule XVII)
-        "arc",
-        "amp", "amplitude",
-        "antilog", "antilogarithm",
-        "arg", "argument",
-        "colog", "cologarithm",
-        "cosine",
-        "hyperbolic cosine",
-        "cotangent",
-        "hyperbolic cotangent",
-        "covers", "coversine",
-        "cosecant",
-        "hyperbolic cosecant",
-        "ctn",
-        "ctnh",
-        "determinant",
-        "erf", "error function",
-        "exponential",
-        "exsec", "exsecant",
-        "grad", "gradient",
-        "hav", "haversine",
-        "limit",
-        "upper limit",
-        "lower limit",
-        "natural logarithm",
-        "logarithm",
-        "maximum",
-        "minimum",
-        "real part",
-        "secant",
-        "hyperbolic secant",
-        "sine",
-        "hyperbolic sine",
-        "supremum",
-        "tangent",
-        "hyperbolic tangent",
-        "vers", "versine"
-    ],
+    # these come from the nemeth book (Rule XVII)
+    "arc",
+    "amp", "amplitude",
+    "antilog", "antilogarithm",
+    "arg", "argument",
+    "colog", "cologarithm",
+    "cosine",
+    "hyperbolic cosine",
+    "cotangent",
+    "hyperbolic cotangent",
+    "covers", "coversine",
+    "cosecant",
+    "hyperbolic cosecant",
+    "ctn",
+    "ctnh",
+    "determinant",
+    "erf", "error function",
+    "exponential",
+    "exsec", "exsecant",
+    "grad", "gradient",
+    "hav", "haversine",
+    "limit",
+    "upper limit",
+    "lower limit",
+    "natural logarithm",
+    "logarithm",
+    "maximum",
+    "minimum",
+    "real part",
+    "secant",
+    "hyperbolic secant",
+    "sine",
+    "hyperbolic sine",
+    "supremum",
+    "tangent",
+    "hyperbolic tangent",
+    "vers", "versine"
+  ],
 
-    # common names of functions along with a capital letter followed more one or more letters
-    # these will be interpreted as functions when followed by parens as in f(x+y)
-    # other variables will be interpreted as functions when there is a "," in the parens as in t(x,a)
-    # FIX: Also useful to define are multi-letter function names that start with a capital letter: "[A-Za-z]+"
-    # FIX: That's not currently possible, so the canonicalize function builds that in. Should be externally-definable
-    LikelyFunctionNames: [
-        "f", "g", "h", "F", "G", "H"
-    ],
+  # common names of functions along with a capital letter followed more one or more letters
+  # these will be interpreted as functions when followed by parens as in f(x+y)
+  # other variables will be interpreted as functions when there is a "," in the parens as in t(x,a)
+  # FIX: Also useful to define are multi-letter function names that start with a capital letter: "[A-Za-z]+"
+  # FIX: That's not currently possible, so the canonicalize function builds that in. Should be externally-definable
+  LikelyFunctionNames: [
+      "f", "g", "h", "F", "G", "H"
+  ],
 
-    # probably need to expand, but these are ones that have braille codes and are in the op dict
-    GeometryPrefixOperators: [
-        '∟', '∠', '∡', '∢', '⊾', '⊿',
-        '△', '▷', '▽', '◁'
-    ],
+  # probably need to expand, but these are ones that have braille codes and are in the op dict
+  GeometryPrefixOperators: [
+      '∟', '∠', '∡', '∢', '⊾', '⊿',
+  ],
+
+  # note: the u+2500 are shapes, but they should be <mi>s that will potentially make use of invisible function application
+  # so that △ABC makes sense since △ and the other shapes are not in the operator dictionary.
+  GeometryShapes: [
+    '■','□','▢','▣','▤','▥','▦','▧','▨','▩','▪','▫','▬','▭','▮','▯',
+    '▰','▱','▲','△','▴','▵','▶','▷','▸','▹','►','▻','▼','▽','▾','▿',
+    '◀','◁','◂','◃','◄','◅','◆','◇','◈','◉','◊','○','◌','◍','◎','●',
+    '◐','◑','◒','◓','◔','◕','◖','◗','◘','◙','◚','◛','◜','◝','◞','◟',
+    '◠','◡','◢','◣','◤','◥','◦','◧','◨','◩','◪','◫','◬','◭','◮','◯',
+    '◰','◱','◲','◳','◴','◵','◶','◷','◸','◹','◺','◻','◼','◽','◾', '◿',
+  ],
+
+  SubsetOperators: [
+    "⋢", "⋣", "⋤", "⋥", "⊂", "⊃", "⊄", "⊅", "⊆", "⊇", "⊈", "⊉", "⊊", "⊋",
+    "⊏", "⊐", "⊑", "⊒", "⪽", "⪾", "⪿", "⫀", "⫁", "⫂", "⫃", "⫄", "⫅", "⫆",
+    "⫇", "⫈", "⫉", "⫊", "⫋", "⫌", "⫍", "⫎", "⫏", "⫐", "⫑", "⫒", "⫓", "⫔",
+    "⫕", "⫖", "⫗", "⫘", "⋐", "⋑", "⋪", "⋫", "⋬", "⋭", "⊲", "⊳", "⊴", "⊵",
+
+    "∈", "∊", "⋲", "⋳", "⋴", "⋵", "⋶", "⋷", "⋸", "⋹", "⋿",
+
+    "∋", "∍", "⋺", "⋻", "⋼", "⋽", "⋾",
+  ],
 
   # these come from SRE's ts\semantic_tree\semantic_attr.ts file
   NemethComparisonOperators: [

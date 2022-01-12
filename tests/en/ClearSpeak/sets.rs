@@ -51,7 +51,7 @@ fn msup_complex() {
                     <mn>2</mn>
                 </msup>
                 </math>";
-    test("ClearSpeak", expr, "c 2");
+    test("ClearSpeak", expr, "C 2");
 }
 
 #[test]
@@ -62,7 +62,7 @@ fn msup_natural() {
                     <mn>2</mn>
                 </msup>
             </math>";
-    test("ClearSpeak", expr, "n 2");
+    test("ClearSpeak", expr, "N 2");
 }
 
 #[test]
@@ -73,7 +73,7 @@ fn msup_rationals() {
                     <mn>2</mn>
                 </msup>
             </math>";
-    test("ClearSpeak", expr, "q 2");
+    test("ClearSpeak", expr, "Q 2");
 }
 
 #[test]
@@ -84,7 +84,7 @@ fn msup_reals() {
                     <mn>3</mn>
                 </msup>
             </math>";
-    test("ClearSpeak", expr, "r 3");
+    test("ClearSpeak", expr, "R 3");
 }
 
 #[test]
@@ -95,7 +95,7 @@ fn msup_integers() {
                     <mn>4</mn>
                 </msup>
             </math>";
-    test("ClearSpeak", expr, "z 4");
+    test("ClearSpeak", expr, "Z 4");
 }
 
 #[test]

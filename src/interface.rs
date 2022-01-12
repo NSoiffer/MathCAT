@@ -8,8 +8,6 @@
 //! AT can pass key strokes to allow a user to navigate the MathML by calling [`DoNavigateKeyPress`]; the speech is returned.
 //! To get the MathML associated with the current navigation node, call [`GetNavigationMathML`].
 //!
-//! TODO: Braille generation and navigation are just stubs at the moment.
-//!
 //! When calling from `main`, getting speech is done with [`speak_mathml`] which will parse the MathML, canonicalize it,
 //! then invoke the speech rules on it.
 
@@ -33,7 +31,7 @@ fn cleanup_mathml(mathml: Element) -> Element {
     trim_element(&mathml);
     let mathml = crate::canonicalize::canonicalize(mathml);
     let mathml = add_ids(mathml);
-    return crate::infer_intent::infer_intent(mathml);
+    return mathml;
 }
 
 /// Given MathML, a string is return.
@@ -47,10 +45,13 @@ pub fn speak_mathml(mathml_str: &str) -> String {
         eprintln!("Error in parsing MathML: {}.\nThe MathML is:\n{}", e.to_string(), mathml_str);       // FIX: log 
         return "Invalid MathML. Unable to speak math.".to_string();
     };
-    let package = package.unwrap();
-    cleanup_mathml(get_element(&package));
-    let mathml = get_element(&package);
-    return crate::speech::speak_mathml(mathml);
+    let parse_package = package.unwrap();
+    let mathml = cleanup_mathml(get_element(&parse_package));
+
+    let infer_package = Package::new();
+    let intent = crate::speech::intent_from_mathml(mathml, infer_package.as_document());
+    debug!("Intent tree:\n{}", mml_to_string(&intent));
+    return crate::speech::speak_intent(intent);
 }
 
 /// Given MathML, a Unicode braille string is return.
@@ -112,7 +113,10 @@ pub fn GetSpokenText() -> Result<String> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
-        let speech = crate::speech::speak_mathml(mathml);
+        let new_package = Package::new();
+        let intent = crate::speech::intent_from_mathml(mathml, new_package.as_document());
+        debug!("Intent tree:\n{}", mml_to_string(&intent));
+        let speech = crate::speech::speak_intent(intent);
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( speech );
     });
@@ -292,6 +296,19 @@ pub fn DoNavigateKeyPress(key: usize, shift_key: bool, control_key: bool, alt_ke
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
         return do_navigate_key_press(mathml, key, shift_key, control_key, alt_key, meta_key);
+    });
+}
+
+pub fn DoNavigateCommand(command: String) -> Result<String> {
+    let command = NAV_COMMANDS.get_key(&command);       // gets a &'static version of the command
+    if command.is_none() {
+        bail!("Unknown command in call to DoNavigateCommand()");
+    };
+    let command = *command.unwrap();
+    return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&*package_instance);
+        return do_navigate_command_string(mathml, command);
     });
 }
 
@@ -550,10 +567,12 @@ mod tests {
         let package1 = &parser::parse(str1).expect("Failed to parse input");
         let doc1 = package1.as_document();
         trim_doc(&doc1);
+        debug!("doc1:\n{}", mml_to_string(&get_element(&package1)));
         
         let package2 = parser::parse(str2).expect("Failed to parse input");
         let doc2 = package2.as_document();
         trim_doc(&doc2);
+        debug!("doc2:\n{}", mml_to_string(&get_element(&package2)));
             
         is_same_doc(&doc1, &doc2)
     }
@@ -566,14 +585,14 @@ mod tests {
 
     #[test]
     fn trim_whitespace() {
-        let trimmed_str = "<math><mrow><mo>-</mo><mi>a</mi></mrow></math>";
+        let trimmed_str = "<math><mrow><mo>-</mo><mi> a </mi></mrow></math>";
         let whitespace_str = "<math> <mrow ><mo>-</mo><mi> a </mi></mrow ></math>";
         assert!(are_parsed_strs_equal(trimmed_str, whitespace_str));
     }
 
     #[test]
     fn no_trim_whitespace_nbsp() {
-        let trimmed_str = "<math><mrow><mo>-</mo><mtext>&#x00A0;a</mtext></mrow></math>";
+        let trimmed_str = "<math><mrow><mo>-</mo><mtext> &#x00A0;a </mtext></mrow></math>";
         let whitespace_str = "<math> <mrow ><mo>-</mo><mtext> &#x00A0;a </mtext></mrow ></math>";
         assert!(are_parsed_strs_equal(trimmed_str, whitespace_str));
     }
@@ -581,7 +600,7 @@ mod tests {
     #[test]
     fn trim_comment() {
         let whitespace_str = "<math> <mrow ><mo>-</mo><mi> a </mi></mrow ></math>";
-        let comment_str = "<math><mrow><mo>-</mo><!--a comment --><mi>a</mi></mrow></math>";
+        let comment_str = "<math><mrow><mo>-</mo><!--a comment --><mi> a </mi></mrow></math>";
         assert!(are_parsed_strs_equal(comment_str, whitespace_str));
     }
  

@@ -82,7 +82,7 @@ use sxd_xpath::nodeset::Node;
 pub fn pp_xpath_value(value: Value) {
     debug!("XPath value:");
     if let Value::Nodeset(nodeset) = &value {
-        for node in nodeset {
+        for node in nodeset.document_order() {
             match node {
                 Node::Element(el) => {debug!("{}", crate::pretty_print::format_element(&el, 1))},
                 Node::Text(t) =>  {debug!("found Text value: {}", t.text())},

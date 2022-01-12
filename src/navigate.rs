@@ -7,23 +7,41 @@
 use std::cell::RefCell;
 use sxd_xpath::{Context, Factory, Value};
 use sxd_document::dom::Element;
+use sxd_document::Package;
+
 use std::fmt;
 use crate::pretty_print::mml_to_string;
 use crate::speech::{NAVIGATION_RULES, CONCAT_INDICATOR, CONCAT_STRING};
 use std::time::{Instant};
 use crate::errors::*;
 use crate::canonicalize::as_element;
+use phf::phf_set;
 
 
 
 const MAX_PLACE_MARKERS: usize = 10;
 
-//use sxd_document::dom::*;
 thread_local!{
     /// The current set of navigation rules
     pub static NAVIGATION_STATE: RefCell<NavigationState> =
             RefCell::new( NavigationState::new() );
 }
+
+pub static NAV_COMMANDS: phf::Set<&str> = phf_set! {
+    "MovePrevious", "MoveNext", "MoveStart", "MoveEnd", "MoveLineStart", "MoveLineEnd", 
+    "MoveCellPrevious", "MoveCellNext", "MoveCellUp", "MoveCellDown", "MoveColumnStart", "MoveColumnEnd", 
+    "ZoomIn", "ZoomOut", "ZoomOutAll", "ZoomInAll", 
+    "MoveLastLocation", 
+    "ReadPrevious", "ReadNext", "ReadCurrent", "ReadCellCurrent", "ReadStart", "ReadEnd", "ReadLineStart", "ReadLineEnd", 
+    "DescribePrevious", "DescribeNext", "DescribeCurrent", 
+    "WhereAmI", "WhereAmIAll", 
+    "ToggleZoomLockUp", "ToggleZoomLockDown", "ToggleSpeakMode", 
+    "Exit", 
+    "MoveTo0","MoveTo1","MoveTo2","MoveTo3","MoveTo4","MoveTo5","MoveTo6","MoveTo7","MoveTo8","MoveTo9",
+    "Read0","Read1","Read2","Read3","Read4","Read5","Read6","Read7","Read8","Read9",
+    "Describe0","Describe1","Describe2","Describe3","Describe4","Describe5","Describe6","Describe7","Describe8","Describe9",
+    "SetPlacemarker0","SetPlacemarker1","SetPlacemarker2","SetPlacemarker3","SetPlacemarker4","SetPlacemarker5","SetPlacemarker6","SetPlacemarker7","SetPlacemarker8","SetPlacemarker9",
+};
 
 #[derive(Clone, PartialEq, Debug)]
 struct NavigationPosition {
@@ -230,9 +248,9 @@ pub fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> 
 }
 
 fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>) -> (Option<String>, Option<f64>) {
-   // First return tuple value is string-value (if string, bool, or single node) or None
-   // Second return tuple value is f64 if variable is a number or None
-   // This is ridiculously complicated for what in the end is a hashmap lookup
+    // First return tuple value is string-value (if string, bool, or single node) or None
+    // Second return tuple value is f64 if variable is a number or None
+    // This is ridiculously complicated for what in the end is a hashmap lookup
     // There isn't an API that lets us get at the value, so we have to setup/build/evaluate an xpath
     // Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate() 
     let factory = Factory::new();
@@ -296,7 +314,7 @@ fn do_navigate_command<'a>(mathml: Element<'a>, command: NavigationCommand, para
     return do_navigate_command_string(mathml, navigation_command_string(command, param));
 }
 
-fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str) -> Result<String> {
+pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str) -> Result<String> {
     // If no speech happened for some calls, we try the call the call again (e.g, no speech for invisible times).
     // To prevent to infinite loop, we limit the number of tries
     const LOOP_LIMIT: usize = 3;
@@ -324,7 +342,8 @@ fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str
                     mut_rules.update();    
                 }
                 let rules = rules.borrow();
-                let mut rules_with_context = crate::speech::SpeechRulesWithContext::new(&rules, "".to_string()); 
+                let new_package = Package::new();
+                let mut rules_with_context = crate::speech::SpeechRulesWithContext::new(&rules, new_package.as_document(), "".to_string()); 
                 
                 // if nav_state.mode.is_empty() {
                     nav_state.mode = rules.pref_manager.as_ref().borrow().get_user_prefs().to_string("NavMode");
@@ -356,7 +375,7 @@ fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str
                 };
 
                 // Finally, apply the navigation rules
-                let speech = match rules_with_context.match_pattern(&start_node) {
+                let speech = match rules_with_context.match_pattern::<String>(start_node) {
                     Ok(speech_string) => {
                         rules.pref_manager.borrow().get_tts()
                             .merge_pauses(crate::speech::remove_optional_indicators(
@@ -421,7 +440,7 @@ fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str
                 let nav_mathml = get_node_by_id(mathml, &nav_position.current_node);
                 if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", mathml).0.unwrap() == "true" {
                     // Speak/Overview of where we landed (if we are supposed to speak it)
-                    let node_speech = speak(nav_mathml.unwrap(), use_read_rules);
+                    let node_speech = speak(&mut rules_with_context, nav_mathml.unwrap(), use_read_rules)?;
                     if !node_speech.is_empty() {
                         pop_stack(&mut nav_state, loop_count);
                         return Ok( speech + &node_speech );
@@ -469,12 +488,12 @@ fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str
     }
 }
 
-fn speak(mathml: Element, full_read: bool) -> String {
+fn speak<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut crate::speech::SpeechRulesWithContext<'c,'s,'m>, mathml: Element<'c>, full_read: bool) -> Result<String> {
     if full_read {
-        return crate::speech::speak_mathml(mathml);
+        return Ok( crate::speech::speak_intent(crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())) );
     } else {
         // FIX: overview not implemented
-        return crate::speech::overview_mathml(mathml);
+        return Ok( crate::speech::overview_mathml(mathml) );
     }
 }
 
@@ -771,19 +790,11 @@ fn navigation_command_string(command: NavigationCommand, param: NavigationParam)
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused_imports)]
+    use crate::init_logger;
     use crate::interface::*;
 
-    #[cfg(test)]
-    fn init_logger() {
-        env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug"))
-            .is_test(true)
-            .format_timestamp(None)
-            .format_module_path(false)
-            .format_indent(None)
-            .format_level(false)
-            .init();
-    }
-    
+    #[cfg(test)]    
     fn test_command(command: &'static str, mathml: Element, result_id: &str) -> Result<String> {
         let nav_speech = do_navigate_command_string(mathml, command)?;
         debug!("Full speech: {}", nav_speech);
@@ -961,7 +972,7 @@ mod tests {
     
     #[test]
     fn move_right_sup() -> Result<()> {
-        init_logger();
+        // init_logger();
         let mathml_str = "<math display='block' id='Msowudr8-0' data-id-added='true'>
         <mrow data-changed='added' id='Msowudr8-1' data-id-added='true'>
           <msup id='Msowudr8-2' data-id-added='true'>
@@ -1014,7 +1025,7 @@ mod tests {
     
     #[test]
     fn move_right_char() -> Result<()> {
-        // init_logger();
+        // gger();
         let mathml_str = "<math id='Myt3m7mx-0' data-id-added='true'>
         <mrow displaystyle='true' id='Myt3m7mx-1' data-id-added='true'>
           <mi id='Myt3m7mx-2' data-id-added='true'>x</mi>

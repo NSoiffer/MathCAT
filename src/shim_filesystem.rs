@@ -72,7 +72,7 @@ cfg_if! {
             return Ok( path.to_path_buf() );
         }
         
-        pub fn read_to_string_shim(path: &PathBuf) -> Result<String, crate::errors::Error> {
+        pub fn read_to_string_shim(path: &Path) -> Result<String, crate::errors::Error> {
             use std::io::Cursor;
             use std::io::Read;
             static ZIPPED_FILES: &'static [u8] = include_bytes!("..\\Rules.zip");
@@ -117,7 +117,7 @@ cfg_if! {
             OVERRIDE_FILE_CONTENTS.with(|contents| *contents.borrow_mut() = file_contents.to_string());
             crate::speech::NAVIGATION_RULES.with(|nav_rules|
                 nav_rules.borrow_mut().invalidate(
-                    crate::prefs::FilesChanged{ rules: true, unicode: false, defs: false }
+                    crate::prefs::FilesChanged{ rules: true, unicode_short: false, unicode_full: false, defs: false }
             ));
         }
 
@@ -129,24 +129,33 @@ cfg_if! {
                     parser::parse(r"
                     <dir name='Rules'>
                     <file name='definitions.yaml'/>
-                    <file name='infer.yaml'/>
+                    <file name='intent.yaml'/>
                     <file name='prefs.yaml'/>
+                    <dir name='Intent'>
+                        <file name='general.yaml'/>
+                        <file name='geometry.yaml'/>
+                        <file name='linear-algebra.yaml'/>
+                    </dir>
                     <dir name='Nemeth'>
                         <file name='Nemeth_Rules.yaml'/>
                         <file name='unicode.yaml'/>
+                        <file name='unicode-full.yaml'/>
                     </dir>
                     <dir name='en'>
+                        <dir name='SharedRules'>
+                            <file name='default.yaml'/>
+                            <file name='general.yaml'/>
+                            <file name='geometry.yaml'/>
+                            <file name='linear-algebra.yaml'/>
+                            <file name='menclose.yaml'/>
+                        </dir>
                         <file name='ClearSpeak_Rules.yaml'/>
-                        <file name='menclose.yaml'/>
-                        <file name='unicode.yaml'/>
-                        <file name='common-rules.yaml'/>
-                        <file name='navigate.yaml'/>
-                        <file name='unicode.yaml'/>
-                        <file name='unicode-all.yaml'/>
-                        <file name='default-rules.yaml'/>
-                        <file name='overview.yaml'/>
                         <file name='definitions.yaml'/>
+                        <file name='navigate.yaml'/>
+                        <file name='overview.yaml'/>
                         <file name='SimpleSpeak_Rules.yaml'/>
+                        <file name='unicode.yaml'/>
+                        <file name='unicode-full.yaml'/>
                     </dir>
                     </dir>")
                     .expect("Internal error in creating web assembly files: didn't parse initializer string")
@@ -166,7 +175,7 @@ cfg_if! {
             return path.canonicalize();
         }
         
-        pub fn read_to_string_shim(path: &PathBuf) -> Result<String> {
+        pub fn read_to_string_shim(path: &Path) -> Result<String> {
             return std::fs::read_to_string(path).chain_err(|| format!("while trying to read {}", path.to_str().unwrap()));
         }     
     }

@@ -509,7 +509,7 @@ fn matrix_4x2() {
 // put absolute value test here since it is related to determinate and is small for its own file
 #[test]
 fn simple_absolute_value() {
-let expr = "<math>
+  let expr = "<math>
     <mrow><mrow><mo>|</mo> <mi>x</mi> <mo>|</mo></mrow></mrow>
   </math>";
   test("ClearSpeak", expr, "the absolute value of x");
@@ -940,10 +940,10 @@ test_ClearSpeak("ClearSpeak_Matrix", "EndVector",
 
 #[test]
 fn matrix_binomial() {
-let expr = "<math>
-    <mo>(</mo><mrow>
-      <mtable><mtr><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd></mtr></mtable>
-    </mrow><mo>)</mo>
-  </math>";
-test_ClearSpeak("ClearSpeak_Matrix", "Combinatorics", expr, "3 choose 2");
+  let expr = "<math>
+      <mo>(</mo><mrow>
+        <mtable><mtr><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd></mtr></mtable>
+      </mrow><mo>)</mo>
+    </math>";
+  test_ClearSpeak("ClearSpeak_Matrix", "Combinatorics", expr, "3 choose 2");
 }

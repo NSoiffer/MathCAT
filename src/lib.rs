@@ -41,3 +41,15 @@ pub mod definitions;
 pub mod pretty_print;
 
 pub mod shim_filesystem;
+
+#[cfg(test)]
+#[allow(dead_code)] 
+pub fn init_logger() {
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug"))
+        .is_test(true)
+        .format_timestamp(None)
+        .format_module_path(false)
+        .format_indent(None)
+        .format_level(false)
+        .init();
+}
