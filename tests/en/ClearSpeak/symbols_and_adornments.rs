@@ -268,7 +268,7 @@ fn vertical_line_evaluated_at() {
             </msub>
         </math>";
     test_ClearSpeak("ClearSpeak_VerticalLine", "Auto", expr,
-        "f of x, evaluated at x equals 5");
+        "f of x evaluated at x equals 5");
 }
 
 #[test]
@@ -287,7 +287,7 @@ fn vertical_line_evaluated_at_both() {
             </msubsup>
         </math>";
     test_ClearSpeak("ClearSpeak_VerticalLine", "Auto", expr,
-        "x squared plus x; evaluated at 1 minus the same expression evaluated at 0");
+        "x squared plus x, evaluated at 1 minus the same expression evaluated at 0");
 }
 #[test]
 fn vertical_line_evaluated_at_divides() {
@@ -308,7 +308,7 @@ fn vertical_line_evaluated_at_divides() {
             </msub>
         </math>";
     test_ClearSpeak("ClearSpeak_VerticalLine", "Divides", expr,
-        "f of x, evaluated at x equals 5");
+        "f of x evaluated at x equals 5");
 }
 
 #[test]
@@ -327,5 +327,5 @@ fn vertical_line_evaluated_at_both_given() {
             </msubsup>
         </math>";
     test_ClearSpeak("ClearSpeak_VerticalLine", "Given", expr,
-        "x squared plus x; evaluated at 1 minus the same expression evaluated at 0");
+        "x squared plus x, evaluated at 1 minus the same expression evaluated at 0");
 }

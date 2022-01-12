@@ -107,14 +107,14 @@ fn normal_ln() {
 #[test]
 fn normal_ln_terse() {
     let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test_prefs("SimpleSpeak", vec![("Verbosity", "terse")],
+    test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")],
                 expr, "l n of, open x plus y close");
 }
 
 #[test]
 fn simple_ln_terse() {
     let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
-    test_prefs("SimpleSpeak", vec![("Verbosity", "terse")],
+    test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")],
                 expr, "l n x");
 }
 
@@ -260,64 +260,64 @@ fn no_times_sqrt() {
     #[test]
     fn parens_interval_open_open() {
         let expr = "<math> 
-        <mrow intent='interval($1, $2)'><mo>(</mo>
-        <mrow> <mi arg='1'>c</mi><mo>,</mo><mi arg='2'>d</mi></mrow>
+        <mrow intent='interval($open, $start, $end, $close)'><mo>(</mo>
+        <mrow> <mo arg='open'>(</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>)</mo>
         <mo>)</mo></mrow>
     </math>";
-    test("SimpleSpeak",expr, "the open interval c comma d,");
+    test("SimpleSpeak",expr, "the open interval from c to d");
 }
 
 #[test]
     fn parens_interval_closed_open() {
         let expr = "<math> 
-        <mrow intent='interval($1, $2)'><mo>[</mo>
-            <mrow> <mi arg='1'>c</mi><mo>,</mo><mi arg='2'>d</mi></mrow>
+        <mrow intent='interval($open, $start, $end, $close)'><mo>[</mo>
+            <mrow> <mo arg='open'>[(]</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>)</mo>
             <mo>)</mo></mrow>
         </math>";
-    test("SimpleSpeak",expr, "the closed open interval c comma d,");
+    test("SimpleSpeak",expr, "the closed open interval from c to d");
 }
 
 
 #[test]
 fn parens_interval_open_closed() {
     let expr = "<math> 
-    <mrow intent='interval($1, $2)'><mo>(</mo>
-        <mrow> <mi arg='1'>c</mi><mo>,</mo><mi arg='2'>d</mi></mrow>
+    <mrow intent='interval($open, $start, $end, $close)'><mo>(</mo>
+        <mrow> <mo arg='open'>(</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>]</mo>
         <mo>]</mo></mrow>
     </math>";
-    test("SimpleSpeak",expr,"the open closed interval c comma d,");
+    test("SimpleSpeak",expr,"the open closed interval from c to d");
 }
 
 
 #[test]
 fn parens_interval_closed_closed() {
     let expr = "<math> 
-    <mrow intent='interval($1, $2)'><mo>[</mo>
-        <mrow> <mi arg='1'>c</mi><mo>,</mo><mi arg='2'>d</mi></mrow>
+    <mrow intent='interval($open, $start, $end, $close)'><mo>[</mo>
+        <mrow> <mo arg='open'>[(]</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>]</mo>
         <mo>]</mo></mrow>
 </math>";
-test("SimpleSpeak",expr, "the closed interval c comma d,");
+test("SimpleSpeak",expr, "the closed interval from c to d");
 }
 
     #[test]
     fn parens_interval_neg_infinity_open_open() {
         let expr = "<math> 
-        <mrow intent='interval($1, $2)'><mo>(</mo>
-        <mrow><mo arg='1'>-</mo> <mi>∞</mi><mo>,</mo><mi arg='2'>d</mi></mrow>
+        <mrow intent='interval($open, $start, $end, $close)'><mo arg='open'>(</mo>
+        <mrow><mrow arg='start'><mo>-</mo> <mi>∞</mi></mrow><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>)</mo>
         <mo>)</mo></mrow>
     </math>";
     test("SimpleSpeak",expr,
-    "the open interval negative infinity comma d,");
+    "the open interval from negative infinity to d");
 }
 
     #[test]
     fn parens_interval_neg_infinity_open_closed() {
         let expr = "<math> 
-        <mrow intent='interval($1, $2)'><mo>(</mo>
-        <mrow><mo arg='1'>-</mo> <mi>∞</mi><mo>,</mo><mi arg='2'>d</mi></mrow>
+        <mrow intent='interval($open, $start, $end, $close)'><mo arg='open'>(</mo>
+        <mrow><mrow arg='start'><mo>-</mo> <mi>∞</mi></mrow><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>]</mo>
         <mo>]</mo></mrow>
     </math>";
     test("SimpleSpeak",expr,
-    "the open closed interval negative infinity comma d,");
+    "the open closed interval from negative infinity to d");
 }
 

@@ -6,6 +6,17 @@ extern crate lazy_static;
 use lazy_static::lazy_static;
 use libmathcat::interface::{speak_mathml, braille_mathml};
 
+#[allow(dead_code)] 
+pub fn init_logger() {
+    env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("debug"))
+        .is_test(true)
+        .format_timestamp(None)
+        .format_module_path(false)
+        .format_indent(None)
+        .format_level(false)
+        .init();
+}
+
 // Strip spaces from 'str' so comparison doesn't need to worry about spacing
 #[allow(dead_code)]     // used in testing
 fn strip_spaces(str: String) -> String {
