@@ -364,7 +364,7 @@ impl CanonicalizeContext {
 				return e;
 			},
 			Err(e)  => {
-				crate::speech::print_errors( &e.chain_err(|| mml_to_string(&mathml)) );
+				error!("{}", crate::speech::get_errors( &e.chain_err(|| mml_to_string(&mathml))));
 				return mathml;
 			},
 		};
@@ -496,21 +496,26 @@ impl CanonicalizeContext {
 				let mut children = mathml.children();
 				let mut i = 0;
 				while i < children.len() {
-					let child = as_element(children[i]);
-					match self.clean_mathml(child) {
-						None => {
-							mathml.remove_child(child);
-							i += 1;
-						},
-						Some(new_child) => {
-							if child != new_child {
-								// replace() doesn't exist, so change 'child' itself
-								child.set_name(new_child.name());
-								child.replace_children(new_child.children());
+					if let Some(child) = children[i].element() {
+						match self.clean_mathml(child) {
+							None => {
+								mathml.remove_child(child);
+								i += 1;
+							},
+							Some(new_child) => {
+								if child != new_child {
+									// replace() doesn't exist, so change 'child' itself
+									child.set_name(new_child.name());
+									child.replace_children(new_child.children());
+								}
+								children = child.following_siblings();
+								i = 0;
 							}
-							children = child.following_siblings();
-							i = 0;
 						}
+					} else {
+						// bad mathml such as '<annotation-xml> </annotation-xml>'
+						mathml.remove_child(children[i]);
+						i += 1;
 					}
 				}
 
@@ -2231,8 +2236,10 @@ pub fn name<'a>(node: &'a Element<'a>) -> &str {
 pub fn as_element(child: ChildOfElement) -> Element {
 	return match child {
 		ChildOfElement::Element(e) => e,
-		_ => panic!("as_element: internal error -- found non-element child"),
-	}
+		_ => {
+			panic!("as_element: internal error -- found non-element child (text? '{:?}')", child.text());
+		},
+	};
 }
 
 // The child of a leaf element must be text (previously trimmed)
