@@ -385,7 +385,7 @@ pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static
                             .trim())
                     },
                     Err(e)             => { 
-                        crate::speech::print_errors(&e.chain_err(|| "Pattern match/replacement failure!"));
+                        error!("{}", crate::speech::get_errors(&e.chain_err(|| "Pattern match/replacement failure!")));
                         bail!("Error in speaking math navigation; see error log.")
                     }
                 };
@@ -1025,7 +1025,6 @@ mod tests {
     
     #[test]
     fn move_right_char() -> Result<()> {
-        // gger();
         let mathml_str = "<math id='Myt3m7mx-0' data-id-added='true'>
         <mrow displaystyle='true' id='Myt3m7mx-1' data-id-added='true'>
           <mi id='Myt3m7mx-2' data-id-added='true'>x</mi>

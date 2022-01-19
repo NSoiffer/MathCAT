@@ -229,12 +229,12 @@ fn read_one_definitions_file(path: &Path) -> Result<()> {
         // debug!("variable_def_list {} is\n{}", yaml_to_type(variable_def_list), yaml_to_string(variable_def_list));
         match crate::speech::as_vec_checked(&variable_def_list) {
             Err(e) => {
-                crate::speech::print_errors(&e.chain_err(||format!("in file {:?}", path.to_str())));
+                error!("{}", crate::speech::get_errors(&e.chain_err(||format!("in file {:?}", path.to_str()))));
             }
             Ok(vec) => {
                 for variable_def in vec {
                     if let Err(e) = build_values(variable_def) {
-                        crate::speech::print_errors(&e.chain_err(||format!("in file {:?}", path.to_str())));
+                        error!("{}", crate::speech::get_errors(&e.chain_err(||format!("in file {:?}", path.to_str()))));
                     }    
                 }
             }
@@ -296,7 +296,7 @@ mod tests {
             //debug!("variable_def_list {} is\n{}", yaml_to_type(variable_def_list), yaml_to_string(variable_def_list, 0));
             for variable_def in variable_def_list.as_vec().unwrap() {
                 if let Err(e) = build_values(variable_def) {
-                    crate::speech::print_errors(&e.chain_err(||format!("in file {:?}", str)));
+                    error!("{}", crate::speech::get_errors(&e.chain_err(||format!("in file {:?}", str))));
                 }
             }
         };

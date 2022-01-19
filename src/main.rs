@@ -100,21 +100,50 @@ fn main() {
   //  </mrow>
   //  </semantics></math>";
   let expr = "
-  <math>
-  <msub>
-  <mrow>
-      <mo fence='true' stretchy='false'>∥</mo>
-  <mo>⁢</mo>
-  <mi>f</mi>
-  <mo>⁢</mo>
-      <mo fence='true' stretchy='false'>∥</mo>
-      </mrow> <mi>max</mi></msub>
-</math>
-  ";
+  <math xmlns='http://www.w3.org/1998/Math/MathML'  alttext='{\\displaystyle ax^{2}+bx+c=a(x-r)(x-s)=0}'>
+  <semantics>
+    <mrow class='MJX-TeXAtom-ORD'>
+      <mstyle displaystyle='true' scriptlevel='0'>
+        <mi>a</mi>
+        <msup>
+          <mi>x</mi>
+          <mrow class='MJX-TeXAtom-ORD'>
+            <mn>2</mn>
+          </mrow>
+        </msup>
+        <mo>+</mo>
+        <mi>b</mi>
+        <mi>x</mi>
+        <mo>+</mo>
+        <mi>c</mi>
+        <mo>=</mo>
+        <mi>a</mi>
+        <mo stretchy='false'>(</mo>
+        <mi>x</mi>
+        <mo>&#x2212;<!-- − --></mo>
+        <mi>r</mi>
+        <mo stretchy='false'>)</mo>
+        <mo stretchy='false'>(</mo>
+        <mi>x</mi>
+        <mo>&#x2212;<!-- − --></mo>
+        <mi>s</mi>
+        <mo stretchy='false'>)</mo>
+        <mo>=</mo>
+        <mn>0</mn>
+      </mstyle>
+    </mrow>
+    <annotation encoding='application/x-tex'>{\\displaystyle ax^{2}+bx+c=a(x-r)(x-s)=0}</annotation>
+  </semantics>
+</math>  ";
   // let expr = "
   // <math display='block'><mrow><mrow><mrow><mover accent='true'><mo fence='true' stretchy='false'>∥</mo><mo stretchy='false'>^</mo></mover><mo>⁢</mo><mi>f</mi><mo>⁢</mo><msub><mover accent='true'><mo fence='true' stretchy='false'>∥</mo><mo stretchy='false'>^</mo></mover><mi>p</mi></msub></mrow><mo>=</mo><msup><mrow><mo>(</mo><mrow><munder><mo largeop='true' movablelimits='false' symmetric='true'>∑</mo><mrow><mi>γ</mi><mo>∈</mo><mover accent='true'><msubsup><mi>𝔽</mi><mn>𝟚</mn><mi>𝕟</mi></msubsup><mo>^</mo></mover></mrow></munder><msup><mrow><mo stretchy='false'>|</mo><mrow><mover accent='true'><mi>f</mi><mo>^</mo></mover><mo>⁢</mo><mrow><mo stretchy='false'>(</mo><mi>γ</mi><mo stretchy='false'>)</mo></mrow></mrow><mo stretchy='false'>|</mo></mrow><mi>p</mi></msup></mrow><mo>)</mo></mrow><mrow><mn>1</mn><mo>/</mo><mi>p</mi></mrow></msup></mrow><mo>.</mo></mrow></math>
   //   ";
   let instant = Instant::now();
+  let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("..\\..\\..\\Rules");
+  let rules_dir = rules_dir.as_os_str().to_str().unwrap().to_string();
+  if SetRulesDir(rules_dir.clone()).is_err() {
+    panic!("Didn't find Rules dir: {}", rules_dir);
+  }
   if let Err(e) = SetMathML(expr.to_string()) {
     panic!("Error: exiting -- {}", e);
   };
@@ -128,7 +157,7 @@ fn main() {
   info!("Computed braille string:\n   '{}'", braille_string);
   info!("Time taken: {}ms", instant.elapsed().as_millis());
   // let instant = Instant::now();
-  // let _speech_string = speak_mathml(expr);
+  // let speech_string = GetSpokenText().unwrap();
   // let _braille_string = GetBraille("".to_string()).unwrap();
   // info!("Time taken (second time): {}ms", instant.elapsed().as_millis());
 }

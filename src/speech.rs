@@ -7,7 +7,7 @@
 //! A number of useful utility functions used by other modules are defined here.
 #![allow(clippy::needless_return)]
 use std::path::PathBuf;
-use std::{collections::HashMap, process::exit};
+use std::collections::HashMap;
 use std::cell::{RefCell, RefMut};
 use sxd_document::dom::{ChildOfElement, Document, Element};
 use sxd_document::{Package, QName};
@@ -72,7 +72,7 @@ fn intent_rules<'c, 'm>(rules: &'static std::thread::LocalKey<RefCell<SpeechRule
                 }
             },
             Err(e) => { 
-                print_errors(&e.chain_err(|| "Pattern match/replacement failure!"));
+                error!("{}", get_errors(&e.chain_err(|| "Pattern match/replacement failure!")));
                 let intent_error = create_mathml_element(&rules_with_context.doc, "merror");
                 intent_error.set_text("Error in speaking math; see error log.");
                 return intent_error;
@@ -101,7 +101,7 @@ fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, math
                             .trim());
             },
             Err(e)             => { 
-                print_errors(&e.chain_err(|| "Pattern match/replacement failure!"));
+                error!("{}", (&e.chain_err(|| "Pattern match/replacement failure!")));
                 return String::from("Error in speaking math; see error log.")
             }
         }
@@ -131,7 +131,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> String {
                 }
             },
             Err(e)             => { 
-                print_errors(&e.chain_err(|| "Pattern match/replacement failure!"));
+                get_errors(&e.chain_err(|| "Pattern match/replacement failure!"));
                 return String::from("Error in speaking math; see error log.")
             }
         }
@@ -2001,12 +2001,17 @@ impl UnicodeDef {
 /// Print out the errors to `stderr`.
 ///
 /// Useful functionality that had to had a home in some crate, so it is here.
-pub fn print_errors(e:&Error) {
-    for e in e.iter().skip(1) {
-        error!("caused by: {}", e);
+pub fn get_errors(e:&Error) -> String {
+    let mut result = String::default();
+    for (i, e) in e.iter().enumerate() {
+        if i == 0 {
+            result = e.to_string();
+        } else {
+            result += &format!("caused by: {}\n", e);
+        }
     }
+    return result;
 }
-
 
 // Fix: there should be a cache so subsequent library calls don't have to read in the same speech rules
 //   likely a cache of size 1 is fine
@@ -2042,7 +2047,11 @@ pub fn print_errors(e:&Error) {
 
 /// `SpeechRulesWithContext` encapsulates a named group of speech rules (e.g, "ClearSpeak")
 /// along with the preferences to be used for speech.
+// Note: if we can't read the files, an error message is stored in the structure and needs to be checked.
+// I tried using Result<SpeechRules>, but it was a mess with all the unwrapping.
+// Important: the code needs to be careful to check this at the top level calls
 pub struct SpeechRules {
+    error: String,
     name: RulesFor,
     pub pref_manager: Rc<RefCell<PreferenceManager>>,
     rules: RuleTable,                       // the speech rules used (partitioned into MathML tags in hashmap, then linearly searched)
@@ -2110,33 +2119,56 @@ impl SpeechRules {
     pub fn new(name: RulesFor, translate_single_chars_only: bool) -> SpeechRules {
         use crate::definitions::read_definitions_file;
         let pref_manager = PreferenceManager::get();
-        if let Err(e) = read_definitions_file(pref_manager.borrow().get_definitions_file()) {
-            print_errors(&e);
-            exit(1);
-        };
+        let mut error = pref_manager.borrow().get_error().to_string();
 
-        // debug!("SpeechRules new for {}, tts {}", name, pref_manager.borrow().get_api_prefs().to_string("TTS"));
-        let unicode = if name == RulesFor::Braille {
-            (
-                Rc::new( RefCell::new (HashMap::with_capacity(497)) ),
-                Rc::new( RefCell::new (HashMap::with_capacity(2497)) )
-            )
-        } else {
-            (
-                SPEECH_UNICODE_SHORT.with( |unicode| Rc::clone( unicode) ),
-                SPEECH_UNICODE_FULL. with( |unicode| Rc::clone( unicode) )
-            )
-        };
+        if pref_manager.borrow().get_error().is_empty() {
+            let read_files = read_definitions_file(pref_manager.borrow().get_definitions_file());
+            match read_files {
+                Ok(_) => {
+                    // debug!("SpeechRules new for {}, tts {}", name, pref_manager.borrow().get_api_prefs().to_string("TTS"));
+                    let unicode = if name == RulesFor::Braille {
+                        (
+                            Rc::new( RefCell::new (HashMap::with_capacity(497)) ),
+                            Rc::new( RefCell::new (HashMap::with_capacity(2497)) )
+                        )
+                    } else {
+                        (
+                            SPEECH_UNICODE_SHORT.with( |unicode| Rc::clone( unicode) ),
+                            SPEECH_UNICODE_FULL. with( |unicode| Rc::clone( unicode) )
+                        )
+                    };
 
-        let rules = SpeechRules {
+                    let rules = SpeechRules {
+                        error: Default::default(),
+                        name,
+                        rules: HashMap::with_capacity(if name == RulesFor::Intent {1023} else {31}),                       // lazy load them
+                        unicode_short: unicode.0,       // lazy load them
+                        unicode_full: unicode.1,        // lazy load them
+                        translate_single_chars_only,
+                        pref_manager,
+                    };
+                    return rules;
+                },
+                Err(e) => error = get_errors(&e),
+            }
+        };
+        return SpeechRules {
+            error: error,
             name,
-            rules: HashMap::with_capacity(if name == RulesFor::Intent {1023} else {31}),                       // lazy load them
-            unicode_short: unicode.0,       // lazy load them
-            unicode_full: unicode.1,        // lazy load them
-            translate_single_chars_only,
+            rules: HashMap::with_capacity(1),
+            unicode_short: Rc::new( RefCell::new (HashMap::with_capacity(1)) ),
+            unicode_full: Rc::new( RefCell::new (HashMap::with_capacity(1)) ),
+            translate_single_chars_only: true,
             pref_manager,
         };
-        return rules;
+    }
+
+    pub fn get_error(&self) -> Option<&str> {
+        return if self.error.is_empty() {
+             None
+        } else {
+            Some(&self.error)
+        }
     }
 
     pub fn invalidate(&mut self, changes: FilesChanged) {
@@ -2173,11 +2205,11 @@ impl SpeechRules {
             let rule_file_contents = read_to_string_shim(p.as_path()).expect("cannot read file");
             let rules_build_fn = |pattern: &Yaml| {
                 if let Err(e) = self.build_speech_patterns(pattern, p) {
-                    print_errors(&e.chain_err(||format!("in file {:?}", p.to_str().unwrap())));
+                    error!("{}", get_errors(&e.chain_err(||format!("in file {:?}", p.to_str().unwrap()))));
                 }    
             };
             if let Err(e) = compile_rule(&rule_file_contents, rules_build_fn) {
-                print_errors(&e.chain_err(||format!("in file {:?}", p.to_str().unwrap())));
+                error!("{}", get_errors(&e.chain_err(||format!("in file {:?}", p.to_str().unwrap()))));
             }
         }
     }
@@ -2231,13 +2263,13 @@ impl SpeechRules {
             };
             for unicode_def in unicode_defs.unwrap() {
                 if let Err(e) = UnicodeDef::build(unicode_def, &path, self, use_short) {
-                    print_errors(&e.chain_err(|| {format!("In file {:?}", path.to_str())}));
+                    error!("{}", get_errors(&e.chain_err(|| {format!("In file {:?}", path.to_str())})));
                 }        
             };
         };
 
         if let Err(e) =compile_rule(&unicode_file_contents, unicode_build_fn) {
-            print_errors(&e.chain_err(||format!("in file {:?}", path.to_str().unwrap())));
+            error!("{}", get_errors(&e.chain_err(||format!("in file {:?}", path.to_str().unwrap()))));
         }
     }
 }

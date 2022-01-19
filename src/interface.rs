@@ -34,41 +34,6 @@ fn cleanup_mathml(mathml: Element) -> Element {
     return mathml;
 }
 
-/// Given MathML, a string is return.
-///
-/// If there is an error, the string will give a general message (e.g., "MathML error" if the MathML is bad)
-pub fn speak_mathml(mathml_str: &str) -> String {
-    // this forces initialization
-    crate::speech::SPEECH_RULES.with(|_| true);
-    let package = parser::parse(mathml_str);
-    if let Err(e) = package {
-        eprintln!("Error in parsing MathML: {}.\nThe MathML is:\n{}", e.to_string(), mathml_str);       // FIX: log 
-        return "Invalid MathML. Unable to speak math.".to_string();
-    };
-    let parse_package = package.unwrap();
-    let mathml = cleanup_mathml(get_element(&parse_package));
-
-    let infer_package = Package::new();
-    let intent = crate::speech::intent_from_mathml(mathml, infer_package.as_document());
-    debug!("Intent tree:\n{}", mml_to_string(&intent));
-    return crate::speech::speak_intent(intent);
-}
-
-/// Given MathML, a Unicode braille string is return.
-///
-/// If there is an error, the string will give a general message (e.g., "MathML error" if the MathML is bad)
-pub fn braille_mathml(mathml_str: &str, nav_node_id: String) -> String {
-    // this forces initialization
-    crate::speech::BRAILLE_RULES.with(|_| true);
-    let package = parser::parse(mathml_str);
-    if let Err(e) = package {
-        eprintln!("Error in parsing MathML: {}.\nThe MathML is:\n{}", e.to_string(), mathml_str);       // FIX: log 
-        return "Invalid MathML. Unable to braille math.".to_string();
-    };
-    let package = package.unwrap();
-    let mathml = cleanup_mathml(get_element(&package));
-    return crate::speech::braille_mathml(mathml, nav_node_id);
-}
 
 thread_local!{
     /// The current node being navigated (also spoken and brailled) is stored in `MATHML_INSTANCE`.
@@ -81,6 +46,12 @@ fn init_mathml_instance() -> RefCell<Package> {
     return RefCell::new( package );
 }
 
+/// Set the Rules directory
+/// IMPORTANT: this should be the very first call to MathCAT unless the environment var MathCATRulesDir is set
+pub fn SetRulesDir(dir: String) -> Result<()> {
+    use std::path::PathBuf;
+    return crate::prefs::PreferenceManager::initialize(PathBuf::from(dir));
+}
 /// The MathML to be spoken, brailled, or navigated.
 ///
 /// This will override any previous MathML that was set.
@@ -95,7 +66,9 @@ pub fn SetMathML(mathml_str: String) -> Result<String> {
         }
 
         // this forces initialization of things beyond just the speech rules (e.g, the defs.yaml files get read)
-        crate::speech::SPEECH_RULES.with(|_| true);
+        crate::speech::SPEECH_RULES.with(|speech_rules| -> Result<()> {
+            if let Some(e) = speech_rules.borrow().get_error() {bail!("{}", e)} else {Ok(())}
+        })?;
         let new_package = new_package.unwrap();
         let mathml = cleanup_mathml(get_element(&new_package));
         let mathml_string = mml_to_string(&mathml);
@@ -168,6 +141,9 @@ pub fn GetPreference(name: String) -> Option<String> {
 pub fn SetPreference(name: String, value: StringOrFloat) -> Result<()> {
     return crate::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
+        if let Some(error_string) = rules.get_error() {
+            bail!("{}", error_string);
+        }
         // note: Rust complains if I set
         //    pref_manager = rules.pref_manager.borrow_mut()
         // here/upfront, so it is borrowed separately below. That way its borrowed lifetime is small
