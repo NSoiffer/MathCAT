@@ -193,6 +193,7 @@ fn find_arg<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithCon
     
 #[cfg(test)]
 mod infer_tests {
+    #[allow(unused_imports)]
     use super::super::init_logger;
     use sxd_document::parser;    
 
@@ -200,6 +201,7 @@ mod infer_tests {
     fn test_intent(mathml: &str, target: &str) -> bool {
 		use crate::interface::*;
 		// this forces initialization
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         let package1 = &parser::parse(mathml).expect("Failed to parse test input");
         let mathml = get_element(package1);
         trim_element(&mathml);
@@ -218,7 +220,6 @@ mod infer_tests {
 
     #[test]
     fn infer_binomial() {
-        init_logger();
         let mathml = "<mrow intent='binomial($n, $m)'>
                 <mo>(</mo>
                 <mfrac linethickness='0'> <mn arg='n'>7</mn> <mn arg='m'>3</mn> </mfrac>

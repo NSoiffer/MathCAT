@@ -2329,6 +2329,7 @@ fn is_chemical_element(node: Element) -> bool {
 mod canonicalize_tests {
 	#[allow(unused_imports)]
 	use super::super::init_logger;
+	use super::super::abs_rules_dir_path;
     use super::*;
     use sxd_document::parser;
 
@@ -2336,8 +2337,9 @@ mod canonicalize_tests {
     fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
 		use crate::interface::*;
 		// this forces initialization
+		crate::interface::SetRulesDir(abs_rules_dir_path()).unwrap();
 		crate::speech::SPEECH_RULES.with(|_| true);
-
+		
         let package1 = &parser::parse(test).expect("Failed to parse test input");
 		let mathml = get_element(package1);
 		trim_element(&mathml);

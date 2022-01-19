@@ -731,9 +731,9 @@ mod tests {
     // ClearSpeak_Rules.yaml is in zz
     use super::*;
 
-    /// Build Absolute path to rules dir for testing
+    /// Version of abs_rules_dir_path that returns a PathBuf
     fn abs_rules_dir_path() -> PathBuf {
-        return env::current_exe().unwrap().parent().unwrap().join("..\\..\\..\\..\\Rules");
+        return PathBuf::from(super::super::abs_rules_dir_path());
     }
     /// Return a relative path to Rules dir (ie, .../Rules/zz... returns zz/...)
     /// strip .../Rules from file path

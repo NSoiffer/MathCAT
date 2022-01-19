@@ -13,7 +13,6 @@ fn natural() {
     let expr = "<math>
                     <mi>ℕ</mi>
                 </math>";
-    assert_eq!("the natural numbers", libmathcat::interface::speak_mathml(expr /*, tts: none*/));
     test("SimpleSpeak", expr, "the natural numbers");
 }
 

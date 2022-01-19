@@ -813,6 +813,7 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
@@ -854,7 +855,8 @@ mod tests {
           <mn id='Ml2f6pjt-19' data-id-added='true'>1</mn>
         </mrow>
        </math>";
-        SetMathML(mathml_str.to_string()).unwrap();
+       crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
+       SetMathML(mathml_str.to_string()).unwrap();
         SetPreference("NavMode".to_string(), StringOrFloat::AsString("Enhanced".to_string()))?;
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
@@ -880,6 +882,7 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
@@ -897,6 +900,7 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
@@ -926,6 +930,7 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
@@ -949,6 +954,7 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
@@ -982,7 +988,8 @@ mod tests {
           <mo id='Msowudr8-5' data-id-added='true'>-</mo>
           <mi id='Msowudr8-6' data-id-added='true'>x</mi>
         </mrow>
-       </math>";
+        </math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
@@ -1046,7 +1053,8 @@ mod tests {
             </mrow>
           </mrow>
         </mrow>
-       </math>";
+        </math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         SetPreference("NavMode".to_string(), StringOrFloat::AsString("Character".to_string()))?;
         return MATHML_INSTANCE.with(|package_instance| {
@@ -1078,7 +1086,8 @@ mod tests {
           <mo id='plus-2'>+</mo>
           <mi id='c'>c</mi>
         </mrow>
-       </math>";
+        </math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         SetPreference("NavMode".to_string(), StringOrFloat::AsString("Character".to_string()))?;
         return MATHML_INSTANCE.with(|package_instance| {
@@ -1105,6 +1114,7 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
