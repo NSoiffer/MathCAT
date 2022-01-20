@@ -247,57 +247,50 @@ pub fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> 
     return None;
 }
 
-fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>) -> (Option<String>, Option<f64>) {
+fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>) -> Result<(Option<String>, Option<f64>)> {
     // First return tuple value is string-value (if string, bool, or single node) or None
     // Second return tuple value is f64 if variable is a number or None
     // This is ridiculously complicated for what in the end is a hashmap lookup
     // There isn't an API that lets us get at the value, so we have to setup/build/evaluate an xpath
     // Note: mathml can be any node. It isn't really used but some Element needs to be part of Evaluate() 
     let factory = Factory::new();
-    return match factory.build(&("$".to_string() + var_name)) {
-        Err(_) => {
-            error!("Could not compile XPath for variable: {}", var_name);
-            (None, None)
-        },
-        Ok(xpath) => {
-            let xpath = xpath.unwrap();
-            return match xpath.evaluate(context, mathml) {
-                Ok(val) => {
-                    match val {
-                        Value::String(s) => (Some(s), None),
-                        Value::Number(f) => (None, Some(f)),
-                        Value::Boolean(b) => (Some(format!("{}", b)), None),
-                        Value::Nodeset(nodes) => {
-                            if nodes.size() == 1 {
-                                if let Some(attr) = nodes.document_order_first().unwrap().attribute() {
-                                    return (Some(attr.value().to_string()), None);
-                                }
-                            };
-                            error!("Variable '{}' set in navigate.yaml is nodeset and not an attribute (correct by using '.../@id'??):\n", var_name);
-                            if nodes.size() == 0 {
-                                debug!("0 nodes (false)");
-                            } else {
-                                let singular = nodes.size()==1;
-                                debug!("{} node{}. {}:", nodes.size(),
-                                    if singular {""} else {"s"},
-                                    if singular {"Node is"} else {"Nodes are"});
-                                    nodes.document_order()
-                                        .iter()
-                                        .enumerate()
-                                        .for_each(|(i, node)| {
-                                            match node {
-                                                sxd_xpath::nodeset::Node::Element(mathml) => debug!("#{}:\n{}",
-                                                        i, mml_to_string(mathml)),
-                                                _ => debug!("'{:?}'", node),
-                                            }   
-                                        })    
-                            };
-                            (None, None)
-                        },
-                    }
+    match factory.build(&("$".to_string() + var_name)) {
+        Err(_) => bail!("Could not compile XPath for variable: {}", var_name),
+        Ok(xpath) => match xpath.unwrap().evaluate(context, mathml) {
+            Ok(val) => return Ok( match val {
+                Value::String(s) => (Some(s), None),
+                Value::Number(f) => (None, Some(f)),
+                Value::Boolean(b) => (Some(format!("{}", b)), None),
+                Value::Nodeset(nodes) => {
+                    if nodes.size() == 1 {
+                        if let Some(attr) = nodes.document_order_first().unwrap().attribute() {
+                            return Ok( (Some(attr.value().to_string()), None) );
+                        }
+                    };
+                    let mut error_message = format!("Variable '{}' set somewhere in navigate.yaml is nodeset and not an attribute (correct by using '.../@id'??):\n", var_name);
+                    if nodes.size() == 0 {
+                        error_message += &format!("0 nodes (false)");
+                    } else {
+                        let singular = nodes.size()==1;
+                        error_message += &format!("{} node{}. {}:",
+                                nodes.size(),
+                                if singular {""} else {"s"},
+                                if singular {"Node is"} else {"Nodes are"});
+                        nodes.document_order()
+                            .iter()
+                            .enumerate()
+                            .for_each(|(i, node)| {
+                                match node {
+                                    sxd_xpath::nodeset::Node::Element(mathml) =>
+                                        error_message += &format!("#{}:\n{}",i, mml_to_string(mathml)),
+                                    _ => error_message += &format!("'{:?}'", node),
+                                }   
+                            })    
+                    };
+                    bail!(error_message);
                 },
-                Err(_) => (None, None),
-            }
+            } ),
+            Err(__) => bail!("Could not find value for navigation variable '{}'", var_name),
         }
     }
 }
@@ -319,6 +312,11 @@ pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static
     // To prevent to infinite loop, we limit the number of tries
     const LOOP_LIMIT: usize = 3;
     static TRY_AGAIN: &'static str = "try again";
+    NAVIGATION_RULES.with(|rules| {
+        // don't need to check update in loop
+        let mut mut_rules = rules.borrow_mut();
+        return mut_rules.update();  
+    })?;
 
     for loop_count in 0..LOOP_LIMIT {
         if mathml.children().is_empty() {
@@ -337,10 +335,6 @@ pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static
             };
     
             return NAVIGATION_RULES.with(|rules| {
-                {
-                    let mut mut_rules = rules.borrow_mut();
-                    mut_rules.update();    
-                }
                 let rules = rules.borrow();
                 let new_package = Package::new();
                 let mut rules_with_context = crate::speech::SpeechRulesWithContext::new(&rules, new_package.as_document(), "".to_string()); 
@@ -369,26 +363,19 @@ pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static
                 let start_node = match get_node_by_id(mathml, &start_node_id) {
                     Some(node) => node,
                     None => {
-                        error!("Didn't find id '{}'", &start_node_id);
-                        bail!("No node found");
+                        bail!("Internal Error: didn't find id '{}' while attempting to start navigation", &start_node_id);
                     }
                 };
 
                 // Finally, apply the navigation rules
-                let speech = match rules_with_context.match_pattern::<String>(start_node) {
-                    Ok(speech_string) => {
-                        rules.pref_manager.borrow().get_tts()
+                let raw_speech_string = rules_with_context.match_pattern::<String>(start_node)
+                            .chain_err(|| "Pattern match/replacement failure during math navigation!")?;
+                let speech = rules.pref_manager.borrow().get_tts()
                             .merge_pauses(crate::speech::remove_optional_indicators(
-                                &speech_string.replace(CONCAT_STRING, "")
-                                                    .replace(CONCAT_INDICATOR, "")                            
+                                &raw_speech_string.replace(CONCAT_STRING, "")
+                                                      .replace(CONCAT_INDICATOR, "")                            
                                             )
-                            .trim())
-                    },
-                    Err(e)             => { 
-                        crate::speech::print_errors(&e.chain_err(|| "Pattern match/replacement failure!"));
-                        bail!("Error in speaking math navigation; see error log.")
-                    }
-                };
+                            .trim());
                 debug!("Nav Speech: {}", speech);
     
                 // FIX: add things that need to do
@@ -397,14 +384,14 @@ pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static
                 let context = rules_with_context.get_context();
     
                 // transfer some values that might have been set into the prefs
-                nav_state.mode = context_get_variable(context, "NavMode", mathml).0.unwrap();
+                nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
                 rules.pref_manager.as_ref().borrow_mut().set_user_prefs("NavMode", &nav_state.mode);
 
-                let nav_position = match context_get_variable(&context, "NavNode", mathml).0 {
+                let nav_position = match context_get_variable(&context, "NavNode", mathml)?.0 {
                     None => NavigationPosition::default(),
                     Some(node) => NavigationPosition {
                         current_node: node,
-                        current_node_offset: context_get_variable(&context, "NavNodeOffset", mathml).1.unwrap() as usize
+                        current_node_offset: context_get_variable(&context, "NavNodeOffset", mathml)?.1.unwrap() as usize
                     }
                 };
     
@@ -415,7 +402,7 @@ pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static
                 } else if nav_command.starts_with("Describe") {
                     false
                 } else {
-                    let overview = context_get_variable(context, "Overview", mathml).0.unwrap();
+                    let overview = context_get_variable(context, "Overview", mathml)?.0.unwrap();
                     overview == "false"
                 };
     
@@ -430,15 +417,15 @@ pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static
                 }
 
                 if nav_command.starts_with("SetPlacemarker") {
-                    if let Some(new_node_id) = context_get_variable(&context, "NavNode", mathml).0 {
-                        let offset = context_get_variable(&context, "NavNodeOffset", mathml).1.unwrap() as usize;
+                    if let Some(new_node_id) = context_get_variable(&context, "NavNode", mathml)?.0 {
+                        let offset = context_get_variable(&context, "NavNodeOffset", mathml)?.1.unwrap() as usize;
                         nav_state.place_markers[convert_last_char_to_number(nav_command)] = NavigationPosition{ current_node: new_node_id, current_node_offset: offset};
                     }
                 }
     
                 debug!("{}", &nav_state);
                 let nav_mathml = get_node_by_id(mathml, &nav_position.current_node);
-                if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", mathml).0.unwrap() == "true" {
+                if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", mathml)?.0.unwrap() == "true" {
                     // Speak/Overview of where we landed (if we are supposed to speak it)
                     let node_speech = speak(&mut rules_with_context, nav_mathml.unwrap(), use_read_rules)?;
                     if !node_speech.is_empty() {
@@ -490,10 +477,10 @@ pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static
 
 fn speak<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut crate::speech::SpeechRulesWithContext<'c,'s,'m>, mathml: Element<'c>, full_read: bool) -> Result<String> {
     if full_read {
-        return Ok( crate::speech::speak_intent(crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())) );
+        return crate::speech::speak_intent(crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?);
     } else {
         // FIX: overview not implemented
-        return Ok( crate::speech::overview_mathml(mathml) );
+        return crate::speech::overview_mathml(mathml);
     }
 }
 
@@ -795,15 +782,19 @@ mod tests {
     use crate::interface::*;
 
     #[cfg(test)]    
-    fn test_command(command: &'static str, mathml: Element, result_id: &str) -> Result<String> {
-        let nav_speech = do_navigate_command_string(mathml, command)?;
-        debug!("Full speech: {}", nav_speech);
-        NAVIGATION_STATE.with(|nav_stack| {
-            let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
-            assert_eq!(id, result_id);
-        });
-
-        return Ok( nav_speech );
+    fn test_command(command: &'static str, mathml: Element, result_id: &str) -> String {
+        match do_navigate_command_string(mathml, command) {
+            Err(e) => panic!("{}", &crate::speech::get_errors(&e)),
+            Ok(nav_speech) => {
+                // debug!("Full speech: {}", nav_speech);
+                NAVIGATION_STATE.with(|nav_stack| {
+                    let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
+                    assert_eq!(id, result_id);
+                });
+        
+                return nav_speech;
+            }
+        }
     }
 
     #[test]
@@ -813,12 +804,14 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            test_command("ZoomIn", mathml, "msup")?;
-            test_command("ZoomIn", mathml, "base")?;
+            test_command("ZoomIn", mathml, "msup");
+            test_command("ZoomIn", mathml, "base");
+            test_command("ZoomIn", mathml, "base");
             return Ok( () );
         });
     }
@@ -827,48 +820,49 @@ mod tests {
     fn zoom_in_parens() -> Result<()> {
         // init_logger();
         // (a+b)(c+d) + 1
-        let mathml_str = " <math display='block' id='Ml2f6pjt-0' data-id-added='true'>
-        <mrow data-changed='added' id='Ml2f6pjt-1' data-id-added='true'>
-          <mrow data-changed='added' id='Ml2f6pjt-2' data-id-added='true'>
-            <mrow data-changed='added' id='Ml2f6pjt-3' data-id-added='true'>
-              <mo stretchy='false' id='Ml2f6pjt-4' data-id-added='true'>(</mo>
-              <mrow data-changed='added' id='Ml2f6pjt-5' data-id-added='true'>
-                <mi id='Ml2f6pjt-6' data-id-added='true'>a</mi>
-                <mo id='Ml2f6pjt-7' data-id-added='true'>+</mo>
-                <mi id='Ml2f6pjt-8' data-id-added='true'>b</mi>
+        let mathml_str = " <math display='block' id='id-0'>
+        <mrow id='id-1'>
+          <mrow id='id-2'>
+            <mrow id='id-3'>
+              <mo stretchy='false' id='id-4'>(</mo>
+              <mrow id='id-5'>
+                <mi id='id-6'>a</mi>
+                <mo id='id-7'>+</mo>
+                <mi id='id-8'>b</mi>
               </mrow>
-              <mo stretchy='false' id='Ml2f6pjt-9' data-id-added='true'>)</mo>
+              <mo stretchy='false' id='id-9'>)</mo>
             </mrow>
-            <mo data-changed='added' id='Ml2f6pjt-10' data-id-added='true'>&#x2062;</mo>
-            <mrow data-changed='added' id='Ml2f6pjt-11' data-id-added='true'>
-              <mo stretchy='false' id='Ml2f6pjt-12' data-id-added='true'>(</mo>
-              <mrow data-changed='added' id='Ml2f6pjt-13' data-id-added='true'>
-                <mi id='Ml2f6pjt-14' data-id-added='true'>c</mi>
-                <mo id='Ml2f6pjt-15' data-id-added='true'>+</mo>
-                <mi id='Ml2f6pjt-16' data-id-added='true'>d</mi>
+            <mo id='id-10'>&#x2062;</mo>
+            <mrow id='id-11'>
+              <mo stretchy='false' id='id-12'>(</mo>
+              <mrow id='id-13'>
+                <mi id='id-14'>c</mi>
+                <mo id='id-15'>+</mo>
+                <mi id='id-16'>d</mi>
               </mrow>
-              <mo stretchy='false' id='Ml2f6pjt-17' data-id-added='true'>)</mo>
+              <mo stretchy='false' id='id-17'>)</mo>
             </mrow>
           </mrow>
-          <mo id='Ml2f6pjt-18' data-id-added='true'>+</mo>
-          <mn id='Ml2f6pjt-19' data-id-added='true'>1</mn>
+          <mo id='id-18'>+</mo>
+          <mn id='id-19'>1</mn>
         </mrow>
        </math>";
-        SetMathML(mathml_str.to_string()).unwrap();
+       crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
+       SetMathML(mathml_str.to_string()).unwrap();
         SetPreference("NavMode".to_string(), StringOrFloat::AsString("Enhanced".to_string()))?;
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            test_command("ZoomIn", mathml, "Ml2f6pjt-2")?;
-            test_command("ZoomIn", mathml, "Ml2f6pjt-5")?;
-            test_command("ZoomIn", mathml, "Ml2f6pjt-6")?;
+            test_command("ZoomIn", mathml, "id-2");
+            test_command("ZoomIn", mathml, "id-5");
+            test_command("ZoomIn", mathml, "id-6");
             
             // repeat, but this time with "Simple
             SetPreference("NavMode".to_string(), StringOrFloat::AsString("Simple".to_string()))?;
-            test_command("ZoomOutAll", mathml, "Ml2f6pjt-0")?;
-            test_command("ZoomIn", mathml, "Ml2f6pjt-2")?;
-            test_command("ZoomIn", mathml, "Ml2f6pjt-3")?;
-            test_command("ZoomIn", mathml, "Ml2f6pjt-4")?;
+            test_command("ZoomOutAll", mathml, "id-1");
+            test_command("ZoomIn", mathml, "id-2");
+            test_command("ZoomIn", mathml, "id-3");
+            test_command("ZoomIn", mathml, "id-4");
             return Ok( () );
         });
     }
@@ -880,11 +874,12 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            test_command("ZoomInAll", mathml, "base")?;
+            test_command("ZoomInAll", mathml, "base");
             return Ok( () );
         });
     }
@@ -897,6 +892,7 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
@@ -907,7 +903,7 @@ mod tests {
                     current_node_offset: 0
                 }, "None")
             });
-            test_command("ZoomOut", mathml, "msup")?;
+            test_command("ZoomOut", mathml, "msup");
 
             let nav_speech = do_navigate_command(mathml, NavigationCommand::Zoom, NavigationParam::Previous)?;
             debug!("Full speech: {}", nav_speech);
@@ -926,6 +922,7 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
@@ -937,7 +934,7 @@ mod tests {
                 }, "None")
             });
 
-            test_command("ZoomOutAll", mathml, "math")?;
+            test_command("ZoomOutAll", mathml, "mfrac");
             return Ok( () );
         });
     }
@@ -946,9 +943,10 @@ mod tests {
     fn move_to_start() -> Result<()> {
         // init_logger();
         let mathml_str = "<math id='math'><mfrac id='mfrac'>
-                <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
+                <mrow id='num'><msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup><mo id='factorial'>!</mo></mrow>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
@@ -959,7 +957,16 @@ mod tests {
                     current_node_offset: 0
                 }, "None")
             });
-            test_command("MoveLineStart", mathml, "denom")?;
+            test_command("MoveLineStart", mathml, "denom");
+
+            NAVIGATION_STATE.with(|nav_stack| {
+                nav_stack.borrow_mut().push(NavigationPosition{
+                    current_node: "factorial".to_string(),
+                    current_node_offset: 0
+                }, "None")
+            });
+            test_command("MoveLineStart", mathml, "msup");
+
             let nav_speech = do_navigate_command(mathml, NavigationCommand::Move, NavigationParam::Start)?;
             debug!("Full speech: {}", nav_speech);
             NAVIGATION_STATE.with(|nav_stack| {
@@ -973,16 +980,17 @@ mod tests {
     #[test]
     fn move_right_sup() -> Result<()> {
         // init_logger();
-        let mathml_str = "<math display='block' id='Msowudr8-0' data-id-added='true'>
-        <mrow data-changed='added' id='Msowudr8-1' data-id-added='true'>
-          <msup id='Msowudr8-2' data-id-added='true'>
-            <mn id='Msowudr8-3' data-id-added='true'>2</mn>
-            <mi id='Msowudr8-4' data-id-added='true'>q</mi>
+        let mathml_str = "<math display='block' id='Msowudr8-0'>
+        <mrow id='Msowudr8-1'>
+          <msup id='Msowudr8-2'>
+            <mn id='Msowudr8-3'>2</mn>
+            <mi id='Msowudr8-4'>q</mi>
           </msup>
-          <mo id='Msowudr8-5' data-id-added='true'>-</mo>
-          <mi id='Msowudr8-6' data-id-added='true'>x</mi>
+          <mo id='Msowudr8-5'>-</mo>
+          <mi id='Msowudr8-6'>x</mi>
         </mrow>
-       </math>";
+        </math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
@@ -994,7 +1002,7 @@ mod tests {
                 }, "None")
             });
             SetPreference("NavMode".to_string(), StringOrFloat::AsString("Enhanced".to_string()))?;
-            test_command("MoveNext", mathml, "Msowudr8-5")?;
+            test_command("MoveNext", mathml, "Msowudr8-5");
 
             // reset start and test Simple
             NAVIGATION_STATE.with(|nav_stack| {
@@ -1004,7 +1012,7 @@ mod tests {
                 }, "None")
             });
             SetPreference("NavMode".to_string(), StringOrFloat::AsString("Simple".to_string()))?;
-            test_command("MoveNext", mathml, "Msowudr8-5")?;
+            test_command("MoveNext", mathml, "Msowudr8-5");
 
             // reset start and test Character
             NAVIGATION_STATE.with(|nav_stack| {
@@ -1014,10 +1022,10 @@ mod tests {
                 }, "None")
             });
             SetPreference("NavMode".to_string(), StringOrFloat::AsString("Character".to_string()))?;
-            test_command("MoveNext", mathml, "Msowudr8-4")?;
+            test_command("MoveNext", mathml, "Msowudr8-4");
 
             SetPreference("NavMode".to_string(), StringOrFloat::AsString("Character".to_string()))?;
-            test_command("MoveNext", mathml, "Msowudr8-5")?;
+            test_command("MoveNext", mathml, "Msowudr8-5");
             return Ok( () );
         });
     }
@@ -1025,44 +1033,44 @@ mod tests {
     
     #[test]
     fn move_right_char() -> Result<()> {
-        // gger();
-        let mathml_str = "<math id='Myt3m7mx-0' data-id-added='true'>
-        <mrow displaystyle='true' id='Myt3m7mx-1' data-id-added='true'>
-          <mi id='Myt3m7mx-2' data-id-added='true'>x</mi>
-          <mo id='Myt3m7mx-3' data-id-added='true'>=</mo>
-          <mrow data-changed='added' id='Myt3m7mx-4' data-id-added='true'>
-            <mfrac id='Myt3m7mx-5' data-id-added='true'>
-              <mn id='Myt3m7mx-6' data-id-added='true'>1</mn>
-              <mrow id='Myt3m7mx-7' data-id-added='true'>
-                <mi id='Myt3m7mx-8' data-id-added='true'>a</mi>
-                <mo id='Myt3m7mx-9' data-id-added='true'>+</mo>
-                <mn id='Myt3m7mx-10' data-id-added='true'>2</mn>
+        let mathml_str = "<math id='Myt3m7mx-0'>
+        <mrow displaystyle='true' id='Myt3m7mx-1'>
+          <mi id='Myt3m7mx-2'>x</mi>
+          <mo id='Myt3m7mx-3'>=</mo>
+          <mrow id='Myt3m7mx-4'>
+            <mfrac id='Myt3m7mx-5'>
+              <mn id='Myt3m7mx-6'>1</mn>
+              <mrow id='Myt3m7mx-7'>
+                <mi id='Myt3m7mx-8'>a</mi>
+                <mo id='Myt3m7mx-9'>+</mo>
+                <mn id='Myt3m7mx-10'>2</mn>
               </mrow>
             </mfrac>
-            <mo id='Myt3m7mx-11' data-id-added='true'>+</mo>
-            <mrow data-changed='added' id='Myt3m7mx-12' data-id-added='true'>
-              <mn id='Myt3m7mx-13' data-id-added='true'>3</mn>
-              <mo data-changed='added' id='Myt3m7mx-14' data-id-added='true'>&#x2062;</mo>
-              <mi id='Myt3m7mx-15' data-id-added='true'>b</mi>
+            <mo id='Myt3m7mx-11'>+</mo>
+            <mrow id='Myt3m7mx-12'>
+              <mn id='Myt3m7mx-13'>3</mn>
+              <mo id='Myt3m7mx-14'>&#x2062;</mo>
+              <mi id='Myt3m7mx-15'>b</mi>
             </mrow>
           </mrow>
         </mrow>
-       </math>";
+        </math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         SetPreference("NavMode".to_string(), StringOrFloat::AsString("Character".to_string()))?;
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            test_command("ZoomInAll", mathml, "Myt3m7mx-2")?;
-            test_command("MoveNext", mathml, "Myt3m7mx-3")?;
-            test_command("MoveNext", mathml, "Myt3m7mx-6")?;
-            test_command("MoveNext", mathml, "Myt3m7mx-8")?;
-            test_command("MoveNext", mathml, "Myt3m7mx-9")?;
-            test_command("MoveNext", mathml, "Myt3m7mx-10")?;
-            test_command("MoveNext", mathml, "Myt3m7mx-11")?;
-            test_command("MoveNext", mathml, "Myt3m7mx-13")?;
-            test_command("MoveNext", mathml, "Myt3m7mx-15")?;
-            test_command("MoveNext", mathml, "Myt3m7mx-15")?;
+            test_command("ZoomInAll", mathml, "Myt3m7mx-2");
+            test_command("MoveNext", mathml, "Myt3m7mx-3");
+            test_command("MoveNext", mathml, "Myt3m7mx-6");
+            test_command("MoveNext", mathml, "Myt3m7mx-8");
+            test_command("MoveNext", mathml, "Myt3m7mx-9");
+            test_command("MoveNext", mathml, "Myt3m7mx-10");
+            test_command("MoveNext", mathml, "Myt3m7mx-11");
+            test_command("MoveNext", mathml, "Myt3m7mx-13");
+            test_command("MoveNext", mathml, "Myt3m7mx-15");
+            test_command("MoveNext", mathml, "Myt3m7mx-15");
 
             return Ok( () );
         });
@@ -1079,21 +1087,22 @@ mod tests {
           <mo id='plus-2'>+</mo>
           <mi id='c'>c</mi>
         </mrow>
-       </math>";
+        </math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         SetPreference("NavMode".to_string(), StringOrFloat::AsString("Character".to_string()))?;
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            test_command("MoveStart", mathml, "a")?;
-            test_command("SetPlacemarker0", mathml, "a")?;
-            test_command("MoveEnd", mathml, "c")?;
-            test_command("Read0", mathml, "c")?;
-            test_command("Describe0", mathml, "c")?;
-            test_command("SetPlacemarker1", mathml, "c")?;
-            test_command("MoveTo0", mathml, "a")?;
-            test_command("MoveTo1", mathml, "c")?;
-            test_command("MoveLastLocation", mathml, "a")?;
+            test_command("MoveStart", mathml, "a");
+            test_command("SetPlacemarker0", mathml, "a");
+            test_command("MoveEnd", mathml, "c");
+            test_command("Read0", mathml, "c");
+            test_command("Describe0", mathml, "c");
+            test_command("SetPlacemarker1", mathml, "c");
+            test_command("MoveTo0", mathml, "a");
+            test_command("MoveTo1", mathml, "c");
+            test_command("MoveLastLocation", mathml, "a");
             
             return Ok( () );
         });
@@ -1106,6 +1115,7 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
+        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
         SetMathML(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
@@ -1117,7 +1127,7 @@ mod tests {
                 }, "None")
             });
             // WhereAmIAll doesn't change the stack
-            let speech =test_command("WhereAmIAll", mathml, "exp")?;
+            let speech =test_command("WhereAmIAll", mathml, "exp");
             // should be 2 "inside" strings corresponding to steps to the root
             assert_eq!(speech.matches("inside").map(|_| 1).sum::<i32>(), 2);
             return Ok( () );

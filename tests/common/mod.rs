@@ -4,7 +4,7 @@
 use regex::Regex;
 extern crate lazy_static;
 use lazy_static::lazy_static;
-use libmathcat::interface::{speak_mathml, braille_mathml};
+use libmathcat::interface::{SetRulesDir, SetMathML, GetSpokenText, GetBraille};
 
 #[allow(dead_code)] 
 pub fn init_logger() {
@@ -17,6 +17,14 @@ pub fn init_logger() {
         .init();
 }
 
+/// Build Absolute path to rules dir for testing
+pub fn abs_rules_dir_path() -> String {
+    return std::env::current_exe().unwrap().parent().unwrap()
+                .join("..\\..\\..\\..\\Rules")
+                .to_str().unwrap().to_string();
+}
+
+
 // Strip spaces from 'str' so comparison doesn't need to worry about spacing
 #[allow(dead_code)]     // used in testing
 fn strip_spaces(str: String) -> String {
@@ -26,17 +34,28 @@ fn strip_spaces(str: String) -> String {
     return String::from( SPACES.replace_all(&str, " ") );
 }
 
+#[allow(dead_code)]     // used in testing
+fn check_answer(test: &str, target: &str) {
+    if let Err(e) = SetMathML(test.to_string()) {
+        panic!("{}", e.to_string());
+    };
+    match GetSpokenText() {
+        Ok(speech) => assert_eq!(target, strip_spaces(speech)),
+        Err(e) => panic!("{}", e.to_string()),
+    };    
+}
+
 // Compare the result of speaking the mathml input to the output 'speech'
 // This uses default preferences
 #[allow(dead_code)]     // used in testing
 pub fn test(style: &str, mathml: &str, speech: &str) {
+    SetRulesDir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", style);
         rules.invalidate(changes);
     });
-
-    assert_eq!(speech, strip_spaces(speak_mathml(mathml)));
+    check_answer(mathml, speech);
 }
 
 
@@ -45,6 +64,7 @@ pub fn test(style: &str, mathml: &str, speech: &str) {
 #[allow(dead_code)]     // used in testing
 #[allow(non_snake_case)]
 pub fn test_prefs(speech_style: &str, prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
+    SetRulesDir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let mut changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", speech_style);
@@ -53,7 +73,7 @@ pub fn test_prefs(speech_style: &str, prefs: Vec<(&str, &str)>, mathml: &str, sp
         };
         rules.invalidate(changes);
     });
-    assert_eq!(speech, strip_spaces(speak_mathml(mathml)));
+    check_answer(mathml, speech);
 }
 
 // Compare the result of speaking the mathml input to the output 'speech'
@@ -61,13 +81,14 @@ pub fn test_prefs(speech_style: &str, prefs: Vec<(&str, &str)>, mathml: &str, sp
 #[allow(dead_code)]     // used in testing
 #[allow(non_snake_case)]
 pub fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: &str) {
+    SetRulesDir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let mut changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", "ClearSpeak");
         changes.add_changes( rules.pref_manager.borrow_mut().set_user_prefs(pref_name, pref_value) );
         rules.invalidate(changes);
     });
-    assert_eq!(speech, strip_spaces(speak_mathml(mathml)));
+    check_answer(mathml, speech);
 }
 
 // Compare the result of speaking the mathml input to the output 'speech'
@@ -75,6 +96,7 @@ pub fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: 
 #[allow(dead_code)]     // used in testing
 #[allow(non_snake_case)]
 pub fn test_ClearSpeak_prefs(prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
+    SetRulesDir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let mut changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", "ClearSpeak");
@@ -83,17 +105,24 @@ pub fn test_ClearSpeak_prefs(prefs: Vec<(&str, &str)>, mathml: &str, speech: &st
         };
         rules.invalidate(changes);
     });
-    assert_eq!(speech, strip_spaces(speak_mathml(mathml)));
+    check_answer(mathml, speech);
 }
 
 // Compare the result of brailling the mathml input to the output (Unicode) 'braille'
 #[allow(dead_code)]     // used in testing
 #[allow(non_snake_case)]
 pub fn test_braille(code: &str, mathml: &str, braille: &str) {
+    SetRulesDir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::BRAILLE_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let changes = rules.pref_manager.borrow_mut().set_user_prefs("Code", code);
         rules.invalidate(changes);
     });
-    assert_eq!(braille, strip_spaces(braille_mathml(mathml, "".to_string())));
+    if let Err(e) = SetMathML(mathml.to_string()) {
+        panic!("{}", e.to_string());
+    };
+    match GetBraille("".to_string()) {
+        Ok(result) => assert_eq!(braille, &result),
+        Err(e) => panic!("{}", e.to_string()),
+    };    
 }

@@ -363,7 +363,7 @@
     - test:
         if: "$MatchCounter = 0"
         then: [t: "zoom out", pause: "long"]
-    - set_variables: [NavNode: "self::*[1]/@id"]   # no-op for $NavCommand = 'ZoomOut'
+    - set_variables: [NavNode: "*[1]/@id"]   # no-op for $NavCommand = 'ZoomOut'
 
 -
   name: zoom-out-all-default
@@ -495,12 +495,15 @@
 -
   name: move-to-start-or-end-2d
   tag: "*"
-  match: "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and IsNode(.., '2D')"
+  match: "DEBUG( ($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and IsNode(.., '2D') )"
   replace:
     test:
-        if: "$NavCommand = 'MoveLineStart'"
-        then: [set_variables: [NavNode: "*[1]/@id"]]
-        else: [set_variables: [NavNode: "*[last()]/@id"]]
+        if: "self::m:mrow"
+        then_test:
+          if: "$NavCommand = 'MoveLineStart'"
+          then: [set_variables: [NavNode: "*[1]/@id"]]
+          else: [set_variables: [NavNode: "*[last()]/@id"]]
+        else: [set_variables: [NavNode: "@id"]]
 
 -
   name: move-to-start-or-end-default
