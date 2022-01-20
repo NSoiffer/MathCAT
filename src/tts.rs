@@ -144,7 +144,7 @@ impl Pronounce {
             let key_value_hash = key_value.as_hash().ok_or_else(|| 
                                         format!("pronounce value '{}' is not key/value pair", yaml_to_string(key_value, 0)))?;
             if key_value_hash.len() != 1 {
-                error!("pronounce value {:?} is not a single key/value pair", key_value_hash);
+                bail!("pronounce value {:?} is not a single key/value pair", key_value_hash);
             }
         
             for (key, value) in key_value_hash {

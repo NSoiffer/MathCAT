@@ -87,12 +87,12 @@ impl Preferences{
 
     // Before we can get the other files, we need the preferences.
     // To get them we need to read pref files, so the pref file reading is different than the other files
-    fn from_file(rules_dir: &PathBuf) -> (Preferences, FileAndTime) {
+    fn from_file(rules_dir: &PathBuf) -> Result<(Preferences, FileAndTime)> {
         let files = Preferences::get_prefs_file_and_time(rules_dir);
         return DEFAULT_USER_PREFERENCES.with(|defaults| {
-            let mut system_prefs = Preferences::read_file(&files.files[0], defaults.clone());
-            system_prefs = Preferences::read_file(&files.files[1], system_prefs);
-            return (system_prefs, files);
+            let mut system_prefs = Preferences::read_file(&files.files[0], defaults.clone())?;
+            system_prefs = Preferences::read_file(&files.files[1], system_prefs)?;
+            return Ok((system_prefs, files));
         });
     }
 
@@ -122,9 +122,9 @@ impl Preferences{
         }
     }
 
-    fn read_file(file: &Option<PathBuf>, base_prefs: Preferences) -> Preferences {
+    fn read_file(file: &Option<PathBuf>, base_prefs: Preferences) -> Result<Preferences> {
         let unwrapped_file = match file {
-            None => return base_prefs,
+            None => return Ok(base_prefs),
             Some(f) => f.as_path(),
         };
 
@@ -132,15 +132,14 @@ impl Preferences{
         let docs;
         match read_to_string_shim(unwrapped_file) {
             Err(e) => {
-                eprint!("Couldn't read file {}\n{}", file_name, e);
-                return base_prefs;
-            }
+                bail!("Couldn't read file {}\n{}", file_name, e);
+            },
             Ok( file_contents) => {
                 match YamlLoader::load_from_str(&file_contents) {
                     Err(e) => {
                         error!("Yaml parse error ('{}') in file {}.\nUsing fallback defaults which may be inappropriate.",
                                     e, file_name);
-                        return base_prefs;
+                        return Ok(base_prefs);
                     },
                     Ok(d) => docs = d,
                 }
@@ -150,33 +149,34 @@ impl Preferences{
         if docs.len() != 1 {
             error!("Yaml error in file {}.\nFound {} 'documents' -- should only be 1.",
                         file_name, docs.len());
-            return base_prefs;
+            return Ok(base_prefs);
         }
 
         let doc = &docs[0];
-        verify_keys(doc, "Speech", file_name);
-        verify_keys(doc, "Navigation", file_name);
-        verify_keys(doc, "Braille", file_name);
+        verify_keys(doc, "Speech", file_name)?;
+        verify_keys(doc, "Navigation", file_name)?;
+        verify_keys(doc, "Braille", file_name)?;
 
         return DEFAULT_USER_PREFERENCES.with(|defaults| {
             let prefs = &mut defaults.prefs.clone(); // ensure basic key/values exist
             add_prefs(prefs, &doc["Speech"], "", file_name);
             add_prefs(prefs, &doc["Navigation"], "", file_name);
             add_prefs(prefs, &doc["Braille"], "", file_name);
-            return Preferences{ prefs: prefs.to_owned() };
+            return Ok( Preferences{ prefs: prefs.to_owned() } );
         });
 
 
 
-        fn verify_keys(dict: &Yaml, key: &str, file_name: &str) {
+        fn verify_keys(dict: &Yaml, key: &str, file_name: &str) -> Result<()> {
             let prefs = &dict[key];
             if prefs.is_badvalue() {
-                error!("Yaml error in file {}.\nDidn't find '{}' key.", file_name, key);
+                bail!("Yaml error in file {}.\nDidn't find '{}' key.", file_name, key);
             }
             if prefs.as_hash().is_none() {
-                error!("Yaml error in file {}.\n'{}' key is not a dictionary. Value found is {}.",
+                bail!("Yaml error in file {}.\n'{}' key is not a dictionary. Value found is {}.",
                             file_name, key, yaml_to_string(dict, 1));
             }
+            return Ok(());
         }
 
         fn add_prefs(map: &mut PreferenceHashMap, new_prefs: &Yaml, name_prefix: &str, file_name: &str) {
@@ -351,7 +351,7 @@ impl PreferenceManager {
 
             match PreferenceManager::find_rules_dir(&rules_dir) {
                 Ok(rules_dir) => {
-                    let (user_prefs, pref_files) = Preferences::from_file(&rules_dir);
+                    let (user_prefs, pref_files) = Preferences::from_file(&rules_dir)?;
                     match pref_manager.set_all_files(&rules_dir, user_prefs, pref_files) {
                         Ok(_) => return Ok(()),
                         Err(e) => pref_manager.error = get_errors(&e),

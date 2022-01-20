@@ -213,7 +213,7 @@ mod infer_tests {
         debug!("target: {}", crate::pretty_print::mml_to_string(&target));
 
         // let result = infer_intent(&mut SpeechRulesWithContext::new(&rules.borrow(), package2.as_document(), "".to_string()), mathml);
-        let result = crate::speech::intent_from_mathml(mathml, package2.as_document());
+        let result = crate::speech::intent_from_mathml(mathml, package2.as_document()).unwrap();
         debug!("result: {}", crate::pretty_print::mml_to_string(&result));
         return crate::interface::is_same_element(&result, &target);
     }

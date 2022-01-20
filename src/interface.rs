@@ -27,11 +27,11 @@ use crate::pretty_print::mml_to_string;
 use crate::xpath_functions::is_leaf;
 
 // wrap up some common functionality between the call from 'main' and AT
-fn cleanup_mathml(mathml: Element) -> Element {
+fn cleanup_mathml(mathml: Element) -> Result<Element> {
     trim_element(&mathml);
-    let mathml = crate::canonicalize::canonicalize(mathml);
+    let mathml = crate::canonicalize::canonicalize(mathml)?;
     let mathml = add_ids(mathml);
-    return mathml;
+    return Ok(mathml);
 }
 
 
@@ -70,7 +70,7 @@ pub fn SetMathML(mathml_str: String) -> Result<String> {
             if let Some(e) = speech_rules.borrow().get_error() {bail!("{}", e)} else {Ok(())}
         })?;
         let new_package = new_package.unwrap();
-        let mathml = cleanup_mathml(get_element(&new_package));
+        let mathml = cleanup_mathml(get_element(&new_package))?;
         let mathml_string = mml_to_string(&mathml);
         old_package.replace(new_package);
 
@@ -87,9 +87,9 @@ pub fn GetSpokenText() -> Result<String> {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
         let new_package = Package::new();
-        let intent = crate::speech::intent_from_mathml(mathml, new_package.as_document());
+        let intent = crate::speech::intent_from_mathml(mathml, new_package.as_document())?;
         debug!("Intent tree:\n{}", mml_to_string(&intent));
-        let speech = crate::speech::speak_intent(intent);
+        let speech = crate::speech::speak_intent(intent)?;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( speech );
     });
@@ -103,7 +103,7 @@ pub fn GetOverviewText() -> Result<String> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
-        let speech = crate::speech::overview_mathml(mathml);
+        let speech = crate::speech::overview_mathml(mathml)?;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( speech );
     });
@@ -258,7 +258,7 @@ pub fn GetBraille(nav_node_id: String) -> Result<String> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
-        let braille = crate::speech::braille_mathml(mathml, nav_node_id);
+        let braille = crate::speech::braille_mathml(mathml, nav_node_id)?;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( braille );
     });

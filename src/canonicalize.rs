@@ -313,7 +313,7 @@ pub fn set_mathml_name(element: Element, new_name: &str) {
 /// * if the mrow starts and ends with a fence (e.g, French open interval "]0,1[")
 ///
 /// An mrow is never deleted unless it is redundant.
-pub fn canonicalize(mathml: Element) -> Element {
+pub fn canonicalize(mathml: Element) -> Result<Element> {
 	let context = CanonicalizeContext::new();
 	return context.canonicalize(mathml);
 }
@@ -334,7 +334,7 @@ impl CanonicalizeContext {
 		return CanonicalizeContext{}
 	}
 
-	fn canonicalize<'a>(&self, mathml: Element<'a>) -> Element<'a> {
+	fn canonicalize<'a>(&self, mathml: Element<'a>) -> Result<Element<'a>> {
 		// debug!("MathML before canonicalize:\n{}", mml_to_string(&mathml));
 		let converted_mathml = mathml;
 	
@@ -357,17 +357,10 @@ impl CanonicalizeContext {
 			mrow_element.append_children(children);
 			converted_mathml.append_child(mrow_element);
 		}
-		let converted_mathml = self.canonicalize_mrows(converted_mathml);
-		match converted_mathml {
-			Ok(e) => {
-				debug!("\nMathML after canonicalize:\n{}", mml_to_string(&e));
-				return e;
-			},
-			Err(e)  => {
-				error!("{}", crate::speech::get_errors( &e.chain_err(|| mml_to_string(&mathml))));
-				return mathml;
-			},
-		};
+		let converted_mathml = self.canonicalize_mrows(converted_mathml)
+				.chain_err(|| format!("while processing\n{}", mml_to_string(&mathml)))?;
+		debug!("\nMathML after canonicalize:\n{}", mml_to_string(&converted_mathml));
+		return Ok(converted_mathml);
 	}
 	
 	// This function does some cleanup of MathML (mostly fixing bad MathML)
@@ -2343,7 +2336,7 @@ mod canonicalize_tests {
         let package1 = &parser::parse(test).expect("Failed to parse test input");
 		let mathml = get_element(package1);
 		trim_element(&mathml);
-		let mathml_test = canonicalize(mathml);
+		let mathml_test = canonicalize(mathml).unwrap();
 		debug!("test:\n{}", mml_to_string(&mathml));
         
         let package2 = &parser::parse(target).expect("Failed to parse target input");
