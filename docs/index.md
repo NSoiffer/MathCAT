@@ -38,7 +38,7 @@ These plans are very tentative and will likely change based on feedback from use
 There are many different audiences for MathCAT and each audience has different interests/needs. Please see the following documentation for details based on your needs:
 * AT users: [information about preferences you can set](users.md)
 * AT developers/library users: [information about the API that MathCAT exposes](callers.md)
-* Translators/Rule writers: [information about the files that need to be translated](helers.md)
+* Translators/Rule writers: [information about the files that need to be translated](helpers.md)
 * MathCAT developers: information about MathCAT's design
 
 _TODO: split the text after the next section in the various components above and link them_
