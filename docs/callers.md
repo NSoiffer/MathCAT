@@ -73,7 +73,14 @@ pub fn GetPreference(name: String) -> Option<String>
 ## Python Users
 You can build your own Python interface, or use the one that is built with the related project [MathCATForPython](https://github.com/NSoiffer/MathCATForPython). This uses the Rust package pyo3.
 
-The Python interface is basically the same as the Rust interface. When calling a function, it should be wrapped in `try: ... except: ...`
+The Python interface is basically the same as the Rust interface. When calling a function, it should be wrapped in
+```
+try:
+    ...
+except Exception as e:
+    ...  # log the error 'e'
+```
+
 
 ## Web Users
 I built a web assembly version. Has a few compromises and requires some hand tweaks during the build process. Those need to be automated. It can be found at [MathCatDemo](https://github.com/NSoiffer/MathCATDemo). This builds a web page for demo purposes, so it is not a pure build for the Web. Nonetheless, it does demonstrate how that can be done.
