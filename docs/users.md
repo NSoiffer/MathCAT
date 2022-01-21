@@ -2,11 +2,16 @@
 <img src="logo.png" style="position: relative; top: 16px; z-index: -1;">
 
 ## Information for MathCAT users
-MathCAT supports a number of options to control speech, braille, and navigation. This page describes the options these options.
+MathCAT supports a number of options to control speech, braille, and navigation. These are described below.
 Not all options are currently supported. The current state of support for an option is listed with the option and a ✓ is used before the option as a quick reference to indicate at least partial support for that option.
 
 Note: currently, the options can only be changed by modifying a text file. Work is being done to provide a more friendly (accessible) GUI.
 This documentation will be updated when the GUI is ready to be used.
+
+MathCAT supports multiple modes of navigation. The means to begin navigating and end navigating will differ depending on the AT you are using. See the list below. The commands/key-strokes accepted by MathCAT are the same as those accepted by MathPlayer and are [listed in this document](https://docs.wiris.com/en/mathplayer/navigation_commands). MathCAT's navigation is the same in Word and in a browser.
+
+To start navigation:
+* NVDA:  press NVDA+Alt+M to enter math navigation mode, press Esc to exit
 
 ## Option List
 The options are listed below. Most options allow only a limited set of values and those are indicated in the options.
