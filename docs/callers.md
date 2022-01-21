@@ -21,7 +21,8 @@ have an 'id' set. You can get the current node with
 * [`GetNavigationMathML`] -- returns a string representing the MathML for the selected node
 
 Note: a second integer is returned by both of these calls. This number is the offset in characters for a leaf node.
-  This is needed when navigating by character for multi-symbol leaf nodes such as "sin" and "1234"
+This is needed when navigating by character for multi-symbol leaf nodes such as "sin" and "1234".
+Currently the value is always '0' -- this feature needs more implementation work.
 
 It is also possible to find out what preferences are currently set by calling [`GetPreference`]
 
