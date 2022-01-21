@@ -71,11 +71,12 @@ use std::str::FromStr;
 use strum_macros::{Display, EnumString};
 use regex::Regex;
 
-pub const PAUSE_SHORT:f64 = 150.0;  // ms
-pub const PAUSE_MEDIUM:f64 = 300.0; // ms
-pub const PAUSE_LONG:f64 = 600.0;   // ms
-pub const PAUSE_AUTO:f64 = 987654321.5;   // ms -- hopefully unique
+const PAUSE_SHORT:f64 = 150.0;  // ms
+const PAUSE_MEDIUM:f64 = 300.0; // ms
+const PAUSE_LONG:f64 = 600.0;   // ms
+const PAUSE_AUTO:f64 = 987654321.5;   // ms -- hopefully unique
 pub const PAUSE_AUTO_STR: &str = "\u{F8FA}\u{F8FA}";
+const RATE_FROM_CONTEXT:f64 = 987654321.5;   // hopefully unique
 
 /// TTSCommand are the supported TTS commands
 /// When parsing the YAML rule files, they are converted to these enums
@@ -285,6 +286,7 @@ impl TTS {
                 "medium" => Ok( PAUSE_MEDIUM ),
                 "long" => Ok( PAUSE_LONG ),
                 "auto" => Ok( PAUSE_AUTO ),
+                "$MathRate" => Ok( RATE_FROM_CONTEXT ), // special case hack -- value determined in replace
                 _ => tts_value.parse::<f64>()
             };
         
@@ -333,9 +335,19 @@ impl TTS {
                 TTS::SSML => compute_bookmark_element(&command.value, "mark name", rules_with_context, mathml)?,
             } );
         }
-        if command.command == TTSCommand::Bookmark && prefs.get_api_prefs().to_string("Bookmark") != "true" {
-            return Ok("".to_string());
+
+        let mut command = command.clone();
+        if command.command == TTSCommand::Rate && self != &TTS::None {
+            if let TTSCommandValue::Number(number_value) = command.value {
+                if number_value == RATE_FROM_CONTEXT {
+                    // handle hack for $Rate -- need to look up in context
+                    let rate_from_context = crate::navigate::context_get_variable(rules_with_context.get_context(), "MathRate", mathml)?.1;
+                    assert!(rate_from_context.is_some());
+                    command.value = TTSCommandValue::Number(rate_from_context.unwrap());
+                }
+            }
         }
+
 
         let mut result = String::with_capacity(255);
         result += &match self {

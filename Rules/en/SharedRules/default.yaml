@@ -4,7 +4,14 @@
     name: default
     tag: math
     match: "."
-    replace: [x: "*"]
+    replace:
+    - test:
+        if: "$MathRate = 100"
+        then: [x: "*"]
+        else:
+        - rate:
+            value: "$MathRate"
+            replace: [x: "*"]
 -
     name: default
     tag: mrow

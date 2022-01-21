@@ -247,7 +247,8 @@ pub fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> 
     return None;
 }
 
-fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>) -> Result<(Option<String>, Option<f64>)> {
+// FIX: think of a better place to put this, and maybe a better interface
+pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>) -> Result<(Option<String>, Option<f64>)> {
     // First return tuple value is string-value (if string, bool, or single node) or None
     // Second return tuple value is f64 if variable is a number or None
     // This is ridiculously complicated for what in the end is a hashmap lookup

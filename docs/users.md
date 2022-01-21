@@ -36,11 +36,11 @@ The default value is given in \[brackets\].
     * Description: controls how much "extra" speech is used. E.g, square roots are verbosely spoken as "the square root of x" and tersely spoken as "square root x".
     * Status: supported, but there will likely be improvements made over time
 
-* ✓Rate: [100]
+* ✓MathRate: [100]
     * Options: Number between 1 and 1000(?)
-    * Description: percentage speed change from standard speech engine rate.
+    * Description: percentage speed change from standard speech engine rate. '100' means the math reading rate is the same as that of the text rate.
       This only works for implementations that tell MathCAT to generate speech engine tagging such as SSML.
-    * Status: implemented but not well tested. This should work in NVDA.
+    * Status: This should work in NVDA.
 
 
 * SubjectArea: [General]

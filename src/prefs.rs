@@ -348,6 +348,7 @@ impl PreferenceManager {
         // the prefs files are in the rules dir and the user dir; differs from other files
         return PREF_MANAGER.with( |pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.api_prefs = Preferences{ prefs: DEFAULT_API_PREFERENCES.with(|defaults| defaults.prefs.clone()) };
 
             match PreferenceManager::find_rules_dir(&rules_dir) {
                 Ok(rules_dir) => {
@@ -393,7 +394,6 @@ impl PreferenceManager {
         self.rules_dir = Some(rules_dir.clone());
         self.pref_files = pref_files;
         self.user_prefs = prefs.clone();
-        self.api_prefs = Preferences{ prefs: DEFAULT_API_PREFERENCES.with(|defaults| defaults.prefs.clone()) };
         self.intent = PreferenceManager::get_file_and_time(
             &rules_dir, language, Some("en"), "intent.yaml")?;
         self.speech = PreferenceManager::get_file_and_time(

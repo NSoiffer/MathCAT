@@ -3,10 +3,10 @@
     Impairment: Blindness       # LearningDisability, LowVision, Blindness
     Language: en                # any known language code and sub-code -- could be en-uk, etc
     Verbosity: Medium           # Terse, Medium, Verbose
-    Rate: 100                   # Change from text speech rate (%)
+    MathRate: 100               # Change from text speech rate (%)
     SpeechStyle: ClearSpeak #ClearSpeak     # Any known speech style (falls back to ClearSpeak)
-    SubjectArea: general        # FIX: still working on this
-    Chemistry: spell_out        # SpellOut (H 2 0), AsCompound (Water), Off (H sub 2 O)
+    SubjectArea: Off            # FIX: still working on this
+    Chemistry: SpellOut         # SpellOut (H 2 0), AsCompound (Water), Off (H sub 2 O)
 
     ClearSpeak:                 # see ClearSpeak speak for meanings
       CapitalLetters: Auto      # SayCaps or use pitch
