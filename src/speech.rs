@@ -1979,21 +1979,6 @@ impl UnicodeDef {
     }    
 }
 
-/// Print out the errors to `stderr`.
-///
-/// Useful functionality that had to had a home in some crate, so it is here.
-pub fn get_errors(e:&Error) -> String {
-    let mut result = String::default();
-    for (i, e) in e.iter().enumerate() {
-        if i == 0 {
-            result = e.to_string();
-        } else {
-            result += &format!("caused by: {}\n", e);
-        }
-    }
-    return result;
-}
-
 // Fix: there should be a cache so subsequent library calls don't have to read in the same speech rules
 //   likely a cache of size 1 is fine
 // Fix: all statics should be gathered together into one structure that is a Mutex
@@ -2130,7 +2115,7 @@ impl SpeechRules {
                     };
                     return rules;
                 },
-                Err(e) => error = get_errors(&e),
+                Err(e) => error = crate::interface::errors_to_string(&e),
             }
         };
         return SpeechRules {
@@ -2532,7 +2517,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                 return replace_single_char(self, ch, mathml)
             } else {
                 // more than one char (don't use str.len() since that is bytes, not chars)
-                return Ok(String::from(str));
+                return Ok(String::from(str.replace('\u{a0}', " ")));
             }
         };
 

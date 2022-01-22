@@ -785,7 +785,7 @@ mod tests {
     #[cfg(test)]    
     fn test_command(command: &'static str, mathml: Element, result_id: &str) -> String {
         match do_navigate_command_string(mathml, command) {
-            Err(e) => panic!("{}", &crate::speech::get_errors(&e)),
+            Err(e) => panic!("{}", &crate::interface::errors_to_string(&e)),
             Ok(nav_speech) => {
                 // debug!("Full speech: {}", nav_speech);
                 NAVIGATION_STATE.with(|nav_stack| {

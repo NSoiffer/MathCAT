@@ -290,7 +290,7 @@ mod tests {
             //debug!("variable_def_list {} is\n{}", yaml_to_type(variable_def_list), yaml_to_string(variable_def_list, 0));
             for variable_def in variable_def_list.as_vec().unwrap() {
                 if let Err(e) = build_values(variable_def) {
-                    bail!("{}", crate::speech::get_errors(&e.chain_err(||format!("in file {:?}", str))));
+                    bail!("{}", crate::interface::errors_to_string(&e.chain_err(||format!("in file {:?}", str))));
                 }
             }
             return Ok(());

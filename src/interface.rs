@@ -60,6 +60,12 @@ pub fn SetMathML(mathml_str: String) -> Result<String> {
         nav_stack.borrow_mut().reset();
     });
     return MATHML_INSTANCE.with(|old_package| {
+        // need to deal with character data and convert to something the parser knows
+        // potentially all of the names HTML knows could be here, but these are hopefully the important ones
+        let mathml_str = mathml_str.replace("&lt;", "&#x3c;")
+                                          .replace("&gt;", "&#x3e;")
+                                          .replace("&amp;", "&#x26;")
+                                          .replace("&nbsp;", "&#xa0;");
         let new_package = parser::parse(&mathml_str);    
         if new_package.is_err() {
             bail!("Invalid MathML input:\n{}", &mathml_str);
@@ -310,6 +316,22 @@ pub fn GetNavigationMathMLId() -> Result<(String, usize)> {
             return nav_stack.borrow().get_navigation_mathml_id(mathml);
         }) )
     });
+}
+
+
+/// Convert the returned error from SetMathML, etc., to a useful string for display
+pub fn errors_to_string(e:&Error) -> String {
+    let mut result = String::default();
+    let mut first_time = true;
+    for e in e.iter() {
+        if first_time {
+            result = e.to_string();
+            first_time = false;
+        } else {
+            result += &format!("caused by: {}\n", e);
+        }
+    }
+    return result;
 }
 
 

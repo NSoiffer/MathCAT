@@ -27,7 +27,8 @@ use std::rc::Rc;
 use std::path::{Path, PathBuf};
 use std::time::SystemTime;
 use std::env;
-use crate::speech::{as_str_checked, get_errors, RulesFor};
+use crate::speech::{as_str_checked, RulesFor};
+use crate::interface::errors_to_string;
 use std::collections::HashMap;
 use crate::shim_filesystem::*;
 use crate::errors::*;
@@ -355,11 +356,11 @@ impl PreferenceManager {
                     let (user_prefs, pref_files) = Preferences::from_file(&rules_dir)?;
                     match pref_manager.set_all_files(&rules_dir, user_prefs, pref_files) {
                         Ok(_) => return Ok(()),
-                        Err(e) => pref_manager.error = get_errors(&e),
+                        Err(e) => pref_manager.error = errors_to_string(&e),
                     }
                 },
                 Err(e) => {
-                    pref_manager.error = get_errors(&e);
+                    pref_manager.error = errors_to_string(&e);
                 },
             };
             bail!("{}", pref_manager.error);
