@@ -77,8 +77,8 @@ ClearSpeak has a number of options. These were designed for authors to use, but 
 * ✓ImpliedTimes: Auto, MoreImpliedTimes , None
 * ✓Paren: Auto, Speak, SpeakNestingLevel, Silent, CoordPoint, Interval
 * ✓Matrix: Auto, SpeakColNum, SilentColNum, EndMatrix, Vector, EndVector, Combinatorics
-* ✓MultiLineLabel: Auto, Case, Constraint, Equation, None, Row, Step 
-* ✓MultiLineOverview: Auto, None, 
+* ✓MultiLineLabel: Auto, Case, Constraint, Equation, Line, None, Row, Step 
+* MultiLineOverview: Auto, None, 
 * ✓MultiLinePausesBetweenColumns: Short, Long
 * ✓Sets: Auto, woAll, SilentBracket
 * ✓MultSymbolX: Auto, By, Cross
