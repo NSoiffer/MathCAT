@@ -109,7 +109,7 @@ test("ClearSpeak", expr, "3 raised to the 2 x squared power");
 
 #[test]
 fn nested_squared_power_with_neg_coef() {
-  init_logger();
+  // init_logger();
     let expr = "<math>
     <mrow>
     <msup>

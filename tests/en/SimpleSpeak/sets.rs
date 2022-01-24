@@ -234,5 +234,5 @@ fn complicated_set_with_mtext() {
         <mo>}</mo>
         </math>";
     test("SimpleSpeak", expr, 
-            "the set of all x an element of the natural numbers such that x \u{a0}is\u{a0}an\u{a0}even\u{a0}number");
+            "the set of all x an element of the natural numbers such that x is an even number");
 }
