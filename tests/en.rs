@@ -13,6 +13,7 @@ mod en {
         mod mtable;
         mod sets;
         mod symbols_and_adornments;
+        mod multiline;
     }
     mod SimpleSpeak {
         mod functions;
@@ -25,6 +26,7 @@ mod en {
         mod sets;
         mod geometry;
         mod linear_algebra;
+        mod multiline;
     }
 }
 

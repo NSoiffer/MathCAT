@@ -41,7 +41,7 @@ fn check_answer(test: &str, target: &str) {
     };
     match GetSpokenText() {
         Ok(speech) => assert_eq!(target, strip_spaces(speech)),
-        Err(e) => panic!("{}", e.to_string()),
+        Err(e) => panic!("{}", libmathcat::interface::errors_to_string(&e)),
     };    
 }
 
