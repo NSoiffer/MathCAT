@@ -2,6 +2,7 @@ import xml
 import codecs
 from xml.etree.ElementTree import parse
 
+# FIX: manually added POSTFIX priority 25 for '.,;:?'
 def convert_xml_entities(in_file, out_obj):
     import xml.etree.ElementTree as ET
     tree = ET.parse(in_file)
