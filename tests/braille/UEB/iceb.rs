@@ -1,7 +1,80 @@
 // UEB tests for the basic mathml tags
-// These come from (refer to) https://iceb.org/guidelines_for_technical_material_2014.pdf
+// Initial tests are from BANA guidelines, mostly about initial chars for code switching
+//   http://www.brailleauthority.org/ueb/ueb_math_guidance/final_for_posting_ueb_math_guidance_may_2019_102419.pdf
+// These tests start with "bana_"
+//
+// Many come from (refer to) https://iceb.org/guidelines_for_technical_material_2014.pdf
 // For example, "fraction_6_1_1" is a fraction example from section 6.1, and is the first example there.
 use crate::common::*;
+
+#[test]
+fn bana_2_1() {
+    let expr = "<math><mn>6</mn><mo>=</mo><mn>1</mn><mo>&#xD7;</mo><mn>2</mn><mo>&#xD7;</mo><mn>3</mn>
+                <mo>=</mo><mn>1</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>3</mn></math>";
+    test_braille("UEB", expr, "⠼⠋⠀⠐⠶⠀⠼⠁⠐⠦⠼⠃⠐⠦⠼⠉⠀⠐⠶⠀⠼⠁⠐⠖⠼⠃⠐⠖⠼⠉");
+}
+
+#[test]
+fn bana_5_1() {
+    let expr = "<math><mi>x</mi><mo>+</mo><mi>y</mi><mo>=</mo><mn>6</mn></math>";
+    test_braille("UEB", expr, "⠭⠐⠖⠽⠀⠐⠶⠀⠼⠋");
+}
+
+#[test]
+fn bana_5_2() {
+    let expr = "<math><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup><mo>=</mo><mi>C</mi></math>";
+    test_braille("UEB", expr, "⠭⠰⠔⠼⠃⠐⠖⠽⠔⠼⠃⠀⠐⠶⠀⠰⠠⠉");
+}
+
+#[test]
+fn bana_5_3() {
+    let expr = "<math><mfrac><mi>a</mi><mi>b</mi></mfrac><mo>+</mo><mfrac><mi>c</mi><mi>d</mi></mfrac></math>>";
+    test_braille("UEB", expr, "⠰⠰⠷⠁⠨⠌⠃⠾⠐⠖⠷⠉⠨⠌⠙⠾");
+}
+
+#[test]
+fn bana_5_4() {
+    let expr = "<math><msup><mi>a</mi><mi>n</mi></msup><mo>&#xD7;</mo><msup><mi>a</mi><mi>m</mi></msup><mo>=</mo>
+                    <msup><mi>a</mi><mrow><mi>n</mi><mo>+</mo><mi>m</mi></mrow></msup></math>";
+    test_braille("UEB", expr, "⠰⠰⠰⠁⠔⠝⠐⠦⠁⠔⠍⠀⠐⠶⠀⠁⠔⠣⠝⠐⠖⠍⠜⠰⠄");
+}
+
+#[test]
+fn bana_5_5() {
+    let expr = "<math><msub><mi>log</mi><mi>x</mi></msub><mi>y</mi></math>";
+    test_braille("UEB", expr, "⠰⠰⠇⠕⠛⠢⠭⠀⠰⠽");
+}
+
+#[test]
+fn bana_5a_1() {
+    let expr = "<math><msup><mn>100</mn><mo>&#xB0;</mo></msup><mi>F</mi></math>";
+    test_braille("UEB", expr, "⠰⠰⠇⠕⠛⠢⠭⠀⠰⠽");
+}
+
+#[test]
+fn bana_5a_1_baseline() {
+    let expr = "<math><mn>100</mn><mo>&#xB0;</mo><mi class='MathML-unit'>F</mi></math>";
+    test_braille("UEB", expr, "⠰⠰⠇⠕⠛⠢⠭⠀⠰⠽");
+}
+
+#[test]
+fn bana_5a_2() {
+    let expr = "<math><mn>25</mn><mo>&#xA0;</mo><msup><mi class='MathML-unit'>km</mi><mn>2</mn></msup></math>";
+    test_braille("UEB", expr, "⠼⠃⠑⠀⠅⠍⠰⠔⠼⠃");
+}
+
+#[test]
+fn bana_5a_2_mtext() {
+    let expr = "<math><mn>25</mn><mo>&#xA0;</mo><msup><mtext>km</mtext><mn>2</mn></msup></math>";
+    test_braille("UEB", expr, "⠼⠃⠑⠀⠅⠍⠰⠔⠼⠃");
+}
+
+#[test]
+fn bana_5a_3() {
+    let expr = "<math><mn>6</mn><mo>&#xA0;</mo><mi>m</mi><mo>&#xA0;</mo>
+            <msup><mi>s</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup></math>";
+    test_braille("UEB", expr, "⠼⠃⠑⠀⠅⠍⠰⠔⠼⠃");
+}
 
 #[test]
 fn fraction_6_1_1() {
