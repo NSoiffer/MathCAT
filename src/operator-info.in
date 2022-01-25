@@ -17,8 +17,7 @@ phf_map! {
 			next: &Some( OperatorInfo{ op_type: OperatorTypes::PREFIX, priority: 690, next: &None } )},
 	"++" => OperatorInfo{ op_type: OperatorTypes::POSTFIX, priority: 880, next: &None },
 	"+=" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 260, next: &None },
-	"," => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 40, 
-			next: &Some( OperatorInfo{ op_type: OperatorTypes::POSTFIX, priority: 25, next: &None } )}, // Punctuation
+	"," => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 40, next: &None },
 	"-" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 280, 
 			next: &Some( OperatorInfo{ op_type: OperatorTypes::PREFIX, priority: 690, next: &None } )},
 	"--" => OperatorInfo{ op_type: OperatorTypes::POSTFIX, priority: 880, next: &None },
