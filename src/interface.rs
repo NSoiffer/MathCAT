@@ -20,6 +20,8 @@ use sxd_document::parser;
 use sxd_document::Package;
 use sxd_document::dom::*;
 use crate::errors::*;
+use regex::Regex;
+
 
 use crate::prefs::PreferenceManager;
 use crate::navigate::*;
@@ -56,6 +58,12 @@ pub fn SetRulesDir(dir: String) -> Result<()> {
 ///
 /// This will override any previous MathML that was set.
 pub fn SetMathML(mathml_str: String) -> Result<String> {
+    lazy_static! {
+        // if these are present when resent to MathJaX, MathJaX crashes (https://github.com/mathjax/MathJax/issues/2822)
+        static ref MATHJAX_V2: Regex = Regex::new(r#"class *= *['"]MJX-TeXAtom-ORD.*?['"]"#).unwrap();
+        static ref MATHJAX_V3: Regex = Regex::new(r#"class *= *['"]data-mjx-.*?['"]"#).unwrap();
+    }
+
     NAVIGATION_STATE.with(|nav_stack| {
         nav_stack.borrow_mut().reset();
     });
@@ -66,9 +74,12 @@ pub fn SetMathML(mathml_str: String) -> Result<String> {
                                           .replace("&gt;", "&#x3e;")
                                           .replace("&amp;", "&#x26;")
                                           .replace("&nbsp;", "&#xa0;");
+
+        let mathml_str = MATHJAX_V2.replace_all(&mathml_str, "");
+        let mathml_str = MATHJAX_V3.replace_all(&mathml_str, "");
         let new_package = parser::parse(&mathml_str);    
-        if new_package.is_err() {
-            bail!("Invalid MathML input:\n{}", &mathml_str);
+        if let Err(e) = new_package {
+            bail!("Invalid MathML input:\n{}\nError is: {}", &mathml_str, &e.to_string());
         }
 
         // this forces initialization of things beyond just the speech rules (e.g, the defs.yaml files get read)
@@ -325,7 +336,7 @@ pub fn errors_to_string(e:&Error) -> String {
     let mut first_time = true;
     for e in e.iter() {
         if first_time {
-            result = e.to_string();
+            result = format!("{}\n", e);
             first_time = false;
         } else {
             result += &format!("caused by: {}\n", e);
