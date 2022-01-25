@@ -76,4 +76,4 @@ def write_comma_line(out_stream):
     out_stream.write('         else: [t: "⠂"]\n')
 
 
-write_nemeth_yaml("braille.csv", "unicode.yaml")
+write_nemeth_yaml("nemeth.csv", "unicode.yaml")
