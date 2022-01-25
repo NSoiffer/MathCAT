@@ -222,9 +222,9 @@
       then: [t: of]
   
 -
-   name: bigop
+   name: largeop
    tag: mrow
-   match: "count(*)=2 and IsLargeOp(*[1])"
+   match: "count(*)=2 and DEBUG(IsLargeOp(*[1]))"
    replace: 
     - test: 
        if: "$Verbosity!='Terse'"
@@ -390,10 +390,66 @@
    tag: log-base
    match: "."
    replace:
-      - bookmark: "@id"
-      - test: 
-         if: "$Verbosity!='Terse'"
-         then: {t: the}
-      - t: log base
-      - x: "*[1]"
+   - bookmark: "@id"
+   - test: 
+      if: "$Verbosity!='Terse'"
+      then: {t: the}
+   - t: log base
+   - x: "*[1]"
 
+-
+   # IDEA:  set a variable with the word to saw for the row (e.g., RowLabel = Row/Case/Line/...)
+   #   that eliminates the need for the if: else_if: ...
+   name: multi-line
+   tag: [piecewise, equations, lines]
+   match: "."
+   replace:
+   - x: "count(*)"
+   - test:
+      - if: "self::m:piecewise"
+        then: [t: "case"]
+      - else_if: "self::m:equations"
+        then: [t: "equation"]
+        else: [t: "line"]
+   - test:
+      - if: "count(*) > 1"
+        then: [ct: "s"]    # plural
+   - pause: short
+   - x: "*"
+
+-
+  name: default-multiline
+  tag: [mtr, mlabeledtr]
+  match: "parent::m:piecewise or parent::m:equations or parent::m:lines"
+  replace:
+   - test:
+      - if: "parent::m:piecewise"
+        then: [t: "case"]
+      - else_if: "parent::m:equations"
+        then: [t: "equation"]
+        else: [t: "line"]
+   - x: "count(preceding-sibling::*)+1"
+   - test:
+      if: .[self::m:mlabeledtr]
+      then:
+         - t: with label
+         - x: "*[1]/*"
+   - pause: medium
+   - test:
+      if: .[self::m:mlabeledtr]
+      then: [x: "*[position()>1]"]
+      else: {x: "*"}
+
+-
+  name: default-multiline
+  tag: mtd
+  match: "parent::*[parent::m:piecewise or parent::m:equations or parent::m:lines]"
+  replace:
+   - x: "*"
+   - test:
+      # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
+      - if: count(following-sibling::*) > 0
+        then: {pause: short}
+      - else_if: count(../following-sibling::*) > 0
+        then: {pause: medium}
+        else: {pause: long}

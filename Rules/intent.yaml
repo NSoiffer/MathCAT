@@ -33,6 +33,12 @@
 
 -
   # we need to leave "math" here so that there is a parent to all the rules (otherwise we have a special case tests)
+  name: ignore-punctuation
+  tag: math
+  match: "*[1][self::m:mrow and count(*)=2 and *[2][translate(.,'.,;:?', '')='']]"
+  replace: [x: "*[1]/*[1]" ]
+
+-
   name: default
   tag: math
   match: "."

@@ -1,19 +1,39 @@
 ---
 
 -
-  # vertical bars around an mtable or around a capital letter
-  # could add a check to make sure it was a square mtable
-  name: determinant
+  # vertical bars around a capital letter
+  name: determinant-scalar
   tag: mrow
   match: 
     - "IsBracketed(., '|', '|') and "
-    - "( *[2][self::m:mtable or "
-    - "  self::m:mi[self::m:mi and string-length(text()) and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]]"
-    - ")"
+    - "*[2][self::m:mi and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '']"
   replace:
   - intent:
       name: "determinant"
       children: [x: "*[2]"]
+
+-
+  # vertical bars around an mtable
+  # FIX: could add a check to make sure it was a square mtable
+  name: determinant
+  tag: mrow
+  match: 
+    - "IsBracketed(., '|', '|') and  *[2][self::m:mtable]"
+  replace:
+  - intent:
+      name: "determinant"
+      children: [x: "*[2]/*"]
+
+-
+  # parens or brackets around an mtable
+  name: matrix
+  tag: mrow
+  match: 
+    - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']')) and *[2][self::m:mtable]"
+  replace:
+  - intent:
+      name: "matrix"
+      children: [x: "*[2]/*"]
 
 -
   name: norm
@@ -45,18 +65,6 @@
   replace:
   - intent:
       name: "magnitude"
-      children: [x: "*[2]"]
-
-
--
-  # parens or brackets around an mtable
-  name: matrix
-  tag: mrow
-  match: 
-    - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']')) and *[2][self::m:mtable]"
-  replace:
-  - intent:
-      name: "matrix"
       children: [x: "*[2]"]
 
 -

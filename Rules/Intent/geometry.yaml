@@ -6,9 +6,9 @@
   match:
     - "*[2][self::m:mo][text()='¯'] and"
     - "*[1][self::m:mrow][count(*)=3 and "
-    - "     *[1][self::m:mi and string-length(text()) and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())] and"
+    - "     *[1][self::m:mi and string-length(text()) and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] and"
     - "     *[2][self::m:mo and (text()='\u2062' or text()='\u2063')] and"
-    - "     *[3][self::m:mi and string-length(text()) and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]"
+    - "     *[3][self::m:mi and string-length(text()) and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '']"
     - "                  ]"
   replace:
   - intent:
@@ -23,9 +23,9 @@
   match:
     - "*[2][self::m:mo][text()='→'] and"  # u2192
     - "*[1][self::m:mrow][count(*)=3 and "
-    - "     *[1][self::m:mi and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())] and"
+    - "     *[1][self::m:mi and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] and"
     - "     *[2][self::m:mo and (text()='\u2062' or text()='\u2063')] and"
-    - "     *[3][self::m:mi and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]"
+    - "     *[3][self::m:mi and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '']"
     - "                  ]"
   replace:
   - intent:
@@ -40,9 +40,9 @@
   match:
     - "*[2][self::m:mo][text()='⌒'] and"  # u2192
     - "*[1][self::m:mrow][count(*)=3 and "
-    - "     *[1][self::m:mi and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())] and"
+    - "     *[1][self::m:mi and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] and"
     - "     *[2][self::m:mo and (text()='\u2062' or text()='\u2063')] and"
-    - "     *[3][self::m:mi and contains('ABCDEFGHIJKLMNOPQRSTUVWXYZ', text())]"
+    - "     *[3][self::m:mi and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '']"
     - "    ]"
   replace:
   - intent:

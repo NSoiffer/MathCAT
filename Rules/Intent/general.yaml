@@ -12,7 +12,7 @@
   name: sup-number-set
   tag: msup
   match:
-  - "*[1][string-length(text())=1 and translate(text(), 'ℂℕℚℝℤ', '')=''] and" 
+  - "*[1][string-length(text())=1 and translate(., 'ℂℕℚℝℤ', '')=''] and" 
   - "*[2][string-length(text())=1 and (text()='+' or text()='-' or self::m:mn)]" 
   replace:
   - intent:
@@ -285,3 +285,41 @@
       children:
       - x: "*[1]"
       - x: "*[2]"
+
+
+# generic mtable: treat as multiline equations of some sort
+-
+  name: cases
+  tag: mrow
+  match: "count(*)=2 and *[1][text()='{'] and *[2][self::m:mtable]"
+  replace:
+  - intent:
+      name: "piecewise"
+      children:
+      - x: "*[2]/*"
+
+
+-
+  # if there is a relational op in the first row, assume that's true of all rows and call them equations
+  name: equations
+  tag: mtable
+      # xpath hack: transform the chars we care about to an unlikely char and then see if that char exists
+  match: "count(*) > 0 and *[1][contains(translate(., '=≠<>≤≥≦≧', '='), '=')]"
+  replace:
+  - intent:
+      name: "equations"
+      children:
+      - x: "*"
+
+
+-
+  # don't know anything about them -- think of them as "lines"
+  name: lines
+  tag: mtable
+  match: "."
+  replace:
+  - intent:
+      name: "lines"
+      children:
+      - x: "*"
+

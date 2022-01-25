@@ -205,7 +205,7 @@
   match:
     - "($NavCommand = 'ZoomIn' or $NavCommand = 'ZoomInAll' or $NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and"
     - " parent::m:math and count(*)=2 and"
-    - " *[2][text()=',' or text()='.' or text()=';' or text()='?']"
+    - " *[2][translate(.,'.,;:?', '')='']"
   replace: 
     - x: "*[1]"
 
@@ -215,7 +215,7 @@
   match:
     - "($NavCommand = 'ZoomOut' or $NavCommand = 'ZoomOutAll') and"
     - " parent::m:math and count(*)=2 and"
-    - " *[2][text()=',' or text()='.' or text()=';' or text()='?']"
+    - " *[2][translate(.,'.,;:?', '')='']"
   replace: 
     - x: ".."
 
