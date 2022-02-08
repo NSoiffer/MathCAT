@@ -19,15 +19,15 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
         let rules = rules.borrow();
         let new_package = Package::new();
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id);
-        let speech_string = rules_with_context.match_pattern::<String>(mathml)
+        let braille_string = rules_with_context.match_pattern::<String>(mathml)
                         .chain_err(|| "Pattern match/replacement failure!")?;
             // FIX: need to set name of speech rules so test Nemeth/UEB clean for
         let pref_manager = rules_with_context.get_rules().pref_manager.borrow();
         let highlight_style = pref_manager.get_user_prefs().to_string("BrailleNavHighlight");
         let braille = if &pref_manager.get_user_prefs().to_string("Code") == "UEB" {
-            ueb_cleanup(speech_string.replace(" ", ""))
+            ueb_cleanup(braille_string.replace(" ", ""))
         } else {
-            nemeth_cleanup(speech_string.replace(" ", ""))
+            nemeth_cleanup(braille_string.replace(" ", ""))
         };
 
         return Ok(

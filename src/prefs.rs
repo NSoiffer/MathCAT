@@ -548,6 +548,8 @@ impl PreferenceManager {
         return PreferenceManager::is_file_up_to_date(&self.pref_files) &&
                PreferenceManager::is_file_up_to_date(&self.speech) &&
                PreferenceManager::is_file_up_to_date(&self.speech_unicode) &&
+               PreferenceManager::is_file_up_to_date(&self.braille) &&
+               PreferenceManager::is_file_up_to_date(&self.braille_unicode) &&
                PreferenceManager::is_file_up_to_date(&self.defs) ;
     }
 

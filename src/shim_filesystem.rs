@@ -117,7 +117,10 @@ cfg_if! {
             OVERRIDE_FILE_CONTENTS.with(|contents| *contents.borrow_mut() = file_contents.to_string());
             crate::speech::NAVIGATION_RULES.with(|nav_rules|
                 nav_rules.borrow_mut().invalidate(
-                    crate::prefs::FilesChanged{ rules: true, unicode_short: false, unicode_full: false, defs: false }
+                    crate::prefs::FilesChanged{
+                        speech_rules: true, speech_unicode_short: false, speech_unicode_full: false, 
+                        braille_rules: true, braille_unicode_short: false, braille_unicode_full: false, 
+                        defs: false }
             ));
         }
 
@@ -138,6 +141,11 @@ cfg_if! {
                     </dir>
                     <dir name='Nemeth'>
                         <file name='Nemeth_Rules.yaml'/>
+                        <file name='unicode.yaml'/>
+                        <file name='unicode-full.yaml'/>
+                    </dir>
+                    <dir name='UEB'>
+                        <file name='UEB_Rules.yaml'/>
                         <file name='unicode.yaml'/>
                         <file name='unicode-full.yaml'/>
                     </dir>

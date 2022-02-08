@@ -1869,22 +1869,15 @@ impl SpeechRules {
     }
 
     pub fn invalidate(&mut self, changes: FilesChanged) {
-        if changes.speech_rules {
+        if changes.speech_rules || changes.braille_rules {
             self.rules.clear();
-        };
-
-        if changes.speech_unicode_short {
+        }
+        if changes.speech_unicode_short || changes.braille_unicode_short {
             self.unicode_short.borrow_mut().clear();
-        };
-
-        if changes.speech_unicode_full {
+        }
+        if changes.speech_unicode_full || changes.braille_unicode_full {
             self.unicode_full.borrow_mut().clear();
-        };
-
-        // FIX: figure out flow of 'DEFINITIONS' setting/clearing
-        // if changes.defs {
-        //     self.defs.clear();
-        // };
+        }
     }
 
     pub fn update(&mut self) -> Result<()> {

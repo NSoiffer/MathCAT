@@ -3109,10 +3109,14 @@ mod canonicalize_tests {
         let target_str = "<math>
 				<mrow data-changed='added'>
 					<mi>cos</mi>
-					<mo> </mo>>
-					<mi>x</mi>
+					<mo data-changed='added'>&#x2061;</mo>
+					<mrow data-changed='added'>
+						<mtext> </mtext>
+						<mo data-changed='added'>&#x2062;</mo>
+						<mi>x</mi>
+					</mrow>
 				</mrow>
-			</math>";
+	  		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 

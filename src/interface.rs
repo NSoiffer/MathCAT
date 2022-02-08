@@ -209,6 +209,12 @@ pub fn SetPreference(name: String, value: StringOrFloat) -> Result<()> {
                 let files_changed = rules.pref_manager.borrow_mut().set_user_prefs("Language", value_as_string.as_str());  
                 rules.invalidate(files_changed);  
             },
+            "code" => {
+                let files_changed = rules.pref_manager.borrow_mut().set_user_prefs("Code", to_string(&name, value)?.as_str());    
+                crate::speech::BRAILLE_RULES.with(|braille_rules| {
+                    braille_rules.borrow_mut().invalidate(files_changed);
+                })
+            },
             "braillenavhighlight" => {
                 rules.pref_manager.borrow_mut().set_user_prefs("BrailleNavHighlight", to_string(&name, value)?.as_str());    
             },

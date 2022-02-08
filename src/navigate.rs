@@ -308,17 +308,17 @@ fn do_navigate_command<'a>(mathml: Element<'a>, command: NavigationCommand, para
     return do_navigate_command_string(mathml, navigation_command_string(command, param));
 }
 
-pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str) -> Result<String> {
-    // If no speech happened for some calls, we try the call the call again (e.g, no speech for invisible times).
-    // To prevent to infinite loop, we limit the number of tries
-    const LOOP_LIMIT: usize = 3;
-    static TRY_AGAIN: &'static str = "try again";
+pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str) -> Result<String> {   
+    // first check to see if nav file has been changed -- don't bother checking in loop below
     NAVIGATION_RULES.with(|rules| {
-        // don't need to check update in loop
         let mut mut_rules = rules.borrow_mut();
         return mut_rules.update();  
     })?;
 
+    // If no speech happened for some calls, we try the call the call again (e.g, no speech for invisible times).
+    // To prevent to infinite loop, we limit the number of tries
+    const LOOP_LIMIT: usize = 3;
+    static TRY_AGAIN: &'static str = "try again";
     for loop_count in 0..LOOP_LIMIT {
         if mathml.children().is_empty() {
             bail!("MathML has not been set -- can't navigate");
