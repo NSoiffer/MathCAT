@@ -33,6 +33,7 @@ pub mod interface;
 pub mod canonicalize;
 pub mod infer_intent;
 pub mod speech;
+pub mod braille;
 pub mod navigate;
 pub mod prefs;
 pub mod tts;
@@ -57,6 +58,6 @@ pub fn init_logger() {
 /// Build Absolute path to rules dir for testing
 pub fn abs_rules_dir_path() -> String {
     return std::env::current_exe().unwrap().parent().unwrap()
-                .join("..\\..\\..\\..\\Rules")
+                .join("../../../Rules")
                 .to_str().unwrap().to_string();
 }
