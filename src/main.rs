@@ -138,39 +138,43 @@ fn main() {
   // let expr = "
   // <math display='block'><mrow><mrow><mrow><mover accent='true'><mo fence='true' stretchy='false'>∥</mo><mo stretchy='false'>^</mo></mover><mo>⁢</mo><mi>f</mi><mo>⁢</mo><msub><mover accent='true'><mo fence='true' stretchy='false'>∥</mo><mo stretchy='false'>^</mo></mover><mi>p</mi></msub></mrow><mo>=</mo><msup><mrow><mo>(</mo><mrow><munder><mo largeop='true' movablelimits='false' symmetric='true'>∑</mo><mrow><mi>γ</mi><mo>∈</mo><mover accent='true'><msubsup><mi>𝔽</mi><mn>𝟚</mn><mi>𝕟</mi></msubsup><mo>^</mo></mover></mrow></munder><msup><mrow><mo stretchy='false'>|</mo><mrow><mover accent='true'><mi>f</mi><mo>^</mo></mover><mo>⁢</mo><mrow><mo stretchy='false'>(</mo><mi>γ</mi><mo stretchy='false'>)</mo></mrow></mrow><mo stretchy='false'>|</mo></mrow><mi>p</mi></msup></mrow><mo>)</mo></mrow><mrow><mn>1</mn><mo>/</mo><mi>p</mi></mrow></msup></mrow><mo>.</mo></mrow></math>
   //   ";
-  let expr = "<math xml:lang='en'><mi>x</mi><mo>&lt;</mo><mn>2</mn><mtext>&nbsp;</mtext></math>";
+  let expr = "<math><mn>1750</mn>
+      <mo>&#xA0;</mo><mi mathvariant='normal' class='MathML-Unit'>cm</mi><mo>=</mo>
+      <mo>&#xA0;</mo><mn>1</mn><mn>&#xBE;</mn>
+      </math>";
   let instant = Instant::now();
-  let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("..\\..\\..\\Rules");
+  let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../../Rules");
   let rules_dir = rules_dir.as_os_str().to_str().unwrap().to_string();
-  if SetRulesDir(rules_dir.clone()).is_err() {
-    panic!("Didn't find Rules dir: {}", rules_dir);
-  }
+  if let Err(e) = SetRulesDir(rules_dir.clone()) {
+    panic!("Error: exiting -- {}", errors_to_string(&e));  }
   if let Err(e) = SetMathML(expr.to_string()) {
-    panic!("Error: exiting -- {}", e);
+    panic!("Error: exiting -- {}", errors_to_string(&e));
   };
-  SetPreference("TTS".to_string(), StringOrFloat::AsString("SSML".to_string())).unwrap();
+  // SetPreference("TTS".to_string(), StringOrFloat::AsString("SSML".to_string())).unwrap();
   // SetPreference("Bookmark".to_string(), StringOrFloat::AsString("true".to_string())).unwrap();
-  SetPreference("SpeechStyle".to_string(), StringOrFloat::AsString("SimpleSpeak".to_string())).unwrap();
+  // SetPreference("SpeechStyle".to_string(), StringOrFloat::AsString("SimpleSpeak".to_string())).unwrap();
 
   match GetSpokenText() {
     Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
     Err(e) => panic!("{}", errors_to_string(&e)),
   }
   
-  // match GetBraille("".to_string()) {
-  //   Ok(braille) => info!("Computed speech string:\n   '{}'", braille),
-  //   Err(e) => panic!("{}", get_errors(&e)),
-  // }
-  info!("Time taken: {}ms", instant.elapsed().as_millis());
+  match GetBraille("".to_string()) {
+    Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
+    Err(e) => panic!("{}", errors_to_string(&e)),
+  }
+
+  // Note: the logger seems to be a huge time sync, so println! is used for timing
+  println!("Time taken: {}ms", instant.elapsed().as_millis());
   // let instant = Instant::now();
   // match GetSpokenText() {
   //   Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
-  //   Err(e) => panic!("{}", get_errors(&e)),
+  //   Err(e) => panic!("{}", errors_to_string(&e)),
   // }
   
   // match GetBraille("".to_string()) {
-  //   Ok(braille) => info!("Computed speech string:\n   '{}'", braille),
-  //   Err(e) => panic!("{}", get_errors(&e)),
+  //   Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
+  //   Err(e) => panic!("{}", errors_to_string(&e)),
   // }
-  // info!("Time taken (second time): {}ms", instant.elapsed().as_millis());
+  // println!("Time taken (second time): {}ms", instant.elapsed().as_millis());
 }

@@ -60,7 +60,7 @@ pub fn SetRulesDir(dir: String) -> Result<()> {
 pub fn SetMathML(mathml_str: String) -> Result<String> {
     lazy_static! {
         // if these are present when resent to MathJaX, MathJaX crashes (https://github.com/mathjax/MathJax/issues/2822)
-        static ref MATHJAX_V2: Regex = Regex::new(r#"class *= *['"]MJX-TeXAtom-ORD.*?['"]"#).unwrap();
+        static ref MATHJAX_V2: Regex = Regex::new(r#"class *= *['"]MJX-.*?['"]"#).unwrap();
         static ref MATHJAX_V3: Regex = Regex::new(r#"class *= *['"]data-mjx-.*?['"]"#).unwrap();
     }
 
@@ -275,7 +275,7 @@ pub fn GetBraille(nav_node_id: String) -> Result<String> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
-        let braille = crate::speech::braille_mathml(mathml, nav_node_id)?;
+        let braille = crate::braille::braille_mathml(mathml, nav_node_id)?;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( braille );
     });

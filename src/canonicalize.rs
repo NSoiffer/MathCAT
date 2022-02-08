@@ -227,7 +227,7 @@ impl<'a, 'op:'a> StackInfo<'a, 'op> {
 	}
 
 	fn with_op<'d>(doc: &'d Document<'a>, node: Element<'a>, op_pair: OperatorPair<'op>) -> StackInfo<'a, 'op> {
-		// debug!("  new StackInfo with '{}' and operator {}/{}", name(&node), show_invisible_op_char(op_pair), op_pair.op.priority);
+		// debug!("  new StackInfo with '{}' and operator {}/{}", name(&node), show_invisible_op_char(op_pair.ch), op_pair.op.priority);
 		let mrow = create_mathml_element(doc, "mrow");
 		mrow.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
 		mrow.append_child(node);
@@ -418,13 +418,18 @@ impl CanonicalizeContext {
 				return Some(mathml);
 			}
 			"mo" => {
+				// WIRIS editor at least puts non-breaking whitespace as standalone in 'mo'
+				let text = as_text(mathml);
+				if !text.is_empty() && IS_WHITESPACE.is_match(&text) {
+					// can't throw it out because it is needed by braille -- change to what it really is
+					set_mathml_name(mathml, "mtext");
+				}
 				// common bug: trig functions, lim, etc., should be mi
 				// same for ellipsis ("…")
 				if let Some(result) = merge_arc_trig(mathml) {
 					return Some(result);
 				};
 
-				let text = as_text(mathml);
 				return crate::definitions::DEFINITIONS.with(|definitions| {
 					if text == "…" || 
 					   definitions.borrow().get_hashset("FunctionNames").unwrap().contains(text) ||
@@ -576,7 +581,6 @@ impl CanonicalizeContext {
 		}
 
 		fn convert_mfenced_to_mrow(mfenced: Element) -> Element {
-			// FIX: implement this
 			let open = mfenced.attribute_value("open").unwrap_or("(");
 			let close = mfenced.attribute_value("close").unwrap_or(")");
 			let mut separators= mfenced.attribute_value("separators").unwrap_or(",").chars();
@@ -630,43 +634,63 @@ impl CanonicalizeContext {
 				let child = as_element(children[i]);
 				let mut is_comma = false;
 				let mut is_decimal_pt = false;
+				let mut has_decimal_pt = false;
 				if name(&child) == "mn" {
 					// potential start of a number
+					let mut start = i;
 					let mut looking_for_separator = true;
-					let mut end = children.len() - i;
+					if i > 0 && name(&as_element(children[i-1])) == "mo" {
+						let leaf_text = as_text(as_element(children[i-1]));
+						is_comma = leaf_text == ",";
+						is_decimal_pt = leaf_text == ".";
+						has_decimal_pt = is_decimal_pt;
+						if is_decimal_pt {
+							start = i - 1;
+						}
+					}
+	
+					let mut end = children.len();
 					for (j, sibling) in children[i+1..].iter().enumerate() {
 						let sibling = as_element(*sibling);
 						let sibling_name = name(&sibling);
-						// FIX: generalize to more types of spacing (e.g., mtext with space)
-						// FIX: generalize to include locale ("." vs ",")
-						if looking_for_separator {
-							if sibling_name == "mo" {
+						if !(sibling_name=="mn" || sibling_name=="mspace") {
+							if sibling_name=="mo" {
+								// FIX: generalize to more types of spacing (e.g., mtext with space)
+								// FIX: generalize to include locale ("." vs ",")
 								let leaf_text = as_text(sibling);
-								is_comma = leaf_text == ",";
-								is_decimal_pt = leaf_text == ".";
+								if !(leaf_text=="." || leaf_text==",") || (leaf_text=="." && has_decimal_pt) {
+									end = start + j+1;
+									break;
+								} else if looking_for_separator {
+									is_comma = leaf_text == ",";
+									is_decimal_pt = leaf_text == ".";
+								} else {
+									is_comma = false;
+									is_decimal_pt = false;
+								}
 							} else {
-								is_comma = false;
-								is_decimal_pt = false;
+								end = start + j+1;
+								break;
 							}
-						};
+						}
 						// debug!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
 						// 		 i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
 						if !(looking_for_separator &&
 							 (sibling_name == "mspace" || is_comma || is_decimal_pt)) &&
 						   ( looking_for_separator ||
 						   	 !(is_decimal_pt || is_digit_block(sibling) != DigitBlockType::None)) {
-							end = j+1;
+							end = start + if is_decimal_pt {j+2} else {j+1};
 							break;
 						}
 						looking_for_separator = !looking_for_separator;
 					}
-					// debug!("start={}, end={}", i, i+end);
-					if is_likely_a_number(mrow, i, i+end) {
-						merge_block(mrow, i, i+end);
+					// debug!("start={}, end={}", start, end);
+					if is_likely_a_number(mrow, start, end) {
+						merge_block(mrow, start, end);
 						children = mrow.children();		// mrow has changed, so we need a new children array
 						// note: i..i+end has been collapsed, so just inc 'i' by one
 					} else {
-						i += end-1;	// start looking at the end of the block we just rejected
+						i = end-1;	// start looking at the end of the block we just rejected
 					}
 				}
 				i += 1;
@@ -736,10 +760,25 @@ impl CanonicalizeContext {
 		}
 
 
-		fn is_likely_a_number<'a>(mrow: Element<'a>, start: usize, end: usize) -> bool {
+		fn is_likely_a_number<'a>(mrow: Element<'a>, mut start: usize, mut end: usize) -> bool {
+			if count_decimal_pts(mrow, start, end) > 1 {
+				return false;
+			}
+
+			let decimal_at_start = count_decimal_pts(mrow, start, start+1) == 1;
+			// decimal_at_start => none at end
+			let decimal_at_end = !(decimal_at_start || count_decimal_pts(mrow, end-1, end) == 0);
 			// be a little careful about merging the numbers	
 			if end - start < 3 {
-				return false;		// need at least digit separator digit-block
+				// need at least digit separator digit-block unless it starts or ends with a decimal point
+				return decimal_at_start || decimal_at_end;
+			}
+
+			// simplify a little by removing starting/ending decimals
+			if decimal_at_start {
+				start += 1;
+			} else if decimal_at_end {
+				end -= 1;
 			}
 
 			let children = mrow.children();
@@ -801,6 +840,18 @@ impl CanonicalizeContext {
 				     name(&last_child) == "mo" && is_fence(last_child) );
 		}
 
+		fn count_decimal_pts<'a>(mrow: Element<'a>, start: usize, end: usize) -> usize {
+			let children = mrow.children();
+			let mut n_decimal_pt = 0;
+			for i in start..end {
+				let child = as_element(children[i]);
+				if as_text(child).contains('.')  {
+					n_decimal_pt += 1;
+				}
+			}
+			return n_decimal_pt;
+		}
+
 		fn merge_block<'a>(mrow: Element<'a>, start: usize, end: usize) {
 			let children = mrow.children();
 			let mut mn_text = String::with_capacity(4*(end-start)-1);		// true size less than #3 digit blocks + separator
@@ -813,6 +864,7 @@ impl CanonicalizeContext {
 				}
 			}
 			let child = as_element(children[start]);
+			set_mathml_name(child, "mn");
 			child.set_text(&mn_text);
 
 			// not very efficient since this is probably causing an array shift each time (array is probably not big though)
@@ -1644,16 +1696,17 @@ impl CanonicalizeContext {
 			return false;
 		}
 	
-		let node_str = as_text(base_of_name);
+		let node_str = as_text(base_of_name).trim(); // if mtext to get Roman, sometimes following space included
 		if node_str.is_empty() {
 			return false;
 		}
-		// debug!("    is_function_name({}), {} following nodes", node_str, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
+		debug!("    is_function_name({}), {} following nodes", node_str, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
 		return crate::definitions::DEFINITIONS.with(|defs| {
 			// names that are always function names (e.g, "sin" and "log")
 			let defs = defs.borrow();
 			let names = defs.get_hashset("FunctionNames").unwrap();
 			if names.contains(node_str) {
+				debug!("     ...is in FunctionNames");
 				return true;	// always treated as function names
 			}
 
@@ -1672,15 +1725,18 @@ impl CanonicalizeContext {
 			assert_eq!(name(&node.parent().unwrap().element().unwrap()), "mrow");
 			let right_siblings = right_siblings.unwrap();
 			if right_siblings.is_empty() {
+				debug!("     ...right siblings not None, but zero of them");
 				return false;
 			}
 
 			let first_child = as_element(right_siblings[0]);
 			if name(&first_child) == "mrow" && is_left_paren(as_element(first_child.children()[0])) {
+				debug!("     ...trying again after expanding mrow");
 				return self.is_function_name(node, Some(&first_child.children()));
 			}
 
 			if right_siblings.len() < 2 {
+				debug!("     ...not enough right siblings");
 				return false;	// can't be (...)
 			}
 
@@ -1689,11 +1745,12 @@ impl CanonicalizeContext {
 			let first_sibling = as_element(right_siblings[0]);
 			if name(&first_sibling) != "mo"  || !is_left_paren(first_sibling)  // '(' or '['
 			{
+				debug!("     ...first sibling is not '(' or '['");
 				return false;
 			}
 	
 			if self.is_likely_chemical_state(node, right_siblings) {
-				// debug!("    is_likely_chemical_state=true");
+				// debug!("      ...is_likely_chemical_state=true");
 				return true;
 			}
 	
@@ -1703,7 +1760,7 @@ impl CanonicalizeContext {
 			}
 	
 			if is_single_arg(as_text(first_sibling), &right_siblings[1..]) {
-				// debug!("      ...is single arg");
+				debug!("      ...is single arg");
 				return true;	// if there is only a single arg, why else would you use parens?
 			};
 
@@ -1719,10 +1776,11 @@ impl CanonicalizeContext {
 			let mut chars = node_str.chars();
 			let first_char = chars.next().unwrap();		// we know there is at least one byte in it, hence one char
 			if chars.next().is_some() && first_char.is_uppercase() {
+				debug!("      ...is uppercase name");
 				return true;
 			}
 
-			// debug!("      ...didn't match options to be a function");
+			debug!("      ...didn't match options to be a function");
 			return false;		// didn't fit one of the above categories
 		});
 	
@@ -1920,8 +1978,8 @@ impl CanonicalizeContext {
 		let previous_op = top(&parse_stack).op_pair.clone();
 		// debug!(" shift_stack: mrow len={}", top(parse_stack).mrow.children().len().to_string());
 		// debug!(" shift_stack: shift on '{}'; ops: prev '{}/{}', cur '{}/{}'",
-		//		element_summary(current_child),show_invisible_op_char(previous_op.ch), previous_op.op.priority,
-		//		show_invisible_op_char(current_op.ch), current_op.op.priority);
+		// 		element_summary(current_child),show_invisible_op_char(previous_op.ch), previous_op.op.priority,
+		// 		show_invisible_op_char(current_op.ch), current_op.op.priority);
 		if !previous_op.op.is_nary(current_op.op) {
 			// grab operand on top of stack (if there is one) and make it part of the new mrow since current op has higher precedence
 			// if operators are the same and are binary, then this push makes them act as left associative
@@ -1990,7 +2048,7 @@ impl CanonicalizeContext {
 			let mut top_of_stack = parse_stack.pop().unwrap();
 			// debug!(" ..popped len={} op:'{}/{}', operand: {}",
 			// 		top_of_stack.mrow.children().len(),
-			// 		show_invisible_op_char(top_of_stack.op), top_of_stack.op.priority,
+			// 		show_invisible_op_char(top_of_stack.op_pair.ch), top_of_stack.op_pair.op.priority,
 			// 		top_of_stack.is_operand);
 			let mut mrow = top_of_stack.mrow;
 			if mrow.children().len() == 1 {
@@ -3161,6 +3219,23 @@ mod canonicalize_tests {
 				<mn>8,123,456</mn>
 				<mo>+</mo>
 				<mn>4.32</mn>
+				</mrow>
+			</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn digit_block_decimal_pt() {
+        let test_str = "<math><mn>8</mn><mo>,</mo><mn>123</mn><mo>.</mo>
+								<mo>+</mo><mn>4</mn><mo>.</mo>
+								<mo>+</mo><mo>.</mo><mn>01</mn></math>";
+        let target_str = " <math>
+				<mrow data-changed='added'>
+				<mn>8,123.</mn>
+				<mo>+</mo>
+				<mn>4.</mn>
+				<mo>+</mo>
+				<mn>.01</mn>
 				</mrow>
 			</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));

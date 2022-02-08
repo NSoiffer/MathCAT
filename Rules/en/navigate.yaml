@@ -1332,7 +1332,7 @@
         ($NavCommand = 'WhereAmI' or $NavCommand = 'WhereAmIAll') and $MatchCounter = 0
       )"
   replace:
-    - speak: "@id"
+    - translate: "@id"
     - pause: long
     - with:
         variables: [MatchCounter: "$MatchCounter + 1"]
@@ -1378,6 +1378,6 @@
         - else_if: "$NavCommand = 'WhereAmI'"
           then: [set_variables: [NavNode: "@id"]]
           else:
-            - speak: "@id"
+            - translate: "@id"
             - pause: long
             - x: '..'

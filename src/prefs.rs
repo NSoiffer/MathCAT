@@ -316,9 +316,12 @@ impl fmt::Display for PreferenceManager {
 }
 
 pub struct FilesChanged {
-    pub rules: bool,
-    pub unicode_short: bool,
-    pub unicode_full: bool,
+    pub speech_rules: bool,
+    pub speech_unicode_short: bool,
+    pub speech_unicode_full: bool,
+    pub braille_rules: bool,
+    pub braille_unicode_short: bool,
+    pub braille_unicode_full: bool,
     pub defs: bool
 }
 
@@ -326,17 +329,23 @@ impl FilesChanged {
     // FIX: this should include all files
     fn none() -> FilesChanged {
         return FilesChanged {
-            rules: false,
-            unicode_short: false,
-            unicode_full: false,
+            speech_rules: false,
+            speech_unicode_short: false,
+            speech_unicode_full: false,
+            braille_rules: false,
+            braille_unicode_short: false,
+            braille_unicode_full: false,
             defs: false
         }
     }
 
     pub fn add_changes(&mut self, additional_changes: FilesChanged) {
-        self.rules |= additional_changes.rules;
-        self.unicode_short |= additional_changes.unicode_short;
-        self.unicode_full  |= additional_changes.unicode_full;
+        self.speech_rules |= additional_changes.speech_rules;
+        self.speech_unicode_short |= additional_changes.speech_unicode_short;
+        self.speech_unicode_full  |= additional_changes.speech_unicode_full;
+        self.braille_rules |= additional_changes.braille_rules;
+        self.braille_unicode_short |= additional_changes.braille_unicode_short;
+        self.braille_unicode_full  |= additional_changes.braille_unicode_full;
         self.defs |= additional_changes.defs;
     }
 }
@@ -409,14 +418,15 @@ impl PreferenceManager {
         self.speech_unicode_full = PreferenceManager::get_file_and_time(
                         &rules_dir, language, Some("en"), "unicode-full.yaml")?;
 
-        let braille = prefs.to_string("Code") + "_Rules.yaml";
+        let braille_code = prefs.to_string("Code");
+        let braille_file = braille_code.clone() + "_Rules.yaml";
         self.braille = PreferenceManager::get_file_and_time(
-                        &rules_dir, &braille, Some("Nemeth"), &braille)?;
+                        &rules_dir, &braille_code, Some("Nemeth"), &(braille_file))?;
 
         self.braille_unicode = PreferenceManager::get_file_and_time(
-                        &rules_dir, braille.as_str(), Some("Nemeth"), "unicode.yaml")?;
+                        &rules_dir, &braille_code, Some("Nemeth"), "unicode.yaml")?;
         self.braille_unicode_full = PreferenceManager::get_file_and_time(
-                        &rules_dir, braille.as_str(), Some("Nemeth"), "unicode-full.yaml")?;
+                        &rules_dir, &braille_code, Some("Nemeth"), "unicode-full.yaml")?;
 
         self.defs = PreferenceManager::get_file_and_time(
         &rules_dir, language, Some("en"), "definitions.yaml")?;
@@ -701,18 +711,24 @@ impl PreferenceManager {
         };
 
         self.user_prefs.set_string_value(name, value);
-        if name == "Language" || name == "SpeechStyle" {
+        if name == "Language" || name == "SpeechStyle" || name == "Code" {
             let old_speech = self.speech.clone();
             let old_speech_unicode= self.speech_unicode.clone();
             let old_speech_unicode_full = self.speech_unicode_full.clone();
+            let old_braille = self.braille.clone();
+            let old_braille_unicode= self.braille_unicode.clone();
+            let old_braille_unicode_full = self.braille_unicode_full.clone();
             let old_defs= self.defs.clone();
 
             if let Some(rules_dir) = self.rules_dir.clone() {
                 self.set_all_files(&rules_dir, self.user_prefs.clone(), self.pref_files.clone()).unwrap();
                 let changed = FilesChanged {
-                    rules: old_speech != self.speech,
-                    unicode_short: old_speech_unicode != self.speech_unicode,
-                    unicode_full: old_speech_unicode_full != self.speech_unicode_full,
+                    speech_rules: old_speech != self.speech,
+                    speech_unicode_short: old_speech_unicode != self.speech_unicode,
+                    speech_unicode_full: old_speech_unicode_full != self.speech_unicode_full,
+                    braille_rules: old_braille != self.braille,
+                    braille_unicode_short: old_braille_unicode != self.braille_unicode,
+                    braille_unicode_full: old_braille_unicode_full != self.braille_unicode_full,
                     defs: old_defs != self.defs,
                 };
                 return changed;
@@ -809,7 +825,7 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.set_user_prefs("Language", "zz-aa");
-            pref_manager.set_user_prefs("Code", "Nemeth");
+            pref_manager.set_user_prefs("Code", "UEB");
             
             assert_helper(count_files(&pref_manager.speech), 2, "ClearSpeak_Rules.yaml");
             assert_helper(count_files(&pref_manager.speech_unicode), 1, "unicode.yaml");
@@ -848,7 +864,7 @@ mod tests {
             let pref_manager = pref_manager.borrow_mut();
             let prefs = pref_manager.get_user_prefs();
             assert_eq!(prefs.to_string("Language").as_str(), "en");
-            assert_eq!(prefs.to_string("SubjectArea").as_str(), "general");
+            assert_eq!(prefs.to_string("SubjectArea").as_str(), "General");
             assert_eq!(prefs.to_string("ClearSpeak_AbsoluteValue").as_str(), "Auto");
             assert_eq!(prefs.to_string("ResetNavMode").as_str(), "false");
             assert_eq!(prefs.to_string("Code").as_str(), "Nemeth");
@@ -868,6 +884,21 @@ mod tests {
             pref_manager.set_user_prefs("Language", "zz");
             
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("zz/ClearSpeak_Rules.yaml"));
+        });
+    }
+
+    #[test]
+    fn test_some_changes() {
+        PreferenceManager::initialize(abs_rules_dir_path()).unwrap();
+        PREF_MANAGER.with(|pref_manager| {
+            let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.set_user_prefs("Verbosity", "Terse");
+
+            assert_eq!(&pref_manager.get_user_prefs().to_string("Verbosity"), "Terse");
+
+            pref_manager.set_user_prefs("Code", "UEB");
+            
+            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Braille)[0]), PathBuf::from("UEB/UEB_Rules.yaml"));
         });
     }
 
