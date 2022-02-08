@@ -694,7 +694,7 @@
  - "⁠": [t: ""]                                   # 0x2060
  - "⁡":                                          # 0x2061
     - test:
-        if: "not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])" 
+        if: $Verbosity!='Terse' and "not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])" 
         then: [t: "of"]
  - "⁢": [t: ""]                                   # 0x2062
  - "⁣": [t: ""]                                   # 0x2063
