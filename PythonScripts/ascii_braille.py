@@ -16,7 +16,7 @@ def ascii_to_unicode(ascii: str):
     for ch in ascii:
         i = ord(ch) - 32
         result += ASCII_TO_UNICODE[i]
-    print( result )
+    return result
 
 def a2u(ascii:str):
     return ascii_to_unicode(ascii)
