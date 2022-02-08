@@ -5,7 +5,7 @@
     Verbosity: Medium           # Terse, Medium, Verbose
     MathRate: 100               # Change from text speech rate (%)
     SpeechStyle: ClearSpeak #ClearSpeak     # Any known speech style (falls back to ClearSpeak)
-    SubjectArea: Off            # FIX: still working on this
+    SubjectArea: General            # FIX: still working on this
     Chemistry: SpellOut         # SpellOut (H 2 0), AsCompound (Water), Off (H sub 2 O)
 
     ClearSpeak:                 # see ClearSpeak speak for meanings
@@ -51,5 +51,5 @@
 
   Braille:
     BrailleNavHighlight: EndPoints   # Highlight with dots 7 & 8 the current nav node -- values are Off, FirstChar, EndPoints, All
-    Code: Nemeth                # Any supported braille code
+    Code: "Nemeth"                # Any supported braille code (currently Nemeth, UEB)
 
