@@ -9,5 +9,8 @@ mod braille {
         mod SRE_NemethBase;
         mod AataNemeth;
     }
+    mod UEB {
+        mod iceb;
+    }
 }
 

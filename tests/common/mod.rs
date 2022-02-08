@@ -4,7 +4,7 @@
 use regex::Regex;
 extern crate lazy_static;
 use lazy_static::lazy_static;
-use libmathcat::interface::{SetRulesDir, SetMathML, GetSpokenText, GetBraille};
+use libmathcat::interface::*;
 
 #[allow(dead_code)] 
 pub fn init_logger() {
@@ -20,7 +20,7 @@ pub fn init_logger() {
 /// Build Absolute path to rules dir for testing
 pub fn abs_rules_dir_path() -> String {
     return std::env::current_exe().unwrap().parent().unwrap()
-                .join("..\\..\\..\\..\\Rules")
+                .join("../../../Rules")
                 .to_str().unwrap().to_string();
 }
 
@@ -37,11 +37,11 @@ fn strip_spaces(str: String) -> String {
 #[allow(dead_code)]     // used in testing
 fn check_answer(test: &str, target: &str) {
     if let Err(e) = SetMathML(test.to_string()) {
-        panic!("{}", e.to_string());
+        panic!("{}", errors_to_string(&e));
     };
     match GetSpokenText() {
         Ok(speech) => assert_eq!(target, strip_spaces(speech)),
-        Err(e) => panic!("{}", libmathcat::interface::errors_to_string(&e)),
+        Err(e) => panic!("{}", errors_to_string(&e)),
     };    
 }
 
@@ -119,10 +119,10 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
         rules.invalidate(changes);
     });
     if let Err(e) = SetMathML(mathml.to_string()) {
-        panic!("{}", e.to_string());
+        panic!("{}", errors_to_string(&e));
     };
     match GetBraille("".to_string()) {
         Ok(result) => assert_eq!(braille, &result),
-        Err(e) => panic!("{}", e.to_string()),
+        Err(e) => panic!("{}", errors_to_string(&e)),
     };    
 }
