@@ -111,7 +111,7 @@ impl Preferences{
 
         let user_dir = dirs::config_dir();
         if let Some(mut user_prefs_file) = user_dir {
-            user_prefs_file.push("prefs.yaml");
+            user_prefs_file.push("MathCAT/prefs.yaml");
             if is_file_shim(&user_prefs_file) {
                 result[1] = Some( user_prefs_file );
             }            
