@@ -147,8 +147,17 @@ def  write_vulgar_fractions(out_stream):
     write_yaml_line(out_stream, "⅓", "!N⠁N⠌N⠉","2153", "Vulgar Fraction One Third")
     write_yaml_line(out_stream, "⅔", "!N⠃N⠌N⠉","2154", "Vulgar Fraction Two Thirds")
     write_yaml_line(out_stream, "⅕", "!N⠁N⠌N⠑","2155", "Vulgar Fraction One Fifth")
-    # FIX -- add up to 215E
-    # '⠁', '⠃', '⠉', '⠙', '⠑', '⠋', '⠛', '⠓', '⠊', '⠚',
+    write_yaml_line(out_stream, "⅖", "!N⠃N⠌N⠑","2156", "Vulgar Fraction Two Fifths")
+    write_yaml_line(out_stream, "⅗", "!N⠉N⠌N⠑","2157", "Vulgar Fraction Three Fifths")
+    write_yaml_line(out_stream, "⅘", "!N⠙N⠌N⠑","2158", "Vulgar Fraction Four Fifths")
+    write_yaml_line(out_stream, "⅙", "!N⠁N⠌N⠋","2159", "Vulgar Fraction One Sixth")
+    write_yaml_line(out_stream, "⅚", "!N⠑N⠌N⠋","215A", "Vulgar Fraction Five Sixths")
+    write_yaml_line(out_stream, "⅛", "!N⠁N⠌N⠓","215B", "Vulgar Fraction One Eighth")
+    write_yaml_line(out_stream, "⅜", "!N⠉N⠌N⠓","215C", "Vulgar Fraction Three Eighths")
+    write_yaml_line(out_stream, "⅝", "!N⠑N⠌N⠓","215D", "Vulgar Fraction Five Eighths")
+    write_yaml_line(out_stream, "⅞", "!N⠛N⠌N⠓","215E", "Vulgar Fraction Seven Eighths")
+
+    write_yaml_line(out_stream, "↉", "!N⠚N⠌N⠑","2189", "Vulgar Fraction Zero Thirds")
     out_stream.write("\n")
 
 
