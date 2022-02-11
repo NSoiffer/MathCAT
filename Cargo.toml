@@ -1,6 +1,6 @@
 [package]
 name = "MathCAT"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Neil Soiffer <soiffer@alum.mit.edu>"]
 edition = "2018"
 
