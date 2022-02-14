@@ -201,7 +201,7 @@ mod infer_tests {
     fn test_intent(mathml: &str, target: &str) -> bool {
 		use crate::interface::*;
 		// this forces initialization
-        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         let package1 = &parser::parse(mathml).expect("Failed to parse test input");
         let mathml = get_element(package1);
         trim_element(&mathml);

@@ -74,23 +74,22 @@ pub fn format_attrs(attrs: &[Attribute]) -> String {
     result
 }
 
-use sxd_xpath::Value;
-use sxd_xpath::nodeset::Node;
-
 /// Pretty print an xpath value.
 /// If the value is a `NodeSet`, the MathML for the node/element is returned.
-pub fn pp_xpath_value(value: Value) {
-    debug!("XPath value:");
-    if let Value::Nodeset(nodeset) = &value {
-        for node in nodeset.document_order() {
-            match node {
-                Node::Element(el) => {debug!("{}", crate::pretty_print::format_element(&el, 1))},
-                Node::Text(t) =>  {debug!("found Text value: {}", t.text())},
-                _ => {debug!("found unexpected node type")}
-            }
-        }
-    }
-}
+// pub fn pp_xpath_value(value: Value) {
+//     use sxd_xpath::Value;
+//     use sxd_xpath::nodeset::Node;
+//     debug!("XPath value:");
+//     if let Value::Nodeset(nodeset) = &value {
+//         for node in nodeset.document_order() {
+//             match node {
+//                 Node::Element(el) => {debug!("{}", crate::pretty_print::format_element(&el, 1))},
+//                 Node::Text(t) =>  {debug!("found Text value: {}", t.text())},
+//                 _ => {debug!("found unexpected node type")}
+//             }
+//         }
+//     }
+// }
 
 /// Convert YAML to a string using with `indent` amount of space.
 pub fn yaml_to_string(yaml: &Yaml, indent: usize) -> String {

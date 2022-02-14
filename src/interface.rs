@@ -1,14 +1,14 @@
 //! The interface module provides functionality both for calling from an API and also running the code from `main`.
 //!
 //! When calling from python, the general ordering is:
-//! 1. whatever preferences the AT needs to set, it is done with calls to [`SetPreference`].
-//! 2. the MathML is sent over via [`SetMathML`].
-//! 3. AT calls to get the speech [`GetSpokenText`] and calls [`GetBraille`] to get the (Unicode) braille.
+//! 1. whatever preferences the AT needs to set, it is done with calls to [`set_preference`].
+//! 2. the MathML is sent over via [`set_mathml`].
+//! 3. AT calls to get the speech [`get_spoken_text`] and calls [`get_braille`] to get the (Unicode) braille.
 //!
-//! AT can pass key strokes to allow a user to navigate the MathML by calling [`DoNavigateKeyPress`]; the speech is returned.
-//! To get the MathML associated with the current navigation node, call [`GetNavigationMathML`].
+//! AT can pass key strokes to allow a user to navigate the MathML by calling [`do_navigate_keypress`]; the speech is returned.
+//! To get the MathML associated with the current navigation node, call [`get_navigation_mathml`].
 //!
-//! When calling from `main`, getting speech is done with [`speak_mathml`] which will parse the MathML, canonicalize it,
+//! When calling from `main`, getting speech is done with [`get_spoken_text`] which will parse the MathML, canonicalize it,
 //! then invoke the speech rules on it.
 
 // for Python interfaces --#[...] doesn't help on name mangled python function names
@@ -23,7 +23,6 @@ use crate::errors::*;
 use regex::Regex;
 
 
-use crate::prefs::PreferenceManager;
 use crate::navigate::*;
 use crate::pretty_print::mml_to_string;
 use crate::xpath_functions::is_leaf;
@@ -50,14 +49,15 @@ fn init_mathml_instance() -> RefCell<Package> {
 
 /// Set the Rules directory
 /// IMPORTANT: this should be the very first call to MathCAT unless the environment var MathCATRulesDir is set
-pub fn SetRulesDir(dir: String) -> Result<()> {
+pub fn set_rules_dir(dir: String) -> Result<()> {
     use std::path::PathBuf;
     return crate::prefs::PreferenceManager::initialize(PathBuf::from(dir));
 }
 /// The MathML to be spoken, brailled, or navigated.
-///
 /// This will override any previous MathML that was set.
-pub fn SetMathML(mathml_str: String) -> Result<String> {
+/// This returns canonical MathML with 'id's set on any node that doesn't have an id.
+/// The ids can be used for sync highlighting if the `Bookmark` API preference is true.
+pub fn set_mathml(mathml_str: String) -> Result<String> {
     lazy_static! {
         // if these are present when resent to MathJaX, MathJaX crashes (https://github.com/mathjax/MathJax/issues/2822)
         static ref MATHJAX_V2: Regex = Regex::new(r#"class *= *['"]MJX-.*?['"]"#).unwrap();
@@ -97,7 +97,7 @@ pub fn SetMathML(mathml_str: String) -> Result<String> {
 
 /// Get the spoken text of the MathML that was set.
 /// The speech takes into account any AT or user preferences.
-pub fn GetSpokenText() -> Result<String> {
+pub fn get_spoken_text() -> Result<String> {
     // use std::time::{Instant};
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
@@ -112,9 +112,10 @@ pub fn GetSpokenText() -> Result<String> {
     });
 }
 
-/// Get the spoken text of the MathML that was set.
+/// Get the spoken text for an overview of the MathML that was set.
 /// The speech takes into account any AT or user preferences.
-pub fn GetOverviewText() -> Result<String> {
+/// Note: this implementation for is currently minimal and should not be used.
+pub fn get_overview_text() -> Result<String> {
     // use std::time::{Instant};
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
@@ -126,17 +127,9 @@ pub fn GetOverviewText() -> Result<String> {
     });
 }
 
-/// Set an API preference. The preference name should be a known preference name.
-/// The value should either be a string or a number (depending upon the preference being set)
-///
-/// This function can be called multiple times to set different values.
-/// The values are persistent but can be overwritten by setting a preference with the same name and a different value.
-pub enum StringOrFloat {
-    AsString(String),
-    AsFloat(f64),
-}
-
-pub fn GetPreference(name: String) -> Option<String> {
+/// Get the value of the named preference.
+/// None is returned if `name` is not a known preference.
+pub fn get_preference(name: String) -> Option<String> {
     use yaml_rust::Yaml;
     return crate::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow();
@@ -155,7 +148,27 @@ pub fn GetPreference(name: String) -> Option<String> {
     });
 }
 
-pub fn SetPreference(name: String, value: StringOrFloat) -> Result<()> {
+/// Set a MathCAT preference. The preference name should be a known preference name.
+/// The value should either be a string or a number (depending upon the preference being set)
+/// The list of known user preferences is in the MathCAT user documentation.
+/// Here are common preferences set by programs (not settable by the user):
+/// * TTS -- SSML, SAPI5, None
+/// * Pitch -- normalized at '1.0'
+/// * Rate -- words per minute (should match current speech rate).
+///       There is a separate "MathRate" that is user settable that causes a relative percentage change from this rate.
+/// * Volume -- default 100
+/// * Voice -- set a voice to use (not implemented)
+/// * Gender -- set pick any voice of the given gender (not implemented)
+/// * Bookmark -- set to `true` if a `mark`/`bookmark` should be part of the returned speech (used for sync highlighting)
+///
+/// Important: both the preference name and value are case-sensitive
+/// 
+/// This function can be called multiple times to set different values.
+/// The values are persistent and extend beyond calls to [`set_mathml`].
+/// A value can be overwritten by calling this function again with a different value.
+/// 
+/// FIX: Some preferences are both API and user preferences and something such as '!name' should be used for overrides. Not implemented yet.
+pub fn set_preference(name: String, value: String) -> Result<()> {
     return crate::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         if let Some(error_string) = rules.get_error() {
@@ -166,116 +179,54 @@ pub fn SetPreference(name: String, value: StringOrFloat) -> Result<()> {
         // here/upfront, so it is borrowed separately below. That way its borrowed lifetime is small
         //let value_as_py_float = value.downcast::<PyFloat>();
 
-        match name.to_lowercase().as_str() {
-            "speechstyle" => {
+        match name.as_str() {
+            "SpeechStyle" => {
                 let files_changed;
                 { 
                     let mut pref_manager = rules.pref_manager.borrow_mut();
-                    files_changed = pref_manager.set_user_prefs("SpeechStyle", to_string(&name, value)?.as_str());
+                    files_changed = pref_manager.set_user_prefs("SpeechStyle", &value);
                 };
                 rules.invalidate(files_changed);
             },
-            "verbosity" | "navverbosity" => {
-                let pref_name = if name.to_lowercase().as_str()=="verbosity" {"Verbosity"} else {"NavVerbosity"};
-                let value = match to_string(&name, value)?.to_lowercase().as_str() {
-                    "terse" => "Terse".to_string(),
-                    "medium" => "Medium".to_string(),
-                    "verbose" => "Verbose".to_string(),
-                    _ => rules.pref_manager.borrow().get_user_prefs().to_string(pref_name),
-                    };
-
-                rules.pref_manager.borrow_mut().set_user_prefs(pref_name, value.as_str());
-            },
-            "navmode" => {
-                let value = match to_string(&name, value)?.to_lowercase().as_str() {
-                    "enhanced" => "Enhanced".to_string(),
-                    "simple" => "Simple".to_string(),
-                    "character" => "Character".to_string(),
-                    _ => rules.pref_manager.borrow().get_user_prefs().to_string("NavMode"),
-                    };
-
-                rules.pref_manager.borrow_mut().set_user_prefs("NavMode", value.as_str());
-            },
-            "speechtags" | "tts" => {
-                return set_speech_tags(&mut rules.pref_manager.borrow_mut(), to_string(&name, value)?);
-            },
-            "language" => {
-                let value_as_string = to_string(&name, value)?;
+            "Language" => {
                 // check the format
-                if !( value_as_string.len() == 2 ||
-                      (value_as_string.len() == 5 && value_as_string.as_bytes()[2] == b'-') ) {
-                        bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value_as_string);
+                if !( value.len() == 2 ||
+                      (value.len() == 5 && value.as_bytes()[2] == b'-') ) {
+                        bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value);
                       }
-                let files_changed = rules.pref_manager.borrow_mut().set_user_prefs("Language", value_as_string.as_str());  
+                let files_changed = rules.pref_manager.borrow_mut().set_user_prefs(&name, &value);  
                 rules.invalidate(files_changed);  
             },
-            "code" => {
-                let files_changed = rules.pref_manager.borrow_mut().set_user_prefs("Code", to_string(&name, value)?.as_str());    
+            "Code" => {
+                let files_changed = rules.pref_manager.borrow_mut().set_user_prefs(&name, &value);    
                 crate::speech::BRAILLE_RULES.with(|braille_rules| {
                     braille_rules.borrow_mut().invalidate(files_changed);
                 })
             },
-            "braillenavhighlight" => {
-                rules.pref_manager.borrow_mut().set_user_prefs("BrailleNavHighlight", to_string(&name, value)?.as_str());    
+            "Pitch" | "Rate" | "Volume" => {
+                rules.pref_manager.borrow_mut().set_api_float_pref(&name, to_float(&name, value)?);    
             },
-            "pitch" => {
-                rules.pref_manager.borrow_mut().set_api_float_pref("Pitch".to_string(), to_float(&name, value)?);    
+            "Bookmark" => {
+                rules.pref_manager.borrow_mut().set_api_boolean_pref(&name, value.to_lowercase()=="true");    
             },
-            "rate" => {
-                rules.pref_manager.borrow_mut().set_api_float_pref("Rate".to_string(), to_float(&name, value)?);    
-            },
-            "volume" => {
-                rules.pref_manager.borrow_mut().set_api_float_pref("Volume".to_string(), to_float(&name, value)?);    
-            },
-            "gender" => {
-                rules.pref_manager.borrow_mut().set_api_string_pref("Gender".to_string(), to_string(&name, value)?);    
-            },
-            "voice" => {
-                rules.pref_manager.borrow_mut().set_api_string_pref("Voice".to_string(), to_string(&name, value)?);    
-            },
-            "bookmark" => {
-                rules.pref_manager.borrow_mut().set_api_boolean_pref("Bookmark".to_string(), to_string(&name, value)?.to_lowercase()=="true");    
-            },
-                _ => {
-
+            _ => {
+                rules.pref_manager.borrow_mut().set_user_prefs(&name, &value);     // assume string valued
             }
         }
         return Ok( () );
     });
 
-    fn to_string(name: &str, value: StringOrFloat) -> Result<String> {
-        return match value {
-            StringOrFloat::AsString(s) => Ok(s),
-            StringOrFloat::AsFloat(f) => bail!("SetPreference: preference'{}'s value '{}' must be a string", name, f),
-        };
-    }
-
-    fn to_float(name: &str, value: StringOrFloat) -> Result<f64> {
-        return match value {
-            StringOrFloat::AsString(s) => bail!("SetPreference: preference'{}'s value '{}' must be a float", name, s),
-            StringOrFloat::AsFloat(f) => Ok(f),
+    fn to_float(name: &str, value: String) -> Result<f64> {
+        match value.parse::<f64>() {
+            Ok(val) => return Ok(val),
+            Err(_) => bail!("SetPreference: preference'{}'s value '{}' must be a float", name, value),
         };
     }
 }
 
-fn set_speech_tags(pref_manager: &mut PreferenceManager, speech_tags: String ) -> Result<()> {
-    let tts = match speech_tags.to_lowercase().as_str() {
-        "0" | "none" => "none",
-        // 1 => "sapi4",
-        "2" | "sapi5" => "sapi5",
-        // 3 => "Mac",
-        "4" | "ssml" => "ssml",
-        // 6 => "eloquence",
-        _ => bail!("Unknown value '{}' for SetSpeechTags", speech_tags),
-    };
-    pref_manager.set_api_string_pref("TTS".to_string(), tts.to_string());
-    return Ok( () );
-}
-
-
-/// Get the braille associated with the MathML that was set by [`SetMathML`].
-/// The braille returned depends upon the preference for braille output.
-pub fn GetBraille(nav_node_id: String) -> Result<String> {
+/// Get the braille associated with the MathML that was set by [`set_mathml`].
+/// The braille returned depends upon the preference for the `code` preference (default `Nemeth`).
+pub fn get_braille(nav_node_id: String) -> Result<String> {
     // use std::time::{Instant};
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
@@ -288,17 +239,45 @@ pub fn GetBraille(nav_node_id: String) -> Result<String> {
 }
 
 /// Given a key code along with the modifier keys, the current node is moved accordingly (or value reported in some cases).
-///
+/// `key` is the [keycode](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode#constants_for_keycode_value) for the key (in JavaScript, `ev.key_code`)
 /// The spoken text for the new current node is returned.
-pub fn DoNavigateKeyPress(key: usize, shift_key: bool, control_key: bool, alt_key: bool, meta_key: bool) -> Result<String> {
+pub fn do_navigate_keypress(key: usize, shift_key: bool, control_key: bool, alt_key: bool, meta_key: bool) -> Result<String> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
-        return do_navigate_key_press(mathml, key, shift_key, control_key, alt_key, meta_key);
+        return do_mathml_navigate_key_press(mathml, key, shift_key, control_key, alt_key, meta_key);
     });
 }
 
-pub fn DoNavigateCommand(command: String) -> Result<String> {
+/// Given a navigation command, the current node is moved accordingly.
+/// This is a higher level interface than `do_navigate_keypress` for applications that want to interpret the keys themselves.
+/// The valid commands are:
+/// Standard move commands:
+///    `MovePrevious`, `MoveNext`, `MoveStart`, `MoveEnd`, `MoveLineStart`, `MoveLineEnd`, 
+/// Movement in a table or elementary math:
+///    `MoveCellPrevious`, `MoveCellNext`, `MoveCellUp`, `MoveCellDown`, `MoveColumnStart`, `MoveColumnEnd`, 
+/// Moving into children or out to parents
+///    `ZoomIn`, `ZoomOut`, `ZoomOutAll`, `ZoomInAll`, 
+/// Undo the last movement command
+///     `MoveLastLocation`, 
+/// Read commands (standard speech)
+///     `ReadPrevious`, `ReadNext`, `ReadCurrent`, `ReadCellCurrent`, `ReadStart`, `ReadEnd`, `ReadLineStart`, `ReadLineEnd`,
+/// Describe commands (overview) 
+///     `DescribePrevious`, `DescribeNext`, `DescribeCurrent`, 
+/// Location information
+///     `WhereAmI`, `WhereAmIAll`, 
+/// Change navigation modes (circle up/down)
+///     `ToggleZoomLockUp`, `ToggleZoomLockDown`,
+/// Speak the current navigation mode
+///     `ToggleSpeakMode`, 
+/// There are 10 place markers that can be set/read/described or moved to
+///     `SetPlacemarker0`,`SetPlacemarker1`,`SetPlacemarker2`,`SetPlacemarker3`,`SetPlacemarker4`,`SetPlacemarker5`,`SetPlacemarker6`,`SetPlacemarker7`,`SetPlacemarker8`,`SetPlacemarker9`,
+///     `Read0`,`Read1`,`Read2`,`Read3`,`Read4`,`Read5`,`Read6`,`Read7`,`Read8`,`Read9`,
+///     `Describe0`,`Describe1`,`Describe2`,`Describe3`,`Describe4`,`Describe5`,`Describe6`,`Describe7`,`Describe8`,`Describe9`,
+///     `MoveTo0`,`MoveTo1`,`MoveTo2`,`MoveTo3`,`MoveTo4`,`MoveTo5`,`MoveTo6`,`MoveTo7`,`MoveTo8`,`MoveTo9`,
+/// Done with Navigation
+///     `Exit`, 
+pub fn do_navigate_command(command: String) -> Result<String> {
     let command = NAV_COMMANDS.get_key(&command);       // gets a &'static version of the command
     if command.is_none() {
         bail!("Unknown command in call to DoNavigateCommand()");
@@ -312,7 +291,9 @@ pub fn DoNavigateCommand(command: String) -> Result<String> {
 }
 
 /// Return the MathML associated with the current (navigation) node.
-pub fn GetNavigationMathML() -> Result<(String, usize)> {
+/// The returned result is the `id` of the node and the offset (0-based) from that node (not yet implemented)
+/// The offset is needed for token elements that have multiple characters.
+pub fn get_navigation_mathml() -> Result<(String, usize)> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
@@ -325,7 +306,10 @@ pub fn GetNavigationMathML() -> Result<(String, usize)> {
     });
 }
 
-pub fn GetNavigationMathMLId() -> Result<(String, usize)> {
+/// Return the `id` and `offset` (0-based) associated with the current (navigation) node.
+/// `offset` (not yet implemented)
+/// The offset is needed for token elements that have multiple characters.
+pub fn get_navigation_mathml_id() -> Result<(String, usize)> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&*package_instance);
@@ -336,7 +320,7 @@ pub fn GetNavigationMathMLId() -> Result<(String, usize)> {
 }
 
 
-/// Convert the returned error from SetMathML, etc., to a useful string for display
+/// Convert the returned error from set_mathml, etc., to a useful string for display
 pub fn errors_to_string(e:&Error) -> String {
     let mut result = String::default();
     let mut first_time = true;

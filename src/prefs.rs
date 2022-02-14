@@ -658,20 +658,20 @@ impl PreferenceManager {
 
     /// Set the number-valued preference.
     /// All number-valued preferences are stored with type `f64`.
-    pub fn set_api_float_pref(&mut self, key: String, value: f64) {
+    pub fn set_api_float_pref(&mut self, key: &str, value: f64) {
         if !self.error.is_empty() {
             panic!("Internal error: set_api_float_pref called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
-        self.api_prefs.prefs.insert(key, Yaml::Real(value.to_string()));
+        self.api_prefs.prefs.insert(key.to_string(), Yaml::Real(value.to_string()));
     }
 
-    pub fn set_api_boolean_pref(&mut self, key: String, value: bool) {
+    pub fn set_api_boolean_pref(&mut self, key: &str, value: bool) {
         if !self.error.is_empty() {
             panic!("Internal error: set_api_boolean_pref called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
-        self.api_prefs.prefs.insert(key, Yaml::Boolean(value));
+        self.api_prefs.prefs.insert(key.to_string(), Yaml::Boolean(value));
     }
 
     /// Return the current speech rate.

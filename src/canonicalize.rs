@@ -2388,7 +2388,7 @@ mod canonicalize_tests {
     fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
 		use crate::interface::*;
 		// this forces initialization
-		crate::interface::SetRulesDir(abs_rules_dir_path()).unwrap();
+		crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
 		crate::speech::SPEECH_RULES.with(|_| true);
 		
         let package1 = &parser::parse(test).expect("Failed to parse test input");

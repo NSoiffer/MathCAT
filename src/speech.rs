@@ -1,8 +1,5 @@
 //! The speech module is where the speech rules are read in and speech generated.
 //!
-//! The main external call, [`speak_mathml`] returns a string for the speech associated with the `mathml`
-//!   param based on the user preferences.
-//!
 //! The speech rules call out to the preferences and tts modules and the dividing line is not always clean.
 //! A number of useful utility functions used by other modules are defined here.
 #![allow(clippy::needless_return)]
@@ -26,13 +23,13 @@ use crate::shim_filesystem::read_to_string_shim;
 use crate::canonicalize::{as_element, create_mathml_element, set_mathml_name, name};
 
 
-/// The main external call, `speak_mathml` returns a string for the speech associated with the `mathml`.
+/// The main external call, `intent_from_mathml` returns a string for the speech associated with the `mathml`.
 ///   It matches against the rules that are computed by user prefs such as "Language" and "SpeechStyle".
 ///
 /// The speech rules assume `mathml` has been "cleaned" via the canonicalization step.
 ///
 /// If the preferences change (and hence the speech rules to use change), or if the rule file changes,
-///   `speak_mathml` will detect that and (re)load the proper rules.
+///   `intent_from_mathml` will detect that and (re)load the proper rules.
 ///
 /// A string is returned in call cases.
 /// If there is an error, the speech string will indicate an error.

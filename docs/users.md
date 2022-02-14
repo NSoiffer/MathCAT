@@ -105,7 +105,7 @@ ClearSpeak has a number of options. These were designed for authors to use, but 
 * Code: [Nemeth]
   * Options: Any implemented braille code
   * Description: the braille math code to use
-  * Status: currently only Nemeth is supported, but UEB math is planned for the near future. Other braille code support will depend upon help from others.
+  * Status: currently only Nemeth and UEB are supported. Other braille code support will depend upon help from others.
 * BrailleNavHighlight: [EndPoints]
   * Options: Off, FirstChar, EndPoints, All
   * Description:  highlight with dots 7 & 8 the currently selected navigation node

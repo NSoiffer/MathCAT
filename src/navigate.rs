@@ -1,5 +1,3 @@
-//! Navigation has two public functions: [`do_navigate_key_press`] and [`get_navigation_mathml`].
-//!
 //! Navigation is controlled by a `Navigation_Rules.yaml` file in conjunction with preferences.
 //! See preference documentation for more info on navigation preferences.
 #![allow(clippy::needless_return)]
@@ -298,13 +296,13 @@ pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: E
 
 /// Given a key code along with the modifier keys, the current node is moved accordingly (or value reported in some cases).]
 /// The spoken text for the new current node is returned.
-pub fn do_navigate_key_press<'a>(mathml: Element<'a>,
+pub fn do_mathml_navigate_key_press<'a>(mathml: Element<'a>,
             key: usize, shift_key: bool, control_key: bool, alt_key: bool, meta_key: bool) -> Result<String> {
     let (command, param) = key_press_to_command_and_param(key, shift_key, control_key, alt_key, meta_key)?;
-    return do_navigate_command(mathml, command, param);
+    return do_navigate_command_and_param(mathml, command, param);
 }
 
-fn do_navigate_command<'a>(mathml: Element<'a>, command: NavigationCommand, param: NavigationParam) -> Result<String> {
+fn do_navigate_command_and_param<'a>(mathml: Element<'a>, command: NavigationCommand, param: NavigationParam) -> Result<String> {
     return do_navigate_command_string(mathml, navigation_command_string(command, param));
 }
 
@@ -805,8 +803,8 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
-        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
-        SetMathML(mathml_str.to_string()).unwrap();
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -848,9 +846,9 @@ mod tests {
           <mn id='id-19'>1</mn>
         </mrow>
        </math>";
-       crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
-       SetMathML(mathml_str.to_string()).unwrap();
-        SetPreference("NavMode".to_string(), StringOrFloat::AsString("Enhanced".to_string()))?;
+       crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+       set_mathml(mathml_str.to_string()).unwrap();
+        set_preference("NavMode".to_string(), "Enhanced".to_string())?;
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -859,7 +857,7 @@ mod tests {
             test_command("ZoomIn", mathml, "id-6");
             
             // repeat, but this time with "Simple
-            SetPreference("NavMode".to_string(), StringOrFloat::AsString("Simple".to_string()))?;
+            set_preference("NavMode".to_string(), "Simple".to_string())?;
             test_command("ZoomOutAll", mathml, "id-1");
             test_command("ZoomIn", mathml, "id-2");
             test_command("ZoomIn", mathml, "id-3");
@@ -875,8 +873,8 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
-        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
-        SetMathML(mathml_str.to_string()).unwrap();
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -893,8 +891,8 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
-        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
-        SetMathML(mathml_str.to_string()).unwrap();
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -906,7 +904,7 @@ mod tests {
             });
             test_command("ZoomOut", mathml, "msup");
 
-            let nav_speech = do_navigate_command(mathml, NavigationCommand::Zoom, NavigationParam::Previous)?;
+            let nav_speech = do_navigate_command_and_param(mathml, NavigationCommand::Zoom, NavigationParam::Previous)?;
             debug!("Full speech: {}", nav_speech);
             NAVIGATION_STATE.with(|nav_stack| {
                 let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
@@ -923,8 +921,8 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
-        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
-        SetMathML(mathml_str.to_string()).unwrap();
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -947,8 +945,8 @@ mod tests {
                 <mrow id='num'><msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup><mo id='factorial'>!</mo></mrow>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
-        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
-        SetMathML(mathml_str.to_string()).unwrap();
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -968,7 +966,7 @@ mod tests {
             });
             test_command("MoveLineStart", mathml, "msup");
 
-            let nav_speech = do_navigate_command(mathml, NavigationCommand::Move, NavigationParam::Start)?;
+            let nav_speech = do_navigate_command_and_param(mathml, NavigationCommand::Move, NavigationParam::Start)?;
             debug!("Full speech: {}", nav_speech);
             NAVIGATION_STATE.with(|nav_stack| {
                 let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
@@ -991,8 +989,8 @@ mod tests {
           <mi id='Msowudr8-6'>x</mi>
         </mrow>
         </math>";
-        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
-        SetMathML(mathml_str.to_string()).unwrap();
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -1002,7 +1000,7 @@ mod tests {
                     current_node_offset: 0
                 }, "None")
             });
-            SetPreference("NavMode".to_string(), StringOrFloat::AsString("Enhanced".to_string()))?;
+            set_preference("NavMode".to_string(), "Enhanced".to_string())?;
             test_command("MoveNext", mathml, "Msowudr8-5");
 
             // reset start and test Simple
@@ -1012,7 +1010,7 @@ mod tests {
                     current_node_offset: 0
                 }, "None")
             });
-            SetPreference("NavMode".to_string(), StringOrFloat::AsString("Simple".to_string()))?;
+            set_preference("NavMode".to_string(), "Simple".to_string())?;
             test_command("MoveNext", mathml, "Msowudr8-5");
 
             // reset start and test Character
@@ -1022,10 +1020,10 @@ mod tests {
                     current_node_offset: 0
                 }, "None")
             });
-            SetPreference("NavMode".to_string(), StringOrFloat::AsString("Character".to_string()))?;
+            set_preference("NavMode".to_string(), "Character".to_string())?;
             test_command("MoveNext", mathml, "Msowudr8-4");
 
-            SetPreference("NavMode".to_string(), StringOrFloat::AsString("Character".to_string()))?;
+            set_preference("NavMode".to_string(), "Character".to_string())?;
             test_command("MoveNext", mathml, "Msowudr8-5");
             return Ok( () );
         });
@@ -1056,9 +1054,9 @@ mod tests {
           </mrow>
         </mrow>
         </math>";
-        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
-        SetMathML(mathml_str.to_string()).unwrap();
-        SetPreference("NavMode".to_string(), StringOrFloat::AsString("Character".to_string()))?;
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
+        set_preference("NavMode".to_string(), "Character".to_string())?;
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -1089,9 +1087,9 @@ mod tests {
           <mi id='c'>c</mi>
         </mrow>
         </math>";
-        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
-        SetMathML(mathml_str.to_string()).unwrap();
-        SetPreference("NavMode".to_string(), StringOrFloat::AsString("Character".to_string()))?;
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
+        set_preference("NavMode".to_string(), "Character".to_string())?;
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -1116,8 +1114,8 @@ mod tests {
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
             </mfrac></math>";
-        crate::interface::SetRulesDir(super::super::abs_rules_dir_path()).unwrap();
-        SetMathML(mathml_str.to_string()).unwrap();
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
