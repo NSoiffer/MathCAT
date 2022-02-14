@@ -136,8 +136,8 @@ If you are working on an in-browser solution (i.e, you are using JavaScript or s
 Several people helped out in various ways with the project:
 
 * David Carlisle -- provided invaluable help figuring out some xpath matches
-* Susan Jolly -- provided lots of guidance on Nemeth generation and feedback on what is right and wrong.
-* Murray Sargent and Volker Sorge -- provided tables of Nemeth translations of characters
+* Susan Jolly -- provided lots of patient guidance on Nemeth and UEB generation along with feedback on what is right and wrong.
+* Murray Sargent and Volker Sorge -- provided tables of Nemeth translations of characters and Nemeth tests
 
 Translators:
 This has yet to be done, but initial translations will come from MathPlayer. I hope others will help out so I can list you here...
