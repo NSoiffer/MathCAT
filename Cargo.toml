@@ -4,6 +4,9 @@ version = "0.1.2"
 authors = ["Neil Soiffer <soiffer@alum.mit.edu>"]
 license = "MIT"
 description = "MathCAT: Math Capable Assistive Technology ('Speech and braille from MathML')"
+repository = "https://github.com/NSoiffer/MathCAT"
+homepage = "https://nsoiffer.github.io/MathCAT/"
+documentation = "https://nsoiffer.github.io/MathCAT/"
 edition = "2018"
 
 
