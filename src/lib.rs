@@ -1,3 +1,19 @@
+//! A library for generating speech and braille from MathML
+//! 
+//! Typical usage is:
+//! 1. Set the rules directory [`set_rules_dir`]
+//! 2. Set whatever preferences are need with repeated calls to [`set_preference`].
+//! 3. Set MathML via [`set_mathml`]
+//!    A string representing the cleaned up MathML along with `id`s on each node is returned for highlighting if desired
+//! 4. Get the speech [`get_spoken_text`] or (Unicode) braille [`get_braille`].
+//!
+//! The expression can be navigated also.
+//! This is done in one of two ways:
+//! 1. Pass key strokes to allow a user to navigate the MathML by calling [`do_navigate_keypress`]; the speech is returned.
+//! 2. Pass the MathCAT navigation command directory by called [`do_navigate_command`]; the speech is return returned.
+//! 
+//! To get the MathML associated with the current navigation node, call [`get_navigation_mathml`].
+//! To just get the `id` and offset from the id of the current navigation node, call [`get_navigation_mathml_id`].
 #![recursion_limit = "1024"]
 
 #[macro_use]
@@ -42,6 +58,7 @@ mod definitions;
 mod pretty_print;
 
 pub mod shim_filesystem;
+pub use interface::*;
 
 #[cfg(test)]
 pub fn init_logger() {

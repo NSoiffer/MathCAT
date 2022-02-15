@@ -1,3 +1,9 @@
+//! This is used to paste over normal reading of the Rules files and building them into the code for web assembly (WASM) which
+//! can't do file system access. For the latter, the Rules directory should be zipped up.
+//! 
+//! Note: if files are added or removed, the directory structure needs to be reflected here. This could be automated,
+//! but changes are pretty rare and it didn't seem worth it (this may need to be revisited).
+
 use std::path::{Path, PathBuf};
 cfg_if! {
     if #[cfg(target_family = "wasm")] {

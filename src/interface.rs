@@ -1,17 +1,5 @@
 //! The interface module provides functionality both for calling from an API and also running the code from `main`.
 //!
-//! When calling from python, the general ordering is:
-//! 1. whatever preferences the AT needs to set, it is done with calls to [`set_preference`].
-//! 2. the MathML is sent over via [`set_mathml`].
-//! 3. AT calls to get the speech [`get_spoken_text`] and calls [`get_braille`] to get the (Unicode) braille.
-//!
-//! AT can pass key strokes to allow a user to navigate the MathML by calling [`do_navigate_keypress`]; the speech is returned.
-//! To get the MathML associated with the current navigation node, call [`get_navigation_mathml`].
-//!
-//! When calling from `main`, getting speech is done with [`get_spoken_text`] which will parse the MathML, canonicalize it,
-//! then invoke the speech rules on it.
-
-// for Python interfaces --#[...] doesn't help on name mangled python function names
 #![allow(non_snake_case)]
 #![allow(clippy::needless_return)]
 use std::cell::RefCell;
@@ -252,31 +240,36 @@ pub fn do_navigate_keypress(key: usize, shift_key: bool, control_key: bool, alt_
 /// Given a navigation command, the current node is moved accordingly.
 /// This is a higher level interface than `do_navigate_keypress` for applications that want to interpret the keys themselves.
 /// The valid commands are:
-/// Standard move commands:
-///    `MovePrevious`, `MoveNext`, `MoveStart`, `MoveEnd`, `MoveLineStart`, `MoveLineEnd`, 
-/// Movement in a table or elementary math:
-///    `MoveCellPrevious`, `MoveCellNext`, `MoveCellUp`, `MoveCellDown`, `MoveColumnStart`, `MoveColumnEnd`, 
-/// Moving into children or out to parents
-///    `ZoomIn`, `ZoomOut`, `ZoomOutAll`, `ZoomInAll`, 
-/// Undo the last movement command
-///     `MoveLastLocation`, 
-/// Read commands (standard speech)
-///     `ReadPrevious`, `ReadNext`, `ReadCurrent`, `ReadCellCurrent`, `ReadStart`, `ReadEnd`, `ReadLineStart`, `ReadLineEnd`,
-/// Describe commands (overview) 
-///     `DescribePrevious`, `DescribeNext`, `DescribeCurrent`, 
-/// Location information
-///     `WhereAmI`, `WhereAmIAll`, 
-/// Change navigation modes (circle up/down)
-///     `ToggleZoomLockUp`, `ToggleZoomLockDown`,
-/// Speak the current navigation mode
-///     `ToggleSpeakMode`, 
-/// There are 10 place markers that can be set/read/described or moved to
-///     `SetPlacemarker0`,`SetPlacemarker1`,`SetPlacemarker2`,`SetPlacemarker3`,`SetPlacemarker4`,`SetPlacemarker5`,`SetPlacemarker6`,`SetPlacemarker7`,`SetPlacemarker8`,`SetPlacemarker9`,
-///     `Read0`,`Read1`,`Read2`,`Read3`,`Read4`,`Read5`,`Read6`,`Read7`,`Read8`,`Read9`,
-///     `Describe0`,`Describe1`,`Describe2`,`Describe3`,`Describe4`,`Describe5`,`Describe6`,`Describe7`,`Describe8`,`Describe9`,
-///     `MoveTo0`,`MoveTo1`,`MoveTo2`,`MoveTo3`,`MoveTo4`,`MoveTo5`,`MoveTo6`,`MoveTo7`,`MoveTo8`,`MoveTo9`,
-/// Done with Navigation
-///     `Exit`, 
+/// * Standard move commands:
+/// `MovePrevious`, `MoveNext`, `MoveStart`, `MoveEnd`, `MoveLineStart`, `MoveLineEnd`
+/// * Movement in a table or elementary math:
+/// `MoveCellPrevious`, `MoveCellNext`, `MoveCellUp`, `MoveCellDown`, `MoveColumnStart`, `MoveColumnEnd`
+/// * Moving into children or out to parents:
+/// `ZoomIn`, `ZoomOut`, `ZoomOutAll`, `ZoomInAll`
+/// * Undo the last movement command:
+/// `MoveLastLocation`
+/// * Read commands (standard speech):
+/// `ReadPrevious`, `ReadNext`, `ReadCurrent`, `ReadCellCurrent`, `ReadStart`, `ReadEnd`, `ReadLineStart`, `ReadLineEnd`
+/// * Describe commands (overview):
+/// `DescribePrevious`, `DescribeNext`, `DescribeCurrent`
+/// * Location information:
+/// `WhereAmI`, `WhereAmIAll`
+/// * Change navigation modes (circle up/down):
+///  `ToggleZoomLockUp`, `ToggleZoomLockDown`
+/// * Speak the current navigation mode
+/// `ToggleSpeakMode`
+/// 
+/// There are 10 place markers that can be set/read/described or moved to.
+/// * Setting:
+/// `SetPlacemarker0`, `SetPlacemarker1`, `SetPlacemarker2`, `SetPlacemarker3`, `SetPlacemarker4`, `SetPlacemarker5`, `SetPlacemarker6`, `SetPlacemarker7`, `SetPlacemarker8`, `SetPlacemarker9`
+/// * Reading:
+/// `Read0`, `Read1`, `Read2`, `Read3`, `Read4`, `Read5`, `Read6`, `Read7`, `Read8`, `Read9`
+/// * Describing:
+/// `Describe0`, `Describe1`, `Describe2`, `Describe3`, `Describe4`, `Describe5`, `Describe6`, `Describe7`, `Describe8`, `Describe9`
+/// * Moving:
+/// `MoveTo0`, `MoveTo1`, `MoveTo2`, `MoveTo3`, `MoveTo4`, `MoveTo5`, `MoveTo6`, `MoveTo7`, `MoveTo8`, `MoveTo9`
+/// 
+/// When done with Navigation, call with `Exit`
 pub fn do_navigate_command(command: String) -> Result<String> {
     let command = NAV_COMMANDS.get_key(&command);       // gets a &'static version of the command
     if command.is_none() {
