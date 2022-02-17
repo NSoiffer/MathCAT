@@ -8,8 +8,7 @@ repository = "https://github.com/NSoiffer/MathCAT"
 homepage = "https://nsoiffer.github.io/MathCAT/"
 documentation = "https://nsoiffer.github.io/MathCAT/"
 edition = "2018"
-exclude = ["Rules/*"]
-include = ["rules.zip"]
+# exclude = ["Rules/*"]
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

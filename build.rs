@@ -5,6 +5,7 @@
 use std::fs::{read_dir, DirEntry, File};
 use std::io::{self, Read, Seek, Write};
 use std::path::Path;
+use std::path::PathBuf;
 
 use zip::result::ZipResult;
 use zip::write::FileOptions;
@@ -19,7 +20,9 @@ pub fn zip_dir<T: Write + Seek>(
     let mut zip = ZipWriter::new(target);
 
     for entry in read_dir(path)? {
-        zip_entry(&mut zip, entry?, options)?;
+        let entry = entry?;
+        eprintln!("trying dir entry {:?}", entry.path().to_str());
+        zip_entry(&mut zip, entry, options)?;
     }
 
     zip.finish()
@@ -54,16 +57,27 @@ fn zip_entry<T: Write + Seek>(
 }
 
 fn main() {
-    // let out_dir = env::var_os("OUT_DIR").unwrap();
-    let archive = match File::create("rules.zip") {
+    // This doesn't work because the build claims OUT_DIR is not defined(?)
+    // let archive = PathBuf::from(concat!(env!("OUT_DIR"),"/rules.zip"));
+
+    let out_dir = std::env::var_os("OUT_DIR").unwrap();
+    let archive: PathBuf = [out_dir.clone(), std::ffi::OsString::from("rules.zip")].iter().collect();
+    eprintln!("archive: '{:?}'", archive.to_str());
+
+    let archive = match File::create(&archive) {
         Ok(file) => file,
-        Err(e) => panic!("build.rs couldn't create rules.zip: {}", e),
+        Err(e) => panic!("build.rs couldn't create {:?}: {}", archive.to_str(), e),
     };
+    // let root_dir = std::env::var_os("CARGO_MANIFEST_DIR ").unwrap(); 
+    // let zip_directory: PathBuf = [root_dir.clone(), std::ffi::OsString::from("Rules")].iter().collect();
+    // eprintln!("rules dir: '{:?}'", zip_directory.to_str());
+
     let zip_directory = Path::new("Rules");
     let zip_options = FileOptions::default().compression_method(CompressionMethod::Bzip2);
 
-    if let Err(e) = zip_dir(zip_directory, archive, zip_options) {
+    if let Err(e) = zip_dir(&zip_directory, archive, zip_options) {
         panic!("Error: {}", e);
     }
     println!("cargo:rerun-if-changed=Rules");
+    println!("cargo:rerun-if-changed=build.rs");
 }
