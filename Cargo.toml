@@ -1,6 +1,6 @@
 [package]
 name = "mathcat"
-version = "0.1.4"
+version = "0.1.6"
 authors = ["Neil Soiffer <soiffer@alum.mit.edu>"]
 license = "MIT"
 description = "MathCAT: Math Capable Assistive Technology ('Speech and braille from MathML')"
@@ -8,6 +8,8 @@ repository = "https://github.com/NSoiffer/MathCAT"
 homepage = "https://nsoiffer.github.io/MathCAT/"
 documentation = "https://nsoiffer.github.io/MathCAT/"
 edition = "2018"
+exclude = ["Rules/*"]
+include = ["rules.zip"]
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -58,6 +60,8 @@ getrandom = { version = "0.2.3", features = ["js"] }
 [build-dependencies]
 bitflags = "1.2.1"
 phf = { version = "0.8.0", features = ["macros"] }
+zip = "0.5.8"
+
 
 [[bin]]
 name = "mathcat"

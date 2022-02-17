@@ -5,6 +5,14 @@
 //! but changes are pretty rare and it didn't seem worth it (this may need to be revisited).
 
 use std::path::{Path, PathBuf};
+
+// The zipped files are needed by WASM builds.
+// However, they are also useful for other builds because there really isn't another good way to get at the rules.
+// Other build scripts can extract these files and unzip to their needed locations.
+// I'm not thrilled with this solution as it seems hacky, but I don't know another way for crates to allow for each access to data.
+pub static ZIPPED_RULE_FILES: &'static [u8] = include_bytes!("../rules.zip");
+
+
 cfg_if! {
     if #[cfg(target_family = "wasm")] {
         use std::cell::RefCell;
@@ -81,7 +89,6 @@ cfg_if! {
         pub fn read_to_string_shim(path: &Path) -> Result<String, crate::errors::Error> {
             use std::io::Cursor;
             use std::io::Read;
-            static ZIPPED_FILES: &'static [u8] = include_bytes!("..\\Rules.zip");
 
             let file_name = path.to_str().unwrap().replace("\\", "/");
             if let Some(contents) = OVERRIDE_FILE_NAME.with(|override_name| {
@@ -95,7 +102,7 @@ cfg_if! {
                 return Ok(contents);
             };
             debug!("read_to_string_shim: {}",file_name);
-            let buf_reader = Cursor::new(ZIPPED_FILES);
+            let buf_reader = Cursor::new(ZIPPED_RULE_FILES);
             let mut archive = zip::ZipArchive::new(buf_reader).unwrap();
             // for name in archive.file_names() {
             //     debug!(" File: {}", name);
