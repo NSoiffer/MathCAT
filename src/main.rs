@@ -1,18 +1,6 @@
-/*
+// *** MathCAT doesn't normally want to build a binary ***
+// *** This file is here because it is useful for trying out things ***
 
-*** see https://rust-cli.github.io/book/tutorial/cli-args.html#parsing-cli-arguments-with-structopt
-use structopt::StructOpt;
-
-/// Search for a pattern in a file and display the lines that contain it.
-#[derive(StructOpt)]
-struct Cli {
-    /// The pattern to look for
-    pattern: String,
-    /// The path to the file to read
-    #[structopt(parse(from_os_str))]
-    path: std::path::PathBuf,
-}
-*/
 
 // const LOG_FILE: &'static str = "./MathCAT.log";
 // lazy_static! {
