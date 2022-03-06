@@ -29,7 +29,7 @@
       - t: "1⠣"
       - x: "*[2]"
       - t: "1⠜"
-   - t: "!"    # signal end of script/numeric mode
+   - t: "#"    # signal end of script/numeric mode
    - x: "*[1]"
    - t: "1⠬"
         
@@ -47,7 +47,7 @@
       - "*[1][self::m:mn][not(contains(., '.'))]   and" 
       - "*[2][self::m:mn][not(contains(., '.'))]"
    replace: 
-   - t: "!"    # signal end of previous numeric mode
+   - t: "#"    # signal end of previous numeric mode
    - x: "*[1]"
    - t: "N⠌"
    - x: "*[2]"
@@ -57,7 +57,7 @@
    tag: mfrac
    match: "*[1][self::m:mn] and *[2][self::m:mn]"
    replace: 
-   - t: "!"    # signal end of any previous numeric mode (probably not needed, but...)
+   - t: "#"    # signal end of any previous numeric mode (probably not needed, but...)
    - x: "*[1]"
    - t: "N⠌"
    - x: "*[2]"
@@ -187,11 +187,43 @@
          then: [t: "W"]
 
 -
+   # Non-breaking whitespace is added to the start/end of numbers in cases of adjoining text to help the parse.
+   # These generate a different char inside of a number, so we peel them off here because it doesn't seem possible
+   # to ask "what character position am I inside of an mn?" in unicode.yaml
+   # Here we deal with the messy abnormal case separately
+   name: peel-off-spaces
+   tag: mn
+   match: "starts-with(., '\u00A0') or substring(., string-length(.), 1)='\u00A0'"
+   replace:
+   - test:
+      if: "starts-with(., '\u00A0')"
+      then:
+      - t: "W"
+      - test:
+         if: "substring(., string-length(.), 1)='\u00A0'"
+         then:
+         - x: "BrailleChars(., 'UEB', 2, string-length(.)-1)"
+         - t: "W"
+         else:
+         - x: "BrailleChars(., 'UEB', 2, string-length(.))"
+      else:
+      - test:
+         if: "substring(., string-length(.), 1)='\u00A0'"
+         then:
+         - x: "BrailleChars(., 'UEB', 1, string-length(.)-1)"
+         - t: "W"
+         else:
+         - x: "BrailleChars(., 'UEB', 1, string-length(.))"
+
+-
    name: default
    tag: mn
    match: "."
    replace:
-      - x: "text()"
+   - test:
+      if: "@data-roman-numeral"  # GTM 2.6 -- roman numerals are always G1
+      then: [t: "1"]
+   - x: "BrailleChars(., 'UEB')"
       
 
 -
@@ -200,17 +232,9 @@
    tag: [mi, mtext]
    match: "."
    replace:
-      - x: "text()"
+      - x: "BrailleChars(., 'UEB')"
       
 
-# -
-#    name: default
-#    tag: ms
-#    match: "."
-#    replace: 
-#     - t: the string
-#     - pause: short
-#     - x: text()
 -
    name: default
    tag: mstyle
@@ -243,7 +267,10 @@
       then: [t: "⠠"]
    - test:
       - if: "*[2][text()='_' or text()='¯']"
-        then: [t: "⠱"]
+        then_test:
+         if: "self::m:over"
+         then: [t: "1⠱"]   # need G1 because no prior cell with only dots 4,5 or 6
+         else: [t: "⠱"]
       - else_if: "*[2][text()='→']"
         then: [t: "⠘⠱"]
       - else_if: "*[2][text()='.']"
@@ -303,7 +330,7 @@
          - t: "1⠣"
          - x: "*[2]"
          - t: "1⠜"
-   - t: "!"   # signal end script/numeric mode
+   - t: "#"   # signal end script/numeric mode
 
 
 -
@@ -368,7 +395,7 @@
          - t: "1⠣"
          - x: "*[3]"
          - t: "1⠜"
-   - t: "!"   # signal end script/numeric mode
+   - t: "#"   # signal end script/numeric mode
 
 -
    name: default
@@ -470,7 +497,7 @@
                                  - t: "1⠣"
                                  - x: "$Postscripts[2]"
                                  - t: "1⠜"
-      - t: "!"   # signal end script/numeric mode
+      - t: "#"   # signal end script/numeric mode
                   
 
 -
@@ -646,7 +673,7 @@
          if: "string(@lquote)!=''"
          then: [x: "@lquote"]
          else: [t: "⠄⠄"]
-      - x: "text()"
+      - x: "BrailleChars(., 'UEB')"
       - test:
          if: "string(@rquote)!=''"
          then: [x: "@rquote"]
