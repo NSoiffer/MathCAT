@@ -227,4 +227,4 @@ MathCAT adds some custom functions to make writing rules easier:
 These are used by Nemeth Rules
 | function | meaning |
 | NestingChars | Used by mfrac, msqrt, and mroot rules to repeat the chars the appropriate number of times |
-| NemethChars | Used by token elements to deal with the complicated rearrangement of various Nemeth indicators such as capitalization and font face |
+| BrailleChars | Used by token elements to deal with the complicated rearrangement of various Nemeth indicators such as capitalization and font face |
