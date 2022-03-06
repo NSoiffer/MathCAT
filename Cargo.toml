@@ -1,6 +1,6 @@
 [package]
 name = "mathcat"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["Neil Soiffer <soiffer@alum.mit.edu>"]
 license = "MIT"
 description = "MathCAT: Math Capable Assistive Technology ('Speech and braille from MathML')"
@@ -61,10 +61,10 @@ bitflags = "1.2.1"
 phf = { version = "0.8.0", features = ["macros"] }
 zip = "0.5.8"
 
-
-[[bin]]
-name = "mathcat"
-path = "src/main.rs"
+# when publishing, the next three lines need to be commented out
+# [[bin]]
+# name = "mathcat"
+# path = "src/main.rs"
 
 [lib]
 name = "libmathcat"
