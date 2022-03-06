@@ -45,7 +45,7 @@
     NavMode: Enhanced         # Enhanced, Simple, Character
     ResetNavMode: false       # remember previous value and use it
     Overview: false             # speak the expression or give a description/overview
-    ResetOverView: true        # remember previous value and use it
+    ResetOverview: true        # remember previous value and use it
     NavVerbosity: Medium        # Terse, Medium, Full (words to say for nav command)
     AutoZoomOut: true           # Auto zoom out of 2D exprs (use shift-arrow to force zoom out if unchecked)
 
