@@ -424,7 +424,7 @@ impl<'r> InsertChildren {
     //    This is slower than the alternatives, but reuses a bunch of code and hence is less complicated.
     fn replace<'c, 's:'c, 'm: 'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
         let result = self.xpath.evaluate(&rules_with_context.context_stack.base, mathml)
-                .chain_err(||"replacing after pattern match" )?;
+                .chain_err(||format!("in '{}' replacing after pattern match", &self.xpath.string) )?;
         match result {
             Value::Nodeset(nodes) => {
                 if nodes.size() == 0 {
@@ -1027,7 +1027,7 @@ impl<'r> MyXPath {
         }
         
         let result = self.evaluate(&rules_with_context.context_stack.base, mathml)
-                .chain_err(||"replacing after pattern match" )?;
+                .chain_err(|| format!("in '{}' replacing after pattern match", &self.string) )?;
         return match result {
                 Value::Nodeset(nodes) => {
                     if nodes.size() == 0 {
@@ -1066,7 +1066,8 @@ struct SpeechPattern {
     tag_name: String,
     file_name: String,
     pattern: MyXPath,                     // the xpath expr to attempt to match
-    var_defs: VariableDefinitions,    // any variable definitions [can be and probably is an empty vector most of the time]
+    match_uses_var_defs: bool,            // include var_defs in context for matching
+    var_defs: VariableDefinitions,        // any variable definitions [can be and probably is an empty vector most of the time]
     replacements: ReplacementArray,       // the replacements in case there is a match
 }
 
@@ -1142,16 +1143,18 @@ impl SpeechPattern  {
         // xpath's can't be cloned, so we need to do a 'build_xxx' for each tag name
         for tag_name in tag_names {
             let tag_name = tag_name.to_string();
+            let pattern_xpath = MyXPath::build(&dict["match"])
+                    .chain_err(|| {
+                        format!("value for 'match' in rule ({}: {}):\n{}",
+                                tag_name, pattern_name, yaml_to_string(dict, 1))
+                    })?;
             let speech_pattern = 
                 Box::new( SpeechPattern{
                     pattern_name: pattern_name.clone(),
                     tag_name: tag_name.clone(),
                     file_name: file.to_str().unwrap().to_string(),
-                    pattern: MyXPath::build(&dict["match"])
-                        .chain_err(|| {
-                            format!("value for 'match' in rule ({}: {}):\n{}",
-                                    tag_name, pattern_name, yaml_to_string(dict, 1))
-                        })?,
+                    match_uses_var_defs: dict["variables"].is_array() && pattern_xpath.string.contains('$'),    // FIX: should look at var_defs for actual name
+                    pattern: pattern_xpath,
                     var_defs: VariableDefinitions::build(&dict["variables"])
                         .chain_err(|| {
                             format!("value for 'variables' in rule ({}: {}):\n{}",
@@ -1380,7 +1383,7 @@ impl Test {
 // Used for speech rules with "variables: ..."
 #[derive(Debug, Clone)]
 struct VariableDefinition {
-    name: String,       // name of variable
+    name: String,     // name of variable
     value: MyXPath,   // xpath value, typically a constant like "true" or "0", but could be "*/*[1]" to store some nodes   
 }
 
@@ -2017,9 +2020,13 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
     fn find_match<T:TreeOrString<'c, 'm, T>>(&'r mut self, rule_vector: &[Box<SpeechPattern>], mathml: Element<'c>) -> Result<Option<T>> {
         for pattern in rule_vector {
             // debug!("Pattern: {}", pattern);
+            // pushing and popping around the is_match would be a little cleaner, but push/pop is relatively expensive, so we optimize
+            if pattern.match_uses_var_defs {
+                self.context_stack.push(pattern.var_defs.clone(), mathml)?;
+            }
             if pattern.is_match(&self.context_stack.base, mathml)
                     .chain_err(|| error_string(pattern, mathml) )? {
-                if pattern.var_defs.len() > 0 {
+                if !pattern.match_uses_var_defs && pattern.var_defs.len() > 0 { // don't push them on twice
                     self.context_stack.push(pattern.var_defs.clone(), mathml)?;
                 }
                 let result: Result<T> = pattern.replacements.replace(self, mathml);
@@ -2055,6 +2062,8 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                         )
                     ))
                 }
+            } else if pattern.match_uses_var_defs {
+                self.context_stack.pop();
             }
         };
         return Ok(None);    // no matches
