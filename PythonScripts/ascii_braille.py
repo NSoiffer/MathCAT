@@ -2,8 +2,11 @@ UNICODE_TO_ASCII = " A1B'K2L@CIF/MSP\"E3H9O6R^DJG>NTQ,*5<-U8V.%[$+X!&;:4\\0Z7(_?
 def unicode_to_ascii(unicode: str):
     result = "";
     for ch in unicode:
-        i = ord(ch) - 0x2800
-        result += UNICODE_TO_ASCII[i]
+        if ord(ch) < 128:
+            result += '_'
+        else:
+            i = ord(ch) - 0x2800
+            result += UNICODE_TO_ASCII[i]
     print( result )
 
 def u2a(unicode:str):
