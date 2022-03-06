@@ -176,26 +176,45 @@
    replace: [x: "*"]
 
 -
-   # need to deal with numeric indicator
-   # part of SRE test
-      # "not(@font) or @font=\"normal\" or @font=\"fullwidth\" or @font=\"monospace\"",
-      # "not(ancestor::sqrt)",
-      # "not(ancestor::root)",
-      # "not(ancestor::fraction)",
-   name: default
-   tag: mn
-   match: "."
-   replace: [x: "NemethChars(.)"]
-
--
    # Rule 138 a.2 -- space after a function name
    # most functions will have an invisible apply that adds the space, but "mod" and "rem" are infix, so different
    name: mod_and_rem
    tag: [mi, mo, mtext]    # should really only be 'mo', but others are used
-   match: "text()='mod' or text()='rem'"
+   variables: [Chars: "translate(., '\u00A0', '')"]     #FIX: not really right since it could have a non-breaking spacing inside 'mod'
+   match: "$Chars='mod' or $Chars='rem'"
    replace:
-      - x: "NemethChars(.)"
+      - x: "BrailleChars(DEBUG(.), 'Nemeth')"
       - t: "W"
+
+-
+   # Non-breaking whitespace is added to the start/end of numbers in cases of adjoining text to help the parse.
+   # These generate a different char inside of a number, so we peel them off here because it doesn't seem possible
+   # to ask "what character position am I inside of an mn?" in unicode.yaml
+   # Here we deal with the messy abnormal case separately
+   # Note: Nemeth code doesn't seem to want to keep these spaces
+   name: peel-off-spaces
+   tag: [mi, mn]
+   match: "starts-with(., '\u00A0') or substring(., string-length(.), 1)='\u00A0'"
+   replace:
+   - test:
+      if: "starts-with(., '\u00A0')"
+      then:
+      - test:
+         if: "substring(., string-length(.), 1)='\u00A0'"
+         then: [x: "BrailleChars(., 'Nemeth', 2, string-length(.)-1)"]
+         else: [x: "BrailleChars(., 'Nemeth', 2, string-length(.))"]
+      else:
+      - test:
+         if: "substring(., string-length(.), 1)='\u00A0'"
+         then: [x: "BrailleChars(., 'Nemeth', 1, string-length(.)-1)"]
+         else: [x: "BrailleChars(., 'Nemeth', 1, string-length(.))"]
+
+
+-
+   name: default
+   tag: mn
+   match: "."
+   replace: [x: "BrailleChars(., 'Nemeth')"]
 
 -
    # add space after these ops when they are prefix operators
@@ -227,18 +246,24 @@
             - test:
                if: "$NewScriptContext!=''"  # Rule 79g
                then: [x: "$NewScriptContext"]
-      - x: "NemethChars(.)"
+      - x: "BrailleChars(., 'Nemeth')"
       - test:
          if: "$MaybeAddSpaces and following-sibling::* and 
               not(IsInDefinition(following-sibling::*[1], 'NemethPunctAndOpenAfterSymbols'))" #Rule 151"
          then: [t: "W"]
 
 -
+   name: remove-space
+   tag: mtext
+   match: "text()='\u00A0'"
+   replace:
+      - t: ""    # do nothing -- Nemeth ignores spaces
+-
    name: default
    tag: [mi, mtext]
    match: "."
    replace:
-      - x: "NemethChars(.)"
+      - x: "BrailleChars(., 'Nemeth')"
       
 
 # -
@@ -519,13 +544,13 @@
          if: "$AddSpaces"
          then: [t: "W"]
     - test:
-         if: "$NotNested"
+         if: "DEBUG($NotNested)"
          then:
             - test:
                # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
-               if: "parent::*[self::m:mrow] and
+               if: "DEBUG(parent::*[self::m:mrow] and
                     ancestor-or-self::*[not(preceding-sibling::*)][1]
-                                       [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts]"
+                                       [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts])"
                then: [x: "$NewScriptContext"]
             - t: "⠐"
     - x: "*[1]"
@@ -723,7 +748,7 @@
          if: "string(@lquote)!=''"
          then: [x: "@lquote"]
          else: [t: "⠄⠄"]
-      - x: "text()"
+      - x: "BrailleChars(., 'Nemeth')"
       - test:
          if: "string(@rquote)!=''"
          then: [x: "@rquote"]
