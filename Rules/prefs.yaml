@@ -51,5 +51,14 @@
 
   Braille:
     BrailleNavHighlight: EndPoints   # Highlight with dots 7 & 8 the current nav node -- values are Off, FirstChar, EndPoints, All
-    Code: "Nemeth"                # Any supported braille code (currently Nemeth, UEB)
+    BrailleCode: "Nemeth"                # Any supported braille code (currently Nemeth, UEB)
+
+    UEB:
+      # UEB Guide to Technical Material (https://iceb.org/Guidelines_for_Technical_Material_2008-10.pdf)
+      #   says to normally treat Fraktur and DoubleStruck as Script
+      # Here we provide an option to specify a transcriber-defined typeform prefix indicator instead
+      # Note: here are prefixes for 1st - 5th: "⠈⠼", "⠘⠼", "⠸⠼", "⠐⠼", "⠨⠼"
+      DoubleStruck: "⠈"     # script
+      Fraktur:      "⠈"     # script
+      SansSerif:    "⠈⠼"     # first transcriber-defined typeform prefix indicator
 
