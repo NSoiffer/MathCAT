@@ -2,6 +2,7 @@ use crate::common::*;
 
 #[test]
 fn test_000() {
+    init_logger();
     let expr = "<math><mi>r</mi><mo>≡<!-- ≡ --></mo><mi>s</mi><mspace width=\"0.444em\"></mspace><mo stretchy=\"false\">(</mo><mi>mod</mi><mspace width=\"0.333em\"></mspace><mi>n</mi><mo stretchy=\"false\">)</mo></math>";
     test_braille("Nemeth", expr, "⠗⠀⠸⠇⠀⠎⠷⠍⠕⠙⠀⠝⠾");
 }

@@ -248,7 +248,7 @@ fn comma_ellipsis_in_sub_79_b_5() {
 }
 #[test]
 fn text_after_sup_79_c_3() {
-    // bad mn from Wiris; also &ao;
+    // bad mn from Wiris; also &A0;
     let expr = "<math><mn>6</mn><mo>.</mo><mn>696</mn><mo>×</mo><msup><mn>10</mn><mn>8</mn></msup><mo>&#xA0;</mo><mtext>mph</mtext></math>";
     test_braille("Nemeth", expr, "⠼⠖⠨⠖⠔⠖⠈⠡⠂⠴⠘⠦⠀⠍⠏⠓");
 }
@@ -800,4 +800,24 @@ fn braille2print_example() {
         <mn>2</mn></mrow></mrow></msup></mrow></msqrt>
         <mi>d</mi> <mi>t</mi> <mo>.</mo></math>";
     test_braille("Nemeth", expr, "⠐⠮⠩⠠⠉⠻⠙⠎⠀⠨⠅⠀⠮⠰⠞⠰⠰⠂⠘⠞⠘⠰⠆⠐⠜⠷⠹⠙⠭⠌⠙⠞⠼⠾⠘⠆⠐⠬⠷⠹⠙⠽⠌⠙⠞⠼⠾⠘⠆⠐⠻⠙⠞⠸⠲");
+}
+
+
+// Extra tests targeted at special cases in MathCAT
+#[test]
+fn number_space_before() {
+    let expr = "<math><mtext>&#xA0;</mtext><mn>2</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠆");
+}
+
+#[test]
+fn number_space_after() {
+    let expr = "<math><mn>2</mn><mtext>&#xA0;</mtext></math>";
+    test_braille("Nemeth", expr, "⠼⠆");
+}
+
+#[test]
+fn number_space_before_and_after() {
+    let expr = "<math><mtext>&#xA0;</mtext><mn>2</mn><mtext>&#xA0;</mtext></math>";
+    test_braille("Nemeth", expr, "⠼⠆");
 }
