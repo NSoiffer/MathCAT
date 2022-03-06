@@ -67,7 +67,7 @@ impl Preferences{
         prefs.insert("ResetOverView".to_string(), Yaml::Boolean(true));
         prefs.insert("NavVerbosity".to_string(), Yaml::String("verbose".to_string()));
         prefs.insert("AutoZoomOut".to_string(), Yaml::Boolean(true));
-        prefs.insert("Code".to_string(), Yaml::String("Nemeth".to_string()));
+        prefs.insert("BrailleCode".to_string(), Yaml::String("Nemeth".to_string()));
         prefs.insert("BrailleNavHighlight".to_string(), Yaml::String("EndPoints".to_string()));
     
         return Preferences{ prefs };
@@ -91,8 +91,8 @@ impl Preferences{
     fn from_file(rules_dir: &PathBuf) -> Result<(Preferences, FileAndTime)> {
         let files = Preferences::get_prefs_file_and_time(rules_dir);
         return DEFAULT_USER_PREFERENCES.with(|defaults| {
-            let mut system_prefs = Preferences::read_file(&files.files[0], defaults.clone())?;
-            system_prefs = Preferences::read_file(&files.files[1], system_prefs)?;
+            let system_prefs = Preferences::read_file(&files.files[0], defaults.clone())?;
+            let system_prefs = Preferences::read_file(&files.files[1], system_prefs)?;
             return Ok((system_prefs, files));
         });
     }
@@ -123,7 +123,7 @@ impl Preferences{
         }
     }
 
-    fn read_file(file: &Option<PathBuf>, base_prefs: Preferences) -> Result<Preferences> {
+    fn read_file(file: &Option<PathBuf>, mut base_prefs: Preferences) -> Result<Preferences> {
         let unwrapped_file = match file {
             None => return Ok(base_prefs),
             Some(f) => f.as_path(),
@@ -158,13 +158,11 @@ impl Preferences{
         verify_keys(doc, "Navigation", file_name)?;
         verify_keys(doc, "Braille", file_name)?;
 
-        return DEFAULT_USER_PREFERENCES.with(|defaults| {
-            let prefs = &mut defaults.prefs.clone(); // ensure basic key/values exist
-            add_prefs(prefs, &doc["Speech"], "", file_name);
-            add_prefs(prefs, &doc["Navigation"], "", file_name);
-            add_prefs(prefs, &doc["Braille"], "", file_name);
-            return Ok( Preferences{ prefs: prefs.to_owned() } );
-        });
+        let prefs = &mut base_prefs.prefs;
+        add_prefs(prefs, &doc["Speech"], "", file_name);
+        add_prefs(prefs, &doc["Navigation"], "", file_name);
+        add_prefs(prefs, &doc["Braille"], "", file_name);
+        return Ok( Preferences{ prefs: prefs.to_owned() } );
 
 
 
@@ -418,7 +416,7 @@ impl PreferenceManager {
         self.speech_unicode_full = PreferenceManager::get_file_and_time(
                         &rules_dir, language, Some("en"), "unicode-full.yaml")?;
 
-        let braille_code = prefs.to_string("Code");
+        let braille_code = prefs.to_string("BrailleCode");
         let braille_file = braille_code.clone() + "_Rules.yaml";
         self.braille = PreferenceManager::get_file_and_time(
                         &rules_dir, &braille_code, Some("Nemeth"), &(braille_file))?;
@@ -713,7 +711,7 @@ impl PreferenceManager {
         };
 
         self.user_prefs.set_string_value(name, value);
-        if name == "Language" || name == "SpeechStyle" || name == "Code" {
+        if name == "Language" || name == "SpeechStyle" || name == "BrailleCode" {
             let old_speech = self.speech.clone();
             let old_speech_unicode= self.speech_unicode.clone();
             let old_speech_unicode_full = self.speech_unicode_full.clone();
@@ -827,7 +825,7 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.set_user_prefs("Language", "zz-aa");
-            pref_manager.set_user_prefs("Code", "UEB");
+            pref_manager.set_user_prefs("BrailleCode", "UEB");
             
             assert_helper(count_files(&pref_manager.speech), 2, "ClearSpeak_Rules.yaml");
             assert_helper(count_files(&pref_manager.speech_unicode), 1, "unicode.yaml");
@@ -863,13 +861,13 @@ mod tests {
     fn test_prefs() {
         PreferenceManager::initialize(abs_rules_dir_path()).unwrap();
         PREF_MANAGER.with(|pref_manager| {
-            let pref_manager = pref_manager.borrow_mut();
+            let pref_manager = pref_manager.borrow();
             let prefs = pref_manager.get_user_prefs();
             assert_eq!(prefs.to_string("Language").as_str(), "en");
             assert_eq!(prefs.to_string("SubjectArea").as_str(), "General");
             assert_eq!(prefs.to_string("ClearSpeak_AbsoluteValue").as_str(), "Auto");
             assert_eq!(prefs.to_string("ResetNavMode").as_str(), "false");
-            assert_eq!(prefs.to_string("Code").as_str(), "Nemeth");
+            assert_eq!(prefs.to_string("BrailleCode").as_str(), "Nemeth");
             assert_eq!(prefs.to_string("X_Y_Z").as_str(), "");
         });
     }
@@ -898,7 +896,7 @@ mod tests {
 
             assert_eq!(&pref_manager.get_user_prefs().to_string("Verbosity"), "Terse");
 
-            pref_manager.set_user_prefs("Code", "UEB");
+            pref_manager.set_user_prefs("BrailleCode", "UEB");
             
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Braille)[0]), PathBuf::from("UEB/UEB_Rules.yaml"));
         });
