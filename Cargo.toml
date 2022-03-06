@@ -1,6 +1,6 @@
 [package]
 name = "mathcat"
-version = "0.1.6"
+version = "0.1.7"
 authors = ["Neil Soiffer <soiffer@alum.mit.edu>"]
 license = "MIT"
 description = "MathCAT: Math Capable Assistive Technology ('Speech and braille from MathML')"
@@ -8,7 +8,7 @@ repository = "https://github.com/NSoiffer/MathCAT"
 homepage = "https://nsoiffer.github.io/MathCAT/"
 documentation = "https://nsoiffer.github.io/MathCAT/"
 edition = "2018"
-# exclude = ["Rules/*"]
+exclude = ["src/main.rs"]    # should have "Rules/", but then one can't run build.rs to build the zip file
 
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -69,3 +69,7 @@ path = "src/main.rs"
 [lib]
 name = "libmathcat"
 crate-type = ["rlib", "cdylib"]
+
+[profile.release]
+lto = true
+# opt-level = "z"  # Optimize for size.
