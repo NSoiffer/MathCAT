@@ -12,7 +12,9 @@ src/*.bak
 */*/*.swp
 __pycache__
 PythonScripts/__pycache__
-PythonScripts/*.yaml
+PythonScripts/shapes.yaml
+PythonScripts/ueb-shapes.yaml
+PythonScripts/unicode.yaml
 PythonScripts/*.txt
 PythonScripts/*.rs
 PythonScripts/out
