@@ -25,8 +25,8 @@ Timeline:
 * late January/February: add more intent inference rules
 * February: Release MathCAT as NVDA add-on
 * February/March: Work on at least one translation of MathCAT to another language
-* February/March: Work on MathML->UEB translation
-* March/April: work on UEB->MathML translation and explore UEB->Nemeth math translator
+* ✓ February/March: Work on MathML->UEB translation
+* May/June: work on UEB->MathML translation and explore UEB->Nemeth math translator
 * Late spring/summer: develop GUI interface for setting user preferences
 * Summer, Fall, and Winter: work with translators to hopefully add many languages
 * Fall: potentially work on 2D Nemeth generation along with Nemeth input
