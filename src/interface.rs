@@ -185,7 +185,7 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
                 let files_changed = rules.pref_manager.borrow_mut().set_user_prefs(&name, &value);  
                 rules.invalidate(files_changed);  
             },
-            "Code" => {
+            "BrailleCode" => {
                 let files_changed = rules.pref_manager.borrow_mut().set_user_prefs(&name, &value);    
                 crate::speech::BRAILLE_RULES.with(|braille_rules| {
                     braille_rules.borrow_mut().invalidate(files_changed);
