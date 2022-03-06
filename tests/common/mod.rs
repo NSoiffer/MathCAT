@@ -115,7 +115,7 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::BRAILLE_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
-        let changes = rules.pref_manager.borrow_mut().set_user_prefs("Code", code);
+        let changes = rules.pref_manager.borrow_mut().set_user_prefs("BrailleCode", code);
         rules.invalidate(changes);
     });
     if let Err(e) = set_mathml(mathml.to_string()) {
