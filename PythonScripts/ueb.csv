@@ -151,13 +151,13 @@ $,@s,0024,Dollar sign
 ↶,\99[,21B6,Anticlockwise top semicircle arrow
 ↷,\55o,21B7,Clockwise top semicircle arrow
 ↼,\@r[,21BC,Leftwards harpoon with barb upwards
-↽,".\,r[",21BD,Leftwards harpoon with barb downwards
-↾,".\,r+",21BE,Upwards harpoon with barb rightwards
+↽,"\,r[",21BD,Leftwards harpoon with barb downwards
+↾,"\,r+",21BE,Upwards harpoon with barb rightwards
 ↿,\@r+,21BF,Upwards harpoon with barb leftwards
 ⇀,\@ro,21C0,Rightwards harpoon with barb upwards
-⇁,".\,ro",21C1,Rightwards harpoon with barb downwards
+⇁,"\,ro",21C1,Rightwards harpoon with barb downwards
 ⇂,\@r%,21C2,Downwards harpoon with barb rightwards
-⇃,".\,r%",21C3,Downwards harpoon with barb leftwards
+⇃,"\,r%",21C3,Downwards harpoon with barb leftwards
 ⇄,\o]\[,21C4,Rightwards arrow over leftwards arrow
 ⇅,\+=\%,21C5,Upwards arrow left of Downwards arrow
 ⇌,^_7,21CC,Rightwards harpoon over leftwards harpoon (equilibrium)
