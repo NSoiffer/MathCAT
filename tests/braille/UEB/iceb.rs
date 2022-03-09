@@ -71,8 +71,8 @@ fn bana_5a_2_mtext() {
 
 #[test]
 fn bana_5a_3() {
-    let expr = "<math><mn>6</mn><mo>&#xA0;</mo><mi>m</mi><mo>&#xA0;</mo>
-            <msup><mi>s</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup></math>";
+    let expr = "<math><mn>6</mn><mo>&#xA0;</mo><mi class='MathML-unit'>m</mi><mo>&#xA0;</mo>
+            <msup><mi class='MathML-unit'>s</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup></math>";
     test_braille("UEB", expr, "⠼⠋⠀⠰⠍⠀⠰⠰⠎⠔⠣⠐⠤⠼⠁⠜");
 }
 
@@ -192,14 +192,18 @@ fn time_2_4_1() {
 
 #[test]
 fn roman_numeral_2_6_1() {
-    let expr = "<math><mn>I</mn><mo>,</mo><mtext>&#xA0;</mtext><mn>II</mn></math>";
-    test_braille("UEB", expr, "⠠⠊⠂⠀⠠⠠⠊⠊");
+    let expr = " <math><mi mathvariant='normal'>I</mi><mo>,</mo>
+        <mo>&#xA0;</mo><mi>II</mi>
+        <mo>&#xA0;</mo><mtext>and</mtext><mo>&#xA0;</mo><mi mathvariant='normal'>V</mi></math>";
+    test_braille("UEB", expr, "⠠⠊⠂⠀⠠⠠⠊⠊⠀⠯⠀⠰⠠⠧");
 }
 
 #[test]
 fn roman_numeral_2_6_2() {
-    let expr = "<math><mn>i</mn><mo>,</mo><mtext>&#xA0;</mtext><mn>vi</mn></math>";
-    test_braille("UEB", expr, "⠊⠂⠀⠧⠊");
+    let expr = " <math><mi mathvariant='normal'>i</mi><mo>,</mo>
+        <mo>&#xA0;</mo><mi>vi</mi>
+        <mo>&#xA0;</mo><mtext>and</mtext><mo>&#xA0;</mo><mi mathvariant='normal'>x</mi></math>";
+    test_braille("UEB", expr, "⠊⠂⠀⠧⠊⠀⠯⠀⠰⠭");
 }
 
 #[test]
@@ -251,8 +255,8 @@ fn signs_2_10_8() {
 
 #[test]
 fn signs_2_10_16() {
-    let expr = "<math><mn>1</mn><mi mathvariant='normal'>&#xC5;</mi><mo>=</mo>
-        <mfrac><mn>1</mn><mrow><mn>10</mn><mo>,</mo><mn>000</mn></mrow></mfrac>
+    let expr = "<math><mn>1</mn><mo>&#xA0;</mo><mi mathvariant='normal'>&#xC5;</mi><mo>=</mo>
+        <mfrac><mn>1</mn><mrow><mn>10</mn><mo>,</mo><mn>000</mn></mrow></mfrac><mo>&#xA0;</mo>
         <mi mathvariant='normal'>&#x3BC;</mi></math>";
     test_braille("UEB", expr, "⠼⠁⠀⠠⠘⠫⠁⠀⠐⠶⠀⠼⠁⠌⠁⠚⠂⠚⠚⠚⠀⠨⠍");
 }
@@ -795,6 +799,7 @@ fn example_11_5_5_2() {
 
 #[test]
 fn example_11_5_5_3() {
+    init_logger();
     // this comes from MathJax
     let expr = "<math>
         <mi mathvariant='normal'>&#x2200;</mi>
