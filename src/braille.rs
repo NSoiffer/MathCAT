@@ -319,6 +319,7 @@ static UEB_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "N" => "⠼",     // number indicator
     "t" => "⠱",     // shape terminator
     "W" => "⠀",     // whitespace
+    "𝐖"=> "⠀",     // whitespace
     "s" => "⠆",     // typeface single char indicator
     "w" => "⠂",     // typeface word indicator
     "e" => "⠄",     // typeface terminator 
@@ -371,7 +372,7 @@ lazy_static! {
     // Note: fraction over is not listed due to example 42(4) which shows a space before the "/"
     // static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex = 
     //     Regex::new(r"(⠄⠄⠄|⠤⠤⠤)W+([⠼⠸⠪])").unwrap();
-    static ref REPLACE_INDICATORS: Regex =Regex::new(r"([1SB𝔹TIREDGVHPCLMNWswe,.-—―#ocb])").unwrap();  
+    static ref REPLACE_INDICATORS: Regex =Regex::new(r"([1SB𝔹TIREDGVHPCLMNW𝐖swe,.-—―#ocb])").unwrap();  
     static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
 }
 
@@ -383,7 +384,14 @@ fn is_short_form(chars: &[char]) -> bool {
 fn ueb_cleanup(raw_braille: String) -> String {
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
-    let result = pick_start_mode(&result);
+
+    
+    // '𝐖' is a hard break -- basically, it separates exprs
+    let mut result = result.split("𝐖")
+                        .map(|str| pick_start_mode(str) + "W")
+                        .collect::<String>();
+    result.pop();   // we added a 'W' at the end that needs to be removed.
+
     let result = result.replace("tW", "W");
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
@@ -446,7 +454,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
             } else if ch == 'L' || ch == 'N' {
                 result.push(chars[i]);
                 result.push(chars[i+1]);
-                if !word_mode_end.is_empty() && i+2 < chars.len() && chars[i+2] != 'W' {
+                if !word_mode_end.is_empty() && i+2 < chars.len() && !(chars[i+2] == 'W'|| chars[i+2] == '𝐖') {
                     // add terminator unless word sequence is terminated by end of string or whitespace
                     for &ch in &word_mode_end {
                         result.push(ch);
@@ -559,6 +567,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
         debug!("before determining mode:  '{}'", raw_braille);
         let grade2 = remove_unneeded_mode_changes(&raw_braille, UEB_Mode::Grade2, UEB_Duration::Symbol);
         debug!("Symbol mode:  '{}'", &grade2);
+
         if is_grade2_string_ok(&grade2) {
             return grade2;
         } else {
@@ -599,6 +608,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
                     found_g1 = true;
                 } else if !"Lobc".contains(ch) {
                     if n_real_chars == 2 {
+                        i += 1;
                         break;      // this is the third real char
                     };
                     n_real_chars += 1;
@@ -628,7 +638,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
                 // this will be 'N' followed by LETTER_NUMBERS or the number ".", ",", or " "
                 for j in (0..i).rev() {
                     let ch = chars[j];
-                    if !(LETTER_NUMBERS.contains(&ch) || ".,W".contains(ch)) {
+                    if !(LETTER_NUMBERS.contains(&ch) || ".,W𝐖".contains(ch)) {
                         return ch == 'N'
                     }
                 }
@@ -751,7 +761,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                         // moving out of numeric mode
                         result.push(ch);
                         i += 1;
-                        mode = if "W-—―".contains(ch) {start_mode} else {UEB_Mode::Grade1};     // space, hyphen, dash(short & long) RUEB 6.5.1
+                        mode = if "W𝐖-—―".contains(ch) {start_mode} else {UEB_Mode::Grade1};     // space, hyphen, dash(short & long) RUEB 6.5.1
                     },
                 }
             },
@@ -784,7 +794,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                         mode = UEB_Mode::Numeric;
                         duration = UEB_Duration::Word;
                     },
-                    'W' => {
+                    'W' | '𝐖' => {
                         // this terminates a word mode if there was one
                         result.push(ch);
                         i += 1;
@@ -906,11 +916,11 @@ fn stands_alone(chars: &[char], i: usize) -> (bool, &[char], usize) {
         return (false, &chars[i..i+2], 0);
     }
 
-    let (is_alone, n_letters, matched_chars) = right_side_stands_alone(&chars[i+2..]);
+    let (mut is_alone, n_letters, matched_chars) = right_side_stands_alone(&chars[i+2..]);
     if is_alone && n_letters == 1 {
         let ch = chars[i+1];
-        if ch=='a' || ch=='i' || ch=='o' {
-            return (false, &chars[i..i+2], n_letters);
+        if ch=='⠁' || ch=='⠊' || ch=='⠕' {      // a, i, o
+            is_alone = false;
         }
     }
     return (is_alone, &chars[i..i+2+matched_chars], n_letters);
@@ -941,7 +951,7 @@ fn stands_alone(chars: &[char], i: usize) -> (bool, &[char], usize) {
             } else if LEFT_INTERVENING_CHARS.contains(&ch) {
                 intervening_chars_mode = true;
             } else {
-                return "W-—―".contains(ch);
+                return "W𝐖-—―".contains(ch);
             }
         }
 
@@ -972,7 +982,7 @@ fn stands_alone(chars: &[char], i: usize) -> (bool, &[char], usize) {
             } else if RIGHT_INTERVENING_CHARS.contains(&ch) {  
                 intervening_chars_mode = true;
             } else {
-                return if "W-—―".contains(ch) {(true, n_letters, i)} else {(false, n_letters, i)};
+                return if "W𝐖-—―".contains(ch) {(true, n_letters, i)} else {(false, n_letters, i)};
             }
             i += 1;
         }
