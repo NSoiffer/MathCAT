@@ -404,30 +404,34 @@ impl PreferenceManager {
         self.user_prefs = prefs.clone();
         self.intent = PreferenceManager::get_file_and_time(
             &rules_dir, language, Some("en"), "intent.yaml")?;
+        let mut speech_rules_dir = rules_dir.clone();
+        speech_rules_dir.push("Languages");
         self.speech = PreferenceManager::get_file_and_time(
-                        &rules_dir, language, Some("en"), &style_file_name)?;
+                        &speech_rules_dir, language, Some("en"), &style_file_name)?;
         self.overview = PreferenceManager::get_file_and_time(
-                        &rules_dir, language, Some("en"), "overview.yaml")?;
+                        &speech_rules_dir, language, Some("en"), "overview.yaml")?;
         self.navigation = PreferenceManager::get_file_and_time(
-                        &rules_dir, language, Some("en"), "navigate.yaml")?;
+                        &speech_rules_dir, language, Some("en"), "navigate.yaml")?;
 
         self.speech_unicode = PreferenceManager::get_file_and_time(
-                        &rules_dir, language, Some("en"), "unicode.yaml")?;
+                        &speech_rules_dir, language, Some("en"), "unicode.yaml")?;
         self.speech_unicode_full = PreferenceManager::get_file_and_time(
-                        &rules_dir, language, Some("en"), "unicode-full.yaml")?;
+                        &speech_rules_dir, language, Some("en"), "unicode-full.yaml")?;
 
+        let mut braille_rules_dir = rules_dir.clone();
+        braille_rules_dir.push("Braille");
         let braille_code = prefs.to_string("BrailleCode");
         let braille_file = braille_code.clone() + "_Rules.yaml";
         self.braille = PreferenceManager::get_file_and_time(
-                        &rules_dir, &braille_code, Some("Nemeth"), &(braille_file))?;
+                        &braille_rules_dir, &braille_code, Some("Nemeth"), &(braille_file))?;
 
         self.braille_unicode = PreferenceManager::get_file_and_time(
-                        &rules_dir, &braille_code, Some("Nemeth"), "unicode.yaml")?;
+                        &braille_rules_dir, &braille_code, Some("Nemeth"), "unicode.yaml")?;
         self.braille_unicode_full = PreferenceManager::get_file_and_time(
-                        &rules_dir, &braille_code, Some("Nemeth"), "unicode-full.yaml")?;
+                        &braille_rules_dir, &braille_code, Some("Nemeth"), "unicode-full.yaml")?;
 
         self.defs = PreferenceManager::get_file_and_time(
-        &rules_dir, language, Some("en"), "definitions.yaml")?;
+        &speech_rules_dir, language, Some("en"), "definitions.yaml")?;
         return Ok(());
     }
 
@@ -451,7 +455,7 @@ impl PreferenceManager {
         let mut default_lang = default_lang;
         if lang_dir.is_none() {
             // try again with the default lang if there is one
-            if default_lang.is_none() {
+            if default_lang.is_some() {
                 lang_dir = PreferenceManager::get_language_dir(&rules_dir, default_lang.unwrap());
                 if lang_dir.is_none() {
                     // We are done for -- MathCAT can't do anything without the required files!
@@ -502,7 +506,7 @@ impl PreferenceManager {
     }
 
     fn get_language_dir(rules_dir: &PathBuf, lang: &str) -> Option<PathBuf> {
-        // return 'Rules/fr', 'Rules/en/gb', etc, if they exist.
+        // return 'Rules/Language/fr', 'Rules/Language/en/gb', etc, if they exist.
         // fall back to main language, and then to default_dir if language dir doesn't exist
         let mut full_path = rules_dir.clone();
         let lang_parts = lang.split('-');
@@ -774,7 +778,7 @@ mod tests {
         PreferenceManager::initialize(abs_rules_dir_path()).unwrap();
         PREF_MANAGER.with(|pref_manager| {
             let pref_manager = pref_manager.borrow_mut();
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("en/ClearSpeak_Rules.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
         });
     }
 
@@ -784,7 +788,7 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.set_user_prefs("Language", "zz");
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("zz/ClearSpeak_Rules.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
         });
     }
 
@@ -795,8 +799,8 @@ mod tests {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.set_user_prefs("Language", "zz-aa");
             
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("zz/ClearSpeak_Rules.yaml"));
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[1]), PathBuf::from("zz/aa/ClearSpeak_Rules.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[1]), PathBuf::from("Languages/zz/aa/ClearSpeak_Rules.yaml"));
         });
     }
 
@@ -807,7 +811,7 @@ mod tests {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.set_user_prefs("Language", "zz-ab");
             
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("zz/ClearSpeak_Rules.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
         });
     }
 
@@ -851,8 +855,8 @@ mod tests {
 
             let mut iter = pref_manager.defs.files.iter();
             assert_eq!(rel_path(&pref_manager.rules_dir, iter.next().unwrap()), Path::new("definitions.yaml"));
-            assert_eq!(rel_path(&pref_manager.rules_dir, iter.next().unwrap()), Path::new("zz/definitions.yaml"));
-            assert_eq!(rel_path(&pref_manager.rules_dir, iter.next().unwrap()), Path::new("zz/aa/definitions.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, iter.next().unwrap()), Path::new("Languages/zz/definitions.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, iter.next().unwrap()), Path::new("Languages/zz/aa/definitions.yaml"));
             assert_eq!(iter.next(), None, "Should not be any files left")
         });
     }
@@ -879,11 +883,11 @@ mod tests {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
 
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("en/ClearSpeak_Rules.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
 
             pref_manager.set_user_prefs("Language", "zz");
             
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("zz/ClearSpeak_Rules.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
         });
     }
 
@@ -898,7 +902,7 @@ mod tests {
 
             pref_manager.set_user_prefs("BrailleCode", "UEB");
             
-            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Braille)[0]), PathBuf::from("UEB/UEB_Rules.yaml"));
+            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Braille)[0]), PathBuf::from("Braille/UEB/UEB_Rules.yaml"));
         });
     }
 

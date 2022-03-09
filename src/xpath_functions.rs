@@ -1055,12 +1055,12 @@ mod tests {
 
     fn init_word_list() {
         let result = crate::definitions::read_definitions_file(&[
-            Some(PathBuf::from("Rules/en/definitions.yaml")),
+            Some(PathBuf::from("Rules/Languages/en/definitions.yaml")),
             Some(PathBuf::from("Rules/definitions.yaml")),
             None
         ]);
         if let Err(e) = result {
-            panic!("unable to read 'Rules/en/definitions.yaml\n{}", e.to_string());
+            panic!("unable to read 'Rules/Languages/en/definitions.yaml\n{}", e.to_string());
         }
     }
 
