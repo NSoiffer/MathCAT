@@ -1,9 +1,21 @@
-UNICODE_TO_ASCII = " A1B'K2L@CIF/MSP\"E3H9O6R^DJG>NTQ,*5<-U8V.%[$+X!&;:4\\0Z7(_?W]#Y)="
+UNICODE_TO_ASCII = """ a1b\'k2l@cif/msp"e3h9o6r^djg>ntq,*5<-u8v.%[$+x!&;:4\\0z7(_?w]#y)="""
 def unicode_to_ascii(unicode: str):
     result = "";
     for ch in unicode:
         if ord(ch) < 128:
             result += '_'
+        else:
+            i = ord(ch) - 0x2800
+            result += UNICODE_TO_ASCII[i]
+    print( result )
+
+# convert a bunch of text that is in Unicode braille to ASCII braille
+# typically uses as text_u2a(""" lines of text """)
+def text_u2a(unicode: str):
+    result = "";
+    for ch in unicode:
+        if ord(ch) < 128:
+            result += ch
         else:
             i = ord(ch) - 0x2800
             result += UNICODE_TO_ASCII[i]
