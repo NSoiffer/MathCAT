@@ -192,7 +192,7 @@
    # to ask "what character position am I inside of an mn?" in unicode.yaml
    # Here we deal with the messy abnormal case separately
    name: peel-off-spaces
-   tag: mn
+   tag: [mn, mi]
    match: "starts-with(., '\u00A0') or substring(., string-length(.), 1)='\u00A0'"
    replace:
    - test:
@@ -203,7 +203,10 @@
          if: "substring(., string-length(.), 1)='\u00A0'"
          then:
          - x: "BrailleChars(., 'UEB', 2, string-length(.)-1)"
-         - t: "W"
+         - test:
+            if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
+            then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
+            else: [t: "W"]
          else:
          - x: "BrailleChars(., 'UEB', 2, string-length(.))"
       else:
@@ -211,7 +214,10 @@
          if: "substring(., string-length(.), 1)='\u00A0'"
          then:
          - x: "BrailleChars(., 'UEB', 1, string-length(.)-1)"
-         - t: "W"
+         - test:
+            if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
+            then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
+            else: [t: "W"]
          else:
          - x: "BrailleChars(., 'UEB', 1, string-length(.))"
 
@@ -220,9 +226,9 @@
    tag: mn
    match: "."
    replace:
-   - test:
-      if: "@data-roman-numeral"  # GTM 2.6 -- roman numerals are always G1
-      then: [t: "1"]
+   # - test:
+   #    if: "@data-roman-numeral"  # GTM 2.6 -- roman numerals are always G1
+   #    then: [t: "1"]
    - x: "BrailleChars(., 'UEB')"
       
 
