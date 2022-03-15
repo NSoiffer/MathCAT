@@ -279,7 +279,9 @@
     - test:
         if: # GTM 9.3.3 (not very clear in rule, but the function name has to start with a lower case latin char ['no indicators'])
         - "parent::m:mrow and "
-        - "preceding-sibling::*[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] and"
+        - "preceding-sibling::*[1]["
+        - "           (self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '') or "
+        - "           (self::m:mrow and translate(*[last()], 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '')] and"
         - "  following::*[1][self::m:mrow and count(*)=3 and "   # look for function apply
         - "     *[2][text()='⁡'] and *[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']]" 
         then: [t: "W"]
