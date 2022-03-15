@@ -19,6 +19,8 @@ PythonScripts/*.txt
 PythonScripts/*.rs
 PythonScripts/out
 PythonScripts/foo
+PythonScripts/UEBCharTable.csv
+PythonScripts/ueb.csv.bak
 
 PythonScripts/UEBCharTable.xlsx
 PythonScripts/all-nemeth-chars.py
