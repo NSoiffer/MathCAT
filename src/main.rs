@@ -78,7 +78,18 @@ fn main() {
   //                 <mspace width=\"thinmathspace\"></mspace><mn>037</mn>
   //                 <mspace width=\"thinmathspace\"></mspace><mn>234</mn></math>";
   // let expr = "<math><mn>𝟏𝟐𝟑</mn></math>";
-  let expr = "<math><mi>sin</mi><mi>x</mi></math>";
+  let expr = "<math>
+  <msup>
+    <mi>x</mi>
+    <mfrac>
+      <mi>a</mi>
+      <mi>b</mi>
+    </mfrac>
+  </msup>
+  <mi>y</mi>
+  <mo>=</mo>
+  <mi>x</mi>
+</math>";
   // let expr = "
   // <math display='block' id='x0'> <semantics>
   //  <mrow displaystyle='true' id='x1'>
@@ -138,15 +149,16 @@ fn main() {
   if let Err(e) = set_mathml(expr.to_string()) {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   };
-  // SetPreference("TTS".to_string(), ("SSML".to_string()).unwrap();
-  // SetPreference("Bookmark".to_string(), "true".to_string()).unwrap();
-  // SetPreference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+  // set_preference("TTS".to_string(), ("SSML".to_string()).unwrap();
+  // set_preference("Bookmark".to_string(), "true".to_string()).unwrap();
+  // set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
 
-  match get_spoken_text() {
-    Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
-    Err(e) => panic!("{}", errors_to_string(&e)),
-  }
+  // match get_spoken_text() {
+  //   Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
+  //   Err(e) => panic!("{}", errors_to_string(&e)),
+  // }
   
+  set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),
@@ -155,12 +167,12 @@ fn main() {
   // Note: the logger seems to be a huge time sync, so println! is used for timing
   println!("Time taken: {}ms", instant.elapsed().as_millis());
   // let instant = Instant::now();
-  // match GetSpokenText() {
+  // match get_spoken_text() {
   //   Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
   //   Err(e) => panic!("{}", errors_to_string(&e)),
   // }
   
-  // match GetBraille("".to_string()) {
+  // match get_braille("".to_string()) {
   //   Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
   //   Err(e) => panic!("{}", errors_to_string(&e)),
   // }
