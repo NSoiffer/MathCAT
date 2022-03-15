@@ -444,10 +444,10 @@ fn ueb_cleanup(raw_braille: String) -> String {
                 } else {
                     result.push(ch);
                     if is_next_char_target {
-                        result.push('w');
-                        word_mode.push(ch);     // starting word mode for this char
+                        result.push('w');     // typeface word indicator
+                        word_mode.push(ch);      // starting word mode for this char
                     } else {
-                        result.push('s');
+                        result.push('s');     // typeface single char indicator
                     }
                 }
                 i += 1; // eat "B", etc
@@ -698,12 +698,20 @@ enum UEB_Duration {
     Passage,
 }
 
+// used to determine standing alone (on left side)
+static LEFT_INTERVENING_CHARS: phf::Set<char> = phf_set! {  // see RUEB 2.6.2
+    'B', 'I', '𝔹', 'S', 'T', 'D', 'C', 's', 'w',     // indicators
+    // opening chars have prefix 'o', so not in set ['(', '{', '[', '"', '\'', '“', '‘', '«'] 
+};
+
 fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_duration: UEB_Duration) -> String {
 
     // FIX: need to be smarter about moving on wrt to typeforms/typefaces, caps, bold/italic. [maybe just let them loop through the default?]
     let mut mode = start_mode;
     let mut duration = start_duration;
     let mut start_g2_letter = None;    // used for start of contraction checks
+    let mut i_g2_start = None;  // set to 'i' when entering G2 mode; None in other modes. '1' indicator goes here if standing alone
+    let mut cap_word_mode = false;     // only set to true in G2 to prevent contractions
     let mut result = String::default();
     let chars = raw_braille.chars().collect::<Vec<char>>();
     let mut i = 0;
@@ -721,6 +729,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                 // When grade 1 mode is set by the numeric indicator,
                 //   grade 1 indicators are not used unless a single lower-case letter a-j immediately follows a digit.
                 // Grade 1 mode when set by the numeric indicator is terminated by a space, hyphen, dash, or a grade 1 indicator.
+                i_g2_start = None;
                 debug!("Numeric: ch={}, duration: {:?}", ch, duration);
                 match ch {
                     'L' => {
@@ -762,6 +771,9 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                         result.push(ch);
                         i += 1;
                         mode = if "W𝐖-—―".contains(ch) {start_mode} else {UEB_Mode::Grade1};     // space, hyphen, dash(short & long) RUEB 6.5.1
+                        if mode == UEB_Mode::Grade2 {
+                            start_g2_letter = None;        // will be set to real letter
+                        }
                     },
                 }
             },
@@ -770,6 +782,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                 // The numeric indicator also sets grade 1 mode.
                 // Grade 1 mode, when initiated by the numeric indicator, is terminated by a space, hyphen, dash or grade 1 terminator.
                 // Grade 1 mode is also set by grade 1 indicators.
+                i_g2_start = None;
                 debug!("Grade 1: ch={}, duration: {:?}", ch, duration);
                 match ch {
                     'L' => {
@@ -818,49 +831,54 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
             },
             UEB_Mode::Grade2 => {
                 // note: if we ended up using a '1', it only extends to the next char, which is also dealt with, so mode doesn't change
+               if i_g2_start.is_none() {
+                   i_g2_start = Some(i);
+                   cap_word_mode = false;
+               }
                 debug!("Grade 2: ch={}, duration: {:?}", ch, duration);
                 match ch {
                     'L' => {
                         if start_g2_letter.is_none() {
                             start_g2_letter = Some(i);
                         }
-                        let (is_alone, matched_chars, n_letters) = stands_alone(&chars, i);
+                        let (is_alone, right_matched_chars, n_letters) = stands_alone(&chars, i);
                         // GTM 1.2.1 says we only need to use G1 for single letters or sequences that are a shortform (e.g, "ab")
-                        if is_alone && (n_letters == 1 || is_short_form(&matched_chars[..2*n_letters])) {
+                        if is_alone && (n_letters == 1 || is_short_form(&right_matched_chars[..2*n_letters])) {
                             debug!("  is_alone -- pushing '1'");
                             result.push('1');
                             mode = UEB_Mode::Grade1;
                         }
-                        debug!("  pushing {:?}", matched_chars);
-                        matched_chars.iter().for_each(|&ch| result.push(ch));
-                        i += matched_chars.len();
+                        debug!("  pushing {:?}", right_matched_chars);
+                        right_matched_chars.iter().for_each(|&ch| result.push(ch));
+                        i += right_matched_chars.len();
                     },
                     'C' => {
                         // Want 'C' before 'L'; Could be CC for word cap -- if so, eat it and move on
                         // Note: guaranteed that there is a char after the 'C', so chars[i+1] is safe
                         if chars[i+1] == 'C' {
-                            result.push(ch);
+                            cap_word_mode = true;
                             i += 1;
                         } else {
                             let is_greek = chars[i+1] == 'G';
-                            let (is_alone, matched_chars, n_letters) = stands_alone(&chars, if is_greek {i+2} else {i+1});
+                            let (is_alone, right_matched_chars, n_letters) = stands_alone(&chars, if is_greek {i+2} else {i+1});
                             // GTM 1.2.1 says we only need to use G1 for single letters or sequences that are a shortform (e.g, "ab")
-                            if is_alone && (n_letters == 1 || is_short_form(&matched_chars[..2*n_letters])) {
+                            if is_alone && (n_letters == 1 || is_short_form(&right_matched_chars[..2*n_letters])) {
                                 debug!("  is_alone -- pushing '1'");
                                 result.push('1');
                                 mode = UEB_Mode::Grade1;
                             }
-                            result.push(ch);
+                            if cap_word_mode {
+                                result.push('C');   // first 'C' if cap word
+                            }
+                            result.push('C');
                             if is_greek {
                                 result.push('G');
                                 i += 1;
                             }
-                            if start_g2_letter.is_none() {
-                                start_g2_letter = Some(i);
-                            }
-                            debug!("  pushing 'C' + {:?}", matched_chars);
-                            matched_chars.iter().for_each(|&ch| result.push(ch));
-                            i += 1 + matched_chars.len();
+                            start_g2_letter = Some(i);
+                            debug!("  pushing 'C' + {:?}", right_matched_chars);
+                            right_matched_chars.iter().for_each(|&ch| result.push(ch));
+                            i += 1 + right_matched_chars.len();
                         }
                     },
                     '1' => {
@@ -878,14 +896,22 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                     },
                     _ => {
                         if let Some(start) = start_g2_letter {
-                            result = handle_contractions(&chars[start..i], result);
+                            if !cap_word_mode {
+                                result = handle_contractions(&chars[start..i], result);
+                            }
+                            cap_word_mode = false;
                             start_g2_letter = None;     // not start of char sequence
                         }
                         result.push(ch);
                         i += 1;
+                        if !LEFT_INTERVENING_CHARS.contains(&ch) {
+                            cap_word_mode = false;
+                            i_g2_start = Some(i);
+                        }
+
                     }
                 }
-                if mode != UEB_Mode::Grade2 {
+                if mode != UEB_Mode::Grade2 && !cap_word_mode {
                     if let Some(start) = start_g2_letter {
                         result = handle_contractions(&chars[start..i], result);
                         start_g2_letter = None;     // not start of char sequence
@@ -903,7 +929,10 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
     return result;
 }
 
-/// Returns true if the ith char "stands alone" (UEB 2.6) along with the last char checked
+/// Returns a tuple:
+///   true if the ith char "stands alone" (UEB 2.6)
+///   the chars on the right that are part of the standing alone sequence
+///   the number of letters in that sequence
 /// This basically means a letter sequence surrounded by white space with some potentially intervening chars
 /// The intervening chars can be typeform/cap indicators, along with various forms of punctuation
 /// The ith char should be an "L"
@@ -916,22 +945,17 @@ fn stands_alone(chars: &[char], i: usize) -> (bool, &[char], usize) {
         return (false, &chars[i..i+2], 0);
     }
 
-    let (mut is_alone, n_letters, matched_chars) = right_side_stands_alone(&chars[i+2..]);
+    let (mut is_alone, n_letters, n_right_matched) = right_side_stands_alone(&chars[i+2..]);
     if is_alone && n_letters == 1 {
         let ch = chars[i+1];
         if ch=='⠁' || ch=='⠊' || ch=='⠕' {      // a, i, o
             is_alone = false;
         }
     }
-    return (is_alone, &chars[i..i+2+matched_chars], n_letters);
+    return (is_alone, &chars[i..i+2+n_right_matched], n_letters);
 
     /// chars before before 'L'
     fn left_side_stands_alone(chars: &[char]) -> bool {
-        static LEFT_INTERVENING_CHARS: phf::Set<char> = phf_set! {  // see RUEB 2.6.2
-            'B', 'I', '𝔹', 'S', 'T', 'D', 'C', 's', 'w',     // indicators
-            // opening chars have prefix 'o', so not in set ['(', '{', '[', '"', '\'', '“', '‘', '«'] 
-        };
-
         // scan backwards to skip letters and intervening chars
         // once we hit an intervening char, only intervening chars are allowed if standing alone
         let mut intervening_chars_mode = false; // true when we are on the final stretch
@@ -941,9 +965,6 @@ fn stands_alone(chars: &[char], i: usize) -> (bool, &[char], usize) {
             let ch = chars[i];
             let prev_ch = if i > 0 {chars[i-1]} else {' '};  // ' ' is a char not in input
             debug!("  left alone: prev/ch {}/{}", prev_ch, ch);
-            if prev_ch == 'C' && ch == 'C' {
-                return false;       // GTM 1.6 -- strings of caps are never contracted
-            }
             if !intervening_chars_mode && prev_ch == 'L' {
                 i -= 1;       // ignore 'Lx' and also ignore 'ox'
             } else if ch == 'o' || ch == 'b' {
@@ -962,7 +983,7 @@ fn stands_alone(chars: &[char], i: usize) -> (bool, &[char], usize) {
     fn right_side_stands_alone(chars: &[char]) -> (bool, usize, usize) {
         // see RUEB 2.6.3
         static RIGHT_INTERVENING_CHARS: phf::Set<char> = phf_set! {
-            'B', 'I', '𝔹', 'S', 'T', 'D', 's', 'w', 'e',   // indicators
+            'B', 'I', '𝔹', 'S', 'T', 'D', 'C', 's', 'w', 'e',   // indicators
             // ')', '}', ']', '\"', '\'', '”', '’', '»',      // closing chars
             // ',', ';', ':', '.', '…', '!', '?'              // punctuation           
         };
