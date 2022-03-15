@@ -53,7 +53,9 @@ pub fn test(style: &str, mathml: &str, speech: &str) {
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", style);
-        rules.invalidate(changes);
+        if let Some(changes) = changes {
+            rules.invalidate(changes);
+        }
     });
     check_answer(mathml, speech);
 }
@@ -67,11 +69,15 @@ pub fn test_prefs(speech_style: &str, prefs: Vec<(&str, &str)>, mathml: &str, sp
     set_rules_dir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
-        let mut changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", speech_style);
-        for (pref_name, pref_value) in prefs {
-            changes.add_changes(rules.pref_manager.borrow_mut().set_user_prefs(pref_name, pref_value));
-        };
-        rules.invalidate(changes);
+        let changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", speech_style);
+        if let Some(mut changes) = changes {
+            for (pref_name, pref_value) in prefs {
+                if let Some(more_changes) = rules.pref_manager.borrow_mut().set_user_prefs(pref_name, pref_value) {
+                    changes.add_changes(more_changes);
+                }
+            };
+            rules.invalidate(changes);
+        }
     });
     check_answer(mathml, speech);
 }
@@ -84,8 +90,13 @@ pub fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: 
     set_rules_dir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
-        let mut changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", "ClearSpeak");
-        changes.add_changes( rules.pref_manager.borrow_mut().set_user_prefs(pref_name, pref_value) );
+        let mut changes;
+        {   // needs to be scoped due to problems with rules potentially being used with prefs' destructor runs in an outer scope
+            let mut prefs = rules.pref_manager.borrow_mut();
+            changes = prefs.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap_or_default();
+            let more_changes = prefs.set_user_prefs(pref_name, pref_value).unwrap_or_default();
+            changes.add_changes(more_changes);
+        }
         rules.invalidate(changes);
     });
     check_answer(mathml, speech);
@@ -99,11 +110,15 @@ pub fn test_ClearSpeak_prefs(prefs: Vec<(&str, &str)>, mathml: &str, speech: &st
     set_rules_dir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
-        let mut changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", "ClearSpeak");
-        for (pref_name, pref_value) in prefs {
-            changes.add_changes(rules.pref_manager.borrow_mut().set_user_prefs(pref_name, pref_value));
-        };
-        rules.invalidate(changes);
+        let changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", "ClearSpeak");
+        if let Some(mut changes) = changes {
+            for (pref_name, pref_value) in prefs {
+                if let Some(more_changes) = rules.pref_manager.borrow_mut().set_user_prefs(pref_name, pref_value) {
+                    changes.add_changes(more_changes);
+                }
+            };
+            rules.invalidate(changes);
+        }
     });
     check_answer(mathml, speech);
 }
@@ -116,7 +131,9 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
     libmathcat::speech::BRAILLE_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
         let changes = rules.pref_manager.borrow_mut().set_user_prefs("BrailleCode", code);
-        rules.invalidate(changes);
+        if let Some(changes) = changes {
+            rules.invalidate(changes);
+        }
     });
     if let Err(e) = set_mathml(mathml.to_string()) {
         panic!("{}", errors_to_string(&e));
