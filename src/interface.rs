@@ -174,7 +174,9 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
                     let mut pref_manager = rules.pref_manager.borrow_mut();
                     files_changed = pref_manager.set_user_prefs("SpeechStyle", &value);
                 };
-                rules.invalidate(files_changed);
+                if let Some(files_changed) = files_changed {
+                    rules.invalidate(files_changed);
+                }
             },
             "Language" => {
                 // check the format
@@ -183,13 +185,17 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
                         bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value);
                       }
                 let files_changed = rules.pref_manager.borrow_mut().set_user_prefs(&name, &value);  
-                rules.invalidate(files_changed);  
+                if let Some(files_changed) = files_changed {
+                    rules.invalidate(files_changed);
+                }
             },
             "BrailleCode" => {
                 let files_changed = rules.pref_manager.borrow_mut().set_user_prefs(&name, &value);    
                 crate::speech::BRAILLE_RULES.with(|braille_rules| {
-                    braille_rules.borrow_mut().invalidate(files_changed);
-                })
+                    if let Some(files_changed) = files_changed {
+                        braille_rules.borrow_mut().invalidate(files_changed);
+                    }
+                   })
             },
             "Pitch" | "Rate" | "Volume" => {
                 rules.pref_manager.borrow_mut().set_api_float_pref(&name, to_float(&name, value)?);    

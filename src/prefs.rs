@@ -313,6 +313,7 @@ impl fmt::Display for PreferenceManager {
     }
 }
 
+#[derive(Default)]
 pub struct FilesChanged {
     pub speech_rules: bool,
     pub speech_unicode_short: bool,
@@ -323,20 +324,17 @@ pub struct FilesChanged {
     pub defs: bool
 }
 
+impl fmt::Display for FilesChanged {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        writeln!(f, "FilesChanged {{\n  Speech: rules {}, short {}, full {}", self.speech_rules, self.speech_unicode_short, self.speech_unicode_full)?;
+        writeln!(f, "  Braille: rules {}, short {}, full {}", self.braille_rules, self.braille_unicode_short, self.braille_unicode_full)?;
+        writeln!(f, "  Defs {}", self.defs)?;
+        return Ok(());
+    }
+}
+
 impl FilesChanged {
     // FIX: this should include all files
-    fn none() -> FilesChanged {
-        return FilesChanged {
-            speech_rules: false,
-            speech_unicode_short: false,
-            speech_unicode_full: false,
-            braille_rules: false,
-            braille_unicode_short: false,
-            braille_unicode_full: false,
-            defs: false
-        }
-    }
-
     pub fn add_changes(&mut self, additional_changes: FilesChanged) {
         self.speech_rules |= additional_changes.speech_rules;
         self.speech_unicode_short |= additional_changes.speech_unicode_short;
@@ -437,11 +435,24 @@ impl PreferenceManager {
 
 
     fn get_file_and_time(rules_dir: &PathBuf, lang: &str, default_lang: Option<&str>, file_name: &str) -> Result<FileAndTime> {
+        use std::fs;
         let files = PreferenceManager::get_files(rules_dir, lang, default_lang, file_name)?;
         return Ok(FileAndTime {
-            time: if cfg!(target_family = "wasm") {None} else {Some( SystemTime::now() )},
+            time: if cfg!(target_family = "wasm") {None} else {get_metadata(&files[0])},
             files
-        })
+        });
+
+        fn get_metadata(path: &Option<PathBuf>) -> Option<SystemTime> {
+            if let Some(path) = path {
+                let metadata = fs::metadata(path);
+                if let Ok(metadata) = metadata {
+                    if let Ok(mod_time) = metadata.modified() {
+                        return Some(mod_time);
+                    }
+                }
+            }
+            return None;
+        }
     }
 
    fn get_files(rules_dir: &PathBuf, lang: &str, default_lang: Option<&str>, file_name: &str) -> Result<Locations> {
@@ -545,14 +556,52 @@ impl PreferenceManager {
                     &bad_env_value, rules_dir.to_str().unwrap_or("rules dir is none???"));
     }
 
-    pub fn is_up_to_date(&self) -> bool {
+    pub fn is_up_to_date(&self) -> Option<FilesChanged> {
         // this will work even if self is invalid
-        return PreferenceManager::is_file_up_to_date(&self.pref_files) &&
-               PreferenceManager::is_file_up_to_date(&self.speech) &&
-               PreferenceManager::is_file_up_to_date(&self.speech_unicode) &&
-               PreferenceManager::is_file_up_to_date(&self.braille) &&
-               PreferenceManager::is_file_up_to_date(&self.braille_unicode) &&
-               PreferenceManager::is_file_up_to_date(&self.defs) ;
+        let mut files_changed = FilesChanged {
+            speech_rules: PreferenceManager::is_file_up_to_date(&self.speech),
+            speech_unicode_short: PreferenceManager::is_file_up_to_date(&self.speech_unicode),
+            speech_unicode_full: PreferenceManager::is_file_up_to_date(&self.speech_unicode_full),
+            braille_rules: PreferenceManager::is_file_up_to_date(&self.braille),
+            braille_unicode_short: PreferenceManager::is_file_up_to_date(&self.braille_unicode),
+            braille_unicode_full: PreferenceManager::is_file_up_to_date(&self.braille_unicode_full),
+            defs: PreferenceManager::is_file_up_to_date(&self.defs),
+        };
+
+        if !PreferenceManager::is_file_up_to_date(&self.pref_files) {
+            let old_lang = self.user_prefs.to_string("Language");
+            let old_speech_style = self.user_prefs.to_string("SpeechStyle");
+            let old_braille_code = self.user_prefs.to_string("BrailleCode");
+            match PreferenceManager::initialize(self.rules_dir.clone().unwrap()) {
+                Err(e) => error!("Failed to reread prefs.yaml: {}", e),  // probably in big trouble, but continue on and maybe ok
+                Ok(_) => {
+                    if old_speech_style != self.user_prefs.to_string("SpeechStyle") {
+                        files_changed.speech_rules = false;
+                    }
+                    if old_lang != self.user_prefs.to_string("Language") {
+                        files_changed.speech_rules = false;
+                        files_changed.speech_unicode_short = false;
+                        files_changed.speech_unicode_full = false;
+                    }
+                    if old_braille_code != self.user_prefs.to_string("BrailleCode") {
+                        files_changed.braille_rules = false;
+                        files_changed.braille_unicode_short = false;
+                        files_changed.braille_unicode_full = false;
+                    }
+                }
+            } 
+        }
+        if files_changed.speech_rules &&
+           files_changed.speech_unicode_short &&
+           files_changed.speech_unicode_full &&
+           files_changed.braille_rules &&
+           files_changed.braille_unicode_short &&
+           files_changed.braille_unicode_full &&
+           files_changed.defs {
+            return None;
+        } else {
+            return Some(files_changed);
+        }
     }
 
     fn is_file_up_to_date(ft: &FileAndTime) -> bool {
@@ -709,7 +758,7 @@ impl PreferenceManager {
     //     return yaml_to_string(self.user_prefs.prefs.get(pref_name).unwrap(), 1);
     // }
 
-    pub fn set_user_prefs(&mut self, name: &str, value: &str) -> FilesChanged {
+    pub fn set_user_prefs(&mut self, name: &str, value: &str) -> Option<FilesChanged> {
         if !self.error.is_empty() {
             panic!("Internal error: set_user_prefs called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
@@ -735,10 +784,10 @@ impl PreferenceManager {
                     braille_unicode_full: old_braille_unicode_full != self.braille_unicode_full,
                     defs: old_defs != self.defs,
                 };
-                return changed;
+                return Some(changed);
             }
         }
-        return FilesChanged::none();
+        return None;
     }
 }
 
@@ -912,7 +961,7 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.set_user_prefs("Language", "zz-ab");        
-            assert!(pref_manager.is_up_to_date());
+            assert!(pref_manager.is_up_to_date().is_none());
         });
     }
 
@@ -925,7 +974,6 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.set_user_prefs("Language", "zz-aa");        
-            sleep(Duration::from_millis(10));
 
             // Note: need to use pattern match to avoid borrow problem
             if let Some(file_name) = &pref_manager.get_rule_file(&RulesFor::Speech)[0] {
@@ -933,8 +981,11 @@ mod tests {
                 let contents = fs::read(file_name).expect(&format!("Failed to write file {} during test", file_name_as_str));
                 #[allow(unused_must_use)] { 
                     fs::write(file_name, contents);
+                    sleep(Duration::from_millis(10));
                 }
-                assert!(!pref_manager.is_up_to_date());    
+                let files_changed = pref_manager.is_up_to_date();
+                assert!(files_changed.is_some());
+                assert!(!files_changed.unwrap().speech_rules);
             } else {
                 panic!("First path is 'None'");
             }

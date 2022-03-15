@@ -1869,25 +1869,59 @@ impl SpeechRules {
     }
 
     pub fn invalidate(&mut self, changes: FilesChanged) {
-        if changes.speech_rules || changes.braille_rules {
-            self.rules.clear();
-        }
-        if changes.speech_unicode_short || changes.braille_unicode_short {
-            self.unicode_short.borrow_mut().clear();
-        }
-        if changes.speech_unicode_full || changes.braille_unicode_full {
-            self.unicode_full.borrow_mut().clear();
+        if self.name == RulesFor::Braille {
+            if changes.braille_rules {
+                self.rules.clear();
+            }
+            if changes.braille_unicode_short {
+                self.unicode_short.borrow_mut().clear();
+            }
+            if changes.braille_unicode_full {
+                self.unicode_full.borrow_mut().clear();
+            }
+        } else {
+            if changes.speech_rules {
+                self.rules.clear();
+            }
+            if changes.speech_unicode_short {
+                self.unicode_short.borrow_mut().clear();
+            }
+            if changes.speech_unicode_full {
+                self.unicode_full.borrow_mut().clear();
+            }
         }
     }
 
     pub fn update(&mut self) -> Result<()> {
-        if self.rules.is_empty() || !self.pref_manager.borrow().is_up_to_date() {
+        let update_rules;
+        let update_unicode_short;
+        let update_unicode_full;
+        if let Some(files_changed) = self.pref_manager.borrow().is_up_to_date() {
+            if self.name == RulesFor::Braille {
+                update_rules = files_changed.braille_rules;
+                update_unicode_short = files_changed.braille_unicode_short;
+                update_unicode_full = files_changed.braille_unicode_full;
+            } else {
+                update_rules = files_changed.speech_rules;
+                update_unicode_short = files_changed.speech_unicode_short;
+                update_unicode_full = files_changed.speech_unicode_full;
+            }
+        } else {
+            update_rules = false;
+            update_unicode_short = false;
+            update_unicode_full = false;
+        }
+        if self.rules.is_empty() || update_rules  {
             let rule_file = self.pref_manager.borrow().get_rule_file(&self.name).clone();
             self.read_patterns(&rule_file)?;
         };
 
-        if self.unicode_short.borrow_mut().is_empty() {
+        if self.unicode_short.borrow().is_empty() || update_unicode_short {
             self.read_unicode(None, true)?;
+        }
+
+        if update_unicode_full {
+            self.unicode_full.borrow_mut().clear();     // will lazy update
         }
 
         return Ok(());
