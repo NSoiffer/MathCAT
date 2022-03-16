@@ -1896,7 +1896,7 @@ impl SpeechRules {
         let update_rules;
         let update_unicode_short;
         let update_unicode_full;
-        if let Some(files_changed) = self.pref_manager.borrow().is_up_to_date() {
+        if let Some(files_changed) = self.pref_manager.borrow_mut().is_up_to_date() {
             if self.name == RulesFor::Braille {
                 update_rules = files_changed.braille_rules;
                 update_unicode_short = files_changed.braille_unicode_short;

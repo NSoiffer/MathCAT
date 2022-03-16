@@ -349,27 +349,24 @@ impl FilesChanged {
 impl PreferenceManager {
     /// Initialize (the) PreferenceManager (a global var).
     /// 'rules_dir' is the path to "Rules" unless the env var MathCATRulesDir is set
-    pub fn initialize(rules_dir: PathBuf) -> Result<()> {
+    pub fn initialize(&mut self, rules_dir: PathBuf) -> Result<()> {
         // first, read in the preferences -- need to determine which files to read next
         // the prefs files are in the rules dir and the user dir; differs from other files
-        return PREF_MANAGER.with( |pref_manager| {
-            let mut pref_manager = pref_manager.borrow_mut();
-            pref_manager.api_prefs = Preferences{ prefs: DEFAULT_API_PREFERENCES.with(|defaults| defaults.prefs.clone()) };
+        self.api_prefs = Preferences{ prefs: DEFAULT_API_PREFERENCES.with(|defaults| defaults.prefs.clone()) };
 
-            match PreferenceManager::find_rules_dir(&rules_dir) {
-                Ok(rules_dir) => {
-                    let (user_prefs, pref_files) = Preferences::from_file(&rules_dir)?;
-                    match pref_manager.set_all_files(&rules_dir, user_prefs, pref_files) {
-                        Ok(_) => return Ok(()),
-                        Err(e) => pref_manager.error = errors_to_string(&e),
-                    }
-                },
-                Err(e) => {
-                    pref_manager.error = errors_to_string(&e);
-                },
-            };
-            bail!("{}", pref_manager.error);
-        })
+        match PreferenceManager::find_rules_dir(&rules_dir) {
+            Ok(rules_dir) => {
+                let (user_prefs, pref_files) = Preferences::from_file(&rules_dir)?;
+                match self.set_all_files(&rules_dir, user_prefs, pref_files) {
+                    Ok(_) => return Ok(()),
+                    Err(e) => self.error = errors_to_string(&e),
+                }
+            },
+            Err(e) => {
+                self.error = errors_to_string(&e);
+            },
+        };
+        bail!("{}", self.error);
     }
 
     pub fn get() -> Rc<RefCell<PreferenceManager>> {
@@ -556,7 +553,7 @@ impl PreferenceManager {
                     &bad_env_value, rules_dir.to_str().unwrap_or("rules dir is none???"));
     }
 
-    pub fn is_up_to_date(&self) -> Option<FilesChanged> {
+    pub fn is_up_to_date(&mut self) -> Option<FilesChanged> {
         // this will work even if self is invalid
         let mut files_changed = FilesChanged {
             speech_rules: PreferenceManager::is_file_up_to_date(&self.speech),
@@ -572,7 +569,7 @@ impl PreferenceManager {
             let old_lang = self.user_prefs.to_string("Language");
             let old_speech_style = self.user_prefs.to_string("SpeechStyle");
             let old_braille_code = self.user_prefs.to_string("BrailleCode");
-            match PreferenceManager::initialize(self.rules_dir.clone().unwrap()) {
+            match self.initialize(self.rules_dir.clone().unwrap()) {
                 Err(e) => error!("Failed to reread prefs.yaml: {}", e),  // probably in big trouble, but continue on and maybe ok
                 Ok(_) => {
                     if old_speech_style != self.user_prefs.to_string("SpeechStyle") {
@@ -824,18 +821,18 @@ mod tests {
 
     #[test]
     fn find_simple_style() {
-        PreferenceManager::initialize(abs_rules_dir_path()).unwrap();
         PREF_MANAGER.with(|pref_manager| {
-            let pref_manager = pref_manager.borrow_mut();
+            let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
         });
     }
 
     #[test]
     fn find_style_other_language() {
-        PreferenceManager::initialize(abs_rules_dir_path()).unwrap();
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("Language", "zz");
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
         });
@@ -843,9 +840,9 @@ mod tests {
 
     #[test]
     fn find_unicode_files() {
-        PreferenceManager::initialize(abs_rules_dir_path()).unwrap();
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("Language", "zz-aa");
             
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
@@ -855,9 +852,9 @@ mod tests {
 
     #[test]
     fn find_style_no_sublanguage() {
-        PreferenceManager::initialize(abs_rules_dir_path()).unwrap();
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("Language", "zz-ab");
             
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
@@ -874,9 +871,9 @@ mod tests {
                     file_name, count, correct);
         }
 
-        PreferenceManager::initialize(abs_rules_dir_path()).unwrap();
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("Language", "zz-aa");
             pref_manager.set_user_prefs("BrailleCode", "UEB");
             
@@ -897,9 +894,9 @@ mod tests {
 
     #[test]
     fn file_found_order() {
-        PreferenceManager::initialize(abs_rules_dir_path()).unwrap();
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("Language", "zz-aa");
 
             let mut iter = pref_manager.defs.files.iter();
@@ -912,9 +909,9 @@ mod tests {
 
     #[test]
     fn test_prefs() {
-        PreferenceManager::initialize(abs_rules_dir_path()).unwrap();
         PREF_MANAGER.with(|pref_manager| {
-            let pref_manager = pref_manager.borrow();
+            let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
             let prefs = pref_manager.get_user_prefs();
             assert_eq!(prefs.to_string("Language").as_str(), "en");
             assert_eq!(prefs.to_string("SubjectArea").as_str(), "General");
@@ -927,9 +924,9 @@ mod tests {
 
     #[test]
     fn test_language_change() {
-        PreferenceManager::initialize(abs_rules_dir_path()).unwrap();
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
 
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
@@ -942,9 +939,9 @@ mod tests {
 
     #[test]
     fn test_some_changes() {
-        PreferenceManager::initialize(abs_rules_dir_path()).unwrap();
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("Verbosity", "Terse");
 
             assert_eq!(&pref_manager.get_user_prefs().to_string("Verbosity"), "Terse");
@@ -957,9 +954,9 @@ mod tests {
 
     #[test]
     fn test_is_up_to_date() {
-        PreferenceManager::initialize(abs_rules_dir_path()).unwrap();
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("Language", "zz-ab");        
             assert!(pref_manager.is_up_to_date().is_none());
         });
@@ -970,9 +967,9 @@ mod tests {
     fn test_is_not_up_to_date() {
         use std::thread::sleep;
         use std::time::Duration;
-        PreferenceManager::initialize(abs_rules_dir_path()).unwrap();
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("Language", "zz-aa");        
 
             // Note: need to use pattern match to avoid borrow problem

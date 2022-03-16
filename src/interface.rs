@@ -39,7 +39,8 @@ fn init_mathml_instance() -> RefCell<Package> {
 /// IMPORTANT: this should be the very first call to MathCAT unless the environment var MathCATRulesDir is set
 pub fn set_rules_dir(dir: String) -> Result<()> {
     use std::path::PathBuf;
-    return crate::prefs::PreferenceManager::initialize(PathBuf::from(dir));
+    let pref_manager = crate::prefs::PreferenceManager::get();
+    return pref_manager.borrow_mut().initialize(PathBuf::from(dir));
 }
 /// The MathML to be spoken, brailled, or navigated.
 /// This will override any previous MathML that was set.

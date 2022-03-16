@@ -78,18 +78,9 @@ fn main() {
   //                 <mspace width=\"thinmathspace\"></mspace><mn>037</mn>
   //                 <mspace width=\"thinmathspace\"></mspace><mn>234</mn></math>";
   // let expr = "<math><mn>𝟏𝟐𝟑</mn></math>";
-  let expr = "<math>
-  <msup>
-    <mi>x</mi>
-    <mfrac>
-      <mi>a</mi>
-      <mi>b</mi>
-    </mfrac>
-  </msup>
-  <mi>y</mi>
-  <mo>=</mo>
-  <mi>x</mi>
-</math>";
+  let expr = "<math display='inline' xmlns='http://www.w3.org/1998/Math/MathML'>
+      <mo>(</mo><mn>3</mn><mo>,</mo><mn>12</mn><mo>)</mo>
+      </math>";
   // let expr = "
   // <math display='block' id='x0'> <semantics>
   //  <mrow displaystyle='true' id='x1'>
@@ -153,28 +144,30 @@ fn main() {
   // set_preference("Bookmark".to_string(), "true".to_string()).unwrap();
   // set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
 
-  // match get_spoken_text() {
-  //   Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
-  //   Err(e) => panic!("{}", errors_to_string(&e)),
-  // }
-  
-  set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
-  match get_braille("".to_string()) {
-    Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
+  match get_spoken_text() {
+    Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
     Err(e) => panic!("{}", errors_to_string(&e)),
   }
-
-  // Note: the logger seems to be a huge time sync, so println! is used for timing
-  println!("Time taken: {}ms", instant.elapsed().as_millis());
-  // let instant = Instant::now();
-  // match get_spoken_text() {
-  //   Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
+  info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()));
+ 
+  // set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
+  // match get_braille("".to_string()) {
+  //   Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
   //   Err(e) => panic!("{}", errors_to_string(&e)),
   // }
+
+  // Note: the logger seems to be a huge time sync, so println! is used for timing
+  info!("Time taken: {}ms", instant.elapsed().as_millis());
+  let instant = Instant::now();
+  match get_spoken_text() {
+    Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
+    Err(e) => panic!("{}", errors_to_string(&e)),
+  }
+  info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()));
   
   // match get_braille("".to_string()) {
   //   Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
   //   Err(e) => panic!("{}", errors_to_string(&e)),
   // }
-  // println!("Time taken (second time): {}ms", instant.elapsed().as_millis());
+  info!("Time taken (second time): {}ms", instant.elapsed().as_millis());
 }
