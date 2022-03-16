@@ -269,14 +269,14 @@
       - x: "*[1]"
       - t: "1⠜"
    - test:
+      if: "*[2][translate(., '_¯→^', '') = '']"
+      then: [t: "1"]
+   - test:
       if: "self::m:munder"
       then: [t: "⠠"]
    - test:
       - if: "*[2][text()='_' or text()='¯']"
-        then_test:
-         if: "self::m:over"
-         then: [t: "1⠱"]   # need G1 because no prior cell with only dots 4,5 or 6
-         else: [t: "⠱"]
+        then: [t: "⠱"]
       - else_if: "*[2][text()='→']"
         then: [t: "⠘⠱"]
       - else_if: "*[2][text()='.']"

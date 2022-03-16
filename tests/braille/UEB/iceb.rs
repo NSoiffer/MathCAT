@@ -888,10 +888,17 @@ fn hat_12_1_7() {
 }
 
 #[test]
-fn arrow_12() {
-    // This is not directly an example, but the text at the start says this is the result
+fn arrow_over_12() {
+    // This comes from https://uebonline.org/wp-content/uploads/2021/05/Unified-English-Braille-Extension-Maths-Training-Manual-First-Edition-Rev-4.pdf
     let expr = "<math><mover><mi>x</mi><mo>→</mo></mover></math>";
-    test_braille("UEB", expr, "⠭⠘⠱");
+    test_braille("UEB", expr, "⠭⠰⠘⠱");
+}
+
+#[test]
+fn arrow_under_12() {
+    // This comes from https://uebonline.org/wp-content/uploads/2021/05/Unified-English-Braille-Extension-Maths-Training-Manual-First-Edition-Rev-4.pdf
+    let expr = "<math><munder><mi>x</mi><mo>→</mo></munder></math>";
+    test_braille("UEB", expr, "⠭⠰⠠⠘⠱");
 }
 
 #[test]
