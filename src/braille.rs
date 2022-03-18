@@ -477,23 +477,23 @@ fn ueb_cleanup(raw_braille: String) -> String {
 
         let mut result = "".to_string();
         let chars = braille.chars().collect::<Vec<char>>();
-        let mut word_mode = "".to_string();
+        let mut word_mode_start = "".to_string();
         let mut word_mode_end = "".to_string();
         let mut i = 0;
         while i < chars.len() {
             let ch = chars[i];
             if ch == 'C' {
-                let is_next_char_target = is_next_char(&chars[i+1..], ch);
-                if word_mode.contains(ch) {
+                let is_next_char_target = is_next_char(&chars[i+1..], ch);  // next letter sequence "C..."
+                if word_mode_start.contains(ch) {
                     if !is_next_char_target {
-                        word_mode = word_mode.replacen(ch.to_string().as_str(), "", 1);  // drop the char since word mode is done
+                        word_mode_start = word_mode_start.replacen(ch.to_string().as_str(), "", 1);  // drop the char since word mode is done
                         word_mode_end.push(ch);   // add the char to signal to add end sequence
                     }
                 } else {
                     result.push(ch);
                     if is_next_char_target {
                         result.push('C');    // word mode indicator for capitals
-                        word_mode.push(ch);     // starting word mode for this char
+                        word_mode_start.push(ch);     // starting word mode for this char
                     // } else {
                     //     result.push('s');
                     }
@@ -525,7 +525,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
                 result.push(chars[i+1]);
                 i += 2; // eat L, letter
             } else {
-                word_mode = "".to_string();
+                word_mode_start = "".to_string();
                 word_mode_end = "".to_string();
                 result.push(ch);
                 i += 1;
@@ -593,7 +593,12 @@ fn ueb_cleanup(raw_braille: String) -> String {
 
         /// Return true if the BANA guidelines say it is ok to start with grade 2
         fn is_grade2_string_ok(grade2_braille: &str) -> bool {
-            // BANA says use grade 2 if there is not more than one grade one symbol in first three cells and none later
+            // BANA says use grade 2 if there is not more than one grade one symbol or single letter standing alone.
+            // The exact quote from their guidance:
+            //    Unless a math expression can be correctly represented with only a grade 1 symbol indicator in the first three cells
+            //    or before a single letter standing alone anywhere in the expression,
+            //    begin the expression with a grade 1 word indicator
+            
             // Because of the 'L's which go away, we have to put a little more work into finding the first three chars
             let chars = grade2_braille.chars().collect::<Vec<char>>();
             let mut n_real_chars = 0;  // actually number of chars
