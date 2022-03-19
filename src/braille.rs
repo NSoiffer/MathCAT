@@ -12,11 +12,9 @@ use std::ops::Range;
 /// braille the MathML
 /// If 'nav_node_id' is not an empty string, then the element with that id will have dots 7 & 8 turned on as per the pref
 pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
+    crate::speech::SpeechRules::update();
     return BRAILLE_RULES.with(|rules| {
-        {
-            let mut mut_rules = rules.borrow_mut();
-            mut_rules.update()?;    
-        }
+        rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
         let new_package = Package::new();
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id);
@@ -598,7 +596,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
             //    Unless a math expression can be correctly represented with only a grade 1 symbol indicator in the first three cells
             //    or before a single letter standing alone anywhere in the expression,
             //    begin the expression with a grade 1 word indicator
-            
+
             // Because of the 'L's which go away, we have to put a little more work into finding the first three chars
             let chars = grade2_braille.chars().collect::<Vec<char>>();
             let mut n_real_chars = 0;  // actually number of chars

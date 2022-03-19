@@ -307,6 +307,7 @@ impl fmt::Display for PreferenceManager {
             writeln!(f, "  api prefs:\n{}", self.api_prefs)?;
             writeln!(f, "  style files: {:?}", self.speech.files)?;
             writeln!(f, "  unicode files: {:?}", self.speech_unicode.files)?;
+            writeln!(f, "  intent files: {:?}", self.intent.files)?;
             writeln!(f, "  definition files: {:?}", self.defs.files)?;
         }
         return Ok(());
@@ -321,6 +322,7 @@ pub struct FilesChanged {
     pub braille_rules: bool,
     pub braille_unicode_short: bool,
     pub braille_unicode_full: bool,
+    pub intent: bool,
     pub defs: bool
 }
 
@@ -328,7 +330,7 @@ impl fmt::Display for FilesChanged {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "FilesChanged {{\n  Speech: rules {}, short {}, full {}", self.speech_rules, self.speech_unicode_short, self.speech_unicode_full)?;
         writeln!(f, "  Braille: rules {}, short {}, full {}", self.braille_rules, self.braille_unicode_short, self.braille_unicode_full)?;
-        writeln!(f, "  Defs {}", self.defs)?;
+        writeln!(f, "  Intent {}, Defs {}", self.intent, self.defs)?;
         return Ok(());
     }
 }
@@ -342,6 +344,7 @@ impl FilesChanged {
         self.braille_rules |= additional_changes.braille_rules;
         self.braille_unicode_short |= additional_changes.braille_unicode_short;
         self.braille_unicode_full  |= additional_changes.braille_unicode_full;
+        self.intent |= additional_changes.intent;
         self.defs |= additional_changes.defs;
     }
 }
@@ -425,8 +428,10 @@ impl PreferenceManager {
         self.braille_unicode_full = PreferenceManager::get_file_and_time(
                         &braille_rules_dir, &braille_code, Some("Nemeth"), "unicode-full.yaml")?;
 
+        self.intent = PreferenceManager::get_file_and_time(
+            &speech_rules_dir, language, Some("en"), "intent.yaml")?;
         self.defs = PreferenceManager::get_file_and_time(
-        &speech_rules_dir, language, Some("en"), "definitions.yaml")?;
+            &speech_rules_dir, language, Some("en"), "definitions.yaml")?;
         return Ok(());
     }
 
@@ -562,6 +567,7 @@ impl PreferenceManager {
             braille_rules: !PreferenceManager::is_file_up_to_date(&self.braille),
             braille_unicode_short: !PreferenceManager::is_file_up_to_date(&self.braille_unicode),
             braille_unicode_full: !PreferenceManager::is_file_up_to_date(&self.braille_unicode_full),
+            intent: !PreferenceManager::is_file_up_to_date(&self.intent),
             defs: !PreferenceManager::is_file_up_to_date(&self.defs),
         };
 
@@ -594,6 +600,7 @@ impl PreferenceManager {
            files_changed.braille_rules ||
            files_changed.braille_unicode_short ||
            files_changed.braille_unicode_full ||
+           files_changed.intent ||
            files_changed.defs {
             return Some(files_changed);
         } else {
@@ -768,6 +775,7 @@ impl PreferenceManager {
             let old_braille = self.braille.clone();
             let old_braille_unicode= self.braille_unicode.clone();
             let old_braille_unicode_full = self.braille_unicode_full.clone();
+            let old_intent= self.intent.clone();
             let old_defs= self.defs.clone();
 
             if let Some(rules_dir) = self.rules_dir.clone() {
@@ -779,6 +787,7 @@ impl PreferenceManager {
                     braille_rules: old_braille != self.braille,
                     braille_unicode_short: old_braille_unicode != self.braille_unicode,
                     braille_unicode_full: old_braille_unicode_full != self.braille_unicode_full,
+                    intent: old_intent != self.intent,
                     defs: old_defs != self.defs,
                 };
                 return Some(changed);
@@ -881,6 +890,7 @@ mod tests {
             assert_helper(count_files(&pref_manager.speech_unicode), 1, "unicode.yaml");
             assert_helper(count_files(&pref_manager.braille), 1, "Nemeth_Rules.yaml");
             assert_helper(count_files(&pref_manager.braille_unicode), 1, "unicode.yaml");
+            assert_helper(count_files(&pref_manager.intent), 1, "intent.yaml");
             assert_helper(count_files(&pref_manager.defs), 3,"definitions.yaml");
     
             pref_manager.set_user_prefs("Language", "zz-ab");
@@ -888,6 +898,7 @@ mod tests {
             assert_helper(count_files(&pref_manager.speech_unicode), 1, "unicode.yaml");
             assert_helper(count_files(&pref_manager.braille), 1, "Nemeth_Rules.yaml");
             assert_helper(count_files(&pref_manager.braille_unicode), 1, "unicode.yaml");
+            assert_helper(count_files(&pref_manager.intent), 1, "intent.yaml");
             assert_helper(count_files(&pref_manager.defs), 2, "definitions.yaml");
         })
     }
@@ -957,8 +968,9 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("Language", "zz-ab");        
-            assert!(pref_manager.is_up_to_date().is_none());
+            pref_manager.set_user_prefs("Language", "zz-ab");
+            let files_changed = pref_manager.is_up_to_date();        
+            assert!(files_changed.is_none(), "files_changed={}", files_changed.unwrap());
         });
     }
 
@@ -973,7 +985,8 @@ mod tests {
             pref_manager.set_user_prefs("Language", "zz-aa");        
 
             // Note: need to use pattern match to avoid borrow problem
-            if let Some(file_name) = &pref_manager.get_rule_file(&RulesFor::Speech)[0] {
+            // Don't change a speech related file because 'test_is_up_to_date' might fail 
+            if let Some(file_name) = &pref_manager.get_definitions_file()[0] {
                 let file_name_as_str = file_name.to_str().unwrap();
                 let contents = fs::read(file_name).expect(&format!("Failed to write file {} during test", file_name_as_str));
                 #[allow(unused_must_use)] { 
@@ -982,7 +995,10 @@ mod tests {
                 }
                 let files_changed = pref_manager.is_up_to_date();
                 assert!(files_changed.is_some());
-                assert!(!files_changed.unwrap().speech_rules);
+                let files_changed = files_changed.unwrap();
+                assert!(&files_changed.defs);
+                assert!(!&files_changed.speech_rules);
+                assert!(!&files_changed.speech_unicode_short);
             } else {
                 panic!("First path is 'None'");
             }

@@ -308,10 +308,8 @@ fn do_navigate_command_and_param<'a>(mathml: Element<'a>, command: NavigationCom
 
 pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str) -> Result<String> {   
     // first check to see if nav file has been changed -- don't bother checking in loop below
-    NAVIGATION_RULES.with(|rules| {
-        let mut mut_rules = rules.borrow_mut();
-        return mut_rules.update();  
-    })?;
+    crate::speech::SpeechRules::update();
+    NAVIGATION_RULES.with(|rules| { rules.borrow_mut().read_files() })?;
 
     // If no speech happened for some calls, we try the call the call again (e.g, no speech for invisible times).
     // To prevent to infinite loop, we limit the number of tries

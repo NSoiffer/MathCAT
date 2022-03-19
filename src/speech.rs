@@ -49,11 +49,9 @@ pub fn overview_mathml(mathml: Element) -> Result<String> {
 
 
 fn intent_rules<'c, 'm>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, doc: Document<'m>, mathml: Element<'c>) -> Result<Element<'m>> {
+    SpeechRules::update();
     rules.with(|rules| {
-        {
-            let mut mut_rules = rules.borrow_mut();
-            mut_rules.update()?;    
-        }
+        rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
         // debug!("speak_rules:\n{}", mml_to_string(&mathml));
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, doc, "".to_string());
@@ -69,11 +67,9 @@ fn intent_rules<'c, 'm>(rules: &'static std::thread::LocalKey<RefCell<SpeechRule
 }
 
 fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, mathml: Element) -> Result<String> {
+    SpeechRules::update();
     rules.with(|rules| {
-        {
-            let mut mut_rules = rules.borrow_mut();
-            mut_rules.update()?;    
-        }
+        rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
         // debug!("speak_rules:\n{}", mml_to_string(&mathml));
         let new_package = Package::new();
@@ -1868,6 +1864,37 @@ impl SpeechRules {
         }
     }
 
+    pub fn initialize_all_rules() -> Result<()> {
+        // this forces initialization of things beyond just the speech rules (e.g, the defs.yaml files get read)
+        INTENT_RULES.with(|speech_rules| -> Result<()> {
+            if let Some(e) = speech_rules.borrow().get_error() {bail!("{}", e)} else {Ok(())}
+        })?;
+        SPEECH_RULES.with(|speech_rules| -> Result<()> {
+            if let Some(e) = speech_rules.borrow().get_error() {bail!("{}", e)} else {Ok(())}
+        })?;
+        BRAILLE_RULES.with(|speech_rules| -> Result<()> {
+            if let Some(e) = speech_rules.borrow().get_error() {bail!("{}", e)} else {Ok(())}
+        })?;
+        NAVIGATION_RULES.with(|speech_rules| -> Result<()> {
+            if let Some(e) = speech_rules.borrow().get_error() {bail!("{}", e)} else {Ok(())}
+        })?;
+        OVERVIEW_RULES.with(|speech_rules| -> Result<()> {
+            if let Some(e) = speech_rules.borrow().get_error() {bail!("{}", e)} else {Ok(())}
+        })?;
+        return Ok( () );
+    }
+
+    pub fn read_files(&mut self) -> Result<()> {
+        if self.rules.is_empty() {
+            let rule_file = self.pref_manager.borrow().get_rule_file(&self.name).clone();
+            self.read_patterns(&rule_file)?;
+        }
+        if self.unicode_short.borrow().is_empty()  {
+            self.read_unicode(None, true)?;
+        }
+        return Ok( () );
+    }
+
     pub fn invalidate(&mut self, changes: FilesChanged) {
         if self.name == RulesFor::Braille {
             if changes.braille_rules {
@@ -1892,39 +1919,42 @@ impl SpeechRules {
         }
     }
 
-    pub fn update(&mut self) -> Result<()> {
-        let update_rules;
-        let update_unicode_short;
-        let update_unicode_full;
-        if let Some(files_changed) = self.pref_manager.borrow_mut().is_up_to_date() {
-            if self.name == RulesFor::Braille {
-                update_rules = files_changed.braille_rules;
-                update_unicode_short = files_changed.braille_unicode_short;
-                update_unicode_full = files_changed.braille_unicode_full;
-            } else {
-                update_rules = files_changed.speech_rules;
-                update_unicode_short = files_changed.speech_unicode_short;
-                update_unicode_full = files_changed.speech_unicode_full;
-            }
-        } else {
-            update_rules = false;
-            update_unicode_short = false;
-            update_unicode_full = false;
+    pub fn update() {
+        if let Some(files_changed) = PreferenceManager::get().borrow_mut().is_up_to_date() {
+            SPEECH_RULES.with(|rules| {
+                let mut rules = rules.borrow_mut();
+                if files_changed.speech_rules {
+                    rules.rules.clear();
+                }
+                if files_changed.speech_unicode_short  {
+                    rules.unicode_short.borrow_mut().clear();
+                }
+                if files_changed.speech_unicode_full {
+                    rules.unicode_full.borrow_mut().clear();
+                }
+            });
+            BRAILLE_RULES.with(|rules| {
+                let mut rules = rules.borrow_mut();
+                if files_changed.braille_rules {
+                    rules.rules.clear();
+                }
+                if files_changed.braille_unicode_short  {
+                    rules.unicode_short.borrow_mut().clear();
+                }
+                if files_changed.braille_unicode_full {
+                    rules.unicode_full.borrow_mut().clear();
+                }
+            });
+            INTENT_RULES.with(|rules| {
+                let mut rules = rules.borrow_mut();
+                if files_changed.intent {
+                    rules.rules.clear();
+                }
+                // unicode files are shared with speech and updated/cleared there
+            });
+            
+            // FIX: need to add overview and navigation to the update rules
         }
-        if self.rules.is_empty() || update_rules  {
-            let rule_file = self.pref_manager.borrow().get_rule_file(&self.name).clone();
-            self.read_patterns(&rule_file)?;
-        };
-
-        if self.unicode_short.borrow().is_empty() || update_unicode_short {
-            self.read_unicode(None, true)?;
-        }
-
-        if update_unicode_full {
-            self.unicode_full.borrow_mut().clear();     // will lazy update
-        }
-
-        return Ok(());
     }
 
     fn read_patterns(&mut self, path: &Locations) -> Result<()> {

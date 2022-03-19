@@ -70,11 +70,8 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
         if let Err(e) = new_package {
             bail!("Invalid MathML input:\n{}\nError is: {}", &mathml_str, &e.to_string());
         }
+        crate::speech::SpeechRules::initialize_all_rules()?;
 
-        // this forces initialization of things beyond just the speech rules (e.g, the defs.yaml files get read)
-        crate::speech::SPEECH_RULES.with(|speech_rules| -> Result<()> {
-            if let Some(e) = speech_rules.borrow().get_error() {bail!("{}", e)} else {Ok(())}
-        })?;
         let new_package = new_package.unwrap();
         let mathml = cleanup_mathml(get_element(&new_package))?;
         let mathml_string = mml_to_string(&mathml);
