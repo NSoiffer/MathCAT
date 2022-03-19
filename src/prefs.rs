@@ -556,13 +556,13 @@ impl PreferenceManager {
     pub fn is_up_to_date(&mut self) -> Option<FilesChanged> {
         // this will work even if self is invalid
         let mut files_changed = FilesChanged {
-            speech_rules: PreferenceManager::is_file_up_to_date(&self.speech),
-            speech_unicode_short: PreferenceManager::is_file_up_to_date(&self.speech_unicode),
-            speech_unicode_full: PreferenceManager::is_file_up_to_date(&self.speech_unicode_full),
-            braille_rules: PreferenceManager::is_file_up_to_date(&self.braille),
-            braille_unicode_short: PreferenceManager::is_file_up_to_date(&self.braille_unicode),
-            braille_unicode_full: PreferenceManager::is_file_up_to_date(&self.braille_unicode_full),
-            defs: PreferenceManager::is_file_up_to_date(&self.defs),
+            speech_rules: !PreferenceManager::is_file_up_to_date(&self.speech),
+            speech_unicode_short: !PreferenceManager::is_file_up_to_date(&self.speech_unicode),
+            speech_unicode_full: !PreferenceManager::is_file_up_to_date(&self.speech_unicode_full),
+            braille_rules: !PreferenceManager::is_file_up_to_date(&self.braille),
+            braille_unicode_short: !PreferenceManager::is_file_up_to_date(&self.braille_unicode),
+            braille_unicode_full: !PreferenceManager::is_file_up_to_date(&self.braille_unicode_full),
+            defs: !PreferenceManager::is_file_up_to_date(&self.defs),
         };
 
         if !PreferenceManager::is_file_up_to_date(&self.pref_files) {
@@ -573,31 +573,31 @@ impl PreferenceManager {
                 Err(e) => error!("Failed to reread prefs.yaml: {}", e),  // probably in big trouble, but continue on and maybe ok
                 Ok(_) => {
                     if old_speech_style != self.user_prefs.to_string("SpeechStyle") {
-                        files_changed.speech_rules = false;
+                        files_changed.speech_rules = true;
                     }
                     if old_lang != self.user_prefs.to_string("Language") {
-                        files_changed.speech_rules = false;
-                        files_changed.speech_unicode_short = false;
-                        files_changed.speech_unicode_full = false;
+                        files_changed.speech_rules = true;
+                        files_changed.speech_unicode_short = true;
+                        files_changed.speech_unicode_full = true;
                     }
                     if old_braille_code != self.user_prefs.to_string("BrailleCode") {
-                        files_changed.braille_rules = false;
-                        files_changed.braille_unicode_short = false;
-                        files_changed.braille_unicode_full = false;
+                        files_changed.braille_rules = true;
+                        files_changed.braille_unicode_short = true;
+                        files_changed.braille_unicode_full = true;
                     }
                 }
             } 
         }
-        if files_changed.speech_rules &&
-           files_changed.speech_unicode_short &&
-           files_changed.speech_unicode_full &&
-           files_changed.braille_rules &&
-           files_changed.braille_unicode_short &&
-           files_changed.braille_unicode_full &&
+        if files_changed.speech_rules ||
+           files_changed.speech_unicode_short ||
+           files_changed.speech_unicode_full ||
+           files_changed.braille_rules ||
+           files_changed.braille_unicode_short ||
+           files_changed.braille_unicode_full ||
            files_changed.defs {
-            return None;
-        } else {
             return Some(files_changed);
+        } else {
+            return None;
         }
     }
 
