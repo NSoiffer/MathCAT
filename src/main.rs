@@ -140,7 +140,7 @@ fn main() {
   if let Err(e) = set_mathml(expr.to_string()) {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   };
-  // set_preference("TTS".to_string(), ("SSML".to_string()).unwrap();
+  set_preference("TTS".to_string(), "SSML".to_string()).unwrap();
   // set_preference("Bookmark".to_string(), "true".to_string()).unwrap();
   // set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
 

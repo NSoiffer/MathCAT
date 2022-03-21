@@ -355,7 +355,9 @@ impl PreferenceManager {
     pub fn initialize(&mut self, rules_dir: PathBuf) -> Result<()> {
         // first, read in the preferences -- need to determine which files to read next
         // the prefs files are in the rules dir and the user dir; differs from other files
-        self.api_prefs = Preferences{ prefs: DEFAULT_API_PREFERENCES.with(|defaults| defaults.prefs.clone()) };
+        if self.api_prefs.prefs.is_empty() {
+            self.api_prefs = Preferences{ prefs: DEFAULT_API_PREFERENCES.with(|defaults| defaults.prefs.clone()) };
+        }
 
         match PreferenceManager::find_rules_dir(&rules_dir) {
             Ok(rules_dir) => {
@@ -691,7 +693,7 @@ impl PreferenceManager {
             panic!("Internal error: get_tts called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
-        return match self.api_prefs.to_string("TTS").as_str() {
+        return match self.api_prefs.to_string("TTS").as_str().to_ascii_lowercase().as_str() {
             "none" => TTS::None,
             "ssml" => TTS::SSML,
             "sapi5" => TTS::SAPI5,
@@ -703,12 +705,12 @@ impl PreferenceManager {
     }
 
     /// Set the string-valued preference.
-    pub fn set_api_string_pref(&mut self, key: String, value: String) {
+    pub fn set_api_string_pref(&mut self, key: &str, value: &str) {
         if !self.error.is_empty() {
             panic!("Internal error: set_api_string_pref called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
-        self.api_prefs.prefs.insert(key, Yaml::String(value));
+        self.api_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
     }
 
     /// Set the number-valued preference.

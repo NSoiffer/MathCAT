@@ -163,15 +163,32 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
         // note: Rust complains if I set
         //    pref_manager = rules.pref_manager.borrow_mut()
         // here/upfront, so it is borrowed separately below. That way its borrowed lifetime is small
-        //let value_as_py_float = value.downcast::<PyFloat>();
+        let files_changed;
+        {
+            let mut pref_manager = rules.pref_manager.borrow_mut();
+            if !pref_manager.get_api_prefs().to_string(&name).is_empty() {
+                match name.as_str() {
+                    "Pitch" | "Rate" | "Volume" => {
+                        rules.pref_manager.borrow_mut().set_api_float_pref(&name, to_float(&name, &value)?);    
+                    },
+                    "Bookmark" => {
+                        rules.pref_manager.borrow_mut().set_api_boolean_pref(&name, value.to_lowercase()=="true");    
+                    },
+                    _ => {
+                        pref_manager.set_api_string_pref(&name, &value);
+                    }
+                }
+                files_changed = None;
+            } else if pref_manager.get_user_prefs().to_string(name.as_str()).is_empty() {
+                bail!("set_preference: {} is not a known preference", &name); 
+            } else {
+                files_changed = pref_manager.set_user_prefs(&name, &value);     // assume string valued
+            }
+            pref_manager.merge_prefs();
+        }
 
         match name.as_str() {
             "SpeechStyle" => {
-                let files_changed;
-                { 
-                    let mut pref_manager = rules.pref_manager.borrow_mut();
-                    files_changed = pref_manager.set_user_prefs("SpeechStyle", &value);
-                };
                 if let Some(files_changed) = files_changed {
                     rules.invalidate(files_changed);
                 }
@@ -182,33 +199,24 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
                       (value.len() == 5 && value.as_bytes()[2] == b'-') ) {
                         bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value);
                       }
-                let files_changed = rules.pref_manager.borrow_mut().set_user_prefs(&name, &value);  
                 if let Some(files_changed) = files_changed {
                     rules.invalidate(files_changed);
                 }
             },
             "BrailleCode" => {
-                let files_changed = rules.pref_manager.borrow_mut().set_user_prefs(&name, &value);    
                 crate::speech::BRAILLE_RULES.with(|braille_rules| {
                     if let Some(files_changed) = files_changed {
                         braille_rules.borrow_mut().invalidate(files_changed);
                     }
-                   })
-            },
-            "Pitch" | "Rate" | "Volume" => {
-                rules.pref_manager.borrow_mut().set_api_float_pref(&name, to_float(&name, value)?);    
-            },
-            "Bookmark" => {
-                rules.pref_manager.borrow_mut().set_api_boolean_pref(&name, value.to_lowercase()=="true");    
+                })
             },
             _ => {
-                rules.pref_manager.borrow_mut().set_user_prefs(&name, &value);     // assume string valued
             }
         }
         return Ok( () );
     });
 
-    fn to_float(name: &str, value: String) -> Result<f64> {
+    fn to_float(name: &str, value: &str) -> Result<f64> {
         match value.parse::<f64>() {
             Ok(val) => return Ok(val),
             Err(_) => bail!("SetPreference: preference'{}'s value '{}' must be a float", name, value),
