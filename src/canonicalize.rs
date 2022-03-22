@@ -567,6 +567,8 @@ impl CanonicalizeContext {
 						mrow.append_children(children);
 						return Some(mrow);
 					}
+				} else if element_name == "semantics" {
+					return Some( as_element(children[0]) );	// FIX: presentation isn't necessarily first child
 				} else if children.len() > 1 && ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 						// wrap the children in an mrow
 						let mrow = create_mathml_element(&mathml.document(), "mrow");
@@ -962,7 +964,7 @@ impl CanonicalizeContext {
 			// merge consecutive <mo>s containing '.' into ellipsis
 			let children = mrow.children();
 			let mut i = 0;
-			let mut n_dots = 0;		// number of consecutive mo's containing primes
+			let mut n_dots = 0;		// number of consecutive mo's containing dots
 			while i < children.len() {
 				let child = as_element(children[i]);
 				if name(&child) == "mo" {
