@@ -28,5 +28,6 @@ mod en {
         mod linear_algebra;
         mod multiline;
     }
+    mod shared;
 }
 
