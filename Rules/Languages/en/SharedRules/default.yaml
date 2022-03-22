@@ -83,7 +83,9 @@
     tag: munder
     match: "."
     replace: 
-    - t: modified
+    - test:
+        if: "not(IsNode(*[1], 'simple'))"
+        then: [t: modified]
     - x: "*[1]"
     - t: with
     - x: "*[2]"
@@ -94,7 +96,9 @@
     tag: mover
     match: "."
     replace: 
-    - t: modified
+    - test:
+        if: "not(IsNode(*[1], 'simple'))"
+        then: [t: modified]
     - x: "*[1]"
     - t: with
     - x: "*[2]"
@@ -105,7 +109,9 @@
     tag: munderover
     match: "."
     replace: 
-    - t: modified
+    - test:
+        if: "not(IsNode(*[1], 'simple'))"
+        then: [t: modified]
     - x: "*[1]"
     - t: with
     - x: "*[2]"
@@ -282,4 +288,4 @@
     tag: "*"
     match: "."
     replace: 
-    - x: translate(text(), '-', ' ')
+    - x: translate(name(), '-', ' ')

@@ -191,7 +191,94 @@
       children:
       - x: "*[1]"
       - x: "*[2]"
+-
+  name: limit
+  tag: [msub, munder]
+  match: "*[1][text()='lim']"
+  replace: 
+  - intent:
+      name: "limit"    # Fix: the name in the spreadsheet needs updating/fixing
+      children:
+      - x: "*[1]"
+      - x: "*[2]"
 
+-
+  name: modified-var
+  tag: mover
+  # breve, check, dot, double-dot, triple-dot, quadruple-dot, grave, hat, tilde
+  # note: canonicalize mapped \u02D9 to '.'
+  match: "*[2][translate(., '\u0306\u030c.\u00A8\u20DB\u20DC`^~→', '')='']"
+  replace:
+  - intent:
+      name: "modified-variable"
+      children:
+      - x: "*[1]"
+      - x: "*[2]"
+
+# This needs to be before the simple "x prime" rule
+# minutes/seconds or feet/inches
+# If ' or " follows a number, then it is not "prime", but is a unit
+# Note the ASCII ' and " are converted to prime during canonicalization if in a superscript
+# Handles single, double, primes, and also double quote, which don't have to be in an msup
+# The rules are:
+# 1. If the prime follows a degree sign with a number (in various forms) or letter after it,
+#    then it is minutes/seconds
+# 2. Else, if it follows a *number* (in various forms), then it feet/inches
+# 3. Else it is 'prime'
+# any ? ( count(match)==2 &&
+#           (name(match)=="mrow" || name(match)=="msup") &&
+#           (MatchString($1, "mo", "'") || MatchString($1, "mo", "′") ||      // apostrophe or prime
+#            MatchString($1, "mo", "″") || MatchString($1, "mo", "\"")) &&    // double quote or double prime
+#           (
+#               // '1': degree sign check
+#               ( has_previous(match) &&
+#                  ( (MatchString($1, "mo", "′") &&
+#                      ( name(previous(match))=="msup" ||
+#                         (name(previous(match))=="mrow" && count(previous(match))==2)) &&
+#                     MatchString(previous(match)[1], "mo", "°")) ||
+#                      ( has_previous(previous(match)) &&
+#                         (MatchString($1, "mo", "″") || MatchString($1, "mo", "\"")) &&
+#                         ( name(previous(match, 2))=="msup" ||
+#                           (name(previous(match, 2))=="mrow" && count(previous(match, 2))==2)) &&
+#                         MatchString(previous(match, 2)[1], "mo", "°"))
+#                   )
+#               ) || 
+# 
+#              // '2': number or numeric fraction in front
+#              name($0)=="mn" ||
+#               (name($0)=="mfrac" && name($0[0])=="mn" && name($0[1])=="mn")
+#           )
+#         )
+#   => structure(
+#         $0,
+#        UIWord([$1[0],$1[-1]])
+#                 {ruleRef="RR_unitsBase";
+#                  singular=MatchString($0, "mn", "1");
+#                  // if this follows a degree sign, then it is an angle notation (min/secs) regardless of the pref setting
+#                  // we have to either look at the previous entry for mins or the one prior to that for secs
+#                  pref= ( has_previous(match) &&
+#                            ( (MatchString($1, "mo", "′") &&
+#                               ( name(previous(match))=="msup" ||
+#                                  (name(previous(match))=="mrow" && count(previous(match))==2)) &&
+#                                MatchString(previous(match)[1], "mo", "°")) ||
+#                               ( has_previous(previous(match)) &&
+#                                   (MatchString($1, "mo", "″") || MatchString($1, "mo", "\"")) &&
+#                                 ( name(previous(match, 2))=="msup" ||
+#                                    (name(previous(match, 2))=="mrow" && count(previous(match, 2))==2)) &&
+#                                  MatchString(previous(match, 2)[1], "mo", "°"))
+#                             )
+#                          ) ? "Angle" : "Length";
+#                 }
+#         );
+
+-
+  name: prime
+  tag: msup
+  match: "*[2][translate(., '′″‴⁗', '')=''] and *[1][self::m:mi]"
+  replace:
+  - intent:
+      name: "prime"
+      children: [x: "*"]
 
 # rules for functions raised to a power
 # these could have been written on 'mrow' but putting them on msup seems more specific

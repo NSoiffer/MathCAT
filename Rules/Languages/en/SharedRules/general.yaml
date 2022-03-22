@@ -196,7 +196,7 @@
    replace: 
    - test: 
       if: "$Verbosity!='Terse'"
-      then: {t: the}
+      then: [t: the]
    - x: "*[1]"
    - t: from
    - x: "*[2]"
@@ -213,7 +213,7 @@
    replace: 
    - test: 
       if: "$Verbosity!='Terse'"
-      then: {t: the}
+      then: [t: the]
    - x: "*[1]"
    - t: over
    - x: "*[2]"
@@ -224,15 +224,54 @@
 -
    name: largeop
    tag: mrow
-   match: "count(*)=2 and DEBUG(IsLargeOp(*[1]))"
+   match: "count(*)=2 and IsLargeOp(*[1])"
    replace: 
     - test: 
        if: "$Verbosity!='Terse'"
-       then: {t: the}
+       then: [t: the]
     - x: "*[1]"
     - t: of
     - x: "*[2]"
+  
+-
+   name: limit
+   tag: limit
+   match: "."
+   replace: 
+   - test: 
+      if: "$Verbosity!='Terse'"
+      then: [t: the limit as]
+      else: [t: "limit as"]
+   - x: "*[2]"
+   - pause: short
+  
+-
+   name: vector
+   tag: modified-variable
+   match: "*[2][text()='→']"
+   replace: 
+   - t: "vector"
+   - x: "*[1]"
+   
+  
+-
+   name: default
+   tag: modified-variable
+   match: "."
+   replace: 
+   - x: "*[1]"
+   - x: "*[2]"
+   - pause: short
 
+-
+   # handles single, double, etc., prime
+   name: default
+   tag: prime
+   match: "."
+   replace: 
+   - x: "*[1]"
+   - x: "*[2]"
+   - pause: short
 
 -
    name: sin

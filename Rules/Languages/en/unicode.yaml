@@ -60,7 +60,11 @@
         # else silent
 
  - "-": [t: minus]                               # 0x2d
- - ".": [t: point]                               # 0x2e
+ - ".":                                          # 0x2e
+    - test:
+        if: "parent::*[1][self::m:modified-variable]"
+        then: [t: "dot"]
+        else: [t: "point"]
  - "/": [t: divided by]                          # 0x2f
  - ":": [t: colon]                               # 0x3a
  - ";": [t: semicolon]                           # 0x3b
@@ -88,10 +92,10 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [t: close bracket]
         else: [t: right bracket]
- - "^": [t: hat]                              # 0x5e
- - "_": [t: under bar]                           # 0x5f
- - "`": [t: grave accent]                        # 0x60
- - "{":                                          # 0x7b
+ - "^": [t: hat]                                # 0x5e
+ - "_": [t: under bar]                          # 0x5f
+ - "`": [t: grave]                              # 0x60
+ - "{":                                         # 0x7b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [t: open brace]
@@ -141,7 +145,7 @@
  - "̃": [t: tilde embellishment]                 # 0x303
  - "̄": [t: macron embellishment]                # 0x304
  - "̅": [t: overbar embellishment]               # 0x305
- - "̆": [t: breve embellishment]                 # 0x306
+ - "̆": [t: breve]                 # 0x306
  - "̇": [t: dot above embellishment]             # 0x307
  - "Α":                                          # 0x391
      - test: 
@@ -401,7 +405,12 @@
  - "ⅉ": [t: double-struck italic J]              # 0x2149
  - "←": [t: leftwards arrow]                     # 0x2190
  - "↑": [t: upwards arrow]                       # 0x2191
- - "→": [t: rightwards arrow]                    # 0x2192
+ - "→":                                          # 0x2192
+     - test:
+        if: "ancestor::*[2][self::m:limit]"
+        then: [t: "approaches"]
+        else: [t: "right arrow"]
+
  - "↓": [t: downwards arrow]                     # 0x2193
  - "⇒": [t: rightwards double arrow]             # 0x21d2
  - "∀": [t: for all]                             # 0x2200

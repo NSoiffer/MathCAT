@@ -107,7 +107,7 @@
  - "¥": [t: yen]                                 # 0xa5
  - "¦": [t: broken bar]                          # 0xa6
  - "§": [t: section]                             # 0xa7
- - "¨": [t: diaeresis]                           # 0xa8
+ - "¨": [t: double dot]                          # 0xa8
  - "©": [t: copyright]                           # 0xa9
  - "ª": [t: feminine ordinal indicator]          # 0xaa
  - "¬": [t: not]                                 # 0xac
@@ -231,7 +231,7 @@
  - "̉": [t: hook above embellishment]            # 0x309
  - "̊": [t: ring above embellishment]            # 0x30a
  - "̋": [t: double acute accent embellishment]   # 0x30b
- - "̌": [t: caron embellishment]                 # 0x30c
+ - "̌": [t: check]                 # 0x30c
  - "̍": [t: vertical line above embellishment]   # 0x30d
  - "̎": [t: double vertical line above embellishment] # 0x30e
  - "̏": [t: double grave accent embellishment]   # 0x30f
@@ -778,8 +778,8 @@
  - "⃘": [t: ring overlay embellishment]          # 0x20d8
  - "⃙": [t: clockwise ring overlay embellishment] # 0x20d9
  - "⃚": [t: anticlockwise ring overlay embellishment] # 0x20da
- - "⃛": [t: three dots above embellishment]      # 0x20db
- - "⃜": [t: four dots above embellishment]       # 0x20dc
+ - "⃛": [t: triple dot]      # 0x20db
+ - "⃜": [t: quadruple dot]       # 0x20dc
  - "⃝": [t: enclosing circle embellishment]      # 0x20dd
  - "⃞": [t: enclosing square embellishment]      # 0x20de
  - "⃟": [t: enclosing diamond embellishment]     # 0x20df
@@ -791,7 +791,7 @@
  - "⃥": [t: reverse solidus overlay embellishment] # 0x20e5
  - "⃦": [t: double verticle stroke embellishment] # 0x20e6
  - "⃧": [t: annuity symbol embellishment]        # 0x20e7
- - "⃨": [t: triple underdot embellishment]       # 0x20e8
+ - "⃨": [t: triple underdot]       # 0x20e8
  - "⃩": [t: wide bridge above embellishment]     # 0x20e9
  - "⃪": [t: leftwards arrow overlay embellishment] # 0x20ea
  - "⃫": [t: long double solidus overlay embellishment] # 0x20eb
@@ -1077,8 +1077,18 @@
  - "↔": [t: left right arrow]                    # 0x2194
  - "↕": [t: up down arrow]                       # 0x2195
  - "↖": [t: north west arrow]                    # 0x2196
- - "↗": [t: north east arrow]                    # 0x2197
- - "↘": [t: south east arrow]                    # 0x2198
+ - "↗":                                          # 0x2197
+    - test:
+        if: "ancestor::*[2][self::m:limit]"
+        then: [t: "approaches from below"]
+        else: [t: "north east arrow"]
+
+ - "↘":                                          # 0x2198
+    - test:
+        if: "ancestor::*[2][self::m:limit]"
+        then: [t: "approaches from above"]
+        else: [t: "south east arrow"]
+
  - "↙": [t: south west arrow]                    # 0x2199
  - "↚": [t: leftwards arrow with stroke]         # 0x219a
  - "↛": [t: rightwards arrow with stroke]        # 0x219b
