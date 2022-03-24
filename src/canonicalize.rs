@@ -329,6 +329,14 @@ enum DigitBlockType {
 	BinaryBlock_4,
 }
 
+
+#[derive(PartialEq)]
+enum FunctionNameCertainty {
+	TRUE,
+	MAYBE,
+	FALSE
+}
+
 impl CanonicalizeContext {
 	fn new() -> CanonicalizeContext {
 		return CanonicalizeContext{}
@@ -1532,11 +1540,11 @@ impl CanonicalizeContext {
 			// Need to be careful because (sin - cos)(x) needs an infix '-'
 			// Return either the prefix or infix version of the operator
 			if next_node.is_some() &&
-			   context.is_function_name(get_possible_embellished_node(next_node.unwrap()), None) {
+			   context.is_function_name(get_possible_embellished_node(next_node.unwrap()), None) == FunctionNameCertainty::TRUE {
 				return OperatorTypes::INFIX;
 			}
 			if previous_node.is_some() &&
-			   context.is_function_name(get_possible_embellished_node(previous_node.unwrap()), None) {
+			   context.is_function_name(get_possible_embellished_node(previous_node.unwrap()), None) == FunctionNameCertainty::TRUE {
 				return OperatorTypes::PREFIX;
 			}
 		
@@ -1770,23 +1778,26 @@ impl CanonicalizeContext {
 	//   - it is on the list of likely function names (e.g, f, g, h)
 	//   - multi-char names that begin with a capital letter (e.g, "Tr")
 	//   - there is a single token inside the parens (why else would someone use parens), any name (e.g, a(x))
+	//	 - if there are multiple comma-separated args
 	//
-	// 2. If there are no parens, then only names on the known function list are used (e.g., "sin x") 
-	fn is_function_name<'a>(&self, node: Element<'a>, right_siblings: Option<&[ChildOfElement<'a>]>) -> bool {
+	// 2. If there are no parens, then only names on the known function list are used (e.g., "sin x")
+	//
+	// If the name if followed by parens but doesn't fit into the above categories, we return a "maybe"
+	fn is_function_name<'a>(&self, node: Element<'a>, right_siblings: Option<&[ChildOfElement<'a>]>) -> FunctionNameCertainty {
 		let base_of_name = get_possible_embellished_node(node);
 	
 		// actually only 'mi' should be legal here, but some systems used 'mtext' for multi-char variables
 		// FIX: need to allow for composition of function names. E.g, (f+g)(x) and (f^2/g)'(x)
 		let node_name = name(&base_of_name);
 		if node_name != "mi" && node_name != "mtext" {
-			return false;
+			return FunctionNameCertainty::FALSE;
 		}
 	
 		 // mtext to get Roman
 		 // whitespace is sometimes added to the mi since braille needs it, so do a trim here to get function name
 		let base_name = as_text(base_of_name).trim();
 		if base_name.is_empty() {
-			return false;
+			return FunctionNameCertainty::FALSE;
 		}
 		// debug!("    is_function_name({}), {} following nodes", base_name, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
 		return crate::definitions::DEFINITIONS.with(|defs| {
@@ -1796,18 +1807,18 @@ impl CanonicalizeContext {
 		 // UEB seems to think "Sin" (etc) is used for "sin", so we move to lower case
 		 if names.contains(&base_name.to_ascii_lowercase()) {
 				// debug!("     ...is in FunctionNames");
-				return true;	// always treated as function names
+				return FunctionNameCertainty::TRUE;	// always treated as function names
 			}
 
 			// We include shapes as function names so that △ABC makes sense since △ and
 			//   the other shapes are not in the operator dictionary
 			let shapes = defs.get_hashset("GeometryShapes").unwrap();
 			if shapes.contains(base_name) {
-				return true;	// always treated as function names
+				return FunctionNameCertainty::TRUE;	// always treated as function names
 			}
 	
 			if right_siblings.is_none() {
-				return false;	// only accept known names, which is tested above
+				return FunctionNameCertainty::FALSE;	// only accept known names, which is tested above
 			}
 
 			// make sure that what follows starts and ends with parens/brackets
@@ -1815,7 +1826,7 @@ impl CanonicalizeContext {
 			let right_siblings = right_siblings.unwrap();
 			if right_siblings.is_empty() {
 				// debug!("     ...right siblings not None, but zero of them");
-				return false;
+				return FunctionNameCertainty::FALSE;
 			}
 
 			let first_child = as_element(right_siblings[0]);
@@ -1826,7 +1837,7 @@ impl CanonicalizeContext {
 
 			if right_siblings.len() < 2 {
 				// debug!("     ...not enough right siblings");
-				return false;	// can't be (...)
+				return FunctionNameCertainty::FALSE;	// can't be (...)
 			}
 
 			// at least two siblings are this point -- check that they are parens/brackets
@@ -1835,27 +1846,27 @@ impl CanonicalizeContext {
 			if name(&first_sibling) != "mo"  || !is_left_paren(first_sibling)  // '(' or '['
 			{
 				// debug!("     ...first sibling is not '(' or '['");
-				return false;
+				return FunctionNameCertainty::FALSE;
 			}
 	
 			if self.is_likely_chemical_state(node, right_siblings) {
 				// debug!("      ...is_likely_chemical_state=true");
-				return true;
+				return FunctionNameCertainty::TRUE;
 			}
 	
 			let likely_names = defs.get_hashset("LikelyFunctionNames").unwrap();
 			if likely_names.contains(base_name) {
-				return true;	// don't bother checking contents of parens, consider these as function names
+				return FunctionNameCertainty::TRUE;	// don't bother checking contents of parens, consider these as function names
 			}
 	
 			if is_single_arg(as_text(first_sibling), &right_siblings[1..]) {
 				// debug!("      ...is single arg");
-				return true;	// if there is only a single arg, why else would you use parens?
+				return FunctionNameCertainty::TRUE;	// if there is only a single arg, why else would you use parens?
 			};
 
 			if is_comma_arg(as_text(first_sibling), &right_siblings[1..]) {
 				// debug!("      ...is comma arg");
-				return true;	// if there is only a single arg, why else would you use parens?
+				return FunctionNameCertainty::TRUE;	// if there is only a single arg, why else would you use parens?
 			};
 	
 			// Names like "Tr" are likely function names, single letter names like "M" or "J" are iffy
@@ -1866,11 +1877,11 @@ impl CanonicalizeContext {
 			let first_char = chars.next().unwrap();		// we know there is at least one byte in it, hence one char
 			if chars.next().is_some() && first_char.is_uppercase() {
 				// debug!("      ...is uppercase name");
-				return true;
+				return FunctionNameCertainty::TRUE;
 			}
 
 			// debug!("      ...didn't match options to be a function");
-			return false;		// didn't fit one of the above categories
+			return FunctionNameCertainty::MAYBE;		// didn't fit one of the above categories
 		});
 	
 		fn is_single_arg<'a>(open: &str, following_nodes: &[ChildOfElement<'a>]) -> bool {
@@ -2172,7 +2183,7 @@ impl CanonicalizeContext {
 		}
 	
 		// Use lower priority multiplication if current_child is a function (e.g. "cos" in "sin x cos 3y")
-		if self.is_function_name(current_child, None) {
+		if self.is_function_name(current_child, None) == FunctionNameCertainty::TRUE{
 			return false;
 		}
 	
@@ -2255,7 +2266,8 @@ impl CanonicalizeContext {
 				let base_of_previous_child = get_possible_embellished_node(previous_child);
 				if name(&base_of_previous_child) != "mo" {
 					// consecutive operands -- add an invisible operator as appropriate
-					current_op = if self.is_function_name(previous_child, Some(&children[i_child..])) {
+					let likely_function_name = self.is_function_name(previous_child, Some(&children[i_child..]));
+					current_op = if likely_function_name == FunctionNameCertainty::TRUE {
 								OperatorPair{ ch: "\u{2061}", op: &*INVISIBLE_FUNCTION_APPLICATION }
 							} else if self.is_mixed_fraction(&previous_child, &children[i_child..])? {
 								OperatorPair{ ch: "\u{2064}", op: &*IMPLIED_INVISIBLE_PLUS }
@@ -2274,9 +2286,11 @@ impl CanonicalizeContext {
 						// debug!("  Found whitespace op '{}'/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
 					} else {
 						// debug!("  Found implicit op {}/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
-						self.reduce_stack(&mut parse_stack, current_op.op.priority, !self.is_function_name(base_of_child, None));
+						self.reduce_stack(&mut parse_stack, current_op.op.priority,
+							self.is_function_name(base_of_child, None) != FunctionNameCertainty::TRUE);
 		
 						let implied_mo = create_mo(current_child.document(), current_op.ch);
+						implied_mo.set_attribute_value("data-guess", "true");
 						let shift_result = self.shift_stack(&mut parse_stack, implied_mo, current_op.clone());
 						// ignore shift_result.0 which is just 'implied_mo'
 						assert_eq!(implied_mo, shift_result.0);
@@ -2295,7 +2309,7 @@ impl CanonicalizeContext {
 						// will end up with operand operand -- need to choose operator associated with prev child
 						// we use the original input here because in this case, we need to look to the right of the ()s to deal with chemical states
 						let implied_operator = if self.is_function_name(as_element(children[i_child-1]),
-																	Some(&children[i_child..])) {
+																	Some(&children[i_child..])) == FunctionNameCertainty::TRUE {
 								OperatorPair{ ch: "\u{2061}", op: &*INVISIBLE_FUNCTION_APPLICATION }
 							} else {
 								OperatorPair{ ch: "\u{2062}", op: &*IMPLIED_TIMES }

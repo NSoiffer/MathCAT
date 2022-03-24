@@ -441,7 +441,8 @@
    tag: mo
    match:
       # say "times" when invisible times is followed by parens or a superscript that has a base with parens or "|"s
-      - "text()='\u2062' and ("
+      # if we aren't sure if it is times or not, don't say anything
+   - "text()='\u2062' and @data-guess and ("
       - "  following-sibling::*[1][" 
       - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|') or self::m:binomial or"  # followed by parens
       - "    ( (self::m:msup or self::m:msub or self::m:msubsup or self::m:power) and "               # followed by msup, etc.
