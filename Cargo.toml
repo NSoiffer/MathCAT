@@ -59,7 +59,7 @@ getrandom = { version = "0.2.3", features = ["js"] }
 [build-dependencies]
 bitflags = "1.2.1"
 phf = { version = "0.8.0", features = ["macros"] }
-zip = "0.5.8"
+zip = { version = "0.5", default-features = false }
 
 # when publishing, the next three lines need to be commented out
 # [[bin]]

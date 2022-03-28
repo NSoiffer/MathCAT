@@ -73,11 +73,10 @@ fn main() {
     // eprintln!("rules dir: '{:?}'", zip_directory.to_str());
 
     let zip_directory = Path::new("Rules");
-    let zip_options = FileOptions::default().compression_method(CompressionMethod::Bzip2);
+    let zip_options = FileOptions::default().compression_method(CompressionMethod::Deflated);
 
     if let Err(e) = zip_dir(&zip_directory, archive, zip_options) {
         panic!("Error: {}", e);
     }
-    println!("cargo:rerun-if-changed=Rules");
-    println!("cargo:rerun-if-changed=build.rs");
+    // println!("cargo:rerun-if-changed=Rules"); **** UNCOMMENT before commit
 }
