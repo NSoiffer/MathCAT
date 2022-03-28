@@ -169,10 +169,10 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
             if !pref_manager.get_api_prefs().to_string(&name).is_empty() {
                 match name.as_str() {
                     "Pitch" | "Rate" | "Volume" => {
-                        rules.pref_manager.borrow_mut().set_api_float_pref(&name, to_float(&name, &value)?);    
+                        pref_manager.set_api_float_pref(&name, to_float(&name, &value)?);    
                     },
                     "Bookmark" => {
-                        rules.pref_manager.borrow_mut().set_api_boolean_pref(&name, value.to_lowercase()=="true");    
+                        pref_manager.set_api_boolean_pref(&name, value.to_lowercase()=="true");    
                     },
                     _ => {
                         pref_manager.set_api_string_pref(&name, &value);
