@@ -90,7 +90,7 @@ cfg_if! {
             use std::io::Cursor;
             use std::io::Read;
 
-            let file_name = path.to_str().unwrap().replace("\\", "/");
+            let file_name = path.to_str().unwrap().replace("/", "\\");
             if let Some(contents) = OVERRIDE_FILE_NAME.with(|override_name| {
                 if file_name.as_str() == override_name.borrow().as_str() {
                     debug!("override read_to_string_shim{}",file_name);
@@ -133,7 +133,7 @@ cfg_if! {
                     crate::prefs::FilesChanged{
                         speech_rules: true, speech_unicode_short: false, speech_unicode_full: false, 
                         braille_rules: true, braille_unicode_short: false, braille_unicode_full: false, 
-                        defs: false }
+                        intent: false, defs: false }
             ));
         }
 
@@ -144,40 +144,44 @@ cfg_if! {
             static DIRECTORY_TREE: RefCell<Package> = RefCell::new(
                     parser::parse(r"
                     <dir name='Rules'>
-                    <file name='definitions.yaml'/>
-                    <file name='intent.yaml'/>
-                    <file name='prefs.yaml'/>
-                    <dir name='Intent'>
-                        <file name='general.yaml'/>
-                        <file name='geometry.yaml'/>
-                        <file name='linear-algebra.yaml'/>
-                    </dir>
-                    <dir name='Nemeth'>
-                        <file name='Nemeth_Rules.yaml'/>
-                        <file name='unicode.yaml'/>
-                        <file name='unicode-full.yaml'/>
-                    </dir>
-                    <dir name='UEB'>
-                        <file name='UEB_Rules.yaml'/>
-                        <file name='unicode.yaml'/>
-                        <file name='unicode-full.yaml'/>
-                    </dir>
-                    <dir name='en'>
-                        <dir name='SharedRules'>
-                            <file name='default.yaml'/>
+                        <file name='definitions.yaml'/>
+                        <file name='intent.yaml'/>
+                        <file name='prefs.yaml'/>
+                        <dir name='Intent'>
                             <file name='general.yaml'/>
                             <file name='geometry.yaml'/>
                             <file name='linear-algebra.yaml'/>
-                            <file name='menclose.yaml'/>
                         </dir>
-                        <file name='ClearSpeak_Rules.yaml'/>
-                        <file name='definitions.yaml'/>
-                        <file name='navigate.yaml'/>
-                        <file name='overview.yaml'/>
-                        <file name='SimpleSpeak_Rules.yaml'/>
-                        <file name='unicode.yaml'/>
-                        <file name='unicode-full.yaml'/>
-                    </dir>
+                        <dir name='Braille'>
+                            <dir name='Nemeth'>
+                                <file name='Nemeth_Rules.yaml'/>
+                                <file name='unicode.yaml'/>
+                                <file name='unicode-full.yaml'/>
+                            </dir>
+                            <dir name='UEB'>
+                                <file name='UEB_Rules.yaml'/>
+                                <file name='unicode.yaml'/>
+                                <file name='unicode-full.yaml'/>
+                            </dir>
+                        </dir>
+                        <dir name='Languages'>
+                            <dir name='en'>
+                                <dir name='SharedRules'>
+                                    <file name='default.yaml'/>
+                                    <file name='general.yaml'/>
+                                    <file name='geometry.yaml'/>
+                                    <file name='linear-algebra.yaml'/>
+                                    <file name='menclose.yaml'/>
+                                </dir>
+                                <file name='ClearSpeak_Rules.yaml'/>
+                                <file name='definitions.yaml'/>
+                                <file name='navigate.yaml'/>
+                                <file name='overview.yaml'/>
+                                <file name='SimpleSpeak_Rules.yaml'/>
+                                <file name='unicode.yaml'/>
+                                <file name='unicode-full.yaml'/>
+                            </dir>
+                        </dir>
                     </dir>")
                     .expect("Internal error in creating web assembly files: didn't parse initializer string")
             );
