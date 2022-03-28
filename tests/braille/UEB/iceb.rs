@@ -799,7 +799,6 @@ fn example_11_5_5_2() {
 
 #[test]
 fn example_11_5_5_3() {
-    init_logger();
     // this comes from MathJax
     let expr = "<math>
         <mi mathvariant='normal'>&#x2200;</mi>
