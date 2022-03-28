@@ -42,7 +42,14 @@ pub fn set_rules_dir(dir: String) -> Result<()> {
     let pref_manager = crate::prefs::PreferenceManager::get();
     return pref_manager.borrow_mut().initialize(PathBuf::from(dir));
 }
-/// The MathML to be spoken, brailled, or navigated.
+
+/// Returns the version number (from Cargo.toml) of the build
+pub fn get_version() -> String {
+    const VERSION: &str = env!("CARGO_PKG_VERSION");
+    return VERSION.to_string();
+}
+
+
 /// This will override any previous MathML that was set.
 /// This returns canonical MathML with 'id's set on any node that doesn't have an id.
 /// The ids can be used for sync highlighting if the `Bookmark` API preference is true.
