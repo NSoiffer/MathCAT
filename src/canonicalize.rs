@@ -2290,7 +2290,9 @@ impl CanonicalizeContext {
 							self.is_function_name(base_of_child, None) != FunctionNameCertainty::TRUE);
 		
 						let implied_mo = create_mo(current_child.document(), current_op.ch);
-						implied_mo.set_attribute_value("data-guess", "true");
+						if likely_function_name == FunctionNameCertainty::MAYBE {
+							implied_mo.set_attribute_value("data-guess", "true");
+						}
 						let shift_result = self.shift_stack(&mut parse_stack, implied_mo, current_op.clone());
 						// ignore shift_result.0 which is just 'implied_mo'
 						assert_eq!(implied_mo, shift_result.0);
