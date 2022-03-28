@@ -170,7 +170,7 @@ def write_letters_and_digits(out_stream):
     write_yaml_line(out_stream, "𝚥", "L⠚", "1d6a5", "dotless j")
 
     write_letter_chars(out_stream, my_ascii_to_unicode(small_greek), '𝛂', "BGL")
-    write_letter_chars(out_stream, my_ascii_to_unicode(small_greek), 'Α', "BCGL")
+    write_letter_chars(out_stream, my_ascii_to_unicode(small_greek), '𝚨', "BCGL")
 
     write_letter_chars(out_stream, my_ascii_to_unicode(small_greek), '𝛼', "IGL")
     write_letter_chars(out_stream, my_ascii_to_unicode(small_greek), '𝛢', "ICGL")
