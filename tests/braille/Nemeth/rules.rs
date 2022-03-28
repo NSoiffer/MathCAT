@@ -44,6 +44,13 @@ fn lower_roman_numeral_18_b_4() {
 }
 
 #[test]
+fn cap_22_a_1() {
+    // from WIRIS
+    let expr = "<math><mo>&#x25B3;</mo><mo>&#xA0;</mo><mi>A</mi><mi>B</mi><mi>C</mi></math>";
+    test_braille("Nemeth", expr, "⠫⠞⠀⠠⠁⠠⠃⠠⠉");
+}
+
+#[test]
 fn letter_26_b_19() {
     let expr = "<math><mo>(</mo>
             <mi mathvariant='normal'>l</mi><mo>,</mo>
@@ -329,8 +336,8 @@ fn sub_ind_80_b_4() {
 
 #[test]
 fn numeric_sub_81_a_1() {
-    let expr = "<math><mo>(</mo><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><mn>1</mn><mo>)</mo></math>";
-    test_braille("Nemeth", expr, "⠷⠭⠘⠆⠐⠬⠂⠾");
+    let expr = "<math><mo>(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>+</mo><mn>1</mn><mo>)</mo></math>";
+    test_braille("Nemeth", expr, "⠷⠭⠂⠬⠂⠾");
 }
 
 #[test]
