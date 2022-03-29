@@ -133,7 +133,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
             n_chars += 1;
             prefix.next();
         } else if prefix.peek() == Some(&&'⠼') && NEMETH_NUMBERS.contains(&first_ch) { // number indicator
-            debug!("Numeric indicator: first_ch: {}", first_ch);
+            // debug!("Numeric indicator: first_ch: {}", first_ch);
             n_chars += 1;
             prefix.next();
         } 
@@ -602,18 +602,18 @@ fn ueb_cleanup(raw_braille: String) -> String {
 
     fn is_next_char(chars: &[char], target: char) -> bool {
         // first find the L or N and eat the char so that we are at the potential start of where the target lies
-            debug!("Looking for '{}' in '{}'", target, chars.iter().collect::<String>());
+            // debug!("Looking for '{}' in '{}'", target, chars.iter().collect::<String>());
         for i_end in 0..chars.len() {
             if chars[i_end] == 'L' || chars[i_end] == 'N' {
                 // skip the next char to get to the real start, and then look for the target
                 // stop when L/N signals past potential target or we hit some non L/N char (actual braille)
-                debug!("   after L/N '{}'", chars[i_end+2..].iter().collect::<String>());
+                // debug!("   after L/N '{}'", chars[i_end+2..].iter().collect::<String>());
                 for i_next in i_end+2..chars.len() {
                     let ch = chars[i_next];
                     if ch == 'L' || ch == 'N' || !LETTER_PREFIXES.contains(&ch) {
                         return false;
                     } else if ch == target {
-                        debug!("   found target");
+                        // debug!("   found target");
                         return true;
                     }
                 }
@@ -801,7 +801,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                 //   grade 1 indicators are not used unless a single lower-case letter a-j immediately follows a digit.
                 // Grade 1 mode when set by the numeric indicator is terminated by a space, hyphen, dash, or a grade 1 indicator.
                 i_g2_start = None;
-                debug!("Numeric: ch={}, duration: {:?}", ch, duration);
+                // debug!("Numeric: ch={}, duration: {:?}", ch, duration);
                 match ch {
                     'L' => {
                         // terminate numeric mode -- duration doesn't change
@@ -854,7 +854,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                 // Grade 1 mode, when initiated by the numeric indicator, is terminated by a space, hyphen, dash or grade 1 terminator.
                 // Grade 1 mode is also set by grade 1 indicators.
                 i_g2_start = None;
-                debug!("Grade 1: ch={}, duration: {:?}", ch, duration);
+                // debug!("Grade 1: ch={}, duration: {:?}", ch, duration);
                 match ch {
                     'L' => {
                         // note: be aware of '#' case for Numeric because '1' might already be generated
@@ -906,7 +906,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                    i_g2_start = Some(i);
                    cap_word_mode = false;
                }
-                debug!("Grade 2: ch={}, duration: {:?}", ch, duration);
+                // debug!("Grade 2: ch={}, duration: {:?}", ch, duration);
                 match ch {
                     'L' => {
                         if start_g2_letter.is_none() {
@@ -915,11 +915,11 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                         let (is_alone, right_matched_chars, n_letters) = stands_alone(&chars, i);
                         // GTM 1.2.1 says we only need to use G1 for single letters or sequences that are a shortform (e.g, "ab")
                         if is_alone && (n_letters == 1 || is_short_form(&right_matched_chars[..2*n_letters])) {
-                            debug!("  is_alone -- pushing '1'");
+                            // debug!("  is_alone -- pushing '1'");
                             result.push('1');
                             mode = UEB_Mode::Grade1;
                         }
-                        debug!("  pushing {:?}", right_matched_chars);
+                        // debug!("  pushing {:?}", right_matched_chars);
                         right_matched_chars.iter().for_each(|&ch| result.push(ch));
                         i += right_matched_chars.len();
                     },
@@ -934,7 +934,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                             let (is_alone, right_matched_chars, n_letters) = stands_alone(&chars, if is_greek {i+2} else {i+1});
                             // GTM 1.2.1 says we only need to use G1 for single letters or sequences that are a shortform (e.g, "ab")
                             if is_alone && (n_letters == 1 || is_short_form(&right_matched_chars[..2*n_letters])) {
-                                debug!("  is_alone -- pushing '1'");
+                                // debug!("  is_alone -- pushing '1'");
                                 result.push('1');
                                 mode = UEB_Mode::Grade1;
                             }
@@ -947,7 +947,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                                 i += 1;
                             }
                             start_g2_letter = Some(i);
-                            debug!("  pushing 'C' + {:?}", right_matched_chars);
+                            // debug!("  pushing 'C' + {:?}", right_matched_chars);
                             right_matched_chars.iter().for_each(|&ch| result.push(ch));
                             i += 1 + right_matched_chars.len();
                         }
@@ -1035,7 +1035,7 @@ fn stands_alone(chars: &[char], i: usize) -> (bool, &[char], usize) {
             i -= 1;
             let ch = chars[i];
             let prev_ch = if i > 0 {chars[i-1]} else {' '};  // ' ' is a char not in input
-            debug!("  left alone: prev/ch {}/{}", prev_ch, ch);
+            // debug!("  left alone: prev/ch {}/{}", prev_ch, ch);
             if !intervening_chars_mode && prev_ch == 'L' {
                 i -= 1;       // ignore 'Lx' and also ignore 'ox'
             } else if ch == 'o' || ch == 'b' {
@@ -1065,7 +1065,7 @@ fn stands_alone(chars: &[char], i: usize) -> (bool, &[char], usize) {
         let mut n_letters = 1;      // we have skipped the first letter
         while i < chars.len() {
             let ch = chars[i];
-            debug!("  right alone: ch/next {}/{}", ch, if i+1<chars.len() {chars[i+1]} else {' '});
+            // debug!("  right alone: ch/next {}/{}", ch, if i+1<chars.len() {chars[i+1]} else {' '});
             if !intervening_chars_mode && ch == 'L' {
                 n_letters += 1;
                 i += 1;       // ignore 'Lx' and also ignore 'ox'
@@ -1122,15 +1122,15 @@ fn handle_contractions(chars: &[char], mut result: String) -> String {
     }
 
     let mut chars_as_str = chars.iter().collect::<String>();
-    debug!("  handle_contractions: examine '{}'", &chars_as_str);
+    // debug!("  handle_contractions: examine '{}'", &chars_as_str);
     let matches = CONTRACTION_PATTERNS.matches(&chars_as_str);
     for i in matches.iter() {
         let element = &CONTRACTIONS[i];
-        debug!("  replacing '{}' with '{}' in '{}'", element.pattern, element.replacement, &chars_as_str);
+        // debug!("  replacing '{}' with '{}' in '{}'", element.pattern, element.replacement, &chars_as_str);
         result.truncate(result.len() - chars_as_str.len());
         chars_as_str = CONTRACTION_REGEX[i].replace_all(&chars_as_str, element.replacement).to_string();
         result.push_str(&chars_as_str);
-        debug!("  result after replace '{}'", result);
+        // debug!("  result after replace '{}'", result);
     }
     return result;
 
@@ -1384,7 +1384,7 @@ impl BrailleChars {
             },
         };
         let result = PICK_APART_CHAR.replace_all(&braille_chars, |caps: &Captures| {
-            debug!("captures: {:?}", caps);
+            // debug!("captures: {:?}", caps);
             // debug!("  bold: {:?}, italic: {:?}, face: {:?}, cap: {:?}, char: {:?}",
             //        &caps["bold"], &caps["italic"], &caps["face"], &caps["cap"], &caps["char"]);
             let new_char = if bold || !caps["bold"].is_empty() {"B"} else {""}.to_string()
