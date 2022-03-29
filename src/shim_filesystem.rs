@@ -93,7 +93,7 @@ cfg_if! {
             let file_name = path.to_str().unwrap().replace("/", "\\");
             if let Some(contents) = OVERRIDE_FILE_NAME.with(|override_name| {
                 if file_name.as_str() == override_name.borrow().as_str() {
-                    debug!("override read_to_string_shim{}",file_name);
+                    debug!("override read_to_string_shim: {}",file_name);
                     return OVERRIDE_FILE_CONTENTS.with(|contents| return Some(contents.borrow().clone()));
                 } else {
                     return None;
@@ -126,7 +126,7 @@ cfg_if! {
         }
         pub fn override_file_for_debugging_rules(file_name: &str, file_contents: &str) {
             // file_name should be path name starting at Rules dir: e.g, "Rules/en/navigate.yaml"
-            OVERRIDE_FILE_NAME.with(|name| *name.borrow_mut() = file_name.to_string());
+            OVERRIDE_FILE_NAME.with(|name| *name.borrow_mut() = file_name.to_string().replace("/", "\\"));
             OVERRIDE_FILE_CONTENTS.with(|contents| *contents.borrow_mut() = file_contents.to_string());
             crate::speech::NAVIGATION_RULES.with(|nav_rules|
                 nav_rules.borrow_mut().invalidate(
