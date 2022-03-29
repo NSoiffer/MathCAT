@@ -407,6 +407,13 @@ impl CanonicalizeContext {
 				let parent_name = name(&parent).to_string();
 				ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(parent_name.as_str())
 			};
+		if is_leaf(mathml) && as_text(mathml).is_empty() {
+			// get this out of the way since it common to all leaf elements -- leaving it empty causes problems with the speech rules
+			if !parent_requires_child {
+				return None;
+			}
+			mathml.set_text(" ");
+		};
 		match element_name {
 			"mn" => {
 				let text = as_text(mathml);
