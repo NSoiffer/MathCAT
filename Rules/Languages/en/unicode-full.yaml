@@ -9176,56 +9176,56 @@
      - t: omega
  - "": [t: bold nabla]                          # 0xf45b
  - "𝛻": [t: bold nabla]                          # 0x1d6fb
- - "": [t: italic  alpha]                       # 0xf45c
- - "𝛼": [t: italic  alpha]                       # 0x1d6fc
- - "": [t: italic  beta]                        # 0xf45d
- - "𝛽": [t: italic  beta]                        # 0x1d6fd
- - "": [t: italic  gamma]                       # 0xf45e
- - "𝛾": [t: italic  gamma]                       # 0x1d6fe
- - "": [t: italic  delta]                       # 0xf45f
- - "𝛿": [t: italic  delta]                       # 0x1d6ff
- - "": [t: italic  epsilon]                     # 0xf460
- - "𝜀": [t: italic  epsilon]                     # 0x1d700
- - "": [t: italic  zeta]                        # 0xf461
- - "𝜁": [t: italic  zeta]                        # 0x1d701
- - "": [t: italic  eta]                         # 0xf462
- - "𝜂": [t: italic  eta]                         # 0x1d702
- - "": [t: italic  theta]                       # 0xf463
- - "𝜃": [t: italic  theta]                       # 0x1d703
- - "": [t: italic  iota]                        # 0xf464
- - "𝜄": [t: italic  iota]                        # 0x1d704
- - "": [t: italic  kappa]                       # 0xf465
- - "𝜅": [t: italic  kappa]                       # 0x1d705
- - "": [t: italic  lamda]                       # 0xf466
- - "𝜆": [t: italic  lamda]                       # 0x1d706
- - "": [t: italic  mu]                          # 0xf467
- - "𝜇": [t: italic  mu]                          # 0x1d707
- - "": [t: italic  nu]                          # 0xf468
- - "𝜈": [t: italic  nu]                          # 0x1d708
- - "": [t: italic  xi]                          # 0xf469
- - "𝜉": [t: italic  xi]                          # 0x1d709
- - "": [t: italic  omicron]                     # 0xf46a
- - "𝜊": [t: italic  omicron]                     # 0x1d70a
- - "": [t: italic  pi]                          # 0xf46b
- - "𝜋": [t: italic  pi]                          # 0x1d70b
- - "": [t: italic  rho]                         # 0xf46c
- - "𝜌": [t: italic  rho]                         # 0x1d70c
- - "": [t: italic  final sigma]                 # 0xf46d
- - "𝜍": [t: italic  final sigma]                 # 0x1d70d
- - "": [t: italic  sigma]                       # 0xf46e
- - "𝜎": [t: italic  sigma]                       # 0x1d70e
- - "": [t: italic  tau]                         # 0xf46f
- - "𝜏": [t: italic  tau]                         # 0x1d70f
- - "": [t: italic  upsilon]                     # 0xf470
- - "𝜐": [t: italic  upsilon]                     # 0x1d710
- - "": [t: italic  phi]                         # 0xf471
- - "𝜑": [t: italic  phi]                         # 0x1d711
- - "": [t: italic  chi]                         # 0xf472
- - "𝜒": [t: italic  chi]                         # 0x1d712
- - "": [t: italic  psi]                         # 0xf473
- - "𝜓": [t: italic  psi]                         # 0x1d713
- - "": [t: italic  omega]                       # 0xf474
- - "𝜔": [t: italic  omega]                       # 0x1d714
+ - "": [t: italic alpha]                       # 0xf45c
+ - "𝛼": [t: italic alpha]                       # 0x1d6fc
+ - "": [t: italic beta]                        # 0xf45d
+ - "𝛽": [t: italic beta]                        # 0x1d6fd
+ - "": [t: italic gamma]                       # 0xf45e
+ - "𝛾": [t: italic gamma]                       # 0x1d6fe
+ - "": [t: italic delta]                       # 0xf45f
+ - "𝛿": [t: italic delta]                       # 0x1d6ff
+ - "": [t: italic epsilon]                     # 0xf460
+ - "𝜀": [t: italic epsilon]                     # 0x1d700
+ - "": [t: italic zeta]                        # 0xf461
+ - "𝜁": [t: italic zeta]                        # 0x1d701
+ - "": [t: italic eta]                         # 0xf462
+ - "𝜂": [t: italic eta]                         # 0x1d702
+ - "": [t: italic theta]                       # 0xf463
+ - "𝜃": [t: italic theta]                       # 0x1d703
+ - "": [t: italic iota]                        # 0xf464
+ - "𝜄": [t: italic iota]                        # 0x1d704
+ - "": [t: italic kappa]                       # 0xf465
+ - "𝜅": [t: italic kappa]                       # 0x1d705
+ - "": [t: italic lamda]                       # 0xf466
+ - "𝜆": [t: italic lamda]                       # 0x1d706
+ - "": [t: italic mu]                          # 0xf467
+ - "𝜇": [t: italic mu]                          # 0x1d707
+ - "": [t: italic nu]                          # 0xf468
+ - "𝜈": [t: italic nu]                          # 0x1d708
+ - "": [t: italic xi]                          # 0xf469
+ - "𝜉": [t: italic xi]                          # 0x1d709
+ - "": [t: italic omicron]                     # 0xf46a
+ - "𝜊": [t: italic omicron]                     # 0x1d70a
+ - "": [t: italic pi]                          # 0xf46b
+ - "𝜋": [t: italic pi]                          # 0x1d70b
+ - "": [t: italic rho]                         # 0xf46c
+ - "𝜌": [t: italic rho]                         # 0x1d70c
+ - "": [t: italic final sigma]                 # 0xf46d
+ - "𝜍": [t: italic final sigma]                 # 0x1d70d
+ - "": [t: italic sigma]                       # 0xf46e
+ - "𝜎": [t: italic sigma]                       # 0x1d70e
+ - "": [t: italic tau]                         # 0xf46f
+ - "𝜏": [t: italic tau]                         # 0x1d70f
+ - "": [t: italic upsilon]                     # 0xf470
+ - "𝜐": [t: italic upsilon]                     # 0x1d710
+ - "": [t: italic phi]                         # 0xf471
+ - "𝜑": [t: italic phi]                         # 0x1d711
+ - "": [t: italic chi]                         # 0xf472
+ - "𝜒": [t: italic chi]                         # 0x1d712
+ - "": [t: italic psi]                         # 0xf473
+ - "𝜓": [t: italic psi]                         # 0x1d713
+ - "": [t: italic omega]                       # 0xf474
+ - "𝜔": [t: italic omega]                       # 0x1d714
  - "": [t: bold partial differential]           # 0xf475
  - "𝜕": [t: bold partial differential]           # 0x1d715
  - "": [t: italic epsilon]                      # 0xf476
@@ -9542,56 +9542,56 @@
      - t: omega
  - "": [t: bold nabla]                          # 0xf495
  - "𝜵": [t: bold nabla]                          # 0x1d735
- - "": [t: bold italic  alpha]                  # 0xf496
- - "𝜶": [t: bold italic  alpha]                  # 0x1d736
- - "": [t: bold italic  beta]                   # 0xf497
- - "𝜷": [t: bold italic  beta]                   # 0x1d737
- - "": [t: bold italic  gamma]                  # 0xf498
- - "𝜸": [t: bold italic  gamma]                  # 0x1d738
- - "": [t: bold italic  delta]                  # 0xf499
- - "𝜹": [t: bold italic  delta]                  # 0x1d739
- - "": [t: bold italic  epsilon]                # 0xf49a
- - "𝜺": [t: bold italic  epsilon]                # 0x1d73a
- - "": [t: bold italic  zeta]                   # 0xf49b
- - "𝜻": [t: bold italic  zeta]                   # 0x1d73b
- - "": [t: bold italic  eta]                    # 0xf49c
- - "𝜼": [t: bold italic  eta]                    # 0x1d73c
- - "": [t: bold italic  theta]                  # 0xf49d
- - "𝜽": [t: bold italic  theta]                  # 0x1d73d
- - "": [t: bold italic  iota]                   # 0xf49e
- - "𝜾": [t: bold italic  iota]                   # 0x1d73e
- - "": [t: bold italic  kappa]                  # 0xf49f
- - "𝜿": [t: bold italic  kappa]                  # 0x1d73f
- - "": [t: bold italic  lamda]                  # 0xf4a0
- - "𝝀": [t: bold italic  lamda]                  # 0x1d740
- - "": [t: bold italic  mu]                     # 0xf4a1
- - "𝝁": [t: bold italic  mu]                     # 0x1d741
- - "": [t: bold italic  nu]                     # 0xf4a2
- - "𝝂": [t: bold italic  nu]                     # 0x1d742
- - "": [t: bold italic  xi]                     # 0xf4a3
- - "𝝃": [t: bold italic  xi]                     # 0x1d743
- - "": [t: bold italic  omicron]                # 0xf4a4
- - "𝝄": [t: bold italic  omicron]                # 0x1d744
- - "": [t: bold italic  pi]                     # 0xf4a5
- - "𝝅": [t: bold italic  pi]                     # 0x1d745
- - "": [t: bold italic  rho]                    # 0xf4a6
- - "𝝆": [t: bold italic  rho]                    # 0x1d746
- - "": [t: bold italic  final sigma]            # 0xf4a7
- - "𝝇": [t: bold italic  final sigma]            # 0x1d747
- - "": [t: bold italic  sigma]                  # 0xf4a8
- - "𝝈": [t: bold italic  sigma]                  # 0x1d748
- - "": [t: bold italic  tau]                    # 0xf4a9
- - "𝝉": [t: bold italic  tau]                    # 0x1d749
- - "": [t: bold italic  upsilon]                # 0xf4aa
- - "𝝊": [t: bold italic  upsilon]                # 0x1d74a
- - "": [t: bold italic  phi]                    # 0xf4ab
- - "𝝋": [t: bold italic  phi]                    # 0x1d74b
- - "": [t: bold italic  chi]                    # 0xf4ac
- - "𝝌": [t: bold italic  chi]                    # 0x1d74c
- - "": [t: bold italic  psi]                    # 0xf4ad
- - "𝝍": [t: bold italic  psi]                    # 0x1d74d
- - "": [t: bold italic  omega]                  # 0xf4ae
- - "𝝎": [t: bold italic  omega]                  # 0x1d74e
+ - "": [t: bold italic alpha]                  # 0xf496
+ - "𝜶": [t: bold italic alpha]                  # 0x1d736
+ - "": [t: bold italic beta]                   # 0xf497
+ - "𝜷": [t: bold italic beta]                   # 0x1d737
+ - "": [t: bold italic gamma]                  # 0xf498
+ - "𝜸": [t: bold italic gamma]                  # 0x1d738
+ - "": [t: bold italic delta]                  # 0xf499
+ - "𝜹": [t: bold italic delta]                  # 0x1d739
+ - "": [t: bold italic epsilon]                # 0xf49a
+ - "𝜺": [t: bold italic epsilon]                # 0x1d73a
+ - "": [t: bold italic zeta]                   # 0xf49b
+ - "𝜻": [t: bold italic zeta]                   # 0x1d73b
+ - "": [t: bold italic eta]                    # 0xf49c
+ - "𝜼": [t: bold italic eta]                    # 0x1d73c
+ - "": [t: bold italic theta]                  # 0xf49d
+ - "𝜽": [t: bold italic theta]                  # 0x1d73d
+ - "": [t: bold italic iota]                   # 0xf49e
+ - "𝜾": [t: bold italic iota]                   # 0x1d73e
+ - "": [t: bold italic kappa]                  # 0xf49f
+ - "𝜿": [t: bold italic kappa]                  # 0x1d73f
+ - "": [t: bold italic lamda]                  # 0xf4a0
+ - "𝝀": [t: bold italic lamda]                  # 0x1d740
+ - "": [t: bold italic mu]                     # 0xf4a1
+ - "𝝁": [t: bold italic mu]                     # 0x1d741
+ - "": [t: bold italic nu]                     # 0xf4a2
+ - "𝝂": [t: bold italic nu]                     # 0x1d742
+ - "": [t: bold italic xi]                     # 0xf4a3
+ - "𝝃": [t: bold italic xi]                     # 0x1d743
+ - "": [t: bold italic omicron]                # 0xf4a4
+ - "𝝄": [t: bold italic omicron]                # 0x1d744
+ - "": [t: bold italic pi]                     # 0xf4a5
+ - "𝝅": [t: bold italic pi]                     # 0x1d745
+ - "": [t: bold italic rho]                    # 0xf4a6
+ - "𝝆": [t: bold italic rho]                    # 0x1d746
+ - "": [t: bold italic final sigma]            # 0xf4a7
+ - "𝝇": [t: bold italic final sigma]            # 0x1d747
+ - "": [t: bold italic sigma]                  # 0xf4a8
+ - "𝝈": [t: bold italic sigma]                  # 0x1d748
+ - "": [t: bold italic tau]                    # 0xf4a9
+ - "𝝉": [t: bold italic tau]                    # 0x1d749
+ - "": [t: bold italic upsilon]                # 0xf4aa
+ - "𝝊": [t: bold italic upsilon]                # 0x1d74a
+ - "": [t: bold italic phi]                    # 0xf4ab
+ - "𝝋": [t: bold italic phi]                    # 0x1d74b
+ - "": [t: bold italic chi]                    # 0xf4ac
+ - "𝝌": [t: bold italic chi]                    # 0x1d74c
+ - "": [t: bold italic psi]                    # 0xf4ad
+ - "𝝍": [t: bold italic psi]                    # 0x1d74d
+ - "": [t: bold italic omega]                  # 0xf4ae
+ - "𝝎": [t: bold italic omega]                  # 0x1d74e
  - "": [t: bold partial differential]           # 0xf4af
  - "𝝏": [t: bold partial differential]           # 0x1d74f
  - "": [t: bold italic epsilon]                 # 0xf4b0
@@ -10274,56 +10274,56 @@
      - t: omega
  - "": [t: bold nabla]                          # 0xf509
  - "𝞩": [t: bold nabla]                          # 0x1d7a9
- - "": [t: bold italic  alpha]                  # 0xf50a
- - "𝞪": [t: bold italic  alpha]                  # 0x1d7aa
- - "": [t: bold italic  beta]                   # 0xf50b
- - "𝞫": [t: bold italic  beta]                   # 0x1d7ab
- - "": [t: bold italic  gamma]                  # 0xf50c
- - "𝞬": [t: bold italic  gamma]                  # 0x1d7ac
- - "": [t: bold italic  delta]                  # 0xf50d
- - "𝞭": [t: bold italic  delta]                  # 0x1d7ad
- - "": [t: bold italic  epsilon]                # 0xf50e
- - "𝞮": [t: bold italic  epsilon]                # 0x1d7ae
- - "": [t: bold italic  zeta]                   # 0xf50f
- - "𝞯": [t: bold italic  zeta]                   # 0x1d7af
- - "": [t: bold italic  eta]                    # 0xf510
- - "𝞰": [t: bold italic  eta]                    # 0x1d7b0
- - "": [t: bold italic  theta]                  # 0xf511
- - "𝞱": [t: bold italic  theta]                  # 0x1d7b1
- - "": [t: bold italic  iota]                   # 0xf512
- - "𝞲": [t: bold italic  iota]                   # 0x1d7b2
- - "": [t: bold italic  kappa]                  # 0xf513
- - "𝞳": [t: bold italic  kappa]                  # 0x1d7b3
- - "": [t: bold italic  lamda]                  # 0xf514
- - "𝞴": [t: bold italic  lamda]                  # 0x1d7b4
- - "": [t: bold italic  mu]                     # 0xf515
- - "𝞵": [t: bold italic  mu]                     # 0x1d7b5
- - "": [t: bold italic  nu]                     # 0xf516
- - "𝞶": [t: bold italic  nu]                     # 0x1d7b6
- - "": [t: bold italic  xi]                     # 0xf517
- - "𝞷": [t: bold italic  xi]                     # 0x1d7b7
- - "": [t: bold italic  omicron]                # 0xf518
- - "𝞸": [t: bold italic  omicron]                # 0x1d7b8
- - "": [t: bold italic  pi]                     # 0xf519
- - "𝞹": [t: bold italic  pi]                     # 0x1d7b9
- - "": [t: bold italic  rho]                    # 0xf51a
- - "𝞺": [t: bold italic  rho]                    # 0x1d7ba
- - "": [t: bold italic  final sigma]            # 0xf51b
- - "𝞻": [t: bold italic  final sigma]            # 0x1d7bb
- - "": [t: bold italic  sigma]                  # 0xf51c
- - "𝞼": [t: bold italic  sigma]                  # 0x1d7bc
- - "": [t: bold italic  tau]                    # 0xf51d
- - "𝞽": [t: bold italic  tau]                    # 0x1d7bd
- - "": [t: bold italic  upsilon]                # 0xf51e
- - "𝞾": [t: bold italic  upsilon]                # 0x1d7be
- - "": [t: bold italic  phi]                    # 0xf51f
- - "𝞿": [t: bold italic  phi]                    # 0x1d7bf
- - "": [t: bold italic  chi]                    # 0xf520
- - "𝟀": [t: bold italic  chi]                    # 0x1d7c0
- - "": [t: bold italic  psi]                    # 0xf521
- - "𝟁": [t: bold italic  psi]                    # 0x1d7c1
- - "": [t: bold italic  omega]                  # 0xf522
- - "𝟂": [t: bold italic  omega]                  # 0x1d7c2
+ - "": [t: bold italic alpha]                  # 0xf50a
+ - "𝞪": [t: bold italic alpha]                  # 0x1d7aa
+ - "": [t: bold italic beta]                   # 0xf50b
+ - "𝞫": [t: bold italic beta]                   # 0x1d7ab
+ - "": [t: bold italic gamma]                  # 0xf50c
+ - "𝞬": [t: bold italic gamma]                  # 0x1d7ac
+ - "": [t: bold italic delta]                  # 0xf50d
+ - "𝞭": [t: bold italic delta]                  # 0x1d7ad
+ - "": [t: bold italic epsilon]                # 0xf50e
+ - "𝞮": [t: bold italic epsilon]                # 0x1d7ae
+ - "": [t: bold italic zeta]                   # 0xf50f
+ - "𝞯": [t: bold italic zeta]                   # 0x1d7af
+ - "": [t: bold italic eta]                    # 0xf510
+ - "𝞰": [t: bold italic eta]                    # 0x1d7b0
+ - "": [t: bold italic theta]                  # 0xf511
+ - "𝞱": [t: bold italic theta]                  # 0x1d7b1
+ - "": [t: bold italic iota]                   # 0xf512
+ - "𝞲": [t: bold italic iota]                   # 0x1d7b2
+ - "": [t: bold italic kappa]                  # 0xf513
+ - "𝞳": [t: bold italic kappa]                  # 0x1d7b3
+ - "": [t: bold italic lamda]                  # 0xf514
+ - "𝞴": [t: bold italic lamda]                  # 0x1d7b4
+ - "": [t: bold italic mu]                     # 0xf515
+ - "𝞵": [t: bold italic mu]                     # 0x1d7b5
+ - "": [t: bold italic nu]                     # 0xf516
+ - "𝞶": [t: bold italic nu]                     # 0x1d7b6
+ - "": [t: bold italic xi]                     # 0xf517
+ - "𝞷": [t: bold italic xi]                     # 0x1d7b7
+ - "": [t: bold italic omicron]                # 0xf518
+ - "𝞸": [t: bold italic omicron]                # 0x1d7b8
+ - "": [t: bold italic pi]                     # 0xf519
+ - "𝞹": [t: bold italic pi]                     # 0x1d7b9
+ - "": [t: bold italic rho]                    # 0xf51a
+ - "𝞺": [t: bold italic rho]                    # 0x1d7ba
+ - "": [t: bold italic final sigma]            # 0xf51b
+ - "𝞻": [t: bold italic final sigma]            # 0x1d7bb
+ - "": [t: bold italic sigma]                  # 0xf51c
+ - "𝞼": [t: bold italic sigma]                  # 0x1d7bc
+ - "": [t: bold italic tau]                    # 0xf51d
+ - "𝞽": [t: bold italic tau]                    # 0x1d7bd
+ - "": [t: bold italic upsilon]                # 0xf51e
+ - "𝞾": [t: bold italic upsilon]                # 0x1d7be
+ - "": [t: bold italic phi]                    # 0xf51f
+ - "𝞿": [t: bold italic phi]                    # 0x1d7bf
+ - "": [t: bold italic chi]                    # 0xf520
+ - "𝟀": [t: bold italic chi]                    # 0x1d7c0
+ - "": [t: bold italic psi]                    # 0xf521
+ - "𝟁": [t: bold italic psi]                    # 0x1d7c1
+ - "": [t: bold italic omega]                  # 0xf522
+ - "𝟂": [t: bold italic omega]                  # 0x1d7c2
  - "": [t: bold partial differential]           # 0xf523
  - "𝟃": [t: bold partial differential]           # 0x1d7c3
  - "": [t: bold italic epsilon]                 # 0xf524
