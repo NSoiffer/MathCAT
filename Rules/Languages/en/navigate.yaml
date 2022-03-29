@@ -387,8 +387,8 @@
   name: move-zoom-enhanced
   tag: "*"
   match: 
-    - "($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and "
-    - "$NavMode = 'Enhanced'" 
+    - "DEBUG(($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and "
+    - "$NavMode = 'Enhanced')" 
   replace:
     # don't bother with MatchCounter since we only get here if > 1
       - with:
@@ -495,7 +495,7 @@
 -
   name: move-to-start-or-end-2d
   tag: "*"
-  match: "DEBUG( ($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and IsNode(.., '2D') )"
+  match: "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and IsNode(.., '2D')"
   replace:
     test:
         if: "self::m:mrow"
@@ -574,7 +574,7 @@
 # 		::EndPosition = child(child(previous(^match), index(match)),0).offset;
 #   };
 
-# # no prevous row -- in first row -- don't move
+# # no previous row -- in first row -- don't move
 # mtd ? ( ::NavCommand=="MoveCellUp" )
 # => MoveCell {
 # 		ruleRef = name(^^match);
@@ -592,7 +592,7 @@
 # 		::EndPosition = child(child(next(^match), index(match)),0).offset;
 #   };
 
-# # no prevous row -- in last row -- don't move
+# # no previous row -- in last row -- don't move
 # mtd ? ( ::NavCommand=="MoveCellDown" )
 # => MoveCell {
 # 		ruleRef = name(^^match);
@@ -628,7 +628,7 @@
 
 
 
-# # Rules for columnar math (mstack and mlondiv) -- each row is an msrow or mscarries except for the start of mlongdiv
+# # Rules for columnar math (mstack and mlongdiv) -- each row is an msrow or mscarries except for the start of mlongdiv
 # # FIX:  not dealing with different number of digits on different lines
 # # FIX:  not dealing with + (etc) on same line if they are on the right side (Dutch, others)
 # # FIX:  not dealing with intervening msline (say it and move on??)
@@ -860,7 +860,7 @@
   match: "$NavCommand = 'MoveNext' and $NavMode!='Character' and not($AutoZoomOut) and $EdgeNode/@id!=@id"
   replace:
     - test:
-        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose' and $NavCommand = 'MoveNext'"
+        if: "$MatchCounter = 0 and $NavVerbosity != 'Terse' and $NavCommand = 'MoveNext'"
         then:
           - t: "can't move right"
     - with:
@@ -889,7 +889,7 @@
     - "EdgeNode(., 'right', 'math')/@id!=@id"   # at edge of math
   replace:
     - test:
-        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+        if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
         then:
           - t: "can't move right, end of math"
           - pause: long
@@ -995,26 +995,26 @@
   name: move-next-default
   tag: "*"
   match:
-    - "$NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext'"
+  - "$NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext'"
   replace:
-    - test:
-        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-        then:
-          - test:
-            - if: "$NavCommand = 'MoveNext'"
-              then: [t:  move]
-            - else_if: "$NavCommand = 'ReadNext'"
-              then: [t: "read"]
-              else: [t: "describe"]
-          - t: "right"
-          - pause: short
-          - test:
-              if: "IsNode(.., '2D')"
-              then:
-                - with:
-                    variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]
-                    replace: [x: ".."]
-    - set_variables: [NavNode: "following-sibling::*[1]/@id"]
+  - test:
+      if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+      then:
+      - test:
+        - if: "$NavCommand = 'MoveNext'"
+          then: [t:  move]
+        - else_if: "$NavCommand = 'ReadNext'"
+          then: [t: "read"]
+          else: [t: "describe"]
+      - t: "right"
+      - pause: short
+  - test:
+      if: "IsNode(.., '2D')"
+      then:
+        - with:
+            variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]
+            replace: [x: ".."]
+  - set_variables: [NavNode: "following-sibling::*[1]/@id"]
 
 
 
@@ -1029,7 +1029,7 @@
   match: "$NavCommand = 'MovePrevious' and $NavMode!='Character' and not($AutoZoomOut) and $EdgeNode/@id!=@id"
   replace:
     - test:
-        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose' and $NavCommand = 'MovePrevious'"
+        if: "$MatchCounter = 0 and $NavVerbosity != 'Terse' and $NavCommand = 'MovePrevious'"
         then:
           - t: "can't move left"
     - with:
@@ -1058,7 +1058,7 @@
     - "EdgeNode(., 'left', 'math')/@id!=@id"   # at edge of math
   replace:
     - test:
-        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+        if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
         then:
           - t: "can't move left, start of math"
           - pause: long
@@ -1165,24 +1165,24 @@
   match:
     - "$NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious'"
   replace:
-    - test:
-        if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-        then:
-          - test:
-            - if: "$NavCommand = 'MovePrevious'"
-              then: [t:  move]
-            - else_if: "$NavCommand = 'ReadPrevious'"
-              then: [t: "read"]
-              else: [t: "describe"]
-          - t: "left"
-          - pause: short
-          - test:
-              if: "IsNode(.., '2D')"
-              then:
-                - with:
-                    variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]
-                    replace: [x: ".."]
-    - set_variables: [NavNode: "preceding-sibling::*[1]/@id"]
+  - test:
+      if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+      then:
+      - test:
+        - if: "$NavCommand = 'MovePrevious'"
+          then: [t:  move]
+        - else_if: "$NavCommand = 'ReadPrevious'"
+          then: [t: "read"]
+          else: [t: "describe"]
+      - t: "left"
+      - pause: short
+  - test:
+      if: "IsNode(.., '2D')"
+      then:
+        - with:
+            variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]
+            replace: [x: ".."]
+  - set_variables: [NavNode: "preceding-sibling::*[1]/@id"]
 
 
 
@@ -1327,10 +1327,7 @@
 -
   name: where-am-i-start
   tag: "*"
-  match:
-    - "DEBUG(
-        ($NavCommand = 'WhereAmI' or $NavCommand = 'WhereAmIAll') and $MatchCounter = 0
-      )"
+  match: "($NavCommand = 'WhereAmI' or $NavCommand = 'WhereAmIAll') and $MatchCounter = 0"
   replace:
     - translate: "@id"
     - pause: long
