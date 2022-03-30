@@ -151,7 +151,7 @@ pub fn as_vec_checked(value: &Yaml) -> Result<&Vec<Yaml>> {
 }
 
 /// Returns the Yaml as a `&str` or an error if it isn't.
-pub fn as_str_checked<'a>(yaml: &'a Yaml) -> Result<&'a str> {
+pub fn as_str_checked(yaml: &Yaml) -> Result<&str> {
     return Ok( yaml.as_str().ok_or_else(|| yaml_type_err(yaml, "string"))? );
 }
 
@@ -278,6 +278,7 @@ impl<'c, 'm:'c> TreeOrString<'c, 'm, Element<'m>> for Element<'m> {
 /// 'Replacement' is an enum that contains all the potential replacement types/structs
 /// Hence there are fields 'Test' ("test:"), 'Text" ("t:"), "XPath", etc
 #[derive(Debug, Clone)]
+#[allow(clippy::upper_case_acronyms)]
 enum Replacement {
     // Note: all of these are pointer types
     Text(String),
@@ -398,7 +399,7 @@ impl<'r> InsertChildren {
             bail!("Missing 'nodes' as part of 'insert'.\n    \
                   Suggestion: add 'nodes:' or if present, indent so it is contained in 'insert'");
         }
-        let nodes = as_str_checked(&nodes)?;
+        let nodes = as_str_checked(nodes)?;
         let replace = &insert["replace"];
         if replace.is_badvalue() { 
             bail!("Missing 'replace' as part of 'insert'.\n    \
@@ -527,7 +528,7 @@ impl<'r> Intent {
         return T::from_element(result);
 
         /// "lift" up the children any "TEMP_NAME" child -- could short circuit when only one child
-        fn lift_children<'c>(result: Element<'c>) -> Element<'c> {
+        fn lift_children(result: Element) -> Element {
             // debug!("lift_children:\n{}", mml_to_string(&result));
             result.replace_children(
                 result.children().iter()
@@ -641,17 +642,13 @@ impl<'r> TranslateExpression {
     }
         
     fn replace<'c, 's:'c, 'm:'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
-        if self.id.string.contains("@") {
+        if self.id.string.contains('@') {
             let xpath_value = self.id.evaluate(rules_with_context.get_context(), mathml)?;
             let id = match xpath_value {
                 Value::String(s) => Some(s),
                 Value::Nodeset(nodes) => {
                     if nodes.size() == 1 {
-                        if let Some(attr) = nodes.document_order_first().unwrap().attribute() {
-                            Some(attr.value().to_string())
-                        } else {
-                            None
-                        }
+                        nodes.document_order_first().unwrap().attribute().map(|attr| attr.value().to_string())
                     } else {
                         None
                     }
@@ -703,17 +700,16 @@ impl<'r> ReplacementArray {
     /// Any errors are passed back out.
     pub fn build(replacements: &Yaml) -> Result<ReplacementArray> {
         // replacements is either a single replacement or an array of replacements
-        let result;
-        if replacements.is_array() {
+        let result= if replacements.is_array() {
             let replacements = replacements.as_vec().unwrap();
-            result = replacements
+            replacements
                 .iter()
                 .enumerate()    // useful for errors
                 .map(|(i, r)| Replacement::build(r)
                             .chain_err(|| format!("replacement #{} of {}", i+1, replacements.len())))
-                .collect::<Result<Vec<Replacement>>>()?;
+                .collect::<Result<Vec<Replacement>>>()?
         } else {
-            result = vec![ Replacement::build(replacements)?];
+            vec![ Replacement::build(replacements)?]
         };
 
         return Ok( ReplacementArray{ replacements: result } );
@@ -880,7 +876,7 @@ impl<'r> MyXPath {
             Yaml::Array(v) =>
                 // array of strings -- concatenate them together
                 v.iter()
-                    .map(|str| as_str_checked(str))
+                    .map(as_str_checked)
                     .collect::<Result<Vec<&str>>>()?
                     .join(" "),
             _ => bail!("Bad value when trying to create an xpath: {}", yaml_to_string(xpath, 1)),
@@ -894,11 +890,11 @@ impl<'r> MyXPath {
         let compiled_xpath = factory.build(&xpath_with_debug_info)
                         .chain_err(|| format!(
                             "Could not compile XPath for pattern:\n{}{}",
-                            &xpath, more_details(&xpath)))?;
+                            &xpath, more_details(xpath)))?;
         return match compiled_xpath {
             Some(xpath) => Ok(xpath),
             None => bail!("Problem compiling Xpath for pattern:\n{}{}",
-                            &xpath, more_details(&xpath)),
+                            &xpath, more_details(xpath)),
         };
 
         
@@ -993,9 +989,9 @@ impl<'r> MyXPath {
                             count -= 1;
                             if count == 0 {
                                 let i_end = xpath.len() - remainder.len() + i_paren; 
-                                let escaped_arg = &xpath[debug_start+6..i_end].to_string().replace("\"", "\\\"");
+                                let escaped_arg = &xpath[debug_start+6..i_end].to_string().replace('"', "\\\"");
                                 let contents = MyXPath::add_debug_string_arg(&xpath[debug_start+6..i_end])?;
-                                return Ok( string_start + &contents + ", \"" + &escaped_arg + "\" "
+                                return Ok( string_start + &contents + ", \"" + escaped_arg + "\" "
                                                 + &MyXPath::add_debug_string_arg(&xpath[i_end..])? );
                             }
                         }    
@@ -1415,7 +1411,7 @@ impl VariableDefinition {
                             yaml_to_string(name_value_def, 1) );
                 }
                 let (name, value) = map.iter().next().unwrap();
-                let name = as_str_checked( &name)
+                let name = as_str_checked( name)
                     .chain_err(|| format!( "definition name is not a string: {}",
                             yaml_to_string(name, 1) ))?.to_string();
                 match value {
@@ -1547,10 +1543,7 @@ impl<'c, 'r> ContextStack<'c> {
         for def in &new_vars.defs {
             // get the old value (might not be defined)
             let qname = QName::new(def.name.as_str());
-            let old_value = match evaluation.value_of(qname) {
-                Some(val) => Some( val.clone() ),   // &Value -> Value
-                None => None,
-            };
+            let old_value = evaluation.value_of(qname).map(|val| val.clone());
             old_values.defs.push( VariableValue{ name: def.name.clone(), value: old_value} );
         }
 
@@ -1682,7 +1675,7 @@ impl UnicodeDef {
                          .collect::<Hash>()
                     )
                 },
-                Yaml::String(s) => Yaml::String( s.replace(".", ch) ),
+                Yaml::String(s) => Yaml::String( s.replace('.', ch) ),
                 _ => yaml.clone(),
             }
         }
@@ -1846,7 +1839,7 @@ impl SpeechRules {
             }
         };
         return SpeechRules {
-            error: error,
+            error,
             name,
             rules: HashMap::with_capacity(1),
             unicode_short: Rc::new( RefCell::new (HashMap::with_capacity(1)) ),

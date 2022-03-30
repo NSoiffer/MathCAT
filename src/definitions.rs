@@ -144,7 +144,7 @@ pub fn read_definitions_file(locations: &Locations) -> Result<()> {
         .map(|path| 
                 match path {
                     None => Ok(()),
-                    Some(path) => read_one_definitions_file(&path)
+                    Some(path) => read_one_definitions_file(path)
                 }
             )
         .collect();
@@ -201,7 +201,7 @@ fn verify_definitions() -> Result<()> {
             }
         }
         for (name,collection) in name_definition_map.iter() {
-            if name.find("number").is_some() && name.find("fraction").is_none() {
+            if name.contains("number") && !name.contains("fraction") {
                 match collection {
                     Contains::Vec(v) => {
                         let v = v.borrow();
@@ -227,7 +227,7 @@ fn read_one_definitions_file(path: &Path) -> Result<()> {
     let defs_build_fn = |variable_def_list: &Yaml| {
         // Rule::DefinitionList
         // debug!("variable_def_list {} is\n{}", yaml_to_type(variable_def_list), yaml_to_string(variable_def_list));
-        let vec = crate::speech::as_vec_checked(&variable_def_list)
+        let vec = crate::speech::as_vec_checked(variable_def_list)
                     .chain_err(||format!("in file {:?}", path.to_str()))?;
         for variable_def in vec {
             build_values(variable_def).chain_err(||format!("in file {:?}", path.to_str()))?;

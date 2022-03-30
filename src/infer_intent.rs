@@ -3,6 +3,7 @@
 //! The inference is added to the MathML
 //!
 //! The implementation of the module is on hold until the MathML committee figures out how it wants to do this.
+#![allow(clippy::needless_return)]
 
 use sxd_document::dom::*;
 use crate::speech::SpeechRulesWithContext;
@@ -12,8 +13,8 @@ use crate::pretty_print::mml_to_string;
 use crate::xpath_functions::is_leaf;
 use regex::Regex;
 
-pub const LITERAL_NAME: &'static str = "literal";
-const IMPLICIT_FUNCTION_NAME: &'static str = "apply-function";
+pub const LITERAL_NAME: &str = "literal";
+const IMPLICIT_FUNCTION_NAME: &str = "apply-function";
 
 lazy_static! {
     static ref LITERAL: Regex = Regex::new(r"^[\d\w_-]+$").unwrap();
@@ -56,18 +57,18 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
         }
     } else if let Some(i) = intent_str.find('(') {
         // deal with f ( x, y, ...) where f, x, y (etc) can be "intent"
-        let (function_name, before_paren) = build_intent(rules_with_context, &intent_str[..i].trim_end(), mathml)?;
+        let (function_name, before_paren) = build_intent(rules_with_context, intent_str[..i].trim_end(), mathml)?;
         assert_eq!(before_paren, "");        // shouldn't be anything left after literal/arg ref
         debug!("function name:\n  {}", crate::pretty_print::mml_to_string(&function_name));
 
-        let (children, rest) = build_intent_children(rules_with_context, &intent_str[i..].trim_start(), mathml)?;
+        let (children, rest) = build_intent_children(rules_with_context, intent_str[i..].trim_start(), mathml)?;
         let mut head = lift_function_name(rules_with_context.get_document(), function_name, children);
         let mut rest_intent_str = rest;
 
         let mut terminator = rest_intent_str.find('(');
         while terminator.is_some() {
             let i = terminator.unwrap();
-            let (children, rest) = build_intent_children(rules_with_context, &rest_intent_str[i..].trim_start(), mathml)?;
+            let (children, rest) = build_intent_children(rules_with_context, rest_intent_str[i..].trim_start(), mathml)?;
             head = lift_function_name(rules_with_context.get_document(), head, children);
             rest_intent_str = rest.trim_start();
             terminator = rest_intent_str.find('(');
@@ -117,10 +118,10 @@ fn build_intent_children<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut S
                 rest_intent_str = rest.trim_start();
             },
             ',' => {
-                let (child, _) = build_intent(rules_with_context, &rest_intent_str[..i].trim_end(), mathml)?;
+                let (child, _) = build_intent(rules_with_context, rest_intent_str[..i].trim_end(), mathml)?;
                 debug!("    before ',':\n      {}", crate::pretty_print::mml_to_string(&child));
                 children.push(child);    
-                rest_intent_str = &rest_intent_str[i+1..].trim_start();
+                rest_intent_str = rest_intent_str[i+1..].trim_start();
             }
             _ => {
                 assert_eq!(char_found, ')');
@@ -130,7 +131,7 @@ fn build_intent_children<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut S
                     debug!("    before ')':\n      {}", crate::pretty_print::mml_to_string(&child));
                     children.push(child);        
                 }
-                return Ok( (children, &rest_intent_str[i+1..].trim_start() ) );
+                return Ok( (children, rest_intent_str[i+1..].trim_start() ) );
             }
         };
         terminator = rest_intent_str.find(&[',', '(', ')'][..]);

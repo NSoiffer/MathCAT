@@ -348,7 +348,7 @@ pub fn errors_to_string(e:&Error) -> String {
 }
 
 
-fn add_ids<'a>(mathml: Element<'a>) -> Element<'a> {
+fn add_ids(mathml: Element) -> Element {
     use std::time::SystemTime;
     let time = if cfg!(target_family = "wasm") {
         rand::random::<usize>()
@@ -361,7 +361,7 @@ fn add_ids<'a>(mathml: Element<'a>) -> Element<'a> {
     add_ids_to_all(mathml, &prefix, 0);
     return mathml;
 
-    fn add_ids_to_all<'a>(mathml: Element<'a>, id_prefix: &str, count: usize) -> usize {
+    fn add_ids_to_all(mathml: Element, id_prefix: &str, count: usize) -> usize {
         let mut count = count;
         if mathml.attribute("id").is_none() {
             mathml.set_attribute_value("id", (id_prefix.to_string() + &count.to_string()).as_str());
@@ -381,7 +381,7 @@ fn add_ids<'a>(mathml: Element<'a>) -> Element<'a> {
     }
 }
 
-pub fn get_element<'a>(package: &'a Package) -> Element<'a> {
+pub fn get_element(package: &Package) -> Element {
     let doc = package.as_document();
     let mut result = None;
     for root_child in doc.root().children() {
@@ -432,7 +432,7 @@ pub fn trim_element(e: &Element) {
 
     // hack to avoid non-breaking whitespace from being removed -- move to a unique non-whitespace char then back
     const TEMP_NBSP: &str = "\u{F8FB}";
-    let trimmed_text = single_text.replace(" ", TEMP_NBSP).trim().replace(TEMP_NBSP, " ");
+    let trimmed_text = single_text.replace(' ', TEMP_NBSP).trim().replace(TEMP_NBSP, " ");
     if !e.children().is_empty() && !trimmed_text.is_empty() {
         // FIX: we have a problem -- what should happen???
         // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash

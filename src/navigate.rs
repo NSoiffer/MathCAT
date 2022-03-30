@@ -54,7 +54,7 @@ impl fmt::Display for NavigationPosition {
     }
 }
 
-const ILLEGAL_NODE_ID: &'static str = "!not set";     // an illegal 'id' value
+const ILLEGAL_NODE_ID: &str = "!not set";     // an illegal 'id' value
 impl Default for NavigationPosition {
     fn default() -> Self {
         NavigationPosition {
@@ -164,7 +164,7 @@ impl NavigationState {
         }
     }
 
-    pub fn get_navigation_mathml_id<'a>(&self, mathml: Element<'a>) -> (String, usize) {
+    pub fn get_navigation_mathml_id(&self, mathml: Element) -> (String, usize) {
         if self.position_stack.is_empty() {
             return (mathml.attribute_value("id").unwrap().to_string(), 0);
         } else {
@@ -214,8 +214,8 @@ impl NavigationState {
 
         fn convert_last_char_to_number(str: &str) -> usize {
             let last_char = str.as_bytes()[str.len()-1];
-            assert!( '0' as u8 <= last_char && last_char <= '9' as u8);
-            return (last_char - '0' as u8) as usize;
+            assert!( b'0' <= last_char && last_char <= b'9');
+            return (last_char - b'0') as usize;
         }
     }
 }
@@ -223,8 +223,8 @@ impl NavigationState {
 // convert the last digit of a Placemarker command to an integer
 fn convert_last_char_to_number(str: &str) -> usize {
     let last_char = str.as_bytes()[str.len()-1];
-    assert!( '0' as u8 <= last_char && last_char <= '9' as u8);
-    return (last_char - '0' as u8) as usize;
+    assert!( b'0' <= last_char && last_char <= b'9');
+    return (last_char - b'0') as usize;
 }
 
 
@@ -269,7 +269,7 @@ pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: E
                     };
                     let mut error_message = format!("Variable '{}' set somewhere in navigate.yaml is nodeset and not an attribute (correct by using '.../@id'??):\n", var_name);
                     if nodes.size() == 0 {
-                        error_message += &format!("0 nodes (false)");
+                        error_message += "0 nodes (false)";
                     } else {
                         let singular = nodes.size()==1;
                         error_message += &format!("{} node{}. {}:",
@@ -290,24 +290,24 @@ pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: E
                     bail!(error_message);
                 },
             } ),
-            Err(__) => bail!("Could not find value for navigation variable '{}'", var_name),
+            Err(_) => bail!("Could not find value for navigation variable '{}'", var_name),
         }
     }
 }
 
 /// Given a key code along with the modifier keys, the current node is moved accordingly (or value reported in some cases).]
 /// The spoken text for the new current node is returned.
-pub fn do_mathml_navigate_key_press<'a>(mathml: Element<'a>,
+pub fn do_mathml_navigate_key_press(mathml: Element,
             key: usize, shift_key: bool, control_key: bool, alt_key: bool, meta_key: bool) -> Result<String> {
     let (command, param) = key_press_to_command_and_param(key, shift_key, control_key, alt_key, meta_key)?;
     return do_navigate_command_and_param(mathml, command, param);
 }
 
-fn do_navigate_command_and_param<'a>(mathml: Element<'a>, command: NavigationCommand, param: NavigationParam) -> Result<String> {
+fn do_navigate_command_and_param(mathml: Element, command: NavigationCommand, param: NavigationParam) -> Result<String> {
     return do_navigate_command_string(mathml, navigation_command_string(command, param));
 }
 
-pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static str) -> Result<String> {   
+pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) -> Result<String> {   
     // first check to see if nav file has been changed -- don't bother checking in loop below
     crate::speech::SpeechRules::update();
     NAVIGATION_RULES.with(|rules| { rules.borrow_mut().read_files() })?;
@@ -315,7 +315,7 @@ pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static
     // If no speech happened for some calls, we try the call the call again (e.g, no speech for invisible times).
     // To prevent to infinite loop, we limit the number of tries
     const LOOP_LIMIT: usize = 3;
-    static TRY_AGAIN: &'static str = "try again";
+    static TRY_AGAIN: &str = "try again";
     for loop_count in 0..LOOP_LIMIT {
         if mathml.children().is_empty() {
             bail!("MathML has not been set -- can't navigate");
@@ -349,7 +349,7 @@ pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static
                 let start_node_id = if nav_command == "MoveLastLocation" {
                     match nav_state.pop() {
                         None => mathml.attribute_value("id)").unwrap().to_string(),
-                        Some( (position, _) ) => position.current_node.clone(),
+                        Some( (position, _) ) => position.current_node,
                     }
                 } else {
                     match nav_state.top() {
@@ -385,11 +385,11 @@ pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static
                 nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
                 rules.pref_manager.as_ref().borrow_mut().set_user_prefs("NavMode", &nav_state.mode);
 
-                let nav_position = match context_get_variable(&context, "NavNode", mathml)?.0 {
+                let nav_position = match context_get_variable(context, "NavNode", mathml)?.0 {
                     None => NavigationPosition::default(),
                     Some(node) => NavigationPosition {
                         current_node: node,
-                        current_node_offset: context_get_variable(&context, "NavNodeOffset", mathml)?.1.unwrap() as usize
+                        current_node_offset: context_get_variable(context, "NavNodeOffset", mathml)?.1.unwrap() as usize
                     }
                 };
     
@@ -406,17 +406,17 @@ pub fn do_navigate_command_string<'a>(mathml: Element<'a>, nav_command: &'static
     
                 if (nav_command.starts_with("Move") || nav_command.starts_with("Zoom")) && nav_command != "MoveLastLocation" {
                     // push the new location on the stack
-                    if &nav_position != &NavigationPosition::default() {
+                    if nav_position != NavigationPosition::default() {
                         debug!("nav_state: pushing on {}", &nav_position);
-                        if &nav_position.current_node != ILLEGAL_NODE_ID {
+                        if nav_position.current_node != ILLEGAL_NODE_ID {
                             nav_state.push(nav_position.clone(), nav_command);
                         }
                     }
                 }
 
                 if nav_command.starts_with("SetPlacemarker") {
-                    if let Some(new_node_id) = context_get_variable(&context, "NavNode", mathml)?.0 {
-                        let offset = context_get_variable(&context, "NavNodeOffset", mathml)?.1.unwrap() as usize;
+                    if let Some(new_node_id) = context_get_variable(context, "NavNode", mathml)?.0 {
+                        let offset = context_get_variable(context, "NavNodeOffset", mathml)?.1.unwrap() as usize;
                         nav_state.place_markers[convert_last_char_to_number(nav_command)] = NavigationPosition{ current_node: new_node_id, current_node_offset: offset};
                     }
                 }

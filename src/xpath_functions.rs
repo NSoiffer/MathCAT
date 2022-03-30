@@ -150,7 +150,7 @@ impl IsNode {
             if is_tag(elem, "mn")  {
                 return true;
             }
-            if is_tag(elem, "mi") && is_single_char(to_str(&elem)) {
+            if is_tag(elem, "mi") && is_single_char(to_str(elem)) {
                 // "simple" only if it is a single char (which can be multiple bytes)
                 return true;
             }
@@ -359,7 +359,7 @@ impl Function for IsNode {
 
         let nodes = args.pop_nodeset()?;
         if nodes.size() == 0 {
-            return Err(Error::Other(format!("Missing argument for IsNode") ));
+            return Err(Error::Other("Missing argument for IsNode".to_string() ));
         };
         return Ok(
             Value::Boolean( 
@@ -771,7 +771,7 @@ pub struct IsBracketed;
 impl IsBracketed {
     pub fn is_bracketed(element: &Element, left: &str, right: &str, requires_comma: bool, requires_mrow: bool) -> bool {
         use crate::canonicalize::is_fence;
-        if requires_mrow && !is_tag(&element, "mrow") {
+        if requires_mrow && !is_tag(element, "mrow") {
             return false;
         }
         let children = element.children();

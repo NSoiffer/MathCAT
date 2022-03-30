@@ -34,16 +34,16 @@ lazy_static!{
 	// lowest priority operator so it is never popped off the stack
 	static ref LEFT_FENCEPOST: OperatorInfo = OperatorInfo{ op_type: OperatorTypes::LEFT_FENCE, priority: 0, next: &None };
 
-	static ref INVISIBLE_FUNCTION_APPLICATION: &'static OperatorInfo = OPERATORS.get(&"\u{2061}").unwrap();
-	static ref IMPLIED_TIMES: &'static OperatorInfo = OPERATORS.get(&"\u{2062}").unwrap();
-	static ref IMPLIED_INVISIBLE_COMMA: &'static OperatorInfo = OPERATORS.get(&"\u{2063}").unwrap();
-	static ref IMPLIED_INVISIBLE_PLUS: &'static OperatorInfo = OPERATORS.get(&"\u{2064}").unwrap();
+	static ref INVISIBLE_FUNCTION_APPLICATION: &'static OperatorInfo = OPERATORS.get("\u{2061}").unwrap();
+	static ref IMPLIED_TIMES: &'static OperatorInfo = OPERATORS.get("\u{2062}").unwrap();
+	static ref IMPLIED_INVISIBLE_COMMA: &'static OperatorInfo = OPERATORS.get("\u{2063}").unwrap();
+	static ref IMPLIED_INVISIBLE_PLUS: &'static OperatorInfo = OPERATORS.get("\u{2064}").unwrap();
 
 	// FIX: any other operators that should act the same (e.g, plus-minus and minus-plus)?
-	static ref PLUS: &'static OperatorInfo = OPERATORS.get(&"+").unwrap();
-	static ref MINUS: &'static OperatorInfo = OPERATORS.get(&"-").unwrap();
+	static ref PLUS: &'static OperatorInfo = OPERATORS.get("+").unwrap();
+	static ref MINUS: &'static OperatorInfo = OPERATORS.get("-").unwrap();
 
-	static ref TIMES_SIGN: &'static OperatorInfo = OPERATORS.get(&"×").unwrap();
+	static ref TIMES_SIGN: &'static OperatorInfo = OPERATORS.get("×").unwrap();
 
 	// IMPLIED_TIMES_HIGH_PRIORITY -- used in trig functions for things like sin 2x cos 2x where want > function app priority
 	static ref IMPLIED_TIMES_HIGH_PRIORITY: OperatorInfo = OperatorInfo{
@@ -332,9 +332,9 @@ enum DigitBlockType {
 
 #[derive(PartialEq)]
 enum FunctionNameCertainty {
-	TRUE,
-	MAYBE,
-	FALSE
+	True,
+	Maybe,
+	False
 }
 
 impl CanonicalizeContext {
@@ -448,7 +448,7 @@ impl CanonicalizeContext {
 			"mo" => {
 				// WIRIS editor at least puts non-breaking whitespace as standalone in 'mo'
 				let text = as_text(mathml);
-				if !text.is_empty() && IS_WHITESPACE.is_match(&text) {
+				if !text.is_empty() && IS_WHITESPACE.is_match(text) {
 					// can't throw it out because it is needed by braille -- change to what it really is
 					set_mathml_name(mathml, "mtext");
 				}
@@ -494,7 +494,7 @@ impl CanonicalizeContext {
 					return Some(mathml);
 				}
 				// allow non-breaking whitespace to stay -- needed by braille
-				if IS_WHITESPACE.is_match(&text) {
+				if IS_WHITESPACE.is_match(text) {
 					// normalize to just a single non-breaking space
 					mathml.set_text("\u{A0}");
 				}
@@ -506,7 +506,7 @@ impl CanonicalizeContext {
 				// need to hold onto space for braille
 				// FIX: only do the conversion to non-breaking space if width is above some threshold
 				let width = mathml.attribute_value("width").unwrap_or("0");
-				if width == "0" || width.starts_with("-") {		// testing <= 0 -- could do better
+				if width == "0" || width.starts_with('-') {		// testing <= 0 -- could do better
 					return None;
 				}
 				set_mathml_name(mathml, "mtext");
@@ -520,8 +520,7 @@ impl CanonicalizeContext {
 				let mathml =  if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 					let merged = merge_dots(mathml);
 					let merged = merge_primes(merged);
-					let merged = handle_pseudo_scripts(merged);
-					merged
+					handle_pseudo_scripts(merged)
 				} else {
 					mathml
 				};
@@ -671,7 +670,7 @@ impl CanonicalizeContext {
 
 		/// Merge mtext that is whitespace onto preceding or following mi/mn
 		/// Note: this should be called *after* the mo/mtext cleanup (i.e., after the MathML cleanup loop)
-		fn merge_whitespace<'a>(mrow: Element<'a>) {
+		fn merge_whitespace(mrow: Element) {
 			let mut children = mrow.children();
 			let mut i = 0;
 			while i < children.len() {
@@ -720,7 +719,7 @@ impl CanonicalizeContext {
 		}
 
 		/// look for potential numbers by looking for sequences with commas, spaces, and decimal points
-		fn merge_number_blocks<'a>(mrow: Element<'a>) {
+		fn merge_number_blocks(mrow: Element) {
 			lazy_static!{
 				static ref SEPARATORS: Regex = Regex::new(r"[],. \u{00A0}]").unwrap(); 
 			}
@@ -861,7 +860,7 @@ impl CanonicalizeContext {
 		}
 
 
-		fn is_likely_a_number<'a>(mrow: Element<'a>, mut start: usize, mut end: usize) -> bool {
+		fn is_likely_a_number(mrow: Element, mut start: usize, mut end: usize) -> bool {
 			if count_decimal_pts(mrow, start, end) > 1 {
 				return false;
 			}
@@ -941,11 +940,11 @@ impl CanonicalizeContext {
 				     name(&last_child) == "mo" && is_fence(last_child) );
 		}
 
-		fn count_decimal_pts<'a>(mrow: Element<'a>, start: usize, end: usize) -> usize {
+		fn count_decimal_pts(mrow: Element, start: usize, end: usize) -> usize {
 			let children = mrow.children();
 			let mut n_decimal_pt = 0;
-			for i in start..end {
-				let child = as_element(children[i]);
+			for &child_as_element in children.iter().take(end).skip(start) {
+				let child = as_element(child_as_element);
 				if as_text(child).contains('.')  {
 					n_decimal_pt += 1;
 				}
@@ -953,11 +952,11 @@ impl CanonicalizeContext {
 			return n_decimal_pt;
 		}
 
-		fn merge_block<'a>(mrow: Element<'a>, start: usize, end: usize) {
+		fn merge_block(mrow: Element, start: usize, end: usize) {
 			let children = mrow.children();
 			let mut mn_text = String::with_capacity(4*(end-start)-1);		// true size less than #3 digit blocks + separator
-			for i in start..end {
-				let child = as_element(children[i]);
+			for &child_as_element in children.iter().take(end).skip(start) {
+				let child = as_element(child_as_element);
 				if name(&child) == "mtext" {
 					mn_text.push(' ');
 				} else {
@@ -969,13 +968,13 @@ impl CanonicalizeContext {
 			child.set_text(&mn_text);
 
 			// not very efficient since this is probably causing an array shift each time (array is probably not big though)
-			for i in start+1..end {
-				let child = as_element(children[i]);
+			for &child_as_element in children.iter().take(end).skip(start) {
+				let child = as_element(child_as_element);
 				child.remove_from_parent();
 			}
 		}
 
-		fn merge_dots<'a>(mrow: Element<'a>) -> Element<'a> {
+		fn merge_dots(mrow: Element) -> Element {
 			// merge consecutive <mo>s containing '.' into ellipsis
 			let children = mrow.children();
 			let mut i = 0;
@@ -1004,7 +1003,7 @@ impl CanonicalizeContext {
 			return mrow;
 		}
 
-		fn merge_primes<'a>(mrow: Element<'a>) -> Element<'a> {
+		fn merge_primes(mrow: Element) -> Element {
 			// merge consecutive <mo>s containing primes (in various forms)
 			let mut children = mrow.children();
 			let mut i = 0;
@@ -1037,8 +1036,8 @@ impl CanonicalizeContext {
 			let first_child = as_element(children[start]);
 			let mut new_text = String::with_capacity(end+3-start);	// one per element plus a little extra
 			new_text.push_str(as_text(first_child));
-			for i in start+1..end {
-				let child = as_element(children[i]);
+			for &child_as_element in children.iter().take(end).skip(start) {
+				let child = as_element(child_as_element);
 				let text = as_text(child); 		// only in this function because it is an <mo>
 				new_text.push_str(text);
 				child.remove_from_parent();
@@ -1075,7 +1074,7 @@ impl CanonicalizeContext {
 			return result;
 		}
 
-		fn handle_pseudo_scripts<'a>(mrow: Element<'a>) -> Element<'a> {
+		fn handle_pseudo_scripts(mrow: Element) -> Element {
 			// from https://www.w3.org/TR/MathML3/chapter7.html#chars.pseudo-scripts
 			static PSEUDO_SCRIPTS: phf::Set<&str> = phf_set! {
 				"\"", "'", "*", "`", "ª", "°", "²", "³", "´", "¹", "º",
@@ -1107,7 +1106,7 @@ impl CanonicalizeContext {
 			return mrow;
 		}
 
-		fn convert_to_mmultiscripts<'a>(script: Element<'a>) {
+		fn convert_to_mmultiscripts(script: Element) {
 			let script_name = name(&script);
 			let mut prescripts = vec![];
 			if script_name == "msub" {
@@ -1218,7 +1217,7 @@ impl CanonicalizeContext {
 				return Ok( mathml );
 			},
 			"mrow" => {
-				return Ok( self.canonicalize_mrows_in_mrow(mathml)? );
+				return self.canonicalize_mrows_in_mrow(mathml);
 			},
 			_ => {
 				// recursively try to make mrows in other structures (eg, num/denom in fraction)
@@ -1464,7 +1463,7 @@ impl CanonicalizeContext {
 		}
 	}
 
-	fn canonicalize_mo_text<'a>(&self, mo: Element<'a>) {
+	fn canonicalize_mo_text(&self, mo: Element) {
 		let mut mo_text = as_text(mo);
 		let parent = mo.parent().unwrap().element().unwrap();
 		let parent_name = name(&parent);
@@ -1547,11 +1546,11 @@ impl CanonicalizeContext {
 			// Need to be careful because (sin - cos)(x) needs an infix '-'
 			// Return either the prefix or infix version of the operator
 			if next_node.is_some() &&
-			   context.is_function_name(get_possible_embellished_node(next_node.unwrap()), None) == FunctionNameCertainty::TRUE {
+			   context.is_function_name(get_possible_embellished_node(next_node.unwrap()), None) == FunctionNameCertainty::True {
 				return OperatorTypes::INFIX;
 			}
 			if previous_node.is_some() &&
-			   context.is_function_name(get_possible_embellished_node(previous_node.unwrap()), None) == FunctionNameCertainty::TRUE {
+			   context.is_function_name(get_possible_embellished_node(previous_node.unwrap()), None) == FunctionNameCertainty::True {
 				return OperatorTypes::PREFIX;
 			}
 		
@@ -1633,7 +1632,7 @@ impl CanonicalizeContext {
 	
 		let operator_versions = OperatorVersions::new(op);
 		if operator_versions.prefix.is_some() &&
-		   (top(&parse_stack).last_child_in_mrow().is_none() || !top(&parse_stack).is_operand) {
+		   (top(parse_stack).last_child_in_mrow().is_none() || !top(parse_stack).is_operand) {
 			// debug!("   is prefix");
 			return operator_versions.prefix.unwrap();
 		}
@@ -1649,12 +1648,12 @@ impl CanonicalizeContext {
 		// If there is a matching open vertical bar, it is either at the top of the stack or the entry just below the top
 
 		let has_left_match = if let Some(op_prefix) = operator_versions.prefix {
-			if ptr_eq(top(&parse_stack).op_pair.op, op_prefix) { 	// match at top of stack? (empty matching bars)
+			if ptr_eq(top(parse_stack).op_pair.op, op_prefix) { 	// match at top of stack? (empty matching bars)
 				true
 			} else if parse_stack.len() > 2 {
 				// matching op is below top (operand between matching bars) -- pop, peek, push
 				let old_top = parse_stack.pop().unwrap();		
-				let top_op = top(&parse_stack).op_pair.op;																	// can only access top, so we need to pop off top and push back later
+				let top_op = top(parse_stack).op_pair.op;																	// can only access top, so we need to pop off top and push back later
 				parse_stack.push(old_top);
 				ptr_eq(top_op, op_prefix)
 			} else {
@@ -1685,7 +1684,7 @@ impl CanonicalizeContext {
 				let next_next_children = next_child.following_siblings();
 				let next_next_child = if next_next_children.is_empty() { None } else { Some( as_element(next_next_children[0]) )};
 				Some( self.find_operator(next_child, operator_versions.infix,
-									top(&parse_stack).last_child_in_mrow(), next_next_child) )
+									top(parse_stack).last_child_in_mrow(), next_next_child) )
 			};
 												  
 		// If the next child is a prefix op or a left fence, it will reduce to an operand, so don't consider it an operator
@@ -1797,14 +1796,14 @@ impl CanonicalizeContext {
 		// FIX: need to allow for composition of function names. E.g, (f+g)(x) and (f^2/g)'(x)
 		let node_name = name(&base_of_name);
 		if node_name != "mi" && node_name != "mtext" {
-			return FunctionNameCertainty::FALSE;
+			return FunctionNameCertainty::False;
 		}
 	
 		 // mtext to get Roman
 		 // whitespace is sometimes added to the mi since braille needs it, so do a trim here to get function name
 		let base_name = as_text(base_of_name).trim();
 		if base_name.is_empty() {
-			return FunctionNameCertainty::FALSE;
+			return FunctionNameCertainty::False;
 		}
 		// debug!("    is_function_name({}), {} following nodes", base_name, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
 		return crate::definitions::DEFINITIONS.with(|defs| {
@@ -1814,18 +1813,18 @@ impl CanonicalizeContext {
 		 // UEB seems to think "Sin" (etc) is used for "sin", so we move to lower case
 		 if names.contains(&base_name.to_ascii_lowercase()) {
 				// debug!("     ...is in FunctionNames");
-				return FunctionNameCertainty::TRUE;	// always treated as function names
+				return FunctionNameCertainty::True;	// always treated as function names
 			}
 
 			// We include shapes as function names so that △ABC makes sense since △ and
 			//   the other shapes are not in the operator dictionary
 			let shapes = defs.get_hashset("GeometryShapes").unwrap();
 			if shapes.contains(base_name) {
-				return FunctionNameCertainty::TRUE;	// always treated as function names
+				return FunctionNameCertainty::True;	// always treated as function names
 			}
 	
 			if right_siblings.is_none() {
-				return FunctionNameCertainty::FALSE;	// only accept known names, which is tested above
+				return FunctionNameCertainty::False;	// only accept known names, which is tested above
 			}
 
 			// make sure that what follows starts and ends with parens/brackets
@@ -1833,7 +1832,7 @@ impl CanonicalizeContext {
 			let right_siblings = right_siblings.unwrap();
 			if right_siblings.is_empty() {
 				// debug!("     ...right siblings not None, but zero of them");
-				return FunctionNameCertainty::FALSE;
+				return FunctionNameCertainty::False;
 			}
 
 			let first_child = as_element(right_siblings[0]);
@@ -1844,7 +1843,7 @@ impl CanonicalizeContext {
 
 			if right_siblings.len() < 2 {
 				// debug!("     ...not enough right siblings");
-				return FunctionNameCertainty::FALSE;	// can't be (...)
+				return FunctionNameCertainty::False;	// can't be (...)
 			}
 
 			// at least two siblings are this point -- check that they are parens/brackets
@@ -1853,27 +1852,27 @@ impl CanonicalizeContext {
 			if name(&first_sibling) != "mo"  || !is_left_paren(first_sibling)  // '(' or '['
 			{
 				// debug!("     ...first sibling is not '(' or '['");
-				return FunctionNameCertainty::FALSE;
+				return FunctionNameCertainty::False;
 			}
 	
 			if self.is_likely_chemical_state(node, right_siblings) {
 				// debug!("      ...is_likely_chemical_state=true");
-				return FunctionNameCertainty::TRUE;
+				return FunctionNameCertainty::True;
 			}
 	
 			let likely_names = defs.get_hashset("LikelyFunctionNames").unwrap();
 			if likely_names.contains(base_name) {
-				return FunctionNameCertainty::TRUE;	// don't bother checking contents of parens, consider these as function names
+				return FunctionNameCertainty::True;	// don't bother checking contents of parens, consider these as function names
 			}
 	
 			if is_single_arg(as_text(first_sibling), &right_siblings[1..]) {
 				// debug!("      ...is single arg");
-				return FunctionNameCertainty::TRUE;	// if there is only a single arg, why else would you use parens?
+				return FunctionNameCertainty::True;	// if there is only a single arg, why else would you use parens?
 			};
 
 			if is_comma_arg(as_text(first_sibling), &right_siblings[1..]) {
 				// debug!("      ...is comma arg");
-				return FunctionNameCertainty::TRUE;	// if there is only a single arg, why else would you use parens?
+				return FunctionNameCertainty::True;	// if there is only a single arg, why else would you use parens?
 			};
 	
 			// Names like "Tr" are likely function names, single letter names like "M" or "J" are iffy
@@ -1884,11 +1883,11 @@ impl CanonicalizeContext {
 			let first_char = chars.next().unwrap();		// we know there is at least one byte in it, hence one char
 			if chars.next().is_some() && first_char.is_uppercase() {
 				// debug!("      ...is uppercase name");
-				return FunctionNameCertainty::TRUE;
+				return FunctionNameCertainty::True;
 			}
 
 			// debug!("      ...didn't match options to be a function");
-			return FunctionNameCertainty::MAYBE;		// didn't fit one of the above categories
+			return FunctionNameCertainty::Maybe;		// didn't fit one of the above categories
 		});
 	
 		fn is_single_arg<'a>(open: &str, following_nodes: &[ChildOfElement<'a>]) -> bool {
@@ -1996,7 +1995,7 @@ impl CanonicalizeContext {
 				return false;
 			};
 		
-			return is_int(&integer_part);
+			return is_int(integer_part);
 		}
 
 		fn is_mfrac_ok<'a>(fraction_part: &'a Element<'a>) -> bool {
@@ -2082,7 +2081,7 @@ impl CanonicalizeContext {
 				current_op: OperatorPair<'op>) -> (Element<'a>, OperatorPair<'op>) {
 		let mut new_current_child = current_child;
 		let mut new_current_op = current_op.clone();
-		let previous_op = top(&parse_stack).op_pair.clone();
+		let previous_op = top(parse_stack).op_pair.clone();
 		// debug!(" shift_stack: mrow len={}", top(parse_stack).mrow.children().len().to_string());
 		// debug!(" shift_stack: shift on '{}'; ops: prev '{}/{}', cur '{}/{}'",
 		// 		element_summary(current_child),show_invisible_op_char(previous_op.ch), previous_op.op.priority,
@@ -2142,10 +2141,10 @@ impl CanonicalizeContext {
 	
 	fn reduce_stack<'s, 'a:'s, 'op:'a>(&self, parse_stack: &'s mut Vec<StackInfo<'a, 'op>>, current_priority: usize, stop_at_function_call: bool) {
 		// stop_at_function_call -- hack to to deal with exceptional parsing for things like "sin -2x" (see comments around call of reduce_stack)
-		let mut prev_priority = top(&parse_stack).priority();
+		let mut prev_priority = top(parse_stack).priority();
 		// debug!(" reduce_stack: stack len={}, priority: prev={}, cur={}", parse_stack.len(), prev_priority, current_priority);
 		while current_priority < prev_priority {					// pop off operators until we are back to the right level
-			if stop_at_function_call && ptr_eq(top(&parse_stack).op_pair.op, *INVISIBLE_FUNCTION_APPLICATION) {
+			if stop_at_function_call && ptr_eq(top(parse_stack).op_pair.op, *INVISIBLE_FUNCTION_APPLICATION) {
 				break;
 			}
 	
@@ -2190,7 +2189,7 @@ impl CanonicalizeContext {
 		}
 	
 		// Use lower priority multiplication if current_child is a function (e.g. "cos" in "sin x cos 3y")
-		if self.is_function_name(current_child, None) == FunctionNameCertainty::TRUE{
+		if self.is_function_name(current_child, None) == FunctionNameCertainty::True{
 			return false;
 		}
 	
@@ -2236,8 +2235,7 @@ impl CanonicalizeContext {
 		// FIX: don't touch/canonicalize
 		// 1. if intent is given -- anything intent references
 		// 2. if the mrow starts or ends with a fence, don't merge into parent (parse children only) -- allows for "]a,b["
-		let mut parse_stack = vec![];
-		parse_stack.push(StackInfo::new(mrow.document()));
+		let mut parse_stack = vec![StackInfo::new(mrow.document())];
 		let mut children = mrow.children();
 		let num_children = children.len();
 	
@@ -2250,12 +2248,12 @@ impl CanonicalizeContext {
 			let mut current_op = OperatorPair::new();
 			// figure what the current operator is -- it either comes from the 'mo' (if we have an 'mo') or it is implied
 			if name(&base_of_child) == "mo" &&
-			   !( base_of_child.children().is_empty() || IS_WHITESPACE.is_match(&as_text(base_of_child)) ) { // shouldn't have empty mo node, but...
+			   !( base_of_child.children().is_empty() || IS_WHITESPACE.is_match(as_text(base_of_child)) ) { // shouldn't have empty mo node, but...
 				let previous_op = if top(&parse_stack).is_operand {None} else {Some( top(&parse_stack).op_pair.op )};
 				let next_node = if i_child + 1 < num_children {Some(as_element(children[i_child+1]))} else {None};
 				current_op = OperatorPair{
 					ch: as_text(base_of_child),
-					op: &self.find_operator(base_of_child, previous_op,
+					op: self.find_operator(base_of_child, previous_op,
 							top(&parse_stack).last_child_in_mrow(), next_node)
 				};
 	
@@ -2274,18 +2272,18 @@ impl CanonicalizeContext {
 				if name(&base_of_previous_child) != "mo" {
 					// consecutive operands -- add an invisible operator as appropriate
 					let likely_function_name = self.is_function_name(previous_child, Some(&children[i_child..]));
-					current_op = if likely_function_name == FunctionNameCertainty::TRUE {
-								OperatorPair{ ch: "\u{2061}", op: &*INVISIBLE_FUNCTION_APPLICATION }
+					current_op = if likely_function_name == FunctionNameCertainty::True {
+								OperatorPair{ ch: "\u{2061}", op: *INVISIBLE_FUNCTION_APPLICATION }
 							} else if self.is_mixed_fraction(&previous_child, &children[i_child..])? {
-								OperatorPair{ ch: "\u{2064}", op: &*IMPLIED_INVISIBLE_PLUS }
+								OperatorPair{ ch: "\u{2064}", op: *IMPLIED_INVISIBLE_PLUS }
 							} else if self.is_implied_comma(&previous_child, &current_child) {
-								OperatorPair{ch: "\u{2063}", op: &*IMPLIED_INVISIBLE_COMMA }				  
+								OperatorPair{ch: "\u{2063}", op: *IMPLIED_INVISIBLE_COMMA }				  
 							} else if self.is_implied_separator(&previous_child, &current_child) {
 								OperatorPair{ch: "\u{2063}", op: &*IMPLIED_SEPARATOR_HIGH_PRIORITY }				  
 							} else if self.is_trig_arg(base_of_previous_child, base_of_child, &parse_stack) {
 								OperatorPair{ch: "\u{2062}", op: &*IMPLIED_TIMES_HIGH_PRIORITY }				  
 							} else {
-								OperatorPair{ ch: "\u{2062}", op: &*IMPLIED_TIMES }
+								OperatorPair{ ch: "\u{2062}", op: *IMPLIED_TIMES }
 							};
 	
 					if name(&base_of_child) == "mo" {
@@ -2294,10 +2292,10 @@ impl CanonicalizeContext {
 					} else {
 						// debug!("  Found implicit op {}/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
 						self.reduce_stack(&mut parse_stack, current_op.op.priority,
-							self.is_function_name(base_of_child, None) != FunctionNameCertainty::TRUE);
+							self.is_function_name(base_of_child, None) != FunctionNameCertainty::True);
 		
 						let implied_mo = create_mo(current_child.document(), current_op.ch);
-						if likely_function_name == FunctionNameCertainty::MAYBE {
+						if likely_function_name == FunctionNameCertainty::Maybe {
 							implied_mo.set_attribute_value("data-guess", "true");
 						}
 						let shift_result = self.shift_stack(&mut parse_stack, implied_mo, current_op.clone());
@@ -2318,10 +2316,10 @@ impl CanonicalizeContext {
 						// will end up with operand operand -- need to choose operator associated with prev child
 						// we use the original input here because in this case, we need to look to the right of the ()s to deal with chemical states
 						let implied_operator = if self.is_function_name(as_element(children[i_child-1]),
-																	Some(&children[i_child..])) == FunctionNameCertainty::TRUE {
-								OperatorPair{ ch: "\u{2061}", op: &*INVISIBLE_FUNCTION_APPLICATION }
+																	Some(&children[i_child..])) == FunctionNameCertainty::True {
+								OperatorPair{ ch: "\u{2061}", op: *INVISIBLE_FUNCTION_APPLICATION }
 							} else {
-								OperatorPair{ ch: "\u{2062}", op: &*IMPLIED_TIMES }
+								OperatorPair{ ch: "\u{2062}", op: *IMPLIED_TIMES }
 							};
 						// debug!("  adding implied {}", if ptr_eq(implied_operator.op,*IMPLIED_TIMES) {"times"} else {"function apply"});
 	

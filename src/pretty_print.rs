@@ -56,7 +56,7 @@ pub fn format_element(e: &Element, indent: usize) -> String {
     // Use the &#x....; representation for invisible chars when printing
     fn make_invisible_chars_visible(text: &str) -> String {
         return text.chars().map(|ch| {
-            if '\u{2061}' <= ch && ch <= '\u{2064}' {
+            if ('\u{2061}'..'\u{2064}').contains(&ch) {
                 return format!("&#x{:x};", ch as u32)
             } else {
                 return ch.to_string();
@@ -100,7 +100,7 @@ pub fn yaml_to_string(yaml: &Yaml, indent: usize) -> String {
         emitter.emit_node(yaml).unwrap(); // dump the YAML object to a String
     }
     let indent_str = format!("{:in$}", " ", in=2*indent);
-    result = result.replace("\n",&("\n".to_string() + &indent_str)); // add indentation to all but first line
+    result = result.replace('\n',&("\n".to_string() + &indent_str)); // add indentation to all but first line
     return indent_str + result.trim_end();  // add indent to first line and remove an extra indent at end
 }
 
@@ -120,7 +120,7 @@ fn is_complex(v: &Yaml) -> bool {
                 0 => false,
                 1 => {
                     let (key,val) = h.iter().next().unwrap();
-                    return !(is_scalar(&key) && is_scalar(&val));            
+                    return !(is_scalar(key) && is_scalar(val));            
                 },
                 _ => true,
             }
@@ -135,7 +135,7 @@ fn is_complex(v: &Yaml) -> bool {
                             0 => false,
                             1 => {
                                 let (key, val) = hash.iter().next().unwrap();
-                                return !(is_scalar(&key) && is_scalar(&val));
+                                return !(is_scalar(key) && is_scalar(val));
                             },
                             _ => true,
                         }
@@ -462,7 +462,7 @@ fn need_quotes(string: &str) -> bool {
         string.starts_with(' ') || string.ends_with(' ')
     }
 
-    string == ""
+    string.is_empty()
         || need_quotes_spaces(string)
         || string.starts_with(|character: char| matches!(character,
             '&' | '*' | '?' | '|' | '-' | '<' | '>' | '=' | '!' | '%' | '@') )

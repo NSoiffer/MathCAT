@@ -28,6 +28,7 @@ pub fn zip_dir<T: Write + Seek>(
     zip.finish()
 }
 
+#[allow(clippy::unused_io_amount)]
 fn zip_entry<T: Write + Seek>(
     zip: &mut ZipWriter<T>,
     entry: DirEntry,
@@ -42,9 +43,10 @@ fn zip_entry<T: Write + Seek>(
     } else if let Some(suffix) =path.extension() {
         let suffix = suffix.to_ascii_lowercase();
         if suffix == "yaml" || suffix == "yml" {
-            zip.start_file(path.to_str().unwrap(), options)?;
+            let file_name = path.to_str().unwrap();
+            zip.start_file(file_name, options)?;
 
-            let mut file = File::open(path)?;
+            let mut file = File::open(&path)?;
             let mut buffer = Vec::new();
     
             file.read_to_end(&mut buffer)?;
@@ -61,7 +63,7 @@ fn main() {
     // let archive = PathBuf::from(concat!(env!("OUT_DIR"),"/rules.zip"));
 
     let out_dir = std::env::var_os("OUT_DIR").unwrap();
-    let archive: PathBuf = [out_dir.clone(), std::ffi::OsString::from("rules.zip")].iter().collect();
+    let archive: PathBuf = [out_dir, std::ffi::OsString::from("rules.zip")].iter().collect();
     eprintln!("archive: '{:?}'", archive.to_str());
 
     let archive = match File::create(&archive) {
@@ -75,7 +77,7 @@ fn main() {
     let zip_directory = Path::new("Rules");
     let zip_options = FileOptions::default().compression_method(CompressionMethod::Deflated);
 
-    if let Err(e) = zip_dir(&zip_directory, archive, zip_options) {
+    if let Err(e) = zip_dir(zip_directory, archive, zip_options) {
         panic!("Error: {}", e);
     }
     // println!("cargo:rerun-if-changed=Rules"); **** UNCOMMENT before commit
