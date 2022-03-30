@@ -10,6 +10,7 @@ use sxd_document::Package;
 use std::fmt;
 use crate::pretty_print::mml_to_string;
 use crate::speech::{NAVIGATION_RULES, CONCAT_INDICATOR, CONCAT_STRING};
+#[cfg(not(target_family = "wasm"))]
 use std::time::{Instant};
 use crate::errors::*;
 use crate::canonicalize::as_element;
