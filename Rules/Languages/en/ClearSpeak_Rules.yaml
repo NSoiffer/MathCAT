@@ -821,7 +821,7 @@
    match:
       # say "times" when invisible times is followed by parens or a superscript that has a base with parens or "|"s
       # if we aren't sure if it is times or not, don't say anything
-      - "text()='\u2062' and @data-guess and ("
+      - "text()='\u2062' and (not(@data-guess) or $ClearSpeak_Functions = 'None') and ("
       - "  $ClearSpeak_ImpliedTimes = 'MoreImpliedTimes'"
       - " or "
       - "  following-sibling::*[1][" 
