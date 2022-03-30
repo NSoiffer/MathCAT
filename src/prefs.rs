@@ -965,26 +965,20 @@ mod tests {
         });
     }
 
-    #[test]
-    fn test_is_up_to_date() {
-        PREF_MANAGER.with(|pref_manager| {
-            let mut pref_manager = pref_manager.borrow_mut();
-            pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("Language", "zz-ab");
-            let files_changed = pref_manager.is_up_to_date();        
-            assert!(files_changed.is_none(), "files_changed={}", files_changed.unwrap());
-        });
-    }
-
     use std::fs;
     #[test]
-    fn test_is_not_up_to_date() {
+    fn test_up_to_date() {
         use std::thread::sleep;
         use std::time::Duration;
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("Language", "zz-aa");        
+            pref_manager.set_user_prefs("Language", "zz-aa");
+            
+            // First test to make sure the up_to_date check works -- need to do in this test since the order of testing is random
+            let files_changed = pref_manager.is_up_to_date();        
+            assert!(files_changed.is_none(), "files_changed={}", files_changed.unwrap());
+
 
             // Note: need to use pattern match to avoid borrow problem
             // Don't change a speech related file because 'test_is_up_to_date' might fail 
