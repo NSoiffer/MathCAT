@@ -1497,7 +1497,7 @@ impl<'c> fmt::Display for ContextStack<'c> {
 }
 
 impl<'c, 'r> ContextStack<'c> {
-    fn new<'a, 'm:'c>(pref_manager: &'a PreferenceManager) -> ContextStack<'c> {
+    fn new<'a,>(pref_manager: &'a PreferenceManager) -> ContextStack<'c> {
         let prefs = pref_manager.merge_prefs();
         let context_stack = ContextStack {
             base: ContextStack::base_context(prefs),
@@ -1522,7 +1522,7 @@ impl<'c, 'r> ContextStack<'c> {
         return context;
     }
 
-    fn set_globals<'a:'c>(&'r mut self, new_vars: VariableDefinitions, mathml: Element<'c>) -> Result<()> {
+    fn set_globals(&'r mut self, new_vars: VariableDefinitions, mathml: Element<'c>) -> Result<()> {
         // for each var/value pair, evaluate the value and add the var/value to the base context
         for def in &new_vars.defs {
             // set the new value
@@ -1536,7 +1536,7 @@ impl<'c, 'r> ContextStack<'c> {
         return Ok( () );
     }
 
-    fn push<'a:'c>(&'r mut self, new_vars: VariableDefinitions, mathml: Element<'c>) -> Result<()> {
+    fn push(&'r mut self, new_vars: VariableDefinitions, mathml: Element<'c>) -> Result<()> {
         // store the old value and set the new one 
         let mut old_values = VariableValues {defs: Vec::with_capacity(new_vars.defs.len()) };
         let evaluation = Evaluation::new(&self.base, Node::Element(mathml));
@@ -2151,7 +2151,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         let mut result = String::with_capacity(braille.len());
         let mut i_bytes = 0;
         let mut chars = braille.chars();
-        while let Some(ch) = chars.next() {
+        for ch in chars.by_ref() {
             let modified_ch = add_dots_to_braille_char(ch);
             i_bytes += ch.len_utf8();
             result.push(modified_ch);
@@ -2163,8 +2163,8 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         let mut i_end = braille.len();
         if &highlight_style != "FirstChar" {
             // find last char so that we know when to modify the char
-            let mut rev_chars = braille.chars().rev();
-            while let Some(ch) = rev_chars.next() {
+            let rev_chars = braille.chars().rev();
+            for ch in rev_chars {
                 let modified_ch = add_dots_to_braille_char(ch);
                 i_end -= ch.len_utf8();
                 if ch !=  modified_ch {
@@ -2174,7 +2174,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         }
 
         // finish going through the string
-        while let Some(ch) = chars.next() {
+        for ch in chars {
             result.push( if i_bytes == i_end {add_dots_to_braille_char(ch)} else {ch} );
             i_bytes += ch.len_utf8();
         };
@@ -2183,7 +2183,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
 
         fn add_dots_to_braille_char(ch: char) -> char {
             let as_u32 = ch as u32;
-            if 0x2800 <= as_u32 && as_u32 <= 0x28FF {
+            if (0x2800..0x28FF).contains(&as_u32) {
                 return unsafe {char::from_u32_unchecked(as_u32 | 0xC0)};
             } else {
                 return ch;
@@ -2198,7 +2198,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                 Replacement::XPath(xpath) => xpath.replace(self, mathml)?,
                 Replacement::TTS(tts) => {
                     T::from_string(
-                        self.speech_rules.pref_manager.borrow().get_tts().replace(&tts, &self.speech_rules.pref_manager.borrow(), self, mathml)?,
+                        self.speech_rules.pref_manager.borrow().get_tts().replace(tts, &self.speech_rules.pref_manager.borrow(), self, mathml)?,
                         self.doc
                     )?
                 },
@@ -2243,12 +2243,12 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                 Node::Text(t) =>  {
                     let leaf = create_mathml_element(&self.doc, "TEMP_NAME");
                     // debug!("  from leaf with text '{}'", &t.text());
-                    leaf.set_text(&t.text());
+                    leaf.set_text(t.text());
                     leaf
                 },
                 Node::Attribute(attr) => {
                     let leaf = create_mathml_element(&self.doc, "TEMP_NAME");
-                    leaf.set_text(&attr.value());
+                    leaf.set_text(attr.value());
                     leaf
                 },
                 _ => {
@@ -2276,8 +2276,8 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
             };
             let matched = match node {
                 Node::Element(n) => self.match_pattern::<String>(n)?,
-                Node::Text(t) =>  self.replace_chars(&t.text(), mathml)?,
-                Node::Attribute(attr) => self.replace_chars(&attr.value(), mathml)?,
+                Node::Text(t) =>  self.replace_chars(t.text(), mathml)?,
+                Node::Attribute(attr) => self.replace_chars(attr.value(), mathml)?,
                 _ => bail!("replace_nodes: found unexpected node type!!!"),
             };
             result += &matched;
@@ -2297,7 +2297,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                 return replace_single_char(self, ch, mathml)
             } else {
                 // more than one char (don't use str.len() since that is bytes, not chars)
-                return Ok(String::from(str.replace('\u{a0}', " ")));
+                return Ok(str.replace('\u{a0}', " "));
             }
         };
 

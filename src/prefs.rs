@@ -48,7 +48,7 @@ impl fmt::Display for Preferences {
         let mut pref_vec: Vec<(&String, &Yaml)> = self.prefs.iter().collect();
         pref_vec.sort();
         for (name, value) in pref_vec {
-            writeln!(f, "    {}: {}", name, yaml_to_string(&value, 0))?;
+            writeln!(f, "    {}: {}", name, yaml_to_string(value, 0))?;
         }
         return Ok(());
     }
@@ -88,7 +88,7 @@ impl Preferences{
 
     // Before we can get the other files, we need the preferences.
     // To get them we need to read pref files, so the pref file reading is different than the other files
-    fn from_file(rules_dir: &PathBuf) -> Result<(Preferences, FileAndTime)> {
+    fn from_file(rules_dir: &Path) -> Result<(Preferences, FileAndTime)> {
         let files = Preferences::get_prefs_file_and_time(rules_dir);
         return DEFAULT_USER_PREFERENCES.with(|defaults| {
             let system_prefs = Preferences::read_file(&files.files[0], defaults.clone())?;
@@ -97,8 +97,8 @@ impl Preferences{
         });
     }
 
-    fn get_prefs_file_and_time(rules_dir: &PathBuf) -> FileAndTime {
-        let mut system_prefs_file = rules_dir.clone();
+    fn get_prefs_file_and_time(rules_dir: &Path) -> FileAndTime {
+        let mut system_prefs_file = rules_dir.to_path_buf();
         system_prefs_file.push("prefs.yaml");
 
         let mut result: [Option<PathBuf>; 3] = [None, None, None];
@@ -389,7 +389,7 @@ impl PreferenceManager {
         return merged_prefs;
     }
 
-    fn set_all_files(&mut self, rules_dir: &PathBuf, prefs: Preferences, pref_files: FileAndTime) -> Result<()> {
+    fn set_all_files(&mut self, rules_dir: &Path, prefs: Preferences, pref_files: FileAndTime) -> Result<()> {
         // try to find ./Rules/lang/style.yaml and ./Rules/lang/style.yaml
         // we go through a series of fallbacks -- we try to maintain the language if possible
 
@@ -399,12 +399,12 @@ impl PreferenceManager {
         let language = prefs.to_string("Language");
         let language = language.as_str();       // avoid 'temp value dropped while borrowed' error
 
-        self.rules_dir = Some(rules_dir.clone());
+        self.rules_dir = Some(rules_dir.to_path_buf());
         self.pref_files = pref_files;
         self.user_prefs = prefs.clone();
         self.intent = PreferenceManager::get_file_and_time(
-            &rules_dir, language, Some("en"), "intent.yaml")?;
-        let mut speech_rules_dir = rules_dir.clone();
+            rules_dir, language, Some("en"), "intent.yaml")?;
+        let mut speech_rules_dir = rules_dir.to_path_buf();
         speech_rules_dir.push("Languages");
         self.speech = PreferenceManager::get_file_and_time(
                         &speech_rules_dir, language, Some("en"), &style_file_name)?;
@@ -418,7 +418,7 @@ impl PreferenceManager {
         self.speech_unicode_full = PreferenceManager::get_file_and_time(
                         &speech_rules_dir, language, Some("en"), "unicode-full.yaml")?;
 
-        let mut braille_rules_dir = rules_dir.clone();
+        let mut braille_rules_dir = rules_dir.to_path_buf();
         braille_rules_dir.push("Braille");
         let braille_code = prefs.to_string("BrailleCode");
         let braille_file = braille_code.clone() + "_Rules.yaml";
@@ -438,7 +438,7 @@ impl PreferenceManager {
     }
 
 
-    fn get_file_and_time(rules_dir: &PathBuf, lang: &str, default_lang: Option<&str>, file_name: &str) -> Result<FileAndTime> {
+    fn get_file_and_time(rules_dir: &Path, lang: &str, default_lang: Option<&str>, file_name: &str) -> Result<FileAndTime> {
         use std::fs;
         let files = PreferenceManager::get_files(rules_dir, lang, default_lang, file_name)?;
         return Ok(FileAndTime {
@@ -459,19 +459,19 @@ impl PreferenceManager {
         }
     }
 
-   fn get_files(rules_dir: &PathBuf, lang: &str, default_lang: Option<&str>, file_name: &str) -> Result<Locations> {
+   fn get_files(rules_dir: &Path, lang: &str, default_lang: Option<&str>, file_name: &str) -> Result<Locations> {
         // rules_dir: is the root of the search
         //   to that we add the language dir(s)
         //   if file_name doesn't exist in the language dir(s), we try to find it in the default dir
         // returns all the locations of the file_name from Rules downward
 
         // start by trying to find a dir that exists
-        let mut lang_dir = PreferenceManager::get_language_dir(&rules_dir, lang);
+        let mut lang_dir = PreferenceManager::get_language_dir(rules_dir, lang);
         let mut default_lang = default_lang;
         if lang_dir.is_none() {
             // try again with the default lang if there is one
             if default_lang.is_some() {
-                lang_dir = PreferenceManager::get_language_dir(&rules_dir, default_lang.unwrap());
+                lang_dir = PreferenceManager::get_language_dir(rules_dir, default_lang.unwrap());
                 if lang_dir.is_none() {
                     // We are done for -- MathCAT can't do anything without the required files!
                     bail!("Wasn't able to find/read directory for language {}\n
@@ -520,10 +520,10 @@ impl PreferenceManager {
             rules_dir.to_str().unwrap(), lang, file_name);
     }
 
-    fn get_language_dir(rules_dir: &PathBuf, lang: &str) -> Option<PathBuf> {
+    fn get_language_dir(rules_dir: &Path, lang: &str) -> Option<PathBuf> {
         // return 'Rules/Language/fr', 'Rules/Language/en/gb', etc, if they exist.
         // fall back to main language, and then to default_dir if language dir doesn't exist
-        let mut full_path = rules_dir.clone();
+        let mut full_path = rules_dir.to_path_buf();
         let lang_parts = lang.split('-');
         for part in lang_parts {
             full_path.push(Path::new(part));
@@ -533,7 +533,7 @@ impl PreferenceManager {
         }
 
         // make sure something got added...
-        if rules_dir == &full_path {
+        if rules_dir == full_path {
             return None;    // didn't find a dir
         } else {
             return Some(full_path);
@@ -551,7 +551,7 @@ impl PreferenceManager {
             warn!("{}", &bad_env_value);
         }
         
-        if is_dir_shim(&rules_dir) {
+        if is_dir_shim(rules_dir) {
             return Ok(PathBuf::from(rules_dir));
         };
 

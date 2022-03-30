@@ -25,9 +25,9 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
         let highlight_style = pref_manager.get_user_prefs().to_string("BrailleNavHighlight");
         let braille_code = &pref_manager.get_user_prefs().to_string("BrailleCode");
         let braille = if braille_code == "UEB" {
-            ueb_cleanup(braille_string.replace(" ", ""))
+            ueb_cleanup(braille_string.replace(' ', ""))
         } else {
-            nemeth_cleanup(braille_string.replace(" ", ""))
+            nemeth_cleanup(braille_string.replace(' ', ""))
         };
 
         return Ok(
@@ -48,8 +48,8 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
         // they need to be added to the start
 
         // find start and end indexes of the highlighted region
-        let start = braille.find(|ch| is_highlighted(ch));
-        let end = braille.rfind(|ch| is_highlighted(ch));
+        let start = braille.find(is_highlighted);
+        let end = braille.rfind(is_highlighted);
         if start.is_none() {
             assert!(end.is_none());
             return braille;
@@ -77,7 +77,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
 
         fn is_highlighted(ch: char) -> bool {
             let ch_as_u32 = ch as u32;
-            return 0x28C0 <= ch_as_u32 && ch_as_u32 <= 0x28FF;
+            return (0x28C0..0x28FF).contains(&ch_as_u32);
         }
 
         fn highlight(ch: char) -> char {
@@ -129,27 +129,21 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
         };
         let mut n_chars = 0;
         let prefix = &mut braille_prefix.chars().rev().peekable();
-        if prefix.peek() == Some(&&'⠠') { // cap indicator
-            n_chars += 1;
-            prefix.next();
-        } else if prefix.peek() == Some(&&'⠼') && NEMETH_NUMBERS.contains(&first_ch) { // number indicator
-            // debug!("Numeric indicator: first_ch: {}", first_ch);
+        if prefix.peek() == Some(&'⠠') ||  // cap indicator
+           (prefix.peek() == Some(&'⠼') && NEMETH_NUMBERS.contains(&first_ch)) ||  // number indicator
+           [Some(&'⠸'), Some(&'⠈'), Some(&'⠨')].contains(&prefix.peek()) {         // bold, script/blackboard, italic indicator
             n_chars += 1;
             prefix.next();
         } 
-        if [Some(&'⠸'), Some(&'⠈'), Some(&'⠨')].contains(&prefix.peek()) { // bold, script/blackboard, italic indicator
-            n_chars += 1;
-            prefix.next();
-        }
 
         if [Some(&'⠰'), Some(&'⠸'), Some(&'⠨')].contains(&prefix.peek()) {   // English, German, Greek
             n_chars += 1;
-        } else if prefix.peek() == Some(&&'⠈') {  
+        } else if prefix.peek() == Some(&'⠈') {  
             let ch = prefix.next();                              // Russian/Greek Variant
             if ch == Some('⠈') || ch == Some('⠨') {
                 n_chars += 2;
             }
-        } else if prefix.peek() == Some(&&'⠠')  { // Hebrew 
+        } else if prefix.peek() == Some(&'⠠')  { // Hebrew 
             let ch = prefix.next();                              // Russian/Greek Variant
             if ch == Some('⠠') {
                 n_chars += 2;
@@ -352,7 +346,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
 
     // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces
     let result = result.trim_start_matches('⠀').trim_end_matches('⠀');
-    let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
+    let result = COLLAPSE_SPACES.replace_all(result, "⠀");
    
     return result.to_string();
 
@@ -453,7 +447,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
 
     
     // '𝐖' is a hard break -- basically, it separates exprs
-    let mut result = result.split("𝐖")
+    let mut result = result.split('𝐖')
                         .map(|str| pick_start_mode(str) + "W")
                         .collect::<String>();
     result.pop();   // we added a 'W' at the end that needs to be removed.
@@ -631,25 +625,25 @@ fn ueb_cleanup(raw_braille: String) -> String {
         //   begin the expression with a grade 1 word indicator (or a passage indicator if the expression includes spaces)
         // Apparently "only a grade 1 symbol..." means at most one grade 1 symbol based on some examples (GTM 6.4, example 4)
         debug!("before determining mode:  '{}'", raw_braille);
-        let grade2 = remove_unneeded_mode_changes(&raw_braille, UEB_Mode::Grade2, UEB_Duration::Symbol);
-        debug!("Symbol mode:  '{}'", &grade2);
+        let grade2 = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade2, UEB_Duration::Symbol);
+        debug!("Symbol mode:  '{}'", grade2);
 
         if is_grade2_string_ok(&grade2) {
             return grade2;
         } else {
-            let grade1_word = remove_unneeded_mode_changes(&raw_braille, UEB_Mode::Grade1, UEB_Duration::Word);
-            debug!("Word mode:    '{}'", &grade1_word);
+            let grade1_word = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Word);
+            debug!("Word mode:    '{}'", grade1_word);
             
             // BANA says use g1 word mode if spaces are present, but that's not what their examples do
-            // A conversation with a BANA said that they mean use passage mode if ≥3 "segments" (≥2 blanks)
+            // A conversation with Ms. DeAndrea from BANA said that they mean use passage mode if ≥3 "segments" (≥2 blanks)
             let mut n_blanks = 0;
-            if grade1_word.chars().find(|&ch| {
+            if grade1_word.chars().any(|ch| {
                 if ch == 'W' {
                     n_blanks += 1;
                 }
                 n_blanks == 2
-            }).is_some() {
-                let grade1_passage = remove_unneeded_mode_changes(&raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage);
+            }) {
+                let grade1_passage = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage);
                 debug!("Passage mode: '{}'", &grade1_passage);
                 return "⠰⠰⠰".to_string() + &grade1_passage + "⠰⠄";
             } else {
@@ -1172,7 +1166,7 @@ impl NemethNestingChars {
     // note: this value is likely one char too long because the starting fraction is counted
     fn nemeth_frac_value<'a>(node: &'a Element, repeat_char: &'a str) -> String {
         let children = node.children();
-        let name = name(&node);
+        let name = name(node);
         if is_leaf(*node) {
             return "".to_string();
         } else if name == "mfrac" {
@@ -1271,7 +1265,7 @@ impl BrailleChars {
     // returns a string for the chars in the *leaf* node.
     // this string follows the Nemeth rules typefaces and deals with mathvariant
     //  which has partially turned chars to the alphanumeric block
-    fn get_braille_chars<'a>(node: &'a Element, code: &str, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
+    fn get_braille_chars(node: &Element, code: &str, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
         match code {
             "Nemeth" => return BrailleChars::get_braille_nemeth_chars(node, text_range),
             "UEB" => return BrailleChars:: get_braille_ueb_chars(node, text_range),
@@ -1282,7 +1276,7 @@ impl BrailleChars {
         };
     }
 
-    fn get_braille_nemeth_chars<'a>(node: &'a Element, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
+    fn get_braille_nemeth_chars(node: &Element, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
         lazy_static! {
             // To greatly simplify typeface/language generation, the chars have unique ASCII chars for them:
             // Typeface: S: sans-serif, B: bold, 𝔹: blackboard, T: script, I: italic, R: Roman
@@ -1307,7 +1301,7 @@ impl BrailleChars {
             },
         };
         let text = BrailleChars::substring(as_text(*node), text_range);
-        let braille_chars = crate::speech::braille_replace_chars(&text, *node).unwrap_or("".to_string());
+        let braille_chars = crate::speech::braille_replace_chars(&text, *node).unwrap_or_else(|_| "".to_string());
         // debug!("braille_chars: '{}'", braille_chars);
         
         // we want to pull the prefix (typeface, language) out to the front until a change happens
@@ -1322,7 +1316,7 @@ impl BrailleChars {
             //        &caps["face"], &caps["lang"], &caps["num"], &caps["cap"], &caps["char"]);
             let mut nemeth_chars = "".to_string();
             let char_face = if caps["face"].is_empty() {attr_typeface} else {&caps["face"]};
-            let typeface_changed =  &typeface != char_face;
+            let typeface_changed =  typeface != char_face;
             if typeface_changed {
                 typeface = char_face.to_string();   // needs to outlast this instance of the loop
                 nemeth_chars += &typeface;
@@ -1344,13 +1338,13 @@ impl BrailleChars {
         // debug!("  result: {}", &result);
         let mut text_chars = text.chars();     // see if more than one char
         if is_all_caps_valid && is_all_caps && text_chars.next().is_some() &&  text_chars.next().is_some() {
-            return Ok( "CC".to_string() + &result.replace("C", ""));
+            return Ok( "CC".to_string() + &result.replace('C', ""));
         } else {
             return Ok( result.to_string() );
         }
     }
 
-    fn get_braille_ueb_chars<'a>(node: &'a Element, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
+    fn get_braille_ueb_chars(node: &Element, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
         // Because in UEB typeforms and caps may extend for multiple tokens,
         //   this routine merely deals with the mathvariant attr.
         // Canonicalize has already transformed all chars it can to math alphanumerics, but not all have bold/italic 
@@ -1363,7 +1357,7 @@ impl BrailleChars {
     
         let math_variant = node.attribute_value("mathvariant");
         let text = BrailleChars::substring(as_text(*node), text_range);
-        let braille_chars = crate::speech::braille_replace_chars(&text, *node).unwrap_or("".to_string());
+        let braille_chars = crate::speech::braille_replace_chars(&text, *node).unwrap_or_else(|_| "".to_string());
 
         if math_variant.is_none() {         // nothing we need to do
             return Ok(braille_chars);
@@ -1387,13 +1381,12 @@ impl BrailleChars {
             // debug!("captures: {:?}", caps);
             // debug!("  bold: {:?}, italic: {:?}, face: {:?}, cap: {:?}, char: {:?}",
             //        &caps["bold"], &caps["italic"], &caps["face"], &caps["cap"], &caps["char"]);
-            let new_char = if bold || !caps["bold"].is_empty() {"B"} else {""}.to_string()
+            if bold || !caps["bold"].is_empty() {"B"} else {""}.to_string()
                 + if italic || !caps["italic"].is_empty() {"I"} else {""}
                 + if !&caps["face"].is_empty() {&caps["face"]} else {typeface}
                 + &caps["cap"]
                 + &caps["greek"]
-                + &caps["char"];
-            new_char
+                + &caps["char"]
         });
         return Ok(result.to_string())
     }
@@ -1473,7 +1466,7 @@ impl Function for BrailleChars {
                             -> StdResult<Value<'d>, XPathError>
         {
             let mut args = Args(args);
-            if let Err(e) = args.exactly(2).or(args.exactly(4)) {
+            if let Err(e) = args.exactly(2).or_else(|_| args.exactly(4)) {
                 return Err( XPathError::Other(format!("BrailleChars requires 2 or 4 args: {}", e)));
             };
 

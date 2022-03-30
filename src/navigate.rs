@@ -214,7 +214,7 @@ impl NavigationState {
 
         fn convert_last_char_to_number(str: &str) -> usize {
             let last_char = str.as_bytes()[str.len()-1];
-            assert!( b'0' <= last_char && last_char <= b'9');
+            assert!( (b'0'..=b'9').contains(&last_char) );
             return (last_char - b'0') as usize;
         }
     }
@@ -223,7 +223,7 @@ impl NavigationState {
 // convert the last digit of a Placemarker command to an integer
 fn convert_last_char_to_number(str: &str) -> usize {
     let last_char = str.as_bytes()[str.len()-1];
-    assert!( b'0' <= last_char && last_char <= b'9');
+    assert!( (b'0'..=b'9').contains(&last_char) );
     return (last_char - b'0') as usize;
 }
 

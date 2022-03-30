@@ -190,14 +190,14 @@ impl TTSCommandValue {
 
     fn get_string(&self) -> &String {
         match self {
-            TTSCommandValue::String(s) => return &s,
+            TTSCommandValue::String(s) => return s,
             _                                  => panic!("Internal error: TTSCommandValue is not a string"),
         }
     }
 
     fn get_pronounce(&self) -> &Pronounce {
         match self {
-            TTSCommandValue::Pronounce(p) => return &p,
+            TTSCommandValue::Pronounce(p) => return p,
             _                               => panic!("Internal error: TTSCommandValue is not a 'pronounce' command'"),
         }
         
@@ -223,7 +223,7 @@ impl fmt::Display for TTSCommandRule {
         if self.command == TTSCommand::Pause {
             return write!(f, "pause: {}", value);
         } else {
-            return write!(f, "{}: {}{}", self.command.to_string(), value, self.replacements);
+            return write!(f, "{}: {}{}", self.command, value, self.replacements);
         };
     }
 }
@@ -241,6 +241,7 @@ impl TTSCommandRule {
 
 /// Supported TTS engines
 /// These types should do something for all the TTSCommands
+#[allow(clippy::upper_case_acronyms)]
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
 pub enum TTS {
@@ -272,7 +273,7 @@ impl TTS {
             tts_value = values;
             replacements = ReplacementArray::build_empty();
         }
-        let tts_value = yaml_to_string(&tts_value, 0);
+        let tts_value = yaml_to_string(tts_value, 0);
         let tts_value = tts_value.trim(); // if not a number or string, value is bogus
         let tts_enum = match TTSCommand::from_str(tts_command) {
             Ok(t) => t,

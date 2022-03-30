@@ -140,14 +140,11 @@ thread_local!{
 /// If there is a failure during read, the error is propagated to the caller
 pub fn read_definitions_file(locations: &Locations) -> Result<()> {
     // for each file in `locations`, read the contents and process them
-    let result = locations.iter()
-        .map(|path| 
-                match path {
-                    None => Ok(()),
-                    Some(path) => read_one_definitions_file(path)
-                }
-            )
-        .collect();
+    let result = locations.iter().try_for_each(|path|
+            match path {
+                None => Ok(()),
+                Some(path) => read_one_definitions_file(path)
+            });
     verify_definitions()?;
 
     // merge the contents of `TrigFunctions` into a set that contains all the function names (from `AdditionalFunctionNames`).
