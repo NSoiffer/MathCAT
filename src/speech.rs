@@ -1543,7 +1543,7 @@ impl<'c, 'r> ContextStack<'c> {
         for def in &new_vars.defs {
             // get the old value (might not be defined)
             let qname = QName::new(def.name.as_str());
-            let old_value = evaluation.value_of(qname).map(|val| val.clone());
+            let old_value = evaluation.value_of(qname).cloned();
             old_values.defs.push( VariableValue{ name: def.name.clone(), value: old_value} );
         }
 
