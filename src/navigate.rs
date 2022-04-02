@@ -126,8 +126,25 @@ impl NavigationState {
         self.position_stack.clear();
         self.command_stack.clear();
         self.where_am_i = NavigationPosition::default();
-        self.where_am_i_start_time;
+        self.reset_start_time()
+        
     }
+
+
+    // defining reset_start_time because of the following message if done inline
+    // attributes on expressions are experimental
+    // see issue #15701 <https://github.com/rust-lang/rust/issues/15701> for more information
+    #[cfg(target_family = "wasm")]
+    fn reset_start_time(&mut self) {
+         self.where_am_i_start_time = 0; // FIX: for web
+    }
+
+    #[cfg(not(target_family = "wasm"))]
+    fn reset_start_time(&mut self) {
+         self.where_am_i_start_time = Instant::now();      // need to give it some value, and "default()" isn't an option
+
+    }
+
 
     fn push(&mut self, position: NavigationPosition, command: &'static str) {
         self.position_stack.push(position);
