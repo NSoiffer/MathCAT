@@ -9,6 +9,7 @@ use sxd_document::Package;
 use sxd_document::dom::*;
 use crate::errors::*;
 use regex::Regex;
+use crate::canonicalize::{name, as_element};
 
 
 use crate::navigate::*;
@@ -374,7 +375,7 @@ fn add_ids(mathml: Element) -> Element {
         }
         
         for child in mathml.children() {
-            let child = crate::canonicalize::as_element(child);
+            let child = as_element(child);
             count = add_ids_to_all(child, id_prefix, count);
         }
         return count;
@@ -477,98 +478,121 @@ pub fn trim_element(e: &Element) {
 
 
 // used for testing trim
-// returns true if two Documents are equal
+/// returns Ok() if two Documents are equal or some info where they differ in the Err
 #[allow(dead_code)]
-fn is_same_doc(doc1: &Document, doc2: &Document) -> bool {
+fn is_same_doc(doc1: &Document, doc2: &Document) -> Result<()> {
+    // assume 'e' doesn't have element children until proven otherwise
+    // this means we keep Text children until we are proven they aren't needed
     if doc1.root().children().len() != doc2.root().children().len() {
-        return false;
+        bail!("Children of docs have {} != {} children", doc1.root().children().len(), doc2.root().children().len());
     }
-    for root_child in doc1.root().children().iter().zip(doc2.root().children().iter()) {
-        let (c1, c2) = root_child;
+
+    for (i, (c1, c2)) in doc1.root().children().iter().zip(doc2.root().children().iter()).enumerate() {
         match c1 {
             ChildOfRoot::Element(e1) => {
                 if let ChildOfRoot::Element(e2) = c2 {
-                    if is_same_element(e1, e2) {
-                        continue;
-                    }
+                    is_same_element(e1, e2)?;
+                } else {
+                    bail!("child #{}, first is element, second is something else", i);
                 }
-                return false;
             },
             ChildOfRoot::Comment(com1) => {
                 if let ChildOfRoot::Comment(com2) = c2 {
-                    if com1.text() == com2.text() {
-                        continue;
+                    if com1.text() != com2.text() {
+                        bail!("child #{} -- comment text differs", i);
                     }
+                } else {
+                    bail!("child #{}, first is comment, second is something else", i);
                 }
-                return false;
             }
             ChildOfRoot::ProcessingInstruction(p1) => {
                 if let ChildOfRoot::ProcessingInstruction(p2) = c2 {
-                    if p1.target() == p2.target() && p1.value() == p2.value() {
-                        continue;
+                    if p1.target() != p2.target() || p1.value() != p2.value() {
+                        bail!("child #{} -- processing instruction differs", i);
                     }
+                } else {
+                    bail!("child #{}, first is processing instruction, second is something else", i);
                 }
-                return false;
             }
         }
     };
-    return true;
+    return Ok( () );
 }
 
-/// Not really meant to be public -- used by tests in some packages
+/// returns Ok() if two Documents are equal or some info where they differ in the Err
+// Not really meant to be public -- used by tests in some packages
 #[allow(dead_code)]
-pub fn is_same_element(e1: &Element, e2: &Element) -> bool {
+pub fn is_same_element(e1: &Element, e2: &Element) -> Result<()> {
+    if name(e1) != name(e2) {
+        bail!("Names not the same: {}, {}", name(e1), name(e2));
+    }
+
     // assume 'e' doesn't have element children until proven otherwise
     // this means we keep Text children until we are proven they aren't needed
     if e1.children().len() != e2.children().len() {
-        return false;
+        bail!("Children of {} have {} != {} children", name(e1), e1.children().len(), e2.children().len());
     }
-    for element_child in e1.children().iter().zip(e2.children().iter()) {
-        let (c1, c2) = element_child;
+
+    if let Err(e) = attrs_are_same(e1.attributes(), e2.attributes()) {
+        bail!("In element {}, {}", name(e1), e);
+    }
+
+    for (i, (c1, c2)) in e1.children().iter().zip(e2.children().iter()).enumerate() {
         match c1 {
             ChildOfElement::Element(child1) => {
                 if let ChildOfElement::Element(child2) = c2 {
-                    if is_same_element(child1, child2) {
-                        continue;
-                    }
+                    is_same_element(child1, child2)?;
+                } else {
+                    bail!("{} child #{}, first is element, second is something else", name(e1), i);
                 }
-                return false;
             },
             ChildOfElement::Comment(com1) => {
                 if let ChildOfElement::Comment(com2) = c2 {
-                    if com1.text() == com2.text() {
-                        continue;
+                    if com1.text() != com2.text() {
+                        bail!("{} child #{} -- comment text differs", name(e1), i);
                     }
+                } else {
+                    bail!("{} child #{}, first is comment, second is something else", name(e1), i);
                 }
-                return false;
             }
             ChildOfElement::ProcessingInstruction(p1) => {
                 if let ChildOfElement::ProcessingInstruction(p2) = c2 {
-                    if p1.target() == p2.target() && p1.value() == p2.value() {
-                        continue;
+                    if p1.target() != p2.target() || p1.value() != p2.value() {
+                        bail!("{} child #{} -- processing instruction differs", name(e1), i);
                     }
+                } else {
+                    bail!("{} child #{}, first is processing instruction, second is something else", name(e1), i);
                 }
-                return false;
             }
             ChildOfElement::Text(t1) => {
                 if let ChildOfElement::Text(t2) = c2 {
-                    if t1.text() == t2.text() {
-                        continue;
+                    if t1.text() != t2.text() {
+                        bail!("{} child #{} --  text differs", name(e1), i);
                     }
-                    // debug!("#1 '{}[{}]', #2 '{}[{}]'", t1.text(), t1.text().len(),
-                    //         t2.text(), t2.text().len());
-                    // t1.text().chars().enumerate()
-                    //     .for_each(|(i, ch1)| {
-                    //         let ch2 = t2.text().chars().nth(i).unwrap();
-                    //         debug!("  {}: {}/{}, {}", i, ch1,  ch2, ch1==ch2)
-                    //     })
+                } else {
+                    bail!("{} child #{}, first is text, second is something else", name(e1), i);
                 }
-                return false;
             }
         }
     };
-    return true;
+    return Ok( () );
+
+    /// compares attributes -- '==' didn't seems to work
+    fn attrs_are_same(attrs1: Vec<Attribute>, attrs2: Vec<Attribute>) -> Result<()> {
+        if attrs1.len() != attrs2.len() {
+            bail!("Attributes have different length: {:?} != {:?}", attrs1, attrs2);
+        }
+        for (attr1, attr2) in attrs1.iter().zip(attrs2.iter()) {
+            if attr1.name().local_part() != attr2.name().local_part() || attr1.value() != attr2.value() {
+                bail!("Attribute {}.{} != {}.{}",
+                        attr1.name().local_part(), attr1.value(),
+                        attr2.name().local_part(), attr2.value());
+            }
+        }
+        return Ok( () );
+    }
 }
+
 
 #[cfg(test)]
 mod tests {
@@ -584,8 +608,11 @@ mod tests {
         let doc2 = package2.as_document();
         trim_doc(&doc2);
         debug!("doc2:\n{}", mml_to_string(&get_element(&package2)));
-            
-        is_same_doc(&doc1, &doc2)
+    
+        match is_same_doc(&doc1, &doc2) {
+			Ok(_) => return true,
+			Err(e) => panic!("{}", e),
+		}
     }
 
     #[test]
@@ -619,6 +646,18 @@ mod tests {
     fn trim_differs() {
         let whitespace_str = "<math> <mrow ><mo>-</mo><mi> a </mi></mrow ></math>";
         let different_str = "<math> <mrow ><mo>-</mo><mi> b </mi></mrow ></math>";
-        assert!(!are_parsed_strs_equal(different_str, whitespace_str));
+
+        // need to manually do this since failure shouldn't be a panic
+        let package1 = &parser::parse(whitespace_str).expect("Failed to parse input");
+        let doc1 = package1.as_document();
+        trim_doc(&doc1);
+        debug!("doc1:\n{}", mml_to_string(&get_element(&package1)));
+        
+        let package2 = parser::parse(different_str).expect("Failed to parse input");
+        let doc2 = package2.as_document();
+        trim_doc(&doc2);
+        debug!("doc2:\n{}", mml_to_string(&get_element(&package2)));
+
+        assert!(is_same_doc(&doc1, &doc2).is_err());
     }
 }
