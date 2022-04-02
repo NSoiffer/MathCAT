@@ -602,8 +602,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
                 // skip the next char to get to the real start, and then look for the target
                 // stop when L/N signals past potential target or we hit some non L/N char (actual braille)
                 // debug!("   after L/N '{}'", chars[i_end+2..].iter().collect::<String>());
-                for i_next in i_end+2..chars.len() {
-                    let ch = chars[i_next];
+                for &ch in chars.iter().skip(i_end+2) {
                     if ch == 'L' || ch == 'N' || !LETTER_PREFIXES.contains(&ch) {
                         return false;
                     } else if ch == target {
@@ -1030,9 +1029,8 @@ fn stands_alone(chars: &[char], i: usize) -> (bool, &[char], usize) {
             let ch = chars[i];
             let prev_ch = if i > 0 {chars[i-1]} else {' '};  // ' ' is a char not in input
             // debug!("  left alone: prev/ch {}/{}", prev_ch, ch);
-            if !intervening_chars_mode && prev_ch == 'L' {
-                i -= 1;       // ignore 'Lx' and also ignore 'ox'
-            } else if ch == 'o' || ch == 'b' {
+            if (!intervening_chars_mode && prev_ch == 'L') ||
+               (ch == 'o' || ch == 'b') {
                 i -= 1;       // ignore 'Lx' and also ignore 'ox'
             } else if LEFT_INTERVENING_CHARS.contains(&ch) {
                 intervening_chars_mode = true;
@@ -1271,7 +1269,7 @@ impl BrailleChars {
             "UEB" => return BrailleChars:: get_braille_ueb_chars(node, text_range),
             _ => {
                 warn!("get_braille_chars: unknown braille code '{}'", code);
-                return Ok( as_text(*node).to_string() );
+                return Ok( as_text(*node).to_string() )
             },
         };
     }
