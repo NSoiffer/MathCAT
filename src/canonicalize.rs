@@ -330,7 +330,7 @@ enum DigitBlockType {
 }
 
 
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq)]
 enum FunctionNameCertainty {
 	True,
 	Maybe,
@@ -407,7 +407,8 @@ impl CanonicalizeContext {
 				let parent_name = name(&parent).to_string();
 				ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(parent_name.as_str())
 			};
-		if is_leaf(mathml) && as_text(mathml).is_empty() {
+		// mspace and mglyph are elements, so don't count them (could be <mrow><mspace/></mrow> and don't want to throw out mspace)
+		if is_leaf(mathml) && element_name != "mspace" && element_name != "mglyph" && as_text(mathml).is_empty() {
 			// get this out of the way since it common to all leaf elements -- leaving it empty causes problems with the speech rules
 			if !parent_requires_child {
 				return None;
@@ -559,7 +560,7 @@ impl CanonicalizeContext {
 
 				} else if element_name == "msub" || element_name == "msup" || element_name == "msubsup" {
 					let base = as_element(mathml.children()[0]);
-					if (is_leaf(base) && as_text(base).is_empty()) ||
+					if (is_leaf(base) && as_text(base).trim().is_empty()) ||
 					   (name(&base) == "mrow" && base.children().is_empty()) {
 						convert_to_mmultiscripts(mathml);
 					}
@@ -968,7 +969,7 @@ impl CanonicalizeContext {
 			child.set_text(&mn_text);
 
 			// not very efficient since this is probably causing an array shift each time (array is probably not big though)
-			for &child_as_element in children.iter().take(end).skip(start) {
+			for &child_as_element in children.iter().take(end).skip(start+1) {
 				let child = as_element(child_as_element);
 				child.remove_from_parent();
 			}
@@ -1036,7 +1037,7 @@ impl CanonicalizeContext {
 			let first_child = as_element(children[start]);
 			let mut new_text = String::with_capacity(end+3-start);	// one per element plus a little extra
 			new_text.push_str(as_text(first_child));
-			for &child_as_element in children.iter().take(end).skip(start) {
+			for &child_as_element in children.iter().take(end).skip(start+1) {
 				let child = as_element(child_as_element);
 				let text = as_text(child); 		// only in this function because it is an <mo>
 				new_text.push_str(text);
@@ -1183,15 +1184,15 @@ impl CanonicalizeContext {
 		}
 
 		fn add_pair<'v, 'a:'v>(script_vec: &'v mut Vec<ChildOfElement<'a>>, subscript: Option<ChildOfElement<'a>>, superscript: Option<ChildOfElement<'a>>) {
-			let child_of_element = if subscript.is_some() {subscript.unwrap()} else {superscript.unwrap()};
+			let child_of_element = if let Some(subscript) = subscript {subscript} else {superscript.unwrap()};
 			let doc = as_element(child_of_element).document();
-			let subscript = if subscript.is_some() {
-				subscript.unwrap()
+			let subscript = if let Some(subscript)= subscript {
+				subscript
 			} else {
 				ChildOfElement::Element(create_mathml_element(&doc, "none"))
 			};
-			let superscript = if superscript.is_some() {
-				superscript.unwrap()
+			let superscript = if let Some(superscript) = superscript {
+				superscript
 			} else {
 				ChildOfElement::Element(create_mathml_element(&doc, "none"))
 			};
@@ -1810,8 +1811,8 @@ impl CanonicalizeContext {
 			// names that are always function names (e.g, "sin" and "log")
 			let defs = defs.borrow();
 			let names = defs.get_hashset("FunctionNames").unwrap();
-		 // UEB seems to think "Sin" (etc) is used for "sin", so we move to lower case
-		 if names.contains(&base_name.to_ascii_lowercase()) {
+			// UEB seems to think "Sin" (etc) is used for "sin", so we move to lower case
+			if names.contains(&base_name.to_ascii_lowercase()) {
 				// debug!("     ...is in FunctionNames");
 				return FunctionNameCertainty::True;	// always treated as function names
 			}
@@ -2240,7 +2241,7 @@ impl CanonicalizeContext {
 		let num_children = children.len();
 	
 		for i_child in 0..num_children {
-			// debug!("\nDealing with child #{}: {}", i_child, mml_to_string(&as_element(children[i_child])));
+			debug!("\nDealing with child #{}: {}", i_child, mml_to_string(&as_element(children[i_child])));
 			let mut current_child = self.canonicalize_mrows(as_element(children[i_child]))?;
 			children[i_child] = ChildOfElement::Element( current_child );
 			let base_of_child = get_possible_embellished_node(current_child);
@@ -2288,9 +2289,9 @@ impl CanonicalizeContext {
 	
 					if name(&base_of_child) == "mo" {
 						current_op.ch = as_text(base_of_child);
-						// debug!("  Found whitespace op '{}'/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
+						debug!("  Found whitespace op '{}'/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
 					} else {
-						// debug!("  Found implicit op {}/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
+						debug!("  Found implicit op {}/{} [{:?}]", show_invisible_op_char(current_op.ch), current_op.op.priority, likely_function_name);
 						self.reduce_stack(&mut parse_stack, current_op.op.priority,
 							self.is_function_name(base_of_child, None) != FunctionNameCertainty::True);
 		
@@ -2315,8 +2316,8 @@ impl CanonicalizeContext {
 					if top(&parse_stack).is_operand {
 						// will end up with operand operand -- need to choose operator associated with prev child
 						// we use the original input here because in this case, we need to look to the right of the ()s to deal with chemical states
-						let implied_operator = if self.is_function_name(as_element(children[i_child-1]),
-																	Some(&children[i_child..])) == FunctionNameCertainty::True {
+						let likely_function_name = self.is_function_name(as_element(children[i_child-1]), Some(&children[i_child..]));
+						let implied_operator = if likely_function_name== FunctionNameCertainty::True {
 								OperatorPair{ ch: "\u{2061}", op: *INVISIBLE_FUNCTION_APPLICATION }
 							} else {
 								OperatorPair{ ch: "\u{2062}", op: *IMPLIED_TIMES }
@@ -2324,6 +2325,9 @@ impl CanonicalizeContext {
 						// debug!("  adding implied {}", if ptr_eq(implied_operator.op,*IMPLIED_TIMES) {"times"} else {"function apply"});
 	
 						let implied_mo = create_mo(current_child.document(), implied_operator.ch);
+						if likely_function_name == FunctionNameCertainty::Maybe {
+							implied_mo.set_attribute_value("data-guess", "true");
+						}
 						let shift_result = self.shift_stack(&mut parse_stack, implied_mo, implied_operator.clone());
 						// ignore shift_result.0 which is just 'implied_mo'
 						assert_eq!(implied_mo, shift_result.0);
@@ -2504,15 +2508,18 @@ mod canonicalize_tests {
         let package1 = &parser::parse(test).expect("Failed to parse test input");
 		let mathml = get_element(package1);
 		trim_element(&mathml);
-		debug!("test:\n{}", mml_to_string(&mathml));
+		// debug!("test:\n{}", mml_to_string(&mathml));
 		let mathml_test = canonicalize(mathml).unwrap();
         
         let package2 = &parser::parse(target).expect("Failed to parse target input");
 		let mathml_target = get_element(package2);
 		trim_element(&mathml_target);
-		debug!("target:\n{}", mml_to_string(&mathml_target));
+		// debug!("target:\n{}", mml_to_string(&mathml_target));
     
-        return is_same_element(&mathml_test, &mathml_target);
+        match is_same_element(&mathml_test, &mathml_target) {
+			Ok(_) => return true,
+			Err(e) => panic!("{}", e),
+		}
     }
 
     #[test]
@@ -2539,27 +2546,27 @@ mod canonicalize_tests {
 			</math>";
         let target_str = "<math>
 				<mrow data-changed='added'>
-					<mi>sin</mi>
+					<mi mathvariant='normal'>sin</mi>
+					<mo >,</mo>
+					<mi mathvariant='italic'>bB4</mi>
 					<mo>,</mo>
-					<mi>bB4</mi>
+					<mi mathvariant='bold'>𝐚</mi>
 					<mo>,</mo>
-					<mi>𝐚</mi>
+					<mi mathvariant='bold'>𝐙</mi>
 					<mo>,</mo>
-					<mi>𝐙</mi>
+					<mn mathvariant='bold'>𝟏𝟗=𝟗</mn>
 					<mo>,</mo>
-					<mn>𝟏𝟗=𝟗</mn>
+					<mn mathvariant='double-struck'>𝟘𝟚𝟜𝟞𝟠𝟡</mn>
 					<mo>,</mo>
-					<mn>𝟘𝟚𝟜𝟞𝟠𝟡</mn>
+					<mi mathvariant='double-struck'>𝕪𝕫ℂℍℕℙℚℝℤ</mi>
 					<mo>,</mo>
-					<mi>𝕪𝕫ℂℍℕℙℚℝℤ</mi>
+					<mi mathvariant='fraktur'>0𝔶𝔄ℭℌℑℜℨ</mi>
 					<mo>,</mo>
-					<mi>0𝔶𝔄ℭℌℑℜℨ</mi>
+					<mi mathvariant='bold-fraktur'>𝖓𝕮</mi>
 					<mo>,</mo>
-					<mi>𝖓𝕮</mi>
+					<mi mathvariant='script'>𝒜ℬℰℱℋℐℒℳℛℯℊℴ𝓌</mi>
 					<mo>,</mo>
-					<mi>𝒜ℬℰℱℋℐℒℳℛℯℊℴ𝓌</mi>
-					<mo>,</mo>
-					<mi>𝓯𝓖*</mi>
+					<mi mathvariant='bold-script'>𝓯𝓖*</mi>
 				</mrow>
 			</math>";
 		assert!(are_strs_canonically_equal(test_str, target_str));
@@ -2576,15 +2583,15 @@ mod canonicalize_tests {
 			</math>";
         let target_str = "<math>
 				<mrow data-changed='added'>
-					<mi>𝖺𝖠𝟢𝟫=</mi>
+					<mi mathvariant='sans-serif'>𝖺𝖠𝟢𝟫=</mi>
 					<mo>,</mo>
-					<mi>𝘇𝗭𝟬𝟵</mi>
+					<mi mathvariant='bold-sans-serif'>𝘇𝗭𝟬𝟵</mi>
 					<mo>,</mo>
-					<mi>𝘢𝘻𝘈𝘡𝟢𝟫</mi>
+					<mi mathvariant='sans-serif-italic'>𝘢𝘻𝘈𝘡𝟢𝟫</mi>
 					<mo>,</mo>
-					<mi>𝘼𝙕𝙖𝙯𝟬𝟵</mi>
+					<mi mathvariant='sans-serif-bold-italic'>𝘼𝙕𝙖𝙯𝟬𝟵</mi>
 					<mo>,</mo>
-					<mi>𝚊𝙰𝟶𝟿</mi>
+					<mi mathvariant='monospace'>𝚊𝙰𝟶𝟿</mi>
 				</mrow>
 			</math>";
 		assert!(are_strs_canonically_equal(test_str, target_str));
@@ -2604,21 +2611,21 @@ mod canonicalize_tests {
 			</math>";
         let target_str = "<math>
 				<mrow data-changed='added'>
-					<mi>ΑΩαω∇∂ϵ=</mi>
+					<mi mathvariant='normal'>ΑΩαω∇∂ϵ=</mi>
 					<mo>,</mo>
-					<mi>𝛳𝛢𝛺𝛼𝜔𝛻𝜕𝜖</mi>
+					<mi mathvariant='italic'>𝛳𝛢𝛺𝛼𝜔𝛻𝜕𝜖</mi>
 					<mo>,</mo>
-					<mi>𝚨𝛀𝛂𝛚𝟋𝟊</mi>
+					<mi mathvariant='bold'>𝚨𝛀𝛂𝛚𝟋𝟊</mi>
 					<mo>,</mo>
-					<mi>Σβ∇</mi>
+					<mi mathvariant='double-struck'>Σβ∇</mi>
 					<mo>,</mo>
-					<mn>ΞΦλϱ</mn>
+					<mi mathvariant='fraktur'>ΞΦλϱ</mi>
 					<mo>,</mo>
-					<mn>𝛙𝚪</mn>
+					<mi mathvariant='bold-fraktur'>𝛙𝚪</mi>
 					<mo>,</mo>
-					<mi>μΨ</mi>
+					<mi mathvariant='script'>μΨ</mi>
 					<mo>,</mo>
-					<mi>𝚺𝛑</mi>
+					<mi mathvariant='bold-script'>𝚺𝛑</mi>
 				</mrow>
 			</math>";
 		assert!(are_strs_canonically_equal(test_str, target_str));
@@ -2635,15 +2642,15 @@ mod canonicalize_tests {
 			</math>";
         let target_str = "<math>
 				<mrow data-changed='added'>
-					<mi>ΑΩαω∇∂ϵ=</mi>
+					<mi mathvariant='sans-serif'>ΑΩαω∇∂ϵ=</mi>
 					<mo>,</mo>
-					<mi>𝝧𝟬𝝖𝝮𝝰𝞈𝝯𝞉𝞊</mi>
+					<mi mathvariant='bold-sans-serif'>𝝧𝟬𝝖𝝮𝝰𝞈𝝯𝞉𝞊</mi>
 					<mo>,</mo>
-					<mi>𝘢ΑΩαω∇∂ϵ</mi>
+					<mi mathvariant='sans-serif-italic'>𝘢ΑΩαω∇∂ϵ</mi>
 					<mo>,</mo>
-					<mi>𝙕𝞐𝞨𝞪𝟂𝟆𝟇𝟈𝟉</mi>
+					<mi mathvariant='sans-serif-bold-italic'>𝙕𝞐𝞨𝞪𝟂𝟆𝟇𝟈𝟉</mi>
 					<mo>,</mo>
-					<mi>𝚣ΑΩαω∇∂</mi>
+					<mi mathvariant='monospace'>𝚣ΑΩαω∇∂</mi>
 				</mrow>
 			</math>";
 		assert!(are_strs_canonically_equal(test_str, target_str));
@@ -2819,6 +2826,36 @@ mod canonicalize_tests {
         assert!(are_strs_canonically_equal(test_str, target_str));
     }
 
+	#[test]
+	fn maybe_function() {
+		let test_str = "<math>
+				<mrow>
+					<mi>P</mi>
+					<mo>(</mo>
+					<mi>A</mi>
+					<mo>∩</mo>
+					<mi>B</mi>
+					<mo>)</mo>
+				</mrow>
+			</math>";
+		let target_str = "<math>
+				<mrow>
+				<mi>P</mi>
+				<mo data-guess='true' data-changed='added'>&#x2062;</mo>
+				<mrow data-changed='added'>
+					<mo>(</mo>
+					<mrow data-changed='added'>
+					<mi>A</mi>
+					<mo>∩</mo>
+					<mi>B</mi>
+					</mrow>
+					<mo>)</mo>
+				</mrow>
+				</mrow>
+			</math>";
+		assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
     #[test]
     fn function_with_multiple_args() {
         let test_str = "<math>
@@ -2862,7 +2899,7 @@ mod canonicalize_tests {
 		<mo>+</mo>
 		<mrow data-changed='added'>
 		  <mi>t</mi>
-		  <mo data-changed='added'>&#x2062;</mo>
+		  <mo data-changed='added' data-guess='true'>&#x2062;</mo>
 		  <mrow data-changed='added'>
 			<mo>(</mo>
 			<mrow data-changed='added'>
@@ -2973,7 +3010,7 @@ mod canonicalize_tests {
 			<mrow>
 				<mn>2</mn>
 				<mo data-changed='added'>&#x2064;</mo>
-				<mrow data-changed='added'>>
+				<mrow>
 					<mn>3</mn>
 					<mo>/</mo>
 					<mn>4</mn>
@@ -3170,7 +3207,7 @@ mod canonicalize_tests {
         let target_str = " <math>
 		<mrow data-changed='added'>
 		  <mi>t&#x00A0;</mi>
-		  <mo data-changed='added'>&#x2062;</mo>
+		  <mo data-changed='added' data-guess='true'>&#x2062;</mo>
 		  <mrow>
 			<mo>(</mo>
 			<mrow data-changed='added'>
