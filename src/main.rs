@@ -78,11 +78,18 @@ fn main() {
   //                 <mspace width=\"thinmathspace\"></mspace><mn>037</mn>
   //                 <mspace width=\"thinmathspace\"></mspace><mn>234</mn></math>";
   // let expr = "<math><mn>𝟏𝟐𝟑</mn></math>";
-  let expr = "<math><mi></mi><mo>-</mo><mi>x</mi></math>";
+  let expr = "<math>
+      <msub>
+        <mtext></mtext>
+        <mn>92</mn>
+      </msub>
+      <mi>U</mi>
+    </math>
+    ";
   let instant = Instant::now();
   let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../../Rules");
   let rules_dir = rules_dir.as_os_str().to_str().unwrap().to_string();
-  if let Err(e) = set_rules_dir(rules_dir.clone()) {
+  if let Err(e) = set_rules_dir(rules_dir) {
     panic!("Error: exiting -- {}", errors_to_string(&e));  }
   if let Err(e) = set_mathml(expr.to_string()) {
     panic!("Error: exiting -- {}", errors_to_string(&e));
