@@ -118,6 +118,64 @@
     - t: below and
     - x: "*[3]"
     - t: above
+-
+    # FIX: this could use more special cases 
+    name: default
+    tag: mmultiscripts
+    variables:
+    - Prescripts: "m:mprescripts/following-sibling::*"
+    - Postscripts: "m:mprescripts/preceding-sibling::*[position() < last()]"
+    match: "."
+    replace: 
+    - x: "*[1]"
+    - test:
+        if: "$Prescripts"
+        then_test:
+            if: "count($Prescripts) = 2"    # more common case
+            then:
+            - test:
+                if: "not($Prescripts[1][self::m:none])"
+                then:
+                - t: "with pre-subscript"
+                - x: "$Prescripts[1]"
+            - test:
+                if: "not($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none])"
+                then: [t: "and"]
+            - test:
+                if: "not($Prescripts[2][self::m:none])"
+                then:
+                - t: "with pre-superscript"
+                - x: "$Prescripts[2]"
+            else:
+            - t: "with"
+            - x: "count($Prescripts) div 2"
+            - t: "prescripts"
+            - pause: short
+            - x: "$Prescripts"   # FIX: should alternatively say upper/lower 
+    - test:
+        if: "count($Postscripts)"
+        then_test:
+            if: "count($Postscripts) = 2"    # more common case
+            then:
+            - test:
+                if: "not($Postscripts[1][self::m:none])"
+                then:
+                - t: "with post-subscript"
+                - x: "$Postscripts[1]"
+            - test:
+                if: "not($Postscripts[1][self::m:none] or $Postscripts[2][self::m:none])"
+                then: [t: "and"]
+            - test:
+                if: "not($Postscripts[2][self::m:none])"
+                then:
+                - t: "with post-superscript"
+                - x: "$Postscripts[2]"
+            else:
+            - t: "with"
+            - x: "count($Postscripts) div 2"
+            - t: "Postscripts"
+            - pause: short
+            - x: "$Postscripts"   # FIX: should alternatively say upper/lower 
 
 -
     name: default

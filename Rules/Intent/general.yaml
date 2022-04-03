@@ -99,6 +99,58 @@
       - x: "*[2]/*[2]"
 
 
+-
+  # C with pre-subscript 'n' and post-subscript 'm'
+  name: binomial-mmultiscripts
+  tag: mmultiscripts
+  variables:
+  - Prescripts: "m:mprescripts/following-sibling::*"
+  - Postscripts: "m:mprescripts/preceding-sibling::*[position() < last()]"
+  match: 
+  - "*[1][self::m:mi and text()='C'] and"
+  - "count($Prescripts)=2 and $Prescripts[2][self::m:none] and "
+  - "count($Postscripts)=2 and $Postscripts[2][self::m:none]"
+  replace:
+  - intent:
+      name: binomial
+      children:
+      - x: "$Prescripts[1]"
+      - x: "$Postscripts[1]"
+
+-
+  # P with pre-sub or superscript 'n' and post-subscript 'k' (https://en.wikipedia.org/wiki/Permutation#k-permutations_of_n)
+  name: permutation-mmultiscripts
+  tag: mmultiscripts
+  variables:
+  - Prescripts: "m:mprescripts/following-sibling::*"
+  - Postscripts: "m:mprescripts/preceding-sibling::*[position() < last()]"
+  match: 
+  - "*[1][self::m:mi and text()='P'] and"
+  - "count($Prescripts)=2 and ($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none]) and "
+  - "count($Postscripts)=2 and $Postscripts[2][self::m:none]"
+  replace:
+  - intent:
+      name: permutation-symbol
+      children:
+      - test:
+          if: "$Prescripts[1][self::m:none]"
+          then: [x: "$Prescripts[2]"]
+          else: [x: "$Prescripts[1]"]
+      - x: "$Postscripts[1]"
+
+-
+  # P with superscript 'n' and subscript 'k' (https://en.wikipedia.org/wiki/Permutation#k-permutations_of_n)
+  name: permutation-msubsup
+  tag: msubsup
+  match: 
+  - "*[1][self::m:mi and text()='P']"
+  replace:
+  - intent:
+      name: permutation-symbol
+      children:
+      - x: "*[3]"
+      - x: "*[2]"
+
 # rules on scripted vertical bars ('evaluated at')
 -
   name: evaluated-at-msub

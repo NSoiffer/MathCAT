@@ -124,6 +124,15 @@
    - x: "*[2]"
 
 -
+   name: permutation
+   tag: permutation-symbol
+   match: "."
+   replace: 
+   - x: "*[2]"
+   - t: permutations of
+   - x: "*[1]"
+
+-
    name: default-interval
    tag: interval
    match: "."

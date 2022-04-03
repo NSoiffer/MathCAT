@@ -11,15 +11,20 @@
   match: "ancestor-or-self::*[@subject][1][@subject='None']"    # do this only if there isn't some other subject first
   replace:
   - test:
-      if: "count(*) > 0"
-      then:
-      - intent:
-          xpath-name: "name(.)"
-          children: [x: "*"]
-      else:
-      - intent:
-          xpath-name: "name(.)"
-          children: [x: "text()"]
+      - if: "count(*) > 0"
+        then:
+        - intent:
+            xpath-name: "name(.)"
+            children: [x: "*"]
+      - else_if: "self::m:mspace or self::m:none or self::m:mprescripts or self::m:mglyph"
+        then:
+        - intent:
+            xpath-name: "name(.)"
+            children: []
+        else:
+        - intent:
+            xpath-name: "name(.)"
+            children: [x: "text()"]
 
 -
    include: "Intent/geometry.yaml"
@@ -75,12 +80,17 @@
   match: "."
   replace:
   - test:
-      if: "count(*) > 0"
-      then:
-      - intent:
-          xpath-name: "name(.)"
-          children: [x: "*"]
-      else:
-      - intent:
-          xpath-name: "name(.)"
-          children: [x: "text()"]
+      - if: "count(*) > 0"
+        then:
+        - intent:
+            xpath-name: "name(.)"
+            children: [x: "*"]
+      - else_if: "self::m:mspace or self::m:none or self::m:mprescripts or self::m:mglyph"
+        then:
+        - intent:
+            xpath-name: "name(.)"
+            children: []
+        else:
+        - intent:
+            xpath-name: "name(.)"
+            children: [x: "text()"]

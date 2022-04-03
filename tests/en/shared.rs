@@ -56,6 +56,32 @@ fn limit_from_below() {
 
 
 #[test]
+fn binomial_mmultiscripts() {
+    let expr = "<math><mmultiscripts><mi>C</mi><mi>m</mi><none/><mprescripts/><mi>n</mi><none/></mmultiscripts></math>";
+    test("SimpleSpeak", expr, "n choose m");
+}
+
+
+#[test]
+fn permutation_mmultiscripts() {
+    let expr = "<math><mmultiscripts><mi>P</mi><mi>k</mi><none/><mprescripts/><mi>n</mi><none/></mmultiscripts></math>";
+    test("SimpleSpeak", expr, "k permutations of n");
+}
+
+#[test]
+fn permutation_mmultiscripts_sup() {
+    let expr = "<math><mmultiscripts><mi>P</mi><mi>k</mi><none/><mprescripts/><none/><mi>n</mi></mmultiscripts></math>";
+    test("SimpleSpeak", expr, "k permutations of n");
+}
+
+#[test]
+fn permutation_msubsup() {
+    let expr = "<math><msubsup><mi>P</mi><mi>k</mi><mi>n</mi></msubsup></math>";
+    test("SimpleSpeak", expr, "k permutations of n");
+}
+
+
+#[test]
 fn prime() {
     let expr = "<math> <msup><mi>x</mi><mo >&#x2032;</mo></msup> </math>";
     test("SimpleSpeak", expr, "x prime,");
