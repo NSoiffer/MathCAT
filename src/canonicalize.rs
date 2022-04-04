@@ -2241,7 +2241,7 @@ impl CanonicalizeContext {
 		let num_children = children.len();
 	
 		for i_child in 0..num_children {
-			debug!("\nDealing with child #{}: {}", i_child, mml_to_string(&as_element(children[i_child])));
+			// debug!("\nDealing with child #{}: {}", i_child, mml_to_string(&as_element(children[i_child])));
 			let mut current_child = self.canonicalize_mrows(as_element(children[i_child]))?;
 			children[i_child] = ChildOfElement::Element( current_child );
 			let base_of_child = get_possible_embellished_node(current_child);
