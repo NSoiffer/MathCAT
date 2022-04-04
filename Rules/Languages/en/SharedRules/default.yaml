@@ -35,16 +35,16 @@
     match: "."
     replace:
     - bookmark: "@id"
-    - x: text()
+    - x: "text()"
 
 -
     name: default
     tag: ms
     match: "."
     replace: 
-    - t: the string
+    - t: "the string"
     - pause: short
-    - x: text()
+    - x: "text()"
 
 -
     name: default
@@ -61,7 +61,7 @@
         - x: "*[1]"
         - test:
             if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
-            then: [t: sub]
+            then: [t: "sub"]
         - x: "*[2]"
 
 -
@@ -83,7 +83,7 @@
     - x: "*[1]"
     - t: sub
     - x: "*[2]"
-    - t: raised to the
+    - t: "raised to the"
     - x: "*[3]"
     - t: power
 -
@@ -93,9 +93,9 @@
     replace: 
     - test:
         if: "not(IsNode(*[1], 'simple'))"
-        then: [t: modified]
+        then: [t: "modified"]
     - x: "*[1]"
-    - t: with
+    - t: "with"
     - x: "*[2]"
     - t: below
     
@@ -106,11 +106,11 @@
     replace: 
     - test:
         if: "not(IsNode(*[1], 'simple'))"
-        then: [t: modified]
+        then: [t: "modified"]
     - x: "*[1]"
-    - t: with
+    - t: "with"
     - x: "*[2]"
-    - t: above
+    - t: "above"
     
 -
     name: default
@@ -119,13 +119,13 @@
     replace: 
     - test:
         if: "not(IsNode(*[1], 'simple'))"
-        then: [t: modified]
+        then: [t: "modified"]
     - x: "*[1]"
-    - t: with
+    - t: "with"
     - x: "*[2]"
-    - t: below and
+    - t: "below and"
     - x: "*[3]"
-    - t: above
+    - t: "above"
 -
     # FIX: this could use more special cases 
     name: default
@@ -191,18 +191,18 @@
     variables: [IsColumnSilent: false()]
     match: "."
     replace: 
-    - t: table with
+    - t: "table with"
     - x: count(*)
     - test: 
          if: count(*)=1
-         then: {t: row}
-         else: {t: rows}
+         then: {t: "row"}
+         else: {t: "rows"}
     - t: and
     - x: "count(*[1]/*)"
     - test: 
          if: "count(*[1]/*)=1"
-         then: {t: column}
-         else: {t: columns}
+         then: {t: "column"}
+         else: {t: "columns"}
     - pause: long
     - x: "* "
 
@@ -354,4 +354,4 @@
     tag: "*"
     match: "."
     replace: 
-    - x: translate(name(), '-', ' ')
+    - x: "translate(name(), '-', ' ')"
