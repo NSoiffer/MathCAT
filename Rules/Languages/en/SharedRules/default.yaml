@@ -12,6 +12,14 @@
         - rate:
             value: "$MathRate"
             replace: [x: "*"]
+
+-
+    name: empty-mrow
+    tag: mrow
+    match: "not(*)"
+    replace: 
+    - t: " "  # say nothing -- placeholder
+
 -
     name: default
     tag: mrow

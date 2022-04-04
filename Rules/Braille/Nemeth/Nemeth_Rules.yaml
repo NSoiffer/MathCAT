@@ -126,10 +126,20 @@
   tag: mtd
   match: "."
   replace:
-   - test: 
-      if: "preceding-sibling::*"
-      then: [t: "W"]
-   - x: "*"
+  - test:
+      if: "*"
+      then:
+      - test: 
+         if: "preceding-sibling::*"
+         then: [t: "W"]
+      - x: "*"
+      # else nothing to braille
+
+-
+   name: no-content
+   tag: math
+   match: "not(*)"      # empty
+   replace: [t: "W"]    # not sure that is right, but this shouldn't happen
 
 -
    name: default
@@ -169,11 +179,19 @@
       - x: "*"
       - t: "m"
 
+
+-
+    name: empty-mrow
+    tag: mrow
+    match: "not(*)"
+    replace: [t: "W"] # not sure what is correct -- if in a fraction, probably something is better than nothing
+
 -
    name: default
    tag: mrow
    match: "."
    replace: [x: "*"]
+   
 
 -
    # Rule 138 a.2 -- space after a function name
@@ -278,7 +296,11 @@
    name: default
    tag: mstyle
    match: "."
-   replace: [x: "*"]
+   replace:
+   - test:
+      if: "*"
+      then: [x: "*"]
+      # else do nothing -- no content
 
 -
    # primes don't get a superscript indicator
@@ -764,21 +786,24 @@
 -
    name: default-children
    tag: "*"
-   match: count(*)>1
+   match: "*"    # make sure there are children
    replace: 
-    - t: unknown math m l element
-    - x: text()
+   - t: "unknown math m l element"
+   - x: "name(.)"
+   - x: "*"
 -
-   name: default-empty
+   # at this point, we know there are no children -- might be no text
+   name: default-no-children
    tag: "*"
-   match: "*[not(text())]"
+   match: "text()"
    replace: 
-    - t: empty unknown math m l element
-    - x: text()
+   - t: unknown math m l element
+   - x: "name(.)"
+   - x: "text()"
 -
-   name: default-text
+   name: default-no-text
    tag: "*"
    match: "."
    replace: 
-    - t: unknown math m l element
-    - x: text()
+    - t: "empty unknown math m l element"
+    - x: "name(.)"

@@ -11,7 +11,7 @@
   match: "ancestor-or-self::*[@subject][1][@subject='None']"    # do this only if there isn't some other subject first
   replace:
   - test:
-      - if: "count(*) > 0"
+      - if: "*"
         then:
         - intent:
             xpath-name: "name(.)"
@@ -48,16 +48,24 @@
   tag: math
   match: "."
   replace:
-  - intent:
-      name: "math"
-      children: [x: "*"]
+  - test:
+      if: "*"
+      then:
+      - intent:
+          name: "math"
+          children: [x: "*"]
+      else: [t: " "]    # empty math -- don't say anything
 
 
 -
   name: default
   tag: mstyle
   match: "."
-  replace: [x: "*"]
+  replace:
+  - test:
+      if: "*"
+      then: [x: "*"]
+      else: [t: " "]    # empty math -- don't say anything
 
 -
   name: semantics
@@ -85,12 +93,12 @@
         - intent:
             xpath-name: "name(.)"
             children: [x: "*"]
-      - else_if: "self::m:mspace or self::m:none or self::m:mprescripts or self::m:mglyph"
+      - else_if: "text()"
         then:
         - intent:
             xpath-name: "name(.)"
-            children: []
+            children: [x: "text()"]
         else:
         - intent:
             xpath-name: "name(.)"
-            children: [x: "text()"]
+            children: []

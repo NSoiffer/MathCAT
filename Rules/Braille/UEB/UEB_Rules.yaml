@@ -121,10 +121,20 @@
   tag: mtd
   match: "."
   replace:
-   - test: 
-      if: "preceding-sibling::*"
-      then: [t: "W"]
-   - x: "*"
+  - test:
+      if: "*"
+      then:
+      - test: 
+         if: "preceding-sibling::*"
+         then: [t: "W"]
+      - x: "*"
+      # else nothing to braille
+
+-
+   name: no-content
+   tag: math
+   match: "not(*)"      # empty
+   replace: [t: "W"]    # not sure that is right, but this shouldn't happen
 
 -
    name: default
@@ -147,6 +157,12 @@
    - t: "⠰⠻"
    - x: "*[2]/*[2]"
    - x: "*[3]"
+
+-
+    name: empty-mrow
+    tag: mrow
+    match: "not(*)"
+    replace: [t: "W"] # not sure what is correct -- if in a fraction, probably something is better than nothing
 
 -
    name: default
@@ -245,7 +261,11 @@
    name: default
    tag: mstyle
    match: "."
-   replace: [x: "*"]
+   replace:
+   - test:
+      if: "*"
+      then: [x: "*"]
+      # else do nothing -- no content
 
 -
    name: single-char-exceptions    # GTM 12
@@ -695,21 +715,26 @@
 -
    name: default-children
    tag: "*"
-   match: count(*)>1
+   match: "*"    # make sure there are children
    replace: 
-    - t: unknown math m l element
-    - x: text()
+   - t: "unknown math m l element"
+   - x: "name(.)"
+   - x: "*"
+
 -
-   name: default-empty
+   # at this point, we know there are no children -- might be no text
+   name: default-no-children
    tag: "*"
-   match: "*[not(text())]"
+   match: "text()"
    replace: 
-    - t: empty unknown math m l element
-    - x: text()
+   - t: unknown math m l element
+   - x: "name(.)"
+   - x: "text()"
+
 -
-   name: default-text
+   name: default-no-text
    tag: "*"
    match: "."
    replace: 
-    - t: unknown math m l element
-    - x: text()
+    - t: "empty unknown math m l element"
+    - x: "name(.)"
