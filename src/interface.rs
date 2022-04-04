@@ -123,20 +123,20 @@ pub fn get_overview_text() -> Result<String> {
 
 /// Get the value of the named preference.
 /// None is returned if `name` is not a known preference.
-pub fn get_preference(name: String) -> Option<String> {
+pub fn get_preference(name: String) -> Result<String> {
     use yaml_rust::Yaml;
     return crate::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow();
         let pref_manager = rules.pref_manager.borrow();
         let prefs = pref_manager.merge_prefs();
         return match prefs.get(&name) {
-            None => None,
+            None => bail!("No preference named '{}'", &name),
             Some(yaml) => match yaml {
-                Yaml::String(s) => Some(s.clone()),
-                Yaml::Boolean(b)  => Some( (if *b {"true"} else {"false"}).to_string() ),
-                Yaml::Integer(i)   => Some( format!("{}", *i)),
-                Yaml::Real(s)   => Some(s.clone()),
-                _                      => None,            
+                Yaml::String(s) => Ok(s.clone()),
+                Yaml::Boolean(b)  => Ok( (if *b {"true"} else {"false"}).to_string() ),
+                Yaml::Integer(i)   => Ok( format!("{}", *i)),
+                Yaml::Real(s)   => Ok(s.clone()),
+                _                       => bail!("Internal error in get_preference -- unknown YAML type"),            
             },
         }
     });
