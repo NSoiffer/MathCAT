@@ -75,19 +75,6 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
         result.push_str(&braille[end..]);
         return result;
 
-        fn is_highlighted(ch: char) -> bool {
-            let ch_as_u32 = ch as u32;
-            return (0x28C0..0x28FF).contains(&ch_as_u32);
-        }
-
-        fn highlight(ch: char) -> char {
-            return unsafe{char::from_u32_unchecked(ch as u32 | 0xC0)};      
-        }
-
-        fn unhighlight(ch: char) -> char {
-            return unsafe{char::from_u32_unchecked(ch as u32 & 0x283F)};      
-        }
-
         fn highlight_first_indicator(braille: &mut String, braille_code: &str, start_index: usize, end_index: usize) -> usize {
             // chars in the braille block range use 3 bytes -- we can use that to optimize the code some
             let first_ch = unhighlight(braille[start_index..start_index+3].chars().next().unwrap());
@@ -196,6 +183,23 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
     }
 }
 
+fn is_highlighted(ch: char) -> bool {
+    let ch_as_u32 = ch as u32;
+    return (0x28C0..0x28FF).contains(&ch_as_u32);
+}
+
+fn highlight(ch: char) -> char {
+    return unsafe{char::from_u32_unchecked(ch as u32 | 0xC0)};      
+}
+
+fn unhighlight(ch: char) -> char {
+    let ch_as_u32 = ch as u32;
+    if (0x28C0..0x28FF).contains(&ch_as_u32) {
+        return unsafe{char::from_u32_unchecked(ch_as_u32 & 0x283F)};  
+    } else {
+        return ch;
+    }
+}
 
 
 fn nemeth_cleanup(raw_braille: String) -> String {
@@ -573,7 +577,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
                 i += 3 // eat "C", etc
             } else if ch == 'L' {       // must be lowercase -- uppercase consumed above
                 if !word_mode_end.is_empty() {
-                    assert!(LETTERS.contains(&chars[i+1]));
+                    assert!(LETTERS.contains(&unhighlight(chars[i+1])));
                     // add terminator if terminated by lowercase letter
                     for ch in word_mode_end.chars() {
                         result.push(ch);
@@ -697,12 +701,12 @@ fn ueb_cleanup(raw_braille: String) -> String {
             // A '1' is forced if 'a-j' follows a digit
             assert_eq!(chars[i], '1', "'is_forced_grade1' didn't start with '1'");
             // check that a-j follows the '1'
-            if i+1 < chars.len() && LETTER_NUMBERS.contains(&chars[i+1]) {
+            if i+1 < chars.len() && LETTER_NUMBERS.contains(&unhighlight(chars[i+1])) {
                 // check for a number before the '1'
                 // this will be 'N' followed by LETTER_NUMBERS or the number ".", ",", or " "
                 for j in (0..i).rev() {
                     let ch = chars[j];
-                    if !(LETTER_NUMBERS.contains(&ch) || ".,W𝐖".contains(ch)) {
+                    if !(LETTER_NUMBERS.contains(&unhighlight(ch)) || ".,W𝐖".contains(ch)) {
                         return ch == 'N'
                     }
                 }
@@ -799,7 +803,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                     'L' => {
                         // terminate numeric mode -- duration doesn't change
                         // let the default case handle pushing on the chars for the letter
-                        if LETTER_NUMBERS.contains(&chars[i+1]) {
+                        if LETTER_NUMBERS.contains(&unhighlight(chars[i+1])) {
                             result.push('1');   // need to distinguish a-j from a digit
                         }
                         result.push(ch);
@@ -818,7 +822,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                     '#' => {
                         // terminate numeric mode -- duration doesn't change
                         i += 1;
-                        if i+1 < chars.len() && chars[i] == 'L' && LETTER_NUMBERS.contains(&chars[i+1]) {
+                        if i+1 < chars.len() && chars[i] == 'L' && LETTER_NUMBERS.contains(&unhighlight(chars[i+1])) {
                             // special case where the script was numeric and a letter follows, so need to put out G1 indicator
                             result.push('1');
                             // the G1 case should work with 'L' now
@@ -853,7 +857,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                         // note: be aware of '#' case for Numeric because '1' might already be generated
                         // let prev_ch = if i > 1 {chars[i-1]} else {'1'};   // '1' -- anything beside ',' or '.'
                         // if duration == UEB_Duration::Symbol || 
-                        //     ( ",. ".contains(prev_ch) && LETTER_NUMBERS.contains(&chars[i+1]) ) {
+                        //     ( ",. ".contains(prev_ch) && LETTER_NUMBERS.contains(&unhighlight(chars[i+1])) ) {
                         //     result.push('1');        // need to retain grade 1 indicator (RUEB 6.5.2)
                         // }
                         // let the default case handle pushing on the chars for the letter
@@ -1269,7 +1273,7 @@ impl BrailleChars {
             "UEB" => return BrailleChars:: get_braille_ueb_chars(node, text_range),
             _ => {
                 warn!("get_braille_chars: unknown braille code '{}'", code);
-                return Ok( as_text(*node).to_string() )
+                return Ok( as_text(*node).to_string() );
             },
         };
     }
@@ -1487,3 +1491,33 @@ impl Function for BrailleChars {
         }
     }
     
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[allow(unused_imports)]
+    use crate::init_logger;
+    use crate::interface::*;
+    
+    #[test]
+    fn ueb_highlight_24() -> Result<()> {       // issue 24
+        init_logger();
+        let mathml_str = "<math display='block' id='M8o41h70-0'>
+                <mrow id='M8o41h70-1'>
+                <mn id='M8o41h70-2'>4</mn>
+                <mo id='M8o41h70-3'>&#x2062;</mo>
+                <mi id='M8o41h70-4'>a</mi>
+                <mo id='M8o41h70-5'>&#x2062;</mo>
+                <mi id='M8o41h70-6'>c</mi>
+            </mrow>
+        </math>";
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
+        set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
+        set_preference("BrailleNavHighlight".to_string(), "All".to_string()).unwrap();
+        let braille = get_braille("M8o41h70-2".to_string())?;
+        assert_eq!("⣼⣙⠰⠁⠉", braille);
+        let braille = get_braille("M8o41h70-4".to_string())?;
+        assert_eq!("⠼⠙⣰⣁⠉", braille);
+        return Ok( () );
+    }
+}
