@@ -177,25 +177,27 @@
   tag: "*"
   match: "$NavCommand = 'MoveLastLocation'"
   replace:
-    - test:
-        if: "$NavVerbosity != 'Terse'"
-        then:
-          - test:
-            - if: "$PreviousNavCommand = 'ZoomIn'"
-              then: [t: "undo zoom in"]
-            - else_if: "$PreviousNavCommand = 'ZoomOut'"
-              then: [t: "undo zoom out"]
-            - else_if: "$PreviousNavCommand = 'ZoomInAll'"
-              then: [t: "undo zooming in all the way"]
-            - else_if: "$PreviousNavCommand = 'ZoomOutAll'"
-              then: [t: "undo zooming out all the way"]
-            - else_if: "$PreviousNavCommand = 'MovePrevious' or $PreviousNavCommand = 'MovePreviousZoom'"
-              then: [t: "undo move left"]
-            - else_if: "$PreviousNavCommand = 'MoveNext' or $PreviousNavCommand = 'MoveNextZoom'"
-              then: [t: "undo move right"]
-            - else_if: "$PreviousNavCommand = ''"
-              then: [t: "no previous command"]
-          - pause: "long"
+  - test:
+      if: "$NavVerbosity != 'Terse'"
+      then:
+      - test:
+        - if: "$PreviousNavCommand = 'ZoomIn'"
+          then: [t: "undo zoom in"]
+        - else_if: "$PreviousNavCommand = 'ZoomOut'"
+          then: [t: "undo zoom out"]
+        - else_if: "$PreviousNavCommand = 'ZoomInAll'"
+          then: [t: "undo zooming in all the way"]
+        - else_if: "$PreviousNavCommand = 'ZoomOutAll'"
+          then: [t: "undo zooming out all the way"]
+        - else_if: "$PreviousNavCommand = 'MovePrevious' or $PreviousNavCommand = 'MovePreviousZoom'"
+          then: [t: "undo move left"]
+        - else_if: "$PreviousNavCommand = 'MoveNext' or $PreviousNavCommand = 'MoveNextZoom'"
+          then: [t: "undo move right"]
+        - else_if: "$PreviousNavCommand = 'None'"
+          then: [t: "no previous command"]
+      - pause: "long"
+  - set_variables: [NavNode: "@id"]
+
 
 # many times, for typographic reasons, people include punctuation at the end of a math expr
 # these rules detect that and skip speaking it (should be similar regular rule)
@@ -209,15 +211,6 @@
   replace: 
     - x: "*[1]"
 
--
-  name: skip-punct-at-end-zoom-out
-  tag: mrow
-  match:
-    - "($NavCommand = 'ZoomOut' or $NavCommand = 'ZoomOutAll') and"
-    - " parent::m:math and count(*)=2 and"
-    - " *[2][translate(.,'.,;:?', '')='']"
-  replace: 
-    - x: ".."
 
 # ********* ZoomIn  ***************
 -
@@ -225,14 +218,14 @@
   tag: "*"
   match: "($NavCommand = 'ZoomIn' or $NavCommand = 'ZoomInAll') and IsNode(., 'leaf')"
   replace:
-    - test:
-        if: "$MatchCounter = 0"
-        then: [t: "zoomed in all of the way", pause: "long"]
-    - test:
-        if: "$ReadZoomLevel!=-1"
-        then:
-          - set_variables: [ReadZoomLevel: "0"]
-    - set_variables: [NavNode: "@id", ]
+  - test:
+      if: "$MatchCounter = 0"
+      then: [t: "zoomed in all of the way", pause: "long"]
+  - test:
+      if: "$ReadZoomLevel!=-1"
+      then:
+      - set_variables: [ReadZoomLevel: "0"]
+  - set_variables: [NavNode: "@id"]
     
 
 # special case of zooming into a matrix or determinant -- move to the first element
@@ -360,10 +353,29 @@
   tag: math
   match: "$NavCommand = 'ZoomOut' or $NavCommand = 'ZoomOutAll'"
   replace:
-    - test:
-        if: "$MatchCounter = 0"
-        then: [t: "zoom out", pause: "long"]
-    - set_variables: [NavNode: "*[1]/@id"]   # no-op for $NavCommand = 'ZoomOut'
+  - test:
+      if: "$MatchCounter = 0"
+      then: [t: "zoomed out all the way", pause: "long"]
+  - set_variables: [NavNode: "*[1]/@id"]   # no-op for $NavCommand = 'ZoomOut'
+
+-
+  name: zoom-out-top
+  tag: "*"
+  match:
+    - "($NavCommand = 'ZoomOut' or $NavCommand = 'ZoomOut') and"
+    - "parent::m:math "
+  replace: 
+    - x: ".."   # let math rule deal with it
+
+-
+  name: skip-punct-at-end-zoom-out
+  tag: mrow
+  match:
+    - "($NavCommand = 'ZoomOut' or $NavCommand = 'ZoomOutAll') and"
+    - " parent::m:math and count(*)=2 and"
+    - " *[2][translate(.,'.,;:?', '')='']"
+  replace: 
+    - x: ".."
 
 -
   name: zoom-out-all-default

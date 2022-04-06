@@ -195,12 +195,12 @@ impl NavigationState {
         context.set_variable("NavCommand", command);
 
         if command == "WhereAmI" && self.where_am_i == NavigationPosition::default() {
+            context.set_variable("NavNode", self.where_am_i.current_node.as_str());
+            context.set_variable("NavNodeOffset", self.where_am_i.current_node_offset as f64);
+        } else {
             let position = &self.position_stack[self.position_stack.len()-1];
             context.set_variable("NavNode", position.current_node.as_str());
             context.set_variable("NavNodeOffset", position.current_node_offset as f64);
-        } else {
-            context.set_variable("NavNode", self.where_am_i.current_node.as_str());
-            context.set_variable("NavNodeOffset", self.where_am_i.current_node_offset as f64);
         }
 
         // get the index from command (e.g., '3' in 'SetPlacemarker3 or MoveTo3' and set 'PlaceMarker' to it's position)
@@ -360,21 +360,16 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
 
                 nav_state.init_navigation_context(rules_with_context.get_context(), nav_command, nav_state.top());
                 
-                debug!("NavCommand: {}, NavMode {}", nav_command, nav_state.mode);
-
                 // start navigation off at the right node
-                let start_node_id = if nav_command == "MoveLastLocation" {
-                    match nav_state.pop() {
-                        None => mathml.attribute_value("id)").unwrap().to_string(),
-                        Some( (position, _) ) => position.current_node,
-                    }
-                } else {
-                    match nav_state.top() {
-                        None => mathml.attribute_value("id").unwrap().to_string(),
-                        Some( (position, _) ) => position.current_node.clone(),
-                    }
+                if nav_command == "MoveLastLocation" {
+                    nav_state.pop();
+                }
+                let start_node_id =  match nav_state.top() {
+                    None => mathml.attribute_value("id").unwrap().to_string(),
+                    Some( (position, _) ) => position.current_node.clone(),
                 };
-    
+                // debug!("NavCommand: {}, NavMode {}, start_node_id {}", nav_command, nav_state.mode, start_node_id);
+
                 let start_node = match get_node_by_id(mathml, &start_node_id) {
                     Some(node) => node,
                     None => {
@@ -391,7 +386,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                                                       .replace(CONCAT_INDICATOR, "")                            
                                             )
                             .trim());
-                debug!("Nav Speech: {}", speech);
+                // debug!("Nav Speech: {}", speech);
     
                 // FIX: add things that need to do
                 // do a speech replacement based on some marker for "where am i" and others that loop ([Speak: id])???
@@ -424,8 +419,9 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                 if (nav_command.starts_with("Move") || nav_command.starts_with("Zoom")) && nav_command != "MoveLastLocation" {
                     // push the new location on the stack
                     if nav_position != NavigationPosition::default() {
-                        debug!("nav_state: pushing on {}", &nav_position);
-                        if nav_position.current_node != ILLEGAL_NODE_ID {
+                        // debug!("nav_state: pushing on {}", &nav_position);
+                        let current_node = nav_position.current_node.as_str();
+                        if current_node != nav_state.top().unwrap().0.current_node && current_node != ILLEGAL_NODE_ID {
                             nav_state.push(nav_position.clone(), nav_command);
                         }
                     }
@@ -438,7 +434,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                     }
                 }
     
-                debug!("{}", &nav_state);
+                // debug!("{}", &nav_state);
                 let nav_mathml = get_node_by_id(mathml, &nav_position.current_node);
                 if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", mathml)?.0.unwrap() == "true" {
                     // Speak/Overview of where we landed (if we are supposed to speak it)
@@ -476,7 +472,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         let (top_position, top_command) = nav_state.pop().unwrap();
         let mut count = count-1;
         loop {
-            debug!("  ... loop count={}", count);
+            // debug!("  ... loop count={}", count);
             let (_, nav_command) = nav_state.top().unwrap();
             if (nav_command.starts_with("Move") || nav_command.starts_with("Zoom")) && nav_command != "MoveLastLocation" {
                 nav_state.pop();
@@ -921,7 +917,7 @@ mod tests {
             test_command("ZoomOut", mathml, "msup");
 
             let nav_speech = do_navigate_command_and_param(mathml, NavigationCommand::Zoom, NavigationParam::Previous)?;
-            debug!("Full speech: {}", nav_speech);
+            // debug!("Full speech: {}", nav_speech);
             NAVIGATION_STATE.with(|nav_stack| {
                 let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
                 assert_eq!(id, "mfrac");
@@ -955,6 +951,37 @@ mod tests {
     }
     
     #[test]
+    fn text_extremes_and_move_last_location() -> Result<()> {
+        let mathml_str = "<math id='math'><mfrac id='mfrac'>
+                <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
+                <mi id='denom'>d</mi>
+            </mfrac></math>";
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            NAVIGATION_STATE.with(|nav_stack| {
+                nav_stack.borrow_mut().push(NavigationPosition{
+                    current_node: "base".to_string(),
+                    current_node_offset: 0
+                }, "None")
+            });
+
+            test_command("ZoomOutAll", mathml, "mfrac");
+            test_command("ZoomOut", mathml, "mfrac");
+            test_command("MoveLastLocation", mathml, "base");       // second zoom out should do nothing
+
+            test_command("ZoomOut", mathml, "msup");
+            test_command("ZoomInAll", mathml, "base");
+            test_command("ZoomIn", mathml, "base");
+            test_command("MoveLastLocation", mathml, "msup");       // second zoom in should do nothing
+
+            return Ok( () );
+        });
+    }
+    
+    #[test]
     fn move_to_start() -> Result<()> {
         // init_logger();
         let mathml_str = "<math id='math'><mfrac id='mfrac'>
@@ -983,7 +1010,7 @@ mod tests {
             test_command("MoveLineStart", mathml, "msup");
 
             let nav_speech = do_navigate_command_and_param(mathml, NavigationCommand::Move, NavigationParam::Start)?;
-            debug!("Full speech: {}", nav_speech);
+            // debug!("Full speech: {}", nav_speech);
             NAVIGATION_STATE.with(|nav_stack| {
                 let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
                 assert_eq!(id, "mfrac");
