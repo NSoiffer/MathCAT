@@ -1,17 +1,6 @@
 ---
 
- - "a": 
-    - test: 
-        if: "$TTS='none'"
-        then: {t: eigh}                          # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
-        else: {spell: a}                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
- - "A":
-    - test: 
-        if: "$TTS='none'"
-        then: {t: Eigh}                          # long "a" sound in all speech engines I tested (see above)
-        else: {spell: a}
 
- - "!": [t: factorial]                           # 0x21
  - "\"": [t: quotation mark]                     # 0x22
  - "#": [t: number]                              # 0x23
  - "$": [t: dollars]                             # 0x24
