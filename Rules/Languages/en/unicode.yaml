@@ -15,7 +15,7 @@
     - test: 
         if: "$TTS='none'"
         then: {t: Eigh}                          # long "a" sound in all speech engines I tested (see above)
-        else: {spell: a}
+        else: {spell: A}
 
  - "B-Z": 
     - test: 
