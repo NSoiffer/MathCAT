@@ -209,6 +209,8 @@
  - "⊩": [t: "⠸⠳⠿⠸⠒"]            # 0x22A9 (Forces)
  - "˙": [t: "1⠲"]               # 0x02D9 ( Dot Above)
  - "¨": [t: "1⠲⠲"]              # 0x00A8 ( Double Dot Above)
+ - "©": [t: "⠘⠉"]               # 0xa9 (Copyright)
+
 
  - "\"": [t: "b⠠b⠶"]
  - "'": [t: "b⠄"]
