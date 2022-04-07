@@ -133,28 +133,21 @@
 
 
   # --- Nemeth Default Characters math_symbols chars. ---
- - "!": [t: "⠖"]                # 0x21
  - "\"": [t: "⠄⠄"]              # 0x22
  - "#": [t: "⠨⠼"]               # 0x23
  - "$": [t: "⠈⠎"]               # 0x24
  - "%": [t: "⠈⠴"]               # 0x25
  - "&": [t: "⠸⠯"]               # 0x26
- - "'": [t: "⠄"]                # 0x27
  - "*": [t: "⠈⠼"]               # 0x2a
  - "+": [t: "⠬"]                # 0x2b
- - "-": [t: "⠤"]                # 0x2d
  - "/": [t: "⠸⠌"]               # 0x2f
- - ";": [t: "⠆"]                # 0x3b
  - "<": [t: "⠐⠅"]               # 0x3c
  - "=": [t: "⠨⠅"]               # 0x3d
  - ">": [t: "⠨⠂"]               # 0x3e
- - "?": [t: "⠿"]                # 0x3f
  - "@": [t: "⠈⠁"]               # 0x40
  - "\\": [t: "⠸⠡"]              # 0x5c
  - "^": [t: "⠸⠣"]               # 0x5e
- - "_": [t: "⠸"]                # 0x5f
  - "`": [t: "⠈"]                # 0x60
- - "|": [t: "⠳"]                # 0x7c
  - "≟": [t: "⠐⠨⠅⠣⠸⠦⠻"]          # 0x225f
  - "≠": [t: "⠌⠨⠅"]              # 0x2260
  - "≡": [t: "⠸⠇"]               # 0x2261
@@ -181,7 +174,6 @@
 
   # --- Nemeth Default Characters rest chars. ---
  - "←": [t: "⠫⠪⠒⠒"]             # 0x2190
- - "ℓ": [t: "⠈⠰⠇"]              # 0x2113
  - "ⅆ": [t: "⠙"]                # 0x2146
  - "ⅇ": [t: "⠑"]                # 0x2147
  - "(": [t: "⠷"]                # 0x28
@@ -294,7 +286,6 @@
  - "§": [t: "⠈⠠⠎"]              # 0x00A7 (Section sign)
  - "©": [t: "⠷⠠⠉⠾"]             # 0x00A9 (Copyright sign)
  - "¬": [t: ""]                 # 0x00AC (Not sign)
- - "®": [t: "⠷⠠r⠾"]             # 0x00AE (Registered sign)
  - "¯": [t: "⠱"]                # 0x00AF (bar)
  - "°": [t: "⠨⠡"]              # 0x00B0 (Degree sign)
  - "±": [t: "⠬⠤"]               # 0x00B1 (Plus-minus sign)
@@ -355,8 +346,6 @@
  - "‰": [t: "`00"]
  - "′": [t: "⠄"]                # 0x2032 (Prime)
  - "″": [t: "⠄⠄"]               # 0x2033 (Double prime)
- - "‴": [t: "⠄⠄."]               # 0x2034 (Triple prime)
- - "⁗": [t: "⠄⠄.."]               # 0x2057 (Quadruple prime)
  - "⁡":                         # 0x2061⁡ (invisible function apply)
     # add a space if name doesn't have brackets after it or is in FunctionNames list 
     - test:
@@ -378,7 +367,6 @@
  - "∃": [t: "⠈⠿"]               # 0x2203 (There exists)
  - "∄": [t: "⠌⠈⠿"]              # 0x2204 (There does not exist)
  - "∅": [t: "⠸⠴"]               # 0x2205 (Empty set)
- - "∇": [t: "⠨⠫"]               # 0x2207 (Nabla)
  - "∑": [t: "⠨⠠⠎"]              # 0x2211 (N-ary summation)
  - "∞": [t: "⠠⠿"]               # 0x221E (Infinity)
  - "∟": [t: "⠫⠪⠨⠗⠻"]            # 0x221F (Right angle)
@@ -392,10 +380,6 @@
  - "∪": [t: "⠨⠬"]               # 0x222A (Union)
  - "∫": [t: "⠮"]                # 0x222B (Integral)
  - "∬": [t: "⠮⠮"]               # 0x222C (Double integral)
- - "⋮": [t: "⠀⠩⠒⠒⠒⠀"]           # 0x22EE (Vertical ellipsis)
- - "⋯": [t: "⠀⠒⠒⠒"]             # 0x22EF (Midline horizontal ellipsis)
- - "⋰": [t: "⠀⠘⠒⠒⠒⠀"]           # 0x22F0 (Up right diagonal ellipsis)
- - "⋱": [t: "⠀⠰⠒⠒⠒⠀"]           # 0x22F1 (Down right diagonal ellipsis)
  - "⌈": [t: "⠈⠘⠷"]              # 0x2308 (Left ceiling)
  - "⌉": [t: "⠈⠘⠾"]              # 0x2309 (Right ceiling)
  - "⌊": [t: "⠈⠰⠷"]              # 0x230A (Left floor)
