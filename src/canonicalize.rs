@@ -515,8 +515,14 @@ impl CanonicalizeContext {
 				return Some(mathml);
 			}
 			_  => {
-				if element_name == "mrow" && mathml.children().is_empty() {
-					return if parent_requires_child {Some(mathml)} else {None}
+				let mut children = mathml.children();
+				if element_name == "mrow" {
+					if children.is_empty() {
+						return if parent_requires_child {Some(mathml)} else {None};
+					} else if children.len() == 1 {
+						return self.clean_mathml( add_attrs(as_element(children[0]), mathml.attributes()) );
+					}
+			
 				}
 				let mathml =  if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 					let merged = merge_dots(mathml);
@@ -528,7 +534,6 @@ impl CanonicalizeContext {
 
 				// cleaning children can "eat" subsequent children, so the children vector isn't reliable
 				// instead we constantly get a new vector by asking for the following siblings until there aren't any
-				let mut children = mathml.children();
 				let mut i = 0;
 				while i < children.len() {
 					if let Some(child) = children[i].element() {
@@ -2226,12 +2231,7 @@ impl CanonicalizeContext {
 	fn canonicalize_mrows_in_mrow<'a>(&self, mrow: Element<'a>) -> Result<Element<'a>> {
 		let saved_mrow_attrs = mrow.attributes();	
 		assert_eq!(name(&mrow), "mrow");
-		let children = mrow.children();
-		// debug!("canonicalize_mrows_in_mrow: mrow len={}", children.len());
-		if children.len() == 1 {
-			return Ok(add_attrs_back(self.canonicalize_mrows(as_element(children[0]))?, saved_mrow_attrs));
-		}
-	
+		// debug!("canonicalize_mrows_in_mrow: mrow len={}", children.len());	
 	
 		// FIX: don't touch/canonicalize
 		// 1. if intent is given -- anything intent references
@@ -2374,21 +2374,21 @@ impl CanonicalizeContext {
 		}
 	
 		parsed_mrow.remove_attribute(CHANGED_ATTR);
-		return Ok( add_attrs_back(parsed_mrow, saved_mrow_attrs) );
-	
-		fn add_attrs_back<'a>(mrow: Element<'a>, attrs: Vec<Attribute>) -> Element<'a> {
-			// debug!(   "Adding back {} attr(s)", attrs.len());
-			for attr in attrs {
-				mrow.set_attribute_value(attr.name(), attr.value());
-			}
-			return mrow;
-		}
-	}
+		return Ok( add_attrs(parsed_mrow, saved_mrow_attrs) );
+	}	
 }
 
 // ---------------- useful utility functions --------------------
 fn top<'s, 'a:'s, 'op:'a>(vec: &'s[StackInfo<'a, 'op>]) -> &'s StackInfo<'a, 'op> {
 	return &vec[vec.len()-1];
+}
+
+fn add_attrs<'a>(mathml: Element<'a>, attrs: Vec<Attribute>) -> Element<'a> {
+	// debug!(   "Adding back {} attr(s)", attrs.len());
+	for attr in attrs {
+		mathml.set_attribute_value(attr.name(), attr.value());
+	}
+	return mathml;
 }
 
 
