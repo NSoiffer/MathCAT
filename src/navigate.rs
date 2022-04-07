@@ -916,8 +916,8 @@ mod tests {
             });
             test_command("ZoomOut", mathml, "msup");
 
-            let nav_speech = do_navigate_command_and_param(mathml, NavigationCommand::Zoom, NavigationParam::Previous)?;
-            // debug!("Full speech: {}", nav_speech);
+            let _nav_speech = do_navigate_command_and_param(mathml, NavigationCommand::Zoom, NavigationParam::Previous)?;
+            // debug!("Full speech: {}", _nav_speech);
             NAVIGATION_STATE.with(|nav_stack| {
                 let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
                 assert_eq!(id, "mfrac");
@@ -1009,8 +1009,8 @@ mod tests {
             });
             test_command("MoveLineStart", mathml, "msup");
 
-            let nav_speech = do_navigate_command_and_param(mathml, NavigationCommand::Move, NavigationParam::Start)?;
-            // debug!("Full speech: {}", nav_speech);
+            let _nav_speech = do_navigate_command_and_param(mathml, NavigationCommand::Move, NavigationParam::Start)?;
+            // debug!("Full speech: {}", _nav_speech);
             NAVIGATION_STATE.with(|nav_stack| {
                 let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
                 assert_eq!(id, "mfrac");
