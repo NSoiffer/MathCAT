@@ -390,6 +390,10 @@ impl CanonicalizeContext {
 			"mfrac", "mroot", "msub", "msup", "msupsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv"
 		};
 
+		static EMPTY_ELEMENTS: phf::Set<&str> = phf_set! {
+			"mspace", "none", "mprescripts", "mglyph", "malignmark", "malgingroup",
+		};
+
 		static ELEMENTS_WITH_ONE_CHILD: phf::Set<&str> = phf_set! {
 			"math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd"
 		};
@@ -408,12 +412,20 @@ impl CanonicalizeContext {
 				ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(parent_name.as_str())
 			};
 		// mspace and mglyph are elements, so don't count them (could be <mrow><mspace/></mrow> and don't want to throw out mspace)
-		if is_leaf(mathml) && element_name != "mspace" && element_name != "mglyph" && as_text(mathml).is_empty() {
+		if is_leaf(mathml) && !EMPTY_ELEMENTS.contains(element_name) && as_text(mathml).is_empty() {
 			// get this out of the way since it common to all leaf elements -- leaving it empty causes problems with the speech rules
 			if !parent_requires_child {
 				return None;
 			}
 			mathml.set_text(" ");
+		};
+		if mathml.children().is_empty() && !EMPTY_ELEMENTS.contains(element_name) {
+			// create some content so that speech rules don't require special cases
+			let mtext = create_mathml_element(&mathml.document(), "mtext");
+			mtext.set_text("\u{A0}");
+			mtext.set_attribute_value("data-added", "missing-content");
+			mathml.append_child(mtext);
+			return Some(mathml);
 		};
 		match element_name {
 			"mn" => {
