@@ -411,7 +411,7 @@ impl CanonicalizeContext {
 				let parent_name = name(&parent).to_string();
 				ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(parent_name.as_str())
 			};
-		// mspace and mglyph are elements, so don't count them (could be <mrow><mspace/></mrow> and don't want to throw out mspace)
+
 		if is_leaf(mathml) && !EMPTY_ELEMENTS.contains(element_name) && as_text(mathml).is_empty() {
 			// get this out of the way since it common to all leaf elements -- leaving it empty causes problems with the speech rules
 			if !parent_requires_child {
@@ -419,13 +419,25 @@ impl CanonicalizeContext {
 			}
 			mathml.set_text(" ");
 		};
+		
 		if mathml.children().is_empty() && !EMPTY_ELEMENTS.contains(element_name) {
-			// create some content so that speech rules don't require special cases
-			let mtext = create_mathml_element(&mathml.document(), "mtext");
-			mtext.set_text("\u{A0}");
-			mtext.set_attribute_value("data-added", "missing-content");
-			mathml.append_child(mtext);
-			return Some(mathml);
+			if element_name == "mrow" {
+				// if it is an empty mrow that doesn't need to be there, get rid of it. Otherwise, replace it with an mtext
+				if parent_requires_child {
+					set_mathml_name(mathml, "mtext");
+					mathml.set_text("\u{A0}");
+					return Some(mathml);
+				} else {
+					return None;
+				}
+			} else {
+				// create some content so that speech rules don't require special cases
+				let mtext = create_mathml_element(&mathml.document(), "mtext");
+				mtext.set_text("\u{A0}");
+				mtext.set_attribute_value("data-added", "missing-content");
+				mathml.append_child(mtext);
+				return Some(mathml);
+			}
 		};
 		match element_name {
 			"mn" => {
@@ -558,6 +570,7 @@ impl CanonicalizeContext {
 								if child != new_child {
 									// replace() doesn't exist, so change 'child' itself
 									child.set_name(new_child.name());
+									add_attrs(child, new_child.attributes());
 									child.replace_children(new_child.children());
 								}
 								children = child.following_siblings();
@@ -577,8 +590,7 @@ impl CanonicalizeContext {
 
 				} else if element_name == "msub" || element_name == "msup" || element_name == "msubsup" {
 					let base = as_element(mathml.children()[0]);
-					if (is_leaf(base) && as_text(base).trim().is_empty()) ||
-					   (name(&base) == "mrow" && base.children().is_empty()) {
+					if is_leaf(base) && as_text(base).trim().is_empty() {
 						convert_to_mmultiscripts(mathml);
 					}
 				}
