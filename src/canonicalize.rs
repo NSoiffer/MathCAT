@@ -1274,7 +1274,6 @@ impl CanonicalizeContext {
 		let first_child = as_element(mrow_children[0]);
 		let last_child = as_element(mrow_children[mrow_children.len()-1]);
 		let last_child_name = name(&last_child);
-		debug!("potentially_lift_script: mrow=\n{}", mml_to_string(&mrow));
 
 		if name(&first_child) == "mo" && is_fence(first_child) &&
 		   (last_child_name == "msub" || last_child_name == "msup" || last_child_name == "msubsup") {
@@ -3620,6 +3619,75 @@ mod canonicalize_tests {
 	}
 
 	#[test]
+    fn lift_script() {
+        let test_str = "<math xmlns='http://www.w3.org/1998/Math/MathML' >
+		<mrow>
+		  <mstyle scriptlevel='0' displaystyle='true'>
+			<mrow>
+			  <msqrt>
+				<munder>
+				  <mo>∑<!-- ∑ --></mo>
+				  <mrow>
+					<mn>0</mn>
+					<mo>≤<!-- ≤ --></mo>
+					<mi>k</mi>
+					<mo>≤<!-- ≤ --></mo>
+					<mi>n</mi>
+				  </mrow>
+				</munder>
+				<mrow>
+				  <mo stretchy='false'>|</mo>
+				</mrow>
+				<msub>
+				  <mi>a</mi>
+				  <mrow>
+					<mi>k</mi>
+				  </mrow>
+				</msub>
+				<msup>
+				  <mrow>
+					<mo stretchy='false'>|</mo>
+				  </mrow>
+				  <mrow>
+					<mn>2</mn>
+				  </mrow>
+				</msup>
+			  </msqrt>
+			</mrow>
+		  </mstyle>
+		</mrow>
+	  </math>";
+        let target_str = "<math>
+		<msqrt>
+		  <mrow data-changed='added'>
+			<munder>
+			  <mo>∑</mo>
+			  <mrow>
+				<mn>0</mn>
+				<mo>≤</mo>
+				<mi>k</mi>
+				<mo>≤</mo>
+				<mi>n</mi>
+			  </mrow>
+			</munder>
+			<msup>
+			  <mrow data-changed='added'>
+				<mo stretchy='false'>|</mo>
+				<msub>
+				  <mi>a</mi>
+				  <mi>k</mi>
+				</msub>
+				<mo stretchy='false'>|</mo>
+			  </mrow>
+			  <mn>2</mn>
+			</msup>
+		  </mrow>
+		</msqrt>
+	   </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
     fn pseudo_scripts() {
         let test_str = "<math><mrow>
 				<mi>cos</mi><mn>30</mn><mo>º</mo>
@@ -3689,6 +3757,7 @@ mod canonicalize_tests {
 		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
+
 
 	#[test]
 	#[ignore]	// this fails -- need to figure out grabbing base from previous or next child
