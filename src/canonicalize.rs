@@ -337,40 +337,49 @@ enum FunctionNameCertainty {
 	False
 }
 
+
+static ELEMENTS_WITH_ONE_CHILD: phf::Set<&str> = phf_set! {
+	"math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd"
+};
+
+
 impl CanonicalizeContext {
 	fn new() -> CanonicalizeContext {
 		return CanonicalizeContext{}
 	}
 
-	fn canonicalize<'a>(&self, mathml: Element<'a>) -> Result<Element<'a>> {
+	fn canonicalize<'a>(&self, mut mathml: Element<'a>) -> Result<Element<'a>> {
 		// debug!("MathML before canonicalize:\n{}", mml_to_string(&mathml));
-		let converted_mathml = mathml;
 	
 		if name(&mathml) != "math" {
 			// debug!("Didn't start with <math> element -- attempting repair");
-			let math_element = create_mathml_element(&converted_mathml.document(), "math");
+			let math_element = create_mathml_element(&mathml.document(), "math");
 			math_element.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
-			math_element.append_child(converted_mathml);
+			math_element.append_child(mathml);
 			let root = math_element.document().root();
 			root.clear_children();
 			root.append_child(math_element);
+			mathml = root.children()[0].element().unwrap();
 		}
-		set_mathml_name(converted_mathml, "math");
-		self.clean_mathml(converted_mathml);
-		let children = converted_mathml.children();
-		if children.len() > 1 {
-			// start canonicalization by adding an mrow -- then the rest flows
-			let mrow_element = create_mathml_element(&converted_mathml.document(), "mrow");
-			mrow_element.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
-			mrow_element.append_children(children);
-			converted_mathml.append_child(mrow_element);
-		}
-		let converted_mathml = self.canonicalize_mrows(converted_mathml)
+		self.clean_mathml(mathml);
+		self.assure_nary_tag_has_mrow(mathml);
+		let converted_mathml = self.canonicalize_mrows(mathml)
 				.chain_err(|| format!("while processing\n{}", mml_to_string(&mathml)))?;
 		debug!("\nMathML after canonicalize:\n{}", mml_to_string(&converted_mathml));
 		return Ok(converted_mathml);
 	}
 	
+	fn assure_nary_tag_has_mrow(&self, mathml: Element) {
+		let children = mathml.children();
+		if children.len() > 1 && ELEMENTS_WITH_ONE_CHILD.contains(name(&mathml)) {
+			// wrap the children in an mrow
+			let mrow = create_mathml_element(&mathml.document(), "mrow");
+			mrow.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
+			mrow.append_children(children);
+			mathml.replace_children(vec![ChildOfElement::Element(mrow)]);
+		}
+	}
+
 	// This function does some cleanup of MathML (mostly fixing bad MathML)
 	// Unlike the main canonicalization routine, significant tree changes happen here
 	// Changes to "good" MathML:
@@ -392,10 +401,6 @@ impl CanonicalizeContext {
 
 		static EMPTY_ELEMENTS: phf::Set<&str> = phf_set! {
 			"mspace", "none", "mprescripts", "mglyph", "malignmark", "malgingroup",
-		};
-
-		static ELEMENTS_WITH_ONE_CHILD: phf::Set<&str> = phf_set! {
-			"math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd"
 		};
 
 		static CURRENCY_SYMBOLS: phf::Set<&str> = phf_set! {
@@ -587,7 +592,6 @@ impl CanonicalizeContext {
 				if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 					merge_number_blocks(mathml);
 					merge_whitespace(mathml);
-
 				} else if element_name == "msub" || element_name == "msup" || element_name == "msubsup" {
 					let base = as_element(mathml.children()[0]);
 					if is_leaf(base) && as_text(base).trim().is_empty() {
@@ -613,12 +617,8 @@ impl CanonicalizeContext {
 					}
 				} else if element_name == "semantics" {
 					return Some( as_element(children[0]) );	// FIX: presentation isn't necessarily first child
-				} else if children.len() > 1 && ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
-						// wrap the children in an mrow
-						let mrow = create_mathml_element(&mathml.document(), "mrow");
-						mrow.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
-						mrow.append_children(children);
-						mathml.replace_children(vec![ChildOfElement::Element(mrow)]);
+				} else {
+					self.assure_nary_tag_has_mrow(mathml);
 				} 
 				return Some(mathml);				
 			}
@@ -1265,7 +1265,40 @@ impl CanonicalizeContext {
 			},
 		}
 	}
-	
+		
+	fn potentially_lift_script<'a>(&self, mrow: Element<'a>) -> Element<'a> {
+		if name(&mrow) != "mrow" {
+			return mrow;
+		}
+		let mut mrow_children = mrow.children();
+		let first_child = as_element(mrow_children[0]);
+		let last_child = as_element(mrow_children[mrow_children.len()-1]);
+		let last_child_name = name(&last_child);
+		debug!("potentially_lift_script: mrow=\n{}", mml_to_string(&mrow));
+
+		if name(&first_child) == "mo" && is_fence(first_child) &&
+		   (last_child_name == "msub" || last_child_name == "msup" || last_child_name == "msubsup") {
+			let base = as_element(last_child.children()[0]);
+			if !(name(&base) == "mo" && is_fence(base)) {
+				return mrow;	// not a case we are interested in
+			}
+			// else drop through
+		} else {
+			return mrow; // not a case we are interested in
+		}
+
+		let script = last_child;	// better name now that we know what it is
+		let mut script_children = script.children();
+		let close_fence = script_children[0];
+		let mrow_children_len = mrow_children.len();		  // rust complains about a borrow after move if we don't store this first
+		mrow_children[mrow_children_len-1] = close_fence;		  // make the mrow hold the fences
+		mrow.replace_children(mrow_children);
+		// make the mrow the child of the script
+		script_children[0] = ChildOfElement::Element(mrow);
+		script.replace_children(script_children);
+		return script;
+	}
+
 	fn canonicalize_plane1<'a>(&self, mi: Element<'a>) -> Element<'a> {
 		// map names to start of Unicode alphanumeric blocks (Roman, digits, Greek)
 		// if the character shouldn't be mapped, use 0 -- don't use 'A' as ASCII and Greek aren't contiguous
@@ -2145,6 +2178,7 @@ impl CanonicalizeContext {
 					parse_stack.push( StackInfo::new(mrow.document()) );
 				} else if children.len() <= 3 {
 					// the mrow started with some open fence (which caused a push) -- add the close, pop, and push on the "operand"
+					new_current_child = self.potentially_lift_script(mrow)
 				} else {
 					panic!("Wrong number of children in mrow when handling a close fence");
 				}
