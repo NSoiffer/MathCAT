@@ -59,6 +59,8 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
         // if these are present when resent to MathJaX, MathJaX crashes (https://github.com/mathjax/MathJax/issues/2822)
         static ref MATHJAX_V2: Regex = Regex::new(r#"class *= *['"]MJX-.*?['"]"#).unwrap();
         static ref MATHJAX_V3: Regex = Regex::new(r#"class *= *['"]data-mjx-.*?['"]"#).unwrap();
+        static ref NAMESPACE_DECL: Regex = Regex::new(r#"xmlns:[[:alpha:]]+"#).unwrap();     // very limited namespace prefix match
+        static ref PREFIX: Regex = Regex::new(r#"(</?)[[:alpha:]]+:"#).unwrap();     // very limited namespace prefix match
     }
 
     NAVIGATION_STATE.with(|nav_stack| {
@@ -74,6 +76,13 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
 
         let mathml_str = MATHJAX_V2.replace_all(&mathml_str, "");
         let mathml_str = MATHJAX_V3.replace_all(&mathml_str, "");
+
+        // the speech rules use the xpath "name" function and that includes the prefix
+        // getting rid of the prefix properly probably involves a recursive replacement in the tree
+        // if the prefix is used, it is almost certainly something like "m" or "mml", so this cheat will work.
+        let mathml_str = NAMESPACE_DECL.replace(&mathml_str, "xmlns");  // do this before the PREFIX replace!
+        let mathml_str = PREFIX.replace_all(&mathml_str, "$1");
+
         let new_package = parser::parse(&mathml_str);    
         if let Err(e) = new_package {
             bail!("Invalid MathML input:\n{}\nError is: {}", &mathml_str, &e.to_string());
@@ -81,7 +90,8 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
         crate::speech::SpeechRules::initialize_all_rules()?;
 
         let new_package = new_package.unwrap();
-        let mathml = cleanup_mathml(get_element(&new_package))?;
+        let mathml = get_element(&new_package);
+        let mathml = cleanup_mathml(mathml)?;
         let mathml_string = mml_to_string(&mathml);
         old_package.replace(new_package);
 
