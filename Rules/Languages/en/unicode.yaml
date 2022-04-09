@@ -3,25 +3,25 @@
  - "a": 
     - test: 
         if: "$TTS='none'"
-        then: {t: eigh}                          # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
-        else: {spell: a}                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
+        then: [t: "eigh"]                         # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
+        else: [spell: "a"]                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
  - "b-z": 
     - test: 
         if: "$TTS='none'"
-        then: {t: .}                          
-        else: {spell: .}                       
+        then: [t: "."]                          
+        else: [spell: "."]                       
 
  - "A":
     - test: 
         if: "$TTS='none'"
-        then: {t: Eigh}                          # long "a" sound in all speech engines I tested (see above)
-        else: {spell: A}
+        then: [t: "cap eigh"]                         # long "a" sound in all speech engines I tested (see above)
+        else: [spell: "A"]
 
  - "B-Z": 
     - test: 
         if: "$TTS='none'"
-        then: {t: .}                          
-        else: {spell: .}                       
+        then: [t: "cap", t: "."]                         
+        else: {spell: "."}                       
 
  - "0-9": [t: "."]
 
@@ -35,12 +35,12 @@
  - "(":                                          # 0x28
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [test: {if: "$Verbosity='Terse'", then: {t: open}, else: {t: open paren}}]
+        then: [test: {if: "$Verbosity='Terse'", then: [t: open], else: [t: open paren]}]
         else: [t: left paren]                            
  - ")":                                          # 0x29
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [test: {if: "$Verbosity='Terse'", then: {t: close}, else: {t: close paren}}]
+        then: [test: {if: "$Verbosity='Terse'", then: [t: close], else: [t: close paren]}]
         else: [t: right paren]                            
 
  - "*": [t: times]                               # 0x2a
@@ -71,13 +71,13 @@
  - "<":                                          # 0x3c
      - test: 
          if: "$Verbosity!='Terse'"
-         then: {t: is}
+         then: [t: is]
      - t: less than
  - "=": [t: equals]                              # 0x3d
  - ">":                                          # 0x3e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: {t: is}
+         then: [t: is]
      - t: greater than
  - "?": [t: question mark]                       # 0x3f
  - "@": [t: at sign]                             # 0x40
@@ -150,134 +150,134 @@
  - "Α":                                          # 0x391
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: alpha
  - "Β":                                          # 0x392
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: beta
  - "Γ":                                          # 0x393
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: gamma
 
     # Note: ClearSpeak has pref TriangleSymbol for this character, but that is wrong
  - "Δ":                                          # 0x394
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: delta
  - "Ε":                                          # 0x395
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: epsilon
  - "Ζ":                                          # 0x396
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: zeta
  - "Η":                                          # 0x397
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: eta
  - "Θ":                                          # 0x398
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: theta
  - "Ι":                                          # 0x399
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: iota
  - "Κ":                                          # 0x39a
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: kappa
  - "Λ":                                          # 0x39b
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: lamda
  - "Μ":                                          # 0x39c
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: mu
  - "Ν":                                          # 0x39d
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: nu
  - "Ξ":                                          # 0x39e
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: zai
  - "Ο":                                          # 0x39f
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: omicron
  - "Π":                                          # 0x3a0
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: pi
  - "Ρ":                                          # 0x3a1
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: rho
  - "Σ":                                          # 0x3a3
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: sigma
  - "Τ":                                          # 0x3a4
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: tau
  - "Υ":                                          # 0x3a5
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: upsilon
  - "Φ":                                          # 0x3a6
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: phi
  - "Χ":                                          # 0x3a7
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: chi
  - "Ψ":                                          # 0x3a8
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: psi
  - "Ω":                                          # 0x3a9
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: omega
  - "Ϊ":                                          # 0x3aa
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: iota with dialytika
  - "Ϋ":                                          # 0x3ab
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: upsilon with dialytika
  - "α": [t: alpha]                               # 0x3b1
  - "β": [t: beta]                                # 0x3b2
@@ -311,7 +311,7 @@
  - "А":                                          # 0x410
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: a
  - "–": [t: en dash]                             # 0x2013
  - "—": [t: em dash]                             # 0x2014
@@ -333,7 +333,7 @@
 
  - "⁡":                                          # 0x2061
     - test:
-        if: $Verbosity!='Terse' and "not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])" 
+        if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])" 
         then: [t: "of"]
  - "⁢": [t: ""]                                   # 0x2062
  - "⁣": [t: ""]                                   # 0x2063
@@ -348,7 +348,7 @@
      - t: double-struck
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: C
  - "℃": [t: degrees celsius]                     # 0x2103
  - "℉": [t: degrees fahrenheit]                  # 0x2109
@@ -356,7 +356,7 @@
      - t: script
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: h
  - "ℎ": [t: planck constant]                     # 0x210e
  - "ℓ": [t: script l]                            # 0x2113
@@ -364,37 +364,37 @@
      - t: double-struck
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: n
  - "ℚ":                                          # 0x211a
      - t: double-struck
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: q
  - "ℛ":                                          # 0x211b
      - t: script
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: r
  - "ℜ":                                          # 0x211c
      - t: fraktur
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: r
  - "ℝ":                                          # 0x211d
      - t: double-struck
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: r
  - "ℤ":                                          # 0x2124
      - t: double-struck
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
-         then: {t: cap}
+         then: [t: "cap"]
      - t: z
  - "Ω": [t: ohms]                                # 0x2126
  - "K": [t: kelvin]                              # 0x212a
@@ -425,12 +425,12 @@
  - "∆":                                          # 0x2206
      - test: 
          if: "$Verbosity!='Terse'"
-         then: {t: the}
+         then: [t: "the"]
      - t: laplacian of
  - "∇":                                          # 0x2207
      - test: 
          if: "$Verbosity!='Terse'"
-         then: {t: the}
+         then: [t: "the"]
      - t: gradient of
  - "∈":                                          # 0x2208
      - test:
@@ -513,12 +513,12 @@
  - "√":                                          # 0x221a
      - test: 
          if: "$Verbosity!='Terse'"
-         then: {t: the}
+         then: [t: "the"]
      - t: square root of
  - "∝":                                          # 0x221d
      - test: 
          if: "$Verbosity!='Terse'"
-         then: {t: is}
+         then: [t: is]
      - t: proportional to
  - "∞": [t: "infinity"]                          # 0x221e
  - "∟": [t: right angle]                         # 0x221f
@@ -529,12 +529,12 @@
  - "∥":                                           # 0x2225
      - test: 
          if: "$Verbosity!='Terse'"
-         then: {t: is}
+         then: [t: is]
      - t: parallel to
  - "∦":                                           # 0x2226
      - test: 
          if: "$Verbosity!='Terse'"
-         then: {t: is}
+         then: [t: is]
      - t: not parallel to
  - "∧": [t: and]                                 # 0x2227
  - "∨": [t: or]                                  # 0x2228
@@ -547,7 +547,7 @@
  - "∶":                                          # 0x2236
      - test: 
          if: "$Verbosity!='Terse'"
-         then: {t: is}
+         then: [t: is]
      - t: to
  - "∷": [t: as]                                  # 0x2237
  - "∼": [t: varies with]                         # 0x223c
@@ -555,13 +555,13 @@
  - "∾":                                          # 0x223e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: {t: is}
+         then: [t: is]
      - t: most positive
  - "∿": [t: sine wave]                           # 0x223f
  - "≠":                                          # 0x2260
      - test: 
          if: "$Verbosity!='Terse'"
-         then: {t: is}
+         then: [t: is]
      - t: not equal to
  - "≡":                                          # 0x2261
      - test: 
@@ -590,12 +590,12 @@
  - "⊄":                                          # 0x2284
      - test: 
          if: "$Verbosity!='Terse'"
-         then: {t: is}
+         then: [t: is]
      - t: not a subset of
  - "⊅":                                          # 0x2285
      - test: 
          if: "$Verbosity!='Terse'"
-         then: {t: is}
+         then: [t: is]
      - t: not a superset of
  - "⊆":                                          # 0x2286
      - test: 
