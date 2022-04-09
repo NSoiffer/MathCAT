@@ -61,11 +61,6 @@ bitflags = "1.2.1"
 phf = { version = "0.8.0", features = ["macros"] }
 zip = { version = "0.5", default-features = false }
 
-# when publishing, the next three lines need to be commented out
-# [[bin]]
-# name = "mathcat"
-# path = "src/main.rs"
-
 [lib]
 name = "libmathcat"
 crate-type = ["rlib", "cdylib"]
