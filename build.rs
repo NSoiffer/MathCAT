@@ -80,5 +80,5 @@ fn main() {
     if let Err(e) = zip_dir(zip_directory, archive, zip_options) {
         panic!("Error: {}", e);
     }
-    // println!("cargo:rerun-if-changed=Rules"); **** UNCOMMENT before commit
+    println!("cargo:rerun-if-changed=Rules");
 }
