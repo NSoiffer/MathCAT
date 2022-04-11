@@ -22,7 +22,7 @@ fn sum_under() {
         </munder>
         <mi>i</mi>
     </math>";
-    test("ClearSpeak", expr, "the sum over S of i");
+    test("ClearSpeak", expr, "the sum over cap s of i");
 }
 #[test]
 fn sum_both_msubsup() {
@@ -46,7 +46,7 @@ fn sum_sub() {
         </msub>
         <mi>i</mi>
     </math>";
-    test("ClearSpeak", expr, "the sum over S of i");
+    test("ClearSpeak", expr, "the sum over cap s of i");
 }
 
 #[test]
@@ -80,7 +80,7 @@ fn product_under() {
         </munder>
         <mi>i</mi>
     </math>";
-    test("ClearSpeak", expr, "the product over S of i");
+    test("ClearSpeak", expr, "the product over cap s of i");
 }
 
 #[test]
@@ -102,7 +102,7 @@ fn intersection_both() {
         </munderover>
         <msub><mi>S</mi><mi>i</mi></msub>
     </math>";
-    test("ClearSpeak", expr, "the intersection from i equals 1 to 10 of; S sub i");
+    test("ClearSpeak", expr, "the intersection from i equals 1 to 10 of; cap s sub i");
 }
 
 #[test]
@@ -114,7 +114,7 @@ fn intersection_under() {
         </munder>
         <msub><mi>S</mi><mi>i</mi></msub>
     </math>";
-    test("ClearSpeak", expr, "the intersection over C of, S sub i");
+    test("ClearSpeak", expr, "the intersection over cap c of, cap s sub i");
 }
 
 #[test]
@@ -123,7 +123,7 @@ fn intersection() {
             <mo>⋂</mo>
             <msub><mi>S</mi><mi>i</mi></msub>
             </math>";
-    test("ClearSpeak", expr, "the intersection of S sub i");
+    test("ClearSpeak", expr, "the intersection of cap s sub i");
 }
 
 #[test]
@@ -136,7 +136,7 @@ fn union_both() {
         </munderover>
         <msub><mi>S</mi><mi>i</mi></msub>
     </math>";
-    test("ClearSpeak", expr, "the union from i equals 1 to 10 of, S sub i");
+    test("ClearSpeak", expr, "the union from i equals 1 to 10 of, cap s sub i");
 }
 
 #[test]
@@ -148,7 +148,7 @@ fn union_under() {
         </munder>
         <msub><mi>S</mi><mi>i</mi></msub>
     </math>";
-    test("ClearSpeak", expr, "the union over C of S sub i");
+    test("ClearSpeak", expr, "the union over cap c of, cap s sub i");
 }
 
 #[test]
@@ -157,7 +157,7 @@ fn union() {
             <mo>⋃</mo>
             <msub><mi>S</mi><mi>i</mi></msub>
             </math>";
-    test("ClearSpeak", expr, "the union of S sub i");
+    test("ClearSpeak", expr, "the union of cap s sub i");
 }
 
 #[test]

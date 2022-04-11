@@ -417,6 +417,8 @@ fn trim_doc(doc: &Document) {
 
 /// Not really meant to be public -- used by tests in some packages
 pub fn trim_element(e: &Element) {
+    const TEMP_NBSP: &str = "\u{F8FB}";
+
     // "<mtext>this is text</mtext" results in 3 text children
     // these are combined into one child as it makes code downstream simpler
     if is_leaf(*e) {
@@ -442,7 +444,6 @@ pub fn trim_element(e: &Element) {
     }
 
     // hack to avoid non-breaking whitespace from being removed -- move to a unique non-whitespace char then back
-    const TEMP_NBSP: &str = "\u{F8FB}";
     let trimmed_text = single_text.replace(' ', TEMP_NBSP).trim().replace(TEMP_NBSP, " ");
     if !e.children().is_empty() && !trimmed_text.is_empty() {
         // FIX: we have a problem -- what should happen???
@@ -482,7 +483,10 @@ pub fn trim_element(e: &Element) {
 
         // get rid of the old children and replace with the text we just built
         mathml_leaf.clear_children();
-        mathml_leaf.set_text(&text);
+
+        // hack to avoid non-breaking whitespace from being removed -- move to a unique non-whitespace char then back
+        let trimmed_text = text.replace(' ', TEMP_NBSP).trim().replace(TEMP_NBSP, " ");
+        mathml_leaf.set_text(&trimmed_text);
     }
 }
 

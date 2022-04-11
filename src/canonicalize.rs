@@ -3305,24 +3305,21 @@ mod canonicalize_tests {
     fn remove_mtext_whitespace_3() {
         let test_str = "<math><mi>t</mi>
 				<mrow><mtext>&#x2009;</mtext><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></mrow></math>";
-        let target_str = " <math>
+        let target_str = "<math>
 		<mrow data-changed='added'>
 		  <mi>t</mi>
-		  <mo data-changed='added'>&#x2062;</mo>
+		  <mo data-changed='added' data-guess='true'>&#x2062;</mo>
 		  <mrow>
-			<mtext>&#xA0;</mtext>
-			<mo data-changed='added'>&#x2062;</mo>
+			<mo>(</mo>
 			<mrow data-changed='added'>
-			  <mo>(</mo>
-			  <mrow data-changed='added'>
-				<mi>x</mi>
-				<mo>+</mo>
-				<mi>y</mi>
-			  </mrow>
-			  <mo>)</mo>
+			  <mi>x</mi>
+			  <mo>+</mo>
+			  <mi>y</mi>
 			</mrow>
+			<mo>)</mo>
 		  </mrow>
-		</mrow> </math>";
+		</mrow>
+	   </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
@@ -3518,7 +3515,7 @@ mod canonicalize_tests {
 					<mn>456</mn>
 					<mo>+</mo>
 					<mrow data-changed='added'>
-					<mn>4&#xA0;</mn>
+					<mn>4</mn>
 					<mo data-changed='added'>&#x2062;</mo>
 					<mn>32</mn>
 					</mrow>

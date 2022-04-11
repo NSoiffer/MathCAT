@@ -77,14 +77,8 @@ fn main() {
   // let expr = "<math><mi>c</mi><mo>=</mo><mn>4</mn><mspace width=\"thinmathspace\"></mspace><mn>598</mn>
   //                 <mspace width=\"thinmathspace\"></mspace><mn>037</mn>
   //                 <mspace width=\"thinmathspace\"></mspace><mn>234</mn></math>";
-  // let expr = "<math><mn>𝟏𝟐𝟑</mn></math>";
-  let expr = "<math>
-      <msub>
-        <mtext></mtext>
-        <mn>92</mn>
-      </msub>
-      <mi>U</mi>
-    </math>
+let expr = "
+      <math><mn>4</mn><mtext> </mtext><mn>32</mn></math>
     ";
   let instant = Instant::now();
   let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../../Rules");
@@ -96,15 +90,15 @@ fn main() {
   };
 
   info!("Version = '{}'", get_version());
-  set_preference("TTS".to_string(), "SSML".to_string()).unwrap();
+  set_preference("TTS".to_string(), "none".to_string()).unwrap();
   // set_preference("Bookmark".to_string(), "true".to_string()).unwrap();
-  set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+  set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
 
   match get_spoken_text() {
     Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
     Err(e) => panic!("{}", errors_to_string(&e)),
   }
-  info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()));
+  info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
   set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
   match get_braille("".to_string()) {
@@ -113,7 +107,7 @@ fn main() {
   }
 
   // Note: the logger seems to be a huge time sync, so println! is used for timing
-  // info!("Time taken: {}ms", instant.elapsed().as_millis());
+  info!("Time taken: {}ms", instant.elapsed().as_millis());
   // let instant = Instant::now();
   // set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
   // match get_spoken_text() {
@@ -126,5 +120,5 @@ fn main() {
   //   Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
   //   Err(e) => panic!("{}", errors_to_string(&e)),
   // }
-  info!("Time taken (second time): {}ms", instant.elapsed().as_millis());
+  // info!("Time taken (second time): {}ms", instant.elapsed().as_millis());
 }

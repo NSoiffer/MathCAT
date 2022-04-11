@@ -3,31 +3,31 @@ use crate::common::*;
 #[test]
 fn transpose() {
   let expr = "<math> <msup><mi>M</mi><mi>T</mi></msup> </math>";
-  test("SimpleSpeak", expr, "M transpose");
+  test("SimpleSpeak", expr, "cap m transpose");
 }
 
 #[test]
 fn trace() {
   let expr = "<math> <mi>Tr</mi><mi>M</mi> </math>";
-  test("SimpleSpeak", expr, "trace of M");
+  test("SimpleSpeak", expr, "trace of cap m");
 }
 
 #[test]
 fn dimension() {
   let expr = "<math> <mi>Dim</mi><mi>M</mi> </math>";
-  test("SimpleSpeak", expr, "dimension of M");
+  test("SimpleSpeak", expr, "dimension of cap m");
 }
 
 #[test]
 fn homomorphism() {
   let expr = "<math> <mi>Hom</mi><mo>(</mo><mi>M</mi><mo>)</mo> </math>";
-  test("SimpleSpeak", expr, "homomorphism of M");
+  test("SimpleSpeak", expr, "homomorphism of cap m");
 }
 
 #[test]
 fn kernel() {
   let expr = "<math> <mi>ker</mi><mrow><mo>(</mo><mi>L</mi><mo>)</mo></mrow> </math>";
-  test("SimpleSpeak", expr, "kernel of L");
+  test("SimpleSpeak", expr, "kernel of cap l");
 }
 
 #[test]

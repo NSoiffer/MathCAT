@@ -14,13 +14,14 @@
  - "A":
     - test: 
         if: "$TTS='none'"
-        then: [t: "cap eigh"]                         # long "a" sound in all speech engines I tested (see above)
+        then: [x: "$CapitalLetters", t: "eigh"]                         # long "a" sound in all speech engines I tested (see above)
         else: [spell: "A"]
 
  - "B-Z": 
     - test: 
         if: "$TTS='none'"
-        then: [t: "cap", t: "."]                         
+        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
+        then: [x: "$CapitalLetters", x: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]                         
         else: {spell: "."}                       
 
  - "0-9": [t: "."]
