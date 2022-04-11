@@ -2290,8 +2290,8 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
     fn replace_chars(&'r mut self, str: &str, mathml: Element<'c>) -> Result<String> {
         let rules = self.speech_rules;
         let mut chars = str.chars();
-            // avoid "a" -> "eigh", "." -> "point" and non-breaking space but catch monospaced "a" so it becomes "a"
-            if rules.translate_single_chars_only && str.find(|ch: char| ch.is_ascii() || ch == '\u{00A0}').is_some() {
+        // avoid "a" -> "eigh", "." -> "point" and non-breaking space but catch monospaced "a" so it becomes "a"
+        if rules.translate_single_chars_only && str.find(|ch: char| ch.is_ascii() || ch == '\u{00A0}').is_some() {
             let ch = chars.next().unwrap_or(' ');
             if chars.next().is_none() {
                 // single char
