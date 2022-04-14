@@ -12,7 +12,7 @@ use zip::write::FileOptions;
 use zip::CompressionMethod;
 use zip::ZipWriter;
 
-pub fn zip_dir<T: Write + Seek>(
+fn zip_dir<T: Write + Seek>(
     path: &Path,
     target: T,
     options: FileOptions,
@@ -51,7 +51,7 @@ fn zip_entry<T: Write + Seek>(
     
             file.read_to_end(&mut buffer)?;
     
-            zip.write(&buffer)?;
+            zip.write_all(&buffer)?;
         }
     }
 
@@ -64,7 +64,7 @@ fn main() {
 
     let out_dir = std::env::var_os("OUT_DIR").unwrap();
     let archive: PathBuf = [out_dir, std::ffi::OsString::from("rules.zip")].iter().collect();
-    eprintln!("archive: '{:?}'", archive.to_str());
+    eprintln!("zip file location: '{:?}'", archive.to_str());
 
     let archive = match File::create(&archive) {
         Ok(file) => file,
@@ -75,7 +75,8 @@ fn main() {
     // eprintln!("rules dir: '{:?}'", zip_directory.to_str());
 
     let zip_directory = Path::new("Rules");
-    let zip_options = FileOptions::default().compression_method(CompressionMethod::Deflated);
+    let zip_options = FileOptions::default().compression_method(CompressionMethod::Deflated)
+                    .compression_level(Some(9));
 
     if let Err(e) = zip_dir(zip_directory, archive, zip_options) {
         panic!("Error: {}", e);
