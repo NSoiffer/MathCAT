@@ -32,7 +32,7 @@ Timeline:
 * Fall: potentially work on 2D Nemeth generation along with Nemeth input
 
 These plans are very tentative and will likely change based on feedback from users and AT developers.
-I also commitments for working on the MathML spec, so that can also delay some of these dates.
+I also have commitments for working on the MathML spec, so that can also delay some of these dates.
 
 # Documentation for different MathCAT Users
 
