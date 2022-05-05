@@ -22,16 +22,17 @@ A demo to show off some of MathCAT's features and also as an aid for debugging w
 Timeline:
 * ✓ December/early January: prototype usage of preliminary MathML WG proposal for "intent"
 * ✓ January: Distribute MathCAT to a small group of students and other users for feedback and bug reports
-* late January/February: add more intent inference rules
-* February: Release MathCAT as NVDA add-on
-* February/March: Work on at least one translation of MathCAT to another language
 * ✓ February/March: Work on MathML->UEB translation
-* May/June: work on UEB->MathML translation and explore UEB->Nemeth math translator
-* Late spring/summer: develop GUI interface for setting user preferences
-* Summer, Fall, and Winter: work with translators to hopefully add many languages
+* late April/May: add more intent inference rules
+* May: Release MathCAT as NVDA add-on
+* June/July: Work on at least one translation of MathCAT to another language
+* Aug/Sept: work on UEB->MathML translation and explore UEB->Nemeth math translator
+* ✓ Late spring/summer: develop GUI interface for setting user preferences
+* Fall, Winter: work with translators to hopefully add many languages
 * Fall: potentially work on 2D Nemeth generation along with Nemeth input
 
 These plans are very tentative and will likely change based on feedback from users and AT developers.
+I also commitments for working on the MathML spec, so that can also delay some of these dates.
 
 # Documentation for different MathCAT Users
 
