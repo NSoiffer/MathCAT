@@ -213,7 +213,7 @@
     tag: mtr
     match: "."
     replace:
-    - x: "DEBUG(*)"
+    - x: "*"
 
 -
     name: default

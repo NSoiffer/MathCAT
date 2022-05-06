@@ -656,7 +656,7 @@
          then: {t: determinant}
          else: {t: matrix}
 -
-  name: default
+  name: ClearSpeak-default
   tag: [mtr, mlabeledtr]
   match: "parent::m:matrix or parent::m:determinant"
   replace:
@@ -735,11 +735,11 @@
    replace:
    - x: "count(*)"
    - test:
-      - if: "(DEBUG($ClearSpeak_MultiLineLabel) = 'Auto' and self::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
+      - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
         then: [t: "case"]
       - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case 
         then: [t: "line"]
-      - else_if: "DEBUG($ClearSpeak_MultiLineLabel = 'Constraint')" 
+      - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'" 
         then: [t: "constraint"]
       - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'" 
         then: [t: "equation"]

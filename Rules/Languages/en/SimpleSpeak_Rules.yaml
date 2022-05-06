@@ -398,7 +398,7 @@
         then: {t: determinant}
         else: {t: matrix}
 -
-  name: default
+  name: SimpleSpeak-default
   tag: [mtr, mlabeledtr]
   match: "parent::m:matrix or parent::m:determinant"
   replace:
