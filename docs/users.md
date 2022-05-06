@@ -1,5 +1,11 @@
 # MathCAT: Math Capable Assistive Technology
 <img src="logo.png" style="position: relative; top: 16px; z-index: -1;">
+<br/>
+<br/>
+<br/>
+
+## Advice on Choosing a Voice
+In NVDA, you have a choice of using different synthesizers. This is found in NVDA `Preferences:Settings...` followed by choosing `Speech`. There are usually at least three choices: eSpeak NG, Microsoft Speech API, Windows OneCore voices. All synthesizers work, but the Windows OneCore voices don't support speaking "a" properly and the other options should be used. In particular, the Microsoft Speech API are a good substitute for the OneCore voices.
 
 ## Information for MathCAT users
 MathCAT supports a number of options to control speech, braille, and navigation. These are described below.
@@ -60,7 +66,7 @@ The default value is given in \[brackets\].
   * Status: not yet implemented. Inferring Chemical notations is a bit tricky so MathCAT will sometimes not pick it up. The work of the MathML WG may make it substantially easier for authors to indicate that something is Chemistry.
 
 SpeechOverrides:
-* CapitalLetters: "cap"     # word to say as a prefix for capital letters unless in unicode.yaml; empty string leaves it to screen reader
+* ✓CapitalLetters: "cap"     # word to say as a prefix for capital letters unless in unicode.yaml; empty string leaves it to screen reader
 * LeftParen: ""             # word used as override
 * RightParen: ""            # word used as override
 
