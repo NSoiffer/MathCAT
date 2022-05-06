@@ -7,8 +7,7 @@ In NVDA, you have a choice of using different synthesizers. This is found in NVD
 MathCAT supports a number of options to control speech, braille, and navigation. These are described below.
 Not all options are currently supported. The current state of support for an option is listed with the option and a ✓ is used before the option as a quick reference to indicate at least partial support for that option.
 
-Note: currently, the options can only be changed by modifying a text file. Work is being done to provide a more friendly (accessible) GUI.
-This documentation will be updated when the GUI is ready to be used.
+Note: in NVDA, the options can be set by using the MathCAT preferences dialog. This is accessed by going to the NVDA preferences, choosing "Tools", and then "MathCAT settings...". The settings are divided into three categories: Speech, Navigation, and Braille. This division is reflected in the documentation below.
 
 MathCAT supports multiple modes of navigation. The means to begin navigating and end navigating will differ depending on the AT you are using. See the list below. The commands/key-strokes accepted by MathCAT are the same as those accepted by MathPlayer and are [listed in this document](https://docs.wiris.com/en/mathplayer/navigation_commands). MathCAT's navigation is the same in Word and in a browser.
 
@@ -49,6 +48,10 @@ The default value is given in \[brackets\].
       This only works for implementations that tell MathCAT to generate speech engine tagging such as SSML.
     * Status: This should work in NVDA.
 
+* ✓SpeechSound: [None]
+    * Options: None, Beep
+    * Description: a start and end beep occur before and after reading an expression.
+    * Status: This should work in NVDA.
 
 * SubjectArea: [General]
   * Status: this was used in MathPlayer but not yet currently implemented. I am waiting on further discussion in the MathML which might add this as a means of providing different default `intent` values.
