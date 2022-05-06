@@ -1068,12 +1068,12 @@
   name: move-next-no-auto-zoom-at-edge
   tag: "*"
   variables: [EdgeNode: "EdgeNode(., 'right', '2D')"]
-  match: "$NavCommand = 'MoveNext' and $NavMode!='Character' and not($AutoZoomOut) and $EdgeNode/@id!=@id"
+  match: "$NavCommand = 'MoveNext' and $NavMode!='Character' and not($AutoZoomOut) and DEBUG($EdgeNode/@id)!=@id"
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse' and $NavCommand = 'MoveNext'"
       then:
-        - t: "can't move right"
+        - t: "cannot move right"
   - with:
       variables: [Move2D:  "'end of'", Child2D: "$EdgeNode/*[last()]"]
       replace: [x: "$EdgeNode"]
@@ -1087,12 +1087,12 @@
   tag: "*"
   match:
   - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
-  - "EdgeNode(., 'right', 'math')/@id!=@id"   # at edge of math
+  - "(self::m:math or EdgeNode(., 'right', 'math')/@id!=@id)"   # at edge of math
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
       then:
-      - t: "can't"
+      - t: "cannot"
       - test:
           - if: "$NavCommand = 'MoveNext'"
             then: [t:  "move"]
@@ -1284,7 +1284,7 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse' and $NavCommand = 'MovePrevious'"
       then:
-        - t: "can't move left"
+        - t: "cannot move left"
   - with:
       variables: [Move2D:  "'end of'", Child2D: "$EdgeNode/*[1]"]
       replace: [x: "$EdgeNode"]
@@ -1296,7 +1296,7 @@
   tag: "*"
   match:
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
-  - "EdgeNode(., 'left', 'math')/@id!=@id"
+  - "(self::m:math or EdgeNode(., 'left', 'math')/@id!=@id)"
   replace:
   - t: "start of math"
   - pause: long
@@ -1313,7 +1313,7 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
       then:
-      - t: "can't move left, start of math"
+      - t: "cannot move left, start of math"
       - pause: long
   - set_variables: [SpeakExpression: "'false'"]
 
