@@ -1381,7 +1381,7 @@ struct VariableDefinition {
 
 impl fmt::Display for VariableDefinition {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "[name: {}, value: {}]", self.name, self.value);
+        return write!(f, "[name: {}={}]", self.name, self.value);
     }   
 }
 
@@ -1441,7 +1441,7 @@ struct VariableDefinitions {
 impl fmt::Display for VariableDefinitions {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         for def in &self.defs {
-            write!(f, "  {}={}", &def.name, &def.value)?;
+            write!(f, "{},", def)?;
         }
         return Ok( () );
     }
