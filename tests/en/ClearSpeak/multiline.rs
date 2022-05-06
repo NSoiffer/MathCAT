@@ -68,7 +68,7 @@ fn equation_case() {
 
 #[test]
 fn equation_constraint() {
-    let expr = "<math>
+  let expr = "<math>
      <mrow>
       <mtable>
        <mtr> <mtd> <mrow> <mi>x</mi><mo>+</mo><mi>y</mi></mrow> </mtd>  <mtd><mo>=</mo> </mtd>  <mtd><mn>7</mn></mtd>  </mtr>

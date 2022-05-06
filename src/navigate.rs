@@ -1268,7 +1268,7 @@ mod tests {
                     current_node_offset: 0
                 }, "None")
             });
-            test_command("MoveCellNext", mathml, "nav-12");
+            test_command("MoveNext", mathml, "nav-12");
             test_command("MoveNext", mathml, "nav-13");
             test_command("MoveNext", mathml, "nav-14");
             test_command("MoveNext", mathml, "nav-17");
@@ -1277,7 +1277,7 @@ mod tests {
             test_command("MoveCellPrevious", mathml, "nav-14");
             test_command("MovePrevious", mathml, "nav-13");
             test_command("MovePrevious", mathml, "nav-12");
-            test_command("MovePrevious", mathml, "nav-12");
+            test_command("MoveCellPrevious", mathml, "nav-12");
             test_command("MovePrevious", mathml, "nav-8");
             test_command("MoveCellDown", mathml, "nav-20");
             test_command("MoveCellDown", mathml, "nav-27");
