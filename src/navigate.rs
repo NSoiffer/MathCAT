@@ -213,7 +213,7 @@ impl NavigationState {
         }
            
         context.set_variable("ReadZoomLevel", (if self.mode == "Enhanced" {-1} else {1}) as f64);
-        context.set_variable("MatchCounter", 0 as f64);						// default is to speak the expr after navigation
+        context.set_variable("MatchCounter", 0 as f64);
 
         if command == "MoveLastLocation" {
             let previous_command = match nav_state_top {
@@ -225,7 +225,8 @@ impl NavigationState {
 
         // used by nav rules for speech -- needs an initial value so tests don't fail
         context.set_variable("Move2D", "" );
-        context.set_variable("SpeakExpression","true" );
+        context.set_variable("SpeakExpression","true" );    // default is to speak the expr after navigation
+
 
         return;
 
@@ -800,7 +801,7 @@ mod tests {
                 // debug!("Full speech: {}", nav_speech);
                 NAVIGATION_STATE.with(|nav_stack| {
                     let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
-                    assert_eq!(id, result_id);
+                    assert_eq!(result_id, id);
                 });
         
                 return nav_speech;
@@ -1113,6 +1114,177 @@ mod tests {
             test_command("MoveNext", mathml, "Myt3m7mx-13");
             test_command("MoveNext", mathml, "Myt3m7mx-15");
             test_command("MoveNext", mathml, "Myt3m7mx-15");
+
+            return Ok( () );
+        });
+    }
+    
+    #[test]
+    fn move_cell() -> Result<()> {
+        let mathml_str = "<math id='nav-0' data-id-added='true'>
+        <mtable id='nav-1' data-id-added='true'>
+          <mtr id='nav-2' data-id-added='true'>
+            <mtd id='nav-3' data-id-added='true'> <mn id='nav-4' data-id-added='true'>1</mn></mtd>
+            <mtd id='nav-5' data-id-added='true'> <mn id='nav-6' data-id-added='true'>2</mn></mtd>
+            <mtd id='nav-7' data-id-added='true'><mn id='nav-8' data-id-added='true'>3</mn> </mtd>
+          </mtr>
+          <mtr id='nav-9' data-id-added='true'>
+            <mtd id='nav-10' data-id-added='true'>
+              <mrow data-changed='added' id='nav-11' data-id-added='true'>
+                <mi id='nav-12' data-id-added='true'>x</mi>
+                <mo id='nav-13' data-id-added='true'>-</mo>
+                <mi id='nav-14' data-id-added='true'>y</mi>
+              </mrow>
+            </mtd>
+            <mtd id='nav-15' data-id-added='true'>
+              <mfrac id='nav-16' data-id-added='true'>
+                <mn id='nav-17' data-id-added='true'>1</mn>
+                <mn id='nav-18' data-id-added='true'>2</mn>
+              </mfrac>
+            </mtd>
+            <mtd id='nav-19' data-id-added='true'>
+              <mi id='nav-20' data-id-added='true'>z</mi>
+            </mtd>
+          </mtr>
+          <mtr id='nav-21' data-id-added='true'>
+            <mtd id='nav-22' data-id-added='true'><mn id='nav-23' data-id-added='true'>7</mn> </mtd>
+            <mtd id='nav-24' data-id-added='true'><mn id='nav-25' data-id-added='true'>8</mn> </mtd>
+            <mtd id='nav-26' data-id-added='true'> <mn id='nav-27' data-id-added='true'>9</mn></mtd>
+          </mtr>
+          <mtr id='nav-28' data-id-added='true'>
+            <mtd id='nav-29' data-id-added='true'>
+              <mrow data-changed='added' id='nav-30' data-id-added='true'>
+                <mi id='nav-31' data-id-added='true'>sin</mi>
+                <mo data-changed='added' id='nav-32' data-id-added='true'>&#x2061;</mo>
+                <mi id='nav-33' data-id-added='true'>x</mi>
+              </mrow>
+            </mtd>
+            <mtd id='nav-34' data-id-added='true'>
+              <msup id='nav-35' data-id-added='true'>
+                <mi id='nav-36' data-id-added='true'>e</mi>
+                <mi id='nav-37' data-id-added='true'>x</mi>
+              </msup>
+            </mtd>
+            <mtd id='nav-38' data-id-added='true'>
+              <mrow data-changed='added' id='nav-39' data-id-added='true'>
+                <mn id='nav-40' data-id-added='true'>2</mn>
+                <mo id='nav-41' data-id-added='true'>-</mo>
+                <mi id='nav-42' data-id-added='true'>y</mi>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+       </math>";
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
+        set_preference("NavMode".to_string(), "Enhanced".to_string())?;
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomInAll", mathml, "nav-4");
+            test_command("MoveCellNext", mathml, "nav-6");
+            test_command("MoveCellNext", mathml, "nav-8");
+            test_command("MoveCellNext", mathml, "nav-8");
+            test_command("MoveCellDown", mathml, "nav-20");
+            test_command("MoveCellDown", mathml, "nav-27");
+            test_command("MoveCellDown", mathml, "nav-39");
+            test_command("MoveCellDown", mathml, "nav-39");
+            test_command("MoveCellPrevious", mathml, "nav-35");
+            test_command("ZoomIn", mathml, "nav-36");
+            test_command("MoveCellUp", mathml, "nav-25");
+            test_command("MoveCellUp", mathml, "nav-16");
+            test_command("MoveCellUp", mathml, "nav-6");
+            test_command("MoveCellUp", mathml, "nav-6");
+
+            return Ok( () );
+        });
+    }
+    
+    #[test]
+    fn move_cell_char_mode() -> Result<()> {
+        let mathml_str = "<math id='nav-0' data-id-added='true'>
+        <mtable id='nav-1' data-id-added='true'>
+          <mtr id='nav-2' data-id-added='true'>
+            <mtd id='nav-3' data-id-added='true'> <mn id='nav-4' data-id-added='true'>1</mn></mtd>
+            <mtd id='nav-5' data-id-added='true'> <mn id='nav-6' data-id-added='true'>2</mn></mtd>
+            <mtd id='nav-7' data-id-added='true'><mn id='nav-8' data-id-added='true'>3</mn> </mtd>
+          </mtr>
+          <mtr id='nav-9' data-id-added='true'>
+            <mtd id='nav-10' data-id-added='true'>
+              <mrow data-changed='added' id='nav-11' data-id-added='true'>
+                <mi id='nav-12' data-id-added='true'>x</mi>
+                <mo id='nav-13' data-id-added='true'>-</mo>
+                <mi id='nav-14' data-id-added='true'>y</mi>
+              </mrow>
+            </mtd>
+            <mtd id='nav-15' data-id-added='true'>
+              <mfrac id='nav-16' data-id-added='true'>
+                <mn id='nav-17' data-id-added='true'>1</mn>
+                <mn id='nav-18' data-id-added='true'>2</mn>
+              </mfrac>
+            </mtd>
+            <mtd id='nav-19' data-id-added='true'>
+              <mi id='nav-20' data-id-added='true'>z</mi>
+            </mtd>
+          </mtr>
+          <mtr id='nav-21' data-id-added='true'>
+            <mtd id='nav-22' data-id-added='true'><mn id='nav-23' data-id-added='true'>7</mn> </mtd>
+            <mtd id='nav-24' data-id-added='true'><mn id='nav-25' data-id-added='true'>8</mn> </mtd>
+            <mtd id='nav-26' data-id-added='true'> <mn id='nav-27' data-id-added='true'>9</mn></mtd>
+          </mtr>
+          <mtr id='nav-28' data-id-added='true'>
+            <mtd id='nav-29' data-id-added='true'>
+              <mrow data-changed='added' id='nav-30' data-id-added='true'>
+                <mi id='nav-31' data-id-added='true'>sin</mi>
+                <mo data-changed='added' id='nav-32' data-id-added='true'>&#x2061;</mo>
+                <mi id='nav-33' data-id-added='true'>x</mi>
+              </mrow>
+            </mtd>
+            <mtd id='nav-34' data-id-added='true'>
+              <msup id='nav-35' data-id-added='true'>
+                <mi id='nav-36' data-id-added='true'>e</mi>
+                <mi id='nav-37' data-id-added='true'>x</mi>
+              </msup>
+            </mtd>
+            <mtd id='nav-38' data-id-added='true'>
+              <mrow data-changed='added' id='nav-39' data-id-added='true'>
+                <mn id='nav-40' data-id-added='true'>2</mn>
+                <mo id='nav-41' data-id-added='true'>-</mo>
+                <mi id='nav-42' data-id-added='true'>y</mi>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+       </math>";
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
+        set_preference("NavMode".to_string(), "Character".to_string())?;
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            NAVIGATION_STATE.with(|nav_stack| {
+                nav_stack.borrow_mut().push(NavigationPosition{
+                    current_node: "nav-8".to_string(),
+                    current_node_offset: 0
+                }, "None")
+            });
+            test_command("MoveCellNext", mathml, "nav-12");
+            test_command("MoveNext", mathml, "nav-13");
+            test_command("MoveNext", mathml, "nav-14");
+            test_command("MoveNext", mathml, "nav-17");
+            test_command("MovePrevious", mathml, "nav-14");
+            test_command("MoveCellNext", mathml, "nav-17");
+            test_command("MoveCellPrevious", mathml, "nav-14");
+            test_command("MovePrevious", mathml, "nav-13");
+            test_command("MovePrevious", mathml, "nav-12");
+            test_command("MovePrevious", mathml, "nav-12");
+            test_command("MovePrevious", mathml, "nav-8");
+            test_command("MoveCellDown", mathml, "nav-20");
+            test_command("MoveCellDown", mathml, "nav-27");
+            test_command("MoveCellDown", mathml, "nav-40");
+            test_command("MoveCellDown", mathml, "nav-40");
+            test_command("MoveCellPrevious", mathml, "nav-37");
+            test_command("MoveCellUp", mathml, "nav-25");
 
             return Ok( () );
         });
