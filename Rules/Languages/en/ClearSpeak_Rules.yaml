@@ -562,7 +562,7 @@
    replace: 
    - t: the 1 by
    - x: count(*/*)
-   - t: row
+   - t: "row"
    - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: {t: vector}
@@ -586,7 +586,7 @@
    replace: 
    - t: the 1 by
    - x: "count(*/*)"
-   - t: row
+   - t: "row"
    - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: {t: vector}
@@ -660,7 +660,7 @@
   tag: [mtr, mlabeledtr]
   match: "parent::m:matrix or parent::m:determinant"
   replace:
-   - t: row
+   - t: "row"
    - x: "count(preceding-sibling::*)+1"
    - test:
       if: .[self::m:mlabeledtr]
@@ -674,7 +674,7 @@
       then: [x: "*[position()>1]"]
       else: {x: "*"}
 -
-  name: default
+  name: matrix-default
   tag: mtd
   match: "parent::*[parent::m:matrix or parent::m:determinant]"
   replace:

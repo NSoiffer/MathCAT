@@ -204,7 +204,27 @@
          then: {t: "column"}
          else: {t: "columns"}
     - pause: long
-    - x: "* "
+    - x: "*"
+
+-
+    # this may get called from navigation -- in that case, there is no context to speak the row #, so don't do it
+    # callers/context should do that.
+    name: default
+    tag: mtr
+    match: "."
+    replace:
+    - x: "DEBUG(*)"
+
+-
+    name: default
+    tag: mtd
+    match: "."
+    replace:
+    - t: "column"
+    - x: "count(preceding-sibling::*)+1"
+    - pause: medium
+    - x: "*"  # speak the entry
+    - pause: long
 
 -
   # Note: @notation can contain more than one value
