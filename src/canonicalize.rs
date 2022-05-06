@@ -2346,9 +2346,9 @@ impl CanonicalizeContext {
 	
 					if name(&base_of_child) == "mo" {
 						current_op.ch = as_text(base_of_child);
-						debug!("  Found whitespace op '{}'/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
+						// debug!("  Found whitespace op '{}'/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
 					} else {
-						debug!("  Found implicit op {}/{} [{:?}]", show_invisible_op_char(current_op.ch), current_op.op.priority, likely_function_name);
+						// debug!("  Found implicit op {}/{} [{:?}]", show_invisible_op_char(current_op.ch), current_op.op.priority, likely_function_name);
 						self.reduce_stack(&mut parse_stack, current_op.op.priority,
 							self.is_function_name(base_of_child, None) != FunctionNameCertainty::True);
 		
