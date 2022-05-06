@@ -331,7 +331,7 @@ const MATHML_LEAF_NODES: &[&str] = &["mi", "mo", "mn", "mtext", "ms", "mspace", 
 static MATHML_2D_NODES: &[&str] = &[
     "mfrac", "msqrt", "mroot", "menclose",
     "msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts",
-    "mtable"
+    "mtable", "mtr", "mlabeledtr", "mtd"
 ];
 
 pub fn is_leaf(element: Element) -> bool {
