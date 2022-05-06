@@ -1183,7 +1183,14 @@
       - x: "count(preceding-sibling::*)+2"
       - t: "column 1"
       - pause: medium
-      - set_variables: [NavNode: "following-sibling::*[1]/*[1]/*[1]/@id"]
+      - test:
+          if: "$NavMode = 'Character'"
+          then:
+          - with:
+              variables: [NavCommand: "'MoveNextZoom'"]
+              replace: [x: "following-sibling::*[1]"]
+          else:
+          - set_variables: [NavNode: "following-sibling::*[1]/*[1]/*[1]/@id"]
       else: [x: ".."]   # try again for after
 
 -
@@ -1416,7 +1423,14 @@
       - t: "column"
       - x: "count(*)"
       - pause: medium
-      - set_variables: [NavNode: "preceding-sibling::*[1]/*[last()]/*[last()]/@id"]
+      - test:
+          if: "$NavMode = 'Character'"
+          then:
+          - with:
+              variables: [NavCommand: "'MovePreviousZoom'"]
+              replace: [x: "preceding-sibling::*[1]"]
+          else:
+          - set_variables: [NavNode: "preceding-sibling::*[1]/*[last()]/*[last()]/@id"]
       else: [x: ".."]   # try again for after
 
 -
