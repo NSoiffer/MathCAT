@@ -23,6 +23,7 @@ Timeline:
 * ✓ December/early January: prototype usage of preliminary MathML WG proposal for "intent"
 * ✓ January: Distribute MathCAT to a small group of students and other users for feedback and bug reports
 * ✓ February/March: Work on MathML->UEB translation
+* ✓ April: Prosody implementation/compatibility with SAPI, One Core, eSpeak, and Eloquence voices
 * late April/May: add more intent inference rules
 * May: Release MathCAT as NVDA add-on
 * June/July: Work on at least one translation of MathCAT to another language
