@@ -12,7 +12,7 @@ Note: in NVDA, the options can be set by using the MathCAT preferences dialog. T
 MathCAT supports multiple modes of navigation. The means to begin navigating and end navigating will differ depending on the AT you are using. See the list below. The commands/key-strokes accepted by MathCAT are the same as those accepted by MathPlayer and are [listed in this document](https://docs.wiris.com/en/mathplayer/navigation_commands). MathCAT's navigation is the same in Word and in a browser.
 
 To start navigation:
-* NVDA:  press NVDA+Alt+M to enter math navigation mode, press Esc to exit
+* NVDA:  press NVDA+Alt+M or the space key to enter math navigation mode, press Esc to exit
 
 ## Option List
 The options are listed below. Most options allow only a limited set of values and those are indicated in the options.
