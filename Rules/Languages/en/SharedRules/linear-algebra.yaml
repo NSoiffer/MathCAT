@@ -3,7 +3,7 @@
 -
    name: simple-determinant
    tag: determinant
-   match: "not(*[1][self::m:mtable])"
+   match: "not(*[1][self::m:mtr])"
    replace:
    - test:
       if: "$Verbosity='Verbose'"
