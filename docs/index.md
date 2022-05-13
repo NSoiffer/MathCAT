@@ -44,8 +44,6 @@ There are many different audiences for MathCAT and each audience has different i
 * Translators/Rule writers: [information about the files that need to be translated](helpers.md)
 * MathCAT developers: information about MathCAT's design
 
-_TODO: split the text after the next section in the various components above and link them_
-
 ## Why MathCAT?
 
 MathCAT is a follow-on to MathPlayer. I developed MathPlayer's accessibility while at Design Science starting back in 2004 after I joined Design Science. At the time, MathPlayer was chiefly designed to be a C++ plugin to Internet Explorer (IE) that displayed MathML on web pages. For quite some time, it was the most complete MathML implementation available. The original work for display of math was done by Design Science's founder Paul Topping and their chief technology officer, the late Robert Miner. Eventually, for numerous reasons, IE withdrew the interface that MathPlayer used for display and did not implement a replacement as the world was moving towards using JavaScript in the browser and not allowing security threats posed by external code. This left MathPlayer as an accessibility-only library called by other programs (chiefly NVDA). MathPlayer was proprietary, but was given away for free.
