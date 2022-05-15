@@ -400,7 +400,7 @@ impl CanonicalizeContext {
 		};
 
 		static EMPTY_ELEMENTS: phf::Set<&str> = phf_set! {
-			"mspace", "none", "mprescripts", "mglyph", "malignmark", "malgingroup",
+			"mspace", "none", "mprescripts", "mglyph", "malignmark", "maligngroup",
 		};
 
 		static CURRENCY_SYMBOLS: phf::Set<&str> = phf_set! {
@@ -531,7 +531,16 @@ impl CanonicalizeContext {
 				return if parent_requires_child || !text.is_empty() {Some(mathml)} else {None};
 			},
 			"mfenced" => {return self.clean_mathml( convert_mfenced_to_mrow(mathml) )},
-			"mphantom" => {return if parent_requires_child {Some(mathml)} else {None};},
+			"mphantom" | "malignmark" | "maligngroup"=> {
+				if parent_requires_child {
+					set_mathml_name(mathml, "mtext");
+					mathml.clear_children();
+					mathml.set_text("\u{A0}");
+					return Some(mathml);
+				} else {
+					return None;
+				}
+			},
 			"mspace" => {
 				// need to hold onto space for braille
 				// FIX: only do the conversion to non-breaking space if width is above some threshold
