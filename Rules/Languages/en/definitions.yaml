@@ -5,7 +5,7 @@
 #   name: [ "...", "..." "..." ],
 
 
-# ----------------  Cardinal and Oridnal Numbers  --------------------------
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
 # The following definitions are used to convert numbers to words
 # The are mainly used for ordinals, of which there are two cases:
 # 1. Regular ordinals: first, second, third, ...
