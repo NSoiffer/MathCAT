@@ -16,15 +16,15 @@
         - intent:
             xpath-name: "name(.)"
             children: [x: "*"]
-      - else_if: "self::m:mspace or self::m:none or self::m:mprescripts or self::m:mglyph"
+      - else_if: "text()"
         then:
         - intent:
             xpath-name: "name(.)"
-            children: []
+            children: [x: "text()"]
         else:
         - intent:
             xpath-name: "name(.)"
-            children: [x: "text()"]
+            children: []
 
 -
    include: "Intent/geometry.yaml"
