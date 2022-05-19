@@ -363,7 +363,10 @@ impl PreferenceManager {
             Ok(rules_dir) => {
                 let (user_prefs, pref_files) = Preferences::from_file(&rules_dir)?;
                 match self.set_all_files(&rules_dir, user_prefs, pref_files) {
-                    Ok(_) => return Ok(()),
+                    Ok(_) => {
+                        self.error = String::new();
+                        return Ok(())
+                    },
                     Err(e) => self.error = errors_to_string(&e),
                 }
             },
