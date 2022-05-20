@@ -674,4 +674,10 @@ mod tests {
 
         assert!(is_same_doc(&doc1, &doc2).is_err());
     }
+    #[test]
+    fn can_recover_from_invalid_set_rules_dir() {
+        assert!(set_rules_dir("someInvalidRulesDir".to_string()).is_err());
+        assert!(set_rules_dir(super::super::abs_rules_dir_path()).is_ok());
+        assert!(set_mathml("<math><mn>1</mn></math>".to_string()).is_ok());
+    }
 }
