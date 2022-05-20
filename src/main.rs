@@ -68,62 +68,13 @@ fn main() {
   //    </math>
   // ";
 
-  let expr = "
-  <math id='Mkgychwj-0' data-id-added='true'>
-  <mtable id='Mkgychwj-1' data-id-added='true'>
-    <mtr id='Mkgychwj-2' data-id-added='true'>
-      <mtd id='Mkgychwj-3' data-id-added='true'> <mn id='Mkgychwj-4' data-id-added='true'>1</mn></mtd>
-      <mtd id='Mkgychwj-5' data-id-added='true'> <mn id='Mkgychwj-6' data-id-added='true'>2</mn></mtd>
-      <mtd id='Mkgychwj-7' data-id-added='true'><mn id='Mkgychwj-8' data-id-added='true'>3</mn> </mtd>
-    </mtr>
-    <mtr id='Mkgychwj-9' data-id-added='true'>
-      <mtd id='Mkgychwj-10' data-id-added='true'>
-        <mrow data-changed='added' id='Mkgychwj-11' data-id-added='true'>
-          <mi id='Mkgychwj-12' data-id-added='true'>x</mi>
-          <mo id='Mkgychwj-13' data-id-added='true'>-</mo>
-          <mi id='Mkgychwj-14' data-id-added='true'>y</mi>
-        </mrow>
-      </mtd>
-      <mtd id='Mkgychwj-15' data-id-added='true'>
-        <mfrac id='Mkgychwj-16' data-id-added='true'>
-          <mn id='Mkgychwj-17' data-id-added='true'>1</mn>
-          <mn id='Mkgychwj-18' data-id-added='true'>2</mn>
-        </mfrac>
-      </mtd>
-      <mtd id='Mkgychwj-19' data-id-added='true'>
-        <mi id='Mkgychwj-20' data-id-added='true'>z</mi>
-      </mtd>
-    </mtr>
-    <mtr id='Mkgychwj-21' data-id-added='true'>
-      <mtd id='Mkgychwj-22' data-id-added='true'><mn id='Mkgychwj-23' data-id-added='true'>7</mn> </mtd>
-      <mtd id='Mkgychwj-24' data-id-added='true'><mn id='Mkgychwj-25' data-id-added='true'>8</mn> </mtd>
-      <mtd id='Mkgychwj-26' data-id-added='true'> <mn id='Mkgychwj-27' data-id-added='true'>9</mn></mtd>
-    </mtr>
-    <mtr id='Mkgychwj-28' data-id-added='true'>
-      <mtd id='Mkgychwj-29' data-id-added='true'>
-        <mrow data-changed='added' id='Mkgychwj-30' data-id-added='true'>
-          <mi id='Mkgychwj-31' data-id-added='true'>sin</mi>
-          <mo data-changed='added' id='Mkgychwj-32' data-id-added='true'>&#x2061;</mo>
-          <mi id='Mkgychwj-33' data-id-added='true'>x</mi>
-        </mrow>
-      </mtd>
-      <mtd id='Mkgychwj-34' data-id-added='true'>
-        <msup id='Mkgychwj-35' data-id-added='true'>
-          <mi id='Mkgychwj-36' data-id-added='true'>e</mi>
-          <mi id='Mkgychwj-37' data-id-added='true'>x</mi>
-        </msup>
-      </mtd>
-      <mtd id='Mkgychwj-38' data-id-added='true'>
-        <mrow data-changed='added' id='Mkgychwj-39' data-id-added='true'>
-          <mn id='Mkgychwj-40' data-id-added='true'>2</mn>
-          <mo id='Mkgychwj-41' data-id-added='true'>-</mo>
-          <mi id='Mkgychwj-42' data-id-added='true'>y</mi>
-        </mrow>
-      </mtd>
-    </mtr>
-  </mtable>
- </math>
-     ";
+  let expr = "<math display='inline' xmlns='http://www.w3.org/1998/Math/MathML' subject='None'>
+  <mrow>
+  <mo>(</mo><mn arg='arg1'>3</mn><mo>,</mo><mn arg='arg2'>12</mn><mo>)</mo>
+  </mrow>
+  </math>
+  
+      ";
   // let expr = "
   // <math><mo>&#x25B3;</mo><mi>ABC</mi></math>
   //   ";
@@ -150,7 +101,7 @@ fn main() {
   }
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
-  set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
+  set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),
