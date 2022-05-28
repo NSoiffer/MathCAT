@@ -63,9 +63,9 @@
  - "-": [t: minus]                               # 0x2d
  - ".":                                          # 0x2e
     - test:
-        if: "parent::*[1][self::m:modified-variable]"
-        then: [t: "dot"]
-        else: [t: "point"]
+        if: "parent::*[1][self::m:mn]"
+        then: [t: "point"]
+        else: [t: "dot"]
  - "/": [t: divided by]                          # 0x2f
  - ":": [t: colon]                               # 0x3a
  - ";": [t: semicolon]                           # 0x3b
