@@ -73,7 +73,7 @@
     - "*[1][text()='(' or text()='['] and *[3][text()=')' or text()=']'] and"   # match bracketing
     - "*[2][count(*)=3 and *[2][text()=',']] and"                                # inside should have ','
       # FIX: if both the first and third children of *[2] are mn, then make sure first <= third
-    - "( parent::m:math or "  # all by itself
+    - "("
     - "  preceding-sibling::*[1][self::m:mo and ( text()='=' or IsInDefinition(., 'SubsetOperators') )] or "  # context hint
     - "  following-sibling::*[1][self::m:mo and ( text()='=' or IsInDefinition(., 'SubsetOperators') )]"      # context hint
     - ")"
