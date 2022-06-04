@@ -1,0 +1,332 @@
+# MathCAT Navigation Commands and their Key Bindings
+
+There are two modes, each of which can set:
+* Speech after move mode: whether the expression is <i>read</i> or <i>described</i>
+(a summary/outline) after each move
+* Navigation mode: navigate by subexpression, small piece, or
+character (shift+down/up arrow will cycle to smaller/larger modes and then wrap
+around). See next section for explanations of these modes.
+
+<span style='color:gray'>NYI</span> = Not Yet Implemented
+
+<table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <thead>
+  <tr style='page-break-inside:avoid'>
+   <td valign=top style='border:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+   <a
+   name="Table_of_Keybindings"><b>Key</b></a>
+   </td>
+   <td valign=top style='border:solid 1.0pt;border-left:none;
+   padding:0in 5.4pt 0in 5.4pt'>
+   <b>Unmodified</b>
+   </td>
+   <td valign=top style='border:solid 1.0pt;border-left:none;
+   padding:0in 5.4pt 0in 5.4pt'>
+   <b>+ Ctrl</b>
+   </td>
+   <td valign=top style='border:solid 1.0pt;border-left:none;
+   padding:0in 5.4pt 0in 5.4pt'>
+   <b>+ Shift</b>
+   </td>
+   <td valign=top style='border:solid 1.0pt;border-left:none;
+   padding:0in 5.4pt 0in 5.4pt'>
+   <b>+Cntrl+Shift</b>
+   </td>
+  </tr>
+ </thead>
+ <tr style='page-break-inside:avoid'>
+  <td valign=top style='border:solid 1.0pt;border-top:none;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <b>Left</b>
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Move to
+  previous
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  In table:
+  Move to previous cell
+  In columnar
+  math: Move to previous digit
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Read previous
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Describe
+  previous
+  </td>
+ </tr>
+ <tr style='page-break-inside:avoid'>
+  <td valign=top style='border:solid 1.0pt;border-top:none;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <b>Right</b>
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Move to next 
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  In table:
+  Move to next cell
+  In columnar
+  math: Move to next digit
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Read next
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Describe next
+  </td>
+ </tr>
+ <tr style='page-break-inside:avoid'>
+  <td valign=top style='border:solid 1.0pt;border-top:none;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <b>Up</b>
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Zoom out
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  In table:
+  Move to cell above
+  In columnar
+  math: Move to digit above
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Change
+  Navigation Mode (Enhanced/Simple/Character) to larger
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Zoom out all
+  the way
+  </td>
+ </tr>
+ <tr style='page-break-inside:avoid'>
+  <td valign=top style='border:solid 1.0pt;border-top:none;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <b>Down</b>
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Zoom in 
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  In table:
+  Move to cell below
+  In columnar
+  math: Move to digit below
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Change
+  Navigation Mode (Enhanced/Simple/Character) to smaller
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Zoom in all
+  the way
+  </td>
+ </tr>
+ <tr style='page-break-inside:avoid'>
+  <td valign=top style='border:solid 1.0pt;border-top:none;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <b>Enter</b>
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Where am I
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Global Where
+  am I
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  &nbsp;
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  &nbsp;
+  </td>
+ </tr>
+ <tr style='page-break-inside:avoid'>
+  <td valign=top style='border:solid 1.0pt;border-top:none;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <b>Numbers<br>
+  1-10 (0 is 10)</b>
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Jump to Place
+  Marker
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Set
+  placemarker
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Read
+  Placemarker
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Describe
+  Placemarker
+  </td>
+ </tr>
+ <tr style='page-break-inside:avoid'>
+  <td valign=top style='border:solid 1.0pt;border-top:none;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <b>Space</b>
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Read current
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Read Current
+  cell
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Toggle
+  “speech mode” to read or describe
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Describe
+  current
+  </td>
+ </tr>
+ <tr style='page-break-inside:avoid'>
+  <td valign=top style='border:solid 1.0pt;border-top:none;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <b>Home</b>
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Move to start
+  of expression
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Move to start
+  of line
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Move to start
+  of column
+  Move to digit
+  at top
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  NYI: Read from start of expression</span>
+  </td>
+ </tr>
+ <tr style='page-break-inside:avoid'>
+  <td valign=top style='border:solid 1.0pt;border-top:none;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <b>End</b>
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Move to end
+  of expression
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Move to end
+  of line
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Move to end
+  of column
+  Move to digit
+  at bottom
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  NYI: Read to end of expression</span>
+  </td>
+ </tr>
+ <tr style='page-break-inside:avoid'>
+  <td valign=top style='border:solid 1.0pt;border-top:none;
+  padding:0in 5.4pt 0in 5.4pt'>
+  <b>Backspace</b>
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  Move back to
+  last position
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  &nbsp;
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  &nbsp;
+  </td>
+  <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
+  border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
+  <p style='margin-bottom:0in;line-height:normal;page-break-after:
+  avoid'>&nbsp;
+  </td>
+ </tr>
+</table>
+
+## Navigation Modes
+
+
+<b>Enhanced mode</b>: &nbsp;navigation is by mathematically
+meaningful pieces (operators, delimiters, and operands)
+
+
+<b>Simple mode</b>: this moves by words except when you get to a
+2D notation (fractions, roots, ...), then it speaks the entire notation.
+Zooming in lets you explore the 2D notation in the same mode. Zooming out or
+moving out of the 2D notation brings you back to the outer/higher level of
+navigation.
+
+
+<b>Character mode</b>: &nbsp;this is actually two useful modes --
+word mode and character mode (zoom in to get &quot;real&quot; character mode).
+&nbsp;Moves by words/characters. &nbsp;This differs for numbers of more than
+one digit and function names such as &quot;sin&quot; that are multiple
+characters. Otherwise, word and character navigation is the same.
+
+## Typical Use
+
+Typically, you begin navigating by zooming in (down arrow)
+one or more levels, and then moving right (right arrow) as desired. Some larger
+expressions require zooming in again as you move to the right.
+
+<i>Backspace</i> will take you back to where you were, which
+is not always the same as moving to the left. For example, if right arrow moved
+you out of a fraction, backspace will take you back to where you were in the
+denominator and left arrow will land on the entire fraction.
+
+## Acknowledgements
+A version of this document was produced as part of the ClearSpeak project.
+ClearSpeak was supported by the Institute of Education Sciences, U.S. Department of Education, through Grant R324A110355 to the Educational Testing Service. 
