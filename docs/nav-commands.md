@@ -5,7 +5,7 @@ There are two modes, each of which can set:
 (a summary/outline) after each move
 * Navigation mode: navigate by subexpression, small piece, or
 character (shift+down/up arrow will cycle to smaller/larger modes and then wrap
-around). See next section for explanations of these modes.
+around). See the text after the table for explanations of these modes.
 
 <span style='color:gray'>NYI</span> = Not Yet Implemented
 
@@ -291,7 +291,7 @@ around). See next section for explanations of these modes.
   <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
   border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
   <p style='margin-bottom:0in;line-height:normal;page-break-after:
-  avoid'>&nbsp;
+  avoid'>&nbsp; </p>
   </td>
  </tr>
 </table>
