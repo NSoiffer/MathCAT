@@ -5,10 +5,12 @@ There are two modes, each of which can set:
 (a summary/outline) after each move
 * Navigation mode: navigate by subexpression, small piece, or
 character (shift+down/up arrow will cycle to smaller/larger modes and then wrap
-around). See the text after the table for explanations of these modes.
+around).
 
-<span style='color:gray'>NYI</span> = Not Yet Implemented
+See the [Navigation Modes section](#navigation-modes) after the table for explanations of these modes.
 
+
+## Navigation Commands Table
 <table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0
  style='border-collapse:collapse;border:none'>
  <thead>
@@ -296,8 +298,9 @@ around). See the text after the table for explanations of these modes.
  </tr>
 </table>
 
-## Navigation Modes
+<span style='color:gray'>NYI</span> = Not Yet Implemented
 
+## Navigation Modes
 
 <b>Enhanced mode</b>: &nbsp;navigation is by mathematically
 meaningful pieces (operators, delimiters, and operands)
