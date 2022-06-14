@@ -361,6 +361,7 @@ impl CanonicalizeContext {
 			root.append_child(math_element);
 			mathml = root.children()[0].element().unwrap();
 		}
+		self.assure_mathml(mathml)?;
 		self.clean_mathml(mathml);
 		self.assure_nary_tag_has_mrow(mathml);
 		let converted_mathml = self.canonicalize_mrows(mathml)
@@ -380,6 +381,37 @@ impl CanonicalizeContext {
 		}
 	}
 
+	/// Return an error is some element is not MathML (only look at first child of <semantics>)
+	fn assure_mathml<'a>(&self, mathml: Element<'a>) -> Result<()> {
+		static ALL_MATHML_ELEMENTS: phf::Set<&str> = phf_set!{
+			"mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph",
+			"mfrac", "mroot", "msub", "msup", "msubsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv",
+			"none", "mprescripts", "malignmark", "maligngroup",
+			"math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd", "mstyle",
+			"mrow", "mfenced", "mtable", "mtr",
+		};
+		
+		let element_name = name(&mathml);
+		let children = mathml.children();
+		if element_name == "semantics" {
+			if children.is_empty() {
+				return Ok( () );
+			} else {
+				return self.assure_mathml(as_element(children[0]));		// FIX: really should find presentation child
+			}
+		}
+		if !ALL_MATHML_ELEMENTS.contains(&element_name) {
+			bail!("'{}' is not a valid MathML element", element_name);
+		}
+		for child in children {
+			let child = as_element(child);
+			if !is_leaf(child) {
+				self.assure_mathml(child)?;
+			}			
+		}
+		return Ok( () );
+	}
+
 	// This function does some cleanup of MathML (mostly fixing bad MathML)
 	// Unlike the main canonicalization routine, significant tree changes happen here
 	// Changes to "good" MathML:
@@ -396,7 +428,7 @@ impl CanonicalizeContext {
         }
 
 		static ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN: phf::Set<&str> = phf_set! {
-			"mfrac", "mroot", "msub", "msup", "msupsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv"
+			"mfrac", "mroot", "msub", "msup", "msubsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv"
 		};
 
 		static EMPTY_ELEMENTS: phf::Set<&str> = phf_set! {
@@ -2721,6 +2753,17 @@ mod canonicalize_tests {
 			</math>";
 		assert!(are_strs_canonically_equal(test_str, target_str));
 	}
+
+    #[test]
+    fn illegal_mathml_element() {
+		use crate::interface::*;
+        let test_str = "<math><foo><mi>f</mi></foo></math>";
+        let package1 = &parser::parse(test_str).expect("Failed to parse test input");
+		let mathml = get_element(package1);
+		trim_element(&mathml);
+		assert!(canonicalize(mathml).is_err());
+    }
+
 
     #[test]
     fn mfenced_no_children() {
