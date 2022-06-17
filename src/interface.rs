@@ -8,7 +8,9 @@ use sxd_document::parser;
 use sxd_document::Package;
 use sxd_document::dom::*;
 use crate::errors::*;
-use regex::Regex;
+use regex::{Regex, Captures};
+use phf::phf_map;
+
 use crate::canonicalize::{name, as_element};
 
 
@@ -61,19 +63,31 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
         static ref MATHJAX_V3: Regex = Regex::new(r#"class *= *['"]data-mjx-.*?['"]"#).unwrap();
         static ref NAMESPACE_DECL: Regex = Regex::new(r#"xmlns:[[:alpha:]]+"#).unwrap();     // very limited namespace prefix match
         static ref PREFIX: Regex = Regex::new(r#"(</?)[[:alpha:]]+:"#).unwrap();     // very limited namespace prefix match
+        static ref HTML_ENTITIES: Regex = Regex::new(r#"&([a-zA-Z]+?);"#).unwrap();
     }
 
     NAVIGATION_STATE.with(|nav_stack| {
         nav_stack.borrow_mut().reset();
     });
     return MATHML_INSTANCE.with(|old_package| {
-        // need to deal with character data and convert to something the parser knows
-        // potentially all of the names HTML knows could be here, but these are hopefully the important ones
-        let mathml_str = mathml_str.replace("&lt;", "&#x3c;")
-                                          .replace("&gt;", "&#x3e;")
-                                          .replace("&amp;", "&#x26;")
-                                          .replace("&nbsp;", "&#xa0;");
+        // FIX: convert this to an included file once I get the full entity list
+        static HTML_ENTITIES_MAPPING: phf::Map<&str, &str> = include!("entities.in");
 
+        let mut error_message = "".to_string();     // can't return a result inside the replace_all, so we do this hack of setting the message and then returning the error
+        // need to deal with character data and convert to something the parser knows
+        let mathml_str = HTML_ENTITIES.replace_all(&mathml_str, |cap: &Captures| {
+            match HTML_ENTITIES_MAPPING.get(&cap[1]) {
+                None => {
+                    error_message = format!("No entity named '{}'", &cap[0]);
+                    cap[0].to_string()
+                },
+                Some(&ch) => ch.to_string(),
+            }
+        });
+
+        if !error_message.is_empty() {
+            bail!(error_message);
+        }
         let mathml_str = MATHJAX_V2.replace_all(&mathml_str, "");
         let mathml_str = MATHJAX_V3.replace_all(&mathml_str, "");
 
@@ -674,6 +688,25 @@ mod tests {
 
         assert!(is_same_doc(&doc1, &doc2).is_err());
     }
+ 
+    #[test]
+    fn test_entities() {
+        // this forces initialization
+        set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+
+        let entity_str = set_mathml("<math><mrow><mo>&minus;</mo><mi>&mopf;</mi></mrow></math>".to_string()).unwrap();
+        let converted_str = set_mathml("<math><mrow><mo>&#x02212;</mo><mi>&#x1D55E;</mi></mrow></math>".to_string()).unwrap();
+        
+        // need to remove unique ids
+        lazy_static! {
+            static ref ID_MATCH: Regex = Regex::new(r#"id='.+?' "#).unwrap();
+        }
+        let entity_str = ID_MATCH.replace_all(&entity_str, "");
+        let converted_str = ID_MATCH.replace_all(&converted_str, "");
+    
+        assert_eq!(entity_str, converted_str);
+    }
+
     #[test]
     fn can_recover_from_invalid_set_rules_dir() {
         use std::env;
