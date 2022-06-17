@@ -181,7 +181,7 @@
             else:
             - t: "with"
             - x: "count($Postscripts) div 2"
-            - t: "Postscripts"
+            - t: "postscripts"
             - pause: short
             - x: "$Postscripts"   # FIX: should alternatively say upper/lower 
 
