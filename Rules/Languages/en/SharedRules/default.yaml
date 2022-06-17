@@ -132,7 +132,7 @@
     tag: mmultiscripts
     variables:
     - Prescripts: "m:mprescripts/following-sibling::*"
-    - Postscripts: "m:mprescripts/preceding-sibling::*[position() < last()]"
+    - Postscripts: "*[position()>1 and position() < (last()+1-count($Prescripts))]"
     match: "."
     replace: 
     - x: "*[1]"
@@ -161,7 +161,7 @@
             - pause: short
             - x: "$Prescripts"   # FIX: should alternatively say upper/lower 
     - test:
-        if: "count($Postscripts)"
+        if: "$Postscripts"
         then_test:
             if: "count($Postscripts) = 2"    # more common case
             then:
@@ -355,6 +355,13 @@
     replace: 
     - x: "*[1]"
 
+-
+    # unknown leaf -- just speak the text -- could be a literal intent
+    name: default-text
+    tag: "literal"
+    match: "."
+    replace: 
+    - x: "translate(text(), '-', ' ')"
 -
     # uncaught intent -- speak as foo of arg1 comma arg2 ....
     name: default-children
