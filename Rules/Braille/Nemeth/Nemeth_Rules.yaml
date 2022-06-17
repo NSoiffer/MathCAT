@@ -104,8 +104,11 @@
   match: "."
   replace:
    - test: 
-      if: "count(parent::*) > 1"
-      then: [t: "⠠"]
+      if: "preceding-sibling::*"
+      then: [t: "W"]
+   - test: 
+      if: "count(parent::*/*) > 1"
+      then: [t: "⠈⠠"]
    - t: ""
    - x: $RowStart
    - test:
@@ -118,8 +121,8 @@
       then: [x: "*[position()>1]"]
       else: {x: "*"}
    - test: 
-      if: "count(parent::*) > 1"
-      then: [t: "⠠"]
+      if: "count(parent::*/*) > 1"
+      then: [t: "⠈⠠"]
    - x: $RowEnd
 -
   name: default

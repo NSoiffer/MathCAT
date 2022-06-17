@@ -642,6 +642,16 @@ fn function_space_119_c_3() {
 }
 
 #[test]
+fn identity_matrix_126() {
+    let expr = "<math> <mrow><mo>(</mo> <mtable>
+        <mtr><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd></mtr>
+        <mtr><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd></mtr>
+        <mtr><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd></mtr>
+      </mtable><mo>)</mo></mrow></math>";
+    test_braille("Nemeth", expr, "⠈⠠⠷⠂⠀⠼⠴⠀⠼⠴⠈⠠⠾⠀⠈⠠⠷⠴⠀⠼⠂⠀⠼⠴⠈⠠⠾⠀⠈⠠⠷⠴⠀⠼⠴⠀⠼⠂⠈⠠⠾");
+}
+
+#[test]
 fn set_vertical_bar_145_1() {
     let expr = "<math><mo>{</mo><mi>x</mi><mo>|</mo><mo>|</mo><mi>x</mi><mo>|</mo><mo>&lt;</mo><mn>10</mn><mo>}</mo></math>";
     test_braille("Nemeth", expr, "⠨⠷⠭⠀⠳⠀⠳⠭⠳⠀⠐⠅⠀⠼⠂⠴⠨⠾");
