@@ -212,6 +212,12 @@ fn comma_78_2() {
 }
 
 #[test]
+fn comma_78_2_invisible() { // test with invisible comma -- should be the same (issue #40)
+    let expr = "<math><msub><mi>x</mi><mrow><mo>(</mo><mi>a</mi><mo>&#x2063;</mo><mi>b</mi><mo>)</mo></mrow></msub></math>";
+    test_braille("Nemeth", expr, "⠭⠰⠷⠁⠪⠃⠾");
+}
+
+#[test]
 fn comma_78_3() {
     let expr = "<math><msub><mi>x</mi><mrow><mn>1</mn><mo>,</mo><mn>2</mn></mrow></msub></math>";
     test_braille("Nemeth", expr, "⠭⠰⠂⠪⠆");
