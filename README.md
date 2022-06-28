@@ -6,9 +6,10 @@ is a library that supports conversion of MathML to:
 * Braille (Nemeth, UEB Technical, and eventually other braille math codes)
 * Navigation of math (in multiple ways including overviews)
 
-There are three related projects that make use of MathCAT:
+There are four related projects that make use of MathCAT:
 * [MathCATDemo](https://nsoiffer.github.io/MathCATDemo/) -- an online demonstration of some of what can be done with MathCAT
 * [A python interface for MathCAT](https://github.com/NSoiffer/MathCATForPython) -- used by a [MathCAT NVDA add-on](https://addons.nvda-project.org/addons/MathCAT.en.html).
 * [A C/C++ interface for MathCAT](https://github.com/NSoiffer/MathCATForC)
+* [A Java interface for MathCAT](https://github.com/mwhapples/MathCAT4J) (thanks to Michael Whapples for working on that)
 
 For more information, see the [full documentation](https://nsoiffer.github.io/MathCAT/).
