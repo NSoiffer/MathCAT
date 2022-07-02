@@ -14,6 +14,8 @@ use crate::xpath_functions::{IsBracketed, is_leaf};
 use std::{ptr::eq as ptr_eq};
 use crate::pretty_print::*;
 use regex::Regex;
+use crate::chemistry::*;
+
 
 // FIX: DECIMAL_SEPARATOR should be set by env, or maybe language
 const DECIMAL_SEPARATOR: &str = ".";
@@ -366,6 +368,7 @@ impl CanonicalizeContext {
 		self.assure_nary_tag_has_mrow(mathml);
 		let converted_mathml = self.canonicalize_mrows(mathml)
 				.chain_err(|| format!("while processing\n{}", mml_to_string(&mathml)))?;
+		crate::chemistry::scan_and_mark_chemistry(converted_mathml);
 		debug!("\nMathML after canonicalize:\n{}", mml_to_string(&converted_mathml));
 		return Ok(converted_mathml);
 	}
@@ -493,6 +496,7 @@ impl CanonicalizeContext {
 				let text = as_text(mathml);
 				if OPERATORS.get(text).is_some() {
 					set_mathml_name(mathml, "mo");
+					return Some(mathml);
 				} else {
 					if let Some(result) = merge_arc_trig(mathml) {
 						return Some(result);
@@ -503,10 +507,40 @@ impl CanonicalizeContext {
 					} else if let Some(result) = split_points(mathml) {
 						return Some(result);
 					}
+					let likely_chemistry = likely_chem_element(mathml);
+					if likely_chemistry >= 0 {
+						mathml.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
+					}
 					return Some(mathml);
 				};
-				return Some(mathml);
 			}
+			"mtext" => {
+				if let Some(result) = merge_arc_trig(mathml) {
+					return Some(result);
+				};
+			
+				if let Some(result) = split_points(mathml) {
+					return Some(result);
+				}
+				
+				let text = as_text(mathml);
+				if !text.trim().is_empty() && ROMAN_NUMERAL.is_match(text) {
+					// people tend to set them in a non-italic font and software makes that 'mtext'
+					set_mathml_name(mathml, "mn");
+					mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+					return Some(mathml);
+				}
+				// allow non-breaking whitespace to stay -- needed by braille
+				if IS_WHITESPACE.is_match(text) {
+					// normalize to just a single non-breaking space
+					mathml.set_text("\u{A0}");
+				}
+				let likely_chemistry = likely_chem_element(mathml);
+				if likely_chemistry >= 0 {
+					mathml.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
+				}
+				return if parent_requires_child || !text.is_empty() {Some(mathml)} else {None};
+			},
 			"mo" => {
 				// WIRIS editor at least puts non-breaking whitespace as standalone in 'mo'
 				let text = as_text(mathml);
@@ -538,29 +572,6 @@ impl CanonicalizeContext {
 					}
 					return Some(mathml);
 				});
-			},
-			"mtext" => {
-				if let Some(result) = merge_arc_trig(mathml) {
-					return Some(result);
-				};
-			
-				if let Some(result) = split_points(mathml) {
-					return Some(result);
-				}
-				
-				let text = as_text(mathml);
-				if !text.trim().is_empty() && ROMAN_NUMERAL.is_match(text) {
-					// people tend to set them in a non-italic font and software makes that 'mtext'
-					set_mathml_name(mathml, "mn");
-					mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
-					return Some(mathml);
-				}
-				// allow non-breaking whitespace to stay -- needed by braille
-				if IS_WHITESPACE.is_match(text) {
-					// normalize to just a single non-breaking space
-					mathml.set_text("\u{A0}");
-				}
-				return if parent_requires_child || !text.is_empty() {Some(mathml)} else {None};
 			},
 			"mfenced" => {return self.clean_mathml( convert_mfenced_to_mrow(mathml) )},
 			"mphantom" | "malignmark" | "maligngroup"=> {
@@ -638,6 +649,10 @@ impl CanonicalizeContext {
 					if is_leaf(base) && as_text(base).trim().is_empty() {
 						convert_to_mmultiscripts(mathml);
 					}
+					let base = as_element(mathml.children()[0]);	// could have changed
+					if let Some(likely) = base.attribute_value(MAYBE_CHEMISTRY) {
+						mathml.set_attribute_value(MAYBE_CHEMISTRY, likely);
+					}
 				}
 
 				// some elements might have been deleted, so get a new vector
@@ -660,7 +675,8 @@ impl CanonicalizeContext {
 					return Some( as_element(children[0]) );	// FIX: presentation isn't necessarily first child
 				} else {
 					self.assure_nary_tag_has_mrow(mathml);
-				} 
+				}
+				clean_chemistry_mathml(mathml);
 				return Some(mathml);				
 			}
 		}
@@ -2158,8 +2174,12 @@ impl CanonicalizeContext {
 		return (name == "msub" || name == "msubsup" || name == "msup") && !mrow.preceding_siblings().is_empty();
 	}
 
-	// implied separator when two capital letters are adjacent
+	// implied separator when two capital letters are adjacent or two chemical elements
 	fn is_implied_separator<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>) -> bool {
+		if prev.attribute(MAYBE_CHEMISTRY).is_some() && current.attribute(MAYBE_CHEMISTRY).is_some() {
+			return true;
+		}
+
 		if name(prev) != "mi" || name(current) != "mi" {
 			return false;
 		}
@@ -2562,63 +2582,14 @@ fn show_invisible_op_char(ch: &str) -> &str {
 }
 
 
-static CHEMICAL_ELEMENTS: phf::Set<&str> = phf_set! {
-	"Ac", "Ag", "Al", "Am", "Ar", "As", "At", "Au", "B", "Ba", "Be", "Bh", "Bi", "Bk", "Br",
-	"C", "Ca", "Cd", "Ce", "Cf", "Cl", "Cm", "Cn", "Co", "Cr", "Cs", "Cu", "Db", "Ds", "Dy", 
-	"Er", "Es", "Eu", "F", "Fe", "Fl", "Fm", "Fr", "Ga", "Gd", "Ge",
-	"H", "He", "Hf", "Hg", "Ho", "Hs", "I", "In", "Ir", "K", "Kr",
-	"La", "Li", "Lr", "Lu", "Lv", "Mc", "Md", "Mg", "Mn", "Mo", "Mt", 
-	"N", "Na", "Nb", "Nd", "Ne", "Nh", "Ni", "No", "Np", "O", "Og", "Os", 
-	"P", "Pa", "Pb", "Pd", "Pm", "Po", "Pr", "Pt", "Pu",
-	"Ra", "Rb", "Re", "Rf", "Rg", "Rh", "Rn", "Ru", 
-	"S", "Sb", "Sc", "Se", "Sg", "Si", "Sm", "Sn", "Sr",
-	"Ta", "Tb", "Tc", "Te", "Th", "Ti", "Tl", "Tm", "Ts", 
-	"U", "V", "W", "Xe", "Y", "Yb", "Zn", "Zr"};
-
-fn is_chemical_element(node: Element) -> bool {
-	// FIX: allow name to be in an mrow (e.g., <mi>N</mi><mi>a</mi>
-	let name = name(&node);
-	if name != "mi" && name != "mtext" {
-		return false;
-	}
-
-	let text = as_text(node);
-	return CHEMICAL_ELEMENTS.contains(text);
-}
-
-
-
 #[cfg(test)]
 mod canonicalize_tests {
 	#[allow(unused_imports)]
 	use super::super::init_logger;
-	use super::super::abs_rules_dir_path;
+	use super::super::are_strs_canonically_equal;
     use super::*;
     use sxd_document::parser;
 
-
-    fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
-		use crate::interface::*;
-		// this forces initialization
-		crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
-		crate::speech::SPEECH_RULES.with(|_| true);
-		
-        let package1 = &parser::parse(test).expect("Failed to parse test input");
-		let mathml = get_element(package1);
-		trim_element(&mathml);
-		// debug!("test:\n{}", mml_to_string(&mathml));
-		let mathml_test = canonicalize(mathml).unwrap();
-        
-        let package2 = &parser::parse(target).expect("Failed to parse target input");
-		let mathml_target = get_element(package2);
-		trim_element(&mathml_target);
-		// debug!("target:\n{}", mml_to_string(&mathml_target));
-    
-        match is_same_element(&mathml_test, &mathml_target) {
-			Ok(_) => return true,
-			Err(e) => panic!("{}", e),
-		}
-    }
 
     #[test]
     fn canonical_same() {
@@ -2626,7 +2597,6 @@ mod canonicalize_tests {
         assert!(are_strs_canonically_equal(target_str, target_str));
     }
 
-	
 	#[test]
     fn plane1_common() {
         let test_str = "<math>

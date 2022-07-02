@@ -56,6 +56,7 @@ mod tts;
 mod xpath_functions;
 mod definitions;
 mod pretty_print;
+mod chemistry;
 
 pub mod shim_filesystem; // really just for override_file_for_debugging_rules, but the config seems to throw it off
 pub use shim_filesystem::ZIPPED_RULE_FILES;
@@ -79,3 +80,30 @@ pub fn abs_rules_dir_path() -> String {
                 .join("../../../Rules")
                 .to_str().unwrap().to_string();
 }
+
+#[cfg(test)]
+pub fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
+    use crate::interface::*;
+    use sxd_document::parser;
+    use crate::canonicalize::canonicalize;
+    // this forces initialization
+    crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
+    crate::speech::SPEECH_RULES.with(|_| true);
+    
+    let package1 = &parser::parse(test).expect("Failed to parse test input");
+    let mathml = get_element(package1);
+    trim_element(&mathml);
+    // debug!("test:\n{}", mml_to_string(&mathml));
+    let mathml_test = canonicalize(mathml).unwrap();
+    
+    let package2 = &parser::parse(target).expect("Failed to parse target input");
+    let mathml_target = get_element(package2);
+    trim_element(&mathml_target);
+    // debug!("target:\n{}", mml_to_string(&mathml_target));
+
+    match is_same_element(&mathml_test, &mathml_target) {
+        Ok(_) => return true,
+        Err(e) => panic!("{}", e),
+    }
+}
+

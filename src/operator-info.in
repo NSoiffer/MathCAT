@@ -109,10 +109,10 @@ phf_map! {
 	"⁃" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 390, next: &None },
 	"⁄" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 680, next: &None },
 	"⁗" => OperatorInfo{ op_type: OperatorTypes::POSTFIX, priority: 880, next: &None },
-	"⁡" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 850, next: &None },
-	"⁢" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 390, next: &None },
-	"⁣" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 40, next: &None },
-	"⁤" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 880, next: &None },
+	"⁡" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 850, next: &None }, // U+2061
+	"⁢" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 390, next: &None }, // U+2062
+	"⁣" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 40, next: &None }, // U+2063
+	"⁤" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 880, next: &None }, // U+2064
 	"⃛" => OperatorInfo{ op_type: OperatorTypes::POSTFIX, priority: 880, next: &None },
 	"⃜" => OperatorInfo{ op_type: OperatorTypes::POSTFIX, priority: 880, next: &None },
 	"ⅅ" => OperatorInfo{ op_type: OperatorTypes::PREFIX, priority: 740, next: &None },

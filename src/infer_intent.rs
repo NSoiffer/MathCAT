@@ -308,7 +308,7 @@ fn find_arg<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithCon
 
     return Ok(None);               // not present
 }
-    
+
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]
@@ -357,7 +357,6 @@ mod tests {
 
     #[test]
     fn infer_binomial_intent_arg() {
-        init_logger();
         let mathml = "<msubsup intent='$op($n,$m)'>
                 <mi arg='op' intent='binomial'>C</mi>
                 <mi arg='n'>n</mi>
