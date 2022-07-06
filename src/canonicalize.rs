@@ -1829,24 +1829,31 @@ impl CanonicalizeContext {
 	}
 
 
-	// return true if 'node' is a chemical element and is followed by a state (solid, liquid, ...)
-	fn is_likely_chemical_state<'a>(&self, node: Element<'a>, right_sibling: Element<'a>) -> bool {
+	// return FunctionNameCertainty::False or Maybe if 'node' is a chemical element and is followed by a state (solid, liquid, ...)
+	//  in other words, we are certain this can't be a function since it looks like it is or might be chemistry
+	fn is_likely_chemical_state<'a>(&self, node: Element<'a>, right_sibling: Element<'a>) -> FunctionNameCertainty {
 		assert_eq!(name(&node.parent().unwrap().element().unwrap()), "mrow"); // should be here because we are parsing an mrow
 	
 		debug!("   in is_likely_chemical_state: '{}'?",element_summary(node));
+		let node_chem_likelihood= node.attribute_value(MAYBE_CHEMISTRY);
 		if node.attribute(MAYBE_CHEMISTRY).is_none() {
-			return false;
+			return FunctionNameCertainty::True;
 		}
 
 		if name(&right_sibling) == "mrow" {		// clean_chemistry_mrow made sure any state-like structure is an mrow
-			let likely = likely_chem_state(right_sibling);
-			if likely > 0 {
-				right_sibling.set_attribute_value(MAYBE_CHEMISTRY, likely.to_string().as_str());
-				return true;
+			let state_likelihood = likely_chem_state(right_sibling);
+			if state_likelihood > 0 {
+				right_sibling.set_attribute_value(MAYBE_CHEMISTRY, state_likelihood.to_string().as_str());
+				// at this point, we know both node and right_sibling are positive, so we have at least a maybe
+				if state_likelihood + node_chem_likelihood.unwrap().parse::<isize>().unwrap() > 2 {
+					return FunctionNameCertainty::False;
+				} else {
+					return FunctionNameCertainty::Maybe
+				}
 			}
 		}
 
-		return false;
+		return FunctionNameCertainty::True;
 	}
 	
 	// Try to figure out whether an <mi> is a function name or note.
@@ -1910,10 +1917,11 @@ impl CanonicalizeContext {
 
 			let first_child = as_element(right_siblings[0]);
 					
-			// clean_chemistry will wrap up a state in an mrow -- call before unwrapping
-			if self.is_likely_chemical_state(node, first_child) {
-				debug!("      ...is_likely_chemical_state=true");
-				return FunctionNameCertainty::False;
+			// clean_chemistry wrapped up a state in an mrow and this is assumed by is_likely_chemical_state()
+			let chem_state_certainty = self.is_likely_chemical_state(node, first_child);
+			if chem_state_certainty != FunctionNameCertainty::True {
+				debug!("      ...is_likely_chemical_state says it is a function ={:?}", chem_state_certainty);
+				return chem_state_certainty;
 			}
 
 			if name(&first_child) == "mrow" && is_left_paren(as_element(first_child.children()[0])) {
