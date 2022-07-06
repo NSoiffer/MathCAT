@@ -54,25 +54,27 @@ pub fn format_element(e: &Element, indent: usize) -> String {
     return answer + &format!("{:in$}</{ns}{name}>\n", " ", in=2*indent, ns=namespace, name=e.name().local_part());
 
     // Use the &#x....; representation for invisible chars when printing
-    fn make_invisible_chars_visible(text: &str) -> String {
-        return text.chars().map(|ch| {
-            if ('\u{2061}'..'\u{2064}').contains(&ch) {
-                return format!("&#x{:x};", ch as u32)
-            } else {
-                return ch.to_string();
-            }    
-        }).collect::<Vec<String>>().join("");
-    }
 }
 
 /// Format a vector of attributes as a string with a leading space
 pub fn format_attrs(attrs: &[Attribute]) -> String {
     let mut result = String::new();
     for attr in attrs {
-        result += format!(" {}='{}'", attr.name().local_part(), attr.value()).as_str();
+        result += format!(" {}='{}'", attr.name().local_part(), &make_invisible_chars_visible(attr.value())).as_str();
     }
     result
 }
+
+fn make_invisible_chars_visible(text: &str) -> String {
+    return text.chars().map(|ch| {
+        if ('\u{2061}'..'\u{2064}').contains(&ch) || ch == crate::canonicalize::HIGH_PRIORITY_OPERATOR.chars().next().unwrap() {
+            return format!("&#x{:x};", ch as u32)
+        } else {
+            return ch.to_string();
+        }    
+    }).collect::<Vec<String>>().join("");
+}
+
 
 /// Pretty print an xpath value.
 /// If the value is a `NodeSet`, the MathML for the node/element is returned.
