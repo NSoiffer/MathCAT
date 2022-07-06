@@ -610,14 +610,23 @@ pub fn is_same_element(e1: &Element, e2: &Element) -> Result<()> {
         if attrs1.len() != attrs2.len() {
             bail!("Attributes have different length: {:?} != {:?}", attrs1, attrs2);
         }
-        for (attr1, attr2) in attrs1.iter().zip(attrs2.iter()) {
-            if attr1.name().local_part() != attr2.name().local_part() || attr1.value() != attr2.value() {
-                bail!("Attribute {}.{} != {}.{}",
-                        attr1.name().local_part(), attr1.value(),
-                        attr2.name().local_part(), attr2.value());
+        // can't guarantee attrs are in the same order
+        for attr1 in attrs1 {
+            if !attrs2.iter().any(|attr2| attr1.name().local_part() == attr2.name().local_part() && attr1.value() == attr2.value() ) {
+                bail!("Attribute {} not in [{}]", print_attr(&attr1), print_attrs(&attrs2));
             }
         }
         return Ok( () );
+
+        fn print_attr(attr: &Attribute) -> String {
+            return format!("@{}='{}'", attr.name().local_part(), attr.value());
+        }
+        fn print_attrs(attrs: &[Attribute]) -> String {
+            return attrs.iter()
+                .map(|attr| print_attr(attr))
+                .collect::<Vec<String>>()
+                .join(", ");
+        }
     }
 }
 
