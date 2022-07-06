@@ -1,4 +1,6 @@
 
+use std::convert::TryInto;
+
 /// Chemistry terms used here:
 /// chemical formula -- this references a molecule (one or more elements with bonds between them), including its state.
 /// chemical equation -- this is a notation specialized to chemistry -- it has concentration, arrows, equality, "addition" along with 
@@ -89,20 +91,19 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
     while i < old_children.len() {
         // FIX -- implement gathering up mi/mtext
 
-        if let Some(aq) = clean_aq_state(old_children, i) {
-            new_children.push(old_children[i]);     // '(')
-            new_children.push(aq);
-            new_children.push(old_children[i+3]);   // ')'
+        if let Some(paren_mrow_aq) = clean_aq_state(old_children, i) {
+            new_children.push(paren_mrow_aq);
             i += 4;                                 // skipping "( a q )"
             changed = true;
             continue;
-        }
-        if let Some(paren_mrow) = make_mrow(old_children, i) {
-            debug!("make_mrow added mrow");
-            new_children.push(paren_mrow);
-            i += 3;
-            changed = true;
-            continue;
+        } else if i + 2 < old_children.len() {
+            if let Some(paren_mrow) = make_mrow(old_children[i..i+3].try_into().unwrap()) {
+                debug!("make_mrow added mrow");
+                new_children.push(paren_mrow);
+                i += 3;
+                changed = true;
+                continue;
+            }
         }
         let child = old_children[i];
         let tag_name = name(&child);
@@ -139,8 +140,9 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
         if is_text(children[i], "(") &&
            is_text(children[i+1], "a") && is_text(children[i+2], "q") &&
            is_text(children[i+3], ")") {
-            children[i+1].set_text("aq");
-            return Some(children[i+1]);
+            let mi = create_mathml_element(&children[i].document(), "mi");
+            mi.set_text("aq");
+            return make_mrow([children[i], mi, children[i+3]].try_into().unwrap());
         }
         return None;
     }
@@ -151,18 +153,13 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
 
     // converts  "( child )" to mrow with those elements as children 
     // this is to make ascertaining with this is a chemical state easier, but it is correct even if not a chemical state
-    fn make_mrow<'a>(children: &[Element<'a>], i: usize) -> Option<Element<'a>> {
-        if i+2 >= children.len() || // can't be '( xxx )' -- not enough elements left
-           children.len() == 3 {    // already grouped
-            return None;       
-        }
-        
+    fn make_mrow<'a>(children: [Element<'a>; 3]) -> Option<Element<'a>> {
         // this is a little sloppy in that we allow matching text in any leaf element, but we can use the same function
-        if is_text(children[i], "(") &&
-           is_text(children[i+2], ")") {
-			let mrow = create_mathml_element(&children[i].document(), "mrow");
+        if is_text(children[0], "(") &&
+           is_text(children[2], ")") {
+			let mrow = create_mathml_element(&children[0].document(), "mrow");
 			mrow.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
-			mrow.append_children(&children[i..i+3]);
+			mrow.append_children(children);
             return Some(mrow);
         }
         return None;
