@@ -32,11 +32,11 @@
 ///        a) find the first marked child and then the last consecutive marked child and trim any mo's from the ends
 ///        b) evaluate the likelihood that the sequence is chemistry
 ///           yes: replace mathml children with new (potentially restructured) children
-///           no: clear all the marks for the old children and replace mathml children with old one (links are messed up)
+///           no: clear all the marks for the old children
 /// After canonicalization, we take another pass looking for chemical equations and marking them if found.
 
 use sxd_document::dom::*;
-use crate::canonicalize::{as_element, as_text, name};
+use crate::canonicalize::*;
 use crate::pretty_print::mml_to_string;
 use crate::xpath_functions::is_leaf;
 use regex::Regex;
@@ -60,36 +60,20 @@ static CHEM_FORMULA: &str = "data-chem-formula";
 static CHEM_ELEMENT: &str = "data-chem-element";
 
 
-pub fn clean_chemistry_mathml(mut mathml: Element) {
+pub fn clean_chemistry_mrow(mathml: Element) {
     let pref_manager = crate::prefs::PreferenceManager::get();
     if pref_manager.borrow().get_user_prefs().to_string("Chemistry") == "Off" {
         return;
     }
-    let mut tag_name = name(&mathml);
-    if tag_name == "math" && mathml.children().len() == 1 {
-        mathml = as_element(mathml.children()[0]);
-        tag_name = name(&mathml);
-        // if child_tag_name == "mrow" {       // mrow wrapper maybe added (FIX: check for data-changed='added'?)
-        //     mathml = child;
-        //     tag_name = child_tag_name;
-        // }
-    }
-    debug!("check_for_chem_formula: {}", mml_to_string(&mathml));
-    if tag_name != "mrow" {
-        error!("clean_chemistry_mathml: found none mrow\n{}", mml_to_string(&mathml));
-        return;
-    }
-    let old_children = mathml.children().iter()
+    debug!("clean_chemistry_mrow:\n{}", mml_to_string(&mathml));
+    let mut children = mathml.children().iter()
                 .map(|child| as_element(*child))
                 .collect::<Vec<Element>>();
-    if let Some(new_children) = mark_possible_chemistry_children(&old_children) {
-        if mark_actual_chemistry_children(&new_children) {
-            mathml.replace_children(&new_children);
-        } else {
-            unset_marked_chemistry(mathml);
-        }
-    } // else nothing was done
-
+    if let Some(new_children) = clean_mrow_children_restructure_pass(&children) {
+        mathml.replace_children(&new_children);
+        children = new_children;
+    }
+    clean_mrow_children_mark_pass(&children);
 }
 
 /// Do some aggressive structural changes and if they make this look like a chemistry formula, make it as one else remove other marks
@@ -98,61 +82,135 @@ pub fn clean_chemistry_mathml(mut mathml: Element) {
 ///        a) for any run of mi/mtext that can be re-split into chem elements, split them and mark them if it is at least 3 chars long
 ///        b) if there are any potential chem formula operators (e.g., "=" and ":") and the previous node is marked MAYBE_CHEMISTRY,
 ///           mark this as MAYBE_CHEMISTRY
-
-fn mark_possible_chemistry_children<'a>(old_children: &[Element<'a>]) -> Option<Vec<Element<'a>>> {
+fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Option<Vec<Element<'a>>> {
+    let mut changed = false;
     let mut new_children = Vec::with_capacity(2*old_children.len());
-    for &child in old_children {
-        let tag_name = name(&child);
+    let mut i = 0;
+    while i < old_children.len() {
         // FIX -- implement gathering up mi/mtext
-        if tag_name == "mo" {
-            likely_chem_formula_operator(child);
+
+        if let Some(aq) = clean_aq_state(old_children, i) {
+            new_children.push(old_children[i]);     // '(')
+            new_children.push(aq);
+            new_children.push(old_children[i+3]);   // ')'
+            i += 4;                                 // skipping "( a q )"
+            changed = true;
+            continue;
         }
+        if let Some(paren_mrow) = make_mrow(old_children, i) {
+            debug!("make_mrow added mrow");
+            new_children.push(paren_mrow);
+            i += 3;
+            changed = true;
+            continue;
+        }
+        let child = old_children[i];
+        let tag_name = name(&child);
+        if tag_name == "mo" {
+            let likely_chemistry_op = likely_chem_formula_operator(child);
+            // debug!("clean_mrow_children_restructure_pass -- in mo: likely {}, {}", likely_chemistry_op, mml_to_string(&child));
+            if likely_chemistry_op >= 0 {
+                child.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry_op.to_string().as_str());
+                // if possible chemistry to left and right, then override text for operator lookup
+                let preceding = child.preceding_siblings();
+                let following = child.following_siblings();
+                if !preceding.is_empty() && as_element(preceding[0]).attribute(MAYBE_CHEMISTRY).is_some() &&
+                   !following.is_empty() && as_element(following[0]).attribute(MAYBE_CHEMISTRY).is_some() {
+                    // "=", etc., should be tried as high priority separators
+                    child.set_attribute_value(OPERATOR_OVERRIDE, HIGH_PRIORITY_OPERATOR);
+                }
+            }
+        }
+        i += 1;
         new_children.push(child.clone());
     }
 
-    return Some(new_children);
+    return if changed {Some(new_children)} else {None};
+
+    /// if it looks like we have ChemFormula ( a q ), merge the 'a' and 'q' together into an 'mi'
+    /// if not already true, structure '( aq )' into a single mrow (might be other elements on either side)
+    /// returns the last char matched
+    fn clean_aq_state<'a>(children: &[Element<'a>], i: usize) -> Option<Element<'a>> {
+        if i+3 >= children.len() || (i > 0 && children[i-1].attribute(MAYBE_CHEMISTRY).is_none()) {
+            return None;       // can't be '( a q )' -- not enough elements left or not Chem Formula on left
+        }
+        
+        // this is a little sloppy in that we allow matching text in any leaf element, but we can use the same function
+        if is_text(children[i], "(") &&
+           is_text(children[i+1], "a") && is_text(children[i+2], "q") &&
+           is_text(children[i+3], ")") {
+            children[i+1].set_text("aq");
+            return Some(children[i+1]);
+        }
+        return None;
+    }
+
+    fn is_text(node: Element, target: &str) -> bool {
+        return is_leaf(node) && as_text(node) == target;
+    }
+
+    // converts  "( child )" to mrow with those elements as children 
+    // this is to make ascertaining with this is a chemical state easier, but it is correct even if not a chemical state
+    fn make_mrow<'a>(children: &[Element<'a>], i: usize) -> Option<Element<'a>> {
+        if i+2 >= children.len() || // can't be '( xxx )' -- not enough elements left
+           children.len() == 3 {    // already grouped
+            return None;       
+        }
+        
+        // this is a little sloppy in that we allow matching text in any leaf element, but we can use the same function
+        if is_text(children[i], "(") &&
+           is_text(children[i+2], ")") {
+			let mrow = create_mathml_element(&children[i].document(), "mrow");
+			mrow.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
+			mrow.append_children(&children[i..i+3]);
+            return Some(mrow);
+        }
+        return None;
+    }
 }
 
 /// Pass 2: (assuming something was marked in pass 1)
 /// a) find the first marked child and then the last consecutive marked child and trim any mo's from the ends
 /// b) evaluate the likelihood that the sequence is chemistry
-fn mark_actual_chemistry_children(children: &[Element]) -> bool {
+fn clean_mrow_children_mark_pass(children: &[Element]) {
     let mut start = None;
-    let mut likelihood = 0;
     for i in 0..children.len() {
         let child = children[i];
-        if let Some(attr_val) = child.attribute_value(MAYBE_CHEMISTRY)  {
-            if start ==None {
+        if child.attribute(MAYBE_CHEMISTRY).is_some()  {
+            if start == None {
                 if name(&child) == "mo" {
+                    debug!(" start == None: removing MAYBE_CHEMISTRY on {}", as_text(child));
                     child.remove_attribute(MAYBE_CHEMISTRY);
                 } else {
                     start = Some(i);
-                    likelihood = attr_val.parse::<isize>().unwrap();
                 }
-            } else {
-                likelihood += attr_val.parse::<isize>().unwrap();
             }
         } else if let Some(seq_start) = start {
-            for stop in (seq_start..i).rev() {
-                let end_child = children[stop];
-                if name(&end_child) == "mo" {
-                    let attr_val = end_child.attribute_value(MAYBE_CHEMISTRY).unwrap();
-                    likelihood -= attr_val.parse::<isize>().unwrap();
-                    end_child.remove_attribute(MAYBE_CHEMISTRY);
-                } else {
-                    if likelihood < IS_CHEMISTRY_THRESHOLD {
-                        for k in seq_start..stop {
-                            children[k].remove_attribute(MAYBE_CHEMISTRY);
-                        }
-                    }
-                    start = None;
-                    break;
-                }
+            if remove_operators_at_end_of_sequence(children, seq_start, i) {
+                start = None;
             }
         }
     }
 
-    return true;
+    if let Some(seq_start) = start {
+        remove_operators_at_end_of_sequence(children, seq_start, children.len());
+    }
+    return;
+
+
+    fn remove_operators_at_end_of_sequence(children: &[Element], start: usize, end: usize) -> bool {
+        // debug!("  looking for ops at end of {}..{}, last is:{}", start, end, mml_to_string(&children[end-1]));
+        for stop in (start..end).rev() {
+            let end_child = children[stop];
+            if name(&end_child) == "mo" {
+                debug!("removing MAYBE_CHEMISTRY on {}", as_text(end_child));
+                end_child.remove_attribute(MAYBE_CHEMISTRY);
+            } else {
+                return true;
+            }
+        }
+        return false
+}
 }
 
 
@@ -160,8 +218,13 @@ fn mark_actual_chemistry_children(children: &[Element]) -> bool {
 /// If it is, it is marked with either data-chem-equation or data-chem-formula
 /// This function assumes proper structure
 pub fn scan_and_mark_chemistry(mathml: Element) {
+    let pref_manager = crate::prefs::PreferenceManager::get();
+    if pref_manager.borrow().get_user_prefs().to_string("Chemistry") == "Off" {
+        return;
+    }
+
     // FIX -- need to implement
-    debug!("mark_if_likely_chemistry (after): {}", mml_to_string(&mathml));
+    debug!("scan_and_mark_chemistry:\n{}", mml_to_string(&mathml));
     likely_chem_formula(mathml);
     unset_marked_chemistry(mathml)
 
@@ -213,12 +276,10 @@ pub fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
 /// Clears MAYBE_CHEMISTRY from this element and its decedents
 fn unset_marked_chemistry(mathml: Element) {
     // If MAYBE_CHEMISTRY is not set, we don't need to recurse
-    if let Some(maybe_chem_attr) = mathml.attribute(MAYBE_CHEMISTRY) {
-        maybe_chem_attr.remove_from_parent();
-        if !is_leaf(mathml) {
-            for child in mathml.children() {
-                unset_marked_chemistry(as_element(child));
-            }
+    mathml.remove_attribute(MAYBE_CHEMISTRY);
+    if !is_leaf(mathml) {
+        for child in mathml.children() {
+            unset_marked_chemistry(as_element(child));
         }
     }
 }
@@ -238,8 +299,9 @@ fn likely_chem_equation(mathml: Element) -> isize {
 	for i in 0..children.len() {
 		let child = as_element(children[i]);
 		if i == children.len()-1 {
-			if is_chem_state(child) {
-                likelihood += 2;
+            let likely = likely_chem_state(child);
+            if likely > 0 {
+                likelihood += likely;
                 break;
 			}
             // otherwise, check the last element as normal
@@ -287,7 +349,7 @@ fn likely_chem_equation(mathml: Element) -> isize {
 }
 
 
-
+/// could be a number, a state ("(l)", "(g)", etc), or a number followed by a state
 fn likely_chem_subscript(supscript: Element) -> isize {
     let subscript_name = name(&supscript);
     if  subscript_name == "mn" && !as_text(supscript).contains(".") {
@@ -297,8 +359,16 @@ fn likely_chem_subscript(supscript: Element) -> isize {
         if text == "s" || text == "l" ||text == "g" ||text == "aq" {
             return 2;
         }
-    } else if is_chem_state(supscript) { // notation used in en.wikipedia.org/wiki/Electrolyte
-        return 2;       
+    } else if subscript_name == "mrow" {
+        let children = supscript.children();
+        let i_first_child = as_element(children[0]);
+        if children.len() == 2 &&
+           name(&i_first_child) == "mn" && !as_text(i_first_child).contains(".") &&
+           name (&as_element(children[1])) == "mrow" {
+            if likely_chem_state(as_element(children[1])) > 0 { // notation used in en.wikipedia.org/wiki/Electrolyte#Formation
+                return 2;
+            }
+        }     
     }
     return NOT_CHEMISTRY;     
 }
@@ -307,7 +377,7 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
     // either one or more '+'s (or '-'s) or a number followed by +/-
     // also could be state (en.wikipedia.org/wiki/Nuclear_chemistry#PUREX_chemistry)
     lazy_static! {
-        static ref PLUS_OR_MINUS: Regex = Regex::new(r"^\++ | -+$").unwrap(); 
+        static ref PLUS_OR_MINUS: Regex = Regex::new(r"^\++$|^-+$").unwrap(); 
     }
 
     let sup_name = name(&sup);
@@ -318,10 +388,11 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
         if children.len() == 2 {
             let first = as_element(children[0]);
             let second = as_element(children[1]);
-            if name(&first) == "mn" && name(&second) == "mo" &&
-                !as_text(first).contains(".") &&
-                (as_text(second) == "+" || as_text(second) == "-") {
+            if name(&first) == "mn" && name(&second) == "mo" && !as_text(first).contains(".") {
+                let second_text = as_text(second);
+                if second_text == "+" || second_text == "-" || second_text == "\u{2212}" { // '-' not yet canonicalized
                     return 2;   // ending with a +/- makes it likely this is an ion
+                }
             }
         }
     }
@@ -352,12 +423,26 @@ fn likely_chem_formula(mathml: Element) -> isize {
         // a parent may clear the chem flags if something says can't be chemistry (e.g, a non chemically valid script)
         "mi" => return likely_chem_element(mathml),
         "mo" => return likely_chem_formula_operator(mathml),
-        "msub" | "msup" | "msubsup" | "mmultiscripts" => return likely_adorned_chem_formula(mathml),
+        "msub" | "msup" | "msubsup" | "mmultiscripts" => {
+            likely_chem_formula(as_element(mathml.children()[0]));
+            let likelihood = likely_adorned_chem_formula(mathml);
+            if likelihood >= IS_CHEMISTRY_THRESHOLD {
+                mathml.set_attribute_value(MAYBE_CHEMISTRY, likelihood.to_string().as_str());
+            }
+            return likelihood;
+        },
         "mrow" => {
+            let chem_state = likely_chem_state(mathml);
+            if chem_state > 0 {
+                mathml.set_attribute_value(MAYBE_CHEMISTRY, chem_state.to_string().as_str());
+                return chem_state;
+            }
+
             let mut mrow = mathml;
             // check if it is bracketed -- doesn't add much info
-            if IsBracketed::is_bracketed(&mrow, "(", ")", false, false) ||
-               IsBracketed::is_bracketed(&mrow, "[", "]", false, false) {
+            if (IsBracketed::is_bracketed(&mrow, "(", ")", false, false) ||
+                IsBracketed::is_bracketed(&mrow, "[", "]", false, false)) &&
+               name(&as_element(mrow.children()[1]))  == "mrow" {
                 mrow = as_element(mrow.children()[1]);
             } 
 
@@ -366,7 +451,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
             for child in mrow.children() {
                 let child = as_element(child);
                 likelihood += likely_chem_formula(child);
-                debug!("in likely_chem_formula likelihood={}, child {}", likelihood, mml_to_string(&child));
+                // debug!("in likely_chem_formula likelihood={}, child\n{}", likelihood, mml_to_string(&child));
                 if likelihood < NOT_CHEMISTRY_THRESHOLD {
                     return NOT_CHEMISTRY;
                 }
@@ -374,9 +459,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
 
             if likelihood < IS_CHEMISTRY_THRESHOLD {
                 // the children may have looked have looked right, but something as said "not likely"
-                // mark this element so that unset_marked_chemistry will unset the children
-                mrow.set_attribute_value(MAYBE_CHEMISTRY, "-1000000");
-                unset_marked_chemistry(mrow);
+                // unset_marked_chemistry(mrow);
                 return NOT_CHEMISTRY;
             } else {
                 let likelihood_str = likelihood.to_string();
@@ -384,6 +467,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
                     mrow.set_attribute_value(MAYBE_CHEMISTRY, &likelihood_str);
                 }
                 mathml.set_attribute_value(MAYBE_CHEMISTRY, &likelihood_str);
+                // set here so calls to unset_marked_chemistry from a parent won't change it being chem
                 set_marked_chemistry_attr(mathml, CHEM_FORMULA);
                 return likelihood;
             }
@@ -391,11 +475,13 @@ fn likely_chem_formula(mathml: Element) -> isize {
         _ => {
             if !is_leaf(mathml) {
                 for child in mathml.children() {
-                    if likely_chem_formula(as_element(child)) < NOT_CHEMISTRY_THRESHOLD {
+                    let child = as_element(child);
+                    let likelihood = likely_chem_formula(child);
+                    if  likelihood >= IS_CHEMISTRY_THRESHOLD {
+                        child.set_attribute_value(MAYBE_CHEMISTRY, likelihood.to_string().as_str());
+                        set_marked_chemistry_attr(child, CHEM_FORMULA);
                     };
                 }
-                // mark this element so that unset_marked_chemistry will unset the children
-                mathml.set_attribute_value(MAYBE_CHEMISTRY, "-1000000");
             }
             return NOT_CHEMISTRY;
         },
@@ -430,9 +516,9 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
         // prescripts should be positive integers
         let children = mathml.children();
         let prescripts = if children.len() == 4 && name(&as_element(children[1]))=="mprescripts" {
-            &children[2..3]
+            &children[2..4]
         } else if children.len() == 6 && name(&as_element(children[3]))=="mprescripts" {
-            &children[1..2]
+            &children[1..3]
         } else {
             return NOT_CHEMISTRY;
         };
@@ -454,7 +540,7 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
     let base = as_element(mathml.children()[0]);
     if let Some(likely) = get_marked_value(base) {
         likelihood += likely;
-    } else if let Some(likely) = mathml.attribute_value(MAYBE_CHEMISTRY) {
+    } else if let Some(likely) = base.attribute_value(MAYBE_CHEMISTRY) {
         likelihood += likely.parse::<isize>().unwrap();
     }
     
@@ -466,8 +552,8 @@ fn is_in_set(leaf_text: &str, set: &phf::Set<char> ) -> bool {
     let mut chars = leaf_text.chars();
     let ch = chars.next();
     if chars.next().is_none() {     // only one char
-        if let Some(ch) = ch {
-            return set.contains(&ch);
+        if let Some(first_ch) = ch {
+            return set.contains(&first_ch);
         }
     }
     return false;
@@ -476,13 +562,15 @@ fn is_in_set(leaf_text: &str, set: &phf::Set<char> ) -> bool {
 fn likely_chem_formula_operator(mathml: Element) -> isize {
     // mostly from chenzhijin.com/en/article/Useful%20Unicode%20for%20Chemists (Arrows and Other)
     static CHEM_FORMULA_OPERATORS: phf::Set<char> = phf_set! {
-        '-', '=', '≡', '≣', '⠆', '⠇', '⠿',  // bond symbols
+        '-', '\u{2212}', '=', '≡', '≣', '⠆', '⠇', '⠿', // bond symbols (need both 2212 and minus because maybe not canonicalized)
+        '(', ')', '[', ']',
         // FIX: the invisible operator between elements should be well-defined, but this likely needs work, so both accepted for now
-        '\u{2061}', '\u{2063}' // invisible separators
+        '\u{2062}', '\u{2063}' // invisible separators
     };
 
     assert_eq!(name(&mathml), "mo");
-    if is_in_set(as_text(mathml), &CHEM_FORMULA_OPERATORS) {
+    let leaf_text = as_text(mathml);
+    if is_in_set(leaf_text, &CHEM_FORMULA_OPERATORS) || leaf_text == "::" {
         return 1;
     } else {
         return -3; // still a small chance;
@@ -534,27 +622,30 @@ fn is_equilibrium_constant(mut mathml: Element) -> bool {
 }
 
 /// look for "(s), "(l)", "(g)", "(aq)" (could also use [...])
-fn is_chem_state(mathml: Element) -> bool {
+/// this might be called before canonicalization, but in clean_chemistry_mrow, we made sure "( xxx )" is grouped properly
+pub fn likely_chem_state(mathml: Element) -> isize {
     if IsBracketed::is_bracketed(&mathml, "(", ")", false, false) ||
        IsBracketed::is_bracketed(&mathml, "[", "]", false, false) {
         let contents = as_element(mathml.children()[1]);
         if name(&contents) == "mi" {
             let text = as_text(contents);
-            return text == "s" || text == "l" ||text == "g" ||text == "aq";
+            if text == "s" || text == "l" ||text == "g" ||text == "aq" {
+                return text.as_bytes().len() as isize;       // hack to count chars -- works because all are ASCII
+            };
         }
      }
-     return false;
+     return NOT_CHEMISTRY;
 }
 
 /// Returns the likelihood that the arg is an element
 pub fn likely_chem_element(mathml: Element) -> isize {
     static NUCLEAR_SYMBOLS: [&str; 6] = ["e", "p", "n", "α", "β","γ"];
 
-    assert_eq!(name(&mathml), "mi");   
+    assert!(name(&mathml) == "mi" || name(&mathml) == "mtext", "{} is not 'mi' or 'mtext'", name(&mathml));   
     let text = as_text(mathml) ;
     if is_chemical_element(mathml) {
         // single letter = 1; double =2; triple = 3
-        return ((3 * text.chars().count() as isize) /2) as isize;
+        return text.chars().count() as isize;
     } else if NUCLEAR_SYMBOLS.contains(&text) {
         // not much special about them;
         return 0;
@@ -597,13 +688,12 @@ mod chem_tests {
 
     #[test]
     fn salt() {
-        init_logger();
         let test = "<math><mi>Na</mi><mi>Cl</mi></math>";
         let target = " <math>
-        <mrow data-changed='added' data-chem-formula='7'>
-          <mi data-chem-element='3'>Na</mi>
+        <mrow data-changed='added' data-chem-formula='5'>
+          <mi data-chem-element='2'>Na</mi>
           <mo data-changed='added'>&#x2063;</mo>
-          <mi data-chem-element='3'>Cl</mi>
+          <mi data-chem-element='2'>Cl</mi>
         </mrow>
        </math>";
         assert!(are_strs_canonically_equal(test, target));
@@ -633,4 +723,249 @@ mod chem_tests {
         </math>";
         assert!(are_strs_canonically_equal(test, target));
     }
+
+    #[test]
+    fn sulfate() {
+        let test = "<math><mrow><msup>
+                <mrow><mo>[</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>]</mo></mrow>
+                <mrow><mn>2</mn><mo>&#x2212;</mo></mrow>
+            </msup></mrow></math>";
+        let target = "<math>
+        <msup data-chem-formula='5'>
+          <mrow data-chem-formula='3'>
+            <mo>[</mo>
+            <mrow data-changed='added' data-chem-formula='3'>
+              <mi data-chem-element='1'>S</mi>
+              <mo data-changed='added'>&#x2063;</mo>
+              <msub data-chem-formula='1'>
+                <mi data-chem-element='1'>O</mi>
+                <mn>4</mn>
+              </msub>
+            </mrow>
+            <mo>]</mo>
+          </mrow>
+          <mrow>
+            <mn>2</mn>
+            <mo>-</mo>
+          </mrow>
+        </msup>
+       </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn aluminum_sulfate() {
+        let test = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
+                <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
+        let target = "<math>
+        <mrow data-chem-formula='6'>
+          <msub data-chem-formula='2'>
+            <mi data-chem-element='2'>Al</mi>
+            <mn>2</mn>
+          </msub>
+          <mo data-changed='added'>&#x2063;</mo>
+          <msub data-chem-formula='3'>
+            <mrow data-chem-formula='3'>
+              <mo>(</mo>
+              <mrow data-changed='added' data-chem-formula='3'>
+                <mi data-chem-element='1'>S</mi>
+                <mo data-changed='added'>&#x2063;</mo>
+                <msub data-chem-formula='1'>
+                  <mi data-chem-element='1'>O</mi>
+                  <mn>4</mn>
+                </msub>
+              </mrow>
+              <mo>)</mo>
+            </mrow>
+            <mn>3</mn>
+          </msub>
+        </mrow>
+       </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn ethanol_bonds() {
+        let test = "<math>
+                <mrow>
+                    <mi>C</mi>
+                    <msub>  <mi>H</mi> <mn>3</mn> </msub>
+                    <mo>&#x2212;</mo>
+                    <mi>C</mi>
+                    <msub>  <mi>H</mi> <mn>2</mn> </msub>
+                    <mo>&#x2212;</mo>
+                    <mi>O</mi>
+                    <mi>H</mi>
+                </mrow>
+            </math>";
+        let target = "<math>
+                <mrow data-chem-formula='11'>
+                    <mi data-chem-element='1'>C</mi>
+                    <mo data-changed='added'>&#x2063;</mo>
+                    <mrow data-changed='added' data-chem-formula='9'>
+                    <msub data-chem-formula='1'>
+                        <mi data-chem-element='1'>H</mi>
+                        <mn>3</mn>
+                    </msub>
+                    <mo data-operator='&#xf8ff;' data-chem-element='1'>-</mo>
+                    <mrow data-changed='added' data-chem-formula='7'>
+                        <mi data-chem-element='1'>C</mi>
+                        <mo data-changed='added'>&#x2063;</mo>
+                        <mrow data-changed='added' data-chem-formula='5'>
+                        <msub data-chem-formula='1'>
+                            <mi data-chem-element='1'>H</mi>
+                            <mn>2</mn>
+                        </msub>
+                        <mo data-operator='&#xf8ff;' data-chem-element='1'>-</mo>
+                        <mrow data-changed='added' data-chem-formula='3'>
+                            <mi data-chem-element='1'>O</mi>
+                            <mo data-changed='added'>&#x2063;</mo>
+                            <mi data-chem-element='1'>H</mi>
+                        </mrow>
+                        </mrow>
+                    </mrow>
+                </mrow>
+            </mrow>
+        </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn dichlorine_hexoxide() {
+        let test = "<math><mrow>
+        <msup>
+          <mrow><mo>[</mo><mi>Cl</mi><msub><mi>O</mi><mn>2</mn></msub><mo>]</mo></mrow>
+          <mo>+</mo>
+        </msup>
+        <msup>
+          <mrow><mo>[</mo><mi>Cl</mi><msub><mi>O</mi><mn>4</mn></msub><mo>]</mo></mrow>
+          <mo>-</mo>
+        </msup>
+      </mrow></math>";
+        let target = " <math>
+            <mrow data-chem-formula='11'>
+                <msup data-chem-formula='5'>
+                    <mrow data-chem-formula='4'>
+                    <mo>[</mo>
+                    <mrow data-changed='added' data-chem-formula='4'>
+                        <mi data-chem-element='2'>Cl</mi>
+                        <mo data-changed='added'>&#x2063;</mo>
+                        <msub data-chem-formula='1'>
+                        <mi data-chem-element='1'>O</mi>
+                        <mn>2</mn>
+                        </msub>
+                    </mrow>
+                    <mo>]</mo>
+                    </mrow>
+                    <mo>+</mo>
+                </msup>
+                <mo data-changed='added'>&#x2063;</mo>
+                <msup data-chem-formula='5'>
+                    <mrow data-chem-formula='4'>
+                    <mo>[</mo>
+                    <mrow data-changed='added' data-chem-formula='4'>
+                        <mi data-chem-element='2'>Cl</mi>
+                        <mo data-changed='added'>&#x2063;</mo>
+                        <msub data-chem-formula='1'>
+                        <mi data-chem-element='1'>O</mi>
+                        <mn>4</mn>
+                        </msub>
+                    </mrow>
+                    <mo>]</mo>
+                    </mrow>
+                    <mo>-</mo>
+                </msup>
+            </mrow>
+        </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn ethylene_with_bond() {
+        let test = "<math><mrow>
+                <msub><mi>H</mi><mn>2</mn></msub><mi>C</mi>
+                <mo>=</mo>
+                <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
+            </mrow></math>";
+        let target = "<math>
+            <mrow data-chem-formula='7'>
+                <msub data-chem-formula='1'>
+                    <mi data-chem-element='1'>H</mi>
+                    <mn>2</mn>
+                </msub>
+                <mo data-changed='added'>&#x2063;</mo>
+                <mrow data-changed='added' data-chem-formula='5'>
+                    <mi data-chem-element='1'>C</mi>
+                    <mo data-operator='&#xf8ff;' data-chem-element='1'>=</mo>
+                    <mrow data-changed='added' data-chem-formula='3'>
+                    <mi data-chem-element='1'>C</mi>
+                    <mo data-changed='added'>&#x2063;</mo>
+                    <msub data-chem-formula='1'>
+                        <mi data-chem-element='1'>H</mi>
+                        <mn>2</mn>
+                    </msub>
+                    </mrow>
+                </mrow>
+            </mrow>
+       </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn ferric_chloride_aq() {
+        let test = "<math><mrow>
+            <mi>Fe</mi>
+            <msub><mi>Cl</mi><mn>3</mn></msub>
+            <mrow><mo>(</mo><mrow><mi>aq</mi></mrow><mo>)</mo></mrow>
+        </mrow></math>";
+        let target = "<math>
+                <mrow data-chem-formula='8'>
+                    <mi data-chem-element='2'>Fe</mi>
+                    <mo data-changed='added'>&#x2063;</mo>
+                    <msub data-chem-formula='2'>
+                        <mi data-chem-element='2'>Cl</mi>
+                        <mn>3</mn>
+                    </msub>
+                    <mo data-changed='added'>&#x2063;</mo>
+                    <mrow data-chem-formula='2'>
+                        <mo>(</mo>
+                        <mi>aq</mi>
+                        <mo>)</mo>
+                    </mrow>
+                </mrow>
+            </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn ethylene_with_colon_bond() {
+        let test = "<math><mrow>
+                <msub><mi>H</mi><mn>2</mn></msub><mi>C</mi>
+                <mo>::</mo>
+                <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
+            </mrow></math>";
+        let target = "<math>
+            <mrow data-chem-formula='7'>
+                <msub data-chem-formula='1'>
+                    <mi data-chem-element='1'>H</mi>
+                    <mn>2</mn>
+                </msub>
+                <mo data-changed='added'>&#x2063;</mo>
+                <mrow data-changed='added' data-chem-formula='5'>
+                    <mi data-chem-element='1'>C</mi>
+                    <mo data-operator='&#xf8ff;' data-chem-element='1'>::</mo>
+                    <mrow data-changed='added' data-chem-formula='3'>
+                    <mi data-chem-element='1'>C</mi>
+                    <mo data-changed='added'>&#x2063;</mo>
+                    <msub data-chem-formula='1'>
+                        <mi data-chem-element='1'>H</mi>
+                        <mn>2</mn>
+                    </msub>
+                    </mrow>
+                </mrow>
+            </mrow>
+        </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
 }

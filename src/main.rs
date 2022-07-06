@@ -85,7 +85,7 @@ fn main() {
 //   <mi arg='b'>B</mi>
 // </mrow>
 //   </math>";
-  let expr = "<math><mi>Na</mi><mi>Cl</mi></math>";
+  let expr = "<math><mi>Na</mi><mi>Cl</mi><mo>(</mo><mi>a</mi><mi>q</mi><mo>)</mo></math>";
   let instant = Instant::now();
   let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../../Rules");
   let rules_dir = rules_dir.as_os_str().to_str().unwrap().to_string();
