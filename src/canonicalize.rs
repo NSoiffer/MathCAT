@@ -394,7 +394,7 @@ impl CanonicalizeContext {
 			"mfrac", "mroot", "msub", "msup", "msubsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv",
 			"none", "mprescripts", "malignmark", "maligngroup",
 			"math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd", "mstyle",
-			"mrow", "mfenced", "mtable", "mtr",
+			"mrow", "mfenced", "mtable", "mtr", "mlabeledtr",
 		};
 		
 		let element_name = name(&mathml);
