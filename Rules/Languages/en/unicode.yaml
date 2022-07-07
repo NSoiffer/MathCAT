@@ -4,25 +4,33 @@
     - test: 
         if: "$TTS='none'"
         then: [t: "eigh"]                         # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
-        else: [spell: "a"]                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
+        else: [spell: "'a'"]                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
  - "b-z": 
     - test: 
         if: "$TTS='none'"
         then: [t: "."]                          
-        else: [spell: "."]                       
+        else: [spell: "'.'"]                       
 
  - "A":
-    - test: 
-        if: "$TTS='none'"
-        then: [x: "$SpeechOverrides_CapitalLetters", t: "eigh"]                         # long "a" sound in all speech engines I tested (see above)
-        else: [spell: "A"]
-
+    - test:
+        if: "$SpeechOverrides_CapitalLetters = ''"
+        then_test:
+            if: "$TTS='none'"
+            then: [t: "Eigh"]
+            else: [spell: "'A'"]
+        else:
+        - x: "$SpeechOverrides_CapitalLetters"
+        - test:
+            if: "$TTS='none'"
+            then: [t: "eigh"]
+            else: [spell: "'a'"]
+            
  - "B-Z": 
-    - test: 
-        if: "$TTS='none'"
+    - test:
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
-        then: [x: "$SpeechOverrides_CapitalLetters", x: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]                         
-        else: {spell: "."}                       
+        if: "$SpeechOverrides_CapitalLetters = ''"
+        then: [spell: "'.'"]
+        else: [x: "$SpeechOverrides_CapitalLetters", spell: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]
 
  - "0-9": [t: "."]
 

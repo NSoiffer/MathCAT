@@ -85,7 +85,7 @@ fn main() {
 //   <mi arg='b'>B</mi>
 // </mrow>
 //   </math>";
-  let expr = "<math><mi>Na</mi><mi>Cl</mi><mo>(</mo><mi>a</mi><mi>q</mi><mo>)</mo></math>";
+  let expr = "<math><mi>Na</mi><mi>S</mi><mo>(</mo><mi>l</mi><mo>)</mo></math>";
   let instant = Instant::now();
   let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../../Rules");
   let rules_dir = rules_dir.as_os_str().to_str().unwrap().to_string();
@@ -96,7 +96,7 @@ fn main() {
   };
 
   info!("Version = '{}'", get_version());
-  set_preference("TTS".to_string(), "none".to_string()).unwrap();
+  set_preference("TTS".to_string(), "ssml".to_string()).unwrap();
   // set_preference("Bookmark".to_string(), "true".to_string()).unwrap();
   set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
 

@@ -64,14 +64,15 @@
   # (a,b) has many interpretations; (a, b] (etc) have fewer interpretations.
   # as an interval, it represents a set and hence a clue that it is an interval is that a set operator comes
   #   before or after it. '=' is also common.
-  # They also commonly stand by themselves, but so does the interpretation as a point or gcd.
+  # They also commonly stand by themselves, but so does the interpretation as a point or gcd, so we don't include (xxx, yyy) in the inference
   name: interval
   tag: mrow
   match: 
     - "count(*)=3 and "
        # FIX: consider adding ]...[ versions
-    - "*[1][text()='(' or text()='['] and *[3][text()=')' or text()=']'] and"   # match bracketing
-    - "*[2][count(*)=3 and *[2][text()=',']] and"                                # inside should have ','
+    - "(*[1][text()='(' or text()='[']) and (*[3][text()=')' or text()=']']) and"   # match bracketing
+    - "not(IsBracketed(., '(', ')')) and"
+    - "*[2][count(*)=3 and *[2][text()=',']] and"                                   # inside should have ','
       # FIX: if both the first and third children of *[2] are mn, then make sure first <= third
     - "("
     - "  preceding-sibling::*[1][self::m:mo and ( text()='=' or IsInDefinition(., 'SubsetOperators') )] or "  # context hint
@@ -375,6 +376,49 @@
           if: count(*) = 2
           then: []
           else: [x: "*[2]"]
+
+-
+  name: chemistry
+  tag: [msub, msup, msubsup]
+  match: "@data-chem-formula"
+  replace:
+  - intent:
+      name: "chemical-formula"
+      children:
+      - x: "*"
+
+-
+  name: chemical-element
+  tag: [mi]
+  match: "@data-chem-element"
+  replace:
+  - intent:
+      name: "chemical-element"
+      children:
+      - x: "text()"
+
+-
+  name: chemical-formula-op
+  tag: [mo]
+  match: "@data-chem-formula"
+  replace:
+  - intent:
+      name: "chemical-formula-operator"
+      children:
+      - x: "text()"
+
+-
+  name: chemistry-state
+  tag: mrow
+  match:
+    - "@data-chem-formula and"
+    - "IsBracketed(., '(', ')') and"
+    - "*[2][text()='s' or text()='l' or text()='g' or text()='aq']"
+  replace:
+  - intent:
+      name: "chemical-state"
+      children:
+      - x: "*[2]"
 
 -
   name: default

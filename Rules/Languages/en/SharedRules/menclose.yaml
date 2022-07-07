@@ -41,7 +41,7 @@
         then:
           - test:
               if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
-              then: [spell: x, pause: short]  # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+              then: [spell: "'x'", pause: short]  # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
               else:
                 - test:
                     if: ".[contains(@notation,'updiagonalstrike')]"

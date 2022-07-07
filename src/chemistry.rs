@@ -259,14 +259,18 @@ pub fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
     if let Some(maybe) = mathml.attribute(MAYBE_CHEMISTRY) {
         maybe.remove_from_parent();
 
-        if is_leaf(mathml) {
-            mathml.set_attribute_value(CHEM_ELEMENT, maybe.value());
-        } else {
-            mathml.set_attribute_value(chem, maybe.value());
-            for child in mathml.children() {
-                set_marked_chemistry_attr(as_element(child), chem);
+        let leaf_name = name(&mathml);
+        match leaf_name {
+            "mi" => {mathml.set_attribute_value(CHEM_ELEMENT, maybe.value());},
+            "mo" => {mathml.set_attribute_value(chem, maybe.value());},
+            "mrow" | "msub" | "msup" | "msubsup" | "mmultiscripts" => {
+                mathml.set_attribute_value(chem, maybe.value());
+                for child in mathml.children() {
+                    set_marked_chemistry_attr(as_element(child), chem);
+                };
             }
-        }    
+            _ => error!("Internal error: {} should not be marked as 'MAYBE_CHEMISTRY'", leaf_name),
+        }
     }
 }
 
@@ -804,7 +808,7 @@ mod chem_tests {
                         <mi data-chem-element='1'>H</mi>
                         <mn>3</mn>
                     </msub>
-                    <mo data-operator='&#xf8ff;' data-chem-element='1'>-</mo>
+                    <mo data-operator='&#xf8ff;' data-chem-formula='1'>-</mo>
                     <mrow data-changed='added' data-chem-formula='7'>
                         <mi data-chem-element='1'>C</mi>
                         <mo data-changed='added'>&#x2063;</mo>
@@ -813,7 +817,7 @@ mod chem_tests {
                             <mi data-chem-element='1'>H</mi>
                             <mn>2</mn>
                         </msub>
-                        <mo data-operator='&#xf8ff;' data-chem-element='1'>-</mo>
+                        <mo data-operator='&#xf8ff;' data-chem-formula='1'>-</mo>
                         <mrow data-changed='added' data-chem-formula='3'>
                             <mi data-chem-element='1'>O</mi>
                             <mo data-changed='added'>&#x2063;</mo>
@@ -893,7 +897,7 @@ mod chem_tests {
                 <mo data-changed='added'>&#x2063;</mo>
                 <mrow data-changed='added' data-chem-formula='5'>
                     <mi data-chem-element='1'>C</mi>
-                    <mo data-operator='&#xf8ff;' data-chem-element='1'>=</mo>
+                    <mo data-operator='&#xf8ff;' data-chem-formula='1'>=</mo>
                     <mrow data-changed='added' data-chem-formula='3'>
                     <mi data-chem-element='1'>C</mi>
                     <mo data-changed='added'>&#x2063;</mo>
@@ -950,7 +954,7 @@ mod chem_tests {
                 <mo data-changed='added'>&#x2063;</mo>
                 <mrow data-changed='added' data-chem-formula='5'>
                     <mi data-chem-element='1'>C</mi>
-                    <mo data-operator='&#xf8ff;' data-chem-element='1'>::</mo>
+                    <mo data-operator='&#xf8ff;' data-chem-formula='1'>::</mo>
                     <mrow data-changed='added' data-chem-formula='3'>
                     <mi data-chem-element='1'>C</mi>
                     <mo data-changed='added'>&#x2063;</mo>
