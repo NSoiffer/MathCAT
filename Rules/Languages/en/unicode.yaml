@@ -44,16 +44,16 @@
  - "(":                                          # 0x28
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [test: {if: "$Verbosity='Terse'", then: [t: open], else: [t: open paren]}]
-        else: [t: left paren]                            
+        then: [test: {if: "$Verbosity='Terse'", then: [t: "open"], else: [t: "open paren"]}]
+        else: [t: "left paren"]                            
  - ")":                                          # 0x29
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [test: {if: "$Verbosity='Terse'", then: [t: close], else: [t: close paren]}]
-        else: [t: right paren]                            
+        then: [test: {if: "$Verbosity='Terse'", then: [t: "close"], else: [t: "close paren"]}]
+        else: [t: "right paren"]                            
 
- - "*": [t: times]                               # 0x2a
- - "+": [t: plus]                                # 0x2b
+ - "*": [t: "times"]                               # 0x2a
+ - "+": [t: "plus"]                                # 0x2b
  - ",":                                          # 0x2c
     # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
     # that this test is here and not with "…" is not ideal, but seems simplest
@@ -65,89 +65,89 @@
             - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
                # except if expression starts with '…'
             - " ../*[1][text()='…'] "
-        then: [t: comma]
+        then: [t: "comma"]
         # else silent
 
- - "-": [t: minus]                               # 0x2d
+ - "-": [t: "minus"]                               # 0x2d
  - ".":                                          # 0x2e
     - test:
         if: "parent::*[1][self::m:mn]"
         then: [t: "point"]
         else: [t: "dot"]
- - "/": [t: divided by]                          # 0x2f
- - ":": [t: colon]                               # 0x3a
- - ";": [t: semicolon]                           # 0x3b
+ - "/": [t: "divided by"]                          # 0x2f
+ - ":": [t: "colon"]                               # 0x3a
+ - ";": [t: "semicolon"]                           # 0x3b
  - "<":                                          # 0x3c
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: is]
-     - t: less than
- - "=": [t: equals]                              # 0x3d
+         then: [t: "is"]
+     - t: "less than"
+ - "=": [t: "equals"]                              # 0x3d
  - ">":                                          # 0x3e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: is]
-     - t: greater than
- - "?": [t: question mark]                       # 0x3f
- - "@": [t: at sign]                             # 0x40
+         then: [t: "is"]
+     - t: "greater than"
+ - "?": [t: "question mark"]                       # 0x3f
+ - "@": [t: "at sign"]                             # 0x40
  - "[":                                          # 0x5b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: open bracket]
-        else: [t: left bracket]                            
- - "\\": [t: back slash]                         # 0x5c
+        then: [t: "open bracket"]
+        else: [t: "left bracket"]                            
+ - "\\": [t: "back slash"]                         # 0x5c
  - "]":                                          # 0x5d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: close bracket]
-        else: [t: right bracket]
- - "^": [t: hat]                                # 0x5e
- - "_": [t: under bar]                          # 0x5f
- - "`": [t: grave]                              # 0x60
+        then: [t: "close bracket"]
+        else: [t: "right bracket"]
+ - "^": [t: "hat"]                                # 0x5e
+ - "_": [t: "under bar"]                          # 0x5f
+ - "`": [t: "grave"]                              # 0x60
  - "{":                                         # 0x7b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: open brace]
-        else: [t: left brace]                            
+        then: [t: "open brace"]
+        else: [t: "left brace"]                            
  - "|":                                          # 0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" in side of sets is handled at the mrow level, same for 'sets'
      - test:
         - if: $SpeechStyle != 'ClearSpeak'
-          then: [t: vertical line]
+          then: [t: "vertical line"]
         - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
-          then: [t: such that]
+          then: [t: "such that"]
         - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
-          then: [t: given] 
-        - else: [t: divides]                   
+          then: [t: "given"] 
+        - else: [t: "divides"]                   
 
  - "}":                                          # 0x7d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: close brace]
-        else: [t: right brace]                            
+        then: [t: "close brace"]
+        else: [t: "right brace"]                            
 
- - "~": [t: tilde]                               # 0x7e
+ - "~": [t: "tilde"]                               # 0x7e
  - " ": [t: ""]                                  # 0xa0
- - "¢": [t: cents]                               # 0xa2
- - "£": [t: pounds]                              # 0xa3
- - "¬": [t: not]                                 # 0xac
+ - "¢": [t: "cents"]                               # 0xa2
+ - "£": [t: "pounds"]                              # 0xa3
+ - "¬": [t: "not"]                                 # 0xac
  - "°": [t: "degrees"]                           # 0xb0
- - "±": [t: plus or minus]                       # 0xb1
- - "´": [t: "accute"]                            # 0xb4
+ - "±": [t: plu"s or minus"]                       # 0xb1
+ - "´": [t: "acute"]                            # 0xb4
  - "·":
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
-        then: [t: times]
-        else: [t: dot]
+        then: [t: "times"]
+        else: [t: "dot"]
  - "×":                                          # 0xd7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
-        then: [t: times]
+        then: [t: "times"]
         else_test:
             if: $ClearSpeak_MultSymbolX = 'By'
-            then: [t: by]
-            else: [t: cross]
- - "÷": [t: divided by]                          # 0xf7
+            then: [t: "by"]
+            else: [t: "cross"]
+ - "÷": [t: "divided by"]                          # 0xf7
  - "̀": [t: grave accent embellishment]          # 0x300
  - "́": [t: acute accent embellishment]          # 0x301
  - "̂": [t: circumflex accent embellishment]     # 0x302
