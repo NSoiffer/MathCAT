@@ -43,18 +43,58 @@ Similarly, it is likely that in some languages, additional words are used based 
 those should be added with whatever test is appropriate.
 See below for a discussion of what can be used in a rule file.
 
+Once you've done some translations and want to try them out, you can do so immediately if using NVDA. Assuming you have the MathCAT addon:
+1. copy your new translation directory to `%AppData%\nvda\addons\MathCAT\globalPlugins\MathCAT\Rules\Languages`.
+2. Start NVDA and go to the MathCAT settings menu (NVDA preferences: MathCAT settings..).
+3. Under the "Languages" drop down you should see your new language. Select that.
+4. Try out the speech. Wikipedia pages are a good source for examples.
+
+Translating the settings dialog: this is a separate process from translating the speech. [to be written]
+
+Testing is very important! MathCAT is written in Rust and has a large number of automated tests. These tests take advantage of the builtin Rust test system. Hence, to write and verify your own tests, you need to [download and install Rust](https://www.rust-lang.org/tools/install). You do not need to know Rust -- you will simply change some strings from what they are in English to what you think they should be in your language.
+In the `tests` directory, there is a file `en.rs` and a directory `en`. For the sake of discussion, let's assume you are doing a French translation, then your country code is `fr`.
+1. Copy `en.rs` to `fr.rs`.
+2. Copy the `en` directory to `fr`.
+3. If you only choose one speech style (e.g., "SimpleSpeak), edit `fr.rs` and remove the lines starting `mod ClearSpeak {` all the way down to the matching `}`. In the `fr` directory, remove the subdirectory `ClearSpeak`.
+4. Start editing the files, changing `test(` to `test_lang(` and then replacing the English string with the appropriate French (or whatever language you added) string.
+
+Now that you have some tests translated, try running the automated tests.
+As a check that everything is set up properly, verify that the English version of the tests are working
+```
+cargo test en
+```
+If that is working, try your tests. Again assuming your created a `fr` version:
+```
+cargo test fr
+```
+MathCAT adds pausing in places and in the test strings, these appear as `,` and `;`. You may need to adjust your expected output by adding or removing those. If those pauses seem inappropriate, you will need to add or remove `pause: xxx` from the appropriate place in the one of the `Rules\fr` files.
+
+
+
+To be written...
+
 I hope to eventually have a tool that will
 1. warn about missing translations
 2. warn about rules in the `en` that have not been copied to another language (likely due to new rules having been added to English)
 
 These tools will look for untranslated and translated text so make sure you convert to the key (`t`, 'ct`, or 'ot`) to be capitalized.
 
-Testing is very important!
 
-To be written...
 
 ### Braille translators
 If you want support for a new language, you probably need to start from scratch unless the language is similar to an existing braille language.
+You will need to create three `.yaml` files in `Rules\Braille\your-braille-language`. The should mirror the files that are in the other braille directories:
+1. xxx_Rules.yaml -- where 'xxx' is the name of your new braille language. These will contain the rules that translate MathML to braille
+2. unicode.yaml -- this is a translation of the more common braille characters. Use `Nemeth\unicode.yaml` as a starting point for the the translation. Convert the `t: xxx` into what is appropriate for your language. You likely need to delete some logic or maybe add some of your own for characters that might be represented differently based on context. For example, in Nemeth, a "," is represented differently if it is part of a number.
+3. unicode-full.yaml -- this is the rest of the character translations.
+
+The reason for two separate unicode files is that having a shorter file for the most common characters means startup takes less time. The goal of that file is to capture 99.99% of the characters used.
+
+For both UEB and Nemeth, some cleanup code needed to be written in Rust. If you are doing a braille translation and cleanup needs to be done, please file an issue and we can work together to get the code written.
+
+To try out your braille translation, you can do so immediately. Please see the instructions above for doing a language translation where it instructs on copying the files to `%AppData%\nvda\addons\MathCAT\globalPlugins\MathCAT\Rules\Languages`. Change languages to `Braille` and most things will be the same.
+
+For automated testing, the instructions above should be followed. The current tests are taken from braille guides for Nemeth/UEB, and you may want to do the same. Unlikely for a language translation, use `test_braille` as is done for Nemeth/UEB.
 
 ### Rust Developers
 `build.rs` and files in `src`
