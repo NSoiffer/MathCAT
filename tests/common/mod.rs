@@ -60,6 +60,25 @@ pub fn test(style: &str, mathml: &str, speech: &str) {
     check_answer(mathml, speech);
 }
 
+// Compare the result of speaking the mathml input to the output 'speech'
+// This uses default preferences
+#[allow(dead_code)]     // used in testing
+pub fn test_lang(language: &str, style: &str, mathml: &str, speech: &str) {
+    set_rules_dir(abs_rules_dir_path()).unwrap();
+    libmathcat::speech::SPEECH_RULES.with(|rules| {
+        let mut rules = rules.borrow_mut();
+        let mut changes;
+        {   // needs to be scoped due to problems with rules potentially being used with prefs' destructor runs in an outer scope
+            let mut prefs = rules.pref_manager.borrow_mut();
+            changes = prefs.set_user_prefs("SpeechStyle", style).unwrap_or_default();
+            let more_changes = prefs.set_user_prefs("Language", language).unwrap_or_default();
+            changes.add_changes(more_changes);
+        }
+        rules.invalidate(changes);
+    });
+    check_answer(mathml, speech);
+}
+
 
 // Compare the result of speaking the mathml input to the output 'speech'
 // This takes the speech style along with a vector of (pref_name, pref_value)
