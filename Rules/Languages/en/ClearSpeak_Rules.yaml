@@ -541,7 +541,7 @@
               then: [t: log]
             - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
               then: [t: natural log]
-              else: [spell: ln]
+              else: [spell: "'ln'"]
          else:
           - test: 
              if: "$Verbosity!='Terse' and not(log_is_simple)"
@@ -551,7 +551,7 @@
               then: [t: log]
             - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
               then: [t: natural log]
-              else: [spell: ln]
+              else: [spell: "'ln'"]
           - t: of
           - pause: short
       - x: "*[3]"

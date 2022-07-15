@@ -62,25 +62,30 @@ fn main() {
   //          <mtd>
   //           <mn>6</mn>
   //          </mtd>
-  //         </mtr>
+  //         </mtr>','
   //        </mtable>
   //      <mo>]</mo></mrow></mrow>
   //    </math>
   // ";
 
-  let expr = "<math display='inline' xmlns='http://www.w3.org/1998/Math/MathML' subject='None'>
-  <mrow>
-  <mo>(</mo><mn arg='arg1'>3</mn><mo>,</mo><mn arg='arg2'>12</mn><mo>)</mo>
-  </mrow>
-  </math>
-  
-      ";
-  // let expr = "
-  // <math><mo>&#x25B3;</mo><mi>ABC</mi></math>
-  //   ";
-  // let expr = "<math><mi>c</mi><mo>=</mo><mn>4</mn><mspace width=\"thinmathspace\"></mspace><mn>598</mn>
-  //                 <mspace width=\"thinmathspace\"></mspace><mn>037</mn>
-  //                 <mspace width=\"thinmathspace\"></mspace><mn>234</mn></math>";
+  // let expr = "<math display='inline' xmlns='http://www.w3.org/1998/Math/MathML'>
+  //       <msup intent='power($base(2, $base),silly($exp,-1.))'>
+  //       <mi arg='base'>x</mi>
+  //       <mi arg='exp'>n</mi>
+  //     </msup>
+  //       </math>
+  //     ";
+//   let expr = "<math>
+//   <mrow intent='$op($a,$b)'>
+//   <mi arg='a'>A</mi>
+//   <mover arg='op' intent='$U27F6($U2245)'>
+//       <mo movablelimits='false' arg='U27F6' intent='map'>⟶</mo>
+//       <mo arg='U2245' intent='congruence'>≅</mo>
+//   </mover>
+//   <mi arg='b'>B</mi>
+// </mrow>
+//   </math>";
+  let expr = "<math><mi>Na</mi><mi>S</mi><mo>(</mo><mi>l</mi><mo>)</mo></math>";
   let instant = Instant::now();
   let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../../Rules");
   let rules_dir = rules_dir.as_os_str().to_str().unwrap().to_string();
@@ -91,7 +96,7 @@ fn main() {
   };
 
   info!("Version = '{}'", get_version());
-  set_preference("TTS".to_string(), "none".to_string()).unwrap();
+  set_preference("TTS".to_string(), "ssml".to_string()).unwrap();
   // set_preference("Bookmark".to_string(), "true".to_string()).unwrap();
   set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
 

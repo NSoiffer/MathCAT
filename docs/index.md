@@ -3,14 +3,18 @@
 is a library that supports conversion of MathML to:
 
 * Speech strings with embedded speech engine commands
-* Braille (Nemeth and eventually other braille math codes)
+* Braille (Nemeth, UEB Technical, and eventually other braille math codes)
 * Navigation of math (in multiple ways including overviews)
 
 A goal of MathCAT is to be an easy to use library for screen readers and other assistive technology to use to produce high quality speech and/or braille from MathML. It is a follow-on project from MathPlayer (see below) and uses lessons learned from it to do to produce even higher quality speech, navigation, and braille. MathCAT takes advantage of some new ideas the [MathML Working Group](https://mathml-refresh.github.io/charter-drafts/math-2020.html) is developing to allow authors to express their intent when they use a notation. E.g., $(3, 6)$ could be a point in the plane or an open interval, or even a shorthand notation for the greatest common divisor. When that information is conveyed in the MathML, MathCAT will use it to generate more natural sounding speech.
 
 Todo: incorporation of third party libraries to support a common subset of TeX math commands along with ASCIIMath.
 
-MathCAT is written in Rust and can be built to interface with C/C++, Python, and other languages. [The Python interface](https://github.com/NSoiffer/MathCATForPython) is used by an [NVDA add-on](https://addons.nvda-project.org/addons/MathCAT.en.html) and I hope to eventually get it incorporated into Orca which is written in Python. There is also [a C/C++ interface](https://github.com/NSoiffer/MathCATForC).
+MathCAT is written in Rust and can be built to interface with many languages. To date there are interfaces for:
+* [C/C++](https://github.com/NSoiffer/MathCATForC)
+* [Python](https://github.com/NSoiffer/MathCATForPython) -- this is used by an [NVDA add-on](https://addons.nvda-project.org/addons/MathCAT.en.html). I hope to eventually get it incorporated into [Orca](https://help.gnome.org/users/orca/stable) which is written in Python.
+* [Java](https://github.com/mwhapples/MathCAT4J) -- this is currently being used to experiment with MathCAT in [BrailleBlaster](https://www.brailleblaster.org/).
+* [WebAssembly (Wasm)](https://github.com/NSoiffer/MathCATDemo/) -- this is used for a web demo of MathCAT.
 
 MathCAT uses a number of heuristics that try to repair poor MathML and put it in a recommended format. For example, TeX converters and WYSIWYG editors will take "1,234+1" and break the number "1,234" apart at the comma. MathCAT recognizes that and folds the number into a single `mn`. Other repairs are structural such as creating `mrow`s based on information from MathML's operator dictionary and adding invisible function application, multiplication, addition (mixed fractions), and separators (e.g, between the $i$ and $j$ in $a\_{ij}$) when it seems appropriate. This simplifies speech and Nemeth generation and may be useful to other apps. Currently the cleanup is not exposed in an API, but potentially it could be another service of MathCAT. In general, MathCAT is somewhat conservative in its repair. However, it likely will do the wrong thing in some cases, but the hope is it does the right thing much, much more frequently. Finding common mistakes of translators to MathML and patching up the poor MathML is an ongoing project.
 

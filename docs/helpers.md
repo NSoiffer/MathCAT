@@ -10,6 +10,7 @@ If you plan to work on MathCAT development, you need to make use of github:
 2. Clone the the forked copy so you have a local copy to work on
 If you are unfamiliar with these steps, a simple search will turn up lots of places that describe how to do them. They are simple, so don't get put off by your unfamiliarity.
 
+
 ### Language Translators
 If you are a translator, then you should copy the Rules/Languages/en directory to Rules/Languages/xx, where 'xx' is your country code (e.g., fr, de, el, ...). This new directory is where you will make your translations. There are three categories of files you should edit:
 1. The xxx_Rules.yaml files (currently `ClearSpeak_Rules.yaml` and `SimpleSpeak_Rules.yaml`). These represent different styles of speech. I strongly recommend you just pick one to start with. These files typically have the words that describe the structure such as "fraction" and "power" along with connective words such as "the", "of", and "from".
@@ -31,6 +32,7 @@ As an example, here are two rules from `unicode.yaml`:
 If you were translating this to French, the words after the `t:` would get changed to (probably):
 ```
  - "=": [T: "égale"]                            # 0x3d
+
  - ">":                                         # 0x3e
      - test: 
          if: "$Verbosity!='Terse'"
@@ -42,6 +44,7 @@ Translators should feel free to change the logic appropriately.
 Similarly, it is likely that in some languages, additional words are used based on context;
 those should be added with whatever test is appropriate.
 See below for a discussion of what can be used in a rule file.
+
 
 Once you've done some translations and want to try them out, you can do so immediately if using NVDA. Assuming you have the MathCAT addon:
 1. copy your new translation directory to `%AppData%\nvda\addons\MathCAT\globalPlugins\MathCAT\Rules\Languages`.
@@ -80,7 +83,6 @@ I hope to eventually have a tool that will
 These tools will look for untranslated and translated text so make sure you convert to the key (`t`, 'ct`, or 'ot`) to be capitalized.
 
 
-
 ### Braille translators
 If you want support for a new language, you probably need to start from scratch unless the language is similar to an existing braille language.
 You will need to create three `.yaml` files in `Rules\Braille\your-braille-language`. The should mirror the files that are in the other braille directories:
@@ -100,6 +102,7 @@ For automated testing, the instructions above should be followed. The current te
 `build.rs` and files in `src`
 
 tests
+
 ## Files
 MathCAT reads the following files for critical information:
 * Rules

@@ -417,7 +417,7 @@
             - if: "*[1][text()='log']"
               then: [t: log]
             - else_if: "$Verbosity='Terse'"
-              then: [spell: ln]
+              then: [spell: "'ln'"]
               else: [t: natural log]
          else:
             - test: 
@@ -427,7 +427,7 @@
                - if: "*[1][text()='log']"
                  then: [t: log]
                - else_if: "$Verbosity='Terse'"
-                 then: [spell: ln]
+                 then: [spell: "'ln'"]
                  else: [t: natural log]
             - t: of
             - pause: short
@@ -675,3 +675,49 @@
          if: "self::m:determinant"
          then: {t: determinant}
          else: {t: matrix}
+
+
+-
+   name: chemistry
+   tag: [chemical-equation, chemical-formula]
+   match: "."
+   replace:
+   - x: "*"
+
+-
+   name: chemical-element
+   tag: chemical-element
+   match: "."
+   replace:
+   - spell: text()
+
+-
+   name: chemical-state
+   tag: chemical-state
+   match: "."
+   replace:
+   - test:
+      - if: "text()='s'"
+        then: [t: "as solid"]
+      - else_if: "text()='l'"
+        then: [t: "as liquid"]
+      - else_if: "text()='g'"
+        then: [t: "as gas"]
+        else: [t: "dissolved in water"] # (aq)
+
+-
+   name: chemical-formula-operator
+   tag: chemical-formula-operator
+   match: "."
+   replace:
+   # FIX: this might be better/more efficient if in unicode.yaml
+   - test:
+      - if: "text()='-' or text() = ':'"
+        then: [t: "single bond"]
+      - else_if: "text()='=' or text() = '::'"
+        then: [t: "double bond"]
+      - else_if: "text()='≡'"
+        then: [t: "triple bond"]
+      - else_if: "text()='≣'"
+        then: [t: "quadruple bond"]
+        else: [x: "*"]

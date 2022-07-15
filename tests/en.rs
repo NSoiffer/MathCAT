@@ -29,5 +29,6 @@ mod en {
         mod multiline;
     }
     mod shared;
+    mod chemistry;
 }
 

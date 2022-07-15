@@ -14,11 +14,16 @@ use crate::xpath_functions::{IsBracketed, is_leaf};
 use std::{ptr::eq as ptr_eq};
 use crate::pretty_print::*;
 use regex::Regex;
+use crate::chemistry::*;
+
 
 // FIX: DECIMAL_SEPARATOR should be set by env, or maybe language
 const DECIMAL_SEPARATOR: &str = ".";
-const CHANGED_ATTR: &str = "data-changed";
-const ADDED_ATTR_VALUE: &str = "added";
+pub const CHANGED_ATTR: &str = "data-changed";
+pub const ADDED_ATTR_VALUE: &str = "added";
+// character to use instead of the text content for priority, etc.
+pub const OPERATOR_OVERRIDE: &str ="data-operator";
+pub const HIGH_PRIORITY_OPERATOR: &str = "\u{F8FF}";	// this should be in-sync with last value in "operator-info.in"
 
 // (perfect) hash of operators built from MathML's operator dictionary
 static OPERATORS: phf::Map<&str, OperatorInfo> = include!("operator-info.in");
@@ -366,6 +371,7 @@ impl CanonicalizeContext {
 		self.assure_nary_tag_has_mrow(mathml);
 		let converted_mathml = self.canonicalize_mrows(mathml)
 				.chain_err(|| format!("while processing\n{}", mml_to_string(&mathml)))?;
+		crate::chemistry::scan_and_mark_chemistry(converted_mathml);
 		debug!("\nMathML after canonicalize:\n{}", mml_to_string(&converted_mathml));
 		return Ok(converted_mathml);
 	}
@@ -388,7 +394,7 @@ impl CanonicalizeContext {
 			"mfrac", "mroot", "msub", "msup", "msubsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv",
 			"none", "mprescripts", "malignmark", "maligngroup",
 			"math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd", "mstyle",
-			"mrow", "mfenced", "mtable", "mtr",
+			"mrow", "mfenced", "mtable", "mtr", "mlabeledtr",
 		};
 		
 		let element_name = name(&mathml);
@@ -493,6 +499,7 @@ impl CanonicalizeContext {
 				let text = as_text(mathml);
 				if OPERATORS.get(text).is_some() {
 					set_mathml_name(mathml, "mo");
+					return Some(mathml);
 				} else {
 					if let Some(result) = merge_arc_trig(mathml) {
 						return Some(result);
@@ -503,10 +510,40 @@ impl CanonicalizeContext {
 					} else if let Some(result) = split_points(mathml) {
 						return Some(result);
 					}
+					let likely_chemistry = likely_chem_element(mathml);
+					if likely_chemistry >= 0 {
+						mathml.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
+					}
 					return Some(mathml);
 				};
-				return Some(mathml);
 			}
+			"mtext" => {
+				if let Some(result) = merge_arc_trig(mathml) {
+					return Some(result);
+				};
+			
+				if let Some(result) = split_points(mathml) {
+					return Some(result);
+				}
+				
+				let text = as_text(mathml);
+				if !text.trim().is_empty() && ROMAN_NUMERAL.is_match(text) {
+					// people tend to set them in a non-italic font and software makes that 'mtext'
+					set_mathml_name(mathml, "mn");
+					mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+					return Some(mathml);
+				}
+				// allow non-breaking whitespace to stay -- needed by braille
+				if IS_WHITESPACE.is_match(text) {
+					// normalize to just a single non-breaking space
+					mathml.set_text("\u{A0}");
+				}
+				let likely_chemistry = likely_chem_element(mathml);
+				if likely_chemistry >= 0 {
+					mathml.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
+				}
+				return if parent_requires_child || !text.is_empty() {Some(mathml)} else {None};
+			},
 			"mo" => {
 				// WIRIS editor at least puts non-breaking whitespace as standalone in 'mo'
 				let text = as_text(mathml);
@@ -538,29 +575,7 @@ impl CanonicalizeContext {
 					}
 					return Some(mathml);
 				});
-			},
-			"mtext" => {
-				if let Some(result) = merge_arc_trig(mathml) {
-					return Some(result);
-				};
-			
-				if let Some(result) = split_points(mathml) {
-					return Some(result);
-				}
-				
-				let text = as_text(mathml);
-				if !text.trim().is_empty() && ROMAN_NUMERAL.is_match(text) {
-					// people tend to set them in a non-italic font and software makes that 'mtext'
-					set_mathml_name(mathml, "mn");
-					mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
-					return Some(mathml);
-				}
-				// allow non-breaking whitespace to stay -- needed by braille
-				if IS_WHITESPACE.is_match(text) {
-					// normalize to just a single non-breaking space
-					mathml.set_text("\u{A0}");
-				}
-				return if parent_requires_child || !text.is_empty() {Some(mathml)} else {None};
+				// note: chemistry test is done later as part of another phase of chemistry cleanup
 			},
 			"mfenced" => {return self.clean_mathml( convert_mfenced_to_mrow(mathml) )},
 			"mphantom" | "malignmark" | "maligngroup"=> {
@@ -638,6 +653,10 @@ impl CanonicalizeContext {
 					if is_leaf(base) && as_text(base).trim().is_empty() {
 						convert_to_mmultiscripts(mathml);
 					}
+					let likely_chemistry = likely_adorned_chem_formula(mathml);
+					if likely_chemistry >= 0 {
+						mathml.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
+					}
 				}
 
 				// some elements might have been deleted, so get a new vector
@@ -659,8 +678,11 @@ impl CanonicalizeContext {
 				} else if element_name == "semantics" {
 					return Some( as_element(children[0]) );	// FIX: presentation isn't necessarily first child
 				} else {
+					if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
+						clean_chemistry_mrow(mathml);
+					}
 					self.assure_nary_tag_has_mrow(mathml);
-				} 
+				}
 				return Some(mathml);				
 			}
 		}
@@ -1624,7 +1646,8 @@ impl CanonicalizeContext {
 			}
 		};	
 	
-		let operator_str = as_text(mo_node);
+		let operator_str = if let Some(op_str) = mo_node.attribute_value(OPERATOR_OVERRIDE)
+									{op_str} else {as_text(mo_node)};
 		let found_op_info = OPERATORS.get(operator_str);
 		if found_op_info.is_none() {
 			// no known operator -- return the unknown operator with the correct "fix" type
@@ -1806,76 +1829,31 @@ impl CanonicalizeContext {
 	}
 
 
-	// return true if 'node' is a chemical element and is followed by a state (solid, liquid, ...)
-	fn is_likely_chemical_state<'a>(&self, node: Element<'a>, right_siblings:&[ChildOfElement]) -> bool {
+	// return FunctionNameCertainty::False or Maybe if 'node' is a chemical element and is followed by a state (solid, liquid, ...)
+	//  in other words, we are certain this can't be a function since it looks like it is or might be chemistry
+	fn is_likely_chemical_state<'a>(&self, node: Element<'a>, right_sibling: Element<'a>) -> FunctionNameCertainty {
 		assert_eq!(name(&node.parent().unwrap().element().unwrap()), "mrow"); // should be here because we are parsing an mrow
 	
-		// debug!("   is_likely_chemical_state: '{}'?",element_summary(node));
-	
-		
-		// right side hasn't been parsed, so two cases to look at
-		let next_sibling = as_element(right_siblings[0]);
-		if name(&next_sibling) == "mrow" {
-			return self.is_likely_chemical_state(node, next_sibling.children().as_slice());
+		debug!("   in is_likely_chemical_state: '{}'?",element_summary(node));
+		let node_chem_likelihood= node.attribute_value(MAYBE_CHEMISTRY);
+		if node.attribute(MAYBE_CHEMISTRY).is_none() {
+			return FunctionNameCertainty::True;
 		}
-	
-		if right_siblings.is_empty() {
-			return false;
-		}
-	
-		if right_siblings.len() < 3 {  // need at least '(' state ')
-			return false;
-		}
-		// debug!("    ....have enough siblings");
-	
-		if !is_chemical_element(node) {
-			return false;
-		}
-		// debug!("    ....found chemical element");
-	
-		let left_paren = as_element(right_siblings[0]);
-		if name(&left_paren) != "mo" {
-			return false;
-		}
-	
-		// take care of special case of bad MathML for "aq" (split across two tokens)
-		if right_siblings.len() > 3 {
-			// check to make sure right kind of leaves then check the contents
-			let a = as_element(right_siblings[1]);
-			let q = as_element(right_siblings[2]);
-			let right_paren = as_element(right_siblings[3]);
-			if name(&a) == "mi" && as_text(a)== "a" && 
-			   name(&q) == "mi" && as_text(q) == "q" &&
-			   name(&right_paren) == "mo" {
-				let left_paren = as_text(left_paren);
-				let right_paren = as_text(right_paren);
-				// since we matched 'a' and 'q' -- either is or isn't chem state
-				return (left_paren == "(" && right_paren == ")") || (left_paren == "[" && right_paren == "]");
+
+		if name(&right_sibling) == "mrow" {		// clean_chemistry_mrow made sure any state-like structure is an mrow
+			let state_likelihood = likely_chem_state(right_sibling);
+			if state_likelihood > 0 {
+				right_sibling.set_attribute_value(MAYBE_CHEMISTRY, state_likelihood.to_string().as_str());
+				// at this point, we know both node and right_sibling are positive, so we have at least a maybe
+				if state_likelihood + node_chem_likelihood.unwrap().parse::<isize>().unwrap() > 2 {
+					return FunctionNameCertainty::False;
+				} else {
+					return FunctionNameCertainty::Maybe
+				}
 			}
 		}
-	
-		let right_paren = as_element(right_siblings[2]);
-		if name(&right_paren) != "mo" {
-			return false;
-		}
-	
-		if !( (as_text(left_paren) == "(" && as_text(right_paren) == ")") ||
-			  (as_text(left_paren)== "[" && as_text(right_paren) == "]") ) {
-			return false;
-		}
-	
-		// have (xxx) or [xxx] -- check for "s, "l", "g", "aq"
-		let state_node = as_element(right_siblings[1]);
-		if name(&state_node) != "mi" {
-			return false;
-		}
-		let state = as_text(state_node);
-		if state == "s" || state == "l" || state == "g" || state == "aq" {
-			return true;
-		}
-	
-		// wasn't one of the cases that make it a chemical state
-		return false;
+
+		return FunctionNameCertainty::True;
 	}
 	
 	// Try to figure out whether an <mi> is a function name or note.
@@ -1901,14 +1879,13 @@ impl CanonicalizeContext {
 		if node_name != "mi" && node_name != "mtext" {
 			return FunctionNameCertainty::False;
 		}
-	
-		 // mtext to get Roman
-		 // whitespace is sometimes added to the mi since braille needs it, so do a trim here to get function name
+		// mtext is sometimes used to get non-italic font
+		// whitespace is sometimes added to the mi since braille needs it, so do a trim here to get function name
 		let base_name = as_text(base_of_name).trim();
 		if base_name.is_empty() {
 			return FunctionNameCertainty::False;
 		}
-		// debug!("    is_function_name({}), {} following nodes", base_name, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
+		debug!("    is_function_name({}), {} following nodes", base_name, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
 		return crate::definitions::DEFINITIONS.with(|defs| {
 			// names that are always function names (e.g, "sin" and "log")
 			let defs = defs.borrow();
@@ -1939,8 +1916,16 @@ impl CanonicalizeContext {
 			}
 
 			let first_child = as_element(right_siblings[0]);
+					
+			// clean_chemistry wrapped up a state in an mrow and this is assumed by is_likely_chemical_state()
+			let chem_state_certainty = self.is_likely_chemical_state(node, first_child);
+			if chem_state_certainty != FunctionNameCertainty::True {
+				debug!("      ...is_likely_chemical_state says it is a function ={:?}", chem_state_certainty);
+				return chem_state_certainty;
+			}
+
 			if name(&first_child) == "mrow" && is_left_paren(as_element(first_child.children()[0])) {
-				// debug!("     ...trying again after expanding mrow");
+				debug!("     ...trying again after expanding mrow");
 				return self.is_function_name(node, Some(&first_child.children()));
 			}
 
@@ -1958,9 +1943,10 @@ impl CanonicalizeContext {
 				return FunctionNameCertainty::False;
 			}
 	
-			if self.is_likely_chemical_state(node, right_siblings) {
-				// debug!("      ...is_likely_chemical_state=true");
-				return FunctionNameCertainty::True;
+			// FIX: should really make sure all the args are marked as MAYBE_CHEMISTRY, but we don't know the matching close paren/bracket
+			if node.attribute(MAYBE_CHEMISTRY).is_some() &&
+			   as_element(right_siblings[1]).attribute(MAYBE_CHEMISTRY).is_some() {
+				return FunctionNameCertainty::False;
 			}
 	
 			let likely_names = defs.get_hashset("LikelyFunctionNames").unwrap();
@@ -1969,7 +1955,7 @@ impl CanonicalizeContext {
 			}
 	
 			if is_single_arg(as_text(first_sibling), &right_siblings[1..]) {
-				// debug!("      ...is single arg");
+				debug!("      ...is single arg");
 				return FunctionNameCertainty::True;	// if there is only a single arg, why else would you use parens?
 			};
 
@@ -2158,8 +2144,12 @@ impl CanonicalizeContext {
 		return (name == "msub" || name == "msubsup" || name == "msup") && !mrow.preceding_siblings().is_empty();
 	}
 
-	// implied separator when two capital letters are adjacent
+	// implied separator when two capital letters are adjacent or two chemical elements
 	fn is_implied_separator<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>) -> bool {
+		if prev.attribute(MAYBE_CHEMISTRY).is_some() && current.attribute(MAYBE_CHEMISTRY).is_some() {
+			return true;
+		}
+
 		if name(prev) != "mi" || name(current) != "mi" {
 			return false;
 		}
@@ -2562,63 +2552,14 @@ fn show_invisible_op_char(ch: &str) -> &str {
 }
 
 
-static CHEMICAL_ELEMENTS: phf::Set<&str> = phf_set! {
-	"Ac", "Ag", "Al", "Am", "Ar", "As", "At", "Au", "B", "Ba", "Be", "Bh", "Bi", "Bk", "Br",
-	"C", "Ca", "Cd", "Ce", "Cf", "Cl", "Cm", "Cn", "Co", "Cr", "Cs", "Cu", "Db", "Ds", "Dy", 
-	"Er", "Es", "Eu", "F", "Fe", "Fl", "Fm", "Fr", "Ga", "Gd", "Ge",
-	"H", "He", "Hf", "Hg", "Ho", "Hs", "I", "In", "Ir", "K", "Kr",
-	"La", "Li", "Lr", "Lu", "Lv", "Mc", "Md", "Mg", "Mn", "Mo", "Mt", 
-	"N", "Na", "Nb", "Nd", "Ne", "Nh", "Ni", "No", "Np", "O", "Og", "Os", 
-	"P", "Pa", "Pb", "Pd", "Pm", "Po", "Pr", "Pt", "Pu",
-	"Ra", "Rb", "Re", "Rf", "Rg", "Rh", "Rn", "Ru", 
-	"S", "Sb", "Sc", "Se", "Sg", "Si", "Sm", "Sn", "Sr",
-	"Ta", "Tb", "Tc", "Te", "Th", "Ti", "Tl", "Tm", "Ts", 
-	"U", "V", "W", "Xe", "Y", "Yb", "Zn", "Zr"};
-
-fn is_chemical_element(node: Element) -> bool {
-	// FIX: allow name to be in an mrow (e.g., <mi>N</mi><mi>a</mi>
-	let name = name(&node);
-	if name != "mi" && name != "mtext" {
-		return false;
-	}
-
-	let text = as_text(node);
-	return CHEMICAL_ELEMENTS.contains(text);
-}
-
-
-
 #[cfg(test)]
 mod canonicalize_tests {
 	#[allow(unused_imports)]
 	use super::super::init_logger;
-	use super::super::abs_rules_dir_path;
+	use super::super::are_strs_canonically_equal;
     use super::*;
     use sxd_document::parser;
 
-
-    fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
-		use crate::interface::*;
-		// this forces initialization
-		crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
-		crate::speech::SPEECH_RULES.with(|_| true);
-		
-        let package1 = &parser::parse(test).expect("Failed to parse test input");
-		let mathml = get_element(package1);
-		trim_element(&mathml);
-		// debug!("test:\n{}", mml_to_string(&mathml));
-		let mathml_test = canonicalize(mathml).unwrap();
-        
-        let package2 = &parser::parse(target).expect("Failed to parse target input");
-		let mathml_target = get_element(package2);
-		trim_element(&mathml_target);
-		// debug!("target:\n{}", mml_to_string(&mathml_target));
-    
-        match is_same_element(&mathml_test, &mathml_target) {
-			Ok(_) => return true,
-			Err(e) => panic!("{}", e),
-		}
-    }
 
     #[test]
     fn canonical_same() {
@@ -2626,7 +2567,6 @@ mod canonicalize_tests {
         assert!(are_strs_canonically_equal(target_str, target_str));
     }
 
-	
 	#[test]
     fn plane1_common() {
         let test_str = "<math>

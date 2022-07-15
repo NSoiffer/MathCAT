@@ -327,7 +327,7 @@ fn find_arg<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithCon
 
     return Ok(None);               // not present
 }
-    
+
 #[cfg(test)]
 mod tests {
     #[allow(unused_imports)]

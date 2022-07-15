@@ -280,31 +280,35 @@ impl TTS {
             Err(_) => bail!("Internal error in build_tts: unexpected rule ({:?}) encountered", tts_command),
         };
     
-        let tts_command_value;
-        if tts_enum == TTSCommand::Pause || tts_enum == TTSCommand::Rate || tts_enum == TTSCommand::Volume || tts_enum == TTSCommand::Pitch {
-            let val = match tts_value {
-                "short" => Ok( PAUSE_SHORT ),
-                "medium" => Ok( PAUSE_MEDIUM ),
-                "long" => Ok( PAUSE_LONG ),
-                "auto" => Ok( PAUSE_AUTO ),
-                "$MathRate" => Ok( RATE_FROM_CONTEXT ), // special case hack -- value determined in replace
-                _ => tts_value.parse::<f64>()
-            };
+        let tts_command_value = match tts_enum {
+            TTSCommand::Pause | TTSCommand::Rate | TTSCommand::Volume | TTSCommand::Pitch => {
+                let val = match tts_value {
+                    "short" => Ok( PAUSE_SHORT ),
+                    "medium" => Ok( PAUSE_MEDIUM ),
+                    "long" => Ok( PAUSE_LONG ),
+                    "auto" => Ok( PAUSE_AUTO ),
+                    "$MathRate" => Ok( RATE_FROM_CONTEXT ), // special case hack -- value determined in replace
+                    _ => tts_value.parse::<f64>()
+                };
+            
+                if val.is_err() {
+                    bail!(format!("\"{}: {}\" is not a number", &tts_command, tts_value));    
+                }
         
-            if val.is_err() {
-                bail!(format!("\"{}: {}\" is not a number", &tts_command, tts_value));    
-            }
-    
-            tts_command_value = TTSCommandValue::Number(val.unwrap());
-        } else if tts_enum == TTSCommand::Bookmark {
-            tts_command_value = TTSCommandValue::XPath(
-                MyXPath::build(values).chain_err(|| "while trying to evaluate value of 'bookmark:'")?
-            );
-        } else if tts_enum == TTSCommand::Pronounce {
-            tts_command_value = TTSCommandValue::Pronounce( Box::new( Pronounce::build(values)? ) );
-        } else {
-            tts_command_value = TTSCommandValue::String(tts_value.to_string());
-        }
+                TTSCommandValue::Number(val.unwrap())
+            },
+            TTSCommand::Bookmark | TTSCommand::Spell => {
+                TTSCommandValue::XPath(
+                    MyXPath::build(values).chain_err(|| format!("while trying to evaluate value of '{}:'", tts_enum))?
+                )
+            },
+            TTSCommand::Pronounce => {
+                TTSCommandValue::Pronounce( Box::new( Pronounce::build(values)? ) )
+            },
+            _ => {
+                TTSCommandValue::String(tts_value.to_string())
+            },
+        };
         return Ok( Box::new( TTSCommandRule::new(tts_enum, tts_command_value, replacements) ) );
     }
     
@@ -323,7 +327,7 @@ impl TTS {
         // The general idea is we handle the begin tag, the contents, and then the end tag
         // For the begin/end tag, we dispatch off to specialized code for each TTS engine
 
-        // bookmarks are special in that we need to eval the xpath
+        // 'bookmark' is special in that we need to eval the xpath
         // rather than pass a bunch of extra info into the generic handling routines, we just deal with them here
         if command.command == TTSCommand::Bookmark {
            // if we aren't suppose to generate bookmarks, short circuit and just return
@@ -338,7 +342,15 @@ impl TTS {
         }
 
         let mut command = command.clone();
-        if command.command == TTSCommand::Rate && self != &TTS::None {
+        if command.command == TTSCommand::Spell {
+            // spell is also special because we need eval the xpath to get the string to spell (typically the text content of an mi)
+            match command.value {
+                TTSCommandValue::XPath(xpath) => {
+                    command.value = TTSCommandValue::String(xpath.replace::<String>(rules_with_context, mathml)?);
+                },
+                _ => bail!("Implementation error: found non-xpath value for spell"),
+            }
+        } else if command.command == TTSCommand::Rate && self != &TTS::None {
             if let TTSCommandValue::Number(number_value) = command.value {
                 if number_value == RATE_FROM_CONTEXT {
                     // handle hack for $Rate -- need to look up in context
@@ -409,18 +421,11 @@ impl TTS {
                 );
             } else if command.command == TTSCommand::Spell {
                 // add a space between the chars
-                let mut chars = command.value.get_string().chars();
-                let first_char = chars.next();
-                if first_char.is_none() {
-                    return "".to_string();
-                }
-            
-                let mut chars_with_spaces = vec![first_char.unwrap()];
-                for ch in chars {
-                    chars_with_spaces.push(' ');
-                    chars_with_spaces.push(ch);
-                }
-                return chars_with_spaces.into_iter().collect();
+                debug!("spell rule: {}", command.value.get_string());
+                return command.value.get_string().chars()
+                        .map(|ch| ch.to_string())   // can't collect into String without the mapping
+                        .collect::<Vec<String>>()
+                        .join(" ");
             } else if let TTSCommandValue::Pronounce(p) = &command.value {
                 return crate::speech::CONCAT_INDICATOR.to_string() + &p.text;
             }
