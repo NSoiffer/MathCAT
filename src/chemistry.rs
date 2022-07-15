@@ -128,6 +128,31 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
 
     return if changed {Some(new_children)} else {None};
 
+    // fn convert_leaves_to_chem_elements<'a>(children: &[Element<'a>], i: usize) -> Option<(Vec<Element<'a>>, isize)> {
+    //     // gather up all the consecutive mi/mtext
+    //     let mut last = i;
+    //     let mut token_string = String::with_capacity(2*children.len());
+    //     for &child in &children[i..] {
+    //         match name(&child) {
+    //             "mi" | "mtext" => {
+    //                 token_string.push_str( as_text(child) );
+    //             },
+    //             _ => break,
+    //         };
+    //         last += 1;
+    //     }
+    //     if i == last {
+    //         return None;
+    //     }
+    //     // FIX: this is inefficient -- should group elements by letter and have a mini-state machine check possibilities
+    //     let mut j = 0;
+    //     while j < token_string.len() {
+    //         let chem_element_length = match_chem_element(token_string, i);
+    //     }
+
+    //     return None;
+    // }
+
     /// if it looks like we have ChemFormula ( a q ), merge the 'a' and 'q' together into an 'mi'
     /// if not already true, structure '( aq )' into a single mrow (might be other elements on either side)
     /// returns the last char matched
