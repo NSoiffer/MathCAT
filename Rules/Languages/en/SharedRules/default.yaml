@@ -361,7 +361,7 @@
     tag: "literal"
     match: "."
     replace: 
-    - x: "translate(text(), '-', ' ')"
+    - x: "translate(text(), '-_.', ' ')"
 -
     # uncaught intent -- speak as foo of arg1 comma arg2 ....
     name: default-children

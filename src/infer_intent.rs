@@ -36,15 +36,13 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
     bail!("Internal error: infer_intent() called on MathML with no intent arg:\n{}", mml_to_string(&mathml));
 }
 
-// Build up intent from intent string and element
-// Notice that "f(x)(y)" is legal as is "f()"
-// intent      := name | number | reference | application
-// name        := NCName
-// number      := '-'? digit+ ( '.' digit+ )?
-// reference   := '$' NCName
-// application := function '(' arguments? ')'
-// function    := name | reference | application
-// arguments   := intent ( ',' intent )*
+// intent          := name-or-literal | number | reference | application 
+// name-or-literal := NCName
+// number          := '-'? digit+ ( '.' digit+ )?
+// reference       := '$' NCName
+// application     := intent hint? '(' arguments? ')'
+// arguments       := intent ( ',' intent )*
+// hint            :=  '@' ('prefix' | 'infix' | 'postfix'  | 'silent' | NCName)
 lazy_static! {
     // The practical restrictions of NCName are that it cannot contain several symbol characters like
     //  !, ", #, $, %, &, ', (, ), *, +, ,, /, :, ;, <, =, >, ?, @, [, \, ], ^, `, {, |, }, ~, and whitespace characters
@@ -54,8 +52,8 @@ lazy_static! {
     static ref ARG_REF: Regex = Regex::new(r"^\$[:\pL_][:\pL\-.0-9·]*$").unwrap();  // $ NC_NAME
 }
 
-static TERMINALS_AS_U8: [u8; 3] = ['(' as u8, ',' as u8, ')' as u8];
-static TERMINALS: [char; 3] = ['(', ',',')'];
+static TERMINALS_AS_U8: [u8; 4] = ['(' as u8, ',' as u8, ')' as u8, '@' as u8];
+static TERMINALS: [char; 4] = ['(', ',',')', '@'];
 
 // 'i -- "i" for the lifetime of the "intent" string
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -154,7 +152,7 @@ impl<'i> LexState<'i> {
     }
 }
 
-
+const INTENT_HINT: &str = "data-intent-hint";
 /// Build an intent
 /// Start state: lex_state on token to build
 /// End state: after built intent (a terminal or None)
@@ -165,12 +163,33 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
     // intent := name | number | reference | application
     debug!("start build_intent:  state: {}", lex_state);
     let mut intent = get_element_from_token(rules_with_context, lex_state, mathml)?;
-    lex_state.get_next()?;
+    let next_token = lex_state.get_next()?;
+    let hint = if next_token.is_terminal("@") {
+        let temp = Some(get_hint(lex_state)?);
+        lex_state.get_next()?;
+        temp
+    } else {
+        None
+    };
     if lex_state.is_terminal("(") {
         intent = build_function(intent, rules_with_context, lex_state, mathml)?;
+        if let Some(hint_str) = hint {
+            intent.set_attribute_value(INTENT_HINT, &hint_str);
+        }
     }
     debug!("end build_intent:  state: {}..[bi] intent: {}", lex_state, mml_to_string(&intent));
     return Ok( intent );
+}
+
+fn get_hint<'b>(lex_state: &mut LexState<'b>) -> Result<String> {
+    // return the 'hint' leaving the stat
+    assert!(lex_state.is_terminal("@"));
+    let token = lex_state.get_next()?;
+    if let Token::NCName(str) = token {
+        return Ok( str.to_string() );       // note: there are lifetime/borrow issues if we just return 'str'
+    } else {
+        bail!("Illegal 'intent' syntax after '@': {}", token);
+    }
 }
 
 /// build a function 'f(...)' where '...' can be empty
@@ -366,7 +385,6 @@ mod tests {
         assert!(test_intent(mathml, intent));
     }
 
-    
     #[test]
     fn intent_nest_no_arg_call() {
         let mathml = "<mrow intent='foo(bar())'>
@@ -376,6 +394,18 @@ mod tests {
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
         let intent = "<foo><bar></bar></foo>";
+        assert!(test_intent(mathml, intent));
+    }
+
+    #[test]
+    fn intent_hints() {
+        let mathml = "<mrow intent='foo@silent(bar@postfix())'>
+                <mi arg='a'>a</mi>
+                <mo arg='p' intent='plus'>+</mo>
+                <mi arg='b'>b</mi>
+                <mo arg='f' intent='factorial'>!</mo>
+            </mrow>";
+        let intent = "<foo data-intent-hint='silent'><bar data-intent-hint='postfix'></bar></foo>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -454,6 +484,38 @@ mod tests {
                 <mi arg='b'>B</mi>
             </mrow>";
         let intent = "<apply-function><map> <literal>congruence</literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
+        assert!(test_intent(mathml, intent));
+    }
+
+
+    #[test]
+    fn intent_with_nested_head_and_hints() {
+        init_logger();
+        let mathml = "<mrow intent='f@prefix(g@infix(x))@postfix($a,$b)'>
+                <mi arg='a'>A</mi>
+                <mover>
+                    <mo intent='map'>⟶</mo>
+                    <mo intent='congruence'>≅</mo>
+                </mover>
+                <mi arg='b'>B</mi>
+            </mrow>";
+        let intent = "<apply-function><map data-intent-hint='prefix'>
+                                <literal>congruence</literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
+        assert!(test_intent(mathml, intent));
+    }
+
+
+    #[test]
+    fn intent_at() {
+        let mathml = "<mrow intent='$U27F6@prefix($U2245)($a,$b)'>
+                <mi arg='a'>A</mi>
+                <mover>
+                    <mo movablelimits='false' arg='U27F6' intent='map'>⟶</mo>
+                    <mo arg='U2245' intent='congruence'>≅</mo>
+                </mover>
+                <mi arg='b'>B</mi>
+            </mrow>";
+        let intent = "<apply-function  data-intent-hint='prefix'><map> <literal>congruence</literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
         assert!(test_intent(mathml, intent));
     }
 
