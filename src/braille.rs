@@ -23,16 +23,16 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
             // FIX: need to set name of speech rules so test Nemeth/UEB clean for
         let pref_manager = rules_with_context.get_rules().pref_manager.borrow();
         let highlight_style = pref_manager.get_user_prefs().to_string("BrailleNavHighlight");
-        let braille_code = &pref_manager.get_user_prefs().to_string("BrailleCode");
-        let braille = if braille_code == "UEB" {
-            ueb_cleanup(braille_string.replace(' ', ""))
-        } else {
-            nemeth_cleanup(braille_string.replace(' ', ""))
+        let braille_code = pref_manager.get_user_prefs().to_string("BrailleCode");
+        let braille = match braille_code.as_str() {
+            "UEB" => ueb_cleanup(braille_string.replace(' ', "")),
+            "Nemeth" => nemeth_cleanup(braille_string.replace(' ', "")),
+            _ => braille_string,    // probably needs cleanup if someone has another code, but this will have to get added by hand
         };
 
         return Ok(
             if highlight_style != "Off" {
-                highlight_braille_chars(braille, braille_code, highlight_style == "All")
+                highlight_braille_chars(braille, &braille_code, highlight_style == "All")
             } else {
              braille
             }
