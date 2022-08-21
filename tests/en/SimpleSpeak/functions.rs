@@ -260,7 +260,7 @@ fn no_times_sqrt() {
     #[test]
     fn parens_interval_open_open() {
         let expr = "<math> 
-        <mrow intent='interval($open, $start, $end, $close)'><mo>(</mo>
+        <mrow intent='open-interval($start, $end)'><mo>(</mo>
         <mrow> <mo arg='open'>(</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>)</mo>
         <mo>)</mo></mrow>
     </math>";
@@ -270,7 +270,7 @@ fn no_times_sqrt() {
 #[test]
     fn parens_interval_closed_open() {
         let expr = "<math> 
-        <mrow intent='interval($open, $start, $end, $close)'><mo>[</mo>
+        <mrow intent='interval($start, $end)'><mo>[</mo>
             <mrow> <mo arg='open'>[(]</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>)</mo>
             <mo>)</mo></mrow>
         </math>";
@@ -281,7 +281,7 @@ fn no_times_sqrt() {
 #[test]
 fn parens_interval_open_closed() {
     let expr = "<math> 
-    <mrow intent='interval($open, $start, $end, $close)'><mo>(</mo>
+    <mrow intent='interval($start, $end)'><mo>(</mo>
         <mrow> <mo arg='open'>(</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>]</mo>
         <mo>]</mo></mrow>
     </math>";
@@ -292,7 +292,7 @@ fn parens_interval_open_closed() {
 #[test]
 fn parens_interval_closed_closed() {
     let expr = "<math> 
-    <mrow intent='interval($open, $start, $end, $close)'><mo>[</mo>
+    <mrow intent='interval($start, $end)'><mo>[</mo>
         <mrow> <mo arg='open'>[(]</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>]</mo>
         <mo>]</mo></mrow>
 </math>";
@@ -302,7 +302,7 @@ test("SimpleSpeak",expr, "the closed interval from c to d");
     #[test]
     fn parens_interval_neg_infinity_open_open() {
         let expr = "<math> 
-        <mrow intent='interval($open, $start, $end, $close)'><mo arg='open'>(</mo>
+        <mrow intent='interval($start, $end)'><mo arg='open'>(</mo>
         <mrow><mrow arg='start'><mo>-</mo> <mi>∞</mi></mrow><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>)</mo>
         <mo>)</mo></mrow>
     </math>";
@@ -313,7 +313,7 @@ test("SimpleSpeak",expr, "the closed interval from c to d");
     #[test]
     fn parens_interval_neg_infinity_open_closed() {
         let expr = "<math> 
-        <mrow intent='interval($open, $start, $end, $close)'><mo arg='open'>(</mo>
+        <mrow intent='interval($start, $end)'><mo arg='open'>(</mo>
         <mrow><mrow arg='start'><mo>-</mo> <mi>∞</mi></mrow><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>]</mo>
         <mo>]</mo></mrow>
     </math>";

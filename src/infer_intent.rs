@@ -490,7 +490,6 @@ mod tests {
 
     #[test]
     fn intent_with_nested_head_and_hints() {
-        init_logger();
         let mathml = "<mrow intent='f@prefix(g@infix(x))@postfix($a,$b)'>
                 <mi arg='a'>A</mi>
                 <mover>

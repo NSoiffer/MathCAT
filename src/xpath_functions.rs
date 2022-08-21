@@ -776,8 +776,9 @@ impl IsBracketed {
         }
         let children = element.children();
         let n_children = children.len();
-        if (!left.is_empty() && !right.is_empty() && n_children < 2) ||
-           requires_comma && element.children().len() < 3 {
+        if (n_children == 0 ||
+            !left.is_empty() && !right.is_empty() && n_children < 2) ||
+            requires_comma && element.children().len() < 3 {
             // not enough argument for there to be a match
             return false;
         }
