@@ -31,8 +31,8 @@ All functions return a potential error code.
 ## Rust Users
 MathCAT is written in Rust, so all you need to do is build MathCAT and in your project's Cargo.toml file add something like
 ```
-[dependencies.MathCAT]
-mathcat = 0.1
+[dependencies.mathcat]
+version = "0.1.22"
 ```
 
 The exact function signatures are (with comments):
