@@ -1248,7 +1248,7 @@ mod chem_tests {
     }
 
     #[test]
-    fn mchemx_so4_with_extra_mrow() {
+    fn mchem_so4_with_extra_mrow() {
         let test = "<math>
             <mstyle mathcolor='#a33e00'>
             <mrow>

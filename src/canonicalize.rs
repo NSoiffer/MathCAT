@@ -650,7 +650,6 @@ impl CanonicalizeContext {
 					let merged = merge_dots(mathml);	// FIX -- switch to passing in children
 					let merged = merge_primes(merged);
 					let merged = handle_pseudo_scripts(merged);
-					children = handle_convert_to_mmultiscripts(merged.children());
 					merged
 				} else {
 					mathml
@@ -692,6 +691,8 @@ impl CanonicalizeContext {
 				if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 					merge_number_blocks(mathml, &mut new_children);
 					merge_whitespace(&mut new_children);
+					handle_convert_to_mmultiscripts(&mut new_children);
+
 				} else if element_name == "msub" || element_name == "msup" || 
 						  element_name == "msubsup" || element_name == "mmultiscripts"{
 					mathml.replace_children(new_children);
@@ -1368,23 +1369,24 @@ impl CanonicalizeContext {
 			return mrow;
 		}
 
-		fn handle_convert_to_mmultiscripts<'a>(mut children: Vec<ChildOfElement<'a>>) -> Vec<ChildOfElement<'a>> {
+		fn handle_convert_to_mmultiscripts(children: &mut Vec<ChildOfElement>) {
   			let mut i = 1;		// want at least two children -- one to pull into base
 			while i < children.len() {
 				let child = as_element(children[i]);
 				let child_name = name(&child);
 				if child_name == "msub" || child_name == "msup" || child_name == "msubsup" {
-					(children, i) = convert_to_mmultiscripts(children, i);
+					i = convert_to_mmultiscripts(children, i);
+				} else {
+					i += 1;
 				}
 			}
-			return children;
 		}
 
 
 		/// Converts the script element with an empty base to mmultiscripts by sucking the base from the following or preceding element.
 		/// The following element is preferred so that these become prescripts (common usage is from TeX)
 		/// mchem has some ugly output (at least in MathJax) and that's where using the preceding element makes sense
-		fn convert_to_mmultiscripts<'a>(mut mrow_children: Vec<ChildOfElement<'a>>, mut i: usize) -> (Vec<ChildOfElement<'a>>, usize) {
+		fn convert_to_mmultiscripts<'a>(mrow_children: &mut Vec<ChildOfElement<'a>>, mut i: usize) -> usize {
 			// this is a bit messy/confusing because we might scan forwards or backwards and this affects whether
 			// we are scanning for prescripts or postscripts
 			// the generic name "primary_scripts" means prescripts if going forward or postscripts if going backwards
@@ -1500,10 +1502,9 @@ impl CanonicalizeContext {
 				mrow_children.drain(i+1..i+1+num_siblings_used);
 			} else {
 				mrow_children.drain(i-num_siblings_used..i);
-				debug!("after draining {:?}, size={}", i-num_siblings_used..i, mrow_children.len());
 				i -= num_siblings_used;
 			}
-			return (mrow_children, i);
+			return i;
 		}
 
 		fn add_pair<'v, 'a:'v>(script_vec: &'v mut Vec<ChildOfElement<'a>>, subscript: Option<ChildOfElement<'a>>, superscript: Option<ChildOfElement<'a>>) {

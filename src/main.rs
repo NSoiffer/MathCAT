@@ -88,32 +88,30 @@ fn main() {
   // let expr = "<math><mi>Na</mi><mi>S</mi><mo>(</mo><mi>l</mi><mo>)</mo></math>";
 
 let expr = "<math>
-<mstyle mathcolor='#a33e00'>
-<mrow>
+    <mstyle mathcolor='#a33e00'>
     <mrow>
-    <mi>SO</mi>
-    </mrow>
-    <msub>
-    <mrow>
+        <mi>SO</mi>
+        <msub>
         <mrow>
-        <mpadded width='0'>
-            <mphantom>
-            <mi>A</mi>
-            </mphantom>
-        </mpadded>
+            <mrow>
+            <mpadded width='0'>
+                <mphantom>
+                <mi>A</mi>
+                </mphantom>
+            </mpadded>
+            </mrow>
         </mrow>
-    </mrow>
-    <mrow>
         <mrow>
-        <mpadded height='0'>
-            <mn>4</mn>
-        </mpadded>
+            <mrow>
+            <mpadded height='0'>
+                <mn>4</mn>
+            </mpadded>
+            </mrow>
         </mrow>
+        </msub>
     </mrow>
-    </msub>
-</mrow>
-</mstyle>
-</math>";
+    </mstyle>
+    </math>";
 
 //   let expr = "<math xmlns='http://www.w3.org/1998/Math/MathML'>
 //   <mstyle mathcolor='#a33e00'>
