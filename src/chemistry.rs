@@ -219,29 +219,20 @@ fn clean_mrow_children_mark_pass(children: &[Element]) {
 }
 
 
+/// Very little software gets the token elements for chemistry right
+/// Sometimes multiple elements are in a single token (e.g. "NaCl") and sometimes
+/// a single element is spread across multiple tokens (e.g. "N", "a").
+/// 
+/// Here we attempt one or the other repair, but not both on the assumption there is 
+/// consistency in the error.
+/// 
+/// Returns a Vec of the chemical elements or None. If a merge happened, the tree is altered
 pub fn convert_leaves_to_chem_elements<'a>(mathml: Element<'a>) -> Option<Vec<Element<'a>>> {
-    // FIX: right now only splits an mi/mtext -- should gather up text to the right and split
     // gather up all the consecutive mi/mtext
     let doc = mathml.document();
     if !(name(&mathml) == "mi" || name(&mathml) == "mtext") {
         return None;       // do nothing
     }
-
-    // let mut token_string = Vec::with_capacity(2*children.len());
-    // let mut last = i;
-    // for &child in &children[i..] {
-    //     match name(&child) {
-    //         "mi" | "mtext" => {
-    //             token_string.push_str( as_text(child) );
-    //         },
-    //         _ => break,
-    //     };
-    //     last += 1;
-    // }
-    // if i == last {
-    //     return None;
-    // }
-    // FIX: this is inefficient -- should group elements by letter and have a mini-state machine check possibilities
 
     // we play games with the string to avoid allocation...
     let token_string = as_text(mathml).as_bytes();
@@ -249,27 +240,57 @@ pub fn convert_leaves_to_chem_elements<'a>(mathml: Element<'a>) -> Option<Vec<El
         return None;    // chemical elements are ASCII
     }
     let token_len = token_string.len();
-    let mut j = 0;
-    let mut new_children = Vec::with_capacity(token_string.len());
-    while j < token_len {
-        // try elements of length 3, 2, 1, preferring longer elements (e.g., prefer "Na" over "N")
-        if let Some(chem_element) = get_chem_element(&doc, &token_string[j..], 3) {
-            new_children.push(chem_element);
-            j += 3;
-            continue;
-        } else if let Some(chem_element) = get_chem_element(&doc, &token_string[j..], 2) {
-            new_children.push(chem_element);
-            j += 2;
-            continue;
-        } else if let Some(chem_element) = get_chem_element(&doc, &token_string[j..], 1) {
-            new_children.push(chem_element);
-            j += 1;
-            continue;
-        }
-        return None;    // didn't find a valid chem element
+    if token_len == 1 {
+        return merge_tokens_chem_element(&doc, token_string, &mathml.following_siblings());
+    } else {
+        return split_string_chem_element(&doc, token_string);
     }
 
-    return Some(new_children);
+    fn merge_tokens_chem_element<'a>(doc: &Document<'a>, token_string: &[u8], following_siblings: &[ChildOfElement<'a>]) -> Option<Vec<Element<'a>>> {
+        // FIX: need to handle three char chem elements (make a nested fn to deal with each char)
+        if following_siblings.len() == 0 {
+            return None;
+        }
+        let second_element = as_element(following_siblings[0]);
+        let second_element_name = name(&second_element);
+        if second_element_name != "mi" && second_element_name != "mtext" {
+            return None;
+        }
+        let second_element_text = as_text(second_element);
+        if second_element_text.len() != 1 {
+            return None;
+        }
+        let chem_token_string = vec![token_string[0], second_element_text.as_bytes()[0] as u8];
+        if let Some(chem_element) = get_chem_element(doc, &chem_token_string, 2) {
+            return Some(vec![chem_element]);
+        }
+        return None;
+    }
+
+    fn split_string_chem_element<'a>(doc: &Document<'a>, token_string: &[u8]) -> Option<Vec<Element<'a>>> {
+        let token_len = token_string.len();
+        let mut j = 0;
+        let mut new_children = Vec::with_capacity(token_string.len());
+        while j < token_len {
+            // try elements of length 3, 2, 1, preferring longer elements (e.g., prefer "Na" over "N")
+            if let Some(chem_element) = get_chem_element(&doc, &token_string[j..], 3) {
+                new_children.push(chem_element);
+                j += 3;
+                continue;
+            } else if let Some(chem_element) = get_chem_element(&doc, &token_string[j..], 2) {
+                new_children.push(chem_element);
+                j += 2;
+                continue;
+            } else if let Some(chem_element) = get_chem_element(&doc, &token_string[j..], 1) {
+                new_children.push(chem_element);
+                j += 1;
+                continue;
+            }
+            return None;    // didn't find a valid chem element
+        }
+
+        return Some(new_children);
+    }
 
     /// Returns element or None
     fn get_chem_element<'a>(doc: &Document<'a>, bytes_str: &[u8], n: usize) -> Option<Element<'a>> {
@@ -1002,7 +1023,6 @@ mod chem_tests {
 
     #[test]
     fn aluminum_sulfate() {
-        init_logger();
         let test = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
                 <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
         let target = "<math>
@@ -1187,6 +1207,48 @@ mod chem_tests {
 
     #[test]
     fn mchem_so4() {
+        init_logger();
+        let test = "<math>
+            <mstyle mathcolor='#a33e00'>
+            <mrow>
+                <mi>SO</mi>
+                <msub>
+                <mrow>
+                    <mrow>
+                    <mpadded width='0'>
+                        <mphantom>
+                        <mi>A</mi>
+                        </mphantom>
+                    </mpadded>
+                    </mrow>
+                </mrow>
+                <mrow>
+                    <mrow>
+                    <mpadded height='0'>
+                        <mn>4</mn>
+                    </mpadded>
+                    </mrow>
+                </mrow>
+                </msub>
+            </mrow>
+            </mstyle>
+        </math>";
+        let target = "<math>
+            <mrow data-changed='added' data-chem-formula='4'>
+                <mi data-chem-element='1'>S</mi>
+                <mo data-changed='added'>&#x2063;</mo>
+                <mmultiscripts mathcolor='#a33e00' data-chem-element='2'>
+                    <mi data-chem-element='1'>O</mi>
+                    <mn>4</mn>
+                    <none></none>
+                </mmultiscripts>
+            </mrow>
+       </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn mchemx_so4_with_extra_mrow() {
         let test = "<math>
             <mstyle mathcolor='#a33e00'>
             <mrow>
