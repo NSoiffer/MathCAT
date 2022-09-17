@@ -627,17 +627,17 @@ impl CanonicalizeContext {
 			},
 			_  => {
 				let mut children = mathml.children();
-				let mut already_processed_mrow = false;
 				if element_name == "mrow" {
 					if children.is_empty() {
 						return if parent_requires_child {Some(mathml)} else {None};
 					} else if children.len() == 1 {
 						if let Some(new_mathml) = self.clean_mathml( add_attrs(as_element(children[0]), mathml.attributes()) ) {
 							// "lift" the child up so all the links (e.g., siblings) are correct
-							children.clear();
-							children.push( ChildOfElement::Element(new_mathml) );
-							children.append(&mut new_mathml.following_siblings());
-							already_processed_mrow = true;
+							// return Some(new_mathml);
+							mathml.replace_children(new_mathml.children());
+							set_mathml_name(mathml, name(&new_mathml));
+							add_attrs(mathml, new_mathml.attributes());
+							return Some(mathml);
 						} else {
 							return None;
 						}
@@ -645,8 +645,7 @@ impl CanonicalizeContext {
 				}
 
 				// FIX: this should be setting children, not mathml
-				let mathml =  if (element_name == "mrow" && !already_processed_mrow) ||
-										   ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
+				let mathml =  if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 					let merged = merge_dots(mathml);	// FIX -- switch to passing in children
 					let merged = merge_primes(merged);
 					let merged = handle_pseudo_scripts(merged);
@@ -667,7 +666,10 @@ impl CanonicalizeContext {
 								i += 1;
 							},
 							Some(new_child) => {
-								debug!("--in loop: # new_child: {}\n{}", new_children.len(), mml_to_string(&new_child));
+								debug!("--in loop: # new_children: {}, # new siblings: {}\n{}\n{}",
+									 new_children.len(), new_child.following_siblings().len(),
+									 mml_to_string(&new_child),
+									 if new_child.following_siblings().len()==0 {"no siblings".to_string()} else {mml_to_string(&as_element(new_child.following_siblings()[0]))});
 								if new_children.len() > 0 {
 									let prev = as_element(new_children[new_children.len()-1]);
 									debug!("  previous stored new child:\n{}", mml_to_string(&prev));
@@ -675,7 +677,7 @@ impl CanonicalizeContext {
 								new_children.push(ChildOfElement::Element(new_child));
 								children = new_child.following_siblings();
 								debug!("in loop: # following: {}", children.len());
-								children.iter().for_each(|&coe| {
+ 								children.iter().for_each(|&coe| {
 									let child = as_element(coe);
 									debug!("   {}", mml_to_string(&child));
 								});
@@ -725,11 +727,10 @@ impl CanonicalizeContext {
 					if children.len() == 1 {
 						return Some( as_element(children[0]) );
 					} else {
-						// wrap the children in an mrow
-						let mrow = create_mathml_element(&mathml.document(), "mrow");
-						mrow.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
-						mrow.append_children(children);
-						return Some(mrow);
+						// wrap the children in an mrow, but maintain tree siblings by changing mpadded/mstyle to mrow
+						set_mathml_name(mathml, "mrow");
+						mathml.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
+						return Some(mathml);
 					}
 				} else if element_name == "semantics" {
 					return Some( as_element(children[0]) );	// FIX: presentation isn't necessarily first child
@@ -1497,6 +1498,12 @@ impl CanonicalizeContext {
 				children.append(&mut primary_scripts)
 			}
 			script.replace_children(children);
+			let likely_chemistry = likely_adorned_chem_formula(script);
+			if likely_chemistry >= 0 {
+				script.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
+			}
+
+
 			debug!("convert_to_mmultiscripts -- converted script:\n{}", mml_to_string(&script));
 			if looking_for_prescripts {
 				mrow_children.drain(i+1..i+1+num_siblings_used);

@@ -571,7 +571,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
         "msub" | "msup" | "msubsup" | "mmultiscripts" => {
             likely_chem_formula(as_element(mathml.children()[0]));  // set MAYBE_CHEMISTRY attribute
             let likelihood = likely_adorned_chem_formula(mathml);
-            if likelihood >= IS_CHEMISTRY_THRESHOLD {
+            if likelihood > 0 {
                 mathml.set_attribute_value(MAYBE_CHEMISTRY, likelihood.to_string().as_str());
             }
             return likelihood;
@@ -665,6 +665,7 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
     let children = mathml.children();
     let mut likelihood = 0;
     let mut empty_subscript = false;
+    debug!("likely_adorned_chem_formula:\n{}", mml_to_string(&mathml));
     if tag_name == "msub" || tag_name == "msubsup" {
         // subscripts should be just a number
         let subscript = as_element(children[1]);
@@ -694,6 +695,7 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
             &children[1..3] 
         } else if children.len() == 3 {   // just postscripts
             let sub = as_element(children[1]);
+            debug!("sub: {}", mml_to_string(&sub));
             if name(&sub) != "none" {
                 likelihood += likely_chem_subscript(sub);
             } 
@@ -1234,10 +1236,10 @@ mod chem_tests {
             </mstyle>
         </math>";
         let target = "<math>
-            <mrow data-changed='added' data-chem-formula='4'>
+            <mrow data-chem-formula='3'>
                 <mi data-chem-element='1'>S</mi>
                 <mo data-changed='added'>&#x2063;</mo>
-                <mmultiscripts mathcolor='#a33e00' data-chem-element='2'>
+                <mmultiscripts data-chem-formula='1'>
                     <mi data-chem-element='1'>O</mi>
                     <mn>4</mn>
                     <none></none>
@@ -1249,6 +1251,7 @@ mod chem_tests {
 
     #[test]
     fn mchem_so4_with_extra_mrow() {
+        init_logger();
         let test = "<math>
             <mstyle mathcolor='#a33e00'>
             <mrow>
@@ -1277,16 +1280,16 @@ mod chem_tests {
             </mstyle>
         </math>";
         let target = "<math>
-            <mrow data-changed='added' data-chem-formula='4'>
-                <mi data-chem-element='1'>S</mi>
-                <mo data-changed='added'>&#x2063;</mo>
-                <mmultiscripts mathcolor='#a33e00' data-chem-element='2'>
-                    <mi data-chem-element='1'>O</mi>
-                    <mn>4</mn>
-                    <none></none>
-                </mmultiscripts>
-            </mrow>
-       </math>";
+                <mrow data-chem-formula='3'>
+                    <mi data-chem-element='1'>S</mi>
+                    <mo data-changed='added'>&#x2063;</mo>
+                    <mmultiscripts data-chem-formula='1'>
+                        <mi data-chem-element='1'>O</mi>
+                        <mn>4</mn>
+                        <none></none>
+                    </mmultiscripts>
+                </mrow>
+        </math>";
         assert!(are_strs_canonically_equal(test, target));
     }
 
