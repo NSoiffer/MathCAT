@@ -1375,7 +1375,7 @@ impl CanonicalizeContext {
 			while i < children.len() {
 				let child = as_element(children[i]);
 				let child_name = name(&child);
-				if child_name == "msub" || child_name == "msup" || child_name == "msubsup" {
+				if (child_name == "msub" || child_name == "msup" || child_name == "msubsup") && is_empty_base(child.children()[0]) {
 					i = convert_to_mmultiscripts(children, i);
 				} else {
 					i += 1;
