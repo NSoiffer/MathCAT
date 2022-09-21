@@ -328,34 +328,22 @@ pub fn scan_and_mark_chemistry(mathml: Element) {
     assert_eq!(name(&mathml), "math");
     assert_eq!(mathml.children().len(), 1);
     let child = as_element(mathml.children()[0]);
-    let likelihood = likely_chem_formula(child);
-    if likelihood >= IS_CHEMISTRY_THRESHOLD && child.attribute(CHEM_FORMULA).is_none() {
-        child.set_attribute_value(MAYBE_CHEMISTRY, likelihood.to_string().as_str());
-        set_marked_chemistry_attr(child, CHEM_FORMULA);
-    }
-
-    if name(&child) == "mrow" {
-        let likelihood = likely_chem_equation(child);
+    if has_chemical_element(child) {
+        let likelihood = likely_chem_formula(child);
         if likelihood >= IS_CHEMISTRY_THRESHOLD && child.attribute(CHEM_FORMULA).is_none() {
             child.set_attribute_value(MAYBE_CHEMISTRY, likelihood.to_string().as_str());
-            set_marked_chemistry_attr(child, CHEM_EQUATION);
+            set_marked_chemistry_attr(child, CHEM_FORMULA);
+        }
+
+        if name(&child) == "mrow" {
+            let likelihood = likely_chem_equation(child);
+            if likelihood >= IS_CHEMISTRY_THRESHOLD && child.attribute(CHEM_FORMULA).is_none() {
+                child.set_attribute_value(MAYBE_CHEMISTRY, likelihood.to_string().as_str());
+                set_marked_chemistry_attr(child, CHEM_EQUATION);
+            }
         }
     }
     unset_marked_chemistry(mathml);
-
-    // if is_leaf(mathml) {
-    //     match name(&mathml) {
-    //         "mi" | "mo" => set_chem_attr(mathml, CHEM_ELEMENT),
-    //         _ => NOT_CHEMISTRY,
-    //     };
-    //     return;
-    // }
-    // set_chem_attr(mathml, CHEM_FORMULA);   // FIX: this might be CHEM_EQUATION
-
-    // for child in mathml.children() {
-    //     let child = as_element(child);
-    //     mark_if_likely_chemistry(child);
-    // }
 }
 
 // returns the marked attr value or None
@@ -417,6 +405,23 @@ fn unset_marked_chemistry(mathml: Element) {
             unset_marked_chemistry(as_element(child));
         }
     }
+}
+
+/// Returns true only if 'mathml' potentially has a chemical element in it.
+/// This assumes canonicalization has happened
+fn has_chemical_element(mathml: Element) -> bool {
+    // this could be combined with likely_chem_formula() and likely_chem_equation(), but then the return structure and other logic gets messy
+    // doing this separately is cleaner but slower
+    if is_leaf(mathml) {
+        return name(&mathml) == "mi" && is_chemical_element(mathml);
+    }
+    for child in mathml.children() {
+        let child = as_element(child);
+        if has_chemical_element(child) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /// Looks at the children of the element and uses heuristics to decide whether this is a chemical equation 
@@ -550,6 +555,7 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
 /// * an operator that represents a bond
 /// * fences around a chemical formula
 /// * an mrow made up of only chemical formulas
+/// * there needs to be at least chemical element (don't want a+b+c+d to be thought of as chemistry)
 fn likely_chem_formula(mathml: Element) -> isize {
     if let Some(value) = get_marked_value(mathml) {
         return value;       // already marked
@@ -804,10 +810,11 @@ fn likely_chem_formula_operator(mathml: Element) -> isize {
     } 
 }
 
+/// This assumes canonicalization of characters has happened
 fn likely_chem_equation_operator(mathml: Element) -> isize {
     // mostly from chenzhijin.com/en/article/Useful%20Unicode%20for%20Chemists (Arrows and Other)
     static CHEM_EQUATION_OPERATORS: phf::Set<char> = phf_set! {
-        '+', '=',
+        '+', '=', '-',
         '·', '℃', '°', '‡', '∆', '×',
         // FIX: the invisible operator between elements should be well-defined, but this likely needs work, so both accepted for now
         '\u{2061}', '\u{2063}' // invisible separators
@@ -1209,7 +1216,6 @@ mod chem_tests {
 
     #[test]
     fn mchem_so4() {
-        init_logger();
         let test = "<math>
             <mstyle mathcolor='#a33e00'>
             <mrow>
