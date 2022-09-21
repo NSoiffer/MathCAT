@@ -628,6 +628,7 @@ impl CanonicalizeContext {
 			_  => {
 				let mut children = mathml.children();
 				if element_name == "mrow" {
+					// handle special cases of empty mrows and mrows which just one element
 					if children.is_empty() {
 						return if parent_requires_child {Some(mathml)} else {None};
 					} else if children.len() == 1 {
@@ -656,6 +657,7 @@ impl CanonicalizeContext {
 
 				// cleaning children can add or delete subsequent children, so the children vector isn't reliable
 				// instead we constantly get a new vector by asking for the following siblings until there aren't any
+				children = mathml.children();
 				let mut i = 0;
 				let mut new_children = Vec::with_capacity(children.len()+4);	// + 4 allow for some splitting of mi's for chemistry
 				while i < children.len() {
@@ -871,31 +873,35 @@ impl CanonicalizeContext {
 		}
 
 		fn merge_arc_trig(leaf: Element) -> Option<Element> {
-			let preceding_siblings = leaf.preceding_siblings();
-			if !preceding_siblings.is_empty() {
-				let preceding_sibling = as_element(preceding_siblings[preceding_siblings.len()-1]);
-				let preceding_sibling_name = name(&preceding_sibling);
-				if preceding_sibling_name == "mi" || preceding_sibling_name == "mo" || preceding_sibling_name == "mtext" {
-					let preceding_text = as_text(preceding_sibling);
-					if preceding_text == "arc" || preceding_text == "arc " || preceding_text == "arc " /* non-breaking space */ {
-						return crate::definitions::DEFINITIONS.with(|definitions| {
-							// change "arc" "cos" to "arccos" -- we look forward because calling loop stores previous node
-							let leaf_name = name(&leaf);
-							if leaf_name == "mi" || leaf_name == "mo" || leaf_name == "mtext" {
-								let leaf_text = as_text(leaf);
-								if definitions.borrow().get_hashset("TrigFunctionNames").unwrap().contains(leaf_text) {
-									let new_text = preceding_text.to_string() + leaf_text;
-									leaf.set_text(&new_text);
-									preceding_sibling.remove_from_parent();
-									return Some(leaf);
-								}
-							}
-							return None;
-						})
-					}
-				}
+			assert!(is_leaf(leaf));
+			let leaf_text = as_text(leaf);
+			if !(leaf_text == "arc" || leaf_text == "arc " || leaf_text == "arc " /* non-breaking space */ ) {
+				return None;
 			}
-			return None;
+
+			let following_siblings = leaf.following_siblings();
+			if following_siblings.is_empty() {
+				return None;
+			}
+
+			let following_sibling = as_element(following_siblings[0]);
+			let following_sibling_name = name(&following_sibling);
+			if !(following_sibling_name == "mi" || following_sibling_name == "mo" || following_sibling_name == "mtext") {
+				return None;
+			}
+
+			return crate::definitions::DEFINITIONS.with(|definitions| {
+				// change "arc" "cos" to "arccos" -- we look forward because calling loop stores previous node
+				let following_text = as_text(following_sibling);
+				if definitions.borrow().get_hashset("TrigFunctionNames").unwrap().contains(following_text) {
+					let new_text = "arc".to_string() + following_text;
+					set_mathml_name(leaf, "mi");
+					leaf.set_text(&new_text);
+					following_sibling.remove_from_parent();
+					return Some(leaf);
+				}
+				return None;
+			})
 		}
 
 		fn convert_mfenced_to_mrow(mfenced: Element) -> Element {
@@ -3651,7 +3657,7 @@ mod canonicalize_tests {
         let test_str = "<math><mtext>arc&#xA0;</mtext><mi>cos</mi><mi>x</mi></math>";
         let target_str = "<math>
 			<mrow data-changed='added'>
-			<mi>arc cos</mi>
+			<mi>arccos</mi>
 			<mo data-changed='added'>&#x2062;</mo>
 			<mi>x</mi>
 			</mrow>
