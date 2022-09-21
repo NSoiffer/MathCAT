@@ -561,14 +561,6 @@ fn likely_chem_formula(mathml: Element) -> isize {
         return value;       // already marked
     }
 
-    // if is_leaf(mathml) {
-    //     if let Some(likely) = mathml.attribute_value(MAYBE_CHEMISTRY) {
-    //         return likely.parse().unwrap();
-    //     } else {
-    //         return NOT_CHEMISTRY;
-    //     }
-    // }
-
     let tag_name = name(&mathml);
     match tag_name {
         // a parent may clear the chem flags if something says can't be chemistry (e.g, a non chemically valid script)
@@ -614,6 +606,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
                     }
                 } else {
                     last_was_likely_formula = 0;
+                    likelihood += likely;
                 }
                 // debug!("in likely_chem_formula likelihood={}, child\n{}", likelihood, mml_to_string(&child));
                 if likelihood < NOT_CHEMISTRY_THRESHOLD {
