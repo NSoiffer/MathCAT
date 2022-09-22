@@ -414,7 +414,10 @@ fn has_chemical_element(mathml: Element) -> bool {
     // doing this separately is cleaner but slower
     if is_leaf(mathml) {
         return name(&mathml) == "mi" && is_chemical_element(mathml);
+    } else if name(&mathml) == "semantics" {
+        return has_chemical_element( get_presentation_element(mathml) );
     }
+
     for child in mathml.children() {
         let child = as_element(child);
         if has_chemical_element(child) {
@@ -487,6 +490,9 @@ fn likely_chem_equation(mathml: Element) -> isize {
                     return NOT_CHEMISTRY;
                 }
             },
+            "semantics" => {
+                return likely_chem_equation(get_presentation_element(child));
+            }
             _ => return NOT_CHEMISTRY,
         };
 
@@ -573,6 +579,9 @@ fn likely_chem_formula(mathml: Element) -> isize {
                 mathml.set_attribute_value(MAYBE_CHEMISTRY, likelihood.to_string().as_str());
             }
             return likelihood;
+        },
+        "semantics" => {
+            return likely_chem_formula(get_presentation_element(mathml));
         },
         "mrow" => {
             let chem_state = likely_chem_state(mathml);

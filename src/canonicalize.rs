@@ -303,6 +303,12 @@ pub fn set_mathml_name(element: Element, new_name: &str) {
 	element.set_name(QName::with_namespace_uri(Some("http://www.w3.org/1998/Math/MathML"), new_name));
 }
 
+// returns the presentation element of a "semantics" element
+pub fn get_presentation_element<'a>(element: Element<'a>) -> Element<'a> {
+	// FIX: implement this
+	assert_eq!(name(&element), "semantics");
+	return as_element( element.children()[0] );
+}
 
 /// Canonicalize does several things:
 /// 1. cleans up the tree so all extra white space is removed (should only have element and text nodes)
@@ -406,7 +412,7 @@ impl CanonicalizeContext {
 			if children.is_empty() {
 				return Ok( () );
 			} else {
-				return self.assure_mathml(as_element(children[0]));		// FIX: really should find presentation child
+				return self.assure_mathml(get_presentation_element(mathml));
 			}
 		}
 		if !ALL_MATHML_ELEMENTS.contains(&element_name) {
@@ -625,6 +631,24 @@ impl CanonicalizeContext {
 				mathml.set_text("\u{A0}");
 				return Some(mathml);
 			},
+			"semantics" => {
+				// clean the presentation child but leave the annotations in case they want to be used by the rules.
+				// not attempt is made to clean the annotations or verify they are annotations
+				// FIX: presentation isn't necessarily first child
+				let mut children = mathml.children();
+				let new_presentation = if let Some(presentation) = self.clean_mathml(get_presentation_element(mathml)) {
+					presentation
+				} else {
+					// probably shouldn't happen, but just in case
+					let mtext = create_mathml_element(&mathml.document(), "mtext");
+					mtext.set_text("\u{A0}");
+					mtext.set_attribute_value("data-added", "missing-content");
+					mtext
+				};
+				children[0] = ChildOfElement::Element(new_presentation);
+				mathml.replace_children(children);
+				return Some(mathml);
+		}
 			_  => {
 				let mut children = mathml.children();
 				if element_name == "mrow" {
@@ -734,8 +758,6 @@ impl CanonicalizeContext {
 						mathml.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
 						return Some(mathml);
 					}
-				} else if element_name == "semantics" {
-					return Some( as_element(children[0]) );	// FIX: presentation isn't necessarily first child
 				} else {
 					if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 						clean_chemistry_mrow(mathml);
@@ -1556,6 +1578,12 @@ impl CanonicalizeContext {
 			},
 			"mrow" => {
 				return self.canonicalize_mrows_in_mrow(mathml);
+			},
+			"semantics" => {
+				let mut children = mathml.children();
+				children[0] = ChildOfElement::Element(self.canonicalize_mrows( get_presentation_element(mathml))? );
+				mathml.replace_children(children);
+				return Ok(mathml);
 			},
 			_ => {
 				// recursively try to make mrows in other structures (eg, num/denom in fraction)
@@ -3619,7 +3647,7 @@ mod canonicalize_tests {
 		// this comes from LateXML
         let test_str = "<math>
 				<semantics>
-					<mi>z</mi>
+					<mrow><mi>z</mi></mrow>
 					<annotation-xml encoding='MathML-Content'>
 						<ci>𝑧</ci>
 					</annotation-xml>
@@ -3628,8 +3656,15 @@ mod canonicalize_tests {
 				</semantics>
 			</math>";
 		let target_str = "<math>
-				<mi>z</mi>
-			</math>";
+		<semantics>
+			<mi>z</mi>
+			<annotation-xml encoding='MathML-Content'>
+				<ci>𝑧</ci>
+			</annotation-xml>
+			<annotation encoding='application/x-tex'>z</annotation>
+			<annotation encoding='application/x-llamapun'>italic_z</annotation>
+		</semantics>
+	</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
