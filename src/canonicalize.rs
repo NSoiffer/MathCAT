@@ -720,10 +720,10 @@ impl CanonicalizeContext {
 					merge_number_blocks(mathml, &mut new_children);
 					merge_whitespace(&mut new_children);
 					handle_convert_to_mmultiscripts(&mut new_children);
-
 				} else if element_name == "msub" || element_name == "msup" || 
 						  element_name == "msubsup" || element_name == "mmultiscripts"{
 					mathml.replace_children(new_children);
+					let mathml = if element_name == "mmultiscripts" {clean_mmultiscripts(mathml).unwrap()} else {mathml};		
 					if !is_chemistry_off() {
 						let likely_chemistry = likely_adorned_chem_formula(mathml);
 						debug!("likely_chemistry={}, {}", likely_chemistry, mml_to_string(&mathml));
@@ -737,8 +737,6 @@ impl CanonicalizeContext {
 					} else {
 						return Some(mathml);
 					}
-				} else if element_name == "mmultiscripts" {
-					return clean_mmultiscripts(mathml);
 				}
 
 				mathml.replace_children(new_children);
@@ -807,6 +805,7 @@ impl CanonicalizeContext {
 		///
 		/// This does some dubious repairs when the structure is bad, but not sure what else to do
 		fn clean_mmultiscripts(mathml: Element) -> Option<Element> {
+			let mut mathml = mathml;
 			let children = mathml.children();
 			let n = children.len();
 			let i_mprescripts =
@@ -842,12 +841,11 @@ impl CanonicalizeContext {
 						i += 2;
 					}
 				}
-				mathml.replace_children(new_children);
-			}
-
-			let likely_chemistry = likely_adorned_chem_formula(mathml);
-			if likely_chemistry >= 0 {
-				mathml.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
+				if new_children.len() == 1 {
+					mathml = as_element(new_children[0]);
+				} else {
+					mathml.replace_children(new_children);
+				}
 			}
 
 			return Some(mathml);
@@ -4009,6 +4007,7 @@ mod canonicalize_tests {
 
 	#[test]
     fn pre_and_postscript_only() {
+		init_logger();
         let test_str = "<math>
 			<msub><mrow/><mn>0</mn></msub>
 			<msub><mi>F</mi><mn>1</mn></msub>
