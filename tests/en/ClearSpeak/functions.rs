@@ -361,7 +361,6 @@ fn explicit_times_none_superscript() {
 
 #[test]
     fn parens_interval_closed_open() {
-        init_logger();
         let expr = "<math> 
         <mrow><mo>[</mo>
         <mrow> <mi>c</mi><mo>,</mo><mi>d</mi></mrow>

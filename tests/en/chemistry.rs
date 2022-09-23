@@ -102,7 +102,6 @@ fn ethylene_with_colon_bond() {
 
 #[test]
 fn beta_decay() {
-    init_logger();
     let expr = "<math>
     <mmultiscripts>
       <mtext>C</mtext>
