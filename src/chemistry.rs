@@ -219,17 +219,16 @@ fn clean_mrow_children_mark_pass(children: &[Element]) {
 }
 
 
-/// Very little software gets the token elements for chemistry right
+/// Very little software gets the token elements for chemistry right.
 /// Sometimes multiple elements are in a single token (e.g. "NaCl") and sometimes
 /// a single element is spread across multiple tokens (e.g. "N", "a").
 /// 
 /// Here we attempt one or the other repair, but not both on the assumption there is 
 /// consistency in the error.
 /// 
-/// Returns a Vec of the chemical elements or None. If a merge happened, the tree is altered
+/// Returns a Vec of the chemical elements or None. If a merge happened, the tree is altered.
 pub fn convert_leaves_to_chem_elements<'a>(mathml: Element<'a>) -> Option<Vec<Element<'a>>> {
     // gather up all the consecutive mi/mtext
-    let doc = mathml.document();
     if !(name(&mathml) == "mi" || name(&mathml) == "mtext") {
         return None;       // do nothing
     }
@@ -239,14 +238,19 @@ pub fn convert_leaves_to_chem_elements<'a>(mathml: Element<'a>) -> Option<Vec<El
     if token_string.iter().find(|&&ch| ch >=128).is_some() {
         return None;    // chemical elements are ASCII
     }
+    let doc = mathml.document();
     let token_len = token_string.len();
     if token_len == 1 {
-        return merge_tokens_chem_element(&doc, token_string, &mathml.following_siblings());
+        let answer = merge_tokens_chem_element(&doc, mathml, token_string, &mathml.following_siblings());
+        if answer.is_none() && is_chemical_element(mathml) {
+            mathml.set_attribute_value(MAYBE_CHEMISTRY, "1");
+        }
+        return answer;
     } else {
         return split_string_chem_element(&doc, token_string);
     }
 
-    fn merge_tokens_chem_element<'a>(doc: &Document<'a>, token_string: &[u8], following_siblings: &[ChildOfElement<'a>]) -> Option<Vec<Element<'a>>> {
+    fn merge_tokens_chem_element<'a>(doc: &Document<'a>, leaf: Element<'a>, token_string: &[u8], following_siblings: &[ChildOfElement<'a>]) -> Option<Vec<Element<'a>>> {
         // FIX: need to handle three char chem elements (make a nested fn to deal with each char)
         if following_siblings.len() == 0 {
             return None;
@@ -262,6 +266,9 @@ pub fn convert_leaves_to_chem_elements<'a>(mathml: Element<'a>) -> Option<Vec<El
         }
         let chem_token_string = vec![token_string[0], second_element_text.as_bytes()[0] as u8];
         if let Some(chem_element) = get_chem_element(doc, &chem_token_string, 2) {
+            leaf.set_text(as_text(chem_element));
+            leaf.set_attribute_value(MAYBE_CHEMISTRY, "2");
+            second_element.remove_from_parent();
             return Some(vec![chem_element]);
         }
         return None;
@@ -1244,12 +1251,12 @@ mod chem_tests {
             </mstyle>
         </math>";
         let target = "<math>
-            <mrow data-chem-formula='3'>
+            <mrow  mathcolor='#a33e00' data-chem-formula='3'>
                 <mi data-chem-element='1'>S</mi>
                 <mo data-changed='added'>&#x2063;</mo>
                 <mmultiscripts data-chem-formula='1'>
                     <mi data-chem-element='1'>O</mi>
-                    <mn>4</mn>
+                    <mn height='0'>4</mn>
                     <none></none>
                 </mmultiscripts>
             </mrow>
@@ -1288,12 +1295,12 @@ mod chem_tests {
             </mstyle>
         </math>";
         let target = "<math>
-                <mrow data-chem-formula='3'>
+                <mrow  mathcolor='#a33e00' data-chem-formula='3'>
                     <mi data-chem-element='1'>S</mi>
                     <mo data-changed='added'>&#x2063;</mo>
                     <mmultiscripts data-chem-formula='1'>
                         <mi data-chem-element='1'>O</mi>
-                        <mn>4</mn>
+                        <mn height='0'>4</mn>
                         <none></none>
                     </mmultiscripts>
                 </mrow>

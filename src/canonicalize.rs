@@ -474,12 +474,12 @@ impl CanonicalizeContext {
 				false
 			};
 
+		// handle empty leaves -- leaving it empty causes problems with the speech rules
 		if is_leaf(mathml) && !EMPTY_ELEMENTS.contains(element_name) && as_text(mathml).is_empty() {
-			// get this out of the way since it common to all leaf elements -- leaving it empty causes problems with the speech rules
 			if !parent_requires_child {
 				return None;
 			}
-			mathml.set_text(" ");
+			mathml.set_text("\u{A0}");
 		};
 		
 		if mathml.children().is_empty() && !EMPTY_ELEMENTS.contains(element_name) {
@@ -530,13 +530,6 @@ impl CanonicalizeContext {
 					} else if let Some(result) = split_points(mathml) {
 						return Some(result);
 					}
-					clean_chemistry_leaf(mathml);
-					debug!("after cleaning leaf: math):\n{}", mml_to_string(&mathml));
-					let parent = mathml.parent().unwrap().element().unwrap();
-					debug!("after cleaning leaf: parent):\n{}", mml_to_string(&parent));
-					// let parent = parent.parent().unwrap().element().unwrap();
-					// debug!("after cleaning leaf: grandparent):\n{}", mml_to_string(&parent));
-					
 					let siblings = mathml.following_siblings();
 					if siblings.is_empty() {
 						debug!("after cleaning leaf: no following sibling)");
@@ -560,24 +553,26 @@ impl CanonicalizeContext {
 				}
 				
 				let text = as_text(mathml);
-				if !text.trim().is_empty() && ROMAN_NUMERAL.is_match(text) && 
-				   name(&mathml.parent().unwrap().element().unwrap()) == "mrow" {	// typically not in powers, radicals, etc.
-					// people tend to set them in a non-italic font and software makes that 'mtext'
-					set_mathml_name(mathml, "mn");
-					mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
-					return Some(mathml);
+				if !text.trim().is_empty() && ROMAN_NUMERAL.is_match(text) {
+					let parent = mathml.parent().unwrap().element().unwrap();
+					let parent_name = name(&parent);
+				  	if parent_name == "mrow" || parent_name == "math" {	// typically not in powers, radicals, etc.
+						// people tend to set them in a non-italic font and software makes that 'mtext'
+						set_mathml_name(mathml, "mn");
+						mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+						return Some(mathml);
+					}
 				}
 				// allow non-breaking whitespace to stay -- needed by braille
+				let mathml = mathml;
 				if IS_WHITESPACE.is_match(text) {
 					// normalize to just a single non-breaking space
 					mathml.set_text("\u{A0}");
-				} else {
-					clean_chemistry_leaf(mathml);
 				}
 				return if parent_requires_child || !text.is_empty() {Some(mathml)} else {None};
 			},
 			"mo" => {
-				// WIRIS editor at least puts non-breaking whitespace as standalone in 'mo'
+				// WIRIS editor puts non-breaking whitespace as standalone in 'mo'
 				let text = as_text(mathml);
 				if !text.is_empty() && IS_WHITESPACE.is_match(text) {
 					// can't throw it out because it is needed by braille -- change to what it really is
@@ -610,6 +605,34 @@ impl CanonicalizeContext {
 				// note: chemistry test is done later as part of another phase of chemistry cleanup
 			},
 			"mfenced" => {return self.clean_mathml( convert_mfenced_to_mrow(mathml) )},
+			"mstyle" | "mpadded" => {
+				// Throw out mstyle and mpadded -- to do this, we need to avoid mstyle being the arg of clean_mathml
+				// FIX: should probably push the attrs down to the children (set in 'self')
+				let children = mathml.children();
+				if children.len() == 1 {
+					// "lift" the child up so all the links (e.g., siblings) are correct
+					if let Some(new_mathml) = self.clean_mathml( as_element(children[0]) ) {
+						// "lift" the child up so all the links (e.g., siblings) are correct
+						mathml.replace_children(new_mathml.children());
+						set_mathml_name(mathml, name(&new_mathml));
+						add_attrs(mathml, new_mathml.attributes());
+						return Some(mathml);
+					} else if parent_requires_child {
+						// need a placeholder -- make it empty mtext
+						mathml.clear_children();
+						set_mathml_name(mathml, "mtext");
+						mathml.set_text("\u{A0}");
+						return Some(mathml);
+					} else {
+						return None;
+					}
+				} else {
+					// wrap the children in an mrow, but maintain tree siblings by changing mpadded/mstyle to mrow
+					set_mathml_name(mathml, "mrow");
+					mathml.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
+					return self.clean_mathml(mathml);	// now it's an mrow so a different path next time
+				}
+			},
 			"mphantom" | "malignmark" | "maligngroup"=> {
 				if parent_requires_child {
 					set_mathml_name(mathml, "mtext");
@@ -633,8 +656,7 @@ impl CanonicalizeContext {
 			},
 			"semantics" => {
 				// clean the presentation child but leave the annotations in case they want to be used by the rules.
-				// not attempt is made to clean the annotations or verify they are annotations
-				// FIX: presentation isn't necessarily first child
+				// no attempt is made to clean the annotations or verify they are annotations
 				let mut children = mathml.children();
 				let new_presentation = if let Some(presentation) = self.clean_mathml(get_presentation_element(mathml)) {
 					presentation
@@ -648,20 +670,30 @@ impl CanonicalizeContext {
 				children[0] = ChildOfElement::Element(new_presentation);
 				mathml.replace_children(children);
 				return Some(mathml);
-		}
+			},
 			_  => {
-				let mut children = mathml.children();
+				let children = mathml.children();
 				if element_name == "mrow" {
 					// handle special cases of empty mrows and mrows which just one element
 					if children.is_empty() {
 						return if parent_requires_child {Some(mathml)} else {None};
 					} else if children.len() == 1 {
-						if let Some(new_mathml) = self.clean_mathml( add_attrs(as_element(children[0]), mathml.attributes()) ) {
+						if let Some(new_mathml) = self.clean_mathml( as_element(children[0]) ) {
 							// "lift" the child up so all the links (e.g., siblings) are correct
-							// return Some(new_mathml);
+							debug!("lifting children of mrow (before):\n{}", mml_to_string(&mathml));
 							mathml.replace_children(new_mathml.children());
 							set_mathml_name(mathml, name(&new_mathml));
 							add_attrs(mathml, new_mathml.attributes());
+							debug!("lifting children of mrow (after):\n{}", mml_to_string(&mathml));
+							if !mathml.following_siblings().is_empty() {
+								let first_sibling = as_element(mathml.following_siblings()[0]);
+								debug!("lifting children of mrow (first sibling):\n{}", mml_to_string(&first_sibling));
+							}
+							return Some(mathml);
+						} else if parent_requires_child {
+							set_mathml_name(mathml, "mtext");
+							mathml.clear_children();
+							mathml.set_text("\u{A0}");
 							return Some(mathml);
 						} else {
 							return None;
@@ -679,37 +711,31 @@ impl CanonicalizeContext {
 					mathml
 				};
 
-				// cleaning children can add or delete subsequent children, so the children vector isn't reliable
-				// instead we constantly get a new vector by asking for the following siblings until there aren't any
-				children = mathml.children();
+				// cleaning children can add or delete subsequent children, so we need to constantly update the children (and mathml)
+				let mut children = mathml.children();
 				let mut i = 0;
-				let mut new_children = Vec::with_capacity(children.len()+4);	// + 4 allow for some splitting of mi's for chemistry
 				while i < children.len() {
 					if let Some(child) = children[i].element() {
 						match self.clean_mathml(child) {
 							None => {
 								mathml.remove_child(child);
-								i += 1;
+								// don't increment 'i' because there is one less child now and so everything shifted left
 							},
 							Some(new_child) => {
-								debug!("--in loop: # new_children: {}, # new siblings: {}\n{}\n{}",
-									 new_children.len(), new_child.following_siblings().len(),
-									 mml_to_string(&new_child),
-									 if new_child.following_siblings().len()==0 {"no siblings".to_string()} else {mml_to_string(&as_element(new_child.following_siblings()[0]))});
-								if new_children.len() > 0 {
-									let prev = as_element(new_children[new_children.len()-1]);
-									debug!("  previous stored new child:\n{}", mml_to_string(&prev));
-								}
-								new_children.push(ChildOfElement::Element(new_child));
-								children = new_child.following_siblings();
-								debug!("in loop: # following: {}", children.len());
- 								children.iter().for_each(|&coe| {
-									let child = as_element(coe);
-									debug!("   {}", mml_to_string(&child));
-								});
-								i = 0;
+								let new_child_name = name(&new_child);
+								children = mathml.children();				// clean_mathml(child) may have changed following siblings
+								debug!("new_child (i={})\n{}", i, mml_to_string(&new_child));
+								children[i] = ChildOfElement::Element(new_child);
+								mathml.replace_children(children);
+								if new_child_name == "mi" || new_child_name == "mtext" {
+									// can't do this above in 'match' because this changes the tree and
+									// lifting single element mrows messes with structure in a conflicting way
+									clean_chemistry_leaf(as_element(mathml.children()[i]));
+								}			
+								i += 1;
 							}
 						}
+						children = mathml.children();						// 'children' moved above, so need need new values
 					} else {
 						// bad mathml such as '<annotation-xml> </annotation-xml>' -- don't add to new_children
 						i += 1;
@@ -717,13 +743,13 @@ impl CanonicalizeContext {
 				}
 
 				if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
-					merge_number_blocks(mathml, &mut new_children);
-					merge_whitespace(&mut new_children);
-					handle_convert_to_mmultiscripts(&mut new_children);
+					merge_number_blocks(mathml, &mut children);
+					merge_whitespace(&mut children);
+					handle_convert_to_mmultiscripts(&mut children);
 				} else if element_name == "msub" || element_name == "msup" || 
 						  element_name == "msubsup" || element_name == "mmultiscripts"{
-					mathml.replace_children(new_children);
-					let mathml = if element_name == "mmultiscripts" {clean_mmultiscripts(mathml).unwrap()} else {mathml};		
+					let mathml = if element_name == "mmultiscripts" {clean_mmultiscripts(mathml).unwrap()} else {mathml};
+					debug!("some scripted element...\n{}", mml_to_string(&mathml));	
 					if !is_chemistry_off() {
 						let likely_chemistry = likely_adorned_chem_formula(mathml);
 						debug!("likely_chemistry={}, {}", likely_chemistry, mml_to_string(&mathml));
@@ -739,29 +765,13 @@ impl CanonicalizeContext {
 					}
 				}
 
-				mathml.replace_children(new_children);
+				mathml.replace_children(children);
 				debug!("clean_mathml: after loop\n{}", mml_to_string(&mathml));
-				// some elements might have been deleted, so get a new vector
-				let children = mathml.children();
 
-				// Throw out mstyle -- to do this, we need to avoid mstyle being the arg of clean_mathml
-				// FIX: should probably push the attrs down to the children (set in 'self')
-				// Also throw out mpadded
-				if element_name == "mstyle" || element_name == "mpadded" {
-					if children.len() == 1 {
-						return Some( as_element(children[0]) );
-					} else {
-						// wrap the children in an mrow, but maintain tree siblings by changing mpadded/mstyle to mrow
-						set_mathml_name(mathml, "mrow");
-						mathml.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
-						return Some(mathml);
-					}
-				} else {
-					if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
-						clean_chemistry_mrow(mathml);
-					}
-					self.assure_nary_tag_has_mrow(mathml);
+				if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
+					clean_chemistry_mrow(mathml);
 				}
+				self.assure_nary_tag_has_mrow(mathml);
 				return Some(mathml);				
 			}
 		}
@@ -772,32 +782,39 @@ impl CanonicalizeContext {
 				   (name(&base) == "mrow" && base.children().is_empty());
 		}
 
-		fn clean_chemistry_leaf(mathml: Element) {
-			if !is_chemistry_off() {
-				if let Some(mut elements) = convert_leaves_to_chem_elements(mathml) {
-					// want first element to be unchanged (i.e., want it to be 'mathml') so it isn't removed from parent (messes up clean_mathml)
-					mathml.set_text(as_text(elements[0]));
-					elements[0] = mathml;
-					let mut new_children = mathml.preceding_siblings();
-					let mut elements = elements.iter()
-						.map(|&e| {
-							let likely_chemistry = likely_chem_element(e);
-							if likely_chemistry >= 0 {
-								e.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
-							}			
-							ChildOfElement::Element(e)
-						})
-						.collect();
-					new_children.append(&mut elements);
-					new_children.append(&mut mathml.following_siblings());
-					mathml.parent().unwrap().element().unwrap().replace_children(new_children);
+		fn replace_children<'a>(mathml: Element<'a>, mut replacements: Vec<ChildOfElement<'a>>) -> Element<'a> {
+			// replace the children of the parent (must exist since this only happens for leaves) with the new children
+			if replacements.len() == 1 {
+				// rather than replace the children, the children are already in place, so we can optimize a little
+				// we just need to make sure that MAYBE_CHEMISTRY is set since we aren't using the new element directly
+				add_attrs(mathml, as_element(replacements[0]).attributes());
+				return mathml;
+			} else {
+				let mut new_children = mathml.preceding_siblings();
+				let i_first_new_child = new_children.len();
+				new_children.append(&mut replacements);
+				new_children.append(&mut mathml.following_siblings());
+				let parent = mathml.parent().unwrap().element().unwrap();
+				parent.replace_children(new_children);
+				return as_element(parent.children()[i_first_new_child]);
+			}
+		}
+
+		fn clean_chemistry_leaf<'a>(mathml: Element<'a>) -> Element<'a> {
+			if !(is_chemistry_off() || mathml.attribute(MAYBE_CHEMISTRY).is_some()) {
+				assert!(name(&mathml)=="mi" || name(&mathml)=="mtext");
+				if let Some(elements) = convert_leaves_to_chem_elements(mathml) {
+					// children are already marked as chemical elements
+					let elements = elements.iter().map(|&el| ChildOfElement::Element(el)).collect::<Vec<ChildOfElement>>();
+					return replace_children(mathml, elements);
 				} else {
 					let likely_chemistry = likely_chem_element(mathml);
 					if likely_chemistry >= 0 {
 						mathml.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
-					}			
+					}
 				};
 			}
+			return mathml;
 		}
 
 		/// makes sure the structure is correct and also eliminates <none/> pairs
@@ -892,6 +909,7 @@ impl CanonicalizeContext {
 			}
 		}
 
+		/// If arg is "arc" (with optional space), merge the following element in if a trig function (sibling is deleted)
 		fn merge_arc_trig(leaf: Element) -> Option<Element> {
 			assert!(is_leaf(leaf));
 			let leaf_text = as_text(leaf);
@@ -970,9 +988,9 @@ impl CanonicalizeContext {
 			return DigitBlockType::None;
 		}
 
-		/// Merge mtext that is whitespace onto preceding or following mi/mn
+		/// Merge mtext that is whitespace onto preceding or following mi/mn.
 		/// 
-		/// Note: this should be called *after* the mo/mtext cleanup (i.e., after the MathML cleanup loop)
+		/// Note: this should be called *after* the mo/mtext cleanup (i.e., after the MathML child cleanup loop).
 		fn merge_whitespace(children: &mut Vec<ChildOfElement>) {
 			let mut i = 0;
 			while i < children.len() {
@@ -1095,8 +1113,9 @@ impl CanonicalizeContext {
 			}
 		}
 
-		/// if we have something like 'shape' ABC, we split the ABC and add IMPLIED_SEPARATOR_HIGH_PRIORITY between them
-		/// under some specific conditions (trying to be a little cautious)
+		/// If we have something like 'shape' ABC, we split the ABC and add IMPLIED_SEPARATOR_HIGH_PRIORITY between them
+		/// under some specific conditions (trying to be a little cautious).
+		/// The returned (mrow) element reuses the arg so tree siblings links remain correct.
 		fn split_points(leaf: Element) -> Option<Element> {
 			lazy_static!{
 				static ref IS_UPPERCASE: Regex = Regex::new(r"^[A-Z]+$").unwrap(); 
@@ -1397,7 +1416,7 @@ impl CanonicalizeContext {
 		}
 
 		fn handle_convert_to_mmultiscripts(children: &mut Vec<ChildOfElement>) {
-  			let mut i = 1;		// want at least two children -- one to pull into base
+  			let mut i = 0;
 			while i < children.len() {
 				let child = as_element(children[i]);
 				let child_name = name(&child);
@@ -3945,7 +3964,7 @@ mod canonicalize_tests {
 		</mrow>
 	  </math>";
         let target_str = "<math>
-		<msqrt>
+		<msqrt scriptlevel='0' displaystyle='true'>
 		  <mrow data-changed='added'>
 			<munder>
 			  <mo>∑</mo>
@@ -4007,7 +4026,6 @@ mod canonicalize_tests {
 
 	#[test]
     fn pre_and_postscript_only() {
-		init_logger();
         let test_str = "<math>
 			<msub><mrow/><mn>0</mn></msub>
 			<msub><mi>F</mi><mn>1</mn></msub>
