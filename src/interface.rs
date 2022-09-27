@@ -484,10 +484,14 @@ pub fn trim_element(e: &Element) {
         for child in children {
             match child {
                 ChildOfElement::Element(e) => {
-                    make_leaf_element(e);
-                    match e.children()[0] {
-                        ChildOfElement::Text(t) => text += t.text(),
-                        _ => panic!("as_text: internal error -- make_leaf_element found non-text child"),
+                    if name(&e) == "mglyph" {
+                        text += e.attribute_value("alt").or(Some("")).unwrap();
+                    } else {
+                        make_leaf_element(e);
+                        match e.children()[0] {
+                            ChildOfElement::Text(t) => text += t.text(),
+                            _ => panic!("as_text: internal error -- make_leaf_element found non-text child"),
+                        }
                     }
                 }
                 ChildOfElement::Text(t) => text += t.text(),
@@ -677,6 +681,33 @@ mod tests {
         let whitespace_str = "<math> <mrow ><mo>-</mo><mi> a </mi></mrow ></math>";
         let comment_str = "<math><mrow><mo>-</mo><!--a comment --><mi> a </mi></mrow></math>";
         assert!(are_parsed_strs_equal(comment_str, whitespace_str));
+    }
+ 
+    #[test]
+    fn replace_mglyph() {
+        let mglyph_str = "<math>
+                <mrow>
+                    <mi>X<mglyph fontfamily='my-braid-font' index='2' alt='23braid' /></mi>
+                    <mo>+</mo>
+                    <mi>
+                        <mglyph fontfamily='my-braid-font' index='5' alt='132braid' />Y
+                    </mi>
+                    <mo>=</mo>
+                    <mi>
+                        <mglyph fontfamily='my-braid-font' index='3' alt='13braid' />
+                    </mi>
+                </mrow>
+            </math>";
+        let result_str = "<math>
+            <mrow>
+                <mi>X23braid</mi>
+                <mo>+</mo>
+                <mi>132braidY</mi>
+                <mo>=</mo>
+                <mi>13braid</mi>
+            </mrow>
+        </math>";
+    assert!(are_parsed_strs_equal(mglyph_str, result_str));
     }
  
     #[test]

@@ -1581,7 +1581,7 @@ impl CanonicalizeContext {
 		let tag_name = name(&mathml);
 		set_mathml_name(mathml, tag_name);	// add namespace
 		match tag_name {
-			"mi" | "ms" | "mtext" | "mspace" | "mglyph" => {
+			"mi" | "ms" | "mtext" | "mspace"  => {
 				self.canonicalize_plane1(mathml);
 				return Ok( mathml ); },
 			"mo" => {
