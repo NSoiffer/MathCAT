@@ -1500,7 +1500,6 @@ mod tests {
     
     #[test]
     fn ueb_highlight_24() -> Result<()> {       // issue 24
-        init_logger();
         let mathml_str = "<math display='block' id='M8o41h70-0'>
                 <mrow id='M8o41h70-1'>
                 <mn id='M8o41h70-2'>4</mn>

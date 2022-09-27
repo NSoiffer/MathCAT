@@ -79,14 +79,26 @@
     - "  following-sibling::*[1][self::m:mo and ( text()='=' or IsInDefinition(., 'SubsetOperators') )]"      # context hint
     - ")"
   replace:
-  - intent:
-      name: "interval"
-      children:
-      - x: "*[1]"           # from symbol
-      - x: "*[2]/*[1]"
-      - x: "*[2]/*[3]"
-      - x: "*[3]"           # to symbol
-
+  - test:
+    - if: "*[1][text()='('] and *[3][text()=')']"
+      then:
+      - intent:
+          name: "open-interval"
+          children: [x: "*[2]/*[1]", x: "*[2]/*[3]"]
+    - else_if: "*[1][text()='('] and *[3][text()=']']"
+      then:
+      - intent:
+          name: "open-closed-interval"
+          children: [x: "*[2]/*[1]", x: "*[2]/*[3]"]
+    - else_if: "*[1][text()='['] and *[3][text()=']']"
+      then:
+      - intent:
+          name: "closed-interval"
+          children: [x: "*[2]/*[1]", x: "*[2]/*[3]"]
+      else:
+      - intent:
+          name: "closed-open-interval"
+          children: [x: "*[2]/*[1]", x: "*[2]/*[3]"]
 
 -
   name: binomial-frac
@@ -388,6 +400,36 @@
       - x: "*"
 
 -
+  name: chemistry-prescripts
+  tag: mmultiscripts
+  match: "@data-chem-formula"
+  replace:
+  - test:
+      - if: "count(*)=4"
+        then:
+        - intent:
+            name: "chemical-nuclide"
+            children:       # typical order spoken
+            - x: "*[3]"     # pre-lower
+            - x: "*[4]"     # pre-upper
+            - x: "*[1]"     # base
+      - else_if: "count(*)=3"
+        then:
+        - intent:
+            name: "chemical-formula"
+            children:       # typical order spoken
+            - x: "*"
+        else:       # FIX: what other cases are there???
+        - intent:
+            name: "chemical-multiscript"
+            children:       
+            - x: "*"
+
+
+      
+
+
+-
   name: chemical-element
   tag: [mi]
   match: "@data-chem-element"
@@ -404,6 +446,16 @@
   replace:
   - intent:
       name: "chemical-formula-operator"
+      children:
+      - x: "text()"
+
+-
+  name: chemical-equation-op
+  tag: [mo]
+  match: "@data-chem-equation"
+  replace:
+  - intent:
+      name: "chemical-equation-operator"
       children:
       - x: "text()"
 

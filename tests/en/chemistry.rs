@@ -101,6 +101,36 @@ fn ethylene_with_colon_bond() {
 }
 
 #[test]
+fn beta_decay() {
+    let expr = "<math>
+    <mmultiscripts>
+      <mtext>C</mtext>
+      <mprescripts />
+      <mn>6</mn>
+      <mn>14</mn>
+    </mmultiscripts>
+    <mo>&#x2192;</mo>
+    <mmultiscripts>
+      <mtext>N</mtext>
+      <mprescripts />
+      <mn>7</mn>
+      <mn>14</mn>
+    </mmultiscripts>
+    <mo>+</mo>
+    <mmultiscripts>
+      <mtext>e</mtext>
+      <mprescripts />
+      <mrow>
+        <mo>&#x2212;</mo>
+        <mn>1</mn>
+      </mrow>
+      <mn>0</mn>
+    </mmultiscripts>
+  </math>";
+    test("SimpleSpeak", expr, "14 6 C decays to 14 7 N plus 0 -1 electrons");
+}
+
+#[test]
 fn hcl_na_yields() {
     let expr = "<math <mrow>
       <mn>2</mn><mi>H</mi><mi>Cl</mi><mo>+</mo><mn>2</mn><mtext>Na</mtext>

@@ -85,7 +85,64 @@ fn main() {
 //   <mi arg='b'>B</mi>
 // </mrow>
 //   </math>";
-  let expr = "<math><mi>Na</mi><mi>S</mi><mo>(</mo><mi>l</mi><mo>)</mo></math>";
+  // let expr = "<math><mi>Na</mi><mi>S</mi><mo>(</mo><mi>l</mi><mo>)</mo></math>";
+
+let expr = "<math>
+<mstyle mathcolor='#a33e00'>
+<mrow>
+    <mi>SO</mi>
+    <msub>
+    <mrow>
+        <mrow>
+        <mpadded width='0'>
+            <mphantom>
+            <mi>A</mi>
+            </mphantom>
+        </mpadded>
+        </mrow>
+    </mrow>
+    <mrow>
+        <mrow>
+        <mpadded height='0'>
+            <mn>4</mn>
+        </mpadded>
+        </mrow>
+    </mrow>
+    </msub>
+</mrow>
+</mstyle>
+</math>";
+
+//   let expr = "<math xmlns='http://www.w3.org/1998/Math/MathML'>
+//   <mstyle mathcolor='#a33e00'>
+//     <mrow>
+//       <mrow>
+//         <mi mathvariant='normal'>H</mi>
+//       </mrow>
+//       <msub>
+//         <mrow>
+//           <mrow>
+//             <mpadded width='0'>
+//               <mphantom>
+//                 <mi>A</mi>
+//               </mphantom>
+//             </mpadded>
+//           </mrow>
+//         </mrow>
+//         <mrow>
+//           <mrow>
+//             <mpadded height='0'>
+//               <mn>2</mn>
+//             </mpadded>
+//           </mrow>
+//         </mrow>
+//       </msub>
+//       <mrow>
+//         <mi mathvariant='normal'>O</mi>
+//       </mrow>
+//     </mrow>
+//   </mstyle>
+// </math>";
   let instant = Instant::now();
   let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../../Rules");
   let rules_dir = rules_dir.as_os_str().to_str().unwrap().to_string();
@@ -96,7 +153,7 @@ fn main() {
   };
 
   info!("Version = '{}'", get_version());
-  set_preference("TTS".to_string(), "ssml".to_string()).unwrap();
+  set_preference("TTS".to_string(), "none".to_string()).unwrap();
   // set_preference("Bookmark".to_string(), "true".to_string()).unwrap();
   set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
 

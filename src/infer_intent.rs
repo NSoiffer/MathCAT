@@ -483,14 +483,17 @@ mod tests {
                 </mover>
                 <mi arg='b'>B</mi>
             </mrow>";
-        let intent = "<apply-function><map> <literal>congruence</literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
+        let intent = "<apply-function>
+                    <map><literal>congruence</literal></map>
+                    <mi arg='a'>A</mi> <mi arg='b'>B</mi>
+                </apply-function>";
         assert!(test_intent(mathml, intent));
     }
 
 
     #[test]
+    #[ignore]
     fn intent_with_nested_head_and_hints() {
-        init_logger();
         let mathml = "<mrow intent='f@prefix(g@infix(x))@postfix($a,$b)'>
                 <mi arg='a'>A</mi>
                 <mover>
@@ -499,8 +502,10 @@ mod tests {
                 </mover>
                 <mi arg='b'>B</mi>
             </mrow>";
-        let intent = "<apply-function><map data-intent-hint='prefix'>
-                                <literal>congruence</literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
+        let intent = "<apply-function>
+                    <map data-intent-hint='prefix'><literal>congruence</literal></map>
+                    <mi arg='a'>A</mi> <mi arg='b'>B</mi>
+                </apply-function>";
         assert!(test_intent(mathml, intent));
     }
 

@@ -132,7 +132,7 @@
  - "£": [t: "pounds"]                              # 0xa3
  - "¬": [t: "not"]                                 # 0xac
  - "°": [t: "degrees"]                           # 0xb0
- - "±": [t: plu"s or minus"]                       # 0xb1
+ - "±": [t: "plus or minus"]                       # 0xb1
  - "´": [t: "acute"]                            # 0xb4
  - "·":
     - test:

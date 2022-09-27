@@ -23,6 +23,8 @@ use crate::definitions::DEFINITIONS;
 use regex::Regex;
 use crate::pretty_print::mml_to_string;
 use std::cell::Ref;
+use phf::phf_set;
+
 
 use crate::canonicalize::{as_element, name};
 
@@ -324,18 +326,21 @@ impl IsNode {
     }
 }
 
-const MATHML_LEAF_NODES: &[&str] = &["mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph"];
+static MATHML_LEAF_NODES: phf::Set<&str> = phf_set! {
+	"mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph",
+    "annotation", "ci", "cn", "csymbol",    // content could be inside an annotation-xml (faster to allow here than to check lots of places)
+};
+
 
 // Should mstack and mlongdiv be included here?
-// Hmm... tried using phf::Set, but rust complained about lifetime mismatch when I did MATHML_2D_NODES.contains(str)
-static MATHML_2D_NODES: &[&str] = &[
+static MATHML_2D_NODES: phf::Set<&str> = phf_set! {
     "mfrac", "msqrt", "mroot", "menclose",
     "msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts",
-    "mtable", "mtr", "mlabeledtr", "mtd"
-];
+    "mtable", "mtr", "mlabeledtr", "mtd",
+};
 
 pub fn is_leaf(element: Element) -> bool {
-    return MATHML_LEAF_NODES.contains(&name(&element));
+    return MATHML_LEAF_NODES.contains(name(&element));
 }
 
 impl Function for IsNode {
@@ -369,7 +374,7 @@ impl Function for IsNode {
                             match kind.as_str() {
                                 "simple" => IsNode::is_simple(&e),
                                 "leaf"   => MATHML_LEAF_NODES.contains(&name(&e)),
-                                "2D" => MATHML_2D_NODES.contains(&name(&e)),
+                                "2D" => MATHML_2D_NODES.contains(name(&e)),
                                 "trig_name" => IsNode::is_trig_name(&e),
                                 "common_fraction" => IsNode::is_common_fraction(&e, usize::MAX, usize::MAX), 
                                 "nemeth_punctuation" => IsNode::is_punctuation(&e),
@@ -776,8 +781,9 @@ impl IsBracketed {
         }
         let children = element.children();
         let n_children = children.len();
-        if (!left.is_empty() && !right.is_empty() && n_children < 2) ||
-           requires_comma && element.children().len() < 3 {
+        if (n_children == 0 ||
+            !left.is_empty() && !right.is_empty() && n_children < 2) ||
+            requires_comma && element.children().len() < 3 {
             // not enough argument for there to be a match
             return false;
         }
@@ -911,7 +917,7 @@ impl DistanceFromLeaf {
             if is_leaf(element) {
                 return distance;
             }
-            if treat_2d_elements_as_tokens && MATHML_2D_NODES.contains(&name(&element)) {
+            if treat_2d_elements_as_tokens && MATHML_2D_NODES.contains(name(&element)) {
                 return distance;
             }
             let children = element.children();
@@ -986,7 +992,7 @@ impl EdgeNode {
 
         // at an edge -- check to see the parent is desired root
         if parent_name == stop_node_name || 
-           (stop_node_name == "2D" && MATHML_2D_NODES.contains(&name(&parent))) {
+           (stop_node_name == "2D" && MATHML_2D_NODES.contains(name(&parent))) {
             return Some(parent);
         };
         

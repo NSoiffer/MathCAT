@@ -133,36 +133,40 @@
    - x: "*[1]"
 
 -
-   name: default-interval
-   tag: interval
+   name: open-interval
+   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
    match: "."
    replace:
    - test:
       if: "$Verbosity!='Terse'"
       then:
       - t: "the" 
-   - test:
-      if: "*[1][text()='(']"
-      then_test:
-         if: "*[4][text()=')']"
-         then: [t: "open"] 
-         else: [t: "open closed"] 
-      else_test:
-         if: "*[4][text()=')']"
-         then: [t: "closed open"] 
-         else: [t: "closed"] 
-   - t: "interval" 
+   - x: "translate(name(.),'-', ' ')"
    - test:
       if: "$Verbosity!='Terse'"
       then:
       - t: "from"
-      - x: "*[2]"
+      - x: "*[1]"
       - t: "to"
-      - x: "*[3]"
-      else:
       - x: "*[2]"
+      else:
+      - x: "*[1]"
       - t: "comma"
-      - x: "*[3]"
+      - x: "*[2]"
+
+-
+   name: default-point
+   tag: point
+   match: "."
+   replace:
+   - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "the" 
+   - t: "point"
+   - x: "*[1]"
+   - t: "comma"
+   - x: "*[2]"
 
 
 -
@@ -679,7 +683,7 @@
 
 -
    name: chemistry
-   tag: [chemical-equation, chemical-formula]
+   tag: [chemical-equation, chemical-formula, chemical-nuclide]
    match: "."
    replace:
    - x: "*"
@@ -689,7 +693,7 @@
    tag: chemical-element
    match: "."
    replace:
-   - spell: text()
+   - x: text()
 
 -
    name: chemical-state
@@ -720,4 +724,17 @@
         then: [t: "triple bond"]
       - else_if: "text()='≣'"
         then: [t: "quadruple bond"]
+        else: [x: "*"]
+
+-
+   name: chemical-equation-operator
+   tag: chemical-equation-operator
+   match: "."
+   replace:
+   # FIX: this might be better/more efficient if in unicode.yaml
+   - test:
+      - if: "text()='→'"
+        then: [t: "yields"]
+      - else_if: "text()='⇌'"
+        then: [t: "is in equilibrium with"]
         else: [x: "*"]
