@@ -130,3 +130,15 @@ fn beta_decay() {
     test("SimpleSpeak", expr, "14 6 C decays to 14 7 N plus 0 -1 electrons");
 }
 
+#[test]
+fn hcl_na_yields() {
+    let expr = "<math <mrow>
+      <mn>2</mn><mi>H</mi><mi>Cl</mi><mo>+</mo><mn>2</mn><mtext>Na</mtext>
+      <mo>&#x2192;</mo>
+      <mn>2</mn><mtext>Na</mtext><mi>Cl</mi><mo>+</mo>
+      <msub> <mi>H</mi> <mn>2</mn> </msub>
+      </mrow>
+    </math>";
+    test("SimpleSpeak", expr, "2 H C l plus 2 N a yields 2 N a C l plus H 2");
+}
+
