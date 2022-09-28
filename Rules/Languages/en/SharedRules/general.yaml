@@ -738,3 +738,10 @@
       - else_if: "text()='⇌'"
         then: [t: "is in equilibrium with"]
         else: [x: "*"]
+
+-
+   name: none
+   tag: none
+   match: "parent::*[self::m:chemical-formula or self::m:chemical-nuclide]"
+   replace:
+   - t: ""   # don't say anything
