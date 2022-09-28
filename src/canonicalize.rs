@@ -1430,7 +1430,7 @@ impl CanonicalizeContext {
 
 
 		/// Converts the script element with an empty base to mmultiscripts by sucking the base from the following or preceding element.
-		/// The following element is preferred so that these become prescripts (common usage is from TeX)
+		/// The preceding element is preferred so that these become prescripts (common usage is from TeX)
 		/// mchem has some ugly output (at least in MathJax) and that's where using the preceding element makes sense
 		fn convert_to_mmultiscripts<'a>(mrow_children: &mut Vec<ChildOfElement<'a>>, mut i: usize) -> usize {
 			// this is a bit messy/confusing because we might scan forwards or backwards and this affects whether
@@ -1443,7 +1443,7 @@ impl CanonicalizeContext {
 			debug!("convert_to_mmultiscripts -- PARENT:\n{}", mml_to_string(&parent));
 			if i > 0 {
 				let preceding = as_element(mrow_children[i -1]);
-				debug!("convert_to_mmultiscripts:\n{}", mml_to_string(&preceding));
+				debug!("convert_to_mmultiscripts -- preceding child:\n{}", mml_to_string(&preceding));
 			}
 			
 			let script_name = name(&script);
@@ -1460,7 +1460,10 @@ impl CanonicalizeContext {
 			let mut other_scripts = vec![];
 			let mut siblings;
 			let looking_for_prescripts;
-			if i == mrow_children.len()-1 {
+			let preceding_element= as_element(mrow_children[i-1]);
+			let preceding_element_name= name(&preceding_element);
+			if i == mrow_children.len()-1 ||
+			   (i > 0 && (preceding_element_name == "mi" || preceding_element_name == "mtext") ) {
 				siblings = script.preceding_siblings();
 				siblings.reverse();
 				looking_for_prescripts = false;
