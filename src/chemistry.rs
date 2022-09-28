@@ -540,7 +540,7 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
     // either one or more '+'s (or '-'s) or a number followed by +/-
     // also could be state (en.wikipedia.org/wiki/Nuclear_chemistry#PUREX_chemistry)
     lazy_static! {
-        static ref PLUS_OR_MINUS: Regex = Regex::new(r"^\++$|^-+$").unwrap(); 
+        static ref PLUS_OR_MINUS: Regex = Regex::new(r"^\++$|^-+$|^\U{2212}+$").unwrap(); 
     }
 
     let sup_name = name(&sup);
