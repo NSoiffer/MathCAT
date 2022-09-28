@@ -1266,7 +1266,6 @@ mod chem_tests {
 
     #[test]
     fn mchem_so4_with_extra_mrow() {
-        init_logger();
         let test = "<math>
             <mstyle mathcolor='#a33e00'>
             <mrow>
@@ -1304,6 +1303,87 @@ mod chem_tests {
                         <none></none>
                     </mmultiscripts>
                 </mrow>
+        </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn mchem_ions_and_state() {
+        let test = "<math>
+            <mrow>
+            <mrow>
+                <mi>Na</mi>
+            </mrow>
+            <msup>
+                <mrow>
+                <mrow>
+                    <mpadded width='0'>
+                    <mphantom>
+                        <mi>A</mi>
+                    </mphantom>
+                    </mpadded>
+                </mrow>
+                </mrow>
+                <mrow>
+                <mo>+</mo>
+                </mrow>
+            </msup>
+            <mo stretchy='false'>(</mo>
+            <mrow>
+                <mi>aq</mi>
+            </mrow>
+            <mo stretchy='false'>)</mo>
+            <mrow>
+                <mi>Cl</mi>
+            </mrow>
+            <msup>
+                <mrow>
+                <mrow>
+                    <mpadded width='0'>
+                    <mphantom>
+                        <mi>A</mi>
+                    </mphantom>
+                    </mpadded>
+                </mrow>
+                </mrow>
+                <mrow>
+                <mo>&#x2212;</mo>
+                </mrow>
+            </msup>
+            <mspace width='0.111em'></mspace>
+            <mo stretchy='false'>(</mo>
+            <mrow>
+                <mi>aq</mi>
+            </mrow>
+            <mo stretchy='false'>)</mo>
+            </mrow>
+            </math>";
+        let target = "<math>
+            <mrow data-chem-formula='14'>
+            <mmultiscripts data-chem-formula='3'>
+                <mi data-chem-element='2'>Na</mi>
+                <none></none>
+                <mo>+</mo>
+            </mmultiscripts>
+            <mo data-changed='added'>&#x2063;</mo>
+            <mrow data-changed='added' data-chem-formula='2'>
+                <mo stretchy='false'>(</mo>
+                <mi>aq</mi>
+                <mo stretchy='false'>)</mo>
+            </mrow>
+            <mo data-changed='added'>&#x2063;</mo>
+            <mmultiscripts data-chem-formula='4'>
+                <mi data-chem-element='2'>Cl</mi>
+                <none></none>
+                <mo>-</mo>
+            </mmultiscripts>
+            <mo data-changed='added'>&#x2063;</mo>
+            <mrow data-changed='added' data-chem-formula='2'>
+                <mo stretchy='false'>(</mo>
+                <mi>aq</mi>
+                <mo stretchy='false'>)</mo>
+            </mrow>
+            </mrow>
         </math>";
         assert!(are_strs_canonically_equal(test, target));
     }
