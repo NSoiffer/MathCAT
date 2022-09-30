@@ -494,9 +494,7 @@ impl CanonicalizeContext {
 				}
 			} else {
 				// create some content so that speech rules don't require special cases
-				let mtext = create_mathml_element(&mathml.document(), "mtext");
-				mtext.set_text("\u{A0}");
-				mtext.set_attribute_value("data-added", "missing-content");
+				let mtext = create_empty_element(&mathml.document());
 				mathml.append_child(mtext);
 				return Some(mathml);
 			}
@@ -530,16 +528,6 @@ impl CanonicalizeContext {
 					} else if let Some(result) = split_points(mathml) {
 						return Some(result);
 					}
-					let siblings = mathml.following_siblings();
-					if siblings.is_empty() {
-						debug!("after cleaning leaf: no following sibling)");
-					} else {
-						debug!("==after cleaning leaf:");
-						siblings.iter().for_each(|&coe| {
-							let child = as_element(coe);
-							debug!("   {}", mml_to_string(&child));
-						});
-					}	
 					return Some(mathml);
 				};
 			}
@@ -645,9 +633,8 @@ impl CanonicalizeContext {
 			},
 			"mspace" => {
 				// need to hold onto space for braille
-				// FIX: only do the conversion to non-breaking space if width is above some threshold
 				let width = mathml.attribute_value("width").unwrap_or("0");
-				if width == "0" || width.starts_with('-') {		// testing <= 0 -- could do better
+				if is_width_ignorable(width)  {		// testing <= 0 -- could do better
 					return None;
 				}
 				set_mathml_name(mathml, "mtext");
@@ -662,10 +649,7 @@ impl CanonicalizeContext {
 					presentation
 				} else {
 					// probably shouldn't happen, but just in case
-					let mtext = create_mathml_element(&mathml.document(), "mtext");
-					mtext.set_text("\u{A0}");
-					mtext.set_attribute_value("data-added", "missing-content");
-					mtext
+					create_empty_element(&mathml.document())
 				};
 				children[0] = ChildOfElement::Element(new_presentation);
 				mathml.replace_children(children);
@@ -680,15 +664,9 @@ impl CanonicalizeContext {
 					} else if children.len() == 1 {
 						if let Some(new_mathml) = self.clean_mathml( as_element(children[0]) ) {
 							// "lift" the child up so all the links (e.g., siblings) are correct
-							debug!("lifting children of mrow (before):\n{}", mml_to_string(&mathml));
 							mathml.replace_children(new_mathml.children());
 							set_mathml_name(mathml, name(&new_mathml));
 							add_attrs(mathml, new_mathml.attributes());
-							debug!("lifting children of mrow (after):\n{}", mml_to_string(&mathml));
-							if !mathml.following_siblings().is_empty() {
-								let first_sibling = as_element(mathml.following_siblings()[0]);
-								debug!("lifting children of mrow (first sibling):\n{}", mml_to_string(&first_sibling));
-							}
 							return Some(mathml);
 						} else if parent_requires_child {
 							set_mathml_name(mathml, "mtext");
@@ -724,7 +702,7 @@ impl CanonicalizeContext {
 							Some(new_child) => {
 								let new_child_name = name(&new_child);
 								children = mathml.children();				// clean_mathml(child) may have changed following siblings
-								debug!("new_child (i={})\n{}", i, mml_to_string(&new_child));
+								// debug!("new_child (i={})\n{}", i, mml_to_string(&new_child));
 								children[i] = ChildOfElement::Element(new_child);
 								mathml.replace_children(children);
 								if new_child_name == "mi" || new_child_name == "mtext" {
@@ -746,13 +724,14 @@ impl CanonicalizeContext {
 					merge_number_blocks(mathml, &mut children);
 					merge_whitespace(&mut children);
 					handle_convert_to_mmultiscripts(&mut children);
+
 				} else if element_name == "msub" || element_name == "msup" || 
 						  element_name == "msubsup" || element_name == "mmultiscripts"{
 					let mathml = if element_name == "mmultiscripts" {clean_mmultiscripts(mathml).unwrap()} else {mathml};
-					debug!("some scripted element...\n{}", mml_to_string(&mathml));	
+					// debug!("some scripted element...\n{}", mml_to_string(&mathml));	
 					if !is_chemistry_off() {
 						let likely_chemistry = likely_adorned_chem_formula(mathml);
-						debug!("likely_chemistry={}, {}", likely_chemistry, mml_to_string(&mathml));
+						// debug!("likely_chemistry={}, {}", likely_chemistry, mml_to_string(&mathml));
 						if likely_chemistry >= 0 {
 							mathml.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
 						}
@@ -766,7 +745,7 @@ impl CanonicalizeContext {
 				}
 
 				mathml.replace_children(children);
-				debug!("clean_mathml: after loop\n{}", mml_to_string(&mathml));
+				// debug!("clean_mathml: after loop\n{}", mml_to_string(&mathml));
 
 				if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 					clean_chemistry_mrow(mathml);
@@ -776,10 +755,38 @@ impl CanonicalizeContext {
 			}
 		}
 
-		fn is_empty_base(base: ChildOfElement) -> bool {
-			let base = as_element(base);
-			return (is_leaf(base) && as_text(base).trim().is_empty()) ||
-				   (name(&base) == "mrow" && base.children().is_empty());
+		/// Returns true if it appears the width is just a spacing tweak rather than really a space.
+		/// 
+		/// This is not great in that someone could have multiple 'mspace's and together they exceed the threshold, but not individually
+		fn is_width_ignorable(width: &str) -> bool {
+			// Check to see if above some threshold (0.25em/0.5ex?)
+			// FIX: this is far from complete
+			if  width == "0" || width.starts_with('-') {	// simple cases
+				return true;	
+			}
+			if let Some(i) = width.find(|ch: char| ch.is_ascii_alphabetic()) {
+				let (amount, unit) = width.split_at(i);
+				match unit {
+					"em" | "rem" => return amount.parse::<f64>().unwrap_or(100.) < 0.25,
+					"ex" => return amount.parse::<f64>().unwrap_or(100.) < 0.5,
+					"px" => return amount.parse::<f64>().unwrap_or(100.) < 6.1,	// assume 12pt font -- hack
+					_ => return false,
+				}
+			}
+			return false;
+		}
+
+
+		fn create_empty_element<'a>(doc: &Document<'a>) -> Element<'a> {
+			let mtext = create_mathml_element(doc, "mtext");
+			mtext.set_text("\u{A0}");
+			mtext.set_attribute_value("data-added", "missing-content");
+			return mtext;
+		}
+		
+		fn is_empty_element(el: Element) -> bool {
+			return (is_leaf(el) && as_text(el).trim().is_empty()) ||
+				   (name(&el) == "mrow" && el.children().is_empty());
 		}
 
 		fn replace_children<'a>(mathml: Element<'a>, mut replacements: Vec<ChildOfElement<'a>>) -> Element<'a> {
@@ -841,9 +848,7 @@ impl CanonicalizeContext {
 					let child_name = name(&child);
 					if child_name == "mprescripts" {
 						if has_misplaced_mprescripts {
-							let mtext = create_mathml_element(&mathml.document(), "mtext");
-							mtext.set_text("\u{A0}");
-							mtext.set_attribute_value("data-added", "missing-content");
+							let mtext = create_empty_element(&mathml.document());
 							new_children.push(ChildOfElement::Element(mtext));
 							has_proper_number_of_children = !has_proper_number_of_children;
 						}
@@ -1420,146 +1425,115 @@ impl CanonicalizeContext {
 			while i < children.len() {
 				let child = as_element(children[i]);
 				let child_name = name(&child);
-				if (child_name == "msub" || child_name == "msup" || child_name == "msubsup") && is_empty_base(child.children()[0]) {
+				if (child_name == "msub" || child_name == "msup" || child_name == "msubsup") && is_empty_element(as_element(child.children()[0])) {
 					i = convert_to_mmultiscripts(children, i);
 				} else {
 					i += 1;
+				}
+				if i < children.len() {
+					// let child = as_element(children[i]);
+					// debug!("convert_to_mmultiscripts i={}, len={}:\n{}", i, children.len(), mml_to_string(&child));
 				}
 			}
 		}
 
 
 		/// Converts the script element with an empty base to mmultiscripts by sucking the base from the following or preceding element.
-		/// The preceding element is preferred so that these become prescripts (common usage is from TeX)
-		/// mchem has some ugly output (at least in MathJax) and that's where using the preceding element makes sense
-		fn convert_to_mmultiscripts<'a>(mrow_children: &mut Vec<ChildOfElement<'a>>, mut i: usize) -> usize {
+		/// The following element is preferred so that these become prescripts (common usage is from TeX), but if the preceding element
+		///   has a closer mi/mtext, it is used.
+		/// mchem has some ugly output (at least in MathJax) and that's where using the following element makes sense
+		///   because an empty based (mpadded width=0) is used for the scripts
+		fn convert_to_mmultiscripts<'a>(mrow_children: &mut Vec<ChildOfElement<'a>>, i: usize) -> usize {
 			// this is a bit messy/confusing because we might scan forwards or backwards and this affects whether
 			// we are scanning for prescripts or postscripts
 			// the generic name "primary_scripts" means prescripts if going forward or postscripts if going backwards
 			// if we are going forward and hit a sub/superscript with a base, then those scripts become postscripts ("other_scripts")
 			// if we are going backwards, we never add prescripts
-			let script = as_element(mrow_children[i]);
-			let parent = script.parent().unwrap().element().unwrap();
-			debug!("convert_to_mmultiscripts -- PARENT:\n{}", mml_to_string(&parent));
-			if i > 0 {
-				let preceding = as_element(mrow_children[i -1]);
-				debug!("convert_to_mmultiscripts -- preceding child:\n{}", mml_to_string(&preceding));
-			}
+			// let parent = as_element(mrow_children[i]).parent().unwrap().element().unwrap();
+			// debug!("convert_to_mmultiscripts (i={}) -- PARENT:\n{}", i, mml_to_string(&parent));
 			
-			let script_name = name(&script);
-			let mut primary_scripts = vec![];
-			if script_name == "msub" {
-				add_pair(&mut primary_scripts, Some(script.children()[1]), None);
-			} else if script_name == "msup" {
-				add_pair(&mut primary_scripts, None, Some(script.children()[1]));
-			} else {  // msubsup
-				add_pair(&mut primary_scripts, Some(script.children()[1]), Some(script.children()[2]));
-			};
-			let mut base = script.children()[0];			// hopefully reset
+			let i_base = choose_base_of_mmultiscripts(&mrow_children, i);
+			let mut base = as_element(mrow_children[i_base]);
+			// debug!("convert_to_mmultiscripts -- base\n{}", mml_to_string(&base));
+			let base_name = name(&base);
+			let mut prescripts = vec![];
+			let mut postscripts = vec![];
+			let mut i_postscript = i_base + 1;
 
-			let mut other_scripts = vec![];
-			let mut siblings;
-			let looking_for_prescripts;
-			let preceding_element= as_element(mrow_children[i-1]);
-			let preceding_element_name= name(&preceding_element);
-			if i == mrow_children.len()-1 ||
-			   (i > 0 && (preceding_element_name == "mi" || preceding_element_name == "mtext") ) {
-				siblings = script.preceding_siblings();
-				siblings.reverse();
-				looking_for_prescripts = false;
-			} else {
-				siblings = script.following_siblings();
-				looking_for_prescripts = true;
-			};
-			let mut num_siblings_used = 0;
-			for child in siblings {
-				let child = as_element(child);
-				debug!("convert_to_mmultiscripts -- child:\n{}", mml_to_string(&child));
-				// if we haven't encountered a non-empty base yet, 'postscripts' is empty
-				//   in that case, just keep adding primary_scripts, otherwise, add to postscripts
-				// if we encounter a non empty base:
-				//   1. if we haven't seen this before (i.e, 'postscripts' is empty), we set the base
-				//   2. we are done -- create the mmultiscripts
-				let script_children = child.children();
-				child.remove_from_parent();
-				num_siblings_used += 1;			
-				match name(&child) {
-					"msub" => {
-						if is_empty_base(script_children[0]) {
-							add_pair( &mut primary_scripts, Some(script_children[1]), None);
-						} else {
-							base = script_children[0];
-							add_pair( if looking_for_prescripts {&mut other_scripts} else {&mut primary_scripts}, Some(script_children[1]), None);
-							break;
-						}
-					},
-					"msup" => {
-						if is_empty_base(script_children[0]) {
-							add_pair(&mut primary_scripts, None, Some(script_children[1]));
-						} else {
-							base = script_children[0];
-							add_pair(if looking_for_prescripts {&mut other_scripts} else {&mut primary_scripts}, None, Some(script_children[1]));
-							break;
-						}
-					},
-					"msubsup" => {
-						if is_empty_base(script_children[0]) {
-							add_pair(&mut primary_scripts, Some(script.children()[1]), Some(script.children()[2]));
-						} else {
-							base = script_children[0];
-							add_pair(if looking_for_prescripts {&mut other_scripts} else {&mut primary_scripts}, Some(script.children()[1]), Some(script.children()[2]));
-							break;
-						}
-					},
-					// FIX: add mmultiscripts case (seems ugly)
-					"mo" => {
-						if child.attribute(CHANGED_ATTR).is_none() {	// ignore added (invisible) ops
-							base = ChildOfElement::Element(child);			// have now found base
-							break;
-						}
-					}
-					_ => {
-						base = ChildOfElement::Element(child);			// have now found base
+			if (base_name == "msub" || base_name == "msup" || base_name == "msubsup") &&
+			   !is_empty_element(as_element(base.children()[0])) {
+				// if the base is a script element, then we want the base of that to be the base of the mmultiscripts
+				let mut base_children = base.children();
+				let script_base = as_element(base.children()[0]);
+				base_children[0] = ChildOfElement::Element(create_empty_element(&base.document()));
+				base.replace_children(base_children);
+				add_to_scripts(base, &mut postscripts);
+				base = script_base;
+			}
+
+			if i_base > i {
+				// we have prescripts -- gather them up
+				for i_prescript in i..i_base {
+					let script = as_element(mrow_children[i_prescript]);
+					if !add_to_scripts(script, &mut prescripts) {
 						break;
-					},
-				};
-			}
-			set_mathml_name(script, "mmultiscripts");
-			let mut num_children = 1 + primary_scripts.len();
-			if looking_for_prescripts && !primary_scripts.is_empty() {
-				num_children += 1 + other_scripts.len();		// '1' -- mprescripts ('other_scripts' are postscripts)
-			}
-			let mut children = Vec::with_capacity(num_children);
-			children.push(base);
-			if looking_for_prescripts {
-				children.append(&mut other_scripts);
-				if !primary_scripts.is_empty() {
-					children.push( ChildOfElement::Element( create_mathml_element(&script.document(), "mprescripts") ) );
-					children.append(&mut primary_scripts);	
+					}
 				}
-			} else {
-				if primary_scripts.len() > 2 {
-					// need to reverse sub/super pairs
-					primary_scripts = primary_scripts.chunks(2).rev().flatten().map(|&e| e).collect::<Vec<ChildOfElement>>();
-				}
-				
-				children.append(&mut primary_scripts)
 			}
-			script.replace_children(children);
+
+			// gather up the postscripts (if any)
+			while i_postscript < mrow_children.len() {
+				let script = as_element(mrow_children[i_postscript]);
+				if !add_to_scripts(script, &mut postscripts) {
+					break;
+				}
+				i_postscript += 1;
+			}
+
+			let i_returned = if i_base < i {i_base} else {i};
+			let script = create_mathml_element(&base.document(), "mmultiscripts");
+			let mut num_children = 1 + postscripts.len();
+			if !prescripts.is_empty() {
+				num_children += 1 + prescripts.len();
+			}
+			let mut new_children = Vec::with_capacity(num_children);
+			new_children.push(ChildOfElement::Element(base));
+			new_children.append(&mut postscripts);
+			if !prescripts.is_empty() {
+				new_children.push( ChildOfElement::Element( create_mathml_element(&script.document(), "mprescripts") ) );
+				new_children.append(&mut prescripts);
+			}
+
+			script.replace_children(new_children);
+			mrow_children[i_returned] = ChildOfElement::Element(script);
+			mrow_children.drain(i_returned+1..i_postscript);	// remove children after the first
+
 			let likely_chemistry = likely_adorned_chem_formula(script);
 			if likely_chemistry >= 0 {
 				script.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
 			}
 
+			// debug!("convert_to_mmultiscripts -- converted script:\n{}", mml_to_string(&script));
+			return i_returned;
+		}
 
-			debug!("convert_to_mmultiscripts -- converted script:\n{}", mml_to_string(&script));
-			if looking_for_prescripts {
-				mrow_children.drain(i+1..i+1+num_siblings_used);
-			} else {
-				mrow_children.drain(i-num_siblings_used..i);
-				i -= num_siblings_used;
+		fn add_to_scripts<'a>(el: Element<'a>, scripts: &mut Vec<ChildOfElement<'a>>) -> bool {
+			let script_name = name(&el);
+			if (script_name == "msub" || script_name == "msup" || script_name == "msubsup") &&
+			   !is_empty_element(as_element(el.children()[0])) {
+				return false;
 			}
-			return i;
+			if script_name == "msub" {
+				add_pair(scripts, Some(el.children()[1]), None);
+			} else if script_name == "msup" {
+				add_pair(scripts, None, Some(el.children()[1]));
+			} else if script_name ==  "msubsup" {
+				add_pair(scripts, Some(el.children()[1]), Some(el.children()[2]));
+			} else {
+				error!("add_to_scripts: non-script element while trying to build mmultiscripts");
+				return false;
+			};
+			return true;
 		}
 
 		fn add_pair<'v, 'a:'v>(script_vec: &'v mut Vec<ChildOfElement<'a>>, subscript: Option<ChildOfElement<'a>>, superscript: Option<ChildOfElement<'a>>) {
@@ -1577,6 +1551,50 @@ impl CanonicalizeContext {
 			};
 			script_vec.push(subscript);
 			script_vec.push(superscript);
+		}
+
+		/// Find the closest likely base to the 'i'th child, preferring the next one over the preceding one, but want the closest
+		/// We already know there are no empty scripts to the left (because we find first empty base from left to right).
+		/// However, there may be some empty bases before we get to real base on the right.
+		fn choose_base_of_mmultiscripts(mrow_children: &[ChildOfElement], i: usize) -> usize {
+			if mrow_children.len() > i+1 {
+				if is_child_simple_base(mrow_children[i+1]) {
+					return i+1;
+				}
+			}
+			if i > 0 {
+				if is_child_simple_base(mrow_children[i-1]) {
+					return i-1;
+				}
+			}
+
+			// base very likely after multiple scripts to the right
+			for i_base in i+1..mrow_children.len() {
+				if is_child_simple_base(mrow_children[i_base]) {
+						return i_base;
+				} else {
+					let child = as_element(mrow_children[i_base]);
+					let child_name = name(&child);
+					if !(child_name == "msub" || child_name == "msup" || child_name == "msubsup") {
+						break;
+					}
+				}
+			}
+			// didn't find any good candidates for a base -- pick something valid
+			assert!(mrow_children.len() > i);
+			return i;
+			
+			
+			fn is_child_simple_base(child: ChildOfElement) -> bool {
+				let mut child = as_element(child);
+				let mut child_name = name(&child);
+				if child_name == "msub" || child_name == "msup" || child_name == "msubsup" {
+					child = as_element(child.children()[0]);
+					child_name = name(&child);
+				}
+
+				return child_name == "mi" || child_name == "mtext";
+			}
 		}
 	}
 
@@ -4029,6 +4047,7 @@ mod canonicalize_tests {
 
 	#[test]
     fn pre_and_postscript_only() {
+		init_logger();
         let test_str = "<math>
 			<msub><mrow/><mn>0</mn></msub>
 			<msub><mi>F</mi><mn>1</mn></msub>
