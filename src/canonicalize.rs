@@ -3651,7 +3651,7 @@ mod canonicalize_tests {
 				</mroot></math>";
         let target_str = "<math><mroot>
 				<mi>b</mi>
-				<mtext>&#xA0;</mtext>
+				<mtext data-changed='empty_content'>&#xA0;</mtext>
 			</mroot></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
