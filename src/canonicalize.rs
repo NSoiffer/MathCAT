@@ -479,16 +479,14 @@ impl CanonicalizeContext {
 			if !parent_requires_child {
 				return None;
 			}
-			mathml.set_text("\u{A0}");
+			make_empty_element(mathml);
 		};
 		
 		if mathml.children().is_empty() && !EMPTY_ELEMENTS.contains(element_name) {
 			if element_name == "mrow" {
 				// if it is an empty mrow that doesn't need to be there, get rid of it. Otherwise, replace it with an mtext
 				if parent_requires_child {
-					set_mathml_name(mathml, "mtext");
-					mathml.set_text("\u{A0}");
-					return Some(mathml);
+					return Some( make_empty_element(mathml) );
 				} else {
 					return None;
 				}
@@ -555,7 +553,7 @@ impl CanonicalizeContext {
 				let mathml = mathml;
 				if IS_WHITESPACE.is_match(text) {
 					// normalize to just a single non-breaking space
-					mathml.set_text("\u{A0}");
+					make_empty_element(mathml);
 				}
 				return if parent_requires_child || !text.is_empty() {Some(mathml)} else {None};
 			},
@@ -607,10 +605,7 @@ impl CanonicalizeContext {
 						return Some(mathml);
 					} else if parent_requires_child {
 						// need a placeholder -- make it empty mtext
-						mathml.clear_children();
-						set_mathml_name(mathml, "mtext");
-						mathml.set_text("\u{A0}");
-						return Some(mathml);
+						return Some( make_empty_element(mathml));
 					} else {
 						return None;
 					}
@@ -623,10 +618,7 @@ impl CanonicalizeContext {
 			},
 			"mphantom" | "malignmark" | "maligngroup"=> {
 				if parent_requires_child {
-					set_mathml_name(mathml, "mtext");
-					mathml.clear_children();
-					mathml.set_text("\u{A0}");
-					return Some(mathml);
+					return Some( make_empty_element(mathml));
 				} else {
 					return None;
 				}
@@ -637,9 +629,7 @@ impl CanonicalizeContext {
 				if is_width_ignorable(width)  {		// testing <= 0 -- could do better
 					return None;
 				}
-				set_mathml_name(mathml, "mtext");
-				mathml.set_text("\u{A0}");
-				return Some(mathml);
+				return Some( make_empty_element(mathml));
 			},
 			"semantics" => {
 				// clean the presentation child but leave the annotations in case they want to be used by the rules.
@@ -669,10 +659,7 @@ impl CanonicalizeContext {
 							add_attrs(mathml, new_mathml.attributes());
 							return Some(mathml);
 						} else if parent_requires_child {
-							set_mathml_name(mathml, "mtext");
-							mathml.clear_children();
-							mathml.set_text("\u{A0}");
-							return Some(mathml);
+							return Some( make_empty_element(mathml));
 						} else {
 							return None;
 						}
@@ -777,6 +764,14 @@ impl CanonicalizeContext {
 		}
 
 
+		fn make_empty_element<'a>(mathml: Element<'a>) -> Element<'a> {
+			set_mathml_name(mathml, "mtext");
+			mathml.clear_children();
+			mathml.set_text("\u{A0}");
+			mathml.set_attribute_value("data-changed", "empty_content");
+			return mathml;
+		}
+		
 		fn create_empty_element<'a>(doc: &Document<'a>) -> Element<'a> {
 			let mtext = create_mathml_element(doc, "mtext");
 			mtext.set_text("\u{A0}");
@@ -1430,10 +1425,6 @@ impl CanonicalizeContext {
 				} else {
 					i += 1;
 				}
-				if i < children.len() {
-					// let child = as_element(children[i]);
-					// debug!("convert_to_mmultiscripts i={}, len={}:\n{}", i, children.len(), mml_to_string(&child));
-				}
 			}
 		}
 
@@ -1454,7 +1445,7 @@ impl CanonicalizeContext {
 			
 			let i_base = choose_base_of_mmultiscripts(&mrow_children, i);
 			let mut base = as_element(mrow_children[i_base]);
-			// debug!("convert_to_mmultiscripts -- base\n{}", mml_to_string(&base));
+			debug!("convert_to_mmultiscripts -- base\n{}", mml_to_string(&base));
 			let base_name = name(&base);
 			let mut prescripts = vec![];
 			let mut postscripts = vec![];
@@ -1513,7 +1504,7 @@ impl CanonicalizeContext {
 				script.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
 			}
 
-			// debug!("convert_to_mmultiscripts -- converted script:\n{}", mml_to_string(&script));
+			debug!("convert_to_mmultiscripts -- converted script:\n{}", mml_to_string(&script));
 			return i_returned;
 		}
 
@@ -3633,8 +3624,8 @@ mod canonicalize_tests {
 					<mtext>&#x2009;</mtext>
 				</mfrac></math>";
         let target_str = " <math> <mfrac>
-		  <mtext width='3em'> </mtext>
-		  <mtext> </mtext>
+		  <mtext width='3em' data-changed='empty_content'> </mtext>
+		  <mtext data-changed='empty_content'> </mtext>
 		</mfrac> </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
@@ -4047,7 +4038,6 @@ mod canonicalize_tests {
 
 	#[test]
     fn pre_and_postscript_only() {
-		init_logger();
         let test_str = "<math>
 			<msub><mrow/><mn>0</mn></msub>
 			<msub><mi>F</mi><mn>1</mn></msub>
