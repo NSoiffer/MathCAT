@@ -94,4 +94,23 @@ fn prime() {
     test("SimpleSpeak", expr, "x prime,");
 }
 
+#[test]
+fn simple_msubsup() {
+    init_logger();
+    let expr = "<math>
+            <mstyle displaystyle='true' scriptlevel='0'>
+            <msubsup>
+                <mi>x</mi>
+                <mrow>
+                <mi>k</mi>
+                </mrow>
+                <mrow>
+                <mi>i</mi>
+                </mrow>
+            </msubsup>
+            </mstyle>
+        </math>";
+    test("ClearSpeak", expr, "x sub k to the i-th power");
+}
+
 

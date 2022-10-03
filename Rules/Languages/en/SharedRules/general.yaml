@@ -201,6 +201,15 @@
       - bookmark: "./@id"
       - t: "positive"
       - x: "*[1]"
+
+-
+   name: subscript
+   tag: sub
+   match: "."
+   replace:
+      - x: "*[1]"
+      - t: "sub"
+      - x: "*[2]"
                
 -
    name: bigop-both

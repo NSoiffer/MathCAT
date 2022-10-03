@@ -504,7 +504,7 @@
       name: "power"
       children:
       - intent:
-          name: "msub"
+          name: "sub"
           children:
             - x: "*[1]"
             - x: "*[2]"
