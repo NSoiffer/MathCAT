@@ -96,7 +96,6 @@ fn prime() {
 
 #[test]
 fn simple_msubsup() {
-    init_logger();
     let expr = "<math>
             <mstyle displaystyle='true' scriptlevel='0'>
             <msubsup>
