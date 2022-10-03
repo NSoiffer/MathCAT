@@ -1894,8 +1894,10 @@
  - "⌳": [t: slope]                               # 0x2333
  - "⌴": [t: counterbore]                         # 0x2334
  - "⌵": [t: countersink]                         # 0x2335
- - "⍰": [t: unknown box]                         # 0x2370
- - "⎕": [t: box]                                 # 0x2395
+ - "⍰": [t: unknown box]                        # 0x2370
+ - "⎕": [t: box]                                # 0x2395
+ - "⏞": [t: top brace]                           # 0x23DE
+ - "⏟": [t: bottom brace]                        # 0x23DF
  - "①": [t: circled one]                         # 0x2460
  - "②": [t: circled two]                         # 0x2461
  - "③": [t: circled three]                       # 0x2462
