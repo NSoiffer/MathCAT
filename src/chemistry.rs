@@ -1002,6 +1002,50 @@ mod chem_tests {
     }
 
     #[test]
+    fn mhchem_water() {
+        let test = "<math>
+            <mrow>
+            <mrow>
+                <mi mathvariant='normal'>H</mi>
+            </mrow>
+            <msub>
+                <mrow>
+                <mrow>
+                    <mpadded width='0'>
+                    <mphantom>
+                        <mi>A</mi>
+                    </mphantom>
+                    </mpadded>
+                </mrow>
+                </mrow>
+                <mrow>
+                <mrow>
+                    <mpadded height='0'>
+                    <mn>2</mn>
+                    </mpadded>
+                </mrow>
+                </mrow>
+            </msub>
+            <mrow>
+                <mi mathvariant='normal'>O</mi>
+            </mrow>
+            </mrow>
+        </math>";
+        let target = "<math>
+            <mrow data-chem-formula='3'>
+            <mmultiscripts data-chem-formula='1'>
+                <mi mathvariant='normal' data-chem-element='1'>H</mi>
+                <mn height='0'>2</mn>
+                <none></none>
+            </mmultiscripts>
+            <mo data-changed='added'>&#x2063;</mo>
+            <mi mathvariant='normal' data-chem-element='1'>O</mi>
+            </mrow>
+        </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
     fn carbon() {
         let test = "<math><mi>C</mi></math>";     // not enough to trigger recognition
         let target = " <math>

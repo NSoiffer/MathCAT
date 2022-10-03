@@ -25,6 +25,8 @@ pub const ADDED_ATTR_VALUE: &str = "added";
 pub const OPERATOR_OVERRIDE: &str ="data-operator";
 pub const HIGH_PRIORITY_OPERATOR: &str = "\u{F8FF}";	// this should be in-sync with last value in "operator-info.in"
 
+const MHCHEM_HACK: &str = "MHCHEM_HACK";
+
 // (perfect) hash of operators built from MathML's operator dictionary
 static OPERATORS: phf::Map<&str, OperatorInfo> = include!("operator-info.in");
 
@@ -652,14 +654,19 @@ impl CanonicalizeContext {
 					if children.is_empty() {
 						return if parent_requires_child {Some(mathml)} else {None};
 					} else if children.len() == 1 {
-						if let Some(new_mathml) = self.clean_mathml( as_element(children[0]) ) {
+						let is_from_mhchem = is_from_mhchem_hack(mathml);
+						if let Some(new_mathml) = self.clean_mathml(as_element(children[0])) {
 							// "lift" the child up so all the links (e.g., siblings) are correct
 							mathml.replace_children(new_mathml.children());
 							set_mathml_name(mathml, name(&new_mathml));
 							add_attrs(mathml, new_mathml.attributes());
 							return Some(mathml);
 						} else if parent_requires_child {
-							return Some( make_empty_element(mathml));
+							let empty = make_empty_element(mathml);
+							if is_from_mhchem {
+								empty.set_attribute_value(MHCHEM_HACK, "true");
+							}
+							return Some(empty);
 						} else {
 							return None;
 						}
@@ -740,6 +747,38 @@ impl CanonicalizeContext {
 				self.assure_nary_tag_has_mrow(mathml);
 				return Some(mathml);				
 			}
+		}
+
+		// Returns true if it detects that this is likely coming from mhchem (msub/msup with mrow/mrow/mpadded width=0/mphantom/mi=A)
+		// This should be called with 'mrow' being the outer mrow
+		fn is_from_mhchem_hack(mrow: Element) -> bool {
+			assert_eq!(name(&mrow), "mrow");
+			assert_eq!(mrow.children().len(), 1);
+			let parent = mrow.parent().unwrap().element().unwrap();
+			let parent_name = name(&parent);
+			if !(parent_name == "msub" || parent_name == "msup") {
+				return false;
+			}
+
+			let mrow = as_element(mrow.children()[0]);
+			if !(name(&mrow) == "mrow" && mrow.children().len() == 1) {
+				return false;
+			}
+			let child = as_element(mrow.children()[0]);
+			if !(name(&child) == "mpadded" && child.attribute("width").is_some()) {
+				return false;
+			}
+			if child.attribute_value("width").unwrap() != "0" {
+				return false;
+			}
+
+			let child = as_element(child.children()[0]);
+			if !(name(&child) == "mphantom" && child.children().len() == 1) {
+				return false;
+			}
+
+			let child = as_element(child.children()[0]);
+			return name(&child) == "mi" && as_text(child) == "A";
 		}
 
 		/// Returns true if it appears the width is just a spacing tweak rather than really a space.
@@ -1432,8 +1471,8 @@ impl CanonicalizeContext {
 		/// Converts the script element with an empty base to mmultiscripts by sucking the base from the following or preceding element.
 		/// The following element is preferred so that these become prescripts (common usage is from TeX), but if the preceding element
 		///   has a closer mi/mtext, it is used.
-		/// mchem has some ugly output (at least in MathJax) and that's where using the following element makes sense
-		///   because an empty based (mpadded width=0) is used for the scripts
+		/// mhchem has some ugly output (at least in MathJax) and that's where using the following element makes sense
+		///   because an empty based (mpadded width=0) is used for the scripts. A hacky attribute indicates this case.
 		fn convert_to_mmultiscripts<'a>(mrow_children: &mut Vec<ChildOfElement<'a>>, i: usize) -> usize {
 			// this is a bit messy/confusing because we might scan forwards or backwards and this affects whether
 			// we are scanning for prescripts or postscripts
@@ -1548,7 +1587,9 @@ impl CanonicalizeContext {
 		/// We already know there are no empty scripts to the left (because we find first empty base from left to right).
 		/// However, there may be some empty bases before we get to real base on the right.
 		fn choose_base_of_mmultiscripts(mrow_children: &[ChildOfElement], i: usize) -> usize {
-			if mrow_children.len() > i+1 {
+			let script_element_base = as_element(as_element(mrow_children[i]).children()[0]);
+			let from_mchem = script_element_base.attribute(MHCHEM_HACK).is_some();
+			if mrow_children.len() > i+1 && !(from_mchem && i > 0) {
 				if is_child_simple_base(mrow_children[i+1]) {
 					return i+1;
 				}
