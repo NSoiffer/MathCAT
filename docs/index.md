@@ -32,9 +32,9 @@ Timeline (Starting 2020):
 * ✓ May: Release MathCAT as NVDA add-on
 * ✓ June: C/C++ interface for MathCAT
 * ✓ Late spring/summer: develop GUI interface for setting user preferences
-* June/July: Add Chemistry-specific speech
-* July: vacation 😎
-* Aug/Sept: work on UEB->MathML translation and explore UEB->Nemeth math translator
+* ✓ June/July: Add Chemistry-specific speech
+* July/Aug: vacation 😎
+* Sept: work on UEB->MathML translation and explore UEB->Nemeth math translator
 * Fall: potentially work on 2D Nemeth generation along with Nemeth input
 * Nov/Dec: Work on at least one translation of MathCAT to another language (pushed back from late spring)
 * Winter, Spring: work with translators to hopefully add many languages
@@ -42,7 +42,7 @@ Timeline (Starting 2020):
 
 These plans are very tentative and will likely change based on feedback from users and AT developers.
 I also have commitments for working on the MathML spec, so that can also delay some of these dates.
-A broken ankle also slowed me down considerably in the spring.
+A broken ankle also slowed me down considerably in the spring and summer.
 
 # Documentation for different MathCAT Users
 
@@ -92,8 +92,9 @@ Rust is quite efficient. On a Core I7-770K machine (higher end processor circa 2
     </msup>
   </mrow>
 </math>
-takes about 1ms to generate the ClearSpeak string
+takes about 4ms to generate the ClearSpeak string
 "_e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren squared, end exponent_" along with the Nemeth braille string "⠑⠘⠤⠹⠂⠌⠆⠼⠈⠡⠷⠹⠭⠤⠨⠍⠌⠨⠎⠼⠾⠘⠘⠆".
+This time is split approximately: 2ms to cleanup the MathML + 1ms for speech generation + 1ms for braille generation.
 The MathML for this expression is:
 ```
 <math>
@@ -132,7 +133,7 @@ The MathML for this expression is:
 ```
 
 MathCAT uses external rules to generate speech and braille.
-These take about 35ms to load; this load only happens the first time the rules are used, or if the speech style, language, or other external preference is changed. An additional 50ms are required to load the full Unicode files for speech and braille,
+These take about 45ms to load; this load only happens the first time the rules are used, or if the speech style, language, or other external preference is changed. An additional 50ms are required to load the full Unicode files for speech and braille,
 but studies have shown that a vast majority of English K-14 math material uses a surprisingly few number of characters.
 Using open source math books, the initial load should cover at least 99.99% of the characters used in expressions encountered in English K-14 math textbooks.
 
