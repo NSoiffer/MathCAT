@@ -38,12 +38,14 @@ fn test_005() {
 
 #[test]
 fn test_006() {
-    let expr = "<math><mn>100</mn><mo>,</mo><mn>200</mn><mo>,</mo><mn>300</mn></math>";
+    // modified to add space as in number_list_8_b_2
+    let expr = "<math><mn>100</mn><mo>,</mo><mtext>&#xA0;</mtext><mn>200</mn><mo>,</mo><mtext>&#xA0;</mtext><mn>300</mn></math>";
     test_braille("Nemeth", expr, "⠼⠂⠴⠴⠠⠀⠼⠆⠴⠴⠠⠀⠼⠒⠴⠴");
 }
 
 #[test]
 fn test_007() {
+    // number_8_c_5
     let expr = "<math><mn>.35</mn></math>";
     test_braille("Nemeth", expr, "⠼⠨⠒⠢");
 }
@@ -141,13 +143,15 @@ fn test_022() {
 
 #[test]
 fn test_023() {
-    let expr = "<math><mtext>“</mtext><mn>3</mn><mtext>&#xA0;dogs”</mtext></math>";
+    // (modified to be a single mtext) 9_b_1
+    let expr = "<math><mtext>“3&#xA0;dogs”</mtext></math>";
     test_braille("Nemeth", expr, "⠦⠼⠒⠀⠙⠕⠛⠎⠴");
 }
 
 #[test]
 fn test_024() {
-    let expr = "<math><mtext>Probability</mtext><mo>--</mo><mn>0</mn></math>";
+    // 9_b_2 -- changed dash to be char that outputs the appropriate Nemeth
+    let expr = "<math><mtext>Probability</mtext><mo>—</mo><mn>0</mn></math>";
     test_braille("Nemeth", expr, "⠠⠏⠗⠕⠃⠁⠃⠊⠇⠊⠞⠽⠤⠤⠼⠴");
 }
 

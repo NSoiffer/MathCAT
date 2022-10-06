@@ -295,7 +295,7 @@
  - "÷": [t: "⠨⠌"]               # 0x00F7 (Division sign)
       # rule 43b about spaces (references rule 42)
       # tests are ugly because an invisible times might have been inserted and we need to skip that
- - "—": [t: "⠤⠤"]               # 0x2014 (Em dash)
+ - "—": [t: "P⠤⠤"]               # 0x2014 (Em dash)
  - "―":                          # 0x2015 (Horizontal bar)
     - test:
         if:
