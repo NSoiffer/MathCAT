@@ -70,11 +70,14 @@
   match: 
     - "count(*)=3 and "
        # FIX: consider adding ]...[ versions
-    - "(*[1][text()='(' or text()='[']) and (*[3][text()=')' or text()=']']) and"   # match bracketing
-    - "not(IsBracketed(., '(', ')')) and"
-    - "*[2][count(*)=3 and *[2][text()=',']] and"                                   # inside should have ','
+    - "(*[1][text()='(' or text()='['] and *[3][text()=')' or text()=']']) and"   # match bracketing
+    - "(*[2][count(*)=3 and *[2][text()=',']]) and"                               # inside should have ','
       # FIX: if both the first and third children of *[2] are mn, then make sure first <= third
     - "("
+    - "  not(IsBracketed(., '(', ')')) or "                                                                   # not (.,.) is less ambiguous
+    - "  $ClearSpeak_Paren = 'Interval' or "                                                                  # pref is set
+    - " *[2]/*[1][contains(., '∞')] or "                                                                      # starts with infinity
+    - " *[2]/*[3][contains(., '∞')] or "                                                                      # ends with infinity
     - "  preceding-sibling::*[1][self::m:mo and ( text()='=' or IsInDefinition(., 'SubsetOperators') )] or "  # context hint
     - "  following-sibling::*[1][self::m:mo and ( text()='=' or IsInDefinition(., 'SubsetOperators') )]"      # context hint
     - ")"
@@ -405,29 +408,19 @@
   match: "@data-chem-formula"
   replace:
   - test:
-      - if: "count(*)=4"
+      - if: "count(*)=4 or count(*)=6"
         then:
         - intent:
             name: "chemical-nuclide"
             children:       # typical order spoken
-            - x: "*[3]"     # pre-lower
-            - x: "*[4]"     # pre-upper
+            - x: "*[4]"     # pre-lower
+            - x: "*[3]"     # pre-upper
             - x: "*[1]"     # base
-      - else_if: "count(*)=3"
-        then:
-        - intent:
-            name: "chemical-formula"
-            children:       # typical order spoken
-            - x: "*"
         else:       # FIX: what other cases are there???
         - intent:
-            name: "chemical-multiscript"
+            name: "chemical-formula"
             children:       
             - x: "*"
-
-
-      
-
 
 -
   name: chemical-element
@@ -442,7 +435,7 @@
 -
   name: chemical-formula-op
   tag: [mo]
-  match: "@data-chem-formula"
+  match: "@data-chem-formula-op"
   replace:
   - intent:
       name: "chemical-formula-operator"
@@ -452,7 +445,7 @@
 -
   name: chemical-equation-op
   tag: [mo]
-  match: "@data-chem-equation"
+  match: "@data-chem-equation-op"
   replace:
   - intent:
       name: "chemical-equation-operator"

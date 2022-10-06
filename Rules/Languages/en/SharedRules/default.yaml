@@ -130,10 +130,12 @@
     # FIX: this could use more special cases 
     name: default
     tag: mmultiscripts
-    variables:
-    - Prescripts: "m:mprescripts/following-sibling::*"
-    - Postscripts: "*[position()>1 and position() < (last()+1-count($Prescripts))]"
     match: "."
+    variables:
+    # computing the number of postscripts is messy because of <mprescripts> being optionally present -- we use "mod" to get the count right
+    - Prescripts: "m:mprescripts/following-sibling::*"
+    - NumChildren: "count(*)"       # need to stash this since the count is wrong inside '*[...]' below
+    - Postscripts: "*[position()>1 and position() < (last() + ($NumChildren mod 2) -count($Prescripts))]"
     replace: 
     - x: "*[1]"
     - test:

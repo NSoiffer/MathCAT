@@ -133,7 +133,7 @@
    - x: "*[1]"
 
 -
-   name: open-interval
+   name: intervals
    tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
    match: "."
    replace:
@@ -702,7 +702,7 @@
    tag: chemical-element
    match: "."
    replace:
-   - x: text()
+   - spell: text()
 
 -
    name: chemical-state
@@ -733,7 +733,7 @@
         then: [t: "triple bond"]
       - else_if: "text()='≣'"
         then: [t: "quadruple bond"]
-        else: [x: "*"]
+        else: [x: text()]
 
 -
    name: chemical-equation-operator
@@ -742,11 +742,14 @@
    replace:
    # FIX: this might be better/more efficient if in unicode.yaml
    - test:
-      - if: "text()='→'"
-        then: [t: "yields"]
+      - if: "text()='→' or text()='⟶'"
+        then_test:
+         if: "name(preceding-sibling::*[1]) = 'chemical-nuclide'"
+         then: [t: "decays to"]
+         else: [t: "yields"]
       - else_if: "text()='⇌'"
         then: [t: "is in equilibrium with"]
-        else: [x: "*"]
+        else: [x: text()]
 
 -
    name: none
