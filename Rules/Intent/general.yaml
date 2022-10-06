@@ -456,7 +456,7 @@
   name: chemistry-state
   tag: mrow
   match:
-    - "@data-chem-formula and"
+    - "(@data-chem-formula or @data-chem-equation) and"
     - "IsBracketed(., '(', ')') and"
     - "*[2][text()='s' or text()='l' or text()='g' or text()='aq']"
   replace:

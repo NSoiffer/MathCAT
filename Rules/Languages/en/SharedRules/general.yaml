@@ -710,11 +710,11 @@
    match: "."
    replace:
    - test:
-      - if: "text()='s'"
+      - if: ".='s'"
         then: [t: "as solid"]
-      - else_if: "text()='l'"
+      - else_if: ".='l'"
         then: [t: "as liquid"]
-      - else_if: "text()='g'"
+      - else_if: ".='g'"
         then: [t: "as gas"]
         else: [t: "dissolved in water"] # (aq)
 
