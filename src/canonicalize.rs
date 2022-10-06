@@ -25,7 +25,7 @@ pub const ADDED_ATTR_VALUE: &str = "added";
 pub const OPERATOR_OVERRIDE: &str ="data-operator";
 pub const HIGH_PRIORITY_OPERATOR: &str = "\u{F8FF}";	// this should be in-sync with last value in "operator-info.in"
 
-const MHCHEM_HACK: &str = "MHCHEM_HACK";
+const MHCHEM_MMULTISCRIPTS_HACK: &str = "MHCHEM_SCRIPT_HACK";
 
 // (perfect) hash of operators built from MathML's operator dictionary
 static OPERATORS: phf::Map<&str, OperatorInfo> = include!("operator-info.in");
@@ -464,6 +464,7 @@ impl CanonicalizeContext {
 		};
 		
 		// begin by cleaning up empty elements
+		debug!("clean_mathml\n{}", mml_to_string(&mathml));
 		let element_name = name(&mathml);
 		let parent_requires_child = 
 			if element_name == "math" {
@@ -496,7 +497,7 @@ impl CanonicalizeContext {
 				// create some content so that speech rules don't require special cases
 				let mtext = create_empty_element(&mathml.document());
 				mathml.append_child(mtext);
-				return Some(mathml);
+				// return Some(mathml);
 			}
 		};
 
@@ -597,7 +598,14 @@ impl CanonicalizeContext {
 				// Throw out mstyle and mpadded -- to do this, we need to avoid mstyle being the arg of clean_mathml
 				// FIX: should probably push the attrs down to the children (set in 'self')
 				let children = mathml.children();
-				if children.len() == 1 {
+				if children.is_empty() {
+					if parent_requires_child {
+						// need a placeholder -- make it empty mtext
+						return Some( make_empty_element(mathml));
+					} else {
+						return None;
+					}
+				} else if children.len() == 1 {
 					// "lift" the child up so all the links (e.g., siblings) are correct
 					if let Some(new_mathml) = self.clean_mathml( as_element(children[0]) ) {
 						// "lift" the child up so all the links (e.g., siblings) are correct
@@ -664,7 +672,7 @@ impl CanonicalizeContext {
 						} else if parent_requires_child {
 							let empty = make_empty_element(mathml);
 							if is_from_mhchem {
-								empty.set_attribute_value(MHCHEM_HACK, "true");
+								empty.set_attribute_value(MHCHEM_MMULTISCRIPTS_HACK, "true");
 							}
 							return Some(empty);
 						} else {
@@ -696,7 +704,7 @@ impl CanonicalizeContext {
 							Some(new_child) => {
 								let new_child_name = name(&new_child);
 								children = mathml.children();				// clean_mathml(child) may have changed following siblings
-								// debug!("new_child (i={})\n{}", i, mml_to_string(&new_child));
+								debug!("new_child (i={})\n{}", i, mml_to_string(&new_child));
 								children[i] = ChildOfElement::Element(new_child);
 								mathml.replace_children(children);
 								if new_child_name == "mi" || new_child_name == "mtext" {
@@ -714,6 +722,16 @@ impl CanonicalizeContext {
 					}
 				}
 
+				// could have deleted children so only one child remains -- need to lift it
+				if element_name == "mrow" && children.len() == 1 {
+					// "lift" the child up so all the links (e.g., siblings) are correct
+					let child = as_element(children[0]);
+					mathml.replace_children(child.children());
+					set_mathml_name(mathml, name(&child));
+					add_attrs(mathml, child.attributes());
+					return Some(mathml);		// child has already been cleaned, so we can return
+				}
+
 				if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 					merge_number_blocks(mathml, &mut children);
 					merge_whitespace(&mut children);
@@ -721,6 +739,22 @@ impl CanonicalizeContext {
 
 				} else if element_name == "msub" || element_name == "msup" || 
 						  element_name == "msubsup" || element_name == "mmultiscripts"{
+					if element_name != "mmultiscripts" {
+						// mhchem emits some cases that boil down to a completely empty script -- see test mhchem_beta_decay
+						let mut is_empty_script = is_empty_element(as_element(children[0])) &&
+						   								is_empty_element(as_element(children[1]));
+						if element_name == "msubsup" {
+							is_empty_script = is_empty_element(as_element(children[2]));
+						}
+						if is_empty_script {
+							if parent_requires_child {
+								// need a placeholder -- make it empty mtext
+								return Some( as_element(children[0]) );	// pick one of the empty elements
+							} else {
+								return None;
+							}
+						}
+					}
 					let mathml = if element_name == "mmultiscripts" {clean_mmultiscripts(mathml).unwrap()} else {mathml};
 					// debug!("some scripted element...\n{}", mml_to_string(&mathml));	
 					if !is_chemistry_off() {
@@ -1479,8 +1513,8 @@ impl CanonicalizeContext {
 			// the generic name "primary_scripts" means prescripts if going forward or postscripts if going backwards
 			// if we are going forward and hit a sub/superscript with a base, then those scripts become postscripts ("other_scripts")
 			// if we are going backwards, we never add prescripts
-			// let parent = as_element(mrow_children[i]).parent().unwrap().element().unwrap();
-			// debug!("convert_to_mmultiscripts (i={}) -- PARENT:\n{}", i, mml_to_string(&parent));
+			let parent = as_element(mrow_children[i]).parent().unwrap().element().unwrap();
+			debug!("convert_to_mmultiscripts (i={}) -- PARENT:\n{}", i, mml_to_string(&parent));
 			
 			let i_base = choose_base_of_mmultiscripts(&mrow_children, i);
 			let mut base = as_element(mrow_children[i_base]);
@@ -1570,12 +1604,20 @@ impl CanonicalizeContext {
 			let child_of_element = if let Some(subscript) = subscript {subscript} else {superscript.unwrap()};
 			let doc = as_element(child_of_element).document();
 			let subscript = if let Some(subscript)= subscript {
-				subscript
+				if is_empty_element(as_element(subscript)) {
+					ChildOfElement::Element(create_mathml_element(&doc, "none"))
+				} else {
+					subscript
+				}
 			} else {
 				ChildOfElement::Element(create_mathml_element(&doc, "none"))
 			};
 			let superscript = if let Some(superscript) = superscript {
-				superscript
+				if is_empty_element(as_element(superscript)) {
+					ChildOfElement::Element(create_mathml_element(&doc, "none"))
+				} else {
+					superscript
+				}
 			} else {
 				ChildOfElement::Element(create_mathml_element(&doc, "none"))
 			};
@@ -1588,7 +1630,7 @@ impl CanonicalizeContext {
 		/// However, there may be some empty bases before we get to real base on the right.
 		fn choose_base_of_mmultiscripts(mrow_children: &[ChildOfElement], i: usize) -> usize {
 			let script_element_base = as_element(as_element(mrow_children[i]).children()[0]);
-			let from_mchem = script_element_base.attribute(MHCHEM_HACK).is_some();
+			let from_mchem = script_element_base.attribute(MHCHEM_MMULTISCRIPTS_HACK).is_some();
 			if mrow_children.len() > i+1 && !(from_mchem && i > 0) {
 				if is_child_simple_base(mrow_children[i+1]) {
 					return i+1;
@@ -2177,7 +2219,7 @@ impl CanonicalizeContext {
 	fn is_likely_chemical_state<'a>(&self, node: Element<'a>, right_sibling: Element<'a>) -> FunctionNameCertainty {
 		assert_eq!(name(&node.parent().unwrap().element().unwrap()), "mrow"); // should be here because we are parsing an mrow
 	
-		debug!("   in is_likely_chemical_state: '{}'?",element_summary(node));
+		// debug!("   in is_likely_chemical_state: '{}'?",element_summary(node));
 		let node_chem_likelihood= node.attribute_value(MAYBE_CHEMISTRY);
 		if node.attribute(MAYBE_CHEMISTRY).is_none() {
 			return FunctionNameCertainty::True;
@@ -2263,12 +2305,12 @@ impl CanonicalizeContext {
 			// clean_chemistry wrapped up a state in an mrow and this is assumed by is_likely_chemical_state()
 			let chem_state_certainty = self.is_likely_chemical_state(node, first_child);
 			if chem_state_certainty != FunctionNameCertainty::True {
-				debug!("      ...is_likely_chemical_state says it is a function ={:?}", chem_state_certainty);
+				// debug!("      ...is_likely_chemical_state says it is a function ={:?}", chem_state_certainty);
 				return chem_state_certainty;
 			}
 
 			if name(&first_child) == "mrow" && is_left_paren(as_element(first_child.children()[0])) {
-				debug!("     ...trying again after expanding mrow");
+				// debug!("     ...trying again after expanding mrow");
 				return self.is_function_name(node, Some(&first_child.children()));
 			}
 
@@ -2298,7 +2340,7 @@ impl CanonicalizeContext {
 			}
 	
 			if is_single_arg(as_text(first_sibling), &right_siblings[1..]) {
-				debug!("      ...is single arg");
+				// debug!("      ...is single arg");
 				return FunctionNameCertainty::True;	// if there is only a single arg, why else would you use parens?
 			};
 
@@ -2813,9 +2855,25 @@ impl CanonicalizeContext {
 fn top<'s, 'a:'s, 'op:'a>(vec: &'s[StackInfo<'a, 'op>]) -> &'s StackInfo<'a, 'op> {
 	return &vec[vec.len()-1];
 }
-
+// Replace the attrs of 'mathml' with 'attrs' and keep the global attrs of 'mathml' (i.e, lift 'attrs' to 'mathml' for replacing children)
 fn add_attrs<'a>(mathml: Element<'a>, attrs: Vec<Attribute>) -> Element<'a> {
-	// debug!(   "Adding back {} attr(s)", attrs.len());
+	static GLOBAL_ATTRS: phf::Set<&str> = phf_set! {
+		"class", "dir", "displaystyle", "id", "mathbackground", "mathcolor", "mathsize",
+		"mathvariant", "nonce", "scriptlevel", "style", "tabindex",
+		"intent", "arg",
+	};
+	
+	debug!(   "Adding back {} attr(s) to {}", attrs.len(), name(&mathml));
+	// remove non-global attrs
+	for attr in mathml.attributes() {
+		let attr_name = attr.name().local_part();
+		if !( attr_name.starts_with("data-") || GLOBAL_ATTRS.contains(&attr_name) ||
+		      attr_name.starts_with("on") ) {			// allows too much - cheapo way to allow event handlers like "onchange"
+			mathml.remove_attribute(attr.name());
+		}
+	}
+
+	// add in 'attrs'
 	for attr in attrs {
 		mathml.set_attribute_value(attr.name(), attr.value());
 	}

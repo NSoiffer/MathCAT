@@ -60,6 +60,8 @@ static CHEM_EQUATION: &str = "data-chem-equation";
 static CHEM_FORMULA: &str = "data-chem-formula";
 /// Attr flag to indicate chemical element
 static CHEM_ELEMENT: &str = "data-chem-element";
+static CHEM_FORMULA_OPERATOR: &str = "data-chem-formula-op";
+static CHEM_EQUATION_OPERATOR: &str = "data-chem-equation-op";
 
 pub fn is_chemistry_off() -> bool {
     let pref_manager = crate::prefs::PreferenceManager::get();
@@ -92,13 +94,6 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
     let mut new_children = Vec::with_capacity(2*old_children.len());
     let mut i = 0;
     while i < old_children.len() {
-        // if let Some(mut new_elements) = convert_leaves_to_chem_elements(old_children, i) {
-        //     i += new_elements.len();
-        //     new_children.append(&mut new_elements);
-        //     changed = true;
-        //     continue;
-        // }
-
         if let Some(paren_mrow_aq) = clean_aq_state(old_children, i) {
             new_children.push(paren_mrow_aq);
             i += 4;                                 // skipping "( a q )"
@@ -240,15 +235,20 @@ pub fn convert_leaves_to_chem_elements<'a>(mathml: Element<'a>) -> Option<Vec<El
     }
     let doc = mathml.document();
     let token_len = token_string.len();
-    if token_len == 1 {
-        let answer = merge_tokens_chem_element(&doc, mathml, token_string, &mathml.following_siblings());
-        if answer.is_none() && is_chemical_element(mathml) {
-            mathml.set_attribute_value(MAYBE_CHEMISTRY, "1");
-        }
-        return answer;
-    } else {
+    if token_len > 1 {
         return split_string_chem_element(&doc, token_string);
+    }   
+    let parent = mathml.parent().unwrap().element().unwrap();
+    let parent_name = name(&parent);
+    if !(parent_name == "mrow" || parent_name == "math") {  // not canonicalized yet
+        return None;    // only try to merge if in an mrow
     }
+    let answer = merge_tokens_chem_element(&doc, mathml, token_string, &mathml.following_siblings());
+    if answer.is_none() && is_chemical_element(mathml) {
+        mathml.set_attribute_value(MAYBE_CHEMISTRY, "1");
+    }
+    return answer;
+
 
     fn merge_tokens_chem_element<'a>(doc: &Document<'a>, leaf: Element<'a>, token_string: &[u8], following_siblings: &[ChildOfElement<'a>]) -> Option<Vec<Element<'a>>> {
         // FIX: need to handle three char chem elements (make a nested fn to deal with each char)
@@ -318,6 +318,9 @@ pub fn convert_leaves_to_chem_elements<'a>(mathml: Element<'a>) -> Option<Vec<El
         let result = create_mathml_element(doc, "mi");
         result.set_text(chem_element_str);
         result.set_attribute_value(MAYBE_CHEMISTRY, chem_element_str.len().to_string().as_str());
+        if chem_element_str.len() == 1 {
+            result.set_attribute_value("mathvariant", "normal");
+        }
         return result;
     }
 }
@@ -344,25 +347,22 @@ pub fn scan_and_mark_chemistry(mathml: Element) {
 
         if name(&child) == "mrow" {
             let likelihood = likely_chem_equation(child);
-            if likelihood >= IS_CHEMISTRY_THRESHOLD && child.attribute(CHEM_FORMULA).is_none() {
+            if likelihood >= IS_CHEMISTRY_THRESHOLD {
                 child.set_attribute_value(MAYBE_CHEMISTRY, likelihood.to_string().as_str());
                 set_marked_chemistry_attr(child, CHEM_EQUATION);
             }
         }
     }
-    unset_marked_chemistry(mathml);
+
+    if mathml.attribute(CHEM_FORMULA).is_none() && mathml.attribute(CHEM_EQUATION).is_none() {
+        unset_marked_chemistry(mathml);
+    }
 }
 
 // returns the marked attr value or None
 fn get_marked_value(mathml: Element) -> Option<isize> {
     if let Some(value) = mathml.attribute_value(MAYBE_CHEMISTRY) {
         return Some(value.parse().unwrap());
-    // if let Some(value) = mathml.attribute_value(CHEM_ELEMENT) {
-    //     return Some(value.parse().unwrap());
-    // } else  if let Some(value) = mathml.attribute_value(CHEM_FORMULA) {
-    //     return Some(value.parse().unwrap());
-    // } else if let Some(value) = mathml.attribute_value(CHEM_EQUATION) {
-    //     return Some(value.parse().unwrap());
     } else {
         return None;
     }
@@ -377,7 +377,12 @@ pub fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
 
         match tag_name {
             "mi" | "mtext" => {mathml.set_attribute_value(CHEM_ELEMENT, maybe.value());},
-            "mo" => {mathml.set_attribute_value(chem, maybe.value());},
+            "mo" => {
+                if mathml.attribute(CHEM_FORMULA_OPERATOR).is_none() {
+                    // don't mark as both formula and equation
+                    mathml.set_attribute_value(if chem == CHEM_FORMULA {CHEM_FORMULA_OPERATOR} else {CHEM_EQUATION_OPERATOR}, maybe.value());
+                }
+                },
             "mrow" | "msub" | "msup" | "msubsup" | "mmultiscripts" => {
                 let mut chem_name = chem;
                 if tag_name != "mrow" && chem != CHEM_FORMULA{
@@ -388,7 +393,11 @@ pub fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
                         chem_name = CHEM_FORMULA;
                     }
                 }
-                mathml.set_attribute_value(chem_name, maybe.value());
+
+                if mathml.attribute(CHEM_FORMULA).is_none() {
+                    // don't mark as both formula and equation
+                    mathml.set_attribute_value(chem_name, maybe.value());
+                }
                 for child in mathml.children() {
                     set_marked_chemistry_attr(as_element(child), chem);
                 };
@@ -419,12 +428,14 @@ fn unset_marked_chemistry(mathml: Element) {
 fn has_chemical_element(mathml: Element) -> bool {
     // this could be combined with likely_chem_formula() and likely_chem_equation(), but then the return structure and other logic gets messy
     // doing this separately is cleaner but slower
-    if is_leaf(mathml) {
-        return name(&mathml) == "mi" && is_chemical_element(mathml);
-    } else if name(&mathml) == "semantics" {
-        return has_chemical_element( get_presentation_element(mathml) );
+    match name(&mathml) {
+        "mi" | "mtext" => return is_chemical_element(mathml),
+        "msub" | "msup" | "msubsup" | "mmultiscripts" => return has_chemical_element(as_element(mathml.children()[0])),
+        "semantics" => return has_chemical_element( get_presentation_element(mathml) ),
+        _ => if is_leaf(mathml) { return false; },
     }
 
+    // mrow, msqrt, etc
     for child in mathml.children() {
         let child = as_element(child);
         if has_chemical_element(child) {
@@ -466,9 +477,6 @@ fn likely_chem_equation(mathml: Element) -> isize {
             "mn" => (),       // not much info
             "mo" => {
                 let likely = likely_chem_equation_operator(child);
-                if likely > 0 {
-                    child.set_attribute_value(MAYBE_CHEMISTRY, likely.to_string().as_str());
-                }
                 likelihood += likely;
             },
             "msub" | "msup" | "msubsup" | "mmultiscripts" => {
@@ -508,6 +516,9 @@ fn likely_chem_equation(mathml: Element) -> isize {
         }
     }
 
+    if likelihood > 0 {
+        mathml.set_attribute_value(MAYBE_CHEMISTRY, likelihood.to_string().as_str());
+    }
     return likelihood;
 }
 
@@ -632,7 +643,6 @@ fn likely_chem_formula(mathml: Element) -> isize {
 
             if likelihood <= NOT_CHEMISTRY {
                 // the children may have looked have looked right, but something as said "not likely"
-                // unset_marked_chemistry(mrow);
                 return NOT_CHEMISTRY;
             } else {
                 let likelihood_str = likelihood.to_string();
@@ -707,17 +717,26 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
         let prescripts = if children.len() == 4 && name(&as_element(children[1]))=="mprescripts" { // just prescripts
             &children[2..4]
         } else if children.len() == 6 && name(&as_element(children[3]))=="mprescripts" {  // pre and postscripts
-            &children[1..3] 
-        } else if children.len() == 3 {   // just postscripts
+            // postscript should be a charge
             let sub = as_element(children[1]);
-            debug!("sub: {}", mml_to_string(&sub));
-            if name(&sub) != "none" {
-                likelihood += likely_chem_subscript(sub);
-            } 
             let sup = as_element(children[2]);
-            if name(&sup) != "none" {
-                likelihood += likely_valid_chem_superscript(sup);
-            } 
+            if name(&sub)!="none" || name(&sup)=="none" {
+                return NOT_CHEMISTRY;
+            }
+            likelihood += likely_valid_chem_superscript(sup);
+            &children[1..3] 
+        } else if children.len() % 2 == 1 {   // just postscripts
+            for i in (1..children.len()).step_by(2) {
+                let sub = as_element(children[i]);
+                debug!("sub: {}", mml_to_string(&sub));
+                if name(&sub) != "none" {
+                    likelihood += likely_chem_subscript(sub);
+                } 
+                let sup = as_element(children[i+1]);
+                if name(&sup) != "none" {
+                    likelihood += likely_valid_chem_superscript(sup);
+                } 
+            }
             &children[0..0] // empty
         } else {
             return NOT_CHEMISTRY;
@@ -740,14 +759,6 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
                 return NOT_CHEMISTRY;
             }
             likelihood += 1;        // looking like an atomic number                
-        }
-
-        // if there is a post superscript, it should be a charge
-        if children.len() == 6 {
-            if name(&as_element(children[1]))!="none" {
-                return NOT_CHEMISTRY;
-            }
-            likelihood += likely_valid_chem_superscript(as_element(children[2]));
         }
     }
 
@@ -811,6 +822,7 @@ fn likely_chem_formula_operator(mathml: Element) -> isize {
     assert_eq!(name(&mathml), "mo");
     let leaf_text = as_text(mathml);
     if is_in_set(leaf_text, &CHEM_FORMULA_OPERATORS) || leaf_text == "::" {
+        mathml.set_attribute_value(MAYBE_CHEMISTRY, "1");
         return 1;
     } else if is_in_set(leaf_text, &CHEM_FORMULA_OK) {
         return 0;  // not much info
@@ -825,8 +837,6 @@ fn likely_chem_equation_operator(mathml: Element) -> isize {
     static CHEM_EQUATION_OPERATORS: phf::Set<char> = phf_set! {
         '+', '=', '-',
         '·', '℃', '°', '‡', '∆', '×',
-        // FIX: the invisible operator between elements should be well-defined, but this likely needs work, so both accepted for now
-        '\u{2061}', '\u{2063}' // invisible separators
     };
 
     // these can be in the base of an under/over script
@@ -841,6 +851,7 @@ fn likely_chem_equation_operator(mathml: Element) -> isize {
     if elem_name == "munder" || elem_name == "mover" || elem_name == "munderover" {
         let mathml = as_element(mathml.children()[0]);
         if name(&mathml) == "mo" && is_in_set(as_text(mathml), &CHEM_EQUATION_ARROWS) {
+            mathml.set_attribute_value(MAYBE_CHEMISTRY, "1");
             return 1;
         } else {
             return NOT_CHEMISTRY;
@@ -850,7 +861,11 @@ fn likely_chem_equation_operator(mathml: Element) -> isize {
     if name(&mathml) == "mo" {
         let text = as_text(mathml);
         if is_in_set(text, &CHEM_EQUATION_OPERATORS) || is_in_set(text, &CHEM_EQUATION_ARROWS) {
+            mathml.set_attribute_value(MAYBE_CHEMISTRY, "1");
             return 1;
+        } else if text == "\u{2062}" || text == "\u{2063}" {
+            // FIX: the invisible operator between elements should be well-defined, but this likely needs work, so both accepted for now
+            return 0;
         }
     }
     return -3;  // there is still a chance
@@ -936,7 +951,7 @@ mod chem_tests {
         <mrow data-changed='added' data-chem-formula='4'>
           <mi data-chem-element='2'>Li</mi>
           <mo data-changed='added'>&#x2063;</mo>
-          <mi data-chem-element='1'>F</mi>
+          <mi data-chem-element='1' mathvariant='normal'>F</mi>
         </mrow>
        </math>";
         assert!(are_strs_canonically_equal(test, target));
@@ -960,10 +975,10 @@ mod chem_tests {
         let test = "<math> <mi>SO</mi>  <msub> <mrow></mrow> <mn>2</mn> </msub> </math>";
         let target = " <math>
         <mrow data-changed='added' data-chem-formula='3'>
-          <mi data-chem-element='1'>S</mi>
+          <mi data-chem-element='1' mathvariant='normal'>S</mi>
           <mo data-changed='added'>&#x2063;</mo>
           <mmultiscripts data-chem-formula='1'>
-            <mi data-chem-element='1'>O</mi>
+            <mi data-chem-element='1' mathvariant='normal'>O</mi>
             <mn>2</mn>
             <none></none>
           </mmultiscripts>
@@ -987,15 +1002,15 @@ mod chem_tests {
 
     #[test]
     fn water() {
-        let test = "<math><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></math>";
+        let test = "<math><msub><mi mathvariant='normal'>H</mi><mn>2</mn></msub><mi mathvariant='normal'>O</mi></math>";
         let target = " <math>
             <mrow data-changed='added' data-chem-formula='3'>
                 <msub data-chem-formula='1'>
-                    <mi data-chem-element='1'>H</mi>
+                    <mi data-chem-element='1' mathvariant='normal'>H</mi>
                     <mn>2</mn>
                 </msub>
                 <mo data-changed='added'>&#x2063;</mo>
-                <mi data-chem-element='1'>O</mi>
+                <mi data-chem-element='1' mathvariant='normal'>O</mi>
             </mrow>
         </math>";
         assert!(are_strs_canonically_equal(test, target));
@@ -1035,7 +1050,7 @@ mod chem_tests {
             <mrow data-chem-formula='3'>
             <mmultiscripts data-chem-formula='1'>
                 <mi mathvariant='normal' data-chem-element='1'>H</mi>
-                <mn height='0'>2</mn>
+                <mn>2</mn>
                 <none></none>
             </mmultiscripts>
             <mo data-changed='added'>&#x2063;</mo>
@@ -1137,7 +1152,7 @@ mod chem_tests {
                         <mi data-chem-element='1'>H</mi>
                         <mn>3</mn>
                     </msub>
-                    <mo data-operator='&#xf8ff;' data-chem-formula='1'>-</mo>
+                    <mo data-operator='&#xf8ff;' data-chem-formula-op='1'>-</mo>
                     <mrow data-changed='added' data-chem-formula='9'>
                         <mi data-chem-element='1'>C</mi>
                         <mo data-changed='added'>&#x2063;</mo>
@@ -1146,7 +1161,7 @@ mod chem_tests {
                             <mi data-chem-element='1'>H</mi>
                             <mn>2</mn>
                         </msub>
-                        <mo data-operator='&#xf8ff;' data-chem-formula='1'>-</mo>
+                        <mo data-operator='&#xf8ff;' data-chem-formula-op='1'>-</mo>
                         <mrow data-changed='added' data-chem-formula='3'>
                             <mi data-chem-element='1'>O</mi>
                             <mo data-changed='added'>&#x2063;</mo>
@@ -1226,7 +1241,7 @@ mod chem_tests {
                 <mo data-changed='added'>&#x2063;</mo>
                 <mrow data-changed='added' data-chem-formula='7'>
                     <mi data-chem-element='1'>C</mi>
-                    <mo data-operator='&#xf8ff;' data-chem-formula='1'>=</mo>
+                    <mo data-operator='&#xf8ff;' data-chem-formula-op='1'>=</mo>
                     <mrow data-changed='added'  data-chem-formula='3'>
                     <mi data-chem-element='1'>C</mi>
                     <mo data-changed='added'>&#x2063;</mo>
@@ -1296,11 +1311,11 @@ mod chem_tests {
         </math>";
         let target = "<math>
             <mrow  mathcolor='#a33e00' data-chem-formula='3'>
-                <mi data-chem-element='1'>S</mi>
+                <mi data-chem-element='1' mathvariant='normal'>S</mi>
                 <mo data-changed='added'>&#x2063;</mo>
                 <mmultiscripts data-chem-formula='1'>
-                    <mi data-chem-element='1'>O</mi>
-                    <mn height='0'>4</mn>
+                    <mi data-chem-element='1' mathvariant='normal'>O</mi>
+                    <mn>4</mn>
                     <none></none>
                 </mmultiscripts>
             </mrow>
@@ -1338,12 +1353,12 @@ mod chem_tests {
             </mstyle>
         </math>";
         let target = "<math>
-                <mrow  mathcolor='#a33e00' data-chem-formula='3'>
-                    <mi data-chem-element='1'>S</mi>
+                <mrow mathcolor='#a33e00' data-chem-formula='3'>
+                    <mi data-chem-element='1' mathvariant='normal'>S</mi>
                     <mo data-changed='added'>&#x2063;</mo>
                     <mmultiscripts data-chem-formula='1'>
-                        <mi data-chem-element='1'>O</mi>
-                        <mn height='0'>4</mn>
+                        <mi data-chem-element='1' mathvariant='normal'>O</mi>
+                        <mn>4</mn>
                         <none></none>
                     </mmultiscripts>
                 </mrow>
@@ -1448,7 +1463,7 @@ mod chem_tests {
                 <mo data-changed='added'>&#x2063;</mo>
                 <mrow data-changed='added' data-chem-formula='7'>
                     <mi data-chem-element='1'>C</mi>
-                    <mo data-operator='&#xf8ff;' data-chem-formula='1'>::</mo>
+                    <mo data-operator='&#xf8ff;' data-chem-formula-op='1'>::</mo>
                     <mrow data-changed='added' data-chem-formula='3'>
                     <mi data-chem-element='1'>C</mi>
                     <mo data-changed='added'>&#x2063;</mo>
@@ -1459,6 +1474,99 @@ mod chem_tests {
                     </mrow>
                 </mrow>
             </mrow>
+        </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn mhchem_u238() {
+        let test = "<math>
+        <mrow>
+          <msubsup>
+            <mrow>
+              <mrow>
+                <mpadded width='0'>
+                  <mphantom>
+                    <mi>A</mi>
+                  </mphantom>
+                </mpadded>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mrow>
+                <mpadded height='0' depth='0'>
+                  <mphantom></mphantom>
+                </mpadded>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mrow>
+                <mpadded height='0' depth='0'>
+                  <mphantom>
+                    <mn>238</mn>
+                  </mphantom>
+                </mpadded>
+              </mrow>
+            </mrow>
+          </msubsup>
+          <mspace width='-0.083em' linebreak='nobreak'></mspace>
+          <msubsup>
+            <mrow>
+              <mrow>
+                <mpadded width='0'>
+                  <mphantom>
+                    <mi>A</mi>
+                  </mphantom>
+                </mpadded>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mrow>
+                <mpadded width='0'>
+                  <mphantom>
+                    <mn>2</mn>
+                  </mphantom>
+                </mpadded>
+              </mrow>
+              <mrow>
+                <mpadded width='0' lspace='-1width'>
+                  <mrow>
+                    <mpadded height='0'></mpadded>
+                  </mrow>
+                </mpadded>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mrow>
+                <mpadded height='0'>
+                  <mrow>
+                    <mpadded width='0'>
+                      <mphantom>
+                        <mn>2</mn>
+                      </mphantom>
+                    </mpadded>
+                  </mrow>
+                </mpadded>
+              </mrow>
+              <mrow>
+                <mpadded width='0' lspace='-1width'>
+                  <mn>238</mn>
+                </mpadded>
+              </mrow>
+            </mrow>
+          </msubsup>
+          <mrow>
+            <mi mathvariant='normal'>U</mi>
+          </mrow>
+        </mrow>
+      </math>";
+        let target = "<math>
+            <mmultiscripts>
+            <mi mathvariant='normal'>U</mi>
+            <mprescripts></mprescripts>
+            <none/>
+            <mn>238</mn>
+            </mmultiscripts>
         </math>";
         assert!(are_strs_canonically_equal(test, target));
     }
