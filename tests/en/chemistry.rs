@@ -403,7 +403,6 @@ fn hcl_na_yields() {
 
 #[test]
 fn mhchem_so4_2plus() {
-  init_logger();
   let expr = "<math>
     <mrow>
       <mrow>
@@ -445,5 +444,92 @@ fn mhchem_so4_2plus() {
     </mrow>
   </math>";
   test("SimpleSpeak", expr, "S O 4 2 plus");
+}
+
+
+#[test]
+fn mhchem_hcl_aq_etc() {
+  let expr = "<math>
+    <mrow>
+      <mn>2</mn>
+      <mstyle scriptlevel='0'>
+        <mspace width='0.167em'></mspace>
+      </mstyle>
+      <mrow>
+        <mi>HCl</mi>
+      </mrow>
+      <mspace width='0.111em'></mspace>
+      <mo stretchy='false'>(</mo>
+      <mrow>
+        <mi>aq</mi>
+      </mrow>
+      <mo stretchy='false'>)</mo>
+      <mrow></mrow>
+      <mo>+</mo>
+      <mrow></mrow>
+      <mn>2</mn>
+      <mstyle scriptlevel='0'>
+        <mspace width='0.167em'></mspace>
+      </mstyle>
+      <mrow>
+        <mi>Na</mi>
+      </mrow>
+      <mspace width='0.111em'></mspace>
+      <mo stretchy='false'>(</mo>
+      <mrow>
+        <mi mathvariant='normal'>s</mi>
+      </mrow>
+      <mo stretchy='false'>)</mo>
+      <mrow></mrow>
+      <mrow data-mjx-texclass='REL'>
+        <mo stretchy='false'>&#x27F6;</mo>
+      </mrow>
+      <mrow></mrow>
+      <mn>2</mn>
+      <mstyle scriptlevel='0'>
+        <mspace width='0.167em'></mspace>
+      </mstyle>
+      <mrow>
+        <mi>NaCl</mi>
+      </mrow>
+      <mspace width='0.111em'></mspace>
+      <mo stretchy='false'>(</mo>
+      <mrow>
+        <mi>aq</mi>
+      </mrow>
+      <mo stretchy='false'>)</mo>
+      <mrow></mrow>
+      <mo>+</mo>
+      <mrow></mrow>
+      <mrow>
+        <mi mathvariant='normal'>H</mi>
+      </mrow>
+      <msub>
+        <mrow>
+          <mrow>
+            <mpadded width='0'>
+              <mphantom>
+                <mi>A</mi>
+              </mphantom>
+            </mpadded>
+          </mrow>
+        </mrow>
+        <mrow>
+          <mrow>
+            <mpadded height='0'>
+              <mn>2</mn>
+            </mpadded>
+          </mrow>
+        </mrow>
+      </msub>
+      <mspace width='0.111em'></mspace>
+      <mo stretchy='false'>(</mo>
+      <mrow>
+        <mi mathvariant='normal'>g</mi>
+      </mrow>
+      <mo stretchy='false'>)</mo>
+    </mrow>
+  </math>";
+  test("SimpleSpeak", expr, "2 H C l dissolved in water; plus 2 N a as solid; yields; 2, N a C l dissolved in water; plus H 2 as gas");
 }
 
