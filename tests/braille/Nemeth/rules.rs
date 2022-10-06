@@ -90,6 +90,12 @@ fn punct_37_2_2() {
 }
 
 #[test]
+fn punct_37_7_1() {
+    let expr = "<math><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi><mo>.</mo></math>";
+    test_braille("Nemeth", expr, "xxx⠁⠠⠀⠃⠠⠀⠉⠸⠲");
+}
+
+#[test]
 fn dash_42_4() {
     let expr = "<math><mfrac><mo>&#x2015;</mo><mn>15</mn></mfrac><mo>=</mo><mfrac><mn>2</mn><mn>3</mn></mfrac></math>";
     test_braille("Nemeth", expr, "⠹⠤⠤⠤⠤⠀⠌⠂⠢⠼⠀⠨⠅⠀⠹⠆⠌⠒⠼");
@@ -744,10 +750,17 @@ fn lesson_11_24_1() {
 }
 
 #[test]
+fn ms_38_4_8() {
+    let expr = "<math><mo>(</mo><ms lquote='“' rquote='”'>three</ms><mo>)</mo></math>";
+    test_braille("Nemeth", expr, "⠷⠸⠦⠞⠓⠗⠑⠑⠴⠾");
+}
+
+#[test]
 fn ms() {
     let expr = "<math><ms>a string</ms><mo>,</mo><ms lquote='‘' rquote='’'>another string</ms></math>";
     // Not 100% sure this is the right output -- I am a little skeptical of "⠄⠄" being the braille for '"'
-    test_braille("Nemeth", expr, "⠄⠄⠁⠀⠎⠞⠗⠊⠝⠛⠄⠄⠠⠀⠸⠠⠦⠁⠝⠕⠞⠓⠑⠗⠀⠎⠞⠗⠊⠝⠛⠸⠴⠠");
+    // Note: no punct indicator after word (see 38_4_8)
+    test_braille("Nemeth", expr, "⠄⠄⠁⠀⠎⠞⠗⠊⠝⠛⠄⠄⠠⠀⠸⠠⠦⠁⠝⠕⠞⠓⠑⠗⠀⠎⠞⠗⠊⠝⠛⠴⠠");
 }
 
 #[test]

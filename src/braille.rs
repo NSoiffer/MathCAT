@@ -297,14 +297,14 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         //   Beginning of line or after a space (V 38.1)
         //   After a word (38.4)
         //   2nd or subsequent punctuation (includes, "-", etc) (38.7)
-        static ref REMOVE_PUNCT_IND: Regex = Regex::new(r"(^|W|\w)P(.)").unwrap();  
+        static ref REMOVE_PUNCT_IND: Regex = Regex::new(r"(^|W|L.L.)P(.)").unwrap();  
 
         static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHPCLMmb↑↓Nn𝑁W,])").unwrap();  
             
             static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
 
-  // debug!("Before:  \"{}\"", raw_braille);
+//   debug!("Before:  \"{}\"", raw_braille);
 
     // Remove blanks before and after braille indicators
     let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&raw_braille, "$1$2");
@@ -318,28 +318,28 @@ fn nemeth_cleanup(raw_braille: String) -> String {
   // debug!("MULTI:   \"{}\"", result);
 
     let result = NUM_IND_9A.replace_all(&result, "$start$minus${face}n");
-  // debug!("IND_9A:  \"{}\"", result);
+//   debug!("IND_9A:  \"{}\"", result);
 
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
     let result = NUM_IND_9E_SHAPE.replace_all(&result, "${mod}n");
-  // debug!("IND_9E:  \"{}\"", result);
+//   debug!("IND_9E:  \"{}\"", result);
 
     // 9b: insert after punctuation (optional minus sign)
     // common punctuation adds a space, so 9a handled it. Here we deal with other "punctuation" 
     // FIX other punctuation and reference symbols (9d)
     let result = NUM_IND_AFTER_PUNCT.replace_all(&result, "$punct${minus}n");
-  // debug!("A PUNCT: \"{}\"", &result);
+//   debug!("A PUNCT: \"{}\"", &result);
 
     // strip level indicators
     // checks for punctuation char, so needs to before punctuation is stripped.
     
     let result = REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT.replace_all(&result, "$1");
-  // debug!("Punct  : \"{}\"", &result);
+//   debug!("Punct  : \"{}\"", &result);
     let result = REMOVE_LEVEL_IND_BEFORE_BASELINE.replace_all(&result, "b");
   // debug!("Bseline: \"{}\"", &result);
 
     let result = REMOVE_PUNCT_IND.replace_all(&result, "$1$2");
-  // debug!("Punct38: \"{}\"", &result);
+//   debug!("Punct38: \"{}\"", &result);
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         match NEMETH_INDICATOR_REPLACEMENTS.get(&cap[0]) {
@@ -489,7 +489,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
         lazy_static! {
             static ref HAS_TYPEFACE: Regex = Regex::new("[BI𝔹STD]").unwrap();
         }
-        debug!("before typeface fix:  '{}'", braille);
+        // debug!("before typeface fix:  '{}'", braille);
 
         let mut result = "".to_string();
         let chars = braille.chars().collect::<Vec<char>>();
@@ -537,7 +537,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
     }
 
     fn capitals_to_word_mode(braille: &str) -> String {
-        debug!("before capitals fix:  '{}'", braille);
+        // debug!("before capitals fix:  '{}'", braille);
 
         let mut result = "".to_string();
         let chars = braille.chars().collect::<Vec<char>>();
