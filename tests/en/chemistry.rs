@@ -102,43 +102,348 @@ fn ethylene_with_colon_bond() {
 
 #[test]
 fn beta_decay() {
-    let expr = "<math>
-    <mmultiscripts>
-      <mtext>C</mtext>
-      <mprescripts />
-      <mn>6</mn>
-      <mn>14</mn>
-    </mmultiscripts>
-    <mo>&#x2192;</mo>
-    <mmultiscripts>
-      <mtext>N</mtext>
-      <mprescripts />
-      <mn>7</mn>
-      <mn>14</mn>
-    </mmultiscripts>
-    <mo>+</mo>
-    <mmultiscripts>
-      <mtext>e</mtext>
-      <mprescripts />
+  let expr = "<math>
+      <mmultiscripts>
+        <mtext>C</mtext>
+        <mprescripts />
+        <mn>6</mn>
+        <mn>14</mn>
+      </mmultiscripts>
+      <mo>&#x2192;</mo>
+      <mmultiscripts>
+        <mtext>N</mtext>
+        <mprescripts />
+        <mn>7</mn>
+        <mn>14</mn>
+      </mmultiscripts>
+      <mo>+</mo>
+      <mmultiscripts>
+        <mtext>e</mtext>
+        <mprescripts />
+        <mrow>
+          <mo>&#x2212;</mo>
+          <mn>1</mn>
+        </mrow>
+        <mn>0</mn>
+      </mmultiscripts>
+    </math>";
+  test("SimpleSpeak", expr, "14 6 C decays to, 14 7 N plus 0 negative 1 e");
+}
+
+#[test]
+fn mhchem_beta_decay() {
+  let expr = "<math>
       <mrow>
-        <mo>&#x2212;</mo>
-        <mn>1</mn>
+        <msubsup>
+          <mrow>
+            <mrow>
+              <mpadded width='0'>
+                <mphantom>
+                  <mi>A</mi>
+                </mphantom>
+              </mpadded>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow>
+              <mpadded height='0' depth='0'>
+                <mphantom>
+                  <mn>6</mn>
+                </mphantom>
+              </mpadded>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow>
+              <mpadded height='0' depth='0'>
+                <mphantom>
+                  <mn>14</mn>
+                </mphantom>
+              </mpadded>
+            </mrow>
+          </mrow>
+        </msubsup>
+        <mspace width='-0.083em'></mspace>
+        <msubsup>
+          <mrow>
+            <mrow>
+              <mpadded width='0'>
+                <mphantom>
+                  <mi>A</mi>
+                </mphantom>
+              </mpadded>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow>
+              <mpadded width='0'>
+                <mphantom>
+                  <mn>2</mn>
+                </mphantom>
+              </mpadded>
+            </mrow>
+            <mrow>
+              <mpadded width='0' lspace='-1width'>
+                <mrow>
+                  <mpadded height='0'>
+                    <mn>6</mn>
+                  </mpadded>
+                </mrow>
+              </mpadded>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow>
+              <mpadded height='0'>
+                <mrow>
+                  <mpadded width='0'>
+                    <mphantom>
+                      <mn>2</mn>
+                    </mphantom>
+                  </mpadded>
+                </mrow>
+              </mpadded>
+            </mrow>
+            <mrow>
+              <mpadded width='0' lspace='-1width'>
+                <mn>14</mn>
+              </mpadded>
+            </mrow>
+          </mrow>
+        </msubsup>
+        <mrow>
+          <mi mathvariant='normal'>C</mi>
+        </mrow>
+        <mrow></mrow>
+        <mrow>
+          <mo stretchy='false'>&#x27F6;</mo>
+        </mrow>
+        <mrow></mrow>
+        <msubsup>
+          <mrow>
+            <mrow>
+              <mpadded width='0'>
+                <mphantom>
+                  <mi>A</mi>
+                </mphantom>
+              </mpadded>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow>
+              <mpadded height='0' depth='0'>
+                <mphantom>
+                  <mn>7</mn>
+                </mphantom>
+              </mpadded>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow>
+              <mpadded height='0' depth='0'>
+                <mphantom>
+                  <mn>14</mn>
+                </mphantom>
+              </mpadded>
+            </mrow>
+          </mrow>
+        </msubsup>
+        <mspace width='-0.083em'></mspace>
+        <msubsup>
+          <mrow>
+            <mrow>
+              <mpadded width='0'>
+                <mphantom>
+                  <mi>A</mi>
+                </mphantom>
+              </mpadded>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow>
+              <mpadded width='0'>
+                <mphantom>
+                  <mn>2</mn>
+                </mphantom>
+              </mpadded>
+            </mrow>
+            <mrow>
+              <mpadded width='0' lspace='-1width'>
+                <mrow>
+                  <mpadded height='0'>
+                    <mn>7</mn>
+                  </mpadded>
+                </mrow>
+              </mpadded>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow>
+              <mpadded height='0'>
+                <mrow>
+                  <mpadded width='0'>
+                    <mphantom>
+                      <mn>2</mn>
+                    </mphantom>
+                  </mpadded>
+                </mrow>
+              </mpadded>
+            </mrow>
+            <mrow>
+              <mpadded width='0' lspace='-1width'>
+                <mn>14</mn>
+              </mpadded>
+            </mrow>
+          </mrow>
+        </msubsup>
+        <mrow>
+          <mi mathvariant='normal'>N</mi>
+        </mrow>
+        <mrow></mrow>
+        <mo>+</mo>
+        <mrow></mrow>
+        <msubsup>
+          <mrow>
+            <mrow>
+              <mpadded width='0'>
+                <mphantom>
+                  <mi>A</mi>
+                </mphantom>
+              </mpadded>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow>
+              <mpadded height='0' depth='0'>
+                <mphantom>
+                  <mo>&#x2212;</mo>
+                  <mn>1</mn>
+                </mphantom>
+              </mpadded>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow>
+              <mpadded height='0' depth='0'>
+                <mphantom>
+                  <mn>0</mn>
+                </mphantom>
+              </mpadded>
+            </mrow>
+          </mrow>
+        </msubsup>
+        <mspace width='-0.083em'></mspace>
+        <msubsup>
+          <mrow>
+            <mrow>
+              <mpadded width='0'>
+                <mphantom>
+                  <mi>A</mi>
+                </mphantom>
+              </mpadded>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow>
+              <mpadded width='0'>
+                <mphantom>
+                  <mn>2</mn>
+                </mphantom>
+              </mpadded>
+            </mrow>
+            <mrow>
+              <mpadded width='0' lspace='-1width'>
+                <mrow>
+                  <mpadded height='0'>
+                    <mo>&#x2212;</mo>
+                    <mn>1</mn>
+                  </mpadded>
+                </mrow>
+              </mpadded>
+            </mrow>
+          </mrow>
+          <mrow>
+            <mrow>
+              <mpadded height='0'>
+                <mrow>
+                  <mpadded width='0'>
+                    <mphantom>
+                      <mn>2</mn>
+                    </mphantom>
+                  </mpadded>
+                </mrow>
+              </mpadded>
+            </mrow>
+            <mrow>
+              <mpadded width='0' lspace='-1width'>
+                <mn>0</mn>
+              </mpadded>
+            </mrow>
+          </mrow>
+        </msubsup>
+        <mrow>
+          <mi mathvariant='normal'>e</mi>
+        </mrow>
       </mrow>
-      <mn>0</mn>
-    </mmultiscripts>
-  </math>";
-    test("SimpleSpeak", expr, "14 6 C decays to 14 7 N plus 0 -1 electrons");
+    </math>";
+  test("SimpleSpeak", expr, "14 6 C decays to, 14 7 N plus 0 negative 1 e");
 }
 
 #[test]
 fn hcl_na_yields() {
-    let expr = "<math <mrow>
+    let expr = "<math> <mrow>
       <mn>2</mn><mi>H</mi><mi>Cl</mi><mo>+</mo><mn>2</mn><mtext>Na</mtext>
       <mo>&#x2192;</mo>
       <mn>2</mn><mtext>Na</mtext><mi>Cl</mi><mo>+</mo>
       <msub> <mi>H</mi> <mn>2</mn> </msub>
       </mrow>
     </math>";
-    test("SimpleSpeak", expr, "2 H C l plus 2 N a yields 2 N a C l plus H 2");
+    test("SimpleSpeak", expr, "2 H C l, plus 2 Na; yields, 2 Na C l, plus H 2");
+}
+
+#[test]
+fn mhchem_so4_2plus() {
+  init_logger();
+  let expr = "<math>
+    <mrow>
+      <mrow>
+        <mi>SO</mi>
+      </mrow>
+      <msub>
+        <mrow>
+          <mrow>
+            <mpadded width='0'>
+              <mphantom>
+                <mi>A</mi>
+              </mphantom>
+            </mpadded>
+          </mrow>
+        </mrow>
+        <mrow>
+          <mrow>
+            <mpadded height='0'>
+              <mn>4</mn>
+            </mpadded>
+          </mrow>
+        </mrow>
+      </msub>
+      <msup>
+        <mrow>
+          <mrow>
+            <mpadded width='0'>
+              <mphantom>
+                <mi>A</mi>
+              </mphantom>
+            </mpadded>
+          </mrow>
+        </mrow>
+        <mrow>
+          <mn>2</mn>
+          <mo>+</mo>
+        </mrow>
+      </msup>
+    </mrow>
+  </math>";
+  test("SimpleSpeak", expr, "S O 4 2 plus");
 }
 
