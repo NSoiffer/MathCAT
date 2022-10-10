@@ -4,100 +4,112 @@ use crate::common::*;
 
 #[test]
 fn salt() {
-    let expr = "<math><mi>Na</mi><mi>Cl</mi></math>";
-    test("SimpleSpeak", expr, "N a C l");
+  let expr = "<math><mi>Na</mi><mi>Cl</mi></math>";
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "N a C l");
 }
 
 #[test]
 fn water() {
-    let expr = "<math><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></math>";
-    test("ClearSpeak", expr, "H 2 O");
+  let expr = "<math><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></math>";
+  test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr, "H 2 O");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Medium")], expr, "H sub 2 O");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Verbose")], expr, "H subscript 2 O");
 }
 
 #[test]
 fn carbon() {
-    let expr = "<math><mi>C</mi></math>";     // not enough to trigger recognition
-    test("SimpleSpeak", expr, "C");
+  let expr = "<math><mi>C</mi></math>";     // not enough to trigger recognition
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "C");
 }
 
 #[test]
 fn sulfate() {
-    let expr = "<math><mrow><msup>
-            <mrow><mo>[</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>]</mo></mrow>
-            <mrow><mn>2</mn><mo>&#x2212;</mo></mrow>
-        </msup></mrow></math>";
-    test("ClearSpeak", expr, "open bracket S O 4 close bracket 2 minus");
+  let expr = "<math><mrow><msup>
+          <mrow><mo>[</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>]</mo></mrow>
+          <mrow><mn>2</mn><mo>&#x2212;</mo></mrow>
+      </msup></mrow></math>";
+  test_prefs("ClearSpeak", vec![("Verbosity", "Medium")], expr, "open bracket S O sub 4 close bracket super 2 minus");
 }
 
 #[test]
 fn aluminum_sulfate() {
-    let expr = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
-            <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
-    test("SimpleSpeak", expr, "A l 2, open paren S O 4 close paren 3");
+  let expr = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
+          <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
+  test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr, "A l 2 open S O 4 close 3");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Medium")], expr, "A l sub 2, open paren S O sub 4 close paren sub 3");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Verbose")], expr, "A l subscript 2, open paren S O subscript 4, close paren subscript 3");
 }
 
 #[test]
 fn ethanol_bonds() {
-    let expr = "<math>
-            <mrow>
-                <mi>C</mi>
-                <msub>  <mi>H</mi> <mn>3</mn> </msub>
-                <mo>&#x2212;</mo>
-                <mi>C</mi>
-                <msub>  <mi>H</mi> <mn>2</mn> </msub>
-                <mo>&#x2212;</mo>
-                <mi>O</mi>
-                <mi>H</mi>
-            </mrow>
-        </math>";
-    test("ClearSpeak", expr, "C, H 3 single bond, C H 2 single bond O H");
+  let expr = "<math>
+          <mrow>
+              <mi>C</mi>
+              <msub>  <mi>H</mi> <mn>3</mn> </msub>
+              <mo>&#x2212;</mo>
+              <mi>C</mi>
+              <msub>  <mi>H</mi> <mn>2</mn> </msub>
+              <mo>&#x2212;</mo>
+              <mi>O</mi>
+              <mi>H</mi>
+          </mrow>
+      </math>";
+  test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr, "C, H 3 single bond, C H 2 single bond O H");
+
 }
 
 #[test]
 fn dichlorine_hexoxide() {
-    let expr = "<math><mrow>
-    <msup>
-      <mrow><mo>[</mo><mi>Cl</mi><msub><mi>O</mi><mn>2</mn></msub><mo>]</mo></mrow>
-      <mo>+</mo>
-    </msup>
-    <msup>
-      <mrow><mo>[</mo><mi>Cl</mi><msub><mi>O</mi><mn>4</mn></msub><mo>]</mo></mrow>
-      <mo>-</mo>
-    </msup>
-  </mrow></math>";
-    test("SimpleSpeak", expr, "open bracket C l O 2 close bracket plus; \
-                                                    open bracket C l O 4 close bracket minus");
+  let expr = "<math><mrow>
+      <msup>
+        <mrow><mo>[</mo><mi>Cl</mi><msub><mi>O</mi><mn>2</mn></msub><mo>]</mo></mrow>
+        <mo>+</mo>
+      </msup>
+      <msup>
+        <mrow><mo>[</mo><mi>Cl</mi><msub><mi>O</mi><mn>4</mn></msub><mo>]</mo></mrow>
+        <mo>-</mo>
+      </msup>
+    </mrow></math>";
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], 
+    expr, "open bracket C l O 2 close bracket plus; \
+                          open bracket C l O 4 close bracket minus");
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Medium")], 
+    expr, "open bracket C l O sub 2, close bracket super plus; \
+                          open bracket C l O sub 4, close bracket super minus");
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Verbose")], 
+    expr, "open bracket, C l O subscript 2, close bracket superscript plus; \
+                          open bracket, C l O subscript 4, close bracket superscript minus");
 }
 
 
 #[test]
 fn ethylene_with_bond() {
-    let expr = "<math><mrow>
-            <msub><mi>H</mi><mn>2</mn></msub><mi>C</mi>
-            <mo>=</mo>
-            <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
-        </mrow></math>";
-    test("SimpleSpeak", expr, "H 2 C double bond C H 2");
+  let expr = "<math><mrow>
+          <msub><mi>H</mi><mn>2</mn></msub><mi>C</mi>
+          <mo>=</mo>
+          <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
+      </mrow></math>";
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "H 2 C double bond C H 2");
 }
 
 #[test]
 fn ferric_chloride_aq() {
-    let expr = "<math><mrow>
+  let expr = "<math><mrow>
         <mi>Fe</mi>
         <msub><mi>Cl</mi><mn>3</mn></msub>
         <mrow><mo>(</mo><mrow><mi>aq</mi></mrow><mo>)</mo></mrow>
     </mrow></math>";
-    test("SimpleSpeak", expr, "F e C l 3 dissolved in water");
-}
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "F e C l 3 aqueous");
+  }
 
 #[test]
 fn ethylene_with_colon_bond() {
-    let expr = "<math><mrow>
-            <msub><mi>H</mi><mn>2</mn></msub><mi>C</mi>
-            <mo>::</mo>
-            <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
-        </mrow></math>";
-    test("SimpleSpeak", expr, "H 2 C double bond C H 2");
+  let expr = "<math><mrow>
+          <msub><mi>H</mi><mn>2</mn></msub><mi>C</mi>
+          <mo>::</mo>
+          <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
+      </mrow></math>";
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "H 2 C double bond C H 2");
 }
 
 #[test]
@@ -127,7 +139,11 @@ fn beta_decay() {
         <mn>0</mn>
       </mmultiscripts>
     </math>";
-  test("SimpleSpeak", expr, "14 6 C decays to, 14 7 N plus 0 negative 1 e");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr, "14 6 C decays to, 14 7 N plus 0 negative 1 e");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium")], expr,
+      "pre super 14 pre sub 6 C, decays to, pre super 14 pre sub 7 N, plus pre super 0 pre sub negative 1 e");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Verbose")], expr,
+      "pre superscript 14 pre subscript 6 C, decays to; pre superscript 14 pre subscript 7 N, plus, pre superscript 0 pre subscript negative 1 e");
 }
 
 #[test]
@@ -386,7 +402,12 @@ fn mhchem_beta_decay() {
         </mrow>
       </mrow>
     </math>";
-  test("SimpleSpeak", expr, "14 6 C decays to, 14 7 N plus 0 negative 1 e");
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr,
+      "14 6 C decays to, 14 7 N plus 0 negative 1 e");
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Medium")], expr,
+      "pre super 14 pre sub 6 C, decays to, pre super 14 pre sub 7 N, plus pre super 0 pre sub negative 1 e");
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+      "pre superscript 14 pre subscript 6 C, decays to; pre superscript 14 pre subscript 7 N, plus, pre superscript 0 pre subscript negative 1 e");
 }
 
 #[test]
@@ -398,7 +419,8 @@ fn hcl_na_yields() {
       <msub> <mi>H</mi> <mn>2</mn> </msub>
       </mrow>
     </math>";
-    test("SimpleSpeak", expr, "2 H C l, plus 2 Na; yields, 2 Na C l, plus H 2");
+    test_prefs("SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+        "2 H C l, plus 2 Na; yields, 2 Na C l, plus H subscript 2");
 }
 
 #[test]
@@ -443,7 +465,9 @@ fn mhchem_so4_2plus() {
       </msup>
     </mrow>
   </math>";
-  test("SimpleSpeak", expr, "S O 4 2 plus");
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "S O 4 2 plus");
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Medium")], expr, "S O sub 4 super 2 plus");
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "S O subscript 4 superscript 2 plus");
 }
 
 
@@ -481,7 +505,7 @@ fn mhchem_hcl_aq_etc() {
       </mrow>
       <mo stretchy='false'>)</mo>
       <mrow></mrow>
-      <mrow data-mjx-texclass='REL'>
+      <mrow>
         <mo stretchy='false'>&#x27F6;</mo>
       </mrow>
       <mrow></mrow>
@@ -530,6 +554,8 @@ fn mhchem_hcl_aq_etc() {
       <mo stretchy='false'>)</mo>
     </mrow>
   </math>";
-  test("SimpleSpeak", expr, "2 H C l dissolved in water; plus 2 N a as solid; yields; 2, N a C l dissolved in water; plus H 2 as gas");
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")],
+      expr, "2 H C l aqueous, plus 2 N a solid; yields, 2 N a C l aqueous, plus H 2 gas");
+
 }
 
