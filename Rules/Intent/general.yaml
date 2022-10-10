@@ -393,14 +393,18 @@
           else: [x: "*[2]"]
 
 -
+  # need to include the name of the element so the rules know whether to say "sub" or "super"
   name: chemistry
-  tag: [msub, msup, msubsup]
+  tag: [msub, msup]
   match: "@data-chem-formula"
   replace:
   - intent:
       name: "chemical-formula"
-      children:
-      - x: "*"
+      children:       # have to list individual children because "*" results in an internal error (children aren't flat)
+      - x: "name(.)"
+      - x: "*[1]"
+      - x: "*[2]"
+
 
 -
   name: chemistry-prescripts
@@ -412,15 +416,14 @@
         then:
         - intent:
             name: "chemical-nuclide"
-            children:       # typical order spoken
-            - x: "*[4]"     # pre-lower
-            - x: "*[3]"     # pre-upper
-            - x: "*[1]"     # base
+            children:
+            - x: "*"
         else:       # FIX: what other cases are there???
         - intent:
             name: "chemical-formula"
             children:       
             - x: "*"
+
 
 -
   name: chemical-element
