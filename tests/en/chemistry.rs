@@ -141,9 +141,9 @@ fn beta_decay() {
     </math>";
     test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr, "14 6 C decays to, 14 7 N plus 0 negative 1 e");
     test_prefs("ClearSpeak", vec![("Verbosity", "Medium")], expr,
-      "pre super 14 pre sub 6 C, decays to, pre super 14 pre sub 7 N, plus pre super 0 pre sub negative 1 e");
+      "super 14 sub 6 C decays to, super 14 sub 7 N plus super 0 sub negative 1 e");
     test_prefs("ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-      "pre superscript 14 pre subscript 6 C, decays to; pre superscript 14 pre subscript 7 N, plus, pre superscript 0 pre subscript negative 1 e");
+      "superscript 14 subscript 6 C, decays to; superscript 14 subscript 7 N, plus superscript 0 subscript negative 1 e");
 }
 
 #[test]
@@ -405,9 +405,9 @@ fn mhchem_beta_decay() {
   test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr,
       "14 6 C decays to, 14 7 N plus 0 negative 1 e");
   test_prefs("SimpleSpeak", vec![("Verbosity", "Medium")], expr,
-      "pre super 14 pre sub 6 C, decays to, pre super 14 pre sub 7 N, plus pre super 0 pre sub negative 1 e");
+      "super 14 sub 6 C decays to, super 14 sub 7 N plus super 0 sub negative 1 e");
   test_prefs("SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-      "pre superscript 14 pre subscript 6 C, decays to; pre superscript 14 pre subscript 7 N, plus, pre superscript 0 pre subscript negative 1 e");
+      "superscript 14 subscript 6 C, decays to; superscript 14 subscript 7 N, plus superscript 0 subscript negative 1 e");
 }
 
 #[test]

@@ -740,20 +740,20 @@
          then:
             - test:
                if: "$Verbosity='Verbose'"   
-               then: [t: "pre superscript"]
+               then: [t: "superscript"]
                else_test:
                   if: "$Verbosity='Medium'" 
-                  then: [t: "pre super"]
+                  then: [t: "super"]
             - x: "$Prescripts[2]"
       - test:
          if: "not($Prescripts[1][self::m:none])"   
          then:
             - test:
                if: "$Verbosity='Verbose'"   
-               then: [t: "pre subscript"]
+               then: [t: "subscript"]
                else_test:
                   if: "$Verbosity='Medium'" 
-                  then: [t: "pre sub"]
+                  then: [t: "sub"]
             - x: "$Prescripts[1]"
       - test:
          if: "count($Prescripts) > 2"        # can this happen for chemistry??? we allow for one *extra* pre sub/super pair
@@ -763,20 +763,20 @@
             then:
                - test:
                   if: "$Verbosity='Verbose'"   
-                  then: [t: "pre superscript"]
+                  then: [t: "superscript"]
                   else_test:
                      if: "$Verbosity='Medium'" 
-                     then: [t: "pre super"]
+                     then: [t: "super"]
                - x: "$Prescripts[4]"
          - test:
             if: "not($Prescripts[3][self::m:none])"   
             then:
                - test:
                   if: "$Verbosity='Verbose'"   
-                  then: [t: "pre subscript"]
+                  then: [t: "subscript"]
                   else_test:
                      if: "$Verbosity='Medium'" 
-                     then: [t: "pre sub"]
+                     then: [t: "sub"]
                - x: "$Prescripts[3]"
    - x: "*[1]"    # base
    - test: 
