@@ -464,7 +464,7 @@ impl CanonicalizeContext {
 		};
 		
 		// begin by cleaning up empty elements
-		debug!("clean_mathml\n{}", mml_to_string(&mathml));
+		// debug!("clean_mathml\n{}", mml_to_string(&mathml));
 		let element_name = name(&mathml);
 		let parent_requires_child = 
 			if element_name == "math" {
@@ -704,7 +704,7 @@ impl CanonicalizeContext {
 							Some(new_child) => {
 								let new_child_name = name(&new_child);
 								children = mathml.children();				// clean_mathml(child) may have changed following siblings
-								debug!("new_child (i={})\n{}", i, mml_to_string(&new_child));
+								// debug!("new_child (i={})\n{}", i, mml_to_string(&new_child));
 								children[i] = ChildOfElement::Element(new_child);
 								mathml.replace_children(children);
 								if new_child_name == "mi" || new_child_name == "mtext" {
@@ -2863,7 +2863,7 @@ fn add_attrs<'a>(mathml: Element<'a>, attrs: Vec<Attribute>) -> Element<'a> {
 		"intent", "arg",
 	};
 	
-	debug!(   "Adding back {} attr(s) to {}", attrs.len(), name(&mathml));
+	// debug!(   "Adding back {} attr(s) to {}", attrs.len(), name(&mathml));
 	// remove non-global attrs
 	for attr in mathml.attributes() {
 		let attr_name = attr.name().local_part();
