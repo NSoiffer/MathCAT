@@ -2234,7 +2234,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
     /// Iterate over all the nodes finding matches for the elements
     /// For this case of returning MathML, everything else is an error
     fn replace_nodes_tree(&'r mut self, nodes: Vec<Node<'c>>, _mathml: Element<'c>) -> Result<Element<'m>> {
-        // debug!("replace_nodes: working on {} nodes", nodes.size());
+        // debug!("replace_nodes: working on {} nodes", nodes.len());
 
         let mut children = Vec::with_capacity(3*nodes.len());   // guess (2 chars/node + space)
         for node in nodes {
