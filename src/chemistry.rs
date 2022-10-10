@@ -1571,4 +1571,44 @@ mod chem_tests {
         assert!(are_strs_canonically_equal(test, target));
     }
 
+    #[test]
+    fn mhchem_hcl_aq() {
+        init_logger();
+        let test = "<math>
+        <mrow>
+          <mn>2</mn>
+          <mstyle scriptlevel='0'>
+            <mspace width='0.167em'></mspace>
+          </mstyle>
+          <mrow>
+            <mi>HCl</mi>
+          </mrow>
+          <mspace width='0.111em'></mspace>
+          <mo stretchy='false'>(</mo>
+          <mrow>
+            <mi>aq</mi>
+          </mrow>
+          <mo stretchy='false'>)</mo>
+        </mrow>
+      </math>";
+        let target = "<math>
+        <mrow data-chem-equation='7'>
+          <mn>2</mn>
+          <mo data-changed='added'>&#x2062;</mo>
+          <mrow data-changed='added' data-chem-equation='7'>
+            <mi mathvariant='normal' data-chem-element='1'>H</mi>
+            <mo data-changed='added'>&#x2063;</mo>
+            <mi data-chem-element='2'>Cl</mi>
+            <mo data-changed='added'>&#x2063;</mo>
+            <mrow data-changed='added' data-chem-equation='2'>
+              <mo stretchy='false'>(</mo>
+              <mi>aq</mi>
+              <mo stretchy='false'>)</mo>
+            </mrow>
+          </mrow>
+        </mrow>
+       </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
 }
