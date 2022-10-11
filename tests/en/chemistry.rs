@@ -5,7 +5,7 @@ use crate::common::*;
 #[test]
 fn salt() {
   let expr = "<math><mi>Na</mi><mi>Cl</mi></math>";
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "N a C l");
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "N eigh C l");
 }
 
 #[test]
@@ -35,9 +35,9 @@ fn sulfate() {
 fn aluminum_sulfate() {
   let expr = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
           <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
-  test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr, "A l 2 open S O 4 close 3");
-  test_prefs("ClearSpeak", vec![("Verbosity", "Medium")], expr, "A l sub 2, open paren S O sub 4 close paren sub 3");
-  test_prefs("ClearSpeak", vec![("Verbosity", "Verbose")], expr, "A l subscript 2, open paren S O subscript 4, close paren subscript 3");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr, "Eigh l 2 open S O 4 close 3");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Medium")], expr, "Eigh l sub 2, open paren S O sub 4 close paren sub 3");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Verbose")], expr, "Eigh l subscript 2, open paren S O subscript 4, close paren subscript 3");
 }
 
 #[test]
@@ -555,7 +555,7 @@ fn mhchem_hcl_aq_etc() {
     </mrow>
   </math>";
   test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "2 H C l aqueous, plus 2 N a solid; yields, 2 N a C l aqueous, plus H 2 gas");
+      expr, "2 H C l aqueous, plus 2 N eigh solid; yields, 2 N eigh C l aqueous, plus H 2 gas");
 
 }
 
