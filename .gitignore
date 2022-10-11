@@ -6,6 +6,7 @@ src.7z
 mp2.7z
 foo
 out
+Rules.zip
 src/*.bak
 *.swp
 */*.swp
