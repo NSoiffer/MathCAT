@@ -1033,7 +1033,7 @@ impl<'r> MyXPath {
         };
     }
     
-    fn evaluate<'a, 'c>(&'a self, context: &'r Context<'c>, mathml: Element<'c>) -> Result<Value<'c>> {
+    pub fn evaluate<'a, 'c>(&'a self, context: &'r Context<'c>, mathml: Element<'c>) -> Result<Value<'c>> {
         // debug!("evaluate: {}", self);
         let result = self.xpath.evaluate(context, mathml);
         return match result {
@@ -1422,7 +1422,7 @@ impl VariableDefinition {
                 return Ok(
                     VariableDefinition{
                         name,
-                        value: MyXPath::build(value)?
+                        value: MyXPath::build(&value)?
                     }
                 );
             },
@@ -1767,6 +1767,7 @@ pub struct SpeechRulesWithContext<'c, 's:'c, 'm:'c> {
     context_stack: ContextStack<'c>,   // current value of (context) variables
     doc: Document<'m>,
     nav_node_id: String,
+    pub inside_spell: bool,     // hack to allow 'spell' to avoid infinite loop (see 'spell' implementation in tts.rs)
 }
 
 impl<'c, 's:'c, 'm:'c> fmt::Display for SpeechRulesWithContext<'c, 's,'m> {
@@ -2023,6 +2024,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
             context_stack: ContextStack::new(&speech_rules.pref_manager.borrow()),
             doc,
             nav_node_id,
+            inside_spell: false,
         }
     }
 
@@ -2287,7 +2289,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
 
     /// Lookup unicode "pronunciation" of char.
     /// Note: TTS is not supported here (not needed and a little less efficient)
-    fn replace_chars(&'r mut self, str: &str, mathml: Element<'c>) -> Result<String> {
+    pub fn replace_chars(&'r mut self, str: &str, mathml: Element<'c>) -> Result<String> {
         let rules = self.speech_rules;
         let mut chars = str.chars();
         // avoid "a" -> "eigh", "." -> "point" and non-breaking space but catch monospaced "a" so it becomes "a"

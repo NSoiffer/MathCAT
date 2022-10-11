@@ -70,6 +70,7 @@ use std::string::ToString;
 use std::str::FromStr;
 use strum_macros::{Display, EnumString};
 use regex::Regex;
+use sxd_xpath::Value;
 
 const PAUSE_SHORT:f64 = 150.0;  // ms
 const PAUSE_MEDIUM:f64 = 300.0; // ms
@@ -246,10 +247,10 @@ impl TTSCommandRule {
 #[derive(Debug, Clone, PartialEq)]
 pub enum TTS {
     None,
-    SAPI5,
     SSML,
+    SAPI5,
+//    Eloquence,
 //    Mac,
-//    Eloquence
 }
 
 impl TTS {
@@ -336,8 +337,8 @@ impl TTS {
            }
            return Ok( match self {
                 TTS::None  => "".to_string(),
-                TTS::SAPI5 => compute_bookmark_element(&command.value, "bookmark mark", rules_with_context, mathml)?,
                 TTS::SSML => compute_bookmark_element(&command.value, "mark name", rules_with_context, mathml)?,
+                TTS::SAPI5 => compute_bookmark_element(&command.value, "bookmark mark", rules_with_context, mathml)?,
             } );
         }
 
@@ -346,7 +347,42 @@ impl TTS {
             // spell is also special because we need eval the xpath to get the string to spell (typically the text content of an mi)
             match command.value {
                 TTSCommandValue::XPath(xpath) => {
-                    command.value = TTSCommandValue::String(xpath.replace::<String>(rules_with_context, mathml)?);
+                    let value = xpath.evaluate(rules_with_context.get_context(), mathml)
+                        .chain_err(|| format!("in 'spell': can't evaluate xpath \"{}\"", &xpath.to_string()) )?;
+                    let value_string = match value {
+                        Value::String(s) => s,
+                        Value::Nodeset(nodes) if nodes.size() == 1 => {
+                            let node = nodes.iter().next().unwrap();
+                            if let Some(text) = node.text() {
+                                text.text().to_string()
+                            } else {
+                                bail!("in 'spell': value returned from xpath '{}' does not evaluate to a string, it is {} nodes",
+                                        &xpath.to_string(), nodes.size());
+                            }
+                        },
+                        _ => bail!("in 'spell': value returned from xpath '{}' does not evaluate to a string",  &xpath.to_string()),
+                    };
+                    // Chemistry wants to spell elements like "Na". But we also have the issue of capitalization (SpeechOverrides_CapitalLetters)
+                    //   so the "N" need to use that. The logic for that is already in unicode.yaml. We could replicate that here.
+                    // Rather than duplicate the logic (we would need to handle 'a', and who know what in other languages),
+                    //   we split the token into each letter and call the replacement on each letter.
+                    // That in turns calls spell again. We end up in an infinite loop. To prevent this we set a flag that says don't recurse.
+                    // The only structure that to put that in is SpeechRulesWithContext. A bit of a hack to put it there, but better than a static var.
+                    if rules_with_context.inside_spell {
+                        command.value = TTSCommandValue::String(value_string);
+                    } else {
+                        // let the call to replace call spell on the individual chars -- that lets an "cap" be outside "spell"
+                        let str_with_spaces = value_string.chars()
+                                .map(|ch| {
+                                    rules_with_context.inside_spell = true;
+                                    let spelled_char = rules_with_context.replace_chars(ch.to_string().as_str(), mathml);
+                                    rules_with_context.inside_spell = false;
+                                    spelled_char
+                                })
+                                .collect::<Result<Vec<String>>>()?
+                                .join(" ");
+                        return Ok(str_with_spaces);
+                    }             
                 },
                 _ => bail!("Implementation error: found non-xpath value for spell"),
             }
@@ -361,12 +397,11 @@ impl TTS {
             }
         }
 
-
         let mut result = String::with_capacity(255);
         result += &match self {
             TTS::None  => self.get_string_none(&command, prefs, true),
-            TTS::SAPI5 => self.get_string_sapi5(&command, prefs, true),
             TTS::SSML  => self.get_string_ssml(&command, prefs, true),
+            TTS::SAPI5 => self.get_string_sapi5(&command, prefs, true),
         };
 
 
@@ -379,8 +414,8 @@ impl TTS {
 
         let end_tag = match self {
             TTS::None  => self.get_string_none(&command, prefs, false),
-            TTS::SAPI5 => self.get_string_sapi5(&command, prefs, false),
             TTS::SSML  => self.get_string_ssml(&command, prefs, false),
+            TTS::SAPI5 => self.get_string_sapi5(&command, prefs, false),
         };
 
         if end_tag.is_empty() {
@@ -420,12 +455,8 @@ impl TTS {
                     }
                 );
             } else if command.command == TTSCommand::Spell {
-                // add a space between the chars
-                debug!("spell rule: {}", command.value.get_string());
-                return command.value.get_string().chars()
-                        .map(|ch| ch.to_string())   // can't collect into String without the mapping
-                        .collect::<Vec<String>>()
-                        .join(" ");
+                // debug!("spell rule: {}", command.value.get_string());
+                return command.value.get_string().to_string();
             } else if let TTSCommandValue::Pronounce(p) = &command.value {
                 return crate::speech::CONCAT_INDICATOR.to_string() + &p.text;
             }
@@ -532,8 +563,8 @@ impl TTS {
         );
         return match self {
             TTS::None  => self.get_string_none(&command, prefs, true),
-            TTS::SAPI5 => self.get_string_sapi5(&command, prefs, true),
             TTS::SSML  => self.get_string_ssml(&command, prefs, true),
+            TTS::SAPI5 => self.get_string_sapi5(&command, prefs, true),
         };
 
     }
@@ -549,8 +580,8 @@ impl TTS {
         // we need specialized merges for each TTS engine because we need to know the format of the commands
         return match self {
             TTS::None  => self.merge_pauses_none(str),
-            TTS::SAPI5 => self.merge_pauses_sapi5(str),
             TTS::SSML  => self.merge_pauses_ssml(str),
+            TTS::SAPI5 => self.merge_pauses_sapi5(str),
         };        
     }
 

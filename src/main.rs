@@ -87,31 +87,14 @@ fn main() {
 //   </math>";
   // let expr = "<math><mi>Na</mi><mi>S</mi><mo>(</mo><mi>l</mi><mo>)</mo></math>";
 
-let expr = "<math>
-<mstyle mathcolor='#a33e00'>
+let expr = "<math xmlns='http://www.w3.org/1998/Math/MathML' display='block'>
 <mrow>
-    <mi>SO</mi>
-    <msub>
-    <mrow>
-        <mrow>
-        <mpadded width='0'>
-            <mphantom>
-            <mi>A</mi>
-            </mphantom>
-        </mpadded>
-        </mrow>
-    </mrow>
-    <mrow>
-        <mrow>
-        <mpadded height='0'>
-            <mn>4</mn>
-        </mpadded>
-        </mrow>
-    </mrow>
-    </msub>
+  <mrow>
+    <mi>HCl</mi>
+  </mrow>
 </mrow>
-</mstyle>
-</math>";
+</math>
+";
 
 //   let expr = "<math xmlns='http://www.w3.org/1998/Math/MathML'>
 //   <mstyle mathcolor='#a33e00'>
@@ -153,7 +136,8 @@ let expr = "<math>
   };
 
   info!("Version = '{}'", get_version());
-  set_preference("TTS".to_string(), "none".to_string()).unwrap();
+  set_preference("TTS".to_string(), "ssml".to_string()).unwrap();
+  set_preference("SpeechOverrides_CapitalLetters".to_string(), "".to_string()).unwrap();
   // set_preference("Bookmark".to_string(), "true".to_string()).unwrap();
   set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
 
@@ -170,18 +154,19 @@ let expr = "<math>
   }
 
   // Note: the logger seems to be a huge time sync, so println! is used for timing
-  info!("Time taken: {}ms", instant.elapsed().as_millis());
+  info!("Time taken for loading+speech+braille: {}ms", instant.elapsed().as_millis());
   // let instant = Instant::now();
   // set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
   // match get_spoken_text() {
   //   Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
   //   Err(e) => panic!("{}", errors_to_string(&e)),
   // }
+  // info!("Time taken (second time for speech): {}ms", instant.elapsed().as_millis());
   // info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()));
   
   // match get_braille("".to_string()) {
   //   Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
   //   Err(e) => panic!("{}", errors_to_string(&e)),
   // }
-  // info!("Time taken (second time): {}ms", instant.elapsed().as_millis());
+  // info!("Time taken (second time for speech + braille): {}ms", instant.elapsed().as_millis());
 }
