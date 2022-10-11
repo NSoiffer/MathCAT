@@ -28,7 +28,7 @@
  - "B-Z": 
     - test:
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
-        if: "DEBUG($SpeechOverrides_CapitalLetters) = ''"
+        if: "$SpeechOverrides_CapitalLetters = ''"
         then: [spell: "'.'"]
         else: [x: "$SpeechOverrides_CapitalLetters", spell: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]
 
