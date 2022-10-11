@@ -52,7 +52,12 @@ pub fn test(style: &str, mathml: &str, speech: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
-        let changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", style);
+        let changes;
+        {
+            let mut prefs = rules.pref_manager.borrow_mut();
+            prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
+            changes = prefs.set_user_prefs("SpeechStyle", style);
+        }
         if let Some(changes) = changes {
             rules.invalidate(changes);
         }
@@ -70,6 +75,7 @@ pub fn test_lang(language: &str, style: &str, mathml: &str, speech: &str) {
         let mut changes;
         {   // needs to be scoped due to problems with rules potentially being used with prefs' destructor runs in an outer scope
             let mut prefs = rules.pref_manager.borrow_mut();
+            prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
             changes = prefs.set_user_prefs("SpeechStyle", style).unwrap_or_default();
             let more_changes = prefs.set_user_prefs("Language", language).unwrap_or_default();
             changes.add_changes(more_changes);
@@ -84,19 +90,22 @@ pub fn test_lang(language: &str, style: &str, mathml: &str, speech: &str) {
 // This takes the speech style along with a vector of (pref_name, pref_value)
 #[allow(dead_code)]     // used in testing
 #[allow(non_snake_case)]
-pub fn test_prefs(speech_style: &str, prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
+pub fn test_prefs(speech_style: &str, test_prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
-        let changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", speech_style);
-        if let Some(mut changes) = changes {
-            for (pref_name, pref_value) in prefs {
-                if let Some(more_changes) = rules.pref_manager.borrow_mut().set_user_prefs(pref_name, pref_value) {
+        let mut changes;
+        {
+            let mut prefs = rules.pref_manager.borrow_mut();
+            prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
+            changes = prefs.set_user_prefs("SpeechStyle", speech_style).unwrap_or_default();
+            for (pref_name, pref_value) in test_prefs {
+                if let Some(more_changes) = prefs.set_user_prefs(pref_name, pref_value) {
                     changes.add_changes(more_changes);
                 }
             };
-            rules.invalidate(changes);
         }
+        rules.invalidate(changes);
     });
     check_answer(mathml, speech);
 }
@@ -112,6 +121,7 @@ pub fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: 
         let mut changes;
         {   // needs to be scoped due to problems with rules potentially being used with prefs' destructor runs in an outer scope
             let mut prefs = rules.pref_manager.borrow_mut();
+            prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
             changes = prefs.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap_or_default();
             let more_changes = prefs.set_user_prefs(pref_name, pref_value).unwrap_or_default();
             changes.add_changes(more_changes);
@@ -125,19 +135,22 @@ pub fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: 
 // This forces the use of ClearSpeak and sets multiple ClearSpeak preferences
 #[allow(dead_code)]     // used in testing
 #[allow(non_snake_case)]
-pub fn test_ClearSpeak_prefs(prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
+pub fn test_ClearSpeak_prefs(test_prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let mut rules = rules.borrow_mut();
-        let changes = rules.pref_manager.borrow_mut().set_user_prefs("SpeechStyle", "ClearSpeak");
-        if let Some(mut changes) = changes {
-            for (pref_name, pref_value) in prefs {
-                if let Some(more_changes) = rules.pref_manager.borrow_mut().set_user_prefs(pref_name, pref_value) {
+        let mut changes;
+        {
+            let mut prefs = rules.pref_manager.borrow_mut();
+            prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
+            changes = prefs.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap_or_default();
+            for (pref_name, pref_value) in test_prefs {
+                if let Some(more_changes) = prefs.set_user_prefs(pref_name, pref_value) {
                     changes.add_changes(more_changes);
                 }
             };
-            rules.invalidate(changes);
         }
+        rules.invalidate(changes);
     });
     check_answer(mathml, speech);
 }
