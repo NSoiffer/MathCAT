@@ -18,12 +18,12 @@ MathCAT is written in Rust and can be built to interface with many languages. To
 
 MathCAT uses a number of heuristics that try to repair poor MathML and put it in a recommended format. For example, TeX converters and WYSIWYG editors will take "1,234+1" and break the number "1,234" apart at the comma. MathCAT recognizes that and folds the number into a single `mn`. Other repairs are structural such as creating `mrow`s based on information from MathML's operator dictionary and adding invisible function application, multiplication, addition (mixed fractions), and separators (e.g, between the $i$ and $j$ in $a\_{ij}$) when it seems appropriate. This simplifies speech and Nemeth generation and may be useful to other apps. Currently the cleanup is not exposed in an API, but potentially it could be another service of MathCAT. In general, MathCAT is somewhat conservative in its repair. However, it likely will do the wrong thing in some cases, but the hope is it does the right thing much, much more frequently. Finding common mistakes of translators to MathML and patching up the poor MathML is an ongoing project.
 
-## Current Status (updated 6/22)
+## Current Status (updated 10/22)
 MathCAT is under active development. Initial speech, navigation, and Nemeth generation is complete and [NVDA add-on](https://addons.nvda-project.org/addons/MathCAT.en.html) now exists. It should be usable as a MathPlayer replacement for those using the English version. It is not as complete or polished in some ways as MathPlayer though. However, it supports both Nemeth and UEB technical braille generation. The Nemeth braille is substantially better than that provided by MathPlayer and includes integration with navigation (uses dots 7 and 8 to indicate the navigation node).
 
 A demo to show off some of MathCAT's features and also as an aid for debugging was developed. [Visit the demo](https://nsoiffer.github.io/MathCATDemo/) and please report any bugs you find. This demo is _not_ how AT users will typically interact with MathCAT but does show features that AT can potentially expose to end users such as highlighting of the speech, navigation, and braille.
 
-Timeline (Starting 2020):
+Timeline (Starting 2021):
 * ✓ December/early January: prototype usage of preliminary MathML WG proposal for "intent"
 * ✓ January: Distribute MathCAT to a small group of students and other users for feedback and bug reports
 * ✓ February/March: Work on MathML->UEB translation
@@ -32,17 +32,18 @@ Timeline (Starting 2020):
 * ✓ May: Release MathCAT as NVDA add-on
 * ✓ June: C/C++ interface for MathCAT
 * ✓ Late spring/summer: develop GUI interface for setting user preferences
-* ✓ June/July: Add Chemistry-specific speech
-* July/Aug: vacation 😎
-* Sept: work on UEB->MathML translation and explore UEB->Nemeth math translator
-* Fall: potentially work on 2D Nemeth generation along with Nemeth input
+* ✓ July - Oct: Add Chemistry-specific speech
+* July/Aug/Sept: vacation 😎 and conference
+* Fall:
 * Nov/Dec: Work on at least one translation of MathCAT to another language (pushed back from late spring)
-* Winter, Spring: work with translators to hopefully add many languages
+* Winter, Spring 2023: work with translators to hopefully add many languages
+* Winter, Spring 2023: work on UEB->MathML translation and explore UEB->Nemeth math translator
+* Winter, Spring 2023: potentially work on 2D Nemeth generation along with Nemeth input
 
 
 These plans are very tentative and will likely change based on feedback from users and AT developers.
 I also have commitments for working on the MathML spec, so that can also delay some of these dates.
-A broken ankle also slowed me down considerably in the spring and summer.
+A broken ankle also slowed me down in more ways than one in the spring and summer (2022).
 
 # Documentation for different MathCAT Users
 
