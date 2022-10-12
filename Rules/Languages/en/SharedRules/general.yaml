@@ -887,6 +887,7 @@
    match: "."
    replace:
    - spell: text()
+   - pause: short
 
 -
    name: chemical-state
@@ -901,6 +902,7 @@
       - else_if: ".='g'"
         then: [t: "gas"]
         else: [t: "aqueous"] # (aq)
+   - pause: short
 
 -
    name: chemical-formula-operator
