@@ -100,9 +100,15 @@ To try out your braille translation, you can do so immediately. Please see the i
 For automated testing, the instructions above should be followed. The current tests are taken from braille guides for Nemeth/UEB, and you may want to do the same. Unlikely for a language translation, use `test_braille` as is done for Nemeth/UEB.
 
 ### Rust Developers
+To be written...
+
 `build.rs` and files in `src`
 
-tests
+## Testing
+Whether you are developing code or writing rules, writing and running the tests is very important. It is how you know what you wrote works and also how you know what you wrote didn't break something else.
+
+The `tests` directory is similar to the `Rules` directory [Not really true -- it needs updating to follow the way the rules directory works]. If you are a translator, see the section above that describes what you should do.
+
 
 ## Files
 MathCAT reads the following files for critical information:
