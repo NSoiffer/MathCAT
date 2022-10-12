@@ -13,10 +13,12 @@ If you are unfamiliar with these steps, a simple search will turn up lots of pla
 
 ### Language Translators
 If you are a translator, then you should copy the Rules/Languages/en directory to Rules/Languages/xx, where 'xx' is your country code (e.g., fr, de, el, ...). This new directory is where you will make your translations. There are three categories of files you should edit:
-1. The xxx_Rules.yaml files (currently `ClearSpeak_Rules.yaml` and `SimpleSpeak_Rules.yaml`). These represent different styles of speech. I strongly recommend you just pick one to start with. These files typically have the words that describe the structure such as "fraction" and "power" along with connective words such as "the", "of", and "from".
+1. The xxx_Rules.yaml files (currently `ClearSpeak_Rules.yaml` and `SimpleSpeak_Rules.yaml`). These represent different styles of speech. I strongly recommend you just pick one to start with. These files typically have the words that describe the structure such as "fraction" and "power" along with connective words such as "the", "of", and "from". Because there is a lot of similarity between the two styles of speech, there is also a `SharedRules` folder with rule files in it. These are `- include`d into `ClearSpeak_Rules.yaml` and `SimpleSpeak_Rules.yaml`
 2. The unicode files (`unicode.yaml` and `unicode-full.yaml`). These contain characters like "<" and "∫".
 "You should start with translating `unicode.yaml`. These represent the vast majority of math symbols used. Currently the list is based on experience as to which are the most commonly used Unicode symbols, but I plan to make use of statistics from actual books to refine the list even further. There are about 270 characters to translate in `unicode.yaml`, although ~50 of them are Greek letters (which is hopefully simple).
 3. The navigation files `navigate.yaml` and `overview.yaml`. Just translate `navigate.yaml`; `overview.yaml` is not ready to be used.
+
+__NOTE__: I am in the process of changing the rules to make use of `intent`. This will move the complicated logic of recognizing things like absolute value and determinants into the `intent` folder which is language-independent. It should make translations simpler because the rule only needs to match the tag "absolute-value" or "determinant". The tests also should be separated out into an `intent` directory that is language independent.
 
 These files are YAML files and their content is described later in this page.
 In all of these files, the text to translate will have the YAML key name `t` (and very rarely `ot` and `ct`). When you make a translation, you should capitalize them (e.g, `T`) to indicate that the file has been translated.
