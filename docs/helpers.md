@@ -18,7 +18,8 @@ If you are a translator, then you should copy the Rules/Languages/en directory t
 "You should start with translating `unicode.yaml`. These represent the vast majority of math symbols used. Currently the list is based on experience as to which are the most commonly used Unicode symbols, but I plan to make use of statistics from actual books to refine the list even further. There are about 270 characters to translate in `unicode.yaml`, although ~50 of them are Greek letters (which is hopefully simple).
 3. The navigation files `navigate.yaml` and `overview.yaml`. Just translate `navigate.yaml`; `overview.yaml` is not ready to be used.
 
-In all of these files, the text to translate will have the yaml key name `t` (and very rarely `ot` and `ct`). When you make a translation, you should capitalize them (e.g, `T`) to indicate that the file has been translated.
+These files are YAML files and their content is described later in this page.
+In all of these files, the text to translate will have the YAML key name `t` (and very rarely `ot` and `ct`). When you make a translation, you should capitalize them (e.g, `T`) to indicate that the file has been translated.
 
 As an example, here are two rules from `unicode.yaml`:
 ```
@@ -131,9 +132,11 @@ The files (as the suffix implies) are [YAML files](https://lzone.de/cheat-sheet/
 
 ## A YAML Introduction
 The basic types in YAML are:
-* scalar types like integers, floats, and strings (can be inside of ''s or ""s or left unquoted in some cases)
+* scalar types like integers, floats, and strings (can be inside of single or double quotes or left unquoted in some cases)
 * arrays (used inline as `["a", "b", "c"]`)
 * dictionaries/maps (used inline as `{key: value, foo: bar}`)
+
+Comments begin with a `#` and extend to the end of the line. There are no block comments in YAML.
 
 In the more verbose form of YAML syntax for arrays, indentation is used instead of brackets so the above array becomes
 ```
@@ -154,13 +157,13 @@ Pay attention to the indentation: all entries that are indented to the right of 
 ```
 # Two options for defining a simple replacement for the symbol '∞'.
 # For brevity and clarity, the first form is preferred.
-- '∞': {t: "infinity"}
-- '∞':
-    t: infinity
+ - "∞": [t: "infinity"]                          # 0x221e
+ - '∞':
+    - t: infinity                                # 0x222e
 
 # Here are a few options for a more complex definition that involves a test
 # This compact form is (compact) JSON syntax for the value
-- 0x003C: [test: {if:Verbosity!='terse', then: {t: is}}, t: "less than"]
+- 0x003C: [test: {if:Verbosity!='terse', then: [t: is]}, t: "less than"]
 
 # This form emphasizes (to the reader) that there are two actions: a test followed by producing "less than"
 - 0x003C:
@@ -183,8 +186,6 @@ Pay attention to the indentation: all entries that are indented to the right of 
     - t: less than
 ```
 All forms are valid, but the second and third options are preferred as they seem to be good compromises between brevity and clarity
-
-In case it wasn't obvious, "#" indicates a comment and the rest of the line is ignored. There are no block comments in YAML
 
 Note: all YAML files begin with "---". That indicates the beginning of a "document".
 
@@ -228,6 +229,13 @@ Note: all YAML files begin with "---". That indicates the beginning of a "docume
 #      - with:
 #         variables: [name: value, ...] variables whose values are set during the execution of this clause
 #         replace: [replacements]
+#      - intent:
+#          name: string  name of intent rule
+#          children: children of the intent rule
+#      - insert:
+#          nodes:  xpath (evaluate to nodes)
+#          replace: [replacements]  values that are inserted between all the nodes
+#      - translate: xpath   allow speech of an expression in the middle of a rule (used by "WhereAmI" for navigation)
 #      - set_variables: [var: value, ...] global variable definitions.
 #         These are available to the program after the rules have run; currently used for navigation which can change state.
 #      - pause: string or number  # "short", "medium", "long", "auto", or number in milliseconds
@@ -296,7 +304,6 @@ This is what should be used when setting its value via the API and when accessin
 
 ## XPath
 Many parts of a speech rule make use of xpath. This is a popular and well documented method for selecting parts on an XML document. A web search will turn up many tutorials. Those not familiar with xpath are encouraged to read some. The implementation of xpath used by MathCAT is a slightly extended version of XPATH 1.0.
-Many parts of a speech rule make use of xpath. This is a popular and well documented method for selecting parts on an XML document. A web search will turn up many tutorials. Those not familiar with xpath are encouraged to read some. The implementation of xpath used by MathCAT is a slightly extended version of XPATH 1.0.
 
 MathCAT usage tends to use only a few features of xpath. It also makes use of some custom functions. Here is a short explanation of common xpath usage:
 
@@ -312,18 +319,21 @@ MathCAT usage tends to use only a few features of xpath. It also makes use of so
 | `count(preceding-sibling::*)+1` | add 1 to the number of siblings before the current element |
 
 MathCAT adds some custom functions to make writing rules easier:
+
 | function | meaning |
 | ----- | ---- |
 | `IsNode(nodes, type)   | Returns true if all of the nodes are of the same type. Type can be one of:<br/>  "simple" -- a defined set of elements in ClearSpeak <br/> "leaf" -- one of the MathML leaf elements <br/> "common_fraction" -- integer numerator and denominator<br/> "trig_name" -- sin, cos, tan, sinh, cosh, etc |
 | ToOrdinal |  |
 | ToCommonFraction | |
 | IsLargeOp(nodes) | Returns true if all of the nodes are large operators |
-| IsBracketed | |
+| IsBracketed(openChar, closeChar, requiresComma) | |
 | BaseNode(node) | Returns the base (recursively) of a scripted node |
 | IsInDefinition(node, name) | Returns true if node is a member of the list 'name' (defined in definitions.yaml) |
-| DEBUG(xpath) | |
+| DEBUG(xpath) | Really helpful for debugging -- it will be added to debug output |
 
-These are used by Nemeth Rules
+These are used by Nemeth Rules:
+
 | function | meaning |
+| ----- | ---- |
 | NestingChars | Used by mfrac, msqrt, and mroot rules to repeat the chars the appropriate number of times |
 | BrailleChars | Used by token elements to deal with the complicated rearrangement of various Nemeth indicators such as capitalization and font face |
