@@ -427,7 +427,7 @@
 
 -
   name: chemical-element
-  tag: [mi]
+  tag: [mi, mtext]
   match: "@data-chem-element"
   replace:
   - intent:
