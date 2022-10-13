@@ -204,7 +204,7 @@
    variables: [Chars: "translate(., '\u00A0', '')"]     #FIX: not really right since it could have a non-breaking spacing inside 'mod'
    match: "$Chars='mod' or $Chars='rem'"
    replace:
-      - x: "BrailleChars(DEBUG(.), 'Nemeth')"
+      - x: "BrailleChars(., 'Nemeth')"
       - t: "W"
 
 -
@@ -569,13 +569,13 @@
          if: "$AddSpaces"
          then: [t: "W"]
     - test:
-         if: "DEBUG($NotNested)"
+         if: "$NotNested"
          then:
             - test:
                # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
-               if: "DEBUG(parent::*[self::m:mrow] and
+               if: "parent::*[self::m:mrow] and
                     ancestor-or-self::*[not(preceding-sibling::*)][1]
-                                       [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts])"
+                                       [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts]"
                then: [x: "$NewScriptContext"]
             - t: "⠐"
     - x: "*[1]"
