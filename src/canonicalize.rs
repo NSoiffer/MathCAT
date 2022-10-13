@@ -25,6 +25,7 @@ pub const ADDED_ATTR_VALUE: &str = "added";
 pub const OPERATOR_OVERRIDE: &str ="data-operator";
 pub const HIGH_PRIORITY_OPERATOR: &str = "\u{F8FF}";	// this should be in-sync with last value in "operator-info.in"
 
+/// Used when mhchem is detected and we should favor postscripts rather than prescripts in constructing an mmultiscripts
 const MHCHEM_MMULTISCRIPTS_HACK: &str = "MHCHEM_SCRIPT_HACK";
 
 // (perfect) hash of operators built from MathML's operator dictionary
@@ -1516,7 +1517,7 @@ impl CanonicalizeContext {
 			let parent = as_element(mrow_children[i]).parent().unwrap().element().unwrap();
 			debug!("convert_to_mmultiscripts (i={}) -- PARENT:\n{}", i, mml_to_string(&parent));
 			
-			let i_base = choose_base_of_mmultiscripts(&mrow_children, i);
+			let i_base = choose_base_of_mmultiscripts(mrow_children, i);
 			let mut base = as_element(mrow_children[i_base]);
 			debug!("convert_to_mmultiscripts -- base\n{}", mml_to_string(&base));
 			let base_name = name(&base);
@@ -1625,10 +1626,12 @@ impl CanonicalizeContext {
 			script_vec.push(superscript);
 		}
 
-		/// Find the closest likely base to the 'i'th child, preferring the next one over the preceding one, but want the closest
-		/// We already know there are no empty scripts to the left (because we find first empty base from left to right).
-		/// However, there may be some empty bases before we get to real base on the right.
-		fn choose_base_of_mmultiscripts(mrow_children: &[ChildOfElement], i: usize) -> usize {
+		/// Find the closest likely base to the 'i'th child, preferring the next one over the preceding one, but want the closest.
+		///
+		/// Note: because the base might be (...), 'mrow_children might be changed so that they are grouped into an mrow.
+		fn choose_base_of_mmultiscripts(mrow_children: &mut Vec<ChildOfElement>, i: usize) -> usize {
+			// We already know there are no empty scripts to the left (because we find first empty base from left to right).
+			// However, there may be some empty bases before we get to real base on the right.
 			let script_element_base = as_element(as_element(mrow_children[i]).children()[0]);
 			let from_mchem = script_element_base.attribute(MHCHEM_MMULTISCRIPTS_HACK).is_some();
 			if mrow_children.len() > i+1 && !(from_mchem && i > 0) {
@@ -1639,6 +1642,19 @@ impl CanonicalizeContext {
 			if i > 0 {
 				if is_child_simple_base(mrow_children[i-1]) {
 					return i-1;
+				}
+				if let Some(i_start) = is_grouped_base(&mrow_children[..i]) {
+					assert!(i_start < i-1);	// should be at least two children (open and close)
+					// create a new mrow, add the grouped children to it, then drain all but the first of them from the original mrow vec.
+					// stick the mrow into the first of them -- this is the base
+					let new_mrow = create_mathml_element(&as_element(mrow_children[0]).document(), "mrow");
+					new_mrow.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
+					for &child in &mrow_children[i_start..i] {
+						new_mrow.append_child(child);
+					}
+					mrow_children.drain(i_start+1..i);
+					mrow_children[i_start] = ChildOfElement::Element(new_mrow);
+					return i_start;
 				}
 			}
 
@@ -1668,6 +1684,25 @@ impl CanonicalizeContext {
 				}
 
 				return child_name == "mi" || child_name == "mtext";
+			}
+
+			/// Return the index of the matched open paren/bracket if the last element is a closed paren/bracket
+			fn is_grouped_base(mrow_children: &[ChildOfElement]) -> Option<usize> {
+				// FIX: this really belongs in canonicalization pass, not the clean pass
+				let i_last = mrow_children.len()-1;
+				let last_child = as_element(mrow_children[i_last]);
+				if name(&last_child) == "mo" &&
+				   CanonicalizeContext::new().find_operator(last_child, None, None, None).is_right_fence() {
+					for i_child in (0..i_last).rev() {
+						let child = as_element(mrow_children[i_child]);
+						if name(&child) == "mo" &&
+						   CanonicalizeContext::new().find_operator(child, None, None, None).is_left_fence() {
+							// FIX: should make sure left and right match. Should also count for nested parens
+							return Some(i_child);
+						}
+					}
+				}
+				return None;
 			}
 		}
 	}
@@ -2931,7 +2966,7 @@ fn is_adorned_node<'a>(node: &'a Element<'a>) -> bool {
 			name == "mmultiscripts";
 }
 
-
+/// return 'node' or if it is adorned, return its base (recursive)
 fn get_possible_embellished_node(node: Element) -> Element {
 	let mut node = node;
 	while is_adorned_node(&node) {
