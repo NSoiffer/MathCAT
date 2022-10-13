@@ -717,6 +717,9 @@
          if: "$Verbosity='Medium'" 
          then: [t: "super"]
    - x: "*[3]"
+   - test:
+      if: "following-sibling::*[1][text()='+' or text()='-']"    # a little lazy -- assumes chemistry superscripts end with + or -
+      then: [pause: medium]
    
 -
    # There currently is no way to do sub/super for n-ary number of args
@@ -871,6 +874,9 @@
                            if: "$Verbosity='Medium'" 
                            then: [t: "super"]
                      - x: "$Postscripts[8]"
+      - test:
+         if: "$Postscripts[last()][not(self::m:none)] and following-sibling::*[1][text()='+' or text()='-']"
+         then: [pause: medium]
 
    
 -
@@ -886,6 +892,7 @@
    tag: chemical-element
    match: "."
    replace:
+   - bookmark: "@id"
    - spell: text()
    - pause: short
 
@@ -894,6 +901,7 @@
    tag: chemical-state
    match: "."
    replace:
+   - bookmark: "*[1]/@id"
    - test:
       - if: ".='s'"
         then: [t: "solid"]
@@ -910,6 +918,7 @@
    match: "."
    replace:
    # FIX: this might be better/more efficient if in unicode.yaml
+   - bookmark: "@id"
    - test:
       - if: "text()='-' or text() = ':'"
         then: [t: "single bond"]
@@ -927,6 +936,7 @@
    match: "."
    replace:
    # FIX: this might be better/more efficient if in unicode.yaml
+   - bookmark: "@id"
    - test:
       - if: "text()='→' or text()='⟶'"
         then_test:
