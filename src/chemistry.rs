@@ -1573,7 +1573,6 @@ mod chem_tests {
 
     #[test]
     fn mhchem_hcl_aq() {
-        init_logger();
         let test = "<math>
         <mrow>
           <mn>2</mn>
@@ -1609,6 +1608,75 @@ mod chem_tests {
         </mrow>
        </math>";
         assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn mhchem_nested_sub() {
+        let test = "<math>
+        <mrow>
+          <mo stretchy='false'>(</mo>
+          <mrow>
+            <mi>CH</mi>
+          </mrow>
+          <msub>
+            <mrow>
+              <mrow>
+                <mpadded width='0'>
+                  <mphantom>
+                    <mi>A</mi>
+                  </mphantom>
+                </mpadded>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mrow>
+                <mpadded height='0'>
+                  <mn>3</mn>
+                </mpadded>
+              </mrow>
+            </mrow>
+          </msub>
+          <mo stretchy='false'>)</mo>
+          <msub>
+            <mrow>
+              <mrow>
+                <mpadded width='0'>
+                  <mphantom>
+                    <mi>A</mi>
+                  </mphantom>
+                </mpadded>
+              </mrow>
+            </mrow>
+            <mrow>
+              <mrow>
+                <mpadded height='0'>
+                  <mn>3</mn>
+                </mpadded>
+              </mrow>
+            </mrow>
+          </msub>
+        </mrow>
+      </math>";
+    let target = " <math>
+        <mmultiscripts data-chem-formula='3'>
+            <mrow data-changed='added' data-chem-formula='3'>
+                <mo stretchy='false'>(</mo>
+                <mrow data-changed='added'>
+                <mi mathvariant='normal' data-chem-element='1'>C</mi>
+                <mo data-changed='added'>&#x2063;</mo>
+                <mmultiscripts data-chem-formula='1'>
+                    <mi mathvariant='normal' data-chem-element='1'>H</mi>
+                    <mn>3</mn>
+                    <none></none>
+                </mmultiscripts>
+                </mrow>
+                <mo stretchy='false'>)</mo>
+            </mrow>
+            <mn>3</mn>
+            <none></none>
+        </mmultiscripts>
+    </math>";
+    assert!(are_strs_canonically_equal(test, target));
     }
 
 }
