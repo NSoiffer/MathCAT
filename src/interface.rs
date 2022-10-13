@@ -197,8 +197,9 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
         // here/upfront, so it is borrowed separately below. That way its borrowed lifetime is small
         let files_changed;
         {
+            use crate::prefs::NO_PREFERENCE;
             let mut pref_manager = rules.pref_manager.borrow_mut();
-            if !pref_manager.get_api_prefs().to_string(&name).is_empty() {
+            if pref_manager.get_api_prefs().to_string(&name) != NO_PREFERENCE {
                 match name.as_str() {
                     "Pitch" | "Rate" | "Volume" => {
                         pref_manager.set_api_float_pref(&name, to_float(&name, &value)?);    
@@ -211,7 +212,7 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
                     }
                 }
                 files_changed = None;
-            } else if pref_manager.get_user_prefs().to_string(name.as_str()).is_empty() {
+            } else if pref_manager.get_user_prefs().to_string(name.as_str()) == NO_PREFERENCE {
                 bail!("set_preference: {} is not a known preference", &name); 
             } else {
                 files_changed = pref_manager.set_user_prefs(&name, &value);     // assume string valued

@@ -33,6 +33,8 @@ use std::collections::HashMap;
 use crate::shim_filesystem::*;
 use crate::errors::*;
 
+/// Use to indicate preference not found with Preference::to_string()
+pub static NO_PREFERENCE: &str = "\u{FFFF}";
 
 // Preferences are recorded here
 /// Preferences are stored in a HashMap. It maps the name of the pref (a String) to its value (stored as YAML string/float)
@@ -207,17 +209,19 @@ impl Preferences{
         }
     }
 
-    /// returns value associated with 'name' or ""
+    /// returns value associated with 'name' or string NO_PREFERENCE
+    /// 
+    /// Note: Option/Result not used because most of the time we know the preference exists, so no unwrapping is needed for 95% of calls
     pub fn to_string(&self, name: &str) -> String {
         let value = self.prefs.get(name);
         return match value {
-            None => "".to_string(),
+            None => NO_PREFERENCE.to_string(),
             Some(v) => match v {
                 Yaml::String(s) => s.clone(),
                 Yaml::Boolean(b)   => b.to_string(),
                 Yaml::Integer(i)    => i.to_string(),
                 Yaml::Real(s) => s.clone(),
-                _  => "".to_string(),       // shouldn't happen
+                _  => NO_PREFERENCE.to_string(),       // shouldn't happen
             }
         }
     }
@@ -935,7 +939,7 @@ mod tests {
             assert_eq!(prefs.to_string("ClearSpeak_AbsoluteValue").as_str(), "Auto");
             assert_eq!(prefs.to_string("ResetNavMode").as_str(), "false");
             assert_eq!(prefs.to_string("BrailleCode").as_str(), "Nemeth");
-            assert_eq!(prefs.to_string("X_Y_Z").as_str(), "");
+            assert_eq!(prefs.to_string("X_Y_Z").as_str(), NO_PREFERENCE);
         });
     }
 
