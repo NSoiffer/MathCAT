@@ -374,6 +374,7 @@
  - "∃": [t: "⠈⠿"]               # 0x2203 (There exists)
  - "∄": [t: "⠌⠈⠿"]              # 0x2204 (There does not exist)
  - "∅": [t: "⠸⠴"]               # 0x2205 (Empty set)
+ - "∏": [t: "⠨⠠⠏"]              # 0x220F (N-ary product)
  - "∑": [t: "⠨⠠⠎"]              # 0x2211 (N-ary summation)
  - "∞": [t: "⠠⠿"]               # 0x221E (Infinity)
  - "∟": [t: "⠫⠪⠨⠗⠻"]            # 0x221F (Right angle)
