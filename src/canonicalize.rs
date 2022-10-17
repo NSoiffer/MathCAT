@@ -14,6 +14,7 @@ use crate::xpath_functions::{IsBracketed, is_leaf};
 use std::{ptr::eq as ptr_eq};
 use crate::pretty_print::*;
 use regex::Regex;
+use std::fmt;
 use crate::chemistry::*;
 
 
@@ -50,6 +51,7 @@ lazy_static!{
 	// FIX: any other operators that should act the same (e.g, plus-minus and minus-plus)?
 	static ref PLUS: &'static OperatorInfo = OPERATORS.get("+").unwrap();
 	static ref MINUS: &'static OperatorInfo = OPERATORS.get("-").unwrap();
+	static ref PREFIX_MINUS: &'static OperatorInfo = MINUS.next.as_ref().unwrap();
 
 	static ref TIMES_SIGN: &'static OperatorInfo = OPERATORS.get("×").unwrap();
 
@@ -222,6 +224,19 @@ struct StackInfo<'a, 'op>{
 	is_operand: bool,			// true if child at end of mrow is an operand (as opposed to an operator)
 }
 
+impl<'a, 'op> fmt::Display for StackInfo<'a, 'op> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "StackInfo(op={}/{}, is_operand={}, mrow({}",
+				show_invisible_op_char(self.op_pair.ch), self.op_pair.op.priority, self.is_operand,
+				if self.mrow.children().is_empty() {")"} else {""})?;
+		for child in self.mrow.children() {
+			let child = as_element(child);
+			write!(f, "{}{}", name(&child), if child.following_siblings().is_empty() {")"} else {","})?;
+		}
+        return Ok( () );
+    }
+}
+
 impl<'a, 'op:'a> StackInfo<'a, 'op> {
 	fn new(doc: Document<'a>) -> StackInfo<'a, 'op> {
 		// debug!("  new empty StackInfo");
@@ -261,7 +276,7 @@ impl<'a, 'op:'a> StackInfo<'a, 'op> {
 
 	fn add_child_to_mrow(&mut self, child: Element<'a>, child_op: OperatorPair<'op>) {
 		// debug!("  adding '{}' to mrow[{}], operator '{}/{}'",
-		// 			element_summary(child), self.mrow.children().len(), show_invisible_op_char(child_op.ch), child_op.op.priority);
+		// 		element_summary(child), self.mrow.children().len(), show_invisible_op_char(child_op.ch), child_op.op.priority);
 		self.mrow.append_child(child);
 		if ptr_eq(child_op.op, *ILLEGAL_OPERATOR_INFO) {
 			assert!(!self.is_operand); 	// should not have two operands in a row
@@ -2299,7 +2314,6 @@ impl CanonicalizeContext {
 		if node_name != "mi" && node_name != "mtext" {
 			return FunctionNameCertainty::False;
 		}
-		// mtext is sometimes used to get non-italic font
 		// whitespace is sometimes added to the mi since braille needs it, so do a trim here to get function name
 		let base_name = as_text(base_of_name).trim();
 		if base_name.is_empty() {
@@ -2653,46 +2667,45 @@ impl CanonicalizeContext {
 	}
 	
 	
-	fn reduce_stack<'s, 'a:'s, 'op:'a>(&self, parse_stack: &'s mut Vec<StackInfo<'a, 'op>>, current_priority: usize, stop_at_function_call: bool) {
-		// stop_at_function_call -- hack to to deal with exceptional parsing for things like "sin -2x" (see comments around call of reduce_stack)
+	fn reduce_stack<'s, 'a:'s, 'op:'a>(&self, parse_stack: &'s mut Vec<StackInfo<'a, 'op>>, current_priority: usize) {
 		let mut prev_priority = top(parse_stack).priority();
 		// debug!(" reduce_stack: stack len={}, priority: prev={}, cur={}", parse_stack.len(), prev_priority, current_priority);
 		while current_priority < prev_priority {					// pop off operators until we are back to the right level
-			if stop_at_function_call && ptr_eq(top(parse_stack).op_pair.op, *INVISIBLE_FUNCTION_APPLICATION) {
-				break;
-			}
-	
 			if parse_stack.len() == 1 {
 				break;			// something went wrong -- break before popping too much
 			}
-			let mut top_of_stack = parse_stack.pop().unwrap();
-			// debug!(" ..popped len={} op:'{}/{}', operand: {}",
-			// 		top_of_stack.mrow.children().len(),
-			// 		show_invisible_op_char(top_of_stack.op_pair.ch), top_of_stack.op_pair.op.priority,
-			// 		top_of_stack.is_operand);
-			let mut mrow = top_of_stack.mrow;
-			if mrow.children().len() == 1 {
-				// should have added at least operator and operand, but input might not be well-formed
-				// in this case, unwrap the mrow and expose the single child for pushing onto stack
-				let single_child = top_of_stack.remove_last_operand_from_mrow();
-				mrow = single_child;
-			}
-	
-			let mut top_of_stack = parse_stack.pop().unwrap();
-			top_of_stack.add_child_to_mrow(mrow, OperatorPair::new());	// mrow on top is "parsed" -- now add it to previous
-			prev_priority = top_of_stack.priority();
-			parse_stack.push(top_of_stack);
+			prev_priority = self.reduce_stack_one_time(parse_stack);
 		};
 	}
+
+	fn reduce_stack_one_time<'s, 'a:'s, 'op:'a>(&self, parse_stack: &'s mut Vec<StackInfo<'a, 'op>>) -> usize {
+		let mut top_of_stack = parse_stack.pop().unwrap();
+		// debug!(" ..popped len={} op:'{}/{}', operand: {}",
+		// 		top_of_stack.mrow.children().len(),
+		// 		show_invisible_op_char(top_of_stack.op_pair.ch), top_of_stack.op_pair.op.priority,
+		// 		top_of_stack.is_operand);
+		let mut mrow = top_of_stack.mrow;
+		if mrow.children().len() == 1 {
+			// should have added at least operator and operand, but input might not be well-formed
+			// in this case, unwrap the mrow and expose the single child for pushing onto stack
+			let single_child = top_of_stack.remove_last_operand_from_mrow();
+			mrow = single_child;
+		}
+
+		let mut top_of_stack = parse_stack.pop().unwrap();
+		top_of_stack.add_child_to_mrow(mrow, OperatorPair::new());	// mrow on top is "parsed" -- now add it to previous
+		let prev_priority = top_of_stack.priority();
+		parse_stack.push(top_of_stack);
+		return prev_priority;
+	}
 	
-	fn is_trig_arg<'a, 'op:'a>(&self, previous_child: Element<'a>, current_child: Element<'a>, parse_stack: &[StackInfo<'a, 'op>]) -> bool {
+	fn is_trig_arg<'a, 'op:'a>(&self, previous_child: Element<'a>, current_child: Element<'a>, parse_stack: &mut Vec<StackInfo<'a, 'op>>) -> bool {
 		// We have operand-operand and know we want multiplication at this point. 
 		// Check for special case where we want multiplication to bind more tightly than function app (e.g, sin 2x, sin -2xy)
 		// We only want to do this for simple args
 		use crate::xpath_functions::IsNode;
-		// debug!("  is_trig_arg: prev {}, current {}, stack len={}; top len={}",
-		//  element_summary(previous_child), element_summary(current_child),
-		//  parse_stack.len(), top(parse_stack).mrow.children().len());
+		debug!("  is_trig_arg: prev {}, current {}, Stack:", element_summary(previous_child), element_summary(current_child));
+		parse_stack.iter().for_each(|stack_info| debug!("    {}", stack_info));
 		if !IsNode::is_simple(&current_child) {
 			return false;
 		}
@@ -2703,15 +2716,59 @@ impl CanonicalizeContext {
 		}
 	
 		// Use lower priority multiplication if current_child is a function (e.g. "cos" in "sin x cos 3y")
-		if self.is_function_name(current_child, None) == FunctionNameCertainty::True{
+		// if !is_trig(current_child) {
+		if self.is_function_name(current_child, None) == FunctionNameCertainty::True {
 			return false;
 		}
-	
-		// Two cases:
-		// 1. First operand-operand (e.g, sin 2x, where 'current_child' is 'x') -- top of stack is 'sin' 'apply func' '2'
-		// 2. Subsequent operand-operand (e.g, sin 2xy, where 'current_child' is 'y') -- top of stack is '2' 'times' 'x'
+		// Three cases:
+		// 1. First operand-operand (e.g, sin 2x, where 'current_child' is 'x') -- top of stack is mrow('sin' f_apply '2')
+		// 2. Another First operand-operand (e.g, sin -2x, where 'current_child' is 'x') -- top of stack is mrow('-' '2'), next is mrow('sin', f_apply)
+		// 3. Subsequent operand-operand (e.g, sin 2xy, where 'current_child' is 'y') -- top of stack is mrow('2' 'times' 'x')
+		//    Note: IMPLIED_TIMES_HIGH_PRIORITY is only present if we have a trig function
 		let op_on_top = &top(parse_stack).op_pair;
-		return ptr_eq(op_on_top.op, *INVISIBLE_FUNCTION_APPLICATION) || ptr_eq(op_on_top.op, &*IMPLIED_TIMES_HIGH_PRIORITY);
+		if ptr_eq(op_on_top.op, *INVISIBLE_FUNCTION_APPLICATION) {
+			let function_element = as_element(top(parse_stack).mrow.children()[0]);
+			return is_trig(function_element);
+		}
+		if ptr_eq(op_on_top.op, *PREFIX_MINUS) {
+			if parse_stack.len() < 2 {
+				return false;
+			}
+			let next_stack_info = &parse_stack[parse_stack.len()-2];
+			if !ptr_eq(next_stack_info.op_pair.op, *INVISIBLE_FUNCTION_APPLICATION) {
+				return false;
+			}
+			let function_element = as_element(next_stack_info.mrow.children()[0]);
+			if is_trig(function_element) {
+				// want '- 2' to be an mrow; don't want '- 2 x ...' to be the mrow (IMPLIED_TIMES_HIGH_PRIORITY is an internal hack)
+				self.reduce_stack_one_time(parse_stack);
+				return true;
+			}
+			return false;
+		}
+		return ptr_eq(op_on_top.op, &*IMPLIED_TIMES_HIGH_PRIORITY);
+
+		fn is_trig(node: Element) -> bool {
+			let base_of_name = get_possible_embellished_node(node);
+	
+			// actually only 'mi' should be legal here, but some systems used 'mtext' for multi-char variables
+			let node_name = name(&base_of_name);
+			if node_name != "mi" && node_name != "mtext" {
+				return false;
+			}
+			// whitespace is sometimes added to the mi since braille needs it, so do a trim here to get function name
+			let base_name = as_text(base_of_name).trim();
+			if base_name.is_empty() {
+				return false;
+			}
+			return crate::definitions::DEFINITIONS.with(|defs| {
+				// names that are always function names (e.g, "sin" and "log")
+				let defs = defs.borrow();
+				let names = defs.get_hashset("TrigFunctionNames").unwrap();
+				// UEB seems to think "Sin" (etc) is used for "sin", so we move to lower case
+				return names.contains(&base_name.to_ascii_lowercase());
+			});
+		}
 	}
 	
 	
@@ -2789,7 +2846,7 @@ impl CanonicalizeContext {
 								OperatorPair{ch: "\u{2063}", op: *IMPLIED_INVISIBLE_COMMA }				  
 							} else if self.is_implied_separator(&previous_child, &current_child) {
 								OperatorPair{ch: "\u{2063}", op: &*IMPLIED_SEPARATOR_HIGH_PRIORITY }				  
-							} else if self.is_trig_arg(base_of_previous_child, base_of_child, &parse_stack) {
+							} else if self.is_trig_arg(base_of_previous_child, base_of_child, &mut parse_stack) {
 								OperatorPair{ch: "\u{2062}", op: &*IMPLIED_TIMES_HIGH_PRIORITY }				  
 							} else {
 								OperatorPair{ ch: "\u{2062}", op: *IMPLIED_TIMES }
@@ -2800,8 +2857,7 @@ impl CanonicalizeContext {
 						// debug!("  Found whitespace op '{}'/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
 					} else {
 						// debug!("  Found implicit op {}/{} [{:?}]", show_invisible_op_char(current_op.ch), current_op.op.priority, likely_function_name);
-						self.reduce_stack(&mut parse_stack, current_op.op.priority,
-							self.is_function_name(base_of_child, None) != FunctionNameCertainty::True);
+						self.reduce_stack(&mut parse_stack, current_op.op.priority);
 		
 						let implied_mo = create_mo(current_child.document(), current_op.ch);
 						if likely_function_name == FunctionNameCertainty::Maybe {
@@ -2854,7 +2910,7 @@ impl CanonicalizeContext {
 					if current_op.ch == "/" && top(&parse_stack).op_pair.ch == "\u{2064}" {
 							current_op.op = &IMPLIED_PLUS_SLASH_HIGH_PRIORITY;
 					}
-					self.reduce_stack(&mut parse_stack, current_op.op.priority, false);
+					self.reduce_stack(&mut parse_stack, current_op.op.priority);
 					// push new operator on stack (already handled n-ary case)
 					let shift_result = self.shift_stack(&mut parse_stack, current_child, current_op);
 					current_child = shift_result.0;
@@ -2867,7 +2923,7 @@ impl CanonicalizeContext {
 		}
 	
 		// Reached the end -- force reduction of what's left on the stack
-		self.reduce_stack(&mut parse_stack, LEFT_FENCEPOST.priority, false);
+		self.reduce_stack(&mut parse_stack, LEFT_FENCEPOST.priority);
 	
 		// We essentially have 'terminator( mrow terminator)'
 		//   in other words, we have an extra mrow with one child due to the initial start -- remove it
@@ -2948,7 +3004,9 @@ pub fn as_text(leaf_child: Element) -> &str {
 
 #[allow(dead_code)] // for debugging with println
 fn element_summary(mathml: Element) -> String {
-	return format!("{}<{}>", name(&mathml), if is_leaf(mathml) {as_text(mathml).to_string()} else {mathml.children().len().to_string()});
+	return format!("{}<{}>", name(&mathml),
+	              if is_leaf(mathml) {show_invisible_op_char(as_text(mathml)).to_string()} else 
+				  					 {mathml.children().len().to_string()});
 }
 
 fn create_mo<'a, 'd:'a>(doc: Document<'d>, ch: &'a str) -> Element<'d> {
@@ -3450,6 +3508,22 @@ mod canonicalize_tests {
 
 
     #[test]
+    fn function_call_vs_implied_times() {
+        let test_str = "<math><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mi>y</mi></math>";
+        let target_str = "<math>
+			<mrow data-changed='added'>
+				<mrow data-changed='added'>
+					<mi>f</mi>
+					<mo data-changed='added'>&#x2061;</mo>
+					<mrow data-changed='added'> <mo>(</mo> <mi>x</mi> <mo>)</mo> </mrow>
+				</mrow>
+			<mo data-changed='added'>&#x2062;</mo>
+			<mi>y</mi>		</mrow>
+	   </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
     fn implied_plus() {
         let test_str = "<math><mrow>
     <mn>2</mn><mfrac><mn>3</mn><mn>4</mn></mfrac>
@@ -3627,8 +3701,10 @@ mod canonicalize_tests {
 	   </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
     }
+	
     #[test]
     fn trig_negative_args() {
+		init_logger();
         let test_str = "<math><mi>sin</mi><mo>-</mo><mn>2</mn><mi>π</mi><mi>x</mi></math>";
         let target_str = "<math>
 		<mrow data-changed='added'>
@@ -3646,6 +3722,89 @@ mod canonicalize_tests {
 		  </mrow>
 		</mrow>
 	   </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+	
+    #[test]
+    fn not_trig_negative_args() {
+		// this is here to make sure that only trig functions get the special treatment
+        let test_str = "<math><mi>ker</mi><mo>-</mo><mn>2</mn><mi>π</mi><mi>x</mi></math>";
+        let target_str = "<math>
+			<mrow data-changed='added'>
+					<mrow data-changed='added'>
+					<mi>ker</mi>
+					<mo data-changed='added'>&#x2061;</mo>
+					<mrow data-changed='added'>
+						<mo>-</mo>
+						<mn>2</mn>
+					</mrow>
+					</mrow>
+				<mo data-changed='added'>&#x2062;</mo>
+				<mi>π</mi>
+				<mo data-changed='added'>&#x2062;</mo>
+				<mi>x</mi>
+			</mrow>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
+    fn trig_args() {
+        let test_str = "<math><mi>sin</mi><mn>2</mn><mi>π</mi><mi>x</mi></math>";
+        let target_str = "<math>
+		<mrow data-changed='added'>
+		  <mi>sin</mi>
+		  <mo data-changed='added'>&#x2061;</mo>
+		  <mrow data-changed='added'>
+			<mn>2</mn>
+			<mo data-changed='added'>&#x2062;</mo>
+			<mi>π</mi>
+			<mo data-changed='added'>&#x2062;</mo>
+			<mi>x</mi>
+		  </mrow>
+		</mrow>
+	   </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
+    fn not_trig_args() {
+		// this is here to make sure that only trig functions get the special treatment
+        let test_str = "<math><mi>ker</mi><mn>2</mn><mi>π</mi><mi>x</mi></math>";
+        let target_str = "<math>
+		<mrow data-changed='added'>
+			<mrow data-changed='added'>
+				<mi>ker</mi>
+				<mo data-changed='added'>&#x2061;</mo>
+				<mn>2</mn>
+			</mrow>
+			<mo data-changed='added'>&#x2062;</mo>
+			<mi>π</mi>
+			<mo data-changed='added'>&#x2062;</mo>
+			<mi>x</mi>
+		</mrow>
+	   </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
+    fn trig_trig() {
+        let test_str = "<math><mi>sin</mi><mi>x</mi><mi>cos</mi><mi>y</mi></math>";
+        let target_str = "<math>
+		<mrow data-changed='added'>
+			<mrow data-changed='added'>
+				<mi>sin</mi>
+				<mo data-changed='added'>&#x2061;</mo>
+				<mi>x</mi>
+			</mrow>
+			<mo data-changed='added'>&#x2062;</mo>
+			<mrow data-changed='added'>
+				<mi>cos</mi>
+				<mo data-changed='added'>&#x2061;</mo>
+				<mi>y</mi>
+			</mrow>
+		</mrow>
+		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
     }
 
