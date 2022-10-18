@@ -274,8 +274,7 @@
   name: modified-var
   tag: mover
   # breve, check, dot, double-dot, triple-dot, quadruple-dot, grave, hat, tilde
-  # note: canonicalize mapped \u02D9 to '.'
-  match: "*[2][translate(., '\u0306\u030c.\u00A8\u20DB\u20DC`^~→', '')='']"
+  match: "*[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^~→', '')='']"
   replace:
   - intent:
       name: "modified-variable"

@@ -169,7 +169,7 @@
  - "˖": [t: modifier plus sign]                  # 0x2d6
  - "˗": [t: modifier minus sign]                 # 0x2d7
  - "˘": [t: breve]                               # 0x2d8
- - "˙": [t: dot above]                           # 0x2d9
+ - "˙": [t: dot]                                 # 0x2d9
  - "˚": [t: ring above]                          # 0x2da
  - "˛": [t: ogonek]                              # 0x2db
  - "˜": [t: small tilde]                         # 0x2dc

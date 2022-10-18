@@ -134,7 +134,7 @@
  - "°": [t: "degrees"]                           # 0xb0
  - "±": [t: "plus or minus"]                       # 0xb1
  - "´": [t: "acute"]                            # 0xb4
- - "·":
+ - "·":                                            # 0xB7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
         then: [t: "times"]

@@ -2034,7 +2034,7 @@ impl CanonicalizeContext {
 				"\u{02BC}" => "`",
 				"\u{02DC}" => "~",
 				"\u{02C6}"| "\u{0302}" => "^",
-				"\u{02D9}"| "\u{0307}" => ".",
+				"\u{0307}" => "\u{02D9}",	// Nemeth distinguishes this from "." -- \u{02D9} is generated for over dots by most generators
 				"\u{0308}" => "¨",
 				_ => mo_text,
 			}
