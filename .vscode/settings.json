@@ -112,6 +112,7 @@
         "libmathcat",
         "libmp",
         "libyaml",
+        "linearize",
         "linebreak",
         "linethickness",
         "llamapun",
