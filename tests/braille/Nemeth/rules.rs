@@ -92,7 +92,7 @@ fn punct_37_2_2() {
 #[test]
 fn punct_37_7_1() {
     let expr = "<math><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi><mo>.</mo></math>";
-    test_braille("Nemeth", expr, "xxx⠁⠠⠀⠃⠠⠀⠉⠸⠲");
+    test_braille("Nemeth", expr, "⠁⠠⠀⠃⠠⠀⠉⠸⠲");
 }
 
 #[test]
@@ -117,13 +117,13 @@ fn ellipsis_43_b_3() {
 }
 
 #[test]
-fn simple_frac_rule_62_a_3() {
+fn simple_frac_62_a_3() {
     let expr = "<math><mfrac><mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow><mi>c</mi></mfrac></math>";
     test_braille("Nemeth", expr, "⠹⠁⠬⠃⠌⠉⠼");
 }
 
 #[test]
-fn beveled_frac_rule_62_b_1() {
+fn beveled_frac_62_b_1() {
     let expr = "<math><mfrac bevelled='true'>
         <mrow><mi>a</mi><mo>+</mo><mi>b</mi></mrow>
         <mrow><mi>c</mi><mo>+</mo><mi>d</mi></mrow>
@@ -132,25 +132,25 @@ fn beveled_frac_rule_62_b_1() {
 }
 
 #[test]
-fn mixed_frac_rule_63_a_1() {
+fn mixed_frac_63_a_1() {
     let expr = "<math><mn>4</mn><mfrac><mn>3</mn><mn>8</mn></mfrac></math>";
     test_braille("Nemeth", expr, "⠼⠲⠸⠹⠒⠌⠦⠸⠼");
 }
 
 #[test]
-fn mixed_frac_rule_64_2() {
+fn mixed_frac_64_2() {
     let expr = "<math><mn>4</mn><mn>3</mn><mo>/</mo><mn>8</mn></math>";
     test_braille("Nemeth", expr, "⠼⠲⠸⠹⠒⠸⠌⠦⠸⠼");
 }
 
 #[test]
-fn complex_frac_rule_66_1() {
+fn complex_frac_66_1() {
     let expr = "<math><mfrac><mfrac><mn>3</mn><mn>8</mn></mfrac><mn>5</mn></mfrac></math>";
     test_braille("Nemeth", expr, "⠠⠹⠹⠒⠌⠦⠼⠠⠌⠢⠠⠼");
 }
 
 #[test]
-fn non_hyper_complex_frac_rule_67_1() {
+fn non_hyper_complex_frac_67_1() {
     let expr = "<math><mfrac><mi>a</mi><msup><mi>b</mi>
             <mfrac>
                 <mfrac><mn>3</mn><mn>4</mn></mfrac>
@@ -161,7 +161,7 @@ fn non_hyper_complex_frac_rule_67_1() {
 }
 
 #[test]
-fn hyper_complex_frac_rule_68_a_1() {
+fn hyper_complex_frac_68_a_1() {
     // book uses 2d layout -- linear is used here
     let expr = "<math><mfrac>
             <mfrac>
@@ -171,6 +171,24 @@ fn hyper_complex_frac_rule_68_a_1() {
             <mn>5</mn>
         </mfrac></math>";
     test_braille("Nemeth", expr, "⠠⠠⠹⠠⠹⠂⠸⠹⠂⠌⠲⠸⠼⠠⠌⠂⠸⠹⠒⠌⠢⠸⠼⠠⠼⠠⠠⠌⠢⠠⠠⠼");
+}
+
+#[test]
+fn nested_sup_74_b_1() {
+    let expr = "<math><msup><mi>n</mi><msup><mi>x</mi><mi>y</mi></msup></msup></math>";
+    test_braille("Nemeth", expr, "⠝⠘⠭⠘⠘⠽");
+}
+
+#[test]
+fn nested_sup_mmultiscripts_74_b_1() {
+    let expr = "<math><mmultiscripts><mi>n</mi><none/><msup><mi>x</mi><mi>y</mi></msup></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠝⠘⠭⠘⠘⠽");
+}
+
+#[test]
+fn nested_sup_74_b_4() {
+    let expr = "<math><msub><mi>n</mi><msub><mi>x</mi><mi>y</mi></msub></msub></math>";
+    test_braille("Nemeth", expr, "⠝⠰⠭⠰⠰⠽");
 }
 
 #[test]
@@ -206,9 +224,111 @@ fn left_sup_75_7() {
 }
 
 #[test]
+fn left_sup_75_8() {
+    let expr = "<math><mmultiscripts><mi>x</mi><mprescripts/><msup><mi>n</mi><mi>a</mi></msup><none/></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠰⠝⠰⠘⠁⠐⠭");
+}
+
+#[test]
 fn left_sup_75_12() {
     let expr = "<math><msup><mi>p</mi><mi>b</mi></msup><mmultiscripts><mi>x</mi><mprescripts/><none/><mi>c</mi></mmultiscripts></math>";
     test_braille("Nemeth", expr, "⠏⠘⠃⠘⠉⠐⠭");
+}
+
+
+#[test]
+fn german_base_77_4_3() {
+    let expr = "<math><msub> <mi>𝔄</mi> <mn>1</mn> </msub></math>";
+    test_braille("Nemeth", expr, "⠸⠠⠁⠂");
+}
+
+#[test]
+fn prime_77_4_4() {
+    let expr = "<math><msub> <msup><mi>x</mi><mo>'</mo></msup> <mn>1</mn> </msub></math>";
+    test_braille("Nemeth", expr, "⠭⠄⠂");
+}
+
+#[test]
+fn prescript_77_4_6() {
+    let expr = "<math><mmultiscripts> <mi>x</mi> <mprescripts/> <mn>3</mn><none/></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠰⠒⠐⠭");
+}
+
+#[test]
+fn prescript_77_4_7() {
+    let expr = "<math><msub><mi>x</mi><msub><mi>i</mi><mn>1</mn></msub></msub></math>";
+    test_braille("Nemeth", expr, "⠭⠰⠊⠰⠰⠂");
+}
+
+#[test]
+fn log_77_4_8() {
+    let expr = "<math><msub><mi>log</mi><mn>2</mn></msub> <mi>x</mi></math>";
+    test_braille("Nemeth", expr, "⠇⠕⠛⠆⠀⠭");
+}
+
+#[test]
+fn mmultiscripts_77_4_10() {
+    // not  right to use msub because the subscripts should be aligned -- nested msub's won't align subscripts -- mmultiscripts solves this
+    let expr = "<math>
+    <mmultiscripts>
+        <mrow>
+            <mo>(</mo>
+            <mi mathvariant='normal'>C</mi>
+            <mmultiscripts>  <mi mathvariant='normal'>O</mi> <mn>3</mn> <none/> </mmultiscripts>
+            <mo>)</mo>
+        </mrow>
+        <mn>2</mn>
+        <none/>
+    </mmultiscripts>
+</math>
+";
+    test_braille("Nemeth", expr, "⠷⠠⠉⠠⠕⠒⠾⠰⠆");
+}
+
+#[test]
+fn word_77_4_12() {
+    let expr = "<math><msub><mi>seven</mi><mn>3</mn></msub></math>";
+    test_braille("Nemeth", expr, "⠎⠑⠧⠑⠝⠰⠒");
+}
+
+#[test]
+fn comma_number_77_4_20() {
+    // mathml from mathjax output for "x_{10,000}"
+    let expr = "<math><msub><mi>x</mi><mrow><mn>10</mn><mo>,</mo><mn>000</mn></mrow></msub></math>";
+    test_braille("Nemeth", expr, "⠭⠂⠴⠠⠴⠴⠴");
+}
+
+#[test]
+fn sum_77_4_23() {
+    let expr = "<math><msubsup><mo>&#x2211;</mo><mn>0</mn><mi>n</mi></msubsup><msub><mi>a</mi><mi>k</mi></msub></math>";
+    test_braille("Nemeth", expr, "⠨⠠⠎⠴⠘⠝⠐⠁⠰⠅");
+}
+
+#[test]
+fn product_77_4_24() {
+    let expr = "<math><msubsup><mo>&#x220F;</mo><mn>0</mn><mi>n</mi></msubsup><msub><mi>a</mi><mi>k</mi></msub></math>";
+    test_braille("Nemeth", expr, "⠨⠠⠏⠴⠘⠝⠐⠁⠰⠅");
+}
+
+#[test]
+fn integral_77_4_26() {
+    let expr = "<math>
+            <msubsup>
+                <mo>&#x222B;</mo>
+                <mn>0</mn>
+                <msqrt><mn>1</mn><mo>-</mo><msup><mi>x</mi><mn>2</mn></msup></msqrt> 
+            </msubsup>
+            <mrow><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mi>d</mi><mi>x</mi></mrow>
+        </math>";
+    test_braille("Nemeth", expr, "⠮⠰⠴⠘⠜⠂⠤⠭⠘⠘⠆⠘⠻⠐⠋⠷⠭⠾⠙⠭");
+}
+
+#[test]
+fn comma_space_78_1() {
+    // WIRIS output when typed with spaces (which I doubt people do)
+    let expr = "<math><msub><mi>x</mi>
+         <mrow><mi>i</mi><mo>,</mo><mo>&#xA0;</mo><mi>j</mi><mo>,</mo><mo>&#xA0;</mo><mi>k</mi></mrow></msub></math>";
+    test_braille("Nemeth", expr, "⠭⠰⠊⠪⠚⠪⠅");
 }
 
 #[test]
@@ -227,6 +347,19 @@ fn comma_78_2_invisible() { // test with invisible comma -- should be the same (
 fn comma_78_3() {
     let expr = "<math><msub><mi>x</mi><mrow><mn>1</mn><mo>,</mo><mn>2</mn></mrow></msub></math>";
     test_braille("Nemeth", expr, "⠭⠰⠂⠪⠆");
+}
+
+#[test]
+fn comma_78_6() {
+    // WIRIS output when typed with spaces
+    let expr = "<math><mo>(</mo><mi>x</mi><mo>,</mo><mo>&#xA0;</mo><mi>y</mi><mo>)</mo></math>";
+    test_braille("Nemeth", expr, "⠷⠭⠠⠀⠽⠾");
+}
+
+#[test]
+fn nested_super_79_a_2() {
+    let expr = "<math><msub><mi>x</mi><mi>a</mi></msub><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup></math>";
+    test_braille("Nemeth", expr, "⠭⠰⠁⠐⠬⠽⠘⠆");
 }
 
 #[test]
@@ -321,12 +454,24 @@ fn comparison_79_g_2() {
     test_braille("Nemeth", expr, "⠼⠆⠘⠭⠀⠐⠅⠀⠼⠒⠘⠭");
 }
 
-
 #[test]
 fn sub_ind_79_g_4() {
     let expr = "<math><msub><mo>∫</mo><mrow><mi>u</mi><mo>=</mo><mi>a</mi></mrow></msub></math>";
     test_braille("Nemeth", expr, "⠮⠰⠥⠀⠰⠨⠅⠀⠁");
 }
+
+#[test]
+fn baseline_80_a_1() {
+    let expr = "<math><msqrt><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup></msqrt></math>";
+    test_braille("Nemeth", expr, "⠜⠭⠘⠆⠐⠬⠽⠘⠆⠐⠻");
+}
+
+#[test]
+fn superscript_80_a_2() {
+    let expr = "<math><msup><mi>e</mi><msqrt><msup><mi>x</mi><mn>2</mn></msup><mo>+</mo><msup><mi>y</mi><mn>2</mn></msup></msqrt></msup></math>";
+    test_braille("Nemeth", expr, "⠑⠘⠜⠭⠘⠘⠆⠘⠬⠽⠘⠘⠆⠘⠻");
+}
+
 #[test]
 fn sub_ind_80_b_3() {
     let expr = "<math><msub><mi>P</mi><mn>1</mn></msub><mmultiscripts><mi>Q</mi><mprescripts/><mn>2</mn><none/></mmultiscripts></math>";
@@ -365,9 +510,21 @@ fn msubsup_82_a_3() {
 }
 
 #[test]
-fn msubsup_82_a_5() {
-    let expr = "<math><mover><msup><mi>x</mi><mn>2</mn></msup><mo>&#xAF;</mo></mover></math>";
-    test_braille("Nemeth", expr, "⠐⠭⠘⠆⠐⠣⠱⠻");
+fn mmultiscripts_82_a_1() {
+    let expr = "<math><mmultiscripts><mi>x</mi><mi>a</mi><mi>n</mi></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠭⠰⠁⠘⠝");
+}
+
+#[test]
+fn mmultiscripts_82_a_2() {
+    let expr = "<math><mmultiscripts><mi>x</mi><mprescripts/><mi>a</mi><mi>n</mi></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠰⠁⠘⠝⠐⠭");
+}
+
+#[test]
+fn mmultiscripts_82_a_3() {
+    let expr = "<math><mmultiscripts><mi>x</mi><mn>1</mn><mn>2</mn></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠭⠂⠘⠆");
 }
 
 #[test]
@@ -383,35 +540,106 @@ fn sub_sup_82_b_2() {
 }
 
 #[test]
+fn mmultiscripts_82_b_1() {
+    let expr = "<math><mmultiscripts><mi>a</mi><none/><mi>n</mi><mi>m</mi><none/></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠁⠘⠝⠐⠰⠍");
+}
+
+#[test]
+fn mmultiscripts_82_b_2() {
+    let expr = "<math><mmultiscripts><mi>a</mi><mi>m</mi><none/><none/><mi>n</mi></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠁⠰⠍⠐⠘⠝");
+}
+
+#[test]
+fn mmultiscripts_82_b_3() {
+    let expr = "<math><mmultiscripts><mi>x</mi><mprescripts/><none/><mi>a</mi><mi>b</mi><none/></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠘⠁⠐⠰⠃⠐⠭");
+}
+
+#[test]
+fn mmultiscripts_82_b_4() {
+    let expr = "<math><mmultiscripts><mi>x</mi><mprescripts/><mi>b</mi><none/><none/><mi>a</mi></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠰⠃⠐⠘⠁⠐⠭");
+}
+
+#[test]
+fn mmultiscripts_82_b_5() {
+    let expr = "<math><mmultiscripts><mi>x</mi><mn>1</mn><none/><none/><mn>2</mn></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠭⠂⠐⠘⠆");
+}
+
+#[test]
+fn mmultiscripts_82_b_6() {
+    let expr = "<math><mmultiscripts><mi>x</mi><mi>a</mi><mo>'</mo><none/><mi>b</mi></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠭⠄⠰⠁⠐⠘⠃");
+}
+
+#[test]
 fn prime_83_b_1() {
     let expr = "<math><msubsup><mi>x</mi><mi>a</mi><mo>'</mo></msubsup></math>";
     test_braille("Nemeth", expr, "⠭⠄⠰⠁");
 }
 
+#[test]
+fn prime_83_b_4() {
+    let expr = "<math><msubsup> <msup><mi>x</mi><mo>''</mo></msup> <mn>1</mn> <mn>3</mn></msubsup></math>";
+    test_braille("Nemeth", expr, "⠭⠄⠄⠂⠘⠒");
+}
 
 #[test]
-fn underbar_rule_86_a_1() {
+fn prime_mmultiscripts_83_b_4() {
+    let expr = "<math><mmultiscripts> <mi>x</mi> <none/><mo>''</mo> <mn>1</mn><mn>3</mn></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠭⠄⠄⠂⠘⠒");
+}
+
+
+#[test]
+fn underbar_86_a_1() {
     // Note: NFB lessons added a contracted form (lesson 12.5.1.b)
     let expr = "<math><munder><mi>x</mi><mo>&#xAF;</mo></munder></math>";
     test_braille("Nemeth", expr, "⠭⠩⠱");
 }
 
 #[test]
-fn menclose_rule_86_a_1() {
+fn menclose_86_a_1() {
+    // Note: NFB lessons added a contracted form (lesson 12.5.1.b)
     let expr = "<math><menclose notation='bottom'><mi>x</mi></menclose></math>";
     test_braille("Nemeth", expr, "⠭⠩⠱");
 }
 
 #[test]
-fn lim_rule_86_a_3() {
+fn lim_86_a_3() {
     let expr = "<math><munder><mi>lim</mi><mrow><mi>x</mi><mo>&#x2192;</mo><mn>0</mn></mrow></munder><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></math>";
     test_braille("Nemeth", expr, "⠐⠇⠊⠍⠩⠭⠀⠫⠕⠀⠼⠴⠻⠀⠋⠷⠭⠾");
 }
 
 #[test]
-fn overbar_rule_86_a_5() {
+fn overbar_86_a_4() {
     let expr = "<math><mover><msup><mi>x</mi><mn>2</mn></msup><mo>&#xAF;</mo></mover></math>";
     test_braille("Nemeth", expr, "⠐⠭⠘⠆⠐⠣⠱⠻");
+}
+
+#[test]
+fn menclose_86_a_4() {
+    let expr = "<math><menclose notation='top'><msup><mi>x</mi><mn>2</mn></msup></menclose></math>";
+    test_braille("Nemeth", expr, "⠐⠭⠘⠆⠐⠣⠱⠻");
+}
+
+#[test]
+fn overbar_86_a_5() {
+    let expr = "<math><mover><msup><mi>x</mi><mn>2</mn></msup><mo>&#xAF;</mo></mover></math>";
+    test_braille("Nemeth", expr, "⠐⠭⠘⠆⠐⠣⠱⠻");
+}
+
+#[test]
+fn mathml_spec_example_86_a() {
+    let expr = "<math>
+        <munder><mo>(</mo><mo>&#x5F;<!--LOW LINE--></mo></munder>
+        <mfrac><mi>a</mi><mi>b</mi></mfrac>
+        <mover><mo>)</mo><mo>&#x203E;<!--OVERLINE--></mo></mover>
+    </math>";
+    test_braille("Nemeth", expr, "⠐⠷⠩⠱⠻⠹⠁⠌⠃⠼⠐⠾⠣⠱⠻");
 }
 
 #[test]
@@ -428,19 +656,37 @@ fn munder_lesson_12_5_5_5() {
 }
 
 #[test]
-fn overbar_rule_86_b_1() {
+fn overbar_86_b_1() {
     let expr = "<math><mover><mi>x</mi><mo>&#xAF;</mo></mover></math>";
     test_braille("Nemeth", expr, "⠭⠱");
 }
 
 #[test]
-fn overbar_rule_86_b_10() {
+fn menclose_86_b_1() {
+    let expr = "<math><menclose notation='top'><mi>x</mi></menclose></math>";
+    test_braille("Nemeth", expr, "⠭⠱");
+}
+
+#[test]
+fn primed_86_b_6() {
+    let expr = "<math><msup><mrow><mover><mi>x</mi><mo>&#xAF;</mo></mover></mrow><mo>&#x2032;</mo></msup></math>";
+    test_braille("Nemeth", expr, "⠭⠱⠄");
+}
+
+#[test]
+fn menclose_primed_86_b_6() {
+    let expr = "<math><msup><menclose notation='top'><mi>x</mi></menclose><mo>&#x2032;</mo></msup></math>";
+    test_braille("Nemeth", expr, "⠭⠱⠄");
+}
+
+#[test]
+fn overbar_86_b_10() {
     let expr = "<math><mn>3</mn><mo>.</mo><mn>5</mn><mover><mn>4</mn><mo>&#xAF;</mo></mover></math>";
     test_braille("Nemeth", expr, "⠼⠒⠨⠢⠲⠱");
 }
 
 #[test]
-fn overbar_rule_86_b_11() {
+fn overbar_86_b_11() {
     let expr = "<math><mover><mfenced>
             <mrow><mover><mi>a</mi><mo>&#xAF;</mo></mover><mi mathvariant='bold'>A</mi><mo>+</mo>
                 <mover><mi>b</mi><mo>&#xAF;</mo></mover><mi mathvariant='bold'>B</mi></mrow>
@@ -449,7 +695,7 @@ fn overbar_rule_86_b_11() {
 }
 
 #[test]
-fn menclose_rule_86_b_11() {
+fn menclose_86_b_11() {
     let expr = "<math><menclose notation='top'><mfenced>
             <mrow><menclose notation='top'><mi>a</mi></menclose><mi mathvariant='bold'>A</mi><mo>+</mo>
             <menclose notation='top'><mi>b</mi></menclose><mi mathvariant='bold'>B</mi></mrow>
@@ -458,7 +704,7 @@ fn menclose_rule_86_b_11() {
 }
 
 #[test]
-fn order2_overbar_rule_87_a_1() {
+fn order2_overbar_87_a_1() {
     let expr = "<math><mover>
             <mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow>
             <mover><mo>&#xAF;</mo><mrow><mi>a</mi><mo>=</mo><mn>3</mn></mrow></mover>
@@ -479,6 +725,13 @@ fn bar_above_and_below_88_1() {
             <mo>&#xAF;</mo>
         </munderover></math>";
     test_braille("Nemeth", expr, "⠐⠭⠬⠽⠩⠱⠣⠱⠻");
+}
+
+#[test]
+fn above_and_below_88_2() {
+    let expr = "<math><munderover><mo>&#x2211;</mo><mrow><mi>n</mi><mo>=</mo><mn>1</mn></mrow><mo>&#x221E;</mo></munderover>
+                            <mfrac><mn>1</mn><msup><mn>2</mn><mi>n</mi></msup></mfrac><mo>=</mo><mn>1</mn></math>";
+    test_braille("Nemeth", expr, "⠐⠨⠠⠎⠩⠝⠀⠨⠅⠀⠼⠂⠣⠠⠿⠻⠹⠂⠌⠆⠘⠝⠐⠼⠀⠨⠅⠀⠼⠂");
 }
 
 #[test]
@@ -533,6 +786,37 @@ fn bar_97_b_1() {
 fn menclose_bar_97_b_1() {
     let expr = "<math><mo>.</mo><menclose notation='top'><mn>3</mn></menclose></math>";
     test_braille("Nemeth", expr, "⠼⠨⠒⠱");
+}
+
+#[test]
+fn menclose_bar_97_b_3() {
+    let expr = "<math><mn>3.57</mn><mover><mn>29</mn><mo stretchy='true'>&#xAF;</mo></mover></math>";
+    test_braille("Nemeth", expr, "⠼⠒⠨⠢⠶⠐⠆⠔⠣⠱⠻");
+}
+
+#[test]
+fn carrot_98_1() {
+    let expr = "<math><mover><mi>x</mi><mo>^</mo></mover></math>";
+    test_braille("Nemeth", expr, "⠐⠭⠣⠸⠣⠻");
+}
+
+#[test]
+fn dots_99_a_1() {
+    init_logger();
+    let expr = "<math><mo>.</mo><mover><mn>3</mn><mo>&#x2D9;</mo></mover></math>";
+    test_braille("Nemeth", expr, "⠼⠨⠐⠒⠣⠡⠻");
+}
+
+#[test]
+fn dots_99_a_2() {
+    let expr = "<math><mo>.</mo><mover><mn>1</mn><mo>&#x2D9;</mo></mover><mover><mn>3</mn><mo>&#x2D9;</mo></mover><mover><mn>5</mn><mo>&#x2D9;</mo></mover></math>";
+    test_braille("Nemeth", expr, "⠼⠨⠐⠂⠒⠢⠣⠡⠻");
+}
+
+#[test]
+fn dots_99_a_3() {
+    let expr = "<math><mn>.13</mn><mover><mn>5</mn><mo>&#x2D9;</mo></mover></math>";
+    test_braille("Nemeth", expr, "⠼⠨⠂⠒⠐⠢⠣⠡⠻");
 }
 
 #[test]
@@ -689,19 +973,25 @@ fn extension_field_not_ratio_151_11() {
 }
 
 #[test]
-fn multipurpose_172_6() {
+fn prime_172_5() {
+    let expr = "<math><msubsup><mi>x</mi><mi>i</mi><mo>'</mo></msubsup></math>";
+    test_braille("Nemeth", expr, "⠭⠄⠰⠊");
+}
+
+#[test]
+fn prime_172_6() {
     let expr = "<math><msubsup><mi>x</mi><mn>1</mn><mo>'</mo></msubsup></math>";
     test_braille("Nemeth", expr, "⠭⠄⠂");
 }
 
 #[test]
-fn multipurpose_172_8() {
+fn prime_172_8() {
     let expr = "<math><msup><mover><mi>x</mi><mo>&#xAF;</mo></mover><mo>'</mo></msup></math>";
     test_braille("Nemeth", expr, "⠭⠱⠄");
 }
 
 #[test]
-fn multipurpose_172_9() {
+fn prime_172_9() {
     let expr = "<math><msup><mn>5</mn><mo>'</mo></msup><msup><mn>8</mn><mrow><mo>'</mo><mo>'</mo></mrow></msup></math>";
     test_braille("Nemeth", expr, "⠼⠢⠄⠦⠄⠄");
 }
@@ -814,30 +1104,6 @@ fn full_binomial() {
 ";
     test_braille("Nemeth", expr, "⠷⠭⠬⠁⠾⠘⠝⠀⠨⠅⠀⠐⠨⠠⠎⠩⠅⠀⠨⠅⠀⠼⠴⠣⠝⠻⠷⠝⠩⠅⠾⠭⠘⠅⠐⠁⠘⠝⠤⠅");
 }
-
-
-#[test]
-fn braille2print_example() {
-        let expr = "<math>
-        <munder><mrow>
-        <mo>&#x222B;</mo></mrow><mrow>
-        <mi>C</mi></mrow></munder>
-        <mi>d</mi> <mi>s</mi> <mspace/> <mo>=</mo><msubsup><mrow>
-        <mo>&#x222B;</mo></mrow><mrow><msub><mrow> <mi>t</mi></mrow><mrow><mrow>
-        <mn>1</mn></mrow></mrow></msub></mrow><mrow><msub><mrow>
-        <mi>t</mi></mrow><mrow><mrow>
-        <mn>2</mn></mrow></mrow></msub></mrow></msubsup><msqrt><mrow>
-        <msup><mrow> <mo>(</mo><mfrac><mrow> <mi>d</mi> <mi>x</mi></mrow><mrow>
-        <mi>d</mi> <mi>t</mi></mrow></mfrac>
-        <mo>)</mo></mrow><mrow><mrow> <mn>2</mn></mrow></mrow></msup>
-        <mo>+</mo><msup><mrow> <mo>(</mo><mfrac><mrow> <mi>d</mi>
-        <mi>y</mi></mrow><mrow> <mi>d</mi> <mi>t</mi></mrow></mfrac>
-        <mo>)</mo></mrow><mrow><mrow>
-        <mn>2</mn></mrow></mrow></msup></mrow></msqrt>
-        <mi>d</mi> <mi>t</mi> <mo>.</mo></math>";
-    test_braille("Nemeth", expr, "⠐⠮⠩⠠⠉⠻⠙⠎⠀⠨⠅⠀⠮⠰⠞⠰⠰⠂⠘⠞⠘⠰⠆⠐⠜⠷⠹⠙⠭⠌⠙⠞⠼⠾⠘⠆⠐⠬⠷⠹⠙⠽⠌⠙⠞⠼⠾⠘⠆⠐⠻⠙⠞⠸⠲");
-}
-
 
 // Extra tests targeted at special cases in MathCAT
 #[test]
