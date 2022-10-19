@@ -725,6 +725,29 @@ struct BaseNode;
 }
 
 
+struct IfThenElse;
+ impl Function for IfThenElse {
+    fn evaluate<'c, 'd>(&self,
+                        _context: &context::Evaluation<'c, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let args = Args(args);
+        args.exactly(3)?;
+        let if_val = &args[0];
+        let then_val = &args[1];
+        let else_val = &args[2];
+        let is_true = match if_val {
+            Value::Nodeset(nodes) => nodes.size() > 0,
+            Value::Boolean(b) => *b,
+            Value::Number(f) => *f != 0.0,
+            Value::String(s) => !s.is_empty(),
+        };
+        return Ok( if is_true {then_val.clone()} else {else_val.clone()});
+    }
+}
+
+
 struct Debug;
 /**
  * Returns true if the node is a large op
@@ -1045,6 +1068,7 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("IsBracketed", IsBracketed);
     context.set_function("IsInDefinition", IsInDefinition);
     context.set_function("BaseNode", BaseNode);
+    context.set_function("IfThenElse", IfThenElse);
     context.set_function("DistanceFromLeaf", DistanceFromLeaf);
     context.set_function("EdgeNode", EdgeNode);
     context.set_function("DEBUG", Debug);
