@@ -248,6 +248,10 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         static ref REMOVE_SPACE_AFTER_BRAILLE_INDICATORS: Regex = 
             Regex::new(r"([⠹⠻Lb])W+(⠄⠄⠄)").unwrap();
 
+        // Hack to convert non-numeric '.' to numeric '.'
+        // The problem is that the numbers are hidden inside of mover -- this might be more general than rule 99_2.
+        static ref DOTS_99_A_2: Regex = Regex::new(r"𝑁⠨mN").unwrap();
+
         // Multipurpose indicator insertion
         // 177.2 -- add after a letter and before a digit (or decimal pt) -- digits will start with N
         static ref MULTI_177_2: Regex = 
@@ -311,6 +315,8 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&raw_braille, "$1$2");
     let result = REMOVE_SPACE_AFTER_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
   debug!("spaces:  \"{}\"", result);
+
+    let result = DOTS_99_A_2.replace_all(&result, "N⠨mN");
 
     // Multipurpose indicator
     let result = MULTI_177_2.replace_all(&result, "${1}m${2}");

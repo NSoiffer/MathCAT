@@ -642,12 +642,12 @@
                         then: [x: "$Postscripts[position() > 8]"]
    - test:
       # emit level indicator if not numeric subscript, something follows or the closest non-mrow is an element with a close tag [80(a)]
-      if: "not( (DEBUG($Postscripts[last()][self::m:none]) and DEBUG($Postscripts[last()-1][self::m:mn]) and DEBUG($BaseOkForNumericScript)) or
-                DEBUG(parent::m:msubsup and count(following-sibling::*)=1) or
+      if: "not( ($Postscripts[last()][self::m:none] and $Postscripts[last()-1][self::m:mn] and $BaseOkForNumericScript) or
+                (parent::m:msubsup and count(following-sibling::*)=1) or
                 following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]]
               )" # first child is likely invisible times
       then_test:
-         if: "DEBUG($OldScriptContext != '')"
+         if: "$OldScriptContext != ''"
          then: [x: "$OldScriptContext"]
          else: [t: "b"]
 
@@ -676,18 +676,18 @@
    - OldOverContext: "$NewOverContext"
    - NewOverContext: "concat($NewOverContext, '⠣')"
    replace:
-   - test:
+   - test:   # '2' -- skip over added invisible times
       if: "not(preceding-sibling::*[2][
                self::m:mover and
                *[1][self::m:mn and string-length(text())=1 and translate(.,'1234567890', '') = ''] and
                *[2][self::m:mo and text()='˙']])" 
       then: [t: "m"]            # first one
    - x: "*[1]"
-   - test:
+   - test:   # '2' -- skip over added invisible times
       if: "not(following-sibling::*[2][
-               self::m:mover and *[2][
+               self::m:mover and
                *[1][self::m:mn and string-length(text())=1 and translate(.,'1234567890', '') = ''] and
-               self::m:mo and text()='˙']])"
+               *[2][self::m:mo and text()='˙']])"
       then:            # last one
       - x: "$NewOverContext"
       - x: "*[2]"
@@ -705,13 +705,13 @@
       if: "$AddSpaces"
       then: [t: "W"]
    - test:
-      if: "DEBUG($NotNested)"
+      if: "$NotNested"
       then:
       - test:
          # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
-         if: "DEBUG(parent::*[self::m:mrow] and
+         if: "parent::*[self::m:mrow] and
             ancestor-or-self::*[not(preceding-sibling::*)][1]
-            [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts])"
+            [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts]"
          then: [x: "$NewScriptContext"]
       - t: "m"
    - x: "*[1]"
