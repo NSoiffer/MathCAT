@@ -22,7 +22,7 @@
          else: {pause: short}
     - x: "*[1]"
     - test: 
-       - if: $ClearSpeak_Roots = 'EndRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+       - if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
          then:
             - pause: short
             - t: end root
@@ -71,7 +71,7 @@
             then: {t: of}
       - x: "*[1]"
       - test: 
-         if: $ClearSpeak_Roots = 'EndRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+         if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
          then:
             - pause: short
             - t: end root

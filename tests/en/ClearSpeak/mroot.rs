@@ -13,7 +13,7 @@ fn msqrt_simple_end_root() {
     let expr = "<math>
                     <msqrt> <mi>x</mi> </msqrt>
                 </math>";
-    test_ClearSpeak("ClearSpeak_Roots", "EndRoot", expr, "the square root of x, end root;");
+    test_ClearSpeak("ClearSpeak_Roots", "RootEnd", expr, "the square root of x, end root;");
 }
 
 #[test]
@@ -117,7 +117,7 @@ fn mroot_simple_end_root() {
                     <mroot> <mrow> <mi>x</mi> <mo>+</mo> <mi>y</mi> </mrow> 
                     <mn>21</mn></mroot>
                 </math>";
-    test_ClearSpeak("ClearSpeak_Roots", "EndRoot", expr, "the twenty first root of x plus y, end root;");
+    test_ClearSpeak("ClearSpeak_Roots", "RootEnd", expr, "the twenty first root of x plus y, end root;");
 }
 
 #[test]
