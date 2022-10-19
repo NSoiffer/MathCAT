@@ -76,70 +76,73 @@
 # Matrix/Determinant rules
 # matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
 # we don't do spatial layout, instead the beginning/ending of each row uses the enlarged bracketing chars
-- name: default-matrix
-  tag: mrow
-  variables:
-     - RowStart: "*[1]"
-     - RowEnd: "*[3]"
-  match:
-     - "*[2][self::m:mtable] and"
-     - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
-  replace: [x: "*[2]"]
-  
-- name: default-mtable
-  tag: mtable
-  match: "."
-  replace: [x: "*"]
-- name: default
-  tag: [mtr, mlabeledtr]
-  match: "."
-  replace:
-     - test:
-          if: "preceding-sibling::*"
-          then: [t: "W"]
-     - test:
-          if: "count(parent::*/*) > 1"
-          then: [t: "⠈⠠"]
-     - t: ""
-     - x: $RowStart
-     - test:
-          if: .[self::m:mlabeledtr]
-          then:
-             - t: "⠗⠕⠺W⠇⠁⠃⠑⠇⠸⠒" # "row label:"
-             - x: "*[1]/*" # contents of row label
-     - test:
-          if: .[self::m:mlabeledtr]
-          then: [x: "*[position()>1]"]
-          else: { x: "*" }
-     - test:
-          if: "count(parent::*/*) > 1"
-          then: [t: "⠈⠠"]
-     - x: $RowEnd
+- 
+   name: default-matrix
+   tag: mrow
+   variables:
+   - RowStart: "*[1]"
+   - RowEnd: "*[3]"
+   match:
+   - "*[2][self::m:mtable] and"
+   - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
+   replace:
+   - test:
+      if: "count(*[2]/*) > 1"
+      then: [t: "⠈⠠"]
+   - x: "*[1]"       # open paren, etc  -- no space is used between this and the first row entry
+   - x: "*[2]"
+   - test:
+      if: "count(*[2]/*) > 1"
+      then: [t: "⠈⠠"]
+   - x: "*[3]"       # close paren, etc  -- no space is used between this and the last row entry
+
+-
+   name: default-mtable
+   tag: mtable
+   match: "."
+   replace: [x: "*"]
+
+-
+   name: default
+   tag: [mtr, mlabeledtr]
+   match: "."
+   replace:
+   - test:
+      if: "preceding-sibling::*"
+      then: [t: "⣍"]     # https://github.com/NSoiffer/MathCAT/issues/43#issuecomment-1279362093
+   - test:
+      if: .[self::m:mlabeledtr]
+      then: [x: "*[position()>1]"]
+      else: { x: "*" }
+   - test:              # put row label at end so it doesn't interfere with column counts
+      if: .[self::m:mlabeledtr]
+      then:
+      - t: "⠗⠕⠺W⠇⠁⠃⠑⠇⠸⠒" # "row label:"   # FIX: what should be used?
+      - x: "*[1]/*" # contents of row label
+
+-
+   name: default
+   tag: mtd
+   match: "."
+   replace:
+   - test:
+      if: "preceding-sibling::*"
+      then: [t: "W"]
+   - test:
+      if: "*"
+      then: [x: "*"]
+      else: [t: "W"]  # put something out so the reader can tell there was a column
+
+- 
+   name: no-content
+   tag: math
+   match: "not(*)" # empty
+   replace: [t: "W"] # not sure that is right, but this shouldn't happen
 
 - name: default
-  tag: mtd
-  match: "."
-  replace:
-     - test:
-          if: "*"
-          then:
-             - test:
-                  if: "preceding-sibling::*"
-                  then: [t: "W"]
-             - x: "*"
-          # else nothing to braille
-
-- name: no-content
   tag: math
-  match: "not(*)" # empty
-  replace: [t: "W"] # not sure that is right, but this shouldn't happen
-
-- name: default
-  tag: math
   match: "."
   variables:
-     - RowStart: "''" # empty string -- it needs to be set
-     - RowEnd: "''" # empty string -- it needs to be set
      - NewScriptContext: "''" # empty string -- it needs to be set
      - NewUnderContext: "''" # empty string -- it needs to be set
      - NewOverContext: "''" # empty string -- it needs to be set
