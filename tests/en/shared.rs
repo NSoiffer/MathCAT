@@ -85,7 +85,20 @@ fn tensor_mmultiscripts() {
     let expr = "<math><mmultiscripts>
             <mi>R</mi> <mi>i</mi><none/> <none/><mi>j</mi> <mi>k</mi><none/> <mi>l</mi><none/> 
         </mmultiscripts></math>";
-    test("SimpleSpeak", expr, "R with 4 postscripts lower i, upper j, lower k, lower l");
+    test_prefs("SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+            "R with 4 postscripts, subscript i superscript j subscript k subscript l");
+    test_prefs("SimpleSpeak", vec![("Verbosity", "Medium")], expr,
+            "R with 4 postscripts, sub i super j sub k sub l");
+}
+
+#[test]
+fn huge_num_mmultiscripts() {
+    let expr = "<math><mmultiscripts>
+            <mi>R</mi> <mi>i</mi><none/> <none/><mi>j</mi> <mi>k</mi><none/> <mi>l</mi><none/> <mi>m</mi><none/>
+            <mprescripts/> <mi>I</mi><none/> <none/><mi>J</mi> <mi>K</mi><none/> <mi>L</mi><none/>
+        </mmultiscripts></math>";
+    test_prefs("SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+            "R with 4 prescripts, pre-subscript I, pre-superscript J and alternating prescripts K none L none end prescripts and with 5 postscripts, subscript i superscript j subscript k subscript l and alternating scripts m none end scripts");
 }
 
 #[test]

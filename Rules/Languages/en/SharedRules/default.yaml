@@ -127,6 +127,9 @@
     - x: "*[3]"
     - t: "above"
 -
+    # There is (currently) no way in MathCAT to deal with n-ary arguments other than "all" ('*') or an individual entry ('*[1]').
+    #   Here we support up to 2 prescripts and up to 4 postscripts -- that should cover all reasonable cases
+    #   If there are more, we just dump them out without regard to sup/super :-(
     # FIX: this could use more special cases 
     name: default
     tag: mmultiscripts
@@ -139,14 +142,24 @@
     replace: 
     - x: "*[1]"
     - test:
-        if: "$Prescripts"
-        then_test:
-            if: "count($Prescripts) = 2"    # more common case
-            then:
+        if: "$Prescripts"    # more common case
+        then:
+        - with:
+            variables:
+            - PreSubscript: "IfThenElse($Verbosity='Verbose', 'pre-subscript', 'pre-sub')"
+            - PreSuperscript: "IfThenElse($Verbosity='Verbose', 'pre-superscript', 'pre-super')"
+            replace:
+            - test:  # only bother announcing if there is more than one prescript
+                if: "count($Prescripts) > 2"
+                then:
+                - t: "with"
+                - x: "count($Prescripts) div 2"
+                - t: "prescripts"
+                - pause: short
             - test:
                 if: "not($Prescripts[1][self::m:none])"
                 then:
-                - t: "with pre-subscript"
+                - x: "$PreSubscript"
                 - x: "$Prescripts[1]"
             - test:
                 if: "not($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none])"
@@ -154,23 +167,53 @@
             - test:
                 if: "not($Prescripts[2][self::m:none])"
                 then:
-                - t: "with pre-superscript"
+                - x: "$PreSuperscript"
                 - x: "$Prescripts[2]"
-            else:
-            - t: "with"
-            - x: "count($Prescripts) div 2"
-            - t: "prescripts"
             - pause: short
-            - x: "$Prescripts"   # FIX: should alternatively say upper/lower 
+            - test:
+                if: "count($Prescripts) > 2"    # more common case
+                then:
+                - test:
+                    if: "not($Prescripts[3][self::m:none])"
+                    then:
+                    - x: "$PreSubscript"
+                    - x: "$Prescripts[3]"
+                - test:
+                    if: "not($Prescripts[3][self::m:none] or $Prescripts[4][self::m:none])"
+                    then: [t: "and"]
+                - test:
+                    if: "not($Prescripts[4][self::m:none])"
+                    then:
+                    - x: "$PreSuperscript"
+                    - x: "$Prescripts[4]"
+                - test:
+                    if: "count($Prescripts) > 4"   # give up and just dump them out so at least the content is there
+                    then:
+                    - t: "and alternating prescripts"
+                    - x: "$Prescripts[position() > 4]"
+                    - t: "end prescripts"
     - test:
         if: "$Postscripts"
-        then_test:
-            if: "count($Postscripts) = 2"    # more common case
-            then:
+        then:
+        - with:
+            variables:
+            - PostSubscript: "IfThenElse($Verbosity='Verbose', 'subscript', 'sub')"
+            - PostSuperscript: "IfThenElse($Verbosity='Verbose', 'superscript', 'super')"
+            replace:
+            - test:  # only bother announcing if there is more than one postscript
+                if: "count($Postscripts) > 2"
+                then:
+                - test:
+                    if: "$Prescripts"
+                    then: [t: "and"]
+                - t: "with"
+                - x: "count($Postscripts) div 2"
+                - t: "postscripts"
+                - pause: short
             - test:
                 if: "not($Postscripts[1][self::m:none])"
                 then:
-                - t: "with post-subscript"
+                - x: "$PostSubscript"
                 - x: "$Postscripts[1]"
             - test:
                 if: "not($Postscripts[1][self::m:none] or $Postscripts[2][self::m:none])"
@@ -178,14 +221,62 @@
             - test:
                 if: "not($Postscripts[2][self::m:none])"
                 then:
-                - t: "with post-superscript"
+                - x: "$PostSuperscript"
                 - x: "$Postscripts[2]"
-            else:
-            - t: "with"
-            - x: "count($Postscripts) div 2"
-            - t: "postscripts"
-            - pause: short
-            - x: "$Postscripts"   # FIX: should alternatively say upper/lower 
+            - test:
+                if: "count($Postscripts) > 2"
+                then:
+                - test:
+                    if: "not($Postscripts[3][self::m:none])"
+                    then:
+                    - x: "$PostSubscript"
+                    - x: "$Postscripts[3]"
+                - test:
+                    if: "not($Postscripts[3][self::m:none] or $Postscripts[4][self::m:none])"
+                    then: [t: "and"]
+                - test:
+                    if: "not($Postscripts[4][self::m:none])"
+                    then:
+                    - x: "$PostSuperscript"
+                    - x: "$Postscripts[4]"
+                - test:
+                    if: "count($Postscripts) > 4"
+                    then:
+                    - test:
+                        if: "not($Postscripts[5][self::m:none])"
+                        then:
+                        - x: "$PostSubscript"
+                        - x: "$Postscripts[5]"
+                    - test:
+                        if: "not($Postscripts[5][self::m:none] or $Postscripts[6][self::m:none])"
+                        then: [t: "and"]
+                    - test:
+                        if: "not($Postscripts[6][self::m:none])"
+                        then:
+                        - x: "$PostSuperscript"
+                        - x: "$Postscripts[6]"
+                    - test:
+                        if: "count($Postscripts) > 6"
+                        then:
+                        - test:
+                            if: "not($Postscripts[7][self::m:none])"
+                            then:
+                            - x: "$PostSubscript"
+                            - x: "$Postscripts[7]"
+                        - test:
+                            if: "not($Postscripts[7][self::m:none] or $Postscripts[8][self::m:none])"
+                            then: [t: "and"]
+                        - test:
+                            if: "not($Postscripts[8][self::m:none])"
+                            then:
+                            - x: "$PostSuperscript"
+                            - x: "$Postscripts[8]"
+                        - test:
+                            if: "count($Postscripts) > 8"   # give up and just dump them out so at least the content is there
+                            then:
+                            - t: "and alternating scripts"
+                            - x: "$Postscripts[position() > 8]"
+                            - t: "end scripts"
 
 -
     name: default
