@@ -643,6 +643,16 @@ fn mathml_spec_example_86_a() {
 }
 
 #[test]
+fn mathml_spec_example_alt_char_86_a() {
+    let expr = "<math>
+        <munder><mo>(</mo><mo>&#x2015;</mo></munder>
+        <mfrac><mi>a</mi><mi>b</mi></mfrac>
+        <mover><mo>)</mo><mo>&#x2015;</mo></mover>
+    </math>";
+    test_braille("Nemeth", expr, "⠐⠷⠩⠱⠻⠹⠁⠌⠃⠼⠐⠾⠣⠱⠻");
+}
+
+#[test]
 fn menclose_lesson_12_5_5_5() {
     // this is what WIRIS exports
     let expr = "<math><mi>A</mi><mo>(</mo><menclose notation='bottom'><mi>s</mi></menclose><mi>n</mi><mo>)</mo></math>";
@@ -802,7 +812,6 @@ fn carrot_98_1() {
 
 #[test]
 fn dots_99_a_1() {
-    init_logger();
     let expr = "<math><mo>.</mo><mover><mn>3</mn><mo>&#x2D9;</mo></mover></math>";
     test_braille("Nemeth", expr, "⠼⠨⠐⠒⠣⠡⠻");
 }

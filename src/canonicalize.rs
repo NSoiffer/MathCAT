@@ -2030,7 +2030,8 @@ impl CanonicalizeContext {
 		if parent_name == "mover" || parent_name == "munder" || parent_name == "munderover" {
 			// canonicalize various diacritics for munder, mover, munderover
 			mo_text = match mo_text {
-				"_" | "\u{02C9}"| "\u{0304}"| "\u{0305}"| "\u{2212}" => "\u{00AF}",
+				"_" | "\u{02C9}"| "\u{0304}"| "\u{0305}"| "\u{2212}" |
+				"\u{2010}" | "\u{2011}" | "\u{2012}" | "\u{2013}" | "\u{2014}" | "\u{2015}" => "\u{00AF}",
 				"\u{02BC}" => "`",
 				"\u{02DC}" => "~",
 				"\u{02C6}"| "\u{0302}" => "^",
