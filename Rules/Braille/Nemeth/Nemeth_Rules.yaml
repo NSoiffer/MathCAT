@@ -648,42 +648,20 @@
          then: [x: "$OldScriptContext"]
          else: [t: "b"]
 
-- name: contracted-form # NFB Lesson 12.5.1.b
-  tag: munder
-  match: "*[1][string-length(text())=1] and *[2][text()='¯']"
-  replace:
-     - x: "*[1]"
-     - t: "⠩⠱"
-- name: default
-  tag: munder
-  match: "."
-  variables:
-     - NotNested: "$NewUnderContext='' and $NewOverContext=''"
-     - OldUnderContext: "$NewUnderContext"
-     - NewUnderContext: "concat($NewUnderContext, '⠩')"
-  replace:
-     - test:
-          if: "$NotNested"
-          then:
-             - test:
-                  # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
-                  if: "parent::*[self::m:mrow] and
-                     ancestor-or-self::*[not(preceding-sibling::*)][1]
-                     [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts]"
-                  then: [x: "$NewScriptContext"]
-             - t: "m"
-     - x: "*[1]"
-     - x: "$NewUnderContext"
-     - x: "*[2]"
-     - test:
-          if: "$NotNested"
-          then: [t: "⠻"]
+-
+   name: contracted-form # NFB Lesson 12.5.1.b
+   tag: munder
+   match: "*[1][(self::m:mi or self::m:mn or self::m:mtext) and string-length(text())=1] and *[2][text()='¯']"
+   replace:
+   - x: "*[1]"
+   - t: "⠩⠱"
 
-- name: contracted-form #rule 86.b
-  tag: mover
-  match: "*[1][string-length(text())=1] and *[2][text()='¯']"
-  replace:
-     - x: "*"
+-
+   name: contracted-form #rule 86.b
+   tag: mover
+   match: "*[1][(self::m:mi or self::m:mn or self::m:mtext) and string-length(text())=1] and *[2][text()='¯']"
+   replace:
+   - x: "*"
 
 -
    name: subsequent-dots #rule 99.a -- only one dot used for series of dots over digits
@@ -712,64 +690,85 @@
       - x: "*[2]"
       - t: "⠻"
 
-- name: default
-  tag: mover
-  match: "."
-  variables:
-     - NotNested: "$NewUnderContext='' and $NewOverContext=''"
-     - OldOverContext: "$NewOverContext"
-     - NewOverContext: "concat($NewOverContext, '⠣')"
-     - AddSpaces: "IsInDefinition(BaseNode(.), 'NemethComparisonOperators')"
+-
+   name: default
+   tag: [munder, mover]
+   match: "."
+   variables:
+   - NotNested: "$NewUnderContext='' and $NewOverContext=''"
+   - AddSpaces: "IsInDefinition(BaseNode(.), 'NemethComparisonOperators')"
+   replace:
+   - test:
+      if: "$AddSpaces"
+      then: [t: "W"]
+   - test:
+      if: "DEBUG($NotNested)"
+      then:
+      - test:
+         # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
+         if: "DEBUG(parent::*[self::m:mrow] and
+            ancestor-or-self::*[not(preceding-sibling::*)][1]
+            [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts])"
+         then: [x: "$NewScriptContext"]
+      - t: "m"
+   - x: "*[1]"
+   # create the new context only after the base is generated
+   - test:
+      if: "self::m:munder"
+      then:
+      - with:
+         variables:
+         - OldUnderContext: "$NewUnderContext"
+         - NewUnderContext: "concat($NewUnderContext, '⠩')"
+         replace:
+         - x: "$NewUnderContext"
+         - x: "*[2]"
+      else:
+      - with:
+         variables:
+         - OldOverContext: "$NewOverContext"
+         - NewOverContext: "concat($NewOverContext, '⠣')"
+         replace:
+         - x: "$NewOverContext"
+         - x: "*[2]"
+   - test:
+      if: "$NotNested"
+      then: [t: "⠻"]
+   - test:
+      if: "$AddSpaces"
+      then: [t: "W"]
 
-  replace:
-     - test:
-          if: "$AddSpaces"
-          then: [t: "W"]
-     - test:
-          if: "$NotNested"
-          then:
-             - test:
-                  # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
-                  if: "parent::*[self::m:mrow] and
-                     ancestor-or-self::*[not(preceding-sibling::*)][1]
-                     [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts]"
-                  then: [x: "$NewScriptContext"]
-             - t: "m"
-     - x: "*[1]"
-     - x: "$NewOverContext"
-     - x: "*[2]"
-     - test:
-          if: "$NotNested"
-          then: [t: "⠻"]
-     - test:
-          if: "$AddSpaces"
-          then: [t: "W"]
-
-- name: default
-  tag: munderover
-  match: "."
-  variables:
-     - NotNested: "$NewUnderContext='' and $NewOverContext=''"
-     - OldUnderContext: "$NewUnderContext"
-     - NewUnderContext: "concat($NewUnderContext, '⠩')"
-     - OldOverContext: "$NewOverContext"
-     - NewOverContext: "concat($NewOverContext, '⠣')"
-  replace:
-     - test:
-          # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
-          if: "parent::*[self::m:mrow] and
-             ancestor-or-self::*[not(preceding-sibling::*)][1]
-             [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts]"
-          then: [x: "$NewScriptContext"]
-     - t: "m"
-     - x: "*[1]"
-     - x: "$NewUnderContext"
-     - x: "*[2]"
-     - x: "$NewOverContext"
-     - x: "*[3]"
-     - test:
-          if: "$NotNested"
-          then: [t: "⠻"]
+-
+   name: default
+   tag: munderover
+   match: "."
+   replace:
+   - test:
+      # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
+      if: "parent::*[self::m:mrow] and
+         ancestor-or-self::*[not(preceding-sibling::*)][1]
+         [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts]"
+      then: [x: "$NewScriptContext"]
+   - t: "m"
+   - x: "*[1]"
+   # create the new context only after the base is generated
+   - with:
+      variables:
+      - OldUnderContext: "$NewUnderContext"
+      - NewUnderContext: "concat($NewUnderContext, '⠩')"
+      replace:
+      - x: "$NewUnderContext"
+      - x: "*[2]"
+   - with:
+      variables:
+      - OldOverContext: "$NewOverContext"
+      - NewOverContext: "concat($NewOverContext, '⠣')"
+      replace:
+      - x: "$NewOverContext"
+      - x: "*[3]"
+   - test:
+      if: "$NewUnderContext='' and $NewOverContext=''"   # only generate a single terminator (when at baseline)
+      then: [t: "⠻"]
 
 - # Note: @notation can contain more than one value
   # I don't think Nemeth has a good way to represent all notations, especially when in combination
