@@ -257,10 +257,11 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         static ref MULTI_177_3: Regex = 
             Regex::new(r"([N𝑁].)M([N𝑁].)").unwrap(); 
 
-        // add after decimal pt for non-digits except for comma and punctuation
-        // note: since "." can be in the middle of a number, there is not necessarily a "N"
+        // Add after decimal pt for non-digits except for comma and punctuation
+        // Note: since "." can be in the middle of a number, there is not necessarily a "N"
+        // Although not mentioned in 177_5, don't add an 'M' before an 'm'
         static ref MULTI_177_5: Regex = 
-            Regex::new(r"([N𝑁]⠨)([^⠂⠆⠒⠲⠢⠖⠶⠦⠔N𝑁,P])").unwrap(); 
+            Regex::new(r"([N𝑁]⠨)([^⠂⠆⠒⠲⠢⠖⠶⠦⠔N𝑁,Pm])").unwrap(); 
 
 
         // Pattern for rule II.9a (add numeric indicator at start of line or after a space) and 9a (add after typeface)
@@ -301,24 +302,24 @@ fn nemeth_cleanup(raw_braille: String) -> String {
 
         static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHPCLMmb↑↓Nn𝑁W,])").unwrap();  
             
-            static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
+        static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
 
-//   debug!("Before:  \"{}\"", raw_braille);
+  debug!("Before:  \"{}\"", raw_braille);
 
     // Remove blanks before and after braille indicators
     let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&raw_braille, "$1$2");
     let result = REMOVE_SPACE_AFTER_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
-  // debug!("spaces:  \"{}\"", result);
+  debug!("spaces:  \"{}\"", result);
 
     // Multipurpose indicator
     let result = MULTI_177_2.replace_all(&result, "${1}m${2}");
     let result = MULTI_177_3.replace_all(&result, "${1}m$2");
     let result = MULTI_177_5.replace_all(&result, "${1}m$2");
-  // debug!("MULTI:   \"{}\"", result);
+  debug!("MULTI:   \"{}\"", result);
 
     let result = NUM_IND_9A.replace_all(&result, "$start$minus${face}n");
-//   debug!("IND_9A:  \"{}\"", result);
+  debug!("IND_9A:  \"{}\"", result);
 
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
     let result = NUM_IND_9E_SHAPE.replace_all(&result, "${mod}n");
@@ -328,7 +329,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     // common punctuation adds a space, so 9a handled it. Here we deal with other "punctuation" 
     // FIX other punctuation and reference symbols (9d)
     let result = NUM_IND_AFTER_PUNCT.replace_all(&result, "$punct${minus}n");
-//   debug!("A PUNCT: \"{}\"", &result);
+  debug!("A PUNCT: \"{}\"", &result);
 
     // strip level indicators
     // checks for punctuation char, so needs to before punctuation is stripped.
@@ -336,7 +337,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     let result = REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT.replace_all(&result, "$1");
 //   debug!("Punct  : \"{}\"", &result);
     let result = REMOVE_LEVEL_IND_BEFORE_BASELINE.replace_all(&result, "b");
-  // debug!("Bseline: \"{}\"", &result);
+  debug!("Bseline: \"{}\"", &result);
 
     let result = REMOVE_PUNCT_IND.replace_all(&result, "$1$2");
 //   debug!("Punct38: \"{}\"", &result);
