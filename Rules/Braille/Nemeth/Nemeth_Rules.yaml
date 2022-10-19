@@ -413,7 +413,7 @@
 
    replace:
    - test:  # prescripts first
-      if: "count($Prescripts) > 0"
+      if: "$Prescripts"
       then:
       - test:
          if: "not($Prescripts[1][self::m:none])"
@@ -477,7 +477,7 @@
    - t: "M" # multipurpose indicator prevents the 'letter digit' substitution (177.2) from kicking in
    - x: "*[1]"
    - test:
-      if: "count($Postscripts) > 0"
+      if: "$Postscripts"
       then:
       - with:
          variables:
