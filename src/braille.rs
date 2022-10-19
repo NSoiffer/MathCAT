@@ -231,7 +231,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         "m" => "⠐",     // required multipurpose indicator
         "N" => "",       // digit
         "n" => "⠼",     // required number indicator
-        "𝑁" => "",      // long "." treated as a digit
+        "𝑁" => "",      // hack for special case of a lone decimal pt -- not considered a number but follows rules mostly
         "W" => "⠀",     // whitespace
         "," => "⠠⠀",     // comma
         "b" => "⠐",     // baseline
