@@ -2704,8 +2704,8 @@ impl CanonicalizeContext {
 		// Check for special case where we want multiplication to bind more tightly than function app (e.g, sin 2x, sin -2xy)
 		// We only want to do this for simple args
 		use crate::xpath_functions::IsNode;
-		debug!("  is_trig_arg: prev {}, current {}, Stack:", element_summary(previous_child), element_summary(current_child));
-		parse_stack.iter().for_each(|stack_info| debug!("    {}", stack_info));
+		// debug!("  is_trig_arg: prev {}, current {}, Stack:", element_summary(previous_child), element_summary(current_child));
+		// parse_stack.iter().for_each(|stack_info| debug!("    {}", stack_info));
 		if !IsNode::is_simple(&current_child) {
 			return false;
 		}
