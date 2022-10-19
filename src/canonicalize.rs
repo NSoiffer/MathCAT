@@ -3705,7 +3705,6 @@ mod canonicalize_tests {
 	
     #[test]
     fn trig_negative_args() {
-		init_logger();
         let test_str = "<math><mi>sin</mi><mo>-</mo><mn>2</mn><mi>π</mi><mi>x</mi></math>";
         let target_str = "<math>
 		<mrow data-changed='added'>
