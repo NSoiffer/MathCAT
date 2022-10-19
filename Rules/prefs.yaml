@@ -7,13 +7,13 @@
     MathRate: 100               # Change from text speech rate (%)
     SpeechStyle: ClearSpeak     # Any known speech style (falls back to ClearSpeak)
     SubjectArea: General        # FIX: still working on this
-    Chemistry: SpellOut         # SpellOut (H 2 0), AsCompound (Water), Off (H sub 2 O)
+    Chemistry: SpellOut         # SpellOut (H 2 0), AsCompound (Water) -- not implemented, Off (H sub 2 O)
 
     ClearSpeak:                 # see ClearSpeak speak for meanings
       CapitalLetters: Auto      # SayCaps or use pitch
       AbsoluteValue: Auto       # AbsEnd, Cardinality, Determinant
-      Fraction: Auto            # Ordinal, Over, FracOver, General, EndFrac, GeneralEndFrac, OverEndFrac, Per
-      Exponent: Auto            # Ordinal, OrdinalPower, AfterPower
+      Fractions: Auto           # Ordinal, Over, FracOver, General, EndFrac, GeneralEndFrac, OverEndFrac, Per
+      Exponents: Auto           # Ordinal, OrdinalPower, AfterPower
       Roots: Auto               # PosNegSqRoot, RootEnd, PosNegSqRootEnd
       Functions: Auto           # None
       Trig: Auto                # TrigInverse, ArcTrig
