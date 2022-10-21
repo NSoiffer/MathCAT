@@ -1133,3 +1133,18 @@ fn number_space_before_and_after() {
     let expr = "<math><mtext>&#xA0;</mtext><mn>2</mn><mtext>&#xA0;</mtext></math>";
     test_braille("Nemeth", expr, "⠼⠆");
 }
+
+#[test]
+fn tensor_from_mathml_spec() {
+    let expr = "<math>
+    <mmultiscripts>
+      <mi>R</mi>
+      <mi>i</mi> <none></none>
+      <none></none> <mi>j</mi>
+      <mi>k</mi> <none></none>
+      <mi>l</mi> <none></none>
+    </mmultiscripts>
+    </math>";
+    // Note: the braille answer was verified to be correct (see https://github.com/NSoiffer/MathCAT/issues/55) 
+    test_braille("Nemeth", expr, "⠠⠗⠰⠊⠐⠘⠚⠐⠰⠅⠐⠰⠇");
+}
