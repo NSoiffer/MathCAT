@@ -515,7 +515,7 @@
             if: "count($Postscripts) > 2"
             then:
             - test:    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (with prime and number exceptions)
-               if: "not($Postscripts[1][self::m:none] or $IsNumericSubscript) or not(Postscripts[2][self::m:none] or $IsPrimeSuperscript)"
+               if: "not($Postscripts[3][self::m:none] or $IsNumericSubscript) or not(Postscripts[4][self::m:none] or $IsPrimeSuperscript)"
                then:
                - test:
                   if: "$OldScriptContext != ''"
@@ -557,7 +557,7 @@
                if: "count($Postscripts) > 4"
                then:
                - test:    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (with prime and number exceptions)
-                  if: "not($Postscripts[3][self::m:none] or $IsNumericSubscript) or not(Postscripts[4][self::m:none] or $IsPrimeSuperscript)"
+                  if: "not($Postscripts[5][self::m:none] or $IsNumericSubscript) or not(Postscripts[6][self::m:none] or $IsPrimeSuperscript)"
                   then:
                   - test:
                      if: "$OldScriptContext != ''"
@@ -575,8 +575,8 @@
                      - if: "$IsNumericSubscript"
                        then:
                         - t: "M"    # prevent 177.2 (see regex replacement MULTI_177_2 in code)
-                        - x: "$Postscripts[3]"
-                     - else_if: "not($Postscripts[4][self::m:none])"
+                        - x: "$Postscripts[5]"
+                     - else_if: "not($Postscripts[5][self::m:none])"
                        then:
                         - with:
                            variables:
@@ -586,7 +586,7 @@
                            - x: "$NewScriptContext"
                            - x: "$Postscripts[5]"
                   - test:
-                     if: "not($IsPrimeSuperscript or $Postscripts[5][self::m:none])"
+                     if: "not($IsPrimeSuperscript or $Postscripts[6][self::m:none])"
                      then:
                      - with:
                         variables:
@@ -596,10 +596,10 @@
                         - x: "$NewScriptContext"
                         - x: "$Postscripts[6]"
                - test:
-                  if: "count($Postscripts) > 4"
+                  if: "count($Postscripts) > 6"
                   then:
                   - test:    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (with prime and number exceptions)
-                     if: "not($Postscripts[3][self::m:none] or $IsNumericSubscript) or not(Postscripts[4][self::m:none] or $IsPrimeSuperscript)"
+                     if: "not($Postscripts[7][self::m:none] or $IsNumericSubscript) or not(Postscripts[8][self::m:none] or $IsPrimeSuperscript)"
                      then:
                      - test:
                         if: "$OldScriptContext != ''"
@@ -607,18 +607,18 @@
                         else: [t: "b"]
                   - with:
                      variables:
-                     - IsNumericSubscript: "$Postscripts[5][self::m:mn] and ($NewScriptContext = '') and $BaseOkForNumericScript"
-                     - IsPrimeSuperscript: "$Postscripts[6][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
+                     - IsNumericSubscript: "$Postscripts[7][self::m:mn] and ($NewScriptContext = '') and $BaseOkForNumericScript"
+                     - IsPrimeSuperscript: "$Postscripts[8][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
                      replace:
                      - test:
                         if: "$IsPrimeSuperscript"
-                        then: [x: "$Postscripts[6]"]
+                        then: [x: "$Postscripts[8]"]
                      - test:
                         - if: "$IsNumericSubscript"
                           then:
                            - t: "M"    # prevent 177.2 (see regex replacement MULTI_177_2 in code)
-                           - x: "$Postscripts[3]"
-                        - else_if: "not($Postscripts[4][self::m:none])"
+                           - x: "$Postscripts[7]"
+                        - else_if: "not($Postscripts[7][self::m:none])"
                           then:
                            - with:
                               variables:
@@ -626,9 +626,9 @@
                               - NewScriptContext: "concat($OldScriptContext, '↓')"
                               replace:
                               - x: "$NewScriptContext"
-                              - x: "$Postscripts[5]"
+                              - x: "$Postscripts[7]"
                      - test:
-                        if: "not($IsPrimeSuperscript or $Postscripts[5][self::m:none])"
+                        if: "not($IsPrimeSuperscript or $Postscripts[8][self::m:none])"
                         then:
                         - with:
                            variables:
@@ -636,7 +636,7 @@
                            - NewScriptContext: "concat($OldScriptContext, '↑')"
                            replace:
                            - x: "$NewScriptContext"
-                           - x: "$Postscripts[6]"
+                           - x: "$Postscripts[8]"
                      - test:
                         if: "count($Postscripts) > 8"   # give up and just dump them out so at least the content is there
                         then: [x: "$Postscripts[position() > 8]"]
