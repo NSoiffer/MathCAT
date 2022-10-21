@@ -515,7 +515,7 @@
             if: "count($Postscripts) > 2"
             then:
             - test:    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (with prime and number exceptions)
-               if: "not($Postscripts[3][self::m:none] or $IsNumericSubscript) or not(Postscripts[4][self::m:none] or $IsPrimeSuperscript)"
+               if: "not($Postscripts[1][self::m:none] or $IsNumericSubscript) or not(Postscripts[2][self::m:none] or $IsPrimeSuperscript)"
                then:
                - test:
                   if: "$OldScriptContext != ''"
@@ -557,7 +557,7 @@
                if: "count($Postscripts) > 4"
                then:
                - test:    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (with prime and number exceptions)
-                  if: "not($Postscripts[5][self::m:none] or $IsNumericSubscript) or not(Postscripts[6][self::m:none] or $IsPrimeSuperscript)"
+                  if: "not($Postscripts[3][self::m:none] or $IsNumericSubscript) or not(Postscripts[4][self::m:none] or $IsPrimeSuperscript)"
                   then:
                   - test:
                      if: "$OldScriptContext != ''"
@@ -599,7 +599,7 @@
                   if: "count($Postscripts) > 6"
                   then:
                   - test:    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (with prime and number exceptions)
-                     if: "not($Postscripts[7][self::m:none] or $IsNumericSubscript) or not(Postscripts[8][self::m:none] or $IsPrimeSuperscript)"
+                     if: "not($Postscripts[5][self::m:none] or $IsNumericSubscript) or not(Postscripts[6][self::m:none] or $IsPrimeSuperscript)"
                      then:
                      - test:
                         if: "$OldScriptContext != ''"
@@ -639,7 +639,15 @@
                            - x: "$Postscripts[8]"
                      - test:
                         if: "count($Postscripts) > 8"   # give up and just dump them out so at least the content is there
-                        then: [x: "$Postscripts[position() > 8]"]
+                        then:
+                        - test:    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (with prime and number exceptions)
+                           if: "not($Postscripts[5][self::m:none] or $IsNumericSubscript) or not(Postscripts[6][self::m:none] or $IsPrimeSuperscript)"
+                           then:
+                           - test:
+                              if: "$OldScriptContext != ''"
+                              then: [x: "$OldScriptContext"]
+                              else: [t: "b"]
+                        - x: "$Postscripts[position() > 8]"
    - test:
       # emit level indicator if not numeric subscript, something follows or the closest non-mrow is an element with a close tag [80(a)]
       if: "not( ($Postscripts[last()][self::m:none] and $Postscripts[last()-1][self::m:mn] and $BaseOkForNumericScript) or
