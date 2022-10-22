@@ -276,11 +276,17 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         static ref NUM_IND_9A: Regex = 
             Regex::new(r"(?P<start>^|[,W])(?P<minus>⠤?)(?P<face>[SBTIR]*?)N").unwrap();  
 
-        // FIX  add rule 9d after section mark, etc
+        // Needed after section mark(§), paragraph mark(¶), #, or *
+        static ref NUM_IND_9D: Regex = 
+            Regex::new(r"(⠈⠠⠎|⠈⠠⠏|⠨⠼|⠈⠼)N").unwrap();  
 
         // Needed after a typeface change or interior shape modifier indicator
         static ref NUM_IND_9E: Regex = Regex::new(r"(?P<face>[SBTIR]+?)N").unwrap();  
         static ref NUM_IND_9E_SHAPE: Regex = Regex::new(r"(?P<mod>⠸⠫)N").unwrap();  
+
+        // Needed after hyphen that follows a word, abbreviation, or punctuation (caution about rule 11d)
+        // Note -- hyphen might encode as either "P⠤" or "⠤" depending on the tag used
+        static ref NUM_IND_9F: Regex = Regex::new(r"(L.L.|P.)(P?⠤)N").unwrap();  
 
         // Punctuation chars (Rule 38.6 says don't use before ",", "hyphen", "-", "…")
         // Never use punctuation indicator before these (38-6)
@@ -290,7 +296,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         // Rule II.9b (add numeric indicator after punctuation [optional minus[optional .][digit]
         //  because this is run after the above rule, some cases are already caught, so don't
         //  match if there is already a numeric indicator
-        static ref NUM_IND_AFTER_PUNCT: Regex = Regex::new(r"(?P<punct>P.)(?P<minus>⠤?)N").unwrap();  
+        static ref NUM_IND_9B: Regex = Regex::new(r"(?P<punct>P.)(?P<minus>⠤?)N").unwrap();  
 
         // Before 79b (punctuation)
         static ref REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: Regex = Regex::new(r"(?:[↑↓]+b?|b)([W,P]|$)").unwrap();
@@ -327,14 +333,17 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     let result = NUM_IND_9A.replace_all(&result, "$start$minus${face}n");
   debug!("IND_9A:  \"{}\"", result);
 
+    let result = NUM_IND_9D.replace_all(&result, "${1}n");
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
     let result = NUM_IND_9E_SHAPE.replace_all(&result, "${mod}n");
+    let result = NUM_IND_9F.replace_all(&result, "${1}${2}n");
+
 //   debug!("IND_9E:  \"{}\"", result);
 
     // 9b: insert after punctuation (optional minus sign)
     // common punctuation adds a space, so 9a handled it. Here we deal with other "punctuation" 
     // FIX other punctuation and reference symbols (9d)
-    let result = NUM_IND_AFTER_PUNCT.replace_all(&result, "$punct${minus}n");
+    let result = NUM_IND_9B.replace_all(&result, "$punct${minus}n");
   debug!("A PUNCT: \"{}\"", &result);
 
     // strip level indicators
