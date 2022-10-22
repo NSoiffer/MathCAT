@@ -2,6 +2,18 @@
 use crate::common::*;
 
 #[test]
+fn test_9_d_2() {
+    let expr = "<math><mn>3</mn><mi mathvariant=\"normal\">#<!-- # --></mi><mn>4</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠒⠨⠼⠼⠲");
+}
+
+#[test]
+fn test_9_d_3() {
+    let expr = "<math><mn>3</mn><mo>∗<!-- ∗ --></mo><mn>4</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠒⠈⠼⠼⠲");
+}
+
+#[test]
 fn non_list_10_4() {
     let expr = "<math><mo>(</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mtext>and&#xA0;</mtext><mn>3</mn><mo>)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠂⠠⠀⠼⠆⠠⠀⠁⠝⠙⠀⠼⠒⠾");
@@ -29,6 +41,18 @@ fn list_num_ind__11_a_3() {
 fn list_num_ind_11_a_7() {
     let expr = "<math><mo>(</mo><mi>x</mi><mo>,</mo><mn>7</mn><mo>,</mo><mn mathvariant='bold'>8</mn><mo>,</mo><mi>y</mi><mo>)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠭⠠⠀⠶⠠⠀⠸⠼⠦⠠⠀⠽⠾");
+}
+
+#[test]
+fn list_num_ind_11_c_1() {
+    let expr = "<math><mi>&#x3C0;</mi><mo>=</mo><mn>3</mn><mo>.</mo><mn>14159</mn><mo>&#xA0;</mo><mn>26535</mn><mo>&#x2026;</mo></math>";
+    test_braille("Nemeth", expr, "⠨⠏⠀⠨⠅⠀⠼⠒⠨⠂⠲⠂⠢⠔⠀⠆⠖⠢⠒⠢⠀⠄⠄⠄");
+}
+
+#[test]
+fn list_num_ind_11_d_1() {
+    let expr = "<math><mn>65</mn><mo>-</mo><mn>75</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠖⠢⠤⠶⠢");
 }
 
 #[test]
