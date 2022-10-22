@@ -292,6 +292,20 @@ fn word_77_4_12() {
 }
 
 #[test]
+fn prescript_77_4_18() {
+    // from MathJaX
+    let expr = "<math><msub><mrow/><mn>3</mn></msub><msub><mi>x</mi><mn>1</mn></msub></math>";
+    test_braille("Nemeth", expr, "⠰⠒⠐⠭⠂");
+}
+
+#[test]
+fn mmultiscripts_77_4_18() {
+    // from WIRIS (changed empty mrow to 'none')
+    let expr = "<math><mmultiscripts><mi>x</mi><mn>1</mn><none/><mprescripts/><mn>3</mn><none/></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠰⠒⠐⠭⠂");
+}
+
+#[test]
 fn comma_number_77_4_20() {
     // mathml from mathjax output for "x_{10,000}"
     let expr = "<math><msub><mi>x</mi><mrow><mn>10</mn><mo>,</mo><mn>000</mn></mrow></msub></math>";
@@ -534,15 +548,15 @@ fn sub_sup_82_b_1() {
 }
 
 #[test]
-fn sub_sup_82_b_2() {
-    let expr = "<math><msup><msub><mi>a</mi><mi>m</mi></msub><mi>n</mi></msup></math>";
-    test_braille("Nemeth", expr, "⠁⠰⠍⠐⠘⠝");
-}
-
-#[test]
 fn mmultiscripts_82_b_1() {
     let expr = "<math><mmultiscripts><mi>a</mi><none/><mi>n</mi><mi>m</mi><none/></mmultiscripts></math>";
     test_braille("Nemeth", expr, "⠁⠘⠝⠐⠰⠍");
+}
+
+#[test]
+fn sub_sup_82_b_2() {
+    let expr = "<math><msup><msub><mi>a</mi><mi>m</mi></msub><mi>n</mi></msup></math>";
+    test_braille("Nemeth", expr, "⠁⠰⠍⠐⠘⠝");
 }
 
 #[test]
@@ -582,6 +596,31 @@ fn prime_83_b_1() {
 }
 
 #[test]
+fn prime_mmultiscripts_83_b_2() {
+    let expr = "<math><mmultiscripts> <mi>x</mi> <none/><mo>'</mo> <none/><mn>2</mn></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠭⠄⠘⠆");
+}
+
+#[test]
+fn prime_mathjax_83_b_2() {
+    // from MathJax with input x^{\prime 2}
+    let expr = "<math><msup> <mrow><mi>x</mi><mo>'</mo></mrow> <mn>2</mn></msup></math>";
+    test_braille("Nemeth", expr, "⠭⠄⠘⠆");
+}
+
+#[test]
+fn prime_wiris_83_b_2() {
+    let expr = "<math><msup><mi>x</mi> <mrow><mi>&#x2032;</mi><mn>2</mn></mrow> </msup></math>";
+    test_braille("Nemeth", expr, "⠭⠄⠘⠆");
+}
+
+#[test]
+fn prime_83_b_3() {
+    let expr = "<math><mmultiscripts> <mi>x</mi> <none/><mo>'</mo> <mi>a</mi><mi>b</mi></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠭⠄⠰⠁⠘⠃");
+}
+
+#[test]
 fn prime_83_b_4() {
     let expr = "<math><msubsup> <msup><mi>x</mi><mo>''</mo></msup> <mn>1</mn> <mn>3</mn></msubsup></math>";
     test_braille("Nemeth", expr, "⠭⠄⠄⠂⠘⠒");
@@ -593,6 +632,41 @@ fn prime_mmultiscripts_83_b_4() {
     test_braille("Nemeth", expr, "⠭⠄⠄⠂⠘⠒");
 }
 
+#[test]
+fn prime_83_b_5() {
+    let expr = "<math><mmultiscripts> <mi>x</mi> <none/><mo>'</mo> <none/><mo>*</mo></mmultiscripts></math>";
+    test_braille("Nemeth", expr, "⠭⠄⠘⠈⠼");
+}
+
+#[test]
+fn prime_83_b_6() {
+    let expr = "<math><msup> <mi>x</mi> <mrow><mo>*</mo> <mo>'</mo></mrow> </msup></math>";
+    test_braille("Nemeth", expr, "⠭⠘⠈⠼⠄");
+}
+
+#[test]
+fn prime_83_b_7() {
+    let expr = "<math>
+        <msubsup>
+            <mi>A</mi>
+            <mrow><mi>u</mi><mi>e</mi></mrow>
+            <mrow><mo>&#x2217;</mo><mo>&#x2032;</mo></mrow>
+        </msubsup>
+    </math>";
+    test_braille("Nemeth", expr, "⠠⠁⠰⠥⠑⠘⠈⠼⠄");
+}
+
+#[test]
+fn prime_83_b_8() {
+    let expr = "<math>
+        <msubsup>
+            <mi>A</mi>
+            <mrow><mi>u</mi><mi>e</mi></mrow>
+            <mrow><mo>&#x2032;</mo><mo>&#x2217;</mo></mrow>
+        </msubsup>
+    </math>";
+    test_braille("Nemeth", expr, "⠠⠁⠄⠰⠥⠑⠘⠈⠼");
+}
 
 #[test]
 fn underbar_86_a_1() {
