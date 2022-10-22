@@ -562,22 +562,24 @@ impl CanonicalizeContext {
 			"mi" => {
 				// change <mi>s that are likely <mo>s to <mo>s and also merge/spit tokens if chemistry
 				let text = as_text(mathml);
-				if OPERATORS.get(text).is_some() {
+			 	if let Some(dash) = canonicalize_dash(text) {		// needs to be before OPERATORS.get due to "--"
+					mathml.set_text(&dash);
+					return Some(mathml);
+				} else if OPERATORS.get(text).is_some() {
 					set_mathml_name(mathml, "mo");
 					return Some(mathml);
+				} else if let Some(result) = merge_arc_trig(mathml) {
+						return Some(result);
+				} else if IS_PRIME.is_match(text) {
+					let new_text = merge_prime_text(text);
+					mathml.set_text(&new_text);
+					return Some(mathml);
+				} else if let Some(result) = split_points(mathml) {
+					return Some(result);
 				} else {
-					if let Some(result) = merge_arc_trig(mathml) {
-						return Some(result);
-					};
-					if IS_PRIME.is_match(text) {
-						let new_text = merge_prime_text(text);
-						mathml.set_text(&new_text);
-					} else if let Some(result) = split_points(mathml) {
-						return Some(result);
-					}
 					return Some(mathml);
 				};
-			}
+			},
 			"mtext" => {
 				if let Some(result) = merge_arc_trig(mathml) {
 					return Some(result);
@@ -603,6 +605,8 @@ impl CanonicalizeContext {
 				if IS_WHITESPACE.is_match(text) {
 					// normalize to just a single non-breaking space
 					make_empty_element(mathml);
+				} else if let Some(dash) = canonicalize_dash(text) {
+					mathml.set_text(&dash);
 				}
 				return if parent_requires_child || !text.is_empty() {Some(mathml)} else {None};
 			},
@@ -829,8 +833,20 @@ impl CanonicalizeContext {
 			}
 		}
 
-		// Returns true if it detects that this is likely coming from mhchem (msub/msup with mrow/mrow/mpadded width=0/mphantom/mi=A)
-		// This should be called with 'mrow' being the outer mrow
+		/// Returns substitute text if hyphen sequence should be a short or long dash
+		fn canonicalize_dash(text: &str)  -> Option<&str> {
+			if text == "--"  {
+				return Some("—");	// U+2014 (em dash)
+			} else if text == "---" || text == "----" {		// use a regexp to catch a longer sequence?
+				return Some("―");	// U+2015 (Horizontal bar)
+			} else {
+				return None;
+			}
+		}
+
+
+		/// Returns true if it detects that this is likely coming from mhchem (msub/msup with mrow/mrow/mpadded width=0/mphantom/mi=A)
+		/// This should be called with 'mrow' being the outer mrow
 		fn is_from_mhchem_hack(mrow: Element) -> bool {
 			assert_eq!(name(&mrow), "mrow");
 			assert_eq!(mrow.children().len(), 1);
@@ -3218,6 +3234,23 @@ mod canonicalize_tests {
 			</math>";
 		assert!(are_strs_canonically_equal(test_str, target_str));
 	}
+
+    #[test]
+    fn short_and_long_dash() {
+        let test_str = "<math><mi>x</mi> <mo>=</mo> <mi>--</mi><mo>+</mo><mtext>----</mtext></math>";
+        let target_str = "<math>
+			<mrow data-changed='added'>
+			<mi>x</mi>
+			<mo>=</mo>
+			<mrow data-changed='added'>
+				<mi>—</mi>
+				<mo>+</mo>
+				<mtext>―</mtext>
+			</mrow>
+			</mrow>
+		</math>";
+		assert!(are_strs_canonically_equal(test_str, target_str));
+    }
 
     #[test]
     fn illegal_mathml_element() {
