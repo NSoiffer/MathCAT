@@ -285,33 +285,48 @@
           then: [x: "*"]
           # else do nothing -- no content
 
-- # primes don't get a superscript indicator
-  name: prime
-  tag: msup
-  match: "*[2][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
-  replace:
-     - x: "*"
-- name: default
-  tag: msup
-  match: "."
-  variables: [OldScriptContext: "$NewScriptContext"]
-  replace:
-     - x: "*[1]"
-     - with:
-          variables: [NewScriptContext: "concat($OldScriptContext, '↑')"]
-          replace:
-             - x: "$NewScriptContext"
-             - x: "*[2]"
-     - test:
-          # emit level indicator if something follows or the closest non-mrow is an element with a close tag [80(a)]
-          # if: "count(following-sibling::*) > 0 or ancestor::*[name() != 'mrow'][1]/.[self::m:mfrac or self::m:msqrt or self::m:mroot]"
-          if: "not( (parent::m:msubsup and count(following-sibling::*)=1) or following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
-          then_test:
-             if: "$OldScriptContext != ''"
-             then: [x: "$OldScriptContext"]
-             else_test:
-                if: "not( parent::*[self::m:msubsup] )" # msupsup will generate baseline indicator
-                then: [t: "b"]
+-
+   # primes don't get a superscript indicator
+   name: prime
+   tag: msup
+   match: "*[2][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
+   replace:
+   - x: "*"
+
+-
+   name: default
+   tag: msup
+   match: "."
+   variables:
+   - OldScriptContext: "$NewScriptContext"
+
+   # primes don't get a superscript indicator -- sometimes (e.g., WIRIS) prime is in an mrow (see 83_b_2)
+   # here, we peel off the first prime -- the hack won't work if there are multiple primes, but that is HIGHLY unlikely
+   - PrimeHack: "*[2][self::m:mrow]/*[1][self::m:mo and .='′' or .='″' or .='‴' or .='⁗']"
+   replace:
+   - x: "*[1]"
+   - with:
+      variables: [NewScriptContext: "concat($OldScriptContext, '↑')"]
+      replace:
+      - test:
+         if: "$PrimeHack"
+         then:
+         - x: "*[2]/*[1]"
+         - x: "$NewScriptContext"
+         - x: "*[2]/*[position()>1]"
+         else:
+         - x: "$NewScriptContext"
+         - x: "*[2]"
+   - test:
+      # emit level indicator if something follows or the closest non-mrow is an element with a close tag [80(a)]
+      # if: "count(following-sibling::*) > 0 or ancestor::*[name() != 'mrow'][1]/.[self::m:mfrac or self::m:msqrt or self::m:mroot]"
+      if: "not( (parent::m:msubsup and count(following-sibling::*)=1) or following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
+      then_test:
+         if: "$OldScriptContext != ''"
+         then: [x: "$OldScriptContext"]
+         else_test:
+            if: "not( parent::*[self::m:msubsup] )" # msupsup will generate baseline indicator
+            then: [t: "b"]
 
 -
    # implement rule 77 -- simple numeric (non-nested) subscript: don't use a subscript indicator
@@ -352,13 +367,18 @@
              else: [t: "b"]
 
 - # primes don't get a superscript indicator and come before the subscript
-  name: prime
-  tag: msubsup
-  variables: [OldScriptContext: "$NewScriptContext"]
-  match: "*[3][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
-  replace:
+   name: prime
+   tag: msubsup
+   variables:
+   - OldScriptContext: "$NewScriptContext"
+   - PrimeHack: "*[3][self::m:mrow]/*[1][self::m:mo and .='′' or .='″' or .='‴' or .='⁗']"
+   match: "*[3][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗'] or $PrimeHack"
+   replace:
    - x: "*[1]"
-   - x: "*[3]"
+   - test:
+      if: "$PrimeHack"
+      then: [x: "*[3]/*[1]"]
+      else: [x: "*[3]"]
    - test:
       if: "*[2][self::m:mn] and ($NewScriptContext = '') and *[1][BaseNode(.)[self::m:mi]]"
       then:
@@ -372,13 +392,21 @@
          replace:
          - x: "$NewScriptContext"
          - x: "*[2]"
-      - test:
-         # emit level indicator if something follows or the closest non-mrow is an element with a close tag [80(a)]
-         if: "not( (parent::m:msubsup and count(following-sibling::*)=1) or following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
-         then_test:
-            if: "$OldScriptContext != ''"
-            then: [x: "$OldScriptContext"]
-            else: [t: "b"]
+   - test:
+      if: "$PrimeHack"
+      then:
+      - with:
+         variables: [NewScriptContext: "concat($OldScriptContext, '↑')"]
+         replace:
+         - x: "$NewScriptContext"
+         - x: "*[3]/*[position()>1]"
+   - test:
+      # emit level indicator if something follows or the closest non-mrow is an element with a close tag [80(a)]
+      if: "not( (parent::m:msubsup and count(following-sibling::*)=1) or following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
+      then_test:
+         if: "$OldScriptContext != ''"
+         then: [x: "$OldScriptContext"]
+         else: [t: "b"]
 
 -
    # Implement rules 75 - 83 for some general cases 
@@ -481,7 +509,7 @@
       then:
       - with:
          variables:
-         - IsNumericSubscript: "$Postscripts[1][self::m:mn] and ($NewScriptContext = '') and $BaseOkForNumericScript"
+         - IsNumericSubscript: "$Postscripts[1][self::m:mn] and $NewScriptContext = '' and $BaseOkForNumericScript"
          - IsPrimeSuperscript: "$Postscripts[2][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
          replace:
          - test:
@@ -514,28 +542,24 @@
          - test:
             if: "count($Postscripts) > 2"
             then:
-            - test:    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (with prime and number exceptions)
-               if: "not($Postscripts[1][self::m:none] or $IsNumericSubscript) or not(Postscripts[2][self::m:none] or $IsPrimeSuperscript)"
-               then:
-               - test:
-                  if: "$OldScriptContext != ''"
-                  then: [x: "$OldScriptContext"]
-                  else: [t: "b"]
             - with:
                variables:
-               - IsNumericSubscript: "$Postscripts[3][self::m:mn] and ($NewScriptContext = '') and $BaseOkForNumericScript"
-               - IsPrimeSuperscript: "$Postscripts[4][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
+               # generate a numeric shortcut if previous was only a prime 
+               - IsNumericSubscript2: "DEBUG($IsPrimeSuperscript and $Postscripts[1][self::m:none] and
+                                             $Postscripts[3][self::m:mn] and $NewScriptContext = '' and $BaseOkForNumericScript)"
                replace:
                - test:
-                  if: "$IsPrimeSuperscript"
-                  then: [x: "$Postscripts[4]"]
+                  # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts
+                  # The exception is if there was only a prime and/or we used a numeric shortcut for the first script pair or for here
+                  if: "not($IsPrimeSuperscript and $Postscripts[1][self::m:none])"
+                  then: [t: "b"]
                - test:
-                  - if: "$IsNumericSubscript"
-                    then:
-                    - t: "M"    # prevent 177.2 (see regex replacement MULTI_177_2 in code)
-                    - x: "$Postscripts[3]"
-                  - else_if: "not($Postscripts[3][self::m:none])"
-                    then:
+                  if: "not($Postscripts[3][self::m:none])"
+                  then:
+                  - test:
+                     if: "$IsNumericSubscript2"
+                     then: [x: "$Postscripts[3]"]    # numeric shortcut -- note 177.2 can't happen because must be a prime symbol before the number
+                     else:
                      - with:
                         variables:
                         - OldScriptContext: "$NewScriptContext"
@@ -544,7 +568,7 @@
                         - x: "$NewScriptContext"
                         - x: "$Postscripts[3]"
                - test:
-                  if: "not($IsPrimeSuperscript or $Postscripts[4][self::m:none])"
+                  if: "not($Postscripts[4][self::m:none])"
                   then:
                   - with:
                      variables:
@@ -556,37 +580,43 @@
             - test:
                if: "count($Postscripts) > 4"
                then:
-               - test:    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (with prime and number exceptions)
-                  if: "not($Postscripts[3][self::m:none] or $IsNumericSubscript) or not(Postscripts[4][self::m:none] or $IsPrimeSuperscript)"
+               - t: "b"
+               - test:
+                  if: "not($Postscripts[5][self::m:none])"
                   then:
+                  - with:
+                     variables:
+                     - OldScriptContext: "$NewScriptContext"
+                     - NewScriptContext: "concat($OldScriptContext, '↓')"
+                     replace:
+                     - x: "$NewScriptContext"
+                     - x: "$Postscripts[5]"
+               - test:
+                  if: "not($Postscripts[6][self::m:none])"
+                  then:
+                  - with:
+                     variables:
+                     - OldScriptContext: "$NewScriptContext"
+                     - NewScriptContext: "concat($OldScriptContext, '↑')"
+                     replace:
+                     - x: "$NewScriptContext"
+                     - x: "$Postscripts[6]"
+               - test:
+                  if: "count($Postscripts) > 6"
+                  then:
+                  - t: "b"    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (assumes one of sub/super is not 'none')
                   - test:
-                     if: "$OldScriptContext != ''"
-                     then: [x: "$OldScriptContext"]
-                     else: [t: "b"]
-               - with:
-                  variables:
-                  - IsNumericSubscript: "$Postscripts[5][self::m:mn] and ($NewScriptContext = '') and $BaseOkForNumericScript"
-                  - IsPrimeSuperscript: "$Postscripts[6][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
-                  replace:
+                     if: "not($Postscripts[7][self::m:none])"
+                     then:
+                     - with:
+                        variables:
+                        - OldScriptContext: "$NewScriptContext"
+                        - NewScriptContext: "concat($OldScriptContext, '↓')"
+                        replace:
+                        - x: "$NewScriptContext"
+                        - x: "$Postscripts[7]"
                   - test:
-                     if: "$IsPrimeSuperscript"
-                     then: [x: "$Postscripts[6]"]
-                  - test:
-                     - if: "$IsNumericSubscript"
-                       then:
-                        - t: "M"    # prevent 177.2 (see regex replacement MULTI_177_2 in code)
-                        - x: "$Postscripts[5]"
-                     - else_if: "not($Postscripts[5][self::m:none])"
-                       then:
-                        - with:
-                           variables:
-                           - OldScriptContext: "$NewScriptContext"
-                           - NewScriptContext: "concat($OldScriptContext, '↓')"
-                           replace:
-                           - x: "$NewScriptContext"
-                           - x: "$Postscripts[5]"
-                  - test:
-                     if: "not($IsPrimeSuperscript or $Postscripts[6][self::m:none])"
+                     if: "not($Postscripts[8][self::m:none])"
                      then:
                      - with:
                         variables:
@@ -594,59 +624,11 @@
                         - NewScriptContext: "concat($OldScriptContext, '↑')"
                         replace:
                         - x: "$NewScriptContext"
-                        - x: "$Postscripts[6]"
-               - test:
-                  if: "count($Postscripts) > 6"
-                  then:
-                  - test:    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (with prime and number exceptions)
-                     if: "not($Postscripts[5][self::m:none] or $IsNumericSubscript) or not(Postscripts[6][self::m:none] or $IsPrimeSuperscript)"
-                     then:
-                     - test:
-                        if: "$OldScriptContext != ''"
-                        then: [x: "$OldScriptContext"]
-                        else: [t: "b"]
-                  - with:
-                     variables:
-                     - IsNumericSubscript: "$Postscripts[7][self::m:mn] and ($NewScriptContext = '') and $BaseOkForNumericScript"
-                     - IsPrimeSuperscript: "$Postscripts[8][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
-                     replace:
-                     - test:
-                        if: "$IsPrimeSuperscript"
-                        then: [x: "$Postscripts[8]"]
-                     - test:
-                        - if: "$IsNumericSubscript"
-                          then:
-                           - t: "M"    # prevent 177.2 (see regex replacement MULTI_177_2 in code)
-                           - x: "$Postscripts[7]"
-                        - else_if: "not($Postscripts[7][self::m:none])"
-                          then:
-                           - with:
-                              variables:
-                              - OldScriptContext: "$NewScriptContext"
-                              - NewScriptContext: "concat($OldScriptContext, '↓')"
-                              replace:
-                              - x: "$NewScriptContext"
-                              - x: "$Postscripts[7]"
-                     - test:
-                        if: "not($IsPrimeSuperscript or $Postscripts[8][self::m:none])"
-                        then:
-                        - with:
-                           variables:
-                           - OldScriptContext: "$NewScriptContext"
-                           - NewScriptContext: "concat($OldScriptContext, '↑')"
-                           replace:
-                           - x: "$NewScriptContext"
-                           - x: "$Postscripts[8]"
+                        - x: "$Postscripts[8]"
                      - test:
                         if: "count($Postscripts) > 8"   # give up and just dump them out so at least the content is there
                         then:
-                        - test:    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (with prime and number exceptions)
-                           if: "not($Postscripts[5][self::m:none] or $IsNumericSubscript) or not(Postscripts[6][self::m:none] or $IsPrimeSuperscript)"
-                           then:
-                           - test:
-                              if: "$OldScriptContext != ''"
-                              then: [x: "$OldScriptContext"]
-                              else: [t: "b"]
+                        - t: "b"    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (assumes one of sub/super is not 'none')
                         - x: "$Postscripts[position() > 8]"
    - test:
       # emit level indicator if not numeric subscript, something follows or the closest non-mrow is an element with a close tag [80(a)]
