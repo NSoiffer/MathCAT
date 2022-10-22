@@ -371,6 +371,14 @@ static ELEMENTS_WITH_ONE_CHILD: phf::Set<&str> = phf_set! {
 	"math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd"
 };
 
+static ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN: phf::Set<&str> = phf_set! {
+	"mfrac", "mroot", "msub", "msup", "msubsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv"
+};
+
+static EMPTY_ELEMENTS: phf::Set<&str> = phf_set! {
+	"mspace", "none", "mprescripts", "mglyph", "malignmark", "maligngroup",
+};
+
 
 impl CanonicalizeContext {
 	fn new() -> CanonicalizeContext {
@@ -411,7 +419,7 @@ impl CanonicalizeContext {
 		}
 	}
 
-	/// Return an error is some element is not MathML (only look at first child of <semantics>)
+	/// Return an error is some element is not MathML (only look at first child of <semantics>) or if it has the wrong number of children
 	fn assure_mathml<'a>(&self, mathml: Element<'a>) -> Result<()> {
 		static ALL_MATHML_ELEMENTS: phf::Set<&str> = phf_set!{
 			"mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph",
@@ -420,11 +428,41 @@ impl CanonicalizeContext {
 			"math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd", "mstyle",
 			"mrow", "mfenced", "mtable", "mtr", "mlabeledtr",
 		};
+
+		let n_children = mathml.children().len();
+		let element_name = name(&mathml);
 		if is_leaf(mathml) {
-			return Ok( () );
+			if EMPTY_ELEMENTS.contains(element_name) {
+				if n_children != 0 {
+					bail!("{} should only have one child:\n{}", element_name, mml_to_string(&mathml));
+				}
+			} else if (n_children == 1 && mathml.children()[0].text().is_some()) || n_children == 0 {  // allow empty children such as mtext
+				return Ok( () );
+			} else {
+				bail!("Not a valid MathML leaf element:\n{}", mml_to_string(&mathml));
+			};
 		}
 
-		let element_name = name(&mathml);
+		if ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(element_name) {
+			match element_name {
+				"munderover" | "msubsup" => if n_children != 3 {
+					bail!("{} should have 3 children:\n{}", element_name, mml_to_string(&mathml));
+				},
+				"mmultiscripts" => {
+					let has_prescripts = mathml.children().iter()
+							.find(|&&child| name(&as_element(child)) == "mprescripts").is_some();
+					if has_prescripts ^ (n_children % 2 == 0) {
+						bail!("{} has the wrong number of children:\n{}", element_name, mml_to_string(&mathml));
+					}
+				},
+				"mlongdiv" => if n_children < 3 {
+					bail!("{} should have at least 3 children:\n{}", element_name, mml_to_string(&mathml));
+				},
+				_ => if n_children != 2 {
+					bail!("{} should have 2 children:\n{}", element_name, mml_to_string(&mathml));
+				},
+			}
+		}
 		let children = mathml.children();
 		if element_name == "semantics" {
 			if children.is_empty() {
@@ -466,14 +504,6 @@ impl CanonicalizeContext {
 			// cases insensitive pattern for matching valid roman numerals
 			static ref ROMAN_NUMERAL: Regex = Regex::new(r"^\s*(?i)^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})\s*$").unwrap();
         }
-
-		static ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN: phf::Set<&str> = phf_set! {
-			"mfrac", "mroot", "msub", "msup", "msubsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv"
-		};
-
-		static EMPTY_ELEMENTS: phf::Set<&str> = phf_set! {
-			"mspace", "none", "mprescripts", "mglyph", "malignmark", "maligngroup",
-		};
 
 		static CURRENCY_SYMBOLS: phf::Set<&str> = phf_set! {
 			"$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿" // could add more currencies...
