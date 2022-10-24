@@ -16,7 +16,6 @@
    name: default
    tag: mroot
    match: "."
-   variables: [NestingChars: "NestingChars(., '⠨')"]
    replace:
    - x: $NewRadicalContext # start root indicator(s)
    - t: "⠣"
