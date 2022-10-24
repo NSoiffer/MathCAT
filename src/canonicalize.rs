@@ -926,15 +926,18 @@ impl CanonicalizeContext {
 				// we just need to make sure that MAYBE_CHEMISTRY is set since we aren't using the new element directly
 				add_attrs(mathml, as_element(replacements[0]).attributes());
 				return mathml;
-			} else {
-				let mut new_children = mathml.preceding_siblings();
-				let i_first_new_child = new_children.len();
-				new_children.append(&mut replacements);
-				new_children.append(&mut mathml.following_siblings());
-				let parent = mathml.parent().unwrap().element().unwrap();
-				parent.replace_children(new_children);
-				return as_element(parent.children()[i_first_new_child]);
 			}
+
+			if ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(name(&mathml)) {
+				// need to wrap the children in an mrow
+			}
+			let mut new_children = mathml.preceding_siblings();
+			let i_first_new_child = new_children.len();
+			new_children.append(&mut replacements);
+			new_children.append(&mut mathml.following_siblings());
+			let parent = mathml.parent().unwrap().element().unwrap();
+			parent.replace_children(new_children);
+			return as_element(parent.children()[i_first_new_child]);
 		}
 
 		fn clean_chemistry_leaf<'a>(mathml: Element<'a>) -> Element<'a> {
@@ -943,6 +946,15 @@ impl CanonicalizeContext {
 				if let Some(elements) = convert_leaves_to_chem_elements(mathml) {
 					// children are already marked as chemical elements
 					let elements = elements.iter().map(|&el| ChildOfElement::Element(el)).collect::<Vec<ChildOfElement>>();
+					if elements.len() > 1 {
+						let parent = mathml.parent().unwrap().element().unwrap();
+						if ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(name(&parent)) {
+							// wrap in an mrow
+							let mrow = create_mathml_element(&mathml.document(), "mrow");
+							mrow.append_children(elements);
+							return replace_children(mathml, vec![ChildOfElement::Element(mrow)]);
+						}
+					}
 					return replace_children(mathml, elements);
 				} else {
 					let likely_chemistry = likely_chem_element(mathml);
