@@ -1,27 +1,33 @@
 ---
-- name: default
-  tag: msqrt
-  match: "."
-  variables: [NestingChars: "NestingChars(., '⠨')"]
-  replace:
-     - x: $NestingChars # start root indicator(s)
-     - t: "⠜"
-     - x: "*"
-     - x: $NestingChars # end root indicator(s)
-     - t: "⠻"
+-
+   name: default
+   tag: msqrt
+   match: "."
+   replace:
+   - x: $NewRadicalContext # start root indicator(s)
+   - t: "⠜"
+   - with:
+      variables: [NewRadicalContext: "concat($NewRadicalContext, '⠨')"]
+      replace: [x: "*"]
+   - x: $NewRadicalContext # end root indicator(s)
+   - t: "⠻"
 
-- name: default
-  tag: mroot
-  match: "."
-  variables: [NestingChars: "NestingChars(., '⠨')"]
-  replace:
-     - x: $NestingChars # start root indicator(s)
-     - t: "⠣"
-     - x: "*[2]"
-     - t: "⠜" # end of index
-     - x: "*[1]"
-     - x: $NestingChars # end root indicator(s)
-     - t: "⠻"
+-
+   name: default
+   tag: mroot
+   match: "."
+   variables: [NestingChars: "NestingChars(., '⠨')"]
+   replace:
+   - x: $NewRadicalContext # start root indicator(s)
+   - t: "⠣"
+   - x: "*[2]"
+   - t: "⠜"  # end of index
+   - with:
+      variables: [NewRadicalContext: "concat($NewRadicalContext, '⠨')"]
+      replace: [x: "*[1]"]
+   - x: $NewRadicalContext # end root indicator(s)
+   - t: "⠻"
+
 
 # Fraction rules
 # The fraction part of a mixed number is always simple
@@ -143,9 +149,10 @@
   tag: math
   match: "."
   variables:
-     - NewScriptContext: "''" # empty string -- it needs to be set
-     - NewUnderContext: "''" # empty string -- it needs to be set
-     - NewOverContext: "''" # empty string -- it needs to be set
+     - NewScriptContext: "''"    # empty string -- it needs to be set
+     - NewUnderContext: "''"     # empty string -- it needs to be set
+     - NewOverContext: "''"      # empty string -- it needs to be set
+     - NewRadicalContext: "''"   # empty string -- it needs to be set
   replace: [x: "*"]
 
 - name: binomial-frac
