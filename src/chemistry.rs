@@ -569,6 +569,19 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
                 }
             }
         }
+        // gather up the text and see if it is all +/- 
+        let mut text = "".to_string();
+        for child in children {
+            let child = as_element(child);
+            if name(&child) == "mo" {
+                text.push_str(as_text(child));
+            } else {
+                return NOT_CHEMISTRY;
+            }
+        }
+        if PLUS_OR_MINUS.is_match(&text) {
+            return if text.len()==1 {1} else {2};
+        }
     }
     return NOT_CHEMISTRY;
 }
