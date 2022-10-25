@@ -444,7 +444,6 @@
    - Prescripts: "m:mprescripts/following-sibling::*"
    - NumChildren: "count(*)"       # need to stash this since the count is wrong inside '*[...]' below
    - Postscripts: "*[position()>1 and position() < (last() + ($NumChildren mod 2) -count($Prescripts))]"
-
    replace:
    - test:  # prescripts first
       if: "$Prescripts"
