@@ -368,7 +368,7 @@ enum FunctionNameCertainty {
 
 
 static ELEMENTS_WITH_ONE_CHILD: phf::Set<&str> = phf_set! {
-	"math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd"
+	"math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd", "mscarry"
 };
 
 static ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN: phf::Set<&str> = phf_set! {
@@ -376,7 +376,7 @@ static ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN: phf::Set<&str> = phf_set! {
 };
 
 static EMPTY_ELEMENTS: phf::Set<&str> = phf_set! {
-	"mspace", "none", "mprescripts", "mglyph", "malignmark", "maligngroup",
+	"mspace", "none", "mprescripts", "mglyph", "malignmark", "maligngroup", "msline",
 };
 
 
@@ -423,7 +423,8 @@ impl CanonicalizeContext {
 	fn assure_mathml<'a>(&self, mathml: Element<'a>) -> Result<()> {
 		static ALL_MATHML_ELEMENTS: phf::Set<&str> = phf_set!{
 			"mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph",
-			"mfrac", "mroot", "msub", "msup", "msubsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv",
+			"mfrac", "mroot", "msub", "msup", "msubsup","munder", "mover", "munderover", "mmultiscripts",
+			"mstack", "mlongdiv", "msgroup", "msrow", "mscarries", "mscarry", "msline",
 			"none", "mprescripts", "malignmark", "maligngroup",
 			"math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd", "mstyle",
 			"mrow", "mfenced", "mtable", "mtr", "mlabeledtr",
