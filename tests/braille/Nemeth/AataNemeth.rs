@@ -1628,7 +1628,8 @@ fn test_243() {
 #[test]
 fn test_244() {
     let expr = "<math><mi>Hom</mi><mo>⁡<!-- ⁡ --></mo><mo stretchy=\"false\">(</mo><mi>V</mi><mo>,</mo><mi>W</mi><mo stretchy=\"false\">)</mo></math>";
-    test_braille("Nemeth", expr, "⠠⠓⠕⠍⠷⠠⠧⠠⠀⠠⠺⠾");
+    // corrected to add a space after "Hom" -- BANA (new book) says the list of function names is open ended
+    test_braille("Nemeth", expr, "⠠⠓⠕⠍⠀⠷⠠⠧⠠⠀⠠⠺⠾");
 }
 
 #[test]
