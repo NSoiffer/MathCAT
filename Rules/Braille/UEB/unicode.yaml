@@ -38,6 +38,21 @@
  - "≢": [t: "⠸⠿⠈⠱"]             # 0x2262 (Not identical to)
  - "∈": [t: "⠘⠑"]               # 0x2208 (Element of (member of))
  - "+": [t: "⠐⠖"]               # 0x002B (Plus sign)
+ - "∋": [t: "⠈⠘⠑"]              # 0x220B (Contains)
+ - "⊂": [t: "⠘⠣"]              # 0x2282 (Subset of)
+ - "⊃": [t: "⠘⠜"]              # 0x2283 (Superset of)
+ - "⊆": [t: "⠸⠘⠣"]             # 0x2286 (Subset of or equal)
+ - "⊇": [t: "⠸⠘⠜"]             # 0x2287 (Superset of or equal)
+ - "⊊": [t: "⠨⠘⠣"]             # 0x228A (Subset of with not equal)
+ - "⊋": [t: "⠨⠘⠜"]             # 0x228B (Superset of with not equal)
+ - "⊲": [t: "⠈⠸⠣"]             # 0x22B2 (Normal subgroup of)
+ - "⊳": [t: "⠈⠸⠜"]             # 0x22B3 (Contains as normal subgroup)
+ - "⊴": [t: "⠸⠸⠣"]             # 0x22B4 (Normal subgroup of or equal)
+ - "⊵": [t: "⠸⠸⠜"]             # 0x22B5 (Contains as normal subgroup or equal)
+ - "⋬": [t: "⠨⠸⠣"]             # 0x22EC (not normal subgroup) -- this isn't the same as what is in GTM 10, but that similar has no Unicode equiv
+ - "⋭": [t: "⠨⠸⠣"]             # 0x22ED (does not contain as normal subgroup) -- this isn't the same as what is in GTM 10, but that similar has no Unicode equiv
+ - "⊢": [t: "⠸⠒"]               # 0x22a2 (Right tack)
+ - "⊣": [t: "⠈⠸⠒"]              # 0x22a3 (Left tack)
  - "−": [t: "⠐⠤"]               # 0x2212 (Minus sign)
  - "·": [t: "⠐⠲"]               # 0x00D7 (Multiplication dot (times))
  - "×": [t: "⠐⠦"]               # 0x00D7 (Multiplication sign (times))
@@ -62,7 +77,11 @@
  - "}": [t: "c⠸c⠜"]               # 0x007D (Right curly bracket)
  - "〈": [t: "o⠈⠣"]               # 0x2329 (Left angle bracket)
  - "〉": [t: "c⠈⠜"]               # 0x232A (Right angle bracket)
- - "|": [t: "⠸⠳"]               # 0x007C (Vertical bar)
+ - "|":                # 0x007C (Vertical line)
+    - test:
+        if: "preceding-sibling::* and following-sibling::*"
+        then: [t: "W⠸⠳W"]        # comparison (e.g., such that -- rule 145)
+        else: [t: "⠸⠳"]          # absolute value, others???
  - "!": [t: "c⠖"]                # 0x21 (Exclamation (factorial))
  - "#": [t: "⠸⠹"]               # 0x23 (Number sign (hash))
  - "%": [t: "⠴"]                # 0x25 (Percent sign)
@@ -108,7 +127,7 @@
  - "⊾": [t: "⠼⠸⠪"]              # 0x22BE (Right angle with arc)
  - "∫": [t: "1⠮"]               # 0x222B (Integral)
  - "∮": [t: "⠈⠮"]               # 0x222E (Contour integral (closed line integral))
- - "∴": [t: "⠠⠡"]               # 0x2234 (Therefore)
+ - "∴": [t: "1⠠⠡"]               # 0x2234 (Therefore)
  - "∵": [t: "⠈⠌"]               # 0x2235 (Because (since))
  - "∶": [t: "1⠒"]               # 0x2236 (Ratio)
  - "∷": [t: "1⠒⠒"]              # 0x2237 (Proportion)
@@ -237,12 +256,12 @@
      - test:
         if: "self::m:mn"
         then: [t: "N⠂"]
-        else: [t: "c,"]
+        else: [t: ",W"]
  - ".":                        # 0x2e (Period)
      - test:
         if: "self::m:mn"
         then: [t: "N⠲"]
-        else: [t: "c."]
+        else: [t: "."]
  - ":":                         # 0x003A (Colon)
         # Sometimes a colon is meant to be a ratio/mathord and sometimes a map/punct.
         # The latter has a space after it.
@@ -260,8 +279,8 @@
         - "  following-sibling::*[1][self::m:mrow and count(*)=3 and *[1][self::m:mn] and "
         - "     *[3][translate(., 'APM\u00A0', 'apm') = 'am' or translate(., 'APM\u00A0', 'apm') = 'pm']"
         - " ])"
-        then: [t: "1c⠒"]
-        else: [t: "1c⠒W"]
+        then: [t: "1⠒"]
+        else: [t: "1⠒W"]
 
  - "-":                        # 0x2d (Minus sign or hyphen)
      - test:
@@ -329,30 +348,82 @@
  - "z": [t: "L⠵"]               # 0x7a 
 
  - "A": [t: "CL⠁"]              # 0x41 
- - "B": [t: "CL⠃"]              # 0x42 
- - "C": [t: "CL⠉"]              # 0x43 
+ - "B":                         # 0x42 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠃"]
+        else: [t: "CL⠃"]
+ - "C":                         # 0x43 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠉"]
+        else: [t: "CL⠉"]
  - "D": [t: "CL⠙"]              # 0x44 
  - "E": [t: "CL⠑"]              # 0x45 
  - "F": [t: "CL⠋"]              # 0x46 
  - "G": [t: "CL⠛"]              # 0x47 
- - "H": [t: "CL⠓"]              # 0x48 
- - "I": [t: "CL⠊"]              # 0x49 
+ - "H":                         # 0x48 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠓"]
+        else: [t: "CL⠓"]
+ - "I":                         # 0x49 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠊"]
+        else: [t: "CL⠊"]
  - "J": [t: "CL⠚"]              # 0x4a 
- - "K": [t: "CL⠅"]              # 0x4b 
+ - "K":                         # 0x4b 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠅"]
+        else: [t: "CL⠅"]
  - "L": [t: "CL⠇"]              # 0x4c 
  - "M": [t: "CL⠍"]              # 0x4d 
- - "N": [t: "CL⠝"]              # 0x4e 
- - "O": [t: "CL⠕"]              # 0x4f 
- - "P": [t: "CL⠏"]              # 0x50 
+ - "N":                         # 0x4e 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠝"]
+        else: [t: "CL⠝"]
+ - "O":                         # 0x4f 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠕"]
+        else: [t: "CL⠕"]
+ - "P":                         # 0x50 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠏"]
+        else: [t: "CL⠏"]
  - "Q": [t: "CL⠟"]              # 0x51 
  - "R": [t: "CL⠗"]              # 0x52 
- - "S": [t: "CL⠎"]              # 0x53 
+ - "S":                         # 0x53 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠎"]
+        else: [t: "CL⠎"]
  - "T": [t: "CL⠞"]              # 0x54 
- - "U": [t: "CL⠥"]              # 0x55 
- - "V": [t: "CL⠧"]              # 0x56 
- - "W": [t: "CL⠺"]              # 0x57 
+ - "U":                         # 0x55 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠥"]
+        else: [t: "CL⠥"]
+ - "V":                         # 0x56 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠧"]
+        else: [t: "CL⠧"]
+ - "W":                         # 0x57 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠺"]
+        else: [t: "CL⠺"]
  - "X": [t: "CL⠭"]              # 0x58 
- - "Y": [t: "CL⠽"]              # 0x59 
+ - "Y":                         # 0x59 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠽"]
+        else: [t: "CL⠽"]
  - "Z": [t: "CL⠵"]              # 0x5a 
 
  - "α": [t: "GL⠁"]              # 0x3b1 
