@@ -444,7 +444,7 @@ static SHORT_FORMS: phf::Set<&str> = phf_set! {
      "L⠆L⠽", "L⠒L⠉L⠧", "L⠒L⠉L⠧L⠛", "L⠐L⠕L⠋"
 };
 static LETTER_PREFIXES: phf::Set<char> = phf_set! {
-    'B', 'I', '𝔹', 'S', 'T', 'D', 'C'
+    'B', 'I', '𝔹', 'S', 'T', 'D', 'C', '𝐶'
 };
 
 lazy_static! {
@@ -735,7 +735,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
 
         fn is_single_letter_on_right(chars: &[char], i: usize) -> bool {
             static SKIP_CHARS: phf::Set<char> = phf_set! {
-                'B', 'I', '𝔹', 'S', 'T', 'D', 'C', 's', 'w'   // indicators
+                'B', 'I', '𝔹', 'S', 'T', 'D', 'C', '𝐶', 's', 'w'   // indicators
             };
 
             // find the first char (if any)
@@ -787,7 +787,7 @@ enum UEB_Duration {
 
 // used to determine standing alone (on left side)
 static LEFT_INTERVENING_CHARS: phf::Set<char> = phf_set! {  // see RUEB 2.6.2
-    'B', 'I', '𝔹', 'S', 'T', 'D', 'C', 's', 'w',     // indicators
+    'B', 'I', '𝔹', 'S', 'T', 'D', 'C', '𝐶', 's', 'w',     // indicators
     // opening chars have prefix 'o', so not in set ['(', '{', '[', '"', '\'', '“', '‘', '«'] 
 };
 
@@ -1069,7 +1069,7 @@ fn stands_alone(chars: &[char], i: usize) -> (bool, &[char], usize) {
     fn right_side_stands_alone(chars: &[char]) -> (bool, usize, usize) {
         // see RUEB 2.6.3
         static RIGHT_INTERVENING_CHARS: phf::Set<char> = phf_set! {
-            'B', 'I', '𝔹', 'S', 'T', 'D', 'C', 's', 'w', 'e',   // indicators
+            'B', 'I', '𝔹', 'S', 'T', 'D', 'C', '𝐶', 's', 'w', 'e',   // indicators
             // ')', '}', ']', '\"', '\'', '”', '’', '»',      // closing chars
             // ',', ';', ':', '.', '…', '!', '?'              // punctuation           
         };
