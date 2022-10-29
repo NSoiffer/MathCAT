@@ -396,6 +396,7 @@ static UEB_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     // "H" => "⠠⠠",    // Hebrew
     // "U" => "⠈⠈",    // Russian
     "C" => "⠠",      // capital
+    "𝐶" => "⠠",      // capital that never should get word indicator (from chemical element)
     "N" => "⠼",     // number indicator
     "t" => "⠱",     // shape terminator
     "W" => "⠀",     // whitespace
@@ -452,7 +453,7 @@ lazy_static! {
     // Note: fraction over is not listed due to example 42(4) which shows a space before the "/"
     // static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex = 
     //     Regex::new(r"(⠄⠄⠄|⠤⠤⠤)W+([⠼⠸⠪])").unwrap();
-    static ref REPLACE_INDICATORS: Regex =Regex::new(r"([1SB𝔹TIREDGVHPCLMNW𝐖swe,.-—―#ocb])").unwrap();  
+    static ref REPLACE_INDICATORS: Regex =Regex::new(r"([1SB𝔹TIREDGVHP𝐶CLMNW𝐖swe,.-—―#ocb])").unwrap();  
     static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
 }
 
@@ -677,6 +678,8 @@ fn ueb_cleanup(raw_braille: String) -> String {
             //    Unless a math expression can be correctly represented with only a grade 1 symbol indicator in the first three cells
             //    or before a single letter standing alone anywhere in the expression,
             //    begin the expression with a grade 1 word indicator
+            // Note: I modified this slightly to exclude the cap indicator in the count. That allows three more ICEB rule to pass and seems
+            //    like it is a reasonable thing to do.
 
             // Because of the 'L's which go away, we have to put a little more work into finding the first three chars
             let chars = grade2_braille.chars().collect::<Vec<char>>();
@@ -690,7 +693,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
                         return false;
                     }
                     found_g1 = true;
-                } else if !"Lobc".contains(ch) {
+                } else if !"𝐶CLobc".contains(ch) {
                     if n_real_chars == 2 {
                         i += 1;
                         break;      // this is the third real char
@@ -712,7 +715,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
         }
 
         /// Return true if the sequence of chars forces a '1' at the `i`th position
-        /// Note: `chars` should not include the '1'
+        /// Note: `chars[i]` should be '1'
         fn is_forced_grade1(chars: &[char], i: usize) -> bool {
             // A '1' is forced if 'a-j' follows a digit
             assert_eq!(chars[i], '1', "'is_forced_grade1' didn't start with '1'");
