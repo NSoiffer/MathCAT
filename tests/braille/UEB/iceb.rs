@@ -42,7 +42,9 @@ fn bana_5_4() {
 #[test]
 fn bana_5_5() {
     let expr = "<math><msub><mi>log</mi><mi>x</mi></msub><mi>y</mi></math>";
-    test_braille("UEB", expr, "⠰⠰⠇⠕⠛⠢⠭⠀⠰⠽");
+    // BANA example contradicts GTM 9.2 that says don't use a space after a function name if there is an intervening indicator.
+    // Corrected: removed the space and the G1 indicator needed if a space were inserted
+    test_braille("UEB", expr, "⠰⠰⠇⠕⠛⠢⠭⠽");
 }
 
 #[test]
@@ -326,8 +328,13 @@ fn alg_3_2_4() {
 
 #[test]
 fn alg_3_2_5() {
+    init_logger();
     let expr = "<math><mi>d</mi><mo>+</mo><mi>a</mi><mi>b</mi><mo>=</mo><mi>a</mi><mi>c</mi></math>";
-    test_braille("UEB", expr, "⠙⠐⠖⠁⠃⠀⠐⠶⠀⠰⠁⠉");
+    // Acceptable: GTM does not use a G1 start indicator: "⠙⠐⠖⠁⠃⠀⠐⠶⠀⠰⠁⠉"
+    // However, BANA says use a word indicator if G1 not in first 3 cells (it is after the '='); use passage if >=2 whitespace
+    // This seems like a poor choice in this case since there is only one G1 indicator, but that's the BANA guidance so...
+    // Corrected to use passage indicator
+    test_braille("UEB", expr, "⠰⠰⠰⠙⠐⠖⠁⠃⠀⠐⠶⠀⠁⠉⠰⠄");
 }
 
 #[test]
@@ -740,6 +747,44 @@ fn stat_9_7_2() {
 }
 
 #[test]
+fn set_10_1() {
+    let expr = "<math><mi>A</mi><mo>=</mo>
+        <mfenced open='{' close='}'> 
+        <mrow><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>,</mo><mn>4</mn></mrow>
+    </mfenced></math>";
+    test_braille("UEB", expr, "⠠⠁⠀⠐⠶⠀⠸⠣⠼⠁⠂⠀⠼⠃⠂⠀⠼⠉⠂⠀⠼⠙⠸⠜");
+}
+
+#[test]
+fn set_10_3() {
+    let expr = "<math><mn>3</mn><mo>&#x2208;</mo><mi>A</mi><mo>&#x2229;</mo><mi>B</mi></math>";
+    test_braille("UEB", expr, "⠼⠉⠀⠘⠑⠀⠠⠁⠨⠦⠠⠃");
+}
+
+#[test]
+fn set_10_4() {
+    let expr = "<math><mi>A</mi><mo>&#x2229;</mo><mi>B</mi><mo>&#x2282;</mo><mi>A</mi><mo>&#x222A;</mo><mi>B</mi></math>";
+    test_braille("UEB", expr, "⠠⠁⠨⠦⠠⠃⠀⠘⠣⠀⠠⠁⠨⠖⠠⠃");
+}
+#[test]
+fn set_10_5() {
+    let expr = "<math><msup><mi>A</mi><mo>'</mo></msup><mo>∪</mo><msup><mi>B</mi><mo>'</mo></msup><mo>=</mo>
+                        <msup><mrow><mo>(</mo><mi>A</mi><mo>∩</mo><mi>B</mi><mo>)</mo></mrow><mo>'</mo></msup></math>";
+    test_braille("UEB", expr, "⠰⠰⠰⠠⠁⠶⠨⠖⠠⠃⠶⠀⠐⠶⠀⠐⠣⠠⠁⠨⠦⠠⠃⠐⠜⠶⠰⠄");
+}
+
+#[test]
+fn set_10_6() {
+    // Note: example uses the wrong char "├" in the display -- should be "⊢"
+    let expr = "<math><mo>[</mo><mo>(</mo><mi>p</mi><mo>&#x2228;</mo><mi>q</mi><mo>)</mo><mo>&#x2227;</mo><mo>&#xAC;</mo><mi>p</mi><mo>]</mo>
+                <mo>⊢</mo><mi>q</mi></math>";
+    // Acceptable: GTM does uses a G1 passage indicator: "⠰⠰⠰⠨⠣⠐⠣⠏⠈⠖⠟⠐⠜⠈⠦⠈⠹⠏⠨⠜⠀⠸⠒⠀⠟⠰⠄"
+    // However, the BANA G1 standing alone rule ("...before a single letter standing alone") applies, so start in G2 mode.
+    // Corrected to remove the passage indicator
+    test_braille("UEB", expr, "⠨⠣⠐⠣⠏⠈⠖⠟⠐⠜⠈⠦⠈⠹⠏⠨⠜⠀⠸⠒⠀⠰⠟");
+}
+
+#[test]
 fn example_11_5_1_2() {
     let expr = "<math><mfrac><mrow><mi>d</mi><mi>y</mi></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac></math>";
     test_braille("UEB", expr, "⠰⠰⠷⠙⠽⠨⠌⠙⠭⠾");
@@ -748,7 +793,10 @@ fn example_11_5_1_2() {
 #[test]
 fn example_11_5_1_3() {
     let expr = "<math><mi>f</mi><mo>'</mo><mo>(</mo><mi>x</mi><mo>)</mo></math>";
-    test_braille("UEB", expr, "⠰⠰⠋⠶⠐⠣⠭⠐⠜");
+    // Acceptable: GTM uses a G1 start indicator: "⠰⠰⠋⠶⠐⠣⠭⠐⠜"
+    // However, BANA says don't use a word indicator if G1 is in first 3 cells (the ':' needs it)
+    // Corrected to avoid word indicator
+    test_braille("UEB", expr, "⠋⠰⠶⠐⠣⠭⠐⠜");
 }
 
 #[test]
@@ -821,7 +869,10 @@ fn example_11_5_6() {
             <mo>|</mo>
             <mi>x</mi> <mo>+</mo> <mi>y</mi> <mo>=</mo> <mn>6</mn>
         <mo>}</mo> </math>";
-    test_braille("UEB", expr, "⠰⠰⠰⠸⠣⠐⠣⠭⠂⠀⠽⠐⠜⠀⠸⠳⠀⠭⠐⠖⠽⠀⠐⠶⠀⠼⠋⠸⠜⠰⠄");
+    // Acceptable: GTM uses a G1 passage indicator: "⠰⠰⠰⠸⠣⠐⠣⠭⠂⠀⠽⠐⠜⠀⠸⠳⠀⠭⠐⠖⠽⠀⠐⠶⠀⠼⠋⠸⠜⠰⠄"
+    // However, the BANA G1 standing alone rule ("...before a single letter standing alone") applies, so start in G2 mode.
+    // Corrected to remove the passage indicator
+    test_braille("UEB", expr, "⠸⠣⠐⠣⠭⠂⠀⠰⠽⠐⠜⠀⠸⠳⠀⠭⠐⠖⠽⠀⠐⠶⠀⠼⠋⠸⠜");
 }
 
 #[test]
@@ -883,7 +934,7 @@ fn dot_12_1_6_double() {
 #[test]
 fn hat_12_1_7() {
     let expr = "<math><mi>A</mi><mover><mi>B</mi><mo>^</mo></mover><mi>C</mi></math>";
-    test_braille("UEB", expr, "⠰⠰⠠⠁⠠⠃⠐⠱⠠⠉");
+    test_braille("UEB", expr, "⠠⠁⠠⠃⠐⠱⠠⠉");
 }
 
 #[test]
@@ -943,7 +994,107 @@ fn binomial_14_3_3_2() {
 #[test]
 fn chem_16_2_8() {
     let expr = "<math><mi>Ca</mi><msub><mrow><mo>(</mo><mi>OH</mi><mo>)</mo></mrow><mn>2</mn></msub></math>";
-    test_braille("UEB", expr, "⠠⠉⠁⠐⠣⠠⠕⠠⠓⠐⠜⠰⠢⠼⠃");
+    // Acceptable: GTM does not use a G1 start indicator: "⠠⠉⠁⠐⠣⠠⠕⠠⠓⠐⠜⠰⠢⠼⠃"
+    // However, BANA says use a word indicator if G1 not in first 3 cells (it is before the subscript near the end); use passage if >=2 whitespace
+    // This seems like a debateable choice in this case since there is only one G1 indicator, but that's the BANA guidance so...
+    // Corrected to use word indicator
+    test_braille("UEB", expr, "⠰⠰⠠⠉⠁⠐⠣⠠⠕⠠⠓⠐⠜⠢⠼⠃");
+}
+
+#[test]
+fn chem_16_2_9() {
+    // from mhchem -- \ce{CuSO4·5H2O}
+    let expr = "<math>
+        <mrow>
+        <mrow>
+            <mi data-mjx-auto-op='false'>CuSO</mi>
+        </mrow>
+        <msub>
+            <mrow>
+            <mrow>
+                <mpadded width='0'>
+                <mphantom>
+                    <mi>A</mi>
+                </mphantom>
+                </mpadded>
+            </mrow>
+            </mrow>
+            <mrow>
+            <mrow>
+                <mpadded height='0'>
+                <mn>4</mn>
+                </mpadded>
+            </mrow>
+            </mrow>
+        </msub>
+        <mstyle scriptlevel='0'>
+            <mspace width='0.167em'></mspace>
+        </mstyle>
+        <mrow>
+            <mo>&#x22C5;</mo>
+        </mrow>
+        <mstyle scriptlevel='0'>
+            <mspace width='0.167em'></mspace>
+        </mstyle>
+        <mn>5</mn>
+        <mstyle scriptlevel='0'>
+            <mspace width='0.167em'></mspace>
+        </mstyle>
+        <mrow>
+            <mi mathvariant='normal'>H</mi>
+        </mrow>
+        <msub>
+            <mrow>
+            <mrow>
+                <mpadded width='0'>
+                <mphantom>
+                    <mi>A</mi>
+                </mphantom>
+                </mpadded>
+            </mrow>
+            </mrow>
+            <mrow>
+            <mrow>
+                <mpadded height='0'>
+                <mn>2</mn>
+                </mpadded>
+            </mrow>
+            </mrow>
+        </msub>
+        <mrow>
+            <mi mathvariant='normal'>O</mi>
+        </mrow>
+        </mrow>
+    </math>";
+    // Acceptable: GTM does not use a G1 start indicator: "⠠⠉⠥⠠⠎⠠⠕⠰⠢⠼⠙⠐⠲⠼⠑⠠⠓⠢⠼⠃⠠⠕"
+    // However, BANA says use a word indicator if G1 not in first 3 cells (it is before the subscript); use passage if >=2 whitespace
+    // This seems like a debatable choice in this case since there is only one G1 indicator, but that's the BANA guidance so...
+    // Corrected to use word indicator
+    test_braille("UEB", expr, "⠰⠰⠠⠉⠥⠠⠎⠠⠕⠢⠼⠙⠐⠲⠼⠑⠠⠓⠢⠼⠃⠠⠕");
+}
+
+#[test]
+fn chem_16_2_10() {
+    let expr = "<math><mmultiscripts><mi mathvariant='normal'>H</mi><none/><mo>+</mo></mmultiscripts></math>";
+    test_braille("UEB", expr, "⠠⠓⠰⠔⠐⠖");
+}
+
+#[test]
+fn chem_16_2_11() {
+    let expr = "<math>
+        <mi mathvariant='normal'>S</mi>
+        <mmultiscripts> <mi mathvariant='normal'>O</mi> <mn>4</mn> <mrow><mo>-</mo><mo>-</mo></mrow>  </mmultiscripts>
+    </math>";
+    test_braille("UEB", expr, "⠠⠎⠠⠕⠰⠢⠼⠙⠔⠣⠐⠤⠐⠤⠜");
+}
+
+#[test]
+fn chem_16_2_13() {
+    let expr = "<math>
+        <mmultiscripts><mi>Fe</mi><none/><mi>III</mi></mmultiscripts>
+        <mmultiscripts><mi>Cl</mi><mn>3</mn><none/></mmultiscripts>
+    </math>";
+    test_braille("UEB", expr, "⠰⠰⠠⠋⠑⠔⠣⠠⠠⠊⠊⠊⠜⠠⠉⠇⠢⠼⠉");
 }
 
 
