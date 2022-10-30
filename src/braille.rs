@@ -704,10 +704,15 @@ fn ueb_cleanup(raw_braille: String) -> String {
             }
 
             // if we find another g1 that isn't forced and isn't standing alone, we are done
+            // we only allow one standing alone example -- not sure if BANA guidance has this limit, but GTM 11_5_5_3 seems better with it
+            let mut is_standing_alone_already_encountered = false;
             while i < chars.len() {
                 let ch = chars[i];
-                if ch == '1' && !is_forced_grade1(&chars, i) && !is_single_letter_on_right(&chars, i) {
-                    return false; 
+                if ch == '1' && !is_forced_grade1(&chars, i) {
+                    if !is_single_letter_on_right(&chars, i) || is_standing_alone_already_encountered {
+                        return false;
+                    }
+                    is_standing_alone_already_encountered = true; 
                 }
                 i += 1;
             }
