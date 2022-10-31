@@ -118,7 +118,7 @@
    - test:
       if: .[self::m:mlabeledtr]
       then: [x: "*[position()>1]"]
-      else: { x: "*" }
+      else: [x: "*"]
    - test:              # put row label at end so it doesn't interfere with column counts
       if: .[self::m:mlabeledtr]
       then:
@@ -794,7 +794,7 @@
           then:
              - test:
                   if: "$AddSpaces"
-                  then: [t: " "]
+                  then: [t: "⠀"]
              - test:
                   if: "*[1][self::m:mrow]"
                   then: [t: "⠫⠗⠸⠫"] # rectangle
@@ -804,7 +804,7 @@
           then:
              - test:
                   if: "$AddSpaces"
-                  then: [t: " "]
+                  then: [t: "⠀"]
              - test:
                   if: "*[1][self::m:mrow]"
                   then: [t: "⠫⠑⠸⠫"] # ellipse
@@ -912,7 +912,7 @@
              - t: "⠻" # terminate shape
              - test:
                   if: "$AddSpaces"
-                  then: [t: " "]
+                  then: [t: "⠀"]
      - test:
           if: "contains(concat(' ', normalize-space(@notation), ' '), ' right ')" #avoid 'rightarrow'
           then: [t: "⠳"]
