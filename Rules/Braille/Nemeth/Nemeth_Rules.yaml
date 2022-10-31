@@ -114,7 +114,7 @@
    replace:
    - test:
       if: "preceding-sibling::*"
-      then: [t: "⣍"]     # https://github.com/NSoiffer/MathCAT/issues/43#issuecomment-1279362093
+      then: [t: "⠀⣍"]     # github.com/NSoiffer/MathCAT/issues/43#issuecomment-1297048039
    - test:
       if: .[self::m:mlabeledtr]
       then: [x: "*[position()>1]"]

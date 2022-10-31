@@ -1046,7 +1046,7 @@ fn identity_matrix_126() {
         <mtr><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd></mtr>
       </mtable><mo>)</mo></mrow></math>";
     // Note: braille pattern is just a guess as to how to linearize a matrix
-    test_braille("Nemeth", expr, "⠈⠠⠷⠂⠀⠼⠴⠀⠼⠴⣍⠴⠀⠼⠂⠀⠼⠴⣍⠴⠀⠼⠴⠀⠼⠂⠈⠠⠾");
+    test_braille("Nemeth", expr, "⠈⠠⠷⠂⠀⠼⠴⠀⠼⠴⠀⣍⠴⠀⠼⠂⠀⠼⠴⠀⣍⠴⠀⠼⠴⠀⠼⠂⠈⠠⠾");
 }
 
 #[test]
