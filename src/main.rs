@@ -87,13 +87,7 @@ fn main() {
 //   </math>";
   // let expr = "<math><mi>Na</mi><mi>S</mi><mo>(</mo><mi>l</mi><mo>)</mo></math>";
 
-let expr = "<math xmlns='http://www.w3.org/1998/Math/MathML' display='block'>
-<mrow>
-  <mrow>
-    <mi>HCl</mi>
-  </mrow>
-</mrow>
-</math>
+let expr = "<math> <msup> <mrow/> <mo>&#x2212;</mo></msup> <mn>2</mn> </math>
 ";
 
 //   let expr = "<math xmlns='http://www.w3.org/1998/Math/MathML'>
@@ -136,7 +130,7 @@ let expr = "<math xmlns='http://www.w3.org/1998/Math/MathML' display='block'>
   };
 
   info!("Version = '{}'", get_version());
-  set_preference("TTS".to_string(), "ssml".to_string()).unwrap();
+  set_preference("TTS".to_string(), "none".to_string()).unwrap();
   set_preference("SpeechOverrides_CapitalLetters".to_string(), "".to_string()).unwrap();
   // set_preference("Bookmark".to_string(), "true".to_string()).unwrap();
   set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();

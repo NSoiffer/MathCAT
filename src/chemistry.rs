@@ -1625,6 +1625,7 @@ mod chem_tests {
 
     #[test]
     fn mhchem_nested_sub() {
+        // from \ce{(CH3)3}
         let test = "<math>
         <mrow>
           <mo stretchy='false'>(</mo>

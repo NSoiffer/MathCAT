@@ -1714,9 +1714,6 @@ impl CanonicalizeContext {
 				}
 			}
 			if i > 0 {
-				if is_child_simple_base(mrow_children[i-1]) {
-					return i-1;
-				}
 				if let Some(i_start) = is_grouped_base(&mrow_children[..i]) {
 					assert!(i_start < i-1);	// should be at least two children (open and close)
 					// create a new mrow, add the grouped children to it, then drain all but the first of them from the original mrow vec.
@@ -1729,6 +1726,9 @@ impl CanonicalizeContext {
 					mrow_children.drain(i_start+1..i);
 					mrow_children[i_start] = ChildOfElement::Element(new_mrow);
 					return i_start;
+				}
+				if is_child_simple_base(mrow_children[i-1]) {
+					return i-1;
 				}
 			}
 
@@ -1751,13 +1751,12 @@ impl CanonicalizeContext {
 			
 			fn is_child_simple_base(child: ChildOfElement) -> bool {
 				let mut child = as_element(child);
-				let mut child_name = name(&child);
+				let child_name = name(&child);
 				if child_name == "msub" || child_name == "msup" || child_name == "msubsup" {
 					child = as_element(child.children()[0]);
-					child_name = name(&child);
 				}
 
-				return child_name == "mi" || child_name == "mtext";
+				return is_leaf(child);  // a little overly general (but hopefully doesn't matter)
 			}
 
 			/// Return the index of the matched open paren/bracket if the last element is a closed paren/bracket
