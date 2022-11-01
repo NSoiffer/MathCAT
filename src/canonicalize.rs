@@ -1275,7 +1275,7 @@ impl CanonicalizeContext {
 			lazy_static!{
 				static ref SEPARATORS: Regex = Regex::new(r"[],. \u{00A0}]").unwrap(); 
 			}
-			debug!("parent:\n{}", mml_to_string(&parent_mrow));
+			// debug!("parent:\n{}", mml_to_string(&parent_mrow));
 			let mut i = 0;
 			while i < children.len() {
 				let child = as_element(children[i]);
@@ -1326,8 +1326,8 @@ impl CanonicalizeContext {
 								break;
 							}
 						}
-						debug!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
-								 i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
+						// debug!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
+						// 		 i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
 						if !(looking_for_separator &&
 							 (sibling_name == "mtext" || is_comma || is_decimal_pt)) &&
 						   ( looking_for_separator ||
@@ -1337,7 +1337,7 @@ impl CanonicalizeContext {
 						}
 						looking_for_separator = !looking_for_separator;
 					}
-					debug!("start={}, end={}", start, end);
+					// debug!("start={}, end={}", start, end);
 					if is_likely_a_number(parent_mrow, &children, start, end) {
 						merge_block(children, start, end);
 						// note: i..i+end has been collapsed, so just inc 'i' by one
