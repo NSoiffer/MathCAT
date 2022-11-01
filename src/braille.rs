@@ -20,13 +20,13 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id);
         let braille_string = rules_with_context.match_pattern::<String>(mathml)
                         .chain_err(|| "Pattern match/replacement failure!")?;
-            // FIX: need to set name of speech rules so test Nemeth/UEB clean for
+        let braille_string = braille_string.replace(' ', "");
         let pref_manager = rules_with_context.get_rules().pref_manager.borrow();
         let highlight_style = pref_manager.get_user_prefs().to_string("BrailleNavHighlight");
         let braille_code = pref_manager.get_user_prefs().to_string("BrailleCode");
         let braille = match braille_code.as_str() {
-            "UEB" => ueb_cleanup(braille_string.replace(' ', "")),
-            "Nemeth" => nemeth_cleanup(braille_string.replace(' ', "")),
+            "UEB" => ueb_cleanup(braille_string),
+            "Nemeth" => nemeth_cleanup(braille_string),
             _ => braille_string,    // probably needs cleanup if someone has another code, but this will have to get added by hand
         };
 
@@ -1328,7 +1328,7 @@ impl BrailleChars {
         };
         let text = BrailleChars::substring(as_text(*node), text_range);
         let braille_chars = crate::speech::braille_replace_chars(&text, *node).unwrap_or_else(|_| "".to_string());
-        // debug!("braille_chars: '{}'", braille_chars);
+        // debug!("Nemeth chars: text='{}', braille_chars='{}'", &text, &braille_chars);
         
         // we want to pull the prefix (typeface, language) out to the front until a change happens
         // the same is true for number indicator
