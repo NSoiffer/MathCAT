@@ -355,6 +355,8 @@ struct CanonicalizeContext {
 enum DigitBlockType {
 	None,
 	DecimalBlock_3,
+	DecimalBlock_4,
+	DecimalBlock_5,
 	BinaryBlock_4,
 }
 
@@ -502,8 +504,10 @@ impl CanonicalizeContext {
 		lazy_static! {
 			static ref IS_PRIME: Regex = Regex::new(r"['′″‴⁗]").unwrap(); 
 			
-			// cases insensitive pattern for matching valid roman numerals
-			static ref ROMAN_NUMERAL: Regex = Regex::new(r"^\s*(?i)^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})\s*$").unwrap();
+			// turns out Roman Numerals tests aren't needed, but we do want to block VII from being a chemical match
+			// two cases because we don't want to have a match for 'Cl', etc.
+			static ref UPPER_ROMAN_NUMERAL: Regex = Regex::new(r"^\s*^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})\s*$").unwrap();
+			static ref LOWER_ROMAN_NUMERAL: Regex = Regex::new(r"^\s*^m{0,3}(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})\s*$").unwrap();
         }
 
 		static CURRENCY_SYMBOLS: phf::Set<&str> = phf_set! {
@@ -550,20 +554,25 @@ impl CanonicalizeContext {
 
 		match element_name {
 			"mn" => {
-				let text = as_text(mathml);
-				if !text.trim().is_empty() && ROMAN_NUMERAL.is_match(text) {
-					// people tend to set them in a non-italic font and software makes that 'mtext'
-					mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
-				}
+				// let text = as_text(mathml);
+				// if !text.trim().is_empty() && is_roman_number_match(text) {
+				// 	// people tend to set them in a non-italic font and software makes that 'mtext'
+				// 	mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+				// }
 				return Some(mathml);
 			},
 			"ms" | "mglyph" => {
 				return Some(mathml);
 			},
 			"mi" => {
-				// change <mi>s that are likely <mo>s to <mo>s and also merge/spit tokens if chemistry
 				let text = as_text(mathml);
-			 	if let Some(dash) = canonicalize_dash(text) {		// needs to be before OPERATORS.get due to "--"
+				// if !text.trim().is_empty() && is_roman_number_match(text) && is_roman_numeral_number_context(mathml) {
+				// 	// people tend to set them in a non-italic font and software makes that 'mtext'
+				// 	set_mathml_name(mathml, "mn");
+				// 	mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+				// 	return Some(mathml);
+			 	// }
+				if let Some(dash) = canonicalize_dash(text) {		// needs to be before OPERATORS.get due to "--"
 					mathml.set_text(&dash);
 					return Some(mathml);
 				} else if OPERATORS.get(text).is_some() {
@@ -591,16 +600,12 @@ impl CanonicalizeContext {
 				}
 				
 				let text = as_text(mathml);
-				if !text.trim().is_empty() && ROMAN_NUMERAL.is_match(text) {
-					let parent = mathml.parent().unwrap().element().unwrap();
-					let parent_name = name(&parent);
-				  	if parent_name == "mrow" || parent_name == "math" {	// typically not in powers, radicals, etc.
-						// people tend to set them in a non-italic font and software makes that 'mtext'
-						set_mathml_name(mathml, "mn");
-						mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
-						return Some(mathml);
-					}
-				}
+				// if !text.trim().is_empty() && is_roman_number_match(text) && is_roman_numeral_number_context(mathml) {
+				// 	// people tend to set them in a non-italic font and software makes that 'mtext'
+				// 	set_mathml_name(mathml, "mn");
+				// 	mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+				// 	return Some(mathml);
+				// }
 				// allow non-breaking whitespace to stay -- needed by braille
 				let mathml = mathml;
 				if IS_WHITESPACE.is_match(text) {
@@ -944,6 +949,12 @@ impl CanonicalizeContext {
 		fn clean_chemistry_leaf<'a>(mathml: Element<'a>) -> Element<'a> {
 			if !(is_chemistry_off() || mathml.attribute(MAYBE_CHEMISTRY).is_some()) {
 				assert!(name(&mathml)=="mi" || name(&mathml)=="mtext");
+				// this is hack -- VII is more likely to be roman numeral than the molecule V I I so prevent that from happening
+				// FIX: come up with a less hacky way to prevent chem element misinterpretation
+				let text = as_text(mathml);
+				if text.len() > 2 && is_roman_number_match(text) {
+					return mathml;
+				}
 				if let Some(elements) = convert_leaves_to_chem_elements(mathml) {
 					// children are already marked as chemical elements
 					let elements = elements.iter().map(|&el| ChildOfElement::Element(el)).collect::<Vec<ChildOfElement>>();
@@ -1118,19 +1129,95 @@ impl CanonicalizeContext {
 			return mfenced;
 		}
 
+		fn is_roman_number_match(text: &str) -> bool {
+			return UPPER_ROMAN_NUMERAL.is_match(text) || LOWER_ROMAN_NUMERAL.is_match(text);
+		}
+
+		/// Return true if 'element' (which is syntactically a roman numeral) is only inside mrows and
+		///  if its length is < 3 chars, then there is another roman numeral near it (separated by an operator).
+		/// We want to rule out something like 'm' or 'cm' being a roman numeral.
+		// fn is_roman_numeral_number_context(mathml: Element) -> bool {
+		// 	assert!(name(&mathml)=="mtext" || name(&mathml)=="mi");
+		// 	let mut parent = mathml;
+		// 	loop {
+		// 		parent = parent.parent().unwrap().element().unwrap();
+		// 		let current_name = name(&parent);
+		// 		if current_name == "math" {
+		// 			break;
+		// 		} else if current_name != "mrow" {
+		// 			return false;
+		// 		}
+		// 	}
+		// 	if as_text(mathml).len() > 2 {
+		// 		return true;
+		// 	} else {
+		// 		let is_upper_case = as_text(mathml).as_bytes()[0].is_ascii_uppercase();	// safe since we know it is a 
+		// 		let preceding = mathml.preceding_siblings();
+		// 		if !preceding.is_empty() {
+		// 			if !is_roman_numeral_adjacent(preceding.iter().rev(), is_upper_case) {
+		// 				return false;
+		// 			}
+		// 		}
+		// 		let following = mathml.following_siblings();
+		// 		if following.is_empty() {
+		// 			return false;		// no context and too short to confirm it is a roman numeral
+		// 		}
+		// 		return is_roman_numeral_adjacent(following.iter(), is_upper_case);
+		// 	}
+
+		// 	/// make sure all the non-mo leaf siblings are roman numerals
+		// 	fn is_roman_numeral_adjacent<'a, I>(mut siblings: I, must_be_upper_case: bool) -> bool
+		// 			where I: Iterator<Item = &'a ChildOfElement<'a>> {				
+		// 		let mut found_match = false;		// guard against no siblings
+		// 		while let Some(child) = siblings.next() {
+		// 			let mut maybe_roman_numeral = as_element(*child);
+		// 			if name(&maybe_roman_numeral) == "mo" {
+		// 				let after_mo = siblings.next();
+		// 				if after_mo.is_none() {
+		// 					return false;
+		// 				}
+		// 				maybe_roman_numeral = as_element(*after_mo.unwrap());
+		// 			}
+		// 			if !is_leaf(maybe_roman_numeral) {
+		// 				return false;
+		// 			}
+		// 			let text = as_text(maybe_roman_numeral);
+		// 			if text.trim().is_empty() {
+		// 				return false;
+		// 			}
+		// 			if !(( must_be_upper_case && UPPER_ROMAN_NUMERAL.is_match(text)) ||
+		// 				 (!must_be_upper_case && LOWER_ROMAN_NUMERAL.is_match(text)) ) {
+		// 					return false;
+		// 			};
+		// 			found_match = true;
+		// 		}
+		// 		return found_match;
+		// 	}
+		// }
+
 		fn is_digit_block(mathml: Element) -> DigitBlockType {
 			// returns true if an 'mn' with exactly three digits
 			lazy_static! {
-				static ref IS_DIGIT_BLOCK: Regex = Regex::new(r"^\d\d\d$").unwrap();
+				static ref IS_DIGIT_BLOCK_3: Regex = Regex::new(r"^\d\d\d$").unwrap();
+				static ref IS_DIGIT_BLOCK_4: Regex = Regex::new(r"^\d\d\d\d$").unwrap();
+				static ref IS_DIGIT_BLOCK_5: Regex = Regex::new(r"^\d\d\d\d\d$").unwrap();
 				static ref IS_BINARY_DIGIT_BLOCK: Regex = Regex::new(r"^[01]{4}$").unwrap();
 			}
 			if name(&mathml) == "mn"  {
 				let text = as_text(mathml);
-				if IS_DIGIT_BLOCK.is_match(text) {
-					return DigitBlockType::DecimalBlock_3;
-				}
-				if IS_BINARY_DIGIT_BLOCK.is_match(text) {
-					return DigitBlockType::BinaryBlock_4;
+				match text.len() {
+					3 => if IS_DIGIT_BLOCK_3.is_match(text) {
+						return DigitBlockType::DecimalBlock_3;
+					},
+					4 => if IS_DIGIT_BLOCK_4.is_match(text) {
+						return DigitBlockType::DecimalBlock_4;
+					} else if IS_BINARY_DIGIT_BLOCK.is_match(text) {
+						return DigitBlockType::BinaryBlock_4;
+					},
+					5 => if IS_DIGIT_BLOCK_5.is_match(text) {
+						return DigitBlockType::DecimalBlock_5;
+					},
+					_ =>  return DigitBlockType::None,
 				}
 			}
 			return DigitBlockType::None;
@@ -1188,6 +1275,7 @@ impl CanonicalizeContext {
 			lazy_static!{
 				static ref SEPARATORS: Regex = Regex::new(r"[],. \u{00A0}]").unwrap(); 
 			}
+			debug!("parent:\n{}", mml_to_string(&parent_mrow));
 			let mut i = 0;
 			while i < children.len() {
 				let child = as_element(children[i]);
@@ -1218,12 +1306,12 @@ impl CanonicalizeContext {
 					for (j, sibling) in children[i+1..].iter().enumerate() {
 						let sibling = as_element(*sibling);
 						let sibling_name = name(&sibling);
-						if !(sibling_name=="mn" || sibling_name=="mtext") {
-							if sibling_name=="mo" {
-								// FIX: generalize to more types of spacing (e.g., mtext with space)
+						if sibling_name != "mn" {
+							if sibling_name=="mo" || sibling_name=="mtext" {
 								// FIX: generalize to include locale ("." vs ",")
 								let leaf_text = as_text(sibling);
-								if !(leaf_text=="." || leaf_text==",") || (leaf_text=="." && has_decimal_pt) {
+								if !(leaf_text=="." || leaf_text=="," || leaf_text.trim().is_empty()) || 
+								   (leaf_text=="." && has_decimal_pt) {
 									end = start + j+1;
 									break;
 								} else if looking_for_separator {
@@ -1238,8 +1326,8 @@ impl CanonicalizeContext {
 								break;
 							}
 						}
-						// debug!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
-						// 		 i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
+						debug!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
+								 i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
 						if !(looking_for_separator &&
 							 (sibling_name == "mtext" || is_comma || is_decimal_pt)) &&
 						   ( looking_for_separator ||
@@ -1249,7 +1337,7 @@ impl CanonicalizeContext {
 						}
 						looking_for_separator = !looking_for_separator;
 					}
-					// debug!("start={}, end={}", start, end);
+					debug!("start={}, end={}", start, end);
 					if is_likely_a_number(parent_mrow, &children, start, end) {
 						merge_block(children, start, end);
 						// note: i..i+end has been collapsed, so just inc 'i' by one
@@ -1277,7 +1365,7 @@ impl CanonicalizeContext {
 			let parent = leaf.parent().unwrap().element().unwrap();
 			if name(&parent) == "mover" {
 				// look for likely overscripts (basically just rule out some definite 'no's)
-				let over = as_element(leaf.following_siblings()[0]);
+				let over = as_element(parent.children()[1]);
 				if is_leaf(over) {
 					let mut over_chars = as_text(over).chars();
 					let first_char = over_chars.next();
@@ -1327,6 +1415,15 @@ impl CanonicalizeContext {
 		fn is_likely_a_number(mrow: Element, children: &[ChildOfElement], mut start: usize, mut end: usize) -> bool {
 			if count_decimal_pts(children, start, end) > 1 {
 				return false;
+			}
+
+			// remove/don't include whitespace at the end
+			while end >= start+3 {
+				let child = as_element(children[end-1]);	// end is not inclusive
+				if !is_leaf(child) || !as_text(child).trim().is_empty() {
+					break;
+				}
+				end -= 1;
 			}
 
 			let decimal_at_start = count_decimal_pts(children, start, start+1) == 1;
@@ -1418,11 +1515,7 @@ impl CanonicalizeContext {
 			let mut mn_text = String::with_capacity(4*(end-start)-1);		// true size less than #3 digit blocks + separator
 			for &child_as_element in children.iter().take(end).skip(start) {
 				let child = as_element(child_as_element);
-				if name(&child) == "mtext" {
-					mn_text.push(' ');
-				} else {
-					mn_text.push_str(as_text(child));
-				}
+				mn_text.push_str(as_text(child));
 			}
 			let child = as_element(children[start]);
 			set_mathml_name(child, "mn");
@@ -4112,12 +4205,33 @@ mod canonicalize_tests {
 
 	#[test]
     fn roman_numeral() {
-        let test_str = "<math><mrow><mtext>XLVIII</mtext> <mo>+</mo>><mn>mmxxvi</mn></mrow></math>";
-        let target_str = "<math><mrow>
-			<mn data-roman-numeral='true'>XLVIII</mn> <mo>+</mo>><mn data-roman-numeral='true'>mmxxvi</mn>
-			</mrow></math>";
+        let test_str = "<math><mrow><mtext>XLVIII</mtext> <mo>+</mo><mn>mmxxvi</mn></mrow></math>";
+		// turns out there is no need to mark them as Roman Numerals -- thought that was need for braille
+        // let target_str = "<math><mrow>
+		// 	<mn data-roman-numeral='true'>XLVIII</mn> <mo>+</mo><mn data-roman-numeral='true'>mmxxvi</mn>
+		// 	</mrow></math>";
+        let target_str = "<math><mrow><mtext>XLVIII</mtext> <mo>+</mo><mn>mmxxvi</mn></mrow></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
+
+	// #[test]
+    // fn roman_numeral_context() {
+	// 	init_logger();
+    //     let test_str = "<math><mi>vi</mi><mo>-</mo><mi mathvariant='normal'>i</mi><mo>=</mo><mtext>v</mtext></math>";
+    //     let target_str = "<math> <mrow data-changed='added'>
+	// 		<mrow data-changed='added'><mn data-roman-numeral='true'>vi</mn><mo>-</mo><mn mathvariant='normal' data-roman-numeral='true'>i</mn></mrow> 
+	// 		<mo>=</mo> <mn data-roman-numeral='true'>v</mn>
+	// 	</mrow> </math>";
+    //     assert!(are_strs_canonically_equal(test_str, target_str));
+	// }
+
+	// #[test]
+    // fn not_roman_numeral() {
+    //     let test_str = "<math><mtext>cm</mtext></math>";
+	// 	// shouldn't change
+    //     let target_str = "<math><mtext>cm</mtext></math>";
+    //     assert!(are_strs_canonically_equal(test_str, target_str));
+	// }
 
 	#[test]
     fn digit_block_binary() {
@@ -4125,7 +4239,7 @@ mod canonicalize_tests {
         let target_str = " <math>
 				<mrow data-changed='added'>
 				<mo>(</mo>
-				<mn>0110 1110 0110</mn>
+				<mn>0110\u{A0}1110\u{A0}0110</mn>
 				<mo>)</mo>
 				</mrow>
 			</math>";
