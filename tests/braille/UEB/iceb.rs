@@ -264,10 +264,50 @@ fn signs_2_10_16() {
 }
 
 #[test]
+fn expr_3_1_1() {
+    let expr = "<math><mn>3</mn><mo>+</mo><mn>5</mn><mo>=</mo><mn>8</mn></math>";
+    // correct not to use extra spacing
+    test_braille("UEB", expr, "⠼⠉⠐⠖⠼⠑⠀⠐⠶⠀⠼⠓");
+}
+
+#[test]
+fn expr_3_1_2() {
+    let expr = "<math><mn>8</mn><mo>-</mo><mn>5</mn><mo>=</mo><mn>3</mn></math>";
+    // correct not to use extra spacing
+    test_braille("UEB", expr, "⠼⠓⠐⠤⠼⠑⠀⠐⠶⠀⠼⠉");
+}
+
+#[test]
+fn expr_3_1_3() {
+    let expr = "<math><mn>3</mn><mo>&#xD7;</mo><mn>5</mn><mo>=</mo><mn>5</mn><mo>&#xD7;</mo><mn>3</mn><mo>=</mo><mn>15</mn></math>";
+    test_braille("UEB", expr, "⠼⠉⠐⠦⠼⠑⠀⠐⠶⠀⠼⠑⠐⠦⠼⠉⠀⠐⠶⠀⠼⠁⠑");
+}
+
+#[test]
+fn expr_3_1_6() {
+    // example includes spaces, so does the MathML (from WIRIS)
+    let expr = "<math><mn>5</mn><mo>.</mo><mn>72</mn><mo>&#xA0;</mo><mtext>m</mtext><mo>&#xF7;</mo><mn>10</mn><mo>=</mo>
+                    <mn>57</mn><mo>.</mo><mn>2</mn><mo>&#xA0;</mo><mi>cm</mi></math>";
+    test_braille("UEB", expr, "⠼⠑⠲⠛⠃⠀⠍⠐⠌⠼⠁⠚⠀⠐⠶⠀⠼⠑⠛⠲⠃⠀⠉⠍");
+}
+
+#[test]
+fn expr_3_1_7() {
+    let expr = "<math><mn>15</mn><mo>&#xB1;</mo><mn>0</mn><mo>.</mo><mn>5</mn></math>";
+    test_braille("UEB", expr, "⠼⠁⠑⠸⠖⠼⠚⠲⠑");
+}
+
+#[test]
 fn expr_3_1_8() {
     let expr = "<math><mi>Area</mi><mo>=</mo><mi>b</mi><mi>h</mi><mo>=</mo>
             <mn>5</mn><mo>&#xB7;</mo><mn>3</mn><mo>=</mo><mn>15</mn></math>";
     test_braille("UEB", expr, "⠠⠜⠑⠁⠀⠐⠶⠀⠃⠓⠀⠐⠶⠀⠼⠑⠐⠲⠼⠉⠀⠐⠶⠀⠼⠁⠑");
+}
+
+#[test]
+fn expr_3_1_9_wiris() {
+    let expr = "<math><mn>3</mn><mo>.</mo><mn>9</mn><mo>&#xD7;</mo><mn>4</mn><mo>.</mo><mn>1</mn><mo>&#x2243;</mo><mn>16</mn></math>";
+    test_braille("UEB", expr, "⠼⠉⠲⠊⠐⠦⠼⠙⠲⠁⠀⠸⠔⠀⠼⠁⠋");
 }
 
 #[test]
@@ -328,7 +368,6 @@ fn alg_3_2_4() {
 
 #[test]
 fn alg_3_2_5() {
-    init_logger();
     let expr = "<math><mi>d</mi><mo>+</mo><mi>a</mi><mi>b</mi><mo>=</mo><mi>a</mi><mi>c</mi></math>";
     // Acceptable: GTM does not use a G1 start indicator: "⠙⠐⠖⠁⠃⠀⠐⠶⠀⠰⠁⠉"
     // However, BANA says use a word indicator if G1 not in first 3 cells (it is after the '='); use passage if >=2 whitespace
@@ -342,6 +381,25 @@ fn ratio_3_2_6() {
     // the difference from ratio_3_1_12 is this involves letters
     let expr = "<math><mi>x</mi><mo>:</mo><mi>y</mi></math>";
     test_braille("UEB", expr, "⠭⠰⠒⠽");
+}
+
+#[test]
+fn example_3_4_1() {
+    let expr = "<math><mo>-</mo><mn>4</mn><mtext>&#xA0;to&#xA0;</mtext><mo>+</mo><mn>5</mn></math>";
+    test_braille("UEB", expr, "⠐⠤⠼⠙⠀⠞⠕⠀⠐⠖⠼⠑");
+}
+
+#[test]
+fn example_3_4_2() {
+    // removed some cruft from TeX output of {}^{-}2+{}^{+}3, but the basics are preserved
+    let expr = "<math>
+        <msup> <mrow/> <mo>&#x2212;</mo></msup>
+        <mn>2</mn>
+        <mo>+</mo>
+        <msup> <mrow/> <mo>&#x2212;</mo></msup>
+        <mn>3</mn>
+    </math>";
+    test_braille("UEB", expr, "⠰⠔⠐⠤⠼⠃⠐⠖⠔⠐⠤⠼⠉");
 }
 
 #[test]
