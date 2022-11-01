@@ -242,9 +242,6 @@
    tag: mn
    match: "."
    replace:
-   # - test:
-   #    if: "@data-roman-numeral"  # GTM 2.6 -- roman numerals are always G1
-   #    then: [t: "1"]
    - x: "BrailleChars(., 'UEB')"
       
 
