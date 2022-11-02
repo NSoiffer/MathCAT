@@ -17,6 +17,12 @@ use regex::Regex;
 use std::fmt;
 use crate::chemistry::*;
 
+// mhchem generates some code to create arrows not in Unicode (as of 11/22)
+// the UTC might add them at the following (unassigned) code points
+// these are also used in CHEM_EQUATION_ARROWS, but the phf_set macro doesn't allow const values
+pub const ARROW_EQUAL_EQUILIBRIUM_STR: &str = "\u{2B96}";
+pub const ARROW_LEFT_EQUILIBRIUM_STR: &str = "\u{2B74}";
+pub const ARROW_RIGHT_EQUILIBRIUM_STR: &str = "\u{2B75}";
 
 // FIX: DECIMAL_SEPARATOR should be set by env, or maybe language
 const DECIMAL_SEPARATOR: &str = ".";
@@ -1907,6 +1913,38 @@ impl CanonicalizeContext {
 							new_children.push( ChildOfElement::Element(self.canonicalize_mrows(e)? ));
 						},
 						_ => panic!("Should have been an element or text"),
+					}
+				}
+				if tag_name == "mover" {
+					// catches output of mhchem for some equilibrium arrows that currently (11/22) don't have Unicode points
+					// see github.com/NSoiffer/MathCAT/issues/60 for the patterns being matched
+					let base = as_element(new_children[0]);
+					let mo_base = if name(&base) == "mrow" && base.children().len() == 2 {
+						as_element(base.children()[0])
+					} else {
+						base
+					};
+					let upper = as_element(new_children[1]);
+					let mo_upper = if name(&upper) == "mrow" && upper.children().len() == 2 {
+						as_element(upper.children()[1])
+					} else {
+						upper
+					};
+					debug!("mo_base: {}", mml_to_string(&mo_base));
+					debug!("mo_upper: {}", mml_to_string(&mo_upper));
+					if name(&mo_base) == "mo" && name(&mo_upper) == "mo" && 
+					   as_text(mo_base) == "↽" && as_text(mo_upper) == "⇀" {
+						// we have a match -- now figure out which char to use
+						set_mathml_name(mathml, "mo");
+						mathml.clear_children();
+						if name(&base) == "mrow" && name(&upper) == "mrow" {
+							mathml.set_text(ARROW_EQUAL_EQUILIBRIUM_STR);
+						} else if name(&base) == "mrow" {
+							mathml.set_text(ARROW_LEFT_EQUILIBRIUM_STR);
+						} else {
+							mathml.set_text(ARROW_RIGHT_EQUILIBRIUM_STR);
+						}
+						return Ok( mathml );
 					}
 				}
 				mathml.replace_children(new_children);

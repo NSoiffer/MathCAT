@@ -857,6 +857,7 @@ fn likely_chem_equation_operator(mathml: Element) -> isize {
         '→', '➔', '←', '⟶', '⟵', '⤻', '⇋', '⇌',
         '↿', '↾', '⇃', '⇂', '⥮', '⥯', '⇷', '⇸', '⤉', '⤈',
         '⥂', '⥄',
+        '\u{2B96}', '\u{2B74}', '\u{2B75}',         // see constants set in canonicalize.rs
     };
 
     let mathml = mathml;

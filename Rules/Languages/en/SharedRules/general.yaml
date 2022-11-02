@@ -943,8 +943,12 @@
          if: "name(preceding-sibling::*[1]) = 'chemical-nuclide'"
          then: [t: "decays to"]
          else: [t: "yields"]
-      - else_if: "text()='⇌'"
+      - else_if: "text()='⇌' or text()='\u2B96'"
         then: [t: "is in equilibrium with"]
+      - else_if: "text()='\u2B74'"
+        then: [t: "is in left-sided equilibrium with"]
+      - else_if: "text()='\u2B75'"
+        then: [t: "is in right-sided equilibrium with"]
         else: [x: text()]
 
 -
