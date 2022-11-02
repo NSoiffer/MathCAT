@@ -533,12 +533,16 @@ impl<'r> Intent {
             result.replace_children(
                 result.children().iter()
                     .map(|&child_of_element| {
-                        let child = as_element(child_of_element);
-                        if name(&child) == "TEMP_NAME" {
-                            assert_eq!(child.children().len(), 1);
-                            child.children()[0]
-                        } else {
-                            child_of_element
+                        match child_of_element {
+                            ChildOfElement::Element(child) => {
+                                if name(&child) == "TEMP_NAME" {
+                                    assert_eq!(child.children().len(), 1);
+                                    child.children()[0]
+                                } else {
+                                    child_of_element
+                                }
+                            },
+                            _ => child_of_element,      // text()
                         }
                     })
                     .collect::<Vec<ChildOfElement>>()
