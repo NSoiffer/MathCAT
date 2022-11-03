@@ -101,7 +101,7 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
             continue;
         } else if i + 2 < old_children.len() {
             if let Some(paren_mrow) = make_mrow(old_children[i..i+3].try_into().unwrap()) {
-                debug!("make_mrow added mrow");
+                // debug!("make_mrow added mrow");
                 new_children.push(paren_mrow);
                 i += 3;
                 changed = true;
@@ -445,7 +445,8 @@ fn has_chemical_element(mathml: Element) -> bool {
     return false;
 }
 
-/// Looks at the children of the element and uses heuristics to decide whether this is a chemical equation 
+/// Looks at the children of the element and uses heuristics to decide whether this is a chemical equation.
+/// This assumes canonicalization of characters has happened
 fn likely_chem_equation(mathml: Element) -> isize {
     if name(&mathml) != "mrow" {
         return NOT_CHEMISTRY;
@@ -475,7 +476,7 @@ fn likely_chem_equation(mathml: Element) -> isize {
         match tag_name {
             "mi" => likelihood += likely_chem_element(child),
             "mn" => (),       // not much info
-            "mo" => {
+            "mo" | "mover" | "munder" | "munderover" => {
                 let likely = likely_chem_equation_operator(child);
                 likelihood += likely;
             },
@@ -846,6 +847,7 @@ fn likely_chem_formula_operator(mathml: Element) -> isize {
 
 /// This assumes canonicalization of characters has happened
 fn likely_chem_equation_operator(mathml: Element) -> isize {
+
     // mostly from chenzhijin.com/en/article/Useful%20Unicode%20for%20Chemists (Arrows and Other)
     static CHEM_EQUATION_OPERATORS: phf::Set<char> = phf_set! {
         '+', '=', '-',
@@ -857,16 +859,17 @@ fn likely_chem_equation_operator(mathml: Element) -> isize {
         '→', '➔', '←', '⟶', '⟵', '⤻', '⇋', '⇌',
         '↿', '↾', '⇃', '⇂', '⥮', '⥯', '⇷', '⇸', '⤉', '⤈',
         '⥂', '⥄',
-        '\u{2B96}', '\u{2B74}', '\u{2B75}',         // see constants set in canonicalize.rs
+        // '\u{2B96}', '\u{2B74}', '\u{2B75}',         // uncomment when defined in Unicode
     };
 
-    let mathml = mathml;
     let elem_name = name(&mathml);
     if elem_name == "munder" || elem_name == "mover" || elem_name == "munderover" {
-        let mathml = as_element(mathml.children()[0]);
-        if name(&mathml) == "mo" && is_in_set(as_text(mathml), &CHEM_EQUATION_ARROWS) {
-            mathml.set_attribute_value(MAYBE_CHEMISTRY, "1");
+        let base = as_element(mathml.children()[0]);
+        if name(&base) == "mo" && is_in_set(as_text(base), &CHEM_EQUATION_ARROWS) {
+            base.set_attribute_value(MAYBE_CHEMISTRY, "1");
             return 1;
+        } else if elem_name == "mover" && is_hack_for_missing_arrows(mathml) {
+            return 2;
         } else {
             return NOT_CHEMISTRY;
         }    
@@ -883,6 +886,28 @@ fn likely_chem_equation_operator(mathml: Element) -> isize {
         }
     }
     return -3;  // there is still a chance
+
+    /// Detects output of mhchem for some equilibrium arrows that currently (11/22) don't have Unicode points
+    /// See github.com/NSoiffer/MathCAT/issues/60 for the patterns being matched
+    fn is_hack_for_missing_arrows(mover: Element) -> bool {
+        assert_eq!(name(&mover), "mover");
+        let children = mover.children();
+        let base = as_element(children[0]);
+        let mo_base = if name(&base) == "mrow" && base.children().len() == 2 {
+            as_element(base.children()[0])
+        } else {
+            base
+        };
+        let upper = as_element(children[1]);
+        let mo_upper = if name(&upper) == "mrow" && upper.children().len() == 2 {
+            as_element(upper.children()[1])
+        } else {
+            upper
+        };
+        // slightly sloppy match, but almost certainly good enough
+        return name(&mo_base) == "mo" && name(&mo_upper) == "mo" && 
+                as_text(mo_base) == "↽" && as_text(mo_upper) == "⇀";
+        }
 }
 
 fn is_equilibrium_constant(mut mathml: Element) -> bool {

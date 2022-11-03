@@ -946,9 +946,9 @@
       - else_if: "text()='⇌' or text()='\u2B96'"
         then: [t: "is in equilibrium with"]
       - else_if: "text()='\u2B74'"
-        then: [t: "is in left-sided equilibrium with"]
+        then: [t: "is in equilibrium biased to the left with"]
       - else_if: "text()='\u2B75'"
-        then: [t: "is in right-sided equilibrium with"]
+        then: [t: "is in equilibrium biased to the right with"]
         else: [x: text()]
 
 -

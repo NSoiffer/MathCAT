@@ -392,6 +392,26 @@
           else: [x: "*[2]"]
 
 -
+   # this captures the output for the mhchem's "<=>", "<<=>", and "<=>>" output (there are no Unicode arrows for them)
+   # this isn't a perfect match, but should be good enough and allows merging all three (see github.com/NSoiffer/MathCAT/issues/60)
+   name: chemistry-mhchem-equilibrium-arrow
+   tag: mover
+   match:
+   -    "*[1][substring(., 1, 1)='↽'] and"
+   -    "*[2][substring(., string-length(), 1)='⇀']"
+   replace:
+   - intent:
+      name: "chemical-equation-operator"
+      children:
+      - test:
+          if: "*[1][self::m:mrow]"
+          then_test:
+              if: "*[2][self::m:mrow]"
+              then: [t: "\u2B96"]    # this is currently unassigned and may get used by UTC at some point (<=>)
+              else: [t: "\u2B74"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
+          else: [t: "\u2B75"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
+
+-
   # need to include the name of the element so the rules know whether to say "sub" or "super"
   name: chemistry
   tag: [msub, msup]
