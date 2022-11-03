@@ -560,3 +560,69 @@ fn mhchem_hcl_aq_etc() {
 
 }
 
+
+#[test]
+fn mhchem_barbed_equilibrium() {
+  let expr = "<math>
+    <mrow data-mjx-texclass='ORD' data-chem-equation='14'>
+      <mrow data-changed='added' data-chem-equation='3'>
+        <mmultiscripts data-chem-formula='1'>
+          <mi data-mjx-texclass='ORD' mathvariant='normal' data-chem-element='1'>H</mi>
+          <mn data-mjx-texclass='ORD'>2</mn>
+          <none></none>
+        </mmultiscripts>
+        <mo data-changed='added' data-guess='true'>&#x2063;</mo>
+        <mrow data-changed='added' data-chem-equation='1'>
+          <mo stretchy='false'>(</mo>
+          <mi data-mjx-texclass='ORD' mathvariant='normal'>g</mi>
+          <mo stretchy='false'>)</mo>
+        </mrow>
+      </mrow>
+      <mo data-chem-equation-op='1'>+</mo>
+      <mrow data-changed='added' data-chem-equation='10'>
+        <mrow data-changed='added' data-chem-equation='3'>
+          <mmultiscripts data-chem-formula='1'>
+            <mi data-mjx-texclass='ORD' mathvariant='normal' data-chem-element='1'>I</mi>
+            <mn data-mjx-texclass='ORD'>2</mn>
+            <none></none>
+          </mmultiscripts>
+          <mo data-changed='added' data-guess='true'>&#x2063;</mo>
+          <mrow data-changed='added' data-chem-equation='1'>
+            <mo stretchy='false'>(</mo>
+            <mi data-mjx-texclass='ORD' mathvariant='normal'>g</mi>
+            <mo stretchy='false'>)</mo>
+          </mrow>
+        </mrow>
+        <mo data-changed='added'>&#x2062;</mo>
+        <mover data-mjx-texclass='REL'>
+          <mrow data-mjx-texclass='ORD' depth='0' height='0' data-changed='added'>
+            <mo data-mjx-texclass='ORD' stretchy='false'>↽</mo>
+            <mo data-mjx-texclass='ORD'>-</mo>
+          </mrow>
+          <mrow data-mjx-texclass='ORD' displaystyle='false' scriptlevel='0' data-changed='added'>
+            <mo data-mjx-texclass='ORD'>-</mo>
+            <mo data-mjx-texclass='ORD' stretchy='false'>⇀</mo>
+          </mrow>
+        </mover>
+        <mo data-changed='added'>&#x2062;</mo>
+        <mn>2</mn>
+        <mo data-changed='added'>&#x2062;</mo>
+        <mrow data-changed='added' data-chem-equation='5'>
+          <mi mathvariant='normal' data-chem-element='1'>H</mi>
+          <mo data-changed='added'>&#x2063;</mo>
+          <mi mathvariant='normal' data-chem-element='1'>I</mi>
+          <mo data-changed='added' data-guess='true'>&#x2063;</mo>
+          <mrow data-changed='added' data-chem-equation='1'>
+            <mo stretchy='false'>(</mo>
+            <mi data-mjx-texclass='ORD' mathvariant='normal'>g</mi>
+            <mo stretchy='false'>)</mo>
+          </mrow>
+        </mrow>
+      </mrow>
+    </mrow>
+  </math>";
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")],
+      expr, "H, 2 gas; plus; I, 2 gas; is in equilibrium with, 2, H, I; gas,");
+}
+
+
