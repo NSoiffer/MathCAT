@@ -486,7 +486,7 @@ pub fn trim_element(e: &Element) {
             match child {
                 ChildOfElement::Element(e) => {
                     if name(&e) == "mglyph" {
-                        text += e.attribute_value("alt").or(Some("")).unwrap();
+                        text += e.attribute_value("alt").unwrap_or("");
                     } else {
                         make_leaf_element(e);
                         match e.children()[0] {
@@ -628,7 +628,7 @@ pub fn is_same_element(e1: &Element, e2: &Element) -> Result<()> {
         }
         fn print_attrs(attrs: &[Attribute]) -> String {
             return attrs.iter()
-                .map(|attr| print_attr(attr))
+                .map(print_attr)
                 .collect::<Vec<String>>()
                 .join(", ");
         }

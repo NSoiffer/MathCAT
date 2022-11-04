@@ -1067,7 +1067,7 @@ struct SpeechPattern {
     replacements: ReplacementArray,       // the replacements in case there is a match
 }
 
-impl<'a> fmt::Display for SpeechPattern {
+impl fmt::Display for SpeechPattern {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return write!(f, "[name: {}, tag: {},\n  variables: {:?}, pattern: {},\n  replacement: {}]",
                 self.pattern_name, self.tag_name, self.var_defs, self.pattern,
@@ -1426,7 +1426,7 @@ impl VariableDefinition {
                 return Ok(
                     VariableDefinition{
                         name,
-                        value: MyXPath::build(&value)?
+                        value: MyXPath::build(value)?
                     }
                 );
             },
@@ -2199,7 +2199,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
 
     fn replace<T:TreeOrString<'c, 'm, T>>(&'r mut self, replacement: &Replacement, mathml: Element<'c>) -> Result<T> {
         return Ok(
-            match &*replacement {
+            match replacement {
                 Replacement::Text(t) => T::from_string(t.clone(), self.doc)?,
                 Replacement::XPath(xpath) => xpath.replace(self, mathml)?,
                 Replacement::TTS(tts) => {

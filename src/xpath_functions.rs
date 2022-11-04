@@ -373,7 +373,7 @@ impl Function for IsNode {
                         if let Node::Element(e) = node {
                             match kind.as_str() {
                                 "simple" => IsNode::is_simple(&e),
-                                "leaf"   => MATHML_LEAF_NODES.contains(&name(&e)),
+                                "leaf"   => MATHML_LEAF_NODES.contains(name(&e)),
                                 "2D" => MATHML_2D_NODES.contains(name(&e)),
                                 "trig_name" => IsNode::is_trig_name(&e),
                                 "common_fraction" => IsNode::is_common_fraction(&e, usize::MAX, usize::MAX), 

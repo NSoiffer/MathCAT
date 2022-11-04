@@ -1,3 +1,4 @@
+#![allow(clippy::needless_return)]
 
 use std::convert::TryInto;
 
@@ -126,7 +127,7 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
             }
         }
         i += 1;
-        new_children.push(child.clone());
+        new_children.push(child);
     }
 
     return if changed {Some(new_children)} else {None};
@@ -146,7 +147,7 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
            is_text(children[i+3], ")") {
             let mi = create_mathml_element(&children[i].document(), "mi");
             mi.set_text("aq");
-            return make_mrow([children[i], mi, children[i+3]].try_into().unwrap());
+            return make_mrow([children[i], mi, children[i+3]]);
         }
         return None;
     }
@@ -157,7 +158,7 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
 
     // converts  "( child )" to mrow with those elements as children 
     // this is to make ascertaining with this is a chemical state easier, but it is correct even if not a chemical state
-    fn make_mrow<'a>(children: [Element<'a>; 3]) -> Option<Element<'a>> {
+    fn make_mrow(children: [Element; 3]) -> Option<Element> {
         // this is a little sloppy in that we allow matching text in any leaf element, but we can use the same function
         if is_text(children[0], "(") &&
            is_text(children[2], ")") {
@@ -222,7 +223,7 @@ fn clean_mrow_children_mark_pass(children: &[Element]) {
 /// consistency in the error.
 /// 
 /// Returns a Vec of the chemical elements or None. If a merge happened, the tree is altered.
-pub fn convert_leaves_to_chem_elements<'a>(mathml: Element<'a>) -> Option<Vec<Element<'a>>> {
+pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> {
     // gather up all the consecutive mi/mtext
     if !(name(&mathml) == "mi" || name(&mathml) == "mtext") {
         return None;       // do nothing
@@ -230,7 +231,7 @@ pub fn convert_leaves_to_chem_elements<'a>(mathml: Element<'a>) -> Option<Vec<El
 
     // we play games with the string to avoid allocation...
     let token_string = as_text(mathml).as_bytes();
-    if token_string.iter().find(|&&ch| ch >=128).is_some() {
+    if token_string.iter().any(|&ch| ch >=128) {
         return None;    // chemical elements are ASCII
     }
     let doc = mathml.document();
@@ -252,7 +253,7 @@ pub fn convert_leaves_to_chem_elements<'a>(mathml: Element<'a>) -> Option<Vec<El
 
     fn merge_tokens_chem_element<'a>(doc: &Document<'a>, leaf: Element<'a>, token_string: &[u8], following_siblings: &[ChildOfElement<'a>]) -> Option<Vec<Element<'a>>> {
         // FIX: need to handle three char chem elements (make a nested fn to deal with each char)
-        if following_siblings.len() == 0 {
+        if following_siblings.is_empty() {
             return None;
         }
         let second_element = as_element(following_siblings[0]);
@@ -280,15 +281,15 @@ pub fn convert_leaves_to_chem_elements<'a>(mathml: Element<'a>) -> Option<Vec<El
         let mut new_children = Vec::with_capacity(token_string.len());
         while j < token_len {
             // try elements of length 3, 2, 1, preferring longer elements (e.g., prefer "Na" over "N")
-            if let Some(chem_element) = get_chem_element(&doc, &token_string[j..], 3) {
+            if let Some(chem_element) = get_chem_element(doc, &token_string[j..], 3) {
                 new_children.push(chem_element);
                 j += 3;
                 continue;
-            } else if let Some(chem_element) = get_chem_element(&doc, &token_string[j..], 2) {
+            } else if let Some(chem_element) = get_chem_element(doc, &token_string[j..], 2) {
                 new_children.push(chem_element);
                 j += 2;
                 continue;
-            } else if let Some(chem_element) = get_chem_element(&doc, &token_string[j..], 1) {
+            } else if let Some(chem_element) = get_chem_element(doc, &token_string[j..], 1) {
                 new_children.push(chem_element);
                 j += 1;
                 continue;
@@ -527,7 +528,7 @@ fn likely_chem_equation(mathml: Element) -> isize {
 /// could be a number, a state ("(l)", "(g)", etc), or a number followed by a state
 fn likely_chem_subscript(supscript: Element) -> isize {
     let subscript_name = name(&supscript);
-    if  subscript_name == "mn" && !as_text(supscript).contains(".") {
+    if  subscript_name == "mn" && !as_text(supscript).contains('.') {
         return 0;       // not really much chem info about an integer subscript
     } else if subscript_name == "mi" {
         let text = as_text(supscript);
@@ -538,11 +539,10 @@ fn likely_chem_subscript(supscript: Element) -> isize {
         let children = supscript.children();
         let i_first_child = as_element(children[0]);
         if children.len() == 2 &&
-           name(&i_first_child) == "mn" && !as_text(i_first_child).contains(".") &&
-           name (&as_element(children[1])) == "mrow" {
-            if likely_chem_state(as_element(children[1])) > 0 { // notation used in en.wikipedia.org/wiki/Electrolyte#Formation
+           name(&i_first_child) == "mn" && !as_text(i_first_child).contains('.') &&
+           name (&as_element(children[1])) == "mrow" &&
+           likely_chem_state(as_element(children[1])) > 0 { // notation used in en.wikipedia.org/wiki/Electrolyte#Formation
                 return 2;
-            }
         }     
     }
     return NOT_CHEMISTRY;     
@@ -563,7 +563,7 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
         if children.len() == 2 {
             let first = as_element(children[0]);
             let second = as_element(children[1]);
-            if name(&first) == "mn" && name(&second) == "mo" && !as_text(first).contains(".") {
+            if name(&first) == "mn" && name(&second) == "mo" && !as_text(first).contains('.') {
                 let second_text = as_text(second);
                 if second_text == "+" || second_text == "-" || second_text == "\u{2212}" { // '-' not yet canonicalized
                     return 2;   // ending with a +/- makes it likely this is an ion
@@ -756,7 +756,7 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
             return NOT_CHEMISTRY;
         };
 
-        if prescripts.len() > 0 {
+        if !prescripts.is_empty() {
             if name(&as_element(prescripts[1])) != "mn" { // must have a pre-superscript (neutrons + protons)
                 // fix could make sure they are integers
                 return NOT_CHEMISTRY;
@@ -963,7 +963,11 @@ static CHEMICAL_ELEMENTS: phf::Set<&str> = phf_set! {
 	"Ra", "Rb", "Re", "Rf", "Rg", "Rh", "Rn", "Ru", 
 	"S", "Sb", "Sc", "Se", "Sg", "Si", "Sm", "Sn", "Sr",
 	"Ta", "Tb", "Tc", "Te", "Th", "Ti", "Tl", "Tm", "Ts", 
-	"U", "V", "W", "Xe", "Y", "Yb", "Zn", "Zr"};
+	"U", "V", "W", "Xe", "Y", "Yb", "Zn", "Zr",
+    // The following come from E.A. Moore who said to treat them like chemicals 
+    // These stand for methyl, ethyl, alkyl, acetyl and phenyl and apparently are quite commonly used ("Ac" is already a chemical)
+    "Me", "Et", "R", /* "Ac", */ "Ph",
+};
 
 pub fn is_chemical_element(node: Element) -> bool {
 	// FIX: allow name to be in an mrow (e.g., <mi>N</mi><mi>a</mi>

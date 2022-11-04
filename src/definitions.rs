@@ -245,7 +245,7 @@ fn build_values(definition: &Yaml) -> Result<()> {
         bail!("Should only be one definition rule: {}", yaml_to_type(definition));
     }
     let (key, value) = dictionary.iter().next().unwrap();
-    let name = &*key.as_str().ok_or_else(|| format!("definition list name '{}' is not a string", yaml_to_type(key)))?;
+    let name = key.as_str().ok_or_else(|| format!("definition list name '{}' is not a string", yaml_to_type(key)))?;
     let values = value.as_vec().ok_or_else(|| format!("definition list value '{}' is not an array", yaml_to_type(value)))?;
 
     return DEFINITIONS.with(|definitions| {

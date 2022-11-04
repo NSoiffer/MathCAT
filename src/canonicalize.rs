@@ -321,7 +321,7 @@ pub fn set_mathml_name(element: Element, new_name: &str) {
 }
 
 // returns the presentation element of a "semantics" element
-pub fn get_presentation_element<'a>(element: Element<'a>) -> Element<'a> {
+pub fn get_presentation_element(element: Element) -> Element {
 	// FIX: implement this
 	assert_eq!(name(&element), "semantics");
 	return as_element( element.children()[0] );
@@ -421,7 +421,7 @@ impl CanonicalizeContext {
 	}
 
 	/// Return an error is some element is not MathML (only look at first child of <semantics>) or if it has the wrong number of children
-	fn assure_mathml<'a>(&self, mathml: Element<'a>) -> Result<()> {
+	fn assure_mathml(&self, mathml: Element) -> Result<()> {
 		static ALL_MATHML_ELEMENTS: phf::Set<&str> = phf_set!{
 			"mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph",
 			"mfrac", "mroot", "msub", "msup", "msubsup","munder", "mover", "munderover", "mmultiscripts",
@@ -452,7 +452,7 @@ impl CanonicalizeContext {
 				},
 				"mmultiscripts" => {
 					let has_prescripts = mathml.children().iter()
-							.find(|&&child| name(&as_element(child)) == "mprescripts").is_some();
+							.any(|&child| name(&as_element(child)) == "mprescripts");
 					if has_prescripts ^ (n_children % 2 == 0) {
 						bail!("{} has the wrong number of children:\n{}", element_name, mml_to_string(&mathml));
 					}
@@ -473,7 +473,7 @@ impl CanonicalizeContext {
 				return self.assure_mathml(get_presentation_element(mathml));
 			}
 		}
-		if !ALL_MATHML_ELEMENTS.contains(&element_name) {
+		if !ALL_MATHML_ELEMENTS.contains(element_name) {
 			bail!("'{}' is not a valid MathML element", element_name);
 		}
 		// valid MathML element and not a leaf -- check the children
@@ -572,7 +572,7 @@ impl CanonicalizeContext {
 				// 	return Some(mathml);
 			 	// }
 				if let Some(dash) = canonicalize_dash(text) {		// needs to be before OPERATORS.get due to "--"
-					mathml.set_text(&dash);
+					mathml.set_text(dash);
 					return Some(mathml);
 				} else if OPERATORS.get(text).is_some() {
 					set_mathml_name(mathml, "mo");
@@ -611,7 +611,7 @@ impl CanonicalizeContext {
 					// normalize to just a single non-breaking space
 					make_empty_element(mathml);
 				} else if let Some(dash) = canonicalize_dash(text) {
-					mathml.set_text(&dash);
+					mathml.set_text(dash);
 				}
 				return if parent_requires_child || !text.is_empty() {Some(mathml)} else {None};
 			},
@@ -904,7 +904,7 @@ impl CanonicalizeContext {
 		}
 
 
-		fn make_empty_element<'a>(mathml: Element<'a>) -> Element<'a> {
+		fn make_empty_element(mathml: Element) -> Element {
 			set_mathml_name(mathml, "mtext");
 			mathml.clear_children();
 			mathml.set_text("\u{A0}");
@@ -945,7 +945,7 @@ impl CanonicalizeContext {
 			return as_element(parent.children()[i_first_new_child]);
 		}
 
-		fn clean_chemistry_leaf<'a>(mathml: Element<'a>) -> Element<'a> {
+		fn clean_chemistry_leaf(mathml: Element) -> Element {
 			if !(is_chemistry_off() || mathml.attribute(MAYBE_CHEMISTRY).is_some()) {
 				assert!(name(&mathml)=="mi" || name(&mathml)=="mtext");
 				// this is hack -- VII is more likely to be roman numeral than the molecule V I I so prevent that from happening
@@ -1337,7 +1337,7 @@ impl CanonicalizeContext {
 						looking_for_separator = !looking_for_separator;
 					}
 					// debug!("start={}, end={}", start, end);
-					if is_likely_a_number(parent_mrow, &children, start, end) {
+					if is_likely_a_number(parent_mrow, children, start, end) {
 						merge_block(children, start, end);
 						// note: i..i+end has been collapsed, so just inc 'i' by one
 					} else {
@@ -1674,7 +1674,7 @@ impl CanonicalizeContext {
 		///   has a closer mi/mtext, it is used.
 		/// mhchem has some ugly output (at least in MathJax) and that's where using the following element makes sense
 		///   because an empty based (mpadded width=0) is used for the scripts. A hacky attribute indicates this case.
-		fn convert_to_mmultiscripts<'a>(mrow_children: &mut Vec<ChildOfElement<'a>>, i: usize) -> usize {
+		fn convert_to_mmultiscripts(mrow_children: &mut Vec<ChildOfElement>, i: usize) -> usize {
 			// this is a bit messy/confusing because we might scan forwards or backwards and this affects whether
 			// we are scanning for prescripts or postscripts
 			// the generic name "primary_scripts" means prescripts if going forward or postscripts if going backwards
@@ -3109,7 +3109,7 @@ fn add_attrs<'a>(mathml: Element<'a>, attrs: Vec<Attribute>) -> Element<'a> {
 	// remove non-global attrs
 	for attr in mathml.attributes() {
 		let attr_name = attr.name().local_part();
-		if !( attr_name.starts_with("data-") || GLOBAL_ATTRS.contains(&attr_name) ||
+		if !( attr_name.starts_with("data-") || GLOBAL_ATTRS.contains(attr_name) ||
 		      attr_name.starts_with("on") ) {			// allows too much - cheapo way to allow event handlers like "onchange"
 			mathml.remove_attribute(attr.name());
 		}

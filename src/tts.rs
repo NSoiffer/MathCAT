@@ -81,7 +81,7 @@ const RATE_FROM_CONTEXT:f64 = 987654321.5;   // hopefully unique
 
 /// TTSCommand are the supported TTS commands
 /// When parsing the YAML rule files, they are converted to these enums
-#[derive(Debug, Clone, PartialEq, Display, EnumString)]
+#[derive(Debug, Clone, PartialEq, Eq, Display, EnumString)]
 #[strum(serialize_all = "snake_case")]  // allows lower case
 pub enum TTSCommand {
     Pause,
@@ -244,7 +244,7 @@ impl TTSCommandRule {
 /// These types should do something for all the TTSCommands
 #[allow(clippy::upper_case_acronyms)]
 #[allow(dead_code)]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TTS {
     None,
     SSML,
