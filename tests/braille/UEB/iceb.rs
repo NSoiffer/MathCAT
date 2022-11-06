@@ -992,7 +992,10 @@ fn dot_12_1_6_double() {
 #[test]
 fn hat_12_1_7() {
     let expr = "<math><mi>A</mi><mover><mi>B</mi><mo>^</mo></mover><mi>C</mi></math>";
-    test_braille("UEB", expr, "⠠⠁⠠⠃⠐⠱⠠⠉");
+    // Acceptable: GTM uses a G1 start indicator: "⠰⠰⠠⠁⠠⠃⠐⠱⠠⠉"
+    // BANA says use a word indicator if G1 not in first 3 cells (modified it to not count cap indicators since that helps with GTM compatibility)
+    // Corrected to skip the G1 indicator at the start (it's debatable as to which is better)
+    test_braille("UEB", expr, "⠠⠁⠠⠃⠰⠐⠱⠠⠉");
 }
 
 #[test]
