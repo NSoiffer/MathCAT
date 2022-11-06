@@ -1,7 +1,5 @@
 #![allow(clippy::needless_return)]
 
-use std::convert::TryInto;
-
 /// Chemistry terms used here:
 /// chemical formula -- this references a molecule (one or more elements with bonds between them), including its state.
 /// chemical equation -- this is a notation specialized to chemistry -- it has concentration, arrows, equality, "addition" along with 
@@ -45,6 +43,8 @@ use crate::xpath_functions::is_leaf;
 use regex::Regex;
 use crate::xpath_functions::IsBracketed;
 use phf::phf_set;
+use std::convert::TryInto;
+use std::collections::HashSet;
 
 
 pub static NOT_CHEMISTRY: isize = -10000;  // should overwhelm any positive signal
@@ -63,6 +63,15 @@ static CHEM_FORMULA: &str = "data-chem-formula";
 static CHEM_ELEMENT: &str = "data-chem-element";
 static CHEM_FORMULA_OPERATOR: &str = "data-chem-formula-op";
 static CHEM_EQUATION_OPERATOR: &str = "data-chem-equation-op";
+
+/// these can be in the base of an under/over script
+static CHEM_EQUATION_ARROWS: phf::Set<char> = phf_set! {
+    '→', '➔', '←', '⟶', '⟵', '⤻', '⇋', '⇌',
+    '↿', '↾', '⇃', '⇂', '⥮', '⥯', '⇷', '⇸', '⤉', '⤈',
+    '⥂', '⥄',
+    // '\u{2B96}', '\u{2B74}', '\u{2B75}',         // uncomment when defined in Unicode
+};
+
 
 pub fn is_chemistry_off() -> bool {
     let pref_manager = crate::prefs::PreferenceManager::get();
@@ -334,12 +343,11 @@ pub fn scan_and_mark_chemistry(mathml: Element) {
         return;
     }
 
-    // FIX -- need to implement
     debug!("scan_and_mark_chemistry:\n{}", mml_to_string(&mathml));
     assert_eq!(name(&mathml), "math");
-    assert_eq!(mathml.children().len(), 1);
-    let child = as_element(mathml.children()[0]);
-    if has_chemical_element(child) {
+    if is_chemistry_sanity_check(mathml) {
+        assert_eq!(mathml.children().len(), 1);
+        let child = as_element(mathml.children()[0]);
         let likelihood = likely_chem_formula(child);
         if likelihood >= IS_CHEMISTRY_THRESHOLD && child.attribute(CHEM_FORMULA).is_none() {
             child.set_attribute_value(MAYBE_CHEMISTRY, likelihood.to_string().as_str());
@@ -424,26 +432,72 @@ fn unset_marked_chemistry(mathml: Element) {
     }
 }
 
-/// Returns true only if 'mathml' potentially has a chemical element in it.
-/// This assumes canonicalization has happened
-fn has_chemical_element(mathml: Element) -> bool {
-    // this could be combined with likely_chem_formula() and likely_chem_equation(), but then the return structure and other logic gets messy
-    // doing this separately is cleaner but slower
-    match name(&mathml) {
-        "mi" | "mtext" => return is_chemical_element(mathml),
-        "msub" | "msup" | "msubsup" | "mmultiscripts" => return has_chemical_element(as_element(mathml.children()[0])),
-        "semantics" => return has_chemical_element( get_presentation_element(mathml) ),
-        _ => if is_leaf(mathml) { return false; },
-    }
+/// Returns true only if 'mathml' potentially is chemistry.
+/// This assumes canonicalization has happened and that 'mathml' is the 'math' element
+fn is_chemistry_sanity_check(mathml: Element) -> bool {
+    // This does some sanity checking. More can definitely be done
+    // Checks:
+    // * if the child is an mrow with three children, the operator should be '=' or an arrow
+    //   in this case, we gather up the elements on the lhs and rhs. The sets should be equal and non-empty.
+    //   the exception is if there are prescripts, in which as we might have radioactive decay so we don't require the sets to be equal
+    // * otherwise, we gather up all the chemical elements and make sure the set is non-empty
+    // * if it isn't an mrow, we leave it to likely_chem_equation() to rule it out
 
-    // mrow, msqrt, etc
-    for child in mathml.children() {
-        let child = as_element(child);
-        if has_chemical_element(child) {
-            return true;
+    assert_eq!(name(&mathml), "math");
+    assert_eq!(mathml.children().len(), 1);
+    let mathml = as_element(mathml.children()[0]);
+    if name(&mathml) == "mrow" {
+        let mrow_children = mathml.children();
+        if mrow_children.len() == 3 && is_arrow_or_equal(as_element(mrow_children[1])) {
+            let mut lhs_elements = HashSet::with_capacity(8);   // likely more than anything we'll encounter -- bigger affects '=' op
+            let lhs_has_prescripts = gather_chemical_elements(as_element(mrow_children[0]), &mut lhs_elements);
+            let mut rhs_elements = HashSet::with_capacity(8);  // likely more than anything we'll encounter -- bigger affects '=' op
+            let rhs_has_prescripts = gather_chemical_elements(as_element(mrow_children[2]), &mut rhs_elements);
+            if lhs_elements.is_empty() {
+                return false;
+            }
+            if lhs_elements == rhs_elements {
+                return !(lhs_has_prescripts ^ rhs_has_prescripts);      // seems reasonable that if the lhs has prescripts, so should the rhs
+            }
+            return lhs_has_prescripts && rhs_has_prescripts;    // non-equal sets only if radioactive decay.
         }
     }
-    return false;
+    let mut chem_elements = HashSet::with_capacity(8);   // likely more than anything we'll encounter -- bigger affects '=' op
+    gather_chemical_elements(mathml, &mut chem_elements);
+    return !chem_elements.is_empty();
+
+    
+    fn is_arrow_or_equal(mathml: Element) -> bool {
+        let base = get_possible_embellished_node(mathml);
+        if name(&base) != "mo" {
+            return false;
+        }
+        let text = as_text(base);
+        return text.len() == 1 && (text == "=" || CHEM_EQUATION_ARROWS.contains(&text.chars().next().unwrap()));
+
+    }
+
+    fn gather_chemical_elements<'a>(mathml: Element<'a>, chem_elements: &mut HashSet<&'a str>) -> bool {
+        match name(&mathml) {
+            "mi" | "mtext" => {
+                if is_chemical_element(mathml) {
+                    chem_elements.insert(as_text(mathml));
+                }
+                return false;
+            },
+            "msub" | "msup" | "msubsup" | "mmultiscripts" => return gather_chemical_elements(get_possible_embellished_node(mathml), chem_elements),
+            "semantics" => return gather_chemical_elements( get_presentation_element(mathml), chem_elements ),
+            _ => if is_leaf(mathml) { return false; },
+        }
+    
+        // mrow, msqrt, etc
+        let mut has_prescripts = false;
+        for child in mathml.children() {
+            let child = as_element(child);
+            has_prescripts |= gather_chemical_elements(child, chem_elements);
+        }
+        return has_prescripts;
+    }
 }
 
 /// Looks at the children of the element and uses heuristics to decide whether this is a chemical equation.
@@ -854,13 +908,6 @@ fn likely_chem_equation_operator(mathml: Element) -> isize {
         '·', '℃', '°', '‡', '∆', '×',
     };
 
-    // these can be in the base of an under/over script
-    static CHEM_EQUATION_ARROWS: phf::Set<char> = phf_set! {
-        '→', '➔', '←', '⟶', '⟵', '⤻', '⇋', '⇌',
-        '↿', '↾', '⇃', '⇂', '⥮', '⥯', '⇷', '⇸', '⤉', '⤈',
-        '⥂', '⥄',
-        // '\u{2B96}', '\u{2B74}', '\u{2B75}',         // uncomment when defined in Unicode
-    };
 
     let elem_name = name(&mathml);
     if elem_name == "munder" || elem_name == "mover" || elem_name == "munderover" {

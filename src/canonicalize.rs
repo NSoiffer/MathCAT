@@ -3176,7 +3176,7 @@ fn is_adorned_node<'a>(node: &'a Element<'a>) -> bool {
 }
 
 /// return 'node' or if it is adorned, return its base (recursive)
-fn get_possible_embellished_node(node: Element) -> Element {
+pub fn get_possible_embellished_node(node: Element) -> Element {
 	let mut node = node;
 	while is_adorned_node(&node) {
 		node = as_element(node.children()[0]);
