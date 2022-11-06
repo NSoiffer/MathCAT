@@ -7,6 +7,9 @@ use phf::{phf_map, phf_set};
 use crate::speech::{BRAILLE_RULES, SpeechRulesWithContext};
 use std::ops::Range;
 
+static UEB_PREFIXES: phf::Set<char> = phf_set! {
+    '⠼', '⠈', '⠘', '⠸', '⠐', '⠨', '⠰', '⠠',
+};
 
 
 /// braille the MathML
@@ -109,7 +112,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
 
     }
 
-
+    /// Given a position in a Nemeth string, what is the position character that starts it (e.g, the prev char for capital letter)
     fn i_start_nemeth(braille_prefix: &str, first_ch: char) -> usize {
         static NEMETH_NUMBERS: phf::Set<char> = phf_set! {
             '⠂', '⠆', '⠒', '⠲', '⠢', '⠖', '⠶', '⠦', '⠔', '⠴', '⠨' // 1, 2, ...9, 0, decimal pt
@@ -139,11 +142,8 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
         return n_chars;
     }
 
+    /// Given a position in a UEB string, what is the position character that starts it (e.g, the prev char for capital letter)
     fn i_start_ueb(braille_prefix: &str) -> usize {
-        static UEB_PREFIXES: phf::Set<char> = phf_set! {
-            '⠼', '⠈', '⠘', '⠸', '⠐', '⠨', '⠰', '⠠',
-        };
-
         let prefix = &mut braille_prefix.chars().rev().peekable();
         let mut n_chars = 0;
         while let Some(ch) = prefix.next() {
@@ -403,7 +403,7 @@ static UEB_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "𝐖"=> "⠀",     // whitespace
     "s" => "⠆",     // typeface single char indicator
     "w" => "⠂",     // typeface word indicator
-    "e" => "⠄",     // typeface terminator 
+    "e" => "⠄",     // typeface & capital terminator 
     "o" => "",       // flag that what follows is an open indicator (used for standing alone rule)
     "c" => "",       // flag that what follows is an close indicator (used for standing alone rule)
     "b" => "",       // flag that what follows is an open or close indicator (used for standing alone rule)
@@ -419,10 +419,10 @@ static UEB_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 
 };
 
-static LETTERS: phf::Set<char> = phf_set! {
-    '⠁', '⠃', '⠉', '⠙', '⠑', '⠋', '⠛', '⠓', '⠊', '⠚', '⠅', '⠇', '⠍', 
-    '⠝', '⠕', '⠏', '⠟', '⠗', '⠎', '⠞', '⠥', '⠧', '⠺', '⠭', '⠽', '⠵',
-};
+// static LETTERS: phf::Set<char> = phf_set! {
+//     '⠁', '⠃', '⠉', '⠙', '⠑', '⠋', '⠛', '⠓', '⠊', '⠚', '⠅', '⠇', '⠍', 
+//     '⠝', '⠕', '⠏', '⠟', '⠗', '⠎', '⠞', '⠥', '⠧', '⠺', '⠭', '⠽', '⠵',
+// };
 
 static LETTER_NUMBERS: phf::Set<char> = phf_set! {
     '⠁', '⠃', '⠉', '⠙', '⠑', '⠋', '⠛', '⠓', '⠊', '⠚',
@@ -443,6 +443,7 @@ static SHORT_FORMS: phf::Set<&str> = phf_set! {
      "L⠺L⠙", "L⠆L⠉", "L⠆L⠋", "L⠆L⠓", "L⠆L⠇", "L⠆L⠝", "L⠆L⠎", "L⠆L⠞",
      "L⠆L⠽", "L⠒L⠉L⠧", "L⠒L⠉L⠧L⠛", "L⠐L⠕L⠋"
 };
+
 static LETTER_PREFIXES: phf::Set<char> = phf_set! {
     'B', 'I', '𝔹', 'S', 'T', 'D', 'C', '𝐶'
 };
@@ -554,30 +555,38 @@ fn ueb_cleanup(raw_braille: String) -> String {
     }
 
     fn capitals_to_word_mode(braille: &str) -> String {
-        // debug!("before capitals fix:  '{}'", braille);
+        debug!("before capitals fix:  '{}'", braille);
 
         let mut result = "".to_string();
         let chars = braille.chars().collect::<Vec<char>>();
-        let mut word_mode_start = "".to_string();
-        let mut word_mode_end = "".to_string();
+        let mut is_word_mode = false;
         let mut i = 0;
+        // look for a sequence of CLxCLy... and create CCLxLy...
         while i < chars.len() {
             let ch = chars[i];
             if ch == 'C' {
-                let is_next_char_target = is_next_char(&chars[i+1..], ch);  // next letter sequence "C..."
-                if word_mode_start.contains(ch) {
-                    if !is_next_char_target {
-                        word_mode_start = word_mode_start.replacen(ch.to_string().as_str(), "", 1);  // drop the char since word mode is done
-                        word_mode_end.push(ch);   // add the char to signal to add end sequence
+                let is_next_char_cap_c = is_next_char(&chars[i+1..], 'C');  // next letter sequence "C..."
+                if is_next_char_cap_c {
+                    if is_next_char_start_of_section_12_modifier(&chars[i+1..]) {
+                        // to me this is tricky -- section 12 modifiers apply to the previous item
+                        // the last clause of the "item" def is the previous "individual symbol" which ICEB 2.1 say is:
+                        //   braille sign: one or more consecutive braille characters comprising a unit,
+                        //     consisting of a root on its own or a root preceded by one or more
+                        //     prefixes (also referred to as braille symbol)
+                        // this means the capital indicator needs to be stated and can't be part of a word or passage
+                        is_word_mode = false;
+                        result.push('C');
+                        i += 1;
+                        continue;
                     }
-                } else {
-                    result.push(ch);
-                    if is_next_char_target {
-                        result.push('C');    // word mode indicator for capitals
-                        word_mode_start.push(ch);     // starting word mode for this char
-                    // } else {
-                    //     result.push('s');
-                    }
+                    if !is_word_mode {
+                        // start word mode
+                        result.push('C');
+                        result.push('C');
+                        is_word_mode = true;
+                    } // else if word mode, don't emit the 'C'
+                } else if !is_word_mode {
+                    result.push('C');
                 }
                 if chars[i+1] == 'G' {
                     // Greek letters are a bit exceptional in that the pattern is "CGLx" -- push and bump 'i'
@@ -593,21 +602,16 @@ fn ueb_cleanup(raw_braille: String) -> String {
                 }
                 i += 3 // eat "C", etc
             } else if ch == 'L' {       // must be lowercase -- uppercase consumed above
-                if !word_mode_end.is_empty() {
-                    assert!(LETTERS.contains(&unhighlight(chars[i+1])));
-                    // add terminator if terminated by lowercase letter
-                    for ch in word_mode_end.chars() {
-                        result.push(ch);
-                        result.push('e');
-                    };
-                    word_mode_end = "".to_string();
+                // assert!(LETTERS.contains(&unhighlight(chars[i+1]))); not true for other alphabets
+                if is_word_mode {
+                    result.push('e');       // terminate Word mode (letter after caps)
+                    is_word_mode = false;
                 }
-                result.push(ch);
+                result.push('L');
                 result.push(chars[i+1]);
                 i += 2; // eat L, letter
             } else {
-                word_mode_start = "".to_string();
-                word_mode_end = "".to_string();
+                is_word_mode = false;   // non-letters terminate cap word mode
                 result.push(ch);
                 i += 1;
             }
@@ -615,9 +619,9 @@ fn ueb_cleanup(raw_braille: String) -> String {
         return result;
     }
 
-    fn is_next_char(chars: &[char], target: char) -> bool {
+    fn is_next_char(chars: &[char], target: char) -> bool {        
         // first find the L or N and eat the char so that we are at the potential start of where the target lies
-            // debug!("Looking for '{}' in '{}'", target, chars.iter().collect::<String>());
+        // debug!("Looking for '{}' in '{}'", target, chars.iter().collect::<String>());
         for i_end in 0..chars.len() {
             if chars[i_end] == 'L' || chars[i_end] == 'N' {
                 // skip the next char to get to the real start, and then look for the target
@@ -636,6 +640,43 @@ fn ueb_cleanup(raw_braille: String) -> String {
         return false;
     }
 
+    fn is_next_char_start_of_section_12_modifier(chars: &[char]) -> bool {
+        // first find the L and eat the char so that we are at the potential start of where the target lies
+        let chars_len = chars.len();
+        let mut i_cap = 0;
+        while chars[i_cap] != 'C' {     // we know 'C' is in the string, so no need to check for exceeding chars_len
+            i_cap += 1;
+        }
+        for i_end in i_cap+1..chars_len {
+            if chars[i_end] == 'L' {
+                // skip the next char to get to the real start, and then look for the modifier string or next L/N
+                // debug!("   after L '{}'", chars[i_end+2..].iter().collect::<String>());
+                for i in i_end+2..chars_len {
+                    let ch = chars[i]; 
+                    if ch == '1' {
+                        // Fix: there's probably a much better way to check if we have a match against one of "⠱", "⠘⠱", "⠘⠲", "⠸⠱", "⠐⠱ ", "⠨⠸⠱"
+                        if chars[i+1] == '⠱' {
+                            return true;
+                        } else if i+2 < chars_len {
+                            let mut str = chars[i+1].to_string();
+                            str.push(chars[i+2]);
+                            if str == "⠘⠱" || str == "⠘⠲" || str == "⠸⠱" || str == "⠐⠱" {
+                                return true;
+                            } else if i+3 < chars_len {
+                                str.push(chars[i+3]);
+                                return str == "⠨⠸⠱";
+                            }
+                            return false;
+                        }
+                    }
+                    if ch == 'L' || ch == 'N' || !LETTER_PREFIXES.contains(&ch) {
+                        return false;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     fn pick_start_mode(raw_braille: &str) -> String {
         // Need to decide what the start mode should be
