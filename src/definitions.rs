@@ -12,17 +12,8 @@
 //! All of this means that a lock needs to be obtained _and_ the contents borrowed to access a definition.
 //!
 //! To minimize the global variable footprint, all of the definitions are put inside of a single global variable [`DEFINITIONS`].
-//! ## Usage
-//! There is one field in the `DEFINITIONS` structure corresponding to each of the definitions.
-//! A typical example of usage is
-//! ```
-//!# libmathcat::speech::SPEECH_RULES.with(|_| true);  // forces initialization
-//! libmathcat::definitions::DEFINITIONS.with(|definitions| {
-//!    let numbers_large = definitions.numbers_large.as_vec().borrow();
-//!    assert_eq!(numbers_large[3], "billion");
-//! })
-//! ```
-//! Note: some of the variable are `vec`s and some are `hashset`s.
+//!
+//! //! Note: some of the variable are `vec`s and some are `hashset`s.
 //! Numbers are typically vectors so that indexing a digit is easy.
 //! Others such a `functions_names` are a hashset because you just want to know if an `mi` is a known name or not.
 //! The functions `as_vec` and `as_hashset` should be used on the appropriate variable.
