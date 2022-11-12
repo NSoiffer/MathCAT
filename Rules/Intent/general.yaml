@@ -38,6 +38,15 @@
   - intent:
       name: imaginary-part
       children: []
+  
+-
+  name: roman_numeral
+  tag: [mi, mtext]
+  match: "@data-number"
+  replace: 
+  - intent:
+      name: mn
+      children: [x: "@data-number"]
 
 -
   name: negative
@@ -46,8 +55,7 @@
   replace:
   - intent:
       name: "negative"
-      children:
-      - x: "*[2]"
+      children: [x: "*[2]"]
                
 -
   name: positive
@@ -56,8 +64,7 @@
   replace:
   - intent:
       name: "positive"
-      children:
-      - x: "*[2]"
+      children: [x: "*[2]"]
                
 
 -
