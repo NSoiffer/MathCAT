@@ -104,64 +104,117 @@
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
 -
+   name: per-fraction
+   tag: fraction
+   match: "$ClearSpeak_Fractions='Per'"
+   replace: 
+   - x: "*[1]"
+   - t: "per"
+   - x: "*[2]"
+
+-
    name: common-fraction
    tag: fraction
    match:
-      - "*[1][self::m:mn][not(contains(., '.')) and text()<20]   and" 
-      - "*[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]"
+   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
+   - "*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and" 
+   - "*[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
    replace: [x: ToCommonFraction(.)]
+
 -
    name: common-fraction-mixed-number
    tag: fraction
    match:
-      - "preceding-sibling::*[1][self::m:mo][text()='\u2064'] and" # preceding element is invisible plus
-      - "*[1][self::m:mn][not(contains(., '.'))]   and" 
-      - "*[2][self::m:mn][not(contains(., '.'))]"
+   - "preceding-sibling::*[1][self::m:mo][text()='\u2064'] and" # preceding element is invisible plus
+   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
+   - "*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and" 
+   - "*[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
    replace: [x: ToCommonFraction(.)]
+
 -
    name: fraction-over-simple
    tag: fraction
-   match: "(IsNode(*[1],'simple') and IsNode(*[2],'simple'))"  # simple fraction in ClearSpeak spec
+   match: 
+   - "(DEBUG($ClearSpeak_Fractions)='Over' or $ClearSpeak_Fractions='FracOver' or $ClearSpeak_Fractions='OverEndFrac') or"
+   - "( not($ClearSpeak_Fractions='General' or $ClearSpeak_Fractions='GeneralEndFrac') and"
+   - "  (IsNode(*[1],'simple') and IsNode(*[2],'simple')) )"  # simple fraction in ClearSpeak spec
    replace: 
-    - x: "*[1]"
-    - t: over
-    - x: "*[2]"
+   - test:
+      if: "$ClearSpeak_Fractions='FracOver'"
+      then:
+      - test:
+         if: "$Verbosity!='Terse'"
+         then: [ot: "the"]
+      - t: "fraction"
+   - x: "*[1]"
+   - t: "over"
+   - x: "*[2]"
+   - test:
+               # very ugly!!! -- replicate nested ordinal fraction as they are an exception
+      if: "$ClearSpeak_Fractions='OverEndFrac' or
+           ($ClearSpeak_Fractions='EndFrac' and
+            not(
+               ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and
+               *[1][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and 
+                    *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and
+               *[2][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and 
+                    *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] 
+            ) )"
+      then:
+      - pause: short
+      - t: "end fraction"
+      - pause: short
+
 -
    # fraction with text or numbers followed by text in both numerator and denominator
    name: fraction-over-text
    tag: fraction
    match:
-      - "( "
-      - "  ((*[1][self::m:mi or self::m:mtext][string-length(.)>1]) or " # fractions with text
-      - "   (*[1][self::m:mrow][count(*)=3][ "
-      - "        *[1][self::m:mn] and "
-      - "        *[2][self::m:mo][text()='\u2062'] and "            # invisible times
-      - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) ) and"
-      - "  ((*[2][self::m:mi or self::m:mtext][string-length(.)>1]) or " # fractions with text
-      - "   (*[2][self::m:mrow][count(*)=3][ "
-      - "        *[1][self::m:mn] and "
-      - "        *[2][self::m:mo][text()='\u2062'] and "            # invisible times
-      - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) )"
-      - ")"
+   - "not($ClearSpeak_Fractions='General' or $ClearSpeak_Fractions='GeneralEndFrac') and"
+   - "( "
+   - "  ((*[1][self::m:mi or self::m:mtext][string-length(.)>1]) or " # fractions with text
+   - "   (*[1][self::m:mrow][count(*)=3][ "
+   - "        *[1][self::m:mn] and "
+   - "        *[2][self::m:mo][text()='\u2062'] and "            # invisible times
+   - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) ) and"
+   - "  ((*[2][self::m:mi or self::m:mtext][string-length(.)>1]) or " # fractions with text
+   - "   (*[2][self::m:mrow][count(*)=3][ "
+   - "        *[1][self::m:mn] and "
+   - "        *[2][self::m:mo][text()='\u2062'] and "            # invisible times
+   - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) )"
+   - ")"
    replace: 
-    - x: "*[1]"
-    - t: over
-    - x: "*[2]"
+   - x: "*[1]"
+   - t: "over"
+   - x: "*[2]"
+   - test:
+      if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='OverEndFrac'"
+      then:
+      - pause: short
+      - t: "end fraction"
+      - pause: short
+
 -
    name: default
    tag: fraction
    match: "."
    replace: 
-    - ot: the
-    - t: fraction with numerator
-    - test:
-       if: not(IsNode(*[1], 'simple'))
-       then: {pause: medium}
-    - x: "*[1]"
-    - pause: medium
-    - t: and denominator
-    - x: "*[2]"
-    - pause: long
+   - ot: the
+   - t: fraction with numerator
+   - test:
+      if: not(IsNode(*[1], 'simple'))
+      then: {pause: medium}
+   - x: "*[1]"
+   - pause: medium
+   - t: and denominator
+   - x: "*[2]"
+   - pause: long
+   - test:
+      if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='GeneralEndFrac'"
+      then:
+      - pause: short
+      - t: "end fraction"
+      - pause: short
 
 
 # rules for functions raised to a power
@@ -207,27 +260,52 @@
          if: "*[2][self::m:mn][not(contains(., '.'))]"
          then: [x: "ToOrdinal(*[2])"]
          else: [x: "*[2]"]
-    - t: power of
+    - t: "power of"
     - pause: short
     - x: "*[1]"
+
+
+-
+   name: AfterPower-nested
+   tag: power
+   match:  # directly a superscript or an mrow that contains a superscript
+   - "$ClearSpeak_Exponents = 'AfterPower' and"
+   - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
+   replace: 
+   - x: "*[1]"
+   - t: "raised to the exponent"
+   - pause: short
+   - x: "*[2]"
+   - pause: short
+   - t: "end exponent"
+
+-
+   name: AfterPower-default
+   tag: power
+   match: "$ClearSpeak_Exponents = 'AfterPower'"
+   replace: 
+   - x: "*[1]"
+   - t: "raised to the power"
+   - x: "*[2]"
+   - pause: short
 
 -
    name: squared
    tag: power
-   match: "*[2][self::m:mn][text()='2']"
+   match: "*[2][self::m:mn][text()='2'] and $ClearSpeak_Exponents = 'Auto'"
    replace: 
    - x: "*[1]"
    - bookmark: "*[2]/@id"
-   - t: squared
+   - t: "squared"
 
 -
    name: cubed
    tag: power
-   match: "*[2][self::m:mn][text()='3']"
+   match: "*[2][self::m:mn][text()='3'] and $ClearSpeak_Exponents = 'Auto'"
    replace: 
    - x: "*[1]"
    - bookmark: "*[2]/@id"
-   - t: cubed
+   - t: "cubed"
 
 -
    name: simple-integer
@@ -235,12 +313,14 @@
    match: "*[2][self::m:mn][not(contains(., '.'))]"
    replace: 
    - x: "*[1]"
-   - t: to the
-   - test: 
+   - t: "to the"
+   - test:
       if: "*[2][.>0]"
       then: {x: "ToOrdinal(*[2])"}
       else: {x: "*[2]"}
-   - t: power
+   - test:
+      if: "$ClearSpeak_Exponents != 'Ordinal'"
+      then: [t: "power"]
 -
    name: simple-negative-integer
    tag: power
@@ -250,33 +330,42 @@
    - "    ]"
    replace: 
    - x: "*[1]"
-   - t: to the
+   - t: "to the"
    - x: "*[2]"
-   - t: power
+   - test:
+      if: "$ClearSpeak_Exponents != 'Ordinal'"
+      then: [t: "power"]
+
 -
    name: simple-var
    tag: power
    match: "*[2][self::m:mi][string-length(.)=1]"
    replace: 
    - x: "*[1]"
-   - t: to the
+   - t: "to the"
    - x: "*[2]"
    - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
-   - t: "power"
+   - test:
+      if: "$ClearSpeak_Exponents != 'Ordinal'"
+      then: [t: "power"]
 
-
+# match nested exponent, where the nested exponent is has the power 2 or 3 (n below)
+#   [xxx]^n, - [xxx]^n, [xxx] var^n, -[xxx] var^n
+# where xxx is a number or common fraction (or a var in the first two forms)
+# short of creating a specialized built-in function, I don't see a way to eliminate a lot of repetition in the matches
+# also really bad is that the test of a common fraction is replicated here (four times!)
+# Note: the ClearSpeak doc doesn't say these only apply when the pref is "Auto",
+#   but the test cases all fall back to "raised to the exponent" when not "Auto"
+#   If these are allowed for non-Auto values, then you end up with "...power power...".
 -
-   # match nested exponent, where the nested exponent is has the power 2 or 3 (n below)
-   #   [xxx]^n, - [xxx]^n, [xxx] var^n, -[xxx] var^n
-   # where xxx is a number, variable, or common fraction
-   # short of creating a specialized built-in function, I don't see a way to eliminate a lot of repetition in the matches
-   # also really bad is that the test of a common fraction is replicated here (four times!)
+   # [xxx]^n
    name: nested-squared-or-cubed
    tag: power
    match:
+   - "$ClearSpeak_Exponents = 'Auto' and"
    - "*[2][self::m:power]["
    - "     *[2][self::m:mn][text()='2' or text()='3'] and "  # exp is 2 or 3
-   - ""    # base is mn, mi, common fraction ([xxx] case)
+           # base is mn, mi, common fraction ([xxx] case)
    - "     *[1][self::m:mn or self::m:mi or "
    - "          self::m:fraction[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and" 
    - "                        *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
@@ -284,16 +373,20 @@
    - "    ]"
    replace: 
    - x: "*[1]"
-   - t: raised to the
+   - t: "raised to the"
    - x: "*[2]"
-   - t: power
+   - t: "power"
+
 -
-   name: nested-negative-squared-or-cubed  # - [xxx]^n
+   # - [xxx]^n
+   name: nested-negative-squared-or-cubed
    tag: power
    match:
+   - "$ClearSpeak_Exponents = 'Auto' and"
    - " *[2][self::m:negative and "
    - "      *[1]/*[1][self::m:power]["
    - "                *[2][self::m:mn][text()='2' or text()='3'] and "  # exp is 2 or 3"
+                      # base is mn, mi, common fraction ([xxx] case)
    - "                *[1][self::m:mn or self::m:mi or "
    - "                     self::m:fraction[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and" 
    - "                                   *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
@@ -302,33 +395,40 @@
    - "     ]"
    replace: 
    - x: "*[1]"
-   - t: raised to the
+   - t: "raised to the"
    - x: "*[2]"
-   - t: power
+   - t: "power"
+
 -
-   name: nested-var-squared-or-cubed  # [xxx] var^n
+   # [xxx] var^n
+   name: nested-var-squared-or-cubed
    tag: power
    match:
+   - "$ClearSpeak_Exponents = 'Auto' and"
    - "  *[2][self::m:mrow][count(*)=3][ "
    - "       *[3][self::m:power]["
    - "            *[2][self::m:mn][text()='2' or text()='3'] and "  # exp is 2 or 3
    - "            *[1][self::m:mi]"
    - "           ] and "
    - "       *[2][self::m:mo][text()='\u2062'] and "     # invisible times
-   - "       *[1][self::m:mn or self::m:mi or "
+             # base is mn, or common fraction ([xxx] case)
+   - "       *[1][self::m:mn or "
    - "            self::m:fraction[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and" 
    - "                          *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
    - "           ]"
    - "      ]"
    replace: 
    - x: "*[1]"
-   - t: raised to the
+   - t: "raised to the"
    - x: "*[2]"
-   - t: power
+   - t: "power"
+
 -
-   name: nested-negative-var-squared-or-cubed  # -[xxx] var^n
+   # -[xxx] var^n
+   name: nested-negative-var-squared-or-cubed
    tag: power
    match:
+   - "$ClearSpeak_Exponents = 'Auto' and"
    - "  *[2][self::m:mrow][count(*)=3][ "
    - "       *[3][self::m:power]["
    - "            *[2][self::m:mn][text()='2' or text()='3'] and "  # exp is 2 or 3
@@ -336,7 +436,8 @@
    - "           ] and "
    - "       *[2][self::m:mo][text()='\u2062'] and "     # invisible times
    - "       *[1][self::m:negative and "
-   - "            *[1][self::m:mn or self::m:mi or "
+                  # base is mn, or common fraction ([xxx] case)
+   - "            *[1][self::m:mn or "
    - "                 self::m:fraction[*[1][self::m:mn][not(contains(., '.')) and text()<20]   and" 
    - "                                  *[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]]"
    - "                ]"
@@ -344,9 +445,10 @@
    - "      ]"
    replace: 
    - x: "*[1]"
-   - t: raised to the
+   - t: "raised to the"
    - x: "*[2]"
-   - t: power
+   - t: "power"
+
 -
    name: default-exponent-power
    tag: power
@@ -354,34 +456,46 @@
    - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
    replace: 
    - x: "*[1]"
-   - t: raised to the exponent
+   - t: "raised to the exponent"
    - pause: short
    - x: "*[2]"
    - pause: short
    - t: end exponent
+
 -
    name: default
    tag: power
    match: "."
    replace: 
    - x: "*[1]"
-   - t: raised to the
+   - t: "raised to the"
    - x: "*[2]"
-   - t: power
+   - t: "power"
 
 #
 # Some rules on mrows
 #
 -
+   # the inference rules lump absolute value and cardinality together, so those rules are implemented here
    name: ClearSpeak-absolute-value
    tag: absolute-value
    match: "."
+   variables: [WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'cardinality', 'absolute value')"]
    replace: 
    - test: 
       if: "$Verbosity!='Terse'"
       then: {t: the}
-   - t: absolute value of 
+   - x: "$WordToSay"
+   - t: "of" 
    - x: "*[1]"
+   - test:
+      if: "$ClearSpeak_AbsoluteValue = 'AbsEnd'"
+      then:
+      - pause: short
+      - t: "end"
+      - x: "$WordToSay"
+   - pause: short
+
 
 -
    name: set
@@ -396,18 +510,18 @@
             - test: 
                if: "$Verbosity!='Terse'"
                then: {t: the}
-            - t: empty set
+            - t: "empty set"
        - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
          then:
             - test: 
                if: "$Verbosity!='Terse'"
                then: {t: the}
-            - t: set of
+            - t: "set of"
             - test:
                if: $ClearSpeak_Sets != 'woAll'
                then: [t: all]
             - x: "*[1]/*[1]"
-            - t: such that
+            - t: "such that"
             - x: "*[1]/*[3]"
          else:
             - test: 
@@ -415,8 +529,8 @@
                then:
                   - test: 
                      if: "$Verbosity!='Terse'"
-                     then: {t: the}
-                  - t: set
+                     then: {t: "the"}
+                  - t: "set"
             - x: "*[1]"
 
 
