@@ -42,7 +42,7 @@ use crate::pretty_print::mml_to_string;
 use crate::xpath_functions::is_leaf;
 use regex::Regex;
 use crate::xpath_functions::IsBracketed;
-use phf::phf_set;
+use phf::{phf_map, phf_set};
 use std::convert::TryInto;
 use std::collections::HashSet;
 
@@ -602,29 +602,46 @@ fn likely_chem_subscript(supscript: Element) -> isize {
     return NOT_CHEMISTRY;     
 }
 
+fn small_roman_to_number(text: &str) -> &str {
+    // simplest to do a look up
+    static ROMAN_TO_NUMBER: phf::Map<&str, &str> = phf_map! {
+        "I" => "1", "II" => "2", "III" => "3", "IV" => "4", "V" => "5", "VI" => "6", "VII" => "7", "VIII" => "8", "IX" => "9",
+    };
+    return ROMAN_TO_NUMBER.get(text).unwrap_or(&"");
+
+}
+
 fn likely_valid_chem_superscript(sup: Element) -> isize {
     // either one or more '+'s (or '-'s) or a number followed by +/-
     // also could be state (en.wikipedia.org/wiki/Nuclear_chemistry#PUREX_chemistry)
+    // bullet is radical (en.wikipedia.org/wiki/Radical_(chemistry)#Depiction_in_chemical_reactions); mhchem uses dot operator
+    //  these can stand alone, be followed by +/- or have a number in front "(2•)-"" [examples from mhchem documentation]
+    // roman numerals are "oxidation state" and range from -4 to +9
     lazy_static! {
-        static ref PLUS_OR_MINUS: Regex = Regex::new(r"^\++$|^-+$|^\U{2212}+$").unwrap(); 
+        static ref MULTIPLE_PLUS_OR_MINUS_OR_DOT: Regex = Regex::new(r"^\++$|^-+$|^\U{2212}+$|^[⋅•]$").unwrap(); 
+        static ref SINGLE_PLUS_OR_MINUS_OR_DOT: Regex = Regex::new(r"^[+-\U{2212}⋅•]$").unwrap(); 
     }
 
     let sup_name = name(&sup);
-    if sup_name == "mo" && PLUS_OR_MINUS.is_match(as_text(sup)) {
+    if sup_name == "mo" && MULTIPLE_PLUS_OR_MINUS_OR_DOT.is_match(as_text(sup)) {
         return if as_text(sup).len()==1 {1} else {2};
+    } else if (sup_name == "mi" || sup_name=="mtext") && SMALL_UPPER_ROMAN_NUMERAL.is_match(as_text(sup)){
+        sup.set_attribute_value("data-number", small_roman_to_number(as_text(sup)));
+        return 2;
     } else if sup_name == "mrow" {
+        // look for something like '2+'
         let children = sup.children();
         if children.len() == 2 {
             let first = as_element(children[0]);
             let second = as_element(children[1]);
             if name(&first) == "mn" && name(&second) == "mo" && !as_text(first).contains('.') {
                 let second_text = as_text(second);
-                if second_text == "+" || second_text == "-" || second_text == "\u{2212}" { // '-' not yet canonicalized
+                if SINGLE_PLUS_OR_MINUS_OR_DOT.is_match(second_text) {
                     return 2;   // ending with a +/- makes it likely this is an ion
                 }
             }
         }
-        // gather up the text and see if it is all +/- 
+        // gather up the text and see if it is all +, -, etc
         let mut text = "".to_string();
         for child in children {
             let child = as_element(child);
@@ -634,7 +651,7 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
                 return NOT_CHEMISTRY;
             }
         }
-        if PLUS_OR_MINUS.is_match(&text) {
+        if MULTIPLE_PLUS_OR_MINUS_OR_DOT.is_match(&text) {
             return if text.len()==1 {1} else {2};
         }
     }
@@ -965,13 +982,21 @@ fn is_equilibrium_constant(mut mathml: Element) -> bool {
     return name(&mathml) == "mi" && as_text(mathml) == "K";
 }
 
+lazy_static! {
+    // Oxidation states range from -4 to 9 and are written with (a subset of) roman numerals.
+    // All instances seem to be upper case that I've seen.
+    static ref SMALL_UPPER_ROMAN_NUMERAL: Regex = Regex::new(r"^\s*^(IX|IV|V?I{0,3})\s*$").unwrap();
+}
+
 /// look for "(s), "(l)", "(g)", "(aq)" (could also use [...])
 /// this might be called before canonicalization, but in clean_chemistry_mrow, we made sure "( xxx )" is grouped properly
 pub fn likely_chem_state(mathml: Element) -> isize {
+    
     if IsBracketed::is_bracketed(&mathml, "(", ")", false, false) ||
        IsBracketed::is_bracketed(&mathml, "[", "]", false, false) {
         let contents = as_element(mathml.children()[1]);
-        if name(&contents) == "mi" {
+        let contents_name = name(&contents);
+        if contents_name == "mi" || contents_name == "mtext" {
             let text = as_text(contents);
             if text == "s" || text == "l" ||text == "g" ||text == "aq" {
                 return text.as_bytes().len() as isize;       // hack to count chars -- works because all are ASCII
