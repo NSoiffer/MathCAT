@@ -24,7 +24,8 @@ fn common_fraction_tenths() {
     let expr = "<math>
                     <mfrac> <mn>17</mn> <mn>10</mn> </mfrac>
                 </math>";
-    test("ClearSpeak", expr, "17 tenths");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "17 tenths");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "17 tenths");
 }
 
 #[test]
@@ -33,7 +34,8 @@ fn not_ClearSpeak_common_fraction_tenths() {
     let expr = "<math>
                     <mfrac> <mn>89</mn> <mn>10</mn> </mfrac>
                 </math>";
-    test("ClearSpeak", expr, "89 over 10");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "89 over 10");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "89 tenths");
 }
 
 #[test]
@@ -48,9 +50,17 @@ fn non_simple_fraction() {
         <mi>x</mi><mo>-</mo><mi>y</mi></mrow>
         </mfrac>
         </mrow>
-    </math>
-                            ";
-    test("ClearSpeak", expr, "the fraction with numerator; x plus y; and denominator x minus y;");
+    </math>";
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "the fraction with numerator; x plus y; and denominator x minus y;");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "the fraction with numerator; x plus y; and denominator x minus y;");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Over")], expr, "x plus y over x minus y");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "FracOver")], expr, "the fraction x plus y over x minus y");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "General")], expr, "the fraction with numerator; x plus y; and denominator x minus y;");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "EndFrac")], expr, "the fraction with numerator; x plus y; and denominator x minus y; end fraction,");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "GeneralEndFrac")], expr, "the fraction with numerator; x plus y; and denominator x minus y; end fraction,");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "OverEndFrac")], expr, "x plus y over x minus y, end fraction,");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Per")], expr, "x plus y per x minus y");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Verbose"),("ClearSpeak_Fractions", "Auto")], expr, "the fraction with numerator; x plus y; and denominator x minus y; end fraction,");
 }
 
 
@@ -79,7 +89,7 @@ fn mixed_number_big() {
                     <mn>3</mn>
                     <mfrac> <mn>7</mn> <mn>83</mn> </mfrac>
                 </math>";
-    test("ClearSpeak", expr, "3 and 7 eighty thirds");
+    test("ClearSpeak", expr, "3 and 7 over 83");
 }
 
 #[test]
@@ -124,7 +134,18 @@ fn nested_simple_fractions() {
                 </mfrac>
                 </mrow>
             </math>";
-    test("ClearSpeak", expr, "1 half over 2 thirds");
+    test_prefs("ClearSpeak", vec![("ClearSpeak_Fractions", "Auto")], expr, "1 half over 2 thirds");
+    test_prefs("ClearSpeak", vec![("ClearSpeak_Fractions", "Ordinal")], expr, "1 half over 2 thirds");
+    test_prefs("ClearSpeak", vec![("ClearSpeak_Fractions", "Over")], expr, "1 over 2 over 2 over 3");
+    test_prefs("ClearSpeak", vec![("ClearSpeak_Fractions", "FracOver")], expr,
+            "the fraction the fraction 1 over 2 over the fraction 2 over 3");
+    test_prefs("ClearSpeak", vec![("ClearSpeak_Fractions", "General")], expr,
+            "the fraction with numerator the fraction with numerator 1; and denominator 2; and denominator the fraction with numerator 2; and denominator 3;");
+    test_prefs("ClearSpeak", vec![("ClearSpeak_Fractions", "EndFrac")], expr, "1 half over 2 thirds");
+    test_prefs("ClearSpeak", vec![("ClearSpeak_Fractions", "GeneralEndFrac")], expr,
+            "the fraction with numerator the fraction with numerator 1; and denominator 2; end fraction; and denominator the fraction with numerator 2; and denominator 3; end fraction; end fraction,");
+    test_prefs("ClearSpeak", vec![("ClearSpeak_Fractions", "OverEndFrac")], expr,
+            "1 over 2, end fraction, over 2 over 3, end fraction; end fraction,");
 }
 
 
@@ -195,6 +216,35 @@ fn complex_nested_fraction() {
     </math>
                     ";
     test("ClearSpeak", expr, "the fraction with numerator; the fraction with numerator; n plus 10; and denominator n; and denominator 2 over n;");
+}
+
+#[test]
+fn simple_function() {
+    let expr = "<math><mfrac><mrow><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow><mn>2</mn></mfrac></math>";
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "f of x over 2");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr, "f of x over 2, end fraction,");
+}
+
+#[test]
+fn function_over_function() {
+    let expr = "<math><mfrac>
+            <mrow><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
+            <mrow><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
+        </mfrac></math>";
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "f of x over g of x");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr, "f of x over g of x, end fraction,");
+}
+
+#[test]
+fn non_simple_function_over_function() {
+    let expr = "<math><mfrac>
+            <mrow><mi>f</mi><mo>(</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow>
+            <mrow><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
+        </mfrac></math>";
+    test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr,
+             "the fraction with numerator; f of, open paren x plus 1 close paren; and denominator g of x;");
+    test_prefs("ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr,
+             "the fraction with numerator; f of, open paren x plus 1 close paren; and denominator g of x; end fraction,");
 }
 
 #[test]
