@@ -748,6 +748,7 @@
                   if: "$Verbosity='Medium'" 
                   then: [t: "super"]
             - x: "$Prescripts[2]"
+            - pause: "short"
       - test:
          if: "not($Prescripts[1][self::m:none])"   
          then:
@@ -758,6 +759,7 @@
                   if: "$Verbosity='Medium'" 
                   then: [t: "sub"]
             - x: "$Prescripts[1]"
+            - pause: "short"
       - test:
          if: "count($Prescripts) > 2"        # can this happen for chemistry??? we allow for one *extra* pre sub/super pair
          then:
@@ -771,6 +773,7 @@
                      if: "$Verbosity='Medium'" 
                      then: [t: "super"]
                - x: "$Prescripts[4]"
+               - pause: "short"
          - test:
             if: "not($Prescripts[3][self::m:none])"   
             then:
@@ -781,6 +784,7 @@
                      if: "$Verbosity='Medium'" 
                      then: [t: "sub"]
                - x: "$Prescripts[3]"
+               - pause: "short"
    - x: "*[1]"    # base
    - test: 
       if: "$Postscripts"
@@ -795,6 +799,7 @@
                   if: "$Verbosity='Medium'" 
                   then: [t: "sub"]
             - x: "$Postscripts[1]"
+            - pause: "short"
       - test:
          if: "not($Postscripts[2][self::m:none])"   
          then:
@@ -805,6 +810,7 @@
                   if: "$Verbosity='Medium'" 
                   then: [t: "super"]
             - x: "$Postscripts[2]"
+            - pause: "short"
       - test:
          if: "count($Postscripts) > 2" 
          then:
@@ -818,6 +824,7 @@
                      if: "$Verbosity='Medium'" 
                      then: [t: "sub"]
                - x: "$Postscripts[3]"
+               - pause: "short"
          - test:
             if: "not($Postscripts[4][self::m:none])"   
             then:
@@ -828,6 +835,7 @@
                      if: "$Verbosity='Medium'" 
                      then: [t: "super"]
                - x: "$Postscripts[4]"
+               - pause: "short"
          - test:
             if: "count($Postscripts) > 4" 
             then:
@@ -841,6 +849,7 @@
                         if: "$Verbosity='Medium'" 
                         then: [t: "sub"]
                   - x: "$Postscripts[5]"
+                  - pause: "short"
             - test:
                if: "not($Postscripts[6][self::m:none])"   
                then:
@@ -851,6 +860,7 @@
                         if: "$Verbosity='Medium'" 
                         then: [t: "super"]
                   - x: "$Postscripts[6]"
+                  - pause: "short"
             - test:
                if: "count($Postscripts) > 6" 
                then:
@@ -864,6 +874,7 @@
                            if: "$Verbosity='Medium'" 
                            then: [t: "sub"]
                      - x: "$Postscripts[7]"
+                     - pause: "short"
                - test:
                   if: "not($Postscripts[8][self::m:none])"   
                   then:
@@ -874,6 +885,7 @@
                            if: "$Verbosity='Medium'" 
                            then: [t: "super"]
                      - x: "$Postscripts[8]"
+                     - pause: "short"
       - test:
          if: "$Postscripts[last()][not(self::m:none)] and following-sibling::*[1][text()='+' or text()='-']"
          then: [pause: medium]
