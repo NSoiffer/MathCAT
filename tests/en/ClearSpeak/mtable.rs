@@ -512,7 +512,10 @@ fn simple_absolute_value() {
   let expr = "<math>
     <mrow><mrow><mo>|</mo> <mi>x</mi> <mo>|</mo></mrow></mrow>
   </math>";
-  test("ClearSpeak", expr, "the absolute value of x");
+  test("ClearSpeak", expr, "the absolute value of x,");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Terse"), ("ClearSpeak_AbsoluteValue", "Auto")], expr, "absolute value of x,");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_AbsoluteValue", "Auto")],
+             expr, "the absolute value of x, end absolute value,");
 }
   
 #[test]
@@ -522,10 +525,20 @@ let expr = "<math>
       <mrow><mi>x</mi><mo>+</mo><mn>1</mn> </mrow>
     <mo>|</mo></mrow></mrow>
   </math>";
-  test("ClearSpeak", expr, "the absolute value of x plus 1");
+  test("ClearSpeak", expr, "the absolute value of x plus 1,");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Terse"), ("ClearSpeak_AbsoluteValue", "AbsEnd")],
+             expr, "absolute value of x plus 1, end absolute value,");
 }
 
-
+#[test]
+fn simple_cardinality_value() {
+  let expr = "<math>
+    <mrow><mrow><mo>|</mo> <mi>S</mi> <mo>|</mo></mrow></mrow>
+  </math>";
+  test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_AbsoluteValue", "Cardinality")], expr,
+             "the cardinality of S,");
+}
+  
 // Test preferences
 #[test]
 fn simple_matrix_speak_col_num() {
