@@ -503,7 +503,6 @@ fn test_64() {
 #[test]
 fn test_65() {
     // 9_d_1
-    init_logger();
     let expr = "<math><mn>3</mn><mi mathvariant=\"normal\">§<!-- § --></mi><mn>4</mn></math>";
     // corrected
     test_braille("Nemeth", expr, "⠼⠒⠈⠠⠎⠼⠲");
