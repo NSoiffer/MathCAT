@@ -246,7 +246,7 @@ fn vertical_line_set_and_abs() {
             <mo>}</mo>
         </math>";
     test_ClearSpeak("ClearSpeak_VerticalLine", "Auto", expr,
-        "the set of all x such that the absolute value of x, is greater than 2");
+        "the set of all x such that the absolute value of x; is greater than 2");
 }
 
 #[test]
