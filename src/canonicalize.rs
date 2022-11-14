@@ -3021,7 +3021,7 @@ impl CanonicalizeContext {
 		
 						let implied_mo = create_mo(current_child.document(), current_op.ch);
 						if likely_function_name == FunctionNameCertainty::Maybe {
-							implied_mo.set_attribute_value("data-guess", "true");
+							implied_mo.set_attribute_value("data-function-guess", "true");
 						}
 						let shift_result = self.shift_stack(&mut parse_stack, implied_mo, current_op.clone());
 						// ignore shift_result.0 which is just 'implied_mo'
@@ -3050,7 +3050,7 @@ impl CanonicalizeContext {
 	
 						let implied_mo = create_mo(current_child.document(), implied_operator.ch);
 						if likely_function_name == FunctionNameCertainty::Maybe {
-							implied_mo.set_attribute_value("data-guess", "true");
+							implied_mo.set_attribute_value("data-function-guess", "true");
 						}
 						let shift_result = self.shift_stack(&mut parse_stack, implied_mo, implied_operator.clone());
 						// ignore shift_result.0 which is just 'implied_mo'
@@ -3561,7 +3561,7 @@ mod canonicalize_tests {
 		let target_str = "<math>
 				<mrow>
 				<mi>P</mi>
-				<mo data-guess='true' data-changed='added'>&#x2062;</mo>
+				<mo data-function-guess='true' data-changed='added'>&#x2062;</mo>
 				<mrow data-changed='added'>
 					<mo>(</mo>
 					<mrow data-changed='added'>
@@ -3619,7 +3619,7 @@ mod canonicalize_tests {
 		<mo>+</mo>
 		<mrow data-changed='added'>
 		  <mi>t</mi>
-		  <mo data-changed='added' data-guess='true'>&#x2062;</mo>
+		  <mo data-changed='added' data-function-guess='true'>&#x2062;</mo>
 		  <mrow data-changed='added'>
 			<mo>(</mo>
 			<mrow data-changed='added'>
@@ -4027,7 +4027,7 @@ mod canonicalize_tests {
         let target_str = " <math>
 		<mrow data-changed='added'>
 		  <mi>t&#x00A0;</mi>
-		  <mo data-changed='added' data-guess='true'>&#x2062;</mo>
+		  <mo data-changed='added' data-function-guess='true'>&#x2062;</mo>
 		  <mrow>
 			<mo>(</mo>
 			<mrow data-changed='added'>
@@ -4071,7 +4071,7 @@ mod canonicalize_tests {
         let target_str = "<math>
 		<mrow data-changed='added'>
 		  <mi>t</mi>
-		  <mo data-changed='added' data-guess='true'>&#x2062;</mo>
+		  <mo data-changed='added' data-function-guess='true'>&#x2062;</mo>
 		  <mrow>
 			<mo>(</mo>
 			<mrow data-changed='added'>

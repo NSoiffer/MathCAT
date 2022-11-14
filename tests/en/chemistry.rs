@@ -571,7 +571,7 @@ fn mhchem_barbed_equilibrium() {
           <mn data-mjx-texclass='ORD'>2</mn>
           <none></none>
         </mmultiscripts>
-        <mo data-changed='added' data-guess='true'>&#x2063;</mo>
+        <mo data-changed='added' data-function-guess='true'>&#x2063;</mo>
         <mrow data-changed='added' data-chem-equation='1'>
           <mo stretchy='false'>(</mo>
           <mi data-mjx-texclass='ORD' mathvariant='normal'>g</mi>
@@ -586,7 +586,7 @@ fn mhchem_barbed_equilibrium() {
             <mn data-mjx-texclass='ORD'>2</mn>
             <none></none>
           </mmultiscripts>
-          <mo data-changed='added' data-guess='true'>&#x2063;</mo>
+          <mo data-changed='added' data-function-guess='true'>&#x2063;</mo>
           <mrow data-changed='added' data-chem-equation='1'>
             <mo stretchy='false'>(</mo>
             <mi data-mjx-texclass='ORD' mathvariant='normal'>g</mi>
@@ -611,7 +611,7 @@ fn mhchem_barbed_equilibrium() {
           <mi mathvariant='normal' data-chem-element='1'>H</mi>
           <mo data-changed='added'>&#x2063;</mo>
           <mi mathvariant='normal' data-chem-element='1'>I</mi>
-          <mo data-changed='added' data-guess='true'>&#x2063;</mo>
+          <mo data-changed='added' data-function-guess='true'>&#x2063;</mo>
           <mrow data-changed='added' data-chem-equation='1'>
             <mo stretchy='false'>(</mo>
             <mi data-mjx-texclass='ORD' mathvariant='normal'>g</mi>
