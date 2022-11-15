@@ -52,7 +52,7 @@ phf_map! {
 			next: &Some( OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 900, next: &None } )},
 	"`" => OperatorInfo{ op_type: OperatorTypes::POSTFIX, priority: 880, next: &None },
 	"{" => OperatorInfo{ op_type: OperatorTypes::LEFT_FENCE, priority: 20, next: &None },
-	"|" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 260, 
+	"|" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 70,
 			next: &Some( OperatorInfo{ op_type: OperatorTypes::LEFT_FENCE, priority: 20, 
 			next: &Some( OperatorInfo{ op_type: OperatorTypes::RIGHT_FENCE, priority: 20, next: &None } )} )},
 	"||" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 260, 
