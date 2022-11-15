@@ -843,6 +843,7 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
+            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
         });
     }
@@ -852,6 +853,7 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
+            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
             pref_manager.set_user_prefs("Language", "zz");
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
         });
@@ -862,6 +864,7 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
+            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
             pref_manager.set_user_prefs("Language", "zz-aa");
             
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
@@ -874,6 +877,7 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
+            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
             pref_manager.set_user_prefs("Language", "zz-ab");
             
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
@@ -893,6 +897,7 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
+            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
             pref_manager.set_user_prefs("Language", "zz-aa");
             pref_manager.set_user_prefs("BrailleCode", "UEB");
             
