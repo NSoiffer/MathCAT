@@ -126,11 +126,15 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
             if likely_chemistry_op >= 0 {
                 child.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry_op.to_string().as_str());
                 // if possible chemistry to left and right, then override text for operator lookup
+                // note: on the right, we haven't set chem flag for operators yet, so we skip them
                 let preceding = child.preceding_siblings();
                 let following = child.following_siblings();
-                if !preceding.is_empty() && as_element(preceding[0]).attribute(MAYBE_CHEMISTRY).is_some() &&
-                   !following.is_empty() && as_element(following[0]).attribute(MAYBE_CHEMISTRY).is_some() {
-                    // "=", etc., should be tried as high priority separators
+                if !preceding.is_empty() && preceding.iter().all(|&child| as_element(child).attribute(MAYBE_CHEMISTRY).is_some()) &&
+                   !following.is_empty() && following.iter().all(|&child| {
+                        let child = as_element(child);
+                        name(&child)=="mo" || child.attribute(MAYBE_CHEMISTRY).is_some()
+                    }) {
+                    // "=", etc., should be treated as high priority separators
                     child.set_attribute_value(OPERATOR_OVERRIDE, HIGH_PRIORITY_OPERATOR);
                 }
             }
@@ -192,6 +196,7 @@ fn clean_mrow_children_mark_pass(children: &[Element]) {
                 if name(&child) == "mo" {
                     // debug!(" start == None: removing MAYBE_CHEMISTRY on {}", as_text(child));
                     child.remove_attribute(MAYBE_CHEMISTRY);
+                    child.remove_attribute(OPERATOR_OVERRIDE);
                 } else {
                     start = Some(i);
                 }
@@ -486,8 +491,10 @@ fn is_chemistry_sanity_check(mathml: Element) -> bool {
                 return false;
             },
             "msub" | "msup" | "msubsup" | "mmultiscripts" => return gather_chemical_elements(get_possible_embellished_node(mathml), chem_elements),
-            "semantics" => return gather_chemical_elements( get_presentation_element(mathml), chem_elements ),
-            _ => if is_leaf(mathml) { return false; },
+            "semantics" => {
+                return gather_chemical_elements( get_presentation_element(mathml).1, chem_elements );
+            },
+           _ => if is_leaf(mathml) { return false; },
         }
     
         // mrow, msqrt, etc
@@ -562,7 +569,7 @@ fn likely_chem_equation(mathml: Element) -> isize {
                 }
             },
             "semantics" => {
-                return likely_chem_equation(get_presentation_element(child));
+                return likely_chem_equation(get_presentation_element(mathml).1);
             }
             _ => return NOT_CHEMISTRY,
         };
@@ -684,7 +691,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
             return likelihood;
         },
         "semantics" => {
-            return likely_chem_formula(get_presentation_element(mathml));
+            return likely_chem_formula(get_presentation_element(mathml).1);
         },
         "mrow" => {
             let chem_state = likely_chem_state(mathml);

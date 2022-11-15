@@ -108,6 +108,13 @@ fn prime() {
 }
 
 #[test]
+fn given() {
+    let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
+    test("SimpleSpeak", expr, "P, open paren, Eigh vertical line B, close paren");
+    test("ClearSpeak", expr,  "P, open paren Eigh divides B, close paren");  // not good, but follows the spec
+}
+
+#[test]
 fn simple_msubsup() {
     let expr = "<math>
             <mstyle displaystyle='true' scriptlevel='0'>
@@ -125,4 +132,151 @@ fn simple_msubsup() {
     test("ClearSpeak", expr, "x sub k to the i-th power");
 }
 
+#[test]
+fn presentation_mathml_in_semantics() {
+    let expr = "<math>
+        <semantics>
+            <annotation encoding='application/x-tex'>{\\displaystyle x_k^i}</annotation>
+            <annotation-xml encoding='MathML-Presentation'>
+                <msubsup>
+                    <mi>x</mi>
+                    <mrow>
+                    <mi>k</mi>
+                    </mrow>
+                    <mrow>
+                    <mi>i</mi>
+                    </mrow>
+                </msubsup>
+            </annotation-xml>
+        </semantics>
+    </math>";
+    test("ClearSpeak", expr, "x sub k to the i-th power");
+}
+
+#[test]
+fn ignore_period() {
+    // from https://en.wikipedia.org/wiki/Probability
+    let expr = "<math>
+    <semantics>
+    <annotation encoding='application/x-tex'>{\\displaystyle x_k^i}</annotation>
+    <annotation-xml encoding='MathML-Presentation'>
+      <mrow>
+        <mstyle displaystyle='true' scriptlevel='0'>
+          <mi>P</mi>
+          <mo stretchy='false'>(</mo>
+          <mi>A</mi>
+          <mrow>
+            <mstyle displaystyle='false' scriptlevel='0'>
+              <mtext>&nbsp;and&nbsp;</mtext>
+            </mstyle>
+          </mrow>
+          <mi>B</mi>
+          <mo stretchy='false'>)</mo>
+          <mo>=</mo>
+          <mi>P</mi>
+          <mo stretchy='false'>(</mo>
+          <mi>A</mi>
+          <mo>∩<!-- ∩ --></mo>
+          <mi>B</mi>
+          <mo stretchy='false'>)</mo>
+          <mo>=</mo>
+          <mi>P</mi>
+          <mo stretchy='false'>(</mo>
+          <mi>A</mi>
+          <mo stretchy='false'>)</mo>
+          <mi>P</mi>
+          <mo stretchy='false'>(</mo>
+          <mi>B</mi>
+          <mo stretchy='false'>)</mo>
+          <mo>.</mo>
+        </mstyle>
+      </mrow>
+      </annotation-xml>
+    </semantics>
+  </math>";
+    test("SimpleSpeak", expr, "P, open paren, Eigh and B, close paren; equals, P, open paren Eigh intersection B, close paren; equals, P of Eigh P of B");
+}
+
+#[test]
+fn ignore_mtext_period() {
+    let expr = "<math><mrow><mrow><mo>{</mo><mn>2</mn><mo>}</mo></mrow><mtext>.</mtext></mrow></math>";
+    test("SimpleSpeak", expr, "the set 2");
+}
+
+#[test]
+fn ignore_comma() {
+    // from https://en.wikipedia.org/wiki/Probability
+    let expr = "<math>
+    <mrow>
+      <mstyle displaystyle='true' scriptlevel='0'>
+        <mi>ϕ<!-- ϕ --></mi>
+        <mo stretchy='false'>(</mo>
+        <mi>x</mi>
+        <mo stretchy='false'>)</mo>
+        <mo>=</mo>
+        <mi>c</mi>
+        <msup>
+          <mi>e</mi>
+          <mrow>
+            <mo>−<!-- − --></mo>
+            <msup>
+              <mi>h</mi>
+              <mrow>
+                <mn>2</mn>
+              </mrow>
+            </msup>
+            <msup>
+              <mi>x</mi>
+              <mrow>
+                <mn>2</mn>
+              </mrow>
+            </msup>
+          </mrow>
+        </msup>
+        <mo>,</mo>
+      </mstyle>
+    </mrow>
+</math>";
+    test("SimpleSpeak", expr, "phi of x equals, c, e raised to the negative h squared x squared power");
+}
+
+#[test]
+#[ignore] // issue #14
+fn ignore_period_and_space() {
+    // from https://en.wikipedia.org/wiki/Probability
+    let expr = "<math>
+    <mrow>
+      <mstyle displaystyle='true' scriptlevel='0'>
+        <mi>P</mi>
+        <mo stretchy='false'>(</mo>
+        <mi>A</mi>
+        <mo>∣<!-- ∣ --></mo>
+        <mi>B</mi>
+        <mo stretchy='false'>)</mo>
+        <mo>=</mo>
+        <mrow>
+          <mfrac>
+            <mrow>
+              <mi>P</mi>
+              <mo stretchy='false'>(</mo>
+              <mi>A</mi>
+              <mo>∩<!-- ∩ --></mo>
+              <mi>B</mi>
+              <mo stretchy='false'>)</mo>
+            </mrow>
+            <mrow>
+              <mi>P</mi>
+              <mo stretchy='false'>(</mo>
+              <mi>B</mi>
+              <mo stretchy='false'>)</mo>
+            </mrow>
+          </mfrac>
+        </mrow>
+        <mo>.</mo>
+        <mspace width='thinmathspace'></mspace>
+      </mstyle>
+    </mrow>
+</math>";
+    test("ClearSpeak", expr, "phi of x equals, c, e raised to the negative h squared x squared power");
+}
 

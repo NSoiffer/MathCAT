@@ -321,10 +321,24 @@ pub fn set_mathml_name(element: Element, new_name: &str) {
 }
 
 // returns the presentation element of a "semantics" element
-pub fn get_presentation_element(element: Element) -> Element {
+pub fn get_presentation_element(element: Element) -> (usize, Element) {
 	// FIX: implement this
 	assert_eq!(name(&element), "semantics");
-	return as_element( element.children()[0] );
+	let children = element.children();
+	if let Some( (i, child) ) = children.iter().enumerate().find(|(_, &child)| 
+			if let Some(encoding) = as_element(child).attribute_value("encoding") {
+				encoding == "MathML-Presentation"
+			} else {
+				false
+			})
+	{
+		let presentation_annotation = as_element(*child);
+		debug!("get_presentation_element:\n{}", mml_to_string(&presentation_annotation));
+		assert_eq!(presentation_annotation.children().len(), 1);
+		return (i, as_element(presentation_annotation.children()[0]));
+	} else {
+		return (0, as_element(children[0]));
+	}
 }
 
 /// Canonicalize does several things:
@@ -479,7 +493,7 @@ impl CanonicalizeContext {
 			if children.is_empty() {
 				return Ok( () );
 			} else {
-				return self.assure_mathml(get_presentation_element(mathml));
+				return self.assure_mathml(get_presentation_element(mathml).1);
 			}
 		}
 		if !ALL_MATHML_ELEMENTS.contains(element_name) {
@@ -621,6 +635,9 @@ impl CanonicalizeContext {
 					make_empty_element(mathml);
 				} else if let Some(dash) = canonicalize_dash(text) {
 					mathml.set_text(dash);
+				} else if OPERATORS.get(text).is_some() {
+					set_mathml_name(mathml, "mo");
+					return Some(mathml);
 				}
 				return if parent_requires_child || !text.is_empty() {Some(mathml)} else {None};
 			},
@@ -708,14 +725,23 @@ impl CanonicalizeContext {
 			"semantics" => {
 				// clean the presentation child but leave the annotations in case they want to be used by the rules.
 				// no attempt is made to clean the annotations or verify they are annotations
+				// the cleaned child is made the first child and it's annotation-xml wrapper, if any, is removed
 				let mut children = mathml.children();
-				let new_presentation = if let Some(presentation) = self.clean_mathml(get_presentation_element(mathml)) {
+				let (i, presentation) = get_presentation_element(mathml);
+				let new_presentation = if let Some(presentation) = self.clean_mathml(presentation) {
 					presentation
 				} else {
 					// probably shouldn't happen, but just in case
 					create_empty_element(&mathml.document())
 				};
-				children[0] = ChildOfElement::Element(new_presentation);
+				if i==0 {
+					// common case, so optimize
+					children[0] = ChildOfElement::Element(new_presentation);
+				} else {
+					// rearrange -- inefficient but likely just a few annotation and doesn't happen often
+					children.remove(i);
+					children.insert(0, ChildOfElement::Element(presentation));
+				}
 				mathml.replace_children(children);
 				return Some(mathml);
 			},
@@ -1902,7 +1928,8 @@ impl CanonicalizeContext {
 			},
 			"semantics" => {
 				let mut children = mathml.children();
-				children[0] = ChildOfElement::Element(self.canonicalize_mrows( get_presentation_element(mathml))? );
+				let (i, presentation) = get_presentation_element(mathml);
+				children[i] = ChildOfElement::Element(self.canonicalize_mrows(presentation)? );
 				mathml.replace_children(children);
 				return Ok(mathml);
 			},
@@ -2183,6 +2210,10 @@ impl CanonicalizeContext {
 	}
 
 	fn canonicalize_mo_text(&self, mo: Element) {
+		lazy_static! {
+			static ref IS_LIKELY_SCALAR_VARIABLE: Regex = Regex::new("[a-eh-z]").unwrap(); 
+		}
+		
 		let mut mo_text = as_text(mo);
 		let parent = mo.parent().unwrap().element().unwrap();
 		let parent_name = name(&parent);
@@ -2207,6 +2238,24 @@ impl CanonicalizeContext {
 		};
 		mo_text = match mo_text {
 			"\u{2212}" => "-",
+			// FIX: this needs to be after all expr the "|" has been fully canonicalized. At this point, any parent mrow/siblings is in flux
+			// "\u{007C}" => {  // vertical line -> divides
+			// 	// if a number or variable (lower case single letter) precedes and follows "|", switch to divides (a bit questionable...)
+			// 	debug!("canonicalize_mo_text parent:\n{}", mml_to_string(&parent));
+			// 	let precedes = mo.preceding_siblings();
+			// 	let follows = mo.following_siblings();
+			// 	if precedes.is_empty() || follows.is_empty() {
+			// 		"\u{007C}"
+			// 	} else {
+			// 		let before = as_element(precedes[0]);
+			// 		let after = as_element(follows[0]);
+			// 		let before_ok = name(&before) == "mn" ||
+			// 				(name(&before) == "mi" && IS_LIKELY_SCALAR_VARIABLE.is_match(as_text(before)));
+			// 		let after_ok = name(&after) == "mn" ||
+			// 				(name(&after) == "mi" && IS_LIKELY_SCALAR_VARIABLE.is_match(as_text(after)));
+			// 		if before_ok && after_ok {"\u{2224}"} else {"\u{007C}"}
+			// 	}
+			// },
 			_ => mo_text,
 		};
 		mo.set_text(mo_text);
@@ -2537,12 +2586,6 @@ impl CanonicalizeContext {
 				return FunctionNameCertainty::False;
 			}
 	
-			// FIX: should really make sure all the args are marked as MAYBE_CHEMISTRY, but we don't know the matching close paren/bracket
-			if node.attribute(MAYBE_CHEMISTRY).is_some() &&
-			   as_element(right_siblings[1]).attribute(MAYBE_CHEMISTRY).is_some() {
-				return FunctionNameCertainty::False;
-			}
-	
 			let likely_names = defs.get_hashset("LikelyFunctionNames").unwrap();
 			if likely_names.contains(base_name) {
 				return FunctionNameCertainty::True;	// don't bother checking contents of parens, consider these as function names
@@ -2557,6 +2600,12 @@ impl CanonicalizeContext {
 				// debug!("      ...is comma arg");
 				return FunctionNameCertainty::True;	// if there is only a single arg, why else would you use parens?
 			};
+	
+			// FIX: should really make sure all the args are marked as MAYBE_CHEMISTRY, but we don't know the matching close paren/bracket
+			if node.attribute(MAYBE_CHEMISTRY).is_some() &&
+			   as_element(right_siblings[1]).attribute(MAYBE_CHEMISTRY).is_some() {
+				return FunctionNameCertainty::False;
+			}
 	
 			// Names like "Tr" are likely function names, single letter names like "M" or "J" are iffy
 			// This needs to be after the chemical state check above to rule out Cl(g), etc
@@ -3829,17 +3878,41 @@ mod canonicalize_tests {
     #[test]
     fn vertical_bar_such_that() {
         let test_str = "<math>
-            <mo>{</mo> <mrow><mi>x</mi></mrow> <mo>|</mo><mi>a</mi><mo>}</mo>
+				<mo>{</mo><mi>x</mi><mo>|</mo><mi>x</mi><mo>&#x2208;</mo><mi>S</mi><mo>}</mo>
+            </math>";
+        let target_str = "<math>
+		<mrow data-changed='added'>
+		  <mo>{</mo>
+		  <mrow data-changed='added'>
+			<mi>x</mi>
+			<mo>|</mo>
+			<mrow data-changed='added'>
+			  <mi>x</mi>
+			  <mo>∈</mo>
+			  <mi>S</mi>
+			</mrow>
+		  </mrow>
+		  <mo>}</mo>
+		</mrow>
+	   </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
+	#[ignore]  // need to figure out a test for this ("|" should have a precedence around ":" since that is an alternative notation for "such that", but "∣" is higher precedence)
+    fn vertical_bar_divides() {
+        let test_str = "<math>
+		<mi>x</mi><mo>+</mo><mi>y</mi> <mo>|</mo><mn>12</mn>
             </math>";
         let target_str = "<math>
 				<mrow data-changed='added'>
-					<mo>{</mo>
-					<mrow data-changed='added'>
-						<mi>x</mi>
-						<mo>|</mo>
-						<mi>a</mi>
-					</mrow>
-					<mo>}</mo>
+				<mrow data-changed='added'>
+					<mi>x</mi>
+					<mo>+</mo>
+					<mi>y</mi>
+				</mrow>
+				<mo>∣ <!--divides--></mo>
+				<mn>12</mn>
 				</mrow>
 			</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));

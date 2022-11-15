@@ -622,7 +622,7 @@ fn mhchem_barbed_equilibrium() {
     </mrow>
   </math>";
   test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "H, 2, gas; plus; I, 2, gas; is in equilibrium with, 2, H, I; gas,");
+      expr, "H, 2, gas; plus; I, 2, gas; is in equilibrium with, 2 H, I, gas,");
 }
 
 
