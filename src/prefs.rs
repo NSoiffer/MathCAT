@@ -65,6 +65,8 @@ impl Preferences{
         prefs.insert("Verbosity".to_string(), Yaml::String("medium".to_string()));
         prefs.insert("SpeechOverrides_CapitalLetters".to_string(), Yaml::String("".to_string())); // important for testing
         prefs.insert("Blind".to_string(), Yaml::Boolean(true));
+        prefs.insert("MathRate".to_string(), Yaml::String("100.0".to_string()));
+        prefs.insert("PauseFactor".to_string(), Yaml::String("100.0".to_string()));
         prefs.insert("NavMode".to_string(), Yaml::String("enhanced".to_string()));
         prefs.insert("Overview".to_string(), Yaml::String("read".to_string()));
         prefs.insert("ResetOverView".to_string(), Yaml::Boolean(true));

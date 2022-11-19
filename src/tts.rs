@@ -72,6 +72,7 @@ use strum_macros::{Display, EnumString};
 use regex::Regex;
 use sxd_xpath::Value;
 
+const MIN_PAUSE:f64 = 50.0;         // ms -- avoids clutter of putting out pauses that probably can't be heard
 const PAUSE_SHORT:f64 = 150.0;  // ms
 const PAUSE_MEDIUM:f64 = 300.0; // ms
 const PAUSE_LONG:f64 = 600.0;   // ms
@@ -439,7 +440,7 @@ impl TTS {
 
     // auto pausing can't be known until neighboring strings are computed
     // we create a unique string in this case and compute the real value later 
-    fn get_string_none(&self, command: &TTSCommandRule,  _prefs: &PreferenceManager, is_start_tag: bool) -> String  {
+    fn get_string_none(&self, command: &TTSCommandRule,  prefs: &PreferenceManager, is_start_tag: bool) -> String  {
         // they only thing to do is handle "pause" with some punctuation hacks along with 'spell'        
         if is_start_tag {
             if command.command == TTSCommand::Pause {
@@ -448,10 +449,15 @@ impl TTS {
                 return crate::speech::CONCAT_INDICATOR.to_string() + (
                     if amount == PAUSE_AUTO {
                         PAUSE_AUTO_STR
-                    } else if amount <= 250.0 {
-                        ","
-                    } else  {
-                        ";"
+                    } else {
+                        let amount  =  amount * TTS::get_pause_multiplier(prefs);
+                        if amount <= MIN_PAUSE {
+                            ""
+                        } else if amount <= 250.0 {
+                            ","
+                        } else  {
+                            ";"
+                        }
                     }
                 );
             } else if command.command == TTSCommand::Spell {
@@ -471,7 +477,12 @@ impl TTS {
                 if amount == PAUSE_AUTO {
                     PAUSE_AUTO_STR.to_string()
                 } else {
-                    format!("<silence msec=='{}ms'/>", amount * 180.0/prefs.get_rate())
+                    let amount = amount * TTS::get_pause_multiplier(prefs);
+                    if amount > MIN_PAUSE {
+                        format!("<silence msec=='{}ms'/>", amount * 180.0/prefs.get_rate())
+                    } else {
+                        "".to_string()
+                    }
                 }
             } else {
                 "".to_string()
@@ -499,7 +510,12 @@ impl TTS {
                     if amount == PAUSE_AUTO {
                         PAUSE_AUTO_STR.to_string()
                     } else {
-                        format!("<break time='{}ms'/>", amount * 180.0/prefs.get_rate())
+                        let amount = amount * TTS::get_pause_multiplier(prefs);
+                        if amount > MIN_PAUSE {
+                            format!("<break time='{}ms'/>", amount * 180.0/prefs.get_rate())
+                        } else {
+                            "".to_string()
+                        }
                     }
                 } else {
                     "".to_string()
@@ -518,6 +534,10 @@ impl TTS {
             },
         TTSCommand::Bookmark => panic!("Internal error: bookmarks should have been handled earlier"),
         }
+    }
+
+    fn get_pause_multiplier(prefs: &PreferenceManager) -> f64 {
+        return prefs.get_user_prefs().to_string("PauseFactor").parse::<f64>().unwrap_or(100.)/100.0;
     }
 
     /// Compute the length of the pause to use.
@@ -551,10 +571,6 @@ impl TTS {
             return "".to_string(); 
         }
         let pause = std::cmp::min(3000, ((2 * before_len + after_len)/48) * 128);
-        if pause <= 50 {
-            // don't put out a lot of short pauses which probably can't be heard
-            return "".to_string();
-        }
         // create a TTSCommandRule so we reuse code
         let command = TTSCommandRule::new(
             TTSCommand::Pause,
