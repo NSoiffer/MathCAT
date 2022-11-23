@@ -2210,9 +2210,9 @@ impl CanonicalizeContext {
 	}
 
 	fn canonicalize_mo_text(&self, mo: Element) {
-		lazy_static! {
-			static ref IS_LIKELY_SCALAR_VARIABLE: Regex = Regex::new("[a-eh-z]").unwrap(); 
-		}
+		// lazy_static! {
+		// 	static ref IS_LIKELY_SCALAR_VARIABLE: Regex = Regex::new("[a-eh-z]").unwrap(); 
+		// }
 		
 		let mut mo_text = as_text(mo);
 		let parent = mo.parent().unwrap().element().unwrap();
