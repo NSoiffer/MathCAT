@@ -1,63 +1,59 @@
 ---
 
--
-   name: line-segment
-   tag: line-segment
-   match: "."
-   replace:
-   - test:
+- name: line-segment
+  tag: line-segment
+  match: "."
+  replace:
+  - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the line segment from" 
+      - t: "the line segment from"
       - x: "*[1]"
       - t: "to"
       - x: "*[2]"
       else:
-      - t: "line segment" 
+      - t: "line segment"
       - x: "*[1]"
       - x: "*[2]"
 
--
-   name: geometry-ray
-   tag: ray
-   match: "."
-   replace:
-   - test:
+- name: geometry-ray
+  tag: ray
+  match: "."
+  replace:
+  - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the ray from" 
+      - t: "the ray from"
       - x: "*[1]"
       - t: "to"
       - x: "*[2]"
       else:
-      - t: "ray" 
+      - t: "ray"
       - x: "*[1]"
       - x: "*[2]"
 
--
-   name: geometry-arc
-   tag: arc
-   match: "."
-   replace:
-   - test:
+- name: geometry-arc
+  tag: arc
+  match: "."
+  replace:
+  - test:
       if: "$Verbosity='Verbose'"
-      then: [t: "the"]
-   - t: "arc" 
-   - x: "*[1]"
-   - x: "*[2]"
+      then: [{t: "the"}]
+  - t: "arc"
+  - x: "*[1]"
+  - x: "*[2]"
 
--
-   name: measure-of-angle
-   tag: measure-of-angle
-   match: "."
-   replace:
-   - test:
+- name: measure-of-angle
+  tag: measure-of-angle
+  match: "."
+  replace:
+  - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the measure of the angle" 
+      - t: "the measure of the angle"
       else:
-      - t: "measure of angle" 
-   - x: "*[1]"
-   - x: "*[2]"
-   - x: "*[3]"
+      - t: "measure of angle"
+  - x: "*[1]"
+  - x: "*[2]"
+  - x: "*[3]"
 

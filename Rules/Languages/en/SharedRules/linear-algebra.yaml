@@ -1,122 +1,114 @@
 ---
 
--
-   name: simple-determinant
-   tag: determinant
-   match: "not(*[1][self::m:mtr])"
-   replace:
-   - test:
+- name: simple-determinant
+  tag: determinant
+  match: "not(*[1][self::m:mtr])"
+  replace:
+  - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the" 
-   - t: "determinant"
-   - test:
+      - t: "the"
+  - t: "determinant"
+  - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of" 
-   - x: "*[1]"
+      - t: "of"
+  - x: "*[1]"
 
--
-   name: norm
-   tag: norm
-   match: "."
-   replace:
-   - test:
+- name: norm
+  tag: norm
+  match: "."
+  replace:
+  - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the" 
-   - t: "norm"
-   - test:
+      - t: "the"
+  - t: "norm"
+  - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of" 
-   - x: "*[1]"
+      - t: "of"
+  - x: "*[1]"
 
--
-   name: subscripted-norm
-   tag: subscripted-norm
-   match: "."
-   replace:
-   - test:
+- name: subscripted-norm
+  tag: subscripted-norm
+  match: "."
+  replace:
+  - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the" 
-   - x: "*[2]"
-   - t: "norm"
-   - test:
+      - t: "the"
+  - x: "*[2]"
+  - t: "norm"
+  - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of" 
-   - x: "*[1]"
+      - t: "of"
+  - x: "*[1]"
 
--
-   name: transpose
-   tag: transpose
-   match: "."
-   replace:
-   - x: "*[1]"
-   - t: "transpose"
--
-   name: trace
-   tag: trace
-   match: "."
-   replace:
-   - test:
+- name: transpose
+  tag: transpose
+  match: "."
+  replace:
+  - x: "*[1]"
+  - t: "transpose"
+- name: trace
+  tag: trace
+  match: "."
+  replace:
+  - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the" 
-   - t: "trace"
-   - test:
+      - t: "the"
+  - t: "trace"
+  - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of" 
-   - x: "*[1]"
+      - t: "of"
+  - x: "*[1]"
 
--
-   name: dimension
-   tag: dimension
-   match: "."
-   replace:
-   - test:
+- name: dimension
+  tag: dimension
+  match: "."
+  replace:
+  - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the" 
-   - t: "dimension"
-   - test:
+      - t: "the"
+  - t: "dimension"
+  - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of" 
-   - x: "*[1]"
+      - t: "of"
+  - x: "*[1]"
 
--
-   name: homomorphism
-   tag: homomorphism
-   match: "."
-   replace:
-   - test:
+- name: homomorphism
+  tag: homomorphism
+  match: "."
+  replace:
+  - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the" 
-   - t: "homomorphism"
-   - test:
+      - t: "the"
+  - t: "homomorphism"
+  - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of" 
-   - x: "*[1]"
+      - t: "of"
+  - x: "*[1]"
 
--
-   name: kernel
-   tag: kernel
-   match: "."
-   replace:
-   - test:
+- name: kernel
+  tag: kernel
+  match: "."
+  replace:
+  - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the" 
-   - t: "kernel"
-   - test:
+      - t: "the"
+  - t: "kernel"
+  - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of" 
-   - x: "*[1]"
+      - t: "of"
+  - x: "*[1]"
 
