@@ -242,9 +242,9 @@ fn non_simple_function_over_function() {
             <mrow><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
         </mfrac></math>";
     test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr,
-             "the fraction with numerator; f of, open paren x plus 1 close paren; and denominator g of x;");
+             "the fraction with numerator; f of, open paren x plus 1, close paren; and denominator g of x;");
     test_prefs("ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr,
-             "the fraction with numerator; f of, open paren x plus 1 close paren; and denominator g of x; end fraction,");
+             "the fraction with numerator; f of, open paren x plus 1, close paren; and denominator g of x; end fraction,");
 }
 
 #[test]

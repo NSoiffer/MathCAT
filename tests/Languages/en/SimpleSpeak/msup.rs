@@ -241,7 +241,7 @@ fn nested_non_simple_squared_exp() {
       </msup>
       </mrow>
       </math>";
-test("SimpleSpeak", expr, "3 raised to the open paren x plus 1 close paren squared power");
+test("SimpleSpeak", expr, "3 raised to the open paren x plus 1, close paren squared power");
 }
 
 #[test]

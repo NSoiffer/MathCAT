@@ -10,7 +10,7 @@ fn sum_both() {
         </munderover>
         <mi>n</mi>
     </math>";
-    test("ClearSpeak", expr, "the sum from n equals 1 to 10 of n");
+    test("SimpleSpeak", expr, "the sum from n equals 1 to 10 of n");
 }
 
 #[test]
@@ -22,7 +22,7 @@ fn sum_under() {
         </munder>
         <mi>i</mi>
     </math>";
-    test("ClearSpeak", expr, "the sum over S of i");
+    test("SimpleSpeak", expr, "the sum over S of i");
 }
 #[test]
 fn sum_both_msubsup() {
@@ -34,7 +34,7 @@ fn sum_both_msubsup() {
         </msubsup>
         <mi>n</mi>
     </math>";
-    test("ClearSpeak", expr, "the sum from n equals 1 to 10 of n");
+    test("SimpleSpeak", expr, "the sum from n equals 1 to 10 of n");
 }
 
 #[test]
@@ -46,7 +46,7 @@ fn sum_sub() {
         </msub>
         <mi>i</mi>
     </math>";
-    test("ClearSpeak", expr, "the sum over S of i");
+    test("SimpleSpeak", expr, "the sum over S of i");
 }
 
 #[test]
@@ -55,7 +55,7 @@ fn sum() {
             <mo>∑</mo>
             <msub><mi>a</mi><mi>i</mi></msub>
     </math>";
-    test("ClearSpeak", expr, "the sum of eigh sub i");
+    test("SimpleSpeak", expr, "the sum of eigh sub i");
 }
 
 #[test]
@@ -68,7 +68,7 @@ fn product_both() {
         </munderover>
         <mi>n</mi>
     </math>";
-    test("ClearSpeak", expr, "the product from n equals 1 to 10 of n");
+    test("SimpleSpeak", expr, "the product from n equals 1 to 10 of n");
 }
 
 #[test]
@@ -80,7 +80,7 @@ fn product_under() {
         </munder>
         <mi>i</mi>
     </math>";
-    test("ClearSpeak", expr, "the product over S of i");
+    test("SimpleSpeak", expr, "the product over S of i");
 }
 
 #[test]
@@ -89,7 +89,7 @@ fn product() {
             <mo>∏</mo>
             <msub><mi>a</mi><mi>i</mi></msub>
     </math>";
-    test("ClearSpeak", expr, "the product of eigh sub i");
+    test("SimpleSpeak", expr, "the product of eigh sub i");
 }
 
 #[test]
@@ -102,7 +102,7 @@ fn intersection_both() {
         </munderover>
         <msub><mi>S</mi><mi>i</mi></msub>
     </math>";
-    test("ClearSpeak", expr, "the intersection from i equals 1 to 10 of; S sub i");
+    test("SimpleSpeak", expr, "the intersection from i equals 1 to 10 of; S sub i");
 }
 
 #[test]
@@ -114,7 +114,7 @@ fn intersection_under() {
         </munder>
         <msub><mi>S</mi><mi>i</mi></msub>
     </math>";
-    test("ClearSpeak", expr, "the intersection over C of, S sub i");
+    test("SimpleSpeak", expr, "the intersection over C of, S sub i");
 }
 
 #[test]
@@ -123,7 +123,7 @@ fn intersection() {
             <mo>⋂</mo>
             <msub><mi>S</mi><mi>i</mi></msub>
             </math>";
-    test("ClearSpeak", expr, "the intersection of S sub i");
+    test("SimpleSpeak", expr, "the intersection of S sub i");
 }
 
 #[test]
@@ -136,7 +136,7 @@ fn union_both() {
         </munderover>
         <msub><mi>S</mi><mi>i</mi></msub>
     </math>";
-    test("ClearSpeak", expr, "the union from i equals 1 to 10 of, S sub i");
+    test("SimpleSpeak", expr, "the union from i equals 1 to 10 of; S sub i");
 }
 
 #[test]
@@ -148,7 +148,7 @@ fn union_under() {
         </munder>
         <msub><mi>S</mi><mi>i</mi></msub>
     </math>";
-    test("ClearSpeak", expr, "the union over C of S sub i");
+    test("SimpleSpeak", expr, "the union over C of S sub i");
 }
 
 #[test]
@@ -157,7 +157,7 @@ fn union() {
             <mo>⋃</mo>
             <msub><mi>S</mi><mi>i</mi></msub>
             </math>";
-    test("ClearSpeak", expr, "the union of S sub i");
+    test("SimpleSpeak", expr, "the union of S sub i");
 }
 
 #[test]
@@ -173,7 +173,7 @@ fn integral_both() {
             </mrow>
             <mtext>&#x2009;</mtext><mi>d</mi><mi>x</mi>
         </math>";
-    test("ClearSpeak", expr, "the integral from 0 to 1 of, f of x; d x");
+    test("SimpleSpeak", expr, "the integral from 0 to 1 of, f of x; d x");
 }
 
 #[test]
@@ -186,7 +186,7 @@ fn integral_under() {
         <mrow><mi>f</mi><mrow><mo>(</mo><mi>x</mi> <mo>)</mo></mrow></mrow>
         <mi>d</mi><mi>x</mi>
         </math>";
-    test("ClearSpeak", expr, "the integral over the real numbers of; f of x d x");
+    test("SimpleSpeak", expr, "the integral over the real numbers of; f of x d x");
 }
 
 #[test]
@@ -196,5 +196,5 @@ fn integral() {
             <mrow><mi>f</mi><mrow><mo>(</mo><mi>x</mi> <mo>)</mo></mrow></mrow>
             <mi>d</mi><mi>x</mi>
             </math>";
-    test("ClearSpeak", expr, "the integral of f of x d x");
+    test("SimpleSpeak", expr, "the integral of f of x d x");
 }

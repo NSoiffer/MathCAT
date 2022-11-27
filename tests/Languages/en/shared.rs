@@ -194,7 +194,7 @@ fn ignore_period() {
       </annotation-xml>
     </semantics>
   </math>";
-    test("SimpleSpeak", expr, "P, open paren, Eigh and B, close paren; equals, P, open paren Eigh intersection B, close paren; equals, P of Eigh P of B");
+    test("SimpleSpeak", expr, "P, open paren, Eigh and B, close paren; equals; P, open paren, Eigh intersection B, close paren; equals, P of Eigh, P of B");
 }
 
 #[test]

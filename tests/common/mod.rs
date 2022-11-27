@@ -56,6 +56,7 @@ pub fn test(style: &str, mathml: &str, speech: &str) {
         {
             let mut prefs = rules.pref_manager.borrow_mut();
             prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
+            prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
             changes = prefs.set_user_prefs("SpeechStyle", style);
         }
         if let Some(changes) = changes {
@@ -76,6 +77,7 @@ pub fn test_lang(language: &str, style: &str, mathml: &str, speech: &str) {
         {   // needs to be scoped due to problems with rules potentially being used with prefs' destructor runs in an outer scope
             let mut prefs = rules.pref_manager.borrow_mut();
             prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
+            prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
             changes = prefs.set_user_prefs("SpeechStyle", style).unwrap_or_default();
             let more_changes = prefs.set_user_prefs("Language", language).unwrap_or_default();
             changes.add_changes(more_changes);
@@ -98,6 +100,7 @@ pub fn test_prefs(speech_style: &str, test_prefs: Vec<(&str, &str)>, mathml: &st
         {
             let mut prefs = rules.pref_manager.borrow_mut();
             prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
+            prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
             changes = prefs.set_user_prefs("SpeechStyle", speech_style).unwrap_or_default();
             for (pref_name, pref_value) in test_prefs {
                 if let Some(more_changes) = prefs.set_user_prefs(pref_name, pref_value) {
@@ -122,6 +125,7 @@ pub fn test_ClearSpeak(pref_name: &str, pref_value: &str, mathml: &str, speech: 
         {   // needs to be scoped due to problems with rules potentially being used with prefs' destructor runs in an outer scope
             let mut prefs = rules.pref_manager.borrow_mut();
             prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
+            prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
             changes = prefs.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap_or_default();
             let more_changes = prefs.set_user_prefs(pref_name, pref_value).unwrap_or_default();
             changes.add_changes(more_changes);
@@ -143,6 +147,7 @@ pub fn test_ClearSpeak_prefs(test_prefs: Vec<(&str, &str)>, mathml: &str, speech
         {
             let mut prefs = rules.pref_manager.borrow_mut();
             prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
+            prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
             changes = prefs.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap_or_default();
             for (pref_name, pref_value) in test_prefs {
                 if let Some(more_changes) = prefs.set_user_prefs(pref_name, pref_value) {

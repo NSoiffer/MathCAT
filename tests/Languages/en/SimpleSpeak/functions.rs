@@ -77,7 +77,7 @@ fn simple_log() {
 #[test]
 fn normal_log() {
     let expr = "<math><mrow><mi>log</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("SimpleSpeak", expr, "the log of, open paren x plus y close paren");
+    test("SimpleSpeak", expr, "the log of, open paren x plus y, close paren");
 }
 
 #[test]
@@ -89,7 +89,7 @@ fn simple_log_with_base() {
 #[test]
 fn normal_log_with_base() {
     let expr = "<math><mrow><msub><mi>log</mi><mi>b</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("SimpleSpeak", expr, "the log base b of, open paren x plus y close paren");
+    test("SimpleSpeak", expr, "the log base b of, open paren x plus y, close paren");
 }
 
 #[test]
@@ -101,7 +101,7 @@ fn simple_ln() {
 #[test]
 fn normal_ln() {
     let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("SimpleSpeak", expr, "the natural log of, open paren x plus y close paren");
+    test("SimpleSpeak", expr, "the natural log of, open paren x plus y, close paren");
 }
 
 #[test]

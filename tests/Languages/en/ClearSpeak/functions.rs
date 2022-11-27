@@ -91,7 +91,7 @@ fn simple_log() {
 #[test]
 fn normal_log() {
     let expr = "<math><mrow><mi>log</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("ClearSpeak", expr, "the log of, open paren x plus y close paren");
+    test("ClearSpeak", expr, "the log of, open paren x plus y, close paren");
 }
 
 #[test]
@@ -103,7 +103,7 @@ fn simple_log_with_base() {
 #[test]
 fn normal_log_with_base() {
     let expr = "<math><mrow><msub><mi>log</mi><mi>b</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("ClearSpeak", expr, "the log base b of, open paren x plus y close paren");
+    test("ClearSpeak", expr, "the log base b of, open paren x plus y, close paren");
 }
 
 #[test]
@@ -115,7 +115,7 @@ fn simple_ln() {
 #[test]
 fn normal_ln() {
     let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("ClearSpeak", expr, "the l n of, open paren x plus y close paren");
+    test("ClearSpeak", expr, "the l n of, open paren x plus y, close paren");
 }
 
     
@@ -131,7 +131,7 @@ fn simple_natural_log() {
 fn natural_log() {
     let expr = "<math><mi>ln</mi><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></math>";
     test_ClearSpeak("ClearSpeak_Log", "LnAsNaturalLog ",expr,
-        "the natural log of, open paren x plus y close paren");
+        "the natural log of, open paren x plus y, close paren");
 }
 
 
@@ -169,7 +169,7 @@ fn test_functions_none_pref() {
     <mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("ClearSpeak_Functions", "None",expr,
-        "the log of, open paren x plus y close paren; plus, f times, open paren x plus y close paren");
+        "the log of, open paren x plus y, close paren; plus, f times, open paren x plus y, close paren");
 }
 
 #[test]
@@ -178,7 +178,7 @@ fn test_functions_none_pref_multiple_args() {
         <mi>B</mi> <mrow><mo>(</mo> <mrow> <mn>2</mn><mo>,</mo><mn>6</mn></mrow> <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("ClearSpeak_Functions", "None",expr,
-        "B times, open paren 2 comma 6 close paren");
+        "B times, open paren 2 comma 6, close paren");
 }
 
 
@@ -234,7 +234,7 @@ fn more_implied_times() {
     </mrow>
     </mrow></math>";
     test_ClearSpeak("ClearSpeak_ImpliedTimes", "MoreImpliedTimes",expr,
-        "open paren 2 times x close paren squared");
+        "open paren 2 times x, close paren squared");
 }
 
 #[test]
@@ -247,14 +247,14 @@ fn explicit_times_more_implied_times() {
 fn explicit_times_none_simple_right() {
     let expr = "<math><mn>2</mn><mo>[</mo><mn>3</mn> <mo>]</mo></math>";
     test_ClearSpeak("ClearSpeak_ImpliedTimes", "None",
-        expr, "2 open bracket 3 close bracket");
+        expr, "2, open bracket 3 close bracket");
 }
 
 #[test]
 fn explicit_times_none_simple_left() {
     let expr = "<math><mo>(</mo><mn>2</mn><mo>&#x2212;</mo><mn>1</mn><mo>)</mo><mi>x</mi></math>";
     test_ClearSpeak("ClearSpeak_ImpliedTimes", "None",
-        expr, "open paren 2 minus 1 close paren; x");
+        expr, "open paren 2 minus 1, close paren; x");
 }
 
 #[test]
@@ -271,7 +271,7 @@ fn explicit_times_none_superscript() {
     </math>";
     test_ClearSpeak_prefs(
         vec![("ClearSpeak_ImpliedTimes", "None"), ("ClearSpeak_Functions", "None")],
-        expr, "f open paren x close paren, equals, x squared, open paren x plus 1 close paren");
+        expr, "f open paren x close paren; equals, x squared, open paren x plus 1, close paren");
 }
 
 /*

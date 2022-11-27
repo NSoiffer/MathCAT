@@ -268,10 +268,10 @@ fn nested_non_simple_squared_exp() {
       </msup>
       </mrow>
       </math>";
-  test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "3 raised to the exponent, open paren x plus 1 close paren squared, end exponent");
-  test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "3 raised to the exponent, open paren x plus 1 close paren to the second, end exponent");
-  test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "3 raised to the exponent, open paren x plus 1 close paren to the second power, end exponent");
-  test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 raised to the exponent, open paren x plus 1 close paren raised to the power 2; end exponent");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "3 raised to the exponent, open paren x plus 1, close paren squared, end exponent");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "3 raised to the exponent, open paren x plus 1, close paren to the second, end exponent");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "3 raised to the exponent, open paren x plus 1, close paren to the second power, end exponent");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 raised to the exponent, open paren x plus 1, close paren raised to the power 2; end exponent");
 }
 
 #[test]

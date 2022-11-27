@@ -36,7 +36,7 @@ fn aluminum_sulfate() {
   let expr = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
           <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
   test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr, "Eigh l, 2, open S, O, 4, close 3");
-  test_prefs("ClearSpeak", vec![("Verbosity", "Medium")], expr, "Eigh l, sub 2, open paren S, O, sub 4, close paren sub 3");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Medium")], expr, "Eigh l, sub 2, open paren, S, O, sub 4, close paren sub 3");
   test_prefs("ClearSpeak", vec![("Verbosity", "Verbose")], expr, "Eigh l, subscript 2; open paren, S, O, subscript 4, close paren subscript 3");
 }
 
@@ -54,7 +54,7 @@ fn ethanol_bonds() {
               <mi>H</mi>
           </mrow>
       </math>";
-  test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr, "C; H, 3 single bond, C; H, 2 single bond O, H,");
+  test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr, "C; H, 3 single bond; C; H, 2 single bond, O, H,");
 
 }
 
@@ -89,7 +89,7 @@ fn ethylene_with_bond() {
           <mo>=</mo>
           <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
       </mrow></math>";
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "H, 2, C, double bond C, H, 2");
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "H, 2, C, double bond, C, H, 2");
 }
 
 #[test]
@@ -109,7 +109,7 @@ fn ethylene_with_colon_bond() {
           <mo>::</mo>
           <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
       </mrow></math>";
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "H, 2, C, double bond C, H, 2");
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "H, 2, C, double bond, C, H, 2");
 }
 
 #[test]
@@ -421,7 +421,7 @@ fn hcl_na_yields() {
       </mrow>
     </math>";
     test_prefs("SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-        "2 H, C l; plus 2 N eigh; yields, 2 N eigh, C l; plus H, subscript 2");
+        "2 H, C l; plus 2 N eigh; yields; 2 N eigh, C l; plus H, subscript 2");
 }
 
 #[test]
@@ -467,7 +467,7 @@ fn mhchem_so4_2plus() {
     </mrow>
   </math>";
   test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "S, O, 4, 2 plus,");
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Medium")], expr, "S, O, sub 4, super 2 plus,");
+  test_prefs("SimpleSpeak", vec![("Verbosity", "Medium")], expr, "S; O, sub 4, super 2 plus,");
   test_prefs("SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "S; O, subscript 4, superscript 2 plus,");
 }
 
@@ -556,7 +556,7 @@ fn mhchem_hcl_aq_etc() {
     </mrow>
   </math>";
   test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "2, H, C l, aqueous; plus, 2 N eigh, solid; yields; 2, N eigh, C l, aqueous; plus H, 2, gas,");
+      expr, "2, H, C l, aqueous; plus, 2, N eigh, solid; yields; 2, N eigh, C l, aqueous; plus H, 2, gas,");
 
 }
 
@@ -622,7 +622,7 @@ fn mhchem_barbed_equilibrium() {
     </mrow>
   </math>";
   test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "H, 2, gas; plus; I, 2, gas; is in equilibrium with, 2 H, I, gas,");
+      expr, "H, 2, gas; plus; I, 2, gas; is in equilibrium with, 2, H, I, gas,");
 }
 
 

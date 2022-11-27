@@ -31,7 +31,7 @@ fn case_1() {
         </math>
    ";
    test_ClearSpeak("ClearSpeak_MultiLineLabel", "Auto", expr, "f of x equals; 3 cases, \
-                case 1; negative 1 if x, is less than 0; \
+                case 1; negative 1 if x; is less than 0; \
                 case 2; 0 if x, equals 0; \
                 case 3; 1 if x, is greater than 0;");
 }
