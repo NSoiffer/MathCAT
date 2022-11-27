@@ -5,7 +5,7 @@ fn multiplication() {
     let expr = "<math>
                     <mn>2</mn><mo>×</mo><mn>3</mn>
                 </math>";
-    test("ClearSpeak", expr, "2 times 3");
+    test("en", "ClearSpeak", expr, "2 times 3");
 }
 
 #[test]
@@ -13,7 +13,7 @@ fn multiplication_by() {
     let expr = "<math>
                     <mn>2</mn><mo>×</mo><mn>3</mn>
                 </math>";
-    test_ClearSpeak("ClearSpeak_MultSymbolX", "By", expr, "2 by 3");
+    test_ClearSpeak("en", "ClearSpeak_MultSymbolX", "By", expr, "2 by 3");
 }
 
 #[test]
@@ -21,7 +21,7 @@ fn multiplication_cross() {
     let expr = "<math>
                     <mi>u</mi><mo>×</mo><mi>v</mi>
                 </math>";
-    test_ClearSpeak("ClearSpeak_MultSymbolX", "Cross", expr, "u cross v");
+    test_ClearSpeak("en", "ClearSpeak_MultSymbolX", "Cross", expr, "u cross v");
 }
 
 #[test]
@@ -30,7 +30,7 @@ fn ellipses_auto_start() {
             <mi>…</mi><mo>,</mo>
             <mo>-</mo><mn>2</mn><mo>,</mo><mo>-</mo><mn>1</mn><mo>,</mo><mn>0</mn>
         </math>";
-    test("ClearSpeak", expr, "dot dot dot comma negative 2 comma negative 1 comma 0");
+    test("en", "ClearSpeak", expr, "dot dot dot comma negative 2 comma negative 1 comma 0");
 }
 
 #[test]
@@ -44,7 +44,7 @@ fn ellipses_auto_end() {
             <mo>,</mo>
             <mi>…</mi>
         </math>";
-    test_ClearSpeak("ClearSpeak_Ellipses", "Auto", expr, "1 comma 2 comma 3 comma dot dot dot");
+    test_ClearSpeak("en", "ClearSpeak_Ellipses", "Auto", expr, "1 comma 2 comma 3 comma dot dot dot");
 }
 
 #[test]
@@ -62,7 +62,7 @@ fn ellipses_auto_middle() {
                 <mn>20</mn>
             </mrow>
         </math>";
-    test_ClearSpeak("ClearSpeak_Ellipses", "Auto", expr,
+    test_ClearSpeak("en", "ClearSpeak_Ellipses", "Auto", expr,
             "1 comma 2 comma 3 comma dot dot dot comma 20");
 }
 
@@ -73,7 +73,7 @@ fn ellipses_auto_both() {
             <mo>-</mo><mn>2</mn><mo>,</mo><mo>-</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>2</mn>
             <mo>,</mo><mi>…</mi>
        </math>";
-    test_ClearSpeak("ClearSpeak_Ellipses", "Auto", expr,
+    test_ClearSpeak("en", "ClearSpeak_Ellipses", "Auto", expr,
             "dot dot dot comma negative 2 comma negative 1 comma 0 comma 1 comma 2 comma dot dot dot");
 }
 
@@ -83,7 +83,7 @@ fn ellipses_and_so_on_start() {
             <mi>…</mi><mo>,</mo>
             <mo>-</mo><mn>2</mn><mo>,</mo><mo>-</mo><mn>1</mn><mo>,</mo><mn>0</mn>
         </math>";
-        test_ClearSpeak("ClearSpeak_Ellipses", "AndSoOn", expr, "dot dot dot comma negative 2 comma negative 1 comma 0");
+        test_ClearSpeak("en", "ClearSpeak_Ellipses", "AndSoOn", expr, "dot dot dot comma negative 2 comma negative 1 comma 0");
 }
 
 #[test]
@@ -97,7 +97,7 @@ fn ellipses_and_so_on_end() {
             <mo>,</mo>
             <mi>…</mi>
         </math>";
-    test_ClearSpeak("ClearSpeak_Ellipses", "AndSoOn", expr, "1 comma 2 comma 3 and so on");
+    test_ClearSpeak("en", "ClearSpeak_Ellipses", "AndSoOn", expr, "1 comma 2 comma 3 and so on");
 }
 
 #[test]
@@ -115,7 +115,7 @@ fn ellipses_and_so_on_middle() {
                 <mn>20</mn>
             </mrow>
         </math>";
-    test_ClearSpeak("ClearSpeak_Ellipses", "AndSoOn", expr,
+    test_ClearSpeak("en", "ClearSpeak_Ellipses", "AndSoOn", expr,
             "1 comma 2 comma 3 and so on up to 20");
 }
 
@@ -126,7 +126,7 @@ fn ellipses_and_so_on_both() {
             <mo>-</mo><mn>2</mn><mo>,</mo><mo>-</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>2</mn>
             <mo>,</mo><mi>…</mi>
        </math>";
-    test_ClearSpeak("ClearSpeak_Ellipses", "AndSoOn", expr,
+    test_ClearSpeak("en", "ClearSpeak_Ellipses", "AndSoOn", expr,
             "dot dot dot comma negative 2 comma negative 1 comma 0 comma 1 comma 2 comma dot dot dot");
 }
 
@@ -135,7 +135,7 @@ fn vertical_line_auto() {
     let expr = "<math>
         <mn>3</mn><mo>|</mo><mn>6</mn>
     </math>";
-    test_ClearSpeak("ClearSpeak_VerticalLine", "Auto", expr,
+    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Auto", expr,
             "3 divides 6");
 }
 
@@ -144,7 +144,7 @@ fn vertical_line_divides() {
     let expr = "<math>
         <mn>3</mn><mo>|</mo><mn>6</mn>
     </math>";
-    test_ClearSpeak("ClearSpeak_VerticalLine", "Divides", expr,
+    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Divides", expr,
             "3 divides 6");
 }
 
@@ -153,7 +153,7 @@ fn vertical_line_divides() {
         let expr = "<math>
             <mn>3</mn><mo>|</mo><mn>6</mn>
         </math>";
-        test_ClearSpeak("ClearSpeak_VerticalLine", "Given", expr,
+        test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Given", expr,
                 "3 given 6");
     }
 
@@ -171,7 +171,7 @@ fn vertical_line_divides() {
                     <mo>)</mo>
                 </mrow>
             </math>";
-        test_ClearSpeak_prefs(vec![("ClearSpeak_VerticalLine", "Given"), ("ClearSpeak_ImpliedTimes", "None")]
+        test_ClearSpeak_prefs("en", vec![("ClearSpeak_VerticalLine", "Given"), ("ClearSpeak_ImpliedTimes", "None")]
                         , expr, "P, open paren Eigh given B, close paren");
     }
 
@@ -188,7 +188,7 @@ fn vertical_line_set() {
         </mrow>
         <mo>}</mo>    
     </math>";
-    test_ClearSpeak("ClearSpeak_VerticalLine", "Auto", expr,
+    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Auto", expr,
             "the set of all x such that x is greater than 0");
 }
 
@@ -206,7 +206,7 @@ fn vertical_line_set_such_that() {
         </mrow>
         <mo>}</mo>    
     </math>";
-    test_ClearSpeak("ClearSpeak_VerticalLine", "SuchThat", expr,
+    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "SuchThat", expr,
             "the set of all x such that x is greater than 0");
 }
 
@@ -224,7 +224,7 @@ fn vertical_line_set_given() {
         <mo>}</mo>    
     </math>";
     // the rules for set will override all the options -- ClearSpeak spec should be clarified
-    test_ClearSpeak("ClearSpeak_VerticalLine", "Given", expr,
+    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Given", expr,
             "the set of all x such that x is greater than 0");
 }
 
@@ -245,7 +245,7 @@ fn vertical_line_set_and_abs() {
             </mrow>
             <mo>}</mo>
         </math>";
-    test_ClearSpeak("ClearSpeak_VerticalLine", "Auto", expr,
+    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Auto", expr,
         "the set of all x such that the absolute value of x; is greater than 2");
 }
 
@@ -267,7 +267,7 @@ fn vertical_line_evaluated_at() {
                 </mrow>
             </msub>
         </math>";
-    test_ClearSpeak("ClearSpeak_VerticalLine", "Auto", expr,
+    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Auto", expr,
         "f of x evaluated at x equals 5");
 }
 
@@ -286,7 +286,7 @@ fn vertical_line_evaluated_at_both() {
                 <mn>1</mn>
             </msubsup>
         </math>";
-    test_ClearSpeak("ClearSpeak_VerticalLine", "Auto", expr,
+    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Auto", expr,
         "x squared plus x, evaluated at 1 minus the same expression evaluated at 0");
 }
 #[test]
@@ -307,7 +307,7 @@ fn vertical_line_evaluated_at_divides() {
                 </mrow>
             </msub>
         </math>";
-    test_ClearSpeak("ClearSpeak_VerticalLine", "Divides", expr,
+    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Divides", expr,
         "f of x evaluated at x equals 5");
 }
 
@@ -326,6 +326,6 @@ fn vertical_line_evaluated_at_both_given() {
                 <mn>1</mn>
             </msubsup>
         </math>";
-    test_ClearSpeak("ClearSpeak_VerticalLine", "Given", expr,
+    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Given", expr,
         "x squared plus x, evaluated at 1 minus the same expression evaluated at 0");
 }

@@ -5,21 +5,21 @@ use crate::common::*;
 #[test]
 fn salt() {
   let expr = "<math><mi>Na</mi><mi>Cl</mi></math>";
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "N eigh, C l,");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "N eigh, C l,");
 }
 
 #[test]
 fn water() {
   let expr = "<math><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></math>";
-  test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr, "H, 2 O,");
-  test_prefs("ClearSpeak", vec![("Verbosity", "Medium")], expr, "H, sub 2 O,");
-  test_prefs("ClearSpeak", vec![("Verbosity", "Verbose")], expr, "H, subscript 2 O,");
+  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "H, 2 O,");
+  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "H, sub 2 O,");
+  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "H, subscript 2 O,");
 }
 
 #[test]
 fn carbon() {
   let expr = "<math><mi>C</mi></math>";     // not enough to trigger recognition
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "C");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "C");
 }
 
 #[test]
@@ -28,16 +28,16 @@ fn sulfate() {
           <mrow><mo>[</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>]</mo></mrow>
           <mrow><mn>2</mn><mo>&#x2212;</mo></mrow>
       </msup></mrow></math>";
-  test_prefs("ClearSpeak", vec![("Verbosity", "Medium")], expr, "open bracket, S, O, sub 4, close bracket super 2 minus");
+  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "open bracket, S, O, sub 4, close bracket super 2 minus");
 }
 
 #[test]
 fn aluminum_sulfate() {
   let expr = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
           <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
-  test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr, "Eigh l, 2, open S, O, 4, close 3");
-  test_prefs("ClearSpeak", vec![("Verbosity", "Medium")], expr, "Eigh l, sub 2, open paren, S, O, sub 4, close paren sub 3");
-  test_prefs("ClearSpeak", vec![("Verbosity", "Verbose")], expr, "Eigh l, subscript 2; open paren, S, O, subscript 4, close paren subscript 3");
+  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "Eigh l, 2, open S, O, 4, close 3");
+  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "Eigh l, sub 2, open paren, S, O, sub 4, close paren sub 3");
+  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "Eigh l, subscript 2; open paren, S, O, subscript 4, close paren subscript 3");
 }
 
 #[test]
@@ -54,7 +54,7 @@ fn ethanol_bonds() {
               <mi>H</mi>
           </mrow>
       </math>";
-  test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr, "C; H, 3 single bond; C; H, 2 single bond, O, H,");
+  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "C; H, 3 single bond; C; H, 2 single bond, O, H,");
 
 }
 
@@ -70,13 +70,13 @@ fn dichlorine_hexoxide() {
         <mo>-</mo>
       </msup>
     </mrow></math>";
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], 
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], 
     expr, "open bracket, C l, O, 2, close bracket plus; \
                           open bracket, C l, O, 4, close bracket minus");
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Medium")], 
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")], 
     expr, "open bracket, C l, O, sub 2, close bracket super plus; \
                           open bracket, C l, O, sub 4, close bracket super minus");
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Verbose")], 
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], 
     expr, "open bracket, C l, O, subscript 2, close bracket superscript plus; \
                           open bracket, C l, O, subscript 4, close bracket superscript minus");
 }
@@ -89,7 +89,7 @@ fn ethylene_with_bond() {
           <mo>=</mo>
           <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
       </mrow></math>";
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "H, 2, C, double bond, C, H, 2");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "H, 2, C, double bond, C, H, 2");
 }
 
 #[test]
@@ -99,7 +99,7 @@ fn ferric_chloride_aq() {
         <msub><mi>Cl</mi><mn>3</mn></msub>
         <mrow><mo>(</mo><mrow><mi>aq</mi></mrow><mo>)</mo></mrow>
     </mrow></math>";
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "F e, C l, 3 aqueous,");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "F e, C l, 3 aqueous,");
   }
 
 #[test]
@@ -109,7 +109,7 @@ fn ethylene_with_colon_bond() {
           <mo>::</mo>
           <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
       </mrow></math>";
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "H, 2, C, double bond, C, H, 2");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "H, 2, C, double bond, C, H, 2");
 }
 
 #[test]
@@ -139,11 +139,11 @@ fn beta_decay() {
         <mn>0</mn>
       </mmultiscripts>
     </math>";
-    test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr,
+    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse")], expr,
       "14, 6, C; decays to, 14, 7, N, plus 0, negative 1, e,");
-    test_prefs("ClearSpeak", vec![("Verbosity", "Medium")], expr,
+    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
       "super 14, sub 6, C; decays to; super 14, sub 7, N; plus super 0, sub negative 1, e,");
-    test_prefs("ClearSpeak", vec![("Verbosity", "Verbose")], expr,
+    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
       "superscript 14, subscript 6, C; decays to; superscript 14, subscript 7, N; plus, superscript 0, subscript negative 1, e,");
 }
 
@@ -403,11 +403,11 @@ fn mhchem_beta_decay() {
         </mrow>
       </mrow>
     </math>";
-    test_prefs("ClearSpeak", vec![("Verbosity", "Terse")], expr,
+    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse")], expr,
       "14, 6, C; decays to, 14, 7, N, plus 0, negative 1, e,");
-    test_prefs("ClearSpeak", vec![("Verbosity", "Medium")], expr,
+    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
       "super 14, sub 6, C; decays to; super 14, sub 7, N; plus super 0, sub negative 1, e,");
-    test_prefs("ClearSpeak", vec![("Verbosity", "Verbose")], expr,
+    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
       "superscript 14, subscript 6, C; decays to; superscript 14, subscript 7, N; plus, superscript 0, subscript negative 1, e,");
 }
 
@@ -420,7 +420,7 @@ fn hcl_na_yields() {
       <msub> <mi>H</mi> <mn>2</mn> </msub>
       </mrow>
     </math>";
-    test_prefs("SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
         "2 H, C l; plus 2 N eigh; yields; 2 N eigh, C l; plus H, subscript 2");
 }
 
@@ -466,9 +466,9 @@ fn mhchem_so4_2plus() {
       </msup>
     </mrow>
   </math>";
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")], expr, "S, O, 4, 2 plus,");
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Medium")], expr, "S; O, sub 4, super 2 plus,");
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "S; O, subscript 4, superscript 2 plus,");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "S, O, 4, 2 plus,");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "S; O, sub 4, super 2 plus,");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "S; O, subscript 4, superscript 2 plus,");
 }
 
 
@@ -555,7 +555,7 @@ fn mhchem_hcl_aq_etc() {
       <mo stretchy='false'>)</mo>
     </mrow>
   </math>";
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")],
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
       expr, "2, H, C l, aqueous; plus, 2, N eigh, solid; yields; 2, N eigh, C l, aqueous; plus H, 2, gas,");
 
 }
@@ -621,7 +621,7 @@ fn mhchem_barbed_equilibrium() {
       </mrow>
     </mrow>
   </math>";
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")],
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
       expr, "H, 2, gas; plus; I, 2, gas; is in equilibrium with, 2, H, I, gas,");
 }
 
@@ -650,7 +650,7 @@ fn mhchem_roman_in_superscript() {
         </mmultiscripts>
       </mrow>
     </math>";
-  test_prefs("SimpleSpeak", vec![("Verbosity", "Terse")],
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
       expr, "F e, 2, F e, 3, O, 4,");
 }
 

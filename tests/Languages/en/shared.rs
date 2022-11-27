@@ -18,7 +18,7 @@ fn modified_vars() {
         <mover> <mi>x</mi> <mo>^</mo> </mover> <mo>+</mo>
         <mover> <mi>t</mi> <mo>→</mo> </mover>
         </mrow> </math>";
-    test("SimpleSpeak", expr, 
+    test("en", "SimpleSpeak", expr, 
         "eigh grave, b tilde, c breve, b check, c grave; plus; \
             x dot, y dot, z double dot, u triple dot, v quadruple dot; plus x hat, plus vector t");
 }
@@ -37,7 +37,7 @@ fn limit() {
             </mfrac>
             </mrow>
         </math>";
-    test("SimpleSpeak", expr, "the limit as x approaches 0, of, fraction, sine of x, over x, end fraction;");
+    test("en", "SimpleSpeak", expr, "the limit as x approaches 0, of, fraction, sine of x, over x, end fraction;");
 }
 
 #[test]
@@ -51,33 +51,33 @@ fn limit_from_below() {
                 <mrow>  <mi>sin</mi>  <mo>&#x2061;</mo> <mi>x</mi> </mrow>
             </mrow>
         </math>";
-    test("SimpleSpeak", expr, "the limit as x approaches from below 0, of sine of x");
+    test("en", "SimpleSpeak", expr, "the limit as x approaches from below 0, of sine of x");
 }
 
 
 #[test]
 fn binomial_mmultiscripts() {
     let expr = "<math><mmultiscripts><mi>C</mi><mi>m</mi><none/><mprescripts/><mi>n</mi><none/></mmultiscripts></math>";
-    test("SimpleSpeak", expr, "n choose m");
+    test("en", "SimpleSpeak", expr, "n choose m");
 }
 
 
 #[test]
 fn permutation_mmultiscripts() {
     let expr = "<math><mmultiscripts><mi>P</mi><mi>k</mi><none/><mprescripts/><mi>n</mi><none/></mmultiscripts></math>";
-    test("SimpleSpeak", expr, "k permutations of n");
+    test("en", "SimpleSpeak", expr, "k permutations of n");
 }
 
 #[test]
 fn permutation_mmultiscripts_sup() {
     let expr = "<math><mmultiscripts><mi>P</mi><mi>k</mi><none/><mprescripts/><none/><mi>n</mi></mmultiscripts></math>";
-    test("SimpleSpeak", expr, "k permutations of n");
+    test("en", "SimpleSpeak", expr, "k permutations of n");
 }
 
 #[test]
 fn permutation_msubsup() {
     let expr = "<math><msubsup><mi>P</mi><mi>k</mi><mi>n</mi></msubsup></math>";
-    test("SimpleSpeak", expr, "k permutations of n");
+    test("en", "SimpleSpeak", expr, "k permutations of n");
 }
 
 #[test]
@@ -85,9 +85,9 @@ fn tensor_mmultiscripts() {
     let expr = "<math><mmultiscripts>
             <mi>R</mi> <mi>i</mi><none/> <none/><mi>j</mi> <mi>k</mi><none/> <mi>l</mi><none/> 
         </mmultiscripts></math>";
-    test_prefs("SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
             "R with 4 postscripts, subscript i superscript j subscript k subscript l");
-    test_prefs("SimpleSpeak", vec![("Verbosity", "Medium")], expr,
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
             "R with 4 postscripts, sub i super j sub k sub l");
 }
 
@@ -97,21 +97,21 @@ fn huge_num_mmultiscripts() {
             <mi>R</mi> <mi>i</mi><none/> <none/><mi>j</mi> <mi>k</mi><none/> <mi>l</mi><none/> <mi>m</mi><none/>
             <mprescripts/> <mi>I</mi><none/> <none/><mi>J</mi> <mi>K</mi><none/> <mi>L</mi><none/>
         </mmultiscripts></math>";
-    test_prefs("SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
             "R with 4 prescripts, pre-subscript I, pre-superscript J and alternating prescripts K none L none end prescripts and with 5 postscripts, subscript i superscript j subscript k subscript l and alternating scripts m none end scripts");
 }
 
 #[test]
 fn prime() {
     let expr = "<math> <msup><mi>x</mi><mo >&#x2032;</mo></msup> </math>";
-    test("SimpleSpeak", expr, "x prime,");
+    test("en", "SimpleSpeak", expr, "x prime,");
 }
 
 #[test]
 fn given() {
     let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
-    test("SimpleSpeak", expr, "P, open paren, Eigh vertical line B, close paren");
-    test("ClearSpeak", expr,  "P, open paren Eigh divides B, close paren");  // not good, but follows the spec
+    test("en", "SimpleSpeak", expr, "P, open paren, Eigh vertical line B, close paren");
+    test("en", "ClearSpeak", expr,  "P, open paren Eigh divides B, close paren");  // not good, but follows the spec
 }
 
 #[test]
@@ -129,7 +129,7 @@ fn simple_msubsup() {
             </msubsup>
             </mstyle>
         </math>";
-    test("ClearSpeak", expr, "x sub k to the i-th power");
+    test("en", "ClearSpeak", expr, "x sub k to the i-th power");
 }
 
 #[test]
@@ -150,7 +150,7 @@ fn presentation_mathml_in_semantics() {
             </annotation-xml>
         </semantics>
     </math>";
-    test("ClearSpeak", expr, "x sub k to the i-th power");
+    test("en", "ClearSpeak", expr, "x sub k to the i-th power");
 }
 
 #[test]
@@ -194,13 +194,13 @@ fn ignore_period() {
       </annotation-xml>
     </semantics>
   </math>";
-    test("SimpleSpeak", expr, "P, open paren, Eigh and B, close paren; equals; P, open paren, Eigh intersection B, close paren; equals, P of Eigh, P of B");
+    test("en", "SimpleSpeak", expr, "P, open paren, Eigh and B, close paren; equals; P, open paren, Eigh intersection B, close paren; equals, P of Eigh, P of B");
 }
 
 #[test]
 fn ignore_mtext_period() {
     let expr = "<math><mrow><mrow><mo>{</mo><mn>2</mn><mo>}</mo></mrow><mtext>.</mtext></mrow></math>";
-    test("SimpleSpeak", expr, "the set 2");
+    test("en", "SimpleSpeak", expr, "the set 2");
 }
 
 #[test]
@@ -237,7 +237,7 @@ fn ignore_comma() {
       </mstyle>
     </mrow>
 </math>";
-    test("SimpleSpeak", expr, "phi of x equals, c, e raised to the negative h squared x squared power");
+    test("en", "SimpleSpeak", expr, "phi of x equals, c, e raised to the negative h squared x squared power");
 }
 
 #[test]
@@ -245,38 +245,38 @@ fn ignore_comma() {
 fn ignore_period_and_space() {
     // from https://en.wikipedia.org/wiki/Probability
     let expr = "<math>
-    <mrow>
-      <mstyle displaystyle='true' scriptlevel='0'>
-        <mi>P</mi>
-        <mo stretchy='false'>(</mo>
-        <mi>A</mi>
-        <mo>∣<!-- ∣ --></mo>
-        <mi>B</mi>
-        <mo stretchy='false'>)</mo>
-        <mo>=</mo>
-        <mrow>
-          <mfrac>
-            <mrow>
-              <mi>P</mi>
-              <mo stretchy='false'>(</mo>
-              <mi>A</mi>
-              <mo>∩<!-- ∩ --></mo>
-              <mi>B</mi>
-              <mo stretchy='false'>)</mo>
-            </mrow>
-            <mrow>
-              <mi>P</mi>
-              <mo stretchy='false'>(</mo>
-              <mi>B</mi>
-              <mo stretchy='false'>)</mo>
-            </mrow>
-          </mfrac>
-        </mrow>
-        <mo>.</mo>
-        <mspace width='thinmathspace'></mspace>
-      </mstyle>
-    </mrow>
+      <mrow>
+        <mstyle displaystyle='true' scriptlevel='0'>
+          <mi>P</mi>
+          <mo stretchy='false'>(</mo>
+          <mi>A</mi>
+          <mo>∣<!-- ∣ --></mo>
+          <mi>B</mi>
+          <mo stretchy='false'>)</mo>
+          <mo>=</mo>
+          <mrow>
+            <mfrac>
+              <mrow>
+                <mi>P</mi>
+                <mo stretchy='false'>(</mo>
+                <mi>A</mi>
+                <mo>∩<!-- ∩ --></mo>
+                <mi>B</mi>
+                <mo stretchy='false'>)</mo>
+              </mrow>
+              <mrow>
+                <mi>P</mi>
+                <mo stretchy='false'>(</mo>
+                <mi>B</mi>
+                <mo stretchy='false'>)</mo>
+              </mrow>
+            </mfrac>
+          </mrow>
+          <mo>.</mo>
+          <mspace width='thinmathspace'></mspace>
+        </mstyle>
+      </mrow>
 </math>";
-    test("ClearSpeak", expr, "phi of x equals, c, e raised to the negative h squared x squared power");
+    test("en", "ClearSpeak", expr, "phi of x equals, c, e raised to the negative h squared x squared power");
 }
 

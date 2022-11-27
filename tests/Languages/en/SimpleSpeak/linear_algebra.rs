@@ -3,31 +3,31 @@ use crate::common::*;
 #[test]
 fn transpose() {
   let expr = "<math> <msup><mi>M</mi><mi>T</mi></msup> </math>";
-  test("SimpleSpeak", expr, "M transpose");
+  test("en", "SimpleSpeak", expr, "M transpose");
 }
 
 #[test]
 fn trace() {
   let expr = "<math> <mi>Tr</mi><mi>M</mi> </math>";
-  test("SimpleSpeak", expr, "trace of M");
+  test("en", "SimpleSpeak", expr, "trace of M");
 }
 
 #[test]
 fn dimension() {
   let expr = "<math> <mi>Dim</mi><mi>M</mi> </math>";
-  test("SimpleSpeak", expr, "dimension of M");
+  test("en", "SimpleSpeak", expr, "dimension of M");
 }
 
 #[test]
 fn homomorphism() {
   let expr = "<math> <mi>Hom</mi><mo>(</mo><mi>M</mi><mo>)</mo> </math>";
-  test("SimpleSpeak", expr, "homomorphism of M");
+  test("en", "SimpleSpeak", expr, "homomorphism of M");
 }
 
 #[test]
 fn kernel() {
   let expr = "<math> <mi>ker</mi><mrow><mo>(</mo><mi>L</mi><mo>)</mo></mrow> </math>";
-  test("SimpleSpeak", expr, "kernel of L");
+  test("en", "SimpleSpeak", expr, "kernel of L");
 }
 
 #[test]
@@ -40,7 +40,7 @@ fn norm() {
     </mrow>
 </math>
 ";
-  test("SimpleSpeak", expr, "norm of f");
+  test("en", "SimpleSpeak", expr, "norm of f");
 }
 
 #[test]
@@ -56,5 +56,5 @@ fn norm_subscripted() {
     </msub>
 </math>
 ";
-  test("SimpleSpeak", expr, "p norm of f");
+  test("en", "SimpleSpeak", expr, "p norm of f");
 }
