@@ -1,4 +1,9 @@
 {
+    "[yaml]": {
+        "editor.defaultFormatter": "kennylong.kubernetes-yaml-formatter",
+        "editor.autoIndent": "advanced",
+        "editor.formatOnSave": false
+      },
     "cSpell.words": [
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
         "ABEFHILM",
@@ -323,4 +328,14 @@
         "winapi"
     ],
     "editor.tabCompletion": "on",
+    "lldb.showDisassembly": "auto",
+    "lldb.dereferencePointers": true,
+    "lldb.consoleMode": "commands",
+    "yaml.completion": false,
+    "yaml.style.flowSequence": "allow",
+    "yaml.format.singleQuote": false,
+    "yaml.format.enable": false,
+    "includeDocumentStart": true,
+    "editor.tabSize": 4,
+    "editor.useTabStops": true,
 }
