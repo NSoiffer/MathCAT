@@ -1,0 +1,111 @@
+---
+
+- name: default
+  # The ordering below is the order in which words come out when there is more than one value
+  # Note: @notation can contain more than one value
+  tag: menclose
+  match: "."
+  replace:
+  - test:
+      if: ". [contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
+      then: [{T: kotak}, {pause: short}]
+  - test:
+      if: ".[contains(@notation,'roundedbox')]"
+      then: [{T: kotak bulat}, {pause: short}]
+  - test:
+      if: ".[contains(@notation,'circle')]"
+      then: [{T: lingkaran}, {pause: short}]
+  - test:
+      if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or contains(concat(' ', normalize-space(@notation), ' '), ' right ') or contains(@notation,'top') or contains(@notation,'bottom') ]"
+      then:
+      - T: baris aktif
+      - test:
+          if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
+          then: [{T: kiri}, {pause: short}]
+      - test:
+          if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"
+          then: [{T: kanan}, {pause: short}]
+      - test:
+          if: ".[contains(@notation,'top')]"
+          then: [{T: atas}, {pause: short}]
+      - test:
+          if: ".[contains(@notation,'bottom')]"
+          then: [{T: bawah}, {pause: short}]
+  - test:
+      if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
+      then:
+      - test:
+          if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
+          then: [{spell: x}, {pause: short}] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+          else:
+          - test:
+              if: ".[contains(@notation,'updiagonalstrike')]"
+              then: [{T: diagonal atas}, {pause: short}]
+          - test:
+              if: ".[contains(@notation,'downdiagonalstrike')]"
+              then: [{T: diagonal bawah}, {pause: short}]
+      - test:
+          if: ".[contains(@notation,'verticalstrike')]"
+          then: [{T: vertikal}, {pause: short}]
+      - test:
+          if: ".[contains(@notation,'horizontalstrike')]"
+          then: [{T: horizontal}, {pause: short}]
+      - T: mencoret
+      - pause: short
+  - test:
+      if: ".[contains(@notation,'uparrow')]"
+      then: [{T: panah atas}, {pause: short}]
+  - test:
+      if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
+      then: [{T: panah bawah}, {pause: short}]
+  - test:
+      if: ".[contains(@notation,'leftarrow')]"
+      then: [{T: panah kiri}, {pause: short}]
+  - test:
+      if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
+      then: [{T: panah kanan}, {pause: short}]
+  - test:
+      if: ".[contains(@notation,'northeastarrow')]"
+      then: [{T: panah timur laut}, {pause: short}]
+  - test:
+      if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
+      then: [{T: panah tenggara}, {pause: short}]
+  - test:
+      if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
+      then: [{T: panah barat daya}, {pause: short}]
+  - test:
+      if: ".[contains(@notation,'northwestarrow')]"
+      then: [{T: panah barat laut}, {pause: short}]
+  - test:
+      if: ".[contains(@notation,'updownarrow')]"
+      then: [{T: panah vertikal ujung ganda}, {pause: short}]
+  - test:
+      if: ".[contains(@notation,'leftrightarrow')]"
+      then: [{T: panah horizontal ujung ganda}, {pause: short}]
+  - test:
+      if: ".[contains(@notation,'northeastsouthwestarrow')]"
+      then: [{T: panah diagonal atas ujung ganda}, {pause: short}]
+  - test:
+      if: ".[contains(@notation,'northwestsoutheastarrow')]"
+      then: [{T: panah diagonal bawah ujung ganda}, {pause: short}]
+  - test:
+      if: ".[contains(@notation,'actuarial')]"
+      then: [{T: simbol aktuaria}, {pause: short}]
+  - test:
+      if: ".[contains(@notation,'madrub')]"
+      then: [{T: simbol faktorial arab}, {pause: short}]
+  - test:
+      if: ".[contains(@notation,'phasorangle')]"
+      then: [{T: sudut fasor}, {pause: short}]
+  - test:
+      if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']" # default
+      then: [{T: simbol pembagian panjang}, {pause: short}]
+  - test:
+      if: ".[contains(@notation,'radical')]"
+      then: [{T: akar pangkat dua}, {pause: short}]
+  - T: melampirkan
+  - x: "*"
+  - test:
+      if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
+      then: [{T: akhir penutup}]
+  - pause: short

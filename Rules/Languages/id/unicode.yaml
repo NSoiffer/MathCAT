@@ -1,0 +1,629 @@
+---
+- 'a':
+    - test:
+        if: "$TTS='none'"
+        then: [T: 'eigh'] # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
+        else: [spell: 'a'] #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
+- 'b-z':
+    - test:
+        if: "$TTS='none'"
+        then: [T: '.']
+        else: [spell: '.']
+
+- 'A':
+    - test:
+        if: "$TTS='none'"
+        then: [x: '$SpeechOverrides_CapitalLetters', T: 'eigh'] # long "a" sound in all speech engines I tested (see above)
+        else: [spell: 'A']
+
+- 'B-Z':
+    - test:
+        if: "$TTS='none'"
+        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
+        then:
+          [
+            x: '$SpeechOverrides_CapitalLetters',
+            x: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')",
+          ]
+        else: { spell: '.' }
+
+- '0-9': [T: '.']
+
+- '!': [T: faktorial] # 0x21
+- '"': [T: tanda kutip] # 0x22
+- '#': [T: tagar] # 0x23
+- '$': [T: dolar] # 0x24
+- '%': [T: persen] # 0x25
+- '&': [T: tanda dan] # 0x26
+- "'": [T: apostrof] # 0x27
+- '(': # 0x28
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then:
+          [
+            test:
+              {
+                if: "$Verbosity='Terse'",
+                then: [T: buka],
+                else: [T: buka kurung],
+              },
+          ]
+        else: [T: buka kurung]
+- ')': # 0x29
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then:
+          [
+            test:
+              {
+                if: "$Verbosity='Terse'",
+                then: [T: tutup],
+                else: [T: tutup kurung],
+              },
+          ]
+        else: [T: tutup kurung]
+
+- '*': [T: kali] # 0x2a
+- '+': [T: tambah] # 0x2b
+- ',': # 0x2c
+    # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
+    # that this test is here and not with "…" is not ideal, but seems simplest
+    test:
+      if:
+        - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or "
+          # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
+          # speak "comma" when not adjacent to '…'
+        - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
+          # except if expression starts with '…'
+        - " ../*[1][text()='…'] "
+      then: [T: '']
+      # else silent
+
+- '-': [T: kurang] # 0x2d
+- '.': # 0x2e
+    - test:
+        if: 'parent::*[1][self::m:mn]'
+        then: [T: 'poin']
+        else: [T: 'titik']
+- ',': #
+    - test:
+        if: 'parent::*[1][self::m:mn]'
+        then: [T: 'koma']
+        else: [T: 'koma']
+
+- '/': [T: per] # 0x2f
+- ':': [T: bagi] # 0x3a
+- ';': [T: titik koma] # 0x3b
+- '<': # 0x3c
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [T: '']
+    - T: kurang dari
+- '=': [T: sama dengan] # 0x3d
+- '>': # 0x3e
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [T: '']
+    - T: lebih besar dari
+- '?': [T: tanda tanya] # 0x3f
+- '@': [T: tanda at] # 0x40
+- '[': # 0x5b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: buka kurung siku]
+        else: [T: buka kurung siku]
+- "\\": [T: back slash] # 0x5c
+- ']': # 0x5d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: tutup kurung siku]
+        else: [T: tutup kurung siku]
+- '^': [T: hat] # 0x5e
+- '_': [T: garis bawah] # 0x5f
+- '`': [T: grave] # 0x60
+- '{': # 0x7b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: buka kurung kurawal]
+        else: [T: buka kurung kurawal]
+- '|': # 0x7c
+    # note: for ClearSpeak and SimpleSpeak, "|" in side of sets is handled at the mrow level, same for 'sets'
+    - test:
+        - if: $SpeechStyle != 'ClearSpeak'
+          then: [T: garis vertikal]
+        - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+          then: [T: sedemikian sehingga]
+        - else_if: "$ClearSpeak_VerticalLine = 'Given'"
+          then: [T: diberikan]
+        - else: [T: membagi]
+
+- '}': # 0x7d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: tutup kurung kurawal]
+        else: [T: tutup kurung kurawal]
+
+- '~': [T: tilda] # 0x7e
+- ' ': [T: ''] # 0xa0
+- '¢': [T: cent] # 0xa2
+- '£': [T: pound] # 0xa3
+- '¬': [T: not] # 0xac
+- '°': [T: 'derajat'] # 0xb0
+- '±': [T: tambah kurang] # 0xb1
+- '´': [T: 'akut'] # 0xb4
+- '·':
+    - test:
+        if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
+        then: [T: kali]
+        else: [T: titik]
+- '×': # 0xd7
+    - test:
+        if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
+        then: [T: kali]
+        else_test:
+          if: $ClearSpeak_MultSymbolX = 'By'
+          then: [T: dari]
+          else: [T: kali]
+- '÷': [T: dibagi dengan] # 0xf7
+- '̀': [T: grave accent embellishment] # 0x300
+- '́': [T: acute accent embellishment] # 0x301
+- '̂': [T: circumflex accent embellishment] # 0x302
+- '̃': [T: tilde embellishment] # 0x303
+- '̄': [T: macron embellishment] # 0x304
+- '̅': [T: overbar embellishment] # 0x305
+- '̆': [T: breve] # 0x306
+- '̇': [T: dot above embellishment] # 0x307
+- 'Α': # 0x391
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: alpha
+- 'Β': # 0x392
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: beta
+- 'Γ': # 0x393
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: gamma
+
+    # Note: ClearSpeak has pref TriangleSymbol for this character, but that is wrong
+- 'Δ': # 0x394
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: delta
+- 'Ε': # 0x395
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: epsilon
+- 'Ζ': # 0x396
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: zeta
+- 'Η': # 0x397
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: eta
+- 'Θ': # 0x398
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: theta
+- 'Ι': # 0x399
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: iota
+- 'Κ': # 0x39a
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: kappa
+- 'Λ': # 0x39b
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: lamda
+- 'Μ': # 0x39c
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: mu
+- 'Ν': # 0x39d
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: nu
+- 'Ξ': # 0x39e
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: zai
+- 'Ο': # 0x39f
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: omicron
+- 'Π': # 0x3a0
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: pi
+- 'Ρ': # 0x3a1
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: rho
+- 'Σ': # 0x3a3
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: sigma
+- 'Τ': # 0x3a4
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: tau
+- 'Υ': # 0x3a5
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: upsilon
+- 'Φ': # 0x3a6
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: phi
+- 'Χ': # 0x3a7
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: chi
+- 'Ψ': # 0x3a8
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: psi
+- 'Ω': # 0x3a9
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: omega
+- 'Ϊ': # 0x3aa
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: iota dengan dialitik
+- 'Ϋ': # 0x3ab
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: upsilon dengan dialitik
+- 'α': [T: alpha] # 0x3b1
+- 'β': [T: beta] # 0x3b2
+- 'γ': [T: gamma] # 0x3b3
+- 'δ': [T: delta] # 0x3b4
+- 'ε': [T: epsilon] # 0x3b5
+- 'ζ': [T: zeta] # 0x3b6
+- 'η': [T: eta] # 0x3b7
+- 'θ': [T: theta] # 0x3b8
+- 'ι': [T: iota] # 0x3b9
+- 'κ': [T: kappa] # 0x3ba
+- 'λ': [T: lamda] # 0x3bb
+- 'μ': [T: mu] # 0x3bc
+- 'ν': [T: nu] # 0x3bd
+- 'ξ': [T: zai] # 0x3be
+- 'ο': [T: omicron] # 0x3bf
+- 'π': [T: pi] # 0x3c0
+- 'ρ': [T: rho] # 0x3c1
+- 'ς': [T: final sigma] # 0x3c2
+- 'σ': [T: sigma] # 0x3c3
+- 'τ': [T: tau] # 0x3c4
+- 'υ': [T: upsilon] # 0x3c5
+- 'φ': [T: phi] # 0x3c6
+- 'χ': [T: chi] # 0x3c7
+- 'ψ': [T: psi] # 0x3c8
+- 'ω': [T: omega] # 0x3c9
+- 'ϕ': [T: phi] # 0x3d5
+- 'ϖ': [T: pi] # 0x3d6
+- 'ϵ': [T: epsilon] # 0x3f5
+- '϶': [T: epsilon terbalik] # 0x3f6
+- 'А': # 0x410
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: a
+- '–': [T: en dash] # 0x2013
+- '—': [T: em dash] # 0x2014
+- '―': [T: garis horizontal] # 0x2015
+- '‖': [T: garis vertikal ganda] # 0x2016
+- '•': [T: bullet] # 0x2022
+- '…': # 0x2026
+    test:
+      if:
+        - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
+          # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
+          # speak '…' as 'and so on...' unless expr starts with '…'
+        - "../*[1][text()='…']"
+      then: [T: titik titik titik]
+      else_test: # must have $ClearSpeak_Ellipses = 'AndSoOn'
+        if: 'count(following-sibling::*) = 0'
+        then: [T: dan seterusnya]
+        else: [T: dan seterusnya sampai]
+
+- '⁡': # 0x2061
+    - test:
+        if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])"
+        then: [T: '']
+- '⁢': [T: ''] # 0x2062
+- '⁣': [T: ''] # 0x2063
+- '⁤': [T: 'and'] # 0x2064
+- '′': [T: aksen] # 0x2032
+- '″': [T: aksen ganda] # 0x2033
+- '‴': [T: aksen rangkap tiga] # 0x2034
+- '‵': [T: aksen terbalik] # 0x2035
+- '‶': [T: aksen ganda terbalik] # 0x2036
+- '‷': [T: aksen rangkap tiga terbalik] # 0x2037
+- 'ℂ': # 0x2102
+    - T: double-struck
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: C
+- '℃': [T: derajat celsius] # 0x2103
+- '℉': [T: derajat fahrenheit] # 0x2109
+- 'ℋ': # 0x210b
+    - T: script
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: h
+- 'ℎ': [T: planck constant] # 0x210e
+- 'ℓ': [T: script l] # 0x2113
+- 'ℕ': # 0x2115
+    - T: double-struck
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: n
+- 'ℚ': # 0x211a
+    - T: double-struck
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: q
+- 'ℛ': # 0x211b
+    - T: script
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: r
+- 'ℜ': # 0x211c
+    - T: fraktur
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: r
+- 'ℝ': # 0x211d
+    - T: double-struck
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: r
+- 'ℤ': # 0x2124
+    - T: double-struck
+    - test:
+        if: "($Blind or $Verbosity!='Terse')"
+        then: [T: 'cap']
+    - T: z
+- 'Ω': [T: ohms] # 0x2126
+- 'K': [T: kelvin] # 0x212a
+- 'Å': [T: angstroms] # 0x212b
+- 'ⅆ': [T: double-struck italic D] # 0x2146
+- 'ⅇ': [T: double-struck italic E] # 0x2147
+- 'ⅈ': [T: double-struck italic I] # 0x2148
+- 'ⅉ': [T: double-struck italic J] # 0x2149
+- '←': [T: panah kiri] # 0x2190
+- '↑': [T: panah atas] # 0x2191
+- '→': # 0x2192
+    - test:
+        if: 'ancestor::*[2][self::m:limit]'
+        then: [T: 'mendekati']
+        else: [T: 'panah kanan']
+
+- '↓': [T: panah bawah] # 0x2193
+- '⇒': [T: panah kanan ganda] # 0x21d2
+- '∀': [T: untuk semua] # 0x2200
+- '∂': # 0x2202
+    - test:
+        if: "$Verbosity='Terse'"
+        then: { T: parsial }
+        else: { T: turunan parsial }
+- '∃': [T: ada] # 0x2203
+- '∄': [T: tidak ada] # 0x2204
+- '∅': [T: set kosong] # 0x2205
+- '∆': # 0x2206
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [T: '']
+    - T: laplacian dari
+- '∇': # 0x2207
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [T: '']
+    - T: gradien dari
+- '∈': # 0x2208
+    - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [T: sebuah elemen dari]
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+          if: '../../self::m:set or ../../../self::m:set' # inside a set
+          then_test:
+            - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+              then: [T: di]
+            - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+              then: [T: anggota dari]
+            - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+              then: [T: elemen dari]
+            - else: [T: milik] # $ClearSpeak_SetMemberSymbol = 'Belongs'
+          else_test:
+            - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+              then: [T: anggota dari]
+            - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+              then: [T: elemen dari]
+            - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+              then: [T: di]
+            - else: [T: milik] # $ClearSpeak_SetMemberSymbol = 'Belongs'
+- '∉': # 0x2209
+    # rule is identical to 0x2208
+    - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [T: bukan elemen dari]
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+          if: '../../self::m:set or ../../../self::m:set' # inside a set
+          then_test:
+            - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+              then: [T: tidak di]
+            - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+              then: [T: bukan anggota dari]
+            - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+              then: [T: bukan elemen dari]
+            - else: [T: bukan milik] # $ClearSpeak_SetMemberSymbol = 'Belongs'
+          else_test:
+            - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+              then: [T: bukan member dari]
+            - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+              then: [T: bukan elemen dari]
+            - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+              then: [T: tidak di]
+            - else: [T: bukan milik] # $ClearSpeak_SetMemberSymbol = 'Belongs'
+- '∊': # 0x220a
+    - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [T: bukan elemen dari]
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+          if: '../../self::m:set or ../../../self::m:set' # inside a set
+          then_test:
+            - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+              then: [T: di]
+            - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+              then: [T: anggota dari]
+            - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+              then: [T: elemen dari]
+            - else: [T: milik] # $ClearSpeak_SetMemberSymbol = 'Belongs'
+          else_test:
+            - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+              then: [T: anggota dari]
+            - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+              then: [T: elemen dari]
+            - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+              then: [T: ada di]
+            - else: [T: milik] # $ClearSpeak_SetMemberSymbol = 'Belongs'
+- '∏': [T: produk] # 0x220f
+- '∐': [T: produk sampingan] # 0x2210
+- '∑': [T: penjumlahan sigma] # 0x2211
+- '−': [T: kurang] # 0x2212
+- '∓': [T: kurang tambah] # 0x2213
+- '∗': [T: kali] # 0x2217
+- '∘': [T: disusun dengan] # 0x2218
+- '⋅': [T: kali] # 0x2219
+- '√': # 0x221a
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [T: '']
+    - T: akar kuadrat dari
+- '∝': # 0x221d
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [T: sebanding dengan]
+- '∞': [T: 'tak hingga'] # 0x221e
+- '∟': [T: sudut kanan] # 0x221f
+- '∠': [T: sudut] # 0x2220
+- '∡': [T: sudut terukur] # 0x2221
+- '∣': [T: membagi] # 0x2223
+- '∤': [T: tidak membagi] # 0x2224
+- '∥': # 0x2225
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [T: sejajar dengan]
+- '∦': # 0x2226
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [T: tidak sejajar dengan]
+- '∧': [T: dan] # 0x2227
+- '∨': [T: atau] # 0x2228
+- '∩': [T: irisan] # 0x2229
+- '∪': [T: himpunan] # 0x222a
+- '∫': [T: integral] # 0x222b
+- '∬': [T: integral ganda] # 0x222c
+- '∭': [T: integral rangkap tiga] # 0x222d
+- '∮': [T: integral kontur] # 0x222e
+- '∶': # 0x2236
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [T: ke]
+- '∷': [T: sebagai] # 0x2237
+- '∼': [T: bervariasi dengan] # 0x223c
+- '∽': [T: tilda terbalik] # 0x223d
+- '∾': # 0x223e
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [T: paling positif]
+- '∿': [T: gelombang sinus] # 0x223f
+- '≠': # 0x2260
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [T: tidak sama dengan]
+- '≡': # 0x2261
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: { T: identik dengan }
+- '≤': # 0x2264
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: { T: kurang dari atau sama dengan }
+- '≥': # 0x2265
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: { T: lebih besar dari atau sama dengan }
+- '≦': [T: kurang dari lebih sama dengan] # 0x2266
+- '≧': [T: lebih besar dari lebih sama dengan] # 0x2267
+- '≺': [T: mendahului] # 0x227a
+- '≻': [T: berhasil] # 0x227b
+- '⊂': # 0x2282
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: { T: himpunan bagian dari }
+- '⊃': # 0x2283
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: { T: superset dari }
+- '⊄': # 0x2284
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [T: bukan himpunan bagian dari]
+- '⊅': # 0x2285
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [T: bukan superset dari]
+- '⊆': # 0x2286
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: { T: himpunan bagian dari atau sama dengan }
+- '⊇': # 0x2287
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: { T: superset dari atau sama dengan }
+- '≈': # 0x2248
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: { T: mendekati }

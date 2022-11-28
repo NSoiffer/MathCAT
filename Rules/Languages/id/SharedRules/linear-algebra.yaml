@@ -1,0 +1,112 @@
+---
+- name: simple-determinant
+  tag: determinant
+  match: "not(*[1][self::m:mtr])"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: ''
+  - T: 'determinan'
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: 'dari'
+  - x: "*[1]"
+
+- name: norm
+  tag: norm
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: ''
+  - T: 'norma'
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: 'dari'
+  - x: "*[1]"
+
+- name: subscripted-norm
+  tag: subscripted-norm
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: ''
+  - x: "*[2]"
+  - T: 'norma'
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: 'dari'
+  - x: "*[1]"
+
+- name: transpose
+  tag: transpose
+  match: "."
+  replace:
+  - x: "*[1]"
+  - T: 'transpose'
+- name: trace
+  tag: trace
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: ''
+  - T: 'jejak'
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: 'dari'
+  - x: "*[1]"
+
+- name: dimension
+  tag: dimension
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: ''
+  - T: 'dimensi'
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: 'dari'
+  - x: "*[1]"
+
+- name: homomorphism
+  tag: homomorphism
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: ''
+  - T: 'homomorfisme'
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: 'dari'
+  - x: "*[1]"
+
+- name: kernel
+  tag: kernel
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: ''
+  - T: 'kernel'
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: 'dari'
+  - x: "*[1]"

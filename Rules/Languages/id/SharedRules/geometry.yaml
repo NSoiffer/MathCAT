@@ -1,0 +1,57 @@
+---
+- name: line-segment
+  tag: line-segment
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: 'segmen garis dari'
+      - x: "*[1]"
+      - T: 'ke'
+      - x: "*[2]"
+      else:
+      - T: 'segmen garis'
+      - x: "*[1]"
+      - x: "*[2]"
+
+- name: geometry-ray
+  tag: ray
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: 'sinar dari'
+      - x: "*[1]"
+      - T: 'ke'
+      - x: "*[2]"
+      else:
+      - T: 'ray'
+      - x: "*[1]"
+      - x: "*[2]"
+
+- name: geometry-arc
+  tag: arc
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [{T: ''}]
+  - T: 'busur'
+  - x: "*[1]"
+  - x: "*[2]"
+
+- name: measure-of-angle
+  tag: measure-of-angle
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: 'ukuran sudut'
+      else:
+      - T: 'ukuran sudut'
+  - x: "*[1]"
+  - x: "*[2]"
+  - x: "*[3]"
