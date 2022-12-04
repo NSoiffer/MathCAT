@@ -525,11 +525,6 @@ impl CanonicalizeContext {
 		// Note: this works bottom-up (clean the children first, then this element)
 		lazy_static! {
 			static ref IS_PRIME: Regex = Regex::new(r"['′″‴⁗]").unwrap(); 
-			
-			// turns out Roman Numerals tests aren't needed, but we do want to block VII from being a chemical match
-			// two cases because we don't want to have a match for 'Cl', etc.
-			static ref UPPER_ROMAN_NUMERAL: Regex = Regex::new(r"^\s*^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})\s*$").unwrap();
-			static ref LOWER_ROMAN_NUMERAL: Regex = Regex::new(r"^\s*^m{0,3}(cm|cd|d?c{0,3})(xc|xl|l?x{0,3})(ix|iv|v?i{0,3})\s*$").unwrap();
         }
 
 		static CURRENCY_SYMBOLS: phf::Set<&str> = phf_set! {
