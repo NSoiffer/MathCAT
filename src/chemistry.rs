@@ -322,7 +322,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
             return None;    // can't be an chemical letter
         }
         let chem_element = unsafe{ str::from_utf8_unchecked(&bytes_str[..n]) };
-        if CHEMICAL_ELEMENTS.contains( chem_element ) {
+        if CHEMICAL_ELEMENTS.contains_key( chem_element ) {
             return Some( new_chemical_element(doc, chem_element) );
         }
 
@@ -706,11 +706,12 @@ fn likely_chem_formula(mathml: Element) -> isize {
                 IsBracketed::is_bracketed(&mrow, "[", "]", false, false)) &&
                name(&as_element(mrow.children()[1]))  == "mrow" {
                 mrow = as_element(mrow.children()[1]);
-            } 
+            }
+
+            let mut likelihood = if is_order_ok(mrow) {0} else {-4};
 
             // check all the children and compute the likelihood of that this is a chemical formula
             // bonus point for consecutive chemical formula children (not counting invisible children)
-            let mut likelihood = 0;
             let mut last_was_likely_formula = 0;        // 0 is false, 1 is true
             for child in mrow.children() {
                 let child = as_element(child);
@@ -727,10 +728,11 @@ fn likely_chem_formula(mathml: Element) -> isize {
                     last_was_likely_formula = 0;
                     likelihood += likely;
                 }
-                // debug!("in likely_chem_formula likelihood={}, child\n{}", likelihood, mml_to_string(&child));
+                debug!("in likely_chem_formula likelihood={}, child\n{}", likelihood, mml_to_string(&child));
                 if likelihood < NOT_CHEMISTRY_THRESHOLD {
                     return NOT_CHEMISTRY;
                 }
+                debug!("likelihood={} (likely={})", likelihood, likely);
             }
 
             if likelihood <= NOT_CHEMISTRY {
@@ -761,7 +763,112 @@ fn likely_chem_formula(mathml: Element) -> isize {
             return NOT_CHEMISTRY;
         },
     }
+
 }
+
+/// This does some checks that sort of follow IUPAC's "Red Book" in section IR-4.4.
+/// Those rules require knowledge that the program doesn't have (e.g., which bond is closest to the central atom).
+/// Instead, we mainly use the two main types of orderings: alphabetical and electronegativity.
+/// We first do a test to see if this looks like a structural formula -- if so, ordering doesn't apply.
+/// If a formula has groupings, each grouping is checked independently of the rest since
+///   there are cases where the outer ordering doesn't match the inner ordering.
+/// For "generalized salts", we need to split the elements into positive and negative ions, and within each group
+///   the order is suppose to be alphabetical but many use electronegativity (the point being there are two separate groups).
+/// This site has a nice summary of the rules: https://chemistry.stackexchange.com/questions/537/why-is-arsenous-acid-denoted-h3aso3/538#538
+/// Note: "(OH)" doesn't fit with the above, so a special case is made for that.
+fn is_order_ok(mrow: Element) -> bool {
+    assert_eq!(name(&mrow), "mrow");
+    if is_structural(mrow) {
+        return true;
+    }
+    
+    let elements = collect_elements(mrow);
+    if elements.iter().any(|&e| !CHEMICAL_ELEMENTS.contains_key(e)) {
+        return false;
+    }
+    let n_elements = elements.len();
+    if n_elements < 2 {
+        return true;
+    } else if n_elements == 2 && elements[0] == "O" && elements[1] == "H" {
+        return true;    // special case "OH"
+    } else {
+        return !has_noble_element(&elements) &&
+                // has_non_metal_element(&elements) && !has_non_metal_element(&elements) &&    // must have a metal and non-metal
+                (is_alphabetical(&elements) || is_ordered_by_electronegativity(&elements) || is_generalized_salt(&elements));
+    }
+}
+
+// from https://learnwithdrscott.com/ionic-bond-definition/
+// I don't include the noble gases since they don't interact with other elements and are ruled out elsewhere
+// fn has_non_metal_element(elements: &[&str]) -> bool {
+//     static NON_METAL_ELEMENTS: phf::Set<&str> = phf_set! {
+//         "H", "B", "C", "N", "O", "F", "Si", "P", "S", "Cl", "As", "Se", "Br", "Te", "I", "At",
+//     };
+//     return elements.iter().any(|&e| NON_METAL_ELEMENTS.contains(e));
+// }
+
+
+fn has_noble_element(elements: &[&str]) -> bool {
+    static NOBLE_ELEMENTS: phf::Set<&str> = phf_set! {
+        "He", "Ne", "Ar", "Kr", "Xe", "Rn", "Og" // Og might be reactive, but it is unstable
+    };
+    return elements.iter().any(|&e| NOBLE_ELEMENTS.contains(e));
+}
+
+
+fn is_structural(mrow: Element) -> bool {
+    // FIX: implement
+    assert_eq!(name(&mrow), "mrow");
+    return false;
+}
+
+fn collect_elements<'a>(mrow: Element<'a>) -> Vec<&'a str> {
+    let mut elements = Vec::with_capacity(mrow.children().len()/2+1);       // don't bother with slots for operators
+    for child in mrow.children() {
+        let child = as_element(child);
+        match name(&child) {
+            "mi" | "mtext" => elements.push(as_text(child)),
+            "msub" | "msup" => {
+                let base = as_element(child.children()[0]);
+                let base_name = name(&base);
+                if base_name == "mi" || base_name == "mtext" {
+                    elements.push(as_text(base));
+                }   // else skip and let recursive likely_chem_formula call check the contents
+            },
+            _ => (),    // let loop in likely_chem_formula() deal with all the negatives
+        }
+    }
+    return elements;
+}
+
+/// check to make sure elements are ordered alphabetically
+/// Actually check Hill's system that puts 'C' followed by 'H' first if 'C' is present
+fn is_alphabetical(elements: &[&str]) -> bool {
+    assert!(!elements.is_empty());
+    if elements.len() == 1 {
+        return true;    // trivially sorted
+    }
+    debug!("elements: {:?}", elements);
+    let mut elements = elements;
+    if elements[1..].iter().any(|&e| e=="C") {  // "C" must be first if present
+        return false;
+    }
+    if elements[0] == "C" {
+        elements = if elements[1]=="H" {&elements[2..]} else {&elements[1..]};
+    }
+    return elements.len() < 2 || elements.windows(2).all(|pair| pair[0] < pair[1]);
+}
+
+fn is_ordered_by_electronegativity(elements: &[&str]) -> bool {
+    assert!(!elements.is_empty());
+    return elements.len() < 2 || elements.windows(2).all(|pair| CHEMICAL_ELEMENTS.get(pair[0]).unwrap() < CHEMICAL_ELEMENTS.get(pair[1]).unwrap());
+}
+
+fn is_generalized_salt(elements: &[&str]) -> bool {
+    assert!(!elements.is_empty());
+    return false;
+}
+
 
 /// Returns the likelihood that the arg is an adorned chem formula
 /// Adornments are:
@@ -1030,22 +1137,29 @@ pub fn likely_chem_element(mathml: Element) -> isize {
     }
 }
 
-
-static CHEMICAL_ELEMENTS: phf::Set<&str> = phf_set! {
-	"Ac", "Ag", "Al", "Am", "Ar", "As", "At", "Au", "B", "Ba", "Be", "Bh", "Bi", "Bk", "Br",
-	"C", "Ca", "Cd", "Ce", "Cf", "Cl", "Cm", "Cn", "Co", "Cr", "Cs", "Cu", "Db", "Ds", "Dy", 
-	"Er", "Es", "Eu", "F", "Fe", "Fl", "Fm", "Fr", "Ga", "Gd", "Ge",
-	"H", "He", "Hf", "Hg", "Ho", "Hs", "I", "In", "Ir", "K", "Kr",
-	"La", "Li", "Lr", "Lu", "Lv", "Mc", "Md", "Mg", "Mn", "Mo", "Mt", 
-	"N", "Na", "Nb", "Nd", "Ne", "Nh", "Ni", "No", "Np", "O", "Og", "Os", 
-	"P", "Pa", "Pb", "Pd", "Pm", "Po", "Pr", "Pt", "Pu",
-	"Ra", "Rb", "Re", "Rf", "Rg", "Rh", "Rn", "Ru", 
-	"S", "Sb", "Sc", "Se", "Sg", "Si", "Sm", "Sn", "Sr",
-	"Ta", "Tb", "Tc", "Te", "Th", "Ti", "Tl", "Tm", "Ts", 
-	"U", "V", "W", "Xe", "Y", "Yb", "Zn", "Zr",
+/// A map of chemical elements and their relative IUPAC electronegativity (https://i.stack.imgur.com/VCSzW.png)
+/// That list is only 85 elements and leaves out much of the Lanthanide and Actinide Series.
+/// https://i0.wp.com/chemistry.com.pk/wp-content/uploads/2018/09/electronegativity-chart.jpg?fit=1697%2C1117&ssl=1 gives more
+///   electronegativity values and they are added here (values in the 100s) and a values above pushed into the 200s.
+///   The missing values range from 1.1 to 1.38 and fall between Ca (1.00) and Ti 
+static CHEMICAL_ELEMENTS: phf::Map<&str, u32> = phf_map! {
+	"Ac" => 20, "Ag" => 255, "Al" => 263, "Am" => 133, "Ar" => 4, "As" => 272, "At" => 281, "Au" => 254,
+    "B" => 264, "Ba" => 14, "Be" => 18, "Bh" => 237, "Bi" => 270, "Bk" => 135, "Br" => 283,
+	"C" => 269, "Ca" => 16, "Cd" => 258, "Ce" => 111, "Cf" => 136, "Cl" => 284, "Cm" => 134, "Cn" => 170, "Co" => 248, "Cr" => 236, "Cs" => 8, "Cu" => 256,
+    "Db" => 159, "Ds" => 249, "Dy" => 124, 
+	"Er" => 126, "Es" => 137, "Eu" => 120, "F" => 285, "Fe" => 244, "Fl" => 200, "Fm" => 138, "Fr" => 7, "Ga" => 262, "Gd" => 121, "Ge" => 267,
+	"H" => 275, "He" => 6, "Hf" => 141, "Hg" => 257, "Ho" => 125, "Hs" => 241, "I" => 282, "In" => 261, "Ir" => 246, "K" => 10, "Kr" => 3,
+	"La" => 22, "Li" => 12, "Lr" => 19, "Lu" => 21, "Lv" => 200, "Mc" => 200, "Md" => 139, "Mg" => 17, "Mn" => 240, "Mo" => 235, "Mt" => 245, 
+	"N" => 274, "Na" => 11, "Nb" => 231, "Nd" => 116, "Ne" => 5, "Nh" => 200, "Ni" => 252, "No" => 140, "Np" => 145, "O" => 280, "Og" => 8, "Os" => 242, 
+	"P" => 273, "Pa" => 147, "Pb" => 265, "Pd" => 251, "Pm" => 115, "Po" => 276, "Pr" => 113, "Pt" => 250, "Pu" => 129,
+	"Ra" => 13, "Rb" => 9, "Re" => 238, "Rf" => 155, "Rg" => 253, "Rh" => 247, "Rn" => 1, "Ru" => 243, 
+	"S" => 279, "Sb" => 271, "Sc" => 154, "Se" => 278, "Sg" => 233, "Si" => 268, "Sm" => 117, "Sn" => 266, "Sr" => 15,
+	"Ta" => 230, "Tb" => 123, "Tc" => 239, "Te" => 277, "Th" => 132, "Ti" => 158, "Tl" => 260, "Tm" => 127, "Ts" => 200, 
+	"U" => 146, "V" => 232, "W" => 234, "Xe" => 2, "Y" => 23, "Yb" => 110, "Zn" => 259, "Zr" => 143,
     // The following come from E.A. Moore who said to treat them like chemicals 
     // These stand for methyl, ethyl, alkyl, acetyl and phenyl and apparently are quite commonly used ("Ac" is already a chemical)
-    "Me", "Et", "R", /* "Ac", */ "Ph",
+    // FIX:
+    "Me" => 130, "Et" => 130, "R" => 130, /* "Ac" => 130, */ "Ph" => 130,
 };
 
 pub fn is_chemical_element(node: Element) -> bool {
@@ -1056,7 +1170,7 @@ pub fn is_chemical_element(node: Element) -> bool {
 	}
 
 	let text = as_text(node);
-	return CHEMICAL_ELEMENTS.contains(text);
+	return CHEMICAL_ELEMENTS.contains_key(text);
 }
 
 
@@ -1065,6 +1179,114 @@ mod chem_tests {
 	#[allow(unused_imports)]
 	use super::super::init_logger;
 	use super::super::are_strs_canonically_equal;
+    use super::*;
+
+    fn parse_mathml_string<F>(test: &str, test_mathml: F) -> bool
+            where F: Fn(Element) -> bool {
+        use sxd_document::parser;
+        use crate::interface::{get_element, trim_element};
+
+        let new_package = parser::parse(&test);    
+        if let Err(e) = new_package {
+            panic!("Invalid MathML input:\n{}\nError is: {}", &test, &e.to_string());
+        }
+
+        let new_package = new_package.unwrap();
+        let mathml = get_element(&new_package);
+        trim_element(&mathml);
+        return test_mathml(mathml);
+    }
+
+    #[test]
+    fn test_noble_element() {
+        // mathml test strings need to be canonical MathML since we aren't testing canonicalize()
+        let test = "<mrow> <mi>Na</mi> <mo>&#x2063;</mo> <mi>Cl</mi> </mrow>"; // 
+        assert!( !parse_mathml_string(test, |mathml| has_noble_element( &collect_elements(mathml))) );
+        let test = "<mrow> <mi>Ar</mi> <mo>&#x2063;</mo> <mi>Cl</mi> </mrow>"; // 
+        assert!( parse_mathml_string(test, |mathml| has_noble_element( &collect_elements(mathml))) );
+        let test = "<mrow> <mi>Ne</mi> </mrow>"; // 
+        assert!( parse_mathml_string(test, |mathml| has_noble_element( &collect_elements(mathml))) );
+    }
+
+    #[test]
+    fn test_alphabetical_order() {
+        // mathml test strings need to be canonical MathML since we aren't testing canonicalize()
+        let test = r#"<mrow>  
+            <msub><mi>C</mi><mn>6</mn></msub><mo>&#x2063;</mo> 
+            <msub><mi>H</mi><mn>14</mn></msub>
+             </mrow>"#;
+        assert!( parse_mathml_string(test, |mathml| is_alphabetical( &collect_elements(mathml))) );
+        let test = r#"<mrow>  
+             <msub><mi>C</mi><mn>6</mn></msub><mo>&#x2063;</mo> 
+             <msub><mi>H</mi><mn>12</mn></msub><mo>&#x2063;</mo>
+             <msub><mi>O</mi><mn>6</mn></msub>
+              </mrow>"#;
+        assert!( parse_mathml_string(test, |mathml| is_alphabetical( &collect_elements(mathml))) );
+        let test = "<mrow> <mi>B</mi> <mo>&#x2063;</mo> <mi>C</mi> <mo>&#x2063;</mo> <mi>O</mi></mrow>"; // "C" should be first
+        assert!( !parse_mathml_string(test, |mathml| is_alphabetical( &collect_elements(mathml))) );
+        let test = "<mrow> <mi>P</mi> <mo>&#x2063;</mo> <mi>B</mi> <mo>&#x2063;</mo> <mi>O</mi></mrow>"; // not alphabetical
+        assert!( !parse_mathml_string(test, |mathml| is_alphabetical( &collect_elements(mathml))) );
+    }
+
+
+    #[test]
+    fn test_electronegativity_order() {
+        // mathml test strings need to be canonical MathML since we aren't testing canonicalize()
+        let test = r#"<mrow>  
+            <mi>N</mi><mo>&#x2063;</mo> 
+            <msub><mi>H</mi><mn>3</mn></msub>
+             </mrow>"#;
+        assert!( parse_mathml_string(test, |mathml| is_ordered_by_electronegativity( &collect_elements(mathml))) );
+        let test = r#"<mrow>  
+            <mi>O</mi><mo>&#x2063;</mo> 
+            <msub><mi>F</mi><mn>2</mn></msub>
+             </mrow>"#;
+        assert!( parse_mathml_string(test, |mathml| is_ordered_by_electronegativity( &collect_elements(mathml))) );
+        let test = r#"<mrow>  
+            <msub><mi>Rb</mi><mn>15</mn></msub><mo>&#x2063;</mo> 
+            <msub><mi>Hg</mi><mn>16</mn></msub>
+             </mrow>"#;
+        assert!( parse_mathml_string(test, |mathml| is_ordered_by_electronegativity( &collect_elements(mathml))) );
+        let test = r#" 
+            <msup>
+                <mo>[</mo>
+                    <mi>Si</mi><mo>&#x2063;</mo> 
+                    <msub><mi>As</mi><mn>4</mn></msub>
+                <mo>]</mo>
+                <mrow><mn>8</mn><mo>-</mo></mrow>
+            </msup>"#;
+        assert!( parse_mathml_string(test, |mathml| is_ordered_by_electronegativity( &collect_elements(mathml))) );
+        let test = r#"<mrow>  
+                <mi>Si</mi><mo>&#x2063;</mo> 
+                <msub><mi>H</mi><mn>2</mn></msub>
+                <mi>Br</mi><mo>&#x2063;</mo> 
+                <mi>Cl</mi>
+                </mrow>"#;
+        assert!( parse_mathml_string(test, |mathml| is_ordered_by_electronegativity( &collect_elements(mathml))) );
+    }
+
+    #[test]
+    fn test_order() {
+        let test = r#"<mrow>  
+            <msub><mi>C</mi><mn>2</mn></msub><mo>&#x2063;</mo> 
+            <msub><mi>H</mi><mn>4</mn></msub><mo>&#x2063;</mo>
+            <msub><mrow> <mo>(</mo><mi>N</mi> <mo>&#x2063;</mo> <msub> <mi>H</mi> <mn>2</mn> </msub><mo>)</mo> </mrow><mn>2</mn></msub>
+             </mrow>"#;
+        assert!( parse_mathml_string(test, |mathml| is_order_ok(mathml)) );
+        let test = r#"<mrow>
+            <mi>Fe</mi><mo>&#x2063;</mo> 
+            <mi>O</mi><mo>&#x2063;</mo> 
+            <mrow> <mo>(</mo><mrow><mi>O</mi> <mo>&#x2063;</mo><mi>H</mi> </mrow><mo>)</mo> </mrow>
+             </mrow>"#;
+        assert!( parse_mathml_string(test, |mathml| is_order_ok(mathml)) );
+        let test = r#"<mrow>  // R-4.4.3.3 -- Chain compound doesn't fit rules but should be accepted
+                <mi>Br</mi><mo>&#x2063;</mo> 
+                <mi>S</mi><mo>&#x2063;</mo> 
+                <mi>C</mi><mo>&#x2063;</mo> 
+                <mi>N</mi>
+                </mrow>"#;
+        assert!( parse_mathml_string(test, |mathml| likely_chem_formula(mathml)==4) );
+    }
 
     #[test]
     fn split_mi() {
