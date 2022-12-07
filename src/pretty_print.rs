@@ -30,7 +30,7 @@ pub fn format_element(e: &Element, indent: usize) -> String {
     let mut answer = format!("{:in$}<{ns}{name}{attrs}>", " ", in=2*indent, ns=namespace, name=e.name().local_part(), attrs=format_attrs(&e.attributes()));
     let children = e.children();
     let has_element = children.iter().find(|&&c| matches!(c, ChildOfElement::Element(_x)));
-    if has_element == None {
+    if has_element.is_none() {
         // print text content
         let content = children.iter()
                 .map(|c| if let ChildOfElement::Text(t) = c {t.text()} else {""})

@@ -120,7 +120,7 @@ pub fn get_spoken_text() -> Result<String> {
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
-        let mathml = get_element(&*package_instance);
+        let mathml = get_element(&package_instance);
         let new_package = Package::new();
         let intent = crate::speech::intent_from_mathml(mathml, new_package.as_document())?;
         debug!("Intent tree:\n{}", mml_to_string(&intent));
@@ -138,7 +138,7 @@ pub fn get_overview_text() -> Result<String> {
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
-        let mathml = get_element(&*package_instance);
+        let mathml = get_element(&package_instance);
         let speech = crate::speech::overview_mathml(mathml)?;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( speech );
@@ -264,7 +264,7 @@ pub fn get_braille(nav_node_id: String) -> Result<String> {
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
-        let mathml = get_element(&*package_instance);
+        let mathml = get_element(&package_instance);
         let braille = crate::braille::braille_mathml(mathml, nav_node_id)?;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( braille );
@@ -277,7 +277,7 @@ pub fn get_braille(nav_node_id: String) -> Result<String> {
 pub fn do_navigate_keypress(key: usize, shift_key: bool, control_key: bool, alt_key: bool, meta_key: bool) -> Result<String> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
-        let mathml = get_element(&*package_instance);
+        let mathml = get_element(&package_instance);
         return do_mathml_navigate_key_press(mathml, key, shift_key, control_key, alt_key, meta_key);
     });
 }
@@ -323,7 +323,7 @@ pub fn do_navigate_command(command: String) -> Result<String> {
     let command = *command.unwrap();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
-        let mathml = get_element(&*package_instance);
+        let mathml = get_element(&package_instance);
         return do_navigate_command_string(mathml, command);
     });
 }
@@ -334,7 +334,7 @@ pub fn do_navigate_command(command: String) -> Result<String> {
 pub fn get_navigation_mathml() -> Result<(String, usize)> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
-        let mathml = get_element(&*package_instance);
+        let mathml = get_element(&package_instance);
         return NAVIGATION_STATE.with(|nav_stack| {
             return match nav_stack.borrow_mut().get_navigation_mathml(mathml) {
                 Err(e) => Err(e),
@@ -350,7 +350,7 @@ pub fn get_navigation_mathml() -> Result<(String, usize)> {
 pub fn get_navigation_mathml_id() -> Result<(String, usize)> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
-        let mathml = get_element(&*package_instance);
+        let mathml = get_element(&package_instance);
         return Ok( NAVIGATION_STATE.with(|nav_stack| {
             return nav_stack.borrow().get_navigation_mathml_id(mathml);
         }) )
@@ -412,7 +412,7 @@ pub fn get_element(package: &Package) -> Element {
     let mut result = None;
     for root_child in doc.root().children() {
         if let ChildOfRoot::Element(e) = root_child {
-           assert!(result == None);
+           assert!(result.is_none());
            result = Some(e);
         }
     };

@@ -1163,7 +1163,7 @@ impl SpeechPattern  {
                     })?
                 } );
             // get the array of rules for the tag name
-            let rule_value = rules.rules.entry(tag_name).or_insert( Vec::new());
+            let rule_value = rules.rules.entry(tag_name).or_default();
 
             // if the name exists, replace it. Otherwise add the new rule
             match rule_value.iter().enumerate().find(|&pattern| pattern.1.pattern_name == speech_pattern.pattern_name) {
@@ -2001,7 +2001,7 @@ impl SpeechRules {
         let unicode_file_contents = read_to_string_shim(&path)?;
         let unicode_build_fn = |unicode_def_list: &Yaml| {
             let unicode_defs = unicode_def_list.as_vec();
-            if unicode_defs == None {
+            if unicode_defs.is_none() {
                 bail!("File '{}' does not begin with an array", yaml_to_type(unicode_def_list));
             };
             for unicode_def in unicode_defs.unwrap() {
