@@ -1130,7 +1130,7 @@ mod tests {
           </mtr>
           <mtr id='nav-9' data-id-added='true'>
             <mtd id='nav-10' data-id-added='true'>
-              <mrow data-changed='added' id='nav-11' data-id-added='true'>
+              <mrow id='nav-11' data-id-added='true'>
                 <mi id='nav-12' data-id-added='true'>x</mi>
                 <mo id='nav-13' data-id-added='true'>-</mo>
                 <mi id='nav-14' data-id-added='true'>y</mi>
@@ -1153,9 +1153,9 @@ mod tests {
           </mtr>
           <mtr id='nav-28' data-id-added='true'>
             <mtd id='nav-29' data-id-added='true'>
-              <mrow data-changed='added' id='nav-30' data-id-added='true'>
+              <mrow id='nav-30' data-id-added='true'>
                 <mi id='nav-31' data-id-added='true'>sin</mi>
-                <mo data-changed='added' id='nav-32' data-id-added='true'>&#x2061;</mo>
+                <mo id='nav-32' data-id-added='true'>&#x2061;</mo>
                 <mi id='nav-33' data-id-added='true'>x</mi>
               </mrow>
             </mtd>
@@ -1166,7 +1166,7 @@ mod tests {
               </msup>
             </mtd>
             <mtd id='nav-38' data-id-added='true'>
-              <mrow data-changed='added' id='nav-39' data-id-added='true'>
+              <mrow id='nav-39' data-id-added='true'>
                 <mn id='nav-40' data-id-added='true'>2</mn>
                 <mo id='nav-41' data-id-added='true'>-</mo>
                 <mi id='nav-42' data-id-added='true'>y</mi>
@@ -1211,7 +1211,7 @@ mod tests {
           </mtr>
           <mtr id='nav-9' data-id-added='true'>
             <mtd id='nav-10' data-id-added='true'>
-              <mrow data-changed='added' id='nav-11' data-id-added='true'>
+              <mrow id='nav-11' data-id-added='true'>
                 <mi id='nav-12' data-id-added='true'>x</mi>
                 <mo id='nav-13' data-id-added='true'>-</mo>
                 <mi id='nav-14' data-id-added='true'>y</mi>
@@ -1234,9 +1234,9 @@ mod tests {
           </mtr>
           <mtr id='nav-28' data-id-added='true'>
             <mtd id='nav-29' data-id-added='true'>
-              <mrow data-changed='added' id='nav-30' data-id-added='true'>
+              <mrow id='nav-30' data-id-added='true'>
                 <mi id='nav-31' data-id-added='true'>sin</mi>
-                <mo data-changed='added' id='nav-32' data-id-added='true'>&#x2061;</mo>
+                <mo id='nav-32' data-id-added='true'>&#x2061;</mo>
                 <mi id='nav-33' data-id-added='true'>x</mi>
               </mrow>
             </mtd>
@@ -1247,7 +1247,7 @@ mod tests {
               </msup>
             </mtd>
             <mtd id='nav-38' data-id-added='true'>
-              <mrow data-changed='added' id='nav-39' data-id-added='true'>
+              <mrow id='nav-39' data-id-added='true'>
                 <mn id='nav-40' data-id-added='true'>2</mn>
                 <mo id='nav-41' data-id-added='true'>-</mo>
                 <mi id='nav-42' data-id-added='true'>y</mi>

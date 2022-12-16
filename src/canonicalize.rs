@@ -21,9 +21,9 @@ use crate::chemistry::*;
 const DECIMAL_SEPARATOR: &str = ".";
 pub const CHANGED_ATTR: &str = "data-changed";
 pub const ADDED_ATTR_VALUE: &str = "added";
+const MFENCED_ATTR_VALUE: &str = "from_mfenced";
 // character to use instead of the text content for priority, etc.
-pub const OPERATOR_OVERRIDE: &str ="data-operator";
-pub const HIGH_PRIORITY_OPERATOR: &str = "\u{F8FF}";	// this should be in-sync with last value in "operator-info.in"
+pub const CHEMICAL_BOND: &str ="data-chemical-bond";
 
 /// Used when mhchem is detected and we should favor postscripts rather than prescripts in constructing an mmultiscripts
 const MHCHEM_MMULTISCRIPTS_HACK: &str = "MHCHEM_SCRIPT_HACK";
@@ -61,6 +61,10 @@ lazy_static!{
 	// IMPLIED_SEPARATOR_HIGH_PRIORITY -- used for Geometry points like ABC
 	static ref IMPLIED_SEPARATOR_HIGH_PRIORITY: OperatorInfo = OperatorInfo{
 		op_type: OperatorTypes::INFIX, priority: 901, next: &None
+	};
+	// IMPLIED_CHEMICAL_BOND -- used for implicit and explicit bonds
+	static ref IMPLIED_CHEMICAL_BOND: OperatorInfo = OperatorInfo{
+		op_type: OperatorTypes::INFIX, priority: 905, next: &None
 	};
 	static ref IMPLIED_PLUS_SLASH_HIGH_PRIORITY: OperatorInfo = OperatorInfo{	// (linear) mixed fraction 2 3/4
 		op_type: OperatorTypes::INFIX, priority: 881, next: &None
@@ -129,7 +133,7 @@ impl<'op> OperatorPair<'op> {
 	fn new() -> OperatorPair<'op> {
 		return OperatorPair{
 			ch: "illegal",					// value 'illegal' used only in debugging, if then
-			op: *ILLEGAL_OPERATOR_INFO,		// ILLEGAL_OPERATOR_INFO avoids using <Option>
+			op: &ILLEGAL_OPERATOR_INFO,		// ILLEGAL_OPERATOR_INFO avoids using <Option>
 		};
 	}
 }
@@ -320,6 +324,36 @@ pub fn set_mathml_name(element: Element, new_name: &str) {
 	element.set_name(QName::with_namespace_uri(Some("http://www.w3.org/1998/Math/MathML"), new_name));
 }
 
+pub fn replace_children<'a>(mathml: Element<'a>, replacements: Vec<Element<'a>>) -> Element<'a> {
+	// replace the children of the parent (must exist since this only happens for leaves) with the new children
+	if replacements.len() == 1 {
+		// rather than replace the children, the children are already in place, so we can optimize a little
+		add_attrs(mathml, replacements[0].attributes());
+		return mathml;
+	}
+
+	let parent = mathml.parent().unwrap().element().unwrap();
+	if ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(name(&parent)) {
+		// make sure that MAYBE_CHEMISTRY is set since we aren't using the new element directly
+		add_attrs(mathml, replacements[0].attributes());
+
+		// wrap in an mrow
+		let mrow = create_mathml_element(&mathml.document(), "mrow");
+		mrow.append_children(replacements);
+		return mathml;
+	} else {
+		// replace the children of the parent with 'replacements' inserted in place of 'mathml'
+		let mut new_children = mathml.preceding_siblings();
+		let i_first_new_child = new_children.len();
+		let mut replacements = replacements.iter().map(|&el| ChildOfElement::Element(el)).collect::<Vec<ChildOfElement>>();
+		new_children.append(&mut replacements);
+		new_children.append(&mut mathml.following_siblings());
+		let parent = mathml.parent().unwrap().element().unwrap();
+		parent.replace_children(new_children);
+		return as_element(parent.children()[i_first_new_child]);
+	}
+}
+
 // returns the presentation element of a "semantics" element
 pub fn get_presentation_element(element: Element) -> (usize, Element) {
 	// FIX: implement this
@@ -333,7 +367,7 @@ pub fn get_presentation_element(element: Element) -> (usize, Element) {
 			})
 	{
 		let presentation_annotation = as_element(*child);
-		debug!("get_presentation_element:\n{}", mml_to_string(&presentation_annotation));
+		// debug!("get_presentation_element:\n{}", mml_to_string(&presentation_annotation));
 		assert_eq!(presentation_annotation.children().len(), 1);
 		return (i, as_element(presentation_annotation.children()[0]));
 	} else {
@@ -422,12 +456,17 @@ impl CanonicalizeContext {
 			root.append_child(math_element);
 			mathml = root.children()[0].element().unwrap();
 		}
-		self.assure_mathml(mathml)?;
+		CanonicalizeContext::assure_mathml(mathml)?;
 		let mathml = self.clean_mathml(mathml).unwrap();	// 'math' is never removed
 		self.assure_nary_tag_has_mrow(mathml);
-		let converted_mathml = self.canonicalize_mrows(mathml)
+		let mut converted_mathml = self.canonicalize_mrows(mathml)
 				.chain_err(|| format!("while processing\n{}", mml_to_string(&mathml)))?;
-		crate::chemistry::scan_and_mark_chemistry(converted_mathml);
+		if !crate::chemistry::scan_and_mark_chemistry(converted_mathml) {
+			debug!("Not chemistry -- retry:\n{}", mml_to_string(&converted_mathml));
+			self.assure_nary_tag_has_mrow(converted_mathml);
+			converted_mathml = self.canonicalize_mrows(mathml)
+				.chain_err(|| format!("while processing\n{}", mml_to_string(&mathml)))?;
+		}
 		debug!("\nMathML after canonicalize:\n{}", mml_to_string(&converted_mathml));
 		return Ok(converted_mathml);
 	}
@@ -444,7 +483,7 @@ impl CanonicalizeContext {
 	}
 
 	/// Return an error is some element is not MathML (only look at first child of <semantics>) or if it has the wrong number of children
-	fn assure_mathml(&self, mathml: Element) -> Result<()> {
+	fn assure_mathml(mathml: Element) -> Result<()> {
 		static ALL_MATHML_ELEMENTS: phf::Set<&str> = phf_set!{
 			"mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph",
 			"mfrac", "mroot", "msub", "msup", "msubsup","munder", "mover", "munderover", "mmultiscripts",
@@ -493,7 +532,7 @@ impl CanonicalizeContext {
 			if children.is_empty() {
 				return Ok( () );
 			} else {
-				return self.assure_mathml(get_presentation_element(mathml).1);
+				return CanonicalizeContext::assure_mathml(get_presentation_element(mathml).1);
 			}
 		}
 		if !ALL_MATHML_ELEMENTS.contains(element_name) {
@@ -501,7 +540,7 @@ impl CanonicalizeContext {
 		}
 		// valid MathML element and not a leaf -- check the children
 		for child in children {
-			self.assure_mathml( as_element(child) )?;
+			CanonicalizeContext::assure_mathml( as_element(child) )?;
 		}
 		return Ok( () );
 	}
@@ -954,27 +993,6 @@ impl CanonicalizeContext {
 				   (name(&el) == "mrow" && el.children().is_empty());
 		}
 
-		fn replace_children<'a>(mathml: Element<'a>, mut replacements: Vec<ChildOfElement<'a>>) -> Element<'a> {
-			// replace the children of the parent (must exist since this only happens for leaves) with the new children
-			if replacements.len() == 1 {
-				// rather than replace the children, the children are already in place, so we can optimize a little
-				// we just need to make sure that MAYBE_CHEMISTRY is set since we aren't using the new element directly
-				add_attrs(mathml, as_element(replacements[0]).attributes());
-				return mathml;
-			}
-
-			if ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(name(&mathml)) {
-				// need to wrap the children in an mrow
-			}
-			let mut new_children = mathml.preceding_siblings();
-			let i_first_new_child = new_children.len();
-			new_children.append(&mut replacements);
-			new_children.append(&mut mathml.following_siblings());
-			let parent = mathml.parent().unwrap().element().unwrap();
-			parent.replace_children(new_children);
-			return as_element(parent.children()[i_first_new_child]);
-		}
-
 		fn clean_chemistry_leaf(mathml: Element) -> Element {
 			if !(is_chemistry_off() || mathml.attribute(MAYBE_CHEMISTRY).is_some()) {
 				assert!(name(&mathml)=="mi" || name(&mathml)=="mtext");
@@ -986,16 +1004,6 @@ impl CanonicalizeContext {
 				}
 				if let Some(elements) = convert_leaves_to_chem_elements(mathml) {
 					// children are already marked as chemical elements
-					let elements = elements.iter().map(|&el| ChildOfElement::Element(el)).collect::<Vec<ChildOfElement>>();
-					if elements.len() > 1 {
-						let parent = mathml.parent().unwrap().element().unwrap();
-						if ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(name(&parent)) {
-							// wrap in an mrow
-							let mrow = create_mathml_element(&mathml.document(), "mrow");
-							mrow.append_children(elements);
-							return replace_children(mathml, vec![ChildOfElement::Element(mrow)]);
-						}
-					}
 					return replace_children(mathml, elements);
 				} else {
 					let likely_chemistry = likely_chem_element(mathml);
@@ -1141,18 +1149,18 @@ impl CanonicalizeContext {
 			let children = mfenced.children();
 			let mut new_children = Vec::with_capacity(2*children.len() + 1);
 			if !open.is_empty() {
-				new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), open)) );
+				new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), open, MFENCED_ATTR_VALUE)) );
 			}
 			if !children.is_empty() {
 				new_children.push(children[0]);
 				for child in &children[1..] {
 					let sep = separators.next().unwrap_or(',').to_string();
-					new_children.push( ChildOfElement::Element( create_mo(mfenced.document(), &sep)) );
+					new_children.push( ChildOfElement::Element( create_mo(mfenced.document(), &sep, MFENCED_ATTR_VALUE)) );
 					new_children.push(*child);
 				}
 			}
 			if !close.is_empty() {
-				new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), close)) );
+				new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), close, MFENCED_ATTR_VALUE)) );
 			}
 			mfenced.replace_children(new_children);
 			return mfenced;
@@ -1710,12 +1718,13 @@ impl CanonicalizeContext {
 			// the generic name "primary_scripts" means prescripts if going forward or postscripts if going backwards
 			// if we are going forward and hit a sub/superscript with a base, then those scripts become postscripts ("other_scripts")
 			// if we are going backwards, we never add prescripts
-			// let parent = as_element(mrow_children[i]).parent().unwrap().element().unwrap();
-			// debug!("convert_to_mmultiscripts (i={}) -- PARENT:\n{}", i, mml_to_string(&parent));
-			
+
+			let parent = as_element(mrow_children[i]).parent().unwrap().element().unwrap();
+			debug!("convert_to_mmultiscripts (i={}) -- PARENT:\n{}", i, mml_to_string(&parent));
+
 			let i_base = choose_base_of_mmultiscripts(mrow_children, i);
 			let mut base = as_element(mrow_children[i_base]);
-			// debug!("convert_to_mmultiscripts -- base\n{}", mml_to_string(&base));
+			debug!("convert_to_mmultiscripts -- base\n{}", mml_to_string(&base));
 			let base_name = name(&base);
 			let mut prescripts = vec![];
 			let mut postscripts = vec![];
@@ -1734,17 +1743,28 @@ impl CanonicalizeContext {
 
 			if i_base > i {
 				// we have prescripts -- gather them up
-				for i_prescript in i..i_base {
+				let mut i_prescript = i;
+				while i_prescript < i_base {
 					let script = as_element(mrow_children[i_prescript]);
 					if !add_to_scripts(script, &mut prescripts) {
 						break;
 					}
+					i_prescript += 1;
 				}
 			}
 
 			// gather up the postscripts (if any)
 			while i_postscript < mrow_children.len() {
 				let script = as_element(mrow_children[i_postscript]);
+				if name(&script) == "msub" && i_postscript+1 < mrow_children.len() {
+					let superscript = as_element(mrow_children[i_postscript+1]);
+					if name(&superscript) == "msup" && is_empty_element(as_element(superscript.children()[0])) {
+						set_mathml_name(script, "msubsup");
+						script.append_child(superscript.children()[1]);
+						i_postscript += 1;
+					}
+				}
+				debug!("adding script\n{}", mml_to_string(&script));
 				if !add_to_scripts(script, &mut postscripts) {
 					break;
 				}
@@ -1780,19 +1800,16 @@ impl CanonicalizeContext {
 
 		fn add_to_scripts<'a>(el: Element<'a>, scripts: &mut Vec<ChildOfElement<'a>>) -> bool {
 			let script_name = name(&el);
-			if (script_name == "msub" || script_name == "msup" || script_name == "msubsup") &&
+			if !(script_name == "msub" || script_name == "msup" || script_name == "msubsup") ||
 			   !is_empty_element(as_element(el.children()[0])) {
-				return false;
+					return false;
 			}
 			if script_name == "msub" {
 				add_pair(scripts, Some(el.children()[1]), None);
 			} else if script_name == "msup" {
 				add_pair(scripts, None, Some(el.children()[1]));
-			} else if script_name ==  "msubsup" {
+			} else { // msubsup
 				add_pair(scripts, Some(el.children()[1]), Some(el.children()[2]));
-			} else {
-				error!("add_to_scripts: non-script element while trying to build mmultiscripts");
-				return false;
 			};
 			return true;
 		}
@@ -1830,10 +1847,8 @@ impl CanonicalizeContext {
 			// However, there may be some empty bases before we get to real base on the right.
 			let script_element_base = as_element(as_element(mrow_children[i]).children()[0]);
 			let from_mchem = script_element_base.attribute(MHCHEM_MMULTISCRIPTS_HACK).is_some();
-			if mrow_children.len() > i+1 && !(from_mchem && i > 0) {
-				if is_child_simple_base(mrow_children[i+1]) {
-					return i+1;
-				}
+			if mrow_children.len() > i+1 && !(from_mchem && i > 0) && is_child_simple_base(mrow_children[i+1]) {
+				return i+1;
 			}
 			if i > 0 {
 				if let Some(i_start) = is_grouped_base(&mrow_children[..i]) {
@@ -1878,7 +1893,7 @@ impl CanonicalizeContext {
 					child = as_element(child.children()[0]);
 				}
 
-				return is_leaf(child);  // a little overly general (but hopefully doesn't matter)
+				return is_leaf(child) && !is_empty_element(child);  // a little overly general (but hopefully doesn't matter)
 			}
 
 			/// Return the index of the matched open paren/bracket if the last element is a closed paren/bracket
@@ -2285,9 +2300,11 @@ impl CanonicalizeContext {
 			}
 		};	
 	
-		let operator_str = if let Some(op_str) = mo_node.attribute_value(OPERATOR_OVERRIDE)
-									{op_str} else {as_text(mo_node)};
-		let found_op_info = OPERATORS.get(operator_str);
+		let found_op_info = if mo_node.attribute_value(CHEMICAL_BOND).is_some() {
+			Some(&*IMPLIED_CHEMICAL_BOND)
+		} else {
+			OPERATORS.get(as_text(mo_node))
+		};
 		if found_op_info.is_none() {
 			// no known operator -- return the unknown operator with the correct "fix" type
 			return op_not_in_operator_dictionary(op_type);
@@ -2350,14 +2367,14 @@ impl CanonicalizeContext {
 			}
 
 			// didn't find op_info that matches -- if type is not forced, then return first value (any is probably ok) 
-			return if from_form_attr {*ILLEGAL_OPERATOR_INFO} else {op_info};
+			return if from_form_attr {&ILLEGAL_OPERATOR_INFO} else {op_info};
 		}
 	
 		fn op_not_in_operator_dictionary(op_type: OperatorTypes) -> &'static OperatorInfo {
 			return match op_type {
-				OperatorTypes::PREFIX => *DEFAULT_OPERATOR_INFO_PREFIX,
-				OperatorTypes::POSTFIX => *DEFAULT_OPERATOR_INFO_POSTFIX,
-				_ => *DEFAULT_OPERATOR_INFO_INFIX,	// should only be infix
+				OperatorTypes::PREFIX => &DEFAULT_OPERATOR_INFO_PREFIX,
+				OperatorTypes::POSTFIX => &DEFAULT_OPERATOR_INFO_POSTFIX,
+				_ => &DEFAULT_OPERATOR_INFO_INFIX,	// should only be infix
 			};
 		}
 	}
@@ -2783,11 +2800,34 @@ impl CanonicalizeContext {
 	}
 
 	// implied separator when two capital letters are adjacent or two chemical elements
-	fn is_implied_separator<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>) -> bool {
-		if prev.attribute(MAYBE_CHEMISTRY).is_some() && current.attribute(MAYBE_CHEMISTRY).is_some() {
-			return true;
+	fn is_implied_chemical_bond<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>) -> bool {
+		// debug!("is_implied_chemical_bond: previous: {:?}", prev.preceding_siblings());
+		// debug!("is_implied_chemical_bond: following: {:?}", prev.following_siblings());
+		if !prev.attribute(MAYBE_CHEMISTRY).is_some() || !current.attribute(MAYBE_CHEMISTRY).is_some() {
+			return false;
 		}
+		// ABC example where B and C are chemical elements is why we need to scan further than just checking B and C
+		// look for an mi/mtext with @MAYBE_CHEMISTRY until we get to something that can't have it
+		for child in prev.preceding_siblings() {
+			if !is_valid_chemistry(as_element(child)) {
+				return false;
+			}
+		}
+		for child in current.following_siblings() {
+			if !is_valid_chemistry(as_element(child)) {
+				return false;
+			}
+		}
+		return true;		// sequence of all MAYBE_CHEMISTRY
 
+		fn is_valid_chemistry(child: Element) -> bool {
+			let child = get_possible_embellished_node(child);
+			return child.attribute(MAYBE_CHEMISTRY).is_some() || (name(&child) != "mi" && name(&child) != "mtext");
+		}
+	}
+
+	// implied separator when two capital letters are adjacent or two chemical elements
+	fn is_implied_separator<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>) -> bool {
 		if name(prev) != "mi" || name(current) != "mi" {
 			return false;
 		}
@@ -3043,17 +3083,19 @@ impl CanonicalizeContext {
 					// consecutive operands -- add an invisible operator as appropriate
 					let likely_function_name = self.is_function_name(previous_child, Some(&children[i_child..]));
 					current_op = if likely_function_name == FunctionNameCertainty::True {
-								OperatorPair{ ch: "\u{2061}", op: *INVISIBLE_FUNCTION_APPLICATION }
+								OperatorPair{ ch: "\u{2061}", op: &INVISIBLE_FUNCTION_APPLICATION }
 							} else if self.is_mixed_fraction(&previous_child, &children[i_child..])? {
-								OperatorPair{ ch: "\u{2064}", op: *IMPLIED_INVISIBLE_PLUS }
+								OperatorPair{ ch: "\u{2064}", op: &IMPLIED_INVISIBLE_PLUS }
 							} else if self.is_implied_comma(&previous_child, &current_child) {
-								OperatorPair{ch: "\u{2063}", op: *IMPLIED_INVISIBLE_COMMA }				  
+								OperatorPair{ch: "\u{2063}", op: &IMPLIED_INVISIBLE_COMMA }				  
+							} else if self.is_implied_chemical_bond(&previous_child, &current_child) {
+								OperatorPair{ch: "\u{2063}", op: &IMPLIED_CHEMICAL_BOND }				  
 							} else if self.is_implied_separator(&previous_child, &current_child) {
-								OperatorPair{ch: "\u{2063}", op: &*IMPLIED_SEPARATOR_HIGH_PRIORITY }				  
+								OperatorPair{ch: "\u{2063}", op: &IMPLIED_SEPARATOR_HIGH_PRIORITY }				  
 							} else if self.is_trig_arg(base_of_previous_child, base_of_child, &mut parse_stack) {
-								OperatorPair{ch: "\u{2062}", op: &*IMPLIED_TIMES_HIGH_PRIORITY }				  
+								OperatorPair{ch: "\u{2062}", op: &IMPLIED_TIMES_HIGH_PRIORITY }				  
 							} else {
-								OperatorPair{ ch: "\u{2062}", op: *IMPLIED_TIMES }
+								OperatorPair{ ch: "\u{2062}", op: &IMPLIED_TIMES }
 							};
 	
 					if name(&base_of_child) == "mo" {
@@ -3063,7 +3105,7 @@ impl CanonicalizeContext {
 						// debug!("  Found implicit op {}/{} [{:?}]", show_invisible_op_char(current_op.ch), current_op.op.priority, likely_function_name);
 						self.reduce_stack(&mut parse_stack, current_op.op.priority);
 		
-						let implied_mo = create_mo(current_child.document(), current_op.ch);
+						let implied_mo = create_mo(current_child.document(), current_op.ch, ADDED_ATTR_VALUE);
 						if likely_function_name == FunctionNameCertainty::Maybe {
 							implied_mo.set_attribute_value("data-function-guess", "true");
 						}
@@ -3086,13 +3128,13 @@ impl CanonicalizeContext {
 						// we use the original input here because in this case, we need to look to the right of the ()s to deal with chemical states
 						let likely_function_name = self.is_function_name(as_element(children[i_child-1]), Some(&children[i_child..]));
 						let implied_operator = if likely_function_name== FunctionNameCertainty::True {
-								OperatorPair{ ch: "\u{2061}", op: *INVISIBLE_FUNCTION_APPLICATION }
+								OperatorPair{ ch: "\u{2061}", op: &INVISIBLE_FUNCTION_APPLICATION }
 							} else {
-								OperatorPair{ ch: "\u{2062}", op: *IMPLIED_TIMES }
+								OperatorPair{ ch: "\u{2062}", op: &IMPLIED_TIMES }
 							};
 						// debug!("  adding implied {}", if ptr_eq(implied_operator.op,*IMPLIED_TIMES) {"times"} else {"function apply"});
 	
-						let implied_mo = create_mo(current_child.document(), implied_operator.ch);
+						let implied_mo = create_mo(current_child.document(), implied_operator.ch, ADDED_ATTR_VALUE);
 						if likely_function_name == FunctionNameCertainty::Maybe {
 							implied_mo.set_attribute_value("data-function-guess", "true");
 						}
@@ -3209,13 +3251,14 @@ pub fn as_text(leaf_child: Element) -> &str {
 #[allow(dead_code)] // for debugging with println
 fn element_summary(mathml: Element) -> String {
 	return format!("{}<{}>", name(&mathml),
-	              if is_leaf(mathml) {show_invisible_op_char(as_text(mathml)).to_string()} else 
+	              if is_leaf(mathml) {show_invisible_op_char(as_text(mathml)).to_string()}
+				  else 
 				  					 {mathml.children().len().to_string()});
 }
 
-fn create_mo<'a, 'd:'a>(doc: Document<'d>, ch: &'a str) -> Element<'d> {
+fn create_mo<'a, 'd:'a>(doc: Document<'d>, ch: &'a str, attr_value: &str) -> Element<'d> {
 	let implied_mo = create_mathml_element(&doc, "mo");
-	implied_mo.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
+	implied_mo.set_attribute_value(CHANGED_ATTR, attr_value);
 	let mo_text = doc.create_text(ch);
 	implied_mo.append_child(mo_text);
 	return implied_mo;
@@ -3428,8 +3471,8 @@ mod canonicalize_tests {
 				<mi>f</mi>
 				<mo data-changed='added'>&#x2061;</mo>
 				<mrow>
-					<mo data-changed='added'>(</mo>
-					<mo data-changed='added'>)</mo>
+					<mo data-changed='from_mfenced'>(</mo>
+					<mo data-changed='from_mfenced'>)</mo>
 				</mrow>
 			</mrow>
 		</math>";
@@ -3444,9 +3487,9 @@ mod canonicalize_tests {
 			<mi>f</mi>
 			<mo data-changed='added'>&#x2061;</mo>
 			<mrow>
-				<mo data-changed='added'>[</mo>
+				<mo data-changed='from_mfenced'>[</mo>
 				<mi>x</mi>
-				<mo data-changed='added'>]</mo>
+				<mo data-changed='from_mfenced'>]</mo>
 			</mrow>
 			</mrow>
 		</math>";
@@ -3461,7 +3504,7 @@ mod canonicalize_tests {
 			<mi>f</mi>
 			<mo data-changed='added'>&#x2061;</mo>
 			<mrow>
-				<mo data-changed='added'>(</mo>
+				<mo data-changed='from_mfenced'>(</mo>
 				<mrow>
 				<mi>x</mi>
 				<mo>,</mo>
@@ -3469,7 +3512,7 @@ mod canonicalize_tests {
 				<mo>,</mo>
 				<mi>z</mi>
 				</mrow>
-				<mo data-changed='added'>)</mo>
+				<mo data-changed='from_mfenced'>)</mo>
 			</mrow>
 			</mrow>
 		</math>";
@@ -3484,21 +3527,21 @@ mod canonicalize_tests {
 			<mi>f</mi>
 			<mo data-changed='added'>&#x2061;</mo>
 			<mrow>
-				<mo data-changed='added'>(</mo>
+				<mo data-changed='from_mfenced'>(</mo>
 				<mrow data-changed='added'>
 				<mrow data-changed='added'>
 					<mi>x</mi>
-					<mo data-changed='added'>,</mo>
+					<mo data-changed='from_mfenced'>,</mo>
 					<mi>y</mi>
 				</mrow>
-				<mo data-changed='added'>;</mo>
+				<mo data-changed='from_mfenced'>;</mo>
 				<mrow data-changed='added'>
 					<mi>z</mi>
-					<mo data-changed='added'>,</mo>
+					<mo data-changed='from_mfenced'>,</mo>
 					<mi>a</mi>
 				</mrow>
 				</mrow>
-				<mo data-changed='added'>)</mo>
+				<mo data-changed='from_mfenced'>)</mo>
 			</mrow>
 			</mrow>
 		</math>";
@@ -4292,7 +4335,6 @@ mod canonicalize_tests {
 
 	// #[test]
     // fn roman_numeral_context() {
-	// 	init_logger();
     //     let test_str = "<math><mi>vi</mi><mo>-</mo><mi mathvariant='normal'>i</mi><mo>=</mo><mtext>v</mtext></math>";
     //     let target_str = "<math> <mrow data-changed='added'>
 	// 		<mrow data-changed='added'><mn data-roman-numeral='true'>vi</mn><mo>-</mo><mn mathvariant='normal' data-roman-numeral='true'>i</mn></mrow> 

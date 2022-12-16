@@ -1320,7 +1320,4 @@ phf_map! {
 
 	// the following are not in the operator dictionary and are added "manually"
 	"mod" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 800, next: &None },
-
-	// used to get high priority separator (uses private space)
-	"\u{F8FF}" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 901, next: &None },
 }

@@ -36,37 +36,37 @@ fn main() {
       .format_level(false)
       .init();
 
-  //  let expr = "
-  //     <math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
-  //     <mrow>
-  //      <mrow><mo>[</mo>
-  //        <mtable>
-  //         <mtr>
-  //          <mtd>
-  //           <mn>3</mn>
-  //          </mtd>
-  //          <mtd>
-  //           <mn>1</mn>
-  //          </mtd>
-  //          <mtd>
-  //           <mn>4</mn>
-  //          </mtd>
-  //         </mtr>
-  //         <mtr>
-  //          <mtd>
-  //           <mn>0</mn>
-  //          </mtd>
-  //          <mtd>
-  //           <mn>2</mn>
-  //          </mtd>
-  //          <mtd>
-  //           <mn>6</mn>
-  //          </mtd>
-  //         </mtr>','
-  //        </mtable>
-  //      <mo>]</mo></mrow></mrow>
-  //    </math>
-  // ";
+   let expr = "
+      <math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+      <mrow>
+       <mrow><mo>[</mo>
+         <mtable>
+          <mtr>
+           <mtd>
+            <mn>3</mn>
+           </mtd>
+           <mtd>
+            <mn>1</mn>
+           </mtd>
+           <mtd>
+            <mn>4</mn>
+           </mtd>
+          </mtr>
+          <mtr>
+           <mtd>
+            <mn>0</mn>
+           </mtd>
+           <mtd>
+            <mn>2</mn>
+           </mtd>
+           <mtd>
+            <mn>6</mn>
+           </mtd>
+          </mtr>','
+         </mtable>
+       <mo>]</mo></mrow></mrow>
+     </math>
+  ";
 
   // let expr = "<math display='inline' xmlns='http://www.w3.org/1998/Math/MathML'>
   //       <msup intent='power($base(2, $base),silly($exp,-1.))'>
@@ -75,50 +75,87 @@ fn main() {
   //     </msup>
   //       </math>
   //     ";
-//   let expr = "<math>
-//   <mrow intent='$op($a,$b)'>
-//   <mi arg='a'>A</mi>
-//   <mover arg='op' intent='$U27F6($U2245)'>
-//       <mo movablelimits='false' arg='U27F6' intent='map'>⟶</mo>
-//       <mo arg='U2245' intent='congruence'>≅</mo>
-//   </mover>
-//   <mi arg='b'>B</mi>
-// </mrow>
-//   </math>";
+  // let expr = "<math>
+  //     <mrow intent='$op($a,$b)'>
+  //     <mi arg='a'>A</mi>
+  //     <mover arg='op' intent='$U27F6($U2245)'>
+  //         <mo movablelimits='false' arg='U27F6' intent='map'>⟶</mo>
+  //         <mo arg='U2245' intent='congruence'>≅</mo>
+  //     </mover>
+  //     <mi arg='b'>B</mi>
+  //   </mrow>
+  // </math>";
   // let expr = "<math><mi>Na</mi><mi>S</mi><mo>(</mo><mi>l</mi><mo>)</mo></math>";
 
-let expr = "<math> <msup> <mrow/> <mo>&#x2212;</mo></msup> <mn>2</mn> </math>
-";
+// let expr = "
+//     <math xmlns='http://www.w3.org/1998/Math/MathML' display='block'>
+//       <mrow data-mjx-texclass='ORD'>
+//         <mfrac>
+//           <mrow>
+//     <mi>X</mi>      </mrow>
+//           <mrow>
+//             <mo stretchy='false'>[</mo>
+//             <mrow data-mjx-texclass='ORD'>
+//               <mi data-mjx-auto-op='false'>HAc</mi>
+//             </mrow>
+//             <mo stretchy='false'>]</mo>
+//           </mrow>
+//         </mfrac>
+//       </mrow>
+//     </math>
+// ";
 
-//   let expr = "<math xmlns='http://www.w3.org/1998/Math/MathML'>
-//   <mstyle mathcolor='#a33e00'>
+//   let expr = "<math>
+//   <mrow>
 //     <mrow>
-//       <mrow>
-//         <mi mathvariant='normal'>H</mi>
-//       </mrow>
-//       <msub>
-//         <mrow>
-//           <mrow>
-//             <mpadded width='0'>
-//               <mphantom>
-//                 <mi>A</mi>
-//               </mphantom>
-//             </mpadded>
-//           </mrow>
-//         </mrow>
-//         <mrow>
-//           <mrow>
-//             <mpadded height='0'>
-//               <mn>2</mn>
-//             </mpadded>
-//           </mrow>
-//         </mrow>
-//       </msub>
-//       <mrow>
-//         <mi mathvariant='normal'>O</mi>
-//       </mrow>
+//       <mi mathvariant='normal'>H</mi>
 //     </mrow>
-//   </mstyle>
+//     <msub>
+//       <mrow>
+//         <mrow>
+//           <mpadded width='0'>
+//             <mphantom>
+//               <mi>A</mi>
+//             </mphantom>
+//           </mpadded>
+//         </mrow>
+//       </mrow>
+//       <mrow>
+//         <mrow>
+//           <mpadded height='0'>
+//             <mn>2</mn>
+//           </mpadded>
+//         </mrow>
+//       </mrow>
+//     </msub>
+//     <mrow>
+//       <mi mathvariant='normal'>C</mi>
+//     </mrow>
+//     <mrow>
+//       <mo>=</mo>
+//     </mrow>
+//     <mrow>
+//       <mi>CH</mi>
+//     </mrow>
+//     <msub>
+//       <mrow>
+//         <mrow>
+//           <mpadded width='0'>
+//             <mphantom>
+//               <mi>A</mi>
+//             </mphantom>
+//           </mpadded>
+//         </mrow>
+//       </mrow>
+//       <mrow>
+//         <mrow>
+//           <mpadded height='0'>
+//             <mn>2</mn>
+//           </mpadded>
+//         </mrow>
+//       </mrow>
+//     </msub>
+//   </mrow>
 // </math>";
   let instant = Instant::now();
   let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../../Rules");
@@ -131,6 +168,8 @@ let expr = "<math> <msup> <mrow/> <mo>&#x2212;</mo></msup> <mn>2</mn> </math>
 
   info!("Version = '{}'", get_version());
   set_preference("TTS".to_string(), "none".to_string()).unwrap();
+  set_preference("Language".to_string(), "en".to_string()).unwrap();
+  set_preference("Verbosity".to_string(), "terse".to_string()).unwrap();
   set_preference("SpeechOverrides_CapitalLetters".to_string(), "".to_string()).unwrap();
   // set_preference("Bookmark".to_string(), "true".to_string()).unwrap();
   set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
@@ -149,18 +188,18 @@ let expr = "<math> <msup> <mrow/> <mo>&#x2212;</mo></msup> <mn>2</mn> </math>
 
   // Note: the logger seems to be a huge time sync, so println! is used for timing
   info!("Time taken for loading+speech+braille: {}ms", instant.elapsed().as_millis());
-  // let instant = Instant::now();
-  // set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
-  // match get_spoken_text() {
-  //   Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
-  //   Err(e) => panic!("{}", errors_to_string(&e)),
-  // }
-  // info!("Time taken (second time for speech): {}ms", instant.elapsed().as_millis());
-  // info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()));
+  let instant = Instant::now();
+  set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+  match get_spoken_text() {
+    Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
+    Err(e) => panic!("{}", errors_to_string(&e)),
+  }
+  info!("Time taken (second time for speech): {}ms", instant.elapsed().as_millis());
+  info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()));
   
-  // match get_braille("".to_string()) {
-  //   Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
-  //   Err(e) => panic!("{}", errors_to_string(&e)),
-  // }
-  // info!("Time taken (second time for speech + braille): {}ms", instant.elapsed().as_millis());
+  match get_braille("".to_string()) {
+    Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
+    Err(e) => panic!("{}", errors_to_string(&e)),
+  }
+  info!("Time taken (second time for speech + braille): {}ms", instant.elapsed().as_millis());
 }

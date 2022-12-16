@@ -67,7 +67,7 @@ pub fn format_attrs(attrs: &[Attribute]) -> String {
 
 fn make_invisible_chars_visible(text: &str) -> String {
     return text.chars().map(|ch| {
-        if ('\u{2061}'..'\u{2064}').contains(&ch) || ch == crate::canonicalize::HIGH_PRIORITY_OPERATOR.chars().next().unwrap() {
+        if ('\u{2061}'..'\u{2064}').contains(&ch) {
             return format!("&#x{:x};", ch as u32)
         } else {
             return ch.to_string();
