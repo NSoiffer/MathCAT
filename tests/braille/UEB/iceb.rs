@@ -103,6 +103,7 @@ fn cap_1_6_1_separate() {
 
 #[test]
 fn cap_1_6_2() {
+    init_logger();
     let expr = "<math><mi>V</mi><mo>=</mo><mi>I</mi><mi>R</mi></math>";
     test_braille("UEB", expr, "⠰⠠⠧⠀⠐⠶⠀⠠⠠⠊⠗");
 }
