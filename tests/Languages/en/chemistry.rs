@@ -54,7 +54,7 @@ fn ethanol_bonds() {
               <mi>H</mi>
           </mrow>
       </math>";
-  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "C; H, 3 single bond; C; H, 2 single bond, O, H,");
+  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "C, H, 3 single bond C, H, 2 single bond O, H,");
 
 }
 
@@ -89,7 +89,7 @@ fn ethylene_with_bond() {
           <mo>=</mo>
           <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
       </mrow></math>";
-  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "H, 2, C, double bond, C, H, 2");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "H, 2 C, double bond C, H, 2");
 }
 
 #[test]
@@ -109,7 +109,7 @@ fn ethylene_with_colon_bond() {
           <mo>::</mo>
           <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
       </mrow></math>";
-  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "H, 2, C, double bond, C, H, 2");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "H, 2 C, double bond C, H, 2");
 }
 
 #[test]
