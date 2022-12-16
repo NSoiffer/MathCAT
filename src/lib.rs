@@ -95,7 +95,7 @@ pub fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
     trim_element(&mathml);
     // debug!("test:\n{}", mml_to_string(&mathml));
     let mathml_test = canonicalize(mathml).unwrap();
-    
+   
     let package2 = &parser::parse(target).expect("Failed to parse target input");
     let mathml_target = get_element(package2);
     trim_element(&mathml_target);
