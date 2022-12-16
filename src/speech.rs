@@ -1957,6 +1957,7 @@ impl SpeechRules {
 
     fn read_patterns(&mut self, path: &Locations) -> Result<()> {
         if let Some(p) = &path[0] {
+            info!("Reading rule file: {}", p.to_str().unwrap());
             let rule_file_contents = read_to_string_shim(p.as_path()).expect("cannot read file");
             let rules_build_fn = |pattern: &Yaml| {
                 self.build_speech_patterns(pattern, p)
@@ -1998,6 +1999,7 @@ impl SpeechRules {
         };
 
         // FIX: should read first (lang), then supplement with second (region)
+        info!("Reading unicode file {}", path.to_str().unwrap());
         let unicode_file_contents = read_to_string_shim(&path)?;
         let unicode_build_fn = |unicode_def_list: &Yaml| {
             let unicode_defs = unicode_def_list.as_vec();
