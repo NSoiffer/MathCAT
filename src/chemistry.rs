@@ -143,6 +143,7 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
                     }) {
                     // "=", etc., should be treated as high priority separators
                     child.set_attribute_value(CHEMICAL_BOND, "true");
+                    child.set_attribute_value(MAYBE_CHEMISTRY, &likely_chemistry_op.to_string());
                 }
             }
         }
