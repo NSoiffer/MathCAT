@@ -132,7 +132,6 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
             let likely_chemistry_op = likely_chem_formula_operator(child);
             // debug!("clean_mrow_children_restructure_pass -- in mo: likely {}, {}", likely_chemistry_op, mml_to_string(&child));
             if likely_chemistry_op >= 0 {
-                child.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry_op.to_string().as_str());
                 // if possible chemistry to left and right, then override text for operator lookup
                 // note: on the right, we haven't set chem flag for operators yet, so we skip them
                 let preceding = child.preceding_siblings();
@@ -1140,8 +1139,11 @@ fn is_in_set(leaf_text: &str, set: &phf::Set<char> ) -> bool {
 
 fn likely_chem_formula_operator(mathml: Element) -> isize {
     // mostly from chenzhijin.com/en/article/Useful%20Unicode%20for%20Chemists (Arrows and Other)
-    static CHEM_FORMULA_OPERATORS: phf::Set<char> = phf_set! {
-        '-', '\u{2212}', '=', '≡', '≣', '⠆', '⠇', '⠿', // bond symbols (need both 2212 and minus because maybe not canonicalized)
+    // also en.wikipedia.org/wiki/Chemical_formula#Condensed_formula
+    #[derive(PartialEq, Eq)]
+    enum BondType {DoubleBond, TripleBond}      // options for is_legal_bond()
+    static CHEM_FORMULA_OPERATORS: phf::Set<&str> = phf_set! {
+        "-", "\u{2212}", ":", "=", "::", "≡", ":::", "≣", "::::", // bond symbols (need both 2212 and minus because maybe not canonicalized)
     };
     static CHEM_FORMULA_OK: phf::Set<char> = phf_set! {
         '(', ')', '[', ']',
@@ -1151,14 +1153,76 @@ fn likely_chem_formula_operator(mathml: Element) -> isize {
 
     assert_eq!(name(&mathml), "mo");
     let leaf_text = as_text(mathml);
-    if is_in_set(leaf_text, &CHEM_FORMULA_OPERATORS) || leaf_text == "::" {
+    if CHEM_FORMULA_OPERATORS.contains(leaf_text) &&
+       ( !(leaf_text == "=" || leaf_text == "::" ) || is_legal_bond(mathml, BondType::DoubleBond) )  &&
+       ( !(leaf_text == "≡" || leaf_text == ":::" ) || is_legal_bond(mathml, BondType::TripleBond) ) {
         mathml.set_attribute_value(MAYBE_CHEMISTRY, "1");
         return 1;
     } else if is_in_set(leaf_text, &CHEM_FORMULA_OK) {
         return 0;  // not much info
     } else {
         return -3; // still a small chance;
-    } 
+    }
+
+    fn is_legal_bond(mathml: Element, bond_type: BondType) -> bool {
+        let preceding = mathml.preceding_siblings();
+        let following = mathml.following_siblings();
+        if preceding.is_empty() || following.is_empty() {
+            return false;
+        }
+
+        let mut preceding_element = as_element(preceding[preceding.len()-1]);
+        // special check for CH_2 -- double bond is really with C
+        if bond_type == BondType::DoubleBond && name(&preceding_element) == "msub" &&
+           preceding.len() > 1 &&  &convert_to_short_form(preceding_element).unwrap_or_default() == "H_2" {
+            preceding_element = as_element(preceding[preceding.len()-2]);
+            if !is_leaf(preceding_element) || as_text(preceding_element) != "C" {
+                return false;
+            }
+        } else if name(&preceding_element) != "mi" && name(&preceding_element) != "mtext" {
+            return false;
+        }
+        let following_element = as_element(following[0]);
+        if name(&following_element) != "mi" && name(&following_element) != "mtext" {
+            return false;
+        }
+        let preceding_text = as_text(preceding_element);
+        let following_text = as_text(following_element);
+        return match bond_type {
+            BondType::DoubleBond => is_legal_double_bond(preceding_text, following_text),
+            BondType::TripleBond => is_legal_triple_bond(preceding_text, following_text),
+        };
+
+        fn is_legal_double_bond(left: &str, right: &str) -> bool {
+            // this is based on table in en.wikipedia.org/wiki/Double_bond#Types_of_double_bonds_between_atoms
+            static DOUBLE_BOND_TO_SELF: phf::Set<&str> = phf_set! {
+                "C", "O", "N", "S", "Si", "Ge", "Sn", "Pb"
+            };
+                // "C" => &["O", "N", "S"],
+                // "O" => &["N", "S"],
+            if left == right && DOUBLE_BOND_TO_SELF.contains(left) {
+                return true;
+            }
+            return match left {
+                "C" => right=="O" || right=="N" || right=="S",
+                "O" => right=="N" || right=="S",
+                "Si" => right=="C",
+                _ => false,
+            }
+        }
+
+        fn is_legal_triple_bond(left: &str, right: &str) -> bool {
+            // from en.wikipedia.org/wiki/Triple_bond
+            // 'B' is from studiousguy.com/triple-bond-examples/
+            if left=="C" && (right == "C" || right == "N" || right == "O") {
+                return true;
+            } else if left == "B" && right == "B" {
+                return true;
+            } else {
+                return left == "N" && right == "C";
+            }
+        }
+    }
 }
 
 /// This assumes canonicalization of characters has happened
@@ -1314,7 +1378,6 @@ static SHORT_SINGLE_LETTER_ELEMENT_FORMULAE: phf::Set<&str> = phf_set! {
 /// Returns true if the formula is composed of 1 or 2 single letter elements and it matches a known compound/ion
 /// This might be called (via likely_adorned_chem_formula) unparsed
 fn is_short_formula(mrow: Element) -> bool {
-    use crate::errors::*;
     assert_eq!(name(&mrow), "mrow");
     let children = mrow.children();
     let n_children = children.len();
@@ -1331,43 +1394,45 @@ fn is_short_formula(mrow: Element) -> bool {
     } 
     return false;
 
-    fn convert_to_short_form(mathml: Element) -> Result<String> {
-        let mathml_name = name(&mathml);
-        return match mathml_name {
-            "mi" | "mtext" | "mn" => Ok( as_text(mathml).to_string() ),
-            "none" => Ok( "".to_string() ),
-            "msub" | "msup" | "msubsup" | "mmultiscripts"=> {
-                let is_mmultiscripts = mathml_name == "mmultiscripts";
-                let children = mathml.children();
-                let mut result = convert_to_short_form(as_element(children[0]))?;
-                if is_mmultiscripts && children.len() != 3 {
-                    bail!("mmultiscripts found with {} children -- not part of chemical formula", children.len());
-                }
-                if mathml_name == "msub" || mathml_name == "msubsup" || (is_mmultiscripts && name(&as_element(children[1])) != "none") {
-                    result += "_";
-                    result += &convert_to_short_form(as_element(children[1]))?;
-                }
-                if mathml_name == "msup" || mathml_name == "msubsup" || (is_mmultiscripts && name(&as_element(children[2])) != "none") {
-                    result += "^";
-                    result += &convert_to_short_form(as_element(children[if mathml_name=="msup" {1} else {2}]))?;
-                }
-                Ok( result )
-            },
-            "mrow" => {
-                // the only time this is valid is if the superscript is something like "+" or "2+", so we do a few checks and short circuit false now
-                let mrow_children = mathml.children();
-                if mrow_children.len() == 1 || mrow_children.len() == 2 {
-                    let mut result = convert_to_short_form(as_element(mrow_children[0]))?;
-                    if mrow_children.len() == 2 {
-                        result += &convert_to_short_form(as_element(mrow_children[1]))?;
-                    }
-                    return Ok(result)
-                } else {
-                    bail!("mrow found with {} children -- not part of chemical formula", mrow_children.len());
-                }
+
+}
+
+fn convert_to_short_form(mathml: Element) -> Result<String> {
+    let mathml_name = name(&mathml);
+    return match mathml_name {
+        "mi" | "mtext" | "mn" => Ok( as_text(mathml).to_string() ),
+        "none" => Ok( "".to_string() ),
+        "msub" | "msup" | "msubsup" | "mmultiscripts"=> {
+            let is_mmultiscripts = mathml_name == "mmultiscripts";
+            let children = mathml.children();
+            let mut result = convert_to_short_form(as_element(children[0]))?;
+            if is_mmultiscripts && children.len() != 3 {
+                bail!("mmultiscripts found with {} children -- not part of chemical formula", children.len());
             }
-            _ => bail!("{} found -- not part of chemical formula", mathml_name),
+            if mathml_name == "msub" || mathml_name == "msubsup" || (is_mmultiscripts && name(&as_element(children[1])) != "none") {
+                result += "_";
+                result += &convert_to_short_form(as_element(children[1]))?;
+            }
+            if mathml_name == "msup" || mathml_name == "msubsup" || (is_mmultiscripts && name(&as_element(children[2])) != "none") {
+                result += "^";
+                result += &convert_to_short_form(as_element(children[if mathml_name=="msup" {1} else {2}]))?;
+            }
+            Ok( result )
+        },
+        "mrow" => {
+            // the only time this is valid is if the superscript is something like "+" or "2+", so we do a few checks and short circuit false now
+            let mrow_children = mathml.children();
+            if mrow_children.len() == 1 || mrow_children.len() == 2 {
+                let mut result = convert_to_short_form(as_element(mrow_children[0]))?;
+                if mrow_children.len() == 2 {
+                    result += &convert_to_short_form(as_element(mrow_children[1]))?;
+                }
+                return Ok(result)
+            } else {
+                bail!("mrow found with {} children -- not part of chemical formula", mrow_children.len());
+            }
         }
+        _ => bail!("{} found -- not part of chemical formula", mathml_name),
     }
 }
 
@@ -1391,6 +1456,7 @@ static CHEMICAL_ELEMENTS: phf::Map<&str, u32> = phf_map! {
 	"U" => 32, "V" => 132, "W" => 134, "Xe" => 2, "Y" => 123, "Yb" => 44, "Zn" => 159, "Zr" => 127,
     // The following come from E.A. Moore who said to treat them like chemicals 
     // These stand for methyl, ethyl, alkyl, acetyl and phenyl and apparently are quite commonly used ("Ac" is already a chemical)
+    // A full(er?) list is at en.wikipedia.org/wiki/Skeletal_formula#Alkyl_groups and in following sections
     "Me" => 0, "Et" => 0, "R" => 0, /* "Ac" => 0, */ "Ph" => 0,
 };
 pub fn is_chemical_element(node: Element) -> bool {
@@ -1549,6 +1615,74 @@ mod chem_tests {
                 <mi>N</mi>
                 </mrow>"#;
         assert!( parse_mathml_string(test, |mathml| likely_chem_formula(mathml)==5) );
+    }
+
+    #[test]
+    fn test_simple_double_bond() {
+        let test1 = r#"<mrow><mi>C</mi><mo>=</mo><mi>C</mi></mrow>"#;
+        assert!( parse_mathml_string(test1, |mathml| likely_chem_formula(mathml)==CHEMISTRY_THRESHOLD) );
+        let test2 = r#"<mrow><mi>C</mi><mo>::</mo><mi>O</mi></mrow>"#;
+        assert!( parse_mathml_string(test2, |mathml| likely_chem_formula(mathml)==CHEMISTRY_THRESHOLD) );
+        let test3 = r#"<mrow><mi>N</mi><mo>=</mo><mi>N</mi></mrow>"#;
+        assert!( parse_mathml_string(test3, |mathml| likely_chem_formula(mathml)==CHEMISTRY_THRESHOLD) );
+        let test4 = r#"<mrow><mi>Sn</mi><mo>=</mo><mi>Sn</mi></mrow>"#;
+        assert!( parse_mathml_string(test4, |mathml| likely_chem_formula(mathml)==9) );
+        let test5 = r#"<mrow><mi>O</mi><mo>=</mo><mi>S</mi></mrow>"#;
+        assert!( parse_mathml_string(test5, |mathml| likely_chem_formula(mathml)==CHEMISTRY_THRESHOLD) );
+        let test10 = r#"<mrow><mi>K</mi><mo>=</mo><mi>K</mi></mrow>"#;
+        assert!( parse_mathml_string(test10, |mathml| likely_chem_formula(mathml)==NOT_CHEMISTRY) );
+        let test11 = r#"<mrow><mi>C</mi><mo>=</mo><mi>K</mi></mrow>"#;
+        assert!( parse_mathml_string(test11, |mathml| likely_chem_formula(mathml)==NOT_CHEMISTRY) );
+    }
+
+    #[test]
+    fn test_double_bond() {
+        let test1 = r#"<mrow><mi mathvariant='normal'>C</mi><msub><mi mathvariant='normal'>H</mi><mn>2</mn></msub><mo>=</mo><mi>C</mi></mrow>"#;
+        assert!( parse_mathml_string(test1, |mathml| likely_chem_formula(mathml)==7) );
+        let test2 = r#"<mrow><mi mathvariant='normal'>C</mi><msub><mi mathvariant='normal'>H</mi><mn>2</mn></msub><mo>=</mo>
+        <mi>C</mi><mi>H</mi><mi>R</mi></mrow>"#;
+        assert!( parse_mathml_string(test2, |mathml| likely_chem_formula(mathml)==11) );
+        let test3 = r#"<mrow><msub><mi mathvariant='normal'>H</mi><mn>2</mn></msub><mi mathvariant='normal'>C</mi><mo>=</mo>
+                <mi>C</mi><msub><mi mathvariant='normal'>H</mi><mn>2</mn></msub></mrow>"#;
+        assert!( parse_mathml_string(test3, |mathml| likely_chem_formula(mathml)==9) );
+        let test4 = r#"<mrow><mi>H</mi><mo>-</mo><mi>N</mi><mo>=</mo><mi>N</mi><mo>-</mo><mi>H</mi></mrow>"#;
+        assert!( parse_mathml_string(test4, |mathml| likely_chem_formula(mathml)==13) );
+        let test10 = r#"<mrow><mi mathvariant='normal'>C</mi><msub><mi mathvariant='normal'>H</mi><mn>3</mn></msub><mo>=</mo><mi>C</mi></mrow>"#;
+        assert!( parse_mathml_string(test10, |mathml| likely_chem_formula(mathml)==NOT_CHEMISTRY) );
+    }
+
+    #[test]
+    #[ignore]   // It would be good to say "not chemistry" for this, but there aren't rules for that at the moment
+    fn test_water_bond() {
+        init_logger();
+        let test11 = r#"<mrow><msub><mi mathvariant='normal'>H</mi><mn>2</mn></msub><mi mathvariant='normal'>O</mi><mo>=</mo><mi>O</mi></mrow>"#;
+        assert!( parse_mathml_string(test11, |mathml| {println!("val={}", likely_chem_formula(mathml)); likely_chem_formula(mathml)==13}) );
+        // assert!( parse_mathml_string(test11, |mathml| likely_chem_formula(mathml)==NOT_CHEMISTRY) );
+    }
+
+
+    #[test]
+    fn test_triple_bond() {
+        let test1 = r#"<mrow><mi>C</mi><mo>≡</mo><mi>C</mi></mrow>"#;
+        assert!( parse_mathml_string(test1, |mathml| likely_chem_formula(mathml)==CHEMISTRY_THRESHOLD) );
+        let test2 = r#"<mrow><mi>C</mi><mo>:::</mo><mi>O</mi></mrow>"#;
+        assert!( parse_mathml_string(test2, |mathml| likely_chem_formula(mathml)==CHEMISTRY_THRESHOLD) );
+        let test3 = r#"<mrow><mi>H</mi><mo>-</mo><mi>C</mi><mo>≡</mo><mi>C</mi><mo>-</mo><mi>H</mi></mrow>"#;
+        assert!( parse_mathml_string(test3, |mathml| likely_chem_formula(mathml)==13) );
+        let test4 = r#"<mrow><mi>H</mi><mo>-</mo><mi>C</mi><mo>≡</mo><mi>C</mi><mo>-</mo><mi>H</mi></mrow>"#;
+        assert!( parse_mathml_string(test4, |mathml| likely_chem_formula(mathml)==13) );
+        let test5 = r#"<mrow><mi>N</mi><mo>-</mo><mi>C</mi><mo>≡</mo><mi>C</mi><mo>-</mo><mi>N</mi></mrow>"#;
+        assert!( parse_mathml_string(test5, |mathml| likely_chem_formula(mathml)==13) );
+        let test6 = r#"<mrow><mi>H</mi><mo>-</mo><mi>C</mi><mo>≡</mo>
+            <mi>C</mi><mo>-</mo><mi mathvariant='normal'>C</mi><msub><mi mathvariant='normal'>H</mi><mn>3</mn></msub></mrow>"#; // 1-Propyne
+        assert!( parse_mathml_string(test6, |mathml| likely_chem_formula(mathml)==15) );
+        // assert!( parse_mathml_string(test6, |mathml| {println!("val={}", likely_chem_formula(mathml)); likely_chem_formula(mathml)==13}) );
+        let test10 = r#"<mrow><mi>O</mi><mo>:::</mo><mi>S</mi></mrow>"#;
+        assert!( parse_mathml_string(test10, |mathml| likely_chem_formula(mathml)==NOT_CHEMISTRY) );
+        let test11 = r#"<mrow><mi>Pb</mi><mo>≡</mo><mi>Pb</mi></mrow>"#;
+        assert!( parse_mathml_string(test11, |mathml| likely_chem_formula(mathml)==NOT_CHEMISTRY) );
+        let test12 = r#"<mrow><mi>C</mi><mo>≡</mo><mi>K</mi></mrow>"#;
+        assert!( parse_mathml_string(test12, |mathml| likely_chem_formula(mathml)==NOT_CHEMISTRY) );
     }
 
     #[test]
