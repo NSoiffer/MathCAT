@@ -345,7 +345,7 @@ impl Replacement {
                 return Ok( Replacement::XPath( MyXPath::build(value)
                     .chain_err(|| "while trying to evaluate value of 'x:'")? ) );
             },
-            "pause" | "rate" | "pitch" | "volume" | "gender" | "voice" | "spell" | "bookmark" | "pronounce"=> {
+            "pause" | "rate" | "pitch" | "volume" | "gender" | "voice" | "spell" | "Spell" | "bookmark" | "pronounce" | "Pronounce" => {
                 return Ok( Replacement::TTS( TTS::build(key, value)? ) );
             },
             "intent" => {
