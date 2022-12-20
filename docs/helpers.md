@@ -405,6 +405,10 @@ MathCAT adds some custom functions to make writing rules easier:
 | IsBracketed(openChar, closeChar, requiresComma) | |
 | BaseNode(node) | Returns the base (recursively) of a scripted node |
 | IsInDefinition(node, name) | Returns true if node is a member of the list 'name' (defined in definitions.yaml) |
+| IfThenElse(test, then-part, else-part) | Returns `then-part` if the test is true, otherwise `else-part`. All arguments are xpath |
+| DistanceFromLeaf(node, left_side, treat_2d_elements_as_tokens) |  Returns distance from the current node to the leftmost/rightmost leaf (if a char, then = 0, if token, then 1). If the node is a bracketed expr with the indicated left/right chars. If `left_side` is `true`, traverse leftmost child to leaf. If `treat2D_elements_as_tokens` is `true`, 2D notations such as fractions are treated like leaves. |
+| EdgeNode(node, "left"/"right", stopNodeName) | Returns the stopNode if at left/right edge of named ancestor node. "stopNodeName' can also be "2D'. The  original node is returned if match isn't found. Note: if stopNodeName=="math", then punctuation is taken into account since it isn't really part of the math
+ |
 | DEBUG(xpath) | Really helpful for debugging -- it will be added to debug output |
 
 These are used by Nemeth Rules:
