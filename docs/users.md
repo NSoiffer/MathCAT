@@ -33,17 +33,19 @@ The default value is given in \[brackets\].
   * Description: this controls whether certain notations are disambiguated or not in speech.
   * Status: the focus has been on Blindness, but there is some support if a different value is used. That support needs to be improved.
 
-* Language: [en]
+* ✓Language: [en]
   * Options: any known language code and sub-code. E.g., "en-uk".
     [This site gives a list of options](https://www.venea.net/web/culture_code).
   * Description: this value determines the language to be used.
     If the regional variant is not found among the speech rules, the speech will fall back to using the main language. If speech rules for the main language can not be found, English ("en") is used.
-  * Status: currently only English is supported.
+  * Status: currently only English, Indonesian, and Vietnamese are supported.
     Support for other languages will added with help from volunteers.
 
 * ✓SpeechStyle: [ClearSpeak]
-  * Options:  Any implemented speech style
-  * Description: a style of speech speech or coordinated philosophy of how t speak an expression. ClearSpeak with developed by ETS for use on high stake tests such as the SAT. SimpleSpeak tries to minimize speech by speaking simple things quickly without bracketing words; these are distinguished from more complex expressions such as $\frac{a}{b+1}$ which will always have bracketing words. 
+  * Options:  Any implemented speech style (currently only ClearSpeak and SimpleSpeak)
+  * Description: a style of speech speech or coordinated philosophy about how to speak an expression.
+    * ClearSpeak with developed by ETS for use on high stake tests such as the SAT.
+    * SimpleSpeak tries to minimize speech by speaking simple expressions such as $\frac{a}{b}$ quickly without bracketing words ("a over b"); these are distinguished from more complex expressions such as $\frac{a}{b+1}$ which will always have bracketing words ("fraction a over b plus 1 end fraction"). Expressions are never unambiguous in SimpleSpeak.
   * Status: currently only ClearSpeak and SimpleSpeak are implemented, but MathSpeak will likely be implemented at some point.
 
 * ✓Verbosity: [Medium]  
@@ -57,6 +59,12 @@ The default value is given in \[brackets\].
       This only works for implementations that tell MathCAT to generate speech engine tagging such as SSML.
     * Status: This should work in NVDA.
 
+* ✓PauseFactor: [1]
+    * Options: Number between 0 and 10
+    * Description: Changes the relative amount of pausing that MathCAT adds. 0 turns off all pausing and 10 makes the pauses 10 times longer than normal.
+      This only works for implementations that tell MathCAT to generate speech engine tagging such as SSML.
+    * Status: This should work in NVDA.
+
 * ✓SpeechSound: [None]
     * Options: None, Beep
     * Description: a start and end beep occur before and after reading an expression.
@@ -67,11 +75,11 @@ The default value is given in \[brackets\].
 
 * Chemistry: [SpellOut]
   * Options:  SpellOut, AsCompound, Off
-  * Description:  controls how Chemical formulae are read. Examples for $\mathrm{H}_2\mathrm{0}$:
-    * SpellOut: "H 2 0"
+  * Description:  controls how Chemical formulae are read. Examples for $\mathrm{H}_2\mathrm{O}$:
+    * ✓SpellOut: "H 2 0" (verbosity controls whether "sub"/"super" is spoken)
     * AsCompound: "Water"
-    * Off "H sub 2 O"
-  * Status: not yet implemented. Inferring Chemical notations is a bit tricky so MathCAT will sometimes not pick it up. The work of the MathML WG may make it substantially easier for authors to indicate that something is Chemistry.
+    * ✓Off "H sub 2 O"
+  * Status: Many heuristics have been implemented to infer when some notation is chemistry or not. Inferring chemical notations is a bit tricky so MathCAT will sometimes not recognize them and may sometimes inadvertently classify something as chemistry. The work of the MathML WG may make it substantially easier for authors to indicate that something is chemistry.
 
 SpeechOverrides:
 * ✓CapitalLetters: "cap"     # word to say as a prefix for capital letters unless in unicode.yaml; empty string leaves it to screen reader
@@ -116,11 +124,11 @@ ClearSpeak has a number of options. These were designed for authors to use, but 
 
 
 ### Braille Options
-* Code: [Nemeth]
+* ✓Code: [Nemeth]
   * Options: Any implemented braille code
   * Description: the braille math code to use
   * Status: currently only Nemeth and UEB are supported. Other braille code support will depend upon help from others.
-* BrailleNavHighlight: [EndPoints]
+* ✓BrailleNavHighlight: [EndPoints]
   * Options: Off, FirstChar, EndPoints, All
   * Description:  highlight with dots 7 & 8 the currently selected navigation node
 
