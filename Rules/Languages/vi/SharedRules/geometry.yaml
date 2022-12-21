@@ -1,0 +1,59 @@
+---
+
+- name: line-segment
+  tag: line-segment
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: "đoạn thẳng từ"
+      - x: "*[1]"
+      - T: "đến"
+      - x: "*[2]"
+      else:
+      - T: "đoạn thẳng"
+      - x: "*[1]"
+      - x: "*[2]"
+
+- name: geometry-ray
+  tag: ray
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: "tia từ"
+      - x: "*[1]"
+      - T: "đến"
+      - x: "*[2]"
+      else:
+      - T: "tia"
+      - x: "*[1]"
+      - x: "*[2]"
+
+- name: geometry-arc
+  tag: arc
+  match: "."
+  replace:
+  #      if: "$Verbosity='Verbose'"
+  #      then: [T: "the"]
+  - T: "vòng cung"
+    #   - test:
+  - x: "*[1]"
+  - x: "*[2]"
+
+- name: measure-of-angle
+  tag: measure-of-angle
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: "số đo của góc"
+      else:
+      - T: "số đo của góc"
+  - x: "*[1]"
+  - x: "*[2]"
+  - x: "*[3]"
+

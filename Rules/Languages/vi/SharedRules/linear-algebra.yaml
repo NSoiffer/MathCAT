@@ -1,0 +1,114 @@
+---
+
+- name: simple-determinant
+  tag: determinant
+  match: "not(*[1][self::m:mtr])"
+  replace:
+  #      if: "$Verbosity='Verbose'"
+  #      then:
+  #      - T: "the" 
+  - T: "định thức"
+    #   - test:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "của"
+  - x: "*[1]"
+
+- name: norm
+  tag: norm
+  match: "."
+  replace:
+  #      if: "$Verbosity='Verbose'"
+  #      then:
+  #      - T: "the" 
+  - T: "định mức"
+    #   - test:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "của"
+  - x: "*[1]"
+
+- name: subscripted-norm
+  tag: subscripted-norm
+  match: "."
+  replace:
+  #      if: "$Verbosity='Verbose'"
+  #      then:
+  #      - T: "the" 
+  - T: "định mức"
+    #   - test:
+  - x: "*[2]"
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "của"
+  - x: "*[1]"
+
+- name: transpose
+  tag: transpose
+  match: "."
+  replace:
+  - T: "ma trận chuyển vị"
+  - x: "*[1]"
+- name: trace
+  tag: trace
+  match: "."
+  replace:
+  #      if: "$Verbosity='Verbose'"
+  #      then:
+  #      - T: "the" 
+  - T: "vết"
+    #   - test:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "của"
+  - x: "*[1]"
+
+- name: dimension
+  tag: dimension
+  match: "."
+  replace:
+  #      if: "$Verbosity='Verbose'"
+  #      then:
+  #      - T: "the" 
+  - T: "chiều"
+    #   - test:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "của"
+  - x: "*[1]"
+
+- name: homomorphism
+  tag: homomorphism
+  match: "."
+  replace:
+  #      if: "$Verbosity='Verbose'"
+  #      then:
+  #      - T: "the" 
+  - T: "đồng hình"
+    #   - test:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "của"
+  - x: "*[1]"
+
+- name: kernel
+  tag: kernel
+  match: "."
+  replace:
+  #      if: "$Verbosity='Verbose'"
+  #      then:
+  #      - T: "the" 
+  - T: "hạch tâm"
+    #   - test:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "của"
+  - x: "*[1]"
+

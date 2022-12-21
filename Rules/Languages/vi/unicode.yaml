@@ -1,0 +1,634 @@
+---
+
+#  - "a": 
+#     - test: 
+#         if: "$TTS='none'"
+#         then: [T: "a"]                         # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
+#         else: [spell: "a"]                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
+ - "a-z": 
+    - test: 
+        if: "$TTS='none'"
+        then: [T: "."]                          
+        else: [spell: "."]                       
+
+#  - "A":
+#     - test: 
+#         if: "$TTS='none'"
+#         then: [x: "$SpeechOverrides_CapitalLetters", t: "A"]                         # long "a" sound in all speech engines I tested (see above)
+#         else: [spell: "A"]
+
+ - "A-Z": 
+    - test: 
+        if: "$TTS='none'"
+        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
+        then: [x: "$SpeechOverrides_CapitalLetters", x: "translate('.', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"]                         
+        else: {spell: "."}                       
+
+ - "0-9": [T: "."]
+
+ - "!": [T: giai thừa]                           # 0x21
+ - "\"": [T: nháy kép]                     # 0x22
+ - "#": [T: báo số]                              # 0x23
+ - "$": [T: đô-la]                             # 0x24
+ - "%": [T: phần trăm]                             # 0x25
+ - "&": [T: và]                           # 0x26
+ - "'": [T: nháy đơn]                          # 0x27
+ - "(":                                          # 0x28
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [test: {if: "$Verbosity='Terse'", then: [T: mở ngoặc], else: [T: mở ngoặc đơn]}]
+        else: [T: mở ngoặc đơn]                            
+ - ")":                                          # 0x29
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [test: {if: "$Verbosity='Terse'", then: [T: đóng ngoặc], else: [T: đóng ngoặc đơn]}]
+        else: [T: đóng ngoặc đơn]                            
+
+ - "*": [T: nhân]                               # 0x2a
+ - "+": [T: cộng]                                # 0x2b
+ - ",":                                          # 0x2c
+    # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
+    # that this test is here and not with "…" is not ideal, but seems simplest
+     test:
+        if:
+            - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or "
+               # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
+               # speak "comma" when not adjacent to '…'
+            - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
+               # except if expression starts with '…'
+            - " ../*[1][text()='…'] "
+        then: [T: phẩy]
+        # else silent
+
+ - "-": [T: trừ]                               # 0x2d
+ - ".":                                          # 0x2e
+    - test:
+        if: "parent::*[1][self::m:mn]"
+        then: [T: "chấm"]
+        else: [T: "chấm"]
+ - "/": [T: chia]                          # 0x2f
+ - ":": [T: hai chấm]                               # 0x3a
+ - ";": [T: chấm phẩy]                           # 0x3b
+ - "<":                                          # 0x3c
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: nhỏ hơn
+ - "=": [T: bằng]                              # 0x3d
+ - ">":                                          # 0x3e
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: lớn hơn
+ - "?": [T: chấm hỏi]                       # 0x3f
+ - "@": [T: a móc]                             # 0x40
+ - "[":                                          # 0x5b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: mở ngoặc vuông]
+        else: [T: ngoặc vuông trái]                            
+ - "\\": [T: chéo ngược]                         # 0x5c
+ - "]":                                          # 0x5d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: đóng ngoặc vuông]
+        else: [T: ngoặc vuông phải]
+ - "^": [T: mũ]                                # 0x5e
+ - "_": [T: gạch dưới]                          # 0x5f
+ - "`": [T: dấu huyền]                              # 0x60
+ - "{":                                         # 0x7b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: mở ngoặc nhọn]
+        else: [T: ngoặc nhọn trái]                            
+ - "|":                                          # 0x7c
+    # note: for ClearSpeak and SimpleSpeak, "|" in side of sets is handled at the mrow level, same for 'sets'
+     - test:
+        - if: $SpeechStyle != 'ClearSpeak'
+          then: [T: gạch đứng]
+        - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+          then: [T: sao cho]
+        - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
+          then: [T: được cho] 
+        - else: [T: phân chia]                   
+
+ - "}":                                          # 0x7d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: đóng ngoặc nhọn]
+        else: [T: ngoặc nhọn phải]                            
+
+ - "~": [T: dấu ngã]                               # 0x7e
+ - " ": [T: ""]                                  # 0xa0
+ - "¢": [T: cents]                               # 0xa2
+ - "£": [T: bảng Anh]                              # 0xa3
+ - "¬": [T: không]                                 # 0xac
+ - "°": [T: "độ"]                           # 0xb0
+ - "±": [T: cộng trừ]                       # 0xb1
+ - "´": [T: "dấu nháy đơn"]                            # 0xb4
+ - "·":
+    - test:
+        if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
+        then: [T: nhân]
+        else: [T: chấm]
+ - "×":                                          # 0xd7
+    - test:
+        if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
+        then: [T: nhân]
+        else_test:
+            if: $ClearSpeak_MultSymbolX = 'By'
+            then: [T: cho]
+            else: [T: nhân]
+ - "÷": [T: chia]                          # 0xf7
+ - "̀": [T: grave accent embellishment]          # 0x300
+ - "́": [T: acute accent embellishment]          # 0x301
+ - "̂": [T: circumflex accent embellishment]     # 0x302
+ - "̃": [T: tilde embellishment]                 # 0x303
+ - "̄": [T: macron embellishment]                # 0x304
+ - "̅": [T: overbar embellishment]               # 0x305
+ - "̆": [T: mũ ngược]                 # 0x306
+ - "̇": [T: dot above embellishment]             # 0x307
+ - "Α":                                          # 0x391
+     - T: alpha
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: alpha
+ - "Β":                                          # 0x392
+     - T: beta
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: beta
+ - "Γ":                                          # 0x393
+     - T: gamma
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: gamma
+
+    # Note: ClearSpeak has pref TriangleSymbol for this character, but that is wrong
+ - "Δ":                                          # 0x394
+     - T: delta
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: delta
+ - "Ε":                                          # 0x395
+     - T: epsilon
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: epsilon
+ - "Ζ":                                          # 0x396
+     - T: zeta
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: zeta
+ - "Η":                                          # 0x397
+     - T: eta
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: eta
+ - "Θ":                                          # 0x398
+     - T: theta
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+    # - T: theta
+ - "Ι":                                          # 0x399
+     - T: iota
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: iota
+ - "Κ":                                          # 0x39a
+     - T: kappa
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: kappa
+ - "Λ":                                          # 0x39b
+     - T: lambda
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+    # - T: lamda
+ - "Μ":                                          # 0x39c
+     - T: mu
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+    # - T: mu
+ - "Ν":                                          # 0x39d
+     - T: nu
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+    # - T: nu
+ - "Ξ":                                          # 0x39e
+     - T: xi
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: xi
+ - "Ο":                                          # 0x39f
+     - T: omicron
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: omicron
+ - "Π":                                          # 0x3a0
+     - T: pi
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: pi
+ - "Ρ":                                          # 0x3a1
+     - T: rho
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: rho
+ - "Σ":                                          # 0x3a3
+     - T: sigma
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+    # - T: sigma
+ - "Τ":                                          # 0x3a4
+     - T: tau
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: tau
+ - "Υ":                                          # 0x3a5
+     - T: upsilon
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: upsilon
+ - "Φ":                                          # 0x3a6
+     - T: phi
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+    # - T: phi
+ - "Χ":                                          # 0x3a7
+     - T: chi
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+    # - T: chi
+ - "Ψ":                                          # 0x3a8
+     - T: psi
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+    # - T: psi
+ - "Ω":                                          # 0x3a9
+     - T: omega
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: omega
+ - "Ϊ":                                          # 0x3aa
+     - T: iota với hai dấu chấm ở trên
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: iota with dialytika
+ - "Ϋ":                                          # 0x3ab
+    - T: upsilon với hai chấm ở trên
+    - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     #- T: upsilon with dialytika
+ - "α": [T: alpha]                               # 0x3b1
+ - "β": [T: beta]                                # 0x3b2
+ - "γ": [T: gamma]                               # 0x3b3
+ - "δ": [T: delta]                               # 0x3b4
+ - "ε": [T: epsilon]                             # 0x3b5
+ - "ζ": [T: zeta]                                # 0x3b6
+ - "η": [T: eta]                                 # 0x3b7
+ - "θ": [T: theta]                               # 0x3b8
+ - "ι": [T: iota]                                # 0x3b9
+ - "κ": [T: kappa]                               # 0x3ba
+ - "λ": [T: lambda]                               # 0x3bb
+ - "μ": [T: mu]                                  # 0x3bc
+ - "ν": [T: nu]                                  # 0x3bd
+ - "ξ": [T: zai]                                 # 0x3be
+ - "ο": [T: omicron]                             # 0x3bf
+ - "π": [T: pi]                                  # 0x3c0
+ - "ρ": [T: rho]                                 # 0x3c1
+ - "ς": [T: final sigma]                         # 0x3c2
+ - "σ": [T: sigma]                               # 0x3c3
+ - "τ": [T: tau]                                 # 0x3c4
+ - "υ": [T: upsilon]                             # 0x3c5
+ - "φ": [T: phi]                                 # 0x3c6
+ - "χ": [T: chi]                                 # 0x3c7
+ - "ψ": [T: psi]                                 # 0x3c8
+ - "ω": [T: omega]                               # 0x3c9
+ - "ϕ": [T: phi]                                 # 0x3d5
+ - "ϖ": [T: pi]                                  # 0x3d6
+ - "ϵ": [T: epsilon]                             # 0x3f5
+ - "϶": [T: epsilon đảo ngược]                    # 0x3f6
+ - "А":                                          # 0x410
+     - T: a
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+ - "–": [T: gạch nối]                             # 0x2013
+ - "—": [T: gạch ngang]                             # 0x2014
+ - "―": [T: gạch ngang dài]                      # 0x2015
+ - "‖": [T: đường thẳng đứng kép]                # 0x2016
+ - "•": [T: chấm]                              # 0x2022
+ - "…":                                          # 0x2026
+    test:
+        if:
+            - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
+               # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
+               # speak '…' as 'and so on...' unless expr starts with '…'
+            - "../*[1][text()='…']"
+        then: [T: chấm chấm chấm]
+        else_test:  # must have $ClearSpeak_Ellipses = 'AndSoOn'
+            if: "count(following-sibling::*) = 0"
+            then: [T: và như thế]
+            else: [T: và như vậy cho đến]
+
+ - "⁡":                                          # 0x2061
+    - test:
+        if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])" 
+        then: [T: "của"]
+ - "⁢": [T: ""]                                   # 0x2062
+ - "⁣": [T: ""]                                   # 0x2063
+ - "⁤": [T: "và"]                                # 0x2064
+ - "′": [T: nháy đơn]                               # 0x2032
+ - "″": [T: nháy kép]                        # 0x2033
+ - "‴": [T: ba dấu nháy]                        # 0x2034
+ - "‵": [T: nháy đơn ngược]                      # 0x2035
+ - "‶": [T: nháy kép ngược]               # 0x2036
+ - "‷": [T: ba dấu nháy ngược]               # 0x2037
+ - "ℂ":                                          # 0x2102
+     - T: C 
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     - T: gạch đôi
+ - "℃": [T: độ C]                     # 0x2103
+ - "℉": [T: độ F]                  # 0x2109
+ - "ℋ":                                          # 0x210b
+     - T: h
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     - T: viết tay
+     
+ - "ℎ": [T: hằng số plankc]                     # 0x210e
+ - "ℓ": [T: l viết tay]                            # 0x2113
+ - "ℕ":                                          # 0x2115
+     - T: n
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     - T: gạch đôi
+ - "ℚ":                                          # 0x211a
+     - T: q
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     - T: gạch đôi
+ - "ℛ":                                          # 0x211b
+     - T: r
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     - T: viết tay
+ - "ℜ":                                          # 0x211c
+     - T: r
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     - T: kiểu chữ tiếng Đức
+ - "ℝ":                                          # 0x211d
+     - T: r
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     - T: gạch đôi
+ - "ℤ":                                          # 0x2124
+     - T: z
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [T: "hoa"]
+     - T: gạch đôi
+ - "Ω": [T: ohms]                                # 0x2126
+ - "K": [T: kelvin]                              # 0x212a
+ - "Å": [T: angstroms]                           # 0x212b
+ - "ⅆ": [T: D nghiêng gạch đôi]              # 0x2146
+ - "ⅇ": [T: E nghiêng gạch đôi]              # 0x2147
+ - "ⅈ": [T: I nghiêng gạch đôi]              # 0x2148
+ - "ⅉ": [T: J nghiêng gạch đôi]              # 0x2149
+ - "←": [T: mũi tên trái]                     # 0x2190
+ - "↑": [T: mũi tên lên]                       # 0x2191
+ - "→":                                          # 0x2192
+     - test:
+        if: "ancestor::*[2][self::m:limit]"
+        then: [T: "tiếp cận"]
+        else: [T: "mũi tên phải"]
+ - "↓": [T: mũi tên xuống]                     # 0x2193
+ - "⇒": [T: mũi tên đôi hướng phải]             # 0x21d2
+ - "∀": [T: với mọi]                             # 0x2200
+ - "∂":                                          # 0x2202
+      - test: 
+         if: "$Verbosity='Terse'"
+         then: {T: phần}
+         else: {T: đạo hàm riêng}
+ - "∃": [T: tồn tại ít nhất]                        # 0x2203
+ - "∄": [T: không tồn tại]                # 0x2204
+ - "∅": [T: tập hợp rỗng]                           # 0x2205
+ - "∆":                                          # 0x2206
+   #  - test: 
+    #     if: "$Verbosity!='Terse'"
+     #    then: [T: "the"]
+     - T: tam giác
+ - "∇":                                          # 0x2207
+   #  - test: 
+    #     if: "$Verbosity!='Terse'"
+     #    then: [T: "the"]
+     - T: độ dốc của
+ - "∈":                                          # 0x2208
+     - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [T: là phần tử của]
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "../../self::m:set or ../../../self::m:set" # inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: thuộc]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: phần tử của]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: phần tử của]
+              - else: [T: thuộc về]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: là một phần tử của]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: là một phần tử của]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: thuộc]
+              - else: [T: thuộc về]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+ - "∉":                                          # 0x2209
+    # rule is identical to 0x2208
+     - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [T: không là phần tử của]
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "../../self::m:set or ../../../self::m:set" # inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: không thuộc]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: không là phần tử]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: không là phần tử]
+              - else: [T: không thuộc về]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: không là phần tử]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: không là phần tử]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: không thuộc]
+              - else: [T: không thuộc về]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+ - "∊":                                          # 0x220a
+     - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [T: là phần tử của]
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "../../self::m:set or ../../../self::m:set" # inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: thuộc]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: phần tử của]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: phần tử của]
+              - else: [T: thuộc về]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: là một phần tử của]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: là một phần tử của]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: thuộc]
+              - else: [T: thuộc về]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+ - "∏": [T: pi]                             # 0x220f
+ - "∐": [T: pi ngược]                           # 0x2210
+ - "∑": [T: tổng]                                 # 0x2211
+ - "−": [T: trừ]                               # 0x2212
+ - "∓": [T: trừ cộng]                       # 0x2213
+ - "∗": [T: nhân]                               # 0x2217
+ - "∘": [T: hàm hợp]                       # 0x2218
+ - "∙": [T: nhân]                               # 0x2219
+ - "√":                                          # 0x221a
+   #  - test: 
+    #     if: "$Verbosity!='Terse'"
+     #    then: [T: ""]
+     - T: căn bậc 2 của
+ - "∝":                                          # 0x221d
+    # - test: 
+     #    if: "$Verbosity!='Terse'"
+      #   then: [T: is]
+     - T: tỉ lệ với
+ - "∞": [T: "vô cực"]                          # 0x221e
+ - "∟": [T: right angle]                         # 0x221f
+ - "∠": [T: angle]                               # 0x2220
+ - "∡": [T: measured angle]                      # 0x2221
+ - "∣": [T: divides]                              # 0x2223
+ - "∤": [T: does not divide]                      # 0x2224
+ - "∥":                                           # 0x2225
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: song song với
+ - "∦":                                           # 0x2226
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: không song song với
+ - "∧": [T: và]                                 # 0x2227
+ - "∨": [T: hoặc]                                  # 0x2228
+ - "∩": [T: giao]                        # 0x2229
+ - "∪": [T: hợp]                               # 0x222a
+ - "∫": [T: tích phân]                            # 0x222b
+ - "∬": [T: tích phân 2 lớp]                     # 0x222c
+ - "∭": [T: tích phân 3 lớp]                     # 0x222d
+ - "∮": [T: tích phân vòng]                    # 0x222e
+ - "∶":                                          # 0x2236
+     #- test: 
+      #   if: "$Verbosity!='Terse'"
+       #  then: [T: is]
+     - T: tỉ suất
+ - "∷": [T: tỉ lệ]                                  # 0x2237
+ - "∼": [T: tương tự với]                         # 0x223c
+ - "∽": [T: dấu ngã ngược]                      # 0x223d
+ - "∾":                                          # 0x223e
+    # - test: 
+     #    if: "$Verbosity!='Terse'"
+      #   then: [T: is]
+     - T: đồng dạng
+ - "∿": [T: hình sin]                           # 0x223f
+ - "≠":                                          # 0x2260
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]
+     - T: khác
+ - "≡":                                          # 0x2261
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: {T: trùng với}
+ - "≤":                                          # 0x2264
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: {T: nhỏ hơn hoặc bằng}
+ - "≥":                                          # 0x2265
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: {T: lớn hơn hoặc bằng}
+ - "≦": [T: nhỏ hơn hoặc bằng]             # 0x2266
+ - "≧": [T: lớn hơn hoặc bằng]          # 0x2267
+ - "≺": [T: precedes]                            # 0x227a
+ - "≻": [T: succeeds]                            # 0x227b
+ - "⊂":                                          # 0x2282
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: {T: là tập hợp con của}
+ - "⊃":                                          # 0x2283
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: {T: là tập cha của}
+ - "⊄":                                          # 0x2284
+   #  - test: 
+    #     if: "$Verbosity!='Terse'"
+     #    then: [T: is]
+     - T: không là tập con của
+ - "⊅":                                          # 0x2285
+   #  - test: 
+    #     if: "$Verbosity!='Terse'"
+     #    then: [T: is]
+     - T: không là tập cha của
+ - "⊆":                                          # 0x2286
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: {T: là tập hợp con của}
+ - "⊇":                                          # 0x2287
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: {T: là tập hợp cha của}
