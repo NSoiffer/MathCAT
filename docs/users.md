@@ -100,7 +100,7 @@ ClearSpeak has a number of options. These were designed for authors to use, but 
 * ✓Paren: Auto, Speak, SpeakNestingLevel, Silent, CoordPoint, Interval
 * ✓Matrix: Auto, SpeakColNum, SilentColNum, EndMatrix, Vector, EndVector, Combinatorics
 * ✓MultiLineLabel: Auto, Case, Constraint, Equation, Line, None, Row, Step 
-* MultiLineOverview: Auto, None, 
+* ✓MultiLineOverview: Auto, None, 
 * ✓MultiLinePausesBetweenColumns: Short, Long
 * ✓Sets: Auto, woAll, SilentBracket
 * ✓MultSymbolX: Auto, By, Cross
