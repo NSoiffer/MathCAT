@@ -144,11 +144,17 @@ If you are working on an in-browser solution (i.e, you are using JavaScript or s
 
 
 # Acknowledgements
-Several people helped out in various ways with the project:
+Several people helped out in various ways with the project. I am very grateful for all their help!
 
 * David Carlisle -- provided invaluable help figuring out some xpath matches
-* Susan Jolly -- provided lots of patient guidance on Nemeth and UEB generation along with feedback on what is right and wrong.
+* Susan Jolly -- provided lots of patient guidance on Nemeth and UEB generation along with feedback on what is right and wrong. On top of that, she also guided me as I tried to work out chemistry heuristics.
+* Elaine A. Moore -- helped me to figure out what should and should not be said for chemistry, along with what makes sense as chemistry and what doesn't.
+* Richard Orme -- did all the work for the MathCAT NVDA settings dialog.
 * Murray Sargent and Volker Sorge -- provided tables of Nemeth translations of characters and Nemeth tests
 
 Translators:
-This has yet to be done, but initial translations will come from MathPlayer. I hope others will help out so I can list you here...
+* Indonesian -- Dr. Pinta Deniyanti Sampoerno, M.Si; Dr. Meiliasari, S.Pd., M.Sc; and Ari Hendarno, S.Pd., M.kom
+* Vietnamese -- Dang Hoai Phúc and Trang Pham
+* Others??? -- please volunteer so I can list you here...
+
+Thanks to everyone who volunteered!
