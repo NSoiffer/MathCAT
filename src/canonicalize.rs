@@ -2803,7 +2803,7 @@ impl CanonicalizeContext {
 	fn is_implied_chemical_bond<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>) -> bool {
 		// debug!("is_implied_chemical_bond: previous: {:?}", prev.preceding_siblings());
 		// debug!("is_implied_chemical_bond: following: {:?}", prev.following_siblings());
-		if !prev.attribute(MAYBE_CHEMISTRY).is_some() || !current.attribute(MAYBE_CHEMISTRY).is_some() {
+		if prev.attribute(MAYBE_CHEMISTRY).is_none() || current.attribute(MAYBE_CHEMISTRY).is_none() {
 			return false;
 		}
 		// ABC example where B and C are chemical elements is why we need to scan further than just checking B and C

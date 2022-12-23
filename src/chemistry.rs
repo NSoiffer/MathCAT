@@ -841,7 +841,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
                 return NOT_CHEMISTRY;
             } else {
                 if likelihood < CHEMISTRY_THRESHOLD && is_short_formula(mrow) {
-                        mathml.set_attribute_value(MAYBE_CHEMISTRY, &CHEMISTRY_THRESHOLD_STR);
+                        mathml.set_attribute_value(MAYBE_CHEMISTRY, CHEMISTRY_THRESHOLD_STR);
                         debug!("is_short_formula is true for:\n{}", mml_to_string(&mrow));
                         return CHEMISTRY_THRESHOLD
                 } else if likelihood > 0 {
@@ -1388,14 +1388,14 @@ fn is_short_formula(mrow: Element) -> bool {
 
     let first_element = convert_to_short_form( as_element(children[0]) );
     let second_element = convert_to_short_form( as_element(children[if n_children == 2 {1} else {2}]) );
-    if first_element.is_ok() && second_element.is_ok() {
-        let short_form = first_element.unwrap() + second_element.unwrap().as_str();
-        debug!("short_form: {}", short_form);
-        return SHORT_SINGLE_LETTER_ELEMENT_FORMULAE.contains(&short_form);
-    } 
-    return false;
-
-
+    return match (first_element, second_element) {
+        (Ok(first), Ok(second)) => {
+            let short_form = first + second.as_str();
+            debug!("short_form: {}", short_form);
+            return SHORT_SINGLE_LETTER_ELEMENT_FORMULAE.contains(&short_form);
+        },
+        _ => false,
+    }
 }
 
 fn convert_to_short_form(mathml: Element) -> Result<String> {
