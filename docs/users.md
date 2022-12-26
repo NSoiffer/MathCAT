@@ -120,7 +120,9 @@ ClearSpeak has a number of options. These were designed for authors to use, but 
 * Overview: false -- speak the expression or give a description/overview
 * ResetOverView: true -- remember previous value and use it
 * ✓NavVerbosity: Medium -- Terse, Medium, Full (words to say for nav command)
-* ✓AutoZoomOut: true -- Auto zoom out of 2D exprs (use shift-arrow to force zoom out if unchecked)
+* ✓AutoZoomOut: true -- Auto zoom out of 2D exprs (use shift-arrow to force zoom out if unchecked).
+  * `true`: if you are at the edge of a 2D expression (e.g., a fraction or superscript) and you try to move (left or right) out of it, then the move is allowed and the zoom level is set to that of the preceding/following item. 
+  * `false`: moving (left or right) past the edge of a 2D expression is not allowed; you need to zoom out (perhaps repeatedly) until you are not at an edge to be able to move (left or right).
 
 
 ### Braille Options
