@@ -202,6 +202,7 @@ cfg_if! {
         }
         
         pub fn read_to_string_shim(path: &Path) -> Result<String> {
+            debug!("Reading file '{}'", path.to_str().unwrap());
             return std::fs::read_to_string(path).chain_err(|| format!("while trying to read {}", path.to_str().unwrap()));
         }     
     }
