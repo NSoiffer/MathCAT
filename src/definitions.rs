@@ -131,6 +131,22 @@ thread_local!{
 /// If there is a failure during read, the error is propagated to the caller
 pub fn read_definitions_file(locations: &Locations) -> Result<()> {
     // for each file in `locations`, read the contents and process them
+    // we cache the last location (saves 3-4ms on startup/switching): creating the SpeechRules calls this for each rule
+    thread_local!{
+        static LOCATION_CACHE: RefCell<Locations> =
+                RefCell::new( Locations::default() );
+    }
+    
+    if LOCATION_CACHE.with(|cache| are_locations_same(&*cache.borrow(), locations)) {
+        return Ok( () );
+    } else {
+        LOCATION_CACHE.with(|cache| {
+            let mut cache = cache.borrow_mut();
+            cache[0]= locations[0].clone();
+            cache[1]= locations[1].clone();
+            cache[2]= locations[2].clone();
+        })
+    }
     let result = locations.iter().try_for_each(|path|
             match path {
                 None => Ok(()),

@@ -253,6 +253,12 @@ impl Preferences{
 /// Note: the first entry is the first thing found, which might be '2' or '3' in the list above.
 pub type Locations = [Option<PathBuf>; 3];
 
+pub fn are_locations_same(loc1: &Locations, loc2: &Locations) -> bool {
+    return loc1[0] == loc2[0] &&
+           loc1[1] == loc2[1] &&
+           loc1[2] == loc2[2];
+}
+
 #[derive(Debug, Clone, Default)]
 struct FileAndTime {
     files: Locations,
