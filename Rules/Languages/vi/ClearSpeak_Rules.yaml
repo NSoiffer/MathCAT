@@ -61,7 +61,7 @@
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+          #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: {x: "*[2]"}
       - T: căn
   - test:
@@ -106,7 +106,7 @@
   match: "$ClearSpeak_Fractions='Per'"
   replace:
   - x: "*[1]"
-  - t: "per"
+  - T: "trên"
   - x: "*[2]"
 
 - name: common-fraction
@@ -136,10 +136,10 @@
   - test:
       if: "$ClearSpeak_Fractions='FracOver'"
       then:
-      - test:
-          if: "$Verbosity!='Terse'"
-          then: [{ot: "the"}]
-      - t: "fraction"
+      #- test:
+      #    if: "$Verbosity!='Terse'"
+      #    then: [{ot: "the"}]
+      - T: "phân số"
   - x: "*[1]"
   - T: trên
   - x: "*[2]"
@@ -148,7 +148,7 @@
       if: "$ClearSpeak_Fractions='OverEndFrac' or ($ClearSpeak_Fractions='EndFrac' and not( ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and *[1][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and *[2][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] ) )"
       then:
       - pause: short
-      - t: "end fraction"
+      - T: "hết phân số"
       - pause: short
 
 - # fraction with text or numbers followed by text in both numerator and denominator
@@ -176,14 +176,14 @@
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='OverEndFrac'"
       then:
       - pause: short
-      - t: "end fraction"
+      - T: "hết phân số"
       - pause: short
 
 - name: default
   tag: fraction
   match: "."
   replace:
-    #    - ot: the
+  #- ot: the
   - T: phân số có tử là
   - test:
       if: not(IsNode(*[1], 'simple'))
@@ -197,7 +197,7 @@
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='GeneralEndFrac'"
       then:
       - pause: short
-      - t: "end fraction"
+      - T: "hết phân số"
       - pause: short
 
 # rules for functions raised to a power
@@ -209,11 +209,11 @@
   replace:
   - test:
       if: $ClearSpeak_Trig = 'TrigInverse'
-      then: [{x: "*[1]"}, {bookmark: "*[2]/@id"}, {t: hàm nghịch đảo}]
+      then: [{x: "*[1]"}, {bookmark: "*[2]/@id"}, {T: hàm nghịch đảo}]
       else_test:
         if: $ClearSpeak_Trig = 'ArcTrig'
-        then: [{bookmark: "*[2]/@id"}, {t: hàm lượng giác ngược}, {x: "*[1]"}]
-        else: [{bookmark: "*[2]/@id"}, {t: hàm nghịch đảo}, {x: "*[1]"}] # default/Auto
+        then: [{bookmark: "*[2]/@id"}, {T: hàm lượng giác ngược}, {x: "*[1]"}]
+        else: [{bookmark: "*[2]/@id"}, {T: hàm nghịch đảo}, {x: "*[1]"}] # default/Auto
 
 - name: function-squared-or-cubed
   tag: power
@@ -251,18 +251,18 @@
   - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
   replace:
   - x: "*[1]"
-  - t: "raised to the exponent"
+  - T: "chỉ số trên của lũy thừa"
   - pause: short
   - x: "*[2]"
   - pause: short
-  - t: "end exponent"
+  - T: "hết lũy thừa"
 
 - name: AfterPower-default
   tag: power
   match: "$ClearSpeak_Exponents = 'AfterPower'"
   replace:
   - x: "*[1]"
-  - t: "raised to the power"
+  - T: "chỉ số trên của mũ"
   - x: "*[2]"
   - pause: short
 
@@ -304,7 +304,7 @@
   - x: "*[2]"
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{t: "power"}]
+      then: [{T: "lũy thừa"}]
 
 - name: simple-var
   tag: power
@@ -313,10 +313,10 @@
   - x: "*[1]"
   - T: mũ
   - x: "*[2]"
-  - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+  #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{t: "power"}]
+      then: [{T: "lũy thừa"}]
 
 # match nested exponent, where the nested exponent is has the power 2 or 3 (n below)
 #   [xxx]^n, - [xxx]^n, [xxx] var^n, -[xxx] var^n
@@ -442,19 +442,19 @@
   name: ClearSpeak-absolute-value
   tag: absolute-value
   match: "."
-  variables: [{WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'cardinality', 'absolute value')"}] # t: translate the words in single quotes
+  variables: [{WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Tập họp', 'tập họp', 'giá trị tuyệt đối')"}] # T: translate the words in single quotes
   replace:
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: {t: the}
+  #- test:
+  #    if: "$Verbosity!='Terse'"
+  #    then: {t: the}
   - x: "$WordToSay"
-  - t: "of"
+  - T: "của"
   - x: "*[1]"
   - test:
       if: "$ClearSpeak_AbsoluteValue = 'AbsEnd'"
       then:
       - pause: short
-      - t: "end"
+      - T: "hết"
       - x: "$WordToSay"
   - pause: short
 
@@ -536,8 +536,8 @@
           then:
           - test:
               if: "name(.) = 'open-interval' or name(.) = 'closed-open-interval'"
-              then: [{t: "not"}]
-          - t: "including"
+              then: [{T: "không"}]
+          - T: "bao gồm"
       - x: "*[2]"
 
     # onto the [not] [including]... part
@@ -606,7 +606,7 @@
         then: [{T: logarit}]
       - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
         then: [{T: logarit tự nhiên}]
-        else: [{spell: "'ln'"}] # t:  -- needs translation?
+        else: [{Spell: "'ln'"}] # t:  -- needs translation?
       else:
       #    if: "$Verbosity!='Terse' and not(log_is_simple)"
       #   then: {T: the}
@@ -615,7 +615,7 @@
           then: [{T: logarit}]
         - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
           then: [{T: logarit tự nhiên}]
-          else: [{spell: "'ln'"}] # t:  -- needs translation?
+          else: [{Spell: "'ln'"}] # t:  -- needs translation?
       - T: của
       - pause: short
   - x: "*[3]"
