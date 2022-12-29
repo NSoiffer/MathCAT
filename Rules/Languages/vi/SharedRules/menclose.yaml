@@ -35,23 +35,24 @@
   - test:
       if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
       then:
+      - T: đường cắt
       - test:
           if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
-          then: [{spell: x}, {pause: short}] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+          then: [{Spell: x}, {pause: short}] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
           else:
           - test:
               if: ".[contains(@notation,'updiagonalstrike')]"
-              then: [{T: đường chéo lên}, {pause: short}]
+              then: [{T: chéo lên}, {pause: short}]
           - test:
               if: ".[contains(@notation,'downdiagonalstrike')]"
-              then: [{T: đường chéo xuống}, {pause: short}]
+              then: [{T: chéo xuống}, {pause: short}]
       - test:
           if: ".[contains(@notation,'verticalstrike')]"
-          then: [{T: gạch đứng}, {pause: short}]
+          then: [{T: đứng}, {pause: short}]
       - test:
           if: ".[contains(@notation,'horizontalstrike')]"
           then: [{T: ngang}, {pause: short}]
-      - T: đường cắt
+      #- T: đường cắt
       - pause: short
   - test:
       if: ".[contains(@notation,'uparrow')]"
