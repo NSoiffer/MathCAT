@@ -109,11 +109,11 @@
  - "ª": [t: "feminine ordinal indicator"]          # 0xaa
  - "¬": [t: "not"]                                 # 0xac
  - "«": [t: "left-pointing double angle quote mark"] # 0xab
- - "°": [t: "degrees"]                           # 0xb0
+ - "°": [t: "degrees"]                             # 0xb0
  - "±": [t: "plus or minus"]                       # 0xb1
- - "²": [t: "two"]                               # 0xb2
- - "³": [t: "three"]                             # 0xb3
- - "´": [t: "accute"]                            # 0xb4
+ - "²": [t: "two"]                                 # 0xb2
+ - "³": [t: "three"]                               # 0xb3
+ - "´": [t: "acute"]                               # 0xb4
  - "µ": [t: "micro"]                               # 0xb5
  - "¹": [t: "one"]                                 # 0xb9
  - "º": [t: "masculine ordinal indicator"]                                 # 0xb9
