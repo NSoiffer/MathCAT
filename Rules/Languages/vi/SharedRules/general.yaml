@@ -152,13 +152,13 @@
   tag: point
   match: "."
   replace:
-  - test:
-      if: "$Verbosity!='Terse'"
-      then:
-      - t: "the"
-  - t: "point"
+  #- test:
+  #    if: "$Verbosity!='Terse'"
+  #    then:
+  #    - t: "the"
+  - T: "điểm"
   - x: "*[1]"
-  - t: "comma"
+  - T: "phẩy"
   - x: "*[2]"
 
 - name: absolute-value
@@ -173,7 +173,7 @@
   - test:
       if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
       then: [{pause: short}]
-      else: [{pause: short}, {t: hết trị tuyệt đối}, {pause: short}]
+      else: [{pause: short}, {T: hết trị tuyệt đối}, {pause: short}]
 
 - name: negative
   tag: negative
@@ -196,8 +196,8 @@
   match: "."
   replace:
   - x: "*[1]"
-  - t: "sub"
   - x: "*[2]"
+  - T: "dưới"
 
 - name: bigop-both
   tag: large-op
@@ -205,7 +205,7 @@
   replace:
   # - test:
   #     if: "$Verbosity!='Terse'"
-  #     then: [{t: the}]
+  #     then: [{T: the}]
   - x: "*[1]"
     #   - test: 
   - T: từ
@@ -222,7 +222,7 @@
   replace:
   # - test:
   #     if: "$Verbosity!='Terse'"
-  #     then: [{t: the}]
+  #     then: [{T: the}]
   - x: "*[1]"
   - T: trên
   - x: "*[2]"
@@ -236,7 +236,7 @@
   replace:
   # - test:
   #     if: "$Verbosity!='Terse'"
-  #     then: [{t: the}]
+  #     then: [{T: the}]
   - x: "*[1]"
   - T: của
   - x: "*[2]"
@@ -400,7 +400,7 @@
       - if: "*[1][text()='log']"
         then: [{T: logaric}]
       - else_if: "$Verbosity='Terse'"
-        then: [{spell: ln}]
+        then: [{Spell: ln}]
         else: [{T: logaric tự nhiên}]
       else:
       - test:
@@ -410,7 +410,7 @@
         - if: "*[1][text()='log']"
           then: [{T: logaric}]
         - else_if: "$Verbosity='Terse'"
-          then: [{spell: ln}]
+          then: [{Spell: ln}]
           else: [{T: logaric tự nhiên}]
       - T: của
       - pause: short
@@ -654,26 +654,28 @@
   match: "*[1][text()='msub']"
   replace:
   - x: "*[2]"
+  - x: "*[3]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "subscript"}]
+      then: [{T: "chỉ số dưới"}]
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{t: "sub"}]
-  - x: "*[3]"
+        then: [{T: "dưới"}]
+  #- x: "*[3]"
 
 - name: chemistry-msup
   tag: [chemical-formula]
   match: "*[1][text()='msup']"
   replace:
   - x: "*[2]"
+  - x: "*[3]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "superscript"}]
+      then: [{T: "chỉ số trên"}]
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{t: "super"}]
-  - x: "*[3]"
+        then: [{T: "trên"}]
+  #- x: "*[3]"
   - test:
       if: "following-sibling::*[1][text()='+' or text()='-']" # a little lazy -- assumes chemistry superscripts end with + or -
       then: [{pause: medium}]
@@ -697,24 +699,26 @@
       - test:
           if: "not($Prescripts[2][self::m:none])"
           then:
+          - x: "$Prescripts[2]"
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "superscript"}]
+              then: [{T: "chỉ số trên"}]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "super"}]
-          - x: "$Prescripts[2]"
+                then: [{T: "trên"}]
+          #- x: "$Prescripts[2]"
           - pause: "short"
       - test:
           if: "not($Prescripts[1][self::m:none])"
           then:
+          - x: "$Prescripts[1]"
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "subscript"}]
+              then: [{T: "chỉ số dưới"}]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "sub"}]
-          - x: "$Prescripts[1]"
+                then: [{T: "dưới"}]
+          #- x: "$Prescripts[1]"
           - pause: "short"
       - test:
           if: "count($Prescripts) > 2" # can this happen for chemistry??? we allow for one *extra* pre sub/super pair
@@ -722,24 +726,26 @@
           - test:
               if: "not($Prescripts[4][self::m:none])"
               then:
+              - x: "$Prescripts[4]"
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "superscript"}]
+                  then: [{T: "chỉ số trên"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "super"}]
-              - x: "$Prescripts[4]"
+                    then: [{T: "trên"}]
+              #- x: "$Prescripts[4]"
               - pause: "short"
           - test:
               if: "not($Prescripts[3][self::m:none])"
               then:
+              - x: "$Prescripts[3]"
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "subscript"}]
+                  then: [{T: "chỉ số dưới"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "sub"}]
-              - x: "$Prescripts[3]"
+                    then: [{T: "dưới"}]
+              #- x: "$Prescripts[3]"
               - pause: "short"
   - x: "*[1]" # base
   - test:
@@ -748,24 +754,26 @@
       - test:
           if: "not($Postscripts[1][self::m:none])"
           then:
+          - x: "$Postscripts[1]"
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "subscript"}]
+              then: [{T: "chỉ số dưới"}]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "sub"}]
-          - x: "$Postscripts[1]"
+                then: [{T: "dưới"}]
+          #- x: "$Postscripts[1]"
           - pause: "short"
       - test:
           if: "not($Postscripts[2][self::m:none])"
           then:
+          - x: "$Postscripts[2]"
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "superscript"}]
+              then: [{T: "chỉ số trên"}]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "super"}]
-          - x: "$Postscripts[2]"
+                then: [{T: "trên"}]
+          #- x: "$Postscripts[2]"
           - pause: "short"
       - test:
           if: "count($Postscripts) > 2"
@@ -773,24 +781,26 @@
           - test:
               if: "not($Postscripts[3][self::m:none])"
               then:
+              - x: "$Postscripts[3]"
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "subscript"}]
+                  then: [{T: "chỉ số dưới"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "sub"}]
-              - x: "$Postscripts[3]"
+                    then: [{T: "dưới"}]
+              #- x: "$Postscripts[3]"
               - pause: "short"
           - test:
               if: "not($Postscripts[4][self::m:none])"
               then:
+              - x: "$Postscripts[4]"
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "superscript"}]
+                  then: [{T: "chỉ số trên"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "super"}]
-              - x: "$Postscripts[4]"
+                    then: [{T: "trên"}]
+              #- x: "$Postscripts[4]"
               - pause: "short"
           - test:
               if: "count($Postscripts) > 4"
@@ -798,24 +808,26 @@
               - test:
                   if: "not($Postscripts[5][self::m:none])"
                   then:
+                  - x: "$Postscripts[5]"
                   - test:
                       if: "$Verbosity='Verbose'"
-                      then: [{t: "subscript"}]
+                      then: [{T: "chỉ số dưới"}]
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{t: "sub"}]
-                  - x: "$Postscripts[5]"
+                        then: [{T: "dưới"}]
+                  #- x: "$Postscripts[5]"
                   - pause: "short"
               - test:
                   if: "not($Postscripts[6][self::m:none])"
                   then:
+                  - x: "$Postscripts[6]"
                   - test:
                       if: "$Verbosity='Verbose'"
-                      then: [{t: "superscript"}]
+                      then: [{T: "chỉ số trên"}]
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{t: "super"}]
-                  - x: "$Postscripts[6]"
+                        then: [{T: "trên"}]
+                  #- x: "$Postscripts[6]"
                   - pause: "short"
               - test:
                   if: "count($Postscripts) > 6"
@@ -823,24 +835,26 @@
                   - test:
                       if: "not($Postscripts[7][self::m:none])"
                       then:
+                      - x: "$Postscripts[7]"
                       - test:
                           if: "$Verbosity='Verbose'"
-                          then: [{t: "subscript"}]
+                          then: [{T: "chỉ số dưới"}]
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{t: "sub"}]
-                      - x: "$Postscripts[7]"
+                            then: [{T: "dưới"}]
+                      #- x: "$Postscripts[7]"
                       - pause: "short"
                   - test:
                       if: "not($Postscripts[8][self::m:none])"
                       then:
+                      - x: "$Postscripts[8]"
                       - test:
                           if: "$Verbosity='Verbose'"
-                          then: [{t: "superscript"}]
+                          then: [{T: "chỉ số trên"}]
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{t: "super"}]
-                      - x: "$Postscripts[8]"
+                            then: [{T: "trên"}]
+                      #- x: "$Postscripts[8]"
                       - pause: "short"
       - test:
           if: "$Postscripts[last()][not(self::m:none)] and following-sibling::*[1][text()='+' or text()='-']"
@@ -869,12 +883,12 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: ".='s'"
-      then: [{t: "solid"}]
+      then: [{T: "rắn"}]
     - else_if: ".='l'"
-      then: [{t: "liquid"}]
+      then: [{T: "lỏng"}]
     - else_if: ".='g'"
-      then: [{t: "gas"}]
-      else: [{t: "aqueous"}] # (aq)
+      then: [{T: "khí"}]
+      else: [{T: "nước"}] # (aq)
   - pause: short
 
 - name: chemical-formula-operator
@@ -885,13 +899,13 @@
   - bookmark: "@id"
   - test:
     - if: "text()='-' or text() = ':'"
-      then: [{t: "single bond"}]
+      then: [{T: "liên kết đơn"}]
     - else_if: "text()='=' or text() = '::'"
-      then: [{t: "double bond"}]
+      then: [{T: "liên kết đôi"}]
     - else_if: "text()='≡'"
-      then: [{t: "triple bond"}]
+      then: [{T: "liên kết ba"}]
     - else_if: "text()='≣'"
-      then: [{t: "quadruple bond"}]
+      then: [{T: "liên kết bốn"}]
       else: [{x: text()}]
 
 - name: chemical-equation-operator
@@ -904,18 +918,18 @@
     - if: "text()='→' or text()='⟶'"
       then_test:
         if: "name(preceding-sibling::*[1]) = 'chemical-nuclide'"
-        then: [{t: "decays to"}]
-        else: [{t: "yields"}]
+        then: [{T: "phân thành"}]
+        else: [{T: "cho ra"}]
     - else_if: "text()='⇌' or text()='⮖'"
-      then: [{t: "is in equilibrium with"}]
+      then: [{T: "cân bằng với"}]
     - else_if: "text()='⭴'"
-      then: [{t: "is in equilibrium biased to the left with"}]
+      then: [{T: "cân bằng về bên trái với"}]
     - else_if: "text()='⭵'"
-      then: [{t: "is in equilibrium biased to the right with"}]
+      then: [{T: "cân bằng về bên phải với"}]
       else: [{x: text()}]
 
 - name: none
   tag: none
   match: "../../*[self::m:chemical-formula or self::m:chemical-nuclide]"
   replace:
-  - t: "" # don't say anything
+  - T: "" # don't say anything

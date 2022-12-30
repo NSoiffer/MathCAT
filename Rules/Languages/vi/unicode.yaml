@@ -4,25 +4,25 @@
 #     - test: 
 #         if: "$TTS='none'"
 #         then: [T: "a"]                         # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
-#         else: [spell: "a"]                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
+#         else: [Spell: "a"]                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
  - "a-z": 
     - test: 
         if: "$TTS='none'"
         then: [T: "."]                          
-        else: [spell: "."]                       
+        else: [Spell: "."]                       
 
 #  - "A":
 #     - test: 
 #         if: "$TTS='none'"
 #         then: [x: "$SpeechOverrides_CapitalLetters", t: "A"]                         # long "a" sound in all speech engines I tested (see above)
-#         else: [spell: "A"]
+#         else: [Spell: "A"]
 
  - "A-Z": 
     - test: 
         if: "$TTS='none'"
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
         then: [x: "$SpeechOverrides_CapitalLetters", x: "translate('.', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"]                         
-        else: {spell: "."}                       
+        else: {Spell: "."}                       
 
  - "0-9": [T: "."]
 

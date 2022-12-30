@@ -145,9 +145,9 @@
           - test: # only bother announcing if there is more than one prescript
               if: "count($Prescripts) > 2"
               then:
-              - t: "with"
+              - T: "với"
               - x: "count($Prescripts) div 2"
-              - t: "prescripts"
+              - T: "chỉ số trước"
               - pause: short
           - test:
               if: "not($Prescripts[1][self::m:none])"
@@ -156,7 +156,7 @@
               - x: "$Prescripts[1]"
           - test:
               if: "not($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none])"
-              then: [{t: "and"}]
+              then: [{T: "và"}]
           - test:
               if: "not($Prescripts[2][self::m:none])"
               then:
@@ -173,7 +173,7 @@
                   - x: "$Prescripts[3]"
               - test:
                   if: "not($Prescripts[3][self::m:none] or $Prescripts[4][self::m:none])"
-                  then: [{t: "and"}]
+                  then: [{T: "và"}]
               - test:
                   if: "not($Prescripts[4][self::m:none])"
                   then:
@@ -182,9 +182,9 @@
               - test:
                   if: "count($Prescripts) > 4" # give up and just dump them out so at least the content is there
                   then:
-                  - t: "and alternating prescripts"
+                  - T: "và chỉ số trước xen kẽ"
                   - x: "$Prescripts[position() > 4]"
-                  - t: "end prescripts"
+                  - T: "hết chỉ số trước"
   - test:
       if: "$Postscripts"
       then:
@@ -198,10 +198,10 @@
               then:
               - test:
                   if: "$Prescripts"
-                  then: [{t: "and"}]
-              - t: "with"
+                  then: [{T: "và"}]
+              - T: "với"
               - x: "count($Postscripts) div 2"
-              - t: "postscripts"
+              - T: "chỉ số sau"
               - pause: short
           - test:
               if: "not($Postscripts[1][self::m:none])"
@@ -210,7 +210,7 @@
               - x: "$Postscripts[1]"
           - test:
               if: "not($Postscripts[1][self::m:none] or $Postscripts[2][self::m:none])"
-              then: [{t: "and"}]
+              then: [{T: "và"}]
           - test:
               if: "not($Postscripts[2][self::m:none])"
               then:
@@ -226,7 +226,7 @@
                   - x: "$Postscripts[3]"
               - test:
                   if: "not($Postscripts[3][self::m:none] or $Postscripts[4][self::m:none])"
-                  then: [{t: "and"}]
+                  then: [{T: "và"}]
               - test:
                   if: "not($Postscripts[4][self::m:none])"
                   then:
@@ -242,7 +242,7 @@
                       - x: "$Postscripts[5]"
                   - test:
                       if: "not($Postscripts[5][self::m:none] or $Postscripts[6][self::m:none])"
-                      then: [{t: "and"}]
+                      then: [{T: "và"}]
                   - test:
                       if: "not($Postscripts[6][self::m:none])"
                       then:
@@ -258,7 +258,7 @@
                           - x: "$Postscripts[7]"
                       - test:
                           if: "not($Postscripts[7][self::m:none] or $Postscripts[8][self::m:none])"
-                          then: [{t: "and"}]
+                          then: [{T: "và"}]
                       - test:
                           if: "not($Postscripts[8][self::m:none])"
                           then:
@@ -267,9 +267,9 @@
                       - test:
                           if: "count($Postscripts) > 8" # give up and just dump them out so at least the content is there
                           then:
-                          - t: "and alternating scripts"
+                          - T: "và chỉ số xen kẽ"
                           - x: "$Postscripts[position() > 8]"
-                          - t: "end scripts"
+                          - T: "hết chỉ số"
 
 - name: default
   tag: mtable
@@ -344,23 +344,24 @@
   - test:
       if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
       then:
+      - T: đường cắt
       - test:
           if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
-          then: [{spell: x}, {pause: short}] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+          then: [{Spell: "'x'"}, {pause: short}] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
           else:
           - test:
               if: ".[contains(@notation,'updiagonalstrike')]"
-              then: [{T: đường chéo lên}, {pause: short}]
+              then: [{T: chéo lên}, {pause: short}]
           - test:
               if: ".[contains(@notation,'downdiagonalstrike')]"
-              then: [{T: đường chéo xuống}, {pause: short}]
+              then: [{T: chéo xuống}, {pause: short}]
       - test:
           if: ".[contains(@notation,'verticalstrike')]"
-          then: [{T: đường thẳng đứng}, {pause: short}]
+          then: [{T: thẳng đứng}, {pause: short}]
       - test:
           if: ".[contains(@notation,'horizontalstrike')]"
-          then: [{T: đường ngang}, {pause: short}]
-      - T: đường cắt
+          then: [{T: ngang}, {pause: short}]
+      #- T: đường cắt
       - pause: short
   - test:
       if: ".[contains(@notation,'uparrow')]"
