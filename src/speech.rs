@@ -346,7 +346,7 @@ impl Replacement {
                     .chain_err(|| "while trying to evaluate value of 'x:'")? ) );
             },
             "pause" | "rate" | "pitch" | "volume" | "gender" | "voice" | "spell" | "SPELL" | "bookmark" | "pronounce" | "PRONOUNCE" => {
-                return Ok( Replacement::TTS( TTS::build(key, value)? ) );
+                return Ok( Replacement::TTS( TTS::build(&key.to_ascii_lowercase(), value)? ) );
             },
             "intent" => {
                 return Ok( Replacement::Intent( Intent::build(value)? ) );
