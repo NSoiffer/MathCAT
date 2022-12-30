@@ -400,7 +400,7 @@
       - if: "*[1][text()='log']"
         then: [{T: logaric}]
       - else_if: "$Verbosity='Terse'"
-        then: [{Spell: ln}]
+        then: [{SPELL: ln}]
         else: [{T: logaric tự nhiên}]
       else:
       - test:
@@ -410,7 +410,7 @@
         - if: "*[1][text()='log']"
           then: [{T: logaric}]
         - else_if: "$Verbosity='Terse'"
-          then: [{Spell: ln}]
+          then: [{SPELL: ln}]
           else: [{T: logaric tự nhiên}]
       - T: của
       - pause: short

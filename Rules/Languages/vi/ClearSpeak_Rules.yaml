@@ -606,7 +606,7 @@
         then: [{T: logarit}]
       - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
         then: [{T: logarit tự nhiên}]
-        else: [{Spell: "'ln'"}] # t:  -- needs translation?
+        else: [{SPELL: "'ln'"}] # t:  -- needs translation?
       else:
       #    if: "$Verbosity!='Terse' and not(log_is_simple)"
       #   then: {T: the}
@@ -615,7 +615,7 @@
           then: [{T: logarit}]
         - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
           then: [{T: logarit tự nhiên}]
-          else: [{Spell: "'ln'"}] # t:  -- needs translation?
+          else: [{SPELL: "'ln'"}] # t:  -- needs translation?
       - T: của
       - pause: short
   - x: "*[3]"
