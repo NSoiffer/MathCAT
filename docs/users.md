@@ -114,7 +114,7 @@ ClearSpeak has a number of options. These were designed for authors to use, but 
 * ✓Bar: Auto, Bar, Conjugate, Mean
 
 
-### Navigation Options
+### Navigation Options (see [navigation documentation](nav-commands.md))
 * ✓NavMode: Enhanced -- Enhanced, Simple, Character
 * ResetNavMode: false -- remember previous value and use it
 * Overview: false -- speak the expression or give a description/overview
