@@ -75,6 +75,10 @@ pub fn get_preference(name: String) -> Result<String>
 /// * Gender -- set pick any voice of the given gender (not implemented)
 /// * Bookmark -- set to `true` if a `mark`/`bookmark` should be part of the returned speech (used for sync highlighting)
 ///
+/// These are use to control speech and pitch changes for capital letters:
+/// * CapitalLetters_UseWord -- say "cap" (or whatever is appropriate for the language) [default: true]
+/// * CapitalLetters_Pitch -- add a pitch change around a capital letter (normalized at '1.0' -- '1.0' [default] does nothing)
+///
 /// Important: both the preference name and value are case-sensitive
 /// 
 /// This function can be called multiple times to set different values.
