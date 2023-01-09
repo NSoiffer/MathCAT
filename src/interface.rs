@@ -201,10 +201,10 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
             let mut pref_manager = rules.pref_manager.borrow_mut();
             if pref_manager.get_api_prefs().to_string(&name) != NO_PREFERENCE {
                 match name.as_str() {
-                    "Pitch" | "Rate" | "Volume" => {
+                    "Pitch" | "Rate" | "Volume" | "CapitalLetters_Pitch"=> {
                         pref_manager.set_api_float_pref(&name, to_float(&name, &value)?);    
                     },
-                    "Bookmark" => {
+                    "Bookmark" | "CapitalLetters_UseWord" => {
                         pref_manager.set_api_boolean_pref(&name, value.to_lowercase()=="true");    
                     },
                     _ => {

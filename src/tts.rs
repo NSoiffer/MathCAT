@@ -7,9 +7,15 @@
 //!
 //!  Note: no range is specified by the spec
 //! ### SAPI5: Relative pitch
-//! * Number is in range -24 to 24
-//! * -24 is one octave below the default/current pitch, +24 is one octave above
-//! * changes are logarithmic -- a change of +/-1 corresponds to multiplying/dividing by 24th root of 2
+//! From https://documentation.help/SAPI-5/sapi.xsd
+//!   A value of +10 sets a voice to speak at four-thirds (or 4/3) of its default pitch.
+//!   Each increment between –10 and +10 is logarithmically distributed such that
+//!     incrementing/decrementing by 1 is multiplying/dividing the pitch by the 24th root of 2 (about 1.03).
+//!   Values more extreme than –10 and 10 will be passed to an engine but SAPI 5compliant engines may not support
+//!     such extremes and instead may clip the pitch to the maximum or minimum pitch it supports.
+//!   Values of –24 and +24 must lower and raise pitch by 1 octave respectively.
+//!   All incrementing/decrementing by 1 must multiply/divide the pitch by the 24th root of 2.
+//! Note: an octave is a doubling of frequency, so pitch change of 100% should turn into +/- 24
 //! ### SSML: Relative pitch
 //! * pitch in hertz (default/current man's voice is about 100hz, woman's 180hz)
 //!
@@ -25,9 +31,9 @@
 //! ### SAPI5: Relative rate
 //! * Number is in range -10 to 10
 //! * -10 is 1/3 of the default/current speed; 10 3 times the default/current speech
-//! * changes are logarithmic -- a change of +/-1 corresponds to multiplying/dividing by 10th root of 3
-//! ### SSML: Relative rate
-//! * 0.5 is 1/2 of the default/current rate, 2.0 is 2 times the default/current rate
+//! * changes are logarithmic -- a change of +/-1 corresponds to multiplying/dividing by 10th root of 3 (10*log_3(change))
+//! ### SSML: Relative rate %
+//! * 100% is no change, 50% is half the current rate, 200% is doubling the rate
 //!
 //!  Note:  other legal values for SSML are not supported, and all numbers are interpreted as relative changes
 //! ### Eloquence: Absolute rate (relative rate not supported by Eloquence)
@@ -275,8 +281,8 @@ impl TTS {
             tts_value = values;
             replacements = ReplacementArray::build_empty();
         }
-        let tts_value = yaml_to_string(tts_value, 0);
-        let tts_value = tts_value.trim(); // if not a number or string, value is bogus
+        let tts_str_value = yaml_to_string(tts_value, 0);
+        let tts_str_value = tts_str_value.trim();
         let tts_enum = match TTSCommand::from_str(tts_command) {
             Ok(t) => t,
             Err(_) => bail!("Internal error in build_tts: unexpected rule ({:?}) encountered", tts_command),
@@ -284,20 +290,25 @@ impl TTS {
     
         let tts_command_value = match tts_enum {
             TTSCommand::Pause | TTSCommand::Rate | TTSCommand::Volume | TTSCommand::Pitch => {
-                let val = match tts_value {
+                // these strings are almost always what the value will be, so we try them first
+                let val = match tts_str_value {
                     "short" => Ok( PAUSE_SHORT ),
                     "medium" => Ok( PAUSE_MEDIUM ),
                     "long" => Ok( PAUSE_LONG ),
                     "auto" => Ok( PAUSE_AUTO ),
                     "$MathRate" => Ok( RATE_FROM_CONTEXT ), // special case hack -- value determined in replace
-                    _ => tts_value.parse::<f64>()
+                    _ => tts_str_value.parse::<f64>()
                 };
-            
-                if val.is_err() {
-                    bail!(format!("\"{}: {}\" is not a number", &tts_command, tts_value));    
+
+                match val {
+                    Ok(num) => TTSCommandValue::Number(num),
+                    Err(_) => {
+                        // let's try as an xpath (e.g., could be '$CapitalLetters_Pitch')
+                        TTSCommandValue::XPath(
+                            MyXPath::build(tts_value).chain_err(|| format!("while trying to evaluate value of '{}:'", tts_enum))?
+                        )
+                    }
                 }
-        
-                TTSCommandValue::Number(val.unwrap())
             },
             TTSCommand::Bookmark | TTSCommand::Spell => {
                 TTSCommandValue::XPath(
@@ -308,7 +319,7 @@ impl TTS {
                 TTSCommandValue::Pronounce( Box::new( Pronounce::build(values)? ) )
             },
             _ => {
-                TTSCommandValue::String(tts_value.to_string())
+                TTSCommandValue::String(tts_str_value.to_string())
             },
         };
         return Ok( Box::new( TTSCommandRule::new(tts_enum, tts_command_value, replacements) ) );
@@ -332,11 +343,11 @@ impl TTS {
         // 'bookmark' is special in that we need to eval the xpath
         // rather than pass a bunch of extra info into the generic handling routines, we just deal with them here
         if command.command == TTSCommand::Bookmark {
-           // if we aren't suppose to generate bookmarks, short circuit and just return
-           if prefs.get_api_prefs().to_string("Bookmark") != "true"{
-            return Ok("".to_string());
-           }
-           return Ok( match self {
+            // if we aren't suppose to generate bookmarks, short circuit and just return
+            if prefs.get_api_prefs().to_string("Bookmark") != "true"{
+                return Ok("".to_string());
+            }
+            return Ok( match self {
                 TTS::None  => "".to_string(),
                 TTS::SSML => compute_bookmark_element(&command.value, "mark name", rules_with_context, mathml)?,
                 TTS::SAPI5 => compute_bookmark_element(&command.value, "bookmark mark", rules_with_context, mathml)?,
@@ -398,6 +409,23 @@ impl TTS {
             }
         }
 
+        // evaluate any xpath value now to simplify later code
+        if let TTSCommandValue::XPath(xpath) = command.value {
+            let eval_str = xpath.replace::<String>(rules_with_context, mathml)?;
+            // can it be a number?
+            command.value = match eval_str.parse::<f64>() {
+                Ok(num) => TTSCommandValue::Number(num),
+                Err(_) => TTSCommandValue::String(eval_str),
+            }
+        };
+
+
+        // small optimization to avoid generating tags that do nothing
+        if ((command.command == TTSCommand::Pitch || command.command == TTSCommand::Volume || command.command == TTSCommand::Pause) && command.value.get_num() == 0.0) ||
+           (command.command == TTSCommand::Rate && command.value.get_num() == 100.0) {
+            return command.replacements.replace::<String>(rules_with_context, mathml);
+        }
+
         let mut result = String::with_capacity(255);
         result += &match self {
             TTS::None  => self.get_string_none(&command, prefs, true),
@@ -432,7 +460,7 @@ impl TTS {
                     let id = xpath.replace::<String>(rules_with_context, mathml)?;
                     return Ok( format!("<{}='{}'/>", tag_and_attr, id) );
                 },
-                _ => bail!("Implementation error: found non-xpath value for bookmark"),
+                _ => bail!("Implementation error: found bookmark value that did not evaluate to a string"),
             }
         }
     
@@ -479,7 +507,7 @@ impl TTS {
                 } else {
                     let amount = amount * TTS::get_pause_multiplier(prefs);
                     if amount > MIN_PAUSE {
-                        format!("<silence msec=='{}ms'/>", amount * 180.0/prefs.get_rate())
+                        format!("<silence msec=='{}ms'/>", (amount * 180.0/prefs.get_rate()).round())
                     } else {
                         "".to_string()
                     }
@@ -487,11 +515,14 @@ impl TTS {
             } else {
                 "".to_string()
             },
-            TTSCommand::Pitch => if is_start_tag {format!("<pitch middle='XXX{}%'>", command.value.get_num())} else {String::from("</prosody>")},
-            TTSCommand::Rate =>  if is_start_tag {format!("<rate speed='XXX{}%'>", command.value.get_num())} else {String::from("</rate>")},
+            // pitch must be in [-10, 10], logarithmic based on octaves
+            // note MathPlayer uses 'absmiddle' (requires keeping a stack) -- could be 'middle' is not well supported
+            TTSCommand::Pitch => if is_start_tag {format!("<pitch middle=\"{}\">", (24.0*(1.0+command.value.get_num()/100.0).log2()).round())} else {String::from("</prosody>")},
+            // rate must be in [-10, 10], but we get relative %s. 300% => 10 (see comments at top of file)
+            TTSCommand::Rate =>  if is_start_tag {format!("<rate speed='{:.1}'>", 10.0*(0.01*command.value.get_num()).log(3.0))} else {String::from("</rate>")},
             TTSCommand::Volume =>if is_start_tag {format!("<volume level='{}'>", command.value.get_num())} else {String::from("</volume>")},
-            TTSCommand::Gender =>if is_start_tag {format!("<prosody gender='XXX{}%'>", command.value.get_string())} else {String::from("</prosody>")},
-            TTSCommand::Voice =>if is_start_tag {format!("<prosody voice='XXX{}%'>", command.value.get_string())} else {String::from("</prosody>")},
+            TTSCommand::Gender =>if is_start_tag {format!("<voice required=\"Gender={}\">", command.value.get_string())} else {String::from("</prosody>")},
+            TTSCommand::Voice =>if is_start_tag {format!("<voice required=\"Name={}\">", command.value.get_string())} else {String::from("</prosody>")},
             TTSCommand::Spell =>if is_start_tag {format!("<spell>{}", command.value.get_string())} else {String::from("</spell>")},
             TTSCommand::Pronounce =>if is_start_tag {
                     format!("<pron sym='{}'>{}", &command.value.get_pronounce().sapi5, &command.value.get_pronounce().text)
@@ -512,7 +543,7 @@ impl TTS {
                     } else {
                         let amount = amount * TTS::get_pause_multiplier(prefs);
                         if amount > MIN_PAUSE {
-                            format!("<break time='{}ms'/>", amount * 180.0/prefs.get_rate())
+                            format!("<break time='{}ms'/>", (amount * 180.0/prefs.get_rate()).round())
                         } else {
                             "".to_string()
                         }
@@ -523,7 +554,7 @@ impl TTS {
             },
             TTSCommand::Pitch => if is_start_tag {format!("<prosody pitch='{}%'>", command.value.get_num())} else {String::from("</prosody>")},
             TTSCommand::Rate =>  if is_start_tag {format!("<prosody rate='{}%'>", command.value.get_num())} else {String::from("</prosody>")},
-            TTSCommand::Volume =>if is_start_tag {format!("<prosody volume='{}%'>", command.value.get_num())} else {String::from("</prosody>")},
+            TTSCommand::Volume =>if is_start_tag {format!("<prosody volume='{}db'>", command.value.get_num())} else {String::from("</prosody>")},
             TTSCommand::Gender =>if is_start_tag {format!("<voice required='gender=\"{}\"'>", command.value.get_string())} else {String::from("</voice>")},
             TTSCommand::Voice =>if is_start_tag {format!("<voice required='{}'>", command.value.get_string())} else {String::from("</voice>")},
             TTSCommand::Spell =>if is_start_tag {format!("<say-as interpret-as='characters'>{}", command.value.get_string())} else {String::from("</say-as>")},

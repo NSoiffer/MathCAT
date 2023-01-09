@@ -1,5 +1,7 @@
 ---
-
+ # Note to translators:
+ #   most languages don't have two ways to pronounce 'a' -- if not need, remove the rules and change "B-Z" to "A-Z"
+ #   some languages say the word for "uppercase" after the letter. Make sure to change that where appropriate by moving some code around
  - "a": 
     - test: 
         if: "$TTS='none'"
@@ -11,26 +13,35 @@
         then: [t: "."]                          
         else: [spell: "'.'"]                       
 
+ # capital letters are a little tricky: users can pick their favorite word (something that was requested) and 
+ # screen readers have options to use pitch changes or beeps instead of or in addition to say "cap"
  - "A":
-    - test:
-        if: "$SpeechOverrides_CapitalLetters = ''"
+    - test: 
+        if: "$CapitalLetters_UseWord"
         then_test:
-            if: "$TTS='none'"
-            then: [t: "Eigh"]
-            else: [spell: "'A'"]
-        else:
-        - x: "$SpeechOverrides_CapitalLetters"
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then: [t: "cap"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
+        replace:
         - test:
             if: "$TTS='none'"
             then: [t: "eigh"]
             else: [spell: "'a'"]
             
- - "B-Z": 
-    - test:
+ - "B-Z":
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then: [t: "cap"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
-        if: "$SpeechOverrides_CapitalLetters = ''"
-        then: [spell: "'.'"]
-        else: [x: "$SpeechOverrides_CapitalLetters", spell: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]
+        replace: [spell: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]
 
  - "0-9": [t: "."]
 
@@ -44,12 +55,18 @@
  - "(":                                          # 0x28
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [test: {if: "$Verbosity='Terse'", then: [t: "open"], else: [t: "open paren"]}]
+        then_test:
+            if: "$Verbosity='Terse'"
+            then: [t: "open"]
+            else: [t: "open paren"]
         else: [t: "left paren"]                            
  - ")":                                          # 0x29
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [test: {if: "$Verbosity='Terse'", then: [t: "close"], else: [t: "close paren"]}]
+        then_test:
+            if: "$Verbosity='Terse'"
+            then: [t: "close"]
+            else: [t: "close paren"]
         else: [t: "right paren"]                            
 
  - "*": [t: "times"]                               # 0x2a
@@ -156,145 +173,32 @@
  - "̅": [t: "overbar embellishment"]               # 0x305
  - "̆": [t: "breve"]                               # 0x306
  - "̇": [t: "dot above embellishment"]             # 0x307
- - "Α":                                          # 0x391
-    - test:
+
+   # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
+ - "Α-Ω": 
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then: [t: "cap"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
-        if: "DEBUG($SpeechOverrides_CapitalLetters) = ''"
-        then: [x: "$SpeechOverrides_CapitalLetters"]
-        else: [t: "alpha"]
+        replace: [spell: "translate('.', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
 
-#  - "Α":                                          # 0x391
-#      - test: 
-#          if: "($Blind or $Verbosity!='Terse')"
-#          then: [t: "cap"]
-#      - t: "alpha"
- - "Β":                                          # 0x392
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "beta"
- - "Γ":                                          # 0x393
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "gamma"
+ - "ΪΫ":                                          # 0x3aa
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then: [t: "cap"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        replace: [spell: "translate('.', 'ΪΫ', 'ιυ')"]
+    - t: "with dialytika"
 
-    # Note: ClearSpeak has pref TriangleSymbol for this character, but that is wrong
- - "Δ":                                          # 0x394
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "delta"
- - "Ε":                                          # 0x395
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "epsilon"
- - "Ζ":                                          # 0x396
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "zeta"
- - "Η":                                          # 0x397
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "eta"
- - "Θ":                                          # 0x398
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "theta"
- - "Ι":                                          # 0x399
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "iota"
- - "Κ":                                          # 0x39a
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "kappa"
- - "Λ":                                          # 0x39b
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "lambda"
- - "Μ":                                          # 0x39c
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "mu"
- - "Ν":                                          # 0x39d
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "nu"
- - "Ξ":                                          # 0x39e
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "zai"
- - "Ο":                                          # 0x39f
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "omicron"
- - "Π":                                          # 0x3a0
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "pi"
- - "Ρ":                                          # 0x3a1
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "rho"
- - "Σ":                                          # 0x3a3
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "sigma"
- - "Τ":                                          # 0x3a4
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "tau"
- - "Υ":                                          # 0x3a5
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "upsilon"
- - "Φ":                                          # 0x3a6
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "phi"
- - "Χ":                                          # 0x3a7
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "chi"
- - "Ψ":                                          # 0x3a8
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "psi"
- - "Ω":                                          # 0x3a9
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "omega"
- - "Ϊ":                                          # 0x3aa
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "iota with dialytika"
- - "Ϋ":                                          # 0x3ab
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "upsilon with dialytika"
  - "α": [t: "alpha"]                               # 0x3b1
  - "β": [t: "beta"]                                # 0x3b2
  - "γ": [t: "gamma"]                               # 0x3b3
@@ -324,11 +228,7 @@
  - "ϖ": [t: "pi"]                                  # 0x3d6
  - "ϵ": [t: "epsilon"]                             # 0x3f5
  - "϶": [t: "reversed epsilon"]                    # 0x3f6
- - "А":                                          # 0x410
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "a"
+
  - "–": [t: "en dash"]                             # 0x2013
  - "—": [t: "em dash"]                             # 0x2014
  - "―": [t: "horizontal bar"]                      # 0x2015
@@ -360,65 +260,28 @@
  - "‵": [t: "reversed prime"]                      # 0x2035
  - "‶": [t: "reversed double prime"]               # 0x2036
  - "‷": [t: "reversed triple prime"]               # 0x2037
- - "ℂ":                                          # 0x2102
-     - t: "double-struck"
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "C"
+
+ - "ℂℕℚℝℤ":     # here we rely on this running through the table again to speak "cap xxx"
+    - t: "double-struck"
+    - spell: "translate('.', 'ℂℕℚℝℤ', 'CNQRZ')"
+
  - "℃": [t: "degrees celsius"]                     # 0x2103
  - "℉": [t: "degrees fahrenheit"]                  # 0x2109
- - "ℋ":                                          # 0x210b
-     - t: "script"
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "h"
+ - "ℋℛℓ":                                          # 0x210b
+    - t: "script"
+    - spell: "translate('.', 'ℋℛℓ', 'HRl')"
  - "ℎ": [t: "planck constant"]                     # 0x210e
- - "ℓ": [t: "script l"]                            # 0x2113
- - "ℕ":                                          # 0x2115
-     - t: "double-struck"
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "n"
- - "ℚ":                                          # 0x211a
-     - t: "double-struck"
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "q"
- - "ℛ":                                          # 0x211b
-     - t: "script"
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "r"
  - "ℜ":                                          # 0x211c
-     - t: "fraktur"
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "r"
- - "ℝ":                                          # 0x211d
-     - t: "double-struck"
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "r"
- - "ℤ":                                          # 0x2124
-     - t: "double-struck"
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [t: "cap"]
-     - t: "z"
+    - t: "fraktur"
+    - spell: "'R'"
+
  - "Ω": [t: "ohms"]                                # 0x2126
  - "K": [t: "kelvin"]                              # 0x212a
  - "Å": [t: "angstroms"]                           # 0x212b
- - "ⅆ": [t: "double-struck italic D"]              # 0x2146
- - "ⅇ": [t: "double-struck italic E"]              # 0x2147
- - "ⅈ": [t: "double-struck italic I"]              # 0x2148
- - "ⅉ": [t: "double-struck italic J"]              # 0x2149
+ - "ⅆⅇⅈⅉ":                                          # 0x2146-9
+    - t: "double-struck italic"
+    - spell: "translate('.', 'ⅆⅇⅈⅉ', 'deij')"
+
  - "←": [t: "leftwards arrow"]                     # 0x2190
  - "↑": [t: "upwards arrow"]                       # 0x2191
  - "→":                                          # 0x2192

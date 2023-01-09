@@ -82,12 +82,14 @@ impl Preferences{
     fn api_defaults() -> Preferences {
         let mut prefs = PreferenceHashMap::with_capacity(7);
         prefs.insert("TTS".to_string(), Yaml::String("none".to_string()));
-        prefs.insert("Pitch".to_string(), Yaml::Real("1.0".to_string()));
+        prefs.insert("Pitch".to_string(), Yaml::Real("0.0".to_string()));
         prefs.insert("Rate".to_string(), Yaml::Real("180.0".to_string()));
         prefs.insert("Volume".to_string(), Yaml::Real("100.0".to_string()));
         prefs.insert("Voice".to_string(), Yaml::String("none".to_string()));
         prefs.insert("Gender".to_string(), Yaml::String("none".to_string()));
         prefs.insert("Bookmark".to_string(), Yaml::Boolean(false));
+        prefs.insert("CapitalLetters_UseWord".to_string(), Yaml::Boolean(true));
+        prefs.insert("CapitalLetters_Pitch".to_string(), Yaml::Real("0.0".to_string()));
         return Preferences{ prefs };
     }
 
