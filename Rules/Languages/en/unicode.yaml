@@ -13,18 +13,21 @@
         then: [t: "."]                          
         else: [spell: "'.'"]                       
 
- # capital letters are a little tricky: users can pick their favorite word (something that was requested) and 
+ # Capital letters are a little tricky: users can pick their favorite word (something that was requested) and 
  # screen readers have options to use pitch changes or beeps instead of or in addition to say "cap"
+ # Also, if a user can see the screen, they probably don't need to hear "cap", but if they specified an override, they must want to hear the override.
+
  - "A":
     - test: 
         if: "$CapitalLetters_UseWord"
         then_test:
           if: "$SpeechOverrides_CapitalLetters = ''"
-          then: [t: "cap"]
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [t: "cap"]
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
         replace:
         - test:
             if: "$TTS='none'"
@@ -36,7 +39,9 @@
         if: "$CapitalLetters_UseWord"
         then_test:
           if: "$SpeechOverrides_CapitalLetters = ''"
-          then: [t: "cap"]
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [t: "cap"]
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
@@ -180,7 +185,9 @@
         if: "$CapitalLetters_UseWord"
         then_test:
           if: "$SpeechOverrides_CapitalLetters = ''"
-          then: [t: "cap"]
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [t: "cap"]
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
@@ -189,10 +196,10 @@
 
  - "ΪΫ":                                          # 0x3aa
     - test: 
-        if: "$CapitalLetters_UseWord"
-        then_test:
           if: "$SpeechOverrides_CapitalLetters = ''"
-          then: [t: "cap"]
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [t: "cap"]
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
