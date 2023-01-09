@@ -1632,8 +1632,22 @@ impl UnicodeDef {
             speech_rules.unicode_full.borrow_mut()
         };
         if let Some(str) = ch.as_str() {
-            if str.len() > 1 && str.contains('-') {
-                return process_range(str, replacements, unicode_table);
+            if str.is_empty() {
+                bail!("Empty character definition. Replacement is {}", replacements.as_str().unwrap());
+            }
+            let mut chars = str.chars();
+            let first_ch = chars.next().unwrap();       // non-empty string, so a char exists
+            if chars.next().is_some() {                       // more than one char
+                if str.contains('-')  {
+                    return process_range(str, replacements, unicode_table);
+                } else if first_ch != '0' {     // exclude 0xDDDD
+                    for ch in str.chars() {     // restart the iterator
+                        let ch_as_str = ch.to_string();
+                        unicode_table.insert(ch as u32, ReplacementArray::build(&substitute_ch(replacements, &ch_as_str))
+                                            .chain_err(|| format!("In definition of char: '{}'", str))?.replacements);
+                    }
+                    return Ok( () );
+                }
             }
         }
 
