@@ -1614,19 +1614,18 @@ impl UnicodeDef {
             };
             return process_include(file_name, include_file_name, do_include_fn);
         }
-
         // key: char, value is replacement or array of replacements
         let dictionary = unicode_def.as_hash();
         if dictionary.is_none() {
-            bail!("Expected a unicode definition (e.g, '+':{{t: plus}}'), found {}", yaml_to_string(unicode_def, 0));
+            bail!("Expected a unicode definition (e.g, '+':[t: \"plus\"]'), found {}", yaml_to_string(unicode_def, 0));
         }
 
         let dictionary = dictionary.unwrap();
         if dictionary.len() != 1 {
-            bail!("Expected a unicode definition (e.g, '+':{{t: plus}}'), found {}", yaml_to_string(unicode_def, 0));
+            bail!("Expected a unicode definition (e.g, '+':[t: \"plus\"]'), found {}", yaml_to_string(unicode_def, 0));
         }
 
-        let (ch, replacements) = dictionary.iter().next().ok_or_else(||  format!("Expected a unicode definition (e.g, '+':{{t: plus}}'), found {}", yaml_to_string(unicode_def, 0)))?;
+        let (ch, replacements) = dictionary.iter().next().ok_or_else(||  format!("Expected a unicode definition (e.g, '+':[t: \"plus\"]'), found {}", yaml_to_string(unicode_def, 0)))?;
         let mut unicode_table = if use_short {
             speech_rules.unicode_short.borrow_mut()
         } else {
@@ -2298,15 +2297,15 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
     pub fn replace_chars(&'r mut self, str: &str, mathml: Element<'c>) -> Result<String> {
         let rules = self.speech_rules;
         let mut chars = str.chars();
-        // avoid "a" -> "eigh", "." -> "point" and non-breaking space but catch monospaced "a" so it becomes "a"
-        if rules.translate_single_chars_only && str.find(|ch: char| ch.is_ascii() || ch == '\u{00A0}').is_some() {
+        // in a string, avoid "a" -> "eigh", "." -> "point", etc
+        if rules.translate_single_chars_only {
             let ch = chars.next().unwrap_or(' ');
             if chars.next().is_none() {
                 // single char
                 return replace_single_char(self, ch, mathml)
             } else {
-                // more than one char (don't use str.len() since that is bytes, not chars)
-                return Ok(str.replace('\u{a0}', " "));
+                // more than one char -- fix up non-breaking space
+                return Ok(str.replace('\u{00A0}', " "));    
             }
         };
 
