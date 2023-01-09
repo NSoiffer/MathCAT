@@ -39,7 +39,7 @@
     MathSpeak: Verbose          # Brief, SuperBrief
 
     SpeechOverrides:
-      CapitalLetters: ""     # word to say as a prefix for capital letters unless in unicode.yaml; empty string leaves it to screen reader
+      CapitalLetters: ""        # word to say as a prefix/postfix for capital letters; empty string leaves it calling AT with Unicode fallback 
       LeftParen: ""             # word used as override (not implemented)
       RightParen: ""            # word used as override (not implemented)
 
