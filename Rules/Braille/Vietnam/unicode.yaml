@@ -1,4 +1,5 @@
----
+-
+# Definitions for Vietnamese Math Braille. But most of theym are same as UEB.
 # UEB characters
 #
 # Some chars that originally came from an Excel spreadsheet, converted to csv, and the greatly expanded
@@ -16,7 +17,7 @@
 #    o -- opening/left side, c -- closing/right side, b -- both open and close (e.g, '"')
 
  
- - "=": [t: "⠐⠶"]               # 0x003D (Equals)
+ - "=": [T: "⠐⠶"]               # 0x003D (Equals)
  - "≠": [T: "⠐⠾"]             # 0x2260 (Not equal)
  - "<": [T: "⠐⠪"]               # 0x003C (Less than)
  - "≤": [T: "⠐⠪⠶"]              # 0x2264 (Less than or equal to)
@@ -107,10 +108,10 @@
  - "°": [T: "⠔⠚"]               # 0x00B0 (Degree sign)
  - "†": [t: "⠈⠠⠹"]              # 0x2020 (Dagger)
  - "‡": [t: "⠈⠠⠻"]              # 0x2021 (Double dagger)
- - "…": [t: "c⠲c⠲c⠲"]              # 0x2026 (Ellipsis)
- - "′": [t: "1⠶"]                # 0x2032 (Prime sign)
- - "″": [t: "1⠶⠶"]               # 0x2033 (Double prime sign)
- - "‴": [t: "1⠶⠶⠶"]              # 0x2034 (Triple prime sign)
+ - "…": [T: "c⠄c⠄c⠄"]              # 0x2026 (Ellipsis)
+ - "′": [T: "1⠄"]                # 0x2032 (Prime sign)
+ - "″": [T: "1⠄"]               # 0x2033 (Double prime sign)
+ - "‴": [T: "1⠄⠄⠄"]              # 0x2034 (Triple prime sign)
  - "Å": [t: "⠠⠘⠫⠁"]             # 0x212B (Angstrom symbol)
  - "Å": [t: "⠠⠘⠫⠁"]             # 0x00C5 (WIRIS uses this for Angstrom)
  - "∀": [t: "⠘⠁"]               # 0x2200 (For all)
@@ -133,8 +134,8 @@
  - "∷": [t: "1⠒⠒"]              # 0x2237 (Proportion)
  - "∣": [T: "⠣⠴⠜"]               # 0x2223 (Divides) ueb: ⠸⠳
  - "∤": [T: "⠣⠼⠜"]             # 0x2224 (Does not divide) ueb: ⠸⠳⠈⠱
- - "∥": [T: "⠫⠶"]               # 0x2225 (Parallel)
- - "∦": [T: "⠫⠶⠈"]             # 0x2226 (Not parallel)
+ - "∥": [T: "⠫⠶"]               # 0x2225 (Parallel) VI: AB parallel to CD, should be: ⠫AB⠶CD
+ - "∦": [T: "⠫⠐⠾"]             # 0x2226 (Not parallel) Vi: AB not parallel to CD, should be: ⠫AB⠐⠾CD
  - "⟂": [T: "⠫⠧"]               # 0x27C2 (Perpendicular)
  - "⊥": [T: "⠫⠧"]               # 0x22A5 (Up tack (perpendicular))
  - "⊦": [t: "⠸⠒"]               # 0x22A6 (Assertion (is a theorem))

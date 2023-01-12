@@ -295,7 +295,7 @@
       - if: "*[2][text()='_' or text()='¯']"
         then: [t: "⠱"]
       - else_if: "*[2][text()='→']"
-        then: [t: "⠘⠱"]
+        then: [T: "⠨⠔⠳⠕"]
       - else_if: "*[2][text()='.' or text()='˙']"
         then: [t: "⠘⠲"]
       - else_if: "*[2][text()='~']"
