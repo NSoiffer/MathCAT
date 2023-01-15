@@ -464,14 +464,21 @@
 - name: default-multiline
   tag: mtd
   match: "parent::*[parent::m:piecewise or parent::m:equations or parent::m:lines]"
+  variables: [LongPause: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultiLinePausesBetweenColumns = 'Long'"]
   replace:
   - x: "*"
   - test:
-    # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
-    - if: count(following-sibling::*) > 0
-      then: {pause: short}
-    - else_if: count(../following-sibling::*) > 0
-      then: {pause: medium}
+    # short pause after each element; medium pause if last element in a row; long pause for last element in matrix unless ClearSpeak override
+    - if: "count(following-sibling::*) > 0"
+      then_test:
+        if: "$LongPause"
+        then: {pause: medium}
+        else: {pause: short}
+    - else_if: "count(../following-sibling::*) > 0"
+      then_test:
+        if: "$LongPause"
+        then: {pause: long}
+        else: {pause: medium}
       else: {pause: long}
 
 # Matrix/Determinant rules

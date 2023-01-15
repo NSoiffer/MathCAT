@@ -572,6 +572,7 @@
       if: .[self::m:mlabeledtr]
       then: [{x: "*[position()>1]"}]
       else: {x: "*"}
+
 - name: matrix-default
   tag: mtd
   match: "parent::*[parent::m:matrix or parent::m:determinant]"
@@ -631,23 +632,26 @@
   replace:
   - x: "count(*)"
   - test:
-    - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
-      then: [{t: "case"}]
-    - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
-      then: [{t: "line"}]
-    - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
-      then: [{t: "constraint"}]
-    - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
-      then: [{t: "equation"}]
-    - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
-      then: [{t: "row"}]
-    - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
-      then: [{t: "step"}]
-      # else 'None -- don't say anything'
-  - test:
-    - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-      then: [{ct: "s"}] # plural
-  - pause: short
+    - if: $ClearSpeak_MultiLineOverview = 'Auto'
+      then:
+      - test:
+        - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
+          then: [{t: "case"}]
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
+          then: [{t: "line"}]
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
+          then: [{t: "constraint"}]
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
+          then: [{t: "equation"}]
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
+          then: [{t: "row"}]
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
+          then: [{t: "step"}]
+          # else 'None -- don't say anything'
+      - test:
+        - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+          then: [{ct: "s"}] # plural
+      - pause: short
   - x: "*"
 
 - name: ClearSpeak-default-multiline
