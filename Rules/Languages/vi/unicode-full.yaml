@@ -18,7 +18,7 @@
         then: [test: {if: "$Verbosity='Terse'", then: {t: close}, else: {t: close paren}}]
         else: [t: right paren]                            
 
- - "*": [t: times]                               # 0x2a
+ - "*": [T: nhân]                               # 0x2a
  - "+": [t: plus]                                # 0x2b
  - ",":                                          # 0x2c
     # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
@@ -112,17 +112,17 @@
  - "·":
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
-        then: [t: times]
-        else: [t: dot]
+        then: [T: nhân]
+        else: [T: chấm]
  - "×":                                          # 0xd7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
-        then: [t: times]
+        then: [T: nhân]
         else_test:
             if: $ClearSpeak_MultSymbolX = 'By'
-            then: [t: by]
+            then: [T: cho]
             else: [t: cross]
- - "÷": [t: divided by]                          # 0xf7
+ - "÷": [T: chia cho]                          # 0xf7
  - "ʰ": [t: modifier small h]                    # 0x2b0
  - "ʱ": [t: modifier small h with hook]          # 0x2b1
  - "ʲ": [t: modifier small j]                    # 0x2b2
@@ -676,7 +676,7 @@
  - "‹": [t: single left pointing angle quote mark] # 0x2039
  - "›": [t: single right pointing angle quote mark] # 0x203a
  - "‼": [t: double factorial]                    # 0x203c
- - "⁄": [t: divided by]                          # 0x2044
+ - "⁄": [T: trên]                          # 0x2044
  - "⁅": [t: left square bracket with quill]      # 0x2045
  - "⁆": [t: right square bracket with quill]     # 0x2046
  - "⁗": [t: quadruple prime]                     # 0x2057
@@ -688,14 +688,14 @@
  - "⁢": [t: ""]                                   # 0x2062
  - "⁣": [t: ""]                                   # 0x2063
  - "⁤": [t: "and"]                                # 0x2064
- - "⁰": [t: to the zeroth power]                 # 0x2070
- - "ⁱ": [t: to the eihth power]                  # 0x2071
- - "⁴": [t: to the fourth power]                 # 0x2074
- - "⁵": [t: to the fifth power]                  # 0x2075
- - "⁶": [t: to the sixth power]                  # 0x2076
- - "⁷": [t: to the seventh power]                # 0x2077
- - "⁸": [t: to the eighth power]                 # 0x2078
- - "⁹": [t: to the ninth power]                  # 0x2079
+ - "⁰": [T: mũ không]                 # 0x2070
+ - "ⁱ": [T: mũ tám]                  # 0x2071
+ - "⁴": [T: mũ bốn]                 # 0x2074
+ - "⁵": [T: mũ năm]                  # 0x2075
+ - "⁶": [T: mũ sáu]                  # 0x2076
+ - "⁷": [T: mũ bảy]                # 0x2077
+ - "⁸": [T: mũ tám]                 # 0x2078
+ - "⁹": [T: mũ chín]                  # 0x2079
  - "⁺": [t: superscript plus sign]               # 0x207a
  - "⁻": [t: superscript minus]                   # 0x207b
  - "⁼": [t: superscript equals sign]             # 0x207c
@@ -1010,22 +1010,22 @@
  - "⅋": [t: turned ampersand]                    # 0x214b
  - "⅌": [t: per]                                 # 0x214c
  - "ⅎ": [t: turned F]                            # 0x214e
- - "⅐": [t: one seventh]                         # 0x2150
- - "⅑": [t: one ninth]                           # 0x2151
- - "⅒": [t: one tenth]                           # 0x2152
- - "⅓": [t: one third]                           # 0x2153
- - "⅔": [t: two thirds]                          # 0x2154
- - "⅕": [t: one fifth]                           # 0x2155
- - "⅖": [t: two fifths]                          # 0x2156
- - "⅗": [t: three fifths]                        # 0x2157
- - "⅘": [t: four fifths]                         # 0x2158
- - "⅙": [t: one sixth]                           # 0x2159
- - "⅚": [t: five sixths]                         # 0x215a
- - "⅛": [t: one eighth]                          # 0x215b
- - "⅜": [t: three eighths]                       # 0x215c
- - "⅝": [t: five eighths]                        # 0x215d
- - "⅞": [t: seven eighths]                       # 0x215e
- - "⅟": [t: one over]                            # 0x215f
+ - "⅐": [T: một phần bảy]                         # 0x2150
+ - "⅑": [T: một phần chín]                           # 0x2151
+ - "⅒": [T: một phần mười]                           # 0x2152
+ - "⅓": [T: một phần ba]                           # 0x2153
+ - "⅔": [T: hai phần ba]                          # 0x2154
+ - "⅕": [T: một phần năm]                           # 0x2155
+ - "⅖": [T: hai phần năm]                          # 0x2156
+ - "⅗": [T: ba phần năm]                        # 0x2157
+ - "⅘": [T: bốn phần năm]                         # 0x2158
+ - "⅙": [T: một phần sáu]                           # 0x2159
+ - "⅚": [T: năm phần sáu]                         # 0x215a
+ - "⅛": [T: một phần tám]                          # 0x215b
+ - "⅜": [T: ba phần tám]                       # 0x215c
+ - "⅝": [T: năm phần tám]                        # 0x215d
+ - "⅞": [T: bảy phần tám]                       # 0x215e
+ - "⅟": [T: một trên]                            # 0x215f
  - "Ⅰ": [t: I]                                   # 0x2160
  - "Ⅱ": [t: I I]                                 # 0x2161
  - "Ⅲ": [t: I I I]                               # 0x2162
@@ -1285,9 +1285,9 @@
  - "−": [t: minus]                               # 0x2212
  - "∓": [t: minus or plus]                       # 0x2213
  - "∔": [t: dot plus]                            # 0x2214
- - "∕": [t: divided by]                          # 0x2215
+ - "∕": [T: chia cho]                          # 0x2215
  - "∖": [t: set minus]                           # 0x2216
- - "∗": [t: times]                               # 0x2217
+ - "∗": [T: nhân]                               # 0x2217
  - "∘": [t: composed with]                       # 0x2218
  - "∙": [t: times]                               # 0x2219
  - "√":                                          # 0x221a
@@ -1693,8 +1693,8 @@
  - "⋂": [t: intersection]                        # 0x22c2
  - "⋃": [t: union]                               # 0x22c3
  - "⋄": [t: diamond operator]                    # 0x22c4
- - "⋅": [t: times]                               # 0x22c5
- - "⋆": [t: times]                               # 0x22c6
+ - "⋅": [T: nhân]                               # 0x22c5
+ - "⋆": [T: nhân]                               # 0x22c6
  - "⋇": [t: division times]                      # 0x22c7
  - "⋈": [t: bowtie]                              # 0x22c8
  - "⋉":                                          # 0x22c9

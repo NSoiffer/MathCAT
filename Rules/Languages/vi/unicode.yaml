@@ -140,26 +140,26 @@
             then: [T: cho]
             else: [T: nhân]
  - "÷": [T: chia]                          # 0xf7
- - "̀": [T: grave accent embellishment]          # 0x300
- - "́": [T: acute accent embellishment]          # 0x301
- - "̂": [T: circumflex accent embellishment]     # 0x302
- - "̃": [T: tilde embellishment]                 # 0x303
- - "̄": [T: macron embellishment]                # 0x304
- - "̅": [T: overbar embellishment]               # 0x305
+ - "̀": [T: dấu huyền]          # 0x300
+ - "́": [T: dấu sắc embellishment]          # 0x301
+ - "̂": [T: dấu mũ embellishment]     # 0x302
+ - "̃": [T: dấu ngã]                 # 0x303
+ - "̄": [T: dấu nhấn]                # 0x304
+ - "̅": [T: thanh ngang]               # 0x305
  - "̆": [T: mũ ngược]                 # 0x306
  - "̇": [T: dot above embellishment]             # 0x307
  - "Α":                                          # 0x391
-     - T: alpha
+     - T: an-pha
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
          then: [T: "hoa"]
-     #- T: alpha
+     #- T: an-pha
  - "Β":                                          # 0x392
-     - T: beta
+     - T: bê-ta
      - test: 
          if: "($Blind or $Verbosity!='Terse')"
          then: [T: "hoa"]
-     #- T: beta
+     #- T: bê-ta
  - "Γ":                                          # 0x393
      - T: gamma
      - test: 
