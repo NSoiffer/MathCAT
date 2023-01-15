@@ -178,7 +178,7 @@ fn test_functions_none_pref_multiple_args() {
         <mi>B</mi> <mrow><mo>(</mo> <mrow> <mn>2</mn><mo>,</mo><mn>6</mn></mrow> <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("en", "ClearSpeak_Functions", "None",expr,
-        "B times, open paren 2 comma 6, close paren");
+        "cap b times, open paren 2 comma 6, close paren");
 }
 
 

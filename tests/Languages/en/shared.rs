@@ -86,9 +86,9 @@ fn tensor_mmultiscripts() {
             <mi>R</mi> <mi>i</mi><none/> <none/><mi>j</mi> <mi>k</mi><none/> <mi>l</mi><none/> 
         </mmultiscripts></math>";
     test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-            "R with 4 postscripts, subscript i superscript j subscript k subscript l");
+            "cap r with 4 postscripts, subscript i superscript j subscript k subscript l");
     test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
-            "R with 4 postscripts, sub i super j sub k sub l");
+            "cap r with 4 postscripts, sub i super j sub k sub l");
 }
 
 #[test]
@@ -98,7 +98,7 @@ fn huge_num_mmultiscripts() {
             <mprescripts/> <mi>I</mi><none/> <none/><mi>J</mi> <mi>K</mi><none/> <mi>L</mi><none/>
         </mmultiscripts></math>";
     test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-            "R with 4 prescripts, pre-subscript I, pre-superscript J and alternating prescripts K none L none end prescripts and with 5 postscripts, subscript i superscript j subscript k subscript l and alternating scripts m none end scripts");
+            "cap r with 4 prescripts, pre-subscript cap i, pre-superscript cap j and alternating prescripts cap k none cap l none end prescripts and with 5 postscripts, subscript i superscript j subscript k subscript l and alternating scripts m none end scripts");
 }
 
 #[test]
@@ -110,8 +110,8 @@ fn prime() {
 #[test]
 fn given() {
     let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
-    test("en", "SimpleSpeak", expr, "P, open paren, Eigh vertical line B, close paren");
-    test("en", "ClearSpeak", expr,  "P, open paren Eigh divides B, close paren");  // not good, but follows the spec
+    test("en", "SimpleSpeak", expr, "cap p, open paren, cap eigh vertical line cap b, close paren");
+    test("en", "ClearSpeak", expr,  "cap p, open paren, cap eigh divides cap b, close paren");  // not good, but follows the spec
 }
 
 #[test]
@@ -194,7 +194,7 @@ fn ignore_period() {
       </annotation-xml>
     </semantics>
   </math>";
-    test("en", "SimpleSpeak", expr, "P, open paren, Eigh and B, close paren; equals; P, open paren, Eigh intersection B, close paren; equals, P of Eigh, P of B");
+    test("en", "SimpleSpeak", expr, "cap p; open paren, cap eigh and cap b; close paren; equals; cap p, open paren, cap eigh intersection cap b, close paren; equals, cap p of cap eigh, cap p of cap b");
 }
 
 #[test]

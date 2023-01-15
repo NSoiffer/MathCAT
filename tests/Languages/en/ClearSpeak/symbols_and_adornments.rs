@@ -172,7 +172,7 @@ fn vertical_line_divides() {
                 </mrow>
             </math>";
         test_ClearSpeak_prefs("en", vec![("ClearSpeak_VerticalLine", "Given"), ("ClearSpeak_ImpliedTimes", "None")]
-                        , expr, "P, open paren Eigh given B, close paren");
+                        , expr, "cap p, open paren, cap eigh given cap b, close paren");
     }
 
 #[test]
