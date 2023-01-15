@@ -194,18 +194,6 @@
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
         replace: [spell: "translate('.', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
 
- - "ΪΫ":                                          # 0x3aa
-    - test: 
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', 'ΪΫ', 'ιυ')"]
-    - t: "with dialytika"
-
  - "α": [t: "alpha"]                               # 0x3b1
  - "β": [t: "beta"]                                # 0x3b2
  - "γ": [t: "gamma"]                               # 0x3b3
@@ -304,7 +292,7 @@
      - test: 
          if: "$Verbosity='Terse'"
          then: [t: "partial"]
-         else: [t: "the partial derivative"]
+         else: [t: "partial derivative"]
  - "∃": [t: "there exists"]                        # 0x2203
  - "∄": [t: "there does not exist"]                # 0x2204
  - "∅": [t: "empty set"]                           # 0x2205
