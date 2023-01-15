@@ -37,6 +37,7 @@
  - "≡": [t: "⠸⠿"]               # 0x2261 (Equivalent to (three horizontal lines))
  - "≢": [t: "⠸⠿⠈⠱"]             # 0x2262 (Not identical to)
  - "∈": [t: "⠘⠑"]               # 0x2208 (Element of (member of))
+ - "∉": [t: "⠘⠑⠈⠱"]            # 0x2209 (Not Element of)
  - "+": [t: "⠐⠖"]               # 0x002B (Plus sign)
  - "∋": [t: "⠈⠘⠑"]              # 0x220B (Contains)
  - "⊂": [t: "⠘⠣"]              # 0x2282 (Subset of)
