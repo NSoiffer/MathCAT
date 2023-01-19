@@ -101,6 +101,9 @@ pub fn yaml_to_string(yaml: &Yaml, indent: usize) -> String {
         emitter.compact(true);
         emitter.emit_node(yaml).unwrap(); // dump the YAML object to a String
     }
+    if indent == 0 {
+        return result;
+    }
     let indent_str = format!("{:in$}", " ", in=2*indent);
     result = result.replace('\n',&("\n".to_string() + &indent_str)); // add indentation to all but first line
     return indent_str + result.trim_end();  // add indent to first line and remove an extra indent at end

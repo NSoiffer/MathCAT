@@ -118,22 +118,20 @@ fn yaml_type_err(yaml: &Yaml, str: &str) -> String {
     return format!("Expected {}, found {}", str, yaml_to_type(yaml));
 }
 
-fn yaml_key_err(dict: &Yaml, key: &str, yaml_type: &str) -> String {
-    if dict.as_hash().is_none() {
-       return format!("Expected dictionary with key '{}', found\n{}", key, yaml_to_string(dict, 1));
-    }
-    let str = &dict[key];
-    if str.is_badvalue() {
-        return format!("Did not find '{}' in\n{}", key,  yaml_to_string(dict, 1));
-    }
-    return format!("Type of '{}' is not a {}.\nIt is a {}. YAML value is\n{}", 
-            key, yaml_type, yaml_to_type(str), yaml_to_string(dict, 0));
-}
+// fn yaml_key_err(dict: &Yaml, key: &str, yaml_type: &str) -> String {
+//     if dict.as_hash().is_none() {
+//        return format!("Expected dictionary with key '{}', found\n{}", key, yaml_to_string(dict, 1));
+//     }
+//     let str = &dict[key];
+//     if str.is_badvalue() {
+//         return format!("Did not find '{}' in\n{}", key,  yaml_to_string(dict, 1));
+//     }
+//     return format!("Type of '{}' is not a {}.\nIt is a {}. YAML value is\n{}", 
+//             key, yaml_type, yaml_to_type(str), yaml_to_string(dict, 0));
+// }
 
-fn find_str<'a>(dict: &'a Yaml, key: &'a str) -> Result<&'a str> {
-    let value = dict[key].as_str();
-    let result = value.ok_or_else(|| yaml_key_err(dict, key, "str"))?;
-    return Ok( result );
+fn find_str<'a>(dict: &'a Yaml, key: &'a str) -> Option<&'a str> {
+    return dict[key].as_str();
 }
 
 /// Returns the Yaml as a `Hash` or an error if it isn't.
@@ -421,7 +419,7 @@ impl<'r> InsertChildren {
     //    This is slower than the alternatives, but reuses a bunch of code and hence is less complicated.
     fn replace<'c, 's:'c, 'm: 'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
         let result = self.xpath.evaluate(&rules_with_context.context_stack.base, mathml)
-                .chain_err(||format!("in '{}' replacing after pattern match", &self.xpath.string) )?;
+                .chain_err(||format!("in '{}' replacing after pattern match", &self.xpath.rc.string) )?;
         match result {
             Value::Nodeset(nodes) => {
                 if nodes.size() == 0 {
@@ -431,14 +429,14 @@ impl<'r> InsertChildren {
                 let mut expanded_result = Vec::with_capacity(n_nodes + (n_nodes+1)*self.replacements.replacements.len());
                 expanded_result.push(
                     Replacement::XPath(
-                        MyXPath::new(format!("{}[{}]", self.xpath.string , 1))?
+                        MyXPath::new(format!("{}[{}]", self.xpath.rc.string , 1))?
                     )
                 );
                 for i in 2..n_nodes+1 {
                     expanded_result.extend_from_slice(&self.replacements.replacements);
                     expanded_result.push(
                         Replacement::XPath(
-                            MyXPath::new(format!("{}[{}]", self.xpath.string , i))?
+                            MyXPath::new(format!("{}[{}]", self.xpath.rc.string , i))?
                         )
                     );
                 }
@@ -646,7 +644,7 @@ impl<'r> TranslateExpression {
     }
         
     fn replace<'c, 's:'c, 'm:'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
-        if self.id.string.contains('@') {
+        if self.id.rc.string.contains('@') {
             let xpath_value = self.id.evaluate(rules_with_context.get_context(), mathml)?;
             let id = match xpath_value {
                 Value::String(s) => Some(s),
@@ -840,35 +838,56 @@ impl<'r> ReplacementArray {
 
 
 // MyXPath is a wrapper around an 'XPath' that keeps around the original xpath expr (as a string) so it can be used in error reporting.
+// Because we want to be able to clone them and XPath doesn't support clone(), this is a wrapper around an internal MyXPath.
 // It supports the standard SpeechRule functionality of building and replacing.
 #[derive(Debug)]
-pub struct MyXPath {
+struct RCMyXPath {
     xpath: XPath,
     string: String,        // store for error reporting
 }
 
+#[derive(Debug, Clone)]
+pub struct MyXPath {
+    rc: Rc<RCMyXPath>        // rather than putting Rc around both 'xpath' and 'string', just use one and indirect to internal RCMyXPath
+}
+
+
 impl fmt::Display for MyXPath {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return write!(f, "x: \"{}\"", self.string);
+        return write!(f, "x: \"{}\"", self.rc.string);
     }
 }
 
-impl Clone for MyXPath {
-    fn clone(&self) -> Self {
-        return MyXPath{
-            xpath: MyXPath::compile_xpath(&self.string).unwrap(),
-            string: self.string.clone()}
-    }
+// pub fn xpath_count() -> (usize, usize) {
+//     return (XPATH_CACHE.with( |cache| cache.borrow().len()), unsafe{XPATH_CACHE_HITS} );
+// }
+thread_local!{
+    static XPATH_CACHE: RefCell<HashMap<String, MyXPath>> = RefCell::new( HashMap::with_capacity(2047) );
 }
+// static mut XPATH_CACHE_HITS: usize = 0;
 
 impl<'r> MyXPath {
     fn new(xpath: String) -> Result<MyXPath> {
-        return Ok (
-            MyXPath {
-                xpath: MyXPath::compile_xpath(&xpath)?,
-                string: xpath,
-            } 
-        );
+        return XPATH_CACHE.with( |cache|  {
+            let mut cache = cache.borrow_mut();
+            return Ok(
+                match cache.get(&xpath) {
+                    Some(compiled_xpath) => {
+                        // unsafe{ XPATH_CACHE_HITS += 1;};
+                        compiled_xpath.clone()
+                    },
+                    None => {
+                        let new_xpath = MyXPath {
+                            rc: Rc::new( RCMyXPath {
+                                xpath: MyXPath::compile_xpath(&xpath)?,
+                                string: xpath.clone()
+                            })};
+                        cache.insert(xpath.clone(), new_xpath.clone());
+                        new_xpath
+                    },
+                }
+            )
+        });
     }
 
     pub fn build(xpath: &Yaml) -> Result<MyXPath> {
@@ -1018,12 +1037,12 @@ impl<'r> MyXPath {
     }
 
     pub fn replace<'c, 's:'c, 'm:'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
-        if self.string == "process-intent(.)" {
+        if self.rc.string == "process-intent(.)" {
             return T::from_element( crate::infer_intent::infer_intent(rules_with_context, mathml)? );
         }
         
         let result = self.evaluate(&rules_with_context.context_stack.base, mathml)
-                .chain_err(|| format!("in '{}' replacing after pattern match", &self.string) )?;
+                .chain_err(|| format!("in '{}' replacing after pattern match", &self.rc.string) )?;
         return match result {
                 Value::Nodeset(nodes) => {
                     if nodes.size() == 0 {
@@ -1039,7 +1058,7 @@ impl<'r> MyXPath {
     
     pub fn evaluate<'a, 'c>(&'a self, context: &'r Context<'c>, mathml: Element<'c>) -> Result<Value<'c>> {
         // debug!("evaluate: {}", self);
-        let result = self.xpath.evaluate(context, mathml);
+        let result = self.rc.xpath.evaluate(context, mathml);
         return match result {
             Ok(val) => Ok( val ),
             Err(e) => {
@@ -1083,7 +1102,7 @@ impl SpeechPattern  {
 
         // debug!("\nbuild_speech_pattern: dict:\n{}", yaml_to_string(dict, 0));
 
-        if let Ok(include_file_name) = find_str(dict, "include") {
+        if let Some(include_file_name) = find_str(dict, "include") {
             let do_include_fn = |new_file: &Path| {
                 rules.read_patterns(&[Some(new_file.to_path_buf()), None, None])
             };
@@ -1096,8 +1115,8 @@ impl SpeechPattern  {
         // tag_named can be either a string (most common) or an array of strings
         let mut tag_names: Vec<&str> = Vec::new();
         match find_str(dict, "tag") {
-            Ok(str) => tag_names.push(str),
-            Err(_) => {
+            Some(str) => tag_names.push(str),
+            None => {
                 // check for array
                 let tag_array  = &dict["tag"];
                 tag_names = vec![];
@@ -1119,7 +1138,7 @@ impl SpeechPattern  {
             }
         }
 
-        if pattern_name.is_err() {
+        if pattern_name.is_none() {
             if dict.is_null() {
                 bail!("Error trying to find 'name': empty value (two consecutive '-'s?");
             } else {
@@ -1149,7 +1168,7 @@ impl SpeechPattern  {
                     pattern_name: pattern_name.clone(),
                     tag_name: tag_name.clone(),
                     file_name: file.to_str().unwrap().to_string(),
-                    match_uses_var_defs: dict["variables"].is_array() && pattern_xpath.string.contains('$'),    // FIX: should look at var_defs for actual name
+                    match_uses_var_defs: dict["variables"].is_array() && pattern_xpath.rc.string.contains('$'),    // FIX: should look at var_defs for actual name
                     pattern: pattern_xpath,
                     var_defs: VariableDefinitions::build(&dict["variables"])
                         .chain_err(|| {
@@ -1223,9 +1242,9 @@ impl<'r> TestArray {
 
         // if 'test' is a dictionary ('Hash'), we convert it to an array with one entry and proceed
         let tests = if test.as_hash().is_some() {
-            vec![test.to_owned()]
+            vec![test]
         } else if let Some(vec) = test.as_vec() {
-            vec.to_owned()
+            vec.iter().map(|yaml| yaml).collect()
         } else {
             bail!("Value for 'test:' is neither a dictionary or an array.")
         };
@@ -1608,7 +1627,7 @@ impl  fmt::Display for UnicodeDef {
 
 impl UnicodeDef {
     fn build(unicode_def: &Yaml, file_name: &Path, speech_rules: &SpeechRules, use_short: bool) -> Result<()> {
-        if let Ok(include_file_name) = find_str(unicode_def, "include") {
+        if let Some(include_file_name) = find_str(unicode_def, "include") {
             let do_include_fn = |new_file: &Path| {
                 speech_rules.read_unicode(Some(new_file.to_path_buf()), use_short)
             };
@@ -1970,7 +1989,7 @@ impl SpeechRules {
 
     fn read_patterns(&mut self, path: &Locations) -> Result<()> {
         if let Some(p) = &path[0] {
-            info!("Reading rule file: {}", p.to_str().unwrap());
+            // info!("Reading rule file: {}", p.to_str().unwrap());
             let rule_file_contents = read_to_string_shim(p.as_path()).expect("cannot read file");
             let rules_build_fn = |pattern: &Yaml| {
                 self.build_speech_patterns(pattern, p)
@@ -2338,6 +2357,8 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                 if rules_with_context.speech_rules.unicode_full.borrow().is_empty() {
                     info!("*** Loading full unicode {} for char '{}'/{:#06x}", rules_with_context.speech_rules.name, ch, ch_as_u32);
                     rules_with_context.speech_rules.read_unicode(None, false)?;
+                    info!("# Unicode defs = {}/{}", rules_with_context.speech_rules.unicode_short.borrow().len(), rules_with_context.speech_rules.unicode_full.borrow().len());
+
                 }
                 unicode = rules_with_context.speech_rules.unicode_full.borrow();
                 replacements = unicode.get( &ch_as_u32 );
@@ -2391,7 +2412,7 @@ mod tests {
         let speech_pattern = &rules.rules["math"][0];
         assert_eq!(speech_pattern.pattern_name, "default", "\npattern name failure");
         assert_eq!(speech_pattern.tag_name, "math", "\ntag name failure");
-        assert_eq!(speech_pattern.pattern.string, ".", "\npattern failure");
+        assert_eq!(speech_pattern.pattern.rc.string, ".", "\npattern failure");
         assert_eq!(speech_pattern.replacements.replacements.len(), 1, "\nreplacement failure");
         assert_eq!(speech_pattern.replacements.replacements[0].to_string(), r#"x: "./*""#, "\nreplacement failure");
     }
@@ -2415,7 +2436,7 @@ mod tests {
         let speech_pattern = &rules.rules["math"][0];
         assert_eq!(speech_pattern.pattern_name, "default", "\npattern name failure");
         assert_eq!(speech_pattern.tag_name, "math", "\ntag name failure");
-        assert_eq!(speech_pattern.pattern.string, ".", "\npattern failure");
+        assert_eq!(speech_pattern.pattern.rc.string, ".", "\npattern failure");
         assert_eq!(speech_pattern.replacements.replacements.len(), 2, "\nreplacement failure");
     }
 
@@ -2438,7 +2459,7 @@ mod tests {
         let speech_pattern = &rules.rules["math"][0];
         assert_eq!(speech_pattern.pattern_name, "default", "\npattern name failure");
         assert_eq!(speech_pattern.tag_name, "math", "\ntag name failure");
-        assert_eq!(speech_pattern.pattern.string, ".", "\npattern failure");
+        assert_eq!(speech_pattern.pattern.rc.string, ".", "\npattern failure");
         assert_eq!(speech_pattern.replacements.replacements.len(), 1, "\nreplacement failure");
     }
 
