@@ -1244,7 +1244,7 @@ impl<'r> TestArray {
         let tests = if test.as_hash().is_some() {
             vec![test]
         } else if let Some(vec) = test.as_vec() {
-            vec.iter().map(|yaml| yaml).collect()
+            vec.iter().collect()
         } else {
             bail!("Value for 'test:' is neither a dictionary or an array.")
         };
@@ -1263,8 +1263,8 @@ impl<'r> TestArray {
             if !if_part.is_badvalue() {
                 // first case: if:, then:, optional else:
                 let condition = Some( MyXPath::build(if_part)? );
-                let then_part = TestOrReplacements::build(&test, "then", "then_test", true)?; 
-                let else_part = TestOrReplacements::build(&test, "else", "else_test", false)?;
+                let then_part = TestOrReplacements::build(test, "then", "then_test", true)?; 
+                let else_part = TestOrReplacements::build(test, "else", "else_test", false)?;
                 let n_keys = if else_part.is_none() {2} else {3};
                 if test.as_hash().unwrap().len() > n_keys {
                     bail!("A key other than 'if', 'else_if', 'then', 'then_test', 'else', or 'else_test' was found in the 'then' clause of 'test'");
@@ -1274,7 +1274,7 @@ impl<'r> TestArray {
                 );
             } else {
                 // second case: should be else/else_test
-                let else_part = TestOrReplacements::build(&test, "else", "else_test", true)?;
+                let else_part = TestOrReplacements::build(test, "else", "else_test", true)?;
                 if test.as_hash().unwrap().len() > 1 {
                     bail!("A key other than 'if', 'else_if', 'then', 'then_test', 'else', or 'else_test' was found the 'else' clause of 'test'");
                 };

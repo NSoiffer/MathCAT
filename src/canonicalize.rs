@@ -809,8 +809,7 @@ impl CanonicalizeContext {
 				let mathml =  if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 					let merged = merge_dots(mathml);	// FIX -- switch to passing in children
 					let merged = merge_primes(merged);
-					let merged = handle_pseudo_scripts(merged);
-					merged
+					handle_pseudo_scripts(merged)
 				} else {
 					mathml
 				};
