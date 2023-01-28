@@ -119,19 +119,8 @@
  - "ʴ": [t: "modifier small turned r"]             # 0x2b4
  - "ʵ": [t: "modifier small turned r with hook"]   # 0x2b5
  - "ʶ":                                            # 0x2b6
-    - t: "modifier small"
-    - test: 
-        if: "$CapitalLetters_UseWord"
-        then_test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
-        replace: [t: "inverted r"]
+    - t: "modifier small inverted"
+    - spell: "translate('R', 'R', 'R')"
 
  - "ʷ": [t: "modifier small w"]                    # 0x2b7
  - "ʸ": [t: "modifier small y"]                    # 0x2b8
@@ -275,6 +264,8 @@
 
  - "ΪΫϏ":                                          # 0x3aa, 0x3ab, 0x3cf
     - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
@@ -301,6 +292,8 @@
  - "϶": [t: "reversed epsilon"]                    # 0x3f6
  - "А-Я":                                          # 0x410 - 0x42f
     - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
@@ -496,33 +489,11 @@
  - "ℊ": [t: "script g"]                            # 0x210a
  - "ℌℑℨℭ":                                # 0x210c, 0x2111, 0x2128, 0x212d
     - t: "fraktur"
-    - test: 
-        if: "$CapitalLetters_UseWord"
-        then_test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
-        replace: [spell: "translate('.', 'ℌℑℨℭ', 'hizc')"]
+    - spell: "translate('.', 'ℌℑℨℭ', 'HIZC')"
 
  - "ℍℙℾℿ":                                          # 0x210d, 0x2119, 0x213e, 0x213f
     - t: "double struck"
-    - test: 
-        if: "$CapitalLetters_UseWord"
-        then_test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
-        replace: [spell: "translate('.', 'ℍℙℾℿ', 'hpγπ')"]
+    - spell: "translate('.', 'ℍℙℾℿ', 'HPΓΠ')" 
 
  - "ℎ": [t: "planck constant"]                     # 0x210e
  - "ℏ":                                          # 0x210f
@@ -535,18 +506,7 @@
 
  - "ℐℒ℘ℬℰℱℳ":                          # 0x2110, 0x2112, 0x2118, 0x2130, 0x2131, 0x2133
     - t: "script"
-    - test: 
-        if: "$CapitalLetters_UseWord"
-        then_test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
-        replace: [spell: "translate('.', 'ℐℒ℘ℬℰℱℳ', 'ilpbefm')"]
+    - spell: "translate('.', 'ℐℒ℘ℬℰℱℳ', 'ILPBEFM')"
 
  - "ℓ": [t: "script l"]                            # 0x2113
  - "℔": [t: "pounds"]                              # 0x2114
@@ -569,19 +529,7 @@
       - else_if: "'.' = '⅃'"
         then: [t: "reversed sans-serif"]
         else: [t: "turned sans-serif"]
-    - test: 
-        if: "$CapitalLetters_UseWord"
-        then_test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
-        replace: [spell: "translate('.', 'Ⅎ℺⅁⅂⅃⅄', 'fqglly')"]
-
+    - spell: "translate('.', 'Ⅎ℺⅁⅂⅃⅄', 'FQGLLY')"
 
  - "ℴ": [t: "script o"]                             # 0x2134
  - "ℵ": [t: "first transfinite cardinal"]           # 0x2135
@@ -1530,18 +1478,8 @@
 
  - "Ⓐ-Ⓩ":
     - t: "circled"
-    - test: 
-        if: "$CapitalLetters_UseWord"
-        then_test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
-        replace: [spell: "translate('.', 'ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', 'ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+
  - "ⓐ-ⓩ":                                       # 0x24d0 - 0x24e9
     - t: "circled"
     - spell: "translate('.', 'ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ', 'abcdefghijklmnopqrstuvwxyz')"
@@ -3166,18 +3104,8 @@
  - "": [t: "i"]                                   # 0xed12
  - "ⅈ": [t: "i"]                                   # 0x2148
  - "": [t: "j"]                                   # 0xed13
- - "ⅅ":                                          # 0xed16, 0x2145
-    - test: 
-        if: "$CapitalLetters_UseWord"
-        then_test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [t: "d"]
+ - "ⅅ":
+    - spell: "translate('.', 'ⅅ', 'DD')"                                         # 0xed16, 0x2145
 
 # The private use chars are from MathType
  - "": [t: "anticlockwise contour integral loop"] # 0xee00
@@ -3247,27 +3175,11 @@
  # Some of these are reserved because they were used in Plane 0 -- that shouldn't be an issue other than causing the other chars to not display
  - "𝔄-𝔜":    # 0x1d504 - 0x1d51d ('z' version is reserved)
     - t: "fraktur"
-    - test: 
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝔄𝔅𝔆𝔇𝔈𝔉𝔊𝔋𝔌𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔𝔕𝔖𝔗𝔘𝔙𝔚𝔛𝔜', 'abcdefghijklmnopqrstuvwxy')"]
+    - spell: "translate('.', '𝔄𝔅𝔆𝔇𝔈𝔉𝔊𝔋𝔌𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔𝔕𝔖𝔗𝔘𝔙𝔚𝔛𝔜', 'ABCDEFGHIJKLMNOPQRSTUVWXY')"
 
  - "-":                                          # 0xf000 - 0xf018
     - t: "fraktur"
-    - test: 
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxy')"]
+    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXY')"
 
  - "𝔞-𝔷":    # 0x1d51e - 0x1d537
     - t: "fraktur"
@@ -3278,27 +3190,11 @@
     
  - "𝕬-𝖅":    # 0x1D56C - 0x1D585
     - t: "fraktur bold"
-    - test: 
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                          # 0xf040 - 0xf059
     - t: "fraktur bold"
-    - test: 
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝖆-𝖟":    # 0x1d586 - 0x1d59f
     - t: "fraktur bold"
@@ -3311,27 +3207,11 @@
  # Some of these are reserved because they were used in Plane 0 -- that shouldn't be an issue other than causing the other chars to not display
  - "𝔸-𝕐":    # 0x1d504 - 0x1d51d ('z' version is reserved)
     - t: "double struck"
-    - test: 
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝔸𝔹𝔺𝔻𝔼𝔽𝔾𝔿𝕀𝕁𝕂𝕃𝕄𝕅𝕆𝕇𝕈𝕉𝕊𝕋𝕌𝕍𝕎𝕏𝕐', 'abcdefghijklmnopqrstuvwxy')"]
+    - spell: "translate('.', '𝔸𝔹𝔺𝔻𝔼𝔽𝔾𝔿𝕀𝕁𝕂𝕃𝕄𝕅𝕆𝕇𝕈𝕉𝕊𝕋𝕌𝕍𝕎𝕏𝕐', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                          # 0xf080 - 0xf098
     - t: "double struck"
-    - test: 
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxy')"]
+    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝕒-𝕫":    # 0x1d552 - 0x1d56b
     - t: "double struck"
@@ -3352,27 +3232,11 @@
  # script chars in math alphabetic block and also MathType private use area
  - "𝒜-𝒵":    # 0x1d49c - 0x1d4b5
     - t: "script"
-    - test: 
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝒜𝒝𝒞𝒟𝒠𝒡𝒢𝒣𝒤𝒥𝒦𝒧𝒨𝒩𝒪𝒫𝒬𝒭𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '𝒜𝒝𝒞𝒟𝒠𝒡𝒢𝒣𝒤𝒥𝒦𝒧𝒨𝒩𝒪𝒫𝒬𝒭𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                          # 0xf100 - 0xf119
     - t: "script"
-    - test: 
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝒶-𝓏":    # 0x1d4b6 - 0x1d4cf
     - t: "script"
@@ -3384,27 +3248,11 @@
  # bold script chars in math alphabetic block and also MathType private use area
  - "𝓐-𝓩":    # 0x1d4d0 - 0x1d4e9
     - t: "script bold"
-    - test: 
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                          # 0xf140 - 0xf159
     - t: "script bold"
-    - test: 
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝓪-𝔃":    # 0x1d4ea - 0x1d503
     - t: "script bold"
@@ -3414,50 +3262,9 @@
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                          # 0xf180 - 0xf199
-    - test: 
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')" 
 
  - "":                                          # 0xf19a
-    - test: 
-        if: "$SpeechOverrides_CapitalLetters = ''"
-        then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-        else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [t: "ligature ae"]
- - "":                                          # 0xf19b
-    - test: 
-        if: "$SpeechOverrides_CapitalLetters = ''"
-        then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-        else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [t: "sharp s"]
- - "":                                          # 0xf19c
-    - test: 
-        if: "$SpeechOverrides_CapitalLetters = ''"
-        then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-        else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [t: "o with stroke"]
-
- # MathType only has a few of the cap Greek letters in PUA
- - "":                                          # 0xf201 - 0xf209
-    - t: "double struck"
     - test: 
         if: "$CapitalLetters_UseWord"
         then_test:
@@ -3468,38 +3275,51 @@
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'δψλπσθγωυ')"]
+        replace: [t: "ligature ae"]
+ - "":                                          # 0xf19b
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [t: "cap"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        replace: [t: "sharp s"]
+ - "":                                          # 0xf19c
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [t: "cap"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        replace: [t: "o with stroke"]
+
+ # MathType only has a few of the cap Greek letters in PUA
+ - "":                                          # 0xf201 - 0xf209
+    - t: "double struck"
+    - spell: "translate('.', '', 'ΔΨΛΠΣΘΓΩΥ')"
 
  - "-":    # 0xf220 - 0xf236
     - t: "double struck"
-    - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+    - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "": [t: "double struck final sigma"]           # 0xf237
  - "": [t: "double struck rho"]                   # 0xf250
  - "": [t: "double struck phi"]                   # 0xf251
  - "𝐀-𝐙":    # 0x1d400 - 0x1d419
     - t: "bold"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":    # 0xf260 - 0xf279
     - t: "bold"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝐚-𝐳":    # 0x1d41a - 0x1d433
     - t: "bold"
@@ -3510,26 +3330,10 @@
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝐴-𝑍":    # 0x1d434 - 0x1d44d
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝐴𝐵𝐶𝐷𝐸𝐹𝐺𝐻𝐼𝐽𝐾𝐿𝑀𝑁𝑂𝑃𝑄𝑅𝑆𝑇𝑈𝑉𝑊𝑋𝑌𝑍', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '𝐴𝐵𝐶𝐷𝐸𝐹𝐺𝐻𝐼𝐽𝐾𝐿𝑀𝑁𝑂𝑃𝑄𝑅𝑆𝑇𝑈𝑉𝑊𝑋𝑌𝑍', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":    # 0xf294 - 0xf2ad
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝑎-𝑧":    # 0x1d44e - 0x1d467
     - spell: "translate('.', '𝑎𝑏𝑐𝑑𝑒𝑓𝑔𝑕𝑖𝑗𝑘𝑙𝑚𝑛𝑜𝑝𝑞𝑟𝑠𝑡𝑢𝑣𝑤𝑥𝑦𝑧', 'abcdefghijklmnopqrstuvwxyz')"
@@ -3539,27 +3343,11 @@
 
  - "𝑨-𝒁":    # 0x1d468 - 0x1d481
     - t: "bold italic"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":    # 0xf2c8 - 0xf2e1
     - t: "bold italic"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝒂-𝒛":    # 0x1d482 - 0x1d49b
     - t: "bold italic"
@@ -3570,26 +3358,10 @@
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝖠-𝖹":    # 0x1d5a0 - 0x1d5b9
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝖠𝖡𝖢𝖣𝖤𝖥𝖦𝖧𝖨𝖩𝖪𝖫𝖬𝖭𝖮𝖯𝖰𝖱𝖲𝖳𝖴𝖵𝖶𝖷𝖸𝖹', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '𝖠𝖡𝖢𝖣𝖤𝖥𝖦𝖧𝖨𝖩𝖪𝖫𝖬𝖭𝖮𝖯𝖰𝖱𝖲𝖳𝖴𝖵𝖶𝖷𝖸𝖹', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":    # 0xf300 - 0xf319
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝖺-𝗓":    # 0x1d5ba - 0x1d5d3
     - spell: "translate('.', '𝖺𝖻𝖼𝖽𝖾𝖿𝗀𝗁𝗂𝗃𝗄𝗅𝗆𝗇𝗈𝗉𝗊𝗋𝗌𝗍𝗎𝗏𝗐𝗑𝗒𝗓', 'abcdefghijklmnopqrstuvwxyz')"
@@ -3599,27 +3371,11 @@
  
  - "𝗔-𝗭":    # 0x1d5d4 - 0x1d5ed
     - t: "bold"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":    # 0xf334 - 0xf34d
     - t: "bold"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝗮-𝘇":    # 0x1d5ee - 0x1d607
     - t: "bold"
@@ -3630,27 +3386,10 @@
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  - "𝘈-𝘡":    # 0x1d608 - 0x1d621
     - t: "italic"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡', 'abcdefghijklmnopqrstuvwxyz')"]
-
+    - spell: "translate('.', '𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
  - "-":    # 0xf368 - 0xf381
     - t: "italic"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝘢-𝘻":    # 0x1d622 - 0x1d63b
     - t: "italic"
@@ -3662,27 +3401,11 @@
 
  - "𝘼-𝙕":    # 0x1d63c - 0x1d655
     - t: "bold italic"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":    # 0xf39c - 0xf3b5
     - t: "bold italic"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝙖-𝙯":    # 0x1d656 - 0x1d66f
     - t: "bold italic"
@@ -3693,26 +3416,10 @@
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝙰-𝚉":    # 0x1d670 - 0x1d689
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":    # 0xf3d0 - 0xf3e9
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"]
+    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝚊-𝚣":    # 0x1d68a - 0x1d6a3
     - spell: "translate('.', '𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣', 'abcdefghijklmnopqrstuvwxyz')"
@@ -3726,27 +3433,11 @@
 
  - "𝚨-𝛀":    # 0x1d6a8 - 0x1d6c0
     - t: "bold"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝚨𝚩𝚪𝚫𝚬𝚭𝚮𝚯𝚰𝚱𝚲𝚳𝚴𝚵𝚶𝚷𝚸𝚹𝚺𝚻𝚼𝚽𝚾𝚿𝛀', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
+    - spell: "translate('.', '𝚨𝚩𝚪𝚫𝚬𝚭𝚮𝚯𝚰𝚱𝚲𝚳𝚴𝚵𝚶𝚷𝚸𝚹𝚺𝚻𝚼𝚽𝚾𝚿𝛀', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":    # 0xf408 - 0xf420
     - t: "bold"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
+    - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝛂-𝛚":    # 0x1d6c2 - 0x1d6da
     - t: "bold"
@@ -3769,27 +3460,11 @@
 
  - "𝛢-𝛺":    # 0x1d6e2 - 0x1d6fa
     - t: "italic"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝛢𝛣𝛤𝛥𝛦𝛧𝛨𝛩𝛪𝛫𝛬𝛭𝛮𝛯𝛰𝛱𝛲𝛳𝛴𝛵𝛶𝛷𝛸𝛹𝛺', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
+    - spell: "translate('.', '𝛢𝛣𝛤𝛥𝛦𝛧𝛨𝛩𝛪𝛫𝛬𝛭𝛮𝛯𝛰𝛱𝛲𝛳𝛴𝛵𝛶𝛷𝛸𝛹𝛺', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":    # 0xf442 - 0xf45a
     - t: "italic"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
+    - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝛼-𝜔":    # 0x1d6fc - 0x1d714
     - t: "italic"
@@ -3812,27 +3487,11 @@
 
  - "𝜜-𝜴":    # 0x1d71c - 0x1d734
     - t: "bold italic"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝜜𝜝𝜞𝜟𝜠𝜡𝜢𝜣𝜤𝜥𝜦𝜧𝜨𝜩𝜪𝜫𝜬𝜭𝜮𝜯𝜰𝜱𝜲𝜳𝜴', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
+    - spell: "translate('.', '𝜜𝜝𝜞𝜟𝜠𝜡𝜢𝜣𝜤𝜥𝜦𝜧𝜨𝜩𝜪𝜫𝜬𝜭𝜮𝜯𝜰𝜱𝜲𝜳𝜴', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":    # 0xf47c - 0xf494
     - t: "bold italic"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
+    - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝜶-𝝎":    # 0x1d736 - 0x1d74e
     - t: "bold italic"
@@ -3855,27 +3514,10 @@
 
  - "𝝖-𝝮":    # 0x1d756 - 0x1d76e
     - t: "bold"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝝖𝝗𝝘𝝙𝝚𝝛𝝜𝝝𝝞𝝟𝝠𝝡𝝢𝝣𝝤𝝥𝝦𝝧𝝨𝝩𝝪𝝫𝝬𝝭𝝮', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
-
+    - spell: "translate('.', '𝝖𝝗𝝘𝝙𝝚𝝛𝝜𝝝𝝞𝝟𝝠𝝡𝝢𝝣𝝤𝝥𝝦𝝧𝝨𝝩𝝪𝝫𝝬𝝭𝝮', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
  - "-":    # 0xf4b6 - 0xf4ce
     - t: "bold"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
+    - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝝰-𝞈":    # 0x1d770 - 0x1d788
     - t: "bold"
@@ -3898,27 +3540,11 @@
 
  - "𝞐-𝞨":    # 0x1d790 - 0x1d7a8
     - t: "bold italic"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '𝞐𝞑𝞒𝞓𝞔𝞕𝞖𝞗𝞘𝞙𝞚𝞛𝞜𝞝𝞞𝞟𝞠𝞡𝞢𝞣𝞤𝞥𝞦𝞧𝞨', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
+    - spell: "translate('.', '𝞐𝞑𝞒𝞓𝞔𝞕𝞖𝞗𝞘𝞙𝞚𝞛𝞜𝞝𝞞𝞟𝞠𝞡𝞢𝞣𝞤𝞥𝞦𝞧𝞨', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":    # 0xf4f0 - 0xf508
     - t: "bold italic"
-    - test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
+    - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝞪-𝟂":    # 0x1d7aa - 0x1d7c2
     - t: "bold italic"

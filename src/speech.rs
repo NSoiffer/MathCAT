@@ -1069,6 +1069,10 @@ impl<'r> MyXPath {
             }
         };
     }
+
+    pub fn test_input<F>(self, f: F) -> bool where F: Fn(&str) -> bool {
+        return f(self.rc.string.as_ref());
+    }
 }
 
 // 'SpeechPattern' holds a single pattern.
