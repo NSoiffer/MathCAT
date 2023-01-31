@@ -44,7 +44,7 @@ def run_single_test(test_dir: Path):
     if file2braille_result.stderr:
         return "***file2braille error on file {}: {}".format(str(test_dir), file2braille_result.stderr)
     braille = file2braille_result.stdout.rstrip().replace(' ', '⠀') # replace ascii space with Unicode space
-    expected = Path.joinpath(test_dir, 'expected.txt').read_text(encoding='utf8').rstrip()
+    expected = Path.joinpath(test_dir, 'expected.txt').read_text(encoding='utf-8').rstrip()
     if expected.isascii():
         expected = ascii_to_unicode(expected)
 
