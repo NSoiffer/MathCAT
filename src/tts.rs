@@ -356,7 +356,7 @@ impl TTS {
 
         let mut command = command.clone();
         if command.command == TTSCommand::Spell {
-            // spell is also special because we need eval the xpath to get the string to spell (typically the text content of an mi)
+            // spell is also special because we need to eval the xpath to get the string to spell (typically the text content of an mi)
             match command.value {
                 TTSCommandValue::XPath(xpath) => {
                     let value = xpath.evaluate(rules_with_context.get_context(), mathml)
@@ -376,11 +376,12 @@ impl TTS {
                     };
                     // Chemistry wants to spell elements like "Na". But we also have the issue of capitalization (SpeechOverrides_CapitalLetters)
                     //   so the "N" need to use that. The logic for that is already in unicode.yaml. We could replicate that here.
-                    // Rather than duplicate the logic (we would need to handle 'a', and who know what in other languages),
+                    // Rather than duplicate the logic (we would need to handle 'a', and who knows what in other languages),
                     //   we split the token into each letter and call the replacement on each letter.
                     // That in turns calls spell again. We end up in an infinite loop. To prevent this we set a flag that says don't recurse.
-                    // The only structure that to put that in is SpeechRulesWithContext. A bit of a hack to put it there, but better than a static var.
-                    if rules_with_context.inside_spell {
+                    // The only structure to put that in is SpeechRulesWithContext. A bit of a hack to put it there, but better than a static var.
+                    // Also, to avoid repeating the code for "cap" over and over, "spell" with "translate" is used. So keep going until no "translate"
+                    if rules_with_context.inside_spell && xpath.test_input(|input| !input.contains("translate")) {
                         command.value = TTSCommandValue::String(value_string);
                     } else {
                         // let the call to replace call spell on the individual chars -- that lets an "cap" be outside "spell"
