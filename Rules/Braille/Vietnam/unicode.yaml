@@ -118,7 +118,7 @@
  - "∀": [t: "⠘⠁"]               # 0x2200 (For all)
  - "∂": [t: "⠈⠙"]               # 0x2202 (Partial differential)
  - "∃": [T: "⠘⠑"]               # 0x2203 (There exists)
- - "∄": [T: "⠈⠑⠈"]             # 0x2204 (There does not exist)
+ - "∄": [T: "⠘⠑⠈"]             # 0x2204 (There does not exist)
  - "∅": [T: "⠈⠚"]               # 0x2205 (Empty set)
  - "∇": [t: "⠘⠙"]               # 0x2207 (Nabla (del, inverted capital delta))
  - "∎": [t: "⠸⠫⠼⠙t"]            # 0x220E (End of proof)
@@ -128,15 +128,15 @@
  - "∡": [T: "⠨⠫⠛"]              # 0x2221 (Measured angle)
  - "⊾": [T: "⠼⠫⠛"]              # 0x22BE (Right angle with arc)
  - "∫": [T: "1⠾"]               # 0x222B (Integral)
- - "∮": [T: "⠈⠾"]               # 0x222E (Contour integral (closed line integral))
+ - "∮": [T: "⠐⠾"]               # 0x222E (Contour integral (closed line integral))
  - "∴": [t: "1⠠⠡"]               # 0x2234 (Therefore)
  - "∵": [t: "⠈⠌"]               # 0x2235 (Because (since))
  - "∶": [t: "1⠒"]               # 0x2236 (Ratio)
  - "∷": [t: "1⠒⠒"]              # 0x2237 (Proportion)
- - "∣": [T: "⠣⠴⠜"]               # 0x2223 (Divides) ueb: ⠸⠳
- - "∤": [T: "⠣⠼⠜"]             # 0x2224 (Does not divide) ueb: ⠸⠳⠈⠱
+ - "∣": [T: "⠸⠳"]               # 0x2223 (Divides) ueb: ⠸⠳
+ - "∤": [T: "⠸⠳⠈⠱"]             # 0x2224 (Does not divide) ueb: ⠸⠳⠈⠱
  - "∥": [T: "⠫⠶"]               # 0x2225 (Parallel) VI: AB parallel to CD, should be: ⠫AB⠶CD
- - "∦": [T: "⠫⠐⠾"]             # 0x2226 (Not parallel) Vi: AB not parallel to CD, should be: ⠫AB⠐⠾CD
+ - "∦": [T: "⠫⠾"]             # 0x2226 (Not parallel) Vi: AB not parallel to CD, should be: ⠫AB⠐⠾CD
  - "⟂": [T: "⠫⠧"]               # 0x27C2 (Perpendicular)
  - "⊥": [T: "⠫⠧"]               # 0x22A5 (Up tack (perpendicular))
  - "⊦": [t: "⠸⠒"]               # 0x22A6 (Assertion (is a theorem))
@@ -1528,3 +1528,7 @@
  - "⅞": [t: "#N⠛N⠌N⠓"]          # 0x215E (Vulgar Fraction Seven Eighths)
  - "↉": [t: "#N⠚N⠌N⠑"]          # 0x2189 (Vulgar Fraction Zero Thirds)
 
+# Not yet defined symbols
+ - "⋮": [T: "⠣⠴⠜"]          # 0x22ee (vertical ellipsis used to indicate dividable)
+ - "⧸⋮": [T: "⠣⠼⠜"]          # 0x29f8\x22ee (for not dividable sign, not sure if MathCAT supporting multiple-char definition or not
+ 

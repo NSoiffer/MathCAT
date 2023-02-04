@@ -769,7 +769,7 @@
       # - test:
       #       if: "$AddSpaces"
       #       then: [t: " "]
-      - t: "1⠫⠼⠙"                                  # square (no rectangle in UEB)
+      - T: "1⠫⠼⠙"                                  # square (no rectangle in UEB)
    - test:
       if: "contains(@notation,'circle')"
       then:
