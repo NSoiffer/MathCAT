@@ -32,7 +32,7 @@ All functions return a potential error code.
 MathCAT is written in Rust, so all you need to do is build MathCAT and in your project's Cargo.toml file add something like
 ```
 [dependencies.MathCAT]
-mathcat = 0.1
+mathcat = 0.2.0    # check for what the latest version is and use that
 ```
 
 The exact function signatures are (with comments):
