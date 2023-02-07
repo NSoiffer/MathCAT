@@ -460,10 +460,13 @@ pub fn trim_element(e: &Element) {
 
     // hack to avoid non-breaking whitespace from being removed -- move to a unique non-whitespace char then back
     let trimmed_text = single_text.replace(' ', TEMP_NBSP).trim().replace(TEMP_NBSP, " ");
-    if !e.children().is_empty() && !trimmed_text.is_empty() {
+    if !is_leaf(*e) && !single_text.is_empty() {
         // FIX: we have a problem -- what should happen???
         // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash
-        error!("trim_element: both element and textual children which shouldn't happen -- ignoring text '{}'", single_text);
+        if !trimmed_text.is_empty() {
+            error!("trim_element: both element and textual children which shouldn't happen -- ignoring text '{}'", single_text);
+        }
+        return;
     }
     if e.children().is_empty() && !single_text.is_empty() {
         // debug!("Combining text in {}: '{}' -> '{}'", e.name().local_part(), single_text, trimmed_text);
