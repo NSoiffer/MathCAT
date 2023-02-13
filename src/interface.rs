@@ -204,7 +204,7 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
                     "Pitch" | "Rate" | "Volume" | "CapitalLetters_Pitch"=> {
                         pref_manager.set_api_float_pref(&name, to_float(&name, &value)?);    
                     },
-                    "Bookmark" | "CapitalLetters_UseWord" => {
+                    "Bookmark" | "CapitalLetters_UseWord" | "CapitalLetters_Beep" => {
                         pref_manager.set_api_boolean_pref(&name, value.to_lowercase()=="true");    
                     },
                     _ => {
@@ -460,7 +460,7 @@ pub fn trim_element(e: &Element) {
 
     // hack to avoid non-breaking whitespace from being removed -- move to a unique non-whitespace char then back
     let trimmed_text = single_text.replace(' ', TEMP_NBSP).trim().replace(TEMP_NBSP, " ");
-    if !is_leaf(*e) && !single_text.is_empty() {
+    if !(is_leaf(*e) || name(&e) == "intent-literal") && !single_text.is_empty() {  // intent-literal comes from testing intent
         // FIX: we have a problem -- what should happen???
         // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash
         if !trimmed_text.is_empty() {
