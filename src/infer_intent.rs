@@ -14,7 +14,7 @@ use crate::pretty_print::mml_to_string;
 use crate::xpath_functions::is_leaf;
 use regex::Regex;
 
-pub const LITERAL_NAME: &str = "literal";
+pub const LITERAL_NAME: &str = "intent-literal";
 const IMPLICIT_FUNCTION_NAME: &str = "apply-function";
 
 impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
@@ -417,7 +417,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<p> <f><literal>b</literal></f> <literal>a</literal></p>";
+        let intent = "<p> <f><intent-literal>b</intent-literal></f> <intent-literal>a</intent-literal></p>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -429,7 +429,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<plus> <literal>a</literal> <factorial><literal>b</literal></factorial> </plus>";
+        let intent = "<plus> <intent-literal>a</intent-literal> <factorial><intent-literal>b</intent-literal></factorial> </plus>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -458,17 +458,18 @@ mod tests {
                 </mover>
                 <mi arg='b'>B</mi>
             </mrow>";
-        let intent = "<apply-function><map> <literal>congruence</literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
+        let intent = "<apply-function><map> <intent-literal>congruence</intent-literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
         assert!(test_intent(mathml, intent));
     }
 
     #[test]
     fn intent_with_literals() {
+        init_logger();
         let mathml = "<mrow intent='vector(1, 0., .1, -23, -.1234, last)'>
                 <mi>x</mi>
             </mrow>";
         let intent = "<vector>
-            <literal>1</literal><literal>0.</literal><literal>.1</literal><literal>-23</literal><literal>-.1234</literal><literal>last</literal>
+            <intent-literal>1</intent-literal><intent-literal>0.</intent-literal><intent-literal>.1</intent-literal><intent-literal>-23</intent-literal><intent-literal>-.1234</intent-literal><intent-literal>last</intent-literal>
             </vector>";
         assert!(test_intent(mathml, intent));
     }
@@ -484,7 +485,7 @@ mod tests {
                 <mi arg='b'>B</mi>
             </mrow>";
         let intent = "<apply-function>
-                    <map><literal>congruence</literal></map>
+                    <map><intent-literal>congruence</intent-literal></map>
                     <mi arg='a'>A</mi> <mi arg='b'>B</mi>
                 </apply-function>";
         assert!(test_intent(mathml, intent));
@@ -503,7 +504,7 @@ mod tests {
                 <mi arg='b'>B</mi>
             </mrow>";
         let intent = "<apply-function>
-                    <map data-intent-hint='prefix'><literal>congruence</literal></map>
+                    <map data-intent-hint='prefix'><intent-literal>congruence</intent-literal></map>
                     <mi arg='a'>A</mi> <mi arg='b'>B</mi>
                 </apply-function>";
         assert!(test_intent(mathml, intent));
@@ -520,7 +521,7 @@ mod tests {
                 </mover>
                 <mi arg='b'>B</mi>
             </mrow>";
-        let intent = "<apply-function  data-intent-hint='prefix'><map> <literal>congruence</literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
+        let intent = "<apply-function  data-intent-hint='prefix'><map> <intent-literal>congruence</intent-literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
         assert!(test_intent(mathml, intent));
     }
 
