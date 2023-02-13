@@ -160,4 +160,4 @@ except Exception as e:
 I built a web assembly version. Has a few compromises and requires some hand tweaks during the build process. Those need to be automated. It can be found at [MathCatDemo](https://github.com/NSoiffer/MathCATDemo). This builds a web page for demo purposes, so it is not a pure build for the Web. Nonetheless, it does demonstrate how that can be done.
 
 ## C/C++ Users
-It should be easy to add a C/C++ interface, but I haven't done this yet. Please contact me if you are interested in using MathCAT from a C/C++ application.
+There is a C/C++ interface. It can be found at the related project [MathCatForC](https://github.com/NSoiffer/MathCATForC). Rust and C have separate memory managers, and so the interface is a little clunky because the memory needs to be free'd. Otherwise, it is easy to use. If someone knows a better way to deal with the memory issues, please let me know or submit a PR. This is new territory for me as a Rust programmer.
