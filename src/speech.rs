@@ -343,7 +343,7 @@ impl Replacement {
                 return Ok( Replacement::XPath( MyXPath::build(value)
                     .chain_err(|| "while trying to evaluate value of 'x:'")? ) );
             },
-            "pause" | "rate" | "pitch" | "volume" | "gender" | "voice" | "spell" | "SPELL" | "bookmark" | "pronounce" | "PRONOUNCE" => {
+            "pause" | "rate" | "pitch" | "volume" | "audio" | "gender" | "voice" | "spell" | "SPELL" | "bookmark" | "pronounce" | "PRONOUNCE" => {
                 return Ok( Replacement::TTS( TTS::build(&key.to_ascii_lowercase(), value)? ) );
             },
             "intent" => {

@@ -94,7 +94,8 @@ pub enum TTSCommand {
     Pause,
     Rate,
     Volume,
-    Pitch ,
+    Pitch,
+    Audio,
     Gender,
     Voice,
     Spell,
@@ -522,6 +523,7 @@ impl TTS {
             // rate must be in [-10, 10], but we get relative %s. 300% => 10 (see comments at top of file)
             TTSCommand::Rate =>  if is_start_tag {format!("<rate speed='{:.1}'>", 10.0*(0.01*command.value.get_num()).log(3.0))} else {String::from("</rate>")},
             TTSCommand::Volume =>if is_start_tag {format!("<volume level='{}'>", command.value.get_num())} else {String::from("</volume>")},
+            TTSCommand::Audio => "".to_string(),    // SAPI5 doesn't support audio
             TTSCommand::Gender =>if is_start_tag {format!("<voice required=\"Gender={}\">", command.value.get_string())} else {String::from("</prosody>")},
             TTSCommand::Voice =>if is_start_tag {format!("<voice required=\"Name={}\">", command.value.get_string())} else {String::from("</prosody>")},
             TTSCommand::Spell =>if is_start_tag {format!("<spell>{}", command.value.get_string())} else {String::from("</spell>")},
@@ -556,6 +558,7 @@ impl TTS {
             TTSCommand::Pitch => if is_start_tag {format!("<prosody pitch='{}%'>", command.value.get_num())} else {String::from("</prosody>")},
             TTSCommand::Rate =>  if is_start_tag {format!("<prosody rate='{}%'>", command.value.get_num())} else {String::from("</prosody>")},
             TTSCommand::Volume =>if is_start_tag {format!("<prosody volume='{}db'>", command.value.get_num())} else {String::from("</prosody>")},
+            TTSCommand::Audio =>if is_start_tag {format!("<audio src='{}'>", command.value.get_string())} else {String::from("</audio>")}, // only 'beep' is supported for now
             TTSCommand::Gender =>if is_start_tag {format!("<voice required='gender=\"{}\"'>", command.value.get_string())} else {String::from("</voice>")},
             TTSCommand::Voice =>if is_start_tag {format!("<voice required='{}'>", command.value.get_string())} else {String::from("</voice>")},
             TTSCommand::Spell =>if is_start_tag {format!("<say-as interpret-as='characters'>{}", command.value.get_string())} else {String::from("</say-as>")},

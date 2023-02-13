@@ -90,6 +90,7 @@ impl Preferences{
         prefs.insert("Bookmark".to_string(), Yaml::Boolean(false));
         prefs.insert("CapitalLetters_UseWord".to_string(), Yaml::Boolean(true));
         prefs.insert("CapitalLetters_Pitch".to_string(), Yaml::Real("0.0".to_string()));
+        prefs.insert("CapitalLetters_Beep".to_string(), Yaml::Boolean(false));
         return Preferences{ prefs };
     }
 
