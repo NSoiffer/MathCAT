@@ -1,0 +1,358 @@
+test_9_d_2: failed
+  Duxbury: '⠼⠒⠨⠼⠀⠼⠲'
+  MathCAT: '⠼⠒⠨⠼⠼⠲'
+test_9_d_3: failed
+  Duxbury: '⠼⠒⠫⠎⠲'
+  MathCAT: '⠼⠒⠈⠼⠼⠲'
+non_list_10_4: failed
+  Duxbury: '⠷⠂⠠⠀⠼⠆⠠⠁⠝⠙⠀⠼⠒⠾'
+  MathCAT: '⠷⠂⠠⠀⠼⠆⠠⠀⠁⠝⠙⠀⠼⠒⠾'
+list_num_ind_11_a_1: succeeded
+list_num_ind_11_a_2: succeeded
+list_num_ind__11_a_3: failed
+  Duxbury: '⠷⠂⠬⠓⠠⠀⠼⠆⠬⠅⠠⠀⠼⠴⠾'
+  MathCAT: '⠷⠂⠬⠓⠠⠀⠆⠬⠅⠠⠀⠴⠾'
+list_num_ind_11_a_7: failed
+  Duxbury: '⠷⠭⠠⠀⠼⠶⠠⠸⠼⠦⠠⠀⠽⠾'
+  MathCAT: '⠷⠭⠠⠀⠶⠠⠀⠸⠼⠦⠠⠀⠽⠾'
+list_num_ind_11_c_1: failed
+  Duxbury: '⠨⠏⠀⠨⠅⠀⠼⠒⠨⠂⠲⠂⠢⠔⠀⠆⠖⠢⠒⠢⠂⠂⠂'
+  MathCAT: '⠨⠏⠀⠨⠅⠀⠼⠒⠨⠂⠲⠂⠢⠔⠀⠆⠖⠢⠒⠢⠀⠄⠄⠄'
+list_num_ind_11_d_1: succeeded
+cap_roman_numeral_18_a_3: failed
+  Duxbury: '⠠⠠⠧⠊⠊⠬⠰⠠⠧⠀⠨⠅⠀⠠⠠⠭⠊⠊'
+  MathCAT: '⠠⠠⠧⠊⠊⠬⠠⠧⠀⠨⠅⠀⠠⠠⠭⠊⠊'
+lower_roman_numeral_18_b_4: failed
+  Duxbury: '⠧⠊⠬⠊⠧⠀⠨⠅⠀⠰⠭'
+  MathCAT: '⠧⠊⠬⠊⠧⠀⠨⠅⠀⠭'
+cap_22_a_1: succeeded
+letter_26_b_19: failed
+  Duxbury: '⠷⠰⠇⠠⠰⠍⠠⠰⠝⠠⠁⠗⠑⠀⠊⠝⠀⠎⠑⠞⠀⠰⠠⠗⠾'
+  MathCAT: '⠷⠇⠠⠀⠍⠠⠀⠝⠠⠀⠁⠗⠑⠀⠊⠝⠀⠎⠑⠞⠀⠠⠗⠾'
+boldface_32_b_3: succeeded
+boldface_32_b_6: succeeded
+punct_37_1_2: failed
+  Duxbury: '⠐⠧⠑⠇⠕⠉⠊⠞⠽⠣⠱⠻⠲'
+  MathCAT: '⠐⠧⠑⠇⠕⠉⠊⠞⠽⠣⠱⠻⠸⠲'
+punct_37_2_2: failed
+  Duxbury: '⠼⠲⠔'
+  MathCAT: '⠦⠼⠲⠔⠸⠴'
+punct_37_7_1: failed
+  Duxbury: '⠁⠠⠀⠃⠠⠀⠉⠨'
+  MathCAT: '⠁⠠⠀⠃⠠⠀⠉⠸⠲'
+dash_42_4: failed
+  Duxbury: '⠹⠿⠌⠂⠢⠼⠀⠨⠅⠀⠹⠆⠌⠒⠼'
+  MathCAT: '⠹⠤⠤⠤⠤⠀⠌⠂⠢⠼⠀⠨⠅⠀⠹⠆⠌⠒⠼'
+dash_42_6: failed
+  Duxbury: '⠈⠎⠆⠬⠈⠎⠒⠀⠨⠅⠀⠈⠎'
+  MathCAT: '⠈⠎⠆⠬⠈⠎⠒⠀⠨⠅⠀⠈⠎⠤⠤⠤⠤'
+ellipsis_43_b_3: failed
+  Duxbury: '⠏⠂⠘⠨⠁⠘⠰⠂⠐⠂⠂⠂⠏⠰⠗⠘⠨⠁⠘⠰⠗'
+  MathCAT: '⠏⠂⠘⠨⠁⠘⠰⠂⠐⠄⠄⠄⠀⠏⠰⠗⠘⠨⠁⠘⠰⠗'
+simple_frac_62_a_3: succeeded
+beveled_frac_62_b_1: succeeded
+mixed_frac_63_a_1: succeeded
+mixed_frac_64_2: failed
+  Duxbury: '⠼⠲⠒⠸⠌⠦'
+  MathCAT: '⠼⠲⠸⠹⠒⠸⠌⠦⠸⠼'
+complex_frac_66_1: succeeded
+non_hyper_complex_frac_67_1: succeeded
+hyper_complex_frac_68_a_1: succeeded
+nested_sup_74_b_1: succeeded
+nested_sup_mmultiscripts_74_b_1: failed
+  Duxbury: '⠝⠰⠘⠭⠘⠘⠽'
+  MathCAT: '⠝⠘⠭⠘⠘⠽'
+nested_sup_74_b_4: failed
+  Duxbury: '⠝⠰⠘⠭⠘⠘⠽'
+  MathCAT: '⠝⠰⠭⠰⠰⠽'
+nested_sub_sup_74_c_5: succeeded
+as_multiscript_nested_sub_sup_74_c_5: failed
+  Duxbury: '⠝⠰⠘⠭⠘⠰⠁⠘⠰⠰⠚'
+  MathCAT: '⠝⠘⠭⠘⠰⠁⠘⠰⠰⠚'
+left_sup_75_1: failed
+  Duxbury: '⠘⠭⠰⠐⠝'
+  MathCAT: '⠘⠭⠐⠝'
+left_sup_75_4: failed
+  Duxbury: '⠘⠰⠭⠐⠝⠰⠽⠘'
+  MathCAT: '⠰⠭⠐⠝⠰⠽'
+left_sup_75_7: failed
+  Duxbury: '⠘⠘⠘⠘⠰⠁⠘⠝⠰⠐⠭'
+  MathCAT: '⠘⠰⠁⠘⠝⠐⠭'
+left_sup_75_8: failed
+  Duxbury: '⠘⠰⠝⠰⠘⠁⠐⠭'
+  MathCAT: '⠰⠝⠰⠘⠁⠐⠭'
+left_sup_75_12: failed
+  Duxbury: '⠏⠘⠃⠉⠰⠐⠭'
+  MathCAT: '⠏⠘⠃⠘⠉⠐⠭'
+german_base_77_4_3: failed
+  Duxbury: '⠠⠁⠂'
+  MathCAT: '⠸⠠⠁⠂'
+prime_77_4_4: succeeded
+prescript_77_4_6: failed
+  Duxbury: '⠭⠰⠊⠰⠰⠂'
+  MathCAT: '⠰⠒⠐⠭'
+prescript_77_4_7: succeeded
+log_77_4_8: succeeded
+mmultiscripts_77_4_10: failed
+  Duxbury: '⠷⠠⠠⠉⠕⠒⠘⠐⠾⠰⠆⠘'
+  MathCAT: '⠷⠠⠉⠠⠕⠒⠾⠰⠆'
+word_77_4_12: failed
+  Duxbury: '⠎⠑⠧⠑⠝⠒'
+  MathCAT: '⠎⠑⠧⠑⠝⠰⠒'
+prescript_77_4_18: succeeded
+mmultiscripts_77_4_18: failed
+  Duxbury: '⠘⠰⠒⠐⠭⠂⠘'
+  MathCAT: '⠰⠒⠐⠭⠂'
+comma_number_77_4_20: succeeded
+sum_77_4_23: failed
+  Duxbury: '⠨⠠⠎⠰⠴⠘⠝⠐⠁⠰⠅'
+  MathCAT: '⠨⠠⠎⠴⠘⠝⠐⠁⠰⠅'
+product_77_4_24: failed
+  Duxbury: '⠿⠰⠴⠘⠝⠐⠁⠰⠅'
+  MathCAT: '⠨⠠⠏⠴⠘⠝⠐⠁⠰⠅'
+integral_77_4_26: succeeded
+comma_space_78_1: failed
+  Duxbury: '⠭⠰⠊⠪⠀⠚⠪⠀⠅'
+  MathCAT: '⠭⠰⠊⠪⠚⠪⠅'
+comma_78_2: succeeded
+comma_78_2_invisible: failed
+  Duxbury: '⠭⠰⠷⠁⠃⠾'
+  MathCAT: '⠭⠰⠷⠁⠪⠃⠾'
+comma_78_3: failed
+  Duxbury: '⠭⠂⠠⠀⠼⠆'
+  MathCAT: '⠭⠰⠂⠪⠆'
+comma_78_6: succeeded
+nested_super_79_a_2: succeeded
+nested_super_79_a_3: succeeded
+punctuation_after_sup_79_b_2: succeeded
+comma_in_number_in_sup_79_b_3: succeeded
+comma_in_sup_79_b_4: succeeded
+comma_ellipsis_in_sub_79_b_5: failed
+  Duxbury: '⠠⠏⠰⠝⠰⠰⠂⠰⠪⠝⠰⠰⠆⠰⠪⠂⠂⠂'
+  MathCAT: '⠠⠏⠰⠝⠰⠰⠂⠰⠪⠝⠰⠰⠆⠰⠪⠀⠄⠄⠄'
+text_after_sup_79_c_3: succeeded
+***table_entry_after_sup_79_c_4 test exception -- couldn't do comparison
+nested_super_space_79_d_3: succeeded
+nested_super_space_79_d_7: failed
+  Duxbury: '⠑⠘⠉⠕⠎⠘⠘⠆⠘⠭'
+  MathCAT: '⠑⠘⠉⠕⠎⠘⠘⠆⠀⠭'
+nested_sup_sup_space_79_d_9: failed
+  Duxbury: '⠟⠘⠇⠕⠛⠘⠰⠟⠘⠁'
+  MathCAT: '⠟⠘⠇⠕⠛⠘⠰⠟⠀⠁'
+whitespace_in_sup_79_e_1: failed
+  Duxbury: '⠑⠘⠒⠨⠂⠲⠂⠢⠔⠀⠼⠆⠖⠢⠒⠢'
+  MathCAT: '⠑⠘⠒⠨⠂⠲⠂⠢⠔⠀⠆⠖⠢⠒⠢'
+ellipsis_level_79_f_1: failed
+  Duxbury: '⠭⠘⠂⠬⠂⠸⠌⠆⠬⠂⠸⠌⠒⠬⠂⠂⠂⠬⠂⠸⠌⠝'
+  MathCAT: '⠭⠘⠂⠬⠂⠸⠌⠆⠬⠂⠸⠌⠒⠬⠀⠄⠄⠄⠀⠬⠂⠸⠌⠝'
+comparison_79_g_2: succeeded
+sub_ind_79_g_4: succeeded
+baseline_80_a_1: succeeded
+superscript_80_a_2: succeeded
+sub_ind_80_b_3: failed
+  Duxbury: '⠠⠏⠂⠘⠰⠆⠐⠠⠟'
+  MathCAT: '⠠⠏⠂⠰⠆⠐⠠⠟'
+sub_ind_mmultiscripts_80_b_3: failed
+  Duxbury: '⠠⠏⠂⠘⠰⠆⠐⠠⠟'
+  MathCAT: '⠠⠏⠂⠰⠆⠐⠠⠟'
+sub_ind_80_b_4: failed
+  Duxbury: '⠠⠁⠰⠐⠭⠣⠈⠱⠻⠬⠐⠽⠣⠈⠱⠻'
+  MathCAT: '⠠⠁⠰⠐⠭⠣⠈⠱⠻⠬⠰⠐⠽⠣⠈⠱⠻'
+numeric_sub_81_a_1: succeeded
+msubsup_82_a_1: succeeded
+msubsup_82_a_3: succeeded
+mmultiscripts_82_a_1: succeeded
+mmultiscripts_82_a_2: failed
+  Duxbury: '⠘⠝⠰⠁⠐⠭'
+  MathCAT: '⠰⠁⠘⠝⠐⠭'
+mmultiscripts_82_a_3: succeeded
+sub_sup_82_b_1: failed
+  Duxbury: '⠁⠘⠝⠰⠍'
+  MathCAT: '⠁⠘⠝⠐⠰⠍'
+mmultiscripts_82_b_1: failed
+  Duxbury: '⠁⠰⠘⠝⠰⠍⠘'
+  MathCAT: '⠁⠘⠝⠐⠰⠍'
+sub_sup_82_b_2: failed
+  Duxbury: '⠁⠰⠍⠘⠝'
+  MathCAT: '⠁⠰⠍⠐⠘⠝'
+mmultiscripts_82_b_2: failed
+  Duxbury: '⠁⠰⠍⠘⠰⠘⠝'
+  MathCAT: '⠁⠰⠍⠐⠘⠝'
+mmultiscripts_82_b_3: failed
+  Duxbury: '⠘⠁⠰⠘⠰⠃⠐⠭'
+  MathCAT: '⠘⠁⠐⠰⠃⠐⠭'
+mmultiscripts_82_b_4: failed
+  Duxbury: '⠘⠰⠃⠘⠁⠰⠐⠭'
+  MathCAT: '⠰⠃⠐⠘⠁⠐⠭'
+mmultiscripts_82_b_5: failed
+  Duxbury: '⠭⠂⠘⠰⠘⠆'
+  MathCAT: '⠭⠂⠐⠘⠆'
+mmultiscripts_82_b_6: failed
+  Duxbury: '⠭⠰⠁⠄⠰⠘⠃'
+  MathCAT: '⠭⠄⠰⠁⠐⠘⠃'
+prime_83_b_1: failed
+  Duxbury: '⠭⠰⠁⠄'
+  MathCAT: '⠭⠄⠰⠁'
+prime_mmultiscripts_83_b_2: failed
+  Duxbury: '⠭⠰⠄⠰⠘⠆'
+  MathCAT: '⠭⠄⠘⠆'
+prime_mathjax_83_b_2: succeeded
+prime_wiris_83_b_2: failed
+  Duxbury: '⠭⠘⠄⠆'
+  MathCAT: '⠭⠄⠘⠆'
+prime_83_b_3: failed
+  Duxbury: '⠭⠰⠄⠰⠁⠘⠃'
+  MathCAT: '⠭⠄⠰⠁⠘⠃'
+prime_83_b_4: failed
+  Duxbury: '⠭⠘⠸⠴⠰⠂⠘⠒'
+  MathCAT: '⠭⠄⠄⠂⠘⠒'
+prime_mmultiscripts_83_b_4: failed
+  Duxbury: '⠭⠰⠘⠸⠴⠰⠂⠘⠒'
+  MathCAT: '⠭⠄⠄⠂⠘⠒'
+prime_83_b_5: failed
+  Duxbury: '⠭⠰⠄⠰⠘⠈⠼'
+  MathCAT: '⠭⠄⠘⠈⠼'
+prime_83_b_6: succeeded
+prime_83_b_7: failed
+  Duxbury: '⠠⠁⠰⠥⠑⠘⠫⠎⠄'
+  MathCAT: '⠠⠁⠰⠥⠑⠘⠈⠼⠄'
+prime_83_b_8: failed
+  Duxbury: '⠠⠁⠰⠥⠑⠘⠄⠫⠎'
+  MathCAT: '⠠⠁⠄⠰⠥⠑⠘⠈⠼'
+underbar_86_a_1: failed
+  Duxbury: '⠐⠭⠩⠱⠻'
+  MathCAT: '⠭⠩⠱'
+menclose_86_a_1: failed
+  Duxbury: '⠐⠭⠩⠱⠻'
+  MathCAT: '⠭⠩⠱'
+lim_86_a_3: failed
+  Duxbury: '⠐⠇⠊⠍⠩⠭⠀⠫⠕⠀⠼⠴⠻⠋⠷⠭⠾'
+  MathCAT: '⠐⠇⠊⠍⠩⠭⠀⠫⠕⠀⠼⠴⠻⠀⠋⠷⠭⠾'
+overbar_86_a_4: succeeded
+menclose_86_a_4: succeeded
+overbar_86_a_5: succeeded
+mathml_spec_example_86_a: failed
+  Duxbury: '⠐⠷⠩⠱⠻⠹⠁⠌⠃⠼⠐⠾⠣⠻'
+  MathCAT: '⠐⠷⠩⠱⠻⠹⠁⠌⠃⠼⠐⠾⠣⠱⠻'
+mathml_spec_example_alt_char_86_a: succeeded
+menclose_lesson_12_5_5_5: failed
+  Duxbury: '⠠⠁⠷⠐⠎⠩⠱⠻⠝⠾'
+  MathCAT: '⠠⠁⠷⠎⠩⠱⠝⠾'
+munder_lesson_12_5_5_5: failed
+  Duxbury: '⠠⠁⠷⠐⠎⠩⠱⠻⠝⠾'
+  MathCAT: '⠠⠁⠷⠎⠩⠱⠝⠾'
+overbar_86_b_1: succeeded
+menclose_86_b_1: succeeded
+primed_86_b_6: succeeded
+menclose_primed_86_b_6: succeeded
+overbar_86_b_10: succeeded
+overbar_86_b_11: succeeded
+menclose_86_b_11: succeeded
+order2_overbar_87_a_1: failed
+  Duxbury: '⠐⠭⠬⠽⠣⠣⠁⠀⠨⠅⠀⠼⠒⠻⠻'
+  MathCAT: '⠐⠭⠬⠽⠣⠱⠣⠣⠁⠀⠨⠅⠀⠼⠒⠻'
+bar_above_and_below_88_1: failed
+  Duxbury: '⠐⠭⠬⠽⠣⠻⠩⠻'
+  MathCAT: '⠐⠭⠬⠽⠩⠱⠣⠱⠻'
+above_and_below_88_2: succeeded
+menclose_top_bottom_88_1: failed
+  Duxbury: '⠭⠬⠽'
+  MathCAT: '⠐⠭⠬⠽⠩⠱⠣⠱⠻'
+***binomial_90_1 test exception -- couldn't do comparison
+modifier_in_script_91_1: succeeded
+arrow_96_1: failed
+  Duxbury: '⠐⠠⠠⠁⠃⠣⠫⠕⠻'
+  MathCAT: '⠐⠠⠁⠠⠃⠣⠫⠕⠻'
+arrow_96_4: failed
+  Duxbury: '⠠⠭⠐⠿⠣⠋⠘⠨⠡⠐⠛⠻⠠⠽'
+  MathCAT: '⠠⠭⠀⠐⠫⠒⠒⠕⠣⠋⠨⠡⠛⠻⠀⠠⠽'
+bar_97_b_1: failed
+  Duxbury: '⠨⠒⠱'
+  MathCAT: '⠼⠨⠒⠱'
+menclose_bar_97_b_1: failed
+  Duxbury: '⠨⠒⠱'
+  MathCAT: '⠼⠨⠒⠱'
+menclose_bar_97_b_3: succeeded
+carrot_98_1: succeeded
+dots_99_a_1: failed
+  Duxbury: '⠨⠐⠒⠣⠡⠻'
+  MathCAT: '⠼⠨⠐⠒⠣⠡⠻'
+dots_99_a_2: failed
+  Duxbury: '⠨⠐⠂⠣⠡⠻⠐⠒⠣⠡⠻⠐⠢⠣⠡⠻'
+  MathCAT: '⠼⠨⠐⠂⠒⠢⠣⠡⠻'
+dots_99_a_3: succeeded
+sqrt_103_a_2: succeeded
+sqrt_103_a_4: succeeded
+sqrt_103_b_2: succeeded
+root_104_iii_1: succeeded
+root_104_iii_4: succeeded
+nested_sqrt_105_1: succeeded
+nested_root_105_2: failed
+  Duxbury: '⠣⠒⠜⠭⠘⠆⠐⠬⠨⠣⠒⠭⠘⠆⠐⠬⠽⠘⠆⠐⠨⠻⠬⠽⠘⠆⠐⠻'
+  MathCAT: '⠣⠒⠜⠭⠘⠆⠐⠬⠨⠣⠒⠜⠭⠘⠆⠐⠬⠽⠘⠆⠐⠨⠻⠬⠽⠘⠆⠐⠻'
+nested_sqrt_105_3: failed
+  Duxbury: '⠜⠨⠣⠒⠭⠨⠻⠻⠀⠨⠅⠀⠣⠒⠜⠨⠜⠭⠨⠻⠻'
+  MathCAT: '⠜⠨⠣⠒⠜⠭⠨⠻⠻⠀⠨⠅⠀⠣⠒⠜⠨⠜⠭⠨⠻⠻'
+nested_sqrt_105_4: succeeded
+shape_110_1: succeeded
+menclose_111_a_4: failed
+  Duxbury: '⠼⠒⠴⠘⠨⠡'
+  MathCAT: '⠫⠪⠸⠫⠼⠒⠴⠘⠨⠡⠐⠻'
+menclose_115_1: failed
+  Duxbury: '⠠⠁'
+  MathCAT: '⠫⠉⠸⠫⠠⠁⠻'
+function_space_119_c_3: succeeded
+***identity_matrix_126 test exception -- couldn't do comparison
+set_vertical_bar_145_1: failed
+  Duxbury: '⠨⠷⠭⠳⠳⠭⠳⠀⠐⠅⠀⠼⠂⠴⠨⠾'
+  MathCAT: '⠨⠷⠭⠀⠳⠀⠳⠭⠳⠀⠐⠅⠀⠼⠂⠴⠨⠾'
+vertical_bar_145_4: failed
+  Duxbury: '⠠⠏⠷⠠⠁⠳⠠⠃⠾'
+  MathCAT: '⠠⠏⠷⠠⠁⠀⠳⠀⠠⠃⠾'
+ratio_151_11: succeeded
+trilinear_not_ratio_151_11: failed
+  Duxbury: '⠁⠀⠐⠂⠀⠃⠀⠐⠂⠀⠉'
+  MathCAT: '⠁⠸⠒⠀⠃⠸⠒⠀⠉'
+extension_field_not_ratio_151_11: failed
+  Duxbury: '⠈⠷⠠⠅⠀⠐⠂⠀⠠⠋⠈⠾'
+  MathCAT: '⠈⠷⠠⠅⠸⠒⠀⠠⠋⠈⠾'
+prime_172_5: failed
+  Duxbury: '⠭⠰⠊⠄'
+  MathCAT: '⠭⠄⠰⠊'
+prime_172_6: failed
+  Duxbury: '⠭⠂⠄'
+  MathCAT: '⠭⠄⠂'
+prime_172_8: succeeded
+prime_172_9: succeeded
+multipurpose_177_2_1: succeeded
+multipurpose_177_2_2: succeeded
+multipurpose_177_3_1: succeeded
+multipurpose_177_5_1: failed
+  Duxbury: '⠼⠴⠨⠁⠂⠁⠆⠂⠂⠂'
+  MathCAT: '⠼⠴⠨⠐⠁⠂⠁⠆⠀⠄⠄⠄'
+multipurpose_177_7_1: failed
+  Duxbury: '⠳⠭⠳⠳⠽⠳'
+  MathCAT: '⠳⠭⠳⠐⠳⠽⠳'
+lesson_11_24_1: failed
+  Duxbury: '⠭⠘⠆'
+  MathCAT: '⠫⠅⠭⠘⠆⠐⠻'
+ms_38_4_8: failed
+  Duxbury: '⠷⠞⠓⠗⠑⠑⠾'
+  MathCAT: '⠷⠸⠦⠞⠓⠗⠑⠑⠴⠾'
+ms: failed
+  Duxbury: '⠐⠀⠁⠀⠎⠞⠗⠊⠝⠛⠐⠀⠠⠀⠁⠝⠕⠞⠓⠑⠗⠀⠎⠞⠗⠊⠝⠛'
+  MathCAT: '⠄⠄⠁⠀⠎⠞⠗⠊⠝⠛⠄⠄⠠⠀⠸⠠⠦⠁⠝⠕⠞⠓⠑⠗⠀⠎⠞⠗⠊⠝⠛⠴⠠'
+***full_binomial test exception -- couldn't do comparison
+number_space_before: failed
+  Duxbury: '⠀⠼⠆'
+  MathCAT: '⠼⠆'
+number_space_after: failed
+  Duxbury: '⠼⠆⠀'
+  MathCAT: '⠼⠆'
+number_space_before_and_after: failed
+  Duxbury: '⠀⠼⠆⠀'
+  MathCAT: '⠼⠆'
+tensor_from_mathml_spec: failed
+  Duxbury: '⠠⠗⠰⠊⠘⠰⠘⠚⠰⠅⠘⠰⠇⠘'
+  MathCAT: '⠠⠗⠰⠊⠐⠘⠚⠐⠰⠅⠐⠰⠇'
+#tests=169, success rate=43.0%, (#successes=71, #failures=94), #exceptions=4
