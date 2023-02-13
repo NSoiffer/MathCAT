@@ -255,12 +255,12 @@ fn italic_greek_others() {
 #[test]
 fn bold_italic_greek() {
     let expr = "<math> <mi>𝜜</mi><mo>,</mo><mi>𝜴</mi></math>";
-    test("en", "SimpleSpeak", expr, "bold italic cap alpha comma bold italic cap omega");
+    test("en", "SimpleSpeak", expr, "bold italic cap alpha, comma bold italic cap omega");
     let expr = "<math> <mi>𝜶</mi><mo>,</mo><mi>𝝎</mi></math>";
     test("en", "SimpleSpeak", expr, "bold italic alpha comma bold italic omega");
     // MathType private space versions
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("en", "SimpleSpeak", expr, "bold italic cap alpha comma bold italic cap omega");
+    test("en", "SimpleSpeak", expr, "bold italic cap alpha, comma bold italic cap omega");
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
     test("en", "SimpleSpeak", expr, "bold italic alpha comma bold italic omega");
 }
@@ -299,12 +299,12 @@ fn sans_serif_bold_greek_others() {
 #[test]
 fn sans_serif_bold_italic_greek() {
     let expr = "<math> <mi>𝞐</mi><mo>,</mo><mi>𝞨</mi></math>";
-    test("en", "SimpleSpeak", expr, "bold italic cap alpha comma bold italic cap omega");
+    test("en", "SimpleSpeak", expr, "bold italic cap alpha, comma bold italic cap omega");
     let expr = "<math> <mi>𝞪</mi><mo>,</mo><mi>𝟂</mi></math>";
     test("en", "SimpleSpeak", expr, "bold italic alpha comma bold italic omega");
     // MathType private space versions
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("en", "SimpleSpeak", expr, "bold italic cap alpha comma bold italic cap omega");
+    test("en", "SimpleSpeak", expr, "bold italic cap alpha, comma bold italic cap omega");
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
     test("en", "SimpleSpeak", expr, "bold italic alpha comma bold italic omega");
 }

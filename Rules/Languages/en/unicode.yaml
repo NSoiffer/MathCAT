@@ -19,13 +19,19 @@
 
  - "A":
     - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
         if: "$CapitalLetters_UseWord"
         then_test:
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
             then: [t: "cap"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
+          else: [x: "$SpeechOverrides_CapitalLetters"]
     - pitch:
         value: "$CapitalLetters_Pitch"
         replace:
@@ -35,6 +41,12 @@
             else: [spell: "'a'"]
             
  - "B-Z":
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
     - test: 
         if: "$CapitalLetters_UseWord"
         then_test:
@@ -181,6 +193,12 @@
 
    # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
  - "Α-Ω": 
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
     - test: 
         if: "$CapitalLetters_UseWord"
         then_test:

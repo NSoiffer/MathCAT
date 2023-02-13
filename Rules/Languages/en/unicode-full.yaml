@@ -264,6 +264,12 @@
 
  - "ΪΫϏ":                                          # 0x3aa, 0x3ab, 0x3cf
     - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
         if: "$CapitalLetters_UseWord"
         then_test:
           if: "$SpeechOverrides_CapitalLetters = ''"
@@ -291,6 +297,12 @@
  - "ϵ": [t: "epsilon"]                             # 0x3f5
  - "϶": [t: "reversed epsilon"]                    # 0x3f6
  - "А-Я":                                          # 0x410 - 0x42f
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
     - test: 
         if: "$CapitalLetters_UseWord"
         then_test:
@@ -3266,6 +3278,12 @@
 
  - "":                                          # 0xf19a
     - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
         if: "$CapitalLetters_UseWord"
         then_test:
           if: "$SpeechOverrides_CapitalLetters = ''"
@@ -3278,6 +3296,12 @@
         replace: [t: "ligature ae"]
  - "":                                          # 0xf19b
     - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
         if: "$CapitalLetters_UseWord"
         then_test:
           if: "$SpeechOverrides_CapitalLetters = ''"
@@ -3289,6 +3313,12 @@
         value: "$CapitalLetters_Pitch"
         replace: [t: "sharp s"]
  - "":                                          # 0xf19c
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
     - test: 
         if: "$CapitalLetters_UseWord"
         then_test:
