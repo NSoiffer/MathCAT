@@ -62,12 +62,12 @@ fn fraktur() {
 #[test]
 fn bold_fraktur() {
     let expr = "<math> <mi>𝕬</mi><mo>,</mo><mi>𝖅</mi></math>";
-    test("en", "SimpleSpeak", expr, "fraktur bold cap eigh comma fraktur bold cap z");
+    test("en", "SimpleSpeak", expr, "fraktur bold cap eigh, comma fraktur bold cap z");
     let expr = "<math> <mi>𝖆</mi><mo>,</mo><mi>𝖟</mi></math>";
     test("en", "SimpleSpeak", expr, "fraktur bold eigh comma fraktur bold z");
     // MathType private space versions
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("en", "SimpleSpeak", expr, "fraktur bold cap eigh comma fraktur bold cap z");
+    test("en", "SimpleSpeak", expr, "fraktur bold cap eigh, comma fraktur bold cap z");
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
     test("en", "SimpleSpeak", expr, "fraktur bold eigh comma fraktur bold z");
 }

@@ -28,7 +28,7 @@ fn sulfate() {
           <mrow><mo>[</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>]</mo></mrow>
           <mrow><mn>2</mn><mo>&#x2212;</mo></mrow>
       </msup></mrow></math>";
-  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "open bracket, cap s, cap o, sub 4, close bracket super 2 minus");
+  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "open bracket, cap s, cap o, sub 4; close bracket super 2 minus");
 }
 
 #[test]
@@ -36,7 +36,7 @@ fn aluminum_sulfate() {
   let expr = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
           <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
   test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "cap eigh l, 2, open cap s, cap o, 4, close 3");
-  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "cap eigh l, sub 2; open paren, cap s, cap o, sub 4, close paren sub 3");
+  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "cap eigh l, sub 2; open paren, cap s, cap o, sub 4; close paren sub 3");
   test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "cap eigh l, subscript 2; open paren, cap s, cap o, subscript 4; close paren subscript 3");
 }
 
@@ -651,7 +651,7 @@ fn mhchem_roman_in_superscript() {
       </mrow>
     </math>";
   test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "cap f e, 2, cap f e, 3, cap o, 4,");
+      expr, "cap f e, 2; cap f e, 3; cap o, 4,");
 }
 
 
