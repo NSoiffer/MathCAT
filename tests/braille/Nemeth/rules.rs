@@ -872,7 +872,7 @@ fn arrow_96_1() {
 }
 
 #[test]
-fn arrow_96_4() {
+fn arrow_96_10() {
     let expr = "<math>
         <mi>X</mi>
         <mover>
