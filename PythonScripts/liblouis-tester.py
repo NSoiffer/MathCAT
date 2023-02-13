@@ -40,10 +40,11 @@ def run_single_test(test_dir: Path):
     # print("run_single_test for {}".format(test_dir))
     liblouisutdml_ini_file = str(find_file(test_dir, 'liblouisutdml.ini'))
     input_file = str(Path.joinpath(test_dir, 'input.xml'))
-    file2braille_result = subprocess.run(['file2brl.exe', '-f',  liblouisutdml_ini_file, input_file], capture_output=True, encoding="utf-8")
-    if file2braille_result.stderr:
-        return "***file2braille error on file {}: {}".format(str(test_dir), file2braille_result.stderr)
-    braille = file2braille_result.stdout.rstrip().replace(' ', '⠀') # replace ascii space with Unicode space
+    # print("ini_file: '{}', input_file: '{}'".format(liblouisutdml_ini_file, input_file))
+    file2brl_result = subprocess.run(['file2brl.exe', '-l', '-w', '.', '-f',  liblouisutdml_ini_file, input_file], capture_output=True, encoding="utf-8")
+    if file2brl_result.stderr:
+        return "***file2braille error on file {}: {}".format(str(test_dir), file2brl_result.stderr)
+    braille = file2brl_result.stdout.rstrip().replace(' ', '⠀') # replace ascii space with Unicode space
     expected = Path.joinpath(test_dir, 'expected.txt').read_text(encoding='utf-8').rstrip()
     if expected.isascii():
         expected = ascii_to_unicode(expected)
@@ -58,7 +59,7 @@ def find_file(start_dir: Path, file_name: str):
         return target_path
     parent_path = start_dir.parent
     if parent_path == start_dir:
-        raise Exception("Can't find file {}".format(file_name))
+        raise RuntimeError("Can't find file {}".format(file_name))
     else:
         return find_file(parent_path, file_name)
 
