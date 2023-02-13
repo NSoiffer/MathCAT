@@ -435,7 +435,7 @@
 
 - name: default-text
   # unknown leaf -- just speak the text -- could be a literal intent
-  tag: "literal"
+  tag: "intent-literal"
   match: "."
   replace:
   - x: "translate(text(), '-_.', ' ')"
