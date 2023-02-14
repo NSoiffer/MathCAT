@@ -1215,6 +1215,7 @@ fn likely_chem_formula_operator(mathml: Element) -> isize {
         fn is_legal_triple_bond(left: &str, right: &str) -> bool {
             // from en.wikipedia.org/wiki/Triple_bond
             // 'B' is from studiousguy.com/triple-bond-examples/
+            #![allow(clippy::if_same_then_else)]
             if left=="C" && (right == "C" || right == "N" || right == "O") {
                 return true;
             } else if left == "B" && right == "B" {
