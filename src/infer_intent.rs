@@ -17,7 +17,7 @@ use regex::Regex;
 pub const LITERAL_NAME: &str = "intent-literal";
 const IMPLICIT_FUNCTION_NAME: &str = "apply-function";
 
-impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
+impl<'c, 's:'c, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
 }
 
 pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, mathml: Element<'c>) -> Result<Element<'m>> {
@@ -43,6 +43,16 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
 // application     := intent hint? '(' arguments? ')'
 // arguments       := intent ( ',' intent )*
 // hint            :=  '@' ('prefix' | 'infix' | 'postfix'  | 'silent' | NCName)
+
+// With isa/types
+// intent          := typed-name-or-literal | number | reference | application 
+// typed-name-or-literal := NCName type?
+// type            := ':' NCName
+// number          := '-'? digit+ ( '.' digit+ )?
+// reference       := '$' NCName
+// application     := intent hint? '(' arguments? ')'
+// arguments       := intent ( ',' intent )*
+// hint            :=  '@' ('prefix' | 'infix' | 'postfix'  | 'silent' | NCName)
 lazy_static! {
     // The practical restrictions of NCName are that it cannot contain several symbol characters like
     //  !, ", #, $, %, &, ', (, ), *, +, ,, /, :, ;, <, =, >, ?, @, [, \, ], ^, `, {, |, }, ~, and whitespace characters
@@ -52,8 +62,8 @@ lazy_static! {
     static ref ARG_REF: Regex = Regex::new(r"^\$[:\pL_][:\pL\-.0-9·]*$").unwrap();  // $ NC_NAME
 }
 
-static TERMINALS_AS_U8: [u8; 4] = ['(' as u8, ',' as u8, ')' as u8, '@' as u8];
-static TERMINALS: [char; 4] = ['(', ',',')', '@'];
+static TERMINALS_AS_U8: [u8; 5] = [b'(', b',', b')', b'@', b':'];
+static TERMINALS: [char; 5] = ['(', ',',')', '@', ':'];
 
 // 'i -- "i" for the lifetime of the "intent" string
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -73,7 +83,7 @@ impl<'i> fmt::Display for Token<'i> {
                 Token::NCName(str) => format!("Name({})", str),
                 Token::Number(str) => format!("Number({})", str),
                 Token::ArgRef(str) => format!("ArgRef({})", str),
-                Token::None => format!("None"),
+                Token::None => "None".to_string(),
             }
         );
     }
@@ -131,16 +141,16 @@ impl<'i> LexState<'i> {
             self.token = Token::None;
         } else if TERMINALS_AS_U8.contains(&self.remaining_str.as_bytes()[0]) {
             self.token = Token::Terminal(&self.remaining_str[..1]);
-            self.remaining_str = &self.remaining_str[1..].trim_start();  // end is already trimmed
+            self.remaining_str = self.remaining_str[1..].trim_start();  // end is already trimmed
         } else {
             match self.remaining_str.find(TERMINALS) {
                 None => {   // what remains should be a token (note: the string was trimmed)
-                    self.set_token(&self.remaining_str)?;
+                    self.set_token(self.remaining_str)?;
                     self.remaining_str = "";  // nothing left
                 }
                 Some(i) => {
-                    self.set_token(&self.remaining_str[..i].trim_end())?;
-                    self.remaining_str = &self.remaining_str[i..].trim_start();  // end is already trimmed
+                    self.set_token(self.remaining_str[..i].trim_end())?;
+                    self.remaining_str = self.remaining_str[i..].trim_start();  // end is already trimmed
                 }
             }
         }    
@@ -152,6 +162,7 @@ impl<'i> LexState<'i> {
     }
 }
 
+const INTENT_TYPE: &str = "data-intent-type";
 const INTENT_HINT: &str = "data-intent-hint";
 /// Build an intent
 /// Start state: lex_state on token to build
@@ -163,9 +174,16 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
     // intent := name | number | reference | application
     debug!("start build_intent:  state: {}", lex_state);
     let mut intent = get_element_from_token(rules_with_context, lex_state, mathml)?;
-    let next_token = lex_state.get_next()?;
+    let mut next_token = lex_state.get_next()?;
+    let intent_type = if next_token.is_terminal(":") {
+        let temp = Some(get_hint_or_type(lex_state, ":")?);
+        next_token = lex_state.get_next()?;
+        temp
+    } else {
+        None
+    };
     let hint = if next_token.is_terminal("@") {
-        let temp = Some(get_hint(lex_state)?);
+        let temp = Some(get_hint_or_type(lex_state, "@")?);
         lex_state.get_next()?;
         temp
     } else {
@@ -173,22 +191,31 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
     };
     if lex_state.is_terminal("(") {
         intent = build_function(intent, rules_with_context, lex_state, mathml)?;
-        if let Some(hint_str) = hint {
-            intent.set_attribute_value(INTENT_HINT, &hint_str);
+        if let Some(type_str) = intent_type {
+            intent.set_attribute_value(INTENT_TYPE, &type_str);
         }
+        let mut hint_str = "function".to_string();
+        debug!("intent='{}'", mml_to_string(&intent));
+        if let Some(found_hint_str) = hint {
+            hint_str = found_hint_str;
+        } else if name(&intent) == "_" {
+            hint_str = "silent".to_string();
+        }
+        intent.set_attribute_value(INTENT_HINT, &hint_str);
+
     }
     debug!("end build_intent:  state: {}..[bi] intent: {}", lex_state, mml_to_string(&intent));
     return Ok( intent );
 }
 
-fn get_hint<'b>(lex_state: &mut LexState<'b>) -> Result<String> {
-    // return the 'hint' leaving the stat
-    assert!(lex_state.is_terminal("@"));
+fn get_hint_or_type<'b>(lex_state: &mut LexState<'b>, target: &str) -> Result<String> {
+    // return the 'hint' leaving the state
+    assert!(lex_state.is_terminal(target));
     let token = lex_state.get_next()?;
     if let Token::NCName(str) = token {
         return Ok( str.to_string() );       // note: there are lifetime/borrow issues if we just return 'str'
     } else {
-        bail!("Illegal 'intent' syntax after '@': {}", token);
+        bail!("Illegal 'intent' syntax after '{}': {}", target, token);
     }
 }
 
@@ -215,7 +242,9 @@ fn build_function<'b, 'r, 'c, 's:'c, 'm:'c>(
         };
         function = lift_function_name(rules_with_context.get_document(), function, children);
 
-        assert!(lex_state.is_terminal(")"));
+        if !lex_state.is_terminal(")") {
+            bail!("Illegal 'intent' syntax: missing ')' for intent name '{}'", if name(&function_name)==LITERAL_NAME {as_text(function_name)} else {name(&function_name)});
+        }
         lex_state.get_next()?;
     }
     debug!("  end build_function/# children: {}, #state: {}  ..[bfa] function name: {}",
@@ -370,7 +399,7 @@ mod tests {
                 <mfrac linethickness='0'> <mn arg='n'>7</mn> <mn arg='m'>3</mn> </mfrac>
                 <mo>)</mo>
             </mrow>";
-        let intent = "<binomial> <mn arg='n'>7</mn> <mn arg='m'>3</mn>  </binomial>";
+        let intent = "<binomial data-intent-hint='function'> <mn arg='n'>7</mn> <mn arg='m'>3</mn>  </binomial>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -381,7 +410,7 @@ mod tests {
                 <mi arg='n'>n</mi>
                 <mi arg='m'>m</mi>
             </msubsup>";
-        let intent = "<binomial> <mi arg='n'>n</mi> <mi arg='m'>m</mi></binomial>";
+        let intent = "<binomial data-intent-hint='function'> <mi arg='n'>n</mi> <mi arg='m'>m</mi></binomial>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -393,7 +422,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<foo><bar></bar></foo>";
+        let intent = "<foo data-intent-hint='function'><bar data-intent-hint='function'></bar></foo>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -410,6 +439,26 @@ mod tests {
     }
 
     #[test]
+    fn intent_hints_defaults() {
+        let mathml = "<mrow intent='_($p@infix($a, $b, $f@postfix($x)))'>
+                <mi arg='a'>a</mi>
+                <mo arg='p' intent='plus'>+</mo>
+                <mi arg='b'>b</mi>
+                <mo intent='plus'>+</mo>
+                <mi arg='x'>x</mi>
+                <mo arg='f' intent='factorial'>!</mo>
+            </mrow>";
+        let intent = "<_ data-intent-hint='silent'>
+                    <plus data-intent-hint='infix'>
+                        <mi arg='a'>a</mi>
+                        <mi arg='b'>b</mi>
+                        <factorial data-intent-hint='postfix'><mi arg='x'>x</mi></factorial>
+                    </plus>
+                </_>";
+        assert!(test_intent(mathml, intent));
+    }
+
+    #[test]
     fn intent_in_intent_first_arg() {
         let mathml = "<mrow intent='p(f(b), a)'>
                 <mi arg='a'>a</mi>
@@ -417,7 +466,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<p> <f><intent-literal>b</intent-literal></f> <intent-literal>a</intent-literal></p>";
+        let intent = "<p data-intent-hint='function'> <f data-intent-hint='function'><intent-literal>b</intent-literal></f> <intent-literal>a</intent-literal></p>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -429,7 +478,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<plus> <intent-literal>a</intent-literal> <factorial><intent-literal>b</intent-literal></factorial> </plus>";
+        let intent = "<plus data-intent-hint='function'> <intent-literal>a</intent-literal> <factorial data-intent-hint='function'><intent-literal>b</intent-literal></factorial> </plus>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -444,7 +493,7 @@ mod tests {
                 <mi arg='b'>B</mi>
                 <mi arg='c'>C</mi>
             </mrow>";
-        let intent = "<map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> <mi arg='c'>C</mi> </map>";
+        let intent = "<map data-intent-hint='function'> <mi arg='a'>A</mi> <mi arg='b'>B</mi> <mi arg='c'>C</mi> </map>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -458,17 +507,16 @@ mod tests {
                 </mover>
                 <mi arg='b'>B</mi>
             </mrow>";
-        let intent = "<apply-function><map> <intent-literal>congruence</intent-literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
+        let intent = "<apply-function data-intent-hint='function'><map data-intent-hint='function'> <intent-literal>congruence</intent-literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
         assert!(test_intent(mathml, intent));
     }
 
     #[test]
     fn intent_with_literals() {
-        init_logger();
         let mathml = "<mrow intent='vector(1, 0., .1, -23, -.1234, last)'>
                 <mi>x</mi>
             </mrow>";
-        let intent = "<vector>
+        let intent = "<vector data-intent-hint='function'>
             <intent-literal>1</intent-literal><intent-literal>0.</intent-literal><intent-literal>.1</intent-literal><intent-literal>-23</intent-literal><intent-literal>-.1234</intent-literal><intent-literal>last</intent-literal>
             </vector>";
         assert!(test_intent(mathml, intent));
@@ -484,7 +532,7 @@ mod tests {
                 </mover>
                 <mi arg='b'>B</mi>
             </mrow>";
-        let intent = "<apply-function>
+        let intent = "<apply-function data-intent-hint='function'>
                     <map><intent-literal>congruence</intent-literal></map>
                     <mi arg='a'>A</mi> <mi arg='b'>B</mi>
                 </apply-function>";
@@ -493,9 +541,8 @@ mod tests {
 
 
     #[test]
-    #[ignore]
     fn intent_with_nested_head_and_hints() {
-        let mathml = "<mrow intent='f@prefix(g@infix(x))@postfix($a,$b)'>
+        let mathml = "<mrow intent='pre@prefix(in@infix($a, x))(post@postfix($b))'>
                 <mi arg='a'>A</mi>
                 <mover>
                     <mo intent='map'>⟶</mo>
@@ -503,10 +550,17 @@ mod tests {
                 </mover>
                 <mi arg='b'>B</mi>
             </mrow>";
-        let intent = "<apply-function>
-                    <map data-intent-hint='prefix'><intent-literal>congruence</intent-literal></map>
-                    <mi arg='a'>A</mi> <mi arg='b'>B</mi>
-                </apply-function>";
+        let intent = "<apply-function data-intent-hint='prefix'>
+                <pre>
+                    <in data-intent-hint='infix'>
+                        <mi arg='a'>A</mi>
+                        <intent-literal>x</intent-literal>
+                    </in>
+                </pre>
+                <post data-intent-hint='postfix'>
+                    <mi arg='b'>B</mi>
+                </post>
+            </apply-function>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -521,7 +575,7 @@ mod tests {
                 </mover>
                 <mi arg='b'>B</mi>
             </mrow>";
-        let intent = "<apply-function  data-intent-hint='prefix'><map> <intent-literal>congruence</intent-literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
+        let intent = "<apply-function data-intent-hint='prefix'><map> <intent-literal>congruence</intent-literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -533,7 +587,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<plus> <mi arg='a'>a</mi> <factorial><mi arg='b'>b</mi></factorial> </plus>";
+        let intent = "<plus data-intent-hint='function'> <mi arg='a'>a</mi> <factorial data-intent-hint='function'><mi arg='b'>b</mi></factorial> </plus>";
         assert!(!test_intent(mathml, intent));
     }
 
@@ -545,7 +599,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<plus> <mi arg='a'>a</mi> <factorial><mi arg='b'>b</mi></factorial> </plus>";
+        let intent = "<plus data-intent-hint='function'> <mi arg='a'>a</mi> <factorial data-intent-hint='function'><mi arg='b'>b</mi></factorial> </plus>";
         assert!(!test_intent(mathml, intent));
     }
 
@@ -557,7 +611,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<factorial></factorial>";
+        let intent = "<factorial data-intent-hint='function'></factorial>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -569,7 +623,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<factorial></factorial>";
+        let intent = "<factorial data-intent-hint='function'></factorial>";
         assert!(!test_intent(mathml, intent));
     }
 
@@ -580,7 +634,7 @@ mod tests {
                 <mfrac linethickness='0'> <mn arg='n'>7</mn> <mn arg='m'>3</mn> </mfrac>
                 <mo>)</mo>
             </mrow>";
-        let intent = "<binomial> <mn arg='n'>7</mn> <mn arg='m'>3</mn>  </binomial>";
+        let intent = "<binomial data-intent-hint='function'> <mn arg='n'>7</mn> <mn arg='m'>3</mn>  </binomial>";
         assert!(!test_intent(mathml, intent));
     }
 }
