@@ -29,8 +29,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
             bail!("Error in intent value: extra unparsed intent '{}' in intent attribute value '{}'", lex_state.remaining_str, intent_str);
         }
         assert!(lex_state.remaining_str.is_empty());
-        debug!("Resulting intent: {}", crate::pretty_print::mml_to_string(&result));
-        debug!("intent attr result:\n{}", mml_to_string(&result));
+        debug!("Resulting intent: {}\n", crate::pretty_print::mml_to_string(&result));
         return Ok(result);
     }
     bail!("Internal error: infer_intent() called on MathML with no intent arg:\n{}", mml_to_string(&mathml));
@@ -172,7 +171,7 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
                                           lex_state: &mut LexState<'b>,
                                           mathml: Element<'c>) -> Result<Element<'m>> {
     // intent := name | number | reference | application
-    debug!("start build_intent:  state: {}", lex_state);
+    // debug!("start build_intent:  state: {}", lex_state);
     let mut intent = get_element_from_token(rules_with_context, lex_state, mathml)?;
     let mut next_token = lex_state.get_next()?;
     let intent_type = if next_token.is_terminal(":") {
@@ -195,7 +194,7 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
             intent.set_attribute_value(INTENT_TYPE, &type_str);
         }
         let mut hint_str = "function".to_string();
-        debug!("intent='{}'", mml_to_string(&intent));
+        // debug!("intent='{}'", mml_to_string(&intent));
         if let Some(found_hint_str) = hint {
             hint_str = found_hint_str;
         } else if name(&intent) == "_" {
@@ -204,7 +203,7 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
         intent.set_attribute_value(INTENT_HINT, &hint_str);
 
     }
-    debug!("end build_intent:  state: {}..[bi] intent: {}", lex_state, mml_to_string(&intent));
+    // debug!("end build_intent:  state: {}..[bi] intent: {}", lex_state, mml_to_string(&intent));
     return Ok( intent );
 }
 
@@ -230,7 +229,7 @@ fn build_function<'b, 'r, 'c, 's:'c, 'm:'c>(
             mathml: Element<'c>) -> Result<Element<'m>> {
     // application := function '(' arguments? ')'
     // function    := name | reference | application
-    debug!("  start build_function:  name: {}, state: {}", name(&function_name), lex_state);
+    // debug!("  start build_function:  name: {}, state: {}", name(&function_name), lex_state);
     assert!(lex_state.is_terminal("("));
     let mut function = function_name;
     while lex_state.is_terminal("(") {
@@ -247,8 +246,8 @@ fn build_function<'b, 'r, 'c, 's:'c, 'm:'c>(
         }
         lex_state.get_next()?;
     }
-    debug!("  end build_function/# children: {}, #state: {}  ..[bfa] function name: {}",
-        function.children().len(), lex_state, mml_to_string(&function));
+    // debug!("  end build_function/# children: {}, #state: {}  ..[bfa] function name: {}",
+    //    function.children().len(), lex_state, mml_to_string(&function));
     return Ok(function);
 }
 
@@ -260,20 +259,20 @@ fn build_arguments<'b, 'r, 'c, 's:'c, 'm:'c>(
             lex_state: &mut LexState<'b>,
             mathml: Element<'c>) -> Result<Vec<Element<'m>>> {
     // arguments   := intent ( ',' intent )*
-    debug!("    start build_function_args state: {}", lex_state);
+    // debug!("    start build_function_args state: {}", lex_state);
 
     // there is at least one arg
     let mut children = Vec::with_capacity(lex_state.remaining_str.len()/3 + 1);   // conservative estimate ('3' - "$x,");
     children.push( build_intent(rules_with_context, lex_state, mathml)? );   // arg before ','
-    debug!("  build_function_args: # children {};  state: {}", children.len(), lex_state);
+    // debug!("  build_function_args: # children {};  state: {}", children.len(), lex_state);
 
     while lex_state.is_terminal(",") {
         lex_state.get_next()?;
         children.push( build_intent(rules_with_context, lex_state, mathml)? );   // arg before ','
-        debug!("    build_function_args, # children {};  state: {}", children.len(), lex_state);
+        // debug!("    build_function_args, # children {};  state: {}", children.len(), lex_state);
     }
 
-    debug!("    end build_function_args, # children {};  state: {}", children.len(), lex_state);
+    // debug!("    end build_function_args, # children {};  state: {}", children.len(), lex_state);
     return Ok(children);
 }
 
@@ -301,7 +300,7 @@ fn get_element_from_token<'b, 'r, 'c, 's:'c, 'm:'c>(
 
 /// lift the children up to LITERAL_NAME
 fn lift_function_name<'m>(doc: Document<'m>, function_name: Element<'m>, mut children: Vec<Element<'m>>) -> Element<'m> {
-    debug!("    lift_function_name: {}", name(&function_name));
+    // debug!("    lift_function_name: {}", name(&function_name));
     if name(&function_name) == LITERAL_NAME {
         set_mathml_name(function_name, as_text(function_name));
         function_name.clear_children();
@@ -309,7 +308,7 @@ fn lift_function_name<'m>(doc: Document<'m>, function_name: Element<'m>, mut chi
         return function_name;
     } else {
         // FIX: remove -- no longer used because function names are not structured???
-        debug!("IMPLICIT_FUNCTION_NAME is being used");
+        // debug!("IMPLICIT_FUNCTION_NAME is being used");
         let result = create_mathml_element(&doc, IMPLICIT_FUNCTION_NAME);
         let mut new_children = Vec::with_capacity(children.len()+1);
         new_children.push(function_name);
@@ -324,8 +323,12 @@ fn lift_function_name<'m>(doc: Document<'m>, function_name: Element<'m>, mut chi
 /// if 'check_intent', then look at an @intent for this element (typically false for non-recursive calls)
 fn find_arg<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, name: &str, mathml: Element<'c>, no_check_inside: bool) -> Result<Option<Element<'m>>> {
     // debug!("Looking for '{}' in\n{}", name, mml_to_string(&mathml));
-    if let Some(arg_val) = mathml.attribute_value("arg") {
+    if let Some(mut arg_val) = mathml.attribute_value("arg") {
         // debug!("looking for '{}', found arg='{}'", name, arg_val);
+        if let Some((arg_part, type_part)) = arg_val.split_once(':') {
+            arg_val = arg_part;
+            mathml.set_attribute_value(INTENT_TYPE, &type_part);    // ok to set more than once
+        }
         if name == arg_val {
             // check to see if this mathml has an intent value -- if so the value is the value of its intent value
             if let Some(intent_str) = mathml.attribute_value("intent") {
@@ -435,6 +438,19 @@ mod tests {
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
         let intent = "<foo data-intent-hint='silent'><bar data-intent-hint='postfix'></bar></foo>";
+        assert!(test_intent(mathml, intent));
+    }
+
+    #[test]
+    fn intent_hints_and_type() {
+        init_logger();
+        let mathml = "<mrow intent='foo:is-foolish@function($b)'>
+                <mi arg='a'>a</mi>
+                <mo arg='p' intent='plus'>+</mo>
+                <mi arg='b:int'>b</mi>
+                <mo arg='f' intent='factorial'>!</mo>
+            </mrow>";
+        let intent = "<foo data-intent-hint='function' data-intent-type='is-foolish'><mi  arg='b:int' data-intent-type='int'>b</mi></foo>";
         assert!(test_intent(mathml, intent));
     }
 
