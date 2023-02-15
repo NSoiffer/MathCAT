@@ -51,7 +51,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
 // reference       := '$' NCName
 // application     := intent hint? '(' arguments? ')'
 // arguments       := intent ( ',' intent )*
-// hint            :=  '@' ('prefix' | 'infix' | 'postfix'  | 'silent' | NCName)
+// hint            := '@' ( 'prefix' | 'infix' | 'postfix' | 'function' | 'silent' )
 lazy_static! {
     // The practical restrictions of NCName are that it cannot contain several symbol characters like
     //  !, ", #, $, %, &, ', (, ), *, +, ,, /, :, ;, <, =, >, ?, @, [, \, ], ^, `, {, |, }, ~, and whitespace characters
