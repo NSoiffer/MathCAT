@@ -432,13 +432,53 @@
   replace:
   - x: "*[1]"
 
-- name: default-text
+- name: intent-literal
   # unknown leaf -- just speak the text -- could be a literal intent
   tag: "intent-literal"
   match: "."
   replace:
   - x: "translate(text(), '-_.', ' ')"
-- name: default-children
+
+# Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
+- name: silent-intent
+  # uncaught intent -- speak as arg1 arg2 ....
+  tag: "*"
+  match: "@data-intent-hint='silent' and count(*)>0"
+  replace:
+  - x: "*"
+
+- name: prefix-intent
+  # uncaught intent -- speak as arg1 arg2 ....
+  tag: "*"
+  match: "@data-intent-hint='prefix' and count(*)>0"
+  replace:
+  - x: "translate(name(.), '-', ' ')"
+  - x: "*"
+  - pause: short
+
+- name: postfix-intent
+  # uncaught intent -- speak as arg1 arg2 ....
+  tag: "*"
+  match: "@data-intent-hint='postfix' and count(*)>0"
+  replace:
+  - pause: short
+  - x: "*"
+  - x: "translate(name(.), '-', ' ')"
+
+
+- name: infix-intent
+  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  tag: "*"
+  match: "@data-intent-hint='infix' and count(*)>0"
+  replace:
+  - pause: short
+  - insert:
+      nodes: "*"
+      replace: [x: "translate(name(.), '-', ' ')", pause: auto]
+  - pause: short
+
+
+- name: function-intent
   # uncaught intent -- speak as foo of arg1 comma arg2 ....
   tag: "*"
   match: count(*)>0
