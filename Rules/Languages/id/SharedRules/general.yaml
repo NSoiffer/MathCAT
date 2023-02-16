@@ -278,6 +278,22 @@
   - x: "*[2]"
   - pause: short
 
+- name: default
+  # handles single, double, etc., prime
+  tag: msubsup-prime
+  match: "."
+  replace:
+  - x: "*[1]"
+  - t: "sub"
+  - x: "*[2]"
+  - test:
+      if: "not(IsNode(*[2],'simple'))"
+      then:
+      - t: "end subscript"
+      - pause: short
+  - x: "*[3]"
+  - pause: short
+
 - name: sin
   tag: mi
   match: "text()='sin'"

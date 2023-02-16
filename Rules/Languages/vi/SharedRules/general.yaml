@@ -277,6 +277,17 @@
   - x: "*[2]"
   - pause: short
 
+- name: default
+  # handles single, double, etc., prime
+  tag: msubsup-prime
+  match: "."
+  replace:
+  - x: "*[1]"
+  - x: "*[2]"
+  - t: "dưới"
+  - x: "*[3]"
+  - pause: short
+
 - name: sin
   tag: mi
   match: "text()='sin'"
