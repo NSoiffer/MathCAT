@@ -293,7 +293,7 @@
 
 -
    # primes don't get a superscript indicator
-   name: prime
+   name: skip-super
    tag: msup
    match: "*[2][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
    replace:
@@ -373,7 +373,7 @@
              else: [t: "b"]
 
 - # primes don't get a superscript indicator and come before the subscript
-   name: prime
+   name: skip-super
    tag: msubsup
    variables:
    - OldScriptContext: "$NewScriptContext"
