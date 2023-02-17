@@ -147,7 +147,7 @@ pub fn errors_to_string(e:&Error) -> String
 ## Python Users
 You can build your own Python interface, or use the one that is built with the related project [MathCATForPython](https://github.com/NSoiffer/MathCATForPython). This uses the Rust package pyo3.
 
-The Python interface is basically the same as the Rust interface. When calling a function, it should be wrapped in
+The Python interface is basically the same as the Rust interface. The Python interface uses CamelCase rather than Rust's snake_case. For example, `set_rules_dir` is `SetRulesDir` in the Python interface. When calling a function, it should be wrapped in
 ```
 try:
     ...
