@@ -927,6 +927,24 @@ fn dots_99_a_3() {
 }
 
 #[test]
+fn ring_dot_100_1() {
+    let expr = "<math><mo>≗</mo></math>";
+    test_braille("Nemeth", expr, "⠐⠨⠅⠣⠨⠡⠻");
+}
+
+#[test]
+fn question_mark_over_equals_101_1() {
+    let expr = "<math><mover><mo>=</mo><mo>?</mo></mover></math>";
+    test_braille("Nemeth", expr, "⠐⠨⠅⠣⠸⠦⠻");
+}
+
+#[test]
+fn question_mark_under_equals_101_2() {
+    let expr = "<math><munder><mo>=</mo><mo>?</mo></munder></math>";
+    test_braille("Nemeth", expr, "⠐⠨⠅⠩⠸⠦⠻");
+}
+
+#[test]
 fn sqrt_103_a_2() {
     let expr = "<math><msqrt><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow></msqrt></math>";
     test_braille("Nemeth", expr, "⠜⠭⠬⠽⠻");
