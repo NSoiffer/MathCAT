@@ -429,8 +429,6 @@ static EMPTY_ELEMENTS: phf::Set<&str> = phf_set! {
 };
 
 lazy_static! {
-	static ref IS_PRIME: Regex = Regex::new(r"['′″‴⁗]").unwrap(); 
-	
 	// turns out Roman Numerals tests aren't needed, but we do want to block VII from being a chemical match
 	// two cases because we don't want to have a match for 'Cl', etc.
 	static ref UPPER_ROMAN_NUMERAL: Regex = Regex::new(r"^\s*^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})\s*$").unwrap();
@@ -571,18 +569,15 @@ impl CanonicalizeContext {
 		};
 		
 		// begin by cleaning up empty elements
-		// debug!("clean_mathml\n{}", mml_to_string(&mathml));
+		debug!("clean_mathml\n{}", mml_to_string(&mathml));
 		let element_name = name(&mathml);
-		let parent_requires_child = 
-			if element_name == "math" {
-				false
-			} else if let Some(parent) = mathml.parent() { //
-				let parent = parent.element().unwrap();
-				let parent_name = name(&parent).to_string();
-				ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(parent_name.as_str())
-			} else {	// detached from parent
-				false
-			};
+		let parent_name = if element_name == "math" {
+			"math".to_string()
+		} else {
+			let parent = mathml.parent().unwrap().element().unwrap();
+			name(&parent).to_string()
+		};
+		let parent_requires_child = ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(&parent_name);
 
 		// handle empty leaves -- leaving it empty causes problems with the speech rules
 		if is_leaf(mathml) && !EMPTY_ELEMENTS.contains(element_name) && as_text(mathml).is_empty() {
@@ -596,7 +591,12 @@ impl CanonicalizeContext {
 			if element_name == "mrow" {
 				// if it is an empty mrow that doesn't need to be there, get rid of it. Otherwise, replace it with an mtext
 				if parent_requires_child {
-					return Some( make_empty_element(mathml) );
+					if parent_name == "mmultiscripts" {	// MathML Core dropped "none" in favor of <mrow/>, but MathCAT is written with <none/>
+						set_mathml_name(mathml, "none");
+						return Some(mathml);
+					} else {
+						return Some( make_empty_element(mathml) );
+					}
 				} else {
 					return None;
 				}
@@ -610,11 +610,23 @@ impl CanonicalizeContext {
 
 		match element_name {
 			"mn" => {
-				// let text = as_text(mathml);
+				let text = as_text(mathml);
+				let mut chars = text.chars();
+				let first_char = chars.next().unwrap();		// we have already made sure it is non-empty
 				// if !text.trim().is_empty() && is_roman_number_match(text) {
 				// 	// people tend to set them in a non-italic font and software makes that 'mtext'
 				// 	mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
 				// }
+				if first_char == '-' || first_char == '\u{2212}' {
+					let doc = mathml.document();
+					let mo = create_mathml_element(&doc, "mo");
+					let mn = create_mathml_element(&doc, "mn");
+					mo.set_text("-");
+					mn.set_text(&text[first_char.len_utf8()..]);
+					set_mathml_name(mathml, "mrow");
+					mathml.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
+					mathml.replace_children([mo,mn]);
+				}
 				return Some(mathml);
 			},
 			"ms" | "mglyph" => {
@@ -1015,6 +1027,7 @@ impl CanonicalizeContext {
 		}
 
 		/// makes sure the structure is correct and also eliminates <none/> pairs
+		/// MathML core changed <none/> to <mrow/>. For now (since MathCAT has lots of "none" tests), <mrow/> => <mtext> => <none/>
 		/// (used https://chem.libretexts.org/Courses/Saint_Francis_University/CHEM_113%3A_Human_Chemistry_I_(Muino)/13%3A_Nuclear_Chemistry12/13.04%3A_Nuclear_Decay)
 		///
 		/// This does some dubious repairs when the structure is bad, but not sure what else to do
@@ -2242,6 +2255,7 @@ impl CanonicalizeContext {
 		} else {
 			mo_text = match mo_text {
 				"\u{00AF}"| "\u{02C9}"| "\u{0304}"| "\u{0305}" => "_",
+				"\u{01C1}" => "\u{2016}", // U+2016 is "‖"
 				_ => mo_text,
 			};
 		};
@@ -3555,6 +3569,20 @@ mod canonicalize_tests {
     }
 
     #[test]
+    fn mn_with_negative_sign() {
+		init_logger();
+        let test_str = "<math><mfrac>
+				<mrow><mn>-1</mn></mrow>
+				<mn>−987</mn>
+				</mfrac></math>";
+        let target_str = "<math><mfrac>
+			<mrow data-changed='added'><mo>-</mo><mn>1</mn></mrow>
+			<mrow data-changed='added'><mo>-</mo><mn>987</mn></mrow>
+			</mfrac></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
     fn canonical_one_element_mrow_around_mo() {
         let test_str = "<math><mrow><mrow><mo>-</mo></mrow><mi>a</mi></mrow></math>";
         let target_str = "<math><mrow><mo>-</mo><mi>a</mi></mrow></math>";
@@ -4372,6 +4400,20 @@ mod canonicalize_tests {
 				<mn>8,123,456</mn>
 				<mo>+</mo>
 				<mn>4.32</mn>
+				</mrow>
+			</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+	fn digit_block_int() {
+        let test_str = "<math><mn>12</mn><mo>,</mo><mn>345</mn><mo>+</mo>
+								    <mn>1</mn><mo>,</mo><mn>000</mn></math>";
+        let target_str = " <math>
+				<mrow data-changed='added'>
+				<mn>12,345</mn>
+				<mo>+</mo>
+				<mn>1,000</mn>
 				</mrow>
 			</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
