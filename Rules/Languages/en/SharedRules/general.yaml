@@ -283,17 +283,17 @@
   replace:
   - x: "*[1]"
   - test:
-      if: "$Verbosity='Terse'"
-      then: {t: "sub"}
-      else: {t: "subscript"}
+      if: "$Verbosity='Verbose'"
+      then: {t: "subscript"}
+      else: {t: "sub"}
   - x: "*[2]"
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then:
       - test:
-          if: "$Verbosity='Terse'"
-          then: {t: "end sub"}
-          else: {t: "end subscript"}
+          if: "$Verbosity='Verbose'"
+          then: {t: "end subscript"}
+          else: {t: "end sub"}
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -301,9 +301,9 @@
   - test:
       if: "name(.)='say-super'"
       then_test:
-        if: "$Verbosity='Terse'"
-        then: {t: "super"}
-        else: {t: "superscript"}
+        if: "$Verbosity='Verbose'"
+        then: {t: "superscript"}
+        else: {t: "super"}
   - x: "*[3]"
   - pause: short
 
