@@ -352,7 +352,7 @@ pub fn scan_and_mark_chemistry(mathml: Element) -> bool {
     }
 
     let child = as_element(mathml.children()[0]);
-    debug!("scan_and_mark_chemistry:\n{}", mml_to_string(&child));
+    // debug!("scan_and_mark_chemistry:\n{}", mml_to_string(&child));
     assert_eq!(name(&mathml), "math");
     if is_chemistry_sanity_check(mathml) {
         assert_eq!(mathml.children().len(), 1);
@@ -371,7 +371,7 @@ pub fn scan_and_mark_chemistry(mathml: Element) -> bool {
             }
         }
     }
-    debug!("...after marking:\n{}", mml_to_string(&child));
+    // debug!("...after marking:\n{}", mml_to_string(&child));
 
     if child.attribute(CHEM_FORMULA).is_none() && child.attribute(CHEM_EQUATION).is_none() {
         if !has_maybe_chemistry(mathml) {
@@ -486,7 +486,7 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
                     if mathml.children().len() == 1 || name(&parent) == "mrow" {
                         let children = mathml.children().iter().map(|&el| as_element(el)).collect::<Vec<Element>>();
                         mathml.remove_attribute(CHANGED_ATTR);  // if just one child, the attrs are pushed onto the child
-                        debug!("mrow attrs: {}", crate::pretty_print::format_attrs(&mathml.attributes()));
+                        // debug!("mrow attrs: {}", crate::pretty_print::format_attrs(&mathml.attributes()));
                         replace_children(mathml, children);
                     }
                 }
@@ -499,7 +499,7 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
     fn unmerge_element(mathml: Element) {
         // a merged token occurs when two single letters get merged into one. Here we recreate the two tokens
         assert!(is_leaf(mathml));
-        debug!("unmerge_element: {}", mml_to_string(&mathml));
+        // debug!("unmerge_element: {}", mml_to_string(&mathml));
         let mut token_str = as_text(mathml).chars();
         let first = create_mathml_element(&mathml.document(), name(&mathml));
         first.set_text(&token_str.next().unwrap().to_string());
@@ -510,10 +510,10 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
 
     fn merge_element(mathml: Element) -> Result<()> {
         assert!(is_leaf(mathml));
-        debug!("merge_element: {}", mml_to_string(&mathml));
+        // debug!("merge_element: {}", mml_to_string(&mathml));
         mathml.remove_attribute(SPLIT_TOKEN);
         let mut preceding_children = mathml.preceding_siblings();
-        debug!("preceding_children: {}", preceding_children.iter().map(|&el| name(&as_element(el)).to_string()).collect::<Vec<String>>().join(", "));
+        // debug!("preceding_children: {}", preceding_children.iter().map(|&el| name(&as_element(el)).to_string()).collect::<Vec<String>>().join(", "));
         if preceding_children.is_empty() {
             // handle case where we have mi mmultiscripts mi ... where the second mi needs to join with the first (see test mhchem_so4)
             let parent = mathml.parent().unwrap().element().unwrap();   // mathml is leaf, so parent always exists
@@ -784,6 +784,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
         // a parent may clear the chem flags if something says can't be chemistry (e.g, a non chemically valid script)
         "mi" => return likely_chem_element(mathml),
         "mo" => return likely_chem_formula_operator(mathml),
+        "mtext" => return 0,    // definitely need to skip empty mtext, but others are probably neutral also
         "msub" | "msup" | "msubsup" | "mmultiscripts" => {
             likely_chem_formula(as_element(mathml.children()[0]));  // set MAYBE_CHEMISTRY attribute
             let likelihood = likely_adorned_chem_formula(mathml);
@@ -822,12 +823,15 @@ fn likely_chem_formula(mathml: Element) -> isize {
                 if likely > 0 {
                     likelihood += likely + last_was_likely_formula;
                     last_was_likely_formula = 1;
-                } else if likely == 0 && name(&child) == "mo" {
-                    let text = as_text(child);
-                    if text != "\u{2062}" && text != "\u{2063}" {   // one of these, we don't change the status
-                        last_was_likely_formula = 0;
+                } else if likely == 0 {
+                    if name(&child) == "mo" {
+                        let text = as_text(child);
+                        if text != "\u{2062}" && text != "\u{2063}" {   // one of these, we don't change the status
+                            last_was_likely_formula = 0;
+                        }
                     }
                 } else {
+                    // debug!("in likely_chem_formula: FALSE: likelihood={}, child\n{}", likelihood, mml_to_string(&child));
                     is_chem_formula = false;
                     last_was_likely_formula = 0;
                     likelihood += likely;
@@ -842,7 +846,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
             } else {
                 if likelihood < CHEMISTRY_THRESHOLD && is_short_formula(mrow) {
                         mathml.set_attribute_value(MAYBE_CHEMISTRY, CHEMISTRY_THRESHOLD_STR);
-                        debug!("is_short_formula is true for:\n{}", mml_to_string(&mrow));
+                        // debug!("is_short_formula is true for:\n{}", mml_to_string(&mrow));
                         return CHEMISTRY_THRESHOLD
                 } else if likelihood > 0 {
                     let likelihood_str = likelihood.to_string();
@@ -864,6 +868,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
                     };
                 }
             }
+            // debug!("NOT_CHEMISTRY:\n{}", mml_to_string(&mathml));
             return NOT_CHEMISTRY;
         },
     }
@@ -931,7 +936,7 @@ fn has_c_h_o(elements: &[&str]) -> bool {
 fn is_structural(elements: &[&str]) -> bool {
     assert!(!elements.len() > 1);   // already handled
 
-    debug!("is_structural: {:?}", elements);
+    // debug!("is_structural: {:?}", elements);
     let mut element_set = HashSet::with_capacity(elements.len());
     elements.iter().for_each(|&e| {element_set.insert(e);});
     return element_set.len() < elements.len();
@@ -967,7 +972,7 @@ fn collect_elements(mrow: Element) -> Option<Vec<&str>> {
 /// Actually check Hill's system that puts 'C' followed by 'H' first if 'C' is present
 fn is_alphabetical(elements: &[&str]) -> bool {
     assert!(!elements.len() > 1);   // already handled
-    debug!("is_alphabetical: {:?}", elements);
+    // debug!("is_alphabetical: {:?}", elements);
     let mut elements = elements;
     if elements[1..].iter().any(|&e| e=="C") {  // "C" must be first if present
         return false;
@@ -1009,7 +1014,7 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
     let children = mathml.children();
     let mut likelihood = 0;
     let mut empty_subscript = false;
-    debug!("likely_adorned_chem_formula:\n{}", mml_to_string(&mathml));
+    // debug!("likely_adorned_chem_formula:\n{}", mml_to_string(&mathml));
     if tag_name == "msub" || tag_name == "msubsup" {
         // subscripts should be just a number
         let subscript = as_element(children[1]);
@@ -1392,7 +1397,7 @@ fn is_short_formula(mrow: Element) -> bool {
     return match (first_element, second_element) {
         (Ok(first), Ok(second)) => {
             let short_form = first + second.as_str();
-            debug!("short_form: {}", short_form);
+            // debug!("short_form: {}", short_form);
             return SHORT_SINGLE_LETTER_ELEMENT_FORMULAE.contains(&short_form);
         },
         _ => false,
