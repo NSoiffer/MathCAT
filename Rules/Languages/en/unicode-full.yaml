@@ -90,6 +90,11 @@
  - "ª": [t: "feminine ordinal indicator"]          # 0xaa
  - "¬": [t: "not"]                                 # 0xac
  - "«": [t: "left-pointing double angle quote mark"] # 0xab
+ - "¯":                                            # 0xaf
+     - test:
+        if: "ancestor::m:modified-variable and preceding-sibling::*[1][self::m:mi]"
+        then: [t: "bar"]
+        else: [t: "line"]
  - "°": [t: "degrees"]                             # 0xb0
  - "±": [t: "plus or minus"]                       # 0xb1
  - "²": [t: "two"]                                 # 0xb2
@@ -2079,7 +2084,7 @@
  - "⨬": [t: "minus sign with rising dots"]         # 0x2a2c
  - "⨭": [t: "plus sign in left half circle"]       # 0x2a2d
  - "⨮": [t: "plus sign in right half circle"]      # 0x2a2e
- - "⨯": [t: "vector or cross product"]             # 0x2a2f
+ - "⨯": [t: "cross product"]             # 0x2a2f
  - "⨰": [t: "multiplication sign with dot above"]  # 0x2a30
  - "⨱": [t: "multiplication sign with underbar"]   # 0x2a31
  - "⨲": [t: "semidirect product with bottom closed"] # 0x2a32

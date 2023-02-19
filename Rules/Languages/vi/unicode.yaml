@@ -17,12 +17,22 @@
 #         then: [x: "$SpeechOverrides_CapitalLetters", t: "A"]                         # long "a" sound in all speech engines I tested (see above)
 #         else: [SPELL: "A"]
 
- - "A-Z": 
+ - "A-Z":
     - test: 
-        if: "$TTS='none'"
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters != ''"
+          then: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
-        then: [x: "$SpeechOverrides_CapitalLetters", x: "translate('.', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"]                         
-        else: {SPELL: "'.'"}                       
+        replace: [spell: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]
 
  - "0-9": [T: "."]
 
@@ -148,164 +158,28 @@
  - "̅": [T: thanh ngang]               # 0x305
  - "̆": [T: mũ ngược]                 # 0x306
  - "̇": [T: dot above embellishment]             # 0x307
- - "Α":                                          # 0x391
-     - T: an-pha
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: an-pha
- - "Β":                                          # 0x392
-     - T: bê-ta
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: bê-ta
- - "Γ":                                          # 0x393
-     - T: gamma
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: gamma
 
-    # Note: ClearSpeak has pref TriangleSymbol for this character, but that is wrong
- - "Δ":                                          # 0x394
-     - T: delta
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: delta
- - "Ε":                                          # 0x395
-     - T: epsilon
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: epsilon
- - "Ζ":                                          # 0x396
-     - T: zeta
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: zeta
- - "Η":                                          # 0x397
-     - T: eta
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: eta
- - "Θ":                                          # 0x398
-     - T: theta
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-    # - T: theta
- - "Ι":                                          # 0x399
-     - T: iota
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: iota
- - "Κ":                                          # 0x39a
-     - T: kappa
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: kappa
- - "Λ":                                          # 0x39b
-     - T: lambda
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-    # - T: lamda
- - "Μ":                                          # 0x39c
-     - T: mu
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-    # - T: mu
- - "Ν":                                          # 0x39d
-     - T: nu
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-    # - T: nu
- - "Ξ":                                          # 0x39e
-     - T: xi
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: xi
- - "Ο":                                          # 0x39f
-     - T: omicron
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: omicron
- - "Π":                                          # 0x3a0
-     - T: pi
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: pi
- - "Ρ":                                          # 0x3a1
-     - T: rho
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: rho
- - "Σ":                                          # 0x3a3
-     - T: sigma
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-    # - T: sigma
- - "Τ":                                          # 0x3a4
-     - T: tau
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: tau
- - "Υ":                                          # 0x3a5
-     - T: upsilon
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: upsilon
- - "Φ":                                          # 0x3a6
-     - T: phi
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-    # - T: phi
- - "Χ":                                          # 0x3a7
-     - T: chi
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-    # - T: chi
- - "Ψ":                                          # 0x3a8
-     - T: psi
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-    # - T: psi
- - "Ω":                                          # 0x3a9
-     - T: omega
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: omega
- - "Ϊ":                                          # 0x3aa
-     - T: iota với hai dấu chấm ở trên
-     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: iota with dialytika
- - "Ϋ":                                          # 0x3ab
-    - T: upsilon với hai chấm ở trên
+    # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
+ - "Α-Ω": 
     - test: 
-         if: "($Blind or $Verbosity!='Terse')"
-         then: [T: "hoa"]
-     #- T: upsilon with dialytika
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
+        replace: [spell: "translate('.', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [t: "hoa"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+
  - "α": [T: alpha]                               # 0x3b1
  - "β": [T: beta]                                # 0x3b2
  - "γ": [T: gamma]                               # 0x3b3

@@ -269,28 +269,50 @@
   - x: "*[2]"
   - pause: short
 
-- name: default
-  # handles single, double, etc., prime
-  tag: prime
-  match: "."
-  replace:
-  - x: "*[1]"
-  - x: "*[2]"
-  - pause: short
 
 - name: default
   # handles single, double, etc., prime
-  tag: msubsup-prime
-  match: "."
+  tag: [skip-super, say-super]
+  match: "count(*)=2"
   replace:
   - x: "*[1]"
-  - t: "sub"
+  - test:
+      if: "name(.)='say-super'"
+      then_test:
+        if: "$Verbosity='Terse'"
+        then: {t: super}
+        else: {t: superscript}
+  - x: "*[2]"
+  - pause: short
+
+- name: msubsup-skip-super
+  # handles single, double, etc., prime
+  tag: [skip-super, say-super]
+  match: "count(*)=3"
+  replace:
+  - x: "*[1]"
+  - test:
+      if: "$Verbosity='Terse'"
+      then: {t: "sub"}
+      else: {t: "subscript"}
   - x: "*[2]"
   - test:
-      if: "not(IsNode(*[2],'simple'))"
+      if: "not(IsNode(*[2],'leaf'))"
       then:
-      - t: "end subscript"
+      - test:
+          if: "$Verbosity='Terse'"
+          then: {t: "end sub"}
+          else: {t: "end subscript"}
       - pause: short
+      else_test:
+          if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
+          then: [pause: short]
+  - test:
+      if: "name(.)='say-super'"
+      then_test:
+        if: "$Verbosity='Terse'"
+        then: {t: "super"}
+        else: {t: "superscript"}
   - x: "*[3]"
   - pause: short
 
@@ -311,7 +333,7 @@
       else: {T: kosinus}
 - name: tan
   tag: mi
-  match: "text()='tan'"
+  match: "text()='tan' or text()='tg'"
   replace:
   - bookmark: "@id"
   - test:

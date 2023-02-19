@@ -48,7 +48,7 @@
           then: [{T: negatif}]
           else: [{T: positif}]
   - test:
-      if: "*[2][self::m:mn]"
+      if: "*[2][self::m:mn or self::m:intent-literal]"
       then_test:
       - if: "*[2][text()='2']"
         then: {T: akar kuadrat}
@@ -729,7 +729,8 @@
 - name: no-say-parens
   tag: mrow
   match:
-  - "parent::*[not(self::m:msup) and not(self::m:msub) and not(self::m:msubsup) and not(self::m:power)] and "
+  - "parent::*[not(self::m:msup) and not(self::m:msub) and not(self::m:msubsup) and not(self::m:power) and"
+  - "          not(self::m:math) ] and "       # rule out [x] standing alone
   - "( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) and "
   - "not( $ClearSpeak_Functions = 'None' and "
   - "     (preceding-sibling::*[1][text()='⁡'] or following-sibling::*[1][text()='⁡']) ) and "

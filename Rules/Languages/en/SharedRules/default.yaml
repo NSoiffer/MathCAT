@@ -55,7 +55,7 @@
 - name: simple-sub
   tag: particular-value-of
   # invisible comma -- want "x sub 1 1" without "end sub"
-  match: "IsNode(*[2], 'simple') or *[2][self::m:mrow][*[2][text()='⁣']]"
+  match: "IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][text()='⁣']]"
   replace:
   - x: "*[1]"
   - test:
@@ -88,7 +88,7 @@
   match: "."
   replace:
   - test:
-      if: "not(IsNode(*[1], 'simple'))"
+      if: "not(IsNode(*[1], 'leaf'))"
       then: [{t: "modified"}]
   - x: "*[1]"
   - t: "with"
@@ -100,7 +100,7 @@
   match: "."
   replace:
   - test:
-      if: "not(IsNode(*[1], 'simple'))"
+      if: "not(IsNode(*[1], 'leaf'))"
       then: [{t: "modified"}]
   - x: "*[1]"
   - t: "with"
@@ -112,7 +112,7 @@
   match: "."
   replace:
   - test:
-      if: "not(IsNode(*[1], 'simple'))"
+      if: "not(IsNode(*[1], 'leaf'))"
       then: [{t: "modified"}]
   - x: "*[1]"
   - t: "with"
@@ -414,7 +414,10 @@
       if: ".[contains(@notation,'radical')]"
       then: [{t: square root}, {pause: short}]
   - t: enclosing
-  - x: "*"
+  - test:
+      if: "*[self::m:mtext and text()=' ']"
+      then: [t: "some space"]     # otherwise there is complete silence
+      else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
       then: [{t: end enclosure}]

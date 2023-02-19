@@ -90,6 +90,11 @@
  - "ª": [t: "chỉ số thứ tự nữ tính"]            	#  0xaa	(en: 'feminine ordinal indicator')
  - "¬": [t: "không phải"]                       	#  0xac	(en: 'not')
  - "«": [t: "dấu ý nghĩa góc cạnh trái"]        	#  0xab	(en: 'left-pointing double angle quote mark')
+ - "¯":                                            # 0xaf
+     - test:
+        if: "ancestor::m:modified-variable and preceding-sibling::*[1][self::m:mi]"
+        then: [t: "dòng"]                         # (en: 'bar') -- as in "x bar", a shorthand way to speak this
+        else: [t: "dòng"]                          # (en: 'line')
  - "°": [t: "độ"]                               	#  0xb0	(en: 'degrees')
  - "±": [t: "cộng hoặc trừ"]                    	#  0xb1	(en: 'plus or minus')
  - "²": [t: "hai"]                              	#  0xb2	(en: 'two')
@@ -2067,7 +2072,7 @@
  - "⨬": [t: "điểm trừ với dấu hiệu tăng"]       	#  0x2a2c	(en: 'minus sign with rising dots')
  - "⨭": [t: "cộng với dấu hiệu trong nửa vòng tròn trái"]	#  0x2a2d	(en: 'plus sign in left half circle')
  - "⨮": [t: "cộng với đăng nhập vào nửa vòng tròn bên phải"]	#  0x2a2e	(en: 'plus sign in right half circle')
- - "⨯": [t: "vector hoặc sản phẩm chéo"]        	#  0x2a2f	(en: 'vector or cross product')
+ - "⨯": [t: "sản phẩm chéo"]        	#  0x2a2f	(en: 'cross product')
  - "⨰": [t: "dấu hiệu nhân với dấu chấm ở trên"]	#  0x2a30	(en: 'multiplication sign with dot above')
  - "⨱": [t: "dấu hiệu nhân với inderbar"]       	#  0x2a31	(en: 'multiplication sign with underbar')
  - "⨲": [t: "sản phẩm bán kết với đóng đáy đóng"]	#  0x2a32	(en: 'semidirect product with bottom closed')

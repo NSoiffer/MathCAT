@@ -55,7 +55,7 @@
 - name: simple-sub
   tag: particular-value-of
   # invisible comma -- want "x sub 1 1" without "end sub"
-  match: "IsNode(*[2], 'simple') or *[2][self::m:mrow][*[2][text()='⁣']]"
+  match: "IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][text()='⁣']]"
   replace:
   - x: "*[1]"
   - x: "*[2]"
@@ -88,7 +88,7 @@
   match: "."
   replace:
   - test:
-      if: "not(IsNode(*[1], 'simple'))"
+      if: "not(IsNode(*[1], 'leaf'))"
       then: [{T: "đã sửa"}]
   - x: "*[1]"
   - T: "với"
@@ -100,7 +100,7 @@
   match: "."
   replace:
   - test:
-      if: "not(IsNode(*[1], 'simple'))"
+      if: "not(IsNode(*[1], 'leaf'))"
       then: [{T: "đã sửa"}]
   - x: "*[1]"
   - T: "với"
@@ -112,7 +112,7 @@
   match: "."
   replace:
   - test:
-      if: "not(IsNode(*[1], 'simple'))"
+      if: "not(IsNode(*[1], 'leaf'))"
       then: [{T: "đã sửa"}]
   - x: "*[1]"
   - T: "với"
@@ -415,7 +415,10 @@
       if: ".[contains(@notation,'radical')]"
       then: [{T: căn bậc hai}, {pause: short}]
   - T: bọc
-  - x: "*"
+  - test:
+      if: "*[self::m:mtext and text()=' ']"
+      then: [t: "một số không gian"]     # (en: "some space") otherwise there is complete silence
+      else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
       then: [{T: hết bọc}]

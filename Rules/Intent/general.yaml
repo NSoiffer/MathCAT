@@ -113,7 +113,7 @@
 -
   name: binomial-frac
   tag: mrow
-  match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][@linethickness=0]"
+  match: "IsBracketed(., '(', ')') and  *[2][self::m:mfrac][translate(@linethickness, 'abcdefghijklmnopqrstuvwxyz', '')=0]"
   replace:
   - intent:
       name: binomial
@@ -236,6 +236,15 @@
 -
   name: default
   tag: mroot
+  match: "*[2][self::m:mn and text()='2']"
+  replace:
+  - intent:
+      name: "square-root"
+      children: [x: "*[1]"]
+
+-
+  name: default
+  tag: mroot
   match: "."
   replace:
   - intent:
@@ -249,8 +258,7 @@
   name: log-base
   tag: msub
   match:
-  - "*[1][self::m:mi][text()='log'] and"
-  - "following-sibling::*[1][self::m:mo][text()='\u2061']"  #invisible function apply
+  - "*[1][self::m:mi][text()='log']"
   replace:
   - intent:
       name: log-base
@@ -280,8 +288,8 @@
 -
   name: modified-var
   tag: mover
-  # breve, check, dot, double-dot, triple-dot, quadruple-dot, grave, hat, tilde
-  match: "*[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^~→', '')='']"
+  # breve, check, dot, double-dot, triple-dot, quadruple-dot, grave, hat, tilde, line/bar
+  match: "*[1][self::m:mi] and *[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^~→¯', '')='']"
   replace:
   - intent:
       name: "modified-variable"
@@ -345,13 +353,25 @@
 #                 }
 #         );
 
+# Pseudo-script characters are characters such as "degree sign" ('°') that are raised but in MathML should be in a superscript.
+# They are not spoken as if in a superscript (e.g "x degrees", not "x superscripts degrees")
+
 -
-  name: prime
-  tag: msup
-  match: "*[2][translate(., '′″‴⁗', '')=''] and *[1][self::m:mi]"
+  name: skip-super
+  tag: [msup, msubsup]
+  match: "*[last()][translate(., '′″‴⁗†‡°', '')='']"
   replace:
   - intent:
-      name: "prime"
+      name: "skip-super"
+      children: [x: "*"]
+
+-
+  name: mo-super
+  tag: [msup, msubsup]
+  match: "*[last()][self::m:mo]"
+  replace:
+  - intent:
+      name: "say-super"
       children: [x: "*"]
 
 # rules for functions raised to a power

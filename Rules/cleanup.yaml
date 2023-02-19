@@ -19,7 +19,7 @@
         text: "-"
 -
   # MathType puts out 10' and 10" (where ' and " are 0x2032 and 0x2033) as mn msup with base 0
-  name: prime-fix
+  name: skip-super-fix
   tag: msup
   match:
     - "*[1][self::mn] and"                       # mn in base
