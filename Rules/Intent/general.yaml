@@ -297,6 +297,104 @@
       - x: "*[1]"
       - x: "*[2]"
 
+
+-
+   # this captures the output for the mhchem's "<=>", "<<=>", and "<=>>" output (there are no Unicode arrows for them)
+   # this isn't a perfect match, but should be good enough and allows merging all three (see github.com/NSoiffer/MathCAT/issues/60)
+   name: chemistry-mhchem-equilibrium-arrow
+   tag: mover
+   match:
+   -    "*[1][substring(., 1, 1)='↽'] and"
+   -    "*[2][substring(., string-length(), 1)='⇀']"
+   replace:
+   - intent:
+      name: "chemical-equation-operator"
+      children:
+      - test:
+          if: "*[1][self::m:mrow]"
+          then_test:
+              if: "*[2][self::m:mrow]"
+              then: [t: "\u2B96"]    # this is currently unassigned and may get used by UTC at some point (<=>)
+              else: [t: "\u2B74"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
+          else: [t: "\u2B75"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
+
+-
+  # need to include the name of the element so the rules know whether to say "sub" or "super"
+  name: chemistry
+  tag: [msub, msup]
+  match: "@data-chem-formula"
+  replace:
+  - intent:
+      name: "chemical-formula"
+      children:       # have to list individual children because "*" results in an internal error (children aren't flat)
+      - x: "name(.)"
+      - x: "*[1]"
+      - x: "*[2]"
+
+
+-
+  name: chemistry-prescripts
+  tag: mmultiscripts
+  match: "@data-chem-formula"
+  replace:
+  - test:
+      - if: "count(*)=4 or count(*)=6"
+        then:
+        - intent:
+            name: "chemical-nuclide"
+            children:
+            - x: "*"
+        else:       # FIX: what other cases are there???
+        - intent:
+            name: "chemical-formula"
+            children:       
+            - x: "*"
+
+
+-
+  name: chemical-element
+  tag: [mi, mtext]
+  match: "@data-chem-element"
+  replace:
+  - intent:
+      name: "chemical-element"
+      children:
+      - x: "text()"
+
+-
+  name: chemical-formula-op
+  tag: [mo]
+  match: "@data-chem-formula-op"
+  replace:
+  - intent:
+      name: "chemical-formula-operator"
+      children:
+      - x: "text()"
+
+-
+  name: chemical-equation-op
+  tag: [mo]
+  match: "@data-chem-equation-op"
+  replace:
+  - intent:
+      name: "chemical-equation-operator"
+      children:
+      - x: "text()"
+
+-
+  name: chemistry-state
+  tag: mrow
+  match:
+    - "(@data-chem-formula or @data-chem-equation) and"
+    - "IsBracketed(., '(', ')') and"
+    - "*[2][text()='s' or text()='l' or text()='g' or text()='aq']"
+  replace:
+  - intent:
+      name: "chemical-state"
+      children:
+      - x: "*[2]"
+
+
 # This needs to be before the simple "x prime" rule
 # minutes/seconds or feet/inches
 # If ' or " follows a number, then it is not "prime", but is a unit
@@ -417,103 +515,6 @@
           if: count(*) = 2
           then: []
           else: [x: "*[2]"]
-
--
-   # this captures the output for the mhchem's "<=>", "<<=>", and "<=>>" output (there are no Unicode arrows for them)
-   # this isn't a perfect match, but should be good enough and allows merging all three (see github.com/NSoiffer/MathCAT/issues/60)
-   name: chemistry-mhchem-equilibrium-arrow
-   tag: mover
-   match:
-   -    "*[1][substring(., 1, 1)='↽'] and"
-   -    "*[2][substring(., string-length(), 1)='⇀']"
-   replace:
-   - intent:
-      name: "chemical-equation-operator"
-      children:
-      - test:
-          if: "*[1][self::m:mrow]"
-          then_test:
-              if: "*[2][self::m:mrow]"
-              then: [t: "\u2B96"]    # this is currently unassigned and may get used by UTC at some point (<=>)
-              else: [t: "\u2B74"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
-          else: [t: "\u2B75"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
-
--
-  # need to include the name of the element so the rules know whether to say "sub" or "super"
-  name: chemistry
-  tag: [msub, msup]
-  match: "@data-chem-formula"
-  replace:
-  - intent:
-      name: "chemical-formula"
-      children:       # have to list individual children because "*" results in an internal error (children aren't flat)
-      - x: "name(.)"
-      - x: "*[1]"
-      - x: "*[2]"
-
-
--
-  name: chemistry-prescripts
-  tag: mmultiscripts
-  match: "@data-chem-formula"
-  replace:
-  - test:
-      - if: "count(*)=4 or count(*)=6"
-        then:
-        - intent:
-            name: "chemical-nuclide"
-            children:
-            - x: "*"
-        else:       # FIX: what other cases are there???
-        - intent:
-            name: "chemical-formula"
-            children:       
-            - x: "*"
-
-
--
-  name: chemical-element
-  tag: [mi, mtext]
-  match: "@data-chem-element"
-  replace:
-  - intent:
-      name: "chemical-element"
-      children:
-      - x: "text()"
-
--
-  name: chemical-formula-op
-  tag: [mo]
-  match: "@data-chem-formula-op"
-  replace:
-  - intent:
-      name: "chemical-formula-operator"
-      children:
-      - x: "text()"
-
--
-  name: chemical-equation-op
-  tag: [mo]
-  match: "@data-chem-equation-op"
-  replace:
-  - intent:
-      name: "chemical-equation-operator"
-      children:
-      - x: "text()"
-
--
-  name: chemistry-state
-  tag: mrow
-  match:
-    - "(@data-chem-formula or @data-chem-equation) and"
-    - "IsBracketed(., '(', ')') and"
-    - "*[2][text()='s' or text()='l' or text()='g' or text()='aq']"
-  replace:
-  - intent:
-      name: "chemical-state"
-      children:
-      - x: "*[2]"
-
 -
   name: default
   tag: msub
