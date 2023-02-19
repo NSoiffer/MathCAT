@@ -2239,7 +2239,8 @@ impl CanonicalizeContext {
 		let mut mo_text = as_text(mo);
 		let parent = mo.parent().unwrap().element().unwrap();
 		let parent_name = name(&parent);
-		if parent_name == "mover" || parent_name == "munder" || parent_name == "munderover" {
+		let is_base = mo.preceding_siblings().is_empty();
+		if !is_base && (parent_name == "mover" || parent_name == "munder" || parent_name == "munderover") {
 			// canonicalize various diacritics for munder, mover, munderover
 			mo_text = match mo_text {
 				"_" | "\u{02C9}"| "\u{0304}"| "\u{0305}"| "\u{2212}" |
@@ -2252,6 +2253,11 @@ impl CanonicalizeContext {
 				_ => mo_text,
 			}
 			// FIX: MathType generates the wrong version of union and intersection ops (binary instead of unary)
+		} else if !is_base && (parent_name == "msup" || parent_name == "msubsup") {
+			mo_text = match mo_text {
+				"_" | "\u{00BA}"| "\u{2092}"| "\u{20D8}"| "\u{2218}" => "\u{00B0}",		// circle-like objects -> degree
+				_ => mo_text,
+			};
 		} else {
 			mo_text = match mo_text {
 				"\u{00AF}"| "\u{02C9}"| "\u{0304}"| "\u{0305}" => "_",
