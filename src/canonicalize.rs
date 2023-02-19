@@ -569,7 +569,7 @@ impl CanonicalizeContext {
 		};
 		
 		// begin by cleaning up empty elements
-		debug!("clean_mathml\n{}", mml_to_string(&mathml));
+		// debug!("clean_mathml\n{}", mml_to_string(&mathml));
 		let element_name = name(&mathml);
 		let parent_name = if element_name == "math" {
 			"math".to_string()
@@ -1731,12 +1731,12 @@ impl CanonicalizeContext {
 			// if we are going forward and hit a sub/superscript with a base, then those scripts become postscripts ("other_scripts")
 			// if we are going backwards, we never add prescripts
 
-			let parent = as_element(mrow_children[i]).parent().unwrap().element().unwrap();
-			debug!("convert_to_mmultiscripts (i={}) -- PARENT:\n{}", i, mml_to_string(&parent));
+			// let parent = as_element(mrow_children[i]).parent().unwrap().element().unwrap();
+			// debug!("convert_to_mmultiscripts (i={}) -- PARENT:\n{}", i, mml_to_string(&parent));
 
 			let i_base = choose_base_of_mmultiscripts(mrow_children, i);
 			let mut base = as_element(mrow_children[i_base]);
-			debug!("convert_to_mmultiscripts -- base\n{}", mml_to_string(&base));
+			// debug!("convert_to_mmultiscripts -- base\n{}", mml_to_string(&base));
 			let base_name = name(&base);
 			let mut prescripts = vec![];
 			let mut postscripts = vec![];
@@ -1776,7 +1776,7 @@ impl CanonicalizeContext {
 						i_postscript += 1;
 					}
 				}
-				debug!("adding script\n{}", mml_to_string(&script));
+				// debug!("adding script\n{}", mml_to_string(&script));
 				if !add_to_scripts(script, &mut postscripts) {
 					break;
 				}
