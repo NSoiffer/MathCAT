@@ -283,18 +283,20 @@ fn explicit_times_none_superscript() {
         <mrow><mo>(</mo>
         <mn>25</mn>
         <mo>)</mo></mrow>
+        <mi>x</mi>
         </mrow></math>";
-        test("en", "ClearSpeak", expr, "25");
+        test("en", "ClearSpeak", expr, "25 times x");
     }
 
     #[test]
     fn no_parens_monomial() {
         let expr = "<math><mrow>
+        <mi>b</mi>
         <mrow><mo>(</mo>
         <mrow><mi>x</mi><mi>y</mi></mrow>
         <mo>)</mo></mrow>
         </mrow></math>";
-        test("en", "ClearSpeak", expr, "x y");
+        test("en", "ClearSpeak", expr, "b x y");
     }
 
     #[test]
@@ -314,9 +316,11 @@ fn explicit_times_none_superscript() {
         let expr = "<math><mrow>
         <mrow><mo>(</mo>
         <mrow><mo>&#x2212;</mo><mn>2</mn></mrow><mi>x</mi>
-        <mo>)</mo></mrow>
+        <mo>)</mo>
+        </mrow>
+        <mo>+</mo><mn>1</mn>
         </mrow></math>";
-        test("en", "ClearSpeak", expr, "negative 2 x");
+        test("en", "ClearSpeak", expr, "negative 2 x, plus 1");
     }
 
     #[test]
@@ -338,12 +342,14 @@ fn explicit_times_none_superscript() {
     #[test]
     fn no_parens_fraction() {
         let expr = "<math><mrow>
+        <mn>2</mn>
+        <mo>+</mo>
         <mrow>
             <mrow><mo>(</mo>
             <mfrac> <mn>1</mn><mn>2</mn></mfrac>
             <mo>)</mo></mrow></mrow>
     </mrow></math>";
-        test("en", "ClearSpeak", expr, "1 half");
+        test("en", "ClearSpeak", expr, "2 plus 1 half");
     }
 
 
