@@ -440,7 +440,7 @@
   tag: "intent-literal"
   match: "."
   replace:
-  - x: "translate(text(), '-_.', ' ')"
+  - x: "translate(text(), '-_.', '  ')"
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: silent-intent
@@ -455,7 +455,7 @@
   tag: "*"
   match: "@data-intent-hint='prefix' and count(*)>0"
   replace:
-  - x: "translate(name(.), '-', ' ')"
+  - x: "translate(name(.), '-_', '  ')"
   - x: "*"
   - pause: short
 
@@ -466,7 +466,7 @@
   replace:
   - pause: short
   - x: "*"
-  - x: "translate(name(.), '-', ' ')"
+  - x: "translate(name(.), '-_', '  ')"
 
 
 - name: infix-intent
@@ -477,7 +477,7 @@
   - pause: short
   - insert:
       nodes: "*"
-      replace: [x: "translate(name(.), '-', ' ')", pause: auto]
+      replace: [x: "translate(name(.), '-_', '  ')", pause: auto]
   - pause: short
 
 
@@ -486,7 +486,7 @@
   tag: "*"
   match: count(*)>0
   replace:
-  - x: "translate(name(.), '-', ' ')"
+  - x: "translate(name(.), '-_', '  ')"
   - t: "of"
   - pause: short
   - insert:
@@ -498,4 +498,4 @@
   tag: "*"
   match: "."
   replace:
-  - x: "translate(name(), '-', ' ')"
+  - x: "translate(name(), '-_', ' ')"

@@ -49,7 +49,7 @@ lazy_static! {
     //  !, ", #, $, %, &, ', (, ), *, +, ,, /, :, ;, <, =, >, ?, @, [, \, ], ^, `, {, |, }, ~, and whitespace characters
     //  Furthermore an NCName cannot begin with a number, dot or minus character although they can appear later in an NCName.
     static ref NUMBER: Regex = Regex::new(r"^-?([0-9]+.?[0-9]*|.[0-9]+)$").unwrap();
-    static ref NC_NAME: Regex = Regex::new(r"^[:\pL_][:\pL\-.0-9·]*$").unwrap();  // from www.w3.org/TR/REC-xml/#sec-common-syn, with "\pL" for letters
+    static ref NC_NAME: Regex = Regex::new(r"^[:\pL_][:\pL\-_.0-9·]*$").unwrap();  // from www.w3.org/TR/REC-xml/#sec-common-syn, with "\pL" for letters
     static ref ARG_REF: Regex = Regex::new(r"^\$[:\pL_][:\pL\-.0-9·]*$").unwrap();  // $ NC_NAME
     static ref TYPE_PART: Regex = Regex::new(r"^.*?:-?([0-9]+.?[0-9]*|.[0-9]+)").unwrap();           // pull out a intent type from an intent
 }
@@ -279,7 +279,7 @@ fn get_element_from_token<'b, 'r, 'c, 's:'c, 'm:'c>(
             mathml: Element<'c>) -> Result<Element<'m>> {
     return match lex_state.token {
         Token::None => bail!("Illegal 'intent' value: empty string"),
-        Token::Terminal(str) => bail!("Illegal intent syntax: expected number, name, function but found {}", str),
+        Token::Terminal(str) => bail!("Illegal 'intent' syntax: expected number, name, function but found {}", str),
         Token::NCName(str) | Token::Number(str) => {
             let result = create_mathml_element(&rules_with_context.get_document(), LITERAL_NAME);
             result.set_text(str);
