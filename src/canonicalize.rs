@@ -2255,12 +2255,12 @@ impl CanonicalizeContext {
 			// FIX: MathType generates the wrong version of union and intersection ops (binary instead of unary)
 		} else if !is_base && (parent_name == "msup" || parent_name == "msubsup") {
 			mo_text = match mo_text {
-				"_" | "\u{00BA}"| "\u{2092}"| "\u{20D8}"| "\u{2218}" => "\u{00B0}",		// circle-like objects -> degree
+				"\u{00BA}"| "\u{2092}"| "\u{20D8}"| "\u{2218}" => "\u{00B0}",		// circle-like objects -> degree
 				_ => mo_text,
 			};
 		} else {
 			mo_text = match mo_text {
-				"\u{00AF}"| "\u{02C9}"| "\u{0304}"| "\u{0305}" => "_",
+				"_"| "\u{02C9}"| "\u{0304}"| "\u{0305}" => "\u{00AF}",
 				"\u{01C1}" => "\u{2016}", // U+2016 is "‖"
 				_ => mo_text,
 			};
@@ -4655,7 +4655,7 @@ mod canonicalize_tests {
 	#[test]
     fn pseudo_scripts() {
         let test_str = "<math><mrow>
-				<mi>cos</mi><mn>30</mn><mo>º</mo>
+				<mi>cos</mi><mn>30</mn><mo>°</mo>
 				<mi>sin</mi><mn>60</mn><mo>′</mo>
 				</mrow></math>";
         let target_str = "<math>
@@ -4663,7 +4663,7 @@ mod canonicalize_tests {
 		  <mrow data-changed='added'>
 			<mi>cos</mi>
 			<mo data-changed='added'>&#x2061;</mo>
-			<msup data-changed='added'><mn>30</mn><mo>º</mo></msup>
+			<msup data-changed='added'><mn>30</mn><mo>°</mo></msup>
 		  </mrow>
 		  <mo data-changed='added'>&#x2062;</mo>
 		  <mrow data-changed='added'>
