@@ -104,7 +104,8 @@ pub fn clean_chemistry_mrow(mathml: Element) {
 /// Do some aggressive structural changes and if they make this look like a chemistry formula, make it as one else remove other marks
 /// Note: the element is replaced with a new restructured element if it is marked as chemistry
 ///        Pass 1:
-///        a) for any run of mi/mtext that can be re-split into chem elements, split them and mark them if it is at least 3 chars long
+///        a) for any run of mi/mtext that can be re-split into chem elements, split them and mark them if it is at least 3 chars long.
+///           Also split "(g)", etc., when in mi/mtext
 ///        b) if there are any potential chem formula operators (e.g., "=" and ":") and the previous node is marked MAYBE_CHEMISTRY,
 ///           mark this as MAYBE_CHEMISTRY
 fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Option<Vec<Element<'a>>> {
@@ -112,43 +113,64 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
     let mut new_children = Vec::with_capacity(2*old_children.len());
     let mut i = 0;
     while i < old_children.len() {
+        debug!("clean_mrow_children_restructure_pass -- in loop: i={}, child={}", i, mml_to_string(&old_children[i]));
         if let Some(paren_mrow_aq) = clean_aq_state(old_children, i) {
             new_children.push(paren_mrow_aq);
             i += 4;                                 // skipping "( a q )"
             changed = true;
             continue;
-        } else if i + 2 < old_children.len() {
-            if let Some(paren_mrow) = make_mrow(old_children[i..i+3].try_into().unwrap()) {
-                // debug!("make_mrow added mrow");
-                new_children.push(paren_mrow);
-                i += 3;
-                changed = true;
-                continue;
-            }
-        }
-        let child = old_children[i];
-        let tag_name = name(&child);
-        if tag_name == "mo" {
-            let likely_chemistry_op = likely_chem_formula_operator(child);
-            // debug!("clean_mrow_children_restructure_pass -- in mo: likely {}, {}", likely_chemistry_op, mml_to_string(&child));
-            if likely_chemistry_op >= 0 {
-                // if possible chemistry to left and right, then override text for operator lookup
-                // note: on the right, we haven't set chem flag for operators yet, so we skip them
-                let preceding = child.preceding_siblings();
-                let following = child.following_siblings();
-                if !preceding.is_empty() && preceding.iter().all(|&child| as_element(child).attribute(MAYBE_CHEMISTRY).is_some()) &&
-                   !following.is_empty() && following.iter().all(|&child| {
-                        let child = as_element(child);
-                        name(&child)=="mo" || child.attribute(MAYBE_CHEMISTRY).is_some()
-                    }) {
-                    // "=", etc., should be treated as high priority separators
-                    child.set_attribute_value(CHEMICAL_BOND, "true");
-                    child.set_attribute_value(MAYBE_CHEMISTRY, &likely_chemistry_op.to_string());
+        } else {
+            let child = old_children[i];
+            let tag_name = name(&child);
+            if  tag_name == "mi" || (tag_name == "mtext" && as_text(child).len() < 4) {
+                // break mi/mtext that is done as "(g)", etc. Even if it isn't 'g', 'l', etc., it probably shouldn't be an mi/text.
+                let text = as_text(child);
+                if text.starts_with('(') && text.ends_with(')') {
+                    let doc = child.document();
+                    let state = create_mathml_element(&doc, "mi");
+                    state.set_text(&text[1..text.len()-1]);
+                    let open = create_mathml_element(&doc, "mo");
+                    open.set_text("(");
+                    let close = create_mathml_element(&doc, "mo");
+                    close.set_text(")");
+                    let mrow = create_mathml_element(&doc, "mrow");
+                    mrow.append_children(&[open,state,close]);
+                    new_children.push(mrow);
+                    i += 1;
+                    changed = true;
+                    continue;
+                }
+            } else if i + 2 < old_children.len() {
+                if let Some(paren_mrow) = make_mrow(old_children[i..i+3].try_into().unwrap()) {
+                    // debug!("make_mrow added mrow");
+                    new_children.push(paren_mrow);
+                    i += 3;
+                    changed = true;
+                    continue;
                 }
             }
+            if tag_name == "mo" {
+                let likely_chemistry_op = likely_chem_formula_operator(child);
+                // debug!("clean_mrow_children_restructure_pass -- in mo: likely {}, {}", likely_chemistry_op, mml_to_string(&child));
+                if likely_chemistry_op >= 0 {
+                    // if possible chemistry to left and right, then override text for operator lookup
+                    // note: on the right, we haven't set chem flag for operators yet, so we skip them
+                    let preceding = child.preceding_siblings();
+                    let following = child.following_siblings();
+                    if !preceding.is_empty() && preceding.iter().all(|&child| as_element(child).attribute(MAYBE_CHEMISTRY).is_some()) &&
+                        !following.is_empty() && following.iter().all(|&child| {
+                            let child = as_element(child);
+                            name(&child)=="mo" || child.attribute(MAYBE_CHEMISTRY).is_some()
+                        }) {
+                        // "=", etc., should be treated as high priority separators
+                        child.set_attribute_value(CHEMICAL_BOND, "true");
+                        child.set_attribute_value(MAYBE_CHEMISTRY, &likely_chemistry_op.to_string());
+                    }
+                }
+            }
+            i += 1;
+            new_children.push(child);
         }
-        i += 1;
-        new_children.push(child);
     }
 
     return if changed {Some(new_children)} else {None};
@@ -1661,7 +1683,6 @@ mod chem_tests {
     #[test]
     #[ignore]   // It would be good to say "not chemistry" for this, but there aren't rules for that at the moment
     fn test_water_bond() {
-        init_logger();
         let test11 = r#"<mrow><msub><mi mathvariant='normal'>H</mi><mn>2</mn></msub><mi mathvariant='normal'>O</mi><mo>=</mo><mi>O</mi></mrow>"#;
         assert!( parse_mathml_string(test11, |mathml| {println!("val={}", likely_chem_formula(mathml)); likely_chem_formula(mathml)==13}) );
         // assert!( parse_mathml_string(test11, |mathml| likely_chem_formula(mathml)==NOT_CHEMISTRY) );
@@ -2020,6 +2041,32 @@ mod chem_tests {
             <mi>Fe</mi>
             <msub><mi>Cl</mi><mn>3</mn></msub>
             <mrow><mo>(</mo><mrow><mi>aq</mi></mrow><mo>)</mo></mrow>
+        </mrow></math>";
+        let target = "<math>
+                <mrow data-chem-formula='10'>
+                    <mi data-chem-element='3'>Fe</mi>
+                    <mo data-changed='added'>&#x2063;</mo>
+                    <msub data-chem-formula='3'>
+                        <mi data-chem-element='3'>Cl</mi>
+                        <mn>3</mn>
+                    </msub>
+                    <mo data-changed='added'>&#x2063;</mo>
+                    <mrow data-chem-formula='2'>
+                        <mo>(</mo>
+                        <mi>aq</mi>
+                        <mo>)</mo>
+                    </mrow>
+                </mrow>
+            </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn ferric_chloride_aq_as_mi() {
+        let test = "<math><mrow>
+            <mi>Fe</mi>
+            <msub><mi>Cl</mi><mn>3</mn></msub>
+            <mi>(aq)</mi>
         </mrow></math>";
         let target = "<math>
                 <mrow data-chem-formula='10'>
