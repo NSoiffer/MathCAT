@@ -776,6 +776,15 @@ fn menclose_86_b_1() {
 }
 
 #[test]
+fn overbar_86_b_2() {
+    let expr = "<math><mover>
+            <mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow>
+            <mo>&#xAF;</mo>
+        </mover></math>";
+    test_braille("Nemeth", expr, "⠐⠭⠬⠽⠣⠱⠻");
+}
+
+#[test]
 fn primed_86_b_6() {
     let expr = "<math><msup><mrow><mover><mi>x</mi><mo>&#xAF;</mo></mover></mrow><mo>&#x2032;</mo></msup></math>";
     test_braille("Nemeth", expr, "⠭⠱⠄");
