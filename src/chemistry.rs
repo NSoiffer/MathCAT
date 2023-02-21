@@ -113,7 +113,6 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
     let mut new_children = Vec::with_capacity(2*old_children.len());
     let mut i = 0;
     while i < old_children.len() {
-        debug!("clean_mrow_children_restructure_pass -- in loop: i={}, child={}", i, mml_to_string(&old_children[i]));
         if let Some(paren_mrow_aq) = clean_aq_state(old_children, i) {
             new_children.push(paren_mrow_aq);
             i += 4;                                 // skipping "( a q )"
