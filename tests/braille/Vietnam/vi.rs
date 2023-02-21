@@ -5,7 +5,7 @@ use crate::common::*;
 
 #[test]
 fn subset_1a() {
-    let expr = "<math><mrow><mi>A</mi><mo>=</mo><mfenced close="}" open="{"><mrow><mn>1</mn><mo>;</mo><mn>2</mn><mo>;</mo><mn>3</mn><mo>;</mo><mn>4</mn><mo>;</mo><mn>5</mn><mo>;</mo><mn>...</mn><mo>;</mo><mn>100</mn></mrow></mfenced></mrow></math>";
+    let expr = "<math><mrow><mi>A</mi><mo>=</mo><mfenced close='}' open='{'><mrow><mn>1</mn><mo>;</mo><mn>2</mn><mo>;</mo><mn>3</mn><mo>;</mo><mn>4</mn><mo>;</mo><mn>5</mn><mo>;</mo><mn>...</mn><mo>;</mo><mn>100</mn></mrow></mfenced></mrow></math>";
     test_braille("UEB", expr, "⠨⠁⠐⠶⠸⠣⠼⠁⠆⠼⠃⠆⠼⠉⠆⠼⠙⠆⠼⠑⠆⠄⠄⠄⠆⠼⠁⠚⠚⠸⠜");
 }
 
@@ -66,12 +66,12 @@ fn subset_1j() {
 #[test]
 fn subset_1k() {
     let expr = "<math><mrow><mo>&#x2203;</mo><mi>x</mi><mo>&#x2208;</mo><mi>Q</mi><mo>&#x007C;</mo><mn>3</mn><mi>x</mi><menclose notation='updiagonalstrike'><mo>&#x22EE;</mo></menclose> <mn>3</mn></mrow></math>";
-    test_braille("UEB", expr, "⠘⠑⠭⠈⠑⠨⠟⠸⠳⠼⠉⠭⠣⠼⠜ ⠼⠉"); ⠼⠃");
+    test_braille("UEB", expr, "⠘⠑⠭⠈⠑⠨⠟⠸⠳⠼⠉⠭⠣⠼⠜ ⠼⠉ ⠼⠃");
 }
 
 #[test]
 fn subset_1l() {
-    let expr = "<math> <mrow> <mi>D</mi><mo>&#x2208;</mo><mi>R</mi><mo>&#x005C;</mo><mfenced close="}" open="{"><mrow> <mn>1</mn><mo>;</mo><mn>2</mn></mrow> </mfenced></mrow></math>";
+    let expr = "<math> <mrow> <mi>D</mi><mo>&#x2208;</mo><mi>R</mi><mo>&#x005C;</mo><mfenced close='}' open='{'><mrow> <mn>1</mn><mo>;</mo><mn>2</mn></mrow> </mfenced></mrow></math>";
     test_braille("UEB", expr, "⠨⠙⠐⠶⠨⠗⠸⠡⠸⠣⠼⠁⠆⠼⠃⠸⠜");
 }
 
@@ -248,7 +248,7 @@ fn sin_7 () {
 #[test]
 fn cos_7 () {
     let expr = "<math><mrow> <mi>cos</mi><mi>B</mi><mo>=</mo><mfrac><mrow> <mi>A</mi><mi>B</mi></mrow><mrow> <mi>B</mi><mi>C</mi></mrow> </mfrac> </mrow></math>";
-    test_braille("UEB", expr, "⠻⠉⠨⠃⠐⠶⠆⠁⠃⠌⠃⠉⠰:);
+    test_braille("UEB", expr, "⠻⠉⠨⠃⠐⠶⠆⠁⠃⠌⠃⠉⠰:");
 }
 
 #[test]
@@ -278,7 +278,7 @@ fn lim_8a () {
 #[test]
 fn prime_9a () {
     let expr = "<math><mrow> <msup><mi>y</mi><mo>&#x2032;</mo> </msup> <mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>3</mn></mrow></math>";
-    test_braille("UEB", expr, "⠽⠄⠐⠶⠼⠃⠭⠐⠖⠼⠉:);
+    test_braille("UEB", expr, "⠽⠄⠐⠶⠼⠃⠭⠐⠖⠼⠉:");
 }
 
 #[test]
