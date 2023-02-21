@@ -35,7 +35,7 @@
 
 
 # Rules for speaking what happens when moving into or out of a notation
-- name: into
+- name: into-or-out-of
   tag: mfrac
   match: "$Move2D != ''"
   replace:
@@ -46,7 +46,7 @@
       else: [{t: "denominator"}]
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: msqrt
   match: "$Move2D != ''"
   replace:
@@ -54,7 +54,7 @@
   - t: "square root"
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: mroot
   match: "$Move2D != ''"
   replace:
@@ -65,7 +65,7 @@
       else: [{t: "root index"}]
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: msub
   match: "$Move2D != ''"
   replace:
@@ -76,7 +76,7 @@
       else: [{t: "subscript"}]
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: msup
   match: "$Move2D != ''"
   replace:
@@ -87,7 +87,7 @@
       else: [{t: "superscript"}] # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: msubsup
   match: "$Move2D != ''"
   replace:
@@ -100,7 +100,7 @@
       else: [{t: "superscript"}] # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: munder
   match: "$Move2D != ''"
   replace:
@@ -111,7 +111,7 @@
       else: [{t: "lower limit"}]
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: mover
   match: "$Move2D != ''"
   replace:
@@ -122,7 +122,7 @@
       else: [{t: "upper limit"}]
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: munderover
   match: "$Move2D != ''"
   replace:
@@ -135,7 +135,7 @@
       else: [{t: "upper limit "}]
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: mmultiscripts
   match: "$Move2D != ''"
   replace:
@@ -156,7 +156,7 @@
           else: [{t: "superscript"}]
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: mtd
   match: "$Move2D = 'into'"
   replace:
@@ -165,7 +165,7 @@
   - x: "count($Child2D/preceding-sibling::*)+1"
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: [mtr, mlabeledtr]
   match: "$Move2D = 'into'"
   replace:
