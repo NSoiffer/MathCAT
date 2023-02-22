@@ -3576,7 +3576,7 @@ mod canonicalize_tests {
 
     #[test]
     fn mn_with_negative_sign() {
-		init_logger();
+		// init_logger();
         let test_str = "<math><mfrac>
 				<mrow><mn>-1</mn></mrow>
 				<mn>−987</mn>
