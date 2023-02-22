@@ -64,7 +64,7 @@
           - x: "*[2]"
           # - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
           else: {x: "*[2]"}
-    - test:
+  - test:
       if: "$Verbosity!='Terse'"
       then: {T: dari}
   - x: "*[1]"

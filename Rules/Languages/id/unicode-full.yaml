@@ -672,7 +672,7 @@
  - "‷": [T: aksen rangkap tiga terbalik]         # 0x2037
  - "‸": [T: ke]                                  # 0x2038
  - "‹": [T: tanda kutip sudut menunjuk kiri tunggal] # 0x2039
- - "›": [T:tanda kutip sudut menunjuk kanan tunggal] # 0x203a
+ - "›": [T: tanda kutip sudut menunjuk kanan tunggal] # 0x203a
  - "‼": [T: faktorial ganda]                     # 0x203c
  - "⁄": [T: dibagi dengan]                       # 0x2044
  - "⁅": [T: braket persegi kiri dengan pena bulu] # 0x2045
@@ -1644,7 +1644,7 @@
          then: {T: " "}
      - T: "benar"
  - "⊩": [T: kekuatan] # 0x22a9
- - "⊪": [T:pintu putar bilah kanan vertikal rangkat tiga] # 0x22aa
+ - "⊪": [T: pintu putar bilah kanan vertikal rangkat tiga] # 0x22aa
  - "⊫": [T: bilah vertikal ganda pintu putar kanan ganda] # 0x22ab
  - "⊬": [T: tidak membuktikan] # 0x22ac
  - "⊭":                                          # 0x22ad
@@ -7053,7 +7053,7 @@
  - "":                                          # 0xf335
      - T: bold
      - test: 
-         if: "($Blind or $Verbos        ity!='Terse')"
+         if: "($Blind or $Verbosity!='Terse')"
          then: {T: huruf besar}
      - T: b
  - "𝗕":                                          # 0x1d5d5
