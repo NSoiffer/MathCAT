@@ -514,7 +514,7 @@
       variables: [{MatchCounter: "$MatchCounter + 1"}]
       replace:
       - test:
-          if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+          if: "$NavVerbosity = 'Verbose'"
           then:
           - test:
             - if: "$NavCommand = 'MoveStart'"
