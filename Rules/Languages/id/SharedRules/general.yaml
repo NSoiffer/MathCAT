@@ -21,7 +21,7 @@
     - else_if: "*[1][text()='ℕ']"
       then: [{T: bilangan asli}]
     - else_if: "*[1][text()='ℚ']"
-      then: [{T: angka rasional}]
+      then: [{T: bilangan rasional}]
     - else_if: "*[1][text()='ℝ']"
       then: [{T: bilangan asli}]
     - else_if: "*[1][text()='ℤ']"
@@ -102,7 +102,7 @@
   - T: dievaluasi pada
   - pause: auto
   - x: "*[3]"
-  - T: 'dikurang ekspresi yang sama yang dievaluasi pada'
+  - T: 'kurang ekspresi yang sama yang dievaluasi pada'
   - x: "*[2]"
 
 - name: binomial
@@ -143,7 +143,7 @@
       then:
       - T: 'dari'
       - x: "*[2]"
-      - T: 'ke'
+      - T: 'sampai'
       - x: "*[3]"
       else:
       - x: "*[2]"
@@ -157,10 +157,10 @@
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "the"
-  - t: "point"
+      - T: " "
+  - T: "titik"
   - x: "*[1]"
-  - t: "comma"
+  - T: "koma"
   - x: "*[2]"
 
 - name: absolute-value
@@ -198,7 +198,7 @@
   match: "."
   replace:
   - x: "*[1]"
-  - t: "sub"
+  - T: "indeks"
   - x: "*[2]"
 
 - name: bigop-both
@@ -209,13 +209,13 @@
       if: "$Verbosity!='Terse'"
       then: [{T: ''}]
   - x: "*[1]"
-  - T: batas bawah
+  - T: mulai batas bawah
   - x: "*[2]"
-  - T: batas atas
+  - T: sampai batas atas
   - x: "*[3]"
   - test:
       if: "following-sibling::*"
-      then: [{T: untuk}]
+      then: [{T: dari}]
 
 - name: bigop-under
   tag: large-op
@@ -251,7 +251,6 @@
       then: [{T: limit}]
       else: [{T: 'limit '}]
   - x: "*[2]"
-  - T: dari
   - pause: short
 
 - name: vector
@@ -269,7 +268,6 @@
   - x: "*[2]"
   - pause: short
 
-
 - name: default
   # handles single, double, etc., prime
   tag: [skip-super, say-super]
@@ -280,8 +278,8 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Terse'"
-        then: {t: super}
-        else: {t: superscript}
+        then: {T: super}
+        else: {T: superskrip}
   - x: "*[2]"
   - pause: short
 
@@ -293,16 +291,16 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "sub"}
-      else: {t: "subscript"}
+      then: {T: "sub"}
+      else: {T: "subskrip"}
   - x: "*[2]"
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then:
       - test:
           if: "$Verbosity='Terse'"
-          then: {t: "end sub"}
-          else: {t: "end subscript"}
+          then: {T: "akhir sub"}
+          else: {T: "akhir subskrip"}
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -311,8 +309,8 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Terse'"
-        then: {t: "super"}
-        else: {t: "superscript"}
+        then: {T: "super"}
+        else: {T: "superskrip"}
   - x: "*[3]"
   - pause: short
 
@@ -481,7 +479,7 @@
       else: [{T: 'garis'}]
   - test:
     - if: "count(*) > 1"
-      then: [{ct: 's'}] # plural
+      then: [{ct: ' '}] # plural
   - pause: short
   - x: "*"
 
@@ -535,7 +533,7 @@
       then: {T: determinan}
       else: {T: matriks}
   - T: 1 kali 1
-  - T: dengan
+  - T: dengan entri
   - x: "*[1]/*"
 
 # simpler reading methods for smaller matrices if the entries are simple
@@ -575,7 +573,7 @@
       then: {T: vektor}
       else: {T: matriks}
   - x: "count(*)"
-  - T: kali 1 dengan
+  - T: kali 1 kolom
   - pause: long
   - x: "*" # select the rows (mtr)
   - test:
@@ -595,9 +593,10 @@
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: {T: vektor}
       else: {T: matriks}
+  - T: '1 kali'
   - x: count(*/*)
   - pause: long
-  - T: 'kali 1 dengan'
+ 
   - x: "*/*"
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
@@ -617,9 +616,9 @@
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: {T: vektor}
       else: {T: matriks}
+  - T: 1 kali
   - x: count(*/*)
   - pause: long
-  - T: 'kali 1 dengan'
   - pause: medium
   - x: "*/*" # select the cols (mtd)
   - test:
@@ -647,7 +646,6 @@
   - T: kali
   - x: count(*[self::m:mtr][1]/*)
   - pause: long
-  - T: dengan
   - x: "*"
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
@@ -668,9 +666,9 @@
       then: {T: determinan}
       else: {T: matriks}
   - x: "count(*)"
+  - T: kali
   - x: "count(*[self::m:mtr][1]/*)"
   - pause: long
-  - T: dengan
   - x: "*"
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
@@ -689,10 +687,10 @@
   - x: "*[2]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "subscript"}]
+      then: [{T: "subskrip"}]
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{t: "sub"}]
+        then: [{T: "sub"}]
   - x: "*[3]"
 
 - name: chemistry-msup
@@ -702,10 +700,10 @@
   - x: "*[2]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "superscript"}]
+      then: [{T: "superskrip"}]
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{t: "super"}]
+        then: [{T: "super"}]
   - x: "*[3]"
   - test:
       if: "following-sibling::*[1][text()='+' or text()='-']" # a little lazy -- assumes chemistry superscripts end with + or -
@@ -732,10 +730,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "superscript"}]
+              then: [{T: "superskrip"}]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "super"}]
+                then: [{T: "super"}]
           - x: "$Prescripts[2]"
           - pause: "short"
       - test:
@@ -743,10 +741,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "subscript"}]
+              then: [{T: "subskrip"}]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "sub"}]
+                then: [{T: "sub"}]
           - x: "$Prescripts[1]"
           - pause: "short"
       - test:
@@ -757,10 +755,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "superscript"}]
+                  then: [{T: "superskrip"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "super"}]
+                    then: [{T: "super"}]
               - x: "$Prescripts[4]"
               - pause: "short"
           - test:
@@ -768,10 +766,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "subscript"}]
+                  then: [{T: "subskrip"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "sub"}]
+                    then: [{T: "sub"}]
               - x: "$Prescripts[3]"
               - pause: "short"
   - x: "*[1]" # base
@@ -783,10 +781,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "subscript"}]
+              then: [{T: "subskrip"}]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "sub"}]
+                then: [{T: "sub"}]
           - x: "$Postscripts[1]"
           - pause: "short"
       - test:
@@ -794,10 +792,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "superscript"}]
+              then: [{T: "superskrip"}]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "super"}]
+                then: [{T: "super"}]
           - x: "$Postscripts[2]"
           - pause: "short"
       - test:
@@ -808,10 +806,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "subscript"}]
+                  then: [{T: "subskrip"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "sub"}]
+                    then: [{T: "sub"}]
               - x: "$Postscripts[3]"
               - pause: "short"
           - test:
@@ -819,10 +817,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "superscript"}]
+                  then: [{T: "superskrip"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "super"}]
+                    then: [{T: "super"}]
               - x: "$Postscripts[4]"
               - pause: "short"
           - test:
@@ -833,10 +831,10 @@
                   then:
                   - test:
                       if: "$Verbosity='Verbose'"
-                      then: [{t: "subscript"}]
+                      then: [{T: "subskrip"}]
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{t: "sub"}]
+                        then: [{T: "sub"}]
                   - x: "$Postscripts[5]"
                   - pause: "short"
               - test:
@@ -844,10 +842,10 @@
                   then:
                   - test:
                       if: "$Verbosity='Verbose'"
-                      then: [{t: "superscript"}]
+                      then: [{T: "superskrip"}]
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{t: "super"}]
+                        then: [{T: "super"}]
                   - x: "$Postscripts[6]"
                   - pause: "short"
               - test:
@@ -858,10 +856,10 @@
                       then:
                       - test:
                           if: "$Verbosity='Verbose'"
-                          then: [{t: "subscript"}]
+                          then: [{T: "subskrip"}]
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{t: "sub"}]
+                            then: [{T: "sub"}]
                       - x: "$Postscripts[7]"
                       - pause: "short"
                   - test:
@@ -869,10 +867,10 @@
                       then:
                       - test:
                           if: "$Verbosity='Verbose'"
-                          then: [{t: "superscript"}]
+                          then: [{T: "superskrip"}]
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{t: "super"}]
+                            then: [{T: "super"}]
                       - x: "$Postscripts[8]"
                       - pause: "short"
       - test:
@@ -902,12 +900,12 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: ".='s'"
-      then: [{t: "solid"}]
+      then: [{T: "padat"}]
     - else_if: ".='l'"
-      then: [{t: "liquid"}]
+      then: [{T: "cairan"}]
     - else_if: ".='g'"
-      then: [{t: "gas"}]
-      else: [{t: "aqueous"}] # (aq)
+      then: [{T: "gas"}]
+      else: [{T: "encer"}] # (aq)
   - pause: short
 
 - name: chemical-formula-operator
@@ -918,13 +916,13 @@
   - bookmark: "@id"
   - test:
     - if: "text()='-' or text() = ':'"
-      then: [{t: "single bond"}]
+      then: [{T: "ikatan tunggal"}]
     - else_if: "text()='=' or text() = '::'"
-      then: [{t: "double bond"}]
+      then: [{T: "ikatan ganda"}]
     - else_if: "text()='≡'"
-      then: [{t: "triple bond"}]
+      then: [{T: "ikatan rangkap tiga"}]
     - else_if: "text()='≣'"
-      then: [{t: "quadruple bond"}]
+      then: [{T: "ikatan rangkap empat"}]
       else: [{x: text()}]
 
 - name: chemical-equation-operator
@@ -937,18 +935,18 @@
     - if: "text()='→' or text()='⟶'"
       then_test:
         if: "name(preceding-sibling::*[1]) = 'chemical-nuclide'"
-        then: [{t: "decays to"}]
-        else: [{t: "yields"}]
+        then: [{T: "membusuk menjadi"}]
+        else: [{T: "hasil"}]
     - else_if: "text()='⇌' or text()='⮖'"
-      then: [{t: "is in equilibrium with"}]
+      then: [{T: "berada dalam kesetimbangan dengan"}]
     - else_if: "text()='⭴'"
-      then: [{t: "is in equilibrium biased to the left with"}]
+      then: [{T: "berada dalam kesetimbangan bias ke kiri dengan"}]
     - else_if: "text()='⭵'"
-      then: [{t: "is in equilibrium biased to the right with"}]
+      then: [{T: "berada dalam kesetimbangan bias ke kanan dengan"}]
       else: [{x: text()}]
 
 - name: none
   tag: none
   match: "../../*[self::m:chemical-formula or self::m:chemical-nuclide]"
   replace:
-  - t: "" # don't say anything
+  - T: "" # don't say anything

@@ -1,4 +1,4 @@
----
+---  # Indonesian translation contributor: Budi Darmulyana (budi@mitranetra.or.id)
 - name: default
   tag: square-root
   match: "."
@@ -60,11 +60,11 @@
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
+          - T: akar pangkat
           - x: "*[2]"
           # - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
           else: {x: "*[2]"}
-      - T: akar
-  - test:
+    - test:
       if: "$Verbosity!='Terse'"
       then: {T: dari}
   - x: "*[1]"
@@ -104,7 +104,7 @@
   match: "$ClearSpeak_Fractions='Per'"
   replace:
   - x: "*[1]"
-  - t: "per"
+  - T: "per"
   - x: "*[2]"
 
 - name: common-fraction
@@ -136,8 +136,8 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [{ot: "the"}]
-      - t: "fraction"
+          then: [{ot: ""}]  # in Indonesian there is no need 'the'
+      - T: "pecahan"
   - x: "*[1]"
   - T: "per"
   - x: "*[2]"
@@ -146,7 +146,7 @@
       if: "$ClearSpeak_Fractions='OverEndFrac' or ($ClearSpeak_Fractions='EndFrac' and not( ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and *[1][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and *[2][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] ) )"
       then:
       - pause: short
-      - t: "end fraction"
+      - T: "akhir pecahan"
       - pause: short
 
 - # fraction with text or numbers followed by text in both numerator and denominator
@@ -168,13 +168,13 @@
   - ")"
   replace:
   - x: "*[1]"
-  - T: per
+  - T: "per"
   - x: "*[2]"
   - test:
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='OverEndFrac'"
       then:
       - pause: short
-      - t: "end fraction"
+      - T: "akhir pecahan"
       - pause: short
 
 - name: default
@@ -195,7 +195,7 @@
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='GeneralEndFrac'"
       then:
       - pause: short
-      - t: "end fraction"
+      - T: "akhir pecahan"
       - pause: short
 
 # rules for functions raised to a power
@@ -239,7 +239,7 @@
       if: "*[2][self::m:mn][not(contains(., '.'))]"
       then: [{x: "ToOrdinal(*[2])"}]
       else: [{x: "*[2]"}]
-  - T: pangkat
+  - T: "pangkat"
   - pause: short
   - x: "*[1]"
 
@@ -250,18 +250,18 @@
   - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
   replace:
   - x: "*[1]"
-  - t: "raised to the exponent"
+  - T: "pangkat exponen"
   - pause: short
   - x: "*[2]"
   - pause: short
-  - t: "end exponent"
+  - T: "akhir exponen"
 
 - name: AfterPower-default
   tag: power
   match: "$ClearSpeak_Exponents = 'AfterPower'"
   replace:
   - x: "*[1]"
-  - t: "raised to the power"
+  - T: "pangkat"
   - x: "*[2]"
   - pause: short
 
@@ -271,7 +271,7 @@
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
-  - T: kuadrat
+  - T: "kuadrat"
 
 - name: cubed
   tag: power
@@ -279,14 +279,14 @@
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
-  - T: kubik
+  - T: "kubik"
 
 - name: simple-integer
   tag: power
   match: "*[2][self::m:mn][not(contains(., '.'))]"
   replace:
   - x: "*[1]"
-  - T: pangkat
+  - T: "pangkat"
   - test:
       if: "*[2][.>0]"
       then: {x: "ToOrdinal(*[2])"}
@@ -303,7 +303,7 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - T: pangkat
+  - T: "pangkat"
   - x: "*[2]"
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
@@ -314,13 +314,13 @@
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  - T: pangkat
+  - T: "pangkat"
   - x: "*[2]"
   - T: "baris basis"
     # - pronounce: [text: "-th", ipa: "θ", sapi5: "th", eloquence: "T"]
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{t: "power"}]
+      then: [{T: "baris basis"}]
 
 # match nested exponent, where the nested exponent is has the power 2 or 3 (n below)
 #   [xxx]^n, - [xxx]^n, [xxx] var^n, -[xxx] var^n
@@ -345,9 +345,9 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - T: pangkat
+  - T: "pangkat"
   - x: "*[2]"
-  - T: baris basis
+  - T: "baris basis"
 
 - # - [xxx]^n
   name: nested-negative-squared-or-cubed
@@ -424,7 +424,7 @@
   - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
   replace:
   - x: "*[1]"
-  - T: dinaikkan ke eksponen
+  - T: "pangkat eksponen"
   - pause: short
   - x: "*[2]"
   - pause: short
@@ -451,15 +451,15 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: the}
+      then: {T: ""}
   - x: "$WordToSay"
-  - t: "of"
+  - T: "dari"
   - x: "*[1]"
   - test:
       if: "$ClearSpeak_AbsoluteValue = 'AbsEnd'"
       then:
       - pause: short
-      - t: "end"
+      - T: "akhir"
       - x: "$WordToSay"
   - pause: short
 
@@ -469,22 +469,22 @@
   replace:
   - test:
     - if: "count(*)=0"
-      then: [{T: "set kosong"}]
+      then: [{T: "himpunan kosong"}]
     - else_if: "count(*)=2"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: "set kosong"}
+          then: {T: "himpunan kosong"}
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {T: "set dari"}
+          then: {T: "himpunan dari"}
       - test:
           if: $ClearSpeak_Sets != 'woAll'
           then: [{T: semua}]
       - x: "*[1]/*[1]"
-      - T: sedemikian sehingga
+      - T: "sedemikian sehingga"
       - x: "*[1]/*[3]"
       else:
       - test:
@@ -492,8 +492,9 @@
           then:
           - test:
               if: "$Verbosity!='Terse'"
-              then: {T: "set"}
+              then: {T: "himpunan"}
       - x: "*[1]"
+
 
 - # intervals are controlled by a ClearSpeak Preference -- parens/brackets don't have to match, so we avoid IsBracketed
   # alternatively, we could have four (or ten) rules, but there is a lot of duplication if we do that
@@ -508,7 +509,7 @@
   replace:
   - T: interval dari
   - x: "*[1]"
-  - T: ke
+  - T: sampai
   - x: "*[2]"
   - pause: short
   - test:
@@ -644,7 +645,7 @@
       # else 'None -- don't say anything'
   - test:
     - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-      then: [{ct: "s"}] # plural
+      then: [{ct: ""}] # plural
   - pause: short
   - x: "*"
 
@@ -693,7 +694,7 @@
     test:
       if: "$ClearSpeak_ImpliedTimes = 'None'"
       then: [{T: ""}]
-      else: [{T: waktu}]
+      else: [{T: kali}]
 
 - name: no-times
   tag: mo
@@ -701,7 +702,7 @@
   # Note: this rule is also part of the paren rule so that the parens speak
   - "text()='⁢' and $ClearSpeak_ImpliedTimes = 'None'"
   replace:
-  - t: ""
+  - T: ""
 
 - name: ClearSpeak-times
   tag: mo
@@ -724,7 +725,7 @@
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
-  - T: ""
+  - T: "kali"
 
 - name: no-say-parens
   tag: mrow

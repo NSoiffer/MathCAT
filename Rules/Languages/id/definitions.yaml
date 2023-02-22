@@ -1,278 +1,98 @@
 ---
 [
-  # Lines starting with "#" are a comment
-  # Each definition in this file is of the form
-  #   name: [ "...", "..." "..." ],
+# Lines starting with "#" are a comment
+# Each definition in this file is of the form
+#   name: [ "...", "..." "..." ],
 
-  # ----------------  Cardinal and Ordinal Numbers  --------------------------
-  # The following definitions are used to convert numbers to words
-  # The are mainly used for ordinals, of which there are two cases:
-  # 1. Regular ordinals: first, second, third, ...
-  # 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
-  #    When used in the denominator of fractions, a plural version might be
-  #    used (e.g., two halves, two thirds)
-  # Although a lot of languages are regular after a few entries, for generality,
-  # the following lists should be filled out even though they are the same
-  # or easily derived from others in many languages (e.g, an 's' is added for plurals).
-  # The larger ordinal numbers (e.g, millionth) is used when there are only
-  # '0's after that decimal place (e.g., 23000000).:w
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
+# The following definitions are used to convert numbers to words
+# The are mainly used for ordinals, of which there are two cases:
+# 1. Regular ordinals: first, second, third, ...
+# 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
+#    When used in the denominator of fractions, a plural version might be
+#    used (e.g., two halves, two thirds)
+# Although a lot of languages are regular after a few entries, for generality,
+# the following lists should be filled out even though they are the same
+# or easily derived from others in many languages (e.g, an 's' is added for plurals).
+# The larger ordinal numbers (e.g, millionth) is used when there are only
+# '0's after that decimal place (e.g., 23000000).:w
 
-  # All definitions start 0, 10, 100, etc.
+# All definitions start 0, 10, 100, etc.
 
-  # The definitions for the "ones" should extend until a regular pattern begins
-  #   The minimum length is 10.
+# The definitions for the "ones" should extend until a regular pattern begins
+#   The minimum length is 10.
 
-  # For English, a regular pattern starts at twenty
-  NumbersOnes:
-    [
-      'nol',
-      'satu',
-      'dua',
-      'tiga',
-      'empat',
-      'lima',
-      'enam',
-      'tujuh',
-      'delapan',
-      'sembilan',
-      'sepuluh',
-      'sebelas',
-      'dua belas',
-      'tiga belas',
-      'empat belas ',
-      'lima belas',
-      'enam belas',
-      'tujuh belas',
-      'delapan belas',
-      'sembilan belas',
+# For English, a regular pattern starts at twenty
+    NumbersOnes: [
+        "nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan",
+        "sepuluh", "sebelas", "dua belas", "tiga belas", "empat belas", "lima belas", "enam belas",
+        "tujuh belas", "delapan belas", "sembilan belas"
     ],
 
-  NumbersOrdinalOnes:
-    [
-      'nol',
-      'satu',
-      'dua',
-      'tiga',
-      'empat',
-      'lima',
-      'enam',
-      'tujuh',
-      'delapan',
-      'sembilan',
-      'sepuluh',
-      'sebelah',
-      'duabelas',
-      'tigabelas',
-      'empatbelas',
-      'limabelas',
-      'enambelas',
-      'tujuhbelas',
-      'delapanbelas',
-      'sembilanbelas',
+    NumbersOrdinalOnes: [
+        "nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan",
+        "sepuluh", "sebelas", "dua belas", "tiga belas", "empat belas", "lima belas", "enam belas",
+        "tujuh belas", "delapan belas", "sembilan belas"
     ],
 
-  NumbersOrdinalPluralOnes:
-    [
-      'nol',
-      'satu',
-      'dua',
-      'tiga',
-      'empat',
-      'lima',
-      'enam',
-      'tujuh',
-      'delapan',
-      'sembilan',
-      'sepuluh',
-      'sebelas',
-      'duabelas',
-      'tigabelas',
-      'empatbelas',
-      'limabelas',
-      'enambelas',
-      'tujuhbelas',
-      'delapanbelas',
-      'sembilanbelas',
+    NumbersOrdinalPluralOnes: [
+        "nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan",
+        "sepuluh", "sebelas", "dua belas", "tiga belas", "empat belas", "lima belas", "enam belas",
+        "tujuh belas", "delapan belas", "sembilan belas"
     ],
 
-  # stop when regularity begins
-  NumbersOrdinalFractionalOnes:
-    [
-      'pernol',
-      'persatu',
-      'perdua',
-      'pertiga',
-      'perempat',
-      'perlima',
-      'perenam',
-      'pertujuh',
-      'perdelapan',
-      'persembilan',
-      'persepuluh',
-      'persebelas',
-      'perduabelas',
-      'pertigabelas',
-      'perempatbelas',
-      'perlimabelas',
-      'perenambelas',
-      'pertujuhbelas',
-      'perdelapanbelas',
-      'persembilanbelas',
+    # stop when regularity begins
+    NumbersOrdinalFractionalOnes: [
+        "pernol", "persatu", "perdua", "pertiga", "perempat", "perlima", "perenam", "pertujuh", "perdelapan", "persembilan", "persepuluh", "persebelas", "perduabelas", "pertigabelas", "perempatbelas", "perlimabelas", "perenambelas", "pertujuhbelas", "perdelapanbelas", "persembilanbelas"
     ],
 
-  # stop when regularity begins
-  NumbersOrdinalFractionalPluralOnes:
-    [
-      'pernol',
-      'persatu',
-      'perdua',
-      'pertiga',
-      'perempat',
-      'perlima',
-      'perenam',
-      'pertujuh',
-      'perdelapan',
-      'persembilan',
-      'persepuluh',
-      'persebelas',
-      'perduabelas',
-      'pertigabelas',
-      'perempatbelas',
-      'perlimabelas',
-      'perenambelas',
-      'pertujuhbelas',
-      'perdelapanbelas',
-      'persembilanbelas',
+    # stop when regularity begins
+    NumbersOrdinalFractionalPluralOnes: [
+        "pernol", "persatu", "perdua", "pertiga", "perempat", "perlima", "perenam", "pertujuh", "perdelapan", "persembilan", "persepuluh", "persebelas", "perduabelas", "pertigabelas", "perempatbelas", "perlimabelas", "perenambelas", "pertujuhbelas", "perdelapanbelas", "persembilanbelas"
     ],
 
-  # What to use for multiples of 10
-  NumbersTens:
-    [
-      '',
-      'sepuluh',
-      'dua puluh',
-      'tiga puluh',
-      'empat puluh',
-      'lima puluh',
-      'enam puluh',
-      'tujuh puluh',
-      'delapan puluh',
-      'sembilan puluh',
+
+    # What to use for multiples of 10
+    NumbersTens: [
+        "", "sepuluh", "dua puluh", "tiga puluh", "empat puluh", "lima puluh", "enam puluh", "tujuh puluh", "delapan puluh", "sembilan puluh"
     ],
 
-  NumbersOrdinalTens:
-    [
-      '',
-      'sepuluh',
-      'duapuluh',
-      'tigapuluh',
-      'empatpuluh',
-      'limapuluh',
-      'enampuluh',
-      'tujuhpuluh',
-      'delapanpuluh',
-      'sembilanpuluh',
+    NumbersOrdinalTens: [
+        "", "sepuluh", "dua puluh", "tiga puluh", "empat puluh", "lima puluh", "enam puluh", "tujuh puluh", "delapan puluh", "sembilan puluh"
     ],
 
-  NumbersOrdinalPluralTens:
-    [
-      '',
-      'sepuluh',
-      'duapuluh',
-      'tigapuluh',
-      'empatpuluh',
-      'limapuluh',
-      'enampuluh',
-      'tujuhpuluh',
-      'delapanpuluh',
-      'sembilanpuluh',
+    NumbersOrdinalPluralTens: [
+        "", "sepuluh", "dua puluh", "tiga puluh", "empat puluh", "lima puluh", "enam puluh", "tujuh puluh", "delapan puluh", "sembilan puluh"
     ],
 
-  NumbersHundreds:
-    [
-      '',
-      'seratus',
-      'dua ratus',
-      'tiga ratus',
-      'empat ratus',
-      'lima ratus',
-      'enam ratus',
-      'tujuh ratus',
-      'delapan ratus',
-      'sembilan ratus',
+
+    NumbersHundreds: ["", "seratus", "dua ratus", "tiga ratus", "empat ratus", "lima ratus",
+        "enam ratus", "tujuh ratus", "delapan ratus", "sembilan ratus"
     ],
 
-  NumbersOrdinalHundreds:
-    [
-      '',
-      'seratus',
-      'duaratus',
-      'tigaratus',
-      'empatratus',
-      'limaratus',
-      'enamratus',
-      'tujuhratus',
-      'delapanratus',
-      'sembilanratus',
+    NumbersOrdinalHundreds: ["", "seratus", "dua ratus", "tiga ratus", "empat ratus", "lima ratus",
+        "enam ratus", "tujuh ratus", "delapan ratus", "sembilan ratus"
     ],
 
-  NumbersOrdinalPluralHundreds:
-    [
-      '',
-      'seratus',
-      'duaratus',
-      'tigaratus',
-      'empatratus',
-      'limaratus',
-      'enamratus',
-      'tujuhratus',
-      'delapanratus',
-      'sembilanratus',
+    NumbersOrdinalPluralHundreds: ["", "seratus", "dua ratus", "tiga ratus", "empat ratus", "lima ratus",
+        "enam ratus", "tujuh ratus", "delapan ratus", "sembilan ratus"
     ],
 
-  # At this point, hopefully the language is regular. If not, code needs to be written
-  NumbersLarge:
-    [
-      '',
-      'ribu',
-      'juta',
-      'miliar',
-      'triliun',
-      'kuadriliun',
-      'triliun',
-      'sextillion',
-      'septillion',
-      'octillion',
-      'nonillion',
-    ],
 
-  NumbersOrdinalLarge:
-    [
-      '',
-      'seribu',
-      'sejuta',
-      'semilyar',
-      'setrilyun',
-      'quadrillionth',
-      'quintillionth',
-      'sextillionth',
-      'septillionth',
-      'octillionth',
-      'nonillionth',
+    # At this point, hopefully the language is regular. If not, code needs to be written
+    NumbersLarge: [
+        "", "ribu", "juta", "miliar", "triliun", "kuadriliun",
+        "quintillion", "sextillion", "septillion", "octillion", "nonillion"
     ],
+      
+    NumbersOrdinalLarge: [
+        "", "ribu", "juta", "miliar", "triliun", "kuadriliun",
+        "quintillion", "sextillion", "septillion", "octillion", "nonillion"
+    ],
+      
+    NumbersOrdinalPluralLarge: [
+        "", "ribu", "juta", "miliar", "triliun", "kuadriliun",
+        "quintillion", "sextillion", "septillion", "octillion", "nonillion"
+    ]
 
-  NumbersOrdinalPluralLarge:
-    [
-      '',
-      'seribu',
-      'sejuta',
-      'semilyar',
-      'setrilyun',
-      'quadrillionths',
-      'quintillionths',
-      'sextillionths',
-      'septillionths',
-      'octillionths',
-      'nonillionths',
-    ],
 ]

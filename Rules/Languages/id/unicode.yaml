@@ -2,12 +2,12 @@
 - "a": 
   - test: 
       if: "$TTS='none'"
-      then: [t: "eigh"]                         # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
+      then: [T: "eigh"]                         # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
       else: [spell: "'a'"]                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
 - "b-z": 
   - test: 
       if: "$TTS='none'"
-      then: [t: "."]                          
+      then: [T: "."]                          
       else: [spell: "'.'"]                       
 
 - "A":
@@ -27,7 +27,7 @@
         replace:
         - test:
             if: "$TTS='none'"
-            then: [t: "eigh"]
+            then: [T: "eigh"]
             else: [spell: "'a'"]
             
 - "B-Z":
@@ -47,7 +47,7 @@
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
         replace: [spell: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]
 
-- "0-9": [t: "."]
+- "0-9": [T: "."]
 
 - "!": [T: faktorial] # 0x21
 - "\"": [T: tanda kutip] # 0x22
@@ -184,15 +184,15 @@
           if: $ClearSpeak_MultSymbolX = 'By'
           then: [T: dari]
           else: [T: kali]
-- "÷": [T: dibagi dengan] # 0xf7
-- "̀": [T: grave accent embellishment] # 0x300
-- "́": [T: acute accent embellishment] # 0x301
-- "̂": [T: circumflex accent embellishment] # 0x302
-- "̃": [T: tilde embellishment] # 0x303
-- "̄": [T: macron embellishment] # 0x304
-- "̅": [T: overbar embellishment] # 0x305
-- "̆": [T: breve] # 0x306
-- "̇": [T: dot above embellishment] # 0x307
+- "÷": [T: bagi] # 0xf7
+- "̀": [T: hiasan aksen grave]                  # 0x300
+- "́": [T: hiasan aksen akut]                   # 0x301
+- "̂": [T: hiasan aksen sirkumfleksa]           # 0x302
+- "̃": [T: hiasan tilda]                        # 0x303
+- "̄": [T: hiasan makron]                       # 0x304
+- "̅": [T: hiasan garis diatas]                 # 0x305
+- "̆": [T: breve]                               # 0x306
+- "̇": [T: hiasan titik diatas]                 # 0x307
 
   # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
 - "Α-Ω": 
@@ -208,7 +208,7 @@
         if: "$SpeechOverrides_CapitalLetters = ''"
         then_test:
           if: "$Impairment = 'Blindness'"
-          then: [t: "cap"]
+          then: [T: "huruf besar"]
         else: [x: "$SpeechOverrides_CapitalLetters"] 
   - pitch:
       value: "$CapitalLetters_Pitch"
@@ -261,7 +261,7 @@
       else_test: # must have $ClearSpeak_Ellipses = 'AndSoOn'
         if: 'count(following-sibling::*) = 0'
         then: [T: dan seterusnya]
-        else: [T: dan seterusnya sampai]
+        else: [T: dan seterusnya hingga]
 
 - "⁡": # 0x2061
     - test:
@@ -277,10 +277,10 @@
 - "‶": [T: aksen ganda terbalik] # 0x2036
 - "‷": [T: aksen rangkap tiga terbalik] # 0x2037
 - "ℂ": # 0x2102
-    - T: double-struck
+    - T: struck-ganda
     - test:
         if: "($Blind or $Verbosity!='Terse')"
-        then: [T: 'cap']
+        then: [T: 'huruf besar']
     - T: C
 - "℃": [T: derajat celsius] # 0x2103
 - "℉": [T: derajat fahrenheit] # 0x2109
@@ -288,53 +288,53 @@
     - T: script
     - test:
         if: "($Blind or $Verbosity!='Terse')"
-        then: [T: 'cap']
+        then: [T: 'huruf besar']
     - T: h
 - "ℎ": [T: planck constant] # 0x210e
 - "ℓ": [T: script l] # 0x2113
 - "ℕ": # 0x2115
-    - T: double-struck
+    - T: struck-ganda
     - test:
         if: "($Blind or $Verbosity!='Terse')"
-        then: [T: 'cap']
+        then: [T: 'huruf besar']
     - T: n
 - "ℚ": # 0x211a
-    - T: double-struck
+    - T: struck-ganda
     - test:
         if: "($Blind or $Verbosity!='Terse')"
-        then: [T: 'cap']
+        then: [T: 'huruf besar']
     - T: q
 - "ℛ": # 0x211b
     - T: script
     - test:
         if: "($Blind or $Verbosity!='Terse')"
-        then: [T: 'cap']
+        then: [T: 'huruf besar']
     - T: r
 - "ℜ": # 0x211c
     - T: fraktur
     - test:
         if: "($Blind or $Verbosity!='Terse')"
-        then: [T: 'cap']
+        then: [T: 'huruf besar']
     - T: r
 - "ℝ": # 0x211d
-    - T: double-struck
+    - T: struck-ganda
     - test:
         if: "($Blind or $Verbosity!='Terse')"
-        then: [T: 'cap']
+        then: [T: 'huruf besar']
     - T: r
 - "ℤ": # 0x2124
-    - T: double-struck
+    - T: struck-ganda
     - test:
         if: "($Blind or $Verbosity!='Terse')"
-        then: [T: 'cap']
+        then: [T: 'huruf besar']
     - T: z
-- "Ω": [T: ohms] # 0x2126
+- "Ω": [T: ohm] # 0x2126
 - "K": [T: kelvin] # 0x212a
-- "Å": [T: angstroms] # 0x212b
-- "ⅆ": [T: double-struck italic D] # 0x2146
-- "ⅇ": [T: double-struck italic E] # 0x2147
-- "ⅈ": [T: double-struck italic I] # 0x2148
-- "ⅉ": [T: double-struck italic J] # 0x2149
+- "Å": [T: angstrom] # 0x212b
+- "ⅆ": [T: struck-ganda italic D] # 0x2146
+- "ⅇ": [T: struck-ganda italic E] # 0x2147
+- "ⅈ": [T: struck-ganda italic I] # 0x2148
+- "ⅉ": [T: struck-ganda italic J] # 0x2149
 - "←": [T: panah kiri] # 0x2190
 - "↑": [T: panah atas] # 0x2191
 - "→": # 0x2192
@@ -353,7 +353,7 @@
         else: { T: turunan parsial }
 - "∃": [T: ada] # 0x2203
 - "∄": [T: tidak ada] # 0x2204
-- "∅": [T: set kosong] # 0x2205
+- "∅": [T: himpunan kosong] # 0x2205
 - "∆": # 0x2206
     - test:
         if: "$Verbosity!='Terse'"
@@ -375,13 +375,13 @@
             - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
               then: [T: di]
             - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-              then: [T: anggota dari]
+              then: [T: anggota himpunan]
             - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
               then: [T: elemen dari]
             - else: [T: milik] # $ClearSpeak_SetMemberSymbol = 'Belongs'
           else_test:
             - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-              then: [T: anggota dari]
+              then: [T: anggota himpunan]
             - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
               then: [T: elemen dari]
             - else_if: $ClearSpeak_SetMemberSymbol = 'In'
@@ -399,13 +399,13 @@
             - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
               then: [T: tidak di]
             - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-              then: [T: bukan anggota dari]
+              then: [T: bukan anggota himpunan]
             - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
               then: [T: bukan elemen dari]
             - else: [T: bukan milik] # $ClearSpeak_SetMemberSymbol = 'Belongs'
           else_test:
             - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-              then: [T: bukan member dari]
+              then: [T: bukan anggota himpunan]
             - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
               then: [T: bukan elemen dari]
             - else_if: $ClearSpeak_SetMemberSymbol = 'In'
@@ -422,20 +422,20 @@
             - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
               then: [T: di]
             - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-              then: [T: anggota dari]
+              then: [T: anggota himpunan]
             - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
               then: [T: elemen dari]
             - else: [T: milik] # $ClearSpeak_SetMemberSymbol = 'Belongs'
           else_test:
             - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-              then: [T: anggota dari]
+              then: [T: anggota himpunan]
             - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
               then: [T: elemen dari]
             - else_if: $ClearSpeak_SetMemberSymbol = 'In'
               then: [T: ada di]
             - else: [T: milik] # $ClearSpeak_SetMemberSymbol = 'Belongs'
 - "∏": [T: produk] # 0x220f
-- "∐": [T: produk sampingan] # 0x2210
+- "∐": [T: ko-produk] # 0x2210
 - "∑": [T: penjumlahan sigma] # 0x2211
 - "−": [T: kurang] # 0x2212
 - "∓": [T: kurang tambah] # 0x2213
@@ -512,7 +512,7 @@
 - "⊃": # 0x2283
     - test:
         if: "$Verbosity!='Terse'"
-        then: { T: superset dari }
+        then: { T: memuat himpunan }
 - "⊄": # 0x2284
     - test:
         if: "$Verbosity!='Terse'"
@@ -520,7 +520,7 @@
 - "⊅": # 0x2285
     - test:
         if: "$Verbosity!='Terse'"
-        then: [T: bukan superset dari]
+        then: [T: tidak memuat himpunan]
 - "⊆": # 0x2286
     - test:
         if: "$Verbosity!='Terse'"
@@ -528,7 +528,7 @@
 - "⊇": # 0x2287
     - test:
         if: "$Verbosity!='Terse'"
-        then: { T: superset dari atau sama dengan }
+        then: { T: memuat himpunan atau sama dengan }
 - "≈": # 0x2248
     - test:
         if: "$Verbosity!='Terse'"

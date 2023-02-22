@@ -6,9 +6,9 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - T: 'segmen garis dari'
+      - T: 'ruas garis dari'
       - x: "*[1]"
-      - T: 'ke'
+      - T: 'sampai'
       - x: "*[2]"
       else:
       - T: 'segmen garis'
@@ -24,10 +24,10 @@
       then:
       - T: 'sinar dari'
       - x: "*[1]"
-      - T: 'ke'
+      - T: 'sampai'
       - x: "*[2]"
       else:
-      - T: 'ray'
+      - T: 'sinar'
       - x: "*[1]"
       - x: "*[2]"
 

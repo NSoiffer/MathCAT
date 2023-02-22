@@ -80,9 +80,9 @@
   - x: "*[1]"
   - T: indeks
   - x: "*[2]"
-  - T: 'diangkat ke'
+  - T: 'pangkat'
   - x: "*[3]"
-  - T: pangkat
+  - T: baris basis
 - name: default
   tag: munder
   match: "."
@@ -105,7 +105,7 @@
   - x: "*[1]"
   - T: 'dengan'
   - x: "*[2]"
-  - T: 'garis atas'
+  - T: 'di atas'
 
 - name: default
   tag: munderover
@@ -114,12 +114,13 @@
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [{T: 'diubah'}]
-  - x: "*[1]"
   - T: 'dengan'
+  - x: "*[1]"
+  - pause: medium
+  - T: 'di bawah'
   - x: "*[2]"
-  - T: 'di bawah dan'
+  - T: 'dan di atas'
   - x: "*[3]"
-  - T: 'di atas'
 
 - name: default
   #   Here we support up to 2 prescripts and up to 4 postscripts -- that should cover all reasonable cases
@@ -146,9 +147,9 @@
           - test: # only bother announcing if there is more than one prescript
               if: "count($Prescripts) > 2"
               then:
-              - t: "with"
+              - T: "dengan"
               - x: "count($Prescripts) div 2"
-              - t: "prescripts"
+              - T: "pra-superskrip"
               - pause: short
           - test:
               if: "not($Prescripts[1][self::m:none])"
@@ -157,7 +158,7 @@
               - x: "$Prescripts[1]"
           - test:
               if: "not($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none])"
-              then: [{t: "and"}]
+              then: [{T: "dan"}]
           - test:
               if: "not($Prescripts[2][self::m:none])"
               then:
@@ -174,7 +175,7 @@
                   - x: "$Prescripts[3]"
               - test:
                   if: "not($Prescripts[3][self::m:none] or $Prescripts[4][self::m:none])"
-                  then: [{t: "and"}]
+                  then: [{T: "dan"}]
               - test:
                   if: "not($Prescripts[4][self::m:none])"
                   then:
@@ -183,9 +184,9 @@
               - test:
                   if: "count($Prescripts) > 4" # give up and just dump them out so at least the content is there
                   then:
-                  - t: "and alternating prescripts"
+                  - T: "dan bergantian pra-superskrip"
                   - x: "$Prescripts[position() > 4]"
-                  - t: "end prescripts"
+                  - T: "akhir pra-superskrip"
   - test:
       if: "$Postscripts"
       then:
@@ -199,10 +200,10 @@
               then:
               - test:
                   if: "$Prescripts"
-                  then: [{t: "and"}]
-              - t: "with"
+                  then: [{T: "dan"}]
+              - T: "dengan"
               - x: "count($Postscripts) div 2"
-              - t: "postscripts"
+              - T: "postskrip"
               - pause: short
           - test:
               if: "not($Postscripts[1][self::m:none])"
@@ -211,7 +212,7 @@
               - x: "$Postscripts[1]"
           - test:
               if: "not($Postscripts[1][self::m:none] or $Postscripts[2][self::m:none])"
-              then: [{t: "and"}]
+              then: [{T: "dan"}]
           - test:
               if: "not($Postscripts[2][self::m:none])"
               then:
@@ -227,7 +228,7 @@
                   - x: "$Postscripts[3]"
               - test:
                   if: "not($Postscripts[3][self::m:none] or $Postscripts[4][self::m:none])"
-                  then: [{t: "and"}]
+                  then: [{T: "dan"}]
               - test:
                   if: "not($Postscripts[4][self::m:none])"
                   then:
@@ -243,7 +244,7 @@
                       - x: "$Postscripts[5]"
                   - test:
                       if: "not($Postscripts[5][self::m:none] or $Postscripts[6][self::m:none])"
-                      then: [{t: "and"}]
+                      then: [{T: "dan"}]
                   - test:
                       if: "not($Postscripts[6][self::m:none])"
                       then:
@@ -259,7 +260,7 @@
                           - x: "$Postscripts[7]"
                       - test:
                           if: "not($Postscripts[7][self::m:none] or $Postscripts[8][self::m:none])"
-                          then: [{t: "and"}]
+                          then: [{T: "dan"}]
                       - test:
                           if: "not($Postscripts[8][self::m:none])"
                           then:
@@ -268,9 +269,9 @@
                       - test:
                           if: "count($Postscripts) > 8" # give up and just dump them out so at least the content is there
                           then:
-                          - t: "and alternating scripts"
+                          - T: "dan skrip bergantian"
                           - x: "$Postscripts[position() > 8]"
-                          - t: "end scripts"
+                          - T: "akhir skrip"
 
 - name: default
   tag: mtable
@@ -283,7 +284,7 @@
       if: count(*)=1
       then: {T: 'baris'}
       else: {T: 'baris'}
-  - T: and
+  - T: dan
   - x: "count(*[1]/*)"
   - test:
       if: "count(*[1]/*)=1"
@@ -312,7 +313,6 @@
 
 - # Note: @notation can contain more than one value
   # The ordering below is the order in which words come out when there is more than one value
-  #
   name: default
   tag: menclose
   match: "."
@@ -361,7 +361,7 @@
       - test:
           if: ".[contains(@notation,'horizontalstrike')]"
           then: [{T: horizontal}, {pause: short}]
-      - T: cross out
+      - T: mencoret
       - pause: short
   - test:
       if: ".[contains(@notation,'uparrow')]"
@@ -417,7 +417,7 @@
   - T: melampirkan
   - test:
       if: "*[self::m:mtext and text()=' ']"
-      then: [t: "beberapa ruang"]     # (en: "some space") otherwise there is complete silence
+      then: [T: "beberapa ruang"]     # (en: "some space") otherwise there is complete silence
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
@@ -488,15 +488,15 @@
   match: count(*)>0
   replace:
   - x: "translate(name(.), '-_', '  ')"
-  - t: "dari"
+  - T: ' '
   - pause: short
   - insert:
       nodes: "*"
-      replace: [{t: "koma"}, {pause: auto}]
+      replace: [{T: 'koma'}, {pause: auto}]
 
 - name: default-text
   # unknown leaf -- just speak the text -- could be a literal intent
   tag: "*"
   match: "."
   replace:
-  - x: "translate(name(), '-_', ' ')"
+  - x: "translate(name(), '-', ' ')"
