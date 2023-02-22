@@ -28,17 +28,6 @@
  - "/": [t: "divided by"]                          # 0x2f
  - ":": [t: "colon"]                               # 0x3a
  - ";": [t: "semicolon"]                           # 0x3b
- - "<":                                          # 0x3c
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "is"]
-     - t: "less than"
- - "=": [t: "equals"]                              # 0x3d
- - ">":                                          # 0x3e
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "is"]
-     - t: "greater than"
  - "?": [t: "question mark"]                       # 0x3f
  - "@": [t: "at sign"]                             # 0x40
  - "[":                                          # 0x5b
@@ -496,7 +485,7 @@
  - "⃭": [t: "leftwards harpoon with barb downwards embellishment"] # 0x20ed
  - "⃮": [t: "left arrow below embellishment"]      # 0x20ee
  - "⃯": [t: "right arrow below embellishment"]     # 0x20ef
- - "⃰": [t: "astersik above embellishment"]        # 0x20f0
+ - "⃰": [t: "asterisk above embellishment"]        # 0x20f0
  - "℄": [t: "center line symbol"]                  # 0x2104
  - "℅": [t: "care of"]                             # 0x2105
  - "℆": [t: "cada una"]                            # 0x2106
@@ -866,16 +855,6 @@
  - "∢": [t: "spherical angle"]                     # 0x2222
  - "∣": [t: "divides"]                              # 0x2223
  - "∤": [t: "does not divide"]                      # 0x2224
- - "∥":                                           # 0x2225
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "is"]
-     - t: "parallel to"
- - "∦":                                           # 0x2226
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "is"]
-     - t: "not parallel to"
  - "∧": [t: "and"]                                 # 0x2227
  - "∨": [t: "or"]                                  # 0x2228
  - "∩": [t: "intersection"]                        # 0x2229
@@ -902,11 +881,13 @@
  - "∺":                                          # 0x223a
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is geometrically proportinal to"]
+         then: [t: "is"]
+     - t: "geometrically proportional to"
  - "∻":                                          # 0x223b
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is homothetic to"]
+         then: [t: "is"]
+     - t: "homothetic to"
  - "∼": [t: "varies with"]                         # 0x223c
  - "∽": [t: "reversed tilde"]                      # 0x223d
  - "∾":                                          # 0x223e
@@ -921,7 +902,8 @@
  - "≃":                                          # 0x2243
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is asymptotically equal to"]
+         then: [t: "is"]
+     - t: "asymptotically equal to"
  - "≄":                                          # 0x2244
      - test: 
          if: "$Verbosity!='Terse'"
@@ -930,7 +912,8 @@
  - "≅":                                          # 0x2245
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is approximately equal to"]
+         then: [t: "is"]
+     - t: "approximately equal to"
  - "≆":                                          # 0x2246
      - test: 
          if: "$Verbosity!='Terse'"
@@ -944,7 +927,8 @@
  - "≈":                                          # 0x2248
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is almost equal to"]
+         then: [t: "is"]
+     - t: "almost equal to"
  - "≉":                                          # 0x2249
      - test: 
          if: "$Verbosity!='Terse'"
@@ -953,17 +937,20 @@
  - "≊":                                          # 0x224a
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is almost equal or equal to"]
+         then: [t: "is"]
+     - t: "almost equal or equal to"
  - "≋": [t: "triple tilde"]                        # 0x224b
  - "≌": [t: "are all equal to"]                    # 0x224c
  - "≍":                                          # 0x224d
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is equivalent to"]
+         then: [t: "is"]
+     - t: "equivalent to"
  - "≎":                                          # 0x224e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is geometrically equivalent to"]
+         then: [t: "is"]
+     - t: "geometrically equivalent to"
  - "≏":                                          # 0x224f
      - test: 
          if: "$Verbosity!='Terse'"
@@ -973,35 +960,41 @@
  - "≑":                                          # 0x2251
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is geometrically equal to"]
+         then: [t: "is"]
+     - t: "geometrically equal to"
  - "≒":                                          # 0x2252
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is approximately equal to or the image of"]
+         then: [t: "is"]
+     - t: "approximately equal to or the image of"
  - "≓":                                          # 0x2253
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is the image of or approximately equal to"]
+         then: [t: "is the"]
+     - t: "image of or approximately equal to"
  - "≔": [t: "colon equals"]                        # 0x2254
  - "≕": [t: "equals colon"]                        # 0x2255
  - "≖": [t: "ring in equal to"]                    # 0x2256
  - "≗":                                          # 0x2257
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is approximately equal to"]
+         then: [t: "is"]
+     - t: "approximately equal to"
  - "≘": [t: "corresponds to"]                      # 0x2258
  - "≙": [t: "estimates"]                           # 0x2259
  - "≚":                                          # 0x225a
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is equiangular to"]
+         then: [t: "is"]
+     - t: "equiangular to"
  - "≛": [t: "star equals"]                         # 0x225b
  - "≜": [t: "delta equals"]                        # 0x225c
  - "≝": [t: "is defined to be"]                    # 0x225d
  - "≞":                                          # 0x225e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is measured by"]
+         then: [t: "is"]
+     - t: "measured by"
  - "≟": [t: "has an unknown relationship with"]    # 0x225f
  - "≠":                                          # 0x2260
      - test: 
@@ -1011,7 +1004,8 @@
  - "≡":                                          # 0x2261
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is identical to"]
+         then: [t: "is"]
+     - t: "identical to"
  - "≢":                                          # 0x2262
      - test: 
          if: "$Verbosity!='Terse'"
@@ -1020,37 +1014,35 @@
  - "≣":                                          # 0x2263
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is strictly equivalent to"]
- - "≤":                                          # 0x2264
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "is less than or equal to"]
- - "≥":                                          # 0x2265
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "is greater than or equal to"]
+         then: [t: "is"]
+     - t: "strictly equivalent to"
  - "≦": [t: "less than over equal to"]             # 0x2266
  - "≧": [t: "greater than over equal to"]          # 0x2267
  - "≨":                                          # 0x2268
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is less than but not equal to"]
+         then: [t: "is"]
+     - t: "less than but not equal to"
  - "≩":                                          # 0x2269
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is greater than but not equal to"]
+         then: [t: "is"]
+     - t: "greater than but not equal to"
  - "≪":                                          # 0x226a
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is much less than"]
+         then: [t: "is"]
+     - t: "much less than"
  - "≫":                                          # 0x226b
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is much greater than"]
+         then: [t: "is"]
+     - t: "much greater than"
  - "≬":                                          # 0x226c
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is between"]
+         then: [t: "is"]
+     - t: "between"
  - "≭":                                          # 0x226d
      - test: 
          if: "$Verbosity!='Terse'"
@@ -1079,11 +1071,13 @@
  - "≲":                                          # 0x2272
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is less than or equivalent to"]
+         then: [t: "is"]
+     - t: "less than or equivalent to"
  - "≳":                                          # 0x2273
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is greater than or equivalent to"]
+         then: [t: "is"]
+     - t: "greater than or equivalent to"
  - "≴":                                          # 0x2274
      - test: 
          if: "$Verbosity!='Terse'"
@@ -1097,11 +1091,13 @@
  - "≶":                                          # 0x2276
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is less than or greater than"]
+         then: [t: "is"]
+     - t: "less than or greater than"
  - "≷":                                          # 0x2277
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is greater than or less than"]
+         then: [t: "is"]
+     - t: "greater than or less than"
  - "≸":                                          # 0x2278
      - test: 
          if: "$Verbosity!='Terse'"
@@ -1123,11 +1119,13 @@
  - "⊂":                                          # 0x2282
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is a subset of"]
+         then: [t: "is a"]
+     - t: "subset of"
  - "⊃":                                          # 0x2283
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is asuperset of"]
+         then: [t: "is a"]
+     - t: "superset of"
  - "⊄":                                          # 0x2284
      - test: 
          if: "$Verbosity!='Terse'"
@@ -1141,11 +1139,13 @@
  - "⊆":                                          # 0x2286
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is a subset of or equal to"]
+         then: [t: "is a"]
+     - t: "subset of or equal to"
  - "⊇":                                          # 0x2287
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is a superset of or equal to"]
+         then: [t: "is a"]
+     - t: "superset of or equal to"
  - "⊈":                                          # 0x2288
      - test: 
          if: "$Verbosity!='Terse'"
@@ -1186,7 +1186,8 @@
  - "⊥":                                          # 0x22a5
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is bottom"]
+         then: [t: "is"]
+     - t: "bottom"
  - "⊦": [t: "reduces to"]                          # 0x22a6
  - "⊧": [t: "models"]                              # 0x22a7
  - "⊨":                                          # 0x22a8
@@ -1521,7 +1522,7 @@
  - "▢": [t: "white square with rounded corners"]   # 0x25a2
  - "▣": [t: "white square containing small black square"] # 0x25a3
  - "▤": [t: "square with horizontal fill"]         # 0x25a4
- - "▥": [t: "square with verticle fill"]           # 0x25a5
+ - "▥": [t: "square with vertical fill"]           # 0x25a5
  - "▦": [t: "square with orthogonal crosshatch fill"] # 0x25a6
  - "▧": [t: "square with upper left to lower right fill"] # 0x25a7
  - "▨": [t: "square with upper right to lower left fill"] # 0x25a8
@@ -1625,7 +1626,7 @@
  - "❪": [t: "medium flattened left parentheses ornament"] # 0x276a
  - "❫": [t: "medium flattened right parentheses ornament"] # 0x276b
  - "❬": [t: "medium left-pointing angle bracket ornament"] # 0x276c
- - "❭": [t: "medium right--pointing angle bracked ornament"] # 0x276d
+ - "❭": [t: "medium right-pointing angle bracket ornament"] # 0x276d
  - "❮": [t: "heavy left-pointing angle quotation mark ornament"] # 0x276e
  - "❯": [t: "heavy right-pointing angle quotation mark ornament"] # 0x276f
  - "❰": [t: "heavy left-pointing angle bracket ornament"] # 0x2770
@@ -1667,7 +1668,7 @@
  - "➔": [t: "heavy wide-headed rightwards arrow"]  # 0x2794
  - "➕": [t: "heavy plus sign"]                     # 0x2795
  - "➖": [t: "heavy minus sign"]                    # 0x2796
- - "➗": [t: "heavy divison sign"]                  # 0x2797
+ - "➗": [t: "heavy division sign"]                  # 0x2797
  - "➘": [t: "heavy south east arrow"]              # 0x2798
  - "➙": [t: "heavy rightwards arrow"]              # 0x2799
  - "➚": [t: "heavy north east arrow"]              # 0x279a
@@ -1711,7 +1712,8 @@
  - "⟂":                                          # 0x27c2
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is perpendicular to"]
+         then: [t: "is"]
+     - t: "perpendicular to"
  - "⟃":                                          # 0x27c3
      - test: 
          if: "$Verbosity!='Terse'"
@@ -1725,8 +1727,8 @@
  - "⟅": [t: "left s-shaped bag delimiter"]         # 0x27c5
  - "⟆": [t: "right s-shaped bag delimiter"]        # 0x27c6
  - "⟇": [t: "or with dot inside"]                  # 0x27c7
- - "⟈": [t: "reverse solidus preceeding subset"]   # 0x27c8
- - "⟉": [t: "superset preceeding solidus"]         # 0x27c9
+ - "⟈": [t: "reverse solidus preceding subset"]   # 0x27c8
+ - "⟉": [t: "superset preceding solidus"]         # 0x27c9
  - "⟊": [t: "vertical bar with horizontal stroke"] # 0x27ca
  - "⟋": [t: "mathematical rising diagonal"]        # 0x27cb
  - "⟌": [t: "long division"]                       # 0x27cc
@@ -1735,7 +1737,7 @@
  - "⟏": [t: "squared logical or"]                  # 0x27cf
  - "⟐": [t: "white diamond with centered dot"]     # 0x27d0
  - "⟑": [t: "and with dot"]                        # 0x27d1
- - "⟒": [t: "element of openning upwards"]         # 0x27d2
+ - "⟒": [t: "element of opening upwards"]         # 0x27d2
  - "⟓": [t: "lower right corner with dot"]         # 0x27d3
  - "⟔": [t: "upper left corner with dot"]          # 0x27d4
  - "⟕": [t: "left outer join"]                     # 0x27d5
@@ -1937,12 +1939,12 @@
  - "⦙": [t: "dotted fence"]                        # 0x2999
  - "⦚": [t: "vertical zigzag line"]                # 0x299a
  - "⦛": [t: "measured angle opening left"]         # 0x299b
- - "⦜": [t: "right angle varient with square"]     # 0x299c
+ - "⦜": [t: "right angle variant with square"]     # 0x299c
  - "⦝": [t: "measured right angle with dot"]       # 0x299d
  - "⦞": [t: "angle with s inside"]                 # 0x299e
  - "⦟": [t: "acute angle"]                         # 0x299f
- - "⦠": [t: "spehrical angle opening left"]        # 0x29a0
- - "⦡": [t: "spehrical angle opening up"]          # 0x29a1
+ - "⦠": [t: "spherical angle opening left"]        # 0x29a0
+ - "⦡": [t: "spherical angle opening up"]          # 0x29a1
  - "⦢": [t: "turned angle"]                        # 0x29a2
  - "⦣": [t: "reversed angle"]                      # 0x29a3
  - "⦤": [t: "angle with underbar"]                 # 0x29a4
@@ -2012,7 +2014,7 @@
  - "⧤": [t: "equals sign and slanted parallel with tilde above"] # 0x29e4
  - "⧥": [t: "identical to and slanted parallel"]   # 0x29e5
  - "⧦": [t: "gleich stark"]                        # 0x29e6
- - "⧧": [t: "thermydynamic"]                       # 0x29e7
+ - "⧧": [t: "thermodynamic"]                       # 0x29e7
  - "⧨": [t: "down pointing triangle with left half black"] # 0x29e8
  - "⧩": [t: "down pointing triangle with right half black"] # 0x29e9
  - "⧪": [t: "black diamond with down arrow"]       # 0x29ea
@@ -2214,13 +2216,13 @@
  - "⪮": [t: "equals sign with bumpy above"]        # 0x2aae
  - "⪯": [t: "precedes above single line equals sign"] # 0x2aaf
  - "⪰": [t: "succeeds above single line equals sign"] # 0x2ab0
- - "⪱": [t: "prededes above single line not equal to"] # 0x2ab1
+ - "⪱": [t: "precedes above single line not equal to"] # 0x2ab1
  - "⪲": [t: "succeeds above single line not equal to"] # 0x2ab2
  - "⪳": [t: "precedes above equals sign"]          # 0x2ab3
  - "⪴": [t: "succeeds above equals sign"]          # 0x2ab4
- - "⪵": [t: "prededes above not equal to"]         # 0x2ab5
+ - "⪵": [t: "precedes above not equal to"]         # 0x2ab5
  - "⪶": [t: "succeeds above not equal to"]         # 0x2ab6
- - "⪷": [t: "prededes above almost equal to"]      # 0x2ab7
+ - "⪷": [t: "precedes above almost equal to"]      # 0x2ab7
  - "⪸": [t: "succeeds above almost equal to"]      # 0x2ab8
  - "⪹": [t: "precedes above not almost equal to"]  # 0x2ab9
  - "⪺": [t: "succeeds above not almost equal to"]  # 0x2aba
@@ -2259,7 +2261,7 @@
  - "⫛": [t: "transversal intersection"]            # 0x2adb
  - "⫝̸": [t: "forking"]                             # 0x2adc
  - "⫝": [t: "nonforking"]                          # 0x2add
- - "⫞": [t: "shrot left tack"]                     # 0x2ade
+ - "⫞": [t: "short left tack"]                     # 0x2ade
  - "⫟": [t: "short down tack"]                     # 0x2adf
  - "⫠": [t: "short up tack"]                       # 0x2ae0
  - "⫡": [t: "perpendicular with s"]                # 0x2ae1
@@ -2346,7 +2348,7 @@
  - "⬲": [t: "left arrow with circled plus"]        # 0x2b32
  - "⬳": [t: "long leftwards squiggle arrow"]       # 0x2b33
  - "⬴": [t: "leftwards two headed arrow with vertical stroke"] # 0x2b34
- - "⬵": [t: "lettwards two headed arrow with double vertical stroke"] # 0x2b35
+ - "⬵": [t: "leftwards two headed arrow with double vertical stroke"] # 0x2b35
  - "⬶": [t: "leftwards two headed arrow from bar"] # 0x2b36
  - "⬷": [t: "leftwards two headed triple dash arrow"] # 0x2b37
  - "⬸": [t: "leftwards arrow with dotted stem"]    # 0x2b38
@@ -2361,11 +2363,11 @@
  - "⭁": [t: "reverse tilde operator above leftwards arrow"] # 0x2b41
  - "⭂": [t: "leftwards arrow above reverse almost equal to"] # 0x2b42
  - "⭃": [t: "rightwards arrow through greater than"] # 0x2b43
- - "⭄": [t: "rightwards arrow through superret"]   # 0x2b44
- - "⭅": [t: "leftwards quadurple arrow"]           # 0x2b45
+ - "⭄": [t: "rightwards arrow through superset"]   # 0x2b44
+ - "⭅": [t: "leftwards quadruple arrow"]           # 0x2b45
  - "⭆": [t: "rightwards quadruple arrow"]          # 0x2b46
  - "⭇": [t: "reverse tilde operator above rightwards arrow"] # 0x2b47
- - "⭈": [t: "rightwards arrow above rerverse almost equal to"] # 0x2b48
+ - "⭈": [t: "rightwards arrow above reverse almost equal to"] # 0x2b48
  - "⭉": [t: "tilde operator above leftwards arrow"] # 0x2b49
  - "⭊": [t: "leftwards arrow above almost equal to"] # 0x2b4a
  - "⭋": [t: "leftwards arrow above reverse tilde operator"] # 0x2b4b
@@ -2429,7 +2431,7 @@
  - "⸮": [t: "reversed question mark"]              # 0x2e2e
  - "ⸯ": [t: "vertical tilde"]                      # 0x2e2f
  - "⸰": [t: "ring point"]                          # 0x2e30
- - "⸱": [t: "word seperator middle dot"]           # 0x2e31
+ - "⸱": [t: "word separator middle dot"]           # 0x2e31
  - "⸲": [t: "turned comma"]                        # 0x2e32
  - "⸳": [t: "raised dot"]                          # 0x2e33
  - "⸴": [t: "raised comma"]                        # 0x2e34
@@ -2464,7 +2466,7 @@
  - "㉈": [t: "circled number ten on black square"]  # 0x3248
  - "㉉": [t: "circled number twenty on black square"] # 0x3249
  - "㉊": [t: "circled number thirty on black square"] # 0x324a
- - "㉋": [t: "circled number forty on blacks quare"] # 0x324b
+ - "㉋": [t: "circled number forty on blacks square"] # 0x324b
  - "㉌": [t: "circled number fifty on black square"] # 0x324c
  - "㉍": [t: "circled number sixty on black square"] # 0x324d
  - "㉎": [t: "circled number seventy on black square"] # 0x324e
@@ -2535,7 +2537,7 @@
  - "㎓": [t: "gigahertz"]                           # 0x3393
  - "㎔": [t: "terahertz"]                           # 0x3394
  - "㎕": [t: "microliters"]                         # 0x3395
- - "㎖": [t: "millileters"]                         # 0x3396
+ - "㎖": [t: "milliliters"]                         # 0x3396
  - "㎗": [t: "deciliters"]                          # 0x3397
  - "㎘": [t: "kiloliters"]                          # 0x3398
  - "㎙": [t: "femtometers"]                         # 0x3399
@@ -3008,7 +3010,7 @@
  - "": [t: "rightwards arrow over leftwards arrow right"] # 0xeb79
  - "": [t: "rightwards arrow over leftwards arrow left"] # 0xeb7a
  - "": [t: "leftwards arrow over rightwards arrow right"] # 0xeb7b
- - "": [t: "leftwards arrow over rightwards arrow leftt"] # 0xeb7c
+ - "": [t: "leftwards arrow over rightwards arrow left"] # 0xeb7c
  - "": [t: "upwards arrow from bar arrowhead"]    # 0xeb7d
  - "": [t: "upwards arrow from bar tail"]         # 0xeb7e
  - "": [t: "downwards arrow from bar tail"]       # 0xeb7f
@@ -3017,7 +3019,7 @@
  - "": [t: "upwards harpoon to the left of downwards harpoon bottom"] # 0xeb82
  - "": [t: "upwards harpoon to the left of downwards harpoon extender"] # 0xeb83
  - "": [t: "downwards harpoon to the left of upwards harpoon top"] # 0xeb84
- - "": [t: "upwards harppoon to the left of downwards harpoon top"] # 0xeb85
+ - "": [t: "upwards harpoon to the left of downwards harpoon top"] # 0xeb85
  - "": [t: "downwards harpoon to the left of the upwards harpoon extender"] # 0xeb86
  - "": [t: "downwards harpoon to the left of the upwards harpoon bottom"] # 0xeb87
  - "": [t: "upwards arrow leftwards of downwards arrow bottom"] # 0xeb88

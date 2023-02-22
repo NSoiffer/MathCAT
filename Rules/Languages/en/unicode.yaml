@@ -116,7 +116,12 @@
          if: "$Verbosity!='Terse'"
          then: [t: "is"]
      - t: "less than"
- - "=": [t: "equals"]                              # 0x3d
+ - "=":                                           # 0x3d
+    - test: 
+        if: "$Verbosity!='Terse'"
+        then: [t: "is equal to"]
+        else: [t: "equals"]
+
  - ">":                                          # 0x3e
      - test: 
          if: "$Verbosity!='Terse'"
@@ -458,15 +463,18 @@
  - "≡":                                          # 0x2261
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is identical to"]
+         then: [t: "is"]
+     - t: " identical to"
  - "≤":                                          # 0x2264
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is less than or equal to"]
+         then: [t: "is"]
+     - t:  "less than or equal to"
  - "≥":                                          # 0x2265
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is greater than or equal to"]
+         then: [t: "is"]
+     - t: "greater than or equal to"
  - "≦": [t: "less than over equal to"]             # 0x2266
  - "≧": [t: "greater than over equal to"]          # 0x2267
  - "≺": [t: "precedes"]                            # 0x227a
@@ -474,11 +482,13 @@
  - "⊂":                                          # 0x2282
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is a subset of"]
+         then: [t: "is a"]
+     - t: "subset of"
  - "⊃":                                          # 0x2283
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is a superset of"]
+         then: [t: "is a"]
+     - t: "superset of"
  - "⊄":                                          # 0x2284
      - test: 
          if: "$Verbosity!='Terse'"
@@ -492,8 +502,10 @@
  - "⊆":                                          # 0x2286
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is a subset of or equal to"]
+         then: [t: "is a"]
+     - t: "subset of or equal to"
  - "⊇":                                          # 0x2287
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "is a superset of or equal to"]
+         then: [t: "is a"]
+     - t: "superset of or equal to"
