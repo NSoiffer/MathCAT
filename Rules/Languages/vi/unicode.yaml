@@ -1,23 +1,23 @@
 ---
 
-#  - "a": 
-#     - test: 
-#         if: "$TTS='none'"
-#         then: [T: "a"]                         # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
-#         else: [SPELL: "a"]                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
+ - "a": 
+    - test: 
+        if: "$TTS='none'"
+        then: [T: "a"]                         # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
+        else: [SPELL: "a"]                     #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
  - "a-z": 
     - test: 
         if: "$TTS='none'"
         then: [T: "."]                          
         else: [spell: "'.'"]                       
 
-#  - "A":
-#     - test: 
-#         if: "$TTS='none'"
-#         then: [x: "$SpeechOverrides_CapitalLetters", t: "A"]                         # long "a" sound in all speech engines I tested (see above)
-#         else: [SPELL: "A"]
+ - "A":
+    - test: 
+        if: "$TTS='none'"
+        then: [x: "$SpeechOverrides_CapitalLetters", t: "A"]        # long "a" sound in all speech engines I tested (see above)
+        else: [SPELL: "A"]
 
- - "A-Z":
+ - "B-Z":
     - test: 
         if: "$CapitalLetters_Beep"
         then:
@@ -32,7 +32,7 @@
     - pitch:
         value: "$CapitalLetters_Pitch"
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
-        replace: [spell: "translate('.', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"]
+        replace: [spell: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]
 
  - "0-9": [T: "."]
 
