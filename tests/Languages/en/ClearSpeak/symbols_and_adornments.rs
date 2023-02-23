@@ -268,7 +268,7 @@ fn vertical_line_evaluated_at() {
             </msub>
         </math>";
     test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Auto", expr,
-        "f of x evaluated at x equals 5");
+        "f of x evaluated at, x is equal to 5");
 }
 
 #[test]
@@ -308,7 +308,7 @@ fn vertical_line_evaluated_at_divides() {
             </msub>
         </math>";
     test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Divides", expr,
-        "f of x evaluated at x equals 5");
+        "f of x evaluated at, x is equal to 5");
 }
 
 #[test]

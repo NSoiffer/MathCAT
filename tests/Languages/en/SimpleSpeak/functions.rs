@@ -180,7 +180,7 @@ fn no_times_sqrt() {
         <msqrt> <mrow>  <mi>a</mi><mi>b</mi></mrow> </msqrt>
         </mrow></math>";
     test("en", "SimpleSpeak", expr, 
-            "the square root of eigh; the square root of b; equals, the square root of eigh b end root,");
+            "the square root of eigh; the square root of b; is equal to, the square root of eigh b end root,");
 }
 
 /*

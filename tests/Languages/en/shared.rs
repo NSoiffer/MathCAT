@@ -194,7 +194,7 @@ fn ignore_period() {
       </annotation-xml>
     </semantics>  
   </math>";
-    test("en", "SimpleSpeak", expr, "cap p; open paren, cap eigh and cap b; close paren; equals; cap p, open paren, cap eigh intersection cap b; close paren; equals, cap p of cap eigh, cap p of cap b");
+    test("en", "SimpleSpeak", expr, "cap p; open paren, cap eigh and cap b; close paren; is equal to; cap p, open paren, cap eigh intersection cap b; close paren; is equal to, cap p of cap eigh, cap p of cap b");
 }
 
 #[test]
@@ -237,7 +237,7 @@ fn ignore_comma() {
       </mstyle>
     </mrow>
 </math>";
-    test("en", "SimpleSpeak", expr, "phi of x equals, c, e raised to the negative h squared x squared power");
+    test("en", "SimpleSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
 }
 
 #[test]
@@ -277,6 +277,6 @@ fn ignore_period_and_space() {
         </mstyle>
       </mrow>
 </math>";
-    test("en", "ClearSpeak", expr, "phi of x equals, c, e raised to the negative h squared x squared power");
+    test("en", "ClearSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
 }
 

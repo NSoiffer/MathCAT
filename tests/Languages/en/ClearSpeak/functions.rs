@@ -217,7 +217,7 @@ fn no_times_sqrt() {
         <mo>=</mo>
         <msqrt> <mrow>  <mi>a</mi><mi>b</mi></mrow> </msqrt>
         </mrow></math>";
-    test("en", "ClearSpeak", expr, "the square root of eigh; the square root of b; equals, the square root of eigh b,");
+    test("en", "ClearSpeak", expr, "the square root of eigh; the square root of b; is equal to, the square root of eigh b,");
 }
 
 #[test]
@@ -271,7 +271,7 @@ fn explicit_times_none_superscript() {
     </math>";
     test_ClearSpeak_prefs("en", 
         vec![("ClearSpeak_ImpliedTimes", "None"), ("ClearSpeak_Functions", "None")],
-        expr, "f open paren x close paren; equals, x squared, open paren x plus 1, close paren");
+        expr, "f open paren x close paren; is equal to; x squared, open paren x plus 1, close paren");
 }
 
 /*
