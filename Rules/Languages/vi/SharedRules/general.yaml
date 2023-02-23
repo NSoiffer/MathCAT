@@ -155,7 +155,7 @@
   #- test:
   #    if: "$Verbosity!='Terse'"
   #    then:
-  #    - t: "the"
+  #    - T: "the"
   - T: "điểm"
   - x: "*[1]"
   - T: "phẩy"
@@ -278,8 +278,8 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Terse'"
-        then: {t: super}
-        else: {t: superscript}
+        then: {T: chỉ số trên}
+        else: {T: chỉ số trên}
   - x: "*[2]"
   - pause: short
 
@@ -291,16 +291,16 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "dưới"}
-      else: {t: "dưới"}
+      then: {T: "chỉ số dưới"}
+      else: {T: "chỉ số dưới"}
   - x: "*[2]"
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then:
       - test:
           if: "$Verbosity='Terse'"
-          then: {t: "kết thúc bên dưới"}        # (en: "end sub")
-          else: {t: "chỉ số cuối"}              # (en: "end subscript")
+          then: {T: "hết chỉ số dưới"}        # (en: "end sub")
+          else: {T: "hết chỉ số dưới"}              # (en: "end subscript")
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -309,8 +309,8 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Terse'"
-        then: {t: "super"}
-        else: {t: "superscript"}
+        then: {T: "chỉ số trên"}
+        else: {T: "chỉ số trên"}
   - x: "*[3]"
   - pause: short
 
@@ -532,7 +532,7 @@
       if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
       then: {T: định thức}
       else: {T: ma trận}
-    #   - ot: the
+    #   - OT: the
   - T: "1 1"
   - T: có đầu vào là
   - x: "*[1]/*"
