@@ -277,14 +277,51 @@ fn get_element_from_token<'b, 'r, 'c, 's:'c, 'm:'c>(
             rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>,
             lex_state: &mut LexState<'b>,
             mathml: Element<'c>) -> Result<Element<'m>> {
+    let doc = rules_with_context.get_document();
     return match lex_state.token {
         Token::None => bail!("Illegal 'intent' value: empty string"),
         Token::Terminal(str) => bail!("Illegal 'intent' syntax: expected number, name, function but found {}", str),
-        Token::NCName(str) | Token::Number(str) => {
-            let result = create_mathml_element(&rules_with_context.get_document(), LITERAL_NAME);
+        Token::NCName(str) => {
+            let result = create_mathml_element(&doc, LITERAL_NAME);
             result.set_text(str);
             Ok(result)
         },
+        Token::Number(str) => {
+            // really ugly hack to make this seem like the canonicalization and inference happened for negative numbers
+            if str.starts_with('-') {
+                let preceding = mathml.preceding_siblings();
+                let use_prefix_form = if preceding.is_empty() {
+                    true
+                } else {
+                    let previous_child = as_element(preceding[preceding.len()-1]);
+                    debug!("previous child: name={}, text='{}'", name(&previous_child)=="mo", as_text(previous_child));
+                    !(name(&previous_child)=="mo" && as_text(previous_child)=="\u{2062}")
+                };
+                if use_prefix_form {
+                    let negative = create_mathml_element(&doc, "negative");
+                    let mn = create_mathml_element(&doc, "mn");
+                    mn.set_text(&str[1..]);
+                    negative.append_child(mn);
+                    Ok(negative)
+                } else {
+                    // not much that can be done -- the preceding child (maybe an invisible times) has already been processed by speech rules
+                    // so there is no way to get the structure right. We put out an mrow with '-' number in it, but that not right
+                    // convert previous invisible times into '-' and return the number
+                    let mrow = create_mathml_element(&doc, "mrow");
+                    let mo = create_mathml_element(&doc, "mo");
+                    mo.set_text("-");
+                    let mn = create_mathml_element(&doc, "mn");
+                    mn.set_text(&str[1..]);
+                    mrow.append_children([mo,mn]);
+                    Ok(mrow)
+                }
+            } else {
+                // treat as a name
+                let result = create_mathml_element(&doc, LITERAL_NAME);
+                result.set_text(str);
+                Ok(result)
+            }
+        }
         Token::ArgRef(str) => {
             match find_arg(rules_with_context, &str[1..], mathml, true, false)? {
                 Some(e) => Ok(e),
