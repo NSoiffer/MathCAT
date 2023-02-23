@@ -35,7 +35,7 @@
 
 
 # Rules for speaking what happens when moving into or out of a notation
-- name: into
+- name: into-or-out-of
   tag: mfrac
   match: "$Move2D != ''"
   replace:
@@ -46,7 +46,7 @@
       else: [{T: "penyebut"}]
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: msqrt
   match: "$Move2D != ''"
   replace:
@@ -54,7 +54,7 @@
   - T: "akar kuadrat"
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: mroot
   match: "$Move2D != ''"
   replace:
@@ -65,7 +65,7 @@
       else: [{T: "akar pangkat"}]
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: msub
   match: "$Move2D != ''"
   replace:
@@ -76,7 +76,7 @@
       else: [{T: "indeks"}]
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: msup
   match: "$Move2D != ''"
   replace:
@@ -87,7 +87,7 @@
       else: [{T: "pangkat"}] # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: msubsup
   match: "$Move2D != ''"
   replace:
@@ -100,7 +100,7 @@
       else: [{T: "pangkat"}] # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: munder
   match: "$Move2D != ''"
   replace:
@@ -111,7 +111,7 @@
       else: [{T: "batas bawah"}]
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: mover
   match: "$Move2D != ''"
   replace:
@@ -122,7 +122,7 @@
       else: [{T: "batas atas"}]
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: munderover
   match: "$Move2D != ''"
   replace:
@@ -135,7 +135,7 @@
       else: [{T: "batas atas"}]
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: mmultiscripts
   match: "$Move2D != ''"
   replace:
@@ -156,7 +156,7 @@
           else: [{T: "pangkat"}]
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: mtd
   match: "$Move2D = 'into'"
   replace:
@@ -165,7 +165,7 @@
   - x: "count($Child2D/preceding-sibling::*)+1"
   - pause: "medium"
 
-- name: into
+- name: into-or-out-of
   tag: [mtr, mlabeledtr]
   match: "$Move2D = 'into'"
   replace:
@@ -505,8 +505,6 @@
 
 # ********* MoveStart/End  ***************
 - name: math-move-to-start-or-end
-
-
   tag: math
   match: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart' or $NavCommand = 'MoveEnd' or $NavCommand = 'MoveLineEnd'"
   replace:
@@ -528,27 +526,47 @@
       - test:
           if: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart'"
           then:
-          - set_variables: [{NavCommand: "'MoveNextZoom'"}]
-          - x: "*[1]"
+          # move inside of the mrow inside of 'math' or inside the fraction, etc  (hence two levels down)
+          - with:
+              variables: [{NavCommand: "'MoveNextZoom'"}]
+              replace: [x: "*[1]/*[1]"]
           else:
-          - set_variables: [{NavCommand: "'MovePreviousZoom'"}]
-          - x: "*[last()]"
+          - with:
+              variables: [{NavCommand: "'MovePreviousZoom'"}]
+              replace: [x: "*[last()]/*[last()]"]
 
+# We stop when the parent is 2d (e.g., frac), but not if in leaf base of msub/msup/msubsup because that's really on the same line
 - name: move-to-start-or-end-2d
   tag: "*"
-  match: "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and IsNode(.., '2D')"
+  match:
+  - "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and IsNode(.., '2D') and"
+  - "not( IsNode(., 'leaf') and(parent::m:msub or parent::m:msup or parent::m:msubsup) )"
   replace:
+  - test:
+      if: "$NavVerbosity = 'Verbose'"
+      then:
+      - test:
+          if: "$NavCommand = 'MoveLineStart'"
+          then: [{T: "pindah ke awal baris"}]
+          else: [{T: "pindah ke akhir baris"}] # "$NavCommand = 'MoveLineEnd'"
+      - pause: "medium"
   - test:
       if: "self::m:mrow"
       then_test:
         if: "$NavCommand = 'MoveLineStart'"
-        then: [{set_variables: [{NavNode: "*[1]/@id"}]}]
-        else: [{set_variables: [{NavNode: "*[last()]/@id"}]}]
+        then:
+        - with:
+            variables: [{NavCommand: "'MoveNextZoom'"}]
+            replace: [x: "*[1]"]
+        else:
+        - with:
+            variables: [{NavCommand: "'MovePreviousZoom'"}]
+            replace: [x: "*[last()]"]
       else: [{set_variables: [{NavNode: "@id"}]}]
 
 - name: move-to-start-or-end-default
   tag: "*"
-  match: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart' or $NavCommand = 'MoveEnd'   or $NavCommand = 'MoveLineEnd'"
+  match: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart' or $NavCommand = 'MoveEnd' or $NavCommand = 'MoveLineEnd'"
   replace:
   - with:
       variables: [{MatchCounter: "$MatchCounter + 1"}]
@@ -1224,8 +1242,8 @@
       then:
       - T: "tidak dapat pindah ke kiri"
   - with:
-    variables: [{Move2D: "'end of'"}, {Child2D: "$EdgeNode/*[1]"}]
-    replace: [{x: "$EdgeNode"}]
+      variables: [{Move2D: "'end of'"}, {Child2D: "$EdgeNode/*[1]"}]
+      replace: [{x: "$EdgeNode"}]
   - pause: long
 
 - name: move-previous-no-auto-zoom-at-edge-of-math

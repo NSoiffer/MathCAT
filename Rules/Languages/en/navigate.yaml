@@ -505,8 +505,6 @@
 
 # ********* MoveStart/End  ***************
 - name: math-move-to-start-or-end
-
-
   tag: math
   match: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart' or $NavCommand = 'MoveEnd' or $NavCommand = 'MoveLineEnd'"
   replace:
@@ -528,27 +526,47 @@
       - test:
           if: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart'"
           then:
-          - set_variables: [{NavCommand: "'MoveNextZoom'"}]
-          - x: "*[1]"
+          # move inside of the mrow inside of 'math' or inside the fraction, etc  (hence two levels down)
+          - with:
+              variables: [{NavCommand: "'MoveNextZoom'"}]
+              replace: [x: "*[1]/*[1]"]
           else:
-          - set_variables: [{NavCommand: "'MovePreviousZoom'"}]
-          - x: "*[last()]"
+          - with:
+              variables: [{NavCommand: "'MovePreviousZoom'"}]
+              replace: [x: "*[last()]/*[last()]"]
 
+# We stop when the parent is 2d (e.g., frac), but not if in leaf base of msub/msup/msubsup because that's really on the same line
 - name: move-to-start-or-end-2d
   tag: "*"
-  match: "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and IsNode(.., '2D')"
+  match:
+  - "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and IsNode(.., '2D') and"
+  - "not( IsNode(., 'leaf') and(parent::m:msub or parent::m:msup or parent::m:msubsup) )"
   replace:
+  - test:
+      if: "$NavVerbosity = 'Verbose'"
+      then:
+      - test:
+          if: "$NavCommand = 'MoveLineStart'"
+          then: [{t: "move to start of line"}]
+          else: [{t: "move to end of line"}] # "$NavCommand = 'MoveLineEnd'"
+      - pause: "medium"
   - test:
       if: "self::m:mrow"
       then_test:
         if: "$NavCommand = 'MoveLineStart'"
-        then: [{set_variables: [{NavNode: "*[1]/@id"}]}]
-        else: [{set_variables: [{NavNode: "*[last()]/@id"}]}]
+        then:
+        - with:
+            variables: [{NavCommand: "'MoveNextZoom'"}]
+            replace: [x: "*[1]"]
+        else:
+        - with:
+            variables: [{NavCommand: "'MovePreviousZoom'"}]
+            replace: [x: "*[last()]"]
       else: [{set_variables: [{NavNode: "@id"}]}]
 
 - name: move-to-start-or-end-default
   tag: "*"
-  match: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart' or $NavCommand = 'MoveEnd'   or $NavCommand = 'MoveLineEnd'"
+  match: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart' or $NavCommand = 'MoveEnd' or $NavCommand = 'MoveLineEnd'"
   replace:
   - with:
       variables: [{MatchCounter: "$MatchCounter + 1"}]
