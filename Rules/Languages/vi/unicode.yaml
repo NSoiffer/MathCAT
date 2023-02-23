@@ -3,20 +3,41 @@
  - "a": 
     - test: 
         if: "$TTS='none'"
-        then: [T: "a"]                         # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
-        else: [SPELL: "a"]                     #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
- - "a-z": 
+        then: [t: "eigh"]                         # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
+        else: [spell: "'a'"]                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
+ - "b-z": 
     - test: 
         if: "$TTS='none'"
         then: [T: "."]                          
         else: [spell: "'.'"]                       
 
+ # Capital letters are a little tricky: users can pick their favorite word (something that was requested) and 
+ # screen readers have options to use pitch changes or beeps instead of or in addition to say "cap"
+ # Also, if a user can see the screen, they probably don't need to hear "cap", but if they specified an override, they must want to hear the override.
+
  - "A":
     - test: 
-        if: "$TTS='none'"
-        then: [x: "$SpeechOverrides_CapitalLetters", t: "A"]        # long "a" sound in all speech engines I tested (see above)
-        else: [SPELL: "A"]
-
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [t: "chữ hoa"]
+          else: [x: "$SpeechOverrides_CapitalLetters"]
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        replace:
+        - test:
+            if: "$TTS='none'"
+            then: [t: "eigh"]
+            else: [spell: "'a'"]
+            
  - "B-Z":
     - test: 
         if: "$CapitalLetters_Beep"
@@ -27,8 +48,11 @@
     - test: 
         if: "$CapitalLetters_UseWord"
         then_test:
-          if: "$SpeechOverrides_CapitalLetters != ''"
-          then: [x: "$SpeechOverrides_CapitalLetters"] 
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [t: "chữ hoa"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
