@@ -53,175 +53,137 @@ fn main() {
   //     </msup>
   //       </math>
   //     ";
-  // let expr = "<math>
-  //     <mrow intent='$op($a,$b)'>
+  // let expr = "<mrow intent='pre@prefix(in@infix($a, x))(post@postfix($b))'>
   //     <mi arg='a'>A</mi>
-  //     <mover arg='op' intent='$U27F6($U2245)'>
-  //         <mo movablelimits='false' arg='U27F6' intent='map'>⟶</mo>
-  //         <mo arg='U2245' intent='congruence'>≅</mo>
+  //     <mover>
+  //         <mo intent='map'>⟶</mo>
+  //         <mo intent='congruence'>≅</mo>
   //     </mover>
   //     <mi arg='b'>B</mi>
-  //   </mrow>
-  // </math>";
+  //   </mrow>";
   // let expr = "<math><mi>Na</mi><mi>S</mi><mo>(</mo><mi>l</mi><mo>)</mo></math>";
 
-// let expr = "
-//     <math xmlns='http://www.w3.org/1998/Math/MathML' display='block'>
-//       <mrow data-mjx-texclass='ORD'>
-//         <mfrac>
-//           <mrow>
-//     <mi>X</mi>      </mrow>
-//           <mrow>
-//             <mo stretchy='false'>[</mo>
-//             <mrow data-mjx-texclass='ORD'>
-//               <mi data-mjx-auto-op='false'>HAc</mi>
-//             </mrow>
-//             <mo stretchy='false'>]</mo>
-//           </mrow>
-//         </mfrac>
-//       </mrow>
-//     </math>
-// ";
 
-  // let expr = "<math>
-  //   <mrow>
-  //     <msup>
-  //       <mi>e</mi>
+  // let expr = "<math xmlns='http://www.w3.org/1998/Math/MathML' display='block'>
+  //     <mrow>
+  //       <mo stretchy='false'>[</mo>
   //       <mrow>
-  //         <mo>&#x2212;</mo>
-  //         <mfrac>
-  //           <mn>1</mn>
-  //           <mn>2</mn>
-  //         </mfrac>
-  //         <msup>
-  //           <mrow>
-  //             <mrow>
-  //               <mo>(</mo>
-  //               <mrow>
-  //                 <mfrac>
-  //                   <mrow>
-  //                     <mi>x</mi>
-  //                     <mo>&#x2212;</mo>
-  //                     <mi>&#x03BC;</mi>
-  //                   </mrow>
-  //                   <mi>&#x03C3;</mi>
-  //                 </mfrac>
-  //               </mrow>
-  //               <mo>)</mo>
-  //             </mrow>
-  //           </mrow>
-  //           <mn>2</mn>
-  //         </msup>
+  //         <mi>Co</mi>
   //       </mrow>
-  //     </msup>
-  //   </mrow>
-  // </math>";
-  // let expr = "<math ><mo>(</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi><mo>)</mo></math>";
-  // let expr= "<math> <msup><mi>𝛡</mi> <mn>23</mn></msup></math>";  // loads full
-//   let expr = "<math xmlns='http://www.w3.org/1998/Math/MathML' display='block'>
-//   <mrow>
-//     <mo stretchy='false'>[</mo>
-//     <mrow>
-//       <mi>Co</mi>
+  //       <mo stretchy='false'>(</mo>
+  //       <mrow>
+  //         <mi>NH</mi>
+  //       </mrow>
+  //       <msub>
+  //         <mrow>
+  //           <mrow>
+  //             <mpadded width='0'>
+  //               <mphantom>
+  //                 <mi>A</mi>
+  //               </mphantom>
+  //             </mpadded>
+  //           </mrow>
+  //         </mrow>
+  //         <mrow>
+  //           <mrow>
+  //             <mpadded height='0'>
+  //               <mn>3</mn>
+  //             </mpadded>
+  //           </mrow>
+  //         </mrow>
+  //       </msub>
+  //       <mo stretchy='false'>)</mo>
+  //       <msub>
+  //         <mrow>
+  //           <mrow>
+  //             <mpadded width='0'>
+  //               <mphantom>
+  //                 <mi>A</mi>
+  //               </mphantom>
+  //             </mpadded>
+  //           </mrow>
+  //         </mrow>
+  //         <mrow>
+  //           <mrow>
+  //             <mpadded height='0'>
+  //               <mn>6</mn>
+  //             </mpadded>
+  //           </mrow>
+  //         </mrow>
+  //       </msub>
+  //       <mo stretchy='false'>]</mo>
+  //       <msup>
+  //         <mrow>
+  //           <mrow>
+  //             <mpadded width='0'>
+  //               <mphantom>
+  //                 <mi>A</mi>
+  //               </mphantom>
+  //             </mpadded>
+  //           </mrow>
+  //         </mrow>
+  //         <mrow>
+  //           <mn>3</mn>
+  //           <mo>+</mo>
+  //         </mrow>
+  //       </msup>
+  //       <mtext>&#xA0;</mtext>
+  //       <mo stretchy='false'>(</mo>
+  //       <mrow>
+  //         <mi>Cl</mi>
+  //       </mrow>
+  //       <msub>
+  //         <mrow>
+  //           <mrow>
+  //             <mpadded width='0'>
+  //               <mphantom>
+  //                 <mi>A</mi>
+  //               </mphantom>
+  //             </mpadded>
+  //           </mrow>
+  //         </mrow>
+  //         <mrow>
+  //           <mrow>
+  //             <mpadded height='0'>
+  //               <mn>3</mn>
+  //             </mpadded>
+  //           </mrow>
+  //         </mrow>
+  //       </msub>
+  //       <mo stretchy='false'>)</mo>
+  //       <msup>
+  //         <mrow>
+  //           <mrow>
+  //             <mpadded width='0'>
+  //               <mphantom>
+  //                 <mi>A</mi>
+  //               </mphantom>
+  //             </mpadded>
+  //           </mrow>
+  //         </mrow>
+  //         <mrow>
+  //           <mo>&#x2212;</mo>
+  //         </mrow>
+  //       </msup>
+  //     </mrow>
+  //   </math>";
+  let expr="<math>
+  <mn>23</mn>
+  <mi intent='-3'>aaaaaa</mi>
+  </math>";
+//   let expr = "
+//   <math display='block'>
+//   <mrow displaystyle='true' data-changed='added'>
+//     <mrow data-changed='added'>
+//       <mi>A</mi>
+//       <mo data-changed='added'>&#x2062;</mo>
+//       <mi>x</mi>
 //     </mrow>
-//     <mo stretchy='false'>(</mo>
-//     <mrow>
-//       <mi>NH</mi>
-//     </mrow>
-//     <msub>
-//       <mrow>
-//         <mrow>
-//           <mpadded width='0'>
-//             <mphantom>
-//               <mi>A</mi>
-//             </mphantom>
-//           </mpadded>
-//         </mrow>
-//       </mrow>
-//       <mrow>
-//         <mrow>
-//           <mpadded height='0'>
-//             <mn>3</mn>
-//           </mpadded>
-//         </mrow>
-//       </mrow>
-//     </msub>
-//     <mo stretchy='false'>)</mo>
-//     <msub>
-//       <mrow>
-//         <mrow>
-//           <mpadded width='0'>
-//             <mphantom>
-//               <mi>A</mi>
-//             </mphantom>
-//           </mpadded>
-//         </mrow>
-//       </mrow>
-//       <mrow>
-//         <mrow>
-//           <mpadded height='0'>
-//             <mn>6</mn>
-//           </mpadded>
-//         </mrow>
-//       </mrow>
-//     </msub>
-//     <mo stretchy='false'>]</mo>
-//     <msup>
-//       <mrow>
-//         <mrow>
-//           <mpadded width='0'>
-//             <mphantom>
-//               <mi>A</mi>
-//             </mphantom>
-//           </mpadded>
-//         </mrow>
-//       </mrow>
-//       <mrow>
-//         <mn>3</mn>
-//         <mo>+</mo>
-//       </mrow>
-//     </msup>
-//     <mtext>&#xA0;</mtext>
-//     <mo stretchy='false'>(</mo>
-//     <mrow>
-//       <mi>Cl</mi>
-//     </mrow>
-//     <msub>
-//       <mrow>
-//         <mrow>
-//           <mpadded width='0'>
-//             <mphantom>
-//               <mi>A</mi>
-//             </mphantom>
-//           </mpadded>
-//         </mrow>
-//       </mrow>
-//       <mrow>
-//         <mrow>
-//           <mpadded height='0'>
-//             <mn>3</mn>
-//           </mpadded>
-//         </mrow>
-//       </mrow>
-//     </msub>
-//     <mo stretchy='false'>)</mo>
-//     <msup>
-//       <mrow>
-//         <mrow>
-//           <mpadded width='0'>
-//             <mphantom>
-//               <mi>A</mi>
-//             </mphantom>
-//           </mpadded>
-//         </mrow>
-//       </mrow>
-//       <mrow>
-//         <mo>&#x2212;</mo>
-//       </mrow>
-//     </msup>
+//     <mo>+</mo>
+//     <mi>b</mi>
 //   </mrow>
-// </math>";
-  let expr= "<math> <mi>A</mi></math>";
+//  </math>
+//     ";
   // let expr= "<math><mrow><mfrac><mn>1</mn><mn>3</mn></mfrac><mo ame-texclass='bin' stretchy='false'>&#x22C5;</mo><mfrac><mn>85</mn><mn>124</mn></mfrac><mo ame-texclass='bin' stretchy='false'>+</mo><mfrac><mn>2</mn><mn>7</mn></mfrac><mo ame-texclass='bin' stretchy='false'>&#x22C5;</mo><mfrac><mn>39</mn><mn>124</mn></mfrac><mo ame-texclass='bin' stretchy='false'>+</mo><mfrac><mn>5</mn><mn>7</mn></mfrac></mrow></math>";
   let instant = Instant::now();
   let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../../Rules");
@@ -231,8 +193,8 @@ fn main() {
 
   info!("Version = '{}'", get_version());
   set_preference("Language".to_string(), "en".to_string()).unwrap();
-  set_preference("TTS".to_string(), "ssml".to_string()).unwrap();
-  set_preference("Verbosity".to_string(), "terse".to_string()).unwrap();
+  set_preference("TTS".to_string(), "none".to_string()).unwrap();
+  set_preference("Verbosity".to_string(), "Medium".to_string()).unwrap();
   set_preference("Impairment".to_string(), "Blindness".to_string()).unwrap();
   // set_preference("SpeechOverrides_CapitalLetters".to_string(), "".to_string()).unwrap();
   // set_preference("CapitalLetters_UseWord".to_string(), "true".to_string()).unwrap();
@@ -241,7 +203,7 @@ fn main() {
   // set_preference("MathRate".to_string(), "77".to_string()).unwrap();
   
   set_preference("Bookmark".to_string(), "false".to_string()).unwrap();
-  set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+  set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
   if let Err(e) = set_mathml(expr.to_string()) {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   };
@@ -272,6 +234,6 @@ fn main() {
   //   Err(e) => panic!("{}", errors_to_string(&e)),
   // }
   // // let xpath_counts = libmathcat::speech::xpath_count();
-  // // info!("# xpaths = {}; dups = {}", xpath_counts.0, xpath_counts.1);
+  // // info!("#xpath = {}; duplicates = {}", xpath_counts.0, xpath_counts.1);
   // info!("Time taken (second time for speech + braille): {}ms", instant.elapsed().as_millis());
 }
