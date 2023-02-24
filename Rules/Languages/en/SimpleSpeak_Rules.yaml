@@ -243,7 +243,6 @@
       - x: "*[1]"
 
 - name: times
-
   tag: mo
   match:
   # say "times" when invisible times is followed by parens or a superscript that has a base with parens or "|"s
