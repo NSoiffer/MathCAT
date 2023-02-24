@@ -436,12 +436,21 @@
   replace:
   - x: "*[1]"
 
+# handling of negative numbers is hard -- we do something that is close to right here
+- name: intent-literal-negative-number
+  tag: "intent-literal"
+  match: "starts-with(text(), '-')" 
+  replace:
+  - T: "trừ"
+  - x: "translate(text(), '-_.', ' ')"   # more accurate to translate "-" to nothing, but turning it into a space should be ok
+
 - name: intent-literal
   # unknown leaf -- just speak the text -- could be a literal intent
   tag: "intent-literal"
   match: "."
   replace:
   - x: "translate(text(), '-_.', '  ')"
+
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: silent-intent

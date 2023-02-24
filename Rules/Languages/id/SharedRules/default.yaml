@@ -436,7 +436,16 @@
   replace:
   - x: "*[1]"
 
-- name: default-text
+# handling of negative numbers is hard -- we do something that is close to right here
+- name: intent-literal-negative-number
+  # unknown leaf -- just speak the text -- could be a literal intent
+  tag: "intent-literal"
+  match: "starts-with(text(), '-')" 
+  replace:
+  - T: "kurang"
+  - x: "translate(text(), '-_.', ' ')"   # more accurate to translate "-" to nothing, but turning it into a space should be ok
+
+- name: intent-literal
   # unknown leaf -- just speak the text -- could be a literal intent
   tag: "intent-literal"
   match: "."
