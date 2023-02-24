@@ -23,7 +23,6 @@
         then: [t: "dấu phẩy"]                   	# 	(en: 'comma')
         # else silent
 
- - "-": [t: "dấu trừ"]                          	#  0x2d	(en: 'minus')
  - ".": [t: "điểm"]                             	#  0x2e	(en: 'point')
  - "/": [t: "chia"]                             	#  0x2f	(en: 'divided by')
  - ":": [t: "đại tràng"]                        	#  0x3a	(en: 'colon')
