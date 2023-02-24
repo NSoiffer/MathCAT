@@ -485,30 +485,52 @@ pub fn trim_element(e: &Element) {
 
         // gather up the text
         let mut text ="".to_string();
+        let mut previous_element_was_text = false;
         for child in children {
-            match child {
-                ChildOfElement::Element(e) => {
-                    if name(&e) == "mglyph" {
-                        text += e.attribute_value("alt").unwrap_or("");
+            let (child_text, space) = match child {
+                ChildOfElement::Element(child) => {
+                    previous_element_was_text = false;
+                    if name(&child) == "mglyph" {
+                        (child.attribute_value("alt").unwrap_or("").to_string(), " ")
                     } else {
-                        make_leaf_element(e);
-                        match e.children()[0] {
-                            ChildOfElement::Text(t) => text += t.text(),
-                            _ => panic!("as_text: internal error -- make_leaf_element found non-text child"),
-                        }
+                        (gather_text(child), " ")
                     }
-                }
-                ChildOfElement::Text(t) => text += t.text(),
-                _ => (),
-            }
+                },
+                ChildOfElement::Text(t) => {
+                    let space = !previous_element_was_text;
+                    previous_element_was_text = true;
+                    (t.text().to_string(), if space {" "} else {""})
+                },
+                _ => ("".to_string(), ""),
+            };
+            if !child_text.is_empty() {
+                // hack to avoid non-breaking whitespace from being removed -- move to a unique non-whitespace
+                text = text + space + child_text.replace(' ', TEMP_NBSP).trim_start();
+            } 
+
         }
 
         // get rid of the old children and replace with the text we just built
         mathml_leaf.clear_children();
 
-        // hack to avoid non-breaking whitespace from being removed -- move to a unique non-whitespace char then back
-        let trimmed_text = text.replace(' ', TEMP_NBSP).trim().replace(TEMP_NBSP, " ");
+        // move hack back to non-breaking whitespace
+        let trimmed_text = text.trim().replace(TEMP_NBSP, " ");
         mathml_leaf.set_text(&trimmed_text);
+
+        /// gather up all the contents of the element and return them with a leading space
+        fn gather_text(html: Element) -> String {
+            let mut text = "".to_string();      // since we are throwing out the element tag, add a space between the contents
+            for child in html.children() {
+                match child {
+                    ChildOfElement::Element(child) => {
+                        text = text + " " + gather_text(child).trim_start();
+                    },
+                    ChildOfElement::Text(t) => text += t.text(),
+                    _ => (),
+                }
+            }
+            return text;
+        }
     }
 }
 
@@ -641,20 +663,22 @@ pub fn is_same_element(e1: &Element, e2: &Element) -> Result<()> {
 
 #[cfg(test)]
 mod tests {
+	#[allow(unused_imports)]
+	use super::super::init_logger;
     use super::*;
     
-    fn are_parsed_strs_equal(str1: &str, str2: &str) -> bool {
-        let package1 = &parser::parse(str1).expect("Failed to parse input");
-        let doc1 = package1.as_document();
-        trim_doc(&doc1);
-        debug!("doc1:\n{}", mml_to_string(&get_element(&package1)));
+    fn are_parsed_strs_equal(test: &str, target: &str) -> bool {
+        let target_package = &parser::parse(target).expect("Failed to parse input");
+        let target_doc = target_package.as_document();
+        trim_doc(&target_doc);
+        debug!("target:\n{}", mml_to_string(&get_element(&target_package)));
         
-        let package2 = parser::parse(str2).expect("Failed to parse input");
-        let doc2 = package2.as_document();
-        trim_doc(&doc2);
-        debug!("doc2:\n{}", mml_to_string(&get_element(&package2)));
-    
-        match is_same_doc(&doc1, &doc2) {
+        let test_package = &parser::parse(test).expect("Failed to parse input");
+        let test_doc = test_package.as_document();
+        trim_doc(&test_doc);
+        debug!("test:\n{}", mml_to_string(&get_element(&test_package)));
+
+        match is_same_doc(&test_doc, &target_doc) {
 			Ok(_) => return true,
 			Err(e) => panic!("{}", e),
 		}
@@ -704,9 +728,9 @@ mod tests {
             </math>";
         let result_str = "<math>
             <mrow>
-                <mi>X23braid</mi>
+                <mi>X 23braid</mi>
                 <mo>+</mo>
-                <mi>132braidY</mi>
+                <mi>132braid Y</mi>
                 <mo>=</mo>
                 <mi>13braid</mi>
             </mrow>
@@ -759,5 +783,33 @@ mod tests {
         assert!(set_rules_dir("someInvalidRulesDir".to_string()).is_err());
         assert!(set_rules_dir(super::super::abs_rules_dir_path()).is_ok());
         assert!(set_mathml("<math><mn>1</mn></math>".to_string()).is_ok());
+    }
+
+    #[test]
+    fn single_html_in_mtext() {
+        let test = "<math><mn>1</mn> <mtext>a<p>para 1</p>aa</mtext> <mi>y</mi></math>";
+        let target = "<math><mn>1</mn> <mtext>a para 1 aa</mtext> <mi>y</mi></math>";
+        assert!(are_parsed_strs_equal(test, target));
+    }
+
+    #[test]
+    fn multiple_html_in_mtext() {
+        let test = "<math><mn>1</mn> <mtext>a<p>para 1</p><p>para 2</p>aa</mtext> <mi>y</mi></math>";
+        let target = "<math><mn>1</mn> <mtext>a para 1 para 2 aa</mtext> <mi>y</mi></math>";
+        assert!(are_parsed_strs_equal(test, target));
+    }
+
+    #[test]
+    fn nested_html_in_mtext() {
+        let test = "<math><mn>1</mn> <mtext>a<ol><li>first</li><li>second</li></ol>aa</mtext> <mi>y</mi></math>";
+        let target = "<math><mn>1</mn> <mtext>a first second aa</mtext> <mi>y</mi></math>";
+        assert!(are_parsed_strs_equal(test, target));
+    }
+
+    #[test]
+    fn empty_html_in_mtext() {
+        let test = "<math><mn>1</mn> <mtext>a<br/>aa</mtext> <mi>y</mi></math>";
+        let target = "<math><mn>1</mn> <mtext>a aa</mtext> <mi>y</mi></math>";
+        assert!(are_parsed_strs_equal(test, target));
     }
 }
