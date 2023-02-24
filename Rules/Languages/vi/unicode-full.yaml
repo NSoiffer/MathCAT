@@ -23,6 +23,7 @@
         then: [t: "dấu phẩy"]                   	# 	(en: 'comma')
         # else silent
 
+ - "-": [t: "dấu trừ"]                          	#  0x2d	(en: 'minus')
  - ".": [t: "điểm"]                             	#  0x2e	(en: 'point')
  - "/": [t: "chia"]                             	#  0x2f	(en: 'divided by')
  - ":": [t: "đại tràng"]                        	#  0x3a	(en: 'colon')
@@ -380,6 +381,7 @@
     - test:
         if: $Verbosity!='Terse' and "not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])" 
         then: [t: "của"]                        	# 	(en: 'of')
+ - "⁢": [t: ""]                                 	#  0x2062
  - "⁣": [t: ""]                                 	#  0x2063
  - "⁤": [t: "và"]                               	#  0x2064	(en: 'and')
  - "⁰": [T: "mũ không"]                         	#   0x2070	(en: 'to the zeroth power')
@@ -982,7 +984,7 @@
          if: "$Verbosity!='Terse'"
          then: [t: "là tương đương với"]        	# 	(en: 'is equiangular to')
  - "≛": [t: "ngôi sao bằng"]                    	#  0x225b	(en: 'star equals')
- - "≜": [t: "delta bằng"]                       	#  0x225c	(en: 'delta equals')
+ - "≜": [t: "đen ta bằng"]                       	#  0x225c	(en: 'delta equals')
  - "≝": [t: "được xác định là được"]            	#  0x225d	(en: 'is defined to be')
  - "≞":                                         	#  0x225e
      - test: 
@@ -1357,7 +1359,7 @@
          then: [t: "là"]                        	# 	(en: 'is')
      - t: "không phải là một nhóm con bình thường cũng không bằng"	# 	(en: 'not a normal subgroup of nor is equal to')
  - "⋭": [t: "không chứa như một nhóm con bình thường cũng như không bằng"]	#  0x22ed	(en: 'does not contain as a normal subgroup nor is equal to')
- - "⋮": [t: "ellipsis dọc"]                     	#  0x22ee	(en: 'vertical ellipsis')
+ - "⋮": [T: "chia hết cho"]                     	#  0x22ee	(en: 'vertical ellipsis')
  - "⋯": [t: "chấm chấm chấm"]                   	#  0x22ef	(en: 'dot dot dot')
  - "⋰": [t: "elip chéo lên trên"]               	#  0x22f0	(en: 'upwards diagonal ellipsis')
  - "⋱": [t: "dấu chấm lửng chéo"]               	#  0x22f1	(en: 'diagonal ellipsis')
@@ -3133,8 +3135,8 @@
  - "": [t: "mở rộng ba vòng lặp tích phân"]    	#  0xee16	(en: 'expanding integral loop triple')
  - "": [t: "không có triệu chứng bằng giọng"]  	#  0xee17	(en: 'asymptotically equal to accent')
  - "": [t: "dấu hiệu bằng giọng"]              	#  0xee18	(en: 'equal sign accent')
- - "": [t: "quadruple prime"]                  	#  0xee19
- - "⁗": [t: "quadruple prime"]                  	#  0x2057
+ - "": [T: "đạo hàm cấp bốn"]                  	#  0xee19
+ - "⁗": [T: "đạo hàm cấp bốn"]                  	#  0x2057
  - "": [t: "tăng điểm số với vòng tròn mở bên trái"]	#  0xee1a	(en: 'bar accent with open circle left')
  - "": [t: "điểm nhấn thanh với vòng tròn kín trái"]	#  0xee1b	(en: 'bar accent with closed circle left')
  - "": [t: "tăng điểm số với vòng tròn mở phải"]	#  0xee1c	(en: 'bar accent with open circle right')

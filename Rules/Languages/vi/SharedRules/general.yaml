@@ -327,8 +327,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: cos}
-      else: {T: cosin}
+      then: {T: cô sin}
+      else: {T: cô sin}
 - name: tan
   tag: mi
   match: "text()='tan' or text()='tg'"
@@ -336,8 +336,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: tan}
-      else: {T: tangent}
+      then: {T: tang}
+      else: {T: tang}
 - name: sec
   tag: mi
   match: "text()='sec'"
@@ -354,8 +354,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: cos đảo}
-      else: {T: cos đảo}
+      then: {T: cô sin đảo}
+      else: {T: cô sin đảo}
 - name: cot
   tag: mi
   match: "text()='cot'"
@@ -363,8 +363,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: co-tan}
-      else: {T: co-tangent}
+      then: {T: cô tang}
+      else: {T: cô tang}
 
 - name: sinh
   tag: mi

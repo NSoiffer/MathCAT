@@ -302,9 +302,9 @@
   - x: "*[1]"
   - T: mũ
   - x: "*[2]"
-  - test:
-      if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{T: "lũy thừa"}]
+  #- test:
+      #if: "$ClearSpeak_Exponents != 'Ordinal'"
+      #then: [{T: "lũy thừa"}]
 
 - name: simple-var
   tag: power
@@ -314,9 +314,9 @@
   - T: mũ
   - x: "*[2]"
   #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-  - test:
-      if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{T: "lũy thừa"}]
+  #- test:
+      #if: "$ClearSpeak_Exponents != 'Ordinal'"
+      #then: [{T: "lũy thừa"}]
 
 # match nested exponent, where the nested exponent is has the power 2 or 3 (n below)
 #   [xxx]^n, - [xxx]^n, [xxx] var^n, -[xxx] var^n
@@ -639,9 +639,9 @@
     - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
       then: [{T: "bước"}]
       # else 'None -- don't say anything'
-  - test:
-    - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-      then: [{ct: "s"}] # plural
+  #- test:
+    #- if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+      #then: [{ct: "s"}] # plural
   - pause: short
   - x: "*"
 

@@ -1,63 +1,7 @@
 ---
 
- - "a": 
-    - test: 
-        if: "$TTS='none'"
-        then: [t: "eigh"]                         # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
-        else: [spell: "'a'"]                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
- - "b-z": 
-    - test: 
-        if: "$TTS='none'"
-        then: [T: "."]                          
-        else: [spell: "'.'"]                       
-
- # Capital letters are a little tricky: users can pick their favorite word (something that was requested) and 
- # screen readers have options to use pitch changes or beeps instead of or in addition to say "cap"
- # Also, if a user can see the screen, they probably don't need to hear "cap", but if they specified an override, they must want to hear the override.
-
- - "A":
-    - test: 
-        if: "$CapitalLetters_Beep"
-        then:
-        - audio:
-            value: "beep.mp4"
-            replace: []
-    - test: 
-        if: "$CapitalLetters_UseWord"
-        then_test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "chữ hoa"]
-          else: [x: "$SpeechOverrides_CapitalLetters"]
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        replace:
-        - test:
-            if: "$TTS='none'"
-            then: [t: "eigh"]
-            else: [spell: "'a'"]
-            
- - "B-Z":
-    - test: 
-        if: "$CapitalLetters_Beep"
-        then:
-        - audio:
-            value: "beep.mp4"
-            replace: []
-    - test: 
-        if: "$CapitalLetters_UseWord"
-        then_test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness'"
-            then: [t: "chữ hoa"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-    - pitch:
-        value: "$CapitalLetters_Pitch"
-        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
-        replace: [spell: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]
-
+ - "a-z": [T: "."]
+ - "A-Z": [T: "."]
  - "0-9": [T: "."]
 
  - "!": [T: giai thừa]                           # 0x21
@@ -204,35 +148,35 @@
             then: [t: "hoa"]
           else: [x: "$SpeechOverrides_CapitalLetters"] 
 
- - "α": [T: alpha]                               # 0x3b1
- - "β": [T: beta]                                # 0x3b2
- - "γ": [T: gamma]                               # 0x3b3
- - "δ": [T: delta]                               # 0x3b4
- - "ε": [T: epsilon]                             # 0x3b5
- - "ζ": [T: zeta]                                # 0x3b6
- - "η": [T: eta]                                 # 0x3b7
- - "θ": [T: theta]                               # 0x3b8
- - "ι": [T: iota]                                # 0x3b9
- - "κ": [T: kappa]                               # 0x3ba
- - "λ": [T: lambda]                               # 0x3bb
+ - "α": [T: an pha]                               # 0x3b1
+ - "β": [T: bê ta]                                # 0x3b2
+ - "γ": [T: gam ma]                               # 0x3b3
+ - "δ": [T: đen ta]                               # 0x3b4
+ - "ε": [T: ép xi lon]                             # 0x3b5
+ - "ζ": [T: dê ta]                                # 0x3b6
+ - "η": [T: ê ta]                                 # 0x3b7
+ - "θ": [T: thê ta]                               # 0x3b8
+ - "ι": [T: i ô ta]                                # 0x3b9
+ - "κ": [T: ca ba]                               # 0x3ba
+ - "λ": [T: lam đa]                               # 0x3bb
  - "μ": [T: mu]                                  # 0x3bc
  - "ν": [T: nu]                                  # 0x3bd
- - "ξ": [T: zai]                                 # 0x3be
- - "ο": [T: omicron]                             # 0x3bf
- - "π": [T: pi]                                  # 0x3c0
- - "ρ": [T: rho]                                 # 0x3c1
- - "ς": [T: final sigma]                         # 0x3c2
- - "σ": [T: sigma]                               # 0x3c3
+ - "ξ": [T: giai]                                 # 0x3be
+ - "ο": [T: o mi ron]                             # 0x3bf
+ - "π": [T: bi]                                  # 0x3c0
+ - "ρ": [T: rô]                                 # 0x3c1
+ - "ς": [T: xích ma cuối]                         # 0x3c2
+ - "σ": [T: xích ma]                               # 0x3c3
  - "τ": [T: tau]                                 # 0x3c4
- - "υ": [T: upsilon]                             # 0x3c5
+ - "υ": [T: ấp xi lon]                             # 0x3c5
  - "φ": [T: phi]                                 # 0x3c6
- - "χ": [T: chi]                                 # 0x3c7
+ - "χ": [T: cai]                                 # 0x3c7
  - "ψ": [T: psi]                                 # 0x3c8
- - "ω": [T: omega]                               # 0x3c9
+ - "ω": [T: ô mê ga]                               # 0x3c9
  - "ϕ": [T: phi]                                 # 0x3d5
- - "ϖ": [T: pi]                                  # 0x3d6
- - "ϵ": [T: epsilon]                             # 0x3f5
- - "϶": [T: epsilon đảo ngược]                    # 0x3f6
+ - "ϖ": [T: bi]                                  # 0x3d6
+ - "ϵ": [T: ép xi lon]                             # 0x3f5
+ - "϶": [T: ép xi lon đảo ngược]                    # 0x3f6
  - "А":                                          # 0x410
      - T: a
      - test: 
@@ -263,12 +207,12 @@
  - "⁢": [T: ""]                                   # 0x2062
  - "⁣": [T: ""]                                   # 0x2063
  - "⁤": [T: "và"]                                # 0x2064
- - "′": [T: nháy đơn]                               # 0x2032
- - "″": [T: nháy kép]                        # 0x2033
- - "‴": [T: ba dấu nháy]                        # 0x2034
- - "‵": [T: nháy đơn ngược]                      # 0x2035
- - "‶": [T: nháy kép ngược]               # 0x2036
- - "‷": [T: ba dấu nháy ngược]               # 0x2037
+ - "′": [T: đạo hàm]                               # 0x2032
+ - "″": [T: đạo hàm cấp hai]                        # 0x2033
+ - "‴": [T: đạo hàm cấp ba]                        # 0x2034
+ - "‵": [T: nguyên hàm]                      # 0x2035
+ - "‶": [T: nguyên hàm cấp hai]               # 0x2036
+ - "‷": [T: nguyên hàm cấp ba]               # 0x2037
  - "ℂ":                                          # 0x2102
      - T: C 
      - test: 
@@ -384,7 +328,7 @@
     # rule is identical to 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [T: không là phần tử của]
+        then: [T: không là phần tử thuộc]
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set
@@ -392,15 +336,15 @@
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: không thuộc]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [T: không là phần tử]
+                then: [T: không là phần tử thuộc]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [T: không là phần tử]
+                then: [T: không là phần tử thuộc]
               - else: [T: không thuộc về]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [T: không là phần tử]
+                then: [T: không là phần tử thuộc]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [T: không là phần tử]
+                then: [T: không là phần tử thuộc]
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: không thuộc]
               - else: [T: không thuộc về]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
