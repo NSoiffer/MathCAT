@@ -380,7 +380,6 @@
     - test:
         if: $Verbosity!='Terse' and "not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])" 
         then: [t: "của"]                        	# 	(en: 'of')
- - "⁢": [t: ""]                                 	#  0x2062
  - "⁣": [t: ""]                                 	#  0x2063
  - "⁤": [t: "và"]                               	#  0x2064	(en: 'and')
  - "⁰": [T: "mũ không"]                         	#   0x2070	(en: 'to the zeroth power')

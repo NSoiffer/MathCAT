@@ -683,7 +683,6 @@
     - test:
         if: $Verbosity!='Terse' and "not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])" 
         then: [T: "dari"]
- - "⁢": [T: ""]                                  # 0x2062
  - "⁣": [T: ""]                                  # 0x2063
  - "⁤": [T: "dan"]                               # 0x2064
  - "⁰": [T: pangkat nol]                         # 0x2070

@@ -382,7 +382,6 @@
     - test:
         if: $Verbosity!='Terse' and "not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])" 
         then: [t: "of"]
- - "⁢": [t: ""]                                   # 0x2062
  - "⁣": [t: ""]                                   # 0x2063
  - "⁤": [t: "and"]                                # 0x2064
  - "⁰": [t: "to the zeroth power"]                 # 0x2070
