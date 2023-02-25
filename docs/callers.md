@@ -78,6 +78,9 @@ pub fn get_preference(name: String) -> Result<String>
 /// These are use to control speech and pitch changes for capital letters:
 /// * CapitalLetters_UseWord -- say "cap" (or whatever is appropriate for the language) [default: true]
 /// * CapitalLetters_Pitch -- add a pitch change around a capital letter (normalized at '1.0' -- '1.0' [default] does nothing)
+/// * CapitalLetters_Beep -- generates a fake SSML audio take with audio src='beep.mp4' -- used as a flag to beep in NVDA
+///
+/// * IntentErrorRecovery -- determines what should happen if the MathML contains illegal `intent` values. Options are a "Error" and "IgnoreIntent" (default)
 ///
 /// Important: both the preference name and value are case-sensitive
 /// 

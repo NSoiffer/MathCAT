@@ -8,7 +8,7 @@
 use sxd_document::dom::*;
 use crate::speech::SpeechRulesWithContext;
 use crate::canonicalize::{as_element, as_text, name, create_mathml_element,set_mathml_name};
-use crate::{errors::*};
+use crate::errors::*;
 use std::fmt;
 use crate::pretty_print::mml_to_string;
 use crate::xpath_functions::is_leaf;
@@ -17,22 +17,46 @@ use regex::Regex;
 pub const LITERAL_NAME: &str = "intent-literal";
 const IMPLICIT_FUNCTION_NAME: &str = "apply-function";
 
-impl<'c, 's:'c, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
-}
-
 pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, mathml: Element<'c>) -> Result<Element<'m>> {
-    if let Some(intent_str) = mathml.attribute_value("intent") {
-        let mut lex_state = LexState::init(intent_str.trim())?;
-        let result = build_intent(rules_with_context, &mut lex_state, mathml) 
-                    .chain_err(|| format!("in intent attribute value '{}'", intent_str))?;
-        if lex_state.token != Token::None {
-            bail!("Error in intent value: extra unparsed intent '{}' in intent attribute value '{}'", lex_state.remaining_str, intent_str);
+    match catch_errors_building_intent(rules_with_context, mathml) {
+        Ok(intent) => return Ok(intent),
+        Err(e) => {
+            let intent_preference = rules_with_context.get_rules().pref_manager.borrow().get_api_prefs().to_string("IntentErrorRecovery");
+            if intent_preference == "Error" {
+                return Err(e);
+            } else {
+                const INTENT_ATTR: &str = "intent";
+                let saved_intent_attr = mathml.attribute_value(INTENT_ATTR).unwrap();
+                mathml.remove_attribute(INTENT_ATTR);
+                // can't call intent_from_mathml because we have already borrowed_mut 
+                let intent_tree =  match rules_with_context.match_pattern::<Element<'m>>(mathml)
+                                            .chain_err(|| "Pattern match/replacement failure!") {
+                    Err(e) => Err(e),
+                    Ok(intent) => {
+                        intent.set_attribute_value(INTENT_ATTR, saved_intent_attr); //  so attr can be potentially be viewed later
+                        Ok(intent)
+                    },
+                };
+                mathml.set_attribute_value(INTENT_ATTR, saved_intent_attr);
+                return intent_tree;
+            }
         }
-        assert!(lex_state.remaining_str.is_empty());
-        debug!("Resulting intent: {}", crate::pretty_print::mml_to_string(&result));
-        return Ok(result);
     }
-    bail!("Internal error: infer_intent() called on MathML with no intent arg:\n{}", mml_to_string(&mathml));
+
+    fn catch_errors_building_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, mathml: Element<'c>) -> Result<Element<'m>> {
+        if let Some(intent_str) = mathml.attribute_value("intent") {
+            let mut lex_state = LexState::init(intent_str.trim())?;
+            let result = build_intent(rules_with_context, &mut lex_state, mathml)
+                        .chain_err(|| format!("in intent attribute value '{}'", intent_str))?;
+            if lex_state.token != Token::None {
+                bail!("Error in intent value: extra unparsed intent '{}' in intent attribute value '{}'", lex_state.remaining_str, intent_str);
+            }
+            assert!(lex_state.remaining_str.is_empty());
+            debug!("Resulting intent: {}", crate::pretty_print::mml_to_string(&result));
+            return Ok(result);
+        }
+        bail!("Internal error: infer_intent() called on MathML with no intent arg:\n{}", mml_to_string(&mathml));
+    }
 }
 
 // With isa/types
@@ -357,8 +381,10 @@ fn find_arg<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithCon
 
 #[cfg(test)]
 mod tests {
+    use super::*;
     #[allow(unused_imports)]
-    use super::super::init_logger;
+    use crate::init_logger;
+    use crate::interface::*;
     use sxd_document::parser;    
 
 
@@ -590,7 +616,9 @@ mod tests {
     }
 
     #[test]
-    fn intent_missing_open() {
+    fn intent_missing_open() -> Result<()> {
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_preference("IntentErrorRecovery".to_string(), "Error".to_string())?;
         let mathml = "<mrow intent='$p $a,$f($b))'>
                 <mi arg='a'>a</mi>
                 <mo arg='p' intent='plus'>+</mo>
@@ -599,10 +627,13 @@ mod tests {
             </mrow>";
         let intent = "<plus data-intent-hint='function'> <mi arg='a'>a</mi> <factorial data-intent-hint='function'><mi arg='b'>b</mi></factorial> </plus>";
         assert!(!test_intent(mathml, intent));
+        return Ok( () );
     }
 
     #[test]
-    fn intent_missing_comma() {
+    fn intent_missing_comma() -> Result<()> {
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_preference("IntentErrorRecovery".to_string(), "Error".to_string())?;
         let mathml = "<mrow intent='$p($a $f($b))'>
                 <mi arg='a'>a</mi>
                 <mo arg='p' intent='plus'>+</mo>
@@ -611,10 +642,13 @@ mod tests {
             </mrow>";
         let intent = "<plus data-intent-hint='function'> <mi arg='a'>a</mi> <factorial data-intent-hint='function'><mi arg='b'>b</mi></factorial> </plus>";
         assert!(!test_intent(mathml, intent));
+        return Ok( () );
     }
 
     #[test]
-    fn intent_no_arg() {
+    fn intent_no_arg() -> Result<()> {
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_preference("IntentErrorRecovery".to_string(), "Error".to_string())?;
         let mathml = "<mrow intent='factorial()'>
                 <mi arg='a'>a</mi>
                 <mo arg='p' intent='plus'>+</mo>
@@ -623,10 +657,13 @@ mod tests {
             </mrow>";
         let intent = "<factorial data-intent-hint='function'></factorial>";
         assert!(test_intent(mathml, intent));
+        return Ok( () );
     }
 
     #[test]
-    fn intent_illegal_no_arg() {
+    fn intent_illegal_no_arg() -> Result<()> {
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_preference("IntentErrorRecovery".to_string(), "Error".to_string())?;
         let mathml = "<mrow intent='factorial(()))'>
                 <mi arg='a'>a</mi>
                 <mo arg='p' intent='plus'>+</mo>
@@ -635,25 +672,70 @@ mod tests {
             </mrow>";
         let intent = "<factorial data-intent-hint='function'></factorial>";
         assert!(!test_intent(mathml, intent));
+        return Ok( () );
     }
 
     #[test]
-    fn intent_illegal_self_ref() {
+    fn intent_illegal_no_arg_ignore() -> Result<()> {
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_preference("IntentErrorRecovery".to_string(), "IgnoreIntent".to_string())?;
+        let mathml = "<mrow intent='factorial(()))'>
+                <mi arg='a'>a</mi>
+                <mo arg='p' intent='plus'>+</mo>
+                <mi arg='b'>b</mi>
+                <mo arg='f' intent='factorial'>!</mo>
+            </mrow>";
+        let intent = "<mrow intent='factorial(()))'>
+                <mi arg='a'>a</mi>
+                <intent-literal>plus</intent-literal>
+                <mi arg='b'>b</mi>
+                <intent-literal>factorial</intent-literal>
+            </mrow>";
+        assert!(test_intent(mathml, intent));
+        return Ok( () );
+    }
+
+    #[test]
+    fn intent_illegal_self_ref() -> Result<()> {
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_preference("IntentErrorRecovery".to_string(), "Error".to_string())?;
         let mathml = "<mrow intent='foo:is-foolish@function($b)'>
                 <mi intent='$b:int' arg='b'>b</mi>
             </mrow>";
         let intent = "<foo data-intent-hint='function' data-intent-type='is-foolish'><intent-literal data-intent-type='int'>b</intent-literal></foo>";
         assert!(!test_intent(mathml, intent));
+        return Ok( () );
     }
 
     #[test]
-    fn infer_missing_second_arg() {
+    fn infer_missing_second_arg() -> Result<()> {
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_preference("IntentErrorRecovery".to_string(), "Error".to_string())?;
         let mathml = "<mrow intent='binomial($n,)'>
                 <mo>(</mo>
                 <mfrac linethickness='0'> <mn arg='n'>7</mn> <mn arg='m'>3</mn> </mfrac>
                 <mo>)</mo>
             </mrow>";
-        let intent = "<binomial data-intent-hint='function'> <mn arg='n'>7</mn> <mn arg='m'>3</mn>  </binomial>";
+        let intent = "<binomial data-intent-hint='binomial($n,)'> <mn arg='n'>7</mn> <mn arg='m'>3</mn>  </binomial>";
         assert!(!test_intent(mathml, intent));
+        return Ok( () );
+    }
+
+    #[test]
+    fn infer_missing_second_arg_ignore() -> Result<()> {
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_preference("IntentErrorRecovery".to_string(), "IgnoreIntent".to_string())?;
+        let mathml = "<mrow intent='binomial($n,)'>
+                <mo>(</mo>
+                <mfrac linethickness='0'> <mn arg='n'>7</mn> <mn arg='m'>3</mn> </mfrac>
+                <mo>)</mo>
+            </mrow>";
+        let target = "<mrow intent='binomial($n,)'>
+                <mo>(</mo>
+                <fraction linethickness='0'> <mn arg='n'>7</mn> <mn arg='m'>3</mn> </fraction>
+                <mo>)</mo>
+            </mrow>";
+        assert!(test_intent(mathml, target));
+        return Ok( () );
     }
 }
