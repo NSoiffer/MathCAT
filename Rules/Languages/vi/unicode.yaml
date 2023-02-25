@@ -1,7 +1,29 @@
 ---
+ - "a": [T: "eigh"]
+ - "b-z": [T: "."]
 
- - "a-z": [T: "."]
- - "A-Z": [T: "."]
+ - "A":
+    - T: "eigh"
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness' and $Verbosity='Verbose'"
+            then: [t: "hoa"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+
+ - "B-Z":
+    - x: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness' and $Verbosity='Verbose'"
+            then: [t: "hoa"]
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+
  - "0-9": [T: "."]
 
  - "!": [T: giai thừa]                           # 0x21
