@@ -21,6 +21,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
     match catch_errors_building_intent(rules_with_context, mathml) {
         Ok(intent) => return Ok(intent),
         Err(e) => {
+            // lookup what we should do for error recovery
             let intent_preference = rules_with_context.get_rules().pref_manager.borrow().get_api_prefs().to_string("IntentErrorRecovery");
             if intent_preference == "Error" {
                 return Err(e);
@@ -28,7 +29,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
                 const INTENT_ATTR: &str = "intent";
                 let saved_intent_attr = mathml.attribute_value(INTENT_ATTR).unwrap();
                 mathml.remove_attribute(INTENT_ATTR);
-                // can't call intent_from_mathml because we have already borrowed_mut 
+                // can't call intent_from_mathml() because we have already borrowed_mut -- we call a more internal version
                 let intent_tree =  match rules_with_context.match_pattern::<Element<'m>>(mathml)
                                             .chain_err(|| "Pattern match/replacement failure!") {
                     Err(e) => Err(e),
@@ -67,7 +68,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
 // reference       := '$' NCName
 // application     := intent hint? '(' arguments? ')'
 // arguments       := intent ( ',' intent )*
-// hint            := '@' ( 'prefix' | 'infix' | 'postfix' | 'function' | 'silent' )
+// hint            := '@' ( 'prefix' | 'infix' | 'postfix' | 'function' | 'silent' | 'auto' )
 lazy_static! {
     // The practical restrictions of NCName are that it cannot contain several symbol characters like
     //  !, ", #, $, %, &, ', (, ), *, +, ,, /, :, ;, <, =, >, ?, @, [, \, ], ^, `, {, |, }, ~, and whitespace characters
@@ -213,16 +214,18 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
 
     if lex_state.is_terminal("(") {
         intent = build_function(intent, rules_with_context, lex_state, mathml)?;
-        let mut hint_str = "function".to_string();
-        // debug!("intent='{}'", mml_to_string(&intent));
-        if let Some(found_hint_str) = hint {
-            hint_str = found_hint_str;
-        } else if name(&intent) == "_" {
-            hint_str = "silent".to_string();
-        }
-        intent.set_attribute_value(INTENT_HINT, &hint_str);
-
     }
+    let mut hint_str = "auto".to_string();
+    // debug!("intent='{}'", mml_to_string(&intent));
+    if let Some(found_hint_str) = hint {
+        hint_str = found_hint_str;
+    } else if name(&intent) == "_" {
+        hint_str = "silent".to_string();
+    }
+    if hint_str != "auto" {
+        intent.set_attribute_value(INTENT_HINT, &hint_str);
+    }
+
     // debug!("end build_intent:  state: {}..[bi] intent: {}", lex_state, mml_to_string(&intent));
     return Ok( intent );
 }
@@ -423,7 +426,7 @@ mod tests {
                 <mfrac linethickness='0'> <mn arg='n'>7</mn> <mn arg='m'>3</mn> </mfrac>
                 <mo>)</mo>
             </mrow>";
-        let intent = "<binomial data-intent-hint='function'> <mn arg='n'>7</mn> <mn arg='m'>3</mn>  </binomial>";
+        let intent = "<binomial> <mn arg='n'>7</mn> <mn arg='m'>3</mn>  </binomial>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -434,7 +437,7 @@ mod tests {
                 <mi arg='n'>n</mi>
                 <mi arg='m'>m</mi>
             </msubsup>";
-        let intent = "<binomial data-intent-hint='function'> <mi arg='n'>n</mi> <mi arg='m'>m</mi></binomial>";
+        let intent = "<binomial> <mi arg='n'>n</mi> <mi arg='m'>m</mi></binomial>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -446,7 +449,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<foo data-intent-hint='function'><bar data-intent-hint='function'></bar></foo>";
+        let intent = "<foo><bar></bar></foo>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -502,7 +505,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<p data-intent-hint='function'> <f data-intent-hint='function'><intent-literal>b</intent-literal></f> <intent-literal>a</intent-literal></p>";
+        let intent = "<p> <f><intent-literal>b</intent-literal></f> <intent-literal>a</intent-literal></p>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -514,7 +517,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<plus data-intent-hint='function'> <intent-literal>a</intent-literal> <factorial data-intent-hint='function'><intent-literal>b</intent-literal></factorial> </plus>";
+        let intent = "<plus> <intent-literal>a</intent-literal> <factorial><intent-literal>b</intent-literal></factorial> </plus>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -529,7 +532,7 @@ mod tests {
                 <mi arg='b'>B</mi>
                 <mi arg='c'>C</mi>
             </mrow>";
-        let intent = "<map data-intent-hint='function'> <mi arg='a'>A</mi> <mi arg='b'>B</mi> <mi arg='c'>C</mi> </map>";
+        let intent = "<map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> <mi arg='c'>C</mi> </map>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -543,7 +546,7 @@ mod tests {
                 </mover>
                 <mi arg='b'>B</mi>
             </mrow>";
-        let intent = "<apply-function data-intent-hint='function'><map data-intent-hint='function'> <intent-literal>congruence</intent-literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
+        let intent = "<apply-function><map> <intent-literal>congruence</intent-literal></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
         assert!(test_intent(mathml, intent));
     }
 
@@ -552,7 +555,7 @@ mod tests {
         let mathml = "<mrow intent='vector(1, 0., .1, -23, -.1234, last)'>
                 <mi>x</mi>
             </mrow>";
-        let intent = "<vector data-intent-hint='function'>
+        let intent = "<vector>
             <intent-literal>1</intent-literal><intent-literal>0.</intent-literal><intent-literal>.1</intent-literal><intent-literal>-23</intent-literal><intent-literal>-.1234</intent-literal><intent-literal>last</intent-literal>
             </vector>";
         assert!(test_intent(mathml, intent));
@@ -568,7 +571,7 @@ mod tests {
                 </mover>
                 <mi arg='b'>B</mi>
             </mrow>";
-        let intent = "<apply-function data-intent-hint='function'>
+        let intent = "<apply-function>
                     <map><intent-literal>congruence</intent-literal></map>
                     <mi arg='a'>A</mi> <mi arg='b'>B</mi>
                 </apply-function>";
@@ -625,7 +628,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<plus data-intent-hint='function'> <mi arg='a'>a</mi> <factorial data-intent-hint='function'><mi arg='b'>b</mi></factorial> </plus>";
+        let intent = "<plus> <mi arg='a'>a</mi> <factorial><mi arg='b'>b</mi></factorial> </plus>";
         assert!(!test_intent(mathml, intent));
         return Ok( () );
     }
@@ -640,7 +643,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<plus data-intent-hint='function'> <mi arg='a'>a</mi> <factorial data-intent-hint='function'><mi arg='b'>b</mi></factorial> </plus>";
+        let intent = "<plus> <mi arg='a'>a</mi> <factorial><mi arg='b'>b</mi></factorial> </plus>";
         assert!(!test_intent(mathml, intent));
         return Ok( () );
     }
@@ -655,7 +658,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<factorial data-intent-hint='function'></factorial>";
+        let intent = "<factorial></factorial>";
         assert!(test_intent(mathml, intent));
         return Ok( () );
     }
@@ -670,7 +673,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<factorial data-intent-hint='function'></factorial>";
+        let intent = "<factorial></factorial>";
         assert!(!test_intent(mathml, intent));
         return Ok( () );
     }

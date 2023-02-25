@@ -435,9 +435,14 @@
   replace:
   - x: "*[1]"
 
+- name: intent-literal-silent
+  tag: "intent-literal"
+  match: "@data-intent-hint='silent'"
+  # say nothing
+  replace: []
+
 # handling of negative numbers is hard -- we do something that is close to right here
 - name: intent-literal-negative-number
-  # unknown leaf -- just speak the text -- could be a literal intent
   tag: "intent-literal"
   match: "starts-with(text(), '-')"
   replace:
