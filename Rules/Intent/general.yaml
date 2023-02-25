@@ -234,7 +234,7 @@
 
 
 -
-  name: default
+  name: sqrt
   tag: mroot
   match: "*[2][self::m:mn and text()='2']"
   replace:
