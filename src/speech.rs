@@ -662,11 +662,11 @@ impl<'r> TranslateExpression {
                 Some(id) => {
                     match crate::navigate::get_node_by_id(mathml, &id) { // FIX: should use root of MathML
                         None => bail!("'translate' value '{}' was not an 'id' found in {}", &id, mml_to_string(&mathml)),
-                        Some(element) => speak_intent(element)?,
+                        // FIX: ?? see speak() in navigate.rs about maybe using context to generate proper speech
+                        Some(element) => speak_intent(intent_from_mathml(element, rules_with_context.get_document())?)?,
                     }
                 }
             };
-
             return T::from_string(speech, rules_with_context.doc);
         } else {
             return T::from_string(
@@ -1193,7 +1193,7 @@ impl SpeechPattern  {
                 None => rule_value.push(speech_pattern),
                 Some((i, _old_pattern)) => {
                     let old_rule = &rule_value[i];
-                    info!("Warning: replacing {}/'{}' in {} with rule from {}",
+                    info!("\n***WARNING: replacing {}/'{}' in {} with rule from {}\n",
                             old_rule.tag_name, old_rule.pattern_name, old_rule.file_name, speech_pattern.file_name);
                     rule_value[i] = speech_pattern;
                 },
