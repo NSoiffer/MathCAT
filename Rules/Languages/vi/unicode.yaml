@@ -1,20 +1,8 @@
 ---
- - "a": [T: "eigh"]
- - "b-z": [T: "."]
+ - "a-z": [T: "."]
 
- - "A":
-    - T: "eigh"
-    - test: 
-        if: "$CapitalLetters_UseWord"
-        then_test:
-          if: "$SpeechOverrides_CapitalLetters = ''"
-          then_test:
-            if: "$Impairment = 'Blindness' and $Verbosity='Verbose'"
-            then: [t: "hoa"]
-          else: [x: "$SpeechOverrides_CapitalLetters"] 
-
- - "B-Z":
-    - x: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"
+ - "A-Z":
+    - x: "translate('.', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"
     - test: 
         if: "$CapitalLetters_UseWord"
         then_test:
