@@ -4,7 +4,7 @@
 
 use std::cell::{Ref, RefCell, RefMut};
 use sxd_xpath::{Context, Factory, Value};
-use sxd_document::dom::Element;
+use sxd_document::dom::{Element, ChildOfElement};
 use sxd_document::Package;
 
 use std::fmt;
@@ -19,6 +19,7 @@ use phf::phf_set;
 
 
 const MAX_PLACE_MARKERS: usize = 10;
+const MARKED_NODE: &str = "data-navigation-node";
 
 thread_local!{
     /// The current set of navigation rules
@@ -387,7 +388,6 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             None => mathml.attribute_value("id").unwrap().to_string(),
             Some( (position, _) ) => position.current_node.clone(),
         };
-        // debug!("NavCommand: {}, NavMode {}, start_node_id {}", nav_command, nav_state.mode, start_node_id);
 
         return match get_node_by_id(mathml, &start_node_id) {
             Some(node) => Ok(node),
@@ -406,6 +406,8 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         context.set_variable("MatchCounter", loop_count as f64);
 
         let start_node = get_start_node(mathml, &nav_state)?;
+        // debug!("start_node\n{}", mml_to_string(&start_node));
+
         let raw_speech_string = rules_with_context.match_pattern::<String>(start_node)
                     .chain_err(|| "Pattern match/replacement failure during math navigation!")?;
         let speech = rules.pref_manager.borrow().get_tts()
@@ -505,10 +507,45 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
 
 fn speak<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, mathml: Element<'c>, full_read: bool) -> Result<String> {
     if full_read {
-        return crate::speech::speak_intent(crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?);
+        // Some rules require context to speak correctly -- invisible times is a particularly important one
+        // Most only require knowing siblings
+        // FIX: check the rules -- grandparents might be needed
+        // Here, we temporarily mark the current node, get the intent reading of the parent and then find the node in the parent.
+        // If it isn't present, we skip context and retry
+        mathml.set_attribute_value(MARKED_NODE, "nav");
+        let context_mathml = if let Some(parent) = mathml.parent() {parent.element().unwrap()} else {mathml};
+        // debug!("context_mathml: {}", mml_to_string(&context_mathml));
+        let intent = crate::speech::intent_from_mathml(context_mathml, rules_with_context.get_document())?;
+        debug!("intent: {}", mml_to_string(&intent));
+        let intent = if let Some(found) = find_marked_node(intent) {
+            // debug!("Found node: {}", mml_to_string(&found));
+            found
+        } else {
+            crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?
+        };
+        mathml.remove_attribute(MARKED_NODE);
+        return crate::speech::speak_intent(intent);
     } else {
         // FIX: overview not implemented
         return crate::speech::overview_mathml(mathml);
+    }
+
+    fn find_marked_node<'m>(intent: Element<'m>) -> Option<Element<'m>> {
+        if intent.attribute(MARKED_NODE).is_some() {
+            return Some(intent);
+        }
+        for child in intent.children() {
+            match child {
+                ChildOfElement::Element(child) => {
+                    let found = find_marked_node(child);
+                    if found.is_some() {
+                        return found;
+                    }
+                },
+                _ => (),
+            };
+        }
+        return None;
     }
 }
 
@@ -1011,7 +1048,6 @@ mod tests {
     
     #[test]
     fn move_line_start_end() -> Result<()> {
-        init_logger();
         let mathml_str = " <math display='block' id='id-0' data-id-added='true'>
         <mfrac displaystyle='true' id='id-1' data-id-added='true'>
           <mi id='id-2' data-id-added='true'>x</mi>
@@ -1249,6 +1285,79 @@ mod tests {
     }
     
     #[test]
+    fn move_enhanced_times() -> Result<()> {
+        let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
+        <mrow displaystyle='true' data-changed='added' id='id-1' data-id-added='true'>
+          <mn id='id-2' data-id-added='true'>2</mn>
+          <mo data-changed='added' id='id-3' data-id-added='true'>&#x2062;</mo>
+          <mrow id='id-4' data-id-added='true'>
+            <mo id='id-5' data-id-added='true'>(</mo>
+            <mrow data-changed='added' id='id-6' data-id-added='true'>
+              <mn id='id-7' data-id-added='true'>1</mn>
+              <mo id='id-8' data-id-added='true'>-</mo>
+              <mi id='id-9' data-id-added='true'>x</mi>
+            </mrow>
+            <mo id='id-10' data-id-added='true'>)</mo>
+          </mrow>
+        </mrow>
+       </math>";
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
+        set_preference("NavMode".to_string(), "Enhanced".to_string())?;
+        set_preference("NavVerbosity".to_string(), "Verbose".to_string())?;
+        set_preference("Language".to_string(), "en".to_string())?;
+        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomIn", mathml, "id-2");
+            assert_eq!(test_command("MoveNext", mathml, "id-3"), "move right, times");
+            assert_eq!(test_command("MoveNext", mathml, "id-6"), "move right, 1 minus x");
+            assert_eq!(test_command("MovePrevious", mathml, "id-3"), "move left, times");
+            assert_eq!(test_command("MovePrevious", mathml, "id-2"), "move left, 2");
+
+            return Ok( () );
+        });
+    }
+    
+    #[test]
+    fn move_simple_no_times() -> Result<()> {
+        let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
+        <mrow displaystyle='true' data-changed='added' id='id-1' data-id-added='true'>
+          <mn id='id-2' data-id-added='true'>2</mn>
+          <mo data-changed='added' id='id-3' data-id-added='true'>&#x2062;</mo>
+          <mrow id='id-4' data-id-added='true'>
+            <mo id='id-5' data-id-added='true'>(</mo>
+            <mrow data-changed='added' id='id-6' data-id-added='true'>
+              <mn id='id-7' data-id-added='true'>1</mn>
+              <mo id='id-8' data-id-added='true'>-</mo>
+              <mi id='id-9' data-id-added='true'>x</mi>
+            </mrow>
+            <mo id='id-10' data-id-added='true'>)</mo>
+          </mrow>
+        </mrow>
+       </math>";
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
+        set_preference("NavMode".to_string(), "Simple".to_string())?;
+        set_preference("NavVerbosity".to_string(), "Verbose".to_string())?;
+        set_preference("Language".to_string(), "en".to_string())?;
+        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomIn", mathml, "id-2");
+            assert_eq!(test_command("MoveNext", mathml, "id-5"), "move right, open paren");
+            assert_eq!(test_command("MoveNext", mathml, "id-7"), "move right, 1");
+            assert_eq!(test_command("MovePrevious", mathml, "id-5"), "move left, open paren");
+            assert_eq!(test_command("MovePrevious", mathml, "id-2"), "move left, 2");
+
+            return Ok( () );
+        });
+    }
+    
+    
+    #[test]
     fn move_cell() -> Result<()> {
         let mathml_str = "<math id='nav-0' data-id-added='true'>
         <mtable id='nav-1' data-id-added='true'>
@@ -1471,7 +1580,7 @@ mod tests {
             // WhereAmIAll doesn't change the stack
             let speech =test_command("WhereAmIAll", mathml, "exp");
             // should be 2 "inside" strings corresponding to steps to the root
-            assert_eq!(speech.matches("inside").map(|_| 1).sum::<i32>(), 2);
+            assert_eq!(speech, "2; inside; b squared; inside; the fraction with numerator; b squared; and denominator d;");
             return Ok( () );
         });
     }
