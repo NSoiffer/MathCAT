@@ -1029,13 +1029,38 @@
       - set_variables: [{SpeakExpression: "'false'"}]
 
 # ========  Move/Read/Describe Next rules =================
+
+# skip invisible chars except for Enhanced mode when "times" should be read
+- name: move-next-invisible
+  tag: "*"
+  match:
+  - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
+  - "following-sibling::*[1][translate(., '\u2061\u2062\u2063\u2064', '')='']"
+  replace:
+  - test:
+      if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+      then:
+      - test:
+        - if: "$NavCommand = 'MoveNext'"
+          then: [{t: "move"}]
+        - else_if: "$NavCommand = 'ReadNext'"
+          then: [{t: "read"}]
+          else: [{t: "describe"}]
+      - t: "right"
+      - pause: short
+  - with:
+      variables: [{MatchCounter: "$MatchCounter + 1"}]
+      replace:
+      - test:
+          if: "following-sibling::*[1][.='\u2062' or .='\u2064'] and $NavMode='Enhanced'"   # invisible times and plus
+          then: [set_variables: [NavNode: "following-sibling::*[1]/@id"]]
+          else: [x: "following-sibling::*[1]"]
+
 - name: move-next-no-auto-zoom-at-edge
-
-
   # at edge of 2D and in a mode where moving right isn't an option
   tag: "*"
   variables: [{EdgeNode: "EdgeNode(., 'right', '2D')"}]
-  match: "$NavCommand = 'MoveNext' and $NavMode!='Character' and not($AutoZoomOut) and DEBUG($EdgeNode/@id)!=@id"
+  match: "$NavCommand = 'MoveNext' and $NavMode!='Character' and not($AutoZoomOut) and $EdgeNode/@id!=@id"
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse' and $NavCommand = 'MoveNext'"
@@ -1048,7 +1073,6 @@
   - set_variables: [{SpeakExpression: "'false'"}]
 
 - name: move-next-no-auto-zoom-at-edge-math
-
   # at edge of math -- no where to go (must be after we rule out being at the edge of 2D) because we want to speak that
   tag: "*"
   match:
@@ -1230,6 +1254,33 @@
   - set_variables: [{NavNode: "following-sibling::*[1]/@id"}]
 
 # ========  Move/Read/Describe Previous rules =================
+
+# skip invisible chars except for Enhanced mode when "times" should be read
+- name: move-previous-invisible
+  tag: "*"
+  match:
+  - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
+  - "preceding-sibling::*[1][translate(., '\u2061\u2062\u2063\u2064', '')='']"
+  replace:
+  - test:
+      if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+      then:
+      - test:
+        - if: "$NavCommand = 'MovePrevious'"
+          then: [{t: "move"}]
+        - else_if: "$NavCommand = 'ReadPrevious'"
+          then: [{t: "read"}]
+          else: [{t: "describe"}]
+      - t: "left"
+      - pause: short
+  - with:
+      variables: [{MatchCounter: "$MatchCounter + 1"}]
+      replace:
+      - test:
+          if: "preceding-sibling::*[1][.='\u2062' or .='\u2064'] and $NavMode='Enhanced'"   # invisible times and plus
+          then: [set_variables: [NavNode: "preceding-sibling::*[1]/@id"]]
+          else: [x: "preceding-sibling::*[1]"]
+
 # two rules for when can't move right
 - name: move-previous-no-auto-zoom-at-edge
   # at edge of 2D and in a mode where moving right isn't an option
@@ -1572,12 +1623,10 @@
 - name: where-am-i-stop
   tag: "*"
   match:
-  - "DEBUG("
   - "($NavCommand = 'WhereAmI' or $NavCommand = 'WhereAmIAll') and $MatchCounter > 0 and"
   # stopping conditions
   - "(self::m:math or "
   - " parent::*[self::m:math and (count(*)=1 or (count(*)=2 and *[2][text()=',' or text()='.' or text()=';' or text()='?']) ) ] "
-  - ")"
   - ")"
   replace:
   - test:
@@ -1588,7 +1637,7 @@
       - set_variables: [{SpeakExpression: "'false'"}]
       else:
       - t: "inside"
-      - pause: long
+      - pause: medium
   - set_variables: [{NavNode: "@id"}]
 
 - name: where-am-i-middle
@@ -1596,7 +1645,7 @@
   match: "$NavCommand = 'WhereAmI' or $NavCommand = 'WhereAmIAll'"
   replace:
   - t: "inside"
-  - pause: long
+  - pause: medium
   - test:
     - if: "$NavMode='Enhanced' and parent::*[self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"
       then: [{x: ".."}] # auto-zoom up
