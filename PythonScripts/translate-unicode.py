@@ -196,6 +196,8 @@ def translate_words(words_to_translate, lang):
         translated_words = translated_words.split('.\n')
         if len(translated_words) != len(words_to_translate):
             print("\n!!!Problem in translation: size of translations ({}) differs from words to translate ({})\n".format(len(translated_words), len(words_to_translate)))
+            print("Words to translate:\n{}".format(list(words_to_translate)))
+            print("Translations:\n{}".format(list(translated_words)))
         for (orig, translation) in zip(words, translated_words):
             translations[orig] = translation
 
