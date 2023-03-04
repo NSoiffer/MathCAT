@@ -821,11 +821,9 @@
  - "ℎ": [T: konstanta planck]                    # 0x210e
  - "ℏ":                                          # 0x210f
      - test: 
-         if: "($Verbosity!='Terse')"
+         if: "($Verbosity='Terse')"
          then: {T: bilah h}
-     - test: 
-         if: "($Verbosity!='Terse')"
-         then: {T: konstanta planck tereduksi}
+         else: {T: konstanta planck tereduksi}
  - "ℐ":                                          # 0x2110
      - T: aksara
      - test: 
@@ -9530,7 +9528,7 @@
      - T: omega
  - "": [T: bold nabla]                          # 0xf495
  - "𝜵": [T: bold nabla]                          # 0x1d735
- - "": [T: bold italic alpha]                  # 0xf496
+ - "": [T: bold italic nabla]                   # 0xf495
  - "𝜶": [T: bold italic alpha]                  # 0x1d736
  - "": [T: bold italic beta]                   # 0xf497
  - "𝜷": [T: bold italic beta]                   # 0x1d737
