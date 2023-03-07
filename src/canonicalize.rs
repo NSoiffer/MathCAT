@@ -348,7 +348,6 @@ pub fn replace_children<'a>(mathml: Element<'a>, replacements: Vec<Element<'a>>)
 		let mut replacements = replacements.iter().map(|&el| ChildOfElement::Element(el)).collect::<Vec<ChildOfElement>>();
 		new_children.append(&mut replacements);
 		new_children.append(&mut mathml.following_siblings());
-		let parent = mathml.parent().unwrap().element().unwrap();
 		parent.replace_children(new_children);
 		return as_element(parent.children()[i_first_new_child]);
 	}
@@ -2804,12 +2803,11 @@ impl CanonicalizeContext {
 	}
 
 	// implied comma when two numbers are adjacent and are in a script position
-	fn is_implied_comma<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>) -> bool {
+	fn is_implied_comma<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>, mrow: &'a Element<'a>) -> bool {
 		if name(prev) != "mn" || name(current) != "mn" {
 			return false;
 		}
 
-		let mrow = current.parent().unwrap().element().unwrap();
 		assert_eq!(name(&mrow), "mrow");
 		let container = mrow.parent().unwrap().element().unwrap();
 		let name = name(&container);
@@ -3059,7 +3057,6 @@ impl CanonicalizeContext {
 	fn canonicalize_mrows_in_mrow<'a>(&self, mrow: Element<'a>) -> Result<Element<'a>> {
 		let saved_mrow_attrs = mrow.attributes();	
 		assert_eq!(name(&mrow), "mrow");
-		// debug!("canonicalize_mrows_in_mrow: mrow len={}", children.len());	
 	
 		// FIX: don't touch/canonicalize
 		// 1. if intent is given -- anything intent references
@@ -3105,7 +3102,7 @@ impl CanonicalizeContext {
 								OperatorPair{ ch: "\u{2061}", op: &INVISIBLE_FUNCTION_APPLICATION }
 							} else if self.is_mixed_fraction(&previous_child, &children[i_child..])? {
 								OperatorPair{ ch: "\u{2064}", op: &IMPLIED_INVISIBLE_PLUS }
-							} else if self.is_implied_comma(&previous_child, &current_child) {
+							} else if self.is_implied_comma(&previous_child, &current_child, &mrow) {
 								OperatorPair{ch: "\u{2063}", op: &IMPLIED_INVISIBLE_COMMA }				  
 							} else if self.is_implied_chemical_bond(&previous_child, &current_child) {
 								OperatorPair{ch: "\u{2063}", op: &IMPLIED_CHEMICAL_BOND }				  
@@ -4580,6 +4577,32 @@ mod canonicalize_tests {
 				</msup>
 				</mrow>
 			</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn parent_bug_94() {
+		// Note: this isn't ideal -- it really should merge the leading '0' to get just one mn with content "0.02"
+        let test_str = "	<math>
+		<mrow>
+			<msqrt>
+				<mrow>
+					<mstyle mathvariant='bold' mathsize='normal'><mn>0</mn></mstyle>
+					<mstyle mathvariant='bold' mathsize='normal'><mo>.</mo><mn>0</mn><mn>2</mn></mstyle>
+				</mrow>
+			</msqrt>
+		</mrow>
+	</math>
+	";
+        let target_str = "<math>
+		<msqrt>
+		  <mrow>
+			<mn mathsize='normal' mathvariant='bold'>𝟎</mn>
+			<mo data-changed='added'>&#x2062;</mo>
+			<mn mathsize='normal' mathvariant='bold' data-changed='added'>.02</mn>
+		  </mrow>
+		</msqrt>
+	   </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
