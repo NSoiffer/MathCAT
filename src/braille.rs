@@ -1226,7 +1226,7 @@ use sxd_xpath::function::Error as XPathError;
 use std::result::Result as StdResult;
 
 pub struct NemethNestingChars;
-const NEMETH_FRAC_LEVEL: &str = "nemeth-frac-level";    // name of attr where value is cached
+const NEMETH_FRAC_LEVEL: &str = "data-nemeth-frac-level";    // name of attr where value is cached
 const FIRST_CHILD_ONLY: &[&str] = &["mroot", "msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts"];
 impl NemethNestingChars {
     // returns a 'repeat_char' corresponding to the Nemeth rules for nesting
