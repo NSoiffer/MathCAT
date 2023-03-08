@@ -166,7 +166,12 @@
         else: [t: "right brace"]                            
 
  - "~": [t: "tilde"]                               # 0x7e
- - " ": [t: ""]                                  # 0xa0
+ - " ":                                            # 0xa0
+    - test:
+        if: "@data-empty-in-2D"
+        then: [t: "empty"]                         # want to say something for fraction (etc) with empty child
+        else: [t: ""]                            
+
  - "¢": [t: "cents"]                               # 0xa2
  - "£": [t: "pounds"]                              # 0xa3
  - "¬": [t: "not"]                                 # 0xac

@@ -22,6 +22,7 @@ const DECIMAL_SEPARATOR: &str = ".";
 pub const CHANGED_ATTR: &str = "data-changed";
 pub const ADDED_ATTR_VALUE: &str = "added";
 const MFENCED_ATTR_VALUE: &str = "from_mfenced";
+const EMPTY_IN_2D: &str = "data-empty-in-2D";
 // character to use instead of the text content for priority, etc.
 pub const CHEMICAL_BOND: &str ="data-chemical-bond";
 
@@ -456,12 +457,12 @@ impl CanonicalizeContext {
 		CanonicalizeContext::assure_mathml(mathml)?;
 		let mathml = self.clean_mathml(mathml).unwrap();	// 'math' is never removed
 		self.assure_math_not_empty(mathml);
-		self.assure_nary_tag_has_mrow(mathml);
+		self.assure_nary_tag_has_one_child(mathml);
 		let mut converted_mathml = self.canonicalize_mrows(mathml)
 				.chain_err(|| format!("while processing\n{}", mml_to_string(&mathml)))?;
 		if !crate::chemistry::scan_and_mark_chemistry(converted_mathml) {
 			debug!("Not chemistry -- retry:\n{}", mml_to_string(&converted_mathml));
-			self.assure_nary_tag_has_mrow(converted_mathml);
+			self.assure_nary_tag_has_one_child(converted_mathml);
 			converted_mathml = self.canonicalize_mrows(mathml)
 				.chain_err(|| format!("while processing\n{}", mml_to_string(&mathml)))?;
 		}
@@ -478,9 +479,18 @@ impl CanonicalizeContext {
 		}
 	}
 	
-	fn assure_nary_tag_has_mrow(&self, mathml: Element) {
+	/// Make sure there is exactly one child
+	fn assure_nary_tag_has_one_child(&self, mathml: Element) {
 		let children = mathml.children();
-		if children.len() > 1 && ELEMENTS_WITH_ONE_CHILD.contains(name(&mathml)) {
+		if !ELEMENTS_WITH_ONE_CHILD.contains(name(&mathml)) {
+			return;
+		}
+
+		if children.is_empty() {
+			// make sure there is content
+			let child = CanonicalizeContext::create_empty_element(&mathml.document());
+			mathml.append_child(child);
+		} else if children.len() > 1 {
 			// wrap the children in an mrow
 			let mrow = create_mathml_element(&mathml.document(), "mrow");
 			mrow.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
@@ -570,6 +580,15 @@ impl CanonicalizeContext {
 	fn is_empty_element(el: Element) -> bool {
 		return (is_leaf(el) && as_text(el).trim().is_empty()) ||
 			   (name(&el) == "mrow" && el.children().is_empty());
+	}
+
+	fn mark_empty_content(el: Element) {
+		for child in el.children() {
+			let child = as_element(child);
+			if CanonicalizeContext::is_empty_element(child) {
+				child.set_attribute_value(EMPTY_IN_2D, "true");
+			}
+		}
 	}
 
 	/// This function does some cleanup of MathML (mostly fixing bad MathML)
@@ -942,7 +961,11 @@ impl CanonicalizeContext {
 				if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 					clean_chemistry_mrow(mathml);
 				}
-				self.assure_nary_tag_has_mrow(mathml);
+				self.assure_nary_tag_has_one_child(mathml);
+				if crate::xpath_functions::IsNode::is_2D(&mathml) {
+					CanonicalizeContext::mark_empty_content(mathml);
+				}
+
 				return Some(mathml);				
 			}
 		}
@@ -3582,7 +3605,6 @@ mod canonicalize_tests {
 
     #[test]
     fn mn_with_negative_sign() {
-		// init_logger();
         let test_str = "<math><mfrac>
 				<mrow><mn>-1</mn></mrow>
 				<mn>−987</mn>
@@ -4243,8 +4265,8 @@ mod canonicalize_tests {
 					<mtext>&#x2009;</mtext>
 				</mfrac></math>";
         let target_str = " <math> <mfrac>
-		  <mtext width='3em' data-changed='empty_content'> </mtext>
-		  <mtext data-changed='empty_content'> </mtext>
+		  <mtext width='3em' data-changed='empty_content' data-empty-in-2D='true'> </mtext>
+		  <mtext data-changed='empty_content' data-empty-in-2D='true'> </mtext>
 		</mfrac> </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
@@ -4270,7 +4292,7 @@ mod canonicalize_tests {
 				</mroot></math>";
         let target_str = "<math><mroot>
 				<mi>b</mi>
-				<mtext data-changed='empty_content'>&#xA0;</mtext>
+				<mtext data-changed='empty_content' data-empty-in-2D='true'>&#xA0;</mtext>
 			</mroot></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
@@ -4300,6 +4322,20 @@ mod canonicalize_tests {
     fn empty_content_after_cleanup() {
         let test_str = "<math><mrow><mphantom><mn>1</mn></mphantom></mrow></math>";
         let target_str = " <math><mtext data-added='missing-content'> </mtext></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn empty_content_fix_num_children() {
+        let test_str = "  <math><mfrac><menclose notation='box'><mrow/></menclose><mrow/></mfrac></math>";
+        let target_str = "<math>
+		<mfrac>
+		  <menclose notation='box'>
+			<mtext data-added='missing-content' data-empty-in-2D='true'> </mtext>
+		  </menclose>
+		  <mtext data-changed='empty_content' data-empty-in-2D='true'> </mtext>
+		</mfrac>
+	   </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 

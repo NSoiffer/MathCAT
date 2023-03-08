@@ -324,6 +324,11 @@ impl IsNode {
         let text = get_text_from_element(node);
         return PUNCTUATION.is_match(&text);
     }
+
+    #[allow(non_snake_case)]
+    pub fn is_2D(elem: &Element) -> bool {
+        return MATHML_2D_NODES.contains(name(elem));
+    }
 }
 
 static MATHML_LEAF_NODES: phf::Set<&str> = phf_set! {
@@ -374,7 +379,7 @@ impl Function for IsNode {
                             match kind.as_str() {
                                 "simple" => IsNode::is_simple(&e),
                                 "leaf"   => MATHML_LEAF_NODES.contains(name(&e)),
-                                "2D" => MATHML_2D_NODES.contains(name(&e)),
+                                "2D" => IsNode::is_2D(&e),
                                 "trig_name" => IsNode::is_trig_name(&e),
                                 "common_fraction" => IsNode::is_common_fraction(&e, usize::MAX, usize::MAX), 
                                 "nemeth_punctuation" => IsNode::is_punctuation(&e),
