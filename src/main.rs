@@ -167,10 +167,9 @@ fn main() {
   //       </msup>
   //     </mrow>
   //   </math>";
-  let expr="<math>
-  <mn>23</mn>
-  <mi intent='-3'>aaaaaa</mi>
-  </math>";
+  let expr="
+  <m:math><m:mfrac><m:menclose notation='box'><m:mrow/></m:menclose><m:mrow/></m:mfrac></m:math>
+  ";
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>
@@ -184,7 +183,7 @@ fn main() {
 //   </mrow>
 //  </math>
 //     ";
-  // let expr= "<math><mrow><mfrac><mn>1</mn><mn>3</mn></mfrac><mo ame-texclass='bin' stretchy='false'>&#x22C5;</mo><mfrac><mn>85</mn><mn>124</mn></mfrac><mo ame-texclass='bin' stretchy='false'>+</mo><mfrac><mn>2</mn><mn>7</mn></mfrac><mo ame-texclass='bin' stretchy='false'>&#x22C5;</mo><mfrac><mn>39</mn><mn>124</mn></mfrac><mo ame-texclass='bin' stretchy='false'>+</mo><mfrac><mn>5</mn><mn>7</mn></mfrac></mrow></math>";
+  // let expr= "<math><mrow><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>";
   let instant = Instant::now();
   let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../../Rules");
   let rules_dir = rules_dir.as_os_str().to_str().unwrap().to_string();
@@ -193,13 +192,14 @@ fn main() {
 
   info!("Version = '{}'", get_version());
   set_preference("Language".to_string(), "en".to_string()).unwrap();
-  set_preference("TTS".to_string(), "none".to_string()).unwrap();
+  set_preference("TTS".to_string(), "None".to_string()).unwrap();
   set_preference("Verbosity".to_string(), "Medium".to_string()).unwrap();
   set_preference("Impairment".to_string(), "Blindness".to_string()).unwrap();
   // set_preference("SpeechOverrides_CapitalLetters".to_string(), "".to_string()).unwrap();
   // set_preference("CapitalLetters_UseWord".to_string(), "true".to_string()).unwrap();
   // set_preference("CapitalLetters_Pitch".to_string(), "30".to_string()).unwrap();
   set_preference("CapitalLetters_Beep".to_string(), "true".to_string()).unwrap();
+  set_preference("IntentErrorRecovery".to_string(), "Error".to_string()).unwrap();
   // set_preference("MathRate".to_string(), "77".to_string()).unwrap();
   
   set_preference("Bookmark".to_string(), "false".to_string()).unwrap();
