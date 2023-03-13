@@ -168,7 +168,11 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr="
-  <m:math><m:mfrac><m:menclose notation='box'><m:mrow/></m:menclose><m:mrow/></m:mfrac></m:math>
+  <msubsup intent='$op($n,$m)'>
+  <mi arg='op' intent='binomial'>C</mi>
+  <mi arg='n'>n</mi>
+  <mi arg='m'>m</mi>
+</msubsup>
   ";
 //   let expr = "
 //   <math display='block'>

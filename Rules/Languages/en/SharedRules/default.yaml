@@ -445,7 +445,7 @@
 
 - name: intent-literal-silent
   tag: "intent-literal"
-  match: "@data-intent-hint='silent'"
+  match: "@data-intent-property=':silent:'"
   # say nothing
   replace: []
 
@@ -468,14 +468,14 @@
 - name: silent-intent
   # uncaught intent -- speak as arg1 arg2 ....
   tag: "*"
-  match: "@data-intent-hint='silent' and count(*)>0"
+  match: "@data-intent-property=':silent:' and count(*)>0"
   replace:
   - x: "*"
 
 - name: prefix-intent
   # uncaught intent -- speak as arg1 arg2 ....
   tag: "*"
-  match: "@data-intent-hint='prefix' and count(*)>0"
+  match: "@data-intent-property=':prefix:' and count(*)>0"
   replace:
   - x: "translate(name(.), '-_', '  ')"
   - x: "*"
@@ -484,7 +484,7 @@
 - name: postfix-intent
   # uncaught intent -- speak as arg1 arg2 ....
   tag: "*"
-  match: "@data-intent-hint='postfix' and count(*)>0"
+  match: "@data-intent-property=':postfix:' and count(*)>0"
   replace:
   - pause: short
   - x: "*"
@@ -494,7 +494,7 @@
 - name: infix-intent
   # uncaught intent -- speak as foo of arg1 comma arg2 ....
   tag: "*"
-  match: "@data-intent-hint='infix' and count(*)>0"
+  match: "@data-intent-property=':infix:' and count(*)>0"
   replace:
   - pause: short
   - insert:

@@ -3284,7 +3284,7 @@ pub fn as_element(child: ChildOfElement) -> Element {
 // The child of a leaf element must be text (previously trimmed)
 // Note: trim() combines all the Text children into a single string
 pub fn as_text(leaf_child: Element) -> &str {
-	assert!(is_leaf(leaf_child) || name(&leaf_child) == crate::infer_intent::LITERAL_NAME);
+	assert!(is_leaf(leaf_child));
 	let children = leaf_child.children();
 	if children.is_empty() {
 		return "";
