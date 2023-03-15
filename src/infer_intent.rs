@@ -68,7 +68,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
 // property   = ':' NCName
 // reference  = '$' NCName
 // NCName = [\pL][\pL\-.d]*
-// funcall = piece '(' piece (',' piece)* ')'
+// funcall = piece '(' pieces (',' pieces)* ')'
 lazy_static! {
     // The practical restrictions of NCName are that it cannot contain several symbol characters like
     //  !, ", #, $, %, &, ', (, ), *, +, ,, /, :, ;, <, =, >, ?, @, [, \, ], ^, `, {, |, }, ~, and whitespace characters
@@ -255,19 +255,22 @@ fn build_pieces<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
                                         lex_state: &mut LexState<'b>,
                                         mathml: Element<'c>) -> Result<Element<'m>> {
     // pieces := piece (spaces piece)*
-    // piece  := property+ | word property* | funcall
     debug!("  start build_pieces: state: {}", lex_state);
     let mut pieces = Vec::with_capacity(15);
     while !(lex_state.is_terminal("(") || lex_state.is_terminal(",") || lex_state.is_terminal(")")) {
         pieces.push(build_piece(rules_with_context, lex_state, mathml)?);
-        // lex_state.remaining_str = lex_state.remaining_str.trim_start(); // spaces are allowed between each 'piece'
         if lex_state.remaining_str.is_empty() {     // can't be part of while test because we might start with nothing remaining
+            debug!("  build_pieces empty string -- lex_state: {}", lex_state);
+            match lex_state.token {
+                Token::Terminal(_) | Token::None => (),
+                _ => pieces.push(build_piece(rules_with_context, lex_state, mathml)?),
+            };
             break;
         }
     }
 
     if pieces.is_empty() {
-        bail!("Illegal 'intent' syntax: missing argument'");
+        bail!("Illegal 'intent' syntax: no content'");
     } else if pieces.len() == 1 {
         debug!("  end build_pieces: {}", mml_to_string(&pieces[0]));
         return Ok(pieces[0]);
@@ -587,6 +590,16 @@ mod tests {
     }
 
     #[test]
+    fn intent_template_at_toplevel() {
+        let mathml = "<msup intent='$H $n'>
+            <mi arg='H' mathvariant='normal'>H</mi>
+            <mn arg='n'>2</mn>
+            </msup>";
+        let intent = "<mrow><mi arg='H' mathvariant='normal'>H</mi><mn arg='n'>2</mn></mrow>";
+        assert!(test_intent(mathml, intent, "Error"));
+    }
+
+    #[test]
     fn intent_with_nested_indirect_head() {
         let mathml = "<mrow intent='$op($a,$b)'>
                 <mi arg='a'>A</mi>
@@ -606,6 +619,15 @@ mod tests {
                 <mi>x</mi>
             </mrow>";
         let intent = "<vector><mn>1</mn><mn>0.</mn><mn>.1</mn><mn>-23</mn><mn>-.1234</mn><mi>last</mi></vector>";
+        assert!(test_intent(mathml, intent, "Error"));
+    }
+
+    #[test]
+    fn intent_with_string_literals() {
+        let mathml = "<mrow intent='1 0. .1 -23 -.1234 last'>
+                <mi>x</mi>
+            </mrow>";
+        let intent = "<mrow><mn>1</mn><mn>0.</mn><mn>.1</mn><mn>-23</mn><mn>-.1234</mn><mi>last</mi></mrow>";
         assert!(test_intent(mathml, intent, "Error"));
     }
 
@@ -654,7 +676,6 @@ mod tests {
 
     #[test]
     fn intent_double_indirect_head() {
-        init_logger();
         let mathml = "<mrow intent='$m:prefix($c)($a,$b)'>
                 <mi arg='a'>A</mi>
                 <mover>
