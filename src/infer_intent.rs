@@ -67,7 +67,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
 // literal         = [^\s:\$,;()]+
 // property   = ':' NCName
 // reference  = '$' NCName
-// NCName = [\pL][\pL\-.d]*
+// NCName = [\pL][\pL\pMn\-.\d·]*
 // funcall = piece '(' pieces (',' pieces)* ')'
 lazy_static! {
     // The practical restrictions of NCName are that it cannot contain several symbol characters like
@@ -76,10 +76,10 @@ lazy_static! {
     // NC_NAME from www.w3.org/TR/REC-xml/#sec-common-syn, with "\pL" for letters 
 
     static ref LITERAL: Regex = Regex::new(r"^[^\s:\$,;()]+").unwrap(); 
-    static ref PROPERTY: Regex = Regex::new(r"^:[\pL][\pL\-.\d]*").unwrap();    // : NC_NAME
-    static ref ARG_REF: Regex = Regex::new(r"^\$[\pL][\pL\-.\d]*").unwrap();  // $ NC_NAME
+    static ref PROPERTY: Regex = Regex::new(r"^:[\pL][\pL\pMn\-.\d·]*").unwrap();    // : NC_NAME
+    static ref ARG_REF: Regex = Regex::new(r"^\$[\pL][\pL\pMn\-.\d·]*").unwrap();  // $ NC_NAME
     static ref NUMBER: Regex = Regex::new(r"^-?([0-9]+.?[0-9]*|.[0-9]+)").unwrap();     // Token::Literal -- used for matching later on
-    static ref NC_NAME: Regex = Regex::new(r"^[\pL][\pL\-.d]*").unwrap();     // Token::Literal -- used for matching later on
+    static ref NC_NAME: Regex = Regex::new(r"^[\pL][\pL\pMn\-.\d·]*").unwrap();     // Token::Literal -- used for matching later on
 }
 
 static TERMINALS_AS_U8: [u8; 4] = [b'(', b',', b')', b';'];
