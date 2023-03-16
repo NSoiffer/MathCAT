@@ -1,4 +1,19 @@
 ---  # Indonesian translation contributor: Budi Darmulyana (budi@mitranetra.or.id)
+
+- name: intent-literal-silent
+  tag: [mi, mo, mn]
+  match: "contains(@data-intent-property, ':silent:')"
+  # say nothing
+  replace: []
+
+# handling of negative numbers is hard -- we do something that is close to right here
+- name: intent-literal-negative-number
+  tag: "mn"
+  match: "starts-with(text(), '-')" 
+  replace:
+  - T: "kurang"
+  - x: "translate(text(), '-_', '')"   # more accurate to translate "-" to nothing, but turning it into a space should be ok
+
 - name: default
   tag: square-root
   match: "."
@@ -48,7 +63,7 @@
           then: [{T: negatif}]
           else: [{T: positif}]
   - test:
-      if: "*[2][self::m:mn or self::m:intent-literal]"
+      if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][text()='2']"
         then: {T: akar kuadrat}

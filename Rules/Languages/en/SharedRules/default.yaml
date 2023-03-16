@@ -33,7 +33,15 @@
       replace: [pause: auto]
 
 - name: default
-  tag: [mi, mn, mo, mtext]
+  tag: mn
+  match: "."
+  replace:
+  - bookmark: "@id"
+  # FIX: removing the digit block separators is likely locale dependent
+  - x: "translate(., ' ,`', '')"   # remove digit block separators
+
+- name: default
+  tag: [mi, mo, mtext]
   match: "."
   replace:
   - bookmark: "@id"
@@ -443,39 +451,19 @@
   replace:
   - x: "*[1]"
 
-- name: intent-literal-silent
-  tag: "intent-literal"
-  match: "@data-intent-property=':silent:'"
-  # say nothing
-  replace: []
-
-# handling of negative numbers is hard -- we do something that is close to right here
-- name: intent-literal-negative-number
-  tag: "intent-literal"
-  match: "starts-with(text(), '-')"
-  replace:
-  - t: "minus"
-  - x: "translate(text(), '-_.', ' ')"   # more accurate to translate "-" to nothing, but turning it into a space should be ok
-
-- name: intent-literal
-  # unknown leaf -- just speak the text -- could be a literal intent
-  tag: "intent-literal"
-  match: "."
-  replace:
-  - x: "translate(text(), '-_.', '  ')"
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: silent-intent
   # uncaught intent -- speak as arg1 arg2 ....
   tag: "*"
-  match: "@data-intent-property=':silent:' and count(*)>0"
+  match: "contains(@data-intent-property, ':silent:') and count(*)>0"
   replace:
   - x: "*"
 
 - name: prefix-intent
   # uncaught intent -- speak as arg1 arg2 ....
   tag: "*"
-  match: "@data-intent-property=':prefix:' and count(*)>0"
+  match: "contains(@data-intent-property, ':prefix:') and count(*)>0"
   replace:
   - x: "translate(name(.), '-_', '  ')"
   - x: "*"
@@ -484,7 +472,7 @@
 - name: postfix-intent
   # uncaught intent -- speak as arg1 arg2 ....
   tag: "*"
-  match: "@data-intent-property=':postfix:' and count(*)>0"
+  match: "contains(@data-intent-property, ':postfix:') and count(*)>0"
   replace:
   - pause: short
   - x: "*"
@@ -494,7 +482,7 @@
 - name: infix-intent
   # uncaught intent -- speak as foo of arg1 comma arg2 ....
   tag: "*"
-  match: "@data-intent-property=':infix:' and count(*)>0"
+  match: "contains(@data-intent-property, ':infix:') and count(*)>0"
   replace:
   - pause: short
   - insert:
