@@ -168,12 +168,24 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr="
-  <msubsup intent='$op($n,$m)'>
-  <mi arg='op' intent='binomial'>C</mi>
-  <mi arg='n'>n</mi>
-  <mi arg='m'>m</mi>
-</msubsup>
-  ";
+  <math display='block'>
+  <mrow>
+   <msup>
+    <mrow>
+     <mo>(</mo>
+     <mi>g</mi>
+     <mo>∘</mo>
+     <mi>h</mi>
+     <mo>)</mo>
+    </mrow>
+    <mo>′</mo>
+   </msup>
+   <mo>(</mo>
+   <mi>x</mi>
+   <mo>)</mo>
+  </mrow>
+ </math>
+   ";
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>

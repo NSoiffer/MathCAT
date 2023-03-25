@@ -33,11 +33,29 @@
       replace: [{pause: auto}]
 
 - name: default
-  tag: [mi, mn, mo, mtext]
+  tag: mn
+  match: "."
+  replace:
+  - bookmark: "@id"
+  # FIX: removing the digit block separators is likely locale dependent
+  - x: "translate(., ' ,`', '')"   # remove digit block separators
+
+- name: default
+  tag: [mo, mtext]
   match: "."
   replace:
   - bookmark: "@id"
   - x: "text()"
+
+- name: default
+  tag: mi
+  match: "."
+  replace:
+  - bookmark: "@id"
+  - test:
+      if: "string-length(.) = 1"       # need unicode.tdl to kick in for single letter tokens
+      then: [x: "text()"]
+      else: [x: "translate(., '-_', '  ')" ]   # from intent literals
 
 - name: default
   tag: ms

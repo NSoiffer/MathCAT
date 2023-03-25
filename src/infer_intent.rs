@@ -217,7 +217,7 @@ fn build_piece<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRules
                 "mo"
             };
             piece = create_mathml_element(&doc, leaf_name);
-            piece.set_text(word);
+            piece.set_text(word);       // '-' and '_' get removed by the rules.
             lex_state.get_next()?;
             if let Token::Property(_) = lex_state.token {
                 let properties = get_properties(lex_state)?;
