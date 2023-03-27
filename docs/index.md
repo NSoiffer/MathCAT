@@ -12,7 +12,7 @@ Todo: incorporation of third party libraries to support a common subset of TeX m
 
 MathCAT is written in Rust and can be built to interface with many languages. To date there are interfaces for:
 * [C/C++](https://github.com/NSoiffer/MathCATForC)
-* [Python](https://github.com/NSoiffer/MathCATForPython) -- this is used by an [NVDA add-on](https://addons.nvda-project.org/addons/MathCAT.en.html). I hope to eventually get it incorporated into [Orca](https://help.gnome.org/users/orca/stable) which is written in Python.
+* [Python](https://github.com/NSoiffer/MathCATForPython) -- this is used by an [NVDA add-on](https://nvda-addons.org/files/get.php?file=mathcat). I hope to eventually get it incorporated into [Orca](https://help.gnome.org/users/orca/stable) which is written in Python.
 * [Java](https://github.com/mwhapples/MathCAT4J) -- this is currently being used to experiment with MathCAT in [BrailleBlaster](https://www.brailleblaster.org/).
 * [WebAssembly (Wasm)](https://github.com/NSoiffer/MathCATDemo/) -- this is used for a web demo of MathCAT.
 
