@@ -21,7 +21,7 @@ MathCAT uses a number of heuristics that try to repair poor MathML and put it in
 ## Current Status (updated 1/18/23)
 MathCAT is under active development. Initial speech, navigation, and Nemeth generation is complete and [NVDA add-on](https://nvda-addons.org/files/get.php?file=mathcat) now exists. It should be usable as a MathPlayer replacement for those using the English version or one of the supported translations. It is not as complete or polished in some ways as MathPlayer though. However, it supports both Nemeth and UEB technical braille generation. The Nemeth braille is substantially better than that provided by MathPlayer and includes integration with navigation (uses dots 7 and 8 to indicate the navigation node).
 
-A demo to show off some of MathCAT's features and also as an aid for debugging was developed. [Visit the demo](https://nsoiffer.github.io/MathCATDemo/) and please report any bugs you find. This demo is _not_ how AT users will typically interact with MathCAT but does show features that AT can potentially expose to end users such as highlighting of the speech, navigation, and braille.
+[This video](https://youtu.be/-UNeJCStdp4) by Richard Orme show MathCAT working in NVDA. A demo to show off some of MathCAT's features and also as an aid for debugging was developed. [Visit the demo](https://nsoiffer.github.io/MathCATDemo/) and please report any bugs you find. This demo is _not_ how AT users will typically interact with MathCAT but does show features that AT can potentially expose to end users such as highlighting of the speech, navigation, and braille.
 
 Timeline (Starting Dec 2021):
 * ✓ December/early January: prototype usage of preliminary MathML WG proposal for "intent"
