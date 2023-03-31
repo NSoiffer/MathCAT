@@ -579,7 +579,7 @@ impl CanonicalizeContext {
 	
 	fn is_empty_element(el: Element) -> bool {
 		return (is_leaf(el) && as_text(el).trim().is_empty()) ||
-			   (name(&el) == "mrow" && el.children().is_empty());
+			   (name(&el) == "mrow" && el.children().is_empty() && el.attribute("intent").is_none());
 	}
 
 	fn mark_empty_content(el: Element) {
@@ -589,6 +589,14 @@ impl CanonicalizeContext {
 				child.set_attribute_value(EMPTY_IN_2D, "true");
 			}
 		}
+	}
+
+	/// most of the time it is ok to merge the mrow with its singleton child, but there are some exceptions:
+	///   mrow has 'intent' -- this might reference the child and you aren't allowed to self reference
+	fn is_ok_to_merge_mrow_child(mrow: Element) -> bool {
+		assert_eq!(name(&mrow), "mrow");
+		assert!(mrow.children().len() == 1);
+		return mrow.attribute("intent").is_none();		// could check if child is referenced, but that's a chunk of code
 	}
 
 	/// This function does some cleanup of MathML (mostly fixing bad MathML)
@@ -636,7 +644,7 @@ impl CanonicalizeContext {
 		};
 		
 		if mathml.children().is_empty() && !EMPTY_ELEMENTS.contains(element_name) {
-			if element_name == "mrow" {
+			if element_name == "mrow" && mathml.attribute("intent").is_none() {
 				// if it is an empty mrow that doesn't need to be there, get rid of it. Otherwise, replace it with an mtext
 				if parent_requires_child {
 					if parent_name == "mmultiscripts" {	// MathML Core dropped "none" in favor of <mrow/>, but MathCAT is written with <none/>
@@ -843,9 +851,9 @@ impl CanonicalizeContext {
 				let children = mathml.children();
 				if element_name == "mrow" {
 					// handle special cases of empty mrows and mrows which just one element
-					if children.is_empty() {
+					if children.is_empty() && mathml.attribute("intent").is_none() {
 						return if parent_requires_child {Some(mathml)} else {None};
-					} else if children.len() == 1 {
+					} else if children.len() == 1 && CanonicalizeContext::is_ok_to_merge_mrow_child(mathml) {
 						let is_from_mhchem = is_from_mhchem_hack(mathml);
 						if let Some(new_mathml) = self.clean_mathml(as_element(children[0])) {
 							// "lift" the child up so all the links (e.g., siblings) are correct
@@ -906,7 +914,7 @@ impl CanonicalizeContext {
 				}
 
 				// could have deleted children so only one child remains -- need to lift it
-				if element_name == "mrow" && children.len() == 1 {
+				if element_name == "mrow" && children.len() == 1 && CanonicalizeContext::is_ok_to_merge_mrow_child(mathml) {
 					// "lift" the child up so all the links (e.g., siblings) are correct
 					let child = as_element(children[0]);
 					mathml.replace_children(child.children());
@@ -2978,7 +2986,7 @@ impl CanonicalizeContext {
 		// 		show_invisible_op_char(top_of_stack.op_pair.ch), top_of_stack.op_pair.op.priority,
 		// 		top_of_stack.is_operand);
 		let mut mrow = top_of_stack.mrow;
-		if mrow.children().len() == 1 {
+		if mrow.children().len() == 1 && CanonicalizeContext::is_ok_to_merge_mrow_child(mrow) {
 			// should have added at least operator and operand, but input might not be well-formed
 			// in this case, unwrap the mrow and expose the single child for pushing onto stack
 			let single_child = top_of_stack.remove_last_operand_from_mrow();
@@ -3087,6 +3095,7 @@ impl CanonicalizeContext {
 		consecutive operands such as nary times are also considered n-ary operators and don't push/pop in those cases.
 	*/
 	fn canonicalize_mrows_in_mrow<'a>(&self, mrow: Element<'a>) -> Result<Element<'a>> {
+		let is_ok_to_merge_child = mrow.children().len() != 1 || CanonicalizeContext::is_ok_to_merge_mrow_child(mrow);
 		let saved_mrow_attrs = mrow.attributes();	
 		assert_eq!(name(&mrow), "mrow");
 	
@@ -3226,7 +3235,7 @@ impl CanonicalizeContext {
 	
 		let mut parsed_mrow = top_of_stack.mrow;
 		assert_eq!( name(&top_of_stack.mrow), "mrow");
-		if parsed_mrow.children().len() == 1 {
+		if parsed_mrow.children().len() == 1 && is_ok_to_merge_child {
 			parsed_mrow = top_of_stack.remove_last_operand_from_mrow();
 			// was synthesized, but is really the original top level mrow
 		}
@@ -3345,7 +3354,7 @@ fn show_invisible_op_char(ch: &str) -> &str {
 mod canonicalize_tests {
 	#[allow(unused_imports)]
 	use super::super::init_logger;
-	use super::super::are_strs_canonically_equal;
+	use super::super::{are_strs_canonically_equal, abs_rules_dir_path};
     use super::*;
     use sxd_document::parser;
 
@@ -3601,6 +3610,49 @@ mod canonicalize_tests {
         let test_str = "<math><mrow><mrow><mo>-</mo><mi>a</mi></mrow></mrow></math>";
         let target_str = "<math><mrow><mo>-</mo><mi>a</mi></mrow></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
+    fn mrow_with_intent_and_single_child() {
+		use crate::interface::*;
+		use sxd_document::parser;
+		use crate::canonicalize::canonicalize;
+		// this forces initialization
+		crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
+		crate::speech::SPEECH_RULES.with(|_| true);
+
+		// we don't want to remove the mrow because the intent on the mi would reference itself
+        let test = "<math><mrow intent='log($x)'><mi arg='x'>X</mi></mrow></math>";	
+
+		let package1 = &parser::parse(test).expect("Failed to parse test input");
+		let mathml = get_element(package1);
+		trim_element(&mathml);
+		let mathml_test = canonicalize(mathml).unwrap();
+		let first_child = as_element( mathml_test.children()[0] );
+		assert_eq!(name(&first_child), "mrow");
+		assert_eq!(first_child.children().len(), 1);
+    }
+
+    #[test]
+    fn empty_mrow_with_intent() {
+		// we don't want to remove the mrow because the intent on the mi would reference itself
+		use crate::interface::*;
+		use sxd_document::parser;
+		use crate::canonicalize::canonicalize;
+		// this forces initialization
+		crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
+		crate::speech::SPEECH_RULES.with(|_| true);
+
+		// we don't want to remove the mrow because the intent on the mi would reference itself
+        let test = "<math><mrow intent='log(x)'/></math>";
+
+		let package1 = &parser::parse(test).expect("Failed to parse test input");
+		let mathml = get_element(package1);
+		trim_element(&mathml);
+		let mathml_test = canonicalize(mathml).unwrap();
+		let first_child = as_element( mathml_test.children()[0] );
+		assert_eq!(name(&first_child), "mrow");
+		assert!(first_child.children().is_empty());
     }
 
     #[test]
