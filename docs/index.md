@@ -12,19 +12,21 @@ Todo: incorporation of third party libraries to support a common subset of TeX m
 
 MathCAT is written in Rust and can be built to interface with many languages. To date there are interfaces for:
 * [C/C++](https://github.com/NSoiffer/MathCATForC)
-* [Python](https://github.com/NSoiffer/MathCATForPython) -- this is used by an [NVDA add-on](https://nvda-addons.org/files/get.php?file=mathcat). I hope to eventually get it incorporated into [Orca](https://help.gnome.org/users/orca/stable) which is written in Python.
+* [Python](https://github.com/NSoiffer/MathCATForPython) -- this is used by an [NVDA add-on](https://addons.nvda-project.org/addons/MathCAT.en.html). I hope to eventually get it incorporated into [Orca](https://help.gnome.org/users/orca/stable) which is written in Python.
 * [Java](https://github.com/mwhapples/MathCAT4J) -- this is currently being used to experiment with MathCAT in [BrailleBlaster](https://www.brailleblaster.org/).
 * [WebAssembly (Wasm)](https://github.com/NSoiffer/MathCATDemo/) -- this is used for a web demo of MathCAT.
 
 MathCAT uses a number of heuristics that try to repair poor MathML and put it in a recommended format. For example, TeX converters and WYSIWYG editors will take "1,234+1" and break the number "1,234" apart at the comma. MathCAT recognizes that and folds the number into a single `mn`. Other repairs are structural such as creating `mrow`s based on information from MathML's operator dictionary and adding invisible function application, multiplication, addition (mixed fractions), and separators (e.g, between the $i$ and $j$ in $a\_{ij}$) when it seems appropriate. This simplifies speech and Nemeth generation and may be useful to other apps. Currently the cleanup is not exposed in an API, but potentially it could be another service of MathCAT. In general, MathCAT is somewhat conservative in its repair. However, it likely will do the wrong thing in some cases, but the hope is it does the right thing much, much more frequently. Finding common mistakes of translators to MathML and patching up the poor MathML is an ongoing project.
 
-## Current Status (updated 1/18/23)
-MathCAT is under active development. Initial speech, navigation, and Nemeth generation is complete and [NVDA add-on](https://nvda-addons.org/files/get.php?file=mathcat) now exists. It should be usable as a MathPlayer replacement for those using the English version or one of the supported translations. It is not as complete or polished in some ways as MathPlayer though. However, it supports both Nemeth and UEB technical braille generation. The Nemeth braille is substantially better than that provided by MathPlayer and includes integration with navigation (uses dots 7 and 8 to indicate the navigation node).
+## Current Status (updated 3/20/23)
+MathCAT is under active development. Initial speech, navigation, and Nemeth generation is complete and [NVDA add-on](https://addons.nvda-project.org/addons/MathCAT.en.html) now exists. It should be usable as a MathPlayer replacement for those using the English version or one of the supported translations. It is not as complete or polished in some ways as MathPlayer though. However, it supports both Nemeth and UEB technical braille generation. The Nemeth braille is substantially better than that provided by MathPlayer and includes integration with navigation (uses dots 7 and 8 to indicate the navigation node). Because of the high quality braille output, [BrailleBlaster](https://www.brailleblaster.org/) uses MathCAT for braille generation from MathML.
 
-[This video](https://youtu.be/-UNeJCStdp4) by Richard Orme show MathCAT working in NVDA. A demo to show off some of MathCAT's features and also as an aid for debugging was developed. [Visit the demo](https://nsoiffer.github.io/MathCATDemo/) and please report any bugs you find. This demo is _not_ how AT users will typically interact with MathCAT but does show features that AT can potentially expose to end users such as highlighting of the speech, navigation, and braille.
+A demo to show off some of MathCAT's features and also as an aid for debugging was developed. [Visit the demo](https://nsoiffer.github.io/MathCATDemo/) and please report any bugs you find. This demo is _not_ how AT users will typically interact with MathCAT but does show features that AT can potentially expose to end users such as highlighting of the speech, navigation, and braille.
 
-Timeline (Starting Dec 2021):
-* ✓ December/early January: prototype usage of preliminary MathML WG proposal for "intent"
+Timeline:
+
+2022
+* ✓ early January: prototype usage of preliminary MathML WG proposal for "intent"
 * ✓ January: Distribute MathCAT to a small group of students and other users for feedback and bug reports
 * ✓ February/March: Work on MathML->UEB translation
 * ✓ April: Prosody implementation/compatibility with SAPI, One Core, eSpeak, and Eloquence voices
@@ -35,20 +37,24 @@ Timeline (Starting Dec 2021):
 * ✓ July - Oct: Add Chemistry-specific speech
 * ✓ July/Aug/Sept: vacation 😎 and conference
 * ✓ Nov/Dec: Work on at least one translation of MathCAT to another language (pushed back from late spring). Have Indonesian and Vietnamese translations.
-* Winter, Spring 2023: add more inference/speech rules (at least units and currency)
-* Winter, Spring 2023: analyze books to better determine what should be in the Unicode short file (hopefully get someone to help with this)
-* Winter, Spring 2023: translation work
+
+2023
+* Spring 2023: add more inference/speech rules (at least units and currency) [on hold due to Math WG intent discussions continuing]
+* Spring 2023: analyze books to better determine what should be in the Unicode short file (hopefully get someone to help with this)
+* Spring 2023: translation work
   * ✓ Create some tools to simplify generation of the Unicode files in different languages
-  * Create some tools to help update other languages when the English version changes (adds new rules)
+  * Create some tools to help update other languages when the English version changes (adds new rules) [critical]
+  * Add phrases so better starting points for translations can be generated
   * Work with translators and fix any problems they might turn up
   * Work with translators to hopefully add many languages
-* Winter, Spring 2023: work on UEB->MathML translation and explore UEB->Nemeth math translator
-* Summer 2023: potentially work on 2D Nemeth generation along with Nemeth input
+* Early 2024: work on UEB->MathML translation and explore UEB->Nemeth math translator
+* Fall 2023: potentially work on 2D Nemeth generation along with Nemeth input
+* Early 2024: work on UEB->MathML translation and explore UEB->Nemeth math translator
+
 
 
 These plans are very tentative and will likely change based on feedback from users and AT developers.
 I also have commitments for working on the MathML spec, so that can also delay some of these dates.
-A broken ankle also slowed me down in more ways than one in the spring and summer (2022).
 
 # Documentation for different MathCAT Users
 
