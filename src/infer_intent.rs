@@ -224,13 +224,8 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
             intent.set_text(word);       // '-' and '_' get removed by the rules.
             lex_state.get_next()?;
             if let Token::Property(_) = lex_state.token {
-                let mut properties = get_properties(lex_state)?;
-                if word == "_" {
-                    properties.push_str("silent:");     // if order matters, this should be first (current spec says order is implementation dependent)
-                }
+                let properties = get_properties(lex_state)?;
                 intent.set_attribute_value(INTENT_PROPERTY, &properties);
-            } else if word == "_" {
-                intent.set_attribute_value(INTENT_PROPERTY, ":silent:");
             }
         },
         Token::ArgRef(word) => {
@@ -287,11 +282,6 @@ fn build_function<'b, 'r, 'c, 's:'c, 'm:'c>(
     // application := intent '(' arguments? S ')'  where 'function_name' is 'intent'
     assert!(lex_state.is_terminal("("));
     let mut function = function_name;
-    if name(&function) == "mi" && as_text(function) == "_" {
-        // convert the (silent) "_" to an mrow with the property "silent"
-        set_mathml_name(function, "mrow");
-        function.clear_children();
-    }
     while lex_state.is_terminal("(") {
         lex_state.get_next()?;
         if lex_state.is_terminal(")") {
@@ -461,7 +451,7 @@ mod tests {
     #[test]
     fn silent_underscore() {
         let mathml = "<mrow><mi intent='_'>silent</mi><mo>+</mo><mi>e</mi></mrow>";
-        let intent = "<mrow>=<mi data-intent-property=':silent:'>_</mi><mo>+</mo><mi>e</mi></mrow>";
+        let intent = "<mrow>=<mi>_</mi><mo>+</mo><mi>e</mi></mrow>";
         assert!(test_intent(mathml, intent, "Error"));
     }
 
@@ -469,7 +459,7 @@ mod tests {
     #[test]
     fn silent_underscore_function() {
         let mathml = "<mrow intent='_(speak, this)'></mrow>";
-        let intent = "<mrow data-intent-property=':silent:'><mi>speak</mi><mi>this</mi></mrow>";
+        let intent = "<_><mi>speak</mi><mi>this</mi></_>";
         assert!(test_intent(mathml, intent, "Error"));
     }
 
