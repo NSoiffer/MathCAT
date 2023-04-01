@@ -3631,6 +3631,8 @@ mod canonicalize_tests {
 		let first_child = as_element( mathml_test.children()[0] );
 		assert_eq!(name(&first_child), "mrow");
 		assert_eq!(first_child.children().len(), 1);
+		let mi = as_element(first_child.children()[0]);
+		assert_eq!(name(&mi), "mi");
     }
 
     #[test]
@@ -3643,7 +3645,7 @@ mod canonicalize_tests {
 		crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
 		crate::speech::SPEECH_RULES.with(|_| true);
 
-		// we don't want to remove the mrow because the intent on the mi would reference itself
+		// we don't want to remove the mrow because the intent needs to stick around
         let test = "<math><mrow intent='log(x)'/></math>";
 
 		let package1 = &parser::parse(test).expect("Failed to parse test input");
@@ -3652,7 +3654,10 @@ mod canonicalize_tests {
 		let mathml_test = canonicalize(mathml).unwrap();
 		let first_child = as_element( mathml_test.children()[0] );
 		assert_eq!(name(&first_child), "mrow");
-		assert!(first_child.children().is_empty());
+		assert_eq!(first_child.children().len(), 1);
+		let mtext = as_element(first_child.children()[0]);
+		assert_eq!(name(&mtext), "mtext");
+
     }
 
     #[test]
