@@ -53,7 +53,7 @@
   replace:
   - bookmark: "@id"
   - test:
-      if: "string-length(.) = 1"       # need unicode.tdl to kick in for single letter tokens
+      if: "string-length(.) = 1 and text() != '_'"       # need unicode.tdl to kick in for single letter tokens
       then: [x: "text()"]
       else: [x: "translate(., '-_', '  ')" ]   # from intent literals
 
@@ -73,7 +73,7 @@
 - name: simple-sub
   tag: particular-value-of
   # invisible comma -- want "x sub 1 1" without "end sub"
-  match: "IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][text()='⁣']]"
+  match: "count(*)=2 and (IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][text()='⁣']])"
   replace:
   - x: "*[1]"
   - test:
@@ -83,7 +83,7 @@
 
 - name: default
   tag: particular-value-of
-  match: "."
+  match: "count(*)=2"
   replace:
   - x: "*[1]"
   - t: "sub"
@@ -461,6 +461,14 @@
   replace:
   - x: "*[1]"
 
+
+# Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
+- name: function_underscore
+  # uncaught intent -- speak as arg1 arg2 ....
+  tag: "_"
+  match: "."
+  replace:
+  - x: "*"
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: silent-intent

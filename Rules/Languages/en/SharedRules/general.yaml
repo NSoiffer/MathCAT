@@ -3,7 +3,7 @@
 # number-sets are a little messy in that the base was converted to a number-set, so we have to match that (simple) case last
 - name: pos-neg-number-sets
   tag: number-sets
-  match: "*[2][text()='+' or text()='-']"
+  match: "count(*)=2 and *[2][text()='+' or text()='-']"
   replace:
   - test:
       if: "$Verbosity!='Terse'"
@@ -107,7 +107,7 @@
 
 - name: binomial
   tag: binomial
-  match: "not(@data-intent-hint)"
+  match: "count(*)=2 and not(@data-intent-hint)"
   replace:
   - x: "*[1]"
   - t: choose
@@ -115,7 +115,7 @@
 
 - name: permutation
   tag: permutation-symbol
-  match: "not(@data-intent-hint)"
+  match: "count(*)=2 and not(@data-intent-hint)"
   replace:
   - x: "*[2]"
   - t: permutations of
@@ -123,7 +123,7 @@
 
 - name: intervals
   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
-  match: "not(@data-intent-hint)"
+  match: "count(*)=2 and not(@data-intent-hint)"
   replace:
   - test:
       if: "$Verbosity!='Terse'"
@@ -144,7 +144,7 @@
 
 - name: default-point
   tag: point
-  match: "not(@data-intent-hint)"
+  match: "count(*)=2 and not(@data-intent-hint)"
   replace:
   - test:
       if: "$Verbosity!='Terse'"
@@ -157,7 +157,7 @@
 
 - name: absolute-value
   tag: absolute-value
-  match: "not(@data-intent-hint)"
+  match: "count(*)=1 and not(@data-intent-hint)"
   replace:
   - test:
       if: "$Verbosity='Terse'"
@@ -171,7 +171,7 @@
 
 - name: negative
   tag: negative
-  match: "not(@data-intent-hint)"
+  match: "count(*)=1 and not(@data-intent-hint)"
   replace:
   - bookmark: "./@id"
   - t: "negative"
@@ -179,7 +179,7 @@
 
 - name: positive
   tag: positive
-  match: "not(@data-intent-hint)"
+  match: "count(*)=1 and not(@data-intent-hint)"
   replace:
   - bookmark: "./@id"
   - t: "positive"
@@ -187,7 +187,7 @@
 
 - name: subscript
   tag: sub
-  match: "not(@data-intent-hint)"
+  match: "count(*)=2 and not(@data-intent-hint)"
   replace:
   - x: "*[1]"
   - t: "sub"
@@ -211,7 +211,7 @@
 
 - name: bigop-under
   tag: large-op
-  match: "not(@data-intent-hint)"
+  match: "count(*)=2 and not(@data-intent-hint)"
   replace:
   - test:
       if: "$Verbosity!='Terse'"
@@ -236,7 +236,7 @@
 
 - name: limit
   tag: limit
-  match: "not(@data-intent-hint)"
+  match: "count(*)=2 and not(@data-intent-hint)"
   replace:
   - test:
       if: "$Verbosity!='Terse'"
@@ -247,7 +247,7 @@
 
 - name: vector
   tag: modified-variable
-  match: "*[2][text()='→']"
+  match: "count(*)=2 and *[2][text()='→']"
   replace:
   - t: "vector"
   - x: "*[1]"
@@ -255,7 +255,7 @@
 - name: default
 
   tag: modified-variable
-  match: "not(@data-intent-hint)"
+  match: "count(*)=2 and not(@data-intent-hint)"
   replace:
   - x: "*[1]"
   - x: "*[2]"
@@ -700,7 +700,7 @@
 
 - name: chemistry-msup
   tag: [chemical-formula]
-  match: "*[1][text()='msup']"
+  match: "count(*)=3 and *[1][text()='msup']"
   replace:
   - x: "*[2]"
   - test:
@@ -900,7 +900,7 @@
 
 - name: chemical-state
   tag: chemical-state
-  match: "."
+  match: "count(*)=1"
   replace:
   - bookmark: "*[1]/@id"
   - test:
