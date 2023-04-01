@@ -7,7 +7,7 @@
 
 use sxd_document::dom::*;
 use crate::speech::SpeechRulesWithContext;
-use crate::canonicalize::{as_element, as_text, name, create_mathml_element};
+use crate::canonicalize::{as_element, as_text, name, create_mathml_element, set_mathml_name};
 use crate::errors::*;
 use std::fmt;
 use crate::pretty_print::mml_to_string;
@@ -45,7 +45,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
     fn catch_errors_building_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, mathml: Element<'c>) -> Result<Element<'m>> {
         if let Some(intent_str) = mathml.attribute_value("intent") {
             let mut lex_state = LexState::init(intent_str.trim())?;
-            let result = build_pieces(rules_with_context, &mut lex_state, mathml)
+            let result = build_intent(rules_with_context, &mut lex_state, mathml)
                         .chain_err(|| format!("occurs before '{}' in intent attribute value '{}'", lex_state.remaining_str, intent_str))?;
             if lex_state.token != Token::None {
                 bail!("Error in intent value: extra unparsed intent '{}' in intent attribute value '{}'", lex_state.remaining_str, intent_str);
@@ -58,28 +58,26 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
     }
 }
 
-// From https://github.com/w3c/mathml/issues/446
-// pieces        = space piece (spaces piece)* space
-// spaces       = \s+
-// space        = \s*
-// piece          = space (property+ | word space property* | funcall) space
-// word          = literal | reference
-// literal         = [^\s:\$,;()]+
-// property   = ':' NCName
-// reference  = '$' NCName
-// NCName = [\pL][\pL\pMn\-.\d·]*
-// funcall = piece '(' pieces (',' pieces)* ')'
+// intent             := S ( term property* | property+ | application ) S 
+// term               := concept-or-literal | number | reference 
+// concept-or-literal := NCName
+// number             := '-'? \d+ ( '.' \d+ )?
+// reference          := '$' NCName
+// application        := intent '(' arguments? S ')'
+// arguments          := intent ( ',' intent )*
+// property           := S ':' NCName
+// S                  := [ \t\n\r]*
+
 lazy_static! {
     // The practical restrictions of NCName are that it cannot contain several symbol characters like
     //  !, ", #, $, %, &, ', (, ), *, +, ,, /, :, ;, <, =, >, ?, @, [, \, ], ^, `, {, |, }, ~, and whitespace characters
     //  Furthermore an NCName cannot begin with a number, dot or minus character although they can appear later in an NCName.
     // NC_NAME from www.w3.org/TR/REC-xml/#sec-common-syn, with "\pL" for letters 
 
-    static ref LITERAL: Regex = Regex::new(r"^[^\s:\$,;()]+").unwrap(); 
-    static ref PROPERTY: Regex = Regex::new(r"^:[\pL][\pL\pMn\-.\d·]*").unwrap();    // : NC_NAME
-    static ref ARG_REF: Regex = Regex::new(r"^\$[\pL][\pL\pMn\-.\d·]*").unwrap();  // $ NC_NAME
-    static ref NUMBER: Regex = Regex::new(r"^-?([0-9]+.?[0-9]*|.[0-9]+)").unwrap();     // Token::Literal -- used for matching later on
-    static ref NC_NAME: Regex = Regex::new(r"^[\pL][\pL\pMn\-.\d·]*").unwrap();     // Token::Literal -- used for matching later on
+    static ref LITERAL: Regex = Regex::new(r"^[_\pL][_\pL\pMn\-.\d·]*").unwrap(); 
+    static ref PROPERTY: Regex = Regex::new(r"^:[_\pL][_\pL\pMn\-.\d·]*").unwrap();     // : NC_NAME
+    static ref ARG_REF: Regex = Regex::new(r"^\$[_\pL][_\pL\pMn\-.\d·]*").unwrap();     // $ NC_NAME
+    static ref NUMBER: Regex = Regex::new(r"^-?([0-9]+\.?[0-9]*|\.[0-9]+)").unwrap(); // Token::Literal -- used for matching later on
 }
 
 static TERMINALS_AS_U8: [u8; 4] = [b'(', b',', b')', b';'];
@@ -92,6 +90,7 @@ enum Token<'i> {
     Property(&'i str),
     ArgRef(&'i str),
     Literal(&'i str),
+    Number(&'i str),
     None,               // out of characters
 }
 
@@ -103,6 +102,7 @@ impl<'i> fmt::Display for Token<'i> {
                 Token::Property(str) => format!("Property({})", str),
                 Token::ArgRef(str) => format!("ArgRef({})", str),
                 Token::Literal(str) => format!("Literal({})", str),
+                Token::Number(str) => format!("Number({})", str),
                 Token::None => "None".to_string(),
             }
         );
@@ -124,6 +124,7 @@ impl<'i> Token<'i> {
             Token::Property(str) => str,
             Token::ArgRef(str) => str,
             Token::Literal(str) => str,
+            Token::Number(str) => str,
             Token::None => "",
         }
     }
@@ -160,6 +161,8 @@ impl<'i> LexState<'i> {
             self.token = Token::ArgRef(matched_arg_ref.as_str());
         } else if  let Some(matched_literal) = LITERAL.find(str) {
             self.token = Token::Literal(matched_literal.as_str());
+        } else if  let Some(matched_number) = NUMBER.find(str) {
+            self.token = Token::Number(matched_number.as_str());
         } else {
             bail!("Illegal 'intent' syntax: {}", str);
         }
@@ -184,12 +187,15 @@ impl<'i> LexState<'i> {
     }
 }
 
-fn build_piece<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>,
+fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>,
                                          lex_state: &mut LexState<'b>,
                                          mathml: Element<'c>) -> Result<Element<'m>> {
-    debug!("    start build_piece: state: {}", lex_state);
+    //   intent := S ( term property* | property+ | application ) S 
+    //   term := concept-or-literal | number | reference
+    // When we flatten intent we have this implementation looking for Tokens or '(' [for application]
+    debug!("    start build_intent: state: {}", lex_state);
     let doc = rules_with_context.get_document();
-    let mut piece;
+    let mut intent;
     match lex_state.token {
         Token::Property(_) => {
             // We only have a property -- we want to keep this tag
@@ -199,33 +205,36 @@ fn build_piece<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRules
             //    Note: to avoid infinite loop, we need to remove the 'intent' so we don't end up back here; we put it back later
             let properties = get_properties(lex_state)?;    // advance state to see if funcall
             if lex_state.is_terminal("(") {
-                piece = create_mathml_element(&doc, name(&mathml))
+                intent = create_mathml_element(&doc, name(&mathml))
             } else {
                 let saved_intent = mathml.attribute_value("intent").unwrap();
                 mathml.remove_attribute("intent");
-                piece = rules_with_context.match_pattern::<Element<'m>>(mathml)?;
+                intent = rules_with_context.match_pattern::<Element<'m>>(mathml)?;
                 mathml.set_attribute_value("intent", saved_intent);
             }
-            piece.set_attribute_value(INTENT_PROPERTY, &properties);
+            intent.set_attribute_value(INTENT_PROPERTY, &properties);
         },
-        Token::Literal(word) => {
-            let leaf_name = if NUMBER.is_match(word) {
+        Token::Literal(word) | Token::Number(word) => {
+            let leaf_name = if let Token::Number(_) = lex_state.token {
                 "mn"
-            } else if NC_NAME.is_match(word) {
-                "mi"
             } else {
-                "mo"
+                "mi"
             };
-            piece = create_mathml_element(&doc, leaf_name);
-            piece.set_text(word);       // '-' and '_' get removed by the rules.
+            intent = create_mathml_element(&doc, leaf_name);
+            intent.set_text(word);       // '-' and '_' get removed by the rules.
             lex_state.get_next()?;
             if let Token::Property(_) = lex_state.token {
-                let properties = get_properties(lex_state)?;
-                piece.set_attribute_value(INTENT_PROPERTY, &properties);
+                let mut properties = get_properties(lex_state)?;
+                if word == "_" {
+                    properties.push_str("silent:");     // if order matters, this should be first (current spec says order is implementation dependent)
+                }
+                intent.set_attribute_value(INTENT_PROPERTY, &properties);
+            } else if word == "_" {
+                intent.set_attribute_value(INTENT_PROPERTY, ":silent:");
             }
         },
         Token::ArgRef(word) => {
-            piece = match find_arg(rules_with_context, &word[1..], mathml, true, false)? {
+            intent = match find_arg(rules_with_context, &word[1..], mathml, true, false)? {
                 Some(e) => {
                     lex_state.get_next()?;
                     e
@@ -234,54 +243,19 @@ fn build_piece<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRules
             };
             if let Token::Property(_) = lex_state.token {
                 let properties = get_properties(lex_state)?;
-                piece.set_attribute_value(INTENT_PROPERTY, &properties);
+                intent.set_attribute_value(INTENT_PROPERTY, &properties);
             }
         },
         _ => bail!("Illegal 'intent' syntax: found {}", lex_state.token),
     };
     if lex_state.is_terminal("(") {
-        piece = build_function(piece, rules_with_context, lex_state, mathml)?;
+        intent = build_function(intent, rules_with_context, lex_state, mathml)?;
     }
-    debug!("    end build_piece: state: {}     piece: {}", lex_state, mml_to_string(&piece));
-    return Ok(piece);
+    debug!("    end build_intent: state: {}     piece: {}", lex_state, mml_to_string(&intent));
+    return Ok(intent);
 }
 
 const INTENT_PROPERTY: &str = "data-intent-property";
-/// Build an intent
-/// Start state: lex_state on token to build
-/// End state: after built intent (a terminal or None)
-/// Fix (maybe): this allows numbers as the head of a function which is not part of the spec even though an 'argref' can have the same effect
-fn build_pieces<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>,
-                                        lex_state: &mut LexState<'b>,
-                                        mathml: Element<'c>) -> Result<Element<'m>> {
-    // pieces := piece (spaces piece)*
-    debug!("  start build_pieces: state: {}", lex_state);
-    let mut pieces = Vec::with_capacity(15);
-    while !(lex_state.is_terminal("(") || lex_state.is_terminal(",") || lex_state.is_terminal(")")) {
-        pieces.push(build_piece(rules_with_context, lex_state, mathml)?);
-        if lex_state.remaining_str.is_empty() {     // can't be part of while test because we might start with nothing remaining
-            debug!("  build_pieces empty string -- lex_state: {}", lex_state);
-            match lex_state.token {
-                Token::Terminal(_) | Token::None => (),
-                _ => pieces.push(build_piece(rules_with_context, lex_state, mathml)?),
-            };
-            break;
-        }
-    }
-
-    if pieces.is_empty() {
-        bail!("Illegal 'intent' syntax: no content'");
-    } else if pieces.len() == 1 {
-        debug!("  end build_pieces: {}", mml_to_string(&pieces[0]));
-        return Ok(pieces[0]);
-    } else {
-        // use an mrow to enclose all the pieces
-        let template = create_mathml_element(&rules_with_context.get_document(), "mrow");
-        template.append_children(pieces);
-        debug!("  end build_pieces: {}", mml_to_string(&template));
-        return Ok( template );
-    }    
-}
 
 fn get_properties<'b>(lex_state: &mut LexState<'b>) -> Result<String> {
     // return the 'hint' leaving the state
@@ -310,9 +284,14 @@ fn build_function<'b, 'r, 'c, 's:'c, 'm:'c>(
             lex_state: &mut LexState<'b>,
             mathml: Element<'c>) -> Result<Element<'m>> {
     debug!("  start build_function: name: {}, state: {}", name(&function_name), lex_state);
-    // funcall = piece '(' piece (',' piece)* ')'
+    // application := intent '(' arguments? S ')'  where 'function_name' is 'intent'
     assert!(lex_state.is_terminal("("));
     let mut function = function_name;
+    if name(&function) == "mi" && as_text(function) == "_" {
+        // convert the (silent) "_" to an mrow with the property "silent"
+        set_mathml_name(function, "mrow");
+        function.clear_children();
+    }
     while lex_state.is_terminal("(") {
         lex_state.get_next()?;
         if lex_state.is_terminal(")") {
@@ -339,17 +318,17 @@ fn build_arguments<'b, 'r, 'c, 's:'c, 'm:'c>(
             rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>,
             lex_state: &mut LexState<'b>,
             mathml: Element<'c>) -> Result<Vec<Element<'m>>> {
-    // working on the '(' pieces (',' pieces)* ')' part
+    // arguments := intent ( ',' intent )*' 
     debug!("    start build_args state: {}", lex_state);
 
     // there is at least one arg
     let mut children = Vec::with_capacity(lex_state.remaining_str.len()/3 + 1);   // conservative estimate ('3' - "$x,");
-    children.push( build_pieces(rules_with_context, lex_state, mathml)? );   // arg before ','
+    children.push( build_intent(rules_with_context, lex_state, mathml)? );   // arg before ','
     // debug!("  build_args: # children {};  state: {}", children.len(), lex_state);
 
     while lex_state.is_terminal(",") {
         lex_state.get_next()?;
-        children.push( build_pieces(rules_with_context, lex_state, mathml)? );   // arg before ','
+        children.push( build_intent(rules_with_context, lex_state, mathml)? );   // arg before ','
         // debug!("    build_args, # children {};  state: {}", children.len(), lex_state);
     }
 
@@ -359,7 +338,6 @@ fn build_arguments<'b, 'r, 'c, 's:'c, 'm:'c>(
 
 /// lift the children up to LITERAL_NAME
 fn lift_function_name<'m>(doc: Document<'m>, function_name: Element<'m>, children: Vec<Element<'m>>) -> Element<'m> {
-    use crate::canonicalize::set_mathml_name;
     debug!("    lift_function_name: {}", name(&function_name));
     debug!("    lift_function_name: {}", mml_to_string(&function_name));
     if is_leaf(function_name) {
@@ -394,7 +372,7 @@ fn find_arg<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithCon
                 // check to see if this mathml has an intent value -- if so the value is the value of its intent value
                 if let Some(intent_str) = mathml.attribute_value("intent") {
                     let mut lex_state = LexState::init(intent_str.trim())?;
-                    return Ok( Some( build_pieces(rules_with_context, &mut lex_state, mathml)? ) ); 
+                    return Ok( Some( build_intent(rules_with_context, &mut lex_state, mathml)? ) ); 
                 } else {
                     return Ok( Some( rules_with_context.match_pattern::<Element<'m>>(mathml)? ) );
                 }
@@ -477,6 +455,21 @@ mod tests {
                 <mi arg='m'>m</mi>
             </msubsup>";
         let intent = "<binomial> <mi arg='n'>n</mi> <mi arg='m'>m</mi></binomial>";
+        assert!(test_intent(mathml, intent, "Error"));
+    }
+
+    #[test]
+    fn silent_underscore() {
+        let mathml = "<mrow><mi intent='_'>silent</mi><mo>+</mo><mi>e</mi></mrow>";
+        let intent = "<mrow>=<mi data-intent-property=':silent:'>_</mi><mo>+</mo><mi>e</mi></mrow>";
+        assert!(test_intent(mathml, intent, "Error"));
+    }
+
+
+    #[test]
+    fn silent_underscore_function() {
+        let mathml = "<mrow intent='_(speak, this)'></mrow>";
+        let intent = "<mrow data-intent-property=':silent:'><mi>speak</mi><mi>this</mi></mrow>";
         assert!(test_intent(mathml, intent, "Error"));
     }
 
@@ -596,7 +589,7 @@ mod tests {
             <mn arg='n'>2</mn>
             </msup>";
         let intent = "<mrow><mi arg='H' mathvariant='normal'>H</mi><mn arg='n'>2</mn></mrow>";
-        assert!(test_intent(mathml, intent, "Error"));
+        assert!(!test_intent(mathml, intent, "Error"));
     }
 
     #[test]
@@ -623,12 +616,12 @@ mod tests {
     }
 
     #[test]
-    fn intent_with_string_literals() {
+    fn intent_with_template_literals() {
         let mathml = "<mrow intent='1 0. .1 -23 -.1234 last'>
                 <mi>x</mi>
             </mrow>";
         let intent = "<mrow><mn>1</mn><mn>0.</mn><mn>.1</mn><mn>-23</mn><mn>-.1234</mn><mi>last</mi></mrow>";
-        assert!(test_intent(mathml, intent, "Error"));
+        assert!(!test_intent(mathml, intent, "Error"));
     }
 
     #[test]
@@ -718,7 +711,7 @@ mod tests {
                     <factorial> <mi arg='b'>b</mi> </factorial>
                 </mrow>
             </plus>";
-        assert!(test_intent(mathml, intent, "Error"));
+        assert!(!test_intent(mathml, intent, "Error"));
     }
 
     #[test]
