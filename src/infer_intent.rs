@@ -44,6 +44,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
 
     fn catch_errors_building_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, mathml: Element<'c>) -> Result<Element<'m>> {
         if let Some(intent_str) = mathml.attribute_value("intent") {
+            // debug!("Before intent: {}", crate::pretty_print::mml_to_string(&mathml));
             let mut lex_state = LexState::init(intent_str.trim())?;
             let result = build_intent(rules_with_context, &mut lex_state, mathml)
                         .chain_err(|| format!("occurs before '{}' in intent attribute value '{}'", lex_state.remaining_str, intent_str))?;
@@ -193,7 +194,7 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
     //   intent := S ( term property* | property+ | application ) S 
     //   term := concept-or-literal | number | reference
     // When we flatten intent we have this implementation looking for Tokens or '(' [for application]
-    debug!("    start build_intent: state: {}", lex_state);
+    // debug!("    start build_intent: state: {}", lex_state);
     let doc = rules_with_context.get_document();
     let mut intent;
     match lex_state.token {
@@ -205,14 +206,15 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
             //    Note: to avoid infinite loop, we need to remove the 'intent' so we don't end up back here; we put it back later
             let properties = get_properties(lex_state)?;    // advance state to see if funcall
             if lex_state.is_terminal("(") {
-                intent = create_mathml_element(&doc, name(&mathml))
+                intent = create_mathml_element(&doc, name(&mathml));
+                intent.set_attribute_value(INTENT_PROPERTY, &properties);
             } else {
                 let saved_intent = mathml.attribute_value("intent").unwrap();
                 mathml.remove_attribute("intent");
+                mathml.set_attribute_value(INTENT_PROPERTY, &properties);   // needs to be set before the pattern match
                 intent = rules_with_context.match_pattern::<Element<'m>>(mathml)?;
                 mathml.set_attribute_value("intent", saved_intent);
             }
-            intent.set_attribute_value(INTENT_PROPERTY, &properties);
         },
         Token::Literal(word) | Token::Number(word) => {
             let leaf_name = if let Token::Number(_) = lex_state.token {
@@ -246,7 +248,7 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
     if lex_state.is_terminal("(") {
         intent = build_function(intent, rules_with_context, lex_state, mathml)?;
     }
-    debug!("    end build_intent: state: {}     piece: {}", lex_state, mml_to_string(&intent));
+    // debug!("    end build_intent: state: {}     piece: {}", lex_state, mml_to_string(&intent));
     return Ok(intent);
 }
 
@@ -263,7 +265,7 @@ fn get_properties<'b>(lex_state: &mut LexState<'b>) -> Result<String> {
             properties.push_str(property);
         } else {
             properties.push(':');
-            debug!("      get_properties: returns {}", properties);
+            // debug!("      get_properties: returns {}", properties);
             return Ok(properties);
         }
     }
@@ -278,7 +280,7 @@ fn build_function<'b, 'r, 'c, 's:'c, 'm:'c>(
             rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>,
             lex_state: &mut LexState<'b>,
             mathml: Element<'c>) -> Result<Element<'m>> {
-    debug!("  start build_function: name: {}, state: {}", name(&function_name), lex_state);
+    // debug!("  start build_function: name: {}, state: {}", name(&function_name), lex_state);
     // application := intent '(' arguments? S ')'  where 'function_name' is 'intent'
     assert!(lex_state.is_terminal("("));
     let mut function = function_name;
@@ -296,8 +298,8 @@ fn build_function<'b, 'r, 'c, 's:'c, 'm:'c>(
         }
         lex_state.get_next()?;
     }
-    debug!("  end build_function/# children: {}, #state: {}  ..[bfa] function name: {}",
-        function.children().len(), lex_state, mml_to_string(&function));
+    // debug!("  end build_function/# children: {}, #state: {}  ..[bfa] function name: {}",
+    //     function.children().len(), lex_state, mml_to_string(&function));
     return Ok(function);
 }
 
@@ -309,7 +311,7 @@ fn build_arguments<'b, 'r, 'c, 's:'c, 'm:'c>(
             lex_state: &mut LexState<'b>,
             mathml: Element<'c>) -> Result<Vec<Element<'m>>> {
     // arguments := intent ( ',' intent )*' 
-    debug!("    start build_args state: {}", lex_state);
+    // debug!("    start build_args state: {}", lex_state);
 
     // there is at least one arg
     let mut children = Vec::with_capacity(lex_state.remaining_str.len()/3 + 1);   // conservative estimate ('3' - "$x,");
@@ -328,8 +330,8 @@ fn build_arguments<'b, 'r, 'c, 's:'c, 'm:'c>(
 
 /// lift the children up to LITERAL_NAME
 fn lift_function_name<'m>(doc: Document<'m>, function_name: Element<'m>, children: Vec<Element<'m>>) -> Element<'m> {
-    debug!("    lift_function_name: {}", name(&function_name));
-    debug!("    lift_function_name: {}", mml_to_string(&function_name));
+    // debug!("    lift_function_name: {}", name(&function_name));
+    // debug!("    lift_function_name: {}", mml_to_string(&function_name));
     if is_leaf(function_name) {
         // simple/normal case of f(x,y)
         set_mathml_name(function_name, as_text(function_name));
