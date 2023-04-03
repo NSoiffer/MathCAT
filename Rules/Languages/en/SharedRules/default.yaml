@@ -461,12 +461,20 @@
   replace:
   - x: "*[1]"
 
+- name: apply-function
+  tag: "apply-function"
+  match: .
+  replace:
+  - x: "*[1]"
+  - t: "applied to"
+  - x: "*[2]"
+
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: function_underscore
   # uncaught intent -- speak as arg1 arg2 ....
-  tag: "_"
-  match: "."
+  tag: "*"
+  match: "translate(name(.), '_-','')=''"
   replace:
   - x: "*"
 
