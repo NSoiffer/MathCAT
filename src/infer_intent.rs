@@ -337,6 +337,10 @@ fn lift_function_name<'m>(doc: Document<'m>, function_name: Element<'m>, childre
         set_mathml_name(function_name, as_text(function_name));
         function_name.set_text("");
         function_name.replace_children(children);
+        if name(&function_name).find(|ch| ch!='_' && ch!='-').is_none() {
+            let properties = function_name.attribute_value(INTENT_PROPERTY).unwrap_or(":").to_owned();
+            function_name.set_attribute_value(INTENT_PROPERTY, &(properties + "silent:"));
+        }
         return function_name;
     } else if function_name.children().is_empty() {
         // "...  :property(...)" -- no function name
@@ -452,16 +456,17 @@ mod tests {
 
     #[test]
     fn silent_underscore() {
-        let mathml = "<mrow><mi intent='_'>silent</mi><mo>+</mo><mi>e</mi></mrow>";
-        let intent = "<mrow>=<mi>_</mi><mo>+</mo><mi>e</mi></mrow>";
+        let mathml = "<mrow><mi intent='__-'>silent</mi><mo>+</mo><mi>e</mi></mrow>";
+        let intent = "<mrow>=<mi>__-</mi><mo>+</mo><mi>e</mi></mrow>";
         assert!(test_intent(mathml, intent, "Error"));
     }
 
 
     #[test]
     fn silent_underscore_function() {
-        let mathml = "<mrow intent='_(speak, this)'></mrow>";
-        let intent = "<_><mi>speak</mi><mi>this</mi></_>";
+        init_logger();
+        let mathml = "<mrow intent='__-_(speak, this)'></mrow>";
+        let intent = "<__-_ data-intent-property=':silent:'><mi>speak</mi><mi>this</mi></__-_>";
         assert!(test_intent(mathml, intent, "Error"));
     }
 
