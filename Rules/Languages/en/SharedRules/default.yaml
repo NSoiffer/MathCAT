@@ -33,11 +33,29 @@
       replace: [pause: auto]
 
 - name: default
-  tag: [mi, mn, mo, mtext]
+  tag: mn
+  match: "."
+  replace:
+  - bookmark: "@id"
+  # FIX: removing the digit block separators is likely locale dependent
+  - x: "translate(., ' ,`', '')"   # remove digit block separators
+
+- name: default
+  tag: [mo, mtext]
   match: "."
   replace:
   - bookmark: "@id"
   - x: "text()"
+
+- name: default
+  tag: mi
+  match: "."
+  replace:
+  - bookmark: "@id"
+  - test:
+      if: "string-length(.) = 1 and text() != '_'"       # need unicode.tdl to kick in for single letter tokens
+      then: [x: "text()"]
+      else: [x: "translate(., '-_', '  ')" ]   # from intent literals
 
 - name: default
   tag: ms
@@ -55,7 +73,7 @@
 - name: simple-sub
   tag: particular-value-of
   # invisible comma -- want "x sub 1 1" without "end sub"
-  match: "IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][text()='⁣']]"
+  match: "count(*)=2 and (IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][text()='⁣']])"
   replace:
   - x: "*[1]"
   - test:
@@ -65,7 +83,7 @@
 
 - name: default
   tag: particular-value-of
-  match: "."
+  match: "count(*)=2"
   replace:
   - x: "*[1]"
   - t: "sub"
@@ -443,39 +461,27 @@
   replace:
   - x: "*[1]"
 
-- name: intent-literal-silent
-  tag: "intent-literal"
-  match: "@data-intent-hint='silent'"
-  # say nothing
-  replace: []
-
-# handling of negative numbers is hard -- we do something that is close to right here
-- name: intent-literal-negative-number
-  tag: "intent-literal"
-  match: "starts-with(text(), '-')"
+- name: apply-function
+  tag: "apply-function"
+  match: .
   replace:
-  - t: "minus"
-  - x: "translate(text(), '-_.', ' ')"   # more accurate to translate "-" to nothing, but turning it into a space should be ok
+  - x: "*[1]"
+  - t: "applied to"
+  - x: "*[2]"
 
-- name: intent-literal
-  # unknown leaf -- just speak the text -- could be a literal intent
-  tag: "intent-literal"
-  match: "."
-  replace:
-  - x: "translate(text(), '-_.', '  ')"
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: silent-intent
   # uncaught intent -- speak as arg1 arg2 ....
   tag: "*"
-  match: "@data-intent-hint='silent' and count(*)>0"
+  match: "contains(@data-intent-property, ':silent:') and count(*)>0"
   replace:
   - x: "*"
 
 - name: prefix-intent
   # uncaught intent -- speak as arg1 arg2 ....
   tag: "*"
-  match: "@data-intent-hint='prefix' and count(*)>0"
+  match: "contains(@data-intent-property, ':prefix:') and count(*)>0"
   replace:
   - x: "translate(name(.), '-_', '  ')"
   - x: "*"
@@ -484,7 +490,7 @@
 - name: postfix-intent
   # uncaught intent -- speak as arg1 arg2 ....
   tag: "*"
-  match: "@data-intent-hint='postfix' and count(*)>0"
+  match: "contains(@data-intent-property, ':postfix:') and count(*)>0"
   replace:
   - pause: short
   - x: "*"
@@ -494,7 +500,7 @@
 - name: infix-intent
   # uncaught intent -- speak as foo of arg1 comma arg2 ....
   tag: "*"
-  match: "@data-intent-hint='infix' and count(*)>0"
+  match: "contains(@data-intent-property, ':infix:') and count(*)>0"
   replace:
   - pause: short
   - insert:

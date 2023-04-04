@@ -168,8 +168,24 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr="
-  <m:math><m:mfrac><m:menclose notation='box'><m:mrow/></m:menclose><m:mrow/></m:mfrac></m:math>
-  ";
+  <math display='block'>
+  <mrow>
+   <msup>
+    <mrow>
+     <mo>(</mo>
+     <mi>g</mi>
+     <mo>∘</mo>
+     <mi>h</mi>
+     <mo>)</mo>
+    </mrow>
+    <mo>′</mo>
+   </msup>
+   <mo>(</mo>
+   <mi>x</mi>
+   <mo>)</mo>
+  </mrow>
+ </math>
+   ";
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>

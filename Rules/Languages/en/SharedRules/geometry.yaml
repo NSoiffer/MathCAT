@@ -2,7 +2,7 @@
 
 - name: line-segment
   tag: line-segment
-  match: "."
+  match: "count(*)=2"
   replace:
   - test:
       if: "$Verbosity='Verbose'"
@@ -18,7 +18,7 @@
 
 - name: geometry-ray
   tag: ray
-  match: "."
+  match: "count(*)=2"
   replace:
   - test:
       if: "$Verbosity='Verbose'"
@@ -34,7 +34,7 @@
 
 - name: geometry-arc
   tag: arc
-  match: "."
+  match: "count(*)=2"
   replace:
   - test:
       if: "$Verbosity='Verbose'"
@@ -45,7 +45,7 @@
 
 - name: measure-of-angle
   tag: measure-of-angle
-  match: "."
+  match: "count(*)=3"
   replace:
   - test:
       if: "$Verbosity='Verbose'"

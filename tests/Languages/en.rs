@@ -29,4 +29,5 @@ mod SimpleSpeak {
 mod shared;
 mod chemistry;
 mod alphabets;
+mod intent;
 

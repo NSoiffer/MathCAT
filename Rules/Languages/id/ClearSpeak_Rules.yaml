@@ -1,4 +1,19 @@
 ---  # Indonesian translation contributor: Budi Darmulyana (budi@mitranetra.or.id)
+
+- name: intent-literal-silent
+  tag: [mi, mo, mn]
+  match: "contains(@data-intent-property, ':silent:')"
+  # say nothing
+  replace: []
+
+# handling of negative numbers is hard -- we do something that is close to right here
+- name: intent-literal-negative-number
+  tag: "mn"
+  match: "starts-with(text(), '-')" 
+  replace:
+  - T: "kurang"
+  - x: "translate(text(), '-_', '')"   # more accurate to translate "-" to nothing, but turning it into a space should be ok
+
 - name: default
   tag: square-root
   match: "."
@@ -48,7 +63,7 @@
           then: [{T: negatif}]
           else: [{T: positif}]
   - test:
-      if: "*[2][self::m:mn or self::m:intent-literal]"
+      if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][text()='2']"
         then: {T: akar kuadrat}
@@ -625,12 +640,12 @@
   - x: "*[3]"
 
 - name: ClearSpeak-multi-line
-  tag: [piecewise, equations, lines] # these are ignored in favor of the ClearSpeak prefs
+  tag: [cases, equations, lines] # these are ignored in favor of the ClearSpeak prefs
   match: "."
   replace:
   - x: "count(*)"
   - test:
-    - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
+    - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:cases) or $ClearSpeak_MultiLineLabel = 'Case'"
       then: [{T: "kasus"}]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
       then: [{T: "baris"}]
@@ -651,10 +666,10 @@
 
 - name: ClearSpeak-default-multiline
   tag: [mtr, mlabeledtr]
-  match: "parent::m:piecewise or parent::m:equations or parent::m:lines"
+  match: "parent::m:cases or parent::m:equations or parent::m:lines"
   replace:
   - test:
-    - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
+    - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:cases) or $ClearSpeak_MultiLineLabel = 'Case'"
       then: [{T: "kasus"}]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
       then: [{T: "baris"}]

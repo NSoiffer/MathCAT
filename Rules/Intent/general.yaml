@@ -566,13 +566,80 @@
 
 
 # generic mtable: treat as multiline equations of some sort
+# if a property is set, handle that first
+-
+  name: mtable-matrix-property
+  tag: mtable
+  match: "contains(@data-intent-property, ':matrix:')"
+  replace:
+  - intent:
+      name: "matrix"
+      children:
+      - x: "*"
+
+-
+  name: mtable-determinant-property
+  tag: mtable
+  match: "contains(@data-intent-property, ':determinant:')"
+  replace:
+  - intent:
+      name: "determinant"
+      children:
+      - x: "*"
+      
+-
+  name: mtable-cases-property
+  tag: mtable
+  match: "contains(@data-intent-property, ':cases:')"
+  replace:
+  - intent:
+      name: "cases"
+      children:
+      - x: "*"
+
+-
+  name: mtable-equations-property
+  tag: mtable
+  match: "contains(@data-intent-property, ':equations:')"
+  replace:
+  - intent:
+      name: "equations"
+      children:
+      - x: "*"
+
+-
+  name: mtable-lines-property
+  tag: mtable
+  match: "contains(@data-intent-property, ':lines:')"
+  replace:
+  - intent:
+      name: "lines"
+      children:
+      - x: "*"
+
+
+# -
+#   name: mtable-property-is-set
+#   tag: mtable
+#   variables: [MTableProperty: "IfThenElse(contains(DEBUG(@data-intent-property), ':matrix:'), 'matrix',
+#                                IfThenElse(contains(@data-intent-property, ':determinant:'), 'determinant',
+#                                IfThenElse(contains(@data-intent-property, ':cases:'), 'cases',
+#                                IfThenElse(contains(@data-intent-property, ':equations:'), 'equations',
+#                                IfThenElse(contains(@data-intent-property, ':lines:'), 'lines','')))))"]
+#   match: "DEBUG($MTableProperty) !=''"
+#   replace:
+#   - intent:
+#       name: "$MTableProperty"    # doesn't work -- "name:" is not an xpath expr
+#       children:
+#       - x: "*"
+
 -
   name: cases
   tag: mrow
   match: "count(*)=2 and *[1][text()='{'] and *[2][self::m:mtable]"
   replace:
   - intent:
-      name: "piecewise"
+      name: "cases"
       children:
       - x: "*[2]/*"
 

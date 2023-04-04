@@ -280,3 +280,9 @@ fn ignore_period_and_space() {
     test("en", "ClearSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
 }
 
+
+#[test]
+fn mn_with_space() {
+    let expr = "<math><mn>1 234 567</mn></math>";
+    test("en", "SimpleSpeak", expr, "1234567");
+}

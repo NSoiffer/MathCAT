@@ -1,5 +1,19 @@
 ---
 
+- name: intent-literal-silent
+  tag: [mi, mo, mn]
+  match: "contains(@data-intent-property, ':silent:')"
+  # say nothing
+  replace: []
+
+# handling of negative numbers that come from 'intent' is hard -- we do something that is close to right here 
+- name: intent-literal-negative-number
+  tag: mn
+  match: "starts-with(text(), '-')"
+  replace:
+  - t: "minus"
+  - x: "translate(text(), '-_', '')"
+
 - name: default
   tag: square-root
   match: "."
@@ -26,7 +40,7 @@
       if: "$Verbosity!='Terse'"
       then: [{t: the}]
   - test:
-      if: "*[2][self::m:mn or self::m:intent-literal]"
+      if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][text()='2']"
         then: [{t: square root}]
