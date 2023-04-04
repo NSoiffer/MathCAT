@@ -549,6 +549,14 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
         }
         // Note: there was an invisible U+2063, but it was removed before we got here
         let start_token = as_element(preceding_children[ preceding_children.len() - 1]);
+        // because this is before canonicalization, there could be an mrow with just mi/mtext
+        if name(&start_token) == "mrow" && start_token.children().len() == 1 && start_token.attribute("intent").is_none() {
+            // "lift" the child up so all the links (e.g., siblings) are correct
+            let child = as_element(start_token.children()[0]);
+            set_mathml_name(start_token, name(&child));
+            crate::canonicalize::add_attrs(start_token, child.attributes());
+            start_token.replace_children(child.children());
+        }
         if name(&start_token) != "mi" && name(&start_token) != "mtext" {
             bail!("Internal error: bad structure before split element: {}; expected first char of split", mml_to_string(&start_token));
         }
@@ -749,12 +757,15 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
     //  these can stand alone, be followed by +/- or have a number in front "(2•)-"" [examples from mhchem documentation]
     // roman numerals are "oxidation state" and range from -4 to +9
     lazy_static! {
-        static ref MULTIPLE_PLUS_OR_MINUS_OR_DOT: Regex = Regex::new(r"^\++$|^-+$|^\U{2212}+$|^[⋅•]$").unwrap(); 
-        static ref SINGLE_PLUS_OR_MINUS_OR_DOT: Regex = Regex::new(r"^[+-\U{2212}⋅•]$").unwrap(); 
+        static ref MULTIPLE_PLUS_OR_MINUS_OR_DOT: Regex = Regex::new(r"^\++$|^-+$|^\U{2212}+$|^[⋅∙•][-+\U{2212}]*$").unwrap(); 
+        static ref SINGLE_PLUS_OR_MINUS_OR_DOT: Regex = Regex::new(r"^[+-\U{2212}⋅∙•]$").unwrap(); 
     }
-
+    static DOTS: &[char; 3] = &['⋅', '∙', '•'];
     let sup_name = name(&sup);
     if sup_name == "mo" && MULTIPLE_PLUS_OR_MINUS_OR_DOT.is_match(as_text(sup)) {
+        if as_text(sup).find(DOTS).is_some() {
+            sup.set_attribute_value(CHEM_FORMULA_OPERATOR, "1");   // value doesn't really matter
+        }
         return if as_text(sup).len()==1 {1} else {2};
     } else if (sup_name == "mi" || sup_name=="mtext") && SMALL_UPPER_ROMAN_NUMERAL.is_match(as_text(sup)){
         sup.set_attribute_value("data-number", small_roman_to_number(as_text(sup)));
@@ -768,14 +779,15 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
             if name(&first) == "mn" && name(&second) == "mo" && !as_text(first).contains('.') {
                 let second_text = as_text(second);
                 if SINGLE_PLUS_OR_MINUS_OR_DOT.is_match(second_text) {
+                    second.set_attribute_value(CHEM_FORMULA_OPERATOR, "2");   // value doesn't really matter
                     return 2;   // ending with a +/- makes it likely this is an ion
                 }
             }
         }
         // gather up the text and see if it is all +, -, etc
         let mut text = "".to_string();
-        for child in children {
-            let child = as_element(child);
+        for child in &children {    // 'children' used later, so need to borrow rather than move
+            let child = as_element(*child);
             if name(&child) == "mo" {
                 text.push_str(as_text(child));
             } else {
@@ -783,6 +795,14 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
             }
         }
         if MULTIPLE_PLUS_OR_MINUS_OR_DOT.is_match(&text) {
+            for child in children {
+                let child = as_element(child);
+                if name(&child) == "mo" {
+                    if as_text(child).find(DOTS).is_some() {
+                        child.set_attribute_value(CHEM_FORMULA_OPERATOR, "1");   // value doesn't really matter
+                    }
+                            }
+            }
             return if text.len()==1 {1} else {2};
         }
     }

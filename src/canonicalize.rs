@@ -3250,7 +3250,7 @@ fn top<'s, 'a:'s, 'op:'a>(vec: &'s[StackInfo<'a, 'op>]) -> &'s StackInfo<'a, 'op
 	return &vec[vec.len()-1];
 }
 // Replace the attrs of 'mathml' with 'attrs' and keep the global attrs of 'mathml' (i.e, lift 'attrs' to 'mathml' for replacing children)
-fn add_attrs<'a>(mathml: Element<'a>, attrs: Vec<Attribute>) -> Element<'a> {
+pub fn add_attrs<'a>(mathml: Element<'a>, attrs: Vec<Attribute>) -> Element<'a> {
 	static GLOBAL_ATTRS: phf::Set<&str> = phf_set! {
 		"class", "dir", "displaystyle", "id", "mathbackground", "mathcolor", "mathsize",
 		"mathvariant", "nonce", "scriptlevel", "style", "tabindex",
