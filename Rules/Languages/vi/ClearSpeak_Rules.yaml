@@ -636,12 +636,12 @@
   - x: "*[3]"
 
 - name: ClearSpeak-multi-line
-  tag: [piecewise, equations, lines] # these are ignored in favor of the ClearSpeak prefs
+  tag: [cases, equations, lines] # these are ignored in favor of the ClearSpeak prefs
   match: "."
   replace:
   - x: "count(*)"
   - test:
-    - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
+    - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:cases) or $ClearSpeak_MultiLineLabel = 'Case'"
       then: [{T: "trường hợp"}]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case 
       then: [{T: "dòng"}]
@@ -662,10 +662,10 @@
 
 - name: ClearSpeak-default-multiline
   tag: [mtr, mlabeledtr]
-  match: "parent::m:piecewise or parent::m:equations or parent::m:lines"
+  match: "parent::m:cases or parent::m:equations or parent::m:lines"
   replace:
   - test:
-    - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
+    - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:cases) or $ClearSpeak_MultiLineLabel = 'Case'"
       then: [{T: "trường hợp"}]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case 
       then: [{T: "dòng"}]

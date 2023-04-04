@@ -467,12 +467,12 @@
 - name: multi-line
   #   that eliminates the need for the if: else_if: ...
   # IDEA:  set a variable with the word to saw for the row (e.g., RowLabel = Row/Case/Line/...)
-  tag: [piecewise, equations, lines]
+  tag: [cases, equations, lines]
   match: "."
   replace:
   - x: "count(*)"
   - test:
-    - if: "self::m:piecewise"
+    - if: "self::m:cases"
       then: [{T: 'kasus'}]
     - else_if: "self::m:equations"
       then: [{T: 'persamaan'}]
@@ -485,10 +485,10 @@
 
 - name: default-multiline
   tag: [mtr, mlabeledtr]
-  match: "parent::m:piecewise or parent::m:equations or parent::m:lines"
+  match: "parent::m:cases or parent::m:equations or parent::m:lines"
   replace:
   - test:
-    - if: "parent::m:piecewise"
+    - if: "parent::m:cases"
       then: [{T: 'kasus'}]
     - else_if: "parent::m:equations"
       then: [{T: 'persamaan'}]
@@ -507,7 +507,7 @@
 
 - name: default-multiline
   tag: mtd
-  match: "parent::*[parent::m:piecewise or parent::m:equations or parent::m:lines]"
+  match: "parent::*[parent::m:cases or parent::m:equations or parent::m:lines]"
   replace:
   - x: "*"
   - test:
