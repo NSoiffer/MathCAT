@@ -1719,6 +1719,7 @@
  - "⋂": [t: "⠨⠩"]               # 0x22c2
  - "⋃": [t: "⠨⠬"]               # 0x22c3
  - "⋅": [t: "⠡"]                # 0x22c5
+ - "∙": [t: "⠡"]                # 0x2219   -- similar looking to 0x22c5, so using the same braille
  - "⋜": [t: "⠱⠐⠅"]              # 0x22dc
  - "⋝": [t: "⠱⠨⠂"]              # 0x22dd
  - "⋮": [t: "⠣⠄⠄⠄"]             # 0x22ee
@@ -2164,9 +2165,6 @@
  - "’": [t: "P⠴⠠"]               # 0x2019 (Right single quotation mark)
  - "“": [t: "P⠦"]                # 0x201C (Left double quotation mark)
  - "”": [t: "P⠴"]                # 0x201D (Right double quotation mark)
- - "†": [t: "⠸⠻"]               # 0x2020 (Dagger)
- - "‡": [t: "⠸⠸⠻"]              # 0x2021 (Double dagger)
- - "•": [t: "⠔⠔"]               # 0x2022 (Bullet)
  - "…":                          # 0x2026 (Ellipsis)
       # rule 43b about spaces (references rule 42); partly superseded by lesson 2.13
       # tests are ugly because an invisible times might have been inserted and we need to skip that
