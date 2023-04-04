@@ -411,7 +411,6 @@
  - "∓": [t: "minus or plus"]                       # 0x2213
  - "∗": [t: "times"]                               # 0x2217
  - "∘": [t: "composed with"]                       # 0x2218
- - "∙": [t: "times"]                               # 0x2219
  - "√":                                          # 0x221a
      - test: 
          if: "$Verbosity!='Terse'"
