@@ -461,7 +461,7 @@ impl CanonicalizeContext {
 		let mut converted_mathml = self.canonicalize_mrows(mathml)
 				.chain_err(|| format!("while processing\n{}", mml_to_string(&mathml)))?;
 		if !crate::chemistry::scan_and_mark_chemistry(converted_mathml) {
-			debug!("Not chemistry -- retry:\n{}", mml_to_string(&converted_mathml));
+			// debug!("Not chemistry -- retry:\n{}", mml_to_string(&converted_mathml));
 			self.assure_nary_tag_has_one_child(converted_mathml);
 			converted_mathml = self.canonicalize_mrows(mathml)
 				.chain_err(|| format!("while processing\n{}", mml_to_string(&mathml)))?;
@@ -789,6 +789,7 @@ impl CanonicalizeContext {
 						return None;
 					}
 				} else if children.len() == 1 {
+					let is_from_mhchem = element_name == "mpadded" && is_from_mhchem_hack(mathml);
 					// "lift" the child up so all the links (e.g., siblings) are correct
 					if let Some(new_mathml) = self.clean_mathml( as_element(children[0]) ) {
 						// "lift" the child up so all the links (e.g., siblings) are correct
@@ -798,7 +799,11 @@ impl CanonicalizeContext {
 						return Some(mathml);
 					} else if parent_requires_child {
 						// need a placeholder -- make it empty mtext
-						return Some( CanonicalizeContext::make_empty_element(mathml));
+						let empty = CanonicalizeContext::make_empty_element(mathml);
+						if is_from_mhchem {
+							empty.set_attribute_value(MHCHEM_MMULTISCRIPTS_HACK, "true");
+						}
+						return Some(empty);
 					} else {
 						return None;
 					}
@@ -990,35 +995,46 @@ impl CanonicalizeContext {
 		}
 
 
-		/// Returns true if it detects that this is likely coming from mhchem (msub/msup with mrow/mrow/mpadded width=0/mphantom/mi=A)
+		/// Returns true if it detects that this is likely coming from mhchem:
+		/// v3: msub/msup with mpadded width=0/mphantom/mi=A)
+		/// v4: msub/msup with mrow/mrow/mpadded width=0/mphantom/mi=A)
 		/// This should be called with 'mrow' being the outer mrow
-		fn is_from_mhchem_hack(mrow: Element) -> bool {
-			assert_eq!(name(&mrow), "mrow");
-			assert_eq!(mrow.children().len(), 1);
-			let parent = mrow.parent().unwrap().element().unwrap();
+		fn is_from_mhchem_hack(mathml: Element) -> bool {
+			assert!(name(&mathml) == "mrow" || name(&mathml) == "mpadded");
+			assert_eq!(mathml.children().len(), 1);
+			let parent = mathml.parent().unwrap().element().unwrap();
 			let parent_name = name(&parent);
 			if !(parent_name == "msub" || parent_name == "msup") {
 				return false;
 			}
 
-			let mrow = as_element(mrow.children()[0]);
-			if !(name(&mrow) == "mrow" && mrow.children().len() == 1) {
-				return false;
-			}
-			let child = as_element(mrow.children()[0]);
-			if !(name(&child) == "mpadded" && child.attribute("width").is_some()) {
-				return false;
-			}
-			if child.attribute_value("width").unwrap() != "0" {
+			let mpadded = if name(&mathml) == "mrow" {
+				let mrow = as_element(mathml.children()[0]);
+				if !(name(&mrow) == "mrow" && mrow.children().len() == 1) {
+					return false;
+				}
+				let child = as_element(mrow.children()[0]);
+				if name(&child) != "mpadded" {
+					return false;
+				}
+				child
+			} else {
+				mathml
+			};
+			if let Some(width) = mpadded.attribute_value("width") {
+				if width != "0" {
+					return false;
+				}
+			} else {
 				return false;
 			}
 
-			let child = as_element(child.children()[0]);
-			if !(name(&child) == "mphantom" && child.children().len() == 1) {
+			let mphantom = as_element(mpadded.children()[0]);
+			if !(name(&mphantom) == "mphantom" && mphantom.children().len() == 1) {
 				return false;
 			}
 
-			let child = as_element(child.children()[0]);
+			let child = as_element(mphantom.children()[0]);
 			return name(&child) == "mi" && as_text(child) == "A";
 		}
 
@@ -2848,7 +2864,7 @@ impl CanonicalizeContext {
 			return false;
 		}
 
-		assert_eq!(name(&mrow), "mrow");
+		assert_eq!(name(mrow), "mrow");
 		let container = mrow.parent().unwrap().element().unwrap();
 		let name = name(&container);
 
