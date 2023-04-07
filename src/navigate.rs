@@ -400,12 +400,12 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
 
 
     fn apply_navigation_rules<'c, 'm:'c>(mathml: Element<'m>, nav_command: &'static str,
-            rules: &Ref<SpeechRules>, mut rules_with_context: &mut SpeechRulesWithContext<'c, '_, 'm>, mut nav_state: &mut RefMut<NavigationState>,
+            rules: &Ref<SpeechRules>, rules_with_context: &mut SpeechRulesWithContext<'c, '_, 'm>, nav_state: &mut RefMut<NavigationState>,
             loop_count: usize) -> Result<(String, bool)> {
         let context = rules_with_context.get_context();
         context.set_variable("MatchCounter", loop_count as f64);
 
-        let start_node = get_start_node(mathml, &nav_state)?;
+        let start_node = get_start_node(mathml, nav_state)?;
         // debug!("start_node\n{}", mml_to_string(&start_node));
 
         let raw_speech_string = rules_with_context.match_pattern::<String>(start_node)
@@ -466,18 +466,18 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         let nav_mathml = get_node_by_id(mathml, &nav_position.current_node);
         if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", mathml)?.0.unwrap() == "true" {
             // Speak/Overview of where we landed (if we are supposed to speak it)
-            let node_speech = speak(&mut rules_with_context, nav_mathml.unwrap(), use_read_rules)?;
+            let node_speech = speak(rules_with_context, nav_mathml.unwrap(), use_read_rules)?;
             // debug!("node_speech: '{}'", node_speech);
             if node_speech.is_empty() {
                 // try again in loop
                 return Ok( (speech, false));
             } else {
-                pop_stack(&mut nav_state, loop_count);
+                pop_stack(nav_state, loop_count);
                 // debug!("returning: '{}'", speech.clone() + " " + &node_speech);
                 return Ok( (speech + " " + &node_speech, true) );
             }
         } else {
-            pop_stack(&mut nav_state, loop_count);
+            pop_stack(nav_state, loop_count);
             return Ok( (speech, true) );
         };
     }
@@ -530,19 +530,16 @@ fn speak<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContex
         return crate::speech::overview_mathml(mathml);
     }
 
-    fn find_marked_node<'m>(intent: Element<'m>) -> Option<Element<'m>> {
+    fn find_marked_node(intent: Element) -> Option<Element> {
         if intent.attribute(MARKED_NODE).is_some() {
             return Some(intent);
         }
         for child in intent.children() {
-            match child {
-                ChildOfElement::Element(child) => {
+            if let ChildOfElement::Element(child) = child {
                     let found = find_marked_node(child);
                     if found.is_some() {
                         return found;
                     }
-                },
-                _ => (),
             };
         }
         return None;
