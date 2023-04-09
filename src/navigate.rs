@@ -1157,14 +1157,14 @@ mod tests {
     #[test]
     fn move_right_sup() -> Result<()> {
         // init_logger();
-        let mathml_str = "<math display='block' id='Msowudr8-0'>
-        <mrow id='Msowudr8-1'>
-          <msup id='Msowudr8-2'>
-            <mn id='Msowudr8-3'>2</mn>
-            <mi id='Msowudr8-4'>q</mi>
+        let mathml_str = "<math display='block' id='id-0'>
+        <mrow id='id-1'>
+          <msup id='id-2'>
+            <mn id='id-3'>2</mn>
+            <mi id='id-4'>q</mi>
           </msup>
-          <mo id='Msowudr8-5'>-</mo>
-          <mi id='Msowudr8-6'>x</mi>
+          <mo id='id-5'>-</mo>
+          <mi id='id-6'>x</mi>
         </mrow>
         </math>";
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
@@ -1174,60 +1174,144 @@ mod tests {
             let mathml = get_element(&*package_instance);
             NAVIGATION_STATE.with(|nav_stack| {
                 nav_stack.borrow_mut().push(NavigationPosition{
-                    current_node: "Msowudr8-2".to_string(),
+                    current_node: "id-2".to_string(),
                     current_node_offset: 0
                 }, "None")
             });
             set_preference("NavMode".to_string(), "Enhanced".to_string())?;
-            test_command("MoveNext", mathml, "Msowudr8-5");
+            test_command("MoveNext", mathml, "id-5");
 
             // reset start and test Simple
             NAVIGATION_STATE.with(|nav_stack| {
                 nav_stack.borrow_mut().push(NavigationPosition{
-                    current_node: "Msowudr8-2".to_string(),
+                    current_node: "id-2".to_string(),
                     current_node_offset: 0
                 }, "None")
             });
             set_preference("NavMode".to_string(), "Simple".to_string())?;
-            test_command("MoveNext", mathml, "Msowudr8-5");
+            test_command("MoveNext", mathml, "id-5");
 
             // reset start and test Character
             NAVIGATION_STATE.with(|nav_stack| {
                 nav_stack.borrow_mut().push(NavigationPosition{
-                    current_node: "Msowudr8-3".to_string(),
+                    current_node: "id-3".to_string(),
                     current_node_offset: 0
                 }, "None")
             });
             set_preference("NavMode".to_string(), "Character".to_string())?;
-            test_command("MoveNext", mathml, "Msowudr8-4");
-
-            set_preference("NavMode".to_string(), "Character".to_string())?;
-            test_command("MoveNext", mathml, "Msowudr8-5");
+            test_command("MoveNext", mathml, "id-4");
+            test_command("MoveNext", mathml, "id-5");
             return Ok( () );
         });
     }
 
-    
+        
+    #[test]
+    fn move_msubsup_char() -> Result<()> {
+        let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
+        <mrow data-changed='added' id='id-1' data-id-added='true'>
+          <mn id='id-2' data-id-added='true'>1</mn>
+          <mo id='id-3' data-id-added='true'>+</mo>
+          <msubsup id='id-4' data-id-added='true'>
+            <mi id='id-5' data-id-added='true'>x</mi>
+            <mn id='id-6' data-id-added='true'>2</mn>
+            <mn id='id-7' data-id-added='true'>3</mn>
+          </msubsup>
+          <mo id='id-8' data-id-added='true'>+</mo>
+          <mn id='id-9' data-id-added='true'>4</mn>
+        </mrow>
+       </math>";
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
+        set_preference("NavMode".to_string(), "Character".to_string())?;
+        set_preference("NavVerbosity".to_string(), "Verbose".to_string())?;
+        set_preference("Language".to_string(), "en".to_string())?;
+        set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            assert_eq!(test_command("ZoomInAll", mathml, "id-2"), "zoom in all; 1");
+            assert_eq!(test_command("MoveNext", mathml, "id-3"), "move right, plus");
+            assert_eq!(test_command("MoveNext", mathml, "id-5"), "move right, in base; x");
+            assert_eq!(test_command("MoveNext", mathml, "id-6"), "move right, in subscript; 2");
+            assert_eq!(test_command("MoveNext", mathml, "id-7"), "move right, in superscript; 3");
+            assert_eq!(test_command("MoveNext", mathml, "id-8"), "move right, out of superscript; plus");
+            assert_eq!(test_command("MovePrevious", mathml, "id-7"), "move left, in superscript; 3");
+            assert_eq!(test_command("MovePrevious", mathml, "id-6"), "move left, in subscript; 2");
+            assert_eq!(test_command("MovePrevious", mathml, "id-5"), "move left, in base; x");
+            assert_eq!(test_command("MovePrevious", mathml, "id-3"), "move left, out of base; plus");
+
+            return Ok( () );
+        });
+    }
+        
+    #[test]
+    fn move_mmultiscripts_char() -> Result<()> {
+        init_logger();
+        let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
+            <mmultiscripts data-mjx-texclass='ORD' data-chem-formula='5' id='id-1' data-id-added='true'>
+                <mrow data-changed='added' data-chem-formula='3' id='id-2' data-id-added='true'>
+                    <mo stretchy='false' id='id-3' data-id-added='true'>[</mo>
+                    <mmultiscripts data-chem-formula='3' id='id-4' data-id-added='true'>
+                        <mi data-chem-element='3' id='id-5' data-id-added='true'>Co</mi>
+                        <mn id='id-6' data-id-added='true'>6</mn>
+                        <none id='id-7' data-id-added='true'></none>
+                    </mmultiscripts>
+                    <mo stretchy='false' id='id-8' data-id-added='true'>]</mo>
+                </mrow>
+                <none id='id-9' data-id-added='true'></none>
+                <mrow id='id-10' data-id-added='true'>
+                    <mn id='id-11' data-id-added='true'>3</mn>
+                    <mo id='id-12' data-id-added='true'>+</mo>
+                </mrow>
+            </mmultiscripts>
+            </math>";
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
+        set_preference("NavMode".to_string(), "Character".to_string())?;
+        set_preference("NavVerbosity".to_string(), "Verbose".to_string())?;
+        set_preference("Language".to_string(), "en".to_string())?;
+        set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            assert_eq!(test_command("ZoomInAll", mathml, "id-3"), "zoom in all; in base; open bracket");
+            assert_eq!(test_command("MoveNext", mathml, "id-5"), "move right, in base; cap c o,");
+            assert_eq!(test_command("MoveNext", mathml, "id-6"), "move right, in subscript; 6");
+            assert_eq!(test_command("MoveNext", mathml, "id-8"), "move right, out of subscript; close bracket");
+            assert_eq!(test_command("MoveNext", mathml, "id-11"), "move right, in superscript; 3");
+            assert_eq!(test_command("MoveNext", mathml, "id-12"), "move right, plus");
+            assert_eq!(test_command("MoveNext", mathml, "id-12"), "cannot move right, end of math;");
+            assert_eq!(test_command("MovePrevious", mathml, "id-11"), "move left, 3");
+            assert_eq!(test_command("MovePrevious", mathml, "id-8"), "move left, in base; close bracket");
+            assert_eq!(test_command("MovePrevious", mathml, "id-6"), "move left, in subscript; 6");
+            assert_eq!(test_command("MovePrevious", mathml, "id-5"), "move left, in base; cap c o,");
+            assert_eq!(test_command("MovePrevious", mathml, "id-3"), "move left, out of base; open bracket");
+
+            return Ok( () );
+        });
+    }
+
     #[test]
     fn move_right_char() -> Result<()> {
-        let mathml_str = "<math id='Myt3m7mx-0'>
-        <mrow displaystyle='true' id='Myt3m7mx-1'>
-          <mi id='Myt3m7mx-2'>x</mi>
-          <mo id='Myt3m7mx-3'>=</mo>
-          <mrow id='Myt3m7mx-4'>
-            <mfrac id='Myt3m7mx-5'>
-              <mn id='Myt3m7mx-6'>1</mn>
-              <mrow id='Myt3m7mx-7'>
-                <mi id='Myt3m7mx-8'>a</mi>
-                <mo id='Myt3m7mx-9'>+</mo>
-                <mn id='Myt3m7mx-10'>2</mn>
+        let mathml_str = "<math id='id-0'>
+        <mrow displaystyle='true' id='id-1'>
+          <mi id='id-2'>x</mi>
+          <mo id='id-3'>=</mo>
+          <mrow id='id-4'>
+            <mfrac id='id-5'>
+              <mn id='id-6'>1</mn>
+              <mrow id='id-7'>
+                <mi id='id-8'>a</mi>
+                <mo id='id-9'>+</mo>
+                <mn id='id-10'>2</mn>
               </mrow>
             </mfrac>
-            <mo id='Myt3m7mx-11'>+</mo>
-            <mrow id='Myt3m7mx-12'>
-              <mn id='Myt3m7mx-13'>3</mn>
-              <mo id='Myt3m7mx-14'>&#x2062;</mo>
-              <mi id='Myt3m7mx-15'>b</mi>
+            <mo id='id-11'>+</mo>
+            <mrow id='id-12'>
+              <mn id='id-13'>3</mn>
+              <mo id='id-14'>&#x2062;</mo>
+              <mi id='id-15'>b</mi>
             </mrow>
           </mrow>
         </mrow>
@@ -1238,23 +1322,23 @@ mod tests {
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            test_command("ZoomInAll", mathml, "Myt3m7mx-2");
-            test_command("MoveNext", mathml, "Myt3m7mx-3");
-            test_command("MoveNext", mathml, "Myt3m7mx-6");
-            test_command("MoveNext", mathml, "Myt3m7mx-8");
-            test_command("MoveNext", mathml, "Myt3m7mx-9");
-            test_command("MoveNext", mathml, "Myt3m7mx-10");
-            test_command("MoveNext", mathml, "Myt3m7mx-11");
-            test_command("MoveNext", mathml, "Myt3m7mx-13");
-            test_command("MoveNext", mathml, "Myt3m7mx-15");
-            test_command("MoveNext", mathml, "Myt3m7mx-15");
+            test_command("ZoomInAll", mathml, "id-2");
+            test_command("MoveNext", mathml, "id-3");
+            test_command("MoveNext", mathml, "id-6");
+            test_command("MoveNext", mathml, "id-8");
+            test_command("MoveNext", mathml, "id-9");
+            test_command("MoveNext", mathml, "id-10");
+            test_command("MoveNext", mathml, "id-11");
+            test_command("MoveNext", mathml, "id-13");
+            test_command("MoveNext", mathml, "id-15");
+            test_command("MoveNext", mathml, "id-15");
 
             return Ok( () );
         });
     }
     
     #[test]
-    fn move_right_char_speech() -> Result<()> {
+    fn move_char_speech() -> Result<()> {
         let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
                 <mrow id='id-1' data-id-added='true'>
                 <mfrac id='id-2' data-id-added='true'>
@@ -1276,6 +1360,8 @@ mod tests {
             test_command("ZoomInAll", mathml, "id-3");
             assert_eq!(test_command("MoveNext", mathml, "id-4"), "move right, in denominator; y");
             assert_eq!(test_command("MoveNext", mathml, "id-6"), "move right, out of denominator; z");
+            assert_eq!(test_command("MovePrevious", mathml, "id-4"), "move left, in denominator; y");
+            assert_eq!(test_command("MovePrevious", mathml, "id-3"), "move left, in numerator; x");
 
             return Ok( () );
         });
