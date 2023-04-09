@@ -34,7 +34,6 @@ fn silent_intent_underscore() {
 
 #[test]
 fn intent_prob_x() {
-    init_logger();
     let expr = "<math>
     <msup intent='$op($arg)'>
         <mi arg='arg'>x</mi>
