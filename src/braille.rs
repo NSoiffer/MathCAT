@@ -229,11 +229,11 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         "L" => "",      // letter
         "M" => "",      // multipurpose indicator
         "m" => "⠐",     // required multipurpose indicator
-        "N" => "",       // digit
+        "N" => "",      // digit
         "n" => "⠼",     // required number indicator
         "𝑁" => "",      // hack for special case of a lone decimal pt -- not considered a number but follows rules mostly
         "W" => "⠀",     // whitespace
-        "," => "⠠⠀",     // comma
+        "," => "⠠⠀",    // comma
         "b" => "⠐",     // baseline
         "↑" => "⠘",     // superscript
         "↓" => "⠰",     // supscript
@@ -268,13 +268,17 @@ fn nemeth_cleanup(raw_braille: String) -> String {
             Regex::new(r"([N𝑁]⠨)([^⠂⠆⠒⠲⠢⠖⠶⠦⠔N𝑁,Pm])").unwrap(); 
 
 
-        // Pattern for rule II.9a (add numeric indicator at start of line or after a space) and 9a (add after typeface)
+        // Pattern for rule II.9a (add numeric indicator at start of line or after a space) and 9e (add after typeface)
         // 1. start of line
         // 2. optional minus sign (⠤)
         // 3. optional typeface indicator
         // 4. number (N)
         static ref NUM_IND_9A: Regex = 
-            Regex::new(r"(?P<start>^|[,W])(?P<minus>⠤?)(?P<face>[SBTIR]*?)N").unwrap();  
+            Regex::new(r"(?P<start>^|[,W])(?P<minus>⠤?)N").unwrap();  
+
+        // Needed after section mark(§), paragraph mark(¶), #, or *
+        static ref NUM_IND_9C: Regex = 
+            Regex::new(r"(⠤?)(⠠⠷|⠠⠳|⠠⠈⠷)").unwrap();  
 
         // Needed after section mark(§), paragraph mark(¶), #, or *
         static ref NUM_IND_9D: Regex = 
@@ -330,9 +334,10 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     let result = MULTI_177_5.replace_all(&result, "${1}m$2");
   debug!("MULTI:   \"{}\"", result);
 
-    let result = NUM_IND_9A.replace_all(&result, "$start$minus${face}n");
+    let result = NUM_IND_9A.replace_all(&result, "${start}${minus}n");
   debug!("IND_9A:  \"{}\"", result);
 
+    let result = NUM_IND_9C.replace_all(&result, "${1}${2}n");
     let result = NUM_IND_9D.replace_all(&result, "${1}n");
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
     let result = NUM_IND_9E_SHAPE.replace_all(&result, "${mod}n");
