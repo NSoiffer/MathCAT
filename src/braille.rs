@@ -268,7 +268,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
             Regex::new(r"([N𝑁]⠨)([^⠂⠆⠒⠲⠢⠖⠶⠦⠔N𝑁,Pm])").unwrap(); 
 
 
-        // Pattern for rule II.9a (add numeric indicator at start of line or after a space) and 9e (add after typeface)
+        // Pattern for rule II.9a (add numeric indicator at start of line or after a space)
         // 1. start of line
         // 2. optional minus sign (⠤)
         // 3. optional typeface indicator
