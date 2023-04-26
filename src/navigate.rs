@@ -1247,7 +1247,6 @@ mod tests {
         
     #[test]
     fn move_mmultiscripts_char() -> Result<()> {
-        init_logger();
         let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
             <mmultiscripts data-mjx-texclass='ORD' data-chem-formula='5' id='id-1' data-id-added='true'>
                 <mrow data-changed='added' data-chem-formula='3' id='id-2' data-id-added='true'>
