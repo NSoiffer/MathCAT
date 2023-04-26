@@ -264,24 +264,12 @@
         then: [t: "N⠲"]
         else: [t: "."]
  - ":":                         # 0x003A (Colon)
-        # Sometimes a colon is meant to be a ratio/mathord and sometimes a map/punct.
-        # The latter has a space after it.
-        # If in an mrow, guess it is infix and checks the operator. This is pretty weak!
-        # Field extensions "[K:F]" and trilinear coordinates "a:b:c" don't want extra space
-        # Time doesn't want an extra space -- the am/pm get wrapped in an mrow with the minutes after the colon
+        # We can't normally tell spacing, but it *should* have a space in function mapping and set builder notation if the author used appropriate notation
+        # The canonicalization code makes this guess and adds "data-space-after"
     - test:
-        if:
-        - "IsBracketed(ancestor::*[2], '[', ']') or "       # field extension
-        - "preceding-sibling::*[2][text()=':'] or following-sibling::*[2][text()=':'] or"  # trilinear form
-          # ratios tend to have similar left and right sides
-        - "name(preceding-sibling::*[1]) = name(following-sibling::*[1]) or"
-          # am/pm test
-        - "(name(preceding-sibling::*[1]) = 'mn' and "
-        - "  following-sibling::*[1][self::m:mrow and count(*)=3 and *[1][self::m:mn] and "
-        - "     *[3][translate(., 'APM\u00A0', 'apm') = 'am' or translate(., 'APM\u00A0', 'apm') = 'pm']"
-        - " ])"
-        then: [t: "1⠒"]
-        else: [t: "1⠒W"]
+        if: "DEBUG(@data-space-after or IsBracketed(ancestor::*[2], '{', '}') or following-sibling::*[1]/*[2][IsInDefinition(., 'Arrows')])" # "Arrows" is a bit broad...
+        then: [t: "1⠒W"]
+        else: [t: "1⠒"]
 
  - "-":                        # 0x2d (Minus sign or hyphen)
      - test:
