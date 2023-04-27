@@ -23,6 +23,7 @@ pub const CHANGED_ATTR: &str = "data-changed";
 pub const ADDED_ATTR_VALUE: &str = "added";
 const MFENCED_ATTR_VALUE: &str = "from_mfenced";
 const EMPTY_IN_2D: &str = "data-empty-in-2D";
+const SPACE_AFTER: &str = "data-space-after";
 // character to use instead of the text content for priority, etc.
 pub const CHEMICAL_BOND: &str ="data-chemical-bond";
 
@@ -637,10 +638,7 @@ impl CanonicalizeContext {
 
 		// handle empty leaves -- leaving it empty causes problems with the speech rules
 		if is_leaf(mathml) && !EMPTY_ELEMENTS.contains(element_name) && as_text(mathml).is_empty() {
-			if !parent_requires_child {
-				return None;
-			}
-			CanonicalizeContext::make_empty_element(mathml);
+			return if parent_requires_child {Some( CanonicalizeContext::make_empty_element(mathml) )} else {None};
 		};
 		
 		if mathml.children().is_empty() && !EMPTY_ELEMENTS.contains(element_name) {
@@ -669,10 +667,10 @@ impl CanonicalizeContext {
 				let text = as_text(mathml);
 				let mut chars = text.chars();
 				let first_char = chars.next().unwrap();		// we have already made sure it is non-empty
-				// if !text.trim().is_empty() && is_roman_number_match(text) {
-				// 	// people tend to set them in a non-italic font and software makes that 'mtext'
-				// 	mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
-				// }
+				if !text.trim().is_empty() && is_roman_number_match(text) {
+					// people tend to set them in a non-italic font and software makes that 'mtext'
+					mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+				}
 				if first_char == '-' || first_char == '\u{2212}' {
 					let doc = mathml.document();
 					let mo = create_mathml_element(&doc, "mo");
@@ -690,12 +688,12 @@ impl CanonicalizeContext {
 			},
 			"mi" => {
 				let text = as_text(mathml);
-				// if !text.trim().is_empty() && is_roman_number_match(text) && is_roman_numeral_number_context(mathml) {
-				// 	// people tend to set them in a non-italic font and software makes that 'mtext'
-				// 	set_mathml_name(mathml, "mn");
-				// 	mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
-				// 	return Some(mathml);
-			 	// }
+				if !text.trim().is_empty() && is_roman_number_match(text) && is_roman_numeral_number_context(mathml) {
+					// people tend to set them in a non-italic font and software makes that 'mtext'
+					set_mathml_name(mathml, "mn");
+					mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+					return Some(mathml);
+			 	}
 				if let Some(dash) = canonicalize_dash(text) {		// needs to be before OPERATORS.get due to "--"
 					mathml.set_text(dash);
 					return Some(mathml);
@@ -724,12 +722,12 @@ impl CanonicalizeContext {
 				}
 				
 				let text = as_text(mathml);
-				// if !text.trim().is_empty() && is_roman_number_match(text) && is_roman_numeral_number_context(mathml) {
-				// 	// people tend to set them in a non-italic font and software makes that 'mtext'
-				// 	set_mathml_name(mathml, "mn");
-				// 	mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
-				// 	return Some(mathml);
-				// }
+				if !text.trim().is_empty() && is_roman_number_match(text) && is_roman_numeral_number_context(mathml) {
+					// people tend to set them in a non-italic font and software makes that 'mtext'
+					set_mathml_name(mathml, "mn");
+					mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+					return Some(mathml);
+				}
 				// allow non-breaking whitespace to stay -- needed by braille
 				let mathml = mathml;
 				if IS_WHITESPACE.is_match(text) {
@@ -749,13 +747,27 @@ impl CanonicalizeContext {
 				if !text.is_empty() && IS_WHITESPACE.is_match(text) {
 					// can't throw it out because it is needed by braille -- change to what it really is
 					set_mathml_name(mathml, "mtext");
+					return Some(mathml);
+				} else {
+					match text {
+						"arc" | "arc " | "arc " /* non-breaking space */ => {
+							if let Some(result) = merge_arc_trig(mathml) {
+								return Some(result);
+							}
+						},
+						"…" => {mathml.set_text("…");},  // name might need to change -- checked below
+						":" => {
+							if is_ratio(mathml) {
+								mathml.set_text("∶");	// ratio U+2236
+							}
+							return Some(mathml);
+						},
+						_ => (),
+					}
 				}
+
 				// common bug: trig functions, lim, etc., should be mi
 				// same for ellipsis ("…")
-				if let Some(result) = merge_arc_trig(mathml) {
-					return Some(result);
-				};
-
 				return crate::definitions::DEFINITIONS.with(|definitions| {
 					if text == "…" || 
 					   definitions.borrow().get_hashset("FunctionNames").unwrap().contains(text) ||
@@ -782,12 +794,7 @@ impl CanonicalizeContext {
 				// FIX: should probably push the attrs down to the children (set in 'self')
 				let children = mathml.children();
 				if children.is_empty() {
-					if parent_requires_child {
-						// need a placeholder -- make it empty mtext
-						return Some( CanonicalizeContext::make_empty_element(mathml));
-					} else {
-						return None;
-					}
+					return if parent_requires_child {Some( CanonicalizeContext::make_empty_element(mathml) )} else {None};
 				} else if children.len() == 1 {
 					let is_from_mhchem = element_name == "mpadded" && is_from_mhchem_hack(mathml);
 					// "lift" the child up so all the links (e.g., siblings) are correct
@@ -815,20 +822,23 @@ impl CanonicalizeContext {
 				}
 			},
 			"mphantom" | "malignmark" | "maligngroup"=> {
-				if parent_requires_child {
-					return Some( CanonicalizeContext::make_empty_element(mathml));
-				} else {
-					return None;
-				}
+				return if parent_requires_child {Some( CanonicalizeContext::make_empty_element(mathml) )} else {None};
 			},
 			"mspace" => {
 				// need to hold onto space for braille
 				let width = mathml.attribute_value("width").unwrap_or("0");
-				if is_width_ignorable(width)  {		// testing <= 0 -- could do better
-					return None;
+				let ignorable = is_width_ignorable(width);
+				if ignorable {
+					let preceding = mathml.preceding_siblings();
+					if !preceding.is_empty() {
+						let preceding_child = as_element(preceding[preceding.len()-1]);
+						// debug!("preceding ignorable: {}", mml_to_string(&preceding_child));
+						if name(&preceding_child) == "mo" {
+							preceding_child.set_attribute_value(SPACE_AFTER, width);
+						}
+					}
 				}
-				return Some( CanonicalizeContext::make_empty_element(mathml));
-			},
+				return if parent_requires_child || !ignorable {Some( CanonicalizeContext::make_empty_element(mathml) )} else {None};			},
 			"semantics" => {
 				// clean the presentation child but leave the annotations in case they want to be used by the rules.
 				// no attempt is made to clean the annotations or verify they are annotations
@@ -994,17 +1004,92 @@ impl CanonicalizeContext {
 			}
 		}
 
+		/// Hack to try and guess if a colon should be a ratio -- this affects parsing because of different precedences
+		/// It also guesses on the spacing after the colon and adds a space attr if it looks like set building or function mapping notation.
+		/// These conditions are really not well thought out and are just a first cut -- they do cause the braille tests to pass
+		/// 1. It must be infix and there is a proportion (∷) mo as a sibling, or
+		/// 3. It is the only mo and has numbers on each side
+		/// 
+		/// Need to rule out field extensions "[K:F]" and trilinear coordinates "a:b:c" (Nemeth doesn't consider these to be ratios)
+		fn is_ratio(mathml: Element) -> bool {
+			assert_eq!(name(&mathml), "mo");
+			let parent = mathml.parent().unwrap().element().unwrap();	// must exist
+			if name(&parent) != "mrow" && name(&parent) != "math"{
+				return false;
+			}
+
+			if let Some(value) = mathml.attribute_value("data-mjx-texclass") {
+				if value ==  "PUNCT" {
+					mathml.remove_attribute("data-mjx-texclass");
+					mathml.set_attribute_value(SPACE_AFTER, "true");	// signal to at least Nemeth rules that this is punctuation
+				}
+			}
+
+			let preceding = mathml.preceding_siblings();
+			let following = mathml.following_siblings();
+			if preceding.is_empty() || following.is_empty() {
+				return false;
+			}
+			let preceding_child = as_element( preceding[preceding.len()-1] );
+			let following_child = as_element(following[0]);
+			if preceding.len() == 1 && name(&preceding_child) == "mn" &&
+			   following.len() == 1 && name(&following_child) == "mn" {
+				return true;
+			}
+			// only want want one "∷"
+			let is_before = is_proportional_before_colon(preceding.iter().rev());
+			if let Some(is_before) = is_before {
+				if !is_before {
+					return false;
+				}
+			}
+			let is_before = is_before.is_some();		// move this to true/false (found/not found)
+			let is_after = is_proportional_before_colon(following.iter());
+			if let Some(is_after) = is_after {
+				if !is_after {
+					return false;
+				}
+			}
+			let is_after = is_after.is_some();		// move this to true/false (found/not found)
+			return is_before ^ is_after;
+
+			fn is_proportional_before_colon<'a>(siblings: impl Iterator<Item = &'a ChildOfElement<'a>>) -> Option<bool> {
+				// unparsed, so we look at relative priorities to make sure the proportional operator is really the next operator
+				lazy_static!{
+					static ref PROPORTIONAL_PRIORITY: usize = OPERATORS.get("∷").unwrap().priority;
+				}
+				for sibling in siblings {
+					let child = as_element(*sibling);
+					if name(&child) == "mo" {
+						let text = as_text(child);
+						match text {
+							"∷" => return Some(true),
+							"∶" => return Some(false),
+							_ => {
+								if let Some(op) = OPERATORS.get(text) {
+									if op.priority < *PROPORTIONAL_PRIORITY {
+										return None;		// no "∷"
+									}
+								}
+							},
+						}
+					}
+				}
+				return None;
+			}
+		}
+
 
 		/// Returns true if it detects that this is likely coming from mhchem:
-		/// v3: msub/msup with mpadded width=0/mphantom/mi=A)
-		/// v4: msub/msup with mrow/mrow/mpadded width=0/mphantom/mi=A)
+		/// v3: msub/msup/msubsup with mpadded width=0/mphantom/mi=A)
+		/// v4: msub/msup/msubsup with mrow/mrow/mpadded width=0/mphantom/mi=A)
 		/// This should be called with 'mrow' being the outer mrow
 		fn is_from_mhchem_hack(mathml: Element) -> bool {
 			assert!(name(&mathml) == "mrow" || name(&mathml) == "mpadded");
 			assert_eq!(mathml.children().len(), 1);
 			let parent = mathml.parent().unwrap().element().unwrap();
 			let parent_name = name(&parent);
-			if !(parent_name == "msub" || parent_name == "msup") {
+			if !(parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") {
 				return false;
 			}
 
@@ -1042,7 +1127,7 @@ impl CanonicalizeContext {
 		/// 
 		/// This is not great in that someone could have multiple 'mspace's and together they exceed the threshold, but not individually
 		fn is_width_ignorable(width: &str) -> bool {
-			// Check to see if above some threshold (0.25em/0.5ex?)
+			// Check to see if above some threshold (0.278em/1ex? -- thickspace?)  
 			// FIX: this is far from complete
 			if  width == "0" || width.starts_with('-') {	// simple cases
 				return true;	
@@ -1050,8 +1135,8 @@ impl CanonicalizeContext {
 			if let Some(i) = width.find(|ch: char| ch.is_ascii_alphabetic()) {
 				let (amount, unit) = width.split_at(i);
 				match unit {
-					"em" | "rem" => return amount.parse::<f64>().unwrap_or(100.) < 0.25,
-					"ex" => return amount.parse::<f64>().unwrap_or(100.) < 0.5,
+					"em" | "rem" => return amount.parse::<f64>().unwrap_or(100.) < 0.278,
+					"ex" => return amount.parse::<f64>().unwrap_or(100.) < 1.0,
 					"px" => return amount.parse::<f64>().unwrap_or(100.) < 6.1,	// assume 12pt font -- hack
 					_ => return false,
 				}
@@ -1240,64 +1325,75 @@ impl CanonicalizeContext {
 		/// Return true if 'element' (which is syntactically a roman numeral) is only inside mrows and
 		///  if its length is < 3 chars, then there is another roman numeral near it (separated by an operator).
 		/// We want to rule out something like 'm' or 'cm' being a roman numeral.
-		// fn is_roman_numeral_number_context(mathml: Element) -> bool {
-		// 	assert!(name(&mathml)=="mtext" || name(&mathml)=="mi");
-		// 	let mut parent = mathml;
-		// 	loop {
-		// 		parent = parent.parent().unwrap().element().unwrap();
-		// 		let current_name = name(&parent);
-		// 		if current_name == "math" {
-		// 			break;
-		// 		} else if current_name != "mrow" {
-		// 			return false;
-		// 		}
-		// 	}
-		// 	if as_text(mathml).len() > 2 {
-		// 		return true;
-		// 	} else {
-		// 		let is_upper_case = as_text(mathml).as_bytes()[0].is_ascii_uppercase();	// safe since we know it is a 
-		// 		let preceding = mathml.preceding_siblings();
-		// 		if !preceding.is_empty() {
-		// 			if !is_roman_numeral_adjacent(preceding.iter().rev(), is_upper_case) {
-		// 				return false;
-		// 			}
-		// 		}
-		// 		let following = mathml.following_siblings();
-		// 		if following.is_empty() {
-		// 			return false;		// no context and too short to confirm it is a roman numeral
-		// 		}
-		// 		return is_roman_numeral_adjacent(following.iter(), is_upper_case);
-		// 	}
+		/// Note: Nemeth has some rules about roman numerals (capitalization and punctuation after)
+		fn is_roman_numeral_number_context(mathml: Element) -> bool {
+			assert!(name(&mathml)=="mtext" || name(&mathml)=="mi");
+			let mut parent = mathml;
+			loop {
+				parent = parent.parent().unwrap().element().unwrap();
+				let current_name = name(&parent);
+				if current_name == "math" {
+					break;
+				} else if current_name != "mrow" {
+					return false;
+				}
+			}
+			if as_text(mathml).len() > 2 {
+				return true;
+			} else {
+				let is_upper_case = as_text(mathml).as_bytes()[0].is_ascii_uppercase();	// safe since we know it is a 
+				let preceding = mathml.preceding_siblings();
+				if !preceding.is_empty() && is_roman_numeral_adjacent(preceding.iter().rev(), is_upper_case) {
+					return true;
+				}
+				let following = mathml.following_siblings();
+				if following.is_empty() {
+					return false;		// no context and too short to confirm it is a roman numeral
+				}
+				return is_roman_numeral_adjacent(following.iter(), is_upper_case);
+			}
 
-		// 	/// make sure all the non-mo leaf siblings are roman numerals
-		// 	fn is_roman_numeral_adjacent<'a, I>(mut siblings: I, must_be_upper_case: bool) -> bool
-		// 			where I: Iterator<Item = &'a ChildOfElement<'a>> {				
-		// 		let mut found_match = false;		// guard against no siblings
-		// 		while let Some(child) = siblings.next() {
-		// 			let mut maybe_roman_numeral = as_element(*child);
-		// 			if name(&maybe_roman_numeral) == "mo" {
-		// 				let after_mo = siblings.next();
-		// 				if after_mo.is_none() {
-		// 					return false;
-		// 				}
-		// 				maybe_roman_numeral = as_element(*after_mo.unwrap());
-		// 			}
-		// 			if !is_leaf(maybe_roman_numeral) {
-		// 				return false;
-		// 			}
-		// 			let text = as_text(maybe_roman_numeral);
-		// 			if text.trim().is_empty() {
-		// 				return false;
-		// 			}
-		// 			if !(( must_be_upper_case && UPPER_ROMAN_NUMERAL.is_match(text)) ||
-		// 				 (!must_be_upper_case && LOWER_ROMAN_NUMERAL.is_match(text)) ) {
-		// 					return false;
-		// 			};
-		// 			found_match = true;
-		// 		}
-		// 		return found_match;
-		// 	}
-		// }
+			/// make sure all the non-mo leaf siblings are roman numerals
+			/// 'mo' should only be '+', '-', '=', ',', '.'  -- unlikely someone is doing anything sophisticated
+			fn is_roman_numeral_adjacent<'a, I>(siblings: I, must_be_upper_case: bool) -> bool
+					where I: Iterator<Item = &'a ChildOfElement<'a>> {				
+				let mut found_match = false;				// guard against no siblings
+				let mut last_was_roman_numeral = true;	// started at roman numeral
+				// debug!("start is_roman_numeral_adjacent");
+				for child in siblings {
+					let maybe_roman_numeral = as_element(*child);
+					// debug!("maybe_roman_numeral: {}", mml_to_string(&maybe_roman_numeral));
+					match name(&maybe_roman_numeral) {
+						"mo" => {
+							if !last_was_roman_numeral {
+								return false;
+							}
+							let text = as_text(maybe_roman_numeral);
+							if !(text=="+" || text=="-" || text=="," || text==".") {
+								return false;
+							}
+						},
+						"mi" | "mn" => {
+							if last_was_roman_numeral {
+								return false;		// no implicit multiplication (or whatever)
+							}
+							let text = as_text(maybe_roman_numeral);
+							if !(( must_be_upper_case && UPPER_ROMAN_NUMERAL.is_match(text)) ||
+								 (!must_be_upper_case && LOWER_ROMAN_NUMERAL.is_match(text)) ) {
+								return false;
+							};
+							found_match = true;
+							last_was_roman_numeral = true;
+						},
+						"mtext" | "mspace" | "mphantom" => {},
+						_ => {
+							return false;
+						}
+					}
+				}
+				return found_match;
+			}
+		}
 
 		fn is_digit_block(mathml: Element) -> DigitBlockType {
 			// returns true if an 'mn' with exactly three digits
@@ -1387,8 +1483,10 @@ impl CanonicalizeContext {
 				let mut is_decimal_pt = false;
 				let mut has_decimal_pt = false;
 				if name(&child) == "mn" {
-					// if the 'mn' has ',', '.', or space, consider it correctly parsed and move on
-					if SEPARATORS.is_match(as_text(child)) {
+					let leaf_child_text = as_text(child);
+					// if Roman numeral, don't merge (move on)
+					// or if the 'mn' has ',', '.', or space, consider it correctly parsed and move on
+					if is_roman_number_match(leaf_child_text) || SEPARATORS.is_match(leaf_child_text) {
 						i += 1;
 						continue;
 					}
@@ -1521,6 +1619,7 @@ impl CanonicalizeContext {
 				return false;
 			}
 
+			// debug!("is_likely_a_number: start/end={}/{} -- mrow:\n{}", start, end, mml_to_string(&mrow));
 			// remove/don't include whitespace at the end
 			while end >= start+3 {
 				let child = as_element(children[end-1]);	// end is not inclusive
@@ -1530,9 +1629,18 @@ impl CanonicalizeContext {
 				end -= 1;
 			}
 
+			// if space added after ',' or '.', then not a number
+			for i_child in start..end {
+				let child = as_element(children[i_child]);
+				if child.attribute(SPACE_AFTER).is_some() {
+					return false;
+				}
+			}
+
 			let decimal_at_start = count_decimal_pts(children, start, start+1) == 1;
 			// decimal_at_start => none at end
-			let decimal_at_end = !(decimal_at_start || count_decimal_pts(children, end-1, end) == 0);
+			let decimal_at_end = !(decimal_at_start || count_decimal_pts(children, end-1, end) == 0) &&
+									   !is_decimal_a_period(mrow, children, end-1, end);
 			// be a little careful about merging the numbers	
 			if end - start < 3 {
 				// need at least digit separator digit-block unless it starts or ends with a decimal point
@@ -1564,6 +1672,8 @@ impl CanonicalizeContext {
 						}
 					}
 				}
+
+				// ??? might want to rule out "sequences" like '100, 200, 300' and '100, 103, 106' (if constant difference, then a sequence)
 				return true;		// digit block separated by whitespace
 			}
 
@@ -1598,8 +1708,6 @@ impl CanonicalizeContext {
 			}
 			let first_child = as_element(first_child);
 			let last_child = as_element(last_child);
-			// debug!("first_child: {}", crate::pretty_print::mml_to_string(&first_child));
-			// debug!("last_child: {}", crate::pretty_print::mml_to_string(&last_child));
 			return !(name(&first_child) == "mo" && is_fence(first_child) &&
 				     name(&last_child) == "mo" && is_fence(last_child) );
 		}
@@ -1613,6 +1721,30 @@ impl CanonicalizeContext {
 				}
 			}
 			return n_decimal_pt;
+		}
+
+		/// This is a special case heuristic so try and determine if a terminating "." should be a period or decimal point
+		/// E.g, "1,3,5." -- don't merge the '.' into the "5"
+		/// Can't tell: "1,234.", but error on not merging as large numbers tend to be integers
+		/// Should merge: "1.2, 3.2, 5."
+		/// This assumes we have a potential number at start..end and validity will be determined elsewhere
+		fn is_decimal_a_period(math_or_mrow: Element, children: &[ChildOfElement], start: usize, end: usize) -> bool {
+			if end < math_or_mrow.children().len() {
+				return false;		// not at end
+			}
+			let parent = math_or_mrow.parent().unwrap().element();
+			if let Some(math) = parent {
+				return name(&math) != "math";		// mrow inside something else -- not at end
+			}
+
+			let last_child = as_element(children[end-1]);
+			// debug!("is_decimal_a_period: last child={}", mml_to_string(&last_child));
+			if start+1 < end || name(&last_child) != "mo" {
+				return false;	// last was not "mo", so can't be a period
+			}
+
+			// probably could do more tests, but not sure what
+			return true;
 		}
 
 		fn merge_block(children: &mut Vec<ChildOfElement>, start: usize, end: usize) {
@@ -1762,6 +1894,7 @@ impl CanonicalizeContext {
 
 		fn handle_convert_to_mmultiscripts(children: &mut Vec<ChildOfElement>) {
   			let mut i = 0;
+			// convert_to_mmultiscripts changes 'children', so can't cache length
 			while i < children.len() {
 				let child = as_element(children[i]);
 				let child_name = name(&child);
@@ -1777,8 +1910,8 @@ impl CanonicalizeContext {
 		/// Converts the script element with an empty base to mmultiscripts by sucking the base from the following or preceding element.
 		/// The following element is preferred so that these become prescripts (common usage is from TeX), but if the preceding element
 		///   has a closer mi/mtext, it is used.
-		/// mhchem has some ugly output (at least in MathJax) and that's where using the following element makes sense
-		///   because an empty based (mpadded width=0) is used for the scripts. A hacky attribute indicates this case.
+		/// mhchem has some ugly output (at least in MathJax) and that's where using the following element makes sense (usually)
+		///   because an empty base (mpadded width=0) is used for the scripts. A hacky attribute indicates this case.
 		fn convert_to_mmultiscripts(mrow_children: &mut Vec<ChildOfElement>, i: usize) -> usize {
 			// this is a bit messy/confusing because we might scan forwards or backwards and this affects whether
 			// we are scanning for prescripts or postscripts
@@ -1808,11 +1941,18 @@ impl CanonicalizeContext {
 				base = script_base;
 			}
 
+			let mut has_chemistry_prescript = false;	// chemical elements don't have both prescripts (nuclear chem) and postscripts
 			if i_base > i {
 				// we have prescripts -- gather them up
 				let mut i_prescript = i;
 				while i_prescript < i_base {
 					let script = as_element(mrow_children[i_prescript]);
+					// kind of ugly -- this duplicates the first part of add_script
+					let script_name = name(&script);
+					if script_name == "msub" || script_name == "msup" || script_name == "msubsup" {
+						let base = as_element(script.children()[0]);
+						has_chemistry_prescript |= base.attribute(MHCHEM_MMULTISCRIPTS_HACK).is_some();
+					}
 					if !add_to_scripts(script, &mut prescripts) {
 						break;
 					}
@@ -1820,25 +1960,28 @@ impl CanonicalizeContext {
 				}
 			}
 
-			// gather up the postscripts (if any)
-			while i_postscript < mrow_children.len() {
-				let script = as_element(mrow_children[i_postscript]);
-				if name(&script) == "msub" && i_postscript+1 < mrow_children.len() {
-					let superscript = as_element(mrow_children[i_postscript+1]);
-					if name(&superscript) == "msup" && CanonicalizeContext::is_empty_element(as_element(superscript.children()[0])) {
-						set_mathml_name(script, "msubsup");
-						script.append_child(superscript.children()[1]);
-						i_postscript += 1;
+			if !has_chemistry_prescript {
+				// gather up the postscripts (if any)
+				while i_postscript < mrow_children.len() {
+					let script = as_element(mrow_children[i_postscript]);
+					// debug!("script: {}", mml_to_string(&script));
+					if name(&script) == "msub" && i_postscript+1 < mrow_children.len() {
+						let superscript = as_element(mrow_children[i_postscript+1]);
+						if name(&superscript) == "msup" && CanonicalizeContext::is_empty_element(as_element(superscript.children()[0])) {
+							set_mathml_name(script, "msubsup");
+							script.append_child(superscript.children()[1]);
+							i_postscript += 1;
+						}
 					}
+					// debug!("adding postscript\n{}", mml_to_string(&script));
+					if !add_to_scripts(script, &mut postscripts) {
+						break;
+					}
+					i_postscript += 1;
 				}
-				// debug!("adding script\n{}", mml_to_string(&script));
-				if !add_to_scripts(script, &mut postscripts) {
-					break;
-				}
-				i_postscript += 1;
 			}
 
-			let i_returned = if i_base < i {i_base} else {i};
+			let i_multiscript = if i_base < i {i_base} else {i};
 			let script = create_mathml_element(&base.document(), "mmultiscripts");
 			let mut num_children = 1 + postscripts.len();
 			if !prescripts.is_empty() {
@@ -1853,8 +1996,8 @@ impl CanonicalizeContext {
 			}
 
 			script.replace_children(new_children);
-			mrow_children[i_returned] = ChildOfElement::Element(script);
-			mrow_children.drain(i_returned+1..i_postscript);	// remove children after the first
+			mrow_children[i_multiscript] = ChildOfElement::Element(script);
+			mrow_children.drain(i_multiscript+1..i_postscript);	// remove children after the first
 
 			let likely_chemistry = likely_adorned_chem_formula(script);
 			if likely_chemistry >= 0 {
@@ -1862,14 +2005,19 @@ impl CanonicalizeContext {
 			}
 
 			// debug!("convert_to_mmultiscripts -- converted script:\n{}", mml_to_string(&script));
-			return i_returned;
+			// debug!("convert_to_mmultiscripts (at end) -- #children={}", mrow_children.len());
+			return i_multiscript + 1;		// child to start on next
 		}
 
 		fn add_to_scripts<'a>(el: Element<'a>, scripts: &mut Vec<ChildOfElement<'a>>) -> bool {
 			let script_name = name(&el);
-			if !(script_name == "msub" || script_name == "msup" || script_name == "msubsup") ||
-			   !CanonicalizeContext::is_empty_element(as_element(el.children()[0])) {
-					return false;
+			if !(script_name == "msub" || script_name == "msup" || script_name == "msubsup") {
+				return false;
+			}
+			let base = as_element(el.children()[0]);
+			if !CanonicalizeContext::is_empty_element(base) { // prescript that really should be a postscript
+				// debug!("add_to_scripts: not empty base:\n{}", mml_to_string(&base));
+				return false;
 			}
 			if script_name == "msub" {
 				add_pair(scripts, Some(el.children()[1]), None);
@@ -1913,8 +2061,14 @@ impl CanonicalizeContext {
 			// We already know there are no empty scripts to the left (because we find first empty base from left to right).
 			// However, there may be some empty bases before we get to real base on the right.
 			let script_element_base = as_element(as_element(mrow_children[i]).children()[0]);
-			let from_mchem = script_element_base.attribute(MHCHEM_MMULTISCRIPTS_HACK).is_some();
-			if mrow_children.len() > i+1 && !(from_mchem && i > 0) && is_child_simple_base(mrow_children[i+1]) {
+			let mut likely_postscript = script_element_base.attribute(MHCHEM_MMULTISCRIPTS_HACK).is_some() && i > 0;
+			if likely_postscript {
+				let base_of_postscript = as_element(mrow_children[i-1]);
+				if name(&base_of_postscript) != "mi" || likely_chem_element(base_of_postscript) < 0 {
+					likely_postscript = false;	// base for potential postscript doesn't look reasonable -- consider it a prescript
+				}
+			}
+			if i+1 < mrow_children.len() && !likely_postscript && is_child_simple_base(mrow_children[i+1]) {
 				return i+1;
 			}
 			if i > 0 {
@@ -2324,8 +2478,8 @@ impl CanonicalizeContext {
 			"\u{2212}" => "-",
 			// FIX: this needs to be after all expr the "|" has been fully canonicalized. At this point, any parent mrow/siblings is in flux
 			// "\u{007C}" => {  // vertical line -> divides
-			// 	// if a number or variable (lower case single letter) precedes and follows "|", switch to divides (a bit questionable...)
-			// 	debug!("canonicalize_mo_text parent:\n{}", mml_to_string(&parent));
+			// if a number or variable (lower case single letter) precedes and follows "|", switch to divides (a bit questionable...)
+			// debug!("canonicalize_mo_text parent:\n{}", mml_to_string(&parent));
 			// 	let precedes = mo.preceding_siblings();
 			// 	let follows = mo.following_siblings();
 			// 	if precedes.is_empty() || follows.is_empty() {
@@ -2453,7 +2607,7 @@ impl CanonicalizeContext {
 		}
 	}
 	
-	fn n_vertical_bars_on_right<'a>(&self, remaining_children: &[ChildOfElement], vert_bar_ch: &'a str) -> usize {
+	fn n_vertical_bars_on_right(&self, remaining_children: &[ChildOfElement], vert_bar_ch: &str) -> usize {
 		// return the number of children that match 'vert_bar_op' not counting the first element
 		let mut n = 0;
 		for child_of_element in remaining_children {
@@ -2708,7 +2862,7 @@ impl CanonicalizeContext {
 			return FunctionNameCertainty::Maybe;		// didn't fit one of the above categories
 		});
 	
-		fn is_single_arg<'a>(open: &str, following_nodes: &[ChildOfElement<'a>]) -> bool {
+		fn is_single_arg(open: &str, following_nodes: &[ChildOfElement]) -> bool {
 			// following_nodes are nodes after "("
 			if following_nodes.is_empty() {
 				return true;		// "a(" might or might not be a function call -- treat as "is" because we can't see more 
@@ -2726,7 +2880,7 @@ impl CanonicalizeContext {
 					is_matching_right_paren(open, as_element(following_nodes[1]));
 		}
 	
-		fn is_comma_arg<'a>(open: &str, following_nodes: &[ChildOfElement<'a>]) -> bool {
+		fn is_comma_arg(open: &str, following_nodes: &[ChildOfElement]) -> bool {
 			// following_nodes are nodes after "("
 			if following_nodes.len() == 1 {
 				return false; 
@@ -2830,7 +2984,7 @@ impl CanonicalizeContext {
 			return is_int(&denominator);
 		}
 
-		fn is_linear_fraction<'a>(canonicalize: &CanonicalizeContext, fraction_children: &[ChildOfElement<'a>]) -> Result<bool> {
+		fn is_linear_fraction(canonicalize: &CanonicalizeContext, fraction_children: &[ChildOfElement]) -> Result<bool> {
 			// two possibilities
 			// 1. '3 / 4' is in an mrow
 			// 2. '3 / 4' are three separate elements
@@ -4488,10 +4642,10 @@ mod canonicalize_tests {
     fn roman_numeral() {
         let test_str = "<math><mrow><mtext>XLVIII</mtext> <mo>+</mo><mn>mmxxvi</mn></mrow></math>";
 		// turns out there is no need to mark them as Roman Numerals -- thought that was need for braille
-        // let target_str = "<math><mrow>
-		// 	<mn data-roman-numeral='true'>XLVIII</mn> <mo>+</mo><mn data-roman-numeral='true'>mmxxvi</mn>
-		// 	</mrow></math>";
-        let target_str = "<math><mrow><mtext>XLVIII</mtext> <mo>+</mo><mn>mmxxvi</mn></mrow></math>";
+        let target_str = "<math><mrow>
+			<mn data-roman-numeral='true'>XLVIII</mn> <mo>+</mo><mn data-roman-numeral='true'>mmxxvi</mn>
+			</mrow></math>";
+        // let target_str = "<math><mrow><mtext>XLVIII</mtext> <mo>+</mo><mn>mmxxvi</mn></mrow></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
@@ -4505,13 +4659,13 @@ mod canonicalize_tests {
     //     assert!(are_strs_canonically_equal(test_str, target_str));
 	// }
 
-	// #[test]
-    // fn not_roman_numeral() {
-    //     let test_str = "<math><mtext>cm</mtext></math>";
-	// 	// shouldn't change
-    //     let target_str = "<math><mtext>cm</mtext></math>";
-    //     assert!(are_strs_canonically_equal(test_str, target_str));
-	// }
+	#[test]
+    fn not_roman_numeral() {
+        let test_str = "<math><mtext>cm</mtext></math>";
+		// shouldn't change
+        let target_str = "<math><mtext>cm</mtext></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
 
 	#[test]
     fn digit_block_binary() {
@@ -4568,6 +4722,33 @@ mod canonicalize_tests {
 				<mn>.01</mn>
 				</mrow>
 			</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn number_with_decimal_pt() {
+		// this is output from WIRIS for "12.3"
+        let test_str = "<math><mn>12</mn><mo>.</mo><mn>3</mn></math>";
+        let target_str = "<math><mn>12.3</mn></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn addition_with_decimal_point_at_end() {
+		// in this case, the trailing "." is probably a decimal point" -- testing special case combine the "."
+		// this comes from WIRIS
+        let test_str = "<math><mn>1</mn><mo>.</mo><mn>3</mn><mo>+</mo><mn>2</mn><mo>.</mo></math>";
+        let target_str = "<math><mrow data-changed='added'><mn>1.3</mn><mo>+</mo><mn>2.</mn></mrow></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn sequence_with_period() {
+		// in this case, we don't want "5." -- testing special case to avoid combining the period.
+        let test_str = "<math><mn>1</mn><mo>,</mo><mn>3</mn><mo>,</mo><mn>5</mn><mo>.</mo></math>";
+        let target_str = "<math><mrow data-changed='added'>
+				<mrow data-changed='added'><mn>1</mn><mo>,</mo><mn>3</mn><mo>,</mo><mn>5</mn></mrow><mo>.</mo>
+			</mrow></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 

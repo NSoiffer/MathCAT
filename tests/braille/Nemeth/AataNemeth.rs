@@ -1438,7 +1438,7 @@ fn test_214() {
 fn test_215() {
     let expr = "<math><mo stretchy=\"false\">[</mo><mi>GF</mi><mo>⁡<!-- ⁡ --></mo><mo stretchy=\"false\">(</mo><mn>625</mn><mo stretchy=\"false\">)</mo><mo>:</mo><mi>GF</mi><mo>⁡<!-- ⁡ --></mo><mo stretchy=\"false\">(</mo><mn>25</mn><mo stretchy=\"false\">)</mo><mo stretchy=\"false\">]</mo></math>";
     // corrected: field extension, not ratio so "⠸⠒" not "⠐⠂"
-    test_braille("Nemeth", expr, "⠈⠷⠠⠠⠛⠋⠷⠖⠆⠢⠾⠸⠒⠀⠠⠠⠛⠋⠷⠆⠢⠾⠈⠾");
+    test_braille("Nemeth", expr, "⠈⠷⠠⠠⠛⠋⠷⠖⠆⠢⠾⠸⠒⠠⠠⠛⠋⠷⠆⠢⠾⠈⠾");
 }
 
 #[test]
@@ -1597,7 +1597,8 @@ fn test_238() {
 #[test]
 fn test_239() {
     let expr = "<math><mi>h</mi><mo>:</mo><mi>C</mi><mo stretchy=\"false\">→<!-- → --></mo><mi>D</mi></math>";
-    test_braille("Nemeth", expr, "⠓⠸⠒⠀⠠⠉⠀⠫⠕⠀⠠⠙");
+    // corrected to add English Letter indicator
+    test_braille("Nemeth", expr, "⠰⠓⠸⠒⠀⠠⠉⠀⠫⠕⠀⠠⠙");
 }
 
 #[test]
@@ -1781,7 +1782,8 @@ fn test_263() {
 #[test]
 fn test_264() {
     let expr = "<math><mi>f</mi><mo>:</mo><mi>X</mi><mo stretchy=\"false\">→<!-- → --></mo><mi>Y</mi></math>";
-    test_braille("Nemeth", expr, "⠋⠸⠒⠀⠠⠭⠀⠫⠕⠀⠠⠽");
+    // corrected to add English Letter indicator
+    test_braille("Nemeth", expr, "⠰⠋⠸⠒⠀⠠⠭⠀⠫⠕⠀⠠⠽");
 }
 
 #[test]
@@ -2129,13 +2131,15 @@ fn test_313() {
 #[test]
 fn test_314() {
     let expr = "<math><mi>f</mi><mo>:</mo><mi>A</mi><mo stretchy=\"false\">→<!-- → --></mo><mi>B</mi></math>";
-    test_braille("Nemeth", expr, "⠋⠸⠒⠀⠠⠁⠀⠫⠕⠀⠠⠃");
+    // corrected to add English Letter indicator
+    test_braille("Nemeth", expr, "⠰⠋⠸⠒⠀⠠⠁⠀⠫⠕⠀⠠⠃");
 }
 
 #[test]
 fn test_315() {
     let expr = "<math><mi>f</mi><mo>:</mo><mi>a</mi><mo stretchy=\"false\">↦<!-- ↦ --></mo><mi>b</mi></math>";
-    test_braille("Nemeth", expr, "⠋⠸⠒⠀⠁⠀⠫⠳⠒⠒⠕⠀⠃");
+    // corrected to add English Letter indicator
+    test_braille("Nemeth", expr, "⠰⠋⠸⠒⠀⠁⠀⠫⠳⠒⠒⠕⠀⠃");
 }
 
 #[test]

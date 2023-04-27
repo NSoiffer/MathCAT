@@ -93,12 +93,12 @@
    replace:
    - test:
       if: "count(*[2]/*) > 1"
-      then: [t: "⠈⠠"]
+      then: [t: "⠠"]
    - x: "*[1]"       # open paren, etc  -- no space is used between this and the first row entry
    - x: "*[2]"
    - test:
       if: "count(*[2]/*) > 1"
-      then: [t: "⠈⠠"]
+      then: [t: "⠠"]
    - x: "*[3]"       # close paren, etc  -- no space is used between this and the last row entry
 
 -
@@ -114,7 +114,7 @@
    replace:
    - test:
       if: "preceding-sibling::*"
-      then: [t: "⠀⣍"]     # github.com/NSoiffer/MathCAT/issues/43#issuecomment-1297048039
+      then: [t: "W⣍"]     # github.com/NSoiffer/MathCAT/issues/43#issuecomment-1297048039
    - test:
       if: .[self::m:mlabeledtr]
       then: [x: "*[position()>1]"]
@@ -188,6 +188,33 @@
   match: "."
   replace: [x: "*"]
 
+# rule 57 -- there is no way to get this rule completely right because some require knowing what the omitted symbol should to get spacing right (e.g., 57(3): "7×2?14") 
+#  Here we pick off cases that seem likely and doable
+#  We have to be careful that this might just be whitespace, so it really needs to be in an 'mi'-like or 'mo'-like position (see AataNemeth::test_001)
+- name: omissions
+  tag: [mi,mo,mtext]
+  match: "( .='?' or .='-?-' or
+            (translate(.,'\u00A0', '')='' and 
+             not(preceding-sibling::*[1][name(.)='mo' and text()='\u2062'] or following-sibling::*[1][name(.)='mo' and text()='\u2062'] or
+                 parent::*[1][preceding-sibling::*[1][name(.)='mo' and text()='\u2062'] or following-sibling::*[1][name(.)='mo' and text()='\u2062']])
+            )) and
+          parent::*[1][name(.)='mrow' or name(.)='msup' or name(.)='mfrac']"   # various forms of "fill in missing content" -- trying to be conservative but probably should include roots, etc
+  replace:
+  # "?" is punctuation and so won't get spaced, but the omission symbols should get spacing. Here we test and add it in.
+  - test:
+      if: ".='?' and preceding-sibling::*[1][IsInDefinition(., 'NemethComparisonOperators')]"
+      then: [t: "W"]
+  - t: "⠿"
+  - test:
+      if: ".='?' and following-sibling::*[1][IsInDefinition(., 'NemethComparisonOperators')]"
+      then: [t: "W"]
+
+- name: omissions
+  tag: menclose
+  match: "*[1][.='?'] and (@notation='bottom' or @notation='box')"
+  replace: [t: "⠿"]
+
+
 - # Rule 138 a.2 -- space after a function name
   # most functions will have an invisible apply that adds the space, but "mod" and "rem" are infix, so different
   name: mod_and_rem
@@ -196,7 +223,7 @@
   match: "$Chars='mod' or $Chars='rem'"
   replace:
      - x: "BrailleChars(., 'Nemeth')"
-     - t: "W"
+     - t: "w"    # after a function name, so lower case
 
 - # Non-breaking whitespace is added to the start/end of numbers in cases of adjoining text to help the parse.
   # These generate a different char inside of a number, so we peel them off here because it doesn't seem possible
@@ -243,7 +270,7 @@
      # but if "modified", they are moved outside of munder, etc, and handled by those rules
   variables:
      [
-        MaybeAddSpaces: "parent::*[self::m:mrow] and IsInDefinition(., 'NemethComparisonOperators')",
+        MaybeAddSpaces: "parent::*[self::m:mrow] and (IsInDefinition(., 'NemethComparisonOperators') or text()='∶')",  # "ratio" also gets spaced
      ]
   match: "."
   replace:
@@ -253,7 +280,7 @@
              - test:
                   if: "preceding-sibling::* and
                      not(IsInDefinition(preceding-sibling::*[1], 'NemethPunctAndOpenBeforeSymbols'))" #Rule 151
-                  then: [t: "W"]
+                  then: [t: "w"]
              - test:
                   if: "$NewScriptContext!=''" # Rule 79g
                   then: [x: "$NewScriptContext"]
@@ -261,7 +288,7 @@
      - test:
           if: "$MaybeAddSpaces and following-sibling::* and
              not(IsInDefinition(following-sibling::*[1], 'NemethPunctAndOpenAfterSymbols'))" #Rule 151"
-          then: [t: "W"]
+          then: [t: "w"]
 
 - name: remove-space
   tag: mtext
@@ -550,8 +577,8 @@
             - with:
                variables:
                # generate a numeric shortcut if previous was only a prime 
-               - IsNumericSubscript2: "DEBUG($IsPrimeSuperscript and $Postscripts[1][self::m:none] and
-                                             $Postscripts[3][self::m:mn] and $NewScriptContext = '' and $BaseOkForNumericScript)"
+               - IsNumericSubscript2: "$IsPrimeSuperscript and $Postscripts[1][self::m:none] and
+                                       $Postscripts[3][self::m:mn] and $NewScriptContext = '' and $BaseOkForNumericScript"
                replace:
                - test:
                   # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts
@@ -698,7 +725,7 @@
    replace:
    - test:
       if: "$AddSpaces"
-      then: [t: "W"]
+      then: [t: "w"]
    - test:
       if: "$NotNested"
       then:
@@ -734,7 +761,7 @@
       then: [t: "⠻"]
    - test:
       if: "$AddSpaces"
-      then: [t: "W"]
+      then: [t: "w"]
 
 -
    name: default
@@ -794,7 +821,7 @@
           then:
              - test:
                   if: "$AddSpaces"
-                  then: [t: "⠀"]
+                  then: [t: "w"]
              - test:
                   if: "*[1][self::m:mrow]"
                   then: [t: "⠫⠗⠸⠫"] # rectangle
@@ -804,7 +831,7 @@
           then:
              - test:
                   if: "$AddSpaces"
-                  then: [t: "⠀"]
+                  then: [t: "w"]
              - test:
                   if: "*[1][self::m:mrow]"
                   then: [t: "⠫⠑⠸⠫"] # ellipse
@@ -912,7 +939,7 @@
              - t: "⠻" # terminate shape
              - test:
                   if: "$AddSpaces"
-                  then: [t: "⠀"]
+                  then: [t: "w"]
      - test:
           if: "contains(concat(' ', normalize-space(@notation), ' '), ' right ')" #avoid 'rightarrow'
           then: [t: "⠳"]

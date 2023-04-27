@@ -284,7 +284,7 @@ phf_map! {
 			next: &Some( OperatorInfo{ op_type: OperatorTypes::PREFIX, priority: 70, next: &None } )},
 	"∵" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 70, 
 			next: &Some( OperatorInfo{ op_type: OperatorTypes::PREFIX, priority: 70, next: &None } )},
-	"∶" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 680, next: &None },
+	"∶" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 278, next: &None },		// changed: less than addition (280) but more than arrows (270)
 	"∷" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 260, next: &None },
 	"∸" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 280, next: &None },
 	"∹" => OperatorInfo{ op_type: OperatorTypes::INFIX, priority: 260, next: &None },

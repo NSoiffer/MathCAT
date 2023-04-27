@@ -226,13 +226,16 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         "U" => "⠈⠈",    // Russian
         "C" => "⠠",     // capital
         "P" => "⠸",     // punctuation
+        "𝐏" => "⠸",     // hack for punctuation after a roman numeral -- never removed
         "L" => "",      // letter
+        "l" => "",      // letter inside enclosed list
         "M" => "",      // multipurpose indicator
         "m" => "⠐",     // required multipurpose indicator
-        "N" => "",      // digit
-        "n" => "⠼",     // required number indicator
+        "N" => "",      // potential number indicator before digit
+        "n" => "⠼",     // required number indicator before digit
         "𝑁" => "",      // hack for special case of a lone decimal pt -- not considered a number but follows rules mostly
         "W" => "⠀",     // whitespace
+        "w" => "⠀",     // whitespace from comparison operator
         "," => "⠠⠀",    // comma
         "b" => "⠐",     // baseline
         "↑" => "⠘",     // superscript
@@ -240,13 +243,19 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     };
 
     lazy_static! {
+        // Add an English Letter indicator. This involves finding "single letters".
+        // The green book has a complicated set of cases, but the Nemeth UEB Rule book (May 2020), 4.10 has a much shorter explanation:
+        //   punctuation or whitespace on the left and right ignoring open/close chars
+        static ref ADD_ENGLISH_LETTER_INDICATOR: Regex = 
+            Regex::new(r"(?P<start>^|W|P.[\u2800-\u28FF]?|,)(?P<open>[\u2800-\u28FF]?⠷)?(?P<letter>C?L.)(?P<close>[\u2800-\u28FF]?⠾)?(?P<end>W|P|,|$)").unwrap();
+        
         // Trim braille spaces before and after braille indicators
         // In order: fraction, /, cancellation, letter, baseline
         // Note: fraction over is not listed due to example 42(4) which shows a space before the "/"
         static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex = 
-            Regex::new(r"(⠄⠄⠄|⠤⠤⠤)W+([⠼⠸⠪])").unwrap();
+            Regex::new(r"(⠄⠄⠄|⠤⠤⠤⠤)[Ww]+([⠼⠸⠪])").unwrap();
         static ref REMOVE_SPACE_AFTER_BRAILLE_INDICATORS: Regex = 
-            Regex::new(r"([⠹⠻Lb])W+(⠄⠄⠄)").unwrap();
+            Regex::new(r"([⠹⠻Llb])[Ww]+(⠄⠄⠄|⠤⠤⠤⠤)").unwrap();
 
         // Hack to convert non-numeric '.' to numeric '.'
         // The problem is that the numbers are hidden inside of mover -- this might be more general than rule 99_2.
@@ -255,7 +264,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         // Multipurpose indicator insertion
         // 177.2 -- add after a letter and before a digit (or decimal pt) -- digits will start with N
         static ref MULTI_177_2: Regex = 
-            Regex::new(r"(L.)[N𝑁]").unwrap();
+            Regex::new(r"([Ll].)[N𝑁]").unwrap();
 
         // keep between numeric subscript and digit ('M' added by subscript rule)
         static ref MULTI_177_3: Regex = 
@@ -274,11 +283,11 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         // 3. optional typeface indicator
         // 4. number (N)
         static ref NUM_IND_9A: Regex = 
-            Regex::new(r"(?P<start>^|[,W])(?P<minus>⠤?)N").unwrap();  
+            Regex::new(r"(?P<start>^|[,Ww])(?P<minus>⠤?)N").unwrap();  
 
         // Needed after section mark(§), paragraph mark(¶), #, or *
         static ref NUM_IND_9C: Regex = 
-            Regex::new(r"(⠤?)(⠠⠷|⠠⠳|⠠⠈⠷)").unwrap();  
+            Regex::new(r"(⠤?)(⠠⠷|⠠⠳|⠠⠈⠷)N").unwrap();  
 
         // Needed after section mark(§), paragraph mark(¶), #, or *
         static ref NUM_IND_9D: Regex = 
@@ -290,7 +299,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
 
         // Needed after hyphen that follows a word, abbreviation, or punctuation (caution about rule 11d)
         // Note -- hyphen might encode as either "P⠤" or "⠤" depending on the tag used
-        static ref NUM_IND_9F: Regex = Regex::new(r"(L.L.|P.)(P?⠤)N").unwrap();  
+        static ref NUM_IND_9F: Regex = Regex::new(r"([Ll].[Ll].|P.)(P?⠤)N").unwrap();  
 
         // Punctuation chars (Rule 38.6 says don't use before ",", "hyphen", "-", "…")
         // Never use punctuation indicator before these (38-6)
@@ -300,10 +309,10 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         // Rule II.9b (add numeric indicator after punctuation [optional minus[optional .][digit]
         //  because this is run after the above rule, some cases are already caught, so don't
         //  match if there is already a numeric indicator
-        static ref NUM_IND_9B: Regex = Regex::new(r"(?P<punct>P.)(?P<minus>⠤?)N").unwrap();  
+        static ref NUM_IND_9B: Regex = Regex::new(r"(?P<punct>P..?)(?P<minus>⠤?)N").unwrap();  
 
         // Before 79b (punctuation)
-        static ref REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: Regex = Regex::new(r"(?:[↑↓]+b?|b)([W,P]|$)").unwrap();
+        static ref REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: Regex = Regex::new(r"(?:[↑↓]+b?|b)([Ww,P]|$)").unwrap();
 
         static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[↑↓]+b)").unwrap();
 
@@ -312,19 +321,33 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         //   Beginning of line or after a space (V 38.1)
         //   After a word (38.4)
         //   2nd or subsequent punctuation (includes, "-", etc) (38.7)
-        static ref REMOVE_PUNCT_IND: Regex = Regex::new(r"(^|W|L.L.)P(.)").unwrap();  
-
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHPCLMmb↑↓Nn𝑁W,])").unwrap();  
-            
+        static ref REMOVE_AFTER_PUNCT_IND: Regex = Regex::new(r"(^|W|w|[Ll].[Ll].)P(.)").unwrap();  
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏CLlMmb↑↓Nn𝑁Ww,])").unwrap();          
         static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
 
-  debug!("Before:  \"{}\"", raw_braille);
-
+//   debug!("Before:  \"{}\"", raw_braille);
+    // replacements might overlap at boundaries (e.g., whitespace) -- need to repeat
+    let mut start = 0;
+    let mut result = String::with_capacity(raw_braille.len()+ raw_braille.len()/4);  // likely upper bound
+    while let Some(matched) = ADD_ENGLISH_LETTER_INDICATOR.find_at(&raw_braille, start) {
+        result.push_str(&raw_braille[start..matched.start()]);
+        let replacement = ADD_ENGLISH_LETTER_INDICATOR.replace(
+                &raw_braille[matched.start()..matched.end()], "${start}${open}E${letter}${close}");
+        // debug!("matched='{}', start/end={}/{}; replacement: {}", &raw_braille[matched.start()..matched.end()], matched.start(), matched.end(), replacement);
+        result.push_str(&replacement);
+        // put $end back on because needed for next match (e.g., whitespace at end and then start of next match)
+        // but it could also match because it was at the end, in which case "-1" is wrong -- tested after loop for that
+        start = matched.end() - 1;
+    }
+    if !raw_braille.is_empty() && ( start < raw_braille.len()-1 || "WP,".contains(raw_braille.chars().nth_back(0).unwrap()) ) {       // see comment about $end above
+        result.push_str(&raw_braille[start..]);
+    }
+//   debug!("ELIs:    \"{}\"", result);  
     // Remove blanks before and after braille indicators
-    let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&raw_braille, "$1$2");
+    let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
     let result = REMOVE_SPACE_AFTER_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
-  debug!("spaces:  \"{}\"", result);
+//   debug!("spaces:  \"{}\"", result);
 
     let result = DOTS_99_A_2.replace_all(&result, "N⠨mN");
 
@@ -332,24 +355,22 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     let result = MULTI_177_2.replace_all(&result, "${1}m${2}");
     let result = MULTI_177_3.replace_all(&result, "${1}m$2");
     let result = MULTI_177_5.replace_all(&result, "${1}m$2");
-  debug!("MULTI:   \"{}\"", result);
+//   debug!("MULTI:   \"{}\"", result);
 
     let result = NUM_IND_9A.replace_all(&result, "${start}${minus}n");
-  debug!("IND_9A:  \"{}\"", result);
-
     let result = NUM_IND_9C.replace_all(&result, "${1}${2}n");
     let result = NUM_IND_9D.replace_all(&result, "${1}n");
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
     let result = NUM_IND_9E_SHAPE.replace_all(&result, "${mod}n");
     let result = NUM_IND_9F.replace_all(&result, "${1}${2}n");
 
-//   debug!("IND_9E:  \"{}\"", result);
+//   debug!("IND_9F:  \"{}\"", result);
 
     // 9b: insert after punctuation (optional minus sign)
     // common punctuation adds a space, so 9a handled it. Here we deal with other "punctuation" 
     // FIX other punctuation and reference symbols (9d)
     let result = NUM_IND_9B.replace_all(&result, "$punct${minus}n");
-  debug!("A PUNCT: \"{}\"", &result);
+//   debug!("A PUNCT: \"{}\"", &result);
 
     // strip level indicators
     // checks for punctuation char, so needs to before punctuation is stripped.
@@ -357,9 +378,9 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     let result = REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT.replace_all(&result, "$1");
 //   debug!("Punct  : \"{}\"", &result);
     let result = REMOVE_LEVEL_IND_BEFORE_BASELINE.replace_all(&result, "b");
-  debug!("Bseline: \"{}\"", &result);
+//   debug!("Bseline: \"{}\"", &result);
 
-    let result = REMOVE_PUNCT_IND.replace_all(&result, "$1$2");
+    let result = REMOVE_AFTER_PUNCT_IND.replace_all(&result, "$1$2");
 //   debug!("Punct38: \"{}\"", &result);
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
@@ -383,7 +404,6 @@ fn nemeth_cleanup(raw_braille: String) -> String {
 // Others:
 //      W -- whitespace that should be kept (e.g, in a numeral)
 //      𝑁 -- hack for special case of a lone decimal pt -- not considered a number but follows rules mostly 
-// SRE doesn't have H: Hebrew or U: Russian, so not encoded (yet)
 // Note: some "positive" patterns find cases to keep the char and transform them to the lower case version
 static UEB_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "S" => "XXX",    // sans-serif
@@ -560,7 +580,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
     }
 
     fn capitals_to_word_mode(braille: &str) -> String {
-        debug!("before capitals fix:  '{}'", braille);
+        // debug!("before capitals fix:  '{}'", braille);
 
         let mut result = "".to_string();
         let chars = braille.chars().collect::<Vec<char>>();
@@ -690,15 +710,15 @@ fn ueb_cleanup(raw_braille: String) -> String {
         //   or before a single letter standing alone anywhere in the expression,
         //   begin the expression with a grade 1 word indicator (or a passage indicator if the expression includes spaces)
         // Apparently "only a grade 1 symbol..." means at most one grade 1 symbol based on some examples (GTM 6.4, example 4)
-        debug!("before determining mode:  '{}'", raw_braille);
+        // debug!("before determining mode:  '{}'", raw_braille);
         let grade2 = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade2, UEB_Duration::Symbol);
-        debug!("Symbol mode:  '{}'", grade2);
+        // debug!("Symbol mode:  '{}'", grade2);
 
         if is_grade2_string_ok(&grade2) {
             return grade2;
         } else {
             let grade1_word = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Word);
-            debug!("Word mode:    '{}'", grade1_word);
+            // debug!("Word mode:    '{}'", grade1_word);
             
             // BANA says use g1 word mode if spaces are present, but that's not what their examples do
             // A conversation with Ms. DeAndrea from BANA said that they mean use passage mode if ≥3 "segments" (≥2 blanks)
@@ -710,7 +730,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
                 n_blanks == 2
             }) {
                 let grade1_passage = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage);
-                debug!("Passage mode: '{}'", &grade1_passage);
+                // debug!("Passage mode: '{}'", &grade1_passage);
                 return "⠰⠰⠰".to_string() + &grade1_passage + "⠰⠄";
             } else {
                 return "⠰⠰".to_string() + &grade1_word;
@@ -1379,13 +1399,14 @@ impl BrailleChars {
         // we want to pull the prefix (typeface, language) out to the front until a change happens
         // the same is true for number indicator
         // also true (sort of) for capitalization -- if all caps, use double cap in front (assume abbr or Roman Numeral)
-        let is_in_enclosed_list = name(node) == "mn" && BrailleChars::is_in_enclosed_list(*node);
+        let is_in_enclosed_list = BrailleChars::is_in_enclosed_list(*node);
+        let is_mn_in_enclosed_list = is_in_enclosed_list && name(node) == "mn";
         let mut typeface = "R".to_string();     // assumption is "R" and if attr or letter is different, something happens
         let mut is_all_caps = true;
         let mut is_all_caps_valid = false;      // all_caps only valid if we did a replacement
         let result = PICK_APART_CHAR.replace_all(&braille_chars, |caps: &Captures| {
-            // debug!("  face: {:?}, lang: {:?}, num {:?}, cap: {:?}, char: {:?}",
-            //        &caps["face"], &caps["lang"], &caps["num"], &caps["cap"], &caps["char"]);
+            // debug!("  face: {:?}, lang: {:?}, num {:?}, letter: {:?}, cap: {:?}, char: {:?}",
+            //        &caps["face"], &caps["lang"], &caps["num"], &caps["letter"], &caps["cap"], &caps["char"]);
             let mut nemeth_chars = "".to_string();
             let char_face = if caps["face"].is_empty() {attr_typeface} else {&caps["face"]};
             let typeface_changed =  typeface != char_face;
@@ -1397,13 +1418,17 @@ impl BrailleChars {
                 nemeth_chars +=  &caps["lang"];
             }
             // debug!("  typeface changed: {}, is_in_list: {}; num: {}", typeface_changed, is_in_enclosed_list, !caps["num"].is_empty());
-            if !caps["num"].is_empty() && (typeface_changed || !is_in_enclosed_list) {
+            if !caps["num"].is_empty() && (typeface_changed || !is_mn_in_enclosed_list) {
                 nemeth_chars += "N";
             }
             is_all_caps_valid = true;
             is_all_caps &= !&caps["cap"].is_empty();
             nemeth_chars += &caps["cap"];       // will be stripped later if all caps
-            nemeth_chars += &caps["letter"];
+            if is_in_enclosed_list {
+                nemeth_chars += &caps["letter"].replace('L', "l");
+            } else {
+                nemeth_chars += &caps["letter"];
+            }
             nemeth_chars += &caps["char"];
             return nemeth_chars;
         });
@@ -1468,7 +1493,7 @@ impl BrailleChars {
         // 1: begins and ends with fence
         // 2: FIX: not implemented -- must contain no word, abbreviation, ordinal or plural ending
         // 3: function names or signs of shape and the signs which follow them are a single item (not a word)
-        // 4: an item of the list may be an ellipsis or any sign used for mission
+        // 4: an item of the list may be an ellipsis or any sign used for omission
         // 5: no relational operator may appear within the list
         // 6: the list must have at least 2 items.
         //       Items are separated by commas, can not have other punctuation (except ellipsis and dash)
@@ -1491,7 +1516,10 @@ impl BrailleChars {
             return match name {
                 "mi" | "mn" => true,
                 "mo"  => !crate::canonicalize::is_relational_op(node),
-                "mtext" => false, // FIX -- should be more nuanced,
+                "mtext" => {
+                    let text = as_text(node).trim();
+                    return text=="?" || text=="-?-" || text.is_empty();   // various forms of "fill in missing content" (see also Nemeth_Rules.yaml, "omissions")
+                },
                 "mrow" => {
                     if IsBracketed::is_bracketed(&node, "", "", false, false) {
                         return child_meets_conditions(as_element(node.children()[1]));
@@ -1503,6 +1531,16 @@ impl BrailleChars {
                         }
                     }  
                     true      
+                },
+                "menclose" => {
+                    if let Some(notation) = node.attribute_value("notation") {
+                        if notation != "bottom" || notation != "box" {
+                            return false;
+                        }
+                        let child = as_element(node.children()[0]);     // menclose has exactly one child
+                        return is_leaf(child) && as_text(child) == "?";
+                    }
+                    return false;
                 },
                 _ => {
                     for child in node.children() {

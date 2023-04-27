@@ -1,16 +1,107 @@
 // Nemeth tests for the basic mathml tags
+// The numbering refers to the Nemeth green book in most cases.
+// The newer NFB lessons include NFB (https://nfb.org/programs-services/braille-certification/mathematics-braille-transcribing)
+// These lessons are still being developed, so it is possible the numbering gets changed from that used here.
 use crate::common::*;
 
 #[test]
-fn test_9_d_2() {
-    let expr = "<math><mn>3</mn><mi mathvariant=\"normal\">#<!-- # --></mi><mn>4</mn></math>";
+fn num_indicator_9_a_1() {
+    let expr = "<math><mn>27</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠆⠶");
+}
+
+#[test]
+fn num_indicator_9_a_4() {
+    let expr = "<math><mrow><mi>y</mi><mo>=</mo><mrow><mn>2</mn><mo>&#x2062;</mo><mrow><mi>sin</mi><mo>&#x2061;</mo><mi>x</mi></mrow></mrow></mrow></math>";
+    test_braille("Nemeth", expr, "⠽⠀⠨⠅⠀⠼⠆⠎⠊⠝⠀⠭");
+}
+
+#[test]
+fn num_indicator_9_a_5() {
+    let expr = "<math><mrow><mi>sin</mi><mo>&#x2061;</mo><mn>1</mn></mrow></math>";
+    test_braille("Nemeth", expr, "⠎⠊⠝⠀⠼⠂");
+}
+
+#[test]
+fn num_indicator_9_a_9() {
+    let expr = "<math><mrow><mo>∠</mo><mn>1</mn></mrow></math>";
+    test_braille("Nemeth", expr, "⠫⠪⠀⠼⠂");
+}
+
+#[test]
+fn num_indicator_9_a_14() {
+    let expr = "<math><mo>-</mo><mn>1</mn></math>";
+    test_braille("Nemeth", expr, "⠤⠼⠂");
+}
+
+#[test]
+fn num_indicator_9_a_15() {
+    let expr = "<math><mo>-</mo><mn>.3</mn></math>";
+    test_braille("Nemeth", expr, "⠤⠼⠨⠒");
+}
+
+#[test]
+fn test_9_b_1() {
+    let expr = "<math><mrow><mo>“</mo><mrow><mn>3</mn><mtext>&#xa0;dogs</mtext><mo>”</mo></mrow></mrow></math>";
+    test_braille("Nemeth", expr, "⠦⠼⠒⠀⠙⠕⠛⠎⠴");
+}
+
+#[test]
+fn test_9_b_1_mtext() {
+    let expr = "<math><mtext displaystyle='true'>&#x201C;3 dogs&#x201D;</mtext></math>";
+    test_braille("Nemeth", expr, "⠦⠼⠒⠀⠙⠕⠛⠎⠴");
+}
+
+#[test]
+fn test_9_b_4() {
+    let expr = "<math><mrow><mo>“</mo><mrow><mo>-</mo><mn>4</mn></mrow></mrow></math>";
+    test_braille("Nemeth", expr, "⠦⠤⠼⠲");
+}
+#[test]
+fn test_9_c_1_linear() {
+    // see https://github.com/NSoiffer/MathCAT/issues/43 for discussion on linear layout
+    let expr = "<math><mo>|</mo><mtable>
+            <mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr>
+            <mtr><mtd><mo>-</mo><mn>3</mn></mtd><mtd><mo>-</mo><mn>4</mn></mtd></mtr>
+        </mtable><mo>|</mo></math>";
+    test_braille("Nemeth", expr, "⠠⠳⠼⠂⠀⠼⠆⠀⣍⠤⠒⠀⠤⠼⠲⠠⠳");
+}
+
+#[test]
+fn num_indicator_9_d_2() {
+    let expr = "<math><mn>3</mn><mi mathvariant='normal'>#<!-- # --></mi><mn>4</mn></math>";
     test_braille("Nemeth", expr, "⠼⠒⠨⠼⠼⠲");
 }
 
 #[test]
-fn test_9_d_3() {
+fn num_indicator_9_d_3() {
     let expr = "<math><mn>3</mn><mo>∗<!-- ∗ --></mo><mn>4</mn></math>";
     test_braille("Nemeth", expr, "⠼⠒⠈⠼⠼⠲");
+}
+
+#[test]
+fn num_indicator_9_e_2() {
+    let expr = "<math><mn mathvariant='bold'>0</mn></math>";
+    test_braille("Nemeth", expr, "⠸⠼⠴");
+}
+
+#[test]
+fn num_indicator_9_e_5() {
+    let expr = "<math><mn>𝟒𝟑56</mn></math>";
+    test_braille("Nemeth", expr, "⠸⠼⠲⠒⠼⠢⠖");
+}
+
+#[test]
+fn num_indicator_9_e_6() {
+    let expr = "<math><mn>⑤</mn></math>";
+    test_braille("Nemeth", expr, "⠫⠉⠸⠫⠼⠢⠻");
+}
+
+#[test]
+fn num_indicator_9_f_1() {
+    // shortened to the math part (1-1) -- "correspondence" should probably be text and involves contractions
+    let expr = "<math><mtext>1-to-1</mtext></math>";
+    test_braille("Nemeth", expr, "⠼⠂⠤⠞⠕⠤⠼⠂");
 }
 
 #[test]
@@ -75,6 +166,64 @@ fn cap_22_a_1() {
 }
 
 #[test]
+fn greek_24_a_1() {
+    let expr = "<math><mi>α</mi></math>";
+    test_braille("Nemeth", expr, "⠨⠁");
+}
+
+#[test]
+fn german_24_a_7() {
+    let expr = "<math><mi>𝔄</mi></math>";
+    test_braille("Nemeth", expr, "⠸⠠⠁");
+}
+
+#[test]
+fn hebrew_24_a_8() {
+    let expr = "<math><msub><mi>ℵ</mi><mn>0</mn></msub></math>";
+    test_braille("Nemeth", expr, "⠠⠠⠁⠴");
+}
+
+#[test]
+fn russian_24_a_10() {
+    let expr = "<math><mi>А</mi></math>";
+    test_braille("Nemeth", expr, "⠈⠈⠠⠁");
+}
+
+#[test]
+fn greek_24_b_1_together() {
+    let expr = "<math><mi>αβ</mi></math>";
+    test_braille("Nemeth", expr, "⠨⠁⠨⠃");
+}
+
+#[test]
+fn greek_24_b_1() {
+    let expr = "<math><mi>α</mi><mi>β</mi></math>";
+    test_braille("Nemeth", expr, "⠨⠁⠨⠃");
+}
+
+#[test]
+fn eli_nemeth_UEB_rule_book_4_11_1() {
+    let expr = "<math>
+            <mtext>p</mtext><mtext>&#xA0;</mtext>
+            <mtext>D</mtext><mtext>&#xA0;</mtext>
+            <mtext>z</mtext><mtext>&#xA0;</mtext>
+            <mtext>R</mtext><mtext>&#xA0;</mtext>
+            <mtext>x</mtext><mo>,</mo><mtext>&#xA0;</mtext>
+            <mtext>“y”</mtext><mtext>&#xA0;</mtext>
+            <mtext>“w S”</mtext><mtext>&#xA0;</mtext>
+            <mtext>“x”</mtext><mo>+</mo><mtext>“y”</mtext>
+        </math>";
+    test_braille("Nemeth", expr, "⠰⠏⠀⠰⠠⠙⠀⠰⠵⠀⠰⠠⠗⠀⠰⠭⠠⠀⠦⠰⠽⠸⠴⠀⠦⠰⠺⠀⠰⠠⠎⠸⠴⠀⠦⠰⠭⠸⠴⠬⠸⠦⠰⠽⠸⠴");
+}
+
+#[test]
+fn letter_26_b_18() {
+    let expr = "<math><mo>(</mo><mi>p</mi><mo>&#xA0;</mo><mtext>and</mtext><mo>&#xA0;</mo><mi>q</mi><mo>)</mo></math>";
+    // Note: NFB lessons now say 'don't use contractions in Nemeth' -- example modified
+    test_braille("Nemeth", expr, "⠷⠰⠏⠀⠁⠝⠙⠀⠰⠟⠾");
+}
+
+#[test]
 fn letter_26_b_19() {
     let expr = "<math><mo>(</mo>
             <mi mathvariant='normal'>l</mi><mo>,</mo>
@@ -83,7 +232,9 @@ fn letter_26_b_19() {
             <mtext>are in set&#xa0;</mtext>
             <mi mathvariant='normal'>R</mi>
         <mo>)</mo></math>";
-    test_braille("Nemeth", expr, "⠷⠇⠠⠀⠍⠠⠀⠝⠠⠀⠁⠗⠑⠀⠊⠝⠀⠎⠑⠞⠀⠠⠗⠾");
+    // Note: NFB lessons now say 'don't use contractions in Nemeth' -- example modified (no contraction for "re" and "in")
+    // This likely would use an escape to UEB for the "are in set" under the new rules
+    test_braille("Nemeth", expr, "⠷⠰⠇⠠⠀⠰⠍⠠⠀⠰⠝⠠⠀⠁⠗⠑⠀⠊⠝⠀⠎⠑⠞⠀⠰⠠⠗⠾");
 }
 
 #[test]
@@ -96,6 +247,17 @@ fn boldface_32_b_3() {
 fn boldface_32_b_6() {
     let expr = "<math><mn>𝟒35</mn></math>";
     test_braille("Nemeth", expr, "⠸⠼⠲⠼⠒⠢");
+}
+
+#[test]
+fn punct_37_1_1() {
+    let expr = "<math>
+            <mfrac><mn>1</mn><mn>2</mn></mfrac>
+            <mo>,</mo>
+            <mfrac><mn>3</mn><mn>4</mn></mfrac>
+            <mo>.</mo>
+        </math>";
+    test_braille("Nemeth", expr, "⠹⠂⠌⠆⠼⠠⠀⠹⠒⠌⠲⠼⠸⠲");
 }
 
 #[test]
@@ -114,9 +276,69 @@ fn punct_37_2_2() {
 }
 
 #[test]
+fn punct_37_3_1() {
+    let expr = "<math><mtext>I</mtext><mo>,</mo><mtext>II</mtext><mo>,</mo><mtext>III</mtext><mo>.</mo></math>";
+    test_braille("Nemeth", expr, "⠰⠠⠊⠠⠀⠠⠠⠊⠊⠠⠀⠠⠠⠊⠊⠊⠸⠲");
+}
+
+#[test]
+fn punct_37_4_2() {
+    let expr = "<math><mn>1</mn><mo>,</mo><mn>3</mn><mo>,</mo><mo>…</mo><mo>.</mo></math>";
+    test_braille("Nemeth", expr, "⠼⠂⠠⠀⠼⠒⠠⠀⠄⠄⠄⠸⠲");
+}
+
+#[test]
+fn punct_37_6_1() {
+    let expr = "<math><mn>5</mn><mo>×</mo><mn>3</mn><mo>=</mo><mo>?</mo><mo>.</mo></math>";
+    test_braille("Nemeth", expr, "⠼⠢⠈⠡⠒⠀⠨⠅⠀⠿⠸⠲");
+}
+
+#[test]
 fn punct_37_7_1() {
     let expr = "<math><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi><mo>.</mo></math>";
-    test_braille("Nemeth", expr, "⠁⠠⠀⠃⠠⠀⠉⠸⠲");
+    test_braille("Nemeth", expr, "⠰⠁⠠⠀⠰⠃⠠⠀⠰⠉⠸⠲");
+}
+
+#[test]
+fn punct_37_8_1() {
+    let expr = "<math><mo>&#x25B3;</mo><mi>A</mi><mi>B</mi><mi>C</mi><mo>.</mo></math>";
+    test_braille("Nemeth", expr, "⠫⠞⠀⠠⠁⠠⠃⠠⠉⠸⠲");
+}
+
+#[test]
+fn punct_37_11_1() {
+    let expr = "<math><mover><mi>x</mi><mo>&#xAF;</mo></mover><mo>.</mo></math>";
+    test_braille("Nemeth", expr, "⠭⠱⠸⠲");
+}
+
+#[test]
+fn punct_37_16_1() {
+    let expr = "<math><mn>100</mn><mo>%</mo><mo>.</mo></math>";
+    test_braille("Nemeth", expr, "⠼⠂⠴⠴⠈⠴⠸⠲");
+}
+
+#[test]
+fn punct_38_4_12() {
+    let expr = "<math><mi>rate</mi><mo>×</mo><mi>time</mi><mo>.</mo></math>";
+    test_braille("Nemeth", expr, "⠗⠁⠞⠑⠈⠡⠞⠊⠍⠑⠲");
+}
+
+#[test]
+fn punct_38_6_1() {
+    let expr = "<math><mn>0</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>2</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠴⠠⠀⠼⠂⠠⠀⠼⠆");
+}
+
+#[test]
+fn punct_38_6_3() {
+    let expr = "<math><mo>(</mo><mn>1</mn><mo>)</mo><mo>,</mo><mo>(</mo><mn>2</mn><mo>)</mo><mo>,</mo><mo>(</mo><mn>3</mn><mo>)</mo><mo>.</mo></math>";
+    test_braille("Nemeth", expr, "⠷⠂⠾⠠⠀⠷⠆⠾⠠⠀⠷⠒⠾⠸⠲");
+}
+
+#[test]
+fn colon_40_2() {
+    let expr = "<math><mi>f</mi><mo>:</mo><mo>(</mo><mi>x</mi><mo>,</mo><mi>y</mi><mo>)</mo></math>";
+    test_braille("Nemeth", expr, "⠰⠋⠸⠒⠷⠭⠠⠀⠽⠾");
 }
 
 #[test]
@@ -124,10 +346,17 @@ fn dash_42_4() {
     let expr = "<math><mfrac><mo>&#x2015;</mo><mn>15</mn></mfrac><mo>=</mo><mfrac><mn>2</mn><mn>3</mn></mfrac></math>";
     test_braille("Nemeth", expr, "⠹⠤⠤⠤⠤⠀⠌⠂⠢⠼⠀⠨⠅⠀⠹⠆⠌⠒⠼");
 }
+
 #[test]
 fn dash_42_6() {
     let expr = "<math><mo>$</mo><mn>2</mn><mo>+</mo><mo>$</mo><mn>3</mn><mo>=</mo><mo>$</mo><mo>&#x2015;</mo></math>";
     test_braille("Nemeth", expr, "⠈⠎⠆⠬⠈⠎⠒⠀⠨⠅⠀⠈⠎⠤⠤⠤⠤");
+}
+
+#[test]
+fn ellipsis_43_a_1() {
+    let expr = "<math><mn>1</mn><mo>,</mo><mn>3</mn><mo>,</mo><mn>5</mn><mo>,</mo><mo>…</mo><mo>,</mo><mn>15</mn><mo>.</mo></math>";
+    test_braille("Nemeth", expr, "⠼⠂⠠⠀⠼⠒⠠⠀⠼⠢⠠⠀⠄⠄⠄⠠⠀⠼⠂⠢⠸⠲");
 }
 
 #[test]
@@ -138,6 +367,59 @@ fn ellipsis_43_b_3() {
         <msubsup><mi>p</mi><mi>r</mi><msub><mi>&#x3B1;</mi><mi>r</mi></msub></msubsup>
         </math>";
     test_braille("Nemeth", expr, "⠏⠂⠘⠨⠁⠘⠰⠂⠐⠄⠄⠄⠀⠏⠰⠗⠘⠨⠁⠘⠰⠗");
+}
+
+#[test]
+fn ellipsis_43_b_4() {
+    let expr = "<math><mo>(</mo><mo>…</mo><mo>,</mo><mo>-</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>,</mo><mo>…</mo><mo>)</mo></math>";
+    test_braille("Nemeth", expr, "⠷⠄⠄⠄⠠⠀⠤⠂⠠⠀⠴⠠⠀⠂⠠⠀⠄⠄⠄⠾");
+}
+
+#[test]
+fn ellipsis_43_b_5() {
+    let expr = "<math><mn>12</mn><mi>¢</mi><mo>+</mo><mn>14</mn><mi>¢</mi><mo>=</mo><mo>…</mo><mi>¢</mi></math>";
+    test_braille("Nemeth", expr, "⠼⠂⠆⠈⠉⠬⠂⠲⠈⠉⠀⠨⠅⠀⠄⠄⠄⠈⠉");
+}
+
+#[test]
+fn omission_57_1() {
+    let expr = "<math><msup><mrow><mo>(</mo><mo>?</mo><mo>)</mo></mrow><mn>3</mn></msup><mo>=</mo><mn>27</mn></math>";
+    test_braille("Nemeth", expr, "⠷⠿⠾⠘⠒⠀⠨⠅⠀⠼⠆⠶");
+}
+
+#[test]
+fn omission_57_4() {
+    let expr = "<math><mo>?</mo><mo>+</mo><mo>?</mo><mo>=</mo><mn>10</mn></math>";
+    test_braille("Nemeth", expr, "⠿⠬⠿⠀⠨⠅⠀⠼⠂⠴");
+}
+
+#[test]
+fn omission_57_5() {
+    let expr = "<math><mn>7</mn><mo>-</mo><menclose notation='bottom'><mo>?</mo></menclose><mo>=</mo><mn>5</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠶⠤⠿⠀⠨⠅⠀⠼⠢");
+}
+
+#[test]
+fn omission_57_6() {
+    let expr = "<math><mn>9</mn><mo>-</mo><mn>5</mn><mo>=</mo><mtext>-?-</mtext></math>";
+    test_braille("Nemeth", expr, "⠼⠔⠤⠢⠀⠨⠅⠀⠿");
+}
+
+#[test]
+fn omission_57_7() {
+    // test uses a couple of different forms of blank spaces
+    let expr = "<math>
+            <mo>(</mo><mn>5</mn><mo>,</mo><mspace width='1.5em'/><mo>)</mo><mo>+</mo>
+            <mo>(</mo><mo>&#xA0;</mo><mo>&#xA0;</mo><mo>,</mo><mn>15</mn><mo>)</mo><mo>=</mo>
+            <mo>(</mo><mn>7</mn><mo>,</mo><mn>13</mn><mo>)</mo>
+        </math>";
+    test_braille("Nemeth", expr, "⠷⠢⠠⠀⠿⠾⠬⠷⠿⠠⠀⠂⠢⠾⠀⠨⠅⠀⠷⠶⠠⠀⠂⠒⠾");
+}
+
+#[test]
+fn omission_57_8() {
+    let expr = "<math><mn>5</mn><mo>×</mo><mn>25</mn><mo>=</mo><mspace width='1em'/></math>";
+    test_braille("Nemeth", expr, "⠼⠢⠈⠡⠆⠢⠀⠨⠅⠀⠿");
 }
 
 #[test]
@@ -1066,14 +1348,15 @@ fn function_space_119_c_3() {
 }
 
 #[test]
-fn identity_matrix_126() {
+fn identity_matrix_126_linearize() {
+    // see https://github.com/NSoiffer/MathCAT/issues/43 for discussion on linear layout
     let expr = "<math> <mrow><mo>(</mo> <mtable>
         <mtr><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd></mtr>
         <mtr><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd></mtr>
         <mtr><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd></mtr>
       </mtable><mo>)</mo></mrow></math>";
     // Note: braille pattern is just a guess as to how to linearize a matrix
-    test_braille("Nemeth", expr, "⠈⠠⠷⠂⠀⠼⠴⠀⠼⠴⠀⣍⠴⠀⠼⠂⠀⠼⠴⠀⣍⠴⠀⠼⠴⠀⠼⠂⠈⠠⠾");
+    test_braille("Nemeth", expr, "⠠⠷⠼⠂⠀⠼⠴⠀⠼⠴⠀⣍⠴⠀⠼⠂⠀⠼⠴⠀⣍⠴⠀⠼⠴⠀⠼⠂⠠⠾");
 }
 
 #[test]
@@ -1090,21 +1373,79 @@ fn vertical_bar_145_4() {
 }
 
 #[test]
+fn ratio_151_10() {
+    let expr = "<math><mn>1</mn><mo>:</mo><mn>2</mn><mo>∷</mo><mn>3</mn><mo>:</mo><mn>6</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠂⠀⠐⠂⠀⠼⠆⠀⠰⠆⠀⠼⠒⠀⠐⠂⠀⠼⠖");
+}
+
+#[test]
 fn ratio_151_11() {
-    let expr = "<math><mi>a</mi><mo>:</mo><mi>b</mi></math>";
-    test_braille("Nemeth", expr, "⠁⠀⠐⠂⠀⠃");
+    let expr = "<math><mi>a</mi><mo>+</mo><mi>b</mi><mo>:</mo><mi>b</mi><mo>∷</mo><mi>c</mi><mo>+</mo><mi>d</mi><mo>:</mo><mi>d</mi></math>";
+    test_braille("Nemeth", expr, "⠁⠬⠃⠀⠐⠂⠀⠃⠀⠰⠆⠀⠉⠬⠙⠀⠐⠂⠀⠙");
 }
 
 #[test]
-fn trilinear_not_ratio_151_11() {
+fn not_ratio_nfb_5_7_b_2() {
+    let expr = "<math><mo>{</mo><mi>x</mi><mo>:</mo><mi>x</mi><mo>></mo><mn>0</mn><mo>}</mo></math>";
+    test_braille("Nemeth", expr, "⠨⠷⠰⠭⠸⠒⠀⠭⠀⠨⠂⠀⠼⠴⠨⠾");
+}
+
+#[test]
+fn not_ratio_nfb_5_7_b_4() {
+    let expr = "<math><mi>p</mi><mo>:</mo><mi>r</mi><mo>=</mo><mi>q</mi><mo>:</mo><mi>s</mi></math>";
+    test_braille("Nemeth", expr, "⠰⠏⠸⠒⠗⠀⠨⠅⠀⠟⠸⠒⠰⠎");
+}
+
+#[test]
+fn trilinear_not_ratio() {
     let expr = "<math><mi>a</mi><mo>:</mo><mi>b</mi><mo>:</mo><mi>c</mi></math>";
-    test_braille("Nemeth", expr, "⠁⠸⠒⠀⠃⠸⠒⠀⠉");
+    // decided because spacing is symmetric, no space added after ':'
+    test_braille("Nemeth", expr, "⠰⠁⠸⠒⠰⠃⠸⠒⠰⠉");
 }
 
 #[test]
-fn extension_field_not_ratio_151_11() {
+fn extension_field_not_ratio() {
     let expr = "<math><mo>[</mo><mi>K</mi><mo>:</mo><mi>F</mi><mo>]</mo></math>";
-    test_braille("Nemeth", expr, "⠈⠷⠠⠅⠸⠒⠀⠠⠋⠈⠾");
+    // decided because spacing is symmetric, no space added after ':'
+    test_braille("Nemeth", expr, "⠈⠷⠰⠠⠅⠸⠒⠰⠠⠋⠈⠾");
+}
+
+#[test]
+fn proportional_151_12() {
+    let expr = "<math><mi>x</mi><mo>∝</mo><mi>y</mi></math>";
+    test_braille("Nemeth", expr, "⠭⠀⠸⠿⠀⠽");
+}
+
+#[test]
+fn comparison_ops_151_14() {
+    let expr = "<math><mo>{</mo><mi>x</mi><mo>|</mo><mn>0</mn><mo>≤</mo><mi>x</mi><mo>≤</mo><mn>1</mn><mo>}</mo></math>";
+    test_braille("Nemeth", expr, "⠨⠷⠭⠀⠳⠀⠼⠴⠀⠐⠅⠱⠀⠭⠀⠐⠅⠱⠀⠼⠂⠨⠾");
+}
+
+#[test]
+fn no_space_comparison_151_16() {
+    let expr = "<math><mo>(</mo><mo>&#x3C;</mo><mo>,</mo><mo>=</mo><mo>,</mo><mo>&#x3E;</mo><mo>)</mo></math>";
+    test_braille("Nemeth", expr, "⠷⠐⠅⠠⠀⠨⠅⠠⠀⠨⠂⠾");
+}
+
+#[test]
+fn in_scripts_comparison_151_17() {
+    let expr = "<math>
+            <msubsup>
+            <mo>∫</mo>
+            <mrow><mi>x</mi><mo>=</mo><mi>a</mi></mrow>
+            <mrow><mi>x</mi><mo>=</mo><mi>b</mi></mrow>
+            </msubsup>
+            <mrow>
+            <mrow>
+                <mi>f</mi>
+                <mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
+            </mrow>
+            <mi>d</mi>
+            <mi>x</mi>
+            </mrow>
+        </math>";
+    test_braille("Nemeth", expr, "⠮⠰⠭⠀⠰⠨⠅⠀⠁⠘⠭⠀⠘⠨⠅⠀⠃⠐⠋⠷⠭⠾⠙⠭");
 }
 
 #[test]
