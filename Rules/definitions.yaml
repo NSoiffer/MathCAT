@@ -197,7 +197,6 @@
 
     # chars not from SRE
     "∝", "∉",
-    "∶",        # not really a comparison operator but Nemeth adds spaces like it is
   ],
 
   # no space is used when these chars "apply" to ellipsis or long dash (lesson 2.13, differs slightly from rule 42)
@@ -209,8 +208,8 @@
   ],
 
   NemethPunctAndOpenAfterSymbols: [
-    "'", ":", ",", "!", ".", "?", "’", "”",                          # punctuation -- 42(i)
-    ")", "]", "}", "⟩", "⟧", "⦄", "⟫", "⌉", "⌋",                       # 42(iii) close
+    "'", ":", ",", "!", ".", "?", "’", "”", ";",                    # punctuation -- 42(i)
+    ")", "]", "}", "⟩", "⟧", "⦄", "⟫", "⌉", "⌋",                      # 42(iii) close
   ],
 
   NemethCurrencyBeforeSymbols: [
