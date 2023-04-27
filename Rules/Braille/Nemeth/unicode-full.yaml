@@ -4,13 +4,9 @@
 # Language: E: English, D: German, G: Greek, V: Greek variants, H: Hebrew, U: Russian
 # Indicators: C: capital, L: letter, N: number, P: punctuation, M: multipurpose
 # Others: W -- whitespace that should be kept (e.g, in a numeral)
-#  SRE doesn't have H: Hebrew or U: Russian, so not encoded (yet)
+#  SRE doesn't have H: Hebrew, so not encoded (yet)
 # Some of the weird letters (e.g., circled letters) I didn't translate with the above because
 #   they don't interact with rules since they are enclosed in other chars.
-
-
-
-
 
 
   # --- Nemeth Default Alphabet bold chars. ---
@@ -357,6 +353,66 @@
 
  - "𝚤": [t: "L⠊"]               # 0x1d6a4
  - "𝚥": [t: "L⠚"]               # 0x1d6a5
+
+# Russian Alphabet (from Nemeth book)
+ - "а": [t: "U⠁"]               # 0x430
+ - "А": [t: "UC⠁"]              # 0x410
+ - "б": [t: "U⠃"]               # 0x431
+ - "Б": [t: "UC⠃"]              # 0x411
+ - "в": [t: "U⠺"]               # 0x432
+ - "В": [t: "UC⠺"]              # 0x412
+ - "г": [t: "U⠛"]               # 0x433
+ - "Г": [t: "UC⠛"]              # 0x413
+ - "д": [t: "U⠙"]               # 0x434
+ - "Д": [t: "UC⠙"]              # 0x414
+ - "е": [t: "U⠑"]               # 0x435
+ - "Е": [t: "UC⠑"]              # 0x415
+ - "ж": [t: "U⠚"]               # 0x436
+ - "Ж": [t: "UC⠚"]              # 0x416
+ - "з": [t: "U⠵"]               # 0x437
+ - "З": [t: "UC⠵"]              # 0x417
+ - "и": [t: "U⠊"]               # 0x438
+ - "И": [t: "UC⠊"]              # 0x418
+ - "к": [t: "U⠅"]               # 0x43a
+ - "К": [t: "UC⠅"]              # 0x41a
+ - "л": [t: "U⠇"]               # 0x43b
+ - "Л": [t: "UC⠇"]              # 0x41b
+ - "м": [t: "U⠍"]               # 0x43c
+ - "М": [t: "UC⠍"]              # 0x41c
+ - "н": [t: "U⠝"]               # 0x43d
+ - "Н": [t: "UC⠝"]              # 0x41d
+ - "о": [t: "U⠕"]               # 0x43e
+ - "О": [t: "UC⠕"]              # 0x41e
+ - "п": [t: "U⠏"]               # 0x43f
+ - "П": [t: "UC⠏"]              # 0x41f
+ - "р": [t: "U⠗"]               # 0x440
+ - "Р": [t: "UC⠗"]              # 0x420
+ - "с": [t: "U⠎"]               # 0x441
+ - "С": [t: "UC⠎"]              # 0x421
+ - "т": [t: "U⠞"]               # 0x442
+ - "Т": [t: "UC⠞"]              # 0x422
+ - "у": [t: "U⠥"]               # 0x443
+ - "У": [t: "UC⠥"]              # 0x423
+ - "ф": [t: "U⠋"]               # 0x444
+ - "Ф": [t: "UC⠋"]              # 0x424
+ - "х": [t: "U⠓"]               # 0x445
+ - "Х": [t: "UC⠓"]              # 0x425
+ - "ц": [t: "U⠉"]               # 0x446
+ - "Ц": [t: "UC⠉"]              # 0x426
+ - "ч": [t: "U⠟"]               # 0x447
+ - "Ч": [t: "UC⠟"]              # 0x427
+ - "ш": [t: "U⠱"]               # 0x448
+ - "Ш": [t: "UC⠱"]              # 0x428
+ - "щ": [t: "U⠭"]               # 0x449
+ - "Щ": [t: "UC⠭"]              # 0x429
+ - "ы": [t: "U⠮"]               # 0x44b
+ - "Ы": [t: "UC⠮"]              # 0x42b
+ - "э": [t: "U⠪"]               # 0x44d
+ - "Э": [t: "UC⠪"]              # 0x42d
+ - "ю": [t: "U⠳"]               # 0x44e
+ - "Ю": [t: "UC⠳"]              # 0x42e
+ - "я": [t: "U⠫"]               # 0x44f
+ - "Я": [t: "UC⠫"]              # 0x42f
 
   # --- Nemeth Default Alphabet circled chars. ---
  - "⓪": [t: "⠫⠉⠸⠫⠼⠴⠻"]          # 0x24ea
@@ -1611,7 +1667,7 @@
  - "∖": [t: "⠸⠡"]               # 0x2216
  - "∗": [t: "⠈⠼"]               # 0x2217
  - "∘": [t: "⠨⠡"]               # 0x2218
- - "∝": [t: "⠰⠆"]               # 0x221d
+ - "∝": [t: "⠸⠿"]               # 0x221d
  - "∞": [t: "⠠⠿"]               # 0x221e
  - "∟": [t: "⠫⠪⠨⠗⠻"]            # 0x221f
  - "∠": [t: "⠫⠪"]               # 0x2220
@@ -1719,12 +1775,9 @@
  - "⋂": [t: "⠨⠩"]               # 0x22c2
  - "⋃": [t: "⠨⠬"]               # 0x22c3
  - "⋅": [t: "⠡"]                # 0x22c5
+ - "∙": [t: "⠡"]                # 0x2219   -- similar looking to 0x22c5, so using the same braille
  - "⋜": [t: "⠱⠐⠅"]              # 0x22dc
  - "⋝": [t: "⠱⠨⠂"]              # 0x22dd
- - "⋮": [t: "⠣⠄⠄⠄"]             # 0x22ee
- - "⋯": [t: "⠄⠄⠄"]              # 0x22ef
- - "⋰": [t: "⠘⠄⠄⠄"]             # 0x22f0
- - "⋱": [t: "⠰⠄⠄⠄"]             # 0x22f1
  - "⟂": [t: "⠫⠏"]               # 0x27c2
  - "⦀": [t: "⠳⠳⠳"]              # 0x2980
  - "⦶": [t: "⠫⠉⠸⠫⠳⠻"]           # 0x29b6
@@ -2014,20 +2067,6 @@
  - ")": [t: "⠾"]                # 0x29 (Right parenthesis)
  - "*": [t: "⠈⠼"]               # 0x002A (Asterisk)
  - "+": [t: "⠬"]                # 0x002B (Plus sign)
- - ",":                         # 0x002C (Comma)
-    - test:
-          # test if first ancestor that isn't an mrow is a script tag (rule 78)
-      - if: "self::m:mn"
-        then: [t: "⠠"]
-      - else_if: "ancestor-or-self::*[not(parent::m:mrow)][1][parent::m:msub or parent::m:msup or parent::m:msubsup or parent::m:mmultiscripts][preceding-sibling::*]"
-        then: [t: "⠪"]        # Rule 78
-        else: [t: ","]        # ',' used for matching purposes, converted to "⠠⠀"
- - "-":                         # 0x002D (Hyphen)  (0x2212 normalized to here)
-    - test:
-        if: "self::m:mtext"
-        then: [t: "P⠤"]
-        else: [t: "⠤"]
-
  - ".":                          # 0x002E (Full stop or decimal pt)
       # '.' is particularly tricky because we need to know if it is really numeric or not.
       # if it is numeric, it might be a on it's own or part of a number.
@@ -2080,117 +2119,15 @@
  - "·": [t: "⠡"]                # 0x00B7 (Middle dot)
  - "×": [t: "⠈⠡"]               # 0x00D7 (Multiplication sign)
  - "÷": [t: "⠨⠌"]               # 0x00F7 (Division sign)
-#  - "Α": [t: "⠨⠠⠁"]              # 0x391 (Greek capital letter alpha)
-#  - "Β": [t: "⠨⠠⠃"]              # 0x392 (Greek capital letter beta )
-#  - "Γ": [t: "⠨⠠⠛"]              # 0x393 (Greek capital letter gamma)
-#  - "Δ": [t: "⠨⠠⠙"]              # 0x394 (Greek capital letter delta)
-#  - "Ε": [t: "⠨⠠⠑"]              # 0x395 (Greek capital letter epsilon)
-#  - "Ζ": [t: "⠨⠠⠵"]              # 0x396 (Greek capital letter zeta)
-#  - "Η": [t: "⠨⠠⠱"]              # 0x397 (Greek capital letter eta)
-#  - "Θ": [t: "⠨⠠⠹"]              # 0x398 (Greek capital letter theta)
-#  - "Ι": [t: "⠨⠠⠊"]              # 0x399 (Greek capital letter iota)
-#  - "Κ": [t: "⠨⠠⠅"]              # 0x039A (Greek capital letter kappa)
-#  - "Λ": [t: "⠨⠠⠇"]              # 0x039B (Greek capital letter lambda)
-#  - "Μ": [t: "⠨⠠⠍"]              # 0x039C (Greek capital letter mu)
-#  - "Ν": [t: "⠨⠠⠝"]              # 0x039D (Greek capital letter nu)
-#  - "Ξ": [t: "⠨⠠⠭"]              # 0x039E (Greek capital letter xi)
-#  - "Ο": [t: "⠨⠠⠕"]              # 0x039F (Greek capital letter omicron)
-#  - "Π": [t: "⠨⠠⠏"]              # 0x03A0 (Greek capital letter pi)
-#  - "Ρ": [t: "⠨⠠⠗"]              # 0x03A1 (Greek capital letter rho)
-#  - "Σ": [t: "⠨⠠⠎"]              # 0x03A3 (Greek capital letter sigma)
-#  - "Τ": [t: "⠨⠠⠞"]              # 0x03A4 (Greek capital letter tau)
-#  - "Υ": [t: "⠨⠠⠥"]              # 0x03A5 (Greek capital letter upsilon)
-#  - "Φ": [t: "⠨⠠⠋"]              # 0x03A6 (Greek capital letter phi)
-#  - "Χ": [t: "⠨⠠⠯"]              # 0x03A7 (Greek capital letter chi)
-#  - "Ψ": [t: "⠨⠠⠽"]              # 0x03A8 (Greek capital letter psi)
-#  - "Ω": [t: "⠨⠠⠺"]              # 0x03A9 (Greek capital letter omega)
-#  - "α": [t: "⠨⠁"]               # 0x03B1 (Greek small letter alpha)
-#  - "β": [t: "⠨⠃"]               # 0x03B2 (Greek small letter beta)
-#  - "γ": [t: "⠨⠛"]               # 0x03B3 (Greek small letter gamma)
-#  - "δ": [t: "⠨⠙"]               # 0x03B4 (Greek small letter delta)
-#  - "ε": [t: "⠨⠈⠑"]              # 0x03B5 (Greek small letter epsilon (alternative epsilon))
-#  - "ζ": [t: "⠨⠵"]               # 0x03B6 (Greek small letter zeta)
-#  - "η": [t: "⠨⠱"]               # 0x03B7 (Greek small letter eta)
-#  - "θ": [t: "⠨⠹"]               # 0x03B8 (Greek small letter theta)
-#  - "ι": [t: "⠨⠊"]               # 0x03B9 (Greek small letter iota)
-#  - "κ": [t: "⠨⠅"]               # 0x03BA (Greek small letter kappa)
-#  - "λ": [t: "⠨⠇"]               # 0x03BB (Greek small letter lambda)
-#  - "μ": [t: "⠨⠍"]               # 0x03BC (Greek small letter mu)
-#  - "ν": [t: "⠨⠝"]               # 0x03BD (Greek small letter nu)
-#  - "ξ": [t: "⠨⠭"]               # 0x03BE (Greek small letter xi)
-#  - "ο": [t: "⠨⠕"]               # 0x03BF (Greek small letter omicron)
-#  - "π": [t: "⠨⠏"]               # 0x03C0 (Greek small letter pi)
-#  - "ρ": [t: "⠨⠗"]               # 0x03C1 (Greek small letter rho)
-#  - "ς": [t: "⠨⠒"]               # 0x03C2 (Greek small letter final sigma)
-#  - "σ": [t: "⠨⠎"]               # 0x03C3 (Greek small letter sigma)
-#  - "τ": [t: "⠨⠞"]               # 0x03C4 (Greek small letter tau)
-#  - "υ": [t: "⠨⠥"]               # 0x03C5 (Greek small letter upsilon)
-#  - "φ": [t: "⠨⠈⠋"]              # 0x03C6 (Greek small letter phi (alternative phi))
-#  - "χ": [t: "⠨⠯"]               # 0x03C7 (Greek small letter chi)
-#  - "ψ": [t: "⠨⠽"]               # 0x03C8 (Greek small letter psi)
-#  - "ω": [t: "⠨⠺"]               # 0x03C9 (Greek small letter omega)
-#  - "ϑ": [t: "⠨⠈⠹"]              # 0x03D1 (Greek theta symbol)
-#  - "ϕ": [t: "⠨⠋"]               # 0x03D5 (Greek phi symbol)
-#  - "ϖ": [t: "⠨⠈⠏"]              # 0x03D6 (Greek pi symbol)
-#  - "ϰ": [t: "⠨⠈⠅"]              # 0x03F0 (Greek kappa symbol)
-#  - "ϵ": [t: "⠨⠑"]               # 0x03F5 (Greek lunate epsilon symbol)
-      # rule 43b about spaces (references rule 42)
-      # tests are ugly because an invisible times might have been inserted and we need to skip that
- - "—": [t: "⠤⠤"]               # 0x2014 (Em dash)
- - "―":                          # 0x2015 (Horizontal bar)
-    - test:
-        if:
-          - "preceding-sibling::* and"
-          - "not("
-          - "  preceding-sibling::*[1][ "
-          - "    (text() != '\u2062' and (IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols') or IsInDefinition(., 'NemethCurrencyBeforeSymbols')) ) or "
-          - "    (text() = '\u2062' and preceding-sibling::* and "
-          - "       preceding-sibling::*[2][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols') or IsInDefinition(., 'NemethCurrencyBeforeSymbols')] "
-          - "    ) ] )"
-        then: [t: "W"]
-    - t: "⠤⠤⠤⠤"
-    - test:
-        if:
-          - "not("
-          - "  following-sibling::* and "
-          - "  following-sibling::*[1][ "
-          - "    (text() != '\u2062' and (IsInDefinition(., 'NemethPunctAndOpenAfterSymbols') or IsInDefinition(., 'NemethCurrencyAfterSymbols'))) or "
-          - "    (text() = '\u2062' and following-sibling::* and "
-          - "       following-sibling::*[2][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols') or IsInDefinition(., 'NemethCurrencyAfterSymbols')] "
-          - "    ) ]  )"
-        then: [t: "W"]
 
+
+# rule 43b about spaces (references rule 42)
+# tests are ugly because an invisible times might have been inserted and we need to skip that  
+ - "—": [t: "⠤⠤"]               # 0x2014 (Em dash)
  - "‘": [t: "P⠠⠦"]               # 0x2018 (Left single quotation mark)
  - "’": [t: "P⠴⠠"]               # 0x2019 (Right single quotation mark)
  - "“": [t: "P⠦"]                # 0x201C (Left double quotation mark)
  - "”": [t: "P⠴"]                # 0x201D (Right double quotation mark)
- - "†": [t: "⠸⠻"]               # 0x2020 (Dagger)
- - "‡": [t: "⠸⠸⠻"]              # 0x2021 (Double dagger)
- - "•": [t: "⠔⠔"]               # 0x2022 (Bullet)
- - "…":                          # 0x2026 (Ellipsis)
-      # rule 43b about spaces (references rule 42); partly superseded by lesson 2.13
-      # tests are ugly because an invisible times might have been inserted and we need to skip that
-    - test:
-        if:
-          - "not("
-          - "  preceding-sibling::* and "
-          - "  preceding-sibling::*[1][ "
-          - "    (text() != '\u2062' and (IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols') or IsInDefinition(., 'NemethCurrencyBeforeSymbols'))) or "
-          - "    (text() = '\u2062' and preceding-sibling::* and "
-          - "       preceding-sibling::*[2][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols') or IsInDefinition(., 'NemethCurrencyBeforeSymbols')] "
-          - "    ) ] )"
-        then: [t: "W"]
-    - t: "⠄⠄⠄"
-    - test:
-        if:
-          - "not("
-          - "  following-sibling::* and "
-          - "  following-sibling::*[1][ "
-          - "    (text() != '\u2062' and (IsInDefinition(., 'NemethPunctAndOpenAfterSymbols') or IsInDefinition(., 'NemethCurrencyAfterSymbols'))) or "
-          - "    (text() = '\u2062' and following-sibling::* and "
-          - "       following-sibling::*[2][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols') or IsInDefinition(., 'NemethCurrencyAfterSymbols')] "
-          - "    ) ]  )"
-        then: [t: "W"]
  - "‰": [t: "`00"]
  - "ℏ": [t: "⠈⠓"]               # 0x210F (Planck constant over two pi)
  - "ℓ": [t: "TE⠇"]               # 0x2113 (Script small l (differs from 1d4c1: 4-56-123))

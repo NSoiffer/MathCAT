@@ -115,7 +115,26 @@ def generate_char_line(out_stream, char: str, braille: str, is_letter: bool):
     first_part = ' - "{}": [t: "{}"]'.format(char, result)
     out_stream.write('{:32}# {}\n'.format(first_part, hex(ord(char[-1])) ))
 
+RUSSIAN_NEMETH = ['⠁', '⠃', '⠺', '⠛', '⠙', '⠑', '⠚', '⠵', '⠊', '⠅', '⠇', '⠍', '⠝', '⠕', '⠏',
+                  '⠗', '⠎', '⠞', '⠥', '⠋', '⠓', '⠉', '⠟', '⠱', '⠭', '⠮', '⠪', '⠳', '⠫']
 
+def generate_russian(out_stream):
+    for i in range(0,len(RUSSIAN_NEMETH)):
+        i_unicode = i if i < 9 else i+1   # need to skip a char
+        if i_unicode > 25:              # need to skip another char or two
+            if i_unicode > 26:
+                i_unicode += 2
+            else:
+                i_unicode += 1
+        lower = 0x0430 + i_unicode
+        upper = 0x0410 + i_unicode
+        first_part = ' - "{}": [t: "{}"]'.format(chr(lower), "U"+RUSSIAN_NEMETH[i])
+        out_stream.write('{:32}# {}\n'.format(first_part, hex(lower)))
+        first_part = ' - "{}": [t: "{}"]'.format(chr(upper), "UC"+RUSSIAN_NEMETH[i])
+        out_stream.write('{:32}# {}\n'.format(first_part, hex(upper)))
+
+
+                   
 
 import os
 # if os.path.exists("alphanumerics.txt"):
@@ -126,16 +145,16 @@ import os
 if os.path.exists("out"):
   os.remove("out")
 
-path = "C:/Dev/speech-rule-engine/sre-tests/expected/nemeth/symbols/"
-# file = "default_alphabet_bold.json"
-if os.path.exists("alphanumerics.txt"):
-  os.remove("alphanumerics.txt")
-for filename in os.listdir(path):
-    # these have multi char entries and aren't character definitions
-    if not(filename == 'default_functions.json' or filename == 'default_si_units.json' or filename == 'default_units.json'):
-        create_unicode_from_json(path+filename, "alphanumerics.txt")
+# path = "C:/Dev/speech-rule-engine/sre-tests/expected/nemeth/symbols/"
+# # file = "default_alphabet_bold.json"
+# if os.path.exists("alphanumerics.txt"):
+#   os.remove("alphanumerics.txt")
+# for filename in os.listdir(path):
+#     # these have multi char entries and aren't character definitions
+#     if not(filename == 'default_functions.json' or filename == 'default_si_units.json' or filename == 'default_units.json'):
+#         create_unicode_from_json(path+filename, "alphanumerics.txt")
 
-# with open("out", 'a', encoding='utf8') as out_stream:
-#     generate_char_line(out_stream, "𝐅", "⠸⠰⠠⠋")
+with open("out", 'a', encoding='utf8') as out_stream:
+    generate_russian(out_stream)
 # generate_digits("out", "⠈", "1D7D8", "double struck (as script)")
 # generate_digits("out", "⠠", "1D7E2", "sans-serif")

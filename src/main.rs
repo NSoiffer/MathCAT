@@ -168,24 +168,9 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr="
-  <math display='block'>
-  <mrow>
-   <msup>
-    <mrow>
-     <mo>(</mo>
-     <mi>g</mi>
-     <mo>∘</mo>
-     <mi>h</mi>
-     <mo>)</mo>
-    </mrow>
-    <mo>′</mo>
-   </msup>
-   <mo>(</mo>
-   <mi>x</mi>
-   <mo>)</mo>
-  </mrow>
- </math>
-   ";
+  <math><mn>10</mn><mo>+</mo><mo>-</mo><mn>5</mn></math>
+      ";
+
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>
@@ -219,7 +204,7 @@ fn main() {
   // set_preference("MathRate".to_string(), "77".to_string()).unwrap();
   
   set_preference("Bookmark".to_string(), "false".to_string()).unwrap();
-  set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+  set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
   if let Err(e) = set_mathml(expr.to_string()) {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   };
@@ -230,11 +215,11 @@ fn main() {
   }
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
-  // set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
-  // match get_braille("".to_string()) {
-  //   Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
-  //   Err(e) => panic!("{}", errors_to_string(&e)),
-  // }
+  set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
+  match get_braille("".to_string()) {
+    Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
+    Err(e) => panic!("{}", errors_to_string(&e)),
+  }
 
   info!("Time taken for loading+speech+braille: {}ms", instant.elapsed().as_millis());
   // let instant = Instant::now();

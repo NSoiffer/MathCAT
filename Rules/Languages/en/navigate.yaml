@@ -14,7 +14,7 @@
 # * Terse -- no echo of commands or end points
 # 
 # For the second item, a common set of rules is used. These rules require the variable "Move2D"
-# to be set along with "Child2D", where "Move2D" is potentially the parent 2D structure.
+# to be set along with "Child2D", where "Move2D" is either 'in' or 'out'.
 #
 # In addition, the navigation rules make use of two functions:
 #
@@ -139,22 +139,29 @@
   tag: mmultiscripts
   match: "$Move2D != ''"
   replace:
-  - x: "$Move2D"
   - test:
-    - if: "count($Child2D/preceding-sibling::*)=0"
-      then: [{t: "base"}]
-    - else_if: "$Child2D/following-sibling::*[self::m:mprescripts]" # are we before mprescripts and hence are postscripts
+      if: "name($Child2D)!='none'"
       then:
-      - test:
-          if: ['count($Child2D/preceding-sibling::*) mod 2 != 0']
-          then: [{t: "subscript"}]
-          else: [{t: "superscript"}]
-      else:
-      - test:
-          if: ['count($Child2D/preceding-sibling::*) mod 2 = 0']
-          then: [{t: "subscript"}]
-          else: [{t: "superscript"}]
-  - pause: "medium"
+      - with:
+          variables:
+          - NumPrecedingSiblings: "count($Child2D/preceding-sibling::*)"
+          replace:
+          - x: "$Move2D"
+          - test:
+            - if: "$NumPrecedingSiblings=0"
+              then: [{t: "base"}]
+            - else_if: "$Child2D/preceding-sibling::*[self::m:mprescripts]" # are we before mprescripts and hence are postscripts
+              then:
+              - test:   # in postscripts -- base shifts by one
+                  if: "$NumPrecedingSiblings mod 2 = 0"
+                  then: [{t: "subscript"}]
+                  else: [{t: "superscript"}]
+              else:
+              - test:
+                  if: "$NumPrecedingSiblings mod 2 = 0"
+                  then: [{t: "superscript"}]
+                  else: [{t: "subscript"}]
+          - pause: "medium"
 
 - name: into-or-out-of
   tag: mtd
@@ -211,7 +218,6 @@
 # many times, for typographic reasons, people include punctuation at the end of a math expr
 # these rules detect that and skip speaking it (should be similar regular rule)
 - name: skip-punct-at-end-zoom-in
-
   tag: mrow
   match:
   - "($NavCommand = 'ZoomIn' or $NavCommand = 'ZoomInAll' or $NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and"
@@ -535,12 +541,12 @@
               variables: [{NavCommand: "'MovePreviousZoom'"}]
               replace: [x: "*[last()]/*[last()]"]
 
-# We stop when the parent is 2d (e.g., frac), but not if in leaf base of msub/msup/msubsup because that's really on the same line
+# We stop when the parent is 2d (e.g., frac), but not if in leaf base of msub/msup/msubsup/mmultiscripts because that's really on the same line
 - name: move-to-start-or-end-2d
   tag: "*"
   match:
   - "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and IsNode(.., '2D') and"
-  - "not( IsNode(., 'leaf') and(parent::m:msub or parent::m:msup or parent::m:msubsup) )"
+  - "not( IsNode(., 'leaf') and (parent::m:msub or parent::m:msup or parent::m:msubsup or parent::m:mmultiscripts) )"
   replace:
   - test:
       if: "$NavVerbosity = 'Verbose'"
@@ -1030,12 +1036,58 @@
 
 # ========  Move/Read/Describe Next rules =================
 
+# skip 'none'
+- name: move-next-none
+  tag: "none"
+  match: 
+  - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext' or $NavCommand = 'DescribePrevious' or $NavCommand = 'MoveNextZoom') and"
+  - "parent::*[1][name(.)='mmultiscripts'] and following-sibling::*"
+  replace:
+  - with:
+      variables: [Following: "following-sibling::*[1]"]
+      replace:
+      # two 'none's in a row -- move over and try again; one 'none', zoom in on next 
+      - test:
+          if: "$Following[name(.)='none']"
+          then: [x: "$Following"]
+          else:
+          - with:
+              variables: [{Move2D: "'in'"}, {Child2D: "$Following"}]
+              replace: [x: ".."]
+          - with:
+              variables: [{NavCommand: "'MoveNextZoom'"}]
+              replace: [x: "$Following"]
+
+# skip 'none'
+- name: move-previous-none
+  tag: "none"
+  match: 
+  - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious' or $NavCommand = 'MovePreviousZoom') and"
+  - "parent::*[1][name(.)='mmultiscripts'] and preceding-sibling::*"
+  replace:
+  - with:
+      variables: [Preceding: "preceding-sibling::*[1]"]
+      replace:
+      # two 'none's in a row -- move over and try again; one 'none', zoom in on preceding 
+      - test:
+          if: "$Preceding[name(.)='none']"
+          then: [x: "$Preceding"]
+          else:
+          - with:
+              variables: [{Move2D: "'in'"}, {Child2D: "$Preceding"}]
+              replace: [x: ".."]
+          - with:
+              variables: [{NavCommand: "'MovePreviousZoom'"}]
+              replace: [x: "$Preceding"]
+
+
+
 # skip invisible chars except for Enhanced mode when "times" should be read
 - name: move-next-invisible
   tag: "*"
   match:
   - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
-  - "following-sibling::*[1][translate(., '\u2061\u2062\u2063\u2064', '')='']"
+  - "following-sibling::*[1][name(.)='mo' and translate(., '\u2061\u2062\u2063\u2064', '')='']"
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
@@ -1101,24 +1153,24 @@
   - "$AutoZoomOut = 'True' and"
   - "( not(following-sibling::*) or"
   - "  ( $NavMode='Enhanced' and "
-  - "    count(following-sibling::*)=1 and IsBracketed(.., '(', ')') or IsBracketed(.., '[', ']')"
+  - "    count(following-sibling::*)=1 and (IsBracketed(.., '(', ')') or IsBracketed(.., '[', ']'))"
   - "  )"
   - ")"
   replace:
+  - test:
+      if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+      then:
+      - test:
+        - if: "$NavCommand = 'MoveNext'"
+          then: [{t: "move"}]
+        - else_if: "$NavCommand = 'ReadNext'"
+          then: [{t: "read"}]
+          else: [{t: "describe"}]
+      - t: "right"
+      - pause: short
   - with:
       variables: [{MatchCounter: "$MatchCounter + 1"}, {NavCommand: "'MoveNext'"}]
       replace:
-      - test:
-          if: "$MatchCounter = 1 and $NavVerbosity = 'Verbose'"
-          then:
-          - test:
-            - if: "$NavCommand = 'MoveNext'"
-              then: [{t: "move"}]
-            - else_if: "$NavCommand = 'ReadNext'"
-              then: [{t: "read"}]
-              else: [{t: "describe"}]
-          - t: "right"
-          - pause: short
       - test:
           if: "following-sibling::*"
           then:
@@ -1223,12 +1275,23 @@
           else: [{t: "describe"}]
       - t: "right"
       - pause: short
-  - with:
-      variables: [{Move2D: "'in'"}, {Child2D: "following-sibling::*[1]"}]
-      replace: [{x: ".."}]
-  - with:
-      variables: [{MatchCounter: "$MatchCounter + 1"}, {NavCommand: "'MoveNextZoom'"}]
-      replace: [{x: "following-sibling::*[1]"}]
+  - test:
+      # if in base (nothing before), we must be moving to a script, so "in" will be said
+      if: "preceding-sibling::* and following-sibling::*[1][name(.)='none']"
+      then:
+      - with:
+          variables: [{Move2D: "'out of'"}, {Child2D: "."}]
+          replace: [{x: ".."}]
+      - with:
+          variables: [{MatchCounter: "$MatchCounter + 1"}]
+          replace: [x: "following-sibling::*[1]"]          # skip over 'none'
+      else:
+      - with:
+          variables: [{Move2D: "'in'"}, {Child2D: "following-sibling::*[1]"}]
+          replace: [{x: ".."}]
+      - with:
+          variables: [{MatchCounter: "$MatchCounter + 1"}, {NavCommand: "'MoveNextZoom'"}]
+          replace: [{x: "following-sibling::*[1]"}]
 
 - name: move-next-default
   tag: "*"
@@ -1260,7 +1323,7 @@
   tag: "*"
   match:
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
-  - "preceding-sibling::*[1][translate(., '\u2061\u2062\u2063\u2064', '')='']"
+  - "preceding-sibling::*[1][name(.)='mo' and translate(., '\u2061\u2062\u2063\u2064', '')='']"
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
@@ -1327,26 +1390,27 @@
   tag: "*"
   match:
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
+  - "$AutoZoomOut = 'True' and"
   - "( not(preceding-sibling::*) or"
   - "  ( $NavMode='Enhanced' and "
-  - "    count(preceding-sibling::*)=1 and IsBracketed(.., '(', ')') or IsBracketed(.., '[', ']')"
+  - "    count(preceding-sibling::*)=1 and (IsBracketed(.., '(', ')') or IsBracketed(.., '[', ']'))"
   - "  )"
   - ")"
   replace:
+  - test:
+      if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+      then:
+      - test:
+        - if: "$NavCommand = 'MovePrevious'"
+          then: [{t: "move"}]
+        - else_if: "$NavCommand = 'ReadPrevious'"
+          then: [{t: "read"}]
+          else: [{t: "describe"}]
+      - t: "left"
+      - pause: short
   - with:
       variables: [{MatchCounter: "$MatchCounter + 1"}, {NavCommand: "'MovePrevious'"}]
       replace:
-      - test:
-          if: "$MatchCounter = 1 and $NavVerbosity = 'Verbose'"
-          then:
-          - test:
-            - if: "$NavCommand = 'MovePrevious'"
-              then: [{t: "move"}]
-            - else_if: "$NavCommand = 'ReadPrevious'"
-              then: [{t: "read"}]
-              else: [{t: "describe"}]
-          - t: "left"
-          - pause: short
       - test:
           if: "preceding-sibling::*"
           then:
@@ -1442,22 +1506,33 @@
   - "$ReadZoomLevel>=0"
   replace:
   - test:
-      if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+      # if moving into base (nothing before), we must be moving to the base, so "in" will be said
+      if: "count(preceding-sibling::*) > 2 and preceding-sibling::*[1][name(.)='none']"
       then:
+      - with:
+          variables: [{Move2D: "'out of'"}, {Child2D: "."}]
+          replace: [{x: ".."}]
+      - with:
+          variables: [{MatchCounter: "$MatchCounter + 1"}]
+          replace: [x: "preceding-sibling::*[1]"]          # skip over 'none'
+      else:
       - test:
-        - if: "$NavCommand = 'MovePrevious'"
-          then: [{t: move}]
-        - else_if: "$NavCommand = 'ReadPrevious'"
-          then: [{t: "read"}]
-          else: [{t: "describe"}]
-      - t: "left"
-      - pause: short
-  - with:
-      variables: [{Move2D: "'in'"}, {Child2D: "preceding-sibling::*[1]"}]
-      replace: [{x: ".."}]
-  - with:
-      variables: [{MatchCounter: "$MatchCounter + 1"}, {NavCommand: "'MovePreviousZoom'"}]
-      replace: [{x: "preceding-sibling::*[1]"}]
+          if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
+          then:
+          - test:
+            - if: "$NavCommand = 'MovePrevious'"
+              then: [{t: move}]
+            - else_if: "$NavCommand = 'ReadPrevious'"
+              then: [{t: "read"}]
+              else: [{t: "describe"}]
+          - t: "left"
+          - pause: short
+      - with:
+          variables: [{Move2D: "'in'"}, {Child2D: "preceding-sibling::*[1]"}]
+          replace: [{x: ".."}]
+      - with:
+          variables: [{MatchCounter: "$MatchCounter + 1"}, {NavCommand: "'MovePreviousZoom'"}]
+          replace: [{x: "preceding-sibling::*[1]"}]
 
 - name: move-previous-default
   tag: "*"

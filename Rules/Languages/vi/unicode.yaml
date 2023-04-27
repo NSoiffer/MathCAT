@@ -196,7 +196,6 @@
  - "—": [T: gạch ngang]                             # 0x2014
  - "―": [T: gạch ngang dài]                      # 0x2015
  - "‖": [T: đường thẳng đứng kép]                # 0x2016
- - "•": [T: chấm]                              # 0x2022
  - "…":                                          # 0x2026
     test:
         if:
@@ -388,7 +387,6 @@
  - "∓": [T: trừ cộng]                       # 0x2213
  - "∗": [T: nhân]                               # 0x2217
  - "∘": [T: hàm hợp]                       # 0x2218
- - "∙": [T: nhân]                               # 0x2219
  - "√":                                          # 0x221a
    #  - test: 
     #     if: "$Verbosity!='Terse'"

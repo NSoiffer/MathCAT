@@ -133,7 +133,7 @@
 
 
   # --- Nemeth Default Characters math_symbols chars. ---
- - "\"": [t: "⠄⠄"]              # 0x22
+ - "\"": [t: "P⠄⠄"]              # 0x22
  - "#": [t: "⠨⠼"]               # 0x23
  - "$": [t: "⠈⠎"]               # 0x24
  - "%": [t: "⠈⠴"]               # 0x25
@@ -223,13 +223,9 @@
       - if: "self::m:mn"
         then: [t: "⠠"]
       - else_if: "ancestor-or-self::*[not(parent::m:mrow)][1][parent::m:msub or parent::m:msup or parent::m:msubsup or parent::m:mmultiscripts][preceding-sibling::*]"
-        then: [t: "⠪"]        # Rule 78
-        else: [t: ","]        # ',' used for matching purposes, converted to "⠠⠀"
- - "-":                         # 0x002D (Hyphen)  (0x2212 normalized to here)
-    - test:
-        if: "self::m:mtext"
-        then: [t: "P⠤"]
-        else: [t: "⠤"]
+        then: [t: "⠪"]         # Rule 78
+        else: [t: ","]         # ',' used for matching purposes, converted to "⠠⠀"
+ - "-": [t: "⠤"]               # 0x002D (Hyphen)  (0x2212 normalized to here) -- 38vi says don't use the punctuation indicator
 
  - ".":                          # 0x002E (Full stop or decimal pt)
       # '.' is particularly tricky because we need to know if it is really numeric or not.
@@ -246,7 +242,11 @@
               )"
           then: [t: "𝑁⠨"]      # example 8c(4) -- lone "." is not considered numeric, but not a period
           else: [t: "N⠨"]
-        else: [t: "P⠲"]         # period
+        else_test:
+          if: "preceding-sibling::*[1][@data-roman-numeral or
+                  (name(.)='mrow' and *[last()][@data-roman-numeral])]"
+          then: [t: "𝐏⠲"]
+          else: [t: "P⠲"]
  - "/": [t: "⠸⠌"]               # 0x002F (Solidus)
  - ":":                         # 0x003A (Colon)
         # sometimes a colon is meant to be a ratio
@@ -254,6 +254,10 @@
         # MathCAT doesn't have roles, so we do a hack that looks checks mrows if not atomic.
         # If an mrow, guess it is infix and checks the operator. This is pretty weak!
         # Need to rule out field extensions "[K:F]" and trilinear coordinates "a:b:c" as they use the punctuation form
+        # When using the punctuation form, there may or may not be a trailing spacing depending on the "print"
+        #   NFB Lesson 5.7 says "Follow print for spacing after the colon."
+        #   We can't normally tell spacing, but it *should* have a space in function mapping and set builder notation if the author used appropriate notation
+        #   The canonicalization code makes this guess and adds "data-space-after"
     - test:
         if: "not(IsBracketed(ancestor::*[2], '[', ']')) and
              not( preceding-sibling::*[2][text()=':'] or following-sibling::*[2][text()=':']) and 
@@ -261,7 +265,11 @@
              ( name(preceding-sibling::*[1]) != 'mrow' or
                (preceding-sibling::*[1]/*[2][text()] = following-sibling::*[1]/*[2][text()]) )"
         then: [t: "W⠐⠂W"]
-        else: [t: "P⠒W"]
+        else:
+        - t: "P⠒"
+        - test:
+            if: "@data-space-after or IsBracketed(ancestor::*[2], '{', '}') or following-sibling::*[1]/*[2][IsInDefinition(., 'Arrows')]" # "Arrows" is a bit broad...
+            then: [t: "W"]
  - ";": [t: "P⠆"]               # 0x003B (Semicolon)
  - "<": [t: "⠐⠅"]             # 0x003C (Less-than sign)
  - "=": [t: "⠨⠅"]             # 0x003D (Equals sign)
@@ -277,7 +285,7 @@
  - "|":                # 0x007C (Vertical line)
      - test:
         if: "preceding-sibling::* and following-sibling::*"
-        then: [t: "W⠳W"]        # comparison (e.g., such that -- rule 145)
+        then: [t: "w⠳w"]        # comparison (e.g., such that -- rule 145)
         else: [t: "⠳"]          # absolute value, others???
  - "}": [t: "⠨⠾"]               # 0x007D (Right curly bracket)
  - "~": [t: "⠈⠱"]               # 0x007E (Tilde)
@@ -293,30 +301,27 @@
  - "·": [t: "⠡"]                # 0x00B7 (Middle dot)
  - "×": [t: "⠈⠡"]               # 0x00D7 (Multiplication sign)
  - "÷": [t: "⠨⠌"]               # 0x00F7 (Division sign)
-      # rule 43b about spaces (references rule 42)
-      # tests are ugly because an invisible times might have been inserted and we need to skip that
  - "—": [t: "P⠤⠤"]               # 0x2014 (Em dash)
+      # rule 43b about spaces (references rule 42)
+      # dashes are 'mo's so no inserted invisible times between it and currency symbols
  - "―":                          # 0x2015 (Horizontal bar)
     - test:
         if:
-          - "preceding-sibling::* and"
           - "not("
-          - "  preceding-sibling::*[1][ "
-          - "    (text() != '\u2062' and (IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols') or IsInDefinition(., 'NemethCurrencyBeforeSymbols')) ) or "
-          - "    (text() = '\u2062' and preceding-sibling::* and "
-          - "       preceding-sibling::*[2][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols') or IsInDefinition(., 'NemethCurrencyBeforeSymbols')] "
-          - "    ) ] )"
+          - "  (not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols')]]) or"
+          - "  (preceding-sibling::*[1][IsInDefinition(., 'NemethCurrencyBeforeSymbols')])"
+          - ")"
         then: [t: "W"]
     - t: "⠤⠤⠤⠤"
     - test:
         if:
           - "not("
-          - "  following-sibling::* and "
-          - "  following-sibling::*[1][ "
-          - "    (text() != '\u2062' and (IsInDefinition(., 'NemethPunctAndOpenAfterSymbols') or IsInDefinition(., 'NemethCurrencyAfterSymbols'))) or "
-          - "    (text() = '\u2062' and following-sibling::* and "
-          - "       following-sibling::*[2][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols') or IsInDefinition(., 'NemethCurrencyAfterSymbols')] "
-          - "    ) ]  )"
+          - "  name(parent::*[1])='mrow' and ("
+          - "    (following-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols')]) or "
+          - "    (not(following-sibling::*) and parent::*[1][name(.)='mrow' and following-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols')]]) or "
+          - "    (following-sibling::*[1][text() = '\u2062'] and following-sibling::*[2][IsInDefinition(., 'NemethCurrencyAfterSymbols')])"
+          - "  )"
+          - ")"
         then: [t: "W"]
 
  - "…":                          # 0x2026 (Ellipsis)
@@ -325,23 +330,20 @@
     - test:
         if:
           - "not("
-          - "  preceding-sibling::* and "
-          - "  preceding-sibling::*[1][ "
-          - "    (text() != '\u2062' and (IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols') or IsInDefinition(., 'NemethCurrencyBeforeSymbols'))) or "
-          - "    (text() = '\u2062' and preceding-sibling::* and "
-          - "       preceding-sibling::*[2][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols') or IsInDefinition(., 'NemethCurrencyBeforeSymbols')] "
-          - "    ) ] )"
+          - "  (not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols')]]) or"
+          - "  (preceding-sibling::*[1][text() = '\u2062'] and preceding-sibling::*[2][IsInDefinition(., 'NemethCurrencyBeforeSymbols')])"
+          - ")"
         then: [t: "W"]
     - t: "⠄⠄⠄"
     - test:
         if:
           - "not("
-          - "  following-sibling::* and "
-          - "  following-sibling::*[1][ "
-          - "    (text() != '\u2062' and (IsInDefinition(., 'NemethPunctAndOpenAfterSymbols') or IsInDefinition(., 'NemethCurrencyAfterSymbols'))) or "
-          - "    (text() = '\u2062' and following-sibling::* and "
-          - "       following-sibling::*[2][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols') or IsInDefinition(., 'NemethCurrencyAfterSymbols')] "
-          - "    ) ]  )"
+          - "  name(parent::*[1])='mrow' and ("
+          - "    (following-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols')]) or "
+          - "    (not(following-sibling::*) and parent::*[1][name(.)='mrow' and following-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols')]]) or "
+          - "    (following-sibling::*[1][text() = '\u2062'] and following-sibling::*[2][IsInDefinition(., 'NemethCurrencyAfterSymbols')])"
+          - "  )"
+          - ")"
         then: [t: "W"]
  - "‰": [t: "`00"]
  - "′": [t: "⠄"]                # 0x2032 (Prime)
@@ -350,7 +352,7 @@
     # add a space if name doesn't have brackets after it or is in FunctionNames list 
     - test:
         if: "not(following-sibling::*[1][IsBracketed(., '', '')]) or preceding-sibling::*[1][IsInDefinition(BaseNode(.), 'FunctionNames')]" 
-        then: [t: "W"]
+        then: [t: "w"]      # follows a function name, so lowercase
  - "⁢": [t: ""]                  # 0x2062 -- what's right???  "⠈⠡" (times) is not right
  - "⁣":                         # 0x2063 (Invisible Comma -- treat like a normal comma when in a subscript[issue #40]) else ignore
     - test:

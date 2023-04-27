@@ -193,13 +193,11 @@
          if: "$MaybeAddSpaces"
          then:
             - test:
-               if: "preceding-sibling::* and 
-                    not(IsInDefinition(preceding-sibling::*[1], 'NemethPunctAndOpenBeforeSymbols'))" #Rule 151
+               if: "preceding-sibling::*"
                then: [t: "W"]
       - x: "text()"
       - test:
-         if: "$MaybeAddSpaces and following-sibling::* and 
-              not(IsInDefinition(following-sibling::*[1], 'NemethPunctAndOpenAfterSymbols'))" #Rule 151"
+         if: "$MaybeAddSpaces and following-sibling::*" 
          then: [t: "W"]
 
 -

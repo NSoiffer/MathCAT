@@ -256,7 +256,6 @@
  - "—": [t: "em dash"]                             # 0x2014
  - "―": [t: "horizontal bar"]                      # 0x2015
  - "‖": [t: "double vertical line"]                # 0x2016
- - "•": [t: "bullet"]                              # 0x2022
  - "…":                                          # 0x2026
     test:
         if:
@@ -411,7 +410,6 @@
  - "∓": [t: "minus or plus"]                       # 0x2213
  - "∗": [t: "times"]                               # 0x2217
  - "∘": [t: "composed with"]                       # 0x2218
- - "∙": [t: "times"]                               # 0x2219
  - "√":                                          # 0x221a
      - test: 
          if: "$Verbosity!='Terse'"

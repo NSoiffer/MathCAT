@@ -175,10 +175,10 @@ impl<'i> LexState<'i> {
             self.token = Token::None;
         } else if TERMINALS_AS_U8.contains(&self.remaining_str.as_bytes()[0]) {
             self.token = Token::Terminal(&self.remaining_str[..1]);
-            self.remaining_str = &self.remaining_str[1..].trim_start();
+            self.remaining_str = self.remaining_str[1..].trim_start();
         } else {
-            self.set_token(&self.remaining_str)?;
-            self.remaining_str = &self.remaining_str[self.token.as_str().len()..].trim_start(); 
+            self.set_token(self.remaining_str)?;
+            self.remaining_str = self.remaining_str[self.token.as_str().len()..].trim_start(); 
 }    
         return Ok(&self.token);
     }
@@ -254,9 +254,9 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
 
 const INTENT_PROPERTY: &str = "data-intent-property";
 
-fn get_properties<'b>(lex_state: &mut LexState<'b>) -> Result<String> {
+fn get_properties(lex_state: &mut LexState) -> Result<String> {
     // return the 'hint' leaving the state
-    assert!(matches!(lex_state.token, Token::Property(str) if str.starts_with(":")));
+    assert!(matches!(lex_state.token, Token::Property(str) if str.starts_with(':')));
     let mut properties = String::with_capacity(60);
     properties.push_str(lex_state.token.as_str());
     loop {
@@ -464,7 +464,6 @@ mod tests {
 
     #[test]
     fn silent_underscore_function() {
-        init_logger();
         let mathml = "<mrow intent='__-_(speak, this)'></mrow>";
         let intent = "<__-_ data-intent-property=':silent:'><mi>speak</mi><mi>this</mi></__-_>";
         assert!(test_intent(mathml, intent, "Error"));

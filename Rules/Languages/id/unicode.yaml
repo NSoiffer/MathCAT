@@ -249,7 +249,6 @@
 - "—": [T: em dash] # 0x2014
 - "―": [T: garis horizontal] # 0x2015
 - "‖": [T: garis vertikal ganda] # 0x2016
-- "•": [T: bullet] # 0x2022
 - "…": # 0x2026
     test:
       if:
@@ -441,7 +440,6 @@
 - "∓": [T: kurang tambah] # 0x2213
 - "∗": [T: kali] # 0x2217
 - "∘": [T: disusun dengan] # 0x2218
-- "⋅": [T: kali] # 0x2219
 - "√": # 0x221a
     - test:
         if: "$Verbosity!='Terse'"

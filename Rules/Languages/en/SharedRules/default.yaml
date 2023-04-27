@@ -158,8 +158,8 @@
       then:
       - with:
           variables:
-          - PreSubscript: "IfThenElse($Verbosity='Verbose', 'pre-subscript', 'pre-sub')"
-          - PreSuperscript: "IfThenElse($Verbosity='Verbose', 'pre-superscript', 'pre-super')"
+          - PreSubscript: "IfThenElse($Verbosity='Verbose', 'pre subscript', 'pre sub')"
+          - PreSuperscript: "IfThenElse($Verbosity='Verbose', 'pre superscript', 'pre super')"
           replace:
           - test: # only bother announcing if there is more than one prescript
               if: "count($Prescripts) > 2"

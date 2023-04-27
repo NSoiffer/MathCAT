@@ -347,7 +347,12 @@
  - "—": [t: "em dash"]                             # 0x2014
  - "―": [t: "horizontal bar"]                      # 0x2015
  - "‖": [t: "double vertical line"]                # 0x2016
- - "•": [t: "bullet"]                              # 0x2022
+ - "•":                                            # 0x2022
+    - test: 
+        if: "@data-chem-formula-op"
+        then: [t: "dot"]
+        else: [t: "bullet"]
+
  - "…":                                          # 0x2026
     test:
         if:
@@ -826,7 +831,12 @@
  - "∖": [t: "set minus"]                           # 0x2216
  - "∗": [t: "times"]                               # 0x2217
  - "∘": [t: "composed with"]                       # 0x2218
- - "∙": [t: "times"]                               # 0x2219
+ - "∙":                                            # 0x2219
+    - test: 
+        if: "@data-chem-formula-op"
+        then: [t: "dot"]
+        else: [t: "times"]
+
  - "√":                                          # 0x221a
      - test: 
          if: "$Verbosity!='Terse'"
@@ -1242,15 +1252,20 @@
  - "⋂": [t: "intersection"]                        # 0x22c2
  - "⋃": [t: "union"]                               # 0x22c3
  - "⋄": [t: "diamond operator"]                    # 0x22c4
- - "⋅": [t: "times"]                               # 0x22c5
+ - "⋅":                                             # 0x22c5
+    - test: 
+        if: "@data-chem-formula-op"
+        then: [t: "dot"]
+        else: [t: "times"]
+
  - "⋆": [t: "times"]                               # 0x22c6
  - "⋇": [t: "division times"]                      # 0x22c7
  - "⋈": [t: "bowtie"]                              # 0x22c8
  - "⋉":                                          # 0x22c9
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "is"]
-     - t: "the left normal factor semidirect product of"
+    - test: 
+        if: "$Verbosity!='Terse'"
+        then: [t: "is"]
+    - t: "the left normal factor semidirect product of"
  - "⋊":                                          # 0x22ca
      - test: 
          if: "$Verbosity!='Terse'"

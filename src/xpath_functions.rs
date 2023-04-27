@@ -333,7 +333,7 @@ impl IsNode {
 
 static MATHML_LEAF_NODES: phf::Set<&str> = phf_set! {
 	"mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph",
-    "annotation", "ci", "cn", "csymbol",    // content could be inside an annotation-xml (faster to allow here than to check lots of places)
+    "none", "annotation", "ci", "cn", "csymbol",    // content could be inside an annotation-xml (faster to allow here than to check lots of places)
 };
 
 

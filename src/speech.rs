@@ -1474,9 +1474,17 @@ impl fmt::Display for VariableDefinitions {
     }
 }
 
-#[derive(Debug)]
 struct VariableValues<'v> {
     defs: Vec<VariableValue<'v>>
+}
+
+impl<'v> fmt::Display for VariableValues<'v> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for value in &self.defs {
+            write!(f, "{}", value)?;
+        }
+        return write!(f, "\n");
+    }
 }
 
 impl VariableDefinitions {
@@ -1519,7 +1527,11 @@ struct ContextStack<'c> {
 
 impl<'c> fmt::Display for ContextStack<'c> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        return writeln!(f, " {} old_values", self.old_values.len());
+        writeln!(f, " {} old_values", self.old_values.len())?;
+        for values in &self.old_values {
+            write!(f, "  {}\n", values)?;
+        }
+        return write!(f, "\n");
     }
 }
 
@@ -1579,7 +1591,7 @@ impl<'c, 'r> ContextStack<'c> {
             // set the new value
             let new_value = match def.value.evaluate(&self.base, mathml) {
                 Ok(val) => val,
-                Err(_) => bail!(format!("Can't evaluate variable def for {}", def)),
+                Err(_) => bail!(format!("Can't evaluate variable def for {} with ContextStack {}", def, self)),
             };
             let qname = QName::new(def.name.as_str());
             self.base.set_variable(qname, new_value);

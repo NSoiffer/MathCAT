@@ -714,10 +714,11 @@
       if: "following-sibling::*[1][text()='+' or text()='-']" # a little lazy -- assumes chemistry superscripts end with + or -
       then: [{pause: medium}]
 
-- # Instead, we just deal with up to two prescripts and up to four postscripts (repeating blocks of similar code [UGLY!])
+-
+  # There currently is no way to do sub/super for n-ary number of args
+  # Instead, we just deal with up to two prescripts and up to four postscripts (repeating blocks of similar code [UGLY!])
   # This hopefully covers all reasonable cases...
   name: chemistry-scripts
-  # There currently is no way to do sub/super for n-ary number of args
   tag: [chemical-formula, chemical-nuclide]
   variables:
   # computing the number of postscripts is messy because of <mprescripts> being optionally present -- we use "mod" to get the count right
@@ -939,9 +940,9 @@
   - test:
     - if: "text()='→' or text()='⟶'"
       then_test:
-        if: "name(preceding-sibling::*[1]) = 'chemical-nuclide'"
-        then: [{t: "decays to"}]
-        else: [{t: "yields"}]
+        if: "$Verbosity='Terse'"
+        then: [{t: "forms"}]
+        else: [{t: "reacts to form"}]
     - else_if: "text()='⇌' or text()='⮖'"
       then: [{t: "is in equilibrium with"}]
     - else_if: "text()='⭴'"
