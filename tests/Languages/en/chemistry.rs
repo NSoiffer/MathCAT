@@ -114,6 +114,7 @@ fn ethylene_with_colon_bond() {
 
 #[test]
 fn beta_decay() {
+  init_logger();
   let expr = "<math>
       <mmultiscripts>
         <mtext>C</mtext>
@@ -140,11 +141,11 @@ fn beta_decay() {
       </mmultiscripts>
     </math>";
     test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse")], expr,
-      "14, 6, cap c; decays to, 14, 7, cap n; plus 0, negative 1, e,");
+      "14, 6, cap c; forms, 14, 7, cap n; plus 0, negative 1, e,");
     test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
-      "super 14, sub 6, cap c; decays to; super 14, sub 7, cap n; plus super 0, sub negative 1, e,");
+      "super 14, sub 6, cap c; reacts to form; super 14, sub 7, cap n; plus super 0, sub negative 1, e,");
     test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-      "superscript 14, subscript 6, cap c; decays to; superscript 14, subscript 7, cap n; plus, superscript 0, subscript negative 1, e,");
+      "superscript 14, subscript 6, cap c; reacts to form; superscript 14, subscript 7, cap n; plus, superscript 0, subscript negative 1, e,");
 }
 
 #[test]
@@ -404,11 +405,11 @@ fn mhchem_beta_decay() {
       </mrow>
     </math>";
     test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse")], expr,
-      "14, 6, cap c; decays to, 14, 7, cap n; plus 0, negative 1, e,");
+      "14, 6, cap c; forms, 14, 7, cap n; plus 0, negative 1, e,");
     test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
-      "super 14, sub 6, cap c; decays to; super 14, sub 7, cap n; plus super 0, sub negative 1, e,");
+      "super 14, sub 6, cap c; reacts to form; super 14, sub 7, cap n; plus super 0, sub negative 1, e,");
     test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-      "superscript 14, subscript 6, cap c; decays to; superscript 14, subscript 7, cap n; plus, superscript 0, subscript negative 1, e,");
+      "superscript 14, subscript 6, cap c; reacts to form; superscript 14, subscript 7, cap n; plus, superscript 0, subscript negative 1, e,");
 }
 
 #[test]
@@ -421,7 +422,7 @@ fn hcl_na_yields() {
       </mrow>
     </math>";
     test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-        "2, cap h, cap c l; plus 2 cap n eigh; yields; 2, cap n eigh, cap c l; plus cap h, subscript 2");
+        "2, cap h, cap c l; plus 2 cap n eigh; reacts to form; 2, cap n eigh, cap c l; plus cap h, subscript 2");
 }
 
 #[test]
@@ -556,7 +557,7 @@ fn mhchem_hcl_aq_etc() {
     </mrow>
   </math>";
   test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "2, cap h, cap c l, aqueous; plus, 2, cap n eigh, solid; yields; 2, cap n eigh, cap c l, aqueous; plus, cap h, 2, gas,");
+      expr, "2, cap h, cap c l, aqueous; plus, 2, cap n eigh, solid; forms; 2, cap n eigh, cap c l, aqueous; plus, cap h, 2, gas,");
 
 }
 
