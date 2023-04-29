@@ -133,19 +133,6 @@
 
 
   # --- Nemeth Default Characters math_symbols chars. ---
- - "\"": [t: "P⠄⠄"]              # 0x22
- - "#": [t: "⠨⠼"]               # 0x23
- - "$": [t: "⠈⠎"]               # 0x24
- - "%": [t: "⠈⠴"]               # 0x25
- - "&": [t: "⠸⠯"]               # 0x26
- - "+": [t: "⠬"]                # 0x2b
- - "/": [t: "⠸⠌"]               # 0x2f
- - "<": [t: "⠐⠅"]               # 0x3c
- - "=": [t: "⠨⠅"]               # 0x3d
- - ">": [t: "⠨⠂"]               # 0x3e
- - "@": [t: "⠈⠁"]               # 0x40
- - "\\": [t: "⠸⠡"]              # 0x5c
- - "^": [t: "⠸⠣"]               # 0x5e
  - "`": [t: "⠈"]                # 0x60
  - "≟": [t: "⠐⠨⠅⠣⠸⠦⠻"]          # 0x225f
  - "≠": [t: "⠌⠨⠅"]              # 0x2260
@@ -216,7 +203,13 @@
  - "(": [t: "⠷"]                # 0x28 (Left parenthesis)
  - ")": [t: "⠾"]                # 0x29 (Right parenthesis)
  - "*": [t: "⠈⠼"]               # 0x002A (Asterisk)
- - "+": [t: "⠬"]                # 0x002B (Plus sign)
+ - "+":                         # 0x002B (Plus sign)
+    - test:
+        # Add multipurpose indicator before prefix '+' to avoid being the same as '∓' 
+        if: "not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][name(.)='mo' and text()='-']]"
+        then: [t: "m⠬"]
+        else: [t: "⠬"]
+
  - ",":                         # 0x002C (Comma)
     - test:
           # test if first ancestor that isn't an mrow is a script tag (rule 78)
@@ -225,7 +218,12 @@
       - else_if: "ancestor-or-self::*[not(parent::m:mrow)][1][parent::m:msub or parent::m:msup or parent::m:msubsup or parent::m:mmultiscripts][preceding-sibling::*]"
         then: [t: "⠪"]         # Rule 78
         else: [t: ","]         # ',' used for matching purposes, converted to "⠠⠀"
- - "-": [t: "⠤"]               # 0x002D (Hyphen)  (0x2212 normalized to here) -- 38vi says don't use the punctuation indicator
+ - "-":                        # 0x002D (Hyphen)  (0x2212 normalized to here) -- 38vi says don't use the punctuation indicator
+    - test:
+        # Add multipurpose indicator before prefix '+' to avoid being the same as '±' or a dash
+        if: "not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][name(.)='mo' and (text()='+' or text()='-')]]"
+        then: [t: "m⠤"]
+        else: [t: "⠤"] 
 
  - ".":                          # 0x002E (Full stop or decimal pt)
       # '.' is particularly tricky because we need to know if it is really numeric or not.
