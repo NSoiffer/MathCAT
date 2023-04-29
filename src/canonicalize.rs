@@ -755,11 +755,16 @@ impl CanonicalizeContext {
 								return Some(result);
 							}
 						},
-						"…" => {mathml.set_text("…");},  // name might need to change -- checked below
+						"..." => {mathml.set_text("…");},  // name might need to change -- checked below
 						":" => {
 							if is_ratio(mathml) {
 								mathml.set_text("∶");	// ratio U+2236
 							}
+							return Some(mathml);
+						},
+						"|" | "||" => if let Some(result) = merge_vertical_bars(mathml) {
+							return Some(result);
+						} else {
 							return Some(mathml);
 						},
 						_ => (),
@@ -1290,6 +1295,52 @@ impl CanonicalizeContext {
 			})
 		}
 
+		/// Convert "||" to "‖", if in single element or in repeated 'mo's (but not "|x||y|" or "{x ||x|>0}")
+		fn merge_vertical_bars(leaf: Element) -> Option<Element> {
+			assert!(is_leaf(leaf));
+			let leaf_text = as_text(leaf);
+			if leaf_text == "||" {
+				leaf.set_text("‖");		// U+2016
+				return Some(leaf);
+			} else if leaf_text != "|" {
+				return None;
+			}
+			let following_siblings = leaf.following_siblings();
+			if following_siblings.is_empty() {
+				return None;
+			}
+
+			let following_sibling = as_element(following_siblings[0]);
+			if name(&following_sibling) != "mo" || as_text(following_sibling) != "|" {
+				return None
+			}
+
+			// have "||" -- if there a single "|" on left, rule out merge
+			let preceding_siblings = leaf.preceding_siblings();
+			if preceding_siblings.iter().find(|&&child| {
+				let child = as_element(child);
+				return name(&child) == "mo" && as_text(child) == "|";
+			}).is_some() {
+				return None;		// found "|" on left
+			}
+
+			if following_siblings.len() > 1 {
+				let following_siblings = &following_siblings[1..];
+				// if there are an odd number of "|"s to the right, rule out the merge
+				if following_siblings.iter().filter(|&&child| {
+					let child = as_element(child);
+					return name(&child) == "mo" && as_text(child) == "|";
+				}).count() % 2 == 1 {
+					return None;
+				}
+			}
+
+			// didn't find any
+			leaf.set_text("‖");		// U+2016
+			following_sibling.remove_from_parent();
+			return Some(leaf);
+		}
+
 		fn convert_mfenced_to_mrow(mfenced: Element) -> Element {
 			let open = mfenced.attribute_value("open").unwrap_or("(");
 			let close = mfenced.attribute_value("close").unwrap_or(")");
@@ -1478,6 +1529,10 @@ impl CanonicalizeContext {
 			// debug!("parent:\n{}", mml_to_string(&parent_mrow));
 			let mut i = 0;
 			while i < children.len() {
+				for (i_child, &child) in children.iter().enumerate() {
+					let child = as_element(child);
+					// debug!("child #{}: {}", i_child, mml_to_string(&child));
+				}
 				let child = as_element(children[i]);
 				let mut is_comma = false;
 				let mut is_decimal_pt = false;
@@ -1501,48 +1556,52 @@ impl CanonicalizeContext {
 						has_decimal_pt = is_decimal_pt;
 						if is_decimal_pt {
 							start = i - 1;
+							i += 1;		// already looked at this child
 						}
 					}
 	
 					let mut end = children.len();
-					for (j, sibling) in children[i+1..].iter().enumerate() {
-						let sibling = as_element(*sibling);
-						let sibling_name = name(&sibling);
-						if sibling_name != "mn" {
-							if sibling_name=="mo" || sibling_name=="mtext" {
-								// FIX: generalize to include locale ("." vs ",")
-								let leaf_text = as_text(sibling);
-								if !(leaf_text=="." || leaf_text=="," || leaf_text.trim().is_empty()) || 
-								   (leaf_text=="." && has_decimal_pt) {
+					if i < end {
+						for (j, sibling) in children[i+1..].iter().enumerate() {
+							let sibling = as_element(*sibling);
+							let sibling_name = name(&sibling);
+							if sibling_name != "mn" {
+								if sibling_name=="mo" || sibling_name=="mtext" {
+									// FIX: generalize to include locale ("." vs ",")
+									let leaf_text = as_text(sibling);
+									if !(leaf_text=="." || leaf_text=="," || leaf_text.trim().is_empty()) || 
+									   (leaf_text=="." && has_decimal_pt) {
+										end = start + j+1;
+										break;
+									} else if looking_for_separator {
+										is_comma = leaf_text == ",";
+										is_decimal_pt = leaf_text == ".";
+									} else {
+										is_comma = false;
+										is_decimal_pt = false;
+									}
+								} else {
 									end = start + j+1;
 									break;
-								} else if looking_for_separator {
-									is_comma = leaf_text == ",";
-									is_decimal_pt = leaf_text == ".";
-								} else {
-									is_comma = false;
-									is_decimal_pt = false;
 								}
-							} else {
-								end = start + j+1;
+							}
+							// debug!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
+									 i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
+							if !(looking_for_separator &&
+								 (sibling_name == "mtext" || is_comma || is_decimal_pt)) &&
+							   ( looking_for_separator ||
+									!(is_decimal_pt || is_digit_block(sibling) != DigitBlockType::None)) {
+								end = start + if is_decimal_pt {j+2} else {j+1};
 								break;
 							}
+							looking_for_separator = !looking_for_separator;
 						}
-						// debug!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
-						// 		 i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
-						if !(looking_for_separator &&
-							 (sibling_name == "mtext" || is_comma || is_decimal_pt)) &&
-						   ( looking_for_separator ||
-						   	 !(is_decimal_pt || is_digit_block(sibling) != DigitBlockType::None)) {
-							end = start + if is_decimal_pt {j+2} else {j+1};
-							break;
-						}
-						looking_for_separator = !looking_for_separator;
 					}
 					// debug!("start={}, end={}", start, end);
 					if is_likely_a_number(parent_mrow, children, start, end) {
 						merge_block(children, start, end);
-						// note: i..i+end has been collapsed, so just inc 'i' by one
+						// note: start..end has been collapsed, so restart after the collapsed part
+						i = start;
 					} else {
 						i = end-1;	// start looking at the end of the block we just rejected
 					}
@@ -1615,11 +1674,22 @@ impl CanonicalizeContext {
 
 
 		fn is_likely_a_number(mrow: Element, children: &[ChildOfElement], mut start: usize, mut end: usize) -> bool {
+			// Note: the children of math_or_mrow aren't valid ('children' represents the current state)
+
 			if count_decimal_pts(children, start, end) > 1 {
 				return false;
 			}
 
-			// debug!("is_likely_a_number: start/end={}/{} -- mrow:\n{}", start, end, mml_to_string(&mrow));
+			// {
+			// 	debug!("is_likely_a_number: start/end={}/{}", start, end);
+			// 	let mut i_child = start;
+			// 	for &child in &children[start..end] {
+			// 		let child = as_element(child);
+			// 		debug!("child# {}: {}", i_child, mml_to_string(&child));
+			// 		i_child += 1;
+			// 	}
+			// 	debug!("\n");
+			// }
 			// remove/don't include whitespace at the end
 			while end >= start+3 {
 				let child = as_element(children[end-1]);	// end is not inclusive
@@ -1729,12 +1799,15 @@ impl CanonicalizeContext {
 		/// Should merge: "1.2, 3.2, 5."
 		/// This assumes we have a potential number at start..end and validity will be determined elsewhere
 		fn is_decimal_a_period(math_or_mrow: Element, children: &[ChildOfElement], start: usize, end: usize) -> bool {
+			// Note: the children of math_or_mrow aren't valid ('children' represents the current state)
 			if end < math_or_mrow.children().len() {
 				return false;		// not at end
 			}
 			let parent = math_or_mrow.parent().unwrap().element();
 			if let Some(math) = parent {
-				return name(&math) != "math";		// mrow inside something else -- not at end
+				if name(&math) != "math" {
+					return false;			// mrow inside something else -- not at end
+				}
 			}
 
 			let last_child = as_element(children[end-1]);
@@ -2455,7 +2528,7 @@ impl CanonicalizeContext {
 				"_" | "\u{02C9}"| "\u{0304}"| "\u{0305}"| "\u{2212}" |
 				"\u{2010}" | "\u{2011}" | "\u{2012}" | "\u{2013}" | "\u{2014}" | "\u{2015}" => "\u{00AF}",
 				"\u{02BC}" => "`",
-				"\u{02DC}" => "~",
+				"\u{02DC}" | "\u{223C}" => "~",		// use ASCII for diacriticals
 				"\u{02C6}"| "\u{0302}" => "^",
 				"\u{0307}" => "\u{02D9}",	// Nemeth distinguishes this from "." -- \u{02D9} is generated for over dots by most generators
 				"\u{0308}" => "¨",
@@ -2470,7 +2543,9 @@ impl CanonicalizeContext {
 		} else {
 			mo_text = match mo_text {
 				"_"| "\u{02C9}"| "\u{0304}"| "\u{0305}" => "\u{00AF}",
+				"\u{02DC}" | "~"  => "\u{223C}",		// for base, use version with prefix and infix
 				"\u{01C1}" => "\u{2016}", // U+2016 is "‖"
+
 				_ => mo_text,
 			};
 		};
@@ -4202,6 +4277,37 @@ mod canonicalize_tests {
     }
 
     #[test]
+    fn double_vertical_bars() {
+    	let test_str = "<math><mrow><mo>||</mo><mi>x</mi><mo>||</mo><mo>||</mo><mi>y</mi><mo>||</mo></mrow></math>";
+		let target_str = "<math>
+			<mrow>
+				<mrow data-changed='added'><mo>‖</mo><mi>x</mi><mo>‖</mo></mrow>
+				<mo data-changed='added'>&#x2062;</mo>
+				<mrow data-changed='added'><mo>‖</mo><mi>y</mi><mo>‖</mo></mrow>
+			</mrow>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
+    fn double_vertical_bars_mo() {
+    	let test_str = "<math><mo>|</mo><mo>|</mo><mi>a</mi><mo>|</mo><mo>|</mo></math>";
+		let target_str = "<math><mrow data-changed='added'><mo>‖</mo><mi>a</mi><mo>‖</mo></mrow></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
+    fn no_double_vertical_bars_mo() {
+    	let test_str = "<math><mo>|</mo><mi>x</mi><mo>|</mo><mo>|</mo><mi>y</mi><mo>|</mo></math>";
+				let target_str = "<math>  <mrow data-changed='added'>
+				<mrow data-changed='added'><mo>|</mo><mi>x</mi><mo>|</mo></mrow>
+				<mo data-changed='added'>&#x2062;</mo>
+				<mrow data-changed='added'><mo>|</mo><mi>y</mi><mo>|</mo></mrow>
+			</mrow> </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+    #[test]
     fn vertical_bar_such_that() {
         let test_str = "<math>
 				<mo>{</mo><mi>x</mi><mo>|</mo><mi>x</mi><mo>&#x2208;</mo><mi>S</mi><mo>}</mo>
@@ -4749,6 +4855,28 @@ mod canonicalize_tests {
         let target_str = "<math><mrow data-changed='added'>
 				<mrow data-changed='added'><mn>1</mn><mo>,</mo><mn>3</mn><mo>,</mo><mn>5</mn></mrow><mo>.</mo>
 			</mrow></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn addition_decimal_pt() {
+        let test_str = "<math><mo>.</mo><mn>4</mn><mo>=</mo><mn>0</mn><mo>.</mo><mn>4</mn></math>";
+        let target_str = "<math><mrow data-changed='added'><mn>.4</mn><mo>=</mo><mn>0.4</mn></mrow></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn fraction_decimal_pt() {
+        let test_str = "<math><mfrac><mrow><mn>1</mn><mo>.</mo></mrow><mrow><mn>2</mn><mo>.</mo></mrow></mfrac></math>";
+        let target_str = "<math><mfrac><mn>1.</mn><mn>2.</mn></mfrac></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn fraction_decimal_pt_no_split() {
+		// don't split off the '.'
+        let test_str = "<math><mfrac><mn>1.</mn><mn>2.</mn></mfrac></math>";
+        let target_str = "<math><mfrac><mn>1.</mn><mn>2.</mn></mfrac></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
