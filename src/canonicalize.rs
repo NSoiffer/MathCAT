@@ -1529,10 +1529,10 @@ impl CanonicalizeContext {
 			// debug!("parent:\n{}", mml_to_string(&parent_mrow));
 			let mut i = 0;
 			while i < children.len() {
-				for (i_child, &child) in children.iter().enumerate() {
-					let child = as_element(child);
-					// debug!("child #{}: {}", i_child, mml_to_string(&child));
-				}
+				// for (i_child, &child) in children.iter().enumerate() {
+				// 	let child = as_element(child);
+				// 	debug!("child #{}: {}", i_child, mml_to_string(&child));
+				// }
 				let child = as_element(children[i]);
 				let mut is_comma = false;
 				let mut is_decimal_pt = false;
@@ -1586,7 +1586,7 @@ impl CanonicalizeContext {
 								}
 							}
 							// debug!("j/name={}/{}, looking={}, is ',' {}, '.' {}, ",
-									 i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
+							// 		 i+j, sibling_name, looking_for_separator, is_comma, is_decimal_pt);
 							if !(looking_for_separator &&
 								 (sibling_name == "mtext" || is_comma || is_decimal_pt)) &&
 							   ( looking_for_separator ||
