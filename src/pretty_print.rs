@@ -36,7 +36,7 @@ pub fn format_element(e: &Element, indent: usize) -> String {
                 .map(|c| if let ChildOfElement::Text(t) = c {t.text()} else {""})
                 .collect::<Vec<&str>>()
                 .join("");
-        return format!("{}{}</{}{}>\n", answer, &make_invisible_chars_visible(&content), namespace, e.name().local_part());
+        return format!("{}{}</{}{}>\n", answer, &handle_special_chars(&content), namespace, e.name().local_part());
         // for child in children {
         //     if let ChildOfElement::Text(t) = child {
         //         return format!("{}{}</{}{}>\n", answer, &make_invisible_chars_visible(t.text()), namespace, e.name().local_part());
@@ -60,19 +60,26 @@ pub fn format_element(e: &Element, indent: usize) -> String {
 pub fn format_attrs(attrs: &[Attribute]) -> String {
     let mut result = String::new();
     for attr in attrs {
-        result += format!(" {}='{}'", attr.name().local_part(), &make_invisible_chars_visible(attr.value())).as_str();
+        result += format!(" {}='{}'", attr.name().local_part(), &handle_special_chars(attr.value())).as_str();
     }
     result
 }
 
-fn make_invisible_chars_visible(text: &str) -> String {
-    return text.chars().map(|ch| {
-        if ('\u{2061}'..'\u{2064}').contains(&ch) {
-            return format!("&#x{:x};", ch as u32)
-        } else {
-            return ch.to_string();
-        }    
-    }).collect::<Vec<String>>().join("");
+fn handle_special_chars(text: &str) -> String {
+    return text.chars().map(|ch|
+        match ch {
+            '"' => "&quot;".to_string(),
+            '&' => "&amp;".to_string(),
+            '\'' => "&apos;".to_string(),
+            '<' => "&lt;".to_string(),
+            '>' => "&gt;".to_string(),
+            '\u{2061}' => "&#x2061;".to_string(),
+            '\u{2062}' => "&#x2062;".to_string(),
+            '\u{2063}' => "&#x2063;".to_string(),
+            '\u{2064}' => "&#x2064;".to_string(),
+            _ => ch.to_string(),
+        }
+    ).collect::<Vec<String>>().join("");
 }
 
 
