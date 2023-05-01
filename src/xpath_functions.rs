@@ -921,7 +921,11 @@ impl IsInDefinition {
         let mut args = Args(args);
         args.exactly(2)?;
         let set_name = args.pop_string()?;
-        let node = validate_one_node(args.pop_nodeset()?, "IsInDefinition")?;
+        let nodes = args.pop_nodeset()?;
+        if nodes.size() == 0 {
+            return Ok( Value::Boolean(false));      // trivially not in definition
+        }
+        let node = validate_one_node(nodes, "IsInDefinition")?;
         if let Node::Element(e) = node {
             return match IsInDefinition::is_defined_in(&e, &set_name) {
                 Ok(result) => Ok( Value::Boolean( result ) ),
