@@ -1435,6 +1435,9 @@ fn is_short_formula(mrow: Element) -> bool {
     }
 
     let first_element = convert_to_short_form( as_element(children[0]) );
+    if n_children == 1 {
+        return first_element.is_ok();
+    }
     let second_element = convert_to_short_form( as_element(children[if n_children == 2 {1} else {2}]) );
     return match (first_element, second_element) {
         (Ok(first), Ok(second)) => {
