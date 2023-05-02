@@ -767,7 +767,9 @@ impl CanonicalizeContext {
 						} else {
 							return Some(mathml);
 						},
-						_ => (),
+						_ => if let Some(split_element) = maybe_split_mo(mathml) {
+							return Some(split_element);
+						},
 					}
 				}
 
@@ -1341,6 +1343,29 @@ impl CanonicalizeContext {
 			return Some(leaf);
 		}
 
+		fn maybe_split_mo(mo: Element) -> Option<Element> {
+			lazy_static! {
+				static ref IS_MATH_CHARS: Regex = Regex::new(r"^[\p{Math}!%^&*-:]+$").unwrap(); 
+			}
+			
+			assert_eq!(name(&mo), "mo");
+			let text = as_text(mo);
+			let mut chars = text.chars();
+			chars.next();	// eat first char -- just want to know if there is a second char
+			if chars.next().is_none() || !IS_MATH_CHARS.is_match(text) {
+				return None;
+			}
+
+			debug!("maybe_split_mo: text={}", text);
+			let doc = mo.document();
+			let replacements = text.chars().map(|ch| {
+				let new_mo = create_mathml_element(&doc, "mo");
+				new_mo.set_text(&ch.to_string());
+				new_mo
+			}).collect::<Vec<Element>>();
+			return Some( replace_children(mo, replacements) );
+		}
+
 		fn convert_mfenced_to_mrow(mfenced: Element) -> Element {
 			let open = mfenced.attribute_value("open").unwrap_or("(");
 			let close = mfenced.attribute_value("close").unwrap_or(")");
@@ -1615,13 +1640,13 @@ impl CanonicalizeContext {
 		/// The returned (mrow) element reuses the arg so tree siblings links remain correct.
 		fn split_points(leaf: Element) -> Option<Element> {
 			lazy_static!{
-				static ref IS_UPPERCASE: Regex = Regex::new(r"^[A-Z]+$").unwrap(); 
+				static ref IS_UPPERCASE: Regex = Regex::new(r"^[A-Z]+$").unwrap();
 			}
 
 			if !IS_UPPERCASE.is_match(as_text(leaf)) {
 				return None;
 			}
-
+			
 			// check to see if there is a bar, arrow, etc over the letters (line-segment, arc, ...)
 			let parent = leaf.parent().unwrap().element().unwrap();
 			if name(&parent) == "mover" {
