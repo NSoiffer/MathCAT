@@ -239,13 +239,13 @@
           then:
              - test:
                   if: "substring(., string-length(.), 1)='\u00A0'"
-                  then: [x: "BrailleChars(., 'Nemeth', 2, string-length(.)-1)"]
-                  else: [x: "BrailleChars(., 'Nemeth', 2, string-length(.))"]
+                  then: [x: "BrailleChars(., 'Nemeth', 2, string-length(.))"]
+                  else: [x: "BrailleChars(., 'Nemeth', 2, string-length(.)+1)"]
           else:
              - test:
                   if: "substring(., string-length(.), 1)='\u00A0'"
-                  then: [x: "BrailleChars(., 'Nemeth', 1, string-length(.)-1)"]
-                  else: [x: "BrailleChars(., 'Nemeth', 1, string-length(.))"]
+                  then: [x: "BrailleChars(., 'Nemeth', 1, string-length(.))"]
+                  else: [x: "BrailleChars(., 'Nemeth', 1, string-length(.)+1)"]
 
 - name: default
   tag: mn
@@ -263,32 +263,72 @@
      - x: "text()"
      - t: "W"
 
+- # In Nemeth code "∼" can be a prefix *operator* or an infix comparison -- they have different spacing. We catch the prefix version here
+  # Note: ASCII "~" has been canonicalized to occur only in a diacritical position
+  name: prefix-tilde
+  tag: mo
+  match: "text()='∼' and not(preceding-sibling::*)"
+  replace:
+  - x: "text()"
+  - test:    # if there is a following tilde, it is buried in an mrow
+      if: "following-sibling::*[1][name(.)='mrow' and *[1][text()='∼']]"
+      then: [t: "m"]     # add multipurpose indicator (177_9)
+
+- # In the default rule below, we insert multipurpose indicators between chars -- don't do that for dashes (others???)
+  # Note: ASCII "~" has been canonicalized to occur only in a diacritical position
+  name: dashes
+  tag: mo
+  match: "translate(., '-', '')=''"
+  replace:
+  - x: "text()"
+
 - name: default
   tag:
      mo
      # add spaces around comparison operators,
      # but if "modified", they are moved outside of munder, etc, and handled by those rules
-  variables:
-     [
-        MaybeAddSpaces: "parent::*[self::m:mrow] and (IsInDefinition(., 'NemethComparisonOperators') or text()='∶')",  # "ratio" also gets spaced
-     ]
+     # need to insert multipurpose indicators between chars in multi-char mo (see NFB less 5.9.3)
+     # dashes are an exception (others???)
   match: "."
   replace:
-     - test:
-          if: "$MaybeAddSpaces"
+  - test:
+      if: "parent::*[self::m:mrow] and (IsInDefinition(substring(., 1, 1), 'NemethComparisonOperators') or text()='∶')"  # "ratio" also gets spaced"
+      then:
+          - test:   # NemethPunctAndOpenBeforeSymbols test is Rule 151, NemethComparisonOperators test is Rule 149 
+              if: "not( preceding-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols')] )"
+              then: [t: "w"]
+          - test:
+              if: "$NewScriptContext!=''" # Rule 79g
+              then: [x: "$NewScriptContext"]
+  - x: "BrailleChars(., 'Nemeth', 1, 2)"
+  - test:
+      # "insert:" doesn't work because "text()" returns a single text node. Potentially, that could be special cased in "insert"
+      # instead we do the ugly thing and pick off up to four chars and call it a day after that
+      if: "string-length(text()) > 1"
+      then:
+      - t: "m"
+      - x: "BrailleChars(., 'Nemeth', 2, 3)"
+      - test:
+          if: "string-length(text()) > 2"
           then:
-             - test:
-                  if: "preceding-sibling::* and
-                     not(IsInDefinition(preceding-sibling::*[1], 'NemethPunctAndOpenBeforeSymbols'))" #Rule 151
-                  then: [t: "w"]
-             - test:
-                  if: "$NewScriptContext!=''" # Rule 79g
-                  then: [x: "$NewScriptContext"]
-     - x: "BrailleChars(., 'Nemeth')"
-     - test:
-          if: "$MaybeAddSpaces and following-sibling::* and
-             not(IsInDefinition(following-sibling::*[1], 'NemethPunctAndOpenAfterSymbols'))" #Rule 151"
-          then: [t: "w"]
+          - t: "m"
+          - x: "BrailleChars(., 'Nemeth', 3, 4)"
+          - test:
+              if: "string-length(text()) > 3"
+              then:
+              - t: "m"
+              - x: "BrailleChars(., 'Nemeth', 4, 5)"
+              - test:
+                  if: "string-length(text()) > 4"
+                  then:
+                  - t: "m"
+                  - x: "BrailleChars(., 'Nemeth', 5, string-length(text())+1)"    # punt on the rest
+  - test:  # NemethPunctAndOpenAfterSymbols test is Rule 151, NemethComparisonOperators test is Rule 149 
+           # tilde test is a guess as to what is right -- all tildes and in a prefix location, don't treat as comparison operator
+      if: "parent::*[self::m:mrow] and (IsInDefinition(substring(., string-length(.), 1), 'NemethComparisonOperators') or text()='∶') and
+           not( translate(., '∼', '')='' and not(preceding-sibling::*) ) and
+           not( following-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols')] )"
+      then: [t: "w"]
 
 - name: remove-space
   tag: mtext

@@ -140,7 +140,7 @@
 
   # these come from SRE's ts\semantic_tree\semantic_attr.ts file
   NemethComparisonOperators: [
-    "=", "~", "⁼", "₌", "∼", "∽", "≃", "≅",  "≈",  "≊", "≋", "≌", "≍", "≎",
+    "=", "⁼", "₌", "∼", "∽", "≃", "≅",  "≈",  "≊", "≋", "≌", "≍", "≎",
     "≑", "≒", "≓", "≔", "≕", "≖", "≗", "≘",  "≙",  "≚", "≛", "≜", "≝", "≞",
     "≟", "≡", "≣", "⧤", "⩦", "⩮", "⩯", "⩰",  "⩱",  "⩲", "⩳", "⩴", "⩵", "⩶",
     "⩷", "⩸", "⋕", "⩭", "⩪", "⩫", "⩬", "﹦", "＝", "⩬", "⊜", "∷",
@@ -203,7 +203,7 @@
   # can't do 42(ii) which is braille indicators because they are not input (they are output) -- handle by regexp later
   # also used for comparison operators (Rule 151)
   NemethPunctAndOpenBeforeSymbols: [
-    "‘", "“",                                                       # punctuation -- 42(i)
+    "‘", "“", ",",                                                   # punctuation -- 42(i)
     "(", "[", "{", "⟨", "⟦", "⦃", "⟪", "⌈", "⌊",                      # 42(iii) open
   ],
 

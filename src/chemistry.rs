@@ -2513,7 +2513,6 @@ mod chem_tests {
     #[test]
     fn mhchem_isotopes() {
         // from \ce{^{18}O{}^{16}O}
-        init_logger();
         let test = "<math>
         <mrow>
           <msubsup>

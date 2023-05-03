@@ -33,7 +33,7 @@ use crate::canonicalize::{as_element, name};
 //   one for Element and one for ChildOfElement.
 
 // @returns {String} -- the text of the (leaf) element otherwise an empty string
-fn get_text_from_element(e: &Element) -> String {
+fn get_text_from_element(e: Element) -> String {
     if e.children().len() == 1 {
         if let ChildOfElement::Text(t) = e.children()[0] {
             return t.text().to_string();
@@ -47,7 +47,7 @@ fn get_text_from_element(e: &Element) -> String {
 fn get_text_from_COE(coe: &ChildOfElement) -> String {
     let element = coe.element();
     return match element {
-        Some(e) => get_text_from_element(&e),
+        Some(e) => get_text_from_element(e),
         None => "".to_string(),
     };
 }
@@ -158,7 +158,7 @@ impl IsNode {
             }
 
             // FIX: need to consult preference Fraction_Ordinal
-            if IsNode::is_common_fraction(elem, 10, 19) {
+            if IsNode::is_common_fraction(*elem, 10, 19) {
                 return true;
             }
             return false;
@@ -262,7 +262,7 @@ impl IsNode {
     }
     
     // returns true if the text of 'e' is in definitions.trig_function_names
-    fn is_trig_name(e: &Element) -> bool {
+    fn is_trig_name(e: Element) -> bool {
         if e.name().local_part() != "mi" {
             return false;
         }
@@ -276,12 +276,12 @@ impl IsNode {
 
     // Returns true if 'frac' is a common fraction
     // In this case, the numerator and denominator can be no larger than 'num_limit' and 'denom_limit'
-    fn is_common_fraction(frac: &Element, num_limit: usize, denom_limit: usize) -> bool {
+    fn is_common_fraction(frac: Element, num_limit: usize, denom_limit: usize) -> bool {
         lazy_static! {
             static ref ALL_DIGITS: Regex = Regex::new(r"\d+").unwrap();    // match one or more digits
         }
 
-        if !is_tag(frac, "mfrac") &&  !is_tag(frac, "fraction"){
+        if !is_tag(&frac, "mfrac") &&  !is_tag(&frac, "fraction"){
             return false;
         }
         let children = frac.children();
@@ -301,8 +301,8 @@ impl IsNode {
             return false
         };
 
-        let num = get_text_from_element(&num);
-        let denom = get_text_from_element(&denom);
+        let num = get_text_from_element(num);
+        let denom = get_text_from_element(denom);
         if num.is_empty() || denom.is_empty() {
             return false;
         }
@@ -315,7 +315,7 @@ impl IsNode {
         }
     }
 
-    fn is_punctuation(node:  &Element) -> bool {
+    fn is_punctuation(node:  Element) -> bool {
         lazy_static! {
             // list of chars from rule VI (p41) [various dashes are from Unicode, not green book]
             static ref PUNCTUATION: Regex = Regex::new(r"[':,–—―⸺⸻—…!\-.?‘’“”;']").unwrap();    // match one or more digits
@@ -380,9 +380,9 @@ impl Function for IsNode {
                                 "simple" => IsNode::is_simple(&e),
                                 "leaf"   => MATHML_LEAF_NODES.contains(name(&e)),
                                 "2D" => IsNode::is_2D(&e),
-                                "trig_name" => IsNode::is_trig_name(&e),
-                                "common_fraction" => IsNode::is_common_fraction(&e, usize::MAX, usize::MAX), 
-                                "nemeth_punctuation" => IsNode::is_punctuation(&e),
+                                "trig_name" => IsNode::is_trig_name(e),
+                                "common_fraction" => IsNode::is_common_fraction(e, usize::MAX, usize::MAX), 
+                                "nemeth_punctuation" => IsNode::is_punctuation(e),
                                 _        => true,       // can't happen due to check above
                             }    
                         } else {
@@ -578,7 +578,7 @@ impl Function for ToOrdinal {
         let node = validate_one_node(args.pop_nodeset()?, "ToOrdinal")?;
         return match node {
             Node::Text(t) =>  Ok( Value::String( ToOrdinal::convert(t.text(), false, false) ) ),
-            Node::Element(e) => Ok( Value::String( ToOrdinal::convert(&get_text_from_element(&e), false, false) ) ),
+            Node::Element(e) => Ok( Value::String( ToOrdinal::convert(&get_text_from_element(e), false, false) ) ),
             _   =>  Err( Error::ArgumentNotANodeset{actual: ArgumentType::String} ),
         }
     }
@@ -600,16 +600,16 @@ impl Function for ToCommonFraction {
         // FIX: should probably handle errors by logging them and then trying to evaluate any children
         let node = validate_one_node(args.pop_nodeset()?, "ToCommonFraction")?;
         if let Node::Element(frac) = node {
-            if !IsNode::is_common_fraction(&frac, usize::MAX, usize::MAX) {
+            if !IsNode::is_common_fraction(frac, usize::MAX, usize::MAX) {
                 return Err( Error::Other( format!("ToCommonFraction -- argument is not an 'mfrac': {}': ", mml_to_string(&frac))) );
             }
     
             // everything has been verified, so we can just get the pieces and ignore potential error results
             let children = frac.children();
             let num = children[0].element().unwrap();
-            let num =   get_text_from_element( &num );
+            let num =   get_text_from_element( num );
             let denom = children[1].element().unwrap();
-            let denom = get_text_from_element( &denom );
+            let denom = get_text_from_element( denom );
             let mut answer = num.clone() + " ";
             answer += &ToOrdinal::convert(&denom, true, num!="1");
             return Ok( Value::String( answer ) );    
@@ -679,7 +679,7 @@ struct IsLargeOp;
             }
             return DEFINITIONS.with(|definitions| {
                 let definitions = definitions.borrow();
-                let text = get_text_from_element(&e);
+                let text = get_text_from_element(e);
                 return Ok( Value::Boolean(definitions.get_hashset("LargeOperators").unwrap().get(&text).is_some()) );
             });
         } else {
@@ -888,25 +888,20 @@ impl IsBracketed {
 
 pub struct IsInDefinition;
 impl IsInDefinition {
-    fn is_defined_in(element: &Element, set_name: &str) -> Result<bool, Error> {
-        let text = get_text_from_element(element);
-        if text.is_empty() {
-            return Ok(false);
-        }
+    fn is_defined_in(test_str: &str, set_name: &str) -> Result<bool, Error> {
         return DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             if let Some(set) = definitions.get_hashset(set_name) {
-                return Ok( set.contains(&text) );
+                return Ok( set.contains(test_str) );
             }
             return Err( Error::Other( format!("\n  IsInDefinition: '{}' is not defined in definitions.yaml", set_name) ) );
-
         });
     }
 }
 
 /**
  * Returns true if the node is a bracketed expr with the indicated left/right chars
- * node -- node(s) to test
+ * element/string -- element (converted to string)/string to test
  * left -- string (like "[") or empty
  * right -- string (like "]") or empty
  * requires_comma - boolean, optional (check the top level of 'node' for commas
@@ -921,20 +916,33 @@ impl IsInDefinition {
         let mut args = Args(args);
         args.exactly(2)?;
         let set_name = args.pop_string()?;
-        let nodes = args.pop_nodeset()?;
-        if nodes.size() == 0 {
-            return Ok( Value::Boolean(false));      // trivially not in definition
-        }
-        let node = validate_one_node(nodes, "IsInDefinition")?;
-        if let Node::Element(e) = node {
-            return match IsInDefinition::is_defined_in(&e, &set_name) {
+        match &args[0] {
+            Value::String(str) => return match IsInDefinition::is_defined_in(&str, &set_name) {
                 Ok(result) => Ok( Value::Boolean( result ) ),
-                Err(e) => Err(e)
-            };
+                Err(e) => Err(e),
+            },
+            Value::Nodeset(nodes) => {
+                return if nodes.size() == 0 {
+                    Ok( Value::Boolean(false) )    // trivially not in definition
+                } else {
+                    let node = validate_one_node(nodes.clone(), "IsInDefinition")?;
+                    if let Node::Element(e) = node {
+                        let text = get_text_from_element(e);
+                        if text.is_empty() {
+                            Ok( Value::Boolean(false) )
+                        } else {
+                            match IsInDefinition::is_defined_in(&text, &set_name) {
+                                Ok(result) => Ok( Value::Boolean( result ) ),
+                                Err(e) => Err(e),
+                            }          
+                        }
+                    } else {
+                        Ok( Value::Boolean(false))       // trivially not in definition                    }
+                    }
+                }
+            },
+            _ => Err( Error::Other("IsInDefinition:: neither a node nor a string is passed for first argument".to_string()) ),
         }
-
-        // FIX: should having a non-element be an error instead??
-        return Ok( Value::Boolean(false) );
     }
 }
 
@@ -1014,7 +1022,7 @@ impl EdgeNode {
             let grandparent = parent.parent().unwrap().element().unwrap();
             if name(&grandparent) == "math" &&
                parent_name == "mrow" && parent.children().len() == 2 {      // right kind of mrow
-                let text = get_text_from_element( &as_element(parent.children()[1]) );
+                let text = get_text_from_element( as_element(parent.children()[1]) );
                 if text == "," || text == "." || text == ";" || text == "?" {
                     return Some(grandparent);
                 }

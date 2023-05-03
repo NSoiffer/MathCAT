@@ -261,7 +261,14 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         // The problem is that the numbers are hidden inside of mover -- this might be more general than rule 99_2.
         static ref DOTS_99_A_2: Regex = Regex::new(r"𝑁⠨mN").unwrap();
 
+        static ref REMOVE_SPACE_BEFORE_PUNCTUATION_151: Regex = 
+            Regex::new(r"w(P.[\u2800-\u28FF]?|[\u2800-\u28FF]?⠾)").unwrap();
+        static ref REMOVE_SPACE_AFTER_PUNCTUATION_151: Regex = 
+            Regex::new(r"(P.[\u2800-\u28FF]?|[\u2800-\u28FF]?⠷)w").unwrap();
+
         // Multipurpose indicator insertion
+        // 149 -- consecutive comparison operators have no space -- instead a multipurpose indicator is used (doesn't require a regex)
+
         // 177.2 -- add after a letter and before a digit (or decimal pt) -- digits will start with N
         static ref MULTI_177_2: Regex = 
             Regex::new(r"([Ll].)[N𝑁]").unwrap();
@@ -326,7 +333,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
 
-//   debug!("Before:  \"{}\"", raw_braille);
+  debug!("Before:  \"{}\"", raw_braille);
     // replacements might overlap at boundaries (e.g., whitespace) -- need to repeat
     let mut start = 0;
     let mut result = String::with_capacity(raw_braille.len()+ raw_braille.len()/4);  // likely upper bound
@@ -347,15 +354,19 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     // Remove blanks before and after braille indicators
     let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
     let result = REMOVE_SPACE_AFTER_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
-//   debug!("spaces:  \"{}\"", result);
+
+    let result = REMOVE_SPACE_BEFORE_PUNCTUATION_151.replace_all(&result, "$1");
+    let result = REMOVE_SPACE_AFTER_PUNCTUATION_151.replace_all(&result, "$1");
+  debug!("spaces:  \"{}\"", result);
 
     let result = DOTS_99_A_2.replace_all(&result, "N⠨mN");
 
     // Multipurpose indicator
+    let result = result.replace("ww", "m"); // 149
     let result = MULTI_177_2.replace_all(&result, "${1}m${2}");
     let result = MULTI_177_3.replace_all(&result, "${1}m$2");
     let result = MULTI_177_5.replace_all(&result, "${1}m$2");
-//   debug!("MULTI:   \"{}\"", result);
+  debug!("MULTI:   \"{}\"", result);
 
     let result = NUM_IND_9A.replace_all(&result, "${start}${minus}n");
     let result = NUM_IND_9C.replace_all(&result, "${1}${2}n");
@@ -1392,7 +1403,7 @@ impl BrailleChars {
                 _ => "R",       // normal and unknown
             },
         };
-        let text = BrailleChars::substring(as_text(*node), text_range);
+        let text = BrailleChars::substring(as_text(*node), &text_range);
         let braille_chars = crate::speech::braille_replace_chars(&text, *node).unwrap_or_else(|_| "".to_string());
         // debug!("Nemeth chars: text='{}', braille_chars='{}'", &text, &braille_chars);
         
@@ -1453,7 +1464,7 @@ impl BrailleChars {
         }
     
         let math_variant = node.attribute_value("mathvariant");
-        let text = BrailleChars::substring(as_text(*node), text_range);
+        let text = BrailleChars::substring(as_text(*node), &text_range);
         let braille_chars = crate::speech::braille_replace_chars(&text, *node).unwrap_or_else(|_| "".to_string());
 
         if math_variant.is_none() {         // nothing we need to do
@@ -1555,7 +1566,7 @@ impl BrailleChars {
     }
 
     /// Extract the `char`s from `str` within `range` (these are chars, not byte offsets)
-    fn substring(str: &str, text_range: Option<Range<usize>>) -> String {
+    fn substring(str: &str, text_range: &Option<Range<usize>>) -> String {
         return match text_range {
             None => str.to_string(),
             Some(range) => str.chars().skip(range.start).take(range.end - range.start).collect(),
@@ -1581,8 +1592,8 @@ impl Function for BrailleChars {
             };
 
             let range = if args.len() == 4 {
-                let end = args.pop_number()? as usize;   // non-inclusive at end
-                let start = args.pop_number()? as usize - 1;    // adjust to 0-based
+                let end = args.pop_number()? as usize - 1;      // non-inclusive at end, 0-based
+                let start = args.pop_number()? as usize - 1;    // inclusive at start, a 0-based
                 Some(start..end)
             } else {
                 None

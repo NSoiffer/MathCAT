@@ -1360,6 +1360,60 @@ fn identity_matrix_126_linearize() {
 }
 
 #[test]
+fn multipurpose_134_1() {
+    let expr = "<math><mo>+</mo><mn>2</mn><mo>-</mo><mo>+</mo><mn>3</mn></math>";
+    test_braille("Nemeth", expr, "⠬⠆⠤⠐⠬⠒");
+}
+
+#[test]
+fn plus_minus_134_4() {
+    let expr = "<math><mi>x</mi><mo>&#xB1;</mo><mi>y</mi></math>";
+    test_braille("Nemeth", expr, "⠭⠬⠤⠽");
+}
+
+#[test]
+fn multipurpose_lesson_5_2_3() {
+    let expr = "<math><mn>10</mn><mo>+</mo><mo>-</mo><mn>5</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠂⠴⠬⠐⠤⠢");
+}
+
+#[test]
+fn multipurpose_lesson_5_2_4() {
+    let expr = "<math><mn>10</mn><mo>-</mo><mo>+</mo><mn>5</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠂⠴⠤⠐⠬⠢");
+}
+
+#[test]
+fn multipurpose_lesson_5_2_5() {
+    let expr = "<math><mn>10</mn><mo>-</mo><mo>-</mo><mn>5</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠂⠴⠤⠐⠤⠢");
+}
+
+#[test]
+fn tilde_137_2() {
+    let expr = "<math><mo>∼</mo><mi>p</mi><mo>∨</mo><mo>∼</mo><mi>q</mi><mo>∨</mo><mo>∼</mo><mi>r</mi></math>";
+    test_braille("Nemeth", expr, "⠈⠱⠏⠈⠬⠈⠱⠟⠈⠬⠈⠱⠗");
+}
+
+#[test]
+fn tilde_137_3() {
+    let expr = "<math><mo>~</mo><mo>~</mo><mi>T</mi><mo>&#x2228;</mo><mi>R</mi></math>";
+    test_braille("Nemeth", expr, "⠈⠱⠐⠈⠱⠠⠞⠈⠬⠠⠗");
+}
+
+#[test]
+fn tilde_137_3_mathjax() {
+    let expr = "<math><mo>∼∼</mo><mi>T</mi><mo>∨</mo><mi>R</mi></math>";
+    test_braille("Nemeth", expr, "⠈⠱⠐⠈⠱⠠⠞⠈⠬⠠⠗");
+}
+
+#[test]
+fn tilde_144_1() {
+    let expr = "<math><mi>x</mi><mo>∼</mo><mi>y</mi></math>";
+    test_braille("Nemeth", expr, "⠭⠀⠈⠱⠀⠽");
+}
+
+#[test]
 fn set_vertical_bar_145_1() {
     let expr = "<math><mo>{</mo><mi>x</mi><mo>|</mo><mo>|</mo><mi>x</mi><mo>|</mo><mo>&lt;</mo><mn>10</mn><mo>}</mo></math>";
     test_braille("Nemeth", expr, "⠨⠷⠭⠀⠳⠀⠳⠭⠳⠀⠐⠅⠀⠼⠂⠴⠨⠾");
@@ -1424,7 +1478,7 @@ fn comparison_ops_151_14() {
 
 #[test]
 fn no_space_comparison_151_16() {
-    let expr = "<math><mo>(</mo><mo>&#x3C;</mo><mo>,</mo><mo>=</mo><mo>,</mo><mo>&#x3E;</mo><mo>)</mo></math>";
+    let expr = "<math><mo>(</mo><mo>&lt;</mo><mo>,</mo><mo>=</mo><mo>,</mo><mo>&gt;</mo><mo>)</mo></math>";
     test_braille("Nemeth", expr, "⠷⠐⠅⠠⠀⠨⠅⠠⠀⠨⠂⠾");
 }
 
@@ -1504,9 +1558,70 @@ fn multipurpose_177_5_1() {
 }
 
 #[test]
+fn multipurpose_177_5_4() {
+    let expr = "<math><mn>3.</mn><mo>+</mo><mn>.4</mn><mo>=</mo><mn>3.4</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠒⠨⠐⠬⠨⠲⠀⠨⠅⠀⠼⠒⠨⠲");
+}
+
+#[test]
+fn multipurpose_177_5_5() {
+    let expr = "<math><mo>(</mo><mn>3.</mn><mo>)</mo></math>";
+    test_braille("Nemeth", expr, "⠷⠒⠨⠐⠾");
+}
+
+#[test]
+fn multipurpose_177_5_6() {
+    let expr = "<math><mfrac><mn>1.</mn><mn>2.</mn></mfrac></math>";
+    test_braille("Nemeth", expr, "⠹⠂⠨⠐⠌⠆⠨⠐⠼");
+}
+
+#[test]
 fn multipurpose_177_7_1() {
     let expr = "<math><mrow><mo>|</mo><mi>x</mi><mo>|</mo></mrow><mrow><mo>|</mo><mi>y</mi><mo>|</mo></mrow></math>";
     test_braille("Nemeth", expr, "⠳⠭⠳⠐⠳⠽⠳");
+}
+
+#[test]
+fn multipurpose_177_7_2() {
+    let expr = "<math><mrow><mo>‖</mo><mi>x</mi><mo>‖</mo></mrow><mrow><mo>‖</mo><mi>y</mi><mo>‖</mo></mrow></math>";
+    test_braille("Nemeth", expr, "⠳⠳⠭⠳⠳⠐⠳⠳⠽⠳⠳");
+}
+
+#[test]
+fn multipurpose_177_7_9() {
+    let expr = "<math><mo>∼</mo><mo>∼</mo><mi>T</mi></math>";
+    test_braille("Nemeth", expr, "⠈⠱⠐⠈⠱⠠⠞");
+}
+
+#[test]
+fn no_multipurpose_lesson_5_2_6() {
+    let expr = "<math><mo>-</mo><mn>10</mn><mo>+</mo><mo>+</mo><mn>5</mn></math>";
+    test_braille("Nemeth", expr, "⠤⠼⠂⠴⠬⠬⠢");
+}
+
+#[test]
+fn multipurpose_lesson_5_9_1_1() {
+    let expr = "<math><mi>n</mi><mo>&gt;</mo><mo>&lt;</mo><mn>1</mn></math>";
+    test_braille("Nemeth", expr, "⠝⠀⠨⠂⠐⠐⠅⠀⠼⠂");
+}
+
+#[test]
+fn multipurpose_lesson_5_9_2_1() {
+    let expr = "<math><mi>n</mi><mo>&lt;</mo><mo>&gt;</mo><mn>1</mn></math>";
+    test_braille("Nemeth", expr, "⠝⠀⠐⠅⠐⠨⠂⠀⠼⠂");
+}
+
+#[test]
+fn multipurpose_lesson_5_9_2_2() {
+    let expr = "<math><mi>n</mi><mo>&lt;</mo><mo>=</mo><mo>&gt;</mo><mn>1</mn></math>";
+    test_braille("Nemeth", expr, "⠝⠀⠐⠅⠐⠨⠅⠐⠨⠂⠀⠼⠂");
+}
+
+#[test]
+fn multipurpose_lesson_5_9_3() {
+    init_logger();
+    let expr = "<math><mi>y</mi><mo>:=</mo><mn>7</mn><mi>x</mi><mo>+</mo><mn>2</mn></math>";
+    test_braille("Nemeth", expr, "⠰⠽⠸⠒⠐⠨⠅⠀⠼⠶⠭⠬⠆");
 }
 
 #[test]

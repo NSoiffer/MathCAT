@@ -168,7 +168,18 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr="
-  <math><mn>10</mn><mo>+</mo><mo>-</mo><mn>5</mn></math>
+  <math><mi>C</mi><mo>=</mo>
+        <mrow><mo>{</mo>
+        <mrow>
+        <mrow><mi mathvariant=\"bold\">y</mi></mrow></mrow><mo>:</mo><mi>G</mi>
+        <mrow>
+        <mrow><mi mathvariant=\"bold\">x</mi></mrow></mrow><mo>=</mo>
+        <mrow>
+        <mrow><mi mathvariant=\"bold\">y</mi></mrow></mrow><mtext>for</mtext>
+        <mrow>
+        <mrow><mi mathvariant=\"bold\">x</mi></mrow></mrow><mo>∈<!-- ∈ --></mo><msubsup>
+        <mrow>
+        <mrow><mi mathvariant=\"double-struck\">Z</mi></mrow></mrow><mn>2</mn><mi>k</mi></msubsup><mo>}</mo></mrow></math>
       ";
 
 //   let expr = "
