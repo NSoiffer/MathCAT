@@ -1348,6 +1348,30 @@ fn function_space_119_c_3() {
 }
 
 #[test]
+fn brace_above_121_1() {
+    let expr = "<math><mover><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>&#x23DE;</mo></mover></math>";
+    test_braille("Nemeth", expr, "⠐⠭⠬⠽⠣⠨⠷⠻");
+}
+
+#[test]
+fn brace_below_121_2() {
+    let expr = "<math><munder><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>&#x23DF;</mo></munder></math>";
+    test_braille("Nemeth", expr, "⠐⠭⠬⠽⠩⠨⠾⠻");
+}
+
+#[test]
+fn bracket_above_121_3() {
+    let expr = "<math><mover><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>&#x23B4;</mo></mover></math>";
+    test_braille("Nemeth", expr, "⠐⠭⠬⠽⠣⠈⠷⠻");
+}
+
+#[test]
+fn racket_below_121_4() {
+    let expr = "<math><munder><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>&#x23B5;</mo></munder></math>";
+    test_braille("Nemeth", expr, "⠐⠭⠬⠽⠩⠈⠾⠻");
+}
+
+#[test]
 fn identity_matrix_126_linearize() {
     // see https://github.com/NSoiffer/MathCAT/issues/43 for discussion on linear layout
     let expr = "<math> <mrow><mo>(</mo> <mtable>
