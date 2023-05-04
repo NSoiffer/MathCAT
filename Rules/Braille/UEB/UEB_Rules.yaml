@@ -73,6 +73,27 @@
    - x: "*[2]"
    - t: "1⠾"
 
+-
+   #GTM 14.3.3 (not sure what else vertical juxtaposition applies to)
+   name: binomial-frac
+   tag: mrow
+   match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][@linethickness=0]"
+   replace: 
+   - x: "*[1]"
+   - x: "*[2]/*[1]"
+   - t: "⠰⠻"
+   - x: "*[2]/*[2]"
+   - x: "*[3]"
+
+- name: binomial-table
+  tag: mrow
+  match: "IsBracketed(., '(', ')') and *[2][self::m:mtable][count(*)=2 and count(*[1])=1] and contains(@intent, 'binomial(')"
+  replace:
+     - x: "*[1]"
+     - x: "DEBUG(*[2]/*[1]/*[1]/*[1])"
+     - t: "⠰⠻"
+     - x: "*[2]/*[2]/*[1]/*[1]"
+     - x: "*[3]"
 
 #
 # Matrix/Determinant rules
@@ -147,18 +168,6 @@
    replace: [x: "*"]
 
 -
-   #GTM 14.3.3 (not sure what else vertical juxtaposition applies to)
-   name: binomial-frac
-   tag: mrow
-   match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][@linethickness=0]"
-   replace: 
-   - x: "*[1]"
-   - x: "*[2]/*[1]"
-   - t: "⠰⠻"
-   - x: "*[2]/*[2]"
-   - x: "*[3]"
-
--
     name: empty-mrow
     tag: mrow
     match: "not(*)"
@@ -216,24 +225,24 @@
       - test:
          if: "substring(., string-length(.), 1)='\u00A0'"
          then:
-         - x: "BrailleChars(., 'UEB', 2, string-length(.)-1)"
+         - x: "BrailleChars(., 'UEB', 2, string-length(.))"
          - test:
             if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
             then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
             else: [t: "W"]
          else:
-         - x: "BrailleChars(., 'UEB', 2, string-length(.))"
+         - x: "BrailleChars(., 'UEB', 2, string-length(.)+1)"
       else:
       - test:
          if: "substring(., string-length(.), 1)='\u00A0'"
          then:
-         - x: "BrailleChars(., 'UEB', 1, string-length(.)-1)"
+         - x: "BrailleChars(., 'UEB', 1, string-length(.))"
          - test:
             if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
             then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
             else: [t: "W"]
          else:
-         - x: "BrailleChars(., 'UEB', 1, string-length(.))"
+         - x: "BrailleChars(., 'UEB', 1, string-length(.)+1)"
 
 -
    name: default
