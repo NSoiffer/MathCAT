@@ -1053,6 +1053,20 @@ fn binomial_14_3_3_2() {
 }
 
 #[test]
+fn binomial_14_3_3_2_mtable() {
+    init_logger();
+    let expr = "<math><mrow intent='binomial($n,$r)'>
+            <mo>(</mo>
+                <mtable>
+                <mtr><mtd><mi arg='n'>n</mi></mtd></mtr>
+                <mtr><mtd><mi arg='r'>r</mi></mtd></mtr>
+                </mtable>
+            <mo>)</mo>
+        </mrow></math>";
+    test_braille("UEB", expr, "⠐⠣⠝⠰⠻⠗⠐⠜");
+}
+
+#[test]
 fn chem_16_2_8() {
     let expr = "<math><mi>Ca</mi><msub><mrow><mo>(</mo><mi>OH</mi><mo>)</mo></mrow><mn>2</mn></msub></math>";
     // Acceptable: GTM does not use a G1 start indicator: "⠠⠉⠁⠐⠣⠠⠕⠠⠓⠐⠜⠰⠢⠼⠃"

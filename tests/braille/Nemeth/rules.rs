@@ -1146,6 +1146,20 @@ fn binomial_90_1() {
 }
 
 #[test]
+fn binomial_90_1_mtable() {
+    // intent name not finalized -- may change
+    let expr = "<math><mrow intent='binomial($n,$k)'>
+            <mo>(</mo>
+                <mtable>
+                <mtr><mtd><mi arg='n'>n</mi></mtd></mtr>
+                <mtr><mtd><mi arg='k'>k</mi></mtd></mtr>
+                </mtable>
+            <mo>)</mo>
+        </mrow></math>";
+    test_braille("Nemeth", expr, "⠷⠝⠩⠅⠾");
+}
+
+#[test]
 fn modifier_in_script_91_1() {
     let expr = "<math><msub><mi>A</mi><mover><mi>x</mi><mo>~</mo></mover></msub></math>";
     test_braille("Nemeth", expr, "⠠⠁⠰⠐⠭⠣⠈⠱⠻");
@@ -1643,7 +1657,6 @@ fn multipurpose_lesson_5_9_2_2() {
 
 #[test]
 fn multipurpose_lesson_5_9_3() {
-    init_logger();
     let expr = "<math><mi>y</mi><mo>:=</mo><mn>7</mn><mi>x</mi><mo>+</mo><mn>2</mn></math>";
     test_braille("Nemeth", expr, "⠰⠽⠸⠒⠐⠨⠅⠀⠼⠶⠭⠬⠆");
 }
