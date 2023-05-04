@@ -765,7 +765,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
             let mut i = 0;      // chars starts on the 4th char
             while i < chars.len() {
                 let ch = chars[i];
-                if ch == '1' {
+                if ch == '1' && !is_forced_grade1(&chars, i) {
                     if found_g1 {
                         return false;
                     }
