@@ -168,19 +168,25 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr="
-  <math><mi>C</mi><mo>=</mo>
-        <mrow><mo>{</mo>
-        <mrow>
-        <mrow><mi mathvariant=\"bold\">y</mi></mrow></mrow><mo>:</mo><mi>G</mi>
-        <mrow>
-        <mrow><mi mathvariant=\"bold\">x</mi></mrow></mrow><mo>=</mo>
-        <mrow>
-        <mrow><mi mathvariant=\"bold\">y</mi></mrow></mrow><mtext>for</mtext>
-        <mrow>
-        <mrow><mi mathvariant=\"bold\">x</mi></mrow></mrow><mo>∈<!-- ∈ --></mo><msubsup>
-        <mrow>
-        <mrow><mi mathvariant=\"double-struck\">Z</mi></mrow></mrow><mn>2</mn><mi>k</mi></msubsup><mo>}</mo></mrow></math>
-      ";
+  <math>
+  <mrow displaystyle='true' data-changed='added'>
+  <mrow data-changed='added'>
+    <mn>23</mn>
+    <mo data-changed='added'>&#x2062;</mo>
+    <mi>a</mi>
+  </mrow>
+  <mo>+</mo>
+  <mi>a</mi>
+  <mi>b</mi>
+  <mo>+</mo>
+  <mrow data-changed='added'>
+    <mn>3</mn>
+    <mo data-changed='added'>&#x2062;</mo>
+    <mi>x</mi>
+  </mrow>
+</mrow>
+</math>
+       ";
 
 //   let expr = "
 //   <math display='block'>
@@ -226,7 +232,7 @@ fn main() {
   }
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
-  set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
+  set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),

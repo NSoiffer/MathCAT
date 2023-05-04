@@ -33,7 +33,7 @@ use crate::canonicalize::{as_element, create_mathml_element, set_mathml_name, na
 ///
 /// A string is returned in call cases.
 /// If there is an error, the speech string will indicate an error.
-pub fn intent_from_mathml<'a, 'm>(mathml: Element<'a>, doc: Document<'m>) -> Result<Element<'m>> {
+pub fn intent_from_mathml<'m>(mathml: Element, doc: Document<'m>) -> Result<Element<'m>> {
     let intent_tree = intent_rules(&INTENT_RULES, doc, mathml)?;
     doc.root().append_child(intent_tree);
     return Ok(intent_tree);
@@ -48,7 +48,7 @@ pub fn overview_mathml(mathml: Element) -> Result<String> {
 }
 
 
-fn intent_rules<'c, 'm>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, doc: Document<'m>, mathml: Element<'c>) -> Result<Element<'m>> {
+fn intent_rules<'m>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, doc: Document<'m>, mathml: Element) -> Result<Element<'m>> {
     SpeechRules::update();
     rules.with(|rules| {
         rules.borrow_mut().read_files()?;
@@ -1483,7 +1483,7 @@ impl<'v> fmt::Display for VariableValues<'v> {
         for value in &self.defs {
             write!(f, "{}", value)?;
         }
-        return write!(f, "\n");
+        return writeln!(f);
     }
 }
 
@@ -1529,9 +1529,9 @@ impl<'c> fmt::Display for ContextStack<'c> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, " {} old_values", self.old_values.len())?;
         for values in &self.old_values {
-            write!(f, "  {}\n", values)?;
+            writeln!(f, "  {}", values)?;
         }
-        return write!(f, "\n");
+        return writeln!(f);
     }
 }
 
@@ -1615,7 +1615,7 @@ impl<'c, 'r> ContextStack<'c> {
 }
 
 
-fn yaml_to_value<'a, 'b>(yaml: &'a Yaml) -> Value<'b> {
+fn yaml_to_value<'b>(yaml: &Yaml) -> Value<'b> {
     return match yaml {
         Yaml::String(s) => Value::String(s.clone()),
         Yaml::Boolean(b)  => Value::Boolean(*b),

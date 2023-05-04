@@ -1334,8 +1334,8 @@ impl Function for NemethNestingChars {
  * @param(char) -- char (string) that should be repeated
  * Note: as a side effect, an attribute with the value so repeated calls to this or a child will be fast
  */
- fn evaluate<'c, 'd>(&self,
-                        _context: &context::Evaluation<'c, 'd>,
+ fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
                         -> StdResult<Value<'d>, XPathError>
     {
@@ -1581,8 +1581,8 @@ impl Function for BrailleChars {
      * @param(char) -- char (string) that should be repeated
      * Note: as a side effect, an attribute with the value so repeated calls to this or a child will be fast
      */
-     fn evaluate<'c, 'd>(&self,
-                            _context: &context::Evaluation<'c, 'd>,
+     fn evaluate<'d>(&self,
+                            _context: &context::Evaluation<'_, 'd>,
                             args: Vec<Value<'d>>)
                             -> StdResult<Value<'d>, XPathError>
         {

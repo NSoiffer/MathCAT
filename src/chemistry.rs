@@ -45,6 +45,7 @@ use crate::xpath_functions::IsBracketed;
 use phf::{phf_map, phf_set};
 use std::convert::TryInto;
 use std::collections::HashSet;
+use std::cmp::Ordering;
 use crate::errors::*;
 
 
@@ -862,21 +863,25 @@ fn likely_chem_formula(mathml: Element) -> isize {
             for child in mrow.children() {
                 let child = as_element(child);
                 let likely = likely_chem_formula(child);
-                if likely > 0 {
-                    likelihood += likely + last_was_likely_formula;
-                    last_was_likely_formula = 1;
-                } else if likely == 0 {
-                    if name(&child) == "mo" {
-                        let text = as_text(child);
-                        if text != "\u{2062}" && text != "\u{2063}" {   // one of these, we don't change the status
-                            last_was_likely_formula = 0;
+                match likely.cmp(&0) {
+                    Ordering::Greater => { 
+                        likelihood += likely + last_was_likely_formula;
+                        last_was_likely_formula = 1;
+                    },
+                    Ordering::Less => {
+                        // debug!("in likely_chem_formula: FALSE: likelihood={}, child\n{}", likelihood, mml_to_string(&child));
+                        is_chem_formula = false;
+                        last_was_likely_formula = 0;
+                        likelihood += likely;
+                    },
+                    Ordering::Equal => {
+                        if name(&child) == "mo" {
+                            let text = as_text(child);
+                            if text != "\u{2062}" && text != "\u{2063}" {   // one of these, we don't change the status
+                                last_was_likely_formula = 0;
+                            }
                         }
-                    }
-                } else {
-                    // debug!("in likely_chem_formula: FALSE: likelihood={}, child\n{}", likelihood, mml_to_string(&child));
-                    is_chem_formula = false;
-                    last_was_likely_formula = 0;
-                    likelihood += likely;
+                    },
                 }
                 // debug!("in likely_chem_formula likelihood={}, child\n{}", likelihood, mml_to_string(&child));
                 // debug!("likelihood={} (likely={})", likelihood, likely);

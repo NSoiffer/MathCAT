@@ -1317,10 +1317,10 @@ impl CanonicalizeContext {
 
 			// have "||" -- if there a single "|" on left, rule out merge
 			let preceding_siblings = leaf.preceding_siblings();
-			if preceding_siblings.iter().find(|&&child| {
+			if preceding_siblings.iter().any(|&child| {
 				let child = as_element(child);
 				return name(&child) == "mo" && as_text(child) == "|";
-			}).is_some() {
+			}) {
 				return None;		// found "|" on left
 			}
 
@@ -1700,6 +1700,7 @@ impl CanonicalizeContext {
 			}
 
 			// if space added after ',' or '.', then not a number
+			#[allow(clippy::needless_range_loop)]
 			for i_child in start..end {
 				let child = as_element(children[i_child]);
 				if child.attribute(SPACE_AFTER).is_some() {
@@ -1709,8 +1710,9 @@ impl CanonicalizeContext {
 
 			let decimal_at_start = count_decimal_pts(children, start, start+1) == 1;
 			// decimal_at_start => none at end
-			let decimal_at_end = !(decimal_at_start || count_decimal_pts(children, end-1, end) == 0) &&
-									   !is_decimal_a_period(mrow, children, end-1, end);
+			let decimal_at_end = !( decimal_at_start ||
+										  count_decimal_pts(children, end-1, end) == 0 ||
+										  is_decimal_a_period(mrow, children, end-1, end) );
 			// be a little careful about merging the numbers	
 			if end - start < 3 {
 				// need at least digit separator digit-block unless it starts or ends with a decimal point
@@ -2164,11 +2166,11 @@ impl CanonicalizeContext {
 			}
 
 			// base very likely after multiple scripts to the right
-			for i_base in i+1..mrow_children.len() {
-				if is_child_simple_base(mrow_children[i_base]) {
+			for (i_base, &child) in mrow_children.iter().enumerate().skip(i+1) {
+				if is_child_simple_base(child) {
 						return i_base;
 				} else {
-					let child = as_element(mrow_children[i_base]);
+					let child = as_element(child);
 					let child_name = name(&child);
 					if !(child_name == "msub" || child_name == "msup" || child_name == "msubsup") {
 						break;

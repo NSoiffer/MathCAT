@@ -351,8 +351,8 @@ pub fn is_leaf(element: Element) -> bool {
 impl Function for IsNode {
     // eval function for IsNode
     // errors happen for wrong number/kind of arg
-    fn evaluate<'c, 'd>(&self,
-                        _context: &context::Evaluation<'c, 'd>,
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
@@ -568,8 +568,8 @@ impl ToOrdinal {
 
 impl Function for ToOrdinal {
     // convert a node to an ordinal number
-    fn evaluate<'c, 'd>(&self,
-                        _context: &context::Evaluation<'c, 'd>,
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
@@ -589,8 +589,8 @@ struct ToCommonFraction;
 
 impl Function for ToCommonFraction {
     // convert a node to a common fraction (if the numerator and denominator are within given limits)
-    fn evaluate<'c, 'd>(&self,
-                        _context: &context::Evaluation<'c, 'd>,
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
@@ -627,8 +627,8 @@ struct Min;
  */
  impl Function for Min {
 
-    fn evaluate<'c, 'd>(&self,
-                        _context: &context::Evaluation<'c, 'd>,
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
@@ -644,8 +644,8 @@ struct Max;
 
 impl Function for Max {
 
-    fn evaluate<'c, 'd>(&self,
-                        _context: &context::Evaluation<'c, 'd>,
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
@@ -665,8 +665,8 @@ struct IsLargeOp;
  */
  impl Function for IsLargeOp {
 
-    fn evaluate<'c, 'd>(&self,
-                        _context: &context::Evaluation<'c, 'd>,
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
@@ -710,8 +710,8 @@ struct BaseNode;
  }
  impl Function for BaseNode {
 
-    fn evaluate<'c, 'd>(&self,
-                        _context: &context::Evaluation<'c, 'd>,
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
@@ -732,8 +732,8 @@ struct BaseNode;
 
 struct IfThenElse;
  impl Function for IfThenElse {
-    fn evaluate<'c, 'd>(&self,
-                        _context: &context::Evaluation<'c, 'd>,
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
@@ -760,8 +760,8 @@ struct Debug;
  */
  impl Function for Debug {
 
-    fn evaluate<'c, 'd>(&self,
-                        _context: &context::Evaluation<'c, 'd>,
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
@@ -858,8 +858,8 @@ impl IsBracketed {
  */
 // 'requiresComma' is useful for checking parenthesized expressions vs function arg lists and other lists
  impl Function for IsBracketed {
-    fn evaluate<'c, 'd>(&self,
-                        _context: &context::Evaluation<'c, 'd>,
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
@@ -908,8 +908,8 @@ impl IsInDefinition {
  */
 // 'requiresComma' is useful for checking parenthesized expressions vs function arg lists and other lists
  impl Function for IsInDefinition {
-    fn evaluate<'c, 'd>(&self,
-                        _context: &context::Evaluation<'c, 'd>,
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
@@ -917,7 +917,7 @@ impl IsInDefinition {
         args.exactly(2)?;
         let set_name = args.pop_string()?;
         match &args[0] {
-            Value::String(str) => return match IsInDefinition::is_defined_in(&str, &set_name) {
+            Value::String(str) => return match IsInDefinition::is_defined_in(str, &set_name) {
                 Ok(result) => Ok( Value::Boolean( result ) ),
                 Err(e) => Err(e),
             },
@@ -976,8 +976,8 @@ impl DistanceFromLeaf {
  * treat2D_elements_as_tokens -- (bool) 2D notations such as fractions are treated like leaves 
  */
 impl Function for DistanceFromLeaf {
-    fn evaluate<'c, 'd>(&self,
-                        _context: &context::Evaluation<'c, 'd>,
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
@@ -1000,7 +1000,7 @@ impl Function for DistanceFromLeaf {
 pub struct EdgeNode;
 impl EdgeNode {
     // Return the root of the ancestor tree if we are at the left/right side of a path from that to 'element'
-    fn edge_node<'a, 'b>(element: Element<'a>, use_left_side: bool, stop_node_name: &'b str) -> Option<Element<'a>> {
+    fn edge_node<'a>(element: Element<'a>, use_left_side: bool, stop_node_name: &str) -> Option<Element<'a>> {
         let element_name = name(&element);
         if element_name == "math" {
             return Some(element);
@@ -1046,8 +1046,8 @@ impl EdgeNode {
 // 		   returns original node match isn't found
 //  Note: if stopNodeName=="math", then punctuation is taken into account since it isn't really part of the math
 impl Function for EdgeNode {
-    fn evaluate<'c, 'd>(&self,
-                        _context: &context::Evaluation<'c, 'd>,
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
