@@ -33,3 +33,5 @@ src/errors.rs
 src/pattern.pest
 src/read_speech_rules.rs
 src/rules.pest
+
+.vs
