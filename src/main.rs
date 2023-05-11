@@ -168,25 +168,8 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr="
-  <math>
-  <mrow displaystyle='true' data-changed='added'>
-  <mrow data-changed='added'>
-    <mn>23</mn>
-    <mo data-changed='added'>&#x2062;</mo>
-    <mi>a</mi>
-  </mrow>
-  <mo>+</mo>
-  <mi>a</mi>
-  <mi>b</mi>
-  <mo>+</mo>
-  <mrow data-changed='added'>
-    <mn>3</mn>
-    <mo data-changed='added'>&#x2062;</mo>
-    <mi>x</mi>
-  </mrow>
-</mrow>
-</math>
-       ";
+  <math><mi>a</mi><mo>+</mo><mo>&#x22EF;</mo><mo>+</mo><mi>b</mi></math>
+         ";
 
 //   let expr = "
 //   <math display='block'>
