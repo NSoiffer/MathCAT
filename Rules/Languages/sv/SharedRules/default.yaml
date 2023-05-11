@@ -1,0 +1,529 @@
+---
+#default rules shared among several speech rules
+- name: default
+  tag: math
+  match: "."
+  replace:
+  - with:
+      variables:
+      - ClearSpeak_Fractions: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Fractions='Auto', 'EndFrac', $ClearSpeak_Fractions)"
+      - ClearSpeak_AbsoluteValue: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_AbsoluteValue='Auto', 'AbsEnd', $ClearSpeak_AbsoluteValue)"
+      - ClearSpeak_Roots: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Roots='Auto', 'RootEnd', $ClearSpeak_Roots)"
+      replace:
+      - test:
+          if: "$MathRate = 100"
+          then: [x: "*"]
+          else:
+          - rate:
+              value: "$MathRate"
+              replace: [x: "*"]
+
+- name: empty-mrow
+  tag: mrow
+  match: "not(*)"
+  replace:
+  - t: " " # say nothing -- placeholder
+
+- name: default
+  tag: mrow
+  match: "."
+  replace:
+  - insert:
+      nodes: "*"
+      replace: [pause: auto]
+
+- name: default
+  tag: mn
+  match: "."
+  replace:
+  - bookmark: "@id"
+  # FIX: removing the digit block separators is likely locale dependent
+  - x: "translate(., ' ,`', '')"   # remove digit block separators
+
+- name: default
+  tag: [mo, mtext]
+  match: "."
+  replace:
+  - bookmark: "@id"
+  - x: "text()"
+
+- name: default
+  tag: mi
+  match: "."
+  replace:
+  - bookmark: "@id"
+  - test:
+      if: "string-length(.) = 1 and text() != '_'"       # need unicode.tdl to kick in for single letter tokens
+      then: [x: "text()"]
+      else: [x: "translate(., '-_', '  ')" ]   # from intent literals
+
+- name: default
+  tag: ms
+  match: "."
+  replace:
+  - t: "the string"
+  - pause: short
+  - x: "text()"
+
+- name: default
+  tag: mstyle
+  match: "."
+  replace: [x: "*"]
+
+- name: simple-sub
+  tag: particular-value-of
+  # invisible comma -- want "x sub 1 1" without "end sub"
+  match: "count(*)=2 and (IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][text()='⁣']])"
+  replace:
+  - x: "*[1]"
+  - test:
+      if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
+      then: [t: "sub"]
+  - x: "*[2]"
+
+- name: default
+  tag: particular-value-of
+  match: "count(*)=2"
+  replace:
+  - x: "*[1]"
+  - t: "sub"
+  - x: "*[2]"
+  - t: "end sub"
+  - pause: short
+
+- name: default
+  tag: msubsup
+  match: "."
+  replace:
+  - x: "*[1]"
+  - t: sub
+  - x: "*[2]"
+  - t: "raised to the"
+  - x: "*[3]"
+  - t: power
+- name: default
+  tag: munder
+  match: "."
+  replace:
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [t: "modified"]
+  - x: "*[1]"
+  - t: "with"
+  - x: "*[2]"
+  - t: below
+
+- name: default
+  tag: mover
+  match: "."
+  replace:
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [t: "modified"]
+  - x: "*[1]"
+  - t: "with"
+  - x: "*[2]"
+  - t: "above"
+
+- name: default
+  tag: munderover
+  match: "."
+  replace:
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [t: "modified"]
+  - x: "*[1]"
+  - t: "with"
+  - x: "*[2]"
+  - t: "below and"
+  - x: "*[3]"
+  - t: "above"
+
+- name: default
+  #   Here we support up to 2 prescripts and up to 4 postscripts -- that should cover all reasonable cases
+  #   If there are more, we just dump them out without regard to sup/super :-(
+  # FIX: this could use more special cases 
+  # There is (currently) no way in MathCAT to deal with n-ary arguments other than "all" ('*') or an individual entry ('*[1]').
+  tag: mmultiscripts
+  match: "."
+  variables:
+  # computing the number of postscripts is messy because of <mprescripts> being optionally present -- we use "mod" to get the count right
+  - Prescripts: "m:mprescripts/following-sibling::*"
+  - NumChildren: "count(*)" # need to stash this since the count is wrong inside '*[...]' below
+  - Postscripts: "*[position()>1 and position() < (last() + ($NumChildren mod 2) -count($Prescripts))]"
+  replace:
+  - x: "*[1]"
+  - test:
+      if: "$Prescripts" # more common case
+      then:
+      - with:
+          variables:
+          - PreSubscript: "IfThenElse($Verbosity='Verbose', 'pre subscript', 'pre sub')"
+          - PreSuperscript: "IfThenElse($Verbosity='Verbose', 'pre superscript', 'pre super')"
+          replace:
+          - test: # only bother announcing if there is more than one prescript
+              if: "count($Prescripts) > 2"
+              then:
+              - t: "with"
+              - x: "count($Prescripts) div 2"
+              - t: "prescripts"
+              - pause: short
+          - test:
+              if: "not($Prescripts[1][self::m:none])"
+              then:
+              - x: "$PreSubscript"
+              - x: "$Prescripts[1]"
+          - test:
+              if: "not($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none])"
+              then: [t: "and"]
+          - test:
+              if: "not($Prescripts[2][self::m:none])"
+              then:
+              - x: "$PreSuperscript"
+              - x: "$Prescripts[2]"
+          - pause: short
+          - test:
+              if: "count($Prescripts) > 2" # more common case
+              then:
+              - test:
+                  if: "not($Prescripts[3][self::m:none])"
+                  then:
+                  - x: "$PreSubscript"
+                  - x: "$Prescripts[3]"
+              - test:
+                  if: "not($Prescripts[3][self::m:none] or $Prescripts[4][self::m:none])"
+                  then: [t: "and"]
+              - test:
+                  if: "not($Prescripts[4][self::m:none])"
+                  then:
+                  - x: "$PreSuperscript"
+                  - x: "$Prescripts[4]"
+              - test:
+                  if: "count($Prescripts) > 4" # give up and just dump them out so at least the content is there
+                  then:
+                  - t: "and alternating prescripts"
+                  - x: "$Prescripts[position() > 4]"
+                  - t: "end prescripts"
+  - test:
+      if: "$Postscripts"
+      then:
+      - with:
+          variables:
+          - PostSubscript: "IfThenElse($Verbosity='Verbose', 'subscript', 'sub')"
+          - PostSuperscript: "IfThenElse($Verbosity='Verbose', 'superscript', 'super')"
+          replace:
+          - test: # only bother announcing if there is more than one postscript
+              if: "count($Postscripts) > 2"
+              then:
+              - test:
+                  if: "$Prescripts"
+                  then: [t: "and"]
+              - t: "with"
+              - x: "count($Postscripts) div 2"
+              - t: "postscripts"
+              - pause: short
+          - test:
+              if: "not($Postscripts[1][self::m:none])"
+              then:
+              - x: "$PostSubscript"
+              - x: "$Postscripts[1]"
+          - test:
+              if: "not($Postscripts[1][self::m:none] or $Postscripts[2][self::m:none])"
+              then: [t: "and"]
+          - test:
+              if: "not($Postscripts[2][self::m:none])"
+              then:
+              - x: "$PostSuperscript"
+              - x: "$Postscripts[2]"
+          - test:
+              if: "count($Postscripts) > 2"
+              then:
+              - test:
+                  if: "not($Postscripts[3][self::m:none])"
+                  then:
+                  - x: "$PostSubscript"
+                  - x: "$Postscripts[3]"
+              - test:
+                  if: "not($Postscripts[3][self::m:none] or $Postscripts[4][self::m:none])"
+                  then: [t: "and"]
+              - test:
+                  if: "not($Postscripts[4][self::m:none])"
+                  then:
+                  - x: "$PostSuperscript"
+                  - x: "$Postscripts[4]"
+              - test:
+                  if: "count($Postscripts) > 4"
+                  then:
+                  - test:
+                      if: "not($Postscripts[5][self::m:none])"
+                      then:
+                      - x: "$PostSubscript"
+                      - x: "$Postscripts[5]"
+                  - test:
+                      if: "not($Postscripts[5][self::m:none] or $Postscripts[6][self::m:none])"
+                      then: [t: "and"]
+                  - test:
+                      if: "not($Postscripts[6][self::m:none])"
+                      then:
+                      - x: "$PostSuperscript"
+                      - x: "$Postscripts[6]"
+                  - test:
+                      if: "count($Postscripts) > 6"
+                      then:
+                      - test:
+                          if: "not($Postscripts[7][self::m:none])"
+                          then:
+                          - x: "$PostSubscript"
+                          - x: "$Postscripts[7]"
+                      - test:
+                          if: "not($Postscripts[7][self::m:none] or $Postscripts[8][self::m:none])"
+                          then: [t: "and"]
+                      - test:
+                          if: "not($Postscripts[8][self::m:none])"
+                          then:
+                          - x: "$PostSuperscript"
+                          - x: "$Postscripts[8]"
+                      - test:
+                          if: "count($Postscripts) > 8" # give up and just dump them out so at least the content is there
+                          then:
+                          - t: "and alternating scripts"
+                          - x: "$Postscripts[position() > 8]"
+                          - t: "end scripts"
+
+- name: default
+  tag: mtable
+  variables: [IsColumnSilent: false()]
+  match: "."
+  replace:
+  - t: "table with"
+  - x: count(*)
+  - test:
+      if: count(*)=1
+      then: [t: "row"]
+      else: [t: "rows"]
+  - t: and
+  - x: "count(*[1]/*)"
+  - test:
+      if: "count(*[1]/*)=1"
+      then: [t: "column"]
+      else: [t: "columns"]
+  - pause: long
+  - x: "*"
+
+- name: default
+  # callers/context should do that.
+  # this may get called from navigation -- in that case, there is no context to speak the row #, so don't do it
+  tag: mtr
+  match: "."
+  replace:
+  - x: "*"
+
+- name: default
+  tag: mtd
+  match: "."
+  replace:
+  - t: "column"
+  - x: "count(preceding-sibling::*)+1"
+  - pause: medium
+  - x: "*" # speak the entry
+  - pause: long
+
+- name: empty-box
+  # The ordering below is the order in which words come out when there is more than one value
+  # Note: @notation can contain more than one value
+  tag: menclose
+  match: "@notation='box' and *[self::m:mtext and text()=' ']"
+  replace:
+  - t: "empty box"
+
+- name: default
+  # The ordering below is the order in which words come out when there is more than one value
+  # Note: @notation can contain more than one value
+  tag: menclose
+  match: "."
+  replace:
+  - test:
+      if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
+      then: [t: "box", pause: short]
+  - test:
+      if: ".[contains(@notation,'roundedbox')]"
+      then: [t: "round box", pause: short]
+  - test:
+      if: ".[contains(@notation,'circle')]"
+      then: [t: "circle", pause: short]
+  - test:
+      if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or contains(concat(' ', normalize-space(@notation), ' '), ' right ') or contains(@notation,'top') or contains(@notation,'bottom') ]"
+      then:
+      - t: line on
+      - test:
+          if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
+          then: [t: "left", pause: short]
+      - test:
+          if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"
+          then: [t: "right", pause: short]
+      - test:
+          if: ".[contains(@notation,'top')]"
+          then: [t: "top", pause: short]
+      - test:
+          if: ".[contains(@notation,'bottom')]"
+          then: [t: "bottom", pause: short]
+  - test:
+      if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
+      then:
+      - test:
+          if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
+          then: [spell: "'x'", pause: short] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+          else:
+          - test:
+              if: ".[contains(@notation,'updiagonalstrike')]"
+              then: [t: "up diagonal", pause: short]
+          - test:
+              if: ".[contains(@notation,'downdiagonalstrike')]"
+              then: [t: "down diagonal", pause: short]
+      - test:
+          if: ".[contains(@notation,'verticalstrike')]"
+          then: [t: "vertical", pause: short]
+      - test:
+          if: ".[contains(@notation,'horizontalstrike')]"
+          then: [t: "horizontal", pause: short]
+      - t: cross out
+      - pause: short
+  - test:
+      if: ".[contains(@notation,'uparrow')]"
+      then: [t: "up arrow", pause: short]
+  - test:
+      if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
+      then: [t: "down arrow", pause: short]
+  - test:
+      if: ".[contains(@notation,'leftarrow')]"
+      then: [t: "left arrow", pause: short]
+  - test:
+      if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
+      then: [t: "right arrow", pause: short]
+  - test:
+      if: ".[contains(@notation,'northeastarrow')]"
+      then: [t: "northeast arrow", pause: short]
+  - test:
+      if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
+      then: [t: "southeast arrow", pause: short]
+  - test:
+      if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
+      then: [t: "southwest arrow", pause: short]
+  - test:
+      if: ".[contains(@notation,'northwestarrow')]"
+      then: [t: "northwest arrow", pause: short]
+  - test:
+      if: ".[contains(@notation,'updownarrow')]"
+      then: [t: "double ended vertical arrow", pause: short]
+  - test:
+      if: ".[contains(@notation,'leftrightarrow')]"
+      then: [t: "double ended horizontal arrow", pause: short]
+  - test:
+      if: ".[contains(@notation,'northeastsouthwestarrow')]"
+      then: [t: "double ended up diagonal arrow", pause: short]
+  - test:
+      if: ".[contains(@notation,'northwestsoutheastarrow')]"
+      then: [t: "double ended down diagonal arrow", pause: short]
+  - test:
+      if: ".[contains(@notation,'actuarial')]"
+      then: [t: "actuarial symbol", pause: short]
+  - test:
+      if: ".[contains(@notation,'madrub')]"
+      then: [t: "arabic factorial symbol", pause: short]
+  - test:
+      if: ".[contains(@notation,'phasorangle')]"
+      then: [t: "phasor angle", pause: short]
+  - test:
+      if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']" # default
+      then: [t: "long division symbol", pause: short]
+  - test:
+      if: ".[contains(@notation,'radical')]"
+      then: [t: "square root", pause: short]
+  - t: enclosing
+  - test:
+      if: "*[self::m:mtext and text()=' ']"
+      then: [t: "space"]     # otherwise there is complete silence
+      else: [x: "*"]
+  - test:
+      if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
+      then: [t: end enclosure]
+  - pause: short
+
+- name: semantics
+  tag: "semantics"
+  match: "*[@encoding='MathML-Presentation']"
+  replace:
+  - x: "*[@encoding='MathML-Presentation']/*[1]"
+
+- name: semantics-default
+  tag: "semantics"
+  match: .
+  replace:
+  - x: "*[1]"
+
+- name: apply-function
+  tag: "apply-function"
+  match: .
+  replace:
+  - x: "*[1]"
+  - t: "applied to"
+  - x: "*[2]"
+
+
+# Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
+- name: silent-intent
+  # uncaught intent -- speak as arg1 arg2 ....
+  tag: "*"
+  match: "contains(@data-intent-property, ':silent:') and count(*)>0"
+  replace:
+  - x: "*"
+
+- name: prefix-intent
+  # uncaught intent -- speak as arg1 arg2 ....
+  tag: "*"
+  match: "contains(@data-intent-property, ':prefix:') and count(*)>0"
+  replace:
+  - x: "translate(name(.), '-_', '  ')"
+  - x: "*"
+  - pause: short
+
+- name: postfix-intent
+  # uncaught intent -- speak as arg1 arg2 ....
+  tag: "*"
+  match: "contains(@data-intent-property, ':postfix:') and count(*)>0"
+  replace:
+  - pause: short
+  - x: "*"
+  - x: "translate(name(.), '-_', '  ')"
+
+
+- name: infix-intent
+  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  tag: "*"
+  match: "contains(@data-intent-property, ':infix:') and count(*)>0"
+  replace:
+  - pause: short
+  - insert:
+      nodes: "*"
+      replace: [x: "translate(name(.), '-_', '  ')", pause: auto]
+  - pause: short
+
+
+- name: function-intent
+  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  tag: "*"
+  match: count(*)>0
+  replace:
+  - x: "translate(name(.), '-_', '  ')"
+  - t: "of"
+  - pause: short
+  - insert:
+      nodes: "*"
+      replace: [t: "comma", pause: auto]
+
+- name: default-text
+  # unknown leaf -- just speak the text -- could be a literal intent
+  tag: "*"
+  match: "."
+  replace:
+  - x: "translate(name(), '-_', ' ')"
