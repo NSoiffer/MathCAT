@@ -57,18 +57,22 @@ def translate_char_line(ch: str, line:str, mathplayer: dict, sre: dict, google: 
             ignore_ch = line.find('then:') >= 0   # usually an alternative to what mp and sre would say
             mp_trans, sre_trans, google_trans = translate_char(ch, ignore_ch, match_obj.group(1), mathplayer, sre, google)
             # print("ch='{}', mp/sre/google={}/{}/{}\n".format(ch, mp_trans, sre_trans, google_trans))
-            translation = google_trans
-            if mp_trans == sre_trans and mp_trans:  # if mp and sre match, then we don't care about google
+            if mp_trans=='' and sre_trans=='' and google_trans=='':
+                translation = match_obj.group(1)       # found nothing (can this happen?) 
+            elif mp_trans=='' and sre_trans=='':
+                translation = google_trans
+                alternatives.append( "google translation" )
+            elif mp_trans==sre_trans:       # at least one is non-empty
+                translation = mp_trans      # skip the google translation because mp and sre agree
+            elif google_trans == mp_trans and google_trans!='': 
                 translation = mp_trans
-            elif google_trans == mp_trans:  # google_trans is never empty, so can't match an empty mp_trans
-                translation = mp_trans
-                if sre_trans and sre_trans != mp_trans:
+                if sre_trans:
                     alternatives.append("SRE: '{}'".format(sre_trans))
-            elif google_trans == sre_trans: # google_trans is never empty, so can't match an empty sre_trans
+            elif google_trans == sre_trans and google_trans!='':
                 translation = sre_trans
-                if mp_trans:  # already know sre_trans != mp_trans
+                if mp_trans:
                     alternatives.append("MathPlayer: '{}'".format(mp_trans))
-            # at this point we know none of the options match, but some can be empty
+            # at this point we know none of the options match and that at least one of mp or sre is non-empty
             elif sre_trans:
                 translation = sre_trans
                 if mp_trans:
@@ -183,9 +187,14 @@ def collect_words_to_translate(file_to_translate: str, lang: str, mathplayer: di
         return words_to_translate
 
 # break up the words into chunks to make google translate happy (and to run faster) and return a dictionary of word: translation
-MAX_CHARS_IN_CHUNK = 4500
+MAX_CHARS_IN_CHUNK = 4500  # 4500 sometimes failed (language code "no")
+
+# try to avoid google banning us
+TIMEOUT = 2
 import time
-def translate_words(words_to_translate, lang):
+def translate_words(words_to_translate: set, lang):
+    if lang=='nb' or lang=='nn':
+        lang = 'no'  # google doesn't know those variants, but SRE uses them
     translations = {}
 
     def do_translation_chunk(words: list):
@@ -201,7 +210,8 @@ def translate_words(words_to_translate, lang):
         for (orig, translation) in zip(words, translated_words):
             translations[orig] = translation
 
-    word_list = set(words_to_translate)
+    word_list = list(words_to_translate)
+    word_list.sort()    # make deterministic for debugging
     char_count = 0
     words_to_translate = []
     for word in word_list:
@@ -212,7 +222,7 @@ def translate_words(words_to_translate, lang):
             print("Translated {} words...".format(len(words_to_translate)))
             char_count = 0
             words_to_translate = []
-            time.sleep(2)       # try to avoid google banning us
+            time.sleep(TIMEOUT)       # try to avoid google banning us
     do_translation_chunk(words_to_translate)
     return translations
 
@@ -320,5 +330,5 @@ MP_Location = r"C:\Dev\mathplayer\EqnLib\rules\pvt"
 # (sre_only, mp_only, differ, same) = dict_compare("es", sre_chars, mp_chars)
 # (sre_only, mp_only, differ, same) = dict_compare("fr", get_sre_unicode_dict(SRE_Location, "fr"), get_mathplayer_unicode_dict(MP_Location, "fr"))
 # (sre_only, mp_only, differ, same) = dict_compare("it", get_sre_unicode_dict(SRE_Location, "it"), get_mathplayer_unicode_dict(MP_Location, "it"))
-# build_new_translation("..", "fr", "unicode")
-build_new_translation("..", "vi", "unicode-full")
+build_new_translation("..", "nn", "unicode")
+# build_new_translation("..", "nn", "unicode-full")
