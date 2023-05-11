@@ -1054,7 +1054,6 @@ fn binomial_14_3_3_2() {
 
 #[test]
 fn binomial_14_3_3_2_mtable() {
-    init_logger();
     let expr = "<math><mrow intent='binomial($n,$r)'>
             <mo>(</mo>
                 <mtable>
