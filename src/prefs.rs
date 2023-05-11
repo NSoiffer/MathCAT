@@ -992,6 +992,7 @@ mod tests {
 
     use std::fs;
     #[test]
+    // #[ignore]
     fn test_up_to_date() {
         use std::thread::sleep;
         use std::time::Duration;
