@@ -1,0 +1,59 @@
+---
+
+- name: line-segment
+  tag: line-segment
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "the line segment from"
+      - x: "*[1]"
+      - t: "to"
+      - x: "*[2]"
+      else:
+      - t: "line segment"
+      - x: "*[1]"
+      - x: "*[2]"
+
+- name: geometry-ray
+  tag: ray
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "the ray from"
+      - x: "*[1]"
+      - t: "to"
+      - x: "*[2]"
+      else:
+      - t: "ray"
+      - x: "*[1]"
+      - x: "*[2]"
+
+- name: geometry-arc
+  tag: arc
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [{t: "the"}]
+  - t: "arc"
+  - x: "*[1]"
+  - x: "*[2]"
+
+- name: measure-of-angle
+  tag: measure-of-angle
+  match: "count(*)=3"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "the measure of the angle"
+      else:
+      - t: "measure of angle"
+  - x: "*[1]"
+  - x: "*[2]"
+  - x: "*[3]"
+
