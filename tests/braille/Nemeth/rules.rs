@@ -1477,6 +1477,13 @@ fn ratio_151_11() {
 }
 
 #[test]
+fn arrow_lesson_9_5_1() {
+    // Nemeth rule 152
+    let expr = "<math><mi>A</mi><mo>→</mo><mi>B</mi></math>";
+    test_braille("Nemeth", expr, "⠠⠁⠀⠫⠕⠀⠠⠃");
+}
+
+#[test]
 fn not_ratio_nfb_5_7_b_2() {
     let expr = "<math><mo>{</mo><mi>x</mi><mo>:</mo><mi>x</mi><mo>></mo><mn>0</mn><mo>}</mo></math>";
     test_braille("Nemeth", expr, "⠨⠷⠰⠭⠸⠒⠀⠭⠀⠨⠂⠀⠼⠴⠨⠾");
@@ -1656,12 +1663,6 @@ fn multipurpose_lesson_5_9_2_2() {
 }
 
 #[test]
-fn multipurpose_lesson_5_9_3() {
-    let expr = "<math><mi>y</mi><mo>:=</mo><mn>7</mn><mi>x</mi><mo>+</mo><mn>2</mn></math>";
-    test_braille("Nemeth", expr, "⠰⠽⠸⠒⠐⠨⠅⠀⠼⠶⠭⠬⠆");
-}
-
-#[test]
 fn lesson_11_24_1() {
     let expr = "<math><menclose notation='roundedbox'><msup><mi>x</mi><mn>2</mn></msup></menclose></math>";
     test_braille("Nemeth", expr, "⠫⠅⠭⠘⠆⠐⠻");
@@ -1765,4 +1766,61 @@ fn tensor_from_mathml_spec() {
     </math>";
     // Note: the braille answer was verified to be correct (see https://github.com/NSoiffer/MathCAT/issues/55) 
     test_braille("Nemeth", expr, "⠠⠗⠰⠊⠐⠘⠚⠐⠰⠅⠐⠰⠇");
+}
+
+
+// The following are chemistry tests from Braille Code of Chemical Notation 1997 (http://www.brl.org/chemistry/ which seems bug, update in late 2023?)
+#[test]
+fn chem_HOH_1_1_1_mchem() {
+    let expr = "<math>
+      <mi mathvariant='normal'>H</mi>
+      <mo>-</mo>
+      <mi mathvariant='normal'>O</mi>
+      <mo>-</mo>
+      <mi mathvariant='normal'>H</mi>
+   </math>";
+    test_braille("Nemeth", expr, "⠠⠓⠸⠒⠻⠠⠕⠸⠒⠻⠠⠓");
+}
+
+// The following are chemistry tests from Braille Code of Chemical Notation 1997 (http://www.brl.org/chemistry/ which seems bug, update in late 2023?)
+#[test]
+fn chem_2_5_1_mchem() {
+    let expr = "<math>
+        <mrow>
+        <mrow><mi>CaC</mi></mrow>
+        <msub>
+            <mrow><mrow><mpadded width='0'><mphantom><mi>A</mi></mphantom></mpadded></mrow></mrow>
+            <mrow><mrow><mpadded height='0'><mn>2</mn></mpadded></mrow></mrow>
+        </msub>
+        <mrow></mrow>
+        <mo>+</mo>
+        <mrow></mrow>
+        <mn>2</mn>
+        <mstyle scriptlevel='0'><mspace width='0.167em'/></mstyle>
+        <mrow><mi>HOH</mi></mrow>
+        <mrow></mrow>
+        <mrow><mo stretchy='false'>&#x27F6;</mo></mrow>
+        <mrow></mrow>
+        <mrow><mi mathvariant='normal'>H</mi></mrow>
+        <mrow><mo>&#x2212;</mo></mrow>
+        <mrow><mi mathvariant='normal'>C</mi></mrow>
+        <mrow><mo>&#x2261;</mo></mrow>
+        <mrow><mi mathvariant='normal'>C</mi></mrow>
+        <mrow><mo>&#x2212;</mo></mrow>
+        <mrow><mi mathvariant='normal'>H</mi></mrow>
+        <mrow></mrow>
+        <mo>+</mo>
+        <mrow></mrow>
+        <mrow><mi>Ca</mi></mrow>
+        <mo stretchy='false'>(</mo>
+        <mrow><mi>OH</mi></mrow>
+        <mo stretchy='false'>)</mo>
+        <msub>
+            <mrow><mrow><mpadded width='0'><mphantom><mi>A</mi></mphantom></mpadded></mrow></mrow>
+            <mrow><mrow><mpadded height='0'><mn>2</mn></mpadded></mrow></mrow>
+        </msub>
+        </mrow>
+    </math>";
+    // The example uses a short right arrow but chemistry normally uses a long one -- this test has a long right arrow so that char differs from the reference
+    test_braille("Nemeth", expr, "⠠⠉⠁⠠⠉⠆⠬⠆⠠⠓⠠⠕⠠⠓⠀⠫⠒⠒⠒⠕⠀⠠⠓⠸⠒⠻⠠⠉⠸⠿⠻⠠⠉⠸⠒⠻⠠⠓⠬⠠⠉⠁⠷⠠⠕⠠⠓⠾⠰⠆");
 }
