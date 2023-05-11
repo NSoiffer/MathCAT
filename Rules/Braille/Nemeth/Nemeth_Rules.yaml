@@ -297,14 +297,16 @@
      mo
      # add spaces around comparison operators,
      # but if "modified", they are moved outside of munder, etc, and handled by those rules
-     # need to insert multipurpose indicators between chars in multi-char mo (see NFB less 5.9.3)
+     # need to insert multipurpose indicators between comparison chars in multi-char mo
      # dashes are an exception (others???)
+     # We exclude chemical bonds as they aren't comparison operators
   match: "."
   replace:
   - test:
-      if: "parent::*[self::m:mrow] and (IsInDefinition(substring(., 1, 1), 'NemethComparisonOperators') or text()='∶')"  # "ratio" also gets spaced"
+      if: "parent::*[self::m:mrow] and not(@data-chemical-bond) and
+           (IsInDefinition(substring(., 1, 1), 'NemethComparisonOperators') or text()='∶')"  # "ratio" also gets spaced"
       then:
-          - test:   # NemethPunctAndOpenBeforeSymbols test is Rule 151, NemethComparisonOperators test is Rule 149 
+          - test:   # Spacing and NemethPunctAndOpenBeforeSymbols test is Rule 151, NemethComparisonOperators test is Rule 149 
               if: "not( preceding-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols')] )"
               then: [t: "w"]
           - test:
@@ -316,26 +318,35 @@
       # instead we do the ugly thing and pick off up to four chars and call it a day after that
       if: "string-length(text()) > 1"
       then:
-      - t: "m"
+      - test:
+          if: "IsInDefinition(substring(., 1, 1), 'NemethComparisonOperators') and IsInDefinition(substring(., 2, 1), 'NemethComparisonOperators')"
+          then: [t: "m"]
       - x: "BrailleChars(., 'Nemeth', 2, 3)"
       - test:
           if: "string-length(text()) > 2"
           then:
-          - t: "m"
+          - test:
+              if: "IsInDefinition(substring(., 2, 1), 'NemethComparisonOperators') and IsInDefinition(substring(., 3, 1), 'NemethComparisonOperators')"
+              then: [t: "m"]
           - x: "BrailleChars(., 'Nemeth', 3, 4)"
           - test:
               if: "string-length(text()) > 3"
               then:
-              - t: "m"
+              - test:
+                  if: "IsInDefinition(substring(., 3, 1), 'NemethComparisonOperators') and IsInDefinition(substring(., 4, 1), 'NemethComparisonOperators')"
+                  then: [t: "m"]
               - x: "BrailleChars(., 'Nemeth', 4, 5)"
               - test:
                   if: "string-length(text()) > 4"
                   then:
-                  - t: "m"
+                  - test:
+                      if: "IsInDefinition(substring(., 4, 1), 'NemethComparisonOperators') and IsInDefinition(substring(., 5, 1), 'NemethComparisonOperators')"
+                      then: [t: "m"]
                   - x: "BrailleChars(., 'Nemeth', 5, string-length(text())+1)"    # punt on the rest
   - test:  # NemethPunctAndOpenAfterSymbols test is Rule 151, NemethComparisonOperators test is Rule 149 
            # tilde test is a guess as to what is right -- all tildes and in a prefix location, don't treat as comparison operator
-      if: "parent::*[self::m:mrow] and (IsInDefinition(substring(., string-length(.), 1), 'NemethComparisonOperators') or text()='∶') and
+      if: "parent::*[self::m:mrow] and not(@data-chemical-bond) and
+           (IsInDefinition(substring(., string-length(.), 1), 'NemethComparisonOperators') or text()='∶') and
            not( translate(., '∼', '')='' and not(preceding-sibling::*) ) and
            not( following-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols')] )"
       then: [t: "w"]

@@ -157,15 +157,20 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
                     // note: on the right, we haven't set chem flag for operators yet, so we skip them
                     let preceding = child.preceding_siblings();
                     let following = child.following_siblings();
-                    if !preceding.is_empty() && preceding.iter().all(|&child| as_element(child).attribute(MAYBE_CHEMISTRY).is_some()) &&
+                    if !preceding.is_empty() && preceding.iter().all(|&child| {
+                        let child = as_element(child);
+                        name(&child)=="mn" || child.attribute(MAYBE_CHEMISTRY).is_some()}) &&
                         !following.is_empty() && following.iter().all(|&child| {
                             let child = as_element(child);
-                            name(&child)=="mo" || child.attribute(MAYBE_CHEMISTRY).is_some()
+                            name(&child)=="mo" || name(&child)=="mn" || child.attribute(MAYBE_CHEMISTRY).is_some()
                         }) {
                         // "=", etc., should be treated as high priority separators
                         child.set_attribute_value(CHEMICAL_BOND, "true");
+                        child.set_attribute_value(CHEM_FORMULA_OPERATOR, &likely_chemistry_op.to_string());
                         child.set_attribute_value(MAYBE_CHEMISTRY, &likely_chemistry_op.to_string());
                     }
+                } else {
+                    likely_chem_equation_operator(child);   // need to mark MAYBE_CHEMISTRY for CHEMICAL_BOND tests
                 }
             }
             i += 1;
@@ -226,6 +231,9 @@ fn clean_mrow_children_mark_pass(children: &[Element]) {
                 if name(&child) == "mo" {
                     // debug!(" start.is_none(): removing MAYBE_CHEMISTRY on {}", as_text(child));
                     child.remove_attribute(MAYBE_CHEMISTRY);
+                    child.remove_attribute(CHEM_FORMULA_OPERATOR);
+                    child.remove_attribute(CHEM_EQUATION_OPERATOR);
+                    child.remove_attribute(CHEM_EQUATION_OPERATOR);
                     child.remove_attribute(CHEMICAL_BOND);
                 } else {
                     start = Some(i);
@@ -424,7 +432,7 @@ pub fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
         match tag_name {
             "mi" | "mtext" => {mathml.set_attribute_value(CHEM_ELEMENT, maybe_attr.value());},
             "mo" => {
-                if mathml.attribute(CHEM_FORMULA_OPERATOR).is_none() {
+                if mathml.attribute(CHEM_FORMULA_OPERATOR).is_none() && mathml.attribute(CHEM_EQUATION_OPERATOR).is_none(){
                     // don't mark as both formula and equation
                     mathml.set_attribute_value(if chem == CHEM_FORMULA {CHEM_FORMULA_OPERATOR} else {CHEM_EQUATION_OPERATOR}, maybe_attr.value());
                 }
@@ -478,6 +486,10 @@ fn has_maybe_chemistry(mathml: Element) -> bool {
 fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
     mathml.remove_attribute(MAYBE_CHEMISTRY);
     if is_leaf(mathml) {
+        // don't bother testing for the attr -- just remove and nothing bad happens if they aren't there
+        mathml.remove_attribute(CHEM_FORMULA_OPERATOR);
+        mathml.remove_attribute(CHEM_EQUATION_OPERATOR);
+        mathml.remove_attribute(CHEMICAL_BOND);
         if mathml.attribute(MERGED_TOKEN).is_some() {
             unmerge_element(mathml);
             return true;    // need to re-parse
@@ -765,6 +777,7 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
     let sup_name = name(&sup);
     if sup_name == "mo" && MULTIPLE_PLUS_OR_MINUS_OR_DOT.is_match(as_text(sup)) {
         if as_text(sup).find(DOTS).is_some() {
+            sup.set_attribute_value(MAYBE_CHEMISTRY, "1");
             sup.set_attribute_value(CHEM_FORMULA_OPERATOR, "1");   // value doesn't really matter
         }
         return if as_text(sup).len()==1 {1} else {2};
@@ -781,6 +794,7 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
                 let second_text = as_text(second);
                 if SINGLE_PLUS_OR_MINUS_OR_DOT.is_match(second_text) {
                     if second_text.find(DOTS).is_some() {
+                        second.set_attribute_value(MAYBE_CHEMISTRY, "2");
                         second.set_attribute_value(CHEM_FORMULA_OPERATOR, "2");   // value doesn't really matter
                     }
                     return 2;   // ending with a +/- makes it likely this is an ion
@@ -801,6 +815,7 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
             for child in children {
                 let child = as_element(child);
                 if name(&child) == "mo" && as_text(child).find(DOTS).is_some() {
+                    child.set_attribute_value(MAYBE_CHEMISTRY, "1");
                     child.set_attribute_value(CHEM_FORMULA_OPERATOR, "1");   // value doesn't really matter
                 }
             }
@@ -817,6 +832,7 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
 /// * fences around a chemical formula
 /// * an mrow made up of only chemical formulas
 fn likely_chem_formula(mathml: Element) -> isize {
+    // debug!("start likely_chem_formula: {}", mml_to_string(&mathml));
     if let Some(value) = get_marked_value(mathml) {
         return value;       // already marked
     }
@@ -884,7 +900,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
                     },
                 }
                 // debug!("in likely_chem_formula likelihood={}, child\n{}", likelihood, mml_to_string(&child));
-                // debug!("likelihood={} (likely={})", likelihood, likely);
+                // debug!("   likelihood={} (likely={})", likelihood, likely);
             }
 
             if !is_chem_formula || likelihood <= NOT_CHEMISTRY {
@@ -1210,6 +1226,7 @@ fn likely_chem_formula_operator(mathml: Element) -> isize {
        ( !(leaf_text == "=" || leaf_text == "::" ) || is_legal_bond(mathml, BondType::DoubleBond) )  &&
        ( !(leaf_text == "≡" || leaf_text == ":::" ) || is_legal_bond(mathml, BondType::TripleBond) ) {
         mathml.set_attribute_value(MAYBE_CHEMISTRY, "1");
+        mathml.set_attribute_value(CHEM_FORMULA_OPERATOR, "1");
         return 1;
     } else if is_in_set(leaf_text, &CHEM_FORMULA_OK) {
         return 0;  // not much info
@@ -1294,6 +1311,7 @@ fn likely_chem_equation_operator(mathml: Element) -> isize {
         let base = as_element(mathml.children()[0]);
         if name(&base) == "mo" && is_in_set(as_text(base), &CHEM_EQUATION_ARROWS) {
             base.set_attribute_value(MAYBE_CHEMISTRY, "1");
+            base.set_attribute_value(CHEM_EQUATION_OPERATOR, "1");
             return 1;
         } else if elem_name == "mover" && is_hack_for_missing_arrows(mathml) {
             return 2;
@@ -1306,6 +1324,7 @@ fn likely_chem_equation_operator(mathml: Element) -> isize {
         let text = as_text(mathml);
         if is_in_set(text, &CHEM_EQUATION_OPERATORS) || is_in_set(text, &CHEM_EQUATION_ARROWS) {
             mathml.set_attribute_value(MAYBE_CHEMISTRY, "1");
+            mathml.set_attribute_value(CHEM_EQUATION_OPERATOR, "1");
             return 1;
         } else if text == "\u{2062}" || text == "\u{2063}" {
             // FIX: the invisible operator between elements should be well-defined, but this likely needs work, so both accepted for now
@@ -2117,7 +2136,6 @@ mod chem_tests {
 
     #[test]
     fn mhchem_so4() {
-        // init_logger();
         let test = "<math>
             <mrow>
             <mi>SO</mi>

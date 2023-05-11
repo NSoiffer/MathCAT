@@ -308,7 +308,7 @@
    -    "*[2][substring(., string-length(), 1)='⇀']"
    replace:
    - intent:
-      name: "chemical-equation-operator"
+      name: "chemical-arrow-operator"
       children:
       - test:
           if: "*[1][self::m:mrow]"
@@ -368,6 +368,17 @@
   replace:
   - intent:
       name: "chemical-formula-operator"
+      children:
+      - x: "text()"
+
+-
+  name: chemical-arrow-op
+  tag: [mo]
+  # FIX: this is a duplicate of the list in chemistry.rs. Probably should pull out and add to definitions.yaml
+  match: "@data-chem-equation-op and translate(., '→➔←⟶⟵⤻⇋⇌↿↾⇃⇂⥮⥯⇷⇸⤉⤈⥂⥄', '')=''"
+  replace:
+  - intent:
+      name: "chemical-arrow-operator"
       children:
       - x: "text()"
 

@@ -66,7 +66,7 @@
       then: [{t: the real numbers}]
     - else_if: "text()='ℤ'"
       then: [{t: the integers}]
-      else: [{x: text()}] # shouldn't happen
+      else: [x: "text()"] # shouldn't happen
 
 - name: real-part
   tag: real-part
@@ -914,9 +914,9 @@
       else: [{t: "aqueous"}] # (aq)
   - pause: short
 
-- name: chemical-formula-operator
+- name: chemical-formula-operator-bond
   tag: chemical-formula-operator
-  match: "."
+  match: "@data-chemical-bond"
   replace:
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
@@ -929,10 +929,16 @@
       then: [{t: "triple bond"}]
     - else_if: "text()='≣'"
       then: [{t: "quadruple bond"}]
-      else: [{x: text()}]
+      else: [{x: "text()"}]
 
-- name: chemical-equation-operator
-  tag: chemical-equation-operator
+- name: chemical-formula-operator
+  tag: chemical-formula-operator
+  match: "."
+  replace:
+    x: "text()"
+
+- name: chemical-arrow-operator
+  tag: chemical-arrow-operator
   match: "."
   replace:
   # FIX: this might be better/more efficient if in unicode.yaml
@@ -949,7 +955,14 @@
       then: [{t: "is in equilibrium biased to the left with"}]
     - else_if: "text()='⭵'"
       then: [{t: "is in equilibrium biased to the right with"}]
-      else: [{x: text()}]
+      else: [x: "text()"]
+
+- name: chemical-equation-operator
+  tag: chemical-equation-operator
+  match: "."
+  replace:
+  - bookmark: "@id"
+  - x: "text()"
 
 - name: none
   tag: none

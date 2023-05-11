@@ -925,8 +925,8 @@
       then: [{T: "ikatan rangkap empat"}]
       else: [{x: text()}]
 
-- name: chemical-equation-operator
-  tag: chemical-equation-operator
+- name: chemical-arrow-operator
+  tag: chemical-arrow-operator
   match: "."
   replace:
   # FIX: this might be better/more efficient if in unicode.yaml
@@ -944,6 +944,14 @@
     - else_if: "text()='⭵'"
       then: [{T: "berada dalam kesetimbangan bias ke kanan dengan"}]
       else: [{x: text()}]
+
+- name: chemical-equation-operator
+  tag: chemical-equation-operator
+  match: "."
+  replace:
+  # FIX: this might be better/more efficient if in unicode.yaml
+  - bookmark: "@id"
+  - x: "text()"
 
 - name: none
   tag: none

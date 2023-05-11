@@ -1042,7 +1042,7 @@
   tag: "*"
   match:
   - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
-  - "DEBUG(following-sibling::*[1][translate(., '\u2061\u2062\u2063\u2064', '')=''])"
+  - "following-sibling::*[1][translate(., '\u2061\u2062\u2063\u2064', '')='']"
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
@@ -1059,15 +1059,15 @@
       variables: [{MatchCounter: "$MatchCounter + 1"}]
       replace:
       - test:
-          if: "following-sibling::*[1][DEBUG(.='\u2062' or .='\u2064')] and $NavMode='Enhanced'"   # invisible times and plus
+          if: "following-sibling::*[1][.='\u2062' or .='\u2064'] and $NavMode='Enhanced'"   # invisible times and plus
           then: [set_variables: [NavNode: "following-sibling::*[1]/@id"]]
-          else: [x: "DEBUG(following-sibling::*[1])"]
+          else: [x: "following-sibling::*[1]"]
 
 - name: move-next-no-auto-zoom-at-edge
   # at edge of 2D and in a mode where moving right isn't an option
   tag: "*"
   variables: [{EdgeNode: "EdgeNode(., 'right', '2D')"}]
-  match: "$NavCommand = 'MoveNext' and $NavMode!='Character' and not($AutoZoomOut) and DEBUG($EdgeNode/@id)!=@id"
+  match: "$NavCommand = 'MoveNext' and $NavMode!='Character' and not($AutoZoomOut) and $EdgeNode/@id!=@id"
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse' and $NavCommand = 'MoveNext'"
@@ -1268,7 +1268,7 @@
   tag: "*"
   match:
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
-  - "DEBUG(preceding-sibling::*[1][translate(., '\u2061\u2062\u2063\u2064', '')=''])"
+  - "receding-sibling::*[1][translate(., '\u2061\u2062\u2063\u2064', '')='']"
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
@@ -1285,9 +1285,9 @@
       variables: [{MatchCounter: "$MatchCounter + 1"}]
       replace:
       - test:
-          if: "preceding-sibling::*[1][DEBUG(.='\u2062' or .='\u2064')] and $NavMode='Enhanced'"   # invisible times and plus
+          if: "preceding-sibling::*[1][.='\u2062' or .='\u2064'] and $NavMode='Enhanced'"   # invisible times and plus
           then: [set_variables: [NavNode: "preceding-sibling::*[1]/@id"]]
-          else: [x: "DEBUG(preceding-sibling::*[1])"]
+          else: [x: "preceding-sibling::*[1]"]
 
 # two rules for when can't move right
 - name: move-previous-no-auto-zoom-at-edge

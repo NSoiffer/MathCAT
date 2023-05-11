@@ -928,8 +928,8 @@
       else: [{T: "nước"}] # (aq)
   - pause: short
 
-- name: chemical-formula-operator
-  tag: chemical-formula-operator
+- name: chemical-arrow-operator
+  tag: chemical-arrow-operator
   match: "."
   replace:
   # FIX: this might be better/more efficient if in unicode.yaml
@@ -944,6 +944,13 @@
     - else_if: "text()='≣'"
       then: [{T: "liên kết bốn"}]
       else: [{x: text()}]
+
+- name: chemical-formula-operator
+  tag: chemical-formula-operator
+  match: "."
+  replace:
+  - bookmark: "@id"
+  - x: "text()"
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator

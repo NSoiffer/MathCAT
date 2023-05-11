@@ -134,9 +134,14 @@
 
   # --- Nemeth Default Characters math_symbols chars. ---
  - "`": [t: "⠈"]                # 0x60
- - "≟": [t: "⠐⠨⠅⠣⠸⠦⠻"]          # 0x225f
- - "≠": [t: "⠌⠨⠅"]              # 0x2260
- - "≡": [t: "⠸⠇"]               # 0x2261
+ - "≟": [t: "⠐⠨⠅⠣⠸⠦⠻"]       # 0x225f
+ - "≠": [t: "⠌⠨⠅"]             # 0x2260
+ - "≡":                         # 0x2261
+    - test:
+        if: "@data-chemical-bond"
+        then: [t: "⠸⠿⠻"]
+        else: [t: "⠸⠇"]
+
  - "≤": [t: "⠐⠅⠱"]              # 0x2264
  - "≥": [t: "⠨⠂⠱"]              # 0x2265
  - "⊂": [t: "⠸⠐⠅"]              # 0x2282
@@ -221,9 +226,12 @@
  - "-":                        # 0x002D (Hyphen)  (0x2212 normalized to here) -- 38vi says don't use the punctuation indicator
     - test:
         # Add multipurpose indicator before prefix '+' to avoid being the same as '±' or a dash
-        if: "not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][name(.)='mo' and (text()='+' or text()='-')]]"
-        then: [t: "m⠤"]
-        else: [t: "⠤"] 
+        if: "@data-chemical-bond"
+        then: [t: "⠸⠒⠻"]
+        else_test:
+            if: "not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][name(.)='mo' and (text()='+' or text()='-')]]"
+            then: [t: "m⠤"]
+            else: [t: "⠤"] 
 
  - ".":                          # 0x002E (Full stop or decimal pt)
       # '.' is particularly tricky because we need to know if it is really numeric or not.
@@ -270,7 +278,12 @@
             then: [t: "W"]
  - ";": [t: "P⠆"]               # 0x003B (Semicolon)
  - "<": [t: "⠐⠅"]             # 0x003C (Less-than sign)
- - "=": [t: "⠨⠅"]             # 0x003D (Equals sign)
+ - "=":                        # 0x003D (Equals sign)
+    - test:
+        if: "@data-chemical-bond"
+        then: [t: "⠸⠶⠻"]
+        else: [t: "⠨⠅"]
+
  - ">": [t: "⠨⠂"]             # 0x003E (Greater-than sign)
  - "?": [t: "P⠦"]               # 0x003F (Question mark)
  - "@": [t: "⠈⠁"]               # 0x40 (Commercial at)
