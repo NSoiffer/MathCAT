@@ -60,7 +60,7 @@
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
         replace: [spell: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]
 
- - "0-9": [t: "A"]                              	# 	(en: '.', google translation)
+ - "0-9": [t: "."]                              	# 	(en: '.', google translation)
 
  - "!": [t: "utropsteikn"]                      	#  0x21	(en: 'factorial', google: 'factorial')
  - "\"": [t: "bakstrek"]                        	#  0x22	(en: 'quotation mark', google: 'anførselstegn')
