@@ -69,20 +69,32 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
 // property           := S ':' NCName
 // S                  := [ \t\n\r]*
 
+// intent             := self-property-list | expression
+// self-property-list := property+ S    
+// expression         := S ( term property* | application ) S 
+// term               := concept-or-literal | number | reference 
+// concept-or-literal := NCName
+// number             := '-'? \d+ ( '.' \d+ )?
+// reference          := '$' NCName
+// application        := expression '(' arguments? S ')'
+// arguments          := expression ( ',' expression )*
+// property           := S ':' NCName
+// S                  := [ \t\n\r]*
+
 lazy_static! {
     // The practical restrictions of NCName are that it cannot contain several symbol characters like
     //  !, ", #, $, %, &, ', (, ), *, +, ,, /, :, ;, <, =, >, ?, @, [, \, ], ^, `, {, |, }, ~, and whitespace characters
     //  Furthermore an NCName cannot begin with a number, dot or minus character although they can appear later in an NCName.
     // NC_NAME from www.w3.org/TR/REC-xml/#sec-common-syn, with "\pL" for letters 
 
-    static ref LITERAL: Regex = Regex::new(r"^[_\pL][_\pL\pMn\-.\d·]*").unwrap(); 
+    static ref CONCEPT_OR_LITERAL: Regex = Regex::new(r"^[_\pL][_\pL\pMn\-.\d·]*").unwrap(); 
     static ref PROPERTY: Regex = Regex::new(r"^:[_\pL][_\pL\pMn\-.\d·]*").unwrap();     // : NC_NAME
     static ref ARG_REF: Regex = Regex::new(r"^\$[_\pL][_\pL\pMn\-.\d·]*").unwrap();     // $ NC_NAME
-    static ref NUMBER: Regex = Regex::new(r"^-?([0-9]+\.?[0-9]*|\.[0-9]+)").unwrap(); // Token::Literal -- used for matching later on
+    static ref NUMBER: Regex = Regex::new(r"^-?[0-9]+(\.[0-9]+)?").unwrap();
 }
 
-static TERMINALS_AS_U8: [u8; 4] = [b'(', b',', b')', b';'];
-// static TERMINALS: [char; 4] = ['(', ',',')', ';'];
+static TERMINALS_AS_U8: [u8; 3] = [b'(', b',', b')'];
+// static TERMINALS: [char; 3] = ['(', ',',')'];
 
 // 'i -- "i" for the lifetime of the "intent" string
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -90,7 +102,7 @@ enum Token<'i> {
     Terminal(&'i str),  // "(", ",", ")"
     Property(&'i str),
     ArgRef(&'i str),
-    Literal(&'i str),
+    ConceptOrLiteral(&'i str),
     Number(&'i str),
     None,               // out of characters
 }
@@ -102,7 +114,7 @@ impl<'i> fmt::Display for Token<'i> {
                 Token::Terminal(str) => format!("Terminal('{}')", str),
                 Token::Property(str) => format!("Property({})", str),
                 Token::ArgRef(str) => format!("ArgRef({})", str),
-                Token::Literal(str) => format!("Literal({})", str),
+                Token::ConceptOrLiteral(str) => format!("Literal({})", str),
                 Token::Number(str) => format!("Number({})", str),
                 Token::None => "None".to_string(),
             }
@@ -124,7 +136,7 @@ impl<'i> Token<'i> {
             Token::Terminal(str) => str,
             Token::Property(str) => str,
             Token::ArgRef(str) => str,
-            Token::Literal(str) => str,
+            Token::ConceptOrLiteral(str) => str,
             Token::Number(str) => str,
             Token::None => "",
         }
@@ -160,8 +172,8 @@ impl<'i> LexState<'i> {
             self.token = Token::Property(matched_property.as_str());
         } else if let Some(matched_arg_ref) = ARG_REF.find(str) {
             self.token = Token::ArgRef(matched_arg_ref.as_str());
-        } else if  let Some(matched_literal) = LITERAL.find(str) {
-            self.token = Token::Literal(matched_literal.as_str());
+        } else if  let Some(matched_literal) = CONCEPT_OR_LITERAL.find(str) {
+            self.token = Token::ConceptOrLiteral(matched_literal.as_str());
         } else if  let Some(matched_number) = NUMBER.find(str) {
             self.token = Token::Number(matched_number.as_str());
         } else {
@@ -191,15 +203,24 @@ impl<'i> LexState<'i> {
 fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>,
                                          lex_state: &mut LexState<'b>,
                                          mathml: Element<'c>) -> Result<Element<'m>> {
-    //   intent := S ( term property* | property+ | application ) S 
-    //   term := concept-or-literal | number | reference
+    // intent             := self-property-list | expression
+    // self-property-list := property+ S    
+    // expression         := S ( term property* | application ) S 
+    // term               := concept-or-literal | number | reference 
+    // concept-or-literal := NCName
+    // number             := '-'? \d+ ( '.' \d+ )?
+    // reference          := '$' NCName
+    // application        := expression '(' arguments? S ')'
+    //
     // When we flatten intent we have this implementation looking for Tokens or '(' [for application]
+    // Essentially, the grammar we deal with here is:
+    // intent := property+ | (concept-or-literal | number | reference) property* '('?
     // debug!("    start build_intent: state: {}", lex_state);
     let doc = rules_with_context.get_document();
     let mut intent;
     match lex_state.token {
         Token::Property(_) => {
-            // We only have a property -- we want to keep this tag
+            // We only have a property -- we want to keep this tag/element
             // There are two paths:
             // 1. If there is a function call, then the children are dealt with there
             // 2. If there is *no* function call, then the children are kept, which means we return to pattern matching
@@ -215,13 +236,10 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
                 intent = rules_with_context.match_pattern::<Element<'m>>(mathml)?;
                 mathml.set_attribute_value("intent", saved_intent);
             }
+            return Ok(intent);      // if we start with properties, then there can only be properties
         },
-        Token::Literal(word) | Token::Number(word) => {
-            let leaf_name = if let Token::Number(_) = lex_state.token {
-                "mn"
-            } else {
-                "mi"
-            };
+        Token::ConceptOrLiteral(word) | Token::Number(word) => {
+            let leaf_name = if let Token::Number(_) = lex_state.token {"mn"} else {"mi"};
             intent = create_mathml_element(&doc, leaf_name);
             intent.set_text(word);       // '-' and '_' get removed by the rules.
             lex_state.get_next()?;
@@ -253,7 +271,8 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
 }
 
 const INTENT_PROPERTY: &str = "data-intent-property";
-
+/// Get all the properties, stopping we don't have any more
+/// Returns the string of the properties terminated with an additional ":"
 fn get_properties(lex_state: &mut LexState) -> Result<String> {
     // return the 'hint' leaving the state
     assert!(matches!(lex_state.token, Token::Property(str) if str.starts_with(':')));
@@ -271,9 +290,12 @@ fn get_properties(lex_state: &mut LexState) -> Result<String> {
     }
 }
 
-/// build a function 'f(...)' where '...' can be empty
-/// also handles nested functions like f(...)(...)
+/// Build a function 'f(...)' where '...' can be empty
+///
+/// Also handles nested functions like f(...)(...)
+/// 
 /// Start state: at '('
+/// 
 /// End state: after ')'
 fn build_function<'b, 'r, 'c, 's:'c, 'm:'c>(
             function_name: Element<'m>,
@@ -506,26 +528,6 @@ mod tests {
         let intent = "<foo data-intent-property=':silent:'><bar data-intent-property=':postfix:'><mn>3</mn></bar></foo>";
         assert!(test_intent(mathml, intent, "Error"));
     }
-
-    #[test]
-    fn intent_hints_defaults() {
-        let mathml = "<mrow intent=':silent($p:infix($a, $b, $f:postfix($x)))'>
-                <mi arg='a'>a</mi>
-                <mo arg='p' intent='plus'>+</mo>
-                <mi arg='b'>b</mi>
-                <mo intent='plus'>+</mo>
-                <mi arg='x'>x</mi>
-                <mo arg='f' intent='factorial'>!</mo>
-            </mrow>";
-        let intent = "<mrow data-intent-property=':silent:'>
-                    <plus data-intent-property=':infix:'>
-                        <mi arg='a'>a</mi>
-                        <mi arg='b'>b</mi>
-                        <factorial data-intent-property=':postfix:'><mi arg='x'>x</mi></factorial>
-                    </plus>
-                </mrow>";
-        assert!(test_intent(mathml, intent, "Error"));
-    }
     
     #[test]
     fn intent_hints_and_type() {
@@ -604,16 +606,16 @@ mod tests {
 
     #[test]
     fn intent_with_literals() {
-        let mathml = "<mrow intent='vector(1, 0., .1, -23, -.1234, last)'>
+        let mathml = "<mrow intent='vector(1, 0.0, 0.1, -23, -0.1234, last)'>
                 <mi>x</mi>
             </mrow>";
-        let intent = "<vector><mn>1</mn><mn>0.</mn><mn>.1</mn><mn>-23</mn><mn>-.1234</mn><mi>last</mi></vector>";
+        let intent = "<vector><mn>1</mn><mn>0.0</mn><mn>0.1</mn><mn>-23</mn><mn>-0.1234</mn><mi>last</mi></vector>";
         assert!(test_intent(mathml, intent, "Error"));
     }
 
     #[test]
     fn intent_with_template_literals() {
-        let mathml = "<mrow intent='1 0. .1 -23 -.1234 last'>
+        let mathml = "<mrow intent='1 0.0 0.1 -23 -0.1234 last'>
                 <mi>x</mi>
             </mrow>";
         let intent = "<mrow><mn>1</mn><mn>0.</mn><mn>.1</mn><mn>-23</mn><mn>-.1234</mn><mi>last</mi></mrow>";
