@@ -1,0 +1,294 @@
+---
+
+- name: intent-literal-silent
+  tag: [mi, mo, mn]
+  match: "contains(@data-intent-property, ':silent:')"
+  # say nothing
+  replace: []
+
+# handling of negative numbers that come from 'intent' is hard -- we do something that is close to right here 
+- name: intent-literal-negative-number
+  tag: mn
+  match: "starts-with(text(), '-')"
+  replace:
+  - t: "minus"
+  - x: "translate(text(), '-_', '')"
+
+- name: default
+  tag: square-root
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: {t: the}
+  - t: square root
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: {t: of}
+      else: {pause: short}
+  - x: "*[1]"
+  - test:
+      if: IsNode(*[1], 'leaf')
+      then: [{pause: short}]
+      else: [{t: end root}, {pause: short}]
+
+- name: default
+  tag: root
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [{t: the}]
+  - test:
+      if: "*[2][self::m:mn]"
+      then_test:
+      - if: "*[2][text()='2']"
+        then: [{t: square root}]
+      - else_if: "*[2][text()='3']"
+        then: [{t: cube root}]
+      - else_if: "*[2][not(contains(., '.'))]"
+        then: [{x: "ToOrdinal(*[2])"}, {t: root}]
+      else:
+      - test:
+          if: "*[2][self::m:mi][string-length(.)=1]"
+          then:
+          - x: "*[2]"
+          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+          else: [{x: "*[2]"}]
+      - t: root
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [{t: of}]
+  - x: "*[1]"
+  - test:
+      if: IsNode(*[1], 'leaf')
+      then: [{pause: short}]
+      else: [{t: end root}, {pause: short}]
+
+# Fraction rules
+# Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
+- name: common-fraction
+  tag: fraction
+  match:
+  - "*[1][self::m:mn][not(contains(., '.')) and text()<20]   and"
+  - "*[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]"
+  replace: [{x: ToCommonFraction(.)}]
+- name: common-fraction-mixed-number
+  tag: fraction
+  match:
+  - "preceding-sibling::*[1][self::m:mo][text()='⁤'] and" # preceding element is invisible plus
+  - "*[1][self::m:mn][not(contains(., '.'))]   and"
+  - "*[2][self::m:mn][not(contains(., '.'))]"
+  replace: [{x: ToCommonFraction(.)}]
+
+- name: simple
+  # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
+  # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
+  # are never simple, then any 'over' applies only to enclosing "fraction...end fraction" pair.
+  tag: fraction
+  match:
+  - "(IsNode(*[1],'leaf') and IsNode(*[2],'leaf')) and"
+  - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
+  replace:
+  - x: "*[1]"
+  - t: over
+  - x: "*[2]"
+  - pause: short
+
+- name: default
+  tag: fraction
+  match: "."
+  replace:
+  - t: fraction
+  - pause: short
+  - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1],'leaf'))"
+      then: [{pause: short}]
+  - t: over
+  - test:
+      if: "not(IsNode(*[2],'leaf'))"
+      then: [{pause: short}]
+  - x: "*[2]"
+  - pause: short
+  - t: end fraction
+  - pause: medium
+
+# rules for functions raised to a power
+# these could have been written on 'mrow' but putting them on msup seems more specific
+# to see if it is a function, we look right to see if the following sibling is apply-function
+- name: inverse-function
+  tag: inverse-function
+  match: "."
+  replace:
+  - t: inverse
+  - x: "*[1]"
+
+- name: function-squared-or-cubed
+  tag: power
+  match:
+  - "*[2][self::m:mn][text()='2' or text()='3'] and"
+  - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
+  replace:
+  - x: "*[1]"
+  - bookmark: "*[2]/@id"
+  - test:
+      if: "*[2][text()=2]"
+      then: {t: squared}
+      else: {t: cubed}
+- name: function-power
+  tag: power
+  match:
+  - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: {t: the}
+  - bookmark: "*[2]/@id"
+  - test:
+      if: "*[2][self::m:mn][not(contains(., '.'))]"
+      then: [{x: "ToOrdinal(*[2])"}]
+      else: [{x: "*[2]"}]
+  - t: power of
+  - pause: short
+  - x: "*[1]"
+
+# non-function rules for power
+- name: squared-or-cubed
+  tag: power
+  match: "*[2][self::m:mn][text()='2' or text()='3']"
+  replace:
+  - x: "*[1]"
+  - bookmark: "*[2]/@id"
+  - test:
+      if: "*[2][text()=2]"
+      then: {t: squared}
+      else: {t: cubed}
+
+- name: simple-integer
+  tag: power
+  match: "*[2][self::m:mn][not(contains(., '.'))]"
+  replace:
+  - x: "*[1]"
+  - t: to the
+  - test:
+      if: "*[2][.>0]"
+      then: {x: "ToOrdinal(*[2])"}
+      else: {x: "*[2]"}
+- name: simple-negative-integer
+  tag: power
+  match:
+  - "*[2][self::m:negative and"
+  - "     *[1][self::m:mn][not(contains(., '.'))]]"
+  replace:
+  - x: "*[1]"
+  - t: to the
+  - x: "*[2]"
+- name: simple-var
+  tag: power
+  match: "*[2][self::m:mi][string-length(.)=1]"
+  replace:
+  - x: "*[1]"
+  - t: to the
+  - x: "*[2]"
+  - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+
+- name: simple
+  tag: power
+  match: "IsNode(*[2], 'leaf')"
+  replace:
+  - x: "*[1]"
+  - t: to the
+  - x: "*[2]"
+
+- name: nested
+  # it won't end in "power" if the exponent is simple enough
+  # FIX: not that important, but this misses the case where the nested exp is a negative integer (change test if this is fixed)
+  # ending nested exponents with "...power power" sounds bad
+  tag: power
+  match:
+  - "*[2]["
+  - "     (self::m:power and not(IsNode(*[2], 'leaf'))) or" # non-simple nested superscript
+  - "     self::m:mrow[*[last()][self::m:power[not(IsNode(*[2], 'leaf'))]]]" # same as above but at the end of an mrow # FIX: need to figure out linear replacement
+  - "    ]"
+  replace:
+  - x: "*[1]"
+  - t: raised to the
+  - x: "*[2]"
+  - pause: short
+  - t: end exponent
+- name: default
+  tag: power
+  match: "."
+  replace:
+  - x: "*[1]"
+  - t: raised to the
+  - x: "*[2]"
+  - t: power
+
+#
+# Some rules on mrows
+#
+- name: set
+  tag: set
+  match: "."
+  replace:
+  - test:
+    - if: "count(*)=0"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: {t: the}
+      - t: empty set
+    - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: {t: the}
+      - t: set of all
+      - x: "*[1]/*[1]"
+      - t: such that
+      - x: "*[1]/*[3]"
+      else:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: {t: the}
+      - t: set
+      - x: "*[1]"
+
+- name: times
+  tag: mo
+  match:
+  # say "times" when invisible times is followed by parens or a superscript that has a base with parens or "|"s
+  # if we aren't sure if it is times or not, don't say anything
+  - "text()='⁢' and not(@data-function-guess) and ("
+  - "  following-sibling::*[1]["
+  - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|') or self::m:binomial or" # followed by parens
+  - "    ( (self::m:msup or self::m:msub or self::m:msubsup or self::m:power) and " # followed by msup, etc.
+  - "       *[1][self::m:mrow][IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|')]" # base has parens
+  - "    )"
+  - "  ]"
+  # other possibility is the preceding element has parens (but not the following)
+  - " or "
+  - "  preceding-sibling::*[1]["
+  - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|')]" # followed by parens
+  - " )"
+  replace:
+  - t: times
+
+- name: no-say-parens
+  tag: mrow
+  match:
+  - "parent::*[not(self::m:msup) and not(self::m:msub) and not(self::m:msubsup) and not(self::m:power) and"
+  - "          not(self::m:math) ] and "       # rule out [x] standing alone
+  - "( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) and "
+  - "( IsNode(*[2], 'simple')  )"
+  # missing clause: 'a positive fraction that is spoken as an ordinal
+  #   (either by the Ordinal preference or by the default rules_'
+  replace:
+  - x: "*[2]"
+
+- include: "SharedRules/geometry.yaml"
+- include: "SharedRules/linear-algebra.yaml"
+- include: "SharedRules/general.yaml"
+- include: "SharedRules/default.yaml"
