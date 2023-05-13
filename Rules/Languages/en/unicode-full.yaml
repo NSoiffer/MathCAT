@@ -19,7 +19,7 @@
                # speak "comma" when not adjacent to '…'
             - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
                # except if expression starts with '…'
-            - " ../*[1][text()='…'] "
+            - ../*[1][text()='…']"
         then: [t: "comma"]
         # else silent
 
