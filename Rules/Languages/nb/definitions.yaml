@@ -25,75 +25,78 @@
 
 # For English, a regular pattern starts at twenty
     NumbersOnes: [
-        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
-        "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
-        "seventeen", "eighteen", "nineteen"
+         "null", "en", "to", "tre", "fire", "fem", "seks", "sju", "åtte", "ni",
+         "ti", "elleve", "tolv", "tretten", "fjorten", "femten", "seksten",
+         "sytten", "atten", "nitten"
     ],
 
     NumbersOrdinalOnes: [
-        "zeroth", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth",
-        "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth",
-        "seventeenth", "eighteenth", "nineteenth"
+         "null", "første", "andre", "tredje", "fjerde", "femte", "sjette", "syvende", "åttende", "niende",
+         "tiende", "ellevte", "tolvte", "trettende", "fjortende", "femtende", "sekstende",
+         "syttende", "attende", "nittende"
     ],
 
     NumbersOrdinalPluralOnes: [
-        "zeroth", "first", "seconds", "thirds", "fourths", "fifths", "sixths", "sevenths", "eights", "ninths",
-        "tenths", "elevenths", "twelfths", "thirteenths", "fourteenths", "fifteenths", "sixteenths",
-        "seventeenths", "eighteenths", "nineteenths"
+         "null", "første", "sekunder", "tredjedeler", "fjerdedeler", "femtedeler", "sjettedeler", "syvendedeler", "åttere", "niendedeler",
+         "tiendedeler", "ellevtedeler", "tolvtedeler", "trettendedeler", "fjortendedeler", "femtendedeler", "sekstendedeler",
+         "syttendeler", "attendedeler", "nittendedeler"
     ],
 
     # stop when regularity begins
     NumbersOrdinalFractionalOnes: [
-        "zero", "first", "half"
+         "null", "første", "halv"
     ],
 
     # stop when regularity begins
     NumbersOrdinalFractionalPluralOnes: [
-        "zeros", "firsts", "halves"
+         "null", "første", "halvdeler"
     ],
 
 
     # What to use for multiples of 10
     NumbersTens: [
-        "", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"
+         "", "ti", "tjue", "tretti", "førti", "femti", "seksti", "sytti", "åtti", "nitti"
     ],
 
     NumbersOrdinalTens: [
-        "", "tenth", "twentieth", "thirtieth", "fortieth", "fiftieth", "sixtieth", "seventieth", "eightieth", "ninetieth"
+         "", "tiende", "tjuende", "trettiende", "førtiende", "femtiende", "sekstiende", "syttiende", "åttiende", "nittiende"
     ],
 
     NumbersOrdinalPluralTens: [
-        "", "tenths", "twentieths", "thirtieths", "fortieths", "fiftieths", "sixtieths", "seventieths", "eightieths", "ninetieths"
+         "", "tiendedeler", "tjuedeler", "trettideler", "førtideler", "femtideler", "sekstideler", "syttideler", "åttiendedeler", "nittideler"
     ],
 
 
-    NumbersHundreds: ["", "one hundred", "two hundred", "three hundred", "four hundred", "five hundred",
-        "six hundred", "seven hundred", "eight hundred", "nine hundred"
+    NumbersHundreds: [
+       "", "ett hundre", "to hundre", "tre hundre", "fire hundre", "fem hundre",
+         "seks hundre", "sju hundre", "åtte hundre", "ni hundre"
     ],
 
-    NumbersOrdinalHundreds: ["", "one hundredth", "two hundredth", "three hundredth", "four hundredth", "five hundredth",
-        "six hundredth", "seven hundredth", "eight hundredth", "nine hundredth"
+    NumbersOrdinalHundreds: [
+       "", "en hundredel", "to hundredel", "tre hundredel", "fire hundredel", "fem hundredel",
+         "seks hundredel", "sju hundredel", "åtte hundredel", "ni hundredel"
     ],
 
-    NumbersOrdinalPluralHundreds: ["", "one hundredths", "two hundredths", "three hundredths", "four hundredths", "five hundredths",
-        "six hundredths", "seven hundredths", "eight hundredths", "nine hundredths"
+    NumbersOrdinalPluralHundreds: [
+       "", "en hundredeler", "to hundredeler", "tre hundredeler", "fire hundredeler", "fem hundredeler",
+         "seks hundredeler", "sju hundredeler", "åtte hundredeler", "ni hundredeler"
     ],
       
 
     # At this point, hopefully the language is regular. If not, code needs to be written
     NumbersLarge: [
-        "", "thousand", "million", "billion", "trillion", "quadrillion",
-        "quintillion", "sextillion", "septillion", "octillion", "nonillion",
+         "", "tusen", "millioner", "milliarder", "trillioner", "kvadrillioner",
+         "quintillion", "sextillion", "septillion", "oktillion", "nonillion",
     ],
       
     NumbersOrdinalLarge: [
-        "", "thousandth", "millionth", "billionth", "trillionth", "quadrillionth",
-        "quintillionth", "sextillionth", "septillionth", "octillionth", "nonillionth"
+         "", "thousandth", "millionth", "milliardth", "trillionth", "quadrillionth",
+         "kvintilliondel", "sekstilliondel", "sektilliondel", "oktilliondel", "ikke-milliondel"
     ],
       
     NumbersOrdinalPluralLarge: [
-        "", "thousandths", "millionths", "billionths", "trillionths", "quadrillionths",
-        "quintillionths", "sextillionths", "septillionths", "octillionths", "nonillionths"
+         "", "tusendeler", "milliondeler", "milliarddeler", "trilliondeler", "kvadrilliondeler",
+         "kvintilliondeler", "sekstilliondeler", "septilliondeler", "oktilliondeler", "ikke-milliondeler"
     ]
 
 ]
