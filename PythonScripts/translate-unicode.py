@@ -192,6 +192,7 @@ MAX_CHARS_IN_CHUNK = 4500  # 4500 sometimes failed (language code "no")
 # try to avoid google banning us
 TIMEOUT = 2
 import time
+
 def translate_words(words_to_translate: set, lang):
     if lang=='nb' or lang=='nn':
         lang = 'no'  # google doesn't know those variants, but SRE uses them
@@ -201,10 +202,16 @@ def translate_words(words_to_translate: set, lang):
         # translate doesn't handle a list properly -- use ".\n" to separate words
         word_string = ".\n".join(words)
         # chunk_translations = translate(words, from_lang='en', to_lang=lang, url=TRANSLATE_URL)
-        translated_words = GoogleTranslate.translate(word_string, src='en', dest=lang).text.lower()
-        translated_words = translated_words.split('.\n')
+        translated_words_str = GoogleTranslate.translate(word_string, src='en', dest=lang).text.lower()
+        translated_words = translated_words_str.split('.\n')
         if len(translated_words) != len(words_to_translate):
             print("\n!!!Problem in translation: size of translations ({}) differs from words to translate ({})\n".format(len(translated_words), len(words_to_translate)))
+            # The Finnish translation (at least) for some reason has a few failures where ".\n" is only "\n" (and translation failed)
+            # We try a last attempt by deleting the '.' and splitting at the newline
+            print("Retrying by assuming '.' is missing...")
+            translated_words = translated_words_str.replace('.','').split('\n')
+            if len(translated_words) != len(words_to_translate):
+                print("!!!Retry failed: size of translations ({}) differs from words to translate ({})\n".format(len(translated_words), len(words_to_translate)))
             print("Words to translate:\n{}".format(list(words_to_translate)))
             print("Translations:\n{}".format(list(translated_words)))
         for (orig, translation) in zip(words, translated_words):
@@ -330,5 +337,5 @@ MP_Location = r"C:\Dev\mathplayer\EqnLib\rules\pvt"
 # (sre_only, mp_only, differ, same) = dict_compare("es", sre_chars, mp_chars)
 # (sre_only, mp_only, differ, same) = dict_compare("fr", get_sre_unicode_dict(SRE_Location, "fr"), get_mathplayer_unicode_dict(MP_Location, "fr"))
 # (sre_only, mp_only, differ, same) = dict_compare("it", get_sre_unicode_dict(SRE_Location, "it"), get_mathplayer_unicode_dict(MP_Location, "it"))
-build_new_translation("..", "nn", "unicode")
-# build_new_translation("..", "nn", "unicode-full")
+build_new_translation("..", "fi", "unicode")
+build_new_translation("..", "fi", "unicode-full")
