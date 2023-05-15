@@ -326,6 +326,45 @@ def dict_compare(lang: str, sre: dict, mp: dict):
         print_set("mp_only", mp_only, mp)
     return (sre_only, mp_only, differ, same)
 
+# Google translate fails to lots of words when I use GoogleTranslate.translate() on a single def.
+#  I played with changing the quotes and a few other things. The failures shifted, but the results weren't good.
+# Strangely, if you copy the '.../en/definitions.yaml' and paste that into translate.google.com, it does it all.
+# Rather than waste a bunch more time on this, the code assumes you've translated the file already and stored it in 'google-defs.yaml' in the current dir
+# It then goes through the English version leaving the English and  pulling out only the translated *values*
+#   from 'google-defs.yaml' writing '[lang]-definitions.yaml'.
+def translate_definitions(path_to_mathcat: str, lang: str):
+    if lang=='nb' or lang=='nn':
+        lang = 'no'  # google doesn't know those variants
+
+    file_to_translate = "{}/Rules/Languages/en/definitions.yaml".format(path_to_mathcat)
+    with open("google-defs.yaml", 'r', encoding='utf8') as google_stream:
+        translated_lines = google_stream.readlines()
+        with open(file_to_translate, 'r', encoding='utf8') as in_stream:
+            with open(lang+"-definitions.yaml", 'w', encoding='utf8') as out_stream:
+                lines = in_stream.readlines()
+                i = 0
+                n_lines = len(lines)
+                while i < n_lines:
+                    if not(lines[i].startswith('#')) and lines[i].find(': [') >= 0:
+                        # handles 'xxx: [' inclusive of the line with the matching ']'  
+                        i = translate_definition(i, lines, translated_lines, out_stream)
+                    else:
+                        out_stream.write(lines[i])
+                    i += 1
+
+def translate_definition(start: int, lines: list[str], translated_lines: list[str], out_stream):
+    value = ''
+    out_stream.write(lines[start])
+    i = start+1    # first line is 'name: ['
+    while i < len(lines):
+        if lines[i].find(']') >= 0:
+            out_stream.write(lines[i])
+            return i
+        out_stream.write(translated_lines[i])
+        i += 1
+    return i
+
+
 
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
@@ -337,5 +376,6 @@ MP_Location = r"C:\Dev\mathplayer\EqnLib\rules\pvt"
 # (sre_only, mp_only, differ, same) = dict_compare("es", sre_chars, mp_chars)
 # (sre_only, mp_only, differ, same) = dict_compare("fr", get_sre_unicode_dict(SRE_Location, "fr"), get_mathplayer_unicode_dict(MP_Location, "fr"))
 # (sre_only, mp_only, differ, same) = dict_compare("it", get_sre_unicode_dict(SRE_Location, "it"), get_mathplayer_unicode_dict(MP_Location, "it"))
-build_new_translation("..", "fi", "unicode")
-build_new_translation("..", "fi", "unicode-full")
+# build_new_translation("..", "fi", "unicode")
+# build_new_translation("..", "fi", "unicode-full")
+translate_definitions("..", "fi")
