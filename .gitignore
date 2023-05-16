@@ -29,6 +29,7 @@ PythonScripts/all-nemeth-chars.py
 PythonScripts/encrypt.py
 PythonScripts/intent-coverage.py
 PythonScripts/PythonScripts.zip
+PythonScripts/google-defs.yaml
 
 src/errors.rs
 src/pattern.pest
