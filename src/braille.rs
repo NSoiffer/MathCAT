@@ -239,7 +239,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         "," => "⠠⠀",    // comma
         "b" => "⠐",     // baseline
         "↑" => "⠘",     // superscript
-        "↓" => "⠰",     // supscript
+        "↓" => "⠰",     // subscript
     };
 
     lazy_static! {
