@@ -96,11 +96,12 @@
   match: "."
   replace:
   - x: "*[1]"
-  - T: indeks
+  - T: "indeks"
   - x: "*[2]"
-  - T: 'pangkat'
+  - T: "pangkat"
   - x: "*[3]"
-  - T: baris basis
+  - T: "baris basis"
+
 - name: default
   tag: munder
   match: "."

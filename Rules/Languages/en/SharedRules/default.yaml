@@ -96,11 +96,12 @@
   match: "."
   replace:
   - x: "*[1]"
-  - t: sub
+  - t: "sub"
   - x: "*[2]"
   - t: "raised to the"
   - x: "*[3]"
-  - t: power
+  - t: "power"
+
 - name: default
   tag: munder
   match: "."
