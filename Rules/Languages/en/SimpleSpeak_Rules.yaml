@@ -11,7 +11,7 @@
   tag: mn
   match: "starts-with(text(), '-')"
   replace:
-  - t: "minus"
+  - t: "minus"        # phrase(x 'minus' y)
   - x: "translate(text(), '-_', '')"
 
 - name: default
@@ -20,17 +20,17 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: the}
-  - t: square root
+      then: {t: "the"}    # phrase('the' square root of x)
+  - t: "square root"      # phrase(the 'square root' of x)
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: of}
+      then: {t: "of"}   # phrase(the square root 'of' x)
       else: {pause: short}
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{t: end root}, {pause: short}]
+      else: [{t: "end root"}, {pause: short}]  # phrase(the square root of x 'end root')
 
 - name: default
   tag: root
