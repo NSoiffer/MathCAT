@@ -79,9 +79,10 @@
        # FIX: consider adding ]...[ versions
     - "(*[1][text()='(' or text()='['] and *[3][text()=')' or text()=']']) and"   # match bracketing
     - "(*[2][count(*)=3 and *[2][text()=',']]) and"                               # inside should have ','
+    - "not(ancestor::*[IsBracketed(., '{', '}')]) and "                           # intervals are not part of set notation (e.g, { (x,y)∈L | ...})
       # FIX: if both the first and third children of *[2] are mn, then make sure first <= third
     - "("
-    - "  not(IsBracketed(., '(', ')')) or "                                                                   # not (.,.) is less ambiguous
+    - "  not(IsBracketed(., '(', ')')) or "                                                                   # (.,.) is very ambiguous -- need more clues
     - "  $ClearSpeak_Paren = 'Interval' or "                                                                  # pref is set
     - " *[2]/*[1][contains(., '∞')] or "                                                                      # starts with infinity
     - " *[2]/*[3][contains(., '∞')] or "                                                                      # ends with infinity
@@ -468,7 +469,7 @@
 -
   name: skip-super
   tag: [msup, msubsup]
-  match: "*[last()][translate(., '′″‴⁗†‡°', '')='']"
+  match: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
   replace:
   - intent:
       name: "skip-super"
