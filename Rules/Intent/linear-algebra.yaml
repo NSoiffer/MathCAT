@@ -6,7 +6,7 @@
   tag: mrow
   match: 
     - "IsBracketed(., '|', '|') and "
-    - "($SpeechStyle = 'ClearSpeak' and $ClearSpeak_AbsoluteValue != 'Cardinality') and "
+    - "($SpeechStyle = 'SimpleSpeak' or ($SpeechStyle = 'ClearSpeak' and $ClearSpeak_AbsoluteValue != 'Cardinality')) and "
     - "*[2][self::m:mi and translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '']"
   replace:
   - intent:

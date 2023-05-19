@@ -1,6 +1,6 @@
 ---
 
-- name: simple-determinant
+- name: scalar-determinant
   tag: determinant
   match: "count(*)=1 and not(*[1][self::m:mtr])"
   replace:
@@ -14,6 +14,9 @@
       then:
       - t: "of"
   - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [t: "end determinant"]
 
 - name: norm
   tag: norm
@@ -29,6 +32,10 @@
       then:
       - t: "of"
   - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [t: "end norm"]
+
 
 - name: subscripted-norm
   tag: subscripted-norm
