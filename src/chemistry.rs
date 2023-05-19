@@ -82,13 +82,21 @@ static CHEM_EQUATION_ARROWS: phf::Set<char> = phf_set! {
 };
 
 
-pub fn is_chemistry_off() -> bool {
+pub fn is_chemistry_off(mathml: Element) -> bool {
+    lazy_static! {
+        static ref INTENT_STRUCTURE: Regex = Regex::new(r":structure([ \t\n:(]|$)").unwrap(); 
+    }
+    if let Some(intent) = mathml.attribute_value("intent") {
+        if INTENT_STRUCTURE.is_match(intent) {
+            return true;
+        }
+    }
     let pref_manager = crate::prefs::PreferenceManager::get();
     return pref_manager.borrow().get_user_prefs().to_string("Chemistry") == "Off";
 }
 
 pub fn clean_chemistry_mrow(mathml: Element) {
-    if is_chemistry_off() {
+    if is_chemistry_off(mathml) {
         return;
     }
     // debug!("clean_chemistry_mrow:\n{}", mml_to_string(&mathml));
@@ -377,7 +385,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
 /// 
 /// Returns false if not chemistry -- added attrs, mrows, and leaves are removed in preparation for a second parse
 pub fn scan_and_mark_chemistry(mathml: Element) -> bool {
-    if is_chemistry_off() {
+    if is_chemistry_off(mathml) {
         return true;
     }
 

@@ -8,7 +8,7 @@
 -
   name: turn-off
   tag: "!*"     # turn off matching -- runs before specific rules
-  match: "ancestor-or-self::*[@subject][1][@subject='None']"    # do this only if there isn't some other subject first
+  match: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"
   replace:
   - test:
       - if: "*"

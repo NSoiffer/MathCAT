@@ -968,7 +968,7 @@ impl CanonicalizeContext {
 					}
 					let mathml = if element_name == "mmultiscripts" {clean_mmultiscripts(mathml).unwrap()} else {mathml};
 					// debug!("some scripted element...\n{}", mml_to_string(&mathml));	
-					if !is_chemistry_off() {
+					if !is_chemistry_off(mathml) {
 						let likely_chemistry = likely_adorned_chem_formula(mathml);
 						// debug!("likely_chemistry={}, {}", likely_chemistry, mml_to_string(&mathml));
 						if likely_chemistry >= 0 {
@@ -1150,7 +1150,7 @@ impl CanonicalizeContext {
 		}
 
 		fn clean_chemistry_leaf(mathml: Element) -> Element {
-			if !(is_chemistry_off() || mathml.attribute(MAYBE_CHEMISTRY).is_some()) {
+			if !(is_chemistry_off(mathml) || mathml.attribute(MAYBE_CHEMISTRY).is_some()) {
 				assert!(name(&mathml)=="mi" || name(&mathml)=="mtext");
 				// this is hack -- VII is more likely to be roman numeral than the molecule V I I so prevent that from happening
 				// FIX: come up with a less hacky way to prevent chem element misinterpretation

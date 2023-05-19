@@ -9,6 +9,7 @@
       - ClearSpeak_Fractions: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Fractions='Auto', 'EndFrac', $ClearSpeak_Fractions)"
       - ClearSpeak_AbsoluteValue: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_AbsoluteValue='Auto', 'AbsEnd', $ClearSpeak_AbsoluteValue)"
       - ClearSpeak_Roots: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Roots='Auto', 'RootEnd', $ClearSpeak_Roots)"
+      - ClearSpeak_Matrix: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Matrix='Auto', 'EndMatrix', $ClearSpeak_Matrix)"
       replace:
       - test:
           if: "$MathRate = 100"
@@ -91,16 +92,40 @@
   - t: "end sub"
   - pause: short
 
-- name: default
-  tag: msubsup
+
+- name: structure
+  tag: msub
   match: "."
   replace:
   - x: "*[1]"
   - t: "sub"
   - x: "*[2]"
-  - t: "raised to the"
-  - x: "*[3]"
-  - t: "power"
+
+- name: structure
+  tag: [msup, msubsup]
+  match: "."
+  replace:
+  - x: "*[1]"
+  - test:
+      if: "name(.)='msubsup'"
+      then:
+      - t: "sub"
+      - x: "*[2]"
+  - test:
+      if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
+      then:  [x: "*[last()]"]
+      else_test:
+          if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"  # FIX: is this test necessary?
+          then:
+          - t: "super"
+          - x: "*[last()]"
+          - test:
+              if: "not(IsNode(*[last()], 'simple'))"
+              then: [t: "end super"]
+          else:
+          - t: "raised to the"
+          - x: "*[last()]"
+          - t: "power"
 
 - name: default
   tag: munder
@@ -113,6 +138,13 @@
   - t: "with"
   - x: "*[2]"
   - t: below
+
+- name: diacriticals
+  tag: mover
+  match: "*[1][self::m:mi] and *[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^~→¯_', '')='']"
+  replace:
+  - x: "*[1]"
+  - x: "*[2]"
 
 - name: default
   tag: mover
