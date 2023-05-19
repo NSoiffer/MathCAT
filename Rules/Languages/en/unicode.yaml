@@ -86,8 +86,12 @@
             else: [t: "close paren"]
         else: [t: "right paren"]                            
 
- - "*": [t: "times"]                               # 0x2a
- - "+": [t: "plus"]                                # 0x2b
+ - "*":                                          # 0x2a
+    test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup']"
+        then: [t: "star"]
+        else: [t: "times"]
+ - "+": [t: "plus"]                              # 0x2b
  - ",":                                          # 0x2c
     # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
     # that this test is here and not with "…" is not ideal, but seems simplest
