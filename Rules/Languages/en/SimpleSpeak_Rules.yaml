@@ -58,12 +58,12 @@
       - t: root        # phrase(the square  'root' of)
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: of}]        # phrase(a large number 'of' choices)
+      then: [{t: of}]        # phrase(the square root  'of' x)
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{t: end root}, {pause: short}]      # phrase(that is the 'end root' position)
+      else: [{t: end root}, {pause: short}]      # phrase(start the fifth root of x 'end root')
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
