@@ -8,12 +8,14 @@ This page is a work-in-progress.
 If you plan to work on MathCAT development, you need to make use of github:
 1. Fork the MathCAT repo at `github.com/NSoiffer/MathCAT`
 2. Clone the the forked copy so you have a local copy to work on.
+3. Checkout the "translation" branch and work in that branch.
+
 If you are unfamiliar with these steps, a simple search will turn up lots of places that describe how to do them. They are simple, so don't get put off by your unfamiliarity.
 
 
 ## Language Translators
 If you are a translator, please contact @NSoiffer and he will set up an initial translation that could save a large amount of time. This initial translation will create files in Rules/Languages/xx, where 'xx' is your country code (e.g., fr, de, el, ...). This directory is where you will make your translations. There are four categories of files you should edit:
-1. definitions.yaml: this has a number of translations for numbers, both cardinal and ordinal numbers. Look through those initial translations and make any corrections needed. These numbers are used for things like saying "three fifths". Languages start to have regular patterns at some point and so some of the lists in that file can be shortened and some may need additional entries. There are some more details in the English comments in the file.
+1. definitions.yaml: this has a number of translations for numbers, both cardinal and ordinal numbers. Look through those initial translations and make any corrections needed. These numbers are used for things like saying "three fifths". Languages start to have regular counting patterns at some point and so some of the lists in that file can be shortened and some may need additional entries. There are some more details in the English comments in the file.
 2. The xxx_Rules.yaml files (currently `ClearSpeak_Rules.yaml` and `SimpleSpeak_Rules.yaml`). These represent different styles of speech. I strongly recommend you just pick one to start with. These files typically have the words that describe the structure such as "fraction" and "power" along with connective words such as "the", "of", and "from". Because there is a lot of similarity between the two styles of speech, there is also a `SharedRules` folder with rule files in it. These are `- include`d into `ClearSpeak_Rules.yaml` and `SimpleSpeak_Rules.yaml`. They need to be translated also.
     * In some languages it doesn't make sense to says "_the_ square root of x" (and maybe "of"). If that is the case, just change those to empty strings.
     * Some languages, the word order changes -- feel free to move the words around, but pay attention to the indentation.
