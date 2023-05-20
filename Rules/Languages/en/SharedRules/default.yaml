@@ -102,7 +102,7 @@
       then: [{pause: short}]
   - x: "*[2]"
   - pause: short
-  - t: "end fraction"
+  - t: "end"
   - pause: medium
 
 
