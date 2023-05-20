@@ -63,7 +63,7 @@
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{t: end root}, {pause: short}]      #sorry
+      else: [{t: end root}, {pause: short}]      # phrase(that is the 'end root' position)
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
