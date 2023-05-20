@@ -43,11 +43,11 @@
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][text()='2']"
-        then: [{t: square root}]
+        then: [{t: square root}]        # phrase(the 'square root' of)
       - else_if: "*[2][text()='3']"
-        then: [{t: cube root}]
+        then: [{t: cube root}]        # phrase(the 'cube root' of)
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {t: root}]
+        then: [{x: "ToOrdinal(*[2])"}, {t: root}]        # phrase(the square  'root' of)
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
@@ -55,15 +55,15 @@
           - x: "*[2]"
           - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: [{x: "*[2]"}]
-      - t: root
+      - t: root        # phrase(the square  'root' of)
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: of}]
+      then: [{t: of}]        # phrase(a large number 'of' choices)
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{t: end root}, {pause: short}]
+      else: [{t: end root}, {pause: short}]      #sorry
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
