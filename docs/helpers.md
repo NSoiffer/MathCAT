@@ -11,7 +11,7 @@ If you plan to work on MathCAT development, you need to make use of github:
 If you are unfamiliar with these steps, a simple search will turn up lots of places that describe how to do them. They are simple, so don't get put off by your unfamiliarity.
 
 
-### Language Translators
+## Language Translators
 If you are a translator, please contact @NSoiffer and he will set up an initial translation that could save a large amount of time. This initial translation will create files in Rules/Languages/xx, where 'xx' is your country code (e.g., fr, de, el, ...). This directory is where you will make your translations. There are four categories of files you should edit:
 1. definitions.yaml: this has a number of translations for numbers, both cardinal and ordinal numbers. Look through those initial translations and make any corrections needed. These numbers are used for things like saying "three fifths". Languages start to have regular patterns at some point and so some of the lists in that file can be shortened and some may need additional entries. There are some more details in the English comments in the file.
 2. The xxx_Rules.yaml files (currently `ClearSpeak_Rules.yaml` and `SimpleSpeak_Rules.yaml`). These represent different styles of speech. I strongly recommend you just pick one to start with. These files typically have the words that describe the structure such as "fraction" and "power" along with connective words such as "the", "of", and "from". Because there is a lot of similarity between the two styles of speech, there is also a `SharedRules` folder with rule files in it. These are `- include`d into `ClearSpeak_Rules.yaml` and `SimpleSpeak_Rules.yaml`. They need to be translated also.
@@ -27,6 +27,7 @@ If you are a translator, please contact @NSoiffer and he will set up an initial 
 
 __NOTE__: I am in the process of changing the rules to make use of `intent`. This will move the complicated logic of recognizing things like absolute value and determinants into the `intent` folder which is language-independent. It should make translations simpler because the rule only needs to match the tag "absolute-value" or "determinant". The tests also should be separated out into an `intent` directory that is language independent.
 
+### Marking text as translated
 These files are YAML files and their content is described later in this page.
 In all of these files, the text to translate will have the YAML key name `t` (and very rarely `ot`, `ct`, `spell`, and `pronounce`). When you make a translation, you should capitalize them (e.g, `T` and `SPELL`) to indicate that the file has been translated.
 
@@ -52,7 +53,7 @@ If you were translating this to French, the words after the `t:` would get chang
 
 See below for a discussion of what can be used in a rule file.
 
-#### A note about the translated files
+### A note about the translated files
 To derive an initial translation for the Unicode files, both MathPlayer's and SRE's translations are used. Google translate is also used.
 If SRE and MathPlayer agree, or if only one of SRE or MathPlayer has a translation but that translation agrees with the google translation, then only the original English version will be part of a comment at the end. For example:
 ```
@@ -73,7 +74,7 @@ Finally, if there there is no translation, then the google translation is given 
 ```
 
 
-#### Trying out your translation
+### Trying out your translation
 Once you've done some translations and want to try them out, you can do so immediately if using NVDA. Assuming you have the MathCAT addon:
 1. Copy your new translation directory to `%AppData%\nvda\addons\MathCAT\globalPlugins\MathCAT\Rules\Languages`.
 2. Start NVDA and go to the MathCAT settings menu (NVDA preferences: MathCAT settings..).
@@ -84,7 +85,7 @@ Once you've done some translations and want to try them out, you can do so immed
 
 Translating the settings dialog: this is a separate process from translating the speech. [to be written]
 
-#### Automatic tests for your translation
+### Automatic tests for your translation
 Testing is very important! MathCAT is written in Rust and has a large number of automated tests. These tests take advantage of the builtin Rust test system. Hence, to write and verify your own tests, you need to [download and install Rust](https://www.rust-lang.org/tools/install). You do not need to know Rust -- you will simply change some strings from what they are in English to what you think they should be in your language.
 In the `tests\Languages` directory, there is a file `en.rs` and a directory `en`. For the sake of discussion, let's assume you are doing a French translation, then your country code is `fr`.
 1. Copy `en.rs` to `fr.rs`.
@@ -114,7 +115,7 @@ I hope to eventually have a tool that will
 These tools will look for untranslated and translated text.
 
 
-### Braille translators
+## Braille translators
 If you want support for a new braille language, you probably need to start from scratch unless the language is similar to an existing braille language.
 You will need to create three `.yaml` files in `Rules\Braille\your-braille-language`. This should mirror the files that are in the other braille directories:
 1. xxx_Rules.yaml -- where 'xxx' is the name of your new braille language. These will contain the rules that translate MathML to braille
@@ -129,7 +130,7 @@ To try out your braille translation, you can do so immediately. Please see the i
 
 For automated testing, the instructions above should be followed. The current tests are taken from braille guides for Nemeth/UEB, and you may want to do the same. Unlikely for a language translation, use `test_braille` as is done for Nemeth/UEB.
 
-### Understanding MathCAT Error Message
+## Understanding MathCAT Error Message
 If there is a problem with a rule that causes an error, these print to the terminal console if you are running MathCAT directly or to NVDA's log if you are using NVDA.
 
 The error messages can be confusing to understand. Here is a description of one and how to understand what is saying.
@@ -197,7 +198,7 @@ The final line says that in there, the problem is `Unknown 'replace' command (te
 It is often easiest to read the error from the bottom up.
 
 
-### Rust Developers
+## Rust Developers
 To be written...
 
 `build.rs` and files in `src`
