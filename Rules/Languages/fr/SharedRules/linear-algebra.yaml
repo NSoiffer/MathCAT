@@ -1,0 +1,121 @@
+---
+
+- name: scalar-determinant
+  tag: determinant
+  match: "count(*)=1 and not(*[1][self::m:mtr])"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "the"
+  - t: "determinant"
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "of"
+  - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [t: "end determinant"]
+
+- name: norm
+  tag: norm
+  match: "count(*)=1 and not(@data-intent-property)"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "the"
+  - t: "norm"
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "of"
+  - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [t: "end norm"]
+
+
+- name: subscripted-norm
+  tag: subscripted-norm
+  match: count(*)=2 and "not(@data-intent-property)"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "the"
+  - x: "*[2]"
+  - t: "norm"
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "of"
+  - x: "*[1]"
+
+- name: transpose
+  tag: transpose
+  match: "count(*)=1 and not(@data-intent-property)"
+  replace:
+  - x: "*[1]"
+  - t: "transpose"
+- name: trace
+  tag: trace
+  match: "not(@data-intent-property)"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "the"
+  - t: "trace"
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "of"
+  - x: "*[1]"
+
+- name: dimension
+  tag: dimension
+  match: "count(*)=1 and not(@data-intent-property)"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "the"
+  - t: "dimension"
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "of"
+  - x: "*[1]"
+
+- name: homomorphism
+  tag: homomorphism
+  match: "count(*)=1 and not(@data-intent-property)"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "the"
+  - t: "homomorphism"
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "of"
+  - x: "*[1]"
+
+- name: kernel
+  tag: kernel
+  match: "count(*)=1 and not(@data-intent-property)"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "the"
+  - t: "kernel"
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "of"
+  - x: "*[1]"
+

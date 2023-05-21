@@ -1,0 +1,102 @@
+---
+[
+# Lines starting with "#" are a comment
+# Each definition in this file is of the form
+#   name: [ "...", "..." "..." ],
+
+
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
+# The following definitions are used to convert numbers to words
+# The are mainly used for ordinals, of which there are two cases:
+# 1. Regular ordinals: first, second, third, ...
+# 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
+#    When used in the denominator of fractions, a plural version might be
+#    used (e.g., two halves, two thirds)
+# Although a lot of languages are regular after a few entries, for generality,
+# the following lists should be filled out even though they are the same
+# or easily derived from others in many languages (e.g, an 's' is added for plurals).
+# The larger ordinal numbers (e.g, millionth) is used when there are only
+# '0's after that decimal place (e.g., 23000000).:w
+
+# All definitions start 0, 10, 100, etc.
+
+# The definitions for the "ones" should extend until a regular pattern begins
+#   The minimum length is 10.
+
+# For English, a regular pattern starts at twenty
+    NumbersOnes: [
+         "zéro", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf",
+         "dix", "onze", "douze", "treize", "quatorze", "quinze", "seize",
+         "dix-sept", "dix-huit", "dix-neuf"
+    ],
+
+    NumbersOrdinalOnes: [
+         "zéro", "premier", "deuxième", "troisième", "quatrième", "cinquième", "sixième", "septième", "huitième", "neuvième",
+         « dixième », « onzième », « douzième », « treizième », « quatorzième », « quinzième », « seizième »,
+         "dix-septième", "dix-huitième", "dix-neuvième"
+    ],
+
+    NumbersOrdinalPluralOnes: [
+         "zéro", "premier", "seconde", "tiers", "quart", "cinquième", "sixième", "septième", "huit", "neuvième",
+         "dixièmes", "onzièmes", "douzièmes", "treizièmes", "quatorzièmes", "quinzièmes", "seizièmes",
+         "dix-septièmes", "dix-huitièmes", "dix-neuvièmes"
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalOnes: [
+         "zéro", "premier", "moitié"
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalPluralOnes: [
+         "zéros", "premiers", "moitiés"
+    ],
+
+
+    # What to use for multiples of 10
+    NumbersTens: [
+         "", "dix", "vingt", "trente", "quarante", "cinquante", "soixante", "soixante-dix", "quatre-vingt", "quatre-vingt-dix"
+    ],
+
+    NumbersOrdinalTens: [
+         "", "dixième", "vingtième", "trentième", "quarantième", "cinquantième", "soixantième", "soixante-dixième", "quatre-vingtième", "quatre-vingt-dixième"
+    ],
+
+    NumbersOrdinalPluralTens: [
+         "", "dixièmes", "vingtièmes", "trenteièmes", "quarantièmes", "cinquantièmes", "soixantièmes", "soixante-dixièmes", "quatre-vingtièmes", "quatre-vingt-dixièmes"
+    ],
+
+
+    NumbersHundreds: [
+       "", "cent", "deux cents", "trois cents", "quatre cents", "cinq cents",
+         "six cents", "sept cents", "huit cents", "neuf cents"
+    ],
+
+    NumbersOrdinalHundreds: [
+       "", "un centième", "deux centième", "trois centième", "quatre centième", "cinq centième",
+         "six centième", "sept centième", "huit centième", "neuf centième"
+    ],
+
+    NumbersOrdinalPluralHundreds: [
+       "", "un centième", "deux centièmes", "trois centièmes", "quatre centièmes", "cinq centièmes",
+         "six centièmes", "sept centièmes", "huit centièmes", "neuf centièmes"
+    ],
+      
+
+    # At this point, hopefully the language is regular. If not, code needs to be written
+    NumbersLarge: [
+         "", "mille", "million", "milliard", "billion", "quadrillion",
+         "quintillion", "sextillion", "septillion", "octillion", "nonillion",
+    ],
+      
+    NumbersOrdinalLarge: [
+         "", "millième", "millionième", "milliardième", "billionième", "quadrillionième",
+         "quintillionième", "sextillionième", "septillionième", "octillionième", "nonillionième"
+    ],
+      
+    NumbersOrdinalPluralLarge: [
+         "", "millièmes", "millionièmes", "milliardièmes", "trillionièmes", "quadrillionièmes",
+         "quintillionièmes", "sextillionèmes", "septillionèmes", "octillionths", "nonillionths"
+    ]
+
+]
