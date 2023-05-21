@@ -1,14 +1,14 @@
 ---
 
 
- - "\"": [t: "barra inversa"]                   	#  0x22	(en: 'quotation mark')
- - "#": [t: "almuhadilla"]                      	#  0x23	(en: 'number', MathPlayer: 'signo de número', google: 'número')
- - "$": [t: "dólar"]                            	#  0x24	(en: 'dollars')
- - "%": [t: "porciento"]                        	#  0x25	(en: 'percent')
- - "&": [t: "ampersand"]                        	#  0x26
- - "'": [t: "prima"]                            	#  0x27	(en: 'apostrophe', MathPlayer: 'apóstrofo', google: 'apóstrofe')
- - "*": [t: "por"]                              	#  0x2a	(en: 'times')
- - "+": [t: "más"]                              	#  0x2b	(en: 'plus')
+ - "\"": [T: "barra inversa"]                   	#  0x22	(en: 'quotation mark')
+ - "#": [T: "almohadilla"]                      	#  0x23	(en: 'number', MathPlayer: 'signo de número', google: 'número')
+ - "$": [T: "dólar"]                            	#  0x24	(en: 'dollars')
+ - "%": [T: "porciento"]                        	#  0x25	(en: 'percent')
+ - "&": [T: "ampersand"]                        	#  0x26
+ - "'": [T: "apóstrofo"]                            	#  0x27	(en: 'apostrophe', MathPlayer: 'apóstrofo', google: 'apóstrofe')
+ - "*": [T: "por"]                              	#  0x2a	(en: 'times')
+ - "+": [T: "más"]                              	#  0x2b	(en: 'plus')
  - ",":                                         	#  0x2c
     # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
     # that this test is here and not with "…" is not ideal, but seems simplest
@@ -20,56 +20,56 @@
             - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
                # except if expression starts with '…'
             - "../*[1][text()='…']"
-        then: [t: "coma"]                       	# 	(en: 'comma', google translation)
+        then: [T: "coma"]                       	# 	(en: 'comma', google translation)
         # else silent
 
- - "-": [t: "menos"]                            	#  0x2d	(en: 'minus')
- - ".": [t: "punto"]                            	#  0x2e	(en: 'point')
- - "/": [t: "barra oblicua"]                    	#  0x2f	(en: 'divided by')
- - ":": [t: "dos puntos"]                       	#  0x3a	(en: 'colon')
- - ";": [t: "punto y coma"]                     	#  0x3b	(en: 'semicolon')
- - "?": [t: "interrogación derecho"]            	#  0x3f	(en: 'question mark', MathPlayer: 'cierra interrogación', google: 'signo de interrogación')
- - "@": [t: "arroba"]                           	#  0x40	(en: 'at sign')
+ - "-": [T: "menos"]                            	#  0x2d	(en: 'minus')
+ - ".": [T: "punto"]                            	#  0x2e	(en: 'point')
+ - "/": [T: "barra oblicua"]                    	#  0x2f	(en: 'divided by')
+ - ":": [T: "dos puntos"]                       	#  0x3a	(en: 'colon')
+ - ";": [T: "punto y coma"]                     	#  0x3b	(en: 'semicolon')
+ - "?": [T: "interrogación derecha"]            	#  0x3f	(en: 'question mark', MathPlayer: 'cierra interrogación', google: 'signo de interrogación')
+ - "@": [T: "arroba"]                           	#  0x40	(en: 'at sign')
  - "[":                                         	#  0x5b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "bracket abierto"]            	# 	(en: 'open bracket', google translation)
-        else: [t: "corchete izquierdo"]         	# 	(en: 'left bracket', MathPlayer: 'abre corchetes', google: 'soporte izquierdo')
- - "\\": [t: "corchete izquierdo"]              	#  0x5c	(en: 'back slash', MathPlayer: 'abre corchetes', google: 'back slash')
+        then: [T: "abrir corchetes"]            	# 	(en: 'open bracket', google translation)
+        else: [T: "corchete izquierdo"]         	# 	(en: 'left bracket', MathPlayer: 'abre corchetes', google: 'soporte izquierdo')
+ - "\\": [T: "corchete izquierdo"]              	#  0x5c	(en: 'back slash', MathPlayer: 'abre corchetes', google: 'back slash')
  - "]":                                         	#  0x5d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "cerrar el soporte"]          	# 	(en: 'close bracket', google translation)
-        else: [t: "corchete derecho"]           	# 	(en: 'right bracket', MathPlayer: 'cierra corchetes', google: 'soporte derecho')
- - "^": [t: "circunflejo"]                      	#  0x5e	(en: 'hat')
- - "_": [t: "subrayado"]                        	#  0x5f	(en: 'under bar')
- - "`": [t: "acento grave"]                     	#  0x60	(en: 'grave accent')
+        then: [T: "cerrar corchetes"]          	# 	(en: 'close bracket', google translation)
+        else: [T: "corchete derecho"]           	# 	(en: 'right bracket', MathPlayer: 'cierra corchetes', google: 'soporte derecho')
+ - "^": [T: "acento circunflejo"]                      	#  0x5e	(en: 'hat')
+ - "_": [T: "subrayado"]                        	#  0x5f	(en: 'under bar')
+ - "`": [T: "acento grave"]                     	#  0x60	(en: 'grave accent')
  - "{":                                         	#  0x7b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "abrazadera abierta"]         	# 	(en: 'open brace', google translation)
-        else: [t: "llave izquierda"]            	# 	(en: 'left brace', MathPlayer: 'abre llaves', google: 'abrazadera izquierda')
+        then: [T: "abrir llaves"]         	# 	(en: 'open brace', google translation)
+        else: [T: "llave izquierda"]            	# 	(en: 'left brace', MathPlayer: 'abre llaves', google: 'abrazadera izquierda')
  - "|":                                         	#  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
      - test:
         - if: $SpeechStyle != 'ClearSpeak'
-          then: [t: "linea vertical"]           	# 	(en: 'vertical line', google translation)
+          then: [T: "barra vertical"]           	# 	(en: 'vertical line', google translation)
         - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
-          then: [t: "tal que"]                  	# 	(en: 'such that', google translation)
+          then: [T: "tal que"]                  	# 	(en: 'such that', google translation)
         - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
-          then: [t: "dado"]                     	# 	(en: 'given', google translation)
-        - else: [t: "barra vertical"]           	# 	(en: 'divides')
+          then: [T: "dado"]                     	# 	(en: 'given', google translation)
+        - else: [T: "divisible"]           	# 	(en: 'divides')
 
  - "}":                                         	#  0x7d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "cerrar abrazadera"]          	# 	(en: 'close brace', google translation)
-        else: [t: "llaves derecha"]             	# 	(en: 'right brace', MathPlayer: 'cierra llaves', google: 'abrazadera derecha')
+        then: [T: "cerrar llaves"]          	# 	(en: 'close brace', google translation)
+        else: [T: "llave derecha"]             	# 	(en: 'right brace', MathPlayer: 'cierra llaves', google: 'abrazadera derecha')
 
- - "~": [t: "tilde"]                            	#  0x7e
- - " ": [t: ""]                                 	#  0xa0
- - "¢": [t: "centavo"]                          	#  0xa2	(en: 'cents')
- - "£": [t: "libra esterlina"]                  	#  0xa3	(en: 'pounds')
+ - "~": [T: "tilde"]                            	#  0x7e
+ - " ": [T: ""]                                 	#  0xa0
+ - "¢": [T: "centavo"]                          	#  0xa2	(en: 'cents')
+ - "£": [T: "libra esterlina"]                  	#  0xa3	(en: 'pounds')
  - "¤": [t: "moneda"]                           	#  0xa4	(en: 'currency sign')
  - "¥": [t: "yen"]                              	#  0xa5
  - "¦": [t: "barra vertical partida"]           	#  0xa6	(en: 'broken bar')
