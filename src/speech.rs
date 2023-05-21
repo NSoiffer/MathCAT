@@ -1831,10 +1831,10 @@ impl<'c, 's:'c, 'm:'c> fmt::Display for SpeechRulesWithContext<'c, 's,'m> {
 
 thread_local!{
     static SPEECH_UNICODE_SHORT: UnicodeTable =
-        Rc::new( RefCell::new( HashMap::with_capacity(6997) ) );
+        Rc::new( RefCell::new( HashMap::with_capacity(497) ) );
         
     static SPEECH_UNICODE_FULL: UnicodeTable =
-        Rc::new( RefCell::new( HashMap::with_capacity(497) ) );
+        Rc::new( RefCell::new( HashMap::with_capacity(6997) ) );
         
     /// The current set of speech rules
     // maybe this should be a small cache of rules in case people switch rules/prefs?
