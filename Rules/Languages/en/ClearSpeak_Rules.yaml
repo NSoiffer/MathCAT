@@ -359,9 +359,9 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - t: "raised to the"
+  - t: "raised to the"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  - t: "power"
+  - t: "power"      # phrase(x raised to the second 'power')
 
 - # - [xxx]^n
   name: nested-negative-squared-or-cubed
@@ -380,9 +380,9 @@
   - "     ]"
   replace:
   - x: "*[1]"
-  - t: "raised to the"
+  - t: "raised to the"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  - t: "power"
+  - t: "power"      # phrase(x raised to the second 'power')
 
 - # [xxx] var^n
   name: nested-var-squared-or-cubed
@@ -403,9 +403,9 @@
   - "      ]"
   replace:
   - x: "*[1]"
-  - t: "raised to the"
+  - t: "raised to the"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  - t: "power"
+  - t: "power"      # phrase(x raised to the second 'power')
 
 - # -[xxx] var^n
   name: nested-negative-var-squared-or-cubed
@@ -428,9 +428,9 @@
   - "      ]"
   replace:
   - x: "*[1]"
-  - t: "raised to the"
+  - t: "raised to the"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  - t: "power"
+  - t: "power"      # phrase(x raised to the second 'power')
 
 - name: default-exponent-power
   tag: power
@@ -438,20 +438,20 @@
   - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
   replace:
   - x: "*[1]"
-  - t: "raised to the exponent"
+  - t: "raised to the exponent"      # phrase(x is 'raised to the exponent')
   - pause: short
   - x: "*[2]"
   - pause: short
-  - t: end exponent
+  - t: end exponent      # phrase(and now 'end exponent' has been reached)
 
 - name: default
   tag: power
   match: "."
   replace:
   - x: "*[1]"
-  - t: "raised to the"
+  - t: "raised to the"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  - t: "power"
+  - t: "power"      # phrase(x raised to the second 'power')
 
 #
 # Some rules on mrows
@@ -464,15 +464,15 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: the}
+      then: {t: the}      # phrase(5 is 'the' square root of 25)
   - x: "$WordToSay"
-  - t: "of"
+  - t: "of"      # phrase(5 is the square root 'of' 25)
   - x: "*[1]"
   - test:
       if: "$ClearSpeak_AbsoluteValue = 'AbsEnd'"
       then:
       - pause: short
-      - t: "end"
+      - t: "end"      # phrase('end' of equation)
       - x: "$WordToSay"
   - pause: short
 
@@ -482,24 +482,24 @@
   replace:
   - test:
     - if: "count(*)=0"
-      then: [{t: "the empty set"}]
+      then: [{t: "the empty set"}]      # phrase(This is 'the empty set' and it contains no values)
     - else_if: "count(*)=2"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: the}
-      - t: "empty set"
+          then: {t: the}      # phrase(5 is 'the' square root of 25)
+      - t: "empty set"      # phrase(this is the 'empty set' and it contains no values)
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: the}
-      - t: "set of"
+          then: {t: the}      # phrase(5 is 'the' square root of 25)
+      - t: "set of"      # phrase(this is a 'set of' numbers)
       - test:
           if: $ClearSpeak_Sets != 'woAll'
-          then: [{t: all}]
+          then: [{t: all}]      # phrase(this column contains 'all' numbers)
       - x: "*[1]/*[1]"
-      - t: "such that"
+      - t: "such that"      # phrase(therefore x has a value 'such that' it is less than y)
       - x: "*[1]/*[3]"
       else:
       - test:
