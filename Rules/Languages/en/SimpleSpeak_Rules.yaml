@@ -111,7 +111,7 @@
       then: [{pause: short}]
   - x: "*[2]"
   - pause: short
-  - t: end fraction      # phrase(reached 'end fraction' at last)
+  - t: end fraction      # phrase(7 over 8 'end fraction')
   - pause: medium
 
 # rules for functions raised to a power
@@ -135,7 +135,7 @@
   - test:
       if: "*[2][text()=2]"
       then: {t: squared}      # phrase(25 is the 'square' of 5)
-      else: {t: cubed}      # phrase(The value of 5 'cubed' is 625)
+      else: {t: cubed}      # phrase(The value of 5 'cubed' is 125)
 - name: function-power
   tag: power
   match:
@@ -163,7 +163,7 @@
   - test:
       if: "*[2][text()=2]"
       then: {t: squared}      # phrase(the result of 5 'squared' is 25)
-      else: {t: cubed}      # phrase(the result of 5 'cubed' is 625)
+      else: {t: cubed}      # phrase(the result of 5 'cubed' is 125)
 
 - name: simple-integer
   tag: power

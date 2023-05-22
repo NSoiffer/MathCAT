@@ -10,7 +10,7 @@
   tag: mn
   match: "starts-with(text(), '-')"
   replace:
-  - t: "minus"
+  - t: "minus"      # phrase(10 'minus' 4 = 6)
   - x: "translate(text(), '-_', '')"
 
 - name: default
@@ -19,26 +19,26 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: the}
+      then: {t: the}      # phrase(5 is 'the' square root of 25)
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
       - bookmark: "*[1]/@id"
       - test:
           if: parent::*[self::m:negative]
-          then: [{t: "negative"}]
-          else: [{t: "positive"}]
-  - t: square root
+          then: [{t: "negative"}]      # phrase(minus 4 is a 'negative' number)
+          else: [{t: "positive"}]      # phrase(10 is a 'positive' number)
+  - t: square root      # phrase(8 is the 'square root' of 64)
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: of}
+      then: {t: of}      # phrase(10 is the sum 'of' 5 and 5)
       else: {pause: short}
   - x: "*[1]"
   - test:
     - if: "$ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'"
       then:
       - pause: short
-      - t: end root
+      - t: end root      # phrase(the square root of x 'end root')
       - pause: medium
     - else_if: "IsNode(*[1], 'simple')"
       then: [{pause: short}]
@@ -50,7 +50,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: the}
+      then: {t: the}      # phrase(6 is 'the' square root of 36)
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
@@ -59,17 +59,17 @@
           then: [{bookmark: "parent/@id"}]
       - test:
           if: parent::m:negative
-          then: [{t: negative}]
-          else: [{t: positive}]
+          then: [{t: negative}]      # phrase(minus 6 is a 'negative' number)
+          else: [{t: positive}]      # phrase(10 is a 'positive' number)
   - test:
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][text()='2']"
-        then: {t: square root}
+        then: {t: square root}      # phrase(5 is the 'square root' of 25)
       - else_if: "*[2][text()='3']"
-        then: {t: cube root}
+        then: {t: cube root}      # phrase(5 is the 'cube root' of 625)
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {t: root}]
+        then: [{x: "ToOrdinal(*[2])"}, {t: root}]      # phrase(the square 'root' of 25 is 5)
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
@@ -77,16 +77,16 @@
           - x: "*[2]"
           - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: {x: "*[2]"}
-      - t: root
+      - t: root      # phrase(the square 'root' of 36 is 6)
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: of}
+      then: {t: of}      # phrase(the sum 'of' 5 and 5 is 10)
   - x: "*[1]"
   - test:
       if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
       - pause: short
-      - t: end root
+      - t: end root      # phrase(start the fifth root of x 'end root')
       - pause: medium
       else_test:
         if: IsNode(*[1], 'simple')
@@ -107,8 +107,8 @@
       - bookmark: "@id"
       - test:
           if: "self::m:negative"
-          then: [{t: negative}]
-          else: [{t: positive}]
+          then: [{t: negative}]      # phrase(Minus 5 is a 'negative' number)
+          else: [{t: positive}]      # phrase(7 is a 'positive' number)
   - x: "*[1]"
 
 # Fraction rules
@@ -120,7 +120,7 @@
   match: "$ClearSpeak_Fractions='Per'"
   replace:
   - x: "*[1]"
-  - t: "per"
+  - t: "per"      # phrase(6 is 'the' square root of 36)
   - x: "*[2]"
 
 - name: common-fraction
@@ -153,16 +153,16 @@
       - test:
           if: "$Verbosity!='Terse'"
           then: [{ot: "the"}]
-      - t: "fraction"
+      - t: "fraction"      # phrase(the 'fraction' with 3 over 4)
   - x: "*[1]"
-  - t: "over"
+  - t: "over"      # phrase(the fraction with 3 'over' 4)
   - x: "*[2]"
   - test:
       # very ugly!!! -- replicate nested ordinal fraction as they are an exception
       if: "$ClearSpeak_Fractions='OverEndFrac' or ($ClearSpeak_Fractions='EndFrac' and not( ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and *[1][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and *[2][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] ) )"
       then:
       - pause: short
-      - t: "end fraction"
+      - t: "end fraction"      # phrase(7 over 8 'end fraction')
       - pause: short
 
 - # fraction with text or numbers followed by text in both numerator and denominator
@@ -184,34 +184,34 @@
   - ")"
   replace:
   - x: "*[1]"
-  - t: "over"
+  - t: "over"      # phrase(the fraction with 3 'over' 4)
   - x: "*[2]"
   - test:
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='OverEndFrac'"
       then:
       - pause: short
-      - t: "end fraction"
+      - t: "end fraction"      # phrase(7 over 8 'end fraction')
       - pause: short
 
 - name: default
   tag: fraction
   match: "."
   replace:
-  - ot: the
-  - t: fraction with numerator
+  - ot: the      # phrase(5 is 'the' square toot of 25)
+  - t: fraction with numerator      # phrase(the 'fraction with numerator' 6)
   - test:
       if: not(IsNode(*[1], 'simple'))
       then: {pause: medium}
   - x: "*[1]"
   - pause: medium
-  - t: and denominator
+  - t: and denominator      # phrase(the fraction with numerator 5 'and denominator' 8)
   - x: "*[2]"
   - pause: long
   - test:
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='GeneralEndFrac'"
       then:
       - pause: short
-      - t: "end fraction"
+      - t: "end fraction"      # phrase(the fraction with 3 over 4 'end fraction')
       - pause: short
 
 # rules for functions raised to a power
@@ -223,11 +223,11 @@
   replace:
   - test:
       if: $ClearSpeak_Trig = 'TrigInverse'
-      then: [{x: "*[1]"}, {bookmark: "*[2]/@id"}, {t: inverse}]
+      then: [{x: "*[1]"}, {bookmark: "*[2]/@id"}, {t: inverse}]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
       else_test:
         if: $ClearSpeak_Trig = 'ArcTrig'
-        then: [{bookmark: "*[2]/@id"}, {t: arc}, {x: "*[1]"}]
-        else: [{bookmark: "*[2]/@id"}, {t: inverse}, {x: "*[1]"}] # default/Auto
+        then: [{bookmark: "*[2]/@id"}, {t: arc}, {x: "*[1]"}]      # phrase(the 'arc' of a circle)
+        else: [{bookmark: "*[2]/@id"}, {t: inverse}, {x: "*[1]"}] # default/Auto      # phrase(8 over 5 is the 'inverse' of 5 over 8)
 
 - name: function-squared-or-cubed
   tag: power
@@ -239,8 +239,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()='2']"
-      then: {t: squared}
-      else: {t: cubed}
+      then: {t: squared}      # phrase(25 is  5 'squared')
+      else: {t: cubed}      # phrase(625 is 5 'cubed')
 - name: function-power
   tag: power
   match:
@@ -248,13 +248,13 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: the}
+      then: {t: the}      # phrase(8 is 'the' sum of 4 and 4)
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][self::m:mn][not(contains(., '.'))]"
       then: [{x: "ToOrdinal(*[2])"}]
       else: [{x: "*[2]"}]
-  - t: "power of"
+  - t: "power of"      # phrase(36 is the second 'power of' 6)
   - pause: short
   - x: "*[1]"
 
@@ -265,18 +265,18 @@
   - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
   replace:
   - x: "*[1]"
-  - t: "raised to the exponent"
+  - t: "raised to the exponent"      # phrase(the number is 'raised to the exponent')
   - pause: short
   - x: "*[2]"
   - pause: short
-  - t: "end exponent"
+  - t: "end exponent"      # phrase(reached 'end exponent' here)
 
 - name: AfterPower-default
   tag: power
   match: "$ClearSpeak_Exponents = 'AfterPower'"
   replace:
   - x: "*[1]"
-  - t: "raised to the power"
+  - t: "raised to the power"      # phrase(x is 'raised to the power')
   - x: "*[2]"
   - pause: short
 
@@ -286,7 +286,7 @@
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
-  - t: "squared"
+  - t: "squared"      # phrase(49 is 7 'squared')
 
 - name: cubed
   tag: power
@@ -294,21 +294,21 @@
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
-  - t: "cubed"
+  - t: "cubed"      # phrase(125 is 5 'cubed')
 
 - name: simple-integer
   tag: power
   match: "*[2][self::m:mn][not(contains(., '.'))]"
   replace:
   - x: "*[1]"
-  - t: "to the"
+  - t: "to the"      # phrase(raised 'to the' power)
   - test:
       if: "*[2][.>0]"
       then: {x: "ToOrdinal(*[2])"}
       else: {x: "*[2]"}
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{t: "power"}]
+      then: [{t: "power"}]      # phrase(raised to the 'power')
 
 - name: simple-negative-integer
   tag: power
@@ -318,23 +318,23 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - t: "to the"
+  - t: "to the"      # phrase(raised 'to the' power)
   - x: "*[2]"
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{t: "power"}]
+      then: [{t: "power"}]      # phrase(raised to the 'power')
 
 - name: simple-var
   tag: power
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  - t: "to the"
+  - t: "to the"      # phrase(raised 'to the' power)
   - x: "*[2]"
   - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{t: "power"}]
+      then: [{t: "power"}]      # phrase(raised to the 'power')
 
 # match nested exponent, where the nested exponent is has the power 2 or 3 (n below)
 #   [xxx]^n, - [xxx]^n, [xxx] var^n, -[xxx] var^n
