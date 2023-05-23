@@ -86,7 +86,7 @@
     - test: 
         if: "$Verbosity!='Terse'"
         then: [T: "es igual a"]                 	# 	(en: 'is equal to', google translation)
-        else: [T: "igual"]                      	# 	(en: 'equals', google: 'iguales')
+        else: [T: "igual a"]                      	# 	(en: 'equals', google: 'iguales')
 
  - ">":                                         	#  0x3e
      - test: 
