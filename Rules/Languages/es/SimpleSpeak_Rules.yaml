@@ -20,7 +20,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: ""}    # phrase('the' square root of x)
+      then: {T: "la"}    # phrase('the' square root of x)
   - T: "raíz cuadrada"      # phrase(the 'square root' of x)
   - test:
       if: "$Verbosity!='Terse'"
