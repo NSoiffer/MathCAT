@@ -143,7 +143,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: the}      # phrase(When dividing 30 by ten 'the' answer is 3)
+      then: {t: the}      # # phrase('the' set of all x greater than 0)
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][self::m:mn][not(contains(., '.'))]"
