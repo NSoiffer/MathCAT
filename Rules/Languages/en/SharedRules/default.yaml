@@ -62,7 +62,7 @@
   tag: ms
   match: "."
   replace:
-  - t: "the string"
+  - t: "the string"      # phrase('the string' is long)
   - pause: short
   - x: "text()"
 
@@ -79,7 +79,7 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
-      then: [t: "sub"]
+      then: [t: "sub"]      # phrase(x = y plus 'sub' z)
   - x: "*[2]"
 
 - name: default
@@ -87,9 +87,9 @@
   match: "count(*)=2"
   replace:
   - x: "*[1]"
-  - t: "sub"
+  - t: "sub"      # phrase(x = y plus 'sub' z)
   - x: "*[2]"
-  - t: "end sub"
+  - t: "end sub"      # phrase(at the end of the section 'end sub' is used)
   - pause: short
 
 
@@ -98,7 +98,7 @@
   match: "."
   replace:
   - x: "*[1]"
-  - t: "sub"
+  - t: "sub"      # phrase(x = y plus 'sub' z)
   - x: "*[2]"
 
 - name: structure
@@ -109,7 +109,7 @@
   - test:
       if: "name(.)='msubsup'"
       then:
-      - t: "sub"
+      - t: "sub"      # phrase(x = y plus 'sub' z)
       - x: "*[2]"
   - test:
       if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
@@ -117,15 +117,15 @@
       else_test:
           if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"  # FIX: is this test necessary?
           then:
-          - t: "super"
+          - t: "super"      # phrase(the word 'super' may be short for superscript)
           - x: "*[last()]"
           - test:
               if: "not(IsNode(*[last()], 'simple'))"
-              then: [t: "end super"]
+              then: [t: "end super"]      # phrase('end super' indicates end of a superscript)
           else:
-          - t: "raised to the"
+          - t: "raised to the"      # phrase(5  'raised to the' second power equals 25)
           - x: "*[last()]"
-          - t: "power"
+          - t: "power"      # phrase(5 raised to the second 'power' equals 25)
 
 - name: default
   tag: munder
@@ -133,11 +133,11 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]
+      then: [t: "modified"]      # phrase(the equation has been 'modified')
   - x: "*[1]"
-  - t: "with"
+  - t: "with"      # phrase(substitute x 'with' z)
   - x: "*[2]"
-  - t: below
+  - t: below      # phrase(One number is written 'below' the other)
 
 - name: diacriticals
   tag: mover
@@ -152,11 +152,11 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]
+      then: [t: "modified"]      # phrase(the equation has been 'modified')
   - x: "*[1]"
-  - t: "with"
+  - t: "with"      # phrase(substitute x 'with' y)
   - x: "*[2]"
-  - t: "above"
+  - t: "above"      # phrase(in a fraction the numerator is 'above' the denominator)
 
 - name: default
   tag: munderover
@@ -164,13 +164,13 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]
+      then: [t: "modified"]      # phrase(the equation has been 'modified')
   - x: "*[1]"
-  - t: "with"
+  - t: "with"      # phrase(substitute x 'with' y)
   - x: "*[2]"
-  - t: "below and"
+  - t: "below and"      # phrase(in this case the  denominator is 'below and' smaller than the numberator)
   - x: "*[3]"
-  - t: "above"
+  - t: "above"      # phrase(the numerator is 'above' the numerator)
 
 - name: default
   #   Here we support up to 2 prescripts and up to 4 postscripts -- that should cover all reasonable cases
@@ -197,9 +197,9 @@
           - test: # only bother announcing if there is more than one prescript
               if: "count($Prescripts) > 2"
               then:
-              - t: "with"
+              - t: "with"      # phrase(substitute x 'with' y)
               - x: "count($Prescripts) div 2"
-              - t: "prescripts"
+              - t: "prescripts"      # phrase(in this equation certain 'prescripts' apply)
               - pause: short
           - test:
               if: "not($Prescripts[1][self::m:none])"
@@ -208,7 +208,7 @@
               - x: "$Prescripts[1]"
           - test:
               if: "not($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none])"
-              then: [t: "and"]
+              then: [t: "and"]      # phrase(10 is greater than 8 'and' less than 15)
           - test:
               if: "not($Prescripts[2][self::m:none])"
               then:
@@ -225,7 +225,7 @@
                   - x: "$Prescripts[3]"
               - test:
                   if: "not($Prescripts[3][self::m:none] or $Prescripts[4][self::m:none])"
-                  then: [t: "and"]
+                  then: [t: "and"]      # phrase(10 is grater than 8 'and' less than 15)
               - test:
                   if: "not($Prescripts[4][self::m:none])"
                   then:
@@ -234,9 +234,9 @@
               - test:
                   if: "count($Prescripts) > 4" # give up and just dump them out so at least the content is there
                   then:
-                  - t: "and alternating prescripts"
+                  - t: "and alternating prescripts"      # phrase(in this case there are values 'and alternating prescripts')
                   - x: "$Prescripts[position() > 4]"
-                  - t: "end prescripts"
+                  - t: "end prescripts"      # phrase(This is where 'end prescripts' occurs)
   - test:
       if: "$Postscripts"
       then:
@@ -250,10 +250,10 @@
               then:
               - test:
                   if: "$Prescripts"
-                  then: [t: "and"]
-              - t: "with"
+                  then: [t: "and"]      # phrase(10 is greater than 8 'and' less than 15)
+              - t: "with"      # phrase(substitute x 'with' y)
               - x: "count($Postscripts) div 2"
-              - t: "postscripts"
+              - t: "postscripts"      # phrase(this material includes several 'postscripts')
               - pause: short
           - test:
               if: "not($Postscripts[1][self::m:none])"
@@ -262,7 +262,7 @@
               - x: "$Postscripts[1]"
           - test:
               if: "not($Postscripts[1][self::m:none] or $Postscripts[2][self::m:none])"
-              then: [t: "and"]
+              then: [t: "and"]      # phrase(10 is greater than 8 'and' less than 15)
           - test:
               if: "not($Postscripts[2][self::m:none])"
               then:
@@ -278,7 +278,7 @@
                   - x: "$Postscripts[3]"
               - test:
                   if: "not($Postscripts[3][self::m:none] or $Postscripts[4][self::m:none])"
-                  then: [t: "and"]
+                  then: [t: "and"]      # phrase(10 is greater than 8 'and' less than 15)
               - test:
                   if: "not($Postscripts[4][self::m:none])"
                   then:
@@ -294,7 +294,7 @@
                       - x: "$Postscripts[5]"
                   - test:
                       if: "not($Postscripts[5][self::m:none] or $Postscripts[6][self::m:none])"
-                      then: [t: "and"]
+                      then: [t: "and"]      # phrase(10 is greater than 8 'and' less than 15)
                   - test:
                       if: "not($Postscripts[6][self::m:none])"
                       then:
@@ -310,7 +310,7 @@
                           - x: "$Postscripts[7]"
                       - test:
                           if: "not($Postscripts[7][self::m:none] or $Postscripts[8][self::m:none])"
-                          then: [t: "and"]
+                          then: [t: "and"]      # phrase(10 is less than 15 'and' greater than 5)
                       - test:
                           if: "not($Postscripts[8][self::m:none])"
                           then:
@@ -319,27 +319,27 @@
                       - test:
                           if: "count($Postscripts) > 8" # give up and just dump them out so at least the content is there
                           then:
-                          - t: "and alternating scripts"
+                          - t: "and alternating scripts"      # phrase(this situation involves complexities 'and alternating scripts')
                           - x: "$Postscripts[position() > 8]"
-                          - t: "end scripts"
+                          - t: "end scripts"      # phrase(At this point 'end scripts' occurs)
 
 - name: default
   tag: mtable
   variables: [IsColumnSilent: false()]
   match: "."
   replace:
-  - t: "table with"
+  - t: "table with"      # phrase(put the values in the 'table with' comments)
   - x: count(*)
   - test:
       if: count(*)=1
-      then: [t: "row"]
-      else: [t: "rows"]
-  - t: and
+      then: [t: "row"]      # phrase(Look at the values in the third 'row')
+      else: [t: "rows"]      # phrase(Look at the values in the first and second 'rows')
+  - t: and      # phrase(10 is less than 12 'and' greater than 6)
   - x: "count(*[1]/*)"
   - test:
       if: "count(*[1]/*)=1"
-      then: [t: "column"]
-      else: [t: "columns"]
+      then: [t: "column"]      # phrase(Look at the values in the left 'column')
+      else: [t: "columns"]      # phrase(Look at the values in the first two 'columns')
   - pause: long
   - x: "*"
 
@@ -355,7 +355,7 @@
   tag: mtd
   match: "."
   replace:
-  - t: "column"
+  - t: "column"      # phrase(Look at the values in the first 'column')
   - x: "count(preceding-sibling::*)+1"
   - pause: medium
   - x: "*" # speak the entry
@@ -367,7 +367,7 @@
   tag: menclose
   match: "@notation='box' and *[self::m:mtext and text()=' ']"
   replace:
-  - t: "empty box"
+  - t: "empty box"      # phrase(the 'empty box' contains no values)
 
 - name: default
   # The ordering below is the order in which words come out when there is more than one value
@@ -377,26 +377,26 @@
   replace:
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
-      then: [t: "box", pause: short]
+      then: [t: "box", pause: short]      # phrase(the 'box' contains relevant values)
   - test:
       if: ".[contains(@notation,'roundedbox')]"
-      then: [t: "round box", pause: short]
+      then: [t: "round box", pause: short]      # phrase(the 'round box' contains significant values)
   - test:
       if: ".[contains(@notation,'circle')]"
-      then: [t: "circle", pause: short]
+      then: [t: "circle", pause: short]      # phrase(the 'circle' has a radius of 5cm)
   - test:
       if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or contains(concat(' ', normalize-space(@notation), ' '), ' right ') or contains(@notation,'top') or contains(@notation,'bottom') ]"
       then:
-      - t: line on
+      - t: line on      # phrase(draw a straight 'line' on the page)
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
-          then: [t: "left", pause: short]
+          then: [t: "left", pause: short]      # phrase(names are sown in the 'left' column)
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"
-          then: [t: "right", pause: short]
+          then: [t: "right", pause: short]      # phrase(totals are shown in the 'right' column)
       - test:
           if: ".[contains(@notation,'top')]"
-          then: [t: "top", pause: short]
+          then: [t: "top", pause: short]      # phrase(read the items in the 'top' line)
       - test:
           if: ".[contains(@notation,'bottom')]"
           then: [t: "bottom", pause: short]
