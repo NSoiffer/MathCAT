@@ -62,35 +62,43 @@
 
  - "0-9": [t: "."]
 
- - "!": [t: "factorial"]                           # 0x21
+ - "!":                                            # 0x21
+    - test:
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"
+        then_test:
+            if: "$Verbosity = 'Terse'"
+            then: [t: "bang"]                      # 0x21
+            else: [t: "exclamation point"]          # 0x21
+        else: [t: "factorial"]                     # 0x21
+          
  - "\"": [t: "quotation mark"]                     # 0x22
  - "#": [t: "number"]                              # 0x23
  - "$": [t: "dollars"]                             # 0x24
  - "%": [t: "percent"]                             # 0x25
  - "&": [t: "ampersand"]                           # 0x26
  - "'": [t: "apostrophe"]                          # 0x27
- - "(":                                          # 0x28
+ - "(":                                            # 0x28
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [t: "open"]
-            else: [t: "open paren"]
-        else: [t: "left paren"]                            
+            then: [t: "open"]                     # 0x28
+            else: [t: "open paren"]               # 0x28
+        else: [t: "left paren"]                   # 0x28                         
  - ")":                                          # 0x29
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [t: "close"]
-            else: [t: "close paren"]
-        else: [t: "right paren"]                            
+            then: [t: "close"]                   # 0x29
+            else: [t: "close paren"]             # 0x29
+        else: [t: "right paren"]                 # 0x29                 
 
  - "*":                                          # 0x2a
     test:
         if: "parent::*[name(.)='msup' or name(.)='msubsup']"
-        then: [t: "star"]
-        else: [t: "times"]
+        then: [t: "star"]                        # 0x2a
+        else: [t: "times"]                       # 0x2a
  - "+": [t: "plus"]                              # 0x2b
  - ",":                                          # 0x2c
     # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
