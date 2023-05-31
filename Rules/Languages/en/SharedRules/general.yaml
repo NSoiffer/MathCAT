@@ -8,7 +8,7 @@
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "the"      # phrase( 5 is 'the' square root of 25)
+      - t: "the"      # phrase(5 is 'the' square root of 25)
   - bookmark: "*[2]/@id"
   - test:
     - if: "*[2][text()='+']"
@@ -135,7 +135,7 @@
       then:
       - t: "from"      # phrase(subtracting 5 'from' 10 gives 5)
       - x: "*[1]"
-      - t: "to"      # phrase(add 6 and 6 'to' get 12)
+      - t: "to"      # phrase(adding 6 'to' 6 equals  12)
       - x: "*[2]"
       else:
       - x: "*[1]"
@@ -174,7 +174,7 @@
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
   - bookmark: "./@id"
-  - t: "negative"
+  - t: "negative"      # phrase('negative' numbers are those less than 0)
   - x: "*[1]"
 
 - name: positive
@@ -182,7 +182,7 @@
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
   - bookmark: "./@id"
-  - t: "positive"
+  - t: "positive"      # phrase(multiplying two negatives results in a 'positive' number)
   - x: "*[1]"
 
 - name: subscript
@@ -190,7 +190,7 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - t: "sub"
+  - t: "sub"      # phrase(here is a 'sub' total)
   - x: "*[2]"
 
 - name: bigop-both
@@ -199,15 +199,15 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: the}]
+      then: [{t: the}]      # phrase(5 is 'the' square root of 25)
   - x: "*[1]"
-  - t: from
+  - t: from      # phrase(subtracting 5 'from' 10 gives 5)
   - x: "*[2]"
-  - t: to
+  - t: to      # phrase(adding 6 'to' 6 equals  12)
   - x: "*[3]"
   - test:
       if: "following-sibling::*"
-      then: [{t: of}]
+      then: [{t: of}]      # phrase(the square root 'of' 25 is 5)
 
 - name: bigop-under
   tag: large-op
@@ -215,13 +215,13 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: the}]
+      then: [{t: the}]      # phrase(5 is 'the' square root of 25)
   - x: "*[1]"
-  - t: over
+  - t: over      # phrase(2 'over' 3 equals two thirds)
   - x: "*[2]"
   - test:
       if: "following-sibling::*"
-      then: [{t: of}]
+      then: [{t: of}]      # phrase(the square root 'of' 25 is 5)
 
 - name: largeop
   tag: mrow
@@ -229,9 +229,9 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: the}]
+      then: [{t: the}]      # phrase(5 is 'the' square root of 25)
   - x: "*[1]"
-  - t: of
+  - t: of      # phrase(the square root 'of' 25 is 5)
   - x: "*[2]"
 
 - name: limit
@@ -240,8 +240,8 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: the limit as}]
-      else: [{t: "limit as"}]
+      then: [{t: the limit as}]      # phrase('the limit as' indicated by this result)
+      else: [{t: "limit as"}]      # phrase(the 'limit as' indicated by this result)
   - x: "*[2]"
   - pause: short
 
@@ -249,7 +249,7 @@
   tag: modified-variable
   match: "count(*)=2 and *[2][text()='→']"
   replace:
-  - t: "vector"
+  - t: "vector"      # phrase(the 'vector' reflects size and direction)
   - x: "*[1]"
 
 - name: default
@@ -271,8 +271,8 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Terse'"
-        then: {t: super}
-        else: {t: superscript}
+        then: {t: super}      # phrase(this is a 'super' set of numbers)
+        else: {t: superscript}      # phrase(a 'superscript' number indicates raised to a power)
   - x: "*[2]"
   - pause: short
 
@@ -284,16 +284,16 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: {t: "subscript"}
-      else: {t: "sub"}
+      then: {t: "subscript"}      # phrase(a 'subscript' may be used to indicate an index)
+      else: {t: "sub"}      # phrase(the result is 'sub' optimal)
   - x: "*[2]"
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then:
       - test:
           if: "$Verbosity='Verbose'"
-          then: {t: "end subscript"}
-          else: {t: "end sub"}
+          then: {t: "end subscript"}      # phrase(this is the 'end subscript' position)
+          else: {t: "end sub"}      # phrase(this is the 'end sub' position)
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -302,8 +302,8 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Verbose'"
-        then: {t: "superscript"}
-        else: {t: "super"}
+        then: {t: "superscript"}      # phrase(a 'superscript' number indicates raised to a power)
+        else: {t: "super"}      # phrase(this is a 'super' set of numbers)
   - x: "*[3]"
   - pause: short
 
@@ -312,7 +312,7 @@
   match: "text()='sin'"
   replace:
   - bookmark: "@id"
-  - t: "sine"
+  - t: "sine"      # phrase(the 'sine' of the angle)
 - name: cos
   tag: mi
   match: "text()='cos'"
@@ -320,8 +320,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: cos}
-      else: {t: cosine}
+      then: {t: cos}      # phrase('cos' is the abbreviation for cosine)
+      else: {t: cosine}      # phrase(find the 'cosine' in a right-angle triangle)
 - name: tan
   tag: mi
   match: "text()='tan' or text()='tg'"
@@ -329,8 +329,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: tan}
-      else: {t: tangent}
+      then: {t: tan}      # phrase(the 'tan' is the ratio of the opposite to the adjacent side of a right-angled triangle)
+      else: {t: tangent}      # phrase(a 'tangent' is a straight line that touches a curve)
 - name: sec
   tag: mi
   match: "text()='sec'"
@@ -338,8 +338,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: seek}
-      else: {t: secant}
+      then: {t: seek}      # phrase(to 'seek' a solution)
+      else: {t: secant}      # phrase(a 'secant' intersects a curve at two or more points)
 - name: csc
   tag: mi
   match: "text()='csc'"
@@ -347,8 +347,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: co-seek}
-      else: {t: co-secant}
+      then: {t: co-seek}      # phrase(we will 'co-seek' a solution)
+      else: {t: co-secant}      # phrase(the 'co-secant' is the reciprocal of the secant)
 - name: cot
   tag: mi
   match: "text()='cot'"
@@ -356,8 +356,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: co-tan}
-      else: {t: co-tangent}
+      then: {t: co-tan}      # phrase(find the 'cosine' in a right-angle triangle)
+      else: {t: co-tangent}      # phrase(the 'co-tangent' is the reciprocal of the tangent)
 
 - name: sinh
   tag: mi
@@ -366,8 +366,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: sinch}
-      else: {t: hyperbolic sine}
+      then: {t: sinch}      # phrase(the word 'sinch' is an abbreviation for hyperbolic sine)
+      else: {t: hyperbolic sine}      # phrase(the 'hyperbolic sine' is used in mathematics)
 - name: cosh
   tag: mi
   match: "text()='cosh'"
@@ -375,8 +375,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: cosh}
-      else: {t: hyperbolic cosine}
+      then: {t: cosh}      # phrase('cosh' is an abbreviation of hyperbolic cosine)
+      else: {t: hyperbolic cosine}      # phrase(the 'hyperbolic cosine' is a mathematical function)
 - name: tanh
   tag: mi
   match: "text()='tanh'"
@@ -384,8 +384,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: tanch}
-      else: {t: hyperbolic tangent}
+      then: {t: tanch}      # phrase('tanch' is shorthand for hyperbolic tangent)
+      else: {t: hyperbolic tangent}      # phrase('hyperbolic tangent' is a mathematical function)
 - name: sech
   tag: mi
   match: "text()='sech'"
@@ -393,8 +393,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: sheck}
-      else: {t: hyperbolic secant}
+      then: {t: sheck}      # phrase('sheck' is shorthand for hyperbolic secant)
+      else: {t: hyperbolic secant}      # phrase('hyperbolic secant' is a mathematical function)
 - name: csch
   tag: mi
   match: "text()='csch'"
@@ -402,8 +402,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: co-sheck}
-      else: {t: hyperbolic co-secant}
+      then: {t: co-sheck}      # phrase('co-sheck' is shorthand for hyperbolic co-secant)
+      else: {t: hyperbolic co-secant}      # phrase('hyperbolic co-secant' is a mathematical function)
 - name: coth
   tag: mi
   match: "text()='coth'"
