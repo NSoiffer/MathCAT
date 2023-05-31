@@ -8,24 +8,24 @@
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "the"
+      - t: "the"      # phrase( 5 is 'the' square root of 25)
   - bookmark: "*[2]/@id"
   - test:
     - if: "*[2][text()='+']"
-      then: [{t: "positive"}]
-      else: [{t: "negative"}]
+      then: [{t: "positive"}]      # phrase(set of all' positive integers less than 10)
+      else: [{t: "negative"}]      # phrase(set of all 'negative' integers less than minus 10)
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][text()='ℂ']"
-      then: [{t: complex numbers}]
+      then: [{t: complex numbers}]      # phrase('complex numbers' consist of two parts)
     - else_if: "*[1][text()='ℕ']"
-      then: [{t: natural numbers}]
+      then: [{t: natural numbers}]      # phrase('natural numbers' are numbers from 1 to infinity)
     - else_if: "*[1][text()='ℚ']"
-      then: [{t: rational numbers}]
+      then: [{t: rational numbers}]      # phrase('rational numbers' are the fraction of 2 integers)
     - else_if: "*[1][text()='ℝ']"
-      then: [{t: real numbers}]
+      then: [{t: real numbers}]      # phrase('real numbers' can be both positive and negative)
     - else_if: "*[1][text()='ℤ']"
-      then: [{t: integers}]
+      then: [{t: integers}]      # phrase(positive 'integers' are natural numbers above 0)
       else: [{x: "*[1][text()]"}] # shouldn't happen
 
 - name: dimension-number-sets
@@ -37,15 +37,15 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][text()='ℂ']"
-      then: [{t: "C"}]
+      then: [{t: "C"}]      # phrase(the letter 'C' used to represent complex number)
     - else_if: "*[1][text()='ℕ']"
-      then: [{t: "N"}]
+      then: [{t: "N"}]      # phrase(the letter 'N' may represent natural numbers)
     - else_if: "*[1][text()='ℚ']"
-      then: [{t: "Q"}]
+      then: [{t: "Q"}]      # phrase(the letter 'Q' may represent rational numbers)
     - else_if: "*[1][text()='ℝ']"
-      then: [{t: "R"}]
+      then: [{t: "R"}]      # phrase(the letter 'R' may represent real numbers)
     - else_if: "*[1][text()='ℤ']"
-      then: [{t: "Z"}]
+      then: [{t: "Z"}]      # phrase(the letter 'Z' may represent integers)
       else: [{x: "*[1][text()]"}] # shouldn't happen
   - bookmark: "*[2]/@id"
   - x: "*[2]"
@@ -57,15 +57,15 @@
   - bookmark: "@id"
   - test:
     - if: "text()='ℂ'"
-      then: [{t: the complex numbers}]
+      then: [{t: the complex numbers}]      # phrase('the complex numbers' include 2 parts)
     - else_if: "text()='ℕ'"
-      then: [{t: the natural numbers}]
+      then: [{t: the natural numbers}]      # phrase('the natural numbers' begin at 1)
     - else_if: "text()='ℚ'"
-      then: [{t: the rational numbers}]
+      then: [{t: the rational numbers}]      # phrase('the rational numbers' are the fraction of 2 integers)
     - else_if: "text()='ℝ'"
-      then: [{t: the real numbers}]
+      then: [{t: the real numbers}]      # phrase('the real numbers' can be both positive and negative)
     - else_if: "text()='ℤ'"
-      then: [{t: the integers}]
+      then: [{t: the integers}]      # phrase('the integers' are natural numbers above 0)
       else: [x: "text()"] # shouldn't happen
 
 - name: real-part
@@ -73,14 +73,14 @@
   match: "."
   replace:
   - bookmark: "@id"
-  - t: the real part
+  - t: the real part      # phrase('the real part' of a complex number does not include the imaginary part)
 
 - name: imaginary-part
   tag: imaginary-part
   match: "."
   replace:
   - bookmark: "@id"
-  - t: the imaginary part
+  - t: the imaginary part      # phrase('the imaginary part' is part of a complex number)
 
 # rules on scripted vertical bars ('evaluated at')
 - name: evaluated-at-2
@@ -89,7 +89,7 @@
   replace:
   - x: "*[1]"
   - pause: auto
-  - t: evaluated at
+  - t: evaluated at      # phrase(results were 'evaluated at' a given point)
   - pause: auto
   - x: "*[2]"
 
@@ -99,10 +99,10 @@
   replace:
   - x: "*[1]"
   - pause: auto
-  - t: evaluated at
+  - t: evaluated at      # phrase(results were 'evaluated at' this point)
   - pause: auto
   - x: "*[3]"
-  - t: "minus the same expression evaluated at"
+  - t: "minus the same expression evaluated at"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
   - x: "*[2]"
 
 - name: binomial
@@ -110,7 +110,7 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - t: choose
+  - t: choose      # phrase(you can 'choose' a number at random)
   - x: "*[2]"
 
 - name: permutation
@@ -118,7 +118,7 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[2]"
-  - t: permutations of
+  - t: permutations of      # phrase(the solution  involves several 'permutations of' values)
   - x: "*[1]"
 
 - name: intervals
@@ -128,18 +128,18 @@
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "the"
+      - t: "the"      # phrase(5 is 'the' square root of 25)
   - x: "translate(name(.),'-', ' ')"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "from"
+      - t: "from"      # phrase(subtracting 5 'from' 10 gives 5)
       - x: "*[1]"
-      - t: "to"
+      - t: "to"      # phrase(add 6 and 6 'to' get 12)
       - x: "*[2]"
       else:
       - x: "*[1]"
-      - t: "comma"
+      - t: "comma"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
       - x: "*[2]"
 
 - name: default-point
@@ -149,10 +149,10 @@
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "the"
-  - t: "point"
+      - t: "the"      # phrase(5 is 'the' square root of 25)
+  - t: "point"      # phrase(a decimal 'point' indicates the fraction component of a number)
   - x: "*[1]"
-  - t: "comma"
+  - t: "comma"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
   - x: "*[2]"
 
 - name: absolute-value
@@ -161,13 +161,13 @@
   replace:
   - test:
       if: "$Verbosity='Terse'"
-      then: [{t: "absolute value"}]
-      else: [{t: "the absolute value of"}]
+      then: [{t: "absolute value"}]      # phrase(the 'absolute value' of a number represents its distance from 0)
+      else: [{t: "the absolute value of"}]      # phrase('the absolute value of' a number represents its distance from 0)
   - x: "*[1]"
   - test:
       if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
       then: [{pause: short}]
-      else: [{pause: short}, {t: end absolute value}, {pause: short}]
+      else: [{pause: short}, {t: end absolute value}, {pause: short}]      # phrase(show 'end absolute value' position)
 
 - name: negative
   tag: negative
