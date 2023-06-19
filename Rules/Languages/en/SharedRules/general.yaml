@@ -462,8 +462,9 @@
   # IDEA:  set a variable with the word to saw for the row (e.g., RowLabel = Row/Case/Line/...)
   tag: [cases, equations, lines]
   match: "."
+  variables: [LineCount: "count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']])"]
   replace:
-  - x: "count(*)"
+  - x: "$LineCount"
   - test:
     - if: "self::m:cases"
       then: [{t: "case"}]
@@ -471,7 +472,7 @@
       then: [{t: "equation"}]
       else: [{t: "line"}]
   - test:
-    - if: "count(*) > 1"
+    - if: "$LineCount"
       then: [{ct: "s"}] # plural
   - pause: short
   - x: "*"
@@ -481,12 +482,15 @@
   match: "parent::m:cases or parent::m:equations or parent::m:lines"
   replace:
   - test:
-    - if: "parent::m:cases"
-      then: [{t: "case"}]
-    - else_if: "parent::m:equations"
-      then: [{t: "equation"}]
-      else: [{t: "line"}]
-  - x: "count(preceding-sibling::*)+1"
+      if: "$LineCount!=1"
+      then:
+      - test:
+        - if: "parent::m:cases"
+          then: [{t: "case"}]
+        - else_if: "parent::m:equations"
+          then: [{t: "equation"}]
+          else: [{t: "line"}]
+      - x: "count(preceding-sibling::*)+1"
   - test:
       if: .[self::m:mlabeledtr]
       then:
