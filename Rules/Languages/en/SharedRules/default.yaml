@@ -71,45 +71,44 @@
   match: "."
   replace: [x: "*"]
 
-
-- name: structure-simple
-  # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
-  # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
-  # are never simple, then any 'over' applies only to enclosing "fraction...end fraction" pair.
-  tag: mfrac
-  match:
-  - "(IsNode(*[1],'leaf') and IsNode(*[2],'leaf')) and"
-  - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
-  replace:
-  - x: "*[1]"
-  - test:
-      if: "@linethickness=0"
-      then: [t: "atop"]   # mimics TeX command name for this
-      else: [t: "over"]
-  - x: "*[2]"
-  - pause: short
-
+# not sure what really should be said for these since we should not assume they are square roots
 - name: structure-default
-  tag: mfrac
+  tag: msqrt
   match: "."
   replace:
-  - t: "start"
-  - pause: short
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [t: "the"]
+  - t: "root symbol"
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [t: "of"]
   - x: "*[1]"
+  - pause: short
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-      then: [{pause: short}]
+      then: [t: "end root symbol"]
+
+# not sure what really should be said for these since we should not assume they are square roots
+- name: structure-default
+  tag: mroot
+  match: "."
+  replace:
   - test:
-      if: "@linethickness=0"
-      then: [t: "atop"]   # mimics TeX command name for this
-      else: [t: "over"]
+      if: "$Verbosity!='Terse'"
+      then: [t: "the"]
+  - t: "root symbol"
+  - t: "with index"
+  - x: "*[1]"
+  - pause: short
   - test:
-      if: "not(IsNode(*[2],'leaf'))"
-      then: [{pause: short}]
+      if: "$Verbosity!='Terse'"
+      then: [t: "of"]
   - x: "*[2]"
   - pause: short
-  - t: "end"
-  - pause: medium
+  - test:
+      if: "not(IsNode(*[2],'leaf'))"
+      then: [t: "end root symbol"]
 
 
 - name: simple-sub
