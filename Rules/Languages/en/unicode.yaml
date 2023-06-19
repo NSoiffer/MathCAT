@@ -96,7 +96,7 @@
 
  - "*":                                          # 0x2a
     test:
-        if: "parent::*[name(.)='msup' or name(.)='msubsup']"
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='skip-super']"
         then: [t: "star"]                        # 0x2a
         else: [t: "times"]                       # 0x2a
  - "+": [t: "plus"]                              # 0x2b
@@ -180,7 +180,7 @@
  - "~": [t: "tilde"]                               # 0x7e
  - " ":                                            # 0xa0
     - test:
-        if: "@data-empty-in-2D"
+        if: "@data-empty-in-2D and ../../../../*[name(.)!='equations']"
         then: [t: "empty"]                         # want to say something for fraction (etc) with empty child
         else: [t: ""]                            
 
@@ -283,7 +283,8 @@
 
  - "⁡":                                          # 0x2061
     - test:
-        if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])" 
+        if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
+             not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':structure:')])"
         then: [t: "of"]
  - "⁢": [t: ""]                                   # 0x2062
  - "⁣": [t: ""]                                   # 0x2063
