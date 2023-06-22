@@ -472,7 +472,7 @@
       then: [{t: "equation"}]
       else: [{t: "line"}]
   - test:
-    - if: "$LineCount"
+    - if: "$LineCount > 1"
       then: [{ct: "s"}] # plural
   - pause: short
   - x: "*"
