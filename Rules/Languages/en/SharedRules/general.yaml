@@ -480,17 +480,22 @@
 - name: default-multiline
   tag: [mtr, mlabeledtr]
   match: "parent::m:cases or parent::m:equations or parent::m:lines"
+  variables: [ContinuedEquation: "parent::m:equations and *[1][count(*)=1 and *[1][@data-added='missing-content']]"]
   replace:
   - test:
-      if: "$LineCount!=1"
+      if: "$ContinuedEquation"
       then:
-      - test:
-        - if: "parent::m:cases"
-          then: [{t: "case"}]
-        - else_if: "parent::m:equations"
-          then: [{t: "equation"}]
-          else: [{t: "line"}]
-      - x: "count(preceding-sibling::*)+1"
+      - t: "next line"
+      else_test:
+        if: "$LineCount > 1"
+        then:
+        - test:
+          - if: "parent::m:cases"
+            then: [{t: "case"}]
+          - else_if: "parent::m:equations"
+            then: [{t: "equation"}]
+            else: [{t: "line"}]
+        - x: "count(preceding-sibling::*)+1"
   - test:
       if: .[self::m:mlabeledtr]
       then:
