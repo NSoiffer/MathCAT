@@ -50,9 +50,9 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the measure of the angle"      # phrase(we need to take 'the measure of the angle')
+      - t: "the measure of the angle"      # phrase('the measure of the angle' ABC)
       else:
-      - t: "measure of angle"      # phrase(accurate 'measure of angle' is important)
+      - t: "measure of angle"      # phrase('measure of angle' ABC)
   - x: "*[1]"
   - x: "*[2]"
   - x: "*[3]"

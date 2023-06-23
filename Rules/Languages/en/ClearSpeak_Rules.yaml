@@ -10,7 +10,7 @@
   tag: mn
   match: "starts-with(text(), '-')"
   replace:
-  - t: "minus"      # phrase(10 'minus' 4 = 6)
+  - t: "minus"      # phrase(10 'minus' 4 equals 6)
   - x: "translate(text(), '-_', '')"
 
 - name: default
@@ -721,7 +721,7 @@
   # Note: this rule is also part of the paren rule so that the parens speak
   - "text()='⁢' and $ClearSpeak_ImpliedTimes = 'None'"
   replace:
-  - t: ""      # phrase(Also nothing here? '')
+  - t: ""
 
 - name: ClearSpeak-times
   tag: mo

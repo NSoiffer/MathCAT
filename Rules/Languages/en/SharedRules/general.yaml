@@ -472,7 +472,7 @@
       else: [{t: "line"}]      # phrase(the result is on the bottom 'line')
   - test:
     - if: "count(*) > 1"
-      then: [{ct: "s"}] # plural      # phrase('s' is the 19th letter of the English alphabet)
+      then: [{ct: "s"}] # plural 
   - pause: short
   - x: "*"
 
@@ -534,7 +534,7 @@
       then: {t: determinant}      # phrase(the 'determinant' provides information about a matrix)
       else: {t: matrix}      # phrase(a 'matrix' displays data in rows and columns)
       
-  - t: with entry      # phrase(matrix B 'with entry' B [d, g])
+  - t: with entry      # phrase(matrix B 'with entry' x)
   - x: "*[1]/*"
 
 # simpler reading methods for smaller matrices if the entries are simple
@@ -592,7 +592,7 @@
   - count(*[1]/*)<=3 and # at least two cols
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   replace:
-  - t: the 1 by      # phrase(replace 'the 1 by' 2)
+  - t: the 1 by      # phrase('the 1 by' 2 matrix)
   - x: count(*/*)
   - t: "row"      # phrase(it is on the third 'row')
   - test:
@@ -615,7 +615,7 @@
   variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
   match: "count(*)=1" # one row
   replace:
-  - t: the 1 byz      # phrase(replace 'the 1 by' 2)
+  - t: the 1 byz      # phrase('the 1 by' 2 matrix)
   - x: "count(*/*)"
   - t: "row"      # phrase(it is on the third 'row')
   - test:
