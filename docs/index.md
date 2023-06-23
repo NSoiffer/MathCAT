@@ -165,6 +165,7 @@ Several people helped out in various ways with the project. I am very grateful f
 
 Translators:
 * Indonesian -- Dr. Pinta Deniyanti Sampoerno, M.Si; Dr. Meiliasari, S.Pd., M.Sc; and Ari Hendarno, S.Pd., M.kom
+* Spanish -- Noelia Ruiz Martínez (also help with NVDA addon development)
 * Vietnamese -- Dang Hoai Phúc and Trang Pham
 * Others??? -- please volunteer so I can list you here...
 

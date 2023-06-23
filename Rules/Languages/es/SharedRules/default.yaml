@@ -62,7 +62,7 @@
   tag: ms
   match: "."
   replace:
-  - t: "the string"      # phrase('the string' is long)
+  - t: "the string"
   - pause: short
   - x: "text()"
 
@@ -70,81 +70,6 @@
   tag: mstyle
   match: "."
   replace: [x: "*"]
-
-
-- name: structure-simple
-  # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
-  # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
-  # are never simple, then any 'over' applies only to enclosing "fraction...end fraction" pair.
-  tag: mfrac
-  match:
-  - "(IsNode(*[1],'leaf') and IsNode(*[2],'leaf')) and"
-  - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
-  replace:
-  - x: "*[1]"
-  - t: "over"
-  - x: "*[2]"
-  - pause: short
-
-- name: structure-default
-  tag: mfrac
-  match: "."
-  replace:
-  - t: "start"
-  - pause: short
-  - x: "*[1]"
-  - test:
-      if: "not(IsNode(*[1],'leaf'))"
-      then: [{pause: short}]
-  - t: "over"
-  - test:
-      if: "not(IsNode(*[2],'leaf'))"
-      then: [{pause: short}]
-  - x: "*[2]"
-  - pause: short
-  - t: "end over"
-  - pause: medium
-
-
-# not sure what really should be said for these since we should not assume they are square roots
-- name: structure-default
-  tag: msqrt
-  match: "."
-  replace:
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [t: "the"]
-  - t: "root symbol"
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [t: "of"]
-  - x: "*[1]"
-  - pause: short
-  - test:
-      if: "not(IsNode(*[1],'leaf'))"
-      then: [t: "end root symbol"]
-
-# not sure what really should be said for these since we should not assume they are square roots
-- name: structure-default
-  tag: mroot
-  match: "."
-  replace:
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [t: "the"]
-  - t: "root symbol"
-  - t: "with index"
-  - x: "*[1]"
-  - pause: short
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [t: "of"]
-  - x: "*[2]"
-  - pause: short
-  - test:
-      if: "not(IsNode(*[2],'leaf'))"
-      then: [t: "end root symbol"]
-
 
 - name: simple-sub
   tag: particular-value-of
@@ -154,7 +79,7 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
-      then: [t: "sub"]      # phrase(x = y plus 'sub' z)
+      then: [t: "sub"]
   - x: "*[2]"
 
 - name: default
@@ -162,9 +87,9 @@
   match: "count(*)=2"
   replace:
   - x: "*[1]"
-  - t: "sub"      # phrase(x = y plus 'sub' z)
+  - t: "sub"
   - x: "*[2]"
-  - t: "end sub"      # phrase(at the end of the section 'end sub' is used)
+  - t: "end sub"
   - pause: short
 
 
@@ -173,7 +98,7 @@
   match: "."
   replace:
   - x: "*[1]"
-  - t: "sub"      # phrase(x = y plus 'sub' z)
+  - t: "sub"
   - x: "*[2]"
 
 - name: structure
@@ -184,7 +109,7 @@
   - test:
       if: "name(.)='msubsup'"
       then:
-      - t: "sub"      # phrase(x = y plus 'sub' z)
+      - t: "sub"
       - x: "*[2]"
   - test:
       if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
@@ -192,15 +117,15 @@
       else_test:
           if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"  # FIX: is this test necessary?
           then:
-          - t: "super"      # phrase(the word 'super' may be short for superscript)
+          - t: "super"
           - x: "*[last()]"
           - test:
               if: "not(IsNode(*[last()], 'simple'))"
-              then: [t: "end super"]      # phrase('end super' indicates end of a superscript)
+              then: [t: "end super"]
           else:
-          - t: "raised to the"      # phrase(5  'raised to the' second power equals 25)
+          - t: "raised to the"
           - x: "*[last()]"
-          - t: "power"      # phrase(5 raised to the second 'power' equals 25)
+          - t: "power"
 
 - name: default
   tag: munder
@@ -208,11 +133,11 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]      # phrase(the equation has been 'modified')
+      then: [t: "modified"]
   - x: "*[1]"
-  - t: "with"      # phrase(substitute x 'with' z)
+  - t: "with"
   - x: "*[2]"
-  - t: below      # phrase(One number is written 'below' the other)
+  - t: below
 
 - name: diacriticals
   tag: mover
@@ -227,11 +152,11 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]      # phrase(the equation has been 'modified')
+      then: [t: "modified"]
   - x: "*[1]"
-  - t: "with"      # phrase(substitute x 'with' y)
+  - t: "with"
   - x: "*[2]"
-  - t: "above"      # phrase(in a fraction the numerator is 'above' the denominator)
+  - t: "above"
 
 - name: default
   tag: munderover
@@ -239,13 +164,13 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]      # phrase(the equation has been 'modified')
+      then: [t: "modified"]
   - x: "*[1]"
-  - t: "with"      # phrase(substitute x 'with' y)
+  - t: "with"
   - x: "*[2]"
-  - t: "below and"      # phrase(in this case the  denominator is 'below and' smaller than the numberator)
+  - t: "below and"
   - x: "*[3]"
-  - t: "above"      # phrase(the numerator is 'above' the numerator)
+  - t: "above"
 
 - name: default
   #   Here we support up to 2 prescripts and up to 4 postscripts -- that should cover all reasonable cases
@@ -272,9 +197,9 @@
           - test: # only bother announcing if there is more than one prescript
               if: "count($Prescripts) > 2"
               then:
-              - t: "with"      # phrase(substitute x 'with' y)
+              - t: "with"
               - x: "count($Prescripts) div 2"
-              - t: "prescripts"      # phrase(in this equation certain 'prescripts' apply)
+              - t: "prescripts"
               - pause: short
           - test:
               if: "not($Prescripts[1][self::m:none])"
@@ -283,7 +208,7 @@
               - x: "$Prescripts[1]"
           - test:
               if: "not($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none])"
-              then: [t: "and"]      # phrase(10 is greater than 8 'and' less than 15)
+              then: [t: "and"]
           - test:
               if: "not($Prescripts[2][self::m:none])"
               then:
@@ -300,7 +225,7 @@
                   - x: "$Prescripts[3]"
               - test:
                   if: "not($Prescripts[3][self::m:none] or $Prescripts[4][self::m:none])"
-                  then: [t: "and"]      # phrase(10 is grater than 8 'and' less than 15)
+                  then: [t: "and"]
               - test:
                   if: "not($Prescripts[4][self::m:none])"
                   then:
@@ -309,9 +234,9 @@
               - test:
                   if: "count($Prescripts) > 4" # give up and just dump them out so at least the content is there
                   then:
-                  - t: "and alternating prescripts"      # phrase(in this case there are values 'and alternating prescripts')
+                  - t: "and alternating prescripts"
                   - x: "$Prescripts[position() > 4]"
-                  - t: "end prescripts"      # phrase(This is where 'end prescripts' occurs)
+                  - t: "end prescripts"
   - test:
       if: "$Postscripts"
       then:
@@ -325,10 +250,10 @@
               then:
               - test:
                   if: "$Prescripts"
-                  then: [t: "and"]      # phrase(10 is greater than 8 'and' less than 15)
-              - t: "with"      # phrase(substitute x 'with' y)
+                  then: [t: "and"]
+              - t: "with"
               - x: "count($Postscripts) div 2"
-              - t: "postscripts"      # phrase(this material includes several 'postscripts')
+              - t: "postscripts"
               - pause: short
           - test:
               if: "not($Postscripts[1][self::m:none])"
@@ -337,7 +262,7 @@
               - x: "$Postscripts[1]"
           - test:
               if: "not($Postscripts[1][self::m:none] or $Postscripts[2][self::m:none])"
-              then: [t: "and"]      # phrase(10 is greater than 8 'and' less than 15)
+              then: [t: "and"]
           - test:
               if: "not($Postscripts[2][self::m:none])"
               then:
@@ -353,7 +278,7 @@
                   - x: "$Postscripts[3]"
               - test:
                   if: "not($Postscripts[3][self::m:none] or $Postscripts[4][self::m:none])"
-                  then: [t: "and"]      # phrase(10 is greater than 8 'and' less than 15)
+                  then: [t: "and"]
               - test:
                   if: "not($Postscripts[4][self::m:none])"
                   then:
@@ -369,7 +294,7 @@
                       - x: "$Postscripts[5]"
                   - test:
                       if: "not($Postscripts[5][self::m:none] or $Postscripts[6][self::m:none])"
-                      then: [t: "and"]      # phrase(10 is greater than 8 'and' less than 15)
+                      then: [t: "and"]
                   - test:
                       if: "not($Postscripts[6][self::m:none])"
                       then:
@@ -385,7 +310,7 @@
                           - x: "$Postscripts[7]"
                       - test:
                           if: "not($Postscripts[7][self::m:none] or $Postscripts[8][self::m:none])"
-                          then: [t: "and"]      # phrase(10 is less than 15 'and' greater than 5)
+                          then: [t: "and"]
                       - test:
                           if: "not($Postscripts[8][self::m:none])"
                           then:
@@ -394,27 +319,27 @@
                       - test:
                           if: "count($Postscripts) > 8" # give up and just dump them out so at least the content is there
                           then:
-                          - t: "and alternating scripts"      # phrase(this situation involves complexities 'and alternating scripts')
+                          - t: "and alternating scripts"
                           - x: "$Postscripts[position() > 8]"
-                          - t: "end scripts"      # phrase(At this point 'end scripts' occurs)
+                          - t: "end scripts"
 
 - name: default
   tag: mtable
   variables: [IsColumnSilent: false()]
   match: "."
   replace:
-  - t: "table with"      # phrase(put the values in the 'table with' comments)
+  - t: "table with"
   - x: count(*)
   - test:
       if: count(*)=1
-      then: [t: "row"]      # phrase(Look at the values in the third 'row')
-      else: [t: "rows"]      # phrase(Look at the values in the first and second 'rows')
-  - t: and      # phrase(10 is less than 12 'and' greater than 6)
+      then: [t: "row"]
+      else: [t: "rows"]
+  - t: and
   - x: "count(*[1]/*)"
   - test:
       if: "count(*[1]/*)=1"
-      then: [t: "column"]      # phrase(Look at the values in the left 'column')
-      else: [t: "columns"]      # phrase(Look at the values in the first two 'columns')
+      then: [t: "column"]
+      else: [t: "columns"]
   - pause: long
   - x: "*"
 
@@ -430,7 +355,7 @@
   tag: mtd
   match: "."
   replace:
-  - t: "column"      # phrase(Look at the values in the first 'column')
+  - t: "column"
   - x: "count(preceding-sibling::*)+1"
   - pause: medium
   - x: "*" # speak the entry
@@ -442,7 +367,7 @@
   tag: menclose
   match: "@notation='box' and *[self::m:mtext and text()=' ']"
   replace:
-  - t: "empty box"      # phrase(the 'empty box' contains no values)
+  - t: "empty box"
 
 - name: default
   # The ordering below is the order in which words come out when there is more than one value
@@ -452,29 +377,29 @@
   replace:
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
-      then: [t: "box", pause: short]      # phrase(the 'box' contains relevant values)
+      then: [t: "box", pause: short]
   - test:
       if: ".[contains(@notation,'roundedbox')]"
-      then: [t: "round box", pause: short]      # phrase(the 'round box' contains significant values)
+      then: [t: "round box", pause: short]
   - test:
       if: ".[contains(@notation,'circle')]"
-      then: [t: "circle", pause: short]      # phrase(the 'circle' has a radius of 5cm)
+      then: [t: "circle", pause: short]
   - test:
       if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or contains(concat(' ', normalize-space(@notation), ' '), ' right ') or contains(@notation,'top') or contains(@notation,'bottom') ]"
       then:
-      - t: line on      # phrase(draw a straight 'line' on the page)
+      - t: line on
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
-          then: [t: "left", pause: short]      # phrase(names are sown in the 'left' column)
+          then: [t: "left", pause: short]
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"
-          then: [t: "right", pause: short]      # phrase(totals are shown in the 'right' column)
+          then: [t: "right", pause: short]
       - test:
           if: ".[contains(@notation,'top')]"
-          then: [t: "top", pause: short]      # phrase(read the items in the 'top' line)
+          then: [t: "top", pause: short]
       - test:
           if: ".[contains(@notation,'bottom')]"
-          then: [t: "bottom", pause: short]      # phrase(the result is on the 'bottom' line)
+          then: [t: "bottom", pause: short]
   - test:
       if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
       then:
@@ -484,77 +409,77 @@
           else:
           - test:
               if: ".[contains(@notation,'updiagonalstrike')]"
-              then: [t: "up diagonal", pause: short]      # phrase(the line runs 'up diagonal')
+              then: [t: "up diagonal", pause: short]
           - test:
               if: ".[contains(@notation,'downdiagonalstrike')]"
-              then: [t: "down diagonal", pause: short]      # phrase(the line runs 'down diagonal')
+              then: [t: "down diagonal", pause: short]
       - test:
           if: ".[contains(@notation,'verticalstrike')]"
-          then: [t: "vertical", pause: short]      # phrase(the line is  'vertical')
+          then: [t: "vertical", pause: short]
       - test:
           if: ".[contains(@notation,'horizontalstrike')]"
-          then: [t: "horizontal", pause: short]      # phrase(the line is 'horizontal')
-      - t: cross out      # phrase(please 'cross out' the incorrect answer)
+          then: [t: "horizontal", pause: short]
+      - t: cross out
       - pause: short
   - test:
       if: ".[contains(@notation,'uparrow')]"
-      then: [t: "up arrow", pause: short]      # phrase(direction is shown by the 'up arrow')
+      then: [t: "up arrow", pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
-      then: [t: "down arrow", pause: short]      # phrase(the trend is shown by the 'down arrow')
+      then: [t: "down arrow", pause: short]
   - test:
       if: ".[contains(@notation,'leftarrow')]"
-      then: [t: "left arrow", pause: short]      # phrase(the 'left arrow' indicates going back)
+      then: [t: "left arrow", pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
-      then: [t: "right arrow", pause: short]      # phrase(the 'right arrow' indicates moving forward)
+      then: [t: "right arrow", pause: short]
   - test:
       if: ".[contains(@notation,'northeastarrow')]"
-      then: [t: "northeast arrow", pause: short]      # phrase(direction is indicated by the 'northeast arrow')
+      then: [t: "northeast arrow", pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
-      then: [t: "southeast arrow", pause: short]      # phrase(direction is shown by the 'southeast arrow')
+      then: [t: "southeast arrow", pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
-      then: [t: "southwest arrow", pause: short]      # phrase(direction is shown by the 'southwest arrow')
+      then: [t: "southwest arrow", pause: short]
   - test:
       if: ".[contains(@notation,'northwestarrow')]"
-      then: [t: "northwest arrow", pause: short]      # phrase(direction is shown by the 'northwest arrow')
+      then: [t: "northwest arrow", pause: short]
   - test:
       if: ".[contains(@notation,'updownarrow')]"
-      then: [t: "double ended vertical arrow", pause: short]      # phrase(upward movement is indicated by the 'double ended vertical arrow')
+      then: [t: "double ended vertical arrow", pause: short]
   - test:
       if: ".[contains(@notation,'leftrightarrow')]"
-      then: [t: "double ended horizontal arrow", pause: short]      # phrase(progress is indicated by the 'double ended horizontal arrow')
+      then: [t: "double ended horizontal arrow", pause: short]
   - test:
       if: ".[contains(@notation,'northeastsouthwestarrow')]"
-      then: [t: "double ended up diagonal arrow", pause: short]      # phrase(trend is indicated by the 'double ended up diagonal arrow')
+      then: [t: "double ended up diagonal arrow", pause: short]
   - test:
       if: ".[contains(@notation,'northwestsoutheastarrow')]"
-      then: [t: "double ended down diagonal arrow", pause: short]      # phrase(trend is indicated by the 'double ended down diagonal arrow')
+      then: [t: "double ended down diagonal arrow", pause: short]
   - test:
       if: ".[contains(@notation,'actuarial')]"
-      then: [t: "actuarial symbol", pause: short]      # phrase(the 'actuarial symbol' represents a specific quantity)
+      then: [t: "actuarial symbol", pause: short]
   - test:
       if: ".[contains(@notation,'madrub')]"
-      then: [t: "arabic factorial symbol", pause: short]      # phrase(the 'arabic factorial symbol' represents a factorial operation)
+      then: [t: "arabic factorial symbol", pause: short]
   - test:
       if: ".[contains(@notation,'phasorangle')]"
-      then: [t: "phasor angle", pause: short]      # phrase(the 'phasor angle' is used to measure electrical current)
+      then: [t: "phasor angle", pause: short]
   - test:
       if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']" # default
-      then: [t: "long division symbol", pause: short]      # phrase(the 'long division symbol' indicates  a long division calculation)
+      then: [t: "long division symbol", pause: short]
   - test:
       if: ".[contains(@notation,'radical')]"
-      then: [t: "square root", pause: short]      # phrase(5 is the 'square root' of 25)
-  - t: enclosing      # phrase(parentheses are 'enclosing' part of the equation)
+      then: [t: "square root", pause: short]
+  - t: enclosing
   - test:
       if: "*[self::m:mtext and text()=' ']"
-      then: [t: "space"]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)
+      then: [t: "space"]     # otherwise there is complete silence
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
-      then: [t: end enclosure]      # phrase(reached the 'end enclosure' point)
+      then: [t: end enclosure]
   - pause: short
 
 - name: semantics
@@ -574,7 +499,7 @@
   match: .
   replace:
   - x: "*[1]"
-  - t: "applied to"      # phrase(values are 'applied to' the formula)
+  - t: "applied to"
   - x: "*[2]"
 
 
@@ -623,11 +548,11 @@
   match: count(*)>0
   replace:
   - x: "translate(name(.), '-_', '  ')"
-  - t: "of"      # phrase(the sum 'of' 5 plus 5 is 10)
+  - t: "of"
   - pause: short
   - insert:
       nodes: "*"
-      replace: [t: "comma", pause: auto]      # phrase(a 'comma' is used to improve readability of long numbers)
+      replace: [t: "comma", pause: auto]
 
 - name: default-text
   # unknown leaf -- just speak the text -- could be a literal intent

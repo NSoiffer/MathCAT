@@ -43,11 +43,11 @@
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][text()='2']"
-        then: [{t: square root}]        # phrase(the 'square root' of)
+        then: [{t: square root}]
       - else_if: "*[2][text()='3']"
-        then: [{t: cube root}]        # phrase(the 'cube root' of)
+        then: [{t: cube root}]
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {t: root}]        # phrase(the square  'root' of)
+        then: [{x: "ToOrdinal(*[2])"}, {t: root}]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
@@ -55,15 +55,15 @@
           - x: "*[2]"
           - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: [{x: "*[2]"}]
-      - t: root        # phrase(the square  'root' of)
+      - t: root
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: of}]        # phrase(the square root  'of' x)
+      then: [{t: of}]
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{t: end root}, {pause: short}]      # phrase(start the fifth root of x 'end root')
+      else: [{t: end root}, {pause: short}]
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
@@ -91,7 +91,7 @@
   - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
   replace:
   - x: "*[1]"
-  - t: over      # phrase(the fraction with 3 'over' 4)
+  - t: over
   - x: "*[2]"
   - pause: short
 
@@ -99,19 +99,19 @@
   tag: fraction
   match: "."
   replace:
-  - t: fraction      # phrase(the 'fraction' with 3 over 4)
+  - t: fraction
   - pause: short
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1],'leaf'))"
       then: [{pause: short}]
-  - t: over      # phrase(the fraction with3 'over' 4)
+  - t: over
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then: [{pause: short}]
   - x: "*[2]"
   - pause: short
-  - t: end fraction      # phrase(7 over 8 'end fraction')
+  - t: end fraction
   - pause: medium
 
 # rules for functions raised to a power
@@ -121,7 +121,7 @@
   tag: inverse-function
   match: "."
   replace:
-  - t: inverse      # phrase(this is the 'inverse' of 4 over 5)
+  - t: inverse
   - x: "*[1]"
 
 - name: function-squared-or-cubed
@@ -134,8 +134,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {t: squared}      # phrase(25 is the 'square' of 5)
-      else: {t: cubed}      # phrase(The value of 5 'cubed' is 125)
+      then: {t: squared}
+      else: {t: cubed}
 - name: function-power
   tag: power
   match:
@@ -143,13 +143,13 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: the}      # # phrase('the' set of all x greater than 0)
+      then: {t: the}
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][self::m:mn][not(contains(., '.'))]"
       then: [{x: "ToOrdinal(*[2])"}]
       else: [{x: "*[2]"}]
-  - t: power of      # phrase(36 is the result of raising 6 to the 'power of' 2)
+  - t: power of
   - pause: short
   - x: "*[1]"
 
@@ -162,15 +162,15 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {t: squared}      # phrase(the result of 5 'squared' is 25)
-      else: {t: cubed}      # phrase(the result of 5 'cubed' is 125)
+      then: {t: squared}
+      else: {t: cubed}
 
 - name: simple-integer
   tag: power
   match: "*[2][self::m:mn][not(contains(., '.'))]"
   replace:
   - x: "*[1]"
-  - t: to the      # phrase(15 raised 'to the' second power is 225)
+  - t: to the
   - test:
       if: "*[2][.>0]"
       then: {x: "ToOrdinal(*[2])"}
@@ -182,14 +182,14 @@
   - "     *[1][self::m:mn][not(contains(., '.'))]]"
   replace:
   - x: "*[1]"
-  - t: to the      # phrase(15 raised 'to the' second power is 225)
+  - t: to the
   - x: "*[2]"
 - name: simple-var
   tag: power
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  - t: to the      # phrase(15 raised 'to the' second power is 225)
+  - t: to the
   - x: "*[2]"
   - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
 
@@ -198,7 +198,7 @@
   match: "IsNode(*[2], 'leaf')"
   replace:
   - x: "*[1]"
-  - t: to the      # phrase(15 raised 'to the' second power is 225)
+  - t: to the
   - x: "*[2]"
 
 - name: nested
@@ -213,18 +213,18 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - t: raised to the      # phrase(15 'raised to the' second power is 225)
+  - t: raised to the
   - x: "*[2]"
   - pause: short
-  - t: end exponent      # phrase(and now 'end exponent' has been reached)
+  - t: end exponent
 - name: default
   tag: power
   match: "."
   replace:
   - x: "*[1]"
-  - t: raised to the      # phrase(when 15 is 'raised to the' second power the result is 225)
+  - t: raised to the
   - x: "*[2]"
-  - t: power      # phrase(when 15 is raised to the second 'power' the result is 225)
+  - t: power
 
 #
 # Some rules on mrows
@@ -238,22 +238,22 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: the}      # phrase(when 10 is divided by 2 'the' result is 5)
-      - t: empty set      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
+          then: {t: the}
+      - t: empty set
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: the}      # phrase(When dividing 30 by ten 'the' answer is 3)
-      - t: set of all      # phrase(the 'set of all' positive integers less than 10)
+          then: {t: the}
+      - t: set of all
       - x: "*[1]/*[1]"
-      - t: such that      # phrase(therefore x has a value 'such that' it is less than y)
+      - t: such that
       - x: "*[1]/*[3]"
       else:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: the}      # phrase(5 is 'the' square root of 25)
-      - t: set      # phrase(here is a 'set' of numbers)
+          then: {t: the}
+      - t: set
       - x: "*[1]"
 
 - name: times
@@ -261,9 +261,7 @@
   match:
   # say "times" when invisible times is followed by parens or a superscript that has a base with parens or "|"s
   # if we aren't sure if it is times or not, don't say anything
-  - "text()='⁢' and"
-  - "not(@data-function-guess) and ("
-  - "not(ancestor-or-self::*[contains(@data-intent-property, ':structure:')]) and "
+  - "text()='⁢' and not(@data-function-guess) and ("
   - "  following-sibling::*[1]["
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|') or self::m:binomial or" # followed by parens
   - "    ( (self::m:msup or self::m:msub or self::m:msubsup or self::m:power) and " # followed by msup, etc.
@@ -276,7 +274,7 @@
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
-  - t: times      # phrase(7 'times' 5 is 35)
+  - t: times
 
 - name: no-say-parens
   tag: mrow
@@ -284,8 +282,7 @@
   - "parent::*[not(self::m:msup) and not(self::m:msub) and not(self::m:msubsup) and not(self::m:power) and"
   - "          not(self::m:math) ] and "       # rule out [x] standing alone
   - "( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) and "
-  - "( IsNode(*[2], 'simple')  ) and"
-  - "not(ancestor-or-self::*[contains(@data-intent-property, ':structure:')])"
+  - "( IsNode(*[2], 'simple')  )"
   # missing clause: 'a positive fraction that is spoken as an ordinal
   #   (either by the Ordinal preference or by the default rules_'
   replace:

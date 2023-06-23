@@ -7,19 +7,34 @@ This page is a work-in-progress.
 ## Getting Started
 If you plan to work on MathCAT development, you need to make use of github:
 1. Fork the MathCAT repo at `github.com/NSoiffer/MathCAT`
-2. Clone the the forked copy so you have a local copy to work on
+2. Clone the the forked copy so you have a local copy to work on.
+3. Checkout the "translation" branch and work in that branch.
+
 If you are unfamiliar with these steps, a simple search will turn up lots of places that describe how to do them. They are simple, so don't get put off by your unfamiliarity.
 
 
-### Language Translators
-If you are a translator, then you should copy the Rules/Languages/en directory to Rules/Languages/xx, where 'xx' is your country code (e.g., fr, de, el, ...). This new directory is where you will make your translations. There are three categories of files you should edit:
-1. The xxx_Rules.yaml files (currently `ClearSpeak_Rules.yaml` and `SimpleSpeak_Rules.yaml`). These represent different styles of speech. I strongly recommend you just pick one to start with. These files typically have the words that describe the structure such as "fraction" and "power" along with connective words such as "the", "of", and "from". Because there is a lot of similarity between the two styles of speech, there is also a `SharedRules` folder with rule files in it. These are `- include`d into `ClearSpeak_Rules.yaml` and `SimpleSpeak_Rules.yaml`
-2. The unicode files (`unicode.yaml` and `unicode-full.yaml`). These contain characters like `<` and `∫`.
-You should start with translating `unicode.yaml`. These represent the vast majority of math symbols used. Currently the list is based on experience as to which are the most commonly used Unicode symbols, but I plan to make use of statistics from actual books to refine the list even further. There are about 270 characters to translate in `unicode.yaml`, although ~50 of them are Greek letters (which is hopefully simple).
-3. The navigation files `navigate.yaml` and `overview.yaml`. Just translate `navigate.yaml`; `overview.yaml` is not ready to be used.
+## Language Translators
+If you are a translator, please contact @NSoiffer and he will set up an initial translation that could save a large amount of time. This initial translation will create files in Rules/Languages/xx, where 'xx' is your country code (e.g., fr, de, el, ...). This directory is where you will make your translations. There are four categories of files you should edit:
+1. definitions.yaml: this has a number of translations for numbers, both cardinal and ordinal numbers. Look through those initial translations and make any corrections needed. These numbers are used for things like saying "three fifths". Languages start to have regular counting patterns at some point and so some of the lists in that file can be shortened and some may need additional entries. There are some more details in the English comments in the file.
+2. The xxx_Rules.yaml files (currently `ClearSpeak_Rules.yaml` and `SimpleSpeak_Rules.yaml`). These represent different styles of speech. I strongly recommend you just pick one to start with. These files typically have the words that describe the structure such as "fraction" and "power" along with connective words such as "the", "of", and "from". Because there is a lot of similarity between the two styles of speech, there is also a `SharedRules` folder with rule files in it. These are `- include`d into `ClearSpeak_Rules.yaml` and `SimpleSpeak_Rules.yaml`. They need to be translated also.
+    * In some languages it doesn't make sense to says "_the_ square root of x" (and maybe "of"). If that is the case, just change those to empty strings.
+    * Some languages, the word order changes -- feel free to move the words around, but pay attention to the indentation.
+    Indentation is meaningful in YAML. 
+    * In some languages, you may want to add words that aren't in the English version, perhaps before or after existing phrases. Feel free to add them -- they can be added in only certain cases if needed. Please contact @NSoiffer if you need help with this.
+3. The unicode files (`unicode.yaml` and `unicode-full.yaml`). These contain characters like `<` and `∫`.
+    * You should start with translating `unicode.yaml`. These represent the vast majority of math symbols used. Currently the list is based on experience as to which are the most commonly used Unicode symbols, but I plan to make use of statistics from actual books to refine the list even further. There are about 270 characters to translate in `unicode.yaml`, although ~50 of them are Greek letters (which is hopefully simple).
+    These files have auto-generated initial translations. Even though they are translated, the `t:` (see below) is used, not the upper case `T:`. This is because each translation should be verified to be correct and when verified, then change to the uppercase version.
+    See below for more comments about the auto translations.
+    * The `unicode-full.yaml` is thousands of lines long. In general, the more important characters to translate occur earlier in the file.  (Note: there are some duplicates of characters in the `unicode.yaml` that I still need to weed out). Once you have done other translations, I would come back to this file and work through it until you reach a point of being exhausted -- most of these characters will only show up in very advanced mathematics, and even then, only very rarely. The most important of these characters are probably:
+         * Some of the arrows that start at 0x2190
+         * The characters in the math symbols block: 0x2200 - 0x22ff
+         * Some accents: 0x2d8-0x2dd
+         * Some of the simple black/white shapes starting at: 0x25a0 and also at 0x2b1a
+4. The navigation files `navigate.yaml` and `overview.yaml`. Just translate `navigate.yaml`; `overview.yaml` is not ready to be used. Many of the words in `navigate.yaml` are repeated many times, so you probably want to do a global search/replace. I hope to rewrite the file at some point and isolate the words.
 
 __NOTE__: I am in the process of changing the rules to make use of `intent`. This will move the complicated logic of recognizing things like absolute value and determinants into the `intent` folder which is language-independent. It should make translations simpler because the rule only needs to match the tag "absolute-value" or "determinant". The tests also should be separated out into an `intent` directory that is language independent.
 
+### Marking text as translated
 These files are YAML files and their content is described later in this page.
 In all of these files, the text to translate will have the YAML key name `t` (and very rarely `ot`, `ct`, `spell`, and `pronounce`). When you make a translation, you should capitalize them (e.g, `T` and `SPELL`) to indicate that the file has been translated.
 
@@ -42,22 +57,42 @@ If you were translating this to French, the words after the `t:` would get chang
          then: [T: "est"]
      - T: "supérieur à"
 ```
-It is very likely than in some languages, saying "is" or "the" before a word or phrase is not appropriate.
-Translators should feel free to change the logic appropriately.
-Similarly, it is likely that in some languages, word order might change or additional words are used based on context;
-those should be made with whatever test is appropriate.
+
 See below for a discussion of what can be used in a rule file.
 
+### A note about the translated files
+To derive an initial translation for the Unicode files, both MathPlayer's and SRE's translations are used. Google translate is also used.
+If SRE and MathPlayer agree, or if only one of SRE or MathPlayer has a translation but that translation agrees with the google translation, then only the original English version will be part of a comment at the end. For example:
+```
+ - "!": [t: "factorielle"]                      	#  0x21	(en: 'factorial')
+```
 
+If the MathPlayer and SRE translations disagree, then the translations that agrees with the google translation will be chosen and the other translation included in a comment. For example:
+```
+        else: [t: "parenthèse gauche"]          	# 	(en: 'left paren', MathPlayer: 'parenthèse ouvrante')
+```
+If non of the translations agree, than one of the translations is picked and the other translations are in comment. For example:
+```
+            else: [t: "parenthèse gauche"]      	# 	(en: 'open paren', MathPlayer: 'parenthèse ouvrante', google: 'parenthèse ouverte')
+```
+Finally, if there there is no translation, then the google translation is given and is marked with a comment "google translation". There is a significant chance that this is not a good translation so pay special attention to those. Here is an example where these is only a google translation
+```
+          then: [t: "ligne verticale"]          	# 	(en: 'vertical line', google translation)
+```
+
+
+### Trying out your translation
 Once you've done some translations and want to try them out, you can do so immediately if using NVDA. Assuming you have the MathCAT addon:
-1. copy your new translation directory to `%AppData%\nvda\addons\MathCAT\globalPlugins\MathCAT\Rules\Languages`.
+1. Copy your new translation directory to `%AppData%\nvda\addons\MathCAT\globalPlugins\MathCAT\Rules\Languages`.
 2. Start NVDA and go to the MathCAT settings menu (NVDA preferences: MathCAT settings..).
 3. Under the "Languages" drop down you should see your new language. Select that.
 4. Try out the speech. Wikipedia pages are a good source for examples.
-5. If there is an error (often you want hear speech), open NVDA's log (in NVDA's "Tools" submenu). The error should be listed there. The error messages are explained below.
+5. If there is an error (often you won't hear speech), open NVDA's log (in NVDA's "Tools" submenu). The error should be listed there. The error messages are explained below.
+6. When you make a change, either reload MathCAT (NVDA Tools:Reload Plugins) or restart NVDA.
 
 Translating the settings dialog: this is a separate process from translating the speech. [to be written]
 
+### Automatic tests for your translation
 Testing is very important! MathCAT is written in Rust and has a large number of automated tests. These tests take advantage of the builtin Rust test system. Hence, to write and verify your own tests, you need to [download and install Rust](https://www.rust-lang.org/tools/install). You do not need to know Rust -- you will simply change some strings from what they are in English to what you think they should be in your language.
 In the `tests\Languages` directory, there is a file `en.rs` and a directory `en`. For the sake of discussion, let's assume you are doing a French translation, then your country code is `fr`.
 1. Copy `en.rs` to `fr.rs`.
@@ -87,9 +122,9 @@ I hope to eventually have a tool that will
 These tools will look for untranslated and translated text.
 
 
-### Braille translators
+## Braille translators
 If you want support for a new braille language, you probably need to start from scratch unless the language is similar to an existing braille language.
-You will need to create three `.yaml` files in `Rules\Braille\your-braille-language`. The should mirror the files that are in the other braille directories:
+You will need to create three `.yaml` files in `Rules\Braille\your-braille-language`. This should mirror the files that are in the other braille directories:
 1. xxx_Rules.yaml -- where 'xxx' is the name of your new braille language. These will contain the rules that translate MathML to braille
 2. unicode.yaml -- this is a translation of the more common braille characters. Use `Nemeth\unicode.yaml` as a starting point for the the translation. Convert the `t: xxx` into what is appropriate for your language. You likely need to delete some logic or maybe add some of your own for characters that might be represented differently based on context. For example, in Nemeth, a "," is represented differently if it is part of a number.
 3. unicode-full.yaml -- this is the rest of the character translations.
@@ -102,7 +137,7 @@ To try out your braille translation, you can do so immediately. Please see the i
 
 For automated testing, the instructions above should be followed. The current tests are taken from braille guides for Nemeth/UEB, and you may want to do the same. Unlikely for a language translation, use `test_braille` as is done for Nemeth/UEB.
 
-### Understanding MathCAT Error Message
+## Understanding MathCAT Error Message
 If there is a problem with a rule that causes an error, these print to the terminal console if you are running MathCAT directly or to NVDA's log if you are using NVDA.
 
 The error messages can be confusing to understand. Here is a description of one and how to understand what is saying.
@@ -111,7 +146,7 @@ Because the library that is used in MathCAT to read YAML files does not keep lin
 Instead, it reports the file name and rule's `name` and `tag` within that file.
 It then (recursively) reports which section of the rule has the error.
 
-Here's an example or an error message where "test:" was  changed to "textx:" to cause an error:
+Here's an example of an error message where "test:" was  changed to "textx:" to cause an error:
 ```
 caused by: in file "...\\MathCAT\\Rules\\Languages\\en\\ClearSpeak_Rules.yaml"
 caused by: value for 'replace' in rule (fraction: fraction-over-simple). Replacements:
@@ -136,7 +171,7 @@ caused by: replacement #1 of 2
 caused by: Unknown 'replace' command (testx) with value:  if: "$Verbosity!='Terse'" then: [ot: the]
 ```
 To give some explanation:
-The first two lines tell you the file, and the "tag" value and "name" value. Here's that rule:
+The first two lines tell you the file, and the "tag" and "name" values. Here's that rule:
 ```
 - name: fraction-over-simple
   tag: fraction
@@ -148,7 +183,7 @@ The first two lines tell you the file, and the "tag" value and "name" value. Her
   - test:
       if: "$ClearSpeak_Fractions='FracOver'"
       then:
-      - test:
+      - testx:
           if: "$Verbosity!='Terse'"
           then: [{ot: "the"}]
       - t: "fraction"
@@ -167,9 +202,10 @@ The first two lines tell you the file, and the "tag" value and "name" value. Her
 The next part of the message (`caused by: replacement #1 of 5`) says the problem happens in the first replacement (the first "-").
 The next line (`caused by: replacement #1 of 2`) says inside of that, the error inside of the first part of that
 The final line says that in there, the problem is `Unknown 'replace' command (testx) with value`. So now you can correct that problem.
+It is often easiest to read the error from the bottom up.
 
 
-### Rust Developers
+## Rust Developers
 To be written...
 
 `build.rs` and files in `src`

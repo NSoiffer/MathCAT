@@ -127,7 +127,11 @@ impl Preferences{
         }
 
         return FileAndTime {
-            time: if cfg!(target_family = "wasm") {None} else {Some( SystemTime::now() )},
+            times: if cfg!(target_family = "wasm") {
+                [None, None, None]
+            } else {
+                [Some(SystemTime::now()), Some( SystemTime::now()), Some( SystemTime::now())]
+            },
             files: result
         }
     }
@@ -256,6 +260,7 @@ impl Preferences{
 ///
 /// Note: the first entry is the first thing found, which might be '2' or '3' in the list above.
 pub type Locations = [Option<PathBuf>; 3];
+type Times = [Option<SystemTime>; 3];
 
 pub fn are_locations_same(loc1: &Locations, loc2: &Locations) -> bool {
     return loc1[0] == loc2[0] &&
@@ -266,13 +271,20 @@ pub fn are_locations_same(loc1: &Locations, loc2: &Locations) -> bool {
 #[derive(Debug, Clone, Default)]
 struct FileAndTime {
     files: Locations,
-    time: Option<SystemTime>       // ~time file was read (used to see if it was updated and needs to be re-read) 
+    times: Times             // ~time file was read (used to see if it was updated and needs to be re-read) 
 }
 
 impl PartialEq for FileAndTime {
     fn eq(&self, other: &Self) -> bool {
-        // FIX: anticipating changing Locations to single PathBuf
-        return self.files[0] == other.files[0] && self.time == other.time;
+        let is_equal = self.files[0] == other.files[0] && self.times[0] == other.times[0];  // '0' always exists
+        if !is_equal || self.files[1].is_none() {
+            return is_equal;
+        }
+        let is_equal = self.files[1] == other.files[1] && self.times[1] == other.times[1];
+        if !is_equal || self.files[2].is_none() {
+            return is_equal;
+        }
+        return self.files[2] == other.files[2] && self.times[2] == other.times[2];
     }
 }
 impl Eq for FileAndTime {}
@@ -462,7 +474,11 @@ impl PreferenceManager {
         use std::fs;
         let files = PreferenceManager::get_files(rules_dir, lang, default_lang, file_name)?;
         return Ok(FileAndTime {
-            time: if cfg!(target_family = "wasm") {None} else {get_metadata(&files[0])},
+            times: if cfg!(target_family = "wasm") {
+                [None, None, None]
+            } else {
+                [get_metadata(&files[0]), get_metadata(&files[1]), get_metadata(&files[2])]
+            },
             files
         });
 
@@ -580,8 +596,8 @@ impl PreferenceManager {
                     &bad_env_value, rules_dir.to_str().unwrap_or("rules dir is none???"));
     }
 
+    // this will work even if self is invalid
     pub fn is_up_to_date(&mut self) -> Option<FilesChanged> {
-        // this will work even if self is invalid
         let mut files_changed = FilesChanged {
             speech_rules: !PreferenceManager::is_file_up_to_date(&self.speech),
             speech_unicode_short: !PreferenceManager::is_file_up_to_date(&self.speech_unicode),
@@ -631,28 +647,23 @@ impl PreferenceManager {
     }
 
     fn is_file_up_to_date(ft: &FileAndTime) -> bool {
-        if ft.time.is_none() {
-            // wasn't able to determine a time -- just claim it is up to date
-            return true;
-        }
-        let time = ft.time.unwrap();
-        return  is_older(&ft.files[0], time) &&
-                is_older(&ft.files[1], time) &&
-                is_older(&ft.files[2], time);
+        return  is_older(&ft.files[0], ft.times[0]) &&
+                is_older(&ft.files[1], ft.times[1]) &&
+                is_older(&ft.files[2], ft.times[2]);
 
-        fn is_older(path: &Option<PathBuf>, time: SystemTime) -> bool {
+        fn is_older(path: &Option<PathBuf>, time: Option<SystemTime>) -> bool {
             // if let Some(path_buf) = path {
             //     debug!("p={}", path_buf.to_str().unwrap());
             //     debug!("p.metadata={:?}", path_buf.metadata());
             //     debug!("p.metadata.modified={:?}", path_buf.metadata().unwrap().modified());
             //     debug!("p.metadata.modified.duration_since={:?}", path_buf.metadata().unwrap().modified().unwrap().duration_since(time));    
             // }
-            return match path {
-                Some(p) => {
+            return match (path, time) {
+                (Some(p), Some(t)) => {
                     let file_mod_time = p.metadata().unwrap().modified().unwrap();
-                    return file_mod_time <= time;
+                    return file_mod_time <= t;
                 },
-                None => true,
+                _ => true,
             }           
         }
     }
@@ -999,11 +1010,14 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("Language", "zz-aa");
             
             // First test to make sure the up_to_date check works -- need to do in this test since the order of testing is random
             let files_changed = pref_manager.is_up_to_date();        
             assert!(files_changed.is_none(), "files_changed={}", files_changed.unwrap());
+            
+            let files_changed = pref_manager.set_user_prefs("Language", "zz-aa");        
+            assert!(files_changed.is_some(), "files_changed={}", files_changed.unwrap());
+            assert!(files_changed.unwrap().speech_rules);
 
 
             // Note: need to use pattern match to avoid borrow problem
