@@ -7,16 +7,16 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"
-  - t: "determinant"
+      - T: "el"
+  - T: "determinante"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of"
+      - T: "de"
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple'))"
-      then: [t: "end determinant"]
+      then: [T: " fin del determinante"]
 
 - name: norm
   tag: norm
@@ -25,16 +25,16 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"
-  - t: "norm"
+      - T: "la"
+  - T: "regla"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of"
+      - T: "de"
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple'))"
-      then: [t: "end norm"]
+      then: [T: "fin de la regla"]
 
 
 - name: subscripted-norm
@@ -44,13 +44,13 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"
+      - T: "la"
   - x: "*[2]"
-  - t: "norm"
+  - T: "regla"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of"
+      - T: "de"
   - x: "*[1]"
 
 - name: transpose
@@ -58,7 +58,7 @@
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - t: "transpose"
+  - T: "intercambiar"
 - name: trace
   tag: trace
   match: "not(@data-intent-property)"
@@ -66,12 +66,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"
-  - t: "trace"
+      - T: "la"
+  - T: "traza"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of"
+      - T: "de"
   - x: "*[1]"
 
 - name: dimension
@@ -81,12 +81,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"
-  - t: "dimension"
+      - T: "la"
+  - T: "dimensión"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of"
+      - T: "de"
   - x: "*[1]"
 
 - name: homomorphism
@@ -96,12 +96,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"
-  - t: "homomorphism"
+      - T: "el"
+  - T: "homomorfismo"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of"
+      - T: "de"
   - x: "*[1]"
 
 - name: kernel
@@ -111,11 +111,11 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"
-  - t: "kernel"
+      - T: "el"
+  - T: "núcleo"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of"
+      - T: "de"
   - x: "*[1]"
 

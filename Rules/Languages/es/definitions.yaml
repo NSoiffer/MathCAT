@@ -37,19 +37,19 @@
     ],
 
     NumbersOrdinalPluralOnes: [
-         "cero", "primeros", "segundos", "terceros", "cuartos", "quintos", "sextos", "séptimos", "octavos", "novenos",
-         "décimos", "undécimos", "decimosegundos", "decimoterceros", "decimocuartos", "decimoquintos", "decimosextos",
-         "decimoséptimos", "decimoctavos", "decimonovenos"
+         "cero", "primero", "segundos", "tercios", "cuartos", "quintos", "sextos", "séptimos", "ochos", "novenos",
+         "décimos", "undécimos", "doceavos", "treceavos", "catorceavos", "decimoquintos", "dieciseisavos",
+         "diecisiete", "dieciochovo", "diecinueve"
     ],
 
     # stop when regularity begins
     NumbersOrdinalFractionalOnes: [
-         "cero", "unidad", "medio"
+         "cero", "primero", "mitad"
     ],
 
     # stop when regularity begins
     NumbersOrdinalFractionalPluralOnes: [
-         "cero", "unidades", "medios"
+         "ceros", "primeros", "mitades"
     ],
 
 
@@ -59,11 +59,11 @@
     ],
 
     NumbersOrdinalTens: [
-         "", "décimo", "vigésimo", "trigésimo", "cuadragésimo", "quincuagésimo", "sexagésimo", "septuagésimo", "octogésimo", "nonagésimo"
+         "", "décimo", "vigésimo", "trigésimo", "cuadragésimo", "quincuagésimo", "sexagésimo", "setenta", "ochogésimo", "novagésimo"
     ],
 
     NumbersOrdinalPluralTens: [
-         "", "décimos", "vigésimos", "trigésimos", "cuadragésimos", "quincuagésimos", "sexagésimos", "septuagésimos", "octogésimos", "nonagésimos"
+         "", "décimos", "veinte", "treinta", "cuarentavos", "quincuagésimos", "sexagésimos", "setentavos", "ochentavos", "novenonavos"
     ],
 
 
@@ -73,30 +73,30 @@
     ],
 
     NumbersOrdinalHundreds: [
-       "", "centésimo", "ducentésimo", "tricentésimo", "cuadringentésimo", "quingentésimo",
-         "sexcentésimo", "septingentésimo", "octingentésimo", "noningentésimo"
+       "", "una centésima", "dos centésima", "tres centésima", "cuatro centésima", "quinienta centésima",
+         "seiscientos", "setecientos", "ocho centésimo", "nueve centésimo"
     ],
 
     NumbersOrdinalPluralHundreds: [
-       "", "centésimos", "ducentésimos", "tricentésimos", "cuadringentésimos", "quingentésimos",
-         "sexcentésimos", "septingentésimos", "octingentésimos", "noningentésimos"
+       "", "centésimas", "dos centésimas", "tres centésimas", "cuatro centésimas", "cinco centésimas",
+         "seis centésimas", "siete centésimas", "ocho centésimas", "nueve centésimas"
     ],
       
 
     # At this point, hopefully the language is regular. If not, code needs to be written
     NumbersLarge: [
-         "", "mil", "millones", "billones", "trillones", "cuatrillones",
-         "quintillones", "sextillónes", "septillónes", "octillónes", "nonillónes",
+         "", "mil", "millones", "billones", "billones", "cuatrillones",
+         "quintillón", "sextillón", "septillón", "octillón", "nonillón",
     ],
       
     NumbersOrdinalLarge: [
-         "", "milésimo", "millonésimo", "milmillonésimo", "trillonésimo", "cuatrillonésimo",
-         "quintillonésimo", "sextillonésimo", "septillonésimo", "octillonésimo", "nonillonésimo"
+         "", "milésima", "millonésima", "mil millonésima", "trillonésima", "cuatrillonésima",
+         "quintillionth", "sextillionth", "septillionth", "octillionth", "nonillionth"
     ],
       
     NumbersOrdinalPluralLarge: [
-         "", "milésimos", "millonésimos", "milmillonésimos", "trillonésimos", "cuatrillonésimos",
-         "quintillonésimos", "sextillonésimos", "septillonésimos", "octillonésimos", "nonillonésimos"
+         "", "milésimas", "millonésimas", "mil millonésimas", "trillonésimas", "cuatrillonésimas",
+         "quintillionésimas", "sextillones", "septillones", "octillionésimas", "nonillionésimas"
     ]
 
 ]

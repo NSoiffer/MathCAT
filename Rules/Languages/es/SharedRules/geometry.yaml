@@ -1,3 +1,4 @@
+
 ---
 
 - name: line-segment
@@ -7,12 +8,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the line segment from"
+      - T: "el segmento de línea de"
       - x: "*[1]"
-      - t: "to"
+      - T: "a"
       - x: "*[2]"
       else:
-      - t: "line segment"
+      - T: "segmento de línea"
       - x: "*[1]"
       - x: "*[2]"
 
@@ -23,12 +24,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the ray from"
+      - T: "la semirrecta de"
       - x: "*[1]"
-      - t: "to"
+      - T: "a"
       - x: "*[2]"
       else:
-      - t: "ray"
+      - T: "semirrecta"
       - x: "*[1]"
       - x: "*[2]"
 
@@ -38,8 +39,8 @@
   replace:
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "the"}]
-  - t: "arc"
+      then: [{T: "el"}]
+  - T: "arco"
   - x: "*[1]"
   - x: "*[2]"
 
@@ -50,9 +51,9 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the measure of the angle"
+      - T: "la medida del ángulo"
       else:
-      - t: "measure of angle"
+      - T: "medida del ángulo"
   - x: "*[1]"
   - x: "*[2]"
   - x: "*[3]"
