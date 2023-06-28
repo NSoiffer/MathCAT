@@ -1,4 +1,4 @@
----
+t---
 # Provide an overview/outline/description of the math
 # MathPlayer just tried to shorten things like "mfrac" by just saying "fraction"
 #   For mrow, it say up to 5 operands and just say "and n more things" for the rest
@@ -30,22 +30,22 @@
       if: "IsNode(*[1], 'simple') and IsNode(*[2], 'simple')"
       then:
       - x: "*[1]"
-      - t: "over"
+      - T: "partido por"
       - x: "*[2]"
       else:
-      - t: "fraction"
+      - T: "fracción"
 
 - name: default
   tag: msqrt
   match: "."
   replace:
-  - t: "square root"
+  - T: "raíz cuadrada"
   - test:
       if: "IsNode(*[1], 'simple')"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: of}
+          then: {T: de}
       - x: "*[1]"
 
 - name: default
@@ -56,11 +56,11 @@
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][text()='2']"
-        then: {t: square root}
+        then: {T: raíz cuadrada}
       - else_if: "*[2][text()='3']"
-        then: {t: cube root}
+        then: {T: raíz cúbica}
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {t: root}]
+        then: [{x: "ToOrdinal(*[2])"}, {T: raíz}]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
@@ -68,13 +68,13 @@
           - x: "*[2]"
           - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: {x: "*[2]"}
-      - t: root
+      - T: raíz
   - test:
       if: "IsNode(*[1], 'simple')"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: of}
+          then: {T: de}
       - x: "*[1]"
 
 - name: default
@@ -83,24 +83,24 @@
   - "*[2][self::m:mtable] and"
   - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
   replace:
-  - t: the
+  - T: la
   - x: count(*[2]/*)
-  - t: by
+  - T: por
   - x: count(*[2]/*[self::m:mtr][1]/*)
   - test:
       if: "*[1][text()='|']" # just need to check the first bracket since we know it must be (, [, or |
-      then: {t: determinant}
-      else: {t: matrix}
+      then: {T: determinante}
+      else: {T: matriz}
 
 - name: default
   tag: mtable
   match: "."
   replace:
-  - t: the
+  - T: la
   - x: count(*[2]/*)
-  - t: by
+  - T: por
   - x: count(*[2]/*[self::m:mtr][1]/*)
-  - t: "table"
+  - T: "tabla"
 
 - name: short-mrow
   tag: mrow
@@ -124,6 +124,6 @@
   - pause: auto
   - x: "*[5]"
   - pause: auto
-  - t: "and so on"
+  - T: "etc."
 
 - include: "SimpleSpeak_Rules.yaml"
