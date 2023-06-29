@@ -1248,7 +1248,7 @@
       then:
       - test:
         - if: "$NavCommand = 'MoveNext'"
-          then: [{t: move}]
+          then: [{t: "move"}]
         - else_if: "$NavCommand = 'ReadNext'"
           then: [{t: "read"}]
           else: [{t: "describe"}]
@@ -1269,7 +1269,7 @@
       then:
       - test:
         - if: "$NavCommand = 'MoveNext'"
-          then: [{t: move}]
+          then: [{t: "move"}]
         - else_if: "$NavCommand = 'ReadNext'"
           then: [{t: "read"}]
           else: [{t: "describe"}]
@@ -1302,7 +1302,7 @@
       then:
       - test:
         - if: "$NavCommand = 'MoveNext'"
-          then: [{t: move}]
+          then: [{t: "move"}]
         - else_if: "$NavCommand = 'ReadNext'"
           then: [{t: "read"}]
           else: [{t: "describe"}]
@@ -1444,7 +1444,7 @@
       then:
       - test:
         - if: "$NavCommand = 'MovePrevious'"
-          then: [{t: move}]
+          then: [{t: "move"}]
         - else_if: "$NavCommand = 'ReadPrevious'"
           then: [{t: "read"}]
           else: [{t: "describe"}]
@@ -1521,7 +1521,7 @@
           then:
           - test:
             - if: "$NavCommand = 'MovePrevious'"
-              then: [{t: move}]
+              then: [{t: "move"}]
             - else_if: "$NavCommand = 'ReadPrevious'"
               then: [{t: "read"}]
               else: [{t: "describe"}]
@@ -1543,7 +1543,7 @@
       then:
       - test:
         - if: "$NavCommand = 'MovePrevious'"
-          then: [{t: move}]
+          then: [{t: "move"}]
         - else_if: "$NavCommand = 'ReadPrevious'"
           then: [{t: "read"}]
           else: [{t: "describe"}]

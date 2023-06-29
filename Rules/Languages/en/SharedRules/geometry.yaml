@@ -7,12 +7,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the line segment from"      # phrase(look at 'the line segment from' the beginning)
+      - t: "the line segment from"      # phrase('the line segment from' A to B)
       - x: "*[1]"
-      - t: "to"
+      - t: "to"                         # phrase(the line segment from A 'to' B)
       - x: "*[2]"
       else:
-      - t: "line segment"      # phrase(look at this 'line segment')
+      - t: "line segment"               # phrase(the 'line segment' A  B)
       - x: "*[1]"
       - x: "*[2]"
 
@@ -23,12 +23,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the ray from"      # phrase(in geometry 'the ray from' the end point extends indefinitely)
+      - t: "the ray from"             # phrase('the ray from' A to B)
       - x: "*[1]"
-      - t: "to"      # phrase('the' square root of 25 is 5)
+      - t: "to"                       # phrase(the ray from A 'to' B)
       - x: "*[2]"
       else:
-      - t: "ray"      # phrase(the  'ray' in geometry extends indefinitely)
+      - t: "ray"                      # phrase(the 'ray'A  B)
       - x: "*[1]"
       - x: "*[2]"
 
@@ -38,8 +38,8 @@
   replace:
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "the"}]      # phrase('the' square root of 25 is 5)
-  - t: "arc"      # phrase(an 'arc' is a curved shape)
+      then: [{t: "the"}]            # phrase('the' arc A B C)
+  - t: "arc"                        # phrase(the 'arc' A B C)
   - x: "*[1]"
   - x: "*[2]"
 

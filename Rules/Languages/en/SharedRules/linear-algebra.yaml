@@ -7,7 +7,7 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"      # phrase('the' square root of 25 is 5)
+      - t: "the"      # phrase('the' square root of 25 equals 5)
   - t: "determinant"      # phrase(the 'determinant' of a matrix)
   - test:
       if: "$Verbosity!='Terse'"
@@ -25,7 +25,7 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"      # phrase('the' square root of 25 is 5)
+      - t: "the"      # phrase('the' square root of 25 equals 5)
   - t: "norm"      # phrase(the 'norm' can be a measure of distance)
   - test:
       if: "$Verbosity!='Terse'"
@@ -44,7 +44,7 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"      # phrase('the' square root of 25 is 5)
+      - t: "the"      # phrase('the' square root of 25 equals 5)
   - x: "*[2]"
   - t: "norm"      # phrase(the 'norm' can be a measure of distance)
   - test:
@@ -66,7 +66,7 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"      # phrase('the' square root of 25 is 5)
+      - t: "the"      # phrase('the' square root of 25 equals 5)
   - t: "trace"      # phrase('trace' of a matrix)
   - test:
       if: "$Verbosity!='Terse'"
@@ -81,7 +81,7 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"      # phrase('the' square root of 25 is 5)
+      - t: "the"      # phrase('the' square root of 25 equals 5)
   - t: "dimension"      # phrase(the 'dimension' of the matrix)
   - test:
       if: "$Verbosity!='Terse'"
@@ -96,7 +96,7 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"      # phrase('the' square root of 25 is 5)
+      - t: "the"      # phrase('the' square root of 25 equals 5)
   - t: "homomorphism"      # phrase('homomorphism' indicates similarity of form)
   - test:
       if: "$Verbosity!='Terse'"
@@ -111,7 +111,7 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"      # phrase('the' square root of 25 is 5)
+      - t: "the"      # phrase('the' square root of 25 equals 5)
   - t: "kernel"      # phrase(this is the 'kernel' of the function)
   - test:
       if: "$Verbosity!='Terse'"
