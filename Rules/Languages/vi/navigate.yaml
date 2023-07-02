@@ -25,7 +25,7 @@
 #
 # EdgeNode(node, "left"/"right", stopNodeName)
 #   Returns the stopNode if at left/right edge of named ancestor node. 'stopNodeName' can also be "2D"
-# 	If the stopNode isn't found, the original node is returned
+#   If the stopNode isn't found, the original node is returned
 #  Note: if stopNodeName=="math", then punctuation is taken into account since it isn't really part of the math
 #
 # A few other variables are of importance to Navigation
@@ -484,7 +484,7 @@
   - set_variables: [{NavNode: "../@id"}]
 
 - name: zoom-out
-  # a row around a single element -- these might duplicate the position/offset, so we jump an extra level here	
+  # a row around a single element -- these might duplicate the position/offset, so we jump an extra level here  
   tag: "*"
   match: "$NavCommand = 'ZoomOut'"
   replace:
@@ -797,18 +797,18 @@
 
 # mtd ? ( $NavCommand='MoveColumnStart' )
 # => MoveColStart {
-# 		ruleRef = name(^^match);
-# 		column = index(match);
-# 		::StartPosition = ^^match[0][index(match)][0].dfs;
-# 		::EndPosition = ^^match[0][index(match)][0].offset;
+#       ruleRef = name(^^match);
+#       column = index(match);
+#       ::StartPosition = ^^match[0][index(match)][0].dfs;
+#       ::EndPosition = ^^match[0][index(match)][0].offset;
 #   };
 
 # mtd ? ( $NavCommand='MoveColumnEnd' )
 # => MoveColEnd {
-# 		ruleRef = name(^^match);
-# 		column = index(match);
-# 		::StartPosition = ^^match[count(^^match)-1][index(match)][0].dfs;
-# 		::EndPosition = ^^match[count(^^match)-1][index(match)][0].offset;
+#       ruleRef = name(^^match);
+#       column = index(match);
+#       ::StartPosition = ^^match[count(^^match)-1][index(match)][0].dfs;
+#       ::EndPosition = ^^match[count(^^match)-1][index(match)][0].offset;
 #   };
 
 
@@ -820,199 +820,199 @@
 # # FIX:  not dealing with carries well
 # # FIX:  not dealing with navigation of first three children of mlongdiv
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-# 		  ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious') && has_previous(match) )
+#         ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious') && has_previous(match) )
 # => MoveCell {
-# 		ruleRef = name(^^match);
-# 		wordRef = "previous";
-# 		::StartPosition = previous(match).dfs;
-# 		::EndPosition = previous(match).offset;
+#       ruleRef = name(^^match);
+#       wordRef = "previous";
+#       ::StartPosition = previous(match).dfs;
+#       ::EndPosition = previous(match).offset;
 #   };
 
 # # no previous child -- in first column -- don't move
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-# 		  ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious' ) )
+#         ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious' ) )
 # => MoveCell {
-# 		ruleRef = name(^^match);
-# 		wordRef = "previous";
-# 		childIndex = -1;                   # key to know what to say for each notation
-# 		::SpeakAfterMove = false;
+#       ruleRef = name(^^match);
+#       wordRef = "previous";
+#       childIndex = -1;                   # key to know what to say for each notation
+#       ::SpeakAfterMove = false;
 #   };
 
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-# 		  ($NavCommand="MoveNext" || $NavCommand='MoveCellNext') && has_next(match) )
+#         ($NavCommand="MoveNext" || $NavCommand='MoveCellNext') && has_next(match) )
 # => MoveCell {
-# 		ruleRef = name(^^match);
-# 		wordRef = "next";
-# 		::StartPosition = next(match).dfs;
-# 		::EndPosition = next(match).offset;
+#       ruleRef = name(^^match);
+#       wordRef = "next";
+#       ::StartPosition = next(match).dfs;
+#       ::EndPosition = next(match).offset;
 #   };
 
 # # no next child -- in first column -- don't move
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-# 		  ($NavCommand="MoveNext" || $NavCommand='MoveCellNext' ) )
+#         ($NavCommand="MoveNext" || $NavCommand='MoveCellNext' ) )
 # => MoveCell {
-# 		ruleRef = name(^^match);
-# 		wordRef = "next";
-# 		childIndex = -1;                   # key to know what to say for each notation
-# 		::SpeakAfterMove = false;
+#       ruleRef = name(^^match);
+#       wordRef = "next";
+#       childIndex = -1;                   # key to know what to say for each notation
+#       ::SpeakAfterMove = false;
 #   };
 
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-# 		  $NavCommand='MoveCellUp' && has_previous(^^match) )
+#         $NavCommand='MoveCellUp' && has_previous(^^match) )
 # => MoveCell {
-# 		ruleRef = name(^^match);
-# 		wordRef = "up";
-# 		::StartPosition = ^^^match[index(^^match)-1][-1][index(match)-count(^match)].dfs;
-# 		::EndPosition = ^^^match[index(^^match)-1][-1][index(match)-count(^match)].offset;
-#   };
-
-# # no previous child -- in first column -- don't move
-# char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-# 		  $NavCommand='MoveCellUp' )
-# => MoveCell {
-# 		ruleRef = name(^^match);
-# 		wordRef = "up";
-# 		childIndex = -1;                   # key to know what to say for each notation
-# 		::SpeakAfterMove = false;
-#   };
-
-# char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-# 		  $NavCommand='MoveCellDown' && has_next(^^match) )
-# => MoveCell {
-# 		ruleRef = name(^^match);
-# 		wordRef = "down";
-# 		::StartPosition = ^^^match[index(^^match)+1][-1][index(match)-count(^match)].dfs;
-# 		::EndPosition = ^^^match[index(^^match)+1][-1][index(match)-count(^match)].offset;
+#       ruleRef = name(^^match);
+#       wordRef = "up";
+#       ::StartPosition = ^^^match[index(^^match)-1][-1][index(match)-count(^match)].dfs;
+#       ::EndPosition = ^^^match[index(^^match)-1][-1][index(match)-count(^match)].offset;
 #   };
 
 # # no previous child -- in first column -- don't move
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-# 		  $NavCommand='MoveCellDown' )
+#         $NavCommand='MoveCellUp' )
 # => MoveCell {
-# 		ruleRef = name(^^match);
-# 		wordRef = "down";
-# 		childIndex = -1;                   # key to know what to say for each notation
-# 		::SpeakAfterMove = false;
+#       ruleRef = name(^^match);
+#       wordRef = "up";
+#       childIndex = -1;                   # key to know what to say for each notation
+#       ::SpeakAfterMove = false;
 #   };
 
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-# 			$NavCommand='MoveColumnStart' )
+#         $NavCommand='MoveCellDown' && has_next(^^match) )
+# => MoveCell {
+#       ruleRef = name(^^match);
+#       wordRef = "down";
+#       ::StartPosition = ^^^match[index(^^match)+1][-1][index(match)-count(^match)].dfs;
+#       ::EndPosition = ^^^match[index(^^match)+1][-1][index(match)-count(^match)].offset;
+#   };
+
+# # no previous child -- in first column -- don't move
+# char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
+#         $NavCommand='MoveCellDown' )
+# => MoveCell {
+#       ruleRef = name(^^match);
+#       wordRef = "down";
+#       childIndex = -1;                   # key to know what to say for each notation
+#       ::SpeakAfterMove = false;
+#   };
+
+# char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
+#           $NavCommand='MoveColumnStart' )
 # => MoveColStart {
-# 		ruleRef = name(^^match);
-# 		column = index(match);
-# 		::StartPosition = ^^^match[0][-1][index(match)-count(^match)].dfs;
-# 		::EndPosition = ^^^match[0][-1][index(match)-count(^match)].offset;
+#       ruleRef = name(^^match);
+#       column = index(match);
+#       ::StartPosition = ^^^match[0][-1][index(match)-count(^match)].dfs;
+#       ::EndPosition = ^^^match[0][-1][index(match)-count(^match)].offset;
 #   };
 
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-# 			$NavCommand='MoveColumnEnd' )
+#           $NavCommand='MoveColumnEnd' )
 # => MoveColEnd {
-# 		ruleRef = name(^^match);
-# 		column = index(match);
-# 		::StartPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].dfs;
-# 		::EndPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].offset;
+#       ruleRef = name(^^match);
+#       column = index(match);
+#       ::StartPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].dfs;
+#       ::EndPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].offset;
 #   };
 
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-# 		  has_parent(match) && name(^match)=="mscarries" &&
-# 		  ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious') && has_previous(match) )
+#         has_parent(match) && name(^match)=="mscarries" &&
+#         ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious') && has_previous(match) )
 # => MoveCell {
-# 		ruleRef = name(^match);
-# 		wordRef = "previous";
-# 		::StartPosition = previous(match).dfs;
-# 		::EndPosition = previous(match).offset;
+#       ruleRef = name(^match);
+#       wordRef = "previous";
+#       ::StartPosition = previous(match).dfs;
+#       ::EndPosition = previous(match).offset;
 #   };
 
 # # no previous child -- in first column -- don't move
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-# 		  has_parent(match) && name(^match)=="mscarries" &&
-# 		  ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious') )
+#         has_parent(match) && name(^match)=="mscarries" &&
+#         ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious') )
 # => MoveCell {
-# 		ruleRef = name(^match);
-# 		wordRef = "previous";
-# 		childIndex = -1;                   # key to know what to say for each notation
-# 		::SpeakAfterMove = false;
+#       ruleRef = name(^match);
+#       wordRef = "previous";
+#       childIndex = -1;                   # key to know what to say for each notation
+#       ::SpeakAfterMove = false;
 #   };
 
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-# 		  has_parent(match) && name(^match)=="mscarries" &&
-# 		  ($NavCommand="MoveNext" || $NavCommand='MoveCellNext') && has_next(match) )
+#         has_parent(match) && name(^match)=="mscarries" &&
+#         ($NavCommand="MoveNext" || $NavCommand='MoveCellNext') && has_next(match) )
 # => MoveCell {
-# 		ruleRef = name(^match);
-# 		wordRef = "next";
-# 		::StartPosition = next(match).dfs;
-# 		::EndPosition = next(match).offset;
+#       ruleRef = name(^match);
+#       wordRef = "next";
+#       ::StartPosition = next(match).dfs;
+#       ::EndPosition = next(match).offset;
 #   };
 
 # # no next child -- in last column -- don't move
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-# 		  has_parent(match) && name(^match)=="mscarries" &&
-# 		  ($NavCommand="MoveNext" || $NavCommand='MoveCellNext') )
+#         has_parent(match) && name(^match)=="mscarries" &&
+#         ($NavCommand="MoveNext" || $NavCommand='MoveCellNext') )
 # => MoveCell {
-# 		ruleRef = name(^match);
-# 		wordRef = "next";
-# 		childIndex = -1;                   # key to know what to say for each notation
-# 		::SpeakAfterMove = false;
+#       ruleRef = name(^match);
+#       wordRef = "next";
+#       childIndex = -1;                   # key to know what to say for each notation
+#       ::SpeakAfterMove = false;
 #   };
 
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-# 		  has_parent(match) && name(^match)=="mscarries" &&
-# 		  $NavCommand='MoveCellUp' && has_previous(^match) )
+#         has_parent(match) && name(^match)=="mscarries" &&
+#         $NavCommand='MoveCellUp' && has_previous(^match) )
 # => MoveCell {
-# 		ruleRef = name(^match);
-# 		wordRef = "up";
-# 		::StartPosition = ^^match[index(^match)-1][index(match)-count(^match)].dfs;
-# 		::EndPosition = ^^match[index(^match)-1][index(match)-count(^match)].offset;
+#       ruleRef = name(^match);
+#       wordRef = "up";
+#       ::StartPosition = ^^match[index(^match)-1][index(match)-count(^match)].dfs;
+#       ::EndPosition = ^^match[index(^match)-1][index(match)-count(^match)].offset;
 #   };
 
 # # no previous child -- in first row -- don't move
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-# 		  has_parent(match) && name(^match)=="mscarries" &&
-# 		  $NavCommand='MoveCellUp' )
+#         has_parent(match) && name(^match)=="mscarries" &&
+#         $NavCommand='MoveCellUp' )
 # => MoveCell {
-# 		ruleRef = name(^match);
-# 		wordRef = "up";
-# 		childIndex = -1;                   # key to know what to say for each notation
-# 		::SpeakAfterMove = false;
+#       ruleRef = name(^match);
+#       wordRef = "up";
+#       childIndex = -1;                   # key to know what to say for each notation
+#       ::SpeakAfterMove = false;
 #   };
 
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-# 		  has_parent(match) && name(^match)=="mscarries" &&
-# 		  $NavCommand='MoveCellDown' && has_next(^match) )
+#         has_parent(match) && name(^match)=="mscarries" &&
+#         $NavCommand='MoveCellDown' && has_next(^match) )
 # => MoveCell {
-# 		ruleRef = name(^match);
-# 		wordRef = "down";
-# 		::StartPosition = ^^match[index(^match)+1][-1][index(match)-count(^match)].dfs;
-# 		::EndPosition = ^^match[index(^match)+1][-1][index(match)-count(^match)].offset;
+#       ruleRef = name(^match);
+#       wordRef = "down";
+#       ::StartPosition = ^^match[index(^match)+1][-1][index(match)-count(^match)].dfs;
+#       ::EndPosition = ^^match[index(^match)+1][-1][index(match)-count(^match)].offset;
 #   };
 
 # # no next child -- in last row -- don't move
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-# 		  has_parent(match) && name(^match)=="mscarries" &&
-# 		  $NavCommand='MoveCellDown' )
+#         has_parent(match) && name(^match)=="mscarries" &&
+#         $NavCommand='MoveCellDown' )
 # => MoveCell {
-# 		ruleRef = name(^match);
-# 		wordRef = "down";
-# 		childIndex = -1;                   # key to know what to say for each notation
-# 		::SpeakAfterMove = false;
+#       ruleRef = name(^match);
+#       wordRef = "down";
+#       childIndex = -1;                   # key to know what to say for each notation
+#       ::SpeakAfterMove = false;
 #   };
 
 # mn ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-# 			$NavCommand='MoveColumnStart' )
+#           $NavCommand='MoveColumnStart' )
 # => MoveColStart {
-# 		ruleRef = name(^^match);
-# 		column = index(match);
-# 		::StartPosition = ^^^match[0][-1][index(match)-count(^match)].dfs;
-# 		::EndPosition = ^^^match[0][-1][index(match)-count(^match)].offset;
+#       ruleRef = name(^^match);
+#       column = index(match);
+#       ::StartPosition = ^^^match[0][-1][index(match)-count(^match)].dfs;
+#       ::EndPosition = ^^^match[0][-1][index(match)-count(^match)].offset;
 #   };
 
 # mn ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-# 			$NavCommand='MoveColumnEnd' )
+#           $NavCommand='MoveColumnEnd' )
 # => MoveColEnd {
-# 		ruleRef = name(^^match);
-# 		column = index(match);
-# 		::StartPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].dfs;
-# 		::EndPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].offset;
+#       ruleRef = name(^^match);
+#       column = index(match);
+#       ::StartPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].dfs;
+#       ::EndPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].offset;
 #   };
 
 
