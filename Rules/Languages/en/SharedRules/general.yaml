@@ -462,7 +462,10 @@
   # IDEA:  set a variable with the word to saw for the row (e.g., RowLabel = Row/Case/Line/...)
   tag: [cases, equations, lines]
   match: "."
-  variables: [LineCount: "count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']])"]
+  variables:
+    # Wikipedia has some tables where all the entire first column is empty (e.g., https://en.wikipedia.org/wiki/List_of_trigonometric_identities)
+  - LineCountTry: "count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']])"
+  - LineCount: "IfThenElse($LineCountTry=0, count(*/*[1]), $LineCountTry)"
   replace:
   - x: "$LineCount"
   - test:
@@ -472,7 +475,7 @@
       then: [{t: "equation"}]      # phrase(this is the first 'equation' of three equations)
       else: [{t: "line"}]      # phrase(this is the first 'line' of three lines)
   - test:
-    - if: "$LineCount > 1"
+    - if: "$LineCount != 1"
       then: [{ct: "s"}] # plural
   - pause: short
   - x: "*"
@@ -483,11 +486,12 @@
   variables: [ContinuedEquation: "parent::m:equations and *[1][count(*)=1 and *[1][@data-added='missing-content']]"]
   replace:
   - test:
-      if: "$ContinuedEquation"
+      if: "parent::m:equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
+           count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']]) != 0"
       then:
       - t: "next line"
       else_test:
-        if: "$LineCount > 1"
+        if: "$LineCount != 1"
         then:
         - test:
           - if: "parent::m:cases"
@@ -537,7 +541,7 @@
   variables: [{IsColumnSilent: true()}]
   match: "count(*)=1 and *[self::m:mtr][count(*) = 1]"
   replace:
-  - ot: "the"      # phrase('the' 2 by 2 matrix M)
+  - ot: "the"      # phrase('the' 1 by 1 matrix M)
   - t: "1 by 1"      # phrase(the '1 by 1' matrix)
   - test:
       if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
@@ -595,7 +599,7 @@
 
 - name: 1x2-or-3-matrix
   tag: matrix
-  variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum'"}]
+  variables: [{IsColumnSilent: "$SpeechStyle = 'SimpleSpeak' or ($SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum')"}]
   match:
   - "$ClearSpeak_Matrix != 'SpeakColNum' and " # "simple" isn't used for this preference
   - count(*)=1  and # one row
@@ -650,7 +654,7 @@
   - "$ClearSpeak_Matrix != 'SpeakColNum' and " # "simple" isn't used for this preference
   - (count(*)<=3 and count(*[1]/*)<=3) and # no bigger than a 3x3 matrix
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
-  variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum'"}]
+  variables: [{IsColumnSilent: "$SpeechStyle = 'SimpleSpeak' or ($SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum')"}]
   replace:
   - t: "the"      # phrase('the' 1 by 2 matrix M)
   - x: count(*)

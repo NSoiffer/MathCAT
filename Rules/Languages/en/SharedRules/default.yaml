@@ -421,20 +421,45 @@
 - name: default
   # callers/context should do that.
   # this may get called from navigation -- in that case, there is no context to speak the row #, so don't do it
-  tag: mtr
+  tag: [mtr, mlabeledtr]
   match: "."
   replace:
-  - x: "*"
+  - t: "row"      # phrase(the first 'row' of a matrix)
+  - x: "count(preceding-sibling::*)+1"
+  - test:
+      if: .[self::m:mlabeledtr]
+      then:
+      - t: "with label"      # phrase(the line 'with label' first equation)
+      - x: "*[1]/*"
+      - pause: short
+  - pause: medium
+  - test:
+      if: .[self::m:mlabeledtr]
+      then: [{x: "*[position()>1]"}]
+      else: {x: "*"}
 
 - name: default
   tag: mtd
   match: "."
   replace:
-  - t: "column"             # phrase('column' 1 of 10 columns)
-  - x: "count(preceding-sibling::*)+1"
-  - pause: medium
-  - x: "*" # speak the entry
-  - pause: long
+  - test:
+      #  ClearSpeak normally speaks "column 1" even though it says the row number, which is a waste...
+      #  The following is commented out but the count(...)!=0 probably belongs in other rule sets
+      #   if: not($IsColumnSilent) and ($ClearSpeak_Matrix = 'SpeakColNum' or count(preceding-sibling::*) != 0)
+      if: "not($IsColumnSilent)"
+      then:
+      - t: "column"      # phrase(the first 'column' of the matrix)
+      - x: "count(preceding-sibling::*)+1"
+      - pause: medium
+  - x: "*"
+  - test:
+    # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
+    - if: count(following-sibling::*) > 0
+      then: {pause: short}
+    - else_if: count(../following-sibling::*) > 0
+      then: {pause: medium}
+      else: {pause: long}
+
 
 - name: empty-box
   # The ordering below is the order in which words come out when there is more than one value

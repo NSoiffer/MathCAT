@@ -587,28 +587,6 @@
       then: [{x: "*[position()>1]"}]
       else: {x: "*"}
 
-- name: matrix-default
-  tag: mtd
-  match: "parent::*[parent::m:matrix or parent::m:determinant]"
-  replace:
-  - test:
-      #  ClearSpeak normally speaks "column 1" even though it says the row number, which is a waste...
-      #  The following is commented out but the count(...)!=0 probably belongs in other rule sets
-      #   if: not($IsColumnSilent) and ($ClearSpeak_Matrix = 'SpeakColNum' or count(preceding-sibling::*) != 0)
-      if: "not($IsColumnSilent)"
-      then:
-      - t: "column"      # phrase(the first 'column' of the matrix)
-      - x: "count(preceding-sibling::*)+1"
-      - pause: medium
-  - x: "*"
-  - test:
-    # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
-    - if: count(following-sibling::*) > 0
-      then: {pause: short}
-    - else_if: count(../following-sibling::*) > 0
-      then: {pause: medium}
-      else: {pause: long}
-
 - # handle both log and ln
   name: ClearSpeak-log
   tag: mrow
