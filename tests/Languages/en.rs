@@ -7,7 +7,6 @@ mod ClearSpeak {
     mod mfrac;
     mod mroot;
     mod msup;
-    mod mtable;
     mod sets;
     mod symbols_and_adornments;
     mod multiline;
@@ -20,7 +19,6 @@ mod SimpleSpeak {
     mod mfrac;
     // mod mroot;
     mod msup;
-    // mod mtable;
     mod sets;
     mod geometry;
     mod linear_algebra;
@@ -30,4 +28,5 @@ mod shared;
 mod chemistry;
 mod alphabets;
 mod intent;
+mod mtable;
 
