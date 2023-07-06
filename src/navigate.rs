@@ -1498,6 +1498,8 @@ mod tests {
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         set_mathml(mathml_str.to_string()).unwrap();
         set_preference("NavMode".to_string(), "Enhanced".to_string())?;
+        set_preference("NavVerbosity".to_string(), "Verbose".to_string())?;
+        set_preference("Language".to_string(), "en".to_string())?;
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -1507,8 +1509,10 @@ mod tests {
             test_command("MoveCellNext", mathml, "nav-8");
             test_command("MoveCellDown", mathml, "nav-20");
             test_command("MoveCellDown", mathml, "nav-27");
-            test_command("MoveCellDown", mathml, "nav-39");
-            test_command("MoveCellDown", mathml, "nav-39");
+            let speech = test_command("MoveCellDown", mathml, "nav-39");
+            assert_eq!(speech, "move down, row 4, column 3; 2 minus y");
+            let speech = test_command("MoveCellDown", mathml, "nav-39");
+            assert_eq!(speech, "no next row");
             test_command("MoveCellPrevious", mathml, "nav-35");
             test_command("ZoomIn", mathml, "nav-36");
             test_command("MoveCellUp", mathml, "nav-25");
@@ -1650,6 +1654,7 @@ mod tests {
             </mfrac></math>";
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         set_mathml(mathml_str.to_string()).unwrap();
+        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
