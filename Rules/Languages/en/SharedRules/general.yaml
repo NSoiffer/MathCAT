@@ -347,8 +347,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "co-seek"}      # phrase(we will 'co-seek' a solution)
-      else: {t: "co-secant"}      # phrase(the 'co-secant' is the reciprocal of the secant)
+      then: {t: "coseek"}      # phrase(we will 'cosecant' a solution)
+      else: {t: "cosecant"}      # phrase(the 'cosecant' is the reciprocal of the secant)
 - name: cot
   tag: mi
   match: "text()='cot'"
@@ -356,8 +356,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "co-tan"}      # phrase(find the 'cosine' in a right-angle triangle)
-      else: {t: "co-tangent"}      # phrase(the 'co-tangent' is the reciprocal of the tangent)
+      then: {t: "cotan"}      # phrase(find the 'cotangent' in a right-angle triangle)
+      else: {t: "cotangent"}      # phrase(the 'cotangent' is the reciprocal of the tangent)
 
 - name: sinh
   tag: mi
@@ -402,8 +402,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "co-sheck"}      # phrase('co-sheck' is shorthand for hyperbolic co-secant)
-      else: {t: "hyperbolic co-secant"}      # phrase('hyperbolic co-secant' is a mathematical function)
+      then: {t: "cosheck"}      # phrase('cosheck' is shorthand for hyperbolic cosecant)
+      else: {t: "hyperbolic cosecant"}      # phrase('hyperbolic cosecant' is a mathematical function)
 - name: coth
   tag: mi
   match: "text()='coth'"
@@ -411,8 +411,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "co-tanch"}      # phrase('co-tanch' is shorthand for hyperbolic co-tangent)
-      else: {t: "hyperbolic co-tangent"}      # phrase(the 'hyperbolic co-tangent' is a mathematical function)
+      then: {t: "cotanch"}      # phrase('cotanch' is shorthand for hyperbolic cotangent)
+      else: {t: "hyperbolic cotangent"}      # phrase(the 'hyperbolic cotangent' is a mathematical function)
 
 - # handle both log and ln
   name: log

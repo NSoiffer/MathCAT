@@ -15,7 +15,7 @@ fn trig_names() {
     <mi>csc</mi><mi>&#x03D5;</mi><mo>+</mo>
     <mi>cot</mi><mi>&#x03C6;</mi>
     </mrow></math>";
-    test("en", "ClearSpeak", expr, "sine of x plus cosine of y plus tangent of z plus secant of alpha, plus co-secant of phi, plus co-tangent of phi");
+    test("en", "ClearSpeak", expr, "sine of x plus cosine of y plus tangent of z plus secant of alpha, plus cosecant of phi, plus cotangent of phi");
 }
 
 #[test]
@@ -32,8 +32,8 @@ fn hyperbolic_trig_names() {
                                 hyperbolic cosine of y, plus \
                                 hyperbolic tangent of z, plus \
                                 hyperbolic secant of alpha, plus \
-                                hyperbolic co-secant of phi, plus \
-                                hyperbolic co-tangent of phi");
+                                hyperbolic cosecant of phi, plus \
+                                hyperbolic cotangent of phi");
 }
 
 
