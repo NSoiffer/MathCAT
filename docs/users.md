@@ -55,7 +55,7 @@ The default value is given in \[brackets\].
 
 * ✓MathRate: [100]
     * Options: Number between 1 and 1000(?)
-    * Description: percentage speed change from standard speech engine rate. '100' means the math reading rate is the same as that of the text rate.
+    * Description: Changes the relative speech rate. The change is a percentage speed change from standard speech engine rate. '100' means the math reading rate is the same as that of the text rate.
       This only works for implementations that tell MathCAT to generate speech engine tagging such as SSML.
     * Status: This should work in NVDA.
 
