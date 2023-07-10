@@ -55,7 +55,7 @@
  - "⊢": [t: "⠸⠒"]               # 0x22a2 (Right tack)
  - "⊣": [t: "⠈⠸⠒"]              # 0x22a3 (Left tack)
  - "−": [t: "⠐⠤"]               # 0x2212 (Minus sign)
- - "·": [t: "⠐⠲"]               # 0x00D7 (Multiplication dot (times))
+ - "·": [t: "⠐⠲"]               # 0x00B7 (Multiplication dot (times))
  - "×": [t: "⠐⠦"]               # 0x00D7 (Multiplication sign (times))
  - "÷": [t: "⠐⠌"]               # 0x00F7 (Division sign (divided by))
  - "±": [t: "⠸⠖"]               # 0x00B1 (Plus or minus)
