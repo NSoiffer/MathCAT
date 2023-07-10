@@ -308,6 +308,12 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         // Note -- hyphen might encode as either "P⠤" or "⠤" depending on the tag used
         static ref NUM_IND_9F: Regex = Regex::new(r"([Ll].[Ll].|P.)(P?⠤)N").unwrap();  
 
+        // Enclosed list exception
+        // Normally we don't add numeric indicators in enclosed lists (done in get_braille_nemeth_chars).
+        // The green book says "at the start" of an item.
+        // The NFB list exceptions after function abbreviations and angles, but what this really means is "after a space"
+        static ref NUM_IND_ENCLOSED_LIST: Regex = Regex::new(r"w([⠂⠆⠒⠲⠢⠖⠶⠦⠔⠴])").unwrap();  
+
         // Punctuation chars (Rule 38.6 says don't use before ",", "hyphen", "-", "…")
         // Never use punctuation indicator before these (38-6)
         //      "…": "⠀⠄⠄⠄"
@@ -374,8 +380,9 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
     let result = NUM_IND_9E_SHAPE.replace_all(&result, "${mod}n");
     let result = NUM_IND_9F.replace_all(&result, "${1}${2}n");
+    let result = NUM_IND_ENCLOSED_LIST.replace_all(&result, "wn${1}");
 
-//   debug!("IND_9F:  \"{}\"", result);
+  debug!("IND_9F:  \"{}\"", result);
 
     // 9b: insert after punctuation (optional minus sign)
     // common punctuation adds a space, so 9a handled it. Here we deal with other "punctuation" 
@@ -392,7 +399,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
 //   debug!("Bseline: \"{}\"", &result);
 
     let result = REMOVE_AFTER_PUNCT_IND.replace_all(&result, "$1$2");
-//   debug!("Punct38: \"{}\"", &result);
+  debug!("Punct38: \"{}\"", &result);
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         match NEMETH_INDICATOR_REPLACEMENTS.get(&cap[0]) {
@@ -1368,18 +1375,18 @@ impl BrailleChars {
     // returns a string for the chars in the *leaf* node.
     // this string follows the Nemeth rules typefaces and deals with mathvariant
     //  which has partially turned chars to the alphanumeric block
-    fn get_braille_chars(node: &Element, code: &str, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
+    fn get_braille_chars(node: Element, code: &str, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
         match code {
             "Nemeth" => return BrailleChars::get_braille_nemeth_chars(node, text_range),
             "UEB" => return BrailleChars:: get_braille_ueb_chars(node, text_range),
             _ => {
                 warn!("get_braille_chars: unknown braille code '{}'", code);
-                return Ok( as_text(*node).to_string() );
+                return Ok( as_text(node).to_string() );
             },
         };
     }
 
-    fn get_braille_nemeth_chars(node: &Element, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
+    fn get_braille_nemeth_chars(node: Element, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
         lazy_static! {
             // To greatly simplify typeface/language generation, the chars have unique ASCII chars for them:
             // Typeface: S: sans-serif, B: bold, 𝔹: blackboard, T: script, I: italic, R: Roman
@@ -1388,7 +1395,9 @@ impl BrailleChars {
             static ref PICK_APART_CHAR: Regex = 
                 Regex::new(r"(?P<face>[SB𝔹TIR]*)(?P<lang>[EDGVHU]?)(?P<cap>C?)(?P<letter>L?)(?P<num>[N]?)(?P<char>.)").unwrap();
         }
-    
+        if !is_leaf(node) {
+            return Err(sxd_xpath::function::Error::Other("BrailleChars called on non-leaf element".to_string()));
+        }
         let math_variant = node.attribute_value("mathvariant");
         // FIX: cover all the options -- use phf::Map
         let  attr_typeface = match math_variant {
@@ -1403,15 +1412,18 @@ impl BrailleChars {
                 _ => "R",       // normal and unknown
             },
         };
-        let text = BrailleChars::substring(as_text(*node), &text_range);
-        let braille_chars = crate::speech::braille_replace_chars(&text, *node).unwrap_or_else(|_| "".to_string());
+        let text = BrailleChars::substring(as_text(node), &text_range);
+        let braille_chars = crate::speech::braille_replace_chars(&text, node).unwrap_or_else(|_| "".to_string());
         // debug!("Nemeth chars: text='{}', braille_chars='{}'", &text, &braille_chars);
         
         // we want to pull the prefix (typeface, language) out to the front until a change happens
         // the same is true for number indicator
         // also true (sort of) for capitalization -- if all caps, use double cap in front (assume abbr or Roman Numeral)
-        let is_in_enclosed_list = BrailleChars::is_in_enclosed_list(*node);
-        let is_mn_in_enclosed_list = is_in_enclosed_list && name(node) == "mn";
+        
+        // we only care about this for numbers and identifiers/text, so we filter for only those
+        let node_name = name(&node);
+        let is_in_enclosed_list = node_name != "mo" && BrailleChars::is_in_enclosed_list(node);
+        let is_mn_in_enclosed_list = is_in_enclosed_list && node_name == "mn";
         let mut typeface = "R".to_string();     // assumption is "R" and if attr or letter is different, something happens
         let mut is_all_caps = true;
         let mut is_all_caps_valid = false;      // all_caps only valid if we did a replacement
@@ -1452,7 +1464,7 @@ impl BrailleChars {
         }
     }
 
-    fn get_braille_ueb_chars(node: &Element, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
+    fn get_braille_ueb_chars(node: Element, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
         // Because in UEB typeforms and caps may extend for multiple tokens,
         //   this routine merely deals with the mathvariant attr.
         // Canonicalize has already transformed all chars it can to math alphanumerics, but not all have bold/italic 
@@ -1464,8 +1476,8 @@ impl BrailleChars {
         }
     
         let math_variant = node.attribute_value("mathvariant");
-        let text = BrailleChars::substring(as_text(*node), &text_range);
-        let braille_chars = crate::speech::braille_replace_chars(&text, *node).unwrap_or_else(|_| "".to_string());
+        let text = BrailleChars::substring(as_text(node), &text_range);
+        let braille_chars = crate::speech::braille_replace_chars(&text, node).unwrap_or_else(|_| "".to_string());
 
         if math_variant.is_none() {         // nothing we need to do
             return Ok(braille_chars);
@@ -1602,7 +1614,7 @@ impl Function for BrailleChars {
             let node = crate::xpath_functions::validate_one_node(args.pop_nodeset()?, "BrailleChars")?;
             if let Node::Element(el) = node {
                 assert!( is_leaf(el) );
-                return Ok( Value::String( BrailleChars::get_braille_chars(&el, &braille_code, range)? ) );
+                return Ok( Value::String( BrailleChars::get_braille_chars(el, &braille_code, range)? ) );
             } else {
                 // not an element, so nothing to do
                 return Ok( Value::String("".to_string()) );
