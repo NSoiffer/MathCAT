@@ -111,6 +111,36 @@ fn non_list_10_4() {
 }
 
 #[test]
+fn list_10_6_1() {
+    let expr = "<math><mrow><mn>1</mn><mo>,</mo><mi>i</mi><mo>,</mo><mrow><mo>−</mo><mn>1</mn></mrow><mo>,</mo><mrow><mo>−</mo><mi>i</mi></mrow></mrow></math>";
+    test_braille("Nemeth", expr, "⠼⠂⠠⠀⠰⠊⠠⠀⠤⠼⠂⠠⠀⠤⠊");
+}
+
+#[test]
+fn list_10_6_8() {
+    let expr = "<math>
+        <mo>[</mo>
+        <mrow><mo>&#x2220;</mo><mn>1</mn><mo>&#x00B0;</mo><mo>,</mo><mi>sin</mi><mn>1</mn><mo>&#x00B0;</mo></mrow>			<mo>]</mo>
+    </math>";
+    test_braille("Nemeth", expr, "⠈⠷⠫⠪⠀⠼⠂⠘⠨⠡⠠⠀⠎⠊⠝⠀⠼⠂⠘⠨⠡⠐⠈⠾");
+}
+
+#[test]
+fn list_10_6_11() {
+    let expr = "<math><mo>(</mo>
+          <mrow><mi>x</mi><mo>=</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>…</mn><mo>,</mo><mn>10</mn></mrow>
+        <mo>)</mo></math>";
+    test_braille("Nemeth", expr, "⠷⠭⠀⠨⠅⠀⠼⠂⠠⠀⠼⠆⠠⠀⠄⠄⠄⠠⠀⠼⠂⠴⠾");
+}
+
+
+#[test]
+fn list_10_6_14() {
+    let expr = "<math><mfenced><mrow><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn></mrow></mfenced></math>";
+    test_braille("Nemeth", expr, "⠷⠂⠠⠀⠆⠠⠀⠒⠾");
+}
+
+#[test]
 fn list_num_ind_11_a_1() {
     let expr = "<math><mo>[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>]</mo></math>";
     test_braille("Nemeth", expr, "⠈⠷⠴⠠⠀⠂⠈⠾");
@@ -128,6 +158,34 @@ fn list_num_ind__11_a_3() {
     test_braille("Nemeth", expr, "⠷⠂⠬⠓⠠⠀⠆⠬⠅⠠⠀⠴⠾");
 }
 
+
+#[test]
+fn list_num_ind__11_a_4() {
+    let expr = "<math><mfenced><mrow><mn>0</mn><mo>,</mo><mrow><mo>−</mo><mn>1</mn></mrow><mo>,</mo><mrow><mo>±</mo><mn>2</mn></mrow></mrow></mfenced></math>";
+    test_braille("Nemeth", expr, "⠷⠴⠠⠀⠤⠂⠠⠀⠬⠤⠆⠾");
+}
+
+#[test]
+fn list_num_ind_11_a_5() {
+    let expr = "<math><mfenced class='paren'>
+    <mrow>
+      <mrow><mn>2</mn><mo>⁢</mo><mrow><mi>sin</mi><mo>⁡</mo><mrow><mn>30</mn><mo>⁢</mo><mo>°</mo></mrow></mrow></mrow>
+      <mo>,</mo>
+      <mrow><mn>3</mn><mo>⁢</mo><mrow><mi>cos</mi><mo>⁡</mo><mrow><mn>60</mn><mo>⁢</mo><mo>°</mo></mrow></mrow></mrow>
+    </mrow>
+  </mfenced></math>";
+    test_braille("Nemeth", expr, "⠷⠆⠎⠊⠝⠀⠼⠒⠴⠘⠨⠡⠠⠀⠒⠉⠕⠎⠀⠼⠖⠴⠘⠨⠡⠐⠾");
+}
+
+#[test]
+fn lesson_11_35_1() {
+    init_logger();
+    // this is about using a numeric indicator inside an enclosed list after an angle
+    let expr = "<math><mrow><mrow><mo>(</mo><mrow><mo>∠</mo><mn>1</mn><mo>,</mo><mo>∠</mo><mn>2</mn><mo>,</mo><mo>∠</mo><mn>3</mn></mrow><mo>)</mo></mrow></mrow></math>";
+    test_braille("Nemeth", expr, "⠷⠫⠪⠀⠼⠂⠠⠀⠫⠪⠀⠼⠆⠠⠀⠫⠪⠀⠼⠒⠾");
+}
+
+
 #[test]
 fn list_num_ind_11_a_7() {
     let expr = "<math><mo>(</mo><mi>x</mi><mo>,</mo><mn>7</mn><mo>,</mo><mn mathvariant='bold'>8</mn><mo>,</mo><mi>y</mi><mo>)</mo></math>";
@@ -142,8 +200,14 @@ fn list_num_ind_11_c_1() {
 
 #[test]
 fn list_num_ind_11_d_1() {
-    let expr = "<math><mn>65</mn><mo>-</mo><mn>75</mn></math>";
+    let expr = "<math><mrow><mn>65</mn><mo>-</mo><mn>75</mn></mrow></math>";
     test_braille("Nemeth", expr, "⠼⠖⠢⠤⠶⠢");
+}
+
+#[test]
+fn no_num_ind_11_e_3() {
+    let expr = "<math><mrow><mi>r</mi><mn>5</mn></mrow></math>";
+    test_braille("Nemeth", expr, "⠗⠐⠢");
 }
 
 #[test]
