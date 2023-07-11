@@ -229,7 +229,7 @@
  - "⋇": [t: "1⠌⠯⠦"]             # 0x22C7 (Division times)
  - "⊩": [t: "⠸⠳⠿⠸⠒"]            # 0x22A9 (Forces)
  - "˙": [t: "1⠲"]               # 0x02D9 ( Dot Above)
- - "¨": [t: "1⠲⠲"]              # 0x00A8 ( Double Dot Above)
+ - "¨": [t: "1⠲⠲"]              # 0x00A8 ( Diaeresis/Double Dot Above)
  - "©": [t: "⠘⠉"]               # 0xa9 (Copyright)
 
 
@@ -434,7 +434,7 @@
  - "δ": [t: "GL⠙"]              # 0x3b4 
  - "ε": [t: "GL⠑"]              # 0x3b5 
  - "ζ": [t: "GL⠵"]              # 0x3b6 
- - "η": [t: "GL⠱ "]             # 0x3b7 
+ - "η": [t: "GL⠱"]             # 0x3b7 
  - "θ": [t: "GL⠹"]              # 0x3b8 
  - "ι": [t: "GL⠊"]              # 0x3b9 
  - "κ": [t: "GL⠅"]              # 0x3ba 
@@ -446,12 +446,12 @@
  - "π": [t: "GL⠏"]              # 0x3c0 
  - "ρ": [t: "GL⠗"]              # 0x3c1 
  - "ς": [t: "GL⠎"]              # 0x3c2 
- - "σ": [t: "GL⠞"]              # 0x3c3 
- - "τ": [t: "GL⠥"]              # 0x3c4 
- - "υ": [t: "GL⠋"]              # 0x3c5 
- - "φ": [t: "GL⠯"]              # 0x3c6 
- - "χ": [t: "GL⠽"]              # 0x3c7 
- - "ψ": [t: "GL⠺"]              # 0x3c8 
+ - "σ": [t: "GL⠎"]              # 0x3c3 
+ - "τ": [t: "GL⠞"]              # 0x3c4 
+ - "υ": [t: "GL⠥"]              # 0x3c5 
+ - "φ": [t: "GL⠋"]              # 0x3c6 
+ - "χ": [t: "GL⠯"]              # 0x3c7 
+ - "ψ": [t: "GL⠽"]              # 0x3c8 
 
  - "Α": [t: "CGL⠁"]             # 0x391 
  - "Β": [t: "CGL⠃"]             # 0x392 
@@ -471,15 +471,16 @@
  - "Π": [t: "CGL⠏"]             # 0x3a0 
  - "Ρ": [t: "CGL⠗"]             # 0x3a1 
  - "΢": [t: "CGL⠎"]             # 0x3a2 
- - "Σ": [t: "CGL⠞"]             # 0x3a3 
- - "Τ": [t: "CGL⠥"]             # 0x3a4 
- - "Υ": [t: "CGL⠋"]             # 0x3a5 
- - "Φ": [t: "CGL⠯"]             # 0x3a6 
- - "Χ": [t: "CGL⠽"]             # 0x3a7 
- - "Ψ": [t: "CGL⠺"]             # 0x3a8 
+ - "Σ": [t: "CGL⠎"]             # 0x3a3 
+ - "Τ": [t: "CGL⠞"]             # 0x3a4 
+ - "Υ": [t: "CGL⠥"]             # 0x3a5 
+ - "Φ": [t: "CGL⠋"]             # 0x3a6 
+ - "Χ": [t: "CGL⠯"]             # 0x3a7 
+ - "Ψ": [t: "CGL⠽"]             # 0x3a8 
+ - "ω": [t: "CGL⠺"]             # 0x3a9
 
  - "µ": [t: "GL⠍"]              # 0x00B5 (Micro (Greek mu))
- - "Ω": [t: "CGL⠍"]             # 0x2126 (Ohm sign (capital Greek omega))
+ - "Ω": [t: "CGL⠺"]             # 0x2126 (Ohm sign (capital Greek omega))
  - "∆": [t: "CGL⠙"]             # 0x2206 (Increment (capital Greek delta))
  - "∏": [t: "CGL⠏"]             # 0x220F (Product (capital Greek pi))
  - "∑": [t: "CGL⠎"]             # 0x2211 (Sum (capital Greek sigma))
