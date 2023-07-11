@@ -179,7 +179,6 @@ fn list_num_ind_11_a_5() {
 
 #[test]
 fn lesson_11_35_1() {
-    init_logger();
     // this is about using a numeric indicator inside an enclosed list after an angle
     let expr = "<math><mrow><mrow><mo>(</mo><mrow><mo>∠</mo><mn>1</mn><mo>,</mo><mo>∠</mo><mn>2</mn><mo>,</mo><mo>∠</mo><mn>3</mn></mrow><mo>)</mo></mrow></mrow></math>";
     test_braille("Nemeth", expr, "⠷⠫⠪⠀⠼⠂⠠⠀⠫⠪⠀⠼⠆⠠⠀⠫⠪⠀⠼⠒⠾");

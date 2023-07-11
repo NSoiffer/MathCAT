@@ -267,11 +267,11 @@
   name: prefix-geometry-ops
   tag: mo
   match:
-     - "parent::*[count(*) = 2 and name()='mrow' and not(preceding-sibling::*)] and"
+     - "..[count(*) = 2 and name()='mrow'] and not(preceding-sibling::*) and"
      - "IsInDefinition(., 'GeometryPrefixOperators')"
   replace:
      - x: "text()"
-     - t: "W"
+     - t: "w"
 
 - # In Nemeth code "∼" can be a prefix *operator* or an infix comparison -- they have different spacing. We catch the prefix version here
   # Note: ASCII "~" has been canonicalized to occur only in a diacritical position

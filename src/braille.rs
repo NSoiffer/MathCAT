@@ -246,6 +246,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         // Add an English Letter indicator. This involves finding "single letters".
         // The green book has a complicated set of cases, but the Nemeth UEB Rule book (May 2020), 4.10 has a much shorter explanation:
         //   punctuation or whitespace on the left and right ignoring open/close chars
+        //   https://nfb.org/sites/www.nfb.org/files/files-pdf/braille-certification/lesson-4--provisional-5-9-20.pdf
         static ref ADD_ENGLISH_LETTER_INDICATOR: Regex = 
             Regex::new(r"(?P<start>^|W|P.[\u2800-\u28FF]?|,)(?P<open>[\u2800-\u28FF]?⠷)?(?P<letter>C?L.)(?P<close>[\u2800-\u28FF]?⠾)?(?P<end>W|P|,|$)").unwrap();
         
@@ -310,7 +311,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
 
         // Enclosed list exception
         // Normally we don't add numeric indicators in enclosed lists (done in get_braille_nemeth_chars).
-        // The green book says "at the start" of an item.
+        // The green book says "at the start" of an item, don't add the numeric indicator.
         // The NFB list exceptions after function abbreviations and angles, but what this really means is "after a space"
         static ref NUM_IND_ENCLOSED_LIST: Regex = Regex::new(r"w([⠂⠆⠒⠲⠢⠖⠶⠦⠔⠴])").unwrap();  
 
@@ -334,7 +335,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         //   Beginning of line or after a space (V 38.1)
         //   After a word (38.4)
         //   2nd or subsequent punctuation (includes, "-", etc) (38.7)
-        static ref REMOVE_AFTER_PUNCT_IND: Regex = Regex::new(r"(^|W|w|[Ll].[Ll].)P(.)").unwrap();  
+        static ref REMOVE_AFTER_PUNCT_IND: Regex = Regex::new(r"(^|[Ww]|[Ll].[Ll].)P(.)").unwrap();  
         static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏CLlMmb↑↓Nn𝑁Ww,])").unwrap();          
         static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
@@ -356,6 +357,9 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     if !raw_braille.is_empty() && ( start < raw_braille.len()-1 || "WP,".contains(raw_braille.chars().nth_back(0).unwrap()) ) {       // see comment about $end above
         result.push_str(&raw_braille[start..]);
     }
+
+    let result = NUM_IND_ENCLOSED_LIST.replace_all(&result, "wn${1}");
+
 //   debug!("ELIs:    \"{}\"", result);  
     // Remove blanks before and after braille indicators
     let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
@@ -380,7 +384,6 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
     let result = NUM_IND_9E_SHAPE.replace_all(&result, "${mod}n");
     let result = NUM_IND_9F.replace_all(&result, "${1}${2}n");
-    let result = NUM_IND_ENCLOSED_LIST.replace_all(&result, "wn${1}");
 
   debug!("IND_9F:  \"{}\"", result);
 
