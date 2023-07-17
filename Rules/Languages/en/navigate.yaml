@@ -355,7 +355,8 @@
         if: "self::m:mtd"
         then: [{x: "*[1]"}]
         else:
-        - test: "$ReadZoomLevel!=-1"
+        - test:
+            if: "$ReadZoomLevel!=-1"
             then:
             - set_variables: [{ReadZoomLevel: "DistanceFromLeaf(*[1], true, $NavMode!='Character')"}]
         - set_variables: [{NavNode: "*[1]/@id"}]

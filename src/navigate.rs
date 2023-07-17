@@ -849,7 +849,7 @@ mod tests {
         match do_navigate_command_string(mathml, command) {
             Err(e) => panic!("{}", &crate::interface::errors_to_string(&e)),
             Ok(nav_speech) => {
-                ?debug!("Full speech: {}", nav_speech);
+                // debug!("Full speech: {}", nav_speech);
                 if !result_id.is_empty() {
                     NAVIGATION_STATE.with(|nav_stack| {
                         let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
