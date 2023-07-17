@@ -218,7 +218,7 @@ impl NavigationState {
 
         if command == "MoveLastLocation" {
             let previous_command = match nav_state_top {
-                None => "",
+                None => "None",
                 Some( (_, previous_command) ) => previous_command,
             };
             context.set_variable("PreviousNavCommand", previous_command);
@@ -351,9 +351,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             let new_package = Package::new();
             let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), "".to_string()); 
             
-            // if nav_state.mode.is_empty() {
-                nav_state.mode = rules.pref_manager.as_ref().borrow().get_user_prefs().to_string("NavMode");
-            // }
+            nav_state.mode = rules.pref_manager.as_ref().borrow().get_user_prefs().to_string("NavMode");
 
             nav_state.init_navigation_context(rules_with_context.get_context(), nav_command, nav_state.top());
             
@@ -516,7 +514,7 @@ fn speak<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContex
         let context_mathml = if let Some(parent) = mathml.parent() {parent.element().unwrap()} else {mathml};
         // debug!("context_mathml: {}", mml_to_string(&context_mathml));
         let intent = crate::speech::intent_from_mathml(context_mathml, rules_with_context.get_document())?;
-        debug!("intent: {}", mml_to_string(&intent));
+        // debug!("intent: {}", mml_to_string(&intent));
         let intent = if let Some(found) = find_marked_node(intent) {
             // debug!("Found node: {}", mml_to_string(&found));
             found
@@ -847,11 +845,11 @@ mod tests {
     /// Assert if result_id != '' and it doesn't match the id of the result of the move
     /// Returns the speech from the command
     fn test_command(command: &'static str, mathml: Element, result_id: &str) -> String {
-        debug!("\nCommand: {}", command);
+        // debug!("\nCommand: {}", command);
         match do_navigate_command_string(mathml, command) {
             Err(e) => panic!("{}", &crate::interface::errors_to_string(&e)),
             Ok(nav_speech) => {
-                // debug!("Full speech: {}", nav_speech);
+                ?debug!("Full speech: {}", nav_speech);
                 if !result_id.is_empty() {
                     NAVIGATION_STATE.with(|nav_stack| {
                         let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
@@ -880,6 +878,52 @@ mod tests {
             test_command("ZoomIn", mathml, "base");
             return Ok( () );
         });
+    }
+
+    #[test]
+    fn test_init_navigate_move_right() -> Result<()> {
+        // this is how navigation typically starts up
+        init_logger();
+        let mathml_str = " <math display='block' id='id-0' data-id-added='true'>
+        <mrow data-changed='added' id='id-1' data-id-added='true'>
+          <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
+          <mo id='id-3' data-id-added='true'>=</mo>
+          <mrow data-changed='added' id='id-4' data-id-added='true'>
+            <mi id='id-5' data-id-added='true'>a</mi>
+            <mo id='id-6' data-id-added='true'>-</mo>
+            <mn id='id-7' data-id-added='true'>2</mn>
+          </mrow>
+        </mrow>
+       </math>";
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+
+        set_preference("NavMode".to_string(), "Enhanced".to_string())?;
+        set_mathml(mathml_str.to_string()).unwrap();
+        MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomIn", mathml, "msup");
+            test_command("MoveNext", mathml, "id-3");
+        });
+
+        set_preference("NavMode".to_string(), "Simple".to_string())?;
+        set_mathml(mathml_str.to_string()).unwrap();
+        MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomIn", mathml, "msup");
+            test_command("MoveNext", mathml, "id-3");
+        });
+        
+        set_preference("NavMode".to_string(), "Character".to_string())?;
+        set_mathml(mathml_str.to_string()).unwrap();
+        MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomIn", mathml, "base");
+            test_command("MoveNext", mathml, "exp");
+        });
+        return Ok( () );
     }
     
     #[test]
