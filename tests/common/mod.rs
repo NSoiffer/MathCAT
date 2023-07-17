@@ -58,6 +58,7 @@ pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
             prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
             prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
             prefs.set_user_prefs("Language", language);
+            prefs.set_user_prefs("Verbosity", "Medium");
             changes = prefs.set_user_prefs("SpeechStyle", style);
         }
         if let Some(changes) = changes {
