@@ -346,14 +346,19 @@
       variables: [{Move2D: "'in'"}, {Child2D: "*[1]"}]
       replace: [{x: "."}]
   - test:
-      if: "self::m:mtd"
-      then: [{x: "*[1]"}]
-      else:
-      - test:
-          if: "$ReadZoomLevel!=-1"
-          then:
-          - set_variables: [{ReadZoomLevel: "DistanceFromLeaf(*[1], true, $NavMode!='Character')"}]
-      - set_variables: [{NavNode: "*[1]/@id"}]
+      if: "$NavMode='Character'"
+      then:
+      - with:
+          variables: [{MatchCounter: "$MatchCounter + 1"}]
+          replace: [{x: "*[1]"}]
+      else_test:
+        if: "self::m:mtd"
+        then: [{x: "*[1]"}]
+        else:
+        - test: "$ReadZoomLevel!=-1"
+            then:
+            - set_variables: [{ReadZoomLevel: "DistanceFromLeaf(*[1], true, $NavMode!='Character')"}]
+        - set_variables: [{NavNode: "*[1]/@id"}]
 
 - name: zoom-in-all-default
   tag: "*"
@@ -1561,8 +1566,6 @@
 # These set ::NavMode
 
 - name: toggle-mode-up
-
-
   tag: "*"
   match: "$NavCommand = 'ToggleZoomLockUp'"
   replace:
