@@ -653,6 +653,13 @@ fn key_press_to_command_and_param(
 ) -> Result<(NavigationCommand, NavigationParam)> {
 	// key press mapping should probably be stored externally (registry) with an app that allows changes
 	// for now, we build in the defaults
+
+    // this is a hack to map alt+ctl+arrow to ctl+arrow to change table mappings (github.com/NSoiffer/MathCAT/issues/105)
+    // if this change sticks, choose_command() needs to be changed and this hack should go away
+    let mut alt_key = alt_key;
+    if alt_key && control_key && [VK_LEFT, VK_RIGHT, VK_UP, VK_DOWN].contains(&key) {
+        alt_key = false;
+    }
 	if alt_key || meta_key {
         bail!("Invalid argument to key_press_to_command_and_param");
     }
@@ -863,7 +870,6 @@ mod tests {
 
     #[test]
     fn zoom_in() -> Result<()> {
-        // init_logger();
         let mathml_str = "<math id='math'><mfrac id='mfrac'>
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
@@ -883,7 +889,6 @@ mod tests {
     #[test]
     fn test_init_navigate_move_right() -> Result<()> {
         // this is how navigation typically starts up
-        init_logger();
         let mathml_str = " <math display='block' id='id-0' data-id-added='true'>
         <mrow data-changed='added' id='id-1' data-id-added='true'>
           <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
