@@ -457,7 +457,6 @@ mod tests {
 
     #[test]
     fn infer_binomial() {
-        init_logger();
         let mathml = "<mrow intent='binomial($n, $m)'>
                 <mo>(</mo>
                 <mfrac linethickness='0'> <mn arg='n'>7</mn> <mn arg='m'>3</mn> </mfrac>
