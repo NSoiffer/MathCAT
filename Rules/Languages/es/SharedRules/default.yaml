@@ -201,7 +201,7 @@
       if: "not(IsNode(*[1], 'leaf'))"
       then: [T: "modificado"]
   - x: "*[1]"
-  -T: "con"
+  - T: "con"
   - x: "*[2]"
   - T: "y abajo"
   - x: "*[3]"

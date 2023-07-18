@@ -2,6 +2,11 @@
  # Note to translators:
  #   most languages don't have two ways to pronounce 'a' -- if not need, remove the rules and change "B-Z" to "A-Z"
  #   some languages say the word for "uppercase" after the letter. Make sure to change that where appropriate by moving some code around
+ - "a-z": 
+    - test: 
+        if: "$TTS='none'"
+        then: [t: "."]                          
+        else: [spell: "'.'"]                       
  - "A-Z":
     - test: 
         if: "$CapitalLetters_Beep"
@@ -360,7 +365,7 @@
                 then: [T: "miembro de"]         	# 	(en: 'member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "elemento de"]        	# 	(en: 'element of', google translation)
-              - else: [T: "pertenece a"]    	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belonging to')
+              - else: [T: "pertenece a"]    	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belonging to')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
                 then: [T: "es miembro de"]      	# 	(en: 'is a member of', google translation)

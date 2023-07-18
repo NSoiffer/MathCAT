@@ -203,7 +203,7 @@
   - x: "*[1]"
   - T: de
   - x: "*[2]"
-  -T: a
+  - T: a
   - x: "*[3]"
   - test:
       if: "following-sibling::*"
@@ -229,7 +229,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{tT: el}]
+      then: [{T: el}]
   - x: "*[1]"
   - T: de
   - x: "*[2]"
@@ -312,7 +312,7 @@
   match: "text()='sin'"
   replace:
   - bookmark: "@id"
-  -T: "seno"
+  - T: "seno"
 - name: cos
   tag: mi
   match: "text()='cos'"
@@ -527,7 +527,7 @@
   variables: [{IsColumnSilent: true()}]
   match: "count(*)=1 and *[self::m:mtr][count(*) = 1]"
   replace:
-  - ot: the
+  - OT: "el"
   - T: 1 por 1
   - test:
       if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
@@ -593,7 +593,7 @@
   replace:
   - T: el 1 por
   - x: count(*/*)
-  -T: "fila"
+  - T: "fila"
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: {T: vector}

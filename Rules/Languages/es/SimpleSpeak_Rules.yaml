@@ -43,11 +43,11 @@
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][text()='2']"
-        then: [{T: raíz cuadrada}]
+        then: [{T: "raíz cuadrada"}]
       - else_if: "*[2][text()='3']"
-        then: [{T: raíz cúbica}]
+        then: [{T: "raíz cúbica"}]
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {T: raíz}]
+        then: [{x: "ToOrdinal(*[2])"}, {T: "raíz"}]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
@@ -58,12 +58,12 @@
       - T: raíz
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{T: de}]
+      then: [{T: "de"}]
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{T: fin de raíz}, {pause: short}]
+      else: [{T: "fin de raíz"}, {pause: short}]
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
@@ -91,7 +91,7 @@
   - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
   replace:
   - x: "*[1]"
-  - T: partido por 
+  - T: "partido por" 
   - x: "*[2]"
   - pause: short
 
@@ -105,13 +105,13 @@
   - test:
       if: "not(IsNode(*[1],'leaf'))"
       then: [{pause: short}]
-  - T: partido por
+  - T: "partido por"
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then: [{pause: short}]
   - x: "*[2]"
   - pause: short
-  - T: fin de fracción
+  - T: "fin de fracción"
   - pause: medium
 
 # rules for functions raised to a power
@@ -121,7 +121,7 @@
   tag: inverse-function
   match: "."
   replace:
-  - T: inverso
+  - T: "inverso"
   - x: "*[1]"
 
 - name: function-squared-or-cubed
@@ -134,8 +134,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {T: cuadrada}
-      else: {T: cúbica}
+      then: {T: "cuadrada"}
+      else: {T: "cúbica"}
 - name: function-power
   tag: power
   match:
@@ -149,7 +149,7 @@
       if: "*[2][self::m:mn][not(contains(., '.'))]"
       then: [{x: "ToOrdinal(*[2])"}]
       else: [{x: "*[2]"}]
-  - T: potencia de
+  - T: "potencia de"
   - pause: short
   - x: "*[1]"
 
@@ -162,15 +162,15 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {T: cuadrada}
-      else: {T: cúbica}
+      then: {T: "cuadrada"}
+      else: {T: "cúbica"}
 
 - name: simple-integer
   tag: power
   match: "*[2][self::m:mn][not(contains(., '.'))]"
   replace:
   - x: "*[1]"
-  - T: a la
+  - T: "a la"
   - test:
       if: "*[2][.>0]"
       then: {x: "ToOrdinal(*[2])"}
@@ -182,14 +182,14 @@
   - "     *[1][self::m:mn][not(contains(., '.'))]]"
   replace:
   - x: "*[1]"
-  - T: a la
+  - T: "a la"
   - x: "*[2]"
 - name: simple-var
   tag: power
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  - T: a la
+  - T: "a la"
   - x: "*[2]"
   - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
 
@@ -198,7 +198,7 @@
   match: "IsNode(*[2], 'leaf')"
   replace:
   - x: "*[1]"
-  - T: a la 
+  - T: "a la" 
   - x: "*[2]"
 
 - name: nested
@@ -213,18 +213,18 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - T elevado a: 
+  - T: "elevado a"
   - x: "*[2]"
   - pause: short
-  - T: fin de la exponente
+  - T: "fin de la exponente"
 - name: default
   tag: power
   match: "."
   replace:
   - x: "*[1]"
-  - T: elevado a la
+  - T: "elevado a la"
   - x: "*[2]"
-  - T: potencia
+  - T: "potencia"
 
 #
 # Some rules on mrows
@@ -239,21 +239,21 @@
       - test:
           if: "$Verbosity!='Terse'"
           then: {T: el}
-      - T: conjunto vacío
+      - T: "conjunto vacío"
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
           then: {T: el}
-      - T: conjunto completo
+      - T: "conjunto completo"
       - x: "*[1]/*[1]"
-      - T: tal que
+      - T: "tal que"
       - x: "*[1]/*[3]"
       else:
       - test:
           if: "$Verbosity!='Terse'"
           then: {T: el}
-      - T: conjunto
+      - T: "conjunto"
       - x: "*[1]"
 
 - name: times
