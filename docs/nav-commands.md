@@ -317,14 +317,19 @@ characters. Otherwise, word and character navigation is the same.
 
 ## Typical Use
 
-Typically, you begin navigating by zooming in (down arrow)
-one or more levels, and then moving right (right arrow) as desired. Some larger
-expressions require zooming in again as you move to the right.
+Typically, you will start at the first term of an expression and move right as needed.
+You might move up and down levels if needed. This done with the arrow keys.
+`alt+ctrl+arrow` is used to move around tabular entries.
 
 <i>Backspace</i> will take you back to where you were, which
 is not always the same as moving to the left. For example, if right arrow moved
 you out of a fraction, backspace will take you back to where you were in the
 denominator and left arrow will land on the entire fraction.
+
+You will likely find one mode of navigation the most natural for you most of the time.
+This can be set in the MathCAT settings.
+However, at any time during navigation, you can switch the navigation modes using `shift+up/down arrow`.
+This is useful because it each mode of navigation has its strengths and weaknesses.
 
 ## Acknowledgements
 A version of this document was produced as part of the ClearSpeak project.
