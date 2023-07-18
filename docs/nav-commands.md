@@ -49,10 +49,9 @@ See the [Navigation Modes section](#navigation-modes) after the table for explan
   </td>
   <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
   border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
-  In table:
-  Move to previous cell
-  In columnar
-  math: Move to previous digit
+  In table: move to previous cell<br/>
+  In columnar math: move to previous digit<br/>
+  Note: Ctrl+Alt+Left can also be used
   </td>
   <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
   border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
@@ -75,10 +74,9 @@ See the [Navigation Modes section](#navigation-modes) after the table for explan
   </td>
   <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
   border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
-  In table:
-  Move to next cell
-  In columnar
-  math: Move to next digit
+  In table: move to next cell<br/>
+  In columnar math: move to next digit<br/>
+  Note: Ctrl+Alt+Right can also be used
   </td>
   <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
   border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
@@ -100,10 +98,9 @@ See the [Navigation Modes section](#navigation-modes) after the table for explan
   </td>
   <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
   border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
-  In table:
-  Move to cell above
-  In columnar
-  math: Move to digit above
+  In table: move to cell above<br/>
+  In columnar math: move to digit above<br/>
+  Note: Ctrl+Alt+Up can also be used
   </td>
   <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
   border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
@@ -127,10 +124,9 @@ See the [Navigation Modes section](#navigation-modes) after the table for explan
   </td>
   <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
   border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
-  In table:
-  Move to cell below
-  In columnar
-  math: Move to digit below
+  In table: move to cell below<br/>
+  In columnar math: move to digit below<br/>
+  Note: Ctrl+Alt+Down can also be used
   </td>
   <td valign=top style='border-top:none;border-left:none;border-bottom:solid 1.0pt;
   border-right:solid 1.0pt;padding:0in 5.4pt 0in 5.4pt'>
