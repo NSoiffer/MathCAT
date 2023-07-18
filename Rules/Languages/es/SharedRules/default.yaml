@@ -62,7 +62,7 @@
   tag: ms
   match: "."
   replace:
-  - t: "the string"
+  - T: "la cadena"
   - pause: short
   - x: "text()"
 
@@ -70,6 +70,41 @@
   tag: mstyle
   match: "."
   replace: [x: "*"]
+
+
+- name: structure-simple
+  # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
+  # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
+  # are never simple, then any 'over' applies only to enclosing "fraction...end fraction" pair.
+  tag: mfrac
+  match:
+  - "(IsNode(*[1],'leaf') and IsNode(*[2],'leaf')) and"
+  - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
+  replace:
+  - x: "*[1]"
+  - T: "partido por"
+  - x: "*[2]"
+  - pause: short
+
+- name: structure-default
+  tag: mfrac
+  match: "."
+  replace:
+  - T: "comenzar"
+  - pause: short
+  - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1],'leaf'))"
+      then: [{pause: short}]
+  - T: "partido por"
+  - test:
+      if: "not(IsNode(*[2],'leaf'))"
+      then: [{pause: short}]
+  - x: "*[2]"
+  - pause: short
+  - T: "fracción final"
+  - pause: medium
+
 
 - name: simple-sub
   tag: particular-value-of
@@ -79,7 +114,7 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
-      then: [t: "sub"]
+      then: [T: "subíndice"]
   - x: "*[2]"
 
 - name: default
@@ -87,9 +122,9 @@
   match: "count(*)=2"
   replace:
   - x: "*[1]"
-  - t: "sub"
+  - T: "subíndice"
   - x: "*[2]"
-  - t: "end sub"
+  - T: "fin del  subíndice"
   - pause: short
 
 
@@ -98,7 +133,7 @@
   match: "."
   replace:
   - x: "*[1]"
-  - t: "sub"
+  - T: "subíndice"
   - x: "*[2]"
 
 - name: structure
@@ -109,7 +144,7 @@
   - test:
       if: "name(.)='msubsup'"
       then:
-      - t: "sub"
+      - T: "subíndice"
       - x: "*[2]"
   - test:
       if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
@@ -117,15 +152,15 @@
       else_test:
           if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"  # FIX: is this test necessary?
           then:
-          - t: "super"
+          - T: "superíndice"
           - x: "*[last()]"
           - test:
               if: "not(IsNode(*[last()], 'simple'))"
-              then: [t: "end super"]
+              then: [T: "final del superíndice"]
           else:
-          - t: "raised to the"
+          - T: "elevado a la"
           - x: "*[last()]"
-          - t: "power"
+          - T: "potencia"
 
 - name: default
   tag: munder
@@ -133,11 +168,11 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]
+      then: [T: "modificado"]
   - x: "*[1]"
-  - t: "with"
+  - T: "con"
   - x: "*[2]"
-  - t: below
+  - T: abajo
 
 - name: diacriticals
   tag: mover
@@ -152,11 +187,11 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]
+      then: [T: "modificado"]
   - x: "*[1]"
-  - t: "with"
+  - T: "con"
   - x: "*[2]"
-  - t: "above"
+  - T: "por encima de"
 
 - name: default
   tag: munderover
@@ -164,13 +199,13 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]
+      then: [T: "modificado"]
   - x: "*[1]"
-  - t: "with"
+  -T: "con"
   - x: "*[2]"
-  - t: "below and"
+  - T: "y abajo"
   - x: "*[3]"
-  - t: "above"
+  - T: "por encima de"
 
 - name: default
   #   Here we support up to 2 prescripts and up to 4 postscripts -- that should cover all reasonable cases
@@ -197,9 +232,9 @@
           - test: # only bother announcing if there is more than one prescript
               if: "count($Prescripts) > 2"
               then:
-              - t: "with"
+              - T: "con"
               - x: "count($Prescripts) div 2"
-              - t: "prescripts"
+              - T: "secuencia"
               - pause: short
           - test:
               if: "not($Prescripts[1][self::m:none])"
@@ -208,7 +243,7 @@
               - x: "$Prescripts[1]"
           - test:
               if: "not($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none])"
-              then: [t: "and"]
+              then: [T: "y"]
           - test:
               if: "not($Prescripts[2][self::m:none])"
               then:
@@ -225,7 +260,7 @@
                   - x: "$Prescripts[3]"
               - test:
                   if: "not($Prescripts[3][self::m:none] or $Prescripts[4][self::m:none])"
-                  then: [t: "and"]
+                  then: [T: "y"]
               - test:
                   if: "not($Prescripts[4][self::m:none])"
                   then:
@@ -234,9 +269,9 @@
               - test:
                   if: "count($Prescripts) > 4" # give up and just dump them out so at least the content is there
                   then:
-                  - t: "and alternating prescripts"
+                  - T: "una secuencia alternativa"
                   - x: "$Prescripts[position() > 4]"
-                  - t: "end prescripts"
+                  - T: "fin de la secuencia"
   - test:
       if: "$Postscripts"
       then:
@@ -250,10 +285,10 @@
               then:
               - test:
                   if: "$Prescripts"
-                  then: [t: "and"]
-              - t: "with"
+                  then: [T: "y"]
+              - T: "con"
               - x: "count($Postscripts) div 2"
-              - t: "postscripts"
+              - T: "adición"
               - pause: short
           - test:
               if: "not($Postscripts[1][self::m:none])"
@@ -262,7 +297,7 @@
               - x: "$Postscripts[1]"
           - test:
               if: "not($Postscripts[1][self::m:none] or $Postscripts[2][self::m:none])"
-              then: [t: "and"]
+              then: [T: "y"]
           - test:
               if: "not($Postscripts[2][self::m:none])"
               then:
@@ -278,7 +313,7 @@
                   - x: "$Postscripts[3]"
               - test:
                   if: "not($Postscripts[3][self::m:none] or $Postscripts[4][self::m:none])"
-                  then: [t: "and"]
+                  then: [T: "y"]
               - test:
                   if: "not($Postscripts[4][self::m:none])"
                   then:
@@ -294,7 +329,7 @@
                       - x: "$Postscripts[5]"
                   - test:
                       if: "not($Postscripts[5][self::m:none] or $Postscripts[6][self::m:none])"
-                      then: [t: "and"]
+                      then: [T: "y"]
                   - test:
                       if: "not($Postscripts[6][self::m:none])"
                       then:
@@ -310,7 +345,7 @@
                           - x: "$Postscripts[7]"
                       - test:
                           if: "not($Postscripts[7][self::m:none] or $Postscripts[8][self::m:none])"
-                          then: [t: "and"]
+                          then: [T: "y"]
                       - test:
                           if: "not($Postscripts[8][self::m:none])"
                           then:
@@ -319,26 +354,26 @@
                       - test:
                           if: "count($Postscripts) > 8" # give up and just dump them out so at least the content is there
                           then:
-                          - t: "and alternating scripts"
+                          - T: "and alternating scripts"
                           - x: "$Postscripts[position() > 8]"
-                          - t: "end scripts"
+                          - T: "end scripts"
 
 - name: default
   tag: mtable
   variables: [IsColumnSilent: false()]
   match: "."
   replace:
-  - t: "table with"
+  - T: "tabla con"
   - x: count(*)
   - test:
       if: count(*)=1
-      then: [t: "row"]
-      else: [t: "rows"]
-  - t: and
+      then: [T: "fila"]
+      else: [T: "fila"]
+  - T: y
   - x: "count(*[1]/*)"
   - test:
       if: "count(*[1]/*)=1"
-      then: [t: "column"]
+      then: [T: "columna"]
       else: [t: "columns"]
   - pause: long
   - x: "*"
@@ -355,7 +390,7 @@
   tag: mtd
   match: "."
   replace:
-  - t: "column"
+  - T: "columna"
   - x: "count(preceding-sibling::*)+1"
   - pause: medium
   - x: "*" # speak the entry
@@ -367,7 +402,7 @@
   tag: menclose
   match: "@notation='box' and *[self::m:mtext and text()=' ']"
   replace:
-  - t: "empty box"
+  - T: "celda vacía"
 
 - name: default
   # The ordering below is the order in which words come out when there is more than one value
@@ -377,29 +412,29 @@
   replace:
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
-      then: [t: "box", pause: short]
+      then: [T: "celda", pause: short]
   - test:
       if: ".[contains(@notation,'roundedbox')]"
-      then: [t: "round box", pause: short]
+      then: [T: "celda redonda", pause: short]
   - test:
       if: ".[contains(@notation,'circle')]"
-      then: [t: "circle", pause: short]
+      then: [T: "círculo", pause: short]
   - test:
       if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or contains(concat(' ', normalize-space(@notation), ' '), ' right ') or contains(@notation,'top') or contains(@notation,'bottom') ]"
       then:
-      - t: line on
+      - T: línea sobre
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
-          then: [t: "left", pause: short]
+          then: [T: "izquierda", pause: short]
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"
-          then: [t: "right", pause: short]
+          then: [T: "derecha", pause: short]
       - test:
           if: ".[contains(@notation,'top')]"
-          then: [t: "top", pause: short]
+          then: [T: "superior", pause: short]
       - test:
           if: ".[contains(@notation,'bottom')]"
-          then: [t: "bottom", pause: short]
+          then: [T: "inferior", pause: short]
   - test:
       if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
       then:
@@ -409,77 +444,77 @@
           else:
           - test:
               if: ".[contains(@notation,'updiagonalstrike')]"
-              then: [t: "up diagonal", pause: short]
+              then: [T: "diagonal superior", pause: short]
           - test:
               if: ".[contains(@notation,'downdiagonalstrike')]"
-              then: [t: "down diagonal", pause: short]
+              then: [T: "diagonal inferior", pause: short]
       - test:
           if: ".[contains(@notation,'verticalstrike')]"
-          then: [t: "vertical", pause: short]
+          then: [T: "vertical", pause: short]
       - test:
           if: ".[contains(@notation,'horizontalstrike')]"
-          then: [t: "horizontal", pause: short]
-      - t: cross out
+          then: [T: "horizontal", pause: short]
+      - T: tachar
       - pause: short
   - test:
       if: ".[contains(@notation,'uparrow')]"
-      then: [t: "up arrow", pause: short]
+      then: [T: "flecha arriba", pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
-      then: [t: "down arrow", pause: short]
+      then: [T: "flecha abajo", pause: short]
   - test:
       if: ".[contains(@notation,'leftarrow')]"
-      then: [t: "left arrow", pause: short]
+      then: [T: "flecha izquierda", pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
-      then: [t: "right arrow", pause: short]
+      then: [T: "flecha derecha", pause: short]
   - test:
       if: ".[contains(@notation,'northeastarrow')]"
-      then: [t: "northeast arrow", pause: short]
+      then: [T: " flecha hacia el nordeste", pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
-      then: [t: "southeast arrow", pause: short]
+      then: [T: "flecha hacia el sudeste", pause: short]
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
-      then: [t: "southwest arrow", pause: short]
+      then: [T: "flecha hacia el sudoeste", pause: short]
   - test:
       if: ".[contains(@notation,'northwestarrow')]"
-      then: [t: "northwest arrow", pause: short]
+      then: [T: "flecha hacia el noroeste", pause: short]
   - test:
       if: ".[contains(@notation,'updownarrow')]"
-      then: [t: "double ended vertical arrow", pause: short]
+      then: [T: "flecha vertical con doble extremo", pause: short]
   - test:
       if: ".[contains(@notation,'leftrightarrow')]"
-      then: [t: "double ended horizontal arrow", pause: short]
+      then: [T: "flecha horizontal de doble extremo", pause: short]
   - test:
       if: ".[contains(@notation,'northeastsouthwestarrow')]"
-      then: [t: "double ended up diagonal arrow", pause: short]
+      then: [T: "flecha diagonal superior de doble extremo", pause: short]
   - test:
       if: ".[contains(@notation,'northwestsoutheastarrow')]"
-      then: [t: "double ended down diagonal arrow", pause: short]
+      then: [T: "flecha diagonal inferior de doble extremo", pause: short]
   - test:
       if: ".[contains(@notation,'actuarial')]"
-      then: [t: "actuarial symbol", pause: short]
+      then: [T: "símbolo actuarial", pause: short]
   - test:
       if: ".[contains(@notation,'madrub')]"
-      then: [t: "arabic factorial symbol", pause: short]
+      then: [t: "símbolo factorial arábigo", pause: short]
   - test:
       if: ".[contains(@notation,'phasorangle')]"
-      then: [t: "phasor angle", pause: short]
+      then: [T: "ángulo fasorial", pause: short]
   - test:
       if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']" # default
-      then: [t: "long division symbol", pause: short]
+      then: [T: "símbolo de larga partición", pause: short]
   - test:
       if: ".[contains(@notation,'radical')]"
-      then: [t: "square root", pause: short]
-  - t: enclosing
+      then: [T: "raíz cuadrada", pause: short]
+  - T: agregando
   - test:
       if: "*[self::m:mtext and text()=' ']"
-      then: [t: "space"]     # otherwise there is complete silence
+      then: [T: "espacio"]     # otherwise there is complete silence
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
-      then: [t: end enclosure]
+      then: [T: agregación final ]
   - pause: short
 
 - name: semantics
@@ -499,7 +534,7 @@
   match: .
   replace:
   - x: "*[1]"
-  - t: "applied to"
+  - T: "aplicado a"
   - x: "*[2]"
 
 
@@ -548,11 +583,11 @@
   match: count(*)>0
   replace:
   - x: "translate(name(.), '-_', '  ')"
-  - t: "of"
+  - T: "de"
   - pause: short
   - insert:
       nodes: "*"
-      replace: [t: "comma", pause: auto]
+      replace: [T: "coma", pause: auto]
 
 - name: default-text
   # unknown leaf -- just speak the text -- could be a literal intent

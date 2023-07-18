@@ -25,7 +25,7 @@
 #
 # EdgeNode(node, "left"/"right", stopNodeName)
 #   Returns the stopNode if at left/right edge of named ancestor node. 'stopNodeName' can also be "2D"
-#   If the stopNode isn't found, the original node is returned
+# 	If the stopNode isn't found, the original node is returned
 #  Note: if stopNodeName=="math", then punctuation is taken into account since it isn't really part of the math
 #
 # A few other variables are of importance to Navigation
@@ -42,8 +42,8 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [{t: "numerator"}]
-      else: [{t: "denominator"}]
+      then: [{T: "numerador"}]
+      else: [{T: "denominador"}]
   - pause: "medium"
 
 - name: into-or-out-of
@@ -51,7 +51,7 @@
   match: "$Move2D != ''"
   replace:
   - x: "$Move2D"
-  - t: "square root"
+  - T: "raíz cuadrada"
   - pause: "medium"
 
 - name: into-or-out-of
@@ -61,8 +61,8 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [{t: "root"}]
-      else: [{t: "root index"}]
+      then: [{T: "raíz"}]
+      else: [{T: "índice raíz"}]
   - pause: "medium"
 
 - name: into-or-out-of
@@ -72,8 +72,8 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [{t: "base"}]
-      else: [{t: "subscript"}]
+      then: [{T: "base"}]
+      else: [{T: "subíndice"}]
   - pause: "medium"
 
 - name: into-or-out-of
@@ -83,8 +83,8 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [{t: "base"}]
-      else: [{t: "superscript"}] # FIX: it would be better to use the word used when reading (power, exponent, ...)
+      then: [{T: "base"}]
+      else: [{T: "superíndice"}] # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -94,10 +94,10 @@
   - x: "$Move2D"
   - test:
     - if: "count($Child2D/preceding-sibling::*)=0"
-      then: [{t: "base"}]
+      then: [{T: "base"}]
     - else_if: "count($Child2D/preceding-sibling::*)=1"
-      then: [{t: "subscript"}]
-      else: [{t: "superscript"}] # FIX: it would be better to use the word used when reading (power, exponent, ...)
+      then: [{T: "subíndice"}]
+      else: [{T: "superíndice"}] # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -107,8 +107,8 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [{t: "base"}]
-      else: [{t: "lower limit"}]
+      then: [{T: "base"}]
+      else: [{T: "límite inferior
   - pause: "medium"
 
 - name: into-or-out-of
@@ -118,8 +118,8 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [{t: "base"}]
-      else: [{t: "upper limit"}]
+      then: [{T: "base"}]
+      else: [{T: "límite superior"}]
   - pause: "medium"
 
 - name: into-or-out-of
@@ -129,10 +129,10 @@
   - x: "$Move2D"
   - test:
     - if: "count($Child2D/preceding-sibling::*)=0"
-      then: [{t: "base"}]
+      then: [{T: "base"}]
     - else_if: "count($Child2D/preceding-sibling::*)=1"
-      then: [{t: "lower limit"}]
-      else: [{t: "upper limit "}]
+      then: [{T: "límite inferior"}]
+      else: [{T: "límite superior "}]
   - pause: "medium"
 
 - name: into-or-out-of
@@ -149,18 +149,18 @@
           - x: "$Move2D"
           - test:
             - if: "$NumPrecedingSiblings=0"
-              then: [{t: "base"}]
+              then: [{T: "base"}]
             - else_if: "$Child2D/preceding-sibling::*[self::m:mprescripts]" # are we before mprescripts and hence are postscripts
               then:
               - test:   # in postscripts -- base shifts by one
                   if: "$NumPrecedingSiblings mod 2 = 0"
-                  then: [{t: "subscript"}]
-                  else: [{t: "superscript"}]
+                  then: [{T: "subíndice"}]
+                  else: [{T: "superíndice"}]
               else:
               - test:
                   if: "$NumPrecedingSiblings mod 2 = 0"
-                  then: [{t: "superscript"}]
-                  else: [{t: "subscript"}]
+                  then: [{T: "superíndice"}]
+                  else: [{T: "subíndice"}]
           - pause: "medium"
 
 - name: into-or-out-of
@@ -168,7 +168,7 @@
   match: "$Move2D = 'into'"
   replace:
   - x: "$Move2D"
-  - t: "2d column"
+  - T: "2d columna"
   - x: "count($Child2D/preceding-sibling::*)+1"
   - pause: "medium"
 
@@ -199,19 +199,19 @@
       then:
       - test:
         - if: "$PreviousNavCommand = 'ZoomIn'"
-          then: [{t: "undo zoom in"}]
+          then: [{T: " desactivar zoom"}]
         - else_if: "$PreviousNavCommand = 'ZoomOut'"
-          then: [{t: "undo zoom out"}]
+          then: [{T: "activar"}]
         - else_if: "$PreviousNavCommand = 'ZoomInAll'"
-          then: [{t: "undo zooming in all the way"}]
+          then: [{T: "desactivar zoom por completo"}]
         - else_if: "$PreviousNavCommand = 'ZoomOutAll'"
-          then: [{t: "undo zooming out all the way"}]
+          then: [{T: "activar zoom por completo"}]
         - else_if: "$PreviousNavCommand = 'MovePrevious' or $PreviousNavCommand = 'MovePreviousZoom'"
-          then: [{t: "undo move left"}]
+          then: [{T: "desactivar mover a la izquierda"}]
         - else_if: "$PreviousNavCommand = 'MoveNext' or $PreviousNavCommand = 'MoveNextZoom'"
-          then: [{t: "undo move right"}]
+          then: [{T: "desactivar mover a la derecha"}]
         - else_if: "$PreviousNavCommand = 'None'"
-          then: [{t: "no previous command"}]
+          then: [{T: "ningún comando anterior"}]
       - pause: "long"
   - set_variables: [{NavNode: "@id"}]
 
@@ -234,7 +234,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
-      then: [{t: "zoomed in all of the way"}, {pause: "long"}]
+      then: [{T: "zoom totalmente cerca"}, {pause: "long"}]
   - test:
       if: "$ReadZoomLevel!=-1"
       then:
@@ -251,7 +251,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [{t: "zoom in"}, {pause: "long"}]
+      then: [{T: "zoom cerca"}, {pause: "long"}]
   - set_variables: [{NavNode: "*[2]/*[1]/*[1]/@id"}]
 
 # special case of zooming into a table -- move to the first element
@@ -261,7 +261,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [{t: "zoom in"}, {pause: "long"}]
+      then: [{T: "zoom cerca"}, {pause: "long"}]
   - set_variables: [{NavNode: "*[1]/*[1]/*[1]/@id"}]
 
 - name: zoom-in-mrow-in-math
@@ -285,7 +285,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [{t: "zoom in"}, {pause: "long"}]
+      then: [{T: "zoom cerca"}, {pause: "long"}]
   - with:
       variables: [{MatchCounter: "$MatchCounter + 1"}]
       replace:
@@ -301,7 +301,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [{t: "zoom in"}, {pause: "long"}]
+      then: [{T: "zoom cerca"}, {pause: "long"}]
   - test:
     - if: "self::m:mtr or self::m:mlabeledtr"
       then:
@@ -327,7 +327,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [{t: "zoom in"}, {pause: "long"}]
+      then: [{T: "zoom cerca"}, {pause: "long"}]
   - with:
       variables: [{Move2D: "'in'"}, {Child2D: "*[1]"}]
       replace: [{x: "."}]
@@ -341,7 +341,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [{t: "zoom in"}, {pause: "long"}]
+      then: [{T: "zoom cerca"}, {pause: "long"}]
   - with:
       variables: [{Move2D: "'in'"}, {Child2D: "*[1]"}]
       replace: [{x: "."}]
@@ -361,7 +361,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [{t: "zoom in all"}, {pause: "medium"}]
+      then: [{T: "zoom totalmente cerca"}, {pause: "medium"}]
   - with:
       variables: [{Move2D: "'in'"}, {Child2D: "*[1]"}]
       replace: [{x: "."}]
@@ -375,7 +375,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
-      then: [{t: "zoomed out all the way"}, {pause: "long"}]
+      then: [{T: "zoom totalmente alejado"}, {pause: "long"}]
   - set_variables: [{NavNode: "*[1]/@id"}] # no-op for $NavCommand = 'ZoomOut'
 
 - name: zoom-out-top
@@ -401,7 +401,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
-      then: [{t: "zoom out all"}, {pause: "medium"}]
+      then: [{T: "zoom totalmente alejado"}, {pause: "medium"}]
   - with:
       variables: [{Move2D: "'out of'"}, {Child2D: "."}]
       replace: [{x: ".."}]
@@ -474,16 +474,16 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [{t: "zoom out"}, {pause: "medium"}]
+      then: [{T: "alejar zoom"}, {pause: "medium"}]
   # we need to speak it here
-  - t: "row"
+  - T: "fila"
     # if we let the speech rules speak the row, it is given just the MathML for the row, so the row # will always be '1'
   - x: "count(../preceding-sibling::*)+1"
   - pause: medium
   - set_variables: [{NavNode: "../@id"}]
 
 - name: zoom-out
-  # a row around a single element -- these might duplicate the position/offset, so we jump an extra level here  
+  # a row around a single element -- these might duplicate the position/offset, so we jump an extra level here	
   tag: "*"
   match: "$NavCommand = 'ZoomOut'"
   replace:
@@ -492,7 +492,7 @@
       replace:
       - test:
           if: "$MatchCounter = 1 and $NavVerbosity = 'Verbose'"
-          then: [{t: "zoom out"}, {pause: "medium"}]
+          then: [{T: "alejar zoom"}, {pause: "medium"}]
       - test:
           if: "$NavMode='Enhanced' and parent::*[self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"
           then: [{x: ".."}] # auto-zoom: move out a level and retry
@@ -522,12 +522,12 @@
           then:
           - test:
             - if: "$NavCommand = 'MoveStart'"
-              then: [{t: "move to start of math"}]
+              then: [{T: "iniciar cálculo"}]
             - else_if: "$NavCommand = 'MoveLineStart'"
-              then: [{t: "move to start of line"}]
+              then: [{T: "desplazarse al principio de la línea"}]
             - else_if: "$NavCommand = 'MoveEnd'"
-              then: [{t: "move to end of math"}]
-              else: [{t: "move to end of line"}] # "$NavCommand = 'MoveLineEnd'"
+              then: [{T: "finalizar cálculo"}]
+              else: [{T: "desplazarse al final de la línea"}] # "$NavCommand = 'MoveLineEnd'"
           - pause: "medium"
       - test:
           if: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart'"
@@ -553,8 +553,8 @@
       then:
       - test:
           if: "$NavCommand = 'MoveLineStart'"
-          then: [{t: "move to start of line"}]
-          else: [{t: "move to end of line"}] # "$NavCommand = 'MoveLineEnd'"
+          then: [{T: "desplazarse al principio de la línea"}]
+          else: [{T: "desplazarse al final de la línea"}] # "$NavCommand = 'MoveLineEnd'"
       - pause: "medium"
   - test:
       if: "self::m:mrow"
@@ -590,7 +590,7 @@
   - "$NavCommand='MoveColumnStart' or $NavCommand='MoveColumnEnd' or"
   - "$NavCommand='ReadCellCurrent'"
   replace:
-  - t: "not in table"
+  - T: "fuera de tabla"
   - pause: long
   - set_variables: [{SpeakExpression: "'false'"}]
 
@@ -604,9 +604,9 @@
       - test:
           if: "$NavVerbosity = 'Verbose'"
           then:
-          - t: "move left"
+          - T: "desplazarse a la izquierda"
           - pause: short
-          - t: "column"
+          - T: "columna"
           - x: "count(preceding-sibling::*)"
           - pause: medium
       - test:
@@ -618,7 +618,7 @@
           else:
           - set_variables: [{NavNode: "preceding-sibling::*[1]/*[1]/@id"}]
       else:
-      - t: "no previous column"
+      - T: "sin columna anterior"
       - set_variables: [{SpeakExpression: "'false'"}]
 
 - name: move-cell-next
@@ -631,9 +631,9 @@
       - test:
           if: "$NavVerbosity = 'Verbose'"
           then:
-          - t: "move right"
+          - T: "desplazarse a la derecha"
           - pause: short
-          - t: "column"
+          - T: "columna"
           - x: "count(preceding-sibling::*)+2"
           - pause: medium
       - test:
@@ -645,7 +645,7 @@
           else:
           - set_variables: [{NavNode: "following-sibling::*[1]/*[1]/@id"}]
       else:
-      - t: "no next column"
+      - T: "sin columna posterior"
       - set_variables: [{SpeakExpression: "'false'"}]
 
 - name: move-cell-up
@@ -661,12 +661,12 @@
           - test:
               if: "$NavVerbosity = 'Verbose'"
               then:
-              - t: "move up"
+              - T: "desplazarse hacia arriba"
               - pause: short
-              - t: "row"
+              - T: "fila"
               - x: "count(../preceding-sibling::*)"
               - pause: short
-              - t: "column"
+              - Ta: "columna"
               - x: "count(preceding-sibling::*)+1"
               - pause: medium
           - test:
@@ -678,7 +678,7 @@
               else:
               - set_variables: [{NavNode: "../preceding-sibling::*[1]/*[$Column]/*[1]/@id"}]
       else:
-      - t: "no previous row"
+     - T: "ninguna fila anterior"
       - set_variables: [{SpeakExpression: "'false'"}]
 
 - name: move-cell-down
@@ -694,12 +694,12 @@
           - test:
               if: "$NavVerbosity = 'Verbose'"
               then:
-              - t: "move down"
+              - T: "bajar"
               - pause: short
-              - t: "row"
+              - T: "fila"
               - x: "count(../preceding-sibling::*)+2"
               - pause: short
-              - t: "column"
+              - T: "columna"
               - x: "count(preceding-sibling::*)+1"
               - pause: medium
           - test:
@@ -711,7 +711,7 @@
               else:
               - set_variables: [{NavNode: "../following-sibling::*[1]/*[$Column]/*[1]/@id"}]
       else:
-      - t: "no next row"
+      - T: "ninguna fila posterior"
       - set_variables: [{SpeakExpression: "'false'"}]
 
 - name: move-cell-up
@@ -724,9 +724,9 @@
       - test:
           if: "$NavVerbosity = 'Verbose'"
           then:
-          - t: "move up"
+          - T: "subir"
           - pause: medium
-      - t: "row"
+      - T: "fila"
       - x: "count(preceding-sibling::*)"
       - pause: medium
       - test:
@@ -738,7 +738,7 @@
           else:
           - set_variables: [{NavNode: "preceding-sibling::*[1]/@id"}]
       else:
-      - t: "no previous row"
+      - T: "ninguna fila anterior"
       - set_variables: [{SpeakExpression: "'false'"}]
 
 - name: move-cell-down
@@ -751,9 +751,9 @@
       - test:
           if: "$NavVerbosity = 'Verbose'"
           then:
-          - t: "move down"
+          - T: "bajar"
           - pause: medium
-      - t: "row"
+      - T: "fila"
       - x: "count(preceding-sibling::*)+2"
       - pause: medium
       - test:
@@ -765,7 +765,7 @@
           else:
           - set_variables: [{NavNode: "following-sibling::*[1]/@id"}]
       else:
-      - t: "no next row"
+      - T: "ninguna fila posterior"
       - set_variables: [{SpeakExpression: "'false'"}]
 
 - name: default-read-cell
@@ -781,33 +781,33 @@
           - test:
               if: "$NavVerbosity = 'Verbose'"
               then:
-              - t: "read current entry"
+              - T: "leer la entrada actual"
               - pause: medium
-          - t: "row"
+          - T: "fila"
           - x: "count($MTD[1]/../preceding-sibling::*)+1"
-          - t: "column"
+          - T: "columna"
           - x: "count($MTD[1]/preceding-sibling::*)+1"
           - pause: short
           - set_variables: [{NavNode: "$MTD[1]/*[1]/@id"}]
           else:
-          - t: "not in table"
+          - T: "fuera de tabla"
           - pause: long
           - set_variables: [{SpeakExpression: "'false'"}]
 
 # mtd ? ( $NavCommand='MoveColumnStart' )
 # => MoveColStart {
-#       ruleRef = name(^^match);
-#       column = index(match);
-#       ::StartPosition = ^^match[0][index(match)][0].dfs;
-#       ::EndPosition = ^^match[0][index(match)][0].offset;
+# 		ruleRef = name(^^match);
+# 		column = index(match);
+# 		::StartPosition = ^^match[0][index(match)][0].dfs;
+# 		::EndPosition = ^^match[0][index(match)][0].offset;
 #   };
 
 # mtd ? ( $NavCommand='MoveColumnEnd' )
 # => MoveColEnd {
-#       ruleRef = name(^^match);
-#       column = index(match);
-#       ::StartPosition = ^^match[count(^^match)-1][index(match)][0].dfs;
-#       ::EndPosition = ^^match[count(^^match)-1][index(match)][0].offset;
+# 		ruleRef = name(^^match);
+# 		column = index(match);
+# 		::StartPosition = ^^match[count(^^match)-1][index(match)][0].dfs;
+# 		::EndPosition = ^^match[count(^^match)-1][index(match)][0].offset;
 #   };
 
 
@@ -819,199 +819,199 @@
 # # FIX:  not dealing with carries well
 # # FIX:  not dealing with navigation of first three children of mlongdiv
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-#         ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious') && has_previous(match) )
+# 		  ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious') && has_previous(match) )
 # => MoveCell {
-#       ruleRef = name(^^match);
-#       wordRef = "previous";
-#       ::StartPosition = previous(match).dfs;
-#       ::EndPosition = previous(match).offset;
+# 		ruleRef = name(^^match);
+# 		wordRef = "previous";
+# 		::StartPosition = previous(match).dfs;
+# 		::EndPosition = previous(match).offset;
 #   };
 
 # # no previous child -- in first column -- don't move
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-#         ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious' ) )
+# 		  ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious' ) )
 # => MoveCell {
-#       ruleRef = name(^^match);
-#       wordRef = "previous";
-#       childIndex = -1;                   # key to know what to say for each notation
-#       ::SpeakAfterMove = false;
+# 		ruleRef = name(^^match);
+# 		wordRef = "previous";
+# 		childIndex = -1;                   # key to know what to say for each notation
+# 		::SpeakAfterMove = false;
 #   };
 
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-#         ($NavCommand="MoveNext" || $NavCommand='MoveCellNext') && has_next(match) )
+# 		  ($NavCommand="MoveNext" || $NavCommand='MoveCellNext') && has_next(match) )
 # => MoveCell {
-#       ruleRef = name(^^match);
-#       wordRef = "next";
-#       ::StartPosition = next(match).dfs;
-#       ::EndPosition = next(match).offset;
+# 		ruleRef = name(^^match);
+# 		wordRef = "next";
+# 		::StartPosition = next(match).dfs;
+# 		::EndPosition = next(match).offset;
 #   };
 
 # # no next child -- in first column -- don't move
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-#         ($NavCommand="MoveNext" || $NavCommand='MoveCellNext' ) )
+# 		  ($NavCommand="MoveNext" || $NavCommand='MoveCellNext' ) )
 # => MoveCell {
-#       ruleRef = name(^^match);
-#       wordRef = "next";
-#       childIndex = -1;                   # key to know what to say for each notation
-#       ::SpeakAfterMove = false;
+# 		ruleRef = name(^^match);
+# 		wordRef = "next";
+# 		childIndex = -1;                   # key to know what to say for each notation
+# 		::SpeakAfterMove = false;
 #   };
 
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-#         $NavCommand='MoveCellUp' && has_previous(^^match) )
+# 		  $NavCommand='MoveCellUp' && has_previous(^^match) )
 # => MoveCell {
-#       ruleRef = name(^^match);
-#       wordRef = "up";
-#       ::StartPosition = ^^^match[index(^^match)-1][-1][index(match)-count(^match)].dfs;
-#       ::EndPosition = ^^^match[index(^^match)-1][-1][index(match)-count(^match)].offset;
-#   };
-
-# # no previous child -- in first column -- don't move
-# char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-#         $NavCommand='MoveCellUp' )
-# => MoveCell {
-#       ruleRef = name(^^match);
-#       wordRef = "up";
-#       childIndex = -1;                   # key to know what to say for each notation
-#       ::SpeakAfterMove = false;
-#   };
-
-# char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-#         $NavCommand='MoveCellDown' && has_next(^^match) )
-# => MoveCell {
-#       ruleRef = name(^^match);
-#       wordRef = "down";
-#       ::StartPosition = ^^^match[index(^^match)+1][-1][index(match)-count(^match)].dfs;
-#       ::EndPosition = ^^^match[index(^^match)+1][-1][index(match)-count(^match)].offset;
+# 		ruleRef = name(^^match);
+# 		wordRef = "up";
+# 		::StartPosition = ^^^match[index(^^match)-1][-1][index(match)-count(^match)].dfs;
+# 		::EndPosition = ^^^match[index(^^match)-1][-1][index(match)-count(^match)].offset;
 #   };
 
 # # no previous child -- in first column -- don't move
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-#         $NavCommand='MoveCellDown' )
+# 		  $NavCommand='MoveCellUp' )
 # => MoveCell {
-#       ruleRef = name(^^match);
-#       wordRef = "down";
-#       childIndex = -1;                   # key to know what to say for each notation
-#       ::SpeakAfterMove = false;
+# 		ruleRef = name(^^match);
+# 		wordRef = "up";
+# 		childIndex = -1;                   # key to know what to say for each notation
+# 		::SpeakAfterMove = false;
 #   };
 
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-#           $NavCommand='MoveColumnStart' )
+# 		  $NavCommand='MoveCellDown' && has_next(^^match) )
+# => MoveCell {
+# 		ruleRef = name(^^match);
+# 		wordRef = "down";
+# 		::StartPosition = ^^^match[index(^^match)+1][-1][index(match)-count(^match)].dfs;
+# 		::EndPosition = ^^^match[index(^^match)+1][-1][index(match)-count(^match)].offset;
+#   };
+
+# # no previous child -- in first column -- don't move
+# char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
+# 		  $NavCommand='MoveCellDown' )
+# => MoveCell {
+# 		ruleRef = name(^^match);
+# 		wordRef = "down";
+# 		childIndex = -1;                   # key to know what to say for each notation
+# 		::SpeakAfterMove = false;
+#   };
+
+# char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
+# 			$NavCommand='MoveColumnStart' )
 # => MoveColStart {
-#       ruleRef = name(^^match);
-#       column = index(match);
-#       ::StartPosition = ^^^match[0][-1][index(match)-count(^match)].dfs;
-#       ::EndPosition = ^^^match[0][-1][index(match)-count(^match)].offset;
+# 		ruleRef = name(^^match);
+# 		column = index(match);
+# 		::StartPosition = ^^^match[0][-1][index(match)-count(^match)].dfs;
+# 		::EndPosition = ^^^match[0][-1][index(match)-count(^match)].offset;
 #   };
 
 # char ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-#           $NavCommand='MoveColumnEnd' )
+# 			$NavCommand='MoveColumnEnd' )
 # => MoveColEnd {
-#       ruleRef = name(^^match);
-#       column = index(match);
-#       ::StartPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].dfs;
-#       ::EndPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].offset;
+# 		ruleRef = name(^^match);
+# 		column = index(match);
+# 		::StartPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].dfs;
+# 		::EndPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].offset;
 #   };
 
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-#         has_parent(match) && name(^match)=="mscarries" &&
-#         ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious') && has_previous(match) )
+# 		  has_parent(match) && name(^match)=="mscarries" &&
+# 		  ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious') && has_previous(match) )
 # => MoveCell {
-#       ruleRef = name(^match);
-#       wordRef = "previous";
-#       ::StartPosition = previous(match).dfs;
-#       ::EndPosition = previous(match).offset;
+# 		ruleRef = name(^match);
+# 		wordRef = "previous";
+# 		::StartPosition = previous(match).dfs;
+# 		::EndPosition = previous(match).offset;
 #   };
 
 # # no previous child -- in first column -- don't move
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-#         has_parent(match) && name(^match)=="mscarries" &&
-#         ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious') )
+# 		  has_parent(match) && name(^match)=="mscarries" &&
+# 		  ($NavCommand="MovePrevious" || $NavCommand='MoveCellPrevious') )
 # => MoveCell {
-#       ruleRef = name(^match);
-#       wordRef = "previous";
-#       childIndex = -1;                   # key to know what to say for each notation
-#       ::SpeakAfterMove = false;
+# 		ruleRef = name(^match);
+# 		wordRef = "previous";
+# 		childIndex = -1;                   # key to know what to say for each notation
+# 		::SpeakAfterMove = false;
 #   };
 
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-#         has_parent(match) && name(^match)=="mscarries" &&
-#         ($NavCommand="MoveNext" || $NavCommand='MoveCellNext') && has_next(match) )
+# 		  has_parent(match) && name(^match)=="mscarries" &&
+# 		  ($NavCommand="MoveNext" || $NavCommand='MoveCellNext') && has_next(match) )
 # => MoveCell {
-#       ruleRef = name(^match);
-#       wordRef = "next";
-#       ::StartPosition = next(match).dfs;
-#       ::EndPosition = next(match).offset;
+# 		ruleRef = name(^match);
+# 		wordRef = "next";
+# 		::StartPosition = next(match).dfs;
+# 		::EndPosition = next(match).offset;
 #   };
 
 # # no next child -- in last column -- don't move
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-#         has_parent(match) && name(^match)=="mscarries" &&
-#         ($NavCommand="MoveNext" || $NavCommand='MoveCellNext') )
+# 		  has_parent(match) && name(^match)=="mscarries" &&
+# 		  ($NavCommand="MoveNext" || $NavCommand='MoveCellNext') )
 # => MoveCell {
-#       ruleRef = name(^match);
-#       wordRef = "next";
-#       childIndex = -1;                   # key to know what to say for each notation
-#       ::SpeakAfterMove = false;
+# 		ruleRef = name(^match);
+# 		wordRef = "next";
+# 		childIndex = -1;                   # key to know what to say for each notation
+# 		::SpeakAfterMove = false;
 #   };
 
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-#         has_parent(match) && name(^match)=="mscarries" &&
-#         $NavCommand='MoveCellUp' && has_previous(^match) )
+# 		  has_parent(match) && name(^match)=="mscarries" &&
+# 		  $NavCommand='MoveCellUp' && has_previous(^match) )
 # => MoveCell {
-#       ruleRef = name(^match);
-#       wordRef = "up";
-#       ::StartPosition = ^^match[index(^match)-1][index(match)-count(^match)].dfs;
-#       ::EndPosition = ^^match[index(^match)-1][index(match)-count(^match)].offset;
+# 		ruleRef = name(^match);
+# 		wordRef = "up";
+# 		::StartPosition = ^^match[index(^match)-1][index(match)-count(^match)].dfs;
+# 		::EndPosition = ^^match[index(^match)-1][index(match)-count(^match)].offset;
 #   };
 
 # # no previous child -- in first row -- don't move
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-#         has_parent(match) && name(^match)=="mscarries" &&
-#         $NavCommand='MoveCellUp' )
+# 		  has_parent(match) && name(^match)=="mscarries" &&
+# 		  $NavCommand='MoveCellUp' )
 # => MoveCell {
-#       ruleRef = name(^match);
-#       wordRef = "up";
-#       childIndex = -1;                   # key to know what to say for each notation
-#       ::SpeakAfterMove = false;
+# 		ruleRef = name(^match);
+# 		wordRef = "up";
+# 		childIndex = -1;                   # key to know what to say for each notation
+# 		::SpeakAfterMove = false;
 #   };
 
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-#         has_parent(match) && name(^match)=="mscarries" &&
-#         $NavCommand='MoveCellDown' && has_next(^match) )
+# 		  has_parent(match) && name(^match)=="mscarries" &&
+# 		  $NavCommand='MoveCellDown' && has_next(^match) )
 # => MoveCell {
-#       ruleRef = name(^match);
-#       wordRef = "down";
-#       ::StartPosition = ^^match[index(^match)+1][-1][index(match)-count(^match)].dfs;
-#       ::EndPosition = ^^match[index(^match)+1][-1][index(match)-count(^match)].offset;
+# 		ruleRef = name(^match);
+# 		wordRef = "down";
+# 		::StartPosition = ^^match[index(^match)+1][-1][index(match)-count(^match)].dfs;
+# 		::EndPosition = ^^match[index(^match)+1][-1][index(match)-count(^match)].offset;
 #   };
 
 # # no next child -- in last row -- don't move
 # any ? ( (name(match)=="mn" || name(match)=="none") &&
-#         has_parent(match) && name(^match)=="mscarries" &&
-#         $NavCommand='MoveCellDown' )
+# 		  has_parent(match) && name(^match)=="mscarries" &&
+# 		  $NavCommand='MoveCellDown' )
 # => MoveCell {
-#       ruleRef = name(^match);
-#       wordRef = "down";
-#       childIndex = -1;                   # key to know what to say for each notation
-#       ::SpeakAfterMove = false;
+# 		ruleRef = name(^match);
+# 		wordRef = "down";
+# 		childIndex = -1;                   # key to know what to say for each notation
+# 		::SpeakAfterMove = false;
 #   };
 
 # mn ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-#           $NavCommand='MoveColumnStart' )
+# 			$NavCommand='MoveColumnStart' )
 # => MoveColStart {
-#       ruleRef = name(^^match);
-#       column = index(match);
-#       ::StartPosition = ^^^match[0][-1][index(match)-count(^match)].dfs;
-#       ::EndPosition = ^^^match[0][-1][index(match)-count(^match)].offset;
+# 		ruleRef = name(^^match);
+# 		column = index(match);
+# 		::StartPosition = ^^^match[0][-1][index(match)-count(^match)].dfs;
+# 		::EndPosition = ^^^match[0][-1][index(match)-count(^match)].offset;
 #   };
 
 # mn ? ( has_parent(match, 2) && name(^match)=="mn" && name(^^match)=="msrow" &&
-#           $NavCommand='MoveColumnEnd' )
+# 			$NavCommand='MoveColumnEnd' )
 # => MoveColEnd {
-#       ruleRef = name(^^match);
-#       column = index(match);
-#       ::StartPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].dfs;
-#       ::EndPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].offset;
+# 		ruleRef = name(^^match);
+# 		column = index(match);
+# 		::StartPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].dfs;
+# 		::EndPosition = ^^^match[count(^^^match)-1][-1][index(match)-count(^match)].offset;
 #   };
 
 
@@ -1030,7 +1030,7 @@
       then:
       - x: "ancestor::m:mtd[1]" # try again on an mtd node
       else:
-      - t: "not in table"
+      - T: "fuera de tabla"
       - pause: long
       - set_variables: [{SpeakExpression: "'false'"}]
 
@@ -1094,11 +1094,11 @@
       then:
       - test:
         - if: "$NavCommand = 'MoveNext'"
-          then: [{t: "move"}]
+          then: [{T: "ir"}]
         - else_if: "$NavCommand = 'ReadNext'"
-          then: [{t: "read"}]
-          else: [{t: "describe"}]
-      - t: "right"
+          then: [{T: "leer"}]
+          else: [{T: "describir"}]
+      - T: "derecha"
       - pause: short
   - with:
       variables: [{MatchCounter: "$MatchCounter + 1"}]
@@ -1117,7 +1117,7 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse' and $NavCommand = 'MoveNext'"
       then:
-      - t: "cannot move right"
+      - T: "no puede desplazarse a la derecha"
   - with:
       variables: [{Move2D: "'end of'"}, {Child2D: "$EdgeNode/*[last()]"}]
       replace: [{x: "$EdgeNode"}]
@@ -1134,14 +1134,14 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
       then:
-      - t: "cannot"
+      - T: "no puede"
       - test:
         - if: "$NavCommand = 'MoveNext'"
-          then: [{t: "move"}]
+          then: [{T: "desplazarse"}]
         - else_if: "$NavCommand = 'ReadNext'"
-          then: [{t: "read"}]
-          else: [{t: "describe"}]
-      - t: "right, end of math"
+          then: [{T: "leer"}]
+          else: [{T: "describir"}]
+      - T: "derecha, finalizar cálculo"
       - pause: long
   - set_variables: [{SpeakExpression: "'false'"}]
 
@@ -1162,11 +1162,11 @@
       then:
       - test:
         - if: "$NavCommand = 'MoveNext'"
-          then: [{t: "move"}]
+          then: [{T: "desplazar"}]
         - else_if: "$NavCommand = 'ReadNext'"
-          then: [{t: "read"}]
-          else: [{t: "describe"}]
-      - t: "right"
+          then: [{T: "leer"}]
+          else: [{Ta: "describir"}]
+      - T: "derecha"
       - pause: short
   - with:
       variables: [{MatchCounter: "$MatchCounter + 1"}, {NavCommand: "'MoveNext'"}]
@@ -1197,7 +1197,7 @@
       # can't get here with MatchCounter=0, so no need to echo command
       if: "following-sibling::*"
       then:
-      - t: "column"
+      - T: "columna"
       - x: "count(preceding-sibling::*)+2"
       - pause: short
       - test:
@@ -1218,9 +1218,9 @@
       # can't get here with MatchCounter=0, so no need to echo command
       if: "following-sibling::*"
       then:
-      - t: "row"
+      - T: "fila"
       - x: "count(preceding-sibling::*)+2"
-      - t: "column 1"
+      - T: "columna 1"
       - pause: medium
       - test:
           if: "$NavMode = 'Character'"
@@ -1248,11 +1248,11 @@
       then:
       - test:
         - if: "$NavCommand = 'MoveNext'"
-          then: [{t: move}]
+          then: [{T: desplazar}]
         - else_if: "$NavCommand = 'ReadNext'"
-          then: [{t: "read"}]
-          else: [{t: "describe"}]
-      - t: "right"
+          then: [{T: "leer"}]
+          else: [{Ta: "describir"}]
+      - T: "derecha"
       - pause: short
   - set_variables: [{NavNode: "following-sibling::*[1]/*[2]/@id"}]
 
@@ -1269,11 +1269,11 @@
       then:
       - test:
         - if: "$NavCommand = 'MoveNext'"
-          then: [{t: move}]
+          then: [{T: desplazar}]
         - else_if: "$NavCommand = 'ReadNext'"
-          then: [{t: "read"}]
-          else: [{t: "describe"}]
-      - t: "right"
+          then: [{T: "leer"}]
+          else: [{T: "describir"}]
+      - T: "derecha"
       - pause: short
   - test:
       # if in base (nothing before), we must be moving to a script, so "in" will be said
@@ -1302,11 +1302,11 @@
       then:
       - test:
         - if: "$NavCommand = 'MoveNext'"
-          then: [{t: move}]
+          then: [{T: desplazar}]
         - else_if: "$NavCommand = 'ReadNext'"
-          then: [{t: "read"}]
-          else: [{t: "describe"}]
-      - t: "right"
+          then: [{T: "leer"}]
+          else: [{T: "describir"}]
+      - T: "derecha"
       - pause: short
   - test:
       if: "IsNode(.., '2D')"
@@ -1330,11 +1330,11 @@
       then:
       - test:
         - if: "$NavCommand = 'MovePrevious'"
-          then: [{t: "move"}]
+          then: [{T: "desplazar"}]
         - else_if: "$NavCommand = 'ReadPrevious'"
-          then: [{t: "read"}]
-          else: [{t: "describe"}]
-      - t: "left"
+          then: [{T: "leer"}]
+          else: [{T: "describir"}]
+      - T: "izquierda"
       - pause: short
   - with:
       variables: [{MatchCounter: "$MatchCounter + 1"}]
@@ -1354,7 +1354,7 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse' and $NavCommand = 'MovePrevious'"
       then:
-      - t: "cannot move left"
+      - T: "no puede desplazarse a la izquierda"
   - with:
       variables: [{Move2D: "'end of'"}, {Child2D: "$EdgeNode/*[1]"}]
       replace: [{x: "$EdgeNode"}]
@@ -1367,7 +1367,7 @@
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
   - "(self::m:math or EdgeNode(., 'left', 'math')/@id!=@id)"
   replace:
-  - t: "start of math"
+  - T: "iniciar cálculo"
   - pause: long
   - set_variables: [{SpeakExpression: "'false'"}]
 
@@ -1381,7 +1381,7 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
       then:
-      - t: "cannot move left, start of math"
+      - T: "no puede desplazarse a la izquierda, iniciar cálculo"
       - pause: long
   - set_variables: [{SpeakExpression: "'false'"}]
 
@@ -1402,11 +1402,11 @@
       then:
       - test:
         - if: "$NavCommand = 'MovePrevious'"
-          then: [{t: "move"}]
+          then: [{T: "desplazarse"}]
         - else_if: "$NavCommand = 'ReadPrevious'"
-          then: [{t: "read"}]
-          else: [{t: "describe"}]
-      - t: "left"
+          then: [{T: "leer"}]
+          else: [{T: "describir"}]
+      - T: "izquierda"
       - pause: short
   - with:
       variables: [{MatchCounter: "$MatchCounter + 1"}, {NavCommand: "'MovePrevious'"}]
@@ -1444,11 +1444,11 @@
       then:
       - test:
         - if: "$NavCommand = 'MovePrevious'"
-          then: [{t: move}]
+          then: [{T: desplazarse}]
         - else_if: "$NavCommand = 'ReadPrevious'"
-          then: [{t: "read"}]
-          else: [{t: "describe"}]
-      - t: "left"
+          then: [{T: "leer"}]
+          else: [{T: "describir"}]
+      - T: "izquierda"
       - pause: short
   - set_variables: [{NavNode: "preceding-sibling::*[1]/*[2]/@id"}]
 
@@ -1462,7 +1462,7 @@
       # can't get here with MatchCounter=0, so no need to echo command
       if: "preceding-sibling::*"
       then:
-      - t: "column"
+      - T: "columna"
       - x: "count(preceding-sibling::*)"
       - pause: short
       - test:
@@ -1483,9 +1483,9 @@
       # can't get here with MatchCounter=0, so no need to echo command
       if: "preceding-sibling::*"
       then:
-      - t: "row"
+      - T: "fila"
       - x: "count(preceding-sibling::*)"
-      - t: "column"
+      - T: "columna"
       - x: "count(*)"
       - pause: medium
       - test:
@@ -1521,11 +1521,11 @@
           then:
           - test:
             - if: "$NavCommand = 'MovePrevious'"
-              then: [{t: move}]
+              then: [{T: desplazarse}]
             - else_if: "$NavCommand = 'ReadPrevious'"
-              then: [{t: "read"}]
-              else: [{t: "describe"}]
-          - t: "left"
+              then: [{T: "leer"}]
+              else: [{T: "describir"}]
+          - T: "izquierda"
           - pause: short
       - with:
           variables: [{Move2D: "'in'"}, {Child2D: "preceding-sibling::*[1]"}]
@@ -1543,11 +1543,11 @@
       then:
       - test:
         - if: "$NavCommand = 'MovePrevious'"
-          then: [{t: move}]
+          then: [{T: desplazarse}]
         - else_if: "$NavCommand = 'ReadPrevious'"
-          then: [{t: "read"}]
-          else: [{t: "describe"}]
-      - t: "left"
+          then: [{T: "leer"}]
+          else: [{T: "describir"}]
+      - T: "izquierda"
       - pause: short
   - test:
       if: "IsNode(.., '2D')"
@@ -1569,16 +1569,16 @@
   - test:
     - if: "$NavMode = 'Enhanced'"
       then:
-      - t: "character"
-      - set_variables: [{NavMode: "'Character'"}, {ReadZoomLevel: "1"}]
+      - T: "carácter"
+		- set_variables: [{NavMode: "'Character'"}, {ReadZoomLevel: "1"}]
     - else_if: "$NavMode = 'Character'"
       then:
-      - t: "simple"
+      - T: "simple"
       - set_variables: [{NavMode: "'Simple'"}, {ReadZoomLevel: "1"}]
     - else:
-      - t: "enhanced"
+      - T: "aumentado"
       - set_variables: [{NavMode: "'Enhanced'"}, {ReadZoomLevel: "-1"}]
-  - t: "mode"
+  - T: "modo"
   - pause: long
   - test:
     - if: "$NavMode != 'Enhanced'" # potentially need to zoom to the sibling
@@ -1594,16 +1594,16 @@
   - test:
     - if: "$NavMode = 'Enhanced'"
       then:
-      - t: "simple"
+      - T: "simple"
       - set_variables: [{NavMode: "'Simple'"}, {ReadZoomLevel: "1"}]
     - else_if: "$NavMode = 'Character'"
       then:
-      - t: "enhanced"
+      - T: "aumentado"
       - set_variables: [{NavMode: "'Enhanced'"}, {ReadZoomLevel: "-1"}]
     - else:
-      - t: "character"
+      - T: "carácter"
       - set_variables: [{NavMode: "'Character'"}, {ReadZoomLevel: "1"}]
-  - t: "mode"
+  - T: "modo"
   - pause: long
   - test:
     - if: "$NavMode != 'Enhanced'" # potentially need to zoom to the sibling
@@ -1619,10 +1619,10 @@
   - test:
       if: "$Overview = 'true'"
       then:
-      - t: "speak expression after move"
+      - T: "pronunciar expresión tras desplazarse"
       - set_variables: [{Overview: "'false'"}]
       else:
-      - t: "overview of expression after move"
+      - T: "resumen de la expresión tras desplazarse"
       - set_variables: [{Overview: "'true'"}]
   - pause: long
 
@@ -1635,9 +1635,9 @@
       then:
       - test:
         - if: "$NavCommand = 'ReadCurrent'"
-          then: [{t: "read "}]
-          else: [{t: "describe"}]
-      - t: "current"
+          then: [{Ta: "leer"}]
+          else: [{T: "describir"}]
+      - T: "actual"
   - set_variables: [{NavNode: "@id"}]
   - pause: long
 
@@ -1655,13 +1655,13 @@
       then:
       - test:
         - if: "starts-with($NavCommand, 'Read')"
-          then: [{t: "read"}]
+          then: [{T: "leer"}]
         - else_if: "starts-with($NavCommand, 'Describe')"
-          then: [{t: "describe"}]
+          then: [{T: "describir"}]
         - else_if: "starts-with($NavCommand, 'MoveTo')"
-          then: [{t: "move to "}]
-          else: [{t: "set"}]
-      - t: "placeholder"
+          then: [{T: "desplazarse a"}]
+          else: [{T: "conjunto"}]
+      - T: "marcador de posición"
       - x: "$PlaceMarkerIndex"
       - pause: long
   - set_variables: [{NavNode: "$PlaceMarker"}]
@@ -1673,7 +1673,7 @@
   - test:
       if: "$NavVerbosity != 'Terse'"
       then:
-      - t: "set placeholder"
+      - T: "insertar marcador de posición"
       - x: "$PlaceMarkerIndex"
       - pause: long
   - set_variables: [{NavNode: "@id"}]
@@ -1707,11 +1707,11 @@
   - test:
       if: "$NavCommand = 'WhereAmI'"
       then:
-      - t: "inside of nothing more"
+      - T: "interior vacío"
       - pause: long
       - set_variables: [{SpeakExpression: "'false'"}]
       else:
-      - t: "inside"
+      - T: "interior"
       - pause: medium
   - set_variables: [{NavNode: "@id"}]
 
@@ -1719,7 +1719,7 @@
   tag: "*"
   match: "$NavCommand = 'WhereAmI' or $NavCommand = 'WhereAmIAll'"
   replace:
-  - t: "inside"
+  - T: "interior"
   - pause: medium
   - test:
     - if: "$NavMode='Enhanced' and parent::*[self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"
