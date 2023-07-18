@@ -329,7 +329,7 @@ denominator and left arrow will land on the entire fraction.
 You will likely find one mode of navigation the most natural for you most of the time.
 This can be set in the MathCAT settings.
 However, at any time during navigation, you can switch the navigation modes using `shift+up/down arrow`.
-This is useful because it each mode of navigation has its strengths and weaknesses.
+This is useful because each mode of navigation has its strengths and weaknesses.
 
 ## Acknowledgements
 A version of this document was produced as part of the ClearSpeak project.
