@@ -523,17 +523,23 @@
 # the pausing logic is pushed down to the <mtd>
 # the rules either speak the <mtr>s (to get "row n") or the <mtd>s. "column n" spoken if $IsColumnSilent is false
 - name: 1x1-matrix
-  tag: [matrix, determinant]
+  tag: matrix
+  variables: [{IsColumnSilent: true()}]
+  match: "count(*)=1 and *[self::m:mtr][count(*) = 1]"
+  replace:
+  - OT: "la"
+  - T: "matriz 1 por 1"
+  - T: "con acceso"
+  - x: "*[1]/*"
+
+- name: 1x1-determinant
+  tag: determinant
   variables: [{IsColumnSilent: true()}]
   match: "count(*)=1 and *[self::m:mtr][count(*) = 1]"
   replace:
   - OT: "el"
-  - T: 1 por 1
-  - test:
-      if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
-      then: {T: determinante}
-      else: {T: matriz}
-  - T: con acceso
+  - T: "determinante 1 por 1"
+  - T: "con acceso"
   - x: "*[1]/*"
 
 # simpler reading methods for smaller matrices if the entries are simple
@@ -546,13 +552,12 @@
   - count(*)<=3 and # at least two rows
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   replace:
-  - T: la
-  - x: count(*)
-  - T: por 1 columna
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: vector}
-      else: {T: matriz}
+      then: {T: "el vector columna"}
+      else: {T: "la matriz columna"}
+  - x: count(*)
+  - T: "por 1 columna"
   - pause: long
   - x: "*/*"
   - test:
@@ -569,13 +574,12 @@
   variables: [{IsColumnSilent: true()}]
   match: "*[self::m:mtr][count(*) = 1]"
   replace:
-  - T: la
-  - x: "count(*)"
-  - T: por 1 columna
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: vector}
-      else: {T: matriz}
+      then: {T: "el vector"}
+      else: {T: "la matriz"}
+  - x: "count(*)"
+  - T: "por 1 columna"
   - pause: long
   - x: "*" # select the rows (mtr)
   - test:
@@ -591,13 +595,13 @@
   - count(*[1]/*)<=3 and # at least two cols
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   replace:
-  - T: el 1 por
-  - x: count(*/*)
-  - T: "fila"
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: vector}
-      else: {T: matriz}
+      then: {T: "el vector"}
+      else: {T: "la matriz"}
+  - T: "1 por"
+  - x: count(*/*)
+  - T: "fila"
   - pause: long
   - x: "*/*"
   - test:
@@ -614,15 +618,14 @@
   variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
   match: "count(*)=1" # one row
   replace:
-  - T: el 1 por
-  - x: "count(*/*)"
-  - T: "fila"
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: vector}
-      else: {T: matriz}
+      then: {T: "el vector"}
+      else: {T: "la matriz"}
+  - T: "1 por"
+  - x: "count(*/*)"
+  - T: "fila"
   - pause: long
-  - pause: medium
   - x: "*/*" # select the cols (mtd)
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
@@ -641,14 +644,13 @@
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum'"}]
   replace:
-  - T: la
+  - test:
+      if: "self::m:determinant"
+      then: {T: "el determinante"}
+      else: {T: "la matriz"}
   - x: count(*)
   - T: por
   - x: count(*[self::m:mtr][1]/*)
-  - test:
-      if: "self::m:determinant"
-      then: {T: determinante}
-      else: {T: matriz}
   - pause: long
   - x: "*"
   - test:
@@ -657,22 +659,21 @@
       - T: fin
       - test:
           if: "self::m:determinant"
-          then: {T: determinante}
-          else: {T: matriz}
+          then: {T: "determinante"}
+          else: {T: "matriz"}
 
 - name: default-matrix
   tag: [matrix, determinant]
   variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
   match: "not(@data-intent-property)"
   replace:
-  - T: la
+  - test:
+      if: "self::m:determinant"
+      then: {T: "el determinante"}
+      else: {T: "la matriz"}
   - x: "count(*)"
   - T: por
   - x: "count(*[self::m:mtr][1]/*)"
-  - test:
-      if: "self::m:determinant"
-      then: {T: determinante}
-      else: {T: matriz}
   - pause: long
   - x: "*"
   - test:
