@@ -1820,6 +1820,7 @@ pub struct SpeechRulesWithContext<'c, 's:'c, 'm:'c> {
     doc: Document<'m>,
     nav_node_id: String,
     pub inside_spell: bool,     // hack to allow 'spell' to avoid infinite loop (see 'spell' implementation in tts.rs)
+    pub translate_count: usize, // hack to avoid 'translate' infinite loop (see 'spell' implementation in tts.rs)
 }
 
 impl<'c, 's:'c, 'm:'c> fmt::Display for SpeechRulesWithContext<'c, 's,'m> {
@@ -2079,6 +2080,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
             doc,
             nav_node_id,
             inside_spell: false,
+            translate_count: 0,
         }
     }
 

@@ -86,6 +86,8 @@ const PAUSE_AUTO:f64 = 987654321.5;   // ms -- hopefully unique
 pub const PAUSE_AUTO_STR: &str = "\u{F8FA}\u{F8FA}";
 const RATE_FROM_CONTEXT:f64 = 987654321.5;   // hopefully unique
 
+const MAX_TRANSLATE_RECURSION: usize = 5;   // probably never more than three -- prevents infinite loop/stack overflows bugs
+
 /// TTSCommand are the supported TTS commands
 /// When parsing the YAML rule files, they are converted to these enums
 #[derive(Debug, Clone, PartialEq, Eq, Display, EnumString)]
@@ -382,10 +384,15 @@ impl TTS {
                     // That in turns calls spell again. We end up in an infinite loop. To prevent this we set a flag that says don't recurse.
                     // The only structure to put that in is SpeechRulesWithContext. A bit of a hack to put it there, but better than a static var.
                     // Also, to avoid repeating the code for "cap" over and over, "spell" with "translate" is used. So keep going until no "translate"
-                    if rules_with_context.inside_spell && xpath.test_input(|input| !input.contains("translate")) {
+                    let xpath_str = xpath.to_string();
+                    if rules_with_context.inside_spell && !xpath_str.contains("translate") {
                         command.value = TTSCommandValue::String(value_string);
+                        rules_with_context.translate_count  = 0;
+                    } else if rules_with_context.translate_count > MAX_TRANSLATE_RECURSION {
+                        bail!("Rule error: potential infinite recursion found in translate: {}", xpath_str);
                     } else {
                         // let the call to replace call spell on the individual chars -- that lets an "cap" be outside "spell"
+                        rules_with_context.translate_count += 1;
                         let str_with_spaces = value_string.chars()
                                 .map(|ch| {
                                     rules_with_context.inside_spell = true;
