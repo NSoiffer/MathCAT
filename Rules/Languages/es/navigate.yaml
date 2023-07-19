@@ -108,7 +108,7 @@
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
       then: [{T: "base"}]
-      else: [{T: "límite inferior
+      else: [{T: "límite inferior"}]
   - pause: "medium"
 
 - name: into-or-out-of
@@ -306,18 +306,18 @@
     - if: "self::m:mtr or self::m:mlabeledtr"
       then:
       - with:
-          variables: [{Move2D: "'in'"}, {Child2D: "*[1]/*[1]"}]
+          variables: [{Move2D: "'en'"}, {Child2D: "*[1]/*[1]"}]
           replace: [{x: "."}]
       - set_variables: [{NavNode: "*[1]/*[1]/@id"}] # skip mtd
     - else_if: "*[1][self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]" # auto zoom
       then:
       - with:
-          variables: [{Move2D: "'in'"}, {Child2D: "*[1]/*[2]"}]
+          variables: [{Move2D: "'en'"}, {Child2D: "*[1]/*[2]"}]
           replace: [{x: "."}]
       - set_variables: [{NavNode: "*[1]/*[2]/@id"}] # skip mtd
       else:
       - with:
-          variables: [{Move2D: "'in'"}, {Child2D: "*[1]"}]
+          variables: [{Move2D: "'en'"}, {Child2D: "*[1]"}]
           replace: [{x: "."}]
       - set_variables: [{NavNode: "*[1]/@id"}]
 
@@ -329,7 +329,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [{T: "zoom cerca"}, {pause: "long"}]
   - with:
-      variables: [{Move2D: "'in'"}, {Child2D: "*[1]"}]
+      variables: [{Move2D: "'en'"}, {Child2D: "*[1]"}]
       replace: [{x: "."}]
   - with:
       variables: [{MatchCounter: "$MatchCounter + 1"}, {NavCommand: "'MoveNextZoom'"}]
@@ -343,7 +343,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [{T: "zoom cerca"}, {pause: "long"}]
   - with:
-      variables: [{Move2D: "'in'"}, {Child2D: "*[1]"}]
+      variables: [{Move2D: "'en'"}, {Child2D: "*[1]"}]
       replace: [{x: "."}]
   - test:
       if: "self::m:mtd"
@@ -363,7 +363,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [{T: "zoom totalmente cerca"}, {pause: "medium"}]
   - with:
-      variables: [{Move2D: "'in'"}, {Child2D: "*[1]"}]
+      variables: [{Move2D: "'en'"}, {Child2D: "*[1]"}]
       replace: [{x: "."}]
   - with:
       variables: [{MatchCounter: "$MatchCounter + 1"}]
@@ -403,7 +403,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
       then: [{T: "zoom totalmente alejado"}, {pause: "medium"}]
   - with:
-      variables: [{Move2D: "'out of'"}, {Child2D: "."}]
+      variables: [{Move2D: "'furera de'"}, {Child2D: "."}]
       replace: [{x: ".."}]
   - with:
       variables: [{MatchCounter: "$MatchCounter + 1"}]
@@ -420,7 +420,7 @@
   replace:
   # don't bother with MatchCounter since we only get here if > 1
   - with:
-      variables: [{Move2D: "'in'"}, {Child2D: "*[1]"}]
+      variables: [{Move2D: "'en'"}, {Child2D: "*[1]"}]
       replace: [{x: "."}]
   - test:
     - if: "count(*)> 1 or IsNode(., 'leaf') or self::m:msqrt or self::m:menclose"
@@ -437,12 +437,12 @@
       if: "$ReadZoomLevel >= DistanceFromLeaf(., false, $NavMode!='Character')"
       then:
       # - with:
-      #     variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]
+      #     variables: [Move2D: "'en'", Child2D: "following-sibling::*[1]"]
       #     replace: [x: ".."]
       - set_variables: [{NavNode: "@id"}]
       else:
       - with:
-          variables: [{Move2D: "'in'"}, {Child2D: "*[1]"}]
+          variables: [{Move2D: "'en'"}, {Child2D: "*[1]"}]
           replace: [{x: "."}]
       - x: "*[1]"
 
@@ -456,12 +456,12 @@
       if: "$ReadZoomLevel >= DistanceFromLeaf(., true, $NavMode!='Character')"
       then:
       # - with:
-      #     variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]
+      #     variables: [Move2D: "'en'", Child2D: "preceding-sibling::*[1]"]
       #     replace: [x: ".."]
       - set_variables: [{NavNode: "@id"}]
       else:
       - with:
-          variables: [{Move2D: "'in'"}, {Child2D: "*[last()]"}]
+          variables: [{Move2D: "'en'"}, {Child2D: "*[last()]"}]
           replace: [{x: "."}]
       - x: "*[last()]"
 
@@ -498,7 +498,7 @@
           then: [{x: ".."}] # auto-zoom: move out a level and retry
           else:
           - with:
-              variables: [{Move2D: "'out of'"}, {Child2D: "."}]
+              variables: [{Move2D: "'furera de'"}, {Child2D: "."}]
               replace: [{x: ".."}]
           - test:
               if: "parent::m:mtd"
@@ -666,7 +666,7 @@
               - T: "fila"
               - x: "count(../preceding-sibling::*)"
               - pause: short
-              - Ta: "columna"
+              - T: "columna"
               - x: "count(preceding-sibling::*)+1"
               - pause: medium
           - test:
@@ -678,7 +678,7 @@
               else:
               - set_variables: [{NavNode: "../preceding-sibling::*[1]/*[$Column]/*[1]/@id"}]
       else:
-     - T: "ninguna fila anterior"
+      - T: "ninguna fila anterior"
       - set_variables: [{SpeakExpression: "'false'"}]
 
 - name: move-cell-down
@@ -1052,7 +1052,7 @@
           then: [x: "$Following"]
           else:
           - with:
-              variables: [{Move2D: "'in'"}, {Child2D: "$Following"}]
+              variables: [{Move2D: "'en'"}, {Child2D: "$Following"}]
               replace: [x: ".."]
           - with:
               variables: [{NavCommand: "'MoveNextZoom'"}]
@@ -1074,7 +1074,7 @@
           then: [x: "$Preceding"]
           else:
           - with:
-              variables: [{Move2D: "'in'"}, {Child2D: "$Preceding"}]
+              variables: [{Move2D: "'en'"}, {Child2D: "$Preceding"}]
               replace: [x: ".."]
           - with:
               variables: [{NavCommand: "'MovePreviousZoom'"}]
@@ -1165,7 +1165,7 @@
           then: [{T: "desplazar"}]
         - else_if: "$NavCommand = 'ReadNext'"
           then: [{T: "leer"}]
-          else: [{Ta: "describir"}]
+          else: [{T: "describir"}]
       - T: "derecha"
       - pause: short
   - with:
@@ -1175,11 +1175,11 @@
           if: "following-sibling::*"
           then:
           - with:
-              variables: [{Move2D: "'in'"}, {Child2D: "."}]
+              variables: [{Move2D: "'en'"}, {Child2D: "."}]
               replace: [{x: ".."}]
           else:
           - with:
-              variables: [{Move2D: "'out of'"}, {Child2D: "."}]
+              variables: [{Move2D: "'furera de'"}, {Child2D: "."}]
               replace: [{x: ".."}]
       - test:
           if: "following-sibling::*"
@@ -1251,7 +1251,7 @@
           then: [{T: desplazar}]
         - else_if: "$NavCommand = 'ReadNext'"
           then: [{T: "leer"}]
-          else: [{Ta: "describir"}]
+          else: [{T: "describir"}]
       - T: "derecha"
       - pause: short
   - set_variables: [{NavNode: "following-sibling::*[1]/*[2]/@id"}]
@@ -1280,14 +1280,14 @@
       if: "preceding-sibling::* and following-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [{Move2D: "'out of'"}, {Child2D: "."}]
+          variables: [{Move2D: "'furera de'"}, {Child2D: "."}]
           replace: [{x: ".."}]
       - with:
           variables: [{MatchCounter: "$MatchCounter + 1"}]
           replace: [x: "following-sibling::*[1]"]          # skip over 'none'
       else:
       - with:
-          variables: [{Move2D: "'in'"}, {Child2D: "following-sibling::*[1]"}]
+          variables: [{Move2D: "'en'"}, {Child2D: "following-sibling::*[1]"}]
           replace: [{x: ".."}]
       - with:
           variables: [{MatchCounter: "$MatchCounter + 1"}, {NavCommand: "'MoveNextZoom'"}]
@@ -1312,7 +1312,7 @@
       if: "IsNode(.., '2D')"
       then:
       - with:
-          variables: [{Move2D: "'in'"}, {Child2D: "following-sibling::*[1]"}]
+          variables: [{Move2D: "'en'"}, {Child2D: "following-sibling::*[1]"}]
           replace: [{x: ".."}]
   - set_variables: [{NavNode: "following-sibling::*[1]/@id"}]
 
@@ -1415,11 +1415,11 @@
           if: "preceding-sibling::*"
           then:
           - with:
-              variables: [{Move2D: "'in'"}, {Child2D: "."}]
+              variables: [{Move2D: "'en'"}, {Child2D: "."}]
               replace: [{x: ".."}]
           else:
           - with:
-              variables: [{Move2D: "'out of'"}, {Child2D: "."}]
+              variables: [{Move2D: "'furera de'"}, {Child2D: "."}]
               replace: [{x: ".."}]
       - test:
           if: "preceding-sibling::*"
@@ -1510,7 +1510,7 @@
       if: "count(preceding-sibling::*) > 2 and preceding-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [{Move2D: "'out of'"}, {Child2D: "."}]
+          variables: [{Move2D: "'furera de'"}, {Child2D: "."}]
           replace: [{x: ".."}]
       - with:
           variables: [{MatchCounter: "$MatchCounter + 1"}]
@@ -1528,7 +1528,7 @@
           - T: "izquierda"
           - pause: short
       - with:
-          variables: [{Move2D: "'in'"}, {Child2D: "preceding-sibling::*[1]"}]
+          variables: [{Move2D: "'en'"}, {Child2D: "preceding-sibling::*[1]"}]
           replace: [{x: ".."}]
       - with:
           variables: [{MatchCounter: "$MatchCounter + 1"}, {NavCommand: "'MovePreviousZoom'"}]
@@ -1553,7 +1553,7 @@
       if: "IsNode(.., '2D')"
       then:
       - with:
-          variables: [{Move2D: "'in'"}, {Child2D: "preceding-sibling::*[1]"}]
+          variables: [{Move2D: "'en'"}, {Child2D: "preceding-sibling::*[1]"}]
           replace: [{x: ".."}]
   - set_variables: [{NavNode: "preceding-sibling::*[1]/@id"}]
 
@@ -1570,7 +1570,7 @@
     - if: "$NavMode = 'Enhanced'"
       then:
       - T: "carácter"
-		- set_variables: [{NavMode: "'Character'"}, {ReadZoomLevel: "1"}]
+      - set_variables: [{NavMode: "'Character'"}, {ReadZoomLevel: "1"}]
     - else_if: "$NavMode = 'Character'"
       then:
       - T: "simple"
@@ -1635,7 +1635,7 @@
       then:
       - test:
         - if: "$NavCommand = 'ReadCurrent'"
-          then: [{Ta: "leer"}]
+          then: [{T: "leer"}]
           else: [{T: "describir"}]
       - T: "actual"
   - set_variables: [{NavNode: "@id"}]
