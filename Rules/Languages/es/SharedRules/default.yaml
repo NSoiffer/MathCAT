@@ -368,13 +368,13 @@
   - test:
       if: count(*)=1
       then: [T: "fila"]
-      else: [T: "fila"]
+      else: [T: "filas"]
   - T: y
   - x: "count(*[1]/*)"
   - test:
       if: "count(*[1]/*)=1"
       then: [T: "columna"]
-      else: [t: "columns"]
+      else: [t: "columnas"]
   - pause: long
   - x: "*"
 
