@@ -542,7 +542,7 @@ fn simple_absolute_value() {
   test("en", "SimpleSpeak", expr, "the absolute value of x,");
   test("en", "ClearSpeak",  expr, "the absolute value of x,");
   test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse"), ("ClearSpeak_AbsoluteValue", "Auto")], expr, "absolute value of x,");
-  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_AbsoluteValue", "Auto")],
+  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_AbsoluteValue", "AbsEnd")],
              expr, "the absolute value of x, end absolute value,");
 }
   
