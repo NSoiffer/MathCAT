@@ -800,7 +800,6 @@ impl PreferenceManager {
             panic!("Internal error: set_user_prefs called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
-        self.user_prefs.set_string_value(name, value);
         if name == "Language" || name == "SpeechStyle" || name == "BrailleCode" {
             let old_speech = self.speech.clone();
             let old_speech_unicode= self.speech_unicode.clone();
@@ -811,6 +810,7 @@ impl PreferenceManager {
             let old_intent= self.intent.clone();
             let old_defs= self.defs.clone();
 
+            self.user_prefs.set_string_value(name, value);
             if let Some(rules_dir) = self.rules_dir.clone() {
                 self.set_all_files(&rules_dir, self.user_prefs.clone(), self.pref_files.clone()).unwrap();
                 let changed = FilesChanged {
@@ -825,6 +825,8 @@ impl PreferenceManager {
                 };
                 return Some(changed);
             }
+        } else {
+            self.user_prefs.set_string_value(name, value);
         }
         return None;
     }
