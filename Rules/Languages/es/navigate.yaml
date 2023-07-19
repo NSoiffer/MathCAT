@@ -403,7 +403,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
       then: [{T: "zoom totalmente alejado"}, {pause: "medium"}]
   - with:
-      variables: [{Move2D: "'furera de'"}, {Child2D: "."}]
+      variables: [{Move2D: "'fuera de'"}, {Child2D: "."}]
       replace: [{x: ".."}]
   - with:
       variables: [{MatchCounter: "$MatchCounter + 1"}]
@@ -498,7 +498,7 @@
           then: [{x: ".."}] # auto-zoom: move out a level and retry
           else:
           - with:
-              variables: [{Move2D: "'furera de'"}, {Child2D: "."}]
+              variables: [{Move2D: "'fuera de'"}, {Child2D: "."}]
               replace: [{x: ".."}]
           - test:
               if: "parent::m:mtd"
@@ -1179,7 +1179,7 @@
               replace: [{x: ".."}]
           else:
           - with:
-              variables: [{Move2D: "'furera de'"}, {Child2D: "."}]
+              variables: [{Move2D: "'fuera de'"}, {Child2D: "."}]
               replace: [{x: ".."}]
       - test:
           if: "following-sibling::*"
@@ -1280,7 +1280,7 @@
       if: "preceding-sibling::* and following-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [{Move2D: "'furera de'"}, {Child2D: "."}]
+          variables: [{Move2D: "'fuera de'"}, {Child2D: "."}]
           replace: [{x: ".."}]
       - with:
           variables: [{MatchCounter: "$MatchCounter + 1"}]
@@ -1419,7 +1419,7 @@
               replace: [{x: ".."}]
           else:
           - with:
-              variables: [{Move2D: "'furera de'"}, {Child2D: "."}]
+              variables: [{Move2D: "'fuera de'"}, {Child2D: "."}]
               replace: [{x: ".."}]
       - test:
           if: "preceding-sibling::*"
@@ -1510,7 +1510,7 @@
       if: "count(preceding-sibling::*) > 2 and preceding-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [{Move2D: "'furera de'"}, {Child2D: "."}]
+          variables: [{Move2D: "'fuera de'"}, {Child2D: "."}]
           replace: [{x: ".."}]
       - with:
           variables: [{MatchCounter: "$MatchCounter + 1"}]
