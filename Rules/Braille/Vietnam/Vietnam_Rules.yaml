@@ -253,7 +253,20 @@
    match: "."
    replace:
    - x: "BrailleChars(., 'UEB')"
-      
+
+- 
+   name: sin
+   tag: mi
+   match: "text()='sin'"
+   replace:
+   - t: "⠻⠎"
+   
+- 
+   name: cos
+   tag: mi
+   match: "text()='cos'"
+   replace:
+   - t: "⠻⠉"
 
 -
    # FIX: need to deal with all caps
