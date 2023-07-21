@@ -203,7 +203,7 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "mayúscula"]              	# 	(en: 'cap', google translation)
+            then: [T: "mayúscula"]              	# 	(en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
@@ -358,7 +358,7 @@
  - "⃒": [T: "línea vertical larga con ornamentación superpuesta"]	#  0x20d2	(en: 'long vertical line overlay embellishment', google translation)
  - "⃓": [T: "línea vertical corta con ornamentación superpuesta"]	#  0x20d3	(en: 'short vertical line overlay embellishment', google translation)
  - "⃔": [T: "flecha en sentido contrario a las agujas del reloj por encima de la ornamentación"]	#  0x20d4	(en: 'anticlockwise arrow above embellishment', google translation)
- - "⃕": [t: "flecha en el sentido de las agujas del reloj por encima de la ornamentación"]	#  0x20d5	(en: 'clockwise arrow above embellishment', google translation)
+ - "⃕": [T: "flecha en el sentido de las agujas del reloj por encima de la ornamentación"]	#  0x20d5	(en: 'clockwise arrow above embellishment', google translation)
  - "⃖": [T: "flecha izquierda por encima de la ornamentación"]	#  0x20d6	(en: 'left arrow above embellishment', google: 'flecha izquierda por encima del adorno')
  - "⃗": [T: "flecha derecha por encima de la ornamentación"]           	#  0x20d7	(en: 'right arrow above embellishment', google: 'flecha derecha por encima del adorno')
  - "⃘": [T: "ornamentación superpuesta al anillo"]   	#  0x20d8	(en: 'ring overlay embellishment', google translation)
@@ -454,8 +454,8 @@
  - "⅔": [T: "dos tercios"]                      	#  0x2154	(en: 'two thirds', SRE: 'Fracción vulgar dos tercios')
  - "⅕": [T: "un quinto"]                        	#  0x2155	(en: 'one fifth', SRE: 'Vulgar Fraction One Fifth')
  - "⅖": [T: " franción comúndos quintos"]      	#  0x2156	(en: 'two fifths', MathPlayer: 'dos quintos', google: 'dos quintas partes')
- - "⅗": [t: " fracción común tres quintos"]                     	#  0x2157	(en: 'three fifths', SRE: 'Fracción vulgar tres quintos')
- - "⅘": [t: " fracción común cuatro quintos"]                   	#  0x2158	(en: 'four fifths', SRE: 'Fracción vulgar cuatro quintos')
+ - "⅗": [T: " fracción común tres quintos"]                     	#  0x2157	(en: 'three fifths', SRE: 'Fracción vulgar tres quintos')
+ - "⅘": [T: " fracción común cuatro quintos"]                   	#  0x2158	(en: 'four fifths', SRE: 'Fracción vulgar cuatro quintos')
  - "⅙": [T: "un sexto"]                         	#  0x2159	(en: 'one sixth', SRE: 'Vulgar Fracción Un Sexto')
  - "⅚": [T: "cinco sextos"]                     	#  0x215a	(en: 'five sixths', SRE: 'Vulgar fracción cinco sextos')
  - "⅛": [T: "fracción común un octavo"]        	#  0x215b	(en: 'one eighth', MathPlayer: 'un octavo', google: 'un ath')
@@ -463,7 +463,7 @@
  - "⅝": [T: "fracción común cinco octavos"]    	#  0x215d	(en: 'five eighths', MathPlayer: 'cinco octavos', google: 'cinco ats')
  - "⅞": [T: "fracción común siete octavos"]    	#  0x215e	(en: 'seven eighths', MathPlayer: 'siete octavos', google: 'siete ats')
  - "⅟": [T: "Numerador de fracción uno"]      	#  0x215f	(en: 'one over', google: 'uno sobre')
- - "Ⅰ": [t: "Ⅰ"]                                	#  0x2160	(en: 'I', google translation)
+ - "Ⅰ": [T: "Ⅰ"]                                	#  0x2160	(en: 'I', google translation)
  - "Ⅱ": [T: "T"]                                	#  0x2161	(en: 'I I', google translation)
  - "Ⅲ": [T: "III"]                            	#  0x2162	(en: 'I I I', google translation)
  - "Ⅳ": [T: "IV"]                              	#  0x2163	(en: 'I V', google translation)
@@ -474,26 +474,26 @@
  - "Ⅸ": [T: "IX"]                              	#  0x2168	(en: 'I X', google translation)
  - "Ⅹ": [T: "XI"]                              	#  0x216a	(en: 'X I', google translation)
  - "Ⅻ": [T: "XII"]                            	#  0x216b	(en: 'X I I', google translation)
- - "Ⅼ": [t: "Ⅼ"]                                	#  0x216c	(en: 'L', google translation)
- - "Ⅽ": [t: "Ⅽ"]                                	#  0x216d	(en: 'C', google translation)
- - "Ⅾ": [t: "Ⅾ"]                                	#  0x216e	(en: 'D', google translation)
- - "Ⅿ": [t: "Ⅿ"]                                	#  0x216f	(en: 'M', google translation)
- - "ⅰ": [t: "ⅰ"]                                	#  0x2170	(en: 'I', google translation)
+ - "Ⅼ": [T: "Ⅼ"]                                	#  0x216c	(en: 'L', google translation)
+ - "Ⅽ": [T: "Ⅽ"]                                	#  0x216d	(en: 'C', google translation)
+ - "Ⅾ": [T: "Ⅾ"]                                	#  0x216e	(en: 'D', google translation)
+ - "Ⅿ": [T: "Ⅿ"]                                	#  0x216f	(en: 'M', google translation)
+ - "ⅰ": [T: "ⅰ"]                                	#  0x2170	(en: 'I', google translation)
  - "ⅱ": [T: "I"]                                	#  0x2171	(en: 'I I', google translation)
  - "ⅲ": [T: "III"]                            	#  0x2172	(en: 'I I I', google translation)
  - "ⅳ": [T: "IV"]                              	#  0x2173	(en: 'I V', google translation)
- - "ⅴ": [t: "ⅴ"]                                	#  0x2174	(en: 'V', google translation)
+ - "ⅴ": [T: "ⅴ"]                                	#  0x2174	(en: 'V', google translation)
  - "ⅵ": [T: "VI"]                              	#  0x2175	(en: 'V I', google translation)
  - "ⅶ": [T: "VII"]                            	#  0x2176	(en: 'V I I', google translation)
  - "ⅷ": [T: "VIII"]                          	#  0x2177	(en: 'V I I I', google translation)
  - "ⅸ": [T: "IX"]                              	#  0x2178	(en: 'I X', google translation)
- - "ⅹ": [t: "ⅹ"]                                	#  0x2179	(en: 'X', google translation)
+ - "ⅹ": [T: "ⅹ"]                                	#  0x2179	(en: 'X', google translation)
  - "ⅺ": [T: "XI"]                              	#  0x217a	(en: 'X I', google translation)
  - "ⅻ": [T: "XII"]                            	#  0x217b	(en: 'X I I', google translation)
- - "ⅼ": [t: "ⅼ"]                                	#  0x217c	(en: 'L', google translation)
- - "ⅽ": [t: "ⅽ"]                                	#  0x217d	(en: 'C', google translation)
- - "ⅾ": [t: "ⅾ"]                                	#  0x217e	(en: 'D', google translation)
- - "ⅿ": [t: "ⅿ"]                                	#  0x217f	(en: 'M', google translation)
+ - "ⅼ": [T: "ⅼ"]                                	#  0x217c	(en: 'L', google translation)
+ - "ⅽ": [T: "ⅽ"]                                	#  0x217d	(en: 'C', google translation)
+ - "ⅾ": [T: "ⅾ"]                                	#  0x217e	(en: 'D', google translation)
+ - "ⅿ": [T: "ⅿ"]                                	#  0x217f	(en: 'M', google translation)
  - "↉": [T: "fracción común cero tercios"]      	#  0x2189	(en: 'zero thirds', google: 'cero tercios')
  - "←": [T: "flecha hacia la izquierda"]                 	#  0x2190	(en: 'leftwards arrow')
  - "↑": [T: "flecha hacia arriba"]                    	#  0x2191	(en: 'upwards arrow')
@@ -579,7 +579,7 @@
  - "⇘": [T: "flecha doble hacia sudeste"]       	#  0x21d8	(en: 'south east double arrow')
  - "⇙": [T: "flecha doble hacia sudoeste"]      	#  0x21d9	(en: 'south west double arrow')
  - "⇚": [T: "flecha triple hacia la izquierda"]          	#  0x21da	(en: 'leftwards triple arrow')
- - "⇛": [t: "flecha triple hacia la derecha"]                    	#  0x21db	(en: 'rightwards triple arrow')
+ - "⇛": [T: "flecha triple hacia la derecha"]                    	#  0x21db	(en: 'rightwards triple arrow')
  - "⇜": [T: "flecha ondulada izquierda"]        	#  0x21dc	(en: 'leftwards squiggle arrow')
  - "⇝": [T: "flecha ondulada hacia la derecha"]                  	#  0x21dd	(en: 'rightwards squiggle arrow')
  - "⇞": [T: "flecha hacia arriba con doble trazo"]	#  0x21de	(en: 'upwards arrow with double stroke')
@@ -665,7 +665,7 @@
     # rule is identical to 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "no elemento de"]
+        then: [T: "no elemento de"]
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set
@@ -1076,7 +1076,7 @@
  - "⊜": [T: "signo igual en círculo"]                 	#  0x229c	(en: 'circled equals')
  - "⊝": [T: "signo menos en círculo"]                 	#  0x229d	(en: 'circled dash')
  - "⊞": [T: "signo más en  forma de cuadrado"]                  	#  0x229e	(en: 'squared plus')
- - "⊟": [t: "menos en forma de cuadrado"]                	#  0x229f	(en: 'squared minus')
+ - "⊟": [T: "menos en forma de cuadrado"]                	#  0x229f	(en: 'squared minus')
  - "⊠": [T: "signo por en forma de cuadrado"]                	#  0x22a0	(en: 'squared times')
  - "⊡": [T: "punto en forma de cuadrado"]                	#  0x22a1	(en: 'squared dot operator')
  - "⊢": [T: "t horizontal hacia la izquierda"]  	#  0x22a2	(en: 'proves')
@@ -1376,7 +1376,7 @@
  - "⒁": [T: "catorce entre paréntesis"]               	#  0x2481	(en: 'parenthesized fourteen', google translation)
  - "⒂": [T: "quince entre paréntesis"]              	#  0x2482	(en: 'parenthesized fifteen', google translation)
  - "⒃": [T: "dieciséis entre paréntesis"]          	#  0x2483	(en: 'parenthesized sixteen', google translation)
- - "⒄": [t: "diecisiete entre paréntesis"]    	#  0x2484	(en: 'parenthesized seventeen', google translation)
+ - "⒄": [T: "diecisiete entre paréntesis"]    	#  0x2484	(en: 'parenthesized seventeen', google translation)
  - "⒅": [T: "dieciocho entre paréntesis"]               	#  0x2485	(en: 'parenthesized eighteen', google translation)
  - "⒆": [T: "diecinueve entre paréntesis"]         	#  0x2486	(en: 'parenthesized nineteen', google translation)
  - "⒇": [T: "veinte entre paréntesis"]             	#  0x2487	(en: 'parenthesized twenty', google translation)
@@ -1435,7 +1435,7 @@
  - "▫": [T: "cuadrado pequeño blanco"]                         	#  0x25ab	(en: 'white small square')
  - "▬": [T: "rectángulo negro"]                 	#  0x25ac	(en: 'black rectangle')
  - "▭": [T: "rectángulo blanco"]                       	#  0x25ad	(en: 'white rectangle')
- - "▮": [t: "rectángulo relleno vertical"]      	#  0x25ae	(en: 'black vertical rectangle')
+ - "▮": [T: "rectángulo relleno vertical"]      	#  0x25ae	(en: 'black vertical rectangle')
  - "▯": [T: "rectángulo vertical blanco"]              	#  0x25af	(en: 'white vertical rectangle')
  - "▰": [T: "paralelogramo negro"]              	#  0x25b0	(en: 'black parallelogram', google: 'paralelograma negro')
  - "▱": [T: "paralelogramo blanco"]                    	#  0x25b1	(en: 'white parallelogram')
@@ -1487,7 +1487,7 @@
  - "◟": [T: "cuadrante inferior izquierdo arco circular"]          	#  0x25df	(en: 'lower left quadrant circular arc')
  - "◠": [T: "semicírculo superior"]             	#  0x25e0	(en: 'upper half circle')
  - "◡": [T: "semicírculo inferior"]             	#  0x25e1	(en: 'lower half circle')
- - "◢": [t: "triángulo inferior derecha relleno"]	#  0x25e2	(en: 'black lower right triangle')
+ - "◢": [T: "triángulo inferior derecha relleno"]	#  0x25e2	(en: 'black lower right triangle')
  - "◣": [T: "triángulo negro inferior izquierdo"]	#  0x25e3	(en: 'black lower left triangle')
  - "◤": [T: "triángulo negro superior izquierdo"]	#  0x25e4	(en: 'black upper left triangle')
  - "◥": [T: "triángulo negro superior derecho"]	#  0x25e5	(en: 'black upper right triangle')
@@ -1639,9 +1639,9 @@
  - "⟍": [T: "diagonal descendente"]  	#  0x27cd	(en: 'mathematical falling diagonal', google: 'diagonal de caída matemática')
  - "⟎": [T: "cuadrado Lógico Y"]                	#  0x27ce	(en: 'squared logical and', google: 'cuadrado lógico y')
  - "⟏": [T: "cuadrado Lógico O"]                	#  0x27cf	(en: 'squared logical or', google: 'cuadrado lógico o')
- - "⟐": [t: "diamante blanco con punto centrado"]	#  0x27d0	(en: 'white diamond with centered dot')
- - "⟑": [t: "y con punto interior"]             	#  0x27d1	(en: 'and with dot')
- - "⟒": [t: "elemento de apertura hacia arriba"]	#  0x27d2	(en: 'element of opening upwards')
+ - "⟐": [T: "diamante blanco con punto centrado"]	#  0x27d0	(en: 'white diamond with centered dot')
+ - "⟑": [T: "y con punto interior"]             	#  0x27d1	(en: 'and with dot')
+ - "⟒": [T: "elemento de apertura hacia arriba"]	#  0x27d2	(en: 'element of opening upwards')
  - "⟓": [T: "esquina inferior derecha con punto"]	#  0x27d3	(en: 'lower right corner with dot')
  - "⟔": [T: "esquina superior izquierda con punto"]	#  0x27d4	(en: 'upper left corner with dot')
  - "⟕": [T: "unión exterior izquierda"]           	#  0x27d5	(en: 'left outer join')
@@ -1652,7 +1652,7 @@
  - "⟚": [T: "izquierdo y derecho doble torniquete"]	#  0x27da	(en: 'left and right double turnstile')
  - "⟛": [T: "doble T horizontal"]               	#  0x27db	(en: 'left and right tack')
  - "⟜": [T: "multifunción por la izquierda"]    	#  0x27dc	(en: 'left multimap')
- - "⟝": [t: "t horizontal derecha"]       	#  0x27dd	(en: 'long right tack', MathPlayer: 'T horizontal derecha larga', google: 'tachuela a la derecha larga')
+ - "⟝": [T: "t horizontal derecha"]       	#  0x27dd	(en: 'long right tack', MathPlayer: 'T horizontal derecha larga', google: 'tachuela a la derecha larga')
  - "⟞": [T: "t horizontal izquierda"]     	#  0x27de	(en: 'long left tack', MathPlayer: 'T horizontal izquierda larga', google: 'táctica izquierda larga')
  - "⟟": [T: "perpendicular inversa con círculo arriba"]	#  0x27df	(en: 'up tack with circle above')
  - "⟠": [T: "rombo dividido por regla horizontal"]	#  0x27e0	(en: 'lozenge divided by horizontal rule')
@@ -1685,7 +1685,7 @@
  - "⟻": [T: "flecha larga hacia la izquierda partiendo de una barra"]	#  0x27fb	(en: 'long leftwards arrow from bar')
  - "⟼": [T: "flecha larga hacia la derecha partiendo de una barra"]         	#  0x27fc	(en: 'long rightwards arrow from bar')
  - "⟽": [T: "doble flecha larga hacia la izquierda partiendo de una barra"]	#  0x27fd	(en: 'long leftwards double arrow from bar')
- - "⟾": [t: "doble flecha larga hacia la derecha partiendo de una barra"]   	#  0x27fe	(en: 'long rightwards double arrow from bar')
+ - "⟾": [T: "doble flecha larga hacia la derecha partiendo de una barra"]   	#  0x27fe	(en: 'long rightwards double arrow from bar')
  - "⟿": [T: "flecha ondulada hacia la derecha"]           	#  0x27ff	(en: 'long rightwards squiggle arrow')
  - "⤀": [T: "flecha de dos cabezas hacia la derecha con trazo vertical"]	#  0x2900	(en: 'rightwards two headed arrow with vertical stroke', google: 'derecho de dos flechas con trazo vertical')
  - "⤁": [T: "flecha de dos cabezas hacia la derecha con doble trazo vertical"]	#  0x2901	(en: 'rightwards two headed arrow with double vertical stroke', google: 'derecho de dos flechas con cabeza de carrera vertical doble')
@@ -1837,7 +1837,7 @@
  - "⦔": [T: "arco derecho mayor que soporte"]   	#  0x2994
  - "⦕": [T: "doble arco izquierdo mayor que soporte"]	#  0x2995
  - "⦖": [T: "doble arco derecho menor que soporte"]	#  0x2996
- - "⦗": [t: "soporte de concha de tortuga negra izquierda"]	#  0x2997	(en: 'left black tortoise shell bracket')
+ - "⦗": [T: "soporte de concha de tortuga negra izquierda"]	#  0x2997	(en: 'left black tortoise shell bracket')
  - "⦘": [T: "soporte con concha de tortuga a la derecha"]	#  0x2998	(en: 'right black tortoise shell bracket', google: 'soporte de carcasa de tortuga negra derecha')
  - "⦙": [T: "valla punteada"]                   	#  0x2999	(en: 'dotted fence')
  - "⦚": [T: "línea vertical en zigzag"]               	#  0x299a	(en: 'vertical zigzag line')
@@ -1845,7 +1845,7 @@
  - "⦜": [T: "Variante de ángulo recto con cuadrado"]	#  0x299c	(en: 'right angle variant with square', google: 'variante de ángulo recto con cuadrado')
  - "⦝": [T: "ángulo recto medido con punto"]    	#  0x299d	(en: 'measured right angle with dot')
  - "⦞": [T: "Ángulo con S dentro"]              	#  0x299e	(en: 'angle with s inside', google: 'ángulo con s adentro')
- - "⦟": [t: "Ángulo agudo"]                     	#  0x299f	(en: 'acute angle', google: 'ángulo agudo')
+ - "⦟": [T: "Ángulo agudo"]                     	#  0x299f	(en: 'acute angle', google: 'ángulo agudo')
  - "⦠": [T: "Ángulo esférico de apertura a la izquierda"]	#  0x29a0	(en: 'spherical angle opening left', google: 'abertura del ángulo esférico izquierda')
  - "⦡": [T: "ángulo esférico con apertura hacia arriaba"]      	#  0x29a1	(en: 'spherical angle opening up', google: 'abertura del ángulo esférico')
  - "⦢": [T: "ángulo girado"]                   	#  0x29a2	(en: 'turned angle', google: 'ángulo girado')
@@ -2060,7 +2060,7 @@
  - "⩳": [T: "signo igual por encima de tilde"]         	#  0x2a73	(en: 'equals sign above tilde operator')
  - "⩴": [T: "signo igual con dos puntos"]             	#  0x2a74	(en: 'double colon equal')
  - "⩵": [T: "doble signo igual"]                      	#  0x2a75	(en: 'two consecutive equals signs')
- - "⩶": [t: "triple signo igual"]	#  0x2a76	(en: 'three consecutive equals signs', google: 'tres signos consecutivos iguales')
+ - "⩶": [T: "triple signo igual"]	#  0x2a76	(en: 'three consecutive equals signs', google: 'tres signos consecutivos iguales')
  - "⩷": [T: "signo igual entre dos puntos arriba y dos puntos abajo"]        	#  0x2a77	(en: 'equals sign with two dots above and two dots below')
  - "⩸": [T: "equivalente a con cuatro puntos en la parte superior"]    	#  0x2a78	(en: 'equivalent with four dots above')
  - "⩹": [T: "menor que con círculo dentro"]   	#  0x2a79	(en: 'less than with circle inside')
@@ -2174,7 +2174,7 @@
  - "⫥": [T: "doble barra vertical doble torniquete a la izquierda"]	#  0x2ae5	(en: 'double vertical bar double left turnstile', google: 'doble barra vertical de doble tornillo a la izquierda')
  - "⫦": [T: "larga barra discontinua partiendo de doble barra vertical izquierda"]	#  0x2ae6
  - "⫧": [T: "tack corto con barra superior"]     	#  0x2ae7
- - "⫨": [t: "tack corto arriba con barra inferior"]          	#  0x2ae8	(en: 'short up tack with underbar')
+ - "⫨": [T: "tack corto arriba con barra inferior"]          	#  0x2ae8	(en: 'short up tack with underbar')
  - "⫩": [T: "tack corto arriba sobre tack corto abajo"]	#  0x2ae9
  - "⫪": [T: "doble tack hacia abajo"]                   	#  0x2aea	(en: 'double down tack', google: 'duplicar la tachuela')
  - "⫫": [T: "doble tack hacia arriba"]                   	#  0x2aeb
@@ -2887,7 +2887,7 @@
  - "": [T: "flecha hacia abajo hacia la derecha de barra vertical"]	#  0xeb5b	(en: 'downwards arrow rightwards of vertical bar', google translation)
  - "": [T: "flecha hacia la derecha con garfio hacia abajo extendido"]	#  0xeb5c	(en: 'rightwards arrow with extended downwards hook', google translation)
  - "": [T: "flecha hacia la izquierda con gancho extendido"]	#  0xeb5d	(en: 'leftwards arrow with extended hook', google translation)
- - "": [t: "flecha hacia la izquierda con gancho hacia abajo extendido"]	#  0xeb5e	(en: 'leftwards arrow with extended downwards hook', google translation)
+ - "": [T: "flecha hacia la izquierda con gancho hacia abajo extendido"]	#  0xeb5e	(en: 'leftwards arrow with extended downwards hook', google translation)
  - "": [T: "flecha hacia la derecha con garfio extendido"]	#  0xeb5f	(en: 'rightwards arrow with extended hook', google translation)
  - "": [T: "no flecha derecha ondulada"]	#  0xeb60	(en: 'not right arrow wavy', google translation)
  - "": [T: "no flecha derecha curva"]   	#  0xeb61	(en: 'not right arrow curved', google translation)
@@ -2930,7 +2930,7 @@
  - "": [T: "extensor de flechas hacia izquierda y derecha"]	#  0xeb8c	(en: 'leftwards rightwards arrows extender', google translation)
  - "": [T: "extensor de flecha nordeste"]        	#  0xeb8d	(google translation)
  - "": [T: "extensor de flecha noroeste"]        	#  0xeb8e	(google translation)
- - "": [t: "paréntesis izquierdo apuntando hacia abajo"]	#  0xec00	(en: 'down pointing brace left', google translation)
+ - "": [T: "paréntesis izquierdo apuntando hacia abajo"]	#  0xec00	(en: 'down pointing brace left', google translation)
  - "": [T: "paréntesis medio apuntando hacia abajo"]          	#  0xec01	(google translation)
  - "": [T: "paréntesis derecho apuntando hacia abajo"] 	#  0xec02	(en: 'down pointing brace right', google translation)
  - "": [T: "extensor de paréntesis horizontal"]	#  0xec03	(en: 'horizontal brace extender', google translation)
@@ -3017,13 +3017,13 @@
  - "": [T: "j sin puntos"]                        	#  0xed02	(google translation)
  - "": [T: "digamma"]                          	#  0xed03	(google translation)
  - "ϝ": [T: "digamma"]                          	#  0x3dd
- - "": [t: ""]                                	#  0xed10	(en: 'd', google translation)
+ - "": [T: "d"]                                	#  0xed10	(en: 'd', google translation)
  - "ⅆ": [T: "d"]                                	#  0x2146
- - "": [t: ""]                                	#  0xed11	(en: 'e', google translation)
+ - "": [T: "e"]                                	#  0xed11	(en: 'e', google translation)
  - "ⅇ": [T: "e"]                                	#  0x2147
- - "": [t: ""]                                	#  0xed12	(en: 'i', google translation)
+ - "": [T: "i"]                                	#  0xed12	(en: 'i', google translation)
  - "ⅈ": [T: "i"]                                	#  0x2148
- - "": [t: ""]                                	#  0xed13	(en: 'j', google translation)
+ - "": [T: "j"]                                	#  0xed13	(en: 'j', google translation)
  - "ⅅ":
     - spell: "translate('.', 'ⅅ', 'DD')"       	#  0xed16, 0x2145
 
@@ -3656,19 +3656,19 @@
  - "︠": [T: "mitad de ornamentación izquierda en ligadura"]	#  0xfe20	(en: 'ligature left half embellishment', google translation)
  - "︡": [T: "mitad de ornamentación derecha en ligadura"]    	#  0xfe21	(en: 'ligature right half embellishment', google translation)
  - "︢": [T: "doble tilde con media ornamentación izquierda"]   	#  0xfe22	(en: 'double tilde left half embellishment', google translation)
- - "︣": [t: "doble tilde medio adorno"]         	#  0xfe23	(en: 'double tilde right half embellishment', google translation)
- - "︤": [t: "macron dejó medio adorno"]         	#  0xfe24	(en: 'macron left half embellishment', google translation)
- - "︥": [t: "macron medio adorno"]              	#  0xfe25	(en: 'macron right half embellishment', google translation)
- - "︦": [t: "unir el adorno de macron"]         	#  0xfe26	(en: 'conjoining macron embellishment', google translation)
- - "︵": [t: "paréntesis superior"]              	#  0xfe35	(en: 'over paren')
- - "︶": [t: "paréntesis inferior"]              	#  0xfe36	(en: 'under paren')
- - "︷": [t: "llave superior"]                   	#  0xfe37	(en: 'over brace')
- - "︸": [t: "llave inferior"]                   	#  0xfe38	(en: 'under brace')
- - "︿": [t: "paréntesis angular superior"]      	#  0xfe3f	(en: 'over angle bracket')
- - "﹀": [t: "paréntesis angular inferior"]      	#  0xfe40	(en: 'under angle bracket')
- - "﹨": [t: "división entera"]                  	#  0xfe68	(en: 'integer divide')
- - "￼": [t: "objeto desconocido o faltante"]    	#  0xfffc	(en: 'unknown or missing object', google translation)
- - "�": [t: "caracter desconocido o faltante"]  	#  0xfffd	(en: 'unknown or missing character', google: 'personaje desconocido o faltante')
+ - "︣": [T: "doble tilde medio adorno"]         	#  0xfe23	(en: 'double tilde right half embellishment', google translation)
+ - "︤": [T: "macron dejó medio adorno"]         	#  0xfe24	(en: 'macron left half embellishment', google translation)
+ - "︥": [T: "macron medio adorno"]              	#  0xfe25	(en: 'macron right half embellishment', google translation)
+ - "︦": [T: "unir el adorno de macron"]         	#  0xfe26	(en: 'conjoining macron embellishment', google translation)
+ - "︵": [T: "paréntesis superior"]              	#  0xfe35	(en: 'over paren')
+ - "︶": [T: "paréntesis inferior"]              	#  0xfe36	(en: 'under paren')
+ - "︷": [T: "llave superior"]                   	#  0xfe37	(en: 'over brace')
+ - "︸": [T: "llave inferior"]                   	#  0xfe38	(en: 'under brace')
+ - "︿": [T: "paréntesis angular superior"]      	#  0xfe3f	(en: 'over angle bracket')
+ - "﹀": [T: "paréntesis angular inferior"]      	#  0xfe40	(en: 'under angle bracket')
+ - "﹨": [T: "división entera"]                  	#  0xfe68	(en: 'integer divide')
+ - "￼": [T: "objeto desconocido o faltante"]    	#  0xfffc	(en: 'unknown or missing object', google translation)
+ - "�": [T: "caracter desconocido o faltante"]  	#  0xfffd	(en: 'unknown or missing character', google: 'personaje desconocido o faltante')
 
 
 

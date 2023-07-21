@@ -5,7 +5,7 @@
  - "a-z": 
     - test: 
         if: "$TTS='none'"
-        then: [t: "."]                          
+        then: [T: "."]                          
         else: [spell: "'.'"]                       
  - "A-Z":
     - test: 
@@ -43,7 +43,7 @@
             if: "$Verbosity='Terse'"
             then: [T: "abrir paréntesis"]                	# 	(en: 'open', google translation)
             else: [T: "paréntesis izquierdo"]   	# 	(en: 'open paren', MathPlayer: 'paréntesis', google: 'paréntesis abierto')
-        else: [t: "paréntesis izquierdo"]       	# 	(en: 'left paren', MathPlayer: 'paréntesis', google: 'paréntesis dejado')
+        else: [T: "paréntesis izquierdo"]       	# 	(en: 'left paren', MathPlayer: 'paréntesis', google: 'paréntesis dejado')
  - ")":                                         	#  0x29
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
@@ -152,23 +152,23 @@
  - "·":                                         	#  0xB7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
-        then: [T: "veces"]                      	# 	(en: 'times', google translation)
+        then_test:
+            if: "$Verbosity = 'Verbose'"
+            then:  [T: "multiplicado por"]          # 	(en: 'times', google translation)
+            else: [T: "por"]
         else: [T: "punto medio"]                	# 	(en: 'dot')
  - "×":                                         	#  0xd7
     - test:
-        if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
-        then: [T: "veces"]                      	# 	(en: 'times', google translation)
-        else_test:
-            if: $ClearSpeak_MultSymbolX = 'By'
-            then: [T: "por"]                    	# 	(en: 'by', google translation)
-            else: [T: "por"]                    	# 	(en: 'cross')
+        if: "$Verbosity = 'Verbose'"
+        then:  [T: "multiplicado por"]          # 	(en: 'times', google translation)
+        else: [T: "por"]
  - "÷": [T: "dividido por"]                         	#  0xf7	(en: 'divided by')
  - "̀": [T: "acento grave ornamentado"]                     	#  0x300	(en: 'grave accent embellishment', google: 'embellido de acento grave')
  - "́": [T: "acento agudo ornamentado"]                     	#  0x301	(en: 'acute accent embellishment', google: 'embellido de acento agudo')
  - "̂": [T: "acento circunflejo ornamentado"]                         	#  0x302	(en: 'circumflex accent embellishment', google: 'embellamiento del acento circunflejo')
  - "̃": [T: "tilde ornamentada"]                            	#  0x303	(en: 'tilde embellishment', google: 'tilde adorno')
  - "̄": [T: "barra ornamentada"]                            	#  0x304	(en: 'macron embellishment', google: 'embellido de macron')
- - "̅": [t: "barra encima con adorno"]                            	#  0x305	(en: 'overbar embellishment', google: 'embellido de overbar')
+ - "̅": [T: "barra encima con adorno"]                            	#  0x305	(en: 'overbar embellishment', google: 'embellido de overbar')
  - "̆": [T: "breve"]                            	#  0x306
  - "̇": [T: "punto encima con adorno"]            	#  0x307	(en: 'dot above embellishment', google: 'punto por encima del adorno')
 
@@ -251,7 +251,7 @@
  - "″": [T: "segunda"]                        	#  0x2033	(en: 'double prime', MathPlayer: 'segunda', google: 'doble primo')
  - "‴": [T: "tercera"]                       	#  0x2034	(en: 'triple prime', MathPlayer: 'tercera', google: 'triple prime')
  - "‵": [T: "prima inversa"]                     	#  0x2035	(en: 'reversed prime')
- - "‶": [t: "segunda inversa"]               	#  0x2036	(en: 'reversed double prime')
+ - "‶": [T: "segunda inversa"]               	#  0x2036	(en: 'reversed double prime')
  - "‷": [T: "tercera inversa"]                  	#  0x2037	(en: 'reversed triple prime', google: 'triple prime invertido')
 
  - "ℂℕℚℝℤ":                                     	#  here we rely on this running through the table again to speak "cap xxx"
@@ -350,7 +350,7 @@
                 then: [T: "no es un elemento de"]	# 	(en: 'is not an element of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: "no está incluido en"]     	# 	(en: 'is not in', google translation)
-              - else: [t: "no pertenece a"] 	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'does not belong to')
+              - else: [T: "no pertenece a"] 	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'does not belong to')
  - "∊":                                         	#  0x220a
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
