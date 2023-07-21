@@ -26,7 +26,7 @@
       - bookmark: "*[1]/@id"
       - test:
           if: parent::*[self::m:negative]
-          then: [{T: "negativo"}]
+          then: [{T: "menos"}]
           else: [{T: "positivo"}]
   - T: "raíz cuadrada"
   - test:
@@ -59,7 +59,7 @@
           then: [{bookmark: "parent/@id"}]
       - test:
           if: parent::m:negative
-          then: [{T: "negativo"}]
+          then: [{T: "menos"}]
           else: [{T: "positivo"}]
   - test:
       if: "*[2][self::m:mn]"
@@ -107,7 +107,7 @@
       - bookmark: "@id"
       - test:
           if: "self::m:negative"
-          then: [{T: "negativo"}]
+          then: [{T: "menos"}]
           else: [{T: "positivo"}]
   - x: "*[1]"
 
@@ -239,7 +239,10 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()='2']"
-      then: {T: "cuadrada"}
+      then_test: 
+        if: "$Verbosity='Verbose'"
+        then: [T: "elevado al cuadrado"]
+        else: [T: "al cuadrado"]
       else: {T: "al cubo"}
 - name: function-power
   tag: power
