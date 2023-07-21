@@ -134,7 +134,10 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {T: "cuadrada"}
+      then_test: 
+        if: "$Verbosity='Verbose'"
+        then: [T: "elevado al cuadrado"]
+        else: [T: "al cuadrado"]
       else: {T: "cúbica"}
 - name: function-power
   tag: power
@@ -162,7 +165,10 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {T: "cuadrada"}
+      then_test: 
+        if: "$Verbosity='Verbose'"
+        then: [T: "elevado al cuadrado"]
+        else: [T: "al cuadrado"]
       else: {T: "cúbica"}
 
 - name: simple-integer
@@ -274,7 +280,10 @@
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
-  - t: times
+    - test:
+        if: "$Verbosity = 'Verbose'"
+        then:  [T: "multiplicado por"]          # 	(en: 'times', google translation)
+        else: [T: "por"]
 
 - name: no-say-parens
   tag: mrow
