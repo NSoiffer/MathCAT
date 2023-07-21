@@ -70,7 +70,7 @@ use crate::{errors::*, prefs::PreferenceManager, speech::ReplacementArray};
 use sxd_document::dom::Element;
 use yaml_rust::Yaml;
 
-use std::{fmt};
+use std::fmt;
 use crate::speech::{SpeechRulesWithContext, MyXPath, TreeOrString};
 use std::string::ToString;
 use std::str::FromStr;
