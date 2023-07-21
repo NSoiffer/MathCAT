@@ -29,6 +29,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
         let braille_code = pref_manager.get_user_prefs().to_string("BrailleCode");
         let braille = match braille_code.as_str() {
             "UEB" => ueb_cleanup(braille_string),
+            "Vietnam" => ueb_cleanup(braille_string),   // FIX: probably needs some specialized cleanup
             "Nemeth" => nemeth_cleanup(braille_string),
             _ => braille_string,    // probably needs cleanup if someone has another code, but this will have to get added by hand
         };
