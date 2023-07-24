@@ -705,7 +705,7 @@
     test:
       if: "$ClearSpeak_ImpliedTimes = 'None'"
       then: [{T: ""}]
-      else: [{T: lần}]
+      else: [{T: nhân}]
 
 - name: no-times
   tag: mo

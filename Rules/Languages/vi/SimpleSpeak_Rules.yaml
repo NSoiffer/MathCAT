@@ -275,7 +275,7 @@
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
-  - T: lần
+  - T: nhân
 
 - name: no-say-parens
   tag: mrow
