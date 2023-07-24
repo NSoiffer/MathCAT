@@ -11,7 +11,7 @@ use sxd_document::dom::*;
 use sxd_document::QName;
 use phf::{phf_map, phf_set};
 use crate::xpath_functions::{IsBracketed, is_leaf};
-use std::{ptr::eq as ptr_eq};
+use std::ptr::eq as ptr_eq;
 use crate::pretty_print::*;
 use regex::Regex;
 use std::fmt;
@@ -357,7 +357,6 @@ pub fn replace_children<'a>(mathml: Element<'a>, replacements: Vec<Element<'a>>)
 
 // returns the presentation element of a "semantics" element
 pub fn get_presentation_element(element: Element) -> (usize, Element) {
-	// FIX: implement this
 	assert_eq!(name(&element), "semantics");
 	let children = element.children();
 	if let Some( (i, child) ) = children.iter().enumerate().find(|(_, &child)| 
@@ -518,6 +517,8 @@ impl CanonicalizeContext {
 				if n_children != 0 {
 					bail!("{} should only have one child:\n{}", element_name, mml_to_string(&mathml));
 				}
+			} else if element_name == "annotation" {
+				bail!("'annotation' element is not child of 'semantics' element");
 			} else if (n_children == 1 && mathml.children()[0].text().is_some()) || n_children == 0 {  // allow empty children such as mtext
 				return Ok( () );
 			} else {
@@ -550,11 +551,24 @@ impl CanonicalizeContext {
 			if children.is_empty() {
 				return Ok( () );
 			} else {
-				return CanonicalizeContext::assure_mathml(get_presentation_element(mathml).1);
+				let (i_presentation, presentation_element) = get_presentation_element(mathml);
+				for (i, child) in children.iter().enumerate() {
+					if i != i_presentation {
+						let child = as_element(*child);
+						if name(&child)!="annotation" && name(&child)!="annotation-xml" {
+							bail!("Illegal MathML: {} is child of 'semantic'", name(&child));
+						}
+					}
+				}
+				return CanonicalizeContext::assure_mathml(presentation_element);
 			}
 		}
 		if !ALL_MATHML_ELEMENTS.contains(element_name) {
-			bail!("'{}' is not a valid MathML element", element_name);
+			if element_name == "annotation-xml" {
+				bail!("'annotation-xml' element is not child of 'semantics' element");
+			} else {
+				bail!("'{}' is not a valid MathML element", element_name);
+			}
 		}
 		// valid MathML element and not a leaf -- check the children
 		for child in children {
@@ -2247,7 +2261,13 @@ impl CanonicalizeContext {
 						ChildOfElement::Element(e) => {
 							new_children.push( ChildOfElement::Element(self.canonicalize_mrows(e)? ));
 						},
-						_ => panic!("Should have been an element or text"),
+						ChildOfElement::Text(t) => {
+							if mathml.children().len() != 1 {
+								bail!("Text '{}' found with more than one child in element '{}'", t.text(), tag_name);
+							}
+							return Ok( mathml );
+						},
+						_ => panic!("Should have been an element or text in '{}'", tag_name),
 					}
 				}
 				mathml.replace_children(new_children);
