@@ -398,11 +398,11 @@
       #   then: [T: is]
      - T: tỉ lệ với
  - "∞": [T: "vô cực"]                          # 0x221e
- - "∟": [T: right angle]                         # 0x221f
- - "∠": [T: angle]                               # 0x2220
- - "∡": [T: measured angle]                      # 0x2221
- - "∣": [T: divides]                              # 0x2223
- - "∤": [T: does not divide]                      # 0x2224
+ - "∟": [T: góc vuông]                         # 0x221f
+ - "∠": [T: góc]                               # 0x2220
+ - "∡": [T: góc được đo]                      # 0x2221
+ - "∣": [T: chia hết]                              # 0x2223
+ - "∤": [T: không chia hết]                      # 0x2224
  - "∥":                                           # 0x2225
      - test: 
          if: "$Verbosity!='Terse'"

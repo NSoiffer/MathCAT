@@ -110,9 +110,9 @@
  - "†": [t: "⠈⠠⠹"]              # 0x2020 (Dagger)
  - "‡": [t: "⠈⠠⠻"]              # 0x2021 (Double dagger)
  - "…": [T: "c⠄c⠄c⠄"]              # 0x2026 (Ellipsis)
- - "′": [T: "1⠄"]                # 0x2032 (Prime sign)
- - "″": [T: "1⠄"]               # 0x2033 (Double prime sign)
- - "‴": [T: "1⠄⠄⠄"]              # 0x2034 (Triple prime sign)
+ - "′": [T: "⠄"]                # 0x2032 (Prime sign)
+ - "″": [T: "⠄⠄"]               # 0x2033 (Double prime sign)
+ - "‴": [T: "⠄⠄⠄"]              # 0x2034 (Triple prime sign)
  - "Å": [t: "⠠⠘⠫⠁"]             # 0x212B (Angstrom symbol)
  - "Å": [t: "⠠⠘⠫⠁"]             # 0x00C5 (WIRIS uses this for Angstrom)
  - "∀": [t: "⠘⠁"]               # 0x2200 (For all)
@@ -127,14 +127,15 @@
  - "∠": [T: "⠫⠛"]               # 0x2220 (Angle)
  - "∡": [T: "⠨⠫⠛"]              # 0x2221 (Measured angle)
  - "⊾": [T: "⠼⠫⠛"]              # 0x22BE (Right angle with arc)
+ - "∟": [T: "⠫⠧"]
  - "∫": [T: "1⠾"]               # 0x222B (Integral)
  - "∮": [T: "⠐⠾"]               # 0x222E (Contour integral (closed line integral))
  - "∴": [t: "1⠠⠡"]               # 0x2234 (Therefore)
  - "∵": [t: "⠈⠌"]               # 0x2235 (Because (since))
  - "∶": [t: "1⠒"]               # 0x2236 (Ratio)
  - "∷": [t: "1⠒⠒"]              # 0x2237 (Proportion)
- - "∣": [T: "⠸⠳"]               # 0x2223 (Divides) ueb: ⠸⠳
- - "∤": [T: "⠸⠳⠈⠱"]             # 0x2224 (Does not divide) ueb: ⠸⠳⠈⠱
+ - "∣": [T: "⠣⠴⠜"]               # 0x2223 (Divides) ueb: ⠸⠳
+ - "∤": [T: "⠣⠼⠜"]             # 0x2224 (Does not divide) ueb: ⠸⠳⠈⠱
  - "∥": [T: "⠫⠶"]               # 0x2225 (Parallel) VI: AB parallel to CD, should be: ⠫AB⠶CD
  - "∦": [T: "⠫⠾"]             # 0x2226 (Not parallel) Vi: AB not parallel to CD, should be: ⠫AB⠐⠾CD
  - "⟂": [T: "⠫⠧"]               # 0x27C2 (Perpendicular)
@@ -151,7 +152,7 @@
  - "↑": [t: "1⠳⠬"]              # 0x2191 (Upwards arrow)
  - "→": [t: "1⠳⠕"]              # 0x2192 (Rightwards arrow)
  - "↓": [t: "1⠳⠩"]              # 0x2193 (Downwards arrow)
- - "↔": [t: "1⠳⠺⠗⠕"]            # 0x2194 (Left right arrow)
+ - "↔": [T: "1⠳⠪⠶⠕"]            # 0x2194 (Left right arrow)
  - "↕": [t: "1⠳⠺⠗⠬"]            # 0x2195 (Up down arrow)
  - "↖": [t: "1⠳⠱"]              # 0x2196 (Northwest arrow)
  - "↗": [t: "1⠳⠎"]              # 0x2197 (Northeast arrow)
@@ -1531,5 +1532,5 @@
 
 # Not yet defined symbols
  - "⋮": [T: "⠣⠴⠜"]          # 0x22ee (vertical ellipsis used to indicate dividable)
- - "⧸⋮": [T: "⠣⠼⠜"]          # 0x29f8\x22ee (for not dividable sign, not sure if MathCAT supporting multiple-char definition or not
+ #- "⧸⋮": [T: "⠣⠼⠜"]          # 0x29f8\x22ee (for not dividable sign, not sure if MathCAT supporting multiple-char definition or not
  

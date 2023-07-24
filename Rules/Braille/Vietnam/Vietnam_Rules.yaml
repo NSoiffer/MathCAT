@@ -267,6 +267,48 @@
    match: "text()='cos'"
    replace:
    - t: "⠻⠉"
+   
+- 
+   name: tan
+   tag: mi
+   match: "text()='tan'"
+   replace:
+   - t: "⠻⠞"
+   
+- 
+   name: cot
+   tag: mi
+   match: "text()='cot'"
+   replace:
+   - t: "⠻⠉⠞"
+   
+- 
+   name: arcsin
+   tag: mi
+   match: "text()='arcsin'"
+   replace:
+   - t: "⠁⠗⠉⠻⠎"
+   
+- 
+   name: arccos
+   tag: mi
+   match: "text()='arccos'"
+   replace:
+   - t: "⠁⠗⠉⠻⠉"
+   
+- 
+   name: arctan
+   tag: mi
+   match: "text()='arctan'"
+   replace:
+   - t: "⠁⠗⠉⠻⠞"
+   
+- 
+   name: arccot
+   tag: mi
+   match: "text()='arccot'"
+   replace:
+   - t: "⠁⠗⠉⠻⠉⠞"
 
 -
    # FIX: need to deal with all caps
