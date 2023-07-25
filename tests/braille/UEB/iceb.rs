@@ -145,7 +145,7 @@ fn grade1_1_7_3_2() {
     <mrow><mn>1</mn><mo>+</mo><msup><mi>x</mi><mn>2</mn></msup></mrow>
     </mfrac><mo>=</mo><mn>1</mn>
     </math>";
-    test_braille("UEB", expr, "⠰⠰⠰⠷⠭⠔⠼⠃⠐⠖⠼⠃⠭⠨⠌⠼⠁⠐⠖⠭⠔⠼⠃⠾⠀⠐⠶⠀⠼⠁⠰⠄");
+    test_braille("UEB", expr, "⠰⠰⠷⠭⠔⠼⠃⠐⠖⠼⠃⠭⠨⠌⠼⠁⠐⠖⠭⠔⠼⠃⠾⠀⠐⠶⠀⠼⠁");
 }
 
 #[test]
@@ -602,9 +602,10 @@ fn sum_7_9_1() {
 
 #[test]
 fn lim_7_9_2() {
+    // Note: modified because passage indicator is not needed (same expr when word indicator is used)
     let expr = "<math><munder><mi>lim</mi><mrow><mi>x</mi><mo>&#x2192;</mo><mi>a</mi></mrow></munder>
             <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mn>1</mn></math>";
-    test_braille("UEB", expr, "⠰⠰⠰⠇⠊⠍⠨⠢⠣⠭⠳⠕⠁⠜⠋⠐⠣⠭⠐⠜⠀⠐⠶⠀⠼⠁⠰⠄");
+    test_braille("UEB", expr, "⠰⠰⠇⠊⠍⠨⠢⠣⠭⠳⠕⠁⠜⠋⠐⠣⠭⠐⠜⠀⠐⠶⠀⠼⠁");
 }
 
 #[test]
@@ -655,7 +656,7 @@ fn sqrt_8_1_4() {
 #[test]
 fn root_8_2_1() {
     let expr = "<math><mroot><mn>8</mn><mn>3</mn></mroot><mo>=</mo><mn>2</mn></math>";
-    test_braille("UEB", expr, "⠰⠩⠔⠼⠉⠼⠓⠬⠀⠐⠶⠀⠼⠃");
+    test_braille("UEB", expr, "⠰⠰⠩⠔⠼⠉⠼⠓⠬⠀⠐⠶⠀⠼⠃");
 }
 
 #[test]
@@ -691,7 +692,7 @@ fn root_8_2_4() {
 fn root_letter_base() {
     // none of the guides cover this case, but it seems that an a-j base needs a grade 1 indicator
     let expr = "<math><mroot><mi>b</mi><mn>3</mn></mroot><mroot><mi>x</mi><mn>3</mn></mroot></math>";
-    test_braille("UEB", expr, "⠰⠩⠔⠼⠉⠰⠃⠬⠩⠔⠼⠉⠭⠬");
+    test_braille("UEB", expr, "⠰⠰⠩⠔⠼⠉⠰⠃⠬⠩⠔⠼⠉⠭⠬");
 }
 
 #[test]

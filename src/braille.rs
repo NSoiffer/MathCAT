@@ -511,6 +511,7 @@ fn is_short_form(chars: &[char]) -> bool {
 }
 
 fn ueb_cleanup(raw_braille: String) -> String {
+    debug!("ueb_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
 
@@ -744,6 +745,8 @@ fn ueb_cleanup(raw_braille: String) -> String {
             
             // BANA says use g1 word mode if spaces are present, but that's not what their examples do
             // A conversation with Ms. DeAndrea from BANA said that they mean use passage mode if ≥3 "segments" (≥2 blanks)
+            // However, it is pointless to go into passage mode if the internal string is the same as word mode
+            let mut grade1_passage = "".to_string();
             let mut n_blanks = 0;
             if grade1_word.chars().any(|ch| {
                 if ch == 'W' {
@@ -751,11 +754,13 @@ fn ueb_cleanup(raw_braille: String) -> String {
                 }
                 n_blanks == 2
             }) {
-                let grade1_passage = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage);
+                grade1_passage = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage);
                 // debug!("Passage mode: '{}'", &grade1_passage);
-                return "⠰⠰⠰".to_string() + &grade1_passage + "⠰⠄";
-            } else {
+            }
+            if grade1_passage.is_empty() || grade1_passage == grade1_word {
                 return "⠰⠰".to_string() + &grade1_word;
+            } else {
+                return "⠰⠰⠰".to_string() + &grade1_passage + "⠰⠄";
             }
         }
 
