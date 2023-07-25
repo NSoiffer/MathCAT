@@ -66,7 +66,7 @@ fn subset_1j() {
 #[test]
 fn subset_1k() {
     let expr = "<math><mrow><mo>&#x2203;</mo><mi>x</mi><mo>&#x2208;</mo><mi>Q</mi><mo>&#x007C;</mo><mn>3</mn><mi>x</mi><menclose notation='updiagonalstrike'><mo>&#x22EE;</mo></menclose> <mn>3</mn></mrow></math>";
-    test_braille("Vietnam", expr, "⠘⠑⠭⠈⠑⠨⠟⠸⠳⠼⠉⠭⠣⠼⠜ ⠼⠉ ⠼⠃");
+    test_braille("Vietnam", expr, "⠘⠑⠭⠈⠑⠨⠟⠸⠳⠼⠉⠭⠣⠼⠜⠀⠼⠉⠀⠼⠃");
 }
 
 #[test]
@@ -163,14 +163,14 @@ fn exponent_3k () {
 #[test]
 fn log_b1 () {
     let expr = "<math><mrow> <msub><mrow> <mi>log</mi></mrow><mn>2</mn> </msub> <mi>x</mi><mo>+</mo><mn>1</mn><mo>+</mo><msub><mrow> <mi>log</mi></mrow><mn>2</mn> </msub> <mi>x</mi><mo>+</mo><mn>2</mn><mo>=</mo><msub><mrow> <mi>log</mi></mrow><mn>2</mn> </msub> <mn>2</mn></mrow></math>";
-    test_braille("Vietnam", expr, "⠇⠕⠛⠢⠼⠃ ⠭⠐⠖⠼⠁⠐⠖⠇⠕⠛⠢⠼⠃ ⠭⠐⠖⠼⠃⠐⠶⠇⠕⠛⠢⠼⠃ ⠼⠃");
+    test_braille("Vietnam", expr, "⠇⠕⠛⠢⠼⠃⠀⠭⠐⠖⠼⠁⠐⠖⠇⠕⠛⠢⠼⠃⠀⠭⠐⠖⠼⠃⠐⠶⠇⠕⠛⠢⠼⠃⠀⠼⠃");
 }
 
 
 #[test]
 fn root_4a () {
     let expr = "<math><mrow> <msqrt><mn>2</mn> </msqrt> <mo>+</mo><msqrt><mn>3</mn> </msqrt> <mo>&#x2212;</mo><msqrt><mn>5</mn> </msqrt> </mrow></math>";
-    test_braille("Vietnam", expr, "⠩⠼⠃⠱⠐⠖⠩⠼⠉⠱⠐⠤⠩⠼⠑⠱                   ⠼⠃");
+    test_braille("Vietnam", expr, "⠩⠼⠃⠱⠐⠖⠩⠼⠉⠱⠐⠤⠩⠼⠑⠱⠼⠃");
 }
 
 #[test]
