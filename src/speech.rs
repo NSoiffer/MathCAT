@@ -2382,20 +2382,21 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                 replacements = unicode.get( &ch_as_u32 );
                 if replacements.is_none() {
                     // debug!("*** Did not find unicode {} for char '{}'/{:#06x}", rules_with_context.speech_rules.name, ch, ch_as_u32);
+                    rules_with_context.translate_count = 0;     // not in loop
                     return Ok(String::from(ch));   // no replacement, so just return the char and hope for the best
                 }
             };
 
             // map across all the parts of the replacement, collect them up into a Vec, and then concat them together
-            return Ok(
-                replacements.unwrap()
-                            .iter()
-                            .map(|replacement|
-                                rules_with_context.replace(replacement, mathml)
-                                        .chain_err(|| format!("Unicode replacement error: {}", replacement)) )
-                            .collect::<Result<Vec<String>>>()?
-                            .join(" ")
-            );
+            let result = replacements.unwrap()
+                        .iter()
+                        .map(|replacement|
+                            rules_with_context.replace(replacement, mathml)
+                                    .chain_err(|| format!("Unicode replacement error: {}", replacement)) )
+                        .collect::<Result<Vec<String>>>()?
+                        .join(" ");
+            rules_with_context.translate_count = 0;     // found a replacement, so not in a loop
+            return Ok(result);
         }
     }
 }
