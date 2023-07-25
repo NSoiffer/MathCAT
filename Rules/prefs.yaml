@@ -1,7 +1,7 @@
 ---
   Speech:
     Impairment: Blindness       # LearningDisability, LowVision, Blindness
-    Language: en                # any known language code and sub-code -- could be en-uk, etc
+    Language: Auto                # any known language code and sub-code -- could be en-uk, etc
     SpeechSound: None           # make a sound when starting/ending math speech -- None, Beep
     Verbosity: Medium           # Terse, Medium, Verbose
     MathRate: 100               # Change from text speech rate (%)

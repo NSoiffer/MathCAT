@@ -228,7 +228,8 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
             },
             "Language" => {
                 // check the format
-                if !( value.len() == 2 ||
+                if !( value == "Auto" ||
+                      value.len() == 2 ||
                       (value.len() == 5 && value.as_bytes()[2] == b'-') ) {
                         bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value);
                       }
@@ -642,8 +643,14 @@ pub fn is_same_element(e1: &Element, e2: &Element) -> Result<()> {
         }
         // can't guarantee attrs are in the same order
         for attr1 in attrs1 {
-            if !attrs2.iter().any(|attr2| attr1.name().local_part() == attr2.name().local_part() && attr1.value() == attr2.value() ) {
-                bail!("Attribute {} not in [{}]", print_attr(&attr1), print_attrs(&attrs2));
+            if let Some(found_attr2) = attrs2.iter().find(|&attr2| attr1.name().local_part() == attr2.name().local_part()) {
+                if attr1.value() == found_attr2.value() {
+                    break;
+                } else {
+                    bail!("Attribute named {} has differing values:\n  '{}'\n  '{}'", attr1.name().local_part(), attr1.value(), found_attr2.value());
+                }
+            } else {
+                bail!("Attribute name {} not in [{}]", print_attr(&attr1), print_attrs(&attrs2));
             }
         }
         return Ok( () );

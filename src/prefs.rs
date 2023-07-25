@@ -429,7 +429,7 @@ impl PreferenceManager {
         // FIX: should look for other style files in the same language dir if one is not found before move to default
         
         let language = prefs.to_string("Language");
-        let language = language.as_str();       // avoid 'temp value dropped while borrowed' error
+        let language = if language.as_str() == "Auto" {"en"} else {language.as_str()};       // avoid 'temp value dropped while borrowed' error
 
         self.rules_dir = Some(rules_dir.to_path_buf());
         self.pref_files = pref_files;
@@ -777,11 +777,6 @@ impl PreferenceManager {
         };
     }
 
-    /// Return the current language. The will be the most specific version (e.g, "en-gb")
-    pub fn get_language(&self) -> String {
-        return self.user_prefs.to_string("Language");
-    }
-
     pub fn get_api_prefs(&self) -> &Preferences {
         return &self.api_prefs;
     }
@@ -799,6 +794,9 @@ impl PreferenceManager {
         if !self.error.is_empty() {
             panic!("Internal error: set_user_prefs called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
+        if self.user_prefs.to_string(name) == value {
+            return None;
+        }
 
         if name == "Language" || name == "SpeechStyle" || name == "BrailleCode" {
             let old_speech = self.speech.clone();
@@ -964,7 +962,7 @@ mod tests {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
             let prefs = pref_manager.get_user_prefs();
-            assert_eq!(prefs.to_string("Language").as_str(), "en");
+            assert_eq!(prefs.to_string("Language").as_str(), "Auto");
             assert_eq!(prefs.to_string("SubjectArea").as_str(), "General");
             assert_eq!(prefs.to_string("ClearSpeak_AbsoluteValue").as_str(), "Auto");
             assert_eq!(prefs.to_string("ResetNavMode").as_str(), "false");
