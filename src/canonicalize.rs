@@ -552,6 +552,7 @@ impl CanonicalizeContext {
 				return Ok( () );
 			} else {
 				let (i_presentation, presentation_element) = get_presentation_element(mathml);
+				// make sure only 'annotation' and 'annotation-xml' elements are children of the non-presentation element
 				for (i, child) in children.iter().enumerate() {
 					if i != i_presentation {
 						let child = as_element(*child);
@@ -859,27 +860,19 @@ impl CanonicalizeContext {
 				}
 				return if parent_requires_child || !ignorable {Some( CanonicalizeContext::make_empty_element(mathml) )} else {None};			},
 			"semantics" => {
-				// clean the presentation child but leave the annotations in case they want to be used by the rules.
-				// no attempt is made to clean the annotations or verify they are annotations
-				// the cleaned child is made the first child and it's annotation-xml wrapper, if any, is removed
-				let mut children = mathml.children();
-				let (i, presentation) = get_presentation_element(mathml);
+				// The semantics tag, like the style tag, can mess with pattern matching.
+				// However, it may be the case that having the annotations could aid in determining intent, so we want to keep them.
+				// The compromise is to move the annotations into an attr named data-annotation[-xml]-<encoding-name>
+				// The attribute is put on presentation element root
+				let presentation = get_presentation_element(mathml).1;
 				let new_presentation = if let Some(presentation) = self.clean_mathml(presentation) {
 					presentation
 				} else {
 					// probably shouldn't happen, but just in case
 					CanonicalizeContext::create_empty_element(&mathml.document())
 				};
-				if i==0 {
-					// common case, so optimize
-					children[0] = ChildOfElement::Element(new_presentation);
-				} else {
-					// rearrange -- inefficient but likely just a few annotation and doesn't happen often
-					children.remove(i);
-					children.insert(0, ChildOfElement::Element(presentation));
-				}
-				mathml.replace_children(children);
-				return Some(mathml);
+				set_annotation_attrs(new_presentation, mathml);
+				return Some(new_presentation);
 			},
 			_  => {
 				let children = mathml.children();
@@ -1021,6 +1014,27 @@ impl CanonicalizeContext {
 			} else {
 				return None;
 			}
+		}
+
+		fn 	set_annotation_attrs(new_presentation: Element, semantics: Element) {
+			for child in semantics.children() {
+				let child = as_element(child);
+				let child_name = name(&child);
+				if child == new_presentation {
+					continue;
+				}
+				let attr_name = match child.attribute_value("encoding") {
+					Some(encoding_name) => format!("data-{}-{}", child_name, encoding_name.replace("/", "_slash_")),
+					None => format!("data-{}", child_name),		// probably shouldn't happen
+				};
+				let attr_name = attr_name.as_str();
+				if child_name == "annotation" {
+					new_presentation.set_attribute_value(attr_name, as_text(child));
+				} else {
+					new_presentation.set_attribute_value(attr_name, &mml_to_string(&child));
+				}
+			}
+
 		}
 
 		/// Hack to try and guess if a colon should be a ratio -- this affects parsing because of different precedences
@@ -2245,13 +2259,6 @@ impl CanonicalizeContext {
 			},
 			"mrow" => {
 				return self.canonicalize_mrows_in_mrow(mathml);
-			},
-			"semantics" => {
-				let mut children = mathml.children();
-				let (i, presentation) = get_presentation_element(mathml);
-				children[i] = ChildOfElement::Element(self.canonicalize_mrows(presentation)? );
-				mathml.replace_children(children);
-				return Ok(mathml);
 			},
 			_ => {
 				// recursively try to make mrows in other structures (eg, num/denom in fraction)
@@ -4708,16 +4715,13 @@ mod canonicalize_tests {
 					<annotation encoding='application/x-llamapun'>italic_z</annotation>
 				</semantics>
 			</math>";
-		let target_str = "<math>
-		<semantics>
-			<mi>z</mi>
-			<annotation-xml encoding='MathML-Content'>
-				<ci>𝑧</ci>
-			</annotation-xml>
-			<annotation encoding='application/x-tex'>z</annotation>
-			<annotation encoding='application/x-llamapun'>italic_z</annotation>
-		</semantics>
-	</math>";
+		// the annotation-xml value is very touchy and must exactly match what mml-to-string() generates for the test to pass
+		let target_str = " <math>
+		<mi data-annotation-xml-MathML-Content=' &lt;annotation-xml encoding=&apos;MathML-Content&apos;&gt;
+  &lt;ci&gt;𝑧&lt;/ci&gt;
+ &lt;/annotation-xml&gt;
+' data-annotation-application_slash_x-tex='z' data-annotation-application_slash_x-llamapun='italic_z'>z</mi>
+	   </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
