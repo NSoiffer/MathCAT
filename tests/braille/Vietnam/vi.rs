@@ -60,7 +60,7 @@ fn subset_1i() {
 #[test]
 fn subset_1j() {
     let expr = "<math><mrow><mo>&#x2200;</mo><mi>n</mi><mo>&#x2208;</mo><mi>N</mi><mo>&#x007C;</mo><mn>2</mn><mi>n</mi><mo>&#x22EE;</mo><mn>2</mn></mrow></math>";
-    test_braille("Vietnam", expr, "⠘⠁⠝⠈⠑⠨⠝⠸⠳⠼⠃⠝⠣⠴⠜ ⠼⠃");
+    test_braille("Vietnam", expr, "⠘⠁⠝⠈⠑⠨⠝⠸⠳⠼⠃⠝⠣⠴⠜⠀⠼⠃");
 }
 
 #[test]
@@ -194,7 +194,7 @@ fn root_4d () {
 #[test]
 fn quadratic_5a1 () {
     let expr = "<math> <mrow> <mi>a</mi><msup><mi>x</mi><mn>2</mn> </msup> <mo>+</mo><mi>b</mi><mi>x</mi><mo>+</mo><mi>c</mi><mo>=</mo><mn>0</mn></mrow> <mrow> <mo stretchy='false'>(</mo><mi>a</mi><mo>&#x2260;</mo><mn>0</mn><mo stretchy='false'>)</mo></mrow></math>";
-    test_braille("Vietnam", expr, "⠁⠭⠔⠼⠃⠐⠖⠃⠭⠐⠖⠉⠐⠶⠼⠚ ⠈⠣⠁⠐⠾⠼⠚⠈⠜");
+    test_braille("Vietnam", expr, "⠁⠭⠔⠼⠃⠐⠖⠃⠭⠐⠖⠉⠐⠶⠼⠚⠀⠈⠣⠁⠐⠾⠼⠚⠈⠜");
 }
 
 #[test]
@@ -267,7 +267,7 @@ fn cot_7 () {
 #[test]
 fn sincos_7e () {
     let expr = "<math><mrow> <mi>sin</mi><mi>x</mi><mo>+</mo><mi>cos</mi><mi>x</mi><mo>=</mo><msqrt><mn>2</mn> </msqrt> <mi>sin</mi><mfenced><mrow> <mi>x</mi><mo>+</mo><mfrac><mi>&#x03C0;</mi><mn>4</mn> </mfrac> </mrow> </mfenced></mrow></math>";
-    test_braille("Vietnam", expr, "⠻⠎⠭⠐⠖⠻⠉⠭⠐⠶⠩⠼⠃⠱ ⠻⠎⠈⠣⠭⠐⠖⠆⠰⠏⠌⠼⠙⠰⠈⠜");
+    test_braille("Vietnam", expr, "⠻⠎⠭⠐⠖⠻⠉⠭⠐⠶⠩⠼⠃⠱⠀⠻⠎⠈⠣⠭⠐⠖⠆⠰⠏⠌⠼⠙⠰⠈⠜");
 }
 
 #[test]
