@@ -190,7 +190,7 @@
       - "IsInDefinition(., 'GeometryPrefixOperators')"
    replace:
       - x: "text()"
-      - t: "W"
+      - t: ""
 
 -
    name: default
@@ -205,12 +205,12 @@
             - test:
                if: "preceding-sibling::* and 
                     not(IsInDefinition(preceding-sibling::*[1], 'NemethPunctAndOpenBeforeSymbols'))" #Rule 151
-               then: [t: "W"]
+               then: [t: ""]
       - x: "text()"
       - test:
          if: "$MaybeAddSpaces and following-sibling::* and 
               not(IsInDefinition(following-sibling::*[1], 'NemethPunctAndOpenAfterSymbols'))" #Rule 151"
-         then: [t: "W"]
+         then: [t: ""]
 
 -
    # Non-breaking whitespace is added to the start/end of numbers in cases of adjoining text to help the parse.
@@ -224,7 +224,7 @@
    - test:
       if: "starts-with(., '\u00A0')"
       then:
-      - t: "W"
+      - t: ""
       - test:
          if: "substring(., string-length(.), 1)='\u00A0'"
          then:
@@ -232,7 +232,7 @@
          - test:
             if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
             then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
-            else: [t: "W"]
+            else: [t: ""]
          else:
          - x: "BrailleChars(., 'UEB', 2, string-length(.)+1)"
       else:
@@ -243,7 +243,7 @@
          - test:
             if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
             then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
-            else: [t: "W"]
+            else: [t: ""]
          else:
          - x: "BrailleChars(., 'UEB', 1, string-length(.)+1)"
 

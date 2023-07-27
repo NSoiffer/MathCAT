@@ -857,20 +857,20 @@
  - "∥":                                             #  0x2225
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "là"]                            #   (en: 'is')
+         then: [t: ""]                            #   (en: 'is')
      - t: "song song với"                           #   (en: 'parallel to')
  - "∦":                                             #  0x2226
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "là"]                            #   (en: 'is')
+         then: [t: ""]                            #   (en: 'is')
      - t: "không song song với"                     #   (en: 'not parallel to')
  - "∧": [t: "và"]                                   #  0x2227   (en: 'and')
  - "∨": [t: "hoặc là"]                              #  0x2228   (en: 'or')
  - "∩": [t: "ngã tư"]                               #  0x2229   (en: 'intersection')
  - "∪": [t: "liên hiệp"]                            #  0x222a   (en: 'union')
- - "∫": [t: "tích hợp"]                             #  0x222b   (en: 'integral')
- - "∬": [t: "tích hợp gấp đôi"]                     #  0x222c   (en: 'double integral')
- - "∭": [t: "tích hợp ba"]                          #  0x222d   (en: 'triple integral')
+ - "∫": [t: "tích phân"]                             #  0x222b   (en: 'integral')
+ - "∬": [t: "tích phân kép"]                     #  0x222c   (en: 'double integral')
+ - "∭": [t: "tích phân ba"]                          #  0x222d   (en: 'triple integral')
  - "∮": [t: "tích phân đường viền"]                 #  0x222e   (en: 'contour integral')
  - "∯": [t: "tích hợp bề mặt"]                      #  0x222f   (en: 'surface integral')
  - "∰": [t: "khối lượng tích phân"]                 #  0x2230   (en: 'volume integral')
@@ -1174,7 +1174,7 @@
  - "⊥":                                             #  0x22a5
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "là đáy"]                        #   (en: 'is bottom')
+         then: [t: "đáy"]                        #   (en: 'is bottom')
  - "⊦": [t: "giảm xuống"]                           #  0x22a6   (en: 'reduces to')
  - "⊧": [t: "mô hình"]                              #  0x22a7   (en: 'models')
  - "⊨":                                             #  0x22a8
@@ -1699,7 +1699,7 @@
  - "⟂":                                             #  0x27c2
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "là vuông góc với"]              #   (en: 'is perpendicular to')
+         then: [t: "vuông góc với"]              #   (en: 'is perpendicular to')
  - "⟃":                                             #  0x27c3
      - test: 
          if: "$Verbosity!='Terse'"
