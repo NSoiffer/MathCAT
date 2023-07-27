@@ -291,25 +291,25 @@
         then: [t: "⠐⠤"]
         else: [t: "⠤"]
 
- - "⁡":                          # 0x2061⁡ (invisible function apply)
-    - test:
-        if:
-        - "preceding-sibling::*[1][self::m:mi and substring(., string-length(.), 1)!=' '] and " # avoid scripted function names and one that end with spaces
-        - "following-sibling::*[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']" # GTM 9.3.2
-        then: [t: "W"]
-        else: [t: ""]
+ - "⁡": [t: ""]                         # 0x2061⁡ (invisible function apply)
+    #- test:
+        #if:
+        #- "preceding-sibling::*[1][self::m:mi and substring(., string-length(.), 1)!=' '] and " # avoid scripted function names and one that end with spaces
+        #- "following-sibling::*[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']" # GTM 9.3.2
+        #then: [t: "W"]
+        #else: [t: ""]
 
- - "⁢":                         # 0x2062 (invisible times)
-    - test:
-        if: # GTM 9.3.3 (not very clear in rule, but the function name has to start with a lower case latin char ['no indicators'])
-        - "parent::m:mrow and "
-        - "preceding-sibling::*[1]["
-        - "           (self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '') or "
-        - "           (self::m:mrow and translate(*[last()], 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '')] and"
-        - "  following::*[1][self::m:mrow and count(*)=3 and "   # look for function apply
-        - "     *[2][text()='⁡'] and *[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']]" 
-        then: [t: "W"]
-        else: [t: ""]
+ - "⁢": [t: ""]                        # 0x2062 (invisible times)
+    #- test:
+        #if: # GTM 9.3.3 (not very clear in rule, but the function name has to start with a lower case latin char ['no indicators'])
+        #- "parent::m:mrow and "
+        #- "preceding-sibling::*[1]["
+        #- "           (self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '') or "
+        #- "           (self::m:mrow and translate(*[last()], 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '')] and"
+        #- "  following::*[1][self::m:mrow and count(*)=3 and "   # look for function apply
+        #- "     *[2][text()='⁡'] and *[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']]" 
+        #then: [t: "W"]
+        #else: [t: ""]
  - "⁣": [t: ""]                 # 0x2063⁡ (invisible separator)
  - "⁤": [t: ""]                 # 0x2064 (invisible plus)
  - "0": [t: "N⠚"]               # 0x30 
