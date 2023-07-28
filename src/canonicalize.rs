@@ -1040,7 +1040,8 @@ impl CanonicalizeContext {
 		/// Hack to try and guess if a colon should be a ratio -- this affects parsing because of different precedences
 		/// It also guesses on the spacing after the colon and adds a space attr if it looks like set building or function mapping notation.
 		/// These conditions are really not well thought out and are just a first cut -- they do cause the braille tests to pass
-		/// 1. It must be infix and there is a proportion (∷) mo as a sibling, or
+		/// If 'intent' is given, it must be intent='ratio'
+		/// 2. It must be infix and there is a proportion (∷) mo as a sibling, or
 		/// 3. It is the only mo and has numbers on each side
 		/// 
 		/// Need to rule out field extensions "[K:F]" and trilinear coordinates "a:b:c" (Nemeth doesn't consider these to be ratios)
@@ -1049,6 +1050,12 @@ impl CanonicalizeContext {
 			let parent = mathml.parent().unwrap().element().unwrap();	// must exist
 			if name(&parent) != "mrow" && name(&parent) != "math"{
 				return false;
+			}
+
+			if let Some(intent_value) = mathml.attribute_value("intent") {
+				if intent_value != "ratio" || !intent_value.starts_with('_') {
+					return false;
+				}
 			}
 
 			if let Some(value) = mathml.attribute_value("data-mjx-texclass") {

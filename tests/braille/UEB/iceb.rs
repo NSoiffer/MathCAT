@@ -193,6 +193,13 @@ fn time_2_4_1() {
 }
 
 #[test]
+fn time_2_4_1_mtext() {
+    // this was a bug when only mtext occured
+    let expr = "<math><mtext>5:30</mtext></math>";
+    test_braille("UEB", expr, "⠼⠑⠒⠼⠉⠚");
+}
+
+#[test]
 fn roman_numeral_2_6_1() {
     let expr = " <math><mi mathvariant='normal'>I</mi><mo>,</mo>
         <mo>&#xA0;</mo><mi>II</mi>
