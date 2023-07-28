@@ -2,6 +2,7 @@
 use sxd_document::dom::Element;
 use sxd_document::Package;
 use crate::errors::*;
+use crate::pretty_print::mml_to_string;
 use regex::{Captures, Regex, RegexSet};
 use phf::{phf_map, phf_set};
 use crate::speech::{BRAILLE_RULES, SpeechRulesWithContext};
@@ -1385,17 +1386,18 @@ impl BrailleChars {
     // this string follows the Nemeth rules typefaces and deals with mathvariant
     //  which has partially turned chars to the alphanumeric block
     fn get_braille_chars(node: Element, code: &str, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
-        match code {
-            "Nemeth" => return BrailleChars::get_braille_nemeth_chars(node, text_range),
-            "UEB" => return BrailleChars:: get_braille_ueb_chars(node, text_range),
-            _ => {
-                warn!("get_braille_chars: unknown braille code '{}'", code);
-                return Ok( as_text(node).to_string() );
-            },
+        let result = match code {
+            "Nemeth" => BrailleChars::get_braille_nemeth_chars(node, text_range),
+            "UEB" => BrailleChars:: get_braille_ueb_chars(node, text_range),
+            _ => return Err(sxd_xpath::function::Error::Other(format!("get_braille_chars: unknown braille code '{}'", code)))
         };
+        return match result {
+            Ok(string) => Ok(string),
+            Err(err) => return Err(sxd_xpath::function::Error::Other(err.to_string())),
+        }
     }
 
-    fn get_braille_nemeth_chars(node: Element, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
+    fn get_braille_nemeth_chars(node: Element, text_range: Option<Range<usize>>) -> Result<String> {
         lazy_static! {
             // To greatly simplify typeface/language generation, the chars have unique ASCII chars for them:
             // Typeface: S: sans-serif, B: bold, 𝔹: blackboard, T: script, I: italic, R: Roman
@@ -1405,7 +1407,7 @@ impl BrailleChars {
                 Regex::new(r"(?P<face>[SB𝔹TIR]*)(?P<lang>[EDGVHU]?)(?P<cap>C?)(?P<letter>L?)(?P<num>[N]?)(?P<char>.)").unwrap();
         }
         if !is_leaf(node) {
-            return Err(sxd_xpath::function::Error::Other("BrailleChars called on non-leaf element".to_string()));
+            bail!("BrailleChars called on non-leaf element '{}'", mml_to_string(&node));
         }
         let math_variant = node.attribute_value("mathvariant");
         // FIX: cover all the options -- use phf::Map
@@ -1422,7 +1424,7 @@ impl BrailleChars {
             },
         };
         let text = BrailleChars::substring(as_text(node), &text_range);
-        let braille_chars = crate::speech::braille_replace_chars(&text, node).unwrap_or_else(|_| "".to_string());
+        let braille_chars = crate::speech::braille_replace_chars(&text, node)?;
         // debug!("Nemeth chars: text='{}', braille_chars='{}'", &text, &braille_chars);
         
         // we want to pull the prefix (typeface, language) out to the front until a change happens
@@ -1473,7 +1475,7 @@ impl BrailleChars {
         }
     }
 
-    fn get_braille_ueb_chars(node: Element, text_range: Option<Range<usize>>) -> StdResult<String, XPathError> {
+    fn get_braille_ueb_chars(node: Element, text_range: Option<Range<usize>>) -> Result<String> {
         // Because in UEB typeforms and caps may extend for multiple tokens,
         //   this routine merely deals with the mathvariant attr.
         // Canonicalize has already transformed all chars it can to math alphanumerics, but not all have bold/italic 
@@ -1486,8 +1488,9 @@ impl BrailleChars {
     
         let math_variant = node.attribute_value("mathvariant");
         let text = BrailleChars::substring(as_text(node), &text_range);
-        let braille_chars = crate::speech::braille_replace_chars(&text, node).unwrap_or_else(|_| "".to_string());
+        let braille_chars = crate::speech::braille_replace_chars(&text, node)?;
 
+        debug!("get_braille_ueb_chars: before/after unicode.yaml: '{}'/'{}'", text, braille_chars);
         if math_variant.is_none() {         // nothing we need to do
             return Ok(braille_chars);
         }
@@ -1507,9 +1510,9 @@ impl BrailleChars {
             },
         };
         let result = PICK_APART_CHAR.replace_all(&braille_chars, |caps: &Captures| {
-            // debug!("captures: {:?}", caps);
-            // debug!("  bold: {:?}, italic: {:?}, face: {:?}, cap: {:?}, char: {:?}",
-            //        &caps["bold"], &caps["italic"], &caps["face"], &caps["cap"], &caps["char"]);
+            debug!("captures: {:?}", caps);
+            debug!("  bold: {:?}, italic: {:?}, face: {:?}, cap: {:?}, char: {:?}",
+                   &caps["bold"], &caps["italic"], &caps["face"], &caps["cap"], &caps["char"]);
             if bold || !caps["bold"].is_empty() {"B"} else {""}.to_string()
                 + if italic || !caps["italic"].is_empty() {"I"} else {""}
                 + if !&caps["face"].is_empty() {&caps["face"]} else {typeface}
