@@ -246,6 +246,7 @@
  - "/": [t: "⠸⠌"]               # 0x002F (Solidus)
  - ":":                         # 0x003A (Colon)
         # sometimes a colon is meant to be a ratio
+        # we start to see if this is marked as 'ratio' and not marked as something else (but ignoring a literal)
         # this test is based on what SRE does -- if the "roles" are the same, it guesses "ratio"
         # MathCAT doesn't have roles, so we do a hack that looks checks mrows if not atomic.
         # If an mrow, guess it is infix and checks the operator. This is pretty weak!
@@ -255,11 +256,15 @@
         #   We can't normally tell spacing, but it *should* have a space in function mapping and set builder notation if the author used appropriate notation
         #   The canonicalization code makes this guess and adds "data-space-after"
     - test:
-        if: "not(ancestor::*[2][IsBracketed(., '[', ']')]) and
-             not( preceding-sibling::*[2][text()=':'] or following-sibling::*[2][text()=':']) and 
-             name(preceding-sibling::*[1]) = name(following-sibling::*[1]) and
-             ( name(preceding-sibling::*[1]) != 'mrow' or
-               (preceding-sibling::*[1]/*[2][text()] = following-sibling::*[1]/*[2][text()]) )"
+        if: "@intent='ratio' or
+             ( (@intent and DEBUG(starts-with(@intent, '_'))) and
+               ../self::m:mrow and
+               not(ancestor::*[2][IsBracketed(., '[', ']')]) and
+               not( preceding-sibling::*[2][text()=':'] or following-sibling::*[2][text()=':']) and 
+               name(preceding-sibling::*[1]) = name(following-sibling::*[1]) and
+               ( name(preceding-sibling::*[1]) != 'mrow' or
+                 (preceding-sibling::*[1]/*[2][text()] = following-sibling::*[1]/*[2][text()]) )
+             )"
         then: [t: "W⠐⠂W"]
         else:
         - t: "P⠒"
