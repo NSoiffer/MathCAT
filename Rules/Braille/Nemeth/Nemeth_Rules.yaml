@@ -180,9 +180,9 @@
   match:
      - "( IsBracketed(., '', '|') or IsBracketed(., '', '‖') or IsBracketed(., '', '⦀') ) and " # ends with single, double, or triple vertical bar
      - "following-sibling::*[1][self::m:mo and text()='\u2062'] and"
-     - "(  IsBracketed(following-sibling::*[2], '|', '') or " # starts with ... vertical bar
-     - "   IsBracketed(following-sibling::*[2], '‖', '') or "
-     - "   IsBracketed(following-sibling::*[2], '⦀', '')  "
+     - "(  following-sibling::*[2][IsBracketed(., '|', '')] or " # starts with ... vertical bar
+     - "   following-sibling::*[2][IsBracketed(., '‖', '')] or "
+     - "   following-sibling::*[2][IsBracketed(., '⦀', '')] "
      - ")"
   replace:
      - x: "*"

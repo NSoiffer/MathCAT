@@ -273,7 +273,7 @@
         # Time doesn't want an extra space -- the am/pm get wrapped in an mrow with the minutes after the colon
     - test:
         if:
-        - "IsBracketed(ancestor::*[2], '[', ']') or "       # field extension
+        - "ancestor::*[2][IsBracketed(., '{', '}')] or "       # field extension
         - "preceding-sibling::*[2][text()=':'] or following-sibling::*[2][text()=':'] or"  # trilinear form
           # ratios tend to have similar left and right sides
         - "name(preceding-sibling::*[1]) = name(following-sibling::*[1]) or"

@@ -255,7 +255,7 @@
         #   We can't normally tell spacing, but it *should* have a space in function mapping and set builder notation if the author used appropriate notation
         #   The canonicalization code makes this guess and adds "data-space-after"
     - test:
-        if: "not(IsBracketed(ancestor::*[2], '[', ']')) and
+        if: "not(ancestor::*[2][IsBracketed(., '[', ']')]) and
              not( preceding-sibling::*[2][text()=':'] or following-sibling::*[2][text()=':']) and 
              name(preceding-sibling::*[1]) = name(following-sibling::*[1]) and
              ( name(preceding-sibling::*[1]) != 'mrow' or
@@ -264,7 +264,7 @@
         else:
         - t: "P⠒"
         - test:
-            if: "@data-space-after or IsBracketed(ancestor::*[2], '{', '}') or following-sibling::*[1]/*[2][IsInDefinition(., 'Arrows')]" # "Arrows" is a bit broad...
+            if: "@data-space-after or ancestor::*[2][IsBracketed(., '{', '}')] or following-sibling::*[1]/*[2][IsInDefinition(., 'Arrows')]" # "Arrows" is a bit broad...
             then: [t: "W"]
  - ";": [t: "P⠆"]               # 0x003B (Semicolon)
  - "<": [t: "⠐⠅"]             # 0x003C (Less-than sign)

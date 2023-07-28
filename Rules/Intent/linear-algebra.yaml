@@ -51,7 +51,7 @@
   name: norm
   tag: msub
   match: 
-    - "IsBracketed(*[1], '∥', '∥')"
+    - "*[1][IsBracketed(., '∥', '∥')]"
   replace:
   - intent:
       name: "subscripted-norm"
