@@ -44,7 +44,7 @@ The default value is given in \[brackets\].
 * ✓SpeechStyle: [ClearSpeak]
   * Options:  Any implemented speech style (currently only ClearSpeak and SimpleSpeak)
   * Description: a style of speech speech or coordinated philosophy about how to speak an expression.
-    * ClearSpeak with developed by ETS for use on high stake tests such as the SAT.
+    * ClearSpeak with developed by ETS for use on high stake tests such as the SAT. The [ClearSpeak spec details are in this Word document](ClearSpeakRulesAndPreferences.docx).
     * SimpleSpeak tries to minimize speech by speaking simple expressions such as $\frac{a}{b}$ quickly without bracketing words ("a over b"); these are distinguished from more complex expressions such as $\frac{a}{b+1}$ which will always have bracketing words ("fraction a over b plus 1 end fraction"). Expressions are never unambiguous in SimpleSpeak.
   * Status: currently only ClearSpeak and SimpleSpeak are implemented, but MathSpeak will likely be implemented at some point.
 
