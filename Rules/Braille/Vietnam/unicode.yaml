@@ -218,7 +218,7 @@
  - "▱": [T: "⠫⠈⠼⠙"]           # 0x25B1 (Parallelogram)
  - "▲": [T: "⠸⠫⠼⠉"]            # 0x25B2 (Filled triangle)
  - "■": [T: "⠸⠫⠼⠙"]            # 0x25A0 (Filled square)
- - "≜": [T: "⠰⠙⠐⠶"]           # 0x225C (Delta equal to)
+ - "≜": [T: "⠸⠙⠐⠶"]           # 0x225C (Delta equal to)
  - "≝": [t: "⠣⠙⠑⠋⠜⠻⠐⠶"]        # 0x225D (Equal to by definition)
  - "⊕": [t: "⠫⠿⠪⠐⠖t"]          # 0x2295 (Circled plus)
  - "⊖": [t: "⠫⠿⠪⠐⠤t"]          # 0x2296 (Circled minus)

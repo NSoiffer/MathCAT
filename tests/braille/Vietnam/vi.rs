@@ -60,18 +60,18 @@ fn subset_1i() {
 #[test]
 fn subset_1j() {
     let expr = "<math><mrow><mo>&#x2200;</mo><mi>n</mi><mo>&#x2208;</mo><mi>N</mi><mo>&#x007C;</mo><mn>2</mn><mi>n</mi><mo>&#x22EE;</mo><mn>2</mn></mrow></math>";
-    test_braille("Vietnam", expr, "⠘⠁⠝⠈⠑⠨⠝⠸⠳⠼⠃⠝⠣⠴⠜⠀⠼⠃");
+    test_braille("Vietnam", expr, "⠘⠁⠝⠈⠑⠨⠝⠸⠳⠼⠃⠝⠣⠴⠜⠼⠃");
 }
 
 #[test]
 fn subset_1k() {
-    let expr = "<math><mrow><mo>&#x2203;</mo><mi>x</mi><mo>&#x2208;</mo><mi>Q</mi><mo>&#x007C;</mo><mn>3</mn><mi>x</mi><menclose notation='updiagonalstrike'><mo>&#x22EE;</mo></menclose> <mn>3</mn></mrow></math>";
-    test_braille("Vietnam", expr, "⠘⠑⠭⠈⠑⠨⠟⠸⠳⠼⠉⠭⠣⠼⠜⠀⠼⠉⠀⠼⠃");
+    let expr = "<math><mrow><mo>&#x2203;</mo><mi>x</mi><mo>&#x2208;</mo><mi>Q</mi><mo>&#x007C;</mo><mn>3</mn><mi>x</mi><mo>∤</mo> <mn>3</mn></mrow></math>";
+    test_braille("Vietnam", expr, "⠘⠑⠭⠈⠑⠨⠟⠸⠳⠼⠉⠭⠣⠼⠜⠼⠉");
 }
 
 #[test]
 fn subset_1l() {
-    let expr = "<math> <mrow> <mi>D</mi><mo>&#x2208;</mo><mi>R</mi><mo>&#x005C;</mo><mfenced close='}' open='{'><mrow> <mn>1</mn><mo>;</mo><mn>2</mn></mrow> </mfenced></mrow></math>";
+    let expr = "<math> <mrow> <mi>D</mi><mo>=</mo><mi>R</mi><mo>&#x005C;</mo><mfenced close='}' open='{'><mrow> <mn>1</mn><mo>;</mo><mn>2</mn></mrow> </mfenced></mrow></math>";
     test_braille("Vietnam", expr, "⠨⠙⠐⠶⠨⠗⠸⠡⠸⠣⠼⠁⠆⠼⠃⠸⠜");
 }
 
@@ -201,19 +201,19 @@ fn quadratic_5a1 () {
 #[test]
 fn quadratic_5a2 () {
     let expr = "<math><mrow> <mi>&#x0394;</mi><mo>=</mo><msup><mi>b</mi><mn>2</mn> </msup> <mo>&#x2212;</mo><mn>4</mn><mi>a</mi><mi>c</mi></mrow></math>";
-    test_braille("Vietnam", expr, "⠰⠙⠐⠶⠃⠔⠼⠃⠐⠤⠼⠙⠠⠁⠉");
+    test_braille("Vietnam", expr, "⠸⠙⠐⠶⠃⠔⠼⠃⠐⠤⠼⠙⠠⠁⠉");
 }
 
 #[test]
 fn quadratic_5a3 () {
     let expr = "<math><mrow> <mi>&#x0394;</mi><mo>&#x003C;</mo><mn>0</mn></mrow></math>";
-    test_braille("Vietnam", expr, "⠰⠙⠐⠪⠼⠚");
+    test_braille("Vietnam", expr, "⠸⠙⠐⠪⠼⠚");
 }
 
 #[test]
 fn quadratic_5a4 () {
     let expr = "<math> <mrow> <mi>&#x0394;</mi><mo>=</mo><mn>0</mn></mrow></math>";
-    test_braille("Vietnam", expr, "⠰⠙⠐⠶⠼⠚");
+    test_braille("Vietnam", expr, "⠸⠙⠐⠶⠼⠚");
 }
 
 #[test]
@@ -225,19 +225,19 @@ fn quadratic_5a5 () {
 #[test]
 fn quadratic_5a6 () {
     let expr = "<math><mrow> <mi>&#x0394;</mi><mo>&#x003E;</mo><mn>0</mn></mrow></math>";
-    test_braille("Vietnam", expr, "⠰⠙⠐⠕⠼⠚");
+    test_braille("Vietnam", expr, "⠸⠙⠐⠕⠼⠚");
 }
 
 #[test]
 fn quadratic_5a7 () {
     let expr = "<math> <mrow> <msub><mi>x</mi><mn>1</mn> </msub> <mo>=</mo><mfrac><mrow> <mo>&#x2212;</mo><mi>b</mi><mo>+</mo><msqrt><mi>&#x0394;</mi> </msqrt> </mrow><mrow> <mn>2</mn><mi>a</mi></mrow> </mfrac> </mrow></math>";
-    test_braille("Vietnam", expr, "⠭⠢⠼⠁⠐⠶⠆⠐⠤⠃⠐⠖⠩⠰⠙⠱⠌⠼⠃⠠⠁⠰");
+    test_braille("Vietnam", expr, "⠭⠢⠼⠁⠐⠶⠆⠐⠤⠃⠐⠖⠩⠸⠙⠱⠌⠼⠃⠠⠁⠰");
 }
 
 #[test]
 fn quadratic_5a8 () {
     let expr = "<math><mrow> <msub><mi>x</mi><mn>2</mn> </msub> <mo>=</mo><mfrac><mrow> <mo>&#x2212;</mo><mi>b</mi><mo>&#x2212;</mo><msqrt><mi>&#x0394;</mi> </msqrt> </mrow><mrow> <mn>2</mn><mi>a</mi></mrow> </mfrac> </mrow></math>";
-    test_braille("Vietnam", expr, "⠭⠢⠼⠃⠐⠶⠆⠐⠤⠃⠐⠤⠩⠰⠙⠱⠌⠼⠃⠠⠁⠰");
+    test_braille("Vietnam", expr, "⠭⠢⠼⠃⠐⠶⠆⠐⠤⠃⠐⠤⠩⠸⠙⠱⠌⠼⠃⠠⠁⠰");
 }
 
 #[test]
