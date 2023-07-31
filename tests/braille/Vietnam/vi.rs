@@ -278,7 +278,7 @@ fn lim_8a () {
 #[test]
 fn prime_9a () {
     let expr = "<math><mrow> <msup><mi>y</mi><mo>&#x2032;</mo> </msup> <mo>=</mo><mn>2</mn><mi>x</mi><mo>+</mo><mn>3</mn></mrow></math>";
-    test_braille("Vietnam", expr, "⠽⠄⠐⠶⠼⠃⠭⠐⠖⠼⠉:");
+    test_braille("Vietnam", expr, "⠽⠄⠐⠶⠼⠃⠭⠐⠖⠼⠉");
 }
 
 #[test]
@@ -295,7 +295,6 @@ fn integral_9c () {
 
 #[test]
 fn angle_10a () {
-    init_logger();
     let expr = "<math><mrow> <mover accent='true'><mrow> <mi>A</mi><mi>B</mi><mi>C</mi></mrow><mo stretchy='true'>&#x005E;</mo> </mover> <mo>=</mo><mn>40</mn><mo>&#x00B0;</mo></mrow></math>";
     test_braille("Vietnam", expr, "⠫⠛⠸⠁⠃⠉⠐⠶⠼⠙⠚⠔⠚");
 }
