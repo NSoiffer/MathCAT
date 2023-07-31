@@ -120,7 +120,6 @@ fn exponent_3d () {
 
 #[test]
 fn exponent_3e () {
-    init_logger();
     let expr = "<math><mrow> <msup><mn>2</mn><mrow> <mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn></mrow> </msup> <mo>&#x2212;</mo><mn>3</mn><mo>&#x00D7;</mo><msup><mn>2</mn><mi>x</mi> </msup> <mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow></math>";
     test_braille("Vietnam", expr, "⠼⠃⠔⠣⠼⠃⠭⠐⠖⠼⠁⠱⠐⠤⠼⠉⠐⠦⠼⠃⠔⠭⠐⠖⠼⠁⠐⠶⠼⠚");
 }
@@ -171,7 +170,7 @@ fn log_b1 () {
 #[test]
 fn root_4a () {
     let expr = "<math><mrow> <msqrt><mn>2</mn> </msqrt> <mo>+</mo><msqrt><mn>3</mn> </msqrt> <mo>&#x2212;</mo><msqrt><mn>5</mn> </msqrt> </mrow></math>";
-    test_braille("Vietnam", expr, "⠩⠼⠃⠱⠐⠖⠩⠼⠉⠱⠐⠤⠩⠼⠑⠱⠼⠃");
+    test_braille("Vietnam", expr, "⠩⠼⠃⠱⠐⠖⠩⠼⠉⠱⠐⠤⠩⠼⠑⠱");
 }
 
 #[test]
@@ -243,25 +242,25 @@ fn quadratic_5a8 () {
 #[test]
 fn sin_7 () {
     let expr = "<math><mrow> <mi>sin</mi><mi>B</mi><mo>=</mo><mfrac><mrow> <mi>A</mi><mi>C</mi></mrow><mrow> <mi>B</mi><mi>C</mi></mrow> </mfrac> </mrow></math>";
-    test_braille("Vietnam", expr, "⠻⠎⠨⠃⠐⠶⠆⠁⠉⠌⠃⠉⠰");
+    test_braille("Vietnam", expr, "⠻⠎⠨⠃⠐⠶⠆⠸⠁⠉⠌⠸⠃⠉⠰");
 }
 
 #[test]
 fn cos_7 () {
     let expr = "<math><mrow> <mi>cos</mi><mi>B</mi><mo>=</mo><mfrac><mrow> <mi>A</mi><mi>B</mi></mrow><mrow> <mi>B</mi><mi>C</mi></mrow> </mfrac> </mrow></math>";
-    test_braille("Vietnam", expr, "⠻⠉⠨⠃⠐⠶⠆⠁⠃⠌⠃⠉⠰:");
+    test_braille("Vietnam", expr, "⠻⠉⠨⠃⠐⠶⠆⠸⠁⠃⠌⠸⠃⠉⠰");
 }
 
 #[test]
 fn tan_7 () {
     let expr = "<math><mrow> <mi>tan</mi><mi>B</mi><mo>=</mo><mfrac><mrow> <mi>A</mi><mi>C</mi></mrow><mrow> <mi>A</mi><mi>B</mi></mrow> </mfrac> </mrow></math>";
-    test_braille("Vietnam", expr, "⠻⠞⠨⠃⠐⠶⠆⠁⠉⠌⠁⠃⠰");
+    test_braille("Vietnam", expr, "⠻⠞⠨⠃⠐⠶⠆⠸⠁⠉⠌⠸⠁⠃⠰");
 }
 
 #[test]
 fn cot_7 () {
     let expr = "<math><mrow> <mi>cot</mi><mi>B</mi><mo>=</mo><mfrac><mrow> <mi>A</mi><mi>B</mi></mrow><mrow> <mi>A</mi><mi>C</mi></mrow> </mfrac> </mrow></math>";
-    test_braille("Vietnam", expr, "⠻⠉⠞⠨⠃⠐⠶⠆⠁⠃⠌⠁⠉⠰");
+    test_braille("Vietnam", expr, "⠻⠉⠞⠨⠃⠐⠶⠆⠸⠁⠃⠌⠸⠁⠉⠰");
 }
 
 #[test]
@@ -296,6 +295,7 @@ fn integral_9c () {
 
 #[test]
 fn angle_10a () {
+    init_logger();
     let expr = "<math><mrow> <mover accent='true'><mrow> <mi>A</mi><mi>B</mi><mi>C</mi></mrow><mo stretchy='true'>&#x005E;</mo> </mover> <mo>=</mo><mn>40</mn><mo>&#x00B0;</mo></mrow></math>";
     test_braille("Vietnam", expr, "⠫⠛⠸⠁⠃⠉⠐⠶⠼⠙⠚⠔⠚");
 }
@@ -303,13 +303,13 @@ fn angle_10a () {
 #[test]
 fn parallel_10b () {
     let expr = "<math><mrow> <mi>A</mi><mi>B</mi><mo>&#x2225;</mo><mi>C</mi><mi>D</mi></mrow></math>";
-    test_braille("Vietnam", expr, "⠫⠸⠁⠃⠶⠸⠉⠙");
+    test_braille("Vietnam", expr, "⠸⠁⠃⠫⠶⠸⠉⠙");
 }
 
 #[test]
 fn perp_10b1 () {
     let expr = "<math><mrow> <mi>S</mi><mi>A</mi><mo>&#x22A5;</mo><mo stretchy='false'>(</mo><mi>A</mi><mi>B</mi><mi>C</mi><mi>D</mi><mo stretchy='false'>)</mo></mrow></math>";
-    test_braille("Vietnam", expr, "⠸⠎⠁⠠⠧⠈⠣⠸⠁⠃⠉⠙⠈⠜");
+    test_braille("Vietnam", expr, "⠸⠎⠁⠫⠧⠈⠣⠸⠁⠃⠉⠙⠈⠜");
 }
 
 #[test]
