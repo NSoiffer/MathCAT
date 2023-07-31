@@ -28,7 +28,7 @@
       else:
       - T: "⠣"
       - x: "*[2]"
-      - T: "⠜"
+      - T: "⠱"
    - T: "#"    # signal end of script/numeric mode
    - x: "*[1]"
    - T: "⠱"
@@ -417,7 +417,7 @@
          else:
          - t: "⠣"
          - x: "*[2]"
-         - t: "⠜"
+         - t: "⠱"
    - t: "#"   # signal end script/numeric mode
 
 
@@ -622,7 +622,7 @@
                else:
                - t: "⠣"
                - x: "$Postscripts[1]"
-               - t: "⠜"
+               - t: "⠱"
       - test:
          if: "not($Postscripts[2][self::m:none])"
          then:
@@ -645,7 +645,7 @@
                else:
                - t: "⠣"
                - x: "$Postscripts[2]"
-               - t: "⠜"
+               - t: "⠱"
       - test:
          if: "count($Postscripts)>2"
          then:
@@ -671,7 +671,7 @@
                   else:
                   - t: "⠣"
                   - x: "$Postscripts[3]"
-                  - t: "⠜"
+                  - t: "⠱"
          - test:
             if: "not($Postscripts[4][self::m:none])"
             then:
@@ -694,7 +694,7 @@
                   else:
                   - t: "⠣"
                   - x: "$Postscripts[4]"
-                  - t: "⠜"
+                  - t: "⠱"
          - test:
             if: "count($Postscripts)>4"
             then:
@@ -720,7 +720,7 @@
                      else:
                      - t: "⠣"
                      - x: "$Postscripts[5]"
-                     - t: "⠜"
+                     - t: "⠱"
             - test:
                if: "not($Postscripts[6][self::m:none])"
                then:
@@ -743,7 +743,7 @@
                      else:
                      - t: "⠣"
                      - x: "$Postscripts[6]"
-                     - t: "⠜"
+                     - t: "⠱"
             - test:
                if: "count($Postscripts)>6"
                then:
@@ -769,7 +769,7 @@
                         else:
                         - t: "⠣"
                         - x: "$Postscripts[7]"
-                        - t: "⠜"
+                        - t: "⠱"
                - test:
                   if: "not($Postscripts[8][self::m:none])"
                   then:
@@ -792,7 +792,7 @@
                         else:
                         - t: "⠣"
                         - x: "$Postscripts[8]"
-                        - t: "⠜"
+                        - t: "⠱"
                - test:
                   if: "count($Postscripts) > 8"   # give up and just dump them out so at least the content is there
                   then:

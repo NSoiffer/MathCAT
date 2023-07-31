@@ -79,11 +79,11 @@
  - "}": [T: "c⠸c⠜"]               # 0x007D (Right curly bracket)
  - "〈": [T: "o⠸⠣⠤"]               # 0x2329 (Left angle bracket)
  - "〉": [T: "c⠤⠸⠜"]               # 0x232A (Right angle bracket)
- - "|":                # 0x007C (Vertical line)
-    - test:
-        if: "preceding-sibling::* and following-sibling::*"
-        then: [T: "W⠸⠳W"]        # comparison (e.g., such that -- rule 145)
-        else: [T: "⠸⠳"]          # absolute value, others???
+ - "|": [T: "⠸⠳"]                 # 0x007C (Vertical line)
+    # - test:
+    #     if: "preceding-sibling::* and following-sibling::*"
+    #     then: [T: "W⠸⠳W"]        # comparison (e.g., such that -- rule 145)
+    #     else: [T: "⠸⠳"]          # absolute value, others???
  - "!": [T: "c⠖"]                # 0x21 (Exclamation (factorial))
  - "#": [T: "⠼"]               # 0x23 (Number sign (hash))
  - "%": [T: "⠼⠚⠴"]                # 0x25 (Percent sign) No dots 46 before as in UEB
