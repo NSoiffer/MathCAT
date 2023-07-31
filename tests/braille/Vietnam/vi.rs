@@ -120,13 +120,14 @@ fn exponent_3d () {
 
 #[test]
 fn exponent_3e () {
-    let expr = "<math><mrow> <msup><mn>2</mn><mrow> <mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn></mrow> </msup> <mo>&#x2212;</mo><mn>3</mn><mo>&#x22C5;</mo><msup><mn>2</mn><mi>x</mi> </msup> <mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow></math>";
+    init_logger();
+    let expr = "<math><mrow> <msup><mn>2</mn><mrow> <mn>2</mn><mi>x</mi><mo>+</mo><mn>1</mn></mrow> </msup> <mo>&#x2212;</mo><mn>3</mn><mo>&#x00D7;</mo><msup><mn>2</mn><mi>x</mi> </msup> <mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow></math>";
     test_braille("Vietnam", expr, "⠼⠃⠔⠣⠼⠃⠭⠐⠖⠼⠁⠱⠐⠤⠼⠉⠐⠦⠼⠃⠔⠭⠐⠖⠼⠁⠐⠶⠼⠚");
 }
 
 #[test]
 fn exponent_3f () {
-    let expr = "<math> <mrow> <mo>&#x21D4;</mo><mn>2</mn><mo>&#x22C5;</mo><msup><mn>2</mn><mrow> <mn>2</mn><mi>x</mi></mrow> </msup> <mo>&#x2212;</mo><mn>3</mn><mo>&#x22C5;</mo><msup><mn>2</mn><mi>x</mi> </msup> <mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow></math>";
+    let expr = "<math> <mrow> <mo>&#x21D4;</mo><mn>2</mn><mo>&#x00D7;</mo><msup><mn>2</mn><mrow> <mn>2</mn><mi>x</mi></mrow> </msup> <mo>&#x2212;</mo><mn>3</mn><mo>&#x00D7;</mo><msup><mn>2</mn><mi>x</mi> </msup> <mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></mrow></math>";
     test_braille("Vietnam", expr, "⠳⠪⠶⠕⠼⠃⠐⠦⠼⠃⠔⠣⠼⠃⠭⠱⠐⠤⠼⠉⠐⠦⠼⠃⠔⠭⠐⠖⠼⠁⠐⠶⠼⠚");
 }
 
@@ -139,7 +140,7 @@ fn exponent_3g () {
 #[test]
 fn exponent_3h () {
     let expr = "<math><mrow> <mo stretchy='false'>(</mo><mi>t</mi><mo>&#x2265;</mo><mn>0</mn><mo stretchy='false'>)</mo></mrow></math>";
-    test_braille("Vietnam", expr, "⠈⠣⠞⠐⠕⠼⠚⠈⠜");
+    test_braille("Vietnam", expr, "⠈⠣⠞⠐⠕⠶⠼⠚⠈⠜");
 }
 
 #[test]
@@ -193,7 +194,7 @@ fn root_4d () {
 
 #[test]
 fn quadratic_5a1 () {
-    let expr = "<math> <mrow> <mi>a</mi><msup><mi>x</mi><mn>2</mn> </msup> <mo>+</mo><mi>b</mi><mi>x</mi><mo>+</mo><mi>c</mi><mo>=</mo><mn>0</mn></mrow> <mrow> <mo stretchy='false'>(</mo><mi>a</mi><mo>&#x2260;</mo><mn>0</mn><mo stretchy='false'>)</mo></mrow></math>";
+    let expr = "<math> <mrow> <mi>a</mi><msup><mi>x</mi><mn>2</mn> </msup> <mo>+</mo><mi>b</mi><mi>x</mi><mo>+</mo><mi>c</mi><mo>=</mo><mn>0</mn></mrow> <mrow><mtext>&#xA0;</mtext> <mo stretchy='false'>(</mo><mi>a</mi><mo>&#x2260;</mo><mn>0</mn><mo stretchy='false'>)</mo></mrow></math>";
     test_braille("Vietnam", expr, "⠁⠭⠔⠼⠃⠐⠖⠃⠭⠐⠖⠉⠐⠶⠼⠚⠀⠈⠣⠁⠐⠾⠼⠚⠈⠜");
 }
 
@@ -247,7 +248,6 @@ fn sin_7 () {
 
 #[test]
 fn cos_7 () {
-    // init_logger();
     let expr = "<math><mrow> <mi>cos</mi><mi>B</mi><mo>=</mo><mfrac><mrow> <mi>A</mi><mi>B</mi></mrow><mrow> <mi>B</mi><mi>C</mi></mrow> </mfrac> </mrow></math>";
     test_braille("Vietnam", expr, "⠻⠉⠨⠃⠐⠶⠆⠁⠃⠌⠃⠉⠰:");
 }
