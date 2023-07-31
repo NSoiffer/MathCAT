@@ -65,7 +65,7 @@
  - "∘": [t: "⠐⠴"]               # 0x2218 (Ring operator)
  - "◦": [t: "⠐⠴"]               # 0x25E6 (White bullet)
  - "∼": [t: "⠈⠔"]               # 0x223C (Tilde operator)
- - "⋅": [t: "⠐⠲"]               # 0x22C5 (Dot operator)
+ - "⋅": [t: "⠐⠦"]               # 0x22C5 (Dot operator)
  - "∧": [t: "⠈⠦"]               # 0x2227 (Logical and)
  - "∨": [t: "⠈⠖"]               # 0x2228 (Logical or)
  - "∩": [T: "⠨⠦"]               # 0x2229 (Intersection)
