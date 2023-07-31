@@ -63,4 +63,17 @@
       DoubleStruck: "⠈"     # script
       Fraktur:      "⠈"     # script
       SansSerif:    "⠈⠼"     # first transcriber-defined typeform prefix indicator
+      GreekVariant: "⠨"     # default to Greek
+
+    Vietnam:
+      # The guideline is being revised -- current guidance is to follow UEB
+      # UEB Guide to Technical Material (https://iceb.org/Guidelines_for_Technical_Material_2008-10.pdf)
+      #   says to normally treat Fraktur and DoubleStruck as Script
+      # Here we provide an option to specify a transcriber-defined typeform prefix indicator instead
+      # Note: here are prefixes for 1st - 5th: "⠈⠼", "⠘⠼", "⠸⠼", "⠐⠼", "⠨⠼"
+      DoubleStruck: "⠈"     # script
+      Fraktur:      "⠈"     # script
+      SansSerif:    "⠈⠼"    # first transcriber-defined typeform prefix indicator
+      GreekVariant: "⠸"     # default to Greek
+
 
