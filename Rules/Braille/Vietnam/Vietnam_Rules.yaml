@@ -329,6 +329,18 @@
       then: [x: "*"]
       # else do nothing -- no content
 
+
+-
+   name: angle   # angles need a shape indicator -- not sure this is the best test (three letters in base, have invisible separators)
+   tag: mover
+   match: "*[2][text()='^'] and *[1][
+              self::m:mrow and count(*)=5 and
+              *[1][self::m:mi] and *[2][text()='\u2063'] and *[3][self::m:mi] and *[4][text()='\u2063'] and *[5][self::m:mi]
+            ]"
+   replace:
+   - t: "⠫⠛"     # shape indicator, g
+   - x: "*[1]"
+
 -
    name: single-char-exceptions    # GTM 12
    tag: [mover, munder]
@@ -371,7 +383,7 @@
 
 -
    name: single-char-exceptions    # RUEB 3.11 -- ° and various prime/minute/seconds aren't treated as if superscripts
-   tag: [msup]
+   tag: msup
    match: "*[2][translate(., \"'*`ª°²³´¹º‘’“”‟′″‴‵‶‷⁗\",'')='']"
    replace: [x: "*"]
 
