@@ -391,6 +391,13 @@ fn ratio_3_2_6() {
 }
 
 #[test]
+fn standing_alone_1() {
+    // Tests bug: github.com/NSoiffer/MathCAT/issues/142
+    let expr = "<math><mo>(</mo><mi>n</mi><mo>=</mo><mn>7</mn><mo>)</mo></math>";
+    test_braille("UEB", expr, "⠐⠣⠰⠝⠀⠐⠶⠀⠼⠛⠐⠜");
+}
+
+#[test]
 fn example_3_4_1() {
     let expr = "<math><mo>-</mo><mn>4</mn><mtext>&#xA0;to&#xA0;</mtext><mo>+</mo><mn>5</mn></math>";
     test_braille("UEB", expr, "⠐⠤⠼⠙⠀⠞⠕⠀⠐⠖⠼⠑");

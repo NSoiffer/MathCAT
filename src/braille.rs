@@ -512,7 +512,7 @@ fn is_short_form(chars: &[char]) -> bool {
 }
 
 fn ueb_cleanup(raw_braille: String) -> String {
-    debug!("ueb_cleanup: start={}", raw_braille);
+    // debug!("ueb_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
 
@@ -1130,11 +1130,14 @@ fn stands_alone(chars: &[char], i: usize) -> (bool, &[char], usize) {
     // scan backward and check the conditions for "standing-alone"
     // we scan forward and check the conditions for "standing-alone"
     assert_eq!(chars[i], 'L', "'stands_alone' starts with non 'L'");
+    // debug!("stands_alone: i={}, chars: {:?}", i, chars);
     if !left_side_stands_alone(&chars[0..i]) {
         return (false, &chars[i..i+2], 0);
     }
 
     let (mut is_alone, n_letters, n_right_matched) = right_side_stands_alone(&chars[i+2..]);
+    // debug!("left is alone, right is alone: {}, : n_letters={}, n_right_matched={}", is_alone, n_letters, n_right_matched);
+
     if is_alone && n_letters == 1 {
         let ch = chars[i+1];
         if ch=='⠁' || ch=='⠊' || ch=='⠕' {      // a, i, o
@@ -1155,7 +1158,8 @@ fn stands_alone(chars: &[char], i: usize) -> (bool, &[char], usize) {
             let prev_ch = if i > 0 {chars[i-1]} else {' '};  // ' ' is a char not in input
             // debug!("  left alone: prev/ch {}/{}", prev_ch, ch);
             if (!intervening_chars_mode && prev_ch == 'L') ||
-               (ch == 'o' || ch == 'b') {
+               (prev_ch == 'o' || prev_ch == 'b') {
+                intervening_chars_mode = true;
                 i -= 1;       // ignore 'Lx' and also ignore 'ox'
             } else if LEFT_INTERVENING_CHARS.contains(&ch) {
                 intervening_chars_mode = true;
@@ -1224,6 +1228,7 @@ fn handle_contractions(chars: &[char], mut result: String) -> String {
         // figure this out -- also applies to ea, bb, ff, and gg (not that they matter)
         // cc may be important for "arccos", but RUEB doesn't apply it to "arccosine", so maybe not
         // Replacement{ pattern: "L⠉L⠉", replacement: "L⠒" },              // cc -- don't match if after/before a cap letter
+        
         
         Replacement{ pattern: "L⠎L⠓", replacement: "L⠩" },              // sh
         Replacement{ pattern: "L⠁L⠗", replacement: "L⠜" },              // ar
@@ -1594,9 +1599,9 @@ impl BrailleChars {
             },
         };
         let result = PICK_APART_CHAR.replace_all(&braille_chars, |caps: &Captures| {
-            debug!("captures: {:?}", caps);
-            debug!("  bold: {:?}, italic: {:?}, face: {:?}, cap: {:?}, char: {:?}",
-                   &caps["bold"], &caps["italic"], &caps["face"], &caps["cap"], &caps["char"]);
+            // debug!("captures: {:?}", caps);
+            // debug!("  bold: {:?}, italic: {:?}, face: {:?}, cap: {:?}, char: {:?}",
+            //        &caps["bold"], &caps["italic"], &caps["face"], &caps["cap"], &caps["char"]);
             if bold || !caps["bold"].is_empty() {"B"} else {""}.to_string()
                 + if italic || !caps["italic"].is_empty() {"I"} else {""}
                 + if !&caps["face"].is_empty() {&caps["face"]} else {typeface}
