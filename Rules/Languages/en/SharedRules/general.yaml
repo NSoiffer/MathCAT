@@ -190,8 +190,19 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - t: "sub"      # phrase(here is a 'sub' total)
+  - t: "sub"      # phrase(the subscripted variable a 'sub' i)
   - x: "*[2]"
+  - test:
+      if: "DEBUG(not(IsNode(*[2],'leaf')))"
+      then:
+      - test:
+          if: "$Verbosity='Verbose'"
+          then: {t: "end subscript"}      # phrase(this is the 'end subscript' position)
+          else: {t: "end sub"}      # phrase(this is the 'end sub' position)
+      - pause: short
+      else_test:
+          if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
+          then: [pause: short]
 
 - name: bigop-both
   tag: large-op
@@ -288,7 +299,7 @@
       else: {t: "sub"}      # phrase(the result is 'sub' optimal)
   - x: "*[2]"
   - test:
-      if: "not(IsNode(*[2],'leaf'))"
+      if: "DEBUG(not(IsNode(*[2],'leaf')))"
       then:
       - test:
           if: "$Verbosity='Verbose'"
