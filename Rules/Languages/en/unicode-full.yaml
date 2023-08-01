@@ -17,8 +17,6 @@
         if: "ancestor::m:modified-variable and preceding-sibling::*[1][self::m:mi]"
         then: [t: "bar"]
         else: [t: "line"]
- - "°": [t: "degrees"]                             # 0xb0
- - "±": [t: "plus or minus"]                       # 0xb1
  - "²": [t: "two"]                                 # 0xb2
  - "³": [t: "three"]                               # 0xb3
  - "´": [t: "acute"]                               # 0xb4
@@ -319,12 +317,9 @@
  - "⁆": [t: "right square bracket with quill"]     # 0x2046
  - "⁗": [t: "quadruple prime"]                     # 0x2057
  - "⁠": [t: ""]                                   # 0x2060
- - "⁡":                                          # 0x2061
-    - test:
-        if: $Verbosity!='Terse' and "not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])" 
-        then: [t: "of"]
- - "⁣": [t: ""]                                   # 0x2063
- - "⁤": [t: "and"]                                # 0x2064
+ - "‵": [t: "reversed prime"]                      # 0x2035
+ - "‶": [t: "reversed double prime"]               # 0x2036
+ - "‷": [t: "reversed triple prime"]               # 0x2037
  - "⁰": [t: "to the zeroth power"]                 # 0x2070
  - "ⁱ": [t: "to the eihth power"]                  # 0x2071
  - "⁴": [t: "to the fourth power"]                 # 0x2074
