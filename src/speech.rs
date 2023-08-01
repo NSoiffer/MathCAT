@@ -2356,7 +2356,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                 return replace_single_char(self, ch, mathml)
             } else {
                 // more than one char -- fix up non-breaking space
-                return Ok(str.replace('\u{00A0}', " "));    
+                return Ok(str.replace('\u{00A0}', " ").replace(&['\u{2061}', '\u{2062}', '\u{2063}', '\u{2064}'], ""));    
             }
         };
 
