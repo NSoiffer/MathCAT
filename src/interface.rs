@@ -778,9 +778,22 @@ mod tests {
         }
         let entity_str = ID_MATCH.replace_all(&entity_str, "");
         let converted_str = ID_MATCH.replace_all(&converted_str, "");
-    
-        assert_eq!(entity_str, converted_str);
+        assert_eq!(entity_str, converted_str, "normal entity test failed");
+
+
+        let entity_str = set_mathml("<math data-quot=\"&quot;value&quot;\" data-apos='&apos;value&apos;'><mi>XXX</mi></math>".to_string()).unwrap();
+        let converted_str = set_mathml("<math data-quot='\"value\"' data-apos=\"'value'\"><mi>XXX</mi></math>".to_string()).unwrap();
+        let entity_str = ID_MATCH.replace_all(&entity_str, "");
+        let converted_str = ID_MATCH.replace_all(&converted_str, "");
+        assert_eq!(entity_str, converted_str, "special entities quote test failed");
+
+        let entity_str = set_mathml("<math><mo>&lt;</mo><mo>&gt;</mo><mtext>&amp;lt;</mtext></math>".to_string()).unwrap();
+        let converted_str = set_mathml("<math><mo>&#x003C;</mo><mo>&#x003E;</mo><mtext>&#x0026;lt;</mtext></math>".to_string()).unwrap();
+        let entity_str = ID_MATCH.replace_all(&entity_str, "");
+        let converted_str = ID_MATCH.replace_all(&converted_str, "");
+        assert_eq!(entity_str, converted_str, "special entities <,>,& test failed");
     }
+    
 
     #[test]
     fn can_recover_from_invalid_set_rules_dir() {
