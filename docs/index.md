@@ -10,16 +10,28 @@ A goal of MathCAT is to be an easy to use library for screen readers and other a
 
 Todo: incorporation of third party libraries to support a common subset of TeX math commands along with ASCIIMath.
 
+
+# Documentation for different MathCAT Users
+
+There are many different audiences for MathCAT and each audience has different interests/needs. Please see the following documentation for details based on your needs:
+* AT users: [information about preferences you can set](users.md)
+* AT developers/library users: [information about the API that MathCAT exposes](callers.md)
+* Translators/Rule writers: [information about the files that need to be translated](helpers.md)
+* MathCAT developers: information about MathCAT's design
+
+# Some Technical Details
 MathCAT is written in Rust and can be built to interface with many languages. To date there are interfaces for:
 * [C/C++](https://github.com/NSoiffer/MathCATForC)
 * [Python](https://github.com/NSoiffer/MathCATForPython) -- this is used by an [NVDA add-on](https://addons.nvda-project.org/addons/MathCAT.en.html). I hope to eventually get it incorporated into [Orca](https://help.gnome.org/users/orca/stable) which is written in Python.
 * [Java](https://github.com/mwhapples/MathCAT4J) -- this is currently being used to experiment with MathCAT in [BrailleBlaster](https://www.brailleblaster.org/).
-* [WebAssembly (Wasm)](https://github.com/NSoiffer/MathCATDemo/) -- this is used for a web demo of MathCAT.
+* [WebAssembly (Wasm, sort of JavaScript)](https://github.com/NSoiffer/MathCATDemo/) -- this is used for a web demo of MathCAT.
 
 MathCAT uses a number of heuristics that try to repair poor MathML and put it in a recommended format. For example, TeX converters and WYSIWYG editors will take "1,234+1" and break the number "1,234" apart at the comma. MathCAT recognizes that and folds the number into a single `mn`. Other repairs are structural such as creating `mrow`s based on information from MathML's operator dictionary and adding invisible function application, multiplication, addition (mixed fractions), and separators (e.g, between the $i$ and $j$ in $a\_{ij}$) when it seems appropriate. This simplifies speech and Nemeth generation and may be useful to other apps. Currently the cleanup is not exposed in an API, but potentially it could be another service of MathCAT. In general, MathCAT is somewhat conservative in its repair. However, it likely will do the wrong thing in some cases, but the hope is it does the right thing much, much more frequently. Finding common mistakes of translators to MathML and patching up the poor MathML is an ongoing project.
 
-## Current Status (updated 3/20/23)
-MathCAT is under active development. Initial speech, navigation, and Nemeth generation is complete and [NVDA add-on](https://addons.nvda-project.org/addons/MathCAT.en.html) now exists. It should be usable as a MathPlayer replacement for those using the English version or one of the supported translations. It is not as complete or polished in some ways as MathPlayer though. However, it supports both Nemeth and UEB technical braille generation. The Nemeth braille is substantially better than that provided by MathPlayer and includes integration with navigation (uses dots 7 and 8 to indicate the navigation node). Because of the high quality braille output, [BrailleBlaster](https://www.brailleblaster.org/) uses MathCAT for braille generation from MathML.
+## Current Status (updated 8/1/23)
+MathCAT is under active development. Initial speech, navigation, and braille (Nemeth, UEB) generation is complete and [NVDA add-on](https://addons.nvda-project.org/addons/MathCAT.en.html) now exists. It should be usable as a MathPlayer replacement for those using the English version or one of the supported translations. It is not as complete or polished in some ways as MathPlayer though. However, it supports both Nemeth and UEB technical braille generation. The Nemeth braille is substantially better than that provided by MathPlayer and other MathML → Nemeth translators. It also includes integration with navigation (uses dots 7 and 8 to indicate the navigation node). Because of the high quality braille output, [BrailleBlaster](https://www.brailleblaster.org/) uses MathCAT for braille generation from MathML.
+
+A number of other AT are working to incorporate MathCAT into their products. Notable among these groups is Vispero/JAWS. No release date for a version of JAWS with MathCAT has been announced yet. [Other companies: if you have incorporated MathCAT into your product and would like to be mentioned here, please contact me by email or add an issue to update the documentation]
 
 A demo to show off some of MathCAT's features and also as an aid for debugging was developed. [Visit the demo](https://nsoiffer.github.io/MathCATDemo/) and please report any bugs you find. This demo is _not_ how AT users will typically interact with MathCAT but does show features that AT can potentially expose to end users such as highlighting of the speech, navigation, and braille.
 
@@ -28,7 +40,7 @@ Timeline:
 2022
 * ✓ early January: prototype usage of preliminary MathML WG proposal for "intent"
 * ✓ January: Distribute MathCAT to a small group of students and other users for feedback and bug reports
-* ✓ February/March: Work on MathML->UEB translation
+* ✓ February/March: Work on MathML → UEB translation
 * ✓ April: Prosody implementation/compatibility with SAPI, One Core, eSpeak, and Eloquence voices
 * late April/May: add more intent inference rules (ongoing)
 * ✓ May: Release MathCAT as NVDA add-on
@@ -44,25 +56,18 @@ Timeline:
 * Spring 2023: translation work
   * ✓ Create some tools to simplify generation of the Unicode files in different languages
   * Create some tools to help update other languages when the English version changes (adds new rules) [critical]
-  * Add phrases so better starting points for translations can be generated
+  * ✓ Add phrases so better starting points for translations can be generated
   * Work with translators and fix any problems they might turn up
-  * Work with translators to hopefully add many languages
-* Early 2024: work on UEB->MathML translation and explore UEB->Nemeth math translator
+  * Work with translators to hopefully add many languages (added Spanish translation)
+* ✓ (mostly) Summer 2023: Vietnamese braille code 
+* Early 2024: work on UEB → MathML translation and explore UEB → Nemeth math translator
 * Fall 2023: potentially work on 2D Nemeth generation along with Nemeth input
-* Early 2024: work on UEB->MathML translation and explore UEB->Nemeth math translator
+* Early 2024: work on UEB → MathML translation and explore UEB → Nemeth math translator
 
 
 
 These plans are very tentative and will likely change based on feedback from users and AT developers.
 I also have commitments for working on the MathML spec, so that can also delay some of these dates.
-
-# Documentation for different MathCAT Users
-
-There are many different audiences for MathCAT and each audience has different interests/needs. Please see the following documentation for details based on your needs:
-* AT users: [information about preferences you can set](users.md)
-* AT developers/library users: [information about the API that MathCAT exposes](callers.md)
-* Translators/Rule writers: [information about the files that need to be translated](helpers.md)
-* MathCAT developers: information about MathCAT's design
 
 ## Why MathCAT?
 
@@ -151,7 +156,7 @@ Using open source math books, the initial load should cover at least 99.99% of t
 
 The library is about ~3mb in size.
 
-If you are working on an in-browser solution (i.e, you are using JavaScript or some other browser-based language), MathCAT is probably not the best tool for you (although I will probably add a Javascript interface). Instead, take a look at [Speech rule engine](https://github.com/zorkow/speech-rule-engine) (SRE) by Volker Sorge. It is written in TypeScript and will likely meet your needs for an in-browser solution.
+If you are working on an in-browser solution (i.e, you are using JavaScript or some other browser-based language), MathCAT is probably not the best tool for you (although I will probably factor the [MathCATDemo](https://github.com/NSoiffer/MathCATDemo/) into a Javascript interface which the demo is built on top of). Instead, take a look at [Speech rule engine](https://github.com/zorkow/speech-rule-engine) (SRE) by Volker Sorge. It is written in TypeScript and will likely meet your needs for an in-browser solution unless UEB braille is important.
 
 
 # Acknowledgements
@@ -170,3 +175,14 @@ Translators:
 * Others??? -- please volunteer so I can list you here...
 
 Thanks to everyone who volunteered!
+
+# About me
+I've been working on math accessibility since 2002. At the time, I worked on Mathematica's WYSIWYG math editor and other UI features. Prof. John Gardner, who had lost his sight 15 years earlier, asked whether I could make the Mathematica frontend accessible. I maybe got 80% of the way there, but the company wasn't interested in pursuing this and ultimately I left the company and the company removed the code. That was the start of my accessibility journey: one step forward, one step back, and then forward again because allowing _everyone_ to have a chance to find the joy of math and science has given purpose to my life.
+
+I then joined Design Science, Inc (DSI) which had an interest in making math accessible. At the time, DSI had recently developed MathPlayer, a plugin for IE6 that displayed MathML. I worked on adding features to that and with the company's support, applied for and received an NSF grant to make MathPlayer accessible. That work was quite successful and in subsequent years I continued to add features to it. However, for security reasons, Internet Explorer removed the interface that MathPlayer depended upon. It's tempting to say that is what doomed IE... After that, MathPlayer became an accessibility-only NVDA add-on. Further work through an IES grant with ETS refined MathPlayer's capabilities; valuable insight was gained via user-studies funded by the grant.
+
+For more information about what happened to MathPlayer and how MathCAT came to be, see the [Why MathCAT?](#why-mathcat) section.
+
+All along, I've been pushing to make math work on the web and make it accessible. While at Wolfram Research, I helped get the W3C MathML effort started and have been involved with the working group ever since. I currently chair the W3C Math Working Group. I've been a member on several other committees over the years pushing strongly to make sure they incorporated math accessibility into their standards. Some of the these groups include NIMAS, EPUB, and PDF/UA.
+
+I'm very honored that in 2023, the National Federation of the Blind gave me the $25,000 Jacob Bolotin award. In part, that was due to my work on MathCAT. I plan to give most of that money back to blind programmers who help out with MathCAT. MathCAT should not just be _for_ the blind community, it should also be _by_ the blind community. Stay tuned for details.
