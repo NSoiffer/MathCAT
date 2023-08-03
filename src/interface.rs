@@ -217,7 +217,6 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
             } else {
                 files_changed = pref_manager.set_user_prefs(&name, &value);     // assume string valued
             }
-            pref_manager.merge_prefs();
         }
 
         match name.as_str() {
