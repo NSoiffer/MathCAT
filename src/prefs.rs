@@ -390,6 +390,11 @@ impl PreferenceManager {
 
         match PreferenceManager::find_rules_dir(&rules_dir) {
             Ok(rules_dir) => {
+                if let Some(old_rules_dir) = &self.rules_dir {
+                    if old_rules_dir == &rules_dir {
+                        return Ok(());
+                    }
+                }
                 let (user_prefs, pref_files) = Preferences::from_file(&rules_dir)?;
                 match self.set_all_files(&rules_dir, user_prefs, pref_files) {
                     Ok(_) => {
@@ -961,8 +966,15 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
+
+            pref_manager.set_user_prefs("Language", "en");
+            pref_manager.set_user_prefs("SubjectArea", "General");
+            pref_manager.set_user_prefs("ClearSpeak_AbsoluteValue", "Auto");
+            pref_manager.set_user_prefs("ResetNavMode", "false");
+            pref_manager.set_user_prefs("BrailleCode", "Nemeth");
+
             let prefs = pref_manager.get_user_prefs();
-            assert_eq!(prefs.to_string("Language").as_str(), "Auto");
+            assert_eq!(prefs.to_string("Language").as_str(), "en");
             assert_eq!(prefs.to_string("SubjectArea").as_str(), "General");
             assert_eq!(prefs.to_string("ClearSpeak_AbsoluteValue").as_str(), "Auto");
             assert_eq!(prefs.to_string("ResetNavMode").as_str(), "false");
@@ -983,6 +995,22 @@ mod tests {
             pref_manager.set_user_prefs("Language", "zz");
             
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+        });
+    }
+    
+    #[test]
+    fn test_speech_style_change() {
+        PREF_MANAGER.with(|pref_manager| {
+            let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
+            pref_manager.set_user_prefs("Language", "en");
+            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
+
+            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
+
+            pref_manager.set_user_prefs("SpeechStyle", "SimpleSpeak");
+            
+            assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("Languages/en/SimpleSpeak_Rules.yaml"));
         });
     }
 
