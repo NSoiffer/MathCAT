@@ -439,6 +439,7 @@
  - "φ": [t: "GL⠋"]              # 0x3c6 
  - "χ": [t: "GL⠯"]              # 0x3c7 
  - "ψ": [t: "GL⠽"]              # 0x3c8 
+ - "ω": [t: "GL⠺"]              # 0x3c9 
 
  - "Α": [t: "CGL⠁"]             # 0x391 
  - "Β": [t: "CGL⠃"]             # 0x392 
@@ -464,7 +465,7 @@
  - "Φ": [t: "CGL⠋"]             # 0x3a6 
  - "Χ": [t: "CGL⠯"]             # 0x3a7 
  - "Ψ": [t: "CGL⠽"]             # 0x3a8 
- - "ω": [t: "CGL⠺"]             # 0x3a9
+ - "Ω": [t: "CGL⠺"]             # 0x3a9
 
  - "µ": [t: "GL⠍"]              # 0x00B5 (Micro (Greek mu))
  - "Ω": [t: "CGL⠺"]             # 0x2126 (Ohm sign (capital Greek omega))
