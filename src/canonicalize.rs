@@ -1024,7 +1024,7 @@ impl CanonicalizeContext {
 					continue;
 				}
 				let attr_name = match child.attribute_value("encoding") {
-					Some(encoding_name) => format!("data-{}-{}", child_name, encoding_name.replace("/", "_slash_")),
+					Some(encoding_name) => format!("data-{}-{}", child_name, encoding_name.replace('/', "_slash_")),
 					None => format!("data-{}", child_name),		// probably shouldn't happen
 				};
 				let attr_name = attr_name.as_str();
