@@ -1095,7 +1095,7 @@ pub fn add_builtin_functions(context: &mut Context) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::{path::PathBuf};
+    use std::path::PathBuf;
     use sxd_document::parser;
     use crate::interface::{trim_element, get_element};
 
