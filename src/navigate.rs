@@ -511,7 +511,9 @@ fn speak<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContex
         // Here, we temporarily mark the current node, get the intent reading of the parent and then find the node in the parent.
         // If it isn't present, we skip context and retry
         mathml.set_attribute_value(MARKED_NODE, "nav");
-        let context_mathml = if let Some(parent) = mathml.parent() {parent.element().unwrap()} else {mathml};
+        let parent = mathml.parent();
+        #[allow(clippy::unnecessary_unwrap)]        // alternative is mess of nested if let...
+        let context_mathml = if parent.is_some() && parent.unwrap().element().is_some() {parent.unwrap().element().unwrap()} else {mathml};
         // debug!("context_mathml: {}", mml_to_string(&context_mathml));
         let intent = crate::speech::intent_from_mathml(context_mathml, rules_with_context.get_document())?;
         // debug!("intent: {}", mml_to_string(&intent));
