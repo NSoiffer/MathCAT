@@ -644,7 +644,7 @@ pub fn is_same_element(e1: &Element, e2: &Element) -> Result<()> {
         for attr1 in attrs1 {
             if let Some(found_attr2) = attrs2.iter().find(|&attr2| attr1.name().local_part() == attr2.name().local_part()) {
                 if attr1.value() == found_attr2.value() {
-                    break;
+                    continue;
                 } else {
                     bail!("Attribute named {} has differing values:\n  '{}'\n  '{}'", attr1.name().local_part(), attr1.value(), found_attr2.value());
                 }
