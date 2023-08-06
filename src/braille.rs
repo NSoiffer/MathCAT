@@ -15,7 +15,7 @@ static UEB_PREFIXES: phf::Set<char> = phf_set! {
 
 /// braille the MathML
 /// If 'nav_node_id' is not an empty string, then the element with that id will have dots 7 & 8 turned on as per the pref
-pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
+pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<(String, usize, usize)> {
     crate::speech::SpeechRules::update();
     return BRAILLE_RULES.with(|rules| {
         rules.borrow_mut().read_files()?;
@@ -39,7 +39,8 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
             if highlight_style != "Off" {
                 highlight_braille_chars(braille, &braille_code, highlight_style == "All")
             } else {
-             braille
+                let end = braille.chars().count();
+                (braille, 0, end)
             }
         );
     });
@@ -47,28 +48,29 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
     // highlight with dots 7 & 8 based on the highlight style
     // both the start and stop points will be extended to deal with indicators such as capitalization
     // if 'fill_range' is true, the interior will be highlighted
-    fn highlight_braille_chars(braille: String, braille_code: &str, fill_range: bool) -> String {
+    fn highlight_braille_chars(braille: String, braille_code: &str, fill_range: bool) -> (String, usize, usize) {
         let mut braille = braille;
         // some special (non-braille) chars weren't converted to having dots 7 & 8 to indicate navigation position
         // they need to be added to the start
 
-        // find start and end indexes of the highlighted region
+        // find start and end (byte) indexes of the highlighted region (braille chars have length=3 bytes)
         let start = braille.find(is_highlighted);
         let end = braille.rfind(is_highlighted);
         if start.is_none() {
             assert!(end.is_none());
-            return braille;
+            let end = braille.chars().count();
+            return (braille, 0, end/3);
         };
 
         let end = end.unwrap();         // always exists if start exists
         let start = highlight_first_indicator(&mut braille, braille_code, start.unwrap(), end);
 
         if start == end {
-            return braille;
+            return (braille, start/3, end/3);
         }
 
         if !fill_range {
-            return braille;
+            return (braille, start/3, end/3);
         }
 
         let mut result = String::with_capacity(braille.len());
@@ -78,7 +80,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
             result.push( highlight(ch) );
         };
         result.push_str(&braille[end..]);
-        return result;
+        return (result, start/3, end/3);
 
         fn highlight_first_indicator(braille: &mut String, braille_code: &str, start_index: usize, end_index: usize) -> usize {
             // chars in the braille block range use 3 bytes -- we can use that to optimize the code some
@@ -1732,6 +1734,7 @@ mod tests {
     
     #[test]
     fn ueb_highlight_24() -> Result<()> {       // issue 24
+        init_logger();
         let mathml_str = "<math display='block' id='M8o41h70-0'>
                 <mrow id='M8o41h70-1'>
                 <mn id='M8o41h70-2'>4</mn>
@@ -1747,8 +1750,13 @@ mod tests {
         set_preference("BrailleNavHighlight".to_string(), "All".to_string()).unwrap();
         let braille = get_braille("M8o41h70-2".to_string())?;
         assert_eq!("⣼⣙⠰⠁⠉", braille);
+        set_navigation_node("M8o41h70-2".to_string(), 0)?;
+        assert_eq!( get_braille_position()?, (0,1));
+
         let braille = get_braille("M8o41h70-4".to_string())?;
         assert_eq!("⠼⠙⣰⣁⠉", braille);
+        set_navigation_node("M8o41h70-4".to_string(), 0)?;
+        assert_eq!( get_braille_position()?, (2,3));
         return Ok( () );
     }
 }

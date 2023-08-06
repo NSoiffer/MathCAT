@@ -265,7 +265,7 @@ pub fn get_braille(nav_node_id: String) -> Result<String> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
-        let braille = crate::braille::braille_mathml(mathml, nav_node_id)?;
+        let braille = crate::braille::braille_mathml(mathml, nav_node_id)?.0;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( braille );
     });
@@ -364,6 +364,17 @@ pub fn get_navigation_mathml_id() -> Result<(String, usize)> {
         return Ok( NAVIGATION_STATE.with(|nav_stack| {
             return nav_stack.borrow().get_navigation_mathml_id(mathml);
         }) )
+    });
+}
+
+/// Return the start and end braille character positions associated with the current (navigation) node.
+pub fn get_braille_position() -> Result<(usize, usize)> {
+    return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&package_instance);
+        let nav_node = get_navigation_mathml_id()?;
+        let (_, start, end) = crate::braille::braille_mathml(mathml, nav_node.0)?;
+        return Ok( (start, end) )
     });
 }
 
