@@ -328,6 +328,16 @@ pub fn do_navigate_command(command: String) -> Result<String> {
     });
 }
 
+/// Given an 'id' and an offset (for tokens), set the navigation node to that id.
+/// An error is returned if the 'id' doesn't exist
+pub fn set_navigation_node(id: String, offset: usize) -> Result<()> {
+    return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&package_instance);
+        return set_navigation_node_from_id(mathml, id, offset);
+    });
+}
+
 /// Return the MathML associated with the current (navigation) node.
 /// The returned result is the `id` of the node and the offset (0-based) from that node (not yet implemented)
 /// The offset is needed for token elements that have multiple characters.

@@ -10,8 +10,9 @@ use sxd_document::Package;
 use std::fmt;
 use crate::pretty_print::mml_to_string;
 use crate::speech::{NAVIGATION_RULES, CONCAT_INDICATOR, CONCAT_STRING, SpeechRules, SpeechRulesWithContext};
+use crate::xpath_functions::is_leaf;
 #[cfg(not(target_family = "wasm"))]
-use std::time::{Instant};
+use std::time::Instant;
 use crate::errors::*;
 use crate::canonicalize::as_element;
 use phf::phf_set;
@@ -154,7 +155,7 @@ impl NavigationState {
 
     fn pop(&mut self) -> Option<(NavigationPosition, &'static str)> {
         assert_eq!(self.position_stack.len(), self.command_stack.len());
-        if self.position_stack.is_empty() {
+        if self.position_stack.len() <= 1 {
             return None;
         } else {
             return Some( (self.position_stack.pop().unwrap(), self.command_stack.pop().unwrap()) );
@@ -263,6 +264,29 @@ pub fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> 
         }
     }
     return None;
+}
+
+/// Search the mathml for the id and set the navigation node to that id
+/// Resets the navigation stack
+pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -> Result<()> {
+    let node = get_node_by_id(mathml, &id);
+    if let Some(node) = node {
+        if !is_leaf(node) && offset != 0 {
+            bail!("Id {} is not a leaf in the MathML tree but has non-zero offset={}. Referenced MathML node is {}", id, offset, mml_to_string(&node));
+        }
+        return NAVIGATION_STATE.with(|nav_state| {
+            let mut nav_state = nav_state.borrow_mut();
+            nav_state.reset();
+            nav_state.push(NavigationPosition{
+                current_node: id,
+                current_node_offset: offset
+            }, "None");
+            return Ok( () );
+        })
+    } else {
+        bail!("Id {} not found in MathML {}", id, mml_to_string(&mathml));
+    }
+
 }
 
 // FIX: think of a better place to put this, and maybe a better interface
@@ -511,7 +535,9 @@ fn speak<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContex
         // Here, we temporarily mark the current node, get the intent reading of the parent and then find the node in the parent.
         // If it isn't present, we skip context and retry
         mathml.set_attribute_value(MARKED_NODE, "nav");
-        let context_mathml = if let Some(parent) = mathml.parent() {parent.element().unwrap()} else {mathml};
+        let parent = mathml.parent();
+        #[allow(clippy::unnecessary_unwrap)]        // alternative is mess of nested if let...
+        let context_mathml = if parent.is_some() && parent.unwrap().element().is_some() {parent.unwrap().element().unwrap()} else {mathml};
         // debug!("context_mathml: {}", mml_to_string(&context_mathml));
         let intent = crate::speech::intent_from_mathml(context_mathml, rules_with_context.get_document())?;
         // debug!("intent: {}", mml_to_string(&intent));
@@ -860,7 +886,7 @@ mod tests {
                 if !result_id.is_empty() {
                     NAVIGATION_STATE.with(|nav_stack| {
                         let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
-                        assert_eq!(result_id, id);
+                        assert_eq!(result_id, id, "\nTest result did not match id={}", result_id);
                     });
                 }
                 return nav_speech;
@@ -1134,7 +1160,7 @@ mod tests {
     }
     
     #[test]
-    fn text_extremes_and_move_last_location() -> Result<()> {
+    fn test_extremes_and_move_last_location() -> Result<()> {
         let mathml_str = "<math id='math'><mfrac id='mfrac'>
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
@@ -1154,7 +1180,8 @@ mod tests {
 
             test_command("ZoomOutAll", mathml, "mfrac");
             test_command("ZoomOut", mathml, "mfrac");
-            test_command("MoveLastLocation", mathml, "base");       // second zoom out should do nothing
+            assert_eq!(test_command("MoveLastLocation", mathml, "base"), "undo zooming out all the way; b");       // second zoom out should do nothing
+            assert_eq!(test_command("MoveLastLocation", mathml, "base"), "no previous command; b");       // test nothing left on stack
 
             test_command("ZoomOut", mathml, "msup");
             test_command("ZoomInAll", mathml, "base");
@@ -1398,11 +1425,12 @@ mod tests {
                 </mrow>
             </math>";
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
-        set_mathml(mathml_str.to_string()).unwrap();
         set_preference("NavMode".to_string(), "Character".to_string())?;
         set_preference("NavVerbosity".to_string(), "Verbose".to_string())?;
+
         set_preference("Language".to_string(), "en".to_string())?;
-        return MATHML_INSTANCE.with(|package_instance| {
+        set_mathml(mathml_str.to_string()).unwrap();
+        MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
             test_command("ZoomInAll", mathml, "id-3");
@@ -1410,9 +1438,22 @@ mod tests {
             assert_eq!(test_command("MoveNext", mathml, "id-6"), "move right, out of denominator; z");
             assert_eq!(test_command("MovePrevious", mathml, "id-4"), "move left, in denominator; y");
             assert_eq!(test_command("MovePrevious", mathml, "id-3"), "move left, in numerator; x");
-
-            return Ok( () );
         });
+
+        // ***fails due to language not changing -- need to fix up-to-date test***
+        // set_preference("Language".to_string(), "es".to_string())?;
+        // set_mathml(mathml_str.to_string()).unwrap();
+        // MATHML_INSTANCE.with(|package_instance| {
+        //     let package_instance = package_instance.borrow();
+        //     let mathml = get_element(&*package_instance);
+        //     test_command("ZoomInAll", mathml, "id-3");
+        //     assert_eq!(test_command("MoveNext", mathml, "id-4"), "desplazar derecha, en denominador; y");
+        //     assert_eq!(test_command("MoveNext", mathml, "id-6"), "desplazar derecha, furera de denominador; z");
+        //     assert_eq!(test_command("MovePrevious", mathml, "id-4"), "desplazar izquierda, en denominador; y");
+        //     assert_eq!(test_command("MovePrevious", mathml, "id-3"), "desplazarse izquierda, en numerador; x");
+        // });
+
+        return Ok( () );
     }
     
     #[test]
@@ -1717,6 +1758,27 @@ mod tests {
             let speech =test_command("WhereAmIAll", mathml, "exp");
             // should be 2 "inside" strings corresponding to steps to the root
             assert_eq!(speech, "2; inside; b squared; inside; the fraction with numerator; b squared; and denominator d;");
+            return Ok( () );
+        });
+    }
+
+    #[test]
+    fn test_set_navigation_node_from_id() -> Result<()> {
+        init_logger();
+        let mathml_str = "<math id='math'><mfrac id='mfrac'>
+                <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
+                <mi id='denom'>d</mi>
+            </mfrac></math>";
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
+        set_navigation_node("base".to_string(), 0).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            // WhereAmIAll doesn't change the stack
+            test_command("ZoomOut", mathml, "msup");
+            test_command("MoveLastLocation", mathml, "base");
+            test_command("MoveLastLocation", mathml, "base");
             return Ok( () );
         });
     }
