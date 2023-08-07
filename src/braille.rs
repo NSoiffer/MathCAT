@@ -516,19 +516,20 @@ fn ueb_cleanup(raw_braille: String) -> String {
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
 
+    let pref_manager = crate::prefs::PreferenceManager::get();
+    let pref_manager = pref_manager.borrow();
+    let prefs = pref_manager.get_user_prefs();
+    let use_only_grade1 = prefs.to_string("UEB_START_MODE").as_str() == "Grade1";
     
     // '𝐖' is a hard break -- basically, it separates exprs
     let mut result = result.split('𝐖')
-                        .map(|str| pick_start_mode(str) + "W")
+                        .map(|str| pick_start_mode(str, use_only_grade1) + "W")
                         .collect::<String>();
     result.pop();   // we added a 'W' at the end that needs to be removed.
 
     let result = result.replace("tW", "W");
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
-    let pref_manager = crate::prefs::PreferenceManager::get();
-    let pref_manager = pref_manager.borrow();
-    let prefs = pref_manager.get_user_prefs();
     let double_struck = prefs.to_string("UEB_DoubleStruck");
     let sans_serif = prefs.to_string("UEB_SansSerif");
     let fraktur = prefs.to_string("UEB_Fraktur");
@@ -554,7 +555,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
    
     return result.to_string();
 
-    fn pick_start_mode(raw_braille: &str) -> String {
+    fn pick_start_mode(raw_braille: &str, use_only_grade1: bool) -> String {
         // Need to decide what the start mode should be
         // From http://www.brailleauthority.org/ueb/ueb_math_guidance/final_for_posting_ueb_math_guidance_may_2019_102419.pdf
         //   Unless a math expression can be correctly represented with only a grade 1 symbol indicator in the first three cells
@@ -562,6 +563,9 @@ fn ueb_cleanup(raw_braille: String) -> String {
         //   begin the expression with a grade 1 word indicator (or a passage indicator if the expression includes spaces)
         // Apparently "only a grade 1 symbol..." means at most one grade 1 symbol based on some examples (GTM 6.4, example 4)
         // debug!("before determining mode:  '{}'", raw_braille);
+        if use_only_grade1 {
+            return remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage); 
+        }
         let grade2 = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade2, UEB_Duration::Symbol);
         // debug!("Symbol mode:  '{}'", grade2);
 
@@ -1732,23 +1736,40 @@ mod tests {
     
     #[test]
     fn ueb_highlight_24() -> Result<()> {       // issue 24
-        let mathml_str = "<math display='block' id='M8o41h70-0'>
-                <mrow id='M8o41h70-1'>
-                <mn id='M8o41h70-2'>4</mn>
-                <mo id='M8o41h70-3'>&#x2062;</mo>
-                <mi id='M8o41h70-4'>a</mi>
-                <mo id='M8o41h70-5'>&#x2062;</mo>
-                <mi id='M8o41h70-6'>c</mi>
+        let mathml_str = "<math display='block' id='id-0'>
+            <mrow id='id-1'>
+                <mn id='id-2'>4</mn>
+                <mo id='id-3'>&#x2062;</mo>
+                <mi id='id-4'>a</mi>
+                <mo id='id-5'>&#x2062;</mo>
+                <mi id='id-6'>c</mi>
             </mrow>
         </math>";
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         set_mathml(mathml_str.to_string()).unwrap();
         set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
         set_preference("BrailleNavHighlight".to_string(), "All".to_string()).unwrap();
-        let braille = get_braille("M8o41h70-2".to_string())?;
+        let braille = get_braille("id-2".to_string())?;
         assert_eq!("⣼⣙⠰⠁⠉", braille);
-        let braille = get_braille("M8o41h70-4".to_string())?;
+        let braille = get_braille("id-4".to_string())?;
         assert_eq!("⠼⠙⣰⣁⠉", braille);
+        return Ok( () );
+    }
+    
+    #[test]
+    #[allow(non_snake_case)]
+    fn test_UEB_start_mode() -> Result<()> {
+        init_logger();
+        let mathml_str = "<math><msup><mi>x</mi><mi>n</mi></msup></math>";
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
+        set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
+        set_preference("UEB_START_MODE".to_string(), "Grade2".to_string()).unwrap();
+        let braille = get_braille("id-2".to_string())?;
+        assert_eq!("⠭⠰⠔⠝", braille, "Grade2");
+        set_preference("UEB_START_MODE".to_string(), "Grade1".to_string()).unwrap();
+        let braille = get_braille("id-4".to_string())?;
+        assert_eq!("⠭⠔⠝", braille, "Grade1");
         return Ok( () );
     }
 }

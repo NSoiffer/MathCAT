@@ -74,6 +74,7 @@ impl Preferences{
         prefs.insert("AutoZoomOut".to_string(), Yaml::Boolean(true));
         prefs.insert("BrailleCode".to_string(), Yaml::String("Nemeth".to_string()));
         prefs.insert("BrailleNavHighlight".to_string(), Yaml::String("EndPoints".to_string()));
+        prefs.insert("UEB_START_MODE".to_string(), Yaml::String("Grade2".to_string()));
     
         return Preferences{ prefs };
     }
