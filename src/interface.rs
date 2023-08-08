@@ -378,6 +378,15 @@ pub fn get_braille_position() -> Result<(usize, usize)> {
     });
 }
 
+/// Given a 0-based braille position, return the smallest MathML node enclosing it.
+/// This node might be a leaf with an offset.
+pub fn get_navigation_node_from_braille_position(position: usize) -> Result<(String, usize)> {
+    return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&package_instance);
+        return crate::braille::get_navigation_node_from_braille_position(mathml, position);
+    })
+}
 
 /// Convert the returned error from set_mathml, etc., to a useful string for display
 pub fn errors_to_string(e:&Error) -> String {

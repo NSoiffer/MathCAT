@@ -167,7 +167,7 @@ fn main() {
   //       </msup>
   //     </mrow>
   //   </math>";
-  let expr="
+  let expr=r#"
   <math display='block'>
   <mrow>
    <msup>
@@ -177,13 +177,13 @@ fn main() {
    <mo>&#x2061;</mo>
    <mrow>
     <mo>(</mo>
-    <mi>p</mi>
+    <mi>ω</mi>
+    <mi>Ω</mi>
     <mo>)</mo>
    </mrow>
   </mrow>
  </math>
-          ";
-
+                      "#;
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>
@@ -207,9 +207,9 @@ fn main() {
   info!("Version = '{}'", get_version());
   set_preference("Language".to_string(), "en".to_string()).unwrap();
   set_preference("TTS".to_string(), "None".to_string()).unwrap();
-  set_preference("Verbosity".to_string(), "Medium".to_string()).unwrap();
+  set_preference("Verbosity".to_string(), "Medium,".to_string()).unwrap();
   set_preference("Impairment".to_string(), "Blindness".to_string()).unwrap();
-  // set_preference("SpeechOverrides_CapitalLetters".to_string(), "".to_string()).unwrap();
+  set_preference("SpeechOverrides_CapitalLetters".to_string(), "".to_string()).unwrap();
   // set_preference("CapitalLetters_UseWord".to_string(), "true".to_string()).unwrap();
   // set_preference("CapitalLetters_Pitch".to_string(), "30".to_string()).unwrap();
   set_preference("CapitalLetters_Beep".to_string(), "true".to_string()).unwrap();

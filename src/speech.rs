@@ -2209,8 +2209,11 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         let mut result = String::with_capacity(braille.len());
         let mut i_bytes = 0;
         let mut chars = braille.chars();
+
+        // the 'b' for baseline indicator is really part of the previous token, so it needs to be highlighted but isn't because it is not Unicode braille
+        let baseline_indicator_hack = PreferenceManager::get().borrow().get_user_prefs().to_string("BrailleCode") == "Nemeth";
         for ch in chars.by_ref() {
-            let modified_ch = add_dots_to_braille_char(ch);
+            let modified_ch = add_dots_to_braille_char(ch, baseline_indicator_hack);
             i_bytes += ch.len_utf8();
             result.push(modified_ch);
             if ch != modified_ch {
@@ -2223,7 +2226,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
             // find last char so that we know when to modify the char
             let rev_chars = braille.chars().rev();
             for ch in rev_chars {
-                let modified_ch = add_dots_to_braille_char(ch);
+                let modified_ch = add_dots_to_braille_char(ch, baseline_indicator_hack);
                 i_end -= ch.len_utf8();
                 if ch !=  modified_ch {
                     break;
@@ -2233,16 +2236,18 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
 
         // finish going through the string
         for ch in chars {
-            result.push( if i_bytes == i_end {add_dots_to_braille_char(ch)} else {ch} );
+            result.push( if i_bytes == i_end {add_dots_to_braille_char(ch, baseline_indicator_hack)} else {ch} );
             i_bytes += ch.len_utf8();
         };
 
         return result;
 
-        fn add_dots_to_braille_char(ch: char) -> char {
+        fn add_dots_to_braille_char(ch: char, baseline_indicator_hack: bool) -> char {
             let as_u32 = ch as u32;
             if (0x2800..0x28FF).contains(&as_u32) {
                 return unsafe {char::from_u32_unchecked(as_u32 | 0xC0)};
+            } else if baseline_indicator_hack && ch == 'b' {
+                return '𝑏'
             } else {
                 return ch;
             }
