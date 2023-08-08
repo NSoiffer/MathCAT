@@ -886,7 +886,7 @@ impl IsBracketed {
     }
 }
 
-pub struct IsInDefinition;
+struct IsInDefinition;
 impl IsInDefinition {
     fn is_defined_in(test_str: &str, set_name: &str) -> Result<bool, Error> {
         return DEFINITIONS.with(|definitions| {
@@ -946,7 +946,12 @@ impl IsInDefinition {
     }
 }
 
-
+pub fn is_defined_in(test_str: &str, set_name: &str) -> crate::errors::Result<bool> {
+    return match IsInDefinition::is_defined_in(test_str, &set_name) {
+        Ok(result) => Ok( result ),
+        Err(e) => bail!(e.to_string()),
+    };
+}
 pub struct DistanceFromLeaf;
 impl DistanceFromLeaf {
     fn distance(element: Element, use_left_side: bool, treat_2d_elements_as_tokens: bool) -> usize {
@@ -1095,7 +1100,7 @@ pub fn add_builtin_functions(context: &mut Context) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::{path::PathBuf};
+    use std::path::PathBuf;
     use sxd_document::parser;
     use crate::interface::{trim_element, get_element};
 
