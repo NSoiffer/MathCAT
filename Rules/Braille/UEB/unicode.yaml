@@ -30,7 +30,7 @@
  - "≱": [t: "⠸⠈⠜⠈⠱"]            # 0x2271 (Neither greater than nor equal to)
  - "∝": [t: "⠸⠐⠶"]              # 0x221D (Proportional to)
  - "≃": [t: "⠸⠔"]               # 0x2243 (Approximately equal to (tilde over horizontal line))
- - "≅": [t: "⠸⠔"]               # 0x2245 (Approximately equal to (tilde over equals sign))
+ - "≅": [t: "⠐⠸⠔"]               # 0x2245 (Approximately equal to (tilde over equals sign))
  - "≈": [t: "⠘⠔"]               # 0x2248 (Approximately equal (tilde over tilde))
  - "≏": [t: "⠘⠐⠶"]              # 0x224F (Equals with bump in top bar (difference between))
  - "≑": [t: "⠨⠐⠶"]              # 0x2251 (Geometrically equal to (equals dotted above and below))
