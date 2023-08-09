@@ -168,21 +168,8 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr="
-  <math display='block'>
-  <mrow>
-   <msup>
-    <mi>f</mi>
-    <mo>*</mo>
-   </msup>
-   <mo>&#x2061;</mo>
-   <mrow>
-    <mo>(</mo>
-    <mi>p</mi>
-    <mo>)</mo>
-   </mrow>
-  </mrow>
- </math>
-          ";
+  <math><mn>3</mn><mo>+</mo><mn>5</mn><mo>≟</mo><mn>12</mn></math>
+            ";
 
 //   let expr = "
 //   <math display='block'>

@@ -11,6 +11,7 @@ mod braille {
     }
     mod UEB {
         mod iceb;
+        mod other;
     }
     mod Vietnam {
         mod vi;

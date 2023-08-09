@@ -437,13 +437,14 @@ static UEB_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "I" => "⠨",     // italic
     "R" => "",      // roman
     // "E" => "⠰",     // English
-    "1" => "⠰",     // Grade 1 symbol
-    "L" => "",     // Letter left in to assist in locating letters
-    "D" => "XXX",     // German (Deutsche) -- from prefs
-    "G" => "⠨",     // Greek
-    "V" => "⠨⠈",    // Greek Variants
-    // "H" => "⠠⠠",    // Hebrew
-    // "U" => "⠈⠈",    // Russian
+    "1" => "⠰",      // Grade 1 symbol
+    "𝟙" => "⠰⠰",     // Grade 1 word
+    "L" => "",       // Letter left in to assist in locating letters
+    "D" => "XXX",    // German (Deutsche) -- from prefs
+    "G" => "⠨",      // Greek
+    "V" => "⠨⠈",     // Greek Variants
+    // "H" => "⠠⠠",  // Hebrew
+    // "U" => "⠈⠈",  // Russian
     "C" => "⠠",      // capital
     "𝐶" => "⠠",      // capital that never should get word indicator (from chemical element)
     "N" => "⠼",     // number indicator
@@ -503,7 +504,7 @@ lazy_static! {
     // Note: fraction over is not listed due to example 42(4) which shows a space before the "/"
     // static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex = 
     //     Regex::new(r"(⠄⠄⠄|⠤⠤⠤)W+([⠼⠸⠪])").unwrap();
-    static ref REPLACE_INDICATORS: Regex =Regex::new(r"([1SB𝔹TIREDGVHP𝐶CLMNW𝐖swe,.-—―#ocb])").unwrap();  
+    static ref REPLACE_INDICATORS: Regex =Regex::new(r"([1𝟙SB𝔹TIREDGVHP𝐶CLMNW𝐖swe,.-—―#ocb])").unwrap();  
     static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
 }
 
@@ -513,7 +514,7 @@ fn is_short_form(chars: &[char]) -> bool {
 }
 
 fn ueb_cleanup(raw_braille: String) -> String {
-    // debug!("ueb_cleanup: start={}", raw_braille);
+    debug!("ueb_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
 
@@ -568,13 +569,13 @@ fn ueb_cleanup(raw_braille: String) -> String {
             return remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage); 
         }
         let grade2 = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade2, UEB_Duration::Symbol);
-        // debug!("Symbol mode:  '{}'", grade2);
+        debug!("Symbol mode:  '{}'", grade2);
 
         if is_grade2_string_ok(&grade2) {
             return grade2;
         } else {
             let grade1_word = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Word);
-            // debug!("Word mode:    '{}'", grade1_word);
+            debug!("Word mode:    '{}'", grade1_word);
             
             // BANA says use g1 word mode if spaces are present, but that's not what their examples do
             // A conversation with Ms. DeAndrea from BANA said that they mean use passage mode if ≥3 "segments" (≥2 blanks)
@@ -990,7 +991,10 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                         result.push(ch);
                         i += 1;
                     },
-                    '1' => {
+                    '1' | '𝟙' => {
+                        if ch == '𝟙' {
+                            duration = UEB_Duration::Word;
+                        }
                         // nothing to do -- let the default case handle the following chars
                         i += 1;
                     },
@@ -1075,11 +1079,11 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                             i += 1 + right_matched_chars.len();
                         }
                     },
-                    '1' => {
+                    '1' | '𝟙' => {
                         result.push(ch);
                         i += 1;
                         mode = UEB_Mode::Grade1;
-                        duration = UEB_Duration::Symbol;
+                        duration = if ch=='1' {UEB_Duration::Symbol} else {UEB_Duration::Word};
                     },
                     'N' => {
                         result.push(ch);

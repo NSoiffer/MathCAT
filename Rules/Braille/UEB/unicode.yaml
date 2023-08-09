@@ -34,6 +34,7 @@
  - "≈": [t: "⠘⠔"]               # 0x2248 (Approximately equal (tilde over tilde))
  - "≏": [t: "⠘⠐⠶"]              # 0x224F (Equals with bump in top bar (difference between))
  - "≑": [t: "⠨⠐⠶"]              # 0x2251 (Geometrically equal to (equals dotted above and below))
+ - "≟": [t: "𝟙⠦⠻⠐⠶"]           # 0x225F (Questioned equal to)
  - "≡": [t: "⠸⠿"]               # 0x2261 (Equivalent to (three horizontal lines))
  - "≢": [t: "⠸⠿⠈⠱"]             # 0x2262 (Not identical to)
  - "∈": [t: "⠘⠑"]               # 0x2208 (Element of (member of))
