@@ -264,10 +264,11 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         // The problem is that the numbers are hidden inside of mover -- this might be more general than rule 99_2.
         static ref DOTS_99_A_2: Regex = Regex::new(r"𝑁⠨mN").unwrap();
 
+        // Punctuation is one or two chars. There are (currently) only 3 2-char punct chars (—‘’) -- we explicitly list them below
         static ref REMOVE_SPACE_BEFORE_PUNCTUATION_151: Regex = 
-            Regex::new(r"w(P.[\u2800-\u28FF]?|[\u2800-\u28FF]?⠾)").unwrap();
+            Regex::new(r"w(P.[⠤⠦⠠]?|[\u2800-\u28FF]?⠾)").unwrap();
         static ref REMOVE_SPACE_AFTER_PUNCTUATION_151: Regex = 
-            Regex::new(r"(P.[\u2800-\u28FF]?|[\u2800-\u28FF]?⠷)w").unwrap();
+            Regex::new(r"(P.[⠤⠦⠠]?|[\u2800-\u28FF]?⠷)w").unwrap();
 
         // Multipurpose indicator insertion
         // 149 -- consecutive comparison operators have no space -- instead a multipurpose indicator is used (doesn't require a regex)

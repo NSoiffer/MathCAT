@@ -1560,6 +1560,13 @@ fn ratio_151_11() {
 }
 
 #[test]
+fn space_after_punct_bug_152() {
+    // this was a bug involving a bad cleanup rule for whitespace after punctuation
+    let expr = "<math><mn>7</mn><mover><mo>=</mo><mo>?</mo></mover><mn>8</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠶⠀⠐⠨⠅⠣⠸⠦⠻⠀⠼⠦");
+}
+
+#[test]
 fn arrow_lesson_9_5_1() {
     // Nemeth rule 152
     let expr = "<math><mi>A</mi><mo>→</mo><mi>B</mi></math>";
