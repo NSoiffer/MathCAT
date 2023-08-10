@@ -195,7 +195,7 @@
    name: default
    tag: mo
      # add spaces around comparison operators unless they are in a script position,
-   variables: [MaybeAddSpaces: "parent::*[self::m:mrow] and $NewScriptContext='' and IsInDefinition(., 'NemethComparisonOperators')"]
+   variables: [MaybeAddSpaces: "parent::*[self::m:mrow] and $NewScriptContext='' and .!='∶' and IsInDefinition(., 'NemethComparisonOperators')"] # ratio not spaced in UEB
    match: "."
    replace:
       - test:

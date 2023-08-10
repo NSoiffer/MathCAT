@@ -304,7 +304,7 @@
   replace:
   - test:
       if: "parent::*[self::m:mrow] and not(@data-chemical-bond) and
-           (IsInDefinition(substring(., 1, 1), 'NemethComparisonOperators') or text()='∶')"  # "ratio" also gets spaced"
+           IsInDefinition(substring(., 1, 1), 'NemethComparisonOperators')"
       then:
           - test:   # Spacing and NemethPunctAndOpenBeforeSymbols test is Rule 151, NemethComparisonOperators test is Rule 149 
               if: "not( preceding-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols')] )"
@@ -346,7 +346,7 @@
   - test:  # NemethPunctAndOpenAfterSymbols test is Rule 151, NemethComparisonOperators test is Rule 149 
            # tilde test is a guess as to what is right -- all tildes and in a prefix location, don't treat as comparison operator
       if: "parent::*[self::m:mrow] and not(@data-chemical-bond) and
-           (IsInDefinition(substring(., string-length(.), 1), 'NemethComparisonOperators') or text()='∶') and
+           IsInDefinition(substring(., string-length(.), 1), 'NemethComparisonOperators') and
            not( translate(., '∼', '')='' and not(preceding-sibling::*) ) and
            not( following-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols')] )"
       then: [t: "w"]

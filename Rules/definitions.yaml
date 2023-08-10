@@ -196,7 +196,7 @@
     "⥭", "⥮", "⥯", "⥼", "⥽", "⥾", "⥿",
 
     # chars not from SRE
-    "∝", "∉",
+    "∝", "∉", "∶",
   ],
 
   # no space is used when these chars "apply" to ellipsis or long dash (lesson 2.13, differs slightly from rule 42)

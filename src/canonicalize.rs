@@ -777,6 +777,7 @@ impl CanonicalizeContext {
 							}
 							return Some(mathml);
 						},
+						"::" =>{mathml.set_text("∷");},
 						"|" | "||" => if let Some(result) = merge_vertical_bars(mathml) {
 							return Some(result);
 						} else {
@@ -1103,7 +1104,7 @@ impl CanonicalizeContext {
 					if name(&child) == "mo" {
 						let text = as_text(child);
 						match text {
-							"∷" => return Some(true),
+							"∷" | "::" => return Some(true),		// "::" might not be canonicalized yet
 							"∶" => return Some(false),
 							_ => {
 								if let Some(op) = OPERATORS.get(text) {
@@ -2578,7 +2579,7 @@ impl CanonicalizeContext {
 			};
 		} else {
 			mo_text = match mo_text {
-				"_"| "\u{02C9}"| "\u{0304}"| "\u{0305}" => "\u{00AF}",
+				"\u{02C9}"| "\u{0304}"| "\u{0305}" => "\u{00AF}",
 				"\u{02DC}" | "~"  => "\u{223C}",		// for base, use version with prefix and infix
 				"\u{01C1}" => "\u{2016}", // U+2016 is "‖"
 
