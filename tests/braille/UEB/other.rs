@@ -6,11 +6,19 @@ use crate::common::*;
 
 
 // Extra tests targeted at special cases in MathCAT
+
 #[test]
 fn word_symbol_aph_6_7_5() {
     // this test was added because ≟ (U+225F) uses a 'G1 Word mode' char, so is different than others
     let expr = "<math><mn>4</mn><mo>+</mo><mn>5</mn><mo>≟</mo><mn>12</mn></math>";
     test_braille("UEB", expr, "⠼⠙⠐⠖⠼⠑⠀⠰⠰⠦⠻⠐⠶⠀⠼⠁⠃");
+}
+
+#[test]
+fn blank_aph_7_1_ex5() {
+    // this test was added because #153 (both the blank and spaces around "::")
+    let expr = "<math><mn>3</mn><mo>:</mo><mn>15</mn> <mo>::</mo> <mn>60</mn><mo>:</mo><mo>_</mo></math>";
+    test_braille("UEB", expr, "⠼⠉⠒⠼⠁⠑⠀⠒⠒⠀⠼⠋⠚⠒⠨⠤");
 }
 
 // Extra tests targeted at special cases in MathCAT
