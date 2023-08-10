@@ -144,6 +144,8 @@
  - "⊨": [t: "⠘⠸⠒"]              # 0x22A8 (TRUE (is valid))
  - "⊬": [t: "⠸⠒⠈⠱"]             # 0x22AC (Does not prove)
  - "⊭": [t: "⠘⠸⠒⠈⠱"]            # 0x22AD (Not TRUE)
+ - "⫅": [t: "⠘⠣⠰⠻⠐⠶"]         # 0x2AC5 (Subset above equals)
+ - "⫆": [t: "⠘⠜⠰⠻⠐⠶"]         # 0x2AC6 (Superset above equals)
  - "⫤": [t: "⠨⠸⠒"]              # 0x2AE4 (Vertical bar double left turnstile)
  - "✓": [t: "⠈⠩"]               # 0x2713 (Check mark (tick))
  - "⦵": [t: "⠨⠚"]               # 0x29B5 (Plimsoll sign (standard state))
