@@ -413,7 +413,6 @@ fn colon_40_1() {
 
 #[test]
 fn colon_40_1_mtext() {
-    init_logger();
     let expr = "<math><mtext>3:30</mtext></math>";
     test_braille("Nemeth", expr, "⠼⠒⠸⠒⠼⠒⠴");
 }
