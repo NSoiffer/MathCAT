@@ -1764,7 +1764,6 @@ mod tests {
     #[test]
     #[allow(non_snake_case)]
     fn test_UEB_start_mode() -> Result<()> {
-        init_logger();
         let mathml_str = "<math><msup><mi>x</mi><mi>n</mi></msup></math>";
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         set_mathml(mathml_str.to_string()).unwrap();
