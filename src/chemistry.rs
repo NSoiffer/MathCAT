@@ -557,15 +557,16 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
         let mut preceding_children = mathml.preceding_siblings();
         // debug!("preceding_children: {}", preceding_children.iter().map(|&el| name(&as_element(el)).to_string()).collect::<Vec<String>>().join(", "));
         if preceding_children.is_empty() {
-            // handle case where we have mi mmultiscripts mi ... where the second mi needs to join with the first (see test mhchem_so4)
+            // handle:
+            // * case where we have mi mmultiscripts mi ... where the second mi needs to join with the first (see test mhchem_so4)
+            // * case where the child got buried in an added mrow (can only happen one level deep because invisible times should get inserted)
             let parent = mathml.parent().unwrap().element().unwrap();   // mathml is leaf, so parent always exists
-            if name(&parent) == "mmultiscripts" {
-                preceding_children = parent.preceding_siblings();
-                if preceding_children.is_empty() {
+            preceding_children = parent.preceding_siblings();
+            if preceding_children.is_empty() ||
+               !(name(&parent) == "mmultiscripts" ||
+                (name(&parent) == "mrow" && parent.attribute_value(CHANGED_ATTR).is_some() &&
+                 parent.attribute_value(CHANGED_ATTR).unwrap() == ADDED_ATTR_VALUE)) {
                     bail!("Internal error: {} should not have been split'", mml_to_string(&mathml));
-                }
-            } else {
-                bail!("Internal error: {} should not have been split'", mml_to_string(&mathml));
             }
         }
         // Note: there was an invisible U+2063, but it was removed before we got here
@@ -1220,7 +1221,7 @@ fn likely_chem_formula_operator(mathml: Element) -> isize {
     #[derive(PartialEq, Eq)]
     enum BondType {DoubleBond, TripleBond}      // options for is_legal_bond()
     static CHEM_FORMULA_OPERATORS: phf::Set<&str> = phf_set! {
-        "-", "\u{2212}", ":", "=", "::", "≡", ":::", "≣", "::::", // bond symbols (need both 2212 and minus because maybe not canonicalized)
+        "-", "\u{2212}", ":", "=", "∷", "≡", ":::", "≣", "::::", // bond symbols (need both 2212 and minus because maybe not canonicalized)
     };
     static CHEM_FORMULA_OK: phf::Set<char> = phf_set! {
         '(', ')', '[', ']',
@@ -1231,7 +1232,7 @@ fn likely_chem_formula_operator(mathml: Element) -> isize {
     assert_eq!(name(&mathml), "mo");
     let leaf_text = as_text(mathml);
     if CHEM_FORMULA_OPERATORS.contains(leaf_text) &&
-       ( !(leaf_text == "=" || leaf_text == "::" ) || is_legal_bond(mathml, BondType::DoubleBond) )  &&
+       ( !(leaf_text == "=" || leaf_text == "∷" ) || is_legal_bond(mathml, BondType::DoubleBond) )  &&
        ( !(leaf_text == "≡" || leaf_text == ":::" ) || is_legal_bond(mathml, BondType::TripleBond) ) {
         mathml.set_attribute_value(MAYBE_CHEMISTRY, "1");
         mathml.set_attribute_value(CHEM_FORMULA_OPERATOR, "1");
@@ -1705,7 +1706,7 @@ mod chem_tests {
     fn test_simple_double_bond() {
         let test1 = r#"<mrow><mi>C</mi><mo>=</mo><mi>C</mi></mrow>"#;
         assert!( parse_mathml_string(test1, |mathml| likely_chem_formula(mathml)==CHEMISTRY_THRESHOLD) );
-        let test2 = r#"<mrow><mi>C</mi><mo>::</mo><mi>O</mi></mrow>"#;
+        let test2 = r#"<mrow><mi>C</mi><mo>∷</mo><mi>O</mi></mrow>"#;
         assert!( parse_mathml_string(test2, |mathml| likely_chem_formula(mathml)==CHEMISTRY_THRESHOLD) );
         let test3 = r#"<mrow><mi>N</mi><mo>=</mo><mi>N</mi></mrow>"#;
         assert!( parse_mathml_string(test3, |mathml| likely_chem_formula(mathml)==CHEMISTRY_THRESHOLD) );
@@ -2327,7 +2328,7 @@ mod chem_tests {
             </msub>
             <mo data-changed='added'>&#x2063;</mo>
             <mi data-chem-element='1'>C</mi>
-            <mo data-chemical-bond='true' data-chem-formula-op='1'>::</mo>
+            <mo data-chemical-bond='true' data-chem-formula-op='1'>∷</mo>
             <mi data-chem-element='1'>C</mi>
             <mo data-changed='added'>&#x2063;</mo>
             <msub data-chem-formula='1'>

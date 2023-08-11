@@ -949,7 +949,7 @@
   - test:
     - if: "text()='-' or text() = ':'"
       then: [{t: "single bond"}]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
-    - else_if: "text()='=' or text() = '::'"
+    - else_if: "text()='=' or text() = '∷'"
       then: [{t: "double bond"}]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
     - else_if: "text()='≡'"
       then: [{t: "triple bond"}]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
