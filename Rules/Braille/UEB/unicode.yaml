@@ -98,6 +98,7 @@
  - "_": [t: "⠨⠤"]               # 0x005F (Low line (underscore))
  - "~": [t: "⠈⠔"]               # 0x007E (Tilde (swung dash))
  - "¢": [t: "⠈⠉"]               # 0x00A2 (Cents sign)
+ - "‖": [t: "⠸⠳"]               # 0x2016
  - "€": [t: "⠈⠑"]               # 0x20AC (Euro sign)
  - "₣": [t: "⠈⠋"]               # 0x20A3 (French franc sign)
  - "£": [t: "⠈⠇"]               # 0x00A3 (Pound sign)
