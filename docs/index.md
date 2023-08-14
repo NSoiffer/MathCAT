@@ -28,7 +28,7 @@ MathCAT is written in Rust and can be built to interface with many languages. To
 
 MathCAT uses a number of heuristics that try to repair poor MathML and put it in a recommended format. For example, TeX converters and WYSIWYG editors will take "1,234+1" and break the number "1,234" apart at the comma. MathCAT recognizes that and folds the number into a single `mn`. Other repairs are structural such as creating `mrow`s based on information from MathML's operator dictionary and adding invisible function application, multiplication, addition (mixed fractions), and separators (e.g, between the $i$ and $j$ in $a\_{ij}$) when it seems appropriate. This simplifies speech and Nemeth generation and may be useful to other apps. Currently the cleanup is not exposed in an API, but potentially it could be another service of MathCAT. In general, MathCAT is somewhat conservative in its repair. However, it likely will do the wrong thing in some cases, but the hope is it does the right thing much, much more frequently. Finding common mistakes of translators to MathML and patching up the poor MathML is an ongoing project.
 
-## Current Status (updated 8/1/23)
+## Current Status (updated 8/14/23)
 MathCAT is under active development. Initial speech, navigation, and braille (Nemeth, UEB) generation is complete and [NVDA add-on](https://addons.nvda-project.org/addons/MathCAT.en.html) now exists. It should be usable as a MathPlayer replacement for those using the English version or one of the supported translations. It is not as complete or polished in some ways as MathPlayer though. However, it supports both Nemeth and UEB technical braille generation. The Nemeth braille is substantially better than that provided by MathPlayer and other MathML → Nemeth translators. It also includes integration with navigation (uses dots 7 and 8 to indicate the navigation node). Because of the high quality braille output, [BrailleBlaster](https://www.brailleblaster.org/) uses MathCAT for braille generation from MathML.
 
 A number of other AT are working to incorporate MathCAT into their products. Notable among these groups is Vispero/JAWS. No release date for a version of JAWS with MathCAT has been announced yet. [Other companies: if you have incorporated MathCAT into your product and would like to be mentioned here, please contact me by email or add an issue to update the documentation]
@@ -60,6 +60,7 @@ Timeline:
   * Work with translators and fix any problems they might turn up
   * Work with translators to hopefully add many languages (added Spanish translation)
 * ✓ (mostly) Summer 2023: Vietnamese braille code 
+* August: maybe Spanish braille code (potentially French and Portuguese also as they are supposedly similar)
 * Early 2024: work on UEB → MathML translation and explore UEB → Nemeth math translator
 * Fall 2023: potentially work on 2D Nemeth generation along with Nemeth input
 * Early 2024: work on UEB → MathML translation and explore UEB → Nemeth math translator
@@ -112,42 +113,44 @@ Rust is quite efficient. On a Core I7-770K machine (higher end processor circa 2
 takes about 4ms to generate the ClearSpeak string
 "_e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren squared, end exponent_" along with the Nemeth braille string "⠑⠘⠤⠹⠂⠌⠆⠼⠈⠡⠷⠹⠭⠤⠨⠍⠌⠨⠎⠼⠾⠘⠘⠆".
 This time is split approximately: 2ms to cleanup the MathML + 1ms for speech generation + 1ms for braille generation.
-The MathML for this expression is:
-```
-<math>
-  <mrow>
-    <msup>
-      <mi>e</mi>
-      <mrow>
-        <mo>&#x2212;</mo>
-        <mfrac>
-          <mn>1</mn>
-          <mn>2</mn>
-        </mfrac>
-        <msup>
-          <mrow>
-            <mrow>
-              <mo>(</mo>
-              <mrow>
-                <mfrac>
-                  <mrow>
-                    <mi>x</mi>
-                    <mo>&#x2212;</mo>
-                    <mi>&#x03BC;</mi>
-                  </mrow>
-                  <mi>&#x03C3;</mi>
-                </mfrac>
-              </mrow>
-              <mo>)</mo>
-            </mrow>
-          </mrow>
-          <mn>2</mn>
-        </msup>
-      </mrow>
-    </msup>
-  </mrow>
-</math>
-```
+<details>
+<summary>The MathML for this expression</summary>
+<pre>
+&lt;math&gt;
+  &lt;mrow&gt;
+    &lt;msup&gt;
+      &lt;mi&gt;e&lt;/mi&gt;
+      &lt;mrow&gt;
+        &lt;mo&gt;&#x2212;&lt;/mo&gt;
+        &lt;mfrac&gt;
+          &lt;mn&gt;1&lt;/mn&gt;
+          &lt;mn&gt;2&lt;/mn&gt;
+        &lt;/mfrac&gt;
+        &lt;msup&gt;
+          &lt;mrow&gt;
+            &lt;mrow&gt;
+              &lt;mo&gt;(&lt;/mo&gt;
+              &lt;mrow&gt;
+                &lt;mfrac&gt;
+                  &lt;mrow&gt;
+                    &lt;mi&gt;x&lt;/mi&gt;
+                    &lt;mo&gt;&#x2212;&lt;/mo&gt;
+                    &lt;mi&gt;&#x03BC;&lt;/mi&gt;
+                  &lt;/mrow&gt;
+                  &lt;mi&gt;&#x03C3;&lt;/mi&gt;
+                &lt;/mfrac&gt;
+              &lt;/mrow&gt;
+              &lt;mo&gt;)&lt;/mo&gt;
+            &lt;/mrow&gt;
+          &lt;/mrow&gt;
+          &lt;mn&gt;2&lt;/mn&gt;
+        &lt;/msup&gt;
+      &lt;/mrow&gt;
+    &lt;/msup&gt;
+  &lt;/mrow&gt;
+&lt;/math&gt;
+</pre>
+</details>
 
 MathCAT uses external rules to generate speech and braille.
 These take about 40ms to load; this load only happens the first time the rules are used, or if the speech style, language, or other external preference is changed. An additional 50ms are required to load the full Unicode files for speech and braille,
