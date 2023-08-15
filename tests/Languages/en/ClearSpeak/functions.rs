@@ -122,7 +122,7 @@ fn normal_ln() {
 #[test]
 fn simple_natural_log() {
     let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
-    test_ClearSpeak("en", "ClearSpeak_Log", "LnAsNaturalLog ",expr,
+    test_ClearSpeak("en", "ClearSpeak_Log", "LnAsNaturalLog",expr,
         "natural log x");
 }
 
@@ -130,7 +130,7 @@ fn simple_natural_log() {
 #[test]
 fn natural_log() {
     let expr = "<math><mi>ln</mi><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></math>";
-    test_ClearSpeak("en", "ClearSpeak_Log", "LnAsNaturalLog ",expr,
+    test_ClearSpeak("en", "ClearSpeak_Log", "LnAsNaturalLog",expr,
         "the natural log of, open paren x plus y, close paren");
 }
 
@@ -361,7 +361,7 @@ fn explicit_times_none_superscript() {
         <mrow> <mi>c</mi><mo>,</mo><mi>d</mi></mrow>
         <mo>)</mo></mrow>
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_Paren", "Interval ",expr,
+    test_ClearSpeak("en", "ClearSpeak_Paren", "Interval",expr,
     "the interval from c to d, not including c or d");
 }
 
