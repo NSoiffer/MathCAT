@@ -129,8 +129,24 @@ ClearSpeak has a number of options. These were designed for authors to use, but 
 * ✓Code: [Nemeth]
   * Options: Any implemented braille code
   * Description: the braille math code to use
-  * Status: currently only Nemeth and UEB are supported. Other braille code support will depend upon help from others.
+  * Status: currently only Nemeth, UEB, and Vietnam are supported. Other braille code support will depend upon help from others.
 * ✓BrailleNavHighlight: [EndPoints]
   * Options: Off, FirstChar, EndPoints, All
   * Description:  highlight with dots 7 & 8 the currently selected navigation node
+* UEB:
+  * ✓START_MODE: [Grade2] 
+    * Options: Grade1, Grade2
+    * Description: assumed starting mode UEB braille (Grade1 assumes we are in G1 passage mode)
+  
+Braille codes often have author-definable characters. MathCAT provides some options:
 
+The [UEB Guide to Technical Material](https://iceb.org/Guidelines_for_Technical_Material_2008-10.pdf) says to normally treat Fraktur and DoubleStruck as Script.
+Here we provide an option to specify a transcriber-defined typeform prefix indicator instead.
+Note: here are prefixes for 1st - 5th: "⠈⠼", "⠘⠼", "⠸⠼", "⠐⠼", "⠨⠼"
+* UEB:
+  *  ✓DoubleStruck: "⠈"     [script]
+  *  ✓Fraktur:      "⠈"     [script]
+  *  ✓SansSerif:    "⠈⠼"    [first transcriber-defined typeform prefix indicator]
+  *  ✓GreekVariant: "⠨"     [default to Greek]
+
+The characters for Vietnam that are definable is still be discussed. Likely, they will be similar to those for UEB.
