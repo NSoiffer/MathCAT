@@ -194,7 +194,7 @@ fn time_2_4_1() {
 
 #[test]
 fn time_2_4_1_mtext() {
-    // this was a bug when only mtext occured
+    // this was a bug when only mtext occurred
     let expr = "<math><mtext>5:30</mtext></math>";
     test_braille("UEB", expr, "⠼⠑⠒⠼⠉⠚");
 }
