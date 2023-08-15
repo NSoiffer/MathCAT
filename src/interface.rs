@@ -8,6 +8,7 @@ use sxd_document::parser;
 use sxd_document::Package;
 use sxd_document::dom::*;
 use crate::errors::*;
+use crate::prefs::FilesChanged;
 use regex::{Regex, Captures};
 use phf::phf_map;
 
@@ -148,20 +149,18 @@ pub fn get_overview_text() -> Result<String> {
 /// Get the value of the named preference.
 /// None is returned if `name` is not a known preference.
 pub fn get_preference(name: String) -> Result<String> {
-    use yaml_rust::Yaml;
+    use crate::prefs::NO_PREFERENCE;
     return crate::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow();
         let pref_manager = rules.pref_manager.borrow();
-        let prefs = pref_manager.merge_prefs();
-        return match prefs.get(&name) {
-            None => bail!("No preference named '{}'", &name),
-            Some(yaml) => match yaml {
-                Yaml::String(s) => Ok(s.clone()),
-                Yaml::Boolean(b)  => Ok( (if *b {"true"} else {"false"}).to_string() ),
-                Yaml::Integer(i)   => Ok( format!("{}", *i)),
-                Yaml::Real(s)   => Ok(s.clone()),
-                _                       => bail!("Internal error in get_preference -- unknown YAML type"),            
-            },
+        let mut value = pref_manager.pref_to_string(&name);
+        if value == NO_PREFERENCE {
+            value = pref_manager.pref_to_string(&name);
+        }
+        if value == NO_PREFERENCE {
+            bail!("No preference named '{}'", &name);
+        } else {
+            return Ok(value);
         }
     });
 }
@@ -185,69 +184,49 @@ pub fn get_preference(name: String) -> Result<String> {
 /// The values are persistent and extend beyond calls to [`set_mathml`].
 /// A value can be overwritten by calling this function again with a different value.
 /// 
-/// FIX: Some preferences are both API and user preferences and something such as '!name' should be used for overrides. Not implemented yet.
+/// Be careful setting preferences -- these potentially override user settings, so only preferences that really need setting should be set.
 pub fn set_preference(name: String, value: String) -> Result<()> {
-    return crate::speech::SPEECH_RULES.with(|rules| {
-        let mut rules = rules.borrow_mut();
+    let old_value = get_preference(name.clone())?;      // make sure it is a valid preference
+    
+    if name == "Language" {
+        // check the format
+        if !( value == "Auto" ||
+                value.len() == 2 ||
+                (value.len() == 5 && value.as_bytes()[2] == b'-') ) {
+            bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value);
+        }
+    }
+    
+    crate::speech::SPEECH_RULES.with(|rules| {
+        let rules = rules.borrow_mut();
         if let Some(error_string) = rules.get_error() {
             bail!("{}", error_string);
         }
-        // note: Rust complains if I set
-        //    pref_manager = rules.pref_manager.borrow_mut()
-        // here/upfront, so it is borrowed separately below. That way its borrowed lifetime is small
-        let files_changed;
-        {
-            use crate::prefs::NO_PREFERENCE;
-            let mut pref_manager = rules.pref_manager.borrow_mut();
-            if pref_manager.get_api_prefs().to_string(&name) != NO_PREFERENCE {
-                match name.as_str() {
-                    "Pitch" | "Rate" | "Volume" | "CapitalLetters_Pitch"=> {
-                        pref_manager.set_api_float_pref(&name, to_float(&name, &value)?);    
-                    },
-                    "Bookmark" | "CapitalLetters_UseWord" | "CapitalLetters_Beep" => {
-                        pref_manager.set_api_boolean_pref(&name, value.to_lowercase()=="true");    
-                    },
-                    _ => {
-                        pref_manager.set_api_string_pref(&name, &value);
-                    }
-                }
-                files_changed = None;
-            } else if pref_manager.get_user_prefs().to_string(name.as_str()) == NO_PREFERENCE {
-                bail!("set_preference: {} is not a known preference", &name); 
-            } else {
-                files_changed = pref_manager.set_user_prefs(&name, &value);     // assume string valued
-            }
-        }
 
+        // we set the value even if it was the same as the old value because this might override a potentially changed future user value
+        let mut pref_manager = rules.pref_manager.borrow_mut();
         match name.as_str() {
-            "SpeechStyle" => {
-                if let Some(files_changed) = files_changed {
-                    rules.invalidate(files_changed);
-                }
+            "Pitch" | "Rate" | "Volume" | "CapitalLetters_Pitch"=> {
+                pref_manager.set_api_float_pref(&name, to_float(&name, &value)?);    
             },
-            "Language" => {
-                // check the format
-                if !( value == "Auto" ||
-                      value.len() == 2 ||
-                      (value.len() == 5 && value.as_bytes()[2] == b'-') ) {
-                        bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value);
-                      }
-                if let Some(files_changed) = files_changed {
-                    rules.invalidate(files_changed);
-                }
-            },
-            "BrailleCode" => {
-                crate::speech::BRAILLE_RULES.with(|braille_rules| {
-                    if let Some(files_changed) = files_changed {
-                        braille_rules.borrow_mut().invalidate(files_changed);
-                    }
-                })
+            "Bookmark" | "CapitalLetters_UseWord" | "CapitalLetters_Beep" => {
+                pref_manager.set_api_boolean_pref(&name, value.to_lowercase()=="true");    
             },
             _ => {
-            }
-        }
-        return Ok( () );
-    });
+                pref_manager.set_api_string_pref(&name, &value);
+            },
+        };
+        return Ok::<(), Error>( () );
+    })?;
+
+    if old_value == value {
+        return Ok( () );            // nothing changed
+    }
+
+    if let Some(changed) = FilesChanged::new(&name) {
+        crate::speech::SpeechRules::invalidate(changed);
+    }
+    return Ok( () );
 
     fn to_float(name: &str, value: &str) -> Result<f64> {
         match value.parse::<f64>() {

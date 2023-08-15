@@ -169,41 +169,19 @@ fn main() {
   //       </msup>
   //     </mrow>
   //   </math>";
-  let expr="
+  let expr=r#"
   <math>
-  <mrow>
-    <msup>
-      <mi>e</mi>
-      <mrow>
-        <mo>&#x2212;</mo>
-        <mfrac>
-          <mn>1</mn>
-          <mn>2</mn>
-        </mfrac>
-        <msup>
-          <mrow>
-            <mrow>
-              <mo>(</mo>
-              <mrow>
-                <mfrac>
-                  <mrow>
-                    <mi>x</mi>
-                    <mo>&#x2212;</mo>
-                    <mi>&#x03BC;</mi>
-                  </mrow>
-                  <mi>&#x03C3;</mi>
-                </mfrac>
-              </mrow>
-              <mo>)</mo>
-            </mrow>
-          </mrow>
-          <mn>2</mn>
-        </msup>
-      </mrow>
-    </msup>
-  </mrow>
-</math>            ";
-
+	<mo>|</mo>
+	<mo>|</mo>
+	<mn>-3</mn>
+	<mo>|</mo>
+	<mo>+</mo>
+	<mo>|</mo>
+	<mn>2</mn>
+	<mo>|</mo>
+	<mo>|</mo>
+</math>
+"#;
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>
@@ -248,34 +226,38 @@ fn main() {
   }
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
-  set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
+  set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),
   }
 
   info!("Time taken for loading+speech+braille: {}ms", instant.elapsed().as_millis());
-  let instant = Instant::now();
-  match get_spoken_text() {
-    Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
-    Err(e) => panic!("{}", errors_to_string(&e)),
-  }
-  info!("Time taken (second time for speech): {}ms", instant.elapsed().as_millis());
-  info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()));
+  // let instant = Instant::now();
+  // match get_spoken_text() {
+  //   Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
+  //   Err(e) => panic!("{}", errors_to_string(&e)),
+  // }
+  // info!("Time taken (second time for speech): {}ms", instant.elapsed().as_millis());
+  // info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()));
   
-  match get_braille("".to_string()) {
-    Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
-    Err(e) => panic!("{}", errors_to_string(&e)),
-  }
-  // let xpath_counts = libmathcat::speech::xpath_count();
-  // info!("#xpath = {}; duplicates = {}", xpath_counts.0, xpath_counts.1);
-  info!("Time taken (second time for speech + braille): {}ms", instant.elapsed().as_millis());
+  // match get_braille("".to_string()) {
+  //   Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
+  //   Err(e) => panic!("{}", errors_to_string(&e)),
+  // }
+  // // let xpath_counts = libmathcat::speech::xpath_count();
+  // // info!("#xpath = {}; duplicates = {}", xpath_counts.0, xpath_counts.1);
+  // info!("Time taken (second time for speech + braille): {}ms", instant.elapsed().as_millis());
 
-  timing_test(expr, 100);
+  timing_test(expr, 00);
 
 }
 
 fn timing_test(expr: &str, n_loops: usize) {
+  if n_loops == 0 {
+    return;
+  }
+  
   let n_loops_float = n_loops as f64;
   let instant = Instant::now();
   for _ in 0..n_loops {

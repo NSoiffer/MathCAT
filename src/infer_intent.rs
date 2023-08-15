@@ -20,7 +20,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
         Ok(intent) => return Ok(intent),
         Err(e) => {
             // lookup what we should do for error recovery
-            let intent_preference = rules_with_context.get_rules().pref_manager.borrow().get_api_prefs().to_string("IntentErrorRecovery");
+            let intent_preference = rules_with_context.get_rules().pref_manager.borrow().pref_to_string("IntentErrorRecovery");
             if intent_preference == "Error" {
                 return Err(e);
             } else {

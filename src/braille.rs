@@ -3,6 +3,8 @@ use sxd_document::dom::Element;
 use sxd_document::Package;
 use crate::errors::*;
 use crate::pretty_print::mml_to_string;
+use crate::prefs::PreferenceManager;
+use std::cell::Ref;
 use regex::{Captures, Regex, RegexSet};
 use phf::{phf_map, phf_set};
 use crate::speech::{BRAILLE_RULES, SpeechRulesWithContext};
@@ -16,7 +18,7 @@ static UEB_PREFIXES: phf::Set<char> = phf_set! {
 /// braille the MathML
 /// If 'nav_node_id' is not an empty string, then the element with that id will have dots 7 & 8 turned on as per the pref
 pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
-    crate::speech::SpeechRules::update();
+    crate::speech::SpeechRules::update()?;
     return BRAILLE_RULES.with(|rules| {
         rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
@@ -26,12 +28,12 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
                         .chain_err(|| "Pattern match/replacement failure!")?;
         let braille_string = braille_string.replace(' ', "");
         let pref_manager = rules_with_context.get_rules().pref_manager.borrow();
-        let highlight_style = pref_manager.get_user_prefs().to_string("BrailleNavHighlight");
-        let braille_code = pref_manager.get_user_prefs().to_string("BrailleCode");
+        let highlight_style = pref_manager.pref_to_string("BrailleNavHighlight");
+        let braille_code = pref_manager.pref_to_string("BrailleCode");
         let braille = match braille_code.as_str() {
             "Nemeth" => nemeth_cleanup(braille_string),
-            "UEB" => ueb_cleanup(braille_string),
-            "Vietnam" => vietnam_cleanup(braille_string),   // FIX: probably needs some specialized cleanup
+            "UEB" => ueb_cleanup(pref_manager, braille_string),
+            "Vietnam" => vietnam_cleanup(pref_manager, braille_string),   // FIX: probably needs some specialized cleanup
             _ => braille_string,    // probably needs cleanup if someone has another code, but this will have to get added by hand
         };
 
@@ -513,15 +515,12 @@ fn is_short_form(chars: &[char]) -> bool {
     return SHORT_FORMS.contains(&chars_as_string);
 }
 
-fn ueb_cleanup(raw_braille: String) -> String {
+fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     debug!("ueb_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
 
-    let pref_manager = crate::prefs::PreferenceManager::get();
-    let pref_manager = pref_manager.borrow();
-    let prefs = pref_manager.get_user_prefs();
-    let use_only_grade1 = prefs.to_string("UEB_START_MODE").as_str() == "Grade1";
+    let use_only_grade1 = pref_manager.pref_to_string("UEB_START_MODE").as_str() == "Grade1";
     
     // '𝐖' is a hard break -- basically, it separates exprs
     let mut result = result.split('𝐖')
@@ -532,10 +531,10 @@ fn ueb_cleanup(raw_braille: String) -> String {
     let result = result.replace("tW", "W");
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
-    let double_struck = prefs.to_string("UEB_DoubleStruck");
-    let sans_serif = prefs.to_string("UEB_SansSerif");
-    let fraktur = prefs.to_string("UEB_Fraktur");
-    let greek_variant = prefs.to_string("Vietnam_GreekVariant");
+    let double_struck = pref_manager.pref_to_string("UEB_DoubleStruck");
+    let sans_serif = pref_manager.pref_to_string("UEB_SansSerif");
+    let fraktur = pref_manager.pref_to_string("UEB_Fraktur");
+    let greek_variant = pref_manager.pref_to_string("Vietnam_GreekVariant");
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         let matched_char = &cap[0];
@@ -1323,7 +1322,7 @@ static VIETNAM_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 
 };
 
-fn vietnam_cleanup(raw_braille: String) -> String {
+fn vietnam_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     debug!("vietnam_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
@@ -1334,13 +1333,10 @@ fn vietnam_cleanup(raw_braille: String) -> String {
     debug!("   after typeface/caps={}", &result);
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
-    let pref_manager = crate::prefs::PreferenceManager::get();
-    let pref_manager = pref_manager.borrow();
-    let prefs = pref_manager.get_user_prefs();
-    let double_struck = prefs.to_string("Vietnam_DoubleStruck");
-    let sans_serif = prefs.to_string("Vietnam_SansSerif");
-    let fraktur = prefs.to_string("Vietnam_Fraktur");
-    let greek_variant = prefs.to_string("Vietnam_GreekVariant");
+    let double_struck = pref_manager.pref_to_string("Vietnam_DoubleStruck");
+    let sans_serif = pref_manager.pref_to_string("Vietnam_SansSerif");
+    let fraktur = pref_manager.pref_to_string("Vietnam_Fraktur");
+    let greek_variant = pref_manager.pref_to_string("Vietnam_GreekVariant");
 
     // This reuses the code just for getting rid of unnecessary "L"s and "N"s
     let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
@@ -1769,10 +1765,10 @@ mod tests {
         set_mathml(mathml_str.to_string()).unwrap();
         set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
         set_preference("UEB_START_MODE".to_string(), "Grade2".to_string()).unwrap();
-        let braille = get_braille("id-2".to_string())?;
+        let braille = get_braille("".to_string())?;
         assert_eq!("⠭⠰⠔⠝", braille, "Grade2");
         set_preference("UEB_START_MODE".to_string(), "Grade1".to_string()).unwrap();
-        let braille = get_braille("id-4".to_string())?;
+        let braille = get_braille("".to_string())?;
         assert_eq!("⠭⠔⠝", braille, "Grade1");
         return Ok( () );
     }

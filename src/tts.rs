@@ -347,7 +347,7 @@ impl TTS {
         // rather than pass a bunch of extra info into the generic handling routines, we just deal with them here
         if command.command == TTSCommand::Bookmark {
             // if we aren't suppose to generate bookmarks, short circuit and just return
-            if prefs.get_api_prefs().to_string("Bookmark") != "true"{
+            if prefs.pref_to_string("Bookmark") != "true"{
                 return Ok("".to_string());
             }
             return Ok( match self {
@@ -579,7 +579,7 @@ impl TTS {
     }
 
     fn get_pause_multiplier(prefs: &PreferenceManager) -> f64 {
-        return prefs.get_user_prefs().to_string("PauseFactor").parse::<f64>().unwrap_or(100.)/100.0;
+        return prefs.pref_to_string("PauseFactor").parse::<f64>().unwrap_or(100.)/100.0;
     }
 
     /// Compute the length of the pause to use.

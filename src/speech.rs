@@ -49,7 +49,7 @@ pub fn overview_mathml(mathml: Element) -> Result<String> {
 
 
 fn intent_rules<'m>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, doc: Document<'m>, mathml: Element) -> Result<Element<'m>> {
-    SpeechRules::update();
+    SpeechRules::update()?;
     rules.with(|rules| {
         rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
@@ -67,7 +67,7 @@ fn intent_rules<'m>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>,
 }
 
 fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, mathml: Element) -> Result<String> {
-    SpeechRules::update();
+    SpeechRules::update()?;
     rules.with(|rules| {
         rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
@@ -1865,7 +1865,7 @@ impl SpeechRules {
             let read_files = read_definitions_file(pref_manager.borrow().get_definitions_file());
             match read_files {
                 Ok(_) => {
-                    // debug!("SpeechRules new for {}, tts {}", name, pref_manager.borrow().get_api_prefs().to_string("TTS"));
+                    // debug!("SpeechRules new for {}, tts {}", name, pref_manager.borrow().pref_to_string("TTS"));
                     let unicode = if name == RulesFor::Braille {
                         (
                             Rc::new( RefCell::new (HashMap::with_capacity(497)) ),
@@ -1935,6 +1935,7 @@ impl SpeechRules {
         if self.rules.is_empty() {
             let rule_file = self.pref_manager.borrow().get_rule_file(&self.name).clone();
             self.read_patterns(&rule_file)?;
+
         }
         if self.unicode_short.borrow().is_empty()  {
             self.read_unicode(None, true)?;
@@ -1942,72 +1943,65 @@ impl SpeechRules {
         return Ok( () );
     }
 
-    pub fn invalidate(&mut self, changes: FilesChanged) {
-        if self.name == RulesFor::Braille {
-            if changes.braille_rules {
-                self.rules.clear();
-            }
-            if changes.braille_unicode_short {
-                self.unicode_short.borrow_mut().clear();
-            }
-            if changes.braille_unicode_full {
-                self.unicode_full.borrow_mut().clear();
-            }
-        } else {
+    pub fn invalidate(changes: FilesChanged) {
+        SPEECH_RULES.with(|rules| {
+            let mut rules = rules.borrow_mut();
             if changes.speech_rules {
-                self.rules.clear();
+                rules.rules.clear();
             }
-            if changes.speech_unicode_short {
-                self.unicode_short.borrow_mut().clear();
+            if changes.speech_unicode_short  {
+                rules.unicode_short.borrow_mut().clear();
             }
             if changes.speech_unicode_full {
-                self.unicode_full.borrow_mut().clear();
+                rules.unicode_full.borrow_mut().clear();
             }
-        }
-    }
-
-    pub fn update() {
-        if let Some(files_changed) = PreferenceManager::get().borrow_mut().is_up_to_date() {
-            SPEECH_RULES.with(|rules| {
-                let mut rules = rules.borrow_mut();
-                if files_changed.speech_rules {
-                    rules.rules.clear();
-                }
-                if files_changed.speech_unicode_short  {
-                    rules.unicode_short.borrow_mut().clear();
-                }
-                if files_changed.speech_unicode_full {
-                    rules.unicode_full.borrow_mut().clear();
-                }
-            });
-            BRAILLE_RULES.with(|rules| {
-                let mut rules = rules.borrow_mut();
-                if files_changed.braille_rules {
-                    rules.rules.clear();
-                }
-                if files_changed.braille_unicode_short  {
-                    rules.unicode_short.borrow_mut().clear();
-                }
-                if files_changed.braille_unicode_full {
-                    rules.unicode_full.borrow_mut().clear();
-                }
-            });
+        });
+        BRAILLE_RULES.with(|rules| {
+            let mut rules = rules.borrow_mut();
+            if changes.braille_rules {
+                rules.rules.clear();
+            }
+            if changes.braille_unicode_short  {
+                rules.unicode_short.borrow_mut().clear();
+            }
+            if changes.braille_unicode_full {
+                rules.unicode_full.borrow_mut().clear();
+            }
+        });
+        if changes.intent {
             INTENT_RULES.with(|rules| {
-                let mut rules = rules.borrow_mut();
-                if files_changed.intent {
-                    rules.rules.clear();
-                }
+                rules.borrow_mut().rules.clear();
                 // unicode files are shared with speech and updated/cleared there
             });
-            
-            // FIX: need to add overview and navigation to the update rules
         }
+        if changes.navigate_rules {
+            NAVIGATION_RULES.with(|rules| {
+                rules.borrow_mut().rules.clear();
+            });
+        }
+        if changes.overview_rules {
+            OVERVIEW_RULES.with(|rules| {
+                rules.borrow_mut().rules.clear();
+            });
+        }
+        PreferenceManager::get().borrow_mut().invalidate(changes);
+    }
+
+    pub fn update() -> Result<()> {
+        // Note: PreferenceManager::get() can't be part of the "if let ..." as its scope apparently includes the call to invalidate() which causes a borrow problem
+        let files_changed = PreferenceManager::get().borrow_mut().is_up_to_date();
+        if let Some(files_changed) = files_changed {
+            SpeechRules::invalidate(files_changed);
+        }
+        PreferenceManager::get().borrow_mut().initialize(PathBuf::new())?;
+        return Ok( () );
     }
 
     fn read_patterns(&mut self, path: &Locations) -> Result<()> {
         if let Some(p) = &path[0] {
             // info!("Reading rule file: {}", p.to_str().unwrap());
             let rule_file_contents = read_to_string_shim(p.as_path()).expect("cannot read file");
+
             let rules_build_fn = |pattern: &Yaml| {
                 self.build_speech_patterns(pattern, p)
                     .chain_err(||format!("in file {:?}", p.to_str().unwrap()))
@@ -2048,7 +2042,7 @@ impl SpeechRules {
         };
 
         // FIX: should read first (lang), then supplement with second (region)
-        info!("Reading unicode file {}", path.to_str().unwrap());
+        // info!("Reading unicode file {}", path.to_str().unwrap());
         let unicode_file_contents = read_to_string_shim(&path)?;
         let unicode_build_fn = |unicode_def_list: &Yaml| {
             let unicode_defs = unicode_def_list.as_vec();
@@ -2156,7 +2150,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                                 None => {},
                                 Some(id) => {
                                     if self.nav_node_id == id {
-                                        let highlight_style =  self.speech_rules.pref_manager.borrow().get_user_prefs().to_string("BrailleNavHighlight");
+                                        let highlight_style =  self.speech_rules.pref_manager.borrow().pref_to_string("BrailleNavHighlight");
                                         return Ok( Some( T::highlight_braille(s, highlight_style) ) );
                                     }
                                 }

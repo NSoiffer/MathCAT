@@ -51,37 +51,15 @@ fn check_answer(test: &str, target: &str, failure_message: &str) {
 pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
-        let mut rules = rules.borrow_mut();
-        let mut changes = None;
-        {
-            let mut prefs = rules.pref_manager.borrow_mut();
-            prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
-            prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
-            prefs.set_user_prefs("Language", language);
-            prefs.set_user_prefs("Verbosity", "Medium");
-
-            let old_language = prefs.get_user_prefs().to_string("Language");
-            let old_style = prefs.get_user_prefs().to_string("SpeechStyle");
-
-            if &old_language != language {
-                changes = prefs.set_user_prefs("Language", language);
-            }
-            if &old_style != style {
-                if let Some(style_changes) = prefs.set_user_prefs("SpeechStyle", style) {
-                    match changes {
-                        None =>  changes = Some(style_changes),
-                        Some(mut lang_changes) => {
-                            lang_changes.add_changes(style_changes);
-                            changes = Some(lang_changes);
-                        },
-                    }
-                }
-            }
-        }
-        if let Some(changes) = changes {
-            rules.invalidate(changes);
-        }
+        let rules = rules.borrow_mut();
+        let mut prefs = rules.pref_manager.borrow_mut();
+        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
+        prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
+        prefs.set_user_prefs("Verbosity", "Medium");
     });
+
+    set_preference("Language".to_string(), language.to_string()).unwrap();
+    set_preference("SpeechStyle".to_string(), style.to_string()).unwrap();
     check_answer(mathml, speech, &format!("{}/{}", language, style));
 }
 
@@ -92,22 +70,18 @@ pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
 pub fn test_prefs(language: &str, speech_style: &str, test_prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
     libmathcat::speech::SPEECH_RULES.with(|rules| {
-        let mut rules = rules.borrow_mut();
-        let mut changes;
-        {
-            let mut prefs = rules.pref_manager.borrow_mut();
-            prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
-            prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
-            prefs.set_user_prefs("Language", language);
-            changes = prefs.set_user_prefs("SpeechStyle", speech_style).unwrap_or_default();
-            for (pref_name, pref_value) in test_prefs.clone() {
-                if let Some(more_changes) = prefs.set_user_prefs(pref_name, pref_value) {
-                    changes.add_changes(more_changes);
-                }
-            };
-        }
-        rules.invalidate(changes);
+        let rules = rules.borrow_mut();
+        let mut prefs = rules.pref_manager.borrow_mut();
+        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
+        prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
+        prefs.set_user_prefs("Verbosity", "Medium");
     });
+
+    set_preference("Language".to_string(), language.to_string()).unwrap();
+    set_preference("SpeechStyle".to_string(), speech_style.to_string()).unwrap();
+    for (pref_name, pref_value) in test_prefs.clone() {
+        set_preference(pref_name.to_string(), pref_value.to_string()).unwrap();
+    };
     check_answer(mathml, speech, &format!("{}/{} with prefs {:#?}", language, speech_style, test_prefs));
 }
 
@@ -116,48 +90,16 @@ pub fn test_prefs(language: &str, speech_style: &str, test_prefs: Vec<(&str, &st
 #[allow(dead_code)]     // used in testing
 #[allow(non_snake_case)]
 pub fn test_ClearSpeak(language: &str, pref_name: &str, pref_value: &str, mathml: &str, speech: &str) {
-    set_rules_dir(abs_rules_dir_path()).unwrap();
-    libmathcat::speech::SPEECH_RULES.with(|rules| {
-        let mut rules = rules.borrow_mut();
-        let mut changes;
-        {   // needs to be scoped due to problems with rules potentially being used with prefs' destructor runs in an outer scope
-            let mut prefs = rules.pref_manager.borrow_mut();
-            prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
-            prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
-            prefs.set_user_prefs("Language", language);
-            changes = prefs.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap_or_default();
-            let more_changes = prefs.set_user_prefs(pref_name, pref_value).unwrap_or_default();
-            changes.add_changes(more_changes);
-        }
-        rules.invalidate(changes);
-    });
-    check_answer(mathml, speech, &format!("{} with {}={}", language, pref_name, pref_value));
+    let prefs = vec![(pref_name, pref_value)];
+    test_prefs(language, "ClearSpeak", prefs, mathml, speech);
 }
 
 // Compare the result of speaking the mathml input to the output 'speech'
 // This forces the use of ClearSpeak and sets multiple ClearSpeak preferences
 #[allow(dead_code)]     // used in testing
 #[allow(non_snake_case)]
-pub fn test_ClearSpeak_prefs(language: &str, test_prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
-    set_rules_dir(abs_rules_dir_path()).unwrap();
-    libmathcat::speech::SPEECH_RULES.with(|rules| {
-        let mut rules = rules.borrow_mut();
-        let mut changes;
-        {
-            let mut prefs = rules.pref_manager.borrow_mut();
-            prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
-            prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
-            prefs.set_user_prefs("Language", language);
-            changes = prefs.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap_or_default();
-            for (pref_name, pref_value) in test_prefs.clone() {
-                if let Some(more_changes) = prefs.set_user_prefs(pref_name, pref_value) {
-                    changes.add_changes(more_changes);
-                }
-            };
-        }
-        rules.invalidate(changes);
-    });
-    check_answer(mathml, speech, &format!("{} with prefs {:#?}", language, test_prefs));
+pub fn test_ClearSpeak_prefs(language: &str, prefs: Vec<(&str, &str)>, mathml: &str, speech: &str) {
+    test_prefs(language, "ClearSpeak", prefs, mathml, speech);
 }
 
 // Compare the result of brailling the mathml input to the output (Unicode) 'braille'
@@ -165,13 +107,7 @@ pub fn test_ClearSpeak_prefs(language: &str, test_prefs: Vec<(&str, &str)>, math
 #[allow(non_snake_case)]
 pub fn test_braille(code: &str, mathml: &str, braille: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
-    libmathcat::speech::BRAILLE_RULES.with(|rules| {
-        let mut rules = rules.borrow_mut();
-        let changes = rules.pref_manager.borrow_mut().set_user_prefs("BrailleCode", code);
-        if let Some(changes) = changes {
-            rules.invalidate(changes);
-        }
-    });
+    set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
     if let Err(e) = set_mathml(mathml.to_string()) {
         panic!("{}", errors_to_string(&e));
     };

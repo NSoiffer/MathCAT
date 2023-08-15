@@ -25,7 +25,7 @@
 #![allow(clippy::needless_return)]
 
 extern crate yaml_rust;
-use yaml_rust::{Yaml};
+use yaml_rust::Yaml;
 use crate::errors::*; 
 use crate::prefs::*;
 use std::{cell::RefCell, cell::Ref, cell::RefMut, collections::HashSet,  rc::Rc};

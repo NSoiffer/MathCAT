@@ -92,7 +92,7 @@ pub fn is_chemistry_off(mathml: Element) -> bool {
         }
     }
     let pref_manager = crate::prefs::PreferenceManager::get();
-    return pref_manager.borrow().get_user_prefs().to_string("Chemistry") == "Off";
+    return pref_manager.borrow().pref_to_string("Chemistry") == "Off";
 }
 
 pub fn clean_chemistry_mrow(mathml: Element) {
