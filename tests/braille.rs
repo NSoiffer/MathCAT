@@ -13,8 +13,8 @@ mod braille {
         mod iceb;
         mod other;
     }
-    mod Vietnam {
-        mod vi;
-    }
+    // mod Vietnam {
+    //     mod vi;
+    // }
 }
 
