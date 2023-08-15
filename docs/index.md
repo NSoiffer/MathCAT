@@ -114,7 +114,7 @@ takes about 4ms to generate the ClearSpeak string
 "_e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren squared, end exponent_" along with the Nemeth braille string "⠑⠘⠤⠹⠂⠌⠆⠼⠈⠡⠷⠹⠭⠤⠨⠍⠌⠨⠎⠼⠾⠘⠘⠆".
 This time is split approximately: 2ms to cleanup the MathML + 1ms for speech generation + 1ms for braille generation.
 <details>
-<summary>The MathML for this expression</summary>
+<summary>Click to see the MathML for this expression</summary>
 <pre>
 &lt;math&gt;
   &lt;mrow&gt;
