@@ -628,8 +628,11 @@ impl PreferenceManager {
                     &bad_env_value, rules_dir.to_str().unwrap_or("rules dir is none???"));
     }
 
-    // this will work even if self is invalid
-    pub fn is_up_to_date(&mut self) -> Option<FilesChanged> {
+    pub fn is_up_to_date(&mut self) -> Result<Option<FilesChanged>> {
+        if !PreferenceManager::is_file_up_to_date(&self.pref_files) {
+            self.invalidate_old_prefs()?
+        }
+
         let files_changed = FilesChanged {
             speech_rules: !PreferenceManager::is_file_up_to_date(&self.speech),
             speech_unicode_short: !PreferenceManager::is_file_up_to_date(&self.speech_unicode),
@@ -653,14 +656,37 @@ impl PreferenceManager {
            files_changed.defs ||
            files_changed.navigate_rules ||
            files_changed.overview_rules {
-            return Some(files_changed);
+            return Ok( Some(files_changed) );
         } else {
-            return None;
+            return Ok(None);
         }
     }
 
+    fn invalidate_old_prefs(&mut self) -> Result<()> {
+        // Note: to_string() is needed because &str is borrowed from self and resetting the value causes a problem
+        let old_language = self.user_prefs.prefs.get("Language").unwrap().as_str().unwrap().to_string();
+        let old_style = self.user_prefs.prefs.get("SpeechStyle").unwrap().as_str().unwrap().to_string();
+        let old_braille = self.user_prefs.prefs.get("BrailleCode").unwrap().as_str().unwrap().to_string();
+        (self.user_prefs, self.pref_files) = Preferences::from_file(self.rules_dir.as_ref().unwrap().as_path())?;
+
+        let new_language = self.user_prefs.prefs.get("Language").unwrap().as_str().unwrap().to_string();
+        let new_style = self.user_prefs.prefs.get("SpeechStyle").unwrap().as_str().unwrap().to_string();
+        let new_braille = self.user_prefs.prefs.get("BrailleCode").unwrap().as_str().unwrap().to_string();
+        if old_language != new_language {
+            self.invalidate(FilesChanged::new("Language").unwrap());
+        }
+        if old_style != new_style {
+            self.invalidate(FilesChanged::new("SpeechStyle").unwrap());
+        }
+        if old_braille != new_braille {
+            self.invalidate(FilesChanged::new("BrailleCode").unwrap());
+        }
+        return Ok( () )
+    }
+
     fn is_file_up_to_date(ft: &FileAndTime) -> bool {
-        return  is_older(&ft.files[0], ft.times[0]) &&
+        return  ft.is_valid() &&
+                is_older(&ft.files[0], ft.times[0]) &&
                 is_older(&ft.files[1], ft.times[1]) &&
                 is_older(&ft.files[2], ft.times[2]);
 
@@ -1106,7 +1132,7 @@ mod tests {
             pref_manager.initialize(PathBuf::new()).unwrap();
 
             // First test to make sure the up_to_date check works -- need to do in this test since the order of testing is random
-            let files_changed = pref_manager.is_up_to_date();        
+            let files_changed = pref_manager.is_up_to_date().unwrap();        
             assert!(files_changed.is_none(), "files_changed={}", files_changed.unwrap());
             
             // Note: need to use pattern match to avoid borrow problem
@@ -1118,7 +1144,7 @@ mod tests {
                     fs::write(file_name, contents);
                     sleep(Duration::from_millis(10));
                 }
-                let files_changed = pref_manager.is_up_to_date();
+                let files_changed = pref_manager.is_up_to_date().unwrap();
                 assert!(files_changed.is_some());
                 let files_changed = files_changed.unwrap();
                 assert!(&files_changed.defs);

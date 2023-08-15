@@ -1989,7 +1989,7 @@ impl SpeechRules {
 
     pub fn update() -> Result<()> {
         // Note: PreferenceManager::get() can't be part of the "if let ..." as its scope apparently includes the call to invalidate() which causes a borrow problem
-        let files_changed = PreferenceManager::get().borrow_mut().is_up_to_date();
+        let files_changed = PreferenceManager::get().borrow_mut().is_up_to_date()?;
         if let Some(files_changed) = files_changed {
             SpeechRules::invalidate(files_changed);
         }
