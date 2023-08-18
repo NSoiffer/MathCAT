@@ -170,18 +170,8 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr=r#"
-  <math>
-	<mo>|</mo>
-	<mo>|</mo>
-	<mn>-3</mn>
-	<mo>|</mo>
-	<mo>+</mo>
-	<mo>|</mo>
-	<mn>2</mn>
-	<mo>|</mo>
-	<mo>|</mo>
-</math>
-"#;
+  <math><mfenced open='|' close='|'><mrow><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi></mrow></mfenced><mn>3</mn></math>
+  "#;
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>
@@ -226,7 +216,7 @@ fn main() {
   }
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
-  set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
+  set_preference("BrailleCode".to_string(), "CMU".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),

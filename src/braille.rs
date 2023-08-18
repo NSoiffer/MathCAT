@@ -34,6 +34,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
             "Nemeth" => nemeth_cleanup(braille_string),
             "UEB" => ueb_cleanup(pref_manager, braille_string),
             "Vietnam" => vietnam_cleanup(pref_manager, braille_string),   // FIX: probably needs some specialized cleanup
+            "CMU" => cmu_cleanup(pref_manager, braille_string),   // FIX: probably needs some specialized cleanup
             _ => braille_string,    // probably needs cleanup if someone has another code, but this will have to get added by hand
         };
 
@@ -1363,6 +1364,76 @@ fn vietnam_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
     return result.to_string();
 }
 
+
+static CMU_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
+    // "S" => "XXX",    // sans-serif -- from prefs
+    "B" => "⠔",     // bold
+    // "𝔹" => "XXX",     // blackboard -- from prefs
+    // "T" => "⠈",     // script
+    "I" => "⠔",     // italic -- same as bold
+    // "R" => "",      // roman
+    // "E" => "⠰",     // English
+    "1" => "⠐",     // Grade 1 symbol -- used here for a-j after number
+    "L" => "",     // Letter left in to assist in locating letters
+    // "D" => "XXX",     // German (Deutsche) -- from prefs
+    "G" => "⠈",     // Greek
+    "V" => "XXX",    // Greek Variants
+    // "H" => "⠠⠠",    // Hebrew
+    // "U" => "⠈⠈",    // Russian
+    "C" => "⠨",      // capital
+    "𝐶" => "⠨",      // capital that never should get word indicator (from chemical element)
+    "N" => "⠼",     // number indicator
+    // "t" => "⠱",     // shape terminator
+    "W" => "⠀",     // whitespace"
+    "𝐖"=> "⠀",     // whitespace
+    // "s" => "⠆",     // typeface single char indicator
+    // "w" => "⠂",     // typeface word indicator
+    // "e" => "⠄",     // typeface & capital terminator 
+    // "o" => "",       // flag that what follows is an open indicator (used for standing alone rule)
+    // "c" => "",       // flag that what follows is an close indicator (used for standing alone rule)
+    // "b" => "",       // flag that what follows is an open or close indicator (used for standing alone rule)
+    "," => "⠂",     // comma
+    "." => "⠄",     // period
+    "-" => "⠤",     // hyphen
+    "—" => "⠤⠤",   // normal dash (2014) -- assume all normal dashes are unified here [RUEB appendix 3]
+    // "―" => "⠐⠤⠤",  // long dash (2015) -- assume all long dashes are unified here [RUEB appendix 3]
+    "#" => "⠼",      // signals to end/restart of numeric mode (mixed fractions)
+};
+
+
+fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
+    debug!("cmu_cleanup: start={}", raw_braille);
+    let result = typeface_to_word_mode(&raw_braille);
+    let result = capitals_to_word_mode(&result);
+
+    // let result = result.replace("tW", "W");
+    let result = result.replace("CG", "⠸");
+    // let result = result.replace("CC", "⠸"); 
+
+    // these typeforms need to get pulled from user-prefs as they are transcriber-defined
+    // let double_struck = pref_manager.pref_to_string("CMU_DoubleStruck");
+    // let sans_serif = pref_manager.pref_to_string("CMU_SansSerif");
+    // let fraktur = pref_manager.pref_to_string("CMU_Fraktur");
+    // let greek_variant = pref_manager.pref_to_string("CMU_GreekVariant");
+
+    // This reuses the code just for getting rid of unnecessary "L"s and "N"s
+    let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
+    debug!("After remove mode changes: '{}'", &result);
+
+    let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
+        match CMU_INDICATOR_REPLACEMENTS.get(&cap[0]) {
+            None => {error!("REPLACE_INDICATORS and CMU_INDICATOR_REPLACEMENTS are not in sync"); ""},
+            Some(&ch) => ch,
+        }
+    });
+
+    // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces
+    // let result = result.trim_start_matches('⠀').trim_end_matches('⠀');
+    let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
+   
+    return result.to_string();
+}
+
 /************** Braille xpath functionality ***************/
 use crate::canonicalize::{name, as_element, as_text};
 use crate::xpath_functions::{is_leaf, IsBracketed};
@@ -1483,6 +1554,7 @@ impl BrailleChars {
         let result = match code {
             "Nemeth" => BrailleChars::get_braille_nemeth_chars(node, text_range),
             "UEB" => BrailleChars:: get_braille_ueb_chars(node, text_range),
+            "CMU" => BrailleChars:: get_braille_cmu_chars(node, text_range),
             _ => return Err(sxd_xpath::function::Error::Other(format!("get_braille_chars: unknown braille code '{}'", code)))
         };
         return match result {
@@ -1615,6 +1687,97 @@ impl BrailleChars {
                 + &caps["char"]
         });
         return Ok(result.to_string())
+    }
+
+    fn get_braille_cmu_chars(node: Element, text_range: Option<Range<usize>>) -> Result<String> {
+        // In CMU, we need to replace spaces used for number blocks with "."
+        // For other numbers, we need to add "." to create digit blocks
+
+        lazy_static! {
+            // these all use ',' for decimal separators
+            static ref NUMBER_WITH_SPACES: Regex = Regex::new(r"^[1-9]\d{0,2}( \d{3})*(,\d*)?$").unwrap();
+            static ref NUMBER_WITH_BLOCKS: Regex = Regex::new(r"^([1-9]\d\d\d+)(,\d*)?$").unwrap();
+    
+            static ref HAS_TYPEFACE: Regex = Regex::new(".*?(double-struck|script|fraktur|sans-serif).*").unwrap();
+            static ref PICK_APART_CHAR: Regex = 
+                 Regex::new(r"(?P<bold>B??)(?P<italic>I??)(?P<face>[S𝔹TD]??)s??(?P<cap>C??)(?P<greek>G??)(?P<char>[NL].)").unwrap();
+        }
+    
+        let math_variant = node.attribute_value("mathvariant");
+        let text = BrailleChars::substring(as_text(node), &text_range);
+        let text = add_separator(text);
+
+        let braille_chars = crate::speech::braille_replace_chars(&text, node)?;
+
+        // debug!("get_braille_ueb_chars: before/after unicode.yaml: '{}'/'{}'", text, braille_chars);
+        if math_variant.is_none() {         // nothing we need to do
+            return Ok(braille_chars);
+        }
+        // mathvariant could be "sans-serif-bold-italic" -- get the parts
+        let math_variant = math_variant.unwrap();
+        let bold = math_variant.contains("bold");
+        let italic = math_variant.contains("italic");
+        let typeface = match HAS_TYPEFACE.find(math_variant) {
+            None => "",
+            Some(m) => match m.as_str() {
+                "double-struck" => "𝔹",
+                "script" => "T",
+                "fraktur" => "D",
+                "sans-serif" => "S",
+                //  don't consider monospace as a typeform
+                _ => "",
+            },
+        };
+        let result = PICK_APART_CHAR.replace_all(&braille_chars, |caps: &Captures| {
+            // debug!("captures: {:?}", caps);
+            // debug!("  bold: {:?}, italic: {:?}, face: {:?}, cap: {:?}, char: {:?}",
+            //        &caps["bold"], &caps["italic"], &caps["face"], &caps["cap"], &caps["char"]);
+            if bold || !caps["bold"].is_empty() {"B"} else {""}.to_string()
+                + if italic || !caps["italic"].is_empty() {"I"} else {""}
+                + if !&caps["face"].is_empty() {&caps["face"]} else {typeface}
+                + &caps["cap"]
+                + &caps["greek"]
+                + &caps["char"]
+        });
+        return Ok(result.to_string());
+
+        fn add_separator(text: String) -> String {
+            if NUMBER_WITH_SPACES.is_match(&text) {
+                return text.replace(" ", ".");
+            } else if NUMBER_WITH_BLOCKS.is_match(&text) {
+                let mut parts = text.split(',');
+                let integer_part = parts.next().unwrap();   // has to exist -- at least four chars
+                let fractional_part = parts.next();
+                let fractional_part = if let Some(text) = fractional_part {text} else {""};
+                let n_chars = integer_part.chars().count();
+                let mut chars = integer_part.chars();
+                let mut result = String::with_capacity(4*n_chars/3 + fractional_part.len() );      // a bit large if there is a fractional part
+                match n_chars % 3 {     // get the leading digits
+                    0 => {
+                        result.push(chars.next().unwrap());
+                        result.push(chars.next().unwrap());
+                        result.push(chars.next().unwrap());
+                    },
+                    1 => {
+                        result.push(chars.next().unwrap());
+                    },
+                    _ => {      // must be == 2
+                        result.push(chars.next().unwrap());
+                        result.push(chars.next().unwrap());
+                    },
+                }
+                for (i, c) in chars.enumerate() {
+                    if i % 3 == 0 {
+                        result.push('.');
+                    }
+                    result.push(c);
+                }
+                result.push_str(fractional_part);  
+                return result;    
+            } else {
+                return text;
+            }   
+        }
     }
 
     fn is_in_enclosed_list(node: Element) -> bool {
