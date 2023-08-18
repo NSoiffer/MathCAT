@@ -40,7 +40,7 @@ def generate_ascii_to_unicode():
     i = 0
     to_unicode = ['X' for i in range(32, 96)]
     for ch in UNICODE_TO_ASCII:
-        to_unicode[ord(ch)-32] = chr(0x2800 + i)
+        to_unicode[ord(ch)-32, chr(0x2800 + i)]
         i += 1
 
     result = ""
@@ -48,3 +48,68 @@ def generate_ascii_to_unicode():
         result += ch
     print(result)
 
+
+# Major hack
+# ONCE PDF uses a mapping that seems to be based on the Spanish char encoding. This is a bit like ASCII braille, but different
+# Here we start with the ASCII encoding, stretch it to 128, then remap characters
+#   set_char() is used to override a spot
+#   SPANISH_REMAP is used to take non-ASCII chars back down to the ASCII braille mapping if it isn't overridden already.
+# It's all a hack. It would be best if I could find some string encoding like for ASCII braille, but with large gaps due to accented chars
+SPANISH_TO_UNICODE=''
+def initialize_spanish():
+    def set_char(old:str, new:str):
+        global SPANISH_TO_UNICODE
+        index = ord(old) - 32 
+        SPANISH_TO_UNICODE = SPANISH_TO_UNICODE[:index] + new + SPANISH_TO_UNICODE[index+1:]
+
+    global SPANISH_TO_UNICODE
+    SPANISH_TO_UNICODE = ASCII_TO_UNICODE + ''.join(list(map(lambda i: chr(i), range(32+64,128))))
+    set_char('@', '⠐')  
+    set_char('?', '⠢')
+    set_char('!', '⠖')
+    set_char('+', '⠖')   # same as '!'
+    set_char(',', '⠂')
+    set_char('.', '⠄')
+    set_char(':', '⠒')
+    set_char('}', '⠔')
+    set_char('"', '⠦')
+    set_char('{', '⠨')
+    set_char('a', '⠸')
+    set_char('e', '⠮')
+    set_char('f', '⠱')
+    set_char('_', '⠠')
+    set_char("`", '⠈')
+    set_char("=", '⠶')
+
+
+initialize_spanish()
+SPANISH_REMAP = {'¿': '?', 'Á': '(', 'Â': '*', 'É': 'e', 'Ë': '$', 'Ü': '\\', 'Ú': ')', 'Û': 'f',
+                 'Ñ': ']', 'Í': '/', 'Ó': '+', 'Ç': '&', '÷': '4', '°': '0',
+                 '(': '<', ')': '>', '¬': ' ', '%': 'a'}
+def spanish_to_unicode(ascii: str):
+    result = "";
+    ascii = ascii.upper()
+    for ch in ascii:
+        found = SPANISH_REMAP.get(ch)
+        if found:
+            ch = found 
+        i = ord(ch) - 32
+        result += SPANISH_TO_UNICODE[i]
+    return result
+
+def s2u(ascii:str):
+    return spanish_to_unicode(ascii)
+
+def dots_to_unicode(dots: int):
+    answer = 0
+    while dots > 0:
+        digit = dots % 10
+        dots = (dots-digit)//10
+        answer += pow(2, digit-1)
+    return chr(0x2800+answer)
+
+def d2u(dots: int):
+    return dots_to_unicode(dots)
+
+def dl2u(dots: list):
+    return " ".join(list(map(dots_to_unicode, dots)))
