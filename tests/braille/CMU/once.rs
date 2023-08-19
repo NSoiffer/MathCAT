@@ -10,7 +10,41 @@ fn letter_number_1_1_1() {
 }
 
 #[test]
-fn greater_o_1_1_2() {
+fn dot_1_1_2() {
+    let expr = "<math><mover><mi>p</mi><mo>&#x2D9;</mo></mover></math>";
+    test_braille("CMU", expr, "⠈⠐⠏");
+}
+
+#[test]
+fn greek_1_1_3() {
+    let expr = "<math><mi>π</mi></math>";
+    test_braille("CMU", expr, "⠈⠏");
+}
+
+#[test]
+fn greek_dot_1_1_4() {
+    let expr = "<math><mover><mi>π</mi><mo>&#x2D9;</mo></mover></math>";
+    test_braille("CMU", expr, "⠈⠈⠏");
+}
+
+#[test]
+fn strike_1_1_5() {
+    let expr = "<math><menclose notation=\"horizontalstrike\"><mi>p</mi></menclose></math>";
+    test_braille("CMU", expr, "⠘⠐⠏");
+}
+#[test]
+fn strike_1_1_7() {
+    let expr = "<math><menclose notation=\"horizontalstrike\"><mi>Ω</mi></menclose></math>";
+    test_braille("CMU", expr, "⠘⠘⠺");
+}
+#[test]
+fn strike_1_1_8() {
+    let expr = "<math><menclose notation=\"horizontalstrike\"><mi>β</mi></menclose></math>";
+    test_braille("CMU", expr, "⠘⠈⠃");
+}
+
+#[test]
+fn greater_o_1_1_9() {
     let expr = "<math><mi>a</mi><mo>≫</mo><mi>o</mi></math>";
     test_braille("CMU", expr, "⠁⠕⠕⠐⠕");
 }
@@ -142,7 +176,6 @@ fn prime_2_3_1_2() {
 #[test]
 fn super_2_3_1_4() {
     // z^{+}
-    init_logger();
     let expr = "<math><msup><mi>z</mi><mo>+</mo></msup></math>";
     test_braille("CMU", expr, "⠵⠖⠄");
 }
@@ -165,6 +198,61 @@ fn sup_2_3_1_11() {
     // z^{4+}
     let expr = "<math><msup><mi>z</mi><mrow><mn>4</mn><mo>+</mo></mrow></msup></math>";
     test_braille("CMU", expr, "⠵⠡⠼⠙⠖⠄");
+}
+
+#[test]
+fn greek_dot_2_3_2() {
+    let expr = "<math><mover><mi>ζ</mi><mo>¨</mo></mover></math>";
+    test_braille("CMU", expr, "⠈⠈⠈⠵");
+}
+
+#[test]
+fn dot_2_3_3() {
+    let expr = "<math><mover><mi>z</mi><mo>&#x20DB;</mo></mover></math>";
+    test_braille("CMU", expr, "⠈⠈⠈⠐⠵");
+}
+
+#[test]
+fn bar_2_3_4() {
+    let expr = "<math><mover><mi>z</mi><mo>&#xAF;</mo></mover></math>";
+    test_braille("CMU", expr, "⠈⠉⠵");
+}
+
+#[test]
+fn bar_2_3_5() {
+    // A double bar probably should be U+2550, but I don't know how to get a MathML generator to create this
+    let expr = "<math><mover><mi>z</mi><mo>&#x2550;</mo></mover></math>";
+    test_braille("CMU", expr, "⠈⠉⠈⠉⠵");
+}
+
+#[test]
+fn underbar_2_3_6() {
+    let expr = "<math><munder><mi>z</mi><mo>&#xAF;</mo></munder></math>";
+    test_braille("CMU", expr, "⠠⠤⠵");
+}
+
+#[test]
+fn tilde_2_3_7() {
+    let expr = "<math><mover><mi>z</mi><mo>~</mo></mover></math>";
+    test_braille("CMU", expr, "⠐⠢⠵");
+}
+
+    #[test]
+fn bar_2_3_8() {
+    let expr = "<math><mover><mrow><mi>A</mi><mi>B</mi></mrow><mo stretchy=\"false\">&#xAF;</mo></mover></math>";
+    test_braille("CMU", expr, "⠈⠉⠢⠨⠁⠨⠃⠔");
+}
+
+#[test]
+fn bar_menclose_2_3_8() {
+    let expr = "<math><menclose notation=\"top\"><mi>A</mi><mi>B</mi></menclose></math>";
+    test_braille("CMU", expr, "⠈⠉⠢⠨⠁⠨⠃⠔");
+}
+
+#[test]
+fn bar_menclose_2_3_9() {
+    let expr = "<math><menclose notation=\"top\"><mi>z</mi><mo>''</mo></menclose></math>";
+    test_braille("CMU", expr, "⠈⠉⠢⠵⠳⠳⠔");
 }
 
 #[test]

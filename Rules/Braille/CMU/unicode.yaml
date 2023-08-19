@@ -291,8 +291,11 @@
  - "@": [t: "⠐"]               # 0x0040 (Commercial at sign)
  - "\\": [t: "⠐⠄"]              # 0x005C (Backslash)
  - "^": [t: "⠈⠢"]               # 0x005E (Caret (hat, up arrow))
- - "_": [t: "⠨⠤"]               # 0x005F (Low line (underscore))
- - "~": [t: "⠈⠔"]               # 0x007E (Tilde (swung dash))
+ - "_": [t: "⠤"]               # 0x005F (Low line (underscore))
+ - "¯": [t: "⠈⠉"]               # 0x00AF (macron)
+ - "═": [t: "⠈⠉⠈"]             # 0x2550 (BOX DRAWINGS DOUBLE HORIZONTAL)
+ - "~": [t: "⠐⠢"]               # 0x007E (Tilde (swung dash))
+ - "̃̃": [t: "⠐⠢"]               # 0x0303 (combining Tilde (swung dash))
  - "¢": [t: "⠘⠉"]               # 0x00A2 (Cents sign)
  - "—": [t: "⠤⠤"]               # 0x2014 (Em dash)
  - "‖": [t: "⠸⠳"]               # 0x2016
@@ -431,12 +434,13 @@
 #  - "⊞": [t: "1⠫⠼⠙⠪⠐⠖t"]         # 0x229E (Squared plus)
 #  - "⊟": [t: "1⠫⠼⠙⠪⠐⠤t"]         # 0x229F (Squared minus)
 #  - "⊠": [t: "1⠫⠼⠙⠪⠐⠦t"]         # 0x22A0 (Squared times)
-#  - "⋇": [t: "1⠌⠯⠦"]             # 0x22C7 (Division times)
+#  - "⋇": [t: "1⠌⠯⠦"]              # 0x22C7 (Division times)
 #  - "⊩": [t: "⠸⠳⠿⠸⠒"]            # 0x22A9 (Forces)
-#  - "˙": [t: "1⠲"]               # 0x02D9 ( Dot Above)
-#  - "¨": [t: "1⠲⠲"]              # 0x00A8 ( Diaeresis/Double Dot Above )
- - "©": [t: "⠣⠨⠉⠜"]               # 0xa9 (Copyright)
- - "®": [t: "⠣⠨⠗⠜"]               # 0xa9 (Registered sign)
+ - "˙": [t: "⠈"]                     # 0x02D9 ( Dot Above)
+ - "¨": [t: "⠈⠈"]                   # 0x00A8 ( Diaeresis/Double Dot Above )
+ - "⃛": [t: "⠈⠈⠈"]                  # 0x20db (combining triple dot)
+ - "©": [t: "⠣⠨⠉⠜"]                 # 0xa9 (Copyright)
+ - "®": [t: "⠣⠨⠗⠜"]                 # 0xa9 (Registered sign)
 
 
 # All the quotes are the same

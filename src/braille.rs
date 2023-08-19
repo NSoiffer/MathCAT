@@ -1404,10 +1404,9 @@ static CMU_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     debug!("cmu_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
-    let result = capitals_to_word_mode(&result);
 
     // let result = result.replace("tW", "W");
-    let result = result.replace("CG", "⠸");
+    let result = result.replace("CG", "⠘");
     // let result = result.replace("CC", "⠸"); 
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined

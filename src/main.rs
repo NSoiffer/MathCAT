@@ -170,8 +170,12 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr=r#"
-  <math><mfenced open='|' close='|'><mrow><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi></mrow></mfenced><mn>3</mn></math>
-  "#;
+  <math xmlns="http://www.w3.org/1998/Math/MathML">
+  <mover><mi>z</mi><mo>&#xA8;</mo></mover>
+  <mover><mi>a</mi><mo>&#x2D9;</mo></mover>
+  <mover><mi>a</mi><mo>.</mo></mover>
+  </math>
+    "#;
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>
