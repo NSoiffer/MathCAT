@@ -26,6 +26,18 @@
  - "8": [t: "N⠓"]               # 0x38 
  - "9": [t: "N⠊"]               # 0x39 
 
+# we stick the drop numbers into the private use area for consistency
+ - "\ue000": [t: "N⠴"]               # 0 
+ - "\ue001": [t: "N⠂"]               # 1 
+ - "\ue002": [t: "N⠆"]               # 2 
+ - "\ue003": [t: "N⠒"]               # 3 
+ - "\ue004": [t: "N⠲"]               # 4 
+ - "\ue005": [t: "N⠢"]               # 5 
+ - "\ue006": [t: "N⠖"]               # 6 
+ - "\ue007": [t: "N⠶"]               # 7 
+ - "\ue008": [t: "N⠦"]               # 8 
+ - "\ue009": [t: "N⠔"]               # 9 
+
  - "a": [t: "L⠁"]               # 0x61 
  - "b": [t: "L⠃"]               # 0x62 
  - "c": [t: "L⠉"]               # 0x63 
@@ -293,7 +305,7 @@
  - "^": [t: "⠈⠢"]               # 0x005E (Caret (hat, up arrow))
  - "_": [t: "⠤"]               # 0x005F (Low line (underscore))
  - "¯": [t: "⠈⠉"]               # 0x00AF (macron)
- - "═": [t: "⠈⠉⠈"]             # 0x2550 (BOX DRAWINGS DOUBLE HORIZONTAL)
+ - "═": [t: "⠈⠉⠈⠉"]             # 0x2550 (BOX DRAWINGS DOUBLE HORIZONTAL)
  - "~": [t: "⠐⠢"]               # 0x007E (Tilde (swung dash))
  - "̃̃": [t: "⠐⠢"]               # 0x0303 (combining Tilde (swung dash))
  - "¢": [t: "⠘⠉"]               # 0x00A2 (Cents sign)
@@ -476,6 +488,7 @@
         then: [t: "N⠄"]
         else: [t: "⠄"]
  - ":": [t: "⠒"]              # 0x003A (Colon)
+ - "∶": [t: "⠲"]              # 0x2236 (Ratio)
  - "-": [t: "⠤"]              # 0x2d (Minus sign or hyphen)
  - "⁡":                          # 0x2061⁡ (invisible function apply)
     - test:
