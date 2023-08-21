@@ -494,7 +494,7 @@
   - "*[2][self::m:mrow][count(*)=2] and"                        # exponent is an mrow with children...
   - "*[2]/*[1][self::m:mo][text()='-'] and"                     #   '-'
   - "*[2]/*[2][self::m:mn][text()=1] and"                       #  and '1'
-  - "*[1][self::m:mi] and IsNode(*[1], 'trig_name') and"        # base is a trig function name (e.g, sin, sinh)
+  - "*[1][self::m:mi] and IsInDefinition(*[1], 'TrigFunctionNames') and"        # base is a trig function name (e.g, sin, sinh)
   - "following-sibling::*[1][self::m:mo][text()='\u2061']"      # and msup is followed by invisible function apply
   replace:
   - intent:

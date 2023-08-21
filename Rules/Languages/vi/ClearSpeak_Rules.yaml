@@ -700,7 +700,7 @@
   tag: mo
   match:
   - "text()='⁡' and $ClearSpeak_Functions = 'None' and"
-  - not(preceding-sibling::*[1][IsNode(., 'trig_name')]) # Functions=None does not apply to "trig" functions
+  - "not(preceding-sibling::*[1][IsInDefinition(., 'TrigFunctionNames')])" # Functions=None does not apply to "trig" functions
   replace:
     test:
       if: "$ClearSpeak_ImpliedTimes = 'None'"
