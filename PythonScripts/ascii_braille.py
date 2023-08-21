@@ -55,6 +55,7 @@ def generate_ascii_to_unicode():
 #   set_char() is used to override a spot
 #   SPANISH_REMAP is used to take non-ASCII chars back down to the ASCII braille mapping if it isn't overridden already.
 # It's all a hack. It would be best if I could find some string encoding like for ASCII braille, but with large gaps due to accented chars
+# The remap list has grown large, so maybe just have it map to Unicode and be done with the array lookup.
 SPANISH_TO_UNICODE=''
 def initialize_spanish():
     def set_char(old:str, new:str):
@@ -85,7 +86,8 @@ def initialize_spanish():
 initialize_spanish()
 SPANISH_REMAP = {'¿': '?', 'Á': '(', 'Â': '*', 'É': 'e', 'Ë': '$', 'Ü': '\\', 'Ú': ')', 'Û': 'f',
                  'Ñ': ']', 'Í': '/', 'Ó': '+', 'Ç': '&', '÷': '4', '°': '0',
-                 '(': '<', ')': '>', '¬': ' ', '%': 'a', ';': '2', '¨': ';', '*': '8'}
+                 '(': '<', ')': '>', '¬': ' ', '%': 'a', ';': '2', '¨': ';', '*': '8', 'Ö': '[',
+                }
 def spanish_to_unicode(ascii: str):
     result = "";
     ascii = ascii.upper()
@@ -99,6 +101,12 @@ def spanish_to_unicode(ascii: str):
 
 def s2u(ascii:str):
     return spanish_to_unicode(ascii)
+
+def s2u_loop():
+    user_input = "foo"
+    while user_input != "":
+        user_input = input('s2u: ')
+        print( spanish_to_unicode(user_input) )
 
 def dots_to_unicode(dots: int):
     answer = 0

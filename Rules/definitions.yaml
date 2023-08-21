@@ -233,5 +233,20 @@
     "\"", "'", "“", "”", "‘", "’", "«", "»",
     ",", ".", ":", "-",
   ],
+
+  # These get a '.' after them (an abbreviation). From 7.2, 7.5.2, 7.5.3
+  # arcXXX should also get a "." after the "arc"
+  CMUFunctionNames: [
+    "lim",
+    "Antilog", "antilog", "Alog", "alog", "Colog", "colog", "Ln", "Aln", "aln", 
+    "cos", "cosec", "cosech", "cosh", "cot", "cotan", "cotanh", "coth", "csc", "csch",
+    "sec", "sech", "sin", "sinh", "tan", "tang", "tanh", "tg", "ln", "log", "lg",
+    "sen", "cotg", "tn",
+    "arccos", "arccosec", "arccosech", "arccosh",
+    "arccot", "arccotan", "arccotanh", "arccoth",
+    "arccsc", "arccsch", "arcsec", "arcsech", "arcsin", "arcsinh",
+    "arctan", "arctang", "arctanh",
+    "arcsen", "arctn", "arccotg", "asin", "acos", "atan",
+  ]
   
 ]

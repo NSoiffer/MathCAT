@@ -226,7 +226,7 @@
  
  - "=": [t: "⠶"]               # 0x003D (Equals)
 
-#  - "≠": [t: "⠐⠶⠈⠱"]             # 0x2260 (Not equal)
+ - "≠": [t: "⠘⠶"]             # 0x2260 (Not equal)
  - "<": [t: "⠪"]               # 0x003C (Less than)
  - "≤": [t: "⠪⠶"]              # 0x2264 (Less than or equal to)
  - ">": [t: "⠕"]               # 0x003E (Greater than)
@@ -291,7 +291,11 @@
  - "〈": [t: "⠐⠅"]               # 0x2329 (Left angle bracket)
  - "〉": [t: "⠨⠂"]               # 0x232A (Right angle bracket)
  - "|":  [t: "⠸"]      # 0x007C (Vertical line)
- - "!": [t: "⠖"]                # 0x21 (Exclamation (factorial))
+ - "!":                       # 0x21 (Exclamation (factorial))
+     - test:    # CMU seems to use a different char for factorial (7.5) -- this weak guess for factorial
+        if: "self::m:mo and preceding-sibling::*"
+        then: [t: "⠘⠄"]
+        else: [t: "⠖"]
  - "#": [t: "⠸⠹"]               # 0x23 (Number sign (hash))
  - "%": [t: "⠸⠴"]               # 0x25 (Percent sign)
  - "&": [t: "⠠⠯"]               # 0x26 (Ampersand)
@@ -332,19 +336,21 @@
 #  - "Å": [t: "⠠⠘⠫⠁"]             # 0x212B (Angstrom symbol)
 #  - "Å": [t: "⠠⠘⠫⠁"]             # 0x00C5 (WIRIS uses this for Angstrom)
 #  - "∀": [t: "⠘⠁"]               # 0x2200 (For all)
-#  - "∂": [t: "⠈⠙"]               # 0x2202 (Partial differential)
+ - "∂": [t: "⠸⠙"]               # 0x2202 (Partial differential)
 #  - "∃": [t: "⠘⠢"]               # 0x2203 (There exists)
 #  - "∄": [t: "⠘⠢⠈⠱"]             # 0x2204 (There does not exist)
 #  - "∅": [t: "⠈⠚"]               # 0x2205 (Empty set)
 #  - "∇": [t: "⠘⠙"]               # 0x2207 (Nabla (del, inverted capital delta))
 #  - "∎": [t: "⠸⠫⠼⠙t"]            # 0x220E (End of proof)
 #  - "√": [t: "⠐⠩"]               # 0x221A (Square root (radical) without vinculum)
-#  - "∞": [t: "⠼⠿"]               # 0x221E (Infinity)
+ - "∞": [t: "⠼⠳"]               # 0x221E (Infinity)
 #  - "∠": [t: "⠸⠪"]               # 0x2220 (Angle)
 #  - "∡": [t: "⠨⠸⠪"]              # 0x2221 (Measured angle)
 #  - "⊾": [t: "⠼⠸⠪"]              # 0x22BE (Right angle with arc)
-#  - "∫": [t: "1⠮"]               # 0x222B (Integral)
-#  - "∮": [t: "⠈⠮"]               # 0x222E (Contour integral (closed line integral))
+ - "∫": [t: "⠯⠱"]                  # 0x222B (Integral)
+ - "∬": [t: "⠯⠯⠱"]                # 0x222c (Double integral)
+ - "∭": [t: "⠯⠯⠯⠱"]              # 0x222d (Triple integral)
+ - "∮": [t: "⠯⠴⠱"]               # 0x222E (Contour integral (closed line integral))
 #  - "∴": [t: "1⠠⠡"]               # 0x2234 (Therefore)
 #  - "∵": [t: "⠈⠌"]               # 0x2235 (Because (since))
 #  - "∶": [t: "⠒"]               # 0x2236 (Ratio)
@@ -368,9 +374,9 @@
 #  - "✓": [t: "⠈⠩"]               # 0x2713 (Check mark (tick))
 #  - "⦵": [t: "⠨⠚"]               # 0x29B5 (Plimsoll sign (standard state))
 #  - "←": [t: "1⠳⠪"]              # 0x2190 (Leftwards arrow)
-#  - "↑": [t: "1⠳⠬"]              # 0x2191 (Upwards arrow)
-#  - "→": [t: "1⠳⠕"]              # 0x2192 (Rightwards arrow)
-#  - "↓": [t: "1⠳⠩"]              # 0x2193 (Downwards arrow)
+ - "↑": [t: "⠸⠁"]              # 0x2191 (Upwards arrow)
+ - "→": [t: "⠒⠂"]              # 0x2192 (Rightwards arrow)
+ - "↓": [t: "⠸⠄"]              # 0x2193 (Downwards arrow)
 #  - "↔": [t: "1⠳⠺⠗⠕"]            # 0x2194 (Left right arrow)
 #  - "↕": [t: "1⠳⠺⠗⠬"]            # 0x2195 (Up down arrow)
 #  - "↖": [t: "1⠳⠱"]              # 0x2196 (Northwest arrow)
@@ -490,13 +496,7 @@
  - ":": [t: "⠒"]              # 0x003A (Colon)
  - "∶": [t: "⠲"]              # 0x2236 (Ratio)
  - "-": [t: "⠤"]              # 0x2d (Minus sign or hyphen)
- - "⁡":                          # 0x2061⁡ (invisible function apply)
-    - test:
-        if:
-        - "preceding-sibling::*[1][self::m:mi and substring(., string-length(.), 1)!=' '] and " # avoid scripted function names and one that end with spaces
-        - "following-sibling::*[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']" # GTM 9.3.2
-        then: [t: "W"]
-        else: [t: ""]
+ - "⁡": [t: ""]                # 0x2061⁡ (invisible function apply)
 
  - "⁢":                         # 0x2062 (invisible times)
     - test:

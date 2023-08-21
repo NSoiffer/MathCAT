@@ -288,18 +288,30 @@ fn pre_sub_2_3_3_3() {
 }
 
 #[test]
-fn both_scripts_2_3_4_1() {
+fn both_scripts_2_4_1_1() {
     let expr = "<math><msubsup><mi>z</mi><mn>4</mn><mn>3</mn></msubsup></math>";
     test_braille("CMU", expr, "⠵⠌⠼⠙⠡⠼⠉");
 }
 
 #[test]
-fn both_scripts_2_3_4_2() {
+fn multi_both_scripts_2_4_1_1() {
+    let expr = "<math><mmultiscripts><mi>z</mi><mi>4</mi><mi>3</mi></mmultiscripts></math>";
+    test_braille("CMU", expr, "⠵⠌⠼⠙⠡⠼⠉");
+}
+
+#[test]
+fn both_scripts_2_4_1_2() {
     let expr = "<math><msubsup><mi>z</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow><mn>2</mn></msubsup></math>";
     test_braille("CMU", expr, "⠵⠌⠢⠊⠂⠚⠔⠡⠼⠃");
 }
 
-// FIX: add tests for 2.3.4 (Special cases for scripts)
+#[test]
+fn multi_both_scripts_2_4_1_2() {
+    let expr = "<math><mmultiscripts><mi>z</mi><mrow><mi>i</mi><mo>,</mo><mi>j</mi></mrow><mi>2</mi></mmultiscripts></math>";
+    test_braille("CMU", expr, "⠵⠌⠢⠊⠂⠚⠔⠡⠼⠃");
+}
+
+// FIX: add tests for 2.4.2 (Special cases for scripts)
 
 #[test]
 fn scripts_2_5_1() {
@@ -308,8 +320,21 @@ fn scripts_2_5_1() {
 }
 
 #[test]
+fn mmultiscripts_2_5_1() {
+    let expr = "<math><mmultiscripts><mi>T</mi><mi>r</mi><none/><none/><mi>s</mi></mmultiscripts></math>";
+    test_braille("CMU", expr, "⠨⠞⠌⠗⠘⠡⠎");
+}
+
+#[test]
 fn scripts_2_5_2() {
     let expr = "<math><msub><msup><mi>T</mi><mi>r</mi></msup><mi>s</mi></msub></math>";
+    test_braille("CMU", expr, "⠨⠞⠡⠗⠰⠌⠎");
+}
+
+#[test]
+fn mmultiscripts_2_5_2() {
+    init_logger();
+    let expr = "<math><mmultiscripts><mi>T</mi><none/><mi>r</mi><mi>s</mi><none/></mmultiscripts></math>";
     test_braille("CMU", expr, "⠨⠞⠡⠗⠰⠌⠎");
 }
 
@@ -541,4 +566,299 @@ fn root_5_3_8() {
             <mfrac><mn>1</mn><mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow></mfrac>
         </mroot></math>";
     test_braille("CMU", expr, "⠫⠼⠁⠲⠢⠝⠖⠼⠁⠔⠱⠢⠍⠤⠼⠁⠔");
+}
+
+#[test]
+fn limit_7_2_1() {
+    let expr = "<math><mrow><mover accent='true'><mrow><mi>lim</mi></mrow><mo>&#x00AF;</mo></mover></mrow></math>";
+    test_braille("CMU", expr, "⠈⠉⠇⠊⠍⠄");
+}
+
+#[test]
+fn limit_7_2_2() {
+    let expr = "<math><mrow><munder accent='true'><mrow><mi>lim</mi></mrow><mo>&#x00AF;</mo></munder></mrow></math>";
+    test_braille("CMU", expr, "⠠⠤⠇⠊⠍⠄");
+}
+
+#[test]
+fn limit_7_2_4() {
+    let expr = "<math><mrow><munder><mrow><mi>lim</mi></mrow><mrow><mi>x</mi><mo>→</mo><mi>c</mi></mrow></munder></mrow></math>";
+    test_braille("CMU", expr, "⠇⠊⠍⠄⠭⠒⠂⠉⠱");
+}
+
+#[test]
+fn limit_7_2_5() {
+    let expr = "<math><mrow><munder><mrow><mi>lim</mi></mrow><mrow><mi>x</mi><mo>↑</mo><mi>0</mi></mrow></munder></mrow></math>";
+    test_braille("CMU", expr, "⠇⠊⠍⠄⠭⠸⠁⠼⠚⠱");
+}
+
+#[test]
+fn limit_7_2_6() {
+    let expr = "<math><mrow><munder><mrow><mi>lim</mi></mrow><mrow><mi>x</mi><mo>↓</mo><mi>0</mi></mrow></munder></mrow></math>";
+    test_braille("CMU", expr, "⠇⠊⠍⠄⠭⠸⠄⠼⠚⠱");
+}
+
+#[test]
+fn deriv_7_3_1() {
+    let expr = "<math><mfrac><mi>d</mi><mrow><mi>d</mi><mi>x</mi></mrow></mfrac></math>";
+    test_braille("CMU", expr, "⠙⠲⠢⠙⠭⠔");
+}
+
+#[test]
+fn deriv_7_3_2() {
+    let expr = "<math><mfrac><mrow><mi>d</mi><mi>f</mi></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac></math>";
+    test_braille("CMU", expr, "⠢⠙⠋⠔⠲⠢⠙⠭⠔");
+}
+
+#[test]
+fn deriv_7_3_3() {
+    let expr = "<math><mfrac>
+            <msup><mi>d</mi><mi>n</mi></msup>
+            <mrow><mi>d</mi><msup><mi>x</mi><mi>n</mi></msup></mrow>
+        </mfrac></math>";
+    test_braille("CMU", expr, "⠙⠡⠝⠲⠢⠙⠭⠡⠝⠔");
+}
+
+#[test]
+fn deriv_7_3_4() {
+    let expr = "<math><mfrac>
+            <mrow><msup><mi>d</mi><mi>n</mi></msup><mi>f</mi></mrow>
+            <mrow><mi>d</mi><msup><mi>x</mi><mi>n</mi></msup></mrow>
+        </mfrac></math>";
+    test_braille("CMU", expr, "⠢⠙⠡⠝⠋⠔⠲⠢⠙⠭⠡⠝⠔");
+}
+
+#[test]
+fn partial_7_3_9() {
+    // Note: fixed apparent bug with division symbol in manual
+    let expr = "<math><mfrac>
+            <msup><mo>&#x2202;</mo><mn>2</mn></msup>
+            <mrow><mo>&#x2202;</mo><mi>x</mi><mo>&#x2202;</mo><mi>y</mi></mrow>
+        </mfrac></math>";
+    test_braille("CMU", expr, "⠸⠙⠡⠼⠃⠲⠢⠸⠙⠭⠸⠙⠽⠔");
+}
+
+#[test]
+fn partial_7_3_10() {
+    // Note: fixed apparent bug with division symbol in manual
+    let expr = "<math><mfrac>
+            <mrow><msup><mo>&#x2202;</mo><mn>2</mn></msup><mi>f</mi></mrow>
+            <mrow><mo>&#x2202;</mo><mi>x</mi><mo>&#x2202;</mo><mi>y</mi></mrow>
+        </mfrac></math>";
+    test_braille("CMU", expr, "⠢⠸⠙⠡⠼⠃⠐⠋⠔⠲⠢⠸⠙⠭⠸⠙⠽⠔");
+}
+
+#[test]
+fn partial_7_3_11() {
+    let expr = "<math><mfrac>
+            <msup><mo>&#x2202;</mo><mrow><mi>m</mi><mo>+</mo><mi>n</mi></mrow></msup>
+            <mrow><mo>&#x2202;</mo><msup><mi>x</mi><mi>m</mi></msup><mo>&#x2202;</mo><msup><mi>y</mi><mi>n</mi></msup></mrow>
+        </mfrac></math>";
+    test_braille("CMU", expr, "⠸⠙⠡⠢⠍⠖⠝⠔⠲⠢⠸⠙⠭⠡⠍⠸⠙⠽⠡⠝⠔");
+}
+
+#[test]
+fn partial_7_3_12() {
+    let expr = "<math><mfrac>
+            <mrow><msup><mo>&#x2202;</mo><mrow><mi>m</mi><mo>+</mo><mi>n</mi></mrow></msup><mi>f</mi></mrow>
+            <mrow><mo>&#x2202;</mo><msup><mi>x</mi><mi>m</mi></msup><mo>&#x2202;</mo><msup><mi>y</mi><mi>n</mi></msup></mrow>
+        </mfrac></math>";
+    test_braille("CMU", expr, "⠢⠸⠙⠡⠢⠍⠖⠝⠔⠋⠔⠲⠢⠸⠙⠭⠡⠍⠸⠙⠽⠡⠝⠔");
+}
+
+#[test]
+fn integral_7_4_0() {
+    let expr = "<math><msubsup><mo>∫</mo><mi>a</mi><mi>b</mi></msubsup></math>";
+    test_braille("CMU", expr, "⠯⠁⠒⠃⠱");
+}
+
+#[test]
+fn integral_7_4_1() {
+    let expr = "<math><mo>∫</mo><msup><mi>x</mi><mn>2</mn></msup><mi>d</mi><mi>x</mi></math>";
+    test_braille("CMU", expr, "⠯⠱⠭⠡⠼⠃⠐⠙⠭");
+}
+
+#[test]
+fn succession_7_5_1_2() {
+    let expr = "<math><mo>(</mo><msub><mi>s</mi><mi>n</mi></msub><mo>)</mo></math>";
+    test_braille("CMU", expr, "⠣⠎⠌⠝⠜");
+}
+
+#[test]
+fn lim_7_5_1_3() {
+    let expr = "<math><munder><mi>lim</mi><mrow><mi>n</mi><mo>&#x2192;</mo><mo>&#x221E;</mo></mrow></munder>
+                        <msub><mi>s</mi><mi>n</mi></msub></math>";
+    test_braille("CMU", expr, "⠇⠊⠍⠄⠝⠒⠂⠼⠳⠱⠎⠌⠝");
+}
+
+#[test]
+fn sum_7_5_1_4() {
+    let expr = "<math><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover></math>";
+    test_braille("CMU", expr, "⠘⠎⠊⠶⠼⠁⠒⠝⠱");
+}
+
+#[test]
+fn sum_7_5_1_5() {
+    let expr = "<math><munderover><mo>&#x2211;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover>
+                        <msub><mi>s</mi><mi>i</mi></msub></math>";
+    test_braille("CMU", expr, "⠘⠎⠊⠶⠼⠁⠒⠝⠱⠎⠌⠊");
+}
+
+#[test]
+fn product_7_5_1_6() {
+    let expr = "<math><munderover><mo>&#x220F;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover></math>";
+    test_braille("CMU", expr, "⠘⠏⠊⠶⠼⠁⠒⠝⠱");
+}
+
+#[test]
+fn product_7_5_1_7() {
+    let expr = "<math><munderover><mo>&#x220F;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>n</mi></munderover>
+        <msub><mi>s</mi><mi>i</mi></msub></math>";
+    test_braille("CMU", expr, "⠘⠏⠊⠶⠼⠁⠒⠝⠱⠎⠌⠊");
+}
+
+#[test]
+fn factorial_7_5_1_8() {
+    let expr = "<math><mi>n</mi><mo>!</mo></math>";
+    test_braille("CMU", expr, "⠝⠘⠄");
+}
+
+#[test]
+fn binomial_7_5_1_9() {
+    let expr = "<math><mrow>
+        <mo>(</mo>
+        <mfrac linethickness='0'><mi>n</mi><mi>r</mi></mfrac>
+        <mo>)</mo>
+    </mrow></math>";
+    test_braille("CMU", expr, "⠨⠣⠝⠒⠗⠜");
+}
+
+#[test]
+fn log_7_5_2_1() {
+    let expr = "<math><mi>log</mi><mi>x</mi></math>";
+    test_braille("CMU", expr, "⠇⠕⠛⠄⠭");
+}
+
+#[test]
+fn log_7_5_2_2() {
+    let expr = "<math><mi>antilog</mi><mi>x</mi></math>";
+    test_braille("CMU", expr, "⠁⠝⠞⠊⠇⠕⠛⠄⠭");
+}
+
+#[test]
+fn log_7_5_2_3() {
+    let expr = "<math><mi>alog</mi><mi>x</mi></math>";
+    test_braille("CMU", expr, "⠁⠇⠕⠛⠄⠭");
+}
+
+#[test]
+fn log_7_5_2_5() {
+    let expr = "<math><mi>ln</mi><mi>x</mi></math>";
+    test_braille("CMU", expr, "⠇⠝⠄⠭");
+}
+
+#[test]
+fn log_7_5_2_8() {
+    let expr = "<math><msub><mi>log</mi><mi>b</mi></msub><mi>x</mi></math>";
+    test_braille("CMU", expr, "⠇⠕⠛⠄⠃⠱⠭");
+}
+
+#[test]
+fn log_7_5_2_10() {
+    let expr = "<math><mi>log</mi><mfrac><mi>x</mi><mi>y</mi></mfrac></math>";
+    test_braille("CMU", expr, "⠇⠕⠛⠄⠢⠭⠲⠽⠔");
+}
+
+#[test]
+fn log_7_5_2_11() {
+    let expr = "<math><mi>log</mi><mfrac><mn>1</mn><mn>100</mn></mfrac><mo>=</mo><mo>-</mo><mn>2</mn></math>";
+    test_braille("CMU", expr, "⠇⠕⠛⠄⠼⠂⠁⠚⠚⠶⠤⠼⠃");
+}
+
+#[test]
+fn log_7_5_2_12() {
+    let expr = "<math><msub><mi>log</mi><mn>4</mn></msub><mn>64</mn></math>";
+    test_braille("CMU", expr, "⠇⠕⠛⠄⠼⠙⠱⠼⠋⠙");
+}
+
+#[test]
+fn trig_7_5_3_1() {
+    let expr = "<math><mi>sen</mi><mo>(</mo><mi>a</mi><mo>+</mo><mi>b</mi><mo>)</mo></math>";
+    test_braille("CMU", expr, "⠎⠑⠝⠄⠣⠁⠖⠃⠜");
+}
+
+#[test]
+fn trig_7_5_3_3() {
+    let expr = "<math><mi>tan</mi><mo>(</mo><mi>α</mi><mo>)</mo><mo>=</mo><mfrac>
+                <mrow><mi>sin</mi><mo>(</mo><mi>α</mi><mo>)</mo></mrow>
+                <mrow><mi>cos</mi><mo>(</mo><mi>α</mi><mo>)</mo></mrow>
+                </mfrac></math>";
+    test_braille("CMU", expr, "⠞⠁⠝⠄⠣⠈⠁⠜⠶⠎⠊⠝⠄⠣⠈⠁⠜⠲⠉⠕⠎⠄⠣⠈⠁⠜");
+}
+
+#[test]
+fn example_7_7_1() {
+    let expr = "<math>
+        <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo>
+        <mfrac>
+            <mrow><mi>sen</mi><mi>x</mi></mrow>
+            <mrow><msup><mi>sen</mi><mn>2</mn></msup><mi>x</mi><mo>+</mo><mn>1</mn></mrow>
+        </mfrac>
+    </math>";
+    test_braille("CMU", expr, "⠋⠣⠭⠜⠶⠎⠑⠝⠄⠭⠲⠢⠎⠑⠝⠄⠡⠼⠃⠭⠖⠼⠁⠔");
+}
+
+#[test]
+fn log_7_7_2() {
+    let expr = "<math><mi>log</mi><mfrac>
+            <mrow><mi>r</mi><mo>+</mo><mn>1</mn></mrow>
+            <mrow><mi>r</mi><mo>-</mo><mn>1</mn></mrow>
+        </mfrac></math>";
+    test_braille("CMU", expr, "⠇⠕⠛⠄⠢⠢⠗⠖⠼⠁⠔⠲⠢⠗⠤⠼⠁⠔⠔");
+}
+
+#[test]
+fn log_7_7_3() {
+    let expr = "<math><mi>log</mi><mfenced><mfrac>
+            <mrow><mi>r</mi><mo>+</mo><mn>1</mn></mrow>
+            <mrow><mi>r</mi><mo>-</mo><mn>1</mn></mrow>
+        </mfrac></mfenced></math>";
+    test_braille("CMU", expr, "⠇⠕⠛⠄⠣⠢⠗⠖⠼⠁⠔⠲⠢⠗⠤⠼⠁⠔⠜");
+}
+
+#[test]
+fn integral_7_7_4() {
+    let expr = "<math>
+        <msubsup><mo>&#x222B;</mo><mn>1</mn><mn>4</mn></msubsup>
+        <msup><mi>x</mi><mn>2</mn></msup>
+        <mi>d</mi>
+        <mi>x</mi>
+        <mo>=</mo>
+        <msubsup>
+            <mfenced open='[' close=']'>
+                <mrow><mfrac><mn>1</mn><mn>3</mn></mfrac><msup><mi>x</mi><mn>3</mn></msup></mrow>
+            </mfenced>
+            <mn>1</mn>
+            <mn>4</mn>
+        </msubsup>
+        <mo>=</mo>
+        <mn>21</mn>
+    </math>";
+    test_braille("CMU", expr, "⠯⠼⠁⠒⠼⠙⠱⠭⠡⠼⠃⠐⠙⠭⠶⠷⠼⠂⠉⠭⠡⠼⠉⠾⠼⠁⠒⠼⠙⠱⠶⠼⠃⠁");
+}
+
+#[test]
+fn sum_7_7_5() {
+    let expr = "<math>
+        <mrow>
+        <munder>
+        <mo>&#x2211;</mo>
+        <mtable columnalign='left'>
+            <mtr><mtd><mrow><mn>1</mn><mo>&#x2264;</mo><mi>i</mi><mo>&#x2264;</mo><mn>4</mn></mrow></mtd></mtr>
+            <mtr><mtd><mrow><mi>i</mi><mo>&#x2260;</mo><mn>3</mn></mrow></mtd></mtr>
+        </mtable>
+        </munder>
+        <mn>1</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>4</mn><mo>=</mo><mn>7</mn></mrow>
+   </math>";
+    test_braille("CMU", expr, "⠘⠎⠼⠁⠪⠶⠊⠣⠶⠼⠙⠒⠊⠘⠶⠼⠉⠱⠊⠶⠼⠁⠖⠼⠃⠖⠼⠙⠶⠼⠛");
 }

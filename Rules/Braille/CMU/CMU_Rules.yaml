@@ -1,3 +1,5 @@
+# References such as 7.2(5) refer to the fifth example in section 7.2 in guide from ONCE
+# https://www.once.es/servicios-sociales/braille/comision-braille-espanola/documentos-tecnicos/documentos-tecnicos-relacionados-con-el-braille/documentos/b5-signografia-matematica.pdf
 ---
 -
   name: default
@@ -70,9 +72,16 @@
   name: default
   tag: mfrac
   match: "."
+  variables: [AddGrouping: "preceding-sibling::*[2][self::m:mi][IsInDefinition(., 'CMUFunctionNames')]"] # '2' skip function
   replace: 
+  # Inferring from the examples 7.5.2(11) and 7.7(2) fractions are bracketed after log/trig functions
+  # FIX: try to find exact rule
   - test:
-      if: "*[1][self::m:mrow and not(IsBracketed(., '', ''))]"  
+      if: "$AddGrouping"
+      then: [t: "⠢"]
+  - test:
+      if: "*[1][self::m:mrow and not(IsBracketed(., '', '')) and
+            not(count(*)=3 and *[1][self::m:mi][IsInDefinition(., 'CMUFunctionNames')])]"  
       then:
       - t: "⠢"
       - x: "*[1]"
@@ -81,13 +90,17 @@
       - x: "*[1]"
   - t: "⠲"
   - test:
-      if: "*[2][self::m:mrow and not(IsBracketed(., '', ''))]"
+      if: "*[2][self::m:mrow and not(IsBracketed(., '', '')) and
+            not(count(*)=3 and *[1][self::m:mi][IsInDefinition(., 'CMUFunctionNames')])]"
       then:
       - t: "⠢"
       - x: "*[2]"
       - t: "⠔"
       else:
       - x: "*[2]"
+  - test:
+      if: "$AddGrouping"
+      then: [t: "⠔"]
 
 #
 # Matrix/Determinant rules
@@ -192,6 +205,28 @@
   replace:
   - x: "*"
   - t: "W"
+
+-
+  # 7.5.1 defines special rule for binomial
+  name: binomial-frac
+  tag: mrow
+  match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][@linethickness=0]"
+  replace: 
+  - t: "⠨⠣"
+  - x: "*[2]/*[1]"
+  - t: "⠒"
+  - x: "*[2]/*[2]"
+  - t: "⠜"
+
+- name: binomial-table
+  tag: mrow
+  match: "IsBracketed(., '(', ')') and *[2][self::m:mtable][count(*)=2 and count(*[1])=1] and contains(@intent, 'binomial(')"
+  replace:
+  - t: "⠨⠣"
+  - x: "*[2]/*[1]/*[1]/*[1]"
+  - t: "⠒"
+  - x: "*[2]/*[2]/*[1]/*[1]"
+  - t: "⠜"
   
 -
   name: default
@@ -203,7 +238,7 @@
   # Non-breaking whitespace is added to the start/end of numbers in cases of adjoining text to help the parse.
   # These generate a different char inside of a number, so we peel them off here because it doesn't seem possible
   # to ask "what character position am I inside of an mn?" in unicode.yaml
-  # Here we deal with the messy abnormal case separately
+  # Here we deal with the messy abnormal case separately -- CMU seems to want to leave out spaces
   name: peel-off-spaces
   tag: [mn, mi]
   match: "starts-with(., '\u00A0') or substring(., string-length(.), 1)='\u00A0'"
@@ -211,7 +246,6 @@
   - test:
       if: "starts-with(., '\u00A0')"
       then:
-      - t: "W"
       - test:
           if: "substring(., string-length(.), 1)='\u00A0'"
           then:
@@ -236,10 +270,20 @@
 
 -
   name: default
-  tag: [mi, mn, mo, mtext]
+  tag: [mn, mo, mtext]
   match: "."
   replace:
     - x: "BrailleChars(., 'CMU')"
+      
+-
+  name: default
+  tag: mi
+  match: "."
+  replace:
+    - x: "BrailleChars(., 'CMU')"   # also deals with "dot after 'arc'"
+    - test:
+        if: "IsInDefinition(., 'CMUFunctionNames')"
+        then: [t: "."]
       
 
 -
@@ -311,7 +355,8 @@
     #   then: [t: "⠐⠱ "]
       else: [x: "*[2]"]  # maybe not right, but do something
   - test:
-      if: "*[1][IsNode(., 'leaf') and string-length(.) = 1]"
+      # FIX: CMUFunctionNames is a guess based on 7.2(1) and 7.1(2) which involves "lim" without explanation
+      if: "*[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
       then:
       - x: "*[1]"
       else:
@@ -334,7 +379,7 @@
   - x: "*"
   - test:
       # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
-      if: "not(DEBUG(*[2][.='°']) and *[1][self::m:mn or @data-chem-element])" 
+      if: "not(*[2][.='°'] and *[1][self::m:mn or @data-chem-element])" 
       then: [t: "⠄"]
 
 -
@@ -347,18 +392,140 @@
   replace:
   - x: "*[1]"
   - test:
-      - if: "DEBUG(self::m:msub)"
+      - if: "self::m:msub"
         then: [t: "⠌"]
         else: [t: "⠡"]
   - x: "*[2]"
   - test:
       # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
-      if: "not(DEBUG(*[2][.='°']) and *[1][self::m:mn or @data-chem-element])" 
+      if: "not(*[2][.='°'] and *[1][self::m:mn or @data-chem-element])" 
       then: [t: "⠄"]
 
+-  # 7.5.2
+  name: log
+  tag: msub
+  match: "*[1][self::m:mi][.='log']"
+  replace: 
+  - x: "*[1]"
+  - x: "*[2]"
+  - t: "⠱"
+
+-  # 7.2 (guessing this applies to limits written with munder and msub)
+  name: limit
+  tag: [msub, munder]
+  match: "*[1][self::m:mi][.='lim']"
+  replace: 
+  - x: "*[1]"
+  - x: "*[2]"
+  - t: "⠱"
+
+-  # 7.5.4
+  name: integral-sum-product
+  tag: [msubsup, munderover]
+  match: "*[1][self::m:mo][translate(., '∫∬∭∑∏', '')='']"
+  replace:
+  - test:
+    - if: "*[1][.='∫']"
+      then: [t: "⠯"]
+    - else_if: "*[1][.='∬']"
+      then: [t: "⠯⠯"]
+    - else_if: "*[1][.='∬']"
+      then: [t: "⠯⠯"]
+    - else_if: "*[1][.='∭']"
+      then: [t: "⠯⠯⠯"]
+      else: [x: "*[1]"]    # ∑, ∏
+  - x: "*[2]"
+  - t: "⠒"
+  - x: "*[3]"
+  - t: "⠱"
+
+-  # 7.5.4
+  name: contour-integral
+  tag: msub
+  match: "*[1][self::m:mi][.='∮']"
+  replace:
+  - t: "⠯⠴" 
+  - x: "*[2]"
+  - t: "⠱"
+
+-
+  name: nested-scripts    # this case likely should have been written as mmultiscripts, but people will use this (2.5)
+  tag: msub
+  match: "*[1][self::m:msup]"
+  replace:
+  - x: "*[1]/*[1]"
+  - t: "⠡"
+  - x: "*[1]/*[2]"
+  - t: "⠰⠌"
+  - x: "*[2]"
+
+-
+  name: nested-scripts    # this case likely should have been written as mmultiscripts, but people will use this (2.5)
+  tag: msup
+  match: "*[1][self::m:msub]"
+  replace:
+  - x: "*[1]/*[1]"
+  - t: "⠌"
+  - x: "*[1]/*[2]"
+  - t: "⠘⠡"
+  - x: "*[2]"
+
+-
+  name: simple-base
+  # FIX: in 7.7, footnote 37 seems to imply that the rule in 2.2 only applies to characters -- we generalize to tokens here
+  tag: [msubsup]
+  match: "IsNode(*[1], 'leaf')"
+  replace: 
+  - x: "*[1]"
+  - t: "⠌"
+  - test:
+      # the rules for scripts seem to always want a nested script to be bracketed
+      # there aren't any root examples in scripts and it seems like fractions don't get bracketed
+      # also, a leading - seems not to require grouping 
+      # FIX: does this apply to leading +, ±, etc? 
+      if: "*[2][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or 
+                self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or
+                self::m:under or self::m:mover or self::m:munderover]"
+      then:
+      - t: "⠢"
+      - x: "*[2]"
+      - t: "⠔"
+      else:
+      - x: "*[2]"
+  - t: "⠡"
+  - test:
+        # the rules for scripts seem to always want a nested script to be bracketed
+        # there aren't any root examples and it seems like fractions don't get bracketed
+        if: "*[3][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or 
+                  self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or
+                  self::m:under or self::m:mover or self::m:munderover]"
+        then:
+        - t: "⠢"
+        - x: "*[3]"
+        - t: "⠔"
+        else:
+        - x: "*[3]"
+
+-  # FIX: I think is is what footnote #37 in 7.7 means
+  name: default
+  tag: msubsup
+  match: "."
+  replace:
+  - test:
+      if: "*[1][self::m:mrow and not(IsBracketed(., '', ''))]"
+      then:
+      - t: "⠢"
+      - x: "*[1]"
+      - t: "⠔"
+      else:
+      - x: "*[1]"
+  - x: "*[2]"
+  - t: "⠒"
+  - x: "*[3]"
+  - t: "⠱"
 -
   name: default
-  tag: [msub, msup, msubsup, munder, mover, munderover]
+  tag: [msub, msup, munder, mover, munderover]
   match: "."
   replace: 
   - test:
@@ -412,6 +579,7 @@
           - x: "*[3]"
 
 -
+  # FIX: this works staggered indices, but there aren't examples where staggered and simultaneous indices are next to each other
   name: default
   tag: mmultiscripts
   match: "."
@@ -543,49 +711,31 @@
           - test:
               if: "not($Postscripts[3][self::m:none])"
               then:
-              - with:
-                  variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
-                  replace:
-                  - t: "1⠢"
-                  - test:
-                    # omit grouping indicators in the following cases
-                      if:   # FIX: need to add arbitrary shapes here (also for mroot)
-                      - "$Postscripts[3][self::m:mn or"
-                          # next test is to make sure there is just one symbol
-                          # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
-                      - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
-                      - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
-                      - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-                      - "     IsInDefinition(., 'Arrows')"
-                      - "    ]"
-                      then: [x: "$Postscripts[3]"]
-                      else:
-                      - t: "1⠣"
-                      - x: "$Postscripts[3]"
-                      - t: "1⠜"
+              - t: "⠰⠌"
+              - test:
+                  if: "$Postscripts[3][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or
+                            self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or
+                            self::m:under or self::m:mover or self::m:munderover]"
+                  then:
+                  - t: "⠢"
+                  - x: "$Postscripts[3]"
+                  - t: "⠔"
+                  else:
+                  - x: "$Postscripts[3]"
           - test:
               if: "not($Postscripts[4][self::m:none])"
               then:
-              - with:
-                  variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
-                  replace:
-                  - t: "1⠔"
-                  - test:
-                      # omit grouping indicators in the following cases
-                      if:   # FIX: need to add arbitrary shapes here (also for mroot)
-                      - "$Postscripts[4][self::m:mn or"
-                          # next test is to make sure there is just one symbol
-                          # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
-                      - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
-                      - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
-                      - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-                      - "     IsInDefinition(., 'Arrows')"
-                      - "    ]"
-                      then: [x: "$Postscripts[4]"]
-                      else:
-                      - t: "1⠣"
-                      - x: "$Postscripts[4]"
-                      - t: "1⠜"
+              - t: "⠘⠡"
+              - test:
+                  if: "$Postscripts[4][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or
+                            self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or
+                            self::m:under or self::m:mover or self::m:munderover]"
+                  then:
+                  - t: "⠢"
+                  - x: "$Postscripts[4]"
+                  - t: "⠔"
+                  else:
+                  - x: "$Postscripts[4]"
           - test:
               if: "count($Postscripts)>4"
               then:

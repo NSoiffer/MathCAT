@@ -1739,6 +1739,7 @@ impl BrailleChars {
         return Ok(result.to_string());
 
         fn add_separator(text: String) -> String {
+            use crate::definitions::DEFINITIONS;
             if NUMBER_WITH_SPACES.is_match(&text) {
                 return text.replace(" ", ".");
             } else if NUMBER_WITH_BLOCKS.is_match(&text) {
@@ -1771,9 +1772,18 @@ impl BrailleChars {
                 }
                 result.push_str(fractional_part);  
                 return result;    
-            } else {
-                return text;
-            }   
+            } else if text.starts_with("arc") {
+                // "." after arc (7.5.3)
+                let is_function_name = DEFINITIONS.with(|definitions| {
+                    let definitions = definitions.borrow();
+                    let set = definitions.get_hashset("CMUFunctionNames").unwrap();
+                    return set.contains(&text);
+                });
+                if is_function_name {
+                    return "arc.".to_string() + &text[3..];      // ok to index as bytes because we know it starts "arc"
+                }
+            } 
+            return text;  
         }
     }
 
