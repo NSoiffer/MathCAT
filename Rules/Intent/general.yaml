@@ -268,7 +268,7 @@
 -
   name: bigop
   tag: [msub, munder]
-  match: "IsLargeOp(*[1]) or contains(@data-intent-property, ':largeop:')"
+  match: "IsInDefinition(*[1], 'LargeOperators') or contains(@data-intent-property, ':largeop:')"
   replace: 
   - intent:
       name: "large-op"    # Fix: the name in the spreadsheet needs updating/fixing
@@ -506,7 +506,7 @@
 -
   name: bigop
   tag: [msubsup, munderover]
-  match: "IsLargeOp(*[1]) or contains(@data-intent-property, ':largeop:')"
+  match: "IsInDefinition(*[1], 'LargeOperators') or contains(@data-intent-property, ':largeop:')"
   replace: 
   - intent:
       name: "large-op"    # Fix: the name in the spreadsheet needs updating/fixing

@@ -645,38 +645,6 @@ impl Function for Max {
 }
 
 
-struct IsLargeOp;
-/**
- * Returns true if the node is a large op
- * @param(node)     -- node(s) to test -- should be an <mo>
- */
- impl Function for IsLargeOp {
-
-    fn evaluate<'d>(&self,
-                        _context: &context::Evaluation<'_, 'd>,
-                        args: Vec<Value<'d>>)
-                        -> Result<Value<'d>, Error>
-    {
-        let mut args = Args(args);
-        args.exactly(1)?;
-        let node = validate_one_node(args.pop_nodeset()?, "IsLargeOp")?;
-        if let Node::Element(e) = node {
-            if !is_tag(&e, "mo") {
-                return Ok( Value::Boolean(false) );
-            }
-            return DEFINITIONS.with(|definitions| {
-                let definitions = definitions.borrow();
-                let text = get_text_from_element(e);
-                return Ok( Value::Boolean(definitions.get_hashset("LargeOperators").unwrap().get(&text).is_some()) );
-            });
-        } else {
-            // xpath is something besides an element, so no match
-            return Ok( Value::Boolean(false) );
-        }
-    }
-}
-
-
 struct BaseNode;
 /**
  * Returns true if the node is a large op
@@ -1068,7 +1036,6 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("IsNode", IsNode);
     context.set_function("ToOrdinal", ToOrdinal);
     context.set_function("ToCommonFraction", ToCommonFraction);
-    context.set_function("IsLargeOp", IsLargeOp);
     context.set_function("IsBracketed", IsBracketed);
     context.set_function("IsInDefinition", IsInDefinition);
     context.set_function("BaseNode", BaseNode);

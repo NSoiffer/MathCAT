@@ -236,7 +236,7 @@
 
 - name: largeop
   tag: mrow
-  match: "count(*)=2 and IsLargeOp(*[1])"
+  match: "count(*)=2 and IsInDefinition(*[1], 'LargeOperators')"
   replace:
   - test:
       if: "$Verbosity!='Terse'"
