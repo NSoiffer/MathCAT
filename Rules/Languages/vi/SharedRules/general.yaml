@@ -197,7 +197,7 @@
   replace:
   - x: "*[1]"
   - x: "*[2]"
-  - T: "dưới"
+  - T: " "
 
 - name: bigop-both
   tag: large-op
@@ -247,8 +247,8 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{T: giới hạn}]
-      else: [{T: "giới hạn"}]
+      then: [{T: lim}]
+      else: [{T: "lim"}]
   - x: "*[2]"
   - pause: short
 
@@ -373,8 +373,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: sinch}
-      else: {T: hyperbolic sin}
+      then: {T: sin híp bơ bôn}
+      else: {T: sin híp bơ bôn}
 - name: cosh
   tag: mi
   match: "text()='cosh'"
@@ -382,8 +382,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: cosh}
-      else: {T: hyperbolic cosine}
+      then: {T: cô sin híp bơ bôn}
+      else: {T: cô sin híp bơ bôn}
 - name: tanh
   tag: mi
   match: "text()='tanh'"
@@ -391,8 +391,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: tanch}
-      else: {T: hyperbolic tangent}
+      then: {T: tang híp bơ bôn}
+      else: {T: tang híp bơ bôn}
 - name: sech
   tag: mi
   match: "text()='sech'"
@@ -400,8 +400,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: sheck}
-      else: {T: hyperbolic secant}
+      then: {T: xê can híp bơ bôn}
+      else: {T: xê can híp bơ bôn}
 - name: csch
   tag: mi
   match: "text()='csch'"
@@ -409,8 +409,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: co-sheck}
-      else: {T: hyperbolic co-secant}
+      then: {T: cô xê can híp bơ bôn}
+      else: {T: cô xê can híp bơ bôn}
 - name: coth
   tag: mi
   match: "text()='coth'"
@@ -418,8 +418,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: co-tanch}
-      else: {T: hyperbolic co-tangent}
+      then: {T: cô tang híp bơ bôn}
+      else: {T: cô tang híp bơ bôn}
 
 - # handle both log and ln
   name: log
@@ -435,20 +435,20 @@
       if: "$log_is_simple"
       then_test:
       - if: "*[1][text()='log']"
-        then: [{T: logaric}]
+        then: [{T: lóc}]
       - else_if: "$Verbosity='Terse'"
-        then: [{SPELL: ln}]
-        else: [{T: logaric tự nhiên}]
+        then: [{T: lóc nơ be}]
+        else: [{T: lóc nơ be}]
       else:
       - test:
           if: "$Verbosity!='Terse' and not(log_is_simple)"
           then: {T: " "}
       - test:
         - if: "*[1][text()='log']"
-          then: [{T: logaric}]
+          then: [{T: lóc}]
         - else_if: "$Verbosity='Terse'"
-          then: [{SPELL: ln}]
-          else: [{T: logaric tự nhiên}]
+          then: [{T: lóc nơ be}]
+          else: [{T: lóc nơ be}]
       - T: của
       - pause: short
   - x: "*[3]"
@@ -458,7 +458,7 @@
   match: "."
   replace:
   - bookmark: "@id"
-  - T: logaric cơ số
+  - T: lóc cơ số
     #   - test: 
     #      if: "$Verbosity!='Terse'"
     #      then: {T: the}
@@ -697,7 +697,7 @@
       then: [{T: "chỉ số dưới"}]
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{T: "dưới"}]
+        then: [{T: " "}]
   #- x: "*[3]"
 
 - name: chemistry-msup
@@ -754,7 +754,7 @@
               then: [{T: "chỉ số dưới"}]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{T: "dưới"}]
+                then: [{T: " "}]
           #- x: "$Prescripts[1]"
           - pause: "short"
       - test:
@@ -781,7 +781,7 @@
                   then: [{T: "chỉ số dưới"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{T: "dưới"}]
+                    then: [{T: " "}]
               #- x: "$Prescripts[3]"
               - pause: "short"
   - x: "*[1]" # base
@@ -797,7 +797,7 @@
               then: [{T: "chỉ số dưới"}]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{T: "dưới"}]
+                then: [{T: " "}]
           #- x: "$Postscripts[1]"
           - pause: "short"
       - test:
@@ -824,7 +824,7 @@
                   then: [{T: "chỉ số dưới"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{T: "dưới"}]
+                    then: [{T: " "}]
               #- x: "$Postscripts[3]"
               - pause: "short"
           - test:
@@ -836,7 +836,7 @@
                   then: [{T: "chỉ số trên"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{T: "trên"}]
+                    then: [{T: "chỉ số trên"}]
               #- x: "$Postscripts[4]"
               - pause: "short"
           - test:
@@ -851,7 +851,7 @@
                       then: [{T: "chỉ số dưới"}]
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{T: "dưới"}]
+                        then: [{T: " "}]
                   #- x: "$Postscripts[5]"
                   - pause: "short"
               - test:
@@ -878,7 +878,7 @@
                           then: [{T: "chỉ số dưới"}]
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{T: "dưới"}]
+                            then: [{T: " "}]
                       #- x: "$Postscripts[7]"
                       - pause: "short"
                   - test:

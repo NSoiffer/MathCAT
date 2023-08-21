@@ -79,7 +79,7 @@
   - x: "*[2]"
   - test:
       if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
-      then: [{T: "dưới"}]
+      then: [{T: " "}]
 
 - name: default
   tag: particular-value-of
@@ -96,7 +96,7 @@
   match: "."
   replace:
   - x: "*[1]"
-  - T: chỉ số dưới là
+  #- T: chỉ số dưới là
   - x: "*[2]"
   - T: "mũ"
   - x: "*[3]"
@@ -108,11 +108,11 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [{T: "cho"}]
+      then: [{T: " "}]
   - x: "*[1]"
-  - T: "với"
-  - x: "*[2]"
-  - T: bên dưới
+  #- T: "với"
+  #- x: "*[2]"
+  - T: đáy
 
 - name: default
   tag: mover
@@ -120,11 +120,11 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [{T: "cho"}]
+      then: [{T: " "}]
   - x: "*[1]"
-  - T: "với"
-  - x: "*[2]"
-  - T: "bên trên"
+  #- T: "với"
+  #- x: "*[2]"
+  - T: "ngang"
 
 - name: default
   tag: munderover
@@ -132,13 +132,13 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [{T: "cho"}]
+      then: [{T: " "}]
   - x: "*[1]"
-  - T: "với"
-  - x: "*[2]"
-  - T: "bên dưới và"
+  #- T: "với"
+  #- x: "*[2]"
+  - T: "đáy và"
   - x: "*[3]"
-  - T: "bên trên"
+  - T: "ngang"
 - name: default
   #   Here we support up to 2 prescripts and up to 4 postscripts -- that should cover all reasonable cases
   #   If there are more, we just dump them out without regard to sup/super :-(

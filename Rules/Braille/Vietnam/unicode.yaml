@@ -61,7 +61,7 @@
  - "÷": [T: "⠐⠲"]               # 0x00F7 (Division sign (divided by))
  - "±": [T: "⠐⠖⠤"]               # 0x00B1 (Plus or minus)
  - "∓": [T: "⠐⠤⠖"]               # 0x2213 (Minus or plus)
- - "∗": [t: "⠐⠔"]               # 0x2217 (Asterisk operator)
+ - "∗": [t: "⠐⠦"]               # 0x2217 (Asterisk operator)
  - "∘": [t: "⠐⠴"]               # 0x2218 (Ring operator)
  - "◦": [t: "⠐⠴"]               # 0x25E6 (White bullet)
  - "∼": [t: "⠈⠔"]               # 0x223C (Tilde operator)
@@ -88,8 +88,8 @@
  - "#": [T: "⠼"]               # 0x23 (Number sign (hash))
  - "%": [T: "⠼⠚⠴"]                # 0x25 (Percent sign) No dots 46 before as in UEB
  - "&": [t: "⠈⠯"]               # 0x26 (Ampersand)
- - "*": [T: "⠐⠔"]               # 0x002A (Asterisk)
- - "/": [T: "⠌"]               # 0x002F (Solidus (slash))
+ - "*": [T: "⠐⠦"]               # 0x002A (Asterisk)
+ - "/": [T: "⠐⠌"]               # 0x002F (Solidus (slash))
  - ";": [t: "c⠆"]               # 0x003B (Semicolon)
  - "?": [T: "c⠢"]               # 0x003F (Question mark)
  - "@": [T: "⠈⠁"]               # 0x0040 (Commercial at sign)
@@ -222,8 +222,8 @@
  - "≝": [t: "⠣⠙⠑⠋⠜⠻⠐⠶"]        # 0x225D (Equal to by definition)
  - "⊕": [t: "⠫⠿⠪⠐⠖t"]          # 0x2295 (Circled plus)
  - "⊖": [t: "⠫⠿⠪⠐⠤t"]          # 0x2296 (Circled minus)
- - "⊗": [t: "⠫⠿⠪⠐⠦t"]          # 0x2297 (Circled times)
- - "⊛": [t: "⠫⠿⠪⠐⠔t"]          # 0x229B (Circled asterisk operator)
+ - "⊗": [t: "⠐⠦t"]          # 0x2297 (Circled times)
+ - "⊛": [t: "⠐⠦t"]          # 0x229B (Circled asterisk operator)
  - "⊞": [t: "⠫⠼⠙⠪⠐⠖t"]         # 0x229E (Squared plus)
  - "⊟": [t: "⠫⠼⠙⠪⠐⠤t"]         # 0x229F (Squared minus)
  - "⊠": [t: "⠫⠼⠙⠪⠐⠦t"]         # 0x22A0 (Squared times)
@@ -1545,4 +1545,6 @@
 # Not yet defined symbols
  - "⋮": [T: "⠣⠴⠜"]          # 0x22ee (vertical ellipsis used to indicate dividable)
  #- "⧸⋮": [T: "⠣⠼⠜"]          # 0x29f8\x22ee (for not dividable sign, not sure if MathCAT supporting multiple-char definition or not
+ - "∕": [T: "⠐⠌"]
+ - "⊘": [T: "⠐⠌"]
  
