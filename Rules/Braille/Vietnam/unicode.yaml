@@ -323,6 +323,18 @@
  - "8": [t: "N⠓"]               # 0x38 
  - "9": [t: "N⠊"]               # 0x39 
 
+ # we stick the drop numbers into the private use area for consistency
+ - "\ue000": [t: "N⠴"]               # 0 
+ - "\ue001": [t: "N⠂"]               # 1 
+ - "\ue002": [t: "N⠆"]               # 2 
+ - "\ue003": [t: "N⠒"]               # 3 
+ - "\ue004": [t: "N⠲"]               # 4 
+ - "\ue005": [t: "N⠢"]               # 5 
+ - "\ue006": [t: "N⠖"]               # 6 
+ - "\ue007": [t: "N⠶"]               # 7 
+ - "\ue008": [t: "N⠦"]               # 8 
+ - "\ue009": [t: "N⠔"]               # 9 
+
  - "a": [t: "L⠁"]               # 0x61 
  - "b": [t: "L⠃"]               # 0x62 
  - "c": [t: "L⠉"]               # 0x63 

@@ -1365,7 +1365,7 @@ fn vietnam_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 
 /************** Braille xpath functionality ***************/
 use crate::canonicalize::{name, as_element, as_text};
-use crate::xpath_functions::{is_leaf, IsBracketed};
+use crate::xpath_functions::{is_leaf, IsBracketed, validate_one_node};
 use sxd_document::dom::ParentOfChild;
 use sxd_xpath::{Value, context, nodeset::*};
 use sxd_xpath::function::{Function, Args};
@@ -1695,12 +1695,12 @@ impl BrailleChars {
 impl Function for BrailleChars {
     /**
      * Returns a string with the correct number of nesting chars (could be an empty string)
-     * @param(node) -- current node
+     * @param(node) -- current node or string
      * @param(char) -- char (string) that should be repeated
      * Note: as a side effect, an attribute with the value so repeated calls to this or a child will be fast
      */
      fn evaluate<'d>(&self,
-                            _context: &context::Evaluation<'_, 'd>,
+                            context: &context::Evaluation<'_, 'd>,
                             args: Vec<Value<'d>>)
                             -> StdResult<Value<'d>, XPathError>
         {
@@ -1717,16 +1717,28 @@ impl Function for BrailleChars {
                 None
             };
             let braille_code = args.pop_string()?;
-            let node = crate::xpath_functions::validate_one_node(args.pop_nodeset()?, "BrailleChars")?;
-            if let Node::Element(el) = node {
-                assert!( is_leaf(el) );
-                return Ok( Value::String( BrailleChars::get_braille_chars(el, &braille_code, range)? ) );
-            } else {
-                // not an element, so nothing to do
-                return Ok( Value::String("".to_string()) );
+            let v: Value<'_> = args.0.pop().ok_or(XPathError::ArgumentMissing)?;
+            let node = match v {
+                Value::Nodeset(nodes) => {
+                    validate_one_node(nodes, "BrailleChars")?.element().unwrap()
+                },
+                Value::String(s) => {
+                    let new_node = crate::canonicalize::create_mathml_element(&context.node.document(), "mn");
+                    new_node.set_text(&s);
+                    new_node
+                },
+                _ => {
+                    return Ok( Value::String("".to_string()) ) // not an element, so nothing to do
+                },
+            };
+    
+            if !is_leaf(node) {
+                return Err( XPathError::Other(format!("BrailleChars called on non-leaf element '{}'", mml_to_string(&node))) );
             }
+            return Ok( Value::String( BrailleChars::get_braille_chars(node, &braille_code, range)? ) );
         }
     }
+    
     
 #[cfg(test)]
 mod tests {

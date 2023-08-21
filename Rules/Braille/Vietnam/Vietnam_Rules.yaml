@@ -49,8 +49,13 @@
    replace: 
    - T: "#"    # signal end of previous numeric mode
    - x: "*[1]"
-   - t: "N⠌"
-   - x: "*[2]"
+   - test:
+      if: "$Vietnam_UseDropNumbers='true'"
+      then:
+      - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'UEB')"   # drop numbers for the denominator
+      else:
+      - T: "N⠌"
+      - x: "*[2]"
 
 -
    name: simple-number
@@ -59,8 +64,13 @@
    replace: 
    - T: "#"    # signal end of any previous numeric mode (probably not needed, but...)
    - x: "*[1]"
-   - T: "N⠌"
-   - x: "*[2]"
+   - test:
+      if: "$Vietnam_UseDropNumbers='true'"
+      then:
+      - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'UEB')"   # drop numbers for the denominator
+      else:
+      - T: "N⠌"
+      - x: "*[2]"
 
 -
    name: default

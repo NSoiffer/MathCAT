@@ -68,7 +68,8 @@
       GreekVariant: "⠨"     # default to Greek
 
     Vietnam:
-      # The guideline is being revised -- current guidance is to follow UEB
+      UseDropNumbers: false    # drop digits down a row in simple numeric fractions
+      # The guideline is being revised -- current guidance is to follow UEB for alternative scripts
       # UEB Guide to Technical Material (https://iceb.org/Guidelines_for_Technical_Material_2008-10.pdf)
       #   says to normally treat Fraktur and DoubleStruck as Script
       # Here we provide an option to specify a transcriber-defined typeform prefix indicator instead
