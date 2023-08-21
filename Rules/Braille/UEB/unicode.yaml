@@ -52,6 +52,7 @@
  - "⊳": [t: "⠈⠸⠜"]             # 0x22B3 (Contains as normal subgroup)
  - "⊴": [t: "⠸⠸⠣"]             # 0x22B4 (Normal subgroup of or equal)
  - "⊵": [t: "⠸⠸⠜"]             # 0x22B5 (Contains as normal subgroup or equal)
+ - "⊻": [t: "⠈⠖⠠⠱."]           # 0x22bb (Xor)
  - "⋬": [t: "⠨⠸⠣"]             # 0x22EC (not normal subgroup) -- this isn't the same as what is in GTM 10, but that similar has no Unicode equiv
  - "⋭": [t: "⠨⠸⠣"]             # 0x22ED (does not contain as normal subgroup) -- this isn't the same as what is in GTM 10, but that similar has no Unicode equiv
  - "⊢": [t: "⠸⠒"]               # 0x22a2 (Right tack)
