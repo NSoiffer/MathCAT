@@ -269,6 +269,19 @@
           - x: "BrailleChars(., 'CMU', 1, string-length(.)+1)"
 
 -
+  # 3.3 says that hex-like numbers don't reuse a numeric indicator after a letter -- here we try to catch that case.
+  # Match if: 1) has a digit, 2) has A-F after first char, 3) only has digits and A-F
+  name: hex-number
+  tag: [mn, mtext]
+  match:
+  - "string-length(translate(., '0123456789', '')) <string-length(.) and "
+  - "string-length(translate(substring(., 2), 'abcdefABCDEF', '')) <string-length(.) and "
+  - "translate(., '0123456789abcdefABCDEF', '')=''"
+  replace:
+    - x: "BrailleChars(concat(substring(.,1,1), translate(substring(., 2), 'abcdefABCDEF',
+              '\ue00a\ue00b\ue00c\ue00d\ue00e\ue00f\ue00a\ue00b\ue00c\ue00d\ue00e\ue00f')), 'CMU')"
+
+-
   name: default
   tag: [mn, mo, mtext]
   match: "."
@@ -483,9 +496,7 @@
       # there aren't any root examples in scripts and it seems like fractions don't get bracketed
       # also, a leading - seems not to require grouping 
       # FIX: does this apply to leading +, ±, etc? 
-      if: "*[2][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or 
-                self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or
-                self::m:under or self::m:mover or self::m:munderover]"
+      if: "*[2][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -496,9 +507,7 @@
   - test:
         # the rules for scripts seem to always want a nested script to be bracketed
         # there aren't any root examples and it seems like fractions don't get bracketed
-        if: "*[3][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or 
-                  self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or
-                  self::m:under or self::m:mover or self::m:munderover]"
+        if: "*[3][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
         then:
         - t: "⠢"
         - x: "*[3]"
@@ -506,7 +515,7 @@
         else:
         - x: "*[3]"
 
--  # FIX: I think is is what footnote #37 in 7.7 means
+-  # FIX: I think is is what footnote #37 in 7.7 means (applies to 7.4 [integrals, etc] also)
   name: default
   tag: msubsup
   match: "."
@@ -549,9 +558,7 @@
       # there aren't any root examples in scripts and it seems like fractions don't get bracketed
       # also, a leading - seems not to require grouping 
       # FIX: does this apply to leading +, ±, etc? 
-      if: "*[2][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or 
-                self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or
-                self::m:under or self::m:mover or self::m:munderover]"
+      if: "*[2][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -568,9 +575,7 @@
       - test:
           # the rules for scripts seem to always want a nested script to be bracketed
           # there aren't any root examples and it seems like fractions don't get bracketed
-          if: "*[3][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or 
-                    self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or
-                    self::m:under or self::m:mover or self::m:munderover]"
+          if: "*[3][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
           then:
           - t: "⠢"
           - x: "*[3]"
@@ -598,9 +603,7 @@
           then:
           - t: "⠠⠌"
           - test:
-              if: "$Prescripts[1][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or
-                        self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or
-                        self::m:under or self::m:mover or self::m:munderover]"
+              if: "$Prescripts[1][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
               then:
               - t: "⠢"
               - x: "$Prescripts[1]"
@@ -612,9 +615,7 @@
           then:
           - t: "⠈⠡"
           - test:
-              if: "$Prescripts[2][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or
-                        self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or
-                        self::m:under or self::m:mover or self::m:munderover]"
+              if: "$Prescripts[2][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
               then:
               - t: "⠢"
               - x: "$Prescripts[2]"
@@ -682,9 +683,7 @@
           then:
           - t: "⠌"
           - test:
-              if: "$Postscripts[1][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or
-                        self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or
-                        self::m:under or self::m:mover or self::m:munderover]"
+              if: "$Postscripts[1][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
               then:
               - t: "⠢"
               - x: "$Postscripts[1]"
@@ -696,9 +695,7 @@
           then:
           - t: "⠡"
           - test:
-              if: "$Postscripts[2][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or
-                        self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or
-                        self::m:under or self::m:mover or self::m:munderover]"
+              if: "$Postscripts[2][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
               then:
               - t: "⠢"
               - x: "$Postscripts[2]"
@@ -713,9 +710,7 @@
               then:
               - t: "⠰⠌"
               - test:
-                  if: "$Postscripts[3][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or
-                            self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or
-                            self::m:under or self::m:mover or self::m:munderover]"
+                  if: "$Postscripts[3][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
                   then:
                   - t: "⠢"
                   - x: "$Postscripts[3]"
@@ -727,9 +722,7 @@
               then:
               - t: "⠘⠡"
               - test:
-                  if: "$Postscripts[4][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or
-                            self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or
-                            self::m:under or self::m:mover or self::m:munderover]"
+                  if: "$Postscripts[4][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
                   then:
                   - t: "⠢"
                   - x: "$Postscripts[4]"

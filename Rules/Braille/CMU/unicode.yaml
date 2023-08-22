@@ -38,6 +38,15 @@
  - "\ue008": [t: "N⠦"]               # 8 
  - "\ue009": [t: "N⠔"]               # 9 
 
+# we stick hex digits into the private use area for consistency
+# these are used when we don't want to add a numeric indicator for subsequent digits (3.3)
+ - "\ue00A": [t: "N⠨N⠁"]               # A 
+ - "\ue00B": [t: "N⠨N⠃"]               # B 
+ - "\ue00C": [t: "N⠨N⠉"]               # C 
+ - "\ue00D": [t: "N⠨N⠙"]               # D 
+ - "\ue00E": [t: "N⠨N⠑"]               # E 
+ - "\ue00F": [t: "N⠨N⠋"]               # F 
+
  - "a": [t: "L⠁"]               # 0x61 
  - "b": [t: "L⠃"]               # 0x62 
  - "c": [t: "L⠉"]               # 0x63 
