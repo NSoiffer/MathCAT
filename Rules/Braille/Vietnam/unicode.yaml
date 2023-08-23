@@ -1544,7 +1544,7 @@
 
 # Not yet defined symbols
  - "⋮": [T: "⠣⠴⠜"]          # 0x22ee (vertical ellipsis used to indicate dividable)
- #- "⧸⋮": [T: "⠣⠼⠜"]          # 0x29f8\x22ee (for not dividable sign, not sure if MathCAT supporting multiple-char definition or not
+ - "⧵": [T: "⠸⠡"]          
  - "∕": [T: "⠐⠌"]
  - "⊘": [T: "⠐⠌"]
  
