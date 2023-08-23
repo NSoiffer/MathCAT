@@ -1,0 +1,102 @@
+---
+[
+# Lines starting with "#" are a comment
+# Each definition in this file is of the form
+#   name: [ "...", "..." "..." ],
+
+
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
+# The following definitions are used to convert numbers to words
+# The are mainly used for ordinals, of which there are two cases:
+# 1. Regular ordinals: first, second, third, ...
+# 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
+#    When used in the denominator of fractions, a plural version might be
+#    used (e.g., two halves, two thirds)
+# Although a lot of languages are regular after a few entries, for generality,
+# the following lists should be filled out even though they are the same
+# or easily derived from others in many languages (e.g, an 's' is added for plurals).
+# The larger ordinal numbers (e.g, millionth) is used when there are only
+# '0's after that decimal place (e.g., 23000000).:w
+
+# All definitions start 0, 10, 100, etc.
+
+# The definitions for the "ones" should extend until a regular pattern begins
+#   The minimum length is 10.
+
+# For English, a regular pattern starts at twenty
+    NumbersOnes: [
+         "zero", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove",
+         "dez", "onze", "doze", "treze", "quatorze", "quinze", "dezesseis",
+         "dezessete", "dezoito", "dezenove"
+    ],
+
+    NumbersOrdinalOnes: [
+         "zero", "primeiro", "segundo", "terceiro", "quarto", "quinto", "sexto", "sétimo", "oitavo", "nono",
+         "décimo", "décimo primeiro", "décimo segundo", "décimo terceiro", "décimo quarto", "décimo quinto", "décimo sexto",
+         "décimo sétimo", "décimo oitavo", "décimo nono"
+    ],
+
+    NumbersOrdinalPluralOnes: [
+         "zero", "primeiro", "segundo", "terço", "quarto", "quinto", "sexto", "sétimo", "oito", "nono",
+         "décimos", "décimos primeiros", "duodécimos", "décimos terceiros", "décimos quatorze", "décimos quintos", "décimos seis",
+         "dezessete", "dezoito", "décimos dezenove"
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalOnes: [
+         "zero", "primeiro", "metade"
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalPluralOnes: [
+         "zeros", "primeiros", "metades"
+    ],
+
+
+    # What to use for multiples of 10
+    NumbersTens: [
+         "", "dez", "vinte", "trinta", "quarenta", "cinquenta", "sessenta", "setenta", "oitenta", "noventa"
+    ],
+
+    NumbersOrdinalTens: [
+         "", "décimo", "vigésimo", "trigésimo", "quaragésimo", "quinquagésimo", "sexagésimo", "septésimo", "oitenta", "noventa"
+    ],
+
+    NumbersOrdinalPluralTens: [
+         "", "décimos", "vinte", "tringésimos", "quarenta", "quinquagésimos", "sexagésimos", "septésimos", "oitenta", "noventas"
+    ],
+
+
+    NumbersHundreds: [
+       "", "cem", "duzentos", "trezentos", "quatrocentos", "quinhentos",
+         "seiscentos", "setecentos", "oitocentos", "novecentos"
+    ],
+
+    NumbersOrdinalHundreds: [
+       "", "um centésimo", "duzentos", "trezésimo", "quatrocentésimo", "quincentésimo",
+         "seiscentésimo", "septésimo centésimo", "oitocentésimo", "nonocentésimo"
+    ],
+
+    NumbersOrdinalPluralHundreds: [
+       "", "um centésimo", "dois centésimos", "três centésimos", "quatro centésimos", "cinco centésimos",
+         "seis centésimos", "sete centésimos", "oito centésimos", "nove centésimos"
+    ],
+      
+
+    # At this point, hopefully the language is regular. If not, code needs to be written
+    NumbersLarge: [
+         "", "mil", "milhão", "bilhão", "trilhão", "quatrilhão",
+         "quintilhão", "sextilhão", "septilhão", "octilhão", "nonilhão",
+    ],
+      
+    NumbersOrdinalLarge: [
+         "", "milionésimo", "milionésimo", "bilionésimo", "trilionésimo", "quatrilionésimo",
+         "quintilionésimo", "sextilionésimo", "septillionth", "octilionésimo", "nonillionth"
+    ],
+      
+    NumbersOrdinalPluralLarge: [
+         "", "milionésimos", "milionésimos", "bilionésimos", "trilionésimos", "quatrilionésimos",
+         "quintilionésimos", "sextilionésimos", "septillionésimos", "octilionésimos", "nonillionésimos"
+    ]
+
+]
