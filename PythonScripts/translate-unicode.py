@@ -376,6 +376,10 @@ MP_Location = r"C:\Dev\mathplayer\EqnLib\rules\pvt"
 # (sre_only, mp_only, differ, same) = dict_compare("es", sre_chars, mp_chars)
 # (sre_only, mp_only, differ, same) = dict_compare("fr", get_sre_unicode_dict(SRE_Location, "fr"), get_mathplayer_unicode_dict(MP_Location, "fr"))
 # (sre_only, mp_only, differ, same) = dict_compare("it", get_sre_unicode_dict(SRE_Location, "it"), get_mathplayer_unicode_dict(MP_Location, "it"))
-# build_new_translation("..", "fi", "unicode")
-# build_new_translation("..", "fi", "unicode-full")
-translate_definitions("..", "fi")
+
+language = "pt"
+# build_new_translation("..", language, "unicode")
+# build_new_translation("..", language, "unicode-full")
+
+# see translate_definitions comments -- you need to manually copy the file to google translate. 
+translate_definitions("..", language)
