@@ -105,7 +105,6 @@
      - x: "*[2]/*[2]/*[1]/*[1]"
      - x: "*[3]"
 
-
 #
 # Matrix/Determinant rules
 # matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
@@ -121,6 +120,14 @@
       - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
    replace: [x: "*[2]"]
 -
+   name: default-cases
+   tag: mrow
+   variables:
+      - RowStart: "*[1]"
+      - RowEnd: "''"
+   match: "*[2][self::m:mtable] and count(*)=2 and *[1][.='{' or .='[' or .='(']"
+   replace: [x: "*[2]"]
+-
    name: default-mtable
    tag: mtable
    match: "."
@@ -130,6 +137,9 @@
   tag: [mtr, mlabeledtr]
   match: "."
   replace:
+   - test:
+      if: "preceding-sibling::*"
+      then: [t: "⣍"]
    - test: 
       if: "count(parent::*) > 1"
       then: [t: "⠠"]
@@ -442,6 +452,15 @@
          - t: "⠱"
    - t: "#"   # signal end script/numeric mode
 
+- name: log-base-power
+  tag: msubsup
+  match: "*[1][.='log']"
+  replace:
+  - x: "*[1]"   # log
+  - T: "⠔"
+  - x: "*[3]"   # superscript
+  - T: "⠢"
+  - x: "*[2]"   # supscript
 
 -
    name: msubsup_default_mmultiscripts_equiv
