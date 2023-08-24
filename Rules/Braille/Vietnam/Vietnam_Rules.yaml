@@ -466,7 +466,7 @@
       replace:
       - test:
          - if: "self::m:munderover"
-           then: [t: "⠨⠢"]
+           then: [t: "⠢"]    # not use dots 46-26, just use same sub sign dots 26
            else: [t: "⠢"]
       - test:
          # omit grouping indicators in the following cases
@@ -486,7 +486,7 @@
          - t: "⠜"
       - test:
          - if: "self::m:munderover"
-           then: [t: "⠨⠔"]
+           then: [t: "⠔"]     # not use ⠨⠔ as UEB, just use dots 35
            else: [t: "⠔"]
       - test:
          # omit grouping indicators in the following cases
