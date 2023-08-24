@@ -420,6 +420,30 @@
       if: "$Verbosity='Terse'"
       then: {T: cô tang híp bơ bôn}
       else: {T: cô tang híp bơ bôn}
+- name: arcsin
+  tag: mi
+  match: "text()='arcsin'"
+  replace:
+  - bookmark: "@id"
+  - T: "ạt sin"
+- name: arccos
+  tag: mi
+  match: "text()='arccos'"
+  replace:
+  - bookmark: "@id"
+  - T: "ạt cô sin"
+- name: arctan
+  tag: mi
+  match: "text()='arctan'"
+  replace:
+  - bookmark: "@id"
+  - T: "ạt tang"
+- name: arccot
+  tag: mi
+  match: "text()='arccot'"
+  replace:
+  - bookmark: "@id"
+  - T: "ạt cô tang"
 
 - # handle both log and ln
   name: log
@@ -469,17 +493,17 @@
   match: "not(@data-intent-property)"
   replace:
   - bookmark: "@id"
-  - t: "lóc"   # log
+  - T: "lóc"   # log
   - bookmark: "*[1]/@id"
   - test:
       - if: "*[2][text()=2]"
-        then: [t: "bình phương"]     
+        then: [T: "bình phương"]     
       - else_if: "*[2][text()=3]"
-        then: [t: "lập phương"]
+        then: [T: "lập phương"]
         else:
         - T: mũ
         - x: "*[2]"
-  - t: "cơ số"   # base
+  - T: "cơ số"   # base
   - x: "*[2]"   # supscript
   - pause: short
 
