@@ -93,7 +93,7 @@
  - "¯":                                            # 0xaf
      - test:
         if: "ancestor::m:modified-variable and preceding-sibling::*[1][self::m:mi]"
-        then: [t: "dòng"]                         # (en: 'bar') -- as in "x bar", a shorthand way to speak this
+        then: [T: "ngang"]                         # (en: 'bar') -- as in "x bar", a shorthand way to speak this
         else: [t: "dòng"]                          # (en: 'line')
  - "°": [t: "độ"]                                   #  0xb0 (en: 'degrees')
  - "±": [t: "cộng hoặc trừ"]                        #  0xb1 (en: 'plus or minus')

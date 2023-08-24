@@ -344,7 +344,7 @@ fn log_b2 () {
 
 #[test]
 fn rnumber_1_1 () {
-    let expr = r#"<math><mrow><mi>A</mi><mo ame-texclass="rel" stretchy="false">=</mo><mo ame-texclass="open" fence="true" stretchy="false">{</mo><mi>x</mi><mo ame-texclass="rel" stretchy="false">&#x2208;</mo><mi>R</mi><mo ame-texclass="fence" fence="true" stretchy="false">|</mo><msup><mi>x</mi><mn>2</mn></msup><mo ame-texclass="rel" stretchy="false">&#x2265;</mo><mn>1</mn><mo ame-texclass="close" fence="true" stretchy="false">}</mo></mrow></math>"#;
+    let expr = r#"<math><mrow><mi>A</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mo ame-texclass='open' fence='true' stretchy='false'>{</mo><mi>x</mi><mo ame-texclass='rel' stretchy='false'>&#x2208;</mo><mi>R</mi><mo ame-texclass='fence' fence='true' stretchy='false'>|</mo><msup><mi>x</mi><mn>2</mn></msup><mo ame-texclass='rel' stretchy='false'>&#x2265;</mo><mn>1</mn><mo ame-texclass='close' fence='true' stretchy='false'>}</mo></mrow></math>"#;
     test_braille("Vietnam", expr, "⠨⠁⠐⠶⠸⠣⠭⠈⠑⠨⠗⠸⠳⠭⠔⠼⠃⠐⠕⠶⠼⠁⠸⠜");
 }
 
@@ -356,7 +356,7 @@ fn mtable_1_1 () {
 
 #[test]
 fn mtable_1_2 () {
-    let expr = r#"<math><mrow><mfenced close="" open="["><mrow><mtable equalrows='true' equalcolumns='true'><mtr><mtd><mrow><mi>x</mi><mo>=</mo><mn>5</mn></mrow></mtd></mtr><mtr><mtd><mrow><mi>x</mi><mo>=</mo><mo>&#x2212;</mo><mn>7</mn></mrow></mtd></mtr></mtable></mrow></mfenced></mrow></math>"#;
+    let expr = r#"<math><mrow><mfenced close='' open='['><mrow><mtable equalrows='true' equalcolumns='true'><mtr><mtd><mrow><mi>x</mi><mo>=</mo><mn>5</mn></mrow></mtd></mtr><mtr><mtd><mrow><mi>x</mi><mo>=</mo><mo>&#x2212;</mo><mn>7</mn></mrow></mtd></mtr></mtable></mrow></mfenced></mrow></math>"#;
     test_braille("Vietnam", expr, "⠨⠣⠭⠐⠶⠼⠑⣍⠨⠣⠭⠐⠶⠐⠤⠼⠛");
 }
 

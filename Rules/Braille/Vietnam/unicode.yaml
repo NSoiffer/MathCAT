@@ -462,9 +462,11 @@
  - "σ": [t: "GL⠎"]              # 0x3c3 
  - "τ": [t: "GL⠞"]              # 0x3c4 
  - "υ": [t: "GL⠥"]              # 0x3c5 
- - "φ": [t: "GL⠋"]              # 0x3c6 
- - "χ": [t: "GL⠯"]              # 0x3c7 
+ - "φ": [T: "GL⠋"]              # 0x3c6 
+ - "ϕ": [T: "GL⠋"]              # 0x3c6 
+ - "χ": [T: "GL⠯"]              # 0x3c7 
  - "ψ": [t: "GL⠽"]              # 0x3c8 
+ - "ω": [t: "GL⠺"]             # 0x3c9
 
  - "Α": [t: "CGL⠁"]             # 0x391 
  - "Β": [t: "CGL⠃"]             # 0x392 
@@ -490,7 +492,7 @@
  - "Φ": [t: "CGL⠋"]             # 0x3a6 
  - "Χ": [t: "CGL⠯"]             # 0x3a7 
  - "Ψ": [t: "CGL⠽"]             # 0x3a8 
- - "ω": [t: "CGL⠺"]             # 0x3a9
+ - "Ω": [T: "CGL⠺"]             # 0x3a9
 
  - "µ": [t: "GL⠍"]              # 0x00B5 (Micro (Greek mu))
  - "Ω": [t: "CGL⠺"]             # 0x2126 (Ohm sign (capital Greek omega))
@@ -1543,8 +1545,8 @@
  - "↉": [t: "#N⠚N⠌N⠑"]          # 0x2189 (Vulgar Fraction Zero Thirds)
 
 # Not yet defined symbols
+ - "≊": [T: "⠐⠢⠢⠶"]
  - "⋮": [T: "⠣⠴⠜"]          # 0x22ee (vertical ellipsis used to indicate dividable)
  - "⧵": [T: "⠸⠡"]          
  - "∕": [T: "⠐⠌"]
  - "⊘": [T: "⠐⠌"]
- 
