@@ -464,6 +464,26 @@
     #      then: {T: the}
   - x: "*[1]"
 
+- name: log-base-power
+  tag: log-base-power
+  match: "not(@data-intent-property)"
+  replace:
+  - bookmark: "@id"
+  - t: "lóc"   # log
+  - bookmark: "*[1]/@id"
+  - test:
+      - if: "*[2][text()=2]"
+        then: [t: "bình phương"]     
+      - else_if: "*[2][text()=3]"
+        then: [t: "lập phương"]
+        else:
+        - T: mũ
+        - x: "*[2]"
+  - t: "cơ số"   # base
+  - x: "*[2]"   # supscript
+  - pause: short
+
+
 - #   that eliminates the need for the if: else_if: ...
   name: multi-line
   # IDEA:  set a variable with the word to saw for the row (e.g., RowLabel = Row/Case/Line/...)

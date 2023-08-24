@@ -266,6 +266,18 @@
       children: [x: "*[2]"]
 
 -
+  name: log-base-power
+  tag: msubsup
+  match:
+  - "*[1][self::m:mi][text()='log']"
+  replace:
+  - intent:
+      name: log-base-power
+      children:
+      - x: "*[2]"
+      - x: "*[3]"
+
+-
   name: bigop
   tag: [msub, munder]
   match: "IsLargeOp(*[1]) or contains(@data-intent-property, ':largeop:')"
