@@ -1545,6 +1545,7 @@
  - "↉": [t: "#N⠚N⠌N⠑"]          # 0x2189 (Vulgar Fraction Zero Thirds)
 
 # Not yet defined symbols
+ - "‰": [T: "⠼⠚⠴⠴"]
  - "≊": [T: "⠐⠢⠢⠶"]
  - "⋮": [T: "⠣⠴⠜"]          # 0x22ee (vertical ellipsis used to indicate dividable)
  - "⧵": [T: "⠸⠡"]          
