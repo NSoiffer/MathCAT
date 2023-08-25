@@ -170,18 +170,8 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr=r#"
-  <math>
-	<mo>|</mo>
-	<mo>|</mo>
-	<mn>-3</mn>
-	<mo>|</mo>
-	<mo>+</mo>
-	<mo>|</mo>
-	<mn>2</mn>
-	<mo>|</mo>
-	<mo>|</mo>
-</math>
-"#;
+  <math><mrow><msubsup><mi mathvariant='normal' ame-texclass='op'>log</mi><mn>3</mn><mn>2</mn></msubsup><mo>&#x2061;</mo><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mn>2</mn><msub><mi mathvariant='normal' ame-texclass='op'>log</mi><mn>2</mn></msub><mo>&#x2061;</mo><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mn>3</mn><mo ame-texclass='rel' stretchy='false'>=</mo><mn>0</mn></mrow></math>
+  "#;
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>
@@ -197,7 +187,7 @@ fn main() {
 //     ";
   // let expr= "<math><mrow><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>";
   let instant = Instant::now();
-  let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../../Rules");
+  let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../Rules");
   let rules_dir = rules_dir.as_os_str().to_str().unwrap().to_string();
   if let Err(e) = set_rules_dir(rules_dir) {
     panic!("Error: exiting -- {}", errors_to_string(&e));  }
