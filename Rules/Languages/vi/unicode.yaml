@@ -97,8 +97,8 @@
         - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
           then: [T: sao cho]
         - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
-          then: [T: được cho] 
-        - else: [T: phân chia]                   
+          then: [T: sao cho] 
+        - else: [T: sao cho]                   
 
  - "}":                                          # 0x7d
     - test:
