@@ -504,7 +504,7 @@
         - T: mũ
         - x: "*[2]"
   - T: "cơ số"   # base
-  - x: "*[2]"   # supscript
+  - x: "*[1]"   # supscript
   - pause: short
 
 
