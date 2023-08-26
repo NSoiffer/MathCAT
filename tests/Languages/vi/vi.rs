@@ -1,9 +1,10 @@
+use crate::common::*;
 
 
 #[test]
 fn log_sup_sub() {
-    let expr = "<math><mrow><msubsup><mi mathvariant='normal' ame-texclass='op'>log</mi><mn>10</mn><mn>20</mn></msubsup><mo>&#x2061;</mo><mi>x</mi></mrow></math>":
-    test("vi", "ClearSpeak", expr, "lóc mũ 20 cơ số 10 của x");
+    let expr = "<math><mrow><msubsup><mi mathvariant='normal' ame-texclass='op'>log</mi><mn>10</mn><mn>20</mn></msubsup><mo>&#x2061;</mo><mi>x</mi></mrow></math>";
+    test("vi", "ClearSpeak", expr, "lóc mũ 20 cơ số 10; của x");
 }
 
 #[test]
