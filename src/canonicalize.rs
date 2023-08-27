@@ -1560,7 +1560,7 @@ impl CanonicalizeContext {
 		/// look for potential numbers by looking for sequences with commas, spaces, and decimal points
 		fn merge_number_blocks(parent_mrow: Element, children: &mut Vec<ChildOfElement>) {
 			lazy_static!{
-				static ref SEPARATORS: Regex = Regex::new(r"[],. \u{00A0}]").unwrap(); 
+				static ref SEPARATORS: Regex = Regex::new(r"[,. \u{00A0}]").unwrap(); 
 			}
 			// debug!("parent:\n{}", mml_to_string(&parent_mrow));
 			let mut i = 0;
