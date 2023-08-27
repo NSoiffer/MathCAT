@@ -738,10 +738,10 @@
   - x: "*[3]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{T: "chỉ số dưới"}]
+      then: [{T: "dưới"}]
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{T: " "}]
+        then: [{T: ""}]
   #- x: "*[3]"
 
 - name: chemistry-msup
@@ -752,10 +752,10 @@
   - x: "*[3]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{T: "chỉ số trên"}]
+      then: [{T: "trên"}]
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{T: "trên"}]
+        then: [{T: ""}]
   #- x: "*[3]"
   - test:
       if: "following-sibling::*[1][text()='+' or text()='-']" # a little lazy -- assumes chemistry superscripts end with + or -
@@ -783,10 +783,10 @@
           - x: "$Prescripts[2]"
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{T: "chỉ số trên"}]
+              then: [{T: "trên"}]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{T: "trên"}]
+                then: [{T: ""}]
           #- x: "$Prescripts[2]"
           - pause: "short"
       - test:
@@ -795,10 +795,10 @@
           - x: "$Prescripts[1]"
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{T: "chỉ số dưới"}]
+              then: [{T: "dưới"}]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{T: " "}]
+                then: [{T: ""}]
           #- x: "$Prescripts[1]"
           - pause: "short"
       - test:
@@ -810,10 +810,10 @@
               - x: "$Prescripts[4]"
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{T: "chỉ số trên"}]
+                  then: [{T: "trên"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{T: "trên"}]
+                    then: [{T: ""}]
               #- x: "$Prescripts[4]"
               - pause: "short"
           - test:
@@ -822,10 +822,10 @@
               - x: "$Prescripts[3]"
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{T: "chỉ số dưới"}]
+                  then: [{T: "dưới"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{T: " "}]
+                    then: [{T: ""}]
               #- x: "$Prescripts[3]"
               - pause: "short"
   - x: "*[1]" # base
@@ -838,10 +838,10 @@
           - x: "$Postscripts[1]"
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{T: "chỉ số dưới"}]
+              then: [{T: "dưới"}]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{T: " "}]
+                then: [{T: ""}]
           #- x: "$Postscripts[1]"
           - pause: "short"
       - test:
@@ -850,10 +850,10 @@
           - x: "$Postscripts[2]"
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{T: "chỉ số trên"}]
+              then: [{T: "trên"}]
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{T: "trên"}]
+                then: [{T: ""}]
           #- x: "$Postscripts[2]"
           - pause: "short"
       - test:
@@ -865,10 +865,10 @@
               - x: "$Postscripts[3]"
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{T: "chỉ số dưới"}]
+                  then: [{T: "dưới"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{T: " "}]
+                    then: [{T: ""}]
               #- x: "$Postscripts[3]"
               - pause: "short"
           - test:
@@ -877,10 +877,10 @@
               - x: "$Postscripts[4]"
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{T: "chỉ số trên"}]
+                  then: [{T: "trên"}]
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{T: "chỉ số trên"}]
+                    then: [{T: ""}]
               #- x: "$Postscripts[4]"
               - pause: "short"
           - test:
@@ -892,10 +892,10 @@
                   - x: "$Postscripts[5]"
                   - test:
                       if: "$Verbosity='Verbose'"
-                      then: [{T: "chỉ số dưới"}]
+                      then: [{T: "dưới"}]
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{T: " "}]
+                        then: [{T: ""}]
                   #- x: "$Postscripts[5]"
                   - pause: "short"
               - test:
@@ -904,10 +904,10 @@
                   - x: "$Postscripts[6]"
                   - test:
                       if: "$Verbosity='Verbose'"
-                      then: [{T: "chỉ số trên"}]
+                      then: [{T: "trên"}]
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{T: "trên"}]
+                        then: [{T: ""}]
                   #- x: "$Postscripts[6]"
                   - pause: "short"
               - test:
@@ -919,10 +919,10 @@
                       - x: "$Postscripts[7]"
                       - test:
                           if: "$Verbosity='Verbose'"
-                          then: [{T: "chỉ số dưới"}]
+                          then: [{T: "dưới"}]
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{T: " "}]
+                            then: [{T: ""}]
                       #- x: "$Postscripts[7]"
                       - pause: "short"
                   - test:
@@ -931,10 +931,10 @@
                       - x: "$Postscripts[8]"
                       - test:
                           if: "$Verbosity='Verbose'"
-                          then: [{T: "chỉ số trên"}]
+                          then: [{T: "trên"}]
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{T: "trên"}]
+                            then: [{T: ""}]
                       #- x: "$Postscripts[8]"
                       - pause: "short"
       - test:
@@ -972,6 +972,29 @@
       else: [{T: "nước"}] # (aq)
   - pause: short
 
+- name: chemical-formula-operator-bond
+  tag: chemical-formula-operator
+  match: "@data-chemical-bond"
+  replace:
+  # FIX: this might be better/more efficient if in unicode.yaml
+  - bookmark: "@id"
+  - test:
+    - if: "text()='-' or text() = ':'"
+      then: [{T: "liên kết đơn"}]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
+    - else_if: "text()='=' or text() = '∷'"
+      then: [{T: "liên kết đôi"}]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
+    - else_if: "text()='≡'"
+      then: [{T: "liên kết ba"}]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
+    - else_if: "text()='≣'"
+      then: [{T: "liên kết bốn"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
+      else: [{x: "text()"}]
+
+- name: chemical-formula-operator
+  tag: chemical-formula-operator
+  match: "."
+  replace:
+    x: "text()"
+
 - name: chemical-arrow-operator
   tag: chemical-arrow-operator
   match: "."
@@ -979,42 +1002,25 @@
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
   - test:
-    - if: "text()='-' or text() = ':'"
-      then: [{T: "liên kết đơn"}]
-    - else_if: "text()='=' or text() = '::'"
-      then: [{T: "liên kết đôi"}]
-    - else_if: "text()='≡'"
-      then: [{T: "liên kết ba"}]
-    - else_if: "text()='≣'"
-      then: [{T: "liên kết bốn"}]
-      else: [{x: text()}]
-
-- name: chemical-formula-operator
-  tag: chemical-formula-operator
-  match: "."
-  replace:
-  - bookmark: "@id"
-  - x: "text()"
+    - if: "text()='→' or text()='⟶'"
+      then_test:
+        if: "$Verbosity='Terse'"
+        then: [{T: "cho ra"}]      # phrase(hydrogen and oxygen 'forms' water )
+        else: [{T: "phản ứng cho ra"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
+    - else_if: "text()='⇌' or text()='⮖'"
+      then: [{T: "cân bằng với"}]      # phrase(a reactant 'is in equilibrium with' a product)
+    - else_if: "text()='⭴'"
+      then: [{T: "cân bằng về bên trái với"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
+    - else_if: "text()='⭵'"
+      then: [{T: "cân bằng về bên phải với"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
+      else: [x: "text()"]
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator
   match: "."
   replace:
-  # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
-  - test:
-    - if: "text()='→' or text()='⟶'"
-      then_test:
-        if: "name(preceding-sibling::*[1]) = 'chemical-nuclide'"
-        then: [{T: "phân thành"}]
-        else: [{T: "cho ra"}]
-    - else_if: "text()='⇌' or text()='⮖'"
-      then: [{T: "cân bằng với"}]
-    - else_if: "text()='⭴'"
-      then: [{T: "cân bằng về bên trái với"}]
-    - else_if: "text()='⭵'"
-      then: [{T: "cân bằng về bên phải với"}]
-      else: [{x: text()}]
+  - x: "text()"
 
 - name: none
   tag: none
