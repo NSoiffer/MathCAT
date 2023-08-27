@@ -205,16 +205,18 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
 
         // we set the value even if it was the same as the old value because this might override a potentially changed future user value
         let mut pref_manager = rules.pref_manager.borrow_mut();
-        match name.as_str() {
-            "Pitch" | "Rate" | "Volume" | "CapitalLetters_Pitch"=> {
-                pref_manager.set_api_float_pref(&name, to_float(&name, &value)?);    
-            },
-            "Bookmark" | "CapitalLetters_UseWord" | "CapitalLetters_Beep" => {
-                pref_manager.set_api_boolean_pref(&name, value.to_lowercase()=="true");    
-            },
-            _ => {
-                pref_manager.set_api_string_pref(&name, &value);
-            },
+        let lower_case_value = value.to_lowercase();
+        if lower_case_value == "true" || lower_case_value == "false" {
+            pref_manager.set_api_boolean_pref(&name, value.to_lowercase()=="true"); 
+        } else { 
+            match name.as_str() {
+                "Pitch" | "Rate" | "Volume" | "CapitalLetters_Pitch"=> {
+                    pref_manager.set_api_float_pref(&name, to_float(&name, &value)?);    
+                },
+                _ => {
+                    pref_manager.set_api_string_pref(&name, &value);
+                },
+            }
         };
         return Ok::<(), Error>( () );
     })?;
@@ -779,7 +781,7 @@ mod tests {
         // MathCAT will check the env var "MathCATRulesDir" as an override, so the following test might succeed if we don't override the env var
         env::set_var("MathCATRulesDir", "MathCATRulesDir");
         assert!(set_rules_dir("someInvalidRulesDir".to_string()).is_err());
-        assert!(set_rules_dir(super::super::abs_rules_dir_path()).is_ok());
+        assert!(set_rules_dir(super::super::abs_rules_dir_path()).is_ok(), "\nset_rules_dir to '{}' failed", super::super::abs_rules_dir_path());
         assert!(set_mathml("<math><mn>1</mn></math>".to_string()).is_ok());
     }
 
