@@ -1308,10 +1308,10 @@ static VIETNAM_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "W" => "⠀",     // whitespace"
     "𝐖"=> "⠀",     // whitespace
     "s" => "⠆",     // typeface single char indicator
-    "w" => "⠂",     // typeface word indicator
-    "e" => "⠄",     // typeface & capital terminator 
+    "w" => "",     // typeface word indicator
+    "e" => "",     // typeface & capital terminator 
     "o" => "",       // flag that what follows is an open indicator (used for standing alone rule)
-    "c" => "",       // flag that what follows is an close indicator (used for standing alone rule)
+    "c" => "",     // second character of a capital letter
     "b" => "",       // flag that what follows is an open or close indicator (used for standing alone rule)
     "," => "⠂",     // comma
     "." => "⠲",     // period
@@ -1483,6 +1483,7 @@ impl BrailleChars {
         let result = match code {
             "Nemeth" => BrailleChars::get_braille_nemeth_chars(node, text_range),
             "UEB" => BrailleChars:: get_braille_ueb_chars(node, text_range),
+            "Vietnam" => BrailleChars:: get_braille_vietnam_chars(node, text_range),
             _ => return Err(sxd_xpath::function::Error::Other(format!("get_braille_chars: unknown braille code '{}'", code)))
         };
         return match result {
@@ -1616,6 +1617,45 @@ impl BrailleChars {
         });
         return Ok(result.to_string())
     }
+
+    fn get_braille_vietnam_chars(node: Element, text_range: Option<Range<usize>>) -> Result<String> {
+        // this is basically the same as for ueb, but we deal with switching '.' and ',' if in English style for numbers
+        if name(&node) == "mn" {
+            // switch_if_english_style_number modifies the text of 
+            switch_if_english_style_number(node);
+        }
+        return BrailleChars::get_braille_ueb_chars(node, text_range);
+
+        fn switch_if_english_style_number(node: Element) {
+            let text = as_text(node);
+            let dot = text.find('.');
+            let comma = text.find(',');
+            match (dot, comma) {
+                (None, None) => (),
+                (Some(dot), Some(comma)) => {
+                    if comma < dot {
+                        // switch dot/comma -- using "\x01" as a temp when switching the the two chars
+                        let switched = text.replace('.', "\x01").replace(',', ".").replace('\x01', ",");
+                        node.set_text(&switched);
+                    }
+                },
+                (Some(dot), None) => {
+                    // is '.' really a digit block separator? Check for more than one or three digits after a single "."
+                    if text[dot+1..].find('.').is_none() || text[dot+1..].len()==3 {
+                        node.set_text(&text.replace('.', ","));
+                    }
+                },
+                (None, Some(comma)) => {
+                    // if there is more than one ",", than it can't be a decimal separator
+                    if text[comma+1..].find(',').is_some() {
+                        node.set_text(&text.replace(',', "."));
+                    }
+                },
+            }
+        }
+
+    }
+
 
     fn is_in_enclosed_list(node: Element) -> bool {
         // Nemeth Rule 10 defines an enclosed list:
