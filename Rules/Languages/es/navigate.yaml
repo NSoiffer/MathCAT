@@ -1150,7 +1150,7 @@
   tag: "*"
   match:
   - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
-  - "$AutoZoomOut = 'True' and"
+  - "$AutoZoomOut and"
   - "( not(following-sibling::*) or"
   - "  ( $NavMode='Enhanced' and "
   - "    count(following-sibling::*)=1 and (IsBracketed(.., '(', ')') or IsBracketed(.., '[', ']'))"
@@ -1390,7 +1390,7 @@
   tag: "*"
   match:
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
-  - "$AutoZoomOut = 'True' and"
+  - "$AutoZoomOut and"
   - "( not(preceding-sibling::*) or"
   - "  ( $NavMode='Enhanced' and "
   - "    count(preceding-sibling::*)=1 and (IsBracketed(.., '(', ')') or IsBracketed(.., '[', ']'))"

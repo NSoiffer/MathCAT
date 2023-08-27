@@ -1156,7 +1156,7 @@
   tag: "*"
   match:
   - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
-  - "$AutoZoomOut = 'True' and"
+  - "$AutoZoomOut and"
   - "( not(following-sibling::*) or"
   - "  ( $NavMode='Enhanced' and "
   - "    count(following-sibling::*)=1 and (IsBracketed(.., '(', ')') or IsBracketed(.., '[', ']'))"
@@ -1294,10 +1294,10 @@
       else:
       - with:
           variables: [{Move2D: "'in'"}, {Child2D: "following-sibling::*[1]"}]
-          replace: [{x: ".."}]
+          replace: [{x: "DEBUG(..)"}]
       - with:
           variables: [{MatchCounter: "$MatchCounter + 1"}, {NavCommand: "'MoveNextZoom'"}]
-          replace: [{x: "following-sibling::*[1]"}]
+          replace: [{x: "DEBUG(following-sibling::*[1])"}]
 
 - name: move-next-default
   tag: "*"
@@ -1396,7 +1396,7 @@
   tag: "*"
   match:
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
-  - "$AutoZoomOut = 'True' and"
+  - "$AutoZoomOut and"
   - "( not(preceding-sibling::*) or"
   - "  ( $NavMode='Enhanced' and "
   - "    count(preceding-sibling::*)=1 and (IsBracketed(.., '(', ')') or IsBracketed(.., '[', ']'))"
