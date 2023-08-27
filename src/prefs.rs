@@ -615,7 +615,7 @@ impl PreferenceManager {
             if is_dir_shim(&path_buf) {
                 return Ok(path_buf);
             }
-            bad_env_value = format!("MathCATRulesDir value {} is not a directory -- ignoring\n", &env_var);
+            bad_env_value = format!("MathCATRulesDir='{}' is not a directory -- ignoring\n", &env_var);
             warn!("{}", &bad_env_value);
         }
         
@@ -927,6 +927,8 @@ mod tests {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
+            pref_manager.invalidate(FilesChanged::new("Language").unwrap());
+            pref_manager.initialize(PathBuf::new()).unwrap();
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
         });
     }
