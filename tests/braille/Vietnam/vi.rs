@@ -432,3 +432,30 @@ fn vi_letters () {
     test_braille("Vietnam", expr, "⠨⠉⠓⠕⠀⠨⠏⠓⠳⠪⠝⠛⠀⠨⠞⠗⠰⠊⠝⠓⠀⠨⠁⠭⠐⠖⠨⠃⠐⠶⠼⠚⠀⠸⠞⠁⠀⠸⠮⠳⠠⠪⠉ ⠭");
 }
 
+// Cap Roman numbers are marked with dots 46for both single letter and word.
+#[test]
+fn mhchem_roman_in_superscript () {
+    let expr = "<math>
+      <mrow>
+        <mmultiscripts>
+          <mi>Fe</mi>
+          <none></none>
+          <mi>II</mi>
+        </mmultiscripts>
+        <mo>&#x2063;</mo>
+        <mmultiscripts>
+          <mi>Fe</mi>
+          <none></none>
+          <mi data-number='3'>III</mi>
+        </mmultiscripts>
+        <mo>&#x2063;</mo>
+        <mmultiscripts>
+          <mi mathvariant='normal' >O</mi>
+          <mn>4</mn>
+          <none></none>
+        </mmultiscripts>
+      </mrow>
+    </math>";
+    test_braille("Vietnam", expr, "⠨⠋⠑⠔⠣⠨⠊⠊⠱⠨⠋⠑⠔⠣⠨⠊⠊⠊⠱⠨⠕⠢⠼⠙");
+}
+
