@@ -263,8 +263,8 @@
  - ".":                        # 0x2e (Period)
      - test:
         if: "self::m:mn"
-        then: [T: "N."]
-        else: [t: "⠲."]
+        then: [T: "N⠄"]
+        else: [t: "."]
  - ":":                         # 0x003A (Colon)
         # Sometimes a colon is meant to be a ratio/mathord and sometimes a map/punct.
         # The latter has a space after it.
