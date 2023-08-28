@@ -721,6 +721,9 @@ impl CanonicalizeContext {
 					let new_text = merge_prime_text(text);
 					mathml.set_text(&new_text);
 					return Some(mathml);
+				} else if text == "..." {
+					mathml.set_text("…");
+					return Some(mathml);
 				} else if let Some(result) = split_points(mathml) {
 					return Some(result);
 				} else {
