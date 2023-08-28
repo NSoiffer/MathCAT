@@ -5,7 +5,8 @@ use crate::common::*;
 
 #[test]
 fn subset_1a() {
-    let expr = "<math><mrow><mi>A</mi><mo>=</mo><mfenced close='}' open='{'><mrow><mn>1</mn><mo>;</mo><mn>2</mn><mo>;</mo><mn>3</mn><mo>;</mo><mn>4</mn><mo>;</mo><mn>5</mn><mo>;</mo><mn>...</mn><mo>;</mo><mn>100</mn></mrow></mfenced></mrow></math>";
+    init_logger();
+    let expr = "<math><mrow><mi>A</mi><mo>=</mo><mfenced close='}' open='{'><mrow><mn>1</mn><mo>;</mo><mn>2</mn><mo>;</mo><mn>3</mn><mo>;</mo><mn>4</mn><mo>;</mo><mn>5</mn><mo>;</mo><mi>...</mi><mo>;</mo><mn>100</mn></mrow></mfenced></mrow></math>";
     test_braille("Vietnam", expr, "⠨⠁⠐⠶⠸⠣⠼⠁⠆⠼⠃⠆⠼⠉⠆⠼⠙⠆⠼⠑⠆⠄⠄⠄⠆⠼⠁⠚⠚⠸⠜");
 }
 
