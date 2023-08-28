@@ -612,7 +612,7 @@ impl<'r> SetVariables {
     fn build(vars: &Yaml) -> Result<Box<SetVariables>> {
         // 'set_variables:' -- 'variables': xxx (array)
         if vars.as_vec().is_none() {
-            bail!("'set_variables' -- should be an of variable name, xpath value");
+            bail!("'set_variables' -- should be an array of variable name, xpath value");
         }
         return Ok( Box::new( SetVariables {
             variables: VariableDefinitions::build(vars).chain_err(|| "'set_variables'")?
