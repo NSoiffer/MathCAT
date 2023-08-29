@@ -368,21 +368,105 @@ fn number_1 () {
 }
 
 #[test]
-fn number_2 () {
-    let expr = "<math><mn>3,14</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠉⠂⠁⠙");
-}
-
-#[test]
 fn number_1a () {
     let expr = "<math><mn>3,000.12</mn></math>";
     test_braille("Vietnam", expr, "⠼⠉⠄⠚⠚⠚⠂⠁⠃");
 }
 
 #[test]
+fn number_2 () {
+    let expr = "<math><mn>3,14</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠉⠂⠁⠙");
+}
+
+#[test]
 fn number_2a () {
     let expr = "<math><mn>3.14</mn></math>";
     test_braille("Vietnam", expr, "⠼⠉⠂⠁⠙");
+}
+
+#[test]
+fn number_3 () {
+    let expr = "<math><mn>1.000</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠄⠚⠚⠚");
+}
+
+#[test]
+fn number_3a () {
+    let expr = "<math><mn>1,000</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠂⠚⠚⠚");
+}
+
+#[test]
+fn number_4 () {
+    let expr = "<math><mn>1.000.000</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚");
+}
+
+#[test]
+fn number_4a () {
+    let expr = "<math><mn>1,000,000</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚");
+}
+
+#[test]
+fn number_5 () {
+    let expr = "<math><mn>123.456.789,987</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠃⠉⠄⠙⠑⠋⠄⠛⠓⠊⠂⠊⠓⠛");
+}
+
+#[test]
+fn number_5a () {
+    let expr = "<math><mn>123,456,789.987</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠃⠉⠄⠙⠑⠋⠄⠛⠓⠊⠂⠊⠓⠛");
+}
+
+#[test]
+fn number_6 () {
+    let expr = "<math><mn>,57</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠂⠑⠛");
+}
+
+#[test]
+fn number_6a () {
+    let expr = "<math><mn>.57</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠂⠑⠛");
+}
+
+#[test]
+fn number_6b () {
+    let expr = "<math><mn>0,57</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠚⠂⠑⠛");
+}
+
+#[test]
+fn number_6c () {
+    let expr = "<math><mn>0.57</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠚⠂⠑⠛");
+}
+
+#[test]
+fn number_7 () {
+    let expr = "<math><mn>,578</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠂⠑⠛⠓");
+}
+
+#[test]
+fn number_7a () {
+    let expr = "<math><mn>.578</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠂⠑⠛⠓");
+}
+
+#[test]
+fn number_7b () {
+    let expr = "<math><mn>0,578</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠚⠂⠑⠛⠓");
+}
+
+#[test]
+fn number_7c () {
+    let expr = "<math><mn>0.578</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠚⠂⠑⠛⠓");
 }
 
 #[test]
