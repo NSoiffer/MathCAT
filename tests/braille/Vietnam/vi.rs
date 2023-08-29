@@ -394,7 +394,19 @@ fn number_3 () {
 #[test]
 fn number_3a () {
     let expr = "<math><mn>1,000</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠁⠂⠚⠚⠚");
+    test_braille("Vietnam", expr, "⠼⠁⠄⠚⠚⠚");
+}
+
+#[test]
+fn number_3b () {
+    let expr = "<math><mn>1.234</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠄⠃⠉⠙");
+}
+
+#[test]
+fn number_3c () {
+    let expr = "<math><mn>1,234</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠂⠃⠉⠙");
 }
 
 #[test]
