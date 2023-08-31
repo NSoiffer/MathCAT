@@ -173,32 +173,32 @@
       # else nothing to braille
 
 -
-   name: no-content
-   tag: math
-   match: "not(*)"      # empty
-   replace: [t: "W"]    # not sure that is right, but this shouldn't happen
+  name: no-content
+  tag: math
+  match: "not(*)"      # empty
+  replace: [t: "W"]    # not sure that is right, but this shouldn't happen
 
 -
-   name: default
-   tag: math
-   match: "."
-   variables:
-      - RowStart: "''"           # empty string -- it needs to be set
-      - RowEnd: "''"             # empty string -- it needs to be set
-      - NewScriptContext: "''"    # empty string -- it needs to be set
-   replace: [x: "*"]
+  name: default
+  tag: math
+  match: "."
+  variables:
+    - RowStart: "''"           # empty string -- it needs to be set
+    - RowEnd: "''"             # empty string -- it needs to be set
+    - NewScriptContext: "''"    # empty string -- it needs to be set
+  replace: [x: "*"]
 
 -
-    name: empty-mrow
-    tag: mrow
-    match: "not(*)"
-    replace: [t: "W"] # not sure what is correct -- if in a fraction, probably something is better than nothing
+  name: empty-mrow
+  tag: mrow
+  match: "not(*)"
+  replace: [t: "W"] # not sure what is correct -- if in a fraction, probably something is better than nothing
 
 -
-   name: default
-   tag: mrow
-   match: "."
-   replace: [x: "*"]
+  name: default
+  tag: mrow
+  match: "."
+  replace: [x: "*"]
 
 -
    # add space after these ops when they are prefix operators
@@ -268,98 +268,101 @@
          - x: "BrailleChars(., 'Vietnam', 1, string-length(.)+1)"
 
 -
-   name: default
-   tag: mn
-   match: "."
-   replace:
-   - x: "BrailleChars(., 'Vietnam')"
+  name: default
+  tag: mn
+  match: "."
+  replace:
+  - x: "BrailleChars(., 'Vietnam')"
 
 - 
-   name: sin
-   tag: mi
-   match: "text()='sin'"
-   replace:
-   - t: "⠻⠎"
+  name: sin
+  tag: mi
+  match: "text()='sin'"
+  replace:
+  - t: "⠻⠎"
    
 - 
-   name: cos
-   tag: mi
-   match: "text()='cos'"
-   replace:
-   - t: "⠻⠉"
+  name: cos
+  tag: mi
+  match: "text()='cos'"
+  replace:
+  - t: "⠻⠉"
    
 - 
-   name: tan
-   tag: mi
-   match: "text()='tan'"
-   replace:
-   - t: "⠻⠞"
+  name: tan
+  tag: mi
+  match: "text()='tan'"
+  replace:
+  - t: "⠻⠞"
    
 - 
-   name: cot
-   tag: mi
-   match: "text()='cot'"
-   replace:
-   - t: "⠻⠉⠞"
+  name: cot
+  tag: mi
+  match: "text()='cot'"
+  replace:
+  - t: "⠻⠉⠞"
    
 - 
-   name: arcsin
-   tag: mi
-   match: "text()='arcsin'"
-   replace:
-   - t: "⠁⠗⠉⠻⠎"
+  name: arcsin
+  tag: mi
+  match: "text()='arcsin'"
+  replace:
+  - t: "⠁⠗⠉⠻⠎"
    
 - 
-   name: arccos
-   tag: mi
-   match: "text()='arccos'"
-   replace:
-   - t: "⠁⠗⠉⠻⠉"
+  name: arccos
+  tag: mi
+  match: "text()='arccos'"
+  replace:
+  - t: "⠁⠗⠉⠻⠉"
    
 - 
-   name: arctan
-   tag: mi
-   match: "text()='arctan'"
-   replace:
-   - t: "⠁⠗⠉⠻⠞"
+  name: arctan
+  tag: mi
+  match: "text()='arctan'"
+  replace:
+  - t: "⠁⠗⠉⠻⠞"
    
 - 
-   name: arccot
-   tag: mi
-   match: "text()='arccot'"
-   replace:
-   - t: "⠁⠗⠉⠻⠉⠞"
+  name: arccot
+  tag: mi
+  match: "text()='arccot'"
+  replace:
+  - t: "⠁⠗⠉⠻⠉⠞"
 
 -
-   # FIX: need to deal with all caps
-   name: default
-   tag: [mi, mtext]
-   match: "."
-   replace:
-      - x: "BrailleChars(., 'Vietnam')"
+  # FIX: need to deal with all caps
+  name: default
+  tag: [mi, mtext]
+  match: "."
+  replace:
+  - test:
+      if: "IsInDefinition(., 'Units') or (string-length(.)=1 and @mathvariant='normal')"
+      then: [t: "W"]
+  - x: "BrailleChars(., 'Vietnam')"
       
 
 -
-   name: default
-   tag: mstyle
-   match: "."
-   replace:
-   - test:
+  name: default
+  tag: mstyle
+  match: "."
+  replace:
+  - test:
       if: "*"
       then: [x: "*"]
       # else do nothing -- no content
 
 
 -
-   name: angle   # angles need a shape indicator -- not sure this is the best test (three letters in base, have invisible separators)
-   tag: mover
-   match: "*[2][text()='^'] and *[1][
-              self::m:mrow and count(*)=5 and
-              *[1][self::m:mi] and *[2][text()='\u2063'] and *[3][self::m:mi] and *[4][text()='\u2063'] and *[5][self::m:mi]
-            ]"
-   replace:
-   - t: "⠫⠛"     # shape indicator, g
-   - x: "*[1]"
+  name: angle   # angles need a shape indicator -- not sure this is the best test (three letters in base, have invisible separators)
+  tag: mover
+  match: "*[2][text()='^'] and *[1][
+            self::m:mrow and count(*)=5 and
+            *[1][self::m:mi] and *[2][text()='\u2063'] and *[3][self::m:mi] and *[4][text()='\u2063'] and *[5][self::m:mi]
+          ]"
+  replace:
+  - t: "⠫⠛"     # shape indicator, g
+  - x: "*[1]"
 
 -
    name: single-char-exceptions    # GTM 12
