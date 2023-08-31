@@ -1862,7 +1862,7 @@ impl SpeechRules {
         let mut error = pref_manager.borrow().get_error().to_string();
 
         if pref_manager.borrow().get_error().is_empty() {
-            let read_files = read_definitions_file(pref_manager.borrow().get_definitions_file());
+            let read_files = read_definitions_file(pref_manager.borrow_mut().get_definitions_file());
             match read_files {
                 Ok(_) => {
                     // debug!("SpeechRules new for {}, tts {}", name, pref_manager.borrow().pref_to_string("TTS"));
@@ -1984,7 +1984,7 @@ impl SpeechRules {
                 rules.borrow_mut().rules.clear();
             });
         }
-        PreferenceManager::get().borrow_mut().invalidate(changes);
+        PreferenceManager::get().borrow_mut().invalidate(&changes);
     }
 
     pub fn update() -> Result<()> {

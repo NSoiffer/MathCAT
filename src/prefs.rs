@@ -284,6 +284,10 @@ impl FileAndTime {
     }
 }
 
+pub fn is_valid(locations: &Locations) -> bool {
+    return locations[0].is_some();
+}
+
 thread_local!{
     static DEFAULT_USER_PREFERENCES: Preferences = Preferences::user_defaults();
     static DEFAULT_API_PREFERENCES: Preferences = Preferences::api_defaults();
@@ -673,13 +677,13 @@ impl PreferenceManager {
         let new_style = self.user_prefs.prefs.get("SpeechStyle").unwrap().as_str().unwrap().to_string();
         let new_braille = self.user_prefs.prefs.get("BrailleCode").unwrap().as_str().unwrap().to_string();
         if old_language != new_language {
-            self.invalidate(FilesChanged::new("Language").unwrap());
+            self.invalidate(&FilesChanged::new("Language").unwrap());
         }
         if old_style != new_style {
-            self.invalidate(FilesChanged::new("SpeechStyle").unwrap());
+            self.invalidate(&FilesChanged::new("SpeechStyle").unwrap());
         }
         if old_braille != new_braille {
-            self.invalidate(FilesChanged::new("BrailleCode").unwrap());
+            self.invalidate(&FilesChanged::new("BrailleCode").unwrap());
         }
         return Ok( () )
     }
@@ -707,7 +711,7 @@ impl PreferenceManager {
         }
     }
 
-    pub fn invalidate(&mut self, files_changed: FilesChanged) {
+    pub fn invalidate(&mut self, files_changed: &FilesChanged) {
         if files_changed.speech_rules {
             self.speech.invalidate();
         }
@@ -782,11 +786,23 @@ impl PreferenceManager {
     }
 
     /// Return the definitions.yaml file locations.
-    pub fn get_definitions_file(&self) -> &Locations {
+    pub fn get_definitions_file(&mut self) -> &Locations {
         if !self.error.is_empty() {
             panic!("Internal error: get_definitions_file called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
+        if !is_valid(&self.defs.files) {
+            let language = self.pref_to_string("Language");
+            let language = if language.as_str() == "Auto" {"en"} else {language.as_str()};       // avoid 'temp value dropped while borrowed' error
+            if let Some(speech_rules_dir) = &self.rules_dir {  // if 'None', then initialization and it doesn't matter.
+                let mut speech_rules_dir = speech_rules_dir.clone();
+                speech_rules_dir.push("Languages");
+    
+                // by this point, prefs and files should have been set already so the call to get_files() in set_file_and_time() shouldn't fail (hence unwrap)
+                PreferenceManager::set_file_and_time(
+                    &speech_rules_dir, language, Some("en"), "definitions.yaml", &mut self.defs).unwrap();
+            }
+        }
         return &self.defs.files;
     }
 
@@ -927,7 +943,7 @@ mod tests {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
-            pref_manager.invalidate(FilesChanged::new("Language").unwrap());
+            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
             pref_manager.initialize(PathBuf::new()).unwrap();
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
         });
@@ -941,7 +957,7 @@ mod tests {
             pref_manager.set_user_prefs("Language", "en");
             pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
             pref_manager.set_user_prefs("Language", "zz");
-            pref_manager.invalidate(FilesChanged::new("Language").unwrap());
+            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
             pref_manager.initialize(PathBuf::new()).unwrap();
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
         });
@@ -954,7 +970,7 @@ mod tests {
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
             pref_manager.set_user_prefs("Language", "zz-aa");
-            pref_manager.invalidate(FilesChanged::new("Language").unwrap());
+            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
             pref_manager.initialize(PathBuf::new()).unwrap();
 
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
@@ -969,7 +985,7 @@ mod tests {
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
             pref_manager.set_user_prefs("Language", "zz-ab");
-            pref_manager.invalidate(FilesChanged::new("Language").unwrap());
+            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
             pref_manager.initialize(PathBuf::new()).unwrap();
 
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.speech.files[0]), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
@@ -996,7 +1012,7 @@ mod tests {
             files_changed.braille_rules = true;
             files_changed.braille_unicode_short = true;
             files_changed.braille_unicode_full = true;
-            pref_manager.invalidate(files_changed);
+            pref_manager.invalidate(&files_changed);
             pref_manager.initialize(PathBuf::new()).unwrap();
             
             assert_helper(count_files(&pref_manager.speech), 2, "ClearSpeak_Rules.yaml");
@@ -1007,7 +1023,7 @@ mod tests {
             assert_helper(count_files(&pref_manager.defs), 3,"definitions.yaml");
     
             pref_manager.set_user_prefs("Language", "zz-ab");
-            pref_manager.invalidate(FilesChanged::new("Language").unwrap());
+            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
             pref_manager.initialize(PathBuf::new()).unwrap();
 
             assert_helper(count_files(&pref_manager.speech), 1, "ClearSpeak_Rules.yaml");
@@ -1025,7 +1041,7 @@ mod tests {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("Language", "zz-aa");
-            pref_manager.invalidate(FilesChanged::new("Language").unwrap());
+            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
             pref_manager.initialize(PathBuf::new()).unwrap();
 
             let mut iter = pref_manager.defs.files.iter();
@@ -1051,7 +1067,7 @@ mod tests {
             files_changed.braille_rules = true;
             files_changed.braille_unicode_short = true;
             files_changed.braille_unicode_full = true;
-            pref_manager.invalidate(files_changed);
+            pref_manager.invalidate(&files_changed);
             pref_manager.initialize(PathBuf::new()).unwrap();
 
             assert_eq!(pref_manager.pref_to_string("Language").as_str(), "en");
@@ -1070,7 +1086,7 @@ mod tests {
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("Language", "en");
             pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
-            pref_manager.invalidate(FilesChanged::new("Language").unwrap());
+            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
             pref_manager.initialize(PathBuf::new()).unwrap();
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
         });
@@ -1091,13 +1107,13 @@ mod tests {
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("Language", "en");
             pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
-            pref_manager.invalidate(FilesChanged::new("Language").unwrap());
+            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
             pref_manager.initialize(PathBuf::new()).unwrap();
 
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
 
             pref_manager.set_user_prefs("SpeechStyle", "SimpleSpeak");
-            pref_manager.invalidate(FilesChanged::new("SpeechStyle").unwrap());
+            pref_manager.invalidate(&FilesChanged::new("SpeechStyle").unwrap());
             pref_manager.initialize(PathBuf::new()).unwrap();
             
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Speech)[0]), PathBuf::from("Languages/en/SimpleSpeak_Rules.yaml"));
@@ -1114,7 +1130,7 @@ mod tests {
             assert_eq!(&pref_manager.pref_to_string("Verbosity"), "Terse");
 
             pref_manager.set_user_prefs("BrailleCode", "UEB");
-            pref_manager.invalidate(FilesChanged::new("BrailleCode").unwrap());
+            pref_manager.invalidate(&FilesChanged::new("BrailleCode").unwrap());
             pref_manager.initialize(PathBuf::new()).unwrap();            
             assert_eq!(rel_path(&pref_manager.rules_dir, &pref_manager.get_rule_file(&RulesFor::Braille)[0]), PathBuf::from("Braille/UEB/UEB_Rules.yaml"));
         });
@@ -1130,7 +1146,7 @@ mod tests {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
             pref_manager.set_user_prefs("Language", "zz-aa");   // move to a directory where making a time change doesn't really matter
-            pref_manager.invalidate(FilesChanged::new("Language").unwrap());
+            pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
             pref_manager.initialize(PathBuf::new()).unwrap();
 
             // First test to make sure the up_to_date check works -- need to do in this test since the order of testing is random
