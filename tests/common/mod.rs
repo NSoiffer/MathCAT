@@ -108,6 +108,13 @@ pub fn test_ClearSpeak_prefs(language: &str, prefs: Vec<(&str, &str)>, mathml: &
 pub fn test_braille(code: &str, mathml: &str, braille: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
     set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
+    // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically
+    log::debug!("\nsetting Language");
+    match code {
+        "Vietnam" => set_preference("Language".to_string(), "vi".to_string()).unwrap(),
+        "CMU" => set_preference("Language".to_string(), "es".to_string()).unwrap(),
+        "UEB" | "Nemeth" | _ => set_preference("Language".to_string(), "en".to_string()).unwrap(),
+    }
     if let Err(e) = set_mathml(mathml.to_string()) {
         panic!("{}", errors_to_string(&e));
     };
