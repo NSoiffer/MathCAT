@@ -5,7 +5,7 @@
 #   name: [ "...", "..." "..." ],
 
   Units: [
-    "cm", "km", "hm", "dam", "dm", "mm", "tấn", "tạ", "yến", "kg", "lít", "ml", "ft", "in"
+    "cm", "km", "hm", "dam", "dm", "mm", "tấn", "tạ", "yến", "kg", "hg", "dag", "lít", "ml", "ft", "in"
   ],
 
 # ----------------  Cardinal and Ordinal Numbers  --------------------------
