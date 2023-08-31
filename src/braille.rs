@@ -784,12 +784,13 @@ fn capitals_to_word_mode(braille: &str) -> String {
             } else if is_word_mode {
                 i += 1;         // skip the 'C'
             }
-            if chars[next_non_cap+1] == 'G' {
+            if chars[next_non_cap] == 'G' {
                 // Greek letters are a bit exceptional in that the pattern is "CGLx" -- bump 'i'
                 next_non_cap += 1;
             }
-            if chars[next_non_cap+1] != 'L' {
-                error!("capitals_to_word_mode: internal error: didn't find L after C.");
+            if chars[next_non_cap] != 'L' {
+                error!("capitals_to_word_mode: internal error: didn't find L after C in '{}'.",
+                       chars[i..next_non_cap+2].iter().collect::<String>().as_str());
             }
             let i_braille_char = next_non_cap + 2;
             result.push_str(String::from_iter(&chars[i..i_braille_char]).as_str());
@@ -858,8 +859,7 @@ fn find_next_char(chars: &[char], target: char) -> Option<usize> {
             // skip the next char to get to the real start, and then look for the target
             // stop when L/N signals past potential target or we hit some non L/N char (actual braille)
             // debug!("   after L/N '{}'", chars[i_end+2..].iter().collect::<String>());
-            for i in i_end+2..chars.len() {
-                let ch = chars[i];
+            for (i, &ch) in chars.iter().enumerate().skip(i_end+2) {
                 if ch == 'L' || ch == 'N' || !LETTER_PREFIXES.contains(&ch) {
                     return None;
                 } else if ch == target {
@@ -1624,15 +1624,27 @@ impl BrailleChars {
     }
 
     fn get_braille_vietnam_chars(node: Element, text_range: Option<Range<usize>>) -> Result<String> {
-        // this is basically the same as for ueb, but we deal with switching '.' and ',' if in English style for numbers
+        // this is basically the same as for ueb except:
+        // 1. we deal with switching '.' and ',' if in English style for numbers
+        // 2. if it is identified as a Roman Numeral, we make all but the first char lower case because they shouldn't get a cap indicator
         if name(&node) == "mn" {
-            // switch_if_english_style_number modifies the text of 
+            // text of element is modified by these if needed
+            lower_case_roman_numerals(node);
             switch_if_english_style_number(node);
         }
         return BrailleChars::get_braille_ueb_chars(node, text_range);
 
-        fn switch_if_english_style_number(node: Element) {
-            let text = as_text(node);
+        fn lower_case_roman_numerals(mn_node: Element) {
+            if mn_node.attribute("data-roman-numeral").is_some() {
+                // if a roman numeral, all ASCII so we can optimize
+                let text = as_text(mn_node);
+                let mut new_text = String::from(&text[..1]);
+                new_text.push_str(text[1..].to_ascii_lowercase().as_str());    // works for single char too
+                mn_node.set_text(&new_text);
+            }
+        }
+        fn switch_if_english_style_number(mn_node: Element) {
+            let text = as_text(mn_node);
             let dot = text.find('.');
             let comma = text.find(',');
             match (dot, comma) {
@@ -1641,19 +1653,21 @@ impl BrailleChars {
                     if comma < dot {
                         // switch dot/comma -- using "\x01" as a temp when switching the the two chars
                         let switched = text.replace('.', "\x01").replace(',', ".").replace('\x01', ",");
-                        node.set_text(&switched);
+                        mn_node.set_text(&switched);
                     }
                 },
                 (Some(dot), None) => {
-                    // is '.' really a digit block separator? Check for more than one or three digits after a single "."
-                    if text[dot+1..].find('.').is_none() || text[dot+1..].len()==3 {
-                        node.set_text(&text.replace('.', ","));
+                    // If it starts with a '.', a leading 0, or if there is only one '.' and not three chars after it
+                    if dot==0 ||
+                       (dot==1 && text.starts_with('0')) ||
+                       (text[dot+1..].find('.').is_none() && text[dot+1..].len()!=3) {
+                        mn_node.set_text(&text.replace('.', ","));
                     }
                 },
                 (None, Some(comma)) => {
                     // if there is more than one ",", than it can't be a decimal separator
                     if text[comma+1..].find(',').is_some() {
-                        node.set_text(&text.replace(',', "."));
+                        mn_node.set_text(&text.replace(',', "."));
                     }
                 },
             }
