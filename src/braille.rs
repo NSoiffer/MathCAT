@@ -650,8 +650,8 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
         fn is_forced_grade1(chars: &[char], i: usize) -> bool {
             // A '1' is forced if 'a-j' follows a digit
             assert_eq!(chars[i], '1', "'is_forced_grade1' didn't start with '1'");
-            // check that a-j follows the '1'
-            if i+1 < chars.len() && LETTER_NUMBERS.contains(&unhighlight(chars[i+1])) {
+            // check that a-j follows the '1' -- we have '1Lx' where 'x' is the letter to check
+            if i+2 < chars.len() && LETTER_NUMBERS.contains(&unhighlight(chars[i+2])) {
                 // check for a number before the '1'
                 // this will be 'N' followed by LETTER_NUMBERS or the number ".", ",", or " "
                 for j in (0..i).rev() {
