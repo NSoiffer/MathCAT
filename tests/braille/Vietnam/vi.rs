@@ -5,7 +5,6 @@ use crate::common::*;
 
 #[test]
 fn subset_1a() {
-    init_logger();
     let expr = "<math><mrow><mi>A</mi><mo>=</mo><mfenced close='}' open='{'><mrow><mn>1</mn><mo>;</mo><mn>2</mn><mo>;</mo><mn>3</mn><mo>;</mo><mn>4</mn><mo>;</mo><mn>5</mn><mo>;</mo><mi>...</mi><mo>;</mo><mn>100</mn></mrow></mfenced></mrow></math>";
     test_braille("Vietnam", expr, "⠨⠁⠐⠶⠸⠣⠼⠁⠆⠼⠃⠆⠼⠉⠆⠼⠙⠆⠼⠑⠆⠄⠄⠄⠆⠼⠁⠚⠚⠸⠜");
 }
@@ -483,32 +482,32 @@ fn number_7c () {
 
 #[test]
 fn meter_1 () {
-    let expr = "<math><mrow><mn>5,72</mn><mi>m</mi><mo ame-texclass='ord' stretchy='false'>/</mo><mn>10</mn><mo ame-texclass='rel' stretchy='false'>=</mo><mn>57,2</mn><mi>cm</mi></mrow></math>";
-    test_braille("Vietnam", expr, "⠼⠑⠂⠛⠃ ⠍⠐⠌⠼⠁⠚⠐⠶⠼⠑⠛⠂⠃ ⠉⠍");
+    let expr = "<math><mrow><mn>5,72</mn><mi mathvariant='normal'>m</mi><mo ame-texclass='ord' stretchy='false'>/</mo><mn>10</mn><mo ame-texclass='rel' stretchy='false'>=</mo><mn>57,2</mn><mi>cm</mi></mrow></math>";
+    test_braille("Vietnam", expr, "⠼⠑⠂⠛⠃⠀⠍⠐⠌⠼⠁⠚⠐⠶⠼⠑⠛⠂⠃⠀⠉⠍");
 }
 
 #[test]
 fn meter_2 () {
-    let expr = "<math><mrow><mn>1</mn><mi>km</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10</mn><mi>hm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100</mn><mi>dam</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000</mn><mi>m</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10.000</mn><mi>dm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100.000</mn><mi>cm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000.000</mn><mi>mm</mi></mrow></math>";
-    test_braille("Vietnam", expr, "⠼⠁ ⠅⠍⠐⠶⠼⠁⠚ ⠓⠍⠐⠶⠼⠁⠚⠚ ⠙⠁⠍⠐⠶⠼⠁⠄⠚⠚⠚ ⠍⠐⠶⠼⠁⠚⠄⠚⠚⠚ ⠙⠍⠐⠶⠼⠁⠚⠚⠄⠚⠚⠚ ⠉⠍⠐⠶⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚ ⠍⠍");
+    let expr = "<math><mrow><mn>1</mn><mi>km</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10</mn><mi>hm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100</mn><mi>dam</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000</mn><mi mathvariant='normal'>m</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10.000</mn><mi>dm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100.000</mn><mi>cm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000.000</mn><mi>mm</mi></mrow></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠀⠅⠍⠐⠶⠼⠁⠚⠀⠓⠍⠐⠶⠼⠁⠚⠚⠀⠙⠁⠍⠐⠶⠼⠁⠄⠚⠚⠚⠀⠍⠐⠶⠼⠁⠚⠄⠚⠚⠚⠀⠙⠍⠐⠶⠼⠁⠚⠚⠄⠚⠚⠚⠀⠉⠍⠐⠶⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚⠀⠍⠍");
 }
 
 #[test]
 fn gram_1 () {
-    let expr = "<math><mrow><mn>1</mn><mi>t&#x1EA5;n</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10</mn><mi>t&#x1EA1;</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100</mn><mi>y&#x1EBF;n</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000</mn><mi>kg</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10.000</mn><mi>hg</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100.000</mn><mi>dag</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000.000</mn><mi>g</mi></mrow></math>";
-    test_braille("Vietnam", expr, "⠼⠁ ⠞⠔⠡⠝⠐⠶⠼⠁⠚ ⠞⠠⠁⠐⠶⠼⠁⠚⠚ ⠽⠔⠣⠝⠐⠶⠼⠁⠄⠚⠚⠚ ⠅⠛⠐⠶⠼⠁⠚⠄⠚⠚⠚ ⠓⠛⠐⠶⠼⠁⠚⠚⠄⠚⠚⠚ ⠙⠁⠛⠐⠶⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚ ⠛");
+    let expr = "<math><mrow><mn>1</mn><mi>t&#x1EA5;n</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10</mn><mi>t&#x1EA1;</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100</mn><mi>y&#x1EBF;n</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000</mn><mi>kg</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10.000</mn><mi>hg</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100.000</mn><mi>dag</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000.000</mn><mi mathvariant='normal'>g</mi></mrow></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠀⠞⠔⠡⠝⠐⠶⠼⠁⠚⠀⠞⠠⠁⠐⠶⠼⠁⠚⠚⠀⠽⠔⠣⠝⠐⠶⠼⠁⠄⠚⠚⠚⠀⠅⠛⠐⠶⠼⠁⠚⠄⠚⠚⠚⠀⠓⠛⠐⠶⠼⠁⠚⠚⠄⠚⠚⠚⠀⠙⠁⠛⠐⠶⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚⠀⠛");
 }
 
 #[test]
 fn liquid_1 () {
-    let expr = "<math><mrow><mn>1</mn><mi>l>&#xED;t</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1</mn><mi>l</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000</mn><mi>ml</mi></mrow></math>";
-    test_braille("Vietnam", expr, "⠼⠁ ⠇⠔⠊⠞⠐⠶⠼⠁ ⠇⠐⠶⠼⠁⠄⠚⠚⠚ ⠍⠇");
+    let expr = "<math><mrow><mn>1</mn><mi>l&#xED;t</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1</mn><mi mathvariant='normal'>l</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000</mn><mi>ml</mi></mrow></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠀⠇⠔⠊⠞⠐⠶⠼⠁⠀⠇⠐⠶⠼⠁⠄⠚⠚⠚⠀⠍⠇");
 }
 
 #[test]
 fn feet_1 () {
     let expr = "<math><mrow><mn>1</mn><mi>ft</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mn>3</mn><mi>in</mi></mrow></math>";
-    test_braille("Vietnam", expr, "⠼⠁ ⠋⠞⠐⠖⠼⠉ ⠊⠝");
+    test_braille("Vietnam", expr, "⠼⠁⠀⠋⠞⠐⠖⠼⠉⠀⠊⠝");
 }
 
 #[test]
@@ -532,6 +531,7 @@ fn vi_letters () {
 // Cap Roman numbers are marked with dots 46for both single letter and word.
 #[test]
 fn mhchem_roman_in_superscript () {
+    init_logger();
     let expr = "<math>
       <mrow>
         <mmultiscripts>
@@ -543,7 +543,7 @@ fn mhchem_roman_in_superscript () {
         <mmultiscripts>
           <mi>Fe</mi>
           <none></none>
-          <mi data-number='3'>III</mi>
+          <mi>III</mi>
         </mmultiscripts>
         <mo>&#x2063;</mo>
         <mmultiscripts>
