@@ -1135,7 +1135,7 @@
   tag: "*"
   match:
   - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
-  - "(self::m:math or EdgeNode(., 'right', 'math')/@id!=@id)" # at edge of math
+  - "(self::m:math or name(EdgeNode(., 'right', 'math'))='math')" # at edge of math
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
@@ -1153,10 +1153,10 @@
 
 - name: move-next-auto-zoom-up-one-level
   # Last child or in auto-zoom'd in-- move up a level and try again 
+  # Note: we've already checked the for the case where we are at an edge and should not AutoZoomOut
   tag: "*"
   match:
   - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
-  - "$AutoZoomOut and"
   - "( not(following-sibling::*) or"
   - "  ( $NavMode='Enhanced' and "
   - "    count(following-sibling::*)=1 and (IsBracketed(.., '(', ')') or IsBracketed(.., '[', ']'))"
@@ -1294,10 +1294,10 @@
       else:
       - with:
           variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]
-          replace: [x: "DEBUG(..)"]
+          replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNextZoom'"]
-          replace: [x: "DEBUG(following-sibling::*[1])"]
+          replace: [x: "following-sibling::*[1]"]
 
 - name: move-next-default
   tag: "*"
@@ -1371,18 +1371,17 @@
   tag: "*"
   match:
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
-  - "(self::m:math or EdgeNode(., 'left', 'math')/@id!=@id)"
+  - "(self::m:math or name(EdgeNode(., 'left', 'math'))='math')"
   replace:
   - t: "start of math"
   - pause: long
   - set_variables: [SpeakExpression: "'false'"]
 
 - name: move-previous-at-end
-
   tag: "*"
   match:
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
-  - "EdgeNode(., 'left', 'math')/@id!=@id" # at edge of math
+  - "name(EdgeNode(., 'left', 'math'))='math'" # at edge of math
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
@@ -1393,10 +1392,10 @@
 
 - name: move-previous-auto-zoom-up-one-level
   # Last child or in auto-zoom'd in-- move up a level and try again 
+  # Note: we've already checked the for the case where we are at an edge and should not AutoZoomOut
   tag: "*"
   match:
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
-  - "$AutoZoomOut and"
   - "( not(preceding-sibling::*) or"
   - "  ( $NavMode='Enhanced' and "
   - "    count(preceding-sibling::*)=1 and (IsBracketed(.., '(', ')') or IsBracketed(.., '[', ']'))"
@@ -1435,12 +1434,16 @@
           - x: ".."
 
 - name: move-previous-auto-zoom-parens
-  # auto-zoom into next child if next child is parenthesized expr
+  # auto-zoom into previous child if previous child is parenthesized expr
+  # Note: there is an asymmetry here from MoveNext because the base of a scripted might have parens for grouping, but not true for the script
   tag: "*"
   match:
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
   - "$NavMode='Enhanced' and"
-  - "parent::m:mrow and preceding-sibling::* and"
+  - "preceding-sibling::* and"
+  - "(parent::m:mrow or parent::m:msub or parent::m:msup or"
+  - " (count(preceding-sibling::*)=1 and (parent::m:msubsup or parent::m:mmultiscripts))"  # make sure moving into base
+  - ") and"
   - "preceding-sibling::*[1][self::m:mrow and count(*)=3 and " #exclude empty parens
   - "       (IsBracketed(., '(', ')') or IsBracketed(., '[', ']'))"
   - "   ]"
@@ -1456,6 +1459,12 @@
           else: [t: "describe"]
       - t: "left"
       - pause: short
+  - test:
+      if: "not(parent::m:mrow)"
+      then:
+      - with:
+          variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]
+          replace: [x: ".."]
   - set_variables: [NavNode: "preceding-sibling::*[1]/*[2]/@id"]
 
 # normal cases for MovePrevious
