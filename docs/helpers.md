@@ -434,10 +434,9 @@ MathCAT adds some custom functions to make writing rules easier:
 
 | function | meaning |
 | ----- | ---- |
-| `IsNode(nodes, type)   | Returns true if all of the nodes are of the same type. Type can be one of:<br/>  "simple" -- a defined set of elements in ClearSpeak <br/> "leaf" -- one of the MathML leaf elements <br/> "common_fraction" -- integer numerator and denominator<br/> "trig_name" -- sin, cos, tan, sinh, cosh, etc |
+| `IsNode(nodes, type)   | Returns true if all of the nodes are of the same type. Type can be one of:<br/>  "simple" -- a defined set of elements in ClearSpeak <br/> "leaf" -- one of the MathML leaf elements <br/> "2D" -- a 2D nodes such as `mfrac` or `mroot` <br/> "modified" -- the node has a script or something over/under it <br/> "scripts" -- the node as a subscript and/or superscript<br/> "common_fraction" -- integer numerator and denominator |
 | ToOrdinal |  |
 | ToCommonFraction | |
-| IsLargeOp(nodes) | Returns true if all of the nodes are large operators |
 | IsBracketed(openChar, closeChar, requiresComma) | |
 | BaseNode(node) | Returns the base (recursively) of a scripted node |
 | IsInDefinition(node, name) | Returns true if node is a member of the list 'name' (defined in definitions.yaml) |
