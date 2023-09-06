@@ -594,7 +594,9 @@
 -
   name: mtable-matrix-property
   tag: mtable
-  match: "contains(@data-intent-property, ':matrix:')"
+  match:
+  - "contains(@data-intent-property, ':matrix:') or"
+  - "..[self::m:mrow and (IsBracketed(., '(', ')') or IsBracketed(., '[', ']'))]"
   replace:
   - intent:
       name: "matrix"
@@ -604,7 +606,7 @@
 -
   name: mtable-determinant-property
   tag: mtable
-  match: "contains(@data-intent-property, ':determinant:')"
+  match: "contains(@data-intent-property, ':determinant:') or ..[self::m:mrow and IsBracketed(., '|', '|')]"
   replace:
   - intent:
       name: "determinant"
@@ -614,7 +616,9 @@
 -
   name: mtable-cases-property
   tag: mtable
-  match: "contains(@data-intent-property, ':cases:')"
+  match:
+  - "contains(@data-intent-property, ':cases:') or"
+  - "..[self::m:mrow and count(*)=2 and *[1][text()='{']]"
   replace:
   - intent:
       name: "cases"
