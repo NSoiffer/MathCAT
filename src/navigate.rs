@@ -1743,42 +1743,96 @@ mod tests {
     }
 
     #[test]
-    fn auto_zoom_out_msup() -> Result<()> {
+    fn matrix_speech() -> Result<()> {
         let mathml_str = "<math id='math'>
             <mrow id='mrow'>
-                <mrow id='sin-mrow'>
-                    <mi id='sin'>sin</mi>
-                    <mo id='function-apply'>&#x2061;</mo>
-                    <msup id='sup'>
-                        <mrow id='parens'>
-                            <mo id='open'>(</mo>
-                            <mrow id='base'><mi id='a'>a</mi><mo id='plus'>+</mo><mn id='1'>1</mn></mrow>
-                            <mo id='close'>)</mo>
-                        </mrow>
-                        <mrow id='exp'><mn id='2'>2</mn><mo id='invisible-times'>&#x2062;</mo><mi id='b'>b</mi></mrow>
-                    </msup>
-                </mrow>
-                <mo id='minus'>-</mo>
-                <mn id='3'>3</mn>
+            <mo id='open'>[</mo>
+            <mtable columnspacing='1em' rowspacing='4pt' id='table'>
+                <mtr id='row-1'>
+                <mtd id='1-1'><mn id='id-6'>9</mn></mtd>
+                <mtd id='1-2'><mrow id='id-8'><mo id='id-9'>-</mo><mn id='id-10'>13</mn></mrow></mtd>
+                </mtr>
+                <mtr id='row-2'>
+                <mtd id='2-1'><mn id='id-13'>5</mn></mtd>
+                <mtd id='2-2'><mo id='id-16'>-</mo><mn id='id-17'>6</mn></mtd>
+                </mtr>
+            </mtable>
+            <mo id='close'>]</mo>
             </mrow>
         </math>";
         init_default_prefs(mathml_str, "Enhanced");
-        set_preference("AutoZoomOut".to_string(), "False".to_string())?;
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            test_command("ZoomIn", mathml, "sin-mrow");
-            test_command("ZoomIn", mathml, "sin");
-            test_command("MoveNext", mathml, "sup");
-            test_command("ZoomIn", mathml, "base");
-            test_command("MoveNext", mathml, "exp");
-            test_command("MoveNext", mathml, "exp");
-            test_command("ZoomIn", mathml, "2");
-            test_command("MoveNext", mathml, "b");
-            test_command("MoveNext", mathml, "b");
-            test_command("ZoomOut", mathml, "exp");
-            test_command("MovePrevious", mathml, "base");
-            test_command("MovePrevious", mathml, "base");
+            test_command("ZoomIn", mathml, "open");
+            let speech = test_command("MoveNext", mathml, "table");
+            // tables need to check their parent for proper speech
+            assert_eq!(speech, "move right, the 2 by 2 matrix; row 1; 9, negative 13; row 2; 5, negative 6;");
+            let speech = test_command("ZoomIn", mathml, "id-6");
+            assert_eq!(speech, "zoom in; 9");
+            return Ok( () );
+        });
+    }
+
+    #[test]
+    fn determinant_speech() -> Result<()> {
+        let mathml_str = "<math id='math'>
+            <mrow id='mrow'>
+            <mo id='open'>|</mo>
+            <mtable columnspacing='1em' rowspacing='4pt' id='table'>
+                <mtr id='row-1'>
+                <mtd id='1-1'><mn id='id-6'>9</mn></mtd>
+                <mtd id='1-2'><mrow id='id-8'><mo id='id-9'>-</mo><mn id='id-10'>13</mn></mrow></mtd>
+                </mtr>
+                <mtr id='row-2'>
+                <mtd id='2-1'><mn id='id-13'>5</mn></mtd>
+                <mtd id='2-2'><mo id='id-16'>-</mo><mn id='id-17'>6</mn></mtd>
+                </mtr>
+            </mtable>
+            <mo id='close'>|</mo>
+            </mrow>
+        </math>";
+        init_default_prefs(mathml_str, "Enhanced");
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomIn", mathml, "open");
+            let speech = test_command("MoveNext", mathml, "table");
+            // tables need to check their parent for proper speech
+            assert_eq!(speech, "move right, the 2 by 2 determinant; row 1; 9, negative 13; row 2; 5, negative 6;");
+            let speech = test_command("ZoomIn", mathml, "id-6");
+            assert_eq!(speech, "zoom in; 9");
+            return Ok( () );
+        });
+    }
+
+    #[test]
+    fn cases_speech() -> Result<()> {
+        let mathml_str = " <math id='id-0'>
+        <mrow id='id-1'>
+          <mo id='open'>{</mo>
+          <mtable columnalign='left left' columnspacing='1em' displaystyle='false' rowspacing='.2em' id='table'>
+            <mtr id='id-4'>
+              <mtd id='id-5'><mrow id='id-6'><mrow id='id-7'><mo id='id-8'>-</mo><mi id='id-9'>x</mi></mrow><mo id='id-10'>,</mo></mrow></mtd>
+              <mtd id='id-11'><mrow id='id-12'><mrow id='id-13'><mtext id='id-14'>if</mtext><mo id='id-15'>&#x2062;</mo><mi id='id-16'>x</mi></mrow><mo id='id-17'>&lt;</mo><mn id='id-18'>0</mn></mrow></mtd>
+            </mtr>
+            <mtr id='id-19'>
+              <mtd id='id-20'><mrow id='id-21'><mrow id='id-22'><mo id='id-23'>+</mo><mi id='id-24'>x</mi></mrow><mo id='id-25'>,</mo></mrow></mtd>
+              <mtd id='id-26'><mrow id='id-27'><mrow id='id-28'><mtext id='id-29'>if</mtext><mo id='id-30'>&#x2062;</mo><mi id='id-31'>x</mi></mrow><mo id='id-32'>≥</mo><mn id='id-33'>0</mn></mrow></mtd>
+            </mtr>
+          </mtable>
+        </mrow>
+       </math>";
+        init_default_prefs(mathml_str, "Enhanced");
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomIn", mathml, "open");
+            let speech = test_command("MoveNext", mathml, "table");
+            // tables need to check their parent for proper speech
+            assert_eq!(speech, "move right, 2 cases, case 1; negative x comma, if x is less than 0; case 2; positive x comma, if x, is greater than or equal to 0;");
+            let speech = test_command("ZoomIn", mathml, "id-6");
+            assert_eq!(speech, "zoom in; negative x comma");
             return Ok( () );
         });
     }
