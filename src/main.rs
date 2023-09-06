@@ -170,8 +170,18 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr=r#"
-  <math><mrow><msubsup><mi mathvariant='normal' ame-texclass='op'>log</mi><mn>3</mn><mn>2</mn></msubsup><mo>&#x2061;</mo><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mn>2</mn><msub><mi mathvariant='normal' ame-texclass='op'>log</mi><mn>2</mn></msub><mo>&#x2061;</mo><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mn>3</mn><mo ame-texclass='rel' stretchy='false'>=</mo><mn>0</mn></mrow></math>
-  "#;
+  <math>
+	<mo>|</mo>
+	<mo>|</mo>
+	<mn>-3</mn>
+	<mo>|</mo>
+	<mo>+</mo>
+	<mo>|</mo>
+	<mn>2</mn>
+	<mo>|</mo>
+	<mo>|</mo>
+</math>
+"#;
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>
@@ -216,7 +226,7 @@ fn main() {
   }
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
-  set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
+  set_preference("BrailleCode".to_string(), "CMU".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),

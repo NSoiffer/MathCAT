@@ -274,7 +274,7 @@
 -
    name: single-char-exceptions    # GTM 12
    tag: [mover, munder]
-   match: "*[2][string-length(.) = 1 and ( translate(., '_¯→.˙~^','')='' or (self::m:mover and text()='⌒') )]"
+   match: "*[2][string-length(.) = 1 and ( translate(., '_¯→.˙~^','')='' or (parent::m:mover and text()='⌒') )]"
    replace: 
    - test:
       # omit grouping indicators in the following cases

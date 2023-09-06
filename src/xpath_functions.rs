@@ -260,19 +260,6 @@ impl IsNode {
             }
         }
     }
-    
-    // returns true if the text of 'e' is in definitions.trig_function_names
-    fn is_trig_name(e: Element) -> bool {
-        if e.name().local_part() != "mi" {
-            return false;
-        }
-
-        let mi_text = get_text_from_element(e);
-        return DEFINITIONS.with(|definitions| {
-            let definitions = definitions.borrow();
-            return definitions.get_hashset("TrigFunctionNames").unwrap().contains(&mi_text);
-        });
-    }
 
     // Returns true if 'frac' is a common fraction
     // In this case, the numerator and denominator can be no larger than 'num_limit' and 'denom_limit'
@@ -315,16 +302,6 @@ impl IsNode {
         }
     }
 
-    fn is_punctuation(node:  Element) -> bool {
-        lazy_static! {
-            // list of chars from rule VI (p41) [various dashes are from Unicode, not green book]
-            static ref PUNCTUATION: Regex = Regex::new(r"[':,–—―⸺⸻—…!\-.?‘’“”;']").unwrap();    // match one or more digits
-        }
-
-        let text = get_text_from_element(node);
-        return PUNCTUATION.is_match(&text);
-    }
-
     #[allow(non_snake_case)]
     pub fn is_2D(elem: &Element) -> bool {
         return MATHML_2D_NODES.contains(name(elem));
@@ -342,6 +319,16 @@ static MATHML_2D_NODES: phf::Set<&str> = phf_set! {
     "mfrac", "msqrt", "mroot", "menclose",
     "msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts",
     "mtable", "mtr", "mlabeledtr", "mtd",
+};
+
+// Should mstack and mlongdiv be included here?
+static MATHML_MODIFIED_NODES: phf::Set<&str> = phf_set! {
+    "msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts",
+};
+
+// Should mstack and mlongdiv be included here?
+static MATHML_SCRIPTED_NODES: phf::Set<&str> = phf_set! {
+    "msub", "msup", "msubsup", "mmultiscripts",
 };
 
 pub fn is_leaf(element: Element) -> bool {
@@ -363,7 +350,7 @@ impl Function for IsNode {
         // FIX: there is some conflict problem with xpath errors and error-chain
         //                .chain_err(|e| format!("Second arg to is_leaf is not a string: {}", e.to_string()))?;
         match kind.as_str() {
-            "simple" | "leaf" | "common_fraction" | "trig_name" | "2D" | "nemeth_punctuation" => (), 
+            "simple" | "leaf" | "common_fraction" | "2D" | "modified" | "scripted" => (), 
             _ => return Err( Error::Other(format!("Unknown argument value '{}' for IsNode",  kind.as_str())) ),
         };
 
@@ -380,9 +367,9 @@ impl Function for IsNode {
                                 "simple" => IsNode::is_simple(&e),
                                 "leaf"   => MATHML_LEAF_NODES.contains(name(&e)),
                                 "2D" => IsNode::is_2D(&e),
-                                "trig_name" => IsNode::is_trig_name(e),
+                                "modified" => MATHML_MODIFIED_NODES.contains(name(&e)),
+                                "scripted" => MATHML_SCRIPTED_NODES.contains(name(&e)),
                                 "common_fraction" => IsNode::is_common_fraction(e, usize::MAX, usize::MAX), 
-                                "nemeth_punctuation" => IsNode::is_punctuation(e),
                                 _        => true,       // can't happen due to check above
                             }    
                         } else {
@@ -654,38 +641,6 @@ impl Function for Max {
         let num1 = args.pop_number()?;
         let num2 = args.pop_number()?;
         return Ok( Value::Number( num1.max(num2) ) );
-    }
-}
-
-
-struct IsLargeOp;
-/**
- * Returns true if the node is a large op
- * @param(node)     -- node(s) to test -- should be an <mo>
- */
- impl Function for IsLargeOp {
-
-    fn evaluate<'d>(&self,
-                        _context: &context::Evaluation<'_, 'd>,
-                        args: Vec<Value<'d>>)
-                        -> Result<Value<'d>, Error>
-    {
-        let mut args = Args(args);
-        args.exactly(1)?;
-        let node = validate_one_node(args.pop_nodeset()?, "IsLargeOp")?;
-        if let Node::Element(e) = node {
-            if !is_tag(&e, "mo") {
-                return Ok( Value::Boolean(false) );
-            }
-            return DEFINITIONS.with(|definitions| {
-                let definitions = definitions.borrow();
-                let text = get_text_from_element(e);
-                return Ok( Value::Boolean(definitions.get_hashset("LargeOperators").unwrap().get(&text).is_some()) );
-            });
-        } else {
-            // xpath is something besides an element, so no match
-            return Ok( Value::Boolean(false) );
-        }
     }
 }
 
@@ -1081,7 +1036,6 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("IsNode", IsNode);
     context.set_function("ToOrdinal", ToOrdinal);
     context.set_function("ToCommonFraction", ToCommonFraction);
-    context.set_function("IsLargeOp", IsLargeOp);
     context.set_function("IsBracketed", IsBracketed);
     context.set_function("IsInDefinition", IsInDefinition);
     context.set_function("BaseNode", BaseNode);
