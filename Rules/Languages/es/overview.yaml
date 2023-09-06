@@ -1,4 +1,4 @@
-t---
+---
 # Provide an overview/outline/description of the math
 # MathPlayer just tried to shorten things like "mfrac" by just saying "fraction"
 #   For mrow, it say up to 5 operands and just say "and n more things" for the rest

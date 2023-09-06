@@ -40,6 +40,14 @@ fn number_space_before_and_after() {
     test_braille("UEB", expr, "⠀⠼⠃⠀");
 }
 
+#[test]
+fn forced_g1_symbol_mode() {
+    // A forced G1 should not count against starting in G2 mode
+    // This is issue #170 -- surprisingly not tested by other tests 
+    let expr = "<math><mo>∫</mo><mn>3</mn><msup><mi>x</mi><mn>2</mn></msup><mi>dx</mi></math>";
+    test_braille("UEB", expr, "⠰⠮⠼⠉⠭⠔⠼⠃⠰⠙⠭");
+}
+
 // extra tests targeted at contractions based on function names
 #[test]
 fn contractions_1() {
