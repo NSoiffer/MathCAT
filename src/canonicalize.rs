@@ -721,6 +721,9 @@ impl CanonicalizeContext {
 					let new_text = merge_prime_text(text);
 					mathml.set_text(&new_text);
 					return Some(mathml);
+				} else if text == "..." {
+					mathml.set_text("…");
+					return Some(mathml);
 				} else if let Some(result) = split_points(mathml) {
 					return Some(result);
 				} else {
@@ -1412,6 +1415,7 @@ impl CanonicalizeContext {
 		/// Return true if 'element' (which is syntactically a roman numeral) is only inside mrows and
 		///  if its length is < 3 chars, then there is another roman numeral near it (separated by an operator).
 		/// We want to rule out something like 'm' or 'cm' being a roman numeral.
+		/// Note: this function assumes 'mathml' is a Roman Numeral, and optimizes operations based on that.
 		/// Note: Nemeth has some rules about roman numerals (capitalization and punctuation after)
 		fn is_roman_numeral_number_context(mathml: Element) -> bool {
 			assert!(name(&mathml)=="mtext" || name(&mathml)=="mi");
@@ -1421,14 +1425,32 @@ impl CanonicalizeContext {
 				let current_name = name(&parent);
 				if current_name == "math" {
 					break;
+				} else if current_name == "msup" || current_name == "mmultiscripts" {
+					// could be a oxidation state in a Chemical formula
+					let children = parent.children();
+					// make sure that there is only one script and that 'mathml' is a superscript
+					if current_name == "mmultiscripts" && (children.len() > 3  || !mathml.following_siblings().is_empty()) {
+						return false;
+					}
+					let base = as_element(children[0]);
+					if is_chemical_element(base) {
+						break;
+					} else {
+						return false;
+					}
 				} else if current_name != "mrow" {
 					return false;
 				}
 			}
-			if as_text(mathml).len() > 2 {
+
+			let text = as_text(mathml).as_bytes();	// note: we know it is all ASCII chars
+			// if roman numeral is in superscript and we get here, then it had a chemical element base, so we accept it
+			// note: you never has a state = I; if two letters, it must be 'II'.
+			if text.len() > 2  || 
+			   ((name(&parent) =="msup" || name(&parent) == "mmultiscripts") && text.len()==2 && text==[b'I',b'I']) {
 				return true;
 			} else {
-				let is_upper_case = as_text(mathml).as_bytes()[0].is_ascii_uppercase();	// safe since we know it is a 
+				let is_upper_case = text[0].is_ascii_uppercase();	// safe since we know it is a roman numeral
 				let preceding = mathml.preceding_siblings();
 				if !preceding.is_empty() && is_roman_numeral_adjacent(preceding.iter().rev(), is_upper_case) {
 					return true;
@@ -1560,7 +1582,7 @@ impl CanonicalizeContext {
 		/// look for potential numbers by looking for sequences with commas, spaces, and decimal points
 		fn merge_number_blocks(parent_mrow: Element, children: &mut Vec<ChildOfElement>) {
 			lazy_static!{
-				static ref SEPARATORS: Regex = Regex::new(r"[],. \u{00A0}]").unwrap(); 
+				static ref SEPARATORS: Regex = Regex::new(r"[,. \u{00A0}]").unwrap(); 
 			}
 			// debug!("parent:\n{}", mml_to_string(&parent_mrow));
 			let mut i = 0;

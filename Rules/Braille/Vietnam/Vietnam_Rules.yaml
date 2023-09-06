@@ -49,8 +49,13 @@
    replace: 
    - T: "#"    # signal end of previous numeric mode
    - x: "*[1]"
-   - t: "N⠌"
-   - x: "*[2]"
+   - test:
+      if: "$Vietnam_UseDropNumbers"
+      then:
+      - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Vietnam')"   # drop numbers for the denominator
+      else:
+      - T: "N⠌"
+      - x: "*[2]"
 
 -
    name: simple-number
@@ -59,8 +64,13 @@
    replace: 
    - T: "#"    # signal end of any previous numeric mode (probably not needed, but...)
    - x: "*[1]"
-   - T: "N⠌"
-   - x: "*[2]"
+   - test:
+      if: "$Vietnam_UseDropNumbers"
+      then:
+      - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Vietnam')"   # drop numbers for the denominator
+      else:
+      - T: "N⠌"
+      - x: "*[2]"
 
 -
    name: default
@@ -95,7 +105,6 @@
      - x: "*[2]/*[2]/*[1]/*[1]"
      - x: "*[3]"
 
-
 #
 # Matrix/Determinant rules
 # matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
@@ -111,6 +120,14 @@
       - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
    replace: [x: "*[2]"]
 -
+   name: default-cases
+   tag: mrow
+   variables:
+      - RowStart: "*[1]"
+      - RowEnd: "''"
+   match: "*[2][self::m:mtable] and count(*)=2 and *[1][.='{' or .='[' or .='(']"
+   replace: [x: "*[2]"]
+-
    name: default-mtable
    tag: mtable
    match: "."
@@ -120,6 +137,9 @@
   tag: [mtr, mlabeledtr]
   match: "."
   replace:
+   - test:
+      if: "preceding-sibling::*"
+      then: [t: "⣍"]
    - test: 
       if: "count(parent::*) > 1"
       then: [t: "⠠"]
@@ -153,32 +173,32 @@
       # else nothing to braille
 
 -
-   name: no-content
-   tag: math
-   match: "not(*)"      # empty
-   replace: [t: "W"]    # not sure that is right, but this shouldn't happen
+  name: no-content
+  tag: math
+  match: "not(*)"      # empty
+  replace: [t: "W"]    # not sure that is right, but this shouldn't happen
 
 -
-   name: default
-   tag: math
-   match: "."
-   variables:
-      - RowStart: "''"           # empty string -- it needs to be set
-      - RowEnd: "''"             # empty string -- it needs to be set
-      - NewScriptContext: "''"    # empty string -- it needs to be set
-   replace: [x: "*"]
+  name: default
+  tag: math
+  match: "."
+  variables:
+    - RowStart: "''"           # empty string -- it needs to be set
+    - RowEnd: "''"             # empty string -- it needs to be set
+    - NewScriptContext: "''"    # empty string -- it needs to be set
+  replace: [x: "*"]
 
 -
-    name: empty-mrow
-    tag: mrow
-    match: "not(*)"
-    replace: [t: "W"] # not sure what is correct -- if in a fraction, probably something is better than nothing
+  name: empty-mrow
+  tag: mrow
+  match: "not(*)"
+  replace: [t: "W"] # not sure what is correct -- if in a fraction, probably something is better than nothing
 
 -
-   name: default
-   tag: mrow
-   match: "."
-   replace: [x: "*"]
+  name: default
+  tag: mrow
+  match: "."
+  replace: [x: "*"]
 
 -
    # add space after these ops when they are prefix operators
@@ -228,118 +248,121 @@
       - test:
          if: "substring(., string-length(.), 1)='\u00A0'"
          then:
-         - x: "BrailleChars(., 'UEB', 2, string-length(.))"
+         - x: "BrailleChars(., 'Vietnam', 2, string-length(.))"
          - test:
             if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
             then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
             else: [t: ""]
          else:
-         - x: "BrailleChars(., 'UEB', 2, string-length(.)+1)"
+         - x: "BrailleChars(., 'Vietnam', 2, string-length(.)+1)"
       else:
       - test:
          if: "substring(., string-length(.), 1)='\u00A0'"
          then:
-         - x: "BrailleChars(., 'UEB', 1, string-length(.))"
+         - x: "BrailleChars(., 'Vietnam', 1, string-length(.))"
          - test:
             if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
             then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
             else: [t: ""]
          else:
-         - x: "BrailleChars(., 'UEB', 1, string-length(.)+1)"
+         - x: "BrailleChars(., 'Vietnam', 1, string-length(.)+1)"
 
 -
-   name: default
-   tag: mn
-   match: "."
-   replace:
-   - x: "BrailleChars(., 'UEB')"
+  name: default
+  tag: mn
+  match: "."
+  replace:
+  - x: "BrailleChars(., 'Vietnam')"
 
 - 
-   name: sin
-   tag: mi
-   match: "text()='sin'"
-   replace:
-   - t: "⠻⠎"
+  name: sin
+  tag: mi
+  match: "text()='sin'"
+  replace:
+  - t: "⠻⠎"
    
 - 
-   name: cos
-   tag: mi
-   match: "text()='cos'"
-   replace:
-   - t: "⠻⠉"
+  name: cos
+  tag: mi
+  match: "text()='cos'"
+  replace:
+  - t: "⠻⠉"
    
 - 
-   name: tan
-   tag: mi
-   match: "text()='tan'"
-   replace:
-   - t: "⠻⠞"
+  name: tan
+  tag: mi
+  match: "text()='tan'"
+  replace:
+  - t: "⠻⠞"
    
 - 
-   name: cot
-   tag: mi
-   match: "text()='cot'"
-   replace:
-   - t: "⠻⠉⠞"
+  name: cot
+  tag: mi
+  match: "text()='cot'"
+  replace:
+  - t: "⠻⠉⠞"
    
 - 
-   name: arcsin
-   tag: mi
-   match: "text()='arcsin'"
-   replace:
-   - t: "⠁⠗⠉⠻⠎"
+  name: arcsin
+  tag: mi
+  match: "text()='arcsin'"
+  replace:
+  - t: "⠁⠗⠉⠻⠎"
    
 - 
-   name: arccos
-   tag: mi
-   match: "text()='arccos'"
-   replace:
-   - t: "⠁⠗⠉⠻⠉"
+  name: arccos
+  tag: mi
+  match: "text()='arccos'"
+  replace:
+  - t: "⠁⠗⠉⠻⠉"
    
 - 
-   name: arctan
-   tag: mi
-   match: "text()='arctan'"
-   replace:
-   - t: "⠁⠗⠉⠻⠞"
+  name: arctan
+  tag: mi
+  match: "text()='arctan'"
+  replace:
+  - t: "⠁⠗⠉⠻⠞"
    
 - 
-   name: arccot
-   tag: mi
-   match: "text()='arccot'"
-   replace:
-   - t: "⠁⠗⠉⠻⠉⠞"
+  name: arccot
+  tag: mi
+  match: "text()='arccot'"
+  replace:
+  - t: "⠁⠗⠉⠻⠉⠞"
 
 -
-   # FIX: need to deal with all caps
-   name: default
-   tag: [mi, mtext]
-   match: "."
-   replace:
-      - x: "BrailleChars(., 'UEB')"
+  # FIX: need to deal with all caps
+  name: default
+  tag: [mi, mtext]
+  match: "."
+  replace:
+  - test:
+      if: "IsInDefinition(., 'Units') or (string-length(.)=1 and @mathvariant='normal')"
+      then: [t: "W"]
+  - x: "BrailleChars(., 'Vietnam')"
       
 
 -
-   name: default
-   tag: mstyle
-   match: "."
-   replace:
-   - test:
+  name: default
+  tag: mstyle
+  match: "."
+  replace:
+  - test:
       if: "*"
       then: [x: "*"]
       # else do nothing -- no content
 
 
 -
-   name: angle   # angles need a shape indicator -- not sure this is the best test (three letters in base, have invisible separators)
-   tag: mover
-   match: "*[2][text()='^'] and *[1][
-              self::m:mrow and count(*)=5 and
-              *[1][self::m:mi] and *[2][text()='\u2063'] and *[3][self::m:mi] and *[4][text()='\u2063'] and *[5][self::m:mi]
-            ]"
-   replace:
-   - t: "⠫⠛"     # shape indicator, g
-   - x: "*[1]"
+  name: angle   # angles need a shape indicator -- not sure this is the best test (three letters in base, have invisible separators)
+  tag: mover
+  match: "*[2][text()='^'] and *[1][
+            self::m:mrow and count(*)=5 and
+            *[1][self::m:mi] and *[2][text()='\u2063'] and *[3][self::m:mi] and *[4][text()='\u2063'] and *[5][self::m:mi]
+          ]"
+  replace:
+  - t: "⠫⠛"     # shape indicator, g
+  - x: "*[1]"
 
 -
    name: single-char-exceptions    # GTM 12
@@ -370,7 +393,7 @@
       then: [t: "⠠"]
    - test:
       - if: "*[2][text()='_' or text()='¯']"
-        then: [t: "⠱"]
+        then: [T: "⠨⠱"]
       - else_if: "*[2][text()='→']"
         then: [T: "⠨⠔⠳⠕"]
       - else_if: "*[2][text()='.' or text()='˙']"
@@ -432,6 +455,15 @@
          - t: "⠱"
    - t: "#"   # signal end script/numeric mode
 
+- name: log-base-power
+  tag: msubsup
+  match: "*[1][.='log']"
+  replace:
+  - x: "*[1]"   # log
+  - T: "⠔"
+  - x: "*[3]"   # superscript
+  - T: "⠢"
+  - x: "*[2]"   # supscript
 
 -
    name: msubsup_default_mmultiscripts_equiv
@@ -456,7 +488,7 @@
       replace:
       - test:
          - if: "self::m:munderover"
-           then: [t: "⠨⠢"]
+           then: [t: "⠢"]    # not use dots 46-26, just use same sub sign dots 26
            else: [t: "⠢"]
       - test:
          # omit grouping indicators in the following cases
@@ -476,7 +508,7 @@
          - t: "⠜"
       - test:
          - if: "self::m:munderover"
-           then: [t: "⠨⠔"]
+           then: [t: "⠔"]     # not use ⠨⠔ as UEB, just use dots 35
            else: [t: "⠔"]
       - test:
          # omit grouping indicators in the following cases
@@ -953,7 +985,7 @@
            then: [t: "⠳⠺⠗⠣"]                                                           
    - test:
       if: "contains(@notation,'top')"
-      then: [t: "⠱"]                                                                
+      then: [T: "⠨⠱"]                                                                
    - test:
       if: "contains(@notation,'bottom')"
       then: [t: "⠠⠱"]                                                                
@@ -986,7 +1018,7 @@
          if: "string(@lquote)!=''"
          then: [x: "@lquote"]
          else: [t: "⠄⠄"]
-      - x: "BrailleChars(., 'UEB')"
+      - x: "BrailleChars(., 'Vietnam')"
       - test:
          if: "string(@rquote)!=''"
          then: [x: "@rquote"]

@@ -5,7 +5,7 @@ use crate::common::*;
 
 #[test]
 fn subset_1a() {
-    let expr = "<math><mrow><mi>A</mi><mo>=</mo><mfenced close='}' open='{'><mrow><mn>1</mn><mo>;</mo><mn>2</mn><mo>;</mo><mn>3</mn><mo>;</mo><mn>4</mn><mo>;</mo><mn>5</mn><mo>;</mo><mn>...</mn><mo>;</mo><mn>100</mn></mrow></mfenced></mrow></math>";
+    let expr = "<math><mrow><mi>A</mi><mo>=</mo><mfenced close='}' open='{'><mrow><mn>1</mn><mo>;</mo><mn>2</mn><mo>;</mo><mn>3</mn><mo>;</mo><mn>4</mn><mo>;</mo><mn>5</mn><mo>;</mo><mi>...</mi><mo>;</mo><mn>100</mn></mrow></mfenced></mrow></math>";
     test_braille("Vietnam", expr, "⠨⠁⠐⠶⠸⠣⠼⠁⠆⠼⠃⠆⠼⠉⠆⠼⠙⠆⠼⠑⠆⠄⠄⠄⠆⠼⠁⠚⠚⠸⠜");
 }
 
@@ -79,6 +79,14 @@ fn subset_1l() {
 fn frac_2a() {
     let expr = "<math><mrow> <mfrac><mn>1</mn><mn>2</mn> </mfrac> <mo>+</mo><mfrac><mn>3</mn><mn>4</mn> </mfrac> <mo>&#x2212;</mo><mfrac><mn>3</mn><mn>7</mn> </mfrac> </mrow></math>";
     test_braille("Vietnam", expr, "⠼⠁⠌⠃⠐⠖⠼⠉⠌⠙⠐⠤⠼⠉⠌⠛");
+}
+
+#[test]
+fn drop_frac_2a() {
+    let expr = "<math><mrow> <mfrac><mn>1</mn><mn>2</mn> </mfrac> <mo>+</mo><mfrac><mn>3</mn><mn>4</mn> </mfrac> <mo>&#x2212;</mo><mfrac><mn>3</mn><mn>7</mn> </mfrac> </mrow></math>";
+    libmathcat::set_rules_dir(abs_rules_dir_path()).unwrap();
+    libmathcat::set_preference("Vietnam_UseDropNumbers".to_string(), "true".to_string()).unwrap();
+    test_braille("Vietnam", expr, "⠼⠁⠆⠐⠖⠼⠉⠲⠐⠤⠼⠉⠶");
 }
 
 #[test]
@@ -163,9 +171,8 @@ fn exponent_3k () {
 #[test]
 fn log_b1 () {
     let expr = "<math><mrow> <msub><mrow> <mi>log</mi></mrow><mn>2</mn> </msub> <mi>x</mi><mo>+</mo><mn>1</mn><mo>+</mo><msub><mrow> <mi>log</mi></mrow><mn>2</mn> </msub> <mi>x</mi><mo>+</mo><mn>2</mn><mo>=</mo><msub><mrow> <mi>log</mi></mrow><mn>2</mn> </msub> <mn>2</mn></mrow></math>";
-    test_braille("Vietnam", expr, "⠇⠕⠛⠢⠼⠃⠀⠭⠐⠖⠼⠁⠐⠖⠇⠕⠛⠢⠼⠃⠀⠭⠐⠖⠼⠃⠐⠶⠇⠕⠛⠢⠼⠃⠀⠼⠃");
+    test_braille("Vietnam", expr, "⠇⠕⠛⠢⠼⠃⠭⠐⠖⠼⠁⠐⠖⠇⠕⠛⠢⠼⠃⠭⠐⠖⠼⠃⠐⠶⠇⠕⠛⠢⠼⠃⠼⠃");
 }
-
 
 #[test]
 fn root_4a () {
@@ -266,13 +273,13 @@ fn cot_7 () {
 #[test]
 fn sincos_7e () {
     let expr = "<math><mrow> <mi>sin</mi><mi>x</mi><mo>+</mo><mi>cos</mi><mi>x</mi><mo>=</mo><msqrt><mn>2</mn> </msqrt> <mi>sin</mi><mfenced><mrow> <mi>x</mi><mo>+</mo><mfrac><mi>&#x03C0;</mi><mn>4</mn> </mfrac> </mrow> </mfenced></mrow></math>";
-    test_braille("Vietnam", expr, "⠻⠎⠭⠐⠖⠻⠉⠭⠐⠶⠩⠼⠃⠱⠀⠻⠎⠈⠣⠭⠐⠖⠆⠰⠏⠌⠼⠙⠰⠈⠜");
+    test_braille("Vietnam", expr, "⠻⠎⠭⠐⠖⠻⠉⠭⠐⠶⠩⠼⠃⠱⠻⠎⠈⠣⠭⠐⠖⠆⠰⠏⠌⠼⠙⠰⠈⠜");
 }
 
 #[test]
 fn lim_8a () {
     let expr = "<math><mrow> <munder><mrow> <mi>lim</mi></mrow><mrow> <mi>x</mi><mo>&#x2192;</mo><mo>&#x221E;</mo></mrow> </munder> <mfrac><mrow> <msup><mi>x</mi><mn>2</mn> </msup> <mo>+</mo><mn>3</mn><mi>x</mi><mo>+</mo><mn>1</mn></mrow><mrow> <mn>3</mn><msup><mi>x</mi><mn>2</mn> </msup> <mo>&#x2212;</mo><mn>4</mn></mrow> </mfrac> </mrow> </math>";
-    test_braille("Vietnam", expr, "⠇⠊⠍⠢⠭⠳⠕⠼⠕⠆⠭⠔⠼⠃⠐⠖⠼⠉⠭⠐⠖⠼⠁⠌⠼⠉⠭⠔⠼⠃⠐⠤⠼⠙⠰");
+    test_braille("Vietnam", expr, "⠇⠊⠍⠢⠣⠭⠳⠕⠼⠕⠱⠆⠭⠔⠼⠃⠐⠖⠼⠉⠭⠐⠖⠼⠁⠌⠼⠉⠭⠔⠼⠃⠐⠤⠼⠙⠰");
 }
 
 #[test]
@@ -314,12 +321,238 @@ fn perp_10b1 () {
 #[test]
 fn vector_10c () {
     let expr = "<math><mrow> <mover accent='true'><mrow> <mi>A</mi><mi>B</mi></mrow><mo stretchy='true'>&#x2192;</mo> </mover> <mo>+</mo><mover accent='true'><mrow> <mi>B</mi><mi>C</mi></mrow><mo stretchy='true'>&#x2192;</mo> </mover> <mo>=</mo><mover accent='true'><mrow> <mi>A</mi><mi>C</mi></mrow><mo stretchy='true'>&#x2192;</mo> </mover> </mrow></math>";
-    test_braille("Vietnam", expr, "⠸⠁⠃⠨⠔⠳⠕⠐⠖⠸⠃⠉⠨⠔⠳⠕⠐⠶⠸⠁⠉⠨⠔⠳⠕");
+    test_braille("Vietnam", expr, "⠣⠸⠁⠃⠜⠨⠔⠳⠕⠐⠖⠣⠸⠃⠉⠜⠨⠔⠳⠕⠐⠶⠣⠸⠁⠉⠜⠨⠔⠳⠕");
 }
 
 #[test]
 fn vector_10d () {
     let expr = "<math><mrow> <mo>&#x007C;</mo><mover accent='true'><mrow> <mi>A</mi><mi>B</mi></mrow><mo stretchy='true'>&#x2192;</mo> </mover> <mo>&#x007C;</mo><mo>=</mo><msqrt><mrow> <msubsup><mi>x</mi><mrow> <mi>A</mi><mi>B</mi></mrow><mn>2</mn> </msubsup> <mo>+</mo><msubsup><mi>y</mi><mrow> <mi>A</mi><mi>B</mi></mrow><mn>2</mn> </msubsup> </mrow> </msqrt> </mrow></math>";
-    test_braille("Vietnam", expr, "⠸⠳⠸⠁⠃⠨⠔⠳⠕⠸⠳⠐⠶⠩⠭⠢⠣⠸⠁⠃⠜⠔⠼⠃⠐⠖⠽⠢⠣⠸⠁⠃⠜⠔⠼⠃⠱");
+    test_braille("Vietnam", expr, "⠸⠳⠣⠸⠁⠃⠜⠨⠔⠳⠕⠸⠳⠐⠶⠩⠭⠢⠣⠸⠁⠃⠜⠔⠼⠃⠐⠖⠽⠢⠣⠸⠁⠃⠜⠔⠼⠃⠱");
+}
+
+#[test]
+fn greek_1_1 () {
+    let expr = "<math><mrow><mi>&#x3B1;</mi><mi>&#x391;</mi></mrow></math>";
+    test_braille("Vietnam", expr, "⠰⠁⠸⠁");
+}
+
+#[test]
+fn log_b2 () {
+    let expr = "<math><mrow><msubsup><mi mathvariant='normal' ame-texclass='op'>log</mi><mn>3</mn><mn>2</mn></msubsup><mo>&#x2061;</mo><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mn>2</mn><msub><mi mathvariant='normal' ame-texclass='op'>log</mi><mn>2</mn></msub><mo>&#x2061;</mo><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mn>3</mn><mo ame-texclass='rel' stretchy='false'>=</mo><mn>0</mn></mrow></math>";
+    test_braille("Vietnam", expr, "⠇⠕⠛⠔⠼⠃⠢⠼⠉⠭⠐⠖⠼⠃⠇⠕⠛⠢⠼⠃⠭⠐⠖⠼⠉⠐⠶⠼⠚");
+}
+
+#[test]
+fn rnumber_1_1 () {
+    let expr = r#"<math><mrow><mi>A</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mo ame-texclass='open' fence='true' stretchy='false'>{</mo><mi>x</mi><mo ame-texclass='rel' stretchy='false'>&#x2208;</mo><mi>R</mi><mo ame-texclass='fence' fence='true' stretchy='false'>|</mo><msup><mi>x</mi><mn>2</mn></msup><mo ame-texclass='rel' stretchy='false'>&#x2265;</mo><mn>1</mn><mo ame-texclass='close' fence='true' stretchy='false'>}</mo></mrow></math>"#;
+    test_braille("Vietnam", expr, "⠨⠁⠐⠶⠸⠣⠭⠈⠑⠨⠗⠸⠳⠭⠔⠼⠃⠐⠕⠶⠼⠁⠸⠜");
+}
+
+#[test]
+fn mtable_1_1 () {
+    let expr = "<math><mrow><mfenced close='' open='{'><mrow><mtable columnalign='left' equalrows='true' equalcolumns='true'><mtr columnalign='left'><mtd columnalign='left'><mrow><mi>x</mi><mo>+</mo><mi>y</mi><mo>=</mo><mn>5</mn></mrow></mtd></mtr><mtr columnalign='left'><mtd columnalign='left'><mrow><mn>2</mn><mi>x</mi><mo>&#x2212;</mo><mi>y</mi><mo>=</mo><mn>1</mn></mrow></mtd></mtr></mtable></mrow></mfenced></mrow></math>";
+    test_braille("Vietnam", expr, "⠸⠣⠭⠐⠖⠽⠐⠶⠼⠑⣍⠸⠣⠼⠃⠭⠐⠤⠽⠐⠶⠼⠁");
+}
+
+#[test]
+fn mtable_1_2 () {
+    let expr = r#"<math><mrow><mfenced close='' open='['><mrow><mtable equalrows='true' equalcolumns='true'><mtr><mtd><mrow><mi>x</mi><mo>=</mo><mn>5</mn></mrow></mtd></mtr><mtr><mtd><mrow><mi>x</mi><mo>=</mo><mo>&#x2212;</mo><mn>7</mn></mrow></mtd></mtr></mtable></mrow></mfenced></mrow></math>"#;
+    test_braille("Vietnam", expr, "⠨⠣⠭⠐⠶⠼⠑⣍⠨⠣⠭⠐⠶⠐⠤⠼⠛");
+}
+
+#[test]
+fn number_1 () {
+    let expr = "<math><mn>3.000,12</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠉⠄⠚⠚⠚⠂⠁⠃");
+}
+
+#[test]
+fn number_1a () {
+    let expr = "<math><mn>3,000.12</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠉⠄⠚⠚⠚⠂⠁⠃");
+}
+
+#[test]
+fn number_2 () {
+    let expr = "<math><mn>3,14</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠉⠂⠁⠙");
+}
+
+#[test]
+fn number_2a () {
+    let expr = "<math><mn>3.14</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠉⠂⠁⠙");
+}
+
+#[test]
+fn number_3 () {
+    let expr = "<math><mn>1.000</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠄⠚⠚⠚");
+}
+
+#[test]
+fn number_3a () {
+    let expr = "<math><mn>1,000</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠄⠚⠚⠚");
+}
+
+#[test]
+fn number_3b () {
+    let expr = "<math><mn>1.234</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠄⠃⠉⠙");
+}
+
+#[test]
+fn number_3c () {
+    let expr = "<math><mn>1,234</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠂⠃⠉⠙");
+}
+
+#[test]
+fn number_4 () {
+    let expr = "<math><mn>1.000.000</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚");
+}
+
+#[test]
+fn number_4a () {
+    let expr = "<math><mn>1,000,000</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚");
+}
+
+#[test]
+fn number_5 () {
+    let expr = "<math><mn>123.456.789,987</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠃⠉⠄⠙⠑⠋⠄⠛⠓⠊⠂⠊⠓⠛");
+}
+
+#[test]
+fn number_5a () {
+    let expr = "<math><mn>123,456,789.987</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠃⠉⠄⠙⠑⠋⠄⠛⠓⠊⠂⠊⠓⠛");
+}
+
+#[test]
+fn number_6 () {
+    let expr = "<math><mn>,57</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠂⠑⠛");
+}
+
+#[test]
+fn number_6a () {
+    let expr = "<math><mn>.57</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠂⠑⠛");
+}
+
+#[test]
+fn number_6b () {
+    let expr = "<math><mn>0,57</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠚⠂⠑⠛");
+}
+
+#[test]
+fn number_6c () {
+    let expr = "<math><mn>0.57</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠚⠂⠑⠛");
+}
+
+#[test]
+fn number_7 () {
+    let expr = "<math><mn>,578</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠂⠑⠛⠓");
+}
+
+#[test]
+fn number_7a () {
+    let expr = "<math><mn>.578</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠂⠑⠛⠓");
+}
+
+#[test]
+fn number_7b () {
+    let expr = "<math><mn>0,578</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠚⠂⠑⠛⠓");
+}
+
+#[test]
+fn number_7c () {
+    let expr = "<math><mn>0.578</mn></math>";
+    test_braille("Vietnam", expr, "⠼⠚⠂⠑⠛⠓");
+}
+
+#[test]
+fn meter_1 () {
+    let expr = "<math><mrow><mn>5,72</mn><mi mathvariant='normal'>m</mi><mo ame-texclass='ord' stretchy='false'>/</mo><mn>10</mn><mo ame-texclass='rel' stretchy='false'>=</mo><mn>57,2</mn><mi>cm</mi></mrow></math>";
+    test_braille("Vietnam", expr, "⠼⠑⠂⠛⠃⠀⠍⠐⠌⠼⠁⠚⠐⠶⠼⠑⠛⠂⠃⠀⠉⠍");
+}
+
+#[test]
+fn meter_2 () {
+    let expr = "<math><mrow><mn>1</mn><mi>km</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10</mn><mi>hm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100</mn><mi>dam</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000</mn><mi mathvariant='normal'>m</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10.000</mn><mi>dm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100.000</mn><mi>cm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000.000</mn><mi>mm</mi></mrow></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠀⠅⠍⠐⠶⠼⠁⠚⠀⠓⠍⠐⠶⠼⠁⠚⠚⠀⠙⠁⠍⠐⠶⠼⠁⠄⠚⠚⠚⠀⠍⠐⠶⠼⠁⠚⠄⠚⠚⠚⠀⠙⠍⠐⠶⠼⠁⠚⠚⠄⠚⠚⠚⠀⠉⠍⠐⠶⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚⠀⠍⠍");
+}
+
+#[test]
+fn gram_1 () {
+    let expr = "<math><mrow><mn>1</mn><mi>t&#x1EA5;n</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10</mn><mi>t&#x1EA1;</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100</mn><mi>y&#x1EBF;n</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000</mn><mi>kg</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10.000</mn><mi>hg</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100.000</mn><mi>dag</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000.000</mn><mi mathvariant='normal'>g</mi></mrow></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠀⠞⠔⠡⠝⠐⠶⠼⠁⠚⠀⠞⠠⠁⠐⠶⠼⠁⠚⠚⠀⠽⠔⠣⠝⠐⠶⠼⠁⠄⠚⠚⠚⠀⠅⠛⠐⠶⠼⠁⠚⠄⠚⠚⠚⠀⠓⠛⠐⠶⠼⠁⠚⠚⠄⠚⠚⠚⠀⠙⠁⠛⠐⠶⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚⠀⠛");
+}
+
+#[test]
+fn liquid_1 () {
+    let expr = "<math><mrow><mn>1</mn><mi>l&#xED;t</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1</mn><mi mathvariant='normal'>l</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000</mn><mi>ml</mi></mrow></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠀⠇⠔⠊⠞⠐⠶⠼⠁⠀⠇⠐⠶⠼⠁⠄⠚⠚⠚⠀⠍⠇");
+}
+
+#[test]
+fn feet_1 () {
+    let expr = "<math><mrow><mn>1</mn><mi>ft</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mn>3</mn><mi>in</mi></mrow></math>";
+    test_braille("Vietnam", expr, "⠼⠁⠀⠋⠞⠐⠖⠼⠉⠀⠊⠝");
+}
+
+#[test]
+fn cap_1 () {
+    let expr = "<math><mrow><mi>A</mi><mi>B</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mi>C</mi><mi>d</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mi>e</mi><mi>F</mi></mrow></math>";
+    test_braille("Vietnam", expr, "⠸⠁⠃⠐⠖⠨⠉⠙⠐⠶⠑⠨⠋");
+}
+
+#[test]
+fn cap_2 () {
+    let expr = "<math><mrow><mi>AB</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mi>Cd</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mi>eF</mi></mrow></math>";
+    test_braille("Vietnam", expr, "⠸⠁⠃⠐⠖⠨⠉⠙⠐⠶⠑⠨⠋");
+}
+
+#[test]
+fn vi_letters () {
+    let expr = "<math><mrow><mtext>Cho Ph&#x1B0;&#x1A1;ng Tr&#xEC;nh</mtext><mtext>&#xA0;</mtext><mi>A</mi><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mi>B</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>0</mn><mtext>&#xA0;</mtext><mtext>TA &#x110;&#x1AF;&#x1EE2;C</mtext><mtext>&#xA0;</mtext><mi>x</mi></mrow></math>";
+    test_braille("Vietnam", expr, "⠨⠉⠓⠕⠀⠨⠏⠓⠳⠪⠝⠛⠀⠨⠞⠗⠰⠊⠝⠓⠀⠨⠁⠭⠐⠖⠨⠃⠐⠶⠼⠚⠀⠸⠞⠁⠀⠸⠮⠳⠠⠪⠉⠀⠭");
+}
+
+// Cap Roman numbers are marked with dots 46for both single letter and word.
+#[test]
+fn mhchem_roman_in_superscript () {
+    init_logger();
+    let expr = "<math>
+      <mrow>
+        <mmultiscripts>
+          <mi>Fe</mi>
+          <none></none>
+          <mi>II</mi>
+        </mmultiscripts>
+        <mo>&#x2063;</mo>
+        <mmultiscripts>
+          <mi>Fe</mi>
+          <none></none>
+          <mi>III</mi>
+        </mmultiscripts>
+        <mo>&#x2063;</mo>
+        <mmultiscripts>
+          <mi mathvariant='normal' >O</mi>
+          <mn>4</mn>
+          <none></none>
+        </mmultiscripts>
+      </mrow>
+    </math>";
+    test_braille("Vietnam", expr, "⠨⠋⠑⠔⠣⠨⠊⠊⠱⠨⠋⠑⠔⠣⠨⠊⠊⠊⠱⠨⠕⠢⠼⠙");
 }
 

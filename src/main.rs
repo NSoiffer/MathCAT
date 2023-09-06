@@ -170,12 +170,18 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr=r#"
-  <math xmlns="http://www.w3.org/1998/Math/MathML">
-  <mover><mi>z</mi><mo>&#xA8;</mo></mover>
-  <mover><mi>a</mi><mo>&#x2D9;</mo></mover>
-  <mover><mi>a</mi><mo>.</mo></mover>
-  </math>
-    "#;
+  <math>
+	<mo>|</mo>
+	<mo>|</mo>
+	<mn>-3</mn>
+	<mo>|</mo>
+	<mo>+</mo>
+	<mo>|</mo>
+	<mn>2</mn>
+	<mo>|</mo>
+	<mo>|</mo>
+</math>
+"#;
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>
@@ -191,7 +197,7 @@ fn main() {
 //     ";
   // let expr= "<math><mrow><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>";
   let instant = Instant::now();
-  let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../../Rules");
+  let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../Rules");
   let rules_dir = rules_dir.as_os_str().to_str().unwrap().to_string();
   if let Err(e) = set_rules_dir(rules_dir) {
     panic!("Error: exiting -- {}", errors_to_string(&e));  }

@@ -136,8 +136,7 @@ pub fn read_definitions_file(locations: &Locations) -> Result<()> {
         static LOCATION_CACHE: RefCell<Locations> =
                 RefCell::new( Locations::default() );
     }
-    
-    if LOCATION_CACHE.with(|cache| are_locations_same(&cache.borrow(), locations)) {
+    if is_valid(locations) && LOCATION_CACHE.with(|cache| are_locations_same(&cache.borrow(), locations)) {
         return Ok( () );
     } else {
         LOCATION_CACHE.with(|cache| {
