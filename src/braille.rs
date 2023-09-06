@@ -1747,7 +1747,7 @@ impl BrailleChars {
         fn add_separator(text: String) -> String {
             use crate::definitions::DEFINITIONS;
             if NUMBER_WITH_SPACES.is_match(&text) {
-                return text.replace(" ", ".");
+                return text.replace(' ', ".");
             } else if NUMBER_WITH_BLOCKS.is_match(&text) {
                 let mut parts = text.split(',');
                 let integer_part = parts.next().unwrap();   // has to exist -- at least four chars
@@ -1778,7 +1778,7 @@ impl BrailleChars {
                 }
                 result.push_str(fractional_part);  
                 return result;    
-            } else if text.starts_with("arc") {
+            } else if let Some(text_without_arc) = text.strip_prefix("arc") {
                 // "." after arc (7.5.3)
                 let is_function_name = DEFINITIONS.with(|definitions| {
                     let definitions = definitions.borrow();
@@ -1786,7 +1786,7 @@ impl BrailleChars {
                     return set.contains(&text);
                 });
                 if is_function_name {
-                    return "arc.".to_string() + &text[3..];      // ok to index as bytes because we know it starts "arc"
+                    return "arc.".to_string() + text_without_arc;
                 }
             } 
             return text;  
