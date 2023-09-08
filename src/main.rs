@@ -171,17 +171,12 @@ fn main() {
   //   </math>";
   let expr=r#"
   <math>
-	<mo>|</mo>
-	<mo>|</mo>
-	<mn>-3</mn>
-	<mo>|</mo>
-	<mo>+</mo>
-	<mo>|</mo>
-	<mn>2</mn>
-	<mo>|</mo>
-	<mo>|</mo>
-</math>
-"#;
+  <mi>y</mi>
+  <mtext>&#x00a0;&#x2063;</mtext>
+  <mo>=</mo>
+  <mtext>&#x00a0;&#x2063;</mtext>
+  <mn>5</mn>
+</math>"#;
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>
@@ -226,8 +221,8 @@ fn main() {
   }
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
-  set_preference("BrailleCode".to_string(), "CMU".to_string()).unwrap();
-  match get_braille("") {
+  set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
+  match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),
   }
@@ -268,7 +263,7 @@ fn timing_test(expr: &str, n_loops: usize) {
       Ok(_) =>( ),
       Err(e) => panic!("{}", errors_to_string(&e)),
     }
-    match get_braille("") {
+    match get_braille("".to_string()) {
       Ok(_) => (),
       Err(e) => panic!("{}", errors_to_string(&e)),
     }
@@ -293,10 +288,10 @@ fn timing_test(expr: &str, n_loops: usize) {
   info!("Time taken (time for speech averaged over 100 loops): {}ms", instant.elapsed().as_millis() as f64/n_loops_float);
 
   set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
-  get_braille("").unwrap();
+  get_braille("".to_string()).unwrap();
   let instant = Instant::now();
   for _ in 0..n_loops {
-    match get_braille("") {
+    match get_braille("".to_string()) {
       Ok(_) => (),
       Err(e) => panic!("{}", errors_to_string(&e)),
     }
@@ -304,10 +299,10 @@ fn timing_test(expr: &str, n_loops: usize) {
   info!("Time taken (time for {} braille averaged over 100 loops): {}ms", get_preference("BrailleCode".to_string()).unwrap(), instant.elapsed().as_millis() as f64/n_loops_float);
 
   set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
-  get_braille("").unwrap();
+  get_braille("".to_string()).unwrap();
   let instant = Instant::now();
   for _ in 0..n_loops {
-    match get_braille("") {
+    match get_braille("".to_string()) {
       Ok(_) => (),
       Err(e) => panic!("{}", errors_to_string(&e)),
     }

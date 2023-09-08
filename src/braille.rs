@@ -1991,9 +1991,9 @@ mod tests {
         set_mathml(mathml_str.to_string()).unwrap();
         set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
         set_preference("BrailleNavHighlight".to_string(), "All".to_string()).unwrap();
-        let braille = get_braille("id-2")?;
+        let braille = get_braille("id-2".to_string())?;
         assert_eq!("⣼⣙⠰⠁⠉", braille);
-        let braille = get_braille("id-4")?;
+        let braille = get_braille("id-4".to_string())?;
         assert_eq!("⠼⠙⣰⣁⠉", braille);
         return Ok( () );
     }
@@ -2006,10 +2006,10 @@ mod tests {
         set_mathml(mathml_str.to_string()).unwrap();
         set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
         set_preference("UEB_START_MODE".to_string(), "Grade2".to_string()).unwrap();
-        let braille = get_braille("")?;
+        let braille = get_braille("".to_string())?;
         assert_eq!("⠭⠰⠔⠝", braille, "Grade2");
         set_preference("UEB_START_MODE".to_string(), "Grade1".to_string()).unwrap();
-        let braille = get_braille("")?;
+        let braille = get_braille("".to_string())?;
         assert_eq!("⠭⠔⠝", braille, "Grade1");
         return Ok( () );
     }

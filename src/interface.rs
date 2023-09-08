@@ -240,13 +240,13 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
 
 /// Get the braille associated with the MathML that was set by [`set_mathml`].
 /// The braille returned depends upon the preference for the `code` preference (default `Nemeth`).
-pub fn get_braille(nav_node_id: &str) -> Result<String> {
+pub fn get_braille(nav_node_id: String) -> Result<String> {
     // use std::time::{Instant};
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
-        let braille = crate::braille::braille_mathml(mathml, nav_node_id)?;
+        let braille = crate::braille::braille_mathml(mathml, &nav_node_id)?;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( braille );
     });
