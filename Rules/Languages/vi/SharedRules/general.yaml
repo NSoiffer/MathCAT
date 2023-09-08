@@ -510,7 +510,7 @@
 
 - #   that eliminates the need for the if: else_if: ...
   name: multi-line
-  # IDEA:  set a variable with the word to saw for the row (e.g., RowLabel = Row/Case/Line/...)
+  # IDEA:  set a variable with the word to say for the row (e.g., RowLabel = Row/Case/Line/...)
   tag: [cases, equations, lines]
   match: "."
   replace:

@@ -492,7 +492,7 @@
 
 - name: multi-line
   #   that eliminates the need for the if: else_if: ...
-  # IDEA:  set a variable with the word to saw for the row (e.g., RowLabel = Row/Case/Line/...)
+  # IDEA:  set a variable with the word to say for the row (e.g., RowLabel = Row/Case/Line/...)
   tag: [cases, equations, lines]
   match: "."
   variables:
@@ -516,7 +516,6 @@
 - name: default-multiline
   tag: [mtr, mlabeledtr]
   match: "parent::m:cases or parent::m:equations or parent::m:lines"
-  variables: [ContinuedEquation: "parent::m:equations and *[1][count(*)=1 and *[1][@data-added='missing-content']]"]
   replace:
   - test:
       if: "parent::m:equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
