@@ -13,7 +13,6 @@ use crate::speech::{NAVIGATION_RULES, CONCAT_INDICATOR, CONCAT_STRING, SpeechRul
 #[cfg(not(target_family = "wasm"))]
 use std::time::Instant;
 use crate::errors::*;
-use crate::canonicalize::as_element;
 use phf::phf_set;
 
 
@@ -243,20 +242,18 @@ fn convert_last_char_to_number(str: &str) -> usize {
     return (last_char - b'0') as usize;
 }
 
-
-pub fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> {
+/// Get the node associated with 'id'
+/// This can be called on an intent tree -- it does not make use of is_leaf()
+fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> {
     if mathml.attribute_value("id").unwrap() == id {
         return Some(mathml);
     }
 
-    if crate::xpath_functions::is_leaf(mathml) {
-        return None;
-    }
-
     for child in mathml.children() {
-        let child = as_element(child);
-        if let Some(found) = get_node_by_id(child, id) {
-            return Some(found);
+        if let Some(child) = child.element() {
+            if let Some(found) = get_node_by_id(child, id) {
+                return Some(found);
+            }
         }
     }
     return None;
@@ -504,22 +501,24 @@ fn speak<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContex
     if full_read {
         let intent = crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?;
         debug!("intent: {}", mml_to_string(&intent));
-        return match crate::speech::speak_mathml(intent, &nav_node_id) {
-            Ok(speech) => Ok(speech),
-            Err(e) => {
-                if e.to_string() == crate::speech::NAV_NODE_SPEECH_NOT_FOUND {
-                    // In something like x^3, we might be looking for the '3', but it will be "cubed", so we don't find it.
-                    // Or we might be on a "(" surrounding a matrix and that isn't part of the intent
-                    // We are probably safer in terms of getting the same speech if we retry intent starting at the nav node,
-                    //  but the node to speech is almost certainly trivial.
-                    // By speaking the non-intent tree, we are certain to speech on the next try
-                    debug!("Retrying for id='{}'", nav_node_id);
-                    crate::speech::speak_mathml(mathml, &nav_node_id)
-                } else {
-                    Err(e)
-                }
+
+        // In something like x^3, we might be looking for the '3', but it will be "cubed", so we don't find it.
+        // Or we might be on a "(" surrounding a matrix and that isn't part of the intent
+        // We are probably safer in terms of getting the same speech if we retry intent starting at the nav node,
+        //  but the node to speech is almost certainly trivial.
+        // By speaking the non-intent tree, we are certain to speech on the next try
+        if get_node_by_id(intent, &nav_node_id).is_some() {
+            match crate::speech::speak_mathml(intent, &nav_node_id) {
+                Ok(speech) => return Ok(speech),
+                Err(e) => {
+                    if e.to_string() != crate::speech::NAV_NODE_SPEECH_NOT_FOUND {
+                        return Err(e);
+                    }
+                    // else could be something like '3' in 'x^3' ("cubed")
+                },
             }
-        };
+        }
+        return crate::speech::speak_mathml(mathml, &nav_node_id);
     } else {
         return crate::speech::overview_mathml(mathml, &nav_node_id);
     }
