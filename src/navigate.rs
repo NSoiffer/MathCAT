@@ -1817,4 +1817,78 @@ mod tests {
             return Ok( () );
         });
     }
+
+    
+    #[test]
+    fn basic_language_test() -> Result<()> {
+        // this is basically a sanity check that all the language's navigation.yaml files are at least syntactically correct
+        // FIX: should look through the Languages dir and figure this is out
+        let mathml_str = "<math id='math'>
+                <mrow id='contents'>
+                <mrow id='lhs'>
+                    <mrow id='term'>
+                    <mn id='2'>2</mn>
+                    <mo id='invisible-times'>&#x2062;</mo>
+                    <msup id='msup'>
+                        <mi id='x'>x</mi>
+                        <mn id='3'>3</mn>
+                    </msup>
+                    </mrow>
+                    <mo id='plus'>+</mo>
+                    <mn id='1'>1</mn>
+                </mrow>
+                <mo id='id-11'>=</mo>
+                <mi id='id-12'>y</mi>
+                </mrow>
+            </math>";
+        test_language("en", mathml_str);
+        test_language("es", mathml_str);
+        test_language("id", mathml_str);
+        test_language("vi", mathml_str);
+        return Ok( () );
+
+        fn test_language(lang: &str, mathml_str: &str) {
+            init_default_prefs(mathml_str, "Enhanced");
+            set_preference("Language".to_string(), lang.to_string()).unwrap();
+
+            set_preference("NavMode".to_string(), "Enhanced".to_string()).unwrap();
+            MATHML_INSTANCE.with(|package_instance| {
+                let package_instance = package_instance.borrow();
+                let mathml = get_element(&*package_instance);
+                test_command("ZoomInAll", mathml, "2");
+                test_command("MoveNext", mathml, "msup");
+                test_command("MoveNext", mathml, "plus");
+                test_command("MovePrevious", mathml, "term");
+                test_command("MovePrevious", mathml, "term");
+                test_command("ZoomOutAll", mathml, "contents");
+            });
+    
+            set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
+            MATHML_INSTANCE.with(|package_instance: &RefCell<Package>| {
+                let package_instance = package_instance.borrow();
+                let mathml = get_element(&*package_instance);
+                test_command("ZoomInAll", mathml, "2");
+                test_command("MoveNext", mathml, "msup");
+                test_command("MoveNext", mathml, "plus");
+                test_command("MovePrevious", mathml, "msup");
+                test_command("MovePrevious", mathml, "2");
+                test_command("MovePrevious", mathml, "2");
+                test_command("ZoomOutAll", mathml, "contents");
+            });
+            
+            set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
+            MATHML_INSTANCE.with(|package_instance| {
+                let package_instance = package_instance.borrow();
+                let mathml = get_element(&*package_instance);
+                test_command("ZoomIn", mathml, "2");
+                test_command("MoveNext", mathml, "x");
+                test_command("MoveNext", mathml, "3");
+                test_command("MoveNext", mathml, "plus");
+                test_command("MovePrevious", mathml, "3");
+                test_command("MovePrevious", mathml, "x");
+                test_command("MovePrevious", mathml, "2");
+                test_command("MovePrevious", mathml, "2");
+            });
+        }
+    }
 }
