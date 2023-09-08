@@ -125,7 +125,7 @@ pub fn get_spoken_text() -> Result<String> {
         let new_package = Package::new();
         let intent = crate::speech::intent_from_mathml(mathml, new_package.as_document())?;
         debug!("Intent tree:\n{}", mml_to_string(&intent));
-        let speech = crate::speech::speak_intent(intent)?;
+        let speech = crate::speech::speak_mathml(intent, "")?;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( speech );
     });
@@ -140,7 +140,7 @@ pub fn get_overview_text() -> Result<String> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
-        let speech = crate::speech::overview_mathml(mathml)?;
+        let speech = crate::speech::overview_mathml(mathml, "")?;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( speech );
     });
@@ -240,7 +240,7 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
 
 /// Get the braille associated with the MathML that was set by [`set_mathml`].
 /// The braille returned depends upon the preference for the `code` preference (default `Nemeth`).
-pub fn get_braille(nav_node_id: String) -> Result<String> {
+pub fn get_braille(nav_node_id: &str) -> Result<String> {
     // use std::time::{Instant};
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {

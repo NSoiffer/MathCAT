@@ -668,6 +668,7 @@
   replace:
   - intent:
       name: "cases"
+      id: "*[2]/@id"
       children:
       - x: "*[2]/*"
 

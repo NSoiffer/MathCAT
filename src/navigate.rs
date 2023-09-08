@@ -4,7 +4,7 @@
 
 use std::cell::{Ref, RefCell, RefMut};
 use sxd_xpath::{Context, Factory, Value};
-use sxd_document::dom::{Element, ChildOfElement};
+use sxd_document::dom::Element;
 use sxd_document::Package;
 
 use std::fmt;
@@ -19,7 +19,6 @@ use phf::phf_set;
 
 
 const MAX_PLACE_MARKERS: usize = 10;
-const MARKED_NODE: &str = "data-navigation-node";
 
 thread_local!{
     /// The current set of navigation rules
@@ -226,9 +225,7 @@ impl NavigationState {
 
         // used by nav rules for speech -- needs an initial value so tests don't fail
         context.set_variable("Move2D", "" );
-        context.set_variable("SpeakExpression","true" );    // default is to speak the expr after navigation
-
-
+        context.set_variable("SpeakExpression", true );    // default is to speak the expr after navigation
         return;
 
         fn convert_last_char_to_number(str: &str) -> usize {
@@ -349,7 +346,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         return NAVIGATION_RULES.with(|rules| {
             let rules = rules.borrow();
             let new_package = Package::new();
-            let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), "".to_string()); 
+            let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), ""); 
             
             nav_state.mode = rules.pref_manager.as_ref().borrow().pref_to_string("NavMode");
 
@@ -464,7 +461,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         let nav_mathml = get_node_by_id(mathml, &nav_position.current_node);
         if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", mathml)?.0.unwrap() == "true" {
             // Speak/Overview of where we landed (if we are supposed to speak it)
-            let node_speech = speak(rules_with_context, nav_mathml.unwrap(), use_read_rules)?;
+            let node_speech = speak(rules_with_context, mathml, nav_position.current_node, use_read_rules)?;
             // debug!("node_speech: '{}'", node_speech);
             if node_speech.is_empty() {
                 // try again in loop
@@ -503,46 +500,28 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
     }
 }
 
-fn speak<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, mathml: Element<'c>, full_read: bool) -> Result<String> {
+fn speak<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, mathml: Element<'c>, nav_node_id: String, full_read: bool) -> Result<String> {
     if full_read {
-        // Some rules require context to speak correctly -- invisible times is a particularly important one
-        // Most only require knowing siblings
-        // FIX: check the rules -- grandparents might be needed
-        // Here, we temporarily mark the current node, get the intent reading of the parent and then find the node in the parent.
-        // If it isn't present, we skip context and retry
-        mathml.set_attribute_value(MARKED_NODE, "nav");
-        let parent = mathml.parent();
-        #[allow(clippy::unnecessary_unwrap)]        // alternative is mess of nested if let...
-        let context_mathml = if parent.is_some() && parent.unwrap().element().is_some() {parent.unwrap().element().unwrap()} else {mathml};
-        // debug!("context_mathml: {}", mml_to_string(&context_mathml));
-        let intent = crate::speech::intent_from_mathml(context_mathml, rules_with_context.get_document())?;
-        // debug!("intent: {}", mml_to_string(&intent));
-        let intent = if let Some(found) = find_marked_node(intent) {
-            // debug!("Found node: {}", mml_to_string(&found));
-            found
-        } else {
-            crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?
+        let intent = crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?;
+        debug!("intent: {}", mml_to_string(&intent));
+        return match crate::speech::speak_mathml(intent, &nav_node_id) {
+            Ok(speech) => Ok(speech),
+            Err(e) => {
+                if e.to_string() == crate::speech::NAV_NODE_SPEECH_NOT_FOUND {
+                    // In something like x^3, we might be looking for the '3', but it will be "cubed", so we don't find it.
+                    // Or we might be on a "(" surrounding a matrix and that isn't part of the intent
+                    // We are probably safer in terms of getting the same speech if we retry intent starting at the nav node,
+                    //  but the node to speech is almost certainly trivial.
+                    // By speaking the non-intent tree, we are certain to speech on the next try
+                    debug!("Retrying for id='{}'", nav_node_id);
+                    crate::speech::speak_mathml(mathml, &nav_node_id)
+                } else {
+                    Err(e)
+                }
+            }
         };
-        mathml.remove_attribute(MARKED_NODE);
-        return crate::speech::speak_intent(intent);
     } else {
-        // FIX: overview not implemented
-        return crate::speech::overview_mathml(mathml);
-    }
-
-    fn find_marked_node(intent: Element) -> Option<Element> {
-        if intent.attribute(MARKED_NODE).is_some() {
-            return Some(intent);
-        }
-        for child in intent.children() {
-            if let ChildOfElement::Element(child) = child {
-                    let found = find_marked_node(child);
-                    if found.is_some() {
-                        return found;
-                    }
-            };
-        }
-        return None;
+        return crate::speech::overview_mathml(mathml, &nav_node_id);
     }
 }
 
@@ -879,6 +858,7 @@ mod tests {
         set_preference("AutoZoomOut".to_string(), "True".to_string()).unwrap();
         set_preference("Language".to_string(), "en".to_string()).unwrap();
         set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+        set_preference("Verbosity".to_string(), "Medium".to_string()).unwrap();
         set_mathml(mathml.to_string()).unwrap();
     }
 
@@ -1768,8 +1748,8 @@ mod tests {
             let speech = test_command("MoveNext", mathml, "table");
             // tables need to check their parent for proper speech
             assert_eq!(speech, "move right, the 2 by 2 matrix; row 1; 9, negative 13; row 2; 5, negative 6;");
-            let speech = test_command("ZoomIn", mathml, "id-6");
-            assert_eq!(speech, "zoom in; 9");
+            let speech = test_command("ZoomIn", mathml, "row-1");
+            assert_eq!(speech, "zoom in; row 1; 9, negative 13;");
             return Ok( () );
         });
     }
@@ -1793,6 +1773,7 @@ mod tests {
             </mrow>
         </math>";
         init_default_prefs(mathml_str, "Enhanced");
+        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -1800,23 +1781,23 @@ mod tests {
             let speech = test_command("MoveNext", mathml, "table");
             // tables need to check their parent for proper speech
             assert_eq!(speech, "move right, the 2 by 2 determinant; row 1; 9, negative 13; row 2; 5, negative 6;");
-            let speech = test_command("ZoomIn", mathml, "id-6");
-            assert_eq!(speech, "zoom in; 9");
+            let speech = test_command("ZoomIn", mathml, "row-1");
+            assert_eq!(speech, "zoom in; row 1; 9, negative 13;");
             return Ok( () );
         });
     }
 
     #[test]
     fn cases_speech() -> Result<()> {
-        let mathml_str = " <math id='id-0'>
+        let mathml_str = "<math id='id-0'>
         <mrow id='id-1'>
           <mo id='open'>{</mo>
           <mtable columnalign='left left' columnspacing='1em' displaystyle='false' rowspacing='.2em' id='table'>
-            <mtr id='id-4'>
+            <mtr id='row-1'>
               <mtd id='id-5'><mrow id='id-6'><mrow id='id-7'><mo id='id-8'>-</mo><mi id='id-9'>x</mi></mrow><mo id='id-10'>,</mo></mrow></mtd>
               <mtd id='id-11'><mrow id='id-12'><mrow id='id-13'><mtext id='id-14'>if</mtext><mo id='id-15'>&#x2062;</mo><mi id='id-16'>x</mi></mrow><mo id='id-17'>&lt;</mo><mn id='id-18'>0</mn></mrow></mtd>
             </mtr>
-            <mtr id='id-19'>
+            <mtr id='row-2'>
               <mtd id='id-20'><mrow id='id-21'><mrow id='id-22'><mo id='id-23'>+</mo><mi id='id-24'>x</mi></mrow><mo id='id-25'>,</mo></mrow></mtd>
               <mtd id='id-26'><mrow id='id-27'><mrow id='id-28'><mtext id='id-29'>if</mtext><mo id='id-30'>&#x2062;</mo><mi id='id-31'>x</mi></mrow><mo id='id-32'>≥</mo><mn id='id-33'>0</mn></mrow></mtd>
             </mtr>
@@ -1824,6 +1805,7 @@ mod tests {
         </mrow>
        </math>";
         init_default_prefs(mathml_str, "Enhanced");
+        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
@@ -1831,8 +1813,8 @@ mod tests {
             let speech = test_command("MoveNext", mathml, "table");
             // tables need to check their parent for proper speech
             assert_eq!(speech, "move right, 2 cases, case 1; negative x comma, if x is less than 0; case 2; positive x comma, if x, is greater than or equal to 0;");
-            let speech = test_command("ZoomIn", mathml, "id-6");
-            assert_eq!(speech, "zoom in; negative x comma");
+            let speech = test_command("ZoomIn", mathml, "row-1");
+            assert_eq!(speech, "zoom in; case 1; negative x comma, if x is less than 0;");
             return Ok( () );
         });
     }

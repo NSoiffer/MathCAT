@@ -17,7 +17,7 @@ static UEB_PREFIXES: phf::Set<char> = phf_set! {
 
 /// braille the MathML
 /// If 'nav_node_id' is not an empty string, then the element with that id will have dots 7 & 8 turned on as per the pref
-pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
+pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<String> {
     crate::speech::SpeechRules::update()?;
     return BRAILLE_RULES.with(|rules| {
         rules.borrow_mut().read_files()?;
@@ -1991,9 +1991,9 @@ mod tests {
         set_mathml(mathml_str.to_string()).unwrap();
         set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
         set_preference("BrailleNavHighlight".to_string(), "All".to_string()).unwrap();
-        let braille = get_braille("id-2".to_string())?;
+        let braille = get_braille("id-2")?;
         assert_eq!("⣼⣙⠰⠁⠉", braille);
-        let braille = get_braille("id-4".to_string())?;
+        let braille = get_braille("id-4")?;
         assert_eq!("⠼⠙⣰⣁⠉", braille);
         return Ok( () );
     }
@@ -2006,10 +2006,10 @@ mod tests {
         set_mathml(mathml_str.to_string()).unwrap();
         set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
         set_preference("UEB_START_MODE".to_string(), "Grade2".to_string()).unwrap();
-        let braille = get_braille("".to_string())?;
+        let braille = get_braille("")?;
         assert_eq!("⠭⠰⠔⠝", braille, "Grade2");
         set_preference("UEB_START_MODE".to_string(), "Grade1".to_string()).unwrap();
-        let braille = get_braille("".to_string())?;
+        let braille = get_braille("")?;
         assert_eq!("⠭⠔⠝", braille, "Grade1");
         return Ok( () );
     }
