@@ -790,7 +790,7 @@ fn likely_valid_chem_superscript(sup: Element) -> isize {
             sup.set_attribute_value(CHEM_FORMULA_OPERATOR, "1");   // value doesn't really matter
         }
         return if as_text(sup).len()==1 {1} else {2};
-    } else if (sup_name == "mi" || sup_name=="mtext") && SMALL_UPPER_ROMAN_NUMERAL.is_match(as_text(sup)){
+    } else if (sup_name == "mi" || sup_name == "mn" || sup_name=="mtext") && SMALL_UPPER_ROMAN_NUMERAL.is_match(as_text(sup)){
         sup.set_attribute_value("data-number", small_roman_to_number(as_text(sup)));
         return 2;
     } else if sup_name == "mrow" {

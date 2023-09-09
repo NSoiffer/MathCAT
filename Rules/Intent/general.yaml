@@ -41,7 +41,7 @@
   
 -
   name: roman_numeral
-  tag: [mi, mtext]
+  tag: [mi, mn, mtext]
   match: "@data-number"
   replace: 
   - intent:
