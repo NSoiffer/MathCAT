@@ -260,7 +260,7 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [T: "mở rộng", pause: "long"]
-  - set_variables: [NavNode: "*[2]/*[1]/*[1]/@id"]
+  - set_variables: [NavNode: "*[2]/*[1]/@id"]
 
 # special case of zooming into a table -- move to the first element
 - name: zoom-in-table
@@ -270,7 +270,7 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [T: "mở rộng", pause: "long"]
-  - set_variables: [NavNode: "*[1]/*[1]/*[1]/@id"]
+  - set_variables: [NavNode: "*[1]/@id"]
 
 - name: zoom-in-mrow-in-math
   # Moving to first or last is meaningless the 'math' has only an 'mrow' inside -- dig inside and do it again 
@@ -605,7 +605,7 @@
   replace:
   - T: "không phải bảng"
   - pause: long
-  - set_variables: [SpeakExpression: "'false'"]
+  - set_variables: [SpeakExpression: false()]
 
 - name: move-cell-previous
   tag: mtd
@@ -619,6 +619,9 @@
           then:
           - T: "qua trái"
           - pause: short
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
           - T: "cột"
           - x: "count(preceding-sibling::*)"
           - pause: medium
@@ -632,7 +635,7 @@
           - set_variables: [NavNode: "preceding-sibling::*[1]/*[1]/@id"]
       else:
       - T: "trước đó không có cột"
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
 
 - name: move-cell-next
   tag: mtd
@@ -646,6 +649,9 @@
           then:
           - T: "qua phải"
           - pause: short
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
           - T: "cột"
           - x: "count(preceding-sibling::*)+2"
           - pause: medium
@@ -659,7 +665,7 @@
           - set_variables: [NavNode: "following-sibling::*[1]/*[1]/@id"]
       else:
       - T: "không có cột kế "
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
 
 - name: move-cell-up
   tag: mtd
@@ -676,6 +682,9 @@
               then:
               - T: "chuyển lên"
               - pause: short
+          - test:
+              if: "$NavVerbosity != 'Terse'"
+              then:
               - T: "dòng"
               - x: "count(../preceding-sibling::*)"
               - pause: short
@@ -692,7 +701,7 @@
               - set_variables: [NavNode: "../preceding-sibling::*[1]/*[$Column]/*[1]/@id"]
       else:
       - T: "trước đó không có dòng"
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
 
 - name: move-cell-down
   tag: mtd
@@ -709,6 +718,9 @@
               then:
               - T: "chuyển xuống"
               - pause: short
+          - test:
+              if: "$NavVerbosity != 'Terse'"
+              then:
               - T: "dòng"
               - x: "count(../preceding-sibling::*)+2"
               - pause: short
@@ -725,7 +737,7 @@
               - set_variables: [NavNode: "../following-sibling::*[1]/*[$Column]/*[1]/@id"]
       else:
       - T: "không có dòng kế"
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
 
 - name: move-cell-up
   tag: [mtr, mlabeledtr]
@@ -752,7 +764,7 @@
           - set_variables: [NavNode: "preceding-sibling::*[1]/@id"]
       else:
       - T: "không có dòng kế"
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
 
 - name: move-cell-down
   tag: [mtr, mlabeledtr]
@@ -779,7 +791,7 @@
           - set_variables: [NavNode: "following-sibling::*[1]/@id"]
       else:
       - T: "không có dòng kế"
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
 
 - name: default-read-cell
   tag: "*"
@@ -796,16 +808,19 @@
               then:
               - T: "đọc mục hiện tại"
               - pause: medium
-          - T: "dòng"
-          - x: "count($MTD[1]/../preceding-sibling::*)+1"
-          - T: "cột"
-          - x: "count($MTD[1]/preceding-sibling::*)+1"
-          - pause: short
+          - test:
+              if: "$NavVerbosity != 'Terse'"
+              then:
+              - T: "dòng"
+              - x: "count($MTD[1]/../preceding-sibling::*)+1"
+              - T: "cột"
+              - x: "count($MTD[1]/preceding-sibling::*)+1"
+              - pause: short
           - set_variables: [NavNode: "$MTD[1]/*[1]/@id"]
           else:
           - T: "không phải bảng"
           - pause: long
-          - set_variables: [SpeakExpression: "'false'"]
+          - set_variables: [SpeakExpression: false()]
 
 # mtd ? ( $NavCommand='MoveColumnStart' )
 # => MoveColStart {
@@ -1045,7 +1060,7 @@
       else:
       - T: "không phải bảng"
       - pause: long
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
 
 # ========  Move/Read/Describe Next rules =================
 
@@ -1135,7 +1150,7 @@
       variables: [Move2D: "'end of'", Child2D: "$EdgeNode/*[last()]"]
       replace: [x: "$EdgeNode"]
   - pause: long
-  - set_variables: [SpeakExpression: "'false'"]
+  - set_variables: [SpeakExpression: false()]
 
 - name: move-next-no-auto-zoom-at-edge-math
   # at edge of math -- no where to go (must be after we rule out being at the edge of 2D) because we want to speak that
@@ -1156,7 +1171,7 @@
           else: [T: "mô tả"]
       - T: "qua phải, cuối bài toán"
       - pause: long
-  - set_variables: [SpeakExpression: "'false'"]
+  - set_variables: [SpeakExpression: false()]
 
 - name: move-next-auto-zoom-up-one-level
   # Last child or in auto-zoom'd in-- move up a level and try again 
@@ -1210,9 +1225,12 @@
       # can't get here with MatchCounter=0, so no need to echo command
       if: "following-sibling::*"
       then:
-      - T: "cột"
-      - x: "count(preceding-sibling::*)+2"
-      - pause: short
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
+          - T: "cột"
+          - x: "count(preceding-sibling::*)+2"
+          - pause: short
       - test:
           if: "$NavMode = 'Character'"
           then:
@@ -1382,7 +1400,7 @@
   replace:
   - T: "đầu bài toán"
   - pause: long
-  - set_variables: [SpeakExpression: "'false'"]
+  - set_variables: [SpeakExpression: false()]
 
 - name: move-previous-at-end
   tag: "*"
@@ -1395,7 +1413,7 @@
       then:
       - T: "không thể qua trái, đầu bài toán"
       - pause: long
-  - set_variables: [SpeakExpression: "'false'"]
+  - set_variables: [SpeakExpression: false()]
 
 - name: move-previous-auto-zoom-up-one-level
   # Last child or in auto-zoom'd in-- move up a level and try again 
@@ -1485,9 +1503,12 @@
       # can't get here with MatchCounter=0, so no need to echo command
       if: "preceding-sibling::*"
       then:
-      - T: "cột"
-      - x: "count(preceding-sibling::*)"
-      - pause: short
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
+          - T: "cột"
+          - x: "count(preceding-sibling::*)"
+          - pause: short
       - test:
           if: "$NavMode = 'Character'"
           then:
@@ -1508,9 +1529,12 @@
       then:
       - T: "dòng"
       - x: "count(preceding-sibling::*)"
-      - T: "cột"
-      - x: "count(*)"
-      - pause: medium
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
+          - T: "cột"
+          - x: "count(*)"
+          - pause: medium
       - test:
           if: "$NavMode = 'Character'"
           then:
@@ -1730,7 +1754,7 @@
       then:
       - T: "bên trong không còn"
       - pause: long
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
       else:
       - T: "bên trong"
       - pause: long

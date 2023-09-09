@@ -241,7 +241,7 @@
       - set_variables: [ReadZoomLevel: "0"]
   - set_variables: [NavNode: "@id"]
 
-# special case of zooming into a matrix or determinant -- move to the first element
+# special case of zooming into a matrix or determinant -- move to the first row
 - name: zoom-in-matrix
 
   tag: mrow
@@ -252,9 +252,9 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [t: "zoom in", pause: "long"]
-  - set_variables: [NavNode: "*[2]/*[1]/*[1]/@id"]
+  - set_variables: [NavNode: "*[2]/*[1]/@id"]
 
-# special case of zooming into a table -- move to the first element
+# special case of zooming into a table -- move to the first row
 - name: zoom-in-table
   tag: mtable
   match: "$NavCommand = 'ZoomIn'"
@@ -262,7 +262,7 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [t: "zoom in", pause: "long"]
-  - set_variables: [NavNode: "*[1]/*[1]/*[1]/@id"]
+  - set_variables: [NavNode: "*[1]/@id"]
 
 - name: zoom-in-mrow-in-math
   # Moving to first or last is meaningless the 'math' has only an 'mrow' inside -- dig inside and do it again 
@@ -612,6 +612,9 @@
           then:
           - t: "move left"
           - pause: short
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
           - t: "column"
           - x: "count(preceding-sibling::*)"
           - pause: medium
@@ -639,6 +642,9 @@
           then:
           - t: "move right"
           - pause: short
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
           - t: "column"
           - x: "count(preceding-sibling::*)+2"
           - pause: medium
@@ -669,6 +675,9 @@
               then:
               - t: "move up"
               - pause: short
+          - test:
+              if: "$NavVerbosity != 'Terse'"
+              then:
               - t: "row"
               - x: "count(../preceding-sibling::*)"
               - pause: short
@@ -702,6 +711,9 @@
               then:
               - t: "move down"
               - pause: short
+          - test:
+              if: "$NavVerbosity != 'Terse'"
+              then:
               - t: "row"
               - x: "count(../preceding-sibling::*)+2"
               - pause: short
@@ -732,9 +744,12 @@
           then:
           - t: "move up"
           - pause: medium
-      - t: "row"
-      - x: "count(preceding-sibling::*)"
-      - pause: medium
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
+          - t: "row"
+          - x: "count(preceding-sibling::*)"
+          - pause: medium
       - test:
           if: "$NavMode='Character'"
           then:
@@ -759,9 +774,12 @@
           then:
           - t: "move down"
           - pause: medium
-      - t: "row"
-      - x: "count(preceding-sibling::*)+2"
-      - pause: medium
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
+          - t: "row"
+          - x: "count(preceding-sibling::*)+2"
+          - pause: medium
       - test:
           if: "$NavMode='Character'"
           then:
@@ -789,11 +807,14 @@
               then:
               - t: "read current entry"
               - pause: medium
-          - t: "row"
-          - x: "count($MTD[1]/../preceding-sibling::*)+1"
-          - t: "column"
-          - x: "count($MTD[1]/preceding-sibling::*)+1"
-          - pause: short
+          - test:
+              if: "$NavVerbosity != 'Terse'"
+              then:
+              - t: "row"
+              - x: "count($MTD[1]/../preceding-sibling::*)+1"
+              - t: "column"
+              - x: "count($MTD[1]/preceding-sibling::*)+1"
+              - pause: short
           - set_variables: [NavNode: "$MTD[1]/*[1]/@id"]
           else:
           - t: "not in table"
@@ -1203,9 +1224,12 @@
       # can't get here with MatchCounter=0, so no need to echo command
       if: "following-sibling::*"
       then:
-      - t: "column"
-      - x: "count(preceding-sibling::*)+2"
-      - pause: short
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
+          - t: "column"
+          - x: "count(preceding-sibling::*)+2"
+          - pause: short
       - test:
           if: "$NavMode = 'Character'"
           then:
@@ -1477,9 +1501,12 @@
       # can't get here with MatchCounter=0, so no need to echo command
       if: "preceding-sibling::*"
       then:
-      - t: "column"
-      - x: "count(preceding-sibling::*)"
-      - pause: short
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
+          - t: "column"
+          - x: "count(preceding-sibling::*)"
+          - pause: short
       - test:
           if: "$NavMode = 'Character'"
           then:
@@ -1498,11 +1525,14 @@
       # can't get here with MatchCounter=0, so no need to echo command
       if: "preceding-sibling::*"
       then:
-      - t: "row"
-      - x: "count(preceding-sibling::*)"
-      - t: "column"
-      - x: "count(*)"
-      - pause: medium
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
+          - t: "row"
+          - x: "count(preceding-sibling::*)"
+          - t: "column"
+          - x: "count(*)"
+          - pause: medium
       - test:
           if: "$NavMode = 'Character'"
           then:
