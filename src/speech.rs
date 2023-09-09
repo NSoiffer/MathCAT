@@ -518,7 +518,7 @@ impl<'r> Intent {
         }
         let id = &yaml_dict["id"];
         let replace = &yaml_dict["children"];
-        if replace.is_badvalue() { 
+        if replace.is_badvalue() {
             bail!("Missing 'children' as part of 'intent'.\n    \
                   Suggestion: add 'children:' or if present, indent so it is contained in 'intent'");
         }
@@ -533,14 +533,19 @@ impl<'r> Intent {
     fn replace<'c, 's:'c, 'm: 'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
         let result = self.children.replace::<Element<'m>>(rules_with_context, mathml)
                     .chain_err(||"replacing inside 'intent'")?;
-        let result = lift_children(result);
+        let mut result = lift_children(result);
+        if name(&result) != "TEMP_NAME" && name(&result) != "Unknown" {
+            // this case happens when you have an 'intent' replacement as a direct child of an 'intent' replacement
+            let temp = create_mathml_element(&result.document(), "TEMP_NAME");
+            temp.append_child(result);
+            result = temp;
+        }
         if let Some(name) = &self.name {
             set_mathml_name(result, name.as_str());
         } else if let Some(my_xpath) = &self.xpath{    // self.xpath_name must be != None
             let xpath_value = my_xpath.evaluate(rules_with_context.get_context(), mathml)?;
             match xpath_value {
                 Value::String(name) => {
-                    // debug!("replace name: '{}'", &name);
                     set_mathml_name(result, name.as_str())
                 },
                 _ => bail!("'xpath-name' value '{}' was not a string", &my_xpath),
@@ -2174,7 +2179,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                 }
                 return match result {
                     Ok(s) => {
-                        // for all except braille, nav_node_id will be an empty string and will not match
+                        // for all except braille and navigation, nav_node_id will be an empty string and will not match
                         if self.nav_node_id.is_empty() {
                             Ok( Some(s) )
                         } else {
@@ -2329,7 +2334,6 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
     /// Iterate over all the nodes finding matches for the elements
     /// For this case of returning MathML, everything else is an error
     fn replace_nodes_tree(&'r mut self, nodes: Vec<Node<'c>>, _mathml: Element<'c>) -> Result<Element<'m>> {
-        // debug!("replace_nodes: working on {} nodes", nodes.len());
 
         let mut children = Vec::with_capacity(3*nodes.len());   // guess (2 chars/node + space)
         for node in nodes {
@@ -2342,6 +2346,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                     leaf
                 },
                 Node::Attribute(attr) => {
+                    // debug!("  from attr with text '{}'", attr.value());
                     let leaf = create_mathml_element(&self.doc, "TEMP_NAME");
                     leaf.set_text(attr.value());
                     leaf
@@ -2355,7 +2360,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
 
         let result = create_mathml_element(&self.doc, "TEMP_NAME");    // FIX: what name should be used?
         result.append_children(children);
-        // debug!("replace_nodes_tree\n{}", mml_to_string(&result));
+        // debug!("replace_nodes_tree\n{}\n====>>>>>\n", mml_to_string(&result));
         return Ok( result );
     }
 
