@@ -122,7 +122,7 @@
  - "|":                                         	#  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
      - test:
-        - if: $SpeechStyle != 'ClearSpeak'
+        - if: "$SpeechStyle != 'ClearSpeak' or not(preceding-sibling::*) or not(following-sibling::*)"
           then: [T: "barra vertical"]           	# 	(en: 'vertical line', google translation)
         - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
           then: [T: "tal que"]                  	# 	(en: 'such that', google translation)
