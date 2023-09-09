@@ -1002,18 +1002,18 @@
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
   - test:
-    - if: "text()='→' or text()='⟶'"
+    - if: ".='→' or .='⟶'"
       then_test:
         if: "$Verbosity='Terse'"
         then: [{T: "cho ra"}]      # phrase(hydrogen and oxygen 'forms' water )
         else: [{T: "phản ứng cho ra"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
-    - else_if: "text()='⇌' or text()='⮖'"
+    - else_if: ".='⇌' or .='⮖'"
       then: [{T: "cân bằng với"}]      # phrase(a reactant 'is in equilibrium with' a product)
-    - else_if: "text()='⭴'"
+    - else_if: ".='⭴'"
       then: [{T: "cân bằng về bên trái với"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
-    - else_if: "text()='⭵'"
+    - else_if: ".='⭵'"
       then: [{T: "cân bằng về bên phải với"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
-      else: [x: "text()"]
+      else: [x: "."]
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator

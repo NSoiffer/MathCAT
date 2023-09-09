@@ -932,18 +932,18 @@
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
   - test:
-    - if: "text()='→' or text()='⟶'"
+    - if: ".='→' or .='⟶'"
       then_test:
         if: "name(preceding-sibling::*[1]) = 'chemical-nuclide'"
         then: [{T: "membusuk menjadi"}]
         else: [{T: "hasil"}]
-    - else_if: "text()='⇌' or text()='⮖'"
+    - else_if: ".='⇌' or .='⮖'"
       then: [{T: "berada dalam kesetimbangan dengan"}]
-    - else_if: "text()='⭴'"
+    - else_if: ".='⭴'"
       then: [{T: "berada dalam kesetimbangan bias ke kiri dengan"}]
-    - else_if: "text()='⭵'"
+    - else_if: ".='⭵'"
       then: [{T: "berada dalam kesetimbangan bias ke kanan dengan"}]
-      else: [{x: text()}]
+      else: [{x: .}]
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator
