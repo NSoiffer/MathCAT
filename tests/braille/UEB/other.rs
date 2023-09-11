@@ -41,6 +41,27 @@ fn number_space_before_and_after() {
 }
 
 #[test]
+fn not_number_space_blocks() {
+    // https://github.com/NSoiffer/MathCAT/issues/144
+    let expr = "<math><mn>123</mn><mtext>&nbsp;&#x2063;</mtext><mn>456</mn></math>";
+    test_braille("UEB", expr, "⠼⠁⠃⠉⠀⠼⠙⠑⠋");
+}
+
+#[test]
+fn space_hack_between_digits() {
+    // https://github.com/NSoiffer/MathCAT/issues/144
+    let expr = "<math><mn>1</mn><mtext>&#x00a0;&#x2063;</mtext><mn>3</mn><mtext>&#x00a0;&#x2063;</mtext><mn>5</mn></math>";
+    test_braille("UEB", expr, "⠼⠁⠀⠼⠉⠀⠼⠑");
+}
+
+#[test]
+fn space_hack_around_operator() {
+    // https://github.com/NSoiffer/MathCAT/issues/144
+    let expr = "<math><mi>y</mi><mtext>&#x00a0;&#x2063;</mtext><mo>=</mo><mtext>&#x00a0;&#x2063;</mtext><mn>5</mn></math>";
+    test_braille("UEB", expr, "⠰⠽⠀⠐⠶⠀⠼⠑");
+}
+
+#[test]
 fn forced_g1_symbol_mode() {
     // A forced G1 should not count against starting in G2 mode
     // This is issue #170 -- surprisingly not tested by other tests 
