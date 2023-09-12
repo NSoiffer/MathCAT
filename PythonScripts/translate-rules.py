@@ -91,16 +91,16 @@ def translate_phrases(phrases_to_translate: list[str], lang) -> list[str]:
 TargetWord = re.compile(r"'([^']+)'")
 TextString = re.compile(r't: "([^"]+)"')
 def substitute_in_translated_word(line, translated_phrase) -> str:
-    print("original phrase:   {}".format(TextToTranslate.search(line).group(1)))
-    print("translated phrase: {}".format(translated_phrase))
+    # print("original phrase:   {}".format(TextToTranslate.search(line).group(1)))
+    # print("translated phrase: {}".format(translated_phrase))
     target_words = TargetWord.search(translated_phrase)
     new_line = line
     if target_words:
         replacement = 't: "' + target_words.group(1) + '"'    # add the surrounding context back
         new_line = TextString.sub(replacement, line)
-        print("fixed line: {}".format(new_line))
+        # print("fixed line: {}".format(new_line))
     else:
-        print("ERROR: failed to find 'xxx' in line: {}".format(line))
+        print("ERROR: failed to find quoted part in translation \"{}\"\n   original line: {}".format(translated_phrase, line))
     return new_line
 
 
