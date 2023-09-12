@@ -49,7 +49,7 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [T: "cerca"]                  	# 	(en: 'close', google translation)
+            then: [T: "cerrar paréntesis"]                  	# 	(en: 'close', google translation)
             else: [T: "paréntesis derecho"]     	# 	(en: 'close paren', MathPlayer: 'cierra paréntesis', google: 'paréntesis cercana')
         else: [T: "paréntesis derecho"]         	# 	(en: 'right paren', MathPlayer: 'cierra paréntesis')
 
