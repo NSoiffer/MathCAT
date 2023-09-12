@@ -459,7 +459,7 @@
 
 - name: multi-line
   #   that eliminates the need for the if: else_if: ...
-  # IDEA:  set a variable with the word to saw for the row (e.g., RowLabel = Row/Case/Line/...)
+  # IDEA:  set a variable with the word to say for the row (e.g., RowLabel = Row/Case/Line/...)
   tag: [cases, equations, lines]
   match: "."
   replace:
@@ -945,18 +945,18 @@
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
   - test:
-    - if: "text()='→' or text()='⟶'"
+    - if: ".='→' or .='⟶'"
       then_test:
         if: "$Verbosity='Terse'"
         then: [{T: "formas"}]
         else: [{T: "da forma"}]
-    - else_if: "text()='⇌' or text()='⮖'"
+    - else_if: ".='⇌' or .='⮖'"
       then: [{T: "está en equilibrio con"}]
-    - else_if: "text()='⭴'"
+    - else_if: ".='⭴'"
       then: [{T: "equilibrado parcialmente hacia el lado izquierdo"}]
-    - else_if: "text()='⭵'"
+    - else_if: ".='⭵'"
       then: [{T: "equilibrado parcialmente hacia el lado derecho"}]
-      else: [x: "text()"]
+      else: [x: "."]
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator
@@ -970,3 +970,9 @@
   match: "../../*[self::m:chemical-formula or self::m:chemical-nuclide]"
   replace:
   - t: "" # don't say anything
+
+- name: ignore-intent-wrapper
+  tag: intent-wrapper
+  match: "."
+  replace:
+  - x: "*"

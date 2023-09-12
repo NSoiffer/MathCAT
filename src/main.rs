@@ -170,8 +170,13 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr=r#"
-  <math><mrow><msubsup><mi mathvariant='normal' ame-texclass='op'>log</mi><mn>3</mn><mn>2</mn></msubsup><mo>&#x2061;</mo><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mn>2</mn><msub><mi mathvariant='normal' ame-texclass='op'>log</mi><mn>2</mn></msub><mo>&#x2061;</mo><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mn>3</mn><mo ame-texclass='rel' stretchy='false'>=</mo><mn>0</mn></mrow></math>
-  "#;
+  <math>
+  <mi>y</mi>
+  <mtext>&#x00a0;&#x2063;</mtext>
+  <mo>=</mo>
+  <mtext>&#x00a0;&#x2063;</mtext>
+  <mn>5</mn>
+</math>"#;
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>
@@ -216,7 +221,8 @@ fn main() {
   }
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
-  set_preference("BrailleCode".to_string(), "CMU".to_string()).unwrap();
+
+  set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),
@@ -231,7 +237,7 @@ fn main() {
   // info!("Time taken (second time for speech): {}ms", instant.elapsed().as_millis());
   // info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()));
   
-  // match get_braille("".to_string()) {
+  // match get_braille("") {
   //   Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
   //   Err(e) => panic!("{}", errors_to_string(&e)),
   // }

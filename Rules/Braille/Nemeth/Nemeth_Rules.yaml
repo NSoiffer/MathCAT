@@ -353,7 +353,7 @@
 
 - name: remove-space
   tag: mtext
-  match: "text()='\u00A0'"
+  match: "translate(., '\u00A0\u2063', '')=''"
   replace:
      - t: "" # do nothing -- Nemeth ignores spaces
 - name: default

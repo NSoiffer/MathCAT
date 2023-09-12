@@ -17,7 +17,7 @@ static UEB_PREFIXES: phf::Set<char> = phf_set! {
 
 /// braille the MathML
 /// If 'nav_node_id' is not an empty string, then the element with that id will have dots 7 & 8 turned on as per the pref
-pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<String> {
+pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<String> {
     crate::speech::SpeechRules::update()?;
     return BRAILLE_RULES.with(|rules| {
         rules.borrow_mut().read_files()?;
@@ -1690,6 +1690,107 @@ impl BrailleChars {
                 + &caps["char"]
         });
         return Ok(result.to_string())
+    }
+
+    fn get_braille_cmu_chars(node: Element, text_range: Option<Range<usize>>) -> Result<String> {
+        // In CMU, we need to replace spaces used for number blocks with "."
+        // For other numbers, we need to add "." to create digit blocks
+
+        lazy_static! {
+            // these all use ',' for decimal separators
+            static ref NUMBER_WITH_SPACES: Regex = Regex::new(r"^[1-9]\d{0,2}( \d{3})*(,\d*)?$").unwrap();
+            static ref NUMBER_WITH_BLOCKS: Regex = Regex::new(r"^([1-9]\d\d\d+)(,\d*)?$").unwrap();
+    
+            static ref HAS_TYPEFACE: Regex = Regex::new(".*?(double-struck|script|fraktur|sans-serif).*").unwrap();
+            static ref PICK_APART_CHAR: Regex = 
+                 Regex::new(r"(?P<bold>B??)(?P<italic>I??)(?P<face>[S𝔹TD]??)s??(?P<cap>C??)(?P<greek>G??)(?P<char>[NL].)").unwrap();
+        }
+    
+        let math_variant = node.attribute_value("mathvariant");
+        let text = BrailleChars::substring(as_text(node), &text_range);
+        let text = add_separator(text);
+
+        let braille_chars = crate::speech::braille_replace_chars(&text, node)?;
+
+        // debug!("get_braille_ueb_chars: before/after unicode.yaml: '{}'/'{}'", text, braille_chars);
+        if math_variant.is_none() {         // nothing we need to do
+            return Ok(braille_chars);
+        }
+        // mathvariant could be "sans-serif-bold-italic" -- get the parts
+        let math_variant = math_variant.unwrap();
+        let bold = math_variant.contains("bold");
+        let italic = math_variant.contains("italic");
+        let typeface = match HAS_TYPEFACE.find(math_variant) {
+            None => "",
+            Some(m) => match m.as_str() {
+                "double-struck" => "𝔹",
+                "script" => "T",
+                "fraktur" => "D",
+                "sans-serif" => "S",
+                //  don't consider monospace as a typeform
+                _ => "",
+            },
+        };
+        let result = PICK_APART_CHAR.replace_all(&braille_chars, |caps: &Captures| {
+            // debug!("captures: {:?}", caps);
+            // debug!("  bold: {:?}, italic: {:?}, face: {:?}, cap: {:?}, char: {:?}",
+            //        &caps["bold"], &caps["italic"], &caps["face"], &caps["cap"], &caps["char"]);
+            if bold || !caps["bold"].is_empty() {"B"} else {""}.to_string()
+                + if italic || !caps["italic"].is_empty() {"I"} else {""}
+                + if !&caps["face"].is_empty() {&caps["face"]} else {typeface}
+                + &caps["cap"]
+                + &caps["greek"]
+                + &caps["char"]
+        });
+        return Ok(result.to_string());
+
+        fn add_separator(text: String) -> String {
+            use crate::definitions::DEFINITIONS;
+            if NUMBER_WITH_SPACES.is_match(&text) {
+                return text.replace(' ', ".");
+            } else if NUMBER_WITH_BLOCKS.is_match(&text) {
+                let mut parts = text.split(',');
+                let integer_part = parts.next().unwrap();   // has to exist -- at least four chars
+                let fractional_part = parts.next();
+                let fractional_part = if let Some(text) = fractional_part {text} else {""};
+                let n_chars = integer_part.chars().count();
+                let mut chars = integer_part.chars();
+                let mut result = String::with_capacity(4*n_chars/3 + fractional_part.len() );      // a bit large if there is a fractional part
+                match n_chars % 3 {     // get the leading digits
+                    0 => {
+                        result.push(chars.next().unwrap());
+                        result.push(chars.next().unwrap());
+                        result.push(chars.next().unwrap());
+                    },
+                    1 => {
+                        result.push(chars.next().unwrap());
+                    },
+                    _ => {      // must be == 2
+                        result.push(chars.next().unwrap());
+                        result.push(chars.next().unwrap());
+                    },
+                }
+                for (i, c) in chars.enumerate() {
+                    if i % 3 == 0 {
+                        result.push('.');
+                    }
+                    result.push(c);
+                }
+                result.push_str(fractional_part);  
+                return result;    
+            } else if let Some(text_without_arc) = text.strip_prefix("arc") {
+                // "." after arc (7.5.3)
+                let is_function_name = DEFINITIONS.with(|definitions| {
+                    let definitions = definitions.borrow();
+                    let set = definitions.get_hashset("CMUFunctionNames").unwrap();
+                    return set.contains(&text);
+                });
+                if is_function_name {
+                    return "arc.".to_string() + text_without_arc;
+                }
+            } 
+            return text;  
+        }
     }
 
     fn get_braille_vietnam_chars(node: Element, text_range: Option<Range<usize>>) -> Result<String> {

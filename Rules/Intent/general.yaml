@@ -41,7 +41,7 @@
   
 -
   name: roman_numeral
-  tag: [mi, mtext]
+  tag: [mi, mn, mtext]
   match: "@data-number"
   replace: 
   - intent:
@@ -594,7 +594,9 @@
 -
   name: mtable-matrix-property
   tag: mtable
-  match: "contains(@data-intent-property, ':matrix:')"
+  match:
+  - "contains(@data-intent-property, ':matrix:') or"
+  - "..[self::m:mrow and (IsBracketed(., '(', ')') or IsBracketed(., '[', ']'))]"
   replace:
   - intent:
       name: "matrix"
@@ -604,7 +606,7 @@
 -
   name: mtable-determinant-property
   tag: mtable
-  match: "contains(@data-intent-property, ':determinant:')"
+  match: "contains(@data-intent-property, ':determinant:') or ..[self::m:mrow and IsBracketed(., '|', '|')]"
   replace:
   - intent:
       name: "determinant"
@@ -614,7 +616,9 @@
 -
   name: mtable-cases-property
   tag: mtable
-  match: "contains(@data-intent-property, ':cases:')"
+  match:
+  - "contains(@data-intent-property, ':cases:') or"
+  - "..[self::m:mrow and count(*)=2 and *[1][text()='{']]"
   replace:
   - intent:
       name: "cases"
@@ -663,10 +667,12 @@
   match: "count(*)=2 and *[1][text()='{'] and *[2][self::m:mtable]"
   replace:
   - intent:
-      name: "cases"
+      name: "intent-wrapper"
       children:
-      - x: "*[2]/*"
-
+      - intent:
+          name: "cases"
+          id: "*[2]/@id"
+          children: [x: "*[2]/*"]
 
 -
   # if there is a relational op in the first row, assume that's true of all rows and call them equations

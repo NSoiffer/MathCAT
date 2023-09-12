@@ -252,7 +252,7 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [T: "zoom cerca", pause: "long"]
-  - set_variables: [NavNode: "*[2]/*[1]/*[1]/@id"]
+  - set_variables: [NavNode: "*[2]/*[1]/@id"]
 
 # special case of zooming into a table -- move to the first element
 - name: zoom-in-table
@@ -262,7 +262,7 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [T: "zoom cerca", pause: "long"]
-  - set_variables: [NavNode: "*[1]/*[1]/*[1]/@id"]
+  - set_variables: [NavNode: "*[1]/@id"]
 
 - name: zoom-in-mrow-in-math
   # Moving to first or last is meaningless the 'math' has only an 'mrow' inside -- dig inside and do it again 
@@ -598,7 +598,7 @@
   replace:
   - T: "fuera de tabla"
   - pause: long
-  - set_variables: [SpeakExpression: "'false'"]
+  - set_variables: [SpeakExpression: false()]
 
 - name: move-cell-previous
   tag: mtd
@@ -612,6 +612,9 @@
           then:
           - T: "desplazarse a la izquierda"
           - pause: short
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
           - T: "columna"
           - x: "count(preceding-sibling::*)"
           - pause: medium
@@ -625,7 +628,7 @@
           - set_variables: [NavNode: "preceding-sibling::*[1]/*[1]/@id"]
       else:
       - T: "sin columna anterior"
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
 
 - name: move-cell-next
   tag: mtd
@@ -639,6 +642,9 @@
           then:
           - T: "desplazarse a la derecha"
           - pause: short
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
           - T: "columna"
           - x: "count(preceding-sibling::*)+2"
           - pause: medium
@@ -652,7 +658,7 @@
           - set_variables: [NavNode: "following-sibling::*[1]/*[1]/@id"]
       else:
       - T: "sin columna posterior"
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
 
 - name: move-cell-up
   tag: mtd
@@ -669,6 +675,9 @@
               then:
               - T: "desplazarse hacia arriba"
               - pause: short
+          - test:
+              if: "$NavVerbosity != 'Terse'"
+              then:
               - T: "fila"
               - x: "count(../preceding-sibling::*)"
               - pause: short
@@ -685,7 +694,7 @@
               - set_variables: [NavNode: "../preceding-sibling::*[1]/*[$Column]/*[1]/@id"]
       else:
       - T: "ninguna fila anterior"
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
 
 - name: move-cell-down
   tag: mtd
@@ -702,6 +711,9 @@
               then:
               - T: "bajar"
               - pause: short
+          - test:
+              if: "$NavVerbosity != 'Terse'"
+              then:
               - T: "fila"
               - x: "count(../preceding-sibling::*)+2"
               - pause: short
@@ -718,7 +730,7 @@
               - set_variables: [NavNode: "../following-sibling::*[1]/*[$Column]/*[1]/@id"]
       else:
       - T: "ninguna fila posterior"
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
 
 - name: move-cell-up
   tag: [mtr, mlabeledtr]
@@ -745,7 +757,7 @@
           - set_variables: [NavNode: "preceding-sibling::*[1]/@id"]
       else:
       - T: "ninguna fila anterior"
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
 
 - name: move-cell-down
   tag: [mtr, mlabeledtr]
@@ -772,7 +784,7 @@
           - set_variables: [NavNode: "following-sibling::*[1]/@id"]
       else:
       - T: "ninguna fila posterior"
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
 
 - name: default-read-cell
   tag: "*"
@@ -789,16 +801,19 @@
               then:
               - T: "leer la entrada actual"
               - pause: medium
-          - T: "fila"
-          - x: "count($MTD[1]/../preceding-sibling::*)+1"
-          - T: "columna"
-          - x: "count($MTD[1]/preceding-sibling::*)+1"
-          - pause: short
+          - test:
+              if: "$NavVerbosity != 'Terse'"
+              then:
+              - T: "fila"
+              - x: "count($MTD[1]/../preceding-sibling::*)+1"
+              - T: "columna"
+              - x: "count($MTD[1]/preceding-sibling::*)+1"
+              - pause: short
           - set_variables: [NavNode: "$MTD[1]/*[1]/@id"]
           else:
           - T: "fuera de tabla"
           - pause: long
-          - set_variables: [SpeakExpression: "'false'"]
+          - set_variables: [SpeakExpression: false()]
 
 # mtd ? ( $NavCommand='MoveColumnStart' )
 # => MoveColStart {
@@ -1038,7 +1053,7 @@
       else:
       - T: "fuera de tabla"
       - pause: long
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
 
 # ========  Move/Read/Describe Next rules =================
 
@@ -1128,7 +1143,7 @@
       variables: [Move2D: "'end of'", Child2D: "$EdgeNode/*[last()]"]
       replace: [x: "$EdgeNode"]
   - pause: long
-  - set_variables: [SpeakExpression: "'false'"]
+  - set_variables: [SpeakExpression: false()]
 
 - name: move-next-no-auto-zoom-at-edge-math
   # at edge of math -- no where to go (must be after we rule out being at the edge of 2D) because we want to speak that
@@ -1149,7 +1164,7 @@
           else: [T: "describir"]
       - T: "derecha, finalizar cálculo"
       - pause: long
-  - set_variables: [SpeakExpression: "'false'"]
+  - set_variables: [SpeakExpression: false()]
 
 - name: move-next-auto-zoom-up-one-level
   # Last child or in auto-zoom'd in-- move up a level and try again 
@@ -1203,9 +1218,12 @@
       # can't get here with MatchCounter=0, so no need to echo command
       if: "following-sibling::*"
       then:
-      - T: "columna"
-      - x: "count(preceding-sibling::*)+2"
-      - pause: short
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
+          - T: "columna"
+          - x: "count(preceding-sibling::*)+2"
+          - pause: short
       - test:
           if: "$NavMode = 'Character'"
           then:
@@ -1375,7 +1393,7 @@
   replace:
   - T: "iniciar cálculo"
   - pause: long
-  - set_variables: [SpeakExpression: "'false'"]
+  - set_variables: [SpeakExpression: false()]
 
 - name: move-previous-at-end
 
@@ -1389,7 +1407,7 @@
       then:
       - T: "no puede desplazarse a la izquierda, iniciar cálculo"
       - pause: long
-  - set_variables: [SpeakExpression: "'false'"]
+  - set_variables: [SpeakExpression: false()]
 
 - name: move-previous-auto-zoom-up-one-level
   # Last child or in auto-zoom'd in-- move up a level and try again 
@@ -1479,9 +1497,12 @@
       # can't get here with MatchCounter=0, so no need to echo command
       if: "preceding-sibling::*"
       then:
-      - T: "columna"
-      - x: "count(preceding-sibling::*)"
-      - pause: short
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
+          - T: "columna"
+          - x: "count(preceding-sibling::*)"
+          - pause: short
       - test:
           if: "$NavMode = 'Character'"
           then:
@@ -1500,10 +1521,13 @@
       # can't get here with MatchCounter=0, so no need to echo command
       if: "preceding-sibling::*"
       then:
-      - T: "fila"
-      - x: "count(preceding-sibling::*)"
-      - T: "columna"
-      - x: "count(*)"
+      - test:
+          if: "$NavVerbosity != 'Terse'"
+          then:
+          - T: "fila"
+          - x: "count(preceding-sibling::*)"
+          - T: "columna"
+          - x: "count(*)"
       - pause: medium
       - test:
           if: "$NavMode = 'Character'"
@@ -1726,7 +1750,7 @@
       then:
       - T: "interior vacío"
       - pause: long
-      - set_variables: [SpeakExpression: "'false'"]
+      - set_variables: [SpeakExpression: false()]
       else:
       - T: "interior"
       - pause: medium

@@ -492,7 +492,7 @@
 
 - name: multi-line
   #   that eliminates the need for the if: else_if: ...
-  # IDEA:  set a variable with the word to saw for the row (e.g., RowLabel = Row/Case/Line/...)
+  # IDEA:  set a variable with the word to say for the row (e.g., RowLabel = Row/Case/Line/...)
   tag: [cases, equations, lines]
   match: "."
   variables:
@@ -516,7 +516,6 @@
 - name: default-multiline
   tag: [mtr, mlabeledtr]
   match: "parent::m:cases or parent::m:equations or parent::m:lines"
-  variables: [ContinuedEquation: "parent::m:equations and *[1][count(*)=1 and *[1][@data-added='missing-content']]"]
   replace:
   - test:
       if: "parent::m:equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
@@ -992,18 +991,18 @@
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
   - test:
-    - if: "text()='→' or text()='⟶'"
+    - if: ".='→' or .='⟶'"
       then_test:
         if: "$Verbosity='Terse'"
         then: [{t: "forms"}]      # phrase(hydrogen and oxygen 'forms' water )
         else: [{t: "reacts to form"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
-    - else_if: "text()='⇌' or text()='⮖'"
+    - else_if: ".='⇌' or .='⮖'"
       then: [{t: "is in equilibrium with"}]      # phrase(a reactant 'is in equilibrium with' a product)
-    - else_if: "text()='⭴'"
+    - else_if: ".='⭴'"
       then: [{t: "is in equilibrium biased to the left with"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
-    - else_if: "text()='⭵'"
+    - else_if: ".='⭵'"
       then: [{t: "is in equilibrium biased to the right with"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
-      else: [x: "text()"]
+      else: [x: "."]
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator
@@ -1017,3 +1016,9 @@
   match: "../../*[self::m:chemical-formula or self::m:chemical-nuclide]"
   replace:
   - t: "" # don't say anything
+
+- name: ignore-intent-wrapper
+  tag: intent-wrapper
+  match: "."
+  replace:
+  - x: "*"
