@@ -221,6 +221,7 @@ fn main() {
   }
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
+
   set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),

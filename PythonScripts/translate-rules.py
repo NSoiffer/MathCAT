@@ -1,3 +1,11 @@
+"""
+Translate the English rule files (but not the unicode files) to the target language.
+This is done with the function build_all_translations().
+
+The unicode files are not built here because they are large enough to seem to occasionally run into hiccups.
+
+See the end of this file how this is used (typically change 'language' and just run the file)
+"""
 # Translate text in rules into the target language
 
 # The google translate is done via https://github.com/ffreemt/google-stranslate (pip install itranslate)
@@ -131,12 +139,10 @@ def build_all_translations(path_to_mathcat: str, lang: str, subdir="") -> None:
 
 
 
-# if os.path.exists("unicode.yaml"):
-#   os.remove("unicode.yaml")
-language = 'es'
+language = 'pt'
 if not os.path.exists(language):
     os.makedirs(language)
 if not os.path.exists(language+"/SharedRules"):
     os.makedirs(language+"/SharedRules")
 # build_new_translation("..", language, "SharedRules/general.yaml")
-build_all_translations("..", "es")
+build_all_translations("..", language)
