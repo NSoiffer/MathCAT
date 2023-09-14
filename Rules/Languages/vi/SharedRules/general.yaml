@@ -964,12 +964,12 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: ".='s'"
-      then: [{T: "rắn"}]
+      then: [{T: "thể rắn"}]
     - else_if: ".='l'"
-      then: [{T: "lỏng"}]
+      then: [{T: "thể lỏng"}]
     - else_if: ".='g'"
-      then: [{T: "khí"}]
-      else: [{T: "nước"}] # (aq)
+      then: [{T: "thể khí"}]
+      else: [{T: "thể lỏng"}] # (aq)
   - pause: short
 
 - name: chemical-formula-operator-bond
@@ -980,13 +980,13 @@
   - bookmark: "@id"
   - test:
     - if: "text()='-' or text() = ':'"
-      then: [{T: "liên kết đơn"}]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
+      then: [{T: "nối đơn"}]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
     - else_if: "text()='=' or text() = '∷'"
-      then: [{T: "liên kết đôi"}]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
+      then: [{T: "nối đôi"}]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
     - else_if: "text()='≡'"
-      then: [{T: "liên kết ba"}]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
+      then: [{T: "nối ba"}]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
     - else_if: "text()='≣'"
-      then: [{T: "liên kết bốn"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
+      then: [{T: "nối bốn"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
       else: [{x: "text()"}]
 
 - name: chemical-formula-operator
@@ -1008,11 +1008,11 @@
         then: [{T: "cho ra"}]      # phrase(hydrogen and oxygen 'forms' water )
         else: [{T: "phản ứng cho ra"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
     - else_if: ".='⇌' or .='⮖'"
-      then: [{T: "cân bằng với"}]      # phrase(a reactant 'is in equilibrium with' a product)
+      then: [{T: "mũi tên hai chiều"}]      # phrase(a reactant 'is in equilibrium with' a product)
     - else_if: ".='⭴'"
-      then: [{T: "cân bằng về bên trái với"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
+      then: [{T: "mũi tên chiều bên trái"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
     - else_if: ".='⭵'"
-      then: [{T: "cân bằng về bên phải với"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
+      then: [{T: "mũi tên chiều bên phải"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
       else: [x: "."]
 
 - name: chemical-equation-operator
