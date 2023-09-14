@@ -684,9 +684,9 @@ fn beta_decay() {
         <mn>0</mn>
       </mmultiscripts>
     </math>";
-  test_braille("Vietnam", expr, "⠨⠉⠢⠮⠼⠋⠔⠞⠼⠁⠙⠳⠕⠨⠝⠢⠮⠼⠛⠔⠞⠼⠁⠙⠐⠖⠑⠢⠮⠣⠐⠤⠼⠁⠜⠔⠞⠼⠚");
+  test_braille("Vietnam", expr, "⠨⠉⠢⠞⠼⠋⠔⠞⠼⠁⠙⠳⠕⠨⠝⠢⠞⠼⠛⠔⠞⠼⠁⠙⠐⠖⠑⠢⠞⠣⠐⠤⠼⠁⠜⠔⠞⠼⠚");
   // quite similar to math, sub and super scripts always written after its constant/variable
-  // subscript on the left: ⠢⠮. Superscript on the left: ⠔⠞. Subscript at the middle: ⠨⠢. Superscript at the middle: ⠨⠔. Subscript on the right: ⠢. And superscript on the right: ⠔
+  // subscript on the left: ⠢⠞. Superscript on the left: ⠔⠞. Subscript at the middle: ⠨⠢. Superscript at the middle: ⠨⠔. Subscript on the right: ⠢. And superscript on the right: ⠔
 }
 
 #[test]
