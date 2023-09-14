@@ -143,7 +143,6 @@
  - "⟂": [t: "⠼⠤"]               # 0x27C2 (Perpendicular)
  - "⊥": [t: "⠼⠤"]               # 0x22A5 (Up tack (perpendicular))
  - "⊦": [t: "⠸⠒"]               # 0x22A6 (Assertion (is a theorem))
- - "⊣": [t: "⠈⠸⠒"]              # 0x22A3 (Left tack (reverse assertion))
  - "⊨": [t: "⠘⠸⠒"]              # 0x22A8 (TRUE (is valid))
  - "⊬": [t: "⠸⠒⠈⠱"]             # 0x22AC (Does not prove)
  - "⊭": [t: "⠘⠸⠒⠈⠱"]            # 0x22AD (Not TRUE)
