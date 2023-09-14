@@ -123,7 +123,6 @@
  - "χ": [t: "GL⠯"]              # 0x3c7
  - "ψ": [t: "GL⠽"]              # 0x3c8
  - "ω": [t: "GL⠺"]              # 0x3c9
- - "∂": [t: "⠈⠙"]               # 0x2202
  - "ϵ": [t: "GL⠑"]              # 0x3f5
  - "ϑ": [t: "VL⠹"]              # 0x3d1
  - "ϰ": [t: "GL⠅"]              # 0x3f0
@@ -155,7 +154,6 @@
  - "⋁": [t: "⠈⠬"]               # 0x22c1
  - "⋂": [t: "⠨⠩"]               # 0x22c2
  - "⋃": [t: "⠨⠬"]               # 0x22c3
- - "⋅": [t: "⠡"]                # 0x22c5
  - "⋜": [t: "⠱⠐⠅"]              # 0x22dc
  - "⋝": [t: "⠱⠨⠂"]              # 0x22dd
  - "⋮": [t: "⠣⠄⠄⠄"]             # 0x22ee
@@ -295,15 +293,10 @@
         else: [t: "⠳"]          # absolute value, others???
  - "}": [t: "⠨⠾"]               # 0x007D (Right curly bracket)
  - "~": [t: "⠈⠱"]               # 0x007E (Tilde)
- - "¢": [t: "⠈⠉"]               # 0x00A2 (Cent sign)
- - "£": [t: "⠈⠇"]               # 0x00A3 (Pound sterling)
- - "§": [t: "⠈⠠⠎"]              # 0x00A7 (Section sign)
- - "©": [t: "⠷⠠⠉⠾"]             # 0x00A9 (Copyright sign)
  - "¬": [t: ""]                 # 0x00AC (Not sign)
  - "¯": [t: "⠱"]                # 0x00AF (bar)
  - "°": [t: "⠨⠡"]              # 0x00B0 (Degree sign)
  - "±": [t: "⠬⠤"]               # 0x00B1 (Plus-minus sign)
- - "¶": [t: "⠈⠠⠏"]              # 0x00B6 (Pilcrow sign)
  - "·": [t: "⠡"]                # 0x00B7 (Middle dot)
  - "×": [t: "⠈⠡"]               # 0x00D7 (Multiplication sign)
  - "÷": [t: "⠨⠌"]               # 0x00F7 (Division sign)
@@ -391,7 +384,3 @@
  - "∞": [t: "⠠⠿"]               # 0x221E (Infinity)
  - "∣": [t: "⠳"]              # 0x2223 (Divides)
  - "∫": [t: "⠮"]                # 0x222B (Integral)
- - "⌈": [t: "⠈⠘⠷"]              # 0x2308 (Left ceiling)
- - "⌉": [t: "⠈⠘⠾"]              # 0x2309 (Right ceiling)
- - "⌊": [t: "⠈⠰⠷"]              # 0x230A (Left floor)
- - "⌋": [t: "⠈⠰⠾"]              # 0x230B (Right floor)
