@@ -435,8 +435,8 @@
          - else_if: "self::m:msub"
            then: [T: "⠢"]
          - else_if: "self::m:munder"
-           then: [T: "⠨⠢"]
-           else: [T: "⠨⠔"]  # mover
+           then: [T: "⠢"]
+           else: [T: "⠔"]  # mover
       - test:
          # omit grouping indicators in the following cases
          if:   # FIX: need to add arbitrary shapes here (also for mroot) also multi-char leaf translations except mi
@@ -488,7 +488,7 @@
       replace:
       - test:
          - if: "self::m:munderover"
-           then: [t: "⠨⠢"]    
+           then: [t: "⠢"]    
            else: [t: "⠢"]
       - test:
          # omit grouping indicators in the following cases
@@ -508,8 +508,8 @@
          - t: "⠜"
       - test:
          - if: "self::m:munderover"
-           then: [t: "⠨⠔"]     
-           else: [t: "⠔"]
+           then: [T: "⠔"]     
+           else: [T: "⠔"]
       - test:
          # omit grouping indicators in the following cases
          if:   # FIX: need to add arbitrary shapes here (also for mroot) also multi-char leaf translations except mi
