@@ -531,7 +531,6 @@ fn vi_letters () {
 // Cap Roman numbers are marked with dots 46for both single letter and word.
 #[test]
 fn mhchem_roman_in_superscript () {
-    init_logger();
     let expr = "<math>
       <mrow>
         <mmultiscripts>
