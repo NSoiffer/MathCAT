@@ -306,6 +306,10 @@ impl IsNode {
     pub fn is_2D(elem: &Element) -> bool {
         return MATHML_2D_NODES.contains(name(elem));
     }
+
+    pub fn is_scripted(elem: &Element) -> bool {
+        return MATHML_SCRIPTED_NODES.contains(name(elem));
+    }
 }
 
 static MATHML_LEAF_NODES: phf::Set<&str> = phf_set! {
