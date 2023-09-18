@@ -237,6 +237,7 @@
   # These get a '.' after them (an abbreviation). From 7.2, 7.5.2, 7.5.3
   # arcXXX should also get a "." after the "arc"
   CMUFunctionNames: [
+    "máx", "mín", "mcd", "mcm", "ínf", "sup",   # from 5.5.3
     "lim",
     "Antilog", "antilog", "Alog", "alog", "Colog", "colog", "Ln", "Aln", "aln", 
     "cos", "cosec", "cosech", "cosh", "cot", "cotan", "cotanh", "coth", "csc", "csch",
