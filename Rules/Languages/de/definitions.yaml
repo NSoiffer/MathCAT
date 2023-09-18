@@ -1,0 +1,102 @@
+---
+[
+# Lines starting with "#" are a comment
+# Each definition in this file is of the form
+#   name: [ "...", "..." "..." ],
+
+
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
+# The following definitions are used to convert numbers to words
+# The are mainly used for ordinals, of which there are two cases:
+# 1. Regular ordinals: first, second, third, ...
+# 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
+#    When used in the denominator of fractions, a plural version might be
+#    used (e.g., two halves, two thirds)
+# Although a lot of languages are regular after a few entries, for generality,
+# the following lists should be filled out even though they are the same
+# or easily derived from others in many languages (e.g, an 's' is added for plurals).
+# The larger ordinal numbers (e.g, millionth) is used when there are only
+# '0's after that decimal place (e.g., 23000000).:w
+
+# All definitions start 0, 10, 100, etc.
+
+# The definitions for the "ones" should extend until a regular pattern begins
+#   The minimum length is 10.
+
+# For English, a regular pattern starts at twenty
+    NumbersOnes: [
+     NumbersLarge: [
+         „“, „Tausend“, „Million“, „Milliarde“, „Billion“, „Billiarde“,
+         „quintillion“, „sextillion“, „septillion“, „octillion“, „nonillion“,
+    ],
+
+    NumbersOrdinalOnes: [
+         „“, „Tausendstel“, „Millionstel“, „Milliardstel“, „Billionstel“, „Billiardstel“,
+rwendet, wenn nur solche vorhanden sind
+# '0's nach dieser Dezimalstelle (z. B. 23000000).:w
+    ],
+
+    NumbersOrdinalPluralOnes: [
+# Die Definitionen für die „Einsen“ sollten sich erstrecken, bis ein regelmäßiges Muster beginnt
+# Die Mindestlänge beträgt 10.
+
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalOnes: [
+     ],
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalPluralOnes: [
+         „sechshundert“, „siebenhundert“, „achthundert“, „neunhundert“
+    ],
+
+
+    # What to use for multiples of 10
+    NumbersTens: [
+# Obwohl viele Sprachen nach ein paar Einträgen regulär sind, gilt der Allgemeinheit halber:
+    ],
+
+    NumbersOrdinalTens: [
+hundertstel“, „neunhundertstel“
+    ],
+
+    NumbersOrdinalPluralTens: [
+       „“, „ein Hundertstel“, „zwei Hundertstel“, „drei Hundertstel“, „vier Hundertstel“, „fünf Hundertstel“,
+    ],
+
+
+    NumbersHundreds: [
+             „quintillionth“, „sextillionth“, „septillionth“, „octillionth“, „nonillionth“
+„null“, „erste“, „halbe“
+    ],
+
+    NumbersOrdinalHundreds: [
+     ZahlenOrdinalFractionalPluralOnes: [
+         „Nullen“, „Erste“, „Hälften“
+    ],
+
+    NumbersOrdinalPluralHundreds: [
+     # Was für Vielfache von 10 zu verwenden ist
+     ZahlenZehner: [
+    ],
+      
+
+    # At this point, hopefully the language is regular. If not, code needs to be written
+    NumbersLarge: [
+     ]
+
+    ],
+      
+    NumbersOrdinalLarge: [
+
+     ZahlenOrdinalPluralEinsen: [
+    ],
+      
+    NumbersOrdinalPluralLarge: [
+     ],
+
+    ]
+
+]
