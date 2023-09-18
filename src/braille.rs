@@ -363,10 +363,10 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     if !raw_braille.is_empty() && ( start < raw_braille.len()-1 || "WP,".contains(raw_braille.chars().nth_back(0).unwrap()) ) {       // see comment about $end above
         result.push_str(&raw_braille[start..]);
     }
+  debug!("ELIs:    \"{}\"", result);  
 
     let result = NUM_IND_ENCLOSED_LIST.replace_all(&result, "wn${1}");
 
-//   debug!("ELIs:    \"{}\"", result);  
     // Remove blanks before and after braille indicators
     let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
     let result = REMOVE_SPACE_AFTER_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
@@ -1373,24 +1373,26 @@ fn vietnam_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 static CMU_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     // "S" => "XXX",    // sans-serif -- from prefs
     "B" => "⠔",     // bold
-    // "𝔹" => "XXX",     // blackboard -- from prefs
+    "𝔹" => "⠬",     // blackboard -- from prefs
     // "T" => "⠈",     // script
     "I" => "⠔",     // italic -- same as bold
     // "R" => "",      // roman
     // "E" => "⠰",     // English
     "1" => "⠐",     // Grade 1 symbol -- used here for a-j after number
     "L" => "",     // Letter left in to assist in locating letters
-    // "D" => "XXX",     // German (Deutsche) -- from prefs
+    "D" => "⠠",     // German (Gothic)
     "G" => "⠈",     // Greek
-    "V" => "XXX",    // Greek Variants
+    "V" => "⠈⠬",    // Greek Variants
     // "H" => "⠠⠠",    // Hebrew
     // "U" => "⠈⠈",    // Russian
     "C" => "⠨",      // capital
     "𝐶" => "⠨",      // capital that never should get word indicator (from chemical element)
     "N" => "⠼",     // number indicator
+    "𝑁" => "",      // continue number
     // "t" => "⠱",     // shape terminator
     "W" => "⠀",     // whitespace"
     "𝐖"=> "⠀",     // whitespace
+    // "𝘄" => "⠀",    // add whitespace if char to the left has dots 1, 2, or 3 -- special rule handled separately, so commented out
     "s" => "",     // typeface single char indicator
     // "w" => "⠂",     // typeface word indicator
     // "e" => "⠄",     // typeface & capital terminator 
@@ -1407,23 +1409,29 @@ static CMU_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 
 
 fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
+    lazy_static! {
+        static ref ADD_WHITE_SPACE: Regex = Regex::new(r"𝘄(.)").unwrap();
+    }
+
     debug!("cmu_cleanup: start={}", raw_braille);
     // let result = typeface_to_word_mode(&raw_braille);
 
     // let result = result.replace("tW", "W");
-    let result = raw_braille.replace("CG", "⠘").replace("𝔹C", "⠸"); // 3.5
+    let result = raw_braille.replace("CG", "⠘")
+                                .replace("𝔹C", "⠩")
+                                .replace("DC", "⠰");
     // let result = result.replace("CC", "⠸"); 
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
     // let double_struck = pref_manager.pref_to_string("CMU_DoubleStruck");
     // let sans_serif = pref_manager.pref_to_string("CMU_SansSerif");
     // let fraktur = pref_manager.pref_to_string("CMU_Fraktur");
-    // let greek_variant = pref_manager.pref_to_string("CMU_GreekVariant");
 
     debug!("Before remove mode changes: '{}'", &result);
     // This reuses the code just for getting rid of unnecessary "L"s and "N"s
     let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
-    debug!("After remove mode changes: '{}'", &result);
+    let result = result.replace("𝑁N", "");
+    debug!(" After remove mode changes: '{}'", &result);
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         match CMU_INDICATOR_REPLACEMENTS.get(&cap[0]) {
@@ -1431,12 +1439,24 @@ fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> St
             Some(&ch) => ch,
         }
     });
-
+    let result = ADD_WHITE_SPACE.replace_all(&result, |cap: &Captures| {
+        debug!("ADD_WHITE_SPACE match='{}', has left dots = {}", &cap[1], has_left_dots(cap[1].chars().next().unwrap()));
+        let mut next_chars = cap[1].chars();
+        let next_char = next_chars.next().unwrap();
+        assert!(next_chars.next().is_none());
+        return (if has_left_dots(next_char) {"⠀"} else {""}).to_string() + &cap[1];
+    });
+    
     // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces
     // let result = result.trim_start_matches('⠀').trim_end_matches('⠀');
     let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
    
     return result.to_string();
+
+    fn has_left_dots(ch: char) -> bool {
+        // Unicode braille is set up so dot 1 is 2^0, dot 2 is 2^1, etc
+        return ( (ch as u32 - 0x2800) >> 4 ) > 0;
+    }
 }
 
 /************** Braille xpath functionality ***************/
@@ -1748,36 +1768,6 @@ impl BrailleChars {
             use crate::definitions::DEFINITIONS;
             if NUMBER_WITH_SPACES.is_match(&text) {
                 return text.replace(' ', ".");
-            } else if NUMBER_WITH_BLOCKS.is_match(&text) {
-                let mut parts = text.split(',');
-                let integer_part = parts.next().unwrap();   // has to exist -- at least four chars
-                let fractional_part = parts.next();
-                let fractional_part = if let Some(text) = fractional_part {text} else {""};
-                let n_chars = integer_part.chars().count();
-                let mut chars = integer_part.chars();
-                let mut result = String::with_capacity(4*n_chars/3 + fractional_part.len() );      // a bit large if there is a fractional part
-                match n_chars % 3 {     // get the leading digits
-                    0 => {
-                        result.push(chars.next().unwrap());
-                        result.push(chars.next().unwrap());
-                        result.push(chars.next().unwrap());
-                    },
-                    1 => {
-                        result.push(chars.next().unwrap());
-                    },
-                    _ => {      // must be == 2
-                        result.push(chars.next().unwrap());
-                        result.push(chars.next().unwrap());
-                    },
-                }
-                for (i, c) in chars.enumerate() {
-                    if i % 3 == 0 {
-                        result.push('.');
-                    }
-                    result.push(c);
-                }
-                result.push_str(fractional_part);  
-                return result;    
             } else if let Some(text_without_arc) = text.strip_prefix("arc") {
                 // "." after arc (7.5.3)
                 let is_function_name = DEFINITIONS.with(|definitions| {

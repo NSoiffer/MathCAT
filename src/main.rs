@@ -170,13 +170,8 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr=r#"
-  <math>
-  <mi>y</mi>
-  <mtext>&#x00a0;&#x2063;</mtext>
-  <mo>=</mo>
-  <mtext>&#x00a0;&#x2063;</mtext>
-  <mn>5</mn>
-</math>"#;
+  <math><mi>ℝ</mi><mtext>&#x00a0;</mtext><mo>=</mo><mtext>&#x00a0;&#x2063;</mtext><mn>5</mn></math>
+    "#;
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>
@@ -222,7 +217,7 @@ fn main() {
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
 
-  set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
+  set_preference("BrailleCode".to_string(), "CMU".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),
