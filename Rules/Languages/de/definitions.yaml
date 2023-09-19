@@ -25,78 +25,78 @@
 
 # For English, a regular pattern starts at twenty
     NumbersOnes: [
-     NumbersLarge: [
-         „“, „Tausend“, „Million“, „Milliarde“, „Billion“, „Billiarde“,
-         „quintillion“, „sextillion“, „septillion“, „octillion“, „nonillion“,
+         "null", "eins", "zwei", "drei", "vier", "fünf", "sechs", "sieben", "acht", "neun",
+         "zehn", "elf", "zwölf", "dreizehn", "vierzehn", "fünfzehn", "sechzehn",
+         "siebzehn", "achtzehn", "neunzehn"
     ],
 
     NumbersOrdinalOnes: [
-         „“, „Tausendstel“, „Millionstel“, „Milliardstel“, „Billionstel“, „Billiardstel“,
-rwendet, wenn nur solche vorhanden sind
-# '0's nach dieser Dezimalstelle (z. B. 23000000).:w
+         "nullte", "erste", "zweite", "dritte", "vierte", "fünfte", "sechste", "siebte", "achte", "neunte",
+         "zehnter", "elfter", "zwölfter", "dreizehnter", "vierzehnter", "fünfzehnter", "sechzehnter",
+         "siebzehnter", "achtzehnter", "neunzehnter"
     ],
 
     NumbersOrdinalPluralOnes: [
-# Die Definitionen für die „Einsen“ sollten sich erstrecken, bis ein regelmäßiges Muster beginnt
-# Die Mindestlänge beträgt 10.
-
+         "Null", "erster", "Sekunden", "Drittel", "Viertel", "Fünftel", "Sechstel", "Siebtel", "Achtel", "Neuntel",
+         "Zehntel", "Ellftel", "Zwölftel", "Dreizehntel", "Vierzehntel", "Fünfzehntel", "Sechzehntel",
+         "Siebzehntel", "Achtzehntel", "Neunzehntel"
     ],
 
     # stop when regularity begins
     NumbersOrdinalFractionalOnes: [
-     ],
+         "null", "erste", "halbe"
     ],
 
     # stop when regularity begins
     NumbersOrdinalFractionalPluralOnes: [
-         „sechshundert“, „siebenhundert“, „achthundert“, „neunhundert“
+         "Nullen", "Erste", "Hälften"
     ],
 
 
     # What to use for multiples of 10
     NumbersTens: [
-# Obwohl viele Sprachen nach ein paar Einträgen regulär sind, gilt der Allgemeinheit halber:
+         "", "zehn", "zwanzig", "dreißig", "vierzig", "fünfzig", "sechzig", "siebzig", "achtzig", "neunzig"
     ],
 
     NumbersOrdinalTens: [
-hundertstel“, „neunhundertstel“
+         "", "Zehntel", "Zwanzigste", "Dreißigste", "Vierzigste", "Fünfzigste", "Sechzigste", "Siebzigste", "Achtzigste", "Neunzigste"
     ],
 
     NumbersOrdinalPluralTens: [
-       „“, „ein Hundertstel“, „zwei Hundertstel“, „drei Hundertstel“, „vier Hundertstel“, „fünf Hundertstel“,
+         "", "Zehntel", "Zwanzigstel", "Dreißigstel", "Vierzigstel", "Fünfzigstel", "Sechzigstel", "Siebzigstel", "Achtzigstel", "Neunzigstel"
     ],
 
 
     NumbersHundreds: [
-             „quintillionth“, „sextillionth“, „septillionth“, „octillionth“, „nonillionth“
-„null“, „erste“, „halbe“
+       "", "einhundert", "zweihundert", "dreihundert", "vierhundert", "fünfhundert",
+         "sechshundert", "siebenhundert", "achthundert", "neunhundert"
     ],
 
     NumbersOrdinalHundreds: [
-     ZahlenOrdinalFractionalPluralOnes: [
-         „Nullen“, „Erste“, „Hälften“
+       "", "ein Hundertstel", "zweihundertstel", "dreihundertstel", "vierhundertstel", "fünfhundertstel",
+         "sechshundertstel", "siebenhundertstel", "achthundertstel", "neunhundertstel"
     ],
 
     NumbersOrdinalPluralHundreds: [
-     # Was für Vielfache von 10 zu verwenden ist
-     ZahlenZehner: [
+       "", "ein Hundertstel", "zwei Hundertstel", "drei Hundertstel", "vier Hundertstel", "fünf Hundertstel",
+         "sechs Hundertstel", "sieben Hundertstel", "acht Hundertstel", "neun Hundertstel"
     ],
       
 
     # At this point, hopefully the language is regular. If not, code needs to be written
     NumbersLarge: [
-     ]
-
+         "", "Tausend", "Million", "Milliarde", "Billion", "Billiarde",
+         "quintillion", "sextillion", "septillion", "octillion", "nonillion",
     ],
       
     NumbersOrdinalLarge: [
-
-     ZahlenOrdinalPluralEinsen: [
+         "", "Tausendstel", "Millionstel", "Milliardstel", "Billionstel", "Billiardstel",
+         "quintillionth", "sextillionth", "septillionth", "octillionth", "nonillionth"
     ],
       
     NumbersOrdinalPluralLarge: [
-     ],
-
+         "", "Tausendstel", "Millionstel", "Milliardstel", "Billionstel", "Billiardstel",
+         "Quintillionstel", "Sextillionstel", "Septillionstel", "Oktillionstel", "Nichtmillionstel"
     ]
 
 ]
