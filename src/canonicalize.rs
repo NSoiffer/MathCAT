@@ -793,7 +793,7 @@ impl CanonicalizeContext {
 				// common bug: trig functions, lim, etc., should be mi
 				// same for ellipsis ("…")
 				return crate::definitions::DEFINITIONS.with(|definitions| {
-					if text == "…" || text == "⋯" ||
+					if ["…", "⋯", "∞"].contains(&text) ||
 					   definitions.borrow().get_hashset("FunctionNames").unwrap().contains(text) ||
 					   definitions.borrow().get_hashset("GeometryShapes").unwrap().contains(text) {
 						set_mathml_name(mathml, "mi");
