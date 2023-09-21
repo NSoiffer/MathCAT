@@ -170,7 +170,8 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr=r#"
-  <math><mi>ℝ</mi><mtext>&#x00a0;</mtext><mo>=</mo><mtext>&#x00a0;&#x2063;</mtext><mn>5</mn></math>
+  <math><mfrac><mn>1</mn><mn>16</mn></mfrac><mo>+</mo>
+  <mo>&#x22EF;</mo></math>
     "#;
 //   let expr = "
 //   <math display='block'>

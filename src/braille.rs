@@ -1410,7 +1410,7 @@ static CMU_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 
 fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     lazy_static! {
-        static ref ADD_WHITE_SPACE: Regex = Regex::new(r"𝘄(.)").unwrap();
+        static ref ADD_WHITE_SPACE: Regex = Regex::new(r"𝘄(.)|𝘄$").unwrap();
     }
 
     debug!("cmu_cleanup: start={}", raw_braille);
@@ -1440,11 +1440,15 @@ fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> St
         }
     });
     let result = ADD_WHITE_SPACE.replace_all(&result, |cap: &Captures| {
-        debug!("ADD_WHITE_SPACE match='{}', has left dots = {}", &cap[1], has_left_dots(cap[1].chars().next().unwrap()));
-        let mut next_chars = cap[1].chars();
-        let next_char = next_chars.next().unwrap();
-        assert!(next_chars.next().is_none());
-        return (if has_left_dots(next_char) {"⠀"} else {""}).to_string() + &cap[1];
+        if cap.get(1).is_none() {
+            return "⠀".to_string();
+        } else {
+            // debug!("ADD_WHITE_SPACE match='{}', has left dots = {}", &cap[1], has_left_dots(cap[1].chars().next().unwrap()));
+            let mut next_chars = cap[1].chars();
+            let next_char = next_chars.next().unwrap();
+            assert!(next_chars.next().is_none());
+            return (if has_left_dots(next_char) {"⠀"} else {""}).to_string() + &cap[1];
+        }
     });
     
     // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces

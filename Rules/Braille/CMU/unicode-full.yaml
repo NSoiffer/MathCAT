@@ -1050,3 +1050,13 @@
  - "⌣": [T: "⠠⠒"]           	#  0x2323
  - "⏜": [T: "⠈⠒"]             #  0x232DC
  - "⏝": [T: "⠠⠒"]           	#  0x23DD
+
+ - "∟": [t: "⠸⠤"]                # 0x221F (ángulo recto)
+ - "⦜": [t: "⠸⠤"]                # 0x299C (ángulo recto)
+ - "⦝": [t: "⠸⠤"]                # 0x299D (ángulo recto)
+ - "⦨": [t: "⠨⠱"]                # 0x29A8 (ángulo orientado positivo)
+ - "⦩": [t: "⠨⠜"]                # 0x29A9 (ángulo orientado negativo)
+ - "ᴗ": [t: "⠢⠜"]                # 0x1D17 (arco correspondiente al ángulo abc)
+ - "⤻": [t: "⠠⠱"]                # 0x293B (vector axial positivo)
+ - "↷": [t: "⠈⠜"]                # 0x21B7 (vector axial negativo)
+ 

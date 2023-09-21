@@ -297,8 +297,8 @@
  - "−": [t: "⠐⠤"]               # 0x2212 (Minus sign)
  - "·": [t: "⠠𝘄"]               # 0x00B7 (Multiplication dot (times))
 #  - "∗": [t: "⠐⠔"]               # 0x2217 (Asterisk operator)
- - "∘": [t: "⠰⠄"]               # 0x2218 (Ring operator)  value based on last row in 5.1 (probably what they should have used)
- - "◦": [t: "⠰⠄"]               # 0x25E6 (White bullet) (value based on 2218)
+ - "∘": [t: "⠠⠆"]               # 0x2218 (Ring operator)  value based on last row in 5.1 (probably what they should have used)
+ - "◦": [t: "⠠⠆"]               # 0x25E6 (White bullet) (value based on 2218)
  - "⋅": [t: "⠰⠄"]               # 0x22C5 (Dot operator)(value based on 2218)
 #  - "∖": [t: "⠸⠡"]               # 0x2216 (Set minus)
  - "(": [t: "⠣"]               # 0x0028 (Left parenthesis)
@@ -315,7 +315,11 @@
  - "?": [t: "⠢"]               # 0x003F (Question mark)
  - "¿": [t: "⠢"]               # 0x00BF (Question mark)
  - "@": [t: "⠐"]               # 0x0040 (Commercial at sign)
- - "^": [t: "⠰⠒"]               # 0x005E (Caret (hat, up arrow))
+ - "^":                        # 0x005E (Caret (hat, up arrow)) 4.3.2 uses one form as a circumflex, and 11.1 as a geometric angle
+    - test:    # it is not clear how to distinguish one form from another -- the following passes the tests, but is almost certainly wrong
+        - if: "..[self::m:mover][ *[1][self::m:mi and string-length(.)=1 and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = ''] ]"
+          then: [t: "⠰⠒"]   # circumflex
+          else: [t: "⠘⠒"]   # angle and everything else
  - "_": [t: "⠤"]               # 0x005F (Low line (underscore))
  - "¯": [t: "⠈⠉"]               # 0x00AF (macron)
  - "═": [t: "⠈⠉⠈⠉"]             # 0x2550 (BOX DRAWINGS DOUBLE HORIZONTAL)
@@ -338,7 +342,7 @@
           then: [t: "⠠⠄"]     # (8.2 -- prefix?)
           else: [t: "⠐⠢⠠"]   # (6.1 -- infix?)
  - "—": [t: "⠤⠤"]               # 0x2014 (Em dash)
- - "‖": [t: "⠸⠳"]               # 0x2016
+ - "‖": [t: "⠸⠇"]               # 0x2016
 #  - "¦": [t: "⠨⠳"]               # 0x00A6 (Broken bar)
 #  - "¬": [t: "⠈⠹"]               # 0x00AC (Not sign)
  - "°": [t: "⠴"]                 # 0x00B0 (Degree sign)
@@ -346,7 +350,6 @@
  - "³": [t: "⠡⠼⠉"]               # 0x00B3 (superscripted 3)
 #  - "†": [t: "⠈⠠⠹"]              # 0x2020 (Dagger)
 #  - "‡": [t: "⠈⠠⠻"]              # 0x2021 (Double dagger)
-#  - "…": [t: "⠄⠄⠄"]              # 0x2026 (Ellipsis)
 #  - "‰": [t: "⠸⠴⠴"]              # 0x2030 (Per mille)
  - "′": [t: "⠳"]                  # 0x2032 (Prime sign)
  - "″": [t: "⠳⠳"]                 # 0x2033 (Double prime sign)
@@ -389,12 +392,54 @@
 #  - "∥": [t: "⠼⠇"]               # 0x2225 (Parallel)
 #  - "∦": [t: "⠼⠇⠈⠱"]             # 0x2226 (Not parallel)
 #  - "⟂": [t: "⠼⠤"]               # 0x27C2 (Perpendicular)
- - "←": [t: "⠐⠒"]              # 0x2190 (Leftwards arrow)
- - "⟵": [t: "⠐⠒"]           # 0x27F5 (Long leftwards arrow)
- - "→": [t: "⠒⠂"]              # 0x2192 (Rightwards arrow)
- - "⟶": [t: "⠒⠂"]           # 0x27F6 (Long rightwards arrow)
- - "↔": [t: "⠐⠒⠂"]            # 0x2194 (Left right arrow)
- - "⟷": [t: "⠐⠒⠂"]            # 0x27F7 (Long Left right arrow)
+ - "←":                            # 0x2190 (Leftwards arrow)
+    - test:  # this is a guess as to when to use each
+        if:  # mi on either side or if parent is mover, mi on either side of the parent (e.g., A⟶B or labeled arrow)
+        - "(..[self::m:mrow] and preceding-sibling::*[1][self::m:mi] and following-sibling::*[1][self::m:mi]) or "
+        - "(..[self::m:mover][ ..[self::m:mrow][preceding-sibling::*[1][self::m:mi] and following-sibling::*[1][self::m:mi]] ])"
+        then: [t: "⠐⠒⠒"]  # 9.1
+        else: [t: "⠐⠒"]   # 9.2
+ - "⟵":                         # 0x27F5 (Long leftwards arrow)
+    - test:  # this is a guess as to when to use each
+        if:  # mi on either side or if parent is mover, mi on either side of the parent (e.g., A⟶B or labeled arrow)
+        - "(..[self::m:mrow] and preceding-sibling::*[1][self::m:mi] and following-sibling::*[1][self::m:mi]) or "
+        - "(..[self::m:mover][ ..[self::m:mrow][preceding-sibling::*[1][self::m:mi] and following-sibling::*[1][self::m:mi]] ])"
+        then: [t: "⠐⠒⠒"]  # 9.1
+        else: [t: "⠐⠒"]   # 9.2
+ - "→":                          # 0x2192 (Rightwards arrow)
+    - test:  # this is a guess as to when to use each
+        if:  # mi on either side or if parent is mover, mi on either side of the parent (e.g., A⟶B or labeled arrow), but rule out limit
+        - "("
+        - "  (..[self::m:mrow] and preceding-sibling::*[1][self::m:mi] and following-sibling::*[1][self::m:mi]) or "
+        - "  (..[self::m:mover][ ..[self::m:mrow][preceding-sibling::*[1][self::m:mi] and following-sibling::*[1][self::m:mi]] ])"
+        - ") and"
+        - "not(../..[self::m:munder or self::m:msub][*[1][self::m:mi and starts-with(., 'lim')]])"
+        then: [t: "⠒⠒⠂"]  # 9.1
+        else: [t: "⠒⠂"]   # 9.2
+ - "⟶":                       # 0x27F6 (Long rightwards arrow)
+    - test:  # this is a guess as to when to use each
+        if:  # mi on either side or if parent is mover, mi on either side of the parent (e.g., A⟶B or labeled arrow), but rule out limit
+        - "("
+        - "  (..[self::m:mrow] and preceding-sibling::*[1][self::m:mi] and following-sibling::*[1][self::m:mi]) or "
+        - "  (..[self::m:mover][ ..[self::m:mrow][preceding-sibling::*[1][self::m:mi] and following-sibling::*[1][self::m:mi]] ])"
+        - ") and"
+        - "not(../..[self::m:munder or self::m:msub][*[1][self::m:mi and starts-with(., 'lim')]])"
+        then: [t: "⠒⠒⠂"]  # 9.1
+        else: [t: "⠒⠂"]   # 9.2
+ - "↔":                     # 0x2194 (Left right arrow)
+    - test:  # this is a guess as to when to use each
+        if:  # mi on either side or if parent is mover, mi on either side of the parent (e.g., A⟶B or labeled arrow)
+        - "(..[self::m:mrow] and preceding-sibling::*[1][self::m:mi] and following-sibling::*[1][self::m:mi]) or "
+        - "(..[self::m:mover][ ..[self::m:mrow][preceding-sibling::*[1][self::m:mi] and following-sibling::*[1][self::m:mi]] ])"
+        then: [t: "⠐⠒⠒⠂"]  # 9.1
+        else: [t: "⠐⠒⠂"]   # 9.2
+ - "⟷":                 # 0x27F7 (Long Left right arrow)
+    - test:  # this is a guess as to when to use each
+        if:  # mi on either side or if parent is mover, mi on either side of the parent (e.g., A⟶B or labeled arrow)
+        - "(..[self::m:mrow] and preceding-sibling::*[1][self::m:mi] and following-sibling::*[1][self::m:mi]) or "
+        - "(..[self::m:mover][ ..[self::m:mrow][preceding-sibling::*[1][self::m:mi] and following-sibling::*[1][self::m:mi]] ])"
+        then: [t: "⠐⠒⠒⠂"]  # 9.1
+        else: [t: "⠐⠒⠂"]   # 9.2
 #  - "↚": [t: "1⠳⠪⠈⠱"]            # 0x219A (Leftwards arrow with stroke)
 #  - "↛": [t: "1⠳⠕⠈⠱"]            # 0x219B (Rightwards arrow with stroke)
 #  - "↜": [t: "1⠳⠔⠢⠪"]            # 0x219C (Leftwards wave arrow)
@@ -467,7 +512,8 @@
  - "©": [t: "⠣⠨⠉⠜"]                 # 0xa9 (Copyright)
  - "®": [t: "⠣⠨⠗⠜"]                 # 0xa9 (Registered sign)
 
- - "…": [t: "⠄⠄⠄"]                 # 0x2026 (Ellipsis)
+ - "…": [t: "⠄⠄⠄"]                    # 0x2026 (Ellipsis)
+ - "⋯": [t: "⠄⠄⠄"]               # 0x22EF (mid-line Ellipsis) -- seems to be same based on Example 10.1.3
 
 
 # All the quotes are the same
@@ -604,7 +650,6 @@
  - "≦": [t: "⠪⠶"]                # 0x2266 (menor o igual que  MULTI)
  - "≱": [t: "⠘⠕⠶"]                # 0x2271 (no es mayor ni igual que)
  - "≥": [t: "⠕⠶"]                # 0x2265 (mayor o igual que MULTI)
- - "≤": [t: "⠪⠶"]                # 0x2264 (menor o igual que  MULTI)
  - "≤": [t: "⠪⠶"]                # 0x2264 (menor o igual que  MULTI)
  - "≰": [t: "⠘⠪⠶"]                # 0x2270 (no es menor ni igual que)
  - "⩽": [t: "⠪⠶"]                # 0x227D
