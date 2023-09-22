@@ -37,9 +37,9 @@
     ],
 
     NumbersOrdinalPluralOnes: [
-         "zero", "primeiro", "segundo", "terço", "quarto", "quinto", "sexto", "sétimo", "oito", "nono",
-         "décimos", "décimos primeiros", "duodécimos", "décimos terceiros", "décimos quatorze", "décimos quintos", "décimos seis",
-         "dezessete", "dezoito", "décimos dezenove"
+         "zero", "primeiros", "segundos", "terços", "quartos", "quintos", "sextos", "sétimos", "oitavos", "nonos",
+         "décimos", "décimos primeiros", "décimos segundos", "décimos terceiros", "décimos quartos", "décimos quintos", "décimos sextos",
+         "décimos sétimos", "décimos oitavos", "décimos nonos"
     ],
 
     # stop when regularity begins
