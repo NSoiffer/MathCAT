@@ -8,7 +8,13 @@
   replace: 
   - t: "⠫⠱"
   - test:
-      if: "*[1][self::m:mrow and not(IsBracketed(., '', ''))]"
+      if:
+      - "*[1][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
+      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
+      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
+      - "     ) or" 
+      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
+      - "    ]"
       then:
       - t: "⠢"
       - x: "*"
@@ -25,7 +31,13 @@
   - x: "*[2]"
   - t: "⠱"
   - test:
-      if: "*[1][self::m:mrow and not(IsBracketed(., '', ''))]"
+      if:
+      - "*[1][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
+      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
+      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
+      - "     ) or" 
+      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
+      - "    ]"
       then:
       - t: "⠢"
       - x: "*[1]"
@@ -33,7 +45,25 @@
       else:
       - x: "*[1]"
         
-               
+-
+  name: repeating decimal (2.3 uses a "^" over the repeating decimals)
+  tag: mrow
+  match:
+    - "count(*)=3 and *[1][self::m:mn] and *[2][self::m:mo and .='\u2062'] and"
+    - "*[3][self::m:mover and *[1][self::m:mn] and *[2][self::m:mo and .='^']]" 
+  replace: 
+  - x: "*[1]"
+  - t: "⠂"
+  - test:
+      if: "string-length(*[3]/*[1]) <= 2"
+      then:             # the examples don't group the digits when there are only one or two digits
+      - t: "𝑁"
+      - x: "*[3]/*[1]" 
+      else:
+      - t: "⠢𝑁"
+      - x: "*[3]/*[1]"
+      - t: "⠔"
+
 # Fraction rules
   # The fraction part of a mixed number is always simple
   # They also differ because a two character sequence is needed to bracket the fraction
@@ -48,31 +78,41 @@
     - "*[2][self::m:mn][not(contains(., '.,'))]"
   replace: 
   - t: "#"   # need to force a number sign between the numbers
-  - x: "BrailleChars(translate(*[1], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the numerator
-  - x: "*[2]"
+  - x: "*[1]"
+  - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the numerator
+  - t: "W"
 
 -
-  name: numeric-slash
+  name: numeric-slash  (includes -1/2, etc)
   tag: mrow
-  match: "*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mo][.='/']  and *[3][self::m:mn][not(contains(., '.,'))]"
+  match:
+  - "(  *[1][self::m:mn][not(contains(., '.,'))] or"
+  - "   *[1][self::m:mrow][*[1][self::m:mo][.='-'] and *[2][self::m:mn][not(contains(., '.,'))]]"
+  - ") and"
+  - "*[2][self::m:mo][translate(., '/:÷', '')='']  and"
+  - "*[3][self::m:mn][not(contains(., '.,'))]"
   replace:
-  - x: "BrailleChars(translate(*[1], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the numerator
+  - test:
+      if: "*[1][self::m:mn]"
+      then: [x: "*[1]"]
+      else: [x: "*[1]/*[1]", x: "*[1]/*[2]"]
   # '/' not used
-  - x: "*[3]"
+  - x: "BrailleChars(translate(*[3], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the numerator
 
 -
   name: simple-number
   tag: mfrac
   match: "*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]"
   replace:
-  - x: "BrailleChars(translate(*[1], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the numerator
-  - x: "*[2]"
+  - x: "*[1]"
+  - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the numerator
+  - t: "W"
 
 -
   name: default
   tag: mfrac
   match: "."
-  variables: [AddGrouping: "preceding-sibling::*[2][self::m:mi][IsInDefinition(., 'CMUFunctionNames')]"] # '2' skip function
+  variables: [AddGrouping: "preceding-sibling::*[2][self::m:mi][IsInDefinition(., 'CMUFunctionNames')]"] # '2' skip invis function apply
   replace: 
   # Inferring from the examples 7.5.2(11) and 7.7(2) fractions are bracketed after log/trig functions
   # FIX: try to find exact rule
@@ -80,8 +120,13 @@
       if: "$AddGrouping"
       then: [t: "⠢"]
   - test:
-      if: "*[1][self::m:mrow and not(IsBracketed(., '', '')) and
-            not(count(*)=3 and *[1][self::m:mi][IsInDefinition(., 'CMUFunctionNames')])]"  
+      if:
+      - "*[1][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
+      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
+      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
+      - "     ) or" 
+      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
+      - "    ]"
       then:
       - t: "⠢"
       - x: "*[1]"
@@ -90,8 +135,13 @@
       - x: "*[1]"
   - t: "⠲"
   - test:
-      if: "*[2][self::m:mrow and not(IsBracketed(., '', '')) and
-            not(count(*)=3 and *[1][self::m:mi][IsInDefinition(., 'CMUFunctionNames')])]"
+      if:
+      - "*[2][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
+      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
+      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
+      - "     ) or" 
+      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
+      - "    ]"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -269,8 +319,9 @@
           - x: "BrailleChars(., 'CMU', 1, string-length(.)+1)"
 
 -
-  # 3.3 says that hex-like numbers don't reuse a numeric indicator after a letter -- here we try to catch that case.
+  # 2.5b says that hex-like numbers don't reuse a numeric indicator after a letter -- here we try to catch that case.
   # Match if: 1) has a digit, 2) has A-F after first char, 3) only has digits and A-F
+  # FIX: the rule doesn't restrict itself to hex digits, but in practice, that probably covers almost all cases
   name: hex-number
   tag: [mn, mtext]
   match:
@@ -278,25 +329,32 @@
   - "string-length(translate(substring(., 2), 'abcdefABCDEF', '')) <string-length(.) and "
   - "translate(., '0123456789abcdefABCDEF', '')=''"
   replace:
-    - x: "BrailleChars(concat(substring(.,1,1), translate(substring(., 2), 'abcdefABCDEF',
-              '\ue00a\ue00b\ue00c\ue00d\ue00e\ue00f\ue00a\ue00b\ue00c\ue00d\ue00e\ue00f')), 'CMU')"
+  - x: "BrailleChars(concat(substring(.,1,1), translate(substring(., 2), 'abcdefABCDEF',
+            '\ue00a\ue00b\ue00c\ue00d\ue00e\ue00f\ue01a\ue01b\ue01c\ue01d\ue01e\ue01f')), 'CMU')"
 
 -
   name: default
   tag: [mn, mo, mtext]
   match: "."
   replace:
-    - x: "BrailleChars(., 'CMU')"
-      
+  - x: "BrailleChars(., 'CMU')"
+
+-
+  name: Ln-hack
+  tag: mi
+  match: ".='Ln'"   # 'Ln' is supposed braille the same as 'ln'
+  replace:
+  - t: "L⠇L⠝."
+
 -
   name: default
   tag: mi
   match: "."
   replace:
-    - x: "BrailleChars(., 'CMU')"   # also deals with "dot after 'arc'"
-    - test:
-        if: "IsInDefinition(., 'CMUFunctionNames')"
-        then: [t: "."]
+  - x: "BrailleChars(., 'CMU')"   # also deals with "dot after 'arc'"
+  - test:  # Section 12 says strings longer than one should end with dot 3 rather than restricting to just listed functions (don't do this for mtext)
+      if: "string-length(.) > 1 and translate(., 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''"
+      then: [t: "."]
       
 
 -
@@ -310,20 +368,18 @@
       # else do nothing -- no content
 
 -
-  name: dot-exception  # 
-  tag: mover
-  match: "*[2][self::m:mo and (.='˙' or .='¨' or .='⃛')]"   # 0x02d9, 0x00A8, 0x20db
+  # 9.1 (doesn't say what to do about munderover -- seems to only apply to right arrow)  -- splits dots25
+  name: modified-right-arrow
+  tag: [mover, munder]
+  match: "*[1][self::m:mo and (.='→' or .='⟶')]"
   replace:
+  - t: "⠒"
   - x: "*[2]"
-  - test:   # roman lower case letters need to be prefixed (1.1)
-      if: "*[1][self::m:mi and string-length(.)=1 and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']"
-      then: [t: "⠐"]
-  - x: "*[1]"
+  - t: "⠒⠂"
 
 -
   # special hack to catch double over/under bar built from nested mover/munder
-  # FIX: the ones below need vetting
-  name: doubled-over-hack-exception 
+  name: doubled-line-hack-exception 
   tag: [mover, munder]
   match:
   - "*[2][self::m:mo and string-length(.) = 1 and (.='¯')] and"    # has line/bar
@@ -344,11 +400,120 @@
       - t: "⠔"
 
 -
-  # several "normal" bar-like symbols have special treatment, but the manual doesn't seem to have a comprehensive list
-  # FIX: the ones below need vetting
-  name: over-exceptions  
-  tag: [mover, munder]
-  match: "*[2][self::m:mo and string-length(.) = 1 and ( translate(., '_¯═→.˙~^','')='' or (parent::m:mover and text()='⌒') )]"
+  # special hack to catch double over/under bar built from nested mover/munder
+  name: doubled-line-hack-exception 
+  tag: menclose
+  match:
+  - "*[1][self::m:menclose] and"   # nested
+  - "(@notation='top' and *[1][@notation='top']) or (@notation='bottom' and *[1][@notation='bottom'])"
+  replace: 
+  - test:
+      if: "@notation='bottom'"
+      then: [t: "⠠⠤⠠⠤"]
+      else: [t: "⠈⠉⠈⠉"]
+  - test:
+      if: "*[1]/*[1][IsNode(., 'leaf') and string-length(.) = 1]"
+      then:
+      - x: "*[1]/*[1]"
+      else:
+      - t: "⠢"
+      - x: "*[1]/*[1]"
+      - t: "⠔"
+  
+-
+  name: dot-exception  # 4.3.2
+  tag: mover
+  match: "*[2][self::m:mo and (.='˙' or .='¨' or .='⃛')]"   # 0x02d9, 0x00A8, 0x20db
+  replace:
+  - x: "*[2]"
+  - test:   # roman lower case letters need to be prefixed (1.1)
+      if: "*[1][self::m:mi and string-length(.)=1 and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']"
+      then: [t: "⠐"]
+  - x: "*[1]"
+
+-
+  name: shortforms  
+  tag: mover
+  match: "*[2][self::m:mo and string-length(.) = 1 and translate(., '_¯═→⟶↔⟷←⟵.˙~^ˇ̊ ⌢⌣⏜⏝','')='']"
+  replace: 
+  - test:
+      if: "*[2][text()='=']"  # in case someone uses this for a double bar
+      then: [t: "⠈⠉⠈⠉"]
+      else: [x: "*[2]"]
+  - test:
+      # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
+      if: "*[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
+      then:
+      - x: "*[1]"
+      else:
+      - t: "⠢"
+      - x: "*[1]"
+      - t: "⠔"
+
+-
+  name: shortforms-default  
+  tag: mover
+  match: "*[2][self::m:mo or self::m:mrow[*[self::m:mo]]]"
+  replace: 
+  - test:
+      # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
+      if: "*[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
+      then:
+      - x: "*[1]"
+      else:
+      - t: "⠢"
+      - x: "*[1]"
+      - t: "⠔"
+  - t: "⠡⠡"
+  - x: "*[2]"
+  - t: "⠄"
+
+
+-
+  name: shortforms  
+  tag: munder
+  match: "*[2][self::m:mo and string-length(.) = 1 and translate(., '=¯〰﹏','')='']" # 0x3030, 0xFE4F ("_" canonicalized to "¯")
+  replace: 
+  - test:
+      - if: "*[2][text()='=']"  # in case someone uses this for a double bar
+        then: [t: "⠈⠉⠈⠉"]
+      - else_if: "*[2][text()='¯']"
+        then: [t: "⠠⠤"]
+        else: [t: "⠂⠢"]   # wavy line
+  - test:
+      # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
+      if: "*[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
+      then:
+      - x: "*[1]"
+      else:
+      - t: "⠢"
+      - x: "*[1]"
+      - t: "⠔"
+
+-
+  name: shortforms-default  
+  tag: munder
+  match: "*[2][self::m:mo or self::m:mrow[not(./*[name() != 'mo'])]]"
+  # match: "*[2][self::m:mo or self::m:mrow[*[self::m:mo]]]"
+
+  replace: 
+  - test:
+      # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
+      if: "*[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
+      then:
+      - x: "*[1]"
+      else:
+      - t: "⠢"
+      - x: "*[1]"
+      - t: "⠔"
+  - t: "⠌⠌"
+  - x: "*[2]"
+  - t: "⠄"
+
+-
+  name: under-shortforms  
+  tag: munder
+  match: "*[2][self::m:mo and string-length(.) = 1 and translate(., '_¯═→.˙~^ˇ̊ ⌢⌣⏜⏝','')='']"
   replace: 
   - test:
     - if: "self::m:munder[*[2][.='¯' or .='═']]"  # mover falls back to the unicode defs
@@ -378,14 +543,39 @@
       - t: "⠔"
 
 -
-  name: prime-exception    # 2.3.1
+  name: prime-exception    # 4.3.1
   tag: msup
   match: "*[2][translate(., \"′″‴⁗\",'')='']"
   replace:
   - x: "*"
 
 -
-  name: single-char-exceptions    # 2.3.1
+  name: prime-exception    # 4.3.1
+  tag: msubsup
+  match: "*[3][translate(., \"′″‴⁗\",'')='']"
+  replace:
+  - x: "*[1]"
+  - x: "*[3]"
+  - t: "⠌"
+  - test:
+      # the rules for scripts seem to always want a nested script to be bracketed
+      # there aren't any root examples in scripts and numeric fractions don't get bracketed
+      if:
+      - "*[2][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
+      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
+      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
+      - "     ) or" 
+      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
+      - "    ]"
+      then:
+      - t: "⠢"
+      - x: "*[2]"
+      - t: "⠔"
+      else:
+      - x: "*[2]"
+
+-
+  name: single-char-exceptions    # 4.3.1
   tag: msup
   match: "*[2][translate(., \"'*`+-ª°²³´¹º‘’“”‟‵‶‷\",'')='']"
   replace:
@@ -396,11 +586,39 @@
       then: [t: "⠄"]
 
 -
+  name: single-char-exceptions    # 4.3.1
+  tag: msubsup
+  match: "*[3][translate(., \"'*`+-ª°²³´¹º‘’“”‟‵‶‷\",'')='']"
+  replace:
+  - x: "*[1]"
+  - x: "*[3]"
+  - test:
+      # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
+      if: "not(*[3][.='°'] and *[1][self::m:mn or @data-chem-element])" 
+      then: [t: "⠄"]
+  - test:
+      # the rules for scripts seem to always want a nested script to be bracketed
+      # there aren't any root examples in scripts and numeric fractions don't get bracketed
+      if:
+      - "*[2][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
+      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
+      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
+      - "     ) or" 
+      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
+      - "    ]"
+      then:
+      - t: "⠢"
+      - x: "*[2]"
+      - t: "⠔"
+      else:
+      - x: "*[2]"
+
+-
   # this is the last part of the section -- something like "4*" in superscript indicating 4 "*"s
-  name: number-char-exceptions    # 2.3.1 and 2.3.3  (FIX: degree doesn't use dot-3 for chemistry or temp/angles/etc)
+  name: number-char-exceptions    # 4.3.1  (FIX: degree doesn't use dot-3 for chemistry or temp/angles/etc)
   tag: [msub, msup]
   match:
-  - "*[2][translate(., \"'*`+-ª°²³´¹º‘’“”‟‵‶‷\",'')=''] or"
+  - "*[2][translate(., \"'*`+-∞ª°²³´¹º‘’“”‟‵‶‷\",'')=''] or"
   - "*[2][self::m:mrow and count(*)=2 and *[1][self::m:mn] and *[2][self::m:mo][translate(., \"'*`+-ª°²³´¹º‘’“”‟‵‶‷\",'')='']]"
   replace:
   - x: "*[1]"
@@ -414,55 +632,64 @@
       if: "not(*[2][.='°'] and *[1][self::m:mn or @data-chem-element])" 
       then: [t: "⠄"]
 
--  # 7.5.2
-  name: log
-  tag: msub
-  match: "*[1][self::m:mi][.='log']"
-  replace: 
-  - x: "*[1]"
-  - x: "*[2]"
-  - t: "⠱"
-
--  # 7.2 (guessing this applies to limits written with munder and msub)
-  name: limit
-  tag: [msub, munder]
-  match: "*[1][self::m:mi][.='lim']"
-  replace: 
-  - x: "*[1]"
-  - x: "*[2]"
-  - t: "⠱"
-
--  # 7.5.4
-  name: integral-sum-product
-  tag: [msubsup, munderover]
-  match: "*[1][self::m:mo][translate(., '∫∬∭∑∏', '')='']"
+-
+  # this is the last part of the section -- something like "****" in superscript should turn into "4*"
+  name: number-char-exceptions-abbrev   # 4.3.1  (FIX: degree doesn't use dot-3 for chemistry or temp/angles/etc)
+  tag: [msub, msup]
+  match:
+  - "*[2][self::m:mrow[not(./*[name() != 'mo'])]] and" # script consists of all mo's
+  - "count(*[2]/*) > 3 and string-length(*[2]/*[1])=1 and"    # at least four mo's, this first of which has a single char
+  - "*[2][ not(./*[text() != text(*[2]/*[1])]) ]" # they are all have the same text (we know it is an mrow)
   replace:
+  - x: "*[1]"
   - test:
-    - if: "*[1][.='∫']"
-      then: [t: "⠯"]
-    - else_if: "*[1][.='∬']"
-      then: [t: "⠯⠯"]
-    - else_if: "*[1][.='∬']"
-      then: [t: "⠯⠯"]
-    - else_if: "*[1][.='∭']"
-      then: [t: "⠯⠯⠯"]
-      else: [x: "*[1]"]    # ∑, ∏
+      - if: "self::m:msub"
+        then: [t: "⠌"]
+        else: [t: "⠡"]
+  - x: "count(*[2])"
+  - x: "text(*[2]/*[1])"
+  - test:
+      # degree doesn't use dot-3 for chemistry, temp, angles -- can't know that so we make a wild guess here
+      if: "not(*[2][.='°'] and *[1][self::m:mn or @data-chem-element])" 
+      then: [t: "⠄"]
+
+-  # 9.2 (guessing this applies to limits written with both munder and msub)
+  name: known-functions
+  tag: [munder, msub]
+  match: "*[1][self::m:mi][.='log' or .='lim']"
+  replace: 
+  - x: "*[1]"    # trailing dot 3 handled by mi rule
   - x: "*[2]"
-  - t: "⠒"
-  - x: "*[3]"
   - t: "⠱"
 
--  # 7.5.4
-  name: contour-integral
-  tag: msub
-  match: "*[1][self::m:mi][.='∮']"
+-  # 9.4
+  name: integral-sum-product
+  tag: [msub, munder, msubsup, munderover]
+  match: "*[1][self::m:mo][translate(., '∫∬∭∮∑∏∐⋃⋂⋁⋀', '')='']"
   replace:
-  - t: "⠯⠴" 
+  - x: "*[1]"
   - x: "*[2]"
+  - test:
+      if: "self::m:msubsup or self::m:munderover"
+      then:
+      - t: "⠒"
+      - x: "*[3]"
   - t: "⠱"
+
+-  # 4.2.2 -- numeric subscripts (note does not apply to msubsup -- 4.4.1, example 1, nor to nested subscript - 4.2.1, last example)
+   # the rule doesn't mention having a simple base, but I think that is what is meant
+  name: numeric-subscripts
+  tag: msub
+  match:
+  - "*[1][self::m:mi] and"
+  - "*[2][self::m:mn][not(contains(., '.,'))] and ..[1][not(IsNode(., 'modified'))]"
+  replace:
+  - x: "*[1]"
+  - t: "𝑁"    # don't add numeric indicator
+  - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the subscript
 
 -
-  name: nested-scripts    # this case likely should have been written as mmultiscripts, but people will use this (2.5)
+  name: nested-scripts    # this case likely should have been written as mmultiscripts, but people will use this (4.4.2)
   tag: msub
   match: "*[1][self::m:msup]"
   replace:
@@ -484,57 +711,8 @@
   - x: "*[2]"
 
 -
-  name: simple-base
-  # FIX: in 7.7, footnote 37 seems to imply that the rule in 2.2 only applies to characters -- we generalize to tokens here
-  tag: [msubsup]
-  match: "IsNode(*[1], 'leaf')"
-  replace: 
-  - x: "*[1]"
-  - t: "⠌"
-  - test:
-      # the rules for scripts seem to always want a nested script to be bracketed
-      # there aren't any root examples in scripts and it seems like fractions don't get bracketed
-      # also, a leading - seems not to require grouping 
-      # FIX: does this apply to leading +, ±, etc? 
-      if: "*[2][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
-      then:
-      - t: "⠢"
-      - x: "*[2]"
-      - t: "⠔"
-      else:
-      - x: "*[2]"
-  - t: "⠡"
-  - test:
-        # the rules for scripts seem to always want a nested script to be bracketed
-        # there aren't any root examples and it seems like fractions don't get bracketed
-        if: "*[3][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
-        then:
-        - t: "⠢"
-        - x: "*[3]"
-        - t: "⠔"
-        else:
-        - x: "*[3]"
-
--  # FIX: I think is is what footnote #37 in 7.7 means (applies to 7.4 [integrals, etc] also)
   name: default
-  tag: msubsup
-  match: "."
-  replace:
-  - test:
-      if: "*[1][self::m:mrow and not(IsBracketed(., '', ''))]"
-      then:
-      - t: "⠢"
-      - x: "*[1]"
-      - t: "⠔"
-      else:
-      - x: "*[1]"
-  - x: "*[2]"
-  - t: "⠒"
-  - x: "*[3]"
-  - t: "⠱"
--
-  name: default
-  tag: [msub, msup, munder, mover, munderover]
+  tag: [msub, msup, msubsup, munder, mover, munderover]
   match: "."
   replace: 
   - test:
@@ -555,10 +733,14 @@
         else: [t: "⠡⠡"]  # mover
   - test:
       # the rules for scripts seem to always want a nested script to be bracketed
-      # there aren't any root examples in scripts and it seems like fractions don't get bracketed
-      # also, a leading - seems not to require grouping 
-      # FIX: does this apply to leading +, ±, etc? 
-      if: "*[2][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
+      # there aren't any root examples in scripts and numeric fractions don't get bracketed
+      if:
+      - "*[2][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
+      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
+      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
+      - "     ) or" 
+      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
+      - "    ]"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -575,13 +757,22 @@
       - test:
           # the rules for scripts seem to always want a nested script to be bracketed
           # there aren't any root examples and it seems like fractions don't get bracketed
-          if: "*[3][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
+          if:
+          - "*[3][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
+          - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
+          - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
+          - "     ) or" 
+          - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
+          - "    ]"
           then:
           - t: "⠢"
           - x: "*[3]"
           - t: "⠔"
           else:
           - x: "*[3]"
+  - test:
+     if: "self::m:msup and *[2][self::m:mo]"
+     then: [t: "⠄"]
 
 -
   # FIX: this works staggered indices, but there aren't examples where staggered and simultaneous indices are next to each other
@@ -603,7 +794,7 @@
           then:
           - t: "⠠⠌"
           - test:
-              if: "$Prescripts[1][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
+              if: "$Prescripts[1][((self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')) or self::m:mfrac]"
               then:
               - t: "⠢"
               - x: "$Prescripts[1]"
@@ -615,7 +806,7 @@
           then:
           - t: "⠈⠡"
           - test:
-              if: "$Prescripts[2][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
+              if: "$Prescripts[2][((self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')) or self::m:mfrac]"
               then:
               - t: "⠢"
               - x: "$Prescripts[2]"
@@ -683,7 +874,7 @@
           then:
           - t: "⠌"
           - test:
-              if: "$Postscripts[1][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
+              if: "$Postscripts[1][((self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')) or self::m:mfrac]"
               then:
               - t: "⠢"
               - x: "$Postscripts[1]"
@@ -695,7 +886,7 @@
           then:
           - t: "⠡"
           - test:
-              if: "$Postscripts[2][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
+              if: "$Postscripts[2][((self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')) or self::m:mfrac]"
               then:
               - t: "⠢"
               - x: "$Postscripts[2]"
@@ -710,7 +901,7 @@
               then:
               - t: "⠰⠌"
               - test:
-                  if: "$Postscripts[3][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
+                  if: "$Postscripts[3][((self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')) or self::m:mfrac]"
                   then:
                   - t: "⠢"
                   - x: "$Postscripts[3]"
@@ -722,7 +913,7 @@
               then:
               - t: "⠘⠡"
               - test:
-                  if: "$Postscripts[4][(self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')]"
+                  if: "$Postscripts[4][((self::m:mrow and not(IsBracketed(., '', '')) and not(*[1][self::m:mo][.='-'])) or IsNode(., 'modified')) or self::m:mfrac]"
                   then:
                   - t: "⠢"
                   - x: "$Postscripts[4]"
@@ -845,16 +1036,17 @@
   - test:
       if: "contains(@notation,'top')"
       then:
-      - t: "⠈⠉"                        # bar
+      - t: "⠈⠉"                        # overline
+  - test:
+      if: "contains(@notation,'bottom')"
+      then:
+      - t: "⠠⠤"                        # underline
   - test:
       if: "contains(@notation,'horizontalstrike')"
       then:
       - t: "⠘"                        # cancellation
-  - test:   # roman lower case letters need to be prefixed (1.1)
-      if: "*[1][self::m:mi and string-length(.)=1 and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']"
-      then: [t: "⠐"]
   - test:  # group anything that isn't a single character
-      if: "*[1][IsNode(., 'leaf') and string-length(.)=1]"
+      if: "*[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
       then: [x: "*[1]"]
       else:
       - t: "⠢"

@@ -1713,8 +1713,10 @@ impl UnicodeDef {
                 } else if first_ch != '0' {     // exclude 0xDDDD
                     for ch in str.chars() {     // restart the iterator
                         let ch_as_str = ch.to_string();
-                        unicode_table.insert(ch as u32, ReplacementArray::build(&substitute_ch(replacements, &ch_as_str))
-                                            .chain_err(|| format!("In definition of char: '{}'", str))?.replacements);
+                        if let Some(_) = unicode_table.insert(ch as u32, ReplacementArray::build(&substitute_ch(replacements, &ch_as_str))
+                                            .chain_err(|| format!("In definition of char: '{}'", str))?.replacements) {
+                            error!("*** Character '{}' (0x{:X}) is repeated", ch, ch as u32);
+                        }
                     }
                     return Ok( () );
                 }
@@ -1722,9 +1724,11 @@ impl UnicodeDef {
         }
 
         let ch = UnicodeDef::get_unicode_char(ch)?;
-        unicode_table.insert(ch, ReplacementArray::build(replacements)
+        if let Some(_) = unicode_table.insert(ch, ReplacementArray::build(replacements)
                                         .chain_err(|| format!("In definition of char: '{}' (0x{})",
-                                                                        char::from_u32(ch).unwrap(), ch))?.replacements);
+                                                                        char::from_u32(ch).unwrap(), ch))?.replacements) {
+            error!("*** Character '{}' (0x{:X}) is repeated", char::from_u32(ch).unwrap(), ch);
+        }
         return Ok( () );
 
         fn process_range(def_range: &str, replacements: &Yaml, mut unicode_table: RefMut<HashMap<u32,Vec<Replacement>>>) -> Result<()> {

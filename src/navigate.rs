@@ -1755,7 +1755,6 @@ mod tests {
 
     #[test]
     fn determinant_speech() -> Result<()> {
-        init_logger();
         let mathml_str = "<math id='math'>
             <mrow id='mrow'>
             <mo id='open'>|</mo>

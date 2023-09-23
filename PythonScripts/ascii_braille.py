@@ -99,35 +99,34 @@ SPANISH_TO_UNICODE=''
 #         result += SPANISH_TO_UNICODE[i]
 #     return result
 
-# SPANISH_TO_UNICODE = "⠀⠮⠐⠼⠫⠩⠯⠄⠷⠾⠡⠬⠠⠤⠨⠌⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠱⠰⠣⠿⠜⠹⠈⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵⠪⠳⠻⠘⠸"
-SPANISH_TO_UNICODE =   "⠀⠮⠐⠼⠫⠩⠯⠄⠷⠾⠡⠬⠂⠤⠨⠌⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠱⠰⠣⠿⠜⠹⠈⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵⠪⠳⠻⠘⠸"
 REMAP = {
-    ',': '1',
-    ';': '2',
-    ':': '3',
-    '*': '4',
-    '?': '5',
-    '¿': '5',
-    '+': '6',
-    '=': '7',
-    '[': '8',
-    '}': '9',
-    ']': '0',
-    '.': "'",
-    '_': ',',
-    '{': '.',
+    ',': '1',  ';': '2', ':': '3', '*': '4',  '?': '5', '¿': '5', '+': '6', '=': '7', '[': '8', '}': '9',  ']': '0',
+    '(': '<',  ')': '>',
+    '.': "'", '_': ',', '@': '"', '{': '.', '%': '_', '\\':'=',
+    '¾': '@',
+    '×': '*',
+    '1': '*',
+    '°': 'A', 'º': ';', '§': '*',
+    'Í': '/', 'Ü': '\\', 'Ý': ':', 'Ë': '$', 'Ó': '+', 'Ö': '[', 'Ç': '&', 'Á': '(', 'Ã': '*', 'Ú': ')', 'Ñ': ']',
+    '»': ';',
 }
 
-def spanish_to_unicode(ascii: str):
-    global SPANISH_TO_UNICODE
+def remap(ch: str) -> str:
     global REMAP
+    ch = ch.upper()
     for k,v in REMAP.items():
-        ascii = ascii.replace(k,v)
+        if k == ch:
+           return ch.replace(k,v)
+    return ch
+
+def spanish_to_unicode(ascii: str):
     result = "";
-    ascii = ascii.upper()
     for ch in ascii:
-        i = ord(ch) - 32
-        result += SPANISH_TO_UNICODE[i]
+        i = ord(remap(ch)) - 32
+        try:
+            result += ASCII_TO_UNICODE[i]
+        except:
+            print(f"ch='{ch}' is not ASCII braille char")
     return result
 
 def s2u(ascii:str):

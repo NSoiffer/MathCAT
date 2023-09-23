@@ -793,7 +793,7 @@ impl CanonicalizeContext {
 				// common bug: trig functions, lim, etc., should be mi
 				// same for ellipsis ("…")
 				return crate::definitions::DEFINITIONS.with(|definitions| {
-					if text == "…" || text == "⋯" ||
+					if ["…", "⋯", "∞"].contains(&text) ||
 					   definitions.borrow().get_hashset("FunctionNames").unwrap().contains(text) ||
 					   definitions.borrow().get_hashset("GeometryShapes").unwrap().contains(text) {
 						set_mathml_name(mathml, "mi");
@@ -2001,13 +2001,34 @@ impl CanonicalizeContext {
 				"′", "″", "‴", "‵", "‶", "‷", "⁗",
 			};
 	
-			// merge consecutive <mo>s containing primes (in various forms)
 			let mut children = mrow.children();
+			// check to see if mrow of all psuedo scripts
+			if children.iter().all(|&child| {
+				let child = as_element(child);
+				name(&child) == "mo" && PSEUDO_SCRIPTS.contains(as_text(child))
+			}) {
+				let parent = mrow.parent().unwrap().element().unwrap();  // must exist
+				let is_first_child = mrow.preceding_siblings().is_empty();
+				if  is_first_child {
+					return mrow;	// FIX: what should happen
+				}
+				if crate::xpath_functions::IsNode::is_scripted(&parent) {
+					return mrow;		// already in a script position
+				}
+				if name(&parent) == "mrow" {
+					mrow.set_attribute_value("data-pseudo-script", "true");
+					return handle_pseudo_scripts(parent);
+				} else {
+					return mrow;	// FIX: what should happen?
+				}
+			}
+
 			let mut i = 1;
 			let mut found = false;
 			while i < children.len() {
 				let child = as_element(children[i]);
-				if name(&child) == "mo" && PSEUDO_SCRIPTS.contains(as_text(child)) {
+				if (name(&child) == "mo" && PSEUDO_SCRIPTS.contains(as_text(child))) ||
+				   child.attribute("data-pseudo-script").is_some() {
 					let msup = create_mathml_element(&child.document(), "msup");
 					msup.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
 					msup.append_child(children[i-1]);
