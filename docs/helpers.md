@@ -89,7 +89,7 @@ Once you've done some translations and want to try them out, you can do so immed
 3. Under the "Languages" drop down you should see your new language. Select that.
 4. Try out the speech. Wikipedia pages are a good source for examples.
 5. If there is an error (often you won't hear speech), open NVDA's log (in NVDA's "Tools" submenu). The error should be listed there. The error messages are explained below.
-6. When you make a change, either reload MathCAT (NVDA Tools:Reload Plugins) or restart NVDA.
+6. When you make a change, MathCAT should notice the file is changed and reload it. There is currently a bug that this is not done for files that are `include`d in from a file (e.g., all those in the Shared directory). If you make a change to one of those files, either reload MathCAT (NVDA Tools:Reload Plugins) or restart NVDA.
 
 Translating the settings dialog: this is a separate process from translating the speech. This done by volunteers that do other addon translations also. See [this mailing list](https://groups.io/g/nvda-translations) for more info.
 
