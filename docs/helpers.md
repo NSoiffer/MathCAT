@@ -1,5 +1,4 @@
-# MathCAT: Math Capable Assistive Technology
-<img src="logo.png" style="position: relative; top: 16px; z-index: -1;"> Translator and Rule Developer Guide
+# <img src="logo.png" style="position: relative; top: 16px; z-index: -1;"> Translator and Rule Developer Guide
 
 ## Information for MathCAT Rule Developers/Translators
 This page is a work-in-progress.
