@@ -75,15 +75,14 @@
     ],
 
     NumbersOrdinalHundreds: [
-       "", "centésimo", "Ducentésimo", "trecentésimo", "quadringentésimo", "quingentésimo",
+       "", "centésimo", "ducentésimo", "trecentésimo", "quadringentésimo", "quingentésimo",
          "sexcentésimo", "septingentésimo", "octingentésimo", "nongentésimo"
     ],
 
     NumbersOrdinalPluralHundreds: [
-       "", "um centésimo", "dois centésimos", "três centésimos", "quatro centésimos", "cinco centésimos",
-         "seis centésimos", "sete centésimos", "oito centésimos", "nove centésimos"
-    ],NumbersOrdinalFractionalOnes
-      
+       "", "centésimos", "ducentésimos", "trecentésimos", "quadringentésimos", "quingentésimos",
+         "sexcentésimos", "septingentésimos", "octingentésimos", "nongentésimos"
+    ],
 
     # At this point, hopefully the language is regular. If not, code needs to be written
     NumbersLarge: [
