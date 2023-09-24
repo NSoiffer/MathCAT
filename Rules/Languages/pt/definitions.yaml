@@ -44,7 +44,9 @@
 
     # stop when regularity begins
     NumbersOrdinalFractionalOnes: [
-         "zero", "primeiro", "metade"
+         "zero", "um", "meio", "terço", "quarto", "quinto", "sexto", "sétimo", "oitavo", "nono",
+         "décimo", "onze avos", "doze avos", "treze avos", "quatorze avos", "quinze avos", "dezesseis avos", "dezessete avos",
+         "dezoito avos", "dezenove avos"
     ],
 
     # stop when regularity begins
@@ -80,7 +82,7 @@
     NumbersOrdinalPluralHundreds: [
        "", "um centésimo", "dois centésimos", "três centésimos", "quatro centésimos", "cinco centésimos",
          "seis centésimos", "sete centésimos", "oito centésimos", "nove centésimos"
-    ],
+    ],NumbersOrdinalFractionalOnes
       
 
     # At this point, hopefully the language is regular. If not, code needs to be written
