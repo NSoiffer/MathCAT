@@ -61,7 +61,7 @@
     ],
 
     NumbersOrdinalTens: [
-         "", "décimo", "vigésimo", "trigésimo", "quaragésimo", "quinquagésimo", "sexagésimo", "septésimo", "oitenta", "noventa"
+         "", "décimo", "vigésimo", "trigésimo", "quadragésimo", "quinquagésimo", "sextagésimo", "septuagésimo", "octagésimo", "nonagésimo"
     ],
 
     NumbersOrdinalPluralTens: [
