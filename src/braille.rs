@@ -1927,6 +1927,7 @@ impl Function for BrailleChars {
                             args: Vec<Value<'d>>)
                             -> StdResult<Value<'d>, XPathError>
         {
+            use crate::canonicalize::create_mathml_element;
             let mut args = Args(args);
             if let Err(e) = args.exactly(2).or_else(|_| args.exactly(4)) {
                 return Err( XPathError::Other(format!("BrailleChars requires 2 or 4 args: {}", e)));
@@ -1945,8 +1946,13 @@ impl Function for BrailleChars {
                 Value::Nodeset(nodes) => {
                     validate_one_node(nodes, "BrailleChars")?.element().unwrap()
                 },
+                Value::Number(n) => {
+                    let new_node = create_mathml_element(&context.node.document(), "mn");
+                    new_node.set_text(&n.to_string());
+                    new_node
+                },
                 Value::String(s) => {
-                    let new_node = crate::canonicalize::create_mathml_element(&context.node.document(), "mn");
+                    let new_node = create_mathml_element(&context.node.document(), "mi");   // FIX: try to guess mi vs mo???
                     new_node.set_text(&s);
                     new_node
                 },
