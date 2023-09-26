@@ -1381,8 +1381,10 @@ impl CanonicalizeContext {
 		}
 
 		fn convert_mfenced_to_mrow(mfenced: Element) -> Element {
-			let open = mfenced.attribute_value("open").unwrap_or("(");
-			let close = mfenced.attribute_value("close").unwrap_or(")");
+			// The '<'/'>' replacements are because WIRIS uses them out instead of the correct chars in its template
+			let open = mfenced.attribute_value("open").unwrap_or("(").replace('<', "⟨");
+			let close = mfenced.attribute_value("close").unwrap_or(")").replace('>', "⟩");
+			debug!("open={}, close={}", open, close);
 			let mut separators= mfenced.attribute_value("separators").unwrap_or(",").chars();
 			set_mathml_name(mfenced, "mrow");
 			mfenced.remove_attribute("open");
@@ -1391,7 +1393,7 @@ impl CanonicalizeContext {
 			let children = mfenced.children();
 			let mut new_children = Vec::with_capacity(2*children.len() + 1);
 			if !open.is_empty() {
-				new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), open, MFENCED_ATTR_VALUE)) );
+				new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), &open, MFENCED_ATTR_VALUE)) );
 			}
 			if !children.is_empty() {
 				new_children.push(children[0]);
@@ -1402,7 +1404,7 @@ impl CanonicalizeContext {
 				}
 			}
 			if !close.is_empty() {
-				new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), close, MFENCED_ATTR_VALUE)) );
+				new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), &close, MFENCED_ATTR_VALUE)) );
 			}
 			mfenced.replace_children(new_children);
 			return mfenced;
