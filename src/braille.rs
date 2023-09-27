@@ -1456,6 +1456,7 @@ fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> St
     let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
    
     return result.to_string();
+    // return result.trim_end_matches('⠀').to_string();
 
     fn has_left_dots(ch: char) -> bool {
         // Unicode braille is set up so dot 1 is 2^0, dot 2 is 2^1, etc
