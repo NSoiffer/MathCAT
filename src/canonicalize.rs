@@ -633,7 +633,10 @@ impl CanonicalizeContext {
 	fn clean_mathml<'a>(&self, mathml: Element<'a>) -> Option<Element<'a>> {
 		// Note: this works bottom-up (clean the children first, then this element)
 		lazy_static! {
-			static ref IS_PRIME: Regex = Regex::new(r"['′″‴⁗]").unwrap(); 
+			static ref IS_PRIME: Regex = Regex::new(r"['′″‴⁗]").unwrap();
+
+			// Note: including intervening spaces in what is likely a symbol of omission preserves any notion of separate digits (e.g., "_ _ _")
+			static ref IS_UNDERSCRORE: Regex = Regex::new(r"^[_\u{A0}]+$").unwrap(); 
         }
 
 		static CURRENCY_SYMBOLS: phf::Set<&str> = phf_set! {
@@ -711,6 +714,18 @@ impl CanonicalizeContext {
 			 	}
 				if let Some(dash) = canonicalize_dash(text) {		// needs to be before OPERATORS.get due to "--"
 					mathml.set_text(dash);
+					return Some(mathml);
+				} else if text.contains('_') {
+					// if left or right are an mo, leave as is. Otherwis convert to an mo.
+					let preceding_siblings = mathml.preceding_siblings();
+					let following_siblings = mathml.following_siblings();
+					if preceding_siblings.is_empty() || following_siblings.is_empty() {
+						return Some(mathml);
+					}
+					if name(&as_element(preceding_siblings[preceding_siblings.len()-1])) != "mo" &&
+					   name(&as_element(following_siblings[0])) != "mo" {
+						set_mathml_name(mathml, "mo");
+					}
 					return Some(mathml);
 				} else if OPERATORS.get(text).is_some() {
 					set_mathml_name(mathml, "mo");
@@ -908,6 +923,7 @@ impl CanonicalizeContext {
 				let mathml =  if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 					let merged = merge_dots(mathml);	// FIX -- switch to passing in children
 					let merged = merge_primes(merged);
+					let merged = merge_chars(merged, &IS_UNDERSCRORE);
 					handle_pseudo_scripts(merged)
 				} else {
 					mathml
@@ -1893,6 +1909,47 @@ impl CanonicalizeContext {
 			child.set_text(&mn_text);
 
 			children.drain(start+1..end);
+		}
+
+		fn merge_chars<'a>(mrow: Element<'a>, pattern: &Regex) -> Element<'a> {
+			// merge consecutive <mi>s containing any of the 'chars' into one <mi> -- probably used for omission with('_')
+			debug!("merge_chars: {}", mml_to_string(&mrow));
+			let mut first_child = None;
+			let mut new_text = "".to_string();
+			for child in mrow.children() {
+				let child = as_element(child);
+				if is_leaf(child) {
+					let text = as_text(child);
+					if pattern.is_match(text) {
+						if new_text.is_empty() {
+							// potential start of a string
+							first_child = Some(child);
+							new_text = as_text(child).to_string();
+						} else {
+							// merge chars
+							new_text.push_str(text);
+							child.remove_from_parent();
+						}
+					} else if new_text.len() > 1 {
+						// end of a run
+						first_child.unwrap().set_text(&new_text);
+						new_text.clear();
+					} else {
+						new_text.clear();	// just one entry -- no need to set the text
+					}
+				} else if new_text.len() > 1{
+					// end of a run
+					first_child.unwrap().set_text(&new_text);
+					new_text.clear();
+				} else {
+					new_text.clear();  		// just one entry -- no need to set the text
+				}
+			}
+			if new_text.len() > 1{
+				// end of a run
+				first_child.unwrap().set_text(&new_text);
+			}
+			return mrow;
 		}
 
 		fn merge_dots(mrow: Element) -> Element {
@@ -3211,15 +3268,18 @@ impl CanonicalizeContext {
 	}
 
 	// implied separator when two capital letters are adjacent or two chemical elements
+	// also for adjacent omission chars
 	fn is_implied_separator<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>) -> bool {
 		if name(prev) != "mi" || name(current) != "mi" {
 			return false;
 		}
 
-		let prev_text = as_text(*prev);
-		let current_text = as_text(*current);
+		// trim because whitespace might have gotten stuffed into the <mi>s
+		let prev_text = as_text(*prev).trim();
+		let current_text = as_text(*current).trim();
 		return prev_text.len() == 1 && current_text.len() == 1 &&
-			   is_cap(prev_text) && is_cap(current_text);
+			   ((is_cap(prev_text) && is_cap(current_text)) ||
+			    (prev_text=="_" && current_text=="_"));
 
 
 		fn is_cap(str: &str) -> bool {
