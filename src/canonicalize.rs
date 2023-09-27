@@ -1913,7 +1913,6 @@ impl CanonicalizeContext {
 
 		fn merge_chars<'a>(mrow: Element<'a>, pattern: &Regex) -> Element<'a> {
 			// merge consecutive <mi>s containing any of the 'chars' into one <mi> -- probably used for omission with('_')
-			debug!("merge_chars: {}", mml_to_string(&mrow));
 			let mut first_child = None;
 			let mut new_text = "".to_string();
 			for child in mrow.children() {
