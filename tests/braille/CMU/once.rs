@@ -155,6 +155,14 @@ fn letter_number_2_5_b_1() {
     test_braille("CMU", expr, "⠼⠁⠨⠃⠙⠨⠙");
 }
 
+#[test]
+// #[ignore]  // really requires a transcriber's note
+fn color_2_5_c_2() {
+    init_logger();
+    let expr = "<math><mn>3</mn><mn mathcolor='#FF0000'>4</mn><mn>2</mn><mn mathcolor='#00FF00'>9</mn></math>";
+    test_braille("CMU", expr, "⠼⠉⠩⠙⠃⠰⠊");
+}
+
 
 #[test]
 fn number_base_2_5_d_1() {
