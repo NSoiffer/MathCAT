@@ -1059,4 +1059,9 @@
  - "ᴗ": [t: "⠢⠜"]                # 0x1D17 (arco correspondiente al ángulo abc)
  - "⤻": [t: "⠠⠱"]                # 0x293B (vector axial positivo)
  - "↷": [t: "⠈⠜"]                # 0x21B7 (vector axial negativo)
- 
+
+ - "#": [t: "⠸⠇⠶"]                # 0x0023 (es paralelo e igual a)
+ - "∾": [t: "⠰⠢⠆"]                # 0x223E (homólogo a/semejante a)
+ - "~": [t: "⠐⠢⠄"]                # 0x007E (equivale a/similar a)
+ - "⌅": [t: "⠸⠫"]                # 0x2305 (proyectividad)
+ - "⌆": [t: "⠸⠻"]                # 0x2306 (perspectividad)

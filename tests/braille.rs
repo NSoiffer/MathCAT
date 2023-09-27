@@ -14,9 +14,9 @@ mod braille {
         mod other;
     }
 
-    // mod CMU {
-    //     mod once;
-    // }
+    mod CMU {
+        mod once;
+    }
 
     // mod Vietnam {
     //     mod vi;

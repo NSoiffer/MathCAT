@@ -273,7 +273,6 @@
 #  - "∝": [t: "⠸⠐⠶"]              # 0x221D (Proportional to)
 #  - "≃": [t: "⠸⠔"]               # 0x2243 (Approximately equal to (tilde over horizontal line))
 #  - "≅": [t: "⠐⠸⠔"]               # 0x2245 (Approximately equal to (tilde over equals sign))
-#  - "≈": [t: "⠘⠔"]               # 0x2248 (Approximately equal (tilde over tilde))
 #  - "≏": [t: "⠘⠐⠶"]              # 0x224F (Equals with bump in top bar (difference between))
 #  - "≢": [t: "⠸⠿⠈⠱"]             # 0x2262 (Not identical to)
 #  - "∈": [t: "⠘⠑"]               # 0x2208 (Element of (member of))
@@ -389,9 +388,6 @@
 #  - "∷": [t: "⠒⠒"]              # 0x2237 (Proportion)
 #  - "∣": [t: "⠸⠳"]               # 0x2223 (Divides)
 #  - "∤": [t: "⠸⠳⠈⠱"]             # 0x2224 (Does not divide)
-#  - "∥": [t: "⠼⠇"]               # 0x2225 (Parallel)
-#  - "∦": [t: "⠼⠇⠈⠱"]             # 0x2226 (Not parallel)
-#  - "⟂": [t: "⠼⠤"]               # 0x27C2 (Perpendicular)
  - "←":                            # 0x2190 (Leftwards arrow)
     - test:  # this is a guess as to when to use each
         if:  # mi on either side or if parent is mover, mi on either side of the parent (e.g., A⟶B or labeled arrow)
@@ -417,6 +413,16 @@
         then: [t: "⠒⠒⠂"]  # 9.1
         else: [t: "⠒⠂"]   # 9.2
  - "⟶":                       # 0x27F6 (Long rightwards arrow)
+    - test:  # this is a guess as to when to use each
+        if:  # mi on either side or if parent is mover, mi on either side of the parent (e.g., A⟶B or labeled arrow), but rule out limit
+        - "("
+        - "  (..[self::m:mrow] and preceding-sibling::*[1][self::m:mi] and following-sibling::*[1][self::m:mi]) or "
+        - "  (..[self::m:mover][ ..[self::m:mrow][preceding-sibling::*[1][self::m:mi] and following-sibling::*[1][self::m:mi]] ])"
+        - ") and"
+        - "not(../..[self::m:munder or self::m:msub][*[1][self::m:mi and starts-with(., 'lim')]])"
+        then: [t: "⠒⠒⠂"]  # 9.1
+        else: [t: "⠒⠂"]   # 9.2
+ - "⇀":                       # 0x21C0 (RIGHTWARDS HARPOON WITH BARB UPWARDS)  [not mentioned in spec]
     - test:  # this is a guess as to when to use each
         if:  # mi on either side or if parent is mover, mi on either side of the parent (e.g., A⟶B or labeled arrow), but rule out limit
         - "("
@@ -654,6 +660,7 @@
  - "≰": [t: "⠘⠪⠶"]                # 0x2270 (no es menor ni igual que)
  - "⩽": [t: "⠪⠶"]                # 0x227D
  - "⩾": [t: "⠕⠶"]                # 0x2A7E (greater-than-or-slanted-equals)
+ # FIX: ≈" p99 has "⠐⠶"
  - "≈": [t: "⠐⠶⠄"]                # 0x2248 (casi igual a; asintóticamente igual a)
  - "≄": [t: "⠘⠐⠶⠄"]                # 0x2244 (no es asintóticamente igual a)
  - "≁": [t: "⠘⠐⠢⠄"]                # 0x2241 (tilde sube-baja tachada)
@@ -680,8 +687,16 @@
  - "∄": [t: "⠘⠨⠢"]                # 0x2204 (no existe)
  - "∀": [t: "⠨⠄"]                # 0x2200 (cuantificador universal: para todo)
  - "ǁ": [t: "⠸⠇"]                # 0x01C1 (doble barra)
- - "÷": [t: "⠦"]                # 0x00F7 (dividido por)
- - "×": [t: "⠦"]                # 0x00D7 (multiplicar (aspas))
+ - "÷": [t: "⠲"]                # 0x00F7 (dividido por)
+ - "×":                          # 0x00D7 (multiplicar (aspas))
+    # FIX: this is a hacky attempt to figure out whether this is vector multiplication or regular multiplication
+    # Look for an arrow above or a bold on each side
+    - test:
+        if:
+        - "preceding-sibling::*[1][@math-variant='bold' or self::m:mover[*[2][.='→' or .='⟶' or .='⇀']]] and"
+        - "following-sibling::*[1][@math-variant='bold' or self::m:mover[*[2][.='→' or .='⟶' or .='⇀']]]"
+        then: [t: "⠈⠦"]
+        else: [t: "⠦"]
  - "≫": [t: "⠕⠕"]                # 0x226B (mucho mayor que)
  - "≪": [t: "⠪⠪"]                # 0x226A (mucho menor que)
  - "±": [t: "⠖⠒⠤"]                # 0x00B1 (más o menos)
@@ -706,6 +721,8 @@
  - "¢": [t: "⠘⠉"]                # 0x00A2 (centavo)
  - "〉": [t: "⠨⠂"]                # 0x232A (cerrar paréntesis angulares)
  - "〈": [t: "⠐⠅"]                # 0x2329 (abrir paréntesis angulares)
+ - "⟨": [t: "⠐⠅"]                # 0x27E8 (Mathematical left angle bracket)
+ - "⟩": [t: "⠨⠂"]                # 0x27E9 (Mathematical right angle bracket)
  - "}": [t: "⠸⠂"]                # 0x007D (cerrar llaves)
  - "|": [t: "⠸𝘄"]                # 0x007C (barra vertical)
  - "{": [t: "⠐⠇"]                # 0x007B (abrir llaves)
@@ -730,6 +747,11 @@
  - "≙": [t: "⠰⠒⠶"]                # 0x2259 (corresponde a)
  - "≡": [t: "⠶⠶"]                # 0x2261 (idéntico a; congruente con)
 
+ - "∥": [t: "⠸⠇"]                # 0x2225 (es paralela a)
+ - "∦": [t: "⠘⠸⠇"]                # 0x2226 (no paralela)
+ - "≅": [t: "⠐⠢⠶"]                # 0x2245 (congruente con)
+ - "⊥": [t: "⠼⠄"]                # 0x22A5 (perpendicular a/ortogonal a) [symbol used in spec]
+ - "⟂": [t: "⠼⠤"]               # 0x27C2 (Perpendicular)
 
  - "⊙": [t: "⠰⠄"]                # 0x2299 (operador genérico (suele utilizarse para representar una operación entre elementos de un conjunto)
  - "⊚": [t: "⠰⠄"]                # 0x229A (operador genérico (suele utilizarse para representar una operación entre elementos de un conjunto)
