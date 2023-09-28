@@ -190,7 +190,7 @@
  - "⇃": [t: "⠳⠠⠗⠩"]            # 0x21C3 (Downwards harpoon with barb leftwards)
  - "⇄": [t: "⠳⠕⠻⠳⠪"]           # 0x21C4 (Rightwards arrow over leftwards arrow)
  - "⇅": [t: "⠳⠬⠿⠳⠩"]           # 0x21C5 (Upwards arrow left of Downwards arrow)
- - "⇌": [t: "⠘⠸⠶"]              # 0x21CC (Rightwards harpoon over leftwards harpoon (equilibrium))
+ - "⇌": [T: "⠳⠪⠕"]              # 0x21CC (Rightwards harpoon over leftwards harpoon (equilibrium))
  - "⇐": [t: "⠳⠶⠪"]             # 0x21D0 (Leftwards double arrow)
  - "⇑": [t: "⠳⠶⠬"]             # 0x21D1 (Upwards double arrow)
  - "⇒": [t: "⠳⠶⠕"]             # 0x21D2 (Rightwards double arrow)
@@ -1687,3 +1687,5 @@
  - "⧵": [T: "⠸⠡"]          
  - "∕": [T: "⠐⠌"]
  - "⊘": [T: "⠐⠌"]
+ - "℃": [T: "⠔⠚⠀⠨⠉"]
+ - "℉": [T: "⠔⠚⠀⠨⠋"]

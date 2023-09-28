@@ -1,5 +1,4 @@
 ---
-
 - name: intent-literal-silent
   tag: [mi, mo, mn]
   match: "contains(@data-intent-property, ':silent:')"
@@ -36,7 +35,7 @@
       else: {pause: short}
   - x: "*[1]"
   - test:
-    - if: $ClearSpeak_Roots = 'EndRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+    - if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
       - pause: short
       - T: hết căn
@@ -84,7 +83,7 @@
       then: {T: của}
   - x: "*[1]"
   - test:
-      if: $ClearSpeak_Roots = 'EndRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+      if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
       - pause: short
       - T: hết căn
