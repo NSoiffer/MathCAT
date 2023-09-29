@@ -1,0 +1,102 @@
+---
+[
+# Lines starting with "#" are a comment
+# Each definition in this file is of the form
+#   name: [ "...", "..." "..." ],
+
+
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
+# The following definitions are used to convert numbers to words
+# The are mainly used for ordinals, of which there are two cases:
+# 1. Regular ordinals: first, second, third, ...
+# 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
+#    When used in the denominator of fractions, a plural version might be
+#    used (e.g., two halves, two thirds)
+# Although a lot of languages are regular after a few entries, for generality,
+# the following lists should be filled out even though they are the same
+# or easily derived from others in many languages (e.g, an 's' is added for plurals).
+# The larger ordinal numbers (e.g, millionth) is used when there are only
+# '0's after that decimal place (e.g., 23000000).:w
+
+# All definitions start 0, 10, 100, etc.
+
+# The definitions for the "ones" should extend until a regular pattern begins
+#   The minimum length is 10.
+
+# For English, a regular pattern starts at twenty
+    NumbersOnes: [
+         "noll", "en", "två", "tre", "fyra", "fem", "sex", "sju", "åtta", "nio",
+         "tio", "elva", "tolv", "tretton", "fjorton", "femton", "sexton",
+         "sjutton", "arton", "nitton"
+    ],
+
+    NumbersOrdinalOnes: [
+         "nolla", "första", "andra", "tredje", "fjärde", "femte", "sjätte", "sjunde", "åttonde", "nionde",
+         "tionde", "elfte", "tolfte", "trettonde", "fjortonde", "femtonde", "sextonde",
+         "sjuttonde", "artonde", "nittonde"
+    ],
+
+    NumbersOrdinalPluralOnes: [
+         "nolla", "första", "sekunder", "tredjedelar", "fjärdedelar", "femtedelar", "sjättedelar", "sjundedelar", "åttor", "niondelar",
+         "tiondelar", "elftedelar", "tolftedelar", "trettondelar", "fjortondelar", "femtondelar", "sextondelar",
+         "sjuttondelar", "artondelar", "nittondelar"
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalOnes: [
+         "noll", "första", "halva"
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalPluralOnes: [
+         "nollor", "första", "halvor"
+    ],
+
+
+    # What to use for multiples of 10
+    NumbersTens: [
+         "", "tio", "tjugo", "trettio", "fyrtio", "femtio", "sextio", "sjuttio", "åttio", "nittio"
+    ],
+
+    NumbersOrdinalTens: [
+         "", "tionde", "tjugonde", "trettionde", "fyrtionde", "femtionde", "sextionde", "sjuttio", "åttonde", "nittionde"
+    ],
+
+    NumbersOrdinalPluralTens: [
+         "", "tiondelar", "tjugondelar", "trettiodelar", "fyrtiondelar", "femtiondelar", "sextiondelar", "sjuttiodelar", "åttondelar", "nittiodelar"
+    ],
+
+
+    NumbersHundreds: [
+       "", "etthundra", "tvåhundra", "trehundra", "fyrahundra", "femhundra",
+         "sexhundra", "sjuhundra", "åttahundra", "niohundra"
+    ],
+
+    NumbersOrdinalHundreds: [
+       "", "en hundradel", "två hundradel", "tre hundradel", "fyra hundradel", "fem hundradel",
+         "sex hundradel", "sju hundradel", "åtta hundradel", "nio hundradel"
+    ],
+
+    NumbersOrdinalPluralHundreds: [
+       "", "en hundradelar", "två hundradelar", "tre hundradelar", "fyra hundradelar", "fem hundradelar",
+         "sex hundradelar", "sju hundradelar", "åtta hundradelar", "nio hundradelar"
+    ],
+      
+
+    # At this point, hopefully the language is regular. If not, code needs to be written
+    NumbersLarge: [
+         "", "tusen", "miljoner", "miljarder", "biljoner", "kvadrilljoner",
+         "quintillion", "sextillion", "septillion", "oktillion", "nonillion",
+    ],
+      
+    NumbersOrdinalLarge: [
+         "", "tusendel", "miljondel", "miljarddel", "biljondel", "kvadrilliondel",
+         "kvintillionth", "sextillionth", "septillionth", "oktillionth", "nonillionth"
+    ],
+      
+    NumbersOrdinalPluralLarge: [
+         "", "tusendelar", "miljondelar", "miljarddelar", "biljondelar", "kvadrilliondelar",
+         "kvintilliondelar", "sextilljondelar", "septiljondelar", "oktiljondelar", "nonmiljondelar"
+    ]
+
+]
