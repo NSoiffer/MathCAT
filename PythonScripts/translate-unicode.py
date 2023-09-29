@@ -256,7 +256,7 @@ def build_new_translation(path_to_mathcat: str, lang: str, unicode_file_name: st
     words_to_translate = collect_words_to_translate(file_to_translate, lang, mathplayer, sre)
     google = translate_words(words_to_translate, lang)
     print("Translations: MathPlayer={}, SRE={}, Google={}".format(len(mathplayer), len(sre), len(google)))
-    create_new_file(file_to_translate, "{}-{}.yaml".format(unicode_file_name, lang), mathplayer, sre, google)
+    create_new_file(file_to_translate, "{}/{}.yaml".format(lang, unicode_file_name), mathplayer, sre, google)
 
 
 import os
@@ -340,7 +340,7 @@ def translate_definitions(path_to_mathcat: str, lang: str):
     with open("google-defs.yaml", 'r', encoding='utf8') as google_stream:
         translated_lines = google_stream.readlines()
         with open(file_to_translate, 'r', encoding='utf8') as in_stream:
-            with open(lang+"-definitions.yaml", 'w', encoding='utf8') as out_stream:
+            with open(f"{lang}/definitions.yaml", 'w', encoding='utf8') as out_stream:
                 lines = in_stream.readlines()
                 i = 0
                 n_lines = len(lines)
@@ -377,9 +377,9 @@ MP_Location = r"C:\Dev\mathplayer\EqnLib\rules\pvt"
 # (sre_only, mp_only, differ, same) = dict_compare("fr", get_sre_unicode_dict(SRE_Location, "fr"), get_mathplayer_unicode_dict(MP_Location, "fr"))
 # (sre_only, mp_only, differ, same) = dict_compare("it", get_sre_unicode_dict(SRE_Location, "it"), get_mathplayer_unicode_dict(MP_Location, "it"))
 
-language = "pt"
+language = "sv"
 build_new_translation("..", language, "unicode")
 build_new_translation("..", language, "unicode-full")
 
 # see translate_definitions comments -- you need to manually copy the file to google translate. 
-# translate_definitions("..", language)
+translate_definitions("..", language)

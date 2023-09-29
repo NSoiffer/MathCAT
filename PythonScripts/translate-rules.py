@@ -27,14 +27,14 @@ GoogleTranslate = Translator(service_urls=["translate.google.us"])
 # 3. Reread the file replacing translations (we know the line number) and writing it out
 
 import re
-TextToTranslate = re.compile(r'phrase\(([^)]+)\)')
+PhraseToTranslate = re.compile(r'phrase\(([^)]+)\)')
 
 # run over the file and figure out what words need to be translated
 def collect_phrases_to_translate(file_to_translate: str) -> list[str]:
     with open(file_to_translate, 'r', encoding='utf8') as in_stream:
         translations = []
         for line in in_stream:
-            phrase = TextToTranslate.search(line)
+            phrase = PhraseToTranslate.search(line)
             if phrase:
                 translations.append(phrase.group(1))
         return translations
@@ -114,7 +114,7 @@ def create_new_file(file_to_translate: str, output_file: str, translations: list
         with open(output_file, 'w', encoding='utf8') as out_stream:
             iTranslation = 0
             for line in in_stream:
-                if TextToTranslate.search(line):
+                if PhraseToTranslate.search(line):
                     out_stream.write(substitute_in_translated_word(line, translations[iTranslation]))
                     iTranslation += 1
                 else:
