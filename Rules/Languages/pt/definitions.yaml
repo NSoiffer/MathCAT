@@ -96,7 +96,7 @@
     ],
       
     NumbersOrdinalPluralLarge: [
-         "", "milionésimos", "milionésimos", "bilionésimos", "trilionésimos", "quatrilionésimos",
+         "décimos", "centésimos", "milésimos", "milionésimos", "bilionésimos", "trilionésimos", "quatrilionésimos",
          "quintilionésimos", "sextilionésimos", "septillionésimos", "octilionésimos", "nonillionésimos"
     ]
 
