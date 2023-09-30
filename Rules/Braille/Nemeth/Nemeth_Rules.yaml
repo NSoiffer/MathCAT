@@ -293,8 +293,7 @@
   - x: "text()"
 
 - name: default
-  tag:
-     mo
+  tag: mo
      # add spaces around comparison operators,
      # but if "modified", they are moved outside of munder, etc, and handled by those rules
      # need to insert multipurpose indicators between comparison chars in multi-char mo
