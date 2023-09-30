@@ -352,11 +352,7 @@
     - test:
         if: "not(following-sibling::*[1][IsBracketed(., '', '')]) or preceding-sibling::*[1][IsInDefinition(BaseNode(.), 'FunctionNames')]" 
         then: [t: "w"]      # follows a function name, so lowercase
- - "⁢":                       # 0x2062 -- what's right???  "⠈⠡" (times) is not right -- if a number before and after, we need a space
-    - test:
-        if: "preceding-sibling::*[1][self::m:mn] and following-sibling::*[1][self::m:mn]"
-        then: [t: "W"]
-        else: [t: ""]
+ - "⁢": [t: ""]                  # 0x2062 -- what's right???  "⠈⠡" (times) is not right
  - "⁣":                         # 0x2063 (Invisible Comma -- treat like a normal comma when in a subscript[issue #40]) else ignore
     - test:
           # test if first ancestor that isn't an mrow is a script tag (rule 78)
