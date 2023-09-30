@@ -109,7 +109,7 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
     set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
     // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically
-    log::debug!("\nsetting Language");
+    // log::debug!("\nsetting Language");
     match code {
         "Vietnam" => set_preference("Language".to_string(), "vi".to_string()).unwrap(),
         "CMU" => set_preference("Language".to_string(), "es".to_string()).unwrap(),
@@ -123,3 +123,31 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
         Err(e) => panic!("{}", errors_to_string(&e)),
     };    
 }
+
+#[allow(dead_code)]     // used in testing
+pub fn test_braille_prefs(code: &str, test_prefs: Vec<(&str, &str)>, mathml: &str, braille: &str) {
+    set_rules_dir(abs_rules_dir_path()).unwrap();
+    set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
+
+    // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically
+    // log::debug!("\nsetting Language");
+    match code {
+        "Vietnam" => set_preference("Language".to_string(), "vi".to_string()).unwrap(),
+        "CMU" => set_preference("Language".to_string(), "es".to_string()).unwrap(),
+        "UEB" | "Nemeth" | _ => set_preference("Language".to_string(), "en".to_string()).unwrap(),
+    }
+
+    set_preference("UEB_UseSpacesAroundAllOperators".to_string(), "false".to_string()).unwrap();         // makes testing simpler
+    for (pref_name, pref_value) in test_prefs.clone() {
+        set_preference(pref_name.to_string(), pref_value.to_string()).unwrap();
+    };
+
+    if let Err(e) = set_mathml(mathml.to_string()) {
+        panic!("{}", errors_to_string(&e));
+    };
+    match get_braille("".to_string()) {
+        Ok(result) => assert_eq!(braille, &result),
+        Err(e) => panic!("{}", errors_to_string(&e)),
+    };    
+}
+

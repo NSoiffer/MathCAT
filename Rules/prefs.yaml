@@ -55,8 +55,11 @@
     BrailleNavHighlight: EndPoints   # Highlight with dots 7 & 8 the current nav node -- values are Off, FirstChar, EndPoints, All
     BrailleCode: "Nemeth"                # Any supported braille code (currently Nemeth, UEB)
 
+    Nemeth:
+
     UEB:
-      START_MODE: "Grade2"   # Grade1/Grade2 -- assumed starting mode UEB braille (Grade1 assumes we are in G1 passage mode)
+      StartMode: "Grade2"   # Grade1/Grade2 -- assumed starting mode UEB braille (Grade1 assumes we are in G1 passage mode)
+      UseSpacesAroundAllOperators: false  # true/false
 
       # UEB Guide to Technical Material (https://iceb.org/Guidelines_for_Technical_Material_2008-10.pdf)
       #   says to normally treat Fraktur and DoubleStruck as Script
