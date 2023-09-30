@@ -89,6 +89,11 @@
          "", "mil", "milhão", "bilhão", "trilhão", "quatrilhão",
          "quintilhão", "sextilhão", "septilhão", "octilhão", "nonilhão",
     ],
+
+    NumbersPluralLarge: [
+         "", "milhões", "bilhões", "trilhões", "quatrilhões",
+         "quintilhões", "sextilhões", "septilhões", "octilhões", "nonilhões",
+    ],
       
     NumbersOrdinalLarge: [
          "décimo", "centésimo", "milésimo", "milionésimo", "bilionésimo", "trilionésimo", "quatrilionésimo",
