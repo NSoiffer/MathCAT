@@ -1364,7 +1364,7 @@
         - else_if: "$NavCommand = 'ReadPrevious'"
           then: [t: "read"]                                  # phrase('read' next entry in table)     
           else: [t: "describe"]                              # phrase('describe' next entry in table)     
-      - t: "right"                                           # phrase(move 'right')
+      - t: "left"                                            # phrase(move 'left')
       - pause: short
   - with:
       variables: [MatchCounter: "$MatchCounter + 1"]
@@ -1435,7 +1435,7 @@
         - else_if: "$NavCommand = 'ReadPrevious'"
           then: [t: "read"]                                  # phrase('read' next entry in table)     
           else: [t: "describe"]                              # phrase('describe' next entry in table)     
-      - t: "right"                                           # phrase(move 'right')
+      - t: "left"                                            # phrase(move 'left')
       - pause: short
   - with:
       variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MovePrevious'"]
@@ -1481,7 +1481,7 @@
         - else_if: "$NavCommand = 'ReadPrevious'"
           then: [t: "read"]                                  # phrase('read' next entry in table)     
           else: [t: "describe"]                              # phrase('describe' next entry in table)     
-      - t: "right"                                           # phrase(move 'right')
+      - t: "left"                                            # phrase(move 'left')
       - pause: short
   - test:
       if: "not(parent::m:mrow)"
@@ -1570,7 +1570,7 @@
             - else_if: "$NavCommand = 'ReadPrevious'"
               then: [t: "read"]                                  # phrase('read' next entry in table)     
               else: [t: "describe"]                              # phrase('describe' next entry in table)     
-          - t: "right"                                           # phrase(move 'right')
+          - t: "left"                                            # phrase(move 'left')
           - pause: short
       - with:
           variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]               # phrase('in' the denominator)
@@ -1592,7 +1592,7 @@
         - else_if: "$NavCommand = 'ReadPrevious'"
           then: [t: "read"]                                  # phrase('read' next entry in table)     
           else: [t: "describe"]                              # phrase('describe' next entry in table)     
-      - t: "right"                                           # phrase(move 'right')
+      - t: "left"                                            # phrase(move 'left')
       - pause: short
   - test:
       if: "IsNode(.., '2D')"
