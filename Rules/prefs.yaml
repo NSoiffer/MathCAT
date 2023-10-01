@@ -64,3 +64,6 @@
       Fraktur:      "⠈"     # script
       SansSerif:    "⠈⠼"     # first transcriber-defined typeform prefix indicator
 
+  Other:
+    DecimalSeparators: "." # [default]
+    BlockSeparators: ", \u00A0\u202F" # [default -- includes two forms of non-breaking spaces]

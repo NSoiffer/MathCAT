@@ -167,14 +167,19 @@ impl Preferences{
         }
 
         let doc = &docs[0];
-        verify_keys(doc, "Speech", file_name)?;
-        verify_keys(doc, "Navigation", file_name)?;
-        verify_keys(doc, "Braille", file_name)?;
+
+        if cfg!(debug_assertions) {
+            verify_keys(doc, "Speech", file_name)?;
+            verify_keys(doc, "Navigation", file_name)?;
+            verify_keys(doc, "Braille", file_name)?;
+            verify_keys(doc, "Other", file_name)?;
+        }
 
         let prefs = &mut base_prefs.prefs;
         add_prefs(prefs, &doc["Speech"], "", file_name);
         add_prefs(prefs, &doc["Navigation"], "", file_name);
         add_prefs(prefs, &doc["Braille"], "", file_name);
+        add_prefs(prefs, &doc["Other"], "", file_name);
         return Ok( Preferences{ prefs: prefs.to_owned() } );
 
 
