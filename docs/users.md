@@ -7,7 +7,7 @@ In NVDA, you have a choice of using different synthesizers. This is found in NVD
 MathCAT supports a number of options to control speech, braille, and navigation. These are described below.
 Not all options are currently supported. The current state of support for an option is listed with the option and a ✓ is used before the option as a quick reference to indicate at least partial support for that option.
 
-Note: in NVDA, the options can be set by using the MathCAT preferences dialog. This is accessed by going to the NVDA preferences, choosing "Tools", and then "MathCAT settings...". The settings are divided into three categories: Speech, Navigation, and Braille. This division is reflected in the documentation below.
+Note: in NVDA, the options can be set by using the MathCAT preferences dialog. This is accessed by going to the NVDA preferences, choosing "Preferences", and then "MathCAT settings...". The settings are divided into three categories: Speech, Navigation, and Braille. This division is reflected in the documentation below.
 
 MathCAT supports multiple modes of navigation. The means to begin navigating and end navigating will differ depending on the AT you are using. See the list below. The commands/key-strokes accepted by MathCAT are the same as those accepted by MathPlayer and are [listed in this document](nav-commands.md).
 The documentation describes many useful ways to navigate math. For those who just want to get started:
