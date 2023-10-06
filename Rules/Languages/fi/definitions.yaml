@@ -81,9 +81,9 @@
          "kuudessadas", "seitsemässadas", "kahdeksassadas", "yhdeksässadas"
     ],
 
-     # how should these be translated? "kaksi sadasosaa" or "toiset sadasosat"?
+     # how should these be translated? weirdness going on... context for these?
     NumbersOrdinalPluralHundreds: [
-       "", "sadasosat", "kaksi sadasosaa", "kolme sadasosaa", "neljä sadasosaa", "viisi sadasosaa",
+       "", "sadannet", "kahdet sadannet", "kolme sadasosaa", "neljä sadasosaa", "viisi sadasosaa",
          "kuusi sadasosaa", "seitsemän sadasosaa", "kahdeksan sadasosaa", "yhdeksän sadasosaa"
     ],
       
