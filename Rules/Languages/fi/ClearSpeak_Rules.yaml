@@ -123,7 +123,7 @@
   - T: "per"      # phrase('5 meters 'per' second) # Finnish: is there a better way? 'per' might not be widely known
   - x: "*[2]"
 
-- name: common-fraction
+- name: common-fraction # have to test how this works in Finnish
   tag: fraction
   match:
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
