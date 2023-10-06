@@ -31,7 +31,7 @@
     ],
 
     NumbersOrdinalOnes: [
-         "nolla", "ensimmäinen", "toinen", "kolmas", "neljäs", "viides", "kuudes", "seitsemäs", "kahdeksas", "yhdeksäs",
+         "nollannes", "ensimmäinen", "toinen", "kolmas", "neljäs", "viides", "kuudes", "seitsemäs", "kahdeksas", "yhdeksäs",
          "kymmenes", "yhdestoista", "kahdestoista", "kolmestoista", "neljästoista", "viisitoista", "kuudestoista",
          "seitsemästoista", "kahdeksastoista", "yhdeksästoista"
     ],
