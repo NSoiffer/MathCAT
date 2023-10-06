@@ -26,8 +26,8 @@
       - bookmark: "*[1]/@id"
       - test:
           if: parent::*[self::m:negative]
-          then: [{t: "negatiivinen"}]      # phrase(minus 4 is a 'negative' number)
-          else: [{t: "positiivinen"}]      # phrase(10 is a 'positive' number)
+          then: [{T: "negatiivinen"}]      # phrase(minus 4 is a 'negative' number)
+          else: [{T: "positiivinen"}]      # phrase(10 is a 'positive' number)
   - t: "neliöjuuri"      # phrase(8 is the 'square root' of 64)
   - test:
       if: "$Verbosity!='Terse'"
@@ -38,7 +38,7 @@
     - if: "$ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'"
       then:
       - pause: short
-      - t: "pääjuurin neliöjuuri"      # phrase(the square root of x 'end root')
+      - T: "juuri loppu"      # phrase(the square root of x 'end root')
       - pause: medium
     - else_if: "IsNode(*[1], 'simple')"
       then: [{pause: short}]
