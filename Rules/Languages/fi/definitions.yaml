@@ -62,6 +62,7 @@
          "", "kymmenes", "kahdeskymmenes", "kolmaskymmenes", "neljäskymmenes", "viideskymmenes", "kuudeskymmenes", "seitsemäskymmenes", "kahdeksaskymmenes", "yhdeksäskymmenes"
     ],
 
+     # check meaning and translation
     NumbersOrdinalPluralTens: [
          "", "kymmenesosa", "kahdeskymmenesosa", "kolmaskymmenesosa", "neljäskymmenesosa", "viideskymmenesosa", "kuudeskymmenesosa", "seitsemäskymmenesosa", "kahdeksaskymmenesosa", "yhdeksäskymmenesosa"
     ],
@@ -78,7 +79,7 @@
     ],
 
     NumbersOrdinalPluralHundreds: [
-       "", "yksi sadasosa", "kaksi sadasosaa", "kolme sadasosaa", "neljä sadasosaa", "viisi sadasosaa",
+       "", "sadasosat", "kaksi sadasosaa", "kolme sadasosaa", "neljä sadasosaa", "viisi sadasosaa",
          "kuusi sadasosaa", "seitsemän sadasosaa", "kahdeksan sadasosaa", "yhdeksän sadasosaa"
     ],
       
