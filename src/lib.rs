@@ -83,7 +83,7 @@ pub fn abs_rules_dir_path() -> String {
 
 #[cfg(test)]
 pub fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
-    use crate::interface::*;
+    use crate::{interface::*, pretty_print::mml_to_string};
     use sxd_document::parser;
     use crate::canonicalize::canonicalize;
     // this forces initialization
@@ -103,7 +103,7 @@ pub fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
 
     match is_same_element(&mathml_test, &mathml_target) {
         Ok(_) => return true,
-        Err(e) => panic!("{}", e),
+        Err(e) => panic!("{}\nResult:\n{}\nTarget:\n{}", e, mml_to_string(&mathml_test), mml_to_string(&mathml_target)),
     }
 }
 
