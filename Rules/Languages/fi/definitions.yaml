@@ -23,7 +23,7 @@
 # The definitions for the "ones" should extend until a regular pattern begins
 #   The minimum length is 10.
 
-# For English, a regular pattern starts at twenty
+# For Finnish the regular pattern starts at... where?
     NumbersOnes: [
          "nolla", "yksi", "kaksi", "kolme", "neljä", "viisi", "kuusi", "seitsemän", "kahdeksan", "yhdeksän",
          "kymmenen", "yksitoista", "kaksitoista", "kolmetoista", "neljätoista", "viisitoista", "kuusitoista",
