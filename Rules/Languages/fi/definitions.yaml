@@ -68,13 +68,13 @@
 
 
     NumbersHundreds: [
-       "", "sata", "kaksisataa", "kolmesataa", "nelisataa", "viisisataa",
-         "kuusisataa", "seitsemänsataa", "kahdeksasataa", "yhdeksänsataa"
+       "", "sata", "kaksisataa", "kolmesataa", "neljäsataa", "viisisataa",
+         "kuusisataa", "seitsemänsataa", "kahdeksansataa", "yhdeksänsataa"
     ],
 
     NumbersOrdinalHundreds: [
-       "", "yksi sadasosa", "kaksi sadasosa", "kolmessadas", "neljäsasasosa", "viisisadas",
-         "kuusi sadasosa", "seitsemänsadas", "kahdeksassadas", "yhdeksänsasas"
+       "", "sadasosa", "kahdessadasosa", "kolmessadasosa", "neljäsadasosa", "viidessadasosa",
+         "kuudessadasosa", "seitsemässadasosa", "kahdeksassadasosa", "yhdeksässadasosa"
     ],
 
     NumbersOrdinalPluralHundreds: [
