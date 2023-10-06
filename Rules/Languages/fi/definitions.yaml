@@ -87,6 +87,8 @@
       
 
     # At this point, hopefully the language is regular. If not, code needs to be written
+
+    # Is Finnish regular when it comes to this point? Requires thinking
     NumbersLarge: [
          "", "tuhat", "miljoona", "miljardi", "biljoona", "kvadriljoona",
          "quintillion", "sextillion", "septillion", "octillion", "nonillion",
