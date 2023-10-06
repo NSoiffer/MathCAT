@@ -75,8 +75,8 @@
     ],
 
     NumbersOrdinalHundreds: [
-       "", "sadasosa", "kahdessadasosa", "kolmessadasosa", "neljäsadasosa", "viidessadasosa",
-         "kuudessadasosa", "seitsemässadasosa", "kahdeksassadasosa", "yhdeksässadasosa"
+       "", "sadas", "kahdessadas", "kolmassadas", "neljäsadas", "viidessadas",
+         "kuudessadas", "seitsemässadas", "kahdeksassadas", "yhdeksässadas"
     ],
 
      # how should these be translated? "kaksi sadasosaa" or "toiset sadasosat"?
