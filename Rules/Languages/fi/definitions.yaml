@@ -36,10 +36,11 @@
          "seitsemästoista", "kahdeksastoista", "yhdeksästoista"
     ],
 
+     # check translation, should it be done differently?
     NumbersOrdinalPluralOnes: [
-         "nolla", "ensimmäinen", "sekuntia", "kolmannet", "neljännekset", "viidesosa", "kuudesosa", "seitsemäsosa", "kahdeksas", "yhdeksäsosa",
-         "kymmenesosat", "yhdestoistaosat", "kahdestoistaosat", "kolmestoistaosat", "neljätoistaosat", "viisitoistaosat", "kuudestoistaosat",
-         "seitsemäntoistaosat", "kahdeksantoistaosat", "yhdeksästoista"
+         "nolla", "ensimmäiset", "toiset", "kolmannet", "neljännet", "viidennet", "kuudennet", "seitsemännet", "kahdeksannet", "yhdeksännet",
+         "kymmenennet", "yhdennettoista", "kahdennettoista", "kolmannettoista", "neljännettoista", "viidennettoista", "kuudennettoista",
+         "seitsemännettoista", "kahdeksannettoista", "yhdeksännettoista"
     ],
 
     # stop when regularity begins
