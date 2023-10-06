@@ -51,24 +51,24 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [t: "avata"]                  	#  0x28	(en: 'open', google translation)
-            else: [t: "sulku auki"]             	#  0x28	(en: 'open paren', google: 'avoin sulku')
-        else: [t: "sulku auki"]                 	#  0x28	(en: 'left paren', google: 'vasen sulku')
+            then: [T: "auki"]                  	#  0x28	(en: 'open', google translation)
+            else: [T: "sulku auki"]             	#  0x28	(en: 'open paren', google: 'avoin sulku')
+        else: [T: "vasen sulku"]             #  0x28	(en: 'left paren', google: 'vasen sulku')
  - ")":                                         	#  0x29
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [t: "kiinni"]                 	#  0x29	(en: 'close', google translation)
-            else: [t: "sulku kiinni"]           	#  0x29	(en: 'close paren', google: 'sulje sulku')
-        else: [t: "sulku kiinni"]               	#  0x29	(en: 'right paren', google: 'oikea sulku')
+            then: [T: "kiinni"]                 	#  0x29	(en: 'close', google translation)
+            else: [T: "sulku kiinni"]           	#  0x29	(en: 'close paren', google: 'sulje sulku')
+        else: [T: "oikea sulku"]               	#  0x29	(en: 'right paren', google: 'oikea sulku')
 
  - "*":                                         	#  0x2a
     test:
         if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='skip-super']"
-        then: [t: "tähti"]                      	#  0x2a	(en: 'star', google translation)
-        else: [t: "kertaa"]                     	#  0x2a	(en: 'times', google: 'ajat')
- - "+": [t: "plus"]                             	#  0x2b
+        then: [T: "tähti"]                      	#  0x2a	(en: 'star', google translation)
+        else: [T: "kertaa"]                     	#  0x2a	(en: 'times', google: 'ajat')
+ - "+": [T: "plus"]                             	#  0x2b
  - ",":                                         	#  0x2c
     # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
     # that this test is here and not with "…" is not ideal, but seems simplest
