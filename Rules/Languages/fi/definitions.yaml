@@ -63,9 +63,9 @@
          "", "kymmenes", "kahdeskymmenes", "kolmaskymmenes", "neljäskymmenes", "viideskymmenes", "kuudeskymmenes", "seitsemäskymmenes", "kahdeksaskymmenes", "yhdeksäskymmenes"
     ],
 
-     # check meaning and translation
+     # translation is weird, are these used in Finnish that much?
     NumbersOrdinalPluralTens: [
-         "", "kymmenesosa", "kahdeskymmenesosa", "kolmaskymmenesosa", "neljäskymmenesosa", "viideskymmenesosa", "kuudeskymmenesosa", "seitsemäskymmenesosa", "kahdeksaskymmenesosa", "yhdeksäskymmenesosa"
+         "", "kymmenet", "kahdetkymmenet", "kolmetkymmenet", "neljätkymmenet", "viidetkymmenet", "kuudetkymmenet", "seitsemätkymmenet", "kahdeksatkymmenet", "yhdeksätkymmenet"
     ],
 
 
