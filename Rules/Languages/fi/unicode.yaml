@@ -40,9 +40,9 @@
             else: [T: "huuto"]      # obsolete?          	#  0x21	(en: 'exclamation point', google: 'huutomerkki')
         else: [T: "kertoma"]                    	#  0x21	(en: 'factorial', google: 'tekijä')
           
- - "\"": [t: "kenoviiva"]                       	#  0x22	(en: 'quotation mark', google: 'lainausmerkki')
+ - "\"": [T: "lainaus"]          # or "sitaatti"?             	#  0x22	(en: 'quotation mark', google: 'lainausmerkki')
  - "#": [t: "ristikkomerkki"]                   	#  0x23	(en: 'number', google: 'määrä')
- - "$": [t: "dollaria"]                         	#  0x24	(en: 'dollars', google: 'dollarit')
+ - "$": [T: "dollarit"]          # or "dollaria"?               	#  0x24	(en: 'dollars', google: 'dollarit')
  - "%": [t: "prosenttia"]                       	#  0x25	(en: 'percent')
  - "&": [t: "et-merkki"]                        	#  0x26	(en: 'ampersand', google: 'ampersand')
  - "'": [t: "heittomerkki"]                     	#  0x27	(en: 'apostrophe')
