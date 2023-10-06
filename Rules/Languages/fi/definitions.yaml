@@ -65,7 +65,7 @@
 
      # translation is weird, are these used in Finnish that much?
     NumbersOrdinalPluralTens: [
-         "", "kymmenet", "kahdetkymmenet", "kolmetkymmenet", "neljätkymmenet", "viidetkymmenet", "kuudetkymmenet", "seitsemätkymmenet", "kahdeksatkymmenet", "yhdeksätkymmenet"
+         "", "kymmenennet", "kahdetkymmenennet", "kolmetkymmenennet", "neljätkymmenennet", "viidetkymmenennet", "kuudetkymmenennet", "seitsemätkymmenennet", "kahdeksatkymmenennet", "yhdeksätkymmenennet"
     ],
 
 
