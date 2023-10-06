@@ -36,9 +36,9 @@
         if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"
         then_test:
             if: "$Verbosity = 'Terse'"
-            then: [t: "pamaus"]                 	#  0x21	(en: 'bang', google translation)
-            else: [t: "kertoma"]                	#  0x21	(en: 'exclamation point', google: 'huutomerkki')
-        else: [t: "kertoma"]                    	#  0x21	(en: 'factorial', google: 'tekijä')
+            then: [T: "huuto"]                 	#  0x21	(en: 'bang', google translation)
+            else: [T: "huuto"]      # obsolete?          	#  0x21	(en: 'exclamation point', google: 'huutomerkki')
+        else: [T: "kertoma"]                    	#  0x21	(en: 'factorial', google: 'tekijä')
           
  - "\"": [t: "kenoviiva"]                       	#  0x22	(en: 'quotation mark', google: 'lainausmerkki')
  - "#": [t: "ristikkomerkki"]                   	#  0x23	(en: 'number', google: 'määrä')
