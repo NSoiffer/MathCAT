@@ -120,7 +120,7 @@
   match: "$ClearSpeak_Fractions='Per'"
   replace:
   - x: "*[1]"
-  - t: "per"      # phrase('5 meters 'per' second) # Finnish: is there a better way? 'per' might not be widely known
+  - T: "per"      # phrase('5 meters 'per' second) # Finnish: is there a better way? 'per' might not be widely known
   - x: "*[2]"
 
 - name: common-fraction
