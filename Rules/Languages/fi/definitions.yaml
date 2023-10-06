@@ -59,11 +59,11 @@
     ],
 
     NumbersOrdinalTens: [
-         "", "kymmenes", "kahdeskymmenes", "kolmekymmenes", "neljäskymmenes", "viideskymmenes", "kuusikymmenes", "seitsemäskymmenes", "kahdeksaskymmenes", "yhdeksäskymmenes"
+         "", "kymmenes", "kahdeskymmenes", "kolmaskymmenes", "neljäskymmenes", "viideskymmenes", "kuudeskymmenes", "seitsemäskymmenes", "kahdeksaskymmenes", "yhdeksäskymmenes"
     ],
 
     NumbersOrdinalPluralTens: [
-         "", "kymmenesosa", "kahdeskymmenes", "kolmekymmenes", "neljäskymmenes", "fiftiyth", "sixtieths", "seventyths", "kahdeksaskymmenesosa", "yhdeksänkymmenes"
+         "", "kymmenesosa", "kahdeskymmenesosa", "kolmaskymmenesosa", "neljäskymmenesosa", "viideskymmenesosa", "kuudeskymmenesosa", "seitsemäskymmenesosa", "kahdeksaskymmenesosa", "yhdeksäskymmenesosa"
     ],
 
 
