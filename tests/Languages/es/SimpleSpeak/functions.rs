@@ -279,7 +279,7 @@ fn no_times_sqrt() {
             <mrow> <mo arg='open'>[(]</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>)</mo>
             <mo>)</mo></mrow>
         </math>";
-    test("en", "SimpleSpeak",expr, "el intervalo cerrado abierto de c a d");
+    test("es", "SimpleSpeak",expr, "el intervalo cerrado abierto de c a d");
 }
 
 
