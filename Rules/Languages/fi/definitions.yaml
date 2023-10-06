@@ -89,9 +89,11 @@
     # At this point, hopefully the language is regular. If not, code needs to be written
 
     # Is Finnish regular when it comes to this point? Requires thinking. At least "kolme tuhatta" is missing.
+    
+    # In Finnish, the long scale is used. Should it be skipped or added as "thousand billions"?
     NumbersLarge: [
-         "", "tuhat", "miljoona", "miljardi", "biljoona", "kvadriljoona",
-         "quintillion", "sextillion", "septillion", "octillion", "nonillion",
+        "", "tuhat", "miljoona", "miljardi", "biljoona", "tuhat biljoonaa",
+        "triljoona", "tuhat triljoonaa", "kvadriljoona", "tuhat kvadriljoonaa", "kvintiljoona",
     ],
       
     NumbersOrdinalLarge: [
