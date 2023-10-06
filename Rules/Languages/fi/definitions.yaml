@@ -83,8 +83,8 @@
 
      # how should these be translated? weirdness going on... context for these?
     NumbersOrdinalPluralHundreds: [
-       "", "sadannet", "kahdet sadannet", "kolme sadasosaa", "neljä sadasosaa", "viisi sadasosaa",
-         "kuusi sadasosaa", "seitsemän sadasosaa", "kahdeksan sadasosaa", "yhdeksän sadasosaa"
+       "", "sadannet", "kahdet sadannet", "kolmet sadannet", "neljät sadannet", "viidet sadannet",
+         "kuudet sadannet", "seitsemät sadannet", "kahdeksat sadannet", "yhdeksät sadannet"
     ],
       
 
