@@ -105,7 +105,7 @@
       
      # confusing, I don't get it
     NumbersOrdinalPluralLarge: [
-         "", "tuhannesosat", "miljoonasosat", "miljardisosat", "tuhannes biljoonasosat", "kvadriljoonasosat",
+         "", "tuhannet", "miljoonannet", "miljardinnet", "tuhannet biljoonannet", "kvadriljoonasosat",
          "miljoonasosat", "kuusimiljoonasosat", "septimiljardisosat", "oktilliososat", "ei-miljoonasosat"
     ]
 
