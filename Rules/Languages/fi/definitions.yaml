@@ -101,8 +101,9 @@
         "triljoonas", "tuhannes triljoonas", "kvadriljoonas", "tuhannes kvadriljoonas", "kvintiljoonas"
     ],
       
+     # confusing, I don't get it
     NumbersOrdinalPluralLarge: [
-         "", "tuhansosat", "miljoonasosat", "miljardisosat", "biljoonasosat", "kvadriljoonasosat",
+         "", "tuhannesosat", "miljoonasosat", "miljardisosat", "tuhannes biljoonasosat", "kvadriljoonasosat",
          "miljoonasosat", "kuusimiljoonasosat", "septimiljardisosat", "oktilliososat", "ei-miljoonasosat"
     ]
 
