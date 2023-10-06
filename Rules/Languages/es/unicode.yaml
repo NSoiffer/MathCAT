@@ -42,16 +42,16 @@
         then_test:
             if: "$Verbosity='Terse'"
             then: [T: "abrir paréntesis"]                	# 	(en: 'open', google translation)
-            else: [T: "paréntesis izquierdo"]   	# 	(en: 'open paren', MathPlayer: 'paréntesis', google: 'paréntesis abierto')
-        else: [T: "paréntesis izquierdo"]       	# 	(en: 'left paren', MathPlayer: 'paréntesis', google: 'paréntesis dejado')
+            else: [T: "se abren paréntesis"]   	# 	(en: 'open paren', MathPlayer: 'paréntesis', google: 'paréntesis abierto')
+        else: [T: "se abren paréntesis"]       	# 	(en: 'left paren', MathPlayer: 'paréntesis', google: 'paréntesis dejado')
  - ")":                                         	#  0x29
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
             then: [T: "cerrar paréntesis"]                  	# 	(en: 'close', google translation)
-            else: [T: "paréntesis derecho"]     	# 	(en: 'close paren', MathPlayer: 'cierra paréntesis', google: 'paréntesis cercana')
-        else: [T: "paréntesis derecho"]         	# 	(en: 'right paren', MathPlayer: 'cierra paréntesis')
+            else: [T: "se cierran paréntesis"]     	# 	(en: 'close paren', MathPlayer: 'cierra paréntesis', google: 'paréntesis cercana')
+        else: [T: "se cierran paréntesis"]         	# 	(en: 'right paren', MathPlayer: 'cierra paréntesis')
 
  - "*":                                         	#  0x2a
     test:
@@ -104,13 +104,13 @@
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [T: "abrir corchetes"]            	# 	(en: 'open bracket', google translation)
-        else: [T: "corchete izquierdo"]         	# 	(en: 'left bracket', MathPlayer: 'abre corchetes', google: 'soporte izquierdo')
- - "\\": [T: "corchete izquierdo"]              	#  0x5c	(en: 'back slash', MathPlayer: 'abre corchetes', google: 'back slash')
+        else: [T: "se abren corchetes"]         	# 	(en: 'left bracket', MathPlayer: 'abre corchetes', google: 'soporte izquierdo')
+ - "\\": [T: "se abren corchetes"]              	#  0x5c	(en: 'back slash', MathPlayer: 'abre corchetes', google: 'back slash')
  - "]":                                         	#  0x5d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [T: "cerrar corchetes"]          	# 	(en: 'close bracket', google translation)
-        else: [T: "corchete derecho"]           	# 	(en: 'right bracket', MathPlayer: 'cierra corchetes', google: 'soporte derecho')
+        else: [T: "se cierran corchetes"]           	# 	(en: 'right bracket', MathPlayer: 'cierra corchetes', google: 'soporte derecho')
  - "^": [T: "acento circunflejo"]                      	#  0x5e	(en: 'hat')
  - "_": [T: "subrayado"]                        	#  0x5f	(en: 'under bar')
  - "`": [T: "acento grave"]                     	#  0x60	(en: 'grave')
@@ -118,7 +118,7 @@
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [T: "abrir llaves"]         	# 	(en: 'open brace', google translation)
-        else: [T: "llave izquierda"]            	# 	(en: 'left brace', MathPlayer: 'abre llaves', google: 'abrazadera izquierda')
+        else: [T: "se abren llaves"]            	# 	(en: 'left brace', MathPlayer: 'abre llaves', google: 'abrazadera izquierda')
  - "|":                                         	#  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
      - test:
@@ -134,7 +134,7 @@
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [T: "cerrar llaves"]          	# 	(en: 'close brace', google translation)
-        else: [T: "llave derecha"]             	# 	(en: 'right brace', MathPlayer: 'cierra llaves', google: 'abrazadera derecha')
+        else: [T: "se cierran llaves"]             	# 	(en: 'right brace', MathPlayer: 'cierra llaves', google: 'abrazadera derecha')
 
  - "~": [T: "tilde"]                            	#  0x7e
  - " ":                                         	#  0xa0
