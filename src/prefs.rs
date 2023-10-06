@@ -214,11 +214,11 @@ impl Preferences{
                     return;
                 } else {
                     let trimmed_name = name_prefix.to_string() + name.unwrap().trim();
-                    let mut trimmed_yaml_value = yaml_value.to_owned();
-                    if let Some(value) = trimmed_yaml_value.as_str() {
-                        trimmed_yaml_value = Yaml::String(value.trim().to_string());
+                    let mut yaml_value = yaml_value.to_owned();
+                    if let Some(value) = yaml_value.as_str() {
+                        yaml_value = Yaml::String(value.to_string());
                     }
-                    map.insert(trimmed_name, trimmed_yaml_value);
+                    map.insert(trimmed_name, yaml_value);
                 }
             }
         }
