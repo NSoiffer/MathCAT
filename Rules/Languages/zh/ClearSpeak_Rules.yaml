@@ -154,9 +154,9 @@
           if: "$Verbosity!='Terse'"
           then: [{ot: "the"}]
       - t: "分數"      # phrase(the 'fraction' with 3 over 4)
-  - x: "*[1]"
-  - t: "超過"      # phrase(the fraction 3 'over' 4)
   - x: "*[2]"
+  - t: "分之"      # phrase(the fraction 3 'over' 4)
+  - x: "*[1]"
   - test:
       # very ugly!!! -- replicate nested ordinal fraction as they are an exception
       if: "$ClearSpeak_Fractions='OverEndFrac' or ($ClearSpeak_Fractions='EndFrac' and not( ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and *[1][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and *[2][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] ) )"
@@ -183,9 +183,9 @@
   - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) )"
   - ")"
   replace:
-  - x: "*[1]"
-  - t: "超過"      # phrase(the fraction 3 'over' 4)
   - x: "*[2]"
+  - t: "分之"      # phrase(the fraction 3 'over' 4)
+  - x: "*[1]"
   - test:
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='OverEndFrac'"
       then:
@@ -198,13 +198,13 @@
   match: "."
   replace:
   - ot: "the"      # phrase(5 is 'the' square toot of 25)
-  - t: "分子分數"      # phrase(the 'fraction with numerator' 6)
+  - t: "分數分子"      # phrase(the 'fraction with numerator' 6)
   - test:
       if: not(IsNode(*[1], 'simple'))
       then: {pause: medium}
   - x: "*[1]"
   - pause: medium
-  - t: "和分母"      # phrase(the fraction with numerator 5 'and denominator' 8)
+  - t: "分母"      # phrase(the fraction with numerator 5 'and denominator' 8)
   - x: "*[2]"
   - pause: long
   - test:
