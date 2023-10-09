@@ -68,6 +68,7 @@ def translate_phrases(phrases_to_translate: list[str], lang) -> list[str]:
         phrases_string = ".\n".join(phrases)
         # print("***Phrases to translate: {}\n".format(phrases))
         translated_phrases_str = GoogleTranslate.translate(phrases_string, src='en', dest=lang).text.lower()
+        translated_phrases_str = translated_phrases_str.replace('。', '.')   # happens for Chinese
         translated_phrases_str = translated_phrases_str.replace('"', "'")    # google occasionally changes single quotes to double quotes
         translated_phrases_list = translated_phrases_str.split('.\n')
         if len(translated_phrases_list) != len(phrases):
@@ -99,20 +100,21 @@ def translate_phrases(phrases_to_translate: list[str], lang) -> list[str]:
             time.sleep(TIMEOUT)       # try to avoid google banning us
     return translations + do_translation_chunk(phrases_chunks_to_translate)
 
-TargetWord = re.compile(r"'([^']+)'")
-TextString = re.compile(r't: "([^"]+)"')
+TargetWord = re.compile(r"'phrase([^']+)'")
+TextString = re.compile(r'([ \[{])t: "([^"]+)"')
 def substitute_in_translated_phrase(line, translated_phrase, translated_word) -> str:
     target_words = TargetWord.search(translated_phrase)
     text_words = TextString.search(line)
     new_line = line
     if target_words:
-        replacement = 't: "' + target_words.group(1) + '"'    # add the surrounding context back
+        print(f"target_words found -- line: {line}")
+        replacement = text_words.group(1) + 't: "' + target_words.group(1) + '"'    # add the surrounding context back
         new_line = TextString.sub(replacement, line)
         # print("fixed line: {}".format(new_line))
     elif text_words:
         print(f"Failed to find quoted part in translation \"{translated_phrase}\", \
                using '{translated_word}\n   original line: {line}")
-        replacement = 't: "' + translated_word + '"'    # add the surrounding context back
+        replacement = text_words.group(1) + 't: "' + translated_word + '"'    # add the surrounding context back
         new_line = TextString.sub(replacement, line)
     return new_line
 
