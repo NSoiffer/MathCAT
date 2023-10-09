@@ -1,0 +1,59 @@
+---
+
+- name: line-segment
+  tag: line-segment
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "線段的"      # phrase('the line segment from' A to B)
+      - x: "*[1]"
+      - t: "到"                         # phrase(the line segment from A 'to' B)
+      - x: "*[2]"
+      else:
+      - t: "線段"               # phrase(the 'line segment' A  B)
+      - x: "*[1]"
+      - x: "*[2]"
+
+- name: geometry-ray
+  tag: ray
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "來自"             # phrase('the ray from' A to B)
+      - x: "*[1]"
+      - t: "到"                       # phrase(the ray from A 'to' B)
+      - x: "*[2]"
+      else:
+      - t: "射線"                      # phrase(the 'ray'A  B)
+      - x: "*[1]"
+      - x: "*[2]"
+
+- name: geometry-arc
+  tag: arc
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [{t: "這"}]            # phrase('the' arc A B C)
+  - t: "弧"                        # phrase(the 'arc' A B C)
+  - x: "*[1]"
+  - x: "*[2]"
+
+- name: measure-of-angle
+  tag: measure-of-angle
+  match: "count(*)=3"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "角度的度量"      # phrase('the measure of the angle' ABC)
+      else:
+      - t: "角度的度量"      # phrase('measure of angle' ABC)
+  - x: "*[1]"
+  - x: "*[2]"
+  - x: "*[3]"
+
