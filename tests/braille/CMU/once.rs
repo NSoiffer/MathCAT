@@ -1298,32 +1298,32 @@ fn angle_11_1_8() {
 }
 
 #[test]
-fn vector_11_1_10() {
+fn vector_11_2_3() {
     let expr = "<math><mfenced open='|' close='|'><mover><mi>v</mi><mo>⟶</mo></mover></mfenced></math>";
     test_braille("CMU", expr, "⠸⠀⠒⠂⠧⠸⠀");
 }
 
 #[test]
-fn vector_11_1_11() {
+fn vector_11_2_4() {
     let expr = "<math><mfenced open='‖' close='‖'><mover><mi>v</mi><mo>⟶</mo></mover></mfenced></math>";
     test_braille("CMU", expr, "⠸⠇⠒⠂⠧⠸⠇");
 }
 
 #[test]
-fn vector_11_1_12() {
+fn vector_11_2_5() {
     let expr = "<math><mfenced open='|' close='|'><mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⟶</mo></mover></mfenced></math>";
-    // modified to include space at end as in vector_11_1_10
+    // modified to include space at end as in vector_11_2_3
     test_braille("CMU", expr, "⠸⠀⠒⠂⠢⠨⠁⠨⠃⠔⠸⠀");
 }
 
 #[test]
-fn vector_11_1_13() {
+fn vector_11_2_6() {
     let expr = "<math><mfenced open='‖' close='‖'><mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⟶</mo></mover></mfenced></math>";
     test_braille("CMU", expr, "⠸⠇⠒⠂⠢⠨⠁⠨⠃⠔⠸⠇");
 }
 
 #[test]
-fn vector_11_1_16() {
+fn vector_11_2_9() {
     let expr = "<math><mfenced open='[' close=']'><mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⟶</mo></mover></mfenced></math>";
     test_braille("CMU", expr, "⠷⠒⠂⠢⠨⠁⠨⠃⠔⠾");
 }
