@@ -20,17 +20,17 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "這"}    # phrase('the' square root of x)
-  - t: "平方根"      # phrase(the 'square root' of x)
+      then: {t: ""}    # phrase('the' square root of x)
+  - t: "根號"      # phrase(the 'square root' of x)
+  - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "的"}   # phrase(the square root 'of' x)
+      then: {t: ""}   # phrase(the square root 'of' x)
       else: {pause: short}
-  - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{t: "端根"}, {pause: short}]  # phrase(start the square root of x 'end of root')
+      else: [{t: "結束根號"}, {pause: short}]  # phrase(start the square root of x 'end of root')
 
 - name: default
   tag: root
@@ -67,19 +67,19 @@
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
-- name: common-fraction
-  tag: fraction
-  match:
-  - "*[1][self::m:mn][not(contains(., '.')) and text()<20]   and"
-  - "*[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]"
-  replace: [{x: ToCommonFraction(.)}]
-- name: common-fraction-mixed-number
-  tag: fraction
-  match:
-  - "preceding-sibling::*[1][self::m:mo][text()='⁤'] and" # preceding element is invisible plus
-  - "*[1][self::m:mn][not(contains(., '.'))]   and"
-  - "*[2][self::m:mn][not(contains(., '.'))]"
-  replace: [{x: ToCommonFraction(.)}]
+#- name: common-fraction
+#  tag: fraction
+#  match:
+#  - "*[1][self::m:mn][not(contains(., '.')) and text()<20]   and"
+#  - "*[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]"
+#  replace: [{x: ToCommonFraction(.)}]
+#- name: common-fraction-mixed-number
+#  tag: fraction
+#  match:
+#  - "preceding-sibling::*[1][self::m:mo][text()='⁤'] and" # preceding element is invisible plus
+#  - "*[1][self::m:mn][not(contains(., '.'))]   and"
+#  - "*[2][self::m:mn][not(contains(., '.'))]"
+#  replace: [{x: ToCommonFraction(.)}]
 
 - name: simple
   # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
@@ -90,9 +90,9 @@
   - "(IsNode(*[1],'leaf') and IsNode(*[2],'leaf')) and"
   - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
   replace:
-  - x: "*[1]"
-  - t: "超過"      # phrase(the fraction 3 'over' 4)
   - x: "*[2]"
+  - t: "分之"      # phrase(the fraction 3 'over' 4)
+  - x: "*[1]"
   - pause: short
 
 - name: default
@@ -101,15 +101,15 @@
   replace:
   - t: "分數"      # phrase(the 'fraction' 3 over 4)
   - pause: short
-  - x: "*[1]"
-  - test:
-      if: "not(IsNode(*[1],'leaf'))"
-      then: [{pause: short}]
-  - t: "超過"      # phrase(the fraction 3 'over' 4)
+  - x: "*[2]"
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then: [{pause: short}]
-  - x: "*[2]"
+  - t: "分之"      # phrase(the fraction 3 'over' 4)
+  - test:
+      if: "not(IsNode(*[1],'leaf'))"
+      then: [{pause: short}]
+  - x: "*[1]"
   - pause: short
   - t: "結束分數"      # phrase(start 7 over 8 'end of fraction')
   - pause: medium
@@ -276,7 +276,7 @@
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
-  - t: "時代"      # phrase(7 'times' 5 equals 35)
+  - t: "乘"      # phrase(7 'times' 5 equals 35)
 
 - name: no-say-parens
   tag: mrow

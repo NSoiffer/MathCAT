@@ -110,7 +110,7 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - t: "選擇"      # phrase(you can 'choose' a number at random)
+  - t: "選"      # phrase(you can 'choose' a number at random)
   - x: "*[2]"
 
 - name: permutation
