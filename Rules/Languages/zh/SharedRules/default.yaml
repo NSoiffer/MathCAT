@@ -154,7 +154,7 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
-      then: [t: "子"]      # phrase(x 'sub' 2)
+      then: [t: "下標"]      # phrase(x 'sub' 2)
   - x: "*[2]"
 
 - name: default
@@ -162,9 +162,9 @@
   match: "count(*)=2"
   replace:
   - x: "*[1]"
-  - t: "子"               # phrase(x 'sub' 2)
+  - t: "下標"               # phrase(x 'sub' 2)
   - x: "*[2]"
-  - t: "結束子"           # phrase(x sub 2 'end of sub')
+  - t: "結束下標"           # phrase(x sub 2 'end of sub')
   - pause: short
 
 
@@ -173,7 +173,7 @@
   match: "."
   replace:
   - x: "*[1]"
-  - t: "子"              # phrase(x 'sub' 2)
+  - t: "下標"              # phrase(x 'sub' 2)
   - x: "*[2]"
 
 - name: structure
@@ -184,7 +184,7 @@
   - test:
       if: "name(.)='msubsup'"
       then:
-      - t: "子"          # phrase(x 'sub' 2)
+      - t: "下標"          # phrase(x 'sub' 2)
       - x: "*[2]"
   - test:
       if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
@@ -403,18 +403,18 @@
   variables: [IsColumnSilent: false()]
   match: "."
   replace:
-  - t: "桌子"      # phrase(the 'table with' 3 rows)
+  - t: "表"      # phrase(the 'table with' 3 rows)
   - x: count(*)
   - test:
       if: count(*)=1
-      then: [t: "排"]      # phrase(the table with 1 'row')
-      else: [t: "行"]      # phrase(the table with 3 'rows')
+      then: [t: "列"]      # phrase(the table with 1 'row')
+      else: [t: "列"]      # phrase(the table with 3 'rows')
   - t: "和"      # phrase(the table with 3 rows 'and' 4 columns)
   - x: "count(*[1]/*)"
   - test:
       if: "count(*[1]/*)=1"
-      then: [t: "柱子"]      # phrase(the table with 3 rows and 1 'column')
-      else: [t: "列"]      # phrase(the table with 3 rows and 4 'columns')
+      then: [t: "行"]      # phrase(the table with 3 rows and 1 'column')
+      else: [t: "行"]      # phrase(the table with 3 rows and 4 'columns')
   - pause: long
   - x: "*"
 
@@ -448,7 +448,7 @@
       #   if: not($IsColumnSilent) and ($ClearSpeak_Matrix = 'SpeakColNum' or count(preceding-sibling::*) != 0)
       if: "not($IsColumnSilent)"
       then:
-      - t: "柱子"      # phrase(the first 'column' of the matrix)
+      - t: "行"      # phrase(the first 'column' of the matrix)
       - x: "count(preceding-sibling::*)+1"
       - pause: medium
   - x: "*"

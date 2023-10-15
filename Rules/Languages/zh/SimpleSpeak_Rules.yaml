@@ -36,9 +36,11 @@
   tag: root
   match: "."
   replace:
+  - t: "根號"
+  - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "這"}]
+      then: [{t: "的"}]        # phrase(the square root 'of' x)
   - test:
       if: "*[2][self::m:mn]"
       then_test:
@@ -47,23 +49,15 @@
       - else_if: "*[2][text()='3']"
         then: [{t: "立方根"}]        # phrase(the 'cube root' of x)
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {t: "根"}]        # phrase(the square 'root' of x)
+        then: [{x: "*[2]"}, {t: "次方根"}]        # phrase(the square 'root' of x)
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+          #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: [{x: "*[2]"}]
-      - t: "根"        # phrase(the square 'root' of)
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [{t: "的"}]        # phrase(the square root 'of' x)
-  - x: "*[1]"
-  - test:
-      if: IsNode(*[1], 'leaf')
-      then: [{pause: short}]
-      else: [{t: "端根"}, {pause: short}]      # phrase(start the fifth root of x 'end of root')
+      - t: "次方根"        # phrase(the square 'root' of)
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
