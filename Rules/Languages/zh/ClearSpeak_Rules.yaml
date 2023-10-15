@@ -28,14 +28,21 @@
           if: parent::*[self::m:negative]
           then: [{t: "負"}]      # phrase(minus 4 is a 'negative' number)
           else: [{t: ""}]      # phrase(10 is a 'positive' number)
-  - t: ""      # phrase(8 is the 'square root' of 64)
+  - t: "根號"      # phrase(8 is the 'square root' of 64)
   - test:
       if: "$Verbosity!='Terse'"
       then: {t: ""}      # phrase(the square root 'of' 5)
       else: {pause: short}
   - x: "*[1]"
-  - t: "的 平方根"
-  - pause: long
+  - test:
+    - if: "$ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'"
+      then:
+      - pause: short
+      - t: "結束根號"      # phrase(the square root of x 'end root')
+      - pause: medium
+    - else_if: "IsNode(*[1], 'simple')"
+      then: [{pause: short}]
+      else: [{pause: long}]
 
 - name: default
   tag: root
