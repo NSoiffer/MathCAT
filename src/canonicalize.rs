@@ -836,12 +836,12 @@ impl CanonicalizeContext {
 			"mstyle" | "mpadded" => {
 				// Throw out mstyle and mpadded -- to do this, we need to avoid mstyle being the arg of clean_mathml
 				// FIX: should probably push the attrs down to the children (set in 'self')
+				merge_adjacent_similar_mstyles(mathml);
 				let children = mathml.children();
 				if children.is_empty() {
 					return if parent_requires_child {Some( CanonicalizeContext::make_empty_element(mathml) )} else {None};
 				} else if children.len() == 1 {
 					let is_from_mhchem = element_name == "mpadded" && is_from_mhchem_hack(mathml);
-					// "lift" the child up so all the links (e.g., siblings) are correct
 					if let Some(new_mathml) = self.clean_mathml( as_element(children[0]) ) {
 						// "lift" the child up so all the links (e.g., siblings) are correct
 						mathml.replace_children(new_mathml.children());
@@ -1393,6 +1393,25 @@ impl CanonicalizeContext {
 			return Some(leaf);
 		}
 
+		/// merge a following mstyle that has the same attrs
+		fn merge_adjacent_similar_mstyles(mathml: Element) {
+			let following_siblings = mathml.following_siblings();
+			if following_siblings.is_empty() {
+				return;
+			}
+			let following_element = as_element(following_siblings[0]);
+			if name(&following_element) != "mstyle" {
+				return;
+			}
+			let are_same = mathml.attributes().iter()
+							.zip( following_element.attributes() )
+							.all(|(first, second)| first.name()==second.name() && first.value()==second.value());
+			if are_same {
+				mathml.append_children(following_element.children());
+				following_element.remove_from_parent();
+			}
+		}
+
 		fn convert_mfenced_to_mrow(mfenced: Element) -> Element {
 			let open = mfenced.attribute_value("open").unwrap_or("(");
 			let close = mfenced.attribute_value("close").unwrap_or(")");
@@ -1700,6 +1719,8 @@ impl CanonicalizeContext {
 				debug!("\n");
 			}
 
+			let children = if ignore_final_punctuation(context, mrow, children) {&children[..children.len()-1]} else {children};
+
 			// gather up the text of the children (all mn, mo, or mtext)
 			let mut previous_name_was_mn = false;
 			let mut text = "".to_string();
@@ -1717,7 +1738,7 @@ impl CanonicalizeContext {
 			if !(context.block_3digit_pattern.is_match(&text) ||
 				 context.block_3_5digit_pattern.is_match(&text) ||
 				 context.block_4digit_hex_pattern.is_match(&text) ||
-				 context.block_1digit_pattern.is_match(&text) ) {
+				 ((text.len() > 5 || context.decimal_separator.is_match(&text)) && context.block_1digit_pattern.is_match(&text)) ) {
 					return false;
 			}
 
@@ -1766,33 +1787,28 @@ impl CanonicalizeContext {
 		// 	return n_decimal_pt;
 		// }
 
-		/// This is a special case heuristic so try and determine if a terminating "." should be a period or decimal point
-		///    Note: the terminating decimal point has already been detected, so we don't look here.
-		/// E.g, "1,3,5." -- don't merge the '.' into the "5"
-		/// Can't tell: "1,234.", but error on not merging as large numbers tend to be integers
-		/// Should merge: "1.2, 3.2, 5."
-		/// A similar rule applies if the locale uses "," as the decimal separator
-		/// This assumes we have a potential number at start..end and validity will be determined elsewhere
-		fn is_decimal_a_period(math_or_mrow: Element, children: &[ChildOfElement], start: usize, end: usize) -> bool {
-			// Note: the children of math_or_mrow aren't valid ('children' represents the current state)
-			if end < math_or_mrow.children().len() {
+		/// This is a special case heuristic so try and determine if a terminating punctuation should be a decimal separator
+		/// Often math expressions end with punctuations for typographic reasons, so we try to figure that out here.
+		/// 'children' is a subset of 'mrow'
+		fn ignore_final_punctuation(context: &CanonicalizeContext, mrow: Element, children: &[ChildOfElement]) -> bool {
+			let last_child = children[children.len()-1];
+			if mrow.children()[mrow.children().len()-1] != last_child {
 				return false;		// not at end
 			}
-			let parent = math_or_mrow.parent().unwrap().element();
+			let parent = mrow.parent().unwrap().element();
 			if let Some(math) = parent {
 				if name(&math) != "math" {
 					return false;			// mrow inside something else -- not at end
 				}
 			}
 
-			let last_child = as_element(children[end-1]);
+			let last_child = as_element(last_child);
 			// debug!("is_decimal_a_period: last child={}", mml_to_string(&last_child));
-			if start+1 < end || name(&last_child) != "mo" {
+			if name(&last_child) != "mo" {
 				return false;	// last was not "mo", so can't be a period
 			}
 
-			// probably could do more tests, but not sure what
-			return true;
+			return context.decimal_separator.is_match(as_text(last_child));
 		}
 
 		fn merge_block(children: &mut Vec<ChildOfElement>, start: usize, end: usize) {
@@ -4996,7 +5012,10 @@ mod canonicalize_tests {
 
 	#[test]
     fn parent_bug_94() {
-		// Note: this isn't ideal -- it really should merge the leading '0' to get just one mn with content "0.02"
+		// This is a test to make sure the crash in the bug report doesn't happen.
+		// Note: in the bug, they behavior they would like is a single mn with content "0.02"
+		// However, TeX input "1 2 3" will produce three consecutive <mn>s, so merging <mn>s isn't good in general
+		// This test 
         let test_str = "	<math>
 			<mrow>
 				<msqrt>
@@ -5010,11 +5029,7 @@ mod canonicalize_tests {
 		";
     	let target_str = "<math>
 			<msqrt>
-			<mrow>
-				<mn mathsize='normal' mathvariant='bold'>𝟎</mn>
-				<mo data-changed='added'>&#x2062;</mo>
-				<mn mathsize='normal' mathvariant='bold' data-changed='added'>.02</mn>
-			</mrow>
+				<mn mathsize='normal' mathvariant='bold' data-changed='added'>0.02</mn>
 			</msqrt>
 		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
