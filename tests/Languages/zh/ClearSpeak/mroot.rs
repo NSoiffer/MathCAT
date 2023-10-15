@@ -5,7 +5,7 @@ fn msqrt_simple() {
     let expr = "<math>
                     <msqrt> <mi>x</mi> </msqrt>
                 </math>";
-    test("zh", "ClearSpeak", expr, "根號 x,");
+    test("zh", "ClearSpeak", expr, "x 的 平方根;");
 }
 
 #[test]
@@ -13,7 +13,7 @@ fn msqrt_simple_end_root() {
     let expr = "<math>
                     <msqrt> <mi>x</mi> </msqrt>
                 </math>";
-    test_ClearSpeak("zh", "ClearSpeak_Roots", "RootEnd", expr, "根號 x, 結束根號;");
+    test_ClearSpeak("zh", "ClearSpeak_Roots", "RootEnd", expr, "x 的 平方根;");
 }
 
 #[test]
@@ -21,7 +21,7 @@ fn msqrt_simple_positive() {
     let expr = "<math>
                     <msqrt> <mi>x</mi> </msqrt>
                 </math>";
-    test_ClearSpeak("zh", "ClearSpeak_Roots", "PosNegSqRoot", expr, "根號 x,");
+    test_ClearSpeak("zh", "ClearSpeak_Roots", "PosNegSqRoot", expr, "x 的 平方根;");
 }
 
 #[test]
@@ -29,7 +29,7 @@ fn msqrt_simple_pos_end_root() {
     let expr = "<math>
                     <msqrt> <mi>x</mi> </msqrt>
                 </math>";
-    test_ClearSpeak("zh", "ClearSpeak_Roots", "PosNegSqRootEnd", expr, "根號 x, 結束根號;");
+    test_ClearSpeak("zh", "ClearSpeak_Roots", "PosNegSqRootEnd", expr, "x 的 平方根;");
 }
 
 #[test]
@@ -39,7 +39,7 @@ fn msqrt_simple_pos_end_with_neg_root() {
                     <mo>-</mo> <mroot> <mi>x</mi> <mn>3</mn></mroot>
                 </math>";
     test_ClearSpeak("zh", "ClearSpeak_Roots", "PosNegSqRootEnd", expr, 
-    "負 根號 x, 結束根號; 減 立方根 x, 結束根號;");
+    "負 x 的 平方根; 減 x 的 立方根;");
 }
 
 #[test]
@@ -50,7 +50,7 @@ fn mroot_simple_pos_end_with_neg_root() {
 
                 </math>";
     test_ClearSpeak("zh", "ClearSpeak_Roots", "PosNegSqRoot", expr, 
-    "負 立方根 x, 減 根號 x,");
+    "負 x 的 立方根; 減 x 的 平方根;");
 }
 
 #[test]
@@ -68,7 +68,7 @@ fn msqrt() {
                         <mrow> <mi>x</mi> <mo>+</mo> <mi>y</mi> </mrow>
                     </msqrt>
                 </math>";
-    test("zh", "ClearSpeak", expr, "根號 x 加 y;");
+    test("zh", "ClearSpeak", expr, "x 加 y 的 平方根;");
 }
 
 #[test]
@@ -76,7 +76,7 @@ fn mroot_as_square_root() {
     let expr = "<math>
                     <mroot> <mi>x</mi> <mn>2</mn> </mroot>
                 </math>";
-    test("zh", "ClearSpeak", expr, "根號 x,");
+    test("zh", "ClearSpeak", expr, "x 的 平方根;");
 }
 
 #[test]
@@ -84,7 +84,7 @@ fn cube_root() {
     let expr = "<math>
                     <mroot> <mi>x</mi> <mn>3</mn> </mroot>
                 </math>";
-    test("zh", "ClearSpeak", expr, "立方根 x,");
+    test("zh", "ClearSpeak", expr, "x 的 立方根;");
 }
 
 #[test]
@@ -92,7 +92,7 @@ fn ordinal_root() {
     let expr = "<math>
                     <mroot> <mi>x</mi> <mn>9</mn> </mroot>
                 </math>";
-    test("zh", "ClearSpeak", expr, "9 次方根 x,");
+    test("zh", "ClearSpeak", expr, "x 的 9 次方根;");
 }
 
 #[test]
@@ -100,7 +100,7 @@ fn simple_mi_root() {
     let expr = "<math>
                     <mroot> <mi>x</mi> <mi>n</mi> </mroot>
                 </math>";
-    test("zh", "ClearSpeak", expr, "n 次方根 x,");
+    test("zh", "ClearSpeak", expr, "x 的 n 次方根;");
 }
 
 #[test]
@@ -108,7 +108,7 @@ fn mroot_simple_pos_end_root() {
     let expr = "<math>
                 <mroot> <mi>x</mi> <mi>t</mi> </mroot>
                 </math>";
-    test_ClearSpeak("zh", "ClearSpeak_Roots", "PosNegSqRootEnd", expr, "t 次方根 x, 結束根號;");
+    test_ClearSpeak("zh", "ClearSpeak_Roots", "PosNegSqRootEnd", expr, "x 的 t 次方根;");
 }
 
 #[test]
@@ -117,7 +117,7 @@ fn mroot_simple_end_root() {
                     <mroot> <mrow> <mi>x</mi> <mo>+</mo> <mi>y</mi> </mrow> 
                     <mn>21</mn></mroot>
                 </math>";
-    test_ClearSpeak("zh", "ClearSpeak_Roots", "RootEnd", expr, "21 次方根 x 加 y, 結束根號;");
+    test_ClearSpeak("zh", "ClearSpeak_Roots", "RootEnd", expr, "x 加 y 的 21 次方根;");
 }
 
 #[test]
@@ -128,5 +128,5 @@ fn simple_fraction_power() {
                         <mfrac><mn>1</mn><mn>3</mn></mfrac>
                     </mroot>
                 </math>";
-    test("zh", "ClearSpeak", expr, "3 分之 1 次方根 x,");
+    test("zh", "ClearSpeak", expr, "x 的 3 分之 1 次方根;");
 }
