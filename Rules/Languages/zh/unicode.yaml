@@ -286,7 +286,7 @@
         then: [t: "的"]                          	# 	(en: 'of', google translation)
  - "⁢": [t: ""]                                 	#  0x2062
  - "⁣": [t: ""]                                 	#  0x2063
- - "⁤": [t: "和"]                                	#  0x2064	(en: 'and', google translation)
+ - "⁤": [t: "又"]                                	#  0x2064	(en: 'and', google translation)(3 又 1/2)
  - "′": [t: "prime"]                            	#  0x2032
  - "″": [t: "double prime"]                     	#  0x2033
  - "‴": [t: "triple prime"]                     	#  0x2034
