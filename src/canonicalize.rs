@@ -1629,7 +1629,8 @@ impl CanonicalizeContext {
 					}
 				}
 				debug!("start={}, end={}", i, end);
-				if is_likely_a_number(context, parent_mrow, &children[i..end]) {
+				// no need to merge if only one child (also avoids "." being considered a number)
+				if end > i + 1 && is_likely_a_number(context, parent_mrow, &children[i..end]) {
 					merge_block(children, i, end);
 					// note: start..end has been collapsed, so restart after the collapsed part
 				} else {
@@ -1734,7 +1735,10 @@ impl CanonicalizeContext {
 				previous_name_was_mn = child_name == "mn";
 			}
 
-			debug!("  text='{}'", &text);
+			debug!("  text='{}', 3 digit match={}, 3-5 match={}, 1 digit={}", &text,
+					context.block_3digit_pattern.is_match(&text),
+					context.block_3_5digit_pattern.is_match(&text),
+					context.block_1digit_pattern.is_match(&text));
 			if !(context.block_3digit_pattern.is_match(&text) ||
 				 context.block_3_5digit_pattern.is_match(&text) ||
 				 context.block_4digit_hex_pattern.is_match(&text) ||
