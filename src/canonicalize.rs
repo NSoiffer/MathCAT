@@ -397,6 +397,7 @@ pub fn canonicalize(mathml: Element) -> Result<Element> {
 struct CanonicalizeContext {
 	decimal_separator: Regex,
 	block_separator: Regex,
+	digit_only_decimal_number: Regex,
 	block_3digit_pattern: Regex,
 	block_3_5digit_pattern: Regex,
 	block_4digit_hex_pattern: Regex,
@@ -440,6 +441,8 @@ impl CanonicalizeContext {
 
 		let block_separator = Regex::new(&format!("[{}]", regex::escape(&block_separator_pref))).unwrap();
 		let decimal_separator = Regex::new(&format!("[{}]", regex::escape(&decimal_separator_pref))).unwrap();
+		// allows just "." and also matches an empty string, but those are ruled out elsewhere
+		let digit_only_decimal_number = Regex::new(&format!(r"^\d*{}?\d*$", regex::escape(&decimal_separator_pref))).unwrap();
 		let block_3digit_pattern = get_number_pattern_regex(&block_separator_pref, &decimal_separator_pref, 3, 3);
 		let block_3_5digit_pattern = get_number_pattern_regex(&block_separator_pref, &decimal_separator_pref, 3, 5);
 		// Note: on en.wikipedia.org/wiki/Decimal_separator, show '3.14159 26535 89793 23846'
@@ -449,6 +452,7 @@ impl CanonicalizeContext {
 		return CanonicalizeContext {
 			block_separator,
 			decimal_separator,
+			digit_only_decimal_number,
 			block_3digit_pattern,
 			block_3_5digit_pattern,
 			block_4digit_hex_pattern,
@@ -1569,13 +1573,13 @@ impl CanonicalizeContext {
 			// debug!("parent:\n{}", mml_to_string(&parent_mrow));
 			let mut i = 0;
 			while i < children.len() {		// length might change after a merge
-				{
-					debug!("merge_number_blocks: top of loop");
-					for (i_child, &child) in children[i..].iter().enumerate() {
-						let child = as_element(child);
-						debug!("child #{}: {}", i+i_child, mml_to_string(&child));
-					}
-				}
+				// {
+				// 	debug!("merge_number_blocks: top of loop");
+				// 	for (i_child, &child) in children[i..].iter().enumerate() {
+				// 		let child = as_element(child);
+				// 		debug!("child #{}: {}", i+i_child, mml_to_string(&child));
+				// 	}
+				// }
 				let child = as_element(children[i]);
 				let child_name = name(&child);
 
@@ -1628,7 +1632,10 @@ impl CanonicalizeContext {
 						end += 1;			// increment at end so we can tell the difference between a 'break' and end of loop
 					}
 				}
-				debug!("start={}, end={}", i, end);
+				if ignore_final_punctuation(context, parent_mrow, &children[i..end]) {
+					end -= 1;
+				};
+				// debug!("start={}, end={}", i, end);
 				// no need to merge if only one child (also avoids "." being considered a number)
 				if end > i + 1 && is_likely_a_number(context, parent_mrow, &children[i..end]) {
 					merge_block(children, i, end);
@@ -1710,17 +1717,15 @@ impl CanonicalizeContext {
 			}
 			// Note: the children of math_or_mrow aren't valid ('children' represents the current state)
 			let end = children.len();
-			{
-				let n_preceding_siblings = as_element(children[0]).preceding_siblings().len();
-				debug!("is_likely_a_number: start/end={}/{}", n_preceding_siblings, n_preceding_siblings+end);
-				for (i, &child) in children.iter().enumerate() {
-					let child = as_element(child);
-					debug!("child# {}: {}", n_preceding_siblings+i, mml_to_string(&child));
-				}
-				debug!("\n");
-			}
-
-			let children = if ignore_final_punctuation(context, mrow, children) {&children[..children.len()-1]} else {children};
+			// {
+			// 	let n_preceding_siblings = as_element(children[0]).preceding_siblings().len();
+			// 	debug!("is_likely_a_number: start/end={}/{}", n_preceding_siblings, n_preceding_siblings+end);
+			// 	for (i, &child) in children.iter().enumerate() {
+			// 		let child = as_element(child);
+			// 		debug!("child# {}: {}", n_preceding_siblings+i, mml_to_string(&child));
+			// 	}
+			// 	debug!("\n");
+			// }
 
 			// gather up the text of the children (all mn, mo, or mtext)
 			let mut previous_name_was_mn = false;
@@ -1735,14 +1740,17 @@ impl CanonicalizeContext {
 				previous_name_was_mn = child_name == "mn";
 			}
 
-			debug!("  text='{}', 3 digit match={}, 3-5 match={}, 1 digit={}", &text,
-					context.block_3digit_pattern.is_match(&text),
-					context.block_3_5digit_pattern.is_match(&text),
-					context.block_1digit_pattern.is_match(&text));
-			if !(context.block_3digit_pattern.is_match(&text) ||
-				 context.block_3_5digit_pattern.is_match(&text) ||
-				 context.block_4digit_hex_pattern.is_match(&text) ||
-				 ((text.len() > 5 || context.decimal_separator.is_match(&text)) && context.block_1digit_pattern.is_match(&text)) ) {
+			let text = text.trim();	// could be space got merged into an mn (e.g., braille::UEB::iceb::expr_3_1_6)
+			// debug!("  text='{}', decimal num={}, 3 digit match={}, 3-5 match={}, 1 digit={}", &text,
+			// 		context.digit_only_decimal_number.is_match(text),
+			// 		context.block_3digit_pattern.is_match(text),
+			// 		context.block_3_5digit_pattern.is_match(text),
+			// 		context.block_1digit_pattern.is_match(text));
+			if !(context.digit_only_decimal_number.is_match(text) ||
+				 context.block_3digit_pattern.is_match(text) ||
+				 context.block_3_5digit_pattern.is_match(text) ||
+				 context.block_4digit_hex_pattern.is_match(text) ||
+				 ((text.len() > 5 || context.decimal_separator.is_match(text)) && context.block_1digit_pattern.is_match(text)) ) {
 					return false;
 			}
 
@@ -1807,16 +1815,26 @@ impl CanonicalizeContext {
 			}
 
 			let last_child = as_element(last_child);
-			// debug!("is_decimal_a_period: last child={}", mml_to_string(&last_child));
+			// debug!("ignore_final_punctuation: last child={}", mml_to_string(&last_child));
 			if name(&last_child) != "mo" {
 				return false;	// last was not "mo", so can't be a period
 			}
 
-			return context.decimal_separator.is_match(as_text(last_child));
+			if !context.decimal_separator.is_match(as_text(last_child)) {
+				return false;
+			}
+
+			debug!("ignore_final_punctuation: #preceding={}", as_element(children[0]).preceding_siblings().len());
+			// look to preceding siblings and see if an of the mn's have a decimal separator
+			return !as_element(children[0]).preceding_siblings().iter()
+					.any(|&child| {
+						let child = as_element(child);
+						name(&child) == "mn" && context.decimal_separator.is_match(as_text(child))
+					});
 		}
 
 		fn merge_block(children: &mut Vec<ChildOfElement>, start: usize, end: usize) {
-			debug!("merge_block: merging {}..{}", start, end);
+			// debug!("merge_block: merging {}..{}", start, end);
 			let mut mn_text = String::with_capacity(4*(end-start)-1);		// true size less than #3 digit blocks + separator
 			for &child_as_element in children.iter().take(end).skip(start) {
 				let child = as_element(child_as_element);
@@ -3592,7 +3610,9 @@ fn show_invisible_op_char(ch: &str) -> &str {
 
 #[cfg(test)]
 mod canonicalize_tests {
-	#[allow(unused_imports)]
+	use crate::are_strs_canonically_equal_with_locale;
+
+#[allow(unused_imports)]
 	use super::super::init_logger;
 	use super::super::{are_strs_canonically_equal, abs_rules_dir_path};
     use super::*;
@@ -4165,7 +4185,6 @@ mod canonicalize_tests {
 
     #[test]
     fn implied_plus_linear() {
-		init_logger();
         let test_str = "<math><mrow>
 			<mn>2</mn><mspace width='0.278em'></mspace><mn>3</mn><mo>/</mo><mn>4</mn>
 			</mrow></math>";
@@ -4792,6 +4811,19 @@ mod canonicalize_tests {
 			</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
+	#[test]
+    fn digit_block_comma() {
+        let test_str = "<math><mn>8</mn><mo>.</mo><mn>123</mn><mo>.</mo><mn>456</mn><mo>+</mo>
+								    <mn>4</mn><mo>,</mo><mn>32</mn></math>";
+        let target_str = " <math>
+				<mrow data-changed='added'>
+				<mn>8.123.456</mn>
+				<mo>+</mo>
+				<mn>4,32</mn>
+				</mrow>
+			</math>";
+        assert!(are_strs_canonically_equal_with_locale(test_str, target_str, ".", ", "));
+	}
 
 	#[test]
 	fn digit_block_int() {
@@ -4805,6 +4837,20 @@ mod canonicalize_tests {
 				</mrow>
 			</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+	fn digit_block_int_dots() {
+        let test_str = "<math><mn>12</mn><mo>.</mo><mn>345</mn><mo>+</mo>
+								    <mn>1</mn><mo>.</mo><mn>000</mn></math>";
+        let target_str = " <math>
+				<mrow data-changed='added'>
+				<mn>12.345</mn>
+				<mo>+</mo>
+				<mn>1.000</mn>
+				</mrow>
+			</math>";
+        assert!(are_strs_canonically_equal_with_locale(test_str, target_str, ".", ", "));
 	}
 
 	#[test]
@@ -4833,12 +4879,29 @@ mod canonicalize_tests {
 	}
 
 	#[test]
+    fn number_with_comma_decimal_pt() {
+		// this is output from WIRIS for "12.3"
+        let test_str = "<math><mn>12</mn><mo>,</mo><mn>3</mn></math>";
+        let target_str = "<math><mn>12,3</mn></math>";
+        assert!(are_strs_canonically_equal_with_locale(test_str, target_str, ".", ", "));
+	}
+
+	#[test]
     fn addition_with_decimal_point_at_end() {
 		// in this case, the trailing "." is probably a decimal point" -- testing special case combine the "."
 		// this comes from WIRIS
         let test_str = "<math><mn>1</mn><mo>.</mo><mn>3</mn><mo>+</mo><mn>2</mn><mo>.</mo></math>";
         let target_str = "<math><mrow data-changed='added'><mn>1.3</mn><mo>+</mo><mn>2.</mn></mrow></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn addition_with_decimal_point_at_end_and_comma_decimal_separator() {
+		// in this case, the trailing "." is probably a decimal point" -- testing special case combine the "."
+		// this comes from WIRIS
+        let test_str = "<math><mn>1</mn><mo>,</mo><mn>3</mn><mo>+</mo><mn>2</mn><mo>,</mo></math>";
+        let target_str = "<math><mrow data-changed='added'><mn>1,3</mn><mo>+</mo><mn>2,</mn></mrow></math>";
+        assert!(are_strs_canonically_equal_with_locale(test_str, target_str, ".", ", "));
 	}
 
 	#[test]
