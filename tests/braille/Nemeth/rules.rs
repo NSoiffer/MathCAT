@@ -204,6 +204,12 @@ fn list_num_ind_11_d_1() {
 }
 
 #[test]
+fn list_num_ind_11_d_2() {
+    let expr = "<math><mn>3</mn><mo>:</mo><mn>30</mn><mo>&#x2212;</mo><mn>4</mn><mo>:</mo><mn>45</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠒⠸⠒⠼⠒⠴⠤⠲⠸⠒⠼⠲⠢");
+}
+
+#[test]
 fn no_num_ind_11_e_3() {
     let expr = "<math><mrow><mi>r</mi><mn>5</mn></mrow></math>";
     test_braille("Nemeth", expr, "⠗⠐⠢");
@@ -396,6 +402,19 @@ fn punct_38_6_1() {
 fn punct_38_6_3() {
     let expr = "<math><mo>(</mo><mn>1</mn><mo>)</mo><mo>,</mo><mo>(</mo><mn>2</mn><mo>)</mo><mo>,</mo><mo>(</mo><mn>3</mn><mo>)</mo><mo>.</mo></math>";
     test_braille("Nemeth", expr, "⠷⠂⠾⠠⠀⠷⠆⠾⠠⠀⠷⠒⠾⠸⠲");
+}
+
+#[test]
+fn colon_40_1() {
+    // including 'intent' is a little bit of a cheat, but there is no way to know whether this is time or ratio without it
+    let expr = "<math><mn>3</mn><mo intent='time'>:</mo><mn>30</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠒⠸⠒⠼⠒⠴");
+}
+
+#[test]
+fn colon_40_1_mtext() {
+    let expr = "<math><mtext>3:30</mtext></math>";
+    test_braille("Nemeth", expr, "⠼⠒⠸⠒⠼⠒⠴");
 }
 
 #[test]
@@ -1537,6 +1556,13 @@ fn ratio_151_10() {
 fn ratio_151_11() {
     let expr = "<math><mi>a</mi><mo>+</mo><mi>b</mi><mo>:</mo><mi>b</mi><mo>∷</mo><mi>c</mi><mo>+</mo><mi>d</mi><mo>:</mo><mi>d</mi></math>";
     test_braille("Nemeth", expr, "⠁⠬⠃⠀⠐⠂⠀⠃⠀⠰⠆⠀⠉⠬⠙⠀⠐⠂⠀⠙");
+}
+
+#[test]
+fn space_after_punct_bug_152() {
+    // this was a bug involving a bad cleanup rule for whitespace after punctuation
+    let expr = "<math><mn>7</mn><mover><mo>=</mo><mo>?</mo></mover><mn>8</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠶⠀⠐⠨⠅⠣⠸⠦⠻⠀⠼⠦");
 }
 
 #[test]

@@ -193,6 +193,13 @@ fn time_2_4_1() {
 }
 
 #[test]
+fn time_2_4_1_mtext() {
+    // this was a bug when only mtext occurred
+    let expr = "<math><mtext>5:30</mtext></math>";
+    test_braille("UEB", expr, "⠼⠑⠒⠼⠉⠚");
+}
+
+#[test]
 fn roman_numeral_2_6_1() {
     let expr = " <math><mi mathvariant='normal'>I</mi><mo>,</mo>
         <mo>&#xA0;</mo><mi>II</mi>
@@ -261,6 +268,18 @@ fn signs_2_10_16() {
         <mfrac><mn>1</mn><mrow><mn>10</mn><mo>,</mo><mn>000</mn></mrow></mfrac><mo>&#xA0;</mo>
         <mi mathvariant='normal'>&#x3BC;</mi></math>";
     test_braille("UEB", expr, "⠼⠁⠀⠠⠘⠫⠁⠀⠐⠶⠀⠼⠁⠌⠁⠚⠂⠚⠚⠚⠀⠨⠍");
+}
+
+#[test]
+fn expr_3_1_1_spaces() {
+    let expr = "<math><mn>3</mn><mo>+</mo><mn>5</mn><mo>=</mo><mn>8</mn></math>";
+    test_braille_prefs("UEB", vec![("UEB_UseSpacesAroundAllOperators", "true")], expr, "⠼⠉⠀⠐⠖⠀⠼⠑⠀⠐⠶⠀⠼⠓");
+}
+
+#[test]
+fn expr_3_1_2_spaces() {
+    let expr = "<math><mn>8</mn><mo>-</mo><mn>5</mn><mo>=</mo><mn>3</mn></math>";
+    test_braille_prefs("UEB", vec![("UEB_UseSpacesAroundAllOperators", "true")], expr, "⠼⠓⠀⠐⠤⠀⠼⠑⠀⠐⠶⠀⠼⠉");
 }
 
 #[test]
@@ -381,6 +400,13 @@ fn ratio_3_2_6() {
     // the difference from ratio_3_1_12 is this involves letters
     let expr = "<math><mi>x</mi><mo>:</mo><mi>y</mi></math>";
     test_braille("UEB", expr, "⠭⠰⠒⠽");
+}
+
+#[test]
+fn standing_alone_1() {
+    // Tests bug: github.com/NSoiffer/MathCAT/issues/142
+    let expr = "<math><mo>(</mo><mi>n</mi><mo>=</mo><mn>7</mn><mo>)</mo></math>";
+    test_braille("UEB", expr, "⠐⠣⠰⠝⠀⠐⠶⠀⠼⠛⠐⠜");
 }
 
 #[test]
@@ -1170,59 +1196,4 @@ fn chem_16_2_13() {
         <mmultiscripts><mi>Cl</mi><mn>3</mn><none/></mmultiscripts>
     </math>";
     test_braille("UEB", expr, "⠰⠰⠠⠋⠑⠔⠣⠠⠠⠊⠊⠊⠜⠠⠉⠇⠢⠼⠉");
-}
-
-
-// Extra tests targeted at special cases in MathCAT
-#[test]
-fn number_space_before() {
-    let expr = "<math><mtext>&#xA0;</mtext><mn>2</mn></math>";
-    test_braille("UEB", expr, "⠀⠼⠃");
-}
-
-#[test]
-fn number_space_after() {
-    let expr = "<math><mn>2</mn><mtext>&#xA0;</mtext></math>";
-    test_braille("UEB", expr, "⠼⠃⠀");
-}
-
-#[test]
-fn number_space_before_and_after() {
-    let expr = "<math><mtext>&#xA0;</mtext><mn>2</mn><mtext>&#xA0;</mtext></math>";
-    test_braille("UEB", expr, "⠀⠼⠃⠀");
-}
-
-// extra tests targeted at contractions based on function names
-#[test]
-fn contractions_1() {
-    let expr = "<math>
-        <mi>sech</mi><mo>&#x2061;</mo><mi>x</mi><mo>+</mo>
-        <mi>cosh</mi><mo>&#x2061;</mo><mi>y</mi><mo>+</mo>
-        <mi>arccos</mi><mo>&#x2061;</mo><mi>t</mi>
-    </math>";
-    // Note: "arccos" does not use the "cc" contraction -- RUEB 10.6.5 lists "arccosine" without the contraction
-    test_braille("UEB", expr, "⠎⠑⠡⠀⠭⠐⠖⠉⠕⠩⠀⠽⠐⠖⠜⠉⠉⠕⠎⠀⠰⠞");
-}
-#[test]
-fn contractions_2() {
-    let expr = "<math><mi>ker</mi><mo>&#x2061;</mo><mi>h</mi></math>";
-    test_braille("UEB", expr, "⠅⠻⠀⠰⠓");
-}
-
-#[test]
-fn contractions_3() {
-    let expr = "<math><mi>argument</mi><mo>&#x2061;</mo><mo>(</mo><mi>f</mi><mo>)</mo></math>";
-    test_braille("UEB", expr, "⠜⠛⠥⠰⠞⠐⠣⠋⠐⠜");
-}
-
-#[test]
-fn contractions_4() {
-    let expr = "<math><mtext>error&#xA0;function&#xA0;</mtext><mi>erf</mi></math>";
-    test_braille("UEB", expr, "⠻⠗⠕⠗⠀⠋⠥⠝⠉⠰⠝⠀⠻⠋");
-}
-
-#[test]
-fn contractions_5() {
-    let expr = "<math><mi>Real</mi><mo>(</mo><mi>z</mi><mo>)</mo></math>";
-    test_braille("UEB", expr, "⠠⠗⠂⠇⠐⠣⠵⠐⠜");
 }

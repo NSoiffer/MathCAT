@@ -1,12 +1,14 @@
 // *** MathCAT doesn't normally want to build a binary ***
 // *** This file is here because it is useful for trying out things ***
 
+use libmathcat::interface::*;
+use log::*;
+use std::time::Instant;
+
+
 // Maybe also have this speak to test the TTS generation.
 // There is a rust winapi crate that mirrors the WinPAI and has "Speak(...)" in it
 fn main() {
-  use libmathcat::interface::*;
-  use log::*;
-  use std::time::Instant;
   env_logger::builder()
       .format_timestamp(None)
       .format_module_path(false)
@@ -200,7 +202,7 @@ fn main() {
 //     ";
   // let expr= "<math><mrow><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>";
   let instant = Instant::now();
-  let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../../Rules");
+  let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../Rules");
   let rules_dir = rules_dir.as_os_str().to_str().unwrap().to_string();
   if let Err(e) = set_rules_dir(rules_dir) {
     panic!("Error: exiting -- {}", errors_to_string(&e));  }
@@ -229,7 +231,8 @@ fn main() {
   }
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
-  set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
+
+  set_preference("BrailleCode".to_string(), "CMU".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),
@@ -244,11 +247,76 @@ fn main() {
   // info!("Time taken (second time for speech): {}ms", instant.elapsed().as_millis());
   // info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()));
   
-  // match get_braille("".to_string()) {
+  // match get_braille("") {
   //   Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
   //   Err(e) => panic!("{}", errors_to_string(&e)),
   // }
   // // let xpath_counts = libmathcat::speech::xpath_count();
   // // info!("#xpath = {}; duplicates = {}", xpath_counts.0, xpath_counts.1);
   // info!("Time taken (second time for speech + braille): {}ms", instant.elapsed().as_millis());
+
+  timing_test(expr, 00);
+
+}
+
+fn timing_test(expr: &str, n_loops: usize) {
+  if n_loops == 0 {
+    return;
+  }
+  
+  let n_loops_float = n_loops as f64;
+  let instant = Instant::now();
+  for _ in 0..n_loops {
+    if let Err(e) = set_mathml(expr.to_string()) {
+      panic!("Error: exiting -- {}", errors_to_string(&e));
+    };
+    match get_spoken_text() {
+      Ok(_) =>( ),
+      Err(e) => panic!("{}", errors_to_string(&e)),
+    }
+    match get_braille("".to_string()) {
+      Ok(_) => (),
+      Err(e) => panic!("{}", errors_to_string(&e)),
+    }
+  }
+  info!("Time taken (time for set, speech, {} braille averaged over 100 loops): {}ms", get_preference("BrailleCode".to_string()).unwrap(), instant.elapsed().as_millis() as f64/n_loops_float);
+
+  let instant = Instant::now();
+  for _ in 0..n_loops {
+    if let Err(e) = set_mathml(expr.to_string()) {
+      panic!("Error: exiting -- {}", errors_to_string(&e));
+    };
+  }
+  info!("Time taken (time for set averaged over 100 loops): {}ms", instant.elapsed().as_millis() as f64/n_loops_float);
+
+  let instant = Instant::now();
+  for _ in 0..n_loops {
+    match get_spoken_text() {
+      Ok(_) =>( ),
+      Err(e) => panic!("{}", errors_to_string(&e)),
+    }
+  }
+  info!("Time taken (time for speech averaged over 100 loops): {}ms", instant.elapsed().as_millis() as f64/n_loops_float);
+
+  set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
+  get_braille("".to_string()).unwrap();
+  let instant = Instant::now();
+  for _ in 0..n_loops {
+    match get_braille("".to_string()) {
+      Ok(_) => (),
+      Err(e) => panic!("{}", errors_to_string(&e)),
+    }
+  }
+  info!("Time taken (time for {} braille averaged over 100 loops): {}ms", get_preference("BrailleCode".to_string()).unwrap(), instant.elapsed().as_millis() as f64/n_loops_float);
+
+  set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
+  get_braille("".to_string()).unwrap();
+  let instant = Instant::now();
+  for _ in 0..n_loops {
+    match get_braille("".to_string()) {
+      Ok(_) => (),
+      Err(e) => panic!("{}", errors_to_string(&e)),
+    }
+  }
+  info!("Time taken (time for {} braille averaged over 100 loops): {}ms", get_preference("BrailleCode".to_string()).unwrap(), instant.elapsed().as_millis() as f64/n_loops_float);
 }

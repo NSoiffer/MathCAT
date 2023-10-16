@@ -740,6 +740,18 @@ impl CanonicalizeContext {
 				if let Some(dash) = canonicalize_dash(text) {		// needs to be before OPERATORS.get due to "--"
 					mathml.set_text(dash);
 					return Some(mathml);
+				} else if text.contains('_') {
+					// if left or right are an mo, leave as is. Otherwis convert to an mo.
+					let preceding_siblings = mathml.preceding_siblings();
+					let following_siblings = mathml.following_siblings();
+					if preceding_siblings.is_empty() || following_siblings.is_empty() {
+						return Some(mathml);
+					}
+					if name(&as_element(preceding_siblings[preceding_siblings.len()-1])) != "mo" &&
+					   name(&as_element(following_siblings[0])) != "mo" {
+						set_mathml_name(mathml, "mo");
+					}
+					return Some(mathml);
 				} else if OPERATORS.get(text).is_some() {
 					set_mathml_name(mathml, "mo");
 					return Some(mathml);
@@ -748,6 +760,9 @@ impl CanonicalizeContext {
 				} else if IS_PRIME.is_match(text) {
 					let new_text = merge_prime_text(text);
 					mathml.set_text(&new_text);
+					return Some(mathml);
+				} else if text == "..." {
+					mathml.set_text("…");
 					return Some(mathml);
 				} else if let Some(result) = split_points(mathml) {
 					return Some(result);
@@ -805,6 +820,7 @@ impl CanonicalizeContext {
 							}
 							return Some(mathml);
 						},
+						"::" =>{mathml.set_text("∷");},
 						"|" | "||" => if let Some(result) = merge_vertical_bars(mathml) {
 							return Some(result);
 						} else {
@@ -817,7 +833,7 @@ impl CanonicalizeContext {
 				// common bug: trig functions, lim, etc., should be mi
 				// same for ellipsis ("…")
 				return crate::definitions::DEFINITIONS.with(|definitions| {
-					if text == "…" || text == "⋯" ||
+					if ["…", "⋯", "∞"].contains(&text) ||
 					   definitions.borrow().get_hashset("FunctionNames").unwrap().contains(text) ||
 					   definitions.borrow().get_hashset("GeometryShapes").unwrap().contains(text) {
 						set_mathml_name(mathml, "mi");
@@ -932,6 +948,7 @@ impl CanonicalizeContext {
 				let mathml =  if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 					let merged = merge_dots(mathml);	// FIX -- switch to passing in children
 					let merged = merge_primes(merged);
+					let merged = merge_chars(merged, &IS_UNDERSCRORE);
 					handle_pseudo_scripts(merged)
 				} else {
 					mathml
@@ -1052,7 +1069,7 @@ impl CanonicalizeContext {
 					continue;
 				}
 				let attr_name = match child.attribute_value("encoding") {
-					Some(encoding_name) => format!("data-{}-{}", child_name, encoding_name.replace("/", "_slash_")),
+					Some(encoding_name) => format!("data-{}-{}", child_name, encoding_name.replace('/', "_slash_")),
 					None => format!("data-{}", child_name),		// probably shouldn't happen
 				};
 				let attr_name = attr_name.as_str();
@@ -1068,7 +1085,8 @@ impl CanonicalizeContext {
 		/// Hack to try and guess if a colon should be a ratio -- this affects parsing because of different precedences
 		/// It also guesses on the spacing after the colon and adds a space attr if it looks like set building or function mapping notation.
 		/// These conditions are really not well thought out and are just a first cut -- they do cause the braille tests to pass
-		/// 1. It must be infix and there is a proportion (∷) mo as a sibling, or
+		/// If 'intent' is given, it must be intent='ratio'
+		/// 2. It must be infix and there is a proportion (∷) mo as a sibling, or
 		/// 3. It is the only mo and has numbers on each side
 		/// 
 		/// Need to rule out field extensions "[K:F]" and trilinear coordinates "a:b:c" (Nemeth doesn't consider these to be ratios)
@@ -1077,6 +1095,12 @@ impl CanonicalizeContext {
 			let parent = mathml.parent().unwrap().element().unwrap();	// must exist
 			if name(&parent) != "mrow" && name(&parent) != "math"{
 				return false;
+			}
+
+			if let Some(intent_value) = mathml.attribute_value("intent") {
+				if intent_value != "ratio" || !intent_value.starts_with('_') {
+					return false;
+				}
 			}
 
 			if let Some(value) = mathml.attribute_value("data-mjx-texclass") {
@@ -1124,7 +1148,7 @@ impl CanonicalizeContext {
 					if name(&child) == "mo" {
 						let text = as_text(child);
 						match text {
-							"∷" => return Some(true),
+							"∷" | "::" => return Some(true),		// "::" might not be canonicalized yet
 							"∶" => return Some(false),
 							_ => {
 								if let Some(op) = OPERATORS.get(text) {
@@ -1417,8 +1441,10 @@ impl CanonicalizeContext {
 		}
 
 		fn convert_mfenced_to_mrow(mfenced: Element) -> Element {
-			let open = mfenced.attribute_value("open").unwrap_or("(");
-			let close = mfenced.attribute_value("close").unwrap_or(")");
+			// The '<'/'>' replacements are because WIRIS uses them out instead of the correct chars in its template
+			let open = mfenced.attribute_value("open").unwrap_or("(").replace('<', "⟨");
+			let close = mfenced.attribute_value("close").unwrap_or(")").replace('>', "⟩");
+			debug!("open={}, close={}", open, close);
 			let mut separators= mfenced.attribute_value("separators").unwrap_or(",").chars();
 			set_mathml_name(mfenced, "mrow");
 			mfenced.remove_attribute("open");
@@ -1427,7 +1453,7 @@ impl CanonicalizeContext {
 			let children = mfenced.children();
 			let mut new_children = Vec::with_capacity(2*children.len() + 1);
 			if !open.is_empty() {
-				new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), open, MFENCED_ATTR_VALUE)) );
+				new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), &open, MFENCED_ATTR_VALUE)) );
 			}
 			if !children.is_empty() {
 				new_children.push(children[0]);
@@ -1438,7 +1464,7 @@ impl CanonicalizeContext {
 				}
 			}
 			if !close.is_empty() {
-				new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), close, MFENCED_ATTR_VALUE)) );
+				new_children.push(ChildOfElement::Element( create_mo(mfenced.document(), &close, MFENCED_ATTR_VALUE)) );
 			}
 			mfenced.replace_children(new_children);
 			return mfenced;
@@ -1451,6 +1477,7 @@ impl CanonicalizeContext {
 		/// Return true if 'element' (which is syntactically a roman numeral) is only inside mrows and
 		///  if its length is < 3 chars, then there is another roman numeral near it (separated by an operator).
 		/// We want to rule out something like 'm' or 'cm' being a roman numeral.
+		/// Note: this function assumes 'mathml' is a Roman Numeral, and optimizes operations based on that.
 		/// Note: Nemeth has some rules about roman numerals (capitalization and punctuation after)
 		fn is_roman_numeral_number_context(mathml: Element) -> bool {
 			assert!(name(&mathml)=="mtext" || name(&mathml)=="mi");
@@ -1460,14 +1487,32 @@ impl CanonicalizeContext {
 				let current_name = name(&parent);
 				if current_name == "math" {
 					break;
+				} else if current_name == "msup" || current_name == "mmultiscripts" {
+					// could be a oxidation state in a Chemical formula
+					let children = parent.children();
+					// make sure that there is only one script and that 'mathml' is a superscript
+					if current_name == "mmultiscripts" && (children.len() > 3  || !mathml.following_siblings().is_empty()) {
+						return false;
+					}
+					let base = as_element(children[0]);
+					if is_chemical_element(base) {
+						break;
+					} else {
+						return false;
+					}
 				} else if current_name != "mrow" {
 					return false;
 				}
 			}
-			if as_text(mathml).len() > 2 {
+
+			let text = as_text(mathml).as_bytes();	// note: we know it is all ASCII chars
+			// if roman numeral is in superscript and we get here, then it had a chemical element base, so we accept it
+			// note: you never has a state = I; if two letters, it must be 'II'.
+			if text.len() > 2  || 
+			   ((name(&parent) =="msup" || name(&parent) == "mmultiscripts") && text.len()==2 && text==[b'I',b'I']) {
 				return true;
 			} else {
-				let is_upper_case = as_text(mathml).as_bytes()[0].is_ascii_uppercase();	// safe since we know it is a 
+				let is_upper_case = text[0].is_ascii_uppercase();	// safe since we know it is a roman numeral
 				let preceding = mathml.preceding_siblings();
 				if !preceding.is_empty() && is_roman_numeral_adjacent(preceding.iter().rev(), is_upper_case) {
 					return true;
@@ -1847,6 +1892,46 @@ impl CanonicalizeContext {
 			children.drain(start+1..end);
 		}
 
+		fn merge_chars<'a>(mrow: Element<'a>, pattern: &Regex) -> Element<'a> {
+			// merge consecutive <mi>s containing any of the 'chars' into one <mi> -- probably used for omission with('_')
+			let mut first_child = None;
+			let mut new_text = "".to_string();
+			for child in mrow.children() {
+				let child = as_element(child);
+				if is_leaf(child) {
+					let text = as_text(child);
+					if pattern.is_match(text) {
+						if new_text.is_empty() {
+							// potential start of a string
+							first_child = Some(child);
+							new_text = as_text(child).to_string();
+						} else {
+							// merge chars
+							new_text.push_str(text);
+							child.remove_from_parent();
+						}
+					} else if new_text.len() > 1 {
+						// end of a run
+						first_child.unwrap().set_text(&new_text);
+						new_text.clear();
+					} else {
+						new_text.clear();	// just one entry -- no need to set the text
+					}
+				} else if new_text.len() > 1{
+					// end of a run
+					first_child.unwrap().set_text(&new_text);
+					new_text.clear();
+				} else {
+					new_text.clear();  		// just one entry -- no need to set the text
+				}
+			}
+			if new_text.len() > 1{
+				// end of a run
+				first_child.unwrap().set_text(&new_text);
+			}
+			return mrow;
+		}
+
 		fn merge_dots(mrow: Element) -> Element {
 			// merge consecutive <mo>s containing '.' into ellipsis
 			let children = mrow.children();
@@ -1955,13 +2040,34 @@ impl CanonicalizeContext {
 				"′", "″", "‴", "‵", "‶", "‷", "⁗",
 			};
 	
-			// merge consecutive <mo>s containing primes (in various forms)
 			let mut children = mrow.children();
+			// check to see if mrow of all psuedo scripts
+			if children.iter().all(|&child| {
+				let child = as_element(child);
+				name(&child) == "mo" && PSEUDO_SCRIPTS.contains(as_text(child))
+			}) {
+				let parent = mrow.parent().unwrap().element().unwrap();  // must exist
+				let is_first_child = mrow.preceding_siblings().is_empty();
+				if  is_first_child {
+					return mrow;	// FIX: what should happen
+				}
+				if crate::xpath_functions::IsNode::is_scripted(&parent) {
+					return mrow;		// already in a script position
+				}
+				if name(&parent) == "mrow" {
+					mrow.set_attribute_value("data-pseudo-script", "true");
+					return handle_pseudo_scripts(parent);
+				} else {
+					return mrow;	// FIX: what should happen?
+				}
+			}
+
 			let mut i = 1;
 			let mut found = false;
 			while i < children.len() {
 				let child = as_element(children[i]);
-				if name(&child) == "mo" && PSEUDO_SCRIPTS.contains(as_text(child)) {
+				if (name(&child) == "mo" && PSEUDO_SCRIPTS.contains(as_text(child))) ||
+				   child.attribute("data-pseudo-script").is_some() {
 					let msup = create_mathml_element(&child.document(), "msup");
 					msup.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
 					msup.append_child(children[i-1]);
@@ -2555,7 +2661,7 @@ impl CanonicalizeContext {
 			};
 		} else {
 			mo_text = match mo_text {
-				"_"| "\u{02C9}"| "\u{0304}"| "\u{0305}" => "\u{00AF}",
+				"\u{02C9}"| "\u{0304}"| "\u{0305}" => "\u{00AF}",
 				"\u{02DC}" | "~"  => "\u{223C}",		// for base, use version with prefix and infix
 				"\u{01C1}" => "\u{2016}", // U+2016 is "‖"
 
@@ -3142,15 +3248,18 @@ impl CanonicalizeContext {
 	}
 
 	// implied separator when two capital letters are adjacent or two chemical elements
+	// also for adjacent omission chars
 	fn is_implied_separator<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>) -> bool {
 		if name(prev) != "mi" || name(current) != "mi" {
 			return false;
 		}
 
-		let prev_text = as_text(*prev);
-		let current_text = as_text(*current);
+		// trim because whitespace might have gotten stuffed into the <mi>s
+		let prev_text = as_text(*prev).trim();
+		let current_text = as_text(*current).trim();
 		return prev_text.len() == 1 && current_text.len() == 1 &&
-			   is_cap(prev_text) && is_cap(current_text);
+			   ((is_cap(prev_text) && is_cap(current_text)) ||
+			    (prev_text=="_" && current_text=="_"));
 
 
 		fn is_cap(str: &str) -> bool {

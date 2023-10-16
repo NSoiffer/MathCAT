@@ -58,8 +58,8 @@
  - "{":                                             #  0x7b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "mở nẹp"]                         #   (en: 'open brace')
-        else: [t: "đùi trái"]                       #   (en: 'left brace')
+        then: [t: "mở ngoặc nhọn"]                         #   (en: 'open brace')
+        else: [t: "mở ngoặc nhọn"]                       #   (en: 'left brace')
  - "|":                                             #  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
      - test:
@@ -74,10 +74,10 @@
  - "}":                                             #  0x7d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "đóng nẹp"]                       #   (en: 'close brace')
-        else: [t: "đúng nẹp"]                       #   (en: 'right brace')
+        then: [T: "đóng ngoặc nhọn"]                       #   (en: 'close brace')
+        else: [T: "đóng ngoặc nhọn"]                       #   (en: 'right brace')
 
- - "~": [t: "tilde"]                                #  0x7e
+ - "~": [T: "dấu ngã"]                                #  0x7e
  - " ": [t: ""]                                     #  0xa0
  - "¢": [t: "xu"]                                   #  0xa2 (en: 'cents')
  - "£": [t: "bảng"]                                 #  0xa3 (en: 'pounds')
@@ -93,7 +93,7 @@
  - "¯":                                            # 0xaf
      - test:
         if: "ancestor::m:modified-variable and preceding-sibling::*[1][self::m:mi]"
-        then: [t: "dòng"]                         # (en: 'bar') -- as in "x bar", a shorthand way to speak this
+        then: [T: "ngang"]                         # (en: 'bar') -- as in "x bar", a shorthand way to speak this
         else: [t: "dòng"]                          # (en: 'line')
  - "°": [t: "độ"]                                   #  0xb0 (en: 'degrees')
  - "±": [t: "cộng hoặc trừ"]                        #  0xb1 (en: 'plus or minus')
@@ -116,7 +116,7 @@
             if: $ClearSpeak_MultSymbolX = 'By'
             then: [T: "cho"]
             else: [t: "vượt qua"]                   #   (en: 'cross')
- - "÷": [T: "chia cho"]                             #  0xf7
+ - "÷": [T: "chia"]                             #  0xf7
  - "ʰ": [t: "công cụ sửa đổi nhỏ h"]                #  0x2b0    (en: 'modifier small h')
  - "ʱ": [t: "công cụ sửa đổi h nhỏ với móc"]        #  0x2b1    (en: 'modifier small h with hook')
  - "ʲ": [t: "sửa đổi nhỏ j"]                        #  0x2b2    (en: 'modifier small j')
@@ -253,7 +253,7 @@
  - "̲": [t: "tinh chỉnh dòng thấp"]                 #  0x332    (en: 'low line embellishment')
  - "̳": [t: "double line dòng tô điểm"]             #  0x333    (en: 'double low line embellishment')
  - "̴": [t: "tinh chỉnh lớp phủ tilde"]             #  0x334    (en: 'tilde overlay embellishment')
- - "̵": [t: "tiếng đột quỵ ngắn tô điểm"]           #  0x335    (en: 'short stroke overlay embellishment')
+ - "̵": [t: "tiếng gạch ngắn tô điểm"]           #  0x335    (en: 'short stroke overlay embellishment')
  - "̶": [t: "tinh chỉnh lớp phủ dài"]               #  0x336    (en: 'long stroke overlay embellishment')
  - "̷": [t: "slidus lớp phủ ngắn gọn"]              #  0x337    (en: 'short solidus overlay embellishment')
  - "̸": [t: "tinh chỉnh lớp phủ solidus dài"]       #  0x338    (en: 'long solidus overlay embellishment')
@@ -474,7 +474,7 @@
  - "⃣": [t: "kèm theo tô điểm khóa"]                #  0x20e3   (en: 'enclosing keycap embellishment')
  - "⃤": [t: "kèm theo tô điểm hình tam giác hướng lên"] #  0x20e4   (en: 'enclosing upward pointing triangle embellishment')
  - "⃥": [t: "đảo ngược solidus overlay tô điểm"]    #  0x20e5   (en: 'reverse solidus overlay embellishment')
- - "⃦": [t: "tinh chỉnh đột quỵ đôi"]               #  0x20e6   (en: 'double verticle stroke embellishment')
+ - "⃦": [t: "tinh chỉnh gạch đôi"]               #  0x20e6   (en: 'double verticle stroke embellishment')
  - "⃧": [t: "tổ chức biểu tượng niên kim"]          #  0x20e7   (en: 'annuity symbol embellishment')
  - "⃨": [t: "triple underdot"]                      #  0x20e8
  - "⃩": [t: "cầu rộng phía trên sự tô điểm"]        #  0x20e9   (en: 'wide bridge above embellishment')
@@ -600,7 +600,7 @@
  - "↑": [t: "mũi tên hướng lên"]                    #  0x2191   (en: 'upwards arrow')
  - "→": [t: "mũi tên phải"]                         #  0x2192   (en: 'rightwards arrow')
  - "↓": [t: "mũi tên xuống"]                        #  0x2193   (en: 'downwards arrow')
- - "↔": [t: "mũi tên trái bên trái"]                #  0x2194   (en: 'left right arrow')
+ - "↔": [t: "tương đương"]                #  0x2194   (en: 'left right arrow')
  - "↕": [t: "lên mũi tên xuống"]                    #  0x2195   (en: 'up down arrow')
  - "↖": [t: "mũi tên tây bắc"]                      #  0x2196   (en: 'north west arrow')
  - "↗":                                             #  0x2197
@@ -616,8 +616,8 @@
         else: [t: "mũi tên đông nam"]               #   (en: 'south east arrow')
 
  - "↙": [t: "mũi tên tây nam"]                      #  0x2199   (en: 'south west arrow')
- - "↚": [t: "mũi tên trái với đột quỵ"]             #  0x219a   (en: 'leftwards arrow with stroke')
- - "↛": [t: "mũi tên phải với đột quỵ"]             #  0x219b   (en: 'rightwards arrow with stroke')
+ - "↚": [t: "mũi tên trái với gạch"]             #  0x219a   (en: 'leftwards arrow with stroke')
+ - "↛": [t: "mũi tên phải với gạch"]             #  0x219b   (en: 'rightwards arrow with stroke')
  - "↜": [t: "mũi tên sóng trái"]                    #  0x219c   (en: 'leftwards wave arrow')
  - "↝": [t: "mũi tên sóng bên phải"]                #  0x219d   (en: 'rightwards wave arrow')
  - "↞": [t: "bên trái hai mũi tên đầu"]             #  0x219e   (en: 'leftwards two headed arrow')
@@ -636,7 +636,7 @@
  - "↫": [t: "mũi tên trái với vòng lặp"]            #  0x21ab   (en: 'leftwards arrow with loop')
  - "↬": [t: "mũi tên phải với vòng lặp"]            #  0x21ac   (en: 'rightwards arrow with loop')
  - "↭": [t: "mũi tên bên trái bên phải"]            #  0x21ad   (en: 'left right wave arrow')
- - "↮": [t: "mũi tên trái bên phải với đột quỵ"]    #  0x21ae   (en: 'left right arrow with stroke')
+ - "↮": [t: "mũi tên trái bên phải với gạch"]    #  0x21ae   (en: 'left right arrow with stroke')
  - "↯": [t: "mũi tên ngoằn ngoèo xuống"]            #  0x21af   (en: 'downwards zigzag arrow')
  - "↰": [t: "mũi tên hướng lên với đầu trái"]       #  0x21b0   (en: 'upwards arrow with tip leftwards')
  - "↱": [t: "mũi tên hướng lên với đầu bên phải"]   #  0x21b1   (en: 'upwards arrow with tip rightwards')
@@ -667,14 +667,14 @@
  - "⇊": [t: "mũi tên đi xuống"]                     #  0x21ca   (en: 'downwards paired arrows')
  - "⇋": [t: "trái harpoon qua harpoon phải"]        #  0x21cb   (en: 'left harpoon over right harpoon')
  - "⇌": [t: "harpoon phải qua harpoon trái"]        #  0x21cc   (en: 'right harpoon over left harpoon')
- - "⇍": [t: "mũi tên đôi bên trái với đột quỵ"]     #  0x21cd   (en: 'leftwards double arrow with stroke')
- - "⇎": [t: "mũi tên kép bên trái với đột quỵ"]     #  0x21ce   (en: 'left right double arrow with stroke')
- - "⇏": [t: "mũi tên kép phải với đột quỵ"]         #  0x21cf   (en: 'rightwards double arrow with stroke')
+ - "⇍": [t: "mũi tên đôi bên trái với gạch"]     #  0x21cd   (en: 'leftwards double arrow with stroke')
+ - "⇎": [t: "mũi tên kép bên trái với gạch"]     #  0x21ce   (en: 'left right double arrow with stroke')
+ - "⇏": [t: "mũi tên kép phải với gạch"]         #  0x21cf   (en: 'rightwards double arrow with stroke')
  - "⇐": [t: "mũi tên đôi trái"]                     #  0x21d0   (en: 'leftwards double arrow')
  - "⇑": [t: "mũi tên tăng gấp đôi"]                 #  0x21d1   (en: 'upwards double arrow')
  - "⇒": [t: "mũi tên kép phải"]                     #  0x21d2   (en: 'rightwards double arrow')
  - "⇓": [t: "xuống mũi tên đôi"]                    #  0x21d3   (en: 'downwards double arrow')
- - "⇔": [t: "mũi tên trái bên trái"]                #  0x21d4   (en: 'left right double arrow')
+ - "⇔": [t: "tương đương"]                #  0x21d4   (en: 'left right double arrow')
  - "⇕": [t: "lên xuống mũi tên đôi"]                #  0x21d5   (en: 'up down double arrow')
  - "⇖": [t: "mũi tên đôi tây bắc"]                  #  0x21d6   (en: 'north west double arrow')
  - "⇗": [t: "mũi tên đôi đông bắc"]                 #  0x21d7   (en: 'north east double arrow')
@@ -709,12 +709,12 @@
  - "⇴": [t: "mũi tên phải với vòng tròn nhỏ"]       #  0x21f4   (en: 'right arrow with small circle')
  - "⇵": [t: "mũi tên xuống bên trái của mũi tên hướng lên"] #  0x21f5   (en: 'downwards arrow leftwards of upwards arrow')
  - "⇶": [t: "ba mũi tên phải"]                      #  0x21f6   (en: 'three rightwards arrows')
- - "⇷": [t: "mũi tên trái với đột quỵ dọc"]         #  0x21f7   (en: 'leftwards arrow with vertical stroke')
- - "⇸": [t: "mũi tên phải với đột quỵ dọc"]         #  0x21f8   (en: 'rightwards arrow with vertical stroke')
- - "⇹": [t: "mũi tên trái bên trái với đột quỵ dọc"]    #  0x21f9   (en: 'left right arrow with vertical stroke')
- - "⇺": [t: "mũi tên trái với đột quỵ dọc"]         #  0x21fa   (en: 'leftwards arrow with double vertical stroke')
- - "⇻": [t: "mũi tên phải với đột quỵ dọc"]         #  0x21fb   (en: 'rightwards arrow with double vertical stroke')
- - "⇼": [t: "mũi tên trái bên trái với đột quỵ dọc"]    #  0x21fc   (en: 'left right arrow with double vertical stroke')
+ - "⇷": [t: "mũi tên trái với gạch dọc"]         #  0x21f7   (en: 'leftwards arrow with vertical stroke')
+ - "⇸": [t: "mũi tên phải với gạch dọc"]         #  0x21f8   (en: 'rightwards arrow with vertical stroke')
+ - "⇹": [t: "mũi tên trái bên trái với gạch dọc"]    #  0x21f9   (en: 'left right arrow with vertical stroke')
+ - "⇺": [t: "mũi tên trái với gạch dọc"]         #  0x21fa   (en: 'leftwards arrow with double vertical stroke')
+ - "⇻": [t: "mũi tên phải với gạch dọc"]         #  0x21fb   (en: 'rightwards arrow with double vertical stroke')
+ - "⇼": [t: "mũi tên trái bên trái với gạch dọc"]    #  0x21fc   (en: 'left right arrow with double vertical stroke')
  - "⇽": [t: "mũi tên mở bên trái"]                  #  0x21fd   (en: 'leftwards open headed arrow')
  - "⇾": [t: "mũi tên mở bên phải"]                  #  0x21fe   (en: 'rightwards open headed arrow')
  - "⇿": [t: "bên trái mũi tên mở đầu"]              #  0x21ff   (en: 'left right open headed arrow')
@@ -822,8 +822,8 @@
  - "−": [t: "dấu trừ"]                              #  0x2212   (en: 'minus')
  - "∓": [t: "trừ hoặc cộng"]                        #  0x2213   (en: 'minus or plus')
  - "∔": [t: "dot plus"]                             #  0x2214
- - "∕": [T: "chia cho"]                             #  0x2215
- - "∖": [t: "đặt điểm trừ"]                         #  0x2216   (en: 'set minus')
+ - "∕": [T: "chia"]                             #  0x2215
+ - "∖": [t: "hiệu"]                         #  0x2216   (en: 'set minus')
  - "∗": [T: "nhân"]                                 #  0x2217
  - "∘": [t: "sáng tác với"]                         #  0x2218   (en: 'composed with')
  - "∙": [T: "nhân"]                                 #  0x2219
@@ -932,16 +932,16 @@
  - "≈":                                             #  0x2248
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "gần như bằng"]                  #   (en: 'is almost equal to')
+         then: [t: "xấp xỉ"]                  #   (en: 'is almost equal to')
  - "≉":                                             #  0x2249
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "là"]                            #   (en: 'is')
-     - t: "không gần như bằng"                      #   (en: 'not almost equal to')
+         then: [t: " "]                            #   (en: 'is')
+     - t: "không gần bằng"                      #   (en: 'not almost equal to')
  - "≊":                                             #  0x224a
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "gần như bằng hoặc bằng"]        #   (en: 'is almost equal or equal to')
+         then: [t: "xấp xỉ hoặc bằng"]        #   (en: 'is almost equal or equal to')
  - "≋": [t: "triple tilde"]                         #  0x224b
  - "≌": [t: "đều bằng"]                             #  0x224c   (en: 'are all equal to')
  - "≍":                                             #  0x224d
@@ -1158,7 +1158,7 @@
  - "⊕": [t: "bao quanh cộng"]                       #  0x2295   (en: 'circled plus')
  - "⊖": [t: "khoanh tròn trừ đi"]                   #  0x2296   (en: 'circled minus')
  - "⊗": [t: "thời gian khoanh tròn"]                #  0x2297   (en: 'circled times')
- - "⊘": [t: "cắt bao quanh chém"]                   #  0x2298   (en: 'circled slash')
+ - "⊘": [t: "chia"]                   #  0x2298   (en: 'circled slash')
  - "⊙": [t: "toán tử chấm được khoanh tròn"]        #  0x2299   (en: 'circled dot operator')
  - "⊚": [t: "vòng tròn"]                            #  0x229a   (en: 'circled ring')
  - "⊛": [t: "asterisk bao quanh"]                   #  0x229b   (en: 'circled asterisk')
@@ -1363,17 +1363,17 @@
  - "⋯": [t: "chấm chấm chấm"]                       #  0x22ef   (en: 'dot dot dot')
  - "⋰": [t: "elip chéo lên trên"]                   #  0x22f0   (en: 'upwards diagonal ellipsis')
  - "⋱": [t: "dấu chấm lửng chéo"]                   #  0x22f1   (en: 'diagonal ellipsis')
- - "⋲": [t: "yếu tố của với đột quỵ ngang dài"]     #  0x22f2   (en: 'element of with long horizontal stroke')
- - "⋳": [t: "yếu tố của thanh dọc ở cuối đột quỵ ngang"]    #  0x22f3   (en: 'element of with vertical bar at end of horizontal stroke')
- - "⋴": [t: "yếu tố của thanh dọc ở cuối đột quỵ ngang"]    #  0x22f4   (en: 'element of with vertical bar at end of horizontal stroke')
+ - "⋲": [t: "yếu tố của với gạch ngang dài"]     #  0x22f2   (en: 'element of with long horizontal stroke')
+ - "⋳": [t: "yếu tố của thanh dọc ở cuối gạch ngang"]    #  0x22f3   (en: 'element of with vertical bar at end of horizontal stroke')
+ - "⋴": [t: "yếu tố của thanh dọc ở cuối gạch ngang"]    #  0x22f4   (en: 'element of with vertical bar at end of horizontal stroke')
  - "⋵": [t: "phần tử của với dấu chấm ở trên"]      #  0x22f5   (en: 'element of with dot above')
  - "⋶": [t: "yếu tố của với overbar"]               #  0x22f6   (en: 'element of with overbar')
  - "⋷": [t: "yếu tố của với overbar"]               #  0x22f7   (en: 'element of with overbar')
  - "⋸": [t: "yếu tố của với atarbar"]               #  0x22f8   (en: 'element of with underbar')
  - "⋹": [t: "yếu tố của hai nét ngang"]             #  0x22f9   (en: 'element of with two horizontal strokes')
- - "⋺": [t: "chứa với đột quỵ ngang dài"]           #  0x22fa   (en: 'contains with long horizontal stroke')
- - "⋻": [t: "chứa với thanh dọc ở cuối đột quỵ ngang"]  #  0x22fb   (en: 'contains with vertical bar at end of horizontal stroke')
- - "⋼": [t: "chứa với thanh dọc ở cuối đột quỵ ngang"]  #  0x22fc   (en: 'contains with vertical bar at end of horizontal stroke')
+ - "⋺": [t: "chứa với gạch ngang dài"]           #  0x22fa   (en: 'contains with long horizontal stroke')
+ - "⋻": [t: "chứa với thanh dọc ở cuối gạch ngang"]  #  0x22fb   (en: 'contains with vertical bar at end of horizontal stroke')
+ - "⋼": [t: "chứa với thanh dọc ở cuối gạch ngang"]  #  0x22fc   (en: 'contains with vertical bar at end of horizontal stroke')
  - "⋽": [t: "chứa với overbar"]                     #  0x22fd   (en: 'contains with overbar')
  - "⋾": [t: "chứa với overbar"]                     #  0x22fe   (en: 'contains with overbar')
  - "⋿": [t: "z ký hiệu thành viên túi"]             #  0x22ff   (en: 'z notation bag membership')
@@ -1521,9 +1521,9 @@
  - "▮": [t: "hình chữ nhật thẳng đứng màu đen"]     #  0x25ae   (en: 'black vertical rectangle')
  - "▯": [t: "hình chữ nhật thẳng đứng màu trắng"]   #  0x25af   (en: 'white vertical rectangle')
  - "▰": [t: "hình bình hành đen"]                   #  0x25b0   (en: 'black parallelogram')
- - "▱": [t: "hình bình hành trắng"]                 #  0x25b1   (en: 'white parallelogram')
+ - "▱": [t: "hình bình hành"]                 #  0x25b1   (en: 'white parallelogram')
  - "▲": [t: "màu đen lên tam giác"]                 #  0x25b2   (en: 'black up pointing triangle')
- - "△": [t: "trắng lên tam giác"]                   #  0x25b3   (en: 'white up pointing triangle')
+ - "△": [t: "tam giác"]                   #  0x25b3   (en: 'white up pointing triangle')
  - "▴": [t: "màu đen lên hình tam giác nhỏ"]        #  0x25b4   (en: 'black up pointing small triangle')
  - "▵": [t: "trắng lên hình tam giác nhỏ"]          #  0x25b5   (en: 'white up pointing small triangle')
  - "▶": [t: "triangle chân phải màu đen"]           #  0x25b6   (en: 'black right pointing triangle')
@@ -1715,7 +1715,7 @@
  - "⟇": [t: "hoặc với dấu chấm bên trong"]          #  0x27c7   (en: 'or with dot inside')
  - "⟈": [t: "đảo ngược solidus preeding tập hợp con"]   #  0x27c8   (en: 'reverse solidus preceeding subset')
  - "⟉": [t: "superset preceding solidus"]           #  0x27c9   (en: 'superset preceeding solidus')
- - "⟊": [t: "thanh dọc với đột quỵ ngang"]          #  0x27ca   (en: 'vertical bar with horizontal stroke')
+ - "⟊": [t: "thanh dọc với gạch ngang"]          #  0x27ca   (en: 'vertical bar with horizontal stroke')
  - "⟋": [t: "đường chéo tăng toán"]                 #  0x27cb   (en: 'mathematical rising diagonal')
  - "⟌": [t: "phân chia dài"]                        #  0x27cc   (en: 'long division')
  - "⟍": [t: "đường chéo giảm toán"]                 #  0x27cd   (en: 'mathematical falling diagonal')
@@ -1769,16 +1769,16 @@
  - "⟽": [t: "mũi tên đôi dài trái từ thanh"]        #  0x27fd   (en: 'long leftwards double arrow from bar')
  - "⟾": [t: "mũi tên dài gấp đôi từ thanh"]         #  0x27fe   (en: 'long rightwards double arrow from bar')
  - "⟿": [t: "mũi tên squiggle dài phải"]            #  0x27ff   (en: 'long rightwards squiggle arrow')
- - "⤀": [t: "phải hai mũi tên hai đầu với đột quỵ thẳng đứng"]  #  0x2900   (en: 'rightwards two headed arrow with vertical stroke')
- - "⤁": [t: "phải hai mũi tên hai đầu với đột quỵ thẳng đứng"]  #  0x2901   (en: 'rightwards two headed arrow with double vertical stroke')
- - "⤂": [t: "mũi tên đôi bên trái với đột quỵ dọc"] #  0x2902   (en: 'leftwards double arrow with vertical stroke')
- - "⤃": [t: "mũi tên kép phải với đột quỵ dọc"]     #  0x2903   (en: 'rightwards double arrow with vertical stroke')
- - "⤄": [t: "mũi tên kép bên trái với đột quỵ dọc"] #  0x2904   (en: 'left right double arrow with vertical stroke')
+ - "⤀": [t: "phải hai mũi tên hai đầu với gạch thẳng đứng"]  #  0x2900   (en: 'rightwards two headed arrow with vertical stroke')
+ - "⤁": [t: "phải hai mũi tên hai đầu với gạch thẳng đứng"]  #  0x2901   (en: 'rightwards two headed arrow with double vertical stroke')
+ - "⤂": [t: "mũi tên đôi bên trái với gạch dọc"] #  0x2902   (en: 'leftwards double arrow with vertical stroke')
+ - "⤃": [t: "mũi tên kép phải với gạch dọc"]     #  0x2903   (en: 'rightwards double arrow with vertical stroke')
+ - "⤄": [t: "mũi tên kép bên trái với gạch dọc"] #  0x2904   (en: 'left right double arrow with vertical stroke')
  - "⤅": [t: "phải hai mũi tên hai đầu từ thanh"]    #  0x2905   (en: 'rightwards two headed arrow from bar')
  - "⤆": [t: "mũi tên đôi bên trái từ thanh"]        #  0x2906   (en: 'leftwards double arrow from bar')
  - "⤇": [t: "mũi tên kép bên phải từ thanh"]        #  0x2907   (en: 'rightwards double arrow from bar')
- - "⤈": [t: "mũi tên xuống với đột quỵ ngang"]      #  0x2908   (en: 'downwards arrow with horizontal stroke')
- - "⤉": [t: "mũi tên hướng lên với đột quỵ ngang"]  #  0x2909   (en: 'upwards arrow with horizontal stroke')
+ - "⤈": [t: "mũi tên xuống với gạch ngang"]      #  0x2908   (en: 'downwards arrow with horizontal stroke')
+ - "⤉": [t: "mũi tên hướng lên với gạch ngang"]  #  0x2909   (en: 'upwards arrow with horizontal stroke')
  - "⤊": [t: "mũi tên tăng ba"]                      #  0x290a   (en: 'upwards triple arrow')
  - "⤋": [t: "mũi tên ba xuống xuống"]               #  0x290b   (en: 'downwards triple arrow')
  - "⤌": [t: "mũi tên double double bên trái"]       #  0x290c   (en: 'leftwards double dash arrow')
@@ -1789,11 +1789,11 @@
  - "⤑": [t: "mũi tên phải với thân chấm chấm"]      #  0x2911   (en: 'rightwards arrow with dotted stem')
  - "⤒": [t: "mũi tên hướng lên đến thanh"]          #  0x2912   (en: 'upwards arrow to bar')
  - "⤓": [t: "mũi tên xuống thanh"]                  #  0x2913   (en: 'downwards arrow to bar')
- - "⤔": [t: "mũi tên phải với đuôi và đột quỵ dọc"] #  0x2914   (en: 'rightwards arrow with tail and vertical stroke')
- - "⤕": [t: "mũi tên phải với đuôi và đột quỵ dọc"] #  0x2915   (en: 'rightwards arrow with tail and double vertical stroke')
+ - "⤔": [t: "mũi tên phải với đuôi và gạch dọc"] #  0x2914   (en: 'rightwards arrow with tail and vertical stroke')
+ - "⤕": [t: "mũi tên phải với đuôi và gạch dọc"] #  0x2915   (en: 'rightwards arrow with tail and double vertical stroke')
  - "⤖": [t: "phải hai mũi tên hai đầu với đuôi"]    #  0x2916   (en: 'rightwards two headed arrow with tail')
- - "⤗": [t: "phải hai mũi tên hai đầu với đuôi với đột quỵ thẳng đứng"] #  0x2917   (en: 'rightwards two headed arrow with tail with vertical stroke')
- - "⤘": [t: "phải hai mũi tên hai đầu với đuôi với đột quỵ thẳng đứng"] #  0x2918   (en: 'rightwards two headed arrow with tail with double vertical stroke')
+ - "⤗": [t: "phải hai mũi tên hai đầu với đuôi với gạch thẳng đứng"] #  0x2917   (en: 'rightwards two headed arrow with tail with vertical stroke')
+ - "⤘": [t: "phải hai mũi tên hai đầu với đuôi với gạch thẳng đứng"] #  0x2918   (en: 'rightwards two headed arrow with tail with double vertical stroke')
  - "⤙": [t: "đuôi mũi tên trái"]                    #  0x2919   (en: 'leftwards arrow tail')
  - "⤚": [t: "đuôi mũi tên phải"]                    #  0x291a   (en: 'rightwards arrow tail')
  - "⤛": [t: "đuôi hai mũi tên trái"]                #  0x291b   (en: 'leftwards double arrow tail')
@@ -2014,9 +2014,9 @@
  - "⧲": [t: "vòng tròn trắng lỗi"]                  #  0x29f2   (en: 'error-barred white circle')
  - "⧳": [t: "vòng tròn đen lỗi"]                    #  0x29f3   (en: 'error-barred black circle')
  - "⧴": [t: "sự triệt tiêu quy tắc"]                #  0x29f4   (en: 'rule-delayed')
- - "⧵": [t: "đảo ngược vận hành solidus"]           #  0x29f5   (en: 'reverse solidus operator')
+ - "⧵": [t: "hiệu"]           #  0x29f5   (en: 'reverse solidus operator')
  - "⧶": [t: "solidus với overbar"]                  #  0x29f6   (en: 'solidus with overbar')
- - "⧷": [t: "đảo ngược solidus với đột quỵ ngang"]  #  0x29f7   (en: 'reverse solidus with horizontal stroke')
+ - "⧷": [t: "đảo ngược solidus với gạch ngang"]  #  0x29f7   (en: 'reverse solidus with horizontal stroke')
  - "⧸": [t: "solidus lớn"]                          #  0x29f8   (en: 'big solidus')
  - "⧹": [t: "solidus đảo ngược lớn"]                #  0x29f9   (en: 'big reverse solidus')
  - "⧺": [t: "double plus"]                          #  0x29fa
@@ -2039,7 +2039,7 @@
  - "⨋": [t: "tổng hợp với tích phân"]               #  0x2a0b   (en: 'summation with integral')
  - "⨌": [t: "toán tử tích phân tứ giác"]            #  0x2a0c   (en: 'quadruple integral operator')
  - "⨍": [t: "tích hợp phần hữu hạn"]                #  0x2a0d   (en: 'finite part integral')
- - "⨎": [t: "tích hợp với đột quỵ đôi"]             #  0x2a0e   (en: 'integral with double stroke')
+ - "⨎": [t: "tích hợp với gạch đôi"]             #  0x2a0e   (en: 'integral with double stroke')
  - "⨏": [t: "tích hợp trung bình với chém"]         #  0x2a0f   (en: 'integral average with slash')
  - "⨐": [t: "chức năng lưu thông"]                  #  0x2a10   (en: 'circulation function')
  - "⨑": [t: "tích hợp ngược chiều kim đồng hồ"]     #  0x2a11   (en: 'anticlockwise integration')
@@ -2129,7 +2129,7 @@
  - "⩥": [t: "z ký hiệu phạm vi chống trọng yếu"]    #  0x2a65   (en: 'z notation range antirestriction')
  - "⩦": [t: "bằng dấu hiệu với dấu chấm dưới đây"]  #  0x2a66   (en: 'equals sign with dot below')
  - "⩧": [t: "giống hệt với dấu chấm trên"]          #  0x2a67   (en: 'identical with dot above')
- - "⩨": [t: "thanh ba ngang với đột quỵ dọc"]       #  0x2a68   (en: 'triple horizontal bar with double vertical stroke')
+ - "⩨": [t: "thanh ba ngang với gạch dọc"]       #  0x2a68   (en: 'triple horizontal bar with double vertical stroke')
  - "⩩": [t: "thanh ba ngang với cú đánh thẳng đứng ba"] #  0x2a69   (en: 'triple horizontal bar with triple vertical stroke')
  - "⩪": [t: "toán tử tilde với dấu chấm ở trên"]    #  0x2a6a   (en: 'tilde operator with dot above')
  - "⩫": [t: "nhà điều hành tilde với các chấm tăng"]    #  0x2a6b   (en: 'tilde operator with rising dots')
@@ -2262,15 +2262,15 @@
  - "⫪": [t: "nhân đôi tack xuống"]                  #  0x2aea   (en: 'double down tack')
  - "⫫": [t: "nhân đôi tack"]                        #  0x2aeb   (en: 'double up tack')
  - "⫬": [t: "cú đánh đôi không ký"]                 #  0x2aec   (en: 'double stroke not sign')
- - "⫭": [t: "đảo ngược đột quỵ đôi không ký"]       #  0x2aed   (en: 'reversed double stroke not sign')
+ - "⫭": [t: "đảo ngược gạch đôi không ký"]       #  0x2aed   (en: 'reversed double stroke not sign')
  - "⫮": [t: "không phân chia với sự phủ định đảo ngược"]    #  0x2aee   (en: 'does not divide with reversed negation slash')
  - "⫯": [t: "đường thẳng đứng với vòng tròn ở trên"]    #  0x2aef   (en: 'vertical line with circle above')
  - "⫰": [t: "đường thẳng đứng với vòng tròn dưới đây"]  #  0x2af0   (en: 'vertical line with circle below')
  - "⫱": [t: "xuống tack với vòng tròn bên dưới"]    #  0x2af1   (en: 'down tack with circle below')
- - "⫲": [t: "song song với đột quỵ ngang"]          #  0x2af2   (en: 'parallel with horizontal stroke')
+ - "⫲": [t: "song song với gạch ngang"]          #  0x2af2   (en: 'parallel with horizontal stroke')
  - "⫳": [t: "song song với toán tử tilde"]          #  0x2af3   (en: 'parallel with tilde operator')
  - "⫴": [t: "triple dọc quan hệ nhị phân thanh dọc"]    #  0x2af4   (en: 'triple vertical bar binary relation')
- - "⫵": [t: "thanh ba dọc với đột quỵ ngang"]       #  0x2af5   (en: 'triple vertical bar with horizontal stroke')
+ - "⫵": [t: "thanh ba dọc với gạch ngang"]       #  0x2af5   (en: 'triple vertical bar with horizontal stroke')
  - "⫶": [t: "triple colon toán tử"]                 #  0x2af6   (en: 'triple colon operator')
  - "⫷": [t: "triple lồng ít hơn"]                   #  0x2af7   (en: 'triple nested less than')
  - "⫸": [t: "triple lồng nhau lớn hơn"]             #  0x2af8   (en: 'triple nested greater than')
@@ -2333,16 +2333,16 @@
  - "⬱": [t: "ba mũi tên trái"]                      #  0x2b31   (en: 'three leftwards arrows')
  - "⬲": [t: "mũi tên trái với circled plus"]        #  0x2b32   (en: 'left arrow with circled plus')
  - "⬳": [t: "mũi tên vỗ tay dài sang trái"]         #  0x2b33   (en: 'long leftwards squiggle arrow')
- - "⬴": [t: "bên trái hai mũi tên đầu với đột quỵ thẳng đứng"]  #  0x2b34   (en: 'leftwards two headed arrow with vertical stroke')
- - "⬵": [t: "lettwards hai mũi tên đầu với đột quỵ dọc"]    #  0x2b35   (en: 'lettwards two headed arrow with double vertical stroke')
+ - "⬴": [t: "bên trái hai mũi tên đầu với gạch thẳng đứng"]  #  0x2b34   (en: 'leftwards two headed arrow with vertical stroke')
+ - "⬵": [t: "lettwards hai mũi tên đầu với gạch dọc"]    #  0x2b35   (en: 'lettwards two headed arrow with double vertical stroke')
  - "⬶": [t: "bên trái hai mũi tên đầu từ thanh"]    #  0x2b36   (en: 'leftwards two headed arrow from bar')
  - "⬷": [t: "bên trái hai mũi tên ba đầu"]          #  0x2b37   (en: 'leftwards two headed triple dash arrow')
  - "⬸": [t: "mũi tên trái với thân chấm chấm"]      #  0x2b38   (en: 'leftwards arrow with dotted stem')
- - "⬹": [t: "mũi tên trái với đuôi với đột quỵ dọc"]    #  0x2b39   (en: 'leftwards arrow with tail with vertical stroke')
- - "⬺": [t: "mũi tên trái với đuôi với đột quỵ dọc"]    #  0x2b3a   (en: 'leftwards arrow with tail with double vertical stroke')
+ - "⬹": [t: "mũi tên trái với đuôi với gạch dọc"]    #  0x2b39   (en: 'leftwards arrow with tail with vertical stroke')
+ - "⬺": [t: "mũi tên trái với đuôi với gạch dọc"]    #  0x2b3a   (en: 'leftwards arrow with tail with double vertical stroke')
  - "⬻": [t: "bên trái hai mũi tên đầu với đuôi"]    #  0x2b3b   (en: 'leftwards two headed arrow with tail')
- - "⬼": [t: "bên trái hai mũi tên đầu với đuôi với đột quỵ thẳng đứng"] #  0x2b3c   (en: 'leftwards two headed arrow with tail with vertical stroke')
- - "⬽": [t: "bên trái hai mũi tên đầu với đuôi với đột quỵ thẳng đứng"] #  0x2b3d   (en: 'leftwards two headed arrow with tail with double vertical stroke')
+ - "⬼": [t: "bên trái hai mũi tên đầu với đuôi với gạch thẳng đứng"] #  0x2b3c   (en: 'leftwards two headed arrow with tail with vertical stroke')
+ - "⬽": [t: "bên trái hai mũi tên đầu với đuôi với gạch thẳng đứng"] #  0x2b3d   (en: 'leftwards two headed arrow with tail with double vertical stroke')
  - "⬾": [t: "mũi tên trái qua x"]                   #  0x2b3e   (en: 'leftwards arrow through x')
  - "⬿": [t: "mũi tên sóng hướng trực tiếp bên trái"]    #  0x2b3f   (en: 'wave arrow pointing directly left')
  - "⭀": [t: "bằng dấu hiệu phía trên mũi tên trái"] #  0x2b40   (en: 'equals sign above leftwards arrow')
@@ -2870,9 +2870,9 @@
  - "": [t: "điểm nhấn mũi tên lớn bên trái"]       #  0xeb0c   (en: 'large leftwards arrow accent')
  - "": [t: "đầu mũi tên trái"]                     #  0xeb0d   (en: 'leftwards arrowhead')
  - "": [t: "đầu mũi tên phải"]                     #  0xeb0e   (en: 'rightwards arrowhead')
- - "": [t: "mũi tên lớn bên trái với đột quỵ"]     #  0xeb0f   (en: 'large left right arrow with stroke')
+ - "": [t: "mũi tên lớn bên trái với gạch"]     #  0xeb0f   (en: 'large left right arrow with stroke')
  - "": [t: "bộ mở rộng mũi tên kép ngang"]         #  0xeb10   (en: 'horizontal double arrow extender')
- - "": [t: "mũi tên đôi bên trái lớn bên trái với đột quỵ"]    #  0xeb11   (en: 'large left right double arrow with stroke')
+ - "": [t: "mũi tên đôi bên trái lớn bên trái với gạch"]    #  0xeb11   (en: 'large left right double arrow with stroke')
  - "": [t: "mũi tên xuống bên trái của mũi tên hướng lên"] #  0xeb12   (en: 'downwards arrow leftwards of upwards arrow')
  - "⇵": [t: "mũi tên xuống bên trái của mũi tên hướng lên"] #  0x21f5   (en: 'downwards arrow leftwards of upwards arrow')
  - "": [t: "mũi tên trái với góc xuống"]           #  0xeb13   (en: 'leftwards arrow with corner downwards')
@@ -2882,7 +2882,7 @@
  - "⤽": [t: "mũi tên bán nguyệt trên cùng theo chiều kim đồng hồ với plus"] #  0x293d   (en: 'anticlockwise top semicircle arrow with plus')
  - "": [t: "mũi tên bán nguyệt trên cùng theo chiều kim đồng hồ với điểm trừ"] #  0xeb17   (en: 'clockwise top semicircle arrow with minus')
  - "⤼": [t: "mũi tên bán nguyệt trên cùng theo chiều kim đồng hồ với điểm trừ"] #  0x293c   (en: 'clockwise top semicircle arrow with minus')
- - "": [t: "mũi tên bên phải với đuôi với đột quỵ"]    #  0xeb18   (en: 'rightwards arrow with tail with stroke')
+ - "": [t: "mũi tên bên phải với đuôi với gạch"]    #  0xeb18   (en: 'rightwards arrow with tail with stroke')
  - "": [t: "harpoon phải xuống"]                   #  0xeb19   (en: 'right harpoon down')
  - "": [t: "rời harpoon xuống"]                    #  0xeb1a   (en: 'left harpoon down')
  - "": [t: "bên trái harpoon xuống"]               #  0xeb1b   (en: 'left right harpoon down')
@@ -3316,7 +3316,7 @@
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        replace: [t: "o với đột quỵ"]               #   (en: 'o with stroke')
+        replace: [t: "o với gạch"]               #   (en: 'o with stroke')
 
  # MathType only has a few of the cap Greek letters in PUA
  - "":                                     #  0xf201 - 0xf209

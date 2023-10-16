@@ -7,7 +7,7 @@ In NVDA, you have a choice of using different synthesizers. This is found in NVD
 MathCAT supports a number of options to control speech, braille, and navigation. These are described below.
 Not all options are currently supported. The current state of support for an option is listed with the option and a ✓ is used before the option as a quick reference to indicate at least partial support for that option.
 
-Note: in NVDA, the options can be set by using the MathCAT preferences dialog. This is accessed by going to the NVDA preferences, choosing "Tools", and then "MathCAT settings...". The settings are divided into three categories: Speech, Navigation, and Braille. This division is reflected in the documentation below.
+Note: in NVDA, the options can be set by using the MathCAT preferences dialog. This is accessed by going to the NVDA preferences, choosing "Preferences", and then "MathCAT settings...". The settings are divided into three categories: Speech, Navigation, and Braille. This division is reflected in the documentation below.
 
 MathCAT supports multiple modes of navigation. The means to begin navigating and end navigating will differ depending on the AT you are using. See the list below. The commands/key-strokes accepted by MathCAT are the same as those accepted by MathPlayer and are [listed in this document](nav-commands.md).
 The documentation describes many useful ways to navigate math. For those who just want to get started:
@@ -44,7 +44,7 @@ The default value is given in \[brackets\].
 * ✓SpeechStyle: [ClearSpeak]
   * Options:  Any implemented speech style (currently only ClearSpeak and SimpleSpeak)
   * Description: a style of speech speech or coordinated philosophy about how to speak an expression.
-    * ClearSpeak with developed by ETS for use on high stake tests such as the SAT.
+    * ClearSpeak with developed by ETS for use on high stake tests such as the SAT. The [ClearSpeak spec details are in this Word document](ClearSpeakRulesAndPreferences.docx).
     * SimpleSpeak tries to minimize speech by speaking simple expressions such as $\frac{a}{b}$ quickly without bracketing words ("a over b"); these are distinguished from more complex expressions such as $\frac{a}{b+1}$ which will always have bracketing words ("fraction a over b plus 1 end fraction"). Expressions are never unambiguous in SimpleSpeak.
   * Status: currently only ClearSpeak and SimpleSpeak are implemented, but MathSpeak will likely be implemented at some point.
 
@@ -129,8 +129,24 @@ ClearSpeak has a number of options. These were designed for authors to use, but 
 * ✓Code: [Nemeth]
   * Options: Any implemented braille code
   * Description: the braille math code to use
-  * Status: currently only Nemeth and UEB are supported. Other braille code support will depend upon help from others.
+  * Status: currently only Nemeth, UEB, and Vietnam are supported. Other braille code support will depend upon help from others.
 * ✓BrailleNavHighlight: [EndPoints]
   * Options: Off, FirstChar, EndPoints, All
   * Description:  highlight with dots 7 & 8 the currently selected navigation node
+* UEB:
+  * ✓START_MODE: [Grade2] 
+    * Options: Grade1, Grade2
+    * Description: assumed starting mode UEB braille (Grade1 assumes we are in G1 passage mode)
+  
+Braille codes often have author-definable characters. MathCAT provides some options:
 
+The [UEB Guide to Technical Material](https://iceb.org/Guidelines_for_Technical_Material_2008-10.pdf) says to normally treat Fraktur and DoubleStruck as Script.
+Here we provide an option to specify a transcriber-defined typeform prefix indicator instead.
+Note: here are prefixes for 1st - 5th: "⠈⠼", "⠘⠼", "⠸⠼", "⠐⠼", "⠨⠼"
+* UEB:
+  *  ✓DoubleStruck: "⠈"     [script]
+  *  ✓Fraktur:      "⠈"     [script]
+  *  ✓SansSerif:    "⠈⠼"    [first transcriber-defined typeform prefix indicator]
+  *  ✓GreekVariant: "⠨"     [default to Greek]
+
+The characters for Vietnam that are definable is still be discussed. Likely, they will be similar to those for UEB.

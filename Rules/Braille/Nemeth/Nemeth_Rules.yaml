@@ -180,9 +180,9 @@
   match:
      - "( IsBracketed(., '', '|') or IsBracketed(., '', '‖') or IsBracketed(., '', '⦀') ) and " # ends with single, double, or triple vertical bar
      - "following-sibling::*[1][self::m:mo and text()='\u2062'] and"
-     - "(  IsBracketed(following-sibling::*[2], '|', '') or " # starts with ... vertical bar
-     - "   IsBracketed(following-sibling::*[2], '‖', '') or "
-     - "   IsBracketed(following-sibling::*[2], '⦀', '')  "
+     - "(  following-sibling::*[2][IsBracketed(., '|', '')] or " # starts with ... vertical bar
+     - "   following-sibling::*[2][IsBracketed(., '‖', '')] or "
+     - "   following-sibling::*[2][IsBracketed(., '⦀', '')] "
      - ")"
   replace:
      - x: "*"
@@ -293,8 +293,7 @@
   - x: "text()"
 
 - name: default
-  tag:
-     mo
+  tag: mo
      # add spaces around comparison operators,
      # but if "modified", they are moved outside of munder, etc, and handled by those rules
      # need to insert multipurpose indicators between comparison chars in multi-char mo
@@ -304,7 +303,7 @@
   replace:
   - test:
       if: "parent::*[self::m:mrow] and not(@data-chemical-bond) and
-           (IsInDefinition(substring(., 1, 1), 'NemethComparisonOperators') or text()='∶')"  # "ratio" also gets spaced"
+           IsInDefinition(substring(., 1, 1), 'NemethComparisonOperators')"
       then:
           - test:   # Spacing and NemethPunctAndOpenBeforeSymbols test is Rule 151, NemethComparisonOperators test is Rule 149 
               if: "not( preceding-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols')] )"
@@ -346,14 +345,14 @@
   - test:  # NemethPunctAndOpenAfterSymbols test is Rule 151, NemethComparisonOperators test is Rule 149 
            # tilde test is a guess as to what is right -- all tildes and in a prefix location, don't treat as comparison operator
       if: "parent::*[self::m:mrow] and not(@data-chemical-bond) and
-           (IsInDefinition(substring(., string-length(.), 1), 'NemethComparisonOperators') or text()='∶') and
+           IsInDefinition(substring(., string-length(.), 1), 'NemethComparisonOperators') and
            not( translate(., '∼', '')='' and not(preceding-sibling::*) ) and
            not( following-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols')] )"
       then: [t: "w"]
 
 - name: remove-space
   tag: mtext
-  match: "text()='\u00A0'"
+  match: "translate(., '\u00A0', '')=''"
   replace:
      - t: "" # do nothing -- Nemeth ignores spaces
 - name: default

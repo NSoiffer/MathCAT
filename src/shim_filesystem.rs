@@ -129,13 +129,14 @@ cfg_if! {
             // file_name should be path name starting at Rules dir: e.g, "Rules/en/navigate.yaml"
             OVERRIDE_FILE_NAME.with(|name| *name.borrow_mut() = file_name.to_string().replace("/", "\\"));
             OVERRIDE_FILE_CONTENTS.with(|contents| *contents.borrow_mut() = file_contents.to_string());
-            crate::speech::NAVIGATION_RULES.with(|nav_rules|
-                nav_rules.borrow_mut().invalidate(
-                    crate::prefs::FilesChanged{
-                        speech_rules: true, speech_unicode_short: false, speech_unicode_full: false, 
-                        braille_rules: true, braille_unicode_short: false, braille_unicode_full: false, 
-                        intent: false, defs: false }
-            ));
+            crate::speech::SpeechRules::invalidate(
+                crate::prefs::FilesChanged {
+                    speech_rules: true, speech_unicode_short: true, speech_unicode_full: true, 
+                    braille_rules: true, braille_unicode_short: true, braille_unicode_full: true, 
+                    navigate_rules: true, overview_rules: true,
+                    intent: true, defs: true
+                }
+            )
         }
 
         use sxd_document::parser;

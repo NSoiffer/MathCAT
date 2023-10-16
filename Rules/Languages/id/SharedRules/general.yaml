@@ -233,7 +233,7 @@
 
 - name: largeop
   tag: mrow
-  match: "count(*)=2 and IsLargeOp(*[1])"
+  match: "count(*)=2 and IsInDefinition(*[1], 'LargeOperators')"
   replace:
   - test:
       if: "$Verbosity!='Terse'"
@@ -466,7 +466,7 @@
 
 - name: multi-line
   #   that eliminates the need for the if: else_if: ...
-  # IDEA:  set a variable with the word to saw for the row (e.g., RowLabel = Row/Case/Line/...)
+  # IDEA:  set a variable with the word to say for the row (e.g., RowLabel = Row/Case/Line/...)
   tag: [cases, equations, lines]
   match: "."
   replace:
@@ -932,18 +932,18 @@
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
   - test:
-    - if: "text()='→' or text()='⟶'"
+    - if: ".='→' or .='⟶'"
       then_test:
         if: "name(preceding-sibling::*[1]) = 'chemical-nuclide'"
         then: [{T: "membusuk menjadi"}]
         else: [{T: "hasil"}]
-    - else_if: "text()='⇌' or text()='⮖'"
+    - else_if: ".='⇌' or .='⮖'"
       then: [{T: "berada dalam kesetimbangan dengan"}]
-    - else_if: "text()='⭴'"
+    - else_if: ".='⭴'"
       then: [{T: "berada dalam kesetimbangan bias ke kiri dengan"}]
-    - else_if: "text()='⭵'"
+    - else_if: ".='⭵'"
       then: [{T: "berada dalam kesetimbangan bias ke kanan dengan"}]
-      else: [{x: text()}]
+      else: [{x: .}]
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator
@@ -958,3 +958,9 @@
   match: "../../*[self::m:chemical-formula or self::m:chemical-nuclide]"
   replace:
   - T: "" # don't say anything
+
+- name: ignore-intent-wrapper
+  tag: intent-wrapper
+  match: "."
+  replace:
+  - x: "*"

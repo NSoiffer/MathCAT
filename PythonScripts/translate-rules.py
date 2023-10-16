@@ -1,3 +1,11 @@
+"""
+Translate the English rule files (but not the unicode files) to the target language.
+This is done with the function build_all_translations().
+
+The unicode files are not built here because they are large enough to seem to occasionally run into hiccups.
+
+See the end of this file how this is used (typically change 'language' and just run the file)
+"""
 # Translate text in rules into the target language
 
 # The google translate is done via https://github.com/ffreemt/google-stranslate (pip install itranslate)
@@ -19,14 +27,14 @@ GoogleTranslate = Translator(service_urls=["translate.google.us"])
 # 3. Reread the file replacing translations (we know the line number) and writing it out
 
 import re
-TextToTranslate = re.compile(r'phrase\(([^)]+)\)')
+PhraseToTranslate = re.compile(r'phrase\(([^)]+)\)')
 
 # run over the file and figure out what words need to be translated
 def collect_phrases_to_translate(file_to_translate: str) -> list[str]:
     with open(file_to_translate, 'r', encoding='utf8') as in_stream:
         translations = []
         for line in in_stream:
-            phrase = TextToTranslate.search(line)
+            phrase = PhraseToTranslate.search(line)
             if phrase:
                 translations.append(phrase.group(1))
         return translations
@@ -83,16 +91,16 @@ def translate_phrases(phrases_to_translate: list[str], lang) -> list[str]:
 TargetWord = re.compile(r"'([^']+)'")
 TextString = re.compile(r't: "([^"]+)"')
 def substitute_in_translated_word(line, translated_phrase) -> str:
-    print("original phrase:   {}".format(TextToTranslate.search(line).group(1)))
-    print("translated phrase: {}".format(translated_phrase))
+    # print("original phrase:   {}".format(TextToTranslate.search(line).group(1)))
+    # print("translated phrase: {}".format(translated_phrase))
     target_words = TargetWord.search(translated_phrase)
     new_line = line
     if target_words:
         replacement = 't: "' + target_words.group(1) + '"'    # add the surrounding context back
         new_line = TextString.sub(replacement, line)
-        print("fixed line: {}".format(new_line))
+        # print("fixed line: {}".format(new_line))
     else:
-        print("ERROR: failed to find 'xxx' in line: {}".format(line))
+        print("ERROR: failed to find quoted part in translation \"{}\"\n   original line: {}".format(translated_phrase, line))
     return new_line
 
 
@@ -106,7 +114,7 @@ def create_new_file(file_to_translate: str, output_file: str, translations: list
         with open(output_file, 'w', encoding='utf8') as out_stream:
             iTranslation = 0
             for line in in_stream:
-                if TextToTranslate.search(line):
+                if PhraseToTranslate.search(line):
                     out_stream.write(substitute_in_translated_word(line, translations[iTranslation]))
                     iTranslation += 1
                 else:
@@ -131,12 +139,10 @@ def build_all_translations(path_to_mathcat: str, lang: str, subdir="") -> None:
 
 
 
-# if os.path.exists("unicode.yaml"):
-#   os.remove("unicode.yaml")
-language = 'es'
+language = 'pt'
 if not os.path.exists(language):
     os.makedirs(language)
 if not os.path.exists(language+"/SharedRules"):
     os.makedirs(language+"/SharedRules")
 # build_new_translation("..", language, "SharedRules/general.yaml")
-build_all_translations("..", "es")
+build_all_translations("..", language)

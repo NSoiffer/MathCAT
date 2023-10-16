@@ -1566,22 +1566,15 @@
   # --- Nemeth Default Characters math_geometry chars. ---
  - "─": [t: "⠱"]                # 0x2500
  - "│": [t: "⠳"]                # 0x2502
- - "■": [t: "⠫⠸⠲"]              # 0x25a0
- - "□": [t: "⠫⠲"]               # 0x25a1
  - "▫": [t: "⠫⠸⠗"]              # 0x25ab
  - "▰": [t: "⠫⠸⠛"]              # 0x25b0
  - "▱": [t: "⠫⠛"]               # 0x25b1
- - "▲": [t: "⠫⠸⠞"]              # 0x25b2
- - "△": [t: "⠫⠞"]               # 0x25b3
- - "▼": [t: "⠸⠨⠫"]              # 0x25bc
  - "▽": [t: "⠨⠫"]               # 0x25bd
  - "◆": [t: "⠫⠸⠙"]              # 0x25c6
  - "◇": [t: "⠫⠙"]               # 0x25c7
  - "◈": [t: "⠫⠸⠙"]              # 0x25c8
  - "◉": [t: "⠫⠸⠉"]              # 0x25c9
  - "◊": [t: "⠫⠙"]               # 0x25ca
- - "○": [t: "⠫⠉"]               # 0x25cb
- - "●": [t: "⠫⠸⠉"]              # 0x25cf
  - "⬟": [t: "⠫⠸⠢"]              # 0x2b1f
  - "⬠": [t: "⠫⠢"]               # 0x2b20
  - "⬡": [t: "⠫⠖"]               # 0x2b21
@@ -1616,14 +1609,10 @@
  - "ª": [t: "⠸⠰⠁"]              # 0xaa
  - "«": [t: "⠐⠅⠈⠐⠅⠻"]           # 0xab
  - "®": [t: "⠘⠗"]               # 0xae
- - "¯": [t: "⠱"]                # 0xaf
- - "±": [t: "⠬⠤"]               # 0xb1
  - "´": [t: "⠈"]                # 0xb4
  - "µ": [t: "⠨⠍"]               # 0xb5
  - "¶": [t: "⠈⠠⠏"]              # 0xb6
- - "·": [t: "⠡"]                # 0xb7
  - "¿": [t: "⠦"]                # 0xbf
- - "×": [t: "⠈⠡"]               # 0xd7
  - "ʹ": [t: "⠄"]                # 0x2b9
  - "ʺ": [t: "⠄⠄"]               # 0x2ba
  - "˙": [t: "⠡"]                # 0x2d9
@@ -1762,8 +1751,6 @@
  - "⋁": [t: "⠈⠬"]               # 0x22c1
  - "⋂": [t: "⠨⠩"]               # 0x22c2
  - "⋃": [t: "⠨⠬"]               # 0x22c3
- - "⋅": [t: "⠡"]                # 0x22c5
- - "∙": [t: "⠡"]                # 0x2219   -- similar looking to 0x22c5, so using the same braille
  - "⋜": [t: "⠱⠐⠅"]              # 0x22dc
  - "⋝": [t: "⠱⠨⠂"]              # 0x22dd
  - "⟂": [t: "⠫⠏"]               # 0x27c2
@@ -1953,10 +1940,6 @@
  - "]": [t: "⠈⠾"]               # 0x5d
  - "{": [t: "⠨⠷"]               # 0x7b
  - "}": [t: "⠨⠾"]               # 0x7d
- - "⌈": [t: "⠈⠘⠷"]              # 0x2308
- - "⌉": [t: "⠈⠘⠾"]              # 0x2309
- - "⌊": [t: "⠈⠰⠷"]              # 0x230a
- - "⌋": [t: "⠈⠰⠾"]              # 0x230b
  - "⌜": [t: "⠈⠘⠷"]              # 0x231c
  - "⌝": [t: "⠈⠘⠾"]              # 0x231d
  - "⌞": [t: "⠈⠰⠷"]              # 0x231e
@@ -1967,14 +1950,8 @@
  - "⏟": [t: "⠨⠾"]              # 0x23df
  - "⎴": [t: "⠈⠷"]              # 0x23b4
  - "⎵": [t: "⠈⠾"]              # 0x23b5
- - "⟦": [t: "⠈⠸⠷"]              # 0x27e6
- - "⟧": [t: "⠈⠸⠾"]              # 0x27e7
- - "⟨": [t: "⠨⠨⠷"]              # 0x27e8
- - "⟩": [t: "⠨⠨⠾"]              # 0x27e9
  - "⟪": [t: "⠨⠨⠨⠷"]             # 0x27ea
  - "⟫": [t: "⠨⠨⠨⠾"]             # 0x27eb
- - "⦃": [t: "⠨⠸⠷"]              # 0x2983
- - "⦄": [t: "⠨⠸⠾"]              # 0x2984
  - "〈": [t: "⠨⠨⠷"]              # 0x3008
  - "〉": [t: "⠨⠨⠾"]              # 0x3009
  - "《": [t: "⠨⠨⠨⠷"]             # 0x300a
@@ -2044,70 +2021,7 @@
  - "㉏": [t: "⠫⠸⠲⠸⠫⠫⠉⠸⠫⠼⠦⠴⠻⠻"]   # 0x324f
 
 
-
-
- # overwrites from MS
- - "#": [t: "⠨⠼"]               # 0x23 (Number sign)
- - "$": [t: "⠈⠎"]               # 0x24 (Dollar sign)
- - "%": [t: "⠈⠴"]               # 0x25 (Percent sign)
- - "&": [t: "⠸⠯"]               # 0x26 (Ampersand)
- - "'": [t: "P⠄"]                # 0x27 (Apostrophe)
- - "(": [t: "⠷"]                # 0x28 (Left parenthesis)
- - ")": [t: "⠾"]                # 0x29 (Right parenthesis)
- - "*": [t: "⠈⠼"]               # 0x002A (Asterisk)
- - "+": [t: "⠬"]                # 0x002B (Plus sign)
- - ".":                          # 0x002E (Full stop or decimal pt)
-      # '.' is particularly tricky because we need to know if it is really numeric or not.
-      # if it is numeric, it might be a on it's own or part of a number.
-      # normally, it is merged with the digits if part of a number, but if the adjacent digit(s) are modified
-      #  by something (e.g., a bar over the digit to signify that it repeats), then it is really part of the number
-      # If it is the last part of the expr, then it is punctuation (for typographic reasons, punctuation is often included in the math)
-    - test:
-        if: "self::m:mn or (self::m:mo and following-sibling::*)"
-        then_test:
-          if: "string-length(text()) = 1 and not(
-                  following-sibling::*[1][BaseNode(.)[self::m:mn]] or
-                  following-sibling::*[1][self::m:menclose and @notation='top' and *[1][self::m:mn]]
-              )"
-          then: [t: "𝑁⠨"]      # example 8c(4) -- lone "." is not considered numeric, but not a period
-          else: [t: "N⠨"]
-        else: [t: "P⠲"]         # period
- - "/": [t: "⠸⠌"]               # 0x002F (Solidus)
- - ":":                         # 0x003A (Colon)
-        # sometimes a colon is meant to be a ratio
-        # this test is based on what SRE does -- if the "roles" are the same, it guesses "ratio"
-        # MathCAT doesn't have roles, so we do a hack that looks checks mrows if not atomic.
-        # If an mrow, guess it is infix and checks the operator. This is pretty weak!
-        # Need to rule out field extensions "[K:F]" and trilinear coordinates "a:b:c" as they use the punctuation form
-    - test:
-        if: "not(IsBracketed(ancestor::*[2], '[', ']')) and
-             not( preceding-sibling::*[2][text()=':'] or following-sibling::*[2][text()=':']) and 
-             name(preceding-sibling::*[1]) = name(following-sibling::*[1]) and
-             ( name(preceding-sibling::*[1]) != 'mrow' or
-               (preceding-sibling::*[1]/*[2][text()] = following-sibling::*[1]/*[2][text()]) )"
-        then: [t: "W⠐⠂W"]
-        else: [t: "P⠒W"]
- - "<": [t: "⠐⠅"]             # 0x003C (Less-than sign)
- - "=": [t: "⠨⠅"]             # 0x003D (Equals sign)
- - ">": [t: "⠨⠂"]             # 0x003E (Greater-than sign)
- - "@": [t: "⠈⠁"]               # 0x40 (Commercial at)
- - "[": [t: "⠈⠷"]               # 0x005B (Left square bracket)
- - "\\": [t: "⠸⠡"]              # 0x005C (Reverse solidus)
- - "]": [t: "⠈⠾"]               # 0x005D (Right square bracket)
- - "^": [t: "⠸⠣"]               # 0x005E (Circumflex accent)
- - "{": [t: "⠨⠷"]               # 0x007B (Left curly bracket)
- - "}": [t: "⠨⠾"]               # 0x007D (Right curly bracket)
- - "~": [t: "⠈⠱"]               # 0x007E (Tilde)
- - "¢": [t: "⠈⠉"]               # 0x00A2 (Cent sign)
- - "£": [t: "⠈⠇"]               # 0x00A3 (Pound sterling)
- - "§": [t: "⠈⠠⠎"]              # 0x00A7 (Section sign)
  - "¬": [t: ""]                 # 0x00AC (Not sign)
- - "¯": [t: "⠱"]                # 0x00AF (bar)
- - "±": [t: "⠬⠤"]               # 0x00B1 (Plus-minus sign)
- - "¶": [t: "⠈⠠⠏"]              # 0x00B6 (Pilcrow sign)
- - "·": [t: "⠡"]                # 0x00B7 (Middle dot)
- - "×": [t: "⠈⠡"]               # 0x00D7 (Multiplication sign)
- - "÷": [t: "⠨⠌"]               # 0x00F7 (Division sign)
 
 
 # rule 43b about spaces (references rule 42)
@@ -2124,7 +2038,6 @@
 #  - "ⅇ": [t: ""]                 # 0x2147 (Double-struck italic small e)
 #  - "⇚": [t: "⠀⠫⠪⠸⠸⠀"]           # 0x21DA (Leftwards triple arrow)
 #  - "⇛": [t: "⠀⠫⠸⠸⠕⠀"]           # 0x21DB (Rightwards triple arrow)
- - "∂": [t: "⠈⠙"]               # 0x2202 (Partial differential)
  - "∔": [t: "⠐⠬⠣⠡⠻"]            # 0x2214 (Dot plus)
  - "√": [t: "⠜"]                # 0x221A (Square root)
  - "∛": [t: "⠣⠒⠜"]              # 0x221B (Cube root)
@@ -2172,6 +2085,7 @@
 #  - "⊾": [t: ""]                 # 0x22BE (Right angle w arc)
  - "⊿": [t: "⠫⠞⠨⠗⠻"]            # 0x22BF (Right triangle)
  - "⋅": [t: "⠡"]                # 0x22C5 (Dot operator)
+ - "∙": [t: "⠡"]                # 0x2219   -- similar looking to 0x22c5, so using the same braille
  - "⋆": [t: "⠫⠎"]               # 0x22C6 (Star operator)
  - "⋍": [t: "⠠⠱⠱"]            # 0x22CD (Reversed tilde equals)
  - "⋖": [t: "⠡⠈⠐⠅⠻"]          # 0x22D6 (Less-than w dot)

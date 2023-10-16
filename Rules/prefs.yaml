@@ -55,7 +55,12 @@
     BrailleNavHighlight: EndPoints   # Highlight with dots 7 & 8 the current nav node -- values are Off, FirstChar, EndPoints, All
     BrailleCode: "Nemeth"                # Any supported braille code (currently Nemeth, UEB)
 
+    Nemeth:
+
     UEB:
+      StartMode: "Grade2"   # Grade1/Grade2 -- assumed starting mode UEB braille (Grade1 assumes we are in G1 passage mode)
+      UseSpacesAroundAllOperators: false  # true/false
+
       # UEB Guide to Technical Material (https://iceb.org/Guidelines_for_Technical_Material_2008-10.pdf)
       #   says to normally treat Fraktur and DoubleStruck as Script
       # Here we provide an option to specify a transcriber-defined typeform prefix indicator instead
@@ -63,6 +68,20 @@
       DoubleStruck: "⠈"     # script
       Fraktur:      "⠈"     # script
       SansSerif:    "⠈⠼"     # first transcriber-defined typeform prefix indicator
+      GreekVariant: "⠨"     # default to Greek
+
+    Vietnam:
+      UseDropNumbers: false    # drop digits down a row in simple numeric fractions
+      # The guideline is being revised -- current guidance is to follow UEB for alternative scripts
+      # UEB Guide to Technical Material (https://iceb.org/Guidelines_for_Technical_Material_2008-10.pdf)
+      #   says to normally treat Fraktur and DoubleStruck as Script
+      # Here we provide an option to specify a transcriber-defined typeform prefix indicator instead
+      # Note: here are prefixes for 1st - 5th: "⠈⠼", "⠘⠼", "⠸⠼", "⠐⠼", "⠨⠼"
+      DoubleStruck: "⠈"     # script
+      Fraktur:      "⠈"     # script
+      SansSerif:    "⠈⠼"    # first transcriber-defined typeform prefix indicator
+      GreekVariant: "⠸"     # default to Greek
+
 
   Other:
     DecimalSeparators: "." # [default]

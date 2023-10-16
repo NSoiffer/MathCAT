@@ -25,7 +25,7 @@
 #![allow(clippy::needless_return)]
 
 extern crate yaml_rust;
-use yaml_rust::{Yaml};
+use yaml_rust::Yaml;
 use crate::errors::*; 
 use crate::prefs::*;
 use std::{cell::RefCell, cell::Ref, cell::RefMut, collections::HashSet,  rc::Rc};
@@ -136,8 +136,7 @@ pub fn read_definitions_file(locations: &Locations) -> Result<()> {
         static LOCATION_CACHE: RefCell<Locations> =
                 RefCell::new( Locations::default() );
     }
-    
-    if LOCATION_CACHE.with(|cache| are_locations_same(&cache.borrow(), locations)) {
+    if is_valid(locations) && LOCATION_CACHE.with(|cache| are_locations_same(&cache.borrow(), locations)) {
         return Ok( () );
     } else {
         LOCATION_CACHE.with(|cache| {

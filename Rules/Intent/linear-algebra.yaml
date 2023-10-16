@@ -22,8 +22,12 @@
     - "IsBracketed(., '|', '|') and  *[2][self::m:mtable]"
   replace:
   - intent:
-      name: "determinant"
-      children: [x: "*[2]/*"]
+      name: "intent-wrapper"
+      children:
+      - intent:
+          name: "determinant"
+          id: "*[2]/@id"
+          children: [x: "*[2]/*"]
 
 -
   # parens or brackets around an mtable
@@ -33,8 +37,12 @@
     - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']')) and *[2][self::m:mtable]"
   replace:
   - intent:
-      name: "matrix"
-      children: [x: "*[2]/*"]
+      name: "intent-wrapper"
+      children:
+      - intent:
+          name: "matrix"
+          id: "*[2]/@id"
+          children: [x: "*[2]/*"]
 
 -
   name: norm
@@ -51,7 +59,7 @@
   name: norm
   tag: msub
   match: 
-    - "IsBracketed(*[1], '∥', '∥')"
+    - "*[1][IsBracketed(., '∥', '∥')]"
   replace:
   - intent:
       name: "subscripted-norm"
