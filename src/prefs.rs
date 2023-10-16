@@ -168,14 +168,19 @@ impl Preferences{
         }
 
         let doc = &docs[0];
-        verify_keys(doc, "Speech", file_name)?;
-        verify_keys(doc, "Navigation", file_name)?;
-        verify_keys(doc, "Braille", file_name)?;
+
+        if cfg!(debug_assertions) {
+            verify_keys(doc, "Speech", file_name)?;
+            verify_keys(doc, "Navigation", file_name)?;
+            verify_keys(doc, "Braille", file_name)?;
+            verify_keys(doc, "Other", file_name)?;
+        }
 
         let prefs = &mut base_prefs.prefs;
         add_prefs(prefs, &doc["Speech"], "", file_name);
         add_prefs(prefs, &doc["Navigation"], "", file_name);
         add_prefs(prefs, &doc["Braille"], "", file_name);
+        add_prefs(prefs, &doc["Other"], "", file_name);
         return Ok( Preferences{ prefs: prefs.to_owned() } );
 
 
@@ -210,11 +215,11 @@ impl Preferences{
                     return;
                 } else {
                     let trimmed_name = name_prefix.to_string() + name.unwrap().trim();
-                    let mut trimmed_yaml_value = yaml_value.to_owned();
-                    if let Some(value) = trimmed_yaml_value.as_str() {
-                        trimmed_yaml_value = Yaml::String(value.trim().to_string());
+                    let mut yaml_value = yaml_value.to_owned();
+                    if let Some(value) = yaml_value.as_str() {
+                        yaml_value = Yaml::String(value.to_string());
                     }
-                    map.insert(trimmed_name, trimmed_yaml_value);
+                    map.insert(trimmed_name, yaml_value);
                 }
             }
         }

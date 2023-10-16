@@ -83,3 +83,6 @@
       GreekVariant: "⠸"     # default to Greek
 
 
+  Other:
+    DecimalSeparators: "." # [default]
+    BlockSeparators: ", \u00A0\u202F" # [default -- includes two forms of non-breaking spaces]
