@@ -30,7 +30,7 @@
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{t: "結束根號"}, {pause: short}]  # phrase(start the square root of x 'end of root')
+      else: [{t: "結束根號"}, {pause: medium}]  # phrase(start the square root of x 'end of root')
 
 - name: default
   tag: root
@@ -87,14 +87,14 @@
   - x: "*[2]"
   - t: "分之"      # phrase(the fraction 3 'over' 4)
   - x: "*[1]"
-  - pause: short
+  #- pause: short
 
 - name: default
   tag: fraction
   match: "."
   replace:
   - t: "分數"      # phrase(the 'fraction' 3 over 4)
-  - pause: short
+  #- pause: short
   - x: "*[2]"
   - test:
       if: "not(IsNode(*[2],'leaf'))"
@@ -104,7 +104,7 @@
       if: "not(IsNode(*[1],'leaf'))"
       then: [{pause: short}]
   - x: "*[1]"
-  - pause: short
+  #- pause: short
   - t: "結束分數"      # phrase(start 7 over 8 'end of fraction')
   - pause: medium
 
@@ -129,7 +129,7 @@
   - test:
       if: "*[2][text()=2]"
       then: {t: "平方"}      # phrase(5 'squared' equals 25)
-      else: {t: "立方體"}      # phrase(5 'cubed' equals 125)
+      else: {t: "立方"}      # phrase(5 'cubed' equals 125)
 - name: function-power
   tag: power
   match:
@@ -157,18 +157,19 @@
   - test:
       if: "*[2][text()=2]"
       then: {t: "平方"}      # phrase(5 'squared' equals 25)
-      else: {t: "立方體"}      # phrase(5 'cubed' equals 125)
+      else: {t: "立方"}      # phrase(5 'cubed' equals 125)
 
 - name: simple-integer
   tag: power
   match: "*[2][self::m:mn][not(contains(., '.'))]"
   replace:
   - x: "*[1]"
-  - t: "到"      # phrase(15 raised 'to the' second power equals 225)
+  - t: ""      # phrase(15 raised 'to the' second power equals 225)
   - test:
       if: "*[2][.>0]"
-      then: {x: "ToOrdinal(*[2])"}
+      then: {x: "*[2]"}
       else: {x: "*[2]"}
+  - t: "次方"
 - name: simple-negative-integer
   tag: power
   match:
@@ -176,25 +177,26 @@
   - "     *[1][self::m:mn][not(contains(., '.'))]]"
   replace:
   - x: "*[1]"
-  - t: "到"      # phrase(15 raised 'to the' second power equals 225)
+  - t: "的"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
+  - t: "次方"
 - name: simple-var
   tag: power
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  - t: "到"      # phrase(15 raised 'to the' second power equals 225)
+  - t: ""      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
-  - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-
+  #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+  - t: "次方"
 - name: simple
   tag: power
   match: "IsNode(*[2], 'leaf')"
   replace:
   - x: "*[1]"
-  - t: "到"      # phrase(15 raised 'to the' second power equals 225)
+  - t: ""      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
-
+  - t: "次方"
 - name: nested
   # it won't end in "power" if the exponent is simple enough
   # FIX: not that important, but this misses the case where the nested exp is a negative integer (change test if this is fixed)
@@ -207,18 +209,19 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - t: "提高到"      # phrase(15 'raised to the' second power equals 225)
+  - t: "的"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
-  - pause: short
-  - t: "結束指數"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+  - t: "次方"
+  #- pause: short
+  #- t: "結束指數"      # phrase(start 2 raised to the exponent 4 'end of exponent')
 - name: default
   tag: power
   match: "."
   replace:
   - x: "*[1]"
-  - t: "提高到"      # phrase(15 'raised to the' second power equals 225)
+  - t: "的"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
-  - t: "力量"      # phrase(15 raised to the second 'power' equals 225)
+  - t: "次方"      # phrase(15 raised to the second 'power' equals 225)
 
 #
 # Some rules on mrows
@@ -270,7 +273,7 @@
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
-  - t: "乘"      # phrase(7 'times' 5 equals 35)
+  - t: "成"      # phrase(7 'times' 5 equals 35) 乘 的發音不正確
 
 - name: no-say-parens
   tag: mrow

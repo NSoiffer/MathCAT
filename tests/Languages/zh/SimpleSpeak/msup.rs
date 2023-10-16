@@ -8,7 +8,7 @@ fn squared() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>2</mn> </msup>
                 </math>";
-    test("en", "SimpleSpeak", expr, "x squared");
+    test("zh", "SimpleSpeak", expr, "x 平方");
 }
 
 #[test]
@@ -16,7 +16,7 @@ fn cubed() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>3</mn> </msup>
                 </math>";
-    test("en", "SimpleSpeak", expr, "x cubed");
+    test("zh", "SimpleSpeak", expr, "x 立方");
 }
 
 #[test]
@@ -24,7 +24,7 @@ fn cubed() {
         let expr = "<math>
                         <msup> <mi>x</mi> <mn>4</mn> </msup>
                     </math>";
-        test("en", "SimpleSpeak", expr, "x to the fourth");
+        test("zh", "SimpleSpeak", expr, "x 4 次方");
     }
 
 #[test]
@@ -32,7 +32,7 @@ fn simple_mi_power() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mi>n</mi> </msup>
                 </math>";
-  test("en", "SimpleSpeak", expr, "x to the n-th");
+  test("zh", "SimpleSpeak", expr, "x n 次方");
 }
 
 #[test]
@@ -40,7 +40,7 @@ fn zero_power() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>0</mn> </msup>
                 </math>";
-    test("en", "SimpleSpeak", expr, "x to the 0");
+    test("zh", "SimpleSpeak", expr, "x 0 次方");
 }
 
 
@@ -49,7 +49,7 @@ fn decimal_power() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>2.0</mn> </msup>
                 </math>";
-    test("en", "SimpleSpeak", expr, "x to the 2.0");
+    test("zh", "SimpleSpeak", expr, "x 2.0 次方");
 }
 
 #[test]
@@ -63,7 +63,7 @@ fn non_simple_power() {
       </msup>
       </mrow>
                 </math>";
-    test("en", "SimpleSpeak", expr, "3 raised to the y plus 2 power");
+    test("zh", "SimpleSpeak", expr, "3 的 y 加 2 次方");
 }
 
 #[test]
@@ -74,7 +74,7 @@ fn negative_power() {
                         <mrow> <mo>-</mo> <mn>2</mn> </mrow>
                     </msup>
                 </math>";
-    test("en", "SimpleSpeak", expr, "x to the negative 2");
+    test("zh", "SimpleSpeak", expr, "x 的 負 2 次方");
 }
 
 #[test]
@@ -85,7 +85,7 @@ fn simple_fraction_power() {
                       <mfrac><mn>1</mn><mn>3</mn></mfrac>
                   </msup>
               </math>";
-  test("en", "SimpleSpeak", expr, "x raised to the 1 third power");
+  test("zh", "SimpleSpeak", expr, "x 的 3 分之 1 次方");
 }
 
 #[test]
@@ -104,7 +104,7 @@ fn nested_squared_power_with_coef() {
       </msup>
       </mrow>
       </math>";
-  test("en", "SimpleSpeak", expr, "3 raised to the 2 x squared power");
+  test("zh", "SimpleSpeak", expr, "3 的 2 x 平方 次方");
 }
 
 #[test]
@@ -124,7 +124,7 @@ fn nested_squared_power_with_neg_coef() {
     </msup>
     </mrow>
   </math>";
-  test("en", "SimpleSpeak", expr, "3 raised to the negative 2 x squared power");
+  test("zh", "SimpleSpeak", expr, "3 的 負 2 x 平方 次方");
 }
 
 
@@ -139,7 +139,7 @@ fn nested_cubed_power() {
       </msup>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "y raised to the 4 fifths cubed power");
+  test("zh", "SimpleSpeak", expr, "y 的 5 分之 4 立方 次方");
 }
 
 #[test]
@@ -156,7 +156,7 @@ fn nested_cubed_power_with_neg_base() {
         </mrow>
     </msup>
     </math>";
-  test("en", "SimpleSpeak", expr, "y raised to the negative 4 fifths cubed power");
+  test("zh", "SimpleSpeak", expr, "y 的 負 5 分之 4 立方 次方");
 }
 
 #[test]
@@ -178,7 +178,7 @@ fn nested_number_times_squared() {
         </msup>
         </mrow>
         </math>";
-  test("en", "SimpleSpeak", expr, "e raised to the 1 half x squared power");
+  test("zh", "SimpleSpeak", expr, "e 的 2 分之 1 x 平方 次方");
 }
 
 #[test]
@@ -200,7 +200,7 @@ fn nested_negative_number_times_squared() {
     </msup>
     </mrow>
     </math>";
-  test("en", "SimpleSpeak", expr, "e raised to the negative 1 half x squared power");
+  test("zh", "SimpleSpeak", expr, "e 的 負 2 分之 1 x 平方 次方");
 }
 
 #[test]
@@ -219,7 +219,7 @@ fn nested_expr_to_tenth() {
       </msup>
       </mrow>
       </math>";
-  test("en", "SimpleSpeak", expr, "3 raised to the 3 to the tenth power");
+  test("zh", "SimpleSpeak", expr, "3 的 3 10 次方 次方");
 }
 
 #[test]
@@ -241,7 +241,7 @@ fn nested_non_simple_squared_exp() {
       </msup>
       </mrow>
       </math>";
-  test("en", "SimpleSpeak", expr, "3 raised to the open paren x plus 1, close paren squared power");
+  test("zh", "SimpleSpeak", expr, "3 的 左小括 x 加 1 右小括 平方 次方");
 }
 
 #[test]
@@ -255,7 +255,7 @@ fn nested_simple_power() {
       </msup>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "t raised to the 4 fifths to the n-th power");
+  test("zh", "SimpleSpeak", expr, "t 的 5 分之 4 n 次方 次方");
 }
 
 #[test]
@@ -269,7 +269,7 @@ fn nested_end_exponent_power() {
       </msup>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "t raised to the 4 fifths raised to the n plus 1 power, end exponent");
+  test("zh", "SimpleSpeak", expr, "t 的 5 分之 4 的 n 加 1 次方 次方");
 }
 
 #[test]
@@ -283,7 +283,7 @@ fn nested_end_exponent_neg_power() {
       </msup>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "t raised to the 4 fifths to the negative 3, end exponent");
+  test("zh", "SimpleSpeak", expr, "t 的 5 分之 4 的 負 3 次方 次方");
 }
 
 #[test]
@@ -314,7 +314,7 @@ fn nested_complex_power() {
       </msup>
       </mrow>
       </math>";
-  test("en", "SimpleSpeak", expr, "e raised to the negative 1 half times; open paren, fraction, x minus mu, over sigma, end fraction; close paren squared power");
+  test("zh", "SimpleSpeak", expr, "e 的 負 2 分之 1 成; 左小括, 分數 Sigma 分之, x 減 Mu 結束分數; 右小括 平方 次方");
 }
 
 #[test]
@@ -328,5 +328,5 @@ fn default_power() {
       </mfrac>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "t raised to the fraction, b plus 1, over 3, end fraction; power");
+  test("zh", "SimpleSpeak", expr, "t 的 分數 3 分之, b 加 1 結束分數; 次方");
 }
