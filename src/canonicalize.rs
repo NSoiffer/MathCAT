@@ -436,8 +436,8 @@ impl CanonicalizeContext {
 	fn new() -> CanonicalizeContext {
 		let pref_manager = crate::prefs::PreferenceManager::get();
 		let pref_manager = pref_manager.borrow();
-		let block_separator_pref = pref_manager.get_user_prefs().to_string("BlockSeparators");
-		let decimal_separator_pref = pref_manager.get_user_prefs().to_string("DecimalSeparators");
+		let block_separator_pref = pref_manager.pref_to_string("BlockSeparators");
+		let decimal_separator_pref = pref_manager.pref_to_string("DecimalSeparators");
 
 		let block_separator = Regex::new(&format!("[{}]", regex::escape(&block_separator_pref))).unwrap();
 		let decimal_separator = Regex::new(&format!("[{}]", regex::escape(&decimal_separator_pref))).unwrap();
@@ -661,7 +661,9 @@ impl CanonicalizeContext {
 		// Note: this works bottom-up (clean the children first, then this element)
 		lazy_static! {
 			static ref IS_PRIME: Regex = Regex::new(r"['′″‴⁗]").unwrap();
-        }
+
+			// Note: including intervening spaces in what is likely a symbol of omission preserves any notion of separate digits (e.g., "_ _ _")
+			static ref IS_UNDERSCRORE: Regex = Regex::new(r"^[_\u{A0}]+$").unwrap();        }
 
 		static CURRENCY_SYMBOLS: phf::Set<&str> = phf_set! {
 			"$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿" // could add more currencies...
