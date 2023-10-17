@@ -113,8 +113,7 @@ In the `tests\Languages` directory, there is a file `en.rs` and a directory `en`
 2. Copy the `en` directory to `fr`.
 3. If you only choose one speech style (e.g., "SimpleSpeak), edit `fr.rs` and remove the lines starting `mod ClearSpeak {` all the way down to the matching `}`. In the `fr` directory, remove the subdirectory `ClearSpeak`.
 4. Although it is good translate all the files, it is probably ok to just translate a few of them, especially at the start. In `fr.rs`, comment out any untranslated file by adding `//` in front of the untranslated files. E.g., if you didn't translate the SimpleSpeak file `geometry.yaml`, then the line should look like `// mod geometry;`
-
-4. Start editing the files, first doing a global change of `en` to `fr` and then replacing the English string with the appropriate French (or whatever language you added) string.
+5. Start editing the files, first doing a global change of `en` to `fr` and then replacing the English string with the appropriate French (or whatever language you added) string.
 
 Now that you have some tests translated, try running the automated tests.
 As a check that everything is set up properly, verify that the English version of the tests are working
