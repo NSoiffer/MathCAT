@@ -198,7 +198,7 @@ impl Preferences{
         }
 
         fn add_prefs(map: &mut PreferenceHashMap, new_prefs: &Yaml, name_prefix: &str, file_name: &str) {
-            if new_prefs.is_badvalue() || new_prefs.as_hash().is_none() {
+            if new_prefs.is_badvalue() || new_prefs.is_null() || new_prefs.as_hash().is_none() {
                 return;
             }
             let new_prefs = new_prefs.as_hash().unwrap();
@@ -206,21 +206,24 @@ impl Preferences{
                 let name = as_str_checked(yaml_name);
                 if let Err(e) = name {
                     error!("{}", (&e.chain_err(||
-                        format!("name '{}' is not a string in file {}", yaml_to_string(yaml_name, 0), file_name))));                   
-                } else if yaml_value.as_hash().is_some() {
-                        add_prefs(map, yaml_value, &(name.unwrap().to_string() + "_"), file_name);
-                } else if yaml_value.as_vec().is_some() {
-                    error!("name '{}' has illegal array value {} in file '{}'",
-                            yaml_to_string(yaml_name, 0), yaml_to_string(yaml_value, 0), file_name);
-                    return;
+                        format!("name '{}' is not a string in file {}", yaml_to_string(yaml_name, 0), file_name))));
                 } else {
-                    let trimmed_name = name_prefix.to_string() + name.unwrap().trim();
-                    let mut yaml_value = yaml_value.to_owned();
-                    if let Some(value) = yaml_value.as_str() {
-                        yaml_value = Yaml::String(value.to_string());
+                    match yaml_value {
+                        Yaml::Hash(_) => add_prefs(map, yaml_value, &(name.unwrap().to_string() + "_"), file_name),
+                        Yaml::Array(_) => error!("name '{}' has illegal array value {} in file '{}'",
+                                                 yaml_to_string(yaml_name, 0), yaml_to_string(yaml_value, 0), file_name),
+                        Yaml::String(_) | Yaml::Boolean(_) | Yaml::Integer(_) | Yaml::Real(_) => {
+                            let trimmed_name = name_prefix.to_string() + name.unwrap().trim();
+                            let mut yaml_value = yaml_value.to_owned();
+                            if let Some(value) = yaml_value.as_str() {
+                                yaml_value = Yaml::String(value.to_string());
+                            }
+                            map.insert(trimmed_name, yaml_value);
+                        },
+                        _ => error!("name '{}' has illegal {:#?} value {} in file '{}'",
+                                    yaml_to_string(yaml_name, 0), yaml_value, yaml_to_string(yaml_value, 0), file_name),
                     }
-                    map.insert(trimmed_name, yaml_value);
-                }
+                }                  
             }
         }
     }
