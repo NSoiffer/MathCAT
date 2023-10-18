@@ -51,7 +51,7 @@
   match: "$Move2D != ''"
   replace:
   - x: "$Move2D"
-  - t: "平方根"                    # phrase(the 'square root' of x)
+  - t: "平方根內"                    # phrase(the 'square root' of x)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -61,8 +61,8 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [t: "根"]               # phrase(the cube 'root' of x)
-      else: [t: "根冪"]         # phrase(the 'root index' of x is 3)
+      then: [t: "根號內"]               # phrase(the cube 'root' of x)
+      else: [t: "開方次數"]         # phrase(the 'root index' of x is 3)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -72,7 +72,7 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [t: "底"]              # phrase(the 'base' of the power)
+      then: [t: "基底"]              # phrase(the 'base' of the power)
       else: [t: "下標"]         # phrase(x with 'subscript' 2)
   - pause: "medium"
 
@@ -83,7 +83,7 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [t: "底"]            # phrase(the 'base' of the power)
+      then: [t: "基底"]            # phrase(the 'base' of the power)
       else: [t: "上標"]     # phrase(x with 'superscript' 2)  # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
@@ -94,7 +94,7 @@
   - x: "$Move2D"
   - test:
     - if: "count($Child2D/preceding-sibling::*)=0"
-      then: [t: "底"]             # phrase(the 'base' of the power)
+      then: [t: "基底"]             # phrase(the 'base' of the power)
     - else_if: "count($Child2D/preceding-sibling::*)=1"
       then: [t: "下標"]        # phrase(x with 'subscript' 2)
       else: [t: "上標"]      # phrase(x with 'superscript' 2)  # FIX: it would be better to use the word used when reading (power, exponent, ...)
@@ -107,7 +107,7 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [t: "底"]          # phrase(the 'base' of the power)
+      then: [t: "基底"]          # phrase(the 'base' of the power)
       else: [t: "下限"]   # phrase(the 'lower limit' of the function is zero)
   - pause: "medium"
 
@@ -118,7 +118,7 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [t: "底"]         # phrase(the 'base' of the power)
+      then: [t: "基底"]         # phrase(the 'base' of the power)
       else: [t: "上限"]  # phrase(the 'upper limit' of the function is zero)
   - pause: "medium"
 
@@ -129,7 +129,7 @@
   - x: "$Move2D"
   - test:
     - if: "count($Child2D/preceding-sibling::*)=0"
-      then: [t: "底"]           # phrase(the 'base' of the power)
+      then: [t: "基底"]           # phrase(the 'base' of the power)
     - else_if: "count($Child2D/preceding-sibling::*)=1"
       then: [t: "下限"]    # phrase(the 'lower limit' of the function is zero)
       else: [t: "上限"]   # phrase(the 'upper limit' of the function is zero)
@@ -149,7 +149,7 @@
           - x: "$Move2D"
           - test:
             - if: "$NumPrecedingSiblings=0"
-              then: [t: "底"]                 # phrase(the 'base' of the power)
+              then: [t: "基底"]                 # phrase(the 'base' of the power)
             - else_if: "$Child2D/preceding-sibling::*[self::m:mprescripts]" # are we before mprescripts and hence are postscripts
               then:
               - test:   # in postscripts -- base shifts by one
@@ -165,7 +165,7 @@
 
 - name: into-or-out-of
   tag: mtd
-  match: "$Move2D = 'into'"
+  match: "$Move2D = '進入'"
   replace:
   - x: "$Move2D"
   - t: "行"            # phrase(the first 'column' in the table)
@@ -174,7 +174,7 @@
 
 - name: into-or-out-of
   tag: [mtr, mlabeledtr]
-  match: "$Move2D = 'into'"
+  match: "$Move2D = '進入'"
   replace:
   - x: "$Move2D"
   - x: "count($Child2D/preceding-sibling::*)+1"
@@ -306,18 +306,18 @@
     - if: "self::m:mtr or self::m:mlabeledtr"
       then:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[1]/*[1]"]   # phrase('in' the denominator)
+          variables: [Move2D: "'在'", Child2D: "*[1]/*[1]"]   # phrase('in' the denominator)
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/*[1]/@id"] # skip mtd
     - else_if: "*[1][self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]" # auto zoom
       then:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[1]/*[2]"]   # phrase('in' the denominator)
+          variables: [Move2D: "'在'", Child2D: "*[1]/*[2]"]   # phrase('in' the denominator)
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/*[2]/@id"] # skip mtd
       else:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[1]"]        # phrase('in' the denominator)
+          variables: [Move2D: "'在'", Child2D: "*[1]"]        # phrase('in' the denominator)
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/@id"]
 
@@ -329,7 +329,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [t: "放大", pause: "long"]                   # phrase('zoom in')
   - with:
-      variables: [Move2D: "'in'", Child2D: "*[1]"]          # phrase('in' the denominator)
+      variables: [Move2D: "'在'", Child2D: "*[1]"]          # phrase('in' the denominator)
       replace: [x: "."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNextZoom'"]
@@ -343,7 +343,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [t: "放大", pause: "long"]                 # phrase('zoom in')
   - with:
-      variables: [Move2D: "'in'", Child2D: "*[1]"]        # phrase('in' the denominator)
+      variables: [Move2D: "'在'", Child2D: "*[1]"]        # phrase('in' the denominator)
       replace: [x: "."]
   - test:
       if: "$NavMode='Character'"
@@ -369,7 +369,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [t: "一路放大", pause: "medium"]                 # phrase('zoom in all the way')
   - with:
-      variables: [Move2D: "'in'", Child2D: "*[1]"]              # phrase('in' the denominator)
+      variables: [Move2D: "'在'", Child2D: "*[1]"]              # phrase('in' the denominator)
       replace: [x: "."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1"]
@@ -409,7 +409,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
       then: [t: "一路縮小", pause: "medium"]            # phrase('zoomed out all the the way')
   - with:
-      variables: [Move2D: "'out of'", Child2D: "."]
+      variables: [Move2D: "'離開'", Child2D: "."]
       replace: [x: ".."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1"]
@@ -426,7 +426,7 @@
   replace:
   # don't bother with MatchCounter since we only get here if > 1
   - with:
-      variables: [Move2D: "'in'", Child2D: "*[1]"]            # phrase('in' the denominator)
+      variables: [Move2D: "'在'", Child2D: "*[1]"]            # phrase('in' the denominator)
       replace: [x: "."]
   - test:
     - if: "count(*)> 1 or IsNode(., 'leaf') or self::m:msqrt or self::m:menclose"
@@ -448,7 +448,7 @@
       - set_variables: [NavNode: "@id"]
       else:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[1]"]                        # phrase('in' the denominator)
+          variables: [Move2D: "'在'", Child2D: "*[1]"]                        # phrase('in' the denominator)
           replace: [x: "."]
       - x: "*[1]"
 
@@ -467,7 +467,7 @@
       - set_variables: [NavNode: "@id"]
       else:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[last()]"]                     # phrase('in' the denominator)
+          variables: [Move2D: "'在'", Child2D: "*[last()]"]                     # phrase('in' the denominator)
           replace: [x: "."]
       - x: "*[last()]"
 
@@ -504,7 +504,7 @@
           then: [x: ".."] # auto-zoom: move out a level and retry
           else:
           - with:
-              variables: [Move2D: "'out of'", Child2D: "."]
+              variables: [Move2D: "'離開'", Child2D: "."]
               replace: [x: ".."]
           - test:
               if: "parent::m:mtd"
@@ -1079,7 +1079,7 @@
           then: [x: "$Following"]
           else:
           - with:
-              variables: [Move2D: "'in'", Child2D: "$Following"]        # phrase('in' the denominator)
+              variables: [Move2D: "'在'", Child2D: "$Following"]        # phrase('in' the denominator)
               replace: [x: ".."]
           - with:
               variables: [NavCommand: "'MoveNextZoom'"]
@@ -1101,7 +1101,7 @@
           then: [x: "$Preceding"]
           else:
           - with:
-              variables: [Move2D: "'in'", Child2D: "$Preceding"]          # phrase('in' the denominator)
+              variables: [Move2D: "'在'", Child2D: "$Preceding"]          # phrase('in' the denominator)
               replace: [x: ".."]
           - with:
               variables: [NavCommand: "'MovePreviousZoom'"]
@@ -1146,7 +1146,7 @@
       then:
       - t: "無法往右移動"                              # phrase('cannot move right')
   - with:
-      variables: [Move2D: "'end of'", Child2D: "$EdgeNode/*[last()]"]
+      variables: [Move2D: "'結束'", Child2D: "$EdgeNode/*[last()]"]
       replace: [x: "$EdgeNode"]
   - pause: long
   - set_variables: [SpeakExpression: "'false'"]
@@ -1202,11 +1202,11 @@
           if: "following-sibling::*"
           then:
           - with:
-              variables: [Move2D: "'in'", Child2D: "."]             # phrase('in' the denominator)
+              variables: [Move2D: "'在'", Child2D: "."]             # phrase('in' the denominator)
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'out of'", Child2D: "."]
+              variables: [Move2D: "'離開'", Child2D: "."]
               replace: [x: ".."]
       - test:
           if: "following-sibling::*"
@@ -1310,14 +1310,14 @@
       if: "preceding-sibling::* and following-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'out of'", Child2D: "."]
+          variables: [Move2D: "'離開'", Child2D: "."]
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
           replace: [x: "following-sibling::*[1]"]          # skip over 'none'
       else:
       - with:
-          variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]       # phrase('in' the denominator)
+          variables: [Move2D: "'在'", Child2D: "following-sibling::*[1]"]       # phrase('in' the denominator)
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNextZoom'"]
@@ -1342,7 +1342,7 @@
       if: "IsNode(.., '2D')"
       then:
       - with:
-          variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]           # phrase('in' the denominator)
+          variables: [Move2D: "'在'", Child2D: "following-sibling::*[1]"]           # phrase('in' the denominator)
           replace: [x: ".."]
   - set_variables: [NavNode: "following-sibling::*[1]/@id"]
 
@@ -1386,7 +1386,7 @@
       then:
       - t: "無法向左移動"                                   # phrase('cannot move left' in expression)
   - with:
-      variables: [Move2D: "'end of'", Child2D: "$EdgeNode/*[1]"]
+      variables: [Move2D: "'離開'", Child2D: "$EdgeNode/*[1]"]
       replace: [x: "$EdgeNode"]
   - pause: long
 
@@ -1444,11 +1444,11 @@
           if: "preceding-sibling::*"
           then:
           - with:
-              variables: [Move2D: "'in'", Child2D: "."]             # phrase('in' the denominator)
+              variables: [Move2D: "'在'", Child2D: "."]             # phrase('in' the denominator)
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'out of'", Child2D: "."]
+              variables: [Move2D: "'離開'", Child2D: "."]
               replace: [x: ".."]
       - test:
           if: "preceding-sibling::*"
@@ -1487,7 +1487,7 @@
       if: "not(parent::m:mrow)"
       then:
       - with:
-          variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]         # phrase('in' the denominator)
+          variables: [Move2D: "'在'", Child2D: "preceding-sibling::*[1]"]         # phrase('in' the denominator)
           replace: [x: ".."]
   - set_variables: [NavNode: "preceding-sibling::*[1]/*[2]/@id"]
 
@@ -1555,7 +1555,7 @@
       if: "count(preceding-sibling::*) > 2 and preceding-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'out of'", Child2D: "."]
+          variables: [Move2D: "'離開'", Child2D: "."]
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
@@ -1573,7 +1573,7 @@
           - t: "往左"                                            # phrase(move 'left')
           - pause: short
       - with:
-          variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]               # phrase('in' the denominator)
+          variables: [Move2D: "'在'", Child2D: "preceding-sibling::*[1]"]               # phrase('in' the denominator)
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MovePreviousZoom'"]
@@ -1598,7 +1598,7 @@
       if: "IsNode(.., '2D')"
       then:
       - with:
-          variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]           # phrase('in' the denominator)
+          variables: [Move2D: "'在'", Child2D: "preceding-sibling::*[1]"]           # phrase('in' the denominator)
           replace: [x: ".."]
   - set_variables: [NavNode: "preceding-sibling::*[1]/@id"]
 
