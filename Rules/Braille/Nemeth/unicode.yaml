@@ -380,3 +380,5 @@
  - "∞": [t: "⠠⠿"]               # 0x221E (Infinity)
  - "∣": [t: "⠳"]              # 0x2223 (Divides)
  - "∫": [t: "⠮"]                # 0x222B (Integral)
+ - "℃": [t: "⠘⠨⠡⠀⠰⠠⠉"]          # 0x2103 (Degrees Celsius)
+ - "℉": [t: "⠘⠨⠡⠀⠰⠠⠋"]          # 0x2109 (Degrees Fahrenheit)
