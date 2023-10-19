@@ -209,7 +209,7 @@ def translate_words(words_to_translate: set, lang):
             # The Finnish translation (at least) for some reason has a few failures where ".\n" is only "\n" (and translation failed)
             # We try a last attempt by deleting the '.' and splitting at the newline
             print("Retrying by assuming '.' is missing...")
-            translated_words = translated_words_str.replace('.','').split('\n')
+            translated_words = translated_words_str.replace('.', '').split('\n')
             if len(translated_words) != len(words_to_translate):
                 print("!!!Retry failed: size of translations ({}) differs from words to translate ({})\n".format(len(translated_words), len(words_to_translate)))
             print("Words to translate:\n{}".format(list(words_to_translate)))
@@ -294,7 +294,8 @@ def get_mathplayer_unicode_dict(path: str, lang: str):
                     int_key = int(matches.group(1), base=16)
                     text = matches.group(2).strip()
                     # MP makes use of char in the private use area: E000—F8FF -- don't add those
-                    if (int_key < 0xE000 or int_key > 0xF8FF) and text:
+                    # Also, there's a lot of stuff in the 'zh' translation that isn't Chinese, so skip that
+                    if (int_key < 0xE000 or int_key > 0xF8FF) and text and not(lang.startswith('zh') and text.isascii()):
                         key = chr(int_key)
                         dict[key] = text
         return dict
@@ -360,7 +361,7 @@ def translate_definition(start: int, lines: list[str], translated_lines: list[st
         if lines[i].find(']') >= 0:
             out_stream.write(lines[i])
             return i
-        out_stream.write(translated_lines[i])
+        out_stream.write(translated_lines[i].replace("“", "'").replace("”", "'").replace("、", ",")) # Chinese
         i += 1
     return i
 
@@ -377,9 +378,9 @@ MP_Location = r"C:\Dev\mathplayer\EqnLib\rules\pvt"
 # (sre_only, mp_only, differ, same) = dict_compare("fr", get_sre_unicode_dict(SRE_Location, "fr"), get_mathplayer_unicode_dict(MP_Location, "fr"))
 # (sre_only, mp_only, differ, same) = dict_compare("it", get_sre_unicode_dict(SRE_Location, "it"), get_mathplayer_unicode_dict(MP_Location, "it"))
 
-language = "sv"
+language = "zh-cn"
 build_new_translation("..", language, "unicode")
-build_new_translation("..", language, "unicode-full")
+# build_new_translation("..", language, "unicode-full")
 
 # see translate_definitions comments -- you need to manually copy the file to google translate. 
 translate_definitions("..", language)

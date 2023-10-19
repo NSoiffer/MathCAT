@@ -57,7 +57,8 @@ def translate_phrases(phrases_to_translate: list[str], lang) -> list[str]:
         phrases_string = ".\n".join(phrases)
         # print("***Phrases to translate: {}\n".format(phrases))
         translated_phrases_str = GoogleTranslate.translate(phrases_string, src='en', dest=lang).text.lower()
-        translated_phrases_str = translated_phrases_str.replace('"', "'")    # google occasionally changes single quotes to double quotes
+        translated_phrases_str = translated_phrases_str.replace('"', "'").replace("“", "'").replace("”", "'")    # google occasionally changes quotes
+        translated_phrases_str = translated_phrases_str.replace("、", ",")   # Chinese comma
         translated_phrases_list = translated_phrases_str.split('.\n')
         if len(translated_phrases_list) != len(phrases):
             print("\n!!!Problem in translation: size of translations ({}) differs from phrases to translate ({})\n".format(len(translated_phrases_list), len(phrases)))
@@ -139,7 +140,7 @@ def build_all_translations(path_to_mathcat: str, lang: str, subdir="") -> None:
 
 
 
-language = 'pt'
+language = 'zh-cn'
 if not os.path.exists(language):
     os.makedirs(language)
 if not os.path.exists(language+"/SharedRules"):
