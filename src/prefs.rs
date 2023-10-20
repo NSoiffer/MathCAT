@@ -549,6 +549,7 @@ impl PreferenceManager {
         let mut lang_dir = PreferenceManager::get_language_dir(rules_dir, lang);
         let mut default_lang = default_lang;
         if lang_dir.is_none() {
+            warn!("Warning: didn't find language directory '{}', using default language '{}'", lang, default_lang.unwrap_or("no default"));
             // try again with the default lang if there is one
             if default_lang.is_some() {
                 lang_dir = PreferenceManager::get_language_dir(rules_dir, default_lang.unwrap());
@@ -571,7 +572,7 @@ impl PreferenceManager {
         //   found files are added starting at the end
         let mut result: Locations = [None, None, None];
         let mut i = 3;
-        for os_path in lang_dir.unwrap().ancestors() {
+        for os_path in lang_dir.clone().unwrap().ancestors() {
             let path = PathBuf::from(os_path).join(file_name);
             if is_file_shim(&path) {
                 i -= 1;
@@ -589,7 +590,7 @@ impl PreferenceManager {
 
         if let Some(default_lang) = default_lang {
             // didn't find a file -- retry with default
-            // FIX: give a warning that default dir is being used
+            warn!("Warning: didn't find file '{}', using default language '{}'", PathBuf::from(lang_dir.unwrap()).join(file_name).display(), default_lang);
             return PreferenceManager::get_files(rules_dir, default_lang, None, file_name);
         }
         
