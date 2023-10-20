@@ -42,8 +42,16 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [t: "分子"]            # phrase(the 'numerator' of a fraction)
-      else: [t: "分母"]          # phrase(the 'denominator' of a fraction)
+      then:
+        test:
+          if: "$Child2D/..[@linethickness='0']"
+          then: [t: "全"]            # phrase(the 'numerator' of a fraction)
+          else: [t: "分子"]
+      else: 
+        test:
+          if: "$Child2D/..[@linethickness='0']"
+          then: [t: "選"]
+          else: [t: "分母"]          # phrase(the 'denominator' of a fraction)
   - pause: "medium"
 
 - name: into-or-out-of
