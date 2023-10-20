@@ -119,7 +119,7 @@ def substitute_in_translated_phrase(line, translated_phrase, translated_word) ->
     elif text_words:
         print(f"Failed to find quoted part in translation \"{translated_phrase}\", \
                using '{translated_word}\n   original line: {line}")
-        replacement = text_words.group(1) + translated_word + '"'    # add the surrounding context back
+        replacement = text_words.group(1) + '"' + translated_word + '"'    # add the surrounding context back
         new_line = TextString.sub(replacement, line)
     return new_line
 
@@ -163,7 +163,7 @@ def build_all_translations(path_to_mathcat: str, lang: str, subdir="") -> None:
 
 
 
-language = 'zh-cn'
+language = 'fi'
 if not os.path.exists(language):
     os.makedirs(language)
 if not os.path.exists(language+"/SharedRules"):
