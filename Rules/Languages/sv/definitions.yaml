@@ -25,31 +25,31 @@
 
 # For English, a regular pattern starts at twenty
     NumbersOnes: [
-         "noll", "en", "två", "tre", "fyra", "fem", "sex", "sju", "åtta", "nio",
+         "noll", "ett", "två", "tre", "fyra", "fem", "sex", "sju", "åtta", "nio",
          "tio", "elva", "tolv", "tretton", "fjorton", "femton", "sexton",
          "sjutton", "arton", "nitton"
     ],
 
     NumbersOrdinalOnes: [
-         "nolla", "första", "andra", "tredje", "fjärde", "femte", "sjätte", "sjunde", "åttonde", "nionde",
+         "nollte", "första", "andra", "tredje", "fjärde", "femte", "sjätte", "sjunde", "åttonde", "nionde",
          "tionde", "elfte", "tolfte", "trettonde", "fjortonde", "femtonde", "sextonde",
          "sjuttonde", "artonde", "nittonde"
     ],
 
     NumbersOrdinalPluralOnes: [
-         "nolla", "första", "sekunder", "tredjedelar", "fjärdedelar", "femtedelar", "sjättedelar", "sjundedelar", "åttor", "niondelar",
+         "nolltedelar", "hela", "halva", "tredjedelar", "fjärdedelar", "femtedelar", "sjättedelar", "sjundedelar", "åttondelar", "niondelar",
          "tiondelar", "elftedelar", "tolftedelar", "trettondelar", "fjortondelar", "femtondelar", "sextondelar",
          "sjuttondelar", "artondelar", "nittondelar"
     ],
 
     # stop when regularity begins
     NumbersOrdinalFractionalOnes: [
-         "noll", "första", "halva"
+         "noll", "hela", "halva"
     ],
 
     # stop when regularity begins
     NumbersOrdinalFractionalPluralOnes: [
-         "nollor", "första", "halvor"
+         "nollor", "hela", "halva"
     ],
 
 
@@ -59,11 +59,11 @@
     ],
 
     NumbersOrdinalTens: [
-         "", "tionde", "tjugonde", "trettionde", "fyrtionde", "femtionde", "sextionde", "sjuttio", "åttonde", "nittionde"
+         "", "tionde", "tjugonde", "trettionde", "fyrtionde", "femtionde", "sextionde", "sjuttionde", "åttionde", "nittionde"
     ],
 
     NumbersOrdinalPluralTens: [
-         "", "tiondelar", "tjugondelar", "trettiodelar", "fyrtiondelar", "femtiondelar", "sextiondelar", "sjuttiodelar", "åttondelar", "nittiodelar"
+         "", "tiondelar", "tjugondelar", "trettiondelar", "fyrtiondelar", "femtiondelar", "sextiondelar", "sjuttiondelar", "åttiondelar", "nittiondelar"
     ],
 
 
@@ -73,30 +73,30 @@
     ],
 
     NumbersOrdinalHundreds: [
-       "", "en hundradel", "två hundradel", "tre hundradel", "fyra hundradel", "fem hundradel",
-         "sex hundradel", "sju hundradel", "åtta hundradel", "nio hundradel"
+       "", "hundrade", "tvåhundrade", "trehundrade", "fyrahundrade", "femhundrade",
+         "sexhundrade", "sjuhundrade", "åttahundrade", "niohundrade"
     ],
 
     NumbersOrdinalPluralHundreds: [
-       "", "en hundradelar", "två hundradelar", "tre hundradelar", "fyra hundradelar", "fem hundradelar",
+       "", "en hundradel", "två hundradelar", "tre hundradelar", "fyra hundradelar", "fem hundradelar",
          "sex hundradelar", "sju hundradelar", "åtta hundradelar", "nio hundradelar"
     ],
       
 
     # At this point, hopefully the language is regular. If not, code needs to be written
     NumbersLarge: [
-         "", "tusen", "miljoner", "miljarder", "biljoner", "kvadrilljoner",
-         "quintillion", "sextillion", "septillion", "oktillion", "nonillion",
+         "", "tusen", "miljon", "miljard", "biljon", "biljard",
+         "triljon", "triljard", "kvadriljon", "kvadriljard", "kvintiljon",
     ],
       
     NumbersOrdinalLarge: [
-         "", "tusendel", "miljondel", "miljarddel", "biljondel", "kvadrilliondel",
-         "kvintillionth", "sextillionth", "septillionth", "oktillionth", "nonillionth"
+         "", "tusende", "miljonte", "miljardte", "biljonte", "biljardte",
+         "triljonte", "triljardte", "kvadriljonte", "kvadriljardte", "kvintiljonte"
     ],
       
     NumbersOrdinalPluralLarge: [
-         "", "tusendelar", "miljondelar", "miljarddelar", "biljondelar", "kvadrilliondelar",
-         "kvintilliondelar", "sextilljondelar", "septiljondelar", "oktiljondelar", "nonmiljondelar"
+         "", "tusendelar", "miljondelar", "miljarddelar", "biljondelar", "biljarddelar",
+         "triljondelar", "triljarddelar", "kvadriljondelar", "kvadriljarddelar", "kvintiljondelar"
     ]
 
 ]
