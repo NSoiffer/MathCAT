@@ -4,6 +4,7 @@ mod common;
 
 mod Languages {
     mod en;
+    mod fi;
     // mod vi {
     //     mod vi;
     // }
