@@ -93,12 +93,10 @@ def translate_char_line(ch: str, line:str, mathplayer: dict, sre: dict, access8:
             result['original'] = match_obj.group(1)
             result['translation'] = translation
             result['alternatives'] = alternatives
-            if line.find('divided by') != -1:
-                print(f"  divided by translation: {translation}")
             return 't: "{}"'.format(translation)
         else:
             return line
-    return ( line if line.lstrip().startswith('#') else TextToTranslate.sub(do_translate_char, line),  result )
+    return (line if line.lstrip().startswith('#') else TextToTranslate.sub(do_translate_char, line),  result)
 
 # char defs take one of two forms:
 # single line: - "̇": [t: "dot above embellishment"]             # 0x307
@@ -423,9 +421,9 @@ ACCESS8_Location = r"C:\dev\Access8Math\addon\globalPlugins\Access8Math\locale\s
 # (sre_only, mp_only, differ, same) = dict_compare("fr", get_sre_unicode_dict(SRE_Location, "fr"), get_mathplayer_unicode_dict(MP_Location, "fr"))
 # (sre_only, mp_only, differ, same) = dict_compare("it", get_sre_unicode_dict(SRE_Location, "it"), get_mathplayer_unicode_dict(MP_Location, "it"))
 
-language = "sv"
+language = "zh-cn"
 build_new_translation("..", language, "unicode")
-# build_new_translation("..", language, "unicode-full")
+build_new_translation("..", language, "unicode-full")
 
 # see translate_definitions comments -- you need to manually copy the file to google translate. 
 translate_definitions("..", language)
