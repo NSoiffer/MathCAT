@@ -218,7 +218,7 @@
   - x: "*[3]"
   - test:
       if: "following-sibling::*"
-      then: [{t: "的"}]      # phrase(the square root 'of' 25 equals 5)
+      then: [{t: "項目"}]      # phrase(the square root 'of' 25 equals 5)
 
 - name: bigop-under
   tag: large-op
@@ -228,11 +228,11 @@
       if: "$Verbosity!='Terse'"
       then: [{t: ""}]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
-  - t: "超過"      # phrase(2 'over' 3 equals two thirds)
+  - t: "下層"      # phrase(2 'over' 3 equals two thirds)
   - x: "*[2]"
   - test:
       if: "following-sibling::*"
-      then: [{t: "的"}]      # phrase(the square root 'of' 25 equals 5)
+      then: [{t: "項目"}]      # phrase(the square root 'of' 25 equals 5)
 
 - name: largeop
   tag: mrow
@@ -240,9 +240,9 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "這"}]      # phrase('the' square root of 25 equals 5)
+      then: [{t: ""}]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
-  - t: "的"      # phrase(the square root 'of' 25 equals 5)
+  - t: "項目"      # phrase(the square root 'of' 25 equals 5)
   - x: "*[2]"
 
 - name: limit
@@ -251,8 +251,8 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "限制為"}]      # phrase('the limit as' indicated by this result)
-      else: [{t: "限制為"}]      # phrase(the 'limit as' indicated by this result)
+      then: [{t: "極限為"}]      # phrase('the limit as' indicated by this result)
+      else: [{t: "極限為"}]      # phrase(the 'limit as' indicated by this result)
   - x: "*[2]"
   - pause: short
 
@@ -282,7 +282,7 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Terse'"
-        then: {t: "極好的"}      # phrase(this is a 'super' set of numbers)
+        then: {t: "上標"}      # phrase(this is a 'super' set of numbers)
         else: {t: "上標"}      # phrase(a 'superscript' number indicates raised to a power)
   - x: "*[2]"
   - pause: short
@@ -314,7 +314,7 @@
       then_test:
         if: "$Verbosity='Verbose'"
         then: {t: "上標"}      # phrase(a 'superscript' number indicates raised to a power)
-        else: {t: "極好的"}      # phrase(this is a 'super' set of numbers)
+        else: {t: "上標"}      # phrase(this is a 'super' set of numbers)
   - x: "*[3]"
   - pause: short
 

@@ -411,7 +411,7 @@
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [t: "在"]                  	# 	(en: 'is in', google translation)
               - else: [t: "屬於"]                 	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belongs to')
- - "∏": [t: "N元乘積"]                             	#  0x220f	(en: 'product')
+ - "∏": [t: "積"]                             	#  0x220f	(en: 'product')
  - "∐": [t: "N元余積"]                             	#  0x2210	(en: 'co-product')
  - "∑": [t: "和"]                                	#  0x2211	(en: 'sum')
  - "−": [t: "減"]                                	#  0x2212	(en: 'minus')

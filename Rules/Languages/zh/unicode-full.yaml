@@ -749,7 +749,7 @@
  - "∌": [t: "不包含元素"]                            	#  0x220c	(en: 'does not contain the member')
  - "∍": [t: "小型包含"]                             	#  0x220d	(en: 'contains the member')
  - "∎": [t: "結束證明"]                             	#  0x220e	(en: 'end of proof')
- - "∏": [t: "N元乘積"]                             	#  0x220f	(en: 'product')
+ - "∏": [t: "積"]                             	#  0x220f	(en: 'product')
  - "∐": [t: "N元余積"]                             	#  0x2210	(en: 'coproduct')
  - "∑": [t: "和"]                                	#  0x2211	(en: 'sum')
  - "−": [t: "減"]                                	#  0x2212	(en: 'minus')
@@ -1177,8 +1177,8 @@
  - "⊿": [t: "右三角形"]                             	#  0x22bf	(en: 'right triangle')
  - "⋀": [t: "N元邏輯和"]                            	#  0x22c0	(en: 'logical and')
  - "⋁": [t: "N元邏輯或"]                            	#  0x22c1	(en: 'logical or')
- - "⋂": [t: "N元交集"]                             	#  0x22c2	(en: 'intersection')
- - "⋃": [t: "N元連集"]                             	#  0x22c3	(en: 'union')
+ - "⋂": [t: "交集"]                             	#  0x22c2	(en: 'intersection')
+ - "⋃": [t: "聯集"]                             	#  0x22c3	(en: 'union')
  - "⋄": [t: "菱形運算符"]                            	#  0x22c4	(en: 'diamond operator')
  - "⋅":                                         	#  0x22c5
     - test: 
