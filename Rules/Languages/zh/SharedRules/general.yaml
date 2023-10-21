@@ -17,15 +17,15 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][text()='ℂ']"
-      then: [{t: "複數"}]      # phrase('complex numbers' consist of two parts)
+      then: [{t: "複數集"}]      # phrase('complex numbers' consist of two parts)
     - else_if: "*[1][text()='ℕ']"
-      then: [{t: "自然數"}]      # phrase('natural numbers' are numbers from 1 to infinity)
+      then: [{t: "自然數集"}]      # phrase('natural numbers' are numbers from 1 to infinity)
     - else_if: "*[1][text()='ℚ']"
-      then: [{t: "有理數"}]      # phrase('rational numbers' are the fraction of 2 integers)
+      then: [{t: "有理數集"}]      # phrase('rational numbers' are the fraction of 2 integers)
     - else_if: "*[1][text()='ℝ']"
-      then: [{t: "實數"}]      # phrase('real numbers' can be both positive and negative)
+      then: [{t: "實數集"}]      # phrase('real numbers' can be both positive and negative)
     - else_if: "*[1][text()='ℤ']"
-      then: [{t: "整數"}]      # phrase(positive 'integers' are natural numbers above 0)
+      then: [{t: "整數集"}]      # phrase(positive 'integers' are natural numbers above 0)
       else: [{x: "*[1][text()]"}] # shouldn't happen
 
 - name: dimension-number-sets
@@ -57,15 +57,15 @@
   - bookmark: "@id"
   - test:
     - if: "text()='ℂ'"
-      then: [{t: "複數"}]      # phrase('the complex numbers' include 2 parts)
+      then: [{t: "複數集"}]      # phrase('the complex numbers' include 2 parts)
     - else_if: "text()='ℕ'"
-      then: [{t: "自然數"}]      # phrase('the natural numbers' begin at 1)
+      then: [{t: "自然數集"}]      # phrase('the natural numbers' begin at 1)
     - else_if: "text()='ℚ'"
-      then: [{t: "有理數"}]      # phrase('the rational numbers' are the fraction of 2 integers)
+      then: [{t: "有理數集"}]      # phrase('the rational numbers' are the fraction of 2 integers)
     - else_if: "text()='ℝ'"
-      then: [{t: "實數"}]      # phrase('the real numbers' can be both positive and negative)
+      then: [{t: "實數集"}]      # phrase('the real numbers' can be both positive and negative)
     - else_if: "text()='ℤ'"
-      then: [{t: "整數"}]      # phrase('the integers' are natural numbers above 0)
+      then: [{t: "整數集"}]      # phrase('the integers' are natural numbers above 0)
       else: [x: "text()"] # shouldn't happen
 
 - name: real-part
@@ -503,13 +503,13 @@
   - x: "$LineCount"
   - test:
     - if: "self::m:cases"
-      then: [{t: "案件"}]      # phrase(this is the first 'case' of three cases)
+      then: [{t: "情況"}]      # phrase(this is the first 'case' of three cases)
     - else_if: "self::m:equations"
       then: [{t: "方程"}]      # phrase(this is the first 'equation' of three equations)
-      else: [{t: "線"}]      # phrase(this is the first 'line' of three lines)
+      else: [{t: "列"}]      # phrase(this is the first 'line' of three lines)
   - test:
     - if: "$LineCount != 1"
-      then: [{ct: "s"}] # plural
+      then: [{ct: ""}] # plural
   - pause: short
   - x: "*"
 
@@ -527,10 +527,10 @@
         then:
         - test:
           - if: "parent::m:cases"
-            then: [{t: "案件"}]     # phrase('case' 1 of 10 cases)
+            then: [{t: "情況"}]     # phrase('case' 1 of 10 cases)
           - else_if: "parent::m:equations"
             then: [{t: "方程"}] # phrase('equation' 1 of 10 equations)
-            else: [{t: "線"}]     # phrase('line 1 of 10 lines)
+            else: [{t: "列"}]     # phrase('line 1 of 10 lines)
         - x: "count(preceding-sibling::*)+1"
 
   - test:

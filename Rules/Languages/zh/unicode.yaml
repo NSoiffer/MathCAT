@@ -126,7 +126,7 @@
  - "<":                                         	#  0x3c
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是"]                         	# 	(en: 'is', google translation)
+         then: [t: ""]                         	# 	(en: 'is', google translation)
      - t: "小於"                                  	# 	(en: 'less than')
  - "=":                                         	#  0x3d
     - test: 
@@ -137,7 +137,7 @@
  - ">":                                         	#  0x3e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是"]                         	# 	(en: 'is', google translation)
+         then: [t: ""]                         	# 	(en: 'is', google translation)
      - t: "大於"                                  	# 	(en: 'greater than')
  - "?": [t: "問號"]                               	#  0x3f	(en: 'question mark', google translation)
  - "@": [t: "在標誌"]                              	#  0x40	(en: 'at sign', google translation)
@@ -344,7 +344,7 @@
  - "∈":                                         	#  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "一個元素"]                       	# 	(en: 'an element of', google translation)
+        then: [t: "屬於"]                       	# 	(en: 'an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set"	#  inside a set
@@ -368,7 +368,7 @@
     # rule is identical to 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "不是一個元素"]                     	# 	(en: 'is not an element of', google translation)
+        then: [t: "不屬於"]                     	# 	(en: 'is not an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set"	#  inside a set
@@ -391,7 +391,7 @@
  - "∊":                                         	#  0x220a
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "是一個元素"]                      	# 	(en: 'is an element of', google translation)
+        then: [t: "屬於"]                      	# 	(en: 'is an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set"	#  inside a set

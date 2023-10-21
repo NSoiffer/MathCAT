@@ -186,7 +186,7 @@ fn integral_under() {
         <mrow><mi>f</mi><mrow><mo>(</mo><mi>x</mi> <mo>)</mo></mrow></mrow>
         <mi>d</mi><mi>x</mi>
         </math>";
-    test("zh", "SimpleSpeak", expr, "積分 下層 實數 項目, f x d x");
+    test("zh", "SimpleSpeak", expr, "積分 下層 實數集 項目; f x d x");
 }
 
 #[test]

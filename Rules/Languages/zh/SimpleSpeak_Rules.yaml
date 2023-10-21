@@ -236,22 +236,22 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "這"}      # phrase('the' empty set)
+          then: {t: ""}      # phrase('the' empty set)
       - t: "空集"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "這"}      # phrase('the' set of all integers)
-      - t: "一組"      # phrase(the 'set of all' positive integers less than 10)
+          then: {t: ""}      # phrase('the' set of all integers)
+      - t: "集合"      # phrase(the 'set of all' positive integers less than 10)
       - x: "*[1]/*[1]"
-      - t: "這樣"      # phrase(x 'such that' x is less than y)
+      - t: "滿足"      # phrase(x 'such that' x is less than y)
       - x: "*[1]/*[3]"
       else:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "這"}      # phrase('the' set of integers)
-      - t: "放"      # phrase(here is a 'set' of numbers)
+          then: {t: ""}      # phrase('the' set of integers)
+      - t: "集合"      # phrase(here is a 'set' of numbers)
       - x: "*[1]"
 
 - name: times
