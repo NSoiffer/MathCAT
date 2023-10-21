@@ -1,0 +1,102 @@
+---
+[
+# Lines starting with "#" are a comment
+# Each definition in this file is of the form
+#   name: [ "...", "..." "..." ],
+
+
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
+# The following definitions are used to convert numbers to words
+# The are mainly used for ordinals, of which there are two cases:
+# 1. Regular ordinals: first, second, third, ...
+# 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
+#    When used in the denominator of fractions, a plural version might be
+#    used (e.g., two halves, two thirds)
+# Although a lot of languages are regular after a few entries, for generality,
+# the following lists should be filled out even though they are the same
+# or easily derived from others in many languages (e.g, an 's' is added for plurals).
+# The larger ordinal numbers (e.g, millionth) is used when there are only
+# '0's after that decimal place (e.g., 23000000).:w
+
+# All definitions start 0, 10, 100, etc.
+
+# The definitions for the "ones" should extend until a regular pattern begins
+#   The minimum length is 10.
+
+# For English, a regular pattern starts at twenty
+    NumbersOnes: [
+         «μηδέν», «ένα», «δύο», «τρία», «τέσσερα», «πέντε», «έξι», «επτά», «οκτώ», «εννιά»,
+         "δέκα", "έντεκα", "δώδεκα", "δεκατρία", "δεκατέσσερα", "δεκαπέντε", "δεκαέξι",
+         "δεκαεπτά", "δεκαοκτώ", "δεκαεννέα"
+    ],
+
+    NumbersOrdinalOnes: [
+         "μηδέν", "πρώτος", "δεύτερος", "τρίτος", "τέταρτος", "πέμπτος", "έκτος", "έβδομος", "όγδοος", "ένατος",
+         «δέκατος», «ενδέκατος», «δωδέκατος», «δέκατος τρίτος», «δέκατος τέταρτος», «δέκατος πέμπτος», «δέκατος έκτος»,
+         "δεκαέβδομος", "δέκατος όγδοος", "δέκατος ένατος"
+    ],
+
+    NumbersOrdinalPluralOnes: [
+         "μηδέν", "πρώτος", "δευτερόλεπτα", "τρίτοι", "τέταρτοι", "πέμπτοι", "έκτοι", "έβδομοι", "οκτώ", "ένατοι",
+         "δέκατα", "ενδέκατα", "δωδέκατα", "δεκατρία", "δεκατέσσερα", "δεκαπέντε", "δεκα έκτα",
+         "δεκαέβδομα", "δεκαοκτώ", "δεκαεννάτη"
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalOnes: [
+         "μηδέν", "πρώτο", "μισό"
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalPluralOnes: [
+         "μηδενικά", "πρώτες", "μισές"
+    ],
+
+
+    # What to use for multiples of 10
+    NumbersTens: [
+         "", "δέκα", "είκοσι", "τριάντα", "σαράντα", "πενήντα", "εξήντα", "εβδομήντα", "ογδόντα", "ενενήντα"
+    ],
+
+    NumbersOrdinalTens: [
+         "", "δέκατος", "εικοστός", "τριακοστός", "τεσσαρακοστός", "πεντηκοστός", "εξηκοστός", "εβδομηκοστός", "ογδοηκοστός", "ενενηκοστός"
+    ],
+
+    NumbersOrdinalPluralTens: [
+         «», «δέκατα», «είκοσι», «τριακοστά», «τεσσαρακοστά», «πεντηκοστά», «εξηκοστά», «εβδομήντα», «ογδοηκοστά», «ενενηκοστά»
+    ],
+
+
+    NumbersHundreds: [
+       "", "εκατό", "διακόσια", "τριακόσια", "τετρακόσια", "πεντακόσια",
+         "εξακόσια", "επτακόσια", "οκτακόσια", "εννιακόσια"
+    ],
+
+    NumbersOrdinalHundreds: [
+       "", "ένα εκατοστό", "διακόσιο", "τριακόσιο", "τεταρτοκοστό", "πεντακοσστό",
+         "εξακόσιος", "επτακόσιος", "οκτώ εκατοστός", "εννιακόσιος"
+    ],
+
+    NumbersOrdinalPluralHundreds: [
+       "", "ένα εκατοστά", "δυο εκατοστά", "τριακοσοστια", "τετρακοσοστή", "πεντακοσιοστή",
+         "εξακόσια", "επτα εκατοστά", "οκτώ εκατοστά", "εννιά εκατοστά"
+    ],
+      
+
+    # At this point, hopefully the language is regular. If not, code needs to be written
+    NumbersLarge: [
+         "", "χιλιάδες", "εκατομμύρια", "δισεκατομμύρια", "τρισεκατομμύρια", "τετρασεκατομμύρια",
+         "πεντίλιον", "σεκτίλιον", "σεπτίλιον", "οκτίλιον", "νονίλιον",
+    ],
+      
+    NumbersOrdinalLarge: [
+         "", "χιλιαστός", "εκατομμυριοστός", "δισεκατομμυριοστός", "τρισεκατομμυριοστός", "τετρασεκατομμυριοστός",
+         "πεμπτουσιλιοστό", "εξάξιο", "σεπτιλιοστό", "οκτισιλιοστό", "μη δισεκατομμύριο"
+    ],
+      
+    NumbersOrdinalPluralLarge: [
+         "", "χιλιάδες", "εκατομμυριοστά", "δισεκατομμύρια", "τρισεκατομμύρια", "τετρασεκατομμύρια",
+         "πεμπτουσιλιοστά", "εξαηλιοστά", "σεπτιλιοστά", "οκτασιλιοστά", "μη δισεκατομμύριο"
+    ]
+
+]
