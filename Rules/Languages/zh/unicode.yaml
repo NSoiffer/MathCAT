@@ -82,7 +82,7 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [t: "打開"]                     	#  0x28	(en: 'open', google translation)
+            then: [t: "左小括"]                     	#  0x28	(en: 'open', google translation)
             else: [t: "左小括"]                    	#  0x28	(en: 'open paren')
         else: [t: "左小括"]                        	#  0x28	(en: 'left paren')
  - ")":                                         	#  0x29
@@ -90,7 +90,7 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [t: "關閉"]                     	#  0x29	(en: 'close', google translation)
+            then: [t: "右小括"]                     	#  0x29	(en: 'close', google translation)
             else: [t: "右小括"]                    	#  0x29	(en: 'close paren')
         else: [t: "右小括"]                        	#  0x29	(en: 'right paren')
 
@@ -144,13 +144,13 @@
  - "[":                                         	#  0x5b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "打開括號"]                       	# 	(en: 'open bracket', google translation)
+        then: [t: "左中括"]                       	# 	(en: 'open bracket', google translation)
         else: [t: "左中括"]                        	# 	(en: 'left bracket')
  - "\\": [t: "左中括"]                             	#  0x5c	(en: 'back slash')
  - "]":                                         	#  0x5d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "關閉括號"]                       	# 	(en: 'close bracket', google translation)
+        then: [t: "右中括"]                       	# 	(en: 'close bracket', google translation)
         else: [t: "右中括"]                        	# 	(en: 'right bracket')
  - "^": [t: "帽子"]                               	#  0x5e	(en: 'hat', google translation)
  - "_": [t: "在酒吧下"]                             	#  0x5f	(en: 'under bar', google translation)
@@ -158,7 +158,7 @@
  - "{":                                         	#  0x7b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "打開支撐"]                       	# 	(en: 'open brace', google translation)
+        then: [t: "左大括"]                       	# 	(en: 'open brace', google translation)
         else: [t: "左大括"]                        	# 	(en: 'left brace')
  - "|":                                         	#  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
@@ -174,7 +174,7 @@
  - "}":                                         	#  0x7d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "閉合支撐"]                       	# 	(en: 'close brace', google translation)
+        then: [t: "右大括"]                       	# 	(en: 'close brace', google translation)
         else: [t: "右大括"]                        	# 	(en: 'right brace')
 
  - "~": [t: "蒂爾德"]                              	#  0x7e	(en: 'tilde', google translation)
@@ -232,9 +232,9 @@
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
         replace: [spell: "translate('.', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
 
- - "α": [t: "Alpha"]                            	#  0x3b1	(en: 'alpha')
- - "β": [t: "Beta"]                             	#  0x3b2	(en: 'beta')
- - "γ": [t: "Gamma"]                            	#  0x3b3	(en: 'gamma')
+ - "α": [t: "alpha"]                            	#  0x3b1	(en: 'alpha')
+ - "β": [t: "beta"]                             	#  0x3b2	(en: 'beta')
+ - "γ": [t: "gamma"]                            	#  0x3b3	(en: 'gamma')
  - "δ": [t: "Delta"]                            	#  0x3b4	(en: 'delta')
  - "ε": [t: "Epsilon"]                          	#  0x3b5	(en: 'epsilon')
  - "ζ": [t: "Zeta"]                             	#  0x3b6	(en: 'zeta')
@@ -253,11 +253,11 @@
  - "σ": [t: "Sigma"]                            	#  0x3c3	(en: 'sigma')
  - "τ": [t: "Tau"]                              	#  0x3c4	(en: 'tau')
  - "υ": [t: "Upsilon"]                          	#  0x3c5	(en: 'upsilon')
- - "φ": [t: "Phi"]                              	#  0x3c6	(en: 'phi')
+ - "φ": [t: "phi"]                              	#  0x3c6	(en: 'phi')
  - "χ": [t: "Chi"]                              	#  0x3c7	(en: 'chi')
  - "ψ": [t: "Psi"]                              	#  0x3c8	(en: 'psi')
  - "ω": [t: "Omega"]                            	#  0x3c9	(en: 'omega')
- - "ϕ": [t: "Phi"]                              	#  0x3d5	(en: 'phi')
+ - "ϕ": [t: "phi"]                              	#  0x3d5	(en: 'phi')
  - "ϖ": [t: "Pi"]                               	#  0x3d6	(en: 'pi')
  - "ϵ": [t: "Lunate Epsilon"]                   	#  0x3f5	(en: 'epsilon')
  - "϶": [t: "Reversed Lunate Epsilon"]          	#  0x3f6	(en: 'reversed epsilon')
@@ -283,7 +283,7 @@
     - test:
         if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
              not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':structure:')])"
-        then: [t: "的"]                          	# 	(en: 'of', google translation)
+        then: [t: ""]                          	# 	(en: 'of', google translation)
  - "⁢": [t: ""]                                 	#  0x2062
  - "⁣": [t: ""]                                 	#  0x2063
  - "⁤": [t: "又"]                                	#  0x2064	(en: 'and', google translation)(3 又 1/2)
@@ -428,7 +428,7 @@
          if: "$Verbosity!='Terse'"
          then: [t: "是"]                         	# 	(en: 'is', google translation)
      - t: "正比於"                                 	# 	(en: 'proportional to')
- - "∞": [t: "無限"]                               	#  0x221e	(en: 'infinity')
+ - "∞": [t: "無限大"]                               	#  0x221e	(en: 'infinity')
  - "∟": [t: "直角"]                               	#  0x221f	(en: 'right angle')
  - "∠": [t: "角"]                                	#  0x2220	(en: 'angle')
  - "∡": [t: "測量角"]                              	#  0x2221	(en: 'measured angle')

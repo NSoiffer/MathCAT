@@ -323,7 +323,7 @@
   match: "text()='sin'"
   replace:
   - bookmark: "@id"
-  - t: "正弦"      # phrase(the 'sine' of the angle)
+  - t: "sine"      # phrase(the 'sine' of the angle)
 - name: cos
   tag: mi
   match: "text()='cos'"
@@ -332,7 +332,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: {t: "cos"}      # phrase('cos' is the abbreviation for cosine)
-      else: {t: "餘弦"}      # phrase(find the 'cosine' in a right-angle triangle)
+      else: {t: "cosine"}      # phrase(find the 'cosine' in a right-angle triangle)
 - name: tan
   tag: mi
   match: "text()='tan' or text()='tg'"
@@ -340,8 +340,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "棕褐色"}      # phrase(the 'tan' is the ratio of the opposite to the adjacent side of a right-angled triangle)
-      else: {t: "切線"}      # phrase(a 'tangent' is a straight line that touches a curve)
+      then: {t: "tan"}      # phrase(the 'tan' is the ratio of the opposite to the adjacent side of a right-angled triangle)
+      else: {t: "tangent"}      # phrase(a 'tangent' is a straight line that touches a curve)
 - name: sec
   tag: mi
   match: "text()='sec'"
@@ -349,8 +349,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "尋找"}      # phrase(to 'seek' a solution)
-      else: {t: "割線"}      # phrase(a 'secant' intersects a curve at two or more points)
+      then: {t: "secant"}      # phrase(to 'seek' a solution)
+      else: {t: "secant"}      # phrase(a 'secant' intersects a curve at two or more points)
 - name: csc
   tag: mi
   match: "text()='csc'"
@@ -358,8 +358,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "科塞克"}      # phrase(we will 'cosecant' a solution)
-      else: {t: "合作"}      # phrase(the 'cosecant' is the reciprocal of the secant)
+      then: {t: "cosecant"}      # phrase(we will 'cosecant' a solution)
+      else: {t: "cosecant"}      # phrase(the 'cosecant' is the reciprocal of the secant)
 - name: cot
   tag: mi
   match: "text()='cot'"
@@ -367,7 +367,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "科坦"}      # phrase(find the 'cotangent' in a right-angle triangle)
+      then: {t: "cotangent"}      # phrase(find the 'cotangent' in a right-angle triangle)
       else: {t: "cotangent"}      # phrase(the 'cotangent' is the reciprocal of the tangent)
 
 - name: sinh
@@ -377,8 +377,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "辛奇"}      # phrase(the word 'sinch' is an abbreviation for hyperbolic sine)
-      else: {t: "雙曲線正弦"}      # phrase(the 'hyperbolic sine' is used in mathematics)
+      then: {t: "sinch"}      # phrase(the word 'sinch' is an abbreviation for hyperbolic sine)
+      else: {t: "hyperbolic sine"}      # phrase(the 'hyperbolic sine' is used in mathematics)
 - name: cosh
   tag: mi
   match: "text()='cosh'"
@@ -387,7 +387,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: {t: "cosh"}      # phrase('cosh' is an abbreviation of hyperbolic cosine)
-      else: {t: "雙曲線餘弦"}      # phrase(the 'hyperbolic cosine' is a mathematical function)
+      else: {t: "hyperbolic cosine"}      # phrase(the 'hyperbolic cosine' is a mathematical function)
 - name: tanh
   tag: mi
   match: "text()='tanh'"
@@ -396,7 +396,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: {t: "tanch"}      # phrase('tanch' is shorthand for hyperbolic tangent)
-      else: {t: "雙曲線切線"}      # phrase('hyperbolic tangent' is a mathematical function)
+      else: {t: "hyperbolic tangent"}      # phrase('hyperbolic tangent' is a mathematical function)
 - name: sech
   tag: mi
   match: "text()='sech'"
@@ -405,7 +405,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: {t: "sheck"}      # phrase('sheck' is shorthand for hyperbolic secant)
-      else: {t: "雙曲線割線"}      # phrase('hyperbolic secant' is a mathematical function)
+      else: {t: "hyperbolic secant"}      # phrase('hyperbolic secant' is a mathematical function)
 - name: csch
   tag: mi
   match: "text()='csch'"
@@ -414,7 +414,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: {t: "cosheck"}      # phrase('cosheck' is shorthand for hyperbolic cosecant)
-      else: {t: "雙曲線整合"}      # phrase('hyperbolic cosecant' is a mathematical function)
+      else: {t: "hyperbolic cosecant"}      # phrase('hyperbolic cosecant' is a mathematical function)
 - name: coth
   tag: mi
   match: "text()='coth'"
@@ -423,7 +423,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: {t: "cotanch"}      # phrase('cotanch' is shorthand for hyperbolic cotangent)
-      else: {t: "雙曲線旋轉"}      # phrase(the 'hyperbolic cotangent' is a mathematical function)
+      else: {t: "hyperbolic cotangent"}      # phrase(the 'hyperbolic cotangent' is a mathematical function)
 
 - # handle both log and ln
   name: log
@@ -439,21 +439,21 @@
       if: "$log_is_simple"
       then_test:
       - if: "*[1][text()='log']"
-        then: [{t: "紀錄"}]      # phrase(the 'log' function is used in mathematics)
+        then: [{t: "log"}]      # phrase(the 'log' function is used in mathematics)
       - else_if: "$Verbosity='Terse'"
         then: [{spell: "'ln'"}]
-        else: [{t: "自然日誌"}]      # phrase(the 'natural log' function is used in mathematics)
+        else: [{spell: "'ln'"}]      # phrase(the 'natural log' function is used in mathematics)
       else:
       - test:
           if: "$Verbosity!='Terse' and not(log_is_simple)"
-          then: {t: "這"}      # phrase('the' square root of 25 equals 5)
+          then: {t: ""}      # phrase('the' square root of 25 equals 5)
       - test:
         - if: "*[1][text()='log']"
-          then: [{t: "紀錄"}]      # phrase(the 'log' function is used in mathematics)
+          then: [{t: "log"}]      # phrase(the 'log' function is used in mathematics)
         - else_if: "$Verbosity='Terse'"
           then: [{spell: "'ln'"}]
-          else: [{t: "自然日誌"}]      # phrase(the 'natural log' function is used in mathematics)
-      - t: "的"      # phrase(5 is the square root 'of' 25)
+          else: [{spell: "'ln'"}]      # phrase(the 'natural log' function is used in mathematics)
+      - t: ""      # phrase(5 is the square root 'of' 25)
       - pause: short
   - x: "*[3]"
 
@@ -464,8 +464,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "這"}      # phrase('the' square root of 25 equals 5)
-  - t: "日誌基礎"      # phrase(the 'log base' is often base 10)
+      then: {t: ""}      # phrase('the' square root of 25 equals 5)
+  - t: "log 底"      # phrase(the 'log base' is often base 10)
   - x: "*[1]"
 
 - name: log-base-power
@@ -475,19 +475,19 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "這"}      # phrase('the' square root of 25 equals 5)
-  - t: "日誌基礎"      # phrase(the 'log base' is often base 10)
+      then: {t: ""}      # phrase('the' square root of 25 equals 5)
+  - t: "log 底"      # phrase(the 'log base' is often base 10)
   - x: "*[1]"
   - pause: medium
   - test:
       - if: "*[2][text()=2]"
         then: [t: "平方"]     
       - else_if: "*[2][text()=3]"
-        then: [t: "立方體"]
+        then: [t: "立方"]
         else:  # don't bother with special cases as this isn't likely to happen
-        - t: "提高到"      # phrase(x 'raised to the' second power)
+        - t: "的"      # phrase(x 'raised to the' second power)
         - x: "*[2]"
-        - t: "力量"      # phrase(x raised to the second 'power')
+        - t: "次方"      # phrase(x raised to the second 'power')
   - pause: short
 
 - name: multi-line

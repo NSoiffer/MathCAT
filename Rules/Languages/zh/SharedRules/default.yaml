@@ -648,7 +648,7 @@
   match: count(*)>0
   replace:
   - x: "translate(name(.), '-_', '  ')"
-  - t: "的"      # phrase(sine 'of' 5)
+  - t: "of"      # phrase(sine 'of' 5)
   - pause: short
   - insert:
       nodes: "*"

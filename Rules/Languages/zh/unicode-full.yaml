@@ -785,7 +785,7 @@
          if: "$Verbosity!='Terse'"
          then: [t: "是"]                         	# 	(en: 'is', google translation)
      - t: "正比於"                                 	# 	(en: 'proportional to')
- - "∞": [t: "無限"]                               	#  0x221e	(en: 'infinity')
+ - "∞": [t: "無限大"]                               	#  0x221e	(en: 'infinity')
  - "∟": [t: "直角"]                               	#  0x221f	(en: 'right angle')
  - "∠": [t: "角"]                                	#  0x2220	(en: 'angle')
  - "∡": [t: "測量角"]                              	#  0x2221	(en: 'measured angle')

@@ -115,7 +115,7 @@
   tag: inverse-function
   match: "."
   replace:
-  - t: "逆"      # phrase(the 'inverse' of f)
+  - t: "反"      # phrase(the 'inverse' of f)
   - x: "*[1]"
 
 - name: function-squared-or-cubed
@@ -137,15 +137,15 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "這"}      # # phrase('the' fourth power of 10)
+      then: {t: ""}      # # phrase('the' fourth power of 10)
   - bookmark: "*[2]/@id"
+  - x: "*[1]"
   - test:
       if: "*[2][self::m:mn][not(contains(., '.'))]"
-      then: [{x: "ToOrdinal(*[2])"}]
+      then: [{x: "*[2]"}]
       else: [{x: "*[2]"}]
-  - t: "的力量"      # phrase(the fourth 'power of' 2)
+  - t: "次方"      # phrase(the fourth 'power of' 2)
   - pause: short
-  - x: "*[1]"
 
 # non-function rules for power
 - name: squared-or-cubed
