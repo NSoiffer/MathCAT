@@ -140,6 +140,7 @@
       then: {t: ""}      # # phrase('the' fourth power of 10)
   - bookmark: "*[2]/@id"
   - x: "*[1]"
+  - t: "的"
   - test:
       if: "*[2][self::m:mn][not(contains(., '.'))]"
       then: [{x: "*[2]"}]

@@ -122,7 +122,7 @@
   - x: "*[1]"
 
 - name: intervals
-  tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
+  tag: [開-區間, 開-閉-區間, 閉-區間, 閉-開-區間]
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - test:
