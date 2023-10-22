@@ -33,7 +33,7 @@ fn hyperbolic_trig_names() {
                                 hyperbolic tangent z, 加 \
                                 hyperbolic secant alpha, 加 \
                                 hyperbolic cosecant phi, 加 \
-                                hyperbolic cotangent phi");
+                                hyperbolic cotangent, phi");
 }
 
 
