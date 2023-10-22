@@ -12,20 +12,20 @@
   - bookmark: "*[2]/@id"
   - test:
     - if: "*[2][text()='+']"
-      then: [{t: "positive"}]      # phrase(set of all 'positive' integers less than 10)
-      else: [{t: "negative"}]      # phrase(set of all 'negative' integers less than minus 10)
+      then: [t: "positive"]      # phrase(set of all 'positive' integers less than 10)
+      else: [t: "negative"]      # phrase(set of all 'negative' integers less than minus 10)
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][text()='ℂ']"
-      then: [{t: "complex numbers"}]      # phrase('complex numbers' consist of two parts)
+      then: [t: "complex numbers"]      # phrase('complex numbers' consist of two parts)
     - else_if: "*[1][text()='ℕ']"
-      then: [{t: "natural numbers"}]      # phrase('natural numbers' are numbers from 1 to infinity)
+      then: [t: "natural numbers"]      # phrase('natural numbers' are numbers from 1 to infinity)
     - else_if: "*[1][text()='ℚ']"
-      then: [{t: "rational numbers"}]      # phrase('rational numbers' are the fraction of 2 integers)
+      then: [t: "rational numbers"]      # phrase('rational numbers' are the fraction of 2 integers)
     - else_if: "*[1][text()='ℝ']"
-      then: [{t: "real numbers"}]      # phrase('real numbers' can be both positive and negative)
+      then: [t: "real numbers"]      # phrase('real numbers' can be both positive and negative)
     - else_if: "*[1][text()='ℤ']"
-      then: [{t: "integers"}]      # phrase(positive 'integers' are natural numbers above 0)
+      then: [t: "integers"]      # phrase(positive 'integers' are natural numbers above 0)
       else: [{x: "*[1][text()]"}] # shouldn't happen
 
 - name: dimension-number-sets
@@ -37,15 +37,15 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][text()='ℂ']"
-      then: [{t: "C"}]      # phrase(the letter 'C' used to represent complex number)
+      then: [t: "C"]      # phrase(the letter 'C' used to represent complex number)
     - else_if: "*[1][text()='ℕ']"
-      then: [{t: "N"}]      # phrase(the letter 'N' may represent natural numbers)
+      then: [t: "N"]      # phrase(the letter 'N' may represent natural numbers)
     - else_if: "*[1][text()='ℚ']"
-      then: [{t: "Q"}]      # phrase(the letter 'Q' may represent rational numbers)
+      then: [t: "Q"]      # phrase(the letter 'Q' may represent rational numbers)
     - else_if: "*[1][text()='ℝ']"
-      then: [{t: "R"}]      # phrase(the letter 'R' may represent real numbers)
+      then: [t: "R"]      # phrase(the letter 'R' may represent real numbers)
     - else_if: "*[1][text()='ℤ']"
-      then: [{t: "Z"}]      # phrase(the letter 'Z' may represent integers)
+      then: [t: "Z"]      # phrase(the letter 'Z' may represent integers)
       else: [{x: "*[1][text()]"}] # shouldn't happen
   - bookmark: "*[2]/@id"
   - x: "*[2]"
@@ -57,15 +57,15 @@
   - bookmark: "@id"
   - test:
     - if: "text()='ℂ'"
-      then: [{t: "the complex numbers"}]      # phrase('the complex numbers' include 2 parts)
+      then: [t: "the complex numbers"]      # phrase('the complex numbers' include 2 parts)
     - else_if: "text()='ℕ'"
-      then: [{t: "the natural numbers"}]      # phrase('the natural numbers' begin at 1)
+      then: [t: "the natural numbers"]      # phrase('the natural numbers' begin at 1)
     - else_if: "text()='ℚ'"
-      then: [{t: "the rational numbers"}]      # phrase('the rational numbers' are the fraction of 2 integers)
+      then: [t: "the rational numbers"]      # phrase('the rational numbers' are the fraction of 2 integers)
     - else_if: "text()='ℝ'"
-      then: [{t: "the real numbers"}]      # phrase('the real numbers' can be both positive and negative)
+      then: [t: "the real numbers"]      # phrase('the real numbers' can be both positive and negative)
     - else_if: "text()='ℤ'"
-      then: [{t: "the integers"}]      # phrase('the integers' are natural numbers above 0)
+      then: [t: "the integers"]      # phrase('the integers' are natural numbers above 0)
       else: [x: "text()"] # shouldn't happen
 
 - name: real-part
@@ -161,8 +161,8 @@
   replace:
   - test:
       if: "$Verbosity='Terse'"
-      then: [{t: "absolute value"}]      # phrase(the 'absolute value' of a number represents its distance from 0)
-      else: [{t: "the absolute value of"}]      # phrase('the absolute value of' a number represents its distance from 0)
+      then: [t: "absolute value"]      # phrase(the 'absolute value' of a number represents its distance from 0)
+      else: [t: "the absolute value of"]      # phrase('the absolute value of' a number represents its distance from 0)
   - x: "*[1]"
   - test:
       if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
@@ -210,7 +210,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "the"}]      # phrase('the' square root of 25 equals 5)
+      then: [t: "the"]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
   - t: "from"      # phrase(subtracting 5 'from' 10 gives 5)
   - x: "*[2]"
@@ -218,7 +218,7 @@
   - x: "*[3]"
   - test:
       if: "following-sibling::*"
-      then: [{t: "of"}]      # phrase(the square root 'of' 25 equals 5)
+      then: [t: "of"]      # phrase(the square root 'of' 25 equals 5)
 
 - name: bigop-under
   tag: large-op
@@ -226,13 +226,13 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "the"}]      # phrase('the' square root of 25 equals 5)
+      then: [t: "the"]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
   - t: "over"      # phrase(2 'over' 3 equals two thirds)
   - x: "*[2]"
   - test:
       if: "following-sibling::*"
-      then: [{t: "of"}]      # phrase(the square root 'of' 25 equals 5)
+      then: [t: "of"]      # phrase(the square root 'of' 25 equals 5)
 
 - name: largeop
   tag: mrow
@@ -240,7 +240,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "the"}]      # phrase('the' square root of 25 equals 5)
+      then: [t: "the"]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
   - t: "of"      # phrase(the square root 'of' 25 equals 5)
   - x: "*[2]"
@@ -251,8 +251,8 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "the limit as"}]      # phrase('the limit as' indicated by this result)
-      else: [{t: "limit as"}]      # phrase(the 'limit as' indicated by this result)
+      then: [t: "the limit as"]      # phrase('the limit as' indicated by this result)
+      else: [t: "limit as"]      # phrase(the 'limit as' indicated by this result)
   - x: "*[2]"
   - pause: short
 
@@ -439,20 +439,20 @@
       if: "$log_is_simple"
       then_test:
       - if: "*[1][text()='log']"
-        then: [{t: "log"}]      # phrase(the 'log' function is used in mathematics)
+        then: [t: "log"]      # phrase(the 'log' function is used in mathematics)
       - else_if: "$Verbosity='Terse'"
-        then: [{spell: "'ln'"}]
-        else: [{t: "natural log"}]      # phrase(the 'natural log' function is used in mathematics)
+        then: [spell: "'ln'"]
+        else: [t: "natural log"]      # phrase(the 'natural log' function is used in mathematics)
       else:
       - test:
           if: "$Verbosity!='Terse' and not(log_is_simple)"
           then: {t: "the"}      # phrase('the' square root of 25 equals 5)
       - test:
         - if: "*[1][text()='log']"
-          then: [{t: "log"}]      # phrase(the 'log' function is used in mathematics)
+          then: [t: "log"]      # phrase(the 'log' function is used in mathematics)
         - else_if: "$Verbosity='Terse'"
-          then: [{spell: "'ln'"}]
-          else: [{t: "natural log"}]      # phrase(the 'natural log' function is used in mathematics)
+          then: [spell: "'ln'"]
+          else: [t: "natural log"]      # phrase(the 'natural log' function is used in mathematics)
       - t: "of"      # phrase(5 is the square root 'of' 25)
       - pause: short
   - x: "*[3]"
@@ -503,13 +503,13 @@
   - x: "$LineCount"
   - test:
     - if: "self::m:cases"
-      then: [{t: "case"}]      # phrase(this is the first 'case' of three cases)
+      then: [t: "case"]      # phrase(this is the first 'case' of three cases)
     - else_if: "self::m:equations"
-      then: [{t: "equation"}]      # phrase(this is the first 'equation' of three equations)
-      else: [{t: "line"}]      # phrase(this is the first 'line' of three lines)
+      then: [t: "equation"]      # phrase(this is the first 'equation' of three equations)
+      else: [t: "line"]      # phrase(this is the first 'line' of three lines)
   - test:
     - if: "$LineCount != 1"
-      then: [{ct: "s"}] # plural
+      then: [[ct: "s"]] # plural
   - pause: short
   - x: "*"
 
@@ -527,10 +527,10 @@
         then:
         - test:
           - if: "parent::m:cases"
-            then: [{t: "case"}]     # phrase('case' 1 of 10 cases)
+            then: [t: "case"]     # phrase('case' 1 of 10 cases)
           - else_if: "parent::m:equations"
-            then: [{t: "equation"}] # phrase('equation' 1 of 10 equations)
-            else: [{t: "line"}]     # phrase('line 1 of 10 lines)
+            then: [t: "equation"] # phrase('equation' 1 of 10 equations)
+            else: [t: "line"]     # phrase('line 1 of 10 lines)
         - x: "count(preceding-sibling::*)+1"
 
   - test:
@@ -627,7 +627,7 @@
   - x: "*" # select the rows (mtr)
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
-      then: [{t: "end matrix"}]      # phrase(the 'end of matrix' has been reached)
+      then: [t: "end matrix"]      # phrase(the 'end of matrix' has been reached)
 
 - name: 1x2-or-3-matrix
   tag: matrix
@@ -739,10 +739,10 @@
   - x: "*[2]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "subscript"}]      # phrase(H 'subscript' 2)
+      then: [t: "subscript"]      # phrase(H 'subscript' 2)
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{t: "sub"}]      # phrase(H 'sub' 2)
+        then: [t: "sub"]      # phrase(H 'sub' 2)
   - x: "*[3]"
 
 - name: chemistry-msup
@@ -752,10 +752,10 @@
   - x: "*[2]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+      then: [t: "superscript"]      # phrase(H 'superscript' 2)
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{t: "super"}]      # phrase(H 'super' 2)
+        then: [t: "super"]      # phrase(H 'super' 2)
   - x: "*[3]"
   - test:
       if: "following-sibling::*[1][text()='+' or text()='-']" # a little lazy -- assumes chemistry superscripts end with + or -
@@ -783,10 +783,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+              then: [t: "superscript"]      # phrase(H 'superscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "super"}]      # phrase(H 'super' 2)
+                then: [t: "super"]      # phrase(H 'super' 2)
           - x: "$Prescripts[2]"
           - pause: "short"
       - test:
@@ -794,10 +794,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "subscript"}]      # phrase(a 'subscript' may be used to indicate an index)
+              then: [t: "subscript"]      # phrase(a 'subscript' may be used to indicate an index)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "sub"}]      # phrase(here is a 'sub' total)
+                then: [t: "sub"]      # phrase(here is a 'sub' total)
           - x: "$Prescripts[1]"
           - pause: "short"
       - test:
@@ -808,10 +808,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+                  then: [t: "superscript"]      # phrase(H 'superscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "super"}]      # phrase(H 'super' 2)
+                    then: [t: "super"]      # phrase(H 'super' 2)
               - x: "$Prescripts[4]"
               - pause: "short"
           - test:
@@ -819,10 +819,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "subscript"}]      # phrase(H 'subscript' 2)
+                  then: [t: "subscript"]      # phrase(H 'subscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "sub"}]      # phrase(H 'sub' 2)
+                    then: [t: "sub"]      # phrase(H 'sub' 2)
               - x: "$Prescripts[3]"
               - pause: "short"
   - x: "*[1]" # base
@@ -834,10 +834,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "subscript"}]      # phrase(phrase(H 'subscript' 2)
+              then: [t: "subscript"]      # phrase(phrase(H 'subscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "sub"}]      # phrase(phrase(H 'sub' 2)
+                then: [t: "sub"]      # phrase(phrase(H 'sub' 2)
           - x: "$Postscripts[1]"
           - pause: "short"
       - test:
@@ -845,10 +845,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+              then: [t: "superscript"]      # phrase(H 'superscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "super"}]          # phrase(H 'super' 2)
+                then: [t: "super"]          # phrase(H 'super' 2)
           - x: "$Postscripts[2]"
           - pause: "short"
       - test:
@@ -859,10 +859,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "subscript"}]      # phrase(H 'subscript' 2)
+                  then: [t: "subscript"]      # phrase(H 'subscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "sub"}]          # phrase(H 'sub' 2)
+                    then: [t: "sub"]          # phrase(H 'sub' 2)
               - x: "$Postscripts[3]"
               - pause: "short"
           - test:
@@ -870,10 +870,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+                  then: [t: "superscript"]      # phrase(H 'superscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "super"}]          # phrase(H 'super' 2)
+                    then: [t: "super"]          # phrase(H 'super' 2)
               - x: "$Postscripts[4]"
               - pause: "short"
           - test:
@@ -884,10 +884,10 @@
                   then:
                   - test:
                       if: "$Verbosity='Verbose'"
-                      then: [{t: "subscript"}]    # phrase(H 'subscript' 2)
+                      then: [t: "subscript"]    # phrase(H 'subscript' 2)
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{t: "sub"}]        # phrase(H 'sub' 2)
+                        then: [t: "sub"]        # phrase(H 'sub' 2)
                   - x: "$Postscripts[5]"
                   - pause: "short"
               - test:
@@ -895,10 +895,10 @@
                   then:
                   - test:
                       if: "$Verbosity='Verbose'"
-                      then: [{t: "superscript"}]  # phrase(H 'superscript' 2)
+                      then: [t: "superscript"]  # phrase(H 'superscript' 2)
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{t: "super"}]      # phrase(H 'super' 2)
+                        then: [t: "super"]      # phrase(H 'super' 2)
                   - x: "$Postscripts[6]"
                   - pause: "short"
               - test:
@@ -909,10 +909,10 @@
                       then:
                       - test:
                           if: "$Verbosity='Verbose'"
-                          then: [{t: "subscript"}]      # phrase(H 'subscript' 2)
+                          then: [t: "subscript"]      # phrase(H 'subscript' 2)
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{t: "sub"}]      # phrase(H 'sub' 2)
+                            then: [t: "sub"]      # phrase(H 'sub' 2)
                       - x: "$Postscripts[7]"
                       - pause: "short"
                   - test:
@@ -920,10 +920,10 @@
                       then:
                       - test:
                           if: "$Verbosity='Verbose'"
-                          then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+                          then: [t: "superscript"]      # phrase(H 'superscript' 2)
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{t: "super"}]      # phrase(H 'super' 2)
+                            then: [t: "super"]      # phrase(H 'super' 2)
                       - x: "$Postscripts[8]"
                       - pause: "short"
       - test:
@@ -953,12 +953,12 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: ".='s'"
-      then: [{t: "solid"}]      # phrase(Boron is a 'solid' in its natural state)
+      then: [t: "solid"]      # phrase(Boron is a 'solid' in its natural state)
     - else_if: ".='l'"
-      then: [{t: "liquid"}]      # phrase(water is a 'liquid')
+      then: [t: "liquid"]      # phrase(water is a 'liquid')
     - else_if: ".='g'"
-      then: [{t: "gas"}]      # phrase(hydrogen is a 'gas' )
-      else: [{t: "aqueous"}]      # phrase(an 'aqueous' solution is contained in water)
+      then: [t: "gas"]      # phrase(hydrogen is a 'gas' )
+      else: [t: "aqueous"]      # phrase(an 'aqueous' solution is contained in water)
   - pause: short
 
 - name: chemical-formula-operator-bond
@@ -969,13 +969,13 @@
   - bookmark: "@id"
   - test:
     - if: "text()='-' or text() = ':'"
-      then: [{t: "single bond"}]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
+      then: [t: "single bond"]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
     - else_if: "text()='=' or text() = '∷'"
-      then: [{t: "double bond"}]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
+      then: [t: "double bond"]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
     - else_if: "text()='≡'"
-      then: [{t: "triple bond"}]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
+      then: [t: "triple bond"]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
     - else_if: "text()='≣'"
-      then: [{t: "quadruple bond"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
+      then: [t: "quadruple bond"]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
       else: [{x: "text()"}]
 
 - name: chemical-formula-operator
@@ -994,14 +994,14 @@
     - if: ".='→' or .='⟶'"
       then_test:
         if: "$Verbosity='Terse'"
-        then: [{t: "forms"}]      # phrase(hydrogen and oxygen 'forms' water )
-        else: [{t: "reacts to form"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
+        then: [t: "forms"]      # phrase(hydrogen and oxygen 'forms' water )
+        else: [t: "reacts to form"]      # phrase(hydrogen and oxygen 'reacts to form' water)
     - else_if: ".='⇌' or .='⮖'"
-      then: [{t: "is in equilibrium with"}]      # phrase(a reactant 'is in equilibrium with' a product)
+      then: [t: "is in equilibrium with"]      # phrase(a reactant 'is in equilibrium with' a product)
     - else_if: ".='⭴'"
-      then: [{t: "is in equilibrium biased to the left with"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
+      then: [t: "is in equilibrium biased to the left with"]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
     - else_if: ".='⭵'"
-      then: [{t: "is in equilibrium biased to the right with"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
+      then: [t: "is in equilibrium biased to the right with"]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
       else: [x: "."]
 
 - name: chemical-equation-operator

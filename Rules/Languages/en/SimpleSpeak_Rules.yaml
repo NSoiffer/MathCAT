@@ -38,14 +38,14 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "the"}]
+      then: [t: "the"]
   - test:
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][text()='2']"
-        then: [{t: "square root"}]        # phrase(the 'square root' of x)
+        then: [t: "square root"]        # phrase(the 'square root' of x)
       - else_if: "*[2][text()='3']"
-        then: [{t: "cube root"}]        # phrase(the 'cube root' of x)
+        then: [t: "cube root"]        # phrase(the 'cube root' of x)
       - else_if: "*[2][not(contains(., '.'))]"
         then: [{x: "ToOrdinal(*[2])"}, {t: "root"}]        # phrase(the square 'root' of x)
       else:
@@ -58,7 +58,7 @@
       - t: "root"        # phrase(the square 'root' of)
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "of"}]        # phrase(the square root 'of' x)
+      then: [t: "of"]        # phrase(the square root 'of' x)
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
