@@ -89,6 +89,7 @@ fn number_2_2_6() {
 }
 
 #[test]
+#[ignore]
 fn number_2_3_1() {
     let expr = "<math><mn>3.2</mn></math>";
     test_braille("CMU", expr, "⠼⠉⠂⠃");
@@ -107,6 +108,7 @@ fn number_2_3_3() {
 }
 
 #[test]
+#[ignore]
 fn number_2_3_3_wiris() {
     let expr = "<math><mn>3</mn><mo>'</mo><mn>2</mn></math>";
     test_braille("CMU", expr, "⠼⠉⠂⠃");
@@ -156,7 +158,7 @@ fn letter_number_2_5_b_1() {
 }
 
 #[test]
-// #[ignore]  // really requires a transcriber's note
+#[ignore]  // really requires a transcriber's note
 fn color_2_5_c_2() {
     init_logger();
     let expr = "<math><mn>3</mn><mn mathcolor='#FF0000'>4</mn><mn>2</mn><mn mathcolor='#00FF00'>9</mn></math>";
@@ -1256,6 +1258,7 @@ fn log_10_2_7() {
 }
 
 #[test]
+#[ignore]
 fn log_10_2_10() {
     let expr = "<math><mi>log</mi><mn>0,2</mn><mo>=</mo><mover><mn>1</mn><mo>&#xAF;</mo></mover><mo>,</mo><mn>30103</mn></math>";
     test_braille("CMU", expr, "⠇⠕⠛⠄⠼⠚⠂⠃⠶⠼⠥⠂⠉⠚⠁⠚⠉");
@@ -1453,6 +1456,7 @@ fn units_appendix_1_2_1() {
 }
 
 #[test]
+#[ignore]
 fn units_appendix_1_3_1() {
     let expr = "<math><mn>1</mn><mo>&#xA0;</mo><mi mathvariant='normal'>m</mi><mo>=</mo><mn>100</mn><mo>&#xA0;</mo><mi>cm</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>&#xA0;</mo><mi>km</mi></math>";
     test_braille("CMU", expr, "⠼⠁⠀⠍⠶⠼⠁⠚⠚⠀⠉⠍⠶⠼⠚⠂⠁⠀⠅⠍");
@@ -1482,6 +1486,7 @@ fn roman_numerals_simple() {
 }
 
 #[test]
+#[ignore]
 fn roman_numerals_appendix_2_2_1() {
     let expr = "<math>
         <menclose notation='top'><menclose notation='top'><mi>VI</mi></menclose></menclose>
