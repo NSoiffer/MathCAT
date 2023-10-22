@@ -548,7 +548,7 @@ fn simple_absolute_value() {
   
 #[test]
 fn absolute_value_plus_1() {
-let expr = "<math>
+let _expr = "<math>
     <mrow><mrow><mo>|</mo>
       <mrow><mi>x</mi><mo>+</mo><mn>1</mn> </mrow>
     <mo>|</mo></mrow></mrow>
@@ -560,7 +560,7 @@ let expr = "<math>
 
 #[test]
 fn simple_cardinality_value() {
-  let expr = "<math>
+  let _expr = "<math>
     <mrow><mrow><mo>|</mo> <mi>S</mi> <mo>|</mo></mrow></mrow>
   </math>";
   //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_AbsoluteValue", "Cardinality")], expr,
@@ -570,7 +570,7 @@ fn simple_cardinality_value() {
 // Test preferences
 #[test]
 fn simple_matrix_speak_col_num() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>(</mo>
     <mrow>
@@ -592,7 +592,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn col_matrix_3x1_speak_col_num() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>(</mo>
     <mrow>
@@ -615,7 +615,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn row_matrix_1x2_speak_col_num() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>[</mo>
     <mrow>
@@ -632,7 +632,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn matrix_2x2_speak_col_num() {
-let expr = "<math><mrow><mrow><mo>(</mo><mrow>
+let _expr = "<math><mrow><mrow><mo>(</mo><mrow>
     <mtable>
     <mtr>
         <mtd><mrow><msub><mi>b</mi><mrow><mn>1</mn><mn>1</mn></mrow></msub></mrow></mtd>
@@ -652,7 +652,7 @@ let expr = "<math><mrow><mrow><mo>(</mo><mrow>
 
 #[test]
 fn simple_matrix_silent_col_num() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>(</mo>
     <mrow>
@@ -674,7 +674,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn col_matrix_3x1_silent_col_num() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>(</mo>
     <mrow>
@@ -697,7 +697,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn row_matrix_1x2_silent_col_num() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>[</mo>
     <mrow>
@@ -714,7 +714,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn matrix_2x2_silent_col_num() {
-let expr = "<math><mrow><mrow><mo>(</mo><mrow>
+let _expr = "<math><mrow><mrow><mo>(</mo><mrow>
     <mtable>
     <mtr>
         <mtd><mrow><msub><mi>b</mi><mrow><mn>1</mn><mn>1</mn></mrow></msub></mrow></mtd>
@@ -734,7 +734,7 @@ let expr = "<math><mrow><mrow><mo>(</mo><mrow>
 
 #[test]
 fn simple_matrix_end_matrix() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>(</mo>
     <mrow>
@@ -756,7 +756,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn col_matrix_3x1_end_matrix() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>(</mo>
     <mrow>
@@ -779,7 +779,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn row_matrix_1x2_end_matrix() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>[</mo>
     <mrow>
@@ -796,7 +796,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn matrix_2x2_end_matrix() {
-let expr = "<math><mrow><mrow><mo>(</mo><mrow>
+let _expr = "<math><mrow><mrow><mo>(</mo><mrow>
     <mtable>
     <mtr>
         <mtd><mrow><msub><mi>b</mi><mrow><mn>1</mn><mn>1</mn></mrow></msub></mrow></mtd>
@@ -816,7 +816,7 @@ let expr = "<math><mrow><mrow><mo>(</mo><mrow>
 
 #[test]
 fn simple_matrix_vector() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>(</mo>
     <mrow>
@@ -838,7 +838,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn col_matrix_3x1_vector() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>(</mo>
     <mrow>
@@ -861,7 +861,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn row_matrix_1x2_vector() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>[</mo>
     <mrow>
@@ -878,7 +878,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn matrix_2x2_vector() {
-let expr = "<math><mrow><mrow><mo>(</mo><mrow>
+let _expr = "<math><mrow><mrow><mo>(</mo><mrow>
     <mtable>
     <mtr>
         <mtd><mrow><msub><mi>b</mi><mrow><mn>1</mn><mn>1</mn></mrow></msub></mrow></mtd>
@@ -898,7 +898,7 @@ let expr = "<math><mrow><mrow><mo>(</mo><mrow>
 
 #[test]
 fn simple_matrix_end_vector() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>(</mo>
     <mrow>
@@ -920,7 +920,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn col_matrix_3x1_end_vector() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>(</mo>
     <mrow>
@@ -943,7 +943,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn row_matrix_1x2_end_vector() {
-let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
+let _expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
   <mrow>
     <mrow><mo>[</mo>
     <mrow>
@@ -960,7 +960,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
 
 #[test]
 fn matrix_2x2_end_vector() {
-let expr = "<math><mrow><mrow><mo>(</mo><mrow>
+let _expr = "<math><mrow><mrow><mo>(</mo><mrow>
     <mtable>
     <mtr>
         <mtd><mrow><msub><mi>b</mi><mrow><mn>1</mn><mn>1</mn></mrow></msub></mrow></mtd>
@@ -981,7 +981,7 @@ let expr = "<math><mrow><mrow><mo>(</mo><mrow>
 
 #[test]
 fn matrix_binomial() {
-  let expr = "<math>
+  let _expr = "<math>
       <mo>(</mo><mrow>
         <mtable><mtr><mtd><mn>3</mn></mtd></mtr><mtr><mtd><mn>2</mn></mtd></mtr></mtable>
       </mrow><mo>)</mo>
