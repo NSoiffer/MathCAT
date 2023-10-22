@@ -37,7 +37,7 @@
         replace:
         - test:
             if: "$TTS='none'"
-            then: [t: ""]                      	# 	(en: 'eigh', google translation)
+            then: [t: "a"]                      	# 	(en: 'eigh', google translation)
             else: [spell: "'a'"]
             
  - "B-Z":

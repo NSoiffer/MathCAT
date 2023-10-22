@@ -37,15 +37,15 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][text()='ℂ']"
-      then: [{t: "c"}]      # phrase(the letter 'C' used to represent complex number)
+      then: [{t: "C"}]      # phrase(the letter 'C' used to represent complex number)
     - else_if: "*[1][text()='ℕ']"
-      then: [{t: "n"}]      # phrase(the letter 'N' may represent natural numbers)
+      then: [{t: "N"}]      # phrase(the letter 'N' may represent natural numbers)
     - else_if: "*[1][text()='ℚ']"
-      then: [{t: "q"}]      # phrase(the letter 'Q' may represent rational numbers)
+      then: [{t: "Q"}]      # phrase(the letter 'Q' may represent rational numbers)
     - else_if: "*[1][text()='ℝ']"
-      then: [{t: "r"}]      # phrase(the letter 'R' may represent real numbers)
+      then: [{t: "R"}]      # phrase(the letter 'R' may represent real numbers)
     - else_if: "*[1][text()='ℤ']"
-      then: [{t: "z"}]      # phrase(the letter 'Z' may represent integers)
+      then: [{t: "Z"}]      # phrase(the letter 'Z' may represent integers)
       else: [{x: "*[1][text()]"}] # shouldn't happen
   - bookmark: "*[2]/@id"
   - x: "*[2]"
