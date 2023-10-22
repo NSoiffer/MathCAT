@@ -424,11 +424,29 @@
       if: "$Verbosity='Terse'"
       then: [t: "cotanch"]      # phrase('cotanch' is shorthand for hyperbolic cotangent)
       else: [t: "hyperbolic cotangent"]      # phrase(the 'hyperbolic cotangent' is a mathematical function)
+- name: exponential
+  tag: mi
+  match: "text()='exp'"
+  replace:
+  - bookmark: "@id"
+  - test:
+      if: "$Verbosity='Terse'"
+      then: [t: "exp"]      # phrase('exp' means exponential function)
+      else: [t: "exponential"]      # phrase('exponential' function)
+- name: covariance
+  tag: mi
+  match: "text()='Cov'"
+  replace:
+  - bookmark: "@id"
+  - test:
+      if: "$Verbosity='Terse'"
+      then: [t: "Cov"]      # phrase('Cov' is shorthand for the covariance function)
+      else: [t: "covariance"]      # phrase('covariance' function)
 
 - # handle both log and ln
   name: log
   tag: mrow
-  variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
+  variables: [log_is_simple: "IsNode(*[3],'simple')"]
   match:
   - "count(*)=3 and"
   - "*[1][self::m:mi][text()='log' or text()='ln'] and"
