@@ -266,15 +266,15 @@
       then:
       - with:
           variables:
-          - PreSubscript: "IfThenElse($Verbosity='Verbose', 'pre subscript', 'pre sub')"
-          - PreSuperscript: "IfThenElse($Verbosity='Verbose', 'pre superscript', 'pre super')"
+          - PreSubscript: "IfThenElse($Verbosity='Verbose', '前下標', '前下標')"
+          - PreSuperscript: "IfThenElse($Verbosity='Verbose', '前上標', '前上標')"
           replace:
           - test: # only bother announcing if there is more than one prescript
               if: "count($Prescripts) > 2"
               then:
-              - t: "和"      # phrase(substitute x 'with' y)
+              - t: "有"      # phrase(substitute x 'with' y)
               - x: "count($Prescripts) div 2"
-              - t: "處方"      # phrase(in this equation certain 'prescripts' apply)
+              - t: "前標"      # phrase(in this equation certain 'prescripts' apply)
               - pause: short
           - test:
               if: "not($Prescripts[1][self::m:none])"
@@ -283,7 +283,7 @@
               - x: "$Prescripts[1]"
           - test:
               if: "not($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none])"
-              then: [t: "和"]      # phrase(10 is greater than 8 'and' less than 15)
+              then: [t: "且"]      # phrase(10 is greater than 8 'and' less than 15)
           - test:
               if: "not($Prescripts[2][self::m:none])"
               then:
@@ -300,7 +300,7 @@
                   - x: "$Prescripts[3]"
               - test:
                   if: "not($Prescripts[3][self::m:none] or $Prescripts[4][self::m:none])"
-                  then: [t: "和"]      # phrase(10 is grater than 8 'and' less than 15)
+                  then: [t: "且"]      # phrase(10 is grater than 8 'and' less than 15)
               - test:
                   if: "not($Prescripts[4][self::m:none])"
                   then:
@@ -309,26 +309,26 @@
               - test:
                   if: "count($Prescripts) > 4" # give up and just dump them out so at least the content is there
                   then:
-                  - t: "和交替的處方"      # phrase(in this case there are values 'and alternating prescripts')
+                  - t: "與交替前標"      # phrase(in this case there are values 'and alternating prescripts')
                   - x: "$Prescripts[position() > 4]"
-                  - t: "結束處方"      # phrase(This is where 'end prescripts' occurs)
+                  - t: "結束前標"      # phrase(This is where 'end prescripts' occurs)
   - test:
       if: "$Postscripts"
       then:
       - with:
           variables:
-          - PostSubscript: "IfThenElse($Verbosity='Verbose', 'subscript', 'sub')"
-          - PostSuperscript: "IfThenElse($Verbosity='Verbose', 'superscript', 'super')"
+          - PostSubscript: "IfThenElse($Verbosity='Verbose', '下標', '下標')"
+          - PostSuperscript: "IfThenElse($Verbosity='Verbose', '上標', '上標')"
           replace:
           - test: # only bother announcing if there is more than one postscript
               if: "count($Postscripts) > 2"
               then:
               - test:
                   if: "$Prescripts"
-                  then: [t: "和"]      # phrase(10 is greater than 8 'and' less than 15)
-              - t: "和"      # phrase(substitute x 'with' y)
+                  then: [t: "且"]      # phrase(10 is greater than 8 'and' less than 15)
+              - t: "有"      # phrase(substitute x 'with' y)
               - x: "count($Postscripts) div 2"
-              - t: "後記"      # phrase(this material includes several 'postscripts')
+              - t: "標記"      # phrase(this material includes several 'postscripts')
               - pause: short
           - test:
               if: "not($Postscripts[1][self::m:none])"
@@ -337,7 +337,7 @@
               - x: "$Postscripts[1]"
           - test:
               if: "not($Postscripts[1][self::m:none] or $Postscripts[2][self::m:none])"
-              then: [t: "和"]      # phrase(10 is greater than 8 'and' less than 15)
+              then: [t: "且"]      # phrase(10 is greater than 8 'and' less than 15)
           - test:
               if: "not($Postscripts[2][self::m:none])"
               then:
@@ -353,7 +353,7 @@
                   - x: "$Postscripts[3]"
               - test:
                   if: "not($Postscripts[3][self::m:none] or $Postscripts[4][self::m:none])"
-                  then: [t: "和"]      # phrase(10 is greater than 8 'and' less than 15)
+                  then: [t: "且"]      # phrase(10 is greater than 8 'and' less than 15)
               - test:
                   if: "not($Postscripts[4][self::m:none])"
                   then:
@@ -369,7 +369,7 @@
                       - x: "$Postscripts[5]"
                   - test:
                       if: "not($Postscripts[5][self::m:none] or $Postscripts[6][self::m:none])"
-                      then: [t: "和"]      # phrase(10 is greater than 8 'and' less than 15)
+                      then: [t: "且"]      # phrase(10 is greater than 8 'and' less than 15)
                   - test:
                       if: "not($Postscripts[6][self::m:none])"
                       then:
@@ -385,7 +385,7 @@
                           - x: "$Postscripts[7]"
                       - test:
                           if: "not($Postscripts[7][self::m:none] or $Postscripts[8][self::m:none])"
-                          then: [t: "和"]      # phrase(10 is less than 15 'and' greater than 5)
+                          then: [t: "且"]      # phrase(10 is less than 15 'and' greater than 5)
                       - test:
                           if: "not($Postscripts[8][self::m:none])"
                           then:
@@ -394,9 +394,9 @@
                       - test:
                           if: "count($Postscripts) > 8" # give up and just dump them out so at least the content is there
                           then:
-                          - t: "和交替的腳本"      # phrase(this situation involves complexities 'and alternating scripts')
+                          - t: "與交替標記"      # phrase(this situation involves complexities 'and alternating scripts')
                           - x: "$Postscripts[position() > 8]"
-                          - t: "結束腳本"      # phrase(At this point 'end scripts' occurs)
+                          - t: "結束標記"      # phrase(At this point 'end scripts' occurs)
 
 - name: default
   tag: mtable

@@ -68,14 +68,14 @@
         then_test:
             if: "$Verbosity = 'Terse'"
             then: [t: "砰"]                      	#  0x21	(en: 'bang', google translation)
-            else: [t: "階層"]                     	#  0x21	(en: 'exclamation point')
-        else: [t: "階層"]                         	#  0x21	(en: 'factorial')
+            else: [t: "階乘"]                     	#  0x21	(en: 'exclamation point')
+        else: [t: "階乘"]                         	#  0x21	(en: 'factorial')
           
  - "\"": [t: "引號"]                              	#  0x22	(en: 'quotation mark', google translation)
  - "#": [t: "數字"]                               	#  0x23	(en: 'number', google translation)
  - "$": [t: "美元"]                               	#  0x24	(en: 'dollars', google translation)
  - "%": [t: "百分"]                               	#  0x25	(en: 'percent', google translation)
- - "&": [t: "andand"]                           	#  0x26	(en: 'ampersand', google translation)
+ - "&": [t: "ampersand"]                           	#  0x26	(en: 'ampersand', google translation)
  - "'": [t: "單引號"]                              	#  0x27	(en: 'apostrophe')
  - "(":                                         	#  0x28
     - test:
@@ -97,8 +97,8 @@
  - "*":                                         	#  0x2a
     test:
         if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='skip-super']"
-        then: [t: "星星"]                         	#  0x2a	(en: 'star', google translation)
-        else: [t: "乘以"]                         	#  0x2a	(en: 'times')
+        then: [t: "星號"]                         	#  0x2a	(en: 'star', google translation)
+        else: [t: "乘"]                         	#  0x2a	(en: 'times')
  - "+": [t: "加"]                                	#  0x2b	(en: 'plus')
  - ",":                                         	#  0x2c
     # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
@@ -118,7 +118,7 @@
  - ".":                                         	#  0x2e
     - test:
         if: "parent::*[1][self::m:mn]"
-        then: [t: "觀點"]                         	# 	(en: 'point', google translation)
+        then: [t: "點"]                         	# 	(en: 'point', google translation)
         else: [t: "點"]                          	# 	(en: 'dot', google translation)
  - "/": [t: "除以"]                               	#  0x2f	(en: 'divided by')
  - ":": [t: "冒號"]                               	#  0x3a	(en: 'colon')
@@ -146,15 +146,15 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [t: "左中括"]                       	# 	(en: 'open bracket', google translation)
         else: [t: "左中括"]                        	# 	(en: 'left bracket')
- - "\\": [t: "左中括"]                             	#  0x5c	(en: 'back slash')
+ - "\\": [t: "反斜線"]                             	#  0x5c	(en: 'back slash')
  - "]":                                         	#  0x5d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [t: "右中括"]                       	# 	(en: 'close bracket', google translation)
         else: [t: "右中括"]                        	# 	(en: 'right bracket')
- - "^": [t: "帽子"]                               	#  0x5e	(en: 'hat', google translation)
- - "_": [t: "在酒吧下"]                             	#  0x5f	(en: 'under bar', google translation)
- - "`": [t: "墳"]                                	#  0x60	(en: 'grave', google translation)
+ - "^": [t: "hat"]                               	#  0x5e	(en: 'hat', google translation)
+ - "_": [t: "under bar"]                             	#  0x5f	(en: 'under bar', google translation)
+ - "`": [t: "grave"]                                	#  0x60	(en: 'grave', google translation)
  - "{":                                         	#  0x7b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
@@ -166,10 +166,10 @@
         - if: "$SpeechStyle != 'ClearSpeak' or not(preceding-sibling::*) or not(following-sibling::*)"
           then: [t: "垂線"]                       	# 	(en: 'vertical line', google translation)
         - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
-          then: [t: "這樣"]                       	# 	(en: 'such that', google translation)
+          then: [t: "滿足"]                       	# 	(en: 'such that', google translation)
         - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
-          then: [t: "給出"]                       	# 	(en: 'given', google translation)
-        - else: [t: "豎線"]                       	# 	(en: 'divides')
+          then: [t: "給定"]                       	# 	(en: 'given', google translation)
+        - else: [t: "整除"]                       	# 	(en: 'divides')
 
  - "}":                                         	#  0x7d
     - test:
@@ -177,7 +177,7 @@
         then: [t: "右大括"]                       	# 	(en: 'close brace', google translation)
         else: [t: "右大括"]                        	# 	(en: 'right brace')
 
- - "~": [t: "蒂爾德"]                              	#  0x7e	(en: 'tilde', google translation)
+ - "~": [t: "tilde"]                              	#  0x7e	(en: 'tilde', google translation)
  - " ":                                         	#  0xa0
     - test:
         if: "@data-empty-in-2D and ../../../../*[name(.)!='equations']"
@@ -185,31 +185,31 @@
         else: [t: ""]                            
 
  - "¬": [t: "不是"]                               	#  0xac	(en: 'not', google translation)
- - "°": [t: "學位"]                               	#  0xb0	(en: 'degrees', google translation)
+ - "°": [t: "度"]                               	#  0xb0	(en: 'degrees', google translation)
  - "±": [t: "加減"]                               	#  0xb1	(en: 'plus or minus')
- - "´": [t: "急性"]                               	#  0xb4	(en: 'acute', google translation)
+ - "´": [t: "acute"]                               	#  0xb4	(en: 'acute', google translation)
  - "·":                                         	#  0xB7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
-        then: [t: "時代"]                         	# 	(en: 'times', google translation)
-        else: [t: "內積"]                         	# 	(en: 'dot')
+        then: [t: "乘"]                         	# 	(en: 'times', google translation)
+        else: [t: "dot"]                         	# 	(en: 'dot')
  - "×":                                         	#  0xd7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
-        then: [t: "時代"]                         	# 	(en: 'times', google translation)
+        then: [t: "乘"]                         	# 	(en: 'times', google translation)
         else_test:
             if: $ClearSpeak_MultSymbolX = 'By'
-            then: [t: "經過"]                     	# 	(en: 'by', google translation)
-            else: [t: "乘以"]                     	# 	(en: 'cross')
+            then: [t: "乘"]                     	# 	(en: 'by', google translation)
+            else: [t: "乘"]                     	# 	(en: 'cross')
  - "÷": [t: "除以"]                               	#  0xf7	(en: 'divided by')
- - "̀": [t: "嚴重的口音裝飾"]                          	#  0x300	(en: 'grave accent embellishment', google translation)
- - "́": [t: "急性口音裝飾"]                           	#  0x301	(en: 'acute accent embellishment', google translation)
- - "̂": [t: "繞過額的口音裝飾"]                         	#  0x302	(en: 'circumflex accent embellishment', google translation)
- - "̃": [t: "tilde點綴"]                          	#  0x303	(en: 'tilde embellishment', google translation)
- - "̄": [t: "馬克龍點綴"]                            	#  0x304	(en: 'macron embellishment', google translation)
- - "̅": [t: "額外的點綴"]                            	#  0x305	(en: 'overbar embellishment', google translation)
- - "̆": [t: "布雷夫"]                              	#  0x306	(en: 'breve', google translation)
- - "̇": [t: "點點上方"]                             	#  0x307	(en: 'dot above embellishment', google translation)
+ - "̀": [t: "grave accent embellishment"]                          	#  0x300	(en: 'grave accent embellishment', google translation)
+ - "́": [t: "acute accent embellishment"]                           	#  0x301	(en: 'acute accent embellishment', google translation)
+ - "̂": [t: "circumflex accent embellishment"]                         	#  0x302	(en: 'circumflex accent embellishment', google translation)
+ - "̃": [t: "tilde embellishment"]                          	#  0x303	(en: 'tilde embellishment', google translation)
+ - "̄": [t: "macron embellishment"]                            	#  0x304	(en: 'macron embellishment', google translation)
+ - "̅": [t: "overbar embellishment"]                            	#  0x305	(en: 'overbar embellishment', google translation)
+ - "̆": [t: "breve"]                              	#  0x306	(en: 'breve', google translation)
+ - "̇": [t: "dot above embellishment"]                             	#  0x307	(en: 'dot above embellishment', google translation)
 
    # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
  - "Α-Ω": 
@@ -235,37 +235,37 @@
  - "α": [t: "alpha"]                            	#  0x3b1	(en: 'alpha')
  - "β": [t: "beta"]                             	#  0x3b2	(en: 'beta')
  - "γ": [t: "gamma"]                            	#  0x3b3	(en: 'gamma')
- - "δ": [t: "Delta"]                            	#  0x3b4	(en: 'delta')
- - "ε": [t: "Epsilon"]                          	#  0x3b5	(en: 'epsilon')
- - "ζ": [t: "Zeta"]                             	#  0x3b6	(en: 'zeta')
- - "η": [t: "Eta"]                              	#  0x3b7	(en: 'eta')
- - "θ": [t: "Theta"]                            	#  0x3b8	(en: 'theta')
- - "ι": [t: "Lota"]                             	#  0x3b9	(en: 'iota')
- - "κ": [t: "Kappa"]                            	#  0x3ba	(en: 'kappa')
- - "λ": [t: "Lamda"]                            	#  0x3bb	(en: 'lambda')
- - "μ": [t: "Mu"]                               	#  0x3bc	(en: 'mu')
- - "ν": [t: "Nu"]                               	#  0x3bd	(en: 'nu')
- - "ξ": [t: "Xi"]                               	#  0x3be	(en: 'zai')
- - "ο": [t: "Omicron"]                          	#  0x3bf	(en: 'omicron')
- - "π": [t: "Pi"]                               	#  0x3c0	(en: 'pi')
- - "ρ": [t: "Rho"]                              	#  0x3c1	(en: 'rho')
- - "ς": [t: "Final Sigma"]                      	#  0x3c2	(en: 'final sigma')
- - "σ": [t: "Sigma"]                            	#  0x3c3	(en: 'sigma')
- - "τ": [t: "Tau"]                              	#  0x3c4	(en: 'tau')
- - "υ": [t: "Upsilon"]                          	#  0x3c5	(en: 'upsilon')
+ - "δ": [t: "delta"]                            	#  0x3b4	(en: 'delta')
+ - "ε": [t: "epsilon"]                          	#  0x3b5	(en: 'epsilon')
+ - "ζ": [t: "zeta"]                             	#  0x3b6	(en: 'zeta')
+ - "η": [t: "eta"]                              	#  0x3b7	(en: 'eta')
+ - "θ": [t: "theta"]                            	#  0x3b8	(en: 'theta')
+ - "ι": [t: "iota"]                             	#  0x3b9	(en: 'iota')
+ - "κ": [t: "kappa"]                            	#  0x3ba	(en: 'kappa')
+ - "λ": [t: "lamda"]                            	#  0x3bb	(en: 'lambda')
+ - "μ": [t: "mu"]                               	#  0x3bc	(en: 'mu')
+ - "ν": [t: "nu"]                               	#  0x3bd	(en: 'nu')
+ - "ξ": [t: "xi"]                               	#  0x3be	(en: 'zai')
+ - "ο": [t: "omicron"]                          	#  0x3bf	(en: 'omicron')
+ - "π": [t: "pi"]                               	#  0x3c0	(en: 'pi')
+ - "ρ": [t: "rho"]                              	#  0x3c1	(en: 'rho')
+ - "ς": [t: "final sigma"]                      	#  0x3c2	(en: 'final sigma')
+ - "σ": [t: "sigma"]                            	#  0x3c3	(en: 'sigma')
+ - "τ": [t: "tau"]                              	#  0x3c4	(en: 'tau')
+ - "υ": [t: "upsilon"]                          	#  0x3c5	(en: 'upsilon')
  - "φ": [t: "phi"]                              	#  0x3c6	(en: 'phi')
- - "χ": [t: "Chi"]                              	#  0x3c7	(en: 'chi')
- - "ψ": [t: "Psi"]                              	#  0x3c8	(en: 'psi')
- - "ω": [t: "Omega"]                            	#  0x3c9	(en: 'omega')
+ - "χ": [t: "chi"]                              	#  0x3c7	(en: 'chi')
+ - "ψ": [t: "psi"]                              	#  0x3c8	(en: 'psi')
+ - "ω": [t: "omega"]                            	#  0x3c9	(en: 'omega')
  - "ϕ": [t: "phi"]                              	#  0x3d5	(en: 'phi')
- - "ϖ": [t: "Pi"]                               	#  0x3d6	(en: 'pi')
- - "ϵ": [t: "Lunate Epsilon"]                   	#  0x3f5	(en: 'epsilon')
- - "϶": [t: "Reversed Lunate Epsilon"]          	#  0x3f6	(en: 'reversed epsilon')
+ - "ϖ": [t: "pi"]                               	#  0x3d6	(en: 'pi')
+ - "ϵ": [t: "epsilon"]                   	        #  0x3f5	(en: 'epsilon')
+ - "϶": [t: "reversed epsilon"]          	        #  0x3f6	(en: 'reversed epsilon')
 
  - "–": [t: "en dash"]                          	#  0x2013	(google translation)
  - "—": [t: "em dash"]                          	#  0x2014	(google translation)
  - "―": [t: "單槓"]                               	#  0x2015	(en: 'horizontal bar', google translation)
- - "‖": [t: "雙垂直線"]                             	#  0x2016	(en: 'double vertical line', google translation)
+ - "‖": [t: "雙垂直線"]                              #  0x2016	(en: 'double vertical line', google translation)
  - "…":                                         	#  0x2026
     test:
         if:
@@ -295,10 +295,10 @@
     - t: "triple prime"                         	# 	(en: 'double-struck')
     - spell: "translate('.', 'ℂℕℚℝℤ', 'CNQRZ')"
 
- - "℃": [t: "攝氏攝氏度"]                            	#  0x2103	(en: 'degrees celsius', google translation)
+ - "℃": [t: "攝氏度"]                            	#  0x2103	(en: 'degrees celsius', google translation)
  - "℉": [t: "華氏度"]                              	#  0x2109	(en: 'degrees fahrenheit', google translation)
  - "ℋℛℓ":                                       	#  0x210b
-    - t: "腳本"                                   	# 	(en: 'script', google translation)
+    - t: "script"                                   	# 	(en: 'script', google translation)
     - spell: "translate('.', 'ℋℛℓ', 'HRl')"
  - "ℎ": [t: "普朗克常數"]                            	#  0x210e	(en: 'planck constant', google translation)
  - "ℜ":                                         	#  0x211c
@@ -306,8 +306,8 @@
     - spell: "'R'"
 
  - "Ω": [t: "歐姆"]                               	#  0x2126	(en: 'ohms', google translation)
- - "K": [t: "開爾文"]                              	#  0x212a	(en: 'kelvin', google translation)
- - "Å": [t: "埃埃斯特羅姆"]                           	#  0x212b	(en: 'angstroms', google translation)
+ - "K": [t: "kelvin"]                              	#  0x212a	(en: 'kelvin', google translation)
+ - "Å": [t: "angstroms"]                           	#  0x212b	(en: 'angstroms', google translation)
  - "ⅆⅇⅈⅉ":                                      	#  0x2146-9
     - t: "雙擊斜體"                                 	# 	(en: 'double-struck italic', google translation)
     - spell: "translate('.', 'ⅆⅇⅈⅉ', 'deij')"
@@ -317,16 +317,16 @@
  - "→":                                         	#  0x2192
      - test:
         if: "ancestor::*[2][self::m:limit]"
-        then: [t: "方法"]                         	# 	(en: 'approaches', google translation)
+        then: [t: "趨近"]                         	# 	(en: 'approaches', google translation)
         else: [t: "右箭頭"]                        	# 	(en: 'right arrow')
 
  - "↓": [t: "向下箭頭"]                             	#  0x2193	(en: 'downwards arrow', google translation)
  - "⇒": [t: "向右雙箭頭"]                            	#  0x21d2	(en: 'rightwards double arrow', google translation)
- - "∀": [t: "對任意的"]                             	#  0x2200	(en: 'for all')
+ - "∀": [t: "對所有"]                             	#  0x2200	(en: 'for all')
  - "∂":                                         	#  0x2202
      - test: 
          if: "$Verbosity='Terse'"
-         then: [t: "部分的"]                       	# 	(en: 'partial', google translation)
+         then: [t: "偏微分"]                       	# 	(en: 'partial', google translation)
          else: [t: "偏微分"]                       	# 	(en: 'partial derivative')
  - "∃": [t: "存在"]                               	#  0x2203	(en: 'there exists')
  - "∄": [t: "不存在"]                              	#  0x2204	(en: 'there does not exist')
@@ -334,12 +334,12 @@
  - "∆":                                         	#  0x2206
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "這"]                         	# 	(en: 'the', google translation)
+         then: [t: ""]                         	# 	(en: 'the', google translation)
      - t: "變化量"                                 	# 	(en: 'laplacian of')
  - "∇":                                         	#  0x2207
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "這"]                         	# 	(en: 'the', google translation)
+         then: [t: ""]                         	# 	(en: 'the', google translation)
      - t: "梯度"                                  	# 	(en: 'gradient of')
  - "∈":                                         	#  0x2208
      - test:
@@ -412,111 +412,111 @@
                 then: [t: "在"]                  	# 	(en: 'is in', google translation)
               - else: [t: "屬於"]                 	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belongs to')
  - "∏": [t: "積"]                             	#  0x220f	(en: 'product')
- - "∐": [t: "N元余積"]                             	#  0x2210	(en: 'co-product')
+ - "∐": [t: "餘積"]                             	#  0x2210	(en: 'co-product')
  - "∑": [t: "和"]                                	#  0x2211	(en: 'sum')
  - "−": [t: "減"]                                	#  0x2212	(en: 'minus')
  - "∓": [t: "正負號"]                              	#  0x2213	(en: 'minus or plus')
- - "∗": [t: "時代"]                               	#  0x2217	(en: 'times', google translation)
+ - "∗": [t: "乘"]                               	#  0x2217	(en: 'times', google translation)
  - "∘": [t: "合成"]                               	#  0x2218	(en: 'composed with')
  - "√":                                         	#  0x221a
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "這"]                         	# 	(en: 'the', google translation)
-     - t: "開根號"                                 	# 	(en: 'square root of')
+         then: [t: ""]                         	# 	(en: 'the', google translation)
+     - t: "根號"                                 	# 	(en: 'square root of')
  - "∝":                                         	#  0x221d
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是"]                         	# 	(en: 'is', google translation)
+         then: [t: ""]                         	# 	(en: 'is', google translation)
      - t: "正比於"                                 	# 	(en: 'proportional to')
  - "∞": [t: "無限大"]                               	#  0x221e	(en: 'infinity')
  - "∟": [t: "直角"]                               	#  0x221f	(en: 'right angle')
  - "∠": [t: "角"]                                	#  0x2220	(en: 'angle')
  - "∡": [t: "測量角"]                              	#  0x2221	(en: 'measured angle')
- - "∣": [t: "除"]                                	#  0x2223	(en: 'divides')
- - "∤": [t: "不除"]                               	#  0x2224	(en: 'does not divide')
+ - "∣": [t: "整除"]                                	#  0x2223	(en: 'divides')
+ - "∤": [t: "不整除"]                               	#  0x2224	(en: 'does not divide')
  - "∥":                                         	#  0x2225
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是"]                         	# 	(en: 'is', google translation)
+         then: [t: ""]                         	# 	(en: 'is', google translation)
      - t: "平行"                                  	# 	(en: 'parallel to')
  - "∦":                                         	#  0x2226
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是"]                         	# 	(en: 'is', google translation)
+         then: [t: ""]                         	# 	(en: 'is', google translation)
      - t: "不平行"                                 	# 	(en: 'not parallel to')
- - "∧": [t: "邏輯與"]                              	#  0x2227	(en: 'and')
- - "∨": [t: "邏輯或"]                              	#  0x2228	(en: 'or')
+ - "∧": [t: "且"]                              	#  0x2227	(en: 'and')
+ - "∨": [t: "或"]                              	#  0x2228	(en: 'or')
  - "∩": [t: "交集"]                               	#  0x2229	(en: 'intersection')
  - "∪": [t: "聯集"]                               	#  0x222a	(en: 'union')
  - "∫": [t: "積分"]                               	#  0x222b	(en: 'integral')
  - "∬": [t: "雙重積分"]                             	#  0x222c	(en: 'double integral')
  - "∭": [t: "三重積分"]                             	#  0x222d	(en: 'triple integral')
- - "∮": [t: "圍道積分"]                             	#  0x222e	(en: 'contour integral')
+ - "∮": [t: "線積分"]                             	#  0x222e	(en: 'contour integral')
  - "∶":                                         	#  0x2236
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是"]                         	# 	(en: 'is', google translation)
+         then: [t: ""]                         	# 	(en: 'is', google translation)
      - t: "比"                                   	# 	(en: 'to')
  - "∷": [t: "比例"]                               	#  0x2237	(en: 'as')
  - "∼": [t: "波浪符"]                              	#  0x223c	(en: 'varies with')
- - "∽": [t: "反波浪符"]                             	#  0x223d	(en: 'reversed tilde')
+ - "∽": [t: "反波浪符"]                             #  0x223d	(en: 'reversed tilde')
  - "∾":                                         	#  0x223e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是"]                         	# 	(en: 'is', google translation)
-     - t: "豎翻躺倒S"                               	# 	(en: 'most positive')
+         then: [t: ""]                         	# 	(en: 'is', google translation)
+     - t: "正無限大"                               	# 	(en: 'most positive')
  - "∿": [t: "正弦波型"]                             	#  0x223f	(en: 'sine wave')
  - "≠":                                         	#  0x2260
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是"]                         	# 	(en: 'is', google translation)
+         then: [t: ""]                         	# 	(en: 'is', google translation)
      - t: "不等於"                                 	# 	(en: 'not equal to')
  - "≡":                                         	#  0x2261
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是"]                         	# 	(en: 'is', google translation)
-     - t: "恆等於"                                 	# 	(en: 'identical to')
+         then: [t: ""]                         	# 	(en: 'is', google translation)
+     - t: "全等於"                                 	# 	(en: 'identical to')
  - "≤":                                         	#  0x2264
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是"]                         	# 	(en: 'is', google translation)
-     - t:  "less than or equal to"
+         then: [t: ""]                         	# 	(en: 'is', google translation)
+     - t:  "小於或等於"
  - "≥":                                         	#  0x2265
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是"]                         	# 	(en: 'is', google translation)
+         then: [t: ""]                         	# 	(en: 'is', google translation)
      - t: "大於或等於"                               	# 	(en: 'greater than or equal to')
- - "≦": [t: "小於等於"]                             	#  0x2266	(en: 'less than over equal to')
- - "≧": [t: "大於等於"]                             	#  0x2267	(en: 'greater than over equal to')
+ - "≦": [t: "小於或等於"]                             	#  0x2266	(en: 'less than over equal to')
+ - "≧": [t: "大於或等於"]                             	#  0x2267	(en: 'greater than over equal to')
  - "≺": [t: "先於"]                               	#  0x227a	(en: 'precedes')
  - "≻": [t: "後於"]                               	#  0x227b	(en: 'succeeds')
  - "⊂":                                         	#  0x2282
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是一個"]                       	# 	(en: 'is a', google translation)
+         then: [t: ""]                       	# 	(en: 'is a', google translation)
      - t: "包含於"                                 	# 	(en: 'subset of')
  - "⊃":                                         	#  0x2283
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是一個"]                       	# 	(en: 'is a', google translation)
+         then: [t: ""]                       	# 	(en: 'is a', google translation)
      - t: "包含"                                  	# 	(en: 'superset of')
  - "⊄":                                         	#  0x2284
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是"]                         	# 	(en: 'is', google translation)
+         then: [t: ""]                         	# 	(en: 'is', google translation)
      - t: "不包含於"                                	# 	(en: 'not a subset of')
  - "⊅":                                         	#  0x2285
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是"]                         	# 	(en: 'is', google translation)
+         then: [t: ""]                         	# 	(en: 'is', google translation)
      - t: "不包含"                                 	# 	(en: 'not a superset of')
  - "⊆":                                         	#  0x2286
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是一個"]                       	# 	(en: 'is a', google translation)
+         then: [t: ""]                       	# 	(en: 'is a', google translation)
      - t: "包含於或等於"                              	# 	(en: 'subset of or equal to')
  - "⊇":                                         	#  0x2287
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "是一個"]                       	# 	(en: 'is a', google translation)
+         then: [t: ""]                       	# 	(en: 'is a', google translation)
      - t: "包含或等於"                               	# 	(en: 'superset of or equal to')

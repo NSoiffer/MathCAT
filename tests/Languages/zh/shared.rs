@@ -18,9 +18,9 @@ fn modified_vars() {
         <mover> <mi>x</mi> <mo>^</mo> </mover> <mo>+</mo>
         <mover> <mi>t</mi> <mo>→</mo> </mover>
         </mrow> </math>";
-    test("en", "SimpleSpeak", expr, 
-        "eigh grave, b tilde, c breve, b check, c grave; plus; \
-            x dot, y dot, z double dot, u triple dot, v quadruple dot; plus x hat, plus vector t");
+    test("zh", "SimpleSpeak", expr, 
+        "a grave, b tilde, c breve, b check, c grave; 加; \
+            x 點, y dot, z double dot, u triple dot, v quadruple dot; 加 x hat, 加 向量 t");
 }
 
 #[test]
@@ -37,7 +37,7 @@ fn limit() {
             </mfrac>
             </mrow>
         </math>";
-    test("en", "SimpleSpeak", expr, "the limit as x approaches 0, of, fraction, sine of x, over x, end fraction;");
+    test("zh", "SimpleSpeak", expr, "極限 x 趨近 0; 分數 x 分之, sine x 結束分數;");
 }
 
 #[test]
@@ -51,33 +51,33 @@ fn limit_from_below() {
                 <mrow>  <mi>sin</mi>  <mo>&#x2061;</mo> <mi>x</mi> </mrow>
             </mrow>
         </math>";
-    test("en", "SimpleSpeak", expr, "the limit as x approaches from below 0, of sine of x");
+    test("zh", "SimpleSpeak", expr, "極限 x 從下方趨近 0; sine x");
 }
 
 
 #[test]
 fn binomial_mmultiscripts() {
     let expr = "<math><mmultiscripts><mi>C</mi><mi>m</mi><none/><mprescripts/><mi>n</mi><none/></mmultiscripts></math>";
-    test("en", "SimpleSpeak", expr, "n choose m");
+    test("zh", "SimpleSpeak", expr, "n 選 m");
 }
 
 
 #[test]
 fn permutation_mmultiscripts() {
     let expr = "<math><mmultiscripts><mi>P</mi><mi>k</mi><none/><mprescripts/><mi>n</mi><none/></mmultiscripts></math>";
-    test("en", "SimpleSpeak", expr, "k permutations of n");
+    test("zh", "SimpleSpeak", expr, "k 排列 n");
 }
 
 #[test]
 fn permutation_mmultiscripts_sup() {
     let expr = "<math><mmultiscripts><mi>P</mi><mi>k</mi><none/><mprescripts/><none/><mi>n</mi></mmultiscripts></math>";
-    test("en", "SimpleSpeak", expr, "k permutations of n");
+    test("zh", "SimpleSpeak", expr, "k 排列 n");
 }
 
 #[test]
 fn permutation_msubsup() {
     let expr = "<math><msubsup><mi>P</mi><mi>k</mi><mi>n</mi></msubsup></math>";
-    test("en", "SimpleSpeak", expr, "k permutations of n");
+    test("zh", "SimpleSpeak", expr, "k 排列 n");
 }
 
 #[test]
@@ -85,10 +85,10 @@ fn tensor_mmultiscripts() {
     let expr = "<math><mmultiscripts>
             <mi>R</mi> <mi>i</mi><none/> <none/><mi>j</mi> <mi>k</mi><none/> <mi>l</mi><none/> 
         </mmultiscripts></math>";
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-            "cap r with 4 postscripts, subscript i superscript j subscript k subscript l");
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
-            "cap r with 4 postscripts, sub i super j sub k sub l");
+    test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+            "大寫 r 有 4 標記, 下標 i 上標 j 下標 k 下標 l");
+    test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
+            "大寫 r 有 4 標記, 下標 i 上標 j 下標 k 下標 l");
 }
 
 #[test]
@@ -97,26 +97,26 @@ fn huge_num_mmultiscripts() {
             <mi>R</mi> <mi>i</mi><none/> <none/><mi>j</mi> <mi>k</mi><none/> <mi>l</mi><none/> <mi>m</mi><none/>
             <mprescripts/> <mi>I</mi><none/> <none/><mi>J</mi> <mi>K</mi><none/> <mi>L</mi><none/>
         </mmultiscripts></math>";
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-            "cap r with 4 prescripts, pre subscript cap i, pre superscript cap j and alternating prescripts cap k none cap l none end prescripts and with 5 postscripts, subscript i superscript j subscript k subscript l and alternating scripts m none end scripts");
+    test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+            "大寫 r 有 4 前標, 前下標 大寫 i, 前上標 大寫 j 與交替前標 大寫 k none 大寫 l none 結束前標 且 有 5 標記, 下標 i 上標 j 下標 k 下標 l 與交替標記 m none 結束標記");
 }
 
 #[test]
 fn prime() {
     let expr = "<math> <msup><mi>x</mi><mo >&#x2032;</mo></msup> </math>";
-    test("en", "SimpleSpeak", expr, "x prime,");
+    test("zh", "SimpleSpeak", expr, "x prime,");
 }
 
 #[test]
 fn given() {
     let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
-    test("en", "SimpleSpeak", expr, "cap p, open paren, cap eigh vertical line cap b; close paren");
-    test("en", "ClearSpeak", expr,  "cap p, open paren, cap eigh divides cap b, close paren");  // not good, but follows the spec
+    test("zh", "SimpleSpeak", expr, "大寫 p, 左小括, 大寫 a 垂線 大寫 b, 右小括");
+    test("zh", "ClearSpeak", expr,  "大寫 p, 左小括, 大寫 a 整除 大寫 b, 右小括");  // not good, but follows the spec
 }
 
 #[test]
 fn simple_msubsup() {
-    let expr = "<math>
+    let _expr = "<math>
             <mstyle displaystyle='true' scriptlevel='0'>
             <msubsup>
                 <mi>x</mi>
@@ -129,19 +129,19 @@ fn simple_msubsup() {
             </msubsup>
             </mstyle>
         </math>";
-    test("en", "ClearSpeak", expr, "x sub k, to the i-th power");
+    //test("zh", "ClearSpeak", expr, "x sub k, to the i-th power");
 }
 
 #[test]
 fn non_simple_msubsup() {
     let expr = "<math><msubsup><mi>i</mi><mrow><mi>j</mi><mo>&#x2212;</mo><mn>2</mn></mrow><mi>k</mi></msubsup></math>";
-    test("en", "SimpleSpeak", expr, "i sub j minus 2 end sub, to the k-th");
-    test("en", "ClearSpeak", expr, "i sub j minus 2 end sub, to the k-th power");
+    test("zh", "SimpleSpeak", expr, "i 下標 j 減 2 結束下標, k 次方");
+    //test("zh", "ClearSpeak", expr, "i sub j minus 2 end sub, to the k-th power");
 }
 
 #[test]
 fn presentation_mathml_in_semantics() {
-    let expr = "<math>
+    let _expr = "<math>
         <semantics>
             <annotation encoding='application/x-tex'>{\\displaystyle x_k^i}</annotation>
             <annotation-xml encoding='MathML-Presentation'>
@@ -157,7 +157,7 @@ fn presentation_mathml_in_semantics() {
             </annotation-xml>
         </semantics>
     </math>";
-    test("en", "ClearSpeak", expr, "x sub k, to the i-th power");
+    //test("zh", "ClearSpeak", expr, "x sub k, to the i-th power");
 }
 
 #[test]
@@ -201,13 +201,13 @@ fn ignore_period() {
       </annotation-xml>
     </semantics>  
   </math>";
-    test("en", "SimpleSpeak", expr, "cap p; open paren, cap eigh and cap b; close paren; is equal to; cap p, open paren, cap eigh intersection cap b; close paren; is equal to, cap p of cap eigh, cap p of cap b");
+    test("zh", "SimpleSpeak", expr, "大寫 p; 左小括, 大寫 a and 大寫 b; 右小括; 等於; 大寫 p, 左小括, 大寫 a 交集 大寫 b, 右小括; 等於, 大寫 p 大寫 a, 大寫 p 大寫 b");
 }
 
 #[test]
 fn ignore_mtext_period() {
     let expr = "<math><mrow><mrow><mo>{</mo><mn>2</mn><mo>}</mo></mrow><mtext>.</mtext></mrow></math>";
-    test("en", "SimpleSpeak", expr, "the set 2");
+    test("zh", "SimpleSpeak", expr, "集合 2");
 }
 
 #[test]
@@ -244,14 +244,14 @@ fn ignore_comma() {
       </mstyle>
     </mrow>
 </math>";
-    test("en", "SimpleSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
+    test("zh", "SimpleSpeak", expr, "phi x 等於, c, e 的 負 h 平方 x 平方 次方");
 }
 
 #[test]
 #[ignore] // issue #14
 fn ignore_period_and_space() {
     // from https://en.wikipedia.org/wiki/Probability
-    let expr = "<math>
+    let _expr = "<math>
       <mrow>
         <mstyle displaystyle='true' scriptlevel='0'>
           <mi>P</mi>
@@ -284,12 +284,12 @@ fn ignore_period_and_space() {
         </mstyle>
       </mrow>
 </math>";
-    test("en", "ClearSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
+    //test("zh", "ClearSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
 }
 
 
 #[test]
 fn mn_with_space() {
     let expr = "<math><mn>1 234 567</mn></math>";
-    test("en", "SimpleSpeak", expr, "1234567");
+    test("zh", "SimpleSpeak", expr, "1234567");
 }

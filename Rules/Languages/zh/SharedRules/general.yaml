@@ -252,8 +252,8 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "極限為"}]      # phrase('the limit as' indicated by this result)
-      else: [{t: "極限為"}]      # phrase(the 'limit as' indicated by this result)
+      then: [{t: "極限"}]      # phrase('the limit as' indicated by this result)
+      else: [{t: "極限"}]      # phrase(the 'limit as' indicated by this result)
   - x: "*[2]"
   - pause: short
 

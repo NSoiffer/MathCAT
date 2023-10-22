@@ -314,7 +314,7 @@ fn nested_complex_power() {
       </msup>
       </mrow>
       </math>";
-  test("zh", "SimpleSpeak", expr, "e 的 負 2 分之 1 成; 左小括, 分數 Sigma 分之, x 減 Mu 結束分數; 右小括 平方 次方");
+  test("zh", "SimpleSpeak", expr, "e 的 負 2 分之 1 成; 左小括, 分數 sigma 分之, x 減 mu 結束分數; 右小括 平方 次方");
 }
 
 #[test]

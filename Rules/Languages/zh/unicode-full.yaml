@@ -7,7 +7,7 @@
  - "¥": [t: "日元"]                               	#  0xa5	(en: 'yen', google translation)
  - "¦": [t: "破碎的酒吧"]                            	#  0xa6	(en: 'broken bar', google translation)
  - "§": [t: "部分"]                               	#  0xa7	(en: 'section', google translation)
- - "¨": [t: "雙點"]                               	#  0xa8	(en: 'double dot', google translation)
+ - "¨": [t: "double dot"]                               	#  0xa8	(en: 'double dot', google translation)
  - "©": [t: "版權"]                               	#  0xa9	(en: 'copyright', google translation)
  - "ª": [t: "女性序數指標"]                           	#  0xaa	(en: 'feminine ordinal indicator', google translation)
  - "¬": [t: "不是"]                               	#  0xac	(en: 'not', google translation)
@@ -80,8 +80,8 @@
  - "˕": [t: "修改器向下釘"]                           	#  0x2d5	(en: 'modifier down tack', google translation)
  - "˖": [t: "修飾符加號"]                            	#  0x2d6	(en: 'modifier plus sign', google translation)
  - "˗": [t: "修飾符負符號"]                           	#  0x2d7	(en: 'modifier minus sign', google translation)
- - "˘": [t: "布雷夫"]                              	#  0x2d8	(en: 'breve', google translation)
- - "˙": [t: "點"]                                	#  0x2d9	(en: 'dot', google translation)
+ - "˘": [t: "breve"]                              	#  0x2d8	(en: 'breve', google translation)
+ - "˙": [t: "dot"]                                	#  0x2d9	(en: 'dot', google translation)
  - "˚": [t: "戒指上方"]                             	#  0x2da	(en: 'ring above', google translation)
  - "˛": [t: "ogonek"]                           	#  0x2db	(google translation)
  - "˜": [t: "小茶"]                               	#  0x2dc	(en: 'small tilde', google translation)
@@ -126,13 +126,13 @@
  - "̃": [t: "tilde點綴"]                          	#  0x303	(en: 'tilde embellishment', google translation)
  - "̄": [t: "馬克龍點綴"]                            	#  0x304	(en: 'macron embellishment', google translation)
  - "̅": [t: "額外的點綴"]                            	#  0x305	(en: 'overbar embellishment', google translation)
- - "̆": [t: "布雷夫點綴"]                            	#  0x306	(en: 'breve embellishment', google translation)
+ - "̆": [t: "breve embellishment"]                            	#  0x306	(en: 'breve embellishment', google translation)
  - "̇": [t: "點點上方"]                             	#  0x307	(en: 'dot above embellishment', google translation)
  - "̈": [t: "透水點綴"]                             	#  0x308	(en: 'diaeresis embellishment', google translation)
  - "̉": [t: "掛在點綴上方"]                           	#  0x309	(en: 'hook above embellishment', google translation)
  - "̊": [t: "戒指上的點綴"]                           	#  0x30a	(en: 'ring above embellishment', google translation)
  - "̋": [t: "雙重敏感裝飾"]                           	#  0x30b	(en: 'double acute accent embellishment', google translation)
- - "̌": [t: "查看"]                               	#  0x30c	(en: 'check', google translation)
+ - "̌": [t: "check"]                               	#  0x30c	(en: 'check', google translation)
  - "̍": [t: "點綴上方的垂直線"]                         	#  0x30d	(en: 'vertical line above embellishment', google translation)
  - "̎": [t: "點綴上方的雙垂直線"]                        	#  0x30e	(en: 'double vertical line above embellishment', google translation)
  - "̏": [t: "雙重重音點綴"]                           	#  0x30f	(en: 'double grave accent embellishment', google translation)
@@ -284,8 +284,8 @@
  - "•":                                         	#  0x2022
     - test: 
         if: "@data-chem-formula-op"
-        then: [t: "點"]                          	# 	(en: 'dot', google translation)
-        else: [t: "子彈"]                         	# 	(en: 'bullet', google translation)
+        then: [t: "dot"]                          	# 	(en: 'dot', google translation)
+        else: [t: "bullet"]                         	# 	(en: 'bullet', google translation)
 
  - "…":                                         	#  0x2026
     test:
@@ -396,8 +396,8 @@
  - "⃘": [t: "環疊加點綴"]                            	#  0x20d8	(en: 'ring overlay embellishment', google translation)
  - "⃙": [t: "順時針環覆蓋點綴"]                         	#  0x20d9	(en: 'clockwise ring overlay embellishment', google translation)
  - "⃚": [t: "逆時針環覆蓋點綴"]                         	#  0x20da	(en: 'anticlockwise ring overlay embellishment', google translation)
- - "⃛": [t: "三點"]                               	#  0x20db	(en: 'triple dot', google translation)
- - "⃜": [t: "四倍點"]                              	#  0x20dc	(en: 'quadruple dot', google translation)
+ - "⃛": [t: "triple dot"]                               	#  0x20db	(en: 'triple dot', google translation)
+ - "⃜": [t: "quadruple dot"]                              	#  0x20dc	(en: 'quadruple dot', google translation)
  - "⃝": [t: "封閉圓圈點綴"]                           	#  0x20dd	(en: 'enclosing circle embellishment', google translation)
  - "⃞": [t: "封閉正方形點綴"]                          	#  0x20de	(en: 'enclosing square embellishment', google translation)
  - "⃟": [t: "封閉鑽石點綴"]                           	#  0x20df	(en: 'enclosing diamond embellishment', google translation)
@@ -539,7 +539,7 @@
  - "↗":                                         	#  0x2197
     - test:
         if: "ancestor::*[2][self::m:limit]"
-        then: [t: "從下方接近"]                      	# 	(en: 'approaches from below', google translation)
+        then: [t: "從下方趨近"]                      	# 	(en: 'approaches from below', google translation)
         else: [t: "東北箭頭"]                       	# 	(en: 'north east arrow', google translation)
 
  - "↘":                                         	#  0x2198
@@ -762,7 +762,7 @@
  - "∙":                                         	#  0x2219
     - test: 
         if: "@data-chem-formula-op"
-        then: [t: "點"]                          	# 	(en: 'dot', google translation)
+        then: [t: "dot"]                          	# 	(en: 'dot', google translation)
         else: [t: "成"]                          	# 	(en: 'times')
 
  - "√":                                         	#  0x221a
@@ -790,8 +790,8 @@
  - "∠": [t: "角"]                                	#  0x2220	(en: 'angle')
  - "∡": [t: "測量角"]                              	#  0x2221	(en: 'measured angle')
  - "∢": [t: "球面角"]                              	#  0x2222	(en: 'spherical angle')
- - "∣": [t: "除"]                                	#  0x2223	(en: 'divides')
- - "∤": [t: "不除"]                               	#  0x2224	(en: 'does not divide')
+ - "∣": [t: "整除"]                                	#  0x2223	(en: 'divides')
+ - "∤": [t: "不整除"]                               	#  0x2224	(en: 'does not divide')
  - "∧": [t: "邏輯與"]                              	#  0x2227	(en: 'and')
  - "∨": [t: "邏輯或"]                              	#  0x2228	(en: 'or')
  - "∩": [t: "交集"]                               	#  0x2229	(en: 'intersection')
@@ -1183,8 +1183,8 @@
  - "⋅":                                         	#  0x22c5
     - test: 
         if: "@data-chem-formula-op"
-        then: [t: "點"]                          	# 	(en: 'dot', google translation)
-        else: [t: "點運算符"]                       	# 	(en: 'times')
+        then: [t: "dot"]                          	# 	(en: 'dot', google translation)
+        else: [t: "乘"]                       	# 	(en: 'times')
 
  - "⋆": [t: "星號運算符"]                            	#  0x22c6	(en: 'times')
  - "⋇": [t: "乘除號"]                              	#  0x22c7	(en: 'division times')
