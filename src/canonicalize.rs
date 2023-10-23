@@ -768,6 +768,8 @@ impl CanonicalizeContext {
 					return Some(mathml);
 				} else if let Some(result) = split_points(mathml) {
 					return Some(result);
+				} else if let Some(result) = merge_mi_sequence(mathml) {
+					return Some(result);
 				} else {
 					return Some(mathml);
 				};
@@ -1756,6 +1758,93 @@ impl CanonicalizeContext {
 			}
 		}
 
+		/// If we have something like 'V e l o c i t y', merge that into a single <mi>
+		/// We only do this for sequences of at least three chars, and also exclude things like consequtive letter (e.g., 'x y z')
+		/// The returned (mi) element reuses 'mi'
+		fn merge_mi_sequence(mi: Element) -> Option<Element> {
+			// The best solution would be to use a dictionary of words, or maybe restricted to words in a formula,
+			//   but that would like miss the words used in slope=run/rise
+			// We shouldn't need to worry about trig names like "cos", but people sometimes forget to use "\cos"
+			// Hence, we check against the "AdditionalFunctionNames" that get read on startup.
+			if as_text(mi).len() > 1 {
+				return None;
+			}
+			let following_siblings = mi.following_siblings();
+			// quick check to rule common cases
+			if following_siblings.len() < 2 ||
+			   name(&as_element(following_siblings[0])) != "mi" ||
+			   name(&as_element(following_siblings[1])) != "mi" {
+				return None;
+			}
+			// we have at least three <mi>s -- find out what the longest stretch is
+			let mut text =  as_text(mi).to_string();
+			for &child in &following_siblings {   // referenced to avoid a move
+				let child = as_element(child);
+				if name(&child) != "mi" {
+					break;		// because of the earlier check of two <mi>s, we know we have at least three chars
+				}
+				if as_text(child).len() > 1 {
+					return None;		// if something in the sequence is more than a char, assume the others are correct
+				}
+				text.push_str(as_text(child));
+			}
+			// If it is a word, it needs a vowel
+			// FIX: this check needs to be internationalized to include accented vowels, other alphabets
+			if !text.contains(&['a', 'e', 'i', 'o', 'u', 'y']) {
+				let pref_manager = crate::prefs::PreferenceManager::get();
+				let pref_manager = pref_manager.borrow();
+				if pref_manager.pref_to_string("Language").starts_with("en") {
+					return None;
+				};
+			}
+
+			let following_siblings: Vec<Element> = following_siblings[..text.len()-1].iter()
+						.map(|&child| as_element(child))
+						.collect();
+			
+			// I asked bard and chatgpt for formula words that are alphabetical, and they failed.
+			// I did find "flow" and "flux" in a list elsewhere -- I'm sure there are more. Probably other languages need to be handled
+			// Check for them here, and anything else that's alphabetical we avoid turning into a word
+			// FIX: this is English-centric
+			if ["flow", "flux"].contains(&text.as_str()) {
+				return merge_from_text(mi, &text, following_siblings);
+			}
+			let is_function_name = crate::definitions::DEFINITIONS.with(|definitions| {
+				let definitions = definitions.borrow();
+				return definitions.get_hashset("FunctionNames").unwrap().contains(&text);
+			});
+			if is_function_name {
+				return merge_from_text(mi, &text, following_siblings);
+			
+			}
+		
+			// now for some hueristics to rule out a sequence of variables
+			// rule out sequences like 'abc' and also 'axy'
+			let mut chars = text.chars();
+			let mut left = chars.next().unwrap();		// at least 3 chars
+			let mut is_in_alphabetical_order = true;
+			for ch in chars {
+				if (left as u32) >= (ch as u32) {
+					is_in_alphabetical_order = false;
+					break;									// can't be 'abc', 'axy', etc
+				}
+				left = ch;
+			}
+			if is_in_alphabetical_order || text.len() < 4 {
+				// If it is in alphabetical order, it's not likely a word
+				return None;
+			}
+
+			// FIX: should add more huerestics to rule out words
+			return merge_from_text(mi, &text, following_siblings);
+
+			fn merge_from_text<'a>(mi: Element<'a>, text: &str, following_siblings: Vec<Element>) -> Option<Element<'a>> {
+				// remove trailing mi's
+				following_siblings.into_iter().for_each(|sibling| sibling.remove_from_parent());
+				mi.set_text(text);
+				return Some(mi);
+			}
+		}
 
 		// Check if start..end is a number
 		fn is_likely_a_number(context: &CanonicalizeContext, mrow: Element, children: &[ChildOfElement]) -> bool {
@@ -5185,6 +5274,45 @@ mod canonicalize_tests {
 				</msup>
 				</mrow>
 			</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn merge_mi_test() {
+        let test_str = "<math>
+			<mi>c</mi><mi>o</mi><mi>s</mi><mo>=</mo>
+			<mi>w</mi><mi>x</mi><mi>y</mi><mi>z</mi><mo>+</mo>
+			<mi>n</mi><mi>a</mi><mi>x</mi><mo>+</mo>
+			<mi>m</mi><mi>a</mi><mi>x</mi>
+		</math> 
+	";
+        let target_str = "<math>
+		<mrow data-changed='added'>
+			<mi>cos</mi>
+			<mo>=</mo>
+			<mrow data-changed='added'>
+				<mrow data-changed='added'>
+				<mi>w</mi>
+				<mo data-changed='added'>&#x2062;</mo>
+				<mi>x</mi>
+				<mo data-changed='added'>&#x2062;</mo>
+				<mi>y</mi>
+				<mo data-changed='added'>&#x2062;</mo>
+				<mi>z</mi>
+				</mrow>
+				<mo>+</mo>
+				<mrow data-changed='added'>
+				<mi>n</mi>
+				<mo data-changed='added'>&#x2062;</mo>
+				<mi>a</mi>
+				<mo data-changed='added'>&#x2062;</mo>
+				<mi>x</mi>
+				</mrow>
+				<mo>+</mo>
+				<mi>max</mi>
+			</mrow>
+			</mrow>
+		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
