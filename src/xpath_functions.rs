@@ -84,6 +84,7 @@ impl IsNode {
     /// this is fairly detailed, so we define a few local functions (at end) to help out
     /// Also, it doesn't help that the structure is a bit complicated Elements->ChildOfElement->Element/Text
     pub fn is_simple(elem: &Element) -> bool {
+        debug!("is-simple: {}", mml_to_string(&elem));
         if is_trivially_simple(elem) {
             return true;
         }
@@ -205,7 +206,9 @@ impl IsNode {
                 if !is_negative_of_trivially_simple(&first_child) {
                     return false;
                 }
-                if children.len() == 5 && !is_COE_tag(&first_child.children()[1], "mn") {
+                if children.len() == 5 && 
+                   ( (name(&first_child) == "negative" && !is_COE_tag(&first_child.children()[0], "mn")) ||
+                     (name(&first_child) == "mrow"     && !is_COE_tag(&first_child.children()[1], "mn")) ) {
                     return false;      // '-x y z' is too complicated () -- -2 x y is ok
                 }
             }
@@ -1199,6 +1202,8 @@ mod tests {
         test_is_simple("f(x+y)",
          "<mrow><mi>f</mi><mo>&#x2061;</mo>\
             <mrow><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></mrow></mrow>");
+        test_is_simple("C(-2,1,4)",             // github.com/NSoiffer/MathCAT/issues/199
+         "<mrow><mi>C</mi><mrow><mo>(</mo><mo>−</mo><mn>2</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>4</mn><mo>)</mo></mrow></mrow>");
         
     }
 
