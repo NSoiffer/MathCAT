@@ -265,65 +265,65 @@ fn no_times_sqrt() {
     #[test]
     fn parens_interval_open_open() {
         let expr = "<math> 
-        <mrow intent='開-區間($start, $end)'><mo>(</mo>
+        <mrow intent='open-interval($start, $end)'><mo>(</mo>
         <mrow> <mo arg='open'>(</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>)</mo>
         <mo>)</mo></mrow>
     </math>";
     ///// mysterious intent 
-    test("zh", "SimpleSpeak",expr, "開 區間 從 c 到 d");
+    test("zh", "SimpleSpeak",expr, "開區間 c 逗號 d");
 }
 
 #[test]
     fn parens_interval_closed_open() {
         let expr = "<math> 
-        <mrow intent='閉-開-區間($start, $end)'><mo>[</mo>
+        <mrow intent='closed-open-interval($start, $end)'><mo>[</mo>
             <mrow> <mo arg='open'>[(]</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>)</mo>
             <mo>)</mo></mrow>
         </math>";
-    test("zh", "SimpleSpeak",expr, "閉 開 區間 從 c 到 d");
+    test("zh", "SimpleSpeak",expr, "閉開區間 c 逗號 d");
 }
 
 
 #[test]
 fn parens_interval_open_closed() {
     let expr = "<math> 
-    <mrow intent='開-閉-區間($start, $end)'><mo>(</mo>
+    <mrow intent='open-closed-interval($start, $end)'><mo>(</mo>
         <mrow> <mo arg='open'>(</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>]</mo>
         <mo>]</mo></mrow>
     </math>";
-    test("zh", "SimpleSpeak",expr,"開 閉 區間 從 c 到 d");
+    test("zh", "SimpleSpeak",expr,"開閉區間 c 逗號 d");
 }
 
 
 #[test]
 fn parens_interval_closed_closed() {
     let expr = "<math> 
-        <mrow intent='閉-區間($start, $end)'><mo>[</mo>
+        <mrow intent='closed-interval($start, $end)'><mo>[</mo>
             <mrow> <mo arg='open'>[(]</mo><mi arg='start'>c</mi><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>]</mo>
             <mo>]</mo></mrow>
     </math>";
-    test("zh", "SimpleSpeak",expr, "閉 區間 從 c 到 d");
+    test("zh", "SimpleSpeak",expr, "閉區間 c 逗號 d");
 }
 
     #[test]
     fn parens_interval_neg_infinity_open_open() {
         let expr = "<math> 
-        <mrow intent='開-區間($start, $end)'><mo arg='open'>(</mo>
+        <mrow intent='open-interval($start, $end)'><mo arg='open'>(</mo>
         <mrow><mrow arg='start'><mo>-</mo> <mi>∞</mi></mrow><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>)</mo>
         <mo>)</mo></mrow>
     </math>";
     test("zh", "SimpleSpeak",expr,
-    "開 區間 從 負 無限大 到 d");
+    "開區間 負 無限大 逗號 d");
 }
 
     #[test]
     fn parens_interval_neg_infinity_open_closed() {
         let expr = "<math> 
-        <mrow intent='開-閉-區間($start, $end)'><mo arg='open'>(</mo>
+        <mrow intent='open-closed-interval($start, $end)'><mo arg='open'>(</mo>
         <mrow><mrow arg='start'><mo>-</mo> <mi>∞</mi></mrow><mo>,</mo><mi arg='end'>d</mi></mrow><mo arg='close'>]</mo>
         <mo>]</mo></mrow>
     </math>";
     test("zh", "SimpleSpeak",expr,
-    "開 閉 區間 從 負 無限大 到 d");
+    "開閉區間 負 無限大 逗號 d");
 }
 
