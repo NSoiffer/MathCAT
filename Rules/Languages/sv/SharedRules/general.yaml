@@ -520,11 +520,10 @@
             then: [{T: "ekvationer"}]
             else: [{T: "ekvationen"}]      # phrase(this is the first 'equation' of three equations)
     - else:
-      then:
-        - test:
-          - if: "$LineCount != 1"
-            then: [{T: "rader"}]
-            else: [{T: "raden"}]      # phrase(this is the first 'line' of three lines)
+      - test:
+        - if: "$LineCount != 1"
+          then: [{T: "rader"}]
+          else: [{T: "raden"}]      # phrase(this is the first 'line' of three lines)
   # - test:
   #   - if: "$LineCount != 1"
   #     then: [{ct: "s"}] # plural
