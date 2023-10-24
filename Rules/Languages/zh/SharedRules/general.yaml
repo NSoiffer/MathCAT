@@ -122,16 +122,32 @@
   - x: "*[1]"
 
 - name: intervals
-  tag: [開-區間, 開-閉-區間, 閉-區間, 閉-開-區間]
+  tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - test:
       if: "$Verbosity!='Terse'"
       then:
       - t: ""      # phrase('the' square root of 25 equals 5)
-  - x: "translate(name(.),'-', ' ')"
+  #- x: "translate(name(.),'-',' ')"
   - test:
-      if: "$Verbosity!='Terse'"
+      if: name(.) = 'open-interval'
+      then:
+      - t: "開區間"
+      else_test:
+        if: name(.) = 'closed-interval'
+        then:
+        - t: "閉區間"
+        else_test:
+          if: name(.) = 'open-closed-interval'
+          then:
+          - t: "開閉區間"
+          else_test:
+            if: name(.) = 'closed-open-interval'
+            then:
+            - t: "閉開區間"
+  - test:
+      if: "$Verbosity='Verbose'"
       then:
       - t: "從"      # phrase(subtracting 5 'from' 10 gives 5)
       - x: "*[1]"
@@ -139,7 +155,7 @@
       - x: "*[2]"
       else:
       - x: "*[1]"
-      - t: "comma"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
+      - t: "逗號"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
       - x: "*[2]"
 
 - name: default-point
