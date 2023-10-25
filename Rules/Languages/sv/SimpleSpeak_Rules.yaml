@@ -136,22 +136,29 @@
       if: "*[2][text()=2]"
       then: {T: "i kvadrat"}      # phrase(5 'squared' equals 25)
       else: {T: "i kubik"}      # phrase(5 'cubed' equals 125)
+
 - name: function-power
   tag: power
   match:
   - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
+  # replace:
+  # - test:
+  #     if: "$Verbosity!='Terse'"
+  #     then: {t: "the"}      # # phrase('the' fourth power of 10)
+  # - bookmark: "*[2]/@id"
+  # - test:
+  #     if: "*[2][self::m:mn][not(contains(., '.'))]"
+  #     then: [{x: "ToOrdinal(*[2])"}]
+  #     else: [{x: "*[2]"}]
+  # - t: "kraften"      # phrase(the fourth 'power of' 2)
+  # - pause: short
+  # - x: "*[1]"
   replace:
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: {t: "the"}      # # phrase('the' fourth power of 10)
-  - bookmark: "*[2]/@id"
-  - test:
-      if: "*[2][self::m:mn][not(contains(., '.'))]"
-      then: [{x: "ToOrdinal(*[2])"}]
-      else: [{x: "*[2]"}]
-  - t: "kraften"      # phrase(the fourth 'power of' 2)
-  - pause: short
   - x: "*[1]"
+  - T: "upphöjt till"
+  - bookmark: "*[2]/@id"
+  - x: "*[2]"
+  - pause: short
 
 # non-function rules for power
 - name: squared-or-cubed
@@ -162,44 +169,66 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {t: "squared"}      # phrase(5 'squared' equals 25)
-      else: {t: "cubed"}      # phrase(5 'cubed' equals 125)
+      then: {T: "i kvadrat"}      # phrase(5 'squared' equals 25)
+      else: {T: "i kubik"}      # phrase(5 'cubed' equals 125)
 
 - name: simple-integer
   tag: power
   match: "*[2][self::m:mn][not(contains(., '.'))]"
+  # replace:
+  # - x: "*[1]"
+  # - t: "till"      # phrase(15 raised 'to the' second power equals 225)
+  # - test:
+  #     if: "*[2][.>0]"
+  #     then: {x: "ToOrdinal(*[2])"}
+  #     else: {x: "*[2]"}
   replace:
   - x: "*[1]"
-  - t: "till"      # phrase(15 raised 'to the' second power equals 225)
-  - test:
-      if: "*[2][.>0]"
-      then: {x: "ToOrdinal(*[2])"}
-      else: {x: "*[2]"}
+  - T: "upphöjt till"
+  - x: "*[2]"
+  - pause: short
+
 - name: simple-negative-integer
   tag: power
   match:
   - "*[2][self::m:negative and"
   - "     *[1][self::m:mn][not(contains(., '.'))]]"
+  # replace:
+  # - x: "*[1]"
+  # - t: "till"      # phrase(15 raised 'to the' second power equals 225)
+  # - x: "*[2]"
   replace:
   - x: "*[1]"
-  - t: "till"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "upphöjt till"
   - x: "*[2]"
+  - pause: short
+
 - name: simple-var
   tag: power
   match: "*[2][self::m:mi][string-length(.)=1]"
+  # replace:
+  # - x: "*[1]"
+  # - t: "till"      # phrase(15 raised 'to the' second power equals 225)
+  # - x: "*[2]"
+  # - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
   replace:
   - x: "*[1]"
-  - t: "till"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "upphöjt till"
   - x: "*[2]"
-  - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+  - pause: short
 
 - name: simple
   tag: power
   match: "IsNode(*[2], 'leaf')"
+  # replace:
+  # - x: "*[1]"
+  # - t: "till"      # phrase(15 raised 'to the' second power equals 225)
+  # - x: "*[2]"
   replace:
   - x: "*[1]"
-  - t: "till"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "upphöjt till"
   - x: "*[2]"
+  - pause: short
 
 - name: nested
   # it won't end in "power" if the exponent is simple enough
@@ -213,18 +242,19 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - t: "höjt till"      # phrase(15 'raised to the' second power equals 225)
+  - T: "upphöjt till"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
   - pause: short
-  - t: "end of exponent"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+  - T: "slut exponent"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+
 - name: default
   tag: power
   match: "."
   replace:
   - x: "*[1]"
-  - t: "höjt till"      # phrase(15 'raised to the' second power equals 225)
+  - T: "upphöjt till"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
-  - t: "power"      # phrase(15 raised to the second 'power' equals 225)
+  # - t: "power"      # phrase(15 raised to the second 'power' equals 225)
 
 #
 # Some rules on mrows
@@ -238,22 +268,22 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "den"}      # phrase('the' empty set)
-      - t: "tom uppsättning"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
+          then: {T: "den"}      # phrase('the' empty set)
+      - T: "tomma mängden"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
       then:
-      - test:
-          if: "$Verbosity!='Terse'"
-          then: {t: "the"}      # phrase('the' set of all integers)
-      - t: "uppsättningen av alla"      # phrase(the 'set of all' positive integers less than 10)
+      # - test:
+      #     if: "$Verbosity!='Terse'"
+      #     then: {t: "the"}      # phrase('the' set of all integers)
+      - T: "mängden av alla"      # phrase(the 'set of all' positive integers less than 10)
       - x: "*[1]/*[1]"
-      - t: "så att"      # phrase(x 'such that' x is less than y)
+      - T: "sådana att"      # phrase(x 'such that' x is less than y)
       - x: "*[1]/*[3]"
       else:
-      - test:
-          if: "$Verbosity!='Terse'"
-          then: {t: "the"}      # phrase('the' set of integers)
-      - t: "uppsättning"      # phrase(here is a 'set' of numbers)
+      # - test:
+      #     if: "$Verbosity!='Terse'"
+      #     then: {t: "the"}      # phrase('the' set of integers)
+      - T: "mängden"      # phrase(here is a 'set' of numbers)
       - x: "*[1]"
 
 - name: times
@@ -276,7 +306,7 @@
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
-  - t: "times"      # phrase(7 'times' 5 equals 35)
+  - T: "gånger"      # phrase(7 'times' 5 equals 35)
 
 - name: no-say-parens
   tag: mrow
