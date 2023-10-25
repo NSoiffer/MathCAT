@@ -463,8 +463,8 @@ impl CanonicalizeContext {
 			// the following is a generalization of a regex like ^(\d*|\d{1,3}([, ]?\d{3})*)(\.(\d*|(\d{3}[, ])*\d{1,3}))?$
 			// that matches something like '1 234.567 8' and '1,234.', but not '1,234.12,34
 			return Regex::new(&format!(r"^(\d*|\d{{1,{}}}([{}]?\d{{{}}})*)([{}](\d*|(\d{{{}}}[{}])*\d{{1,{}}}))?$",
-							n_sep_before, regex::escape(&block_separator), n_sep_before, regex::escape(&decimal_separator),
-							n_sep_after, regex::escape(&block_separator), n_sep_after) ).unwrap();
+							n_sep_before, regex::escape(block_separator), n_sep_before, regex::escape(decimal_separator),
+							n_sep_after, regex::escape(block_separator), n_sep_after) ).unwrap();
 		}
 	}
 
@@ -1790,7 +1790,7 @@ impl CanonicalizeContext {
 			}
 			// If it is a word, it needs a vowel
 			// FIX: this check needs to be internationalized to include accented vowels, other alphabets
-			if !text.contains(&['a', 'e', 'i', 'o', 'u', 'y']) {
+			if !text.contains(['a', 'e', 'i', 'o', 'u', 'y']) {
 				let pref_manager = crate::prefs::PreferenceManager::get();
 				let pref_manager = pref_manager.borrow();
 				if pref_manager.pref_to_string("Language").starts_with("en") {

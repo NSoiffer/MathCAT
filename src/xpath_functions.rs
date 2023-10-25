@@ -84,7 +84,6 @@ impl IsNode {
     /// this is fairly detailed, so we define a few local functions (at end) to help out
     /// Also, it doesn't help that the structure is a bit complicated Elements->ChildOfElement->Element/Text
     pub fn is_simple(elem: &Element) -> bool {
-        debug!("is-simple: {}", mml_to_string(&elem));
         if is_trivially_simple(elem) {
             return true;
         }
