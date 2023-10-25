@@ -772,7 +772,7 @@
       then: [{t: "上標"}]      # phrase(H 'superscript' 2)
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{t: "極好的"}]      # phrase(H 'super' 2)
+        then: [{t: "上標"}]      # phrase(H 'super' 2)
   - x: "*[3]"
   - test:
       if: "following-sibling::*[1][text()='+' or text()='-']" # a little lazy -- assumes chemistry superscripts end with + or -
@@ -803,7 +803,7 @@
               then: [{t: "上標"}]      # phrase(H 'superscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "極好的"}]      # phrase(H 'super' 2)
+                then: [{t: "上標"}]      # phrase(H 'super' 2)
           - x: "$Prescripts[2]"
           - pause: "short"
       - test:
@@ -828,7 +828,7 @@
                   then: [{t: "上標"}]      # phrase(H 'superscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "極好的"}]      # phrase(H 'super' 2)
+                    then: [{t: "上標"}]      # phrase(H 'super' 2)
               - x: "$Prescripts[4]"
               - pause: "short"
           - test:
@@ -865,7 +865,7 @@
               then: [{t: "上標"}]      # phrase(H 'superscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "極好的"}]          # phrase(H 'super' 2)
+                then: [{t: "上標"}]          # phrase(H 'super' 2)
           - x: "$Postscripts[2]"
           - pause: "short"
       - test:
@@ -890,7 +890,7 @@
                   then: [{t: "上標"}]      # phrase(H 'superscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "極好的"}]          # phrase(H 'super' 2)
+                    then: [{t: "上標"}]          # phrase(H 'super' 2)
               - x: "$Postscripts[4]"
               - pause: "short"
           - test:
@@ -915,7 +915,7 @@
                       then: [{t: "上標"}]  # phrase(H 'superscript' 2)
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{t: "極好的"}]      # phrase(H 'super' 2)
+                        then: [{t: "上標"}]      # phrase(H 'super' 2)
                   - x: "$Postscripts[6]"
                   - pause: "short"
               - test:
@@ -940,7 +940,7 @@
                           then: [{t: "上標"}]      # phrase(H 'superscript' 2)
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{t: "極好的"}]      # phrase(H 'super' 2)
+                            then: [{t: "上標"}]      # phrase(H 'super' 2)
                       - x: "$Postscripts[8]"
                       - pause: "short"
       - test:
@@ -970,12 +970,12 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: ".='s'"
-      then: [{t: "堅硬的"}]      # phrase(Boron is a 'solid' in its natural state)
+      then: [{t: "固體"}]      # phrase(Boron is a 'solid' in its natural state)
     - else_if: ".='l'"
       then: [{t: "液體"}]      # phrase(water is a 'liquid')
     - else_if: ".='g'"
       then: [{t: "氣體"}]      # phrase(hydrogen is a 'gas' )
-      else: [{t: "水"}]      # phrase(an 'aqueous' solution is contained in water)
+      else: [{t: "溶液"}]      # phrase(an 'aqueous' solution is contained in water)
   - pause: short
 
 - name: chemical-formula-operator-bond
@@ -1011,14 +1011,14 @@
     - if: ".='→' or .='⟶'"
       then_test:
         if: "$Verbosity='Terse'"
-        then: [{t: "形式"}]      # phrase(hydrogen and oxygen 'forms' water )
-        else: [{t: "反應形成"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
+        then: [{t: "形成"}]      # phrase(hydrogen and oxygen 'forms' water )
+        else: [{T: "反應形成"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
     - else_if: ".='⇌' or .='⮖'"
-      then: [{t: "與"}]      # phrase(a reactant 'is in equilibrium with' a product)
+      then: [{t: "左右平衡"}]      # phrase(a reactant 'is in equilibrium with' a product)
     - else_if: ".='⭴'"
-      then: [{t: "處於左側的平衡"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
+      then: [{t: "偏左平衡"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
     - else_if: ".='⭵'"
-      then: [{t: "在右側有偏見的平衡"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
+      then: [{t: "偏右平衡"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
       else: [x: "."]
 
 - name: chemical-equation-operator

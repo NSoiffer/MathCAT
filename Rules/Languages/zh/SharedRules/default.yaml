@@ -192,7 +192,7 @@
       else_test:
           if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"  # FIX: is this test necessary?
           then:
-          - t: "極好的"      # phrase(x 'super' 2)
+          - t: "上標"      # phrase(x 'super' 2)
           - x: "*[last()]"
           - test:
               if: "not(IsNode(*[last()], 'simple'))"
