@@ -17,7 +17,7 @@ mod SimpleSpeak {
     mod large_ops;
     // mod menclose;
     mod mfrac;
-    // mod mroot;
+    mod mroot;
     mod msup;
     mod sets;
     mod geometry;
