@@ -56,7 +56,7 @@
   - test:
       if: "string-length(.) = 1 and text() != '_'"       # need unicode.tdl to kick in for single letter tokens
       then: [x: "text()"]
-      else: [x: "translate(., '-_', '  ')" ]   # from intent literals
+      else: [x: "translate(., '-_\u00A0', '  ')" ]   # from intent literals or from extra spaces added (which get deleted)
 
 - name: default
   tag: ms
