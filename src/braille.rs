@@ -7,7 +7,7 @@ use crate::prefs::PreferenceManager;
 use std::cell::Ref;
 use regex::{Captures, Regex, RegexSet};
 use phf::{phf_map, phf_set};
-use crate::speech::{BRAILLE_RULES, SpeechRulesWithContext};
+use crate::speech::{BRAILLE_RULES, SpeechRulesWithContext, make_quoted_string};
 use std::ops::Range;
 
 static UEB_PREFIXES: phf::Set<char> = phf_set! {
@@ -1589,7 +1589,7 @@ impl BrailleChars {
             _ => return Err(sxd_xpath::function::Error::Other(format!("get_braille_chars: unknown braille code '{}'", code)))
         };
         return match result {
-            Ok(string) => Ok(string),
+            Ok(string) => Ok(make_quoted_string(string)),
             Err(err) => return Err(sxd_xpath::function::Error::Other(err.to_string())),
         }
     }

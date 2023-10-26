@@ -24,6 +24,35 @@ use crate::canonicalize::{as_element, create_mathml_element, set_mathml_name, na
 
 pub const NAV_NODE_SPEECH_NOT_FOUND: &str = "NAV_NODE_NOT_FOUND";
 
+/// Like lisp's ' (quote foo), this is used to block "replace_chars" being called.
+///   Unlike lisp, this appended to the end of a string (more efficient)
+/// At the moment, the only use is BrailleChars(...) -- internally, it calls replace_chars and we don't want it called again.
+/// Note: an alternative to this hack is to add "xq" (execute but don't eval the result), but that's heavy-handed for the current need
+const NO_EVAL_QUOTE_CHAR: char = '\u{e00A}';            // a private space char
+const NO_EVAL_QUOTE_CHAR_AS_BYTES: [u8;3] = [0xee,0x80,0x8a];
+const N_BYTES_NO_EVAL_QUOTE_CHAR: usize = NO_EVAL_QUOTE_CHAR.len_utf8();
+
+/// Converts 'string' into a "quoted" string -- use is_quoted_string and unquote_string
+pub fn make_quoted_string(mut string: String) -> String {
+    string.push(NO_EVAL_QUOTE_CHAR);
+    return string;
+}
+
+/// Checks the string to see if it is "quoted"
+pub fn is_quoted_string(str: &str) -> bool {
+    if str.len() < N_BYTES_NO_EVAL_QUOTE_CHAR {
+        return false;
+    }
+    let bytes = str.as_bytes();
+    return &bytes[bytes.len()-N_BYTES_NO_EVAL_QUOTE_CHAR..] == NO_EVAL_QUOTE_CHAR_AS_BYTES;
+}
+
+/// Converts 'string' into a "quoted" string -- use is_quoted_string and unquote_string
+/// IMPORTANT: this assumes the string is quoted -- no check is made
+pub fn unquote_string(str: &str) -> &str {
+    return &str[..str.len()-N_BYTES_NO_EVAL_QUOTE_CHAR];
+}
+
 
 /// The main external call, `intent_from_mathml` returns a string for the speech associated with the `mathml`.
 ///   It matches against the rules that are computed by user prefs such as "Language" and "SpeechStyle".
@@ -1078,17 +1107,21 @@ impl<'r> MyXPath {
         
         let result = self.evaluate(&rules_with_context.context_stack.base, mathml)
                 .chain_err(|| format!("in '{}' replacing after pattern match", &self.rc.string) )?;
-        return match result {
+        let string = match result {
                 Value::Nodeset(nodes) => {
                     if nodes.size() == 0 {
                         bail!("During replacement, no matching element found");
                     }
-                    rules_with_context.replace_nodes(nodes.document_order(), mathml)
+                    return rules_with_context.replace_nodes(nodes.document_order(), mathml);
                 },
-                Value::String(t) => T::from_string(t, rules_with_context.doc),
-                Value::Number(num) => T::from_string(num.to_string(), rules_with_context.doc ),
-                Value::Boolean(b) => T::from_string(b.to_string(), rules_with_context.doc ),          // FIX: is this right???
+                Value::String(s) => s,
+                Value::Number(num) => num.to_string(),
+                Value::Boolean(b) => b.to_string(),          // FIX: is this right???
         };
+        // Hack!: this test for input that starts with a '$' (defined variable), avoids a double evaluate;
+        // We don't need NO_EVAL_QUOTE_CHAR here, but the more general solution of a quoted execute (- xq:) would avoid this hack
+        let result = if self.rc.string.starts_with('$') {string} else {rules_with_context.replace_chars(&string, mathml)?};
+        return T::from_string(result, rules_with_context.doc );
     }
     
     pub fn evaluate<'a, 'c>(&'a self, context: &'r Context<'c>, mathml: Element<'c>) -> Result<Value<'c>> {
@@ -2392,6 +2425,9 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
     /// Lookup unicode "pronunciation" of char.
     /// Note: TTS is not supported here (not needed and a little less efficient)
     pub fn replace_chars(&'r mut self, str: &str, mathml: Element<'c>) -> Result<String> {
+        if is_quoted_string(str) {
+            return Ok(unquote_string(str).to_string());
+        }
         let rules = self.speech_rules;
         let mut chars = str.chars();
         // in a string, avoid "a" -> "eigh", "." -> "point", etc
