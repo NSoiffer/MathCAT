@@ -39,7 +39,7 @@ fn gothic_1_3_1() {
 }
 
 #[test]
-#[ignore]   // need to add a pref that 
+#[ignore]   // need to add a transcriber note pref for different fonts 
 fn double_struck_1_3_2() {
     let expr = "<math><mi>𝕔𝕎</mi></math>";
     test_braille("CMU", expr, "⠬⠉⠩⠺");
@@ -55,13 +55,13 @@ fn number_3_1_1() {
 #[test]
 fn number_2_2_1() {
     let expr = "<math><mn>31.720</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠁⠄⠛⠃⠚");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "."), ("BlockSeparators", ", ")], expr, "⠼⠉⠁⠄⠛⠃⠚");
 }
 
 #[test]
 fn number_2_2_2() {
     let expr = "<math><mn>3 802 197</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠄⠓⠚⠃⠄⠁⠊⠛");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "."), ("BlockSeparators", ", ")], expr, "⠼⠉⠄⠓⠚⠃⠄⠁⠊⠛");
 }
 
 #[test]
@@ -85,32 +85,32 @@ fn number_2_2_5() {
 #[test]
 fn number_2_2_6() {
     let expr = "<math><mo>-</mo><mn>25 347</mn></math>";
-    test_braille("CMU", expr, "⠤⠼⠃⠑⠄⠉⠙⠛");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "."), ("BlockSeparators", ", ")], expr, "⠤⠼⠃⠑⠄⠉⠙⠛");
 }
 
 #[test]
-#[ignore]
 fn number_2_3_1() {
     let expr = "<math><mn>3.2</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠂⠃");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "."), ("BlockSeparators", ", ")], expr, "⠼⠉⠂⠃");
+
 }
 
 #[test]
 fn number_2_3_2() {
     let expr = "<math><mn>3,2</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠂⠃");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠉⠂⠃");
 }
 
 #[test]
 fn number_2_3_3() {
     let expr = "<math><mn>3’2</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠂⠃");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "’,"), ("BlockSeparators", ". ")], expr, "⠼⠉⠂⠃");
 }
 
 #[test]
 #[ignore]
 fn number_2_3_3_wiris() {
-    let expr = "<math><mn>3</mn><mo>'</mo><mn>2</mn></math>";
+    let expr = "<math><mn>3</mn><mo>’</mo><mn>2</mn></math>";
     test_braille("CMU", expr, "⠼⠉⠂⠃");
 }
 
@@ -269,21 +269,6 @@ fn script_4_2_1_13() {
     // z_i_0
     let expr = "<math><msub><mi>z</mi><msub><mi>i</mi><mn>0</mn></msub></msub></math>";
     test_braille("CMU", expr, "⠵⠌⠊⠌⠼⠚");
-}
-
-#[test]
-fn script_4_2_2_1() {
-    // just first entry because 2D not supported yet
-    let expr = "<math><msub><mi>a</mi><mn>11</mn></msub></math>";
-    test_braille("CMU", expr, "⠁⠂⠂");
-}
-
-#[test]
-#[ignore] // this appears to be optional -- implementation seems subjective especially when not in a table
-fn script_4_2_2_2() {
-    // just first entry because 2D not supported yet
-    let expr = "<math><msub><mi>a</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow></msub></math>";
-    test_braille("CMU", expr, "⠁⠂⠂");
 }
 
 #[test]
@@ -994,8 +979,7 @@ fn inverse_9_1_1() {
 #[test]
 fn list_9_1_2() {
     let expr = "<math><mo>(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>)</mo></math>";
-    // modified to use numeric subscripts as per 4.2.2
-    test_braille("CMU", expr, "⠣⠭⠂⠀⠂⠭⠆⠜");
+    test_braille("CMU", expr, "⠣⠭⠌⠼⠁⠀⠂⠭⠌⠼⠃⠜");
 }
 
 #[test]
