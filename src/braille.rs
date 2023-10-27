@@ -1722,10 +1722,6 @@ impl BrailleChars {
         // For other numbers, we need to add "." to create digit blocks
 
         lazy_static! {
-            // these all use ',' for decimal separators
-            static ref NUMBER_WITH_SPACES: Regex = Regex::new(r"^[1-9]\d{0,2}( \d{3})*(,\d*)?$").unwrap();
-            static ref NUMBER_WITH_BLOCKS: Regex = Regex::new(r"^([1-9]\d\d\d+)(,\d*)?$").unwrap();
-    
             static ref HAS_TYPEFACE: Regex = Regex::new(".*?(double-struck|script|fraktur|sans-serif).*").unwrap();
             static ref PICK_APART_CHAR: Regex = 
                  Regex::new(r"(?P<bold>B??)(?P<italic>I??)(?P<face>[S𝔹TD]??)s??(?P<cap>C??)(?P<greek>G??)(?P<char>[NL].)").unwrap();
@@ -1771,9 +1767,7 @@ impl BrailleChars {
 
         fn add_separator(text: String) -> String {
             use crate::definitions::DEFINITIONS;
-            if NUMBER_WITH_SPACES.is_match(&text) {
-                return text.replace(' ', ".");
-            } else if let Some(text_without_arc) = text.strip_prefix("arc") {
+            if let Some(text_without_arc) = text.strip_prefix("arc") {
                 // "." after arc (7.5.3)
                 let is_function_name = DEFINITIONS.with(|definitions| {
                     let definitions = definitions.borrow();

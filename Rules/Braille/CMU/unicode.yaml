@@ -539,12 +539,12 @@
  - " ":                        # 0x20 (Space)
      - test:
         if: "self::m:mn"
-        then: [t: "N⠐"]
+        then: [t: "N⠄"]
         else: [t: "W"]
  - " ":                        # 0xa0 (Non-breaking Space)
      - test:
         - if: "self::m:mn"
-          then: [t: "N⠐"]
+          then: [t: "N⠄"]
         - else_if: "following-sibling::*[1][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]"
           then: [t: "𝐖"]
           else: [t: "W"]
@@ -553,10 +553,21 @@
         if: "self::m:mn"
         then: [t: "N⠂"]
         else: [t: "W⠂"]
- - ".":                        # 0x2e (Period)
+ - ".":                        # 0x2e (Period) -- 2.3 says that if this is acting like a decimal separator, it should be brailled like "," 
      - test:
         if: "self::m:mn"
-        then: [t: "N⠄"]
+        then:
+        # presunme this is likely uses "," for a decimal separator, so just do a few checks
+        # 1. if there are < 3 chars after the first ".", then not a block separator
+        # 2. if there is a '.' or other likely block separator after the first '.', then not decimal separator
+        # likely other (complicated?) other tests that could be used
+        - with:
+            variables: [StringAfter: "substring-after(DEBUG(.), '.')"]
+            replace:
+            - test:
+                if: "string-length(DEBUG($StringAfter)) >= 3 and DEBUG(string-length($StringAfter))=string-length( DEBUG(translate($StringAfter, $BlockSeparators, '')) )"
+                then: [t: "N⠄"]   # really is a block separator
+                else: [t: "N⠂"]   # treat as decimal separator
         else: [t: "W⠄"]
  - ":": [t: "⠐⠂"]              # 0x003A (Colon)
  - "-": [t: "⠤"]              # 0x2d (Minus sign or hyphen)
