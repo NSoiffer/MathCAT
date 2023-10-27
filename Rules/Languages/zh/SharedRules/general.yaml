@@ -975,7 +975,7 @@
       then: [{t: "液體"}]      # phrase(water is a 'liquid')
     - else_if: ".='g'"
       then: [{t: "氣體"}]      # phrase(hydrogen is a 'gas' )
-      else: [{t: "溶液"}]      # phrase(an 'aqueous' solution is contained in water)
+      else: [{t: "水溶液"}]      # phrase(an 'aqueous' solution is contained in water)
   - pause: short
 
 - name: chemical-formula-operator-bond

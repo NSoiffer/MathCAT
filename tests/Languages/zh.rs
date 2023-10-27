@@ -1,16 +1,16 @@
 #![allow(non_snake_case)]
 
-mod ClearSpeak {
-    mod functions;
-    mod large_ops;
-    mod menclose;
-    mod mfrac;
-    mod mroot;
-    mod msup;
-    mod sets;
-    mod symbols_and_adornments;
-    mod multiline;
-}
+//mod ClearSpeak {
+//    mod functions;
+//    mod large_ops;
+//    mod menclose;
+//    mod mfrac;
+//    mod mroot;
+//    mod msup;
+//    mod sets;
+//    mod symbols_and_adornments;
+//    mod multiline;
+//}
 
 mod SimpleSpeak {
     mod functions;

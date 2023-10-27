@@ -99,7 +99,7 @@ fn ferric_chloride_aq() {
         <msub><mi>Cl</mi><mn>3</mn></msub>
         <mrow><mo>(</mo><mrow><mi>aq</mi></mrow><mo>)</mo></mrow>
     </mrow></math>";
-  test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 f e, 大寫 c l, 3 溶液,");
+  test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 f e, 大寫 c l, 3 水溶液,");
   }
 
 #[test]
@@ -556,7 +556,7 @@ fn mhchem_hcl_aq_etc() {
     </mrow>
   </math>";
   test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "2, 大寫 h, 大寫 c l, 溶液; 加, 2, 大寫 n a, 固體; 形成; 2, 大寫 n a, 大寫 c l, 溶液; 加, 大寫 h, 2; 氣體,");
+      expr, "2, 大寫 h, 大寫 c l, 水溶液; 加, 2, 大寫 n a, 固體; 形成; 2, 大寫 n a, 大寫 c l, 水溶液; 加, 大寫 h, 2; 氣體,");
 
 }
 

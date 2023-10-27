@@ -893,7 +893,7 @@
          if: "$Verbosity!='Terse'"
          then: [t: "這"]                         	# 	(en: 'the', google translation)
      - t: "相差"                                  	# 	(en: 'difference between')
- - "≐": [t: "接近極限"]                             	#  0x2250	(en: 'approaches the limit')
+ - "≐": [t: "近似於"]                             	#  0x2250	(en: 'approaches the limit')
  - "≑":                                         	#  0x2251
      - test: 
          if: "$Verbosity!='Terse'"
