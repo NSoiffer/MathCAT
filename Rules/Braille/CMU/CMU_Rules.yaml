@@ -726,17 +726,18 @@
           else: [x: "*[3]"]
   - t: "⠱"
 
--  # 4.2.2 -- numeric subscripts (note does not apply to msubsup -- 4.4.1, example 1, nor to nested subscript - 4.2.1, last example)
-   # the rule doesn't mention having a simple base, but I think that is what is meant
-  name: numeric-subscripts
-  tag: msub
-  match:
-  - "*[1][self::m:mi] and"
-  - "*[2][self::m:mn][not(contains(., '.,'))] and ..[1][not(IsNode(., 'modified'))]"
-  replace:
-  - x: "*[1]"
-  - t: "𝑁"    # don't add numeric indicator
-  - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the subscript
+# - # 4.2.2 -- numeric subscripts 
+  # Feedback from Jaime Muñoz Carenas is that they are only used for 2D structures (multiline)
+  # the rule doesn't mention having a simple base, but I think that is what is meant
+  # name: numeric-subscripts
+  # tag: msub
+  # match:
+  # - "*[1][self::m:mi] and"
+  # - "*[2][self::m:mn][not(contains(., '.,'))] and ..[1][not(IsNode(., 'modified'))]"
+  # replace:
+  # - x: "*[1]"
+  # - t: "𝑁"    # don't add numeric indicator
+  # - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the subscript
 
 -
   name: nested-scripts    # this case likely should have been written as mmultiscripts, but people will use this (4.4.2)
@@ -1182,8 +1183,7 @@
       if: "contains(@notation,'bottom')"
       then: [t: "⠠⠤"]                  # underline
   - test:
-      if: "contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
-           contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike')"
+      if: "$IsCancellation"
       then: [t: "⠻"]                   # cancellation
   - test:  # group anything that isn't a single character or bracketed
       if: "*[1][(IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))) or IsBracketed(., '', '')]"
