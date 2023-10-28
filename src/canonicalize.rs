@@ -1448,7 +1448,7 @@ impl CanonicalizeContext {
 			// The '<'/'>' replacements are because WIRIS uses them out instead of the correct chars in its template
 			let open = mfenced.attribute_value("open").unwrap_or("(").replace('<', "⟨");
 			let close = mfenced.attribute_value("close").unwrap_or(")").replace('>', "⟩");
-			debug!("open={}, close={}", open, close);
+			// debug!("open={}, close={}", open, close);
 			let mut separators= mfenced.attribute_value("separators").unwrap_or(",").chars();
 			set_mathml_name(mfenced, "mrow");
 			mfenced.remove_attribute("open");
@@ -1960,7 +1960,7 @@ impl CanonicalizeContext {
 				return false;
 			}
 
-			debug!("ignore_final_punctuation: #preceding={}", as_element(children[0]).preceding_siblings().len());
+			// debug!("ignore_final_punctuation: #preceding={}", as_element(children[0]).preceding_siblings().len());
 			// look to preceding siblings and see if an of the mn's have a decimal separator
 			return !as_element(children[0]).preceding_siblings().iter()
 					.any(|&child| {
@@ -3372,7 +3372,7 @@ impl CanonicalizeContext {
 		// debug!(" shift_stack: shift on '{}'; ops: prev '{}/{}', cur '{}/{}'",
 		// 		element_summary(current_child),show_invisible_op_char(previous_op.ch), previous_op.op.priority,
 		// 		show_invisible_op_char(current_op.ch), current_op.op.priority);
-		if !previous_op.op.is_nary(current_op.op) {
+		if !current_op.op.is_nary(previous_op.op) {
 			// grab operand on top of stack (if there is one) and make it part of the new mrow since current op has higher precedence
 			// if operators are the same and are binary, then this push makes them act as left associative
 			let mut top_of_stack = parse_stack.pop().unwrap();
@@ -3653,7 +3653,7 @@ impl CanonicalizeContext {
 						if likely_function_name == FunctionNameCertainty::Maybe {
 							implied_mo.set_attribute_value("data-function-guess", "true");
 						}
-						let shift_result = self.shift_stack(&mut parse_stack, implied_mo, implied_operator.clone());
+						self.reduce_stack(&mut parse_stack, implied_operator.op.priority);						let shift_result = self.shift_stack(&mut parse_stack, implied_mo, implied_operator.clone());
 						// ignore shift_result.0 which is just 'implied_mo'
 						assert_eq!(implied_mo, shift_result.0);
 						assert!( ptr_eq(implied_operator.op, shift_result.1.op) );
@@ -4163,6 +4163,20 @@ mod canonicalize_tests {
 		  <mi>b</mi>
 		</mrow>
 	   </math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+    }
+
+
+    #[test]
+    fn canonical_prefix_implied_times_prefix() {
+        let test_str = "<math><mrow><mo>∂</mo><mi>x</mi><mo>∂</mo><mi>y</mi></mrow></math>";
+        let target_str = "<math>
+			<mrow>
+			<mrow data-changed='added'><mo>∂</mo><mi>x</mi></mrow>
+			<mo data-changed='added'>&#x2062;</mo>
+			<mrow data-changed='added'><mo>∂</mo><mi>y</mi></mrow>
+			</mrow>
+		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
     }
 
