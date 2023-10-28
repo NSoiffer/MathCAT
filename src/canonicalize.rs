@@ -3617,13 +3617,12 @@ impl CanonicalizeContext {
 						current_op.ch = as_text(base_of_child);
 						// debug!("  Found whitespace op '{}'/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
 					} else {
-						// debug!("  Found implicit op {}/{} [{:?}]", show_invisible_op_char(current_op.ch), current_op.op.priority, likely_function_name);
-						self.reduce_stack(&mut parse_stack, current_op.op.priority);
-		
 						let implied_mo = create_mo(current_child.document(), current_op.ch, ADDED_ATTR_VALUE);
 						if likely_function_name == FunctionNameCertainty::Maybe {
 							implied_mo.set_attribute_value("data-function-guess", "true");
 						}
+						// debug!("  Found implicit op {}/{} [{:?}]", show_invisible_op_char(current_op.ch), current_op.op.priority, likely_function_name);
+						self.reduce_stack(&mut parse_stack, current_op.op.priority);		
 						let shift_result = self.shift_stack(&mut parse_stack, implied_mo, current_op.clone());
 						// ignore shift_result.0 which is just 'implied_mo'
 						assert_eq!(implied_mo, shift_result.0);
