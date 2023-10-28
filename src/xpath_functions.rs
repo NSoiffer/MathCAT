@@ -26,7 +26,7 @@ use std::cell::Ref;
 use phf::phf_set;
 
 
-use crate::canonicalize::{as_element, name};
+use crate::canonicalize::{as_element, as_text, name};
 
 // useful utility functions
 // note: child of an element is a ChildOfElement, so sometimes it is useful to have parallel functions,
@@ -385,6 +385,83 @@ impl Function for IsNode {
                     )
             )
         );
+    }
+}
+
+struct IsInNeedOfParensForCMU;
+impl IsInNeedOfParensForCMU {
+    // ordinals often have an irregular start (e.g., "half") before becoming regular.
+    // if the number is irregular, return the ordinal form, otherwise return 'None'.
+    fn needs_parens(element: Element) -> bool {
+        let node_name = name(&element);
+        let children = element.children();
+        if node_name == "mrow" {
+            // check for bracketed exprs
+            if IsBracketed::is_bracketed(&element, "", "", false, true) {
+                return false;
+            }
+
+            // check for prefix and postfix ops at start or end (=> len()==2, prefix is first op, postfix is last op)
+            if children.len() == 2 &&
+               (name( &as_element(children[0])) == "mo" || name( &as_element(children[1])) == "mo") {
+                return false;
+            }
+
+            if children.len() != 3 {  // ==3, need to check if it a linear fraction
+                return true;
+            }
+            let operator = as_element(children[1]);
+            if name(&operator) != "mo" || as_text(operator) != "/" {
+                return true;
+            }
+        }
+
+        if !(node_name == "mrow" || node_name == "mfrac") {
+            return false;
+        }
+        // check for numeric fractions (regular fractions need brackets, not numeric fractions), either as an mfrac or with "/"
+        // if the fraction starts with a "-", it is still a numeric fraction that doesn't need parens
+        let mut numerator = as_element(children[0]);
+        let denominator = as_element(children[children.len()-1]);
+        let decimal_separator = crate::interface::get_preference("DecimalSeparators".to_string()).unwrap()
+                                                        .chars().next().unwrap_or('.');
+        if is_integer(denominator, decimal_separator) {
+            // check numerator being either an integer "- integer"
+            if name(&numerator) == "mrow" {
+                let numerator_children = numerator.children();
+                if !(numerator_children.len() == 2 &&
+                     name(&as_element(numerator_children[0])) == "mo" &&
+                     as_text(as_element(numerator_children[0])) == "-") {
+                    return true;
+                }
+                numerator = as_element(numerator_children[1]);
+            }
+            return !is_integer(numerator, decimal_separator);
+        }
+        return true;
+
+        fn is_integer(mathml: Element, decimal_serparator: char) -> bool {
+            return name(&mathml) == "mn" && !as_text(mathml).contains(decimal_serparator)
+        }
+    }
+}
+
+impl Function for IsInNeedOfParensForCMU {
+    // convert a node to an ordinal number
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(1)?;
+        let node = validate_one_node(args.pop_nodeset()?, "IsInNeedOfParensForCMU")?;
+        if let Node::Element(e) = node {
+            let answer = IsInNeedOfParensForCMU::needs_parens(e);
+            return Ok( Value::Boolean( answer ) );
+        }
+
+        return Err(Error::Other(format!("IsInNeedOfParensForCMU: first arg '{:?}' is not a node", node)));
     }
 }
 
@@ -1039,6 +1116,7 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("max", Max);       // missing in xpath 1.0
     context.set_function("NestingChars", crate::braille::NemethNestingChars);
     context.set_function("BrailleChars", crate::braille::BrailleChars);
+    context.set_function("IsInNeedOfParensForCMU", IsInNeedOfParensForCMU);
     context.set_function("IsNode", IsNode);
     context.set_function("ToOrdinal", ToOrdinal);
     context.set_function("ToCommonFraction", ToCommonFraction);

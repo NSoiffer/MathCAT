@@ -8,13 +8,7 @@
   replace: 
   - t: "⠫⠱"
   - test:
-      if:
-      - "*[1][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-      - "     ) or" 
-      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-      - "    ]"
+      if: "IsInNeedOfParensForCMU(*[1])"
       then:
       - t: "⠢"
       - x: "*"
@@ -31,13 +25,7 @@
   - x: "*[2]"
   - t: "⠱"
   - test:
-      if:
-      - "*[1][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-      - "     ) or" 
-      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-      - "    ]"
+      if: "IsInNeedOfParensForCMU(*[1])"
       then:
       - t: "⠢"
       - x: "*[1]"
@@ -120,13 +108,7 @@
       if: "$AddGrouping"
       then: [t: "⠢"]
   - test:
-      if:
-      - "*[1][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-      - "     ) or" 
-      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-      - "    ]"
+      if: "IsInNeedOfParensForCMU(*[1])"
       then:
       - t: "⠢"
       - x: "*[1]"
@@ -135,13 +117,7 @@
       - x: "*[1]"
   - t: "⠲"
   - test:
-      if:
-      - "*[2][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-      - "     ) or" 
-      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-      - "    ]"
+      if: "IsInNeedOfParensForCMU(*[2])"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -604,13 +580,7 @@
   - test:
       # the rules for scripts seem to always want a nested script to be bracketed
       # there aren't any root examples in scripts and numeric fractions don't get bracketed
-      if:
-      - "*[2][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-      - "     ) or" 
-      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-      - "    ]"
+      if: "IsInNeedOfParensForCMU(*[2])"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -664,13 +634,7 @@
   - test:
       # the rules for scripts seem to always want a nested script to be bracketed
       # there aren't any root examples in scripts and numeric fractions don't get bracketed
-      if:
-      - "*[2][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-      - "     ) or" 
-      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-      - "    ]"
+      if: "IsInNeedOfParensForCMU(*[2])"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -785,13 +749,7 @@
   - test:
       # the rules for scripts seem to always want a nested script to be bracketed
       # there aren't any root examples in scripts and numeric fractions don't get bracketed
-      if:
-      - "*[2][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-      - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-      - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-      - "     ) or" 
-      - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-      - "    ]"
+      if: "IsInNeedOfParensForCMU(*[2])"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -808,13 +766,7 @@
       - test:
           # the rules for scripts seem to always want a nested script to be bracketed
           # there aren't any root examples and it seems like fractions don't get bracketed
-          if:
-          - "*[3][( self::m:mrow and not(IsBracketed(., '', ''))  and" # rule out bracketed exprs and prefix ops
-          - "       not(*[1][translate(substring(., 1, 1), '-+±∓', '')='']) ) and"  # rule out exprs that start with '-' and other prefix ops (need to handle -1/2 where -1 is it's own mrow)
-          - "       not(*[last()][self::m:mo][.='!']"  # rule out bracketed postfix ops (FIX should handle more than '!')
-          - "     ) or" 
-          - "     self::m:mfrac[ not(*[1][self::m:mn][not(contains(., '.,'))] and *[2][self::m:mn][not(contains(., '.,'))]) ]"
-          - "    ]"
+          if: "IsInNeedOfParensForCMU(*[3])"
           then:
           - t: "⠢"
           - x: "*[3]"
