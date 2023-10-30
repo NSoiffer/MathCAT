@@ -407,7 +407,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "sypersec"}                   # phrase('sheck' is shorthand for hyperbolic secant)
+      then: {T: "hypersec"}                   # phrase('sheck' is shorthand for hyperbolic secant)
       else: {T: "sekans hyperbolicus"}        # phrase('hyperbolic secant' is a mathematical function)
 - name: csch
   tag: mi
