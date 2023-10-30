@@ -212,5 +212,5 @@ fn binomial() {
                     <mfrac linethickness='0'> <mn>7</mn> <mn>3</mn> </mfrac>
                     <mo>)</mo>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "2 成 7 選 3");
+    test("zh", "SimpleSpeak", expr, "2 乘 7 選 3");
 }

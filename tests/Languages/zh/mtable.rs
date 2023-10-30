@@ -13,7 +13,7 @@ fn matrix_1x1() {
     </math>
                                 ";
     //test("zh", "ClearSpeak",  expr, "1 by 1 矩陣 項目 3;");
-    test("zh", "SimpleSpeak", expr, "1 成 1 矩陣 成員 3;");
+    test("zh", "SimpleSpeak", expr, "1 乘 1 矩陣 成員 3;");
 }
 
 #[test]
@@ -29,7 +29,7 @@ fn determinant_1x1() {
     </math>
                                 ";
     //test("zh", "ClearSpeak",  expr, "the 1 by 1 determinant with entry 3;");
-    test("zh", "SimpleSpeak", expr, "1 成 1 行列式 成員 3;");
+    test("zh", "SimpleSpeak", expr, "1 乘 1 行列式 成員 3;");
 }
 
 
@@ -53,7 +53,7 @@ fn matrix_1x2() {
     </math>
                                 ";
     //test("zh", "ClearSpeak",  expr, "the 1 by 2 row matrix; 3, 5;");
-    test("zh", "SimpleSpeak", expr, "1 成 2 矩陣; 3, 5;");
+    test("zh", "SimpleSpeak", expr, "1 乘 2 矩陣; 3, 5;");
 }
 
 
@@ -80,7 +80,7 @@ fn matrix_1x3() {
     </math>
                                 ";
     //test("zh", "ClearSpeak", expr, "the 1 by 3 row matrix; negative x, 5, 12;");
-    test("zh", "SimpleSpeak", expr, "1 成 3 矩陣; 負 x, 5, 12;");
+    test("zh", "SimpleSpeak", expr, "1 乘 3 矩陣; 負 x, 5, 12;");
 }
 
 #[test]
@@ -108,7 +108,7 @@ fn matrix_2x1_not_simple() {
     </math>
                                 ";
     //test("zh", "ClearSpeak", expr, "the 2 by 1 column matrix; row 1; x plus 1; row 2; x minus 1;");
-    test("zh", "SimpleSpeak", expr, "2 成 1 矩陣; 列 1; x 加 1; 列 2; x 減 1;");
+    test("zh", "SimpleSpeak", expr, "2 乘 1 矩陣; 列 1; x 加 1; 列 2; x 減 1;");
 }
 #[test]
 fn matrix_3x1_not_simple() {
@@ -144,7 +144,7 @@ fn matrix_3x1_not_simple() {
         </mtable>
       <mo>)</mo></mrow></mrow>
     </math>";
-    test("zh", "SimpleSpeak", expr, "3 成 1 矩陣; \
+    test("zh", "SimpleSpeak", expr, "3 乘 1 矩陣; \
             列 1; x; \
             列 2; a; \
             列 3; 分數 x 加 1, 分之 x 結束分數;");
@@ -181,7 +181,7 @@ fn determinant_2x2() {
       <mo>|</mo></mrow></mrow>
                         </math>";
     //test("zh", "ClearSpeak",  expr, "the 2 by 2 determinant; row 1; 2, 1; row 2; 7, 5;");
-    test("zh", "SimpleSpeak", expr, "2 成 2 行列式; 列 1; 2, 1; 列 2; 7, 5;");
+    test("zh", "SimpleSpeak", expr, "2 乘 2 行列式; 列 1; 2, 1; 列 2; 7, 5;");
 }
 
 #[test]
@@ -218,7 +218,7 @@ fn matrix_2x3() {
     </math>
                                 ";
     //test("zh", "ClearSpeak",  expr, "the 2 by 3 matrix; row 1; 3, 1, 4; row 2; 0, 2, 6;");
-    test("zh", "SimpleSpeak", expr, "2 成 3 矩陣; 列 1; 3, 1, 4; 列 2; 0, 2, 6;");
+    test("zh", "SimpleSpeak", expr, "2 乘 3 矩陣; 列 1; 3, 1, 4; 列 2; 0, 2, 6;");
 }
 
 #[test]
@@ -261,7 +261,7 @@ fn matrix_2x3_labeled() {
     //    "the 2 by 3 matrix; row 1 with label (3.1); column 2; 3, column 3; 1, column 4; 4; \
     //                               row 2; column 1; 0, column 2; 2, column 3; 6;");
     test("zh", "SimpleSpeak", expr,
-        "2 成 3 矩陣; 列 1 帶有標籤 (3.1); 行 2; 3, 行 3; 1, 行 4; 4; \
+        "2 乘 3 矩陣; 列 1 帶有標籤 (3.1); 行 2; 3, 行 3; 1, 行 4; 4; \
                                    列 2; 行 1; 0, 行 2; 2, 行 3; 6;");
 }
 
@@ -291,7 +291,7 @@ fn matrix_3x1() {
     </math>
                                 ";
     //test("zh", "ClearSpeak",  expr, "the 3 by 1 column matrix; 1; 2; 3;");
-    test("zh", "SimpleSpeak", expr, "3 成 1 矩陣; 1; 2; 3;");
+    test("zh", "SimpleSpeak", expr, "3 乘 1 矩陣; 1; 2; 3;");
 }
 
 #[test]
@@ -326,7 +326,7 @@ fn matrix_4x1() {
     </math>
                                 ";
     //test("zh", "ClearSpeak",  expr, "the 4 by 1 column matrix; row 1; 3; row 2; 6; row 3; 1; row 4; 2;");
-    test("zh", "SimpleSpeak", expr, "4 成 1 矩陣; 列 1; 3; 列 2; 6; 列 3; 1; 列 4; 2;");
+    test("zh", "SimpleSpeak", expr, "4 乘 1 矩陣; 列 1; 3; 列 2; 6; 列 3; 1; 列 4; 2;");
 }
 
 #[test]
@@ -366,7 +366,7 @@ fn matrix_4x1_labeled() {
     //test("zh", "ClearSpeak",  expr,
     //    "the 4 by 1 column matrix; row 1; 3; row 2; 6; row 3; 1; row 4 with label (3.1); 2;");
     test("zh", "SimpleSpeak", expr,
-        "4 成 1 矩陣; 列 1; 3; 列 2; 6; 列 3; 1; 列 4 帶有標籤 (3.1); 2;");
+        "4 乘 1 矩陣; 列 1; 3; 列 2; 6; 列 3; 1; 列 4 帶有標籤 (3.1); 2;");
 }
 
 #[test]
@@ -395,7 +395,7 @@ fn matrix_1x4() {
     </math>
                                 ";
     //test("zh", "ClearSpeak",  expr, "the 1 by 4 row matrix; column 1; 3, column 2; 6, column 3; 1, column 4; 2;");
-    test("zh", "SimpleSpeak", expr, "1 成 4 矩陣; 行 1; 3, 行 2; 6, 行 3; 1, 行 4; 2;");
+    test("zh", "SimpleSpeak", expr, "1 乘 4 矩陣; 行 1; 3, 行 2; 6, 行 3; 1, 行 4; 2;");
 }
 
 #[test]
@@ -470,7 +470,7 @@ fn matrix_4x4() {
     //      row 2; column 1; 2, column 2; 1, column 3; 0, column 4; 9; \
     //      row 3; column 1; 3, column 2; 0, column 3; 2, column 4; 1; \
     //      row 4; column 1; 6, column 2; 2, column 3; 9, column 4; 0;");
-    test("zh", "SimpleSpeak", expr, "4 成 4 矩陣; \
+    test("zh", "SimpleSpeak", expr, "4 乘 4 矩陣; \
           列 1; 行 1; 0, 行 2; 3, 行 3; 4, 行 4; 3; \
           列 2; 行 1; 2, 行 2; 1, 行 3; 0, 行 4; 9; \
           列 3; 行 1; 3, 行 2; 0, 行 3; 2, 行 4; 1; \
@@ -526,7 +526,7 @@ fn matrix_4x2() {
     //          row 3; column 1; 2, column 2; 1; \
     //          row 4; column 1; 0, column 2; 5;\
     //");
-    test("zh", "SimpleSpeak", expr, "4 成 2 矩陣; \
+    test("zh", "SimpleSpeak", expr, "4 乘 2 矩陣; \
               列 1; 行 1; 1, 行 2; 3; \
               列 2; 行 1; 4, 行 2; 2; \
               列 3; 行 1; 2, 行 2; 1; \

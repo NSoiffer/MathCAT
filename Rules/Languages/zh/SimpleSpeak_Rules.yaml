@@ -274,7 +274,7 @@
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
-  - t: "成"      # phrase(7 'times' 5 equals 35) 乘 的發音不正確
+  - t: "乘"      # phrase(7 'times' 5 equals 35) 乘 的發音不正確
 
 - name: no-say-parens
   tag: mrow

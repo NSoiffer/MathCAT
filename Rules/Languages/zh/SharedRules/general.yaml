@@ -591,7 +591,7 @@
   match: "count(*)=1 and *[self::m:mtr][count(*) = 1]"
   replace:
   - ot: ""      # phrase('the' 1 by 1 matrix M)
-  - t: "1 成 1"      # phrase(the '1 by 1' matrix)
+  - t: "1 乘 1"      # phrase(the '1 by 1' matrix)
   - test:
       if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
       then: {t: "行列式"}      # phrase(the 2 by 2 'determinant'))
@@ -612,7 +612,7 @@
   replace:
   - t: ""      # phrase('the' 2 by 2 matrix M)
   - x: count(*)
-  - t: "成 1"      # phrase(the 2 'by 1 column' matrix)
+  - t: "乘 1"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: {t: "向量"}      # phrase(the 2 by 2 'vector')
@@ -635,7 +635,7 @@
   replace:
   - t: ""      # phrase('the' 2 by 2 matrix M)
   - x: "count(*)"
-  - t: "成 1"      # phrase(the 2 'by 1 column' matrix)
+  - t: "乘 1"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: {t: "向量"}      # phrase(the 2 column 'vector')
@@ -655,7 +655,7 @@
   - count(*[1]/*)<=3 and # at least two cols
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   replace:
-  - t: "1 成"      # phrase('the 1 by' 2 matrix)
+  - t: "1 乘"      # phrase('the 1 by' 2 matrix)
   - x: count(*/*)
   - t: ""      # phrase(the 1 by 4 'row' matrix)
   - test:
@@ -678,7 +678,7 @@
   variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
   match: "count(*)=1" # one row
   replace:
-  - t: "1 成"      # phrase('the 1 by' 2 matrix)
+  - t: "1 乘"      # phrase('the 1 by' 2 matrix)
   - x: "count(*/*)"
   - t: ""      # phrase(the 1 by 2 'row' matrix)
   - test:
@@ -707,7 +707,7 @@
   replace:
   - t: ""      # phrase('the' 1 by 2 matrix M)
   - x: count(*)
-  - t: "成"      # phrase(the 1 'by' 2 matrix)
+  - t: "乘"      # phrase(the 1 'by' 2 matrix)
   - x: count(*[self::m:mtr][1]/*)
   - test:
       if: "self::m:determinant"
@@ -731,7 +731,7 @@
   replace:
   - t: ""      # phrase('the' 1 by 2 matrix M)
   - x: "count(*)"
-  - t: "成"      # phrase(the 1 'by' 2 matrix)
+  - t: "乘"      # phrase(the 1 'by' 2 matrix)
   - x: "count(*[self::m:mtr][1]/*)"
   - test:
       if: "self::m:determinant"

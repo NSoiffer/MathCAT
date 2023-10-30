@@ -757,13 +757,13 @@
  - "∔": [t: "點加號"]                              	#  0x2214	(en: 'dot plus')
  - "∕": [t: "正斜線"]                              	#  0x2215	(en: 'divided by')
  - "∖": [t: "差集"]                               	#  0x2216	(en: 'set minus')
- - "∗": [t: "成"]                               	#  0x2217	(en: 'times', google translation)
+ - "∗": [t: "乘"]                               	#  0x2217	(en: 'times', google translation)
  - "∘": [t: "合成"]                               	#  0x2218	(en: 'composed with')
  - "∙":                                         	#  0x2219
     - test: 
         if: "@data-chem-formula-op"
         then: [t: "dot"]                          	# 	(en: 'dot', google translation)
-        else: [t: "成"]                          	# 	(en: 'times')
+        else: [t: "乘"]                          	# 	(en: 'times')
 
  - "√":                                         	#  0x221a
      - test: 

@@ -128,7 +128,7 @@ fn explicit_function_call_with_parens() {
 #[test]
 fn explicit_times_with_parens() {
     let expr = "<math><mrow><mi>t</mi><mo>&#x2062;</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow></math>";
-    test("zh", "SimpleSpeak", expr, "t 成 x");
+    test("zh", "SimpleSpeak", expr, "t 乘 x");
 }
 
 #[test]
@@ -159,7 +159,7 @@ fn times_following_paren() {
         <mn>2</mn>
         <mrow>  <mo>(</mo> <mn>3</mn>  <mo>)</mo> </mrow>
         </mrow></math>";
-    test("zh", "SimpleSpeak", expr, "2 成 3");
+    test("zh", "SimpleSpeak", expr, "2 乘 3");
 }
 
 #[test]
@@ -168,7 +168,7 @@ fn times_preceding_paren() {
         <mrow>  <mo>(</mo> <mn>2</mn>  <mo>)</mo> </mrow>
         <mn>3</mn>
         </mrow></math>";
-    test("zh", "SimpleSpeak", expr, "2 成 3");
+    test("zh", "SimpleSpeak", expr, "2 乘 3");
 }
 
 #[test]
@@ -194,7 +194,7 @@ fn no_times_sqrt() {
         <mo>)</mo></mrow>
         <mi>x</mi>
         </mrow></math>";
-        test("zh", "SimpleSpeak", expr, "25 成 x");
+        test("zh", "SimpleSpeak", expr, "25 乘 x");
     }
 
     #[test]
