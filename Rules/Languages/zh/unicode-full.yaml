@@ -239,8 +239,8 @@
     - pitch:
         value: "$CapitalLetters_Pitch"
         replace: [spell: "translate('.', 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'абвгдежзийклмнопрстуфхцчшщъыьэюя')"]
- - "а": [t: "а"]                                	#  0x430	(en: 'a', google translation)
- - "б": [t: "是"]                                	#  0x431	(en: 'be', google translation)
+ - "а": [T: "a"]                                	#  0x430	(en: 'a', google translation)
+ - "б": [T: "be"]                                	#  0x431	(en: 'be', google translation)
  - "в": [t: "ve"]                               	#  0x432	(google translation)
  - "г": [t: "ghe"]                              	#  0x433	(google translation)
  - "д": [t: "de"]                               	#  0x434	(google translation)
@@ -249,7 +249,7 @@
  - "з": [t: "ze"]                               	#  0x437	(google translation)
  - "и": [t: "и"]                                	#  0x438	(en: 'i', google translation)
  - "й": [t: "短i"]                               	#  0x439	(en: 'short i', google translation)
- - "к": [t: "k a"]                              	#  0x43a	(en: 'ka', google translation)
+ - "к": [t: "ka"]                              	#  0x43a	(en: 'ka', google translation)
  - "л": [t: "el"]                               	#  0x43b	(google translation)
  - "м": [t: "em"]                               	#  0x43c	(google translation)
  - "н": [t: "en"]                               	#  0x43d	(google translation)
@@ -270,7 +270,7 @@
  - "ь": [t: "軟標誌"]                              	#  0x44c	(en: 'soft sign', google translation)
  - "э": [t: "э"]                                	#  0x44d	(en: 'e', google translation)
  - "ю": [t: "yu"]                               	#  0x44e	(google translation)
- - "я": [t: "是的"]                               	#  0x44f	(en: 'ya', google translation)
+ - "я": [T: "ya"]                               	#  0x44f	(en: 'ya', google translation)
  - "‐": [t: "連字符"]                              	#  0x2010	(en: 'hyphen', google translation)
  - "‑": [t: "連字符"]                              	#  0x2011	(en: 'hyphen', google translation)
  - "‒": [t: "圖破折號"]                             	#  0x2012	(en: 'figure dash', google translation)
@@ -424,7 +424,7 @@
  - "ℇ": [t: "歐拉的不變"]                            	#  0x2107	(en: 'euler's constant', google translation)
  - "℈": [t: "顧慮"]                               	#  0x2108	(en: 'scruples', google translation)
  - "℉": [t: "華氏度"]                              	#  0x2109	(en: 'degrees fahrenheit', google translation)
- - "ℊ": [t: "腳本g"]                              	#  0x210a	(en: 'script g', google translation)
+ - "ℊ": [t: "草體g"]                              	#  0x210a	(en: 'script g', google translation)
  - "ℌℑℨℭ":                                      	#  0x210c, 0x2111, 0x2128, 0x212d
     - t: "fraktur"                              	# 	(google translation)
     - spell: "translate('.', 'ℌℑℨℭ', 'HIZC')"
@@ -432,7 +432,7 @@
  - "ℍℙℾℿ":                                      	#  0x210d, 0x2119, 0x213e, 0x213f
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "雙打"]                        	# 	(en: 'double struck', google translation)
+         then: [t: "空心"]                        	# 	(en: 'double struck', google translation)
     - spell: "translate('.', 'ℍℙℾℿ', 'HPΓΠ')" 
 
  - "ℎ": [t: "普朗克常數"]                            	#  0x210e	(en: 'planck constant', google translation)
@@ -443,10 +443,10 @@
          else: [t: "降低了普朗克常數"]                  	# 	(en: 'reduced planck constant', google translation)
 
  - "ℐℒ℘ℬℰℱℳ":                                   	#  0x2110, 0x2112, 0x2118, 0x2130, 0x2131, 0x2133
-    - t: "腳本"                                   	# 	(en: 'script', google translation)
+    - t: "草體"                                   	# 	(en: 'script', google translation)
     - spell: "translate('.', 'ℐℒ℘ℬℰℱℳ', 'ILPBEFM')"
 
- - "ℓ": [t: "腳本l"]                              	#  0x2113	(en: 'script l', google translation)
+ - "ℓ": [t: "草體l"]                              	#  0x2113	(en: 'script l', google translation)
  - "℔": [t: "磅"]                                	#  0x2114	(en: 'pounds', google translation)
  - "№": [t: "數字"]                               	#  0x2116	(en: 'number', google translation)
  - "℥": [t: "盎司"]                               	#  0x2125	(en: 'ounces', google translation)
@@ -455,28 +455,28 @@
  - "℩": [t: "轉過身"]                              	#  0x2129	(en: 'turned iota', google translation)
  - "K": [t: "開爾文"]                              	#  0x212a	(en: 'kelvin', google translation)
  - "Å": [t: "埃埃斯特羅姆"]                           	#  0x212b	(en: 'angstroms', google translation)
- - "ℯ": [t: "腳本e"]                              	#  0x212f	(en: 'script e', google translation)
+ - "ℯ": [t: "草體e"]                              	#  0x212f	(en: 'script e', google translation)
 
    # coalesced some chars that use cap letters
  - "Ⅎ℺⅁⅂⅃⅄":                                    	#  0x2132, 0x213a, 0x2141, 0x2142, 0x2143, 0x2144
     - test:
       - if: "'.' = '℺'"
-        then: [t: "旋轉"]                         	# 	(en: 'rotated', google translation)
+        then: [T: "旋轉"]                         	# 	(en: 'rotated', google translation)
       - else_if: "'.' = 'Ⅎ'"
-        then: [t: "轉身"]                         	# 	(en: 'turned', google translation)
+        then: [T: "翻身"]                         	# 	(en: 'turned', google translation)
       - else_if: "'.' = '⅃'"
-        then: [t: "反向sans-serif"]               	# 	(en: 'reversed sans-serif', google translation)
-        else: [t: "變成了sanserif"]                	# 	(en: 'turned sans-serif', google translation)
+        then: [T: "左右反向sanserif"]               	# 	(en: 'reversed sans-serif', google translation)
+        else: [T: "翻身sanserif"]                	# 	(en: 'turned sans-serif', google translation)
     - spell: "translate('.', 'Ⅎ℺⅁⅂⅃⅄', 'FQGLLY')"
 
- - "ℴ": [t: "腳本o"]                              	#  0x2134	(en: 'script o', google translation)
+ - "ℴ": [t: "草體o"]                              	#  0x2134	(en: 'script o', google translation)
  - "ℵ": [t: "第一個轉菲斯基地"]                         	#  0x2135	(en: 'first transfinite cardinal', google translation)
  - "ℶ": [t: "第二個跨足主教"]                          	#  0x2136	(en: 'second transfinite cardinal', google translation)
  - "ℷ": [t: "第三次轉菲斯基地"]                         	#  0x2137	(en: 'third transfinite cardinal', google translation)
  - "ℸ": [t: "第四個跨足主教"]                          	#  0x2138	(en: 'fourth transfinite cardinal', google translation)
- - "ℼ": [t: "雙擊pi"]                             	#  0x213c	(en: 'double struck pi', google translation)
- - "ℽ": [t: "雙打伽瑪"]                             	#  0x213d	(en: 'double struck gamma', google translation)
- - "⅀": [t: "雙重擊中n-ary總和"]                      	#  0x2140	(en: 'double struck n-ary summation', google translation)
+ - "ℼ": [t: "空心pi"]                             	#  0x213c	(en: 'double struck pi', google translation)
+ - "ℽ": [t: "空心伽瑪"]                             	#  0x213d	(en: 'double struck gamma', google translation)
+ - "⅀": [t: "空心總和"]                      	#  0x2140	(en: 'double struck n-ary summation', google translation)
  - "⅋": [t: "轉向＆ampers"]                        	#  0x214b	(en: 'turned ampersand', google translation)
  - "⅌": [t: "每"]                                	#  0x214c	(en: 'per', google translation)
  - "ⅎ": [t: "轉"]                                	#  0x214e	(en: 'turned F', google translation)
@@ -1391,79 +1391,79 @@
  - "⏞": [t: "頂級支撐"]                             	#  0x23DE	(en: 'top brace', google translation)
  - "⏟": [t: "底托"]                               	#  0x23DF	(en: 'bottom brace', google translation)
  - "①-⑨":                                       	#  0x2460 - 0x2469
-    - t: "盤旋"                                   	# 	(en: 'circled', google translation)
+    - t: "圈圈"                                   	# 	(en: 'circled', google translation)
     - spell: "translate('.', '①②③④⑤⑥⑦⑧⑨', '123456789')"
- - "⑩": [t: "盤旋十"]                              	#  0x2469	(en: 'circled ten', google translation)
- - "⑪": [t: "盤旋十一"]                             	#  0x246a	(en: 'circled eleven', google translation)
- - "⑫": [t: "盤旋十二"]                             	#  0x246b	(en: 'circled twelve', google translation)
- - "⑬": [t: "盤旋十三"]                             	#  0x246c	(en: 'circled thirteen', google translation)
- - "⑭": [t: "盤旋十四"]                             	#  0x246d	(en: 'circled fourteen', google translation)
- - "⑮": [t: "盤旋十五"]                             	#  0x246e	(en: 'circled fifteen', google translation)
- - "⑯": [t: "盤旋十六個"]                            	#  0x246f	(en: 'circled sixteen', google translation)
- - "⑰": [t: "盤旋十七"]                             	#  0x2470	(en: 'circled seventeen', google translation)
- - "⑱": [t: "盤旋"]                               	#  0x2471	(en: 'circled eighteen', google translation)
- - "⑳": [t: "盤旋二十"]                             	#  0x2473	(en: 'circled twenty', google translation)
+ - "⑩": [t: "圈圈十"]                              	#  0x2469	(en: 'circled ten', google translation)
+ - "⑪": [t: "圈圈十一"]                             	#  0x246a	(en: 'circled eleven', google translation)
+ - "⑫": [t: "圈圈十二"]                             	#  0x246b	(en: 'circled twelve', google translation)
+ - "⑬": [t: "圈圈十三"]                             	#  0x246c	(en: 'circled thirteen', google translation)
+ - "⑭": [t: "圈圈十四"]                             	#  0x246d	(en: 'circled fourteen', google translation)
+ - "⑮": [t: "圈圈十五"]                             	#  0x246e	(en: 'circled fifteen', google translation)
+ - "⑯": [t: "圈圈十六個"]                            	#  0x246f	(en: 'circled sixteen', google translation)
+ - "⑰": [t: "圈圈十七"]                             	#  0x2470	(en: 'circled seventeen', google translation)
+ - "⑱": [t: "圈圈"]                               	#  0x2471	(en: 'circled eighteen', google translation)
+ - "⑳": [t: "圈圈二十"]                             	#  0x2473	(en: 'circled twenty', google translation)
  - "⑴-⑼":                                       	#  0x2474 - 0x247d
-    - t: "括號之類的"                                	# 	(en: 'parenthesized', google translation)
+    - t: "括號圍繞"                                	# 	(en: 'parenthesized', google translation)
     - spell: "translate('.', '⑴⑵⑶⑷⑸⑹⑺⑻⑼', '123456789')"
- - "⑽": [t: "括號性十個"]                            	#  0x247d	(en: 'parenthesized ten', google translation)
- - "⑾": [t: "括號性的十一點"]                          	#  0x247e	(en: 'parenthesized eleven', google translation)
- - "⑿": [t: "括號三十的十二"]                          	#  0x247f	(en: 'parenthesized twelve', google translation)
- - "⒀": [t: "括號三十三"]                            	#  0x2480	(en: 'parenthesized thirteen', google translation)
- - "⒁": [t: "括號三十的十四個"]                         	#  0x2481	(en: 'parenthesized fourteen', google translation)
- - "⒂": [t: "括號三十五"]                            	#  0x2482	(en: 'parenthesized fifteen', google translation)
- - "⒃": [t: "括號三十六"]                            	#  0x2483	(en: 'parenthesized sixteen', google translation)
- - "⒄": [t: "括號三十七"]                            	#  0x2484	(en: 'parenthesized seventeen', google translation)
- - "⒅": [t: "括號示威"]                             	#  0x2485	(en: 'parenthesized eighteen', google translation)
- - "⒆": [t: "括號三十九"]                            	#  0x2486	(en: 'parenthesized nineteen', google translation)
- - "⒇": [t: "括號示為二十"]                           	#  0x2487	(en: 'parenthesized twenty', google translation)
+ - "⑽": [t: "括號圍繞10"]                            	#  0x247d	(en: 'parenthesized ten', google translation)
+ - "⑾": [t: "括號圍繞11"]                          	#  0x247e	(en: 'parenthesized eleven', google translation)
+ - "⑿": [t: "括號圍繞12"]                          	#  0x247f	(en: 'parenthesized twelve', google translation)
+ - "⒀": [t: "括號圍繞13"]                            	#  0x2480	(en: 'parenthesized thirteen', google translation)
+ - "⒁": [t: "括號圍繞14"]                         	#  0x2481	(en: 'parenthesized fourteen', google translation)
+ - "⒂": [t: "括號圍繞15"]                            	#  0x2482	(en: 'parenthesized fifteen', google translation)
+ - "⒃": [t: "括號圍繞16"]                            	#  0x2483	(en: 'parenthesized sixteen', google translation)
+ - "⒄": [t: "括號圍繞17"]                            	#  0x2484	(en: 'parenthesized seventeen', google translation)
+ - "⒅": [t: "括號圍繞18"]                             	#  0x2485	(en: 'parenthesized eighteen', google translation)
+ - "⒆": [t: "括號圍繞19"]                            	#  0x2486	(en: 'parenthesized nineteen', google translation)
+ - "⒇": [t: "括號圍繞20"]                           	#  0x2487	(en: 'parenthesized twenty', google translation)
  - "⒈-⒐":                                       	#  0x2488 - 0x2491
     - spell: "translate('.', '⒈⒉⒊⒋⒌⒍⒎⒏⒐', '123456789')"
-    - t: "有期間"                                  	# 	(en: 'with period', google translation)
- - "⒑": [t: "十個時期"]                             	#  0x2491	(en: 'ten with period', google translation)
- - "⒒": [t: "十一期"]                              	#  0x2492	(en: 'eleven with period', google translation)
- - "⒓": [t: "十二個月期"]                            	#  0x2493	(en: 'twelve with period', google translation)
- - "⒔": [t: "十三個時期"]                            	#  0x2494	(en: 'thirteen with period', google translation)
- - "⒕": [t: "十四個時期"]                            	#  0x2495	(en: 'fourteen with period', google translation)
- - "⒖": [t: "十五個時期"]                            	#  0x2496	(en: 'fifteen with period', google translation)
- - "⒗": [t: "十六歲"]                              	#  0x2497	(en: 'sixteen with period', google translation)
- - "⒘": [t: "十七個月期"]                            	#  0x2498	(en: 'seventeen with period', google translation)
- - "⒙": [t: "有期間"]                              	#  0x2499	(en: 'eighteen with period', google translation)
- - "⒚": [t: "十九個時期"]                            	#  0x249a	(en: 'nineteen with period', google translation)
- - "⒛": [t: "二十個月期"]                            	#  0x249b	(en: 'twenty with period', google translation)
+    - t: "點"                                  	# 	(en: 'with period', google translation)
+ - "⒑": [t: "10點"]                             	#  0x2491	(en: 'ten with period', google translation)
+ - "⒒": [t: "11點"]                              	#  0x2492	(en: 'eleven with period', google translation)
+ - "⒓": [t: "12點"]                            	#  0x2493	(en: 'twelve with period', google translation)
+ - "⒔": [t: "13點"]                            	#  0x2494	(en: 'thirteen with period', google translation)
+ - "⒕": [t: "14點"]                            	#  0x2495	(en: 'fourteen with period', google translation)
+ - "⒖": [t: "15點"]                            	#  0x2496	(en: 'fifteen with period', google translation)
+ - "⒗": [t: "16點"]                              	#  0x2497	(en: 'sixteen with period', google translation)
+ - "⒘": [t: "17點"]                            	#  0x2498	(en: 'seventeen with period', google translation)
+ - "⒙": [t: "18點"]                              	#  0x2499	(en: 'eighteen with period', google translation)
+ - "⒚": [t: "19點"]                            	#  0x249a	(en: 'nineteen with period', google translation)
+ - "⒛": [t: "20點"]                            	#  0x249b	(en: 'twenty with period', google translation)
  - "⒜-⒵":                                       	#  0x249c - 0x24b5
-    - t: "括號之類的"                                	# 	(en: 'parenthesized', google translation)
+    - t: "括號圍繞"                                	# 	(en: 'parenthesized', google translation)
     - spell: "translate('.', '⒜⒝⒞⒟⒠⒡⒢⒣⒤⒥⒦⒧⒨⒩⒪⒫⒬⒭⒮⒯⒰⒱⒲⒳⒴⒵', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "Ⓐ-Ⓩ":
-    - t: "盤旋"                                   	# 	(en: 'circled', google translation)
+    - t: "圈圈"                                   	# 	(en: 'circled', google translation)
     - spell: "translate('.', 'ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "ⓐ-ⓩ":                                       	#  0x24d0 - 0x24e9
-    - t: "盤旋"                                   	# 	(en: 'circled', google translation)
+    - t: "圈圈"                                   	# 	(en: 'circled', google translation)
     - spell: "translate('.', 'ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ', 'abcdefghijklmnopqrstuvwxyz')"
  - "⓪": [t: "圓圈零"]                              	#  0x24ea	(en: 'circled zero', google translation)
- - "⓫": [t: "黑色盤旋十一圈"]                          	#  0x24eb	(en: 'black circled eleven', google translation)
- - "⓬": [t: "黑色盤旋十二"]                           	#  0x24ec	(en: 'black circled twelve', google translation)
- - "⓭": [t: "黑色盤旋十三"]                           	#  0x24ed	(en: 'black circled thirteen', google translation)
- - "⓮": [t: "黑色盤旋十四"]                           	#  0x24ee	(en: 'black circled fourteen', google translation)
- - "⓯": [t: "黑色盤旋十五"]                           	#  0x24ef	(en: 'black circled fifteen', google translation)
- - "⓰": [t: "黑色盤旋十六歲"]                          	#  0x24f0	(en: 'black circled sixteen', google translation)
- - "⓱": [t: "黑色盤旋十七"]                           	#  0x24f1	(en: 'black circled seventeen', google translation)
- - "⓲": [t: "黑色盤旋著"]                            	#  0x24f2	(en: 'black circled eighteen', google translation)
- - "⓳": [t: "黑色盤旋十九"]                           	#  0x24f3	(en: 'black circled nineteen', google translation)
- - "⓴": [t: "黑色盤旋二十"]                           	#  0x24f4	(en: 'black circled twenty', google translation)
+ - "⓫": [t: "黑圈圈11"]                          	#  0x24eb	(en: 'black circled eleven', google translation)
+ - "⓬": [t: "黑圈圈12"]                           	#  0x24ec	(en: 'black circled twelve', google translation)
+ - "⓭": [t: "黑圈圈13"]                           	#  0x24ed	(en: 'black circled thirteen', google translation)
+ - "⓮": [t: "黑圈圈14"]                           	#  0x24ee	(en: 'black circled fourteen', google translation)
+ - "⓯": [t: "黑圈圈15"]                           	#  0x24ef	(en: 'black circled fifteen', google translation)
+ - "⓰": [t: "黑圈圈16"]                          	#  0x24f0	(en: 'black circled sixteen', google translation)
+ - "⓱": [t: "黑圈圈17"]                           	#  0x24f1	(en: 'black circled seventeen', google translation)
+ - "⓲": [t: "黑圈圈18"]                            	#  0x24f2	(en: 'black circled eighteen', google translation)
+ - "⓳": [t: "黑圈圈19"]                           	#  0x24f3	(en: 'black circled nineteen', google translation)
+ - "⓴": [t: "黑圈圈20"]                           	#  0x24f4	(en: 'black circled twenty', google translation)
  - "⓵-⓽":                                       	#  0x24f5 - 0x24fe
     - t: "雙圈"                                   	# 	(en: 'double circled', google translation)
     - spell: "translate('.', '⓵⓶⓷⓸⓹⓺⓻⓼⓽', '123456789')"
- - "⓾": [t: "雙圈十"]                              	#  0x24fe	(en: 'double circled ten', google translation)
- - "⓿": [t: "黑色圓圈零"]                            	#  0x24ff	(en: 'black circled zero', google translation)
- - "■": [t: "黑色廣場"]                             	#  0x25a0	(en: 'black square', google translation)
- - "□": [t: "白色廣場"]                             	#  0x25a1	(en: 'white square', google translation)
- - "▢": [t: "白色廣場有圓角"]                          	#  0x25a2	(en: 'white square with rounded corners', google translation)
- - "▣": [t: "白色正方形，包含黑色小正方形"]                   	#  0x25a3	(en: 'white square containing small black square', google translation)
- - "▤": [t: "與水平填充的正方形"]                        	#  0x25a4	(en: 'square with horizontal fill', google translation)
- - "▥": [t: "正方形，垂直填充"]                         	#  0x25a5	(en: 'square with vertical fill', google translation)
+ - "⓾": [t: "雙圈10"]                              	#  0x24fe	(en: 'double circled ten', google translation)
+ - "⓿": [t: "黑圈圈0"]                            	#  0x24ff	(en: 'black circled zero', google translation)
+ - "■": [t: "黑方塊"]                             	#  0x25a0	(en: 'black square', google translation)
+ - "□": [t: "白方塊"]                             	#  0x25a1	(en: 'white square', google translation)
+ - "▢": [t: "白圓角方塊"]                          	#  0x25a2	(en: 'white square with rounded corners', google translation)
+ - "▣": [t: "白方塊內有黑方塊"]                   	#  0x25a3	(en: 'white square containing small black square', google translation)
+ - "▤": [t: "方塊內佈滿水平線"]                        	#  0x25a4	(en: 'square with horizontal fill', google translation)
+ - "▥": [t: "方塊內佈滿鉛直線"]                         	#  0x25a5	(en: 'square with vertical fill', google translation)
  - "▦": [t: "與正交交叉染料填充正方形"]                     	#  0x25a6	(en: 'square with orthogonal crosshatch fill', google translation)
  - "▧": [t: "與左上到右上填充的正方形"]                     	#  0x25a7	(en: 'square with upper left to lower right fill', google translation)
  - "▨": [t: "正方形，右上至左下填充"]                      	#  0x25a8	(en: 'square with upper right to lower left fill', google translation)
@@ -3054,18 +3054,18 @@
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
     
  - "𝕬-𝖅":                                       	#  0x1D56C - 0x1D585
-    - t: "fraktur bold"                         	# 	(google translation)
+    - t: "fraktur 粗體"                         	# 	(google translation)
     - spell: "translate('.', '𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf040 - 0xf059
-    - t: "fraktur bold"                         	# 	(google translation)
+    - t: "fraktur 粗體"                         	# 	(google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝖆-𝖟":                                       	#  0x1d586 - 0x1d59f
-    - t: "fraktur bold"                         	# 	(google translation)
+    - t: "fraktur 粗體"                         	# 	(google translation)
     - spell: "translate('.', '𝖆𝖇𝖈𝖉𝖊𝖋𝖌𝖍𝖎𝖏𝖐𝖑𝖒𝖓𝖔𝖕𝖖𝖗𝖘𝖙𝖚𝖛𝖜𝖝𝖞𝖟', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                       	#  0xf05a - 0xf073
-    - t: "fraktur bold"                         	# 	(google translation)
+    - t: "fraktur 粗體"                         	# 	(google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  # double struck (blackboard bold) chars in math alphabetic block and also MathType private use area
@@ -3073,69 +3073,69 @@
  - "𝔸-𝕐":                                       	#  0x1d504 - 0x1d51d ('z' version is reserved)
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "雙打"]                        	# 	(en: 'double struck', google translation)
+         then: [t: "空心"]                        	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '𝔸𝔹𝔺𝔻𝔼𝔽𝔾𝔿𝕀𝕁𝕂𝕃𝕄𝕅𝕆𝕇𝕈𝕉𝕊𝕋𝕌𝕍𝕎𝕏𝕐', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf080 - 0xf098
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "雙打"]                        	# 	(en: 'double struck', google translation)
+         then: [t: "空心"]                        	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝕒-𝕫":                                       	#  0x1d552 - 0x1d56b
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "雙打"]                        	# 	(en: 'double struck', google translation)
+         then: [t: "空心"]                        	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                       	#  0xf09a - 0xf0b3
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "雙打"]                        	# 	(en: 'double struck', google translation)
+         then: [t: "空心"]                        	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  - "𝟘-𝟡":                                       	#  0x1d7d8 - 0x1d7e1
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "雙打"]                        	# 	(en: 'double struck', google translation)
+         then: [t: "空心"]                        	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡', '0123456789')"
  - "-":                                       	#  0xf0c0 - 0xf0c9
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "雙打"]                        	# 	(en: 'double struck', google translation)
+         then: [t: "空心"]                        	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '', '0123456789')"
 
- - "": [t: "雙擊中了納布拉"]                          	#  0xf0ca	(en: 'double struck nabla', google translation)
- - "": [t: "雙擊歐拉常數"]                           	#  0xf0cb	(en: 'double struck euler constant', google translation)
+ - "": [t: "空心納布拉"]                          	#  0xf0ca	(en: 'double struck nabla', google translation)
+ - "": [t: "空心歐拉常數"]                           	#  0xf0cb	(en: 'double struck euler constant', google translation)
  
  # script chars in math alphabetic block and also MathType private use area
  - "𝒜-𝒵":                                       	#  0x1d49c - 0x1d4b5
-    - t: "腳本"                                   	# 	(en: 'script', google translation)
+    - t: "草體"                                   	# 	(en: 'script', google translation)
     - spell: "translate('.', '𝒜𝒝𝒞𝒟𝒠𝒡𝒢𝒣𝒤𝒥𝒦𝒧𝒨𝒩𝒪𝒫𝒬𝒭𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf100 - 0xf119
-    - t: "腳本"                                   	# 	(en: 'script', google translation)
+    - t: "草體"                                   	# 	(en: 'script', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝒶-𝓏":                                       	#  0x1d4b6 - 0x1d4cf
-    - t: "腳本"                                   	# 	(en: 'script', google translation)
+    - t: "草體"                                   	# 	(en: 'script', google translation)
     - spell: "translate('.', '𝒶𝒷𝒸𝒹𝒺𝒻𝒼𝒽𝒾𝒿𝓀𝓁𝓂𝓃𝓄𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                       	#  0xf11a - 0xf133
-    - t: "腳本"                                   	# 	(en: 'script', google translation)
+    - t: "草體"                                   	# 	(en: 'script', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  # bold script chars in math alphabetic block and also MathType private use area
  - "𝓐-𝓩":                                       	#  0x1d4d0 - 0x1d4e9
-    - t: "腳本粗體"                                 	# 	(en: 'script bold', google translation)
+    - t: "粗草體"                                 	# 	(en: 'script bold', google translation)
     - spell: "translate('.', '𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf140 - 0xf159
-    - t: "腳本粗體"                                 	# 	(en: 'script bold', google translation)
+    - t: "粗草體"                                 	# 	(en: 'script bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝓪-𝔃":                                       	#  0x1d4ea - 0x1d503
-    - t: "腳本粗體"                                 	# 	(en: 'script bold', google translation)
+    - t: "粗草體"                                 	# 	(en: 'script bold', google translation)
     - spell: "translate('.', '𝓪𝓫𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                       	#  0xf15a - 0xf173
-    - t: "腳本粗體"                                 	# 	(en: 'script bold', google translation)
+    - t: "粗草體"                                 	# 	(en: 'script bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf180 - 0xf199
@@ -3200,32 +3200,32 @@
  - "":                                 	#  0xf201 - 0xf209
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "雙打"]                        	# 	(en: 'double struck', google translation)
+         then: [t: "空心"]                        	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '', 'ΔΨΛΠΣΘΓΩΥ')"
 
  - "-":                                       	#  0xf220 - 0xf236
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "雙打"]                        	# 	(en: 'double struck', google translation)
+         then: [t: "空心"]                        	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
- - "": [t: "雙重擊中最終西格瑪"]                        	#  0xf237	(en: 'double struck final sigma', google translation)
- - "": [t: "雙擊rho"]                            	#  0xf250	(en: 'double struck rho', google translation)
- - "": [t: "雙擊phi"]                            	#  0xf251	(en: 'double struck phi', google translation)
+ - "": [t: "空心最終sigma"]                        	#  0xf237	(en: 'double struck final sigma', google translation)
+ - "": [t: "空心rho"]                            	#  0xf250	(en: 'double struck rho', google translation)
+ - "": [t: "空心phi"]                            	#  0xf251	(en: 'double struck phi', google translation)
  - "𝐀-𝐙":                                       	#  0x1d400 - 0x1d419
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf260 - 0xf279
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝐚-𝐳":                                       	#  0x1d41a - 0x1d433
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf27a - 0xf293
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝐴-𝑍":                                       	#  0x1d434 - 0x1d44d
@@ -3242,22 +3242,22 @@
 
  - "𝑨-𝒁":                                       	#  0x1d468 - 0x1d481
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf2c8 - 0xf2e1
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝒂-𝒛":                                       	#  0x1d482 - 0x1d49b
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf2e2 - 0xf2fb
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝖠-𝖹":                                       	#  0x1d5a0 - 0x1d5b9
@@ -3273,19 +3273,19 @@
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  
  - "𝗔-𝗭":                                       	#  0x1d5d4 - 0x1d5ed
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf334 - 0xf34d
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝗮-𝘇":                                       	#  0x1d5ee - 0x1d607
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf34e - 0xf367
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  - "𝘈-𝘡":                                       	#  0x1d608 - 0x1d621
     # - t: "italic"
@@ -3304,22 +3304,22 @@
 
  - "𝘼-𝙕":                                       	#  0x1d63c - 0x1d655
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf39c - 0xf3b5
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝙖-𝙯":                                       	#  0x1d656 - 0x1d66f
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf3b6 - 0xf3cf
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝙰-𝚉":                                       	#  0x1d670 - 0x1d689
@@ -3339,30 +3339,30 @@
  - "𝚥": [t: "無點j"]                              	#  0x1d6a5	(en: 'dotless j', google translation)
 
  - "𝚨-𝛀":                                       	#  0x1d6a8 - 0x1d6c0
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝚨𝚩𝚪𝚫𝚬𝚭𝚮𝚯𝚰𝚱𝚲𝚳𝚴𝚵𝚶𝚷𝚸𝚹𝚺𝚻𝚼𝚽𝚾𝚿𝛀', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                       	#  0xf408 - 0xf420
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝛂-𝛚":                                       	#  0x1d6c2 - 0x1d6da
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝛂𝛃𝛄𝛅𝛆𝛇𝛈𝛉𝛊𝛋𝛌𝛍𝛎𝛏𝛐𝛑𝛒𝛓𝛔𝛕𝛖𝛗𝛘𝛙𝛚', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                       	#  0xf422 - 0xf43a
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
- - "": [t: "大膽的納布拉"]                           	#  0xf421	(en: 'bold nabla', google translation)
- - "𝛁": [t: "大膽的納布拉"]                           	#  0x1d6c1	(en: 'bold nabla', google translation)
+ - "": [t: "粗體納布拉"]                           	#  0xf421	(en: 'bold nabla', google translation)
+ - "𝛁": [t: "粗體納布拉"]                           	#  0x1d6c1	(en: 'bold nabla', google translation)
 
  - "𝛛𝛜𝛝𝛞𝛟𝛠𝛡":                                   	#  0x1D6DB - 0x1D6E1
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝛛𝛜𝛝𝛞𝛟𝛠𝛡', '∂εθκφρπ')"
 
  - "":                                   	#  0xF43C - 0xF441
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', '∂εθκφρπ')"
 
  - "𝛢-𝛺":                                       	#  0x1d6e2 - 0x1d6fa
@@ -3394,116 +3394,116 @@
 
  - "𝜜-𝜴":                                       	#  0x1d71c - 0x1d734
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝜜𝜝𝜞𝜟𝜠𝜡𝜢𝜣𝜤𝜥𝜦𝜧𝜨𝜩𝜪𝜫𝜬𝜭𝜮𝜯𝜰𝜱𝜲𝜳𝜴', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                       	#  0xf47c - 0xf494
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝜶-𝝎":                                       	#  0x1d736 - 0x1d74e
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝜶𝜷𝜸𝜹𝜺𝜻𝜼𝜽𝜾𝜿𝝀𝝁𝝂𝝃𝝄𝝅𝝆𝝇𝝈𝝉𝝊𝝋𝝌𝝍𝝎', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                       	#  0xf496 - 0xf4ae
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "𝝏𝝐𝝑𝝒𝝓𝝔𝝕":                                   	#  0x1d74f - 0x1d755
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝝏𝝐𝝑𝝒𝝓𝝔𝝕', '∂εθκφρπ')"
 
  - "":                                   	#  0xf422 - 0xf43a
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', '∂εθκφρπ')"
 
- - "𝜵": [t: "大膽的斜體nabla"]                       	#  0x1d735	(en: 'bold italic nabla', google translation)
- - "": [t: "大膽的斜體nabla"]                       	#  0xf495	(en: 'bold italic nabla', google translation)
+ - "𝜵": [t: "粗斜體nabla"]                       	#  0x1d735	(en: 'bold italic nabla', google translation)
+ - "": [t: "粗斜體nabla"]                       	#  0xf495	(en: 'bold italic nabla', google translation)
 
  - "𝝖-𝝮":                                       	#  0x1d756 - 0x1d76e
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝝖𝝗𝝘𝝙𝝚𝝛𝝜𝝝𝝞𝝟𝝠𝝡𝝢𝝣𝝤𝝥𝝦𝝧𝝨𝝩𝝪𝝫𝝬𝝭𝝮', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
  - "-":                                       	#  0xf4b6 - 0xf4ce
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝝰-𝞈":                                       	#  0x1d770 - 0x1d788
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝝰𝝱𝝲𝝳𝝴𝝵𝝶𝝷𝝸𝝹𝝺𝝻𝝼𝝽𝝾𝝿𝞀𝞁𝞂𝞃𝞄𝞅𝞆𝞇𝞈', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                       	#  0xf4d0 - 0xf4e8
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "𝞉𝞊𝞋𝞌𝞍𝞎𝞏":                                   	#  0x1d789 - 0x1d78f
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝞉𝞊𝞋𝞌𝞍𝞎𝞏', '∂εθκφρπ')"
 
  - "":                                   	#  0xf4e9 - 0xf4ef
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', '∂εθκφρπ')"
 
- - "": [t: "大膽的納布拉"]                           	#  0xf4cf	(en: 'bold nabla', google translation)
- - "𝝯": [t: "大膽的納布拉"]                           	#  0x1d76f	(en: 'bold nabla', google translation)
+ - "": [t: "粗體納布拉"]                           	#  0xf4cf	(en: 'bold nabla', google translation)
+ - "𝝯": [t: "粗體納布拉"]                           	#  0x1d76f	(en: 'bold nabla', google translation)
 
  - "𝞐-𝞨":                                       	#  0x1d790 - 0x1d7a8
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝞐𝞑𝞒𝞓𝞔𝞕𝞖𝞗𝞘𝞙𝞚𝞛𝞜𝞝𝞞𝞟𝞠𝞡𝞢𝞣𝞤𝞥𝞦𝞧𝞨', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                       	#  0xf4f0 - 0xf508
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝞪-𝟂":                                       	#  0x1d7aa - 0x1d7c2
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝞪𝞫𝞬𝞭𝞮𝞯𝞰𝞱𝞲𝞳𝞴𝞵𝞶𝞷𝞸𝞹𝞺𝞻𝞼𝞽𝞾𝞿𝟀𝟁𝟂', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                       	#  0xf50a - 0xf522
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "𝟃𝟄𝟅𝟆𝟇𝟈𝟉":                                   	#  0x1d7c3 - 0x1d7c9
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '𝟃𝟄𝟅𝟆𝟇𝟈𝟉', '∂εθκφρπ')"
 
  - "":                                   	#  0xf523 - 0xf529
     # - t: "bold italic"
-    - t: "大膽的"                                  	# 	(en: 'bold', google translation)
+    - t: "粗斜體"                                  	# 	(en: 'bold', google translation)
     - spell: "translate('.', '', '∂εθκφρπ')"
 
- - "": [t: "大膽的納布拉"]                           	#  0xf509	(en: 'bold nabla', google translation)
- - "𝞩": [t: "大膽的納布拉"]                           	#  0x1d7a9	(en: 'bold nabla', google translation)
+ - "": [t: "粗體納布拉"]                           	#  0xf509	(en: 'bold nabla', google translation)
+ - "𝞩": [t: "粗體納布拉"]                           	#  0x1d7a9	(en: 'bold nabla', google translation)
 
- - "": [t: "粗體零"]                              	#  0xf52e	(en: 'bold zero', google translation)
- - "𝟎": [t: "粗體零"]                              	#  0x1d7ce	(en: 'bold zero', google translation)
- - "": [t: "大膽的一個"]                            	#  0xf52f	(en: 'bold one', google translation)
- - "𝟏": [t: "大膽的一個"]                            	#  0x1d7cf	(en: 'bold one', google translation)
- - "": [t: "大膽的兩個"]                            	#  0xf530	(en: 'bold two', google translation)
- - "𝟐": [t: "大膽的兩個"]                            	#  0x1d7d0	(en: 'bold two', google translation)
- - "": [t: "大膽的三"]                             	#  0xf531	(en: 'bold three', google translation)
- - "𝟑": [t: "大膽的三"]                             	#  0x1d7d1	(en: 'bold three', google translation)
- - "": [t: "大膽的四"]                             	#  0xf532	(en: 'bold four', google translation)
- - "𝟒": [t: "大膽的四"]                             	#  0x1d7d2	(en: 'bold four', google translation)
- - "": [t: "大膽的五"]                             	#  0xf533	(en: 'bold five', google translation)
- - "𝟓": [t: "大膽的五"]                             	#  0x1d7d3	(en: 'bold five', google translation)
- - "": [t: "大膽的六"]                             	#  0xf534	(en: 'bold six', google translation)
- - "𝟔": [t: "大膽的六"]                             	#  0x1d7d4	(en: 'bold six', google translation)
- - "": [t: "大膽的七"]                             	#  0xf535	(en: 'bold seven', google translation)
- - "𝟕": [t: "大膽的七"]                             	#  0x1d7d5	(en: 'bold seven', google translation)
- - "": [t: "大膽"]                               	#  0xf536	(en: 'bold eight', google translation)
- - "𝟖": [t: "大膽"]                               	#  0x1d7d6	(en: 'bold eight', google translation)
- - "": [t: "大膽九"]                              	#  0xf537	(en: 'bold nine', google translation)
- - "𝟗": [t: "大膽九"]                              	#  0x1d7d7	(en: 'bold nine', google translation)
+ - "": [t: "粗體0"]                              	#  0xf52e	(en: 'bold zero', google translation)
+ - "𝟎": [t: "粗體0"]                              	#  0x1d7ce	(en: 'bold zero', google translation)
+ - "": [t: "粗體1"]                            	#  0xf52f	(en: 'bold one', google translation)
+ - "𝟏": [t: "粗體1"]                            	#  0x1d7cf	(en: 'bold one', google translation)
+ - "": [t: "粗體2"]                            	#  0xf530	(en: 'bold two', google translation)
+ - "𝟐": [t: "粗體2"]                            	#  0x1d7d0	(en: 'bold two', google translation)
+ - "": [t: "粗體3"]                             	#  0xf531	(en: 'bold three', google translation)
+ - "𝟑": [t: "粗體3"]                             	#  0x1d7d1	(en: 'bold three', google translation)
+ - "": [t: "粗體4"]                             	#  0xf532	(en: 'bold four', google translation)
+ - "𝟒": [t: "粗體4"]                             	#  0x1d7d2	(en: 'bold four', google translation)
+ - "": [t: "粗體5"]                             	#  0xf533	(en: 'bold five', google translation)
+ - "𝟓": [t: "粗體5"]                             	#  0x1d7d3	(en: 'bold five', google translation)
+ - "": [t: "粗體6"]                             	#  0xf534	(en: 'bold six', google translation)
+ - "𝟔": [t: "粗體6"]                             	#  0x1d7d4	(en: 'bold six', google translation)
+ - "": [t: "粗體7"]                             	#  0xf535	(en: 'bold seven', google translation)
+ - "𝟕": [t: "粗體7"]                             	#  0x1d7d5	(en: 'bold seven', google translation)
+ - "": [t: "粗體8"]                               	#  0xf536	(en: 'bold eight', google translation)
+ - "𝟖": [t: "粗體8"]                               	#  0x1d7d6	(en: 'bold eight', google translation)
+ - "": [t: "粗體9"]                              	#  0xf537	(en: 'bold nine', google translation)
+ - "𝟗": [t: "粗體9"]                              	#  0x1d7d7	(en: 'bold nine', google translation)
  - "": [t: "零"]                                	#  0xf542	(en: 'zero', google translation)
  - "𝟢": [t: "零"]                                	#  0x1d7e2	(en: 'zero', google translation)
  - "": [t: "一"]                                	#  0xf543	(en: 'one', google translation)
@@ -3512,38 +3512,38 @@
  - "𝟤": [t: "二"]                                	#  0x1d7e4	(en: 'two', google translation)
  - "": [t: "三"]                                	#  0xf545	(en: 'three', google translation)
  - "𝟥": [t: "三"]                                	#  0x1d7e5	(en: 'three', google translation)
- - "": [t: "四個"]                               	#  0xf546	(en: 'four', google translation)
- - "𝟦": [t: "四個"]                               	#  0x1d7e6	(en: 'four', google translation)
+ - "": [t: "四"]                               	#  0xf546	(en: 'four', google translation)
+ - "𝟦": [t: "四"]                               	#  0x1d7e6	(en: 'four', google translation)
  - "": [t: "五"]                                	#  0xf547	(en: 'five', google translation)
  - "𝟧": [t: "五"]                                	#  0x1d7e7	(en: 'five', google translation)
  - "": [t: "六"]                                	#  0xf548	(en: 'six', google translation)
  - "𝟨": [t: "六"]                                	#  0x1d7e8	(en: 'six', google translation)
  - "": [t: "七"]                                	#  0xf549	(en: 'seven', google translation)
  - "𝟩": [t: "七"]                                	#  0x1d7e9	(en: 'seven', google translation)
- - "": [t: "在"]                                	#  0xf54a	(en: 'eight', google translation)
- - "𝟪": [t: "在"]                                	#  0x1d7ea	(en: 'eight', google translation)
+ - "": [t: "八"]                                	#  0xf54a	(en: 'eight', google translation)
+ - "𝟪": [t: "八"]                                	#  0x1d7ea	(en: 'eight', google translation)
  - "": [t: "九"]                                	#  0xf54b	(en: 'nine', google translation)
  - "𝟫": [t: "九"]                                	#  0x1d7eb	(en: 'nine', google translation)
  - "": [t: "粗體零"]                              	#  0xf54c	(en: 'bold zero', google translation)
  - "𝟬": [t: "粗體零"]                              	#  0x1d7ec	(en: 'bold zero', google translation)
- - "": [t: "大膽的一個"]                            	#  0xf54d	(en: 'bold one', google translation)
- - "𝟭": [t: "大膽的一個"]                            	#  0x1d7ed	(en: 'bold one', google translation)
- - "": [t: "大膽的兩個"]                            	#  0xf54e	(en: 'bold two', google translation)
- - "𝟮": [t: "大膽的兩個"]                            	#  0x1d7ee	(en: 'bold two', google translation)
- - "": [t: "大膽的三"]                             	#  0xf54f	(en: 'bold three', google translation)
- - "𝟯": [t: "大膽的三"]                             	#  0x1d7ef	(en: 'bold three', google translation)
- - "": [t: "大膽的四"]                             	#  0xf550	(en: 'bold four', google translation)
- - "𝟰": [t: "大膽的四"]                             	#  0x1d7f0	(en: 'bold four', google translation)
- - "": [t: "大膽的五"]                             	#  0xf551	(en: 'bold five', google translation)
- - "𝟱": [t: "大膽的五"]                             	#  0x1d7f1	(en: 'bold five', google translation)
- - "": [t: "大膽的六"]                             	#  0xf552	(en: 'bold six', google translation)
- - "𝟲": [t: "大膽的六"]                             	#  0x1d7f2	(en: 'bold six', google translation)
- - "": [t: "大膽的七"]                             	#  0xf553	(en: 'bold seven', google translation)
- - "𝟳": [t: "大膽的七"]                             	#  0x1d7f3	(en: 'bold seven', google translation)
- - "": [t: "大膽"]                               	#  0xf554	(en: 'bold eight', google translation)
- - "𝟴": [t: "大膽"]                               	#  0x1d7f4	(en: 'bold eight', google translation)
- - "": [t: "大膽九"]                              	#  0xf555	(en: 'bold nine', google translation)
- - "𝟵": [t: "大膽九"]                              	#  0x1d7f5	(en: 'bold nine', google translation)
+ - "": [t: "粗體1"]                            	#  0xf54d	(en: 'bold one', google translation)
+ - "𝟭": [t: "粗體1"]                            	#  0x1d7ed	(en: 'bold one', google translation)
+ - "": [t: "粗體2"]                            	#  0xf54e	(en: 'bold two', google translation)
+ - "𝟮": [t: "粗體2"]                            	#  0x1d7ee	(en: 'bold two', google translation)
+ - "": [t: "粗體3"]                             	#  0xf54f	(en: 'bold three', google translation)
+ - "𝟯": [t: "粗體3"]                             	#  0x1d7ef	(en: 'bold three', google translation)
+ - "": [t: "粗體4"]                             	#  0xf550	(en: 'bold four', google translation)
+ - "𝟰": [t: "粗體4"]                             	#  0x1d7f0	(en: 'bold four', google translation)
+ - "": [t: "粗體5"]                             	#  0xf551	(en: 'bold five', google translation)
+ - "𝟱": [t: "粗體5"]                             	#  0x1d7f1	(en: 'bold five', google translation)
+ - "": [t: "粗體6"]                             	#  0xf552	(en: 'bold six', google translation)
+ - "𝟲": [t: "粗體6"]                             	#  0x1d7f2	(en: 'bold six', google translation)
+ - "": [t: "粗體7"]                             	#  0xf553	(en: 'bold seven', google translation)
+ - "𝟳": [t: "粗體7"]                             	#  0x1d7f3	(en: 'bold seven', google translation)
+ - "": [t: "粗體8"]                               	#  0xf554	(en: 'bold eight', google translation)
+ - "𝟴": [t: "粗體8"]                               	#  0x1d7f4	(en: 'bold eight', google translation)
+ - "": [t: "粗體9"]                              	#  0xf555	(en: 'bold nine', google translation)
+ - "𝟵": [t: "粗體9"]                              	#  0x1d7f5	(en: 'bold nine', google translation)
  - "": [t: "零"]                                	#  0xf556	(en: 'zero', google translation)
  - "𝟶": [t: "零"]                                	#  0x1d7f6	(en: 'zero', google translation)
  - "": [t: "一"]                                	#  0xf557	(en: 'one', google translation)
@@ -3552,16 +3552,16 @@
  - "𝟸": [t: "二"]                                	#  0x1d7f8	(en: 'two', google translation)
  - "": [t: "三"]                                	#  0xf559	(en: 'three', google translation)
  - "𝟹": [t: "三"]                                	#  0x1d7f9	(en: 'three', google translation)
- - "": [t: "四個"]                               	#  0xf55a	(en: 'four', google translation)
- - "𝟺": [t: "四個"]                               	#  0x1d7fa	(en: 'four', google translation)
+ - "": [t: "四"]                               	#  0xf55a	(en: 'four', google translation)
+ - "𝟺": [t: "四"]                               	#  0x1d7fa	(en: 'four', google translation)
  - "": [t: "五"]                                	#  0xf55b	(en: 'five', google translation)
  - "𝟻": [t: "五"]                                	#  0x1d7fb	(en: 'five', google translation)
  - "": [t: "六"]                                	#  0xf55c	(en: 'six', google translation)
  - "𝟼": [t: "六"]                                	#  0x1d7fc	(en: 'six', google translation)
  - "": [t: "七"]                                	#  0xf55d	(en: 'seven', google translation)
  - "𝟽": [t: "七"]                                	#  0x1d7fd	(en: 'seven', google translation)
- - "": [t: "在"]                                	#  0xf55e	(en: 'eight', google translation)
- - "𝟾": [t: "在"]                                	#  0x1d7fe	(en: 'eight', google translation)
+ - "": [t: "八"]                                	#  0xf55e	(en: 'eight', google translation)
+ - "𝟾": [t: "八"]                                	#  0x1d7fe	(en: 'eight', google translation)
  - "": [t: "九"]                                	#  0xf55f	(en: 'nine', google translation)
  - "𝟿": [t: "九"]                                	#  0x1d7ff	(en: 'nine', google translation)
  - "": [t: "未知角色"]                             	#  0xf700	(en: 'unknown character', google translation)
