@@ -326,6 +326,7 @@
       if: "$Verbosity='Terse'"
       then: {T: "sin"}        # phrase('sin' is the abbreviation for sine)
       else: {T: "sinus"}      # phrase(the 'sine' of the angle)
+      # SWEDISH: Added short form.
 - name: cos
   tag: mi
   match: "text()='cos'"
