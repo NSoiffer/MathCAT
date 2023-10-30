@@ -17,15 +17,15 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][text()='ℂ']"
-      then: [{t: "kompleksinumerot"}]      # phrase('complex numbers' consist of two parts)
+      then: [{T: "kompleksiluvut"}]      # phrase('complex numbers' consist of two parts)
     - else_if: "*[1][text()='ℕ']"
-      then: [{t: "luonnolliset numerot"}]      # phrase('natural numbers' are numbers from 1 to infinity)
+      then: [{T: "luonnolliset luvut"}]      # phrase('natural numbers' are numbers from 1 to infinity)
     - else_if: "*[1][text()='ℚ']"
-      then: [{t: "rationaaliset numerot"}]      # phrase('rational numbers' are the fraction of 2 integers)
+      then: [{T: "rationaaliluvut"}]      # phrase('rational numbers' are the fraction of 2 integers)
     - else_if: "*[1][text()='ℝ']"
-      then: [{t: "real numerot"}]      # phrase('real numbers' can be both positive and negative)
+      then: [{T: "reaaliluvut"}]      # phrase('real numbers' can be both positive and negative)
     - else_if: "*[1][text()='ℤ']"
-      then: [{t: "kokonaisluvut"}]      # phrase(positive 'integers' are natural numbers above 0)
+      then: [{T: "kokonaisluvut"}]      # phrase(positive 'integers' are natural numbers above 0)
       else: [{x: "*[1][text()]"}] # shouldn't happen
 
 - name: dimension-number-sets
@@ -57,15 +57,15 @@
   - bookmark: "@id"
   - test:
     - if: "text()='ℂ'"
-      then: [{t: "kompleksinumerot"}]      # phrase('the complex numbers' include 2 parts)
+      then: [{T: "kompleksiluvut"}]      # phrase('the complex numbers' include 2 parts)
     - else_if: "text()='ℕ'"
-      then: [{t: "luonnolliset numerot"}]      # phrase('the natural numbers' begin at 1)
+      then: [{T: "luonnolliset luvut"}]      # phrase('the natural numbers' begin at 1)
     - else_if: "text()='ℚ'"
-      then: [{t: "rationaaliset numerot"}]      # phrase('the rational numbers' are the fraction of 2 integers)
+      then: [{T: "rationaaliluvut"}]      # phrase('the rational numbers' are the fraction of 2 integers)
     - else_if: "text()='ℝ'"
-      then: [{t: "todelliset numerot"}]      # phrase('the real numbers' can be both positive and negative)
+      then: [{T: "reaaliluvut"}]      # phrase('the real numbers' can be both positive and negative)
     - else_if: "text()='ℤ'"
-      then: [{t: "kokonaisluvut"}]      # phrase('the integers' are natural numbers above 0)
+      then: [{T: "kokonaisluvut"}]      # phrase('the integers' are natural numbers above 0)
       else: [x: "text()"] # shouldn't happen
 
 - name: real-part
@@ -73,14 +73,14 @@
   match: "."
   replace:
   - bookmark: "@id"
-  - t: "todellinen osa"      # phrase('the real part' of a complex number does not include the imaginary part)
+  - T: "reaaliosa"      # phrase('the real part' of a complex number does not include the imaginary part)
 
 - name: imaginary-part
   tag: imaginary-part
   match: "."
   replace:
   - bookmark: "@id"
-  - t: "kuvitteellinen osa"      # phrase('the imaginary part' is part of a complex number)
+  - T: "imaginääriosa"      # phrase('the imaginary part' is part of a complex number)
 
 # rules on scripted vertical bars ('evaluated at')
 - name: evaluated-at-2
