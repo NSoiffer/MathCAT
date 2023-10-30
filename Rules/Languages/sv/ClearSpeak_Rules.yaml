@@ -701,6 +701,7 @@
                 then: [{T: "steg"}]      # phrase(this is the first 'step' of three steps)
                 else: [{T: "steget"}]      # phrase(this is the first 'step' of three steps)
           # else 'None -- don't say anything'
+          # SWEDISH: Every expression had to be inflected separately.
       # - test:
       #   - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
       #     then: [{ct: "s"}] # plural      # phrase(shown by the letter 's')
