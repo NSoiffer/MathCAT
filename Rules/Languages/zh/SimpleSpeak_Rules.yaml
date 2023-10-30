@@ -165,7 +165,7 @@
   match: "*[2][self::m:mn][not(contains(., '.'))]"
   replace:
   - x: "*[1]"
-  - t: ""      # phrase(15 raised 'to the' second power equals 225)
+  - t: "的"      # phrase(15 raised 'to the' second power equals 225)
   - test:
       if: "*[2][.>0]"
       then: {x: "*[2]"}
@@ -186,7 +186,7 @@
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  - t: ""      # phrase(15 raised 'to the' second power equals 225)
+  - t: "的"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
   #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
   - t: "次方"
@@ -195,7 +195,7 @@
   match: "IsNode(*[2], 'leaf')"
   replace:
   - x: "*[1]"
-  - t: ""      # phrase(15 raised 'to the' second power equals 225)
+  - t: "的"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
   - t: "次方"
 - name: nested

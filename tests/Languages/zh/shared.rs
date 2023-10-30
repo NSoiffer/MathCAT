@@ -135,7 +135,7 @@ fn simple_msubsup() {
 #[test]
 fn non_simple_msubsup() {
     let expr = "<math><msubsup><mi>i</mi><mrow><mi>j</mi><mo>&#x2212;</mo><mn>2</mn></mrow><mi>k</mi></msubsup></math>";
-    test("zh", "SimpleSpeak", expr, "i 下標 j 減 2 結束下標, k 次方");
+    test("zh", "SimpleSpeak", expr, "i 下標 j 減 2 結束下標, 的 k 次方");
     //test("zh", "ClearSpeak", expr, "i sub j minus 2 end sub, to the k-th power");
 }
 

@@ -24,7 +24,7 @@ fn cubed() {
         let expr = "<math>
                         <msup> <mi>x</mi> <mn>4</mn> </msup>
                     </math>";
-        test("zh", "SimpleSpeak", expr, "x 4 次方");
+        test("zh", "SimpleSpeak", expr, "x 的 4 次方");
     }
 
 #[test]
@@ -32,7 +32,7 @@ fn simple_mi_power() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mi>n</mi> </msup>
                 </math>";
-  test("zh", "SimpleSpeak", expr, "x n 次方");
+  test("zh", "SimpleSpeak", expr, "x 的 n 次方");
 }
 
 #[test]
@@ -40,7 +40,7 @@ fn zero_power() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>0</mn> </msup>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "x 0 次方");
+    test("zh", "SimpleSpeak", expr, "x 的 0 次方");
 }
 
 
@@ -49,7 +49,7 @@ fn decimal_power() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>2.0</mn> </msup>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "x 2.0 次方");
+    test("zh", "SimpleSpeak", expr, "x 的 2.0 次方");
 }
 
 #[test]
@@ -219,7 +219,7 @@ fn nested_expr_to_tenth() {
       </msup>
       </mrow>
       </math>";
-  test("zh", "SimpleSpeak", expr, "3 的 3 10 次方 次方");
+  test("zh", "SimpleSpeak", expr, "3 的 3 的 10 次方 次方");
 }
 
 #[test]
@@ -255,7 +255,7 @@ fn nested_simple_power() {
       </msup>
     </msup>
   </math>";
-  test("zh", "SimpleSpeak", expr, "t 的 5 分之 4 n 次方 次方");
+  test("zh", "SimpleSpeak", expr, "t 的 5 分之 4 的 n 次方 次方");
 }
 
 #[test]
