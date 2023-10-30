@@ -91,7 +91,7 @@
   - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
   replace:
   - x: "*[1]"
-  - t: "genom"      # phrase(the fraction 3 'over' 4)
+  - T: "genom"      # phrase(the fraction 3 'over' 4)
   - x: "*[2]"
   - pause: short
 
