@@ -3,7 +3,7 @@ use crate::common::*;
 #[test]
 fn transpose() {
   let expr = "<math> <msup><mi>M</mi><mi>T</mi></msup> </math>";
-  test("zh", "SimpleSpeak", expr, "大寫 m 轉置");
+  test("zh", "SimpleSpeak", expr, "大寫 m 的 轉置");
 }
 
 #[test]
