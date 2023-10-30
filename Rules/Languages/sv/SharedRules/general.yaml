@@ -5,6 +5,7 @@
   tag: number-sets
   match: "count(*)=2 and *[2][text()='+' or text()='-']"
   replace:
+  # SWEDISH: This test, to see if "the" is supposed to be added or not, is removed from the Swedish translations, as it is not applicable.
   # - test:
   #     if: "$Verbosity!='Terse'"
   #     then:
