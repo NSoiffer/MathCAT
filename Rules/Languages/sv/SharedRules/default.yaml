@@ -118,7 +118,7 @@
   - T: "rotsymbolen"
   - test:
       if: "$Verbosity!='Terse'"
-      then: [t: "ur"]    # phrase("the root 'of' x")
+      then: [T: "ur"]    # phrase("the root 'of' x")
   - x: "*[1]"
   - pause: short
   - test:
