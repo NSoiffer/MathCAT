@@ -19,7 +19,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "the"}      # phrase('the' square root of 25)
+      then: {T: ""}      # phrase('the' square root of 25)
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
@@ -28,10 +28,10 @@
           if: parent::*[self::m:negative]
           then: [{T: "negatiivinen"}]      # phrase(minus 4 is a 'negative' number)
           else: [{T: "positiivinen"}]      # phrase(10 is a 'positive' number)
-  - t: "neliöjuuri"      # phrase(8 is the 'square root' of 64)
+  - T: "neliöjuuri"      # phrase(8 is the 'square root' of 64)
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "of"}      # phrase(the square root 'of' 5)
+      then: {T: ""}      # phrase(the square root 'of' 5)
       else: {pause: short}
   - x: "*[1]"
   - test:
@@ -50,7 +50,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "the"}      # phrase(6 is 'the' square root of 36)
+      then: {T: ""}      # phrase(6 is 'the' square root of 36)
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
@@ -59,8 +59,8 @@
           then: [{bookmark: "parent/@id"}]
       - test:
           if: parent::m:negative
-          then: [{t: "negatiivinen"}]      # phrase(minus 6 is a 'negative' number)
-          else: [{t: "positiivinen"}]      # phrase(10 is a 'positive' number)
+          then: [{T: "negatiivinen"}]      # phrase(minus 6 is a 'negative' number)
+          else: [{T: "positiivinen"}]      # phrase(10 is a 'positive' number)
   - test:
       if: "*[2][self::m:mn]"
       then_test:
@@ -80,7 +80,7 @@
       - T: "juuri"      # phrase(the square 'root' of 36)
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "of"}      # phrase(the square root 'of' 36)
+      then: {T: ""}      # phrase(the square root 'of' 36)
   - x: "*[1]"
   - test:
       if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
@@ -152,7 +152,7 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [{ot: "the"}]
+          then: [{OT: ""}]
       - t: "jake"      # phrase(the 'fraction' with 3 over 4)
   - x: "*[1]"
   - t: "yli"      # phrase(the fraction 3 'over' 4)
@@ -197,7 +197,7 @@
   tag: fraction
   match: "."
   replace:
-  - ot: "the"      # phrase(5 is 'the' square toot of 25)
+  - OT: ""      # phrase(5 is 'the' square toot of 25)
   - t: "fraktio osoitin"      # phrase(the 'fraction with numerator' 6)
   - test:
       if: not(IsNode(*[1], 'simple'))
@@ -248,7 +248,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "the"}      # phrase('the' third power of 2)
+      then: {T: ""}      # phrase('the' third power of 2)
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][self::m:mn][not(contains(., '.'))]"
@@ -464,9 +464,9 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "the"}      # phrase('the' absolute value of 25)
+      then: {T: ""}      # phrase('the' absolute value of 25)
   - x: "$WordToSay"
-  - t: "of"      # phrase(the absolute value 'of' 25)
+  - T: ""      # phrase(the absolute value 'of' 25)
   - x: "*[1]"
   - test:
       if: "$ClearSpeak_AbsoluteValue = 'AbsEnd'"
@@ -487,13 +487,13 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "the"}      # phrase('the' empty set)
+          then: {T: ""}      # phrase('the' empty set)
       - t: "tyhjä sarja"      # phrase(the 'empty set')
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "the"}      # phrase('the' set of all integers)
+          then: {T: ""}      # phrase('the' set of all integers)
       - t: "joukko"      # phrase(this is a 'set of' numbers)
       - test:
           if: $ClearSpeak_Sets != 'woAll'
@@ -507,7 +507,7 @@
           then:
           - test:
               if: "$Verbosity!='Terse'"
-              then: {t: "the"}      # phrase('the' set of integers)
+              then: {T: ""}      # phrase('the' set of integers)
           - t: "set"      # phrase(this is a 'set' of integers)
       - x: "*[1]"
 
@@ -600,21 +600,21 @@
       if: "$log_is_simple"
       then_test:
       - if: "*[1][text()='log']"
-        then: [{t: "loki"}]      # phrase(the 'log' of x)
+        then: [{t: "logaritmi"}]      # phrase(the 'log' of x)
       - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
-        then: [{t: "luonnollinen loki"}]      # phrase(the 'natural log' of the product of 2 numbers)
+        then: [{t: "luonnollinen logaritmi"}]      # phrase(the 'natural log' of the product of 2 numbers)
         else: [{spell: "'ln'"}]
       else:
       - test:
           if: "$Verbosity!='Terse' and not(log_is_simple)"
-          then: {t: "the"}      # phrase('the' square root of 25)
+          then: {T: ""}      # phrase('the' square root of 25)
       - test:
         - if: "*[1][text()='log']"
           then: [{t: "log"}]
         - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
           then: [{t: "luonnollinen loki"}]      # phrase(the 'natural log' of x)
           else: [{spell: "'ln'"}]
-      - t: "of"      # phrase(the natural log 'of' x)
+      - T: ""      # phrase(the natural log 'of' x)
       - pause: short
   - x: "*[3]"
 
