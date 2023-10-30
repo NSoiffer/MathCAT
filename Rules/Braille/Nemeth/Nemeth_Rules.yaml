@@ -267,7 +267,7 @@
   name: prefix-geometry-ops
   tag: mo
   match:
-     - "..[count(*) = 2 and name()='mrow'] and not(preceding-sibling::*) and"
+     - "..[self::m:mrow and count(*) = 2] and not(preceding-sibling::*) and"
      - "IsInDefinition(., 'GeometryPrefixOperators')"
   replace:
      - x: "text()"
