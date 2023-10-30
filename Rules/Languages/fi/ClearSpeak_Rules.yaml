@@ -119,8 +119,9 @@
   tag: fraction
   match: "$ClearSpeak_Fractions='Per'"
   replace:
+  # Finnish: is there a better way? 'per' might not be widely known
   - x: "*[1]"
-  - T: "per"      # phrase('5 meters 'per' second) # Finnish: is there a better way? 'per' might not be widely known
+  - T: "per"      # phrase('5 meters 'per' second) 
   - x: "*[2]"
 
 - name: common-fraction # have to test how this works in Finnish
