@@ -68,7 +68,7 @@
           - x: "*[2]"
           - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: {x: "*[2]"}
-      - t: "root"
+      - T: "roten"
   - test:
       if: "IsNode(*[1], 'simple')"
       then:
@@ -83,24 +83,24 @@
   - "*[2][self::m:mtable] and"
   - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
   replace:
-  - t: "the"
+  # - t: "the"
   - x: count(*[2]/*)
-  - t: "by"
+  - T: "gånger"
   - x: count(*[2]/*[self::m:mtr][1]/*)
   - test:
       if: "*[1][text()='|']" # just need to check the first bracket since we know it must be (, [, or |
-      then: {t: "determinant"}
-      else: {t: "matrix"}
+      then: {T: "determinanten"}
+      else: {T: "matrisen"}
 
 - name: default
   tag: mtable
   match: "."
   replace:
-  - t: "the"
+  # - t: "the"
   - x: count(*[2]/*)
-  - t: "by"
+  - T: "gånger"
   - x: count(*[2]/*[self::m:mtr][1]/*)
-  - t: "table"
+  - T: "tabell"
 
 - name: short-mrow
   tag: mrow
@@ -124,6 +124,6 @@
   - pause: auto
   - x: "*[5]"
   - pause: auto
-  - t: "and so on"
+  - T: "och så vidare"
 
 - include: "SimpleSpeak_Rules.yaml"
