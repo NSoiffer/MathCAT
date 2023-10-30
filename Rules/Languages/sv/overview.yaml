@@ -30,22 +30,22 @@
       if: "IsNode(*[1], 'simple') and IsNode(*[2], 'simple')"
       then:
       - x: "*[1]"
-      - t: "over"
+      - T: "genom"
       - x: "*[2]"
       else:
-      - t: "fraction"
+      - T: "bråk"
 
 - name: default
   tag: msqrt
   match: "."
   replace:
-  - t: "square root"
+  - T: "roten"
   - test:
       if: "IsNode(*[1], 'simple')"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "of"}
+          then: {T: "ur"}
       - x: "*[1]"
 
 - name: default
@@ -56,11 +56,11 @@
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][text()='2']"
-        then: {t: "square root"}
+        then: {T: "kvadratroten"}
       - else_if: "*[2][text()='3']"
-        then: {t: "cube root"}
+        then: {T: "kubikroten"}
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {t: "root"}]
+        then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
@@ -74,7 +74,7 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "of"}
+          then: {T: "ur"}
       - x: "*[1]"
 
 - name: default
