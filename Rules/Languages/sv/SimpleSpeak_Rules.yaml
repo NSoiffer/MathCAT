@@ -63,7 +63,7 @@
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{t: "slut rot"}, {pause: short}]      # phrase(start the fifth root of x 'end of root')
+      else: [{T: "slut rot"}, {pause: short}]      # phrase(start the fifth root of x 'end of root')
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
