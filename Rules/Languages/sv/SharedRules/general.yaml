@@ -636,7 +636,7 @@
   replace:
   # - t: "the"      # phrase('the' 2 by 2 matrix M)
   - x: "count(*)"
-  - t: "gånger 1"      # phrase(the 2 'by 1 column' matrix)
+  - T: "gånger 1"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: {T: "kolumnvektorn"}      # phrase(the 2 column 'vector')
@@ -816,7 +816,7 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "abonnemang"}]      # phrase(a 'subscript' may be used to indicate an index)
+              then: [{t: "subscript"}]      # phrase(a 'subscript' may be used to indicate an index)
               else_test:
                 if: "$Verbosity='Medium'"
                 then: [{t: "sub"}]      # phrase(here is a 'sub' total)
