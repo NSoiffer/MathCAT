@@ -102,7 +102,7 @@
       if:
       - "*[1][self::m:square-root or self::m:root] and"
       - "($ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd')"
-      then: {t: ""} # usage in Finnish?
+      then: {t: ""}
       else:
       - bookmark: "@id"
       - test:
