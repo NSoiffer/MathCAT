@@ -949,7 +949,6 @@ fn example_11_5_5_3() {
 
 #[test]
 fn example_11_5_6() {
-    init_logger();
     let expr = "<math> <mo>{</mo>
             <mo>(</mo> <mi>x</mi> <mo>,</mo> <mi>y</mi> <mo>)</mo>
             <mo>|</mo>
