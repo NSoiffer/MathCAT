@@ -48,6 +48,13 @@ fn not_number_space_blocks() {
 }
 
 #[test]
+fn dot_above_bug_204() {
+    // https://github.com/NSoiffer/MathCAT/issues/204
+    let expr = "<math> <mn>0.</mn> <mover> <mn>6</mn> <mo>&middot;</mo> </mover> </math>";
+    test_braille("UEB", expr, "⠼⠚⠲⠣⠼⠋⠜⠘⠲");
+}
+
+#[test]
 fn space_hack_between_digits() {
     // https://github.com/NSoiffer/MathCAT/issues/144
     let expr = "<math><mn>1</mn><mtext>&#x00a0;&#x2063;</mtext><mn>3</mn><mtext>&#x00a0;&#x2063;</mtext><mn>5</mn></math>";

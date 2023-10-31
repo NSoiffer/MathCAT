@@ -264,7 +264,7 @@
 -
    name: single-char-exceptions    # GTM 12
    tag: [mover, munder]
-   match: "*[2][string-length(.) = 1 and ( translate(., '_¯→.˙~^','')='' or (parent::m:mover and text()='⌒') )]"
+   match: "*[2][string-length(.) = 1 and ( translate(., '_¯→.·˙~^','')='' or (parent::m:mover and text()='⌒') )]"
    replace: 
    - test:
       # omit grouping indicators in the following cases
@@ -293,7 +293,7 @@
         then: [t: "⠱"]
       - else_if: "*[2][text()='→']"
         then: [t: "⠘⠱"]
-      - else_if: "*[2][text()='.' or text()='˙']"
+      - else_if: "*[2][text()='.' or text()='·' or text()='˙']"
         then: [t: "⠘⠲"]
       - else_if: "*[2][text()='~']"
         then: [t: "⠸⠱"]
