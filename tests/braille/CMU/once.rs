@@ -160,7 +160,6 @@ fn letter_number_2_5_b_1() {
 #[test]
 #[ignore]  // really requires a transcriber's note
 fn color_2_5_c_2() {
-    init_logger();
     let expr = "<math><mn>3</mn><mn mathcolor='#FF0000'>4</mn><mn>2</mn><mn mathcolor='#00FF00'>9</mn></math>";
     test_braille("CMU", expr, "⠼⠉⠩⠙⠃⠰⠊");
 }
@@ -1440,10 +1439,19 @@ fn units_appendix_1_2_1() {
 }
 
 #[test]
-#[ignore]
 fn units_appendix_1_3_1() {
-    let expr = "<math><mn>1</mn><mo>&#xA0;</mo><mi mathvariant='normal'>m</mi><mo>=</mo><mn>100</mn><mo>&#xA0;</mo><mi>cm</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>&#xA0;</mo><mi>km</mi></math>";
-    test_braille("CMU", expr, "⠼⠁⠀⠍⠶⠼⠁⠚⠚⠀⠉⠍⠶⠼⠚⠂⠁⠀⠅⠍");
+    // manually added "intent" -- should have another test
+    let expr = "<math><mn>1</mn><mo>&#xA0;</mo><mi mathvariant='normal' intent=':unit'>m</mi><mo>=</mo><mn>100</mn><mo>&#xA0;</mo><mi intent=':unit'>cm</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>&#xA0;</mo><mi intent=':unit'>km</mi></math>";
+    test_braille_prefs("CMU", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠀⠍⠶⠼⠁⠚⠚⠀⠉⠍⠶⠼⠚⠂⠁⠀⠅⠍");
+
+}
+#[test]
+#[ignore]  // remove 'ignore' once MathCAT adds code to deal with Units/inferring units
+fn units_appendix_1_3_1_auto_intent() {
+    // manually added "intent" -- should have another test
+    let expr = "<math><mn>1</mn><mo>&#xA0;</mo><mi mathvariant='normal' >m</mi><mo>=</mo><mn>100</mn><mo>&#xA0;</mo><mi >cm</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>&#xA0;</mo><mi >km</mi></math>";
+    test_braille_prefs("CMU", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠀⠍⠶⠼⠁⠚⠚⠀⠉⠍⠶⠼⠚⠂⠁⠀⠅⠍");
+
 }
 
 

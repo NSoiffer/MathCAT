@@ -302,6 +302,7 @@
   # for uppercase, need to only have one as uppercase
   - x: "BrailleChars(., 'CMU', 1, 2)"
   - x: "BrailleChars(translate(., 'IVXLCDM', 'ivxlcdm'), 'CMU', 2, string-length(.)+1)"
+
 -
   name: omissions
   tag: [mi, mtext, mo]
@@ -316,6 +317,14 @@
         - x: "translate(., '_\u00A0', '⠰')"  # note space is removed
         else: [t: "⠰⠤⠆"]
   - t: ""
+
+-
+  name: units
+  tag: [mi, mtext]
+  match: "contains(@intent, ':unit')"
+  replace:
+  - t: "W"
+  - x: "text()"
 
 -
   name: Ln-hack
