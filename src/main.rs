@@ -169,23 +169,9 @@ fn main() {
   //       </msup>
   //     </mrow>
   //   </math>";
-  let expr="
-  <math id='Mu7xd7cq-0' data-id-added='true'>
-  <mrow data-changed='added' id='Mu7xd7cq-1' data-id-added='true'>
-    <msub id='Mu7xd7cq-2' data-id-added='true'>
-      <mi id='Mu7xd7cq-3' data-id-added='true'>x</mi>
-      <mn id='Mu7xd7cq-4' data-id-added='true'>1</mn>
-    </msub>
-    <mo data-changed='added' id='Mu7xd7cq-5' data-id-added='true'>&#x2062;</mo>
-    <mn id='Mu7xd7cq-6' data-id-added='true'>10</mn>
-    <mo data-changed='added' id='Mu7xd7cq-7' data-id-added='true'>&#x2062;</mo>
-    <msup id='Mu7xd7cq-8' data-id-added='true'>
-      <mi id='Mu7xd7cq-9' data-id-added='true'>x</mi>
-      <mn id='Mu7xd7cq-10' data-id-added='true'>2</mn>
-    </msup>
-  </mrow>
- </math>
-          ";
+  let expr=r#"
+  <math><mn>0</mn><mo>,</mo><mn>1</mn> </math>
+             "#;
 
 //   let expr = "
 //   <math display='block'>
@@ -220,7 +206,9 @@ fn main() {
   // set_preference("MathRate".to_string(), "77".to_string()).unwrap();
   
   set_preference("Bookmark".to_string(), "false".to_string()).unwrap();
-  set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+  set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+  // set_preference("DecimalSeparators".to_string(), ",".to_string()).unwrap();
+  // set_preference("BlockSeparators".to_string(), ". ".to_string()).unwrap();
   if let Err(e) = set_mathml(expr.to_string()) {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   };
