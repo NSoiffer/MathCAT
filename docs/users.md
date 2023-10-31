@@ -22,6 +22,8 @@ To start navigation:
 
 MathCAT's navigation is the same in Word and in a browser.
 
+While navigating an expression, "control+c" copies the MathML for the current node in NVDA.
+
 
 ## Option List
 The options are listed below. Most options allow only a limited set of values and those are indicated in the options.
