@@ -180,18 +180,6 @@
    replace: [x: "*"]
 
 -
-   # add space after these ops when they are prefix operators
-   # note: other shapes are <mi>s and canonicalization turns them into function calls (which will include spaces after them)
-   name: prefix-geometry-ops
-   tag: mo
-   match:
-      - "parent::*[count(*) = 2 and name()='mrow' and not(preceding-sibling::*)] and"
-      - "IsInDefinition(., 'GeometryPrefixOperators')"
-   replace:
-      - x: "text()"
-      - t: "W"
-
--
    name: default
    tag: mo
      # add spaces around comparison operators unless they are in a script position,
