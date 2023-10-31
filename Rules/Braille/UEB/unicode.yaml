@@ -264,19 +264,19 @@
      - test:
         if: "self::m:mn"
         then: [t: "N⠂"]
-        else: [t: ",W"]
+        else: [t: "c,W"]
  - ".":                        # 0x2e (Period)
      - test:
         if: "self::m:mn"
         then: [t: "N⠲"]
-        else: [t: "."]
+        else: [t: "c."]
  - ":":                         # 0x003A (Colon)
         # We can't normally tell spacing, but it *should* have a space in function mapping and set builder notation if the author used appropriate notation
         # The canonicalization code makes this guess and adds "data-space-after"
     - test:
         if: "@data-space-after or (../self::m:mrow and ancestor::*[2][IsBracketed(., '{', '}')]) or following-sibling::*[1]/*[2][IsInDefinition(., 'Arrows')]" # "Arrows" is a bit broad...
         then: [t: "1⠒W"]
-        else: [t: "1⠒"]
+        else: [t: "1c⠒"]
 
  - "-":                        # 0x2d (Minus sign or hyphen)
      - test:

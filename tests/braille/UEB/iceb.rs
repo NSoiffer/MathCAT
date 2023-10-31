@@ -949,15 +949,13 @@ fn example_11_5_5_3() {
 
 #[test]
 fn example_11_5_6() {
+    init_logger();
     let expr = "<math> <mo>{</mo>
             <mo>(</mo> <mi>x</mi> <mo>,</mo> <mi>y</mi> <mo>)</mo>
             <mo>|</mo>
             <mi>x</mi> <mo>+</mo> <mi>y</mi> <mo>=</mo> <mn>6</mn>
         <mo>}</mo> </math>";
-    // Acceptable: GTM uses a G1 passage indicator: "⠰⠰⠰⠸⠣⠐⠣⠭⠂⠀⠽⠐⠜⠀⠸⠳⠀⠭⠐⠖⠽⠀⠐⠶⠀⠼⠋⠸⠜⠰⠄"
-    // However, the BANA G1 standing alone rule ("...before a single letter standing alone") applies, so start in G2 mode.
-    // Corrected to remove the passage indicator
-    test_braille("UEB", expr, "⠸⠣⠐⠣⠭⠂⠀⠰⠽⠐⠜⠀⠸⠳⠀⠭⠐⠖⠽⠀⠐⠶⠀⠼⠋⠸⠜");
+    test_braille("UEB", expr, "⠰⠰⠰⠸⠣⠐⠣⠭⠂⠀⠽⠐⠜⠀⠸⠳⠀⠭⠐⠖⠽⠀⠐⠶⠀⠼⠋⠸⠜⠰⠄");
 }
 
 #[test]
