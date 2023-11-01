@@ -116,7 +116,7 @@
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
       then: [t: "基底"]          # phrase(the 'base' of the power)
-      else: [t: "下限"]   # phrase(the 'lower limit' of the function is zero)
+      else: [t: "下方"]   # phrase(the 'lower limit' of the function is zero)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -127,7 +127,7 @@
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
       then: [t: "基底"]         # phrase(the 'base' of the power)
-      else: [t: "上限"]  # phrase(the 'upper limit' of the function is zero)
+      else: [t: "上方"]  # phrase(the 'upper limit' of the function is zero)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -139,8 +139,8 @@
     - if: "count($Child2D/preceding-sibling::*)=0"
       then: [t: "基底"]           # phrase(the 'base' of the power)
     - else_if: "count($Child2D/preceding-sibling::*)=1"
-      then: [t: "下限"]    # phrase(the 'lower limit' of the function is zero)
-      else: [t: "上限"]   # phrase(the 'upper limit' of the function is zero)
+      then: [t: "下方"]    # phrase(the 'lower limit' of the function is zero)
+      else: [t: "上方"]   # phrase(the 'upper limit' of the function is zero)
   - pause: "medium"
 
 - name: into-or-out-of

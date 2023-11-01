@@ -292,7 +292,7 @@
  - "‴": [t: "triple prime"]                     	#  0x2034
 
  - "ℂℕℚℝℤ":                                     	#  here we rely on this running through the table again to speak "cap xxx"
-    - t: "triple prime"                         	# 	(en: 'double-struck')
+    - t: "空心"                         	# 	(en: 'double-struck')
     - spell: "translate('.', 'ℂℕℚℝℤ', 'CNQRZ')"
 
  - "℃": [t: "攝氏度"]                            	#  0x2103	(en: 'degrees celsius', google translation)
