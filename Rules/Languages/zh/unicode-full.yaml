@@ -63,7 +63,7 @@
  - "˄": [t: "修改器向上箭頭"]                          	#  0x2c4	(en: 'modifier up arrowhead', google translation)
  - "˅": [t: "修改器向下箭頭"]                          	#  0x2c5	(en: 'modifier down arrowhead', google translation)
  - "ˆ": [t: "修飾符繞著折疊口音"]                        	#  0x2c6	(en: 'modifier circumflex accent', google translation)
- - "ˇ": [t: "卡隆"]                               	#  0x2c7	(en: 'caron', google translation)
+ - "ˇ": [t: "check"]                               	#  0x2c7	(en: 'caron', google translation)
  - "ˈ": [t: "修飾符垂直線"]                           	#  0x2c8	(en: 'modifier vertical line', google translation)
  - "ˉ": [t: "macron的修飾符"]                       	#  0x2c9	(en: 'modifier macron', google translation)
  - "ˊ": [t: "修飾劑急性重音"]                          	#  0x2ca	(en: 'modifier acute accent', google translation)
@@ -545,7 +545,7 @@
  - "↘":                                         	#  0x2198
     - test:
         if: "ancestor::*[2][self::m:limit]"
-        then: [t: "從上方開始"]                      	# 	(en: 'approaches from above', google translation)
+        then: [t: "從上方趨近"]                      	# 	(en: 'approaches from above', google translation)
         else: [t: "東南箭頭"]                       	# 	(en: 'south east arrow', google translation)
 
  - "↙": [t: "西南箭頭"]                             	#  0x2199	(en: 'south west arrow', google translation)

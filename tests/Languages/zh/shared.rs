@@ -65,19 +65,19 @@ fn binomial_mmultiscripts() {
 #[test]
 fn permutation_mmultiscripts() {
     let expr = "<math><mmultiscripts><mi>P</mi><mi>k</mi><none/><mprescripts/><mi>n</mi><none/></mmultiscripts></math>";
-    test("zh", "SimpleSpeak", expr, "k 排列 n");
+    test("zh", "SimpleSpeak", expr, "n 排列 k");
 }
 
 #[test]
 fn permutation_mmultiscripts_sup() {
     let expr = "<math><mmultiscripts><mi>P</mi><mi>k</mi><none/><mprescripts/><none/><mi>n</mi></mmultiscripts></math>";
-    test("zh", "SimpleSpeak", expr, "k 排列 n");
+    test("zh", "SimpleSpeak", expr, "n 排列 k");
 }
 
 #[test]
 fn permutation_msubsup() {
     let expr = "<math><msubsup><mi>P</mi><mi>k</mi><mi>n</mi></msubsup></math>";
-    test("zh", "SimpleSpeak", expr, "k 排列 n");
+    test("zh", "SimpleSpeak", expr, "n 排列 k");
 }
 
 #[test]

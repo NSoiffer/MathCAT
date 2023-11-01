@@ -117,9 +117,9 @@
   tag: permutation-symbol
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
-  - x: "*[2]"
-  - t: "排列"      # phrase(the solution  involves several 'permutations of' values)
   - x: "*[1]"
+  - t: "排列"      # phrase(the solution  involves several 'permutations of' values)
+  - x: "*[2]"
 
 - name: intervals
   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]

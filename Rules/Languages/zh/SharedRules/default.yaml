@@ -208,11 +208,11 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "修改的"]      # phrase(phrase(x 'modified' with y above it)
+      then: [t: ""]      # phrase(phrase(x 'modified' with y above it)
   - x: "*[1]"
-  - t: "和"      # phrase(x 'with' z below it)
+  - t: "下方"      # phrase(x 'with' z below it)
   - x: "*[2]"
-  - t: "以下"      # phrase(x with z 'below' it)
+  - t: ""      # phrase(x with z 'below' it)
 
 - name: diacriticals
   tag: mover
@@ -227,11 +227,13 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "修改的"]      # phrase(phrase(x 'modified' with y above it)
+      then: [t: ""]      # phrase(phrase(x 'modified' with y above it)
   - x: "*[1]"
-  - t: "和"         # phrase(x modified 'with' y above it)
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [t: "上方"]     
   - x: "*[2]"
-  - t: "多於"        # phrase(x modified 'with' y above it)
+  - t: ""        # phrase(x modified 'with' y above it)
 
 - name: default
   tag: munderover
@@ -239,13 +241,15 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "修改的"]      # phrase(the equation has been 'modified')
+      then: [t: ""]      # phrase(the equation has been 'modified')
   - x: "*[1]"
-  - t: "和"         # phrase(x modified 'with' y above it)
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [t: "上方"]     
   - x: "*[2]"
-  - t: "下方和"    # phrase(x modified with y 'below and' y above it)
+  - t: "下方"    # phrase(x modified with y 'below and' y above it)
   - x: "*[3]"
-  - t: "多於"        # phrase(x modified with y 'above' it)
+  - t: ""        # phrase(x modified with y 'above' it)
 
 - name: default
   #   Here we support up to 2 prescripts and up to 4 postscripts -- that should cover all reasonable cases

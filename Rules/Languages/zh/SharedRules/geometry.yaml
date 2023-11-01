@@ -7,7 +7,7 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "線段的"      # phrase('the line segment from' A to B)
+      - t: "線段"      # phrase('the line segment from' A to B)
       - x: "*[1]"
       - t: "到"                         # phrase(the line segment from A 'to' B)
       - x: "*[2]"
@@ -23,7 +23,7 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "來自"             # phrase('the ray from' A to B)
+      - t: "射線"             # phrase('the ray from' A to B)
       - x: "*[1]"
       - t: "到"                       # phrase(the ray from A 'to' B)
       - x: "*[2]"
@@ -38,7 +38,7 @@
   replace:
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "這"}]            # phrase('the' arc A B C)
+      then: [{t: ""}]            # phrase('the' arc A B C)
   - t: "弧"                        # phrase(the 'arc' A B C)
   - x: "*[1]"
   - x: "*[2]"
