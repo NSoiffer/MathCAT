@@ -249,11 +249,11 @@
             then: [T: "ja niin edelleen"]       	# 	(en: 'and so on', google translation)
             else: [T: "piste piste piste"]      	# 	(en: 'and so on up to', google: 'ja niin edelleen'); possibly obsolete if-else
 
- - "⁡":                                         	#  0x2061
+ - "⁡":                                         	#  0x2061, function application
     - test:
         if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
              not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':structure:')])"
-        then: [t: "of"]
+        then: [T: "arvolla"]                     
  - "⁢": [t: ""]                                 	#  0x2062
  - "⁣": [t: ""]                                 	#  0x2063
  - "⁤": [t: "ja"]                               	#  0x2064	(en: 'and', google translation)
