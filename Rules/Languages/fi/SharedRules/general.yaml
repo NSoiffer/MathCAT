@@ -242,7 +242,7 @@
       if: "$Verbosity!='Terse'"
       then: [{t: "the"}]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
-  - t: "of"      # phrase(the square root 'of' 25 equals 5)
+  - T: ""     # phrase(the square root 'of' 25 equals 5)
   - x: "*[2]"
 
 - name: limit
@@ -453,7 +453,7 @@
         - else_if: "$Verbosity='Terse'"
           then: [{spell: "'ln'"}]
           else: [{t: "natural log"}]      # phrase(the 'natural log' function is used in mathematics)
-      - t: "of"      # phrase(5 is the square root 'of' 25)
+      - T: ""     # phrase(5 is the square root 'of' 25)
       - pause: short
   - x: "*[3]"
 
