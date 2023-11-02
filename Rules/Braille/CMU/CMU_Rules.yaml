@@ -297,7 +297,7 @@
 -
   name: roman_numeral
   tag: mn
-  match: "@data-roman-numeral"
+  match: "@data-roman-numeral or contains(@intent, ':roman-numeral')"
   replace:
   # for uppercase, need to only have one as uppercase
   - x: "BrailleChars(., 'CMU', 1, 2)"
