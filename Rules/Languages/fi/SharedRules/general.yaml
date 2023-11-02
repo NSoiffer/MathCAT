@@ -218,7 +218,7 @@
   - x: "*[3]"
   - test:
       if: "following-sibling::*"
-      then: [{t: "of"}]      # phrase(the square root 'of' 25 equals 5)
+      then: [{T: ""}]      # phrase(the square root 'of' 25 equals 5)
 
 - name: bigop-under
   tag: large-op
@@ -232,7 +232,7 @@
   - x: "*[2]"
   - test:
       if: "following-sibling::*"
-      then: [{t: "of"}]      # phrase(the square root 'of' 25 equals 5)
+      then: [{T: ""}]      # phrase(the square root 'of' 25 equals 5)
 
 - name: largeop
   tag: mrow
