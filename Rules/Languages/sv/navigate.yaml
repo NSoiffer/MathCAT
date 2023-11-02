@@ -73,7 +73,7 @@
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
       then: [T: "basen"]              # phrase(the 'base' of the power)
-      else: [t: "subscript"]         # phrase(x with 'subscript' 2)
+      else: [T: "nedre index"]         # phrase(x with 'subscript' 2)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -84,7 +84,7 @@
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
       then: [T: "basen"]            # phrase(the 'base' of the power)
-      else: [t: "superscript"]     # phrase(x with 'superscript' 2)  # FIX: it would be better to use the word used when reading (power, exponent, ...)
+      else: [T: "övre index"]     # phrase(x with 'superscript' 2)  # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -96,8 +96,8 @@
     - if: "count($Child2D/preceding-sibling::*)=0"
       then: [T: "basen"]             # phrase(the 'base' of the power)
     - else_if: "count($Child2D/preceding-sibling::*)=1"
-      then: [t: "subscript"]        # phrase(x with 'subscript' 2)
-      else: [t: "superscript"]      # phrase(x with 'superscript' 2)  # FIX: it would be better to use the word used when reading (power, exponent, ...)
+      then: [T: "nedre index"]        # phrase(x with 'subscript' 2)
+      else: [T: "övre index"]      # phrase(x with 'superscript' 2)  # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -154,13 +154,13 @@
               then:
               - test:   # in postscripts -- base shifts by one
                   if: "$NumPrecedingSiblings mod 2 = 0"
-                  then: [t: "subscript"]       # phrase(x with 'subscript' 2)
-                  else: [t: "superscript"]     # phrase(x with 'superscript' 2)
+                  then: [T: "nedre index"]       # phrase(x with 'subscript' 2)
+                  else: [T: "övre index"]     # phrase(x with 'superscript' 2)
               else:
               - test:
                   if: "$NumPrecedingSiblings mod 2 = 0"
-                  then: [t: "superscript"]    # phrase(x with 'superscript' 2)
-                  else: [t: "subscript"]      # phrase(x with 'subscript' 2)
+                  then: [T: "övre index"]    # phrase(x with 'superscript' 2)
+                  else: [T: "nedre index"]      # phrase(x with 'subscript' 2)
           - pause: "medium"
 
 - name: into-or-out-of
@@ -528,11 +528,11 @@
           then:
           - test:
             - if: "$NavCommand = 'MoveStart'"
-              then: [t: "gå till början av uttrycket"]                  # phrase('move to start of math')
+              then: [T: "gå till start matematik"]                  # phrase('move to start of math')
             - else_if: "$NavCommand = 'MoveLineStart'"
               then: [T: "gå till början av raden"]                  # phrase('move to start of line')
             - else_if: "$NavCommand = 'MoveEnd'"
-              then: [t: "gå till slutet av uttrycket"]                    # phrase('move to end of math')
+              then: [T: "gå till slut matematik"]                    # phrase('move to end of math')
               else: [T: "gå till slutet av raden"] # "$NavCommand = 'MoveLineEnd'"  # phrase('move to end of line')
           - pause: "medium"
       - test:
@@ -709,7 +709,7 @@
           - test:
               if: "$NavVerbosity = 'Verbose'"
               then:
-              - t: "gå ner"                          # phrase('move down to the next row in the table)
+              - T: "gå ner"                          # phrase('move down to the next row in the table)
               - pause: short
           - test:
               if: "$NavVerbosity != 'Terse'"
@@ -805,7 +805,7 @@
           - test:
               if: "$NavVerbosity = 'Verbose'"
               then:
-              - t: "läs aktuellt innehåll"                         # phrase('read current entry' in the table)
+              - T: "läs aktuellt värde"                         # phrase('read current entry' in the table)
               - pause: medium
           - test:
               if: "$NavVerbosity != 'Terse'"
@@ -1168,7 +1168,7 @@
         - else_if: "$NavCommand = 'ReadNext'"
           then: [T: "läs"]                                  # phrase('read' next entry in table)     
           else: [T: "beskriv"]                              # phrase('describe' next entry in table)     
-      - t: "höger, slut på uttrycket"                              # phrase(move 'right, end of math')
+      - T: "höger, slut matematik"                              # phrase(move 'right, end of math')
       - pause: long
   - set_variables: [SpeakExpression: "'false'"]
 
@@ -1397,7 +1397,7 @@
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
   - "(self::m:math or name(EdgeNode(., 'left', 'math'))='math')"
   replace:
-  - t: "början av uttrycket"                                              # phrase('start of math')
+  - T: "start matematik"                                              # phrase('start of math')
   - pause: long
   - set_variables: [SpeakExpression: "'false'"]
 
@@ -1410,7 +1410,7 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
       then:
-      - t: "kan inte gå vänster, början av uttrycket"                      # phrase('cannot move left, start of math')
+      - T: "kan inte gå vänster, start matematik"                      # phrase('cannot move left, start of math')
       - pause: long
   - set_variables: [SpeakExpression: "'false'"]
 
@@ -1612,16 +1612,17 @@
   - test:
     - if: "$NavMode = 'Enhanced'"
       then:
-      - T: "tecken"                                                # phrase(a mathematical 'character')
+      - T: "teckenläge"                                                # phrase(a mathematical 'character')
       - set_variables: [NavMode: "'Character'", ReadZoomLevel: "1"]
     - else_if: "$NavMode = 'Character'"
       then:
-      - t: "enkelt"                                                   # phrase(a 'simple' way to do something)
+      - T: "förenklat läge"                                                   # phrase(a 'simple' way to do something)
       - set_variables: [NavMode: "'Simple'", ReadZoomLevel: "1"]
     - else:
-      - t: "förbättrat"                                                 # phrase(an 'enhanced' way to do something)
+      - T: "utökat läge"                                                 # phrase(an 'enhanced' way to do something)
       - set_variables: [NavMode: "'Enhanced'", ReadZoomLevel: "-1"]
-  - t: "användningsläge"                                                         # phrase(a simple 'mode' of use)
+  # - T: "läge"                                                        # phrase(a simple 'mode' of use)
+  # SWEDISH: Removed the ending "mode" string and added "läge" to the previous strings, for grammatical purposes.
   - pause: long
   - test:
     - if: "$NavMode != 'Enhanced'" # potentially need to zoom to the sibling
@@ -1637,16 +1638,17 @@
   - test:
     - if: "$NavMode = 'Enhanced'"
       then:
-      - t: "enkelt"                                                 # phrase(an 'simple' way to do something)
+      - T: "förenklat läge"                                                 # phrase(an 'simple' way to do something)
       - set_variables: [NavMode: "'Simple'", ReadZoomLevel: "1"]
     - else_if: "$NavMode = 'Character'"
       then:
-      - t: "förbättrat"                                               # phrase(an 'enhanced' way to do something)
+      - T: "utökat läge"                                               # phrase(an 'enhanced' way to do something)
       - set_variables: [NavMode: "'Enhanced'", ReadZoomLevel: "-1"]
     - else:
-      - T: "tecken"                                              # phrase(a mathematical 'character')
+      - T: "teckenläge"                                              # phrase(a mathematical 'character')
       - set_variables: [NavMode: "'Character'", ReadZoomLevel: "1"]
-  - t: "användningsläge"                                                       # phrase(a simple 'mode' of use)
+  # - T: "användningsläge"                                                       # phrase(a simple 'mode' of use)
+  # SWEDISH: Removed the ending "mode" string and added "läge" to the previous strings, for grammatical purposes.
   - pause: long
   - test:
     - if: "$NavMode != 'Enhanced'" # potentially need to zoom to the sibling
@@ -1662,10 +1664,10 @@
   - test:
       if: "$Overview = 'true'"
       then:
-      - t: "läs upp uttrycket efter navigering"                # phrase('speak expression after move')
+      - T: "läs upp uttryck efter navigering"                # phrase('speak expression after move')
       - set_variables: [Overview: "'false'"]
       else:
-      - t: "översikt över uttrycket efter navigering"          # phrase('overview of expression after move')
+      - T: "översikt över uttryck efter navigering"          # phrase('overview of expression after move')
       - set_variables: [Overview: "'true'"]
   - pause: long
 
@@ -1703,7 +1705,7 @@
           then: [T: "beskriv"]                              # phrase('describe' next entry in table)     
         - else_if: "starts-with($NavCommand, 'MoveTo')"
           then: [T: "gå till"]                              # phrase('move to' the next entry in table) 
-          else: [t: "ange"]                                   # phrase('set' the value of the next entry in table) 
+          else: [T: "ange"]                                   # phrase('set' the value of the next entry in table) 
       - T: "platshållare"                                     # phrase('placeholder' for the value)
       - x: "$PlaceMarkerIndex"
       - pause: long
@@ -1716,7 +1718,7 @@
   - test:
       if: "$NavVerbosity != 'Terse'"
       then:
-      - t: "ange platshållare"                                 # phrase('set placeholder' to the value) 
+      - T: "ange platshållare"                                 # phrase('set placeholder' to the value) 
       - x: "$PlaceMarkerIndex"
       - pause: long
   - set_variables: [NavNode: "@id"]
@@ -1750,11 +1752,11 @@
   - test:
       if: "$NavCommand = 'WhereAmI'"
       then:
-      - t: "inuti ingenting mer"                         # phrase('inside of nothing more') 
+      - T: "inget mer"                         # phrase('inside of nothing more') 
       - pause: long
       - set_variables: [SpeakExpression: "'false'"]
       else:
-      - t: "inuti"                                         # phrase('inside' a big expression) 
+      - T: "inne i"                                         # phrase('inside' a big expression) 
       - pause: medium
   - set_variables: [NavNode: "@id"]
 
@@ -1762,7 +1764,7 @@
   tag: "*"
   match: "$NavCommand = 'WhereAmI' or $NavCommand = 'WhereAmIAll'"
   replace:
-  - t: "inuti"                                           # phrase('inside' a big expression)
+  - T: "inne i"                                           # phrase('inside' a big expression)
   - pause: medium
   - test:
     - if: "$NavMode='Enhanced' and parent::*[self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"

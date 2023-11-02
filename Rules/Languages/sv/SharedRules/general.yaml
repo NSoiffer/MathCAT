@@ -189,15 +189,20 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - t: "sub"      # phrase(the subscripted variable a 'sub' i)
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: {T: "nedre index"}
+      else: {T: "nedsänkt"}
+  # - T: "nedsänkt"      # phrase(the subscripted variable a 'sub' i)
+  # SWEDISH: Added verbosity test for the start announcement.
   - x: "*[2]"
   - test:
       if: "DEBUG(not(IsNode(*[2],'leaf')))"
       then:
       - test:
           if: "$Verbosity='Verbose'"
-          then: {t: "slut subscript"}      # phrase(this is the 'end subscript' position)
-          else: {t: "slut sub"}      # phrase(this is the 'end sub' position)
+          then: {T: "slut nedre index"}      # phrase(this is the 'end subscript' position)
+          else: {T: "slut nedsänkt"}      # phrase(this is the 'end sub' position)
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -281,8 +286,8 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Terse'"
-        then: {t: "super"}            # phrase(this is a 'super' set of numbers)
-        else: {t: "superscript"}      # phrase(a 'superscript' number indicates raised to a power)
+        then: {T: "upphöjt"}            # phrase(this is a 'super' set of numbers)
+        else: {T: "övre index"}      # phrase(a 'superscript' number indicates raised to a power)
   - x: "*[2]"
   - pause: short
 
@@ -294,16 +299,16 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: {t: "subscript"}      # phrase(a 'subscript' may be used to indicate an index)
-      else: {t: "sub"}            # phrase(the result is 'sub' optimal)
+      then: {T: "nedre index"}      # phrase(a 'subscript' may be used to indicate an index)
+      else: {T: "nedsänkt"}            # phrase(the result is 'sub' optimal)
   - x: "*[2]"
   - test:
       if: "DEBUG(not(IsNode(*[2],'leaf')))"
       then:
       - test:
           if: "$Verbosity='Verbose'"
-          then: {t: "slut subscript"}      # phrase(this is the 'end subscript' position)
-          else: {t: "slutsub"}      # phrase(this is the 'end sub' position)
+          then: {T: "slut nedre index"}      # phrase(this is the 'end subscript' position)
+          else: {T: "slut nedsänkt"}      # phrase(this is the 'end sub' position)
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -312,8 +317,8 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Verbose'"
-        then: {t: "superscript"}      # phrase(a 'superscript' number indicates raised to a power)
-        else: {t: "super"}      # phrase(this is a 'super' set of numbers)
+        then: {T: "övre index"}      # phrase(a 'superscript' number indicates raised to a power)
+        else: {T: "upphöjt"}      # phrase(this is a 'super' set of numbers)
   - x: "*[3]"
   - pause: short
 
@@ -335,7 +340,7 @@
   - test:
       if: "$Verbosity='Terse'"
       then: {T: "cos"}      # phrase('cos' is the abbreviation for cosine)
-      else: {T: "kosinus"}      # phrase(find the 'cosine' in a right-angle triangle)
+      else: {T: "cosinus"}      # phrase(find the 'cosine' in a right-angle triangle)
 - name: tan
   tag: mi
   match: "text()='tan' or text()='tg'"
@@ -449,9 +454,9 @@
         then: [{spell: "'ln'"}]
         else: [{T: "naturliga logaritmen"}]      # phrase(the 'natural log' function is used in mathematics)
       else:
-      - test:
-          if: "$Verbosity!='Terse' and not(log_is_simple)"
-          then: {t: "the"}      # phrase('the' square root of 25 equals 5)
+      # - test:
+      #     if: "$Verbosity!='Terse' and not(log_is_simple)"
+      #     then: {t: "the"}      # phrase('the' square root of 25 equals 5)
       - test:
         - if: "*[1][text()='log']"
           then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
@@ -761,10 +766,10 @@
   - x: "*[2]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "subscript"}]      # phrase(H 'subscript' 2)
+      then: [{T: "nedre index"}]      # phrase(H 'subscript' 2)
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{t: "sub"}]      # phrase(H 'sub' 2)
+        then: [{T: "nedsänkt"}]      # phrase(H 'sub' 2)
   - x: "*[3]"
 
 - name: chemistry-msup
@@ -774,10 +779,10 @@
   - x: "*[2]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+      then: [{T: "övre index"}]      # phrase(H 'superscript' 2)
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{t: "super"}]      # phrase(H 'super' 2)
+        then: [{T: "upphöjt"}]      # phrase(H 'super' 2)
   - x: "*[3]"
   - test:
       if: "following-sibling::*[1][text()='+' or text()='-']" # a little lazy -- assumes chemistry superscripts end with + or -
@@ -805,10 +810,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+              then: [{T: "övre index"}]      # phrase(H 'superscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "super"}]      # phrase(H 'super' 2)
+                then: [{T: "upphöjt"}]      # phrase(H 'super' 2)
           - x: "$Prescripts[2]"
           - pause: "short"
       - test:
@@ -816,10 +821,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "subscript"}]      # phrase(a 'subscript' may be used to indicate an index)
+              then: [{T: "nedre index"}]      # phrase(a 'subscript' may be used to indicate an index)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "sub"}]      # phrase(here is a 'sub' total)
+                then: [{T: "nedsänkt"}]      # phrase(here is a 'sub' total)
           - x: "$Prescripts[1]"
           - pause: "short"
       - test:
@@ -830,10 +835,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+                  then: [{T: "övre index"}]      # phrase(H 'superscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "super"}]      # phrase(H 'super' 2)
+                    then: [{T: "upphöjt"}]      # phrase(H 'super' 2)
               - x: "$Prescripts[4]"
               - pause: "short"
           - test:
@@ -841,10 +846,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "subscript"}]      # phrase(H 'subscript' 2)
+                  then: [{T: "nedre index"}]      # phrase(H 'subscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "sub"}]      # phrase(H 'sub' 2)
+                    then: [{T: "nedsänkt"}]      # phrase(H 'sub' 2)
               - x: "$Prescripts[3]"
               - pause: "short"
   - x: "*[1]" # base
@@ -856,10 +861,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "subscript"}]      # phrase(phrase(H 'subscript' 2)
+              then: [{T: "nedre index"}]      # phrase(phrase(H 'subscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "sub"}]      # phrase(phrase(H 'sub' 2)
+                then: [{T: "nedsänkt"}]      # phrase(phrase(H 'sub' 2)
           - x: "$Postscripts[1]"
           - pause: "short"
       - test:
@@ -867,10 +872,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+              then: [{T: "övre index"}]      # phrase(H 'superscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "super"}]          # phrase(H 'super' 2)
+                then: [{T: "upphöjt"}]          # phrase(H 'super' 2)
           - x: "$Postscripts[2]"
           - pause: "short"
       - test:
@@ -881,10 +886,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "subscript"}]      # phrase(H 'subscript' 2)
+                  then: [{T: "nedre index"}]      # phrase(H 'subscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "sub"}]          # phrase(H 'sub' 2)
+                    then: [{T: "nedsänkt"}]          # phrase(H 'sub' 2)
               - x: "$Postscripts[3]"
               - pause: "short"
           - test:
@@ -892,10 +897,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+                  then: [{T: "övre index"}]      # phrase(H 'superscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "super"}]          # phrase(H 'super' 2)
+                    then: [{T: "upphöjt"}]          # phrase(H 'super' 2)
               - x: "$Postscripts[4]"
               - pause: "short"
           - test:
@@ -906,10 +911,10 @@
                   then:
                   - test:
                       if: "$Verbosity='Verbose'"
-                      then: [{t: "subscript"}]    # phrase(H 'subscript' 2)
+                      then: [{T: "nedre index"}]    # phrase(H 'subscript' 2)
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{t: "sub"}]        # phrase(H 'sub' 2)
+                        then: [{T: "nedsänkt"}]        # phrase(H 'sub' 2)
                   - x: "$Postscripts[5]"
                   - pause: "short"
               - test:
@@ -917,10 +922,10 @@
                   then:
                   - test:
                       if: "$Verbosity='Verbose'"
-                      then: [{t: "superscript"}]  # phrase(H 'superscript' 2)
+                      then: [{T: "övre index"}]  # phrase(H 'superscript' 2)
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{t: "super"}]      # phrase(H 'super' 2)
+                        then: [{T: "upphöjt"}]      # phrase(H 'super' 2)
                   - x: "$Postscripts[6]"
                   - pause: "short"
               - test:
@@ -931,10 +936,10 @@
                       then:
                       - test:
                           if: "$Verbosity='Verbose'"
-                          then: [{t: "subscript"}]      # phrase(H 'subscript' 2)
+                          then: [{T: "nedre index"}]      # phrase(H 'subscript' 2)
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{t: "sub"}]      # phrase(H 'sub' 2)
+                            then: [{T: "nedsänkt"}]      # phrase(H 'sub' 2)
                       - x: "$Postscripts[7]"
                       - pause: "short"
                   - test:
@@ -942,10 +947,10 @@
                       then:
                       - test:
                           if: "$Verbosity='Verbose'"
-                          then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+                          then: [{T: "övre index"}]      # phrase(H 'superscript' 2)
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{t: "super"}]      # phrase(H 'super' 2)
+                            then: [{T: "upphöjt"}]      # phrase(H 'super' 2)
                       - x: "$Postscripts[8]"
                       - pause: "short"
       - test:
@@ -1037,7 +1042,7 @@
   tag: none
   match: "../../*[self::m:chemical-formula or self::m:chemical-nuclide]"
   replace:
-  - t: "" # don't say anything
+  - T: "" # don't say anything
 
 - name: ignore-intent-wrapper
   tag: intent-wrapper

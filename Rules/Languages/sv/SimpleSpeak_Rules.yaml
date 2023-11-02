@@ -105,7 +105,7 @@
   - test:
       if: "not(IsNode(*[1],'leaf'))"
       then: [{pause: short}]
-  - t: "över"      # phrase(the fraction 3 'over' 4)
+  - T: "över"      # phrase(the fraction 3 'over' 4)
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then: [{pause: short}]

@@ -2,7 +2,7 @@
  - "a-z": 
     - test: 
         if: "$TTS='none'"
-        then: [t: "."]                            #  (en: '.', google translation)
+        then: [T: "."]                            #  (en: '.', google translation)
         else: [spell: "'.'"]                       
 
  # Capital letters are a little tricky: users can pick their favorite word (something that was requested) and 
@@ -29,7 +29,7 @@
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
         replace: [spell: "translate('.', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"]
 
- - "0-9": [t: "."]                               #  (en: '.', google: 'A')
+ - "0-9": [T: "."]                               #  (en: '.', google: 'A')
 
  - "!":                                          #  0x21
     - test:
@@ -44,23 +44,23 @@
  - "#": [T: "nummertecken"]                      #  0x23 (en: 'number', MathPlayer: 'numeriskt tecken', google: 'siffra')
  - "$": [T: "dollar"]                            #  0x24 (en: 'dollars')
  - "%": [T: "procent"]                           #  0x25 (en: 'percent')
- - "&": [t: "ampersand"]                         #  0x26 (en: 'ampersand')
+ - "&": [T: "och-tecken"]                         #  0x26 (en: 'ampersand')
  - "'": [T: "apostrof"]                          #  0x27 (en: 'apostrophe')
  - "(":                                          #  0x28
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [t: "öppna"]                   #  0x28 (en: 'open', google translation)
-            else: [T: "öppna parentes"]          #  0x28 (en: 'open paren')
+            then: [T: "start parentes"]                   #  0x28 (en: 'open', google translation)
+            else: [T: "vänster parentes"]          #  0x28 (en: 'open paren')
         else: [T: "vänster parentes"]            #  0x28 (en: 'left paren')
  - ")":                                          #  0x29
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [t: "stäng"]                   #  0x29 (en: 'close', google translation)
-            else: [T: "stäng parentes"]          #  0x29 (en: 'close paren')
+            then: [T: "slut parentes"]                   #  0x29 (en: 'close', google translation)
+            else: [T: "höger parentes"]          #  0x29 (en: 'close paren')
         else: [T: "höger parentes"]              #  0x29 (en: 'right paren')
 
  - "*":                                          #  0x2a
@@ -80,15 +80,15 @@
             - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
                # except if expression starts with '…'
             - "../*[1][text()='…'] "
-        then: [t: "kommatecken"]                 #  (en: 'comma', google translation)
+        then: [T: "komma"]                 #  (en: 'comma', google translation)
         # else silent
 
  - "-": [T: "minus"]                             #  0x2d
  - ".":                                          #  0x2e
     - test:
         if: "parent::*[1][self::m:mn]"
-        then: [t: "punkt"]                       #  (en: 'point', google translation)
-        else: [t: "punkt"]                       #  (en: 'dot')
+        then: [T: "punkt"]                       #  (en: 'point', google translation)
+        else: [T: "punkt"]                       #  (en: 'dot')
  - "/": [T: "delat med"]                         #  0x2f (en: 'divided by')
  - ":": [T: "kolon"]                             #  0x3a (en: 'colon')
  - ";": [T: "semikolon"]                         #  0x3b (en: 'semicolon')
@@ -138,7 +138,7 @@
           then: [T: "sådana att"]                #  (en: 'such that', google translation)
         - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
           then: [T: "givet"]                     #  (google translation)
-        - else: [t: "delar"]                     #  (en: 'divides')
+        - else: [T: "delar"]                     #  (en: 'divides')
 
  - "}":                                          #  0x7d
     - test:
@@ -194,7 +194,7 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "versal"]                  #  (en: 'cap', google translation)
+            then: [T: "versal"]                  #  (en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
@@ -261,8 +261,9 @@
  - "‴": [t: "tris"]                              #  0x2034 (en: 'triple prime')
 
  - "ℂℕℚℝℤ":                                      #  here we rely on this running through the table again to speak "cap xxx"
-    - t: "double-struck"                          #  (en: 'double-struck')
     - spell: "translate('.', 'ℂℕℚℝℤ', 'CNQRZ')"
+    - T: "med dubbelstreck"                          #  (en: 'double-struck')
+    # SWEDISH: Changed the order of words.
 
  - "℃": [T: "grader celsius"]                    #  0x2103 (en: 'degrees celsius')
  - "℉": [T: "grader fahrenheit"]                 #  0x2109 (en: 'degrees fahrenheit')
@@ -278,8 +279,8 @@
  - "K": [T: "grader kelvin"]                     #  0x212a (en: 'kelvin')
  - "Å": [T: "ångström"]                         #  0x212b
  - "ⅆⅇⅈⅉ":                                       #  0x2146-9
-    - t: "double-struck italic"                     #  (en: 'double-struck italic')
     - spell: "translate('.', 'ⅆⅇⅈⅉ', 'deij')"
+    - T: "med dubbelstreck kursiv"                     #  (en: 'double-struck italic')
 
  - "←": [T: "vänsterpil"]                    #  0x2190 (en: 'leftwards arrow')
  - "↑": [T: "uppåtpil"]                         #  0x2191 (en: 'upwards arrow')
