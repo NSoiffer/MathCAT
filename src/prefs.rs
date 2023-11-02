@@ -543,15 +543,16 @@ impl PreferenceManager {
         // rules_dir: is the root of the search
         //   to that we add the language dir(s)
         //   if file_name doesn't exist in the language dir(s), we try to find it in the default dir
+        //   the exception to this is if it ends with _Rules.yaml, we look for other _Rules.yaml files
         // returns all the locations of the file_name from Rules downward
 
         // start by trying to find a dir that exists
-        let mut lang_dir = PreferenceManager::get_language_dir(rules_dir, lang);
+        let mut lang_dir = get_language_dir(rules_dir, lang);
         let mut default_lang = default_lang;
         if lang_dir.is_none() {
             // try again with the default lang if there is one
             if default_lang.is_some() {
-                lang_dir = PreferenceManager::get_language_dir(rules_dir, default_lang.unwrap());
+                lang_dir = get_language_dir(rules_dir, default_lang.unwrap());
                 if lang_dir.is_none() {
                     // We are done for -- MathCAT can't do anything without the required files!
                     bail!("Wasn't able to find/read directory for language {}\n
@@ -571,7 +572,8 @@ impl PreferenceManager {
         //   found files are added starting at the end
         let mut result: Locations = [None, None, None];
         let mut i = 3;
-        for os_path in lang_dir.unwrap().ancestors() {
+        let lang_dir = lang_dir.unwrap();
+        for os_path in lang_dir.ancestors() {
             let path = PathBuf::from(os_path).join(file_name);
             if is_file_shim(&path) {
                 i -= 1;
@@ -588,9 +590,20 @@ impl PreferenceManager {
         }
 
         if let Some(default_lang) = default_lang {
-            // didn't find a file -- retry with default
-            // FIX: give a warning that default dir is being used
-            return PreferenceManager::get_files(rules_dir, default_lang, None, file_name);
+            if file_name.ends_with("_Rules.yaml") {
+                // try to find other style files
+                match get_fallback_speech_style(lang_dir.as_path()) {
+                    None => {
+                        // didn't find a file -- retry with default
+                        // FIX: give a warning that default dir is being used
+                        return PreferenceManager::get_files(rules_dir, default_lang, None, file_name);
+                    },
+                    Some(file_name) => {
+                        // found a speech style, retry with that
+                        return PreferenceManager::get_files(rules_dir, lang, Some(default_lang), &file_name);
+                    }
+                }
+            }
         }
         
         // We are done for -- MathCAT can't do anything without the required files!
@@ -598,25 +611,45 @@ impl PreferenceManager {
                Initially looked in there for language specific directory: {}\n\
                Looking for file: {}",
             rules_dir.to_str().unwrap(), lang, file_name);
-    }
 
-    fn get_language_dir(rules_dir: &Path, lang: &str) -> Option<PathBuf> {
-        // return 'Rules/Language/fr', 'Rules/Language/en/gb', etc, if they exist.
-        // fall back to main language, and then to default_dir if language dir doesn't exist
-        let mut full_path = rules_dir.to_path_buf();
-        let lang_parts = lang.split('-');
-        for part in lang_parts {
-            full_path.push(Path::new(part));
-            if !is_dir_shim(&full_path) {
-                break;
+        fn get_language_dir(rules_dir: &Path, lang: &str) -> Option<PathBuf> {
+            // return 'Rules/Language/fr', 'Rules/Language/en/gb', etc, if they exist.
+            // fall back to main language, and then to default_dir if language dir doesn't exist
+            let mut full_path = rules_dir.to_path_buf();
+            let lang_parts = lang.split('-');
+            for part in lang_parts {
+                full_path.push(Path::new(part));
+                if !is_dir_shim(&full_path) {
+                    break;
+                }
+            }
+    
+            // make sure something got added...
+            if rules_dir == full_path {
+                return None;    // didn't find a dir
+            } else {
+                return Some(full_path);
             }
         }
-
-        // make sure something got added...
-        if rules_dir == full_path {
-            return None;    // didn't find a dir
-        } else {
-            return Some(full_path);
+    
+        fn get_fallback_speech_style(lang_dir: &Path) -> Option<String> {
+            for os_path in lang_dir.ancestors() {
+                if os_path.ends_with("Rules") {
+                    return None;
+                }
+                let entries = match os_path.read_dir() {
+                    Err(_) => return None,          // I don't think this is possible
+                    Ok(os_path) => os_path,
+                };
+                for dir_entry in entries {
+                    if let Ok(entry) = dir_entry {
+                        if entry.file_name().to_str().unwrap_or("").ends_with("_Rules.yaml") {
+                            return Some(entry.file_name().to_str().unwrap().to_string());
+                        }
+                    }
+                }
+            }
+            return None;
         }
     }
     
