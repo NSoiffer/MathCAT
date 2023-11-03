@@ -80,7 +80,7 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [t: "基底"]              # phrase(the 'base' of the power)
+      then: [t: "基本"]              # phrase(the 'base' of the power)
       else: [t: "下標"]         # phrase(x with 'subscript' 2)
   - pause: "medium"
 
@@ -91,7 +91,7 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [t: "基底"]            # phrase(the 'base' of the power)
+      then: [t: "基本"]            # phrase(the 'base' of the power)
       else: [t: "上標"]     # phrase(x with 'superscript' 2)  # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
@@ -102,7 +102,7 @@
   - x: "$Move2D"
   - test:
     - if: "count($Child2D/preceding-sibling::*)=0"
-      then: [t: "基底"]             # phrase(the 'base' of the power)
+      then: [t: "基本"]             # phrase(the 'base' of the power)
     - else_if: "count($Child2D/preceding-sibling::*)=1"
       then: [t: "下標"]        # phrase(x with 'subscript' 2)
       else: [t: "上標"]      # phrase(x with 'superscript' 2)  # FIX: it would be better to use the word used when reading (power, exponent, ...)
@@ -115,8 +115,8 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [t: "基底"]          # phrase(the 'base' of the power)
-      else: [t: "下方"]   # phrase(the 'lower limit' of the function is zero)
+      then: [t: "基本"]          # phrase(the 'base' of the power)
+      else: [t: "下層"]   # phrase(the 'lower limit' of the function is zero)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -126,8 +126,8 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [t: "基底"]         # phrase(the 'base' of the power)
-      else: [t: "上方"]  # phrase(the 'upper limit' of the function is zero)
+      then: [t: "基本"]         # phrase(the 'base' of the power)
+      else: [t: "上層"]  # phrase(the 'upper limit' of the function is zero)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -137,10 +137,10 @@
   - x: "$Move2D"
   - test:
     - if: "count($Child2D/preceding-sibling::*)=0"
-      then: [t: "基底"]           # phrase(the 'base' of the power)
+      then: [t: "基本"]           # phrase(the 'base' of the power)
     - else_if: "count($Child2D/preceding-sibling::*)=1"
-      then: [t: "下方"]    # phrase(the 'lower limit' of the function is zero)
-      else: [t: "上方"]   # phrase(the 'upper limit' of the function is zero)
+      then: [t: "下層"]    # phrase(the 'lower limit' of the function is zero)
+      else: [t: "上層"]   # phrase(the 'upper limit' of the function is zero)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -157,7 +157,7 @@
           - x: "$Move2D"
           - test:
             - if: "$NumPrecedingSiblings=0"
-              then: [t: "基底"]                 # phrase(the 'base' of the power)
+              then: [t: "基本"]                 # phrase(the 'base' of the power)
             - else_if: "$Child2D/preceding-sibling::*[self::m:mprescripts]" # are we before mprescripts and hence are postscripts
               then:
               - test:   # in postscripts -- base shifts by one
@@ -635,7 +635,7 @@
           else:
           - set_variables: [NavNode: "preceding-sibling::*[1]/*[1]/@id"]
       else:
-      - t: "沒有前面的列"                 # phrase('no previous column' in the table)
+      - t: "沒有前一行"                 # phrase('no previous column' in the table)
       - set_variables: [SpeakExpression: "'false'"]
 
 - name: move-cell-next

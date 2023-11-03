@@ -1016,9 +1016,9 @@
     - else_if: ".='⇌' or .='⮖'"
       then: [{t: "左右平衡"}]      # phrase(a reactant 'is in equilibrium with' a product)
     - else_if: ".='⭴'"
-      then: [{t: "偏左平衡"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
+      then: [{t: "左倾平衡"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
     - else_if: ".='⭵'"
-      then: [{t: "偏右平衡"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
+      then: [{t: "右倾平衡"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
       else: [x: "."]
 
 - name: chemical-equation-operator

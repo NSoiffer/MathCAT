@@ -210,7 +210,7 @@
       if: "not(IsNode(*[1], 'leaf'))"
       then: [t: ""]      # phrase(phrase(x 'modified' with y above it)
   - x: "*[1]"
-  - t: "下方"      # phrase(x 'with' z below it)
+  - t: "下層"      # phrase(x 'with' z below it)
   - x: "*[2]"
   - t: ""      # phrase(x with z 'below' it)
 
@@ -231,7 +231,7 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [t: "上方"]     
+      then: [t: "上層"]     
   - x: "*[2]"
   - t: ""        # phrase(x modified 'with' y above it)
 
@@ -245,9 +245,9 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [t: "上方"]     
+      then: [t: "上層"]     
   - x: "*[2]"
-  - t: "下方"    # phrase(x modified with y 'below and' y above it)
+  - t: "下層"    # phrase(x modified with y 'below and' y above it)
   - x: "*[3]"
   - t: ""        # phrase(x modified with y 'above' it)
 
