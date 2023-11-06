@@ -49,16 +49,19 @@
       - else_if: "*[2][not(contains(., '.'))]"
         then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]        # phrase(the square 'root' of x)
       else:
-      - test:
-          if: "*[2][self::m:mi][string-length(.)=1]"
-          then:
-          - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-          else: [{x: "*[2]"}]
-      - T: "roten"        # phrase(the square 'root' of)
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [{T: "ur"}]        # phrase(the square root 'of' x)
+      # - test:
+      #     if: "*[2][self::m:mi][string-length(.)=1]"
+      #     then:
+      #     - x: "*[2]"
+      #     - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+      #     else: {x: "*[2]"}
+      - T: "roten av grad"      # phrase(the square 'root' of 36)
+      - x: "*[2]"
+  # - test:
+  #     if: "$Verbosity!='Terse'"
+  #     then: {T: "ur"}      # phrase(the square root 'of' 36)
+  # SWEDISH: Removed verbosity settings.
+  - T: "ur"      # phrase(the square root 'of' 36)
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
@@ -99,7 +102,7 @@
   tag: fraction
   match: "."
   replace:
-  - T: "bråk"      # phrase(the 'fraction' 3 over 4)
+  - T: "division"      # phrase(the 'fraction' 3 over 4)
   - pause: short
   - x: "*[1]"
   - test:
@@ -111,7 +114,7 @@
       then: [{pause: short}]
   - x: "*[2]"
   - pause: short
-  - T: "slut bråk"      # phrase(start 7 over 8 'end of fraction')
+  - T: "slut division"      # phrase(start 7 over 8 'end of fraction')
   - pause: medium
 
 # rules for functions raised to a power

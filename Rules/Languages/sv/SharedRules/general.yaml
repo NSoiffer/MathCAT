@@ -88,7 +88,11 @@
   replace:
   - x: "*[1]"
   - pause: auto
-  - T: "evaluerat vid"      # phrase(results were 'evaluated at' a given point)
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [T: "evaluerat då"]      # phrase(results were 'evaluated at' a given point)
+      else: [T: "då"]
+  # SWEDISH: Added a verbosity setting test to allow a shorter form.
   - pause: auto
   - x: "*[2]"
 
@@ -98,10 +102,18 @@
   replace:
   - x: "*[1]"
   - pause: auto
-  - T: "evaluerat vid"      # phrase(results were 'evaluated at' this point)
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [T: "evaluerat då"]      # phrase(results were 'evaluated at' a given point)
+      else: [T: "då"]
   - pause: auto
   - x: "*[3]"
-  - T: "minus samma uttryck evaluerat vid"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
+  - T: "minus samma uttryck"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [T: "evaluerat då"]      # phrase(results were 'evaluated at' a given point)
+      else: [T: "då"]
+  # SWEDISH: Added a verbosity setting test to allow a shorter form.
   - x: "*[2]"
 
 - name: binomial
@@ -449,8 +461,12 @@
       - if: "*[1][text()='log']"
         then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
       - else_if: "*[1][text()='lg']"
-        then: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
-      - else_if: "$Verbosity='Terse'"
+        then_test:
+        - if: "$Verbosity!='Verbose'"
+          then: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
+          else: [{T: "tiologaritmen"}]
+      # SWEDISH: We have added the term "lg" for the logarithm with base 10. Also added a verbosity test for long and short form.
+      - else_if: "$Verbosity!='Verbose'"
         then: [{spell: "'ln'"}]
         else: [{T: "naturliga logaritmen"}]      # phrase(the 'natural log' function is used in mathematics)
       else:

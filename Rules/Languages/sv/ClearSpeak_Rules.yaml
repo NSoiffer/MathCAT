@@ -68,19 +68,22 @@
         then: {T: "kvadratroten"}      # phrase(5 is the 'square root' of 25)
       - else_if: "*[2][text()='3']"
         then: {T: "kubikroten"}        # phrase(5 is the 'cube root' of 625)
-      - else_if: "*[2][not(contains(., ','))]"
+      - else_if: "*[2][not(contains(., ','))]"   # SWEDISH: Changed decimal point to comma.
         then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]      # phrase(the square 'root' of 25)
       else:
-      - test:
-          if: "*[2][self::m:mi][string-length(.)=1]"
-          then:
-          - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-          else: {x: "*[2]"}
-      - T: "roten"      # phrase(the square 'root' of 36)
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: {T: "ur"}      # phrase(the square root 'of' 36)
+      # - test:
+      #     if: "*[2][self::m:mi][string-length(.)=1]"
+      #     then:
+      #     - x: "*[2]"
+      #     - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+      #     else: {x: "*[2]"}
+      - T: "roten av grad"      # phrase(the square 'root' of 36)
+      - x: "*[2]"
+  # - test:
+  #     if: "$Verbosity!='Terse'"
+  #     then: {T: "ur"}      # phrase(the square root 'of' 36)
+  # SWEDISH: Removed verbosity settings.
+  - T: "ur"      # phrase(the square root 'of' 36)
   - x: "*[1]"
   - test:
       if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
@@ -190,7 +193,7 @@
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='OverEndFrac'"
       then:
       - pause: short
-      - T: "slut bråk"      # phrase(7 over 8 'end fraction')
+      - T: "slut division"      # phrase(7 over 8 'end fraction')
       - pause: short
 
 - name: default
@@ -200,9 +203,9 @@
   # - ot: "the"      # phrase(5 is 'the' square toot of 25)
   - test:
       if: "$Verbosity!='Terse'"
-      then: [T: "bråket med täljaren"]      # phrase(the 'fraction with numerator' 6)
+      then: [T: "division med täljaren"]      # phrase(the 'fraction with numerator' 6)
       else: 
-      - T: "bråk"
+      - T: "division"
       - pause: short
       - T: "täljare"
   - test:
@@ -220,7 +223,7 @@
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='GeneralEndFrac'"
       then:
       - pause: short
-      - T: "slut bråk"      # phrase(the fraction with 3 over 4 'end fraction')
+      - T: "slut division"      # phrase(the fraction with 3 over 4 'end fraction')
       - pause: short
 
 # rules for functions raised to a power
