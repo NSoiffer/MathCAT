@@ -259,6 +259,8 @@
           then: [t: "N⠐"]
         - else_if: "following-sibling::*[1][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]"
           then: [t: "𝐖"]
+        - else_if: "@data-added='missing-content'"
+          then: [t: "⠬"]       # omission
           else: [t: "W"]
  - ",":                        # 0x2c (Comma)
      - test:
