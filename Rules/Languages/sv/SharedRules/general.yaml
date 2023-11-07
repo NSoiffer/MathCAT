@@ -397,7 +397,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "hypersin"}                # phrase(the word 'sinch' is an abbreviation for hyperbolic sine)
+      then: {T: "sin hyp"}                # phrase(the word 'sinch' is an abbreviation for hyperbolic sine)
       else: {T: "sinus hyperbolicus"}      # phrase(the 'hyperbolic sine' is used in mathematics)
 - name: cosh
   tag: mi
@@ -406,8 +406,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "hypercos"}                  # phrase('cosh' is an abbreviation of hyperbolic cosine)
-      else: {T: "kosinus hyperbolicus"}      # phrase(the 'hyperbolic cosine' is a mathematical function)
+      then: {T: "cos hyp"}                  # phrase('cosh' is an abbreviation of hyperbolic cosine)
+      else: {T: "cosinus hyperbolicus"}      # phrase(the 'hyperbolic cosine' is a mathematical function)
 - name: tanh
   tag: mi
   match: "text()='tanh'"
@@ -415,7 +415,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "hypertan"}                  # phrase('tanch' is shorthand for hyperbolic tangent)
+      then: {T: "tan hyp"}                  # phrase('tanch' is shorthand for hyperbolic tangent)
       else: {T: "tangens hyperbolicus"}      # phrase('hyperbolic tangent' is a mathematical function)
 - name: sech
   tag: mi
@@ -424,7 +424,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "hypersec"}                   # phrase('sheck' is shorthand for hyperbolic secant)
+      then: {T: "sec hyp"}                   # phrase('sheck' is shorthand for hyperbolic secant)
       else: {T: "sekans hyperbolicus"}        # phrase('hyperbolic secant' is a mathematical function)
 - name: csch
   tag: mi
@@ -433,7 +433,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "hypercosec"}                   # phrase('cosheck' is shorthand for hyperbolic cosecant)
+      then: {T: "cosec hyp"}                   # phrase('cosheck' is shorthand for hyperbolic cosecant)
       else: {T: "cosekans hyperbolicus"}        # phrase('hyperbolic cosecant' is a mathematical function)
 - name: coth
   tag: mi
@@ -442,7 +442,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "hypercotan"}                  # phrase('cotanch' is shorthand for hyperbolic cotangent)
+      then: {T: "cotan hyp"}                  # phrase('cotanch' is shorthand for hyperbolic cotangent)
       else: {T: "cotangens hyperbolicus"}      # phrase(the 'hyperbolic cotangent' is a mathematical function)
 
 - # handle both log and ln

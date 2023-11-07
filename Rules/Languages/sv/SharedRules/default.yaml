@@ -103,7 +103,7 @@
       then: [{pause: short}]
   - x: "*[2]"
   - pause: short
-  - T: "slut bråk"          # phrase("start of fraction x over y 'end over'")
+  - T: "slut division"          # phrase("start of fraction x over y 'end over'")
   - pause: medium
 
 
@@ -480,10 +480,10 @@
   replace:
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
-      then: [T: "ruta", pause: short]      # phrase(the 'box' around the expression)
+      then: [T: "box", pause: short]      # phrase(the 'box' around the expression)
   - test:
       if: ".[contains(@notation,'roundedbox')]"
-      then: [T: "rundad ruta", pause: short]      # phrase(the 'round box' around the expression)
+      then: [T: "rundad box", pause: short]      # phrase(the 'round box' around the expression)
   - test:
       if: ".[contains(@notation,'circle')]"
       then: [T: "cirkel", pause: short]      # phrase(the 'circle' around the expression)
@@ -562,10 +562,10 @@
       then: [T: "dubbelriktad diagonal nedåtpil", pause: short]      # phrase(trend is indicated by the 'double ended down diagonal arrow')
   - test:
       if: ".[contains(@notation,'actuarial')]"
-      then: [t: "aktuariell symbol", pause: short]      # phrase(the 'actuarial symbol' represents a specific quantity)
+      then: [T: "aktuariell symbol", pause: short]      # phrase(the 'actuarial symbol' represents a specific quantity)
   - test:
       if: ".[contains(@notation,'madrub')]"
-      then: [t: "arabisk faktorsymbol", pause: short]      # phrase(the 'arabic factorial symbol' represents a factorial operation)
+      then: [T: "arabisk fakultet", pause: short]      # phrase(the 'arabic factorial symbol' represents a factorial operation)
   - test:
       if: ".[contains(@notation,'phasorangle')]"
       then: [T: "fasorvinkel", pause: short]      # phrase(the 'phasor angle' is used to measure electrical current)
@@ -655,8 +655,8 @@
   - pause: short
   - insert:
       nodes: "*"
-      replace: [T: "komma", pause: auto]      # phrase(f of x 'comma' y)
-      # SWEDISH: 'komma' eller 'och'?
+      replace: [T: "", pause: short]      # phrase(f of x 'comma' y)
+      # SWEDISH: After correspondance with a mathematician we have decided to not have any punctuation between variables, but a short pause. Length of pause needs to be tested.
 
 - name: default-text
   # unknown leaf -- just speak the text -- could be a literal intent
