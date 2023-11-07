@@ -11,7 +11,7 @@
   tag: mn
   match: "starts-with(text(), '-')"
   replace:
-  - t: "減"        # phrase(x 'minus' y)
+  - T: "減"        # phrase(x 'minus' y)
   - x: "translate(text(), '-_', '')"
 
 - name: default
@@ -20,36 +20,36 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: ""}    # phrase('the' square root of x)
-  - t: "根號"      # phrase(the 'square root' of x)
+      then: {T: ""}    # phrase('the' square root of x)
+  - T: "根號"      # phrase(the 'square root' of x)
   - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: ""}   # phrase(the square root 'of' x)
+      then: {T: ""}   # phrase(the square root 'of' x)
       else: {pause: short}
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{t: "結束根號"}, {pause: medium}]  # phrase(start the square root of x 'end of root')
+      else: [{T: "結束根號"}, {pause: medium}]  # phrase(start the square root of x 'end of root')
 
 - name: default
   tag: root
   match: "."
   replace:
-  - t: "根號"
+  - T: "根號"
   - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "的"}]        # phrase(the square root 'of' x)
+      then: [{T: "的"}]        # phrase(the square root 'of' x)
   - test:
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][text()='2']"
-        then: [{t: "平方根"}]        # phrase(the 'square root' of x)
+        then: [{T: "平方根"}]        # phrase(the 'square root' of x)
       - else_if: "*[2][text()='3']"
-        then: [{t: "立方根"}]        # phrase(the 'cube root' of x)
+        then: [{T: "立方根"}]        # phrase(the 'cube root' of x)
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "*[2]"}, {t: "次方根"}]        # phrase(the square 'root' of x)
+        then: [{x: "*[2]"}, {T: "次方根"}]        # phrase(the square 'root' of x)
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
@@ -57,7 +57,7 @@
           - x: "*[2]"
           #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: [{x: "*[2]"}]
-      - t: "次方根"        # phrase(the square 'root' of)
+      - T: "次方根"        # phrase(the square 'root' of)
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
@@ -85,7 +85,7 @@
   - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
   replace:
   - x: "*[2]"
-  - t: "分之"      # phrase(the fraction 3 'over' 4)
+  - T: "分之"      # phrase(the fraction 3 'over' 4)
   - x: "*[1]"
   #- pause: short
 
@@ -93,19 +93,19 @@
   tag: fraction
   match: "."
   replace:
-  - t: "分數"      # phrase(the 'fraction' 3 over 4)
+  - T: "分數"      # phrase(the 'fraction' 3 over 4)
   #- pause: short
   - x: "*[2]"
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then: [{pause: short}]
-  - t: "分之"      # phrase(the fraction 3 'over' 4)
+  - T: "分之"      # phrase(the fraction 3 'over' 4)
   - test:
       if: "not(IsNode(*[1],'leaf'))"
       then: [{pause: short}]
   - x: "*[1]"
   #- pause: short
-  - t: "結束分數"      # phrase(start 7 over 8 'end of fraction')
+  - T: "結束分數"      # phrase(start 7 over 8 'end of fraction')
   - pause: medium
 
 # rules for functions raised to a power
@@ -115,7 +115,7 @@
   tag: inverse-function
   match: "."
   replace:
-  - t: "反"      # phrase(the 'inverse' of f)
+  - T: "反"      # phrase(the 'inverse' of f)
   - x: "*[1]"
 
 - name: function-squared-or-cubed
@@ -128,8 +128,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {t: "平方"}      # phrase(5 'squared' equals 25)
-      else: {t: "立方"}      # phrase(5 'cubed' equals 125)
+      then: {T: "平方"}      # phrase(5 'squared' equals 25)
+      else: {T: "立方"}      # phrase(5 'cubed' equals 125)
 - name: function-power
   tag: power
   match:
@@ -137,15 +137,15 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: ""}      # # phrase('the' fourth power of 10)
+      then: {T: ""}      # # phrase('the' fourth power of 10)
   - bookmark: "*[2]/@id"
   - x: "*[1]"
-  - t: "的"
+  - T: "的"
   - test:
       if: "*[2][self::m:mn][not(contains(., '.'))]"
       then: [{x: "*[2]"}]
       else: [{x: "*[2]"}]
-  - t: "次方"      # phrase(the fourth 'power of' 2)
+  - T: "次方"      # phrase(the fourth 'power of' 2)
   - pause: short
 
 # non-function rules for power
@@ -157,20 +157,20 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {t: "平方"}      # phrase(5 'squared' equals 25)
-      else: {t: "立方"}      # phrase(5 'cubed' equals 125)
+      then: {T: "平方"}      # phrase(5 'squared' equals 25)
+      else: {T: "立方"}      # phrase(5 'cubed' equals 125)
 
 - name: simple-integer
   tag: power
   match: "*[2][self::m:mn][not(contains(., '.'))]"
   replace:
   - x: "*[1]"
-  - t: "的"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "的"      # phrase(15 raised 'to the' second power equals 225)
   - test:
       if: "*[2][.>0]"
       then: {x: "*[2]"}
       else: {x: "*[2]"}
-  - t: "次方"
+  - T: "次方"
 - name: simple-negative-integer
   tag: power
   match:
@@ -178,26 +178,26 @@
   - "     *[1][self::m:mn][not(contains(., '.'))]]"
   replace:
   - x: "*[1]"
-  - t: "的"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "的"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
-  - t: "次方"
+  - T: "次方"
 - name: simple-var
   tag: power
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  - t: "的"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "的"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
   #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-  - t: "次方"
+  - T: "次方"
 - name: simple
   tag: power
   match: "IsNode(*[2], 'leaf')"
   replace:
   - x: "*[1]"
-  - t: "的"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "的"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
-  - t: "次方"
+  - T: "次方"
 - name: nested
   # it won't end in "power" if the exponent is simple enough
   # FIX: not that important, but this misses the case where the nested exp is a negative integer (change test if this is fixed)
@@ -210,9 +210,9 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - t: "的"      # phrase(15 'raised to the' second power equals 225)
+  - T: "的"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
-  - t: "次方"
+  - T: "次方"
   #- pause: short
   #- t: "結束指數"      # phrase(start 2 raised to the exponent 4 'end of exponent')
 - name: default
@@ -220,9 +220,9 @@
   match: "."
   replace:
   - x: "*[1]"
-  - t: "的"      # phrase(15 'raised to the' second power equals 225)
+  - T: "的"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
-  - t: "次方"      # phrase(15 raised to the second 'power' equals 225)
+  - T: "次方"      # phrase(15 raised to the second 'power' equals 225)
 
 #
 # Some rules on mrows
@@ -236,22 +236,22 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: ""}      # phrase('the' empty set)
-      - t: "空集"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
+          then: {T: ""}      # phrase('the' empty set)
+      - T: "空集"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: ""}      # phrase('the' set of all integers)
-      - t: "集合"      # phrase(the 'set of all' positive integers less than 10)
+          then: {T: ""}      # phrase('the' set of all integers)
+      - T: "集合"      # phrase(the 'set of all' positive integers less than 10)
       - x: "*[1]/*[1]"
-      - t: "滿足"      # phrase(x 'such that' x is less than y)
+      - T: "滿足"      # phrase(x 'such that' x is less than y)
       - x: "*[1]/*[3]"
       else:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: ""}      # phrase('the' set of integers)
-      - t: "集合"      # phrase(here is a 'set' of numbers)
+          then: {T: ""}      # phrase('the' set of integers)
+      - T: "集合"      # phrase(here is a 'set' of numbers)
       - x: "*[1]"
 
 - name: times
@@ -274,7 +274,7 @@
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
-  - t: "乘"      # phrase(7 'times' 5 equals 35) 乘 的發音不正確
+  - T: "乘"      # phrase(7 'times' 5 equals 35) 乘 的發音不正確
 
 - name: no-say-parens
   tag: mrow

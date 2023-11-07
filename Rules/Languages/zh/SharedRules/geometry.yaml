@@ -7,12 +7,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "線段"      # phrase('the line segment from' A to B)
+      - T: "線段"      # phrase('the line segment from' A to B)
       - x: "*[1]"
-      - t: "到"                         # phrase(the line segment from A 'to' B)
+      - T: "到"                         # phrase(the line segment from A 'to' B)
       - x: "*[2]"
       else:
-      - t: "線段"               # phrase(the 'line segment' A  B)
+      - T: "線段"               # phrase(the 'line segment' A  B)
       - x: "*[1]"
       - x: "*[2]"
 
@@ -23,12 +23,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "射線"             # phrase('the ray from' A to B)
+      - T: "射線"             # phrase('the ray from' A to B)
       - x: "*[1]"
-      - t: "到"                       # phrase(the ray from A 'to' B)
+      - T: "到"                       # phrase(the ray from A 'to' B)
       - x: "*[2]"
       else:
-      - t: "射線"                      # phrase(the 'ray'A  B)
+      - T: "射線"                      # phrase(the 'ray'A  B)
       - x: "*[1]"
       - x: "*[2]"
 
@@ -38,8 +38,8 @@
   replace:
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: ""}]            # phrase('the' arc A B C)
-  - t: "弧"                        # phrase(the 'arc' A B C)
+      then: [{T: ""}]            # phrase('the' arc A B C)
+  - T: "弧"                        # phrase(the 'arc' A B C)
   - x: "*[1]"
   - x: "*[2]"
 
@@ -50,9 +50,9 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "角度的度量"      # phrase('the measure of the angle' ABC)
+      - T: "角度的度量"      # phrase('the measure of the angle' ABC)
       else:
-      - t: "角度的度量"      # phrase('measure of angle' ABC)
+      - T: "角度的度量"      # phrase('measure of angle' ABC)
   - x: "*[1]"
   - x: "*[2]"
   - x: "*[3]"
