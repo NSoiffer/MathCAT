@@ -429,6 +429,50 @@ fn example_3_4_2() {
 }
 
 #[test]
+fn omission_3_6_1() {
+    let expr = "<math><mn>3</mn><mo>+</mo><mn>7</mn><mo>=</mo><mo>&#x2014;</mo></math>";
+    test_braille("UEB", expr, "⠼⠉⠐⠖⠼⠛⠀⠐⠶⠀⠐⠠⠤");
+}
+
+#[test]
+fn omission_3_6_2() {
+    let expr = "<math><mn>3</mn><mo>+</mo><mn>7</mn><mo>=</mo><mi>_</mi></math>";
+    test_braille("UEB", expr, "⠼⠉⠐⠖⠼⠛⠀⠐⠶⠀⠨⠤");
+}
+
+#[test]
+fn omission_3_6_3() {
+    let expr = "<math><mn>3</mn><mo>+</mo><mn>7</mn><mo>=</mo><mo>?</mo></math>";
+    test_braille("UEB", expr, "⠼⠉⠐⠖⠼⠛⠀⠐⠶⠀⠰⠦");
+}
+
+#[test]
+fn omission_3_6_4() {
+    let expr = "<math><mn>3</mn><mo>&#x25A1;</mo><mn>7</mn><mo>=</mo><mn>10</mn></math>";
+    test_braille("UEB", expr, "⠼⠉⠫⠼⠙⠱⠼⠛⠀⠐⠶⠀⠼⠁⠚");
+}
+
+#[test]
+fn omission_3_6_5() {
+    let expr = "<math><mn>3</mn><mo>&#xA0;</mo><mo>&#xA0;</mo><mn>7</mn><mo>=</mo><mn>10</mn></math>";
+    test_braille("UEB", expr, "⠼⠉⠬⠼⠛⠀⠐⠶⠀⠼⠁⠚");
+}
+
+#[test]
+fn omission_3_6_6() {
+    // comes from WIRIS
+    let expr = "<math><mfrac><mn>9</mn><mn>12</mn></mfrac><mo>=</mo><mfrac><mn>3</mn><mrow/></mfrac></math>";
+    test_braille("UEB", expr, "⠼⠊⠌⠁⠃⠀⠐⠶⠀⠰⠷⠼⠉⠨⠌⠬⠾");
+}
+
+#[test]
+fn omission_3_6_7() {
+    // comes from MathType
+    let expr = "<math><mrow><mn>5</mn><mo>=</mo><msqrt><mrow/></msqrt></mrow></math>";
+    test_braille("UEB", expr, "⠼⠑⠀⠐⠶⠀⠰⠰⠩⠬⠬");
+}
+
+#[test]
 fn fraction_6_1_1() {
     let expr = "<math><mfrac><mn>5</mn><mn>8</mn></mfrac></math>";
     test_braille("UEB", expr, "⠼⠑⠌⠓");
