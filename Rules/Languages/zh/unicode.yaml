@@ -67,7 +67,7 @@
         if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"
         then_test:
             if: "$Verbosity = 'Terse'"
-            then: [t: "砰"]                      	#  0x21	(en: 'bang', google translation)
+            then: [t: "階乘"]                      	#  0x21	(en: 'bang', google translation)
             else: [t: "階乘"]                     	#  0x21	(en: 'exclamation point')
         else: [t: "階乘"]                         	#  0x21	(en: 'factorial')
           
@@ -181,10 +181,10 @@
  - " ":                                         	#  0xa0
     - test:
         if: "@data-empty-in-2D and ../../../../*[name(.)!='equations']"
-        then: [t: "空的"]                         	#  want to say something for fraction (etc) with empty child	(en: 'empty', google translation)
+        then: [t: "無"]                         	#  want to say something for fraction (etc) with empty child	(en: 'empty', google translation)
         else: [t: ""]                            
 
- - "¬": [t: "不是"]                               	#  0xac	(en: 'not', google translation)
+ - "¬": [t: "非"]                               	#  0xac	(en: 'not', google translation)
  - "°": [t: "度"]                               	#  0xb0	(en: 'degrees', google translation)
  - "±": [t: "加減"]                               	#  0xb1	(en: 'plus or minus')
  - "´": [t: "acute"]                               	#  0xb4	(en: 'acute', google translation)
@@ -242,7 +242,7 @@
  - "θ": [t: "theta"]                            	#  0x3b8	(en: 'theta')
  - "ι": [t: "iota"]                             	#  0x3b9	(en: 'iota')
  - "κ": [t: "kappa"]                            	#  0x3ba	(en: 'kappa')
- - "λ": [t: "lamda"]                            	#  0x3bb	(en: 'lambda')
+ - "λ": [t: "lambda"]                            	#  0x3bb	(en: 'lambda')
  - "μ": [t: "mu"]                               	#  0x3bc	(en: 'mu')
  - "ν": [t: "nu"]                               	#  0x3bd	(en: 'nu')
  - "ξ": [t: "xi"]                               	#  0x3be	(en: 'zai')
@@ -309,7 +309,7 @@
  - "K": [t: "kelvin"]                              	#  0x212a	(en: 'kelvin', google translation)
  - "Å": [t: "angstroms"]                           	#  0x212b	(en: 'angstroms', google translation)
  - "ⅆⅇⅈⅉ":                                      	#  0x2146-9
-    - t: "雙擊斜體"                                 	# 	(en: 'double-struck italic', google translation)
+    - t: "空心斜體"                                 	# 	(en: 'double-struck italic', google translation)
     - spell: "translate('.', 'ⅆⅇⅈⅉ', 'deij')"
 
  - "←": [t: "左箭頭"]                              	#  0x2190	(en: 'leftwards arrow', google translation)
@@ -415,7 +415,7 @@
  - "∐": [t: "餘積"]                             	#  0x2210	(en: 'co-product')
  - "∑": [t: "和"]                                	#  0x2211	(en: 'sum')
  - "−": [t: "減"]                                	#  0x2212	(en: 'minus')
- - "∓": [t: "正負號"]                              	#  0x2213	(en: 'minus or plus')
+ - "∓": [t: "減加號"]                              	#  0x2213	(en: 'minus or plus')
  - "∗": [t: "乘"]                               	#  0x2217	(en: 'times', google translation)
  - "∘": [t: "合成"]                               	#  0x2218	(en: 'composed with')
  - "√":                                         	#  0x221a
@@ -451,13 +451,13 @@
  - "∫": [t: "積分"]                               	#  0x222b	(en: 'integral')
  - "∬": [t: "雙重積分"]                             	#  0x222c	(en: 'double integral')
  - "∭": [t: "三重積分"]                             	#  0x222d	(en: 'triple integral')
- - "∮": [t: "線積分"]                             	#  0x222e	(en: 'contour integral')
+ - "∮": [t: "輪廓積分"]                             	#  0x222e	(en: 'contour integral')
  - "∶":                                         	#  0x2236
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: ""]                         	# 	(en: 'is', google translation)
      - t: "比"                                   	# 	(en: 'to')
- - "∷": [t: "比例"]                               	#  0x2237	(en: 'as')
+ - "∷": [t: "當成"]                               	#  0x2237	(en: 'as')
  - "∼": [t: "波浪符"]                              	#  0x223c	(en: 'varies with')
  - "∽": [t: "反波浪符"]                             #  0x223d	(en: 'reversed tilde')
  - "∾":                                         	#  0x223e

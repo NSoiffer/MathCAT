@@ -62,7 +62,7 @@
   tag: ms
   match: "."
   replace:
-  - t: "字符串"      # phrase('the string' is long)
+  - T: "字串"      # phrase('the string' is long)
   - pause: short
   - x: "text()"
 
@@ -113,16 +113,16 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [t: "這"]    # phrase("'the' root of x")
-  - t: "根符號"
+      then: [t: ""]    # phrase("'the' root of x")
+  - t: "根號"
   - test:
       if: "$Verbosity!='Terse'"
-      then: [t: "的"]    # phrase("the root 'of' x")
+      then: [t: ""]    # phrase("the root 'of' x")
   - x: "*[1]"
   - pause: short
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-      then: [t: "端根符號"] # phrase("root of x 'end root symbol'")
+      then: [t: "結束根號"] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
 - name: structure-default
@@ -131,19 +131,19 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [t: "這"]   # phrase("'the' root of x")
-  - t: "根符號"
-  - t: "使用索引"      # phrase("the root of x 'with index' 5")
+      then: [t: ""]   # phrase("'the' root of x")
+  - t: "根號"
+  - t: "開方次數"      # phrase("the root of x 'with index' 5")
   - x: "*[1]"
   - pause: short
   - test:
       if: "$Verbosity!='Terse'"
-      then: [t: "的"]   # phrase("the root 'of' x")
+      then: [t: ""]   # phrase("the root 'of' x")
   - x: "*[2]"
   - pause: short
   - test:
       if: "not(IsNode(*[2],'leaf'))"
-      then: [t: "端根符號"] # phrase("root of x 'end root symbol'")
+      then: [t: "結束根號"] # phrase("root of x 'end root symbol'")
 
 
 - name: simple-sub
@@ -196,11 +196,11 @@
           - x: "*[last()]"
           - test:
               if: "not(IsNode(*[last()], 'simple'))"
-              then: [t: "結束超級"]      # phrase(x super 2 'end of super')
+              then: [t: "結束上標"]      # phrase(x super 2 'end of super')
           else:
-          - t: "提高到"            # phrase(5 'raised to the' second power equals 25)
+          - t: "的"            # phrase(5 'raised to the' second power equals 25)
           - x: "*[last()]"
-          - t: "力量"                    # phrase(5 raised to the second 'power' equals 25)
+          - t: "次方"                    # phrase(5 raised to the second 'power' equals 25)
 
 - name: default
   tag: munder
@@ -245,9 +245,9 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [t: "上層"]     
+      then: [t: "下層"]     
   - x: "*[2]"
-  - t: "下層"    # phrase(x modified with y 'below and' y above it)
+  - t: "上層"    # phrase(x modified with y 'below and' y above it)
   - x: "*[3]"
   - t: ""        # phrase(x modified with y 'above' it)
 
@@ -332,7 +332,7 @@
                   then: [t: "且"]      # phrase(10 is greater than 8 'and' less than 15)
               - t: "有"      # phrase(substitute x 'with' y)
               - x: "count($Postscripts) div 2"
-              - t: "標記"      # phrase(this material includes several 'postscripts')
+              - t: "後標"      # phrase(this material includes several 'postscripts')
               - pause: short
           - test:
               if: "not($Postscripts[1][self::m:none])"
@@ -398,9 +398,9 @@
                       - test:
                           if: "count($Postscripts) > 8" # give up and just dump them out so at least the content is there
                           then:
-                          - t: "與交替標記"      # phrase(this situation involves complexities 'and alternating scripts')
+                          - t: "與交替後標"      # phrase(this situation involves complexities 'and alternating scripts')
                           - x: "$Postscripts[position() > 8]"
-                          - t: "結束標記"      # phrase(At this point 'end scripts' occurs)
+                          - t: "結束後標"      # phrase(At this point 'end scripts' occurs)
 
 - name: default
   tag: mtable
@@ -413,7 +413,7 @@
       if: count(*)=1
       then: [t: "列"]      # phrase(the table with 1 'row')
       else: [t: "列"]      # phrase(the table with 3 'rows')
-  - t: "和"      # phrase(the table with 3 rows 'and' 4 columns)
+  - t: "與"      # phrase(the table with 3 rows 'and' 4 columns)
   - x: "count(*[1]/*)"
   - test:
       if: "count(*[1]/*)=1"
@@ -487,17 +487,17 @@
       then: [t: "圓盒", pause: short]      # phrase(the 'round box' around the expression)
   - test:
       if: ".[contains(@notation,'circle')]"
-      then: [t: "圓圈", pause: short]      # phrase(the 'circle' around the expression)
+      then: [t: "圈圈", pause: short]      # phrase(the 'circle' around the expression)
   - test:
       if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or contains(concat(' ', normalize-space(@notation), ' '), ' right ') or contains(@notation,'top') or contains(@notation,'bottom') ]"
       then:
-      - t: "線路"      # phrase(draw a straight 'line' on the page)
+      - t: "線"      # phrase(draw a straight 'line' on the page)
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
           then: [t: "左邊", pause: short]      # phrase(line on 'left' of the expression)
       - test:
           if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"
-          then: [t: "正確的", pause: short]      # phrase(line on 'right' of the expression)
+          then: [t: "右邊", pause: short]      # phrase(line on 'right' of the expression)
       - test:
           if: ".[contains(@notation,'top')]"
           then: [t: "頂部", pause: short]      # phrase(line on 'top' of the expression)
@@ -509,20 +509,20 @@
       then:
       - test:
           if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
-          then: [spell: "'x'", pause: short] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+          then: [spell: "'叉叉'", pause: short] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
           else:
           - test:
               if: ".[contains(@notation,'updiagonalstrike')]"
-              then: [t: "向上對角線", pause: short]      # phrase(the line runs 'up diagonal')
+              then: [t: "右上對角線", pause: short]      # phrase(the line runs 'up diagonal')
           - test:
               if: ".[contains(@notation,'downdiagonalstrike')]"
-              then: [t: "向下對角線", pause: short]      # phrase(the line runs 'down diagonal')
+              then: [t: "右下對角線", pause: short]      # phrase(the line runs 'down diagonal')
       - test:
           if: ".[contains(@notation,'verticalstrike')]"
-          then: [t: "垂直的", pause: short]      # phrase(the line is  'vertical')
+          then: [t: "垂直", pause: short]      # phrase(the line is  'vertical')
       - test:
           if: ".[contains(@notation,'horizontalstrike')]"
-          then: [t: "水平的", pause: short]      # phrase(the line is 'horizontal')
+          then: [t: "水平", pause: short]      # phrase(the line is 'horizontal')
       - t: "劃掉"      # phrase(please 'cross out' the incorrect answer)
       - pause: short
   - test:
@@ -539,28 +539,28 @@
       then: [t: "右箭頭", pause: short]      # phrase(the 'right arrow' indicates moving forward)
   - test:
       if: ".[contains(@notation,'northeastarrow')]"
-      then: [t: "東北箭頭", pause: short]      # phrase(direction is indicated by the 'northeast arrow')
+      then: [t: "右上箭頭", pause: short]      # phrase(direction is indicated by the 'northeast arrow')
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
-      then: [t: "東南箭頭", pause: short]      # phrase(direction is shown by the 'southeast arrow')
+      then: [t: "右下箭頭", pause: short]      # phrase(direction is shown by the 'southeast arrow')
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
-      then: [t: "西南箭頭", pause: short]      # phrase(direction is shown by the 'southwest arrow')
+      then: [t: "左下箭頭", pause: short]      # phrase(direction is shown by the 'southwest arrow')
   - test:
       if: ".[contains(@notation,'northwestarrow')]"
-      then: [t: "西北箭頭", pause: short]      # phrase(direction is shown by the 'northwest arrow')
+      then: [t: "左上箭頭", pause: short]      # phrase(direction is shown by the 'northwest arrow')
   - test:
       if: ".[contains(@notation,'updownarrow')]"
-      then: [t: "雙端垂直箭頭", pause: short]      # phrase(upward movement is indicated by the 'double ended vertical arrow')
+      then: [t: "垂直上下箭頭", pause: short]      # phrase(upward movement is indicated by the 'double ended vertical arrow')
   - test:
       if: ".[contains(@notation,'leftrightarrow')]"
-      then: [t: "雙端水平箭頭", pause: short]      # phrase(progress is indicated by the 'double ended horizontal arrow')
+      then: [t: "水平左右箭頭", pause: short]      # phrase(progress is indicated by the 'double ended horizontal arrow')
   - test:
       if: ".[contains(@notation,'northeastsouthwestarrow')]"
-      then: [t: "雙最終取出對角線箭頭", pause: short]      # phrase(trend is indicated by the 'double ended up diagonal arrow')
+      then: [t: "左上兩端箭頭", pause: short]      # phrase(trend is indicated by the 'double ended up diagonal arrow')
   - test:
       if: ".[contains(@notation,'northwestsoutheastarrow')]"
-      then: [t: "雙端向下對角線箭頭", pause: short]      # phrase(trend is indicated by the 'double ended down diagonal arrow')
+      then: [t: "右下兩端箭頭", pause: short]      # phrase(trend is indicated by the 'double ended down diagonal arrow')
   - test:
       if: ".[contains(@notation,'actuarial')]"
       then: [t: "精算符號", pause: short]      # phrase(the 'actuarial symbol' represents a specific quantity)
@@ -572,18 +572,18 @@
       then: [t: "相角", pause: short]      # phrase(the 'phasor angle' is used to measure electrical current)
   - test:
       if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']" # default
-      then: [t: "長師符號", pause: short]      # phrase(the 'long division symbol' indicates  a long division calculation)
+      then: [t: "長除符號", pause: short]      # phrase(the 'long division symbol' indicates  a long division calculation)
   - test:
       if: ".[contains(@notation,'radical')]"
       then: [t: "平方根", pause: short]      # phrase(5 is the 'square root' of 25)
-  - t: "封閉"      # phrase(parentheses are 'enclosing' part of the equation)
+  - t: "圍住"      # phrase(parentheses are 'enclosing' part of the equation)
   - test:
       if: "*[self::m:mtext and text()=' ']"
-      then: [t: "空間"]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)
+      then: [t: "空白"]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
-      then: [t: "結束外殼"]      # phrase(reached the 'end enclosure' point)
+      then: [t: "結束圍住"]      # phrase(reached the 'end enclosure' point)
   - pause: short
 
 - name: semantics
@@ -603,7 +603,7 @@
   match: .
   replace:
   - x: "*[1]"
-  - t: "應用於"      # phrase(the function sine 'applied to' x plus y)
+  - t: "作用到"      # phrase(the function sine 'applied to' x plus y)
   - x: "*[2]"
 
 
@@ -652,7 +652,7 @@
   match: count(*)>0
   replace:
   - x: "translate(name(.), '-_', '  ')"
-  - t: "of"      # phrase(sine 'of' 5)
+  - t: ""      # phrase(sine 'of' 5)
   - pause: short
   - insert:
       nodes: "*"

@@ -538,10 +538,10 @@
             - if: "$NavCommand = 'MoveStart'"
               then: [t: "移至數學開頭"]                  # phrase('move to start of math')
             - else_if: "$NavCommand = 'MoveLineStart'"
-              then: [t: "移至行頭"]                  # phrase('move to start of line')
+              then: [t: "移至列頭"]                  # phrase('move to start of line')
             - else_if: "$NavCommand = 'MoveEnd'"
               then: [t: "移至數學結束"]                    # phrase('move to end of math')
-              else: [t: "移至行尾"] # "$NavCommand = 'MoveLineEnd'"  # phrase('move to end of line')
+              else: [t: "移至列尾"] # "$NavCommand = 'MoveLineEnd'"  # phrase('move to end of line')
           - pause: "medium"
       - test:
           if: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart'"
@@ -567,8 +567,8 @@
       then:
       - test:
           if: "$NavCommand = 'MoveLineStart'"
-          then: [t: "移至行頭"]                                # phrase('move to start of line')
-          else: [t: "移至行尾"] # "$NavCommand = 'MoveLineEnd'"  # phrase('move to end of line')
+          then: [t: "移至列頭"]                                # phrase('move to start of line')
+          else: [t: "移至列尾"] # "$NavCommand = 'MoveLineEnd'"  # phrase('move to end of line')
       - pause: "medium"
   - test:
       if: "self::m:mrow"
@@ -1627,7 +1627,7 @@
       - t: "簡單的"                                                   # phrase(a 'simple' way to do something)
       - set_variables: [NavMode: "'Simple'", ReadZoomLevel: "1"]
     - else:
-      - t: "增強"                                                 # phrase(an 'enhanced' way to do something)
+      - t: "增強的"                                                 # phrase(an 'enhanced' way to do something)
       - set_variables: [NavMode: "'Enhanced'", ReadZoomLevel: "-1"]
   - t: "模式"                                                         # phrase(a simple 'mode' of use)
   - pause: long
@@ -1649,7 +1649,7 @@
       - set_variables: [NavMode: "'Simple'", ReadZoomLevel: "1"]
     - else_if: "$NavMode = 'Character'"
       then:
-      - t: "增強"                                               # phrase(an 'enhanced' way to do something)
+      - t: "增強的"                                               # phrase(an 'enhanced' way to do something)
       - set_variables: [NavMode: "'Enhanced'", ReadZoomLevel: "-1"]
     - else:
       - t: "符號"                                              # phrase(a mathematical 'character')

@@ -7,16 +7,16 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "這"      # phrase('the' square root of 25 equals 5)
-  - t: "決定因素"      # phrase(the 'determinant' of a matrix)
+      - t: ""      # phrase('the' square root of 25 equals 5)
+  - t: "行列式"      # phrase(the 'determinant' of a matrix)
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "的"      # phrase(systems 'of' linear equations)
+      - t: ""      # phrase(systems 'of' linear equations)
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple'))"
-      then: [t: "結束決定因素"]      # phrase('end determinant' of a matrix)
+      then: [t: "結束行列式"]      # phrase('end determinant' of a matrix)
 
 - name: norm
   tag: norm

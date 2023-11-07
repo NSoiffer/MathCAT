@@ -168,7 +168,7 @@
       - t: ""      # phrase('the' square root of 25 equals 5)
   - t: "點"      # phrase(a decimal 'point' indicates the fraction component of a number)
   - x: "*[1]"
-  - t: "comma"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
+  - t: "逗號"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
   - x: "*[2]"
 
 - name: absolute-value
@@ -538,7 +538,7 @@
       if: "parent::m:equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
            count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']]) != 0"
       then:
-      - t: "下線"
+      - t: "下一列"
       else_test:
         if: "$LineCount != 1"
         then:
@@ -622,7 +622,7 @@
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
-      - t: "結尾"      # phrase('end' of matrix)
+      - t: "結束"      # phrase('end' of matrix)
       - test:
           if: $ClearSpeak_Matrix = 'EndVector'
           then: {t: "向量"}      # phrase(the 2 column 'vector')
@@ -644,7 +644,7 @@
   - x: "*" # select the rows (mtr)
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
-      then: [{t: "結束矩陣"}]      # phrase(the 'end of matrix' has been reached)
+      then: [{t: "結束"}]      # phrase(the 'end of matrix' has been reached)
 
 - name: 1x2-or-3-matrix
   tag: matrix
@@ -667,7 +667,7 @@
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
-      - t: "結尾"      # phrase(the 'end' of matrix has been reached)
+      - t: "結束"      # phrase(the 'end' of matrix has been reached)
       - test:
           if: $ClearSpeak_Matrix = 'EndMatrix'
           then: {t: "矩陣"}      # phrase(the 2 by 2 'matrix')
@@ -691,7 +691,7 @@
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
-      - t: "結尾"      # phrase(the 'end' of matrix has been reached)
+      - t: "結束"      # phrase(the 'end' of matrix has been reached)
       - test:
           if: $ClearSpeak_Matrix = 'EndMatrix'
           then: {t: "矩陣"}      # phrase(the 2 by 2 'matrix')
@@ -718,7 +718,7 @@
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
-      - t: "結尾"      # phrase(the 'end' of matrix has been reached)
+      - t: "結束"      # phrase(the 'end' of matrix has been reached)
       - test:
           if: "self::m:determinant"
           then: {t: "行列式"}      # phrase(the 2 by 2 'determinant')
@@ -742,7 +742,7 @@
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
-      - t: "結尾"      # phrase(the 'end' of matrix has been reached)
+      - t: "結束"      # phrase(the 'end' of matrix has been reached)
       - test:
           if: "self::m:determinant"
           then: {t: "行列式"}      # phrase(the 2 by 2 'determinant')
@@ -992,7 +992,7 @@
     - else_if: "text()='≡'"
       then: [{t: "三鍵"}]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
     - else_if: "text()='≣'"
-      then: [{t: "四鍵債券"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
+      then: [{t: "四鍵"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
       else: [{x: "text()"}]
 
 - name: chemical-formula-operator
@@ -1016,9 +1016,9 @@
     - else_if: ".='⇌' or .='⮖'"
       then: [{t: "左右平衡"}]      # phrase(a reactant 'is in equilibrium with' a product)
     - else_if: ".='⭴'"
-      then: [{t: "左倾平衡"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
+      then: [{t: "偏左平衡"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
     - else_if: ".='⭵'"
-      then: [{t: "右倾平衡"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
+      then: [{t: "偏右平衡"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
       else: [x: "."]
 
 - name: chemical-equation-operator
