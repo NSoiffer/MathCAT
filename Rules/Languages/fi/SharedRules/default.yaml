@@ -102,7 +102,7 @@
       then: [{pause: short}]
   - x: "*[2]"
   - pause: short
-  - T: "murtoluvun loppu"          # phrase("start of fraction x over y 'end over'")
+  - T: "murtoluku loppu"          # phrase("start of fraction x over y 'end over'")
   - pause: medium
 
 
@@ -114,7 +114,7 @@
   - test:
       if: "$Verbosity!='Terse'"
       then: [T: ""]    # phrase("'the' root of x")
-  - t: "root symbol"
+  - T: "juuri"
   - test:
       if: "$Verbosity!='Terse'"
       then: [T: ""]    # phrase("the root 'of' x")
@@ -122,7 +122,7 @@
   - pause: short
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-      then: [T: "juurimerkin loppu"] # phrase("root of x 'end root symbol'")
+      then: [T: "juuri loppu"] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
 - name: structure-default
@@ -132,8 +132,8 @@
   - test:
       if: "$Verbosity!='Terse'"
       then: [T: ""]   # phrase("'the' root of x")
-  - t: "root symbol"
-  - t: "x "      # phrase("the root of x 'with index' 5")
+  - T: "juuri"
+  - T: "indeksi"      # phrase("the root of x 'with index' 5")
   - x: "*[1]"
   - pause: short
   - test:
@@ -143,7 +143,7 @@
   - pause: short
   - test:
       if: "not(IsNode(*[2],'leaf'))"
-      then: [T: "juurimerkin loppu"] # phrase("root of x 'end root symbol'")
+      then: [T: "juuri loppu"] # phrase("root of x 'end root symbol'")
 
 
 - name: simple-sub
@@ -154,7 +154,7 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
-      then: [T: "alaindeksi"]      # phrase(x 'sub' 2)
+      then: [T: "ala"]      # phrase(x 'sub' 2)
   - x: "*[2]"
 
 - name: default
@@ -162,9 +162,9 @@
   match: "count(*)=2"
   replace:
   - x: "*[1]"
-  - T: "alaindeksi"               # phrase(x 'sub' 2)
+  - T: "ala"               # phrase(x 'sub' 2)
   - x: "*[2]"
-  - T: "alaindeksin loppu"           # phrase(x sub 2 'end of sub')
+  - T: "ala loppu"           # phrase(x sub 2 'end of sub')
   - pause: short
 
 
@@ -173,7 +173,7 @@
   match: "."
   replace:
   - x: "*[1]"
-  - T: "alaindeksi"              # phrase(x 'sub' 2)
+  - T: "ala"              # phrase(x 'sub' 2)
   - x: "*[2]"
 
 - name: structure
@@ -184,7 +184,7 @@
   - test:
       if: "name(.)='msubsup'"
       then:
-      - T: "alaindeksi"          # phrase(x 'sub' 2)
+      - T: "ala"          # phrase(x 'sub' 2)
       - x: "*[2]"
   - test:
       if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
@@ -192,11 +192,11 @@
       else_test:
           if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"  # FIX: is this test necessary?
           then:
-          - T: "yläindeksi"      # phrase(x 'super' 2)
+          - T: "ylä"      # phrase(x 'super' 2)
           - x: "*[last()]"
           - test:
               if: "not(IsNode(*[last()], 'simple'))"
-              then: [T: "yläindeksin loppu"]      # phrase(x super 2 'end of super')
+              then: [T: "ylä loppu"]      # phrase(x super 2 'end of super')
           else:
           - T: "korotettuna"            # phrase(5 'raised to the' second power equals 25)
           - x: "*[last()]"
@@ -208,11 +208,11 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [T: "modifioitu"]      # phrase(phrase(x 'modified' with y above it)
+      then: [T: ""]      # phrase(phrase(x 'modified' with y above it)
   - x: "*[1]"
-  - T: ""      # phrase(x 'with' z below it)
+  - T: "alapuolella"      # phrase(x 'with' z below it)
   - x: "*[2]"
-  - T: "alapuolella"      # phrase(x with z 'below' it)
+  - T: ""      # phrase(x with z 'below' it)
 
 - name: diacriticals
   tag: mover
@@ -227,11 +227,11 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [T: "modifioitu"]      # phrase(phrase(x 'modified' with y above it)
+      then: [T: ""]      # phrase(phrase(x 'modified' with y above it)
   - x: "*[1]"
-  - T: ""         # phrase(x modified 'with' y above it)
+  - T: "yläpuolella"         # phrase(x modified 'with' y above it)
   - x: "*[2]"
-  - T: "yläpuolella"        # phrase(x modified 'with' y above it)
+  - T: ""        # phrase(x modified 'with' y above it)
 
 - name: default
   tag: munderover
@@ -241,11 +241,11 @@
       if: "not(IsNode(*[1], 'leaf'))"
       then: [T: "muokattu"]      # phrase(the equation has been 'modified')
   - x: "*[1]"
-  - T: ""         # phrase(x modified 'with' y above it)
+  - T: "alapuolella ja"         # phrase(x modified 'with' y above it)
   - x: "*[2]"
-  - T: "alapuolella ja"    # phrase(x modified with y 'below and' y above it)
+  - T: "yläpuolella"    # phrase(x modified with y 'below and' y above it)
   - x: "*[3]"
-  - T: "yläpuolella"        # phrase(x modified with y 'above' it)
+  - T: ""        # phrase(x modified with y 'above' it)
 
 - name: default
   #   Here we support up to 2 prescripts and up to 4 postscripts -- that should cover all reasonable cases
@@ -274,7 +274,7 @@
               then:
               - T: ""      # phrase(substitute x 'with' y)
               - x: "count($Prescripts) div 2"
-              - t: "määräyksiä"      # phrase(in this equation certain 'prescripts' apply)
+              - T: "etumääre"      # phrase(in this equation certain 'prescripts' apply)
               - pause: short
           - test:
               if: "not($Prescripts[1][self::m:none])"
@@ -309,9 +309,9 @@
               - test:
                   if: "count($Prescripts) > 4" # give up and just dump them out so at least the content is there
                   then:
-                  - t: "and alternating prescripts"      # phrase(in this case there are values 'and alternating prescripts')
+                  - T: "ja vaihtelevat etumääreet"      # phrase(in this case there are values 'and alternating prescripts')
                   - x: "$Prescripts[position() > 4]"
-                  - t: "loppupäätöksiä"      # phrase(This is where 'end prescripts' occurs)
+                  - T: "etumääreet loppu"      # phrase(This is where 'end prescripts' occurs)
   - test:
       if: "$Postscripts"
       then:
@@ -328,7 +328,7 @@
                   then: [T: "ja"]      # phrase(10 is greater than 8 'and' less than 15)
               - T: "arvolla"      # phrase(substitute x 'with' y)
               - x: "count($Postscripts) div 2"
-              - t: "postscripts"      # phrase(this material includes several 'postscripts')
+              - T: "jälkikirjoitusta"      # phrase(this material includes several 'postscripts')
               - pause: short
           - test:
               if: "not($Postscripts[1][self::m:none])"
@@ -394,16 +394,16 @@
                       - test:
                           if: "count($Postscripts) > 8" # give up and just dump them out so at least the content is there
                           then:
-                          - t: "and alternating scripts"      # phrase(this situation involves complexities 'and alternating scripts')
+                          - T: "ja vaihtelevia määreitä"      # phrase(this situation involves complexities 'and alternating scripts')
                           - x: "$Postscripts[position() > 8]"
-                          - t: "end scripts"      # phrase(At this point 'end scripts' occurs)
+                          - T: "määreet loppu"      # phrase(At this point 'end scripts' occurs)
 
 - name: default
   tag: mtable
   variables: [IsColumnSilent: false()]
   match: "."
   replace:
-  - T: "taulukko, jossa on"      # phrase(the 'table with' 3 rows)
+  - T: "taulukko, jossa"      # phrase(the 'table with' 3 rows)
   - x: count(*)
   - test:
       if: count(*)=1
@@ -429,7 +429,7 @@
   - test:
       if: .[self::m:mlabeledtr]
       then:
-      - t: "otsikolla"      # phrase(the line 'with label' first equation)
+      - T: "merkinnällä"      # phrase(the line 'with label' first equation)
       - x: "*[1]/*"
       - pause: short
   - pause: medium
@@ -480,7 +480,7 @@
       then: [T: "laatikko", pause: short]      # phrase(the 'box' around the expression)
   - test:
       if: ".[contains(@notation,'roundedbox')]"
-      then: [T: "pyöreä laatikko", pause: short]      # phrase(the 'round box' around the expression)
+      then: [T: "pyöristetty laatikko", pause: short]      # phrase(the 'round box' around the expression)
   - test:
       if: ".[contains(@notation,'circle')]"
       then: [T: "ympyrä", pause: short]      # phrase(the 'circle' around the expression)
@@ -512,7 +512,7 @@
               then: [T: "ylös diagonaalisesti", pause: short]      # phrase(the line runs 'up diagonal')
           - test:
               if: ".[contains(@notation,'downdiagonalstrike')]"
-              then: [T: "alas diagnonaalisesti", pause: short]      # phrase(the line runs 'down diagonal')
+              then: [T: "alas diagonaalisesti", pause: short]      # phrase(the line runs 'down diagonal')
       - test:
           if: ".[contains(@notation,'verticalstrike')]"
           then: [T: "pystysuora", pause: short]      # phrase(the line is  'vertical')
@@ -523,37 +523,37 @@
       - pause: short
   - test:
       if: ".[contains(@notation,'uparrow')]"
-      then: [T: "ylöspäin osoittava nuoli", pause: short]      # phrase(direction is shown by the 'up arrow')
+      then: [T: "nuoli ylös", pause: short]      # phrase(direction is shown by the 'up arrow')
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
-      then: [T: "alaspäin osoittava nuoli", pause: short]      # phrase(the trend is shown by the 'down arrow')
+      then: [T: "nuoli alas", pause: short]      # phrase(the trend is shown by the 'down arrow')
   - test:
       if: ".[contains(@notation,'leftarrow')]"
-      then: [T: "vasemmalle osoittava nuoli", pause: short]      # phrase(the 'left arrow' indicates going back)
+      then: [T: "nuoli vasemmalle", pause: short]      # phrase(the 'left arrow' indicates going back)
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
-      then: [T: "oikealle osoittava nuoli", pause: short]      # phrase(the 'right arrow' indicates moving forward)
+      then: [T: "nuoli oikealle", pause: short]      # phrase(the 'right arrow' indicates moving forward)
   - test:
       if: ".[contains(@notation,'northeastarrow')]"
-      then: [T: "koilliseen osoittava nuoli", pause: short]      # phrase(direction is indicated by the 'northeast arrow')
+      then: [T: "nuoli oikealle ylös", pause: short]      # phrase(direction is indicated by the 'northeast arrow')
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
-      then: [T: "kaakkoon osoittava nuoli", pause: short]      # phrase(direction is shown by the 'southeast arrow')
+      then: [T: "nuoli oikealle alas", pause: short]      # phrase(direction is shown by the 'southeast arrow')
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
-      then: [T: "lounaaseen osoittava nuoli", pause: short]      # phrase(direction is shown by the 'southwest arrow')
+      then: [T: "nuoli vasemmalle alas", pause: short]      # phrase(direction is shown by the 'southwest arrow')
   - test:
       if: ".[contains(@notation,'northwestarrow')]"
-      then: [T: "luoteeseen osoittava nuoli", pause: short]      # phrase(direction is shown by the 'northwest arrow')
+      then: [T: "nuoli vasemmalle ylös", pause: short]      # phrase(direction is shown by the 'northwest arrow')
   - test:
       if: ".[contains(@notation,'updownarrow')]"
-      then: [T: "kaksipäinen pystysuora nuoli", pause: short]      # phrase(upward movement is indicated by the 'double ended vertical arrow')
+      then: [T: "nuoli ylös alas", pause: short]      # phrase(upward movement is indicated by the 'double ended vertical arrow')
   - test:
       if: ".[contains(@notation,'leftrightarrow')]"
-      then: [T: "kaksipäinen vaakasuora nuoli", pause: short]      # phrase(progress is indicated by the 'double ended horizontal arrow')
+      then: [T: "nuoli vasemmalle oikealle", pause: short]      # phrase(progress is indicated by the 'double ended horizontal arrow')
   - test:
       if: ".[contains(@notation,'northeastsouthwestarrow')]"
-      then: [T: "kaksipäinen diagonaalisesti ylös osoittava nuoli", pause: short]      # phrase(trend is indicated by the 'double ended up diagonal arrow')
+      then: [T: "nuoli ylös alas oikealle ylös", pause: short]      # phrase(trend is indicated by the 'double ended up diagonal arrow')
   - test:
       if: ".[contains(@notation,'northwestsoutheastarrow')]"
       then: [T: "kaksipäinen diagnonaalisesti alas osoittava nuoli", pause: short]      # phrase(trend is indicated by the 'double ended down diagonal arrow')
