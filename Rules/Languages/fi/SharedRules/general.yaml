@@ -12,8 +12,8 @@
   - bookmark: "*[2]/@id"
   - test:
     - if: "*[2][text()='+']"
-      then: [{T: "positiivisten"}]      # phrase(set of all 'positive' integers less than 10)
-      else: [{T: "negatiivisten"}]      # phrase(set of all 'negative' integers less than minus 10)
+      then: [{T: "positiiviset"}]      # phrase(set of all 'positive' integers less than 10)
+      else: [{T: "negatiiviset"}]      # phrase(set of all 'negative' integers less than minus 10)
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][text()='ℂ']"
@@ -80,7 +80,7 @@
   match: "."
   replace:
   - bookmark: "@id"
-  - T: "imaginääriosa"      # phrase('the imaginary part' is part of a complex number)
+  - T: "imaginaariosa"      # phrase('the imaginary part' is part of a complex number)
 
 # rules on scripted vertical bars ('evaluated at')
 - name: evaluated-at-2
@@ -89,7 +89,7 @@
   replace:
   - x: "*[1]"
   - pause: auto
-  - t: "evaluated at"      # phrase(results were 'evaluated at' a given point)
+  - T: "arvolla"      # phrase(results were 'evaluated at' a given point) # FI: might be different depending on the context
   - pause: auto
   - x: "*[2]"
 
@@ -99,10 +99,10 @@
   replace:
   - x: "*[1]"
   - pause: auto
-  - t: "evaluated at"      # phrase(results were 'evaluated at' this point)
+  - T: "arvolla"      # phrase(results were 'evaluated at' this point)
   - pause: auto
   - x: "*[3]"
-  - t: "minus the same expression evaluated at"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
+  - T: "miinus sama lauseke arvolla"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
   - x: "*[2]"
 
 - name: binomial
@@ -110,7 +110,7 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - T: "valita"      # phrase(you can 'choose' a number at random)
+  - T: "yli"      # phrase(you can 'choose' a number at random) # FI: what does the phrase mean? Translation now means '1 choose 2'
   - x: "*[2]"
 
 - name: permutation
@@ -118,7 +118,7 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[2]"
-  - T: "permutaatioita"      # phrase(the solution  involves several 'permutations of' values)
+  - T: "permutaatio"      # phrase(the solution  involves several 'permutations of' values)
   - x: "*[1]"
 
 - name: intervals
@@ -139,7 +139,7 @@
       - x: "*[2]"
       else:
       - x: "*[1]"
-      - T: "pilkkua"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
+      - T: "pilkku"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
       - x: "*[2]"
 
 - name: default-point
@@ -152,7 +152,7 @@
       - T: ""      # phrase('the' square root of 25 equals 5)
   - T: "piste"      # phrase(a decimal 'point' indicates the fraction component of a number)
   - x: "*[1]"
-  - T: "pilkkua"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
+  - T: "pilkku"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
   - x: "*[2]"
 
 - name: absolute-value
@@ -167,7 +167,7 @@
   - test:
       if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
       then: [{pause: short}]
-      else: [{pause: short}, {T: "itseisarvon lopun"}, {pause: short}]      # phrase(show 'end absolute value' position)
+      else: [{pause: short}, {T: "itseisarvo lopun"}, {pause: short}]      # phrase(show 'end absolute value' position)
 
 - name: negative
   tag: negative
@@ -182,7 +182,7 @@
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
   - bookmark: "./@id"
-  - T: "positiiviseen"      # phrase(multiplying two negatives results in a 'positive' number)
+  - T: "positiivinen"      # phrase(multiplying two negatives results in a 'positive' number)
   - x: "*[1]"
 
 - name: subscript
@@ -197,8 +197,8 @@
       then:
       - test:
           if: "$Verbosity='Verbose'"
-          then: {T: "alaindeksin lopun"}      # phrase(this is the 'end subscript' position)
-          else: {T: "alan lopun"}      # phrase(this is the 'end sub' position)
+          then: {T: "alaindeksi lopun"}      # phrase(this is the 'end subscript' position)
+          else: {T: "ala loppu"}      # phrase(this is the 'end sub' position)
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -228,7 +228,7 @@
       if: "$Verbosity!='Terse'"
       then: [{T: ""}]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
-  - T: "yli"      # phrase(2 'over' 3 equals two thirds)
+  - T: "per"      # phrase(2 'over' 3 equals two thirds)
   - x: "*[2]"
   - test:
       if: "following-sibling::*"
@@ -282,7 +282,7 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Terse'"
-        then: {t: "super"}      # phrase(this is a 'super' set of numbers)
+        then: {T: "yli"}      # phrase(this is a 'super' set of numbers) # FI: have to check the context
         else: {T: "yläindeksi"}      # phrase(a 'superscript' number indicates raised to a power)
   - x: "*[2]"
   - pause: short
@@ -296,15 +296,15 @@
   - test:
       if: "$Verbosity='Verbose'"
       then: {T: "alaindeksi"}      # phrase(a 'subscript' may be used to indicate an index)
-      else: {t: "sub"}      # phrase(the result is 'sub' optimal)
+      else: {T: "ala"}      # phrase(the result is 'sub' optimal)
   - x: "*[2]"
   - test:
       if: "DEBUG(not(IsNode(*[2],'leaf')))"
       then:
       - test:
           if: "$Verbosity='Verbose'"
-          then: {t: "end comption"}      # phrase(this is the 'end subscript' position)
-          else: {T: "alan loppu"}      # phrase(this is the 'end sub' position)
+          then: {T: "alaindeksi loppu"}      # phrase(this is the 'end subscript' position)
+          else: {T: "ala loppu"}      # phrase(this is the 'end sub' position)
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -313,8 +313,8 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Verbose'"
-        then: {t: "superscript"}      # phrase(a 'superscript' number indicates raised to a power)
-        else: {t: "super"}      # phrase(this is a 'super' set of numbers)
+        then: {T: "yläindeksi"}      # phrase(a 'superscript' number indicates raised to a power)
+        else: {T: "yli"}      # phrase(this is a 'super' set of numbers) # FI: does this mean "superset" or "superscript"?
   - x: "*[3]"
   - pause: short
 
@@ -331,7 +331,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "cos"}      # phrase('cos' is the abbreviation for cosine)
+      then: {T: "kos"}      # phrase('cos' is the abbreviation for cosine)
       else: {T: "kosini"}      # phrase(find the 'cosine' in a right-angle triangle)
 - name: tan
   tag: mi
@@ -340,7 +340,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "tangentti"}      # phrase(the 'tan' is the ratio of the opposite to the adjacent side of a right-angled triangle)
+      then: {T: "tan"}      # phrase(the 'tan' is the ratio of the opposite to the adjacent side of a right-angled triangle)
       else: {T: "tangentti"}      # phrase(a 'tangent' is a straight line that touches a curve)
 - name: sec
   tag: mi
@@ -358,8 +358,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "cosecant"}      # phrase(we will 'cosecant' a solution)
-      else: {t: "cosecant"}      # phrase(the 'cosecant' is the reciprocal of the secant)
+      then: {T: "kosekant"}      # phrase(we will 'cosecant' a solution)
+      else: {T: "kosekantti"}      # phrase(the 'cosecant' is the reciprocal of the secant)
 - name: cot
   tag: mi
   match: "text()='cot'"
@@ -367,7 +367,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "kotangentti"}      # phrase(find the 'cotangent' in a right-angle triangle)
+      then: {T: "kotan"}      # phrase(find the 'cotangent' in a right-angle triangle)
       else: {T: "kotangentti"}      # phrase(the 'cotangent' is the reciprocal of the tangent)
 
 - name: sinh
@@ -377,8 +377,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "sinch"}      # phrase(the word 'sinch' is an abbreviation for hyperbolic sine)
-      else: {T: "hyperbolista sinia"}      # phrase(the 'hyperbolic sine' is used in mathematics)
+      then: {T: "sinh"}      # phrase(the word 'sinch' is an abbreviation for hyperbolic sine) # FI: should listen to this
+      else: {T: "hyperbolinen sini"}      # phrase(the 'hyperbolic sine' is used in mathematics)
 - name: cosh
   tag: mi
   match: "text()='cosh'"
@@ -386,7 +386,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "cosh"}      # phrase('cosh' is an abbreviation of hyperbolic cosine)
+      then: {T: "kosh"}      # phrase('cosh' is an abbreviation of hyperbolic cosine)
       else: {T: "hyperbolinen kosini"}      # phrase(the 'hyperbolic cosine' is a mathematical function)
 - name: tanh
   tag: mi
@@ -395,7 +395,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "tanch"}      # phrase('tanch' is shorthand for hyperbolic tangent)
+      then: {T: "tanh"}      # phrase('tanch' is shorthand for hyperbolic tangent) # FI: have to listen to this
       else: {T: "hyperbolinen tangentti"}      # phrase('hyperbolic tangent' is a mathematical function)
 - name: sech
   tag: mi
@@ -404,8 +404,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "sheck"}      # phrase('sheck' is shorthand for hyperbolic secant)
-      else: {t: "hyperbolinen secant"}      # phrase('hyperbolic secant' is a mathematical function)
+      then: {T: "sekanth"}      # phrase('sheck' is shorthand for hyperbolic secant)
+      else: {T: "hyperbolinen sekantti"}      # phrase('hyperbolic secant' is a mathematical function)
 - name: csch
   tag: mi
   match: "text()='csch'"
@@ -413,8 +413,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "cosheck"}      # phrase('cosheck' is shorthand for hyperbolic cosecant)
-      else: {t: "hyperbolinen cosecant"}      # phrase('hyperbolic cosecant' is a mathematical function)
+      then: {T: "kosekanth"}      # phrase('cosheck' is shorthand for hyperbolic cosecant)
+      else: {T: "hyperbolinen kosekantti"}      # phrase('hyperbolic cosecant' is a mathematical function)
 - name: coth
   tag: mi
   match: "text()='coth'"
@@ -422,7 +422,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "cotanch"}      # phrase('cotanch' is shorthand for hyperbolic cotangent)
+      then: {T: "kotanh"}      # phrase('cotanch' is shorthand for hyperbolic cotangent)
       else: {T: "hyperbolinen kotangentti"}      # phrase(the 'hyperbolic cotangent' is a mathematical function)
 
 - # handle both log and ln
@@ -465,7 +465,7 @@
   - test:
       if: "$Verbosity!='Terse'"
       then: {T: ""}      # phrase('the' square root of 25 equals 5)
-  - T: "logaritmin kantaluku"      # phrase(the 'log base' is often base 10)
+  - T: "logaritmi kantaluku"      # phrase(the 'log base' is often base 10)
   - x: "*[1]"
 
 - name: log-base-power
@@ -476,7 +476,7 @@
   - test:
       if: "$Verbosity!='Terse'"
       then: {T: ""}      # phrase('the' square root of 25 equals 5)
-  - T: "logaritmin kantaluku"      # phrase(the 'log base' is often base 10)
+  - T: "logaritmi kantaluku"      # phrase(the 'log base' is often base 10)
   - x: "*[1]"
   - pause: medium
   - test:
@@ -485,9 +485,9 @@
       - else_if: "*[2][text()=3]"
         then: [T: "kuutio"]
         else:  # don't bother with special cases as this isn't likely to happen
-        - T: "korotettuna"      # phrase(x 'raised to the' second power)
+        - T: "korotettu"      # phrase(x 'raised to the' second power)
         - x: "*[2]"
-        - T: "potenssiin"      # phrase(x raised to the second 'power')
+        - T: "potenssi"      # phrase(x raised to the second 'power')
   - pause: short
 
 - name: multi-line
@@ -509,7 +509,7 @@
       else: [{T: "rivi"}]      # phrase(this is the first 'line' of three lines)
   - test:
     - if: "$LineCount != 1"
-      then: [{ct: "s"}] # plural
+      then: [{CT: "t"}] # plural # FI: more logic for different plurals, '-t' for now
   - pause: short
   - x: "*"
 
@@ -536,7 +536,7 @@
   - test:
       if: .[self::m:mlabeledtr]
       then:
-      - t: "tarralla"      # phrase(the diagram is complete 'with label')
+      - t: "merkinnällä"      # phrase(the diagram is complete 'with label')
       - x: "*[1]/*"
   - pause: medium
   - test:
@@ -573,14 +573,14 @@
   variables: [{IsColumnSilent: true()}]
   match: "count(*)=1 and *[self::m:mtr][count(*) = 1]"
   replace:
-  - ot: "the"      # phrase('the' 1 by 1 matrix M)
+  - OT: ""      # phrase('the' 1 by 1 matrix M)
   - T: "1 kertaa 1"      # phrase(the '1 by 1' matrix)
   - test:
       if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
       then: {T: "determinantti"}      # phrase(the 2 by 2 'determinant'))
       else: {T: "matriisi"}      # phrase(the 2 by 2 'matrix')
       
-  - t: "merkinnällä"      # phrase(the 2 by 2 matrix 'with entry' x)
+  - T: "merkinnällä"      # phrase(the 2 by 2 matrix 'with entry' x)
   - x: "*[1]/*"
 
 # simpler reading methods for smaller matrices if the entries are simple
@@ -605,7 +605,7 @@
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
-      - t: "loppu"      # phrase('end' of matrix)
+      - T: "loppu"      # phrase('end' of matrix)
       - test:
           if: $ClearSpeak_Matrix = 'EndVector'
           then: {T: "vektori"}      # phrase(the 2 column 'vector')
@@ -627,7 +627,7 @@
   - x: "*" # select the rows (mtr)
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
-      then: [{T: "matriisin loppu"}]      # phrase(the 'end of matrix' has been reached)
+      then: [{T: "matriisi loppu"}]      # phrase(the 'end of matrix' has been reached)
 
 - name: 1x2-or-3-matrix
   tag: matrix
@@ -643,14 +643,14 @@
   - T: "rivi"      # phrase(the 1 by 4 'row' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {t: "1"}      # phrase('the 1 by' 2 row 'vector')
-      else: {t: "1"}      # phrase('the 1 by' 2 'matrix')
+      then: {T: "1"}      # phrase('the 1 by' 2 row 'vector') # FI: what is the context?
+      else: {T: "1"}      # phrase('the 1 by' 2 'matrix')
   - pause: long
   - x: "*/*"
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
-      - T: "loppu"      # phrase(the 'end' of matrix has been reached)
+      - T: "loppu"      # phrase(the 'end' of matrix has been reached) # FI: maybe change logic?
       - test:
           if: $ClearSpeak_Matrix = 'EndMatrix'
           then: {T: "matriisi"}      # phrase(the 2 by 2 'matrix')
