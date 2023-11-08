@@ -62,7 +62,7 @@
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
       then: [T: "kuutiojuuri"]         # phrase(the cube 'root' of x)
-      else: [T: "juuri-indeksi"]       # phrase(the 'root index' of x is 3)
+      else: [T: "juuren indeksi"]       # phrase(the 'root index' of x is 3)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -306,18 +306,18 @@
     - if: "self::m:mtr or self::m:mlabeledtr"
       then:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[1]/*[1]"]   # phrase('in' the denominator)
+          variables: [Move2D: "'in'", Child2D: "*[1]/*[1]"]   # phrase('in' the denominator) # FI: should this be translated?
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/*[1]/@id"] # skip mtd
     - else_if: "*[1][self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]" # auto zoom
       then:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[1]/*[2]"]   # phrase('in' the denominator)
+          variables: [Move2D: "'in'", Child2D: "*[1]/*[2]"]   # phrase('in' the denominator) # FI: should this be translated?
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/*[2]/@id"] # skip mtd
       else:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[1]"]        # phrase('in' the denominator)
+          variables: [Move2D: "'in'", Child2D: "*[1]"]        # phrase('in' the denominator) # FI: should this be translated?
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/@id"]
 
@@ -329,7 +329,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [T: "zoomaa lähemmäs", pause: "long"]                   # phrase('zoom in')
   - with:
-      variables: [Move2D: "'in'", Child2D: "*[1]"]          # phrase('in' the denominator)
+      variables: [Move2D: "'in'", Child2D: "*[1]"]          # phrase('in' the denominator) # FI: should this be translated?
       replace: [x: "."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNextZoom'"]
@@ -343,7 +343,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [T: "zoomaa lähemmäs", pause: "long"]                 # phrase('zoom in')
   - with:
-      variables: [Move2D: "'in'", Child2D: "*[1]"]        # phrase('in' the denominator)
+      variables: [Move2D: "'in'", Child2D: "*[1]"]        # phrase('in' the denominator) # FI: should this be translated?
       replace: [x: "."]
   - test:
       if: "$NavMode='Character'"
@@ -369,7 +369,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [T: "täysi zoomaus lähemmäs", pause: "medium"]                 # phrase('zoom in all the way')
   - with:
-      variables: [Move2D: "'in'", Child2D: "*[1]"]              # phrase('in' the denominator)
+      variables: [Move2D: "'in'", Child2D: "*[1]"]              # phrase('in' the denominator) # FI: should this be translated?
       replace: [x: "."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1"]
@@ -426,7 +426,7 @@
   replace:
   # don't bother with MatchCounter since we only get here if > 1
   - with:
-      variables: [Move2D: "'in'", Child2D: "*[1]"]            # phrase('in' the denominator)
+      variables: [Move2D: "'in'", Child2D: "*[1]"]            # phrase('in' the denominator) # FI: should this be translated?
       replace: [x: "."]
   - test:
     - if: "count(*)> 1 or IsNode(., 'leaf') or self::m:msqrt or self::m:menclose"
@@ -443,12 +443,12 @@
       if: "$ReadZoomLevel >= DistanceFromLeaf(., false, $NavMode!='Character')"
       then:
       # - with:
-      #     variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]    # phrase('in' the denominator)
+      #     variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]    # phrase('in' the denominator) # FI: should this be translated?
       #     replace: [x: ".."]
       - set_variables: [NavNode: "@id"]
       else:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[1]"]                        # phrase('in' the denominator)
+          variables: [Move2D: "'in'", Child2D: "*[1]"]                        # phrase('in' the denominator) # FI: should this be translated?
           replace: [x: "."]
       - x: "*[1]"
 
@@ -462,12 +462,12 @@
       if: "$ReadZoomLevel >= DistanceFromLeaf(., true, $NavMode!='Character')"
       then:
       # - with:
-      #     variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]     # phrase('in' the denominator)
+      #     variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]     # phrase('in' the denominator) # FI: should this be translated?
       #     replace: [x: ".."]
       - set_variables: [NavNode: "@id"]
       else:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[last()]"]                     # phrase('in' the denominator)
+          variables: [Move2D: "'in'", Child2D: "*[last()]"]                     # phrase('in' the denominator) # FI: should this be translated?
           replace: [x: "."]
       - x: "*[last()]"
 
@@ -504,7 +504,7 @@
           then: [x: ".."] # auto-zoom: move out a level and retry
           else:
           - with:
-              variables: [Move2D: "'out of'", Child2D: "."]
+              variables: [Move2D: "'out of'", Child2D: "."] # FI: should this be translated?
               replace: [x: ".."]
           - test:
               if: "parent::m:mtd"
@@ -528,11 +528,11 @@
           then:
           - test:
             - if: "$NavCommand = 'MoveStart'"
-              then: [T: "siirry matematiikan alkuun"]                  # phrase('move to start of math')
+              then: [T: "siirry matematiikka alkuun"]                  # phrase('move to start of math')
             - else_if: "$NavCommand = 'MoveLineStart'"
               then: [T: "siirry rivin alkuun"]                  # phrase('move to start of line')
             - else_if: "$NavCommand = 'MoveEnd'"
-              then: [T: "siirry matematiikan loppuun"]                    # phrase('move to end of math')
+              then: [T: "siirry matematiikka loppuun"]                    # phrase('move to end of math')
               else: [T: "siirry rivin loppuun"] # "$NavCommand = 'MoveLineEnd'"  # phrase('move to end of line')
           - pause: "medium"
       - test:
@@ -709,7 +709,7 @@
           - test:
               if: "$NavVerbosity = 'Verbose'"
               then:
-              - T: "siirry alas"                          # phrase('move down to the next row in the table)
+              - T: "siirry alas"                          # phrase('move down' to the next row in the table)
               - pause: short
           - test:
               if: "$NavVerbosity != 'Terse'"
@@ -1079,7 +1079,7 @@
           then: [x: "$Following"]
           else:
           - with:
-              variables: [Move2D: "'in'", Child2D: "$Following"]        # phrase('in' the denominator)
+              variables: [Move2D: "'in'", Child2D: "$Following"]        # phrase('in' the denominator) # FI: should this be translated?
               replace: [x: ".."]
           - with:
               variables: [NavCommand: "'MoveNextZoom'"]
@@ -1101,7 +1101,7 @@
           then: [x: "$Preceding"]
           else:
           - with:
-              variables: [Move2D: "'in'", Child2D: "$Preceding"]          # phrase('in' the denominator)
+              variables: [Move2D: "'in'", Child2D: "$Preceding"]          # phrase('in' the denominator) # FI: should this be translated?
               replace: [x: ".."]
           - with:
               variables: [NavCommand: "'MovePreviousZoom'"]
@@ -1168,7 +1168,7 @@
         - else_if: "$NavCommand = 'ReadNext'"
           then: [T: "lukea"]                                  # phrase('read' next entry in table)     
           else: [T: "kuvailla"]                              # phrase('describe' next entry in table)     
-      - T: "oikealle, matematiikan loppu"                              # phrase(move 'right, end of math')
+      - T: "oikealle, matematiikka loppu"                              # phrase(move 'right, end of math') # FI: should there be a comma here?
       - pause: long
   - set_variables: [SpeakExpression: "'false'"]
 
@@ -1202,11 +1202,11 @@
           if: "following-sibling::*"
           then:
           - with:
-              variables: [Move2D: "'in'", Child2D: "."]             # phrase('in' the denominator)
+              variables: [Move2D: "'in'", Child2D: "."]             # phrase('in' the denominator) # FI: should this be translated?
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'out of'", Child2D: "."]
+              variables: [Move2D: "'out of'", Child2D: "."]         # FI: should this be translated?
               replace: [x: ".."]
       - test:
           if: "following-sibling::*"
@@ -1310,14 +1310,14 @@
       if: "preceding-sibling::* and following-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'out of'", Child2D: "."]
+          variables: [Move2D: "'out of'", Child2D: "."] # FI: should this be translated?
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
           replace: [x: "following-sibling::*[1]"]          # skip over 'none'
       else:
       - with:
-          variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]       # phrase('in' the denominator)
+          variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]       # phrase('in' the denominator) # FI: should this be translated?
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNextZoom'"]
@@ -1386,7 +1386,7 @@
       then:
       - T: "ei voi liikkua vasemmalle"                                   # phrase('cannot move left' in expression)
   - with:
-      variables: [Move2D: "'end of'", Child2D: "$EdgeNode/*[1]"]
+      variables: [Move2D: "'end of'", Child2D: "$EdgeNode/*[1]"]         # FI: should this be translated?
       replace: [x: "$EdgeNode"]
   - pause: long
 
@@ -1397,7 +1397,7 @@
   - "($NavCommand = 'MovePrevious' or $NavCommand = 'ReadPrevious' or $NavCommand = 'DescribePrevious') and"
   - "(self::m:math or name(EdgeNode(., 'left', 'math'))='math')"
   replace:
-  - T: "matematiikan alku"                                              # phrase('start of math')
+  - T: "matematiikka alku"                                              # phrase('start of math')
   - pause: long
   - set_variables: [SpeakExpression: "'false'"]
 
@@ -1410,7 +1410,7 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
       then:
-      - T: "ei voi liikkua vasemmalle, matematiikan alku"                      # phrase('cannot move left, start of math')
+      - T: "ei voi liikkua vasemmalle, matematiikka alku"                      # phrase('cannot move left, start of math')
       - pause: long
   - set_variables: [SpeakExpression: "'false'"]
 
@@ -1444,11 +1444,11 @@
           if: "preceding-sibling::*"
           then:
           - with:
-              variables: [Move2D: "'in'", Child2D: "."]             # phrase('in' the denominator)
+              variables: [Move2D: "'in'", Child2D: "."]             # phrase('in' the denominator) # FI: should this be translated?
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'out of'", Child2D: "."]
+              variables: [Move2D: "'out of'", Child2D: "."]         # FI: should this be translated?
               replace: [x: ".."]
       - test:
           if: "preceding-sibling::*"
@@ -1487,7 +1487,7 @@
       if: "not(parent::m:mrow)"
       then:
       - with:
-          variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]         # phrase('in' the denominator)
+          variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]         # phrase('in' the denominator) # FI: should this be translated?
           replace: [x: ".."]
   - set_variables: [NavNode: "preceding-sibling::*[1]/*[2]/@id"]
 
@@ -1555,7 +1555,7 @@
       if: "count(preceding-sibling::*) > 2 and preceding-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'out of'", Child2D: "."]
+          variables: [Move2D: "'out of'", Child2D: "."]           # FI: should this be translated?
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
@@ -1573,7 +1573,7 @@
           - T: "vasemmalle"                                            # phrase(move 'left')
           - pause: short
       - with:
-          variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]               # phrase('in' the denominator)
+          variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]               # phrase('in' the denominator) # FI: should this be translated?
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MovePreviousZoom'"]
@@ -1621,7 +1621,7 @@
     - else:
       - T: "parannettu"                                                 # phrase(an 'enhanced' way to do something)
       - set_variables: [NavMode: "'Enhanced'", ReadZoomLevel: "-1"]
-  - T: "tapa"                                                         # phrase(a simple 'mode' of use)
+  - T: "tila"                                                         # phrase(a simple 'mode' of use)
   - pause: long
   - test:
     - if: "$NavMode != 'Enhanced'" # potentially need to zoom to the sibling
@@ -1646,7 +1646,7 @@
     - else:
       - T: "merkki"                                              # phrase(a mathematical 'character')
       - set_variables: [NavMode: "'Character'", ReadZoomLevel: "1"]
-  - T: "tapa"                                                       # phrase(a simple 'mode' of use)
+  - T: "tila"                                                       # phrase(a simple 'mode' of use)
   - pause: long
   - test:
     - if: "$NavMode != 'Enhanced'" # potentially need to zoom to the sibling
@@ -1662,10 +1662,10 @@
   - test:
       if: "$Overview = 'true'"
       then:
-      - T: "puhu ilmaus liikkumisen jälkeen"                # phrase('speak expression after move')
+      - T: "puhu kaava liikkumisen jälkeen"                # phrase('speak expression after move')
       - set_variables: [Overview: "'false'"]
       else:
-      - T: "yleiskatsaus ilmauksesta liikkumisen jälkeen"          # phrase('overview of expression after move')
+      - T: "yleiskatsaus kaava liikkumisen jälkeen"          # phrase('overview of expression after move')
       - set_variables: [Overview: "'true'"]
   - pause: long
 
@@ -1704,7 +1704,7 @@
         - else_if: "starts-with($NavCommand, 'MoveTo')"
           then: [T: "siirry"]                              # phrase('move to' the next entry in table) 
           else: [T: "aseta"]                                   # phrase('set' the value of the next entry in table) 
-      - T: "paikkamerkki"                                     # phrase('placeholder' for the value)
+      - T: "paikanpitäjä"                                     # phrase('placeholder' for the value)
       - x: "$PlaceMarkerIndex"
       - pause: long
   - set_variables: [NavNode: "$PlaceMarker"]
@@ -1716,7 +1716,7 @@
   - test:
       if: "$NavVerbosity != 'Terse'"
       then:
-      - T: "aseta paikkamerkki"                                 # phrase('set placeholder' to the value) 
+      - T: "aseta paikanpitäjä"                                 # phrase('set placeholder' to the value) 
       - x: "$PlaceMarkerIndex"
       - pause: long
   - set_variables: [NavNode: "@id"]
