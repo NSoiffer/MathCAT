@@ -556,30 +556,30 @@
       then: [T: "nuoli ylös alas oikealle ylös", pause: short]      # phrase(trend is indicated by the 'double ended up diagonal arrow')
   - test:
       if: ".[contains(@notation,'northwestsoutheastarrow')]"
-      then: [T: "kaksipäinen diagnonaalisesti alas osoittava nuoli", pause: short]      # phrase(trend is indicated by the 'double ended down diagonal arrow')
+      then: [T: "nuoli ylös alas oikealle alas", pause: short]      # phrase(trend is indicated by the 'double ended down diagonal arrow')
   - test:
       if: ".[contains(@notation,'actuarial')]"
-      then: [t: "aktionaarinen symboli", pause: short]      # phrase(the 'actuarial symbol' represents a specific quantity)
+      then: [T: "kirjanpitosymboli", pause: short]      # phrase(the 'actuarial symbol' represents a specific quantity)
   - test:
       if: ".[contains(@notation,'madrub')]"
-      then: [t: "arabian tekijäsymboli", pause: short]      # phrase(the 'arabic factorial symbol' represents a factorial operation)
+      then: [T: "arabialainen kertoma", pause: short]      # phrase(the 'arabic factorial symbol' represents a factorial operation)
   - test:
       if: ".[contains(@notation,'phasorangle')]"
-      then: [t: "phasor angle", pause: short]      # phrase(the 'phasor angle' is used to measure electrical current)
+      then: [T: "vaihekulma", pause: short]      # phrase(the 'phasor angle' is used to measure electrical current) # FI: this might another meaning in Finnish strictly 'vaihekulma' is phase angle
   - test:
       if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']" # default
-      then: [T: "pitkä jakomerkki", pause: short]      # phrase(the 'long division symbol' indicates  a long division calculation)
+      then: [T: "jakokulma", pause: short]      # phrase(the 'long division symbol' indicates  a long division calculation)
   - test:
       if: ".[contains(@notation,'radical')]"
       then: [T: "neliöjuuri", pause: short]      # phrase(5 is the 'square root' of 25)
   - t: "sulkevat"      # phrase(parentheses are 'enclosing' part of the equation)
   - test:
       if: "*[self::m:mtext and text()=' ']"
-      then: [T: "tilaa"]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)
+      then: [T: "tyhjää tilaa"]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
-      then: [t: "end enclosure"]      # phrase(reached the 'end enclosure' point)
+      then: [t: "alue loppu"]      # phrase(reached the 'end enclosure' point) # FI: better translation?
   - pause: short
 
 - name: semantics
@@ -599,7 +599,7 @@
   match: .
   replace:
   - x: "*[1]"
-  - t: "sovelletaan"      # phrase(the function sine 'applied to' x plus y)
+  - T: "arvolla"      # phrase(the function sine 'applied to' x plus y) # FI: could also be 'sovelletaan'
   - x: "*[2]"
 
 
