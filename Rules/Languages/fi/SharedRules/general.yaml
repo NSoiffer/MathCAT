@@ -958,7 +958,7 @@
       then: [{T: "neste"}]      # phrase(water is a 'liquid')
     - else_if: ".='g'"
       then: [{T: "kaasu"}]      # phrase(hydrogen is a 'gas' )
-      else: [{t: "vesipitoinen"}]      # phrase(an 'aqueous' solution is contained in water)
+      else: [{T: "vesiliuoksessa"}]      # phrase(an 'aqueous' solution is contained in water)
   - pause: short
 
 - name: chemical-formula-operator-bond
@@ -999,9 +999,9 @@
     - else_if: ".='⇌' or .='⮖'"
       then: [{T: "on tasapainossa"}]      # phrase(a reactant 'is in equilibrium with' a product)
     - else_if: ".='⭴'"
-      then: [{t: "on tasapainossa, joka on puolueellinen vasemmalle"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
+      then: [{T: "on tasapainossa vasemmalle"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
     - else_if: ".='⭵'"
-      then: [{t: "on tasapainossa, joka on puolueellinen oikealle"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
+      then: [{T: "on tasapainossa oikealle"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
       else: [x: "."]
 
 - name: chemical-equation-operator
