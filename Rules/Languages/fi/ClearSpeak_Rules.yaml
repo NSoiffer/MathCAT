@@ -257,7 +257,7 @@
       then: [{x: "ToOrdinal(*[2])"}]
       else: [{x: "*[2]"}]
     # better way? The phrase in Finnish would be "luvun kuusi toinen potenssi" -> "number six's second power", refactor logic?
-  - T: "potenssi luvusta"      # phrase(the third 'power of' 6)
+  - T: "potenssi"      # phrase(the third 'power of' 6)
   - pause: short
   - x: "*[1]"
 
@@ -335,7 +335,7 @@
   - x: "*[1]"
   - T: "korotettu"     # phrase(3 raised 'to the' power 7)
   - x: "*[2]"
-  - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+  # - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}] # FI: no need to pronounce
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
       then: [{T: "potenssiin"}]      # phrase(2 raised to the 'power' 7)
@@ -363,9 +363,9 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - T: "korotettuna"      # phrase(x 'raised to the' second power)
+  - T: "korotettuna potenssiin"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  - T: "potenssiin"      # phrase(x raised to the second 'power')
+  # - T: "potenssiin"      # phrase(x raised to the second 'power')
 
 - # - [xxx]^n
   name: nested-negative-squared-or-cubed
@@ -384,9 +384,9 @@
   - "     ]"
   replace:
   - x: "*[1]"
-  - T: "korotettuna"      # phrase(x 'raised to the' second power)
+  - T: "korotettuna potenssiin"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  - T: "potenssiin"      # phrase(x raised to the second 'power')
+  # - T: "potenssiin"      # phrase(x raised to the second 'power')
 
 - # [xxx] var^n
   name: nested-var-squared-or-cubed
@@ -407,9 +407,9 @@
   - "      ]"
   replace:
   - x: "*[1]"
-  - T: "korotettuna"      # phrase(x 'raised to the' second power)
+  - T: "korotettuna potenssiin"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  - T: "potenssiin"      # phrase(x raised to the second 'power')
+  # - T: "potenssiin"      # phrase(x raised to the second 'power')
 
 - # -[xxx] var^n
   name: nested-negative-var-squared-or-cubed
@@ -432,9 +432,9 @@
   - "      ]"
   replace:
   - x: "*[1]"
-  - T: "korotettuna"      # phrase(x 'raised to the' second power)
+  - T: "korotettuna potenssiin"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  - T: "potenssiin"      # phrase(x raised to the second 'power')
+  # - T: "potenssiin"      # phrase(x raised to the second 'power')
 
 - name: default-exponent-power
   tag: power
@@ -442,20 +442,20 @@
   - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
   replace:
   - x: "*[1]"
-  - T: "korotettu potenssiin"      # phrase(x is 'raised to the exponent')
+  - T: "korotettuna potenssiin"      # phrase(x is 'raised to the exponent')
   - pause: short
   - x: "*[2]"
   - pause: short
-  - T: "loppu potenssi"      # phrase(and now 'end exponent' has been reached)
+  - T: "potenssi loppu"      # phrase(and now 'end exponent' has been reached)
 
 - name: default
   tag: power
   match: "."
   replace:
   - x: "*[1]"
-  - T: "korotettuna"      # phrase(x 'raised to the' second power)
+  - T: "korotettuna potenssiin"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  - T: "potenssiin"      # phrase(x raised to the second 'power')
+  # - T: "potenssiin"      # phrase(x raised to the second 'power')
 
 #
 # Some rules on mrows
@@ -646,7 +646,7 @@
           # else 'None -- don't say anything'
       - test:
         - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-          then: [{CT: "t"}] # plural      # phrase(shown by the letter 's') # new logic needed for Finnish
+          then: [{CT: "t"}] # plural      # phrase(shown by the letter 's') # FI: new logic needed for Finnish
       - pause: short
   - x: "*"
 
@@ -666,7 +666,7 @@
     - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
       then: [{T: "rivillä"}]      # phrase(the values on the top 'row' are relevant)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
-      then: [{T: "vaihe"}]      # phrase(this is a 'step' by step process) # new logic needed for Finnish
+      then: [{T: "vaihe"}]      # phrase(this is a 'step' by step process) # FI: new logic needed for Finnish
       # else 'None -- don't say anything'
   - test:
       if: "$ClearSpeak_MultiLineLabel != 'None'"
