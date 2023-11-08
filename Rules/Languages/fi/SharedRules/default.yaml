@@ -82,7 +82,7 @@
   - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
   replace:
   - x: "*[1]"
-  - T: "yli"               # phrase("the fraction x 'over' y")
+  - T: "per"               # phrase("the fraction x 'over' y")
   - x: "*[2]"
   - pause: short
 
@@ -96,7 +96,7 @@
   - test:
       if: "not(IsNode(*[1],'leaf'))"
       then: [{pause: short}]
-  - T: "yli"               # phrase("the fraction x 'over' y")
+  - T: "per"               # phrase("the fraction x 'over' y")
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then: [{pause: short}]
