@@ -464,7 +464,7 @@
   name: ClearSpeak-absolute-value
   tag: absolute-value
   match: "."
-  variables: [{WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'cardinality', 'absolute value')"}]
+  variables: [{WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Kardinaliteetti', 'kardinaliteetti', 'itseisarvo')"}]
   replace:
   - test:
       if: "$Verbosity!='Terse'"
