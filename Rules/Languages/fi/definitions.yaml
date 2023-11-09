@@ -70,9 +70,14 @@
          "", "kymmenes", "kahdeskymmenes", "kolmaskymmenes", "neljäskymmenes", "viideskymmenes", "kuudeskymmenes", "seitsemäskymmenes", "kahdeksaskymmenes", "yhdeksäskymmenes"
     ],
 
-     # translation is weird, are these used in Finnish that much?
+#      # translation is weird, are these used in Finnish that much?
+#     NumbersOrdinalPluralTens: [
+#          "", "kymmenennet", "kahdetkymmenennet", "kolmetkymmenennet", "neljätkymmenennet", "viidetkymmenennet", "kuudetkymmenennet", "seitsemätkymmenennet", "kahdeksatkymmenennet", "yhdeksätkymmenennet"
+#     ],
+
+ # FI: assuming that these are only used in fractions
     NumbersOrdinalPluralTens: [
-         "", "kymmenennet", "kahdetkymmenennet", "kolmetkymmenennet", "neljätkymmenennet", "viidetkymmenennet", "kuudetkymmenennet", "seitsemätkymmenennet", "kahdeksatkymmenennet", "yhdeksätkymmenennet"
+         "", "kymmenesosaa", "kahdeskymmenesosaa", "kolmaskymmenesosaa", "neljäskymmenesosaa", "viideskymmenesosaa", "kuudeskymmenesosaa", "seitsemäskymmenesosaa", "kahdesaskymmenesosaa", "yhdeksäskymmenesosaa"
     ],
 
 
