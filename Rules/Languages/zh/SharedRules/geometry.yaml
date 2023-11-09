@@ -23,12 +23,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - T: "射線"             # phrase('the ray from' A to B)
+      - T: "向量"             # phrase('the ray from' A to B)
       - x: "*[1]"
       - T: "到"                       # phrase(the ray from A 'to' B)
       - x: "*[2]"
       else:
-      - T: "射線"                      # phrase(the 'ray'A  B)
+      - T: "向量"                      # phrase(the 'ray'A  B)
       - x: "*[1]"
       - x: "*[2]"
 

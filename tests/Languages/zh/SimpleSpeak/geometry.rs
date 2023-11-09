@@ -23,5 +23,5 @@ fn arc_mtext() {
 #[test]
 fn ray_mtext() {
   let expr = "<math> <mover><mtext>XY</mtext><mo>→</mo></mover> </math>";
-  test("zh", "SimpleSpeak", expr, "射線 大寫 x 大寫 y");
+  test("zh", "SimpleSpeak", expr, "向量 大寫 x 大寫 y");
 }
