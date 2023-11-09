@@ -119,10 +119,16 @@ NumbersOrdinalPluralHundreds: [
         "triljoonas", "tuhannes triljoonas", "kvadriljoonas", "tuhannes kvadriljoonas", "kvintiljoonas"
     ],
       
-     # confusing, I don't get it
+#      # confusing, I don't get it
+#     NumbersOrdinalPluralLarge: [
+#          "", "tuhannet", "miljoonannet", "miljardinnet", "tuhannet biljoonannet", "kvadriljoonasosat",
+#          "miljoonasosat", "kuusimiljoonasosat", "septimiljardisosat", "oktilliososat", "ei-miljoonasosat"
+#     ]
+
+         # confusing, I don't get it
     NumbersOrdinalPluralLarge: [
-         "", "tuhannet", "miljoonannet", "miljardinnet", "tuhannet biljoonannet", "kvadriljoonasosat",
-         "miljoonasosat", "kuusimiljoonasosat", "septimiljardisosat", "oktilliososat", "ei-miljoonasosat"
+        "", "tuhannesosaa", "miljoonasosaa", "miljardisosaa", "biljoonasosaa", "tuhannes biljoonasosaa",
+        "triljoonasosaa", "tuhannes triljoonasosaa", "kvadriljoonasosaa", "tuhannes kvadriljoonasosaa", "kvintiljoonasosaa"
     ]
 
 ]
