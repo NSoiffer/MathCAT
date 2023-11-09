@@ -15,17 +15,17 @@ Kääntämisen jälkeen (vuonna 2024) lisätään pistekirjoitustuki pistenäyt�
 Testaamiseen tarvitset NVDA-ruudunlukijan, joka on saatavilla vain Windows-käyttöjärjestelmälle. Ohje testaamiseen:
 
 1. Lataa MathCAT-lisäosa NVDA:n lisäosakaupasta ja ota se käyttöön. Voit nyt kuunnella matemaattisia kaavoja englanniksi ja lukea ne myös pistenäytöltä Nemeth- tai UEB-standardilla.
-2. Siirry painikkeeseen ”<span lang="en">code</span>”, paina valikko auki ja siirry sen sisällä kohtaan ”<span lang="en">Download zip</span>”.
+2. Siirry painikkeeseen <code lang="en">code</code>, paina valikko auki ja siirry sen sisällä kohtaan <code lang="en">Download zip</code>.
 3. Etsi ladattu tiedosto ja pura se. Avaa purettu kansio.
-4. Siirry kansioon ”<span lang="en">Rules</span>” ja kopioi kansio ”<span lang="en">Languages</span>”.
-5. Siirry sijaintiin, jonne NVDA lataa lisäosat. Alla ohjeet. Sen pitäisi olla muotoa ”<code>\AppData\Roaming\nvda\addons\MathCAT\globalPlugins</code>”.
+4. Siirry kansioon <code lang="en">Rules</code> ja kopioi kansio <code lang="en">Languages</code>.
+5. Siirry sijaintiin, jonne NVDA lataa lisäosat. Alla ohjeet. Sen pitäisi olla muotoa <code>\AppData\Roaming\nvda\addons\MathCAT\globalPlugins</code>.
    1. Windowsilla sinne pääsee kätevästi painamalla Win-näppäintä ja hakemalla ”Suorita”.
    2. Kirjoita Suorita-ikkunaan %appdata%. Se vie sinut oikeaan sijaintiin, josta löydät nvda-kansion (kirjoitettu pienellä).
    3. Etene siis nvda, addons, MathCAT, globalplugins, MathCAT, Rules. Rules-kansiossa on oma “Languages” -kansio.
-   4. Liitä kansio ”Languages” ja hyväksy tiedostojen korvaaminen. Näin lisäät suomenkielisen osan MathCATiin.
+   4. Liitä kansio ”<code>Languages</code>” ja hyväksy tiedostojen korvaaminen. Näin lisäät suomenkielisen osan MathCATiin.
 6. Käynnistä NVDA varmuuden vuoksi uudelleen.
 7. MathCATin asetuksia voi muuttaa NVDA-näppäin + N, asetukset, ”MathCAT settings”. (Valikko on englanninkielinen.) Voit muuttaa sitä kautta matematiikan luennan suomenkieliseksi.
-8. Valitse luentatavaksi ”ClearSpeak”. Se on käännetty. ”SimpleSpeak” on myös suomenkielinen, mutta sen käännökset on tehty automaattisesti eli tulos ei ole kovin hyvä.
+8. Valitse luentatavaksi <code>ClearSpeak</code>. Se on käännetty. <code>SimpleSpeak</code> on myös suomenkielinen, mutta sen käännökset on tehty automaattisesti eli tulos ei ole kovin hyvä.
 9. Voit nyt testata matematiikan kaavojen luentaa eri sivuilla, jos matematiikka on esitetty MathML-koodilla. [Kokeile esimerkiksi tekemääni testisivustoa](https://samimaattacelia.github.io/math-fi.html). Se ei ole kuitenkaan kattava, joten voit kokeilla esimerkiksi Wikipedian matematiikkasivuja. Niiss oleva matematiikka on esitetty MathML-koodilla.
 
 Jos huomaat puutteita luennassa tai käännöksissä, niin voit lähettää palautetta suoraan Sami Määtälle, [sami.maatta@celia.fi](mailto:sami.maatta@celia.fi) tai lisätä GitHubin avulla "issuen".
