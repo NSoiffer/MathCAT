@@ -35,8 +35,8 @@ Jos huomaat puutteita luennassa tai käännöksissä, niin voit lähettää pala
 ## Edistyminen
 
 - [ ] Tekstistä puheeksi suomeksi (32 %)
-  - [ x ] ClearSpeak
-  - [ ] SimpleSpeak
+  - ClearSpeak (käännetty)
+  - SimpleSpeak (ei käännetty)
   - Lukuihin liittyvät käännökset voivat toimia hassusti. Kaikenlainen palaute on tervetullutta!
 - [ ] Pistekirjoitustuki suomeksi (0 %)
 
