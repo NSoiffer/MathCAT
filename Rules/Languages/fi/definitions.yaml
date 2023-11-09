@@ -50,16 +50,14 @@
          "seitsemästoistaosaa", "kahdeksastoistaosaa", "yhdeksästoistaosaa"
     ],
 
-    # there are more translations that have to do with Finnish than English: for example kaksi sadasosaa
-
     # stop when regularity begins
     NumbersOrdinalFractionalOnes: [
-         "nolla", "ensimmäinen", "puoli"
+         "nolla", "ensimmäinen"
     ],
 
     # stop when regularity begins
     NumbersOrdinalFractionalPluralOnes: [
-         "nollat", "ensimmäiset", "puolikkaat"
+         "nolla", "ensimmäinen"
     ],
 
 
