@@ -19,9 +19,9 @@ Testaamiseen tarvitset NVDA-ruudunlukijan, joka on saatavilla vain Windows-käyt
 3. Etsi ladattu tiedosto ja pura se. Avaa purettu kansio.
 4. Siirry kansioon <code lang="en">Rules</code> ja kopioi kansio <code lang="en">Languages</code>.
 5. Siirry sijaintiin, jonne NVDA lataa lisäosat. Alla ohjeet. Sen pitäisi olla muotoa <code>\AppData\Roaming\nvda\addons\MathCAT\globalPlugins</code>.
-   1. Windowsilla sinne pääsee kätevästi painamalla Win-näppäintä ja hakemalla ”Suorita”.
-   2. Kirjoita Suorita-ikkunaan %appdata%. Se vie sinut oikeaan sijaintiin, josta löydät nvda-kansion (kirjoitettu pienellä).
-   3. Etene siis nvda, addons, MathCAT, globalplugins, MathCAT, Rules. Rules-kansiossa on oma “Languages” -kansio.
+   1. Windowsilla sinne pääsee kätevästi painamalla Win-näppäintä ja hakemalla <code>Suorita</code>.
+   2. Kirjoita Suorita-ikkunaan <code>%appdata%</code>. Se vie sinut oikeaan sijaintiin, josta löydät nvda-kansion (kirjoitettu pienellä).
+   3. Etene siis nvda, addons, MathCAT, globalplugins, MathCAT, Rules. Rules-kansiossa on oma <code>Languages</code> -kansio.
    4. Liitä kansio ”<code>Languages</code>” ja hyväksy tiedostojen korvaaminen. Näin lisäät suomenkielisen osan MathCATiin.
 6. Käynnistä NVDA varmuuden vuoksi uudelleen.
 7. MathCATin asetuksia voi muuttaa NVDA-näppäin + N, asetukset, ”MathCAT settings”. (Valikko on englanninkielinen.) Voit muuttaa sitä kautta matematiikan luennan suomenkieliseksi.
