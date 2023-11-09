@@ -35,6 +35,9 @@ Jos huomaat puutteita luennassa tai käännöksissä, niin voit lähettää pala
 ## Edistyminen
 
 - [ ] Tekstistä puheeksi suomeksi (32 %)
+  - [ x ] ClearSpeak
+  - [ ] SimpleSpeak
+  - Lukuihin liittyvät käännökset voivat toimia hassusti. Kaikenlainen palaute on tervetullutta!
 - [ ] Pistekirjoitustuki suomeksi (0 %)
 
 ## MathCAT: Math Capable Assistive Technology
