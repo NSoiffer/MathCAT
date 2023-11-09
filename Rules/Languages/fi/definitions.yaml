@@ -32,15 +32,22 @@
 
     NumbersOrdinalOnes: [
          "nollannes", "ensimmäinen", "toinen", "kolmas", "neljäs", "viides", "kuudes", "seitsemäs", "kahdeksas", "yhdeksäs",
-         "kymmenes", "yhdestoista", "kahdestoista", "kolmastoista", "neljästoista", "viisitoista", "kuudestoista",
+         "kymmenes", "yhdestoista", "kahdestoista", "kolmastoista", "neljästoista", "viidestoista", "kuudestoista",
          "seitsemästoista", "kahdeksastoista", "yhdeksästoista"
     ],
 
      # check translation, should it be done differently?
+#     NumbersOrdinalPluralOnes: [
+#          "nolla", "ensimmäiset", "toiset", "kolmannet", "neljännet", "viidennet", "kuudennet", "seitsemännet", "kahdeksannet", "yhdeksännet",
+#          "kymmenennet", "yhdennettoista", "kahdennettoista", "kolmannettoista", "neljännettoista", "viidennettoista", "kuudennettoista",
+#          "seitsemännettoista", "kahdeksannettoista", "yhdeksännettoista"
+#     ],
+
+     # FI: proper try for translation. Assuming that all of these are only used for fractions.
     NumbersOrdinalPluralOnes: [
-         "nolla", "ensimmäiset", "toiset", "kolmannet", "neljännet", "viidennet", "kuudennet", "seitsemännet", "kahdeksannet", "yhdeksännet",
-         "kymmenennet", "yhdennettoista", "kahdennettoista", "kolmannettoista", "neljännettoista", "viidennettoista", "kuudennettoista",
-         "seitsemännettoista", "kahdeksannettoista", "yhdeksännettoista"
+         "nollannes", "ensimmäinen", "kahdesosaa", "kolmasosaa", "neljäsosaa", "viidesosaa", "kuudesosaa", "seitsemäsosaa", "kahdeksasosaa", "yhdeksäsosaa",
+         "kymmenesosaa", "yhdestoistaosaa", "kahdestoistaosaa", "kolmastoistaosaa", "neljästoistaosaa", "viidestoistaosaa", "kuudestoistaosaa",
+         "seitsemästoistaosaa", "kahdeksastoistaosaa", "yhdeksästoistaosaa"
     ],
 
     # there are more translations that have to do with Finnish than English: for example kaksi sadasosaa
