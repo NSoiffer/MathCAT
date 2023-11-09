@@ -32,6 +32,11 @@ Jos huomaat puutteita luennassa tai käännöksissä, niin voit lähettää pala
 
 </div>
 
+## Edistyminen
+
+- [ ] Tekstistä puheeksi suomeksi (32 %)
+- [ ] Pistekirjoitustuki suomeksi (0 %)
+
 ## MathCAT: Math Capable Assistive Technology
 
 <img alt="Logo. Text MathCAT with a cat sitting on the CAT part." src="logo.png" style="position: relative; top: 16px; z-index: -1;">
