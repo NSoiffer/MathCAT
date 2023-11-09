@@ -91,11 +91,17 @@
          "kuudessadas", "seitsemässadas", "kahdeksassadas", "yhdeksässadas"
     ],
 
-     # how should these be translated? weirdness going on... context for these?
-    NumbersOrdinalPluralHundreds: [
-       "", "sadannet", "kahdet sadannet", "kolmet sadannet", "neljät sadannet", "viidet sadannet",
-         "kuudet sadannet", "seitsemät sadannet", "kahdeksat sadannet", "yhdeksät sadannet"
+#      # how should these be translated? weirdness going on... context for these?
+#     NumbersOrdinalPluralHundreds: [
+#        "", "sadannet", "kahdet sadannet", "kolmet sadannet", "neljät sadannet", "viidet sadannet",
+#          "kuudet sadannet", "seitsemät sadannet", "kahdeksat sadannet", "yhdeksät sadannet"
+#     ],
+
+NumbersOrdinalPluralHundreds: [
+       "", "sadasosa", "kahdessadasosaa", "kolmassadasosaa", "neljäsadasosaa", "viidessadasosaa",
+         "kuudessadasosaa", "seitsemässadasosaa", "kahdeksassadasosaa", "yhdeksässadasosaa"
     ],
+
       
 
     # At this point, hopefully the language is regular. If not, code needs to be written
