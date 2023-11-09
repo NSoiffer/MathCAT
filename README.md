@@ -18,7 +18,7 @@ Testaamiseen tarvitset NVDA-ruudunlukijan, joka on saatavilla vain Windows-käyt
 2. Siirry painikkeeseen ”<span lang="en">code</span>”, paina valikko auki ja siirry sen sisällä kohtaan ”<span lang="en">Download zip</span>”.
 3. Etsi ladattu tiedosto ja pura se. Avaa purettu kansio.
 4. Siirry kansioon ”<span lang="en">Rules</span>” ja kopioi kansio ”<span lang="en">Languages</span>”.
-5. Siirry sijaintiin, jonne NVDA lataa lisäosat. Alla ohjeet. Sen pitäisi olla muotoa ”\AppData\Roaming\nvda\addons\MathCAT\globalPlugins”.
+5. Siirry sijaintiin, jonne NVDA lataa lisäosat. Alla ohjeet. Sen pitäisi olla muotoa ”<code>\AppData\Roaming\nvda\addons\MathCAT\globalPlugins</code>”.
    1. Windowsilla sinne pääsee kätevästi painamalla Win-näppäintä ja hakemalla ”Suorita”.
    2. Kirjoita Suorita-ikkunaan %appdata%. Se vie sinut oikeaan sijaintiin, josta löydät nvda-kansion (kirjoitettu pienellä).
    3. Etene siis nvda, addons, MathCAT, globalplugins, MathCAT, Rules. Rules-kansiossa on oma “Languages” -kansio.
