@@ -1704,7 +1704,7 @@
         - else_if: "starts-with($NavCommand, 'MoveTo')"
           then: [T: "siirry"]                              # phrase('move to' the next entry in table) 
           else: [T: "aseta"]                                   # phrase('set' the value of the next entry in table) 
-      - T: "paikanpitäjä"                                     # phrase('placeholder' for the value)
+      - T: "paikanpitäjä"                                     # phrase('placeholder' for the value) # FI: other option might be 'tilapäinen', 'temporary'
       - x: "$PlaceMarkerIndex"
       - pause: long
   - set_variables: [NavNode: "$PlaceMarker"]
@@ -1716,7 +1716,7 @@
   - test:
       if: "$NavVerbosity != 'Terse'"
       then:
-      - T: "aseta paikanpitäjä"                                 # phrase('set placeholder' to the value) 
+      - T: "aseta paikanpitäjä"                                 # phrase('set placeholder' to the value) # FI: other option might be 'tilapäinen', 'temporary'
       - x: "$PlaceMarkerIndex"
       - pause: long
   - set_variables: [NavNode: "@id"]
