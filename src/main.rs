@@ -170,7 +170,7 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr=r#"
-  <math><mn>0</mn><mo>,</mo><mn>1</mn> </math>
+  <math><mrow><mn>5</mn><mo>=</mo><msqrt><mrow/></msqrt></mrow></math>
              "#;
 
 //   let expr = "
@@ -213,14 +213,14 @@ fn main() {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   };
 
-  match get_spoken_text() {
-    Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
-    Err(e) => panic!("{}", errors_to_string(&e)),
-  }
-  info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
+  // match get_spoken_text() {
+  //   Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
+  //   Err(e) => panic!("{}", errors_to_string(&e)),
+  // }
+  // info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
 
-  set_preference("BrailleCode".to_string(), "CMU".to_string()).unwrap();
+  set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),
