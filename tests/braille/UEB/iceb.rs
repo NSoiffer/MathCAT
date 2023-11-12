@@ -135,6 +135,7 @@ fn grade1_1_7_3_1() {
         <mo>=</mo>
         <msup><mi>x</mi><mn>2</mn></msup>
     </math>";
+    // GTM says it can also be "⠼⠉⠭⠐⠤⠼⠙⠽⠐⠖⠽⠔⠼⠃⠀⠐⠶⠀⠭⠰⠔⠼⠃"
     test_braille("UEB", expr, "⠰⠰⠰⠼⠉⠭⠐⠤⠼⠙⠽⠐⠖⠽⠔⠼⠃⠀⠐⠶⠀⠭⠔⠼⠃⠰⠄");
 }
 
@@ -388,11 +389,11 @@ fn alg_3_2_4() {
 #[test]
 fn alg_3_2_5() {
     let expr = "<math><mi>d</mi><mo>+</mo><mi>a</mi><mi>b</mi><mo>=</mo><mi>a</mi><mi>c</mi></math>";
-    // Acceptable: GTM does not use a G1 start indicator: "⠙⠐⠖⠁⠃⠀⠐⠶⠀⠰⠁⠉"
-    // However, BANA says use a word indicator if G1 not in first 3 cells (it is after the '='); use passage if >=2 whitespace
+    // BANA says use a word indicator if G1 not in first 3 cells (it is after the '='); use passage if >=2 whitespace
     // This seems like a poor choice in this case since there is only one G1 indicator, but that's the BANA guidance so...
-    // Corrected to use passage indicator
-    test_braille("UEB", expr, "⠰⠰⠰⠙⠐⠖⠁⠃⠀⠐⠶⠀⠁⠉⠰⠄");
+    // "⠰⠰⠰⠙⠐⠖⠁⠃⠀⠐⠶⠀⠁⠉⠰⠄"
+    // GTM says to use the following and it is more sensisble, so I'm going with it
+    test_braille("UEB", expr, "⠙⠐⠖⠁⠃⠀⠐⠶⠀⠰⠁⠉");
 }
 
 #[test]
@@ -430,7 +431,7 @@ fn example_3_4_2() {
 
 #[test]
 fn omission_3_6_1() {
-    let expr = "<math><mn>3</mn><mo>+</mo><mn>7</mn><mo>=</mo><mo>&#x2014;</mo></math>";
+    let expr = "<math><mn>3</mn><mo>+</mo><mn>7</mn><mo>=</mo><mo>―</mo></math>";
     test_braille("UEB", expr, "⠼⠉⠐⠖⠼⠛⠀⠐⠶⠀⠐⠠⠤");
 }
 

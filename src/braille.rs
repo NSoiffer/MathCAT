@@ -574,12 +574,14 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
         if is_grade2_string_ok(&grade2) {
             return grade2;
         } else {
-            let grade1_word = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Word);
-            debug!("Word mode:    '{}'", grade1_word);
-            
             // BANA says use g1 word mode if spaces are present, but that's not what their examples do
             // A conversation with Ms. DeAndrea from BANA said that they mean use passage mode if ≥3 "segments" (≥2 blanks)
-            // However, it is pointless to go into passage mode if the internal string is the same as word mode
+            // The G1 Word mode might not be at the start (iceb.rs:omission_3_6_7)
+            let grade1_word = try_grade1_word_mode(raw_braille);
+            debug!("Word mode:    '{}'", grade1_word);
+            
+
+            // It is pointless to go into passage mode if the internal string is the same as word mode
             let mut grade1_passage = "".to_string();
             let mut n_blanks = 0;
             if grade1_word.chars().any(|ch| {
@@ -592,7 +594,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
                 // debug!("Passage mode: '{}'", &grade1_passage);
             }
             if grade1_passage.is_empty() || grade1_passage == grade1_word {
-                return "⠰⠰".to_string() + &grade1_word;
+                return grade1_word;
             } else {
                 return "⠰⠰⠰".to_string() + &grade1_passage + "⠰⠄";
             }
@@ -631,12 +633,14 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
             }
 
             // if we find another g1 that isn't forced and isn't standing alone, we are done
+            // to the standing alone rule, I've added a 'follows whitespace' clause for test iceb.rs:omission_3_6_2
             // we only allow one standing alone example -- not sure if BANA guidance has this limit, but GTM 11_5_5_3 seems better with it
             let mut is_standing_alone_already_encountered = false;
             while i < chars.len() {
                 let ch = chars[i];
                 if ch == '1' && !is_forced_grade1(&chars, i) {
-                    if !is_single_letter_on_right(&chars, i) || is_standing_alone_already_encountered {
+                    if is_standing_alone_already_encountered ||
+                       !((!found_g1 && chars[i-1] == 'W') || is_single_letter_on_right(&chars, i)) {
                         return false;
                     }
                     is_standing_alone_already_encountered = true; 
@@ -690,6 +694,33 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
                 }
             }
             return true;
+        }
+
+        fn try_grade1_word_mode(raw_braille: &str) -> String {
+            // this isn't quite right, but pretty close -- try splitting at 'W' (words)
+            // only one of the parts can be in word mode and none of the others can have '1' unless forced
+            let mut g1_word_braille = "".to_string();
+            let mut found_word_mode = false;
+            for raw_word in raw_braille.split('W') {
+                let word = remove_unneeded_mode_changes(raw_word, UEB_Mode::Grade2, UEB_Duration::Symbol);
+                debug!("try_grade1_word_mode: word='{}'", word);
+                if !found_word_mode {
+                    let raw_word_chars = raw_braille.chars().collect::<Vec<char>>();
+
+                    let needs_word_mode = raw_word_chars.iter().enumerate()
+                        .any(|(i, &ch) | ch == '1' && !is_forced_grade1(&raw_word_chars, i));
+                    if needs_word_mode {
+                        found_word_mode = true;
+                        g1_word_braille.push_str("⠰⠰");
+                        g1_word_braille.push_str(
+                            &remove_unneeded_mode_changes(raw_word, UEB_Mode::Grade1, UEB_Duration::Word)
+                        );
+                    }
+                }
+                g1_word_braille.push_str(&word);
+                g1_word_braille.push('W');
+            }
+            return g1_word_braille;
         }
     }
 }
