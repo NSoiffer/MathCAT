@@ -110,8 +110,8 @@
       - bookmark: "@id"
       - test:
           if: "self::m:negative"
-          then: [{T: "negativa"}]      # phrase(minus 5 is a 'negative' number)
-          else: [{T: "positiva"}]      # phrase(7 is a 'positive' number)
+          then: [{T: "minus"}]      # phrase(minus 5 is a 'negative' number)
+          else: [{T: "plus"}]      # phrase(7 is a 'positive' number)
   - x: "*[1]"
 
 # Fraction rules
@@ -672,37 +672,37 @@
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
                 then: [{T: fall}]
-                else: [{T: "fallet"}]      # phrase(this is the first 'case' of three cases)
+                else: [{T: "fall"}]      # phrase(this is the first 'case' of three cases)
         - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
                 then: [{T: "rader"}]      # phrase(this is the first 'line' of three lines)
-                else: [{T: "raden"}]      # phrase(this is the first 'line' of three lines)
+                else: [{T: "rad"}]      # phrase(this is the first 'line' of three lines)
         - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
                 then: [{T: "avgränsningar"}]      # phrase(this is the first 'constraint' of three constraints)
-                else: [{T: "avgränsningen"}]      # phrase(this is the first 'constraint' of three constraints)
+                else: [{T: "avgränsning"}]      # phrase(this is the first 'constraint' of three constraints)
         - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
                 then: [{T: "ekvationer"}]      # phrase(this is the first 'equation' of three equations)
-                else: [{T: "ekvationen"}]      # phrase(this is the first 'equation' of three equations)
+                else: [{T: "ekvation"}]      # phrase(this is the first 'equation' of three equations)
         - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
                 then: [{T: "rader"}]      # phrase(this is the first 'row' of three rows)
-                else: [{T: "raden"}]      # phrase(this is the first 'row' of three rows)
+                else: [{T: "rad"}]      # phrase(this is the first 'row' of three rows)
         - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
                 then: [{T: "steg"}]      # phrase(this is the first 'step' of three steps)
-                else: [{T: "steget"}]      # phrase(this is the first 'step' of three steps)
+                else: [{T: "steg"}]      # phrase(this is the first 'step' of three steps)
           # else 'None -- don't say anything'
           # SWEDISH: Every expression had to be inflected separately.
       # - test:
@@ -717,15 +717,15 @@
   replace:
   - test:
     - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:cases) or $ClearSpeak_MultiLineLabel = 'Case'"
-      then: [{T: "fallet"}]      # phrase(in this  'case' x is not equal to y)
+      then: [{T: "fall"}]      # phrase(in this  'case' x is not equal to y)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
-      then: [{T: "raden"}]      # phrase(the straight 'line' between x and y)
+      then: [{T: "rad"}]      # phrase(the straight 'line' between x and y)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
       then: [{T: "avgränsning"}]      # phrase(there is a 'constraint' on possible values)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
-      then: [{T: "ekvationen"}]      # phrase(the 'equation' pi r squared gives the area of a circle)
+      then: [{T: "ekvation"}]      # phrase(the 'equation' pi r squared gives the area of a circle)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
-      then: [{T: "raden"}]      # phrase(the values on the top 'row' are relevant)
+      then: [{T: "rad"}]      # phrase(the values on the top 'row' are relevant)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
       then: [{T: "steg"}]      # phrase(this is a 'step' by step process)
       # else 'None -- don't say anything'
