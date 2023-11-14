@@ -55,6 +55,7 @@
             else: [T: "vänster parentes"]          #  0x28 (en: 'open paren')
         else: [T: "vänster parentes"]            #  0x28 (en: 'left paren')
  - ")":                                          #  0x29
+    - pause: short
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
