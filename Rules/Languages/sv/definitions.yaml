@@ -37,9 +37,9 @@
     ],
 
     NumbersOrdinalPluralOnes: [
-         "nolltedelar", "hela", "halva", "tredjedelar", "fjärdedelar", "femtedelar", "sjättedelar", "sjundedelar", "åttondelar", "niondelar",
-         "tiondelar", "elftedelar", "tolftedelar", "trettondelar", "fjortondelar", "femtondelar", "sextondelar",
-         "sjuttondelar", "artondelar", "nittondelar"
+         "nollte", "första", "andra", "tredje", "fjärde", "femte", "sjätte", "sjunde", "åttonde", "nionde",
+         "tionde", "elfte", "tolfte", "trettonde", "fjortonde", "femtonde", "sextonde",
+         "sjuttonde", "artonde", "nittonde"
     ],
 
     # stop when regularity begins
