@@ -25,7 +25,7 @@
 
 # For English, a regular pattern starts at twenty
     NumbersOnes: [
-         "noll", "ett", "två", "tre", "fyra", "fem", "sex", "sju", "åtta", "nio",
+         "noll", "en", "två", "tre", "fyra", "fem", "sex", "sju", "åtta", "nio",
          "tio", "elva", "tolv", "tretton", "fjorton", "femton", "sexton",
          "sjutton", "arton", "nitton"
     ],
@@ -44,12 +44,15 @@
 
     # stop when regularity begins
     NumbersOrdinalFractionalOnes: [
-         "noll", "hela", "halva"
+         "nolltedel", "hel", "halv", "tredjedel", "fjärdedel", "femtedel", "sjättedel", "sjundedel", "åttondel", "niondel", "tiondel", "elftedel",
+         "tolftedel", "trettondel", "fjortondel", "femtondel", "sextondel", "sjuttondel", "artondel", "nittondel"
     ],
 
     # stop when regularity begins
     NumbersOrdinalFractionalPluralOnes: [
-         "nollor", "hela", "halva"
+         "nolltedelar", "hela", "halva", "tredjedelar", "fjärdedelar", "femtedelar", "sjättedelar", "sjundedelar", "åttondelar", "niondelar",
+         "tiondelar", "elftedelar", "tolftedelar", "trettondelar", "fjortondelar", "femtondelar", "sextondelar",
+         "sjuttondelar", "artondelar", "nittondelar"
     ],
 
 
