@@ -809,6 +809,7 @@ impl CanonicalizeContext {
 				if !text.is_empty() && IS_WHITESPACE.is_match(text) {
 					// can't throw it out because it is needed by braille -- change to what it really is
 					set_mathml_name(mathml, "mtext");
+					mathml.set_attribute_value(CHANGED_ATTR, "was-mo");
 					return Some(mathml);
 				} else {
 					match text {
@@ -3612,7 +3613,13 @@ impl CanonicalizeContext {
 							} else {
 								OperatorPair{ ch: "\u{2062}", op: &IMPLIED_TIMES }
 							};
-	
+					if let Some(attr_val) = base_of_child.attribute_value(CHANGED_ATTR) {
+						if attr_val == "was-mo" {
+							// it really should be an operator
+							base_of_child.remove_attribute(CHANGED_ATTR);
+							set_mathml_name(base_of_child, "mo");
+						}
+					}
 					if name(&base_of_child) == "mo" {
 						current_op.ch = as_text(base_of_child);
 						// debug!("  Found whitespace op '{}'/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);

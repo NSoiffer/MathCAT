@@ -135,7 +135,8 @@ fn grade1_1_7_3_1() {
         <mo>=</mo>
         <msup><mi>x</mi><mn>2</mn></msup>
     </math>";
-    test_braille("UEB", expr, "⠰⠰⠰⠼⠉⠭⠐⠤⠼⠙⠽⠐⠖⠽⠔⠼⠃⠀⠐⠶⠀⠭⠔⠼⠃⠰⠄");
+    // GTM says it can be either "⠼⠉⠭⠐⠤⠼⠙⠽⠐⠖⠽⠔⠼⠃⠀⠐⠶⠀⠭⠰⠔⠼⠃" or "⠰⠰⠰⠼⠉⠭⠐⠤⠼⠙⠽⠐⠖⠽⠔⠼⠃⠀⠐⠶⠀⠭⠔⠼⠃⠰⠄"
+    test_braille("UEB", expr, "⠼⠉⠭⠐⠤⠼⠙⠽⠐⠖⠽⠔⠼⠃⠀⠐⠶⠀⠭⠰⠔⠼⠃");
 }
 
 #[test]
@@ -388,11 +389,11 @@ fn alg_3_2_4() {
 #[test]
 fn alg_3_2_5() {
     let expr = "<math><mi>d</mi><mo>+</mo><mi>a</mi><mi>b</mi><mo>=</mo><mi>a</mi><mi>c</mi></math>";
-    // Acceptable: GTM does not use a G1 start indicator: "⠙⠐⠖⠁⠃⠀⠐⠶⠀⠰⠁⠉"
-    // However, BANA says use a word indicator if G1 not in first 3 cells (it is after the '='); use passage if >=2 whitespace
+    // BANA says use a word indicator if G1 not in first 3 cells (it is after the '='); use passage if >=2 whitespace
     // This seems like a poor choice in this case since there is only one G1 indicator, but that's the BANA guidance so...
-    // Corrected to use passage indicator
-    test_braille("UEB", expr, "⠰⠰⠰⠙⠐⠖⠁⠃⠀⠐⠶⠀⠁⠉⠰⠄");
+    // "⠰⠰⠰⠙⠐⠖⠁⠃⠀⠐⠶⠀⠁⠉⠰⠄"
+    // GTM says to use the following and it is more sensisble, so I'm going with it
+    test_braille("UEB", expr, "⠙⠐⠖⠁⠃⠀⠐⠶⠀⠰⠁⠉");
 }
 
 #[test]
@@ -426,6 +427,50 @@ fn example_3_4_2() {
         <mn>3</mn>
     </math>";
     test_braille("UEB", expr, "⠰⠔⠐⠤⠼⠃⠐⠖⠔⠐⠤⠼⠉");
+}
+
+#[test]
+fn omission_3_6_1() {
+    let expr = "<math><mn>3</mn><mo>+</mo><mn>7</mn><mo>=</mo><mo>―</mo></math>";
+    test_braille("UEB", expr, "⠼⠉⠐⠖⠼⠛⠀⠐⠶⠀⠐⠠⠤");
+}
+
+#[test]
+fn omission_3_6_2() {
+    let expr = "<math><mn>3</mn><mo>+</mo><mn>7</mn><mo>=</mo><mi>_</mi></math>";
+    test_braille("UEB", expr, "⠼⠉⠐⠖⠼⠛⠀⠐⠶⠀⠨⠤");
+}
+
+#[test]
+fn omission_3_6_3() {
+    let expr = "<math><mn>3</mn><mo>+</mo><mn>7</mn><mo>=</mo><mo>?</mo></math>";
+    test_braille("UEB", expr, "⠼⠉⠐⠖⠼⠛⠀⠐⠶⠀⠰⠦");
+}
+
+#[test]
+fn omission_3_6_4() {
+    let expr = "<math><mn>3</mn><mo>&#x25A1;</mo><mn>7</mn><mo>=</mo><mn>10</mn></math>";
+    test_braille("UEB", expr, "⠼⠉⠫⠼⠙⠱⠼⠛⠀⠐⠶⠀⠼⠁⠚");
+}
+
+#[test]
+fn omission_3_6_5() {
+    let expr = "<math><mn>3</mn><mo>&#xA0;</mo><mo>&#xA0;</mo><mn>7</mn><mo>=</mo><mn>10</mn></math>";
+    test_braille("UEB", expr, "⠼⠉⠬⠼⠛⠀⠐⠶⠀⠼⠁⠚");
+}
+
+#[test]
+fn omission_3_6_6() {
+    // comes from WIRIS
+    let expr = "<math><mfrac><mn>9</mn><mn>12</mn></mfrac><mo>=</mo><mfrac><mn>3</mn><mrow/></mfrac></math>";
+    test_braille("UEB", expr, "⠼⠊⠌⠁⠃⠀⠐⠶⠀⠰⠷⠼⠉⠨⠌⠬⠾");
+}
+
+#[test]
+fn omission_3_6_7() {
+    // comes from MathType
+    let expr = "<math><mrow><mn>5</mn><mo>=</mo><msqrt><mrow/></msqrt></mrow></math>";
+    test_braille("UEB", expr, "⠼⠑⠀⠐⠶⠀⠰⠰⠩⠬⠬");
 }
 
 #[test]
@@ -512,7 +557,8 @@ fn fraction_6_4_5() {
 #[test]
 fn fraction_6_4_6() {
     let expr = "<math><mtext>speed</mtext><mo>=</mo><mfrac><mtext>distance</mtext><mtext>time</mtext></mfrac></math>";
-    test_braille("UEB", expr, "⠰⠰⠰⠎⠏⠑⠑⠙⠀⠐⠶⠀⠷⠙⠊⠎⠞⠁⠝⠉⠑⠨⠌⠞⠊⠍⠑⠾⠰⠄");
+    // GTM lists two options:  "⠎⠏⠑⠫⠀⠐⠶⠀⠰⠰⠷⠙⠊⠎⠞⠁⠝⠉⠑⠨⠌⠞⠊⠍⠑⠾" and "⠰⠰⠰⠎⠏⠑⠑⠙⠀⠐⠶⠀⠷⠙⠊⠎⠞⠁⠝⠉⠑⠨⠌⠞⠊⠍⠑⠾⠰⠄"
+    test_braille("UEB", expr, "⠎⠏⠑⠫⠀⠐⠶⠀⠰⠰⠷⠙⠊⠎⠞⠁⠝⠉⠑⠨⠌⠞⠊⠍⠑⠾");
 }
 
 
@@ -828,7 +874,9 @@ fn text_9_7_1() {
 fn stat_9_7_2() {
     let expr = "<math><mi>Exp</mi><mo>(</mo><mi>R</mi><mo>)</mo><mo>=</mo>
                             <mfrac><mi>n</mi><mn>2</mn></mfrac><mo>+</mo><mn>1</mn></math>";
-    test_braille("UEB", expr, "⠰⠰⠰⠠⠑⠭⠏⠐⠣⠠⠗⠐⠜⠀⠐⠶⠀⠷⠝⠨⠌⠼⠃⠾⠐⠖⠼⠁⠰⠄");
+    // GTM uses "⠰⠰⠰⠠⠑⠭⠏⠐⠣⠠⠗⠐⠜⠀⠐⠶⠀⠷⠝⠨⠌⠼⠃⠾⠐⠖⠼⠁⠰⠄",
+    //      but "⠠⠑⠭⠏⠐⠣⠠⠗⠐⠜⠀⠐⠶⠀⠰⠰⠷⠝⠨⠌⠼⠃⠾⠐⠖⠼⠁" is shorter and is consistent with omission_3_6_7 and fraction_6_4_6
+    test_braille("UEB", expr, "⠠⠑⠭⠏⠐⠣⠠⠗⠐⠜⠀⠐⠶⠀⠰⠰⠷⠝⠨⠌⠼⠃⠾⠐⠖⠼⠁");
 }
 
 #[test]

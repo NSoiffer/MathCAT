@@ -254,7 +254,7 @@
       then: [t: "zoom in", pause: "long"]                 # phrase('zoom in')
   - set_variables: [NavNode: "*[2]/*[1]/@id"]
 
-# special case of zooming into a table -- move to the first row
+# special case of zooming into a table -- move to the first row (if only one row, first column)
 - name: zoom-in-table
   tag: mtable
   match: "$NavCommand = 'ZoomIn'"
@@ -262,7 +262,12 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [t: "zoom in", pause: "long"]               # phrase('zoom in')
-  - set_variables: [NavNode: "*[1]/@id"]
+  - test:
+      if: "count(*)=1"
+      then: 
+      - set_variables: [NavNode: "*[1]/*[1]/@id"]
+      else:
+      - set_variables: [NavNode: "*[1]/@id"]
 
 - name: zoom-in-mrow-in-math
   # Moving to first or last is meaningless the 'math' has only an 'mrow' inside -- dig inside and do it again 

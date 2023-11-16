@@ -574,31 +574,20 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
         if is_grade2_string_ok(&grade2) {
             return grade2;
         } else {
-            let grade1_word = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Word);
-            debug!("Word mode:    '{}'", grade1_word);
-            
             // BANA says use g1 word mode if spaces are present, but that's not what their examples do
             // A conversation with Ms. DeAndrea from BANA said that they mean use passage mode if ≥3 "segments" (≥2 blanks)
-            // However, it is pointless to go into passage mode if the internal string is the same as word mode
-            let mut grade1_passage = "".to_string();
-            let mut n_blanks = 0;
-            if grade1_word.chars().any(|ch| {
-                if ch == 'W' {
-                    n_blanks += 1;
-                }
-                n_blanks == 2
-            }) {
-                grade1_passage = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage);
-                // debug!("Passage mode: '{}'", &grade1_passage);
-            }
-            if grade1_passage.is_empty() || grade1_passage == grade1_word {
-                return "⠰⠰".to_string() + &grade1_word;
+            // The G1 Word mode might not be at the start (iceb.rs:omission_3_6_7)
+            let grade1_word = try_grade1_word_mode(raw_braille);
+            debug!("Word mode:    '{}'", grade1_word);
+            if !grade1_word.is_empty() {
+                return grade1_word;
             } else {
+                let grade1_passage = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage);
                 return "⠰⠰⠰".to_string() + &grade1_passage + "⠰⠄";
             }
         }
 
-        /// Return true if the BANA guidelines say it is ok to start with grade 2
+        /// Return true if the BANA or ICEB guidelines say it is ok to start with grade 2
         fn is_grade2_string_ok(grade2_braille: &str) -> bool {
             // BANA says use grade 2 if there is not more than one grade one symbol or single letter standing alone.
             // The exact quote from their guidance:
@@ -607,12 +596,14 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
             //    begin the expression with a grade 1 word indicator
             // Note: I modified this slightly to exclude the cap indicator in the count. That allows three more ICEB rule to pass and seems
             //    like it is a reasonable thing to do.
+            // Another modification is allow a single G1 indicator to occur after whitespace later on
+            //    because ICEB examples show it and it seems better than going to passage mode if it is the only G1 indicator
 
             // Because of the 'L's which go away, we have to put a little more work into finding the first three chars
             let chars = grade2_braille.chars().collect::<Vec<char>>();
             let mut n_real_chars = 0;  // actually number of chars
             let mut found_g1 = false;
-            let mut i = 0;      // chars starts on the 4th char
+            let mut i = 0;
             while i < chars.len() {
                 let ch = chars[i];
                 if ch == '1' && !is_forced_grade1(&chars, i) {
@@ -623,22 +614,29 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
                 } else if !"𝐶CLobc".contains(ch) {
                     if n_real_chars == 2 {
                         i += 1;
-                        break;      // this is the third real char
+                        break;              // this is the third real char
                     };
                     n_real_chars += 1;
                 }
                 i += 1
             }
 
-            // if we find another g1 that isn't forced and isn't standing alone, we are done
+            // if we find *another* g1 that isn't forced and isn't standing alone, we are done
+            // I've added a 'follows whitespace' clause for test iceb.rs:omission_3_6_2 to the standing alone rule
             // we only allow one standing alone example -- not sure if BANA guidance has this limit, but GTM 11_5_5_3 seems better with it
+            // Same for GTM 1_7_3_1 (passage mode is mentioned also)
             let mut is_standing_alone_already_encountered = false;
+            let mut is_after_whitespace = false;
             while i < chars.len() {
                 let ch = chars[i];
-                if ch == '1' && !is_forced_grade1(&chars, i) {
-                    if !is_single_letter_on_right(&chars, i) || is_standing_alone_already_encountered {
+                if ch == 'W' {
+                    is_after_whitespace = true;
+                } else if ch == '1' && !is_forced_grade1(&chars, i) {
+                    if is_standing_alone_already_encountered ||
+                       ((found_g1 || !is_after_whitespace) && !is_single_letter_on_right(&chars, i)) {
                         return false;
                     }
+                    found_g1 = true;
                     is_standing_alone_already_encountered = true; 
                 }
                 i += 1;
@@ -690,6 +688,31 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
                 }
             }
             return true;
+        }
+
+        fn try_grade1_word_mode(raw_braille: &str) -> String {
+            // this isn't quite right, but pretty close -- try splitting at 'W' (words)
+            // only one of the parts can be in word mode and none of the others can have '1' unless forced
+            let mut g1_words = Vec::default();
+            let mut found_word_mode = false;
+            for raw_word in raw_braille.split('W') {
+                let word = remove_unneeded_mode_changes(raw_word, UEB_Mode::Grade2, UEB_Duration::Symbol);
+                debug!("try_grade1_word_mode: word='{}'", word);
+                let word_chars = word.chars().collect::<Vec<char>>();
+                let needs_word_mode = word_chars.iter().enumerate()
+                    .any(|(i, &ch) | ch == '1' && !is_forced_grade1(&word_chars, i));
+                if needs_word_mode {
+                    if found_word_mode {
+                        return "".to_string();
+                    }
+                    found_word_mode = true;
+                    g1_words.push("⠰⠰".to_string() + &remove_unneeded_mode_changes(raw_word, UEB_Mode::Grade1, UEB_Duration::Word)
+                    );
+                } else {
+                    g1_words.push(word);
+                }
+            }
+            return if found_word_mode {g1_words.join("W")} else {"".to_string()};
         }
     }
 }
@@ -765,7 +788,7 @@ fn capitals_to_word_mode(braille: &str) -> String {
             if find_next_char(&chars[next_non_cap..], 'C').is_some() { // next letter sequence "C..."
                 if is_next_char_start_of_section_12_modifier(&chars[next_non_cap+1..]) {
                     // to me this is tricky -- section 12 modifiers apply to the previous item
-                    // the last clause of the "item" def is the previous "individual symbol" which ICEB 2.1 say is:
+                    // the last clause of the "item" def is the previous adividual symbol" which ICEB 2.1 say is:
                     //   braille sign: one or more consecutive braille characters comprising a unit,
                     //     consisting of a root on its own or a root preceded by one or more
                     //     prefixes (also referred to as braille symbol)
@@ -1217,43 +1240,78 @@ fn stands_alone(chars: &[char], i: usize) -> (bool, &[char], usize) {
     }
 }
 
+
 /// Return a modified result if chars can be contracted.
 /// Otherwise, the original string is returned
 fn handle_contractions(chars: &[char], mut result: String) -> String {
     struct Replacement {
-        pattern: &'static str,
+        pattern: String,
         replacement: &'static str
     }
 
-    // It would be much better from an extensibility point of view to read the table in from a file
-    // FIX: this would be much easier to read/maintain if ASCII braille were used
-    // FIX:   (without the "L"s) and the CONTRACTIONS table built as a lazy static
-    static CONTRACTIONS: &[Replacement] = &[
-        Replacement{ pattern: "L⠁L⠝L⠙", replacement: "L⠯" },           // and
-        Replacement{ pattern: "L⠋L⠕L⠗", replacement: "L⠿" },           // for
-        Replacement{ pattern: "L⠕L⠋", replacement: "L⠷" },             // of
-        Replacement{ pattern: "L⠞L⠓L⠑", replacement: "L⠮" },           // the
-        Replacement{ pattern: "L⠺L⠊L⠞L⠓", replacement: "L⠾" },         // with
-        Replacement{ pattern: "L⠉L⠓", replacement: "L⠡" },              // ch
-        Replacement{ pattern: "L⠊L⠝", replacement: "L⠔" },              // in
-
-        // cc -- don't match if after/before a cap letter -- no/can't use negative pattern (?!...) in regex package
-        // figure this out -- also applies to ea, bb, ff, and gg (not that they matter)
-        // cc may be important for "arccos", but RUEB doesn't apply it to "arccosine", so maybe not
-        // Replacement{ pattern: "L⠉L⠉", replacement: "L⠒" },              // cc -- don't match if after/before a cap letter
-        
-        
-        Replacement{ pattern: "L⠎L⠓", replacement: "L⠩" },              // sh
-        Replacement{ pattern: "L⠁L⠗", replacement: "L⠜" },              // ar
-        Replacement{ pattern: "L⠑L⠗", replacement: "L⠻" },              // er
-        Replacement{ pattern: "(?P<s>L.)L⠍L⠑L⠝L⠞", replacement: "${s}L⠰L⠞" }, // ment
-        Replacement{ pattern: "(?P<s>L.)L⠞L⠊L⠕L⠝", replacement: "${s}L⠰L⠝" } ,// tion
-        Replacement{ pattern: "(?P<s>L.)L⠑L⠁(?P<e>L.)", replacement: "${s}L⠂${e}" },  // ea
+    const ASCII_TO_UNICODE: &[char] = &[
+        '⠀', '⠮', '⠐', '⠼', '⠫', '⠩', '⠯', '⠄', '⠷', '⠾', '⠡', '⠬', '⠠', '⠤', '⠨', '⠌',
+        '⠴', '⠂', '⠆', '⠒', '⠲', '⠢', '⠖', '⠶', '⠦', '⠔', '⠱', '⠰', '⠣', '⠿', '⠜', '⠹',
+        '⠈', '⠁', '⠃', '⠉', '⠙', '⠑', '⠋', '⠛', '⠓', '⠊', '⠚', '⠅', '⠇', '⠍', '⠝', '⠕',
+        '⠏', '⠟', '⠗', '⠎', '⠞', '⠥', '⠧', '⠺', '⠭', '⠽', '⠵', '⠪', '⠳', '⠻', '⠘', '⠸',
     ];
 
+    fn to_unicode_braille(ascii: &str) -> String {
+        let mut unicode = String::with_capacity(4*ascii.len());   // 'L' + 3 bytes for braille char
+        for ch in ascii.as_bytes() {
+            unicode.push('L');
+            unicode.push(ASCII_TO_UNICODE[(ch.to_ascii_uppercase() - 32) as usize])
+        }
+        return unicode;
+    }
+
+    // It would be much better from an extensibility point of view to read the table in from a file
     lazy_static! {
-        static ref CONTRACTION_PATTERNS: RegexSet = init_patterns(CONTRACTIONS);
-        static ref CONTRACTION_REGEX: Vec<Regex> = init_regex(CONTRACTIONS);
+        static ref CONTRACTIONS: Vec<Replacement> = vec![
+            // 10.3: Strong contractions
+            Replacement{ pattern: to_unicode_braille("and"), replacement: "L⠯"},
+            Replacement{ pattern: to_unicode_braille("for"), replacement: "L⠿"},
+            Replacement{ pattern: to_unicode_braille("of"), replacement: "L⠷"},
+            Replacement{ pattern: to_unicode_braille("the"), replacement: "L⠮"},
+            Replacement{ pattern: to_unicode_braille("with"), replacement: "L⠾"},
+            
+            // 10.8: final-letter groupsigns (this need to preceed 'en' and any other shorter contraction)
+            Replacement{ pattern: "(?P<s>L.)L⠍L⠑L⠝L⠞".to_string(), replacement: "${s}L⠰L⠞" }, // ment
+            Replacement{ pattern: "(?P<s>L.)L⠞L⠊L⠕L⠝".to_string(), replacement: "${s}L⠰L⠝" } ,// tion
+
+            // 10.4: Strong groupsigns
+            Replacement{ pattern: to_unicode_braille("ch"), replacement: "L⠡"},
+            Replacement{ pattern: to_unicode_braille("gh"), replacement: "L⠣"},
+            Replacement{ pattern: to_unicode_braille("sh"), replacement: "L⠩"},
+            Replacement{ pattern: to_unicode_braille("th"), replacement: "L⠹"},
+            Replacement{ pattern: to_unicode_braille("wh"), replacement: "L⠱"},
+            Replacement{ pattern: to_unicode_braille("ed"), replacement: "L⠫"},
+            Replacement{ pattern: to_unicode_braille("er"), replacement: "L⠻"},
+            Replacement{ pattern: to_unicode_braille("ou"), replacement: "L⠳"},
+            Replacement{ pattern: to_unicode_braille("ow"), replacement: "L⠪"},
+            Replacement{ pattern: to_unicode_braille("st"), replacement: "L⠌"},
+            Replacement{ pattern: "(?P<s>L.)L⠊L⠝L⠛".to_string(), replacement: "${s}L⠬" },  // 'ing', not at start
+            Replacement{ pattern: to_unicode_braille("ar"), replacement: "L⠜"},
+
+            // 10.6.5: Lower groupsigns preceeded and followed by letters
+            // FIX: don't match if after/before a cap letter -- can't use negative pattern (?!...) in regex package
+            // Note: removed cc because "arccos" shouldn't be contracted (10.11.1), but there is no way to know about compound words
+            // Add it back after implementing a lookup dictionary of exceptions
+            Replacement{ pattern: "(?P<s>L.)L⠑L⠁(?P<e>L.)".to_string(), replacement: "${s}L⠂${e}" },  // ea
+            Replacement{ pattern: "(?P<s>L.)L⠃L⠃(?P<e>L.)".to_string(), replacement: "${s}L⠆${e}" },  // bb
+            // Replacement{ pattern: "(?P<s>L.)L⠉L⠉(?P<e>L.)".to_string(), replacement: "${s}L⠒${e}" },  // cc
+            Replacement{ pattern: "(?P<s>L.)L⠋L⠋(?P<e>L.)".to_string(), replacement: "${s}L⠖${e}" },  // ff
+            Replacement{ pattern: "(?P<s>L.)L⠛L⠛(?P<e>L.)".to_string(), replacement: "${s}L⠶${e}" },  // gg
+
+            // 10.6.8: Lower groupsigns ("in" also 10.5.4 lower wordsigns)
+            // FIX: these need restrictions about only applying when upper dots are present
+            Replacement{ pattern: to_unicode_braille("en"), replacement: "⠢"},
+            Replacement{ pattern: to_unicode_braille("in"), replacement: "⠔"},
+           
+        ];
+
+        static ref CONTRACTION_PATTERNS: RegexSet = init_patterns(&CONTRACTIONS);
+        static ref CONTRACTION_REGEX: Vec<Regex> = init_regex(&CONTRACTIONS);
     }
 
     let mut chars_as_str = chars.iter().collect::<String>();
@@ -1272,9 +1330,9 @@ fn handle_contractions(chars: &[char], mut result: String) -> String {
 
 
     fn init_patterns(contractions: &[Replacement]) -> RegexSet {
-        let mut vec = Vec::with_capacity(contractions.len());
+        let mut vec: Vec<&str> = Vec::with_capacity(contractions.len());
         for contraction in contractions {
-            vec.push(contraction.pattern);
+            vec.push(&contraction.pattern);
         }
         return RegexSet::new(&vec).unwrap();
     }
@@ -1282,7 +1340,7 @@ fn handle_contractions(chars: &[char], mut result: String) -> String {
     fn init_regex(contractions: &[Replacement]) -> Vec<Regex> {
         let mut vec = Vec::with_capacity(contractions.len());
         for contraction in contractions {
-            vec.push(Regex::new(contraction.pattern).unwrap());
+            vec.push(Regex::new(&contraction.pattern).unwrap());
         }
         return vec;
     }

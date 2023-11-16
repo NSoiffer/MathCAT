@@ -69,7 +69,7 @@
    replace: 
    - t: "1⠷"
    - x: "*[1]"
-   - t: "⠨⠌"
+   - t: "1⠨⠌"
    - x: "*[2]"
    - t: "1⠾"
 
@@ -90,7 +90,7 @@
   match: "IsBracketed(., '(', ')') and *[2][self::m:mtable][count(*)=2 and count(*[1])=1] and contains(@intent, 'binomial(')"
   replace:
      - x: "*[1]"
-     - x: "DEBUG(*[2]/*[1]/*[1]/*[1])"
+     - x: "*[2]/*[1]/*[1]/*[1]"
      - t: "⠰⠻"
      - x: "*[2]/*[2]/*[1]/*[1]"
      - x: "*[3]"
@@ -179,6 +179,20 @@
    match: "."
    replace: [x: "*"]
 
+
+-
+   # operator omission
+   name: operator-omission
+   tag: mo
+   # normally(?) this is an omission, but the case 6'2" causes problems due to WIRIS
+   # in that case, it doesn't put the ft/in in a superscript and thinks the space is an operator
+   # canonicalization moves them into <msup> with base <mn>, so this shouldn't be an omission for that case
+   match: "translate(., '\u00A0', '')='' and
+           not( preceding-sibling::*[1][self::m:msup and *[2][self::m:mo]] and
+                following-sibling::*[1][self::m:msup and *[2][self::m:mo]] )"
+   replace:
+   - t: "⠬"   # empty space for omission
+
 -
    name: default
    tag: mo
@@ -241,15 +255,13 @@
    replace:
    - x: "BrailleChars(., 'UEB')"
       
-
 -
    # FIX: need to deal with all caps
    name: default
    tag: [mi, mtext]
    match: "."
    replace:
-      - x: "BrailleChars(., 'UEB')"
-      
+   - x: "BrailleChars(., 'UEB')"
 
 -
    name: default
