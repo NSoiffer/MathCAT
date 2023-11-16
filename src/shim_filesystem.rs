@@ -143,6 +143,7 @@ cfg_if! {
         use sxd_document::Package;
         thread_local! {
             // FIX: use include! macro (static DIRECTORY_TREE: ... = include!(...))
+            //    The file to include would be the result of something added to build.rs to create directory.xml that mimics what's below
             static DIRECTORY_TREE: RefCell<Package> = RefCell::new(
                     parser::parse(r"
                     <dir name='Rules'>
