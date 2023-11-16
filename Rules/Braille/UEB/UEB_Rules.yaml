@@ -90,7 +90,7 @@
   match: "IsBracketed(., '(', ')') and *[2][self::m:mtable][count(*)=2 and count(*[1])=1] and contains(@intent, 'binomial(')"
   replace:
      - x: "*[1]"
-     - x: "DEBUG(*[2]/*[1]/*[1]/*[1])"
+     - x: "*[2]/*[1]/*[1]/*[1]"
      - t: "⠰⠻"
      - x: "*[2]/*[2]/*[1]/*[1]"
      - x: "*[3]"
