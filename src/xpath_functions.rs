@@ -1119,6 +1119,51 @@ impl Function for EdgeNode {
     }
 }
 
+pub struct FontSizeGuess;
+/// FontSizeGuess(size_string)
+///   returns a guess of the size in "ems"
+/// Examples:
+///    "0.278em" -> 0.278
+///    ""
+// 		   returns original node match isn't found
+//  Note: if stopNodeName=="math", then punctuation is taken into account since it isn't really part of the math
+impl Function for FontSizeGuess {
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        lazy_static! {
+            // match one or more digits followed by a unit -- there are many more units, but they tend to be large and rarer(?)
+            static ref FONT_VALUE: Regex = Regex::new(r"([0-9]*.?[0-9]*)(px|cm|mm|Q|in|ppc|pt|ex|em|rem|)").unwrap();
+        }
+        let mut args = Args(args);
+        args.exactly(1)?;
+        let value_with_unit = args.pop_string()?;
+        let cap = FONT_VALUE.captures(&value_with_unit);
+        let (value, multiplier) = if let Some(cap) = cap {
+            let multiplier = match &cap[2] {    // guess based on 12pt font to convert to ems
+                "px" => 1.0/12.0,
+                "cm" => 2.37,
+                "mm" => 0.237,
+                "Q" => 0.059,  // 1/4 mm
+                "in" => 6.02,
+                "pc" => 1.0,
+                "pt" => 1.0/12.0,
+                "ex" => 0.5,
+                "em" => 1.0,
+                "rem" => 16.0/12.0,
+                default => {debug!("unit='{}'", default); 10.0}
+            };
+            (cap[1].parse::<f64>().unwrap_or(0.0), multiplier)
+        } else {
+            (10.0, 1.0)
+        };
+        debug!("FontSizeGuess: {}->{}, val={}, multiplier={}", value_with_unit, value*multiplier, value, multiplier);
+        return Ok( Value::Number(value * multiplier) );
+    }
+}
+
 /// Add all the functions defined in this module to `context`.
 pub fn add_builtin_functions(context: &mut Context) {
     // FIX: should be a static cache that gets regenerated on update
@@ -1136,6 +1181,7 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("IfThenElse", IfThenElse);
     context.set_function("DistanceFromLeaf", DistanceFromLeaf);
     context.set_function("EdgeNode", EdgeNode);
+    context.set_function("FontSizeGuess", FontSizeGuess);
     context.set_function("DEBUG", Debug);
 }
 
