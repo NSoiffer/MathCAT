@@ -679,76 +679,76 @@
  - "∈":                                         	#  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "elementti"]                  	# 	(en: 'an element of', google translation)
+        then: [T: "kuuluu joukkoon"]                  	# 	(en: 'an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set"	#  inside a set
             then_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "sisään"]             	# 	(en: 'in', google translation)
+                then: [T: "kuuluu joukkoon"]             	# 	(en: 'in', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "jonkin jäsen"]       	# 	(en: 'member of', google translation)
+                then: [T: "kuuluu joukkoon"]       	# 	(en: 'member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "elementti"]          	# 	(en: 'element of', google translation)
-              - else: [t: "kuuluu joukkoon"]    	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belonging to', google: 'kuulua')
+                then: [T: "kuuluu joukkoon"]          	# 	(en: 'element of', google translation)
+              - else: [T: "kuuluu joukkoon"]    	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belonging to', google: 'kuulua')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "on jäsen"]           	# 	(en: 'is a member of', google translation)
+                then: [T: "kuuluu joukkoon"]           	# 	(en: 'is a member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "on elementti"]       	# 	(en: 'is an element of', google translation)
+                then: [T: "kuuluu joukkoon"]       	# 	(en: 'is an element of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "on sisään"]          	# 	(en: 'is in', google translation)
-              - else: [t: "kuuluu joukkoon"]    	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belongs to', google: 'kuuluu')
+                then: [T: "kuuluu joukkoon"]          	# 	(en: 'is in', google translation)
+              - else: [T: "kuuluu joukkoon"]    	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belongs to', google: 'kuuluu')
  - "∉":                                         	#  0x2209
     # rule is identical to 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "ei ole elementti"]           	# 	(en: 'is not an element of', google translation)
+        then: [T: "ei kuulu joukkoon"]           	# 	(en: 'is not an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set"	#  inside a set
             then_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "ei mukana"]          	# 	(en: 'not in', google translation)
+                then: [T: "ei kuulu joukkoon"]          	# 	(en: 'not in', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "ei jäsen"]           	# 	(en: 'not member of', google translation)
+                then: [T: "ei kuulu joukkoon"]           	# 	(en: 'not member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "ei elementti"]       	# 	(en: 'not element of', google translation)
-              - else: [t: "ei kuulu joukkoon"]  	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'not belonging to', google: 'ei kuulu')
+                then: [T: "ei kuulu joukkoon"]       	# 	(en: 'not element of', google translation)
+              - else: [T: "ei kuulu joukkoon"]  	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'not belonging to', google: 'ei kuulu')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "ei ole jäsen"]       	# 	(en: 'is not a member of', google translation)
+                then: [T: "ei kuulu joukkoon"]       	# 	(en: 'is not a member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "ei ole elementti"]   	# 	(en: 'is not an element of', google translation)
+                then: [T: "ei kuulu joukkoon"]   	# 	(en: 'is not an element of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "ei ole"]             	# 	(en: 'is not in', google translation)
-              - else: [t: "ei kuulu joukkoon"]  	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'does not belong to', google: 'ei kuulu')
+                then: [T: "ei kuulu joukkoon"]             	# 	(en: 'is not in', google translation)
+              - else: [T: "ei kuulu joukkoon"]  	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'does not belong to', google: 'ei kuulu')
  - "∊":                                         	#  0x220a
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "on elementti"]               	# 	(en: 'is an element of', google translation)
+        then: [T: "kuuluu joukkoon"]               	# 	(en: 'is an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set"	#  inside a set
             then_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "sisään"]             	# 	(en: 'in', google translation)
+                then: [T: "kuuluu joukkoon"]             	# 	(en: 'in', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "jonkin jäsen"]       	# 	(en: 'member of', google translation)
+                then: [T: "kuuluu joukkoon"]       	# 	(en: 'member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "elementti"]          	# 	(en: 'element of', google translation)
-              - else: [t: "kuuluu pienenä alkiona joukkoon"]	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belonging to', google: 'kuulua')
+                then: [T: "kuuluu joukkoon"]          	# 	(en: 'element of', google translation)
+              - else: [T: "kuuluu pienenä alkiona joukkoon"]	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belonging to', google: 'kuulua')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "on jäsen"]           	# 	(en: 'is a member of', google translation)
+                then: [T: "kuuluu joukkoon"]           	# 	(en: 'is a member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "on elementti"]       	# 	(en: 'is an element of', google translation)
+                then: [T: "kuuluu joukkoon"]       	# 	(en: 'is an element of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "on sisään"]          	# 	(en: 'is in', google translation)
-              - else: [t: "kuuluu pienenä alkiona joukkoon"]	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belongs to', google: 'kuuluu')
- - "∋": [t: "sisältää alkion"]                  	#  0x220b	(en: 'contains the member', google: 'sisältää jäsenen')
- - "∌": [t: "ei sisällä alkiota"]               	#  0x220c	(en: 'does not contain the member', google: 'ei sisällä jäsentä')
- - "∍": [t: "sisältää pienen alkion"]           	#  0x220d	(en: 'contains the member', google: 'sisältää jäsenen')
+                then: [T: "kuuluu joukkoon"]          	# 	(en: 'is in', google translation)
+              - else: [T: "kuuluu pienenä alkiona joukkoon"]	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belongs to', google: 'kuuluu')
+ - "∋": [T: "sisältää alkion"]                  	#  0x220b	(en: 'contains the member', google: 'sisältää jäsenen')
+ - "∌": [T: "ei sisällä alkiota"]               	#  0x220c	(en: 'does not contain the member', google: 'ei sisällä jäsentä')
+ - "∍": [T: "sisältää pienen alkion"]           	#  0x220d	(en: 'contains the member', google: 'sisältää jäsenen')
  - "∎": [t: "Todistus päättyy."]                	#  0x220e	(en: 'end of proof', google: 'todistuksen loppu')
  - "∏": [t: "tulo"]                             	#  0x220f	(en: 'product', google: 'tuote')
  - "∐": [t: "coproduct"]                        	#  0x2210	(google: 'kopiointi')
