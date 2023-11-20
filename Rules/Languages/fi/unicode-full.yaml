@@ -7,11 +7,11 @@
  - "¤": [T: "valuuttamerkki"]                   	#  0xa4	(en: 'currency sign')
  - "¥": [T: "jeni"]                              	#  0xa5	(en: 'yen', google: 'jeni')
  - "¦": [T: "katkopystyviiva"]                  	#  0xa6	(en: 'broken bar', google: 'rikkoutunut palkki')
- - "§": [T: "pykälämerkki"]                     	#  0xa7	(en: 'section', google: 'osa')
+ - "§": [T: "pykälä"]                     	        #  0xa7	(en: 'section', google: 'osa')
  - "¨": [T: "treema"]                           	#  0xa8	(en: 'double dot', google: 'kaksinkertainen piste')
  - "©": [T: "tekijänoikeus"]                    	#  0xa9	(en: 'copyright', google: 'tekijänoikeudet')
- - "ª": [T: "feminiinisen järjestysluvun merkki"]	#  0xaa	(en: 'feminine ordinal indicator', google: 'naisellinen ordinaaliindikaattori')
- - "¬": [T: "negaatio"]                         	#  0xac	(en: 'not', google: 'ei')
+ - "ª": [T: "feminiininen järjestysluku"]	        #  0xaa	(en: 'feminine ordinal indicator', google: 'naisellinen ordinaaliindikaattori')
+ - "¬": [T: "ei"]                         	        #  0xac	(en: 'not', google: 'ei')
  - "«": [T: "vasemmalle osoittava kaksinkertainen kulmalainausmerkki"]	#  0xab	(en: 'left-pointing double angle quote mark', google: 'vasemman potentiaalinen kaksoiskulma lainausmerkki')
  - "¯":                                         	#  0xaf
      - test:
@@ -23,7 +23,7 @@
  - "´": [T: "akuutti"]                          	#  0xb4	(en: 'acute')
  - "µ": [T: "mikro"]                            	#  0xb5	(en: 'micro')
  - "¹": [T: "yläindeksi yksi"]                  	#  0xb9	(en: 'one', google: 'yksi')
- - "º": [T: "maskuliinisen järjestysluvun merkki"]	#  0xb9	(en: 'masculine ordinal indicator', google: 'maskuliininen ordinaaliindikaattori')
+ - "º": [T: "maskuliinisen järjestysluvun merkki"]	#  0xb9	(en: 'masculine ordinal indicator', google: 'maskuliininen ordinaaliindikaattori') # should be 0xba
  - "·":
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
@@ -50,7 +50,7 @@
 
  - "ʷ": [T: "yläindeksi w"]                 	    #  0x2b7	(en: 'modifier small w', google translation)
  - "ʸ": [T: "yläindeksi y"]           	            #  0x2b8	(en: 'modifier small y', google translation)
- - "ʹ": [T: "priimikirjain"]                   	    #  0x2b9	(en: 'modifier prime', google translation)
+ - "ʹ": [T: "priimi"]                   	        #  0x2b9	(en: 'modifier prime', google translation)
  - "ʺ": [T: "kaksoispriimi"]            	        #  0x2ba	(en: 'modifier double prime', google translation)
  - "ʻ": [T: "käänteispilkku"] 	                    #  0x2bb	(en: 'modifier turned comma', google translation)
  - "ʼ": [T: "heittomerkki"]        	                #  0x2bc	(en: 'modifier apostrophe', google translation)
@@ -440,12 +440,12 @@
  - "ℏ":                                         	#  0x210f
      - test: 
          if: "($Verbosity='Terse')"
-         then: [t: "h viiva"]                     	# 	(google translation)
+         then: [T: "h viiva"]                     	# 	(google translation)
          else: [T: "redusoitu Planckin vakio"]      # 	(en: 'reduced planck constant', google: 'vähentynyt planck -vakio')
 
  - "ℐℒ℘ℬℰℱℳ":                                   	#  0x2110, 0x2112, 0x2118, 0x2130, 0x2131, 0x2133
-    - t: "h viiva"                              	# 	(en: 'script', google: 'käsikirjoitus')
-    - spell: "translate('.', 'ℐℒ℘ℬℰℱℳ', 'ILPBEFM')"
+    - T: "kauno"                              	# 	(en: 'script', google: 'käsikirjoitus')
+    - SPELL: "translate('.', 'ℐℒ℘ℬℰℱℳ', 'ILPBEFM')"
 
  - "ℓ": [T: "kauno l"]                          	#  0x2113	(en: 'script l', google: 'käsikirjoitus l')
  - "℔": [t: "puntaa"]                           	#  0x2114	(en: 'pounds', google translation)
@@ -462,19 +462,19 @@
  - "Ⅎ℺⅁⅂⅃⅄":                                    	#  0x2132, 0x213a, 0x2141, 0x2142, 0x2143, 0x2144
     - test:
       - if: "'.' = '℺'"
-        then: [t: "kierretty"]                  	# 	(en: 'rotated', google translation)
+        then: [T: "kierretty"]                  	# 	(en: 'rotated', google translation)
       - else_if: "'.' = 'Ⅎ'"
-        then: [t: "käännetty"]                    	# 	(en: 'turned', google translation)
+        then: [T: "käännetty"]                    	# 	(en: 'turned', google translation)
       - else_if: "'.' = '⅃'"
-        then: [t: "kääntynyt sans-serif"]       	# 	(en: 'reversed sans-serif', google translation)
-        else: [t: "kääntynyt sans-serif"]           # 	(en: 'turned sans-serif', google: 'kääntyi sans-serif')
-    - spell: "translate('.', 'Ⅎ℺⅁⅂⅃⅄', 'FQGLLY')"
+        then: [T: "kääntynyt sans-serif"]       	# 	(en: 'reversed sans-serif', google translation)
+        else: [T: "käännetty sans-serif"]           # 	(en: 'turned sans-serif', google: 'kääntyi sans-serif')
+    - SPELL: "translate('.', 'Ⅎ℺⅁⅂⅃⅄', 'FQGLLY')"
 
  - "ℴ": [t: "kauno o"]                          	#  0x2134	(en: 'script o', google: 'käsikirjoitus o')
- - "ℵ": [t: "alef"]                             	#  0x2135	(en: 'first transfinite cardinal', google: 'ensimmäinen transfinite kardinaali')
- - "ℶ": [t: "bet"]                              	#  0x2136	(en: 'second transfinite cardinal', google: 'toinen transfinite kardinaali')
- - "ℷ": [t: "gimel"]                            	#  0x2137	(en: 'third transfinite cardinal', google: 'kolmas transfinite kardinaali')
- - "ℸ": [t: "dalet"]                            	#  0x2138	(en: 'fourth transfinite cardinal', google: 'neljäs transfinite kardinaali')
+ - "ℵ": [T: "alef"]                             	#  0x2135	(en: 'first transfinite cardinal', google: 'ensimmäinen transfinite kardinaali')
+ - "ℶ": [T: "bet"]                              	#  0x2136	(en: 'second transfinite cardinal', google: 'toinen transfinite kardinaali')
+ - "ℷ": [T: "gimel"]                            	#  0x2137	(en: 'third transfinite cardinal', google: 'kolmas transfinite kardinaali')
+ - "ℸ": [T: "dalet"]                            	#  0x2138	(en: 'fourth transfinite cardinal', google: 'neljäs transfinite kardinaali')
  - "ℼ": [t: "kaksoisviivainen pii"]          	    #  0x213c	(en: 'double struck pi', google translation)
  - "ℽ": [t: "kaksoisviivainen gamma"]       	    #  0x213d	(en: 'double struck gamma', google translation)
  - "⅀": [t: "kaksoisviivainen sigma"]	            #  0x2140	(en: 'double struck n-ary summation', google translation)
@@ -578,29 +578,29 @@
  - "↳": [t: "nuoli alas ja kärki oikealle"]     	#  0x21b3	(en: 'downwards arrow with tip rightwards', google: 'alaspäin nuoli kärjen oikealla puolella')
  - "↴": [t: "nuoli oikealle ja kulma alas"]     	#  0x21b4	(en: 'rightwards arrow with corner downwards', google: 'oikealla nuolella nurkkaan alaspäin')
  - "↵": [T: "alas lähtevä vasemmalle kääntyvä nuoli"]   	#  0x21b5	(en: 'downwards arrow with corner leftwards', google: 'alaspäin nuoli vasemmalla kulmassa')
- - "↶": [t: "yläpuoliympyränuoli vastapäivään"] 	#  0x21b6	(en: 'anticlockwise top semicircle arrow', google: 'vastapäivään puolipyöriin nuoli')
- - "↷": [t: "yläpuoliympyränuoli myötäpäivään"] 	#  0x21b7	(en: 'clockwise top semicircle arrow', google: 'myötäpäivään puolipyöriin nuoli')
+ - "↶": [T: "yläpuoliympyränuoli vastapäivään"] 	#  0x21b6	(en: 'anticlockwise top semicircle arrow', google: 'vastapäivään puolipyöriin nuoli')
+ - "↷": [T: "yläpuoliympyränuoli myötäpäivään"] 	#  0x21b7	(en: 'clockwise top semicircle arrow', google: 'myötäpäivään puolipyöriin nuoli')
  - "↸": [t: "nuoli ylävasemmalle pitkään viivaan"]	#  0x21b8	(en: 'north west arrow to long bar', google: 'luoteis -nuoli pitkään baariin')
  - "↹": [t: "nuoli vasemmalle viivaan jonka alla nuoli oikealle viivaan"]	#  0x21b9	(en: 'leftwards arrow to bar over rightwards arrow to bar', google: 'vasen nuoli baariin oikeanpuoleisen nuolen yli baariin')
  - "↺": [T: "vastapäiväinen avoimen ympyrän nuoli"] #  0x21ba	(en: 'anticlockwise open circle arrow', google: 'vastapäivään avoin ympyrä nuoli')
  - "↻": [T: "myötäpäiväinen avoimen ympyrän nuoli"] #  0x21bb	(en: 'clockwise open circle arrow', google: 'myötäpäivään avoin ympyrä nuoli')
- - "↼": [t: "puolinuoli vasemmalle väkä ylös"]  	#  0x21bc	(en: 'left harpoon up', google: 'vasen harppuon ylös')
- - "↽": [t: "puolinuoli vasemmalle väkä alas"]  	#  0x21bd	(en: 'left harpoon down', google: 'vasen harppuon alas')
- - "↾": [t: "puolinuoli ylös väkä oikealle"]    	#  0x21be	(en: 'up harpoon right', google: 'up harpoon oikeassa')
- - "↿": [t: "puolinuoli ylös väkä vasemmalle"]  	#  0x21bf	(en: 'up harpoon left', google: 'up harpoon vasemmalle')
- - "⇀": [t: "puolinuoli oikealle väkä ylös"]    	#  0x21c0	(en: 'right harpoon up', google: 'oikea harppuun')
- - "⇁": [t: "puolinuoli oikealle väkä alas"]    	#  0x21c1	(en: 'right harpoon down', google: 'oikea harppuuna alas')
- - "⇂": [t: "puolinuoli alas väkä oikealle"]    	#  0x21c2	(en: 'down harpoon right', google: 'alas harppuon oikealla')
- - "⇃": [t: "puolinuoli alas väkä vasemmalle"]  	#  0x21c3	(en: 'down harpoon left', google: 'alas harppuun vasemmalle')
- - "⇄": [t: "nuoli oikealle jonka alla nuoli vasemmalle"]	#  0x21c4	(en: 'rightwards arrow over leftwards arrow', google: 'oikealla nuolella vasemmanpuoleisen nuolen yli')
+ - "↼": [T: "puolinuoli vasemmalle väkä ylös"]  	#  0x21bc	(en: 'left harpoon up', google: 'vasen harppuon ylös')
+ - "↽": [T: "puolinuoli vasemmalle väkä alas"]  	#  0x21bd	(en: 'left harpoon down', google: 'vasen harppuon alas')
+ - "↾": [T: "puolinuoli ylös väkä oikealle"]    	#  0x21be	(en: 'up harpoon right', google: 'up harpoon oikeassa')
+ - "↿": [T: "puolinuoli ylös väkä vasemmalle"]  	#  0x21bf	(en: 'up harpoon left', google: 'up harpoon vasemmalle')
+ - "⇀": [T: "puolinuoli oikealle väkä ylös"]    	#  0x21c0	(en: 'right harpoon up', google: 'oikea harppuun')
+ - "⇁": [T: "puolinuoli oikealle väkä alas"]    	#  0x21c1	(en: 'right harpoon down', google: 'oikea harppuuna alas')
+ - "⇂": [T: "puolinuoli alas väkä oikealle"]    	#  0x21c2	(en: 'down harpoon right', google: 'alas harppuon oikealla')
+ - "⇃": [T: "puolinuoli alas väkä vasemmalle"]  	#  0x21c3	(en: 'down harpoon left', google: 'alas harppuun vasemmalle')
+ - "⇄": [T: "oikealle ja vasemmalle osoittavien nuolien pari"]	#  0x21c4	(en: 'rightwards arrow over leftwards arrow', google: 'oikealla nuolella vasemmanpuoleisen nuolen yli')
  - "⇅": [T: "ylös ja alas osoittavien nuolien pari"]	#  0x21c5	(en: 'upwards arrow leftwards of downwards arrow', google: 'ylöspäin nuoli vasemmalle alaspäin nuolesta')
  - "⇆": [T: "vasemmalle ja oikealle osoittavien nuolien pari"]	#  0x21c6	(en: 'leftwards arrow over rightwards arrow', google: 'vasen nuoli oikealla nuolella')
  - "⇇": [T: "nuolipari vasemmalle"]             	#  0x21c7	(en: 'leftwards paired arrows', google: 'vasen parit nuolet')
  - "⇈": [T: "nuolipari ylös"]                   	#  0x21c8	(en: 'upwards paired arrows', google: 'ylöspäin parilliset nuolet')
  - "⇉": [T: "nuolipari oikealle"]               	#  0x21c9	(en: 'rightwards paired arrows', google: 'oikealla puolella nuolet')
  - "⇊": [T: "nuolipari alas"]                   	#  0x21ca	(en: 'downwards paired arrows', google: 'alaspäin parit nuolet')
- - "⇋": [t: "puolinuoli vasemmalle jonka alla puolinuoli oikealle"]	#  0x21cb	(en: 'left harpoon over right harpoon', google: 'vasen harpoon oikean harppuunin yli')
- - "⇌": [t: "puolinuoli oikealle jonka alla puolinuoli vasemmalle"]	#  0x21cc	(en: 'right harpoon over left harpoon', google: 'oikea harppuuna vasemman harppuunin yli')
+ - "⇋": [T: "puolinuolipari vasemmalle ja oikealle"]	#  0x21cb	(en: 'left harpoon over right harpoon', google: 'vasen harpoon oikean harppuunin yli')
+ - "⇌": [T: "puolinuolipari oikealle ja vasemmalle"]	#  0x21cc	(en: 'right harpoon over left harpoon', google: 'oikea harppuuna vasemman harppuunin yli')
  - "⇍": [t: "kaksiviivainen nuoli vasemmalle ja poikkiviiva"]	#  0x21cd	(en: 'leftwards double arrow with stroke', google: 'vasen kaksinkertainen nuoli aivohalvauksella')
  - "⇎": [t: "kaksiviivainen nuoli vasemmalle ja oikealle ja poikkiviiva"]	#  0x21ce	(en: 'left right double arrow with stroke', google: 'vasen oikea kaksinkertainen nuoli aivohalvauksella')
  - "⇏": [t: "kaksiviivainen nuoli oikealle ja poikkiviiva"]	#  0x21cf	(en: 'rightwards double arrow with stroke', google: 'oikeasti kaksinkertainen nuoli aivohalvauksella')
@@ -618,14 +618,14 @@
  - "⇛": [T: "kolmiviivainen nuoli oikealle"]    	#  0x21db	(en: 'rightwards triple arrow', google: 'oikealle kolminkertainen nuoli')
  - "⇜": [t: "kiemuranuoli vasemmalle"]          	#  0x21dc	(en: 'leftwards squiggle arrow', google: 'vasen nuoli')
  - "⇝": [t: "kiemuranuoli oikealle"]            	#  0x21dd	(en: 'rightwards squiggle arrow', google: 'oikealla puolella nuoli')
- - "⇞": [t: "nuoli ylös ja kaksoispoikkiviiva"] 	#  0x21de	(en: 'upwards arrow with double stroke', google: 'ylöspäin nuoli kaksinkertaisella iskulla')
- - "⇟": [t: "nuoli alas ja kaksoispoikkiviiva"] 	#  0x21df	(en: 'downwards arrow with double stroke', google: 'alaspäin nuoli kaksinkertaisella iskulla')
- - "⇠": [t: "katkoviivanuoli vasemmalle"]       	#  0x21e0	(en: 'leftwards dashed arrow', google: 'vasen katkoviiva nuoli')
- - "⇡": [t: "katkoviivanuoli ylös"]             	#  0x21e1	(en: 'upwards dashed arrow', google: 'ylöspäin katkoviiva nuoli')
- - "⇢": [t: "katkoviivanuoli oikealle"]         	#  0x21e2	(en: 'rightwards dashed arrow', google: 'oikealla katkoviivalla nuolella')
- - "⇣": [t: "katkoviivanuoli alas"]             	#  0x21e3	(en: 'downwards dashed arrow', google: 'alaspäin katkoviiva nuoli')
- - "⇤": [t: "nuoli vasemmalle viivaan"]         	#  0x21e4	(en: 'leftwards arrow to bar', google: 'vasen nuoli baariin')
- - "⇥": [T: "pystyviivaan päättyvä oikealle osoittava nuoli"]           	#  0x21e5	(en: 'rightwards arrow to bar', google: 'oikein nuoli baariin')
+ - "⇞": [T: "nuoli ylös kaksoispoikkiviivalla"] 	#  0x21de	(en: 'upwards arrow with double stroke', google: 'ylöspäin nuoli kaksinkertaisella iskulla')
+ - "⇟": [T: "nuoli alas kaksoispoikkiviivalla"] 	#  0x21df	(en: 'downwards arrow with double stroke', google: 'alaspäin nuoli kaksinkertaisella iskulla')
+ - "⇠": [T: "katkoviivanuoli vasemmalle"]       	#  0x21e0	(en: 'leftwards dashed arrow', google: 'vasen katkoviiva nuoli')
+ - "⇡": [T: "katkoviivanuoli ylös"]             	#  0x21e1	(en: 'upwards dashed arrow', google: 'ylöspäin katkoviiva nuoli')
+ - "⇢": [T: "katkoviivanuoli oikealle"]         	#  0x21e2	(en: 'rightwards dashed arrow', google: 'oikealla katkoviivalla nuolella')
+ - "⇣": [T: "katkoviivanuoli alas"]             	#  0x21e3	(en: 'downwards dashed arrow', google: 'alaspäin katkoviiva nuoli')
+ - "⇤": [T: "nuoli vasemmalle viivaan"]         	#  0x21e4	(en: 'leftwards arrow to bar', google: 'vasen nuoli baariin')
+ - "⇥": [T: "nuoli oikealle viivaan"]           	#  0x21e5	(en: 'rightwards arrow to bar', google: 'oikein nuoli baariin')
  - "⇦": [T: "vasemmalle osoittava valkea nuoli"]    #  0x21e6	(en: 'leftwards white arrow', google: 'vasen valkoinen nuoli')
  - "⇧": [T: "ylös osoittava valkea nuoli"]          #  0x21e7	(en: 'upwards white arrow', google: 'ylöspäin valkoinen nuoli')
  - "⇨": [T: "oikealle osoittava valkea nuoli"]      #  0x21e8	(en: 'rightwards white arrow', google: 'oikealle valkoinen nuoli')
@@ -642,7 +642,7 @@
  - "⇳": [t: "ylöspäin valkoinen nuoli"]         	#  0x21f3	(en: 'up down white arrow', google translation)
  - "⇴": [t: "oikea nuoli pienellä ympyrällä"]   	#  0x21f4	(en: 'right arrow with small circle', google translation)
  - "⇵": [t: "upwards arrow to the right of downwards arrow"]	#  0x21f5	(en: 'downwards arrow leftwards of upwards arrow', google: 'alaspäin nuoli ylöspäin ylöspäin nuolesta')
- - "⇶": [t: "kolme oikeusta nuolet"]            	#  0x21f6	(en: 'three rightwards arrows', google translation)
+ - "⇶": [T: "kolmoisnuoli oikealle"]            	#  0x21f6	(en: 'three rightwards arrows', google translation)
  - "⇷": [t: "vasen nuoli pystysuoralla iskulla"]	#  0x21f7	(en: 'leftwards arrow with vertical stroke', google translation)
  - "⇸": [t: "oikealla nuolella pystysuoralla iskulla"]	#  0x21f8	(en: 'rightwards arrow with vertical stroke', google translation)
  - "⇹": [t: "vasen oikea nuoli pystysuoralla iskulla"]	#  0x21f9	(en: 'left right arrow with vertical stroke', google translation)
