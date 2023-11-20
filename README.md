@@ -12,7 +12,13 @@ Kääntämisen jälkeen (vuonna 2024) lisätään pistekirjoitustuki pistenäyt�
 
 ## Testaa suomenkielistä MathCAT-lisäosaa NVDA-ruudunlukijalla
 
-Testaamiseen tarvitset NVDA-ruudunlukijan, joka on saatavilla vain Windows-käyttöjärjestelmälle. Ohje testaamiseen:
+Testaamiseen tarvitset NVDA-ruudunlukijan, joka on saatavilla vain Windows-käyttöjärjestelmälle.
+
+### Tiedostojen lähettäminen sähköpostitse
+
+Voin lähettää testaamiseen vaadittavat tiedostot sähköpostitse, niin GitHubia ei tarvitse osata käyttää. Lähetä sähköpostia osoitteeseen [sami.maatta@celia.fi](mailto:sami.maatta@celia.fi) otsikolla "MathCAT testaaminen", niin lähetän tiedostot. Noudata sitten ohjeita kohdasta 3 eteenpäin.
+
+### Tiedostojen lataaminen GitHubin kautta
 
 1. Lataa MathCAT-lisäosa NVDA:n lisäosakaupasta ja ota se käyttöön. Voit nyt kuunnella matemaattisia kaavoja englanniksi ja lukea ne myös pistenäytöltä Nemeth- tai UEB-standardilla.
 2. Siirry painikkeeseen <code lang="en">code</code>, paina valikko auki ja siirry sen sisällä kohtaan <code lang="en">Download zip</code>.
@@ -30,8 +36,6 @@ Testaamiseen tarvitset NVDA-ruudunlukijan, joka on saatavilla vain Windows-käyt
 
 Jos huomaat puutteita luennassa tai käännöksissä, niin voit lähettää palautetta suoraan Sami Määtälle, [sami.maatta@celia.fi](mailto:sami.maatta@celia.fi) tai lisätä GitHubin avulla "issuen".
 
-</div>
-
 ## Edistyminen
 
 - [ ] Tekstistä puheeksi suomeksi (32 %)
@@ -39,6 +43,8 @@ Jos huomaat puutteita luennassa tai käännöksissä, niin voit lähettää pala
   - SimpleSpeak (ei käännetty)
   - Lukuihin liittyvät käännökset voivat toimia hassusti. Kaikenlainen palaute on tervetullutta!
 - [ ] Pistekirjoitustuki suomeksi (0 %)
+
+</div>
 
 ## MathCAT: Math Capable Assistive Technology
 
