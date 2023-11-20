@@ -794,7 +794,7 @@
  - "∤": [t: "delar inte"]                       	#  0x2224	(en: 'does not divide')
  - "∧": [t: "och"]                              	#  0x2227	(en: 'and')
  - "∨": [t: "eller"]                            	#  0x2228	(en: 'or')
- - "∩": [t: "snitt"]                            	#  0x2229	(en: 'intersection')
+ - "∩": [t: "sniitt"]                            	#  0x2229	(en: 'intersection')
  - "∪": [t: "union"]                            	#  0x222a
  - "∫": [t: "integral"]                         	#  0x222b
  - "∬": [t: "dubbel integral"]                  	#  0x222c	(en: 'double integral')
@@ -1177,7 +1177,7 @@
  - "⊿": [t: "höger triangel"]                   	#  0x22bf	(en: 'right triangle')
  - "⋀": [t: "logiskt och"]                      	#  0x22c0	(en: 'logical and')
  - "⋁": [t: "logiskt eller"]                    	#  0x22c1	(en: 'logical or')
- - "⋂": [t: "snitt"]                            	#  0x22c2	(en: 'intersection')
+ - "⋂": [t: "sniitt"]                            	#  0x22c2	(en: 'intersection')
  - "⋃": [t: "union"]                            	#  0x22c3
  - "⋄": [t: "diamond operator"]                 	#  0x22c4
  - "⋅":                                         	#  0x22c5

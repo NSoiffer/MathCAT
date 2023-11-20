@@ -230,8 +230,10 @@
   - x: "*[1]"
   - T: "från"      # phrase(subtracting 5 'from' 10 gives 5)
   - x: "*[2]"
+  - pause: short
   - T: "till"      # phrase(adding 6 'to' 6 equals  12)
   - x: "*[3]"
+  - pause: short
   - test:
       if: "following-sibling::*"
       then: [{T: "av"}]      # phrase(the square root 'of' 25 equals 5)
@@ -246,6 +248,7 @@
   - x: "*[1]"
   - T: "över"      # phrase(2 'over' 3 equals two thirds)
   - x: "*[2]"
+  - pause: short
   - test:
       if: "following-sibling::*"
       then: [{T: "av"}]      # phrase(the square root 'of' 25 equals 5)

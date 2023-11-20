@@ -54,6 +54,7 @@
             then: [T: "start parentes"]                   #  0x28 (en: 'open', google translation)
             else: [T: "vänster parentes"]          #  0x28 (en: 'open paren')
         else: [T: "vänster parentes"]            #  0x28 (en: 'left paren')
+    - pause: short
  - ")":                                          #  0x29
     - pause: short
     - test:
@@ -116,8 +117,10 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [T: "start hakparentes"]           #  (en: 'open bracket', google translation)
         else: [T: "vänster hakparentes"]         #  (en: 'left bracket')
+    - pause: short
  - "\\": [T: "omvänt snedstreck"]                #  0x5c (en: 'back slash')
  - "]":                                          #  0x5d
+    - pause: short
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [T: "slut hakparentes"]           #  (en: 'close bracket', google translation)
@@ -130,6 +133,7 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [T: "start klammerparentes"]       #  (en: 'open brace', google translation)
         else: [T: "vänster klammerparentes"]     #  (en: 'left brace')
+    - pause: short
  - "|":                                          #  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
      - test:
@@ -142,6 +146,7 @@
         - else: [T: "delar"]                     #  (en: 'divides')
 
  - "}":                                          #  0x7d
+    - pause: short
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [T: "slut klammerparentes"]       #  (en: 'close brace', google translation)
@@ -415,7 +420,7 @@
      - T: "inte parallell med"                  #  (en: 'not parallel to')
  - "∧": [T: "och"]                               #  0x2227 (en: 'and')
  - "∨": [T: "eller"]                             #  0x2228 (en: 'or')
- - "∩": [T: "snitt"]                             #  0x2229 (en: 'intersection')
+ - "∩": [T: "sniitt"]                             #  0x2229 (en: 'intersection')
  - "∪": [T: "union"]                             #  0x222a
  - "∫": [T: "integral"]                          #  0x222b
  - "∬": [T: "dubbel integral"]                   #  0x222c (en: 'double integral')
