@@ -224,11 +224,11 @@
   replace:
   - test:
       if: $ClearSpeak_Trig = 'TrigInverse'
-      then: [{x: "*[1]"}, {bookmark: "*[2]/@id"}, {T: "käänteinen"}]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
+      then: [{x: "*[1]"}, {bookmark: "*[2]/@id"}, {T: "käänteis"}]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
       else_test:
         if: $ClearSpeak_Trig = 'ArcTrig'
         then: [{bookmark: "*[2]/@id"}, {T: "kaari"}, {x: "*[1]"}]      # phrase(the 'arc' of a circle)
-        else: [{bookmark: "*[2]/@id"}, {T: "käänteinen"}, {x: "*[1]"}] # default/Auto      # phrase(8 over 5 is the 'inverse' of 5 over 8)
+        else: [{bookmark: "*[2]/@id"}, {T: "käänteis"}, {x: "*[1]"}] # default/Auto      # phrase(8 over 5 is the 'inverse' of 5 over 8)
 
 - name: function-squared-or-cubed
   tag: power
