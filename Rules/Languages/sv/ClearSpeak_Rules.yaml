@@ -148,7 +148,14 @@
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
   - "*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
   - "*[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
-  replace: [{x: ToCommonFraction(.)}]
+  # replace: [{x: ToCommonFraction(.)}]
+  variables: [IsPlural: "*[1]!=1"]
+  replace:
+  - test:
+      if: "*[1]=1"
+      then: [T: "en"]
+      else: [x: "*[1]"]
+  - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 - name: fraction-over-simple
   tag: fraction
