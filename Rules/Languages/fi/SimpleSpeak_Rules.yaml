@@ -23,9 +23,8 @@
       then: {T: ""}    # phrase('the' square root of x)
   - T: "neliöjuuri"      # phrase(the 'square root' of x)
   - test:
-      # figure out this! Appears in multiple places
       if: "$Verbosity!='Terse'"
-      then: {t: "x: n neliöjuuri"}   # phrase(the square root 'of' x)
+      then: {T: ""}   # phrase(the square root 'of' x) # FI: no need
       else: {pause: short}
   - x: "*[1]"
   - test:
@@ -60,8 +59,7 @@
       - T: "juuri"        # phrase(the square 'root' of)
   - test:
       if: "$Verbosity!='Terse'"
-      # How to handle? "x:n neliöjuuri"
-      then: [{T: "neliöjuuri"}]        # phrase(the square root 'of' x)
+      then: [{T: ""}]        # phrase(the square root 'of' x) # FI: no need
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
@@ -109,13 +107,13 @@
   - test:
       if: "not(IsNode(*[1],'leaf'))"
       then: [{pause: short}]
-  - t: "per"      # phrase(the fraction 3 'over' 4)
+  - T: "per"      # phrase(the fraction 3 'over' 4)
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then: [{pause: short}]
   - x: "*[2]"
   - pause: short
-  - t: "murtoluku loppu"      # phrase(start 7 over 8 'end of fraction')
+  - T: "murtoluku loppu"      # phrase(start 7 over 8 'end of fraction')
   - pause: medium
 
 # rules for functions raised to a power
@@ -125,8 +123,7 @@
   tag: inverse-function
   match: "."
   replace:
-  # Should this rather be "käänteis-"?
-  - T: "käänteinen"      # phrase(the 'inverse' of f)
+  - T: "käänteis"      # phrase(the 'inverse' of f) # FI: example: inverse sine should read "käänteissini", it's a composite word, might not apply for all functions
   - x: "*[1]"
 
 - name: function-squared-or-cubed
@@ -139,7 +136,6 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      # Might not work too well in Finnish
       then: {T: "neliö"}      # phrase(5 'squared' equals 25)
       else: {T: "kuutio"}      # phrase(5 'cubed' equals 125)
 - name: function-power
@@ -155,7 +151,6 @@
       if: "*[2][self::m:mn][not(contains(., '.'))]"
       then: [{x: "ToOrdinal(*[2])"}]
       else: [{x: "*[2]"}]
-    # might have to think about phrasing, listen to it!
   - T: "potenssi"      # phrase(the fourth 'power of' 2)
   - pause: short
   - x: "*[1]"
@@ -172,18 +167,17 @@
       then: {T: "neliö"}      # phrase(5 'squared' equals 25)
       else: {T: "kuutio"}      # phrase(5 'cubed' equals 125)
 
-# check all of these by testing
-# Should it be "korotettuna potenssiin"?
 - name: simple-integer
   tag: power
   match: "*[2][self::m:mn][not(contains(., '.'))]"
   replace:
   - x: "*[1]"
-  - T: "korotettuna"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
   - test:
       if: "*[2][.>0]"
       then: {x: "ToOrdinal(*[2])"}
       else: {x: "*[2]"}
+
 - name: simple-negative-integer
   tag: power
   match:
@@ -191,14 +185,15 @@
   - "     *[1][self::m:mn][not(contains(., '.'))]]"
   replace:
   - x: "*[1]"
-  - T: "korotettuna"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
+
 - name: simple-var
   tag: power
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  - T: "korotettuna"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
   - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
 
@@ -207,7 +202,7 @@
   match: "IsNode(*[2], 'leaf')"
   replace:
   - x: "*[1]"
-  - T: "korotettuna"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
 
 - name: nested
@@ -222,10 +217,11 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - T: "korotettuna"      # phrase(15 'raised to the' second power equals 225)
+  - T: "potenssiin"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
   - pause: short
   - T: "eksponentti loppu"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+
 - name: default
   tag: power
   match: "."
