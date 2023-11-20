@@ -658,7 +658,7 @@
     - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:cases) or $ClearSpeak_MultiLineLabel = 'Case'"
       then: [{T: "tapauksessa"}]      # phrase(in this  'case' x is not equal to y)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
-      then: [{T: "viiva"}]      # phrase(the straight 'line' between x and y)
+      then: [{T: "rivi"}]      # phrase(the straight 'line' between x and y)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
       then: [{T: "ehto"}]      # phrase(there is a 'constraint' on possible values)
     - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
