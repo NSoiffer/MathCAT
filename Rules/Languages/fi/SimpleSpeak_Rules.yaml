@@ -251,7 +251,6 @@
       - test:
           if: "$Verbosity!='Terse'"
           then: {T: ""}      # phrase('the' set of all integers)
-      # Different translation might work too
       - T: "joukko"      # phrase(the 'set of all' positive integers less than 10)
       - x: "*[1]/*[1]"
       - t: "siten, että"      # phrase(x 'such that' x is less than y)
