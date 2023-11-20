@@ -2977,15 +2977,15 @@
 # The private use chars are from MathType
  - "": [t: "vastapäivään muodon integraali -silmukka"]	#  0xee00	(en: 'anticlockwise contour integral loop', google translation)
  - "": [t: "myötäpäivään ääriviivasilmukka"]   	#  0xee01	(en: 'clockwise contour integral loop', google translation)
- - "": [t: ""]                                 	#  0xee04
- - "": [t: ""]                                 	#  0xee05
- - "": [t: ""]                                 	#  0xee06
- - "": [t: ""]                                 	#  0xee07
- - "": [t: ""]                                 	#  0xee08
- - "": [t: ""]                                 	#  0xee09
- - "": [t: ""]                                 	#  0xee0a
- - "": [t: ""]                                 	#  0xee0b
- - "": [t: ""]                                 	#  0xee0c
+ - "": [T: ""]                                 	#  0xee04
+ - "": [T: ""]                                 	#  0xee05
+ - "": [T: ""]                                 	#  0xee06
+ - "": [T: ""]                                 	#  0xee07
+ - "": [T: ""]                                 	#  0xee08
+ - "": [T: ""]                                 	#  0xee09
+ - "": [T: ""]                                 	#  0xee0a
+ - "": [T: ""]                                 	#  0xee0b
+ - "": [T: ""]                                 	#  0xee0c
  - "": [t: "yhteinen asemakoriste"]            	#  0xee0d	(en: 'joint status embellishment', google translation)
  - "": [t: "yhteinen asemakoriste jäljellä"]   	#  0xee0e	(en: 'joint status embellishment left', google translation)
  - "": [t: "yhteinen asemakoriste"]            	#  0xee0f	(en: 'joint status embellishment right', google translation)
@@ -3010,25 +3010,25 @@
  - "": [t: "baaria aksentti suljetulla ympyrällä oikealla"]	#  0xee23	(en: 'bar accent with closed circle right', google translation)
  - "": [t: "suuri piste yllä"]                 	#  0xee24	(en: 'large dot above', google translation)
  - "": [t: "kohdistusmerkki"]                  	#  0xef00	(en: 'alignment mark', google translation)
- - "": [t: ""]                                 	#  0xef01
- - "​": [t: ""]                                 	#  0x200b
- - "": [t: ""]                                 	#  0xef02
- - " ": [t: ""]                                 	#  0x2009
- - "": [t: ""]                                 	#  0xef03
- - " ": [t: ""]                                 	#  0x205f
- - "": [t: ""]                                 	#  0xef04
- - "": [t: ""]                                 	#  0xef05
- - " ": [t: ""]                                 	#  0x2003
- - "": [t: ""]                                 	#  0xef06
- - "": [t: ""]                                 	#  0xef07
- - "": [t: ""]                                 	#  0xef08
- - "": [t: ""]                                 	#  0xef09
- - "": [t: ""]                                 	#  0xef0a
- - " ": [t: ""]                                 	#  0x200a
- - "": [t: ""]                                 	#  0xef22
- - "": [t: ""]                                 	#  0xef23
- - "": [t: ""]                                 	#  0xef24
- - "": [t: ""]                                 	#  0xef29
+ - "": [T: ""]                                 	#  0xef01
+ - "​": [T: ""]                                 	#  0x200b
+ - "": [T: ""]                                 	#  0xef02
+ - " ": [T: ""]                                 	#  0x2009
+ - "": [T: ""]                                 	#  0xef03
+ - " ": [T: ""]                                 	#  0x205f
+ - "": [T: ""]                                 	#  0xef04
+ - "": [T: ""]                                 	#  0xef05
+ - " ": [T: ""]                                 	#  0x2003
+ - "": [T: ""]                                 	#  0xef06
+ - "": [T: ""]                                 	#  0xef07
+ - "": [T: ""]                                 	#  0xef08
+ - "": [T: ""]                                 	#  0xef09
+ - "": [T: ""]                                 	#  0xef0a
+ - " ": [T: ""]                                 	#  0x200a
+ - "": [T: ""]                                 	#  0xef22
+ - "": [T: ""]                                 	#  0xef23
+ - "": [T: ""]                                 	#  0xef24
+ - "": [T: ""]                                 	#  0xef29
  - "": [t: "puuttuva termi"]                   	#  0xef41	(en: 'missing term', google translation)
  - "": [t: "myötäpäivään muotoinen nuoli vasemmalla"]	#  0xef80	(en: 'clockwise contour integral arrow on left', google translation)
  - "": [t: "integraali neliön kanssa"]         	#  0xef81	(en: 'integral with square', google translation)
