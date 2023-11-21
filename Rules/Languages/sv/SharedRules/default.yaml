@@ -508,7 +508,7 @@
       then:
       - test:
           if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
-          then: [spell: "'x'", pause: short] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+          then: [T: "kryss", pause: short] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
           else:
           - test:
               if: ".[contains(@notation,'updiagonalstrike')]"
@@ -582,7 +582,7 @@
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
-      then: [T: "slut omslutning"]      # phrase(reached the 'end enclosure' point)
+      then: [pause: short, T: "slut omslutning"]      # phrase(reached the 'end enclosure' point)
   - pause: short
 
 - name: semantics
