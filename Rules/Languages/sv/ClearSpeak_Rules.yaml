@@ -67,7 +67,7 @@
       - if: "*[2][text()='2']"
         then: {T: "kvadratroten"}      # phrase(5 is the 'square root' of 25)
       - else_if: "*[2][text()='3']"
-        then: {T: "kubikroten"}        # phrase(5 is the 'cube root' of 625)
+        then: {T: "kuubiik-roten"}        # phrase(5 is the 'cube root' of 625)
       - else_if: "*[2][not(contains(., ','))]"   # SWEDISH: Changed decimal point to comma.
         then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]      # phrase(the square 'root' of 25)
       else:
