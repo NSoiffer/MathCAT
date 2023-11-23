@@ -136,11 +136,19 @@
   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then:
-  #     - t: "the"      # phrase('the' square root of 25 equals 5)
-  - x: "translate(name(.),'-', ' ')"
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "det"      # phrase('the' square root of 25 equals 5)
+  # - x: "translate(name(.),'-', ' ')"
+  - test:
+     - if: "self::m:open-interval"
+       then: [T: "öppna intervallet"]
+     - else_if: "self::m:open-closed-interval"
+       then: [T: "öppna stängda intervallet"]
+     - else_if: "self::m:closed-interval"
+       then: [T: "stängda intervallet"]
+       else: [T: "stängda öppna intervallet"]
   - test:
       if: "$Verbosity!='Terse'"
       then:
