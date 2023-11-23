@@ -6,10 +6,10 @@
   match: "count(*)=2 and *[2][text()='+' or text()='-']"
   replace:
   # SWEDISH: This test, to see if "the" is supposed to be added or not, is removed from the Swedish translations, as it is not applicable.
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then:
-  #     - t: "the"      # phrase('the' square root of 25 equals 5)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "de"      # phrase('the' square root of 25 equals 5)
   - bookmark: "*[2]/@id"
   - test:
     - if: "*[2][text()='+']"
@@ -18,15 +18,15 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][text()='ℂ']"
-      then: [{T: "komplexa tal"}]      # phrase('complex numbers' consist of two parts)
+      then: [{T: "komplexa talen"}]      # phrase('complex numbers' consist of two parts)
     - else_if: "*[1][text()='ℕ']"
-      then: [{T: "naturliga tal"}]      # phrase('natural numbers' are numbers from 1 to infinity)
+      then: [{T: "naturliga talen"}]      # phrase('natural numbers' are numbers from 1 to infinity)
     - else_if: "*[1][text()='ℚ']"
-      then: [{T: "rationella tal"}]      # phrase('rational numbers' are the fraction of 2 integers)
+      then: [{T: "rationella talen"}]      # phrase('rational numbers' are the fraction of 2 integers)
     - else_if: "*[1][text()='ℝ']"
-      then: [{T: "reella tal"}]      # phrase('real numbers' can be both positive and negative)
+      then: [{T: "reella talen"}]      # phrase('real numbers' can be both positive and negative)
     - else_if: "*[1][text()='ℤ']"
-      then: [{T: "heltal"}]      # phrase(positive 'integers' are natural numbers above 0)
+      then: [{T: "heltalen"}]      # phrase(positive 'integers' are natural numbers above 0)
       else: [{x: "*[1][text()]"}] # shouldn't happen
 
 - name: dimension-number-sets    # should be single digit integer at this point (e.g, R^3)
