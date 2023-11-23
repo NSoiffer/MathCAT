@@ -256,7 +256,7 @@
 
  - "⁡":                                          #  0x2061
     - test:
-        if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
+        if: "not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
              not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':structure:')])"
         then: [T: "av"]                          #  (en: 'of', google translation)
  - "⁢": [T: ""]                                  #  0x2062

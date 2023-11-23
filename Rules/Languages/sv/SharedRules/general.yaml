@@ -141,6 +141,7 @@
       then:
       - T: "det"      # phrase('the' square root of 25 equals 5)
   # - x: "translate(name(.),'-', ' ')"
+  # SWEDISH: The translate function doesn't work for non-English. Used the solution below instead.
   - test:
      - if: "self::m:open-interval"
        then: [T: "öppna intervallet"]
@@ -355,6 +356,7 @@
       then: {T: "sin"}        # phrase('sin' is the abbreviation for sine)
       else: {T: "sinus"}      # phrase(the 'sine' of the angle)
       # SWEDISH: Added short form.
+
 - name: cos
   tag: mi
   match: "text()='cos'"
@@ -364,6 +366,7 @@
       if: "$Verbosity='Terse'"
       then: {T: "cos"}      # phrase('cos' is the abbreviation for cosine)
       else: {T: "cosinus"}      # phrase(find the 'cosine' in a right-angle triangle)
+
 - name: tan
   tag: mi
   match: "text()='tan' or text()='tg'"
@@ -373,6 +376,7 @@
       if: "$Verbosity='Terse'"
       then: {T: "tan"}      # phrase(the 'tan' is the ratio of the opposite to the adjacent side of a right-angled triangle)
       else: {T: "tangens"}      # phrase(a 'tangent' is a straight line that touches a curve)
+
 - name: sec
   tag: mi
   match: "text()='sec'"
@@ -382,6 +386,7 @@
       if: "$Verbosity='Terse'"
       then: {T: "sec"}         # phrase(to 'seek' a solution)
       else: {T: "sekans"}      # phrase(a 'secant' intersects a curve at two or more points)
+
 - name: csc
   tag: mi
   match: "text()='csc'"
@@ -391,6 +396,7 @@
       if: "$Verbosity='Terse'"
       then: {T: "cosec"}         # phrase(we will 'cosecant' a solution)
       else: {T: "cosekans"}      # phrase(the 'cosecant' is the reciprocal of the secant)
+
 - name: cot
   tag: mi
   match: "text()='cot'"
@@ -408,8 +414,9 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "sin hyp"}                # phrase(the word 'sinch' is an abbreviation for hyperbolic sine)
+      then: {T: "sin hype"}                # phrase(the word 'sinch' is an abbreviation for hyperbolic sine)
       else: {T: "sinus hyperbolicus"}      # phrase(the 'hyperbolic sine' is used in mathematics)
+
 - name: cosh
   tag: mi
   match: "text()='cosh'"
@@ -417,8 +424,9 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "cos hyp"}                  # phrase('cosh' is an abbreviation of hyperbolic cosine)
+      then: {T: "cos hype"}                  # phrase('cosh' is an abbreviation of hyperbolic cosine)
       else: {T: "cosinus hyperbolicus"}      # phrase(the 'hyperbolic cosine' is a mathematical function)
+
 - name: tanh
   tag: mi
   match: "text()='tanh'"
@@ -426,8 +434,9 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "tan hyp"}                  # phrase('tanch' is shorthand for hyperbolic tangent)
+      then: {T: "tan hype"}                  # phrase('tanch' is shorthand for hyperbolic tangent)
       else: {T: "tangens hyperbolicus"}      # phrase('hyperbolic tangent' is a mathematical function)
+
 - name: sech
   tag: mi
   match: "text()='sech'"
@@ -435,8 +444,9 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "sec hyp"}                   # phrase('sheck' is shorthand for hyperbolic secant)
+      then: {T: "sec hype"}                   # phrase('sheck' is shorthand for hyperbolic secant)
       else: {T: "sekans hyperbolicus"}        # phrase('hyperbolic secant' is a mathematical function)
+
 - name: csch
   tag: mi
   match: "text()='csch'"
@@ -444,8 +454,9 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "cosec hyp"}                   # phrase('cosheck' is shorthand for hyperbolic cosecant)
+      then: {T: "cosec hype"}                   # phrase('cosheck' is shorthand for hyperbolic cosecant)
       else: {T: "cosekans hyperbolicus"}        # phrase('hyperbolic cosecant' is a mathematical function)
+
 - name: coth
   tag: mi
   match: "text()='coth'"
@@ -453,7 +464,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "cotan hyp"}                  # phrase('cotanch' is shorthand for hyperbolic cotangent)
+      then: {T: "cotan hype"}                  # phrase('cotanch' is shorthand for hyperbolic cotangent)
       else: {T: "cotangens hyperbolicus"}      # phrase(the 'hyperbolic cotangent' is a mathematical function)
 
 - # handle both log and ln
