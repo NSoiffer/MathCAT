@@ -251,8 +251,8 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{T: "raja-arvo kuten"}]      # phrase('the limit as' indicated by this result)
-      else: [{T: "raja-arvo kuten"}]      # phrase(the 'limit as' indicated by this result)
+      then: [{T: "raja-arvo kun"}]      # phrase('the limit as' indicated by this result)
+      else: [{T: "raja-arvo"}]      # phrase(the 'limit as' indicated by this result)
   - x: "*[2]"
   - pause: short
 
