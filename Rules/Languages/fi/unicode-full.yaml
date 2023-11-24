@@ -408,7 +408,7 @@
  - "⃣": [t: "sisältää keyuppercase -koriste"]   	#  0x20e3	(en: 'enclosing keycap embellishment', google translation)
  - "⃤": [t: "ylöspäin suuntautuva kolmion koriste"]	#  0x20e4	(en: 'enclosing upward pointing triangle embellishment', google translation)
  - "⃥": [t: "käänteinen solidus -päällekkäisyys"]	#  0x20e5	(en: 'reverse solidus overlay embellishment', google translation)
- - "⃦": [t: "kaksinkertainen pystysuora aivohalvaus"]	#  0x20e6	(en: 'double verticle stroke embellishment', google translation)
+ - "⃦": [t: "kaksinkertainen pystysuora viiva"]	#  0x20e6	(en: 'double verticle stroke embellishment', google translation)
  - "⃧": [t: "annuiteettisymboli"]               	#  0x20e7	(en: 'annuity symbol embellishment', google translation)
  - "⃨": [t: "kolminkertainen aladotti"]         	#  0x20e8	(en: 'triple underdot', google translation)
  - "⃩": [t: "laaja silta koristelun yläpuolella"]	#  0x20e9	(en: 'wide bridge above embellishment', google translation)
