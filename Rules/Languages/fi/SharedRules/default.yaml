@@ -266,8 +266,8 @@
       then:
       - with:
           variables:
-          - PreSubscript: "IfThenElse($Verbosity='Verbose', 'pre subscript', 'pre sub')"
-          - PreSuperscript: "IfThenElse($Verbosity='Verbose', 'pre superscript', 'pre super')"
+          - PreSubscript: "IfThenElse($Verbosity='Verbose', 'etualaindeksi', 'etuala')"
+          - PreSuperscript: "IfThenElse($Verbosity='Verbose', 'etuyläindeksi', 'etuylä')"
           replace:
           - test: # only bother announcing if there is more than one prescript
               if: "count($Prescripts) > 2"
@@ -317,8 +317,8 @@
       then:
       - with:
           variables:
-          - PostSubscript: "IfThenElse($Verbosity='Verbose', 'subscript', 'sub')"
-          - PostSuperscript: "IfThenElse($Verbosity='Verbose', 'superscript', 'super')"
+          - PostSubscript: "IfThenElse($Verbosity='Verbose', 'alaindeksi', 'ala')"
+          - PostSuperscript: "IfThenElse($Verbosity='Verbose', 'yläindeksi', 'ylä')"
           replace:
           - test: # only bother announcing if there is more than one postscript
               if: "count($Postscripts) > 2"
