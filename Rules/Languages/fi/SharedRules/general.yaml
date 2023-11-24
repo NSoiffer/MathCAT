@@ -167,7 +167,7 @@
   - test:
       if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
       then: [{pause: short}]
-      else: [{pause: short}, {T: "itseisarvo lopun"}, {pause: short}]      # phrase(show 'end absolute value' position)
+      else: [{pause: short}, {T: "itseisarvo loppu"}, {pause: short}]      # phrase(show 'end absolute value' position)
 
 - name: negative
   tag: negative
@@ -197,7 +197,7 @@
       then:
       - test:
           if: "$Verbosity='Verbose'"
-          then: {T: "alaindeksi lopun"}      # phrase(this is the 'end subscript' position)
+          then: {T: "alaindeksi loppu"}      # phrase(this is the 'end subscript' position)
           else: {T: "ala loppu"}      # phrase(this is the 'end sub' position)
       - pause: short
       else_test:
