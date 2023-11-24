@@ -643,12 +643,12 @@
  - "⇴": [t: "oikea nuoli pienellä ympyrällä"]   	#  0x21f4	(en: 'right arrow with small circle', google translation)
  - "⇵": [t: "upwards arrow to the right of downwards arrow"]	#  0x21f5	(en: 'downwards arrow leftwards of upwards arrow', google: 'alaspäin nuoli ylöspäin ylöspäin nuolesta')
  - "⇶": [T: "kolmoisnuoli oikealle"]            	#  0x21f6	(en: 'three rightwards arrows', google translation)
- - "⇷": [t: "vasen nuoli pystysuoralla iskulla"]	#  0x21f7	(en: 'leftwards arrow with vertical stroke', google translation)
- - "⇸": [t: "oikealla nuolella pystysuoralla iskulla"]	#  0x21f8	(en: 'rightwards arrow with vertical stroke', google translation)
- - "⇹": [t: "vasen oikea nuoli pystysuoralla iskulla"]	#  0x21f9	(en: 'left right arrow with vertical stroke', google translation)
- - "⇺": [t: "vasen nuoli kaksinkertaisella pystysuoralla iskulla"]	#  0x21fa	(en: 'leftwards arrow with double vertical stroke', google translation)
- - "⇻": [t: "oikealla nuolella kaksinkertaisella pystysuoralla iskulla"]	#  0x21fb	(en: 'rightwards arrow with double vertical stroke', google translation)
- - "⇼": [t: "vasen oikea nuoli kaksinkertaisella pystysuoralla iskulla"]	#  0x21fc	(en: 'left right arrow with double vertical stroke', google translation)
+ - "⇷": [t: "vasen nuoli pystysuoralla viivalla"]	#  0x21f7	(en: 'leftwards arrow with vertical stroke', google translation)
+ - "⇸": [t: "oikealla nuolella pystysuoralla viivalla"]	#  0x21f8	(en: 'rightwards arrow with vertical stroke', google translation)
+ - "⇹": [t: "vasen oikea nuoli pystysuoralla viivalla"]	#  0x21f9	(en: 'left right arrow with vertical stroke', google translation)
+ - "⇺": [t: "vasen nuoli kaksinkertaisella pystysuoralla viivalla"]	#  0x21fa	(en: 'leftwards arrow with double vertical stroke', google translation)
+ - "⇻": [t: "oikealla nuolella kaksinkertaisella pystysuoralla viivalla"]	#  0x21fb	(en: 'rightwards arrow with double vertical stroke', google translation)
+ - "⇼": [t: "vasen oikea nuoli kaksinkertaisella pystysuoralla viivalla"]	#  0x21fc	(en: 'left right arrow with double vertical stroke', google translation)
  - "⇽": [t: "avopäänuoli vasemmalle"]           	#  0x21fd	(en: 'leftwards open headed arrow', google: 'vasen auki pää nuoli')
  - "⇾": [t: "avopäänuoli oikealle"]             	#  0x21fe	(en: 'rightwards open headed arrow', google: 'oikea avaa pään nutrow')
  - "⇿": [t: "avopäänuoli oikealle ja vasemmalle"]	#  0x21ff	(en: 'left right open headed arrow', google: 'vasen oikeaa auki nuoli')
@@ -1725,16 +1725,16 @@
  - "⟽": [t: "pitkä vasen kaksinkertainen nuoli baarista"]	#  0x27fd	(en: 'long leftwards double arrow from bar', google translation)
  - "⟾": [t: "pitkä oikea kaksinkertainen nuoli baarista"]	#  0x27fe	(en: 'long rightwards double arrow from bar', google translation)
  - "⟿": [t: "pitkä kiemuranuoli oikealle"]      	#  0x27ff	(en: 'long rightwards squiggle arrow', google: 'pitkä oikeassa nuoli')
- - "⤀": [t: "oikealle kaksi päätä nuoli pystysuoralla iskulla"]	#  0x2900	(en: 'rightwards two headed arrow with vertical stroke', google translation)
- - "⤁": [t: "oikealle kaksi päätä nuoli kaksinkertaisella pystysuoralla iskulla"]	#  0x2901	(en: 'rightwards two headed arrow with double vertical stroke', google translation)
- - "⤂": [t: "vasen kaksinkertainen nuoli pystysuoralla iskulla"]	#  0x2902	(en: 'leftwards double arrow with vertical stroke', google translation)
- - "⤃": [t: "oikeasti kaksinkertainen nuoli pystysuoralla iskulla"]	#  0x2903	(en: 'rightwards double arrow with vertical stroke', google translation)
- - "⤄": [t: "vasen oikea kaksinkertainen nuoli pystysuoralla iskulla"]	#  0x2904	(en: 'left right double arrow with vertical stroke', google translation)
+ - "⤀": [t: "oikealle kaksi päätä nuoli pystysuoralla viivalla"]	#  0x2900	(en: 'rightwards two headed arrow with vertical stroke', google translation)
+ - "⤁": [t: "oikealle kaksi päätä nuoli kaksinkertaisella pystysuoralla viivalla"]	#  0x2901	(en: 'rightwards two headed arrow with double vertical stroke', google translation)
+ - "⤂": [t: "vasen kaksinkertainen nuoli pystysuoralla viivalla"]	#  0x2902	(en: 'leftwards double arrow with vertical stroke', google translation)
+ - "⤃": [t: "oikeasti kaksinkertainen nuoli pystysuoralla viivalla"]	#  0x2903	(en: 'rightwards double arrow with vertical stroke', google translation)
+ - "⤄": [t: "vasen oikea kaksinkertainen nuoli pystysuoralla viivalla"]	#  0x2904	(en: 'left right double arrow with vertical stroke', google translation)
  - "⤅": [t: "rightwards two headed arrow from bar"]	#  0x2905	(google: 'oikealle kaksi päätä nuoli baarista')
  - "⤆": [t: "vasen kaksinkertainen nuoli baarista"]	#  0x2906	(en: 'leftwards double arrow from bar', google translation)
  - "⤇": [t: "oikealle kaksinkertainen nuoli baarista"]	#  0x2907	(en: 'rightwards double arrow from bar', google translation)
- - "⤈": [t: "alaspäin nuoli vaakasuuntaisella iskulla"]	#  0x2908	(en: 'downwards arrow with horizontal stroke', google translation)
- - "⤉": [t: "ylöspäin nuoli vaakasuuntaisella iskulla"]	#  0x2909	(en: 'upwards arrow with horizontal stroke', google translation)
+ - "⤈": [t: "alaspäin nuoli vaakasuuntaisella viivalla"]	#  0x2908	(en: 'downwards arrow with horizontal stroke', google translation)
+ - "⤉": [t: "ylöspäin nuoli vaakasuuntaisella viivalla"]	#  0x2909	(en: 'upwards arrow with horizontal stroke', google translation)
  - "⤊": [t: "ylöspäin kolminkertainen nuoli"]   	#  0x290a	(en: 'upwards triple arrow', google translation)
  - "⤋": [t: "alaspäin kolminkertainen nuoli"]   	#  0x290b	(en: 'downwards triple arrow', google translation)
  - "⤌": [t: "leftwards double dash arrow"]      	#  0x290c	(google: 'vasen kaksinkertainen viiva nuoli')
@@ -1745,11 +1745,11 @@
  - "⤑": [t: "rightwards arrow and dotted stem"] 	#  0x2911	(en: 'rightwards arrow with dotted stem', google: 'oikealla nuolella katkoviivalla')
  - "⤒": [t: "upwards arrow to bar"]             	#  0x2912	(google: 'nuoli ylöspäin baariin')
  - "⤓": [t: "downwards arrow to bar"]           	#  0x2913	(google: 'alaspäin nuoli baariin')
- - "⤔": [t: "oikealla nuolella hännän ja pystysuoran iskun kanssa"]	#  0x2914	(en: 'rightwards arrow with tail and vertical stroke', google translation)
- - "⤕": [t: "oikealla nuolella hännän ja kaksinkertaisen pystysuoran iskun kanssa"]	#  0x2915	(en: 'rightwards arrow with tail and double vertical stroke', google translation)
+ - "⤔": [t: "oikealla nuolella hännän ja pystysuoran viivan kanssa"]	#  0x2914	(en: 'rightwards arrow with tail and vertical stroke', google translation)
+ - "⤕": [t: "oikealla nuolella hännän ja kaksinkertaisen pystysuoran viivan kanssa"]	#  0x2915	(en: 'rightwards arrow with tail and double vertical stroke', google translation)
  - "⤖": [t: "rightwards two headed arrow and tail"]	#  0x2916	(en: 'rightwards two headed arrow with tail', google: 'oikealle kaksi päätä nuoli hännän kanssa')
- - "⤗": [t: "oikealle kaksi päätä nuoli, jonka hännä on pystysuoralla iskulla"]	#  0x2917	(en: 'rightwards two headed arrow with tail with vertical stroke', google translation)
- - "⤘": [t: "oikealle kaksi päätä nuoli hännän kanssa kaksinkertaisella pystysuoralla iskulla"]	#  0x2918	(en: 'rightwards two headed arrow with tail with double vertical stroke', google translation)
+ - "⤗": [t: "oikealle kaksi päätä nuoli, jonka hännä on pystysuoralla viivalla"]	#  0x2917	(en: 'rightwards two headed arrow with tail with vertical stroke', google translation)
+ - "⤘": [t: "oikealle kaksi päätä nuoli hännän kanssa kaksinkertaisella pystysuoralla viivalla"]	#  0x2918	(en: 'rightwards two headed arrow with tail with double vertical stroke', google translation)
  - "⤙": [t: "leftwards arrow tail"]             	#  0x2919	(google: 'vasen nuoli häntä')
  - "⤚": [t: "oikealla nuolen häntä"]            	#  0x291a	(en: 'rightwards arrow tail', google translation)
  - "⤛": [t: "leftwards double arrow tail"]      	#  0x291b	(google: 'vasen kaksinkertainen nuoli häntä')
@@ -1972,7 +1972,7 @@
  - "⧴": [t: "rule delayed"]                     	#  0x29f4	(en: 'rule-delayed', google: 'sääntöviitettu')
  - "⧵": [t: "käänteinen solidus -operaattori"]  	#  0x29f5	(en: 'reverse solidus operator', google translation)
  - "⧶": [t: "solidus and overbar"]              	#  0x29f6	(en: 'solidus with overbar', google: 'solidus ylikuormituksen kanssa')
- - "⧷": [t: "käännä solidus vaakasuuntaisella iskulla"]	#  0x29f7	(en: 'reverse solidus with horizontal stroke', google translation)
+ - "⧷": [t: "käännä solidus vaakasuuntaisella viivalla"]	#  0x29f7	(en: 'reverse solidus with horizontal stroke', google translation)
  - "⧸": [T: "iso vinoviiva"]                      	#  0x29f8	(google translation)
  - "⧹": [T: "iso käänteinen vinoviiva"]           	#  0x29f9	(en: 'big reverse solidus', google translation)
  - "⧺": [t: "kaksinkertainen plus"]             	#  0x29fa	(en: 'double plus', google translation)
@@ -2084,8 +2084,8 @@
  - "⩥": [t: "z -merkinnän vastainen"]           	#  0x2a65	(en: 'z notation range antirestriction', google translation)
  - "⩦": [t: "equal and dot below"]              	#  0x2a66	(en: 'equals sign with dot below', google: 'vastaa alla olevaa pistettä')
  - "⩧": [t: "identtinen yllä olevan dot: n kanssa"]	#  0x2a67	(en: 'identical with dot above', google translation)
- - "⩨": [t: "kolminkertainen vaakasuora palkki kaksinkertaisella pystysuoralla iskulla"]	#  0x2a68	(en: 'triple horizontal bar with double vertical stroke', google translation)
- - "⩩": [t: "kolminkertainen vaakasuora palkki kolminkertaisella pystysuoralla iskulla"]	#  0x2a69	(en: 'triple horizontal bar with triple vertical stroke', google translation)
+ - "⩨": [t: "kolminkertainen vaakasuora palkki kaksinkertaisella pystysuoralla viivalla"]	#  0x2a68	(en: 'triple horizontal bar with double vertical stroke', google translation)
+ - "⩩": [t: "kolminkertainen vaakasuora palkki kolminkertaisella pystysuoralla viivalla"]	#  0x2a69	(en: 'triple horizontal bar with triple vertical stroke', google translation)
  - "⩪": [t: "tilde and dot"]                    	#  0x2a6a	(en: 'tilde operator with dot above', google: 'tilde -operaattori, jossa on pisteen yllä')
  - "⩫": [t: "tilde -operaattori nousevilla pisteillä"]	#  0x2a6b	(en: 'tilde operator with rising dots', google translation)
  - "⩬": [t: "samanlainen miinus samanlainen"]   	#  0x2a6c	(en: 'similar minus similar', google translation)
@@ -2225,7 +2225,7 @@
  - "⫲": [t: "parallel and horizontal stroke"]   	#  0x2af2	(en: 'parallel with horizontal stroke', google: 'yhdensuuntainen vaakasuuntaisen iskun kanssa')
  - "⫳": [t: "parallel and tilde operator"]      	#  0x2af3	(en: 'parallel with tilde operator', google: 'rinnakkain tilde -operaattorin kanssa')
  - "⫴": [t: "kolminkertainen pystysuora baarin binaarisuhde"]	#  0x2af4	(en: 'triple vertical bar binary relation', google translation)
- - "⫵": [t: "kolminkertainen pystysuora palkki vaakasuuntaisella iskulla"]	#  0x2af5	(en: 'triple vertical bar with horizontal stroke', google translation)
+ - "⫵": [t: "kolminkertainen pystysuora palkki vaakasuuntaisella viivalla"]	#  0x2af5	(en: 'triple vertical bar with horizontal stroke', google translation)
  - "⫶": [t: "kolminkertainen paksusuolen operaattori"]	#  0x2af6	(en: 'triple colon operator', google translation)
  - "⫷": [t: "kolminkertainen sisäkkäin vähemmän kuin"]	#  0x2af7	(en: 'triple nested less than', google translation)
  - "⫸": [t: "kolminkertainen sisäkkäinen suurempi kuin"]	#  0x2af8	(en: 'triple nested greater than', google translation)
@@ -2288,16 +2288,16 @@
  - "⬱": [t: "kolme vasemmanpuoleista nuolta"]   	#  0x2b31	(en: 'three leftwards arrows', google translation)
  - "⬲": [t: "vasen nuoli ympyröidulla plus"]    	#  0x2b32	(en: 'left arrow with circled plus', google translation)
  - "⬳": [t: "pitkä vasen nuoli"]                	#  0x2b33	(en: 'long leftwards squiggle arrow', google translation)
- - "⬴": [t: "vasen kaksi päätä nuoli pystysuoralla iskulla"]	#  0x2b34	(en: 'leftwards two headed arrow with vertical stroke', google translation)
- - "⬵": [t: "vasen kaksi päätä nuoli kaksinkertaisella pystysuoralla iskulla"]	#  0x2b35	(en: 'leftwards two headed arrow with double vertical stroke', google translation)
+ - "⬴": [t: "vasen kaksi päätä nuoli pystysuoralla viivalla"]	#  0x2b34	(en: 'leftwards two headed arrow with vertical stroke', google translation)
+ - "⬵": [t: "vasen kaksi päätä nuoli kaksinkertaisella pystysuoralla viivalla"]	#  0x2b35	(en: 'leftwards two headed arrow with double vertical stroke', google translation)
  - "⬶": [t: "vasemmalle kaksi päätä nuoli baarista"]	#  0x2b36	(en: 'leftwards two headed arrow from bar', google translation)
  - "⬷": [t: "vasen kaksi päätä kolminkertainen viiva nuoli"]	#  0x2b37	(en: 'leftwards two headed triple dash arrow', google translation)
  - "⬸": [t: "vasen nuoli katkoviivalla"]        	#  0x2b38	(en: 'leftwards arrow with dotted stem', google translation)
- - "⬹": [t: "vasen nuoli hännän kanssa pystysuoralla iskulla"]	#  0x2b39	(en: 'leftwards arrow with tail with vertical stroke', google translation)
- - "⬺": [t: "vasen nuoli hännän kanssa kaksinkertaisella pystysuoralla iskulla"]	#  0x2b3a	(en: 'leftwards arrow with tail with double vertical stroke', google translation)
+ - "⬹": [t: "vasen nuoli hännän kanssa pystysuoralla viivalla"]	#  0x2b39	(en: 'leftwards arrow with tail with vertical stroke', google translation)
+ - "⬺": [t: "vasen nuoli hännän kanssa kaksinkertaisella pystysuoralla viivalla"]	#  0x2b3a	(en: 'leftwards arrow with tail with double vertical stroke', google translation)
  - "⬻": [t: "vasen kaksi päätä nuoli hännän kanssa"]	#  0x2b3b	(en: 'leftwards two headed arrow with tail', google translation)
- - "⬼": [t: "vasen kaksi päätä nuoli, jonka hännä on pystysuoralla iskulla"]	#  0x2b3c	(en: 'leftwards two headed arrow with tail with vertical stroke', google translation)
- - "⬽": [t: "vasen kaksi päätä nuoli hännän kanssa kaksinkertaisella pystysuoralla iskulla"]	#  0x2b3d	(en: 'leftwards two headed arrow with tail with double vertical stroke', google translation)
+ - "⬼": [t: "vasen kaksi päätä nuoli, jonka hännä on pystysuoralla viivalla"]	#  0x2b3c	(en: 'leftwards two headed arrow with tail with vertical stroke', google translation)
+ - "⬽": [t: "vasen kaksi päätä nuoli hännän kanssa kaksinkertaisella pystysuoralla viivalla"]	#  0x2b3d	(en: 'leftwards two headed arrow with tail with double vertical stroke', google translation)
  - "⬾": [t: "vasen nuoli x: n läpi"]            	#  0x2b3e	(en: 'leftwards arrow through x', google translation)
  - "⬿": [t: "aalto nuoli osoittaa suoraan vasemmalle"]	#  0x2b3f	(en: 'wave arrow pointing directly left', google translation)
  - "⭀": [t: "vastaa vasemmanpuoleista nuolen yläpuolella olevaa merkkiä"]	#  0x2b40	(en: 'equals sign above leftwards arrow', google translation)
@@ -2770,14 +2770,14 @@
  - "": [t: "oikea nuolenpää"]                  	#  0xeb0e	(en: 'rightwards arrowhead', google translation)
  - "": [t: "suuri vasen oikea nuoli aivohalvauksella"]	#  0xeb0f	(en: 'large left right arrow with stroke', google translation)
  - "": [t: "vaakasuuntainen kaksoisnuolen laajennus"]	#  0xeb10	(en: 'horizontal double arrow extender', google translation)
- - "": [t: "suuri vasen oikea kaksinkertainen nuoli iskulla"]	#  0xeb11	(en: 'large left right double arrow with stroke', google translation)
+ - "": [t: "suuri vasen oikea kaksinkertainen nuoli viivalla"]	#  0xeb11	(en: 'large left right double arrow with stroke', google translation)
  - "": [t: "alaspäin nuoli ylöspäin ylöspäin nuolesta"]	#  0xeb12	(en: 'downwards arrow leftwards of upwards arrow', google translation)
  - "": [t: "vasen nuoli nurkkaan alaspäin"]    	#  0xeb13	(en: 'leftwards arrow with corner downwards', google translation)
  - "": [t: "oikealla nuolella nurkkaan ylöspäin"]	#  0xeb14	(en: 'rightwards arrow with corner upwards', google translation)
  - "": [t: "vasen nuoli nurkkaan ylöspäin"]    	#  0xeb15	(en: 'leftwards arrow with corner upwards', google translation)
  - "": [t: "vastapäivään puolipyöriin nuoli plus"]	#  0xeb16	(en: 'anticlockwise top semicircle arrow with plus', google translation)
  - "": [t: "myötäpäivään puolipyöriin nuoli miinus"]	#  0xeb17	(en: 'clockwise top semicircle arrow with minus', google translation)
- - "": [t: "oikealla nuolella hännän kanssa iskulla"]	#  0xeb18	(en: 'rightwards arrow with tail with stroke', google translation)
+ - "": [t: "oikealla nuolella hännän kanssa viivalla"]	#  0xeb18	(en: 'rightwards arrow with tail with stroke', google translation)
  - "": [t: "oikea harppuuna alas"]             	#  0xeb19	(en: 'right harpoon down', google translation)
  - "": [t: "vasen harppuon alas"]              	#  0xeb1a	(en: 'left harpoon down', google translation)
  - "": [t: "vasen oikea harppuun"]             	#  0xeb1b	(en: 'left right harpoon down', google translation)
@@ -3074,38 +3074,38 @@
  - "𝔸-𝕐":                                       	#  0x1d504 - 0x1d51d ('z' version is reserved)
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "kaksinkertainen isku"]      	# 	(en: 'double struck', google translation)
+         then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '𝔸𝔹𝔺𝔻𝔼𝔽𝔾𝔿𝕀𝕁𝕂𝕃𝕄𝕅𝕆𝕇𝕈𝕉𝕊𝕋𝕌𝕍𝕎𝕏𝕐', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf080 - 0xf098
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "kaksinkertainen isku"]      	# 	(en: 'double struck', google translation)
+         then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝕒-𝕫":                                       	#  0x1d552 - 0x1d56b
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "kaksinkertainen isku"]      	# 	(en: 'double struck', google translation)
+         then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                       	#  0xf09a - 0xf0b3
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "kaksinkertainen isku"]      	# 	(en: 'double struck', google translation)
+         then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  - "𝟘-𝟡":                                       	#  0x1d7d8 - 0x1d7e1
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "kaksinkertainen isku"]      	# 	(en: 'double struck', google translation)
+         then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡', '0123456789')"
  - "-":                                       	#  0xf0c0 - 0xf0c9
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "kaksinkertainen isku"]      	# 	(en: 'double struck', google translation)
+         then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '', '0123456789')"
 
- - "": [t: "kaksinkertainen iski nabla"]       	#  0xf0ca	(en: 'double struck nabla', google translation)
- - "": [t: "kaksinkertainen iski euler constant"]	#  0xf0cb	(en: 'double struck euler constant', google translation)
+ - "": [t: "tuplaviiva nabla"]       	#  0xf0ca	(en: 'double struck nabla', google translation)
+ - "": [t: "tuplaviiva eulerin vakio"]	#  0xf0cb	(en: 'double struck euler constant', google translation)
  
  # script chars in math alphabetic block and also MathType private use area
  - "𝒜-𝒵":                                       	#  0x1d49c - 0x1d4b5
@@ -3201,17 +3201,17 @@
  - "":                                 	#  0xf201 - 0xf209
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "kaksinkertainen isku"]      	# 	(en: 'double struck', google translation)
+         then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '', 'ΔΨΛΠΣΘΓΩΥ')"
 
  - "-":                                       	#  0xf220 - 0xf236
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "kaksinkertainen isku"]      	# 	(en: 'double struck', google translation)
+         then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
- - "": [t: "kaksois iski lopullisen sigman"]   	#  0xf237	(en: 'double struck final sigma', google translation)
- - "": [t: "kaksinkertainen isku rho"]         	#  0xf250	(en: 'double struck rho', google translation)
+ - "": [t: "tuplaviiva lopullinen sigma"]   	#  0xf237	(en: 'double struck final sigma', google translation)
+ - "": [t: "tuplaviiva rho"]         	#  0xf250	(en: 'double struck rho', google translation)
  - "": [t: "double struck phi"]                	#  0xf251	(google translation)
  - "𝐀-𝐙":                                       	#  0x1d400 - 0x1d419
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
