@@ -108,6 +108,7 @@
       else: [T: "då"]
   - pause: auto
   - x: "*[3]"
+  - pause: short
   - T: "minus samma uttryck"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
   - test:
       if: "$Verbosity='Verbose'"
@@ -635,7 +636,7 @@
   match: "count(*)=1 and *[self::m:mtr][count(*) = 1]"
   replace:
   # - ot: "the"      # phrase('the' 1 by 1 matrix M)
-  - T: "1 gånger 1"      # phrase(the '1 by 1' matrix)
+  - T: "ett-gånger-ett"      # phrase(the '1 by 1' matrix)
   - test:
       if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
       then: {T: "determinanten"}      # phrase(the 2 by 2 'determinant'))
@@ -656,11 +657,11 @@
   replace:
   # - t: "the"      # phrase('the' 2 by 2 matrix M)
   - x: count(*)
-  - T: "gånger 1"      # phrase(the 2 'by 1 column' matrix)
+  - T: "gånger-ett"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: "kolumnvektorn"}      # phrase(the 2 by 2 'vector')
-      else: {T: "kolumnmatrisen"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "kolumn vektorn"}      # phrase(the 2 by 2 'vector')
+      else: {T: "kolumn matrisen"}      # phrase(the 2 by 2 'matrix')
   - pause: long
   - x: "*/*"
   - test:
@@ -679,11 +680,11 @@
   replace:
   # - t: "the"      # phrase('the' 2 by 2 matrix M)
   - x: "count(*)"
-  - T: "gånger 1"      # phrase(the 2 'by 1 column' matrix)
+  - T: "gånger-ett"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: "kolumnvektorn"}      # phrase(the 2 column 'vector')
-      else: {T: "kolumnmatrisen"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "kolumn vektorn"}      # phrase(the 2 column 'vector')
+      else: {T: "kolumn matrisen"}      # phrase(the 2 by 2 'matrix')
   - pause: long
   - x: "*" # select the rows (mtr)
   - test:
@@ -704,13 +705,13 @@
   - count(*[1]/*)<=3 and # at least two cols
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   replace:
-  - T: "1 gånger"      # phrase('the 1 by' 2 matrix)
+  - T: "ett-gånger"      # phrase('the 1 by' 2 matrix)
   - x: count(*/*)
   # - t: "rad"      # phrase(the 1 by 4 'row' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: "radvektorn"}      # phrase('the 1 by' 2 row 'vector')
-      else: {T: "radmatrisen"}      # phrase('the 1 by' 2 'matrix')
+      then: {T: "rad vektorn"}      # phrase('the 1 by' 2 row 'vector')
+      else: {T: "rad matrisen"}      # phrase('the 1 by' 2 'matrix')
   - pause: long
   - x: "*/*"
   - test:
@@ -727,13 +728,13 @@
   variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
   match: "count(*)=1" # one row
   replace:
-  - T: "1 gånger"      # phrase('the 1 by' 2 matrix)
+  - T: "ett-gånger"      # phrase('the 1 by' 2 matrix)
   - x: "count(*/*)"
   # - t: "rad"      # phrase(the 1 by 2 'row' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: "radvektorn"}      # phrase(the 2 by 1 'vector')
-      else: {T: "radmatrisen"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "rad vektorn"}      # phrase(the 2 by 1 'vector')
+      else: {T: "rad matrisen"}      # phrase(the 2 by 2 'matrix')
   - pause: long
   - pause: medium
   - x: "*/*" # select the cols (mtd)
@@ -795,7 +796,7 @@
       - test:
           if: "self::m:determinant"
           then: {T: "determinant"}      # phrase(the 2 by 2 'determinant')
-          else: {T: "matrix"}      # phrase(the 2 by 2 'matrix's)
+          else: {T: "matris"}      # phrase(the 2 by 2 'matrix's)
 
 - name: chemistry-msub
   tag: [chemical-formula]
