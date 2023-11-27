@@ -115,24 +115,24 @@
  - "[":                                          #  0x5b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [T: "start hakparentes"]           #  (en: 'open bracket', google translation)
-        else: [T: "vänster hakparentes"]         #  (en: 'left bracket')
+        then: [T: "start hak parentes"]           #  (en: 'open bracket', google translation)
+        else: [T: "vänster hak parentes"]         #  (en: 'left bracket')
     - pause: short
  - "\\": [T: "omvänt snedstreck"]                #  0x5c (en: 'back slash')
  - "]":                                          #  0x5d
     - pause: short
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [T: "slut hakparentes"]           #  (en: 'close bracket', google translation)
-        else: [T: "höger hakparentes"]           #  (en: 'right bracket')
+        then: [T: "slut hak parentes"]           #  (en: 'close bracket', google translation)
+        else: [T: "höger hak parentes"]           #  (en: 'right bracket')
  - "^": [T: "hatt"]                        #  0x5e (en: 'hat')
  - "_": [T: "understreck"]                       #  0x5f (en: 'under bar', MathPlayer: 'streck under', google: 'under bar')
  - "`": [T: "grav accent"]                       #  0x60 (en: 'grave')
  - "{":                                          #  0x7b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [T: "start klammerparentes"]       #  (en: 'open brace', google translation)
-        else: [T: "vänster klammerparentes"]     #  (en: 'left brace')
+        then: [T: "start klammer parentes"]       #  (en: 'open brace', google translation)
+        else: [T: "vänster klammer parentes"]     #  (en: 'left brace')
     - pause: short
  - "|":                                          #  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
@@ -149,8 +149,8 @@
     - pause: short
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [T: "slut klammerparentes"]       #  (en: 'close brace', google translation)
-        else: [T: "höger klammerparentes"]       #  (en: 'right brace')
+        then: [T: "slut klammer parentes"]       #  (en: 'close brace', google translation)
+        else: [T: "höger klammer parentes"]       #  (en: 'right brace')
 
  - "~": [T: "tilde"]                             #  0x7e
  - " ":                                          #  0xa0
