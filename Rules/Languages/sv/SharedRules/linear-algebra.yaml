@@ -113,7 +113,7 @@
   #     if: "$Verbosity='Verbose'"
   #     then:
   #     - t: "the"      # phrase('the' square root of 25 equals 5)
-  - T: "nollrummet"      # phrase(this is the 'kernel' of the function)
+  - T: "noll-rummet"      # phrase(this is the 'kernel' of the function)
   - test:
       if: "$Verbosity!='Terse'"
       then:
