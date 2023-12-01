@@ -10,10 +10,10 @@ fn salt() {
 
 #[test]
 fn water() {
-  let _expr = "<math><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></math>";
-  //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "大寫 h, 2 大寫 o,");
-  //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "大寫 h, 下標 2 大寫 o,");
-  //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "大寫 h, 上標 2, 大寫 o,");
+  let expr = "<math><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></math>";
+  test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 h, 2 大寫 o,");
+  test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "大寫 h, 下標 2, 大寫 o,");
+  test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "大寫 h, 下標 2, 大寫 o,");
 }
 
 #[test]
@@ -24,25 +24,25 @@ fn carbon() {
 
 #[test]
 fn sulfate() {
-  let _expr = "<math><mrow><msup>
+  let expr = "<math><mrow><msup>
           <mrow><mo>[</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>]</mo></mrow>
           <mrow><mn>2</mn><mo>&#x2212;</mo></mrow>
       </msup></mrow></math>";
-  //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "open bracket, cap s, cap o, sub 4; close bracket super 2 minus");
+  test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "左中括, 大寫 s, 大寫 o, 下標 4; 右中括 上標 2 減");
 }
 
 #[test]
 fn aluminum_sulfate() {
-  let _expr = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
+  let expr = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
           <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
-  //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "cap eigh l, 2, open cap s, cap o, 4, close 3");
-  //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "cap eigh l, sub 2; open paren, cap s, cap o, sub 4; close paren sub 3");
-  //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "cap eigh l, subscript 2; open paren, cap s, cap o, subscript 4; close paren subscript 3");
+  test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 a l, 2, 左小括, 大寫 s, 大寫 o, 4; 右小括 3");
+  test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "大寫 a l, 下標 2; 左小括, 大寫 s, 大寫 o, 下標 4; 右小括 下標 3");
+  test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "大寫 a l, 下標 2; 左小括, 大寫 s, 大寫 o, 下標 4; 右小括 下標 3");
 }
 
 #[test]
 fn ethanol_bonds() {
-  let _expr = "<math>
+  let expr = "<math>
           <mrow>
               <mi>C</mi>
               <msub>  <mi>H</mi> <mn>3</mn> </msub>
@@ -54,7 +54,7 @@ fn ethanol_bonds() {
               <mi>H</mi>
           </mrow>
       </math>";
-  //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "cap c, cap h, 3 single bond cap c, cap h, 2 single bond cap o, cap h,");
+  test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 c, 大寫 h, 3 單鍵 大寫 c, 大寫 h, 2 單鍵 大寫 o, 大寫 h,");
 
 }
 
@@ -114,7 +114,7 @@ fn ethylene_with_colon_bond() {
 
 #[test]
 fn beta_decay() {
-  let _expr = "<math>
+  let expr = "<math>
       <mmultiscripts>
         <mtext>C</mtext>
         <mprescripts />
@@ -139,17 +139,17 @@ fn beta_decay() {
         <mn>0</mn>
       </mmultiscripts>
     </math>";
-    //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Terse")], expr,
-    //  "14, 6, cap c; forms, 14, 7, cap n; plus 0, negative 1, e,");
-    //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
-    //  "super 14, sub 6, cap c; reacts to form; super 14, sub 7, cap n; plus super 0, sub negative 1, e,");
-    //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-    //  "superscript 14, subscript 6, cap c; reacts to form; superscript 14, subscript 7, cap n; plus, superscript 0, subscript negative 1, e,");
+    test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Terse")], expr,
+      "14, 6, 大寫 c; 形成, 14, 7, 大寫 n; 加 0, 負 1, e,");
+    test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
+      "上標 14, 下標 6, 大寫 c; 反應形成; 上標 14, 下標 7, 大寫 n; 加 上標 0, 下標 負 1, e,");
+    test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+      "上標 14, 下標 6, 大寫 c; 反應形成; 上標 14, 下標 7, 大寫 n; 加 上標 0, 下標 負 1, e,");
 }
 
 #[test]
 fn mhchem_beta_decay() {
-  let _expr = "<math>
+  let expr = "<math>
       <mrow>
         <msubsup>
           <mrow>
@@ -403,12 +403,12 @@ fn mhchem_beta_decay() {
         </mrow>
       </mrow>
     </math>";
-    //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Terse")], expr,
-    //  "14, 6, cap c; forms, 14, 7, cap n; plus 0, negative 1, e,");
-    //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
-    //  "super 14, sub 6, cap c; reacts to form; super 14, sub 7, cap n; plus super 0, sub negative 1, e,");
-    //test_prefs("zh", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-    //  "superscript 14, subscript 6, cap c; reacts to form; superscript 14, subscript 7, cap n; plus, superscript 0, subscript negative 1, e,");
+    test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Terse")], expr,
+      "14, 6, 大寫 c; 形成, 14, 7, 大寫 n; 加 0, 負 1, e,");
+    test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
+      "上標 14, 下標 6, 大寫 c; 反應形成; 上標 14, 下標 7, 大寫 n; 加 上標 0, 下標 負 1, e,");
+    test_prefs("zh", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+      "上標 14, 下標 6, 大寫 c; 反應形成; 上標 14, 下標 7, 大寫 n; 加 上標 0, 下標 負 1, e,");
 }
 
 #[test]

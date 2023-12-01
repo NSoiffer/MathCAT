@@ -111,12 +111,11 @@ fn prime() {
 fn given() {
     let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
     test("zh", "SimpleSpeak", expr, "大寫 p, 左小括, 大寫 a 垂線 大寫 b, 右小括");
-    test("zh", "ClearSpeak", expr,  "大寫 p, 左小括, 大寫 a 整除 大寫 b, 右小括");  // not good, but follows the spec
 }
 
 #[test]
 fn simple_msubsup() {
-    let _expr = "<math>
+    let expr = "<math>
             <mstyle displaystyle='true' scriptlevel='0'>
             <msubsup>
                 <mi>x</mi>
@@ -129,19 +128,18 @@ fn simple_msubsup() {
             </msubsup>
             </mstyle>
         </math>";
-    //test("zh", "ClearSpeak", expr, "x sub k, to the i-th power");
+    test("zh", "SimpleSpeak", expr, "x 下標 k, 的 i 次方");
 }
 
 #[test]
 fn non_simple_msubsup() {
     let expr = "<math><msubsup><mi>i</mi><mrow><mi>j</mi><mo>&#x2212;</mo><mn>2</mn></mrow><mi>k</mi></msubsup></math>";
     test("zh", "SimpleSpeak", expr, "i 下標 j 減 2 結束下標, 的 k 次方");
-    //test("zh", "ClearSpeak", expr, "i sub j minus 2 end sub, to the k-th power");
 }
 
 #[test]
 fn presentation_mathml_in_semantics() {
-    let _expr = "<math>
+    let expr = "<math>
         <semantics>
             <annotation encoding='application/x-tex'>{\\displaystyle x_k^i}</annotation>
             <annotation-xml encoding='MathML-Presentation'>
@@ -157,7 +155,7 @@ fn presentation_mathml_in_semantics() {
             </annotation-xml>
         </semantics>
     </math>";
-    //test("zh", "ClearSpeak", expr, "x sub k, to the i-th power");
+    test("zh", "SimpleSpeak", expr, "x 下標 k, 的 i 次方");
 }
 
 #[test]
@@ -251,7 +249,7 @@ fn ignore_comma() {
 #[ignore] // issue #14
 fn ignore_period_and_space() {
     // from https://en.wikipedia.org/wiki/Probability
-    let _expr = "<math>
+    let expr = "<math>
       <mrow>
         <mstyle displaystyle='true' scriptlevel='0'>
           <mi>P</mi>
@@ -284,7 +282,7 @@ fn ignore_period_and_space() {
         </mstyle>
       </mrow>
 </math>";
-    //test("zh", "ClearSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
+test("zh", "SimpleSpeak", expr, "大寫 p, 左小括, 大寫 a 垂線 大寫 b, 右小括; 等於; 分數 大寫 p 大寫 b, 分之, 大寫 p, 左小括, 大寫 a 交集 大寫 b, 右小括 結束分數; 點");
 }
 
 

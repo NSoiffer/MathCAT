@@ -52,6 +52,14 @@
   tag: mroot
   match: "."
   replace:
+  - T: "根號"
+  - x: "*[1]"
+  - test:
+    if: "IsNode(*[1], 'simple')"
+    then:
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: {T: "的"}
   - test:
       if: "*[2][self::m:mn]"
       then_test:
@@ -60,7 +68,8 @@
       - else_if: "*[2][text()='3']"
         then: {T: "立方根"}
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {T: "次方根"}]
+        then: [{x: "*[2]"}, {T: "次方根"}]
+      - else: [{x: "*[2]"}, {T: "次方根"}]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
@@ -69,13 +78,6 @@
           #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: {x: "*[2]"}
       - T: "次方根"
-  - test:
-      if: "IsNode(*[1], 'simple')"
-      then:
-      - test:
-          if: "$Verbosity!='Terse'"
-          then: {T: ""}
-      - x: "*[1]"
 
 - name: default
   tag: mtable

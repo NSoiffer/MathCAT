@@ -49,6 +49,13 @@ fn ordinal_root() {
                 </math>";
     test("zh", "SimpleSpeak", expr, "根號 x 的 9 次方根");
 }
+#[test]
+fn ordinal_root_2() {
+    let expr = "<math>
+                    <mroot> <mi>x</mi> <mn>9.1</mn> </mroot>
+                </math>";
+    test("zh", "SimpleSpeak", expr, "根號 x 的 9.1 次方根");
+}
 
 #[test]
 fn simple_mi_root() {

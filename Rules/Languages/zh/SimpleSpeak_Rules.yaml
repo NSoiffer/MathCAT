@@ -50,6 +50,8 @@
         then: [{T: "立方根"}]        # phrase(the 'cube root' of x)
       - else_if: "*[2][not(contains(., '.'))]"
         then: [{x: "*[2]"}, {T: "次方根"}]        # phrase(the square 'root' of x)
+      - else: [{x: "*[2]"}, {T: "次方根"}]
+        
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
