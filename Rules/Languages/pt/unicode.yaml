@@ -10,7 +10,7 @@
  - "b-z": 
     - test: 
         if: "$TTS='none'"
-        then: [t: "a"]                          	# 	(en: '.', google translation)
+        then: [T: "a"]                          	# 	(en: '.', google translation)
         else: [spell: "'.'"]                       
 
  # Capital letters are a little tricky: users can pick their favorite word (something that was requested) and 
@@ -30,14 +30,14 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "maiúsculas"]             	# 	(en: 'cap', google translation)
+            then: [T: "maiúsculas"]             	# 	(en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"]
     - pitch:
         value: "$CapitalLetters_Pitch"
         replace:
         - test:
             if: "$TTS='none'"
-            then: [t: "A"]                      	# 	(en: 'eigh', google translation)
+            then: [T: "A"]                      	# 	(en: 'eigh', google translation)
             else: [spell: "'a'"]
             
  - "B-Z":
@@ -53,7 +53,7 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "maiúsculas"]             	# 	(en: 'cap', google translation)
+            then: [T: "maiúsculas"]             	# 	(en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
@@ -68,38 +68,39 @@
         then_test:
             if: "$Verbosity = 'Terse'"
             then: [t: "bang"]                   	#  0x21	(google translation)
-            else: [t: "ponto de exclamação"]    	#  0x21	(en: 'exclamation point', google translation)
-        else: [t: "fatorial"]                   	#  0x21	(en: 'factorial', google translation)
+            else: [T: "ponto de exclamação"]    	#  0x21	(en: 'exclamation point', google translation)
+        else: [T: "fatorial"]                   	#  0x21	(en: 'factorial', google translation)
           
- - "\"": [t: "aspa"]                            	#  0x22	(en: 'quotation mark', google translation)
- - "#": [t: "número"]                           	#  0x23	(en: 'number', google translation)
- - "$": [t: "dólares"]                          	#  0x24	(en: 'dollars', google translation)
- - "%": [t: "por cento"]                        	#  0x25	(en: 'percent', google translation)
- - "&": [t: "ampersand"]                        	#  0x26	(google translation)
- - "'": [t: "apóstrofo"]                        	#  0x27	(en: 'apostrophe', google translation)
+ - "\"": [T: "aspa"]                            	#  0x22	(en: 'quotation mark', google translation)
+ - "#": [T: "hashtag"]                           	#  0x23	(en: 'number', google translation)
+ - "$": [T: "cifrão"]                          	#  0x24	(en: 'dollars', google translation)
+ - "%": [T: "por cento"]                        	#  0x25	(en: 'percent', google translation)
+ - "&": [T: "e comercial"]                        	#  0x26	(google translation)
+ - "'": [T: "apóstrofo"]                        	#  0x27	(en: 'apostrophe', google translation)
  - "(":                                         	#  0x28
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [t: "abrir"]                  	#  0x28	(en: 'open', google translation)
-            else: [t: "parê -is aberto"]        	#  0x28	(en: 'open paren', google translation)
-        else: [t: "parênteses esquerdos"]       	#  0x28	(en: 'left paren', google translation)
+            then: [T: "abrir"]                  	#  0x28	(en: 'open', google translation)
+            else: [T: "abre parênteses"]        	#  0x28	(en: 'open paren', google translation)
+        else: [T: "parênteses esquerdo"]       	#  0x28	(en: 'left paren', google translation) #we dont say this in portuguese
  - ")":                                         	#  0x29
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [t: "fechar"]                 	#  0x29	(en: 'close', google translation)
-            else: [t: "parênteses próximos"]    	#  0x29	(en: 'close paren', google translation)
-        else: [t: "parênteses corretos"]        	#  0x29	(en: 'right paren', google translation)
+            then: [T: "fechar"]                 	#  0x29	(en: 'close', google translation)
+            else: [T: "fecha parênteses"]    	#  0x29	(en: 'close paren', google translation)
+        else: [T: "parênteses direito"]        	#  0x29	(en: 'right paren', google translation) #we dont say this in portuguese
 
  - "*":                                         	#  0x2a
     test:
         if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='skip-super']"
-        then: [t: "estrela"]                    	#  0x2a	(en: 'star', google translation)
-        else: [t: "vezes"]                      	#  0x2a	(en: 'times', google translation)
- - "+": [t: "mais"]                             	#  0x2b	(en: 'plus', google translation)
+        then: [T: "estrela"]                    	#  0x2a	(en: 'star', google translation)
+        else: [T: "vezes"]                      	#  0x2a	(en: 'times', google translation)
+        #how to add other word here?
+ - "+": [T: "mais"]                             	#  0x2b	(en: 'plus', google translation)
  - ",":                                         	#  0x2c
     # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
     # that this test is here and not with "…" is not ideal, but seems simplest
@@ -111,97 +112,113 @@
             - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
                # except if expression starts with '…'
             - "../*[1][text()='…'] "
-        then: [t: "vírgula"]                    	# 	(en: 'comma', google translation)
+        then: [T: "vírgula"]                    	# 	(en: 'comma', google translation)
         # else silent
 
- - "-": [t: "menos"]                            	#  0x2d	(en: 'minus', google translation)
+ - "-": [T: "menos"]                            	#  0x2d	(en: 'minus', google translation)
  - ".":                                         	#  0x2e
     - test:
         if: "parent::*[1][self::m:mn]"
-        then: [t: "apontar"]                    	# 	(en: 'point', google translation)
-        else: [t: "ponto"]                      	# 	(en: 'dot', google translation)
- - "/": [t: "dividido por"]                     	#  0x2f	(en: 'divided by', google translation)
- - ":": [t: "cólon"]                            	#  0x3a	(en: 'colon', google translation)
- - ";": [t: "ponto e vírgula"]                  	#  0x3b	(en: 'semicolon', google translation)
+        then: [T: "ponto"]                    	# 	(en: 'point', google translation)
+        else: [T: "ponto"]                      	# 	(en: 'dot', google translation)
+ 
+ - "/": [T: "dividido por"]                     	#  0x2f	(en: 'divided by', google translation)
+ - ":": [T: "dois pontos"]                            	#  0x3a	(en: 'colon', google translation)
+ - ";": [T: "ponto e vírgula"]                  	#  0x3b	(en: 'semicolon', google translation)
+ 
  - "<":                                         	#  0x3c
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é"]                         	# 	(en: 'is', google translation)
-     - t: "menor que"                           	# 	(en: 'less than', google translation)
+         then: [T: "é"]                         	# 	(en: 'is', google translation)
+     - T: "menor que"                           	# 	(en: 'less than', google translation)
+
  - "=":                                         	#  0x3d
     - test: 
         if: "$Verbosity!='Terse'"
-        then: [t: "é igual a"]                  	# 	(en: 'is equal to', google translation)
-        else: [t: "é igual a"]                  	# 	(en: 'equals', google translation)
+        then: [T: "é igual a"]                  	# 	(en: 'is equal to', google translation)
+        else: [T: "igual"]                  	# 	(en: 'equals', google translation)
 
  - ">":                                         	#  0x3e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é"]                         	# 	(en: 'is', google translation)
-     - t: "maior que"                           	# 	(en: 'greater than', google translation)
- - "?": [t: "ponto de interrogação"]            	#  0x3f	(en: 'question mark', google translation)
- - "@": [t: "no sinal"]                         	#  0x40	(en: 'at sign', google translation)
+         then: [T: "é"]                         	# 	(en: 'is', google translation)
+     - T: "maior que"                           	# 	(en: 'greater than', google translation)
+ 
+ - "?": [T: "ponto de interrogação"]            	#  0x3f	(en: 'question mark', google translation)
+ 
+ - "@": [T: "arroba"]                         	#  0x40	(en: 'at sign', google translation)
+ 
  - "[":                                         	#  0x5b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "suporte aberto"]             	# 	(en: 'open bracket', google translation)
-        else: [t: "suporte esquerdo"]           	# 	(en: 'left bracket', google translation)
- - "\\": [t: "barra traseira"]                  	#  0x5c	(en: 'back slash', google translation)
+        then: [T: "abre colchetes"]             	# 	(en: 'open bracket', google translation)
+        else: [T: "colchete esquerdo"]           	# 	(en: 'left bracket', google translation)
+ 
+ - "\\": [T: "contrabarra"]                  	#  0x5c	(en: 'back slash', google translation)
+ #add other translation
+ 
  - "]":                                         	#  0x5d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "fechar suporte"]             	# 	(en: 'close bracket', google translation)
-        else: [t: "suporte direito"]            	# 	(en: 'right bracket', google translation)
- - "^": [t: "chapéu"]                           	#  0x5e	(en: 'hat', google translation)
- - "_": [t: "em barra"]                         	#  0x5f	(en: 'under bar', google translation)
- - "`": [t: "cova"]                             	#  0x60	(en: 'grave', google translation)
+        then: [T: "fecha colchetes"]             	# 	(en: 'close bracket', google translation)
+        else: [T: "colchete direito"]            	# 	(en: 'right bracket', google translation)
+ 
+ - "^": [T: "acento circunflexo"]                           	#  0x5e	(en: 'hat', google translation)
+ - "_": [T: "underline"]                         	#  0x5f	(en: 'under bar', google translation)
+ - "`": [T: "acento grave"]                             	#  0x60	(en: 'grave', google translation)
+ 
  - "{":                                         	#  0x7b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "brace aberto"]               	# 	(en: 'open brace', google translation)
-        else: [t: "colher esquerda"]            	# 	(en: 'left brace', google translation)
+        then: [T: "abre chaves"]               	# 	(en: 'open brace', google translation)
+        else: [T: "chave esquerda"]            	# 	(en: 'left brace', google translation)
+
  - "|":                                         	#  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
      - test:
         - if: $SpeechStyle != 'ClearSpeak'
-          then: [t: "linha vertical"]           	# 	(en: 'vertical line', google translation)
+          then: [T: "linha vertical"]           	# 	(en: 'vertical line', google translation)
         - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
-          then: [t: "de tal modo que"]          	# 	(en: 'such that', google translation)
+          then: [T: "tal que"]          	# 	(en: 'such that', google translation)
         - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
-          then: [t: "dado"]                     	# 	(en: 'given', google translation)
-        - else: [t: "divide"]                   	# 	(en: 'divides', google translation)
+          then: [T: "dado"]                     	# 	(en: 'given', google translation)
+        - else: [T: "divide"]                   	# 	(en: 'divides', google translation)
 
  - "}":                                         	#  0x7d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "feche a cinta"]              	# 	(en: 'close brace', google translation)
-        else: [t: "chave à direita"]            	# 	(en: 'right brace', google translation)
+        then: [T: "fecha chaves"]              	# 	(en: 'close brace', google translation)
+        else: [T: "chave direita"]            	# 	(en: 'right brace', google translation)
 
- - "~": [t: "til"]                              	#  0x7e	(en: 'tilde', google translation)
+ - "~": [T: "til"]                              	#  0x7e	(en: 'tilde', google translation)
+ 
  - " ":                                         	#  0xa0
     - test:
         if: "@data-empty-in-2D and ../../../../*[name(.)!='equations']"
-        then: [t: "vazio"]                      	#  want to say something for fraction (etc) with empty child	(en: 'empty', google translation)
-        else: [t: ""]                            
+        then: [T: "vazio"]                      	#  want to say something for fraction (etc) with empty child	(en: 'empty', google translation)
+        else: [T: ""]                            
 
- - "¬": [t: "não"]                              	#  0xac	(en: 'not', google translation)
- - "°": [t: "graus"]                            	#  0xb0	(en: 'degrees', google translation)
- - "±": [t: "mais ou menos"]                    	#  0xb1	(en: 'plus or minus', google translation)
- - "´": [t: "agudo"]                            	#  0xb4	(en: 'acute', google translation)
+ - "¬": [T: "não"]                              	#  0xac	(en: 'not', google translation)
+ 
+ - "°": [T: "graus"]                            	#  0xb0	(en: 'degrees', google translation)
+ - "±": [T: "mais ou menos"]                    	#  0xb1	(en: 'plus or minus', google translation)
+ - "´": [T: "agudo"]                            	#  0xb4	(en: 'acute', google translation)
+ 
  - "·":                                         	#  0xB7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
-        then: [t: "vezes"]                      	# 	(en: 'times', google translation)
-        else: [t: "ponto"]                      	# 	(en: 'dot', google translation)
+        then: [T: "vezes"]                      	# 	(en: 'times', google translation)
+        else: [T: "ponto"]                      	# 	(en: 'dot', google translation)
  - "×":                                         	#  0xd7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
-        then: [t: "vezes"]                      	# 	(en: 'times', google translation)
+        then: [T: "vezes"]                      	# 	(en: 'times', google translation)
         else_test:
             if: $ClearSpeak_MultSymbolX = 'By'
-            then: [t: "por"]                    	# 	(en: 'by', google translation)
-            else: [t: "cruzar"]                 	# 	(en: 'cross', google translation)
- - "÷": [t: "dividido por"]                     	#  0xf7	(en: 'divided by', google translation)
+            then: [T: "por"]                    	# 	(en: 'by', google translation)
+            else: [T: "cross"]                 	# 	(en: 'cross', google translation)
+
+ - "÷": [T: "dividido por"]                     	#  0xf7	(en: 'divided by', google translation)
  - "̀": [t: "equipamento grave de sotaque"]     	#  0x300	(en: 'grave accent embellishment', google translation)
  - "́": [t: "equipamento de sotaque agudo"]     	#  0x301	(en: 'acute accent embellishment', google translation)
  - "̂": [t: "embelezamento de sotaque circunflexo"]	#  0x302	(en: 'circumflex accent embellishment', google translation)
