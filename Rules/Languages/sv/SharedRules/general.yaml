@@ -104,16 +104,17 @@
   - pause: auto
   - test:
       if: "$Verbosity='Verbose'"
-      then: [T: "evaluerat då"]      # phrase(results were 'evaluated at' a given point)
-      else: [T: "då"]
-  - pause: auto
+      then: [T: "evaluerat för övre värdet"]      # phrase(results were 'evaluated at' a given point)
+      else: [T: "övre värde"]
+  - pause: short
   - x: "*[3]"
   - pause: short
   - T: "minus samma uttryck"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
   - test:
       if: "$Verbosity='Verbose'"
-      then: [T: "evaluerat då"]      # phrase(results were 'evaluated at' a given point)
-      else: [T: "då"]
+      then: [T: "evaluerat för nedre värdet"]      # phrase(results were 'evaluated at' a given point)
+      else: [T: "nedre värde"]
+  - pause: short
   # SWEDISH: Added a verbosity setting test to allow a shorter form.
   - x: "*[2]"
 
