@@ -90,7 +90,7 @@
   match:
   - "preceding-sibling::*[1][self::m:mo][text()='⁤'] and" # preceding element is invisible plus
   - "*[1][self::m:mn][not(contains(., '.'))]   and"
-  - "*[2][self::m:mn][not(contains(., '.'))]"
+  - "*[2][self::m:mn][not(contains(., '.')) and text()<=10]"
   # replace: [{x: ToCommonFraction(.)}]
   # SWEDISH: Alternative logic for handling correct reading out of common fractions.
   variables: [IsPlural: "*[1]!=1"]
@@ -125,7 +125,7 @@
   - test:
       if: "not(IsNode(*[1],'leaf'))"
       then: [{pause: short}]
-  - T: "över"      # phrase(the fraction 3 'over' 4)
+  - T: "genom"      # phrase(the fraction 3 'over' 4)
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then: [{pause: short}]
