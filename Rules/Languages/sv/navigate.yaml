@@ -306,18 +306,18 @@
     - if: "self::m:mtr or self::m:mlabeledtr"
       then:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[1]/*[1]"]   # phrase('in' the denominator)
+          variables: [Move2D: "'i'", Child2D: "*[1]/*[1]"]   # phrase('in' the denominator)
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/*[1]/@id"] # skip mtd
     - else_if: "*[1][self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]" # auto zoom
       then:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[1]/*[2]"]   # phrase('in' the denominator)
+          variables: [Move2D: "'i'", Child2D: "*[1]/*[2]"]   # phrase('in' the denominator)
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/*[2]/@id"] # skip mtd
       else:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[1]"]        # phrase('in' the denominator)
+          variables: [Move2D: "'i'", Child2D: "*[1]"]        # phrase('in' the denominator)
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/@id"]
 
@@ -329,7 +329,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [T: "zooma in", pause: "long"]                   # phrase('zoom in')
   - with:
-      variables: [Move2D: "'in'", Child2D: "*[1]"]          # phrase('in' the denominator)
+      variables: [Move2D: "'i'", Child2D: "*[1]"]          # phrase('in' the denominator)
       replace: [x: "."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNextZoom'"]
@@ -343,7 +343,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [T: "zooma in", pause: "long"]                 # phrase('zoom in')
   - with:
-      variables: [Move2D: "'in'", Child2D: "*[1]"]        # phrase('in' the denominator)
+      variables: [Move2D: "'i'", Child2D: "*[1]"]        # phrase('in' the denominator)
       replace: [x: "."]
   - test:
       if: "$NavMode='Character'"
@@ -369,7 +369,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [T: "zooma in hela vägen", pause: "medium"]                 # phrase('zoom in all the way')
   - with:
-      variables: [Move2D: "'in'", Child2D: "*[1]"]              # phrase('in' the denominator)
+      variables: [Move2D: "'i'", Child2D: "*[1]"]              # phrase('in' the denominator)
       replace: [x: "."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1"]
@@ -426,7 +426,7 @@
   replace:
   # don't bother with MatchCounter since we only get here if > 1
   - with:
-      variables: [Move2D: "'in'", Child2D: "*[1]"]            # phrase('in' the denominator)
+      variables: [Move2D: "'i'", Child2D: "*[1]"]            # phrase('in' the denominator)
       replace: [x: "."]
   - test:
     - if: "count(*)> 1 or IsNode(., 'leaf') or self::m:msqrt or self::m:menclose"
@@ -443,12 +443,12 @@
       if: "$ReadZoomLevel >= DistanceFromLeaf(., false, $NavMode!='Character')"
       then:
       # - with:
-      #     variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]    # phrase('in' the denominator)
+      #     variables: [Move2D: "'i'", Child2D: "following-sibling::*[1]"]    # phrase('in' the denominator)
       #     replace: [x: ".."]
       - set_variables: [NavNode: "@id"]
       else:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[1]"]                        # phrase('in' the denominator)
+          variables: [Move2D: "'i'", Child2D: "*[1]"]                        # phrase('in' the denominator)
           replace: [x: "."]
       - x: "*[1]"
 
@@ -462,12 +462,12 @@
       if: "$ReadZoomLevel >= DistanceFromLeaf(., true, $NavMode!='Character')"
       then:
       # - with:
-      #     variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]     # phrase('in' the denominator)
+      #     variables: [Move2D: "'i'", Child2D: "preceding-sibling::*[1]"]     # phrase('in' the denominator)
       #     replace: [x: ".."]
       - set_variables: [NavNode: "@id"]
       else:
       - with:
-          variables: [Move2D: "'in'", Child2D: "*[last()]"]                     # phrase('in' the denominator)
+          variables: [Move2D: "'i'", Child2D: "*[last()]"]                     # phrase('in' the denominator)
           replace: [x: "."]
       - x: "*[last()]"
 
@@ -1079,7 +1079,7 @@
           then: [x: "$Following"]
           else:
           - with:
-              variables: [Move2D: "'in'", Child2D: "$Following"]        # phrase('in' the denominator)
+              variables: [Move2D: "'i'", Child2D: "$Following"]        # phrase('in' the denominator)
               replace: [x: ".."]
           - with:
               variables: [NavCommand: "'MoveNextZoom'"]
@@ -1101,7 +1101,7 @@
           then: [x: "$Preceding"]
           else:
           - with:
-              variables: [Move2D: "'in'", Child2D: "$Preceding"]          # phrase('in' the denominator)
+              variables: [Move2D: "'i'", Child2D: "$Preceding"]          # phrase('in' the denominator)
               replace: [x: ".."]
           - with:
               variables: [NavCommand: "'MovePreviousZoom'"]
@@ -1202,7 +1202,7 @@
           if: "following-sibling::*"
           then:
           - with:
-              variables: [Move2D: "'in'", Child2D: "."]             # phrase('in' the denominator)
+              variables: [Move2D: "'i'", Child2D: "."]             # phrase('in' the denominator)
               replace: [x: ".."]
           else:
           - with:
@@ -1317,7 +1317,7 @@
           replace: [x: "following-sibling::*[1]"]          # skip over 'none'
       else:
       - with:
-          variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]       # phrase('in' the denominator)
+          variables: [Move2D: "'i'", Child2D: "following-sibling::*[1]"]       # phrase('in' the denominator)
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNextZoom'"]
@@ -1342,7 +1342,7 @@
       if: "IsNode(.., '2D')"
       then:
       - with:
-          variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]           # phrase('in' the denominator)
+          variables: [Move2D: "'i'", Child2D: "following-sibling::*[1]"]           # phrase('in' the denominator)
           replace: [x: ".."]
   - set_variables: [NavNode: "following-sibling::*[1]/@id"]
 
@@ -1444,7 +1444,7 @@
           if: "preceding-sibling::*"
           then:
           - with:
-              variables: [Move2D: "'in'", Child2D: "."]             # phrase('in' the denominator)
+              variables: [Move2D: "'i'", Child2D: "."]             # phrase('in' the denominator)
               replace: [x: ".."]
           else:
           - with:
@@ -1487,7 +1487,7 @@
       if: "not(parent::m:mrow)"
       then:
       - with:
-          variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]         # phrase('in' the denominator)
+          variables: [Move2D: "'i'", Child2D: "preceding-sibling::*[1]"]         # phrase('in' the denominator)
           replace: [x: ".."]
   - set_variables: [NavNode: "preceding-sibling::*[1]/*[2]/@id"]
 
@@ -1573,7 +1573,7 @@
           - T: "vänster"                                            # phrase(move 'left')
           - pause: short
       - with:
-          variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]               # phrase('in' the denominator)
+          variables: [Move2D: "'i'", Child2D: "preceding-sibling::*[1]"]               # phrase('in' the denominator)
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MovePreviousZoom'"]
@@ -1598,7 +1598,7 @@
       if: "IsNode(.., '2D')"
       then:
       - with:
-          variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]           # phrase('in' the denominator)
+          variables: [Move2D: "'i'", Child2D: "preceding-sibling::*[1]"]           # phrase('in' the denominator)
           replace: [x: ".."]
   - set_variables: [NavNode: "preceding-sibling::*[1]/@id"]
 
