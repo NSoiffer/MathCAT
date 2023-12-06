@@ -885,8 +885,11 @@ impl IsBracketed {
                 if !is_tag(&contents, "mrow") || children.len() <= 1 {
                     return false;
                 }
-                // finally, we can check for a comma -- assume operand followed by a comma
-                if get_text_from_COE(&children[1]).as_str() == "," {
+                // finally, we can check for a comma -- we might not have operands, so we to check first and second entry
+                if get_text_from_COE(&children[0]).as_str() == "," {
+                    return true;
+                }
+                if children.len() > 1 && get_text_from_COE(&children[1]).as_str() == "," {
                     return true;
                 }
             }
@@ -1126,7 +1129,48 @@ pub struct FontSizeGuess;
 ///    "0.278em" -> 0.278
 ///    ""
 // 		   returns original node match isn't found
-//  Note: if stopNodeName=="math", then punctuation is taken into account since it isn't really part of the math
+impl FontSizeGuess {
+    pub fn em_from_value(value_with_unit: &str) -> f64 {
+        lazy_static! {
+            // match one or more digits followed by a unit -- there are many more units, but they tend to be large and rarer(?)
+            static ref FONT_VALUE: Regex = Regex::new(r"([0-9]*\.?[0-9]*)(px|cm|mm|Q|in|ppc|pt|ex|em|rem)").unwrap();
+        }
+        let cap = FONT_VALUE.captures(&value_with_unit);
+        if let Some(cap) = cap {
+            if cap.len() == 3 {
+                let multiplier = match &cap[2] {    // guess based on 12pt font to convert to ems
+                    "px" => 1.0/12.0,
+                    "cm" => 2.37,
+                    "mm" => 0.237,
+                    "Q" => 0.059,  // 1/4 mm
+                    "in" => 6.02,
+                    "pc" => 1.0,
+                    "pt" => 1.0/12.0,
+                    "ex" => 0.5,
+                    "em" => 1.0,
+                    "rem" => 16.0/12.0,
+                    default => {debug!("unit='{}'", default); 10.0}
+                };
+                // debug!("FontSizeGuess: {}->{}, val={}, multiplier={}", value_with_unit, value*multiplier, value, multiplier);
+                return cap[1].parse::<f64>().unwrap_or(0.0) * multiplier;
+            }  else {
+                return 0.0;             // something bad happened
+            }
+        }else {
+            let multiplier = match value_with_unit {    // guess based on 12pt font to convert to ems
+                "veryverythinspace" => 1.0/18.0,
+                "verythinspace" => 2.0/18.0,
+                "thinspace" => 3.0/18.0,
+                "mediumspace" => 4.0/18.0,
+                "thickspace" => 5.0/18.0,
+                "verythickspace" => 6.0/18.0,
+                "veryverythickspace" => 7.0/18.0,
+                _ => 0.0,
+            };
+            return multiplier;
+        }
+    }
+}
 impl Function for FontSizeGuess {
     fn evaluate<'d>(&self,
                         _context: &context::Evaluation<'_, 'd>,
@@ -1140,27 +1184,8 @@ impl Function for FontSizeGuess {
         let mut args = Args(args);
         args.exactly(1)?;
         let value_with_unit = args.pop_string()?;
-        let cap = FONT_VALUE.captures(&value_with_unit);
-        let (value, multiplier) = if let Some(cap) = cap {
-            let multiplier = match &cap[2] {    // guess based on 12pt font to convert to ems
-                "px" => 1.0/12.0,
-                "cm" => 2.37,
-                "mm" => 0.237,
-                "Q" => 0.059,  // 1/4 mm
-                "in" => 6.02,
-                "pc" => 1.0,
-                "pt" => 1.0/12.0,
-                "ex" => 0.5,
-                "em" => 1.0,
-                "rem" => 16.0/12.0,
-                default => {debug!("unit='{}'", default); 10.0}
-            };
-            (cap[1].parse::<f64>().unwrap_or(0.0), multiplier)
-        } else {
-            (10.0, 1.0)
-        };
-        debug!("FontSizeGuess: {}->{}, val={}, multiplier={}", value_with_unit, value*multiplier, value, multiplier);
-        return Ok( Value::Number(value * multiplier) );
+        let em_value = FontSizeGuess::em_from_value(&value_with_unit);
+        return Ok( Value::Number(em_value) );
     }
 }
 
