@@ -7,16 +7,16 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "這"      # phrase('the' square root of 25 equals 5)
-  - t: "決定因素"      # phrase(the 'determinant' of a matrix)
+      - T: ""      # phrase('the' square root of 25 equals 5)
+  - T: "行列式"      # phrase(the 'determinant' of a matrix)
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "的"      # phrase(systems 'of' linear equations)
+      - T: ""      # phrase(systems 'of' linear equations)
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple'))"
-      then: [t: "結束決定因素"]      # phrase('end determinant' of a matrix)
+      then: [T: "結束行列式"]      # phrase('end determinant' of a matrix)
 
 - name: norm
   tag: norm
@@ -25,16 +25,16 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "這"      # phrase('the' square root of 25 equals 5)
-  - t: "規範"      # phrase(the 'norm' can be a measure of distance)
+      - T: ""      # phrase('the' square root of 25 equals 5)
+  - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "的"      # phrase(this is the mean 'of' the data)
-  - x: "*[1]"
-  - test:
-      if: "not(IsNode(*[1], 'simple'))"
-      then: [t: "結束規範"]      # phrase('end norm' that is a measure of distance)
+      - T: "的"      # phrase(this is the mean 'of' the data)
+  - T: "範數"      # phrase(the 'norm' can be a measure of distance)
+  #- test:
+  #    if: "not(IsNode(*[1], 'simple'))"
+  #    then: [t: "結束範數"]      # phrase('end norm' that is a measure of distance)
 
 
 - name: subscripted-norm
@@ -44,21 +44,21 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "這"      # phrase('the' square root of 25 equals 5)
-  - x: "*[2]"
-  - t: "規範"      # phrase(the 'norm' can be a measure of distance)
+      - T: ""      # phrase('the' square root of 25 equals 5)
+  - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "的"      # phrase(systems 'of' linear equations)
-  - x: "*[1]"
+      - T: "的"      # phrase(systems 'of' linear equations)
+  - x: "*[2]"
+  - T: "範數"      # phrase(the 'norm' can be a measure of distance)
 
 - name: transpose
   tag: transpose
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - t: "轉置"      # phrase(this will 'transpose' the values)
+  - T: "的 轉置"      # phrase(this will 'transpose' the values)
 - name: trace
   tag: trace
   match: "not(@data-intent-property)"
@@ -66,13 +66,13 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "這"      # phrase('the' square root of 25 equals 5)
-  - t: "痕跡"      # phrase('trace' of a matrix)
+      - T: ""      # phrase('the' square root of 25 equals 5)
+  - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "的"      # phrase(systems 'of' linear equations)
-  - x: "*[1]"
+      - T: "的"      # phrase(systems 'of' linear equations)
+  - T: "跡"      # phrase('trace' of a matrix)
 
 - name: dimension
   tag: dimension
@@ -81,13 +81,13 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "這"      # phrase('the' square root of 25 equals 5)
-  - t: "方面"      # phrase(the 'dimension' of the matrix)
+      - T: ""      # phrase('the' square root of 25 equals 5)
+  - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "的"      # phrase(systems 'of' linear equations)
-  - x: "*[1]"
+      - T: "的"      # phrase(systems 'of' linear equations)
+  - T: "維數"      # phrase(the 'dimension' of the matrix)
 
 - name: homomorphism
   tag: homomorphism
@@ -96,13 +96,13 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "這"      # phrase('the' square root of 25 equals 5)
-  - t: "同態"      # phrase('homomorphism' indicates similarity of form)
+      - T: ""      # phrase('the' square root of 25 equals 5)
+  - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "的"      # phrase(systems 'of' linear equations)
-  - x: "*[1]"
+      - T: "的"      # phrase(systems 'of' linear equations)
+  - T: "同態"      # phrase('homomorphism' indicates similarity of form)
 
 - name: kernel
   tag: kernel
@@ -111,11 +111,11 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "這"      # phrase('the' square root of 25 equals 5)
-  - t: "核心"      # phrase(this is the 'kernel' of the function)
+      - T: ""      # phrase('the' square root of 25 equals 5)
+  - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "的"      # phrase(systems 'of' linear equations)
-  - x: "*[1]"
+      - T: "的"      # phrase(systems 'of' linear equations)
+  - T: "核"      # phrase(this is the 'kernel' of the function)
 

@@ -37,19 +37,19 @@
     ],
 
     NumbersOrdinalPluralOnes: [
-         "零度", "第一度", "秒度", "三度", "四度", "五度", "六度", "七度", "八度", "九度", 
-         "十分之一", "十一分之一", "十二分之一", "十三分", "十四分", "十五分", "十六分", 
+         "零度", "一度", "二分", "三分", "四分", "五分", "六分", "七分", "八分", "九分", 
+         "十分", "十一分", "十二分", "十三分", "十四分", "十五分", "十六分", 
          "十七分", "十八分", "十九分"
     ],
 
     # stop when regularity begins
     NumbersOrdinalFractionalOnes: [
-         "零", "第一", "一半"
+         "零", "一度", "一半"
     ],
 
     # stop when regularity begins
     NumbersOrdinalFractionalPluralOnes: [
-         "零", "第一", "一半"
+         "零", "一度", "一半"
     ],
 
 
@@ -59,11 +59,11 @@
     ],
 
     NumbersOrdinalTens: [
-         "", "第十", "第二十", "第三十", "第四十", "五十", "六十", "第七十", "八十", "九十"
+         "", "第十", "第二十", "第三十", "第四十", "第五十", "第六十", "第七十", "第八十", "第九十"
     ],
 
     NumbersOrdinalPluralTens: [
-         "", "十分", "二十分", "三十", "四十", "五十", "六十", "七十", "八十", "九十"
+         "", "十分", "二十分", "三十分", "四十分", "五十分", "六十分", "七十分", "八十分", "九十分"
     ],
 
 
@@ -73,30 +73,30 @@
     ],
 
     NumbersOrdinalHundreds: [
-       "", "百分之一", "二百", "三百", "四百", "五百", 
-         "六百", "七百", "八百", "九百"
+       "", "百分", "二百分", "三百分", "四百分", "五百分", 
+         "六百分", "七百分", "八百分", "九百分"
     ],
 
     NumbersOrdinalPluralHundreds: [
-       "", "百分之一", "百分之二", "百分之三", "百分之四", "百分之五", 
-         "百分之六", "百分之七", "百分之八", "百分之九"
+       "", "百分", "二百分", "三百分", "四百分", "五百分", 
+         "六百分", "七百分", "八百分", "九百分"
     ],
       
 
     # At this point, hopefully the language is regular. If not, code needs to be written
     NumbersLarge: [
-         "", "千", "百萬", "十億", "兆", "千萬億", 
+         "", "千", "百萬", "十億", "兆", "quadrillion", 
          "quintillion", "sextillion", "septillion", "octillion", "nonillion", 
     ],
       
     NumbersOrdinalLarge: [
-         "", "千分之一", "百萬分之一", "十億分", "兆分", "萬億分之一", 
-         "五億分", "六分之一", "七億分", "十億分", "十億分"
+         "", "千分", "百萬分", "十億分", "兆分", "quadrillionth",
+        "quintillionth", "sextillionth", "septillionth", "octillionth", "nonillionth"
     ],
       
     NumbersOrdinalPluralLarge: [
-         "", "千分之一", "百萬分之一", "十億分之一", "萬億分之一", "千萬分之一", 
-         "五億分之一", "七分之一", "七億分", "十億分", "十億分"
+         "", "千分", "百萬分", "十億分", "兆分", "quadrillionths",
+        "quintillionths", "sextillionths", "septillionths", "octillionths", "nonillionths"
     ]
 
 ]

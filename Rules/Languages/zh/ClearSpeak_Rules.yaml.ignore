@@ -19,26 +19,26 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "這"}      # phrase('the' square root of 25)
+      then: {t: ""}      # phrase('the' square root of 25)
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
       - bookmark: "*[1]/@id"
       - test:
           if: parent::*[self::m:negative]
-          then: [{t: "消極的"}]      # phrase(minus 4 is a 'negative' number)
-          else: [{t: "積極的"}]      # phrase(10 is a 'positive' number)
-  - t: "平方根"      # phrase(8 is the 'square root' of 64)
+          then: [{t: "負"}]      # phrase(minus 4 is a 'negative' number)
+          else: [{t: ""}]      # phrase(10 is a 'positive' number)
+  - t: "根號"      # phrase(8 is the 'square root' of 64)
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "的"}      # phrase(the square root 'of' 5)
+      then: {t: ""}      # phrase(the square root 'of' 5)
       else: {pause: short}
   - x: "*[1]"
   - test:
     - if: "$ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'"
       then:
       - pause: short
-      - t: "端根"      # phrase(the square root of x 'end root')
+      - t: "結束根號"      # phrase(the square root of x 'end root')
       - pause: medium
     - else_if: "IsNode(*[1], 'simple')"
       then: [{pause: short}]
@@ -50,7 +50,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "這"}      # phrase(6 is 'the' square root of 36)
+      then: {t: ""}      # phrase(6 is 'the' square root of 36)
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
@@ -59,8 +59,13 @@
           then: [{bookmark: "parent/@id"}]
       - test:
           if: parent::m:negative
-          then: [{t: "消極的"}]      # phrase(minus 6 is a 'negative' number)
-          else: [{t: "積極的"}]      # phrase(10 is a 'positive' number)
+          then: [{t: "負"}]      # phrase(minus 6 is a 'negative' number)
+          else: [{t: ""}]      # phrase(10 is a 'positive' number)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: {t: ""}      # phrase(the square root 'of' 36)
+  - x: "*[1]"
+  - t: "的"
   - test:
       if: "*[2][self::m:mn]"
       then_test:
@@ -69,29 +74,16 @@
       - else_if: "*[2][text()='3']"
         then: {t: "立方根"}      # phrase(5 is the 'cube root' of 625)
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {t: "根"}]      # phrase(the square 'root' of 25)
+        then: [{x: "*[2]"}, {t: "次方根"}]      # phrase(the square 'root' of 25)
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+          #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: {x: "*[2]"}
-      - t: "根"      # phrase(the square 'root' of 36)
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: {t: "的"}      # phrase(the square root 'of' 36)
-  - x: "*[1]"
-  - test:
-      if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
-      then:
-      - pause: short
-      - t: "端根"      # phrase(start the fifth root of x 'end root')
-      - pause: medium
-      else_test:
-        if: IsNode(*[1], 'simple')
-        then: [{pause: short}]
-        else: [{pause: long}]
+      - t: "次方根"      # phrase(the square 'root' of 36)
+  - pause: long
 
 # The 'negative' rule interacts with the msqrt/mroot rules as those might pick off this case ("the negative square root of x")
 - name: negative_and_positive
@@ -107,8 +99,8 @@
       - bookmark: "@id"
       - test:
           if: "self::m:negative"
-          then: [{t: "消極的"}]      # phrase(minus 5 is a 'negative' number)
-          else: [{t: "積極的"}]      # phrase(7 is a 'positive' number)
+          then: [{t: "負"}]      # phrase(minus 5 is a 'negative' number)
+          else: [{t: ""}]      # phrase(7 is a 'positive' number)
   - x: "*[1]"
 
 # Fraction rules
@@ -123,22 +115,22 @@
   - t: "每"      # phrase('5 meters 'per' second)
   - x: "*[2]"
 
-- name: common-fraction
-  tag: fraction
-  match:
-  - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
-  - "*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
-  - "*[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
-  replace: [{x: ToCommonFraction(.)}]
+#- name: common-fraction
+#  tag: fraction
+#  match:
+#  - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
+#  - "*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
+#  - "*[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
+#  replace: [{x: ToCommonFraction(.)}]
 
-- name: common-fraction-mixed-number
-  tag: fraction
-  match:
-  - "preceding-sibling::*[1][self::m:mo][text()='⁤'] and" # preceding element is invisible plus
-  - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
-  - "*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
-  - "*[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
-  replace: [{x: ToCommonFraction(.)}]
+#- name: common-fraction-mixed-number
+#  tag: fraction
+#  match:
+#  - "preceding-sibling::*[1][self::m:mo][text()='⁤'] and" # preceding element is invisible plus
+#  - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
+#  - "*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
+#  - "*[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
+#  replace: [{x: ToCommonFraction(.)}]
 
 - name: fraction-over-simple
   tag: fraction
@@ -152,11 +144,11 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [{ot: "the"}]
+          then: [{ot: ""}]
       - t: "分數"      # phrase(the 'fraction' with 3 over 4)
-  - x: "*[1]"
-  - t: "超過"      # phrase(the fraction 3 'over' 4)
   - x: "*[2]"
+  - t: "分之"      # phrase(the fraction 3 'over' 4)
+  - x: "*[1]"
   - test:
       # very ugly!!! -- replicate nested ordinal fraction as they are an exception
       if: "$ClearSpeak_Fractions='OverEndFrac' or ($ClearSpeak_Fractions='EndFrac' and not( ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and *[1][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and *[2][*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] ) )"
@@ -183,9 +175,9 @@
   - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) )"
   - ")"
   replace:
-  - x: "*[1]"
-  - t: "超過"      # phrase(the fraction 3 'over' 4)
   - x: "*[2]"
+  - t: "分之"      # phrase(the fraction 3 'over' 4)
+  - x: "*[1]"
   - test:
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='OverEndFrac'"
       then:
@@ -197,14 +189,14 @@
   tag: fraction
   match: "."
   replace:
-  - ot: "the"      # phrase(5 is 'the' square toot of 25)
-  - t: "分子分數"      # phrase(the 'fraction with numerator' 6)
+  - ot: ""      # phrase(5 is 'the' square toot of 25)
+  - t: "分數分子"      # phrase(the 'fraction with numerator' 6)
   - test:
       if: not(IsNode(*[1], 'simple'))
       then: {pause: medium}
   - x: "*[1]"
   - pause: medium
-  - t: "和分母"      # phrase(the fraction with numerator 5 'and denominator' 8)
+  - t: "分母"      # phrase(the fraction with numerator 5 'and denominator' 8)
   - x: "*[2]"
   - pause: long
   - test:
