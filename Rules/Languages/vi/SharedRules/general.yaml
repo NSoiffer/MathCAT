@@ -1020,13 +1020,13 @@
         if: "$Verbosity='Terse'"
         then: [{T: "cho ra"}]      # phrase(hydrogen and oxygen 'forms' water )
         else: [{T: "phản ứng cho ra"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
-    - else_if: ".='⇌' or .='⮖'"
+    - else_if: ".='⇌' or .='\u1f8d2'"
       then: [{T: "mũi tên hai chiều"}]      # phrase(a reactant 'is in equilibrium with' a product)
-    - else_if: ".='⭴'"
+    - else_if: ".='\u1f8d4'"
       then: [{T: "mũi tên chiều bên trái"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
-    - else_if: ".='⭵'"
+    - else_if: ".='\u1f8d3'"
       then: [{T: "mũi tên chiều bên phải"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
-      else: [x: "."]
+      else: [x: "*"]
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator

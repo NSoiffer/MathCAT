@@ -2,6 +2,38 @@
 # https://www.once.es/servicios-sociales/braille/comision-braille-espanola/documentos-tecnicos/documentos-tecnicos-relacionados-con-el-braille/documentos/b5-signografia-matematica.pdf
 ---
 -
+  name: unit-spaces
+  tag: "!*"
+  match: "not(self::m:math) and not($MatchingWhitespace) and (@data-previous-space-width >= 0.25 or @data-following-space-width >= 0.25)"
+  replace:
+   - with:
+      variables: [MatchingWhitespace: "true()"]
+      replace:
+      - test:
+        - if: "(@class='MathML-unit' or contains(@intent, ':unit') or BaseNode(.)[@class='MathML-unit' or contains(@intent, ':unit')]) and @data-previous-space-width >= 0.25" 
+          then: [t: "𝐖"]
+      - x: "."
+      - test:
+        - if: "(@class='MathML-unit' or contains(@intent, ':unit') or BaseNode(.)[@class='MathML-unit' or contains(@intent, ':unit')]) and @data-following-space-width >= 0.25" 
+          then: [t: "𝐖"]
+
+-
+  name: omissions
+  tag: "!*"
+  match: "contains(@intent, ':blank')"
+  replace:
+  - test:
+      - if: "self::m:mo"
+        then: [t: "⠰"]      # 14.5(1)
+      - else_if: "contains(., '\u00A0')"
+        then:   # treated as a number omission -- FIX: anything to look at to increase the odds of it being digits
+        - t: "N"
+        - x: "translate(., '_\u00A0', '⠰')"  # note space is removed
+        else: [t: "⠰⠤⠆"]
+  - t: ""
+
+
+-
   name: default
   tag: msqrt
   match: "."
@@ -201,6 +233,7 @@
     - RowStart: "''"           # empty string -- it needs to be set
     - RowEnd: "''"             # empty string -- it needs to be set
     - NewScriptContext: "''"    # empty string -- it needs to be set
+    - MatchingWhitespace: "false()"
   replace: [x: "*"]
 
 -
@@ -261,40 +294,6 @@
   replace: [x: "*"]
 
 -
-  # Non-breaking whitespace is added to the start/end of numbers in cases of adjoining text to help the parse.
-  # These generate a different char inside of a number, so we peel them off here because it doesn't seem possible
-  # to ask "what character position am I inside of an mn?" in unicode.yaml
-  # Here we deal with the messy abnormal case separately -- CMU seems to want to leave out spaces
-  name: peel-off-spaces
-  tag: [mn, mi]
-  match: "starts-with(., '\u00A0') or substring(., string-length(.), 1)='\u00A0'"
-  replace:
-  - test:
-      if: "starts-with(., '\u00A0')"
-      then:
-      - test:
-          if: "substring(., string-length(.), 1)='\u00A0'"
-          then:
-          - x: "BrailleChars(., 'CMU', 2, string-length(.))"
-          - test:
-              if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
-              then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
-              else: [t: "W"]
-          else:
-          - x: "BrailleChars(., 'CMU', 2, string-length(.)+1)"
-      else:
-      - test:
-          if: "substring(., string-length(.), 1)='\u00A0'"
-          then:
-          - x: "BrailleChars(., 'CMU', 1, string-length(.))"
-          - test:
-              if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
-              then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
-              else: [t: "W"]
-          else:
-          - x: "BrailleChars(., 'CMU', 1, string-length(.)+1)"
-
--
   name: roman_numeral
   tag: mn
   match: "@data-roman-numeral or contains(@intent, ':roman-numeral')"
@@ -302,29 +301,6 @@
   # for uppercase, need to only have one as uppercase
   - x: "BrailleChars(., 'CMU', 1, 2)"
   - x: "BrailleChars(translate(., 'IVXLCDM', 'ivxlcdm'), 'CMU', 2, string-length(.)+1)"
-
--
-  name: omissions
-  tag: [mi, mtext, mo]
-  match: "contains(@intent, ':omission')"
-  replace:
-  - test:
-      - if: "self::m:mo"
-        then: [t: "⠰"]      # 14.5(1)
-      - else_if: "contains(., '\u00A0')"
-        then:   # treated as a number omission -- FIX: anything to look at to increase the odds of it being digits
-        - t: "N"
-        - x: "translate(., '_\u00A0', '⠰')"  # note space is removed
-        else: [t: "⠰⠤⠆"]
-  - t: ""
-
--
-  name: units
-  tag: [mi, mtext]
-  match: "contains(@intent, ':unit')"
-  replace:
-  - t: "W"
-  - x: "text()"
 
 -
   name: Ln-hack
@@ -361,7 +337,8 @@
   replace:
   - x: "BrailleChars(., 'CMU')"   # also deals with "dot after 'arc'"
   - test:  # Section 12 says strings longer than one should end with dot 3 rather than restricting to just listed functions (don't do this for mtext)
-      if: "string-length(.) > 1 and translate(., 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''"
+      if: "string-length(.) > 1 and translate(., 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '' and
+           not(@class='MathML-unit' or contains(@intent, ':unit') )"
       then: [t: "."]
       
 
@@ -1133,37 +1110,39 @@
   name: default
   tag: menclose
   match: "."
-  variables:
-  - IsCancellation: "contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
-                     contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike')"
   replace:
   - test:
-      if: "contains(@notation,'top')"
-      then: [t: "⠈⠉"]                  # overline
-  - test:
-      if: "contains(@notation,'bottom')"
-      then: [t: "⠠⠤"]                  # underline
-  - test:
-      if: "$IsCancellation"
-      then: [t: "⠻"]                   # cancellation
-  - test:  # group anything that isn't a single character or bracketed
-      if: "*[1][(IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))) or IsBracketed(., '', '')]"
-      then: [x: "*[1]"]
+      if: "contains(@notation,'box')"
+      then_test: 
+          if: "*[1][self::m:mtext and .='\u00A0']"                  # box and roundedbox
+          then: [t: "⠰⠤⠆"]                            # omission
+          else: [t: "1⠫⠼⠙"]                           # square (no rectangle in UEB)
       else:
-      - t: "⠢"
-      - x: "*[1]"
-      - t: "⠔"
- 
+      - with:
+          variables:
+          - IsCancellation: "contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
+                             contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike')"
+          replace:
+          - test:
+              if: "contains(@notation,'top')"
+              then: [t: "⠈⠉"]                  # overline
+          - test:
+              if: "contains(@notation,'bottom')"
+              then: [t: "⠠⠤"]                  # underline
+          - test:
+              if: "$IsCancellation"
+              then: [t: "⠻"]                   # cancellation
+          - test:
+              if: "*[1][(IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))) or IsBracketed(., '', '')]"
+              then: [x: "*[1]"]
+              else:
+              - t: "⠢"
+              - x: "*[1]"
+              - t: "⠔"
+
   #  - test:
   #     if: "contains(concat(' ', normalize-space(@notation), ' '), ' left ')"                  #avoid 'leftarrow'
   #     then: [t: "⠸"]
-  #  - test:
-  #     if: "contains(@notation,'box')"                  # box and roundedbox
-  #     then:
-  #     # - test:
-  #     #       if: "$AddSpaces"
-  #     #       then: [t: " "]
-  #     - t: "1⠫⠼⠙"                                  # square (no rectangle in UEB)
   #  - test:
   #     if: "contains(@notation,'circle')"
   #     then:

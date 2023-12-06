@@ -964,13 +964,13 @@
         if: "$Verbosity='Terse'"
         then: [{T: "formas"}]
         else: [{T: "da forma"}]
-    - else_if: ".='⇌' or .='⮖'"
+    - else_if: ".='⇌' or .='\u1f8d2'"
       then: [{T: "está en equilibrio con"}]
-    - else_if: ".='⭴'"
+    - else_if: ".='\u1f8d4'"
       then: [{T: "equilibrado parcialmente hacia el lado izquierdo"}]
-    - else_if: ".='⭵'"
+    - else_if: ".='\u1f8d3'"
       then: [{T: "equilibrado parcialmente hacia el lado derecho"}]
-      else: [x: "."]
+      else: [x: "*"]
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator
