@@ -336,6 +336,9 @@ fn nemeth_cleanup(raw_braille: String) -> String {
 
         static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[↑↓]+b)").unwrap();
 
+        // Most commas have a space after them, but not when followed by a close quote (others?)
+        static ref NO_SPACE_AFTER_COMMA: Regex = Regex::new(r",P⠴").unwrap();      // captures both single and double close quote
+
         // Except for the four chars above, the unicode rules always include a punctuation indicator.
         // The cases to remove them (that seem relevant to MathML) are:
         //   Beginning of line or after a space (V 38.1)
@@ -385,6 +388,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
   debug!("MULTI:   \"{}\"", result);
 
     let result = NUM_IND_9A.replace_all(&result, "${start}${minus}n");
+    debug!("IND_9A:  \"{}\"", result);
     let result = NUM_IND_9C.replace_all(&result, "${1}${2}n");
     let result = NUM_IND_9D.replace_all(&result, "${1}n");
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
@@ -406,6 +410,8 @@ fn nemeth_cleanup(raw_braille: String) -> String {
 //   debug!("Punct  : \"{}\"", &result);
     let result = REMOVE_LEVEL_IND_BEFORE_BASELINE.replace_all(&result, "b");
 //   debug!("Bseline: \"{}\"", &result);
+
+    let result = NO_SPACE_AFTER_COMMA.replace_all(&result, "⠠P⠴");
 
     let result = REMOVE_AFTER_PUNCT_IND.replace_all(&result, "$1$2");
   debug!("Punct38: \"{}\"", &result);
@@ -453,7 +459,7 @@ static UEB_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "N" => "⠼",     // number indicator
     "t" => "⠱",     // shape terminator
     "W" => "⠀",     // whitespace
-    "𝐖"=> "⠀",     // whitespace
+    "𝐖"=> "⠀",     // whitespace (hard break -- basically, it separates exprs)
     "s" => "⠆",     // typeface single char indicator
     "w" => "⠂",     // typeface word indicator
     "e" => "⠄",     // typeface & capital terminator 
@@ -565,6 +571,10 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
         //   begin the expression with a grade 1 word indicator (or a passage indicator if the expression includes spaces)
         // Apparently "only a grade 1 symbol..." means at most one grade 1 symbol based on some examples (GTM 6.4, example 4)
         // debug!("before determining mode:  '{}'", raw_braille);
+
+        // a bit ugly because we need to store the string if we have cap passage mode
+        let raw_braille_string = if is_cap_passage_mode_good(raw_braille) {convert_to_cap_passage_mode(raw_braille)} else {String::default()};
+        let raw_braille = if raw_braille_string.is_empty() {raw_braille} else {&raw_braille_string};
         if use_only_grade1 {
             return remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage); 
         }
@@ -585,6 +595,50 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
                 let grade1_passage = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage);
                 return "⠰⠰⠰".to_string() + &grade1_passage + "⠰⠄";
             }
+        }
+
+        /// Return true if at least three cap letters and no lower case letters
+        fn is_cap_passage_mode_good(braille: &str) -> bool {
+            let mut n_caps = 0;
+            let mut is_cap_mode = false;
+            let mut cap_mode = UEB_Duration::Symbol;    // real value set when is_cap_mode is set to true
+            let mut chars = braille.chars();
+
+            // look CL or CCL for caps (CC runs until we get whitespace)
+            // if we find an L not in caps mode, we return false
+            // Note: caps can be C𝐶, whitespace can be W𝐖
+            // FIX: something like triangle ABC are purposely not in word mode and should probably only count as a single capital, not as 3 caps
+            //   Maybe could detect this by looking for consequitive CLx patterns (another bool var?)
+            while let Some(ch) = chars.next() {
+                if ch == 'L' {
+                    if !is_cap_mode {
+                        return false;
+                    }
+                    chars.next();       // skip letter
+                    if cap_mode == UEB_Duration::Symbol {
+                        is_cap_mode = false;
+                    }
+                } else if ch == 'C' || ch == '𝐶' {
+                    if is_cap_mode {
+                        assert!(cap_mode == UEB_Duration::Symbol);
+                        cap_mode = UEB_Duration::Word;
+                    } else {
+                        is_cap_mode = true;
+                        n_caps += 1;
+                        cap_mode = UEB_Duration::Symbol;
+                    }
+                } else if ch == 'W' || ch == '𝐖' {
+                    if is_cap_mode {
+                        assert!(cap_mode == UEB_Duration::Word);
+                    }
+                    is_cap_mode = false;                    
+                }
+            }
+            return n_caps > 4;
+        }
+
+        fn convert_to_cap_passage_mode(braille: &str) -> String {
+            return "⠠⠠⠠".to_string() + &braille.replace(&['C', '𝐶'], "") + "⠠⠄";
         }
 
         /// Return true if the BANA or ICEB guidelines say it is ok to start with grade 2
@@ -1510,11 +1564,9 @@ fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> St
     });
     
     // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces
-    // let result = result.trim_start_matches('⠀').trim_end_matches('⠀');
     let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
-   
+    let result = result.trim_start_matches('⠀');            // don't trip end (e.g., see once::vector_11_2_5)
     return result.to_string();
-    // return result.trim_end_matches('⠀').to_string();
 
     fn has_left_dots(ch: char) -> bool {
         // Unicode braille is set up so dot 1 is 2^0, dot 2 is 2^1, etc

@@ -27,6 +27,7 @@ const SPACE_AFTER: &str = "data-space-after";
 // character to use instead of the text content for priority, etc.
 pub const CHEMICAL_BOND: &str ="data-chemical-bond";
 
+
 /// Used when mhchem is detected and we should favor postscripts rather than prescripts in constructing an mmultiscripts
 const MHCHEM_MMULTISCRIPTS_HACK: &str = "MHCHEM_SCRIPT_HACK";
 
@@ -272,11 +273,16 @@ impl<'a, 'op:'a> StackInfo<'a, 'op> {
 
 	fn last_child_in_mrow(&self) -> Option<Element<'a>> {
 		let children = self.mrow.children();
-		if children.is_empty() {
-			return None
-		} else {
-			return Some( as_element(children[children.len() - 1]) );
+		for &child in children.iter().rev() {
+			let child = as_element(child);
+			if let Some(value) = child.attribute_value(CHANGED_ATTR) {
+				if value == "empty_content" {
+					continue;
+				}
+			}
+			return Some(child);
 		}
+		return None;
 	}
 
 	fn add_child_to_mrow(&mut self, child: Element<'a>, child_op: OperatorPair<'op>) {
@@ -284,7 +290,7 @@ impl<'a, 'op:'a> StackInfo<'a, 'op> {
 		// 		element_summary(child), self.mrow.children().len(), show_invisible_op_char(child_op.ch), child_op.op.priority);
 		self.mrow.append_child(child);
 		if ptr_eq(child_op.op, *ILLEGAL_OPERATOR_INFO) {
-			assert!(!self.is_operand); 	// should not have two operands in a row
+			assert!(!self.is_operand); 	// should not have two operands in a row (ok to add whitespace)
 			self.is_operand = true;
 		} else {
 			self.op_pair = child_op;
@@ -389,6 +395,14 @@ pub fn get_presentation_element(element: Element) -> (usize, Element) {
 /// * if the mrow starts and ends with a fence (e.g, French open interval "]0,1[")
 ///
 /// An mrow is never deleted unless it is redundant.
+/// 
+/// Whitespace handling:
+/// Whitespace complicates parsing and also pattern matching (e.g., is it a mixed number which tests for a number preceding a fraction)
+/// The first attempt which mostly worked was to shove whitespace into adjacent mi/mn/mtext. That has a problem with distinguish different uses for whitespace
+/// The second attempt was to leave it in the parse and make it an mo when appropriate, but there were some cases where it should be prefix and wasn't caught
+/// The third attempt (and the current one) is to make it an attribute on adjacent elements.
+///   This preserves the data-width attr (with new name) added in the second attempt that helps resolve whether something is tweaking, a real space, or an omission.
+///   It adds data-previous-space-width/data-following-space-width with values to indicate with the space was on the left or right (typically it placed on the previous token because that's easier)
 pub fn canonicalize(mathml: Element) -> Result<Element> {
 	let context = CanonicalizeContext::new();
 	return context.canonicalize(mathml);
@@ -608,14 +622,15 @@ impl CanonicalizeContext {
 	fn make_empty_element(mathml: Element) -> Element {
 		set_mathml_name(mathml, "mtext");
 		mathml.clear_children();
-		mathml.set_text("\u{A0}");
+		mathml.set_text("\u{00A0}");
 		mathml.set_attribute_value("data-changed", "empty_content");
+		mathml.set_attribute_value("data-width", "0");
 		return mathml;
 	}
 	
 	fn create_empty_element<'a>(doc: &Document<'a>) -> Element<'a> {
 		let mtext = create_mathml_element(doc, "mtext");
-		mtext.set_text("\u{A0}");
+		mtext.set_text("\u{00A0}");
 		mtext.set_attribute_value("data-added", "missing-content");
 		return mtext;
 	}
@@ -663,7 +678,7 @@ impl CanonicalizeContext {
 			static ref IS_PRIME: Regex = Regex::new(r"['′″‴⁗]").unwrap();
 
 			// Note: including intervening spaces in what is likely a symbol of omission preserves any notion of separate digits (e.g., "_ _ _")
-			static ref IS_UNDERSCRORE: Regex = Regex::new(r"^[_\u{A0}]+$").unwrap();        }
+			static ref IS_UNDERSCRORE: Regex = Regex::new(r"^[_\u{00A0}]+$").unwrap();        }
 
 		static CURRENCY_SYMBOLS: phf::Set<&str> = phf_set! {
 			"$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿" // could add more currencies...
@@ -794,7 +809,9 @@ impl CanonicalizeContext {
 				let mathml = mathml;
 				if IS_WHITESPACE.is_match(text) {
 					// normalize to just a single non-breaking space
-					CanonicalizeContext::make_empty_element(mathml);
+					mathml.set_attribute_value("data-width", &white_space_em_width(text).to_string());
+					mathml.set_text("\u{00A0}");
+					return Some(mathml);
 				} else if let Some(dash) = canonicalize_dash(text) {
 					mathml.set_text(dash);
 				} else if OPERATORS.get(text).is_some() {
@@ -809,7 +826,9 @@ impl CanonicalizeContext {
 				if !text.is_empty() && IS_WHITESPACE.is_match(text) {
 					// can't throw it out because it is needed by braille -- change to what it really is
 					set_mathml_name(mathml, "mtext");
-					mathml.set_attribute_value(CHANGED_ATTR, "was-mo");
+					mathml.set_attribute_value("data-width", &white_space_em_width(text).to_string());
+					mathml.set_text("\u{00A0}");
+					mathml.set_attribute_value(CHANGED_ATTR, "data-was-mo");
 					return Some(mathml);
 				} else {
 					match text {
@@ -895,19 +914,16 @@ impl CanonicalizeContext {
 			},
 			"mspace" => {
 				// need to hold onto space for braille
-				let width = mathml.attribute_value("width").unwrap_or("0");
-				let ignorable = is_width_ignorable(width);
-				if ignorable {
-					let preceding = mathml.preceding_siblings();
-					if !preceding.is_empty() {
-						let preceding_child = as_element(preceding[preceding.len()-1]);
-						// debug!("preceding ignorable: {}", mml_to_string(&preceding_child));
-						if name(&preceding_child) == "mo" {
-							preceding_child.set_attribute_value(SPACE_AFTER, width);
-						}
-					}
-				}
-				return if parent_requires_child || !ignorable {Some( CanonicalizeContext::make_empty_element(mathml) )} else {None};			},
+				set_mathml_name(mathml, "mtext");
+				mathml.set_text("\u{00A0}");
+				mathml.set_attribute_value(CHANGED_ATTR, "was-mspace");
+
+				// normalize width ems
+				let width = mathml.attribute_value("width").unwrap_or("0em");
+				let normalized_width = crate::xpath_functions::FontSizeGuess::em_from_value(width); 
+				mathml.set_attribute_value("data-width", &normalized_width.to_string());
+				return Some(mathml);
+			},
 			"semantics" => {
 				// The semantics tag, like the style tag, can mess with pattern matching.
 				// However, it may be the case that having the annotations could aid in determining intent, so we want to keep them.
@@ -1004,7 +1020,6 @@ impl CanonicalizeContext {
 					merge_number_blocks(self, mathml, &mut children);
 					merge_whitespace(&mut children);
 					handle_convert_to_mmultiscripts(&mut children);
-
 				} else if element_name == "msub" || element_name == "msup" || 
 						  element_name == "msubsup" || element_name == "mmultiscripts"{
 					if element_name != "mmultiscripts" {
@@ -1213,25 +1228,26 @@ impl CanonicalizeContext {
 			return name(&child) == "mi" && as_text(child) == "A";
 		}
 
-		/// Returns true if it appears the width is just a spacing tweak rather than really a space.
-		/// 
-		/// This is not great in that someone could have multiple 'mspace's and together they exceed the threshold, but not individually
-		fn is_width_ignorable(width: &str) -> bool {
-			// Check to see if above some threshold (0.278em/1ex? -- thickspace?)  
-			// FIX: this is far from complete
-			if  width == "0" || width.starts_with('-') {	// simple cases
-				return true;	
-			}
-			if let Some(i) = width.find(|ch: char| ch.is_ascii_alphabetic()) {
-				let (amount, unit) = width.split_at(i);
-				match unit {
-					"em" | "rem" => return amount.parse::<f64>().unwrap_or(100.) < 0.278,
-					"ex" => return amount.parse::<f64>().unwrap_or(100.) < 1.0,
-					"px" => return amount.parse::<f64>().unwrap_or(100.) < 6.1,	// assume 12pt font -- hack
-					_ => return false,
+		/// 'text' is potentially one of the many Unicode whitespace chars. Estimate the width in ems
+		fn white_space_em_width(text: &str) -> f64 {
+			assert!(IS_WHITESPACE.is_match(text));
+			let mut width = 0.0;
+			for ch in text.chars() {
+				width += match ch {
+					' ' | '\u{00A0}' | '\u{1680}' | ' ' => 0.7,	// space, non-breaking space, Ogham space mark, figure space
+					' ' | ' ' => 0.5,						// en quad, en space
+					' ' | ' ' => 1.0,						// em quad, em space
+					' ' => 1.0/3.0,							// three per em space
+					' ' | ' ' => 0.25,						// four per em space, punctuation space (wild guess)
+					' ' | ' ' => 1.0/6.0,					// six per em space, thin space
+					' ' => 1.0/18.0,						// hair space
+					' ' => 0.3,								// narrow no-break space (half a regular space?)
+					' ' => 4.0/18.0,						// medium math space
+					'　' => 1.5,							// Ideographic Space
+					_ => 0.7,								// shouldn't happen
 				}
 			}
-			return false;
+			return width;
 		}
 
 		fn clean_chemistry_leaf(mathml: Element) -> Element {
@@ -1571,50 +1587,49 @@ impl CanonicalizeContext {
 			}
 		}
 
-		/// Merge mtext that is whitespace onto preceding or following mi/mn.
+		/// Merge adjacent mtext by increasing the width of the first mtext
+		/// The resulting merged whitespace is put on the previous child, or if there is one, on the following child
 		/// 
 		/// Note: this should be called *after* the mo/mtext cleanup (i.e., after the MathML child cleanup loop).
 		fn merge_whitespace(children: &mut Vec<ChildOfElement>) {
-			let mut i = 0;
+			if children.is_empty() {
+				return;
+			}
+
+			let mut i = 1;	// we look back at previous child if we detect appropriate mtext -- prev child will always exist
+			let mut previous_child = as_element(children[0]);
+			let mut is_previous_child_whitespace = name(&previous_child) == "mtext" && as_text(previous_child) == "\u{00A0}";
 			while i < children.len() {
 				let child = as_element(children[i]);
-				// if we encounter mtext and it is whitespace, it should be normalized to a non-breaking space.
-				if name(&child) == "mtext" && as_text(child) == "\u{A0}" {
-					// normalize whitespace to just non-breaking space
-					// the best merge would be with adjacent mtext (the space might be in 'mo')
-					if i < children.len()-1 {
-						let next_child = as_element(children[i+1]);
-						if name(&next_child) == "mtext"{
-							if as_text(next_child) != "\u{A0}" {
-								let new_text = "\u{A0}".to_string() + as_text(next_child);
-								next_child.set_text(&new_text);
-							}
-							children.remove(i);	
-							continue;	// try again with 'next' removed
-						}
-					}
-					// try to merge with previous
-					if i > 0 {
-						let prev_child = as_element(children[i-1]);
-						if name(&prev_child) == "mi" || name(&prev_child) == "mn" || name(&prev_child) == "mtext" {
-							let new_text = as_text(prev_child).to_string() + "\u{A0}";
-							prev_child.set_text(&new_text);
-							children.remove(i);
-							continue;		// don't advance 'i'
-						}	
-					}
-					if i < children.len()-1 {	// try to merge with next
-						let next_child = as_element(children[i+1]);
-						if name(&next_child) == "mi" || name(&next_child) == "mn" {
-							let new_text = "\u{A0}".to_string() + as_text(next_child);
-							next_child.set_text(&new_text);
-							children.remove(i);
-							i += 1; 	// don't need to look at next child since we know what it is
-							continue;
-						}
-					}
+				let is_child_whitespace = name(&child) == "mtext" && as_text(child) == "\u{00A0}";
+				// debug!("merge_whitespace: {}", mml_to_string(&child));
+				if is_child_whitespace && is_previous_child_whitespace {
+					// grab the width of the previous and current child, add them together
+					let previous_width = previous_child.attribute_value("data-width").unwrap_or("0");
+					let child_width = child.attribute_value("data-width").unwrap_or("0");
+					let width = previous_width.parse::<f64>().unwrap_or(0.0)
+								   + child_width.parse::<f64>().unwrap_or(0.0);
+					// set the combined width on the previous child and remove the current child (don't inc 'i')
+					previous_child.set_attribute_value("data-width", &width.to_string());
+					children.remove(i);
+					// previous child is unchanged
+				} else if is_previous_child_whitespace {
+					// done with sequence of whitespaces
+					child.set_attribute_value("data-previous-space-width", previous_child.attribute_value("data-width").unwrap());
+					children.remove(i-1);
+					previous_child = child;
+					is_previous_child_whitespace = false;
+				} else {
+					i += 1;
+					previous_child = child;
+					is_previous_child_whitespace = is_child_whitespace;
 				}
-				i += 1;
+			}
+			if children.len() > 1 && is_previous_child_whitespace {
+				// last child in mrow (= previous_child) is white space -- mark space *after*
+				let non_space_child = as_element(children[children.len()-2]);
+				non_space_child.set_attribute_value("data-following-space-width", previous_child.attribute_value("data-width").unwrap());
+				children.remove(children.len()-1);
 			}
 		}
 
@@ -1688,6 +1703,7 @@ impl CanonicalizeContext {
 				// debug!("start={}, end={}", i, end);
 				// no need to merge if only one child (also avoids "." being considered a number)
 				if end > i + 1 && is_likely_a_number(context, parent_mrow, &children[i..end]) {
+					(i, end) = trim_whitespace(children, i, end);
 					merge_block(children, i, end);
 					// note: start..end has been collapsed, so restart after the collapsed part
 				} else {
@@ -1970,7 +1986,32 @@ impl CanonicalizeContext {
 					});
 		}
 
+		/// Trim off any children that are whitespace on either side
+		fn trim_whitespace(children: &mut [ChildOfElement], start: usize, end: usize) -> (usize, usize) {
+			let mut real_start = start;
+			#[allow(clippy::needless_range_loop)]  // I don't like enumerate/take/skip here
+			for i in start..end {
+				let child = as_element(children[i]);
+				if !as_text(child).trim().is_empty() {
+					real_start = i;
+					break;
+				}
+			}
+
+			let mut real_end = end;
+			for i in (start..end).rev() {
+				let child = as_element(children[i]);
+				if !as_text(child).trim().is_empty() {
+					real_end = i+1;
+					break;
+				}
+			}
+			return (real_start, real_end);
+		}
+
+		/// Merge the number block from start..end
 		fn merge_block(children: &mut Vec<ChildOfElement>, start: usize, end: usize) {
+
 			// debug!("merge_block: merging {}..{}", start, end);
 			let mut mn_text = String::with_capacity(4*(end-start)-1);		// true size less than #3 digit blocks + separator
 			for &child_as_element in children.iter().take(end).skip(start) {
@@ -2281,6 +2322,7 @@ impl CanonicalizeContext {
 			}
 
 			script.replace_children(new_children);
+			add_attrs(script, as_element(mrow_children[i_multiscript]).attributes());
 			mrow_children[i_multiscript] = ChildOfElement::Element(script);
 			mrow_children.drain(i_multiscript+1..i_postscript);	// remove children after the first
 
@@ -3079,6 +3121,12 @@ impl CanonicalizeContext {
 			// make sure that what follows starts and ends with parens/brackets
 			assert_eq!(name(&node.parent().unwrap().element().unwrap()), "mrow");
 			let right_siblings = right_siblings.unwrap();
+			let non_whitespace = right_siblings.iter().enumerate()
+						.find(|&(_, child)| {
+							let child = as_element(*child);
+							name(&child) != "mtext" || !as_text(child).trim().is_empty()
+						});
+			let right_siblings = if let Some( (i, _) ) = non_whitespace {&right_siblings[i..]} else {right_siblings};
 			if right_siblings.is_empty() {
 				// debug!("     ...right siblings not None, but zero of them");
 				return FunctionNameCertainty::False;
@@ -3389,22 +3437,20 @@ impl CanonicalizeContext {
 				// note:  the code does these operations on the stack for consistency, but it could be optimized without push/popping the stack
 				let mrow = top_of_stack.mrow;
 				top_of_stack.add_child_to_mrow(current_child, current_op);
-				// debug!("shift_stack: after adding right fence to mrow: {}", mml_to_string(&top_of_stack.mrow));
+				// debug!("shift_stack: after adding right fence to mrow:\n{}", mml_to_string(&mrow));
 				new_current_op = OperatorPair::new();							// treat matched brackets as operand
 				new_current_child = mrow;	
 				let children = mrow.children();
-				if  children.len() == 2 &&
-					( name(&as_element(children[0])) != "mo" ||
-					  !self.find_operator(as_element(children[0]),
-								   None, Some(as_element(children[0])), Some(mrow) ).is_left_fence()) {
+				// debug!("looking for left fence: len={}, {:#?}", children.len(), self.find_operator(as_element(children[0]),None, None, Some(as_element(children[1])) ));
+				if children.len() == 2 && (name(&as_element(children[0])) != "mo" ||
+				   !self.find_operator(as_element(children[0]),
+								None, Some(as_element(children[0])), Some(mrow) ).is_left_fence()) {
 					// the mrow did *not* start with an open (hence no push)
 					// since parser really wants balanced parens to keep stack state right, we do a push here
 					parse_stack.push( StackInfo::new(mrow.document()) );
-				} else if children.len() <= 3 {
+				} else {
 					// the mrow started with some open fence (which caused a push) -- add the close, pop, and push on the "operand"
 					new_current_child = self.potentially_lift_script(mrow)
-				} else {
-					panic!("Wrong number of children in mrow when handling a close fence");
 				}
 			} else if current_op.op.is_postfix() {
 				// grab the left operand and start a new mrow with it and the operator -- put those back on the stack
@@ -3574,7 +3620,7 @@ impl CanonicalizeContext {
 			let mut current_op = OperatorPair::new();
 			// figure what the current operator is -- it either comes from the 'mo' (if we have an 'mo') or it is implied
 			if name(&base_of_child) == "mo" &&
-			   !( base_of_child.children().is_empty() || IS_WHITESPACE.is_match(as_text(base_of_child)) ) { // shouldn't have empty mo node, but...
+			   !( base_of_child.children().is_empty() || as_text(base_of_child) == "\u{00A0}" ) { // shouldn't have empty mo node, but...
 				let previous_op = if top(&parse_stack).is_operand {None} else {Some( top(&parse_stack).op_pair.op )};
 				let next_node = if i_child + 1 < num_children {Some(as_element(children[i_child+1]))} else {None};
 				current_op = OperatorPair{
@@ -3592,52 +3638,63 @@ impl CanonicalizeContext {
 					&mut parse_stack,
 					self.n_vertical_bars_on_right(&children[i_child+1..], current_op.ch)
 				);
-			} else if top(&parse_stack).last_child_in_mrow().is_some() {
-				let previous_child = top(&parse_stack).last_child_in_mrow().unwrap();
-				let base_of_previous_child = get_possible_embellished_node(previous_child);
-				if name(&base_of_previous_child) != "mo" {
-					// consecutive operands -- add an invisible operator as appropriate
-					let likely_function_name = self.is_function_name(previous_child, Some(&children[i_child..]));
-					current_op = if likely_function_name == FunctionNameCertainty::True {
-								OperatorPair{ ch: "\u{2061}", op: &INVISIBLE_FUNCTION_APPLICATION }
-							} else if self.is_mixed_fraction(&previous_child, &children[i_child..])? {
-								OperatorPair{ ch: "\u{2064}", op: &IMPLIED_INVISIBLE_PLUS }
-							} else if self.is_implied_comma(&previous_child, &current_child, &mrow) {
-								OperatorPair{ch: "\u{2063}", op: &IMPLIED_INVISIBLE_COMMA }				  
-							} else if self.is_implied_chemical_bond(&previous_child, &current_child) {
-								OperatorPair{ch: "\u{2063}", op: &IMPLIED_CHEMICAL_BOND }				  
-							} else if self.is_implied_separator(&previous_child, &current_child) {
-								OperatorPair{ch: "\u{2063}", op: &IMPLIED_SEPARATOR_HIGH_PRIORITY }				  
-							} else if self.is_trig_arg(base_of_previous_child, base_of_child, &mut parse_stack) {
-								OperatorPair{ch: "\u{2062}", op: &IMPLIED_TIMES_HIGH_PRIORITY }				  
-							} else {
-								OperatorPair{ ch: "\u{2062}", op: &IMPLIED_TIMES }
-							};
-					if let Some(attr_val) = base_of_child.attribute_value(CHANGED_ATTR) {
-						if attr_val == "was-mo" {
-							// it really should be an operator
-							base_of_child.remove_attribute(CHANGED_ATTR);
-							set_mathml_name(base_of_child, "mo");
+			} else {
+				let previous_child = top(&parse_stack).last_child_in_mrow();
+				if let Some(previous_child) = previous_child {
+					let base_of_previous_child = get_possible_embellished_node(previous_child);
+					if name(&base_of_previous_child) != "mo" {
+						let likely_function_name = self.is_function_name(previous_child, Some(&children[i_child..]));
+						if name(&base_of_child) == "mtext" && as_text(base_of_child) == "\u{00A0}" {
+							current_child.set_attribute_value("data-function-likelihood", &(likely_function_name == FunctionNameCertainty::True).to_string());
+							current_child.remove_attribute("data-was-mo");
+							set_mathml_name(current_child, "mo");
+							let mut top_of_stack = parse_stack.pop().unwrap();
+							top_of_stack.add_child_to_mrow(current_child, OperatorPair{ ch: "\u{00A0}", op: &INVISIBLE_FUNCTION_APPLICATION});		// whitespace -- make part of mrow to keep out of parse
+							parse_stack.push(top_of_stack);
+							continue;
 						}
-					}
-					if name(&base_of_child) == "mo" {
-						current_op.ch = as_text(base_of_child);
-						// debug!("  Found whitespace op '{}'/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
-					} else {
-						let implied_mo = create_mo(current_child.document(), current_op.ch, ADDED_ATTR_VALUE);
-						if likely_function_name == FunctionNameCertainty::Maybe {
-							implied_mo.set_attribute_value("data-function-guess", "true");
+						// consecutive operands -- add an invisible operator as appropriate
+						current_op = if likely_function_name == FunctionNameCertainty::True {
+									OperatorPair{ ch: "\u{2061}", op: &INVISIBLE_FUNCTION_APPLICATION }
+								} else if self.is_mixed_fraction(&previous_child, &children[i_child..])? {
+									OperatorPair{ ch: "\u{2064}", op: &IMPLIED_INVISIBLE_PLUS }
+								} else if self.is_implied_comma(&previous_child, &current_child, &mrow) {
+									OperatorPair{ch: "\u{2063}", op: &IMPLIED_INVISIBLE_COMMA }				  
+								} else if self.is_implied_chemical_bond(&previous_child, &current_child) {
+									OperatorPair{ch: "\u{2063}", op: &IMPLIED_CHEMICAL_BOND }				  
+								} else if self.is_implied_separator(&previous_child, &current_child) {
+									OperatorPair{ch: "\u{2063}", op: &IMPLIED_SEPARATOR_HIGH_PRIORITY }				  
+								} else if self.is_trig_arg(base_of_previous_child, base_of_child, &mut parse_stack) {
+									OperatorPair{ch: "\u{2062}", op: &IMPLIED_TIMES_HIGH_PRIORITY }				  
+								} else {
+									OperatorPair{ ch: "\u{2062}", op: &IMPLIED_TIMES }
+								};
+						if let Some(attr_val) = base_of_child.attribute_value(CHANGED_ATTR) {
+							if attr_val == "data-was-mo" {
+								// it really should be an operator
+								base_of_child.remove_attribute(CHANGED_ATTR);
+								set_mathml_name(base_of_child, "mo");
+							}
 						}
-						// debug!("  Found implicit op {}/{} [{:?}]", show_invisible_op_char(current_op.ch), current_op.op.priority, likely_function_name);
-						self.reduce_stack(&mut parse_stack, current_op.op.priority);		
-						let shift_result = self.shift_stack(&mut parse_stack, implied_mo, current_op.clone());
-						// ignore shift_result.0 which is just 'implied_mo'
-						assert_eq!(implied_mo, shift_result.0);
-						assert!( ptr_eq(current_op.op, shift_result.1.op) );
-						let mut top_of_stack = parse_stack.pop().unwrap();
-						top_of_stack.add_child_to_mrow(implied_mo, current_op);
-						parse_stack.push(top_of_stack);
-						current_op = OperatorPair::new();	
+						if name(&base_of_child) == "mo" {
+							current_op.ch = as_text(base_of_child);
+							// debug!("  Found whitespace op '{}'/{}", show_invisible_op_char(current_op.ch), current_op.op.priority);
+						} else {
+							let implied_mo = create_mo(current_child.document(), current_op.ch, ADDED_ATTR_VALUE);
+							if likely_function_name == FunctionNameCertainty::Maybe {
+								implied_mo.set_attribute_value("data-function-guess", "true");
+							}
+							// debug!("  Found implicit op {}/{} [{:?}]", show_invisible_op_char(current_op.ch), current_op.op.priority, likely_function_name);
+							self.reduce_stack(&mut parse_stack, current_op.op.priority);		
+							let shift_result = self.shift_stack(&mut parse_stack, implied_mo, current_op.clone());
+							// ignore shift_result.0 which is just 'implied_mo'
+							assert_eq!(implied_mo, shift_result.0);
+							assert!( ptr_eq(current_op.op, shift_result.1.op) );
+							let mut top_of_stack = parse_stack.pop().unwrap();
+							top_of_stack.add_child_to_mrow(implied_mo, current_op);
+							parse_stack.push(top_of_stack);
+							current_op = OperatorPair::new();	
+						}
 					}
 				}
 			}
@@ -3769,8 +3826,8 @@ pub fn as_text(leaf_child: Element) -> &str {
 	}
 }
 
-#[allow(dead_code)] // for debugging with println
-fn element_summary(mathml: Element) -> String {
+#[allow(dead_code)] // for debugging
+pub fn element_summary(mathml: Element) -> String {
 	return format!("{}<{}>", name(&mathml),
 	              if is_leaf(mathml) {show_invisible_op_char(as_text(mathml)).to_string()}
 				  else 
@@ -5011,7 +5068,7 @@ mod canonicalize_tests {
         let target_str = " <math>
 				<mrow data-changed='added'>
 				<mo>(</mo>
-				<mn>0110\u{A0}1110\u{A0}0110</mn>
+				<mn>0110\u{00A0}1110\u{00A0}0110</mn>
 				<mo>)</mo>
 				</mrow>
 			</math>";
