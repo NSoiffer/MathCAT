@@ -296,19 +296,19 @@ fn mn_with_space() {
 
 #[test]
 fn bug_199_2pi() {
-    let expr = "<math>
-	<mrow>
-		<mo stretchy=\"false\" form=\"prefix\">[</mo>
-		<mspace width=\"0.333em\"></mspace>
-		<mn>0</mn>
-		<mspace width=\"0.333em\"></mspace>
-		<mo>,</mo>
-		<mspace width=\"0.333em\"></mspace>
-		<mn>2</mn>
-		<mi>π</mi>
-		<mspace width=\"0.333em\"></mspace>
-		<mo stretchy=\"false\" form=\"postfix\">)</mo>
-	</mrow>
-</math>";
-test("en", "SimpleSpeak",expr, "the closed open interval from 0 to 2 pi");
+  let expr = "<math>
+      <mrow>
+        <mo stretchy=\"false\" form=\"prefix\">[</mo>
+        <mspace width=\"0.333em\"></mspace>
+        <mn>0</mn>
+        <mspace width=\"0.333em\"></mspace>
+        <mo>,</mo>
+        <mspace width=\"0.333em\"></mspace>
+        <mn>2</mn>
+        <mi>π</mi>
+        <mspace width=\"0.333em\"></mspace>
+        <mo stretchy=\"false\" form=\"postfix\">)</mo>
+      </mrow>
+    </math>";
+  test("en", "SimpleSpeak",expr, "the closed open interval from 0 to 2 pi");
 }
