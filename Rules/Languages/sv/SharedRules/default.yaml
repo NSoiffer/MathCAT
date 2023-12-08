@@ -526,28 +526,28 @@
       - pause: short
   - test:
       if: ".[contains(@notation,'uparrow')]"
-      then: [T: "uppåtpil", pause: short]      # phrase(direction is shown by the 'up arrow')
+      then: [T: "uppåt-pil", pause: short]      # phrase(direction is shown by the 'up arrow')
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
-      then: [T: "nedåtpil", pause: short]      # phrase(the trend is shown by the 'down arrow')
+      then: [T: "nedåt-pil", pause: short]      # phrase(the trend is shown by the 'down arrow')
   - test:
       if: ".[contains(@notation,'leftarrow')]"
-      then: [T: "vänsterpil", pause: short]      # phrase(the 'left arrow' indicates going back)
+      then: [T: "vänster-pil", pause: short]      # phrase(the 'left arrow' indicates going back)
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
-      then: [T: "högerpil", pause: short]      # phrase(the 'right arrow' indicates moving forward)
+      then: [T: "höger-pil", pause: short]      # phrase(the 'right arrow' indicates moving forward)
   - test:
       if: ".[contains(@notation,'northeastarrow')]"
-      then: [T: "nordostpil", pause: short]      # phrase(direction is indicated by the 'northeast arrow')
+      then: [T: "nordost-pil", pause: short]      # phrase(direction is indicated by the 'northeast arrow')
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
-      then: [T: "sydostpil", pause: short]      # phrase(direction is shown by the 'southeast arrow')
+      then: [T: "sydost-pil", pause: short]      # phrase(direction is shown by the 'southeast arrow')
   - test:
       if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
-      then: [T: "sydvästpil", pause: short]      # phrase(direction is shown by the 'southwest arrow')
+      then: [T: "sydväst-pil", pause: short]      # phrase(direction is shown by the 'southwest arrow')
   - test:
       if: ".[contains(@notation,'northwestarrow')]"
-      then: [T: "nordvästpil", pause: short]      # phrase(direction is shown by the 'northwest arrow')
+      then: [T: "nordväst-pil", pause: short]      # phrase(direction is shown by the 'northwest arrow')
   - test:
       if: ".[contains(@notation,'updownarrow')]"
       then: [T: "dubbelriktad vertikal pil", pause: short]      # phrase(upward movement is indicated by the 'double ended vertical arrow')
