@@ -231,8 +231,8 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
     return Ok( () );
 
     fn to_float(name: &str, value: &str) -> Result<f64> {
-        match value.parse::<f64>() {
-            Ok(val) => return Ok(val),
+        return match value.parse::<f64>() {
+            Ok(val) => Ok(val),
             Err(_) => bail!("SetPreference: preference'{}'s value '{}' must be a float", name, value),
         };
     }
@@ -413,10 +413,10 @@ fn trim_doc(doc: &Document) {
 
 /// Not really meant to be public -- used by tests in some packages
 pub fn trim_element(e: &Element) {
-    const TEMP_NBSP: &str = "\u{F8FB}";
-
     // "<mtext>this is text</mtext" results in 3 text children
     // these are combined into one child as it makes code downstream simpler
+    const WHITESPACE: &[char] = &[' ', '\u{0009}', '\u{000A}', '\u{000D}'];      // Rust complains if I don't give this type (from an example)
+
     if is_leaf(*e) {
         // Assume it is HTML inside of the leaf -- turn the HTML into a string
         make_leaf_element(*e);
@@ -439,8 +439,8 @@ pub fn trim_element(e: &Element) {
         }
     }
 
-    // hack to avoid non-breaking whitespace from being removed -- move to a unique non-whitespace char then back
-    let trimmed_text = single_text.replace(' ', TEMP_NBSP).trim().replace(TEMP_NBSP, " ");
+    // CSS considers only space, tab, linefeed, and carriage return as collapsable whitespace
+    let trimmed_text = single_text.trim_matches(WHITESPACE);
     if !(is_leaf(*e) || name(e) == "intent-literal" || single_text.is_empty()) {  // intent-literal comes from testing intent
         // FIX: we have a problem -- what should happen???
         // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash
@@ -478,15 +478,22 @@ pub fn trim_element(e: &Element) {
                     }
                 },
                 ChildOfElement::Text(t) => {
-                    let space = !previous_element_was_text;
-                    previous_element_was_text = true;
-                    (t.text().to_string(), if space {" "} else {""})
+                    let t_text = t.text().trim_matches(WHITESPACE);
+                    if t_text.is_empty() {
+                        ("".to_string(), "")
+                    } else {
+                        let space = !previous_element_was_text;
+                        previous_element_was_text = true;
+                        (t_text.to_string(), if space {" "} else {""})
+                    }
                 },
                 _ => ("".to_string(), ""),
             };
             if !child_text.is_empty() {
-                // hack to avoid non-breaking whitespace from being removed -- move to a unique non-whitespace
-                text = text + space + child_text.replace(' ', TEMP_NBSP).trim_start();
+                if !text.is_empty() {
+                    text += space;
+                }
+                text += &child_text.trim_matches(WHITESPACE).to_string();
             } 
 
         }
@@ -494,9 +501,7 @@ pub fn trim_element(e: &Element) {
         // get rid of the old children and replace with the text we just built
         mathml_leaf.clear_children();
 
-        // move hack back to non-breaking whitespace
-        let trimmed_text = text.trim().replace(TEMP_NBSP, " ");
-        mathml_leaf.set_text(&trimmed_text);
+        mathml_leaf.set_text(&text);
 
         /// gather up all the contents of the element and return them with a leading space
         fn gather_text(html: Element) -> String {
@@ -504,7 +509,7 @@ pub fn trim_element(e: &Element) {
             for child in html.children() {
                 match child {
                     ChildOfElement::Element(child) => {
-                        text = text + " " + gather_text(child).trim_start();
+                        text = text + " " + gather_text(child).trim_matches(WHITESPACE);
                     },
                     ChildOfElement::Text(t) => text += t.text(),
                     _ => (),
