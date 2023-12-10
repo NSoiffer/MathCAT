@@ -1133,7 +1133,7 @@ impl FontSizeGuess {
     pub fn em_from_value(value_with_unit: &str) -> f64 {
         lazy_static! {
             // match one or more digits followed by a unit -- there are many more units, but they tend to be large and rarer(?)
-            static ref FONT_VALUE: Regex = Regex::new(r"([0-9]*\.?[0-9]*)(px|cm|mm|Q|in|ppc|pt|ex|em|rem)").unwrap();
+            static ref FONT_VALUE: Regex = Regex::new(r"(-?[0-9]*\.?[0-9]*)(px|cm|mm|Q|in|ppc|pt|ex|em|rem)").unwrap();
         }
         let cap = FONT_VALUE.captures(&value_with_unit);
         if let Some(cap) = cap {
