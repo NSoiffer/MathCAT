@@ -268,7 +268,7 @@
      - test:
         - if: "self::m:mn"
           then: [t: "N⠐"]
-        - else_if: "@data-added='missing-content' or @data-changed='empty_content' or @width > 1.1"
+        - else_if: "@data-added='missing-content' or @data-empty-in-2D or @width > 1.1"
           then: [t: "⠬"]       # omission
         - else_if: "@width < 0.25"
           then: [t: ""]       # tweaking space -- ignore

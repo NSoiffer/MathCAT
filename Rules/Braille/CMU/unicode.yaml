@@ -535,9 +535,13 @@
 
  - " ":                        # 0x20 (Space)
      - test:
-        if: "self::m:mn"
-        then: [t: "N⠄"]
-        else: [t: "W"]
+        - if: "self::m:mn"
+          then: [t: "N⠄"]
+        - else_if: "@data-added='missing-content' or @data-empty-in-2D or @width > 1.1"
+          then: [t: "⠰⠤⠆"]       # omission
+        - else_if: "@width < 0.25"
+          then: [t: ""]       # tweaking space -- ignore
+          else: [t: "W"]      # space in text or wide enough space
  - " ":                        # 0xa0 (Non-breaking Space)
      - test:
         - if: "self::m:mn"

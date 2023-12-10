@@ -181,6 +181,8 @@
       - if: "self::m:mn" 
         then: [t: "⠀"]
         #   # part of longer string or part of preceeding or following text
+      - else_if: "@data-added='missing-content' or @data-empty-in-2D or @width > 1.1"
+        then: [t: "⠿"]       # omission
       - else_if: "(string-length(.) > 1 or preceding-sibling::*[1][self::m:mtext and .!=','] or following-sibling::*[1][self::m:mtext])"
         then: [t: "W"]
         # treat mo like 0x2061 (function apply)
