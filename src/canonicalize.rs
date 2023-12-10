@@ -497,7 +497,6 @@ impl CanonicalizeContext {
 		}
 		CanonicalizeContext::assure_mathml(mathml)?;
 		let mathml = self.clean_mathml(mathml).unwrap();	// 'math' is never removed
-		self.assure_math_not_empty(mathml);
 		self.assure_nary_tag_has_one_child(mathml);
 		let mut converted_mathml = self.canonicalize_mrows(mathml)
 				.chain_err(|| format!("while processing\n{}", mml_to_string(&mathml)))?;
@@ -510,16 +509,7 @@ impl CanonicalizeContext {
 		debug!("\nMathML after canonicalize:\n{}", mml_to_string(&converted_mathml));
 		return Ok(converted_mathml);
 	}
-	
-	/// Make sure there is some content inside the <math> tag
-	fn assure_math_not_empty(&self, mathml: Element) {
-		assert_eq!(name(&mathml), "math");
-		if mathml.children().is_empty() {
-			let child = CanonicalizeContext::create_empty_element(&mathml.document());
-			mathml.append_child(child);
-		}
-	}
-	
+		
 	/// Make sure there is exactly one child
 	fn assure_nary_tag_has_one_child(&self, mathml: Element) {
 		let children = mathml.children();
@@ -632,6 +622,7 @@ impl CanonicalizeContext {
 		let mtext = create_mathml_element(doc, "mtext");
 		mtext.set_text("\u{00A0}");
 		mtext.set_attribute_value("data-added", "missing-content");
+		mtext.set_attribute_value("data-width", "0");
 		return mtext;
 	}
 	
@@ -640,8 +631,10 @@ impl CanonicalizeContext {
 			   (name(&el) == "mrow" && el.children().is_empty() && el.attribute("intent").is_none());
 	}
 
-	fn mark_empty_content(el: Element) {
-		for child in el.children() {
+
+	// this should only be called for 2D elements
+	fn mark_empty_content(two_d_element: Element) {
+		for child in two_d_element.children() {
 			let child = as_element(child);
 			if CanonicalizeContext::is_empty_element(child) {
 				child.set_attribute_value(EMPTY_IN_2D, "true");
@@ -790,6 +783,8 @@ impl CanonicalizeContext {
 				};
 			},
 			"mtext" => {
+				debug!("before merge_arc_trig: {}", mml_to_string(&mathml));
+
 				if let Some(result) = merge_arc_trig(mathml) {
 					return Some(result);
 				};
@@ -806,10 +801,9 @@ impl CanonicalizeContext {
 					return Some(mathml);
 				}
 				// allow non-breaking whitespace to stay -- needed by braille
-				let mathml = mathml;
 				if IS_WHITESPACE.is_match(text) {
 					// normalize to just a single non-breaking space
-					mathml.set_attribute_value("data-width", &white_space_em_width(text).to_string());
+					mathml.set_attribute_value("data-width", &format!("{:.3}", white_space_em_width(text)));
 					mathml.set_text("\u{00A0}");
 					return Some(mathml);
 				} else if let Some(dash) = canonicalize_dash(text) {
@@ -826,7 +820,7 @@ impl CanonicalizeContext {
 				if !text.is_empty() && IS_WHITESPACE.is_match(text) {
 					// can't throw it out because it is needed by braille -- change to what it really is
 					set_mathml_name(mathml, "mtext");
-					mathml.set_attribute_value("data-width", &white_space_em_width(text).to_string());
+					mathml.set_attribute_value("data-width", &format!("{:.3}", white_space_em_width(text)));
 					mathml.set_text("\u{00A0}");
 					mathml.set_attribute_value(CHANGED_ATTR, "data-was-mo");
 					return Some(mathml);
@@ -1239,7 +1233,7 @@ impl CanonicalizeContext {
 					' ' | ' ' => 1.0,						// em quad, em space
 					' ' => 1.0/3.0,							// three per em space
 					' ' | ' ' => 0.25,						// four per em space, punctuation space (wild guess)
-					' ' | ' ' => 1.0/6.0,					// six per em space, thin space
+					' ' | ' ' => 3.0/18.0,					// six per em space, thin space
 					' ' => 1.0/18.0,						// hair space
 					' ' => 0.3,								// narrow no-break space (half a regular space?)
 					' ' => 4.0/18.0,						// medium math space
@@ -1261,6 +1255,7 @@ impl CanonicalizeContext {
 				}
 				if let Some(elements) = convert_leaves_to_chem_elements(mathml) {
 					// children are already marked as chemical elements
+					debug!("clean_chemistry_leaf: {}", mml_to_string(&mathml));
 					return replace_children(mathml, elements);
 				} else {
 					let likely_chemistry = likely_chem_element(mathml);
@@ -2322,7 +2317,10 @@ impl CanonicalizeContext {
 			}
 
 			script.replace_children(new_children);
-			add_attrs(script, as_element(mrow_children[i_multiscript]).attributes());
+			let lifted_base = as_element(mrow_children[i_multiscript]);
+			add_attrs(script, lifted_base.attributes());
+			script.remove_attribute("data-split");		// doesn't make sense on mmultiscripts
+			script.remove_attribute("mathvariant");		// doesn't make sense on mmultiscripts
 			mrow_children[i_multiscript] = ChildOfElement::Element(script);
 			mrow_children.drain(i_multiscript+1..i_postscript);	// remove children after the first
 
@@ -4467,10 +4465,10 @@ mod canonicalize_tests {
 			</mrow></math>";
         let target_str = "<math>
 			<mrow>
-				<mn>2 </mn>
+				<mn>2</mn>
 				<mo data-changed='added'>&#x2064;</mo>
 				<mrow data-changed='added'>>
-					<mn>3</mn>
+					<mn data-previous-space-width='0.278'>3</mn>
 					<mo>/</mo>
 					<mn>4</mn>
 				</mrow>
@@ -4806,14 +4804,14 @@ mod canonicalize_tests {
 	#[test]
     fn mtext_whitespace_string() {
         let test_str = "<math><mi>t</mi><mtext>&#x00A0;&#x205F;</mtext></math>";
-        let target_str = "<math><mi>t&#x00A0;</mi></math>";
+        let target_str = "<math><mi data-following-space-width='0.922'>t</mi></math>";
 		assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 	
 	#[test]
     fn mtext_whitespace_string_before() {
         let test_str = "<math><mtext>&#x00A0;&#x205F;</mtext><mi>t</mi></math>";
-        let target_str = "<math><mi>&#x00A0;t</mi></math>";
+        let target_str = "<math><mi data-previous-space-width='0.922'>t</mi></math>";
 		assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 	
@@ -4823,9 +4821,9 @@ mod canonicalize_tests {
 				<mrow><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></mrow></math>";
         let target_str = " <math>
 		<mrow data-changed='added'>
-		  <mi>t&#x00A0;</mi>
+		  <mi>t</mi>
 		  <mo data-changed='added' data-function-guess='true'>&#x2062;</mo>
-		  <mrow>
+		  <mrow data-previous-space-width='0.922'>
 			<mo>(</mo>
 			<mrow data-changed='added'>
 			  <mi>x</mi>
@@ -4845,9 +4843,9 @@ mod canonicalize_tests {
 				<mrow><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></mrow></math>";
         let target_str = " <math>
 		<mrow data-changed='added'>
-		  <mi>f&#x00A0;</mi>
+		  <mi>f</mi>
 		  <mo data-changed='added'>&#x2061;</mo>
-		  <mrow>
+		  <mrow  data-previous-space-width='0.922'>
 			<mo>(</mo>
 			<mrow data-changed='added'>
 			  <mi>x</mi>
@@ -4870,7 +4868,7 @@ mod canonicalize_tests {
 		  <mi>t</mi>
 		  <mo data-changed='added' data-function-guess='true'>&#x2062;</mo>
 		  <mrow>
-			<mo>(</mo>
+			<mo data-previous-space-width='0.167'>(</mo>
 			<mrow data-changed='added'>
 			  <mi>x</mi>
 			  <mo>+</mo>
@@ -4889,10 +4887,12 @@ mod canonicalize_tests {
 					<mrow><mspace width='3em'/></mrow>
 					<mtext>&#x2009;</mtext>
 				</mfrac></math>";
-        let target_str = " <math> <mfrac>
-		  <mtext width='3em' data-changed='empty_content' data-empty-in-2D='true'> </mtext>
-		  <mtext data-changed='empty_content' data-empty-in-2D='true'> </mtext>
-		</mfrac> </math>";
+        let target_str = " <math>
+			<mfrac>
+				<mtext width='3em' data-changed='was-mspace' data-width='3' data-empty-in-2D='true'> </mtext>
+				<mtext data-width='0.167' data-empty-in-2D='true'> </mtext>
+			</mfrac>
+	   </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
@@ -4901,9 +4901,9 @@ mod canonicalize_tests {
         let test_str = "<math><mi>cos</mi><mo>&#xA0;</mo><mi>x</mi></math>";
         let target_str = "<math>
 				<mrow data-changed='added'>
-					<mi>cos&#xA0;</mi>
+					<mi>cos</mi>
 					<mo data-changed='added'>&#x2061;</mo>
-					<mi>x</mi>
+					<mi data-previous-space-width='0.700'>x</mi>
 				</mrow>
 	  		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
@@ -4917,7 +4917,7 @@ mod canonicalize_tests {
 				</mroot></math>";
         let target_str = "<math><mroot>
 				<mi>b</mi>
-				<mtext data-changed='empty_content' data-empty-in-2D='true'>&#xA0;</mtext>
+				<mtext data-empty-in-2D='true' data-width='0.167'>&#xA0;</mtext>
 			</mroot></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
@@ -4931,7 +4931,7 @@ mod canonicalize_tests {
 					<mspace width='3em'/>
 				</msqrt></math>";
         let target_str = "<math><msqrt>
-				<mi>b&#xA0;</mi>
+				<mi data-following-space-width='3.167'>b</mi>
 			</msqrt></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
@@ -4939,14 +4939,14 @@ mod canonicalize_tests {
 	#[test]
     fn empty_content() {
         let test_str = "<math></math>";
-        let target_str = " <math><mtext data-added='missing-content' data-changed='empty_content'> </mtext></math>";
+        let target_str = " <math><mtext data-added='missing-content' data-width='0.700'> </mtext></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
 	#[test]
     fn empty_content_after_cleanup() {
         let test_str = "<math><mrow><mphantom><mn>1</mn></mphantom></mrow></math>";
-        let target_str = " <math><mtext data-added='missing-content'> </mtext></math>";
+        let target_str = " <math><mtext data-added='missing-content' data-width='0'> </mtext></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
@@ -4956,9 +4956,9 @@ mod canonicalize_tests {
         let target_str = "<math>
 		<mfrac>
 		  <menclose notation='box'>
-			<mtext data-added='missing-content' data-empty-in-2D='true'> </mtext>
+			<mtext data-added='missing-content' data-empty-in-2D='true' data-width='0'> </mtext>
 		  </menclose>
-		  <mtext data-changed='empty_content' data-empty-in-2D='true'> </mtext>
+		  <mtext data-changed='empty_content' data-empty-in-2D='true' data-width='0'> </mtext>
 		</mfrac>
 	   </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
