@@ -1364,6 +1364,12 @@ fn degrees_11_5_2() {
 }
 
 #[test]
+fn triangle_11_6() {
+    let expr = "<math><mo>&#x25B3;</mo><mi>a</mi><mi>b</mi><mi>c</mi></math>";
+    test_braille("CMU", expr, "⠠⠾⠁⠃⠉");
+}
+
+#[test]
 fn cancellation_14_3_3() {
     // this uses various forms of crossouts to make the test better -- the original only has horizontal crossouts. All should have the same braille.
     let expr = "<math>
@@ -1392,48 +1398,48 @@ fn cancellation_14_3_3() {
 
 #[test]
 fn omission_14_5_1() {
-    // Single and double '_' are used (from WIRIS) for a more robust test -- example seems to use two "_"s for a blank
-    let expr = "<math><mn>5</mn><mi intent=':omission'>_</mi><mn>4</mn><mi intent=':omission'>_</mi><mi intent=':omission'>_</mi><mn>2</mn><mo>=</mo><mn>10</mn></math>";
+    // Single and double '_' are used (from WIRIS) for a more robust test -- example seems to use two "_"s for a blank (added 'intent')
+    let expr = "<math><mn>5</mn><mi intent=':blank'>_</mi><mn>4</mn><mi intent=':blank'>_</mi><mi intent=':blank'>_</mi><mn>2</mn><mo>=</mo><mn>10</mn></math>";
     test_braille("CMU", expr, "⠼⠑⠰⠼⠙⠰⠼⠃⠶⠼⠁⠚");
 }
 
 #[test]
 fn omission_14_5_2() {
     // copied from example and pasted into WIRIS
-    let expr = "<math><mn>12</mn><mo>+</mo><mn>13</mn><mo>=</mo><mi intent=':omission'>_</mi><mo>&#xA0;</mo><mi intent=':omission'>_</mi></math>";
+    let expr = "<math><mn>12</mn><mo>+</mo><mn>13</mn><mo>=</mo><mi intent=':blank'>_</mi><mo>&#xA0;</mo><mi intent=':blank'>_</mi></math>";
     test_braille("CMU", expr, "⠼⠁⠃⠖⠼⠁⠉⠶⠼⠰⠰");
 }
 
 #[test]
 fn omission_14_5_3() {
     // copied from example and pasted into WIRIS
-    let expr = "<math><mn>23</mn><mo>+</mo><mn>145</mn><mo>=</mo><mn>1</mn><mi intent=':omission'>_</mi><mo>&#xA0;</mo><mi intent=':omission'>_</mi></math>";
+    let expr = "<math><mn>23</mn><mo>+</mo><mn>145</mn><mo>=</mo><mn>1</mn><mi intent=':blank'>_</mi><mo>&#xA0;</mo><mi intent=':blank'>_</mi></math>";
     test_braille("CMU", expr, "⠼⠃⠉⠖⠼⠁⠙⠑⠶⠼⠁⠰⠰");
 }
 
 #[test]
 fn omission_14_5_4() {
     // copied from example and pasted into WIRIS
-    let expr = "<math><mn>719</mn><mo>+</mo><mn>83</mn><mo>=</mo><mi intent=':omission'>_</mi><mi intent=':omission'>_</mi></math>";
+    let expr = "<math><mn>719</mn><mo>+</mo><mn>83</mn><mo>=</mo><mi intent=':blank'>_</mi><mi intent=':blank'>_</mi></math>";
     test_braille("CMU", expr, "⠼⠛⠁⠊⠖⠼⠓⠉⠶⠰⠤⠆");
 }
 
 #[test]
 fn omission_14_5_5() {
-    let expr = "<math><mn>3</mn><mo>÷</mo><mn>12</mn><mo>=</mo><mn>18</mn><mo>÷</mo><mo intent=':omission'>□</mo></math>";
+    let expr = "<math><mn>3</mn><mo>&#xF7;</mo><mn>12</mn><mo>=</mo><mn>18</mn><mo>&#xF7;</mo><menclose notation='box'><mo>&#xA0;</mo><mo>&#xA0;</mo><mo>&#xA0;</mo></menclose></math>";
     test_braille("CMU", expr, "⠼⠉⠂⠆⠀⠶⠼⠁⠓⠲⠰⠤⠆");
 }
 
 #[test]
 fn units_appendix_1_2_1() {
     let expr = "<math>
-        <mi mathvariant='normal'>J</mi>
+        <mi mathvariant='normal' intent=':unit'>J</mi>
         <mo>=</mo>
-        <mi>kg</mi>
+        <mi intent=':unit'>kg</mi>
         <mo>&#xA0;</mo>
-        <msup><mi mathvariant='normal'>m</mi><mn>2</mn></msup>
+        <msup><mi mathvariant='normal' intent=':unit'>m</mi><mn>2</mn></msup>
         <mo>&#xA0;</mo>
-        <msup><mi mathvariant='normal'>s</mi><mrow><mo>-</mo><mn>2</mn></mrow></msup>
+        <msup><mi mathvariant='normal' intent=':unit'>s</mi><mrow><mo>-</mo><mn>2</mn></mrow></msup>
     </math>";
     test_braille("CMU", expr, "⠨⠚⠶⠅⠛⠀⠍⠡⠼⠃⠀⠎⠡⠤⠼⠃");
 }

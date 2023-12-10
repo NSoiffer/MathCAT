@@ -233,41 +233,6 @@
          then: [t: ""]
 
 -
-   # Non-breaking whitespace is added to the start/end of numbers in cases of adjoining text to help the parse.
-   # These generate a different char inside of a number, so we peel them off here because it doesn't seem possible
-   # to ask "what character position am I inside of an mn?" in unicode.yaml
-   # Here we deal with the messy abnormal case separately
-   name: peel-off-spaces
-   tag: [mn, mi]
-   match: "starts-with(., '\u00A0') or substring(., string-length(.), 1)='\u00A0'"
-   replace:
-   - test:
-      if: "starts-with(., '\u00A0')"
-      then:
-      - t: ""
-      - test:
-         if: "substring(., string-length(.), 1)='\u00A0'"
-         then:
-         - x: "BrailleChars(., 'Vietnam', 2, string-length(.))"
-         - test:
-            if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
-            then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
-            else: [t: ""]
-         else:
-         - x: "BrailleChars(., 'Vietnam', 2, string-length(.)+1)"
-      else:
-      - test:
-         if: "substring(., string-length(.), 1)='\u00A0'"
-         then:
-         - x: "BrailleChars(., 'Vietnam', 1, string-length(.))"
-         - test:
-            if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
-            then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
-            else: [t: ""]
-         else:
-         - x: "BrailleChars(., 'Vietnam', 1, string-length(.)+1)"
-
--
   name: default
   tag: mn
   match: "."

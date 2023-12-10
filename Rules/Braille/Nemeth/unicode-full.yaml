@@ -1566,7 +1566,6 @@
   # --- Nemeth Default Characters math_geometry chars. ---
  - "─": [t: "⠱"]                # 0x2500
  - "│": [t: "⠳"]                # 0x2502
- - "▫": [t: "⠫⠸⠗"]              # 0x25ab
  - "▰": [t: "⠫⠸⠛"]              # 0x25b0
  - "▱": [t: "⠫⠛"]               # 0x25b1
  - "▽": [t: "⠨⠫"]               # 0x25bd
@@ -2104,7 +2103,9 @@
  - "⌢": [t: "⠫⠁"]             # 0x2322 (Frown)
  - "⌣": [t: "⠫⠄"]             # 0x2323 (Smile)
  - "■": [t: "⠫⠸⠲"]              # 0x25A0 (Filled square)
+ - "▫": [t: "⠫⠲"]               # 0x25AB (Small white Square)
  - "□": [t: "⠫⠲"]               # 0x25A1 (Square)
+ - "◻": [t: "⠫⠲"]               # 0x25FB (Square)
  - "▬": [t: "⠫⠸⠗"]              # 0x25AC (Filled rectangle)
  - "▭": [t: "⠫⠗"]               # 0x25AD (Rectangle)
  - "▲": [t: "⠫⠸⠞"]              # 0x25B2 (Black up-pointing triangle)

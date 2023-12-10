@@ -213,10 +213,16 @@
  - "⇣": [t: "1⠳⠂⠩"]             # 0x21E3 (Downwards dashed arrow)
  - "⟵": [t: "1⠳⠒⠒⠒⠪"]           # 0x27F5 (Long leftwards arrow)
  - "⟶": [t: "1⠳⠒⠒⠒⠕"]           # 0x27F6 (Long rightwards arrow)
- - "⥂": [t: "⠸⠶"]               # 0x2942 (Rightwards arrow above short leftwards arrow (equilibrium, trend to the right))
- - "⥄": [t: "⠈⠸⠶"]              # 0x2944 (Short rightwards arrow above leftwards arrow (equilibrium, trend to the left))
+ - "⥂": [t: "1⠸⠶"]               # 0x2942 (Rightwards arrow above short leftwards arrow (equilibrium, trend to the right))
+ - "⥄": [t: "1⠈⠸⠶"]              # 0x2944 (Short rightwards arrow above leftwards arrow (equilibrium, trend to the left))
+ - "🣒": [t: "1⠘⠸⠶"]               # 0x1f8d2 (Long rightwards harpoon over leftwards harpoon (equilibrium))
+ - "🣓": [t: "1⠸⠶"]                # 0x1f8d3 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the right))
+ - "🣔": [t: "1⠈⠸⠶"]               # 0x1f8d4 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the left))
+
  - "△": [t: "1⠫⠼⠉t"]            # 0x25B3 (Triangle)
+ - "▫": [t: "1⠫⠼⠙t"]             # 0x25AB (Small white Square)
  - "□": [t: "1⠫⠼⠙t"]            # 0x25A1 (Square)
+ - "◻": [t: "1⠫⠼⠙t"]            # 0x25FB (Square)
  - "▤": [t: "⠨⠫⠼⠙t"]            # 0x25A4 (Square with horizontal fill)
  - "▥": [t: "⠨⠫⠼⠙t"]            # 0x25A5 (Square with vertical fill)
  - "▦": [t: "⠨⠫⠼⠙t"]            # 0x25A6 (Square with orthogonal crosshatch fill)
@@ -262,11 +268,11 @@
      - test:
         - if: "self::m:mn"
           then: [t: "N⠐"]
-        - else_if: "following-sibling::*[1][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]"
-          then: [t: "𝐖"]
-        - else_if: "@data-added='missing-content' or @data-changed='empty_content'"
+        - else_if: "@data-added='missing-content' or @data-empty-in-2D or @width > 1.1"
           then: [t: "⠬"]       # omission
-          else: [t: "W"]
+        - else_if: "@width < 0.25"
+          then: [t: ""]       # tweaking space -- ignore
+          else: [t: "W"]      # space in text or wide enough space
  - ",":                        # 0x2c (Comma)
      - test:
         if: "self::m:mn"

@@ -1235,10 +1235,428 @@ fn chem_16_2_11() {
 }
 
 #[test]
+fn chem_16_2_12() {
+    // from MathJax/mhchem V3
+    let expr = "<math>
+            <mrow data-mjx-texclass='ORD'>
+            <mi mathvariant='normal'>R</mi>
+            <mstyle scriptlevel='0'><mspace width='0.167em'/></mstyle>
+            <mo>&#x22C5;</mo>
+            <mstyle scriptlevel='0'><mspace width='0.167em'/></mstyle>
+            <mi data-mjx-auto-op='false'>CH</mi>
+            <mo stretchy='false'>(</mo>
+            <mi data-mjx-auto-op='false'>OH</mi>
+            <mo stretchy='false'>)</mo>
+            <mstyle scriptlevel='0'><mspace width='0.167em'/></mstyle>
+            <mo>&#x22C5;</mo>
+            <mstyle scriptlevel='0'><mspace width='0.167em'/></mstyle>
+            <mi data-mjx-auto-op='false'>CH</mi>
+            <msub>
+                <mpadded width='0'><mphantom><mi>A</mi></mphantom></mpadded>
+                <mpadded height='0'><mn>2</mn></mpadded>
+            </msub>
+            <mstyle scriptlevel='0'><mspace width='0.167em'/></mstyle>
+            <mo>&#x22C5;</mo>
+            <mstyle scriptlevel='0'><mspace width='0.167em'/></mstyle>
+            <mi data-mjx-auto-op='false'>CH</mi>
+            <msub>
+                <mpadded width='0'><mphantom><mi>A</mi></mphantom></mpadded>
+                <mpadded height='0'><mn>2</mn></mpadded>
+            </msub>
+            <mstyle scriptlevel='0'><mspace width='0.167em'/></mstyle>
+            <mo>&#x22C5;</mo>
+            <mstyle scriptlevel='0'><mspace width='0.167em'/></mstyle>
+            <mi data-mjx-auto-op='false'>CO</mi>
+            <msub>
+                <mpadded width='0'><mphantom><mi>A</mi></mphantom></mpadded>
+                <mpadded height='0'><mn>2</mn></mpadded>
+            </msub>
+            <mi mathvariant='normal'>H</mi>
+            </mrow>
+        </math>";
+    // GTM uses G2 mode and has two G1 indicators (in middle and near end). That definitely violates BANA guidelines and maybe there guidelines.
+    // I have switched it to G1 word mode, which seems better (same length, but no switching)
+    test_braille("UEB", expr, "⠰⠰⠠⠠⠠⠗⠐⠲⠉⠓⠐⠣⠕⠓⠐⠜⠐⠲⠉⠓⠢⠼⠃⠐⠲⠉⠓⠢⠼⠃⠐⠲⠉⠕⠢⠼⠃⠰⠓⠠⠄");
+}
+
+#[test]
 fn chem_16_2_13() {
     let expr = "<math>
         <mmultiscripts><mi>Fe</mi><none/><mi>III</mi></mmultiscripts>
         <mmultiscripts><mi>Cl</mi><mn>3</mn><none/></mmultiscripts>
     </math>";
     test_braille("UEB", expr, "⠰⠰⠠⠋⠑⠔⠣⠠⠠⠊⠊⠊⠜⠠⠉⠇⠢⠼⠉");
+}
+
+#[test]
+fn chem_16_3_1() {
+    // see also pre_msubsup_7_8_1 which uses mmultiscripts
+    // from MathJax
+    let expr = "<math><msubsup><mrow/><mn>92</mn><mn>238</mn></msubsup><mi>U</mi></math>";
+    test_braille("UEB", expr, "⠰⠢⠼⠊⠃⠔⠼⠃⠉⠓⠠⠥");
+}
+
+#[test]
+fn chem_16_4_2() {
+    // from MathJax
+    let expr = r#"<math><msup><mrow/><mn>1</mn></msup><msub><mi mathvariant="normal">S</mi><mn>0</mn></msub></math>"#;
+    test_braille("UEB", expr, "⠰⠔⠼⠁⠠⠎⠢⠼⠚");
+}
+
+#[test]
+fn chem_16_4_3() {
+    // from MathJax using \mathrm{}
+    let expr = r#"<math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+        <mn>4</mn><msup><mi mathvariant="normal">d</mi><mn>9</mn></msup>
+        <mn>5</mn><msup><mi mathvariant="normal">s</mi><mn>2</mn></msup>
+        <mstyle scriptlevel="0"><mspace width="0.278em"/></mstyle>
+        <msup><mrow/><mn>2</mn></msup>
+        <msub><mi mathvariant="normal">D</mi><mrow><mn>5</mn><mo>/</mo><mn>2</mn></mrow></msub>
+    </math>"#;
+    test_braille("UEB", expr, "⠼⠙⠰⠙⠔⠼⠊⠼⠑⠎⠔⠼⠃⠀⠰⠔⠼⠃⠠⠙⠢⠣⠼⠑⠸⠌⠼⠃⠜");
+}
+
+#[test]
+fn chem_16_5_1() {
+    // from MathJax v3 mhchem, but substituted short arrow because that is what example uses (although it shouldn't)
+    let expr = r#"
+        <math>
+        <mrow>
+            <mn>2</mn>
+            <mstyle scriptlevel="0">
+            <mspace width="0.167em"></mspace>
+            </mstyle>
+            <mi>NaOH</mi>
+            <mrow></mrow>
+            <mo>+</mo>
+            <mrow></mrow>
+            <mi mathvariant="normal">H</mi>
+            <msub>
+            <mpadded width="0">
+                <mphantom>
+                <mi>A</mi>
+                </mphantom>
+            </mpadded>
+            <mpadded height="0">
+                <mn>2</mn>
+            </mpadded>
+            </msub>
+            <mi>SO</mi>
+            <msub>
+            <mpadded width="0">
+                <mphantom>
+                <mi>A</mi>
+                </mphantom>
+            </mpadded>
+            <mpadded height="0">
+                <mn>4</mn>
+            </mpadded>
+            </msub>
+            <mrow></mrow>
+            <mo stretchy="false">&#x2192;</mo>
+            <mrow></mrow>
+            <mi>Na</mi>
+            <msub>
+            <mpadded width="0">
+                <mphantom>
+                <mi>A</mi>
+                </mphantom>
+            </mpadded>
+            <mpadded height="0">
+                <mn>2</mn>
+            </mpadded>
+            </msub>
+            <mi>SO</mi>
+            <msub>
+            <mpadded width="0">
+                <mphantom>
+                <mi>A</mi>
+                </mphantom>
+            </mpadded>
+            <mpadded height="0">
+                <mn>4</mn>
+            </mpadded>
+            </msub>
+            <mrow></mrow>
+            <mo>+</mo>
+            <mrow></mrow>
+            <mn>2</mn>
+            <mstyle scriptlevel="0">
+            <mspace width="0.167em"></mspace>
+            </mstyle>
+            <mi mathvariant="normal">H</mi>
+            <msub>
+            <mpadded width="0">
+                <mphantom>
+                <mi>A</mi>
+                </mphantom>
+            </mpadded>
+            <mpadded height="0">
+                <mn>2</mn>
+            </mpadded>
+            </msub>
+            <mi mathvariant="normal">O</mi>
+        </mrow>
+        </math>
+        "#;
+    test_braille("UEB", expr, "⠰⠰⠰⠼⠃⠠⠝⠁⠠⠕⠠⠓⠐⠖⠠⠓⠢⠼⠃⠠⠎⠠⠕⠢⠼⠙⠀⠳⠕⠀⠠⠝⠁⠢⠼⠃⠠⠎⠠⠕⠢⠼⠙⠐⠖⠼⠃⠠⠓⠢⠼⠃⠠⠕⠰⠄");
+}
+
+#[test]
+fn chem_16_5_2() {
+    // from WIRIS
+    let expr = r#"
+    <math>
+        <msub><mi mathvariant="normal">N</mi><mn>2</mn></msub>
+        <munderover><mo>&#x2192;</mo><mtext>Haber&#xA0;process</mtext><msub><mi mathvariant="normal">H</mi><mn>2</mn></msub></munderover>
+        <mi mathvariant="normal">N</mi>
+        <msub><mi mathvariant="normal">H</mi><mn>3</mn></msub>
+    </math>
+        "#;
+    // GTM has the order be over followed by under. This is opposite of what is shown in 7.9 (which are  large op examples).
+    // I have spoken with several people about this, including ICEB committee members who all feel this example is a mistake.
+    // I have adjusted the expected output
+    test_braille("UEB", expr, "⠰⠰⠰⠠⠝⠢⠼⠃⠀⠳⠕⠨⠢⠣⠠⠓⠁⠃⠑⠗⠀⠏⠗⠕⠉⠑⠎⠎⠜⠨⠔⠣⠠⠓⠢⠼⠃⠜⠀⠠⠝⠠⠓⠢⠼⠉⠰⠄");
+}
+
+#[test]
+fn chem_16_5_3() {
+    // from MathJax v3 mhchem, uses "\;" before parens because example adds a space there (although it shouldn't)
+    let expr = r#"
+        <math>
+            <mrow>
+            <mi mathvariant="normal">H</mi>
+            <msub>
+                <mpadded width="0"><mphantom><mi>A</mi></mphantom></mpadded>      <mpadded height="0">
+                <mn>2</mn>
+                </mpadded>
+            </msub>
+            <mstyle scriptlevel="0"><mspace width="0.167em"/></mstyle>
+            <mspace width="0.111em"></mspace>
+            <mo stretchy="false">(</mo>
+            <mi mathvariant="normal">g</mi>
+            <mo stretchy="false">)</mo>
+            <mrow/>
+            <mo>+</mo>
+            <mrow/>
+            <mi mathvariant="normal">I</mi>
+            <msub>
+                <mpadded width="0"><mphantom><mi>A</mi></mphantom></mpadded>      <mpadded height="0">
+                <mn>2</mn>
+                </mpadded>
+            </msub>
+            <mstyle scriptlevel="0"><mspace width="0.167em"/></mstyle>
+            <mspace width="0.111em"></mspace>
+            <mo stretchy="false">(</mo>
+            <mi mathvariant="normal">s</mi>
+            <mo stretchy="false">)</mo>
+            <mrow/>
+            <mo>=</mo>
+            <mrow/>
+            <mn>2</mn>
+            <mstyle scriptlevel="0"><mspace width="0.167em"/></mstyle>
+            <mi>HI</mi>
+            <mstyle scriptlevel="0"><mspace width="0.167em"/></mstyle>
+            <mspace width="0.111em"></mspace>
+            <mo stretchy="false">(</mo>
+            <mi mathvariant="normal">g</mi>
+            <mo stretchy="false">)</mo>
+            </mrow>
+        </math>
+          "#;
+    test_braille("UEB", expr, "⠰⠰⠰⠠⠓⠢⠼⠃⠀⠐⠣⠛⠐⠜⠐⠖⠠⠊⠢⠼⠃⠀⠐⠣⠎⠐⠜⠀⠐⠶⠀⠼⠃⠠⠓⠠⠊⠀⠐⠣⠛⠐⠜⠰⠄");
+}
+
+#[test]
+fn chem_16_5_4() {
+    // from MathJax v4 mhchem, but substituted short arrow because that is what example uses (although it shouldn't) 
+    let expr = r#"
+    <math xmlns="http://www.w3.org/1998/Math/MathML" data-latex="\ce{HNCO + ROH -&gt; NH2.CO.OR -&gt; NH2CO.NH.CO2R}" display="block">
+    <mrow data-latex="{\mathrm{HNCO} {}+{} \mathrm{ROH} {}\mathrel{\longrightarrow}{} \mathrm{NH}{\vphantom{A}}_{\smash[t]{2}}\,{\cdot}\,\mathrm{CO}\,{\cdot}\,\mathrm{OR} {}\mathrel{\longrightarrow}{} \mathrm{NH}{\vphantom{A}}_{\smash[t]{2}}\mathrm{CO}\,{\cdot}\,\mathrm{NH}\,{\cdot}\,\mathrm{CO}{\vphantom{A}}_{\smash[t]{2}}\mathrm{R}}">
+      <mrow>
+        <mrow data-latex="\mathrm{HNCO}">
+          <mi data-latex="HNCO">HNCO</mi>
+        </mrow>
+        <mo data-latex="+">+</mo>
+        <mrow data-latex="{}"></mrow>
+        <mrow data-latex="\mathrm{ROH}">
+          <mi data-latex="ROH">ROH</mi>
+        </mrow>
+      </mrow>
+      <mrow data-mjx-texclass="REL" data-latex="\mathrel{\longrightarrow}">
+        <mo stretchy="false" data-latex="\longrightarrow">&#x2192;</mo>
+      </mrow>
+      <mrow>
+        <mrow>
+          <mrow data-latex="\mathrm{NH}">
+            <mi data-latex="NH">NH</mi>
+          </mrow>
+          <mo>&#x2062;</mo>
+          <msub data-latex="{\vphantom{A}}_{\smash[t]{2}}">
+            <mrow data-latex="{\vphantom{A}}">
+              <mrow data-latex="\vphantom{A}">
+                <mpadded width="0">
+                  <mphantom>
+                    <mi data-latex="A">A</mi>
+                  </mphantom>
+                </mpadded>
+              </mrow>
+            </mrow>
+            <mrow data-latex="{\smash[t]{2}}">
+              <mrow data-latex="\smash[t]{2}">
+                <mpadded height="0">
+                  <mn data-latex="2">2</mn>
+                </mpadded>
+              </mrow>
+            </mrow>
+          </msub>
+        </mrow>
+        <mstyle scriptlevel="0" data-latex="\,">
+          <mspace width="0.167em"></mspace>
+        </mstyle>
+        <mrow data-latex="{\cdot}">
+          <mo data-latex="\cdot">&#x22C5;</mo>
+        </mrow>
+        <mstyle scriptlevel="0" data-latex="\,">
+          <mspace width="0.167em"></mspace>
+        </mstyle>
+        <mrow data-latex="\mathrm{CO}">
+          <mi data-latex="CO">CO</mi>
+        </mrow>
+        <mstyle scriptlevel="0" data-latex="\,">
+          <mspace width="0.167em"></mspace>
+        </mstyle>
+        <mrow data-latex="{\cdot}">
+          <mo data-latex="\cdot">&#x22C5;</mo>
+        </mrow>
+        <mstyle scriptlevel="0" data-latex="\,">
+          <mspace width="0.167em"></mspace>
+        </mstyle>
+        <mrow data-latex="\mathrm{OR}">
+          <mi data-latex="OR">OR</mi>
+        </mrow>
+      </mrow>
+      <mrow data-mjx-texclass="REL" data-latex="\mathrel{\longrightarrow}">
+        <mo stretchy="false" data-latex="\longrightarrow">&#x2192;</mo>
+      </mrow>
+      <mrow>
+        <mrow>
+          <mrow data-latex="\mathrm{NH}">
+            <mi data-latex="NH">NH</mi>
+          </mrow>
+          <mo>&#x2062;</mo>
+          <msub data-latex="{\vphantom{A}}_{\smash[t]{2}}">
+            <mrow data-latex="{\vphantom{A}}">
+              <mrow data-latex="\vphantom{A}">
+                <mpadded width="0">
+                  <mphantom>
+                    <mi data-latex="A">A</mi>
+                  </mphantom>
+                </mpadded>
+              </mrow>
+            </mrow>
+            <mrow data-latex="{\smash[t]{2}}">
+              <mrow data-latex="\smash[t]{2}">
+                <mpadded height="0">
+                  <mn data-latex="2">2</mn>
+                </mpadded>
+              </mrow>
+            </mrow>
+          </msub>
+          <mo>&#x2062;</mo>
+          <mrow data-latex="\mathrm{CO}">
+            <mi data-latex="CO">CO</mi>
+          </mrow>
+        </mrow>
+        <mstyle scriptlevel="0" data-latex="\,">
+          <mspace width="0.167em"></mspace>
+        </mstyle>
+        <mrow data-latex="{\cdot}">
+          <mo data-latex="\cdot">&#x22C5;</mo>
+        </mrow>
+        <mstyle scriptlevel="0" data-latex="\,">
+          <mspace width="0.167em"></mspace>
+        </mstyle>
+        <mrow data-latex="\mathrm{NH}">
+          <mi data-latex="NH">NH</mi>
+        </mrow>
+        <mstyle scriptlevel="0" data-latex="\,">
+          <mspace width="0.167em"></mspace>
+        </mstyle>
+        <mrow data-latex="{\cdot}">
+          <mo data-latex="\cdot">&#x22C5;</mo>
+        </mrow>
+        <mstyle scriptlevel="0" data-latex="\,">
+          <mspace width="0.167em"></mspace>
+        </mstyle>
+        <mrow>
+          <mrow data-latex="\mathrm{CO}">
+            <mi data-latex="CO">CO</mi>
+          </mrow>
+          <mo>&#x2062;</mo>
+          <msub data-latex="{\vphantom{A}}_{\smash[t]{2}}">
+            <mrow data-latex="{\vphantom{A}}">
+              <mrow data-latex="\vphantom{A}">
+                <mpadded width="0">
+                  <mphantom>
+                    <mi data-latex="A">A</mi>
+                  </mphantom>
+                </mpadded>
+              </mrow>
+            </mrow>
+            <mrow data-latex="{\smash[t]{2}}">
+              <mrow data-latex="\smash[t]{2}">
+                <mpadded height="0">
+                  <mn data-latex="2">2</mn>
+                </mpadded>
+              </mrow>
+            </mrow>
+          </msub>
+          <mo>&#x2062;</mo>
+          <mrow data-latex="\mathrm{R}">
+            <mi mathvariant="normal" data-latex="R">R</mi>
+          </mrow>
+        </mrow>
+      </mrow>
+    </mrow>
+  </math>
+            "#;
+    test_braille("UEB", expr, "⠰⠰⠰⠠⠠⠠⠓⠝⠉⠕⠐⠖⠗⠕⠓⠀⠳⠕⠀⠝⠓⠢⠼⠃⠐⠲⠉⠕⠐⠲⠕⠗⠀⠳⠕⠀⠝⠓⠢⠼⠃⠰⠉⠕⠐⠲⠝⠓⠐⠲⠉⠕⠢⠼⠃⠗⠠⠄⠰⠄");
+}
+
+#[test]
+fn chem_16_5_5() {
+    // from MathJax v3 mhchem
+    let expr = r#"
+        <math>
+            <mrow>
+                <mi>Pb</mi>
+                <msup><mpadded width="0"><mphantom><mi>A</mi></mphantom></mpadded><mrow><mo>+</mo><mo>+</mo></mrow></msup>
+                <mrow>    </mrow>
+                <mo>+</mo>
+                <mrow>    </mrow>
+                <mn>2</mn>
+                <mstyle scriptlevel="0"><mspace width="0.167em"/></mstyle>
+                <mi mathvariant="normal">e</mi>
+                <mrow>    </mrow>
+                <mover>
+                    <mpadded height="0" depth="0">
+                        <mo stretchy="false">&#x21BD;</mo>
+                        <mstyle scriptlevel="0"><mspace width="-0.167em"/></mstyle>
+                        <mstyle scriptlevel="0"><mspace width="-0.167em"/></mstyle>
+                        <mo>&#x2212;</mo>
+                    </mpadded>
+                    <mstyle displaystyle="false" scriptlevel="0">
+                        <mo>&#x2212;</mo>
+                        <mstyle scriptlevel="0"><mspace width="-0.167em"/></mstyle>
+                        <mstyle scriptlevel="0"><mspace width="-0.167em"/></mstyle>
+                        <mo stretchy="false">&#x21C0;</mo>
+                    </mstyle>
+                </mover>
+                <mrow>    </mrow>
+                <mi>Pb</mi>
+            </mrow>
+        </math>
+        "#;
+    test_braille("UEB", expr, "⠰⠰⠰⠠⠏⠃⠔⠣⠐⠖⠐⠖⠜⠐⠖⠼⠃⠰⠑⠀⠘⠸⠶⠀⠠⠏⠃⠰⠄");
 }
