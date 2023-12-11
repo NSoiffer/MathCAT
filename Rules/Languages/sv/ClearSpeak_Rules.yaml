@@ -169,10 +169,18 @@
   - test:
       if: "$ClearSpeak_Fractions='FracOver'"
       then:
+      # SWEDISH: Made a test to differentiate between "division" and "bråk", where "bråk" should have integers as both nominator and denominator. We do however allow single identifiers as well.
       - test:
-          if: "$Verbosity!='Terse'"
-          then: [T: "bråket"]    # [{ot: "the"}]
-          else: [T: "bråk"]      # phrase(the 'fraction' with 3 over 4)
+          if: "(*[1][self::m:mn][not(contains(., ','))] or *[1][self::m:mi][string-length(.)=1]) and (*[2][self::m:mn][not(contains(., ','))] or *[2][self::m:mi][string-length(.)=1])"
+          then:
+          - test:
+              if: "$Verbosity!='Terse'"
+              then: [T: "bråket"]    # [{ot: "the"}]
+              else: [T: "bråk"]      # phrase(the 'fraction' with 3 over 4)
+          - pause: short
+          else:
+          - T: "division"
+          - pause: short
   - x: "*[1]"
   - T: "genom"      # phrase(the fraction 3 'over' 4)
   - x: "*[2]"
@@ -180,9 +188,17 @@
       # very ugly!!! -- replicate nested ordinal fraction as they are an exception
       if: "$ClearSpeak_Fractions='OverEndFrac' or ($ClearSpeak_Fractions='EndFrac' and not( ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and *[1][*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and *[2][*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] ) )"
       then:
-      - pause: short
-      - T: "slut bråk"      # phrase(7 over 8 'end fraction')
-      - pause: short
+      # SWEDISH: Included the same differentiating test here, as above.
+      - test:
+          if: "(*[1][self::m:mn][not(contains(., ','))] or *[1][self::m:mi][string-length(.)=1]) and (*[2][self::m:mn][not(contains(., ','))] or *[2][self::m:mi][string-length(.)=1])"
+          then:
+          - pause: short
+          - T: "slut bråk"      # phrase(7 over 8 'end fraction')
+          - pause: short
+          else:
+          - pause: short
+          - T: "slut division"      # phrase(7 over 8 'end fraction')
+          - pause: short
 
 - # fraction with text or numbers followed by text in both numerator and denominator
   name: fraction-over-text

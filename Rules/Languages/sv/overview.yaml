@@ -62,13 +62,14 @@
       - else_if: "*[2][not(contains(., '.'))]"
         then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]
       else:
-      - test:
-          if: "*[2][self::m:mi][string-length(.)=1]"
-          then:
-          - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-          else: {x: "*[2]"}
-      - T: "roten"
+      # - test:
+      #     if: "*[2][self::m:mi][string-length(.)=1]"
+      #     then:
+      #     - x: "*[2]"
+      #     - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+      #     else: {x: "*[2]"}
+      - T: "roten av grad"
+      - x: "*[2]"
   - test:
       if: "IsNode(*[1], 'simple')"
       then:
