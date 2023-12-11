@@ -90,16 +90,37 @@
     NumbersLarge: [
          "", "tusen", "miljon", "miljard", "biljon", "biljard",
          "triljon", "triljard", "kvadriljon", "kvadriljard", "kvintiljon",
+         "kvintiljard","sextiljon","sextiljard","septiljon","septiljard",
+         "oktiljon","oktiljard","noniljon","noniljard","deciljon",
+         "deciljard","undeciljon","undeciljard","duodeciljon","tredeciljon",
+         "tredeciljard","quattuordeciljon","uattuordeciljard","quindeciljon","quindeciljard",
+         "sexdeciljon","sexdeciljard","septendeciljon","septendeciljard",
+         "octodeciljon","octodeciljard","novemdeciljon","novemdeciljard","vigintiljon",
+         "vigintiljard","unvigintiljon","unvigintiljard","centiljon","centiljard"
     ],
       
     NumbersOrdinalLarge: [
          "", "tusende", "miljonte", "miljardte", "biljonte", "biljardte",
-         "triljonte", "triljardte", "kvadriljonte", "kvadriljardte", "kvintiljonte"
+         "triljonte", "triljardte", "kvadriljonte", "kvadriljardte", "kvintiljonte",
+         "kvintiljardte","sextiljonte","sextiljardte","septiljonte","septiljardte",
+         "oktiljonte","oktiljardte","noniljonte","noniljardte","deciljonte",
+         "deciljardte","undeciljonte","undeciljardte","duodeciljonte","tredeciljonte",
+         "tredeciljardte","quattuordeciljonte","uattuordeciljardte","quindeciljonte","quindeciljardte",
+         "sexdeciljonte","sexdeciljardte","septendeciljonte","septendeciljardte",
+         "octodeciljonte","octodeciljardte","novemdeciljonte","novemdeciljardte","vigintiljonte",
+         "vigintiljardte","unvigintiljonte","unvigintiljardte","centiljonte","centiljardte"
     ],
       
     NumbersOrdinalPluralLarge: [
          "", "tusendelar", "miljondelar", "miljarddelar", "biljondelar", "biljarddelar",
-         "triljondelar", "triljarddelar", "kvadriljondelar", "kvadriljarddelar", "kvintiljondelar"
+         "triljondelar", "triljarddelar", "kvadriljondelar", "kvadriljarddelar", "kvintiljondelar",
+         "kvintiljarddelar","sextiljondelar","sextiljarddelar","septiljondelar","septiljarddelar",
+         "oktiljondelar","oktiljarddelar","noniljondelar","noniljarddelar","deciljondelar",
+         "deciljarddelar","undeciljondelar","undeciljarddelar","duodeciljondelar","tredeciljondelar",
+         "tredeciljarddelar","quattuordeciljondelar","uattuordeciljarddelar","quindeciljondelar","quindeciljarddelar",
+         "sexdeciljondelar","sexdeciljarddelar","septendeciljondelar","septendeciljarddelar",
+         "octodeciljondelar","octodeciljarddelar","novemdeciljondelar","novemdeciljarddelar","vigintiljondelar",
+         "vigintiljarddelar","unvigintiljondelar","unvigintiljarddelar","centiljondelar","centiljarddelar"
     ]
 
 ]
