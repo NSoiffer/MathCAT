@@ -1956,7 +1956,7 @@ impl BrailleChars {
         //       Items are separated by commas, can not have other punctuation (except ellipsis and dash)
         let mut parent = node.parent().unwrap().element().unwrap(); // safe since 'math' is always at root
         while name(&parent) == "mrow" {
-            if IsBracketed::is_bracketed(&parent, "", "", true, false) {
+            if IsBracketed::is_bracketed(parent, "", "", true, false) {
                 for child in parent.children() {
                     if !child_meets_conditions(as_element(child)) {
                         return false;
@@ -1978,7 +1978,7 @@ impl BrailleChars {
                     return text=="?" || text=="-?-" || text.is_empty();   // various forms of "fill in missing content" (see also Nemeth_Rules.yaml, "omissions")
                 },
                 "mrow" => {
-                    if IsBracketed::is_bracketed(&node, "", "", false, false) {
+                    if IsBracketed::is_bracketed(node, "", "", false, false) {
                         return child_meets_conditions(as_element(node.children()[1]));
                     } else {
                         for child in node.children() {
@@ -2027,51 +2027,217 @@ impl Function for BrailleChars {
      * @param(char) -- char (string) that should be repeated
      * Note: as a side effect, an attribute with the value so repeated calls to this or a child will be fast
      */
-     fn evaluate<'d>(&self,
-                            context: &context::Evaluation<'_, 'd>,
-                            args: Vec<Value<'d>>)
-                            -> StdResult<Value<'d>, XPathError>
-        {
-            use crate::canonicalize::create_mathml_element;
-            let mut args = Args(args);
-            if let Err(e) = args.exactly(2).or_else(|_| args.exactly(4)) {
-                return Err( XPathError::Other(format!("BrailleChars requires 2 or 4 args: {}", e)));
-            };
+    fn evaluate<'d>(&self,
+                        context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> StdResult<Value<'d>, XPathError>
+    {
+        use crate::canonicalize::create_mathml_element;
+        let mut args = Args(args);
+        if let Err(e) = args.exactly(2).or_else(|_| args.exactly(4)) {
+            return Err( XPathError::Other(format!("BrailleChars requires 2 or 4 args: {}", e)));
+        };
 
-            let range = if args.len() == 4 {
-                let end = args.pop_number()? as usize - 1;      // non-inclusive at end, 0-based
-                let start = args.pop_number()? as usize - 1;    // inclusive at start, a 0-based
-                Some(start..end)
-            } else {
-                None
-            };
-            let braille_code = args.pop_string()?;
-            let v: Value<'_> = args.0.pop().ok_or(XPathError::ArgumentMissing)?;
-            let node = match v {
-                Value::Nodeset(nodes) => {
-                    validate_one_node(nodes, "BrailleChars")?.element().unwrap()
-                },
-                Value::Number(n) => {
-                    let new_node = create_mathml_element(&context.node.document(), "mn");
-                    new_node.set_text(&n.to_string());
-                    new_node
-                },
-                Value::String(s) => {
-                    let new_node = create_mathml_element(&context.node.document(), "mi");   // FIX: try to guess mi vs mo???
-                    new_node.set_text(&s);
-                    new_node
-                },
-                _ => {
-                    return Ok( Value::String("".to_string()) ) // not an element, so nothing to do
-                },
-            };
-    
-            if !is_leaf(node) {
-                return Err( XPathError::Other(format!("BrailleChars called on non-leaf element '{}'", mml_to_string(&node))) );
+        let range = if args.len() == 4 {
+            let end = args.pop_number()? as usize - 1;      // non-inclusive at end, 0-based
+            let start = args.pop_number()? as usize - 1;    // inclusive at start, a 0-based
+            Some(start..end)
+        } else {
+            None
+        };
+        let braille_code = args.pop_string()?;
+        let v: Value<'_> = args.0.pop().ok_or(XPathError::ArgumentMissing)?;
+        let node = match v {
+            Value::Nodeset(nodes) => {
+                validate_one_node(nodes, "BrailleChars")?.element().unwrap()
+            },
+            Value::Number(n) => {
+                let new_node = create_mathml_element(&context.node.document(), "mn");
+                new_node.set_text(&n.to_string());
+                new_node
+            },
+            Value::String(s) => {
+                let new_node = create_mathml_element(&context.node.document(), "mi");   // FIX: try to guess mi vs mo???
+                new_node.set_text(&s);
+                new_node
+            },
+            _ => {
+                return Ok( Value::String("".to_string()) ) // not an element, so nothing to do
+            },
+        };
+
+        if !is_leaf(node) {
+            return Err( XPathError::Other(format!("BrailleChars called on non-leaf element '{}'", mml_to_string(&node))) );
+        }
+        return Ok( Value::String( BrailleChars::get_braille_chars(node, &braille_code, range)? ) );
+    }
+}
+
+pub struct NeedsToBeGrouped;
+impl NeedsToBeGrouped {
+    // ordinals often have an irregular start (e.g., "half") before becoming regular.
+    // if the number is irregular, return the ordinal form, otherwise return 'None'.
+    fn needs_grouping_for_cmu(element: Element, _is_base: bool) -> bool {
+        let node_name = name(&element);
+        let children = element.children();
+        if node_name == "mrow" {
+            // check for bracketed exprs
+            if IsBracketed::is_bracketed(element, "", "", false, true) {
+                return false;
             }
-            return Ok( Value::String( BrailleChars::get_braille_chars(node, &braille_code, range)? ) );
+
+            // check for prefix and postfix ops at start or end (=> len()==2, prefix is first op, postfix is last op)
+            if children.len() == 2 &&
+                (name( &as_element(children[0])) == "mo" || name( &as_element(children[1])) == "mo") {
+                return false;
+            }
+
+            if children.len() != 3 {  // ==3, need to check if it a linear fraction
+                return true;
+            }
+            let operator = as_element(children[1]);
+            if name(&operator) != "mo" || as_text(operator) != "/" {
+                return true;
+            }
+        }
+
+        if !(node_name == "mrow" || node_name == "mfrac") {
+            return false;
+        }
+        // check for numeric fractions (regular fractions need brackets, not numeric fractions), either as an mfrac or with "/"
+        // if the fraction starts with a "-", it is still a numeric fraction that doesn't need parens
+        let mut numerator = as_element(children[0]);
+        let denominator = as_element(children[children.len()-1]);
+        let decimal_separator = crate::interface::get_preference("DecimalSeparators".to_string()).unwrap()
+                                                        .chars().next().unwrap_or('.');
+        if is_integer(denominator, decimal_separator) {
+            // check numerator being either an integer "- integer"
+            if name(&numerator) == "mrow" {
+                let numerator_children = numerator.children();
+                if !(numerator_children.len() == 2 &&
+                        name(&as_element(numerator_children[0])) == "mo" &&
+                        as_text(as_element(numerator_children[0])) == "-") {
+                    return true;
+                }
+                numerator = as_element(numerator_children[1]);
+            }
+            return !is_integer(numerator, decimal_separator);
+        }
+        return true;
+
+        fn is_integer(mathml: Element, decimal_serparator: char) -> bool {
+            return name(&mathml) == "mn" && !as_text(mathml).contains(decimal_serparator)
         }
     }
+
+    /// Returns true if the element needs grouping symbols
+    /// Bases need extra attention because if they are a number and the item to the left is one, that needs distinguishing
+    fn needs_grouping_for_ueb(mathml: Element, is_base: bool) -> bool {
+        // From GTM 7.1
+        // 1. An entire number, i.e. the initiating numeric symbol and all succeeding symbols within the numeric mode thus
+        //     established (which would include any interior decimal points, commas, separator spaces, or simple numeric fraction lines).
+        // 2. An entire general fraction, enclosed in fraction indicators.
+        // 3. An entire radical expression, enclosed in radical indicators.
+        // 4. An arrow.
+        // 5. An arbitrary shape.
+        // 6. Any expression enclosed in matching pairs of round parentheses, square brackets or curly braces.
+        // 7. Any expression enclosed in the braille grouping indicators.   [Note: not possible here]
+        // 8. If none of the foregoing apply, the item is simply the [this element's] individual symbol.
+
+        use crate::xpath_functions::IsInDefinition;
+        let mut node_name = name(&mathml);
+        if mathml.attribute_value("data-roman-numeral").is_some() {
+            node_name = "mi";           // roman numerals don't follow number rules
+        }
+        debug!("is_base={}, needs_grouping_for_ueb: {}", is_base, mml_to_string(&mathml));
+        match node_name {
+            "mn" => {   
+                if !is_base {
+                    return false;
+                }                                                                                        // clause 1
+                // two 'mn's can be adjacent, in which case we need to group the 'mn' to make it clear it is separate (see bug #204)
+                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let grandparent = if name(&parent) == "math" {parent} else {parent.parent().unwrap().element().unwrap()};
+                if name(&grandparent) != "mrow" {
+                    return false;
+                }
+                let preceding = parent.preceding_siblings();
+                if preceding.len()  < 2 {
+                    return false;
+                }
+                // any 'mn' would be separated from this node by invisible times
+                let previous_child = as_element(preceding[preceding.len()-1]);
+                if name(&previous_child) == "mo" && as_text(previous_child) == "\u{2062}" {
+                    let previous_child = as_element(preceding[preceding.len()-2]);
+                    return name(&previous_child) == "mn"
+                } else {
+                    return false;
+                }
+            },
+            "mi" | "mo" | "mtext" => {
+                let text = as_text(mathml);
+                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let parent_name = name(&parent);   // there is always a "math" node
+                if is_base && (parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") && !text.contains(&[' ', '\u{00A0}']) {
+                    return false;
+                }
+                let mut chars = text.chars();
+                let first_char = chars.next().unwrap();             // canonicalization assures it isn't empty;
+                let is_one_char = chars.next().is_none();
+                // '¨', etc., brailles as two chars -- there probably is some exception list but I haven't found it -- these are the ones I know about
+                return !((is_one_char && !['¨', '″', '‴', '⁗'].contains(&first_char)) ||                       // clause 8
+                            // "lim", "cos", etc., appear not to get parens, but the rules don't mention it (tests show it)
+                            IsInDefinition::is_defined_in(text, "FunctionNames").unwrap() ||
+                            IsInDefinition::is_defined_in(text, "Arrows").unwrap() ||          // clause 4
+                            IsInDefinition::is_defined_in(text, "GeometryShapes").unwrap());   // clause 5
+            },
+            "mfrac" => return false,                                                     // clause 2 (test GTM 8.2(4) shows numeric fractions are not special)                                 
+            "msqrt" | "mroot" => return false,                                           // clause 3
+                    // clause 6 only mentions three grouping chars, I'm a little suspicious of that, but that's what it says
+            "mrow" => return !(IsBracketed::is_bracketed(mathml, "(", ")", false, false) ||  
+                                IsBracketed::is_bracketed(mathml, "[", "]", false, false) || 
+                                IsBracketed::is_bracketed(mathml, "{", "}", false, false) ),
+            "msub" | "msup" | "msubsup" => {
+                // I'm a little dubious about the false value, but see GTM 7.7(2)
+                if !is_base {
+                    return true;
+                } 
+                // need to group nested scripts in base -- see GTM 12.2(2)                                         
+                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let parent_name = name(&parent);   // there is always a "math" node
+                return parent_name == "munder" || parent_name == "mover" || parent_name == "munderover";
+            },
+            _ => return true,
+        }
+
+    }
+}
+
+impl Function for NeedsToBeGrouped {
+    // convert a node to an ordinal number
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> StdResult<Value<'d>, XPathError>
+    {
+        let mut args = Args(args);
+        args.exactly(3)?;
+        let is_base = args.pop_boolean()?;
+        let braille_code = args.pop_string()?;
+        let node = validate_one_node(args.pop_nodeset()?, "NeedsToBeGrouped")?;
+        if let Node::Element(e) = node {
+            let answer = match braille_code.as_str() {
+                "CMU" => NeedsToBeGrouped::needs_grouping_for_cmu(e, is_base),
+                "UEB" => NeedsToBeGrouped::needs_grouping_for_ueb(e, is_base),
+                _ => return Err(XPathError::Other(format!("NeedsToBeGrouped: braille code arg '{:?}' is not a known code ('UEB' or 'CMU')", braille_code))),
+            };
+            return Ok( Value::Boolean( answer ) );
+        }
+
+        return Err(XPathError::Other(format!("NeedsToBeGrouped: first arg '{:?}' is not a node", node)));
+    }
+}
+    
     
     
 #[cfg(test)]

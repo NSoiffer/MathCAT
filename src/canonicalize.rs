@@ -3510,12 +3510,12 @@ impl CanonicalizeContext {
 		use crate::xpath_functions::IsNode;
 		// debug!("  is_trig_arg: prev {}, current {}, Stack:", element_summary(previous_child), element_summary(current_child));
 		// parse_stack.iter().for_each(|stack_info| debug!("    {}", stack_info));
-		if !IsNode::is_simple(&current_child) {
+		if !IsNode::is_simple(current_child) {
 			return false;
 		}
 		// This only matters if we are not inside of parens
-		if IsBracketed::is_bracketed(&previous_child, "(", ")", false, false) ||
-		   IsBracketed::is_bracketed(&previous_child, "[", "]", false, false) {
+		if IsBracketed::is_bracketed(previous_child, "(", ")", false, false) ||
+		   IsBracketed::is_bracketed(previous_child, "[", "]", false, false) {
 			return false;
 		}
 	

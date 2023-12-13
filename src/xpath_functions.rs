@@ -28,7 +28,7 @@ use sxd_xpath::function::Error as XPathError;
 
 
 
-use crate::canonicalize::{as_element, as_text, name};
+use crate::canonicalize::{as_element, name};
 
 // useful utility functions
 // note: child of an element is a ChildOfElement, so sometimes it is useful to have parallel functions,
@@ -66,7 +66,7 @@ pub fn validate_one_node<'n>(nodes: Nodeset<'n>, func_name: &str) -> Result<Node
 }
 
 // Return true if the element's name is 'name'
-fn is_tag(e: &Element, name: &str) -> bool {
+fn is_tag(e: Element, name: &str) -> bool {
     return e.name().local_part() == name;
 }
 
@@ -74,7 +74,7 @@ fn is_tag(e: &Element, name: &str) -> bool {
 // Same as 'is_tag', but for ChildOfElement
 fn is_COE_tag(coe: &ChildOfElement, name: &str) -> bool {
     let element = coe.element();
-    return element.is_some() && is_tag(&element.unwrap(), name);  
+    return element.is_some() && is_tag(element.unwrap(), name);  
 }
 
 /// Should be an internal structure for implementation of the IsNode, but it was useful in one place in a separate module.
@@ -85,7 +85,7 @@ impl IsNode {
     /// implements ClearSpeak's definition of "simple"
     /// this is fairly detailed, so we define a few local functions (at end) to help out
     /// Also, it doesn't help that the structure is a bit complicated Elements->ChildOfElement->Element/Text
-    pub fn is_simple(elem: &Element) -> bool {
+    pub fn is_simple(elem: Element) -> bool {
         if is_trivially_simple(elem) {
             return true;
         }
@@ -113,7 +113,7 @@ impl IsNode {
 
 
         // returns the element's text value
-        fn to_str<'a>(e: &'a Element) -> &'a str {
+        fn to_str(e: Element) -> &str {
             // typically usage assumes 'e' is a leaf
             // bad MathML is the following isn't true
             if e.children().len() == 1 {
@@ -150,7 +150,7 @@ impl IsNode {
         }
 
         // checks the single element to see if it is simple (mn, mi that is a single char, common fraction)
-        fn is_trivially_simple(elem: &Element) -> bool {
+        fn is_trivially_simple(elem: Element) -> bool {
             if is_tag(elem, "mn")  {
                 return true;
             }
@@ -160,26 +160,26 @@ impl IsNode {
             }
 
             // FIX: need to consult preference Fraction_Ordinal
-            if IsNode::is_common_fraction(*elem, 10, 19) {
+            if IsNode::is_common_fraction(elem, 10, 19) {
                 return true;
             }
             return false;
         }
 
         // true if the negative of a single element that is simple
-        fn is_negative_of_trivially_simple(elem: &Element) -> bool {
+        fn is_negative_of_trivially_simple(elem: Element) -> bool {
             if is_tag(elem, "mrow") && elem.children().len() == 2 {
                 let children = elem.children();
                 // better be negative of something at this point...
                 if is_COE_tag(&children[0], "mo") && is_equal(&children[0], '-') &&
-                   children[1].element().is_some() && is_trivially_simple(&children[1].element().unwrap()) {
+                   children[1].element().is_some() && is_trivially_simple(children[1].element().unwrap()) {
                     return true;
                 }
             }
             if is_tag(elem, "negative") && elem.children().len() == 1 {
                 let child = elem.children()[0];
                 if let Some(e) = child.element() {
-                    return is_trivially_simple(&e);
+                    return is_trivially_simple(e);
                 }
             }
 
@@ -192,7 +192,7 @@ impl IsNode {
         }
 
         // true if mrow(xxx, &it;, mi) or mrow(xxx, &it; mi, &it;, mi) where mi's have len==1
-        fn is_times_mi(mrow: &Element) -> bool {
+        fn is_times_mi(mrow: Element) -> bool {
             assert!( is_tag(mrow, "mrow") );
             let children = mrow.children();
             if !(children.len() == 3 || children.len() == 5) {
@@ -203,8 +203,8 @@ impl IsNode {
             }
 
             let first_child = children[0].element().unwrap();
-            if !is_trivially_simple(&first_child) {
-                if !is_negative_of_trivially_simple(&first_child) {
+            if !is_trivially_simple(first_child) {
+                if !is_negative_of_trivially_simple(first_child) {
                     return false;
                 }
                 if children.len() == 5 && 
@@ -233,7 +233,7 @@ impl IsNode {
         }
 
         // return true if the mrow is var° or num°
-        fn is_degrees(mrow: &Element) -> bool {
+        fn is_degrees(mrow: Element) -> bool {
             assert!( is_tag(mrow, "mrow") );
             let children = mrow.children();
             return children.len() == 2 &&
@@ -243,7 +243,7 @@ impl IsNode {
         }
 
         // fn_name &af; [simple arg or (simple arg)]
-        fn is_function(mrow: &Element) -> bool {
+        fn is_function(mrow: Element) -> bool {
             assert!( is_tag(mrow, "mrow") );
             let children = mrow.children();
             if children.len() != 3 {
@@ -257,10 +257,10 @@ impl IsNode {
                 return false;
             }
             let function_arg = children[2].element().unwrap();
-            if IsBracketed::is_bracketed(&function_arg, "(", ")", false, false) {
-                return IsNode::is_simple(&function_arg.children()[1].element().unwrap());
+            if IsBracketed::is_bracketed(function_arg, "(", ")", false, false) {
+                return IsNode::is_simple(function_arg.children()[1].element().unwrap());
             } else {
-                return IsNode::is_simple(&function_arg);
+                return IsNode::is_simple(function_arg);
             }
         }
     }
@@ -272,7 +272,7 @@ impl IsNode {
             static ref ALL_DIGITS: Regex = Regex::new(r"\d+").unwrap();    // match one or more digits
         }
 
-        if !is_tag(&frac, "mfrac") &&  !is_tag(&frac, "fraction"){
+        if !is_tag(frac, "mfrac") &&  !is_tag(frac, "fraction"){
             return false;
         }
         let children = frac.children();
@@ -288,7 +288,7 @@ impl IsNode {
 
         let num = num.unwrap();
         let denom = denom.unwrap();
-        if !is_tag(&num, "mn") || !is_tag(&denom, "mn") {
+        if !is_tag(num, "mn") || !is_tag(denom, "mn") {
             return false
         };
 
@@ -372,7 +372,7 @@ impl Function for IsNode {
                     .all(|node|
                         if let Node::Element(e) = node {
                             match kind.as_str() {
-                                "simple" => IsNode::is_simple(&e),
+                                "simple" => IsNode::is_simple(e),
                                 "leaf"   => MATHML_LEAF_NODES.contains(name(&e)),
                                 "2D" => IsNode::is_2D(&e),
                                 "modified" => MATHML_MODIFIED_NODES.contains(name(&e)),
@@ -387,83 +387,6 @@ impl Function for IsNode {
                     )
             )
         );
-    }
-}
-
-struct IsInNeedOfParensForCMU;
-impl IsInNeedOfParensForCMU {
-    // ordinals often have an irregular start (e.g., "half") before becoming regular.
-    // if the number is irregular, return the ordinal form, otherwise return 'None'.
-    fn needs_parens(element: Element) -> bool {
-        let node_name = name(&element);
-        let children = element.children();
-        if node_name == "mrow" {
-            // check for bracketed exprs
-            if IsBracketed::is_bracketed(&element, "", "", false, true) {
-                return false;
-            }
-
-            // check for prefix and postfix ops at start or end (=> len()==2, prefix is first op, postfix is last op)
-            if children.len() == 2 &&
-               (name( &as_element(children[0])) == "mo" || name( &as_element(children[1])) == "mo") {
-                return false;
-            }
-
-            if children.len() != 3 {  // ==3, need to check if it a linear fraction
-                return true;
-            }
-            let operator = as_element(children[1]);
-            if name(&operator) != "mo" || as_text(operator) != "/" {
-                return true;
-            }
-        }
-
-        if !(node_name == "mrow" || node_name == "mfrac") {
-            return false;
-        }
-        // check for numeric fractions (regular fractions need brackets, not numeric fractions), either as an mfrac or with "/"
-        // if the fraction starts with a "-", it is still a numeric fraction that doesn't need parens
-        let mut numerator = as_element(children[0]);
-        let denominator = as_element(children[children.len()-1]);
-        let decimal_separator = crate::interface::get_preference("DecimalSeparators".to_string()).unwrap()
-                                                        .chars().next().unwrap_or('.');
-        if is_integer(denominator, decimal_separator) {
-            // check numerator being either an integer "- integer"
-            if name(&numerator) == "mrow" {
-                let numerator_children = numerator.children();
-                if !(numerator_children.len() == 2 &&
-                     name(&as_element(numerator_children[0])) == "mo" &&
-                     as_text(as_element(numerator_children[0])) == "-") {
-                    return true;
-                }
-                numerator = as_element(numerator_children[1]);
-            }
-            return !is_integer(numerator, decimal_separator);
-        }
-        return true;
-
-        fn is_integer(mathml: Element, decimal_serparator: char) -> bool {
-            return name(&mathml) == "mn" && !as_text(mathml).contains(decimal_serparator)
-        }
-    }
-}
-
-impl Function for IsInNeedOfParensForCMU {
-    // convert a node to an ordinal number
-    fn evaluate<'d>(&self,
-                        _context: &context::Evaluation<'_, 'd>,
-                        args: Vec<Value<'d>>)
-                        -> Result<Value<'d>, Error>
-    {
-        let mut args = Args(args);
-        args.exactly(1)?;
-        let node = validate_one_node(args.pop_nodeset()?, "IsInNeedOfParensForCMU")?;
-        if let Node::Element(e) = node {
-            let answer = IsInNeedOfParensForCMU::needs_parens(e);
-            return Ok( Value::Boolean( answer ) );
-        }
-
-        return Err(Error::Other(format!("IsInNeedOfParensForCMU: first arg '{:?}' is not a node", node)));
     }
 }
 
@@ -850,7 +773,7 @@ struct Debug;
 /// This should probably be restructured slightly.
 pub struct IsBracketed;
 impl IsBracketed {
-    pub fn is_bracketed(element: &Element, left: &str, right: &str, requires_comma: bool, requires_mrow: bool) -> bool {
+    pub fn is_bracketed(element: Element, left: &str, right: &str, requires_comma: bool, requires_mrow: bool) -> bool {
         use crate::canonicalize::is_fence;
         if requires_mrow && !is_tag(element, "mrow") {
             return false;
@@ -882,7 +805,7 @@ impl IsBracketed {
         if requires_comma {
             if let ChildOfElement::Element(contents) = children[1] {
                 let children = contents.children();
-                if !is_tag(&contents, "mrow") || children.len() <= 1 {
+                if !is_tag(contents, "mrow") || children.len() <= 1 {
                     return false;
                 }
                 // finally, we can check for a comma -- we might not have operands, so we to check first and second entry
@@ -929,7 +852,7 @@ impl IsBracketed {
         let left = args.pop_string()?;
         let node = validate_one_node(args.pop_nodeset()?, "IsBracketed")?;
         if let Node::Element(e) = node {
-            return Ok( Value::Boolean( IsBracketed::is_bracketed(&e, &left, &right, requires_comma, requires_mrow) ) );
+            return Ok( Value::Boolean( IsBracketed::is_bracketed(e, &left, &right, requires_comma, requires_mrow) ) );
         }
 
         // FIX: should having a non-element be an error instead??
@@ -939,7 +862,9 @@ impl IsBracketed {
 
 pub struct IsInDefinition;
 impl IsInDefinition {
-    fn is_defined_in(test_str: &str, set_name: &str) -> Result<bool, Error> {
+    /// Returns true if `test_str` is in `set_name`
+    /// Returns an error if `set_name` is not defined
+    pub fn is_defined_in(test_str: &str, set_name: &str) -> Result<bool, Error> {
         return DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             if let Some(set) = definitions.get_hashset(set_name) {
@@ -1196,7 +1121,7 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("max", Max);       // missing in xpath 1.0
     context.set_function("NestingChars", crate::braille::NemethNestingChars);
     context.set_function("BrailleChars", crate::braille::BrailleChars);
-    context.set_function("IsInNeedOfParensForCMU", IsInNeedOfParensForCMU);
+    context.set_function("NeedsToBeGrouped", crate::braille::NeedsToBeGrouped);
     context.set_function("IsNode", IsNode);
     context.set_function("ToOrdinal", ToOrdinal);
     context.set_function("ToCommonFraction", ToCommonFraction);
@@ -1330,7 +1255,7 @@ mod tests {
         .expect("failed to parse XML");
         let mathml = get_element(&package);
         trim_element(&mathml);
-        assert!(IsNode::is_simple(&mathml), "{}", message);
+        assert!(IsNode::is_simple(mathml), "{}", message);
     }
 
     fn test_is_not_simple(message: &'static str, mathml_str: &'static str) {
@@ -1340,7 +1265,7 @@ mod tests {
         .expect("failed to parse XML");
         let mathml = get_element(&package);
         trim_element(&mathml);
-        assert!(!IsNode::is_simple(&mathml), "{}", message);
+        assert!(!IsNode::is_simple(mathml), "{}", message);
     }
     #[test]
     fn is_simple() {

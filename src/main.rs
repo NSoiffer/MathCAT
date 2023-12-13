@@ -170,7 +170,8 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr=r#"
-  <math><mrow><mn>5</mn><mo>=</mo><msqrt><mrow/></msqrt></mrow></math>
+  <math><munder><mtext>this is a test</mtext><mrow><mi>x</mi><mo>&#x2192;</mo><mi>a</mi></mrow></munder>
+            <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mn>1</mn></math>
              "#;
 
 //   let expr = "

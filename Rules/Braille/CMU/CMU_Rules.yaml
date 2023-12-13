@@ -40,7 +40,7 @@
   replace: 
   - t: "⠫⠱"
   - test:
-      if: "IsInNeedOfParensForCMU(*[1])"
+      if: "NeedsToBeGrouped(*[1], 'CMU', true())"
       then:
       - t: "⠢"
       - x: "*"
@@ -57,7 +57,7 @@
   - x: "*[2]"
   - t: "⠱"
   - test:
-      if: "IsInNeedOfParensForCMU(*[1])"
+      if: "NeedsToBeGrouped(*[1], 'CMU', true())"
       then:
       - t: "⠢"
       - x: "*[1]"
@@ -140,7 +140,7 @@
       if: "$AddGrouping"
       then: [t: "⠢"]
   - test:
-      if: "IsInNeedOfParensForCMU(*[1])"
+      if: "NeedsToBeGrouped(*[1], 'CMU', true())"
       then:
       - t: "⠢"
       - x: "*[1]"
@@ -149,7 +149,7 @@
       - x: "*[1]"
   - t: "⠲"
   - test:
-      if: "IsInNeedOfParensForCMU(*[2])"
+      if: "NeedsToBeGrouped(*[2], 'CMU', false())"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -566,7 +566,7 @@
   - test:
       # the rules for scripts seem to always want a nested script to be bracketed
       # there aren't any root examples in scripts and numeric fractions don't get bracketed
-      if: "IsInNeedOfParensForCMU(*[2])"
+      if: "NeedsToBeGrouped(*[2], 'CMU', false())"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -620,7 +620,7 @@
   - test:
       # the rules for scripts seem to always want a nested script to be bracketed
       # there aren't any root examples in scripts and numeric fractions don't get bracketed
-      if: "IsInNeedOfParensForCMU(*[2])"
+      if: "NeedsToBeGrouped(*[2], 'CMU', false())"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -735,7 +735,7 @@
   - test:
       # the rules for scripts seem to always want a nested script to be bracketed
       # there aren't any root examples in scripts and numeric fractions don't get bracketed
-      if: "IsInNeedOfParensForCMU(*[2])"
+      if: "NeedsToBeGrouped(*[2], 'CMU', false())"
       then:
       - t: "⠢"
       - x: "*[2]"
@@ -752,7 +752,7 @@
       - test:
           # the rules for scripts seem to always want a nested script to be bracketed
           # there aren't any root examples and it seems like fractions don't get bracketed
-          if: "IsInNeedOfParensForCMU(*[3])"
+          if: "NeedsToBeGrouped(*[3], 'CMU', false())"
           then:
           - t: "⠢"
           - x: "*[3]"

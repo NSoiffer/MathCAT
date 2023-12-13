@@ -905,8 +905,8 @@ fn likely_chem_formula(mathml: Element) -> isize {
         // check if it is bracketed -- doesn't add much info
         let outer_mrow = mrow;
         let mut mrow = mrow;
-        if (IsBracketed::is_bracketed(&mrow, "(", ")", false, false) ||
-            IsBracketed::is_bracketed(&mrow, "[", "]", false, false)) &&
+        if (IsBracketed::is_bracketed(mrow, "(", ")", false, false) ||
+            IsBracketed::is_bracketed(mrow, "[", "]", false, false)) &&
            name(&as_element(mrow.children()[1]))  == "mrow" {
             mrow = as_element(mrow.children()[1]);
         }
@@ -1179,8 +1179,8 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
         likelihood += likely_chem_element(base);
     } else if base_name == "mrow" {
         // a safe minor canonicalization that allows "short_form" calculations if appropriate
-        if (IsBracketed::is_bracketed(&base, "(", ")", false, false) ||
-            IsBracketed::is_bracketed(&base, "[", "]", false, false)) &&
+        if (IsBracketed::is_bracketed(base, "(", ")", false, false) ||
+            IsBracketed::is_bracketed(base, "[", "]", false, false)) &&
            base.children().len() > 3 {
             let inner_mrow = create_mathml_element(&base.document(), "mrow");
             inner_mrow.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
@@ -1398,8 +1398,8 @@ lazy_static! {
 /// this might be called before canonicalization, but in clean_chemistry_mrow, we made sure "( xxx )" is grouped properly
 pub fn likely_chem_state(mathml: Element) -> isize {
     
-    if IsBracketed::is_bracketed(&mathml, "(", ")", false, false) ||
-       IsBracketed::is_bracketed(&mathml, "[", "]", false, false) {
+    if IsBracketed::is_bracketed(mathml, "(", ")", false, false) ||
+       IsBracketed::is_bracketed(mathml, "[", "]", false, false) {
         let contents = as_element(mathml.children()[1]);
         let contents_name = name(&contents);
         if contents_name == "mi" || contents_name == "mtext" {
