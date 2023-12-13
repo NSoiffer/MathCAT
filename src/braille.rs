@@ -2149,7 +2149,6 @@ impl NeedsToBeGrouped {
         if mathml.attribute_value("data-roman-numeral").is_some() {
             node_name = "mi";           // roman numerals don't follow number rules
         }
-        debug!("is_base={}, needs_grouping_for_ueb: {}", is_base, mml_to_string(&mathml));
         match node_name {
             "mn" => {   
                 if !is_base {
