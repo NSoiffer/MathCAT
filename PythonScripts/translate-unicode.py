@@ -93,6 +93,8 @@ def translate_char_line(ch: str, line:str, mathplayer: dict, sre: dict, access8:
             result['original'] = match_obj.group(1)
             result['translation'] = translation
             result['alternatives'] = alternatives
+            if line.find('divided by') != -1:
+                print(f"  divided by translation: {translation}")
             return 't: "{}"'.format(translation)
         else:
             return line
@@ -426,4 +428,4 @@ build_new_translation("..", language, "unicode")
 build_new_translation("..", language, "unicode-full")
 
 # see translate_definitions comments -- you need to manually copy the file to google translate. 
-translate_definitions("..", language)
+# translate_definitions("..", language)

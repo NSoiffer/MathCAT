@@ -1,0 +1,102 @@
+---
+[
+# Lines starting with "#" are a comment
+# Each definition in this file is of the form
+#   name: [ "...", "..." "..." ],
+
+
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
+# The following definitions are used to convert numbers to words
+# The are mainly used for ordinals, of which there are two cases:
+# 1. Regular ordinals: first, second, third, ...
+# 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
+#    When used in the denominator of fractions, a plural version might be
+#    used (e.g., two halves, two thirds)
+# Although a lot of languages are regular after a few entries, for generality,
+# the following lists should be filled out even though they are the same
+# or easily derived from others in many languages (e.g, an 's' is added for plurals).
+# The larger ordinal numbers (e.g, millionth) is used when there are only
+# '0's after that decimal place (e.g., 23000000).:w
+
+# All definitions start 0, 10, 100, etc.
+
+# The definitions for the "ones" should extend until a regular pattern begins
+#   The minimum length is 10.
+
+# For English, a regular pattern starts at twenty
+    NumbersOnes: [
+         "零", "一", "二", "三", "四", "五", "六", "七", "八", "九", 
+         "十", "十一", "十二", "十三", "十四", "十五", "十六", 
+         "十七", "十八", "十九"
+    ],
+
+    NumbersOrdinalOnes: [
+         "第零", "第一", "第二", "第三", "第四", "第五", "第六", "第七", "第八", "第九", 
+         "第十", "第十一", "第十二", "第十三", "第十四", "第十五", "第十六", 
+         "第十七", "第十八", "第十九"
+    ],
+
+    NumbersOrdinalPluralOnes: [
+         "零度", "一度", "二分", "三分", "四分", "五分", "六分", "七分", "八分", "九分", 
+         "十分", "十一分", "十二分", "十三分", "十四分", "十五分", "十六分", 
+         "十七分", "十八分", "十九分"
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalOnes: [
+         "零", "一度", "一半"
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalPluralOnes: [
+         "零", "一度", "一半"
+    ],
+
+
+    # What to use for multiples of 10
+    NumbersTens: [
+         "", "十", "二十", "三十", "四十", "五十", "六十", "七十", "八十", "九十"
+    ],
+
+    NumbersOrdinalTens: [
+         "", "第十", "第二十", "第三十", "第四十", "第五十", "第六十", "第七十", "第八十", "第九十"
+    ],
+
+    NumbersOrdinalPluralTens: [
+         "", "十分", "二十分", "三十分", "四十分", "五十分", "六十分", "七十分", "八十分", "九十分"
+    ],
+
+
+    NumbersHundreds: [
+       "", "一百", "兩百", "三百", "四百", "五百", 
+         "六百", "七百", "八百", "九百"
+    ],
+
+    NumbersOrdinalHundreds: [
+       "", "百分", "二百分", "三百分", "四百分", "五百分", 
+         "六百分", "七百分", "八百分", "九百分"
+    ],
+
+    NumbersOrdinalPluralHundreds: [
+       "", "百分", "二百分", "三百分", "四百分", "五百分", 
+         "六百分", "七百分", "八百分", "九百分"
+    ],
+      
+
+    # At this point, hopefully the language is regular. If not, code needs to be written
+    NumbersLarge: [
+         "", "千", "百萬", "十億", "兆", "quadrillion", 
+         "quintillion", "sextillion", "septillion", "octillion", "nonillion", 
+    ],
+      
+    NumbersOrdinalLarge: [
+         "", "千分", "百萬分", "十億分", "兆分", "quadrillionth",
+        "quintillionth", "sextillionth", "septillionth", "octillionth", "nonillionth"
+    ],
+      
+    NumbersOrdinalPluralLarge: [
+         "", "千分", "百萬分", "十億分", "兆分", "quadrillionths",
+        "quintillionths", "sextillionths", "septillionths", "octillionths", "nonillionths"
+    ]
+
+]
