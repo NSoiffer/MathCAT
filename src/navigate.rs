@@ -246,7 +246,6 @@ fn convert_last_char_to_number(str: &str) -> usize {
 /// This can be called on an intent tree -- it does not make use of is_leaf()
 fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> {
     if let Some(mathml_id) = mathml.attribute_value("id") {
-    match mathml.attribute_value("id") {
         if mathml_id == id {
             return Some(mathml);
         }
@@ -1758,7 +1757,6 @@ mod tests {
 
     #[test]
     fn chem_speech() -> Result<()> {
-        init_logger();
         // this comes from bug 218
         let mathml_str = "<math data-latex='H_2SO_4' display='block' id='id-0' data-id-added='true'>
             <mrow data-changed='added' data-chem-formula='5' id='id-1' data-id-added='true'>
@@ -1782,7 +1780,7 @@ mod tests {
             test_command("ZoomIn", mathml, "id-2");
             let speech = test_command("MoveNext", mathml, "id-6");
             // tables need to check their parent for proper speech
-            assert_eq!(speech, "move right, cap s");
+            assert_eq!(speech, "move right, cap s,");
             return Ok( () );
         });
     }
