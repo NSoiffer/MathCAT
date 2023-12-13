@@ -46,7 +46,7 @@
         then: [{T: "kvadratroten"}]        # phrase(the 'square root' of x)
       - else_if: "*[2][text()='3']"
         then: [{T: "kubikroten"}]        # phrase(the 'cube root' of x)
-      - else_if: "*[2][not(contains(., '.'))]"
+      - else_if: "*[2][not(contains(., ','))]"
         then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]        # phrase(the square 'root' of x)
       else:
       # - test:

@@ -640,8 +640,8 @@
   - T: "ett-gånger-ett"      # phrase(the '1 by 1' matrix)
   - test:
       if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
-      then: {T: "determinanten"}      # phrase(the 2 by 2 'determinant'))
-      else: {T: "matrisen"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "determinant"}      # phrase(the 2 by 2 'determinant'))
+      else: {T: "matris"}      # phrase(the 2 by 2 'matrix')
       
   - T: "med element"      # phrase(the 2 by 2 matrix 'with entry' x)
   - x: "*[1]/*"
@@ -661,8 +661,8 @@
   - T: "gånger-ett"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: "kolumn vektorn"}      # phrase(the 2 by 2 'vector')
-      else: {T: "kolumn matrisen"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "kolumn-vektor"}      # phrase(the 2 by 2 'vector')
+      else: {T: "kolumn-matris"}      # phrase(the 2 by 2 'matrix')
   - pause: long
   - x: "*/*"
   - test:
@@ -684,8 +684,8 @@
   - T: "gånger-ett"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: "kolumn vektorn"}      # phrase(the 2 column 'vector')
-      else: {T: "kolumn matrisen"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "kolumn-vektor"}      # phrase(the 2 column 'vector')
+      else: {T: "kolumn-matris"}      # phrase(the 2 by 2 'matrix')
   - pause: long
   - x: "*" # select the rows (mtr)
   - test:
@@ -711,8 +711,8 @@
   # - t: "rad"      # phrase(the 1 by 4 'row' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: "rad vektorn"}      # phrase('the 1 by' 2 row 'vector')
-      else: {T: "rad matrisen"}      # phrase('the 1 by' 2 'matrix')
+      then: {T: "rad-vektor"}      # phrase('the 1 by' 2 row 'vector')
+      else: {T: "rad-matris"}      # phrase('the 1 by' 2 'matrix')
   - pause: long
   - x: "*/*"
   - test:
@@ -734,8 +734,8 @@
   # - t: "rad"      # phrase(the 1 by 2 'row' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: "rad vektorn"}      # phrase(the 2 by 1 'vector')
-      else: {T: "rad matrisen"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "rad-vektor"}      # phrase(the 2 by 1 'vector')
+      else: {T: "rad-matris"}      # phrase(the 2 by 2 'matrix')
   - pause: long
   - pause: medium
   - x: "*/*" # select the cols (mtd)
@@ -762,8 +762,8 @@
   - x: count(*[self::m:mtr][1]/*)
   - test:
       if: "self::m:determinant"
-      then: {T: "determinanten"}      # phrase(the 2 by 2 'determinant')
-      else: {T: "matrisen"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "determinant"}      # phrase(the 2 by 2 'determinant')
+      else: {T: "matris"}      # phrase(the 2 by 2 'matrix')
   - pause: long
   - x: "*"
   - test:
@@ -786,8 +786,8 @@
   - x: "count(*[self::m:mtr][1]/*)"
   - test:
       if: "self::m:determinant"
-      then: {T: "determinanten"}      # phrase(the 2 by 2 'determinant')
-      else: {T: "matrisen"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "determinant"}      # phrase(the 2 by 2 'determinant')
+      else: {T: "matris"}      # phrase(the 2 by 2 'matrix')
   - pause: long
   - x: "*"
   - test:
@@ -998,8 +998,6 @@
           then: [{pause: medium}]
 
 - name: chemistry
-
-
   tag: chemical-equation
   match: "."
   replace:
