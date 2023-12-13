@@ -24,6 +24,8 @@ use regex::Regex;
 use crate::pretty_print::mml_to_string;
 use std::cell::Ref;
 use phf::phf_set;
+use sxd_xpath::function::Error as XPathError;
+
 
 
 use crate::canonicalize::{as_element, name};
@@ -64,7 +66,7 @@ pub fn validate_one_node<'n>(nodes: Nodeset<'n>, func_name: &str) -> Result<Node
 }
 
 // Return true if the element's name is 'name'
-fn is_tag(e: &Element, name: &str) -> bool {
+fn is_tag(e: Element, name: &str) -> bool {
     return e.name().local_part() == name;
 }
 
@@ -72,7 +74,7 @@ fn is_tag(e: &Element, name: &str) -> bool {
 // Same as 'is_tag', but for ChildOfElement
 fn is_COE_tag(coe: &ChildOfElement, name: &str) -> bool {
     let element = coe.element();
-    return element.is_some() && is_tag(&element.unwrap(), name);  
+    return element.is_some() && is_tag(element.unwrap(), name);  
 }
 
 /// Should be an internal structure for implementation of the IsNode, but it was useful in one place in a separate module.
@@ -83,7 +85,7 @@ impl IsNode {
     /// implements ClearSpeak's definition of "simple"
     /// this is fairly detailed, so we define a few local functions (at end) to help out
     /// Also, it doesn't help that the structure is a bit complicated Elements->ChildOfElement->Element/Text
-    pub fn is_simple(elem: &Element) -> bool {
+    pub fn is_simple(elem: Element) -> bool {
         if is_trivially_simple(elem) {
             return true;
         }
@@ -111,7 +113,7 @@ impl IsNode {
 
 
         // returns the element's text value
-        fn to_str<'a>(e: &'a Element) -> &'a str {
+        fn to_str(e: Element) -> &str {
             // typically usage assumes 'e' is a leaf
             // bad MathML is the following isn't true
             if e.children().len() == 1 {
@@ -148,7 +150,7 @@ impl IsNode {
         }
 
         // checks the single element to see if it is simple (mn, mi that is a single char, common fraction)
-        fn is_trivially_simple(elem: &Element) -> bool {
+        fn is_trivially_simple(elem: Element) -> bool {
             if is_tag(elem, "mn")  {
                 return true;
             }
@@ -158,26 +160,26 @@ impl IsNode {
             }
 
             // FIX: need to consult preference Fraction_Ordinal
-            if IsNode::is_common_fraction(*elem, 10, 19) {
+            if IsNode::is_common_fraction(elem, 10, 19) {
                 return true;
             }
             return false;
         }
 
         // true if the negative of a single element that is simple
-        fn is_negative_of_trivially_simple(elem: &Element) -> bool {
+        fn is_negative_of_trivially_simple(elem: Element) -> bool {
             if is_tag(elem, "mrow") && elem.children().len() == 2 {
                 let children = elem.children();
                 // better be negative of something at this point...
                 if is_COE_tag(&children[0], "mo") && is_equal(&children[0], '-') &&
-                   children[1].element().is_some() && is_trivially_simple(&children[1].element().unwrap()) {
+                   children[1].element().is_some() && is_trivially_simple(children[1].element().unwrap()) {
                     return true;
                 }
             }
             if is_tag(elem, "negative") && elem.children().len() == 1 {
                 let child = elem.children()[0];
                 if let Some(e) = child.element() {
-                    return is_trivially_simple(&e);
+                    return is_trivially_simple(e);
                 }
             }
 
@@ -190,7 +192,7 @@ impl IsNode {
         }
 
         // true if mrow(xxx, &it;, mi) or mrow(xxx, &it; mi, &it;, mi) where mi's have len==1
-        fn is_times_mi(mrow: &Element) -> bool {
+        fn is_times_mi(mrow: Element) -> bool {
             assert!( is_tag(mrow, "mrow") );
             let children = mrow.children();
             if !(children.len() == 3 || children.len() == 5) {
@@ -201,11 +203,13 @@ impl IsNode {
             }
 
             let first_child = children[0].element().unwrap();
-            if !is_trivially_simple(&first_child) {
-                if !is_negative_of_trivially_simple(&first_child) {
+            if !is_trivially_simple(first_child) {
+                if !is_negative_of_trivially_simple(first_child) {
                     return false;
                 }
-                if children.len() == 5 && !is_COE_tag(&first_child.children()[1], "mn") {
+                if children.len() == 5 && 
+                   ( (name(&first_child) == "negative" && !is_COE_tag(&first_child.children()[0], "mn")) ||
+                     (name(&first_child) == "mrow"     && !is_COE_tag(&first_child.children()[1], "mn")) ) {
                     return false;      // '-x y z' is too complicated () -- -2 x y is ok
                 }
             }
@@ -229,7 +233,7 @@ impl IsNode {
         }
 
         // return true if the mrow is var° or num°
-        fn is_degrees(mrow: &Element) -> bool {
+        fn is_degrees(mrow: Element) -> bool {
             assert!( is_tag(mrow, "mrow") );
             let children = mrow.children();
             return children.len() == 2 &&
@@ -239,7 +243,7 @@ impl IsNode {
         }
 
         // fn_name &af; [simple arg or (simple arg)]
-        fn is_function(mrow: &Element) -> bool {
+        fn is_function(mrow: Element) -> bool {
             assert!( is_tag(mrow, "mrow") );
             let children = mrow.children();
             if children.len() != 3 {
@@ -253,10 +257,10 @@ impl IsNode {
                 return false;
             }
             let function_arg = children[2].element().unwrap();
-            if IsBracketed::is_bracketed(&function_arg, "(", ")", false, false) {
-                return IsNode::is_simple(&function_arg.children()[1].element().unwrap());
+            if IsBracketed::is_bracketed(function_arg, "(", ")", false, false) {
+                return IsNode::is_simple(function_arg.children()[1].element().unwrap());
             } else {
-                return IsNode::is_simple(&function_arg);
+                return IsNode::is_simple(function_arg);
             }
         }
     }
@@ -268,7 +272,7 @@ impl IsNode {
             static ref ALL_DIGITS: Regex = Regex::new(r"\d+").unwrap();    // match one or more digits
         }
 
-        if !is_tag(&frac, "mfrac") &&  !is_tag(&frac, "fraction"){
+        if !is_tag(frac, "mfrac") &&  !is_tag(frac, "fraction"){
             return false;
         }
         let children = frac.children();
@@ -284,7 +288,7 @@ impl IsNode {
 
         let num = num.unwrap();
         let denom = denom.unwrap();
-        if !is_tag(&num, "mn") || !is_tag(&denom, "mn") {
+        if !is_tag(num, "mn") || !is_tag(denom, "mn") {
             return false
         };
 
@@ -368,7 +372,7 @@ impl Function for IsNode {
                     .all(|node|
                         if let Node::Element(e) = node {
                             match kind.as_str() {
-                                "simple" => IsNode::is_simple(&e),
+                                "simple" => IsNode::is_simple(e),
                                 "leaf"   => MATHML_LEAF_NODES.contains(name(&e)),
                                 "2D" => IsNode::is_2D(&e),
                                 "modified" => MATHML_MODIFIED_NODES.contains(name(&e)),
@@ -565,11 +569,19 @@ impl Function for ToOrdinal {
                         -> Result<Value<'d>, Error>
     {
         let mut args = Args(args);
-        args.exactly(1)?;
+        if let Err(e) = args.exactly(1).or_else(|_| args.exactly(3)) {
+            return Err( XPathError::Other(format!("ToOrdinal requires 1 or 3 args: {}", e)));
+        };
+        let mut fractional = false;
+        let mut plural = false;
+        if args.len() == 3 {
+            plural = args.pop_boolean()?;
+            fractional = args.pop_boolean()?;
+        }
         let node = validate_one_node(args.pop_nodeset()?, "ToOrdinal")?;
         return match node {
-            Node::Text(t) =>  Ok( Value::String( ToOrdinal::convert(t.text(), false, false) ) ),
-            Node::Element(e) => Ok( Value::String( ToOrdinal::convert(&get_text_from_element(e), false, false) ) ),
+            Node::Text(t) =>  Ok( Value::String( ToOrdinal::convert(t.text(), fractional, plural) ) ),
+            Node::Element(e) => Ok( Value::String( ToOrdinal::convert(&get_text_from_element(e), fractional, plural) ) ),
             _   =>  Err( Error::ArgumentNotANodeset{actual: ArgumentType::String} ),
         }
     }
@@ -761,7 +773,7 @@ struct Debug;
 /// This should probably be restructured slightly.
 pub struct IsBracketed;
 impl IsBracketed {
-    pub fn is_bracketed(element: &Element, left: &str, right: &str, requires_comma: bool, requires_mrow: bool) -> bool {
+    pub fn is_bracketed(element: Element, left: &str, right: &str, requires_comma: bool, requires_mrow: bool) -> bool {
         use crate::canonicalize::is_fence;
         if requires_mrow && !is_tag(element, "mrow") {
             return false;
@@ -793,11 +805,14 @@ impl IsBracketed {
         if requires_comma {
             if let ChildOfElement::Element(contents) = children[1] {
                 let children = contents.children();
-                if !is_tag(&contents, "mrow") || children.len() <= 1 {
+                if !is_tag(contents, "mrow") || children.len() <= 1 {
                     return false;
                 }
-                // finally, we can check for a comma -- assume operand followed by a comma
-                if get_text_from_COE(&children[1]).as_str() == "," {
+                // finally, we can check for a comma -- we might not have operands, so we to check first and second entry
+                if get_text_from_COE(&children[0]).as_str() == "," {
+                    return true;
+                }
+                if children.len() > 1 && get_text_from_COE(&children[1]).as_str() == "," {
                     return true;
                 }
             }
@@ -837,7 +852,7 @@ impl IsBracketed {
         let left = args.pop_string()?;
         let node = validate_one_node(args.pop_nodeset()?, "IsBracketed")?;
         if let Node::Element(e) = node {
-            return Ok( Value::Boolean( IsBracketed::is_bracketed(&e, &left, &right, requires_comma, requires_mrow) ) );
+            return Ok( Value::Boolean( IsBracketed::is_bracketed(e, &left, &right, requires_comma, requires_mrow) ) );
         }
 
         // FIX: should having a non-element be an error instead??
@@ -847,7 +862,9 @@ impl IsBracketed {
 
 pub struct IsInDefinition;
 impl IsInDefinition {
-    fn is_defined_in(test_str: &str, set_name: &str) -> Result<bool, Error> {
+    /// Returns true if `test_str` is in `set_name`
+    /// Returns an error if `set_name` is not defined
+    pub fn is_defined_in(test_str: &str, set_name: &str) -> Result<bool, Error> {
         return DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             if let Some(set) = definitions.get_hashset(set_name) {
@@ -1030,6 +1047,73 @@ impl Function for EdgeNode {
     }
 }
 
+pub struct FontSizeGuess;
+/// FontSizeGuess(size_string)
+///   returns a guess of the size in "ems"
+/// Examples:
+///    "0.278em" -> 0.278
+///    ""
+// 		   returns original node match isn't found
+impl FontSizeGuess {
+    pub fn em_from_value(value_with_unit: &str) -> f64 {
+        lazy_static! {
+            // match one or more digits followed by a unit -- there are many more units, but they tend to be large and rarer(?)
+            static ref FONT_VALUE: Regex = Regex::new(r"(-?[0-9]*\.?[0-9]*)(px|cm|mm|Q|in|ppc|pt|ex|em|rem)").unwrap();
+        }
+        let cap = FONT_VALUE.captures(&value_with_unit);
+        if let Some(cap) = cap {
+            if cap.len() == 3 {
+                let multiplier = match &cap[2] {    // guess based on 12pt font to convert to ems
+                    "px" => 1.0/12.0,
+                    "cm" => 2.37,
+                    "mm" => 0.237,
+                    "Q" => 0.059,  // 1/4 mm
+                    "in" => 6.02,
+                    "pc" => 1.0,
+                    "pt" => 1.0/12.0,
+                    "ex" => 0.5,
+                    "em" => 1.0,
+                    "rem" => 16.0/12.0,
+                    default => {debug!("unit='{}'", default); 10.0}
+                };
+                // debug!("FontSizeGuess: {}->{}, val={}, multiplier={}", value_with_unit, value*multiplier, value, multiplier);
+                return cap[1].parse::<f64>().unwrap_or(0.0) * multiplier;
+            }  else {
+                return 0.0;             // something bad happened
+            }
+        }else {
+            let multiplier = match value_with_unit {    // guess based on 12pt font to convert to ems
+                "veryverythinspace" => 1.0/18.0,
+                "verythinspace" => 2.0/18.0,
+                "thinspace" => 3.0/18.0,
+                "mediumspace" => 4.0/18.0,
+                "thickspace" => 5.0/18.0,
+                "verythickspace" => 6.0/18.0,
+                "veryverythickspace" => 7.0/18.0,
+                _ => 0.0,
+            };
+            return multiplier;
+        }
+    }
+}
+impl Function for FontSizeGuess {
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        lazy_static! {
+            // match one or more digits followed by a unit -- there are many more units, but they tend to be large and rarer(?)
+            static ref FONT_VALUE: Regex = Regex::new(r"([0-9]*.?[0-9]*)(px|cm|mm|Q|in|ppc|pt|ex|em|rem|)").unwrap();
+        }
+        let mut args = Args(args);
+        args.exactly(1)?;
+        let value_with_unit = args.pop_string()?;
+        let em_value = FontSizeGuess::em_from_value(&value_with_unit);
+        return Ok( Value::Number(em_value) );
+    }
+}
+
 /// Add all the functions defined in this module to `context`.
 pub fn add_builtin_functions(context: &mut Context) {
     // FIX: should be a static cache that gets regenerated on update
@@ -1037,6 +1121,7 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("max", Max);       // missing in xpath 1.0
     context.set_function("NestingChars", crate::braille::NemethNestingChars);
     context.set_function("BrailleChars", crate::braille::BrailleChars);
+    context.set_function("NeedsToBeGrouped", crate::braille::NeedsToBeGrouped);
     context.set_function("IsNode", IsNode);
     context.set_function("ToOrdinal", ToOrdinal);
     context.set_function("ToCommonFraction", ToCommonFraction);
@@ -1046,6 +1131,7 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("IfThenElse", IfThenElse);
     context.set_function("DistanceFromLeaf", DistanceFromLeaf);
     context.set_function("EdgeNode", EdgeNode);
+    context.set_function("FontSizeGuess", FontSizeGuess);
     context.set_function("DEBUG", Debug);
 }
 
@@ -1169,7 +1255,7 @@ mod tests {
         .expect("failed to parse XML");
         let mathml = get_element(&package);
         trim_element(&mathml);
-        assert!(IsNode::is_simple(&mathml), "{}", message);
+        assert!(IsNode::is_simple(mathml), "{}", message);
     }
 
     fn test_is_not_simple(message: &'static str, mathml_str: &'static str) {
@@ -1179,7 +1265,7 @@ mod tests {
         .expect("failed to parse XML");
         let mathml = get_element(&package);
         trim_element(&mathml);
-        assert!(!IsNode::is_simple(&mathml), "{}", message);
+        assert!(!IsNode::is_simple(mathml), "{}", message);
     }
     #[test]
     fn is_simple() {
@@ -1212,6 +1298,9 @@ mod tests {
         test_is_not_simple("-x y z", 
                 "<mrow><mrow><mo>-</mo><mi>x</mi></mrow>
                             <mo>&#x2062;</mo><mi>y</mi><mo>&#x2062;</mo><mi>z</mi></mrow>");
+        test_is_not_simple("C(-2,1,4)",             // github.com/NSoiffer/MathCAT/issues/199
+                    "<mrow><mi>C</mi><mrow><mo>(</mo><mo>−</mo><mn>2</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>4</mn><mo>)</mo></mrow></mrow>");
+                   
     }
 
     #[test]

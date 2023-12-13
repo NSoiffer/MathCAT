@@ -21,6 +21,13 @@ fn blank_aph_7_1_ex5() {
     test_braille("UEB", expr, "⠼⠉⠒⠼⠁⠑⠀⠒⠒⠀⠼⠋⠚⠒⠨⠤");
 }
 
+#[test]
+fn overscript_grouping_aph_5_4_8() {
+    // this test was added because #220 (failed to add grouping around overscript)
+    let expr = "<math> <mover> <mi>MN</mi> <mo>&#x2194;</mo> </mover> </math>";
+    test_braille("UEB", expr, "⠰⠰⠣⠠⠠⠍⠝⠜⠨⠔⠳⠺⠗⠕");
+}
+
 // Extra tests targeted at special cases in MathCAT
 #[test]
 fn number_space_before() {
@@ -45,6 +52,13 @@ fn not_number_space_blocks() {
     // https://github.com/NSoiffer/MathCAT/issues/144
     let expr = "<math><mn>123</mn><mtext>&nbsp;&#x2063;</mtext><mn>456</mn></math>";
     test_braille("UEB", expr, "⠼⠁⠃⠉⠀⠼⠙⠑⠋");
+}
+
+#[test]
+fn dot_above_bug_204() {
+    // https://github.com/NSoiffer/MathCAT/issues/204
+    let expr = "<math> <mn>0.</mn> <mover> <mn>6</mn> <mo>&middot;</mo> </mover> </math>";
+    test_braille("UEB", expr, "⠼⠚⠲⠣⠼⠋⠜⠘⠲");
 }
 
 #[test]

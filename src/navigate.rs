@@ -245,8 +245,11 @@ fn convert_last_char_to_number(str: &str) -> usize {
 /// Get the node associated with 'id'
 /// This can be called on an intent tree -- it does not make use of is_leaf()
 fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> {
-    if mathml.attribute_value("id").unwrap() == id {
-        return Some(mathml);
+    if let Some(mathml_id) = mathml.attribute_value("id") {
+    match mathml.attribute_value("id") {
+        if mathml_id == id {
+            return Some(mathml);
+        }
     }
 
     for child in mathml.children() {
@@ -1749,6 +1752,37 @@ mod tests {
             assert_eq!(speech, "move right, the 2 by 2 matrix; row 1; 9, negative 13; row 2; 5, negative 6;");
             let speech = test_command("ZoomIn", mathml, "row-1");
             assert_eq!(speech, "zoom in; row 1; 9, negative 13;");
+            return Ok( () );
+        });
+    }
+
+    #[test]
+    fn chem_speech() -> Result<()> {
+        init_logger();
+        // this comes from bug 218
+        let mathml_str = "<math data-latex='H_2SO_4' display='block' id='id-0' data-id-added='true'>
+            <mrow data-changed='added' data-chem-formula='5' id='id-1' data-id-added='true'>
+                <msub data-latex='H_2' data-chem-formula='1' id='id-2' data-id-added='true'>
+                    <mi data-latex='H' data-chem-element='1' id='id-3' data-id-added='true'>H</mi>
+                    <mn data-latex='2' id='id-4' data-id-added='true'>2</mn>
+                </msub>
+                <mo data-changed='added' data-chem-formula-op='0' id='id-5' data-id-added='true'>&#x2063;</mo>
+                <mi data-latex='S' data-chem-element='1' id='id-6' data-id-added='true'>S</mi>
+                <mo data-changed='added' data-chem-formula-op='0' id='id-7' data-id-added='true'>&#x2063;</mo>
+                <msub data-latex='O_4' data-chem-formula='1' id='id-8' data-id-added='true'>
+                    <mi data-latex='O' data-chem-element='1' id='id-9' data-id-added='true'>O</mi>
+                    <mn data-latex='4' id='id-10' data-id-added='true'>4</mn>
+                </msub>
+            </mrow>
+        </math>";
+        init_default_prefs(mathml_str, "Enhanced");
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomIn", mathml, "id-2");
+            let speech = test_command("MoveNext", mathml, "id-6");
+            // tables need to check their parent for proper speech
+            assert_eq!(speech, "move right, cap s");
             return Ok( () );
         });
     }

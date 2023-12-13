@@ -22,6 +22,8 @@ To start navigation:
 
 MathCAT's navigation is the same in Word and in a browser.
 
+While navigating an expression, "control+c" copies the MathML for the current node in NVDA.
+
 
 ## Option List
 The options are listed below. Most options allow only a limited set of values and those are indicated in the options.
@@ -126,7 +128,7 @@ ClearSpeak has a number of options. These were designed for authors to use, but 
 
 
 ### Braille Options
-* ✓Code: [Nemeth]
+* ✓BrailleCode: [Nemeth]
   * Options: Any implemented braille code
   * Description: the braille math code to use
   * Status: currently only Nemeth, UEB, and Vietnam are supported. Other braille code support will depend upon help from others.
@@ -137,7 +139,10 @@ ClearSpeak has a number of options. These were designed for authors to use, but 
   * ✓START_MODE: [Grade2] 
     * Options: Grade1, Grade2
     * Description: assumed starting mode UEB braille (Grade1 assumes we are in G1 passage mode)
-  
+  * ✓UseSpacesAroundAllOperators: [false]
+    * Options: true/false
+    * Description: The UEB guidelines suggest that for lower grades, adding space around operators such as `+` and `-` can be a good idea. Normally, space is only added around relational operators such as `=` and `<`.
+
 Braille codes often have author-definable characters. MathCAT provides some options:
 
 The [UEB Guide to Technical Material](https://iceb.org/Guidelines_for_Technical_Material_2008-10.pdf) says to normally treat Fraktur and DoubleStruck as Script.
@@ -149,4 +154,18 @@ Note: here are prefixes for 1st - 5th: "⠈⠼", "⠘⠼", "⠸⠼", "⠐⠼", "
   *  ✓SansSerif:    "⠈⠼"    [first transcriber-defined typeform prefix indicator]
   *  ✓GreekVariant: "⠨"     [default to Greek]
 
-The characters for Vietnam that are definable is still be discussed. Likely, they will be similar to those for UEB.
+The characters for Vietnam that are definable is still be discussed. Likely, they will change some.
+* Vietnam:
+  *  ✓UseDropNumbers: [false]
+    * Options: true, false
+    * Description: drop digits down a row in simple numeric fractions
+  *  ✓DoubleStruck: "⠈"     [script]
+  *  ✓Fraktur:      "⠈"     [script]
+  *  ✓SansSerif:    "⠈⠼"    [first transcriber-defined typeform prefix indicator]
+  *  ✓GreekVariant: "⠨"     [default to Greek]
+
+
+### Other Options
+MathCAT cleans up bad MathML. Numbers are frequently improperly marked up in MathML. In order to clean them up correctly, MathCAT needs to know locale information about what characters might be used to separate digit blocks and what characters are used a decimal separator. Typically this is set by AT based on the country code in the document. However, that may not be given and only the language code is given and so AT needs to guess based on that.
+* DecimalSeparators: "." # [default]
+* BlockSeparators: ", \u00A0\u202F" # [default -- includes two forms of non-breaking spaces]

@@ -32,7 +32,7 @@
   replace: [x: "*[1]", t: "squared"]
 -
   name: default
-  tag: msup
+  tag: particular-value-of
   match: "."
   replace:
     - x: "*[1]"
@@ -41,7 +41,7 @@
     - t: power
 -
   name: default
-  tag: msqrt
+  tag: square-root
   match: "."
   replace:
     - test:

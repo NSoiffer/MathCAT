@@ -290,12 +290,13 @@
 -
   name: limit
   tag: [msub, munder]
-  match: "*[1][text()='lim']"
+  variables: [NoSpacesBase: "translate(*[1], ' \u00A0\u2004\u2005\u2006\u2007\u2008\u2009\u200A','')"]   # Sometimes these have (weird) spaces in them
+  match: "*[1][$NoSpacesBase='lim' or $NoSpacesBase='limsup' or $NoSpacesBase='liminf']"
   replace: 
   - intent:
-      name: "limit"    # Fix: the name in the spreadsheet needs updating/fixing
+      name: "limit"
       children:
-      - x: "*[1]"
+      - x: "$NoSpacesBase"
       - x: "*[2]"
 
 -
@@ -327,9 +328,9 @@
           if: "*[1][self::m:mrow]"
           then_test:
               if: "*[2][self::m:mrow]"
-              then: [t: "\u2B96"]    # this is currently unassigned and may get used by UTC at some point (<=>)
-              else: [t: "\u2B74"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
-          else: [t: "\u2B75"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
+              then: [t: "\u1f8d2"]    # this is currently unassigned and may get used by UTC at some point (<=>)
+              else: [t: "\u1f8d4"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
+          else: [t: "\u1f8d3"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
 
 -
   # need to include the name of the element so the rules know whether to say "sub" or "super"

@@ -2,13 +2,18 @@
   Speech:
     Impairment: Blindness       # LearningDisability, LowVision, Blindness
     Language: Auto                # any known language code and sub-code -- could be en-uk, etc
-    SpeechSound: None           # make a sound when starting/ending math speech -- None, Beep
+    SpeechStyle: ClearSpeak     # Any known speech style (falls back to ClearSpeak)
     Verbosity: Medium           # Terse, Medium, Verbose
     MathRate: 100               # Change from text speech rate (%)
     PauseFactor: 100            # Change from normal pause length (%)
-    SpeechStyle: ClearSpeak     # Any known speech style (falls back to ClearSpeak)
+    SpeechSound: None           # make a sound when starting/ending math speech -- None, Beep
     SubjectArea: General        # FIX: still working on this
     Chemistry: SpellOut         # SpellOut (H 2 0), AsCompound (Water) -- not implemented, Off (H sub 2 O)
+
+    SpeechOverrides:
+      CapitalLetters: ""        # word to say as a prefix/postfix for capital letters; empty string leaves it calling AT with Unicode fallback 
+      LeftParen: ""             # word used as override (not implemented)
+      RightParen: ""            # word used as override (not implemented)
 
     ClearSpeak:                 # see ClearSpeak speak for meanings
       CapitalLetters: Auto      # SayCaps or use pitch
@@ -38,11 +43,6 @@
 
     MathSpeak: Verbose          # Brief, SuperBrief
 
-    SpeechOverrides:
-      CapitalLetters: ""        # word to say as a prefix/postfix for capital letters; empty string leaves it calling AT with Unicode fallback 
-      LeftParen: ""             # word used as override (not implemented)
-      RightParen: ""            # word used as override (not implemented)
-
   Navigation:
     NavMode: Enhanced         # Enhanced, Simple, Character
     ResetNavMode: false       # remember previous value and use it
@@ -52,10 +52,8 @@
     AutoZoomOut: true           # Auto zoom out of 2D exprs (use shift-arrow to force zoom out if unchecked)
 
   Braille:
-    BrailleNavHighlight: EndPoints   # Highlight with dots 7 & 8 the current nav node -- values are Off, FirstChar, EndPoints, All
     BrailleCode: "Nemeth"                # Any supported braille code (currently Nemeth, UEB)
-
-    Nemeth:
+    BrailleNavHighlight: EndPoints   # Highlight with dots 7 & 8 the current nav node -- values are Off, FirstChar, EndPoints, All
 
     UEB:
       StartMode: "Grade2"   # Grade1/Grade2 -- assumed starting mode UEB braille (Grade1 assumes we are in G1 passage mode)
@@ -83,3 +81,6 @@
       GreekVariant: "⠸"     # default to Greek
 
 
+  Other:
+    DecimalSeparators: "." # [default]
+    BlockSeparators: ", \u00A0\u202F" # [default -- includes two forms of non-breaking spaces]

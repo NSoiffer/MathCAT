@@ -170,9 +170,10 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr=r#"
-  <math><mfrac><mn>1</mn><mn>16</mn></mfrac><mo>+</mo>
-  <mo>&#x22EF;</mo></math>
-    "#;
+  <math><munder><mtext>this is a test</mtext><mrow><mi>x</mi><mo>&#x2192;</mo><mi>a</mi></mrow></munder>
+            <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mn>1</mn></math>
+             "#;
+
 //   let expr = "
 //   <math display='block'>
 //   <mrow displaystyle='true' data-changed='added'>
@@ -206,19 +207,21 @@ fn main() {
   // set_preference("MathRate".to_string(), "77".to_string()).unwrap();
   
   set_preference("Bookmark".to_string(), "false".to_string()).unwrap();
-  set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+  set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+  // set_preference("DecimalSeparators".to_string(), ",".to_string()).unwrap();
+  // set_preference("BlockSeparators".to_string(), ". ".to_string()).unwrap();
   if let Err(e) = set_mathml(expr.to_string()) {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   };
 
-  match get_spoken_text() {
-    Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
-    Err(e) => panic!("{}", errors_to_string(&e)),
-  }
-  info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
+  // match get_spoken_text() {
+  //   Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
+  //   Err(e) => panic!("{}", errors_to_string(&e)),
+  // }
+  // info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
 
-  set_preference("BrailleCode".to_string(), "CMU".to_string()).unwrap();
+  set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),

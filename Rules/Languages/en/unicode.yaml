@@ -62,6 +62,8 @@
 
  - "0-9": [t: "."]
 
+ - " ": [t: " "]                     # 0x20
+
  - "!":                                            # 0x21
     - test:
         if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"

@@ -9,6 +9,9 @@ around).
 
 See the [Navigation Modes section](#navigation-modes) after the table for explanations of these modes.
 
+Note: while navigating an expression, "control+c" copies the MathML for the current node in NVDA.
+
+
 
 ## Navigation Commands Table
 <table class=MsoTableGrid border=1 cellspacing=0 cellpadding=0

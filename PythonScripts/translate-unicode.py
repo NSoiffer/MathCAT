@@ -98,7 +98,7 @@ def translate_char_line(ch: str, line:str, mathplayer: dict, sre: dict, access8:
             return 't: "{}"'.format(translation)
         else:
             return line
-    return ( line if line.lstrip().startswith('#') else TextToTranslate.sub(do_translate_char, line),  result )
+    return (line if line.lstrip().startswith('#') else TextToTranslate.sub(do_translate_char, line),  result)
 
 # char defs take one of two forms:
 # single line: - "̇": [t: "dot above embellishment"]             # 0x307
@@ -311,7 +311,7 @@ def get_mathplayer_unicode_dict(path: str, lang: str):
                     text = matches.group(2).strip()
                     # MP makes use of char in the private use area: E000—F8FF -- don't add those
                     # Also, there's a lot of stuff in the 'zh' translation that isn't Chinese, so skip that
-                    if (int_key < 0xE000 or int_key > 0xF8FF) and text and not(lang == 'zh' and text.isascii()):
+                    if (int_key < 0xE000 or int_key > 0xF8FF) and text and not(lang.startswith('zh') and text.isascii()):
                         key = chr(int_key)
                         dict[key] = text
         print(f"dict entries = {len(dict)}")
@@ -405,7 +405,7 @@ def translate_definition(start: int, lines: list[str], translated_lines: list[st
         if lines[i].find(']') >= 0:
             out_stream.write(lines[i])
             return i
-        out_stream.write(translated_lines[i])
+        out_stream.write(translated_lines[i].replace("“", "'").replace("”", "'").replace("、", ",")) # Chinese
         i += 1
     return i
 
@@ -423,7 +423,7 @@ ACCESS8_Location = r"C:\dev\Access8Math\addon\globalPlugins\Access8Math\locale\s
 # (sre_only, mp_only, differ, same) = dict_compare("fr", get_sre_unicode_dict(SRE_Location, "fr"), get_mathplayer_unicode_dict(MP_Location, "fr"))
 # (sre_only, mp_only, differ, same) = dict_compare("it", get_sre_unicode_dict(SRE_Location, "it"), get_mathplayer_unicode_dict(MP_Location, "it"))
 
-language = "zh-TW"
+language = "zh-cn"
 build_new_translation("..", language, "unicode")
 build_new_translation("..", language, "unicode-full")
 

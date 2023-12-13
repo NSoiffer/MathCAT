@@ -119,6 +119,20 @@ fn simple_ln_terse() {
 }
 
 #[test]
+fn other_names() {
+    let expr = "<math> <mrow><mi>Cov</mi><mi>x</mi></mrow> </math>";
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
+                expr, "Cov x");
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")],
+                expr, "covariance x");
+    let expr = "<math> <mrow><mi>exp</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow> </math>";
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
+                expr, "exp x");
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")],
+                expr, "exponential of x");
+}
+
+#[test]
 fn explicit_function_call_with_parens() {
     let expr = "<math><mrow><mi>t</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow></math>";
     test("en", "SimpleSpeak", expr, "t of x");

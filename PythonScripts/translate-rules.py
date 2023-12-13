@@ -47,6 +47,7 @@ def collect_phrases_to_translate(file_to_translate: str) -> (list[str], list[str
             word = WordToTranslate.search(line)
             if word:
                 words.append(word.group(1))
+
         print(f"#phrases={len(phrases)}, #words={len(words)}")
         return (phrases, words)
 
@@ -69,7 +70,11 @@ def translate_phrases(phrases_to_translate: list[str], lang) -> list[str]:
         # print("***Phrases to translate: {}\n".format(phrases))
         translated_phrases_str = GoogleTranslate.translate(phrases_string, src='en', dest=lang).text.lower()
         translated_phrases_str = translated_phrases_str.replace('。', '.')   # happens for Chinese
-        translated_phrases_str = translated_phrases_str.replace('"', "'")    # google occasionally changes single quotes to double quotes
+
+        translated_phrases_str = translated_phrases_str.replace('"', "'").replace("“", "'").replace("”", "'")    # google occasionally changes quotes
+        translated_phrases_str = translated_phrases_str.replace("«", "'").replace("»", "'")    # google occasionally changes quotes to this form
+        translated_phrases_str = translated_phrases_str.replace("、", ",")   # Chinese comma
+
         translated_phrases_list = translated_phrases_str.split('.\n')
         if len(translated_phrases_list) != len(phrases):
             print("\n!!!Problem in translation: size of translations ({}) differs from phrases to translate ({})\n".format(len(translated_phrases_list), len(phrases)))
@@ -100,21 +105,27 @@ def translate_phrases(phrases_to_translate: list[str], lang) -> list[str]:
             time.sleep(TIMEOUT)       # try to avoid google banning us
     return translations + do_translation_chunk(phrases_chunks_to_translate)
 
-TargetWord = re.compile(r"'phrase([^']+)'")
-TextString = re.compile(r'([ \[{])t: "([^"]+)"')
+argetWord = re.compile(r"'([^']+)'")
+TextString = re.compile(r'([ \[{][oc]?t: )"([^"]+)"')
 def substitute_in_translated_phrase(line, translated_phrase, translated_word) -> str:
+    has_phrase = PhraseToTranslate.search(line)
     target_words = TargetWord.search(translated_phrase)
     text_words = TextString.search(line)
     new_line = line
-    if target_words:
-        print(f"target_words found -- line: {line}")
-        replacement = text_words.group(1) + 't: "' + target_words.group(1) + '"'    # add the surrounding context back
+    if has_phrase and target_words and text_words: # test for text_words handles "variables: [....]"
+        try:
+            replacement = text_words.group(1) + '"' + target_words.group(1) + '"'    # add the surrounding context back
+        except AttributeError:
+            print(f"text_words={text_words}, target_words={target_words}, line='{line}'")
+            exit()
+
         new_line = TextString.sub(replacement, line)
         # print("fixed line: {}".format(new_line))
     elif text_words:
         print(f"Failed to find quoted part in translation \"{translated_phrase}\", \
                using '{translated_word}\n   original line: {line}")
-        replacement = text_words.group(1) + 't: "' + translated_word + '"'    # add the surrounding context back
+
+        replacement = text_words.group(1) + '"' + translated_word + '"'    # add the surrounding context back
         new_line = TextString.sub(replacement, line)
     return new_line
 
@@ -142,7 +153,10 @@ def build_new_translation(path_to_mathcat: str, lang: str, rule_file_name: str) 
     (phrases_to_translate, words_to_translate) = collect_phrases_to_translate(file_to_translate)
     phrase_translations = translate_phrases(phrases_to_translate, lang)
     word_translations = translate_phrases(words_to_translate, lang)
+
+    print(f"file:{rule_file_name}: #phrases={len(phrase_translations)}, #words={len(word_translations)}")
     create_new_file(file_to_translate, os.path.join(lang, rule_file_name), phrase_translations, word_translations)
+    print("done\n")
 
 def build_all_translations(path_to_mathcat: str, lang: str, subdir="") -> None:
     dir_to_translate = os.path.join(path_to_mathcat, "Rules", "Languages", "en", subdir)
@@ -156,7 +170,7 @@ def build_all_translations(path_to_mathcat: str, lang: str, subdir="") -> None:
 
 
 
-language = 'zh-TW'
+language = 'el'
 if not os.path.exists(language):
     os.makedirs(language)
 if not os.path.exists(language+"/SharedRules"):

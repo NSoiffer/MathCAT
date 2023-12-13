@@ -136,6 +136,8 @@
     "↼", "↽", "↾", "↿", "⇀", "⇁", "⇂", "⇃", "⇋", "⇌", "⥊", "⥋", "⥌", "⥍", "⥎",
     "⥏", "⥐", "⥑", "⥒", "⥓", "⥔", "⥕", "⥖", "⥗", "⥘", "⥙", "⥚", "⥛", "⥜", "⥝",
     "⥞", "⥟", "⥠", "⥡", "⥢", "⥣", "⥤", "⥥", "⥦", "⥧", "⥨", "⥩", "⥪", "⥫", "⥬",
+    "🣒", "🣓", "🣔",                         # 0x1f8d2 - 0x1f8d4 (Unicode 17 equilibrium arrows
+
   ],
 
   # these come from SRE's ts\semantic_tree\semantic_attr.ts file
@@ -197,6 +199,8 @@
 
     # chars not from SRE
     "∝", "∉", "∶",
+
+    "∥", "⟂", "⊥",
   ],
 
   # no space is used when these chars "apply" to ellipsis or long dash (lesson 2.13, differs slightly from rule 42)

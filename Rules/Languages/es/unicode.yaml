@@ -29,6 +29,8 @@
 
  - "0-9": [T: "."]                              	# 	(en: '.')
 
+ - " ": [t: " "]                                  # 0x20
+
  - "!": [T: "factorial"]                        	#  0x21
  - "\"": [T: "barra inversa"]                   	#  0x22	(en: 'quotation mark')
  - "#": [T: "almohadilla"]                      	#  0x23	(en: 'number', MathPlayer: 'signo de número', google: 'número')
