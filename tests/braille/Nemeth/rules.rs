@@ -272,7 +272,6 @@ fn greek_24_b_1() {
 
 #[test]
 fn eli_nemeth_UEB_rule_book_4_11_1() {
-    init_logger();
     let expr = "<math>
             <mtext>p</mtext><mtext>&#xA0;</mtext>
             <mtext>D</mtext><mtext>&#xA0;</mtext>

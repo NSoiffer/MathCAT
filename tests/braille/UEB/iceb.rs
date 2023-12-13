@@ -949,10 +949,23 @@ fn example_11_5_2() {
 
 #[test]
 fn example_11_5_3() {
+    // from MathJaX
+    let expr = "<math>
+        <msup><mrow/><mi>n</mi></msup>
+        <msub><mi>C</mi><mi>r</mi></msub>
+        <mo>=</mo>
+        <mrow>
+            <mo minsize='2.047em' maxsize='2.047em'>(</mo>
+            <mfrac linethickness='0'><mi>n</mi><mi>r</mi></mfrac>
+            <mo minsize='2.047em' maxsize='2.047em'>)</mo>
+        </mrow>
+        <mo>=</mo>
+        <mfrac>
+            <mrow><mi>n</mi><mo>!</mo></mrow>
+            <mrow><mi>r</mi><mo>!</mo><mo stretchy='false'>(</mo><mi>n</mi><mo>&#x2212;</mo><mi>r</mi><mo stretchy='false'>)</mo><mo>!</mo></mrow>
+        </mfrac>
+    </math>";
     // modified to use "shape" as recommended in a comment on this example
-    let expr = "<math><msub><mmultiscripts><mi>C</mi><mprescripts/><none/><mi>n</mi></mmultiscripts><mi>r</mi></msub><mo>=</mo>
-            <mo>(</mo><mfrac linethickness='0'><mi>n</mi><mi>r</mi></mfrac><mo>)</mo><mo>=</mo>
-            <mfrac><mrow><mi>n</mi><mo>!</mo></mrow><mrow><mi>r</mi><mo>!</mo><mo>(</mo><mi>n</mi><mo>-</mo><mi>r</mi><mo>)</mo><mo>!</mo></mrow></mfrac></math>";
     test_braille("UEB", expr, "⠰⠰⠰⠔⠝⠠⠉⠢⠗⠀⠐⠶⠀⠐⠣⠝⠰⠻⠗⠐⠜⠀⠐⠶⠀⠷⠝⠖⠨⠌⠗⠖⠐⠣⠝⠐⠤⠗⠐⠜⠖⠾⠰⠄");
 }
 
