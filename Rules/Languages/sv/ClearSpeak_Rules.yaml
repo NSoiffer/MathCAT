@@ -528,6 +528,7 @@
   name: ClearSpeak-absolute-value
   tag: absolute-value
   match: "."
+  # SWEDISH: Differentiate between the initial and ending declaration of the terms.
   variables: [{WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinaliteten', 'absolutbeloppet')"}, {EndToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinalitet', 'absolutbelopp')"}]
   replace:
   # - test:
