@@ -1,4 +1,12 @@
 ---
+# SWEDISH: This code preserves points in mtext elements. Only the first point, if there are more than one, is currently preserved.
+- name: intercept-comma
+  tag: mtext
+  match: "contains(., '.')"
+  replace:
+  - x: "substring-before(., '.')"
+  - T: "punkt"
+  - x: "substring-after(., '.')"
 
 # number-sets are a little messy in that the base was converted to a number-set, so we have to match that (simple) case last
 - name: pos-neg-number-sets
@@ -1061,13 +1069,13 @@
         if: "$Verbosity='Terse'"
         then: [{T: "bildar"}]      # phrase(hydrogen and oxygen 'forms' water )
         else: [{T: "reaktion bildar"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
-    - else_if: ".='⇌' or .='⮖'"
+    - else_if: ".='⇌' or .='\u1f8d2'"
       then: [{T: "är i jämvikt med"}]      # phrase(a reactant 'is in equilibrium with' a product)
-    - else_if: ".='⭴'"
+    - else_if: ".='\u1f8d4'"
       then: [{T: "är i jämvikt med, vänsterförskjuten"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
-    - else_if: ".='⭵'"
+    - else_if: ".='\u1f8d3'"
       then: [{T: "är i jämvikt med, högerförskjuten"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
-      else: [x: "."]
+      else: [x: "*"]
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator

@@ -327,9 +327,9 @@
           if: "*[1][self::m:mrow]"
           then_test:
               if: "*[2][self::m:mrow]"
-              then: [t: "\u2B96"]    # this is currently unassigned and may get used by UTC at some point (<=>)
-              else: [t: "\u2B74"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
-          else: [t: "\u2B75"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
+              then: [t: "\u1f8d2"]    # this is currently unassigned and may get used by UTC at some point (<=>)
+              else: [t: "\u1f8d4"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
+          else: [t: "\u1f8d3"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
 
 -
   # need to include the name of the element so the rules know whether to say "sub" or "super"
