@@ -37,18 +37,18 @@
             then: [T: "gånger"]                      #     (en: 'by', google translation)
             else: [T: "kryss"]                     #     (en: 'cross')
  - "÷": [T: "division"]                             #  0xf7    (en: 'divided by')
- - "ʰ": [t: "modifierare liten h"]                  #  0x2b0    (en: 'modifier small h', google translation)
+ - "ʰ": [T: "med aspiration"]                  #  0x2b0    (en: 'modifier small h', google translation)
  - "ʱ": [t: "modifierare liten h med krok"]         #  0x2b1    (en: 'modifier small h with hook', google translation)
- - "ʲ": [t: "modifierare liten j"]                  #  0x2b2    (en: 'modifier small j', google translation)
+ - "ʲ": [T: "med palatalisation"]                  #  0x2b2    (en: 'modifier small j', google translation)
  - "ʳ": [t: "modifierare liten r"]                  #  0x2b3    (en: 'modifier small r', google translation)
  - "ʴ": [t: "modifier small vände r"]               #  0x2b4    (en: 'modifier small turned r', google translation)
  - "ʵ": [t: "modifier small vände r med kroken"]    #  0x2b5    (en: 'modifier small turned r with hook', google translation)
  - "ʶ":                                             #  0x2b6
-    - t: "modifierare liten inverterad"             #     (en: 'modifier small inverted', google translation)
+    - T: "med uvularisation"             #     (en: 'modifier small inverted', google translation)
     - spell: "translate('R', 'R', 'R')"
 
- - "ʷ": [t: "modifierare liten w"]                  #  0x2b7    (en: 'modifier small w', google translation)
- - "ʸ": [t: "modifierare liten y"]                  #  0x2b8    (en: 'modifier small y', google translation)
+ - "ʷ": [T: "med labialisation"]                  #  0x2b7    (en: 'modifier small w', google translation)
+ - "ʸ": [T: "med labio-palatisation"]                  #  0x2b8    (en: 'modifier small y', google translation)
  - "ʹ": [T: "prim"]                                 #  0x2b9    (en: 'modifier prime', google: 'modifier prime')
  - "ʺ": [T: "bis"]                          #  0x2ba    (en: 'modifier double prime', google: 'modifier double prime')
  - "ʻ": [t: "modifieren vände komma"]               #  0x2bb    (en: 'modifier turned comma', google translation)
@@ -3039,26 +3039,26 @@
  # fraktur chars in math alphabetic block and also MathType private use area
  # Some of these are reserved because they were used in Plane 0 -- that shouldn't be an issue other than causing the other chars to not display
  - "𝔄-𝔜":                                           #  0x1d504 - 0x1d51d ('z' version is reserved)
-    - t: "fraktur"                                  #     (google translation)
+    - T: "fraktur"                                  #     (google translation)
     - spell: "translate('.', '𝔄𝔅𝔆𝔇𝔈𝔉𝔊𝔋𝔌𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔𝔕𝔖𝔗𝔘𝔙𝔚𝔛𝔜', 'ABCDEFGHIJKLMNOPQRSTUVWXY')"
 
  - "-":                                           #  0xf000 - 0xf018
-    - t: "fraktur"                                  #     (google translation)
+    - T: "fraktur"                                  #     (google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXY')"
 
  - "𝔞-𝔷":                                           #  0x1d51e - 0x1d537
-    - t: "fraktur"                                  #     (google translation)
+    - T: "fraktur"                                  #     (google translation)
     - spell: "translate('.', '𝔞𝔟𝔠𝔡𝔢𝔣𝔤𝔥𝔦𝔧𝔨𝔩𝔪𝔫𝔬𝔭𝔮𝔯𝔰𝔱𝔲𝔳𝔴𝔵𝔶𝔷', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                           #  0xf01a - 0xf033
-    - t: "fraktur"                                  #     (google translation)
+    - T: "fraktur"                                  #     (google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
     
  - "𝕬-𝖅":                                           #  0x1D56C - 0x1D585
-    - t: "fraktur bold"                             #     (google translation)
+    - T: "fraktur fetstilt"                             #     (google translation)
     - spell: "translate('.', '𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                           #  0xf040 - 0xf059
-    - t: "fraktur bold"                             #     (google translation)
+    - t: "fraktur fetstilt"                             #     (google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝖆-𝖟":                                           #  0x1d586 - 0x1d59f
