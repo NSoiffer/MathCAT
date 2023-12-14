@@ -996,13 +996,13 @@
         if: "$Verbosity='Terse'"
         then: [{T: "muodostavat"}]      # phrase(hydrogen and oxygen 'forms' water )
         else: [{T: "reagoivat muodostamaan"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
-    - else_if: ".='⇌' or .='⮖'"
+    - else_if: ".='⇌' or .='\u1f8d2'"
       then: [{T: "on tasapainossa"}]      # phrase(a reactant 'is in equilibrium with' a product)
-    - else_if: ".='⭴'"
+    - else_if: ".='\u1f8d4'"
       then: [{T: "on tasapainossa vasemmalle"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
-    - else_if: ".='⭵'"
+    - else_if: ".='\u1f8d3'"
       then: [{T: "on tasapainossa oikealle"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
-      else: [x: "."]
+      else: [x: "*"]
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator
