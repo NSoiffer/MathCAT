@@ -73,14 +73,21 @@
   match:
   - "*[1][self::m:mn][not(contains(., ',')) and text()<20]   and" # FI: Changed decimal point to decimal comma
   - "*[2][self::m:mn][not(contains(., ',')) and 2<= text() and text()<=10]" # FI: Changed decimal point to decimal comma
-  replace: [{x: ToCommonFraction(.)}]
+  variables: [IsPlural: "*[1]!=1"]
+  replace:
+  - x: "*[1]"
+  - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
+
 - name: common-fraction-mixed-number
   tag: fraction
   match:
   - "preceding-sibling::*[1][self::m:mo][text()='⁤'] and" # preceding element is invisible plus
   - "*[1][self::m:mn][not(contains(., ','))]   and" # FI: Changed decimal point to decimal comma
   - "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
-  replace: [{x: ToCommonFraction(.)}]
+  variables: [IsPlural: "*[1]!=1"]
+  replace:
+  - x: "*[1]"
+  - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 - name: simple
   # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
