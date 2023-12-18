@@ -184,7 +184,7 @@
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
   - bookmark: "./@id"
-  - T: "negatiiviset"      # phrase('negative' numbers are those less than 0)
+  - T: "negatiivinen"      # phrase('negative' infinity)
   - x: "*[1]"
 
 - name: positive
