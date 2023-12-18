@@ -306,7 +306,7 @@
   - bookmark: "*[2]/@id"
   - T: "kuutio"      # phrase(5 'cubed' equals 125)
 
-# next one might not work in Finnish
+# FI: this needs refactoring, maybe just simplifying?
 - name: simple-integer
   tag: power
   match: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
