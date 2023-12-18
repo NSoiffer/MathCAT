@@ -3,26 +3,26 @@
 
  - "¢": [T: "cent"]                                 #  0xa2    (en: 'cents')
  - "£": [T: "pund"]                                 #  0xa3    (en: 'pounds')
- - "¤": [t: "valuta tecken"]                        #  0xa4    (en: 'currency sign')
+ - "¤": [T: "valutatecken"]                        #  0xa4    (en: 'currency sign')
  - "¥": [T: "yen"]                                  #  0xa5
  - "¦": [T: "brutet streck"]                        #  0xa6    (en: 'broken bar')
  - "§": [T: "paragraf"]                         #  0xa7    (en: 'section')
  - "¨": [T: "två punkter"]                          #  0xa8    (en: 'double dot', MathPlayer: 'trema', google: 'dubbel prick')
  - "©": [T: "copyright"]                            #  0xa9    (en: 'copyright')
- - "ª": [t: "feminint ordinaltalstecken"]           #  0xaa    (en: 'feminine ordinal indicator', MathPlayer: 'feminine ordinal indicator', google: 'feminin ordinär indikator')
+ - "ª": [T: "feminint ordinaltalstecken"]           #  0xaa    (en: 'feminine ordinal indicator', MathPlayer: 'feminine ordinal indicator', google: 'feminin ordinär indikator')
  - "¬": [T: "inte"]                                 #  0xac    (en: 'not')
  - "«": [T: "vänster dubbelt pil-citat"]    #  0xab    (en: 'left-pointing double angle quote mark')
  - "¯":                                             #  0xaf
      - test:
         if: "ancestor::m:modified-variable and preceding-sibling::*[1][self::m:mi]"
-        then: [t: "bar"]                            #     (google translation)
+        then: [T: "streck"]                            #     (google translation)
         else: [T: "streck"]                         #     (en: 'line')
  - "²": [T: "kvadrat"]                              #  0xb2    (en: 'two', MathPlayer: 'exponent två', google: 'två')
  - "³": [T: "kubik"]                                #  0xb3    (en: 'three', MathPlayer: 'exponent tre', google: 'tre')
  - "´": [T: "akut accent"]                          #  0xb4    (en: 'acute')
  - "µ": [T: "mikro"]                          #  0xb5    (en: 'micro')
  - "¹": [T: "exponent ett"]                         #  0xb9    (en: 'one', google: 'ett')
- - "º": [t: "maskulint ordinaltalstecken"]          #  0xb9    (en: 'masculine ordinal indicator', MathPlayer: 'masculine ordinal indicator', google: 'maskulina ordinära indikatorer')
+ - "º": [T: "maskulint ordinaltalstecken"]          #  0xb9    (en: 'masculine ordinal indicator', MathPlayer: 'masculine ordinal indicator', google: 'maskulina ordinära indikatorer')
  - "·":
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
@@ -60,10 +60,10 @@
  - "ʿ": [T: "med vänstervänd halv ring efter"]    #  0x2bf    (en: 'modifier left half ring', google: 'modifierare lämnade halva ringen')
  - "ˀ": [T: "med litet glottalt stopp efter"]                #  0x2c0    (google translation)
  - "ˁ": [T: "med litet spegelvänt glottalt stopp efter"]        #  0x2c1    (en: 'modifier reversed glottal stop', google translation)
- - "˂": [t: "modifierare vänster pilspets"]         #  0x2c2    (en: 'modifier left arrowhead', google translation)
- - "˃": [t: "modifierare höger pilspets"]           #  0x2c3    (en: 'modifier right arrowhead', google translation)
- - "˄": [t: "modifier upp pilspetsen"]              #  0x2c4    (en: 'modifier up arrowhead', google translation)
- - "˅": [t: "modifierare ner pilspetsen"]           #  0x2c5    (en: 'modifier down arrowhead', google translation)
+ - "˂": [t: "med vänster pilspets efter"]         #  0x2c2    (en: 'modifier left arrowhead', google translation)
+ - "˃": [t: "med höger pilspets efter"]           #  0x2c3    (en: 'modifier right arrowhead', google translation)
+ - "˄": [t: "med pilspets uppåt efter"]              #  0x2c4    (en: 'modifier up arrowhead', google translation)
+ - "˅": [t: "med pilspets nedåt efter"]           #  0x2c5    (en: 'modifier down arrowhead', google translation)
  - "ˆ": [T: "med cirkumflex efter"]    #  0x2c6    (en: 'modifier circumflex accent', google: 'modifiercirumflex accent')
  - "ˇ": [T: "med hake efter"]                                 #  0x2c7    (en: 'caron', google: 'caron')
  - "ˈ": [T: "med vertikal linje efter"]           #  0x2c8    (en: 'modifier vertical line', google translation)
@@ -79,8 +79,8 @@
  - "˒": [T: "med låg högervänd halv ring efter"]    #  0x2d2    (en: 'modifier centered right half ring', google translation)
  - "˓": [T: "med låg vänstervänd halv ring efter"]    #  0x2d3    (en: 'modifier centered left half ring', google translation)
  #OTTO: Svårt att hitta vad "tack" skulle översättas till på svenska; den som är vänd åt höger verkar kallas "vändkors"
- - "˔": [t: "modifier upp tadck"]                   #  0x2d4    (en: 'modifier up tadck', google translation)
- - "˕": [t: "modifierare ner tack"]                 #  0x2d5    (en: 'modifier down tack', google translation)
+ - "˔": [t: "med uppåt tack efter"]                   #  0x2d4    (en: 'modifier up tadck', google translation)
+ - "˕": [t: "med nedåt tack efter"]                 #  0x2d5    (en: 'modifier down tack', google translation)
  - "˖": [T: "med lågt plustecken efter"]                   #  0x2d6    (google translation)
  - "˗": [T: "med lågt minustecken efter"]             #  0x2d7    (en: 'modifier minus sign', google translation)
  - "˘": [T: "med brevis efter"]                               #  0x2d8    (en: 'breve')
@@ -90,7 +90,7 @@
  - "˜": [T: "med litet tilde efter"]                                #  0x2dc    (en: 'small tilde')
  - "˝": [T: "med dubbel akut accent efter"]                   #  0x2dd    (en: 'double acute accent')
  - "˞": [T: "med rotisk hake efter"]                 #  0x2de    (google translation)
- - "˟": [t: "modifieringskors accent"]              #  0x2df    (en: 'modifier cross accent', google translation)
+ - "˟": [t: "med kors accent efter"]              #  0x2df    (en: 'modifier cross accent', google translation)
  - "ˠ": [T: "med litet gamma efter"]             #  0x2e0    (en: 'modifier small gamma', google translation)
  - "ˡ": [T: med litet l efter"]                  #  0x2e1    (en: 'modifier small l', google translation)
  - "ˢ": [T: "med litet s efter"]                     #  0x2e2    (google translation)
@@ -101,10 +101,10 @@
  - "˧": [T: "med mellan-tontecken efter"]             #  0x2e7    (en: 'modifier mid tone bar', google translation)
  - "˨": [T: "med lågt tontecken efter"]             #  0x2e8    (en: 'modifier low tone bar', google translation)
  - "˩": [T: "med extra lågt tontecken efter"]       #  0x2e9    (en: 'modifier extra-low tone bar', google translation)
- - "˪": [t: "modifierare yin avkastande tonmärke"]    #  0x2ea    (en: 'modifier yin departing tone mark', google translation)
- - "˫": [t: "modifierare yang avgår tonmärke"]      #  0x2eb    (en: 'modifier yang departing tone mark', google translation)
+ - "˪": [t: "med yin avvikande tontecken efter"]    #  0x2ea    (en: 'modifier yin departing tone mark', google translation)
+ - "˫": [t: "med yang avvikande tontecken efter"]      #  0x2eb    (en: 'modifier yang departing tone mark', google translation)
  - "ˬ": [T: "med lågt tonande tecken efter"]                  #  0x2ec    (en: 'modifier voicing', google translation)
- - "˭": [t: "modifierare oaspirerad"]               #  0x2ed    (en: 'modifier unaspirated', google translation)
+ - "˭": [t: "med oaspirerad tecken efter"]               #  0x2ed    (en: 'modifier unaspirated', google translation)
  - "ˮ": [T: "med dubbel apostrof efter"]          #  0x2ee    (en: 'modifier double apostrophe', google translation)
  - "˯": [T: "med låg nedåtpekande pilspets efter"]            #  0x2ef    (en: 'modifier low down arrowhead', google translation)
  - "˰": [T: "med låg uppåtpekande pilspets efter"]            #  0x2f0    (google translation)
@@ -120,15 +120,15 @@
  - "˺": [T: "med slut hög ton efter"]             #  0x2fa    (en: 'modifier end high tone', google translation)
  - "˻": [T: "med start låg ton efter"]           #  0x2fb    (en: 'modifier begin low tone', google translation)
  - "˼": [T: "med slut låg ton efter"]             #  0x2fc    (en: 'modifier end low tone', google translation)
- - "˽": [t: "modifierhylla"]                        #  0x2fd    (en: 'modifier shelf', google translation)
- - "˾": [t: "modifierare öppen hylla"]              #  0x2fe    (en: 'modifier open shelf', google translation)
+ - "˽": [t: "med hylla efter"]                        #  0x2fd    (en: 'modifier shelf', google translation)
+ - "˾": [t: "med öppen hylla efter"]              #  0x2fe    (en: 'modifier open shelf', google translation)
  - "˿": [T: "med låg vänsterpil efter"]             #  0x2ff    (en: 'modifier low left arrow', google translation)
  - "̀": [T: "med grav accent"]                   #  0x300    (en: 'grave accent embellishment', google: 'allvarlig accentutsmyckning')
  - "́": [T: "med akut accent"]               #  0x301    (en: 'acute accent embellishment', google: 'akut accentutsmyckning')
  - "̂": [T: "med circumflex"]                    #  0x302    (en: 'circumflex accent embellishment', google: 'circumflex accent utsmyckning')
  - "̃": [T: "med tilde"]                  #  0x303    (google: 'tilde utsmyckning')
  - "̄": [T: "med streck"]                    #  0x304    (en: 'macron embellishment', google: 'macron -utsmyckning')
- - "̅": [t: "overbar embellishment"]                #  0x305    (google: 'överbar utsmyckning')
+ - "̅": [t: "med streck"]                #  0x305    (google: 'överbar utsmyckning')
  - "̆": [T: "med brevis"]                    #  0x306    (en: 'breve embellishment', google: 'breve utsmyckning')
  - "̇": [T: "med prick"]              #  0x307    (google: 'prick ovanför utsmyckning')
  - "̈": [T: "med trema"]                     #  0x308    (en: 'diaeresis embellishment', google: 'diaeresis utsmyckning')
@@ -148,13 +148,13 @@
  - "̖": [T: "med grav accent under"]    #  0x316    (en: 'grave accent below embellishment', google translation)
  - "̗": [T: "med akut accent under"]        #  0x317    (en: 'acute accent below embellishment', google translation)
  #OTTO: "right tack" = vändkors?
- - "̘": [t: "vänster tack under utsmyckning"]       #  0x318    (en: 'left tack below embellishment', google translation)
- - "̙": [t: "höger tack under utsmyckning"]         #  0x319    (en: 'right tack below embellishment', google translation)
- - "̚": [t: "vänster vinkel ovanför utsmyckning"]    #  0x31a    (en: 'left angle above embellishment', google translation)
+ - "̘": [t: "med vänster tack under"]       #  0x318    (en: 'left tack below embellishment', google translation)
+ - "̙": [t: "med vändkors under"]         #  0x319    (en: 'right tack below embellishment', google translation)
+ - "̚": [t: "med vänster vinkel"]    #  0x31a    (en: 'left angle above embellishment', google translation)
  - "̛": [T: "med horn"]                      #  0x31b    (en: 'horn embellishment', google translation)
  - "̜": [T: "med vänstervänd halvring under"]    #  0x31c    (en: 'left half ring below embellishment', google translation)
- - "̝": [t: "upp tacka under utsmyckningen"]        #  0x31d    (en: 'up tack below embellishment', google translation)
- - "̞": [t: "ned tacka under utsmyckningen"]        #  0x31e    (en: 'down tack below embellishment', google translation)
+ - "̝": [t: "med uppåt tack under"]        #  0x31d    (en: 'up tack below embellishment', google translation)
+ - "̞": [t: "med nedåt tack under"]        #  0x31e    (en: 'down tack below embellishment', google translation)
  - "̟": [T: "med plus under"]        #  0x31f    (en: 'plus sign below embellishment', google translation)
  - "̠": [T: "med minus under"]       #  0x320    (en: 'minus sign below embellishment', google translation)
  - "̡": [T: "med palatalkrok under"]    #  0x321    (en: 'palatalized hook below embellishment', google translation)
@@ -166,7 +166,7 @@
  - "̧": [T: "med cedilj under"]                 #  0x327    (en: 'cedilla embellishment', google: 'cedilla -utsmyckning')
  - "̨": [T: "med svans under"]                                #  0x328    (en: 'ogonek embellishment', google translation)
  - "̩": [T: "med vertikal linje under"]     #  0x329    (en: 'vertical line below embellishment', google translation)
- - "̪": [t: "bro under utsmyckning"]                #  0x32a    (en: 'bridge below embellishment', google translation)
+ - "̪": [t: "med bro under"]                #  0x32a    (en: 'bridge below embellishment', google translation)
  - "̫": [T: "med omvänd dubbelbåge under"]    #  0x32b    (en: 'inverted double arch below embellishment', google translation)
  - "̬": [T: "med hake under"]              #  0x32c    (en: 'caron below embellishment', google translation)
  - "̭": [T: "med omvänd hake under"]    #  0x32d    (en: 'circumflex accent below embellishment', google translation)
@@ -179,15 +179,15 @@
  - "̴": [T: "med tilde mitt på"]       #  0x334    (en: 'tilde overlay embellishment', google translation)
  - "̵": [T: "med streck mitt på"]                #  0x335    (en: 'short stroke overlay embellishment', google translation)
  - "̶": [T: "med linje på"]    #  0x336    (en: 'long stroke overlay embellishment', google translation)
- - "̷": [t: "kort solidus -överläggningsutsmyckning"]    #  0x337    (en: 'short solidus overlay embellishment', google translation)
- - "̸": [t: "forward slash embellishment"]          #  0x338    (en: 'long solidus overlay embellishment', google: 'long solidus overlay embelling')
+ - "̷": [t: "med kort solidus på"]    #  0x337    (en: 'short solidus overlay embellishment', google translation)
+ - "̸": [t: "med lång solidus på"]          #  0x338    (en: 'long solidus overlay embellishment', google: 'long solidus overlay embelling')
  - "̹": [T: "med högervänd halvring under"]    #  0x339    (en: 'right half ring below embellishment', google translation)
- - "̺": [t: "inverterad bro under utsmyckning"]     #  0x33a    (en: 'inverted bridge below embellishment', google translation)
+ - "̺": [t: "med inverterad bro under"]     #  0x33a    (en: 'inverted bridge below embellishment', google translation)
  - "̻": [T: "med fyrkant under"]            #  0x33b    (en: 'square below embellishment', google translation)
- - "̼": [t: "seagull under utsmyckning"]            #  0x33c    (en: 'seagull below embellishment', google translation)
+ - "̼": [t: "med mås under"]            #  0x33c    (en: 'seagull below embellishment', google translation)
  - "̽": [T: "med x ovanför"]                #  0x33d    (en: 'x above embellishment', google translation)
  - "̾": [T: "med vertikal tilde"]           #  0x33e    (en: 'vertical tilde embellishment', google translation)
- - "̿": [t: "dubbel överlinje utsmyckning"]         #  0x33f    (en: 'double overline embellishment', google translation)
+ - "̿": [t: "med dubbelstreck"]         #  0x33f    (en: 'double overline embellishment', google translation)
  - "̀": [T: "med grav ton"]                   #  0x340    (en: 'grave tone mark embellishment', google translation)
  - "́": [T: "med akut ton"]            #  0x341    (en: 'acute tone mark embellishment', google translation)
 
@@ -204,27 +204,27 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "versal"]                     #     (en: 'cap', google translation)
+            then: [T: "versal"]                     #     (en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
         replace: [spell: "translate('.', 'ΪΫϏ', 'ιυϗ')"]
-    - t: "med dialytika"                            #     (en: 'with dialytika', google translation)
- - "ϊ": [t: "iota med dialytika"]                   #  0x3ca    (en: 'iota with dialytika', google translation)
- - "ϋ": [t: "upsilon med dialytika"]                #  0x3cb    (en: 'upsilon with dialytika', google translation)
- - "ό": [t: "omicron med tonos"]                    #  0x3cc    (en: 'omicron with tonos', google translation)
- - "ύ": [t: "upsilon med tonos"]                    #  0x3cd    (en: 'upsilon with tonos', google translation)
+    - T: "med dialytika"                            #     (en: 'with dialytika', google translation)
+ - "ϊ": [T: "iota med dialytika"]                   #  0x3ca    (en: 'iota with dialytika', google translation)
+ - "ϋ": [T: "ypsilon med dialytika"]                #  0x3cb    (en: 'upsilon with dialytika', google translation)
+ - "ό": [t: "omikron med tonos"]                    #  0x3cc    (en: 'omicron with tonos', google translation)
+ - "ύ": [t: "ypsilon med tonos"]                    #  0x3cd    (en: 'upsilon with tonos', google translation)
  - "ώ": [t: "omega med tonos"]                      #  0x3ce    (en: 'omega with tonos', google translation)
- - "ϐ": [t: "grekiskt beta"]                        #  0x3d0    (en: 'beta')
- - "ϑ": [t: "grav accentnt theta"]                  #  0x3d1    (en: 'theta', google: 'theta')
- - "ϒ": [t: "grav accentnt ypsilon med krok"]       #  0x3d2    (en: 'upsilon with hook', google: 'upsilon med krok')
- - "ϓ": [t: "upsilon med akut och krok"]            #  0x3d3    (en: 'upsilon with acute and hook', google translation)
- - "ϔ": [t: "upsilon med diaeres och krok"]         #  0x3d4    (en: 'upsilon with diaeresis and hook', google translation)
- - "ϕ": [t: "straight phi"]                         #  0x3d5    (en: 'phi', google: 'phi')
- - "ϖ": [t: "grav accentnt pi"]                     #  0x3d6    (en: 'pi', google: 'pi')
- - "ϗ": [t: "grav accentnt kai"]                    #  0x3d7    (en: 'kai')
- - "ϵ": [t: "epsilon"]                              #  0x3f5
- - "϶": [t: "bakvänt epsilon"]                      #  0x3f6    (en: 'reversed epsilon')
+ - "ϐ": [T: "grekiskt beta"]                        #  0x3d0    (en: 'beta')
+ - "ϑ": [T: "theta"]                  #  0x3d1    (en: 'theta', google: 'theta')
+ - "ϒ": [T: "ypsilon med krok"]       #  0x3d2    (en: 'upsilon with hook', google: 'upsilon med krok')
+ - "ϓ": [T: "ypsilon med akut accent och krok"]            #  0x3d3    (en: 'upsilon with acute and hook', google translation)
+ - "ϔ": [T: "ypsilon med hiatus och krok"]         #  0x3d4    (en: 'upsilon with diaeresis and hook', google translation)
+ - "ϕ": [T: "fi"]                         #  0x3d5    (en: 'phi', google: 'phi')
+ - "ϖ": [T: "pi"]                     #  0x3d6    (en: 'pi', google: 'pi')
+ - "ϗ": [T: "kai"]                    #  0x3d7    (en: 'kai')
+ - "ϵ": [T: "epsilon"]                              #  0x3f5
+ - "϶": [T: "bakvänt epsilon"]                      #  0x3f6    (en: 'reversed epsilon')
  - "А-Я":                                           #  0x410 - 0x42f
     - test: 
         if: "$CapitalLetters_Beep"
@@ -238,7 +238,7 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "versal"]                     #     (en: 'cap', google translation)
+            then: [T: "versal"]                     #     (en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
@@ -275,15 +275,15 @@
  - "э": [T: "e"]                                    #  0x44d    (google: 'э')
  - "ю": [T: "ju"]                                   #  0x44e
  - "я": [T: "ja"]                                   #  0x44f
- - "‐": [t: "minus"]                                #  0x2010    (en: 'hyphen')
- - "‑": [t: "bindestreck utan radbrytning"]         #  0x2011    (en: 'hyphen', google: 'bindestreck')
- - "‒": [t: "numeriskt bindestreck"]                #  0x2012    (en: 'figure dash', google: 'figurstreck')
+ - "‐": [t: "bindestreck"]                                #  0x2010    (en: 'hyphen')
+ - "‑": [t: "bindestreck"]         #  0x2011    (en: 'hyphen', google: 'bindestreck')
+ - "‒": [t: "tankstreck"]                #  0x2012    (en: 'figure dash', google: 'figurstreck')
  - "–": [t: "tankstreck"]                           #  0x2013    (en: 'en dash')
  - "—": [t: "långt tankstreck"]                     #  0x2014    (en: 'em dash')
- - "―": [t: "horisontalt streck"]                   #  0x2015    (en: 'horizontal bar')
+ - "―": [t: "långt tankstreck"]                   #  0x2015    (en: 'horizontal bar')
  - "‖": [t: "dubbelt vertikalt streck"]             #  0x2016    (en: 'double vertical line')
- - "†": [t: "kors"]                                 #  0x2020    (en: 'dagger')
- - "‡": [t: "dubbelt kors"]                         #  0x2021    (en: 'double dagger')
+ - "†": [T: "kors"]                                 #  0x2020    (en: 'dagger')
+ - "‡": [T: "dubbelkors"]                         #  0x2021    (en: 'double dagger')
 
  - "•":                                             #  0x2022
     - test: 
@@ -298,87 +298,87 @@
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
             - "../*[1][text()='…']"
-        then: [t: "punkt punkt punkt"]              #     (en: 'dot dot dot', google translation)
+        then: [T: "punkt punkt punkt"]              #     (en: 'dot dot dot', google translation)
         else_test:                                  #  must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"
-            then: [t: "och så vidare"]              #     (en: 'and so on', google translation)
-            else: [t: "punkt punkt punkt"]          #     (en: 'and so on up to')
+            then: [T: "och så vidare"]              #     (en: 'and so on', google translation)
+            else: [T: "och så vidare upp till"]          #     (en: 'and so on up to')
 
- - "‰": [t: "promille"]                             #  0x2030    (en: 'per mille', MathPlayer: 'promilletecken')
- - "‱": [t: "baspunkt tecken"]                      #  0x2031    (en: 'per ten thousand')
- - "′": [t: "prim"]                                 #  0x2032    (en: 'prime')
- - "″": [t: "dubbelt prim"]                         #  0x2033    (en: 'double prime')
- - "‴": [t: "trippel prim"]                         #  0x2034    (en: 'triple prime')
- - "‵": [t: "bakvänt prim"]                         #  0x2035    (en: 'reversed prime')
- - "‶": [t: "bakvänt dubbel prim"]                  #  0x2036    (en: 'reversed double prime')
- - "‷": [t: "omvänt trippelt prim"]                 #  0x2037    (en: 'reversed triple prime', google: 'omvänd trippelprime')
- - "‸": [t: "inskjutningstecken"]                   #  0x2038    (en: 'to the', google: 'till')
- - "‹": [t: "enkelt vänstervridet citationstecken"]    #  0x2039    (en: 'single left pointing angle quote mark')
- - "›": [t: "enkelt högervridet citationstecken"]    #  0x203a    (en: 'single right pointing angle quote mark')
- - "‼": [t: "dubbla uttropstecken"]                 #  0x203c    (en: 'double factorial', google: 'dubbel faktorie')
- - "⁄": [t: "snedstreck"]                           #  0x2044    (en: 'divided by')
- - "⁅": [t: "vänster hakparentes med fjäder"]       #  0x2045    (en: 'left square bracket with quill', google: 'vänster fyrkantig konsol med quill')
- - "⁆": [t: "höger hakparentes med fjäder"]         #  0x2046    (en: 'right square bracket with quill', google: 'höger fyrkantig konsol med quill')
- - "⁗": [t: "kvadrupla prim"]                       #  0x2057    (en: 'quadruple prime', MathPlayer: 'quadruple prime', google: 'fyrdubbla prime')
+ - "‰": [T: "promille"]                             #  0x2030    (en: 'per mille', MathPlayer: 'promilletecken')
+ - "‱": [T: "per tio tusen"]                      #  0x2031    (en: 'per ten thousand')
+ - "′": [T: "prim"]                                 #  0x2032    (en: 'prime')
+ - "″": [T: "bis"]                         #  0x2033    (en: 'double prime')
+ - "‴": [T: "tris"]                         #  0x2034    (en: 'triple prime')
+ - "‵": [t: "omvänt prim"]                         #  0x2035    (en: 'reversed prime')
+ - "‶": [t: "omvänt bis"]                  #  0x2036    (en: 'reversed double prime')
+ - "‷": [t: "omvänt tris"]                 #  0x2037    (en: 'reversed triple prime', google: 'omvänd trippelprime')
+ - "‸": [T: "insättningstecken"]                   #  0x2038    (en: 'to the', google: 'till')
+ - "‹": [t: "vänsterriktat vinkelcitattecken"]    #  0x2039    (en: 'single left pointing angle quote mark')
+ - "›": [t: "högerriktat vinkelcitattecken"]    #  0x203a    (en: 'single right pointing angle quote mark')
+ - "‼": [T: "semifakultet"]                 #  0x203c    (en: 'double factorial', google: 'dubbel faktorie')
+ - "⁄": [T: "delat med"]                           #  0x2044    (en: 'divided by')
+ - "⁅": [T: "vänster piggparentes"]       #  0x2045    (en: 'left square bracket with quill', google: 'vänster fyrkantig konsol med quill')
+ - "⁆": [T: "höger piggparentes"]         #  0x2046    (en: 'right square bracket with quill', google: 'höger fyrkantig konsol med quill')
+ - "⁗": [t: "kvadrupelt prim"]                       #  0x2057    (en: 'quadruple prime', MathPlayer: 'quadruple prime', google: 'fyrdubbla prime')
  - "⁠": [t: ""]                                     #  0x2060
- - "⁰": [t: "till zeroth -kraften"]                 #  0x2070    (en: 'to the zeroth power', google translation)
- - "ⁱ": [t: "upphöjt i"]                            #  0x2071    (en: 'to the eihth power', google: 'till eihth power')
- - "⁴": [t: "till den fjärde kraften"]              #  0x2074    (en: 'to the fourth power', google translation)
- - "⁵": [t: "till den femte makten"]                #  0x2075    (en: 'to the fifth power', google translation)
- - "⁶": [t: "till den sjätte makten"]               #  0x2076    (en: 'to the sixth power', google translation)
- - "⁷": [t: "till den sjunde makten"]               #  0x2077    (en: 'to the seventh power', google translation)
- - "⁸": [t: "till ath -kraften"]                    #  0x2078    (en: 'to the eighth power', google translation)
- - "⁹": [t: "till den nionde kraften"]              #  0x2079    (en: 'to the ninth power', google translation)
- - "⁺": [t: "upphöjt plus"]                         #  0x207a    (en: 'superscript plus sign', google: 'superscript plus -skylt')
- - "⁻": [t: "upphöjt minus"]                        #  0x207b    (en: 'superscript minus', google: 'superscript minus')
- - "⁼": [t: "upphöjt likhetstecken"]                #  0x207c    (en: 'superscript equals sign', google: 'superscript är lika med tecken')
- - "⁽": [t: "upphöjd vänsterparentes"]              #  0x207d    (en: 'superscript left parenthesis', google: 'superscript lämnade parentesen')
- - "⁾": [t: "upphöjd högerparentes"]                #  0x207e    (en: 'superscript right parenthesis', google: 'superscript höger parentes')
- - "ⁿ": [t: "upphöjt n"]                            #  0x207f    (en: 'to the ennth power', google: 'till den ena kraften')
- - "₀": [t: "sub noll"]                             #  0x2080    (en: 'sub zero', google translation)
- - "₁": [t: "en under en"]                          #  0x2081    (en: 'sub one', google translation)
- - "₂": [t: "under två"]                            #  0x2082    (en: 'sub two', google translation)
- - "₃": [t: "under tre"]                            #  0x2083    (en: 'sub three', google translation)
- - "₄": [t: "under fyra"]                           #  0x2084    (en: 'sub four', google translation)
- - "₅": [t: "under fem"]                            #  0x2085    (en: 'sub five', google translation)
- - "₆": [t: "sub sex"]                              #  0x2086    (en: 'sub six', google translation)
- - "₇": [t: "under sju"]                            #  0x2087    (en: 'sub seven', google translation)
- - "₈": [t: "sub vid"]                              #  0x2088    (en: 'sub eight', google translation)
- - "₉": [t: "under nio"]                            #  0x2089    (en: 'sub nine', google translation)
- - "₊": [t: "nedsänkt plus"]                        #  0x208a    (en: 'subscript plus sign', google: 'subscript plus -skylt')
- - "₋": [t: "nedsänkt minus"]                       #  0x208b    (en: 'subscript minus sign', google: 'subscript minus sign')
- - "₌": [t: "nedsänkt likhetstecken"]               #  0x208c    (en: 'subscript equals sign', google: 'subscript är lika med tecken')
- - "₍": [t: "nedsänkt vänsterparentes"]             #  0x208d    (en: 'subscript left parenthesis', google: 'subscript vänster parentes av sig')
- - "₎": [t: "nedsänkt högerparentes"]               #  0x208e    (en: 'subscript right parenthesis', google: 'subscript höger parentes')
- - "ₐ": [t: "nedsänkt a"]                           #  0x2090    (en: 'sub A', google: 'sub a')
- - "ₑ": [t: "nedsänkt e"]                           #  0x2091    (en: 'sub E', google: 'sub e')
- - "ₒ": [t: "nedsänkt o"]                           #  0x2092    (en: 'sub O', google: 'under o')
- - "ₓ": [t: "nedsänkt x"]                           #  0x2093    (en: 'sub X', google: 'under x')
- - "ₕ": [t: "nedsänkt h"]                           #  0x2095    (en: 'sub H', google: 'under h')
- - "ₖ": [t: "nedsänkt k"]                           #  0x2096    (en: 'sub K', google: 'under k')
- - "ₗ": [t: "nedsänkt l"]                           #  0x2097    (en: 'sub L', google: 'under l')
- - "ₘ": [t: "nedsänkt m"]                           #  0x2098    (en: 'sub M', google: 'sub m')
- - "ₙ": [t: "nedsänkt n"]                           #  0x2099    (en: 'sub N', google: 'under n')
- - "ₚ": [t: "nedsänkt p"]                           #  0x209a    (en: 'sub P', google: 'sub p')
- - "ₛ": [t: "nedsänkt s"]                           #  0x209b    (en: 'sub S', google: 'sub s')
- - "ₜ": [t: "nedsänkt t"]                           #  0x209c    (en: 'sub T', google: 'under t')
- - "₠": [t: "europeiska nuvarande enheter"]         #  0x20a0    (en: 'european currenty units', google translation)
- - "₡": [t: "colons"]                               #  0x20a1
- - "₢": [t: "cruzeiro"]                             #  0x20a2
- - "₣": [t: "franc"]                                #  0x20a3
- - "₤": [t: "lira"]                                 #  0x20a4    (google: 'lire')
- - "₥": [t: "mills"]                                #  0x20a5
- - "₦": [t: "naira"]                                #  0x20a6
- - "₧": [t: "peseta"]                               #  0x20a7
- - "₨": [t: "rupees"]                               #  0x20a8    (google: 'rupier')
- - "₩": [t: "won"]                                  #  0x20a9    (google: 'vann')
- - "₪": [t: "new sheqels"]                          #  0x20aa    (google: 'nya sheqels')
- - "₫": [t: "dong"]                                 #  0x20ab
- - "€": [t: "euro"]                                 #  0x20ac    (en: 'euros')
+ - "⁰": [T: "upphöjt till noll"]                 #  0x2070    (en: 'to the zeroth power', google translation)
+ - "ⁱ": [T: "upphöjt till i"]                            #  0x2071    (en: 'to the eihth power', google: 'till eihth power')
+ - "⁴": [T: "upphöjt till fyra"]              #  0x2074    (en: 'to the fourth power', google translation)
+ - "⁵": [T: "upphöjt till fem"]                #  0x2075    (en: 'to the fifth power', google translation)
+ - "⁶": [T: "upphöjt till sex"]               #  0x2076    (en: 'to the sixth power', google translation)
+ - "⁷": [T: "upphöjt till sju"]               #  0x2077    (en: 'to the seventh power', google translation)
+ - "⁸": [T: "upphöjt till åtta"]                    #  0x2078    (en: 'to the eighth power', google translation)
+ - "⁹": [T: "upphöjt till nio"]              #  0x2079    (en: 'to the ninth power', google translation)
+ - "⁺": [T: "upphöjt plus"]                         #  0x207a    (en: 'superscript plus sign', google: 'superscript plus -skylt')
+ - "⁻": [T: "upphöjt minus"]                        #  0x207b    (en: 'superscript minus', google: 'superscript minus')
+ - "⁼": [T: "upphöjt likhetstecken"]                #  0x207c    (en: 'superscript equals sign', google: 'superscript är lika med tecken')
+ - "⁽": [T: "upphöjd vänsterparentes"]              #  0x207d    (en: 'superscript left parenthesis', google: 'superscript lämnade parentesen')
+ - "⁾": [T: "upphöjd högerparentes"]                #  0x207e    (en: 'superscript right parenthesis', google: 'superscript höger parentes')
+ - "ⁿ": [T: "upphöjt till n"]                            #  0x207f    (en: 'to the ennth power', google: 'till den ena kraften')
+ - "₀": [T: "nedsänkt noll"]                             #  0x2080    (en: 'sub zero', google translation)
+ - "₁": [T: "nedsänkt ett"]                          #  0x2081    (en: 'sub one', google translation)
+ - "₂": [T: "nedsänkt två"]                            #  0x2082    (en: 'sub two', google translation)
+ - "₃": [T: "nedsänkt tre"]                            #  0x2083    (en: 'sub three', google translation)
+ - "₄": [T: "nedsänkt fyra"]                           #  0x2084    (en: 'sub four', google translation)
+ - "₅": [T: "nedsänkt fem"]                            #  0x2085    (en: 'sub five', google translation)
+ - "₆": [T: "nedsänkt sex"]                              #  0x2086    (en: 'sub six', google translation)
+ - "₇": [T: "nedsänkt sju"]                            #  0x2087    (en: 'sub seven', google translation)
+ - "₈": [T: "nedsänkt åtta"]                              #  0x2088    (en: 'sub eight', google translation)
+ - "₉": [T: "nedsänkt nio"]                            #  0x2089    (en: 'sub nine', google translation)
+ - "₊": [T: "nedsänkt plus"]                        #  0x208a    (en: 'subscript plus sign', google: 'subscript plus -skylt')
+ - "₋": [T: "nedsänkt minus"]                       #  0x208b    (en: 'subscript minus sign', google: 'subscript minus sign')
+ - "₌": [T: "nedsänkt likhetstecken"]               #  0x208c    (en: 'subscript equals sign', google: 'subscript är lika med tecken')
+ - "₍": [T: "nedsänkt vänsterparentes"]             #  0x208d    (en: 'subscript left parenthesis', google: 'subscript vänster parentes av sig')
+ - "₎": [T: "nedsänkt högerparentes"]               #  0x208e    (en: 'subscript right parenthesis', google: 'subscript höger parentes')
+ - "ₐ": [T: "nedsänkt a"]                           #  0x2090    (en: 'sub A', google: 'sub a')
+ - "ₑ": [T: "nedsänkt e"]                           #  0x2091    (en: 'sub E', google: 'sub e')
+ - "ₒ": [T: "nedsänkt o"]                           #  0x2092    (en: 'sub O', google: 'under o')
+ - "ₓ": [T: "nedsänkt x"]                           #  0x2093    (en: 'sub X', google: 'under x')
+ - "ₕ": [T: "nedsänkt h"]                           #  0x2095    (en: 'sub H', google: 'under h')
+ - "ₖ": [T: "nedsänkt k"]                           #  0x2096    (en: 'sub K', google: 'under k')
+ - "ₗ": [T: "nedsänkt l"]                           #  0x2097    (en: 'sub L', google: 'under l')
+ - "ₘ": [T: "nedsänkt m"]                           #  0x2098    (en: 'sub M', google: 'sub m')
+ - "ₙ": [T: "nedsänkt n"]                           #  0x2099    (en: 'sub N', google: 'under n')
+ - "ₚ": [T: "nedsänkt p"]                           #  0x209a    (en: 'sub P', google: 'sub p')
+ - "ₛ": [T: "nedsänkt s"]                           #  0x209b    (en: 'sub S', google: 'sub s')
+ - "ₜ": [T: "nedsänkt t"]                           #  0x209c    (en: 'sub T', google: 'under t')
+ - "₠": [T: "europeiska valutaenheter"]         #  0x20a0    (en: 'european currenty units', google translation)
+ - "₡": [T: "colons"]                               #  0x20a1
+ - "₢": [T: "cruzeiro"]                             #  0x20a2
+ - "₣": [T: "franc"]                                #  0x20a3
+ - "₤": [T: "lire"]                                 #  0x20a4    (google: 'lire')
+ - "₥": [T: "mills"]                                #  0x20a5
+ - "₦": [T: "naira"]                                #  0x20a6
+ - "₧": [T: "pesetas"]                               #  0x20a7
+ - "₨": [T: "rupier"]                               #  0x20a8    (google: 'rupier')
+ - "₩": [T: "won"]                                  #  0x20a9    (google: 'vann')
+ - "₪": [T: "nya sheqels"]                          #  0x20aa    (google: 'nya sheqels')
+ - "₫": [T: "dong"]                                 #  0x20ab
+ - "€": [T: "euro"]                                 #  0x20ac    (en: 'euros')
  - "₭": [t: "kip"]                                  #  0x20ad    (google: 'slaf')
  - "₮": [t: "tugrik"]                               #  0x20ae
- - "₯": [t: "drachma"]                              #  0x20af    (google: 'drakma')
- - "₰": [t: "german pennies"]                       #  0x20b0    (google: 'tyska pennies')
+ - "₯": [t: "drakmer"]                              #  0x20af    (google: 'drakma')
+ - "₰": [t: "tyska pennies"]                       #  0x20b0    (google: 'tyska pennies')
  - "₱": [t: "pesos"]                                #  0x20b1
  - "₲": [t: "guaranis"]                             #  0x20b2
  - "₳": [t: "australs"]                             #  0x20b3    (google: 'österral')
@@ -387,27 +387,27 @@
  - "₶": [t: "livre tournois"]                       #  0x20b6    (google translation)
  - "₷": [t: "spesmilos"]                            #  0x20b7    (google translation)
  - "₸": [t: "tenges"]                               #  0x20b8    (google translation)
- - "₹": [t: "indiska rupier"]                       #  0x20b9    (en: 'indian rupees', google translation)
- - "₺": [t: "turkiska liras"]                       #  0x20ba    (en: 'turkish liras', google translation)
- - "⃐": [t: "vänster harpoon embellishment up"]     #  0x20d0    (en: 'left harpoon above embellishment', google: 'vänster harpoon ovanför utsmyckning')
- - "⃑": [t: "höger harpoon embellishment up"]       #  0x20d1    (en: 'right harpoon above embellishment', google: 'höger harpoon ovanför utsmyckning')
- - "⃒": [t: "lång vertikal linjeöverlagring"]       #  0x20d2    (en: 'long vertical line overlay embellishment', google translation)
- - "⃓": [t: "kort vertikal linjeöverlagring"]       #  0x20d3    (en: 'short vertical line overlay embellishment', google translation)
- - "⃔": [t: "antikvis pil över utsmyckningen"]      #  0x20d4    (en: 'anticlockwise arrow above embellishment', google translation)
- - "⃕": [t: "medurs pil över utsmyckning"]          #  0x20d5    (en: 'clockwise arrow above embellishment', google translation)
- - "⃖": [t: "vänster arrow embellishment"]          #  0x20d6    (en: 'left arrow above embellishment', google: 'vänster pil över utsmyckningen')
- - "⃗": [t: "höger arrow embellishment"]            #  0x20d7    (en: 'right arrow above embellishment', google: 'högerpil över utsmyckning')
- - "⃘": [t: "ring överlägg utsmyckning"]            #  0x20d8    (en: 'ring overlay embellishment', google translation)
- - "⃙": [t: "medurs ring överläggande utsmyckning"]    #  0x20d9    (en: 'clockwise ring overlay embellishment', google translation)
- - "⃚": [t: "antikurs ringöverlägg utsmyckning"]    #  0x20da    (en: 'anticlockwise ring overlay embellishment', google translation)
+ - "₹": [T: "indiska rupier"]                       #  0x20b9    (en: 'indian rupees', google translation)
+ - "₺": [T: "turkiska lire"]                       #  0x20ba    (en: 'turkish liras', google translation)
+ - "⃐": [t: "med vänster harpun"]     #  0x20d0    (en: 'left harpoon above embellishment', google: 'vänster harpoon ovanför utsmyckning')
+ - "⃑": [t: "med höger harpun"]       #  0x20d1    (en: 'right harpoon above embellishment', google: 'höger harpoon ovanför utsmyckning')
+ - "⃒": [t: "med långt vertikalt streck på"]       #  0x20d2    (en: 'long vertical line overlay embellishment', google translation)
+ - "⃓": [t: "med kort vertikalt streck på"]       #  0x20d3    (en: 'short vertical line overlay embellishment', google translation)
+ - "⃔": [t: "med moturs pil"]      #  0x20d4    (en: 'anticlockwise arrow above embellishment', google translation)
+ - "⃕": [t: "med medurs pil"]          #  0x20d5    (en: 'clockwise arrow above embellishment', google translation)
+ - "⃖": [t: "med vänsterpil"]          #  0x20d6    (en: 'left arrow above embellishment', google: 'vänster pil över utsmyckningen')
+ - "⃗": [t: "med högerpil"]            #  0x20d7    (en: 'right arrow above embellishment', google: 'högerpil över utsmyckning')
+ - "⃘": [t: "med ring på"]            #  0x20d8    (en: 'ring overlay embellishment', google translation)
+ - "⃙": [t: "med medurs ring på"]    #  0x20d9    (en: 'clockwise ring overlay embellishment', google translation)
+ - "⃚": [t: "med moturs pil på"]    #  0x20da    (en: 'anticlockwise ring overlay embellishment', google translation)
  - "⃛": [T: "tre punkter"]       #  0x20db    (en: 'triple dot', google: 'triple dot')
  - "⃜": [T: "fyra punkter"]      #  0x20dc    (en: 'quadruple dot', google: 'fyrdubbla prick')
- - "⃝": [t: "inneslutande cirkelutsmyckning"]       #  0x20dd    (en: 'enclosing circle embellishment', google translation)
- - "⃞": [t: "omslutande av fyrkantig utsmyckning"]    #  0x20de    (en: 'enclosing square embellishment', google translation)
- - "⃟": [t: "omslutande av diamantutsmyckning"]     #  0x20df    (en: 'enclosing diamond embellishment', google translation)
- - "⃠": [t: "omslutande av cirkel backslash -utsmyckning"]    #  0x20e0    (en: 'enclosing circle backslash embellishment', google translation)
- - "⃡": [t: "vänster höger arrow embellishment"]    #  0x20e1    (en: 'left right arrow above embellishment', google: 'vänster höger pil över utsmyckningen')
- - "⃢": [t: "omslutande av skärmutsmyckning"]       #  0x20e2    (en: 'enclosing screen embellishment', google translation)
+ - "⃝": [t: "med omslutande cirkel"]       #  0x20dd    (en: 'enclosing circle embellishment', google translation)
+ - "⃞": [t: "med omslutande fyrkant"]    #  0x20de    (en: 'enclosing square embellishment', google translation)
+ - "⃟": [t: "med omslutande diamant"]     #  0x20df    (en: 'enclosing diamond embellishment', google translation)
+ - "⃠": [t: "med omslutande cirkel och omvänt snedstreck"]    #  0x20e0    (en: 'enclosing circle backslash embellishment', google translation)
+ - "⃡": [t: "med dubbelriktad pil"]    #  0x20e1    (en: 'left right arrow above embellishment', google: 'vänster höger pil över utsmyckningen')
+ - "⃢": [t: "med omslutande skärm"]       #  0x20e2    (en: 'enclosing screen embellishment', google translation)
  - "⃣": [t: "omslutande av keyuppercase -utsmyckning"]    #  0x20e3    (en: 'enclosing keycap embellishment', google translation)
  - "⃤": [t: "omslutande uppåt pekande triangelutsmyckning"]    #  0x20e4    (en: 'enclosing upward pointing triangle embellishment', google translation)
  - "⃥": [t: "omvänd solidus -överlägg utsmyckning"]    #  0x20e5    (en: 'reverse solidus overlay embellishment', google translation)
@@ -428,15 +428,15 @@
  - "ℇ": [t: "euler konstant"]                       #  0x2107    (en: 'euler's constant', google: 'eulers konstant')
  - "℈": [t: "skrupler"]                             #  0x2108    (en: 'scruples', google translation)
  - "℉": [t: "grader fahrenheit"]                    #  0x2109    (en: 'degrees fahrenheit')
- - "ℊ": [t: "skript g"]                             #  0x210a    (en: 'script g')
+ - "ℊ": [t: "skrivstilt g"]                             #  0x210a    (en: 'script g')
  - "ℌℑℨℭ":                                          #  0x210c, 0x2111, 0x2128, 0x212d
-    - t: "skript g"                                 #     (en: 'fraktur', google: 'fraktur')
+    - t: "skrivstilt g"                                 #     (en: 'fraktur', google: 'fraktur')
     - spell: "translate('.', 'ℌℑℨℭ', 'HIZC')"
 
  - "ℍℙℾℿ":                                          #  0x210d, 0x2119, 0x213e, 0x213f
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "dubbel slog"]                   #     (en: 'double struck', google translation)
+         then: [t: "dubbelslaget"]                   #     (en: 'double struck', google translation)
     - spell: "translate('.', 'ℍℙℾℿ', 'HPΓΠ')" 
 
  - "ℎ": [t: "planck constant"]                      #  0x210e
@@ -450,7 +450,7 @@
     - t: "h streck"                                 #     (en: 'script')
     - spell: "translate('.', 'ℐℒ℘ℬℰℱℳ', 'ILPBEFM')"
 
- - "ℓ": [t: "skript l"]                             #  0x2113    (en: 'script l')
+ - "ℓ": [t: "skrivstilt l"]                             #  0x2113    (en: 'script l')
  - "℔": [t: "l b stapel"]                           #  0x2114    (en: 'pounds', google: 'pund')
  - "№": [t: "numero tecken"]                        #  0x2116    (en: 'number')
  - "℥": [t: "ounce sign"]                           #  0x2125    (en: 'ounces')
@@ -459,7 +459,7 @@
  - "℩": [t: "roterat jota"]                         #  0x2129    (en: 'turned iota', google: 'vände iota')
  - "K": [t: "grader kelvin"]                        #  0x212a    (en: 'kelvin')
  - "Å": [t: "angstroms"]                            #  0x212b
- - "ℯ": [t: "skript e"]                             #  0x212f    (en: 'script e')
+ - "ℯ": [t: "skrivstilt e"]                             #  0x212f    (en: 'script e')
 
    # coalesced some chars that use cap letters
  - "Ⅎ℺⅁⅂⅃⅄":                                        #  0x2132, 0x213a, 0x2141, 0x2142, 0x2143, 0x2144
@@ -470,17 +470,17 @@
         then: [t: "vände"]                          #     (en: 'turned', google translation)
       - else_if: "'.' = '⅃'"
         then: [t: "omvänd sans-serif"]              #     (en: 'reversed sans-serif', google translation)
-        else: [t: "skript e"]                       #     (en: 'turned sans-serif', google: 'vände sans-serif')
+        else: [t: "skrivstilt e"]                       #     (en: 'turned sans-serif', google: 'vände sans-serif')
     - spell: "translate('.', 'Ⅎ℺⅁⅂⅃⅄', 'FQGLLY')"
 
- - "ℴ": [t: "skript o"]                             #  0x2134    (en: 'script o')
+ - "ℴ": [t: "skrivstilt o"]                             #  0x2134    (en: 'script o')
  - "ℵ": [t: "alef"]                                 #  0x2135    (en: 'first transfinite cardinal')
  - "ℶ": [t: "bet"]                                  #  0x2136    (en: 'second transfinite cardinal')
  - "ℷ": [t: "gimel"]                                #  0x2137    (en: 'third transfinite cardinal')
  - "ℸ": [t: "dalet"]                                #  0x2138    (en: 'fourth transfinite cardinal')
- - "ℼ": [t: "pi med dubbelstreck"]                  #  0x213c    (en: 'double struck pi', google: 'dubbel slog pi')
- - "ℽ": [t: "gamma med dubbelstreck"]               #  0x213d    (en: 'double struck gamma', google: 'dubbel slog gamma')
- - "⅀": [t: "summatecken med dubbelstreck"]         #  0x2140    (en: 'double struck n-ary summation', google: 'dubbel slog n-ary-sammanfattning')
+ - "ℼ": [t: "pi med dubbelstreck"]                  #  0x213c    (en: 'double struck pi', google: 'dubbelslaget pi')
+ - "ℽ": [t: "gamma med dubbelstreck"]               #  0x213d    (en: 'double struck gamma', google: 'dubbelslaget gamma')
+ - "⅀": [t: "summatecken med dubbelstreck"]         #  0x2140    (en: 'double struck n-ary summation', google: 'dubbelslaget n-ary-sammanfattning')
  - "⅋": [t: "vänt och-tecken"]                      #  0x214b    (en: 'turned ampersand', google: 'vände ampersand')
  - "⅌": [t: "per-tecken"]                           #  0x214c    (en: 'per', google: 'per')
  - "ⅎ": [t: "vänt gement f"]                        #  0x214e    (en: 'turned F', google: 'vände f')
@@ -3062,14 +3062,14 @@
     - spell: "translate('.', '𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                           #  0xf040 - 0xf059
-    - t: "fraktur fetstilt"                             #     (google translation)
+    - T: "fraktur fetstilt"                             #     (google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝖆-𝖟":                                           #  0x1d586 - 0x1d59f
-    - t: "fraktur bold"                             #     (google translation)
+    - T: "fraktur fetstilt"                             #     (google translation)
     - spell: "translate('.', '𝖆𝖇𝖈𝖉𝖊𝖋𝖌𝖍𝖎𝖏𝖐𝖑𝖒𝖓𝖔𝖕𝖖𝖗𝖘𝖙𝖚𝖛𝖜𝖝𝖞𝖟', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                           #  0xf05a - 0xf073
-    - t: "fraktur bold"                             #     (google translation)
+    - T: "fraktur fetstilt"                             #     (google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  # double struck (blackboard bold) chars in math alphabetic block and also MathType private use area
@@ -3083,63 +3083,64 @@
  - "-":                                           #  0xf080 - 0xf098
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "dubbel slog"]                   #     (en: 'double struck', google translation)
+         then: [T: "dubbelslaget"]                   #     (en: 'double struck', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝕒-𝕫":                                           #  0x1d552 - 0x1d56b
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "dubbel slog"]                   #     (en: 'double struck', google translation)
+         then: [T: "dubbelslaget"]                   #     (en: 'double struck', google translation)
     - spell: "translate('.', '𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                           #  0xf09a - 0xf0b3
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "dubbel slog"]                   #     (en: 'double struck', google translation)
+         then: [T: "dubbelslaget"]                   #     (en: 'double struck', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  - "𝟘-𝟡":                                           #  0x1d7d8 - 0x1d7e1
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "dubbel slog"]                   #     (en: 'double struck', google translation)
+         then: [T: "dubbelslaget"]                   #     (en: 'double struck', google translation)
     - spell: "translate('.', '𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡', '0123456789')"
  - "-":                                           #  0xf0c0 - 0xf0c9
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "dubbel slog"]                   #     (en: 'double struck', google translation)
+         then: [T: "dubbelslaget"]                   #     (en: 'double struck', google translation)
     - spell: "translate('.', '', '0123456789')"
 
- - "": [t: "dubbel slog nabla"]                    #  0xf0ca    (en: 'double struck nabla', google translation)
- - "": [t: "dubbel slog euler -konstant"]          #  0xf0cb    (en: 'double struck euler constant', google translation)
+ - "": [T: "dubbelslaget nabla"]                    #  0xf0ca    (en: 'double struck nabla', google translation)
+ - "": [T: "dubbelslagen eulerkonstant"]          #  0xf0cb    (en: 'double struck euler constant', google translation)
  
  # script chars in math alphabetic block and also MathType private use area
+ # SWEDISH: We've used "skrivstilt" instead of skrivstilt for clarity
  - "𝒜-𝒵":                                           #  0x1d49c - 0x1d4b5
-    - t: "manus"                                    #     (en: 'script', google translation)
+    - T: "skrivstilt"                                    #     (en: 'script', google translation)
     - spell: "translate('.', '𝒜𝒝𝒞𝒟𝒠𝒡𝒢𝒣𝒤𝒥𝒦𝒧𝒨𝒩𝒪𝒫𝒬𝒭𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                           #  0xf100 - 0xf119
-    - t: "manus"                                    #     (en: 'script', google translation)
+    - T: "skrivstilt"                                    #     (en: 'script', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝒶-𝓏":                                           #  0x1d4b6 - 0x1d4cf
-    - t: "manus"                                    #     (en: 'script', google translation)
+    - T: "skrivstilt"                                    #     (en: 'script', google translation)
     - spell: "translate('.', '𝒶𝒷𝒸𝒹𝒺𝒻𝒼𝒽𝒾𝒿𝓀𝓁𝓂𝓃𝓄𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                           #  0xf11a - 0xf133
-    - t: "manus"                                    #     (en: 'script', google translation)
+    - T: "skrivstilt"                                    #     (en: 'script', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  # bold script chars in math alphabetic block and also MathType private use area
  - "𝓐-𝓩":                                           #  0x1d4d0 - 0x1d4e9
-    - t: "skript djärvt"                            #     (en: 'script bold', google translation)
+    - T: "skrivstilt fetstilt"                            #     (en: 'script bold', google translation)
     - spell: "translate('.', '𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                           #  0xf140 - 0xf159
-    - t: "skript djärvt"                            #     (en: 'script bold', google translation)
+    - T: "skrivstilt fetstilt"                            #     (en: 'script bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝓪-𝔃":                                           #  0x1d4ea - 0x1d503
-    - t: "skript djärvt"                            #     (en: 'script bold', google translation)
+    - T: "skrivstilt fetstilt"                            #     (en: 'script bold', google translation)
     - spell: "translate('.', '𝓪𝓫𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                           #  0xf15a - 0xf173
-    - t: "skript djärvt"                            #     (en: 'script bold', google translation)
+    - T: "skrivstilt fetstilt"                            #     (en: 'script bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                           #  0xf180 - 0xf199
@@ -3158,7 +3159,7 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "versal"]                     #     (en: 'cap', google translation)
+            then: [T: "versal"]                     #     (en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
@@ -3176,11 +3177,11 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "versal"]                     #     (en: 'cap', google translation)
+            then: [T: "versal"]                     #     (en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        replace: [t: "skarp s"]                     #     (en: 'sharp s', google translation)
+        replace: [t: "skarpt s"]                     #     (en: 'sharp s', google translation)
  - "":                                             #  0xf19c
     - test: 
         if: "$CapitalLetters_Beep"
@@ -3194,42 +3195,42 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "versal"]                     #     (en: 'cap', google translation)
+            then: [T: "versal"]                     #     (en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        replace: [t: "o med stroke"]                #     (en: 'o with stroke', google translation)
+        replace: [t: "o med streck genom"]                #     (en: 'o with stroke', google translation)
 
  # MathType only has a few of the cap Greek letters in PUA
  - "":                                     #  0xf201 - 0xf209
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "dubbel slog"]                   #     (en: 'double struck', google translation)
+         then: [T: "dubbelslaget"]                   #     (en: 'double struck', google translation)
     - spell: "translate('.', '', 'ΔΨΛΠΣΘΓΩΥ')"
 
  - "-":                                           #  0xf220 - 0xf236
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "dubbel slog"]                   #     (en: 'double struck', google translation)
+         then: [T: "dubbelslaget"]                   #     (en: 'double struck', google translation)
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
- - "": [t: "dubbel slog slutlig sigma"]            #  0xf237    (en: 'double struck final sigma', google translation)
- - "": [t: "dubbel slog rho"]                      #  0xf250    (en: 'double struck rho', google translation)
- - "": [t: "dubbel slog phi"]                      #  0xf251    (en: 'double struck phi', google translation)
+ - "": [T: "dubbelslaget slutsigma"]            #  0xf237    (en: 'double struck final sigma', google translation)
+ - "": [T: "dubbelslaget rho"]                      #  0xf250    (en: 'double struck rho', google translation)
+ - "": [T: "dubbelslaget fi"]                      #  0xf251    (en: 'double struck phi', google translation)
  - "𝐀-𝐙":                                           #  0x1d400 - 0x1d419
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                           #  0xf260 - 0xf279
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝐚-𝐳":                                           #  0x1d41a - 0x1d433
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                           #  0xf27a - 0xf293
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝐴-𝑍":                                           #  0x1d434 - 0x1d44d
@@ -3246,22 +3247,22 @@
 
  - "𝑨-𝒁":                                           #  0x1d468 - 0x1d481
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                           #  0xf2c8 - 0xf2e1
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝒂-𝒛":                                           #  0x1d482 - 0x1d49b
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                           #  0xf2e2 - 0xf2fb
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝖠-𝖹":                                           #  0x1d5a0 - 0x1d5b9
@@ -3277,19 +3278,19 @@
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  
  - "𝗔-𝗭":                                           #  0x1d5d4 - 0x1d5ed
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                           #  0xf334 - 0xf34d
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝗮-𝘇":                                           #  0x1d5ee - 0x1d607
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                           #  0xf34e - 0xf367
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  - "𝘈-𝘡":                                           #  0x1d608 - 0x1d621
     # - t: "italic"
@@ -3308,22 +3309,22 @@
 
  - "𝘼-𝙕":                                           #  0x1d63c - 0x1d655
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                           #  0xf39c - 0xf3b5
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝙖-𝙯":                                           #  0x1d656 - 0x1d66f
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                           #  0xf3b6 - 0xf3cf
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝙰-𝚉":                                           #  0x1d670 - 0x1d689
@@ -3338,35 +3339,35 @@
  - "-":                                           #  0xf3ea - 0xf403
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
- - "": [t: "dotless i"]                            #  0xf404    (google translation)
+ - "": [t: "i utan prick"]                            #  0xf404    (google translation)
  - "𝚤": [t: "kursivt i utan prick"]                 #  0x1d6a4    (en: 'dotless i', google: 'dotless i')
  - "𝚥": [t: "kursivt j utan prick"]                 #  0x1d6a5    (en: 'dotless j', google: 'dotless j')
 
  - "𝚨-𝛀":                                           #  0x1d6a8 - 0x1d6c0
-    - t: "kursivt j utan prick"                     #     (en: 'bold', google: 'djärv')
+    - T: "fetstilt"                     #     (en: 'bold', google: 'djärv')
     - spell: "translate('.', '𝚨𝚩𝚪𝚫𝚬𝚭𝚮𝚯𝚰𝚱𝚲𝚳𝚴𝚵𝚶𝚷𝚸𝚹𝚺𝚻𝚼𝚽𝚾𝚿𝛀', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                           #  0xf408 - 0xf420
-    - t: "kursivt j utan prick"                     #     (en: 'bold', google: 'djärv')
+    - T: "fetstilt"                     #     (en: 'bold', google: 'djärv')
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝛂-𝛚":                                           #  0x1d6c2 - 0x1d6da
-    - t: "kursivt j utan prick"                     #     (en: 'bold', google: 'djärv')
+    - T: "fetstilt"                     #     (en: 'bold', google: 'djärv')
     - spell: "translate('.', '𝛂𝛃𝛄𝛅𝛆𝛇𝛈𝛉𝛊𝛋𝛌𝛍𝛎𝛏𝛐𝛑𝛒𝛓𝛔𝛕𝛖𝛗𝛘𝛙𝛚', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                           #  0xf422 - 0xf43a
-    - t: "kursivt j utan prick"                     #     (en: 'bold', google: 'djärv')
+    - T: "fetstilt"                     #     (en: 'bold', google: 'djärv')
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
- - "": [t: "djärv nabla"]                          #  0xf421    (en: 'bold nabla', google translation)
- - "𝛁": [t: "djärv nabla"]                          #  0x1d6c1    (en: 'bold nabla', google translation)
+ - "": [T: "fetstilt nabla"]                          #  0xf421    (en: 'bold nabla', google translation)
+ - "𝛁": [T: "fetstilt nabla"]                          #  0x1d6c1    (en: 'bold nabla', google translation)
 
  - "𝛛𝛜𝛝𝛞𝛟𝛠𝛡":                                       #  0x1D6DB - 0x1D6E1
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝛛𝛜𝛝𝛞𝛟𝛠𝛡', '∂εθκφρπ')"
 
  - "":                                       #  0xF43C - 0xF441
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', '∂εθκφρπ')"
 
  - "𝛢-𝛺":                                           #  0x1d6e2 - 0x1d6fa
@@ -3385,8 +3386,8 @@
       # - t: "italic"
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
- - "": [t: "kursiv nabla"]                         #  0xf45b    (en: 'italic nabla', google translation)
- - "𝛻": [t: "kursiv nabla"]                         #  0x1d6fb    (en: 'italic nabla', google translation)
+ - "": [T: "kursivt nabla"]                         #  0xf45b    (en: 'italic nabla', google translation)
+ - "𝛻": [T: "kursivt nabla"]                         #  0x1d6fb    (en: 'italic nabla', google translation)
 
  - "𝜕𝜖𝜗𝜘𝜙𝜚𝜛":                                       #  0x1d715 - 0x1d71b
       # - t: "italic"
@@ -3398,177 +3399,177 @@
 
  - "𝜜-𝜴":                                           #  0x1d71c - 0x1d734
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝜜𝜝𝜞𝜟𝜠𝜡𝜢𝜣𝜤𝜥𝜦𝜧𝜨𝜩𝜪𝜫𝜬𝜭𝜮𝜯𝜰𝜱𝜲𝜳𝜴', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                           #  0xf47c - 0xf494
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝜶-𝝎":                                           #  0x1d736 - 0x1d74e
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝜶𝜷𝜸𝜹𝜺𝜻𝜼𝜽𝜾𝜿𝝀𝝁𝝂𝝃𝝄𝝅𝝆𝝇𝝈𝝉𝝊𝝋𝝌𝝍𝝎', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                           #  0xf496 - 0xf4ae
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "𝝏𝝐𝝑𝝒𝝓𝝔𝝕":                                       #  0x1d74f - 0x1d755
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝝏𝝐𝝑𝝒𝝓𝝔𝝕', '∂εθκφρπ')"
 
  - "":                                       #  0xf422 - 0xf43a
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', '∂εθκφρπ')"
 
- - "𝜵": [t: "djärva kursiv nabla"]                  #  0x1d735    (en: 'bold italic nabla', google translation)
- - "": [t: "djärva kursiv nabla"]                  #  0xf495    (en: 'bold italic nabla', google translation)
+ - "𝜵": [T: "fetstilt kursivt nabla"]                  #  0x1d735    (en: 'bold italic nabla', google translation)
+ - "": [T: "fetstilt kursivt nabla"]                  #  0xf495    (en: 'bold italic nabla', google translation)
 
  - "𝝖-𝝮":                                           #  0x1d756 - 0x1d76e
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝝖𝝗𝝘𝝙𝝚𝝛𝝜𝝝𝝞𝝟𝝠𝝡𝝢𝝣𝝤𝝥𝝦𝝧𝝨𝝩𝝪𝝫𝝬𝝭𝝮', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
  - "-":                                           #  0xf4b6 - 0xf4ce
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝝰-𝞈":                                           #  0x1d770 - 0x1d788
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝝰𝝱𝝲𝝳𝝴𝝵𝝶𝝷𝝸𝝹𝝺𝝻𝝼𝝽𝝾𝝿𝞀𝞁𝞂𝞃𝞄𝞅𝞆𝞇𝞈', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                           #  0xf4d0 - 0xf4e8
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "𝞉𝞊𝞋𝞌𝞍𝞎𝞏":                                       #  0x1d789 - 0x1d78f
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝞉𝞊𝞋𝞌𝞍𝞎𝞏', '∂εθκφρπ')"
 
  - "":                                       #  0xf4e9 - 0xf4ef
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', '∂εθκφρπ')"
 
- - "": [t: "djärv nabla"]                          #  0xf4cf    (en: 'bold nabla', google translation)
- - "𝝯": [t: "djärv nabla"]                          #  0x1d76f    (en: 'bold nabla', google translation)
+ - "": [T: "fetstilt nabla"]                          #  0xf4cf    (en: 'bold nabla', google translation)
+ - "𝝯": [T: "fetstilt nabla"]                          #  0x1d76f    (en: 'bold nabla', google translation)
 
  - "𝞐-𝞨":                                           #  0x1d790 - 0x1d7a8
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝞐𝞑𝞒𝞓𝞔𝞕𝞖𝞗𝞘𝞙𝞚𝞛𝞜𝞝𝞞𝞟𝞠𝞡𝞢𝞣𝞤𝞥𝞦𝞧𝞨', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                           #  0xf4f0 - 0xf508
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝞪-𝟂":                                           #  0x1d7aa - 0x1d7c2
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝞪𝞫𝞬𝞭𝞮𝞯𝞰𝞱𝞲𝞳𝞴𝞵𝞶𝞷𝞸𝞹𝞺𝞻𝞼𝞽𝞾𝞿𝟀𝟁𝟂', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                           #  0xf50a - 0xf522
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "𝟃𝟄𝟅𝟆𝟇𝟈𝟉":                                       #  0x1d7c3 - 0x1d7c9
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝟃𝟄𝟅𝟆𝟇𝟈𝟉', '∂εθκφρπ')"
 
  - "":                                       #  0xf523 - 0xf529
     # - t: "bold italic"
-    - t: "djärv"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', '∂εθκφρπ')"
 
- - "": [t: "djärv nabla"]                          #  0xf509    (en: 'bold nabla', google translation)
- - "𝞩": [t: "djärv nabla"]                          #  0x1d7a9    (en: 'bold nabla', google translation)
+ - "": [T: "fetstilt nabla"]                          #  0xf509    (en: 'bold nabla', google translation)
+ - "𝞩": [T: "fetstilt nabla"]                          #  0x1d7a9    (en: 'bold nabla', google translation)
 
- - "": [t: "djärv noll"]                           #  0xf52e    (en: 'bold zero', google translation)
- - "𝟎": [t: "djärv noll"]                           #  0x1d7ce    (en: 'bold zero', google translation)
- - "": [t: "djärv"]                                #  0xf52f    (en: 'bold one', google translation)
- - "𝟏": [t: "djärv"]                                #  0x1d7cf    (en: 'bold one', google translation)
- - "": [t: "djärva två"]                           #  0xf530    (en: 'bold two', google translation)
- - "𝟐": [t: "djärva två"]                           #  0x1d7d0    (en: 'bold two', google translation)
- - "": [t: "djärva tre"]                           #  0xf531    (en: 'bold three', google translation)
- - "𝟑": [t: "djärva tre"]                           #  0x1d7d1    (en: 'bold three', google translation)
- - "": [t: "djärva fyra"]                          #  0xf532    (en: 'bold four', google translation)
- - "𝟒": [t: "djärva fyra"]                          #  0x1d7d2    (en: 'bold four', google translation)
- - "": [t: "djärva fem"]                           #  0xf533    (en: 'bold five', google translation)
- - "𝟓": [t: "djärva fem"]                           #  0x1d7d3    (en: 'bold five', google translation)
- - "": [t: "djärva sex"]                           #  0xf534    (en: 'bold six', google translation)
- - "𝟔": [t: "djärva sex"]                           #  0x1d7d4    (en: 'bold six', google translation)
- - "": [t: "djärva sju"]                           #  0xf535    (en: 'bold seven', google translation)
- - "𝟕": [t: "djärva sju"]                           #  0x1d7d5    (en: 'bold seven', google translation)
- - "": [t: "djärv vid"]                            #  0xf536    (en: 'bold eight', google translation)
- - "𝟖": [t: "djärv vid"]                            #  0x1d7d6    (en: 'bold eight', google translation)
- - "": [t: "djärv nio"]                            #  0xf537    (en: 'bold nine', google translation)
- - "𝟗": [t: "djärv nio"]                            #  0x1d7d7    (en: 'bold nine', google translation)
- - "": [t: "noll"]                                 #  0xf542    (en: 'zero', google translation)
- - "𝟢": [t: "noll"]                                 #  0x1d7e2    (en: 'zero', google translation)
- - "": [t: "ett"]                                  #  0xf543    (en: 'one', google translation)
- - "𝟣": [t: "ett"]                                  #  0x1d7e3    (en: 'one', google translation)
- - "": [t: "två"]                                  #  0xf544    (en: 'two', google translation)
- - "𝟤": [t: "två"]                                  #  0x1d7e4    (en: 'two', google translation)
- - "": [t: "tre"]                                  #  0xf545    (en: 'three', google translation)
- - "𝟥": [t: "tre"]                                  #  0x1d7e5    (en: 'three', google translation)
- - "": [t: "fyra"]                                 #  0xf546    (en: 'four', google translation)
- - "𝟦": [t: "fyra"]                                 #  0x1d7e6    (en: 'four', google translation)
- - "": [t: "fem"]                                  #  0xf547    (en: 'five', google translation)
- - "𝟧": [t: "fem"]                                  #  0x1d7e7    (en: 'five', google translation)
- - "": [t: "sex"]                                  #  0xf548    (en: 'six', google translation)
- - "𝟨": [t: "sex"]                                  #  0x1d7e8    (en: 'six', google translation)
- - "": [t: "sju"]                                  #  0xf549    (en: 'seven', google translation)
- - "𝟩": [t: "sju"]                                  #  0x1d7e9    (en: 'seven', google translation)
- - "": [t: "på"]                                   #  0xf54a    (en: 'eight', google translation)
- - "𝟪": [t: "på"]                                   #  0x1d7ea    (en: 'eight', google translation)
- - "": [t: "nio"]                                  #  0xf54b    (en: 'nine', google translation)
- - "𝟫": [t: "nio"]                                  #  0x1d7eb    (en: 'nine', google translation)
- - "": [t: "djärv noll"]                           #  0xf54c    (en: 'bold zero', google translation)
- - "𝟬": [t: "djärv noll"]                           #  0x1d7ec    (en: 'bold zero', google translation)
- - "": [t: "djärv"]                                #  0xf54d    (en: 'bold one', google translation)
- - "𝟭": [t: "djärv"]                                #  0x1d7ed    (en: 'bold one', google translation)
- - "": [t: "djärva två"]                           #  0xf54e    (en: 'bold two', google translation)
- - "𝟮": [t: "djärva två"]                           #  0x1d7ee    (en: 'bold two', google translation)
- - "": [t: "djärva tre"]                           #  0xf54f    (en: 'bold three', google translation)
- - "𝟯": [t: "djärva tre"]                           #  0x1d7ef    (en: 'bold three', google translation)
- - "": [t: "djärva fyra"]                          #  0xf550    (en: 'bold four', google translation)
- - "𝟰": [t: "djärva fyra"]                          #  0x1d7f0    (en: 'bold four', google translation)
- - "": [t: "djärva fem"]                           #  0xf551    (en: 'bold five', google translation)
- - "𝟱": [t: "djärva fem"]                           #  0x1d7f1    (en: 'bold five', google translation)
- - "": [t: "djärva sex"]                           #  0xf552    (en: 'bold six', google translation)
- - "𝟲": [t: "djärva sex"]                           #  0x1d7f2    (en: 'bold six', google translation)
- - "": [t: "djärva sju"]                           #  0xf553    (en: 'bold seven', google translation)
- - "𝟳": [t: "djärva sju"]                           #  0x1d7f3    (en: 'bold seven', google translation)
- - "": [t: "djärv vid"]                            #  0xf554    (en: 'bold eight', google translation)
- - "𝟴": [t: "djärv vid"]                            #  0x1d7f4    (en: 'bold eight', google translation)
- - "": [t: "djärv nio"]                            #  0xf555    (en: 'bold nine', google translation)
- - "𝟵": [t: "djärv nio"]                            #  0x1d7f5    (en: 'bold nine', google translation)
- - "": [t: "noll"]                                 #  0xf556    (en: 'zero', google translation)
- - "𝟶": [t: "noll"]                                 #  0x1d7f6    (en: 'zero', google translation)
- - "": [t: "ett"]                                  #  0xf557    (en: 'one', google translation)
- - "𝟷": [t: "ett"]                                  #  0x1d7f7    (en: 'one', google translation)
- - "": [t: "två"]                                  #  0xf558    (en: 'two', google translation)
- - "𝟸": [t: "två"]                                  #  0x1d7f8    (en: 'two', google translation)
- - "": [t: "tre"]                                  #  0xf559    (en: 'three', google translation)
- - "𝟹": [t: "tre"]                                  #  0x1d7f9    (en: 'three', google translation)
- - "": [t: "fyra"]                                 #  0xf55a    (en: 'four', google translation)
- - "𝟺": [t: "fyra"]                                 #  0x1d7fa    (en: 'four', google translation)
- - "": [t: "fem"]                                  #  0xf55b    (en: 'five', google translation)
- - "𝟻": [t: "fem"]                                  #  0x1d7fb    (en: 'five', google translation)
- - "": [t: "sex"]                                  #  0xf55c    (en: 'six', google translation)
- - "𝟼": [t: "sex"]                                  #  0x1d7fc    (en: 'six', google translation)
- - "": [t: "sju"]                                  #  0xf55d    (en: 'seven', google translation)
- - "𝟽": [t: "sju"]                                  #  0x1d7fd    (en: 'seven', google translation)
- - "": [t: "på"]                                   #  0xf55e    (en: 'eight', google translation)
- - "𝟾": [t: "på"]                                   #  0x1d7fe    (en: 'eight', google translation)
- - "": [t: "nio"]                                  #  0xf55f    (en: 'nine', google translation)
- - "𝟿": [t: "nio"]                                  #  0x1d7ff    (en: 'nine', google translation)
- - "": [t: "okänd karaktär"]                       #  0xf700    (en: 'unknown character', google translation)
+ - "": [T: "fetstilt noll"]                           #  0xf52e    (en: 'bold zero', google translation)
+ - "𝟎": [T: "fetstilt noll"]                           #  0x1d7ce    (en: 'bold zero', google translation)
+ - "": [T: "fetstilt ett"]                                #  0xf52f    (en: 'bold one', google translation)
+ - "𝟏": [T: "fetstilt ett"]                                #  0x1d7cf    (en: 'bold one', google translation)
+ - "": [T: "fetstilt två"]                           #  0xf530    (en: 'bold two', google translation)
+ - "𝟐": [T: "fetstilt två"]                           #  0x1d7d0    (en: 'bold two', google translation)
+ - "": [T: "fetstilt tre"]                           #  0xf531    (en: 'bold three', google translation)
+ - "𝟑": [T: "fetstilt tre"]                           #  0x1d7d1    (en: 'bold three', google translation)
+ - "": [T: "fetstilt fyra"]                          #  0xf532    (en: 'bold four', google translation)
+ - "𝟒": [T: "fetstilt fyra"]                          #  0x1d7d2    (en: 'bold four', google translation)
+ - "": [T: "fetstilt fem"]                           #  0xf533    (en: 'bold five', google translation)
+ - "𝟓": [T: "fetstilt fem"]                           #  0x1d7d3    (en: 'bold five', google translation)
+ - "": [T: "fetstilt sex"]                           #  0xf534    (en: 'bold six', google translation)
+ - "𝟔": [T: "fetstilt sex"]                           #  0x1d7d4    (en: 'bold six', google translation)
+ - "": [T: "fetstilt sju"]                           #  0xf535    (en: 'bold seven', google translation)
+ - "𝟕": [T: "fetstilt sju"]                           #  0x1d7d5    (en: 'bold seven', google translation)
+ - "": [T: "fetstilt vid"]                            #  0xf536    (en: 'bold eight', google translation)
+ - "𝟖": [T: "fetstilt vid"]                            #  0x1d7d6    (en: 'bold eight', google translation)
+ - "": [T: "fetstilt nio"]                            #  0xf537    (en: 'bold nine', google translation)
+ - "𝟗": [T: "fetstilt nio"]                            #  0x1d7d7    (en: 'bold nine', google translation)
+ - "": [T: "noll"]                                 #  0xf542    (en: 'zero', google translation)
+ - "𝟢": [T: "noll"]                                 #  0x1d7e2    (en: 'zero', google translation)
+ - "": [T: "ett"]                                  #  0xf543    (en: 'one', google translation)
+ - "𝟣": [T: "ett"]                                  #  0x1d7e3    (en: 'one', google translation)
+ - "": [T: "två"]                                  #  0xf544    (en: 'two', google translation)
+ - "𝟤": [T: "två"]                                  #  0x1d7e4    (en: 'two', google translation)
+ - "": [T: "tre"]                                  #  0xf545    (en: 'three', google translation)
+ - "𝟥": [T: "tre"]                                  #  0x1d7e5    (en: 'three', google translation)
+ - "": [T: "fyra"]                                 #  0xf546    (en: 'four', google translation)
+ - "𝟦": [T: "fyra"]                                 #  0x1d7e6    (en: 'four', google translation)
+ - "": [T: "fem"]                                  #  0xf547    (en: 'five', google translation)
+ - "𝟧": [T: "fem"]                                  #  0x1d7e7    (en: 'five', google translation)
+ - "": [T: "sex"]                                  #  0xf548    (en: 'six', google translation)
+ - "𝟨": [T: "sex"]                                  #  0x1d7e8    (en: 'six', google translation)
+ - "": [T: "sju"]                                  #  0xf549    (en: 'seven', google translation)
+ - "𝟩": [T: "sju"]                                  #  0x1d7e9    (en: 'seven', google translation)
+ - "": [T: "på"]                                   #  0xf54a    (en: 'eight', google translation)
+ - "𝟪": [T: "på"]                                   #  0x1d7ea    (en: 'eight', google translation)
+ - "": [T: "nio"]                                  #  0xf54b    (en: 'nine', google translation)
+ - "𝟫": [T: "nio"]                                  #  0x1d7eb    (en: 'nine', google translation)
+ - "": [T: "fetstilt noll"]                           #  0xf54c    (en: 'bold zero', google translation)
+ - "𝟬": [T: "fetstilt noll"]                           #  0x1d7ec    (en: 'bold zero', google translation)
+ - "": [T: "fetstilt"]                                #  0xf54d    (en: 'bold one', google translation)
+ - "𝟭": [T: "fetstilt"]                                #  0x1d7ed    (en: 'bold one', google translation)
+ - "": [T: "fetstilt två"]                           #  0xf54e    (en: 'bold two', google translation)
+ - "𝟮": [T: "fetstilt två"]                           #  0x1d7ee    (en: 'bold two', google translation)
+ - "": [T: "fetstilt tre"]                           #  0xf54f    (en: 'bold three', google translation)
+ - "𝟯": [T: "fetstilt tre"]                           #  0x1d7ef    (en: 'bold three', google translation)
+ - "": [T: "fetstilt fyra"]                          #  0xf550    (en: 'bold four', google translation)
+ - "𝟰": [T: "fetstilt fyra"]                          #  0x1d7f0    (en: 'bold four', google translation)
+ - "": [T: "fetstilt fem"]                           #  0xf551    (en: 'bold five', google translation)
+ - "𝟱": [T: "fetstilt fem"]                           #  0x1d7f1    (en: 'bold five', google translation)
+ - "": [T: "fetstilt sex"]                           #  0xf552    (en: 'bold six', google translation)
+ - "𝟲": [T: "fetstilt sex"]                           #  0x1d7f2    (en: 'bold six', google translation)
+ - "": [T: "fetstilt sju"]                           #  0xf553    (en: 'bold seven', google translation)
+ - "𝟳": [T: "fetstilt sju"]                           #  0x1d7f3    (en: 'bold seven', google translation)
+ - "": [T: "fetstilt vid"]                            #  0xf554    (en: 'bold eight', google translation)
+ - "𝟴": [T: "fetstilt vid"]                            #  0x1d7f4    (en: 'bold eight', google translation)
+ - "": [T: "fetstilt nio"]                            #  0xf555    (en: 'bold nine', google translation)
+ - "𝟵": [T: "fetstilt nio"]                            #  0x1d7f5    (en: 'bold nine', google translation)
+ - "": [T: "noll"]                                 #  0xf556    (en: 'zero', google translation)
+ - "𝟶": [T: "noll"]                                 #  0x1d7f6    (en: 'zero', google translation)
+ - "": [T: "ett"]                                  #  0xf557    (en: 'one', google translation)
+ - "𝟷": [T: "ett"]                                  #  0x1d7f7    (en: 'one', google translation)
+ - "": [T: "två"]                                  #  0xf558    (en: 'two', google translation)
+ - "𝟸": [T: "två"]                                  #  0x1d7f8    (en: 'two', google translation)
+ - "": [T: "tre"]                                  #  0xf559    (en: 'three', google translation)
+ - "𝟹": [T: "tre"]                                  #  0x1d7f9    (en: 'three', google translation)
+ - "": [T: "fyra"]                                 #  0xf55a    (en: 'four', google translation)
+ - "𝟺": [T: "fyra"]                                 #  0x1d7fa    (en: 'four', google translation)
+ - "": [T: "fem"]                                  #  0xf55b    (en: 'five', google translation)
+ - "𝟻": [T: "fem"]                                  #  0x1d7fb    (en: 'five', google translation)
+ - "": [T: "sex"]                                  #  0xf55c    (en: 'six', google translation)
+ - "𝟼": [T: "sex"]                                  #  0x1d7fc    (en: 'six', google translation)
+ - "": [T: "sju"]                                  #  0xf55d    (en: 'seven', google translation)
+ - "𝟽": [T: "sju"]                                  #  0x1d7fd    (en: 'seven', google translation)
+ - "": [T: "på"]                                   #  0xf55e    (en: 'eight', google translation)
+ - "𝟾": [T: "på"]                                   #  0x1d7fe    (en: 'eight', google translation)
+ - "": [T: "nio"]                                  #  0xf55f    (en: 'nine', google translation)
+ - "𝟿": [T: "nio"]                                  #  0x1d7ff    (en: 'nine', google translation)
+ - "": [T: "okänt tecken"]                       #  0xf700    (en: 'unknown character', google translation)
  - "": [t: "nedre högra och nedre vänstra trianglar"]    #  0xf726    (en: 'lower right and lower left triangles', google translation)
  - "": [t: "horisontell ellipsförlängare"]         #  0xf72d    (en: 'horizontal ellipsis extender', google translation)
  - "": [t: "midline horisontell ellipsisförlängare"]    #  0xf72e    (en: 'midline horizontal ellipsis extender', google translation)
@@ -3613,12 +3614,12 @@
  - "︤": [t: "macron lämnade halva utsmyckningen"]    #  0xfe24    (en: 'macron left half embellishment', google translation)
  - "︥": [t: "macron höger halva utsmyckning"]       #  0xfe25    (en: 'macron right half embellishment', google translation)
  - "︦": [t: "condeining macron utsmyckning"]        #  0xfe26    (en: 'conjoining macron embellishment', google translation)
- - "︵": [t: "over paren"]                           #  0xfe35
- - "︶": [t: "under paren"]                          #  0xfe36
- - "︷": [t: "over curly bracket"]                   #  0xfe37    (en: 'over brace')
- - "︸": [t: "under curly bracket"]                  #  0xfe38    (en: 'under brace')
- - "︿": [t: "over angle bracket"]                   #  0xfe3f
- - "﹀": [t: "under angle bracket"]                  #  0xfe40
+ - "︵": [t: "parentes över"]                           #  0xfe35
+ - "︶": [t: "parentes under"]                          #  0xfe36
+ - "︷": [t: "klammerparentes över"]                   #  0xfe37    (en: 'over brace')
+ - "︸": [t: "klammerparentes under"]                  #  0xfe38    (en: 'under brace')
+ - "︿": [t: "vinkelparentes över"]                   #  0xfe3f
+ - "﹀": [t: "vinkelparentes under"]                  #  0xfe40
  - "﹨": [t: "integer divide"]                       #  0xfe68
  - "￼": [t: "okänt eller saknat objekt"]            #  0xfffc    (en: 'unknown or missing object', google translation)
- - "�": [t: "unknown or missing character"]         #  0xfffd    (google: 'okänd eller saknad karaktär')
+ - "�": [T: "okänt tecken"]         #  0xfffd    (google: 'okänd eller saknad karaktär')
