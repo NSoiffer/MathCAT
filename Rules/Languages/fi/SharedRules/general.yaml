@@ -129,7 +129,17 @@
       if: "$Verbosity!='Terse'"
       then:
       - T: ""      # phrase('the' square root of 25 equals 5)
-  - x: "translate(name(.),'-', ' ')"
+  # - x: "translate(name(.),'-', ' ')"
+  # FI: The translate function doesn't work for non-English. Used the solution below instead.
+  - test:
+     - if: "self::m:open-interval"
+       then: [T: "avoin väli"]
+     - else_if: "self::m:open-closed-interval"
+       then: [T: "vasemmalta puoliavoin väli"]
+     - else_if: "self::m:closed-interval"
+       then: [T: "suljettu väli"]
+     - else_if: "self::m:closed-open-interval"
+       then: [T: "oikealta puoliavoin väli"]
   - test:
       if: "$Verbosity!='Terse'"
       then:
