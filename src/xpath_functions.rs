@@ -24,6 +24,8 @@ use regex::Regex;
 use crate::pretty_print::mml_to_string;
 use std::cell::Ref;
 use phf::phf_set;
+use sxd_xpath::function::Error as XPathError;
+
 
 
 use crate::canonicalize::{as_element, name};
@@ -565,11 +567,19 @@ impl Function for ToOrdinal {
                         -> Result<Value<'d>, Error>
     {
         let mut args = Args(args);
-        args.exactly(1)?;
+        if let Err(e) = args.exactly(1).or_else(|_| args.exactly(3)) {
+            return Err( XPathError::Other(format!("ToOrdinal requires 1 or 3 args: {}", e)));
+        };
+        let mut fractional = false;
+        let mut plural = false;
+        if args.len() == 3 {
+            plural = args.pop_boolean()?;
+            fractional = args.pop_boolean()?;
+        }
         let node = validate_one_node(args.pop_nodeset()?, "ToOrdinal")?;
         return match node {
-            Node::Text(t) =>  Ok( Value::String( ToOrdinal::convert(t.text(), false, false) ) ),
-            Node::Element(e) => Ok( Value::String( ToOrdinal::convert(&get_text_from_element(e), false, false) ) ),
+            Node::Text(t) =>  Ok( Value::String( ToOrdinal::convert(t.text(), fractional, plural) ) ),
+            Node::Element(e) => Ok( Value::String( ToOrdinal::convert(&get_text_from_element(e), fractional, plural) ) ),
             _   =>  Err( Error::ArgumentNotANodeset{actual: ArgumentType::String} ),
         }
     }
