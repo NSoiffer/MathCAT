@@ -587,7 +587,7 @@
   variables: [{IsColumnSilent: true()}]
   match: "count(*)=1 and *[self::m:mtr][count(*) = 1]"
   replace:
-  - OT: ""      # phrase('the' 1 by 1 matrix M)
+  # - OT: ""      # phrase('the' 1 by 1 matrix M)
   - T: "1 kertaa 1"      # phrase(the '1 by 1' matrix)
   - test:
       if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
