@@ -638,21 +638,46 @@
       then:
       - test:
         - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:cases) or $ClearSpeak_MultiLineLabel = 'Case'"
-          then: [{T: "tapaus"}]      # phrase(this is the first 'case' of three cases)
+          then:
+            - test:
+              - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+                then: [{T: "tapausta"}]    # FI: plural
+                else: [{T: "tapaus"}]     # phrase(this is the first 'case' of three cases) # FI: singular
         - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
-          then: [{T: "rivi"}]      # phrase(this is the first 'line' of three lines)
+          then:
+            - test:
+              - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+                then: [{T: "riviä"}]    # FI: plural
+                else: [{T: "rivi"}]      # phrase(this is the first 'line' of three lines) # FI: singular
         - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
-          then: [{T: "ehto"}]      # phrase(this is the first 'constraint' of three constraints) # translation unclear
+          then:
+            - test:
+              - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+                then: [{T: "ehtoa"}]    # FI: plural
+                else: [{T: "ehto"}]      # phrase(this is the first 'contraint' of three contrains) # FI: singular
         - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
-          then: [{T: "yhtälö"}]      # phrase(this is the first 'equation' of three equations)
+          then:
+            - test:
+              - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+                then: [{T: "yhtälöä"}]    # FI: plural
+                else: [{T: "yhtälö"}]     # phrase(this is the first 'equation' of three equations) # FI: singular
         - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
-          then: [{T: "rivi"}]      # phrase(this is the first 'row' of three rows)
+          then:
+            - test:
+              - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+                then: [{T: "riviä"}]    # FI: plural
+                else: [{T: "rivi"}]     # phrase(this is the first 'row' of three rows) # FI: singular
         - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
-          then: [{T: "vaihe"}]      # phrase(this is the first 'step' of three steps)
-          # else 'None -- don't say anything'
-      - test:
-        - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-          then: [{CT: "t"}] # plural      # phrase(shown by the letter 's') # FI: new logic needed for Finnish
+          then:
+            - test:
+              - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+                then: [{T: "vaihetta"}]    # FI: plural
+                else: [{T: "vaihe"}]      # phrase(this is the first 'step' of three steps)
+      #     # else 'None -- don't say anything'
+      # FI: following doesn't work for Finnish, new logic implemented above
+      # - test:
+      #   - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+      #     then: [{ct: "s"}] # plural      # phrase(shown by the letter 's')
       - pause: short
   - x: "*"
 
