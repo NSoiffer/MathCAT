@@ -60,7 +60,9 @@
 
     # stop when regularity begins
     NumbersOrdinalFractionalPluralOnes: [
-         "nolla", "ensimmäinen"
+         "nollannesosaa", "kokonainen", "kahdesosaa", "kolmasosaa", "neljäsosaa", "viidesosaa", "kuudesosaa", "seitsemäsosaa", "kahdeksasosaa", "yhdeksäsosaa",
+         "kymmenesosaa", "yhdestoistaosaa", "kahdestoistaosaa", "kolmastoistaosaa", "neljästoistaosaa", "viidestoistaosaa", "kuudestoistaosaa",
+         "seitsemästoistaosaa", "kahdeksastoistaosaa", "yhdeksästoistaosaa"
     ],
 
 
