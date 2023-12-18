@@ -51,8 +51,11 @@
     ],
 
     # stop when regularity begins
+    # FI: says "one whole" in Finnish when it's 1/1
     NumbersOrdinalFractionalOnes: [
-         "nolla", "ensimmäinen"
+         "nollasosa", "kokonainen", "kahdesosa", "kolmasosa", "neljäsosa", "viidesosa", "kuudesosa", "seitsemäsosa", "kahdeksasosa", "yhdeksäsosa",
+         "kymmenesosa", "yhdestoistaosa", "kahdestoistaosa", "kolmastoistaosa", "neljästoistaosa", "viidestoistaosa", "kuudestoistaosa",
+         "seitsemästoistaosa", "kahdeksastoistaosa", "yhdeksästoistaosa"
     ],
 
     # stop when regularity begins
