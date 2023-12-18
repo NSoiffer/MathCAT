@@ -46,7 +46,7 @@
         then: [{T: "neliöjuuri"}]        # phrase(the 'square root' of x)
       - else_if: "*[2][text()='3']"
         then: [{T: "kuutiojuuri"}]        # phrase(the 'cube root' of x)
-      - else_if: "*[2][not(contains(., '.'))]"
+      - else_if: "*[2][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
         then: [{x: "ToOrdinal(*[2])"}, {T: "juuri"}]        # phrase(the square 'root' of x)
       else:
       - test:
@@ -71,15 +71,15 @@
 - name: common-fraction
   tag: fraction
   match:
-  - "*[1][self::m:mn][not(contains(., '.')) and text()<20]   and"
-  - "*[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]"
+  - "*[1][self::m:mn][not(contains(., ',')) and text()<20]   and" # FI: Changed decimal point to decimal comma
+  - "*[2][self::m:mn][not(contains(., ',')) and 2<= text() and text()<=10]" # FI: Changed decimal point to decimal comma
   replace: [{x: ToCommonFraction(.)}]
 - name: common-fraction-mixed-number
   tag: fraction
   match:
   - "preceding-sibling::*[1][self::m:mo][text()='⁤'] and" # preceding element is invisible plus
-  - "*[1][self::m:mn][not(contains(., '.'))]   and"
-  - "*[2][self::m:mn][not(contains(., '.'))]"
+  - "*[1][self::m:mn][not(contains(., ','))]   and" # FI: Changed decimal point to decimal comma
+  - "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
   replace: [{x: ToCommonFraction(.)}]
 
 - name: simple
@@ -148,7 +148,7 @@
       then: {T: ""}      # # phrase('the' fourth power of 10)
   - bookmark: "*[2]/@id"
   - test:
-      if: "*[2][self::m:mn][not(contains(., '.'))]"
+      if: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
       then: [{x: "ToOrdinal(*[2])"}]
       else: [{x: "*[2]"}]
   - T: "potenssi"      # phrase(the fourth 'power of' 2)
@@ -169,7 +169,7 @@
 
 - name: simple-integer
   tag: power
-  match: "*[2][self::m:mn][not(contains(., '.'))]"
+  match: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
   replace:
   - x: "*[1]"
   - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
@@ -182,7 +182,7 @@
   tag: power
   match:
   - "*[2][self::m:negative and"
-  - "     *[1][self::m:mn][not(contains(., '.'))]]"
+  - "     *[1][self::m:mn][not(contains(., ','))]]" # FI: Changed decimal point to decimal comma
   replace:
   - x: "*[1]"
   - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
