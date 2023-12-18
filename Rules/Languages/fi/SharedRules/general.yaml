@@ -222,13 +222,15 @@
       if: "$Verbosity!='Terse'"
       then: [{T: ""}]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
-  - T: "luvusta"      # phrase(subtracting 5 'from' 10 gives 5)
+  - T: "käy"      # phrase(subtracting 5 'from' 10 gives 5)
   - x: "*[2]"
   - T: "lukuun"      # phrase(adding 6 'to' 6 equals  12)
   - x: "*[3]"
   - test:
       if: "following-sibling::*"
-      then: [{T: ""}]      # phrase(the square root 'of' 25 equals 5)
+      # then: [{T: ""}]      # phrase(the square root 'of' 25 equals 5)
+      then:
+        pause: short # FI: added for Finnish # needs a test
 
 - name: bigop-under
   tag: large-op
