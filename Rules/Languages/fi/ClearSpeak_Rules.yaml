@@ -249,6 +249,7 @@
       # better way?
       then: {T: "neliö"}      # phrase(25 equals 5 'squared')
       else: {T: "kuutio"}      # phrase(625 equals 5 'cubed')
+
 - name: function-power
   tag: power
   match:
