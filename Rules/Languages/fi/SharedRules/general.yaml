@@ -657,8 +657,8 @@
   - T: "rivi"      # phrase(the 1 by 4 'row' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {T: "1"}      # phrase('the 1 by' 2 row 'vector') # FI: what is the context?
-      else: {T: "1"}      # phrase('the 1 by' 2 'matrix')
+      then: {T: "vektori"}      # phrase(the 1 by 2 row 'vector') # FI: what is the context?
+      else: {T: "matriisi"}      # phrase(the 1 by 2 'matrix')
   - pause: long
   - x: "*/*"
   - test:
