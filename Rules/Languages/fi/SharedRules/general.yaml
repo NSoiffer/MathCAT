@@ -609,7 +609,7 @@
   replace:
   - T: ""      # phrase('the' 2 by 2 matrix M)
   - x: count(*)
-  - T: "1 sarake"      # phrase(the 2 'by 1 column' matrix)
+  - T: "kertaa 1 sarake"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: {T: "vektori"}      # phrase(the 2 by 2 'vector')
@@ -632,7 +632,7 @@
   replace:
   - T: ""      # phrase('the' 2 by 2 matrix M)
   - x: "count(*)"
-  - t: "1 sarake"      # phrase(the 2 'by 1 column' matrix)
+  - T: "kertaa 1 sarake"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: {T: "vektori"}      # phrase(the 2 column 'vector')
