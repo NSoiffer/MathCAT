@@ -238,11 +238,13 @@
       if: "$Verbosity!='Terse'"
       then: [{T: ""}]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
-  - T: "per"      # phrase(2 'over' 3 equals two thirds)
+  - T: "yli"      # phrase(2 'over' 3 equals two thirds)
   - x: "*[2]"
   - test:
       if: "following-sibling::*"
-      then: [{T: ""}]      # phrase(the square root 'of' 25 equals 5)
+      # then: [{T: ""}]      # phrase(the square root 'of' 25 equals 5)
+      then:
+        pause: short # FI: added for Finnish # needs a test
 
 - name: largeop
   tag: mrow
