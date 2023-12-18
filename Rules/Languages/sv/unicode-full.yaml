@@ -430,7 +430,7 @@
  - "℉": [t: "grader fahrenheit"]                    #  0x2109    (en: 'degrees fahrenheit')
  - "ℊ": [t: "skrivstilt g"]                             #  0x210a    (en: 'script g')
  - "ℌℑℨℭ":                                          #  0x210c, 0x2111, 0x2128, 0x212d
-    - t: "skrivstilt g"                                 #     (en: 'fraktur', google: 'fraktur')
+    - t: "fraktur g"                                 #     (en: 'fraktur', google: 'fraktur')
     - spell: "translate('.', 'ℌℑℨℭ', 'HIZC')"
 
  - "ℍℙℾℿ":                                          #  0x210d, 0x2119, 0x213e, 0x213f
@@ -467,10 +467,10 @@
       - if: "'.' = '℺'"
         then: [t: "roterad"]                        #     (en: 'rotated', google translation)
       - else_if: "'.' = 'Ⅎ'"
-        then: [t: "vände"]                          #     (en: 'turned', google translation)
+        then: [t: "omvänt"]                          #     (en: 'turned', google translation)
       - else_if: "'.' = '⅃'"
-        then: [t: "omvänd sans-serif"]              #     (en: 'reversed sans-serif', google translation)
-        else: [t: "skrivstilt e"]                       #     (en: 'turned sans-serif', google: 'vände sans-serif')
+        then: [t: "omvänt sans-serif"]              #     (en: 'reversed sans-serif', google translation)
+        else: [t: "roterat sans-serif"]                       #     (en: 'turned sans-serif', google: 'vände sans-serif')
     - spell: "translate('.', 'Ⅎ℺⅁⅂⅃⅄', 'FQGLLY')"
 
  - "ℴ": [t: "skrivstilt o"]                             #  0x2134    (en: 'script o')
@@ -3111,7 +3111,7 @@
  - "": [T: "dubbelslagen eulerkonstant"]          #  0xf0cb    (en: 'double struck euler constant', google translation)
  
  # script chars in math alphabetic block and also MathType private use area
- # SWEDISH: We've used "skrivstilt" instead of skrivstilt for clarity
+ # SWEDISH: We've used "skrivstilt" instead of skript for clarity
  - "𝒜-𝒵":                                           #  0x1d49c - 0x1d4b5
     - T: "skrivstilt"                                    #     (en: 'script', google translation)
     - spell: "translate('.', '𝒜𝒝𝒞𝒟𝒠𝒡𝒢𝒣𝒤𝒥𝒦𝒧𝒨𝒩𝒪𝒫𝒬𝒭𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
