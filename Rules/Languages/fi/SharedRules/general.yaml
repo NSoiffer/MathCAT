@@ -1008,8 +1008,8 @@
     - if: ".='→' or .='⟶'"
       then_test:
         if: "$Verbosity='Terse'"
-        then: [{T: "muodostavat"}]      # phrase(hydrogen and oxygen 'forms' water )
-        else: [{T: "reagoivat muodostamaan"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
+        then: [{T: "muodostaa"}]      # phrase(hydrogen and oxygen 'forms' water )
+        else: [{T: "reagoi"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
     - else_if: ".='⇌' or .='\u1f8d2'"
       then: [{T: "on tasapainossa"}]      # phrase(a reactant 'is in equilibrium with' a product)
     - else_if: ".='\u1f8d4'"
