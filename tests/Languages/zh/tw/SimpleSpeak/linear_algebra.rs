@@ -3,31 +3,31 @@ use crate::common::*;
 #[test]
 fn transpose() {
   let expr = "<math> <msup><mi>M</mi><mi>T</mi></msup> </math>";
-  test("zh", "SimpleSpeak", expr, "大寫 m 的 轉置");
+  test("zh-tw", "SimpleSpeak", expr, "大寫 m 的 轉置");
 }
 
 #[test]
 fn trace() {
   let expr = "<math> <mi>Tr</mi><mi>M</mi> </math>";
-  test("zh", "SimpleSpeak", expr, "大寫 m 的 跡");
+  test("zh-tw", "SimpleSpeak", expr, "大寫 m 的 跡");
 }
 
 #[test]
 fn dimension() {
   let expr = "<math> <mi>Dim</mi><mi>M</mi> </math>";
-  test("zh", "SimpleSpeak", expr, "大寫 m 的 維數");
+  test("zh-tw", "SimpleSpeak", expr, "大寫 m 的 維數");
 }
 
 #[test]
 fn homomorphism() {
   let expr = "<math> <mi>Hom</mi><mo>(</mo><mi>M</mi><mo>)</mo> </math>";
-  test("zh", "SimpleSpeak", expr, "大寫 m 的 同態");
+  test("zh-tw", "SimpleSpeak", expr, "大寫 m 的 同態");
 }
 
 #[test]
 fn kernel() {
   let expr = "<math> <mi>ker</mi><mrow><mo>(</mo><mi>L</mi><mo>)</mo></mrow> </math>";
-  test("zh", "SimpleSpeak", expr, "大寫 l 的 核");
+  test("zh-tw", "SimpleSpeak", expr, "大寫 l 的 核");
 }
 
 #[test]
@@ -40,7 +40,7 @@ fn norm() {
     </mrow>
 </math>
 ";
-  test("zh", "SimpleSpeak", expr, "f 的 範數");
+  test("zh-tw", "SimpleSpeak", expr, "f 的 範數");
 }
 
 #[test]
@@ -56,5 +56,5 @@ fn norm_subscripted() {
     </msub>
 </math>
 ";
-  test("zh", "SimpleSpeak", expr, "f 的 p 範數");
+  test("zh-tw", "SimpleSpeak", expr, "f 的 p 範數");
 }

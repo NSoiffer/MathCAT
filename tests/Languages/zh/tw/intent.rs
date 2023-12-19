@@ -6,7 +6,7 @@ use crate::common::*;
 #[test]
 fn silent_intent_mi() {
     let expr = "<math> <mn>2</mn> <mi intent=':silent'>x</mi></math>";
-    test("zh", "SimpleSpeak", expr, "2");
+    test("zh-tw", "SimpleSpeak", expr, "2");
 }
 
 #[test]
@@ -16,7 +16,7 @@ fn silent_intent_msup() {
             <mi arg='H' mathvariant='normal'>H</mi>
             <mn arg='n'>2</mn>
         </msup></math>";
-    test("zh", "SimpleSpeak", expr, "大寫 h 2");
+    test("zh-tw", "SimpleSpeak", expr, "大寫 h 2");
 }
 
 #[test]
@@ -26,7 +26,7 @@ fn silent_intent_underscore() {
             <mi arg='H' mathvariant='normal'>H</mi>
             <mn arg='n'>2</mn>
         </msup></math>";
-    test("zh", "SimpleSpeak", expr, "大寫 h 2");
+    test("zh-tw", "SimpleSpeak", expr, "大寫 h 2");
 }
 
 #[test]
@@ -36,5 +36,5 @@ fn intent_prob_x() {
         <mi arg='arg'>x</mi>
         <mi arg='op' intent='probability' mathvariant='normal'>P</mi>
     </msup></math>";
-    test("zh", "SimpleSpeak", expr, "probability, x");
+    test("zh-tw", "SimpleSpeak", expr, "probability, x");
 }

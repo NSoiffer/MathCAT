@@ -5,7 +5,7 @@ fn complex() {
     let expr = "<math>
                     <mi>ℂ</mi>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "複數集");
+    test("zh-tw", "SimpleSpeak", expr, "複數集");
 }
 
 #[test]
@@ -13,7 +13,7 @@ fn natural() {
     let expr = "<math>
                     <mi>ℕ</mi>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "自然數集");
+    test("zh-tw", "SimpleSpeak", expr, "自然數集");
 }
 
 #[test]
@@ -21,7 +21,7 @@ fn rationals() {
     let expr = "<math>
                     <mi>ℚ</mi>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "有理數集");
+    test("zh-tw", "SimpleSpeak", expr, "有理數集");
 }
 
 #[test]
@@ -29,7 +29,7 @@ fn reals() {
     let expr = "<math>
                     <mi>ℝ</mi>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "實數集");
+    test("zh-tw", "SimpleSpeak", expr, "實數集");
 }
 
 #[test]
@@ -37,7 +37,7 @@ fn integers() {
     let expr = "<math>
                     <mi>ℤ</mi>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "整數集");
+    test("zh-tw", "SimpleSpeak", expr, "整數集");
 }
 
 
@@ -50,7 +50,7 @@ fn msup_complex() {
                     <mn>2</mn>
                 </msup>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "C 2");
+    test("zh-tw", "SimpleSpeak", expr, "C 2");
 }
 
 #[test]
@@ -61,7 +61,7 @@ fn msup_natural() {
                     <mn>2</mn>
                 </msup>
             </math>";
-    test("zh", "SimpleSpeak", expr, "N 2");
+    test("zh-tw", "SimpleSpeak", expr, "N 2");
 }
 
 #[test]
@@ -72,7 +72,7 @@ fn msup_rationals() {
                     <mn>2</mn>
                 </msup>
             </math>";
-    test("zh", "SimpleSpeak", expr, "Q 2");
+    test("zh-tw", "SimpleSpeak", expr, "Q 2");
 }
 
 #[test]
@@ -83,7 +83,7 @@ fn msup_reals() {
                     <mn>3</mn>
                 </msup>
             </math>";
-    test("zh", "SimpleSpeak", expr, "R 3");
+    test("zh-tw", "SimpleSpeak", expr, "R 3");
 }
 
 #[test]
@@ -94,7 +94,7 @@ fn msup_integers() {
                     <mn>4</mn>
                 </msup>
             </math>";
-    test("zh", "SimpleSpeak", expr, "Z 4");
+    test("zh-tw", "SimpleSpeak", expr, "Z 4");
 }
 
 #[test]
@@ -105,7 +105,7 @@ fn msup_positive_integers() {
                     <mo>+</mo>
                 </msup>
             </math>";
-    test("zh", "SimpleSpeak", expr, "正 整數集");
+    test("zh-tw", "SimpleSpeak", expr, "正 整數集");
 }
 
 #[test]
@@ -116,7 +116,7 @@ fn msup_negative_integers() {
                     <mo>-</mo>
                 </msup>
             </math>";
-    test("zh", "SimpleSpeak", expr, "負 整數集");
+    test("zh-tw", "SimpleSpeak", expr, "負 整數集");
 }
 
 #[test]
@@ -127,7 +127,7 @@ fn msup_positive_rationals() {
                     <mo>+</mo>
                 </msup>
             </math>";
-    test("zh", "SimpleSpeak", expr, "正 有理數集");
+    test("zh-tw", "SimpleSpeak", expr, "正 有理數集");
 }
 
 #[test]
@@ -138,7 +138,7 @@ fn msup_negative_rationals() {
                     <mo>-</mo>
                 </msup>
             </math>";
-    test("zh", "SimpleSpeak", expr, "負 有理數集");
+    test("zh-tw", "SimpleSpeak", expr, "負 有理數集");
 }
 
 #[test]
@@ -146,7 +146,7 @@ fn empty_set() {
     let expr = "<math>
                 <mo>{</mo> <mo>}</mo>
             </math>";
-    test("zh", "SimpleSpeak", expr, "空集");
+    test("zh-tw", "SimpleSpeak", expr, "空集");
 }
 
 #[test]
@@ -154,7 +154,7 @@ fn single_element_set() {
     let expr = "<math>
                 <mo>{</mo> <mn>12</mn><mo>}</mo>
             </math>";
-    test("zh", "SimpleSpeak", expr, "集合 12");
+    test("zh-tw", "SimpleSpeak", expr, "集合 12");
 }
 
 #[test]
@@ -162,7 +162,7 @@ fn multiple_element_set() {
     let expr = "<math>
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-    test("zh", "SimpleSpeak", expr, "集合 5 逗號 10 逗號 15");
+    test("zh-tw", "SimpleSpeak", expr, "集合 5 逗號 10 逗號 15");
 }
 
 #[test]
@@ -170,7 +170,7 @@ fn set_with_colon() {
     let expr = "<math>
                     <mo>{</mo> <mrow><mi>x</mi><mo>:</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow> <mo>}</mo>
             </math>";
-    test("zh", "SimpleSpeak", expr, "集合 x 滿足 x 大於 2");
+    test("zh-tw", "SimpleSpeak", expr, "集合 x 滿足 x 大於 2");
 }
 
 #[test]
@@ -178,7 +178,7 @@ fn set_with_bar() {
     let expr = "<math>
                     <mo>{</mo> <mrow><mi>x</mi><mo>|</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow> <mo>}</mo>
             </math>";
-    test("zh", "SimpleSpeak", expr, "集合 x 滿足 x 大於 2");
+    test("zh-tw", "SimpleSpeak", expr, "集合 x 滿足 x 大於 2");
 }
 
 #[test]
@@ -186,7 +186,7 @@ fn element_alone() {
     let expr = "<math>
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
-    test("zh", "SimpleSpeak", expr, "3 加 2 i, 不屬於 實數集");
+    test("zh-tw", "SimpleSpeak", expr, "3 加 2 i, 不屬於 實數集");
 }
 
 #[test]
@@ -201,7 +201,7 @@ fn element_under_sum() {
                 <mrow> <msup>  <mi>i</mi> <mn>2</mn> </msup> </mrow>
             </mfrac>
         </math>";
-    test("zh", "SimpleSpeak", expr,
+    test("zh-tw", "SimpleSpeak", expr,
                     "和 下層 i 屬於 整數集 項目; 分數 i 平方, 分之 1 結束分數;");
 }
 
@@ -220,7 +220,7 @@ fn complicated_set_with_colon() {
             <mn>7</mn>
             <mo>}</mo>
         </math>";
-    test("zh", "SimpleSpeak", expr, "集合 x 屬於 整數集 滿足 2 小於 x 小於 7");
+    test("zh-tw", "SimpleSpeak", expr, "集合 x 屬於 整數集 滿足 2 小於 x 小於 7");
 }
 
 #[test]
@@ -233,6 +233,6 @@ fn complicated_set_with_mtext() {
         <mrow><mi>x</mi> <mtext>&#x00A0;是&#x00A0;偶&#x00A0;數</mtext> </mrow>
         <mo>}</mo>
         </math>";
-    test("zh", "SimpleSpeak", expr, 
+    test("zh-tw", "SimpleSpeak", expr, 
             "集合 x 屬於 自然數集 滿足 x 是 偶 數");
 }

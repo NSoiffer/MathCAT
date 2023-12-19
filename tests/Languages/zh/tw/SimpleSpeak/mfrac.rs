@@ -8,7 +8,7 @@ fn common_fraction_half() {
     let expr = "<math>
                     <mfrac> <mn>1</mn> <mn>2</mn> </mfrac>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "2 分之 1");
+    test("zh-tw", "SimpleSpeak", expr, "2 分之 1");
 }
 
 #[test]
@@ -16,7 +16,7 @@ fn common_fraction_thirds() {
     let expr = "<math>
                     <mfrac> <mn>2</mn> <mn>3</mn> </mfrac>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "3 分之 2");
+    test("zh-tw", "SimpleSpeak", expr, "3 分之 2");
 }
 
 #[test]
@@ -24,7 +24,7 @@ fn common_fraction_tenths() {
     let expr = "<math>
                     <mfrac> <mn>17</mn> <mn>10</mn> </mfrac>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "10 分之 17");
+    test("zh-tw", "SimpleSpeak", expr, "10 分之 17");
 }
 
 #[test]
@@ -33,7 +33,7 @@ fn not_SimpleSpeak_common_fraction_tenths() {
     let expr = "<math>
                     <mfrac> <mn>89</mn> <mn>10</mn> </mfrac>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "10 分之 89");
+    test("zh-tw", "SimpleSpeak", expr, "10 分之 89");
 }
 
 #[test]
@@ -49,7 +49,7 @@ fn non_simple_fraction() {
         </mrow>
     </math>
                             ";
-    test("zh", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加 y 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加 y 結束分數;");
 }
 
 #[test]
@@ -65,7 +65,7 @@ fn nested_fraction() {
         </mrow>
     </math>
                             ";
-    test("zh", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加 分數 y 分之 1 結束分數; 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加 分數 y 分之 1 結束分數; 結束分數;");
 }
 
 
@@ -82,7 +82,7 @@ fn deeply_nested_fraction_msqrt() {
         </mrow>
     </math>
                             ";
-    test("zh", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加 根號 y 分之 1 結束根號; 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加 根號 y 分之 1 結束根號; 結束分數;");
 }
 
 #[test]
@@ -98,7 +98,7 @@ fn deeply_nested_fraction_mrow_msqrt() {
         </mrow>
     </math>
                             ";
-    test("zh", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加, 根號 2 加 y 分之 1 結束根號; 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加, 根號 2 加 y 分之 1 結束根號; 結束分數;");
 }
 
 #[test]
@@ -114,7 +114,7 @@ fn numerator_simple_fraction() {
         </mrow>
     </math>
                             ";
-    test("zh", "SimpleSpeak", expr, "分數 x 減 y, 分之 x 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之 x 結束分數;");
 }
 
 #[test]
@@ -127,7 +127,7 @@ fn denominator_simple_fraction() {
         </mfrac>
     </math>
                             ";
-    test("zh", "SimpleSpeak", expr, "分數 x 分之, x 減 y 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 x 分之, x 減 y 結束分數;");
 }
 
 
@@ -137,7 +137,7 @@ fn mixed_number() {
                     <mn>3</mn>
                     <mfrac> <mn>1</mn> <mn>2</mn> </mfrac>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "3 又 2 分之 1");
+    test("zh-tw", "SimpleSpeak", expr, "3 又 2 分之 1");
 }
 
 #[test]
@@ -147,7 +147,7 @@ fn explicit_mixed_number() {
                     <mo>&#x2064;</mo>
                     <mfrac> <mn>1</mn> <mn>8</mn> </mfrac>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "3 又 8 分之 1");
+    test("zh-tw", "SimpleSpeak", expr, "3 又 8 分之 1");
 }
 
 #[test]
@@ -156,7 +156,7 @@ fn mixed_number_big() {
                     <mn>3</mn>
                     <mfrac> <mn>7</mn> <mn>83</mn> </mfrac>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "3 又 83 分之 7");
+    test("zh-tw", "SimpleSpeak", expr, "3 又 83 分之 7");
 }
 
 #[test]
@@ -164,7 +164,7 @@ fn simple_text() {
     let expr = "<math>
     <mfrac> <mi>rise</mi> <mi>run</mi> </mfrac>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "run 分之 rise");
+    test("zh-tw", "SimpleSpeak", expr, "run 分之 rise");
 }
 
 #[test]
@@ -177,7 +177,7 @@ fn number_and_text() {
                 <mn>3</mn><mtext>gallons</mtext></mrow>
             </mfrac>
         </math>";
-    test("zh", "SimpleSpeak", expr, "分數 3 gallons, 分之, 2 miles 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 3 gallons, 分之, 2 miles 結束分數;");
 }
 
 
@@ -201,7 +201,7 @@ fn nested_simple_fractions() {
                 </mfrac>
                 </mrow>
             </math>";
-    test("zh", "SimpleSpeak", expr, "分數 分數 3 分之 2 結束分數; 分之, 分數 2 分之 1 結束分數; 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 分數 3 分之 2 結束分數; 分之, 分數 2 分之 1 結束分數; 結束分數;");
 }
 
 #[test]
@@ -212,5 +212,5 @@ fn binomial() {
                     <mfrac linethickness='0'> <mn>7</mn> <mn>3</mn> </mfrac>
                     <mo>)</mo>
                 </math>";
-    test("zh", "SimpleSpeak", expr, "2 乘 7 選 3");
+    test("zh-tw", "SimpleSpeak", expr, "2 乘 7 選 3");
 }

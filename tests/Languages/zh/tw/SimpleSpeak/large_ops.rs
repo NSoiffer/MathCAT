@@ -10,7 +10,7 @@ fn sum_both() {
         </munderover>
         <mi>n</mi>
     </math>";
-    test("zh", "SimpleSpeak", expr, "和 從 n 等於 1 到 10 項目 n");
+    test("zh-tw", "SimpleSpeak", expr, "和 從 n 等於 1 到 10 項目 n");
 }
 
 #[test]
@@ -22,7 +22,7 @@ fn sum_under() {
         </munder>
         <mi>i</mi>
     </math>";
-    test("zh", "SimpleSpeak", expr, "和 下層 大寫 s 項目 i");
+    test("zh-tw", "SimpleSpeak", expr, "和 下層 大寫 s 項目 i");
 }
 #[test]
 fn sum_both_msubsup() {
@@ -34,7 +34,7 @@ fn sum_both_msubsup() {
         </msubsup>
         <mi>n</mi>
     </math>";
-    test("zh", "SimpleSpeak", expr, "和 從 n 等於 1 到 10 項目 n");
+    test("zh-tw", "SimpleSpeak", expr, "和 從 n 等於 1 到 10 項目 n");
 }
 
 #[test]
@@ -46,7 +46,7 @@ fn sum_sub() {
         </msub>
         <mi>i</mi>
     </math>";
-    test("zh", "SimpleSpeak", expr, "和 下層 大寫 s 項目 i");
+    test("zh-tw", "SimpleSpeak", expr, "和 下層 大寫 s 項目 i");
 }
 
 #[test]
@@ -55,7 +55,7 @@ fn sum() {
             <mo>∑</mo>
             <msub><mi>a</mi><mi>i</mi></msub>
     </math>";
-    test("zh", "SimpleSpeak", expr, "和 項目 a 下標 i");
+    test("zh-tw", "SimpleSpeak", expr, "和 項目 a 下標 i");
 }
 
 #[test]
@@ -68,7 +68,7 @@ fn product_both() {
         </munderover>
         <mi>n</mi>
     </math>";
-    test("zh", "SimpleSpeak", expr, "積 從 n 等於 1 到 10 項目 n");
+    test("zh-tw", "SimpleSpeak", expr, "積 從 n 等於 1 到 10 項目 n");
 }
 
 #[test]
@@ -80,7 +80,7 @@ fn product_under() {
         </munder>
         <mi>i</mi>
     </math>";
-    test("zh", "SimpleSpeak", expr, "積 下層 大寫 s 項目 i");
+    test("zh-tw", "SimpleSpeak", expr, "積 下層 大寫 s 項目 i");
 }
 
 #[test]
@@ -89,7 +89,7 @@ fn product() {
             <mo>∏</mo>
             <msub><mi>a</mi><mi>i</mi></msub>
     </math>";
-    test("zh", "SimpleSpeak", expr, "積 項目 a 下標 i");
+    test("zh-tw", "SimpleSpeak", expr, "積 項目 a 下標 i");
 }
 
 #[test]
@@ -102,7 +102,7 @@ fn intersection_both() {
         </munderover>
         <msub><mi>S</mi><mi>i</mi></msub>
     </math>";
-    test("zh", "SimpleSpeak", expr, "交集 從 i 等於 1 到 10 項目; 大寫 s 下標 i");
+    test("zh-tw", "SimpleSpeak", expr, "交集 從 i 等於 1 到 10 項目; 大寫 s 下標 i");
 }
 
 #[test]
@@ -114,7 +114,7 @@ fn intersection_under() {
         </munder>
         <msub><mi>S</mi><mi>i</mi></msub>
     </math>";
-    test("zh", "SimpleSpeak", expr, "交集 下層 大寫 c 項目, 大寫 s 下標 i");
+    test("zh-tw", "SimpleSpeak", expr, "交集 下層 大寫 c 項目, 大寫 s 下標 i");
 }
 
 #[test]
@@ -123,7 +123,7 @@ fn intersection() {
             <mo>⋂</mo>
             <msub><mi>S</mi><mi>i</mi></msub>
             </math>";
-    test("zh", "SimpleSpeak", expr, "交集 項目 大寫 s 下標 i");
+    test("zh-tw", "SimpleSpeak", expr, "交集 項目 大寫 s 下標 i");
 }
 
 #[test]
@@ -136,7 +136,7 @@ fn union_both() {
         </munderover>
         <msub><mi>S</mi><mi>i</mi></msub>
     </math>";
-    test("zh", "SimpleSpeak", expr, "聯集 從 i 等於 1 到 10 項目; 大寫 s 下標 i");
+    test("zh-tw", "SimpleSpeak", expr, "聯集 從 i 等於 1 到 10 項目; 大寫 s 下標 i");
 }
 
 #[test]
@@ -148,7 +148,7 @@ fn union_under() {
         </munder>
         <msub><mi>S</mi><mi>i</mi></msub>
     </math>";
-    test("zh", "SimpleSpeak", expr, "聯集 下層 大寫 c 項目, 大寫 s 下標 i");
+    test("zh-tw", "SimpleSpeak", expr, "聯集 下層 大寫 c 項目, 大寫 s 下標 i");
 }
 
 #[test]
@@ -157,7 +157,7 @@ fn union() {
             <mo>⋃</mo>
             <msub><mi>S</mi><mi>i</mi></msub>
             </math>";
-    test("zh", "SimpleSpeak", expr, "聯集 項目 大寫 s 下標 i");
+    test("zh-tw", "SimpleSpeak", expr, "聯集 項目 大寫 s 下標 i");
 }
 
 #[test]
@@ -173,7 +173,7 @@ fn integral_both() {
             </mrow>
             <mtext>&#x2009;</mtext><mi>d</mi><mi>x</mi>
         </math>";
-    test("zh", "SimpleSpeak", expr, "積分 從 0 到 1 項目, f x; d x");
+    test("zh-tw", "SimpleSpeak", expr, "積分 從 0 到 1 項目, f x; d x");
 }
 
 #[test]
@@ -186,7 +186,7 @@ fn integral_under() {
         <mrow><mi>f</mi><mrow><mo>(</mo><mi>x</mi> <mo>)</mo></mrow></mrow>
         <mi>d</mi><mi>x</mi>
         </math>";
-    test("zh", "SimpleSpeak", expr, "積分 下層 實數集 項目; f x d x");
+    test("zh-tw", "SimpleSpeak", expr, "積分 下層 實數集 項目; f x d x");
 }
 
 #[test]
@@ -196,5 +196,5 @@ fn integral() {
             <mrow><mi>f</mi><mrow><mo>(</mo><mi>x</mi> <mo>)</mo></mrow></mrow>
             <mi>d</mi><mi>x</mi>
             </math>";
-    test("zh", "SimpleSpeak", expr, "積分 項目 f x d x");
+    test("zh-tw", "SimpleSpeak", expr, "積分 項目 f x d x");
 }
