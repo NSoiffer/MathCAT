@@ -135,7 +135,7 @@
  - "̉": [T: "med krok"]             #  0x309    (en: 'hook above embellishment', google translation)
  - "̊": [T: "med ring"]                 #  0x30a    (en: 'ring above embellishment', google: 'ring över utsmyckning')
  - "̋": [T: "med dubbel akut accent"]        #  0x30b    (en: 'double acute accent embellishment', google translation)
- - "̌": [T: "med hake"]                      #  0x30c    (en: 'check', google: 'kolla upp')
+ - "̌": [T: "hake"]                      #  0x30c    (en: 'check', google: 'kolla upp')
  - "̍": [T: "med vertikal linje"]      #  0x30d    (en: 'vertical line above embellishment', google translation)
  - "̎": [T: "med dubbel vertikal linje"]    #  0x30e    (en: 'double vertical line above embellishment', google translation)
  - "̏": [T: "med dubbel grav accent"]    #  0x30f    (en: 'double grave accent embellishment', google translation)
