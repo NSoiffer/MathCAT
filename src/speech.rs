@@ -1945,8 +1945,8 @@ impl SpeechRules {
                         )
                     } else {
                         (
-                            SPEECH_UNICODE_SHORT.with( |unicode| Rc::clone( unicode) ),
-                            SPEECH_UNICODE_FULL. with( |unicode| Rc::clone( unicode) )
+                            SPEECH_UNICODE_SHORT.with(Rc::clone),
+                            SPEECH_UNICODE_FULL. with(Rc::clone)
                         )
                     };
 

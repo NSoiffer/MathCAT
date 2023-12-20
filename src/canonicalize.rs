@@ -99,7 +99,6 @@ lazy_static!{
 // Operators are either PREFIX, INFIX, or POSTFIX, but can also have other properties such as LEFT_FENCE
 bitflags! {
 	struct OperatorTypes: u32 {
-		const NONE		= 0x0;
 		const PREFIX	= 0x1;
 		const INFIX		= 0x2;
 		const POSTFIX	= 0x4;

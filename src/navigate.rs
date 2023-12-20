@@ -690,7 +690,7 @@ fn key_press_to_command_and_param(
             command = NavigationCommand::Exit;
             param = NavigationParam::Last;
             },
-        0x30|0x31|0x32|0x33|0x34|0x35|0x36|0x37|0x38|0x39 => {  // '0' ... '9'
+        0x30..=0x39 => {  // '0' ... '9'
             command = choose_command(shift_key, control_key, NavigationCommand::Move, NavigationCommand::Read, NavigationCommand::SetPlacemarker, NavigationCommand::Describe);
             static PLACE_MARKER: &[NavigationParam] = &[
                 NavigationParam::Placemarker0,
