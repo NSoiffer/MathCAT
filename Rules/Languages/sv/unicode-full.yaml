@@ -37,12 +37,8 @@
             then: [T: "gånger"]                      #     (en: 'by', google translation)
             else: [T: "kryss"]                     #     (en: 'cross')
  - "÷": [T: "division"]                             #  0xf7    (en: 'divided by')
-<<<<<<< Updated upstream
- # SWEDISH: The Swedish character translations are based on the placement and appearance of the characters rather than their function, as function might be context-dependent. In most cases, no difference has been made in the translation between non-combining, modifier (Spacing Modifier Letters), and combining/embellishment characters. Placement above is used as the baseline, and low characters are translated as "låg(t)" (eng "low"). In the case of alphabetical modifier characters (such as modifier small h), the construction "med ... efter" (eng "with ... placed after it") is used to prevent any possible ambiguity.
-=======
  # SWEDISH: The Swedish character translations are based on the placement and appearance of the characters rather than their function, as function might be context-dependent. Placement above is used as the baseline, and low characters are translated as "låg(t)" (eng "low"). In most cases, no difference has been made in the translation between non-combining, modifier (Spacing Modifier Letters), and combining/embellishment characters. However, in the case of alphabetical letters and punctuation marks as modifier characters (such as modifier small h or comma embellishment), the construction "med ...( efter)" (eng "with ...( placed after it)") is used to prevent any possible ambiguity.
 
->>>>>>> Stashed changes
  - "ʰ": [T: "med litet h efter"]                  #  0x2b0    (en: 'modifier small h', google translation)
  - "ʱ": [T: "med litet h med krok efter"]         #  0x2b1    (en: 'modifier small h with hook', google translation)
  - "ʲ": [T: "med litet j efter"]                  #  0x2b2    (en: 'modifier small j', google translation)
@@ -86,7 +82,7 @@
  - "˖": [T: "lågt plustecken"]                   #  0x2d6    (google translation)
  - "˗": [T: "lågt minustecken"]             #  0x2d7    (en: 'modifier minus sign', google translation)
  - "˘": [T: "brevis"]                               #  0x2d8    (en: 'breve')
- - "˙": [T: "med punkt efter"]                           #  0x2d9    (en: 'dot')
+ - "˙": [T: "prick"]                           #  0x2d9    (en: 'dot')
  - "˚": [T: "ring"]                            #  0x2da    (en: 'ring above')
  - "˛": [T: "låg svans"]                                #  0x2db    (en: 'ogonek')
  - "˜": [T: "litet tilde"]                                #  0x2dc    (en: 'small tilde')
@@ -160,7 +156,7 @@
  - "̠": [T: "lågt minus"]       #  0x320    (en: 'minus sign below embellishment', google translation)
  - "̡": [T: "palatalkrok"]    #  0x321    (en: 'palatalized hook below embellishment', google translation)
  - "̢": [T: "retroflexkrok"]      #  0x322    (en: 'retroflex hook below embellishment', google translation)
- - "̣": [T: "låg punkt"]              #  0x323    (google: 'prick under utsmyckningen')
+ - "̣": [T: "låg prick"]              #  0x323    (google: 'prick under utsmyckningen')
  - "̤": [T: "lågt trema"]       #  0x324    (en: 'diaeresis below embellishment', google: 'diaeres under utsmyckning')
  - "̥": [T: "lågt ring"]               #  0x325    (en: 'ring below embellishment', google translation)
  - "̦": [T: "lågt komma"]              #  0x326    (en: 'comma below embellishment', google translation)
@@ -401,8 +397,8 @@
  - "⃘": [t: "med ring på"]            #  0x20d8    (en: 'ring overlay embellishment', google translation)
  - "⃙": [t: "med medurs ring på"]    #  0x20d9    (en: 'clockwise ring overlay embellishment', google translation)
  - "⃚": [t: "med moturs pil på"]    #  0x20da    (en: 'anticlockwise ring overlay embellishment', google translation)
- - "⃛": [T: "tre punkter"]       #  0x20db    (en: 'triple dot', google: 'triple dot')
- - "⃜": [T: "fyra punkter"]      #  0x20dc    (en: 'quadruple dot', google: 'fyrdubbla prick')
+ - "⃛": [T: "tre prickar"]       #  0x20db    (en: 'triple dot', google: 'triple dot')
+ - "⃜": [T: "fyra prickar"]      #  0x20dc    (en: 'quadruple dot', google: 'fyrdubbla prick')
  - "⃝": [t: "med omslutande cirkel"]       #  0x20dd    (en: 'enclosing circle embellishment', google translation)
  - "⃞": [t: "med omslutande fyrkant"]    #  0x20de    (en: 'enclosing square embellishment', google translation)
  - "⃟": [t: "med omslutande diamant"]     #  0x20df    (en: 'enclosing diamond embellishment', google translation)
@@ -763,24 +759,24 @@
  - "∔": [T: "punkt plus"]                           #  0x2214    (en: 'dot plus')
  - "∕": [T: "delat med"]                      #  0x2215    (en: 'divided by')
  - "∖": [t: "minus"]                                #  0x2216    (en: 'set minus')
- - "∗": [t: "asterisk operator"]                    #  0x2217    (en: 'times')
+ - "∗": [t: "gånger"]                    #  0x2217    (en: 'times')
  - "∘": [t: "och"]                                  #  0x2218    (en: 'composed with')
  - "∙":                                             #  0x2219
     - test: 
         if: "@data-chem-formula-op"
         then: [t: "punkt"]                          #     (en: 'dot', google translation)
-        else: [t: "multiplikationstecken"]          #     (en: 'times')
+        else: [T: "gånger"]          #     (en: 'times')
 
  - "√":                                             #  0x221a
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "de"]                            #     (en: 'the', google translation)
-     - t: "radikal"                                 #     (en: 'square root of')
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "de"]                            #     (en: 'the', google translation)
+     - T: "kvadratroten ur"                                 #     (en: 'square root of')
  - "∛":                                             #  0x221b
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "de"]                            #     (en: 'the', google translation)
-     - t: "kubikrot"                                #     (en: 'cube root of')
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "de"]                            #     (en: 'the', google translation)
+     - t: "kubikroten ur"                                #     (en: 'cube root of')
  - "∜":                                             #  0x221c
      - test: 
          if: "$Verbosity!='Terse'"
@@ -1249,7 +1245,7 @@
          if: "$Verbosity!='Terse'"
          then: [t: "är"]                            #     (en: 'is', google translation)
      - t: "lika och och parallellt med"             #     (en: 'equal to and parallel to')
- - "⋖": [t: "mindre than med punkt"]                #  0x22d6    (en: 'less than with dot')
+ - "⋖": [t: "mindre än med punkt"]                #  0x22d6    (en: 'less than with dot')
  - "⋗": [t: "större än med punkt"]                  #  0x22d7    (en: 'greater than with dot')
  - "⋘":                                             #  0x22d8
      - test: 
@@ -1325,14 +1321,14 @@
  - "⋯": [t: "halvhög horisontell ellips"]           #  0x22ef    (en: 'dot dot dot')
  - "⋰": [t: "diagonal upp höger ellips"]            #  0x22f0    (en: 'upwards diagonal ellipsis')
  - "⋱": [t: "diagonal ner höger ellips"]            #  0x22f1    (en: 'diagonal ellipsis')
- - "⋲": [t: "element av med långt horisontalt streck"]    #  0x22f2    (en: 'element of with long horizontal stroke')
- - "⋳": [t: "element av med vertikalt streck i slutet av horisontalt streck"]    #  0x22f3    (en: 'element of with vertical bar at end of horizontal stroke')
- - "⋴": [t: "element av med vertikalt streck i slutet av horisontalt streck"]    #  0x22f4    (en: 'element of with vertical bar at end of horizontal stroke')
- - "⋵": [t: "element av med punkt över"]            #  0x22f5    (en: 'element of with dot above')
- - "⋶": [t: "element av med streck över"]           #  0x22f6    (en: 'element of with overbar')
- - "⋷": [t: "litet element av med streck över"]     #  0x22f7    (en: 'element of with overbar', MathPlayer: 'element of or equal to', google: 'element av med överbar')
- - "⋸": [t: "element av med streck under"]          #  0x22f8    (en: 'element of with underbar')
- - "⋹": [t: "element av med två horisontella streck"]    #  0x22f9    (en: 'element of with two horizontal strokes')
+ - "⋲": [t: "tillhör med långt horisontalt streck"]    #  0x22f2    (en: 'element of with long horizontal stroke')
+ - "⋳": [t: "tillhör med vertikalt streck i slutet av horisontalt streck"]    #  0x22f3    (en: 'element of with vertical bar at end of horizontal stroke')
+ - "⋴": [t: "tillhör med vertikalt streck i slutet av horisontalt streck"]    #  0x22f4    (en: 'element of with vertical bar at end of horizontal stroke')
+ - "⋵": [t: "tillhör med prick över"]            #  0x22f5    (en: 'element of with dot above')
+ - "⋶": [t: "tillhör med streck över"]           #  0x22f6    (en: 'element of with overbar')
+ - "⋷": [t: "tillhör med streck över"]     #  0x22f7    (en: 'element of with overbar', MathPlayer: 'element of or equal to', google: 'element av med överbar')
+ - "⋸": [t: "tillhör med streck under"]          #  0x22f8    (en: 'element of with underbar')
+ - "⋹": [t: "tillhör med två horisontella streck"]    #  0x22f9    (en: 'element of with two horizontal strokes')
  - "⋺": [t: "innehåller med långt horisontellt streck"]    #  0x22fa    (en: 'contains with long horizontal stroke')
  - "⋻": [t: "innehåller med vertikalt streck i slutet av horisontalt streck"]    #  0x22fb    (en: 'contains with vertical bar at end of horizontal stroke')
  - "⋼": [t: "innehåller med vertikalt streck i slutet av horisontalt streck"]    #  0x22fc    (en: 'contains with vertical bar at end of horizontal stroke')
