@@ -37,7 +37,8 @@
             then: [T: "gånger"]                      #     (en: 'by', google translation)
             else: [T: "kryss"]                     #     (en: 'cross')
  - "÷": [T: "division"]                             #  0xf7    (en: 'divided by')
- # SWEDISH: 1. We have decided to use character names based on the placement and appearance rather than the function of the characters, as the function might vary depending on context. 2. The modifier characters (Spacing Modifier Letters) occupy their own horizontal space within a line of text, but act as modifiers to the preceding character. We have decided to use the word "efter" (after) to distinguish them from the embellishment (combining) characters, which are rendered onto the preceding character. 3. We have decided to use the combining characters rendered above the preceding character as a baseline and omitted the placement word "över" (above). 
+ # SWEDISH: The Swedish character translations are based on the placement and appearance of the characters rather than their function, as function might be context-dependent. In most cases, no difference has been made in the translation between non-combining, modifier (Spacing Modifier Letters), and combining/embellishment characters. Placement above is used as the baseline, and low characters are translated as "låg(t)" (eng "low"). In the case of alphabetical modifier characters (such as modifier small h), the construction "med ... efter" (eng "with ... placed after it") is used to prevent any possible ambiguity.
+
  - "ʰ": [T: "med litet h efter"]                  #  0x2b0    (en: 'modifier small h', google translation)
  - "ʱ": [T: "med litet h med krok efter"]         #  0x2b1    (en: 'modifier small h with hook', google translation)
  - "ʲ": [T: "med litet j efter"]                  #  0x2b2    (en: 'modifier small j', google translation)
@@ -48,7 +49,6 @@
  - "ʶ":                                             #  0x2b6
     - T: "med litet omvänt R efter"             #     (en: 'modifier small inverted', google translation)
     - spell: "translate('R', 'R', 'R')"
-#OTTO: test 2
  - "ʷ": [T: "med litet w efter"]                  #  0x2b7    (en: 'modifier small w', google translation)
  - "ʸ": [T: "med litet y efter"]                  #  0x2b8    (en: 'modifier small y', google translation)
  - "ʹ": [T: "prim"]                                 #  0x2b9    (en: 'modifier prime', google: 'modifier prime')
