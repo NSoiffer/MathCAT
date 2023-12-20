@@ -695,11 +695,8 @@
             - if: "$Verbosity='Verbose'"
               then: [{T: "tio-logaritmen"}]
               else: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
-        - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
-          then:
-          - test:
-            - if: "$Verbosity='Verbose'"
-              then: [{T: "naturliga logaritmen"}]      # phrase(the 'natural log' of x)
+        - else_if: $ClearSpeak_Log = 'LnAsNaturalLog' or $Verbosity='Verbose'
+          then: [{T: "naturliga logaritmen"}]      # phrase(the 'natural log' of x)
           else: [{spell: "'ln'"}]
       - test:
         - if: "$Verbosity='Verbose'"
