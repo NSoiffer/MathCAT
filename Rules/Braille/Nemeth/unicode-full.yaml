@@ -2138,6 +2138,13 @@
  - "⟿": [t: "⠀⠫⠢⠤⠔⠒⠢⠤⠔⠒⠢⠕⠀"]    # 0x27FF (Long rightwards squiggle arrow)
  - "⤡": [t: "⠀⠫⠘⠪⠒⠒⠕⠀"]         # 0x2921 (North west and south east arrow)
  - "⤢": [t: "⠀⠫⠰⠪⠒⠒⠕⠀"]         # 0x2922 (North east and south west arrow)
+ - "🣐": [t: "⠫⠒⠒⠕⠫⠪⠒⠒"]         # 0x1f8d0 (Long rightwards arrow over leftwards arrow (equilibrium))
+ - "🣑": [t: "⠫⠒⠒⠈⠕⠫⠠⠪⠒⠒"]      # 0x1f8d1 (Long rightwards harpoon over leftwards harpoon (equilibrium))
+ - "🣒": [t: "⠫⠒⠒⠈⠕⠫⠠⠪⠒"]       # 0x1f8d2 (Long rightwards harpoon over leftwards harpoon (equilibrium))
+ - "🣓": [t: "⠫⠒⠈⠕⠫⠠⠪⠒⠒"]       # 0x1f8d3 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the right))
+ - "🣔": [t: "⠫⠈⠪⠒⠒⠫⠒⠠⠕"]       # 0x1f8d4 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the left))
+ - "🣕": [t: "⠫⠈⠪⠒⠫⠒⠒⠠⠕"]       # 0x1f8d5 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the left))
+
  - "⦃": [t: "⠨⠸⠷"]              # 0x2983 (Left white curly bracket)
  - "⦄": [t: "⠨⠸⠾"]              # 0x2984 (Right white curly bracket)
  - "⦑": [t: "⠡⠈⠨⠨⠷⠻"]           # 0x2991 (Left angle bracket w dot)
