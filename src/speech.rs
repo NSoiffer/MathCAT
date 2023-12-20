@@ -44,7 +44,7 @@ pub fn is_quoted_string(str: &str) -> bool {
         return false;
     }
     let bytes = str.as_bytes();
-    return &bytes[bytes.len()-N_BYTES_NO_EVAL_QUOTE_CHAR..] == NO_EVAL_QUOTE_CHAR_AS_BYTES;
+    return bytes[bytes.len()-N_BYTES_NO_EVAL_QUOTE_CHAR..] == NO_EVAL_QUOTE_CHAR_AS_BYTES;
 }
 
 /// Converts 'string' into a "quoted" string -- use is_quoted_string and unquote_string
@@ -1746,8 +1746,8 @@ impl UnicodeDef {
                 } else if first_ch != '0' {     // exclude 0xDDDD
                     for ch in str.chars() {     // restart the iterator
                         let ch_as_str = ch.to_string();
-                        if let Some(_) = unicode_table.insert(ch as u32, ReplacementArray::build(&substitute_ch(replacements, &ch_as_str))
-                                            .chain_err(|| format!("In definition of char: '{}'", str))?.replacements) {
+                        if unicode_table.insert(ch as u32, ReplacementArray::build(&substitute_ch(replacements, &ch_as_str))
+                                            .chain_err(|| format!("In definition of char: '{}'", str))?.replacements).is_some() {
                             error!("*** Character '{}' (0x{:X}) is repeated", ch, ch as u32);
                         }
                     }
@@ -1757,9 +1757,9 @@ impl UnicodeDef {
         }
 
         let ch = UnicodeDef::get_unicode_char(ch)?;
-        if let Some(_) = unicode_table.insert(ch, ReplacementArray::build(replacements)
+        if unicode_table.insert(ch, ReplacementArray::build(replacements)
                                         .chain_err(|| format!("In definition of char: '{}' (0x{})",
-                                                                        char::from_u32(ch).unwrap(), ch))?.replacements) {
+                                                                        char::from_u32(ch).unwrap(), ch))?.replacements).is_some() {
             error!("*** Character '{}' (0x{:X}) is repeated", char::from_u32(ch).unwrap(), ch);
         }
         return Ok( () );

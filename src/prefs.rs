@@ -641,11 +641,9 @@ impl PreferenceManager {
                     Err(_) => return None,          // I don't think this is possible
                     Ok(os_path) => os_path,
                 };
-                for dir_entry in entries {
-                    if let Ok(entry) = dir_entry {
-                        if entry.file_name().to_str().unwrap_or("").ends_with("_Rules.yaml") {
-                            return Some(entry.file_name().to_str().unwrap().to_string());
-                        }
+                for dir_entry in entries.flatten() {
+                    if dir_entry.file_name().to_str().unwrap_or("").ends_with("_Rules.yaml") {
+                        return Some(dir_entry.file_name().to_str().unwrap().to_string());
                     }
                 }
             }

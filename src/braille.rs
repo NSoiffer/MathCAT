@@ -638,7 +638,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
         }
 
         fn convert_to_cap_passage_mode(braille: &str) -> String {
-            return "⠠⠠⠠".to_string() + &braille.replace(&['C', '𝐶'], "") + "⠠⠄";
+            return "⠠⠠⠠".to_string() + &braille.replace(['C', '𝐶'], "") + "⠠⠄";
         }
 
         /// Return true if the BANA or ICEB guidelines say it is ok to start with grade 2
@@ -2177,7 +2177,7 @@ impl NeedsToBeGrouped {
                 let text = as_text(mathml);
                 let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
                 let parent_name = name(&parent);   // there is always a "math" node
-                if is_base && (parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") && !text.contains(&[' ', '\u{00A0}']) {
+                if is_base && (parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") && !text.contains([' ', '\u{00A0}']) {
                     return false;
                 }
                 let mut chars = text.chars();

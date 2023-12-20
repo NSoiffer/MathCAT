@@ -451,7 +451,7 @@ pub fn trim_element(e: &Element) {
     }
     if e.children().is_empty() && !single_text.is_empty() {
         // debug!("Combining text in {}: '{}' -> '{}'", e.name().local_part(), single_text, trimmed_text);
-        e.set_text(&trimmed_text);
+        e.set_text(trimmed_text);
     }
 
     fn make_leaf_element(mathml_leaf: Element) {
@@ -493,7 +493,7 @@ pub fn trim_element(e: &Element) {
                 if !text.is_empty() {
                     text += space;
                 }
-                text += &child_text.trim_matches(WHITESPACE).to_string();
+                text += child_text.trim_matches(WHITESPACE);
             } 
 
         }

@@ -1060,7 +1060,7 @@ impl FontSizeGuess {
             // match one or more digits followed by a unit -- there are many more units, but they tend to be large and rarer(?)
             static ref FONT_VALUE: Regex = Regex::new(r"(-?[0-9]*\.?[0-9]*)(px|cm|mm|Q|in|ppc|pt|ex|em|rem)").unwrap();
         }
-        let cap = FONT_VALUE.captures(&value_with_unit);
+        let cap = FONT_VALUE.captures(value_with_unit);
         if let Some(cap) = cap {
             if cap.len() == 3 {
                 let multiplier = match &cap[2] {    // guess based on 12pt font to convert to ems

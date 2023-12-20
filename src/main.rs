@@ -170,9 +170,21 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr=r#"
-  <math><munder><mtext>this is a test</mtext><mrow><mi>x</mi><mo>&#x2192;</mo><mi>a</mi></mrow></munder>
-            <mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>=</mo><mn>1</mn></math>
-             "#;
+  <math display='block' id='id-0' data-id-added='true'>
+  <msup data-changed='added' id='id-1' data-id-added='true'>
+      <mrow data-changed='added' id='id-2' data-id-added='true'>
+          <mo stretchy='false' id='id-3' data-id-added='true'>(</mo>
+          <mrow data-changed='added' id='id-4' data-id-added='true'>
+              <mn id='id-5' data-id-added='true'>2</mn>
+              <mo data-changed='added' id='id-6' data-id-added='true'>&#x2062;</mo>
+              <mi id='id-7' data-id-added='true'>x</mi>
+          </mrow>
+          <mo stretchy='false' id='id-8' data-id-added='true'>)</mo>
+      </mrow>
+      <mn id='id-9' data-id-added='true'>2</mn>
+  </msup>
+</math>
+               "#;
 
 //   let expr = "
 //   <math display='block'>
@@ -214,11 +226,11 @@ fn main() {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   };
 
-  // match get_spoken_text() {
-  //   Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
-  //   Err(e) => panic!("{}", errors_to_string(&e)),
-  // }
-  // info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
+  match get_spoken_text() {
+    Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
+    Err(e) => panic!("{}", errors_to_string(&e)),
+  }
+  info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
 
   set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
