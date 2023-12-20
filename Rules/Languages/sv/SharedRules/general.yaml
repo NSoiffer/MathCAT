@@ -491,12 +491,12 @@
       if: "$log_is_simple"
       then_test:
       - if: "*[1][text()='log']"
-        then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
+        then: [{T: "logg"}]      # phrase(the 'log' function is used in mathematics)
       - else_if: "*[1][text()='lg']"
         then_test:
         - if: "$Verbosity!='Verbose'"
           then: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
-          else: [{T: "tiologaritmen"}]
+          else: [{T: "tio-logaritmen"}]
       # SWEDISH: We have added the term "lg" for the logarithm with base 10. Also added a verbosity test for long and short form.
       - else_if: "$Verbosity!='Verbose'"
         then: [{spell: "'ln'"}]
@@ -507,7 +507,7 @@
       #     then: {t: "the"}      # phrase('the' square root of 25 equals 5)
       - test:
         - if: "*[1][text()='log']"
-          then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
+          then: [{T: "logg"}]      # phrase(the 'log' function is used in mathematics)
         - else_if: "*[1][text()='lg']"
           then: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
         - else_if: "$Verbosity='Terse'"
@@ -524,8 +524,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: "logaritmen bas"}      # phrase(the 'log base' is often base 10)
-      else: {T: "log bas"}             # phrase(the 'log base' is often base 10)
+      then: {T: "logaritmen med bas"}      # phrase(the 'log base' is often base 10)
+      else: {T: "logg bas"}             # phrase(the 'log base' is often base 10)
   - x: "*[1]"
 
 - name: log-base-power
@@ -535,8 +535,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity!='Terse'"
-      then: {T: "logaritmen bas"}      # phrase(the 'log base' is often base 10)
-      else: {T: "log bas"}             # phrase(the 'log base' is often base 10)
+      then: {T: "logaritmen med bas"}      # phrase(the 'log base' is often base 10)
+      else: {T: "logg bas"}             # phrase(the 'log base' is often base 10)
   - x: "*[1]"
   - pause: medium
   - test:

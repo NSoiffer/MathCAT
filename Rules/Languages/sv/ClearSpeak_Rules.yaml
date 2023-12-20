@@ -672,7 +672,7 @@
       if: "$log_is_simple"
       then_test:
       - if: "*[1][text()='log']"
-        then: [{T: "log"}]      # phrase(the 'log' of x)
+        then: [{T: "logg"}]      # phrase(the 'log' of x)
       - else_if: "*[1][text()='lg']"
         then: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
       - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
@@ -684,13 +684,26 @@
       #     then: {t: "the"}      # phrase('the' square root of 25)
       - test:
         - if: "*[1][text()='log']"
-          then: [{T: "log"}]
+          then:
+          - test:
+            - if: "$Verbosity='Verbose'"
+              then: [{T: "logaritmen"}]
+              else: [{T: "logg"}]
         - else_if: "*[1][text()='lg']"
-          then: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
+          then:
+          - test:
+            - if: "$Verbosity='Verbose'"
+              then: [{T: "tio-logaritmen"}]
+              else: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
         - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
-          then: [{T: "naturliga logaritmen"}]      # phrase(the 'natural log' of x)
+          then:
+          - test:
+            - if: "$Verbosity='Verbose'"
+              then: [{T: "naturliga logaritmen"}]      # phrase(the 'natural log' of x)
           else: [{spell: "'ln'"}]
-      - T: "av"      # phrase(the natural log 'of' x)
+      - test:
+        - if: "$Verbosity='Verbose'"
+          then: [{T: "av"}]      # phrase(the natural log 'of' x)
       - pause: short
   - x: "*[3]"
 
