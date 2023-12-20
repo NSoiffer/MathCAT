@@ -427,8 +427,8 @@
  - "℆": [t: "cada una"]                             #  0x2106    (google translation)
  - "ℇ": [t: "euler konstant"]                       #  0x2107    (en: 'euler's constant', google: 'eulers konstant')
  - "℈": [t: "skrupler"]                             #  0x2108    (en: 'scruples', google translation)
- - "℉": [t: "grader fahrenheit"]                    #  0x2109    (en: 'degrees fahrenheit')
- - "ℊ": [t: "skrivstilt g"]                             #  0x210a    (en: 'script g')
+ - "℉": [T: "grader fahrenheit"]                    #  0x2109    (en: 'degrees fahrenheit')
+ - "ℊ": [T: "skrivstilt g"]                             #  0x210a    (en: 'script g')
  - "ℌℑℨℭ":                                          #  0x210c, 0x2111, 0x2128, 0x212d
     - t: "fraktur g"                                 #     (en: 'fraktur', google: 'fraktur')
     - spell: "translate('.', 'ℌℑℨℭ', 'HIZC')"
@@ -450,16 +450,16 @@
     - t: "h streck"                                 #     (en: 'script')
     - spell: "translate('.', 'ℐℒ℘ℬℰℱℳ', 'ILPBEFM')"
 
- - "ℓ": [t: "skrivstilt l"]                             #  0x2113    (en: 'script l')
+ - "ℓ": [T: "skrivstilt l"]                             #  0x2113    (en: 'script l')
  - "℔": [t: "l b stapel"]                           #  0x2114    (en: 'pounds', google: 'pund')
  - "№": [t: "numero tecken"]                        #  0x2116    (en: 'number')
  - "℥": [t: "ounce sign"]                           #  0x2125    (en: 'ounces')
- - "Ω": [t: "ohm"]                                  #  0x2126    (en: 'ohms')
+ - "Ω": [T: "ohm"]                                  #  0x2126    (en: 'ohms')
  - "℧": [t: "omvänt ohm"]                           #  0x2127    (en: 'mhos')
  - "℩": [t: "roterat jota"]                         #  0x2129    (en: 'turned iota', google: 'vände iota')
- - "K": [t: "grader kelvin"]                        #  0x212a    (en: 'kelvin')
- - "Å": [t: "angstroms"]                            #  0x212b
- - "ℯ": [t: "skrivstilt e"]                             #  0x212f    (en: 'script e')
+ - "K": [T: "grader kelvin"]                        #  0x212a    (en: 'kelvin')
+ - "Å": [T: "Ångström"]                            #  0x212b
+ - "ℯ": [T: "skrivstilt e"]                             #  0x212f    (en: 'script e')
 
    # coalesced some chars that use cap letters
  - "Ⅎ℺⅁⅂⅃⅄":                                        #  0x2132, 0x213a, 0x2141, 0x2142, 0x2143, 0x2144
@@ -484,55 +484,55 @@
  - "⅋": [t: "vänt och-tecken"]                      #  0x214b    (en: 'turned ampersand', google: 'vände ampersand')
  - "⅌": [t: "per-tecken"]                           #  0x214c    (en: 'per', google: 'per')
  - "ⅎ": [t: "vänt gement f"]                        #  0x214e    (en: 'turned F', google: 'vände f')
- - "⅐": [t: "en sjundedel"]                         #  0x2150    (en: 'one seventh', google: 'en sjunde')
- - "⅑": [t: "en niondel"]                           #  0x2151    (en: 'one ninth', google: 'en nionde')
- - "⅒": [t: "en tiondel"]                           #  0x2152    (en: 'one tenth')
- - "⅓": [t: "vulgar fraction one third"]            #  0x2153    (en: 'one third')
- - "⅔": [t: "vulgar fraction two thirds"]           #  0x2154    (en: 'two thirds')
- - "⅕": [t: "vulgar fraction one fifth"]            #  0x2155    (en: 'one fifth')
- - "⅖": [t: "vulgar fraction two fifths"]           #  0x2156    (en: 'two fifths')
- - "⅗": [t: "vulgar fraction three fifths"]         #  0x2157    (en: 'three fifths')
- - "⅘": [t: "vulgar fraction four fifths"]          #  0x2158    (en: 'four fifths')
- - "⅙": [t: "vulgar fraction one sixth"]            #  0x2159    (en: 'one sixth')
- - "⅚": [t: "vulgar fraction five sixths"]          #  0x215a    (en: 'five sixths')
- - "⅛": [t: "vulgar fraction one eighth"]           #  0x215b    (en: 'one eighth')
- - "⅜": [t: "vulgar fraction three eighths"]        #  0x215c    (en: 'three eighths')
- - "⅝": [t: "vulgar fraction five eighths"]         #  0x215d    (en: 'five eighths')
- - "⅞": [t: "vulgar fraction seven eighths"]        #  0x215e    (en: 'seven eighths')
- - "⅟": [t: "täljare ett"]                          #  0x215f    (en: 'one over', google: 'en över')
- - "Ⅰ": [t: "Ⅰ"]                                    #  0x2160    (en: 'I', google translation)
- - "Ⅱ": [t: "i i"]                                  #  0x2161    (en: 'I I', google translation)
- - "Ⅲ": [t: "i i i"]                                #  0x2162    (en: 'I I I', google translation)
- - "Ⅳ": [t: "i v"]                                  #  0x2163    (en: 'I V', google translation)
- - "Ⅴ": [t: "Ⅴ"]                                    #  0x2164    (en: 'V', google translation)
- - "Ⅵ": [t: "v i"]                                  #  0x2165    (en: 'V I', google translation)
- - "Ⅶ": [t: "v i i"]                                #  0x2166    (en: 'V I I', google translation)
- - "Ⅷ": [t: "v i i i"]                              #  0x2167    (en: 'V I I I', google translation)
- - "Ⅸ": [t: "i x"]                                  #  0x2168    (en: 'I X', google translation)
- - "Ⅹ": [t: "Ⅹ"]                                    #  0x2169    (en: 'X', google translation)
- - "Ⅺ": [t: "x i"]                                  #  0x216a    (en: 'X I', google translation)
- - "Ⅻ": [t: "x i i"]                                #  0x216b    (en: 'X I I', google translation)
- - "Ⅼ": [t: "Ⅼ"]                                    #  0x216c    (en: 'L', google translation)
- - "Ⅽ": [t: "Ⅽ"]                                    #  0x216d    (en: 'C', google translation)
- - "Ⅾ": [t: "Ⅾ"]                                    #  0x216e    (en: 'D', google translation)
- - "Ⅿ": [t: "Ⅿ"]                                    #  0x216f    (en: 'M', google translation)
- - "ⅰ": [t: "ⅰ"]                                    #  0x2170    (en: 'I', google translation)
- - "ⅱ": [t: "i i"]                                  #  0x2171    (en: 'I I', google translation)
- - "ⅲ": [t: "i i i"]                                #  0x2172    (en: 'I I I', google translation)
- - "ⅳ": [t: "i v"]                                  #  0x2173    (en: 'I V', google translation)
- - "ⅴ": [t: "ⅴ"]                                    #  0x2174    (en: 'V', google translation)
- - "ⅵ": [t: "v i"]                                  #  0x2175    (en: 'V I', google translation)
- - "ⅶ": [t: "v i i"]                                #  0x2176    (en: 'V I I', google translation)
- - "ⅷ": [t: "v i i i"]                              #  0x2177    (en: 'V I I I', google translation)
- - "ⅸ": [t: "i x"]                                  #  0x2178    (en: 'I X', google translation)
- - "ⅹ": [t: "ⅹ"]                                    #  0x2179    (en: 'X', google translation)
- - "ⅺ": [t: "x i"]                                  #  0x217a    (en: 'X I', google translation)
- - "ⅻ": [t: "x i i"]                                #  0x217b    (en: 'X I I', google translation)
- - "ⅼ": [t: "ⅼ"]                                    #  0x217c    (en: 'L', google translation)
- - "ⅽ": [t: "ⅽ"]                                    #  0x217d    (en: 'C', google translation)
- - "ⅾ": [t: "ⅾ"]                                    #  0x217e    (en: 'D', google translation)
- - "ⅿ": [t: "ⅿ"]                                    #  0x217f    (en: 'M', google translation)
- - "↉": [t: "noll tredjedelar"]                     #  0x2189    (en: 'zero thirds')
+ - "⅐": [T: "en sjundedel"]                         #  0x2150    (en: 'one seventh', google: 'en sjunde')
+ - "⅑": [T: "en niondel"]                           #  0x2151    (en: 'one ninth', google: 'en nionde')
+ - "⅒": [T: "en tiondel"]                           #  0x2152    (en: 'one tenth')
+ - "⅓": [T: "en tredjedel"]            #  0x2153    (en: 'one third')
+ - "⅔": [T: "två tredjedelar"]           #  0x2154    (en: 'two thirds')
+ - "⅕": [T: "en femtedel"]            #  0x2155    (en: 'one fifth')
+ - "⅖": [T: "två femtedelar"]           #  0x2156    (en: 'two fifths')
+ - "⅗": [T: "tre femtedelar"]         #  0x2157    (en: 'three fifths')
+ - "⅘": [T: "fyra femtedelar"]          #  0x2158    (en: 'four fifths')
+ - "⅙": [T: "en sjättedel"]            #  0x2159    (en: 'one sixth')
+ - "⅚": [T: "fem sjättedelar"]          #  0x215a    (en: 'five sixths')
+ - "⅛": [T: "en åttondel"]           #  0x215b    (en: 'one eighth')
+ - "⅜": [T: "tre åttondelar"]        #  0x215c    (en: 'three eighths')
+ - "⅝": [T: "fem åttondelar"]         #  0x215d    (en: 'five eighths')
+ - "⅞": [T: "sju åttondelar"]        #  0x215e    (en: 'seven eighths')
+ - "⅟": [T: "ett genom"]                          #  0x215f    (en: 'one over', google: 'en över')
+ - "Ⅰ": [T: "Ⅰ"]                                    #  0x2160    (en: 'I', google translation)
+ - "Ⅱ": [T: "i i"]                                  #  0x2161    (en: 'I I', google translation)
+ - "Ⅲ": [T: "i i i"]                                #  0x2162    (en: 'I I I', google translation)
+ - "Ⅳ": [T: "i v"]                                  #  0x2163    (en: 'I V', google translation)
+ - "Ⅴ": [T: "Ⅴ"]                                    #  0x2164    (en: 'V', google translation)
+ - "Ⅵ": [T: "v i"]                                  #  0x2165    (en: 'V I', google translation)
+ - "Ⅶ": [T: "v i i"]                                #  0x2166    (en: 'V I I', google translation)
+ - "Ⅷ": [T: "v i i i"]                              #  0x2167    (en: 'V I I I', google translation)
+ - "Ⅸ": [T: "i x"]                                  #  0x2168    (en: 'I X', google translation)
+ - "Ⅹ": [T: "Ⅹ"]                                    #  0x2169    (en: 'X', google translation)
+ - "Ⅺ": [T: "x i"]                                  #  0x216a    (en: 'X I', google translation)
+ - "Ⅻ": [T: "x i i"]                                #  0x216b    (en: 'X I I', google translation)
+ - "Ⅼ": [T: "Ⅼ"]                                    #  0x216c    (en: 'L', google translation)
+ - "Ⅽ": [T: "Ⅽ"]                                    #  0x216d    (en: 'C', google translation)
+ - "Ⅾ": [T: "Ⅾ"]                                    #  0x216e    (en: 'D', google translation)
+ - "Ⅿ": [T: "Ⅿ"]                                    #  0x216f    (en: 'M', google translation)
+ - "ⅰ": [T: "ⅰ"]                                    #  0x2170    (en: 'I', google translation)
+ - "ⅱ": [T: "i i"]                                  #  0x2171    (en: 'I I', google translation)
+ - "ⅲ": [T: "i i i"]                                #  0x2172    (en: 'I I I', google translation)
+ - "ⅳ": [T: "i v"]                                  #  0x2173    (en: 'I V', google translation)
+ - "ⅴ": [T: "ⅴ"]                                    #  0x2174    (en: 'V', google translation)
+ - "ⅵ": [T: "v i"]                                  #  0x2175    (en: 'V I', google translation)
+ - "ⅶ": [T: "v i i"]                                #  0x2176    (en: 'V I I', google translation)
+ - "ⅷ": [T: "v i i i"]                              #  0x2177    (en: 'V I I I', google translation)
+ - "ⅸ": [T: "i x"]                                  #  0x2178    (en: 'I X', google translation)
+ - "ⅹ": [T: "ⅹ"]                                    #  0x2179    (en: 'X', google translation)
+ - "ⅺ": [T: "x i"]                                  #  0x217a    (en: 'X I', google translation)
+ - "ⅻ": [T: "x i i"]                                #  0x217b    (en: 'X I I', google translation)
+ - "ⅼ": [T: "ⅼ"]                                    #  0x217c    (en: 'L', google translation)
+ - "ⅽ": [T: "ⅽ"]                                    #  0x217d    (en: 'C', google translation)
+ - "ⅾ": [T: "ⅾ"]                                    #  0x217e    (en: 'D', google translation)
+ - "ⅿ": [T: "ⅿ"]                                    #  0x217f    (en: 'M', google translation)
+ - "↉": [T: "noll tredjedelar"]                     #  0x2189    (en: 'zero thirds')
  - "←": [T: "vänster-pil"]                       #  0x2190    (en: 'leftwards arrow')
  - "↑": [T: "uppåt-pil"]                            #  0x2191    (en: 'upwards arrow')
  - "→": [T: "höger-pil"]                         #  0x2192    (en: 'rightwards arrow')
@@ -587,14 +587,14 @@
  - "↹": [t: "pil åt vänster mot streck över pil åt höger mot streck"]    #  0x21b9    (en: 'leftwards arrow to bar over rightwards arrow to bar')
  - "↺": [t: "pil i öppen cirkel moturs"]            #  0x21ba    (en: 'anticlockwise open circle arrow')
  - "↻": [t: "pil i öppen cirkel medurs"]            #  0x21bb    (en: 'clockwise open circle arrow')
- - "↼": [t: "vänster harpoon up"]                   #  0x21bc    (en: 'left harpoon up')
- - "↽": [t: "vänster harpoon ner"]                  #  0x21bd    (en: 'left harpoon down')
- - "↾": [t: "up harpoon höger"]                     #  0x21be    (en: 'up harpoon right')
- - "↿": [t: "up harpoon vänster"]                   #  0x21bf    (en: 'up harpoon left')
- - "⇀": [t: "höger harpoon up"]                     #  0x21c0    (en: 'right harpoon up')
- - "⇁": [t: "höger harpoon ner"]                    #  0x21c1    (en: 'right harpoon down')
- - "⇂": [t: "ner harpoon höger"]                    #  0x21c2    (en: 'down harpoon right')
- - "⇃": [t: "ner harpoon vänster"]                  #  0x21c3    (en: 'down harpoon left')
+ - "↼": [t: "vänster harpun upp"]                   #  0x21bc    (en: 'left harpoon up')
+ - "↽": [t: "vänster harpun ner"]                  #  0x21bd    (en: 'left harpoon down')
+ - "↾": [t: "uppåt harpun höger"]                     #  0x21be    (en: 'up harpoon right')
+ - "↿": [t: "uppåt harpun vänster"]                   #  0x21bf    (en: 'up harpoon left')
+ - "⇀": [t: "höger harpun upp"]                     #  0x21c0    (en: 'right harpoon up')
+ - "⇁": [t: "höger harpun ner"]                    #  0x21c1    (en: 'right harpoon down')
+ - "⇂": [t: "nedåt harpun höger"]                    #  0x21c2    (en: 'down harpoon right')
+ - "⇃": [t: "nedåt harpun vänster"]                  #  0x21c3    (en: 'down harpoon left')
  - "⇄": [t: "pil åt höger över pil åt vänster"]     #  0x21c4    (en: 'rightwards arrow over leftwards arrow')
  - "⇅": [t: "pil uppåt till vänster om pil neråt"]    #  0x21c5    (en: 'upwards arrow leftwards of downwards arrow')
  - "⇆": [t: "pil åt vänster över pil åt höger"]     #  0x21c6    (en: 'leftwards arrow over rightwards arrow')
@@ -655,58 +655,59 @@
  - "⇽": [t: "pil åt vänster med öppen spets"]       #  0x21fd    (en: 'leftwards open headed arrow')
  - "⇾": [t: "pil åt höger med öppen spets"]         #  0x21fe    (en: 'rightwards open headed arrow')
  - "⇿": [t: "pil åt vänster och höger med öppen spets"]    #  0x21ff    (en: 'left right open headed arrow')
- - "∀": [t: "för alla"]                             #  0x2200    (en: 'for all')
+ - "∀": [T: "för alla"]                             #  0x2200    (en: 'for all')
  - "∁":                                             #  0x2201
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "de"]                            #     (en: 'the', google translation)
-     - t: "komplement"                              #     (en: 'complement of')
+   #   - test: 
+   #       if: "$Verbosity!='Terse'"
+   #      then: [t: "de"]                            #     (en: 'the', google translation)
+     - T: "komplementet av"                              #     (en: 'complement of')
  - "∂":                                             #  0x2202
      - test: 
          if: "$Verbosity='Terse'"
-         then: [t: "partiell"]                      #     (en: 'partial', google translation)
-         else: [t: "partiell"]                      #     (en: 'partial derivative', google: 'partiellt derivat')
- - "∃": [t: "det existerar"]                        #  0x2203    (en: 'there exists')
- - "∄": [t: "det existerar inte"]                   #  0x2204    (en: 'there does not exist')
- - "∅": [t: "tomma mängden"]                        #  0x2205    (en: 'empty set')
+         then: [T: "partiell"]                      #     (en: 'partial', google translation)
+         else: [T: "partiella derivatan"]                      #     (en: 'partial derivative', google: 'partiellt derivat')
+ - "∃": [T: "det existerar"]                        #  0x2203    (en: 'there exists')
+ - "∄": [T: "det existerar inte"]                   #  0x2204    (en: 'there does not exist')
+ - "∅": [T: "tomma mängden"]                        #  0x2205    (en: 'empty set')
  - "∆":                                             #  0x2206
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "de"]                            #     (en: 'the', google translation)
-     - t: "differens"                               #     (en: 'laplacian of')
+     #- test: 
+     #    if: "$Verbosity!='Terse'"
+     #    then: [t: "de"]                            #     (en: 'the', google translation)
+     - T: "laplacianen av"                               #     (en: 'laplacian of')
  - "∇":                                             #  0x2207
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "de"]                            #     (en: 'the', google translation)
-     - t: "gradient (nabla)"                        #     (en: 'gradient of', google: 'lutning av')
+         then: [T: "gradienten"]
+         else: [T: "grad"]                            #     (en: 'the', google translation)
+    # - t: "gradient (nabla)"                        #     (en: 'gradient of', google: 'lutning av')
  - "∈":                                             #  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "ett element av"]                 #     (en: 'an element of', google translation)
+        then: [T: "tillhör"]                 #     (en: 'an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set"    #  inside a set
             then_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "i"]                      #     (en: 'in', google translation)
+                then: [T: "i"]                      #     (en: 'in', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "medlem i"]               #     (en: 'member of', google translation)
+                then: [t: "ingår i"]               #     (en: 'member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [t: "element av"]             #     (en: 'element of', google translation)
-              - else: [t: "tillhör"]                #  $ClearSpeak_SetMemberSymbol = 'Belongs'    (en: 'belonging to')
+              - else: [T: "tillhör"]                #  $ClearSpeak_SetMemberSymbol = 'Belongs'    (en: 'belonging to')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "är medlem i"]            #     (en: 'is a member of', google translation)
+                then: [T: "ingår i"]            #     (en: 'is a member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [t: "är ett element av"]      #     (en: 'is an element of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "är i"]                   #     (en: 'is in', google translation)
-              - else: [t: "tillhör"]                #  $ClearSpeak_SetMemberSymbol = 'Belongs'    (en: 'belongs to')
+                then: [T: "ingår i"]                   #     (en: 'is in', google translation)
+              - else: [T: "tillhör"]                #  $ClearSpeak_SetMemberSymbol = 'Belongs'    (en: 'belongs to')
  - "∉":                                             #  0x2209
     # rule is identical to 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "är inte ett element av"]         #     (en: 'is not an element of', google translation)
+        then: [t: "tillhör inte"]         #     (en: 'is not an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set"    #  inside a set
@@ -714,7 +715,7 @@
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
                 then: [t: "inte i"]                 #     (en: 'not in', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "inte medlem i"]          #     (en: 'not member of', google translation)
+                then: [t: "ingår inte i"]          #     (en: 'not member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [t: "inte element av"]        #     (en: 'not element of', google translation)
               - else: [t: "tillhör inte"]           #  $ClearSpeak_SetMemberSymbol = 'Belongs'    (en: 'not belonging to')
@@ -729,37 +730,37 @@
  - "∊":                                             #  0x220a
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "är ett element av"]              #     (en: 'is an element of', google translation)
+        then: [T: "tillhör"]              #     (en: 'is an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set"    #  inside a set
             then_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "i"]                      #     (en: 'in', google translation)
+                then: [T: "i"]                      #     (en: 'in', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "medlem i"]               #     (en: 'member of', google translation)
+                then: [T: "ingår i"]               #     (en: 'member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [t: "element av"]             #     (en: 'element of', google translation)
-              - else: [t: "tillhör"]                #  $ClearSpeak_SetMemberSymbol = 'Belongs'    (en: 'belonging to')
+              - else: [T: "tillhör"]                #  $ClearSpeak_SetMemberSymbol = 'Belongs'    (en: 'belonging to')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "är medlem i"]            #     (en: 'is a member of', google translation)
+                then: [T: "ingår i"]            #     (en: 'is a member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [t: "är ett element av"]      #     (en: 'is an element of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [t: "är i"]                   #     (en: 'is in', google translation)
-              - else: [t: "tillhör"]                #  $ClearSpeak_SetMemberSymbol = 'Belongs'    (en: 'belongs to')
- - "∋": [t: "innehåller som element"]               #  0x220b    (en: 'contains the member')
- - "∌": [t: "innehåller inte som element"]          #  0x220c    (en: 'does not contain the member')
- - "∍": [t: "innehåller som element"]               #  0x220d    (en: 'contains the member')
- - "∎": [t: "vilket skulle bevisas"]                #  0x220e    (en: 'end of proof')
- - "∏": [t: "produkt"]                              #  0x220f    (en: 'product')
- - "∐": [t: "koprodukttecken"]                      #  0x2210    (en: 'coproduct', MathPlayer: 'coproduct', google: 'coprodukt')
- - "∑": [t: "summa"]                                #  0x2211    (en: 'sum')
- - "−": [t: "minus"]                                #  0x2212
- - "∓": [t: "minus plus"]                           #  0x2213    (en: 'minus or plus')
- - "∔": [t: "punkt plus"]                           #  0x2214    (en: 'dot plus')
- - "∕": [t: "divisionsstreck"]                      #  0x2215    (en: 'divided by')
+              - else: [T: "tillhör"]                #  $ClearSpeak_SetMemberSymbol = 'Belongs'    (en: 'belongs to')
+ - "∋": [T: "innehåller som element"]               #  0x220b    (en: 'contains the member')
+ - "∌": [T: "innehåller inte som element"]          #  0x220c    (en: 'does not contain the member')
+ - "∍": [T: "innehåller som element"]               #  0x220d    (en: 'contains the member')
+ - "∎": [T: "vilket skulle bevisas"]                #  0x220e    (en: 'end of proof')
+ - "∏": [T: "produkt"]                              #  0x220f    (en: 'product')
+ - "∐": [t: "koprodukt"]                      #  0x2210    (en: 'coproduct', MathPlayer: 'coproduct', google: 'coprodukt')
+ - "∑": [T: "summa"]                                #  0x2211    (en: 'sum')
+ - "−": [T: "minus"]                                #  0x2212
+ - "∓": [T: "minus plus"]                           #  0x2213    (en: 'minus or plus')
+ - "∔": [T: "punkt plus"]                           #  0x2214    (en: 'dot plus')
+ - "∕": [T: "delat med"]                      #  0x2215    (en: 'divided by')
  - "∖": [t: "minus"]                                #  0x2216    (en: 'set minus')
  - "∗": [t: "asterisk operator"]                    #  0x2217    (en: 'times')
  - "∘": [t: "och"]                                  #  0x2218    (en: 'composed with')
