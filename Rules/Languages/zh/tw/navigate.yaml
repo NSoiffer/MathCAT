@@ -320,9 +320,9 @@
     - else_if: "*[1][self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]" # auto zoom
       then:
       - with:
-          variables: [Move2D: "'在'", Child2D: "*[1]/*[2]"]   # phrase('in' the denominator)
+          variables: [Move2D: "'在'", Child2D: "*[1]"]   # phrase('in' the denominator)
           replace: [x: "."]
-      - set_variables: [NavNode: "*[1]/*[2]/@id"] # skip mtd
+      - set_variables: [NavNode: "*[1]/*[2]/@id"]        # skip parens/brackets
       else:
       - with:
           variables: [Move2D: "'在'", Child2D: "*[1]"]        # phrase('in' the denominator)

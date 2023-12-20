@@ -183,7 +183,7 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
                 if let Some(latex_value) = child.attribute_value("data-latex") {
                     if latex_value == r"\mathrel{\longrightleftharpoons}" {
                         child.set_attribute_value("data-unicode", "\u{1f8d2}");
-                        child.set_attribute_value(MAYBE_CHEMISTRY, &"2".to_string());    // same as is_hack_for_missing_arrows()
+                        child.set_attribute_value(MAYBE_CHEMISTRY, "2");    // same as is_hack_for_missing_arrows()
                     }
                 }               
             }
@@ -532,7 +532,8 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
         }
         if name(&mathml) == "mrow" {
             if let Some(changed_value) = mathml.attribute_value(CHANGED_ATTR) {
-                if changed_value == ADDED_ATTR_VALUE {
+                // we added an mrow, we can remove it -- but this might be already processed which is the case if "data-id-added" is true (exists)
+                if changed_value == ADDED_ATTR_VALUE && mathml.attribute("data-id-added").is_none() {
                     // mrows get added for several reasons. One of them is to canonicalize elements like msqrt that can have 1 or more children;
                     //   those should not get removed because the re-parse doesn't add those
                     // Although they would never be added, elements with fixed number of children also shouldn't have the mrow go away

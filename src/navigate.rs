@@ -1853,6 +1853,37 @@ mod tests {
         });
     }
 
+    #[test]
+    fn base_superscript() -> Result<()> {
+        // bug #217 -- zoom into base of parenthesized script 
+        let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
+            <msup data-changed='added' id='id-1' data-id-added='true'>
+                <mrow data-changed='added' id='id-2' data-id-added='true'>
+                    <mo stretchy='false' id='id-3' data-id-added='true'>(</mo>
+                    <mrow data-changed='added' id='id-4' data-id-added='true'>
+                        <mn id='id-5' data-id-added='true'>2</mn>
+                        <mo data-changed='added' id='id-6' data-id-added='true'>&#x2062;</mo>
+                        <mi id='id-7' data-id-added='true'>x</mi>
+                    </mrow>
+                    <mo stretchy='false' id='id-8' data-id-added='true'>)</mo>
+                </mrow>
+                <mn id='id-9' data-id-added='true'>2</mn>
+            </msup>
+        </math>";
+        init_default_prefs(mathml_str, "Enhanced");
+        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            let speech = test_command("ZoomIn", mathml, "id-4");
+            // tables need to check their parent for proper speech
+            assert_eq!(speech, "zoom in; in base; 2 x");
+            let speech = test_command("MoveNext", mathml, "id-9");
+            assert_eq!(speech, "move right, in superscript; 2");
+            return Ok( () );
+        });
+    }
+
     
     #[test]
     fn basic_language_test() -> Result<()> {
@@ -1880,6 +1911,7 @@ mod tests {
         test_language("es", mathml_str);
         test_language("id", mathml_str);
         test_language("vi", mathml_str);
+        test_language("zh-tw", mathml_str);
         return Ok( () );
 
         fn test_language(lang: &str, mathml_str: &str) {
