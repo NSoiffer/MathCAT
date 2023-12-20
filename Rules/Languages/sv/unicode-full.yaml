@@ -38,7 +38,6 @@
             else: [T: "kryss"]                     #     (en: 'cross')
  - "÷": [T: "division"]                             #  0xf7    (en: 'divided by')
  # SWEDISH: The Swedish character translations are based on the placement and appearance of the characters rather than their function, as function might be context-dependent. In most cases, no difference has been made in the translation between non-combining, modifier (Spacing Modifier Letters), and combining/embellishment characters. Placement above is used as the baseline, and low characters are translated as "låg(t)" (eng "low"). In the case of alphabetical modifier characters (such as modifier small h), the construction "med ... efter" (eng "with ... placed after it") is used to prevent any possible ambiguity.
-
  - "ʰ": [T: "med litet h efter"]                  #  0x2b0    (en: 'modifier small h', google translation)
  - "ʱ": [T: "med litet h med krok efter"]         #  0x2b1    (en: 'modifier small h with hook', google translation)
  - "ʲ": [T: "med litet j efter"]                  #  0x2b2    (en: 'modifier small j', google translation)
