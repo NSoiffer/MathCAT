@@ -48,7 +48,7 @@
  - "ʶ":                                             #  0x2b6
     - T: "med litet omvänt R efter"             #     (en: 'modifier small inverted', google translation)
     - spell: "translate('R', 'R', 'R')"
-
+#OTTO: test 2
  - "ʷ": [T: "med litet w efter"]                  #  0x2b7    (en: 'modifier small w', google translation)
  - "ʸ": [T: "med litet y efter"]                  #  0x2b8    (en: 'modifier small y', google translation)
  - "ʹ": [T: "prim"]                                 #  0x2b9    (en: 'modifier prime', google: 'modifier prime')
