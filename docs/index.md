@@ -172,6 +172,7 @@ Several people helped out in various ways with the project. I am very grateful f
 * Sam Dooley, Murray Sargent, and Volker Sorge -- provided tables of Nemeth translations of characters and Nemeth tests
 
 Translators:
+* Chinese (Traditional) -- Hon-Jang Yang
 * Indonesian -- Dr. Pinta Deniyanti Sampoerno, M.Si; Dr. Meiliasari, S.Pd., M.Sc; and Ari Hendarno, S.Pd., M.kom
 * Spanish -- Noelia Ruiz Martínez (also help with NVDA addon development) and María Allo Roldán
 * Vietnamese -- Dang Hoai Phúc and Trang Pham
