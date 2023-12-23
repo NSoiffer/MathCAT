@@ -1102,15 +1102,29 @@ impl Function for FontSizeGuess {
                         args: Vec<Value<'d>>)
                         -> Result<Value<'d>, Error>
     {
-        lazy_static! {
-            // match one or more digits followed by a unit -- there are many more units, but they tend to be large and rarer(?)
-            static ref FONT_VALUE: Regex = Regex::new(r"([0-9]*.?[0-9]*)(px|cm|mm|Q|in|ppc|pt|ex|em|rem|)").unwrap();
-        }
         let mut args = Args(args);
         args.exactly(1)?;
         let value_with_unit = args.pop_string()?;
         let em_value = FontSizeGuess::em_from_value(&value_with_unit);
         return Ok( Value::Number(em_value) );
+    }
+}
+
+pub struct ReplaceAll;
+/// ReplaceAll(haystack, needle, replacement)
+///   Returns a string with all occurances of 'needle' replaced with 'replacement'
+impl Function for ReplaceAll {
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(3)?;
+        let replacement = args.pop_string()?;
+        let needle = args.pop_string()?;
+        let haystack = args.pop_string()?;
+        return Ok( Value::String(haystack.replace(&needle, &replacement)) );
     }
 }
 
@@ -1132,6 +1146,7 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("DistanceFromLeaf", DistanceFromLeaf);
     context.set_function("EdgeNode", EdgeNode);
     context.set_function("FontSizeGuess", FontSizeGuess);
+    context.set_function("ReplaceAll", ReplaceAll);
     context.set_function("DEBUG", Debug);
 }
 
