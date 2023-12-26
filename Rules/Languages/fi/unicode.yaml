@@ -427,7 +427,7 @@
          if: "$Verbosity!='Terse'"
          then: [T: ""]                        	    # 	(en: 'is', google translation)
      - T: "suhde"                               	# 	(en: 'to', google: 'to')
- - "∷": [t: "verranto"]                         	#  0x2237	(en: 'as', google: 'kuten')
+ - "∷": [T: "kuten"]                         	#  0x2237	(en: 'as', google: 'kuten')
  - "∼": [T: "jakautunut"]                	        #  0x223c	(en: 'varies with', google: 'vaihtelee')
  - "∽": [T: "käännetty tilde"]                  	#  0x223d	(en: 'reversed tilde', google: 'kääntynyt tilde')
  - "∾":                                         	#  0x223e

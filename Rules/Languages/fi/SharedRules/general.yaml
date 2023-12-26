@@ -550,7 +550,7 @@
   - test:
       if: .[self::m:mlabeledtr]
       then:
-      - t: "merkinnällä"      # phrase(the diagram is complete 'with label')
+      - T: "merkinnällä"      # phrase(the diagram is complete 'with label')
       - x: "*[1]/*"
   - pause: medium
   - test:
@@ -825,7 +825,7 @@
                   then: [{T: "yläindeksi"}]      # phrase(H 'superscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "ylä"}]      # phrase(H 'super' 2)
+                    then: [{T: "ylä"}]      # phrase(H 'super' 2)
               - x: "$Prescripts[4]"
               - pause: "short"
           - test:

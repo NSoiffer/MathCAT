@@ -572,14 +572,14 @@
   - test:
       if: ".[contains(@notation,'radical')]"
       then: [T: "neliöjuuri", pause: short]      # phrase(5 is the 'square root' of 25)
-  - t: "sulkevat"      # phrase(parentheses are 'enclosing' part of the equation)
+  - T: "sulkevat"      # phrase(parentheses are 'enclosing' part of the equation)
   - test:
       if: "*[self::m:mtext and text()=' ']"
       then: [T: "tyhjää tilaa"]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
-      then: [t: "alue loppu"]      # phrase(reached the 'end enclosure' point) # FI: better translation?
+      then: [T: "alue loppu"]      # phrase(reached the 'end enclosure' point) # FI: better translation?
   - pause: short
 
 - name: semantics
