@@ -3,7 +3,7 @@
     - test: 
         if: "$TTS='none'"
         then: [T: "."]                          	# 	(en: '.', google translation)
-        else: [spell: "'.'"]   # Meaning?                    
+        else: [SPELL: "'.'"]   # Meaning?                    
 
  # Capital letters are a little tricky: users can pick their favorite word (something that was requested) and 
  # screen readers have options to use pitch changes or beeps instead of or in addition to say "cap"
@@ -28,7 +28,7 @@
         value: "$CapitalLetters_Pitch"
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
         # note: is there a need for Å/Ä/Ö here?
-        replace: [spell: "translate('.', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"]
+        replace: [SPELL: "translate('.', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"]
 
  - "0-9": [T: "."]                          	    # 	(en: '.', google: 'A')
 
@@ -200,7 +200,7 @@
     - pitch:
         value: "$CapitalLetters_Pitch"
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
-        replace: [spell: "translate('.', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
+        replace: [SPELL: "translate('.', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
 
  - "α": [T: "alfa"]                             	#  0x3b1	(en: 'alpha')
  - "β": [T: "beeta"]                            	#  0x3b2	(en: 'beta')

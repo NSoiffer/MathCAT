@@ -205,7 +205,7 @@
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', 'ΪΫϏ', 'ιυϗ')"]
+        replace: [SPELL: "translate('.', 'ΪΫϏ', 'ιυϗ')"]
     - T: "dialyytikalla"                        	# 	(en: 'with dialytika', google translation)
  - "ϊ": [T: "treema-ioota"]           	            #  0x3ca	(en: 'iota with dialytika', google translation)
  - "ϋ": [T: "treema-ypsilon"]         	            #  0x3cb	(en: 'upsilon with dialytika', google translation)
@@ -239,7 +239,7 @@
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        replace: [spell: "translate('.', 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'абвгдежзийклмнопрстуфхцчшщъыьэюя')"]
+        replace: [SPELL: "translate('.', 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ', 'абвгдежзийклмнопрстуфхцчшщъыьэюя')"]
  - "а": [T: "a"]                                	#  0x430	(google: 'а')
  - "б": [T: "bee"]                               	#  0x431	(google: 'olla')
  - "в": [T: "vee"]                               	#  0x432
@@ -428,13 +428,13 @@
  - "ℊ": [T: "pieni g"]                          	#  0x210a	(en: 'script g', google: 'käsikirjoitus g')
  - "ℌℑℨℭ":                                      	#  0x210c, 0x2111, 0x2128, 0x212d
     - T: "fraktuuri"                              	# 	(en: 'fraktur', google: 'fraktur')
-    - spell: "translate('.', 'ℌℑℨℭ', 'HIZC')"
+    - SPELL: "translate('.', 'ℌℑℨℭ', 'HIZC')"
 
  - "ℍℙℾℿ":                                      	#  0x210d, 0x2119, 0x213e, 0x213f
     - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "kaksiviivainen"]      	# 	(en: 'double struck', google translation)
-    - spell: "translate('.', 'ℍℙℾℿ', 'HPΓΠ')" 
+    - SPELL: "translate('.', 'ℍℙℾℿ', 'HPΓΠ')" 
 
  - "ℎ": [T: "planckin vakio"]                   	#  0x210e	(en: 'planck constant', google: 'planck constant')
  - "ℏ":                                         	#  0x210f
@@ -1393,7 +1393,7 @@
  - "⏟": [T: "ala-aaltosulku"]                   	#  0x23DF	(en: 'bottom brace', google: 'pohja ahdin')
  - "①-⑨":                                       	#  0x2460 - 0x2469
     - T: "ympyröity"                       	        # 	(en: 'circled', google: 'ympyröi')
-    - spell: "translate('.', '①②③④⑤⑥⑦⑧⑨', '123456789')"
+    - SPELL: "translate('.', '①②③④⑤⑥⑦⑧⑨', '123456789')"
  - "⑩": [T: "ympyröity kymmenen"]                	#  0x2469	(en: 'circled ten', google translation)
  - "⑪": [T: "ympyröity yksitoista"]                	#  0x246a	(en: 'circled eleven', google translation)
  - "⑫": [T: "ympyröity kaksitoista"]             	#  0x246b	(en: 'circled twelve', google translation)
@@ -1406,7 +1406,7 @@
  - "⑳": [T: "ympyröity kaksikymmentä"]           	#  0x2473	(en: 'circled twenty', google translation)
  - "⑴-⑼":                                       	#  0x2474 - 0x247d
     - T: "suluissa"                            	    # 	(en: 'parenthesized', google translation)
-    - spell: "translate('.', '⑴⑵⑶⑷⑸⑹⑺⑻⑼', '123456789')"
+    - SPELL: "translate('.', '⑴⑵⑶⑷⑸⑹⑺⑻⑼', '123456789')"
  - "⑽": [T: "suluissa kymmenen"]                	#  0x247d	(en: 'parenthesized ten', google translation)
  - "⑾": [T: "suluissa yksitoista"]     	            #  0x247e	(en: 'parenthesized eleven', google translation)
  - "⑿": [T: "suluissa kaksitoista"]             	#  0x247f	(en: 'parenthesized twelve', google translation)
@@ -1419,7 +1419,7 @@
  - "⒆": [T: "suluissa yhdeksäntoista"]          	#  0x2486	(en: 'parenthesized nineteen', google translation)
  - "⒇": [T: "suluissa kaksikymmentä"]           	#  0x2487	(en: 'parenthesized twenty', google translation)
  - "⒈-⒐":                                       	#  0x2488 - 0x2491
-    - spell: "translate('.', '⒈⒉⒊⒋⒌⒍⒎⒏⒐', '123456789')"
+    - SPELL: "translate('.', '⒈⒉⒊⒋⒌⒍⒎⒏⒐', '123456789')"
     - T: "pisteellä"                         	# 	(en: 'with period', google translation)
  - "⒑": [T: "kymmenen pisteellä"]            	#  0x2491	(en: 'ten with period', google translation)
  - "⒒": [T: "yksitoista pisteellä"]          	#  0x2492	(en: 'eleven with period', google translation)
@@ -1434,15 +1434,15 @@
  - "⒛": [T: "kaksikymmentä pisteellä"]          #  0x249b	(en: 'twenty with period', google translation)
  - "⒜-⒵":                                       	#  0x249c - 0x24b5
     - T: "suluissa"                            	# 	(en: 'parenthesized', google translation)
-    - spell: "translate('.', '⒜⒝⒞⒟⒠⒡⒢⒣⒤⒥⒦⒧⒨⒩⒪⒫⒬⒭⒮⒯⒰⒱⒲⒳⒴⒵', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '⒜⒝⒞⒟⒠⒡⒢⒣⒤⒥⒦⒧⒨⒩⒪⒫⒬⒭⒮⒯⒰⒱⒲⒳⒴⒵', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "Ⓐ-Ⓩ":
     - T: "iso ympyröity"                              	# 	(en: 'circled', google translation)
-    - spell: "translate('.', 'ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', 'ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "ⓐ-ⓩ":                                       	#  0x24d0 - 0x24e9
     - T: "ympyröity"                              	# 	(en: 'circled', google translation)
-    - spell: "translate('.', 'ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', 'ⓐⓑⓒⓓⓔⓕⓖⓗⓘⓙⓚⓛⓜⓝⓞⓟⓠⓡⓢⓣⓤⓥⓦⓧⓨⓩ', 'abcdefghijklmnopqrstuvwxyz')"
  - "⓪": [T: "ympyröity nolla"]                    	#  0x24ea	(en: 'circled zero', google translation)
  - "⓫": [T: "musta ympyröity yksitoista"]         	#  0x24eb	(en: 'black circled eleven', google translation)
  - "⓬": [T: "musta ympyröity kaksitoista"]        	#  0x24ec	(en: 'black circled twelve', google translation)
@@ -1456,7 +1456,7 @@
  - "⓴": [T: "musta ympyröity kaksikymmentä"]     	#  0x24f4	(en: 'black circled twenty', google translation)
  - "⓵-⓽":                                       	#  0x24f5 - 0x24fe
     - T: "kaksinkertaisesti ympyröity"               # 	(en: 'double circled', google translation)
-    - spell: "translate('.', '⓵⓶⓷⓸⓹⓺⓻⓼⓽', '123456789')"
+    - SPELL: "translate('.', '⓵⓶⓷⓸⓹⓺⓻⓼⓽', '123456789')"
  - "⓾": [T: "kaksinkertaisesti ympyröity kymmenen"] #  0x24fe	(en: 'double circled ten', google translation)
  - "⓿": [T: "musta ympyröity nolla"]              	#  0x24ff	(en: 'black circled zero', google translation)
  - "■": [T: "musta neliö"]                      	#  0x25a0	(en: 'black square')
@@ -2972,7 +2972,7 @@
  - "ⅈ": [t: "i"]                                	#  0x2148	(google: 'ⅈ')
  - "": [t: ""]                                	#  0xed13	(en: 'j', google translation)
  - "ⅅ":
-    - spell: "translate('.', 'ⅅ', 'DD')"       	#  0xed16, 0x2145
+    - SPELL: "translate('.', 'ⅅ', 'DD')"       	#  0xed16, 0x2145
 
 # The private use chars are from MathType
  - "": [t: "vastapäivään muodon integraali -silmukka"]	#  0xee00	(en: 'anticlockwise contour integral loop', google translation)
@@ -3041,33 +3041,33 @@
  # Some of these are reserved because they were used in Plane 0 -- that shouldn't be an issue other than causing the other chars to not display
  - "𝔄-𝔜":                                       	#  0x1d504 - 0x1d51d ('z' version is reserved)
     - t: "fraktur"                              	# 	(google translation)
-    - spell: "translate('.', '𝔄𝔅𝔆𝔇𝔈𝔉𝔊𝔋𝔌𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔𝔕𝔖𝔗𝔘𝔙𝔚𝔛𝔜', 'ABCDEFGHIJKLMNOPQRSTUVWXY')"
+    - SPELL: "translate('.', '𝔄𝔅𝔆𝔇𝔈𝔉𝔊𝔋𝔌𝔍𝔎𝔏𝔐𝔑𝔒𝔓𝔔𝔕𝔖𝔗𝔘𝔙𝔚𝔛𝔜', 'ABCDEFGHIJKLMNOPQRSTUVWXY')"
 
  - "-":                                       	#  0xf000 - 0xf018
     - t: "fraktur"                              	# 	(google translation)
-    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXY')"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXY')"
 
  - "𝔞-𝔷":                                       	#  0x1d51e - 0x1d537
     - t: "fraktur"                              	# 	(google translation)
-    - spell: "translate('.', '𝔞𝔟𝔠𝔡𝔢𝔣𝔤𝔥𝔦𝔧𝔨𝔩𝔪𝔫𝔬𝔭𝔮𝔯𝔰𝔱𝔲𝔳𝔴𝔵𝔶𝔷', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '𝔞𝔟𝔠𝔡𝔢𝔣𝔤𝔥𝔦𝔧𝔨𝔩𝔪𝔫𝔬𝔭𝔮𝔯𝔰𝔱𝔲𝔳𝔴𝔵𝔶𝔷', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                       	#  0xf01a - 0xf033
     - t: "fraktur"                              	# 	(google translation)
-    - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
     
  - "𝕬-𝖅":                                       	#  0x1D56C - 0x1D585
     - t: "fraktur lihavoitu"                         	# 	(google translation)
-    - spell: "translate('.', '𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '𝕬𝕭𝕮𝕯𝕰𝕱𝕲𝕳𝕴𝕵𝕶𝕷𝕸𝕹𝕺𝕻𝕼𝕽𝕾𝕿𝖀𝖁𝖂𝖃𝖄𝖅', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf040 - 0xf059
     - t: "fraktur lihavoitu"                         	# 	(google translation)
-    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝖆-𝖟":                                       	#  0x1d586 - 0x1d59f
     - t: "fraktur lihavoitu"                         	# 	(google translation)
-    - spell: "translate('.', '𝖆𝖇𝖈𝖉𝖊𝖋𝖌𝖍𝖎𝖏𝖐𝖑𝖒𝖓𝖔𝖕𝖖𝖗𝖘𝖙𝖚𝖛𝖜𝖝𝖞𝖟', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '𝖆𝖇𝖈𝖉𝖊𝖋𝖌𝖍𝖎𝖏𝖐𝖑𝖒𝖓𝖔𝖕𝖖𝖗𝖘𝖙𝖚𝖛𝖜𝖝𝖞𝖟', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                       	#  0xf05a - 0xf073
     - t: "fraktur lihavoitu"                         	# 	(google translation)
-    - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  # double struck (blackboard bold) chars in math alphabetic block and also MathType private use area
  # Some of these are reserved because they were used in Plane 0 -- that shouldn't be an issue other than causing the other chars to not display
@@ -3075,34 +3075,34 @@
     - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
-    - spell: "translate('.', '𝔸𝔹𝔺𝔻𝔼𝔽𝔾𝔿𝕀𝕁𝕂𝕃𝕄𝕅𝕆𝕇𝕈𝕉𝕊𝕋𝕌𝕍𝕎𝕏𝕐', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '𝔸𝔹𝔺𝔻𝔼𝔽𝔾𝔿𝕀𝕁𝕂𝕃𝕄𝕅𝕆𝕇𝕈𝕉𝕊𝕋𝕌𝕍𝕎𝕏𝕐', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf080 - 0xf098
     - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
-    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝕒-𝕫":                                       	#  0x1d552 - 0x1d56b
     - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
-    - spell: "translate('.', '𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                       	#  0xf09a - 0xf0b3
     - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
-    - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  - "𝟘-𝟡":                                       	#  0x1d7d8 - 0x1d7e1
     - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
-    - spell: "translate('.', '𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡', '0123456789')"
+    - SPELL: "translate('.', '𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡', '0123456789')"
  - "-":                                       	#  0xf0c0 - 0xf0c9
     - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
-    - spell: "translate('.', '', '0123456789')"
+    - SPELL: "translate('.', '', '0123456789')"
 
  - "": [t: "tuplaviiva nabla"]       	#  0xf0ca	(en: 'double struck nabla', google translation)
  - "": [t: "tuplaviiva eulerin vakio"]	#  0xf0cb	(en: 'double struck euler constant', google translation)
@@ -3110,37 +3110,37 @@
  # script chars in math alphabetic block and also MathType private use area
  - "𝒜-𝒵":                                       	#  0x1d49c - 0x1d4b5
     - t: "käsikirjoitus"                        	# 	(en: 'script', google translation)
-    - spell: "translate('.', '𝒜𝒝𝒞𝒟𝒠𝒡𝒢𝒣𝒤𝒥𝒦𝒧𝒨𝒩𝒪𝒫𝒬𝒭𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '𝒜𝒝𝒞𝒟𝒠𝒡𝒢𝒣𝒤𝒥𝒦𝒧𝒨𝒩𝒪𝒫𝒬𝒭𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf100 - 0xf119
     - t: "käsikirjoitus"                        	# 	(en: 'script', google translation)
-    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝒶-𝓏":                                       	#  0x1d4b6 - 0x1d4cf
     - t: "käsikirjoitus"                        	# 	(en: 'script', google translation)
-    - spell: "translate('.', '𝒶𝒷𝒸𝒹𝒺𝒻𝒼𝒽𝒾𝒿𝓀𝓁𝓂𝓃𝓄𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '𝒶𝒷𝒸𝒹𝒺𝒻𝒼𝒽𝒾𝒿𝓀𝓁𝓂𝓃𝓄𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                       	#  0xf11a - 0xf133
     - t: "käsikirjoitus"                        	# 	(en: 'script', google translation)
-    - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  # bold script chars in math alphabetic block and also MathType private use area
  - "𝓐-𝓩":                                       	#  0x1d4d0 - 0x1d4e9
     - t: "käsikirjoitus lihavoitu"              	# 	(en: 'script bold', google translation)
-    - spell: "translate('.', '𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf140 - 0xf159
     - t: "käsikirjoitus lihavoitu"              	# 	(en: 'script bold', google translation)
-    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝓪-𝔃":                                       	#  0x1d4ea - 0x1d503
     - t: "käsikirjoitus lihavoitu"              	# 	(en: 'script bold', google translation)
-    - spell: "translate('.', '𝓪𝓫𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '𝓪𝓫𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                       	#  0xf15a - 0xf173
     - t: "käsikirjoitus lihavoitu"              	# 	(en: 'script bold', google translation)
-    - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf180 - 0xf199
-    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')" 
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')" 
 
  - "":                                         	#  0xf19a
     - test: 
@@ -3202,138 +3202,138 @@
     - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
-    - spell: "translate('.', '', 'ΔΨΛΠΣΘΓΩΥ')"
+    - SPELL: "translate('.', '', 'ΔΨΛΠΣΘΓΩΥ')"
 
  - "-":                                       	#  0xf220 - 0xf236
     - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
-    - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
+    - SPELL: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "": [t: "tuplaviiva lopullinen sigma"]   	#  0xf237	(en: 'double struck final sigma', google translation)
  - "": [t: "tuplaviiva rho"]         	#  0xf250	(en: 'double struck rho', google translation)
  - "": [t: "double struck phi"]                	#  0xf251	(google translation)
  - "𝐀-𝐙":                                       	#  0x1d400 - 0x1d419
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf260 - 0xf279
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝐚-𝐳":                                       	#  0x1d41a - 0x1d433
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf27a - 0xf293
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝐴-𝑍":                                       	#  0x1d434 - 0x1d44d
-    - spell: "translate('.', '𝐴𝐵𝐶𝐷𝐸𝐹𝐺𝐻𝐼𝐽𝐾𝐿𝑀𝑁𝑂𝑃𝑄𝑅𝑆𝑇𝑈𝑉𝑊𝑋𝑌𝑍', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '𝐴𝐵𝐶𝐷𝐸𝐹𝐺𝐻𝐼𝐽𝐾𝐿𝑀𝑁𝑂𝑃𝑄𝑅𝑆𝑇𝑈𝑉𝑊𝑋𝑌𝑍', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf294 - 0xf2ad
-    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝑎-𝑧":                                       	#  0x1d44e - 0x1d467
-    - spell: "translate('.', '𝑎𝑏𝑐𝑑𝑒𝑓𝑔𝑕𝑖𝑗𝑘𝑙𝑚𝑛𝑜𝑝𝑞𝑟𝑠𝑡𝑢𝑣𝑤𝑥𝑦𝑧', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '𝑎𝑏𝑐𝑑𝑒𝑓𝑔𝑕𝑖𝑗𝑘𝑙𝑚𝑛𝑜𝑝𝑞𝑟𝑠𝑡𝑢𝑣𝑤𝑥𝑦𝑧', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf2ae - 0xf2c7
-    - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝑨-𝒁":                                       	#  0x1d468 - 0x1d481
     # - t: "bold italic"
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf2c8 - 0xf2e1
     # - t: "bold italic"
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝒂-𝒛":                                       	#  0x1d482 - 0x1d49b
     # - t: "bold italic"
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf2e2 - 0xf2fb
     # - t: "bold italic"
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝖠-𝖹":                                       	#  0x1d5a0 - 0x1d5b9
-    - spell: "translate('.', '𝖠𝖡𝖢𝖣𝖤𝖥𝖦𝖧𝖨𝖩𝖪𝖫𝖬𝖭𝖮𝖯𝖰𝖱𝖲𝖳𝖴𝖵𝖶𝖷𝖸𝖹', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '𝖠𝖡𝖢𝖣𝖤𝖥𝖦𝖧𝖨𝖩𝖪𝖫𝖬𝖭𝖮𝖯𝖰𝖱𝖲𝖳𝖴𝖵𝖶𝖷𝖸𝖹', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf300 - 0xf319
-    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝖺-𝗓":                                       	#  0x1d5ba - 0x1d5d3
-    - spell: "translate('.', '𝖺𝖻𝖼𝖽𝖾𝖿𝗀𝗁𝗂𝗃𝗄𝗅𝗆𝗇𝗈𝗉𝗊𝗋𝗌𝗍𝗎𝗏𝗐𝗑𝗒𝗓', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '𝖺𝖻𝖼𝖽𝖾𝖿𝗀𝗁𝗂𝗃𝗄𝗅𝗆𝗇𝗈𝗉𝗊𝗋𝗌𝗍𝗎𝗏𝗐𝗑𝗒𝗓', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf31a - 0xf333
-    - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  
  - "𝗔-𝗭":                                       	#  0x1d5d4 - 0x1d5ed
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '𝗔𝗕𝗖𝗗𝗘𝗙𝗚𝗛𝗜𝗝𝗞𝗟𝗠𝗡𝗢𝗣𝗤𝗥𝗦𝗧𝗨𝗩𝗪𝗫𝗬𝗭', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf334 - 0xf34d
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝗮-𝘇":                                       	#  0x1d5ee - 0x1d607
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '𝗮𝗯𝗰𝗱𝗲𝗳𝗴𝗵𝗶𝗷𝗸𝗹𝗺𝗻𝗼𝗽𝗾𝗿𝘀𝘁𝘂𝘃𝘄𝘅𝘆𝘇', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf34e - 0xf367
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  - "𝘈-𝘡":                                       	#  0x1d608 - 0x1d621
     # - t: "italic"
-    - spell: "translate('.', '𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
  - "-":                                       	#  0xf368 - 0xf381
       # - t: "italic"
-    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝘢-𝘻":                                       	#  0x1d622 - 0x1d63b
       # - t: "italic"
-    - spell: "translate('.', '𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf382 - 0xf39b
       # - t: "italic"
-    - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝘼-𝙕":                                       	#  0x1d63c - 0x1d655
     # - t: "bold italic"
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf39c - 0xf3b5
     # - t: "bold italic"
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝙖-𝙯":                                       	#  0x1d656 - 0x1d66f
     # - t: "bold italic"
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf3b6 - 0xf3cf
     # - t: "bold italic"
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝙰-𝚉":                                       	#  0x1d670 - 0x1d689
-    - spell: "translate('.', '𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '𝙰𝙱𝙲𝙳𝙴𝙵𝙶𝙷𝙸𝙹𝙺𝙻𝙼𝙽𝙾𝙿𝚀𝚁𝚂𝚃𝚄𝚅𝚆𝚇𝚈𝚉', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf3d0 - 0xf3e9
-    - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
+    - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝚊-𝚣":                                       	#  0x1d68a - 0x1d6a3
-    - spell: "translate('.', '𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '𝚊𝚋𝚌𝚍𝚎𝚏𝚐𝚑𝚒𝚓𝚔𝚕𝚖𝚗𝚘𝚙𝚚𝚛𝚜𝚝𝚞𝚟𝚠𝚡𝚢𝚣', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf3ea - 0xf403
-    - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
+    - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "": [t: "dotless i"]                        	#  0xf404	(google translation)
  - "𝚤": [t: "pisteetön i"]                      	#  0x1d6a4	(en: 'dotless i', google: 'dotless i')
@@ -3341,113 +3341,113 @@
 
  - "𝚨-𝛀":                                       	#  0x1d6a8 - 0x1d6c0
     - t: "pisteetön j"                          	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '𝚨𝚩𝚪𝚫𝚬𝚭𝚮𝚯𝚰𝚱𝚲𝚳𝚴𝚵𝚶𝚷𝚸𝚹𝚺𝚻𝚼𝚽𝚾𝚿𝛀', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
+    - SPELL: "translate('.', '𝚨𝚩𝚪𝚫𝚬𝚭𝚮𝚯𝚰𝚱𝚲𝚳𝚴𝚵𝚶𝚷𝚸𝚹𝚺𝚻𝚼𝚽𝚾𝚿𝛀', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                       	#  0xf408 - 0xf420
     - t: "pisteetön j"                          	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
+    - SPELL: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝛂-𝛚":                                       	#  0x1d6c2 - 0x1d6da
     - t: "pisteetön j"                          	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '𝛂𝛃𝛄𝛅𝛆𝛇𝛈𝛉𝛊𝛋𝛌𝛍𝛎𝛏𝛐𝛑𝛒𝛓𝛔𝛕𝛖𝛗𝛘𝛙𝛚', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+    - SPELL: "translate('.', '𝛂𝛃𝛄𝛅𝛆𝛇𝛈𝛉𝛊𝛋𝛌𝛍𝛎𝛏𝛐𝛑𝛒𝛓𝛔𝛕𝛖𝛗𝛘𝛙𝛚', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                       	#  0xf422 - 0xf43a
     - t: "pisteetön j"                          	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+    - SPELL: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "": [t: "lihavoitu nabla"]                  	#  0xf421	(en: 'bold nabla', google translation)
  - "𝛁": [t: "lihavoitu nabla"]                  	#  0x1d6c1	(en: 'bold nabla')
 
  - "𝛛𝛜𝛝𝛞𝛟𝛠𝛡":                                   	#  0x1D6DB - 0x1D6E1
     - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '𝛛𝛜𝛝𝛞𝛟𝛠𝛡', '∂εθκφρπ')"
+    - SPELL: "translate('.', '𝛛𝛜𝛝𝛞𝛟𝛠𝛡', '∂εθκφρπ')"
 
  - "":                                   	#  0xF43C - 0xF441
     - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '', '∂εθκφρπ')"
+    - SPELL: "translate('.', '', '∂εθκφρπ')"
 
  - "𝛢-𝛺":                                       	#  0x1d6e2 - 0x1d6fa
       # - t: "italic"
-    - spell: "translate('.', '𝛢𝛣𝛤𝛥𝛦𝛧𝛨𝛩𝛪𝛫𝛬𝛭𝛮𝛯𝛰𝛱𝛲𝛳𝛴𝛵𝛶𝛷𝛸𝛹𝛺', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
+    - SPELL: "translate('.', '𝛢𝛣𝛤𝛥𝛦𝛧𝛨𝛩𝛪𝛫𝛬𝛭𝛮𝛯𝛰𝛱𝛲𝛳𝛴𝛵𝛶𝛷𝛸𝛹𝛺', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                       	#  0xf442 - 0xf45a
       # - t: "italic"
-    - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
+    - SPELL: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝛼-𝜔":                                       	#  0x1d6fc - 0x1d714
       # - t: "italic"
-    - spell: "translate('.', '𝛼𝛽𝛾𝛿𝜀𝜁𝜂𝜃𝜄𝜅𝜆𝜇𝜈𝜉𝜊𝜋𝜌𝜍𝜎𝜏𝜐𝜑𝜒𝜓𝜔', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+    - SPELL: "translate('.', '𝛼𝛽𝛾𝛿𝜀𝜁𝜂𝜃𝜄𝜅𝜆𝜇𝜈𝜉𝜊𝜋𝜌𝜍𝜎𝜏𝜐𝜑𝜒𝜓𝜔', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                       	#  0xf45c - 0xf474
       # - t: "italic"
-    - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+    - SPELL: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "": [t: "kursivoitu nabla"]                 	#  0xf45b	(en: 'italic nabla', google translation)
  - "𝛻": [t: "lihavoitu nabla"]                  	#  0x1d6fb	(en: 'italic nabla', google: 'kursivoitu nabla')
 
  - "𝜕𝜖𝜗𝜘𝜙𝜚𝜛":                                   	#  0x1d715 - 0x1d71b
       # - t: "italic"
-    - spell: "translate('.', '𝜕𝜖𝜗𝜘𝜙𝜚𝜛', '∂εθκφρπ')"
+    - SPELL: "translate('.', '𝜕𝜖𝜗𝜘𝜙𝜚𝜛', '∂εθκφρπ')"
 
  - "":                                   	#  0xf475  - 0xf47b
       # - t: "italic"
-    - spell: "translate('.', '', '∂εθκφρπ')"
+    - SPELL: "translate('.', '', '∂εθκφρπ')"
 
  - "𝜜-𝜴":                                       	#  0x1d71c - 0x1d734
     # - t: "bold italic"
     - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '𝜜𝜝𝜞𝜟𝜠𝜡𝜢𝜣𝜤𝜥𝜦𝜧𝜨𝜩𝜪𝜫𝜬𝜭𝜮𝜯𝜰𝜱𝜲𝜳𝜴', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
+    - SPELL: "translate('.', '𝜜𝜝𝜞𝜟𝜠𝜡𝜢𝜣𝜤𝜥𝜦𝜧𝜨𝜩𝜪𝜫𝜬𝜭𝜮𝜯𝜰𝜱𝜲𝜳𝜴', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                       	#  0xf47c - 0xf494
     # - t: "bold italic"
     - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
+    - SPELL: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝜶-𝝎":                                       	#  0x1d736 - 0x1d74e
     # - t: "bold italic"
     - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '𝜶𝜷𝜸𝜹𝜺𝜻𝜼𝜽𝜾𝜿𝝀𝝁𝝂𝝃𝝄𝝅𝝆𝝇𝝈𝝉𝝊𝝋𝝌𝝍𝝎', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+    - SPELL: "translate('.', '𝜶𝜷𝜸𝜹𝜺𝜻𝜼𝜽𝜾𝜿𝝀𝝁𝝂𝝃𝝄𝝅𝝆𝝇𝝈𝝉𝝊𝝋𝝌𝝍𝝎', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                       	#  0xf496 - 0xf4ae
     # - t: "bold italic"
     - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+    - SPELL: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "𝝏𝝐𝝑𝝒𝝓𝝔𝝕":                                   	#  0x1d74f - 0x1d755
     # - t: "bold italic"
     - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '𝝏𝝐𝝑𝝒𝝓𝝔𝝕', '∂εθκφρπ')"
+    - SPELL: "translate('.', '𝝏𝝐𝝑𝝒𝝓𝝔𝝕', '∂εθκφρπ')"
 
  - "":                                   	#  0xf422 - 0xf43a
     # - t: "bold italic"
     - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '', '∂εθκφρπ')"
+    - SPELL: "translate('.', '', '∂εθκφρπ')"
 
  - "𝜵": [t: "lihavoitu nabla"]                  	#  0x1d735	(en: 'bold italic nabla', google: 'rohkea kursivoitu nabla')
  - "": [t: "lihavoitu kursivoitu nabla"]          	#  0xf495	(en: 'bold italic nabla', google translation)
 
  - "𝝖-𝝮":                                       	#  0x1d756 - 0x1d76e
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '𝝖𝝗𝝘𝝙𝝚𝝛𝝜𝝝𝝞𝝟𝝠𝝡𝝢𝝣𝝤𝝥𝝦𝝧𝝨𝝩𝝪𝝫𝝬𝝭𝝮', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
+    - SPELL: "translate('.', '𝝖𝝗𝝘𝝙𝝚𝝛𝝜𝝝𝝞𝝟𝝠𝝡𝝢𝝣𝝤𝝥𝝦𝝧𝝨𝝩𝝪𝝫𝝬𝝭𝝮', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
  - "-":                                       	#  0xf4b6 - 0xf4ce
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
+    - SPELL: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝝰-𝞈":                                       	#  0x1d770 - 0x1d788
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '𝝰𝝱𝝲𝝳𝝴𝝵𝝶𝝷𝝸𝝹𝝺𝝻𝝼𝝽𝝾𝝿𝞀𝞁𝞂𝞃𝞄𝞅𝞆𝞇𝞈', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+    - SPELL: "translate('.', '𝝰𝝱𝝲𝝳𝝴𝝵𝝶𝝷𝝸𝝹𝝺𝝻𝝼𝝽𝝾𝝿𝞀𝞁𝞂𝞃𝞄𝞅𝞆𝞇𝞈', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                       	#  0xf4d0 - 0xf4e8
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+    - SPELL: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "𝞉𝞊𝞋𝞌𝞍𝞎𝞏":                                   	#  0x1d789 - 0x1d78f
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '𝞉𝞊𝞋𝞌𝞍𝞎𝞏', '∂εθκφρπ')"
+    - SPELL: "translate('.', '𝞉𝞊𝞋𝞌𝞍𝞎𝞏', '∂εθκφρπ')"
 
  - "":                                   	#  0xf4e9 - 0xf4ef
     - t: "lihavoitu"                            	# 	(en: 'bold', google translation)
-    - spell: "translate('.', '', '∂εθκφρπ')"
+    - SPELL: "translate('.', '', '∂εθκφρπ')"
 
  - "": [t: "lihavoitu nabla"]                  	#  0xf4cf	(en: 'bold nabla', google translation)
  - "𝝯": [t: "lihavoitu nabla"]                  	#  0x1d76f	(en: 'bold nabla')
@@ -3455,32 +3455,32 @@
  - "𝞐-𝞨":                                       	#  0x1d790 - 0x1d7a8
     # - t: "bold italic"
     - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '𝞐𝞑𝞒𝞓𝞔𝞕𝞖𝞗𝞘𝞙𝞚𝞛𝞜𝞝𝞞𝞟𝞠𝞡𝞢𝞣𝞤𝞥𝞦𝞧𝞨', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
+    - SPELL: "translate('.', '𝞐𝞑𝞒𝞓𝞔𝞕𝞖𝞗𝞘𝞙𝞚𝞛𝞜𝞝𝞞𝞟𝞠𝞡𝞢𝞣𝞤𝞥𝞦𝞧𝞨', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                       	#  0xf4f0 - 0xf508
     # - t: "bold italic"
     - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
+    - SPELL: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝞪-𝟂":                                       	#  0x1d7aa - 0x1d7c2
     # - t: "bold italic"
     - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '𝞪𝞫𝞬𝞭𝞮𝞯𝞰𝞱𝞲𝞳𝞴𝞵𝞶𝞷𝞸𝞹𝞺𝞻𝞼𝞽𝞾𝞿𝟀𝟁𝟂', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+    - SPELL: "translate('.', '𝞪𝞫𝞬𝞭𝞮𝞯𝞰𝞱𝞲𝞳𝞴𝞵𝞶𝞷𝞸𝞹𝞺𝞻𝞼𝞽𝞾𝞿𝟀𝟁𝟂', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                       	#  0xf50a - 0xf522
     # - t: "bold italic"
     - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
+    - SPELL: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "𝟃𝟄𝟅𝟆𝟇𝟈𝟉":                                   	#  0x1d7c3 - 0x1d7c9
     # - t: "bold italic"
     - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '𝟃𝟄𝟅𝟆𝟇𝟈𝟉', '∂εθκφρπ')"
+    - SPELL: "translate('.', '𝟃𝟄𝟅𝟆𝟇𝟈𝟉', '∂εθκφρπ')"
 
  - "":                                   	#  0xf523 - 0xf529
     # - t: "bold italic"
     - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
-    - spell: "translate('.', '', '∂εθκφρπ')"
+    - SPELL: "translate('.', '', '∂εθκφρπ')"
 
  - "": [T: "lihavoitu nabla"]                  	#  0xf509	(en: 'bold nabla', google translation)
  - "𝞩": [T: "lihavoitu nabla"]                  	#  0x1d7a9	(en: 'bold nabla')

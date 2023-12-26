@@ -54,7 +54,7 @@
           then:
           - x: "*[2]"
           # How to handle pronounce?
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+          - PRONOUNCE: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: [{x: "*[2]"}]
       - T: "juuri"        # phrase(the square 'root' of)
   - test:
@@ -202,7 +202,7 @@
   - x: "*[1]"
   - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
-  - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+  - PRONOUNCE: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
 
 - name: simple
   tag: power

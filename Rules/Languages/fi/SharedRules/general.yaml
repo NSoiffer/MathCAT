@@ -455,7 +455,7 @@
       - if: "*[1][text()='log']"
         then: [{T: "logaritmi"}]      # phrase(the 'log' function is used in mathematics)
       - else_if: "$Verbosity='Terse'"
-        then: [{spell: "'ln'"}]
+        then: [{SPELL: "'ln'"}]
         else: [{T: "luonnollinen logaritmi"}]      # phrase(the 'natural log' function is used in mathematics)
       else:
       - test:
@@ -465,7 +465,7 @@
         - if: "*[1][text()='log']"
           then: [{T: "logaritmi"}]      # phrase(the 'log' function is used in mathematics)
         - else_if: "$Verbosity='Terse'"
-          then: [{spell: "'ln'"}]
+          then: [{SPELL: "'ln'"}]
           else: [{T: "luonnollinen logaritmi"}]      # phrase(the 'natural log' function is used in mathematics)
       - T: ""     # phrase(5 is the square root 'of' 25)
       - pause: short
