@@ -157,6 +157,7 @@ fn mhchem_roman_in_superscript() {
         </mmultiscripts>
       </mrow>
     </math>";
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "f hoa e, hóa trị 2 la mã, f hoa e, hóa trị 3 la mã, o hoa, 4");
   test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "f e, hóa trị 2, f e, hóa trị 3, o , 4");
   // when Roman numbers written on superscript at the middle, it should be added prefix text "hóa trị" then + the number
 }
