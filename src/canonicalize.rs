@@ -782,7 +782,7 @@ impl CanonicalizeContext {
 				};
 			},
 			"mtext" => {
-				debug!("before merge_arc_trig: {}", mml_to_string(&mathml));
+				// debug!("before merge_arc_trig: {}", mml_to_string(&mathml));
 
 				if let Some(result) = merge_arc_trig(mathml) {
 					return Some(result);
