@@ -23,7 +23,7 @@
  - "´": [T: "akuutti"]                          	#  0xb4	(en: 'acute')
  - "µ": [T: "mikro"]                            	#  0xb5	(en: 'micro')
  - "¹": [T: "yläindeksi yksi"]                  	#  0xb9	(en: 'one', google: 'yksi')
- - "º": [T: "maskuliinisen järjestysluvun merkki"]	#  0xb9	(en: 'masculine ordinal indicator', google: 'maskuliininen ordinaaliindikaattori') # should be 0xba
+ - "º": [T: "maskuliininen järjestysluku"]	#  0xb9	(en: 'masculine ordinal indicator', google: 'maskuliininen ordinaaliindikaattori') # should be 0xba
  - "·":
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
