@@ -457,7 +457,8 @@ pub fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
                     // don't mark as both formula and equation
                     mathml.set_attribute_value(if chem == CHEM_FORMULA {CHEM_FORMULA_OPERATOR} else {CHEM_EQUATION_OPERATOR}, maybe_attr.value());
                 }
-                },
+            },
+            "mn" => (),
             "mrow" | "msub" | "msup" | "msubsup" | "mmultiscripts" => {
                 let mut chem_name = chem;
                 if tag_name != "mrow" && chem != CHEM_FORMULA{
