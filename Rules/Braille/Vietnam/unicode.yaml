@@ -53,8 +53,6 @@
  - "⊵": [t: "⠸⠸⠜"]             # 0x22B5 (Contains as normal subgroup or equal)
  - "⋬": [t: "⠨⠸⠣"]             # 0x22EC (not normal subgroup) -- this isn't the same as what is in GTM 10, but that similar has no Unicode equiv
  - "⋭": [t: "⠨⠸⠣"]             # 0x22ED (does not contain as normal subgroup) -- this isn't the same as what is in GTM 10, but that similar has no Unicode equiv
- - "⊢": [t: "⠸⠒"]               # 0x22a2 (Right tack)
- - "⊣": [t: "⠈⠸⠒"]              # 0x22a3 (Left tack)
  - "−": [t: "⠐⠤"]               # 0x2212 (Minus sign)
  - "·": [T: "⠐⠦"]               # 0x00D7 (Multiplication dot (times))
  - "×": [T: "⠐⠦"]               # 0x00D7 (Multiplication sign (times))
@@ -139,15 +137,17 @@
  - "∥": [T: "⠫⠶"]               # 0x2225 (Parallel) VI: AB parallel to CD, should be: ⠫AB⠶CD
  - "∦": [T: "⠫⠾"]             # 0x2226 (Not parallel) Vi: AB not parallel to CD, should be: ⠫AB⠐⠾CD
  - "⟂": [T: "⠫⠧"]               # 0x27C2 (Perpendicular)
+ - "⊢": [t: "⠸⠒"]               # 0x22a2 (Right tack)
+ - "⊣": [t: "⠈⠸⠒"]              # 0x22a3 (Left tack)
  - "⊥": [T: "⠫⠧"]               # 0x22A5 (Up tack (perpendicular))
  - "⊦": [t: "⠸⠒"]               # 0x22A6 (Assertion (is a theorem))
- - "⊣": [t: "⠈⠸⠒"]              # 0x22A3 (Left tack (reverse assertion))
  - "⊨": [t: "⠘⠸⠒"]              # 0x22A8 (TRUE (is valid))
  - "⊬": [t: "⠸⠒⠈⠱"]             # 0x22AC (Does not prove)
  - "⊭": [t: "⠘⠸⠒⠈⠱"]            # 0x22AD (Not TRUE)
  - "⫤": [t: "⠨⠸⠒"]              # 0x2AE4 (Vertical bar double left turnstile)
  - "✓": [t: "⠈⠩"]               # 0x2713 (Check mark (tick))
  - "⦵": [t: "⠨⠚"]               # 0x29B5 (Plimsoll sign (standard state))
+ - "⮖": [t: "1⠐⠠⠤⠯⠫⠿"]         # 0x2B96 (MEDIUM SMALL WHITE CIRCLE WITH HORIZONTAL BAR (standard state))
  - "←": [t: "⠳⠪"]              # 0x2190 (Leftwards arrow)
  - "↑": [t: "⠳⠬"]              # 0x2191 (Upwards arrow)
  - "→": [t: "⠳⠕"]              # 0x2192 (Rightwards arrow)
@@ -201,10 +201,25 @@
  - "⇡": [t: "⠳⠂⠬"]             # 0x21E1 (Upwards dashed arrow)
  - "⇢": [t: "⠳⠂⠕"]             # 0x21E2 (Rightwards dashed arrow)
  - "⇣": [t: "⠳⠂⠩"]             # 0x21E3 (Downwards dashed arrow)
- - "⟵": [t: "⠳⠒⠒⠒⠪"]           # 0x27F5 (Long leftwards arrow)
- - "⟶": [t: "⠳⠒⠒⠒⠕"]           # 0x27F6 (Long rightwards arrow)
+ - "⟵": [t: "⠳⠪"]           # 0x27F5 (Long leftwards arrow)
+ - "⟶": [t: "⠳⠕"]           # 0x27F6 (Long rightwards arrow)
  - "⥂": [t: "⠸⠶"]               # 0x2942 (Rightwards arrow above short leftwards arrow (equilibrium, trend to the right))
  - "⥄": [t: "⠈⠸⠶"]              # 0x2944 (Short rightwards arrow above leftwards arrow (equilibrium, trend to the left))
+
+# Mappings for some new Unicode chemistry arrows/symbols
+# These need to be verified -- 0x1f8d1, 0x1f8d2, and 0x1f8d3 conflict with GTM 16 (uses short arrow when really should be long)
+ - "🣐": [t: "⠳⠒⠒⠒⠕⠻⠳⠒⠒⠒⠪"]           # 0x1F8D0 LONG RIGHTWARDS ARROW OVER LONG LEFTWARDS ARROW
+ - "🣑": [t: "⠳⠪⠕"]               # 0x1f8d1 (Long rightwards harpoon over leftwards harpoon (equilibrium))
+ - "🣒": [t: "⠸⠶"]                # 0x1f8d2 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the right))
+ - "🣓": [t: "⠈⠸⠶"]               # 0x1f8d3 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the left))
+#  - "🣑": [t: "⠳⠒⠒⠒⠈⠗⠕⠻⠳⠒⠒⠒⠠⠗⠪"]     # 0x1F8D1 LONG RIGHTWARDS HARPOON OVER LONG LEFTWARDS HARPOON
+#  - "🣒": [t: "⠳⠒⠒⠒⠈⠗⠕⠻⠳⠒⠠⠗⠪"]         # 0x1F8D2 LONG RIGHTWARDS HARPOON ABOVESHORT LEFTWARDS HARPOON
+#  - "🣓": [t: "⠳⠒⠈⠗⠕⠻⠳⠒⠒⠒⠠⠗⠪"]         # 0x1F8D3 SHORT RIGHTWARDS HARPOON ABOVELONG LEFTWARDS HARPOON
+ - "🣔": [t: "⠳⠒⠒⠒⠈⠗⠪⠻⠳⠒⠠⠗⠕"]         # 0x1F8D4 LONG LEFTWARDS HARPOON ABOVESHORT RIGHTWARDS HARPOON
+ - "🣕": [t: "⠳⠒⠈⠗⠪⠻⠳⠒⠒⠒⠠⠗⠕"]         # 0x1F8D5 SHORT LEFTWARDS HARPOON ABOVELONG RIGHTWARDS HARPOON
+ - "🣖": [t: "⠳⠒⠒⠒⠕⠯⠠⠭"]                # 0x1F8D6 LONG RIGHTWARDS ARROW WITH THROUGH X
+ - "🣗": [t: "⠐⠠⠤⠯⠫⠿"]                    # 0x1F8D7 LONG RIGHTWARDS ARROW WITH DOUBLE SLASH
+
  - "△": [T: "⠫⠼⠉"]            # 0x25B3 (Triangle)
  - "□": [T: "⠫⠼⠙"]            # 0x25A1 (Square)
  - "▤": [T: "⠨⠫⠼⠙"]            # 0x25A4 (Square with horizontal fill)
@@ -286,7 +301,7 @@
         else: [t: "⠒W"]
 
  - "-":                        # 0x2d (Minus sign or hyphen)
-     - test:
+    - test:
         if: "self::m:mo"
         then: [t: "⠐⠤"]
         else: [t: "⠤"]
@@ -499,82 +514,30 @@
  - "Ỵ": [t: "CL⠠𝑐L⠽"]
 
  - "A": [t: "CL⠁"]              # 0x41 
- - "B":                         # 0x42 
-    - test:
-        if: "@data-chem-element"
-        then: [t: "𝐶L⠃"]
-        else: [t: "CL⠃"]
- - "C":                         # 0x43 
-    - test:
-        if: "@data-chem-element"
-        then: [t: "𝐶L⠉"]
-        else: [t: "CL⠉"]
+ - "B": [t: "CL⠃"]              # 0x42
+ - "C": [t: "CL⠉"]              # 0x43 
  - "D": [t: "CL⠙"]              # 0x44 
  - "E": [t: "CL⠑"]              # 0x45 
  - "F": [t: "CL⠋"]              # 0x46 
  - "G": [t: "CL⠛"]              # 0x47 
- - "H":                         # 0x48 
-    - test:
-        if: "@data-chem-element"
-        then: [t: "𝐶L⠓"]
-        else: [t: "CL⠓"]
- - "I":                         # 0x49 
-    - test:
-        if: "@data-chem-element"
-        then: [t: "𝐶L⠊"]
-        else: [t: "CL⠊"]
+ - "H": [t: "CL⠓"]              # 0x48 
+ - "I": [t: "CL⠊"]              # 0x49 
  - "J": [t: "CL⠚"]              # 0x4a 
- - "K":                         # 0x4b 
-    - test:
-        if: "@data-chem-element"
-        then: [t: "𝐶L⠅"]
-        else: [t: "CL⠅"]
+ - "K": [t: "CL⠅"]              # 0x4b 
  - "L": [t: "CL⠇"]              # 0x4c 
  - "M": [t: "CL⠍"]              # 0x4d 
- - "N":                         # 0x4e 
-    - test:
-        if: "@data-chem-element"
-        then: [t: "𝐶L⠝"]
-        else: [t: "CL⠝"]
- - "O":                         # 0x4f 
-    - test:
-        if: "@data-chem-element"
-        then: [t: "𝐶L⠕"]
-        else: [t: "CL⠕"]
- - "P":                         # 0x50 
-    - test:
-        if: "@data-chem-element"
-        then: [t: "𝐶L⠏"]
-        else: [t: "CL⠏"]
+ - "N": [t: "CL⠝"]              # 0x4e 
+ - "O": [t: "CL⠕"]              # 0x4f 
+ - "P": [t: "CL⠏"]              # 0x50 
  - "Q": [t: "CL⠟"]              # 0x51 
  - "R": [t: "CL⠗"]              # 0x52 
- - "S":                         # 0x53 
-    - test:
-        if: "@data-chem-element"
-        then: [t: "𝐶L⠎"]
-        else: [t: "CL⠎"]
+ - "S": [t: "CL⠎"]              # 0x53 
  - "T": [t: "CL⠞"]              # 0x54 
- - "U":                         # 0x55 
-    - test:
-        if: "@data-chem-element"
-        then: [t: "𝐶L⠥"]
-        else: [t: "CL⠥"]
- - "V":                         # 0x56 
-    - test:
-        if: "@data-chem-element"
-        then: [t: "𝐶L⠧"]
-        else: [t: "CL⠧"]
- - "W":                         # 0x57 
-    - test:
-        if: "@data-chem-element"
-        then: [t: "𝐶L⠺"]
-        else: [t: "CL⠺"]
+ - "U": [t: "CL⠥"]              # 0x55 
+ - "V": [t: "CL⠧"]              # 0x56 
+ - "W": [t: "CL⠺"]              # 0x57 
  - "X": [t: "CL⠭"]              # 0x58 
- - "Y":                         # 0x59 
-    - test:
-        if: "@data-chem-element"
-        then: [t: "𝐶L⠽"]
-        else: [t: "CL⠽"]
+ - "Y": [t: "CL⠽"]              # 0x59 
  - "Z": [t: "CL⠵"]              # 0x5a 
 
  - "α": [t: "GL⠁"]              # 0x3b1 

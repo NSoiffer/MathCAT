@@ -1824,6 +1824,7 @@ impl BrailleChars {
                 + &caps["greek"]
                 + &caps["char"]
         });
+        debug!("get_braille_ueb_chars: '{}'", &result);
         return Ok(result.to_string())
     }
 
@@ -1896,12 +1897,19 @@ impl BrailleChars {
         // this is basically the same as for ueb except:
         // 1. we deal with switching '.' and ',' if in English style for numbers
         // 2. if it is identified as a Roman Numeral, we make all but the first char lower case because they shouldn't get a cap indicator
+        // 3. double letter chemical elements should NOT be part of a cap word sequence
         if name(&node) == "mn" {
             // text of element is modified by these if needed
             lower_case_roman_numerals(node);
             switch_if_english_style_number(node);
         }
-        return BrailleChars::get_braille_ueb_chars(node, text_range);
+        let mut result = BrailleChars::get_braille_ueb_chars(node, text_range)?;
+        if let Some(value) = node.attribute_value("data-chem-element") {
+            if value != "1" {
+                result = result.replace("CL", "𝐶L");
+            }
+        }
+        return Ok(result);
 
         fn lower_case_roman_numerals(mn_node: Element) {
             if mn_node.attribute("data-roman-numeral").is_some() {
