@@ -3074,69 +3074,69 @@
  - "𝔸-𝕐":                                       	#  0x1d504 - 0x1d51d ('z' version is reserved)
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
+         then: [T: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
     - SPELL: "translate('.', '𝔸𝔹𝔺𝔻𝔼𝔽𝔾𝔿𝕀𝕁𝕂𝕃𝕄𝕅𝕆𝕇𝕈𝕉𝕊𝕋𝕌𝕍𝕎𝕏𝕐', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf080 - 0xf098
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
+         then: [T: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
     - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝕒-𝕫":                                       	#  0x1d552 - 0x1d56b
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
+         then: [T: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
     - SPELL: "translate('.', '𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                       	#  0xf09a - 0xf0b3
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
+         then: [T: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
     - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  - "𝟘-𝟡":                                       	#  0x1d7d8 - 0x1d7e1
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
+         then: [T: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
     - SPELL: "translate('.', '𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡', '0123456789')"
  - "-":                                       	#  0xf0c0 - 0xf0c9
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
+         then: [T: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
     - SPELL: "translate('.', '', '0123456789')"
 
- - "": [t: "tuplaviiva nabla"]       	#  0xf0ca	(en: 'double struck nabla', google translation)
- - "": [t: "tuplaviiva eulerin vakio"]	#  0xf0cb	(en: 'double struck euler constant', google translation)
+ - "": [T: "tuplaviiva nabla"]       	#  0xf0ca	(en: 'double struck nabla', google translation)
+ - "": [T: "tuplaviiva eulerin vakio"]	#  0xf0cb	(en: 'double struck euler constant', google translation)
  
  # script chars in math alphabetic block and also MathType private use area
  - "𝒜-𝒵":                                       	#  0x1d49c - 0x1d4b5
-    - t: "käsikirjoitus"                        	# 	(en: 'script', google translation)
+    - T: "kauno"                        	# 	(en: 'script', google translation)
     - SPELL: "translate('.', '𝒜𝒝𝒞𝒟𝒠𝒡𝒢𝒣𝒤𝒥𝒦𝒧𝒨𝒩𝒪𝒫𝒬𝒭𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf100 - 0xf119
-    - t: "käsikirjoitus"                        	# 	(en: 'script', google translation)
+    - T: "kauno"                        	# 	(en: 'script', google translation)
     - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝒶-𝓏":                                       	#  0x1d4b6 - 0x1d4cf
-    - t: "käsikirjoitus"                        	# 	(en: 'script', google translation)
+    - T: "kauno"                        	# 	(en: 'script', google translation)
     - SPELL: "translate('.', '𝒶𝒷𝒸𝒹𝒺𝒻𝒼𝒽𝒾𝒿𝓀𝓁𝓂𝓃𝓄𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                       	#  0xf11a - 0xf133
-    - t: "käsikirjoitus"                        	# 	(en: 'script', google translation)
+    - T: "kauno"                        	# 	(en: 'script', google translation)
     - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  # bold script chars in math alphabetic block and also MathType private use area
  - "𝓐-𝓩":                                       	#  0x1d4d0 - 0x1d4e9
-    - t: "käsikirjoitus lihavoitu"              	# 	(en: 'script bold', google translation)
+    - T: "lihavoitu kauno"              	# 	(en: 'script bold', google translation)
     - SPELL: "translate('.', '𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf140 - 0xf159
-    - t: "käsikirjoitus lihavoitu"              	# 	(en: 'script bold', google translation)
+    - T: "lihavoitu kauno"              	# 	(en: 'script bold', google translation)
     - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝓪-𝔃":                                       	#  0x1d4ea - 0x1d503
-    - t: "käsikirjoitus lihavoitu"              	# 	(en: 'script bold', google translation)
+    - T: "lihavoitu kauno"              	# 	(en: 'script bold', google translation)
     - SPELL: "translate('.', '𝓪𝓫𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                       	#  0xf15a - 0xf173
-    - t: "käsikirjoitus lihavoitu"              	# 	(en: 'script bold', google translation)
+    - T: "lihavoitu kauno"              	# 	(en: 'script bold', google translation)
     - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                       	#  0xf180 - 0xf199
@@ -3155,11 +3155,11 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "isot kirjaimet"]         	# 	(en: 'cap', google translation)
+            then: [T: "iso"]         	# 	(en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        replace: [t: "ligature ae"]             	# 	(google translation)
+        replace: [T: "ligatuuri ae"]             	# 	(google translation) NOTE: translation unclear
  - "":                                         	#  0xf19b
     - test: 
         if: "$CapitalLetters_Beep"
@@ -3173,11 +3173,11 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "isot kirjaimet"]         	# 	(en: 'cap', google translation)
+            then: [T: "iso"]         	# 	(en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        replace: [t: "terävä s"]                	# 	(en: 'sharp s', google translation)
+        replace: [T: "terävä s"]                	# 	(en: 'sharp s', google translation) NOTE: translation unclear
  - "":                                         	#  0xf19c
     - test: 
         if: "$CapitalLetters_Beep"
@@ -3191,11 +3191,11 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "isot kirjaimet"]         	# 	(en: 'cap', google translation)
+            then: [T: "iso"]         	# 	(en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        replace: [t: "o yliviivauksella"]      	# 	(en: 'o with stroke', google translation)
+        replace: [T: "o yliviivauksella"]      	# 	(en: 'o with stroke', google translation)
 
  # MathType only has a few of the cap Greek letters in PUA
  - "":                                 	#  0xf201 - 0xf209
@@ -3405,7 +3405,7 @@
 
  - "𝜶-𝝎":                                       	#  0x1d736 - 0x1d74e
     # - t: "bold italic"
-    - t: "lihavoitu nabla"                      	# 	(en: 'bold', google: 'lihavoitu')
+    - T: "lihavoitu"                      	# 	(en: 'bold', google: 'lihavoitu')
     - SPELL: "translate('.', '𝜶𝜷𝜸𝜹𝜺𝜻𝜼𝜽𝜾𝜿𝝀𝝁𝝂𝝃𝝄𝝅𝝆𝝇𝝈𝝉𝝊𝝋𝝌𝝍𝝎', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                       	#  0xf496 - 0xf4ae
@@ -3580,7 +3580,7 @@
  - "": [T: "vasen paren ala"]                 	#  0xf8ed	(en: 'left paren bottom', google translation)
  - "": [T: "vasen hakasulku ylä"]         	#  0xf8ee	(en: 'left bracket top', google translation)
  - "": [T: "vasen hakasulku laajennus"]                	#  0xf8ef	(en: 'left bracket extender', google translation)
- - "": [t: "vasen hakasulku ala"]             	#  0xf8f0	(en: 'left bracket bottom', google translation)
+ - "": [T: "vasen hakasulku ala"]             	#  0xf8f0	(en: 'left bracket bottom', google translation)
  - "": [T: "vasen hakasulku ylä"]               	#  0xf8f1	(en: 'left brace top', google translation)
  - "": [T: "vasen aaltosulku keski"]         	#  0xf8f2	(en: 'left brace mid', google translation)
  - "": [T: "vasen aaltosulku ala"]                	#  0xf8f3	(en: 'left brace bottom', google translation)
