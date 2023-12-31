@@ -796,7 +796,7 @@
  - "∧": [T: "looginen ja"]                      	#  0x2227	(en: 'and', google: 'ja')
  - "∨": [T: "looginen tai"]                     	#  0x2228	(en: 'or', google: 'tai')
  - "∩": [T: "leikkaus"]                         	#  0x2229	(en: 'intersection', google: 'risteys')
- - "∪": [T: "yhdiste"]                          	#  0x222a	(en: 'union', google: 'liitto')
+ - "∪": [T: "unioni"]                          	    #  0x222a	(en: 'union', google: 'liitto')
  - "∫": [T: "integraali"]                       	#  0x222b	(en: 'integral', google: 'olennainen')
  - "∬": [T: "kaksoisintegraali"]                	#  0x222c	(en: 'double integral', google: 'kaksinkertainen integraali')
  - "∭": [T: "kolmoisintegraali"]                	#  0x222d	(en: 'triple integral', google: 'kolminkertainen integraali')
@@ -2043,7 +2043,7 @@
  - "⨻": [T: "kertomerkki kolmiossa"]  	            #  0x2a3b	(google: 'kertokultaan kolmiossa')
  - "⨼": [T: "sisäinen tulo"]                 	    #  0x2a3c	(google: 'sisätuote')
  - "⨽": [T: "oikeanpuoleinen sisäinen tulo"]        #  0x2a3d	(en: 'righthand interior product', google translation)
- - "⨿": [T: "yhdiste"]        	                    #  0x2a3f	(google: 'yhdistäminen tai yhteistyö') NOTE: translation unclear
+ - "⨿": [T: "amalgamaatio"]        	                #  0x2a3f	(google: 'yhdistäminen tai yhteistyö') NOTE: translation unclear
  - "⩀": [T: "leikkaus pisteellä"]             	    #  0x2a40	(en: 'intersection with dot', google: 'risteys pisteellä')
  - "⩁": [T: "unioni miinuksella"]       	        #  0x2a41	(en: 'union with minus sign', google translation)
  - "⩂": [T: "unioni yläviivalla"]                	#  0x2a42	(en: 'union with overbar', google: 'unioni ylikuormituksen kanssa')
