@@ -415,7 +415,13 @@ fn trim_doc(doc: &Document) {
 pub fn trim_element(e: &Element) {
     // "<mtext>this is text</mtext" results in 3 text children
     // these are combined into one child as it makes code downstream simpler
-    const WHITESPACE: &[char] = &[' ', '\u{0009}', '\u{000A}', '\u{000D}'];      // Rust complains if I don't give this type (from an example)
+    
+    // space, tab, newline, carriage return all get collapsed to a single space
+    const WHITESPACE: &[char] = &[' ', '\u{0009}', '\u{000A}', '\u{000D}'];
+    lazy_static! {
+        static ref WHITESPACE_MATCH: Regex = Regex::new(r#"[ \u{0009}\u{000A}\u{000D}]+"#).unwrap();
+    }
+
 
     if is_leaf(*e) {
         // Assume it is HTML inside of the leaf -- turn the HTML into a string
@@ -440,18 +446,17 @@ pub fn trim_element(e: &Element) {
     }
 
     // CSS considers only space, tab, linefeed, and carriage return as collapsable whitespace
-    let trimmed_text = single_text.trim_matches(WHITESPACE);
     if !(is_leaf(*e) || name(e) == "intent-literal" || single_text.is_empty()) {  // intent-literal comes from testing intent
         // FIX: we have a problem -- what should happen???
         // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash
-        if !trimmed_text.is_empty() {
+        if !single_text.trim_matches(WHITESPACE).is_empty() {
             error!("trim_element: both element and textual children which shouldn't happen -- ignoring text '{}'", single_text);
         }
         return;
     }
     if e.children().is_empty() && !single_text.is_empty() {
         // debug!("Combining text in {}: '{}' -> '{}'", e.name().local_part(), single_text, trimmed_text);
-        e.set_text(trimmed_text);
+        e.set_text(&WHITESPACE_MATCH.replace_all(&single_text, " "));
     }
 
     fn make_leaf_element(mathml_leaf: Element) {
@@ -466,42 +471,31 @@ pub fn trim_element(e: &Element) {
 
         // gather up the text
         let mut text ="".to_string();
-        let mut previous_element_was_text = false;
         for child in children {
-            let (child_text, space) = match child {
+            let child_text = match child {
                 ChildOfElement::Element(child) => {
-                    previous_element_was_text = false;
                     if name(&child) == "mglyph" {
-                        (child.attribute_value("alt").unwrap_or("").to_string(), " ")
+                        child.attribute_value("alt").unwrap_or("").to_string()
                     } else {
-                        (gather_text(child), " ")
+                        gather_text(child)
                     }
                 },
                 ChildOfElement::Text(t) => {
-                    let t_text = t.text().trim_matches(WHITESPACE);
-                    if t_text.is_empty() {
-                        ("".to_string(), "")
-                    } else {
-                        let space = !previous_element_was_text;
-                        previous_element_was_text = true;
-                        (t_text.to_string(), if space {" "} else {""})
-                    }
+                    // debug!("ChildOfElement::Text: '{}'", t.text());
+                    t.text().to_string()
                 },
-                _ => ("".to_string(), ""),
+                _ => "".to_string(),
             };
             if !child_text.is_empty() {
-                if !text.is_empty() {
-                    text += space;
-                }
-                text += child_text.trim_matches(WHITESPACE);
+                text += &child_text;
             } 
 
         }
 
         // get rid of the old children and replace with the text we just built
         mathml_leaf.clear_children();
-
-        mathml_leaf.set_text(&text);
+        mathml_leaf.set_text(WHITESPACE_MATCH.replace_all(&text, " ").trim_matches(WHITESPACE));
+        // debug!("make_leaf_element: text is '{}'", crate::canonicalize::as_text(mathml_leaf));
 
         /// gather up all the contents of the element and return them with a leading space
         fn gather_text(html: Element) -> String {
@@ -509,12 +503,13 @@ pub fn trim_element(e: &Element) {
             for child in html.children() {
                 match child {
                     ChildOfElement::Element(child) => {
-                        text = text + " " + gather_text(child).trim_matches(WHITESPACE);
+                        text += &gather_text(child);
                     },
                     ChildOfElement::Text(t) => text += t.text(),
                     _ => (),
                 }
             }
+            // debug!("gather_text: '{}'", text);
             return text;
         }
     }
@@ -720,9 +715,9 @@ mod tests {
             </math>";
         let result_str = "<math>
             <mrow>
-                <mi>X 23braid</mi>
+                <mi>X23braid</mi>
                 <mo>+</mo>
-                <mi>132braid Y</mi>
+                <mi>132braidY</mi>
                 <mo>=</mo>
                 <mi>13braid</mi>
             </mrow>
@@ -792,29 +787,29 @@ mod tests {
 
     #[test]
     fn single_html_in_mtext() {
-        let test = "<math><mn>1</mn> <mtext>a<p>para 1</p>aa</mtext> <mi>y</mi></math>";
-        let target = "<math><mn>1</mn> <mtext>a para 1 aa</mtext> <mi>y</mi></math>";
+        let test = "<math><mn>1</mn> <mtext>a<p> para  1</p>bc</mtext> <mi>y</mi></math>";
+        let target = "<math><mn>1</mn> <mtext>a para 1bc</mtext> <mi>y</mi></math>";
         assert!(are_parsed_strs_equal(test, target));
     }
 
     #[test]
     fn multiple_html_in_mtext() {
-        let test = "<math><mn>1</mn> <mtext>a<p>para 1</p><p>para 2</p>aa</mtext> <mi>y</mi></math>";
-        let target = "<math><mn>1</mn> <mtext>a para 1 para 2 aa</mtext> <mi>y</mi></math>";
+        let test = "<math><mn>1</mn> <mtext>a<p>para 1</p> <p>para 2</p>bc  </mtext> <mi>y</mi></math>";
+        let target = "<math><mn>1</mn> <mtext>apara 1 para 2bc</mtext> <mi>y</mi></math>";
         assert!(are_parsed_strs_equal(test, target));
     }
 
     #[test]
     fn nested_html_in_mtext() {
-        let test = "<math><mn>1</mn> <mtext>a<ol><li>first</li><li>second</li></ol>aa</mtext> <mi>y</mi></math>";
-        let target = "<math><mn>1</mn> <mtext>a first second aa</mtext> <mi>y</mi></math>";
+        let test = "<math><mn>1</mn> <mtext>a <ol><li>first</li><li>second</li></ol> bc</mtext> <mi>y</mi></math>";
+        let target = "<math><mn>1</mn> <mtext>a firstsecond bc</mtext> <mi>y</mi></math>";
         assert!(are_parsed_strs_equal(test, target));
     }
 
     #[test]
     fn empty_html_in_mtext() {
-        let test = "<math><mn>1</mn> <mtext>a<br/>aa</mtext> <mi>y</mi></math>";
-        let target = "<math><mn>1</mn> <mtext>a aa</mtext> <mi>y</mi></math>";
+        let test = "<math><mn>1</mn> <mtext>a<br/>bc</mtext> <mi>y</mi></math>";
+        let target = "<math><mn>1</mn> <mtext>abc</mtext> <mi>y</mi></math>";
         assert!(are_parsed_strs_equal(test, target));
     }
 }
