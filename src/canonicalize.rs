@@ -1566,7 +1566,7 @@ impl CanonicalizeContext {
 				// debug!("start is_roman_numeral_adjacent");
 				for child in siblings {
 					let maybe_roman_numeral = as_element(*child);
-					debug!("maybe_roman_numeral: {}", mml_to_string(&maybe_roman_numeral));
+					// debug!("maybe_roman_numeral: {}", mml_to_string(&maybe_roman_numeral));
 					match name(&maybe_roman_numeral) {
 						"mo" => {
 							if !last_was_roman_numeral {
@@ -1793,9 +1793,9 @@ impl CanonicalizeContext {
 		/// The returned (mi) element reuses 'mi'
 		fn merge_mi_sequence(mi: Element) -> Option<Element> {
 			// The best solution would be to use a dictionary of words, or maybe restricted to words in a formula,
-			//   but that would like miss the words used in slope=run/rise
+			//   but that would likely miss the words used in slope=run/rise
 			// We shouldn't need to worry about trig names like "cos", but people sometimes forget to use "\cos"
-			// Hence, we check against the "AdditionalFunctionNames" that get read on startup.
+			// Hence, we check against the "FunctionNames" that get read on startup.
 			if as_text(mi).len() > 1 {
 				return None;
 			}

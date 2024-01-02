@@ -850,7 +850,7 @@
           then:
           - x: "$Postscripts[1]"
           - test:
-              if: "$Verbosity='Verbose'"
+              if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
               then: [{T: "dưới"}]
               else_test:
                 if: "$Verbosity='Medium'"
@@ -862,7 +862,7 @@
           then:
           - x: "$Postscripts[2]"
           - test:
-              if: "$Verbosity='Verbose'"
+              if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
               then: [{T: "trên"}]
               else_test:
                 if: "$Verbosity='Medium'"
@@ -877,7 +877,7 @@
               then:
               - x: "$Postscripts[3]"
               - test:
-                  if: "$Verbosity='Verbose'"
+                  if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
                   then: [{T: "dưới"}]
                   else_test:
                     if: "$Verbosity='Medium'"
@@ -889,7 +889,7 @@
               then:
               - x: "$Postscripts[4]"
               - test:
-                  if: "$Verbosity='Verbose'"
+                  if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
                   then: [{T: "trên"}]
                   else_test:
                     if: "$Verbosity='Medium'"
@@ -904,7 +904,7 @@
                   then:
                   - x: "$Postscripts[5]"
                   - test:
-                      if: "$Verbosity='Verbose'"
+                      if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
                       then: [{T: "dưới"}]
                       else_test:
                         if: "$Verbosity='Medium'"
@@ -916,7 +916,7 @@
                   then:
                   - x: "$Postscripts[6]"
                   - test:
-                      if: "$Verbosity='Verbose'"
+                      if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
                       then: [{T: "trên"}]
                       else_test:
                         if: "$Verbosity='Medium'"
@@ -931,7 +931,7 @@
                       then:
                       - x: "$Postscripts[7]"
                       - test:
-                          if: "$Verbosity='Verbose'"
+                          if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
                           then: [{T: "dưới"}]
                           else_test:
                             if: "$Verbosity='Medium'"
@@ -943,7 +943,7 @@
                       then:
                       - x: "$Postscripts[8]"
                       - test:
-                          if: "$Verbosity='Verbose'"
+                          if: "$Verbosity='Verbose' and not(self::m:chemical-formula)"
                           then: [{T: "trên"}]
                           else_test:
                             if: "$Verbosity='Medium'"

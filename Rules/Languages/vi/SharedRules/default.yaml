@@ -48,7 +48,9 @@
           - x: "@data-number"
           else:
           - x: "DEBUG(@data-number)"
-          - t: "la mã"
+      - test:
+          if: "$Verbosity = 'Verbose'"
+          then: [t: "la mã"]
       else:
       # FIX: removing the digit block separators is likely locale dependent
       - x: "translate(., ' `', '')"   # remove digit block separators

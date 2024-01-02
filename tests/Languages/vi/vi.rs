@@ -34,7 +34,8 @@ fn number_2a() {
 #[test]
 fn roman_numeral() {
   let expr = "<math><mi>IX</mi><mo>+</mo><mi>VIII</mi><mo>=</mo><mi>XVII</mi></math>";
-  test("vi", "ClearSpeak", expr, "9 la mã cộng 8 la mã, bằng 17 la mã");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "9 cộng 8, bằng 17");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "9 la mã cộng 8 la mã, bằng 17 la mã");
 }
 
 #[test]
@@ -142,6 +143,7 @@ fn ethylene_with_colon_bond() {
 
 #[test]
 fn mhchem_roman_in_superscript() {
+  init_logger();
   let expr = " <math>
       <mrow>
         <mmultiscripts>
@@ -163,6 +165,7 @@ fn mhchem_roman_in_superscript() {
         </mmultiscripts>
       </mrow>
     </math>";
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "f hoa e, hóa trị 2 la mã; f hoa e, hóa trị 3 la mã; o hoa, 4,");
   test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "f e, hóa trị 2; f e, hóa trị 3; o , 4,");
   // when Roman numbers written on superscript at the middle, it should be added prefix text "hóa trị" then + the number
 }
