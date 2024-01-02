@@ -641,6 +641,18 @@ impl CanonicalizeContext {
 		}
 	}
 
+	/// Turn leaf into an 'mn' and set attributes appropriately
+	fn make_roman_numeral(leaf: Element) {
+		assert!(is_leaf(leaf));
+		set_mathml_name(leaf, "mn");
+		leaf.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+		let as_number = match roman::from(&as_text(leaf).to_ascii_uppercase()) {
+			Some(i) => i.to_string(),
+			None => as_text(leaf).to_string(),
+		};
+		leaf.set_attribute_value("data-number", &as_number);
+	}
+
 	/// most of the time it is ok to merge the mrow with its singleton child, but there are some exceptions:
 	///   mrow has 'intent' -- this might reference the child and you aren't allowed to self reference
 	fn is_ok_to_merge_mrow_child(mrow: Element) -> bool {
@@ -721,7 +733,7 @@ impl CanonicalizeContext {
 				let first_char = chars.next().unwrap();		// we have already made sure it is non-empty
 				if !text.trim().is_empty() && is_roman_number_match(text) {
 					// people tend to set them in a non-italic font and software makes that 'mtext'
-					mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+					CanonicalizeContext::make_roman_numeral(mathml);
 				}
 				if first_char == '-' || first_char == '\u{2212}' {
 					let doc = mathml.document();
@@ -742,8 +754,7 @@ impl CanonicalizeContext {
 				let text = as_text(mathml);
 				if !text.trim().is_empty() && is_roman_number_match(text) && is_roman_numeral_number_context(mathml) {
 					// people tend to set them in a non-italic font and software makes that 'mtext'
-					set_mathml_name(mathml, "mn");
-					mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+					CanonicalizeContext::make_roman_numeral(mathml);
 					return Some(mathml);
 			 	}
 				if let Some(dash) = canonicalize_dash(text) {		// needs to be before OPERATORS.get due to "--"
@@ -795,8 +806,7 @@ impl CanonicalizeContext {
 				let text = as_text(mathml);
 				if !text.trim().is_empty() && is_roman_number_match(text) && is_roman_numeral_number_context(mathml) {
 					// people tend to set them in a non-italic font and software makes that 'mtext'
-					set_mathml_name(mathml, "mn");
-					mathml.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
+					CanonicalizeContext::make_roman_numeral(mathml);
 					return Some(mathml);
 				}
 				// allow non-breaking whitespace to stay -- needed by braille
@@ -1254,7 +1264,7 @@ impl CanonicalizeContext {
 				}
 				if let Some(elements) = convert_leaves_to_chem_elements(mathml) {
 					// children are already marked as chemical elements
-					debug!("clean_chemistry_leaf: {}", mml_to_string(&mathml));
+					// debug!("clean_chemistry_leaf: {}", mml_to_string(&mathml));
 					return replace_children(mathml, elements);
 				} else {
 					let likely_chemistry = likely_chem_element(mathml);
@@ -1529,35 +1539,44 @@ impl CanonicalizeContext {
 			} else {
 				let is_upper_case = text[0].is_ascii_uppercase();	// safe since we know it is a roman numeral
 				let preceding = mathml.preceding_siblings();
-				if !preceding.is_empty() && is_roman_numeral_adjacent(preceding.iter().rev(), is_upper_case) {
-					return true;
-				}
 				let following = mathml.following_siblings();
-				if following.is_empty() {
+				if preceding.is_empty() && following.is_empty() {
 					return false;		// no context and too short to confirm it is a roman numeral
 				}
-				return is_roman_numeral_adjacent(following.iter(), is_upper_case);
+				if preceding.is_empty() {
+					return is_roman_numeral_adjacent(following.iter(), is_upper_case);
+				}
+				if following.is_empty() {
+					return is_roman_numeral_adjacent(preceding.iter().rev(), is_upper_case);
+				}
+				return is_roman_numeral_adjacent(preceding.iter().rev(), is_upper_case) &&
+					   is_roman_numeral_adjacent(following.iter(), is_upper_case);
 			}
 
 			/// make sure all the non-mo leaf siblings are roman numerals
 			/// 'mo' should only be '+', '-', '=', ',', '.'  -- unlikely someone is doing anything sophisticated
 			fn is_roman_numeral_adjacent<'a, I>(siblings: I, must_be_upper_case: bool) -> bool
-					where I: Iterator<Item = &'a ChildOfElement<'a>> {				
+					where I: Iterator<Item = &'a ChildOfElement<'a>> {		
+				static ROMAN_NUMERAL_OPERATORS: phf::Set<&str> = phf_set! {
+					"+", "-'", "=", "<", "≤", ">", "≥", 
+					// ",", ".",   // [c,d] triggers this if "," is present, so omitting it
+				};
 				let mut found_match = false;				// guard against no siblings
 				let mut last_was_roman_numeral = true;	// started at roman numeral
 				// debug!("start is_roman_numeral_adjacent");
 				for child in siblings {
 					let maybe_roman_numeral = as_element(*child);
-					// debug!("maybe_roman_numeral: {}", mml_to_string(&maybe_roman_numeral));
+					debug!("maybe_roman_numeral: {}", mml_to_string(&maybe_roman_numeral));
 					match name(&maybe_roman_numeral) {
 						"mo" => {
 							if !last_was_roman_numeral {
 								return false;
 							}
 							let text = as_text(maybe_roman_numeral);
-							if !(text=="+" || text=="-" || text=="," || text==".") {
+							if !ROMAN_NUMERAL_OPERATORS.contains(text) {
 								return false;
 							}
+							last_was_roman_numeral = false;
 						},
 						"mi" | "mn" => {
 							if last_was_roman_numeral {
@@ -5037,7 +5056,7 @@ mod canonicalize_tests {
         let test_str = "<math><mrow><mtext>XLVIII</mtext> <mo>+</mo><mn>mmxxvi</mn></mrow></math>";
 		// turns out there is no need to mark them as Roman Numerals -- thought that was need for braille
         let target_str = "<math><mrow>
-			<mn data-roman-numeral='true'>XLVIII</mn> <mo>+</mo><mn data-roman-numeral='true'>mmxxvi</mn>
+			<mn data-roman-numeral='true' data-number='48'>XLVIII</mn> <mo>+</mo><mn data-roman-numeral='true' data-number='2026'>mmxxvi</mn>
 			</mrow></math>";
         // let target_str = "<math><mrow><mtext>XLVIII</mtext> <mo>+</mo><mn>mmxxvi</mn></mrow></math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
