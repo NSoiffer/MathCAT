@@ -157,7 +157,8 @@
  - "⬠": [t: "1⠫⠼⠑t"]            # 0x2B20 (White Pentagon)
  - "⬡": [t: "1⠫⠼⠋t"]            # 0x2B21 (White Hexagon)
  - "✓": [t: "⠈⠩"]               # 0x2713 (Check mark (tick))
- - "⦵": [t: "⠨⠚"]               # 0x29B5 (Plimsoll sign (standard state))
+ - "⦵": [t: "⠨⠚"]               # 0x29B5 (Plimsoll sign)
+ - "⮖": [t: "1⠐⠠⠤⠯⠫⠿"]          # 0x2B96 (MEDIUM SMALL WHITE CIRCLE WITH HORIZONTAL BAR (standard state))
  - "←": [t: "1⠳⠪"]              # 0x2190 (Leftwards arrow)
  - "↑": [t: "1⠳⠬"]              # 0x2191 (Upwards arrow)
  - "→": [t: "1⠳⠕"]              # 0x2192 (Rightwards arrow)
@@ -200,7 +201,7 @@
  - "⇃": [t: "1⠳⠠⠗⠩"]            # 0x21C3 (Downwards harpoon with barb leftwards)
  - "⇄": [t: "1⠳⠕⠻⠳⠪"]           # 0x21C4 (Rightwards arrow over leftwards arrow)
  - "⇅": [t: "1⠳⠬⠿⠳⠩"]           # 0x21C5 (Upwards arrow left of Downwards arrow)
- - "⇌": [t: "⠘⠸⠶"]              # 0x21CC (Rightwards harpoon over leftwards harpoon (equilibrium))
+ - "⇌": [t: "1⠘⠸⠶"]              # 0x21CC (Rightwards harpoon over leftwards harpoon (equilibrium))
  - "⇐": [t: "1⠳⠶⠪"]             # 0x21D0 (Leftwards double arrow)
  - "⇑": [t: "1⠳⠶⠬"]             # 0x21D1 (Upwards double arrow)
  - "⇒": [t: "1⠳⠶⠕"]             # 0x21D2 (Rightwards double arrow)
@@ -220,13 +221,18 @@
  - "🣔": [t: "1⠈⠸⠶"]               # 0x1f8d4 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the left))
  
 # Mappings for some new Unicode chemistry arrows/symbols
-# These need to be verified -- they conflict with GTM 16
-#  - "🣐": [t: "1⠳⠒⠒⠒⠪⠨⠔⠳⠒⠒⠒⠕"]           # 0x1F8D0
-#  - "🣑": [t: "1⠳⠒⠒⠒⠠⠗⠪⠨⠔⠳⠒⠒⠒⠈⠗⠕"]     # 0x1F8D1
-#  - "🣒": [t: "1⠳⠠⠗⠪⠨⠔⠳⠒⠒⠒⠈⠗⠕"]         # 0x1F8D2
-#  - "🣓": [t: "1⠳⠒⠒⠒⠠⠗⠪⠨⠔⠳⠈⠗⠕"]         # 0x1F8D3
-#  - "🣔": [t: "1⠳⠈⠗⠕⠨⠔⠳⠒⠒⠒⠠⠗⠪"]         # 0x1F8D4
-#  - "🣕": [t: "1⠳⠒⠒⠒⠈⠗⠕⠨⠔⠳⠠⠗⠪"]         # 0x1F8D5
+# These need to be verified -- 0x1f8d1, 0x1f8d2, and 0x1f8d3 conflict with GTM 16 (uses short arrow when really should be long)
+ - "🣐": [t: "1⠳⠒⠒⠒⠕⠻⠳⠒⠒⠒⠪"]           # 0x1F8D0 LONG RIGHTWARDS ARROW OVER LONG LEFTWARDS ARROW
+ - "🣒": [t: "1⠘⠸⠶"]               # 0x1f8d2 (Long rightwards harpoon over leftwards harpoon (equilibrium))
+ - "🣓": [t: "1⠸⠶"]                # 0x1f8d3 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the right))
+ - "🣔": [t: "1⠈⠸⠶"]               # 0x1f8d4 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the left))
+#  - "🣑": [t: "1⠳⠒⠒⠒⠈⠗⠕⠻⠳⠒⠒⠒⠠⠗⠪"]     # 0x1F8D1 LONG RIGHTWARDS HARPOON OVER LONG LEFTWARDS HARPOON
+#  - "🣒": [t: "1⠳⠒⠒⠒⠈⠗⠕⠻⠳⠒⠠⠗⠪"]         # 0x1F8D2 LONG RIGHTWARDS HARPOON ABOVESHORT LEFTWARDS HARPOON
+#  - "🣓": [t: "1⠳⠒⠈⠗⠕⠻⠳⠒⠒⠒⠠⠗⠪"]         # 0x1F8D3 SHORT RIGHTWARDS HARPOON ABOVELONG LEFTWARDS HARPOON
+ - "🣔": [t: "1⠳⠒⠒⠒⠈⠗⠪⠻⠳⠒⠠⠗⠕"]         # 0x1F8D4 LONG LEFTWARDS HARPOON ABOVESHORT RIGHTWARDS HARPOON
+ - "🣕": [t: "1⠳⠒⠈⠗⠪⠻⠳⠒⠒⠒⠠⠗⠕"]         # 0x1F8D5 SHORT LEFTWARDS HARPOON ABOVELONG RIGHTWARDS HARPOON
+ - "🣖": [t: "1⠳⠒⠒⠒⠕⠯⠠⠭"]                # 0x1F8D6 LONG RIGHTWARDS ARROW WITH THROUGH X
+ - "🣗": [t: "1⠐⠠⠤⠯⠫⠿"]                    # 0x1F8D7 LONG RIGHTWARDS ARROW WITH DOUBLE SLASH
 
  - "△": [t: "1⠫⠼⠉t"]            # 0x25B3 (Triangle)
  - "▫": [t: "1⠫⠼⠙t"]             # 0x25AB (Small white Square)
