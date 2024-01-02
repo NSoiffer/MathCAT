@@ -38,8 +38,20 @@
   match: "."
   replace:
   - bookmark: "@id"
-  # FIX: removing the digit block separators is likely locale dependent
-  - x: "translate(., ' `', '')"   # remove digit block separators
+  - test:
+      if: "@data-roman-numeral"
+      then:
+      - test:
+          if: "parent::*[1][self::m:chemical-formula]"
+          then:
+          - t: "hóa trị"
+          - x: "@data-number"
+          else:
+          - x: "DEBUG(@data-number)"
+          - t: "la mã"
+      else:
+      # FIX: removing the digit block separators is likely locale dependent
+      - x: "translate(., ' `', '')"   # remove digit block separators
 
 - name: default
   tag: [mo, mtext]
@@ -168,7 +180,7 @@
   - pause: short
 
 
-  - name: structure
+- name: structure
   tag: msub
   match: "."
   replace:
