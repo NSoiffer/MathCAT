@@ -328,7 +328,8 @@ pub struct PreferenceManager {
     braille: FileAndTime,               // the braille rule file
     braille_unicode: FileAndTime,       // short braille unicode file
     braille_unicode_full: FileAndTime,  // full braille unicode file
-    defs: FileAndTime,                  // the definition.yaml file(s)
+    speech_defs: FileAndTime,           // the definition.yaml file(s)
+    braille_defs: FileAndTime,           // the definition.yaml file(s)
 }
 
 
@@ -344,7 +345,8 @@ impl fmt::Display for PreferenceManager {
             writeln!(f, "  style files: {:?}", self.speech.files)?;
             writeln!(f, "  unicode files: {:?}", self.speech_unicode.files)?;
             writeln!(f, "  intent files: {:?}", self.intent.files)?;
-            writeln!(f, "  definition files: {:?}", self.defs.files)?;
+            writeln!(f, "  speech definition files: {:?}", self.speech_defs.files)?;
+            writeln!(f, "  braille definition files: {:?}", self.braille_defs.files)?;
         }
         return Ok(());
     }
@@ -359,7 +361,8 @@ pub struct FilesChanged {
     pub braille_unicode_short: bool,
     pub braille_unicode_full: bool,
     pub intent: bool,
-    pub defs: bool,
+    pub speech_defs: bool,
+    pub braille_defs: bool,
     pub navigate_rules: bool,
     pub overview_rules: bool,
 }
@@ -368,7 +371,7 @@ impl fmt::Display for FilesChanged {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "FilesChanged {{\n  Speech: rules {}, short {}, full {}", self.speech_rules, self.speech_unicode_short, self.speech_unicode_full)?;
         writeln!(f, "  Braille: rules {}, short {}, full {}", self.braille_rules, self.braille_unicode_short, self.braille_unicode_full)?;
-        writeln!(f, "  Intent {}, Defs {}", self.intent, self.defs)?;
+        writeln!(f, "  Intent {}, Defs {}/{}", self.intent, self.speech_defs, self.braille_defs)?;
         return Ok(());
     }
 }
@@ -384,7 +387,8 @@ impl FilesChanged {
                 braille_unicode_short: false,
                 braille_unicode_full: false,
                 intent: false,
-                defs: true,
+                speech_defs: true,
+                braille_defs: true,
                 navigate_rules: true,
                 overview_rules: true,
             }),
@@ -506,7 +510,17 @@ impl PreferenceManager {
         PreferenceManager::set_file_and_time(
             &speech_rules_dir, language, Some("en"), "intent.yaml", &mut self.intent)?;
         PreferenceManager::set_file_and_time(
-            &speech_rules_dir, language, Some("en"), "definitions.yaml", &mut self.defs)?;
+            &speech_rules_dir, language, Some("en"), "definitions.yaml", &mut self.speech_defs)?;
+
+        // FIX: this is hack -- it should probably be part of the braille rules. See #12
+        let lang_for_braille = match self.pref_to_string("BrailleCode").as_str() {
+            "Vietnam" => "vi",
+            "CMU" => if language == "pt" {"pt"} else {"es"},
+            "UEB" => "en",
+            "Nemeth" | _ => if language == "el" {"el"} else {"en"},
+        };
+        PreferenceManager::set_file_and_time(
+            &speech_rules_dir, lang_for_braille, Some("en"), "definitions.yaml", &mut self.braille_defs)?;
         return Ok(());
     }
 
@@ -684,7 +698,8 @@ impl PreferenceManager {
             braille_unicode_short: !PreferenceManager::is_file_up_to_date(&self.braille_unicode),
             braille_unicode_full: !PreferenceManager::is_file_up_to_date(&self.braille_unicode_full),
             intent: !PreferenceManager::is_file_up_to_date(&self.intent),
-            defs: !PreferenceManager::is_file_up_to_date(&self.defs),
+            speech_defs: !PreferenceManager::is_file_up_to_date(&self.speech_defs),
+            braille_defs: !PreferenceManager::is_file_up_to_date(&self.braille_defs),
             navigate_rules: !PreferenceManager::is_file_up_to_date(&self.navigation),
             overview_rules: !PreferenceManager::is_file_up_to_date(&self.overview),
         };
@@ -696,7 +711,8 @@ impl PreferenceManager {
            files_changed.braille_unicode_short ||
            files_changed.braille_unicode_full ||
            files_changed.intent ||
-           files_changed.defs ||
+           files_changed.speech_defs ||
+           files_changed.braille_defs ||
            files_changed.navigate_rules ||
            files_changed.overview_rules {
             return Ok( Some(files_changed) );
@@ -772,8 +788,11 @@ impl PreferenceManager {
         if files_changed.intent {
             self.intent.invalidate();
         }
-        if files_changed.defs {
-            self.defs.invalidate();
+        if files_changed.speech_defs {
+            self.speech_defs.invalidate();
+        }
+        if files_changed.braille_defs {
+            self.braille_defs.invalidate();
         }
         if files_changed.navigate_rules {
             self.navigation.invalidate();
@@ -825,12 +844,12 @@ impl PreferenceManager {
     }
 
     /// Return the definitions.yaml file locations.
-    pub fn get_definitions_file(&mut self) -> &Locations {
+    pub fn get_definitions_file(&mut self, use_speech_defs: bool) -> &Locations {
         if !self.error.is_empty() {
             panic!("Internal error: get_definitions_file called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
-        if !is_valid(&self.defs.files) {
+        if !is_valid(if use_speech_defs {&self.speech_defs.files} else {&self.braille_defs.files}) {
             let language = self.pref_to_string("Language");
             let language = if language.as_str() == "Auto" {"en"} else {language.as_str()};       // avoid 'temp value dropped while borrowed' error
             if let Some(speech_rules_dir) = &self.rules_dir {  // if 'None', then initialization and it doesn't matter.
@@ -839,10 +858,10 @@ impl PreferenceManager {
     
                 // by this point, prefs and files should have been set already so the call to get_files() in set_file_and_time() shouldn't fail (hence unwrap)
                 PreferenceManager::set_file_and_time(
-                    &speech_rules_dir, language, Some("en"), "definitions.yaml", &mut self.defs).unwrap();
+                    &speech_rules_dir, language, Some("en"), "definitions.yaml", if use_speech_defs {&mut self.speech_defs} else {&mut self.braille_defs}).unwrap();
             }
         }
-        return &self.defs.files;
+        return if use_speech_defs {&self.speech_defs.files} else {&self.braille_defs.files};
     }
 
     /// Return the TTS engine currently in use.
@@ -981,6 +1000,7 @@ mod tests {
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
+            pref_manager.set_user_prefs("Language", "en");
             pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak");
             pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
             pref_manager.initialize(PathBuf::new()).unwrap();
@@ -1059,7 +1079,7 @@ mod tests {
             assert_helper(count_files(&pref_manager.braille), 1, "Nemeth_Rules.yaml");
             assert_helper(count_files(&pref_manager.braille_unicode), 1, "unicode.yaml");
             assert_helper(count_files(&pref_manager.intent), 1, "intent.yaml");
-            assert_helper(count_files(&pref_manager.defs), 3,"definitions.yaml");
+            assert_helper(count_files(&pref_manager.speech_defs), 3,"definitions.yaml");
     
             pref_manager.set_user_prefs("Language", "zz-ab");
             pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
@@ -1070,7 +1090,7 @@ mod tests {
             assert_helper(count_files(&pref_manager.braille), 1, "Nemeth_Rules.yaml");
             assert_helper(count_files(&pref_manager.braille_unicode), 1, "unicode.yaml");
             assert_helper(count_files(&pref_manager.intent), 1, "intent.yaml");
-            assert_helper(count_files(&pref_manager.defs), 2, "definitions.yaml");
+            assert_helper(count_files(&pref_manager.speech_defs), 2, "definitions.yaml");
         })
     }
 
@@ -1083,7 +1103,7 @@ mod tests {
             pref_manager.invalidate(&FilesChanged::new("Language").unwrap());
             pref_manager.initialize(PathBuf::new()).unwrap();
 
-            let mut iter = pref_manager.defs.files.iter();
+            let mut iter = pref_manager.speech_defs.files.iter();
             assert_eq!(rel_path(&pref_manager.rules_dir, iter.next().unwrap()), Path::new("definitions.yaml"));
             assert_eq!(rel_path(&pref_manager.rules_dir, iter.next().unwrap()), Path::new("Languages/zz/definitions.yaml"));
             assert_eq!(rel_path(&pref_manager.rules_dir, iter.next().unwrap()), Path::new("Languages/zz/aa/definitions.yaml"));
@@ -1194,7 +1214,7 @@ mod tests {
             
             // Note: need to use pattern match to avoid borrow problem
             // Don't change a speech related file because 'test_is_up_to_date' might fail 
-            if let Some(file_name) = &pref_manager.get_definitions_file()[1] {
+            if let Some(file_name) = &pref_manager.get_definitions_file(true)[1] {
                 let file_name_as_str = file_name.to_str().unwrap();
                 let contents = fs::read(file_name).expect(&format!("Failed to write file {} during test", file_name_as_str));
                 #[allow(unused_must_use)] { 
@@ -1204,7 +1224,7 @@ mod tests {
                 let files_changed = pref_manager.is_up_to_date().unwrap();
                 assert!(files_changed.is_some());
                 let files_changed = files_changed.unwrap();
-                assert!(&files_changed.defs);
+                assert!(&files_changed.speech_defs);
                 assert!(!&files_changed.speech_rules);
                 assert!(!&files_changed.speech_unicode_short);
             } else {
