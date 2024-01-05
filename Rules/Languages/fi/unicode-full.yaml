@@ -8,8 +8,8 @@
  - "¥": [T: "jeni"]                              	#  0xa5	(en: 'yen', google: 'jeni')
  - "¦": [T: "katkopystyviiva"]                  	#  0xa6	(en: 'broken bar', google: 'rikkoutunut palkki')
  - "§": [T: "pykälä"]                     	        #  0xa7	(en: 'section', google: 'osa')
- - "¨": [T: "treema"]                           	#  0xa8	(en: 'double dot', google: 'kaksinkertainen piste')
- - "©": [T: "tekijänoikeus"]                    	#  0xa9	(en: 'copyright', google: 'tekijänoikeudet')
+ - "¨": [T: "treema"]                           	#  0xa8	(en: 'double dot', google: 'kaksinkertainen piste') # FI: use case with derivative?
+ - "©": [T: "tekijänoikeus"]                    	#  0xa9	(en: 'copyright', google: 'tekijänoikeudet') # FI: in NVDA it's written "copyright"
  - "ª": [T: "feminiininen järjestysluku"]	        #  0xaa	(en: 'feminine ordinal indicator', google: 'naisellinen ordinaaliindikaattori')
  - "¬": [T: "ei"]                         	        #  0xac	(en: 'not', google: 'ei')
  - "«": [T: "vasemmalle osoittava kaksinkertainen kulmalainausmerkki"]	#  0xab	(en: 'left-pointing double angle quote mark', google: 'vasemman potentiaalinen kaksoiskulma lainausmerkki')
@@ -50,10 +50,10 @@
 
  - "ʷ": [T: "yläindeksi w"]                 	    #  0x2b7	(en: 'modifier small w', google translation)
  - "ʸ": [T: "yläindeksi y"]           	            #  0x2b8	(en: 'modifier small y', google translation)
- - "ʹ": [T: "priimi"]                   	        #  0x2b9	(en: 'modifier prime', google translation)
- - "ʺ": [T: "kaksoispriimi"]            	        #  0x2ba	(en: 'modifier double prime', google translation)
- - "ʻ": [T: "käänteispilkku"] 	                    #  0x2bb	(en: 'modifier turned comma', google translation)
- - "ʼ": [T: "heittomerkki"]        	                #  0x2bc	(en: 'modifier apostrophe', google translation)
+ - "ʹ": [T: "priimi"]                   	        #  0x2b9	(en: 'modifier prime', google translation) # FI: derivated once -> "pilkku"
+ - "ʺ": [T: "kaksoispriimi"]            	        #  0x2ba	(en: 'modifier double prime', google translation) # FI: derivated twice -> "pilkku pilkku"
+ - "ʻ": [T: "käänteispilkku"] 	                    #  0x2bb	(en: 'modifier turned comma', google translation) # FI: derivated thrice -> "pilkku pilkku pilkku"
+ - "ʼ": [T: "heittomerkki"]        	                #  0x2bc	(en: 'modifier apostrophe', google translation) # FI: "heitto" in NVDA
  - "ʽ": [T: "peilikuvapilkku"]         	            #  0x2bd	(en: 'modifier reversed comma', google translation)
  - "ʾ": [T: "tarke oikea puolikaari"]          	    #  0x2be	(en: 'modifier right half ring', google: 'muokkain oikea puolirengas')
  - "ʿ": [T: "tarke vasen puolikaari"]          	    #  0x2bf	(en: 'modifier left half ring', google: 'muokkain vasemmalla puolirengas')
@@ -63,8 +63,8 @@
  - "˃": [T: "tarke oikea nuoli"]              	    #  0x2c3	(en: 'modifier right arrowhead', google translation)
  - "˄": [T: "tarke nuoli ylös"]         	        #  0x2c4	(en: 'modifier up arrowhead', google translation)
  - "˅": [T: "tarke nuoli alas"]                   	#  0x2c5	(en: 'modifier down arrowhead', google translation)
- - "ˆ": [T: "sirkumfleksi"]                     	#  0x2c6	(en: 'modifier circumflex accent', google: 'modifikaattorin ympäryssuoja aksentti')
- - "ˇ": [T: "ylösalainen sirkumfleksi"]             #  0x2c7	(en: 'caron', google: 'caron')
+ - "ˆ": [T: "sirkumfleksi"]                     	#  0x2c6	(en: 'modifier circumflex accent', google: 'modifikaattorin ympäryssuoja aksentti') # FI: should maybe be "hat", "hattu"
+ - "ˇ": [T: "ylösalainen sirkumfleksi"]             #  0x2c7	(en: 'caron', google: 'caron') # FI: "inverted  hat"? "käännetty  hattu"
  - "ˈ": [T: "tarke pystyviiva"]                 	#  0x2c8	(en: 'modifier vertical line', google translation)
  - "ˉ": [T: "pituusmerkki"]                     	#  0x2c9	(en: 'modifier macron', google: 'muokkain macron')
  - "ˊ": [T: "tarke akuutti"] 	                    #  0x2ca	(en: 'modifier acute accent', google translation)
@@ -82,14 +82,14 @@
  - "˖": [T: "plus"]            	                    #  0x2d6	(en: 'modifier plus sign', google translation)
  - "˗": [T: "miinus"]     	                        #  0x2d7	(en: 'modifier minus sign', google translation)
  - "˘": [T: "lyhyysmerkki"]                     	#  0x2d8	(en: 'breve', google: 'breve')
- - "˙": [T: "yläpiste"]                         	#  0x2d9	(en: 'dot', google: 'piste')
+ - "˙": [T: "yläpiste"]                         	#  0x2d9	(en: 'dot', google: 'piste') # FI: should be only "piste"?
  - "˚": [T: "yläympyrä"]               	            #  0x2da	(en: 'ring above', google: 'rengas yläpuolella')
  - "˛": [T: "ogonek"]                           	#  0x2db
  - "˜": [T: "pieni tilde"]                          #  0x2dc	(en: 'small tilde', google: 'pieni tilde')
  - "˝": [T: "kaksoisakuutti"]                   	#  0x2dd	(en: 'double acute accent', google: 'kaksinkertainen akuutti aksentti')
  - "˞": [T: "rhoottinen koukku"] 	                #  0x2de	(en: 'modifier rhotic hook', google translation)
  - "˟": [T: "risti"]      	                        #  0x2df	(en: 'modifier cross accent', google translation)
- - "ˠ": [T: "pieni gamma"]             	            #  0x2e0	(en: 'modifier small gamma', google translation)
+ - "ˠ": [T: "pieni gamma"]             	            #  0x2e0	(en: 'modifier small gamma', google translation) # FI: should these be without "pieni" ("small")?
  - "ˡ": [T: "pieni l"]                 	            #  0x2e1	(en: 'modifier small l', google translation)
  - "ˢ": [T: "pieni s"]           	                #  0x2e2	(en: 'modifier small s', google translation)
  - "ˣ": [T: "pieni x"]                 	            #  0x2e3	(en: 'modifier small x', google translation)
@@ -99,8 +99,8 @@
  - "˧": [T: "keskiäänipalkki"]  	                #  0x2e7	(en: 'modifier mid tone bar', google translation)
  - "˨": [T: "matala äänipalkki"]	                #  0x2e8	(en: 'modifier low tone bar', google translation)
  - "˩": [T: "erittäin matala äänipalkki"]	        #  0x2e9	(en: 'modifier extra-low tone bar', google translation)
- - "˪": [T: "yin lähtöäänimerkki"]	                #  0x2ea	(en: 'modifier yin departing tone mark', google translation)
- - "˫": [T: "yang lähtöäänimerkki"]	                #  0x2eb	(en: 'modifier yang departing tone mark', google translation)
+ - "˪": [T: "yin lähtöäänimerkki"]	                #  0x2ea	(en: 'modifier yin departing tone mark', google translation) # FI: "jin"
+ - "˫": [T: "yang lähtöäänimerkki"]	                #  0x2eb	(en: 'modifier yang departing tone mark', google translation) # FI: "jin"
  - "ˬ": [T: "ääntämismerkki"]     	                #  0x2ec	(en: 'modifier voicing', google translation)
  - "˭": [T: "aspiroitumattomuusmerkki"]         	#  0x2ed	(en: 'modifier unaspirated', google translation)
  - "ˮ": [T: "kaksoisheittomerkki"]	                #  0x2ee	(en: 'modifier double apostrophe', google translation)
@@ -123,13 +123,13 @@
  - "˿": [T: "vasen alanuoli"]    	                #  0x2ff	(en: 'modifier low left arrow', google translation)
  - "̀": [T: "gravis"]                      #  0x300	(en: 'grave accent embellishment', google: 'vakava korostuskoriste')
  - "́": [T: "akuutti"]                     #  0x301	(en: 'acute accent embellishment', google: 'akuutti korostuskoriste')
- - "̂": [T: "sirkumfleksi"]                #  0x302	(en: 'circumflex accent embellishment', google: 'ympyräkorotuskoriste')
+ - "̂": [T: "sirkumfleksi"]                #  0x302	(en: 'circumflex accent embellishment', google: 'ympyräkorotuskoriste') # FI: should be "hattu"?
  - "̃": [T: "tilde"]                       #  0x303	(en: 'tilde embellishment', google: 'tilde -koriste')
  - "̄": [T: "pituusmerkki"]                #  0x304	(en: 'macron embellishment', google: 'macronin koriste')
  - "̅": [T: "yläviiva"]                    #  0x305	(en: 'overbar embellishment', google: 'ylipalkin koriste')
  - "̆": [T: "lyhyysmerkki"]                #  0x306	(en: 'breve embellishment', google: 'breven koriste')
  - "̇": [T: "yläpiste"]                	 #  0x307	(en: 'dot above embellishment', google: 'piste koristelun yläpuolella')
- - "̈": [T: "treema"]                      #  0x308	(en: 'diaeresis embellishment', google: 'diaeresis -koriste')
+ - "̈": [T: "treema"]                      #  0x308	(en: 'diaeresis embellishment', google: 'diaeresis -koriste') # FI: should be "pilkku"?
  - "̉": [T: "yläkoukku"]    	             #  0x309	(en: 'hook above embellishment', google translation)
  - "̊": [T: "yläympyrä"]               	 #  0x30a	(en: 'ring above embellishment', google: 'rengas koristelun yläpuolella')
  - "̋": [T: "kakoisakuutti"]             	 #  0x30b	(en: 'double acute accent embellishment', google translation)
