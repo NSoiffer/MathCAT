@@ -455,7 +455,7 @@
  - "℧": [T: "käännetty ohmi"]                   	#  0x2127	(en: 'mhos', google: 'mhos')
  - "℩": [T: "käännetty ioota"]                  	#  0x2129	(en: 'turned iota', google: 'kääntyi iota')
  - "K": [T: "kelviniä"]                 	        #  0x212a	(en: 'kelvin', google: 'kelvin')
- - "Å": [T: "ångstromiä"]                       	#  0x212b	(en: 'angstroms', google: 'angstroms')
+ - "Å": [T: "ångströmiä"]                       	#  0x212b	(en: 'angstroms', google: 'angstroms')
  - "ℯ": [T: "kauno e"]                          	#  0x212f	(en: 'script e', google: 'käsikirjoitus e')
 
    # coalesced some chars that use cap letters
