@@ -303,20 +303,20 @@
 
  - "‰": [T: "promille"]                   	        #  0x2030	(en: 'per mille', google: 'per milli')
  - "‱": [T: "kymmenestuhannesosa"]              	#  0x2031	(en: 'per ten thousand', google: 'kymmenentuhatta')
- - "′": [T: "priimi"]    	                        #  0x2032	(en: 'prime', google: 'ensisijainen')
+ - "′": [T: "priimi"]    	                        #  0x2032	(en: 'prime', google: 'ensisijainen') # FI: "pilkku", like before
  - "″": [T: "kaksoispriimi"]	                    #  0x2033	(en: 'double prime', google: 'kaksinkertainen prime')
  - "‴": [T: "kolmoispriimi"]	                    #  0x2034	(en: 'triple prime', google: 'kolminkertainen')
- - "‵": [T: "käänteinen priimi"]	                #  0x2035	(en: 'reversed prime', google: 'kääntynyt pääministeri')
+ - "‵": [T: "käänteinen priimi"]	                #  0x2035	(en: 'reversed prime', google: 'kääntynyt pääministeri') # FI: "käänteinen pilkku" and for the next ones
  - "‶": [T: "käänteinen kaskoispriimi"]	            #  0x2036	(en: 'reversed double prime', google: 'kääntynyt kaksinkertainen prime')
  - "‷": [T: "käänteinen kolmoispriimi"]  	        #  0x2037	(en: 'reversed triple prime', google translation)
  - "‸": [T: "lisäys"]                           	#  0x2038
  - "‹": [T: "vasemmalle osoittava kulmapuolilainaus"]	#  0x2039	(en: 'single left pointing angle quote mark', google: 'yksi vasen piste -kulman lainausmerkki')
  - "›": [T: "oikealle osoittava kulmapuolilainaus"]	#  0x203a	(en: 'single right pointing angle quote mark', google: 'yksi oikea osoituskulma lainausmerkki')
  - "‼": [T: "kaksoiskertoma"]           	    #  0x203c	(en: 'double factorial', google translation)
- - "⁄": [T: "murtoluvun vinoviiva"]                 #  0x2044	(en: 'divided by', google: 'jaettuna')
+ - "⁄": [T: "murtoluvun vinoviiva"]                 #  0x2044	(en: 'divided by', google: 'jaettuna') # FI: check how this works in a sentence
  - "⁅": [T: "piikillinen alkuhakasulku"]    	    #  0x2045	(en: 'left square bracket with quill', google translation)
  - "⁆": [T: "piikillinen loppuhakasulku"]    	    #  0x2046	(en: 'right square bracket with quill', google translation)
- - "⁗": [T: "neloispriimi"]                 	    #  0x2057	(en: 'quadruple prime', google: 'neljänneksen prime')
+ - "⁗": [T: "neloispriimi"]                 	    #  0x2057	(en: 'quadruple prime', google: 'neljänneksen prime') # FI: maybe "pilkku pilkku pilkku pilkku"
  - "⁠": [T: "rivinvaihdon esto"]                                 	#  0x2060
  - "⁰": [T: "potenssiin nolla"]                  	#  0x2070	(en: 'to the zeroth power', google translation)
  - "ⁱ": [T: "potenssiin i"]                   	    #  0x2071	(en: 'to the eihth power', google translation)
@@ -360,15 +360,15 @@
  - "ₛ": [T: "alaindeksi s"]                          #  0x209b	(en: 'sub S', google translation)
  - "ₜ": [T: "alaindeksi t"]                          #  0x209c	(en: 'sub T', google translation)
  - "₠": [T: "eurooppalaiset valuuttayksiköt"]   	#  0x20a0	(en: 'european currenty units', google translation)
- - "₡": [T: "colonia"]                          	#  0x20a1	(en: 'colons', google: 'colons')
- - "₢": [T: "cruzeiroa"]                        	#  0x20a2	(en: 'cruzeiro', google: 'cruzeiro')
+ - "₡": [T: "colonia"]                          	#  0x20a1	(en: 'colons', google: 'colons') # FI: more Finnish pronunciation?
+ - "₢": [T: "cruzeiroa"]                        	#  0x20a2	(en: 'cruzeiro', google: 'cruzeiro') # FI: more Finnish pronunciation?
  - "₣": [T: "frangia"]                          	#  0x20a3	(en: 'franc', google: 'frangi')
  - "₤": [T: "liiraa"]                           	#  0x20a4	(en: 'lira', google: 'liira')
  - "₥": [T: "milliä"]                           	#  0x20a5	(en: 'mills', google: 'myllyt')
  - "₦": [T: "nairaa"]                           	#  0x20a6	(en: 'naira', google: 'naira')
  - "₧": [T: "pesetaa"]                          	#  0x20a7	(en: 'peseta', google: 'peseta')
  - "₨": [T: "rupiaa"]                           	#  0x20a8	(en: 'rupees', google: 'rupia')
- - "₩": [T: "wonia"]                            	#  0x20a9	(en: 'won', google: 'voitti')
+ - "₩": [T: "wonia"]                            	#  0x20a9	(en: 'won', google: 'voitti') # FI: more Finnish pronunciation?
  - "₪": [T: "sekeliä"]                   	#  0x20aa	(en: 'new sheqels', google: 'uudet sheqels')
  - "₫": [T: "dongia"]                           	#  0x20ab	(en: 'dong', google: 'dong')
  - "€": [T: "euroa"]                            	#  0x20ac	(en: 'euros', google: 'eurot')
@@ -380,7 +380,7 @@
  - "₲": [T: "guarania"]                         	#  0x20b2	(en: 'guaranis', google: 'guaranis')
  - "₳": [T: "australia"]                        	#  0x20b3	(en: 'australs', google: 'itävaltait')
  - "₴": [T: "hryvniaa"]                         	#  0x20b4	(en: 'hryvnias', google: 'hryvnias')
- - "₵": [T: "cediä"]                            	#  0x20b5	(en: 'cedis', google: 'cedis')
+ - "₵": [T: "cediä"]                            	#  0x20b5	(en: 'cedis', google: 'cedis') # FI: more Finnish pronunciation?
  - "₶": [T: "Toursin livreä"]                   	#  0x20b6	(google translation)
  - "₷": [T: "spesmiloa"]                        	#  0x20b7	(google translation)
  - "₸": [T: "tengeä"]                           	#  0x20b8	(google translation)
@@ -420,11 +420,11 @@
  - "⃯": [T: "oikea alanuoli"]	                    #  0x20ef	(en: 'right arrow below embellishment', google translation)
  - "⃰": [T: "yläpuolinen asteriski"]  	#  0x20f0	(en: 'asterisk above embellishment', google translation)
  - "℄": [T: "keskiviivasymboli"]                  	#  0x2104	(en: 'center line symbol', google translation)
- - "℅": [T: "care of"]                          	#  0x2105	(google: 'hoito')
- - "℆": [T: "cada una"]                         	#  0x2106	(google translation)
- - "ℇ": [T: "eulerin vakio"]                    	#  0x2107	(en: 'euler's constant', google: 'eulerin jatkuva')
- - "℈": [T: "scruple"]                         	    #  0x2108	(en: 'scruples', google translation)
- - "℉": [T: "astetta fahrenheitia"]             	#  0x2109	(en: 'degrees fahrenheit', google: 'fahrenheit-astetta')
+ - "℅": [T: "jonkun luona"]                          	#  0x2105	(google: 'hoito') # FI: used in post "jonkun luona", "see  oo"
+ - "℆": [T: "cada una"]                         	#  0x2106	(google translation) # FI: Spanish  for "each one",  "see uu"
+ - "ℇ": [T: "eulerin vakio"]                    	#  0x2107	(en: 'euler's constant', google: 'eulerin jatkuva') # FI: more German pronunciation?
+ - "℈": [T: "scruple"]                         	    #  0x2108	(en: 'scruples', google translation) # FI: more Finnish pronunciation?
+ - "℉": [T: "astetta fahrenheitia"]             	#  0x2109	(en: 'degrees fahrenheit', google: 'fahrenheit-astetta') # FI: more German pronunciation?
  - "ℊ": [T: "pieni g"]                          	#  0x210a	(en: 'script g', google: 'käsikirjoitus g')
  - "ℌℑℨℭ":                                      	#  0x210c, 0x2111, 0x2128, 0x212d
     - T: "fraktuura"                              	# 	(en: 'fraktur', google: 'fraktur')
@@ -452,7 +452,7 @@
  - "№": [T: "numero"]                     	        #  0x2116	(en: 'number', google: 'määrä')
  - "℥": [T: "unssia"]                     	        #  0x2125	(en: 'ounces', google: 'unssi')
  - "Ω": [T: "ohmia"]                            	#  0x2126	(en: 'ohms', google: 'ohmit')
- - "℧": [T: "käännetty ohmi"]                   	#  0x2127	(en: 'mhos', google: 'mhos')
+ - "℧": [T: "käännetty ohmi"]                   	#  0x2127	(en: 'mhos', google: 'mhos') # FI: same as eng. "siemen"
  - "℩": [T: "käännetty ioota"]                  	#  0x2129	(en: 'turned iota', google: 'kääntyi iota')
  - "K": [T: "kelviniä"]                 	        #  0x212a	(en: 'kelvin', google: 'kelvin')
  - "Å": [T: "ångströmiä"]                       	#  0x212b	(en: 'angstroms', google: 'angstroms')
@@ -679,7 +679,7 @@
  - "∈":                                         	#  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [T: "kuuluu joukkoon"]                  	# 	(en: 'an element of', google translation)
+        then: [T: "kuuluu"]                  	# 	(en: 'an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set"	#  inside a set
@@ -754,8 +754,8 @@
  - "∐": [T: "kotulo"]                        	    #  0x2210	(google: 'kopiointi')
  - "∑": [T: "summa"]                            	#  0x2211	(en: 'sum')
  - "−": [T: "miinus"]                           	#  0x2212	(en: 'minus')
- - "∓": [T: "miinus-plus"]                  	    #  0x2213	(en: 'minus or plus')
- - "∔": [T: "piste-plus"]                       	#  0x2214	(en: 'dot plus', google: 'dot plus')
+ - "∓": [T: "miinus-plus"]                  	    #  0x2213	(en: 'minus or plus') # FI: check how the hyphen behaves
+ - "∔": [T: "piste-plus"]                       	#  0x2214	(en: 'dot plus', google: 'dot plus') # FI: check how the hyphen behaves
  - "∕": [T: "jakoviiva"]                        	#  0x2215	(en: 'divided by', google: 'jaettuna')
  - "∖": [T: "joukkomiinus"]                         #  0x2216	(en: 'set minus', google: 'aseta miinus')
  - "∗": [T: "kertaa"]             	                #  0x2217	(en: 'times', google: 'ajat')
@@ -793,8 +793,8 @@
  - "∢": [T: "kaarellinen kulma"]                    #  0x2222	(en: 'spherical angle', google: 'pallomainen kulma')
  - "∣": [T: "jakaa"]                            	#  0x2223	(en: 'divides')
  - "∤": [T: "ei jaa"]                           	#  0x2224	(en: 'does not divide')
- - "∧": [T: "looginen ja"]                      	#  0x2227	(en: 'and', google: 'ja')
- - "∨": [T: "looginen tai"]                     	#  0x2228	(en: 'or', google: 'tai')
+ - "∧": [T: "looginen ja"]                      	#  0x2227	(en: 'and', google: 'ja') # FI: should we remove the "looginen"?
+ - "∨": [T: "looginen tai"]                     	#  0x2228	(en: 'or', google: 'tai') # FI: should we remove the "looginen"?
  - "∩": [T: "leikkaus"]                         	#  0x2229	(en: 'intersection', google: 'risteys')
  - "∪": [T: "unioni"]                          	    #  0x222a	(en: 'union', google: 'liitto')
  - "∫": [T: "integraali"]                       	#  0x222b	(en: 'integral', google: 'olennainen')
@@ -820,7 +820,7 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "geometrinen suhde"                   	# 	(en: 'geometrically proportional to', google: 'geometrisesti verrannollinen')
+     - T: "geometrinen suhde"                   	# 	(en: 'geometrically proportional to', google: 'geometrisesti verrannollinen') # FI: "geometrisesti verranollinen"?
  - "∻":                                         	#  0x223b
      - test: 
          if: "$Verbosity!='Terse'"
@@ -828,11 +828,11 @@
      - T: "homoteettinen"                       	# 	(en: 'homothetic to', google: 'homotetiikka')
  - "∼": [T: "tilde"]                	            #  0x223c	(en: 'varies with', google: 'vaihtelee')
  - "∽": [T: "käänteistilde"]                  	#  0x223d	(en: 'reversed tilde', google: 'kääntynyt tilde')
- - "∾":                                         	#  0x223e
+ - "∾":                                         	#  0x223e # FI: apparently has to do with inverse hyperbolic cosine
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "ylösalainen laiska s"        	        # 	(en: 'most positive', google: 'positiivisin')
+     - T: "ylösalainen laiska s"        	        # 	(en: 'most positive', google: 'positiivisin') # FI: check translation
  - "∿": [T: "siniaalto"]                        	#  0x223f	(en: 'sine wave', google: 'siniaalto')
  - "≀": [T: "punostulo"]                 	        #  0x2240	(en: 'wreath product', google: 'seppele tuote')
  - "≁": [T: "ei tilde"]                         	#  0x2241	(en: 'not tilde')
