@@ -312,7 +312,7 @@
  - "‸": [T: "lisäys"]                           	#  0x2038
  - "‹": [T: "vasemmalle osoittava kulmapuolilainaus"]	#  0x2039	(en: 'single left pointing angle quote mark', google: 'yksi vasen piste -kulman lainausmerkki')
  - "›": [T: "oikealle osoittava kulmapuolilainaus"]	#  0x203a	(en: 'single right pointing angle quote mark', google: 'yksi oikea osoituskulma lainausmerkki')
- - "‼": [T: "kaksoishuutomerkki"]           	    #  0x203c	(en: 'double factorial', google translation)
+ - "‼": [T: "kaksoiskertoma"]           	    #  0x203c	(en: 'double factorial', google translation)
  - "⁄": [T: "murtoluvun vinoviiva"]                 #  0x2044	(en: 'divided by', google: 'jaettuna')
  - "⁅": [T: "piikillinen alkuhakasulku"]    	    #  0x2045	(en: 'left square bracket with quill', google translation)
  - "⁆": [T: "piikillinen loppuhakasulku"]    	    #  0x2046	(en: 'right square bracket with quill', google translation)
