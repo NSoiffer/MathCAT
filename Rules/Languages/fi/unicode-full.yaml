@@ -39,7 +39,7 @@
             else: [T: "risti"]                 	    # 	(en: 'cross', google: 'ylittää')
  - "÷": [T: "jaettuna"]                         	#  0xf7	(en: 'divided by')
  - "ʰ": [T: "yläindeksi h"]           	            #  0x2b0	(en: 'modifier small h', google translation)
- - "ʱ": [T: "yläindeksi h koukkulla"]       	    #  0x2b1	(en: 'modifier small h with hook', google translation)
+ - "ʱ": [T: "yläindeksi h koukulla"]       	    #  0x2b1	(en: 'modifier small h with hook', google translation)
  - "ʲ": [T: "yläindeksi j"]                 	    #  0x2b2	(en: 'modifier small j', google translation)
  - "ʳ": [T: "yläindeksi r"]                 	    #  0x2b3	(en: 'modifier small r', google translation)
  - "ʴ": [T: "yläindeksi käännetty r"]       	    #  0x2b4	(en: 'modifier small turned r', google translation)
