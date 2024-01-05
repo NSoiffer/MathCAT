@@ -841,37 +841,37 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "asymptoottsesti yhtäsuuri kuin"      	# 	(en: 'asymptotically equal to', google: 'asymptoottisesti yhtä suuri kuin')
+     - T: "asymptoottisesti yhtä suuri kuin"      	# 	(en: 'asymptotically equal to', google: 'asymptoottisesti yhtä suuri kuin')
  - "≄":                                         	#  0x2244
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "ei asymptoottsesti yhtäsuuri kuin"   	# 	(en: 'not asymptotically equal to', google: 'ei asymptoottisesti yhtä suuri kuin')
+         then: [T: ""]                        	# 	(en: 'is', google translation)
+     - T: "ei asymptoottisesti yhtäsuuri kuin"   	# 	(en: 'not asymptotically equal to', google: 'ei asymptoottisesti yhtä suuri kuin')
  - "≅":                                         	#  0x2245
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "suunnilleen yhtä suuri kuin"          	# 	(en: 'approximately equal to', google: 'suunnilleen yhtä suuri kuin')
+     - T: "likimäärin yhtä suuri kuin"          	# 	(en: 'approximately equal to', google: 'suunnilleen yhtä suuri kuin')
  - "≆":                                         	#  0x2246
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "suunnilleen mutta ei yhtä suuri kuin" 	# 	(en: 'approximately but not actually equal to', google: 'suunnilleen, mutta ei oikeastaan yhtä suuri kuin')
+     - T: "likimäärin mutta ei yhtä suuri kuin" 	# 	(en: 'approximately but not actually equal to', google: 'suunnilleen, mutta ei oikeastaan yhtä suuri kuin')
  - "≇":                                         	#  0x2247
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "ei suunnilleen eikä yhtäsuuri kuin"  	# 	(en: 'neither approximately nor actually equal to', google: 'ei suunnilleen eikä oikeastaan yhtä suuri kuin')
+     - T: "ei likimäärin eikä yhtä suuri kuin"  	# 	(en: 'neither approximately nor actually equal to', google: 'ei suunnilleen eikä oikeastaan yhtä suuri kuin')
  - "≈":                                         	#  0x2248
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "suunnilleen yhtäsuuri kuin"              # 	(en: 'almost equal to', google: 'melkein yhtä suuri kuin')
+     - T: "likimäärin yhtä suuri kuin"              # 	(en: 'almost equal to', google: 'melkein yhtä suuri kuin')
  - "≉":                                         	#  0x2249
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "ei suunnilleen yhtäsuuri kuin"           # 	(en: 'not almost equal to', google: 'ei melkein yhtä suuri kuin')
+     - T: "ei likimäärin yhtä suuri kuin"           # 	(en: 'not almost equal to', google: 'ei melkein yhtä suuri kuin')
  - "≊":                                         	#  0x224a
      - test: 
          if: "$Verbosity!='Terse'"
@@ -894,7 +894,7 @@
          if: "$Verbosity!='Terse'"
          then: [T: ""]                       	    # 	(google translation)
      - T: "ero välillä"                         	# 	(en: 'difference between', google: 'ero välillä')
- - "≐": [T: "lähestyy rajaa"]                   	#  0x2250	(en: 'approaches the limit')
+ - "≐": [T: "lähestyy raja-arvoa"]                   	#  0x2250	(en: 'approaches the limit')
  - "≑":                                         	#  0x2251
      - test: 
          if: "$Verbosity!='Terse'"
@@ -904,36 +904,36 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "suunnilleen yhtä suuri kuin tai kohteen kuva"	                    # 	(google: 'suunnilleen yhtä suuri tai kuva')
+     - T: "likimäärin yhtä suuri kuin tai kohteen kuva"	                    # 	(google: 'suunnilleen yhtä suuri tai kuva')
  - "≓":                                         	#  0x2253
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is the', google translation)
-     - T: "kohteen kuva tai suunnilleen yhtä suuri kuin"  	# 	(google: 'kuva tai suunnilleen yhtä suuri kuin')
- - "≔": [T: "kaksoispiste yhtäsuuruus"]         	#  0x2254	(en: 'colon equals', google: 'colol -eaksi')
- - "≕": [T: "yhtäsuuruus kaksoispiste"]         	#  0x2255	(en: 'equals colon', google: 'vastaa kaksoispistettä')
+     - T: "kohteen kuva tai likimäärin yhtä suuri kuin"  	# 	(google: 'kuva tai suunnilleen yhtä suuri kuin')
+ - "≔": [T: "kaksoispiste yhtä suuri kuin"]         	#  0x2254	(en: 'colon equals', google: 'colol -eaksi')
+ - "≕": [T: "yhtä suuri kuin kaksoispiste"]         	#  0x2255	(en: 'equals colon', google: 'vastaa kaksoispistettä')
  - "≖": [T: "ympyrän sisältävä yhtäläisyys"]      	#  0x2256	(en: 'ring in equal to', google: 'rengas yhtä suuri kuin')
  - "≗":                                         	#  0x2257
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "ympyrä yhtäsuuruus"                  	# 	(en: 'approximately equal to', google: 'suunnilleen yhtä suuri kuin')
- - "≘": [T: "kaariyhtäsuuruus"]                 	#  0x2258	(en: 'corresponds to', google: 'vastaa')
+     - T: "ympyrä yhtä suuri kuin"                  	# 	(en: 'approximately equal to', google: 'suunnilleen yhtä suuri kuin')
+ - "≘": [T: "kaari yhtä suuri kuin"]                 	#  0x2258	(en: 'corresponds to', google: 'vastaa')
  - "≙": [T: "vastaa"]                         	    #  0x2259	(en: 'estimates', google: 'arviot')
  - "≚":                                         	#  0x225a
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
      - T: "samakulmainen kuin"                  	# 	(en: 'equiangular to', google: 'tasa -arvoinen')
- - "≛": [T: "tähtiyhtäsuuruus"]                 	#  0x225b	(en: 'star equals', google: 'tähti on yhtä suuri kuin')
- - "≜": [T: "deltayhtäsuuruus"]                	    #  0x225c	(en: 'delta equals', google: 'delta on tasa -arvoinen')
- - "≝": [T: "määritelmän mukaan yhtäsuuri kuin"]	#  0x225d	(en: 'is defined to be', google: 'on määritelty olevan')
+ - "≛": [T: "tähti yhtä suuri kuin"]                 	#  0x225b	(en: 'star equals', google: 'tähti on yhtä suuri kuin')
+ - "≜": [T: "delta yhtä suuri kuin"]                	    #  0x225c	(en: 'delta equals', google: 'delta on tasa -arvoinen')
+ - "≝": [T: "määritelmän mukaan yhtä suuri kuin"]	#  0x225d	(en: 'is defined to be', google: 'on määritelty olevan')
  - "≞":                                         	#  0x225e
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "mitatusti yhtäsuuri kuin"            	# 	(en: 'measured by', google: 'mitattu')
- - "≟": [T: "kyseenalaisesti yhtäsuuri kuin"]   	#  0x225f	(en: 'has an unknown relationship with', google: 'on tuntematon suhde')
+     - T: "mitatusti yhtä suuri kuin"            	# 	(en: 'measured by', google: 'mitattu')
+ - "≟": [T: "kyseenalaisesti yhtä suuri kuin"]   	#  0x225f	(en: 'has an unknown relationship with', google: 'on tuntematon suhde')
  - "≠":                                         	#  0x2260
      - test: 
          if: "$Verbosity!='Terse'"
@@ -943,7 +943,7 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "identtisesti yhtäsuuri kuin"             # 	(en: 'identical to', google: 'yhtäläinen')
+     - T: "identtisesti yhtä suuri kuin"             # 	(en: 'identical to', google: 'yhtäläinen')
  - "≢":                                         	#  0x2262
      - test: 
          if: "$Verbosity!='Terse'"
@@ -960,12 +960,12 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "pienempi mutta ei yhtäsuuri kuin"    	# 	(en: 'less than but not equal to', google: 'vähemmän kuin, mutta ei yhtä suuri kuin')
+     - T: "pienempi mutta ei yhtä suuri kuin"    	# 	(en: 'less than but not equal to', google: 'vähemmän kuin, mutta ei yhtä suuri kuin')
  - "≩":                                         	#  0x2269
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "suurempi mutta ei yhtäsuuri kuin"    	# 	(en: 'greater than but not equal to', google: 'suurempi kuin, mutta ei yhtä suuri kuin')
+     - T: "suurempi mutta ei yhtä suuri kuin"    	# 	(en: 'greater than but not equal to', google: 'suurempi kuin, mutta ei yhtä suuri kuin')
  - "≪":                                         	#  0x226a
      - test: 
          if: "$Verbosity!='Terse'"
@@ -989,22 +989,22 @@
  - "≮":                                         	#  0x226e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "on"]                        	# 	(en: 'is', google translation)
+         then: [T: ""]                        	# 	(en: 'is', google translation)
      - T: "ei aidosti pienempi kuin"            	# 	(en: 'not less than', google: 'ei vähempää kuin')
  - "≯":                                         	#  0x226f
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "on"]                        	# 	(en: 'is', google translation)
+         then: [T: ""]                        	# 	(en: 'is', google translation)
      - T: "ei aidosti suurempi kuin"            	# 	(en: 'not greater than', google: 'enintään')
  - "≰":                                         	#  0x2270
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "on"]                        	# 	(en: 'is', google translation)
+         then: [T: ""]                        	# 	(en: 'is', google translation)
      - T: "ei pienempi eikä yhtäsuuri kuin"     	# 	(en: 'neither less than nor equal to', google: 'ei vähemmän kuin yhtä suuri kuin')
  - "≱":                                         	#  0x2271
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "on"]                        	# 	(en: 'is', google translation)
+         then: [T: ""]                        	# 	(en: 'is', google translation)
      - T: "ei suurempi eikä yhtäsuuri kuin"     	# 	(en: 'neither greater than nor equal to', google: 'ei suurempi kuin yhtä suuri kuin')
  - "≲":                                         	#  0x2272
      - test: 
@@ -1019,12 +1019,12 @@
  - "≴":                                         	#  0x2274
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "on"]                        	# 	(en: 'is', google translation)
+         then: [T: ""]                        	# 	(en: 'is', google translation)
      - T: "ei pienempi eikä yhtäpitävä"         	# 	(en: 'neither less than nor equivalent to', google: 'ei vähemmän kuin vastaa')
  - "≵":                                         	#  0x2275
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "on"]                        	# 	(en: 'is', google translation)
+         then: [T: ""]                        	# 	(en: 'is', google translation)
      - T: "ei suurempi eikä yhtäpitävä"         	# 	(en: 'neither greater than nor equivalent to', google: 'ei suurempi kuin vastaava')
  - "≶":                                         	#  0x2276
      - test: 
@@ -1039,12 +1039,12 @@
  - "≸":                                         	#  0x2278
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "on"]                        	# 	(en: 'is', google translation)
+         then: [T: ""]                        	# 	(en: 'is', google translation)
      - T: "ei aidosti pienempi eikä suurempi kuin"	# 	(en: 'neither less than nor greater than', google: 'ei vähemmän kuin suurempi kuin')
  - "≹":                                         	#  0x2279
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "on"]                        	# 	(en: 'is', google translation)
+         then: [T: ""]                        	# 	(en: 'is', google translation)
      - T: "ei aidosti suurempi eikä pienempi kuin"	# 	(en: 'neither greater than nor less than', google: 'ei suurempi kuin vähemmän kuin')
  - "≺": [T: "edeltää"]                          	#  0x227a	(en: 'precedes')
  - "≻": [T: "seuraa"]                           	#  0x227b	(en: 'succeeds', google: 'onnistuu')
@@ -1088,12 +1088,12 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: ""]                        	    # 	(en: 'is', google translation)
-     - T: "ei ole osajoukko eikä yhtä kuin"     	# 	(en: 'neither a subset of nor equal to', google: 'ei alajoukko eikä yhtä suuri kuin')
+     - T: "ei osajoukko eikä yhtä kuin"     	# 	(en: 'neither a subset of nor equal to', google: 'ei alajoukko eikä yhtä suuri kuin')
  - "⊉":                                         	#  0x2289
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: ""]                        	    # 	(en: 'is', google translation)
-     - T: "ei sisällä osajoukkoa eikä ole yhtä kuin"	# 	(en: 'neither a superset of nor equal to', google: 'ei ylenmääräinen eikä yhtä suuri kuin')
+     - T: "ei sisällä osajoukkoa eikä yhtä kuin"	# 	(en: 'neither a superset of nor equal to', google: 'ei ylenmääräinen eikä yhtä suuri kuin')
  - "⊊": [T: "on aito osajoukko"]                	#  0x228a	(en: 'subset of with not equal to', google: 'osajoukko, joka ei ole yhtä suuri kuin')
  - "⊋": [T: "sisältää aidon osajoukon"]         	#  0x228b	(en: 'superset of with not equal to', google: 'superset of with ei ole yhtä suuri kuin')
  - "⊌": [T: "monijoukko"]              	            #  0x228c	(en: 'multiset', google: 'multiset')
