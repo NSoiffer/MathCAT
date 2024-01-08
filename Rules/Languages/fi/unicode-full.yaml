@@ -1948,7 +1948,7 @@
  - "⧜": [T: "epätäydellinen äärettömyys"]              	#  0x29dc	(google: 'epätäydellinen äärettömyys')
  - "⧝": [T: "yhdistetty äärettömyys"]              	#  0x29dd	(en: 'tie over infinity', google translation)
  - "⧞": [T: "äärettömyys negatoitu pystyviivalla"]	#  0x29de	(en: 'infinity negated with vertical bar', google: 'äärettömyys kielsi pystysuoralla palkilla')
- - "⧟": [T: "kaksipäinen multimap"]           	#  0x29df	(en: 'double-ended multimap', google translation)
+ - "⧟": [T: "kaksipäinen monikuvaus"]           	#  0x29df	(en: 'double-ended multimap', google translation) # FI: "multimap", "monikuvaus" translation questionable
  - "⧠": [T: "neliö korostetuilla ääreviivoilla"]       	#  0x29e0	(en: 'square with contoured outline', google translation)
  - "⧡": [T: "kasvaa suhteessa"]                           	#  0x29e1	(en: 'increases as', google translation)
  - "⧢": [T: "sekoitetulo"]                    	#  0x29e2	(en: 'shuffle product', google translation)
