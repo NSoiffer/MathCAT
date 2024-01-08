@@ -2214,10 +2214,10 @@
  - "⫧": [T: "lyhyt nasta alaspäin yläviivalla"]      	#  0x2ae7	(en: 'short down tack with overbar', google: 'lyhyt alaspäin tarttuva ylikuormitus')
  - "⫨": [T: "lyhyt nasta ylöspäin alaviivalla"]           	#  0x2ae8	(en: 'short up tack with underbar', google: 'lyhyt up takki alapalkissa')
  - "⫩": [T: "lyhyt nasta ylöspäin jonka alapuolella lyhyt nasta alaspäin"]	#  0x2ae9	(google: 'lyhyt ylösnopeus lyhyen alaspäin')
- - "⫪": [T: "kaksois nasta alaspäin"]                    	#  0x2aea	(en: 'double down tack', google translation)
- - "⫫": [T: "kaksois nasta ylöspäin"]                   	#  0x2aeb	(google: 'kaksinkertainen tarttuva')
- - "⫬": [T: "kaksoisviiva ei merkkiä"]           	#  0x2aec	(google: 'kaksinkertainen isku ei allekirjoittaa') NOTE: translation unclear
- - "⫭": [T: "käännetty kaksoisviiva ei merkkiä"]  	#  0x2aed	(google: 'käänteinen kaksoishalvaus ei allekirjoittaa') NOTE: translation unclear
+ - "⫪": [T: "kaksinkertainen nasta alaspäin"]                    	#  0x2aea	(en: 'double down tack', google translation)
+ - "⫫": [T: "kaksinkertainen nasta ylöspäin"]                   	#  0x2aeb	(google: 'kaksinkertainen tarttuva')
+ - "⫬": [T: "kaksoisviiva ei"]           	#  0x2aec	(en: "double stroke not sign" google: 'kaksinkertainen isku ei allekirjoittaa')
+ - "⫭": [T: "käännetty kaksoisviiva ei"]  	#  0x2aed	(en: "reversed double stroke not sign" google: 'käänteinen kaksoishalvaus ei allekirjoittaa')
  - "⫮": [T: "ei jaa käännetyllä negaatioviivalla"]	#  0x2aee	(en: 'does not divide with reversed negation slash', google: 'ei jaa käännetyn kielteisen viivan kanssa')
  - "⫯": [T: "pystyviiva ja ympyrä yläpuolella"]   	#  0x2aef	(en: 'vertical line with circle above', google: 'pystysuora viiva ympyrän kanssa')
  - "⫰": [T: "pystyviiva ja ympyrä alapuolella"]   	#  0x2af0	(en: 'vertical line with circle below', google: 'pystysuora viiva, jossa ympyrä alla')
