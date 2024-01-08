@@ -2224,14 +2224,14 @@
  - "⫱": [T: "nasta alaspäin ja ympyrä alapuolella"]       	#  0x2af1	(en: 'down tack with circle below', google: 'alaspäin ympyrä alla')
  - "⫲": [T: "yhdensuuntainen poikkiviivalla"]   	#  0x2af2	(en: 'parallel with horizontal stroke', google: 'yhdensuuntainen vaakasuuntaisen iskun kanssa')
  - "⫳": [T: "yhdensuuntainen tildellä"]      	#  0x2af3	(en: 'parallel with tilde operator', google: 'rinnakkain tilde -operaattorin kanssa')
- - "⫴": [T: "kolminkertainen pystysuora viiva binäärisuhteella"]	#  0x2af4	(en: 'triple vertical bar binary relation', google translation) NOTE: translation unclear
+ - "⫴": [T: "kolminkertainen pystysuora viiva binäärirelaatiolla"]	#  0x2af4	(en: 'triple vertical bar binary relation', google translation)
  - "⫵": [T: "kolminkertainen pystysuora viiva poikkiviivalla"]	#  0x2af5	(en: 'triple vertical bar with horizontal stroke', google translation)
  - "⫶": [T: "kolmoispisteoperaattori"]	#  0x2af6	(en: 'triple colon operator', google translation)
  - "⫷": [T: "kolminkertainen sisäkkäinen vähemmän kuin"]	#  0x2af7	(en: 'triple nested less than', google translation)
  - "⫸": [T: "kolminkertainen sisäkkäinen suurempi kuin"]	#  0x2af8	(en: 'triple nested greater than', google translation)
  - "⫹": [T: "pienempi kuin tai vino kaksinkertainen on yhtä suuri kuin"]	#  0x2af9	(en: 'double line slanted less than or equal to', google translation)
  - "⫺": [T: "suurempi kuin tai vino kaksinkertainen on yhtä suuri kuin"]	#  0x2afa	(en: 'double line slanted greater than or equal to', google translation)
- - "⫻": [T: "kolminkertainen vinoviiva binäärisuhteella"]	#  0x2afb	(en: 'triple solidus binary relation', google translation) NOTE: translation unclear
+ - "⫻": [T: "kolminkertainen vinoviiva binäärirelaatiolla"]	#  0x2afb	(en: 'triple solidus binary relation', google translation)
  - "⫼": [T: "suuri kolminkertainen pystyviiva"]	#  0x2afc	(en: 'large triple vertical bar operator', google translation)
  - "⫽": [T: "kaksoisvinoviiva"]      	#  0x2afd	(en: 'double solidus operator', google translation)
  - "⫾": [T: "valkoinen pystysuora palkki"]      	#  0x2afe	(en: 'white vertical bar', google translation)
