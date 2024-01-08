@@ -2020,7 +2020,7 @@
  - "⨤": [T: "plus ja tilde yläpuolella"]             	#  0x2a24	(en: 'plus sign with tilde above', google: 'plus -merkki yllä olevan tilden kanssa')
  - "⨥": [T: "plus ja piste alapuolella"]          	#  0x2a25	(en: 'plus sign with dot below', google: 'plus -merkki alla olevalla pisteellä')
  - "⨦": [T: "plus ja tilde alapuolella"]             	#  0x2a26	(en: 'plus sign with tilde below', google: 'plus -merkki alla olevilla tildeillä')
- - "⨧": [T: "plus, jolla on alaindeksi kaksi"]      #  0x2a27	(en: 'plus sign with subscript two', google: 'plus -merkki alaindeksi kaksi')
+ - "⨧": [T: "plus alaindeksi kaksi"]      #  0x2a27	(en: 'plus sign with subscript two', google: 'plus -merkki alaindeksi kaksi')
  - "⨨": [T: "plus mustalla kolmiolla"]  	#  0x2a28	(en: 'plus sign with black triangle', google translation)
  - "⨩": [T: "miinus ja piste yläpuolella"]       	#  0x2a29	(en: 'minus sign with comma above', google: 'miinus merkki yllä olevalla pilkulla')
  - "⨪": [T: "miinus ja piste alapuolella"]         	#  0x2a2a	(en: 'minus sign with dot below', google: 'miinusmerkki alla olevalla pisteellä')
