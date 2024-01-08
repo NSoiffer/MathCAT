@@ -1998,7 +1998,7 @@
  - "⨎": [T: "integraali kaksinkertaisella poikkiviivalla"]	#  0x2a0e	(en: 'integral with double stroke', google translation)
  - "⨏": [T: "integraalikeskiarvo viistolla vaakaviivalla"]    	#  0x2a0f	(en: 'integral average with slash', google translation)
  - "⨐": [T: "kiertofunktio"]             	        #  0x2a10	(google: 'kiertotoiminto')
- - "⨑": [T: "vastapäivään integraali"]        	#  0x2a11	(google: 'vastapäivään integraatio')
+ - "⨑": [T: "integraali vastapäivään"]        	#  0x2a11	(google: 'vastapäivään integraatio')
  - "⨒": [T: "viivaintegraali neliskulmaisella polulla navan ympäri"]	#  0x2a12	(en: 'line integration with rectangular path around pole', google: 'line -integraatio suorakaiteen muotoisella polulla navan ympärillä')
  - "⨓": [T: "viivaintegraali puoliympyräpolulla navan ympäri"]	#  0x2a13	(en: 'line integration with semicircular path around pole', google: 'line -integrointi puolipyöreällä polulla navan ympärillä')
  - "⨔": [T: "viivaintegraali ei sisällä napaa"]	#  0x2a14	(google: 'linjan integrointi ei sisällä napaa')
