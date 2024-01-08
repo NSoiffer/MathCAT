@@ -1379,14 +1379,14 @@
  - "⌫": [T: "poista vasemmalle"]                	#  0x232b	(en: 'erase to the left', google translation)
  - "⌬": [T: "bentseenirengas"]                  	#  0x232c	(en: 'benzene ring', google translation)
  - "⌭": [T: "sylinterisyys"]                     	#  0x232d	(google: 'sylinteryys')
- - "⌮": [T: "all around profile"]               	#  0x232e	(google: 'ympäri profiilia') NOTE: not translated, meaning unclear
+ - "⌮": [T: "profiilin ympäri"]               	#  0x232e	(en: "all around profile" google: 'ympäri profiilia') # FI: translation unclear
  - "⌯": [T: "symmetria"]                        	#  0x232f	(en: 'symmetry', google translation)
- - "⌰": [T: "total runout"]                   	    #  0x2330	(en: 'total runout', google translation) NOTE: not translated, meaning unclear
- - "⌱": [T: "dimension origin"]                	    #  0x2331	(en: 'dimension origin', google translation) NOTE: not translated, meaning unclear
- - "⌲": [T: "kartio"]              	                #  0x2332	(en: 'conical taper', google translation) NOTE: translation unclear
+ - "⌰": [T: "kokonaispoikkeama"]                   	    #  0x2330	(en: 'total runout', google translation) # FI: meaning bit unclear, placeholder for correct
+ - "⌱": [T: "alkudimensio"]                	    #  0x2331	(en: 'dimension origin', google translation) # FI: translation unclear
+ - "⌲": [T: "kartio"]              	                #  0x2332	(en: 'conical taper', google translation) # FI: translation unclear
  - "⌳": [T: "kaltevuus"]                        	#  0x2333	(en: 'slope', google translation)
- - "⌴": [T: "counterbore"]                         	#  0x2334	(en: 'counterbore', google translation) NOTE: not translated, meaning unclear
- - "⌵": [T: "countersink"]                        	#  0x2335	(en: 'countersink', google translation) NOTE: not translated, meaning unclear
+ - "⌴": [T: "tasoupotin"]                         	#  0x2334	(en: 'counterbore', google translation)
+ - "⌵": [T: "kärkiupotin"]                        	#  0x2335	(en: 'countersink', google translation)
  - "⍰": [T: "kysymysmerkki laatikossa"]         	#  0x2370	(en: 'unknown box', google: 'tuntematon laatikko')
  - "⎕": [T: "laatikko"]                         	#  0x2395	(en: 'box', google translation)
  - "⏞": [T: "yläaaltosulku"]                    	#  0x23DE	(en: 'top brace', google: 'ylä ahdin')
