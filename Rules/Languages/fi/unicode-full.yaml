@@ -1461,7 +1461,7 @@
  - "⓿": [T: "musta ympyröity nolla"]              	#  0x24ff	(en: 'black circled zero', google translation)
  - "■": [T: "musta neliö"]                      	#  0x25a0	(en: 'black square')
  - "□": [T: "valkoinen neliö"]                  	#  0x25a1	(en: 'white square')
- - "▢": [T: "pyöreäkulmainen valkoien neliö"]	    #  0x25a2	(en: 'white square with rounded corners', google translation)
+ - "▢": [T: "pyöreäkulmainen valkoinen neliö"]	    #  0x25a2	(en: 'white square with rounded corners', google translation)
  - "▣": [T: "mustan neliön sisältävä valkoinen neliö"]	#  0x25a3	(en: 'white square containing small black square', google translation)
  - "▤": [T: "neliö vaakasuoralla värityksellä"]	    #  0x25a4	(en: 'square with horizontal fill', google translation)
  - "▥": [T: "neliö pystysuoralla värityksellä"]     #  0x25a5	(en: 'square with vertical fill', google translation)
