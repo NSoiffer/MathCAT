@@ -2003,7 +2003,7 @@
  - "⨓": [T: "viivaintegraali puoliympyräpolulla navan ympäri"]	#  0x2a13	(en: 'line integration with semicircular path around pole', google: 'line -integrointi puolipyöreällä polulla navan ympärillä')
  - "⨔": [T: "viivaintegraali ei sisällä napaa"]	#  0x2a14	(google: 'linjan integrointi ei sisällä napaa')
  - "⨕": [T: "integraali pisteoperaattorin ympärillä"] 	#  0x2a15	(google: 'integroitu pisteen operaattorin ympärillä')
- - "⨖": [T: "kvanternionin kiinteä operaattori"]     	#  0x2a16	(google: 'kvaternionin kiinteä operaattori')
+ - "⨖": [T: "kvaternionin kiinteä operaattori"]     	#  0x2a16	(google: 'kvaternionin kiinteä operaattori')
  - "⨗": [T: "integraali ja vasemmalle osoittava nuoli koukulla"]	#  0x2a17	(en: 'integral with leftwards arrow with hook', google: 'integraali vasemmanpuoleisella nuolella koukussa')
  - "⨘": [T: "integraali kertomerkillä"]	#  0x2a18	(en: 'integral with times sign', google translation)
  - "⨙": [T: "integraali leikkauksella"]           	#  0x2a19	(en: 'integral with intersection', google translation)
