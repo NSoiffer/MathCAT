@@ -1900,7 +1900,7 @@
  - "⦬": [T: "mitattu kulma, jossa oikealle ja ylös osoittava nuoli"]	#  0x29ac	(en: 'measured angle with open arm ending in arrow pointing right and up', google: 'mitattu kulma, kun avoin käsivarsi päättyy nuoleen osoittaen oikealle ja ylöspäin')
  - "⦭": [T: "mitattu kulma, jossa vasemmalle ja ylös osoittava nuoli"]	#  0x29ad	(en: 'measured angle with open arm ending in arrow pointing left and up', google: 'mitattu kulma, jonka avoin käsivarsi päättyy nuoleen osoittaen vasemmalle ja ylöspäin')
  - "⦮": [T: "mitattu kulma, jossa oikealle ja alas osoittava nuoli"]	#  0x29ae	(en: 'measured angle with open arm ending in arrow pointing right and down', google: 'mitattu kulma, kun avoin käsivarsi päättyy nuoleen osoittaen oikealle ja alas')
- - "⦯": [T: "mitattu kulma, jossa vasemmale ja alas osoittava nuoli"]	#  0x29af	(en: 'measured angle with open arm ending in arrow pointing left and down', google: 'mitattu kulma, jonka nuolessa päättyy avoimeen käsivarteen, osoittaen vasemmalle ja alas')
+ - "⦯": [T: "mitattu kulma, jossa vasemmalle ja alas osoittava nuoli"]	#  0x29af	(en: 'measured angle with open arm ending in arrow pointing left and down', google: 'mitattu kulma, jonka nuolessa päättyy avoimeen käsivarteen, osoittaen vasemmalle ja alas')
  - "⦰": [T: "käännetty tyhjä joukko"]               	#  0x29b0	(google: 'kääntynyt tyhjä sarja')
  - "⦱": [T: "tyhjä joukko yläviivalla"]            	#  0x29b1	(en: 'empty set with overbar', google: 'tyhjä sarja ylikuormituksella')
  - "⦲": [T: "tyhjä joukko ja pieni ympyrä yläpuolella"]       	#  0x29b2	(en: 'empty set with small circle above', google: 'tyhjä sarja, jossa on pieni ympyrä yllä')
