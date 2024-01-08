@@ -2080,8 +2080,8 @@
  - "⩡": [T: "pieni vee alaviivalla"]       	#  0x2a61	(en: 'small vee with underbar', google translation)
  - "⩢": [T: "looginen tai kaksoisyläviivalla"]	#  0x2a62	(en: 'logical or with double overbar', google translation)
  - "⩣": [T: "kaksoisalleviivattu looginen tai"]    	#  0x2a63	(en: 'logical or with double underbar', google translation)
- - "⩤": [T: "Z-notaatio domainin antirekstriktio"]    	#  0x2a64	(en: 'z notation domain antirestriction', google translation)
- - "⩥": [T: "Z-notaatio range antirestrestriktio"]           	#  0x2a65	(en: 'z notation range antirestriction', google translation)
+ - "⩤": [T: "Z-notaatio määrittelyjoukon vastarajoitus"]    	#  0x2a64	(en: 'z notation domain antirestriction', google translation) # FI: unclear translation
+ - "⩥": [T: "Z-notaatio kuvajoukon vastarajoitus"]           	#  0x2a65	(en: 'z notation range antirestriction', google translation) # FI: unclear translation
  - "⩦": [T: "on yhtä suuri kuin alapisteellä"]              	#  0x2a66	(en: 'equals sign with dot below', google: 'vastaa alla olevaa pistettä')
  - "⩧": [T: "identtinen kuin yläpisteellä"]	#  0x2a67	(en: 'identical with dot above', google translation)
  - "⩨": [T: "kolminkertainen vaakasuora viiva kaksinkertaisella pystysuoralla viivalla"]	#  0x2a68	(en: 'triple horizontal bar with double vertical stroke', google translation)
