@@ -2043,7 +2043,7 @@
  - "⨻": [T: "kertomerkki kolmiossa"]  	            #  0x2a3b	(google: 'kertokultaan kolmiossa')
  - "⨼": [T: "sisäinen tulo"]                 	    #  0x2a3c	(google: 'sisätuote')
  - "⨽": [T: "oikeanpuoleinen sisäinen tulo"]        #  0x2a3d	(en: 'righthand interior product', google translation)
- - "⨿": [T: "amalgamaatio"]        	                #  0x2a3f	(google: 'yhdistäminen tai yhteistyö') NOTE: translation unclear
+ - "⨿": [T: "amalgamaatio tai kotulo"]        	    #  0x2a3f	(en: "amalgamation or coproduct", google: 'yhdistäminen tai yhteistyö') # FI: translation unclear
  - "⩀": [T: "leikkaus pisteellä"]             	    #  0x2a40	(en: 'intersection with dot', google: 'risteys pisteellä')
  - "⩁": [T: "unioni miinuksella"]       	        #  0x2a41	(en: 'union with minus sign', google translation)
  - "⩂": [T: "unioni yläviivalla"]                	#  0x2a42	(en: 'union with overbar', google: 'unioni ylikuormituksen kanssa')
