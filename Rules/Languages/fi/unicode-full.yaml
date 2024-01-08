@@ -1211,8 +1211,8 @@
          then: [T: "on"]                        	# 	(en: 'is', google translation)
      - T: "oikeanpuoleinen puolisuora tulo"            	# 	(en: 'the right semidirect product of', google: 'oikea semidirect -tuote')
  - "⋍": [T: "käänteinen tilde yhtäsuuruus"]     	#  0x22cd	(en: 'reversed tilde equals', google: 'käänteinen tilde on tasa -arvoinen')
- - "⋎": [T: "kaareva looginen tai"]             	#  0x22ce	(en: 'curly logical or', google: 'kihara looginen tai')
- - "⋏": [T: "kaareva looginen ja"]              	#  0x22cf	(en: 'curly logical and', google: 'curly looginen ja')
+ - "⋎": [T: "kaareva looginen tai"]             	#  0x22ce	(en: 'curly logical or', google: 'kihara looginen tai') # FI: include "logical", "looginen" or not?
+ - "⋏": [T: "kaareva looginen ja"]              	#  0x22cf	(en: 'curly logical and', google: 'curly looginen ja') # FI: include "logical", "looginen" or not?
  - "⋐":                                         	#  0x22d0
      - test: 
          if: "$Verbosity!='Terse'"
@@ -1315,10 +1315,10 @@
          then: [T: ""]                        	    # 	(en: 'is', google translation)
      - T: "ei ole normaali aliryhmä tai yhtä kuin"	# 	(en: 'not a normal subgroup of nor is equal to', google: 'ei normaali alaryhmä, joka ei ole yhtä suuri')
  - "⋭": [T: "ei sisällä normaalina aliryhmänä tai ole yhtä kuin"]	#  0x22ed	(en: 'does not contain as a normal subgroup nor is equal to', google: 'ei sisällä normaalia alaryhmää eikä ole yhtä suuri kuin')
- - "⋮": [T: "pystyellipsi"]      	                #  0x22ee	(en: 'vertical ellipsis', google: 'pystysuora ellipsis')
- - "⋰": [T: "nouseva ellipsi"]                  	#  0x22f0	(en: 'upwards diagonal ellipsis', google: 'ylöspäin diagonaalinen ellipsi')
- - "⋱": [T: "laskeva ellipsi"]     	                #  0x22f1	(en: 'diagonal ellipsis', google: 'diagonaalinen ellipsis')
+ - "⋮": [T: "pystyellipsi"]      	                #  0x22ee	(en: 'vertical ellipsis', google: 'pystysuora ellipsis') # FI: "ellipse", "ellipsi" into "dot dot dot", "piste piste piste"?
  - "⋯": [T: "piste piste piste"]      	        #  0x22ef	(en: 'dot dot dot', google: 'dot dot dot')
+ - "⋰": [T: "nouseva ellipsi"]                  	#  0x22f0	(en: 'upwards diagonal ellipsis', google: 'ylöspäin diagonaalinen ellipsi') # FI: "ellipse", "ellipsi" into "dot dot dot", "piste piste piste"?
+ - "⋱": [T: "laskeva ellipsi"]     	                #  0x22f1	(en: 'diagonal ellipsis', google: 'diagonaalinen ellipsis') # FI: "ellipse", "ellipsi" into "dot dot dot", "piste piste piste"?
  - "⋲": [T: "poikkiviivainen kuulumismerkki"]	    #  0x22f2	(en: 'element of with long horizontal stroke', google: 'elementti pitkällä vaakasuoralla iskulla')
  - "⋳": [T: "kuulumismerkki pystyviivaan päättyvällä poikkiviivalla"]	#  0x22f3	(en: 'element of with vertical bar at end of horizontal stroke', google: 'elementti pystysuoralla tankolla vaakasuoran iskun lopussa')
  - "⋴": [T: "pieni kuulumismerkki pystyviivaan päättyvällä poikkiviivalla"]	#  0x22f4	(en: 'element of with vertical bar at end of horizontal stroke', google: 'elementti pystysuoralla tankolla vaakasuoran iskun lopussa')
@@ -1418,7 +1418,7 @@
  - "⒅": [T: "suluissa kahdeksantoista"]          	#  0x2485	(en: 'parenthesized eighteen', google translation)
  - "⒆": [T: "suluissa yhdeksäntoista"]          	#  0x2486	(en: 'parenthesized nineteen', google translation)
  - "⒇": [T: "suluissa kaksikymmentä"]           	#  0x2487	(en: 'parenthesized twenty', google translation)
- - "⒈-⒐":                                       	#  0x2488 - 0x2491
+ - "⒈-⒐":                                       	#  0x2488 - 0x2491 # FI: should these be ordinals?
     - SPELL: "translate('.', '⒈⒉⒊⒋⒌⒍⒎⒏⒐', '123456789')"
     - T: "pisteellä"                         	# 	(en: 'with period', google translation)
  - "⒑": [T: "kymmenen pisteellä"]            	#  0x2491	(en: 'ten with period', google translation)
@@ -1530,10 +1530,10 @@
  - "◤": [T: "musta vasen yläkolmio"]            	#  0x25e4	(en: 'black upper left triangle', google: 'musta vasen yläosa kolmio')
  - "◥": [T: "musta oikea yläkolmio"]            	#  0x25e5	(en: 'black upper right triangle', google: 'musta oikea yläosa kolmio')
  - "◦": [T: "valkoinen pallo"]          	        #  0x25e6	(en: 'composition', google: 'sävellys')
- - "◧": [T: "neliö, vasen puoli musta"]         	#  0x25e7	(en: 'square with left half black', google: 'neliö vasemmalla puoliksi mustalla')
- - "◨": [T: "neliö, oikea puoli musta"]         	#  0x25e8	(en: 'square with right half black', google: 'neliö oikealla puoliksi mustalla')
- - "◩": [T: "neliö, vasen ylädiagonaali musta"] 	#  0x25e9	(en: 'square with upper left half black', google: 'neliö vasemmalla yläosa mustalla')
- - "◪": [T: "neliö, oikea aladiagonaali musta"] 	#  0x25ea	(en: 'square with lower right half black', google: 'neliö oikealla alaosa mustalla')
+ - "◧": [T: "neliö vasen puoli musta"]         	#  0x25e7	(en: 'square with left half black', google: 'neliö vasemmalla puoliksi mustalla')
+ - "◨": [T: "neliö oikea puoli musta"]         	#  0x25e8	(en: 'square with right half black', google: 'neliö oikealla puoliksi mustalla')
+ - "◩": [T: "neliö vasen ylädiagonaali musta"] 	#  0x25e9	(en: 'square with upper left half black', google: 'neliö vasemmalla yläosa mustalla')
+ - "◪": [T: "neliö oikea aladiagonaali musta"] 	#  0x25ea	(en: 'square with lower right half black', google: 'neliö oikealla alaosa mustalla')
  - "◫": [T: "valkoinen neliö pystysuoralla poikkiviivalla"]	    #  0x25eb	(en: 'white square with bisecting line', google: 'valkoinen neliö puolustamisviivalla')
  - "◬": [T: "valkoinen ylös osoittava kolmio pisteellä"]	#  0x25ec	(en: 'white up pointing triangle with dot', google: 'valkoinen osoittava kolmio pisteellä')
  - "◭": [T: "valkoinen ylös osoittava kolmio, vasen puoli musta"]	#  0x25ed	(en: 'up pointing triangle with left half black', google: 'ylöspäin osoittaen kolmio vasemmalla puoliksi mustalla')
@@ -1689,7 +1689,7 @@
  - "⟙": [T: "suuri nupi alaspäin"]                  	#  0x27d9	(google: 'suuri alaspäin')
  - "⟚": [T: "tuplaportti vasemmalle ja oikealle"]  	#  0x27da	(google: 'vasen ja oikea kaksoiskivi')
  - "⟛": [T: "vasen ja oikea nupi"]              	#  0x27db	(google: 'vasen ja oikea tarttuva')
- - "⟜": [T: "vasen multimap"]                    	#  0x27dc	(google: 'vasen multimep') NOTE: not translated, meaning unclear
+ - "⟜": [T: "vasen monikuvaus"]                    	#  0x27dc	(google: 'vasen multimep') # FI: meaning unclear
  - "⟝": [T: "pitkä oikea nupi"]                  	#  0x27dd	(google: 'pitkä oikea tarttuva')
  - "⟞": [T: "pitkä vasen nupi"]                   	#  0x27de	(google: 'pitkä vasen tarttuva')
  - "⟟": [T: "nupi ylös ympyrällä"]         	        #  0x27df	(en: 'up tack with circle above', google: 'yllä oleva ympyrä')
@@ -2003,7 +2003,7 @@
  - "⨓": [T: "viivaintegraali puoliympyräpolulla navan ympäri"]	#  0x2a13	(en: 'line integration with semicircular path around pole', google: 'line -integrointi puolipyöreällä polulla navan ympärillä')
  - "⨔": [T: "viivaintegraali ei sisällä napaa"]	#  0x2a14	(google: 'linjan integrointi ei sisällä napaa')
  - "⨕": [T: "integraali pisteoperaattorin ympärillä"] 	#  0x2a15	(google: 'integroitu pisteen operaattorin ympärillä')
- - "⨖": [T: "kvaternionin integraalioperaattori"]     	#  0x2a16	(google: 'kvaternionin kiinteä operaattori')
+ - "⨖": [T: "kvaternionin integraalioperaattori"]     	#  0x2a16 en: 'quaternion integral operator'	google: 'kvaternionin kiinteä operaattori'
  - "⨗": [T: "integraali ja vasemmalle osoittava nuoli koukulla"]	#  0x2a17	(en: 'integral with leftwards arrow with hook', google: 'integraali vasemmanpuoleisella nuolella koukussa')
  - "⨘": [T: "integraali kertomerkillä"]	#  0x2a18	(en: 'integral with times sign', google translation)
  - "⨙": [T: "integraali leikkauksella"]           	#  0x2a19	(en: 'integral with intersection', google translation)
@@ -2016,7 +2016,7 @@
  - "⨠": [T: "Z-notaatio skeemapiping"]        	#  0x2a20	(en: 'z notation schema piping', google translation)
  - "⨡": [T: "Z-notaatio skeemaprojektio"]     	#  0x2a21	(en: 'z notation schema projection', google translation)
  - "⨢": [T: "plus ja ympyrä yläpuolella"]       	#  0x2a22	(en: 'plus sign with circle above', google: 'plus -merkki yllä olevalla ympyrällä')
- - "⨣": [T: "plus ja sirkumfleksi yläpuolella"]	#  0x2a23	(en: 'plus sign with circumflex accent above', google: 'plus -merkki yllä olevalla ympyrä -aksentilla')
+ - "⨣": [T: "plus ja sirkumfleksi yläpuolella"]	#  0x2a23	(en: 'plus sign with circumflex accent above', google: 'plus -merkki yllä olevalla ympyrä -aksentilla') # FI: should this be "hat", "hattu"?
  - "⨤": [T: "plus ja tilde yläpuolella"]             	#  0x2a24	(en: 'plus sign with tilde above', google: 'plus -merkki yllä olevan tilden kanssa')
  - "⨥": [T: "plus ja piste alapuolella"]          	#  0x2a25	(en: 'plus sign with dot below', google: 'plus -merkki alla olevalla pisteellä')
  - "⨦": [T: "plus ja tilde alapuolella"]             	#  0x2a26	(en: 'plus sign with tilde below', google: 'plus -merkki alla olevilla tildeillä')
@@ -2031,11 +2031,11 @@
  - "⨯": [T: "ristitulo"]          	                #  0x2a2f	(en: 'cross product', google: 'ristituote')
  - "⨰": [T: "kertomerkki ja piste yläpuolella"]	#  0x2a30	(en: 'multiplication sign with dot above', google: 'kertolaskulla olevan pisteen kanssa')
  - "⨱": [T: "kertomerkki alaviivalla"] 	#  0x2a31	(en: 'multiplication sign with underbar', google: 'kertolasku aluskokouksella')
- - "⨲": [T: "semidirect product jonka pohja suljettu"]	#  0x2a32	(en: 'semidirect product with bottom closed', google translation) NOTE: translation unclear
- - "⨳": [T: "smash product"]                    	#  0x2a33	(google: 'smash -tuote') NOTE: translation unclear
+ - "⨲": [T: "puolisuora tulo, jonka pohja suljettu"]	#  0x2a32	(en: 'semidirect product with bottom closed', google translation)
+ - "⨳": [T: "smash tulo"]                    	#  0x2a33	(en: 'smash product' google: 'smash -tuote') # FI: translation unclear
  - "⨴": [T: "kertomerkki vasemmalla puoliympyrällä"]	#  0x2a34	(google: 'kertolaskenta vasemmassa puolivälissä')
  - "⨵": [T: "kertomerkki oikealla puoliympyrällä"]	#  0x2a35	(google: 'kertokultaan oikea puoli ympyrä')
- - "⨶": [T: "ympyröity kertomerkki sirkumfleksillä"]	#  0x2a36	(en: 'circled multiplication sign with circumflex accent', google: 'ympyräkerroin merkki kehäkykyt aksentilla')
+ - "⨶": [T: "ympyröity kertomerkki sirkumfleksillä"]	#  0x2a36	(en: 'circled multiplication sign with circumflex accent', google: 'ympyräkerroin merkki kehäkykyt aksentilla') # FI: should this be with "hat", "hattu"?
  - "⨷": [T: "kaksoisympyröity kertomerkki"]	        #  0x2a37	(google: 'kertolaskenta kaksoisympyrässä')
  - "⨸": [T: "ympyröity jakomerkki"]            	    #  0x2a38	(google: 'ympyrädivisioonan merkki')
  - "⨹": [T: "plus kolmiossa"]            	        #  0x2a39	(google: 'plus kirjaudu kolmioon')
@@ -2083,7 +2083,7 @@
  - "⩤": [T: "Z-notaatio määrittelyjoukon vastarajoitus"]    	#  0x2a64	(en: 'z notation domain antirestriction', google translation) # FI: unclear translation
  - "⩥": [T: "Z-notaatio kuvajoukon vastarajoitus"]           	#  0x2a65	(en: 'z notation range antirestriction', google translation) # FI: unclear translation
  - "⩦": [T: "on yhtä suuri kuin alapisteellä"]              	#  0x2a66	(en: 'equals sign with dot below', google: 'vastaa alla olevaa pistettä')
- - "⩧": [T: "identtinen kuin yläpisteellä"]	#  0x2a67	(en: 'identical with dot above', google translation)
+ - "⩧": [T: "identtinen yläpisteellä"]	#  0x2a67	(en: 'identical with dot above', google translation)
  - "⩨": [T: "kolminkertainen vaakasuora viiva kaksinkertaisella pystysuoralla viivalla"]	#  0x2a68	(en: 'triple horizontal bar with double vertical stroke', google translation)
  - "⩩": [T: "kolminkertainen vaakasuora viiva kolminkertaisella pystysuoralla viivalla"]	#  0x2a69	(en: 'triple horizontal bar with triple vertical stroke', google translation)
  - "⩪": [T: "tilde yläpisteellä"]                    	#  0x2a6a	(en: 'tilde operator with dot above', google: 'tilde -operaattori, jossa on pisteen yllä')
@@ -2154,7 +2154,7 @@
  - "⪫": [T: "suurempi kuin vaakaviivalla"]                      	#  0x2aab	(google: 'suurempi kuin')
  - "⪬": [T: "pienempi kuin vaakaviivalla tai yhtä suuri kuin"]         	#  0x2aac	(google: 'pienempi tai yhtä suuri kuin')
  - "⪭": [T: "suurempi kuin vaakaviivalla tai yhtä suuri kuin"]          	#  0x2aad	(google: 'suurempi tai yhtä suuri kuin')
- - "⪮": [T: "ero välillä"]     	#  0x2aae	(en: 'equals sign with bumpy above', google: 'yhtä suuri kuin kuohuttava yllä') NOTE: translation unclear
+ - "⪮": [T: "ero välillä"]     	#  0x2aae	(en: 'equals sign with bumpy above', google: 'yhtä suuri kuin kuohuttava yllä') # FI: translation unclear
  - "⪯": [T: "edeltää jonka alapuolella yksiviivainen yhtä suuri kuin"]	#  0x2aaf	(google: 'ennen yhden rivin yläpuolella on yhtä suuri kuin merkki')
  - "⪰": [T: "seuraa jonka alapuolella yksiviivainen yhtä suuri kuin"]	#  0x2ab0	(en: 'succeeds above single line equals sign', google translation)
  - "⪱": [T: "edeltää jonka alapuolella yksiviivainen ei yhtä suuri kuin"]	#  0x2ab1	(en: 'precedes above single line not equal to', google translation)
@@ -2185,8 +2185,8 @@
  - "⫊": [T: "ylijoukko jonka alapuolella likimäärin yhtä suuri kuin"]	#  0x2aca	(en: 'superset of above almost equal to', google translation)
  - "⫋": [T: "osajoukko mutta ei yhtä suuri kuin"]	#  0x2acb	(en: 'subset above not equal to', google translation)
  - "⫌": [T: "ylijoukko mutta ei yhtä suuri kuin"]	#  0x2acc	(en: 'superset of above not equal to', google translation)
- - "⫍": [T: "laatikko-operaattori jonka vasen puoli avoin"]	#  0x2acd	(en: 'square left open box operator', google translation) NOTE: translation unclear
- - "⫎": [T: "laatikko-operaattori jonka oikea puoli avoin"]	#  0x2ace	(en: 'square right open box operator', google translation) NOTE: translation unclear
+ - "⫍": [T: "laatikko-operaattori jonka vasen puoli avoin"]	#  0x2acd	(en: 'square left open box operator', google translation) # FI: translation unclear
+ - "⫎": [T: "laatikko-operaattori jonka oikea puoli avoin"]	#  0x2ace	(en: 'square right open box operator', google translation) # FI: translation unclear
  - "⫏": [T: "suljettu osajoukko"]                    	#  0x2acf	(google: 'suljettu alajoukko')
  - "⫐": [T: "suljettu ylijoukko"]                  	#  0x2ad0	(google: 'suljettu superset')
  - "⫑": [T: "suljettu osajoukko tai yhtä suuri kuin"]        	#  0x2ad1	(google: 'suljettu osajoukko tai yhtä suuri kuin')
@@ -2198,10 +2198,10 @@
  - "⫗": [T: "ylijoukko osajoukon vieressä"]           	#  0x2ad7	(google: 'superset alajoukon vieressä')
  - "⫘": [T: "ylijoukko osajoukon vieressä yhdistettynä viivalla"]	#  0x2ad8	(en: 'superset beside and joined by dash with subset', google: 'superset vieressä ja liittyi viivalla alajoukkoon')
  - "⫙": [T: "alaspäin aukeava kuuluu joukkoon"]     	#  0x2ad9	(google: 'elementti avautumisesta alaspäin')
- - "⫚": [T: "hanko t-yläosalla"]            	#  0x2ada	(en: 'pitchfork with tee top', google: 'pitchfork tee -top') NOTE: translation unclear
- - "⫛": [T: "poikittainen leikkaus"]         	#  0x2adb	(google: 'poikittainen risteys') NOTE: translation unclear
- - "⫝̸": [T: "haarukka"]                         	#  0x2adc	(en: 'forking', google translation) NOTE: translation unclear
- - "⫝": [T: "ei-haarukka"]                 	#  0x2add	(en: 'nonforking', google translation) NOTE: translation unclear
+ - "⫚": [T: "hanko t-yläosalla"]            	#  0x2ada	(en: 'pitchfork with tee top', google: 'pitchfork tee -top') # FI: translation unclear
+ - "⫛": [T: "poikittainen leikkaus"]         	#  0x2adb	(google: 'poikittainen risteys') # FI: translation unclear
+ - "⫝̸": [T: "haarukka"]                         	#  0x2adc	(en: 'forking', google translation) # FI: translation unclear
+ - "⫝": [T: "ei-haarukka"]                 	#  0x2add	(en: 'nonforking', google translation) # FI: translation unclear
  - "⫞": [T: "lyhyt nasta vasemmalle"]             	#  0x2ade	(en: 'short left tack', google translation)
  - "⫟": [T: "lyhyt nasta alaspäin"]                   	#  0x2adf	(en: 'short down tack', google translation)
  - "⫠": [T: "lyhyt nasta ylöspäin"]                   	#  0x2ae0	(en: 'short up tack', google translation)
@@ -2554,8 +2554,8 @@
  - "": [T: "yhtä suuri tai suurempi kuin"]     	#  0xe913	(en: 'equal to or greater than', google translation)
  - "": [T: "likimäärin ylijoukko"]           	#  0xe914	(en: 'approximate superset of', google translation)
  - "": [T: "likimäärin osajoukko"]          	#  0xe915	(en: 'approximate subset of', google translation)
- - "": [T: "ylijoukko pisteellä sisältää alirelaationa"]	#  0xe916	(en: 'superset of with dot includes as sub relation', google translation) NOTE: translation unclear
- - "": [T: "osajoukko pisteellä sisältyy alirelaationa"]	#  0xe917	(en: 'subset of with dot is included in as sub relation', google translation) NOTE: translation unclear
+ - "": [T: "ylijoukko pisteellä sisältää alirelaationa"]	#  0xe916	(en: 'superset of with dot includes as sub relation', google translation) # FI: translation unclear
+ - "": [T: "osajoukko pisteellä sisältyy alirelaationa"]	#  0xe917	(en: 'subset of with dot is included in as sub relation', google translation) # FI: translation unclear
  - "": [T: "on yhtä suuri kuin ja piste alapuolella"] 	#  0xe918	(en: 'equal with dot below', google translation)
  - "": [T: "vasen piste jonka alapuolella miinus jonka alapuolella oikea piste"]	#  0xe919	(en: 'left dot over minus over right dot', google translation)
  - "": [T: "oikea piste jonka alapuolella miinus jonka alapuolella vasen piste"]	#  0xe91a	(en: 'right dot over minus over left dot', google translation)
