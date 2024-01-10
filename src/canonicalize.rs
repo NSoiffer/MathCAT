@@ -1796,6 +1796,15 @@ impl CanonicalizeContext {
 			//   but that would likely miss the words used in slope=run/rise
 			// We shouldn't need to worry about trig names like "cos", but people sometimes forget to use "\cos"
 			// Hence, we check against the "FunctionNames" that get read on startup.
+			static VOWELS: phf::Set<char> = phf_set! {
+				'a', 'e', 'i', 'o', 'u', 'y',
+				'à',  'á',  'â',  'ã',  'ä',  'è',  'é',  'ê',  'ë',  'ì',  'í',  'î',  'ï', 
+				'ò',  'ó',  'ô',  'õ',  'ö',  'ú',  'Ù',  'û',  'ü',  'ý',  'ÿ',  
+				// Vietnamese
+				'ả', 'ạ', 'ă', 'ằ', 'ẳ', 'ẵ', 'ắ', 'ặ', 'ầ', 'ẩ', 'ẫ', 'ấ', 'ậ', 'ẻ', 'ẽ', 'ẹ', 'ề', 'ể', 'ễ', 'ế', 'ệ',
+				'ỉ', 'ĩ', 'ị', 'ỏ', 'ọ', 'ồ', 'ổ', 'ỗ', 'ố', 'ộ', 'ơ', 'ờ', 'ở', 'ỡ', 'ớ', 'ợ',
+				'ủ', 'ũ', 'ụ', 'ư', 'ừ', 'ử', 'ữ', 'ứ', 'ự', 'ỳ', 'ỷ', 'ỹ', 'ỵ', 
+			};
 			if as_text(mi).len() > 1 {
 				return None;
 			}
@@ -1813,22 +1822,20 @@ impl CanonicalizeContext {
 				if name(&child) != "mi" {
 					break;		// because of the earlier check of two <mi>s, we know we have at least three chars
 				}
-				if as_text(child).len() > 1 {
+				let mut chars = as_text(child).chars();
+				chars.next();	// advance to second char
+				if chars.next().is_some() {
 					return None;		// if something in the sequence is more than a char, assume the others are correct
 				}
 				text.push_str(as_text(child));
 			}
 			// If it is a word, it needs a vowel
 			// FIX: this check needs to be internationalized to include accented vowels, other alphabets
-			if !text.contains(['a', 'e', 'i', 'o', 'u', 'y']) {
-				let pref_manager = crate::prefs::PreferenceManager::get();
-				let pref_manager = pref_manager.borrow();
-				if pref_manager.pref_to_string("Language").starts_with("en") {
-					return None;
-				};
+			if !text.chars().any(|ch| VOWELS.contains(&ch)) {
+				return None;
 			}
 
-			let following_siblings: Vec<Element> = following_siblings[..text.len()-1].iter()
+			let following_siblings: Vec<Element> = following_siblings[..text.chars().count()-1].iter()
 						.map(|&child| as_element(child))
 						.collect();
 			
