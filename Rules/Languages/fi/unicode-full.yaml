@@ -2942,27 +2942,28 @@
  - "": [T: "yläoikea suorakulmio"]       	#  0xec90	(en: 'top right rectangle', google translation)
  - "": [T: "alaoikea suorakulmio"]                	#  0xec91	(en: 'bottom right rectangle', google translation)
  - "": [T: "synteettinen jakokulma"]           	#  0xec92	(en: 'synthetic division corner', google translation) NOTE: translation unclear
- - "": [T: "synteettinen jakokulma vaakasuora laajennus"]	#  0xec93	(en: 'synthetic division horizontal extender', google translation) NOTE: translation unclear
- - "": [T: "synteettinen jakokulma pystysuora laajennus"]	#  0xec94	(en: 'synthetic division vertical extender', google translation) NOTE: translation unclear
- - "": [T: "vasen katto lattia laajennus"]    	#  0xec95	(en: 'left ceiling floor extender', google translation)
- - "": [T: "oikea katto lattia laajennus"]    	#  0xec96	(en: 'right ceiling floor extender', google translation)
- - "": [T: "yli hakasulku laajennus"]   	#  0xec97	(en: 'over bracket extender', google translation) NOTE: translation unclear
- - "": [T: "pystypalkki laajennus"]      	#  0xec98	(en: 'vertical bar extender', google translation)
- - "": [T: "vasen kaksinkertainen pystypalkki laajennus"]	#  0xec99	(en: 'left double vertical bar extender', google translation)
- - "": [T: "vaakasuora palkki laajennus"]      	#  0xec9a	(en: 'horizontal bar extender', google translation)
- - "": [T: "ala hakasulku laajennus"]    	#  0xec9c	(en: 'under bracket extender', google translation) NOTE: translation unclear
- - "": [T: "alaspäin osoittava paren oikea"] 	#  0xec9d	(en: 'down pointing paren right', google translation)
- - "": [T: "alaspäin osoittava paren laajennus"]	#  0xec9e	(en: 'down pointing paren extender', google translation)
- - "": [T: "alaspäin osoittava paren vasen"]	#  0xec9f	(en: 'down pointing paren left', google translation)
- - "": [T: "ylöspäin osoittava hakasulku laajennus"]	#  0xeca0	(en: 'up pointing brace extender', google translation)
- - "": [T: "ylöspäin osoittava paren vasen"]	#  0xeca1	(en: 'up pointing paren left', google translation)
- - "": [T: "ylöspäin osoittava paren laajennus"] 	#  0xeca2	(en: 'up pointing paren extender', google translation)
- - "": [T: "ylöspäin osoittava paren oikea"] 	#  0xeca3	(en: 'up pointing paren right', google translation)
- - "": [T: "alaspäin osoittava paren laajennus"]	#  0xeca4	(en: 'down pointing brace extender', google translation)
  - "": [T: "planckin vakio kahden piin yläpuolella palkki"]	#  0xed00	(en: 'planck constant over two pi bar', google translation) NOTE: translation unclear
+ - "": [T: "synteettinen jakokulma vaakasuora pidennys"]	#  0xec93	(en: 'synthetic division horizontal extender', google translation) # FI: translation unclear
+ - "": [T: "synteettinen jakokulma pystysuora pidennys"]	#  0xec94	(en: 'synthetic division vertical extender', google translation) # FI: translation unclear
+ - "": [T: "vasen katto lattia pidennys"]    	#  0xec95	(en: 'left ceiling floor extender', google translation)
+ - "": [T: "oikea katto lattia pidennys"]    	#  0xec96	(en: 'right ceiling floor extender', google translation)
+ - "": [T: "yli hakasulku pidennys"]   	#  0xec97	(en: 'over bracket extender', google translation) # FI: translation unclear
+ - "": [T: "pystypalkki pidennys"]      	#  0xec98	(en: 'vertical bar extender', google translation)
+ - "": [T: "vasen kaksinkertainen pystypalkki pidennys"]	#  0xec99	(en: 'left double vertical bar extender', google translation)
+ - "": [T: "vaakasuora palkki pidennys"]      	#  0xec9a	(en: 'horizontal bar extender', google translation)
+ - "": [T: "ala hakasulku pidennys"]    	#  0xec9c	(en: 'under bracket extender', google translation) # FI: translation unclear
+ - "": [T: "alaspäin osoittava sulku oikea"] 	#  0xec9d	(en: 'down pointing paren right', google translation)
+ - "": [T: "alaspäin osoittava sulku pidennys"]	#  0xec9e	(en: 'down pointing paren extender', google translation)
+ - "": [T: "alaspäin osoittava sulku vasen"]	#  0xec9f	(en: 'down pointing paren left', google translation)
+ - "": [T: "ylöspäin osoittava hakasulku pidennys"]	#  0xeca0	(en: 'up pointing brace extender', google translation)
+ - "": [T: "ylöspäin osoittava sulku vasen"]	#  0xeca1	(en: 'up pointing paren left', google translation)
+ - "": [T: "ylöspäin osoittava sulku pidennys"] 	#  0xeca2	(en: 'up pointing paren extender', google translation)
+ - "": [T: "ylöspäin osoittava sulku oikea"] 	#  0xeca3	(en: 'up pointing paren right', google translation)
+ - "": [T: "alaspäin osoittava sulku pidennys"]	#  0xeca4	(en: 'down pointing brace extender', google translation)
  - "": [T: "peili g"]                          	#  0xed01	(en: 'mirror g', google translation)
  - "": [T: "pisteetön j"]                        	#  0xed02	(google translation)
  - "": [T: "digamma"]                          	#  0xed03	(google translation) NOTE: translation unclear
+ - "": [T: "digamma"]                          	#  0xed03	(google translation) # FI: translation unclear
  - "ϝ": [T: "digamma"]                          	#  0x3dd NOTE: translation unclear
  - "": [T: "d"]                                	#  0xed10	(en: 'd', google translation)
  - "ⅆ": [T: "d"]                                	#  0x2146	(google: 'ⅆ')
