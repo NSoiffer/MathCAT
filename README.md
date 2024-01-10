@@ -32,7 +32,7 @@ Voin lähettää testaamiseen vaadittavat tiedostot sähköpostitse, niin GitHub
 6. Käynnistä NVDA varmuuden vuoksi uudelleen.
 7. MathCATin asetuksia voi muuttaa NVDA-näppäin + N, asetukset, ”MathCAT settings”. (Valikko on englanninkielinen.) Voit muuttaa sitä kautta matematiikan luennan suomenkieliseksi.
 8. Valitse luentatavaksi <code>ClearSpeak</code>. Se on käännetty. <code>SimpleSpeak</code> on myös suomenkielinen, mutta sen käännökset on tehty automaattisesti eli tulos ei ole kovin hyvä.
-9. Voit nyt testata matematiikan kaavojen luentaa eri sivuilla, jos matematiikka on esitetty MathML-koodilla. [Kokeile esimerkiksi tekemääni testisivustoa](https://samimaattacelia.github.io/math-fi.html). Se ei ole kuitenkaan kattava, joten voit kokeilla esimerkiksi Wikipedian matematiikkasivuja. Niiss oleva matematiikka on esitetty MathML-koodilla.
+9. Voit nyt testata matematiikan kaavojen luentaa eri sivuilla, jos matematiikka on esitetty MathML-koodilla. [Kokeile esimerkiksi tekemääni testisivustoa](https://samimaattacelia.github.io/math-fi.html). Se ei ole kuitenkaan kattava, joten voit kokeilla esimerkiksi Wikipedian matematiikkasivuja. Niissä oleva matematiikka on esitetty MathML-koodilla.
 
 Jos huomaat puutteita luennassa tai käännöksissä, niin voit lähettää palautetta suoraan Sami Määtälle, [sami.maatta@celia.fi](mailto:sami.maatta@celia.fi) tai lisätä GitHubin avulla "issuen". -->
 
