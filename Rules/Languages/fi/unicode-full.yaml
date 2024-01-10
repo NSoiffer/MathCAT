@@ -2550,7 +2550,7 @@
  - "": [T: "ylijoukko tai yhtä suuri kuin"]     	#  0xe90b	(en: 'superset of or equal to', google translation)
  - "": [T: "osajoukko tai yhtä suuri kuin"]    	#  0xe90c	(en: 'subset of or equal to', google translation)
  - "": [T: "on yhtä suuri kuin ja alapuolella pienempi kuin"]             	#  0xe90d	(en: 'equal over less than', google translation)
- - "": [T: "kuuluu joukkoon tai on yhtä suuri kuin"]    	#  0xe912	(en: 'element of or equal to', google translation)
+ - "": [T: "kuuluu joukkoon tai on yhtä kuin"]    	#  0xe912	(en: 'element of or equal to', google translation)
  - "": [T: "yhtä suuri tai suurempi kuin"]     	#  0xe913	(en: 'equal to or greater than', google translation)
  - "": [T: "likimäärin ylijoukko"]           	#  0xe914	(en: 'approximate superset of', google translation)
  - "": [T: "likimäärin osajoukko"]          	#  0xe915	(en: 'approximate subset of', google translation)
@@ -2595,11 +2595,11 @@
  - "": [T: "alias delimiter"]                  	#  0xe94e	(google translation) NOTE: translation unclear
  - "": [T: "normaali alaryhmä palkilla"]       	#  0xe950	(en: 'normal subgroup of with bar', google translation)
  - "": [T: "sisältää normaalina alaryhmänä palkilla"]	#  0xe951	(en: 'contains as normal subgroup with bar', google translation)
- - "": [T: "pyöreä tarkoittaa"]                 	#  0xe954	(en: 'round implies', google translation) NOTE: translation unclear
  - "": [T: "hymy palkin alla"]                 	#  0xe955	(en: 'smile under bar', google translation) NOTE: translation unclear
  - "": [T: "murjotus palkin alla"]               	#  0xe956	(en: 'frown over bar', google translation) NOTE: translation unclear
  - "": [T: "ylijoukko tai lähes yhtä suuri kuin"]  	#  0xe957	(en: 'superset of or almost equal to', google translation)
  - "": [T: "osajoukko tai lähes yhtä suuri kuin"]	#  0xe958	(en: 'subset of or almost equal to', google translation)
+ - "": [T: "pyöreä seuraa"]                 	#  0xe954	(en: 'round implies', google translation) # FI: translation unclear
  - "": [T: "suurempi kuin melkein yhtä suuri kuin tai pienempi kuin"]	#  0xe959	(en: 'greater than almost equal to or less than', google translation)
  - "": [T: "pienempi kuin melkein yhtä suuri kuin tai suurempi kuin"]	#  0xe95a	(en: 'less than almost equal or greater than', google translation)
  - "": [T: "kaksinkertainen looginen tai"]     	#  0xe95c	(en: 'double logical or', google translation)
@@ -2657,7 +2657,7 @@
  - "": [T: "musta kuun ensimmäinen neljännes"]	#  0xe999	(en: 'black first quarter moon', google translation)
  - "": [T: "negatiivinen siniaalto"]           	#  0xe9a0	(en: 'negative sine wave', google translation)
  - "": [T: "piste sulkujen sisällä"]          	#  0xe9a1	(en: 'parenthesized dot', google translation)
- - "": [T: "parens"]                             	#  0xe9a2	(en: 'parens', google translation) NOTE: translation unclear
+ - "": [T: "sulku"]                             	#  0xe9a2	(en: 'parens', google translation) # FI: translation unclear, "parenthesis"?
  - "": [T: "valkoinen hymy"]                   	#  0xe9a3	(en: 'white smile', google translation)
  - "": [T: "valkoinen murjotus"]                  	#  0xe9a4	(en: 'white frown', google translation)
  - "": [T: "kuusikulmio"]                      	#  0xe9a5	(en: 'hexagon', google translation)
@@ -2667,10 +2667,10 @@
  - "": [T: "unioni serifillä"]                     	#  0xe9b1	(google translation)
  - "": [T: "neliömäinen leikkaus serifillä"]           	#  0xe9b2	(en: 'square intersection serifs', google translation)
  - "": [T: "neliömäinen unioni serifillä"]              	#  0xe9b3	(google translation)
- - "": [T: "edeltää, on yhtä suuri kuin tai seuraa"]   	#  0xe9e0	(en: 'precedes equivalent to or succeeds', google translation)
- - "": [T: "seuraa, on yhtä suuri kuin tai edeltää"]    	#  0xe9e1	(en: 'succeeds equivalent to or precedes', google translation)
- - "": [T: "edeltää, on lähes yhtä suuri kuin tai seuraa"]	#  0xe9e2	(en: 'precedes almost equal to or succeeds', google translation)
- - "": [T: "seuraa, on lähes yhtä suuri kuin tai edeltää"]	#  0xe9e3	(en: 'succeeds almost equal to or precedes', google translation)
+ - "": [T: "edeltää, on yhtä kuin tai seuraa"]   	#  0xe9e0	(en: 'precedes equivalent to or succeeds', google translation)
+ - "": [T: "seuraa, on yhtä kuin tai edeltää"]    	#  0xe9e1	(en: 'succeeds equivalent to or precedes', google translation)
+ - "": [T: "edeltää, on lähes yhtä kuin tai seuraa"]	#  0xe9e2	(en: 'precedes almost equal to or succeeds', google translation)
+ - "": [T: "seuraa, on lähes yhtä kuin tai edeltää"]	#  0xe9e3	(en: 'succeeds almost equal to or precedes', google translation)
  - "": [T: "vähemmän kuin, vastaa tai suurempi kuin"]	#  0xe9f0	(en: 'less than equivalent to or greater than', google translation)
  - "": [T: "suurempi kuin, vastaa tai vähemmän kuin"]	#  0xe9f1	(en: 'greater than equivalent to or less than', google translation)
  - "": [T: "ei hyvin paljon pienempi kuin"]          	#  0xea00	(en: 'not vert much less than', google translation) NOTE: translation unclear, not sure if vert is very or vertical
@@ -2761,7 +2761,7 @@
  - "": [T: "oikea harppuuna vasemman harppuunan yläpuolella"]	#  0xeb04	(en: 'harpoon right over harpoon left', google translation)
  - "": [T: "koillis-lounaskaksoisnuoli"]	        #  0xeb05	(en: 'double arrow northeast southwest', google translation)
  - "": [T: "luoteis-kaakkoiskaksoisnuoli"]	        #  0xeb06	(en: 'double arrow northwest southeast', google translation)
- - "": [T: "vaakasuora harppuunalaajennus"]        #  0xeb07	(en: 'horizontal harpoon extender', google translation) NOTE: translation unclear
+ - "": [T: "vaakasuora harppuunapidennys"]        #  0xeb07	(en: 'horizontal harpoon extender', google translation) # FI: translation unclear
  - "": [T: "vasen kaarinuoli vastapäivään"]        #  0xeb08	(en: 'anticlockwise arc leftwards arrow', google translation)
  - "": [T: "oikea kaarinuoli vastapäivään"]    	#  0xeb09	(en: 'anticlockwise arc rightwards arrow', google translation)
  - "": [T: "suuri oikean nuolen aksentti"]      	#  0xeb0b	(en: 'large rightwards arrow accent', google translation) NOTE: translation unclear
@@ -2769,7 +2769,7 @@
  - "": [T: "vasen nuolenpää"]                  	#  0xeb0d	(en: 'leftwards arrowhead', google translation)
  - "": [T: "oikea nuolenpää"]                  	#  0xeb0e	(en: 'rightwards arrowhead', google translation)
  - "": [T: "suuri vasen-oikea nuoli yliviivauksella"]	#  0xeb0f	(en: 'large left right arrow with stroke', google translation)
- - "": [T: "vaakasuuntainen kaksoisnuolen laajennus"]	#  0xeb10	(en: 'horizontal double arrow extender', google translation) NOTE: translation unclear
+ - "": [T: "vaakasuuntainen kaksoisnuolen pidennys"]	#  0xeb10	(en: 'horizontal double arrow extender', google translation) # FI: translation unclear
  - "": [T: "suuri vasen-oikea kaksinkertainen nuoli yliviivauksella"]	#  0xeb11	(en: 'large left right double arrow with stroke', google translation)
  - "": [T: "alaspäin osoittava nuoli ylöspäin osoittavan nuolen vasemmalla puolella"]	#  0xeb12	(en: 'downwards arrow leftwards of upwards arrow', google translation)
  - "": [T: "vasen nuoli kulmalla alaspäin"]    	#  0xeb13	(en: 'leftwards arrow with corner downwards', google translation)
@@ -2813,8 +2813,8 @@
  - "": [T: "oikea nuoli palkin yläpuolella"]           	#  0xeb39	(en: 'rightwards arrow over bar', google translation)
  - "": [T: "vasen nuoli palkin alapuolella"]          	#  0xeb3a	(en: 'leftwards arrow under bar', google translation)
  - "": [T: "oikea nuoli palkin alapuolella"]          	#  0xeb3b	(en: 'rightwards arrow under bar', google translation)
- - "": [T: "vasen-oikeakolmoisnuoli"]	                #  0xeb3c	(en: 'left right triple arrow', google translation)
- - "": [T: "koillis-kaakkokaksoisnuoli"]	            #  0xeb3f	(en: 'double arrow northeast southeast', google translation)
+ - "": [T: "vasen-oikea kolmoisnuoli"]	                #  0xeb3c	(en: 'left right triple arrow', google translation)
+ - "": [T: "koillis-kaakko kaksoisnuoli"]	            #  0xeb3f	(en: 'double arrow northeast southeast', google translation)
  - "": [T: "vasen puoliympyränuoli vastapäivään"]	#  0xeb40	(en: 'anticlockwise left semicircle arrow', google translation)
  - "": [T: "vasen puoliympyränuoli myötäpäivään"]	#  0xeb41	(en: 'clockwise left semicircle arrow', google translation)
  - "": [T: "vasen avoin ympyrä vasen-oikea nuoli"]	#  0xeb42	(en: 'left open circle left right arrow', google translation) NOTE: translation unclear
@@ -2874,13 +2874,13 @@
  - "": [T: "nuoli alas ja oikealla nuoli ylös ylös"]	#  0xeb89	(en: 'downwards arrow leftwards of upwards arrow top', google translation) NOTE: translation unclear
  - "": [T: "nuoli ylös ja oikealla nuoli alas ylös"]	#  0xeb8a	(en: 'upwards arrow leftwards of downwards arrow top', google translation) NOTE: translation unclear
  - "": [T: "nuoli alas ja oikealla nuoli ylös alas"]	#  0xeb8b	(en: 'downwards arrow leftwards of upwards arrow bottom', google translation) NOTE: translation unclear
- - "": [T: "vasen-oikeanuolilaajennus"]  	#  0xeb8c	(en: 'leftwards rightwards arrows extender', google translation)
- - "": [T: "koillisnuolilaajennus"]        	#  0xeb8d	(en: 'north east arrow extender', google translation)
- - "": [T: "luoteisnuolilaajennus"]           	#  0xeb8e	(en: 'north west arrow extender', google translation)
+ - "": [T: "vasen-oikeanuolipidennys"]  	#  0xeb8c	(en: 'leftwards rightwards arrows extender', google translation)
+ - "": [T: "koillisnuolipidennys"]        	#  0xeb8d	(en: 'north east arrow extender', google translation)
+ - "": [T: "luoteisnuolipidennys"]           	#  0xeb8e	(en: 'north west arrow extender', google translation)
  - "": [T: "alas osoittava aaltosulku vasen"]	#  0xec00	(en: 'down pointing brace left', google translation)
  - "": [T: "alas osoittava aaltosulku keski"]	#  0xec01	(en: 'down pointing brace mid', google translation)
  - "": [T: "alas osoittava aaltosulku oikea"]   	#  0xec02	(en: 'down pointing brace right', google translation)
- - "": [T: "vaakasuora aaltosulku laajennus"]             	#  0xec03	(en: 'horizontal brace extender', google translation)
+ - "": [T: "vaakasuora aaltosulku pidennys"]             	#  0xec03	(en: 'horizontal brace extender', google translation)
  - "": [T: "ylös osoittava aaltosulku vasen"]  	#  0xec04	(en: 'up pointing brace left', google translation)
  - "": [T: "ylös osoittava aaltosulku keski"]	#  0xec05	(en: 'up pointing brace mid', google translation)
  - "": [T: "ylös osoittava aaltosulku oikea"]         	#  0xec06	(en: 'up-pointing brace right', google translation)
@@ -2888,7 +2888,6 @@
  - "": [T: "oikea pystypalkki"]          	        #  0xec08	(en: 'right vertical bar', google translation)
  - "": [T: "vasen kaksinkertainen pystypalkki"]	#  0xec09	(en: 'left double vertical bar', google translation)
  - "": [T: "oikea kaksinkertainen pystypalkki"]	#  0xec0a	(en: 'right double vertical bar', google translation)
- - "": [T: "vaakasuora hakasulku laajennus"]     	#  0xec0b	(en: 'horizontal bracket extender', google translation)
  - "": [T: "neliön alapuoli hakasulku"]            #  0xec0c	(en: 'under square bracket', google translation) NOTE: translation unclear
  - "⎵": [T: "neliön alapuoli hakasulku"]            #  0x23b5	(google: 'neliön alla') NOTE: translation unclear
  - "": [T: "neliön yläpuoli hakasulku"]      	    #  0xec0d	(en: 'over square bracket', google translation) NOTE: translation unclear
@@ -2911,19 +2910,28 @@
  - "": [T: "radikaali 4"]                      	#  0xec1d	(en: 'radical 4', google translation)
  - "": [T: "radikaali 5"]                      	#  0xec1e	(en: 'radical 5', google translation)
  - "": [T: "radikaali pohja"]                  	#  0xec1f	(en: 'radical bottom', google translation)
- - "": [T: "radikaali pystysuora laajennus"]   	#  0xec20	(en: 'radical vertical extender', google translation)
  - "": [T: "radikaali yläosa"]                 	#  0xec21	(en: 'radical top', google translation)
+ - "": [T: "vaakasuora hakasulku pidennys"]     	#  0xec0b	(en: 'horizontal bracket extender', google translation)
+ - "": [T: "vasen sulku 1"]                 	#  0xec12	(en: 'left parens 1', google translation)
+ - "": [T: "vasen sulku 2"]                 	#  0xec13	(en: 'left parens 2', google translation)
+ - "": [T: "vasen sulku 3"]                 	#  0xec14	(en: 'left parens 3', google translation)
+ - "": [T: "vasen sulku 4"]                 	#  0xec15	(en: 'left parens 4', google translation)
+ - "": [T: "oikea sulku 1"]                 	#  0xec16	(en: 'right parens 1', google translation)
+ - "": [T: "oikea sulku 2"]                 	#  0xec17	(en: 'right parens 2', google translation)
+ - "": [T: "oikea sulku 3"]                 	#  0xec18	(en: 'right parens 3', google translation)
+ - "": [T: "oikea sulku 4"]                 	#  0xec19	(en: 'right parens 4', google translation)
+ - "": [T: "radikaali pystysuora pidennys"]   	#  0xec20	(en: 'radical vertical extender', google translation) # FI: context?
  - "": [T: "vasen valkoinen hakasulku ylös"]       #  0xec22	(en: 'left white bracket top', google translation)
- - "": [T: "vasen valkoinen hakasulku laajennus"]  #  0xec23	(en: 'left white bracket extender', google translation)
+ - "": [T: "vasen valkoinen hakasulku pidennys"]  #  0xec23	(en: 'left white bracket extender', google translation)
  - "": [T: "vasen valkoinen hakasulku alas"]   	#  0xec24	(en: 'left white bracket bottom', google translation)
  - "": [T: "oikea valkoinen hakasulku ylös"]       #  0xec25	(en: 'right white bracket top', google translation)
- - "": [T: "oikea valkoinen hakasulku laajennus"]  #  0xec26	(en: 'right white bracket extender', google translation)
+ - "": [T: "oikea valkoinen hakasulku pidennys"]  #  0xec26	(en: 'right white bracket extender', google translation)
  - "": [T: "oikea valkoinen hakasulku alas"]   	#  0xec27	(en: 'right white bracket bottom', google translation)
  - "": [T: "vasen valkoinen aaltosulku"]  	        #  0xec30	(en: 'left white curly bracket', google translation)
  - "": [T: "oikea valkoinen aaltosulku"]  	        #  0xec31	(en: 'right white curly bracket', google translation)
- - "": [T: "pitkä jakomerkki"]         	        #  0xec32	(en: 'long division sign', google translation)
- - "": [T: "pitkä jakomerkki laajennus"]	        #  0xec33	(en: 'long division sign extender', google translation)
- - "": [T: "lyhyt jakomerkki"]                     #  0xec34	(en: 'short division', google translation)
+ - "": [T: "jakokulmamerkki"]         	        #  0xec32	(en: 'long division sign', google translation)
+ - "": [T: "jakokulmamerkki pidennys"]	        #  0xec33	(en: 'long division sign extender', google translation)
+ - "": [T: "lyhyt jakokulma"]                     #  0xec34	(en: 'short division', google translation)
  - "": [T: "kaksinkertainen em-sidos lounaasta koilliseen"]	#  0xec40	(en: 'double southwest to northeast em bond', google translation)
  - "": [T: "kaksinkertainen em-sidos luoteesta kaakkoon"]	#  0xec41	(en: 'double northwest to southeast em bond', google translation)
  - "": [T: "yksinkertainen vaakasuora em-sidos"]        	#  0xec42	(en: 'single horizontal em bond', google translation)
