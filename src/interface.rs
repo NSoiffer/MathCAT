@@ -71,7 +71,6 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
         nav_stack.borrow_mut().reset();
     });
     return MATHML_INSTANCE.with(|old_package| {
-        // FIX: convert this to an included file once I get the full entity list
         static HTML_ENTITIES_MAPPING: phf::Map<&str, &str> = include!("entities.in");
 
         let mut error_message = "".to_string();     // can't return a result inside the replace_all, so we do this hack of setting the message and then returning the error
