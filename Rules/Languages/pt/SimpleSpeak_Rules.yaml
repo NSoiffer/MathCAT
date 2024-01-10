@@ -30,7 +30,7 @@
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{t: "extremidade da raiz"}, {pause: short}]  # phrase(start the square root of x 'end of root')
+      else: [{T: "extremidade da raiz"}, {pause: short}]  # phrase(start the square root of x 'end of root')
 
 - name: default
   tag: root
@@ -38,7 +38,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "the"}]
+      then: [{T: "a"}]
   - test:
       if: "*[2][self::m:mn]"
       then_test:
@@ -189,7 +189,7 @@
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  - t: "à"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "elevado a"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
   - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
 
