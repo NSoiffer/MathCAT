@@ -2941,8 +2941,7 @@
  - "": [T: "alavasen suorakulmio"]       	#  0xec81	(en: 'bottom left rectangle', google translation)
  - "": [T: "yläoikea suorakulmio"]       	#  0xec90	(en: 'top right rectangle', google translation)
  - "": [T: "alaoikea suorakulmio"]                	#  0xec91	(en: 'bottom right rectangle', google translation)
- - "": [T: "synteettinen jakokulma"]           	#  0xec92	(en: 'synthetic division corner', google translation) NOTE: translation unclear
- - "": [T: "planckin vakio kahden piin yläpuolella palkki"]	#  0xed00	(en: 'planck constant over two pi bar', google translation) NOTE: translation unclear
+ - "": [T: "synteettinen jakokulma"]           	#  0xec92	(en: 'synthetic division corner', google translation) # FI: translation unclear
  - "": [T: "synteettinen jakokulma vaakasuora pidennys"]	#  0xec93	(en: 'synthetic division horizontal extender', google translation) # FI: translation unclear
  - "": [T: "synteettinen jakokulma pystysuora pidennys"]	#  0xec94	(en: 'synthetic division vertical extender', google translation) # FI: translation unclear
  - "": [T: "vasen katto lattia pidennys"]    	#  0xec95	(en: 'left ceiling floor extender', google translation)
@@ -2960,9 +2959,9 @@
  - "": [T: "ylöspäin osoittava sulku pidennys"] 	#  0xeca2	(en: 'up pointing paren extender', google translation)
  - "": [T: "ylöspäin osoittava sulku oikea"] 	#  0xeca3	(en: 'up pointing paren right', google translation)
  - "": [T: "alaspäin osoittava sulku pidennys"]	#  0xeca4	(en: 'down pointing brace extender', google translation)
+ - "": [T: "planckin vakio kahden piin yläpuolella palkki"]	#  0xed00	(en: 'planck constant over two pi bar', google translation) # FI: translation unclear
  - "": [T: "peili g"]                          	#  0xed01	(en: 'mirror g', google translation)
  - "": [T: "pisteetön j"]                        	#  0xed02	(google translation)
- - "": [T: "digamma"]                          	#  0xed03	(google translation) NOTE: translation unclear
  - "": [T: "digamma"]                          	#  0xed03	(google translation) # FI: translation unclear
  - "ϝ": [T: "digamma"]                          	#  0x3dd NOTE: translation unclear
  - "": [T: "d"]                                	#  0xed10	(en: 'd', google translation)
