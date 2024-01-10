@@ -21,5 +21,9 @@ mod braille {
     mod Vietnam {
         mod vi;
     }
+
+    mod Swedish {
+        mod spec;
+    }
 }
 

@@ -33,8 +33,9 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<String> {
         let braille = match braille_code.as_str() {
             "Nemeth" => nemeth_cleanup(braille_string),
             "UEB" => ueb_cleanup(pref_manager, braille_string),
-            "Vietnam" => vietnam_cleanup(pref_manager, braille_string),   // FIX: probably needs some specialized cleanup
-            "CMU" => cmu_cleanup(pref_manager, braille_string),   // FIX: probably needs some specialized cleanup
+            "Vietnam" => vietnam_cleanup(pref_manager, braille_string), 
+            "CMU" => cmu_cleanup(pref_manager, braille_string), 
+            "Swedish" => swedish_cleanup(pref_manager, braille_string),
             _ => braille_string,    // probably needs cleanup if someone has another code, but this will have to get added by hand
         };
 
@@ -1574,6 +1575,89 @@ fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> St
     }
 }
 
+
+
+static SWEDISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
+    "S" => "XXX",    // sans-serif -- from prefs
+    "B" => "⠨",     // bold
+    "𝔹" => "XXX",     // blackboard -- from prefs
+    "T" => "⠈",     // script
+    "I" => "⠨",     // italic
+    "R" => "",      // roman
+    // "E" => "⠰",     // English
+    "1" => "⠠",     // Grade 1 symbol
+    "L" => "",     // Letter left in to assist in locating letters
+    "D" => "XXX",     // German (Deutsche) -- from prefs
+    "G" => "⠰",     // Greek
+    "V" => "XXX",    // Greek Variants
+    // "H" => "⠠⠠",    // Hebrew
+    // "U" => "⠈⠈",    // Russian
+    "C" => "⠠",      // capital
+    "𝑐" => "",       // second or latter braille cell of a capital letter
+    "𝐶" => "⠠",      // capital that never should get word indicator (from chemical element)
+    "N" => "⠼",     // number indicator
+    "t" => "⠱",     // shape terminator
+    "W" => "⠀",     // whitespace"
+    "𝐖"=> "⠀",     // whitespace
+    "s" => "⠆",     // typeface single char indicator
+    "w" => "",     // typeface word indicator
+    "e" => "",     // typeface & capital terminator 
+    "o" => "",       // flag that what follows is an open indicator (used for standing alone rule)
+    "c" => "",     // flag that what follows is an close indicator (used for standing alone rule)
+    "b" => "",       // flag that what follows is an open or close indicator (used for standing alone rule)
+    "," => "⠂",     // comma
+    "." => "⠲",     // period
+    "-" => "-",     // hyphen
+    "—" => "⠠⠤",   // normal dash (2014) -- assume all normal dashes are unified here [RUEB appendix 3]
+    "―" => "⠐⠠⠤",  // long dash (2015) -- assume all long dashes are unified here [RUEB appendix 3]
+    "#" => "",      // signals end of script
+
+};
+
+fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
+    // FIX: need to implement this -- this is just a copy of the Vietnam code
+    debug!("swedish_cleanup: start={}", raw_braille);
+    let result = typeface_to_word_mode(&raw_braille);
+    let result = capitals_to_word_mode(&result);
+
+    let result = result.replace("CG", "⠘")
+                                    .replace("𝔹C", "⠩")
+                                    .replace("DC", "⠰");
+
+    debug!("   after typeface/caps={}", &result);
+
+    // these typeforms need to get pulled from user-prefs as they are transcriber-defined
+    let double_struck = pref_manager.pref_to_string("Vietnam_DoubleStruck");
+    let sans_serif = pref_manager.pref_to_string("Vietnam_SansSerif");
+    let fraktur = pref_manager.pref_to_string("Vietnam_Fraktur");
+    let greek_variant = pref_manager.pref_to_string("Vietnam_GreekVariant");
+
+    // This reuses the code just for getting rid of unnecessary "L"s and "N"s
+    let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
+
+
+    let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
+        let matched_char = &cap[0];
+        match matched_char {
+            "𝔹" => &double_struck,
+            "S" => &sans_serif,
+            "D" => &fraktur,
+            "V" => &greek_variant,
+            _ => match SWEDISH_INDICATOR_REPLACEMENTS.get(matched_char) {
+                None => {error!("REPLACE_INDICATORS and SWEDISH_INDICATOR_REPLACEMENTS are not in sync: missing '{}'", matched_char); ""},
+                Some(&ch) => ch,
+            },
+        }
+    });
+
+    // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces
+    // let result = result.trim_start_matches('⠀').trim_end_matches('⠀');
+    let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
+   
+    return result.to_string();
+}
+
+
 /************** Braille xpath functionality ***************/
 use crate::canonicalize::{name, as_element, as_text};
 use crate::xpath_functions::{is_leaf, IsBracketed, validate_one_node};
@@ -1696,6 +1780,7 @@ impl BrailleChars {
             "UEB" => BrailleChars:: get_braille_ueb_chars(node, text_range),
             "CMU" => BrailleChars:: get_braille_cmu_chars(node, text_range),
             "Vietnam" => BrailleChars:: get_braille_vietnam_chars(node, text_range),
+            "Swedish" => BrailleChars:: get_braille_ueb_chars(node, text_range),    // FIX: need to figure out what to implement
             _ => return Err(sxd_xpath::function::Error::Other(format!("get_braille_chars: unknown braille code '{}'", code)))
         };
         return match result {
@@ -2138,6 +2223,76 @@ impl NeedsToBeGrouped {
         }
     }
 
+    // ordinals often have an irregular start (e.g., "half") before becoming regular.
+    // if the number is irregular, return the ordinal form, otherwise return 'None'.
+    fn needs_grouping_for_swedish(mathml: Element, is_base: bool) -> bool {
+        use crate::xpath_functions::IsInDefinition;
+        let mut node_name = name(&mathml);
+        if mathml.attribute_value("data-roman-numeral").is_some() {
+            node_name = "mi";           // roman numerals don't follow number rules
+        }
+
+        // FIX: the leaf rules are from UEB -- check the Swedish rules
+        match node_name {
+            "mn" => {   
+                if !is_base {
+                    return false;
+                }                                                                                        // clause 1
+                // two 'mn's can be adjacent, in which case we need to group the 'mn' to make it clear it is separate (see bug #204)
+                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let grandparent = if name(&parent) == "math" {parent} else {parent.parent().unwrap().element().unwrap()};
+                if name(&grandparent) != "mrow" {
+                    return false;
+                }
+                let preceding = parent.preceding_siblings();
+                if preceding.len()  < 2 {
+                    return false;
+                }
+                // any 'mn' would be separated from this node by invisible times
+                let previous_child = as_element(preceding[preceding.len()-1]);
+                if name(&previous_child) == "mo" && as_text(previous_child) == "\u{2062}" {
+                    let previous_child = as_element(preceding[preceding.len()-2]);
+                    return name(&previous_child) == "mn"
+                } else {
+                    return false;
+                }
+            },
+            "mi" | "mo" | "mtext" => {
+                let text = as_text(mathml);
+                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let parent_name = name(&parent);   // there is always a "math" node
+                if is_base && (parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") && !text.contains([' ', '\u{00A0}']) {
+                    return false;
+                }
+                let mut chars = text.chars();
+                let first_char = chars.next().unwrap();             // canonicalization assures it isn't empty;
+                let is_one_char = chars.next().is_none();
+                // '¨', etc., brailles as two chars -- there probably is some exception list but I haven't found it -- these are the ones I know about
+                return !((is_one_char && !['¨', '″', '‴', '⁗'].contains(&first_char)) ||                       // clause 8
+                            // "lim", "cos", etc., appear not to get parens, but the rules don't mention it (tests show it)
+                            IsInDefinition::is_defined_in(text, "FunctionNames").unwrap() ||
+                            IsInDefinition::is_defined_in(text, "Arrows").unwrap() ||          // clause 4
+                            IsInDefinition::is_defined_in(text, "GeometryShapes").unwrap());   // clause 5
+            },
+            "mrow" => {
+                // check for bracketed exprs
+                if IsBracketed::is_bracketed(mathml, "", "", false, true) {
+                    return false;
+                }
+
+                // check for prefix at start
+                // example 7.12 has "2-" in superscript and is grouped, so we don't consider postfix ops
+                let children = mathml.children();
+                if children.len() == 2 &&
+                    (name( &as_element(children[0])) == "mo") {
+                    return false;
+                }
+                return true;
+            },
+            _ => return false,
+        }
+    }
+
     /// Returns true if the element needs grouping symbols
     /// Bases need extra attention because if they are a number and the item to the left is one, that needs distinguishing
     fn needs_grouping_for_ueb(mathml: Element, is_base: bool) -> bool {
@@ -2236,7 +2391,8 @@ impl Function for NeedsToBeGrouped {
             let answer = match braille_code.as_str() {
                 "CMU" => NeedsToBeGrouped::needs_grouping_for_cmu(e, is_base),
                 "UEB" => NeedsToBeGrouped::needs_grouping_for_ueb(e, is_base),
-                _ => return Err(XPathError::Other(format!("NeedsToBeGrouped: braille code arg '{:?}' is not a known code ('UEB' or 'CMU')", braille_code))),
+                "Swedish" => NeedsToBeGrouped::needs_grouping_for_swedish(e, is_base),
+                _ => return Err(XPathError::Other(format!("NeedsToBeGrouped: braille code arg '{:?}' is not a known code ('UEB', 'CMU', or 'Swedish')", braille_code))),
             };
             return Ok( Value::Boolean( answer ) );
         }

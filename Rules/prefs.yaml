@@ -54,6 +54,7 @@
   Braille:
     BrailleCode: "Nemeth"                # Any supported braille code (currently Nemeth, UEB)
     BrailleNavHighlight: EndPoints   # Highlight with dots 7 & 8 the current nav node -- values are Off, FirstChar, EndPoints, All
+    UseSpacesAroundAllOperators: false  # true/false
 
     UEB:
       StartMode: "Grade2"   # Grade1/Grade2 -- assumed starting mode UEB braille (Grade1 assumes we are in G1 passage mode)
