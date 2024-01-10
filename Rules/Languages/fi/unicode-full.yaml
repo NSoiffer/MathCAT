@@ -53,7 +53,7 @@
  - "ʹ": [T: "priimi"]                   	        #  0x2b9	(en: 'modifier prime', google translation) # FI: derivated once -> "pilkku"
  - "ʺ": [T: "kaksoispriimi"]            	        #  0x2ba	(en: 'modifier double prime', google translation) # FI: derivated twice -> "pilkku pilkku"
  - "ʻ": [T: "käänteispilkku"] 	                    #  0x2bb	(en: 'modifier turned comma', google translation) # FI: derivated thrice -> "pilkku pilkku pilkku"
- - "ʼ": [T: "heittomerkki"]        	                #  0x2bc	(en: 'modifier apostrophe', google translation) # FI: "heitto" in NVDA
+ - "ʼ": [T: "heitto"]        	                #  0x2bc	(en: 'modifier apostrophe', google translation)
  - "ʽ": [T: "peilikuvapilkku"]         	            #  0x2bd	(en: 'modifier reversed comma', google translation)
  - "ʾ": [T: "tarke oikea puolikaari"]          	    #  0x2be	(en: 'modifier right half ring', google: 'muokkain oikea puolirengas')
  - "ʿ": [T: "tarke vasen puolikaari"]          	    #  0x2bf	(en: 'modifier left half ring', google: 'muokkain vasemmalla puolirengas')
@@ -1977,8 +1977,8 @@
  - "⧹": [T: "iso kenoviiva"]           	            #  0x29f9	(en: 'big reverse solidus', google translation)
  - "⧺": [T: "kaksinkertainen plus"]             	#  0x29fa	(en: 'double plus', google translation)
  - "⧻": [T: "kolminkertainen plus"]                      	#  0x29fb	(google translation)
- - "⧼": [T: "vasemmalle osoittava kaareva kulmakiinnike"]	#  0x29fc	(en: 'left pointing curved angle bracket', google translation)
- - "⧽": [T: "oikealle osoittava kaareva kulmakiinnike"]	#  0x29fd	(en: 'right pointing curved angle bracket', google translation)
+ - "⧼": [T: "vasemmalle osoittava kaareva kulmahakasulku"]	#  0x29fc	(en: 'left pointing curved angle bracket', google translation)
+ - "⧽": [T: "oikealle osoittava kaareva kulmahakasulku"]	#  0x29fd	(en: 'right pointing curved angle bracket', google translation)
  - "⧾": [T: "tiny"]                      	        #  0x29fe	(en: 'tiny', google translation)
  - "⧿": [T: "miny"]                             	#  0x29ff	(google translation)
  - "⨀": [T: "monikollinen ympyrässä oleva kertopiste"]           	#  0x2a00	(en: 'circled dot operator', google translation)
@@ -2337,10 +2337,10 @@
  - "⸋": [T: "korotettu neliö"]                   	#  0x2e0b	(en: 'raised square', google translation)
  - "⸌": [T: "vasen korotettu poistosulku"]     	#  0x2e0c	(en: 'left raised omission bracket', google translation)
  - "⸍": [T: "oikea korotettu poistosulku"]     	#  0x2e0d	(en: 'right raised omission bracket', google translation)
- - "⸎": [T: "toimituskoronis"]                  	#  0x2e0e	(en: 'editorial coronis', google translation) NOTE: translation unclear
- - "⸏": [T: "kappale"]                          	#  0x2e0f	(en: 'paragraphos', google translation) NOTE: translation unclear
- - "⸐": [T: "haarukkakappale"]                  	#  0x2e10	(en: 'forked paragraphos', google translation) NOTE: translation unclear
- - "⸑": [T: "käännetty haarukkakappale"]      	#  0x2e11	(en: 'reversed forked paragraphos', google translation) NOTE: translation unclear
+ - "⸎": [T: "toimituskoronis"]                  	#  0x2e0e	(en: 'editorial coronis', google translation)
+ - "⸏": [T: "kappale"]                          	#  0x2e0f	(en: 'paragraphos', google translation)
+ - "⸐": [T: "haarukkakappale"]                  	#  0x2e10	(en: 'forked paragraphos', google translation)
+ - "⸑": [T: "käännetty haarukkakappale"]      	#  0x2e11	(en: 'reversed forked paragraphos', google translation)
  - "⸒": [T: "hypodiastoli"]                     	#  0x2e12	(en: 'hypodiastole', google translation)
  - "⸓": [T: "obelos pisteellä"]                  	#  0x2e13	(en: 'dotted obelos', google translation)
  - "⸔": [T: "ankkuri alaspäin"]                  	#  0x2e14	(en: 'downwards ancora', google translation)
@@ -2380,7 +2380,7 @@
  - "⸶": [T: "tikari vasemmalla suojalla"]  	#  0x2e36	(en: 'dagger with left guard', google translation)
  - "⸷": [T: "tikari oikealla suojalla"]       	#  0x2e37	(en: 'dagger with right guard', google translation)
  - "⸸": [T: "käännetty tikari"]                 	#  0x2e38	(en: 'turned dagger', google translation)
- - "⸹": [T: "top half section sign"]       	        #  0x2e39	(en: 'top half section sign', google translation) NOTE: translation unclear
+ - "⸹": [T: "yläpuolimerkki"]       	        #  0x2e39	(en: 'top half section sign', google translation) # FI: translation unclear
  - "⸺": [T: "kaksoisajatusviiva"]                     #  0x2e3a	(en: 'two em dash', google translation)
  - "⸻": [T: "kolmoisajatusviiva"]                 	#  0x2e3b	(en: 'three em dash', google translation)
  - "〃": [T: "sama sisältö -merkki"]                       	#  0x3003	(google translation)
@@ -2612,8 +2612,8 @@
  - "": [T: "on yhtä suuri kuin katkoviivoitetulla yläviivalla"]    	#  0xe966	(en: 'equals with dotted top line', google translation)
  - "": [T: "edeltää kaksoispisteellä"]       	#  0xe967	(en: 'precedes with colon', google translation)
  - "": [T: "seuraa kaksoispisteellä"]                   	#  0xe968	(en: 'succeeds with colon', google translation)
- - "": [T: "pienempi tai yhtä suuri kuin vino"]     	#  0xe969	(en: 'smaller than or equal slanted', google translation) NOTE: translation unclear
- - "": [T: "suurempi kuin tai yhtä suuri kuin vino"]       	#  0xe96a	(en: 'larger than or equal slanted', google translation) NOTE: translation unclear
+ - "": [T: "pienempi tai yhtä suuri kuin vino"]     	#  0xe969	(en: 'smaller than or equal slanted', google translation) # FI: : translation unclear
+ - "": [T: "suurempi kuin tai yhtä suuri kuin vino"]       	#  0xe96a	(en: 'larger than or equal slanted', google translation) # FI: : translation unclear
  - "": [T: "sisäkkäinen paljon pienempi kuin"]   	#  0xe96b	(en: 'nested very much less than', google translation)
  - "": [T: "sisäkkäinen paljon suurempi kuin"] 	#  0xe96c	(en: 'nested very much greater than', google translation)
  - "": [T: "ero variantin välillä"]            	#  0xe96d	(en: 'difference between variant', google translation) # FI: unclear translation
@@ -2637,20 +2637,20 @@
  - "": [T: "ympyröity jakomerkki"]         	#  0xe985	(en: 'circled division sign', google translation)
  - "": [T: "katkoviivoitettu vinoviiva"]               	#  0xe986	(en: 'dashed solidus', google translation)
  - "": [T: "katkoviivoitettu kenoviiva"]             	#  0xe987	(en: 'dashed backslash', google translation)
- - "": [T: "katkoviivoitettu puoliväliviiva"]          	#  0xe988	(en: 'dashed mid line', google translation) NOTE: translation unclear
+ - "": [T: "katkoviivoitettu puoliväliviiva"]          	#  0xe988	(en: 'dashed mid line', google translation) # FI: : translation unclear
  - "": [T: "katkoviivoitettu pystysuora palkki"]     	#  0xe989	(en: 'dashed vertical bar', google translation)
  - "": [T: "kohtisuorassa ja s"]                  	#  0xe98a	(en: 'perpendicular with s', google translation)
  - "": [T: "kulma ja s"]                          	#  0xe98b	(en: 'angle with s', google translation)
  - "": [T: "pallomainen kulma avautuu vasemmalle"]	#  0xe98c	(en: 'spherical angle opening left', google translation)
  - "": [T: "vasemmalle avautuva kulma"]           	#  0xe98d	(en: 'angle opening left', google translation)
  - "": [T: "pystysuora palkki kaksoiskoukulla"]	#  0xe98e	(en: 'vertical bar with double hook', google translation)
- - "": [T: "keskikokoinen pisteoperaattori vapaa radikaali"]	#  0xe98f	(en: 'medium dot operator free radical', google translation) NOTE: translation unclear
+ - "": [T: "keskikokoinen pisteoperaattori vapaa radikaali"]	#  0xe98f	(en: 'medium dot operator free radical', google translation)
  - "": [T: "valkoinen ylöspäin osoittava kolmio palkin yläpuolella"]	#  0xe990	(en: 'white up pointing triangle above bar', google translation)
  - "": [T: "identtinen ja yhdensuuntainen"]         	#  0xe991	(en: 'identical and parallel to', google translation)
  - "": [T: "smash product"]                     	#  0xe992	(en: 'smash product', google translation) # FI: meaning unclear
  - "": [T: "kolminkertainen palkkioperaattori vaakasuoralla palkilla"]	#  0xe993	(en: 'triple bar operator with horizontal bar', google translation)
  - "": [T: "identtinen kaksoisvinoviivalla"]       	#  0xe994	(en: 'identical to with double slash', google translation)
- - "": [T: "kolminkertaiset yliviivatut palkit"]           	#  0xe995	(en: 'triple crossed bars', google translation) NOTE: translation unclear
+ - "": [T: "kolminkertaiset yliviivatut palkit"]           	#  0xe995	(en: 'triple crossed bars', google translation) # FI: : translation unclear
  - "": [T: "pystysuora palkki ympyrän yläpuolella"]     	#  0xe996	(en: 'vertical bar over circle', google translation)
  - "": [T: "pystysuora verrannollinen"]        	#  0xe997	(en: 'vertical proportional to', google translation)
  - "": [T: "musta kuun viimeinen neljännes"]	#  0xe998	(en: 'black last quarter moon', google translation)
@@ -2963,7 +2963,7 @@
  - "": [T: "peili g"]                          	#  0xed01	(en: 'mirror g', google translation)
  - "": [T: "pisteetön j"]                        	#  0xed02	(google translation)
  - "": [T: "digamma"]                          	#  0xed03	(google translation) # FI: translation unclear
- - "ϝ": [T: "digamma"]                          	#  0x3dd NOTE: translation unclear
+ - "ϝ": [T: "digamma"]                          	#  0x3dd # FI: : translation unclear
  - "": [T: "d"]                                	#  0xed10	(en: 'd', google translation)
  - "ⅆ": [T: "d"]                                	#  0x2146	(google: 'ⅆ')
  - "": [T: "e"]                                	#  0xed11	(en: 'e', google translation)
@@ -3159,7 +3159,7 @@
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        replace: [T: "ligatuuri ae"]             	# 	(google translation) NOTE: translation unclear
+        replace: [T: "ligatuuri a e"]             	# 	(google translation)
  - "":                                         	#  0xf19b
     - test: 
         if: "$CapitalLetters_Beep"
@@ -3177,7 +3177,7 @@
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        replace: [T: "terävä s"]                	# 	(en: 'sharp s', google translation) NOTE: translation unclear
+        replace: [T: "terävä s"]                	# 	(en: 'sharp s', google translation) # FI: : translation unclear
  - "":                                         	#  0xf19c
     - test: 
         if: "$CapitalLetters_Beep"
@@ -3603,9 +3603,9 @@
  - "ﬄ": [T: "f f l"]                  	            #  0xfb04	(en: 'ffl', google: 'ffl')
  - "ﬅ": [T: "f t"]                               	#  0xfb05	(google translation)
  - "ﬆ": [T: "s t"]                               	#  0xfb06	(google translation)
- - "︠": [T: "ligatuuri vasen puolikas koriste"]	#  0xfe20	(en: 'ligature left half embellishment', google translation) NOTE: translation unclear
- - "︡": [T: "ligatuuri oikea puolikas koriste"]    	#  0xfe21	(en: 'ligature right half embellishment', google translation) NOTE: translation unclear
- - "︢": [T: "kaksoistilde vasen puolikas koriste"]    	#  0xfe22	(en: 'double tilde left half embellishment', google translation) NOTE: translation unclear
+ - "︠": [T: "ligatuuri vasen puolikas koriste"]	#  0xfe20	(en: 'ligature left half embellishment', google translation) # FI: : translation unclear
+ - "︡": [T: "ligatuuri oikea puolikas koriste"]    	#  0xfe21	(en: 'ligature right half embellishment', google translation) # FI: : translation unclear
+ - "︢": [T: "kaksoistilde vasen puolikas koriste"]    	#  0xfe22	(en: 'double tilde left half embellishment', google translation) # FI: : translation unclear
  - "︣": [T: "kaksoistilde oikea puolikas koriste"]	#  0xfe23	(en: 'double tilde right half embellishment', google translation)
  - "︤": [T: "pituusmerkki vasen puolikas koriste"]	#  0xfe24	(en: 'macron left half embellishment', google translation)
  - "︥": [T: "pituusmerkki oikea puolikas koriste"]       	#  0xfe25	(en: 'macron right half embellishment', google translation)
