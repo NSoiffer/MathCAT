@@ -3074,38 +3074,38 @@
  - "𝔸-𝕐":                                       	#  0x1d504 - 0x1d51d ('z' version is reserved)
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
+         then: [T: "kaksoisviivainen"]      	# 	(en: 'double struck', google translation)
     - SPELL: "translate('.', '𝔸𝔹𝔺𝔻𝔼𝔽𝔾𝔿𝕀𝕁𝕂𝕃𝕄𝕅𝕆𝕇𝕈𝕉𝕊𝕋𝕌𝕍𝕎𝕏𝕐', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                       	#  0xf080 - 0xf098
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
+         then: [T: "kaksoisviivainen"]      	# 	(en: 'double struck', google translation)
     - SPELL: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝕒-𝕫":                                       	#  0x1d552 - 0x1d56b
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
+         then: [T: "kaksoisviivainen"]      	# 	(en: 'double struck', google translation)
     - SPELL: "translate('.', '𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":                                       	#  0xf09a - 0xf0b3
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
+         then: [T: "kaksoisviivainen"]      	# 	(en: 'double struck', google translation)
     - SPELL: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  - "𝟘-𝟡":                                       	#  0x1d7d8 - 0x1d7e1
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
+         then: [T: "kaksoisviivainen"]      	# 	(en: 'double struck', google translation)
     - SPELL: "translate('.', '𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡', '0123456789')"
  - "-":                                       	#  0xf0c0 - 0xf0c9
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
+         then: [T: "kaksoisviivainen"]      	# 	(en: 'double struck', google translation)
     - SPELL: "translate('.', '', '0123456789')"
 
- - "": [T: "tuplaviiva nabla"]       	#  0xf0ca	(en: 'double struck nabla', google translation)
- - "": [T: "tuplaviiva eulerin vakio"]	#  0xf0cb	(en: 'double struck euler constant', google translation)
+ - "": [T: "kaksoisviivainen nabla"]       	#  0xf0ca	(en: 'double struck nabla', google translation)
+ - "": [T: "kaksoisviivainen eulerin vakio"]	#  0xf0cb	(en: 'double struck euler constant', google translation)
  
  # script chars in math alphabetic block and also MathType private use area
  - "𝒜-𝒵":                                       	#  0x1d49c - 0x1d4b5
@@ -3201,18 +3201,18 @@
  - "":                                 	#  0xf201 - 0xf209
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
+         then: [T: "kaksoisviivainen"]      	# 	(en: 'double struck', google translation)
     - SPELL: "translate('.', '', 'ΔΨΛΠΣΘΓΩΥ')"
 
  - "-":                                       	#  0xf220 - 0xf236
     - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "tuplaviiva"]      	# 	(en: 'double struck', google translation)
+         then: [T: "kaksoisviivainen"]      	# 	(en: 'double struck', google translation)
     - SPELL: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
- - "": [T: "tuplaviiva viimeinen sigma"]   	#  0xf237	(en: 'double struck final sigma', google translation)
- - "": [T: "tuplaviiva rho"]         	#  0xf250	(en: 'double struck rho', google translation)
- - "": [T: "tuplaviiva fii"]                	#  0xf251	(google translation)
+ - "": [T: "kaksoisviivainen viimeinen sigma"]   	#  0xf237	(en: 'double struck final sigma', google translation)
+ - "": [T: "kaksoisviivainen rho"]         	#  0xf250	(en: 'double struck rho', google translation)
+ - "": [T: "kaksoisviivainen fii"]                	#  0xf251	(google translation)
  - "𝐀-𝐙":                                       	#  0x1d400 - 0x1d419
     - T: "lihavoitu"                            	# 	(en: 'bold', google translation)
     - SPELL: "translate('.', '𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
