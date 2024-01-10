@@ -2584,22 +2584,22 @@
  - "": [T: "seuraa tai vastaa"]              	#  0xe93b	(en: 'succeeds or equivalent to', google translation)
  - "": [T: "edeltää ja alapuolella on yhtä suuri kuin"]              	#  0xe940	(en: 'precedes over equal', google translation)
  - "": [T: "seuraa ja alapuolella on yhtä suuri kuin"]    	#  0xe941	(en: 'succeeds over equal', google translation)
- - "": [T: "vähemmän kuin, on yhtä suuri kuin, vino suurempi kuin"]	#  0xe942	(en: 'less equal slanted greater', google translation) NOTE: translation unclear
+ - "": [T: "vähemmän kuin, on yhtä suuri kuin, vino suurempi kuin"]	#  0xe942	(en: 'less equal slanted greater', google translation) # FI: translation unclear
  - "": [T: "suurempi kuin, on yhtä suuri kuin, vino pienempi kuin"] 	#  0xe943	(en: 'greater equal slanted less', google translation)
- - "": [T: "täyttää ehdon"]                      	#  0xe948	(en: 'satisfied by', google translation) NOTE: translation unclear
+ - "": [T: "täyttää ehdon"]                      	#  0xe948	(en: 'satisfied by', google translation) # FI: translation unclear
  - "": [T: "laiska s"]                         	#  0xe949	(en: 'lazy s', google translation)
- - "": [T: "ei väite"]                         	#  0xe94a	(en: 'not assertion', google translation) NOTE: translation unclear
+ - "": [T: "ei väite"]                         	#  0xe94a	(en: 'not assertion', google translation) # FI: translation unclear
  - "": [T: "kaksinkertainen on yhtä suuri kuin"]   	#  0xe94b	(en: 'double equal', google translation)
  - "": [T: "kolminkertainen on yhtä suuri kuin"]       	#  0xe94c	(en: 'triple equal', google translation)
- - "": [T: "sääntö viivästynyt"]               	#  0xe94d	(en: 'rule delayed', google translation) NOTE: translation unclear
- - "": [T: "alias delimiter"]                  	#  0xe94e	(google translation) NOTE: translation unclear
+ - "": [T: "sääntö viivästynyt"]               	#  0xe94d	(en: 'rule delayed', google translation) # FI: translation unclear
+ - "": [T: "alias delimiter"]                  	#  0xe94e	(google translation) # FI: translation unclear
  - "": [T: "normaali alaryhmä palkilla"]       	#  0xe950	(en: 'normal subgroup of with bar', google translation)
  - "": [T: "sisältää normaalina alaryhmänä palkilla"]	#  0xe951	(en: 'contains as normal subgroup with bar', google translation)
- - "": [T: "hymy palkin alla"]                 	#  0xe955	(en: 'smile under bar', google translation) NOTE: translation unclear
- - "": [T: "murjotus palkin alla"]               	#  0xe956	(en: 'frown over bar', google translation) NOTE: translation unclear
- - "": [T: "ylijoukko tai lähes yhtä suuri kuin"]  	#  0xe957	(en: 'superset of or almost equal to', google translation)
- - "": [T: "osajoukko tai lähes yhtä suuri kuin"]	#  0xe958	(en: 'subset of or almost equal to', google translation)
  - "": [T: "pyöreä seuraa"]                 	#  0xe954	(en: 'round implies', google translation) # FI: translation unclear
+ - "": [T: "hymy palkin alla"]                 	#  0xe955	(en: 'smile under bar', google translation) # FI: translation unclear
+ - "": [T: "murjotus palkin alla"]               	#  0xe956	(en: 'frown over bar', google translation) # FI: translation unclear
+ - "": [T: "ylijoukko tai lähes yhtä kuin"]  	#  0xe957	(en: 'superset of or almost equal to', google translation)
+ - "": [T: "osajoukko tai lähes yhtä kuin"]	#  0xe958	(en: 'subset of or almost equal to', google translation)
  - "": [T: "suurempi kuin melkein yhtä suuri kuin tai pienempi kuin"]	#  0xe959	(en: 'greater than almost equal to or less than', google translation)
  - "": [T: "pienempi kuin melkein yhtä suuri kuin tai suurempi kuin"]	#  0xe95a	(en: 'less than almost equal or greater than', google translation)
  - "": [T: "kaksinkertainen looginen tai"]     	#  0xe95c	(en: 'double logical or', google translation)
@@ -2616,7 +2616,7 @@
  - "": [T: "suurempi kuin tai yhtä suuri kuin vino"]       	#  0xe96a	(en: 'larger than or equal slanted', google translation) NOTE: translation unclear
  - "": [T: "sisäkkäinen paljon pienempi kuin"]   	#  0xe96b	(en: 'nested very much less than', google translation)
  - "": [T: "sisäkkäinen paljon suurempi kuin"] 	#  0xe96c	(en: 'nested very much greater than', google translation)
- - "": [T: "ero variantin välillä"]            	#  0xe96d	(en: 'difference between variant', google translation)
+ - "": [T: "ero variantin välillä"]            	#  0xe96d	(en: 'difference between variant', google translation) # FI: unclear translation
  - "": [T: "pienempi kuin jonka päällä suurempi kuin"]    	#  0xe96e	(en: 'less than greater than overlay', google translation)
  - "": [T: "looginen tai jonka päällä looginen tai"]	#  0xe96f	(en: 'logical or logical and overlay', google translation)
  - "": [T: "ylijoukko ylijoukon yläpuolella"]          	#  0xe970	(en: 'superset over superset', google translation)
@@ -2624,7 +2624,7 @@
  - "": [T: "ylijoukko osajoukon yläpuolella"]           	#  0xe972	(en: 'superset over subset', google translation)
  - "": [T: "osajoukko ylijoukon yläpuolella"]         	#  0xe973	(en: 'subset over superset', google translation)
  - "": [T: "kolminkertainen pystysuora palkki"]	#  0xe979	(en: 'triple vertical bar', google translation)
- - "": [T: "nelinkertainen pystysuora pistepari"]	#  0xe97a	(en: 'paired quadruple vertical dots', google translation) NOTE: translation unclear
+ - "": [T: "nelinkertainen pystysuora pistepari"]	#  0xe97a	(en: 'paired quadruple vertical dots', google translation) # FI: translation unclear
  - "": [T: "kohtisuorassa ja alapuolella palkki"]         	#  0xe97b	(en: 'perpendicular over bar', google translation)
  - "": [T: "vasen kääntöportti kaksinkertainen pystysuora palkki"]	#  0xe97c	(en: 'left turnstile double vertical bar', google translation)
  - "": [T: "kaksinkertainen vasen kääntöportti kaksinkertainen pystysuora palkki"]	#  0xe97d	(en: 'double left turnstile double vertical bar', google translation)
@@ -2647,7 +2647,7 @@
  - "": [T: "keskikokoinen pisteoperaattori vapaa radikaali"]	#  0xe98f	(en: 'medium dot operator free radical', google translation) NOTE: translation unclear
  - "": [T: "valkoinen ylöspäin osoittava kolmio palkin yläpuolella"]	#  0xe990	(en: 'white up pointing triangle above bar', google translation)
  - "": [T: "identtinen ja yhdensuuntainen"]         	#  0xe991	(en: 'identical and parallel to', google translation)
- - "": [T: "smash product"]                     	#  0xe992	(en: 'smash product', google translation)
+ - "": [T: "smash product"]                     	#  0xe992	(en: 'smash product', google translation) # FI: meaning unclear
  - "": [T: "kolminkertainen palkkioperaattori vaakasuoralla palkilla"]	#  0xe993	(en: 'triple bar operator with horizontal bar', google translation)
  - "": [T: "identtinen kaksoisvinoviivalla"]       	#  0xe994	(en: 'identical to with double slash', google translation)
  - "": [T: "kolminkertaiset yliviivatut palkit"]           	#  0xe995	(en: 'triple crossed bars', google translation) NOTE: translation unclear
@@ -2673,12 +2673,12 @@
  - "": [T: "seuraa, on lähes yhtä kuin tai edeltää"]	#  0xe9e3	(en: 'succeeds almost equal to or precedes', google translation)
  - "": [T: "vähemmän kuin, vastaa tai suurempi kuin"]	#  0xe9f0	(en: 'less than equivalent to or greater than', google translation)
  - "": [T: "suurempi kuin, vastaa tai vähemmän kuin"]	#  0xe9f1	(en: 'greater than equivalent to or less than', google translation)
- - "": [T: "ei hyvin paljon pienempi kuin"]          	#  0xea00	(en: 'not vert much less than', google translation) NOTE: translation unclear, not sure if vert is very or vertical
- - "": [T: "ei hyvin paljon suurempi kuin"]     	#  0xea01	(en: 'not vert much greater than', google translation) NOTE: translation unclear, not sure if vert is very or vertical
- - "": [T: "ei paljon pienempi kuin variantti"]	#  0xea02	(en: 'not much less than variant', google translation)
- - "": [T: "ei paljon suurempi kuin variantti"]	#  0xea03	(en: 'not much greater than variant', google translation)
- - "": [T: "pienempi kuin mutta ei yhtä suuri kuin"]	#  0xea04	(en: 'less vert not double equals', google translation) NOTE: translation unclear
- - "": [T: "suurempi kuin mutta ei yhtä suuri kuin"]	#  0xea05	(en: 'gt vert not double equals', google translation) NOTE: translation unclear
+ - "": [T: "ei hyvin paljon pienempi kuin"]          	#  0xea00	(en: 'not vert much less than', google translation) # FI: translation unclear, not sure if vert is very or vertical
+ - "": [T: "ei hyvin paljon suurempi kuin"]     	#  0xea01	(en: 'not vert much greater than', google translation) # FI: translation unclear, not sure if vert is very or vertical
+ - "": [T: "ei paljon pienempi kuin variantti"]	#  0xea02	(en: 'not much less than variant', google translation) # FI: translation unclear
+ - "": [T: "ei paljon suurempi kuin variantti"]	#  0xea03	(en: 'not much greater than variant', google translation) # FI: translation unclear
+ - "": [T: "pienempi kuin mutta ei yhtä suuri kuin"]	#  0xea04	(en: 'less vert not double equals', google translation) # FI: translation unclear
+ - "": [T: "suurempi kuin mutta ei yhtä suuri kuin"]	#  0xea05	(en: 'gt vert not double equals', google translation) # FI: translation unclear
  - "": [T: "ei pienempi tai yhtä suuri kuin"]    	#  0xea06	(en: 'not less than or equal to', google translation)
  - "": [T: "ei suurempi tai yhtä suuri kuin"]	#  0xea07	(en: 'not greater than or equal to', google translation)
  - "": [T: "ei yhtä suuri kuin eikä pienempi kuin"] 	#  0xea09	(en: 'neither equal to nor less than', google translation)
@@ -2693,7 +2693,7 @@
  - "": [T: "ei kuulu joukkoon tai ole yhtä suuri kuin"] 	#  0xea12	(en: 'not element of or equal to', google translation)
  - "": [T: "ei yhtä suuri kuin tai suurempi kuin"] 	#  0xea13	(en: 'neither equal to nor greater than', google translation)
  - "": [T: "ei melkein yhtä suuri"]            	#  0xea14	(en: 'not almost equal', google translation)
- - "": [T: "ei seuraa vastaavaa"]                    	#  0xea15	(en: 'not succeeds similar', google translation) NOTE: translation unclear
+ - "": [T: "ei seuraa vastaavaa"]                    	#  0xea15	(en: 'not succeeds similar', google translation) # FI: translation unclear
  - "": [T: "pienempi kuin tai vino yhtä suuri kuin vinoviivalla"]	#  0xea16	(en: 'less than or slanted equal to with slash', google translation)
  - "": [T: "suurempi kuin tai vino yhtä suuri kuin vinoviivalla"] 	#  0xea17	(en: 'greater than or slanted equal to with slash', google translation)
  - "": [T: "ylijoukko vinoviiva"]                 	#  0xea1a	(google translation)
@@ -2702,7 +2702,7 @@
  - "": [T: "ei suurempi kuin tai yhtä suuri kuin"]	#  0xea1e	(en: 'not greater than or equal to', google translation)
  - "": [T: "ei melkein yhtä suuri kuin miinus"]	#  0xea1f	(en: 'not almost equal to minus', google translation)
  - "": [T: "ei kuulu joukkoon yläpisteellä"]	    #  0xea22	(en: 'negated set membership dot above', google translation)
- - "": [T: "ei vert kulma"]                    	#  0xea2c	(en: 'not vert angle', google translation) NOTE: translation unclear
+ - "": [T: "ei vert kulma"]                    	#  0xea2c	(en: 'not vert angle', google translation) # FI: translation unclear
  - "": [T: "ei yhdensuuntainen vino"]             	#  0xea2d	(en: 'not parallel slanted', google translation)
  - "": [T: "ei palkkioperaattori"]              	#  0xea2e	(en: 'not bar operator', google translation)
  - "": [T: "ei kaksoispalkkioperaattori"]     	    #  0xea2f	(en: 'not double bar operator', google translation)
@@ -2711,8 +2711,8 @@
  - "": [T: "suurempi kuin, mutta ei suunnilleen yhtä suuri kuin"]	#  0xea33	(en: 'greater than but not approximately equal to', google translation)
  - "": [T: "vähemmän kuin tai ei yhtä suuri kuin"]    	#  0xea34	(en: 'less than or not equal to', google translation)
  - "": [T: "suurempi kuin tai ei yhtä suuri kuin"] 	#  0xea35	(en: 'greater than or not equal to', google translation)
- - "": [T: "ei sisäkkäinen vähemmän kuin"]     	#  0xea36	(en: 'not nested less than', google translation) NOTE: translation unclear
- - "": [T: "ei sisäkkäinen suurempi kuin"]     	#  0xea37	(en: 'not nested greater than', google translation) NOTE: translation unclear
+ - "": [T: "ei sisäkkäinen vähemmän kuin"]     	#  0xea36	(en: 'not nested less than', google translation) # FI: translation unclear
+ - "": [T: "ei sisäkkäinen suurempi kuin"]     	#  0xea37	(en: 'not nested greater than', google translation) # FI: translation unclear
  - "": [T: "ei paljon pienempi kuin"]          	#  0xea38	(en: 'not much less than', google translation)
  - "": [T: "ei paljon suurempi kuin"]          	#  0xea39	(en: 'not much greater than', google translation)
  - "": [T: "edeltää, mutta ei vastaa"]         	#  0xea3a	(en: 'precedes but not equivalent to', google translation)
@@ -2737,12 +2737,12 @@
  - "": [T: "ei sisällä normaalina aliryhmänä palkilla"]	#  0xea51	(en: 'does not contain as normal subgroup with bar', google translation)
  - "": [T: "ei ero välillä"]                   	#  0xea52	(en: 'not difference between', google translation)
  - "": [T: "ei geometrisesti vastaa"]          	#  0xea53	(en: 'not geometrically equivalent to', google translation)
- - "": [T: "ei vert samanlainen"]              	#  0xea54	(en: 'not vert similar', google translation) NOTE: translation unclear
+ - "": [T: "ei vert samanlainen"]              	#  0xea54	(en: 'not vert similar', google translation) # FI: translation unclear
  - "": [T: "ei yhtä suuri tai samanlainen"]    	#  0xea55	(en: 'not equal or similar', google translation)
  - "": [T: "ei vert likimääräinen"]            	#  0xea56	(en: 'not vert approximate', google translation)
  - "": [T: "ei likimääräisesti identtinen"]        #  0xea57	(en: 'not approximately identical to', google translation)
- - "": [T: "ei kumpu yhtä suuri kuin"]     	    #  0xea58	(en: 'not bumpy equals', google translation) NOTE: translation unclear
- - "": [T: "ei kumpu yksiviivainen yhtä suuri kuin"]             	#  0xea59	(en: 'not bumpy single equals', google translation) NOTE: translation unclear
+ - "": [T: "ei kumpu yhtä suuri kuin"]     	    #  0xea58	(en: 'not bumpy equals', google translation) # FI: translation unclear
+ - "": [T: "ei kumpu yksiviivainen yhtä suuri kuin"]             	#  0xea59	(en: 'not bumpy single equals', google translation) # FI: translation unclear
  - "": [T: "ei yhtä suuri kuin piste"]             #  0xea5a	(en: 'not equal dot', google translation)
  - "": [T: "käännetty ei vastaa"]           	#  0xea5b	(en: 'reverse not equivalent', google translation)
  - "": [T: "ei neliömäinen osajoukko"]             #  0xea60	(en: 'not square subset', google translation)
@@ -2751,10 +2751,10 @@
  - "": [T: "ei tiukasti vastaa"]               	#  0xea63	(en: 'not strictly equivalent to', google translation)
  - "": [T: "ei kongruentti piste"]              	#  0xea64	(en: 'not congruent dot', google translation)
  - "": [T: "käännetty ei ole yhtä suuri kuin"]     #  0xea65	(en: 'reverse not equal', google translation)
- - "": [T: "ei vasen kolmio on yhtä suuri kuin"] 	#  0xea70	(en: 'not vert left triangle equals', google translation) NOTE: translation unclear
- - "": [T: "ei oikea oikea on yhtä suuri kuin"]    #  0xea71	(en: 'not vert right triangle equals', google translation) NOTE: translation unclear
+ - "": [T: "ei vasen kolmio on yhtä suuri kuin"] 	#  0xea70	(en: 'not vert left triangle equals', google translation) # FI: translation unclear
+ - "": [T: "ei oikea oikea on yhtä suuri kuin"]    #  0xea71	(en: 'not vert right triangle equals', google translation) # FI: translation unclear
  - "": [T: "ei osittainen"]                    	#  0xea80	(en: 'not partial', google translation)
- - "": [T: "nuolen koristeiden laajennus"]     	#  0xeb00	(en: 'arrow embellishment extender', google translation) NOTE: translation unclear
+ - "": [T: "nuolen koristeiden laajennus"]     	#  0xeb00	(en: 'arrow embellishment extender', google translation) # FI: translation unclear
  - "": [T: "oikea nuoli vasemman nuolen yläpuolella"]	#  0xeb01	(en: 'arrow rightwards over arrow leftwards', google translation)
  - "": [T: "oikea nuoli vasemman nuolen yläpuolella"]	#  0xeb02	(en: 'arrow rightwards over arrow leftwards', google translation)
  - "": [T: "oikea harppuuna vasemman harppuunan yläpuolella"]	#  0xeb03	(en: 'harpoon right over harpoon left', google translation)
@@ -2764,8 +2764,8 @@
  - "": [T: "vaakasuora harppuunapidennys"]        #  0xeb07	(en: 'horizontal harpoon extender', google translation) # FI: translation unclear
  - "": [T: "vasen kaarinuoli vastapäivään"]        #  0xeb08	(en: 'anticlockwise arc leftwards arrow', google translation)
  - "": [T: "oikea kaarinuoli vastapäivään"]    	#  0xeb09	(en: 'anticlockwise arc rightwards arrow', google translation)
- - "": [T: "suuri oikean nuolen aksentti"]      	#  0xeb0b	(en: 'large rightwards arrow accent', google translation) NOTE: translation unclear
- - "": [T: "suuri vasen nuolen aksentti"]      	#  0xeb0c	(en: 'large leftwards arrow accent', google translation) NOTE: translation unclear
+ - "": [T: "suuri oikean nuolen aksentti"]      	#  0xeb0b	(en: 'large rightwards arrow accent', google translation) # FI: translation unclear
+ - "": [T: "suuri vasen nuolen aksentti"]      	#  0xeb0c	(en: 'large leftwards arrow accent', google translation) # FI: translation unclear
  - "": [T: "vasen nuolenpää"]                  	#  0xeb0d	(en: 'leftwards arrowhead', google translation)
  - "": [T: "oikea nuolenpää"]                  	#  0xeb0e	(en: 'rightwards arrowhead', google translation)
  - "": [T: "suuri vasen-oikea nuoli yliviivauksella"]	#  0xeb0f	(en: 'large left right arrow with stroke', google translation)
@@ -2817,7 +2817,7 @@
  - "": [T: "koillis-kaakko kaksoisnuoli"]	            #  0xeb3f	(en: 'double arrow northeast southeast', google translation)
  - "": [T: "vasen puoliympyränuoli vastapäivään"]	#  0xeb40	(en: 'anticlockwise left semicircle arrow', google translation)
  - "": [T: "vasen puoliympyränuoli myötäpäivään"]	#  0xeb41	(en: 'clockwise left semicircle arrow', google translation)
- - "": [T: "vasen avoin ympyrä vasen-oikea nuoli"]	#  0xeb42	(en: 'left open circle left right arrow', google translation) NOTE: translation unclear
+ - "": [T: "vasen avoin ympyrä vasen-oikea nuoli"]	#  0xeb42	(en: 'left open circle left right arrow', google translation) # FI: translation unclear
  - "": [T: "oikea nuoli tilden yläpuolella"]           	#  0xeb44	(en: 'rightwards arrow over tilde', google translation)
  - "": [T: "vasen nuoli tilden yläpuolella"]           	#  0xeb45	(en: 'leftwards arrow over tilde', google translation)
  - "": [T: "vasen harppuuna palkin yläpuolella"]       	#  0xeb48	(en: 'leftwards harpoon over bar', google translation)
@@ -2827,7 +2827,7 @@
  - "": [T: "raskas musta lyhyt vasen nuoli"]         	    #  0xeb4c	(en: 'squat black leftwards arrow', google translation)
  - "": [T: "oikea puoliympyränuoli myötäpäivään"]	        #  0xeb50	(en: 'clockwise right semicircle arrow', google translation)
  - "": [T: "oikea puoliympyränuoli vastapäivään"]	        #  0xeb51	(en: 'anticlockwise right semicircle arrow', google translation)
- - "": [T: "vasen-oikea ympyrä vasen-oikea harppuuna"]	    #  0xeb52	(en: 'left open circle left right harpoon', google translation) NOTE: translation unclear
+ - "": [T: "vasen-oikea ympyrä vasen-oikea harppuuna"]	    #  0xeb52	(en: 'left open circle left right harpoon', google translation) # FI: translation unclear
  - "": [T: "nuoli ylös pystypalkin vasemmalla puolella"]	#  0xeb58	(en: 'upwards arrow leftwards of vertical bar', google translation)
  - "": [T: "nuoli alas pystypalkin vasemmalla puolella"]	#  0xeb59	(en: 'downwards arrow leftwards of vertical bar', google translation)
  - "": [T: "nuoli ylös pystypalkin oikealla puolella"]	    #  0xeb5a	(en: 'upwards arrow rightwards of vertical bar', google translation)
@@ -2836,44 +2836,44 @@
  - "": [T: "vasen nuoli jatketulla koukulla"]	            #  0xeb5d	(en: 'leftwards arrow with extended hook', google translation)
  - "": [T: "vasen nuoli jatketulla koukulla alas"]	        #  0xeb5e	(en: 'leftwards arrow with extended downwards hook', google translation)
  - "": [T: "oikea nuoli jatketulla koukulla"]	            #  0xeb5f	(en: 'rightwards arrow with extended hook', google translation)
- - "": [T: "ei oikea nuoli aaltoileva"]       	#  0xeb60	(en: 'not right arrow wavy', google translation) NOTE: translation unclear
- - "": [T: "ei oikea nuoli kaareva"]           	#  0xeb61	(en: 'not right arrow curved', google translation) NOTE: translation unclear
+ - "": [T: "ei oikea nuoli aaltoileva"]       	#  0xeb60	(en: 'not right arrow wavy', google translation) # FI: translation unclear
+ - "": [T: "ei oikea nuoli kaareva"]           	#  0xeb61	(en: 'not right arrow curved', google translation) # FI: translation unclear
  - "": [T: "harppuula ylös pystypalkin vasemmalla puolella"]	#  0xeb68	(en: 'upwards harpoon leftwards of vertical bar', google translation)
  - "": [T: "harppuuna alas pystypalkin vasemmalla puolella"]	#  0xeb69	(en: 'downwards harpoon leftwards of vertical bar', google translation)
  - "": [T: "harppuuna ylös pystypalkin oikealla puolella"]	#  0xeb6a	(en: 'upwards harpoon rightwards of vertical bar', google translation)
  - "": [T: "harppuuna alas pystypalkin oikealla puolella"]	#  0xeb6b	(en: 'downwards harpoon rightwards of vertical bar', google translation)
- - "": [T: "pystysuora kaksoisnuolen laajennus"]	#  0xeb6c	(en: 'vertical double arrow extender', google translation) NOTE: translation unclear
+ - "": [T: "pystysuora kaksoisnuolen laajennus"]	#  0xeb6c	(en: 'vertical double arrow extender', google translation) # FI: translation unclear
  - "": [T: "pystysuora harppuuna piikki vasemmalle laajennus"]	#  0xeb6d	(en: 'vertical harpoon with barb left extender', google translation)
  - "": [T: "pystysuora harppuuna piikki oikealle laajennus"]	#  0xeb6e	(en: 'vertical harpoon with barb right extender', google translation)
- - "": [T: "oikea harppuuna vasemman harppuunan yläpuolella oikealla"]	#  0xeb6f	(en: 'right harpoon over left harpoon right', google translation) NOTE: translation unclear
- - "": [T: "oikea harppuuna vasemman harppuunan yläpuolella vasemmalla"]	#  0xeb70	(en: 'right harpoon over left harpoon left', google translation) NOTE: translation unclear
- - "": [T: "vasen harppuuna oikean harppuunan yläpuolella oikealla"]	#  0xeb71	(en: 'left harpoon over right harpoon right', google translation) NOTE: translation unclear
- - "": [T: "vasen harppuuna oikean harppuunan yläpuolella vasemmalla"]	#  0xeb72	(en: 'left harpoon over right harpoon left', google translation) NOTE: translation unclear
- - "": [T: "vasen nuoli palkista nuolenpää"]    	#  0xeb73	(en: 'leftwards arrow from bar arrowhead', google translation) NOTE: translation unclear
+ - "": [T: "oikea harppuuna vasemman harppuunan yläpuolella oikealla"]	#  0xeb6f	(en: 'right harpoon over left harpoon right', google translation) # FI: translation unclear
+ - "": [T: "oikea harppuuna vasemman harppuunan yläpuolella vasemmalla"]	#  0xeb70	(en: 'right harpoon over left harpoon left', google translation) # FI: translation unclear
+ - "": [T: "vasen harppuuna oikean harppuunan yläpuolella oikealla"]	#  0xeb71	(en: 'left harpoon over right harpoon right', google translation) # FI: translation unclear
+ - "": [T: "vasen harppuuna oikean harppuunan yläpuolella vasemmalla"]	#  0xeb72	(en: 'left harpoon over right harpoon left', google translation) # FI: translation unclear
+ - "": [T: "vasen nuoli palkista nuolenpää"]    	#  0xeb73	(en: 'leftwards arrow from bar arrowhead', google translation) # FI: translation unclear
  - "": [T: "vasen-oikea nuoli palkista laajennus"]	#  0xeb74	(en: 'leftwards rightwards arrow from bar extender', google translation)
- - "": [T: "vasen nuoli palkista häntä"]         	#  0xeb75	(en: 'leftwards arrow from bar tail', google translation) NOTE: translation unclear
- - "": [T: "oikea nuoli palkista häntä"]       	#  0xeb76	(en: 'rightwards arrow from bar tail', google translation) NOTE: translation unclear
- - "": [T: "oikea nuoli palkista nuolenpää"]	    #  0xeb77	(en: 'rightwards arrow from bar arrowhead', google translation) NOTE: translation unclear
- - "": [T: "harppuuna ylös palkista piikki vasemmalle nuolenpää"]	#  0xeb78	(en: 'upwards harpoon from bar with barb leftwards arrowhead', google translation) NOTE: translation unclear
- - "": [T: "oikea nuoli vasemman nuolen yläpuolella oikealla"]	#  0xeb79	(en: 'rightwards arrow over leftwards arrow right', google translation) NOTE: translation unclear
- - "": [T: "oikea nuoli vasemman nuolen yläpuolella vasemmalla"]	#  0xeb7a	(en: 'rightwards arrow over leftwards arrow left', google translation) NOTE: translation unclear
- - "": [T: "vasen nuoli oikean nuolen yläpuolella oikealla"]	#  0xeb7b	(en: 'leftwards arrow over rightwards arrow right', google translation) NOTE: translation unclear
- - "": [T: "vasen nuoli oikean nuolen yläpuolella vasemmalla"]	#  0xeb7c	(en: 'leftwards arrow over rightwards arrow left', google translation) NOTE: translation unclear
- - "": [T: "nuoli ylös palkista nuolenpää"]     	#  0xeb7d	(en: 'upwards arrow from bar arrowhead', google translation) NOTE: translation unclear
- - "": [T: "nuoli ylös palkista häntä"]      	    #  0xeb7e	(en: 'upwards arrow from bar tail', google translation) NOTE: translation unclear
- - "": [T: "nuoli alaspäin palkista häntä"]   	#  0xeb7f	(en: 'downwards arrow from bar tail', google translation) NOTE: translation unclear
- - "": [T: "nuoli alaspäin palkista nuolenpää"]  	#  0xeb80	(en: 'downwards arrow from bar arrowhead', google translation) NOTE: translation unclear
- - "": [T: "harppuuna alas palkista piikki okealle nuolenpää"]	#  0xeb81	(en: 'downwards harpoon from bar with barb rightwards arrowhead', google translation) NOTE: translation unclear
- - "": [T: "harppuuna ylös ja oikealla puolella harppuuna alas alas"]	#  0xeb82	(en: 'upwards harpoon to the left of downwards harpoon bottom', google translation) NOTE: translation unclear
- - "": [T: "harppuuna ylös ja oikealla harppuuna alas laajennus"]	#  0xeb83	(en: 'upwards harpoon to the left of downwards harpoon', google translation)
- - "": [T: "harppuuna alas ja oikealla harppuuna ylös ylös"]	#  0xeb84	(en: 'downwards harpoon to the left of upwards harpoon top', google translation) NOTE: translation unclear
- - "": [T: "harppuuna ylös ja oikealla harppuuna alas ylös"]	#  0xeb85	(en: 'upwards harpoon to the left of downwards harpoon top', google translation) NOTE: translation unclear
+ - "": [T: "vasen nuoli palkista häntä"]         	#  0xeb75	(en: 'leftwards arrow from bar tail', google translation) # FI: translation unclear
+ - "": [T: "oikea nuoli palkista häntä"]       	#  0xeb76	(en: 'rightwards arrow from bar tail', google translation) # FI: translation unclear
+ - "": [T: "oikea nuoli palkista nuolenpää"]	    #  0xeb77	(en: 'rightwards arrow from bar arrowhead', google translation) # FI: translation unclear
+ - "": [T: "harppuuna ylös palkista piikki vasemmalle nuolenpää"]	#  0xeb78	(en: 'upwards harpoon from bar with barb leftwards arrowhead', google translation) # FI: translation unclear
+ - "": [T: "oikea nuoli vasemman nuolen yläpuolella oikealla"]	#  0xeb79	(en: 'rightwards arrow over leftwards arrow right', google translation) # FI: translation unclear
+ - "": [T: "oikea nuoli vasemman nuolen yläpuolella vasemmalla"]	#  0xeb7a	(en: 'rightwards arrow over leftwards arrow left', google translation) # FI: translation unclear
+ - "": [T: "vasen nuoli oikean nuolen yläpuolella oikealla"]	#  0xeb7b	(en: 'leftwards arrow over rightwards arrow right', google translation) # FI: translation unclear
+ - "": [T: "vasen nuoli oikean nuolen yläpuolella vasemmalla"]	#  0xeb7c	(en: 'leftwards arrow over rightwards arrow left', google translation) # FI: translation unclear
+ - "": [T: "nuoli ylös palkista nuolenpää"]     	#  0xeb7d	(en: 'upwards arrow from bar arrowhead', google translation) # FI: translation unclear
+ - "": [T: "nuoli ylös palkista häntä"]      	    #  0xeb7e	(en: 'upwards arrow from bar tail', google translation) # FI: translation unclear
+ - "": [T: "nuoli alaspäin palkista häntä"]   	#  0xeb7f	(en: 'downwards arrow from bar tail', google translation) # FI: translation unclear
+ - "": [T: "nuoli alaspäin palkista nuolenpää"]  	#  0xeb80	(en: 'downwards arrow from bar arrowhead', google translation) # FI: translation unclear
+ - "": [T: "harppuuna alas palkista piikki okealle nuolenpää"]	#  0xeb81	(en: 'downwards harpoon from bar with barb rightwards arrowhead', google translation) # FI: translation unclear
+ - "": [T: "harppuuna ylös ja oikealla puolella harppuuna alas alas"]	#  0xeb82	(en: 'upwards harpoon to the left of downwards harpoon bottom', google translation) # FI: translation unclear
+ - "": [T: "harppuuna ylös ja oikealla harppuuna alas"]	#  0xeb83	(en: 'upwards harpoon to the left of downwards harpoon', google translation)
+ - "": [T: "harppuuna alas ja oikealla harppuuna ylös ylös"]	#  0xeb84	(en: 'downwards harpoon to the left of upwards harpoon top', google translation) # FI: translation unclear
+ - "": [T: "harppuuna ylös ja oikealla harppuuna alas ylös"]	#  0xeb85	(en: 'upwards harpoon to the left of downwards harpoon top', google translation) # FI: translation unclear
  - "": [T: "harppuuna alas ja oikealla harppuuna ylös laajennus"]	#  0xeb86	(en: 'downwards harpoon to the left of the upwards harpoon extender', google translation)
- - "": [T: "harppuuna alas ja oikealla harppuuna ylös alas"]	#  0xeb87	(en: 'downwards harpoon to the left of the upwards harpoon bottom', google translation) NOTE: translation unclear
- - "": [T: "harppuuna ylös ja oikealla harppuuna alas alas"]	#  0xeb88	(en: 'upwards arrow leftwards of downwards arrow bottom', google translation) NOTE: translation unclear
- - "": [T: "nuoli alas ja oikealla nuoli ylös ylös"]	#  0xeb89	(en: 'downwards arrow leftwards of upwards arrow top', google translation) NOTE: translation unclear
- - "": [T: "nuoli ylös ja oikealla nuoli alas ylös"]	#  0xeb8a	(en: 'upwards arrow leftwards of downwards arrow top', google translation) NOTE: translation unclear
- - "": [T: "nuoli alas ja oikealla nuoli ylös alas"]	#  0xeb8b	(en: 'downwards arrow leftwards of upwards arrow bottom', google translation) NOTE: translation unclear
+ - "": [T: "harppuuna alas ja oikealla harppuuna ylös alas"]	#  0xeb87	(en: 'downwards harpoon to the left of the upwards harpoon bottom', google translation) # FI: translation unclear
+ - "": [T: "harppuuna ylös ja oikealla harppuuna alas alas"]	#  0xeb88	(en: 'upwards arrow leftwards of downwards arrow bottom', google translation) # FI: translation unclear
+ - "": [T: "nuoli alas ja oikealla nuoli ylös ylös"]	#  0xeb89	(en: 'downwards arrow leftwards of upwards arrow top', google translation) # FI: translation unclear
+ - "": [T: "nuoli ylös ja oikealla nuoli alas ylös"]	#  0xeb8a	(en: 'upwards arrow leftwards of downwards arrow top', google translation) # FI: translation unclear
+ - "": [T: "nuoli alas ja oikealla nuoli ylös alas"]	#  0xeb8b	(en: 'downwards arrow leftwards of upwards arrow bottom', google translation) # FI: translation unclear
  - "": [T: "vasen-oikeanuolipidennys"]  	#  0xeb8c	(en: 'leftwards rightwards arrows extender', google translation)
  - "": [T: "koillisnuolipidennys"]        	#  0xeb8d	(en: 'north east arrow extender', google translation)
  - "": [T: "luoteisnuolipidennys"]           	#  0xeb8e	(en: 'north west arrow extender', google translation)
@@ -2888,30 +2888,15 @@
  - "": [T: "oikea pystypalkki"]          	        #  0xec08	(en: 'right vertical bar', google translation)
  - "": [T: "vasen kaksinkertainen pystypalkki"]	#  0xec09	(en: 'left double vertical bar', google translation)
  - "": [T: "oikea kaksinkertainen pystypalkki"]	#  0xec0a	(en: 'right double vertical bar', google translation)
- - "": [T: "neliön alapuoli hakasulku"]            #  0xec0c	(en: 'under square bracket', google translation) NOTE: translation unclear
- - "⎵": [T: "neliön alapuoli hakasulku"]            #  0x23b5	(google: 'neliön alla') NOTE: translation unclear
- - "": [T: "neliön yläpuoli hakasulku"]      	    #  0xec0d	(en: 'over square bracket', google translation) NOTE: translation unclear
- - "⎴": [T: "neliön yläpuoli hakasulku"]            #  0x23b4	(google: 'neliömäisen kiinnikkeen yli') NOTE: translation unclear
- - "": [T: "alahakasulku vasen"]      	#  0xec0e	(en: 'under bracket left', google translation) NOTE: translation unclear
- - "": [T: "alahakasulku oikea"]        	#  0xec0f	(en: 'under bracket right', google translation) NOTE: translation unclear
- - "": [T: "ylähakasulku vasen"]                  	#  0xec10	(en: 'over bracket left', google translation) NOTE: translation unclear
- - "": [T: "alahakasulku oikea"]                	#  0xec11	(en: 'over bracket right', google translation) NOTE: translation unclear
- - "": [T: "vasen parens 1"]                 	#  0xec12	(en: 'left parens 1', google translation) NOTE: translation unclear
- - "": [T: "vasen parens 2"]                 	#  0xec13	(en: 'left parens 2', google translation) NOTE: translation unclear
- - "": [T: "vasen parens 3"]                 	#  0xec14	(en: 'left parens 3', google translation) NOTE: translation unclear
- - "": [T: "vasen parens 4"]                 	#  0xec15	(en: 'left parens 4', google translation) NOTE: translation unclear
- - "": [T: "oikea parens 1"]                 	#  0xec16	(en: 'right parens 1', google translation) NOTE: translation unclear
- - "": [T: "oikea parens 2"]                 	#  0xec17	(en: 'right parens 2', google translation) NOTE: translation unclear
- - "": [T: "oikea parens 3"]                 	#  0xec18	(en: 'right parens 3', google translation) NOTE: translation unclear
- - "": [T: "oikea parens 4"]                 	#  0xec19	(en: 'right parens 4', google translation) NOTE: translation unclear
- - "": [T: "radikaali 1"]                      	#  0xec1a	(en: 'radical 1', google translation)
- - "": [T: "radikaali 2"]                      	#  0xec1b	(en: 'radical 2', google translation)
- - "": [T: "radikaali 3"]                      	#  0xec1c	(en: 'radical 3', google translation)
- - "": [T: "radikaali 4"]                      	#  0xec1d	(en: 'radical 4', google translation)
- - "": [T: "radikaali 5"]                      	#  0xec1e	(en: 'radical 5', google translation)
- - "": [T: "radikaali pohja"]                  	#  0xec1f	(en: 'radical bottom', google translation)
- - "": [T: "radikaali yläosa"]                 	#  0xec21	(en: 'radical top', google translation)
  - "": [T: "vaakasuora hakasulku pidennys"]     	#  0xec0b	(en: 'horizontal bracket extender', google translation)
+ - "": [T: "neliön alapuoli hakasulku"]            #  0xec0c	(en: 'under square bracket', google translation) # FI: translation unclear
+ - "⎵": [T: "neliön alapuoli hakasulku"]            #  0x23b5	(google: 'neliön alla') # FI: translation unclear
+ - "": [T: "neliön yläpuoli hakasulku"]      	    #  0xec0d	(en: 'over square bracket', google translation) # FI: translation unclear
+ - "⎴": [T: "neliön yläpuoli hakasulku"]            #  0x23b4	(google: 'neliömäisen kiinnikkeen yli') # FI: translation unclear
+ - "": [T: "alahakasulku vasen"]      	#  0xec0e	(en: 'under bracket left', google translation) # FI: translation unclear
+ - "": [T: "alahakasulku oikea"]        	#  0xec0f	(en: 'under bracket right', google translation) # FI: translation unclear
+ - "": [T: "ylähakasulku vasen"]                  	#  0xec10	(en: 'over bracket left', google translation) # FI: translation unclear
+ - "": [T: "alahakasulku oikea"]                	#  0xec11	(en: 'over bracket right', google translation) # FI: translation unclear
  - "": [T: "vasen sulku 1"]                 	#  0xec12	(en: 'left parens 1', google translation)
  - "": [T: "vasen sulku 2"]                 	#  0xec13	(en: 'left parens 2', google translation)
  - "": [T: "vasen sulku 3"]                 	#  0xec14	(en: 'left parens 3', google translation)
@@ -2920,7 +2905,14 @@
  - "": [T: "oikea sulku 2"]                 	#  0xec17	(en: 'right parens 2', google translation)
  - "": [T: "oikea sulku 3"]                 	#  0xec18	(en: 'right parens 3', google translation)
  - "": [T: "oikea sulku 4"]                 	#  0xec19	(en: 'right parens 4', google translation)
+ - "": [T: "radikaali 1"]                      	#  0xec1a	(en: 'radical 1', google translation) # FI: context? Radical as in root sign?
+ - "": [T: "radikaali 2"]                      	#  0xec1b	(en: 'radical 2', google translation) # FI: context?
+ - "": [T: "radikaali 3"]                      	#  0xec1c	(en: 'radical 3', google translation) # FI: context?
+ - "": [T: "radikaali 4"]                      	#  0xec1d	(en: 'radical 4', google translation) # FI: context?
+ - "": [T: "radikaali 5"]                      	#  0xec1e	(en: 'radical 5', google translation) # FI: context?
+ - "": [T: "radikaali pohja"]                  	#  0xec1f	(en: 'radical bottom', google translation) # FI: context?
  - "": [T: "radikaali pystysuora pidennys"]   	#  0xec20	(en: 'radical vertical extender', google translation) # FI: context?
+ - "": [T: "radikaali yläosa"]                 	#  0xec21	(en: 'radical top', google translation) # FI: context?
  - "": [T: "vasen valkoinen hakasulku ylös"]       #  0xec22	(en: 'left white bracket top', google translation)
  - "": [T: "vasen valkoinen hakasulku pidennys"]  #  0xec23	(en: 'left white bracket extender', google translation)
  - "": [T: "vasen valkoinen hakasulku alas"]   	#  0xec24	(en: 'left white bracket bottom', google translation)
