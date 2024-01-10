@@ -2754,7 +2754,7 @@
  - "": [T: "ei vasen kolmio on yhtä suuri kuin"] 	#  0xea70	(en: 'not vert left triangle equals', google translation) # FI: translation unclear
  - "": [T: "ei oikea oikea on yhtä suuri kuin"]    #  0xea71	(en: 'not vert right triangle equals', google translation) # FI: translation unclear
  - "": [T: "ei osittainen"]                    	#  0xea80	(en: 'not partial', google translation)
- - "": [T: "nuolen koristeiden laajennus"]     	#  0xeb00	(en: 'arrow embellishment extender', google translation) # FI: translation unclear
+ - "": [T: "nuolen koristeiden pidennys"]     	#  0xeb00	(en: 'arrow embellishment extender', google translation) # FI: translation unclear
  - "": [T: "oikea nuoli vasemman nuolen yläpuolella"]	#  0xeb01	(en: 'arrow rightwards over arrow leftwards', google translation)
  - "": [T: "oikea nuoli vasemman nuolen yläpuolella"]	#  0xeb02	(en: 'arrow rightwards over arrow leftwards', google translation)
  - "": [T: "oikea harppuuna vasemman harppuunan yläpuolella"]	#  0xeb03	(en: 'harpoon right over harpoon left', google translation)
@@ -2842,15 +2842,15 @@
  - "": [T: "harppuuna alas pystypalkin vasemmalla puolella"]	#  0xeb69	(en: 'downwards harpoon leftwards of vertical bar', google translation)
  - "": [T: "harppuuna ylös pystypalkin oikealla puolella"]	#  0xeb6a	(en: 'upwards harpoon rightwards of vertical bar', google translation)
  - "": [T: "harppuuna alas pystypalkin oikealla puolella"]	#  0xeb6b	(en: 'downwards harpoon rightwards of vertical bar', google translation)
- - "": [T: "pystysuora kaksoisnuolen laajennus"]	#  0xeb6c	(en: 'vertical double arrow extender', google translation) # FI: translation unclear
- - "": [T: "pystysuora harppuuna piikki vasemmalle laajennus"]	#  0xeb6d	(en: 'vertical harpoon with barb left extender', google translation)
- - "": [T: "pystysuora harppuuna piikki oikealle laajennus"]	#  0xeb6e	(en: 'vertical harpoon with barb right extender', google translation)
+ - "": [T: "pystysuora kaksoisnuolen pidennys"]	#  0xeb6c	(en: 'vertical double arrow extender', google translation) # FI: translation unclear
+ - "": [T: "pystysuora harppuuna piikki vasemmalle pidennys"]	#  0xeb6d	(en: 'vertical harpoon with barb left extender', google translation)
+ - "": [T: "pystysuora harppuuna piikki oikealle pidennys"]	#  0xeb6e	(en: 'vertical harpoon with barb right extender', google translation)
  - "": [T: "oikea harppuuna vasemman harppuunan yläpuolella oikealla"]	#  0xeb6f	(en: 'right harpoon over left harpoon right', google translation) # FI: translation unclear
  - "": [T: "oikea harppuuna vasemman harppuunan yläpuolella vasemmalla"]	#  0xeb70	(en: 'right harpoon over left harpoon left', google translation) # FI: translation unclear
  - "": [T: "vasen harppuuna oikean harppuunan yläpuolella oikealla"]	#  0xeb71	(en: 'left harpoon over right harpoon right', google translation) # FI: translation unclear
  - "": [T: "vasen harppuuna oikean harppuunan yläpuolella vasemmalla"]	#  0xeb72	(en: 'left harpoon over right harpoon left', google translation) # FI: translation unclear
  - "": [T: "vasen nuoli palkista nuolenpää"]    	#  0xeb73	(en: 'leftwards arrow from bar arrowhead', google translation) # FI: translation unclear
- - "": [T: "vasen-oikea nuoli palkista laajennus"]	#  0xeb74	(en: 'leftwards rightwards arrow from bar extender', google translation)
+ - "": [T: "vasen-oikea nuoli palkista pidennys"]	#  0xeb74	(en: 'leftwards rightwards arrow from bar extender', google translation)
  - "": [T: "vasen nuoli palkista häntä"]         	#  0xeb75	(en: 'leftwards arrow from bar tail', google translation) # FI: translation unclear
  - "": [T: "oikea nuoli palkista häntä"]       	#  0xeb76	(en: 'rightwards arrow from bar tail', google translation) # FI: translation unclear
  - "": [T: "oikea nuoli palkista nuolenpää"]	    #  0xeb77	(en: 'rightwards arrow from bar arrowhead', google translation) # FI: translation unclear
@@ -2868,7 +2868,7 @@
  - "": [T: "harppuuna ylös ja oikealla harppuuna alas"]	#  0xeb83	(en: 'upwards harpoon to the left of downwards harpoon', google translation)
  - "": [T: "harppuuna alas ja oikealla harppuuna ylös ylös"]	#  0xeb84	(en: 'downwards harpoon to the left of upwards harpoon top', google translation) # FI: translation unclear
  - "": [T: "harppuuna ylös ja oikealla harppuuna alas ylös"]	#  0xeb85	(en: 'upwards harpoon to the left of downwards harpoon top', google translation) # FI: translation unclear
- - "": [T: "harppuuna alas ja oikealla harppuuna ylös laajennus"]	#  0xeb86	(en: 'downwards harpoon to the left of the upwards harpoon extender', google translation)
+ - "": [T: "harppuuna alas ja oikealla harppuuna ylös pidennys"]	#  0xeb86	(en: 'downwards harpoon to the left of the upwards harpoon extender', google translation)
  - "": [T: "harppuuna alas ja oikealla harppuuna ylös alas"]	#  0xeb87	(en: 'downwards harpoon to the left of the upwards harpoon bottom', google translation) # FI: translation unclear
  - "": [T: "harppuuna ylös ja oikealla harppuuna alas alas"]	#  0xeb88	(en: 'upwards arrow leftwards of downwards arrow bottom', google translation) # FI: translation unclear
  - "": [T: "nuoli alas ja oikealla nuoli ylös ylös"]	#  0xeb89	(en: 'downwards arrow leftwards of upwards arrow top', google translation) # FI: translation unclear
@@ -3567,30 +3567,30 @@
  - "𝟿": [T: "yhdeksän"]                         	#  0x1d7ff	(en: 'nine')
  - "": [T: "tuntematon merkki"]                	#  0xf700	(en: 'unknown character', google translation)
  - "": [T: "alaoikea ja alavasen kolmio"]	#  0xf726	(en: 'lower right and lower left triangles', google translation)
- - "": [T: "vaakasuora pistekolmikko laajennus"]        	#  0xf72d	(en: 'horizontal ellipsis extender', google translation)
- - "": [T: "keskiviivan vaakasuora pistekolmikko laajennus"]	#  0xf72e	(en: 'midline horizontal ellipsis extender', google translation)
- - "": [T: "radikaali laajennus"]              	#  0xf8e5	(en: 'radical extender', google translation)
- - "": [T: "pystysuora nuoli laajennus"] 	#  0xf8e6	(en: 'vertical arrow extender', google translation)
- - "": [T: "vaakasuora nuoli laajennus"]           	#  0xf8e7	(en: 'horizontal arrow extender', google translation)
+ - "": [T: "vaakasuora pistekolmikko pidennys"]        	#  0xf72d	(en: 'horizontal ellipsis extender', google translation)
+ - "": [T: "keskiviivan vaakasuora pistekolmikko pidennys"]	#  0xf72e	(en: 'midline horizontal ellipsis extender', google translation)
+ - "": [T: "radikaali pidennys"]              	#  0xf8e5	(en: 'radical extender', google translation) # FI: unclear translation, root?
+ - "": [T: "pystysuora nuoli pidennys"] 	#  0xf8e6	(en: 'vertical arrow extender', google translation)
+ - "": [T: "vaakasuora nuoli pidennys"]           	#  0xf8e7	(en: 'horizontal arrow extender', google translation)
  - "": [T: "rekisteröity merkki sans serif"]   	#  0xf8e8	(en: 'registered sign sans serif', google translation)
  - "": [T: "tekijänoikeusmerkki sans serif"]   	#  0xf8e9	(en: 'copyright sign sans serif', google translation)
  - "": [T: "trademark-merkki sans serif"]	#  0xf8ea	(en: 'trade mark sign sans serif', google translation)
  - "": [T: "vasen paren ylä"]                 	#  0xf8eb	(en: 'left paren top', google translation)
- - "": [T: "vasen paren laajennus"]          	#  0xf8ec	(en: 'left paren extender', google translation)
+ - "": [T: "vasen paren pidennys"]          	#  0xf8ec	(en: 'left paren extender', google translation)
  - "": [T: "vasen paren ala"]                 	#  0xf8ed	(en: 'left paren bottom', google translation)
  - "": [T: "vasen hakasulku ylä"]         	#  0xf8ee	(en: 'left bracket top', google translation)
- - "": [T: "vasen hakasulku laajennus"]                	#  0xf8ef	(en: 'left bracket extender', google translation)
+ - "": [T: "vasen hakasulku pidennys"]                	#  0xf8ef	(en: 'left bracket extender', google translation)
  - "": [T: "vasen hakasulku ala"]             	#  0xf8f0	(en: 'left bracket bottom', google translation)
  - "": [T: "vasen hakasulku ylä"]               	#  0xf8f1	(en: 'left brace top', google translation)
  - "": [T: "vasen aaltosulku keski"]         	#  0xf8f2	(en: 'left brace mid', google translation)
  - "": [T: "vasen aaltosulku ala"]                	#  0xf8f3	(en: 'left brace bottom', google translation)
- - "": [T: "aaltosulku laajennus"]                 	#  0xf8f4	(en: 'brace extender', google translation)
- - "": [T: "integraali laajennus"]             	#  0xf8f5	(en: 'integral extender', google translation)
+ - "": [T: "aaltosulku pidennys"]                 	#  0xf8f4	(en: 'brace extender', google translation)
+ - "": [T: "integraali pidennys"]             	#  0xf8f5	(en: 'integral extender', google translation)
  - "": [T: "oikea paren ylä"]                      	#  0xf8f6	(en: 'right paren top', google translation)
- - "": [T: "oikea paren laajennus"]        	#  0xf8f7	(en: 'right paren extender', google translation)
+ - "": [T: "oikea paren pidennys"]        	#  0xf8f7	(en: 'right paren extender', google translation)
  - "": [T: "oikea paren ala"]                	#  0xf8f8	(en: 'right paren bottom', google translation)
  - "": [T: "oikea hakasulku ylä"]                   	#  0xf8f9	(en: 'right bracket top', google translation)
- - "": [T: "oikea hakasulku laajennus"]                	#  0xf8fa	(en: 'right bracket extender', google translation)
+ - "": [T: "oikea hakasulku pidennys"]                	#  0xf8fa	(en: 'right bracket extender', google translation)
  - "": [T: "oikea hakasulku ala"]             	#  0xf8fb	(en: 'right bracket bottom', google translation)
  - "": [T: "oikea aaltosulku ylä"]                      	#  0xf8fc	(en: 'right brace top', google translation)
  - "": [T: "oikea aaltosulku keski"]         	#  0xf8fd	(en: 'right brace mid', google translation)
