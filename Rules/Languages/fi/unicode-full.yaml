@@ -2986,10 +2986,10 @@
  - "": [T: ""]                                 	#  0xee0a
  - "": [T: ""]                                 	#  0xee0b
  - "": [T: ""]                                 	#  0xee0c
- - "": [T: "yhteinen tila koriste"]            	#  0xee0d	(en: 'joint status embellishment', google translation) NOTE: translation unclear
- - "": [T: "yhteinen tila korite vasen"]   	    #  0xee0e	(en: 'joint status embellishment left', google translation) NOTE: translation unclear
- - "": [T: "yhteinen tila koriste oikea"]          #  0xee0f	(en: 'joint status embellishment right', google translation) NOTE: translation unclear
- - "": [T: "yhteinen tila koriste laajennus"]	    #  0xee10	(en: 'joint status embellishment extender', google translation) NOTE: translation unclear
+ - "": [T: "yhteinen tila koriste"]            	#  0xee0d	(en: 'joint status embellishment', google translation) # FI: translation unclear, context?
+ - "": [T: "yhteinen tila korite vasen"]   	    #  0xee0e	(en: 'joint status embellishment left', google translation) # FI: translation unclear, context?
+ - "": [T: "yhteinen tila koriste oikea"]          #  0xee0f	(en: 'joint status embellishment right', google translation) # FI: translation unclear, context?
+ - "": [T: "yhteinen tila koriste pidennys"]	    #  0xee10	(en: 'joint status embellishment extender', google translation) # FI: translation unclear, context?
  - "": [T: "integraalisilmukka"]              	#  0xee11	(en: 'integral loop', google translation)
  - "": [T: "kaksinkertainen integraalisilmukka"]	#  0xee12	(en: 'integral loop double', google translation)
  - "": [T: "kolminkertainen integraalisilmukka"]	#  0xee13	(en: 'integral loop triple', google translation)
@@ -2997,19 +2997,19 @@
  - "": [T: "laajentuva kolminkertainen integraalisilmukka"]	#  0xee16	(en: 'expanding integral loop triple', google translation)
  - "": [T: "asymptoottisesti yhtä suuri kuin aksentti"]	#  0xee17	(en: 'asymptotically equal to accent', google translation)
  - "": [T: "yhtä suuri kuin -merkki aksentti"]          	#  0xee18	(en: 'equal sign accent', google translation)
- - "": [T: "nelinkertainen priimi"]               	#  0xee19	(en: 'quadruple prime', google translation) NOTE: translation unclear
- - "": [T: "palkkiaksentti avoimella ympyrällä vasen"]	#  0xee1a	(en: 'bar accent with open circle left', google translation) NOTE: translation unclear
- - "": [T: "palkkiaksentti suljetulla ympyrällä vasen"]	#  0xee1b	(en: 'bar accent with closed circle left', google translation) NOTE: translation unclear
- - "": [T: "palkkiaksentti avoimella ympyrällä oikea"]	#  0xee1c	(en: 'bar accent with open circle right', google translation) NOTE: translation unclear
- - "": [T: "palkkiaksentti ja piste yläpuolella"]	#  0xee1d	(en: 'bar accent with over dot', google translation) NOTE: translation unclear
- - "": [T: "palkkiaksentti ja piste alapuolella"]    	#  0xee1e	(en: 'bar accent with under dot', google translation) NOTE: translation unclear
- - "": [T: "palkkiaksentti ja kaksinkertainen piste yläpuolella"]	#  0xee1f	(en: 'bar accent with double over dot', google translation) NOTE: translation unclear
- - "": [T: "palkkiaksentti ja kaksinkertainen piste alapuolella"]	#  0xee20	(en: 'bar accent with double under dot', google translation) NOTE: translation unclear
- - "": [T: "palkkiaksentti sirkumfleksillä"]        	#  0xee21	(en: 'bar accent with caret', google translation) NOTE: translation unclear
- - "": [T: "paksu alapalkkiaksentti"]            	#  0xee22	(en: 'thick under bar accent', google translation) NOTE: translation unclear
- - "": [T: "palkkiaksentti suljetulla ympyrällä oikea"]	#  0xee23	(en: 'bar accent with closed circle right', google translation) NOTE: translation unclear
- - "": [T: "suuri piste yläpuolella"]                 	#  0xee24	(en: 'large dot above', google translation) NOTE: translation unclear
- - "": [T: "kohdistusmerkki"]                  	#  0xef00	(en: 'alignment mark', google translation) NOTE: translation unclear
+ - "": [T: "neljäs derivaatta"]               	#  0xee19	(en: 'quadruple prime', google translation) # FI: 4th derivative?
+ - "": [T: "palkkiaksentti avoimella ympyrällä vasen"]	#  0xee1a	(en: 'bar accent with open circle left', google translation) # FI: translation unclear
+ - "": [T: "palkkiaksentti suljetulla ympyrällä vasen"]	#  0xee1b	(en: 'bar accent with closed circle left', google translation) # FI: translation unclear
+ - "": [T: "palkkiaksentti avoimella ympyrällä oikea"]	#  0xee1c	(en: 'bar accent with open circle right', google translation) # FI: translation unclear
+ - "": [T: "palkkiaksentti ja piste yläpuolella"]	#  0xee1d	(en: 'bar accent with over dot', google translation) # FI: translation unclear
+ - "": [T: "palkkiaksentti ja piste alapuolella"]    	#  0xee1e	(en: 'bar accent with under dot', google translation) # FI: translation unclear
+ - "": [T: "palkkiaksentti ja kaksinkertainen piste yläpuolella"]	#  0xee1f	(en: 'bar accent with double over dot', google translation) # FI: translation unclear
+ - "": [T: "palkkiaksentti ja kaksinkertainen piste alapuolella"]	#  0xee20	(en: 'bar accent with double under dot', google translation) # FI: translation unclear
+ - "": [T: "palkkiaksentti sirkumfleksillä"]        	#  0xee21	(en: 'bar accent with caret', google translation) # FI: translation unclear
+ - "": [T: "paksu alapalkkiaksentti"]            	#  0xee22	(en: 'thick under bar accent', google translation) # FI: translation unclear
+ - "": [T: "palkkiaksentti suljetulla ympyrällä oikea"]	#  0xee23	(en: 'bar accent with closed circle right', google translation) # FI: translation unclear
+ - "": [T: "suuri piste yläpuolella"]                 	#  0xee24	(en: 'large dot above', google translation) # FI: translation unclear
+ - "": [T: "kohdistusmerkki"]                  	#  0xef00	(en: 'alignment mark', google translation) # FI: translation unclear
  - "": [T: ""]                                 	#  0xef01
  - "​": [T: ""]                                 	#  0x200b
  - "": [T: ""]                                 	#  0xef02
