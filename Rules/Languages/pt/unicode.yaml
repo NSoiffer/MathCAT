@@ -219,14 +219,14 @@
             else: [T: "cross"]                 	# 	(en: 'cross', google translation)
 
  - "÷": [T: "dividido por"]                     	#  0xf7	(en: 'divided by', google translation)
- - "̀": [t: "equipamento grave de sotaque"]     	#  0x300	(en: 'grave accent embellishment', google translation)
- - "́": [t: "equipamento de sotaque agudo"]     	#  0x301	(en: 'acute accent embellishment', google translation)
- - "̂": [t: "embelezamento de sotaque circunflexo"]	#  0x302	(en: 'circumflex accent embellishment', google translation)
- - "̃": [t: "embelezamento tilde"]              	#  0x303	(en: 'tilde embellishment', google translation)
- - "̄": [t: "enfeito de macron"]                	#  0x304	(en: 'macron embellishment', google translation)
- - "̅": [t: "embelezamento da barra"]           	#  0x305	(en: 'overbar embellishment', google translation)
- - "̆": [t: "bre"]                              	#  0x306	(en: 'breve', google translation)
- - "̇": [t: "ponto acima do enfeite"]           	#  0x307	(en: 'dot above embellishment', google translation)
+ - "̀": [T: "acento grave"]     	#  0x300	(en: 'grave accent embellishment', google translation)
+ - "́": [T: "acento agudo"]     	#  0x301	(en: 'acute accent embellishment', google translation)
+ - "̂": [T: "acento circunflexo"]	#  0x302	(en: 'circumflex accent embellishment', google translation)
+ - "̃": [T: "acento tilde"]              	#  0x303	(en: 'tilde embellishment', google translation)
+ - "̄": [T: "enfeito de macron"]                	#  0x304	(en: 'macron embellishment', google translation)
+ - "̅": [T: "barra superior"]           	#  0x305	(en: 'overbar embellishment', google translation)
+ - "̆": [T: "bre"]                              	#  0x306	(en: 'breve', google translation)
+ - "̇": [T: "ponto superior"]           	#  0x307	(en: 'dot above embellishment', google translation)
 
    # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
  - "Α-Ω": 
@@ -242,47 +242,47 @@
           if: "$SpeechOverrides_CapitalLetters = ''"
           then_test:
             if: "$Impairment = 'Blindness'"
-            then: [t: "maiúsculas"]             	# 	(en: 'cap', google translation)
+            then: [T: "maiúsculas"]             	# 	(en: 'cap', google translation)
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
         replace: [spell: "translate('.', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
 
- - "α": [t: "alfa"]                             	#  0x3b1	(en: 'alpha', google translation)
- - "β": [t: "beta"]                             	#  0x3b2	(google translation)
- - "γ": [t: "gama"]                             	#  0x3b3	(en: 'gamma', google translation)
- - "δ": [t: "delta"]                            	#  0x3b4	(google translation)
- - "ε": [t: "epsilon"]                          	#  0x3b5	(google translation)
- - "ζ": [t: "zeta"]                             	#  0x3b6	(google translation)
- - "η": [t: "eta"]                              	#  0x3b7	(google translation)
- - "θ": [t: "theta"]                            	#  0x3b8	(google translation)
- - "ι": [t: "iota"]                             	#  0x3b9	(google translation)
- - "κ": [t: "kappa"]                            	#  0x3ba	(google translation)
- - "λ": [t: "lambda"]                           	#  0x3bb	(google translation)
- - "μ": [t: "mu"]                               	#  0x3bc	(google translation)
- - "ν": [t: "nu"]                               	#  0x3bd	(google translation)
- - "ξ": [t: "zai"]                              	#  0x3be	(google translation)
- - "ο": [t: "omicron"]                          	#  0x3bf	(google translation)
- - "π": [t: "pi"]                               	#  0x3c0	(google translation)
- - "ρ": [t: "rho"]                              	#  0x3c1	(google translation)
- - "ς": [t: "sigma final"]                      	#  0x3c2	(en: 'final sigma', google translation)
- - "σ": [t: "sigma"]                            	#  0x3c3	(google translation)
- - "τ": [t: "tau"]                              	#  0x3c4	(google translation)
- - "υ": [t: "upsilon"]                          	#  0x3c5	(google translation)
- - "φ": [t: "phi"]                              	#  0x3c6	(google translation)
- - "χ": [t: "chi"]                              	#  0x3c7	(google translation)
- - "ψ": [t: "psi"]                              	#  0x3c8	(google translation)
- - "ω": [t: "ómega"]                            	#  0x3c9	(en: 'omega', google translation)
- - "ϕ": [t: "phi"]                              	#  0x3d5	(google translation)
- - "ϖ": [t: "pi"]                               	#  0x3d6	(google translation)
- - "ϵ": [t: "epsilon"]                          	#  0x3f5	(google translation)
- - "϶": [t: "epsilon invertido"]                	#  0x3f6	(en: 'reversed epsilon', google translation)
+ - "α": [T: "alfa"]                             	#  0x3b1	(en: 'alpha', google translation)
+ - "β": [T: "beta"]                             	#  0x3b2	(google translation)
+ - "γ": [T: "gama"]                             	#  0x3b3	(en: 'gamma', google translation)
+ - "δ": [T: "delta"]                            	#  0x3b4	(google translation)
+ - "ε": [T: "epsilon"]                          	#  0x3b5	(google translation)
+ - "ζ": [T: "zeta"]                             	#  0x3b6	(google translation)
+ - "η": [T: "eta"]                              	#  0x3b7	(google translation)
+ - "θ": [T: "theta"]                            	#  0x3b8	(google translation)
+ - "ι": [T: "iota"]                             	#  0x3b9	(google translation)
+ - "κ": [T: "kappa"]                            	#  0x3ba	(google translation)
+ - "λ": [T: "lambda"]                           	#  0x3bb	(google translation)
+ - "μ": [T: "mu"]                               	#  0x3bc	(google translation)
+ - "ν": [T: "nu"]                               	#  0x3bd	(google translation)
+ - "ξ": [T: "zai"]                              	#  0x3be	(google translation)
+ - "ο": [T: "omicron"]                          	#  0x3bf	(google translation)
+ - "π": [T: "pi"]                               	#  0x3c0	(google translation)
+ - "ρ": [T: "rho"]                              	#  0x3c1	(google translation)
+ - "ς": [T: "sigma final"]                      	#  0x3c2	(en: 'final sigma', google translation)
+ - "σ": [T: "sigma"]                            	#  0x3c3	(google translation)
+ - "τ": [T: "tau"]                              	#  0x3c4	(google translation)
+ - "υ": [T: "upsilon"]                          	#  0x3c5	(google translation)
+ - "φ": [T: "phi"]                              	#  0x3c6	(google translation)
+ - "χ": [T: "chi"]                              	#  0x3c7	(google translation)
+ - "ψ": [T: "psi"]                              	#  0x3c8	(google translation)
+ - "ω": [T: "ómega"]                            	#  0x3c9	(en: 'omega', google translation)
+ - "ϕ": [T: "phi"]                              	#  0x3d5	(google translation)
+ - "ϖ": [T: "pi"]                               	#  0x3d6	(google translation)
+ - "ϵ": [T: "epsilon"]                          	#  0x3f5	(google translation)
+ - "϶": [T: "epsilon invertido"]                	#  0x3f6	(en: 'reversed epsilon', google translation)
 
- - "–": [t: "pt dash"]                          	#  0x2013	(en: 'en dash', google translation)
- - "—": [t: "travessão"]                        	#  0x2014	(en: 'em dash', google translation)
- - "―": [t: "barra horizontal"]                 	#  0x2015	(en: 'horizontal bar', google translation)
- - "‖": [t: "linha vertical dupla"]             	#  0x2016	(en: 'double vertical line', google translation)
+ - "–": [T: "meia-risca"]                          	#  0x2013	(en: 'en dash', google translation)
+ - "—": [T: "travessão"]                        	#  0x2014	(en: 'em dash', google translation)
+ - "―": [T: "barra horizontal"]                 	#  0x2015	(en: 'horizontal bar', google translation)
+ - "‖": [T: "linha vertical dupla"]             	#  0x2016	(en: 'double vertical line', google translation)
  - "…":                                         	#  0x2026
     test:
         if:
@@ -290,250 +290,250 @@
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
             - "../*[1][text()='…']"
-        then: [t: "ponto ponto ponto"]          	# 	(en: 'dot dot dot', google translation)
+        then: [T: "três pontos"]          	# 	(en: 'dot dot dot', google translation)
         else_test:                              	#  must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"
-            then: [t: "e assim por diante"]     	# 	(en: 'and so on', google translation)
-            else: [t: "e assim por diante"]     	# 	(en: 'and so on up to', google translation)
+            then: [T: "e assim por diante"]     	# 	(en: 'and so on', google translation)
+            else: [T: "e assim por diante até"]     	# 	(en: 'and so on up to', google translation)
 
  - "⁡":                                         	#  0x2061
     - test:
         if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
              not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':structure:')])"
-        then: [t: "de"]                         	# 	(en: 'of', google translation)
- - "⁢": [t: ""]                                 	#  0x2062
- - "⁣": [t: ""]                                 	#  0x2063
- - "⁤": [t: "e"]                                	#  0x2064	(en: 'and', google translation)
- - "′": [t: "melhor"]                           	#  0x2032	(en: 'prime', google translation)
- - "″": [t: "duplo prime"]                      	#  0x2033	(en: 'double prime', google translation)
- - "‴": [t: "triple prime"]                     	#  0x2034	(google translation)
+        then: [T: "de"]                         	# 	(en: 'of', google translation)
+ - "⁢": [T: ""]                                 	#  0x2062
+ - "⁣": [T: ""]                                 	#  0x2063
+ - "⁤": [T: "e"]                                	#  0x2064	(en: 'and', google translation)
+ - "′": [T: "aspas"]                           	#  0x2032	(en: 'prime', google translation)
+ - "″": [T: "aspas duplas"]                      	#  0x2033	(en: 'double prime', google translation)
+ - "‴": [T: "aspas triplas"]                     	#  0x2034	(google translation)
 
  - "ℂℕℚℝℤ":                                     	#  here we rely on this running through the table again to speak "cap xxx"
-    - t: "duas fios"                            	# 	(en: 'double-struck', google translation)
+    - T: "traço duplo"                            	# 	(en: 'double-struck', google translation)
     - spell: "translate('.', 'ℂℕℚℝℤ', 'CNQRZ')"
 
- - "℃": [t: "graus celsius"]                    	#  0x2103	(en: 'degrees celsius', google translation)
- - "℉": [t: "graus fahrenheit"]                 	#  0x2109	(en: 'degrees fahrenheit', google translation)
+ - "℃": [T: "graus celsius"]                    	#  0x2103	(en: 'degrees celsius', google translation)
+ - "℉": [T: "graus fahrenheit"]                 	#  0x2109	(en: 'degrees fahrenheit', google translation)
  - "ℋℛℓ":                                       	#  0x210b
-    - t: "roteiro"                              	# 	(en: 'script', google translation)
+    - T: "cursiva"                              	# 	(en: 'script', google translation)
     - spell: "translate('.', 'ℋℛℓ', 'HRl')"
- - "ℎ": [t: "planck constante"]                 	#  0x210e	(en: 'planck constant', google translation)
+ - "ℎ": [T: "constante de planck"]                 	#  0x210e	(en: 'planck constant', google translation)
  - "ℜ":                                         	#  0x211c
-    - t: "fraktur"                              	# 	(google translation)
+    - T: "fraktur"                              	# 	(google translation)
     - spell: "'R'"
 
- - "Ω": [t: "ohms"]                             	#  0x2126	(google translation)
- - "K": [t: "kelvin"]                           	#  0x212a	(google translation)
- - "Å": [t: "angstroms"]                        	#  0x212b	(google translation)
+ - "Ω": [T: "ohms"]                             	#  0x2126	(google translation)
+ - "K": [T: "kelvin"]                           	#  0x212a	(google translation)
+ - "Å": [T: "angstroms"]                        	#  0x212b	(google translation)
  - "ⅆⅇⅈⅉ":                                      	#  0x2146-9
-    - t: "itálico de dupla tensão"              	# 	(en: 'double-struck italic', google translation)
+    - T: "itálico de traço duplo"              	# 	(en: 'double-struck italic', google translation)
     - spell: "translate('.', 'ⅆⅇⅈⅉ', 'deij')"
 
- - "←": [t: "arrow para esquerda"]              	#  0x2190	(en: 'leftwards arrow', google translation)
- - "↑": [t: "arrow para cima"]                  	#  0x2191	(en: 'upwards arrow', google translation)
+ - "←": [T: "seta para esquerda"]              	#  0x2190	(en: 'leftwards arrow', google translation)
+ - "↑": [T: "seta para cima"]                  	#  0x2191	(en: 'upwards arrow', google translation)
  - "→":                                         	#  0x2192
      - test:
         if: "ancestor::*[2][self::m:limit]"
-        then: [t: "abordagens"]                 	# 	(en: 'approaches', google translation)
-        else: [t: "seta direita"]               	# 	(en: 'right arrow', google translation)
+        then: [T: "aproxima-se"]                 	# 	(en: 'approaches', google translation)
+        else: [T: "seta para direita"]               	# 	(en: 'right arrow', google translation)
 
- - "↓": [t: "arrow para baixo"]                 	#  0x2193	(en: 'downwards arrow', google translation)
- - "⇒": [t: "arrow dupla à direita"]            	#  0x21d2	(en: 'rightwards double arrow', google translation)
- - "∀": [t: "para todos"]                       	#  0x2200	(en: 'for all', google translation)
+ - "↓": [T: "seta para baixo"]                 	#  0x2193	(en: 'downwards arrow', google translation)
+ - "⇒": [T: "seta dupla para direita"]            	#  0x21d2	(en: 'rightwards double arrow', google translation)
+ - "∀": [T: "para todo"]                       	#  0x2200	(en: 'for all', google translation)
  - "∂":                                         	#  0x2202
      - test: 
          if: "$Verbosity='Terse'"
-         then: [t: "parcial"]                   	# 	(en: 'partial', google translation)
-         else: [t: "derivativo parcial"]        	# 	(en: 'partial derivative', google translation)
- - "∃": [t: "existe"]                           	#  0x2203	(en: 'there exists', google translation)
- - "∄": [t: "não existe"]                       	#  0x2204	(en: 'there does not exist', google translation)
- - "∅": [t: "conjunto vazio"]                   	#  0x2205	(en: 'empty set', google translation)
+         then: [T: "parcial"]                   	# 	(en: 'partial', google translation)
+         else: [T: "derivada parcial"]        	# 	(en: 'partial derivative', google translation)
+ - "∃": [T: "existe"]                           	#  0x2203	(en: 'there exists', google translation)
+ - "∄": [T: "não existe"]                       	#  0x2204	(en: 'there does not exist', google translation)
+ - "∅": [T: "conjunto vazio"]                   	#  0x2205	(en: 'empty set', google translation)
  - "∆":                                         	#  0x2206
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "o"]                         	# 	(en: 'the', google translation)
-     - t: "laplaciano de"                       	# 	(en: 'laplacian of', google translation)
+         then: [T: "o"]                         	# 	(en: 'the', google translation)
+     - T: "laplaciano de"                       	# 	(en: 'laplacian of', google translation)
  - "∇":                                         	#  0x2207
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "o"]                         	# 	(en: 'the', google translation)
-     - t: "gradiente de"                        	# 	(en: 'gradient of', google translation)
+         then: [T: "o"]                         	# 	(en: 'the', google translation)
+     - T: "gradiente de"                        	# 	(en: 'gradient of', google translation)
  - "∈":                                         	#  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "um elemento de"]             	# 	(en: 'an element of', google translation)
+        then: [T: "um elemento de"]             	# 	(en: 'an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set"	#  inside a set
             then_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "em"]                 	# 	(en: 'in', google translation)
+                then: [T: "em"]                 	# 	(en: 'in', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "membro de"]          	# 	(en: 'member of', google translation)
+                then: [T: "membro de"]          	# 	(en: 'member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "elemento de"]        	# 	(en: 'element of', google translation)
-              - else: [t: "pertencendo à"]      	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belonging to', google translation)
+                then: [T: "elemento de"]        	# 	(en: 'element of', google translation)
+              - else: [T: "pertencendo à"]      	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belonging to', google translation)
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "é um membro de"]     	# 	(en: 'is a member of', google translation)
+                then: [T: "é um membro de"]     	# 	(en: 'is a member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "é um elemento de"]   	# 	(en: 'is an element of', google translation)
+                then: [T: "é um elemento de"]   	# 	(en: 'is an element of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "é em"]               	# 	(en: 'is in', google translation)
-              - else: [t: "pertence a"]         	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belongs to', google translation)
+                then: [T: "està em"]               	# 	(en: 'is in', google translation)
+              - else: [T: "pertence à"]         	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belongs to', google translation)
  - "∉":                                         	#  0x2209
     # rule is identical to 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "não é um elemento de"]       	# 	(en: 'is not an element of', google translation)
+        then: [T: "não é um elemento de"]       	# 	(en: 'is not an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set"	#  inside a set
             then_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "não em"]             	# 	(en: 'not in', google translation)
+                then: [T: "não esta em"]             	# 	(en: 'not in', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "não membro de"]      	# 	(en: 'not member of', google translation)
+                then: [T: "não é um membro de"]      	# 	(en: 'not member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "não elemento de"]    	# 	(en: 'not element of', google translation)
-              - else: [t: "não pertencer a"]    	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'not belonging to', google translation)
+                then: [T: "não é um elemento de"]    	# 	(en: 'not element of', google translation)
+              - else: [T: "não pertencer à"]    	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'not belonging to', google translation)
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "não é um membro de"] 	# 	(en: 'is not a member of', google translation)
+                then: [T: "não é um membro de"] 	# 	(en: 'is not a member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "não é um elemento de"]	# 	(en: 'is not an element of', google translation)
+                then: [T: "não é um elemento de"]	# 	(en: 'is not an element of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "não está dentro"]    	# 	(en: 'is not in', google translation)
-              - else: [t: "não pertence a"]     	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'does not belong to', google translation)
+                then: [T: "não está em"]    	# 	(en: 'is not in', google translation)
+              - else: [T: "não pertence à"]     	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'does not belong to', google translation)
  - "∊":                                         	#  0x220a
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "é um elemento de"]           	# 	(en: 'is an element of', google translation)
+        then: [T: "é um elemento de"]           	# 	(en: 'is an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set"	#  inside a set
             then_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "em"]                 	# 	(en: 'in', google translation)
+                then: [T: "em"]                 	# 	(en: 'in', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "membro de"]          	# 	(en: 'member of', google translation)
+                then: [T: "membro de"]          	# 	(en: 'member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "elemento de"]        	# 	(en: 'element of', google translation)
-              - else: [t: "pertencendo à"]      	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belonging to', google translation)
+                then: [T: "elemento de"]        	# 	(en: 'element of', google translation)
+              - else: [T: "pertencendo à"]      	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belonging to', google translation)
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "é um membro de"]     	# 	(en: 'is a member of', google translation)
+                then: [T: "é um membro de"]     	# 	(en: 'is a member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "é um elemento de"]   	# 	(en: 'is an element of', google translation)
+                then: [T: "é um elemento de"]   	# 	(en: 'is an element of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "é em"]               	# 	(en: 'is in', google translation)
-              - else: [t: "pertence a"]         	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belongs to', google translation)
- - "∏": [t: "produtos"]                         	#  0x220f	(en: 'product', google translation)
- - "∐": [t: "co-produção"]                      	#  0x2210	(en: 'co-product', google translation)
- - "∑": [t: "soma"]                             	#  0x2211	(en: 'sum', google translation)
- - "−": [t: "menos"]                            	#  0x2212	(en: 'minus', google translation)
- - "∓": [t: "menos ou mais"]                    	#  0x2213	(en: 'minus or plus', google translation)
- - "∗": [t: "vezes"]                            	#  0x2217	(en: 'times', google translation)
- - "∘": [t: "composto com"]                     	#  0x2218	(en: 'composed with', google translation)
+                then: [T: "està em"]               	# 	(en: 'is in', google translation)
+              - else: [T: "pertence à"]         	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belongs to', google translation)
+ - "∏": [T: "produtório"]                         	#  0x220f	(en: 'product', google translation)
+ - "∐": [T: "co-produtório"]                      	#  0x2210	(en: 'co-product', google translation)
+ - "∑": [T: "somatório"]                             	#  0x2211	(en: 'sum', google translation)
+ - "−": [T: "menos"]                            	#  0x2212	(en: 'minus', google translation)
+ - "∓": [T: "menos ou mais"]                    	#  0x2213	(en: 'minus or plus', google translation)
+ - "∗": [T: "vezes"]                            	#  0x2217	(en: 'times', google translation)
+ - "∘": [T: "composto com"]                     	#  0x2218	(en: 'composed with', google translation)
  - "√":                                         	#  0x221a
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "o"]                         	# 	(en: 'the', google translation)
-     - t: "raiz quadrada de"                    	# 	(en: 'square root of', google translation)
+         then: [T: "o"]                         	# 	(en: 'the', google translation)
+     - T: "raiz quadrada de"                    	# 	(en: 'square root of', google translation)
  - "∝":                                         	#  0x221d
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é"]                         	# 	(en: 'is', google translation)
-     - t: "proporcional a"                      	# 	(en: 'proportional to', google translation)
- - "∞": [t: "infinidade"]                       	#  0x221e	(en: 'infinity', google translation)
- - "∟": [t: "ângulo certo"]                     	#  0x221f	(en: 'right angle', google translation)
- - "∠": [t: "ângulo"]                           	#  0x2220	(en: 'angle', google translation)
- - "∡": [t: "ângulo medido"]                    	#  0x2221	(en: 'measured angle', google translation)
- - "∣": [t: "divide"]                           	#  0x2223	(en: 'divides', google translation)
- - "∤": [t: "não se divide"]                    	#  0x2224	(en: 'does not divide', google translation)
+         then: [T: "é"]                         	# 	(en: 'is', google translation)
+     - T: "proporcional a"                      	# 	(en: 'proportional to', google translation)
+ - "∞": [T: "infinito"]                       	#  0x221e	(en: 'infinity', google translation)
+ - "∟": [T: "ângulo reto"]                     	#  0x221f	(en: 'right angle', google translation)
+ - "∠": [T: "ângulo"]                           	#  0x2220	(en: 'angle', google translation)
+ - "∡": [T: "ângulo medido"]                    	#  0x2221	(en: 'measured angle', google translation)
+ - "∣": [T: "divide"]                           	#  0x2223	(en: 'divides', google translation)
+ - "∤": [T: "não é dividido"]                    	#  0x2224	(en: 'does not divide', google translation)
  - "∥":                                         	#  0x2225
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é"]                         	# 	(en: 'is', google translation)
-     - t: "paralelo a"                          	# 	(en: 'parallel to', google translation)
+         then: [T: "é"]                         	# 	(en: 'is', google translation)
+     - T: "paralelo a"                          	# 	(en: 'parallel to', google translation)
  - "∦":                                         	#  0x2226
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é"]                         	# 	(en: 'is', google translation)
-     - t: "não paralelo a"                      	# 	(en: 'not parallel to', google translation)
- - "∧": [t: "e"]                                	#  0x2227	(en: 'and', google translation)
- - "∨": [t: "ou"]                               	#  0x2228	(en: 'or', google translation)
- - "∩": [t: "interseção"]                       	#  0x2229	(en: 'intersection', google translation)
- - "∪": [t: "união"]                            	#  0x222a	(en: 'union', google translation)
- - "∫": [t: "integrante"]                       	#  0x222b	(en: 'integral', google translation)
- - "∬": [t: "dupla integral"]                   	#  0x222c	(en: 'double integral', google translation)
- - "∭": [t: "triplo integral"]                  	#  0x222d	(en: 'triple integral', google translation)
- - "∮": [t: "contorno integral"]                	#  0x222e	(en: 'contour integral', google translation)
+         then: [T: "é"]                         	# 	(en: 'is', google translation)
+     - T: "não é paralelo a"                      	# 	(en: 'not parallel to', google translation)
+ - "∧": [T: "e"]                                	#  0x2227	(en: 'and', google translation)
+ - "∨": [T: "ou"]                               	#  0x2228	(en: 'or', google translation)
+ - "∩": [T: "interseção"]                       	#  0x2229	(en: 'intersection', google translation)
+ - "∪": [T: "união"]                            	#  0x222a	(en: 'union', google translation)
+ - "∫": [T: "integral"]                       	#  0x222b	(en: 'integral', google translation)
+ - "∬": [T: "integral dupla"]                   	#  0x222c	(en: 'double integral', google translation)
+ - "∭": [T: "integral tripla"]                  	#  0x222d	(en: 'triple integral', google translation)
+ - "∮": [T: "contour integral"]                	#  0x222e	(en: 'contour integral', google translation)
  - "∶":                                         	#  0x2236
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é"]                         	# 	(en: 'is', google translation)
-     - t: "para"                                	# 	(en: 'to', google translation)
- - "∷": [t: "como"]                             	#  0x2237	(en: 'as', google translation)
- - "∼": [t: "varia com"]                        	#  0x223c	(en: 'varies with', google translation)
- - "∽": [t: "tilde revertido"]                  	#  0x223d	(en: 'reversed tilde', google translation)
+         then: [T: "é"]                         	# 	(en: 'is', google translation)
+     - T: "para"                                	# 	(en: 'to', google translation)
+ - "∷": [T: "como"]                             	#  0x2237	(en: 'as', google translation)
+ - "∼": [T: "varia com"]                        	#  0x223c	(en: 'varies with', google translation)
+ - "∽": [T: "til reverso"]                  	#  0x223d	(en: 'reversed tilde', google translation)
  - "∾":                                         	#  0x223e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é"]                         	# 	(en: 'is', google translation)
-     - t: "mais positivo"                       	# 	(en: 'most positive', google translation)
- - "∿": [t: "onda senoidal"]                    	#  0x223f	(en: 'sine wave', google translation)
+         then: [T: "é"]                         	# 	(en: 'is', google translation)
+     - T: "mais positivo"                       	# 	(en: 'most positive', google translation)
+ - "∿": [T: "onda senoidal"]                    	#  0x223f	(en: 'sine wave', google translation)
  - "≠":                                         	#  0x2260
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é"]                         	# 	(en: 'is', google translation)
-     - t: "não igual a"                         	# 	(en: 'not equal to', google translation)
+         then: [T: "é"]                         	# 	(en: 'is', google translation)
+     - T: "não é igual a"                         	# 	(en: 'not equal to', google translation)
  - "≡":                                         	#  0x2261
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é"]                         	# 	(en: 'is', google translation)
-     - t: "idêntico a"                          	# 	(en: 'identical to', google translation)
+         then: [T: "é"]                         	# 	(en: 'is', google translation)
+     - T: "idêntico a"                          	# 	(en: 'identical to', google translation)
  - "≤":                                         	#  0x2264
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é"]                         	# 	(en: 'is', google translation)
-     - t:  "less than or equal to"
+         then: [T: "é"]                         	# 	(en: 'is', google translation)
+     - T:  "menor ou igual a"
  - "≥":                                         	#  0x2265
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é"]                         	# 	(en: 'is', google translation)
-     - t: "melhor que ou igual a"               	# 	(en: 'greater than or equal to', google translation)
+         then: [T: "é"]                         	# 	(en: 'is', google translation)
+     - T: "maior ou igual a"               	# 	(en: 'greater than or equal to', google translation)
  - "≦": [t: "menos do que mais igual a"]        	#  0x2266	(en: 'less than over equal to', google translation)
  - "≧": [t: "maior que mais igual a"]           	#  0x2267	(en: 'greater than over equal to', google translation)
- - "≺": [t: "precedes"]                         	#  0x227a	(google translation)
- - "≻": [t: "consegue"]                         	#  0x227b	(en: 'succeeds', google translation)
+ - "≺": [T: "precede"]                         	#  0x227a	(google translation)
+ - "≻": [T: "sucede"]                         	#  0x227b	(en: 'succeeds', google translation)
  - "⊂":                                         	#  0x2282
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é um"]                      	# 	(en: 'is a', google translation)
-     - t: "subconjunto de"                      	# 	(en: 'subset of', google translation)
+         then: [T: "é um"]                      	# 	(en: 'is a', google translation)
+     - T: "subconjunto de"                      	# 	(en: 'subset of', google translation)
  - "⊃":                                         	#  0x2283
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é um"]                      	# 	(en: 'is a', google translation)
-     - t: "superset de"                         	# 	(en: 'superset of', google translation)
+         then: [T: "é um"]                      	# 	(en: 'is a', google translation)
+     - T: "superset"                         	# 	(en: 'superset of', google translation)
  - "⊄":                                         	#  0x2284
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é"]                         	# 	(en: 'is', google translation)
-     - t: "não é um subconjunto de"             	# 	(en: 'not a subset of', google translation)
+         then: [T: "é"]                         	# 	(en: 'is', google translation)
+     - T: "não é um subconjunto de"             	# 	(en: 'not a subset of', google translation)
  - "⊅":                                         	#  0x2285
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é"]                         	# 	(en: 'is', google translation)
-     - t: "não é um superconjunto de"           	# 	(en: 'not a superset of', google translation)
+         then: [T: "é"]                         	# 	(en: 'is', google translation)
+     - T: "não é um superset de"           	# 	(en: 'not a superset of', google translation)
  - "⊆":                                         	#  0x2286
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é um"]                      	# 	(en: 'is a', google translation)
-     - t: "subconjunto ou igual a"              	# 	(en: 'subset of or equal to', google translation)
+         then: [T: "é um"]                      	# 	(en: 'is a', google translation)
+     - T: "subconjunto ou conjunto igual a"              	# 	(en: 'subset of or equal to', google translation)
  - "⊇":                                         	#  0x2287
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "é um"]                      	# 	(en: 'is a', google translation)
-     - t: "superset de ou igual a"              	# 	(en: 'superset of or equal to', google translation)
+         then: [T: "é um"]                      	# 	(en: 'is a', google translation)
+     - T: "subconjunto ou conjunto igual a"              	# 	(en: 'superset of or equal to', google translation)
