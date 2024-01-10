@@ -2512,7 +2512,7 @@
  - "㏄": [t: "cubic centimeters"]                   # 0x33c4
  - "㏅": [t: "candelas"]                            # 0x33c5
  - "㏆": [t: "coulombs per kilogram"]               # 0x33c6
- - "㏇": [t: "cardiac output"]                      # 0x33c7
+ - "㏇": [t: "cap C, o, period"]                    # 0x33c7 (I have no idea what this is)
  - "㏈": [t: "decibels"]                            # 0x33c8
  - "㏉": [t: "grays"]                               # 0x33c9
  - "㏊": [t: "hectares"]                            # 0x33ca
