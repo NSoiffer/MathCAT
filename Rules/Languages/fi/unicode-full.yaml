@@ -2343,8 +2343,8 @@
  - "⸑": [T: "käännetty haarukkakappale"]      	#  0x2e11	(en: 'reversed forked paragraphos', google translation) NOTE: translation unclear
  - "⸒": [T: "hypodiastoli"]                     	#  0x2e12	(en: 'hypodiastole', google translation)
  - "⸓": [T: "obelos pisteellä"]                  	#  0x2e13	(en: 'dotted obelos', google translation)
- - "⸔": [T: "ancora alaspäin"]                  	#  0x2e14	(en: 'downwards ancora', google translation)
- - "⸕": [T: "ancora ylöspäin"]                  	#  0x2e15	(en: 'upwards ancora', google translation)
+ - "⸔": [T: "ankkuri alaspäin"]                  	#  0x2e14	(en: 'downwards ancora', google translation)
+ - "⸕": [T: "ankkuri ylöspäin"]                  	#  0x2e15	(en: 'upwards ancora', google translation)
  - "⸖": [T: "oikealle osoittava kulma pisteillä"]      	#  0x2e16	(en: 'dotted right pointing angle', google translation)
  - "⸗": [T: "kaksinkertainen vino tavuviiva"]        	#  0x2e17	(en: 'double oblique hyphen', google translation)
  - "⸘": [T: "käänteinen interrobang"]           	#  0x2e18	(en: 'inverted interrobang', google translation)
