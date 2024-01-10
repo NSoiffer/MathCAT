@@ -81,6 +81,8 @@
  - "}": [t: "c⠸c⠜"]               # 0x007D (Right curly bracket)
  - "〈": [t: "o⠈⠣"]               # 0x2329 (Left angle bracket)
  - "〉": [t: "c⠈⠜"]               # 0x232A (Right angle bracket)
+ - "⟨": [t: "o⠈⠣"]               # 0x27E8 (Left angle bracket)
+ - "⟩": [t: "c⠈⠜"]               # 0x27E9 (Right angle bracket)
  - "|":                # 0x007C (Vertical line)
     - test:
         if: "preceding-sibling::* and following-sibling::*"
