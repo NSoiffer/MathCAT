@@ -129,6 +129,7 @@
  - "̅": [T: "yläviiva"]                    #  0x305	(en: 'overbar embellishment', google: 'ylipalkin koriste')
  - "̆": [T: "lyhyysmerkki"]                #  0x306	(en: 'breve embellishment', google: 'breven koriste')
  - "̇": [T: "yläpiste"]                	 #  0x307	(en: 'dot above embellishment', google: 'piste koristelun yläpuolella')
+ - "̈": [T: "treema"]                      #  0x308	(en: 'diaeresis embellishment', google: 'diaeresis -koriste') # FI: should be "pilkku pilkku"?
  - "̉": [T: "yläkoukku"]    	             #  0x309	(en: 'hook above embellishment', google translation)
  - "̊": [T: "yläympyrä"]               	 #  0x30a	(en: 'ring above embellishment', google: 'rengas koristelun yläpuolella')
  - "̋": [T: "kakoisakuutti"]             	 #  0x30b	(en: 'double acute accent embellishment', google translation)
