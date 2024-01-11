@@ -420,8 +420,8 @@
  - "⃯": [T: "oikea alanuoli"]	                    #  0x20ef	(en: 'right arrow below embellishment', google translation)
  - "⃰": [T: "yläpuolinen asteriski"]  	#  0x20f0	(en: 'asterisk above embellishment', google translation)
  - "℄": [T: "keskiviivasymboli"]                  	#  0x2104	(en: 'center line symbol', google translation)
- - "℅": [T: "jonkun luona"]                          	#  0x2105	(google: 'hoito') # FI: used in post "jonkun luona", "see  oo"
- - "℆": [T: "cada una"]                         	#  0x2106	(google translation) # FI: Spanish  for "each one",  "see uu"
+ - "℅": [T: "C O"]                          	#  0x2105	(google: 'hoito')
+ - "℆": [T: "C U"]                         	#  0x2106	(google translation)
  - "ℇ": [T: "eulerin vakio"]                    	#  0x2107	(en: 'euler's constant', google: 'eulerin jatkuva') # FI: more German pronunciation?
  - "℈": [T: "scruple"]                         	    #  0x2108	(en: 'scruples', google translation) # FI: more Finnish pronunciation?
  - "℉": [T: "astetta fahrenheitia"]             	#  0x2109	(en: 'degrees fahrenheit', google: 'fahrenheit-astetta') # FI: more German pronunciation?
@@ -793,8 +793,8 @@
  - "∢": [T: "kaarellinen kulma"]                    #  0x2222	(en: 'spherical angle', google: 'pallomainen kulma')
  - "∣": [T: "jakaa"]                            	#  0x2223	(en: 'divides')
  - "∤": [T: "ei jaa"]                           	#  0x2224	(en: 'does not divide')
- - "∧": [T: "looginen ja"]                      	#  0x2227	(en: 'and', google: 'ja') # FI: should we remove the "looginen"?
- - "∨": [T: "looginen tai"]                     	#  0x2228	(en: 'or', google: 'tai') # FI: should we remove the "looginen"?
+ - "∧": [T: "ja"]                      	#  0x2227	(en: 'and', google: 'ja')
+ - "∨": [T: "tai"]                     	#  0x2228	(en: 'or', google: 'tai')
  - "∩": [T: "leikkaus"]                         	#  0x2229	(en: 'intersection', google: 'risteys')
  - "∪": [T: "unioni"]                          	    #  0x222a	(en: 'union', google: 'liitto')
  - "∫": [T: "integraali"]                       	#  0x222b	(en: 'integral', google: 'olennainen')
