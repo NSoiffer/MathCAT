@@ -811,7 +811,7 @@
  - "∶":                                         	#  0x2236
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "on"]                        	    # 	(en: 'is', google translation)
+         then: [T: ""]                        	    # 	(en: 'is', google translation)
      - T: "suhde"                               	# 	(en: 'to', google: 'to')
  - "∷": [T: "suhteellisuus"]                        #  0x2237	(en: 'as', google: 'kuten')
  - "∸": [T: "piste-miinus"]                     	#  0x2238	(en: 'dot minus')
@@ -820,7 +820,7 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "geometrinen suhde"                   	# 	(en: 'geometrically proportional to', google: 'geometrisesti verrannollinen') # FI: "geometrisesti verranollinen"?
+     - T: "geometrisesti verrannollinen"                   	# 	(en: 'geometrically proportional to', google: 'geometrisesti verrannollinen') # FI: "geometrisesti verranollinen"?
  - "∻":                                         	#  0x223b
      - test: 
          if: "$Verbosity!='Terse'"
@@ -832,7 +832,7 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "ylösalainen laiska s"        	        # 	(en: 'most positive', google: 'positiivisin') # FI: check translation
+     - T: "positiivisin"        	        # 	(en: 'most positive', google: 'positiivisin') # FI: unclear translation
  - "∿": [T: "siniaalto"]                        	#  0x223f	(en: 'sine wave', google: 'siniaalto')
  - "≀": [T: "punostulo"]                 	        #  0x2240	(en: 'wreath product', google: 'seppele tuote')
  - "≁": [T: "ei tilde"]                         	#  0x2241	(en: 'not tilde')
@@ -860,7 +860,7 @@
  - "≇":                                         	#  0x2247
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "on"]                        	# 	(en: 'is', google translation)
+         then: [T: ""]                        	# 	(en: 'is', google translation)
      - T: "ei likimäärin eikä yhtä suuri kuin"  	# 	(en: 'neither approximately nor actually equal to', google: 'ei suunnilleen eikä oikeastaan yhtä suuri kuin')
  - "≈":                                         	#  0x2248
      - test: 
@@ -870,7 +870,7 @@
  - "≉":                                         	#  0x2249
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "on"]                        	# 	(en: 'is', google translation)
+         then: [T: ""]                        	# 	(en: 'is', google translation)
      - T: "ei likimäärin yhtä suuri kuin"           # 	(en: 'not almost equal to', google: 'ei melkein yhtä suuri kuin')
  - "≊":                                         	#  0x224a
      - test: 
@@ -927,13 +927,13 @@
      - T: "samakulmainen kuin"                  	# 	(en: 'equiangular to', google: 'tasa -arvoinen')
  - "≛": [T: "tähti yhtä suuri kuin"]                 	#  0x225b	(en: 'star equals', google: 'tähti on yhtä suuri kuin')
  - "≜": [T: "delta yhtä suuri kuin"]                	    #  0x225c	(en: 'delta equals', google: 'delta on tasa -arvoinen')
- - "≝": [T: "määritelmän mukaan yhtä suuri kuin"]	#  0x225d	(en: 'is defined to be', google: 'on määritelty olevan')
+ - "≝": [T: "määritelmän mukaan yhtä kuin"]	#  0x225d	(en: 'is defined to be', google: 'on määritelty olevan')
  - "≞":                                         	#  0x225e
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
      - T: "mitatusti yhtä suuri kuin"            	# 	(en: 'measured by', google: 'mitattu')
- - "≟": [T: "kyseenalaisesti yhtä suuri kuin"]   	#  0x225f	(en: 'has an unknown relationship with', google: 'on tuntematon suhde')
+ - "≟": [T: "kyseenalaisesti yhtä kuin"]   	#  0x225f	(en: 'has an unknown relationship with', google: 'on tuntematon suhde')
  - "≠":                                         	#  0x2260
      - test: 
          if: "$Verbosity!='Terse'"
@@ -943,12 +943,12 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "identtisesti yhtä suuri kuin"             # 	(en: 'identical to', google: 'yhtäläinen')
+     - T: "identtinen"             # 	(en: 'identical to', google: 'yhtäläinen')
  - "≢":                                         	#  0x2262
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "identtisesti erisuuri kuin"              # 	(en: 'not identical to', google: 'ei identtinen')
+     - T: "identtisesti eri kuin"              # 	(en: 'not identical to', google: 'ei identtinen')
  - "≣":                                         	#  0x2263
      - test: 
          if: "$Verbosity!='Terse'"
@@ -984,7 +984,7 @@
  - "≭":                                         	#  0x226d
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "on"]                        	# 	(en: 'is', google translation)
+         then: [T: ""]                        	# 	(en: 'is', google translation)
      - T: "ei yhtäpitävä"                       	# 	(en: 'not equivalent to', google: 'ei vastaa')
  - "≮":                                         	#  0x226e
      - test: 
@@ -1211,8 +1211,8 @@
          then: [T: "on"]                        	# 	(en: 'is', google translation)
      - T: "oikeanpuoleinen puolisuora tulo"            	# 	(en: 'the right semidirect product of', google: 'oikea semidirect -tuote')
  - "⋍": [T: "käänteinen tilde yhtäsuuruus"]     	#  0x22cd	(en: 'reversed tilde equals', google: 'käänteinen tilde on tasa -arvoinen')
- - "⋎": [T: "kaareva looginen tai"]             	#  0x22ce	(en: 'curly logical or', google: 'kihara looginen tai') # FI: include "logical", "looginen" or not?
- - "⋏": [T: "kaareva looginen ja"]              	#  0x22cf	(en: 'curly logical and', google: 'curly looginen ja') # FI: include "logical", "looginen" or not?
+ - "⋎": [T: "kaareva looginen tai"]             	#  0x22ce	(en: 'curly logical or', google: 'kihara looginen tai')
+ - "⋏": [T: "kaareva looginen ja"]              	#  0x22cf	(en: 'curly logical and', google: 'curly looginen ja')
  - "⋐":                                         	#  0x22d0
      - test: 
          if: "$Verbosity!='Terse'"
@@ -1315,10 +1315,10 @@
          then: [T: ""]                        	    # 	(en: 'is', google translation)
      - T: "ei ole normaali aliryhmä tai yhtä kuin"	# 	(en: 'not a normal subgroup of nor is equal to', google: 'ei normaali alaryhmä, joka ei ole yhtä suuri')
  - "⋭": [T: "ei sisällä normaalina aliryhmänä tai ole yhtä kuin"]	#  0x22ed	(en: 'does not contain as a normal subgroup nor is equal to', google: 'ei sisällä normaalia alaryhmää eikä ole yhtä suuri kuin')
- - "⋮": [T: "pystyellipsi"]      	                #  0x22ee	(en: 'vertical ellipsis', google: 'pystysuora ellipsis') # FI: "ellipse", "ellipsi" into "dot dot dot", "piste piste piste"?
+ - "⋮": [T: "pystyellipsi"]      	                #  0x22ee	(en: 'vertical ellipsis', google: 'pystysuora ellipsis') # FI: context? used in matrices?
  - "⋯": [T: "piste piste piste"]      	        #  0x22ef	(en: 'dot dot dot', google: 'dot dot dot')
- - "⋰": [T: "nouseva ellipsi"]                  	#  0x22f0	(en: 'upwards diagonal ellipsis', google: 'ylöspäin diagonaalinen ellipsi') # FI: "ellipse", "ellipsi" into "dot dot dot", "piste piste piste"?
- - "⋱": [T: "laskeva ellipsi"]     	                #  0x22f1	(en: 'diagonal ellipsis', google: 'diagonaalinen ellipsis') # FI: "ellipse", "ellipsi" into "dot dot dot", "piste piste piste"?
+ - "⋰": [T: "nouseva ellipsi"]                  	#  0x22f0	(en: 'upwards diagonal ellipsis', google: 'ylöspäin diagonaalinen ellipsi') # FI: context? used in matrices?
+ - "⋱": [T: "laskeva ellipsi"]     	                #  0x22f1	(en: 'diagonal ellipsis', google: 'diagonaalinen ellipsis') # FI: context? used in matrices?
  - "⋲": [T: "poikkiviivainen kuulumismerkki"]	    #  0x22f2	(en: 'element of with long horizontal stroke', google: 'elementti pitkällä vaakasuoralla iskulla')
  - "⋳": [T: "kuulumismerkki pystyviivaan päättyvällä poikkiviivalla"]	#  0x22f3	(en: 'element of with vertical bar at end of horizontal stroke', google: 'elementti pystysuoralla tankolla vaakasuoran iskun lopussa')
  - "⋴": [T: "pieni kuulumismerkki pystyviivaan päättyvällä poikkiviivalla"]	#  0x22f4	(en: 'element of with vertical bar at end of horizontal stroke', google: 'elementti pystysuoralla tankolla vaakasuoran iskun lopussa')
@@ -1381,9 +1381,9 @@
  - "⌭": [T: "sylinterisyys"]                     	#  0x232d	(google: 'sylinteryys')
  - "⌮": [T: "profiilin ympäri"]               	#  0x232e	(en: "all around profile" google: 'ympäri profiilia') # FI: translation unclear
  - "⌯": [T: "symmetria"]                        	#  0x232f	(en: 'symmetry', google translation)
- - "⌰": [T: "kokonaispoikkeama"]                   	    #  0x2330	(en: 'total runout', google translation) # FI: meaning bit unclear, placeholder for correct
+ - "⌰": [T: "toleranssin yhteissumma"]                   	    #  0x2330	(en: 'total runout', google translation) # FI: meaning bit unclear, placeholder for correct
  - "⌱": [T: "alkudimensio"]                	    #  0x2331	(en: 'dimension origin', google translation) # FI: translation unclear
- - "⌲": [T: "kartio"]              	                #  0x2332	(en: 'conical taper', google translation) # FI: translation unclear
+ - "⌲": [T: "kartiovähentyminen"]              	                #  0x2332	(en: 'conical taper', google translation) # FI: translation unclear
  - "⌳": [T: "kaltevuus"]                        	#  0x2333	(en: 'slope', google translation)
  - "⌴": [T: "tasoupotin"]                         	#  0x2334	(en: 'counterbore', google translation)
  - "⌵": [T: "kärkiupotin"]                        	#  0x2335	(en: 'countersink', google translation)
@@ -2060,7 +2060,7 @@
  - "⩍": [T: "suljettu leikkaus serifillä"]   	#  0x2a4d	(en: 'closed intersection with serifs', google: 'suljettu risteys serifien kanssa')
  - "⩎": [T: "kaksinkertainen neliöleikkus"]   	#  0x2a4e	(en: 'double square intersection', google translation)
  - "⩏": [T: "kaksinkertainen neliöunioni"]              	#  0x2a4f	(google translation)
- - "⩐": [T: "suljettu unioni serifillä ja smash product"]	#  0x2a50	(en: 'closed union with serifs and smash product', google: 'suljettu liitto serifien ja smash -tuotteen kanssa')
+ - "⩐": [T: "suljettu unioni serifillä ja smash tulo"]	#  0x2a50	(en: 'closed union with serifs and smash product', google: 'suljettu liitto serifien ja smash -tuotteen kanssa')
  - "⩑": [T: "looginen ja yläpisteellä"]     	#  0x2a51	(en: 'logical and with dot above', google translation)
  - "⩒": [T: "looginen tai yläpisteellä"]	#  0x2a52	(en: 'logical or with dot above', google translation)
  - "⩓": [T: "kaksinkertainen looginen ja"]               	#  0x2a53	(google: 'kaksinkertainen looginen ja')
@@ -2647,7 +2647,7 @@
  - "": [T: "keskikokoinen pisteoperaattori vapaa radikaali"]	#  0xe98f	(en: 'medium dot operator free radical', google translation)
  - "": [T: "valkoinen ylöspäin osoittava kolmio palkin yläpuolella"]	#  0xe990	(en: 'white up pointing triangle above bar', google translation)
  - "": [T: "identtinen ja yhdensuuntainen"]         	#  0xe991	(en: 'identical and parallel to', google translation)
- - "": [T: "smash product"]                     	#  0xe992	(en: 'smash product', google translation) # FI: meaning unclear
+ - "": [T: "smash tulo"]                     	#  0xe992	(en: 'smash product', google translation) # FI: meaning unclear
  - "": [T: "kolminkertainen palkkioperaattori vaakasuoralla palkilla"]	#  0xe993	(en: 'triple bar operator with horizontal bar', google translation)
  - "": [T: "identtinen kaksoisvinoviivalla"]       	#  0xe994	(en: 'identical to with double slash', google translation)
  - "": [T: "kolminkertaiset yliviivatut palkit"]           	#  0xe995	(en: 'triple crossed bars', google translation) # FI: : translation unclear
@@ -2752,7 +2752,7 @@
  - "": [T: "ei kongruentti piste"]              	#  0xea64	(en: 'not congruent dot', google translation)
  - "": [T: "käännetty ei ole yhtä suuri kuin"]     #  0xea65	(en: 'reverse not equal', google translation)
  - "": [T: "ei vasen kolmio on yhtä suuri kuin"] 	#  0xea70	(en: 'not vert left triangle equals', google translation) # FI: translation unclear
- - "": [T: "ei oikea oikea on yhtä suuri kuin"]    #  0xea71	(en: 'not vert right triangle equals', google translation) # FI: translation unclear
+ - "": [T: "ei oikea on yhtä suuri kuin"]    #  0xea71	(en: 'not vert right triangle equals', google translation) # FI: translation unclear
  - "": [T: "ei osittainen"]                    	#  0xea80	(en: 'not partial', google translation)
  - "": [T: "nuolen koristeiden pidennys"]     	#  0xeb00	(en: 'arrow embellishment extender', google translation) # FI: translation unclear
  - "": [T: "oikea nuoli vasemman nuolen yläpuolella"]	#  0xeb01	(en: 'arrow rightwards over arrow leftwards', google translation)
