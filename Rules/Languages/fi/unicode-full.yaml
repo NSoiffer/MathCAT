@@ -82,7 +82,7 @@
  - "˖": [T: "plus"]            	                    #  0x2d6	(en: 'modifier plus sign', google translation)
  - "˗": [T: "miinus"]     	                        #  0x2d7	(en: 'modifier minus sign', google translation)
  - "˘": [T: "lyhyysmerkki"]                     	#  0x2d8	(en: 'breve', google: 'breve')
- - "˙": [T: "yläpiste"]                         	#  0x2d9	(en: 'dot', google: 'piste') # FI: should be only "piste"?
+ - "˙": [T: "yläpiste"]                         	#  0x2d9	(en: 'dot', google: 'piste') # FI: should be only "piste"? used in derivative?
  - "˚": [T: "yläympyrä"]               	            #  0x2da	(en: 'ring above', google: 'rengas yläpuolella')
  - "˛": [T: "ogonek"]                           	#  0x2db
  - "˜": [T: "pieni tilde"]                          #  0x2dc	(en: 'small tilde', google: 'pieni tilde')
@@ -99,8 +99,8 @@
  - "˧": [T: "keskiäänipalkki"]  	                #  0x2e7	(en: 'modifier mid tone bar', google translation)
  - "˨": [T: "matala äänipalkki"]	                #  0x2e8	(en: 'modifier low tone bar', google translation)
  - "˩": [T: "erittäin matala äänipalkki"]	        #  0x2e9	(en: 'modifier extra-low tone bar', google translation)
- - "˪": [T: "yin lähtöäänimerkki"]	                #  0x2ea	(en: 'modifier yin departing tone mark', google translation) # FI: "jin"
- - "˫": [T: "yang lähtöäänimerkki"]	                #  0x2eb	(en: 'modifier yang departing tone mark', google translation) # FI: "jin"
+ - "˪": [T: "yin lähtöäänimerkki"]	                #  0x2ea	(en: 'modifier yin departing tone mark', google translation) # FI: unclear
+ - "˫": [T: "yang lähtöäänimerkki"]	                #  0x2eb	(en: 'modifier yang departing tone mark', google translation) # FI: unclear
  - "ˬ": [T: "ääntämismerkki"]     	                #  0x2ec	(en: 'modifier voicing', google translation)
  - "˭": [T: "aspiroitumattomuusmerkki"]         	#  0x2ed	(en: 'modifier unaspirated', google translation)
  - "ˮ": [T: "kaksoisheittomerkki"]	                #  0x2ee	(en: 'modifier double apostrophe', google translation)
@@ -129,7 +129,6 @@
  - "̅": [T: "yläviiva"]                    #  0x305	(en: 'overbar embellishment', google: 'ylipalkin koriste')
  - "̆": [T: "lyhyysmerkki"]                #  0x306	(en: 'breve embellishment', google: 'breven koriste')
  - "̇": [T: "yläpiste"]                	 #  0x307	(en: 'dot above embellishment', google: 'piste koristelun yläpuolella')
- - "̈": [T: "treema"]                      #  0x308	(en: 'diaeresis embellishment', google: 'diaeresis -koriste') # FI: should be "pilkku"?
  - "̉": [T: "yläkoukku"]    	             #  0x309	(en: 'hook above embellishment', google translation)
  - "̊": [T: "yläympyrä"]               	 #  0x30a	(en: 'ring above embellishment', google: 'rengas koristelun yläpuolella')
  - "̋": [T: "kakoisakuutti"]             	 #  0x30b	(en: 'double acute accent embellishment', google translation)
