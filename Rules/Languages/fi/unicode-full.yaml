@@ -2863,7 +2863,7 @@
  - "": [T: "nuoli ylös palkista häntä"]      	    #  0xeb7e	(en: 'upwards arrow from bar tail', google translation) # FI: translation unclear
  - "": [T: "nuoli alaspäin palkista häntä"]   	#  0xeb7f	(en: 'downwards arrow from bar tail', google translation) # FI: translation unclear
  - "": [T: "nuoli alaspäin palkista nuolenpää"]  	#  0xeb80	(en: 'downwards arrow from bar arrowhead', google translation) # FI: translation unclear
- - "": [T: "harppuuna alas palkista piikki okealle nuolenpää"]	#  0xeb81	(en: 'downwards harpoon from bar with barb rightwards arrowhead', google translation) # FI: translation unclear
+ - "": [T: "harppuuna alas palkista piikki oikealle nuolenpää"]	#  0xeb81	(en: 'downwards harpoon from bar with barb rightwards arrowhead', google translation) # FI: translation unclear
  - "": [T: "harppuuna ylös ja oikealla puolella harppuuna alas alas"]	#  0xeb82	(en: 'upwards harpoon to the left of downwards harpoon bottom', google translation) # FI: translation unclear
  - "": [T: "harppuuna ylös ja oikealla harppuuna alas"]	#  0xeb83	(en: 'upwards harpoon to the left of downwards harpoon', google translation)
  - "": [T: "harppuuna alas ja oikealla harppuuna ylös ylös"]	#  0xeb84	(en: 'downwards harpoon to the left of upwards harpoon top', google translation) # FI: translation unclear
