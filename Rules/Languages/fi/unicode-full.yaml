@@ -52,7 +52,7 @@
  - "ʸ": [T: "yläindeksi y"]           	            #  0x2b8	(en: 'modifier small y', google translation)
  - "ʹ": [T: "priimi"]                   	        #  0x2b9	(en: 'modifier prime', google translation) # FI: derivated once -> "pilkku"
  - "ʺ": [T: "kaksoispriimi"]            	        #  0x2ba	(en: 'modifier double prime', google translation) # FI: derivated twice -> "pilkku pilkku"
- - "ʻ": [T: "käänteispilkku"] 	                    #  0x2bb	(en: 'modifier turned comma', google translation) # FI: derivated thrice -> "pilkku pilkku pilkku"
+ - "ʻ": [T: "käänteispilkku"] 	                    #  0x2bb	(en: 'modifier turned comma', google translation) 
  - "ʼ": [T: "heitto"]        	                #  0x2bc	(en: 'modifier apostrophe', google translation)
  - "ʽ": [T: "peilikuvapilkku"]         	            #  0x2bd	(en: 'modifier reversed comma', google translation)
  - "ʾ": [T: "tarke oikea puolikaari"]          	    #  0x2be	(en: 'modifier right half ring', google: 'muokkain oikea puolirengas')
@@ -2441,7 +2441,7 @@
  - "㍷": [T: "desimetriä"]                       	#  0x3377	(en: 'decimeters', google translation)
  - "㍸": [T: "neliödesimetriä"]           	        #  0x3378	(en: 'decimeters squared', google translation)
  - "㍹": [T: "kuutiodesimetriä"]               	    #  0x3379	(en: 'decimeters cubed', google translation)
- - "㍺": [T: "I u"]        	#  0x337a	(en: 'instrumental units', google translation)
+ - "㍺": [T: "I U"]        	#  0x337a	(en: 'instrumental units', google translation)
  - "㎀": [T: "pikoampeeria"]                         	    #  0x3380	(google translation)
  - "㎁": [T: "nanoampeeria"]                         	    #  0x3381	(google translation)
  - "㎂": [T: "mikroampeeria"]                         	#  0x3382	(en: 'microamps', google translation)
@@ -2513,7 +2513,7 @@
  - "㏄": [T: "kuutiosenttimetriä"]               	                #  0x33c4	(en: 'cubic centimeters', google translation)
  - "㏅": [T: "candelaa"]                         	    #  0x33c5	(google translation)
  - "㏆": [T: "coulombia kilogrammassa"]            #  0x33c6	(en: 'coulombs per kilogram', google translation)
- - "㏇": [T: "yritys"]                 	        #  0x33c7	(en: 'cardiac output', google translation)
+ - "㏇": [T: "C o piste"]                 	        #  0x33c7	(en: 'cardiac output', google translation)
  - "㏈": [T: "desibeliä"]                        	#  0x33c8	(en: 'decibels', google translation)
  - "㏉": [T: "grayta"]                            	    #  0x33c9	(en: 'grays', google translation)
  - "㏊": [T: "hehtaaria"]                        	#  0x33ca	(en: 'hectares', google translation)
