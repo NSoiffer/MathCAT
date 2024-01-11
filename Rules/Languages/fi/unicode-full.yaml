@@ -360,15 +360,15 @@
  - "ₛ": [T: "alaindeksi s"]                          #  0x209b	(en: 'sub S', google translation)
  - "ₜ": [T: "alaindeksi t"]                          #  0x209c	(en: 'sub T', google translation)
  - "₠": [T: "eurooppalaiset valuuttayksiköt"]   	#  0x20a0	(en: 'european currenty units', google translation)
- - "₡": [T: "colonia"]                          	#  0x20a1	(en: 'colons', google: 'colons') # FI: more Finnish pronunciation?
- - "₢": [T: "cruzeiroa"]                        	#  0x20a2	(en: 'cruzeiro', google: 'cruzeiro') # FI: more Finnish pronunciation?
+ - "₡": [T: "colonia"]                          	#  0x20a1	(en: 'colons', google: 'colons')
+ - "₢": [T: "cruzeiroa"]                        	#  0x20a2	(en: 'cruzeiro', google: 'cruzeiro')
  - "₣": [T: "frangia"]                          	#  0x20a3	(en: 'franc', google: 'frangi')
  - "₤": [T: "liiraa"]                           	#  0x20a4	(en: 'lira', google: 'liira')
  - "₥": [T: "milliä"]                           	#  0x20a5	(en: 'mills', google: 'myllyt')
  - "₦": [T: "nairaa"]                           	#  0x20a6	(en: 'naira', google: 'naira')
  - "₧": [T: "pesetaa"]                          	#  0x20a7	(en: 'peseta', google: 'peseta')
  - "₨": [T: "rupiaa"]                           	#  0x20a8	(en: 'rupees', google: 'rupia')
- - "₩": [T: "wonia"]                            	#  0x20a9	(en: 'won', google: 'voitti') # FI: more Finnish pronunciation?
+ - "₩": [T: "wonia"]                            	#  0x20a9	(en: 'won', google: 'voitti')
  - "₪": [T: "sekeliä"]                   	#  0x20aa	(en: 'new sheqels', google: 'uudet sheqels')
  - "₫": [T: "dongia"]                           	#  0x20ab	(en: 'dong', google: 'dong')
  - "€": [T: "euroa"]                            	#  0x20ac	(en: 'euros', google: 'eurot')
@@ -380,7 +380,7 @@
  - "₲": [T: "guarania"]                         	#  0x20b2	(en: 'guaranis', google: 'guaranis')
  - "₳": [T: "australia"]                        	#  0x20b3	(en: 'australs', google: 'itävaltait')
  - "₴": [T: "hryvniaa"]                         	#  0x20b4	(en: 'hryvnias', google: 'hryvnias')
- - "₵": [T: "cediä"]                            	#  0x20b5	(en: 'cedis', google: 'cedis') # FI: more Finnish pronunciation?
+ - "₵": [T: "cediä"]                            	#  0x20b5	(en: 'cedis', google: 'cedis')
  - "₶": [T: "Toursin livreä"]                   	#  0x20b6	(google translation)
  - "₷": [T: "spesmiloa"]                        	#  0x20b7	(google translation)
  - "₸": [T: "tengeä"]                           	#  0x20b8	(google translation)
@@ -423,7 +423,7 @@
  - "℅": [T: "C O"]                          	#  0x2105	(google: 'hoito')
  - "℆": [T: "C U"]                         	#  0x2106	(google translation)
  - "ℇ": [T: "eulerin vakio"]                    	#  0x2107	(en: 'euler's constant', google: 'eulerin jatkuva') # FI: more German pronunciation?
- - "℈": [T: "scruple"]                         	    #  0x2108	(en: 'scruples', google translation) # FI: more Finnish pronunciation?
+ - "℈": [T: "scruple"]                         	    #  0x2108	(en: 'scruples', google translation)
  - "℉": [T: "astetta fahrenheitia"]             	#  0x2109	(en: 'degrees fahrenheit', google: 'fahrenheit-astetta') # FI: more German pronunciation?
  - "ℊ": [T: "pieni g"]                          	#  0x210a	(en: 'script g', google: 'käsikirjoitus g')
  - "ℌℑℨℭ":                                      	#  0x210c, 0x2111, 0x2128, 0x212d
@@ -452,7 +452,7 @@
  - "№": [T: "numero"]                     	        #  0x2116	(en: 'number', google: 'määrä')
  - "℥": [T: "unssia"]                     	        #  0x2125	(en: 'ounces', google: 'unssi')
  - "Ω": [T: "ohmia"]                            	#  0x2126	(en: 'ohms', google: 'ohmit')
- - "℧": [T: "käännetty ohmi"]                   	#  0x2127	(en: 'mhos', google: 'mhos') # FI: same as eng. "siemen"
+ - "℧": [T: "käännetty ohmi"]                   	#  0x2127	(en: 'mhos', google: 'mhos')
  - "℩": [T: "käännetty ioota"]                  	#  0x2129	(en: 'turned iota', google: 'kääntyi iota')
  - "K": [T: "kelviniä"]                 	        #  0x212a	(en: 'kelvin', google: 'kelvin')
  - "Å": [T: "ångströmiä"]                       	#  0x212b	(en: 'angstroms', google: 'angstroms')
