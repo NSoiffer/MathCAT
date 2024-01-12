@@ -51,30 +51,28 @@
       - t: "⠱"
       else: [x: "*"]
 
-# -
-  #  name: default
-  #  tag: mroot
-  #  match: "."
-  #  replace: 
-  #  - t: "1⠩1⠔"
-  #  - test:
-  #     if:   # FIX: need to add arbitrary shapes here (see also msub/msup)
-  #     - "*[2][(self::m:mn and not(@data-roman-numeral) ) or"
-  #             # next test is to make sure there is just one symbol
-  #     - "     ((self::m:mi or self::m:mo) and string-length(text())=1) or"
-  #     - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
-  #     - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-  #     - "     IsInDefinition(., 'Arrows')"
-  #     - "    ]"
-  #     then:
-  #     - x: "*[2]"
-  #     else:
-  #       - t: "⠘"
-  #       - x: "*[1]"
-  #       - t: "⠱"
-  #  - t: "#"    # signal end of script/numeric mode
-  #  - x: "*[1]"
-  #  - t: "1⠬"
+-
+   name: default
+   tag: mroot
+   match: "."
+   replace: 
+   - t: "⠬"   # superscript
+   # index is first
+   - test:
+      if: "NeedsToBeGrouped(*[2], 'Swedish', false())"
+      then:
+      - t: "⠘"
+      - x: "*[2]"
+      - t: "⠱"
+      else: [x: "*[2]"]
+   - t: "⠩"   # root
+   - test:
+      if: "NeedsToBeGrouped(*[1], 'Swedish', true())"
+      then:
+      - t: "⠘"
+      - x: "*[1]"
+      - t: "⠱"
+      else: [x: "*[1]"]
         
                
 # Fraction rules
