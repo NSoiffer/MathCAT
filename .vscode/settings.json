@@ -433,4 +433,5 @@
     "includeDocumentStart": true,
     "editor.tabSize": 4,
     "editor.useTabStops": true,
+    "cmake.configureOnOpen": false,
 }
