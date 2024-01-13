@@ -1,3 +1,4 @@
+
 // UEB tests for the basic mathml tags
 // These are additional tests from other sources
 // Those labeled with "aph_" come from the APH lessons:
@@ -6,6 +7,13 @@ use crate::common::*;
 
 
 // Extra tests targeted at special cases in MathCAT
+
+#[test]
+fn overscript_grouping_aph_5_4_8() {
+    // this test was added because #220 (failed to add grouping around overscript)
+    let expr = "<math> <mover> <mi>MN</mi> <mo>&#x2194;</mo> </mover> </math>";
+    test_braille("UEB", expr, "⠰⠰⠣⠠⠠⠍⠝⠜⠨⠔⠳⠺⠗⠕");
+}
 
 #[test]
 fn word_symbol_aph_6_7_5() {
@@ -22,10 +30,10 @@ fn blank_aph_7_1_ex5() {
 }
 
 #[test]
-fn overscript_grouping_aph_5_4_8() {
-    // this test was added because #220 (failed to add grouping around overscript)
-    let expr = "<math> <mover> <mi>MN</mi> <mo>&#x2194;</mo> </mover> </math>";
-    test_braille("UEB", expr, "⠰⠰⠣⠠⠠⠍⠝⠜⠨⠔⠳⠺⠗⠕");
+fn word_symbol_aph_10_3_11() {
+    // this test was added because ⊻ (U+22bb) uses a 'G1 Word mode' char, so is different than others
+    let expr = "<math> <mi>p</mi> <mo>&#x22bb;</mo> <mi>q</mi> </math>";
+    test_braille("UEB", expr, "⠰⠰⠏⠈⠖⠠⠱⠟");
 }
 
 // Extra tests targeted at special cases in MathCAT
@@ -71,7 +79,6 @@ fn tilde_prefix_bug_244() {
 
 #[test]
 fn double_tilde_prefix_bug_244() {
-    init_logger();
     // This is a a MathJax encoding of a double tilde -- see test Nemeth::tilde_137_3_mathjax
     let expr = "<math> <mo>~~</mo> <mi>p</mi> </math>";
     test_braille("UEB", expr, "⠈⠔⠈⠔⠏");

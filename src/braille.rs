@@ -980,8 +980,15 @@ static LEFT_INTERVENING_CHARS: phf::Set<char> = phf_set! {  // see RUEB 2.6.2
     // opening chars have prefix 'o', so not in set ['(', '{', '[', '"', '\'', '“', '‘', '«'] 
 };
 
-fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_duration: UEB_Duration) -> String {
+/// Return value for use_g1_word_mode()
+#[derive(Debug, PartialEq)]
+enum Grade1WordIndicator {
+    NotInWord,        // no '𝟙' in the current/next word
+    InWord,           // '𝟙' in the current/next word
+    NotInChars,       // no '𝟙' in the entire string (optimization for common case)
+}
 
+fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_duration: UEB_Duration) -> String {
     // FIX: need to be smarter about moving on wrt to typeforms/typefaces, caps, bold/italic. [maybe just let them loop through the default?]
     let mut mode = start_mode;
     let mut duration = start_duration;
@@ -990,6 +997,17 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
     let mut cap_word_mode = false;     // only set to true in G2 to prevent contractions
     let mut result = String::default();
     let chars = raw_braille.chars().collect::<Vec<char>>();
+    let mut g1_word_indicator = Grade1WordIndicator::NotInChars;        // almost always true (and often irrelevent)
+    if mode == UEB_Mode::Grade2 || duration == UEB_Duration::Symbol {
+        g1_word_indicator = use_g1_word_mode(&chars);
+        if g1_word_indicator == Grade1WordIndicator::InWord {
+            mode = UEB_Mode::Grade1;
+            if duration == UEB_Duration::Symbol {
+                duration = UEB_Duration::Word;     // if Passage mode, leave as is
+                result.push('𝟙')
+            }
+        }
+    }
     let mut i = 0;
     while i < chars.len() {
         let ch = chars[i];
@@ -1046,9 +1064,16 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                         // moving out of numeric mode
                         result.push(ch);
                         i += 1;
-                        mode = if "W𝐖-—―".contains(ch) {start_mode} else {UEB_Mode::Grade1};     // space, hyphen, dash(short & long) RUEB 6.5.1
-                        if mode == UEB_Mode::Grade2 {
-                            start_g2_letter = None;        // will be set to real letter
+                        if "W𝐖-—―".contains(ch) {
+                            mode = start_mode;
+                            if mode == UEB_Mode::Grade2 {
+                                start_g2_letter = None;        // will be set to real letter
+                            }
+                            if start_duration != UEB_Duration::Passage {
+                                duration = UEB_Duration::Symbol;
+                            }
+                        } else {
+                            mode = UEB_Mode::Grade1
                         }
                     },
                 }
@@ -1073,9 +1098,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                         i += 1;
                     },
                     '1' | '𝟙' => {
-                        if ch == '𝟙' {
-                            duration = UEB_Duration::Word;
-                        }
+                        assert!(ch == '1' || duration != UEB_Duration::Symbol);     // if '𝟙', should be Word or Passage duration
                         // nothing to do -- let the default case handle the following chars
                         i += 1;
                     },
@@ -1160,12 +1183,17 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                             i += 1 + right_matched_chars.len();
                         }
                     },
-                    '1' | '𝟙' => {
+                    '1' => {
                         result.push(ch);
                         i += 1;
                         mode = UEB_Mode::Grade1;
-                        duration = if ch=='1' {UEB_Duration::Symbol} else {UEB_Duration::Word};
+                        duration = UEB_Duration::Symbol;
                     },
+                    '𝟙' => {
+                        // '𝟙' should have forced G1 Word mode
+                        assert!(true, "Internal error: '𝟙' found in G2 mode: index={} in '{}'", i, raw_braille);
+                        i += 1;
+                    }
                     'N' => {
                         result.push(ch);
                         result.push(chars[i+1]);
@@ -1198,6 +1226,18 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                 }
             },
         }
+
+        if (ch == 'W' || ch == '𝐖') && g1_word_indicator != Grade1WordIndicator::NotInChars &&
+           (mode == UEB_Mode::Grade2 || duration == UEB_Duration::Symbol) {
+            g1_word_indicator = use_g1_word_mode(&chars[i..]);
+            if g1_word_indicator == Grade1WordIndicator::InWord {
+                mode = UEB_Mode::Grade1;
+                if duration == UEB_Duration::Symbol {
+                    duration = UEB_Duration::Word;     // if Passage mode, leave as is
+                    result.push('𝟙')
+                }
+            }
+        }
     }
     if mode == UEB_Mode::Grade2 {
         if let Some(start) = start_g2_letter {
@@ -1206,6 +1246,20 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
     }
 
     return result;
+
+
+    fn use_g1_word_mode(chars: &[char]) -> Grade1WordIndicator {
+        debug!("use_g1_word_mode: chars='{:?}'", chars);
+        for &ch in chars {
+            if ch == 'W' || ch == '𝐖' {
+                return Grade1WordIndicator::NotInWord;       // reached a word boundary
+            }
+            if ch == '𝟙' {
+                return Grade1WordIndicator::InWord;        // need word mode in this "word"
+            }
+        }
+        return Grade1WordIndicator::NotInChars;               // 
+    }
 }
 
 /// Returns a tuple:
