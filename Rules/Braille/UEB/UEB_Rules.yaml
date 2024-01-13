@@ -233,12 +233,21 @@
    - t: "⠬"   # empty space for omission
 
 -
+  # "∼" can be a prefix *operator* or an infix comparison -- they have different spacing. We catch the prefix version here
+  # Note: ASCII "~" has been canonicalized to occur only in a diacritical position
+  name: prefix-tilde
+  tag: mo
+  match: "translate(., '∼', '')='' and not(preceding-sibling::*) and parent::m:mrow"
+  replace:
+  - x: "text()"
+
+-
    name: default
    tag: mo
      # add spaces around comparison operators unless they are in a script position,
-   variables: # ratio not spaced in UEB
+   variables: # ratio not spaced in UEB; also make sure it is an infix operator (e.g., "~" can be prefix)
    - AddSpaces: "$UEB_UseSpacesAroundAllOperators or
-                       ( parent::*[self::m:mrow] and $NewScriptContext='' and 
+                       ( parent::*[self::m:mrow] and $NewScriptContext='' and
                          .!='∶' and IsInDefinition(., 'NemethComparisonOperators') )"
    match: "."
    replace:

@@ -62,6 +62,22 @@ fn dot_above_bug_204() {
 }
 
 #[test]
+fn tilde_prefix_bug_244() {
+    // https://github.com/NSoiffer/MathCAT/issues/244
+    let expr = "<math> <mo>~</mo> <mi>p</mi> </math>";
+    test_braille("UEB", expr, "⠈⠔⠏");
+}
+
+
+#[test]
+fn double_tilde_prefix_bug_244() {
+    init_logger();
+    // This is a a MathJax encoding of a double tilde -- see test Nemeth::tilde_137_3_mathjax
+    let expr = "<math> <mo>~~</mo> <mi>p</mi> </math>";
+    test_braille("UEB", expr, "⠈⠔⠈⠔⠏");
+}
+
+#[test]
 fn space_hack_between_digits() {
     // https://github.com/NSoiffer/MathCAT/issues/144
     let expr = "<math><mn>1</mn><mtext>&#x00a0;&#x2063;</mtext><mn>3</mn><mtext>&#x00a0;&#x2063;</mtext><mn>5</mn></math>";
