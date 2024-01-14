@@ -7,16 +7,16 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"      # phrase('the' square root of 25 equals 5)
-  - t: "determinante"      # phrase(the 'determinant' of a matrix)
+      - T: "a"      # phrase('the' square root of 25 equals 5)
+  - T: "determinante"      # phrase(the 'determinant' of a matrix)
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of"      # phrase(systems 'of' linear equations)
+      - T: "de"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple'))"
-      then: [t: "determinante final"]      # phrase('end determinant' of a matrix)
+      then: [T: "determinante final"]      # phrase('end determinant' of a matrix)
 
 - name: norm
   tag: norm
@@ -25,16 +25,16 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"      # phrase('the' square root of 25 equals 5)
-  - t: "norma"      # phrase(the 'norm' can be a measure of distance)
+      - T: "a"      # phrase('the' square root of 25 equals 5)
+  - T: "norma"      # phrase(the 'norm' can be a measure of distance)
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "dos dados"      # phrase(this is the mean 'of' the data)
+      - T: "do"      # phrase(this is the mean 'of' the data)
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple'))"
-      then: [t: "norma final"]      # phrase('end norm' that is a measure of distance)
+      then: [T: "norma final"]      # phrase('end norm' that is a measure of distance)
 
 
 - name: subscripted-norm
@@ -44,13 +44,13 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"      # phrase('the' square root of 25 equals 5)
+      - T: "a"      # phrase('the' square root of 25 equals 5)
   - x: "*[2]"
-  - t: "norma"      # phrase(the 'norm' can be a measure of distance)
+  - T: "norma"      # phrase(the 'norm' can be a measure of distance)
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of"      # phrase(systems 'of' linear equations)
+      - T: "de"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
 
 - name: transpose
@@ -58,7 +58,7 @@
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - t: "transporá"      # phrase(this will 'transpose' the values)
+  - T: "transpor"      # phrase(this will 'transpose' the values)
 - name: trace
   tag: trace
   match: "not(@data-intent-property)"
@@ -66,12 +66,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"      # phrase('the' square root of 25 equals 5)
-  - t: "trace"      # phrase('trace' of a matrix)
+      - T: "a"      # phrase('the' square root of 25 equals 5)
+  - T: "traço"      # phrase('trace' of a matrix)
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of"      # phrase(systems 'of' linear equations)
+      - T: "de"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
 
 - name: dimension
@@ -81,12 +81,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"      # phrase('the' square root of 25 equals 5)
-  - t: "dimensão"      # phrase(the 'dimension' of the matrix)
+      - T: "a"      # phrase('the' square root of 25 equals 5)
+  - T: "dimensão"      # phrase(the 'dimension' of the matrix)
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of"      # phrase(systems 'of' linear equations)
+      - T: "de"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
 
 - name: homomorphism
@@ -96,12 +96,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"      # phrase('the' square root of 25 equals 5)
-  - t: "homomorfismo"      # phrase('homomorphism' indicates similarity of form)
+      - T: "a"      # phrase('the' square root of 25 equals 5)
+  - T: "homomorfismo"      # phrase('homomorphism' indicates similarity of form)
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "of"      # phrase(systems 'of' linear equations)
+      - T: "de"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
 
 - name: kernel
@@ -111,11 +111,11 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "the"      # phrase('the' square root of 25 equals 5)
-  - t: "kernel"      # phrase(this is the 'kernel' of the function)
+      - T: "a"      # phrase('the' square root of 25 equals 5)
+  - T: "kernel"      # phrase(this is the 'kernel' of the function)
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "de"      # phrase(systems 'of' linear equations)
+      - T: "de"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
 
