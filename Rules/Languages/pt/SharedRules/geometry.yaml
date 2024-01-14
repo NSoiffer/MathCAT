@@ -7,12 +7,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "o segmento de linha de"      # phrase('the line segment from' A to B)
+      - T: "o segmento de linha de"      # phrase('the line segment from' A to B)
       - x: "*[1]"
-      - t: "a"                         # phrase(the line segment from A 'to' B)
+      - T: "para"                         # phrase(the line segment from A 'to' B)
       - x: "*[2]"
       else:
-      - t: "segmento de linha"               # phrase(the 'line segment' A  B)
+      - T: "segmento de linha"               # phrase(the 'line segment' A  B)
       - x: "*[1]"
       - x: "*[2]"
 
@@ -23,12 +23,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "o raio de"             # phrase('the ray from' A to B)
+      - T: "o raio de"             # phrase('the ray from' A to B)
       - x: "*[1]"
-      - t: "a"                       # phrase(the ray from A 'to' B)
+      - T: "para"                       # phrase(the ray from A 'to' B)
       - x: "*[2]"
       else:
-      - t: "ray"                      # phrase(the 'ray'A  B)
+      - T: "raio"                      # phrase(the 'ray'A  B)
       - x: "*[1]"
       - x: "*[2]"
 
@@ -38,8 +38,8 @@
   replace:
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "o"}]            # phrase('the' arc A B C)
-  - t: "arco"                        # phrase(the 'arc' A B C)
+      then: [{T: "o"}]            # phrase('the' arc A B C)
+  - T: "arco"                        # phrase(the 'arc' A B C)
   - x: "*[1]"
   - x: "*[2]"
 
@@ -50,9 +50,9 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "a medida do ângulo"      # phrase('the measure of the angle' ABC)
+      - T: "a medida do ângulo"      # phrase('the measure of the angle' ABC)
       else:
-      - t: "medida de ângulo"      # phrase('measure of angle' ABC)
+      - T: "medida de ângulo"      # phrase('measure of angle' ABC)
   - x: "*[1]"
   - x: "*[2]"
   - x: "*[3]"
