@@ -10,7 +10,6 @@ documentation = "https://nsoiffer.github.io/MathCAT/"
 edition = "2018"
 exclude = ["src/main.rs", "docs", "PythonScripts"]    # should have "Rules/", but then one can't run build.rs to build the zip file
 
-
 [features]
 "include-zip" = []
 "enable-logs" = ["android_logger"]
@@ -38,6 +37,7 @@ log = "0.4"
 env_logger = "0.11.8"
 cfg-if = "1.0.1"
 fastrand = { version = "2.3.0" }
+ext-php-rs = "0.10.0"
 
 [target.'cfg(target_family = "wasm")'.dependencies]
 zip = { version = "4.3", default-features = false, features = ["deflate"] }
@@ -47,7 +47,6 @@ zip = { version = "4.3", default-features = false, features = ["bzip2"] }
 android_logger = {version = "0.15.1", optional = true}
 
 
-
 [build-dependencies]
 bitflags = "2.6"
 error-chain = "0.12.4"
@@ -55,9 +54,10 @@ error-chain = "0.12.4"
 zip = { version = "4.3", default-features = false, features = ["deflate"] }
 [target.'cfg(not(target_family = "wasm"))'.build-dependencies]
 zip = { version = "4.3", default-features = false, features = ["bzip2"] }
+bindgen = "0.64.0"
 
 [lib]
-name = "libmathcat"
+name = "mathcat"
 crate-type = ["rlib", "cdylib"]
 
 [profile.test]
