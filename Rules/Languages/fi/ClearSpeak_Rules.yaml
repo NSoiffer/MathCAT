@@ -263,7 +263,7 @@
       if: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
       then: [{x: "ToOrdinal(*[2])"}]
       else: [{x: "*[2]"}]
-    # better way? The phrase in Finnish would be "luvun kuusi toinen potenssi" -> "number six's second power", refactor logic?
+    # FI: better way? The phrase in Finnish would be "luvun kuusi toinen potenssi" -> "number six's second power", refactor logic?
   - T: "potenssi"      # phrase(the third 'power of' 6)
   - pause: short
   - x: "*[1]"
@@ -275,7 +275,7 @@
   - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
   replace:
   - x: "*[1]"
-  - T: "korotettu potenssiin"      # phrase(5 'raised to the exponent' x plus 1)
+  - T: "potenssiin"      # phrase(5 'raised to the exponent' x plus 1)
   - pause: short
   - x: "*[2]"
   - pause: short
@@ -286,7 +286,7 @@
   match: "$ClearSpeak_Exponents = 'AfterPower'"
   replace:
   - x: "*[1]"
-  - T: "korotettu potenssiin"      # phrase(x is 'raised to the power' 4)
+  - T: "potenssiin"      # phrase(x is 'raised to the power' 4)
   - x: "*[2]"
   - pause: short
 
@@ -319,7 +319,7 @@
       else: {x: "*[2]"}
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{T: "potenssiin"}]      # phrase(2 raised to the 'power' 7)
+      then: [{T: "potenssi"}]      # phrase(2 raised to the 'power' 7)
 
 - name: simple-negative-integer
   tag: power
@@ -329,23 +329,23 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - T: ""     # phrase(2 raised 'to the' power 7)
+  - T: "potenssiin"     # phrase(2 raised 'to the' power 7)
   - x: "*[2]"
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{T: "potenssiin"}]      # phrase(2 raised to the 'power' 7)
+      then: [{T: ""}]      # phrase(2 raised to the 'power' 7)
 
 - name: simple-var
   tag: power
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  - T: "korotettu"     # phrase(3 raised 'to the' power 7)
+  - T: "potenssiin"     # phrase(3 raised 'to the' power 7)
   - x: "*[2]"
   # - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}] # FI: no need to pronounce
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{T: "potenssiin"}]      # phrase(2 raised to the 'power' 7)
+      then: [{T: ""}]      # phrase(2 raised to the 'power' 7)
 
 # match nested exponent, where the nested exponent is has the power 2 or 3 (n below)
 #   [xxx]^n, - [xxx]^n, [xxx] var^n, -[xxx] var^n
@@ -370,7 +370,7 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - T: "korotettuna potenssiin"      # phrase(x 'raised to the' second power)
+  - T: "potenssiin"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
   # - T: "potenssiin"      # phrase(x raised to the second 'power')
 
@@ -391,7 +391,7 @@
   - "     ]"
   replace:
   - x: "*[1]"
-  - T: "korotettuna potenssiin"      # phrase(x 'raised to the' second power)
+  - T: "potenssiin"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
   # - T: "potenssiin"      # phrase(x raised to the second 'power')
 
@@ -414,7 +414,7 @@
   - "      ]"
   replace:
   - x: "*[1]"
-  - T: "korotettuna potenssiin"      # phrase(x 'raised to the' second power)
+  - T: "potenssiin"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
   # - T: "potenssiin"      # phrase(x raised to the second 'power')
 
@@ -439,7 +439,7 @@
   - "      ]"
   replace:
   - x: "*[1]"
-  - T: "korotettuna potenssiin"      # phrase(x 'raised to the' second power)
+  - T: "potenssiin"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
   # - T: "potenssiin"      # phrase(x raised to the second 'power')
 
@@ -449,7 +449,7 @@
   - "*[2][self::m:power or self::m:power or self::m:mrow[m:power]]"
   replace:
   - x: "*[1]"
-  - T: "korotettuna potenssiin"      # phrase(x is 'raised to the exponent')
+  - T: "potenssiin"      # phrase(x is 'raised to the exponent')
   - pause: short
   - x: "*[2]"
   - pause: short
@@ -460,7 +460,7 @@
   match: "."
   replace:
   - x: "*[1]"
-  - T: "korotettuna potenssiin"      # phrase(x 'raised to the' second power)
+  - T: "potenssiin"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
   # - T: "potenssiin"      # phrase(x raised to the second 'power')
 
