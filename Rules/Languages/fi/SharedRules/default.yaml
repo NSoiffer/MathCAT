@@ -407,14 +407,14 @@
   - x: count(*)
   - test:
       if: count(*)=1
-      then: [T: "rivi"]      # phrase(the table with 1 'row')
-      else: [T: "riviä"]      # phrase(the table with 3 'rows')
+      then: [T: "rivi"]      # phrase(the table with 1 'row') # FI: singular
+      else: [T: "riviä"]      # phrase(the table with 3 'rows') # FI: plural
   - T: "ja"      # phrase(the table with 3 rows 'and' 4 columns)
   - x: "count(*[1]/*)"
   - test:
       if: "count(*[1]/*)=1"
-      then: [T: "sarake"]      # phrase(the table with 3 rows and 1 'column')
-      else: [T: "saraketta"]      # phrase(the table with 3 rows and 4 'columns')
+      then: [T: "sarake"]      # phrase(the table with 3 rows and 1 'column') # FI: singular
+      else: [T: "saraketta"]      # phrase(the table with 3 rows and 4 'columns') # FI: plural
   - pause: long
   - x: "*"
 
@@ -505,7 +505,7 @@
       then:
       - test:
           if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
-          then: [SPELL: "'x'", pause: short] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+          then: [spell: "'x'", pause: short] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
           else:
           - test:
               if: ".[contains(@notation,'updiagonalstrike')]"
@@ -572,14 +572,14 @@
   - test:
       if: ".[contains(@notation,'radical')]"
       then: [T: "neliöjuuri", pause: short]      # phrase(5 is the 'square root' of 25)
-  - T: "sulkevat"      # phrase(parentheses are 'enclosing' part of the equation)
+  - t: "sulkevat"      # phrase(parentheses are 'enclosing' part of the equation)
   - test:
       if: "*[self::m:mtext and text()=' ']"
       then: [T: "tyhjää tilaa"]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
-      then: [T: "alue loppu"]      # phrase(reached the 'end enclosure' point) # FI: better translation?
+      then: [t: "alue loppu"]      # phrase(reached the 'end enclosure' point) # FI: better translation?
   - pause: short
 
 - name: semantics
