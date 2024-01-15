@@ -483,8 +483,8 @@
       if: "$ClearSpeak_AbsoluteValue = 'AbsEnd'"
       then:
       - pause: short
+      - x: "$WordToSay" # FI: changed order
       - T: "loppu"      # phrase('end' absolute value)
-      - x: "$WordToSay"
   - pause: short
 
 - name: set
