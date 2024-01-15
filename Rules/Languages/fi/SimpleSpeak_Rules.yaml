@@ -182,7 +182,7 @@
   - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
   - test:
       if: "*[2][.>0]"
-      then: {x: "ToOrdinal(*[2])"}
+      then: {x: "ToOrdinal(*[2])"} # FI: when is this triggered?
       else: {x: "*[2]"}
 
 - name: simple-negative-integer
@@ -202,7 +202,7 @@
   - x: "*[1]"
   - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
-  - PRONOUNCE: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+  # - PRONOUNCE: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
 
 - name: simple
   tag: power
@@ -227,7 +227,7 @@
   - T: "potenssiin"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
   - pause: short
-  - T: "eksponentti loppu"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+  - T: "potenssi loppu"      # phrase(start 2 raised to the exponent 4 'end of exponent')
 
 - name: default
   tag: power
@@ -235,9 +235,9 @@
   replace:
   # This logic might have to be changed completely - or it might just work?
   - x: "*[1]"
-  - T: "korotettuna"      # phrase(15 'raised to the' second power equals 225)
+  - T: "potenssiin"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
-  - T: "potenssiin"      # phrase(15 raised to the second 'power' equals 225)
+  # - T: "potenssiin"      # phrase(15 raised to the second 'power' equals 225)
 
 #
 # Some rules on mrows
