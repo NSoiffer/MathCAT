@@ -499,9 +499,9 @@
       - else_if: "*[2][text()=3]"
         then: [T: "kuutio"]
         else:  # don't bother with special cases as this isn't likely to happen
-        - T: "korotettu"      # phrase(x 'raised to the' second power)
+        - T: "potenssiin"      # phrase(x 'raised to the' second power)
         - x: "*[2]"
-        - T: "potenssi"      # phrase(x raised to the second 'power')
+        # - T: "potenssi"      # phrase(x raised to the second 'power')
   - pause: short
 
 - name: multi-line
