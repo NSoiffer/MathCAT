@@ -198,9 +198,9 @@
               if: "not(IsNode(*[last()], 'simple'))"
               then: [T: "ylä loppu"]      # phrase(x super 2 'end of super')
           else:
-          - T: "korotettuna"            # phrase(5 'raised to the' second power equals 25)
+          - T: "potenssiin"            # phrase(5 'raised to the' second power equals 25)
           - x: "*[last()]"
-          - T: "potenssiin"                    # phrase(5 raised to the second 'power' equals 25)
+          # - T: "potenssiin"                    # phrase(5 raised to the second 'power' equals 25)
 
 - name: default
   tag: munder
