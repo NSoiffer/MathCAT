@@ -528,11 +528,11 @@
           then:
           - test:
             - if: "$NavCommand = 'MoveStart'"
-              then: [T: "siirry matematiikka alkuun"]                  # phrase('move to start of math')
+              then: [T: "siirry matematiikan alkuun"]                  # phrase('move to start of math')
             - else_if: "$NavCommand = 'MoveLineStart'"
               then: [T: "siirry rivin alkuun"]                  # phrase('move to start of line')
             - else_if: "$NavCommand = 'MoveEnd'"
-              then: [T: "siirry matematiikka loppuun"]                    # phrase('move to end of math')
+              then: [T: "siirry matematiikan loppuun"]                    # phrase('move to end of math')
               else: [T: "siirry rivin loppuun"] # "$NavCommand = 'MoveLineEnd'"  # phrase('move to end of line')
           - pause: "medium"
       - test:
