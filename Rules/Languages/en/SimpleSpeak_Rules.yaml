@@ -28,7 +28,7 @@
       else: [pause: short]
   - x: "*[1]"
   - test:
-      if: IsNode(*[1], 'leaf')
+      if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
       then: [pause: short]
       else: [t: "end root", pause: short]  # phrase(start the square root of x 'end of root')
 
@@ -61,7 +61,7 @@
       then: [t: "of"]        # phrase(the square root 'of' x)
   - x: "*[1]"
   - test:
-      if: IsNode(*[1], 'leaf')
+      if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
       then: [pause: short]
       else: [t: "end root", pause: short]      # phrase(start the fifth root of x 'end of root')
 
@@ -73,6 +73,7 @@
   - "*[1][self::m:mn][not(contains(., '.')) and text()<20]   and"
   - "*[2][self::m:mn][not(contains(., '.')) and 2<=text() and text()<=10]"
   replace: [x: "ToCommonFraction(.)"]
+
 - name: common-fraction-mixed-number
   tag: fraction
   match:
@@ -99,7 +100,9 @@
   tag: fraction
   match: "."
   replace:
-  - t: "fraction"      # phrase(the 'fraction' 3 over 4)
+  - test:
+      if: "$Impairment = 'Blindness'"
+      then: [t: "fraction"]      # phrase(the 'fraction' 3 over 4)
   - pause: short
   - x: "*[1]"
   - test:
@@ -111,7 +114,9 @@
       then: [pause: short]
   - x: "*[2]"
   - pause: short
-  - t: "end fraction"      # phrase(start 7 over 8 'end of fraction')
+  - test:
+      if: "$Impairment = 'Blindness'"
+      then: [t: "end fraction"]      # phrase(start 7 over 8 'end of fraction')
   - pause: medium
 
 # rules for functions raised to a power
@@ -216,7 +221,14 @@
   - t: "raised to the"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
   - pause: short
-  - t: "end exponent"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+  - test:
+      if: "$Impairment = 'Blindness'"
+      then:
+      - t: "end exponent"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+      - pause: short
+      else:
+      - pause: medium
+
 - name: default
   tag: power
   match: "."
@@ -225,6 +237,7 @@
   - t: "raised to the"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
   - t: "power"      # phrase(15 raised to the second 'power' equals 225)
+  - pause: short
 
 #
 # Some rules on mrows

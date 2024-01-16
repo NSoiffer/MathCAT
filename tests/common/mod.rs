@@ -56,6 +56,7 @@ pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
         prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
         prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
         prefs.set_user_prefs("Verbosity", "Medium");
+        prefs.set_user_prefs("Impairment", "Blindness");
     });
 
     set_preference("Language".to_string(), language.to_string()).unwrap();
