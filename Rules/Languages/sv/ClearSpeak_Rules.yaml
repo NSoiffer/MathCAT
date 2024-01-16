@@ -717,7 +717,7 @@
           then:
             - test:
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-                then: [{T: fall}]
+                then: [{T: "fall"}]
                 else: [{T: "fall"}]      # phrase(this is the first 'case' of three cases)
         - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
           then:

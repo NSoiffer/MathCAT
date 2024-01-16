@@ -430,6 +430,7 @@
  - "∧": [T: "och"]                               #  0x2227 (en: 'and')
  - "∨": [T: "eller"]                             #  0x2228 (en: 'or')
  - "∩": [T: "sniitt"]                             #  0x2229 (en: 'intersection')
+ # SWEDISH: Weird spelling of "snitt" to make Microsoft's Swedish voice pronounce the word reasonably correct. Check with other voices!
  - "∪": [T: "union"]                             #  0x222a
  - "∫": [T: "integral"]                          #  0x222b
  - "∬": [T: "dubbel integral"]                   #  0x222c (en: 'double integral')
