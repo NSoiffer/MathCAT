@@ -63,7 +63,7 @@ fn non_simple_power() {
       </msup>
       </mrow>
                 </math>";
-    test("en", "SimpleSpeak", expr, "3 raised to the y plus 2 power");
+    test("en", "SimpleSpeak", expr, "3 raised to the y plus 2 power,");
 }
 
 #[test]
@@ -85,7 +85,7 @@ fn simple_fraction_power() {
                       <mfrac><mn>1</mn><mn>3</mn></mfrac>
                   </msup>
               </math>";
-  test("en", "SimpleSpeak", expr, "x raised to the 1 third power");
+  test("en", "SimpleSpeak", expr, "x raised to the 1 third power,");
 }
 
 #[test]
@@ -104,7 +104,7 @@ fn nested_squared_power_with_coef() {
       </msup>
       </mrow>
       </math>";
-  test("en", "SimpleSpeak", expr, "3 raised to the 2 x squared power");
+  test("en", "SimpleSpeak", expr, "3 raised to the 2 x squared power,");
 }
 
 #[test]
@@ -124,7 +124,7 @@ fn nested_squared_power_with_neg_coef() {
     </msup>
     </mrow>
   </math>";
-  test("en", "SimpleSpeak", expr, "3 raised to the negative 2 x squared power");
+  test("en", "SimpleSpeak", expr, "3 raised to the negative 2 x squared power,");
 }
 
 
@@ -139,7 +139,7 @@ fn nested_cubed_power() {
       </msup>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "y raised to the 4 fifths cubed power");
+  test("en", "SimpleSpeak", expr, "y raised to the 4 fifths cubed power,");
 }
 
 #[test]
@@ -156,7 +156,7 @@ fn nested_cubed_power_with_neg_base() {
         </mrow>
     </msup>
     </math>";
-  test("en", "SimpleSpeak", expr, "y raised to the negative 4 fifths cubed power");
+  test("en", "SimpleSpeak", expr, "y raised to the negative 4 fifths cubed power,");
 }
 
 #[test]
@@ -178,7 +178,7 @@ fn nested_number_times_squared() {
         </msup>
         </mrow>
         </math>";
-  test("en", "SimpleSpeak", expr, "e raised to the 1 half x squared power");
+  test("en", "SimpleSpeak", expr, "e raised to the 1 half x squared power,");
 }
 
 #[test]
@@ -200,7 +200,7 @@ fn nested_negative_number_times_squared() {
     </msup>
     </mrow>
     </math>";
-  test("en", "SimpleSpeak", expr, "e raised to the negative 1 half x squared power");
+  test("en", "SimpleSpeak", expr, "e raised to the negative 1 half x squared power,");
 }
 
 #[test]
@@ -219,7 +219,7 @@ fn nested_expr_to_tenth() {
       </msup>
       </mrow>
       </math>";
-  test("en", "SimpleSpeak", expr, "3 raised to the 3 to the tenth power");
+  test("en", "SimpleSpeak", expr, "3 raised to the 3 to the tenth power,");
 }
 
 #[test]
@@ -241,7 +241,7 @@ fn nested_non_simple_squared_exp() {
       </msup>
       </mrow>
       </math>";
-  test("en", "SimpleSpeak", expr, "3 raised to the open paren x plus 1, close paren squared power");
+  test("en", "SimpleSpeak", expr, "3 raised to the open paren x plus 1, close paren squared power,");
 }
 
 #[test]
@@ -255,7 +255,7 @@ fn nested_simple_power() {
       </msup>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "t raised to the 4 fifths to the n-th power");
+  test("en", "SimpleSpeak", expr, "t raised to the 4 fifths to the n-th power,");
 }
 
 #[test]
@@ -269,7 +269,9 @@ fn nested_end_exponent_power() {
       </msup>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "t raised to the 4 fifths raised to the n plus 1 power, end exponent");
+  test("en", "SimpleSpeak", expr, "t raised to the 4 fifths raised to the n plus 1 power; end exponent,");
+  test_prefs("en", "SimpleSpeak", vec![("Impairment", "LearningDisability")], expr,
+  "t raised to the 4 fifths raised to the n plus 1 power;");
 }
 
 #[test]
@@ -283,7 +285,7 @@ fn nested_end_exponent_neg_power() {
       </msup>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "t raised to the 4 fifths to the negative 3, end exponent");
+  test("en", "SimpleSpeak", expr, "t raised to the 4 fifths to the negative 3, end exponent,");
 }
 
 #[test]
@@ -314,7 +316,7 @@ fn nested_complex_power() {
       </msup>
       </mrow>
       </math>";
-  test("en", "SimpleSpeak", expr, "e raised to the negative 1 half times; open paren, fraction, x minus mu, over sigma, end fraction; close paren squared power");
+  test("en", "SimpleSpeak", expr, "e raised to the negative 1 half times; open paren, fraction, x minus mu, over sigma, end fraction; close paren squared power,");
 }
 
 #[test]
@@ -328,5 +330,5 @@ fn default_power() {
       </mfrac>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "t raised to the fraction, b plus 1, over 3, end fraction; power");
+  test("en", "SimpleSpeak", expr, "t raised to the fraction, b plus 1, over 3, end fraction; power,");
 }
