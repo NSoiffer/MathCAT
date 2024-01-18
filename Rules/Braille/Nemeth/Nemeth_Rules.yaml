@@ -288,7 +288,7 @@
   # Note: ASCII "~" has been canonicalized to occur only in a diacritical position
   name: prefix-tilde
   tag: mo
-  match: "text()='∼' and not(preceding-sibling::*)"
+  match: "text()='∼' and not(preceding-sibling::*) and parent::m:mrow"
   replace:
   - x: "text()"
   - test:    # if there is a following tilde, it is buried in an mrow

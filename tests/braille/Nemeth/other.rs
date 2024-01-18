@@ -29,3 +29,12 @@ fn space_hack_around_operator() {
     let expr = "<math><mi>y</mi><mtext>&#x00a0;&#x2063;</mtext><mo>=</mo><mtext>&#x00a0;&#x2063;</mtext><mn>5</mn></math>";
     test_braille("Nemeth", expr, "⠽⠀⠨⠅⠀⠼⠢");
 }
+
+
+#[test]
+fn tilde_prefix_bug_244() {
+    // https://github.com/NSoiffer/MathCAT/issues/244
+    let expr = "<math> <mo>~</mo> <mi>p</mi> </math>";
+    test_braille("Nemeth", expr, "⠈⠱⠏");
+}
+
