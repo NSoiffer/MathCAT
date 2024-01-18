@@ -8,7 +8,7 @@
  - "¥": [T: "jeni"]                              	#  0xa5	(en: 'yen', google: 'jeni')
  - "¦": [T: "katkopystyviiva"]                  	#  0xa6	(en: 'broken bar', google: 'rikkoutunut palkki')
  - "§": [T: "pykälä"]                     	        #  0xa7	(en: 'section', google: 'osa')
- - "¨": [T: "treema"]                           	#  0xa8	(en: 'double dot', google: 'kaksinkertainen piste') # FI: use case with derivative?
+ - "¨": [T: "piste piste"]                           	#  0xa8	(en: 'double dot', google: 'kaksinkertainen piste') # FI: use case with derivative?
  - "©": [T: "tekijänoikeus"]                    	#  0xa9	(en: 'copyright', google: 'tekijänoikeudet') # FI: in NVDA it's written "copyright"
  - "ª": [T: "feminiininen järjestysluku"]	        #  0xaa	(en: 'feminine ordinal indicator', google: 'naisellinen ordinaaliindikaattori')
  - "¬": [T: "ei"]                         	        #  0xac	(en: 'not', google: 'ei')
@@ -82,7 +82,7 @@
  - "˖": [T: "plus"]            	                    #  0x2d6	(en: 'modifier plus sign', google translation)
  - "˗": [T: "miinus"]     	                        #  0x2d7	(en: 'modifier minus sign', google translation)
  - "˘": [T: "lyhyysmerkki"]                     	#  0x2d8	(en: 'breve', google: 'breve')
- - "˙": [T: "yläpiste"]                         	#  0x2d9	(en: 'dot', google: 'piste') # FI: should be only "piste"? used in derivative?
+ - "˙": [T: "piste"]                         	#  0x2d9	(en: 'dot', google: 'piste')
  - "˚": [T: "yläympyrä"]               	            #  0x2da	(en: 'ring above', google: 'rengas yläpuolella')
  - "˛": [T: "ogonek"]                           	#  0x2db
  - "˜": [T: "pieni tilde"]                          #  0x2dc	(en: 'small tilde', google: 'pieni tilde')
@@ -123,13 +123,13 @@
  - "˿": [T: "vasen alanuoli"]    	                #  0x2ff	(en: 'modifier low left arrow', google translation)
  - "̀": [T: "gravis"]                      #  0x300	(en: 'grave accent embellishment', google: 'vakava korostuskoriste')
  - "́": [T: "akuutti"]                     #  0x301	(en: 'acute accent embellishment', google: 'akuutti korostuskoriste')
- - "̂": [T: "sirkumfleksi"]                #  0x302	(en: 'circumflex accent embellishment', google: 'ympyräkorotuskoriste') # FI: should be "hattu"?
+ - "̂": [T: "sirkumfleksi"]                #  0x302	(en: 'circumflex accent embellishment', google: 'ympyräkorotuskoriste')
  - "̃": [T: "tilde"]                       #  0x303	(en: 'tilde embellishment', google: 'tilde -koriste')
  - "̄": [T: "pituusmerkki"]                #  0x304	(en: 'macron embellishment', google: 'macronin koriste')
  - "̅": [T: "yläviiva"]                    #  0x305	(en: 'overbar embellishment', google: 'ylipalkin koriste')
  - "̆": [T: "lyhyysmerkki"]                #  0x306	(en: 'breve embellishment', google: 'breven koriste')
  - "̇": [T: "yläpiste"]                	 #  0x307	(en: 'dot above embellishment', google: 'piste koristelun yläpuolella')
- - "̈": [T: "treema"]                      #  0x308	(en: 'diaeresis embellishment', google: 'diaeresis -koriste') # FI: should be "pilkku pilkku"?
+ - "̈": [T: "treema"]                      #  0x308	(en: 'diaeresis embellishment', google: 'diaeresis -koriste')
  - "̉": [T: "yläkoukku"]    	             #  0x309	(en: 'hook above embellishment', google translation)
  - "̊": [T: "yläympyrä"]               	 #  0x30a	(en: 'ring above embellishment', google: 'rengas koristelun yläpuolella')
  - "̋": [T: "kakoisakuutti"]             	 #  0x30b	(en: 'double acute accent embellishment', google translation)
@@ -397,8 +397,8 @@
  - "⃘": [T: "rengas päällä"]              	        #  0x20d8	(en: 'ring overlay embellishment', google translation)
  - "⃙": [T: "rengas myötäpäivään päällä"] 	        #  0x20d9	(en: 'clockwise ring overlay embellishment', google translation)
  - "⃚": [T: "rengas vastapäivään päällä"] 	        #  0x20da	(en: 'anticlockwise ring overlay embellishment', google translation)
- - "⃛": [T: "yläpuolinen pistekolmikko"]       	    #  0x20db	(en: 'triple dot', google: 'kolminkertainen piste')
- - "⃜": [T: "yläpuolinen pistenelikko"]       	    #  0x20dc	(en: 'quadruple dot', google: 'nelinkertainen piste')
+ - "⃛": [T: "kolmoispiste"]       	    #  0x20db	(en: 'triple dot', google: 'kolminkertainen piste')
+ - "⃜": [T: "nelinkertainen piste"]       	    #  0x20dc	(en: 'quadruple dot', google: 'nelinkertainen piste')
  - "⃝": [T: "sulkeva ympyrä"]           	        #  0x20dd	(en: 'enclosing circle embellishment', google translation)
  - "⃞": [T: "sulkeva neliö"]          	            #  0x20de	(en: 'enclosing square embellishment', google translation)
  - "⃟": [T: "sulkeva timantti"]          	        #  0x20df	(en: 'enclosing diamond embellishment', google translation)

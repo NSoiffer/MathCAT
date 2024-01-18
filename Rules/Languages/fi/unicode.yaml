@@ -179,7 +179,7 @@
  - "̄": [T: "pituusmerkki"]                     	 #  0x304	(en: 'macron embellishment', google: 'macronin koriste')
  - "̅": [T: "yläviiva"]                         	 #  0x305	(en: 'overbar embellishment', google: 'ylipalkin koriste')
  - "̆": [T: "lyhyysmerkki"]                     	 #  0x306	(en: 'breve', google: 'breve')
- - "̇": [T: "yläpiste"]                	 #  0x307	(en: 'dot above embellishment', google: 'piste koristelun yläpuolella')
+ - "̇": [T: "piste"]                	 #  0x307	(en: 'dot above embellishment', google: 'piste koristelun yläpuolella')
 
    # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
  - "Α-Ω": 
