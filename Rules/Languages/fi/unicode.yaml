@@ -122,7 +122,7 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [T: "hakasulku kiinni"]             	# 	(en: 'close bracket', google translation)
         else: [T: "oikea hakasulku"]            	# 	(en: 'right bracket', google: 'oikea kiinnike')
- - "^": [T: "sirkumfleksi"]                     	#  0x5e	(en: 'hat', google: 'hattu')
+ - "^": [T: "hattu"]                     	#  0x5e	(en: 'hat', google: 'hattu')
  - "_": [T: "alaviiva"]                         	#  0x5f	(en: 'under bar', google: 'baarin alla')
  - "`": [T: "gravis"]                           	#  0x60	(en: 'grave', google: 'hauta') # FI: not sure
  - "{":                                         	#  0x7b
