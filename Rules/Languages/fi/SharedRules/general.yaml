@@ -363,7 +363,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {T: "etsiä"}      # phrase(to 'seek' a solution)
+      then: {T: "sek"}      # phrase(to 'seek' a solution)
       else: {T: "sekantti"}      # phrase(a 'secant' intersects a curve at two or more points)
 - name: csc
   tag: mi
