@@ -38,7 +38,25 @@ fn fraction_equations_3() {
 
 #[test]
 fn powers_3() {
-    init_logger();
     let expr = "<math><msup><mn>2</mn><mn>3</mn></msup><mo>+</mo><mn>5</mn></math>";
     test_braille("Finnish", expr, "⠼⠃⠬⠼⠉⠀⠖⠼⠑");
+}
+
+#[test]
+fn roots_5() {
+    let expr = "<math><msup><mn>27</mn><mfrac><mn>1</mn><mn>3</mn></mfrac></msup><mo>=</mo>
+                        <mroot><mn>27</mn><mn>3</mn></mroot><mo>=</mo><mn>3</mn></math>";
+    test_braille("Finnish", expr, "⠼⠃⠛⠬⠼⠁⠒⠀⠶⠩⠼⠉⠐⠼⠃⠛⠀⠶⠼⠉");
+}
+
+#[test]
+fn roots_7() {
+    let expr = "<math><msqrt><mn>20</mn><mo>+</mo><mn>5</mn></msqrt><mo>=</mo><msqrt><mn>25</mn></msqrt><mo>=</mo><mn>5</mn></math>";
+    test_braille("Finnish", expr, "⠩⠦⠼⠃⠚⠀⠖⠼⠑⠀⠴⠀⠶⠩⠼⠃⠑⠀⠶⠼⠑");
+}
+
+#[test]
+fn vectors_1() {
+    let expr = "<math><mover><mi>a</mi><mo>&#xAF;</mo></mover></math>";
+    test_braille("Finnish", expr, "⠁⠱");
 }

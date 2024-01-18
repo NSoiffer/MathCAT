@@ -1656,9 +1656,6 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "s" => "⠆",     // typeface single char indicator
     "w" => "",     // typeface word indicator
     "e" => "",     // typeface & capital terminator 
-    "o" => "",       // flag that what follows is an open indicator (used for standing alone rule)
-    "c" => "",     // flag that what follows is an close indicator (used for standing alone rule)
-    "b" => "",       // flag that what follows is an open or close indicator (used for standing alone rule)
     "," => "⠂",     // comma
     "." => "⠲",     // period
     "-" => "-",     // hyphen
@@ -1666,15 +1663,16 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "―" => "⠐⠠⠤",  // long dash (2015) -- assume all long dashes are unified here [RUEB appendix 3]
     "↑" => "⠬",     // superscript
     "↓" => "⠡",     // subscript
-"#" => "",      // signals end of script
+    "#" => "",      // signals end of script
+    "Z" => "⠐",     // signals end of index of root, integrand/lim from function ("zone change")
 
 };
 
 fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     lazy_static! {
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏CLlMmb↑↓Nn𝑁Ww,])").unwrap();          
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏CLlMmb↑↓Nn𝑁WwZ,])").unwrap();          
         // Numbers need to end with a space, but sometimes there is one there for other reasons
-        static ref NUMBER_MATCH: Regex = Regex::new(r"((N.)+[^WN#↑↓])").unwrap();
+        static ref NUMBER_MATCH: Regex = Regex::new(r"((N.)+[^WN#↑↓Z])").unwrap();
     }
 
     // FIX: need to implement this -- this is just a copy of the Vietnam code
@@ -1708,7 +1706,6 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         let matched_char = &cap[0];
-        debug!("REPLACE_INDICATORS matched='{}'", matched_char);
         match matched_char {
             "𝔹" => &double_struck,
             "S" => &sans_serif,

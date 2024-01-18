@@ -38,40 +38,34 @@
    - x: "@data-unicode"
 
 -
-   name: default
-   tag: msqrt
-   match: .
-   replace: 
-   - t: "⠩"
-   - test:
-      if: "NeedsToBeGrouped(*[1], 'Finnish', true())"
+  name: default
+  tag: msqrt
+  match: .
+  replace: 
+  - t: "⠩"
+  - test:
+      if:  "NeedsToBeGrouped(*[1], 'Finnish', true())"
       then:
-      - t: "⠘"
+      - t: "⠦"
       - x: "*[1]"
-      - t: "⠱"
-      else: [x: "*"]
+      - t: "⠴"
+      else: [x: "*[1]"]
 
 -
-   name: default
-   tag: mroot
-   match: "."
-   replace: 
-   - t: "⠬"   # superscript
-   # index is first
-   - test:
-      if: "NeedsToBeGrouped(*[2], 'Finnish', false())"
-      then:
-      - t: "⠘"
-      - x: "*[2]"
-      - t: "⠱"
-      else: [x: "*[2]"]
-   - t: "⠩"   # root
-   - test:
+  name: default
+  tag: mroot
+  match: "."
+  replace: 
+  - t: "⠩"
+  # index is first - no grouping needed due to "Zone Change" after it
+  - x: "*[2]"
+  - t: "Z"   # zoone change
+  - test:
       if: "NeedsToBeGrouped(*[1], 'Finnish', true())"
       then:
-      - t: "⠘"
+      - t: "⠦"
       - x: "*[1]"
-      - t: "⠱"
+      - t: "⠴"
       else: [x: "*[1]"]
         
                
@@ -295,35 +289,15 @@
   - t: "W"
 
 -
-   name: single-char-exceptions    # GTM 12
-   tag: [mover, munder]
-   match: "*[2][string-length(.) = 1 and ( translate(., '_¯→.·˙~^','')='' or (parent::m:mover and text()='⌒') )]"
-   replace: 
-   - test:
-         if: "NeedsToBeGrouped(*[1], 'Finnish', true())"
-         then:
-         - t: "1⠣"
-         - x: "*[1]"
-         - t: "1⠜"
-         else: [x: "*[1]"]
-   - test:
-      if: "*[2][translate(., '_¯→^', '') = '']"
-      then: [t: "1"]
-   - test:
-      if: "self::m:munder"
-      then: [t: "⠠"]
-   - test:
-      - if: "*[2][text()='_' or text()='¯']"
-        then: [t: "⠱"]
-      - else_if: "*[2][text()='→']"
-        then: [t: "⠘⠱"]
-      - else_if: "*[2][text()='.' or text()='·' or text()='˙']"
-        then: [t: "⠘⠲"]
-      - else_if: "*[2][text()='~']"
-        then: [t: "⠸⠱"]
-      - else_if: "*[2][text()='^']"
-        then: [t: "⠐⠱ "]
-        else: [t: "⠨⠸⠱"]    # arc/⌒
+  name: single-char-exceptions
+  tag: [mover, munder]
+  match: "*[2][string-length(.) = 1 and translate(., '_¯','')='']"
+  replace: 
+  - x: "*[1]"
+  - test:
+      if: "self::m:mover"
+      then: [t: "⠱"]
+      else: [t: "⠤"]
 
 -
   name: single-char-exceptions    # RUEB 3.11 -- ° and various prime/minute/seconds aren't treated as if superscripts
