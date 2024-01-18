@@ -1,0 +1,22 @@
+---
+# this needs to be filled out
+
+ - "¼": [t: "#N⠁N⠲"]          # 0x00BC (Vulgar Fraction One Quarter)
+ - "½": [t: "#N⠁N⠆"]          # 0x00BD (Vulgar Fraction One Half)
+ - "¾": [t: "#N⠒N⠲"]          # 0x00BE (Vulgar Fraction Three Quarters)
+ - "⅐": [t: "#N⠁N⠶"]          # 0x2150 (Vulgar Fraction One Seventh)
+ - "⅑": [t: "#N⠁N⠔"]          # 0x2151 (Vulgar Fraction One Ninth)
+ - "⅒": [t: "#N⠁N⠂N⠴"]        # 0x2152 (Vulgar Fraction One Tenth)
+ - "⅓": [t: "#N⠁N⠒"]          # 0x2153 (Vulgar Fraction One Third)
+ - "⅔": [t: "#N⠃N⠒"]          # 0x2154 (Vulgar Fraction Two Thirds)
+ - "⅕": [t: "#N⠁N⠢"]          # 0x2155 (Vulgar Fraction One Fifth)
+ - "⅖": [t: "#N⠃N⠢"]          # 0x2156 (Vulgar Fraction Two Fifths)
+ - "⅗": [t: "#N⠒N⠢"]          # 0x2157 (Vulgar Fraction Three Fifths)
+ - "⅘": [t: "#N⠙N⠢"]          # 0x2158 (Vulgar Fraction Four Fifths)
+ - "⅙": [t: "#N⠁N⠖"]          # 0x2159 (Vulgar Fraction One Sixth)
+ - "⅚": [t: "#N⠢N⠖"]          # 0x215A (Vulgar Fraction Five Sixths)
+ - "⅛": [t: "#N⠁N⠦"]          # 0x215B (Vulgar Fraction One Eighth)
+ - "⅜": [t: "#N⠒N⠦"]          # 0x215C (Vulgar Fraction Three Eighths)
+ - "⅝": [t: "#N⠢N⠦"]          # 0x215D (Vulgar Fraction Five Eighths)
+ - "⅞": [t: "#N⠛N⠦"]          # 0x215E (Vulgar Fraction Seven Eighths)
+ - "↉": [t: "#N⠚N⠒"]          # 0x2189 (Vulgar Fraction Zero Thirds)
