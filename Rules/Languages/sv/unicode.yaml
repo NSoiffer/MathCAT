@@ -396,9 +396,9 @@
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: "är i"]                #  (en: 'is in', google translation)
               - else: [T: "tillhör"]             #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'belongs to')
- - "∏": [T: "produkt"]                           #  0x220f (en: 'product')
- - "∐": [T: "koprodukt"]                   #  0x2210 (en: 'co-product', MathPlayer: 'coproduct', google: 'samprodukt')
- - "∑": [T: "summa"]                             #  0x2211 (en: 'sum')
+ - "∏": [T: "produkten"]                           #  0x220f (en: 'product')
+ - "∐": [T: "koprodukten"]                   #  0x2210 (en: 'co-product', MathPlayer: 'coproduct', google: 'samprodukt')
+ - "∑": [T: "summan"]                             #  0x2211 (en: 'sum')
  - "−": [T: "minus"]                             #  0x2212
  - "∓": [T: "minus plus"]                        #  0x2213 (en: 'minus or plus')
  - "∗": [T: "gånger"]                      #  0x2217 (en: 'times')
@@ -430,13 +430,12 @@
      - T: "inte parallell med"                  #  (en: 'not parallel to')
  - "∧": [T: "och"]                               #  0x2227 (en: 'and')
  - "∨": [T: "eller"]                             #  0x2228 (en: 'or')
- - "∩": [T: "sniitt"]                             #  0x2229 (en: 'intersection')
- # SWEDISH: Weird spelling of "snitt" to make Microsoft's Swedish voice pronounce the word reasonably correct. Check with other voices!
- - "∪": [T: "union"]                             #  0x222a
- - "∫": [T: "integral"]                          #  0x222b
- - "∬": [T: "dubbel integral"]                   #  0x222c (en: 'double integral')
- - "∭": [T: "trippel integral"]                  #  0x222d (en: 'triple integral')
- - "∮": [T: "kurvintegral"]                      #  0x222e (en: 'contour integral')
+ - "∩": [T: "snittet"]                             #  0x2229 (en: 'intersection')
+ - "∪": [T: "unionen"]                             #  0x222a
+ - "∫": [T: "integralen"]                          #  0x222b
+ - "∬": [T: "dubbel-integralen"]                   #  0x222c (en: 'double integral')
+ - "∭": [T: "trippel-integralen"]                  #  0x222d (en: 'triple integral')
+ - "∮": [T: "kurvintegralen"]                      #  0x222e (en: 'contour integral')
  - "∶":                                          #  0x2236
      # - test: 
      #     if: "$Verbosity!='Terse'"
