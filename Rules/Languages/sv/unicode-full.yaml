@@ -797,7 +797,7 @@
  - "∤": [T: "delar inte"]                           #  0x2224    (en: 'does not divide')
  - "∧": [T: "och"]                                  #  0x2227    (en: 'and')
  - "∨": [T: "eller"]                                #  0x2228    (en: 'or')
- # SWEDISH: misspelled to fix pronounciation
+ # SWEDISH: misspelled to fix pronunciation
  - "∩": [T: "sniitt"]                                #  0x2229    (en: 'intersection')
  - "∪": [T: "union"]                                #  0x222a
  - "∫": [T: "integral"]                             #  0x222b
@@ -814,9 +814,9 @@
  - "∶":                                             #  0x2236
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "till"                             #     (en: 'to')
- - "∷": [t: "som"]                          #  0x2237    (en: 'as', MathPlayer: 'proportion', google: 'som')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "till"                             #     (en: 'to')
+ - "∷": [T: "som"]                          #  0x2237    (en: 'as', MathPlayer: 'proportion', google: 'som')
  - "∸": [t: "punkt minus"]                          #  0x2238    (en: 'dot minus')
  - "∹": [t: "har överskott jämfört med"]                            #  0x2239    (en: 'has excess compared to', MathPlayer: 'excess', google: 'har överskott jämfört med')
  - "∺":                                             #  0x223a
@@ -838,299 +838,306 @@
      - t: "omvänt långdraget s"                     #     (en: 'most positive', MathPlayer: 'inverted lazy s', google: 'mest positiva')
  - "∿": [T: "sinuskurva"]                           #  0x223f    (en: 'sine wave')
  - "≀": [T: "kransprodukt"]                         #  0x2240    (en: 'wreath product')
- - "≁": [t: "icke tilde"]                           #  0x2241    (en: 'not tilde')
- - "≂": [t: "minus tilde"]                          #  0x2242    (SRE: 'minus och tilde')
+ - "≁": [T: "inte proportionell mot"]                           #  0x2241    (en: 'not tilde')
+ - "≂": [T: "minus tilde"]                          #  0x2242    (SRE: 'minus och tilde')
  - "≃":                                             #  0x2243
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "är asymptotically lika med"              #     (en: 'asymptotically equal to', MathPlayer: 'asymptotically lika med', google: 'asymptotiskt lika med')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "asymptotiskt lika med"              #     (en: 'asymptotically equal to', MathPlayer: 'asymptotically lika med', google: 'asymptotiskt lika med')
  - "≄":                                             #  0x2244
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "är inte asymptotically lika med"         #     (en: 'not asymptotically equal to', MathPlayer: 'inte asymptotically lika med', google: 'inte asymptotiskt lika med')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "inte asymptotiskt lika med"         #     (en: 'not asymptotically equal to', MathPlayer: 'inte asymptotically lika med', google: 'inte asymptotiskt lika med')
  - "≅":                                             #  0x2245
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "är approximativt lika med"               #     (en: 'approximately equal to', MathPlayer: 'approximativt lika med', google: 'ungefär lika med')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "ungefär lika med"               #     (en: 'approximately equal to', MathPlayer: 'approximativt lika med', google: 'ungefär lika med')
  - "≆":                                             #  0x2246
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "är approximativt men inte faktiskt lika med"    #     (en: 'approximately but not actually equal to', MathPlayer: 'approximativt men inte faktiskt lika med', google: 'ungefär men inte faktiskt lika med')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "ungefär men inte faktiskt lika med"    #     (en: 'approximately but not actually equal to', MathPlayer: 'approximativt men inte faktiskt lika med', google: 'ungefär men inte faktiskt lika med')
  - "≇":                                             #  0x2247
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "är varken approximativt eller fakiskt lika med"    #     (en: 'neither approximately nor actually equal to', MathPlayer: 'varken approximativt eller fakiskt lika med', google: 'varken ungefär eller faktiskt lika med')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "varken ungefär eller fakiskt lika med"    #     (en: 'neither approximately nor actually equal to', MathPlayer: 'varken approximativt eller fakiskt lika med', google: 'varken ungefär eller faktiskt lika med')
  - "≈":                                             #  0x2248
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "nästan lika med"                         #     (en: 'almost equal to', SRE: 'är nästan lika med')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "ungefär lika med"                         #     (en: 'almost equal to', SRE: 'är nästan lika med')
  - "≉":                                             #  0x2249
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "inte nästan lika med"                    #     (en: 'not almost equal to', SRE: 'är inte nästan lika med')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "inte ungefär lika med"                    #     (en: 'not almost equal to', SRE: 'är inte nästan lika med')
  - "≊":                                             #  0x224a
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "nästan lika eller lika med"              #     (en: 'almost equal or equal to', SRE: 'är nästan lika eller lika med')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "ungefär lika med eller lika med"              #     (en: 'almost equal or equal to', SRE: 'är nästan lika eller lika med')
  - "≋": [t: "trippla tilde"]                        #  0x224b    (en: 'triple tilde')
- - "≌": [t: "är alla lika med"]                     #  0x224c    (en: 'are all equal to', MathPlayer: 'alla lika med')
+ - "≌": [T: "är alla lika med"]                     #  0x224c    (en: 'are all equal to', MathPlayer: 'alla lika med')
  - "≍":                                             #  0x224d
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "likvärdigt med"                          #     (en: 'equivalent to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "ekvivalent med"                          #     (en: 'equivalent to')
  - "≎":                                             #  0x224e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "är geometriskt lika med"                 #     (en: 'geometrically equivalent to', MathPlayer: 'geometriskt lika med', google: 'geometriskt motsvarande')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "är geometriskt ekvivalent med"                 #     (en: 'geometrically equivalent to', MathPlayer: 'geometriskt lika med', google: 'geometriskt motsvarande')
  - "≏":                                             #  0x224f
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "de"]                            #     (en: 'the', google translation)
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "de"]                            #     (en: 'the', google translation)
      - t: "differensen mellan"                      #     (en: 'difference between')
- - "≐": [t: "närmar sig gränsen"]                   #  0x2250    (en: 'approaches the limit')
+ - "≐": [T: "närmar sig gränsvärdet"]                   #  0x2250    (en: 'approaches the limit')
  - "≑":                                             #  0x2251
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "geometriskt lika med"                    #     (en: 'geometrically equal to', SRE: 'är geometriskt lika med')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "geometriskt lika med"                    #     (en: 'geometrically equal to', SRE: 'är geometriskt lika med')
  - "≒":                                             #  0x2252
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "är uppskattningsvis lika med eller i likhet med"    #     (en: 'approximately equal to or the image of', MathPlayer: 'uppskattningsvis lika med eller i likhet med', google: 'ungefär lika med eller bilden av')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "ungefär lika med"    #     (en: 'approximately equal to or the image of', MathPlayer: 'uppskattningsvis lika med eller i likhet med', google: 'ungefär lika med eller bilden av')
  - "≓":                                             #  0x2253
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is the', google translation)
-     - t: "är i likhet med eller uppskattningsvis lika med"    #     (en: 'image of or approximately equal to', MathPlayer: 'i likhet med eller uppskattningsvis lika med', google: 'bild av eller ungefär lika med')
- - "≔": [t: "är kolon lika med"]                    #  0x2254    (en: 'colon equals', MathPlayer: 'kolon lika med', google: 'kolon är lika med')
- - "≕": [t: "är lika med kolon"]                    #  0x2255    (en: 'equals colon', MathPlayer: 'lika med kolon')
- - "≖": [t: "ring i lika med"]                      #  0x2256    (en: 'ring in equal to', SRE: 'är ring i lika med')
+         then: [T: "är"]                            #     (en: 'is the', google translation)
+     - T: "ungefär lika med"    #     (en: 'image of or approximately equal to', MathPlayer: 'i likhet med eller uppskattningsvis lika med', google: 'bild av eller ungefär lika med')
+ - "≔": [T: "definieras som"]                    #  0x2254    (en: 'colon equals', MathPlayer: 'kolon lika med', google: 'kolon är lika med')
+ - "≕": [t: "lika med kolon"]                    #  0x2255    (en: 'equals colon', MathPlayer: 'lika med kolon')
+ - "≖": [T: "ring i lika med"]                      #  0x2256    (en: 'ring in equal to', SRE: 'är ring i lika med')
  - "≗":                                             #  0x2257
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
+         then: [T: "är"]                            #     (en: 'is', google translation)
      - t: "ring lika med"                           #     (en: 'approximately equal to')
- - "≘": [t: "motsvarar"]                            #  0x2258    (en: 'corresponds to')
+ - "≘": [T: "motsvarar"]                            #  0x2258    (en: 'corresponds to')
  - "≙": [t: "skattar"]                              #  0x2259    (en: 'estimates')
  - "≚":                                             #  0x225a
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "är"]                            #     (en: 'is', google translation)
-     - T: "likvinklig"                      #     (en: 'equiangular to')
- - "≛": [t: "stjärna lika med"]                     #  0x225b    (en: 'star equals')
+     - T: "likvinklig med"                      #     (en: 'equiangular to')
+ - "≛": [T: "stjärna lika med"]                     #  0x225b    (en: 'star equals')
  # SWEDISH: misspelled delta to fix pronunciation
- - "≜": [t: "dellta lika med"]                       #  0x225c    (en: 'delta equals')
- - "≝": [t: "per definition lika med"]              #  0x225d    (en: 'is defined to be')
+ - "≜": [T: "dellta lika med"]                       #  0x225c    (en: 'delta equals')
+ - "≝": [T: "per definition lika med"]              #  0x225d    (en: 'is defined to be')
  - "≞":                                             #  0x225e
     # - test: 
     #     if: "$Verbosity!='Terse'"
-    #     then: [t: "är"]                            #     (en: 'is', google translation)
+    #     then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "mäts med"                                #     (en: 'measured by')
  - "≟": [T: "ifrågasatt likhet"]                  #  0x225f    (en: 'has an unknown relationship with')
  - "≠":                                             #  0x2260
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "inte lika med"                           #     (en: 'not equal to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "inte lika med"                           #     (en: 'not equal to')
  - "≡":                                             #  0x2261
+ # SWEDISH: This symbol can mean different things. Can MathML differ between them? If so, build a test?
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "identisk med"                            #     (en: 'identical to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - t: "identiskt lika med"                            #     (en: 'identical to')
  - "≢":                                             #  0x2262
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "inte identisk med"                       #     (en: 'not identical to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "inte identisk med"                       #     (en: 'not identical to')
  - "≣":                                             #  0x2263
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "strikt likvärdig med"                    #     (en: 'strictly equivalent to')
- - "≦": [t: "mindre än över lika med"]              #  0x2266    (en: 'less than over equal to')
- - "≧": [t: "större än över lika med"]              #  0x2267    (en: 'greater than over equal to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "strikt ekvivalent med"                    #     (en: 'strictly equivalent to')
+ - "≦": [T: "mindre än eller lika med"]              #  0x2266    (en: 'less than over equal to')
+ - "≧": [T: "större än eller lika med"]              #  0x2267    (en: 'greater than over equal to')
  - "≨":                                             #  0x2268
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "mindre än men inte lika med"             #     (en: 'less than but not equal to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "mindre än men inte lika med"             #     (en: 'less than but not equal to')
  - "≩":                                             #  0x2269
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "större än men inte lika med"             #     (en: 'greater than but not equal to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "större än men inte lika med"             #     (en: 'greater than but not equal to')
  - "≪":                                             #  0x226a
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "mycket mindre än"                        #     (en: 'much less than')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "mycket mindre än"                        #     (en: 'much less than')
  - "≫":                                             #  0x226b
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "mycket större än"                        #     (en: 'much greater than')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "mycket större än"                        #     (en: 'much greater than')
  - "≬":                                             #  0x226c
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "mellan"                                  #     (en: 'between')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "mellan"                                  #     (en: 'between')
  - "≭":                                             #  0x226d
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "inte likvärdig med"                      #     (en: 'not equivalent to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "inte ekvivalent med"                      #     (en: 'not equivalent to')
  - "≮":                                             #  0x226e
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "inte mindre än"                          #     (en: 'not less than')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "inte mindre än"                          #     (en: 'not less than')
  - "≯":                                             #  0x226f
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "inte större än"                          #     (en: 'not greater than')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "inte större än"                          #     (en: 'not greater than')
  - "≰":                                             #  0x2270
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "varken mindre än eller lika med"         #     (en: 'neither less than nor equal to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "varken mindre än eller lika med"         #     (en: 'neither less than nor equal to')
  - "≱":                                             #  0x2271
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "varken större än eller lika med"         #     (en: 'neither greater than nor equal to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "varken större än eller lika med"         #     (en: 'neither greater than nor equal to')
  - "≲":                                             #  0x2272
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "mindre än eller likvärdig med"           #     (en: 'less than or equivalent to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "mindre än eller ungefär lika med"           #     (en: 'less than or equivalent to')
  - "≳":                                             #  0x2273
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "större än eller likvärdig med"           #     (en: 'greater than or equivalent to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "större än eller ungefär lika med"           #     (en: 'greater than or equivalent to')
  - "≴":                                             #  0x2274
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "varken mindre än eller likvärdig med"    #     (en: 'neither less than nor equivalent to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "varken mindre än eller ungefär lika med"    #     (en: 'neither less than nor equivalent to')
  - "≵":                                             #  0x2275
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "varken större än eller likvärdig med"    #     (en: 'neither greater than nor equivalent to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "varken större än eller ungefär lika med"    #     (en: 'neither greater than nor equivalent to')
  - "≶":                                             #  0x2276
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "mindre än eller större än"               #     (en: 'less than or greater than')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "mindre än eller större än"               #     (en: 'less than or greater than')
  - "≷":                                             #  0x2277
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "större än eller mindre än"               #     (en: 'greater than or less than')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "större än eller mindre än"               #     (en: 'greater than or less than')
  - "≸":                                             #  0x2278
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "varken mindre än eller större än"        #     (en: 'neither less than nor greater than')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "varken mindre än eller större än"        #     (en: 'neither less than nor greater than')
  - "≹":                                             #  0x2279
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "varken större än eller mindre än"        #     (en: 'neither greater than nor less than')
- - "≺": [t: "kommer före"]                          #  0x227a    (en: 'precedes')
- - "≻": [t: "kommer efter"]                         #  0x227b    (en: 'succeeds')
- - "≼": [t: "kommer före eller är lika med"]        #  0x227c    (en: 'precedes or is equal to')
- - "≽": [t: "kommer efter eller är lika med"]       #  0x227d    (en: 'succeeds or is equal to')
- - "≾": [t: "kommer före eller är likvärdig med"]    #  0x227e    (en: 'precedes or is equivalent to')
- - "≿": [t: "kommer efter eller är likvärdig med"]    #  0x227f    (en: 'succeeds or is equivalent to')
- - "⊀": [t: "kommer inte före"]                     #  0x2280    (en: 'does not precede')
- - "⊁": [t: "kommer inte efter"]                    #  0x2281    (en: 'does not succeed')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "varken större än eller mindre än"        #     (en: 'neither greater than nor less than')
+ - "≺": [t: "föregår"]                          #  0x227a    (en: 'precedes')
+ - "≻": [t: "följer"]                         #  0x227b    (en: 'succeeds')
+ - "≼": [t: "föregår eller är lika med"]        #  0x227c    (en: 'precedes or is equal to')
+ - "≽": [t: "följer eller är lika med"]       #  0x227d    (en: 'succeeds or is equal to')
+ - "≾": [t: "föregår eller är ekvivalent med"]    #  0x227e    (en: 'precedes or is equivalent to')
+ - "≿": [t: "följer eller är ekvivalent med"]    #  0x227f    (en: 'succeeds or is equivalent to')
+ - "⊀": [t: "föregår inte"]                     #  0x2280    (en: 'does not precede')
+ - "⊁": [t: "följer inte"]                    #  0x2281    (en: 'does not succeed')
  - "⊂":                                             #  0x2282
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är en"]                         #     (en: 'is a', google translation)
-     - t: "äkta delmängd av"                        #     (en: 'subset of')
+         then: [T: "är en"]                         #     (en: 'is a', google translation)
+     - T: "delmängd av"                        #     (en: 'subset of')
  - "⊃":                                             #  0x2283
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "är en"]                         #     (en: 'is a', google translation)
-     - t: "äkta delmängd av"                        #     (en: 'superset of')
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "är en"]                         #     (en: 'is a', google translation)
+     - T: "innehåller som en delmängd"                        #     (en: 'superset of')
  - "⊄":                                             #  0x2284
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "inte en delmängd av"                     #     (en: 'not a subset of')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "inte en delmängd av"                     #     (en: 'not a subset of')
  - "⊅":                                             #  0x2285
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "inte en delmängd av"                     #     (en: 'not a superset of')
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "är"]                            #     (en: 'is', google translation)
+     - T: "innehåller inte som en delmängd"                     #     (en: 'not a superset of')
  - "⊆":                                             #  0x2286
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är en"]                         #     (en: 'is a', google translation)
-     - t: "delmängd av"                             #     (en: 'subset of or equal to')
+         then: [T: "är en"]                         #     (en: 'is a', google translation)
+     - T: "delmängd av eller lika med"                             #     (en: 'subset of or equal to')
  - "⊇":                                             #  0x2287
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "är en"]                         #     (en: 'is a', google translation)
-     - t: "delmängd av"                             #     (en: 'superset of or equal to')
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "är en"]                         #     (en: 'is a', google translation)
+     - T: "innehåller som en delmängd eller är lika med"                             #     (en: 'superset of or equal to')
  - "⊈":                                             #  0x2288
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "inte en delmängd av"                     #     (en: 'neither a subset of nor equal to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "varken en delmängd av eller lika med"                     #     (en: 'neither a subset of nor equal to')
  - "⊉":                                             #  0x2289
-     - test: 
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "är"]                            #     (en: 'is', google translation)
+     - t: "varken innehåller som delmängd eller lika med"                     #     (en: 'neither a superset of nor equal to')
+ - "⊊":         #  0x228a    (en: 'subset of with not equal to')
+# SWEDISH: added test    
+    - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "inte en delmängd av"                     #     (en: 'neither a superset of nor equal to')
- - "⊊": [t: "delmängd av med inte lika med"]        #  0x228a    (en: 'subset of with not equal to')
- - "⊋": [t: "delmängd av med inte lika med"]        #  0x228b    (en: 'superset of with not equal to')
- - "⊌": [t: "multiset"]                             #  0x228c    (SRE: 'multimängd')
- - "⊍": [t: "multiset multiplikation"]              #  0x228d    (en: 'multiset multiplication')
- - "⊎": [t: "multiset union"]                       #  0x228e    (SRE: 'multimängdunion')
- - "⊏": [t: "kvadratiskt bild av"]                  #  0x228f    (en: 'square image of', MathPlayer: 'square image of', google: 'fyrkantig bild av')
- - "⊐": [t: "definitionsmängd "]                    #  0x2290    (en: 'square original of', MathPlayer: 'square original of', google: 'fyrkantig original av')
- - "⊑": [t: "kvadratiskt bild av eller lika med"]    #  0x2291    (en: 'square image of or equal to', MathPlayer: 'square image of or equal to', google: 'fyrkantig bild av eller lika med')
- - "⊒": [t: "definitionsmängd eller lika med"]      #  0x2292    (en: 'square original of or equal to', MathPlayer: 'square original of or equal to', google: 'fyrkantig original av eller lika med')
- - "⊓": [t: "square stort"]                         #  0x2293    (en: 'square cap')
- - "⊔": [t: "square cup"]                           #  0x2294    (SRE: 'kvadratisk kopp')
- - "⊕": [t: "cirkel plus"]                          #  0x2295    (en: 'circled plus')
- - "⊖": [t: "cirkel minus"]                         #  0x2296    (en: 'circled minus')
- - "⊗": [t: "cirkel times"]                         #  0x2297    (en: 'circled times')
- - "⊘": [t: "cirkel slash"]                         #  0x2298    (en: 'circled slash')
- - "⊙": [t: "cirkel dot"]                           #  0x2299    (en: 'circled dot operator')
- - "⊚": [t: "cirkel ring"]                          #  0x229a    (en: 'circled ring')
- - "⊛": [t: "cirkel asterisk"]                      #  0x229b    (en: 'circled asterisk')
- - "⊜": [t: "cirkel equals"]                        #  0x229c    (en: 'circled equals')
- - "⊝": [t: "cirkel dash"]                          #  0x229d    (en: 'circled dash')
- - "⊞": [t: "square plus"]                          #  0x229e    (en: 'squared plus')
- - "⊟": [t: "square minus"]                         #  0x229f    (en: 'squared minus')
- - "⊠": [t: "square times"]                         #  0x22a0    (en: 'squared times')
- - "⊡": [t: "square dot"]                           #  0x22a1    (en: 'squared dot operator')
- - "⊢": [t: "höger tack"]                           #  0x22a2    (en: 'proves')
- - "⊣": [t: "vänster tack"]                         #  0x22a3    (en: 'does not yield')
- - "⊤": [t: "ner tack"]                             #  0x22a4    (en: 'top')
+         then: [T: "är en"]                         
+     - T: "äkta delmängd av"                        
+ - "⊋": [T: "innehåller som en äkta delmängd"]        #  0x228b    (en: 'superset of with not equal to')
+ - "⊌": [T: "multi-mängd"]                             #  0x228c    (SRE: 'multimängd')
+ - "⊍": [T: "multi-mängds-multiplikation"]              #  0x228d    (en: 'multiset multiplication')
+ - "⊎": [T: "multi-mängds-union"]                       #  0x228e    (SRE: 'multimängdunion')
+ - "⊏": [t: "fyrkantig delmängd av"]                  #  0x228f    (en: 'square image of', MathPlayer: 'square image of', google: 'fyrkantig bild av')
+ - "⊐": [t: "fyrkantig innehåller som delmängd"]                    #  0x2290    (en: 'square original of', MathPlayer: 'square original of', google: 'fyrkantig original av')
+ - "⊑": [t: "fyrkantig delmänd av eller lika med"]    #  0x2291    (en: 'square image of or equal to', MathPlayer: 'square image of or equal to', google: 'fyrkantig bild av eller lika med')
+ - "⊒": [t: "fyrkantig innehåller som delmängd eller lika med"]      #  0x2292    (en: 'square original of or equal to', MathPlayer: 'square original of or equal to', google: 'fyrkantig original av eller lika med')
+ # SWEDISH: misspelled to fix pronunciation
+ - "⊓": [t: "fyrkantig sniitt"]                         #  0x2293    (en: 'square cap')
+ - "⊔": [t: "fyrkantig union"]                           #  0x2294    (SRE: 'kvadratisk kopp')
+ - "⊕": [T: "direkt summa"]                          #  0x2295    (en: 'circled plus')
+ - "⊖": [T: "symmetrisk differens"]                         #  0x2296    (en: 'circled minus')
+ - "⊗": [T: "tensorprodukt"]                         #  0x2297    (en: 'circled times')
+ - "⊘": [t: "division i cirkel"]                         #  0x2298    (en: 'circled slash')
+ - "⊙": [t: "XNOR"]                           #  0x2299    (en: 'circled dot operator')
+ - "⊚": [T: "ringoperator i cirkel"]                          #  0x229a    (en: 'circled ring')
+ - "⊛": [t: "asteriskoperator i cirkel"]                      #  0x229b    (en: 'circled asterisk')
+ - "⊜": [t: "likhetstecken i cirkel"]                        #  0x229c    (en: 'circled equals')
+ - "⊝": [T: "symmetrisk differens"]                          #  0x229d    (en: 'circled dash')
+ - "⊞": [t: "plustecken i kvadrat"]                          #  0x229e    (en: 'squared plus')
+ - "⊟": [t: "minustecken i kvadrat"]                         #  0x229f    (en: 'squared minus')
+ - "⊠": [t: "multiplikationstecken i kvadrat"]                         #  0x22a0    (en: 'squared times')
+ - "⊡": [t: "punktoperator i kvadrat"]                           #  0x22a1    (en: 'squared dot operator')
+ - "⊢": [t: "bevisar"]                           #  0x22a2    (en: 'proves')
+ - "⊣": [t: "bevisar inte"]                         #  0x22a3    (en: 'does not yield')
+ - "⊤": [t: "sanning"]                             #  0x22a4    (en: 'top')
  - "⊥":                                             #  0x22a5
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "uppåtriktat stift"                       #     (en: 'bottom', MathPlayer: 'up tack', google: 'botten')
- - "⊦": [t: "påstående"]                            #  0x22a6    (en: 'reduces to')
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "är"]                            #     (en: 'is', google translation)
+     - t: "motsägelse"                       #     (en: 'bottom', MathPlayer: 'up tack', google: 'botten')
+ - "⊦": [t: "reduceras till"]                            #  0x22a6    (en: 'reduces to')
  - "⊧": [t: "modeller"]                             #  0x22a7    (en: 'models', MathPlayer: 'models')
  - "⊨":                                             #  0x22a8
      - test: 
@@ -1182,8 +1189,8 @@
  - "⊿": [t: "höger triangel"]                       #  0x22bf    (en: 'right triangle')
  - "⋀": [t: "logiskt och"]                          #  0x22c0    (en: 'logical and')
  - "⋁": [t: "logiskt eller"]                        #  0x22c1    (en: 'logical or')
- - "⋂": [t: "sniitt"]                                #  0x22c2    (en: 'intersection')
- - "⋃": [t: "union"]                                #  0x22c3
+ - "⋂": [T: "sniitt"]                                #  0x22c2    (en: 'intersection')
+ - "⋃": [T: "union"]                                #  0x22c3
  - "⋄": [t: "diamond operator"]                     #  0x22c4
  - "⋅":                                             #  0x22c5
     - test: 
