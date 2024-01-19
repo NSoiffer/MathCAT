@@ -46,9 +46,9 @@
   - test:
       if:  "NeedsToBeGrouped(*[1], 'Finnish', true())"
       then:
-      - t: "⠦"
+      - t: "("
       - x: "*[1]"
-      - t: "⠴"
+      - t: ")"
       else: [x: "*[1]"]
 
 -
@@ -63,9 +63,9 @@
   - test:
       if: "NeedsToBeGrouped(*[1], 'Finnish', true())"
       then:
-      - t: "⠦"
+      - t: "("
       - x: "*[1]"
-      - t: "⠴"
+      - t: ")"
       else: [x: "*[1]"]
         
                
@@ -102,17 +102,17 @@
   - test:
       if:  "NeedsToBeGrouped(*[1], 'Finnish', true())"
       then:
-      - t: "⠦"
+      - t: "("
       - x: "*[1]"
-      - t: "⠴"
+      - t: ")"
       else: [x: "*[1]"]
   - t: "⠀⠌"
   - test:
       if: "NeedsToBeGrouped(*[2], 'Finnish', true())"
       then:
-      - t: "⠦"
+      - t: "("
       - x: "*[2]"
-      - t: "⠴"
+      - t: ")"
       else: [x: "*[2]"]
 
 -
@@ -307,12 +307,20 @@
   - test:
       if: "NeedsToBeGrouped(*[1], 'Finnish', true())"
       then:
-      - t: "1⠣"
+      - t: "("
       - x: "*[1]"
-      - t: "1⠜"
+      - t: ")"
       else: [x: "*[1]"]
   - x: "*[2]"
 
+-
+  # Chemistry has a special rule for numerical subscripts (note base is not necessarily a chemical element)
+  name: chemistry
+  tag: msub
+  match: "*[2][self::m:mn][not(contains(., '.,'))] and ancestor-or-self::*[@data-chem-formula]"
+  replace:
+  - x: "*[1]"
+  - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'CMU')"   # drop numbers for the numerator
 
 -
    name: default
@@ -322,9 +330,9 @@
    - test:
       if: "(self::m:munder or self::m:mover) and NeedsToBeGrouped(*[1], 'Finnish', true())"
       then:
-      - t: "⠦"
+      - t: "("
       - x: "*[1]"
-      - t: "⠴"
+      - t: ")"
       else:
       - x: "*[1]"
    - with:   # this could be tighter and be just around the *[2] part, but this is consistent with msubsup below
@@ -344,9 +352,9 @@
            then: [t: ""]                # superscripts=2 don't include the '2'
          - else_if: "NeedsToBeGrouped(*[2], 'Finnish', false())"
            then:
-           - t: "⠦"
-           - x: "*[2]"
-           - t: "⠴"
+            - t: "("
+            - x: "*[2]"
+            - t: ")"
            else:
            - x: "*[2]" 
    - t: "W"   # signal end script/numeric mode
@@ -365,9 +373,9 @@
   - test:
       if: "self::m:mundermover and NeedsToBeGrouped(*[1], 'Finnish', true())"
       then:
-      - t: "⠘"
+      - t: "("
       - x: "*[1]"
-      - t: "⠱"
+      - t: ")"
       else: [x: "*[1]"]
   - with:
       variables:
@@ -705,9 +713,9 @@
    - test:
       if: "NeedsToBeGrouped(*[1], 'Finnish', false())"
       then:
-      - t: "1⠣"
+      - t: "("
       - x: "*[1]"
-      - t: "1⠜"
+      - t: ")"
       else: [x: "*[1]"]
 
    # - test:

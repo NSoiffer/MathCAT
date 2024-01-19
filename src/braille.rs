@@ -1648,8 +1648,9 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     // "U" => "⠈⠈",    // Russian
     "C" => "⠠",      // capital
     "𝑐" => "",       // second or latter braille cell of a capital letter
-    "𝐶" => "⠠",      // capital that never should get word indicator (from chemical element)
+    "𝐶" => "⠠",      // capital that never should get whitespace in front (from chemical element)
     "N" => "⠼",     // number indicator
+    "n" => "⠼",     // number indicator for drop numbers (special case with close parens)
     "t" => "⠱",     // shape terminator
     "W" => "⠀",     // whitespace"
     "𝐖"=> "⠀",     // whitespace
@@ -1661,6 +1662,8 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "-" => "-",     // hyphen
     "—" => "⠠⠤",   // normal dash (2014) -- assume all normal dashes are unified here [RUEB appendix 3]
     "―" => "⠐⠠⠤",  // long dash (2015) -- assume all long dashes are unified here [RUEB appendix 3]
+    "(" => "⠦",     // Not really needed, but done for consistancy with ")"
+    ")" => "⠴",     // Needed for rules with drop numbers to avoid mistaking for dropped 0
     "↑" => "⠬",     // superscript
     "↓" => "⠡",     // subscript
     "#" => "",      // signals end of script
@@ -1670,23 +1673,28 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 
 fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     lazy_static! {
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏CLlMmb↑↓Nn𝑁WwZ,])").unwrap();          
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏C𝐶LlMmb↑↓Nn𝑁WwZ,()])").unwrap();          
         // Numbers need to end with a space, but sometimes there is one there for other reasons
-        static ref NUMBER_MATCH: Regex = Regex::new(r"((N.)+[^WN#↑↓Z])").unwrap();
+        static ref DROP_NUMBER_SEPARATOR: Regex = Regex::new(r"(n.)\)").unwrap();
+        static ref NUMBER_MATCH: Regex = Regex::new(r"((N.)+[^WN𝐶#↑↓Z])").unwrap();
     }
 
-    // FIX: need to implement this -- this is just a copy of the Vietnam code
     debug!("finnish_cleanup: start={}", raw_braille);
-    let result = typeface_to_word_mode(&raw_braille);
-    let result = capitals_to_word_mode(&result);
+    let result = DROP_NUMBER_SEPARATOR.replace_all(&raw_braille, |cap: &Captures| {
+        // match includes the char after the number -- insert the whitespace before it
+        // debug!("DROP_NUMBER_SEPARATOR match='{}'", &cap[1]);
+        return cap[1].to_string() + "𝐶)";       // hack to use "𝐶" instead of dot 6 directly, but works for NUMBER_MATCH
+    });
+    let result = result.replace('n', "N");  // avoids having to modify remove_unneeded_mode_changes()
     let result = NUMBER_MATCH.replace_all(&result, |cap: &Captures| {
         // match includes the char after the number -- insert the whitespace before it
-        debug!("NUMBER_MATCH match='{}'", &cap[0]);
+        // debug!("NUMBER_MATCH match='{}'", &cap[1]);
         let mut chars = cap[0].chars();
         let last_char = chars.next_back().unwrap(); // unwrap safe since several chars were matched
         return chars.as_str().to_string() + "W" + &last_char.to_string();
     });
 
+    // FIX: need to implement this -- this is just a copy of the Vietnam code
     let result = result.replace("CG", "⠘")
                                     .replace("𝔹C", "⠩")
                                     .replace("DC", "⠰");

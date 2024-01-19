@@ -20,6 +20,14 @@ fn calculation_marks_7() {
 }
 
 #[test]
+fn fraction_10() {
+    let expr = "<math>
+        <mfrac><mn>3</mn><mn>4</mn></mfrac><mo>+</mo>
+        <mfrac><mn>1</mn><mn>4</mn></mfrac><mo>=</mo><mn>1</mn></math>";
+    test_braille("Finnish", expr, "⠼⠉⠲⠀⠖⠼⠁⠲⠀⠶⠼⠁");
+}
+
+#[test]
 fn fraction_13() {
     let expr = "<math><mfrac><mn>5</mn><mn>4</mn></mfrac><mo>=</mo><mn>1</mn><mfrac><mn>1</mn><mn>4</mn></mfrac></math>";
     test_braille("Finnish", expr, "⠼⠑⠲⠀⠶⠼⠁⠼⠁⠲");
@@ -37,9 +45,29 @@ fn fraction_equations_3() {
 }
 
 #[test]
+fn fraction_equations_6() {
+    let expr = "<math><mfrac>
+        <mrow><mfrac><mn>1</mn><mn>2</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>3</mn></mfrac></mrow>
+        <mrow><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>&#x2212;</mo><mfrac><mn>1</mn><mn>5</mn></mfrac></mrow>
+    </mfrac></math>";
+    test_braille("Finnish", expr, "⠦⠼⠁⠆⠀⠖⠼⠁⠒⠠⠴⠀⠌⠦⠼⠁⠲⠀⠤⠼⠁⠢⠠⠴");
+}
+
+#[test]
 fn powers_3() {
     let expr = "<math><msup><mn>2</mn><mn>3</mn></msup><mo>+</mo><mn>5</mn></math>";
     test_braille("Finnish", expr, "⠼⠃⠬⠼⠉⠀⠖⠼⠑");
+}
+
+#[test]
+fn powers_6() {
+    let expr = "<math>
+        <msup><mn>2</mn><mn>20</mn></msup>
+        <mo>=</mo>
+        <mn>1</mn><mtext>&#x2009;</mtext><mn>048</mn><mtext>&#x2009;</mtext><mn>576</mn>
+    </math>
+   ";
+    test_braille("Finnish", expr, "⠼⠃⠬⠼⠃⠚⠀⠶⠼⠁⠄⠚⠙⠓⠄⠑⠛⠋");
 }
 
 #[test]
@@ -59,4 +87,18 @@ fn roots_7() {
 fn vectors_1() {
     let expr = "<math><mover><mi>a</mi><mo>&#xAF;</mo></mover></math>";
     test_braille("Finnish", expr, "⠁⠱");
+}
+
+#[test]
+fn chemistry_2_4() {
+    // From MathType
+    let expr = "<math><msub><mtext>C</mtext><mn>2</mn></msub><msub><mtext>H</mtext><mn>5</mn></msub><mtext>OH</mtext></math>";
+    test_braille("Finnish", expr, "⠠⠉⠼⠆⠠⠓⠼⠢⠠⠕⠠⠓");
+}
+
+#[test]
+fn chemistry_2_8() {
+    // From MathType
+    let expr = "<math><msup><mrow><mtext>Cu</mtext></mrow><mrow><mn>2</mn><mo>+</mo></mrow></msup></math>";
+    test_braille("Finnish", expr, "⠠⠉⠥⠬⠦⠼⠃⠀⠖⠴⠀");
 }

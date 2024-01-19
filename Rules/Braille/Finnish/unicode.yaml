@@ -19,8 +19,8 @@
 #  - "#": [t: "⠘⠼"]                # 0x0023 (number sign ; crosshatch ; tic-tac-toe ; pounds ( weight ))
 #  - "$": [t: "⠘⠎"]                # 0x0024 (dollar sign)
 #  - "%": [t: "⠹"]                # 0x0025 (percent sign)
- - "(": [t: "⠦"]                # 0x0028 (left parenthesis)
- - ")": [t: "⠴"]                # 0x0029 (right parenthesis)
+ - "(": [t: "("]                # 0x0028 (left parenthesis -- handled later)
+ - ")": [t: ")"]                # 0x0029 (right parenthesis -- handled later)
  - "+": [t: "W⠖"]                # 0x002B (regular plus)
  - "-": [t: "W⠤"]                # 0x002D (hyphen)
  - ".": [t: "⠄"]                # 0x002E (decimal point (American and Continental))
@@ -223,16 +223,16 @@
  - "⁤": [t: ""]                 # 0x2064 (invisible plus)
 
  # we stick the drop numbers into the private use area for consistency
- - "\ue000": [t: "N⠴"]               # 0 
- - "\ue001": [t: "N⠂"]               # 1 
- - "\ue002": [t: "N⠆"]               # 2 
- - "\ue003": [t: "N⠒"]               # 3 
- - "\ue004": [t: "N⠲"]               # 4 
- - "\ue005": [t: "N⠢"]               # 5 
- - "\ue006": [t: "N⠖"]               # 6 
- - "\ue007": [t: "N⠶"]               # 7 
- - "\ue008": [t: "N⠦"]               # 8 
- - "\ue009": [t: "N⠔"]               # 9 
+ - "\ue000": [t: "n⠴"]               # 0 
+ - "\ue001": [t: "n⠂"]               # 1 
+ - "\ue002": [t: "n⠆"]               # 2 
+ - "\ue003": [t: "n⠒"]               # 3 
+ - "\ue004": [t: "n⠲"]               # 4 
+ - "\ue005": [t: "n⠢"]               # 5 
+ - "\ue006": [t: "n⠖"]               # 6 
+ - "\ue007": [t: "n⠶"]               # 7 
+ - "\ue008": [t: "n⠦"]               # 8 
+ - "\ue009": [t: "n⠔"]               # 9 
 
  - "a": [t: "L⠁"]               # 0x61 
  - "b": [t: "L⠃"]               # 0x62 
@@ -398,30 +398,82 @@
  - "Ỵ": [t: "CL⠠𝑐L⠽"]
 
  - "A": [t: "CL⠁"]              # 0x41 
- - "B": [t: "CL⠃"]              # 0x42
- - "C": [t: "CL⠉"]              # 0x43 
+ - "B":                         # 0x42 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠃"]
+        else: [t: "CL⠃"]
+ - "C":                         # 0x43 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠉"]
+        else: [t: "CL⠉"]
  - "D": [t: "CL⠙"]              # 0x44 
  - "E": [t: "CL⠑"]              # 0x45 
  - "F": [t: "CL⠋"]              # 0x46 
  - "G": [t: "CL⠛"]              # 0x47 
- - "H": [t: "CL⠓"]              # 0x48 
- - "I": [t: "CL⠊"]              # 0x49 
+ - "H":                         # 0x48 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠓"]
+        else: [t: "CL⠓"]
+ - "I":                         # 0x49 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠊"]
+        else: [t: "CL⠊"]
  - "J": [t: "CL⠚"]              # 0x4a 
- - "K": [t: "CL⠅"]              # 0x4b 
+ - "K":                         # 0x4b 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠅"]
+        else: [t: "CL⠅"]
  - "L": [t: "CL⠇"]              # 0x4c 
  - "M": [t: "CL⠍"]              # 0x4d 
- - "N": [t: "CL⠝"]              # 0x4e 
- - "O": [t: "CL⠕"]              # 0x4f 
- - "P": [t: "CL⠏"]              # 0x50 
+ - "N":                         # 0x4e 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠝"]
+        else: [t: "CL⠝"]
+ - "O":                         # 0x4f 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠕"]
+        else: [t: "CL⠕"]
+ - "P":                         # 0x50 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠏"]
+        else: [t: "CL⠏"]
  - "Q": [t: "CL⠟"]              # 0x51 
  - "R": [t: "CL⠗"]              # 0x52 
- - "S": [t: "CL⠎"]              # 0x53 
+ - "S":                         # 0x53 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠎"]
+        else: [t: "CL⠎"]
  - "T": [t: "CL⠞"]              # 0x54 
- - "U": [t: "CL⠥"]              # 0x55 
- - "V": [t: "CL⠧"]              # 0x56 
- - "W": [t: "CL⠺"]              # 0x57 
+ - "U":                         # 0x55 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠥"]
+        else: [t: "CL⠥"]
+ - "V":                         # 0x56 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠧"]
+        else: [t: "CL⠧"]
+ - "W":                         # 0x57 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠺"]
+        else: [t: "CL⠺"]
  - "X": [t: "CL⠭"]              # 0x58 
- - "Y": [t: "CL⠽"]              # 0x59 
+ - "Y":                         # 0x59 
+    - test:
+        if: "@data-chem-element"
+        then: [t: "𝐶L⠽"]
+        else: [t: "CL⠽"]
  - "Z": [t: "CL⠵"]              # 0x5a 
 
  - "α": [t: "GL⠁"]              # 0x3b1 
