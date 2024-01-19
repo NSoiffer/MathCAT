@@ -100,9 +100,10 @@
          then: [T: "är"]                         #  (en: 'is', google translation)
      - T: "mindre än"                            #  (en: 'less than')
  - "=":                                          #  0x3d
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [T: "är"]                         #  (en: 'is equal to', google translation)
+     # - test: 
+     #     if: "$Verbosity!='Terse'"
+     #     then: [T: "är"]                         #  (en: 'is equal to', google translation)
+     # SWEDISH: We remove "är" from all occurrences of = after consulting our mathematician advisor.
      - T: "lika med"                             #  (en: 'equals', MathPlayer: 'lika med', google: 'lika')
 
  - ">":                                          #  0x3e
@@ -437,9 +438,9 @@
  - "∭": [T: "trippel integral"]                  #  0x222d (en: 'triple integral')
  - "∮": [T: "kurvintegral"]                      #  0x222e (en: 'contour integral')
  - "∶":                                          #  0x2236
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [T: "är"]                         #  (en: 'is', google translation)
+     # - test: 
+     #     if: "$Verbosity!='Terse'"
+     #     then: [T: "är"]                         #  (en: 'is', google translation)
      - T: "till"                            #  (en: 'to')
  - "∷": [T: "som"]                        #  0x2237 (en: 'as', MathPlayer: 'proportion', google: 'som')
  - "∼": [T: "tilde"]                      #  0x223c (en: 'varies with')
@@ -453,14 +454,14 @@
      - T: "omvänt långdraget s"                  #  (en: 'most positive', MathPlayer: 'inverted lazy s', google: 'mest positiva')
  - "∿": [T: "sinuskurva"]                        #  0x223f (en: 'sine wave')
  - "≠":                                          #  0x2260
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [T: "är"]                         #  (en: 'is', google translation)
+     # - test: 
+     #     if: "$Verbosity!='Terse'"
+     #     then: [T: "är"]                         #  (en: 'is', google translation)
      - T: "inte lika med"                        #  (en: 'not equal to')
  - "≡":                                          #  0x2261
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [T: "är"]                         #  (en: 'is', google translation)
+     # - test: 
+     #     if: "$Verbosity!='Terse'"
+     #     then: [T: "är"]                         #  (en: 'is', google translation)
      - T: "identisk med"                         #  (en: 'identical to')
  - "≤":                                          #  0x2264
      - test: 
