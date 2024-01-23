@@ -1138,59 +1138,58 @@
     #     then: [t: "är"]                            #     (en: 'is', google translation)
      - t: "motsägelse"                       #     (en: 'bottom', MathPlayer: 'up tack', google: 'botten')
  - "⊦": [t: "reduceras till"]                            #  0x22a6    (en: 'reduces to')
- - "⊧": [t: "modeller"]                             #  0x22a7    (en: 'models', MathPlayer: 'models')
  - "⊨":                                             #  0x22a8
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "sant"                                    #     (en: 'true')
- - "⊩": [t: "tvingar"]                              #  0x22a9    (en: 'forces')
- - "⊪": [t: "triple vertical bar höger turnstile"]    #  0x22aa    (en: 'triple vertical bar right turnstile')
- - "⊫": [t: "dubbel vertical bar dubbel höger turnstile"]    #  0x22ab    (en: 'double vertical bar double right turnstile')
- - "⊬": [t: "bevisar inte"]                         #  0x22ac    (en: 'does not prove')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "sant"                                    #     (en: 'true')
+ - "⊩": [T: "tvingar"]                              #  0x22a9    (en: 'forces')
+ - "⊪": [T: "två vertikala streck till vänster om vändkors"]    #  0x22aa    (en: 'triple vertical bar right turnstile')
+ - "⊫": [T: "dubbelslaget vändkors"]    #  0x22ab    (en: 'double vertical bar double right turnstile')
+ - "⊬": [T: "bevisar inte"]                         #  0x22ac    (en: 'does not prove')
  - "⊭":                                             #  0x22ad
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "inte sant"                               #     (en: 'not true')
- - "⊮": [t: "tvingar inte"]                         #  0x22ae    (en: 'does not force')
- - "⊯": [t: "negated dubbel vertical bar dubbel höger turnstile"]    #  0x22af    (en: 'negated double vertical bar double right turnstile')
- - "⊰": [t: "partialordning av"]                    #  0x22b0    (en: 'precedes under relation', MathPlayer: 'precedes under relation', google: 'föregår under relation')
- - "⊱": [t: "partialordning till"]                  #  0x22b1    (en: 'succeeds under relation', MathPlayer: 'succeeds under relation', google: 'lyckas under relation')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "inte sant"                               #     (en: 'not true')
+ - "⊮": [T: "tvingar inte"]                         #  0x22ae    (en: 'does not force')
+ - "⊯": [T: "överstruket dubbelslaget vändkors"]    #  0x22af    (en: 'negated double vertical bar double right turnstile')
+ - "⊰": [T: "föregår under relation"]                    #  0x22b0    (en: 'precedes under relation', MathPlayer: 'precedes under relation', google: 'föregår under relation')
+ - "⊱": [T: "följer under relation"]                  #  0x22b1    (en: 'succeeds under relation', MathPlayer: 'succeeds under relation', google: 'lyckas under relation')
  - "⊲":                                             #  0x22b2
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "normal delmängd av"                      #     (en: 'a normal subgroup of')
- - "⊳": [t: "omfattas som normal delmängd"]         #  0x22b3    (en: 'contains as a normal subgroup')
+         then: [T: "är en"]                            #     (en: 'is', google translation)
+     - T: "normal delgrupp av"                      #     (en: 'a normal subgroup of')
+ - "⊳": [T: "innehåller som normal delgrupp"]         #  0x22b3    (en: 'contains as a normal subgroup')
  - "⊴":                                             #  0x22b4
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "normal delmängd av eller lika med"       #     (en: 'a normal subgroup of or equal to')
- - "⊵": [t: "omfattas som normal delmängd eller lika med"]    #  0x22b5    (en: 'contains as a normal subgroup or equal to')
+         then: [T: "är en"]                            #     (en: 'is', google translation)
+     - T: "normal delgrupp av eller lika med"       #     (en: 'a normal subgroup of or equal to')
+ - "⊵": [T: "innehåller som normal delmängd eller lika med"]    #  0x22b5    (en: 'contains as a normal subgroup or equal to')
  - "⊶":                                             #  0x22b6
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "definitionsmängd"                        #     (en: 'the original of', MathPlayer: 'original of', google: 'originalet av')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "definitionsmängden av"                        #     (en: 'the original of', MathPlayer: 'original of', google: 'originalet av')
  - "⊷":                                             #  0x22b7
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "värdemängd"                              #     (en: 'an image of', MathPlayer: 'image of', google: 'en bild av')
- - "⊸": [t: "multimap"]                             #  0x22b8    (SRE: 'multimatris')
- - "⊹": [t: "hermitian conjugate matrix"]           #  0x22b9    (SRE: 'hermetisk konjugatmatris')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "värdemängden av"                              #     (en: 'an image of', MathPlayer: 'image of', google: 'en bild av')
+ - "⊸": [t: "linjär implikation"]                             #  0x22b8    (SRE: 'multimatris')
+ - "⊹": [T: "hermetisk matris"]           #  0x22b9    (SRE: 'hermetisk konjugatmatris')
  - "⊺": [t: "inskjutning"]                          #  0x22ba    (en: 'intercalate', MathPlayer: 'intercalate', google: 'interkalat')
- - "⊻": [t: "x or"]                                 #  0x22bb    (en: 'xor')
- - "⊼": [t: "n and"]                                #  0x22bc    (en: 'nand')
- - "⊽": [t: "n or"]                                 #  0x22bd    (en: 'nor')
- - "⊾": [t: "höger vinkel med båge"]                #  0x22be    (en: 'right angle with arc')
- - "⊿": [t: "höger triangel"]                       #  0x22bf    (en: 'right triangle')
- - "⋀": [t: "logiskt och"]                          #  0x22c0    (en: 'logical and')
- - "⋁": [t: "logiskt eller"]                        #  0x22c1    (en: 'logical or')
- - "⋂": [T: "snittet"]                                #  0x22c2    (en: 'intersection')
- - "⋃": [T: "unionen"]                                #  0x22c3
+ - "⊻": [T: "exklusiv disjunktion"]                                 #  0x22bb    (en: 'xor')
+ - "⊼": [T: "sheffers streck"]                                #  0x22bc    (en: 'nand')
+ - "⊽": [T: "varken eller"]                                 #  0x22bd    (en: 'nor')
+ - "⊾": [T: "rät vinkel med båge"]                #  0x22be    (en: 'right angle with arc')
+ - "⊿": [T: "rätvinklig triangel"]                       #  0x22bf    (en: 'right triangle')
+ - "⋀": [T: "konjunktion"]                          #  0x22c0    (en: 'logical and')
+ - "⋁": [T: "disjunktion"]                        #  0x22c1    (en: 'logical or')
+ - "⋂": [T: "sniitt"]                                #  0x22c2    (en: 'intersection')
+ - "⋃": [T: "union"]                                #  0x22c3
  - "⋄": [t: "diamond operator"]                     #  0x22c4
  - "⋅":                                             #  0x22c5
     - test: 
