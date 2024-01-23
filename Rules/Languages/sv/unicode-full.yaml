@@ -1109,13 +1109,13 @@
  - "⊌": [T: "multi-mängd"]                             #  0x228c    (SRE: 'multimängd')
  - "⊍": [T: "multi-mängds-multiplikation"]              #  0x228d    (en: 'multiset multiplication')
  - "⊎": [T: "multi-mängds-union"]                       #  0x228e    (SRE: 'multimängdunion')
- - "⊏": [t: "fyrkantig delmängd av"]                  #  0x228f    (en: 'square image of', MathPlayer: 'square image of', google: 'fyrkantig bild av')
- - "⊐": [t: "fyrkantig innehåller som delmängd"]                    #  0x2290    (en: 'square original of', MathPlayer: 'square original of', google: 'fyrkantig original av')
- - "⊑": [t: "fyrkantig delmänd av eller lika med"]    #  0x2291    (en: 'square image of or equal to', MathPlayer: 'square image of or equal to', google: 'fyrkantig bild av eller lika med')
- - "⊒": [t: "fyrkantig innehåller som delmängd eller lika med"]      #  0x2292    (en: 'square original of or equal to', MathPlayer: 'square original of or equal to', google: 'fyrkantig original av eller lika med')
+ - "⊏": [T: "delmängd av"]                  #  0x228f    (en: 'square image of', MathPlayer: 'square image of', google: 'fyrkantig bild av')
+ - "⊐": [T: "innehåller som delmängd"]                    #  0x2290    (en: 'square original of', MathPlayer: 'square original of', google: 'fyrkantig original av')
+ - "⊑": [T: "delmängd av eller lika med"]    #  0x2291    (en: 'square image of or equal to', MathPlayer: 'square image of or equal to', google: 'fyrkantig bild av eller lika med')
+ - "⊒": [T: "innehåller som delmängd eller lika med"]      #  0x2292    (en: 'square original of or equal to', MathPlayer: 'square original of or equal to', google: 'fyrkantig original av eller lika med')
  # SWEDISH: misspelled to fix pronunciation
- - "⊓": [t: "fyrkantigt snitt"]                         #  0x2293    (en: 'square cap')
- - "⊔": [t: "fyrkantig union"]                           #  0x2294    (SRE: 'kvadratisk kopp')
+ - "⊓": [T: "snittet"]                         #  0x2293    (en: 'square cap')
+ - "⊔": [T: "unionen"]                           #  0x2294    (SRE: 'kvadratisk kopp')
  - "⊕": [T: "direkt summa"]                          #  0x2295    (en: 'circled plus')
  - "⊖": [T: "symmetrisk differens"]                         #  0x2296    (en: 'circled minus')
  - "⊗": [T: "tensorprodukt"]                         #  0x2297    (en: 'circled times')
@@ -1129,16 +1129,16 @@
  - "⊟": [t: "minustecken i kvadrat"]                         #  0x229f    (en: 'squared minus')
  - "⊠": [t: "multiplikationstecken i kvadrat"]                         #  0x22a0    (en: 'squared times')
  - "⊡": [t: "punktoperator i kvadrat"]                           #  0x22a1    (en: 'squared dot operator')
- - "⊢": [t: "bevisar"]                           #  0x22a2    (en: 'proves')
- - "⊣": [t: "bevisar inte"]                         #  0x22a3    (en: 'does not yield')
+ - "⊢": [T: "bevisar"]                           #  0x22a2    (en: 'proves')
+ - "⊣": [T: "bevisar inte"]                         #  0x22a3    (en: 'does not yield')
  - "⊤": [t: "sanning"]                             #  0x22a4    (en: 'top')
  - "⊥":                                             #  0x22a5
     # - test: 
     #     if: "$Verbosity!='Terse'"
     #     then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "motsägelse"                       #     (en: 'bottom', MathPlayer: 'up tack', google: 'botten')
- - "⊦": [t: "reduceras till"]                            #  0x22a6    (en: 'reduces to')
- - "⊧": [t: "innebär"]                             #  0x22a7    (en: 'models', MathPlayer: 'models')
+     - T: "motsägelse"                       #     (en: 'bottom', MathPlayer: 'up tack', google: 'botten')
+ - "⊦": [T: "reduceras till"]                            #  0x22a6    (en: 'reduces to')
+ - "⊧": [T: "innebär"]                             #  0x22a7    (en: 'models', MathPlayer: 'models')
  - "⊨":                                             #  0x22a8
      - test: 
          if: "$Verbosity!='Terse'"
@@ -1192,7 +1192,7 @@
  # SWEDISH: misspelled to fix pronunciation
  - "⋂": [T: "snittet"]                                #  0x22c2    (en: 'intersection')
  - "⋃": [T: "unionen"]                                #  0x22c3
- - "⋄": [t: "diamond-operator"]                     #  0x22c4
+ - "⋄": [T: "diamond-operator"]                     #  0x22c4
  - "⋅":                                             #  0x22c5
     - test: 
         if: "@data-chem-formula-op"
@@ -1200,209 +1200,209 @@
         else: [T: "gånger"]                          #     (en: 'times')
 
  - "⋆": [T: "stjärna"]                              #  0x22c6    (en: 'times')
- - "⋇": [t: "delat med gånger"]                      #  0x22c7    (en: 'division times')
- - "⋈": [t: "naturlig join"]                                #  0x22c8    (en: 'bowtie', MathPlayer: 'bowtie')
+ - "⋇": [T: "delat med gånger"]                      #  0x22c7    (en: 'division times')
+ - "⋈": [T: "naturlig join"]                                #  0x22c8    (en: 'bowtie', MathPlayer: 'bowtie')
  - "⋉":                                             #  0x22c9
     #- test: 
     #    if: "$Verbosity!='Terse'"
     #    then: [t: "är"]                             #     (en: 'is', google translation)
-    - t: "vänster semi-join"    #     (en: 'the left normal factor semidirect product of')
+    - T: "vänster semi-join"    #     (en: 'the left normal factor semidirect product of')
  - "⋊":                                             #  0x22ca
     # - test: 
     #     if: "$Verbosity!='Terse'"
     #     then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "höger semi-join"    #     (en: 'the right normal factor semidirect product of')
+     - T: "höger semi-join"    #     (en: 'the right normal factor semidirect product of')
  - "⋋":                                             #  0x22cb
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "vänster semidirect product"              #     (en: 'the left semidirect product of')
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "är"]                            #     (en: 'is', google translation)
+     - T: "vänster semi-direkt product"              #     (en: 'the left semidirect product of')
  - "⋌":                                             #  0x22cc
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "höger semidirect product"                #     (en: 'the right semidirect product of')
- - "⋍": [t: "omvänt tilde lika med"]                #  0x22cd    (en: 'reversed tilde equals')
- - "⋎": [t: "curly logical or"]                     #  0x22ce
- - "⋏": [t: "curly logical och"]                    #  0x22cf    (en: 'curly logical and')
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "är"]                            #     (en: 'is', google translation)
+     - T: "höger semi-direkt produkt"                #     (en: 'the right semidirect product of')
+ - "⋍": [T: "omvänt tilde lika med"]                #  0x22cd    (en: 'reversed tilde equals')
+ - "⋎": [T: "disjunktion"]                     #  0x22ce
+ - "⋏": [T: "konjunktion"]                    #  0x22cf    (en: 'curly logical and')
  - "⋐":                                             #  0x22d0
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "dubbel delmängd"                         #     (en: 'a double subset of')
+         then: [T: "är en"]                            #     (en: 'is', google translation)
+     - T: "dubbel delmängd av"                         #     (en: 'a double subset of')
  - "⋑":                                             #  0x22d1
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "dubbel supermängd"                       #     (en: 'a double superset of')
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "är"]                            #     (en: 'is', google translation)
+     - T: "innehåller som dubbel delmängd"                       #     (en: 'a double superset of')
  - "⋒":                                             #  0x22d2
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "de"]                            #     (en: 'the', google translation)
-     - t: "dubbelt snitt"                           #     (en: 'double intersection of')
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "de"]                            #     (en: 'the', google translation)
+     - T: "dubbla snittet"                           #     (en: 'double intersection of')
  - "⋓":                                             #  0x22d3
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "de"]                            #     (en: 'the', google translation)
-     - t: "dubbel union"                            #     (en: 'double union of')
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "de"]                            #     (en: 'the', google translation)
+     - T: "dubbla unionen"                            #     (en: 'double union of')
  - "⋔":                                             #  0x22d4
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "de"]                            #     (en: 'the', google translation)
-     - t: "högaffel"                                #     (en: 'proper intersection of', MathPlayer: 'pitchfork', google: 'korrekt skärningspunkt av')
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "de"]                            #     (en: 'the', google translation)
+     - T: "äkta snittet av"                                #     (en: 'proper intersection of', MathPlayer: 'pitchfork', google: 'korrekt skärningspunkt av')
  - "⋕":                                             #  0x22d5
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "lika och och parallellt med"             #     (en: 'equal to and parallel to')
- - "⋖": [t: "mindre än med punkt"]                #  0x22d6    (en: 'less than with dot')
- - "⋗": [t: "större än med punkt"]                  #  0x22d7    (en: 'greater than with dot')
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "är"]                            #     (en: 'is', google translation)
+     - T: "lika med och och parallell med"             #     (en: 'equal to and parallel to')
+ - "⋖": [T: "mindre än med punkt"]                #  0x22d6    (en: 'less than with dot')
+ - "⋗": [T: "större än med punkt"]                  #  0x22d7    (en: 'greater than with dot')
  - "⋘":                                             #  0x22d8
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "väldigt mycket mindre än"                #     (en: 'very much less than')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "väldigt mycket mindre än"                #     (en: 'very much less than')
  - "⋙":                                             #  0x22d9
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "väldigt mycket större än"                #     (en: 'very much greater than')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "väldigt mycket större än"                #     (en: 'very much greater than')
  - "⋚":                                             #  0x22da
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "mindre än lika med eller större än"      #     (en: 'less than equal to or greater than')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "mindre än lika med eller större än"      #     (en: 'less than equal to or greater than')
  - "⋛":                                             #  0x22db
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "större än lika med eller mindre än"      #     (en: 'greater than equal to or less than')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "större än lika med eller mindre än"      #     (en: 'greater than equal to or less than')
  - "⋜":                                             #  0x22dc
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "lika med eller mindre än"                #     (en: 'equal to or less than')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "lika med eller mindre än"                #     (en: 'equal to or less than')
  - "⋝":                                             #  0x22dd
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "lika med eller större än"                #     (en: 'equal to or greater than')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "lika med eller större än"                #     (en: 'equal to or greater than')
  - "⋞":                                             #  0x22de
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "lika med eller kommer före"              #     (en: 'equal to or precedes')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "lika med eller föregår"              #     (en: 'equal to or precedes')
  - "⋟":                                             #  0x22df
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "lika med eller kommer efter"             #     (en: 'equal to or succeeds')
- - "⋠": [t: "kommer inte före eller är lika med"]    #  0x22e0    (en: 'does not precede nor is equal to')
- - "⋡": [t: "kommer inte efter eller är lika med"]    #  0x22e1    (en: 'does not succeed nor is equal to')
- - "⋢": [t: "not square image of or equal to"]      #  0x22e2
- - "⋣": [t: "not square original of or equal to"]    #  0x22e3
- - "⋤": [t: "square image of or not equal to"]      #  0x22e4
- - "⋥": [t: "square original of or not equal to"]    #  0x22e5
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "lika med eller följer"             #     (en: 'equal to or succeeds')
+ - "⋠": [T: "varken föregår eller är lika med"]    #  0x22e0    (en: 'does not precede nor is equal to')
+ - "⋡": [T: "varken följer eller är lika med"]    #  0x22e1    (en: 'does not succeed nor is equal to')
+ - "⋢": [T: "varken en delmängd av eller lika med"]      #  0x22e2
+ - "⋣": [T: "varken innehåller som delmängd eller lika med"]    #  0x22e3
+ - "⋤": [T: "är en äkta delmängd av"]      #  0x22e4
+ - "⋥": [T: "innehåller som en äkta delmängd"]    #  0x22e5
  - "⋦":                                             #  0x22e6
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "mindre än men inte likvärdigt med"       #     (en: 'less than but not equivalent to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "mindre än men inte ekvivalent med"       #     (en: 'less than but not equivalent to')
  - "⋧":                                             #  0x22e7
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "större än men inte likvärdigt med"       #     (en: 'greater than but not equivalent to')
- - "⋨": [t: "kommer för men är inte likvärdigt med"]    #  0x22e8    (en: 'precedes but is not equivalent to')
- - "⋩": [t: "kommer efter men är inte likvärdigt med"]    #  0x22e9    (en: 'succeeds but is not equivalent to')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "större än men inte ekvivalent med"       #     (en: 'greater than but not equivalent to')
+ - "⋨": [T: "föregår men är inte ekvivalent med"]    #  0x22e8    (en: 'precedes but is not equivalent to')
+ - "⋩": [T: "följer men är inte ekvivalent med"]    #  0x22e9    (en: 'succeeds but is not equivalent to')
  - "⋪":                                             #  0x22ea
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "inte normal delmängd av"                 #     (en: 'not a normal subgroup of')
- - "⋫": [t: "omfattas inte som normal delmängd"]    #  0x22eb    (en: 'does not contain as a normal subgroup')
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "inte en normal delgrupp av"                 #     (en: 'not a normal subgroup of')
+ - "⋫": [T: "innehåller inte som normal delgrupp"]    #  0x22eb    (en: 'does not contain as a normal subgroup')
  - "⋬":                                             #  0x22ec
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "inte normal delmängd till ellr lika med"    #     (en: 'not a normal subgroup of nor is equal to')
- - "⋭": [t: "omfattas inte som normal delmängd eller lika med"]    #  0x22ed    (en: 'does not contain as a normal subgroup nor is equal to')
- - "⋮": [t: "vertikal ellips"]                      #  0x22ee    (en: 'vertical ellipsis')
- - "⋯": [t: "halvhög horisontell ellips"]           #  0x22ef    (en: 'dot dot dot')
- - "⋰": [t: "diagonal upp höger ellips"]            #  0x22f0    (en: 'upwards diagonal ellipsis')
- - "⋱": [t: "diagonal ner höger ellips"]            #  0x22f1    (en: 'diagonal ellipsis')
- - "⋲": [t: "tillhör med långt horisontalt streck"]    #  0x22f2    (en: 'element of with long horizontal stroke')
- - "⋳": [t: "tillhör med vertikalt streck i slutet av horisontalt streck"]    #  0x22f3    (en: 'element of with vertical bar at end of horizontal stroke')
- - "⋴": [t: "tillhör med vertikalt streck i slutet av horisontalt streck"]    #  0x22f4    (en: 'element of with vertical bar at end of horizontal stroke')
- - "⋵": [t: "tillhör med prick över"]            #  0x22f5    (en: 'element of with dot above')
- - "⋶": [t: "tillhör med streck över"]           #  0x22f6    (en: 'element of with overbar')
- - "⋷": [t: "tillhör med streck över"]     #  0x22f7    (en: 'element of with overbar', MathPlayer: 'element of or equal to', google: 'element av med överbar')
- - "⋸": [t: "tillhör med streck under"]          #  0x22f8    (en: 'element of with underbar')
- - "⋹": [t: "tillhör med två horisontella streck"]    #  0x22f9    (en: 'element of with two horizontal strokes')
- - "⋺": [t: "innehåller med långt horisontellt streck"]    #  0x22fa    (en: 'contains with long horizontal stroke')
- - "⋻": [t: "innehåller med vertikalt streck i slutet av horisontalt streck"]    #  0x22fb    (en: 'contains with vertical bar at end of horizontal stroke')
- - "⋼": [t: "innehåller med vertikalt streck i slutet av horisontalt streck"]    #  0x22fc    (en: 'contains with vertical bar at end of horizontal stroke')
- - "⋽": [t: "innehåller med streck över"]           #  0x22fd    (en: 'contains with overbar', MathPlayer: 'contains or equal to', google: 'innehåller med overbar')
- - "⋾": [t: "litet innehåller med streck över"]     #  0x22fe    (en: 'contains with overbar')
- - "⋿": [t: "mängdtillhörighet enligt z-notation"]    #  0x22ff    (en: 'z notation bag membership', MathPlayer: 'z notation bag membership', google: 'z medlemskap för notation bag')
- - "⌀": [t: "diameter"]                             #  0x2300
+         then: [T: "är"]                            #     (en: 'is', google translation)
+     - T: "varken en normal delgrupp av eller lika med"    #     (en: 'not a normal subgroup of nor is equal to')
+ - "⋭": [T: "varken innehåller som normal delmängd eller lika med"]    #  0x22ed    (en: 'does not contain as a normal subgroup nor is equal to')
+ - "⋮": [T: "vertikal ellips"]                      #  0x22ee    (en: 'vertical ellipsis')
+ - "⋯": [T: "halvhög horisontell ellips"]           #  0x22ef    (en: 'dot dot dot')
+ - "⋰": [T: "diagonal ellips uppåt"]            #  0x22f0    (en: 'upwards diagonal ellipsis')
+ - "⋱": [T: "diagonal ellips nedåt"]            #  0x22f1    (en: 'diagonal ellipsis')
+ - "⋲": [T: "tillhör med långt horisontalt streck"]    #  0x22f2    (en: 'element of with long horizontal stroke')
+ - "⋳": [T: "tillhör med vertikalt streck i slutet av horisontalt streck"]    #  0x22f3    (en: 'element of with vertical bar at end of horizontal stroke')
+ - "⋴": [T: "tillhör med vertikalt streck i slutet av horisontalt streck"]    #  0x22f4    (en: 'element of with vertical bar at end of horizontal stroke')
+ - "⋵": [T: "tillhör med prick över"]            #  0x22f5    (en: 'element of with dot above')
+ - "⋶": [T: "tillhör med streck över"]           #  0x22f6    (en: 'element of with overbar')
+ - "⋷": [T: "tillhör med streck över"]     #  0x22f7    (en: 'element of with overbar', MathPlayer: 'element of or equal to', google: 'element av med överbar')
+ - "⋸": [T: "tillhör med streck under"]          #  0x22f8    (en: 'element of with underbar')
+ - "⋹": [T: "tillhör med två horisontella streck"]    #  0x22f9    (en: 'element of with two horizontal strokes')
+ - "⋺": [T: "innehåller med långt horisontellt streck"]    #  0x22fa    (en: 'contains with long horizontal stroke')
+ - "⋻": [T: "innehåller med vertikalt streck i slutet av horisontalt streck"]    #  0x22fb    (en: 'contains with vertical bar at end of horizontal stroke')
+ - "⋼": [T: "innehåller med vertikalt streck i slutet av horisontalt streck"]    #  0x22fc    (en: 'contains with vertical bar at end of horizontal stroke')
+ - "⋽": [T: "innehåller med streck över"]           #  0x22fd    (en: 'contains with overbar', MathPlayer: 'contains or equal to', google: 'innehåller med overbar')
+ - "⋾": [T: "innehåller med streck över"]     #  0x22fe    (en: 'contains with overbar')
+ - "⋿": [t: "tillhör enligt z-notation"]    #  0x22ff    (en: 'z notation bag membership', MathPlayer: 'z notation bag membership', google: 'z medlemskap för notation bag')
+ - "⌀": [T: "diameter"]                             #  0x2300
  - "⌁": [t: "elektrisk pil"]                        #  0x2301    (en: 'electric arrow')
- - "⌂": [t: "hus"]                                  #  0x2302    (en: 'house')
- - "⌃": [t: "pilspets uppåt"]                       #  0x2303    (en: 'up arrowhead', google: 'upp pilspetsen')
- - "⌄": [t: "pilspets nedåt"]                       #  0x2304    (en: 'down arrowhead', google: 'ner pilspetsen')
- - "⌅": [t: "projektiv"]                            #  0x2305    (en: 'projective')
- - "⌆": [t: "perspektiv"]                           #  0x2306    (en: 'perspective')
- - "⌇": [t: "vågig linje"]                          #  0x2307    (en: 'wavy line', google: 'wavy line')
- - "⌈": [t: "vänster tak"]                          #  0x2308    (en: 'left ceiling')
- - "⌉": [t: "höger tak"]                            #  0x2309    (en: 'right ceiling')
- - "⌊": [t: "vänster golv"]                         #  0x230a    (en: 'left floor')
- - "⌋": [t: "höger golv"]                           #  0x230b    (en: 'right floor')
- - "⌌": [t: "bottom höger crop"]                    #  0x230c    (en: 'bottom right crop')
- - "⌍": [t: "bottom vänster crop"]                  #  0x230d    (en: 'bottom left crop')
- - "⌎": [t: "top höger crop"]                       #  0x230e    (en: 'top right crop')
- - "⌏": [t: "top vänster crop"]                     #  0x230f    (en: 'top left crop')
- - "⌐": [t: "bakvänt inte"]                         #  0x2310    (en: 'reversed not sign')
- - "⌑": [t: "kvadratisk romb"]                      #  0x2311    (en: 'square lozenge', google: 'square pastill')
- - "⌒": [t: "båge"]                                 #  0x2312    (en: 'arc')
- - "⌓": [t: "segment"]                              #  0x2313
- - "⌔": [t: "sektor"]                               #  0x2314    (en: 'sector')
- - "⌕": [t: "telefon inspelare"]                    #  0x2315    (en: 'telephone recorder', google: 'telefoninspelare')
- - "⌖": [t: "positions indikator; korshår"]         #  0x2316    (en: 'position indicator crosshairs', google: 'positionindikator korsstolar')
- - "⌗": [t: "viewdata square"]                      #  0x2317    (google translation)
- - "⌘": [t: "sevärdhetsmärke"]                      #  0x2318    (en: 'place of interest sign', google: 'plats för räntetecken')
- - "⌙": [t: "vände inte tecken"]                    #  0x2319    (en: 'turned not sign', google translation)
- - "⌚": [t: "klocka"]                               #  0x231a    (en: 'watch', google: 'kolla på')
- - "⌛": [t: "timglas"]                              #  0x231b    (en: 'hourglass', google translation)
- - "⌜": [t: "övre vänster hörn"]                    #  0x231c    (en: 'top left corner')
- - "⌝": [t: "övre höger hörn"]                      #  0x231d    (en: 'top right corner')
- - "⌞": [t: "nedre vänster hörn"]                   #  0x231e    (en: 'bottom left corner')
- - "⌟": [t: "nedre vänster hörn"]                   #  0x231f    (en: 'bottom right corner')
+ - "⌂": [T: "hus"]                                  #  0x2302    (en: 'house')
+ - "⌃": [T: "pilspets uppåt"]                       #  0x2303    (en: 'up arrowhead', google: 'upp pilspetsen')
+ - "⌄": [T: "pilspets nedåt"]                       #  0x2304    (en: 'down arrowhead', google: 'ner pilspetsen')
+ - "⌅": [T: "projektiv"]                            #  0x2305    (en: 'projective')
+ - "⌆": [T: "perspektiv"]                           #  0x2306    (en: 'perspective')
+ - "⌇": [T: "vågig linje"]                          #  0x2307    (en: 'wavy line', google: 'wavy line')
+ - "⌈": [T: "vänster tak"]                          #  0x2308    (en: 'left ceiling')
+ - "⌉": [T: "höger tak"]                            #  0x2309    (en: 'right ceiling')
+ - "⌊": [T: "vänster golv"]                         #  0x230a    (en: 'left floor')
+ - "⌋": [T: "höger golv"]                           #  0x230b    (en: 'right floor')
+ - "⌌": [T: "nedre höger utsnitt"]                    #  0x230c    (en: 'bottom right crop')
+ - "⌍": [T: "nedre vänster utsnitt"]                  #  0x230d    (en: 'bottom left crop')
+ - "⌎": [T: "övre höger utsnitt"]                       #  0x230e    (en: 'top right crop')
+ - "⌏": [T: "övre vänster utsnitt"]                     #  0x230f    (en: 'top left crop')
+ - "⌐": [T: "omvänt icke"]                         #  0x2310    (en: 'reversed not sign')
+ - "⌑": [T: "kvadratisk romb"]                      #  0x2311    (en: 'square lozenge', google: 'square pastill')
+ - "⌒": [T: "båge"]                                 #  0x2312    (en: 'arc')
+ - "⌓": [T: "segment"]                              #  0x2313
+ - "⌔": [T: "sektor"]                               #  0x2314    (en: 'sector')
+ - "⌕": [t: "telefon"]                    #  0x2315    (en: 'telephone recorder', google: 'telefoninspelare')
+ - "⌖": [t: "hårkors"]         #  0x2316    (en: 'position indicator crosshairs', google: 'positionindikator korsstolar')
+ - "⌗": [t: "fyrkant"]                      #  0x2317    (google translation)
+ - "⌘": [T: "sevärdhet"]                      #  0x2318    (en: 'place of interest sign', google: 'plats för räntetecken')
+ - "⌙": [T: "roterat icke"]                    #  0x2319    (en: 'turned not sign', google translation)
+ - "⌚": [T: "klocka"]                               #  0x231a    (en: 'watch', google: 'kolla på')
+ - "⌛": [T: "timglas"]                              #  0x231b    (en: 'hourglass', google translation)
+ - "⌜": [T: "övre vänster hörn"]                    #  0x231c    (en: 'top left corner')
+ - "⌝": [T: "övre höger hörn"]                      #  0x231d    (en: 'top right corner')
+ - "⌞": [T: "nedre vänster hörn"]                   #  0x231e    (en: 'bottom left corner')
+ - "⌟": [T: "nedre höger hörn"]                   #  0x231f    (en: 'bottom right corner')
  - "⌠": [t: "övre halvans integral"]                #  0x2320    (en: 'top half integral')
  - "⌡": [t: "nedre halvans integral"]               #  0x2321    (en: 'bottom half integral')
- - "⌢": [t: "rynkar pannan"]                        #  0x2322    (en: 'frown', google: 'rynka pannan')
- - "⌣": [t: "leende"]                               #  0x2323    (en: 'smile')
- - "⌤": [t: "pilspets uppåt mellan två horisontella streck"]    #  0x2324    (en: 'up arrowhead between two horizontal bars', google: 'upp pilspetsen mellan två horisontella staplar')
- - "⌥": [t: "alternativnyckel"]                     #  0x2325    (en: 'option key', google translation)
- - "⌦": [t: "radera till höger"]                    #  0x2326    (en: 'erase to the right', google translation)
- - "⌧": [t: "x i en rektangelbox"]                  #  0x2327    (en: 'x in a rectangle box', google translation)
- - "⌨": [t: "tangentbord"]                          #  0x2328    (en: 'keyboard', google translation)
- - "〈": [t: "vänster vinkelparantes"]               #  0x2329    (en: 'left pointing angle bracket')
- - "〉": [t: "höger vinkelparantes"]                 #  0x232a    (en: 'right pointing angle bracket')
- - "⌫": [t: "radera till vänster"]                  #  0x232b    (en: 'erase to the left', google translation)
- - "⌬": [t: "benzenring"]                           #  0x232c    (en: 'benzene ring', google translation)
- - "⌭": [t: "cylindricity"]                         #  0x232d
- - "⌮": [t: "all around profile"]                   #  0x232e    (google: 'runt profilen')
- - "⌯": [t: "symmetri"]                             #  0x232f    (en: 'symmetry', google translation)
+ - "⌢": [T: "rynkar pannan"]                        #  0x2322    (en: 'frown', google: 'rynka pannan')
+ - "⌣": [T: "leende"]                               #  0x2323    (en: 'smile')
+ - "⌤": [T: "enter"]    #  0x2324    (en: 'up arrowhead between two horizontal bars', google: 'upp pilspetsen mellan två horisontella staplar')
+ - "⌥": [T: "alt"]                     #  0x2325    (en: 'option key', google translation)
+ - "⌦": [T: "delete"]                    #  0x2326    (en: 'erase to the right', google translation)
+ - "⌧": [T: "clear"]                  #  0x2327    (en: 'x in a rectangle box', google translation)
+ - "⌨": [T: "tangentbord"]                          #  0x2328    (en: 'keyboard', google translation)
+ - "〈": [T: "vänster vinkelparantes"]               #  0x2329    (en: 'left pointing angle bracket')
+ - "〉": [T: "höger vinkelparantes"]                 #  0x232a    (en: 'right pointing angle bracket')
+ - "⌫": [T: "backspace"]                  #  0x232b    (en: 'erase to the left', google translation)
+ - "⌬": [T: "bensenring"]                           #  0x232c    (en: 'benzene ring', google translation)
+ - "⌭": [T: "cylindricitet"]                         #  0x232d
+ - "⌮": [t: "profil"]                   #  0x232e    (google: 'runt profilen')
+ - "⌯": [T: "symmetri"]                             #  0x232f    (en: 'symmetry', google translation)
  - "⌰": [t: "total runout"]                         #  0x2330    (google translation)
- - "⌱": [t: "dimension origin"]                     #  0x2331    (google translation)
- - "⌲": [t: "konisk avsmalnande"]                   #  0x2332    (en: 'conical taper', google translation)
- - "⌳": [t: "backe"]                                #  0x2333    (en: 'slope', google translation)
- - "⌴": [t: "motborrning"]                          #  0x2334    (en: 'counterbore', google translation)
- - "⌵": [t: "försänkning"]                          #  0x2335    (en: 'countersink', google translation)
- - "⍰": [t: "låda med frågetecken"]                 #  0x2370    (en: 'unknown box', google: 'okänd ruta')
+ - "⌱": [T: "origo"]                     #  0x2331    (google translation)
+ - "⌲": [T: "konisk avsmalning"]                   #  0x2332    (en: 'conical taper', google translation)
+ - "⌳": [T: "sluttning"]                                #  0x2333    (en: 'slope', google translation)
+ - "⌴": [T: "plansänkning"]                          #  0x2334    (en: 'counterbore', google translation)
+ - "⌵": [T: "försänkning"]                          #  0x2335    (en: 'countersink', google translation)
+ - "⍰": [t: "okänd"]                 #  0x2370    (en: 'unknown box', google: 'okänd ruta')
  - "⎕": [t: "låda"]                                 #  0x2395    (en: 'box', google translation)
- - "⏞": [t: "övre klammerparantes"]                 #  0x23DE    (en: 'top brace')
- - "⏟": [t: "nedre klammerparantes"]                #  0x23DF    (en: 'bottom brace')
+ - "⏞": [T: "övre klammer"]                 #  0x23DE    (en: 'top brace')
+ - "⏟": [T: "nedre klammer"]                #  0x23DF    (en: 'bottom brace')
  - "①-⑨":                                           #  0x2460 - 0x2469
     # SWEDISH: switched order
     - spell: "translate('.', '①②③④⑤⑥⑦⑧⑨', '123456789')"
