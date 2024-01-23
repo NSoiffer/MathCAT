@@ -1138,6 +1138,7 @@
     #     then: [t: "är"]                            #     (en: 'is', google translation)
      - t: "motsägelse"                       #     (en: 'bottom', MathPlayer: 'up tack', google: 'botten')
  - "⊦": [t: "reduceras till"]                            #  0x22a6    (en: 'reduces to')
+ - "⊧": [t: "innebär"]                             #  0x22a7    (en: 'models', MathPlayer: 'models')
  - "⊨":                                             #  0x22a8
      - test: 
          if: "$Verbosity!='Terse'"
@@ -1188,28 +1189,29 @@
  - "⊿": [T: "rätvinklig triangel"]                       #  0x22bf    (en: 'right triangle')
  - "⋀": [T: "konjunktion"]                          #  0x22c0    (en: 'logical and')
  - "⋁": [T: "disjunktion"]                        #  0x22c1    (en: 'logical or')
+ # SWEDISH: misspelled to fix pronunciation
  - "⋂": [T: "snittet"]                                #  0x22c2    (en: 'intersection')
  - "⋃": [T: "unionen"]                                #  0x22c3
- - "⋄": [t: "diamond operator"]                     #  0x22c4
+ - "⋄": [t: "diamond-operator"]                     #  0x22c4
  - "⋅":                                             #  0x22c5
     - test: 
         if: "@data-chem-formula-op"
-        then: [t: "punkt"]                          #     (en: 'dot', google translation)
-        else: [t: "punkt"]                          #     (en: 'times')
+        then: [T: "punkt"]                          #     (en: 'dot', google translation)
+        else: [T: "gånger"]                          #     (en: 'times')
 
- - "⋆": [t: "stjärna"]                              #  0x22c6    (en: 'times')
- - "⋇": [t: "division gånger"]                      #  0x22c7    (en: 'division times')
- - "⋈": [t: "fluga"]                                #  0x22c8    (en: 'bowtie', MathPlayer: 'bowtie')
+ - "⋆": [T: "stjärna"]                              #  0x22c6    (en: 'times')
+ - "⋇": [t: "delat med gånger"]                      #  0x22c7    (en: 'division times')
+ - "⋈": [t: "naturlig join"]                                #  0x22c8    (en: 'bowtie', MathPlayer: 'bowtie')
  - "⋉":                                             #  0x22c9
-    - test: 
-        if: "$Verbosity!='Terse'"
-        then: [t: "är"]                             #     (en: 'is', google translation)
-    - t: "vänster normal factor semidirect product"    #     (en: 'the left normal factor semidirect product of')
+    #- test: 
+    #    if: "$Verbosity!='Terse'"
+    #    then: [t: "är"]                             #     (en: 'is', google translation)
+    - t: "vänster semi-join"    #     (en: 'the left normal factor semidirect product of')
  - "⋊":                                             #  0x22ca
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "höger normal factor semidirect product"    #     (en: 'the right normal factor semidirect product of')
+    # - test: 
+    #     if: "$Verbosity!='Terse'"
+    #     then: [t: "är"]                            #     (en: 'is', google translation)
+     - t: "höger semi-join"    #     (en: 'the right normal factor semidirect product of')
  - "⋋":                                             #  0x22cb
      - test: 
          if: "$Verbosity!='Terse'"
