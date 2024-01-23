@@ -1188,8 +1188,8 @@
  - "⊿": [T: "rätvinklig triangel"]                       #  0x22bf    (en: 'right triangle')
  - "⋀": [T: "konjunktion"]                          #  0x22c0    (en: 'logical and')
  - "⋁": [T: "disjunktion"]                        #  0x22c1    (en: 'logical or')
- - "⋂": [T: "sniitt"]                                #  0x22c2    (en: 'intersection')
- - "⋃": [T: "union"]                                #  0x22c3
+ - "⋂": [T: "snittet"]                                #  0x22c2    (en: 'intersection')
+ - "⋃": [T: "unionen"]                                #  0x22c3
  - "⋄": [t: "diamond operator"]                     #  0x22c4
  - "⋅":                                             #  0x22c5
     - test: 
