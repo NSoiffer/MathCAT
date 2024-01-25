@@ -350,7 +350,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
 
-  debug!("Before:  \"{}\"", raw_braille);
+//   debug!("Before:  \"{}\"", raw_braille);
     // replacements might overlap at boundaries (e.g., whitespace) -- need to repeat
     let mut start = 0;
     let mut result = String::with_capacity(raw_braille.len()+ raw_braille.len()/4);  // likely upper bound
@@ -367,7 +367,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     if !raw_braille.is_empty() && ( start < raw_braille.len()-1 || "WP,".contains(raw_braille.chars().nth_back(0).unwrap()) ) {       // see comment about $end above
         result.push_str(&raw_braille[start..]);
     }
-  debug!("ELIs:    \"{}\"", result);  
+//   debug!("ELIs:    \"{}\"", result);  
 
     let result = NUM_IND_ENCLOSED_LIST.replace_all(&result, "wn${1}");
 
@@ -377,7 +377,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
 
     let result = REMOVE_SPACE_BEFORE_PUNCTUATION_151.replace_all(&result, "$1");
     let result = REMOVE_SPACE_AFTER_PUNCTUATION_151.replace_all(&result, "$1");
-  debug!("spaces:  \"{}\"", result);
+//   debug!("spaces:  \"{}\"", result);
 
     let result = DOTS_99_A_2.replace_all(&result, "N⠨mN");
 
@@ -386,17 +386,17 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     let result = MULTI_177_2.replace_all(&result, "${1}m${2}");
     let result = MULTI_177_3.replace_all(&result, "${1}m$2");
     let result = MULTI_177_5.replace_all(&result, "${1}m$2");
-  debug!("MULTI:   \"{}\"", result);
+//   debug!("MULTI:   \"{}\"", result);
 
     let result = NUM_IND_9A.replace_all(&result, "${start}${minus}n");
-    debug!("IND_9A:  \"{}\"", result);
+    // debug!("IND_9A:  \"{}\"", result);
     let result = NUM_IND_9C.replace_all(&result, "${1}${2}n");
     let result = NUM_IND_9D.replace_all(&result, "${1}n");
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
     let result = NUM_IND_9E_SHAPE.replace_all(&result, "${mod}n");
     let result = NUM_IND_9F.replace_all(&result, "${1}${2}n");
 
-  debug!("IND_9F:  \"{}\"", result);
+//   debug!("IND_9F:  \"{}\"", result);
 
     // 9b: insert after punctuation (optional minus sign)
     // common punctuation adds a space, so 9a handled it. Here we deal with other "punctuation" 
@@ -415,7 +415,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     let result = NO_SPACE_AFTER_COMMA.replace_all(&result, "⠠P⠴");
 
     let result = REMOVE_AFTER_PUNCT_IND.replace_all(&result, "$1$2");
-  debug!("Punct38: \"{}\"", &result);
+//   debug!("Punct38: \"{}\"", &result);
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         match NEMETH_INDICATOR_REPLACEMENTS.get(&cap[0]) {
@@ -524,7 +524,7 @@ fn is_short_form(chars: &[char]) -> bool {
 }
 
 fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
-    debug!("ueb_cleanup: start={}", raw_braille);
+    // debug!("ueb_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
 
@@ -580,7 +580,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
             return remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage); 
         }
         let grade2 = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade2, UEB_Duration::Symbol);
-        debug!("Symbol mode:  '{}'", grade2);
+        // debug!("Symbol mode:  '{}'", grade2);
 
         if is_grade2_string_ok(&grade2) {
             return grade2;
@@ -589,7 +589,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
             // A conversation with Ms. DeAndrea from BANA said that they mean use passage mode if ≥3 "segments" (≥2 blanks)
             // The G1 Word mode might not be at the start (iceb.rs:omission_3_6_7)
             let grade1_word = try_grade1_word_mode(raw_braille);
-            debug!("Word mode:    '{}'", grade1_word);
+            // debug!("Word mode:    '{}'", grade1_word);
             if !grade1_word.is_empty() {
                 return grade1_word;
             } else {
@@ -752,7 +752,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
             let mut found_word_mode = false;
             for raw_word in raw_braille.split('W') {
                 let word = remove_unneeded_mode_changes(raw_word, UEB_Mode::Grade2, UEB_Duration::Symbol);
-                debug!("try_grade1_word_mode: word='{}'", word);
+                // debug!("try_grade1_word_mode: word='{}'", word);
                 let word_chars = word.chars().collect::<Vec<char>>();
                 let needs_word_mode = word_chars.iter().enumerate()
                     .any(|(i, &ch) | ch == '1' && !is_forced_grade1(&word_chars, i));
