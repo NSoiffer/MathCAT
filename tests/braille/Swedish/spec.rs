@@ -46,6 +46,24 @@ fn script_7_12() {
 }
 
 #[test]
+fn script_7_15() {
+    let expr = "<math><msup><mi>a</mi><mrow><mo>-</mo><mi>b</mi></mrow></msup></math>";
+    test_braille("Swedish", expr, "⠁⠬⠤⠃");
+}
+
+#[test]
+fn script_7_16() {
+    let expr = "<math><mi>a</mi><mover><mi>b</mi><mo>&#xAF;</mo></mover></math>";
+    test_braille("Swedish", expr, "⠁⠃⠬⠬⠤");
+}
+
+#[test]
+fn script_7_17() {
+    let expr = "<math><mover><mi>y</mi><mo>~</mo></mover><mo>=</mo><mi>y</mi></math>";
+    test_braille("Swedish", expr, "⠽⠬⠬⠒⠀⠶⠀⠽");
+}
+
+#[test]
 fn root_7_25() {
     let expr = "<math><msqrt><mn>25</mn></msqrt><mo>=</mo><mn>5</mn></math>";
     test_braille("Swedish", expr, "⠩⠼⠃⠑⠀⠶⠀⠼⠑");
@@ -55,4 +73,13 @@ fn root_7_25() {
 fn root_7_32() {
     let expr = "<math><mroot><mn>27</mn><mn>3</mn></mroot><mo>=</mo><mn>3</mn></math>";
     test_braille("Swedish", expr, "⠬⠼⠉⠩⠼⠃⠛⠀⠶⠀⠼⠉");
+}
+
+#[test]
+#[ignore]   // pending answer for what fraction indicators aren't used in the test
+fn primes_9_26() {
+    init_logger();
+    let expr = "<math><mfrac><mi>d</mi><mrow><mi>d</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mfrac><mi>r</mi><mo>''</mo><mo>=</mo>
+                        <mi>r</mi><mo>'</mo><mo>'</mo><mo>'</mo></math>";
+    test_braille("Swedish", expr, "⠙⠳⠙⠦⠭⠴⠀⠗⠐⠐⠀⠶⠀⠗⠐⠐⠐");
 }
