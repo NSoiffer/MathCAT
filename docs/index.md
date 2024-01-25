@@ -55,13 +55,13 @@ Timeline:
   * ✓ Create some tools to simplify generation of the Unicode files in different languages
   * Create some tools to help update other languages when the English version changes (adds new rules) [critical]
   * ✓ Add phrases so better starting points for translations can be generated
-  * Work with translators and fix any problems they might turn up
+  * ✓ Work with translators and fix any problems they might turn up
   * Work with translators to hopefully add many languages (added Spanish translation)
 * ✓ (mostly) Summer 2023: Vietnamese braille code 
-* August: maybe Spanish braille code (potentially French and Portuguese also as they are supposedly similar)
+* ✓August/Sept: Add CMU braille code (Spanish and Portuguese standard)
 
 2024
-* Jan: Automatic builds for the various repos
+* ✓ Jan: Automatic builds for the various repos
 * Jan: Portuguese translation
 * Jan/Feb: More translations (Swedish and Finnish speech and braille)
 * Feb: Units and Currency
