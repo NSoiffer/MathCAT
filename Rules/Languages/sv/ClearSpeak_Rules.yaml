@@ -136,6 +136,7 @@
   # SWEDISH: Alternative logic for handling correct reading out of common fractions.
   variables: [IsPlural: "*[1]!=1"]
   replace:
+  - pause: short
   - test:
       if: "*[1]=1"
       then: [T: "en"]
@@ -153,6 +154,7 @@
   # SWEDISH: Alternative logic for handling correct reading out of common fractions.
   variables: [IsPlural: "*[1]!=1"]
   replace:
+  - pause: short
   - test:
       if: "*[1]=1"
       then: [T: "en"]
@@ -166,6 +168,7 @@
   - "( not($ClearSpeak_Fractions='General' or $ClearSpeak_Fractions='GeneralEndFrac') and"
   - "  (IsNode(*[1],'simple') and IsNode(*[2],'simple')) )" # simple fraction in ClearSpeak spec
   replace:
+  - pause: short
   - test:
       if: "$ClearSpeak_Fractions='FracOver'"
       then:
@@ -218,6 +221,7 @@
   - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) )"
   - ")"
   replace:
+  - pause: short
   - x: "*[1]"
   - T: "genom"      # phrase(the fraction 3 'over' 4)
   - x: "*[2]"
