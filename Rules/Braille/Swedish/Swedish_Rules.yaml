@@ -301,37 +301,6 @@
   - t: "W"
 
 -
-   name: single-char-exceptions    # GTM 12
-   tag: [mover, munder]
-   match: "*[2][string-length(.) = 1 and ( translate(., '_¯→.·˙~^','')='' or (parent::m:mover and text()='⌒') )]"
-   replace: 
-   - test:
-         if: "NeedsToBeGrouped(*[1], 'Swedish', true())"
-         then:
-         - t: "1⠣"
-         - x: "*[1]"
-         - t: "1⠜"
-         else: [x: "*[1]"]
-   - test:
-      if: "*[2][translate(., '_¯→^', '') = '']"
-      then: [t: "1"]
-   - test:
-      if: "self::m:munder"
-      then: [t: "⠠"]
-   - test:
-      - if: "*[2][text()='_' or text()='¯']"
-        then: [t: "⠱"]
-      - else_if: "*[2][text()='→']"
-        then: [t: "⠘⠱"]
-      - else_if: "*[2][text()='.' or text()='·' or text()='˙']"
-        then: [t: "⠘⠲"]
-      - else_if: "*[2][text()='~']"
-        then: [t: "⠸⠱"]
-      - else_if: "*[2][text()='^']"
-        then: [t: "⠐⠱ "]
-        else: [t: "⠨⠸⠱"]    # arc/⌒
-
--
   name: single-char-exceptions    # RUEB 3.11 -- ° and various prime/minute/seconds aren't treated as if superscripts
   tag: [msup]
   match: "*[2][translate(., \"'*`ª°²³´¹º‘’“”‟′″‴‵‶‷⁗\",'')='']"
