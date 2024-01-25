@@ -2007,12 +2007,20 @@ impl SpeechRules {
         if self.rules.is_empty() {
             let rule_file = self.pref_manager.borrow().get_rule_file(&self.name).clone();
             self.read_patterns(&rule_file)?;
-
         }
         if self.unicode_short.borrow().is_empty()  {
             self.read_unicode(None, true)?;
         }
+        // debug!("Rule stats for {}: {}", self.name, hashmap_stats(&self.rules));
         return Ok( () );
+
+        // fn hashmap_stats(map: &RuleTable) -> String {
+        //     let mut result = format!("Map capacity={}, entries={}\n", map.capacity(), map.len());
+        //     for (key, value) in map {
+        //         result += &format!("{} => {} entries\n", key, value.len());
+        //     }
+        //     return result;
+        // }
     }
 
     pub fn invalidate(changes: FilesChanged) {
