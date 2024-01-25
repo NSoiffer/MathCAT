@@ -70,7 +70,7 @@ Timeline:
 * Spring: more translations
 * Spring/Summer/Fall: work on tools to help maintain translations
 * Summer: explore adding ASCIIMath and LaTeX importers (there are Rust packages for these, but I haven't checked quality and completeness)
-* July/Aug/Sept: vacation 😎 and ICCHP conference
+* July: vacation 😎 and ICCHP conference
 * Fall: potentially work on UEB → MathML translation and explore UEB → Nemeth math translator
 
 Longer term
