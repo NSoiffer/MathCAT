@@ -51,8 +51,6 @@ Timeline:
 * ✓ Nov/Dec: Work on at least one translation of MathCAT to another language (pushed back from late spring). Have Indonesian and Vietnamese translations.
 
 2023
-* Spring 2023: add more inference/speech rules (at least units and currency) [on hold due to Math WG intent discussions continuing]
-* Spring 2023: analyze books to better determine what should be in the Unicode short file (hopefully get someone to help with this)
 * Spring 2023: translation work
   * ✓ Create some tools to simplify generation of the Unicode files in different languages
   * Create some tools to help update other languages when the English version changes (adds new rules) [critical]
@@ -61,10 +59,23 @@ Timeline:
   * Work with translators to hopefully add many languages (added Spanish translation)
 * ✓ (mostly) Summer 2023: Vietnamese braille code 
 * August: maybe Spanish braille code (potentially French and Portuguese also as they are supposedly similar)
-* Early 2024: work on UEB → MathML translation and explore UEB → Nemeth math translator
-* Fall 2023: potentially work on 2D Nemeth generation along with Nemeth input
-* Early 2024: work on UEB → MathML translation and explore UEB → Nemeth math translator
 
+2024
+* Jan: Automatic builds for the various repos
+* Jan: Portuguese translation
+* Jan/Feb: More translations (Swedish and Finnish speech and braille)
+* Feb: Units and Currency
+* Spring: add more inference/speech rules based on W3C's Math WG core list
+* Spring: analyze books to better determine what should be in the Unicode short file (hopefully get someone to help with this)
+* Spring: more translations
+* Spring/Summer/Fall: work on tools to help maintain translations
+* Summer: explore adding ASCIIMath and LaTeX importers (there are Rust packages for these, but I haven't checked quality and completeness)
+* July/Aug/Sept: vacation 😎 and ICCHP conference
+* Fall: potentially work on UEB → MathML translation and explore UEB → Nemeth math translator
+
+Longer term
+* other braille input
+* potentially work on 2D Nemeth generation along with other braille codes
 
 
 These plans are very tentative and will likely change based on feedback from users and AT developers.
@@ -177,6 +188,9 @@ Translators:
 * Spanish -- Noelia Ruiz Martínez (also help with NVDA addon development) and María Allo Roldán
 * Vietnamese -- Dang Hoai Phúc and Trang Pham
 * Others??? -- please volunteer so I can list you here...
+
+The initial translation of many braille characters for braille codes developed in 2024 and beyond was greatly helped by a spreadsheet given to me by Georgious Kouroupetroglou and is the work of a larger team. For more details, see:
+* [MathBrailleCodes Repository](https://access.uoa.gr/mathbraille/index.php/en/), Speech and Accessibility Lab, National and Kapodistrian University of Athens, Greece: P. Riga, T. Antonakopoulou, D. Kouvaras, S. Lentas and G. Kouroupetroglou (2021) “[The BrailleMathCodes Repository](https://access.uoa.gr/mathbraille/index.php/en/)”, Proceedings of the 4th International Workshop on “[Digitization and e-Inclusion in Mathematics and Science 2021](https://workshop.sciaccess.net/deims2021/DEIMS2021_Proceedings.zip)” DEIMS2021, February 18-19, 2021, Tokyo, pp. 105-114. 
 
 Thanks to everyone who volunteered!
 
