@@ -168,7 +168,7 @@
   match: "$Move2D = 'into'"
   replace:
   - x: "$Move2D"
-  - T: "kolumnen"            # phrase(the first 'column' in the table)
+  - T: "kolumn"            # phrase(the first 'column' in the table)
   - x: "count($Child2D/preceding-sibling::*)+1"
   - pause: "medium"
 
@@ -409,7 +409,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
       then: [T: "utzoomat hela vägen", pause: "medium"]            # phrase('zoomed out all the the way')
   - with:
-      variables: [Move2D: "'out of'", Child2D: "."]
+      variables: [Move2D: "'lämnar'", Child2D: "."]
       replace: [x: ".."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1"]
@@ -482,7 +482,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then: [T: "zooma ut", pause: "medium"]                  # phrase('zoom out' of expression)
   # we need to speak it here
-  - T: "raden"                                                  # phrase(the first 'row' of the matrix)
+  - T: "rad"                                                  # phrase(the first 'row' of the matrix)
     # if we let the speech rules speak the row, it is given just the MathML for the row, so the row # will always be '1'
   - x: "count(../preceding-sibling::*)+1"
   - pause: medium
@@ -504,7 +504,7 @@
           then: [x: ".."] # auto-zoom: move out a level and retry
           else:
           - with:
-              variables: [Move2D: "'out of'", Child2D: "."]
+              variables: [Move2D: "'lämnar'", Child2D: "."]
               replace: [x: ".."]
           - test:
               if: "parent::m:mtd"
@@ -615,7 +615,7 @@
       - test:
           if: "$NavVerbosity != 'Terse'"
           then:
-          - T: "kolumnen"                           # phrase(the first 'column' of the table)
+          - T: "kolumn"                           # phrase(the first 'column' of the table)
           - x: "count(preceding-sibling::*)"
           - pause: medium
       - test:
@@ -645,7 +645,7 @@
       - test:
           if: "$NavVerbosity != 'Terse'"
           then:
-          - T: "kolumnen"                         # phrase(the first 'column' in the table)
+          - T: "kolumn"                         # phrase(the first 'column' in the table)
           - x: "count(preceding-sibling::*)+2"
           - pause: medium
       - test:
@@ -678,10 +678,10 @@
           - test:
               if: "$NavVerbosity != 'Terse'"
               then:
-              - T: "raden"                                 # phrase(the previous 'row' in the table)
+              - T: "rad"                                 # phrase(the previous 'row' in the table)
               - x: "count(../preceding-sibling::*)"
               - pause: short
-              - T: "kolumnen"                              # phrase(the previous 'column' in the table)
+              - T: "kolumn"                              # phrase(the previous 'column' in the table)
               - x: "count(preceding-sibling::*)+1"
               - pause: medium
           - test:
@@ -714,10 +714,10 @@
           - test:
               if: "$NavVerbosity != 'Terse'"
               then:
-              - T: "raden"                                # phrase(the next 'row' in the table)
+              - T: "rad"                                # phrase(the next 'row' in the table)
               - x: "count(../preceding-sibling::*)+2"
               - pause: short
-              - T: "kolumnen"                             # phrase(the next 'column' in the table)
+              - T: "kolumn"                             # phrase(the next 'column' in the table)
               - x: "count(preceding-sibling::*)+1"
               - pause: medium
           - test:
@@ -747,7 +747,7 @@
       - test:
           if: "$NavVerbosity != 'Terse'"
           then:
-          - T: "raden"                                  # phrase(the previous 'row' in the table)
+          - T: "rad"                                  # phrase(the previous 'row' in the table)
           - x: "count(preceding-sibling::*)"
           - pause: medium
       - test:
@@ -777,7 +777,7 @@
       - test:
           if: "$NavVerbosity != 'Terse'"
           then:
-          - T: "raden"                                # phrase(the previous 'row' in the table)
+          - T: "rad"                                # phrase(the previous 'row' in the table)
           - x: "count(preceding-sibling::*)+2"
           - pause: medium
       - test:
@@ -810,9 +810,9 @@
           - test:
               if: "$NavVerbosity != 'Terse'"
               then:
-              - T: "raden"                                        # phrase(the previous 'row' in the table)
+              - T: "rad"                                        # phrase(the previous 'row' in the table)
               - x: "count($MTD[1]/../preceding-sibling::*)+1"
-              - T: "kolumnen"                                     # phrase(the previous 'column' in the table)
+              - T: "kolumn"                                     # phrase(the previous 'column' in the table)
               - x: "count($MTD[1]/preceding-sibling::*)+1"
               - pause: short
           - set_variables: [NavNode: "$MTD[1]/*[1]/@id"]
@@ -1206,7 +1206,7 @@
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'out of'", Child2D: "."]
+              variables: [Move2D: "'lämnar'", Child2D: "."]
               replace: [x: ".."]
       - test:
           if: "following-sibling::*"
@@ -1227,7 +1227,7 @@
       - test:
           if: "$NavVerbosity != 'Terse'"
           then:
-          - T: "kolumnen"                                       # phrase(the previous 'column' in the table)
+          - T: "kolumn"                                       # phrase(the previous 'column' in the table)
           - x: "count(preceding-sibling::*)+2"
           - pause: short
       - test:
@@ -1248,7 +1248,7 @@
       # can't get here with MatchCounter=0, so no need to echo command
       if: "following-sibling::*"
       then:
-      - T: "raden"                                                    # phrase(the previous 'row' in the table)
+      - T: "rad"                                                    # phrase(the previous 'row' in the table)
       - x: "count(preceding-sibling::*)+2"
       - T: "kolumn 1"                                               # phrase('column 1' in the table)
       - pause: medium
@@ -1310,7 +1310,7 @@
       if: "preceding-sibling::* and following-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'out of'", Child2D: "."]
+          variables: [Move2D: "'lämnar'", Child2D: "."]
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
@@ -1448,7 +1448,7 @@
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'out of'", Child2D: "."]
+              variables: [Move2D: "'lämnar'", Child2D: "."]
               replace: [x: ".."]
       - test:
           if: "preceding-sibling::*"
@@ -1504,7 +1504,7 @@
       - test:
           if: "$NavVerbosity != 'Terse'"
           then:
-          - T: "kolumnen"                               # phrase(the first 'column' in the table)
+          - T: "kolumn"                               # phrase(the first 'column' in the table)
           - x: "count(preceding-sibling::*)"
           - pause: short
       - test:
@@ -1555,7 +1555,7 @@
       if: "count(preceding-sibling::*) > 2 and preceding-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'out of'", Child2D: "."]
+          variables: [Move2D: "'lämnar'", Child2D: "."]
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
