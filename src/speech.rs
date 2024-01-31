@@ -217,8 +217,9 @@ pub fn remove_optional_indicators(str: &str) -> String {
 
 /// Given a string that should be Yaml, it calls `build_fn` with that string.
 /// The build function/closure should process the Yaml as appropriate and capture any errors and write them to `std_err`.
-pub fn compile_rule<F>(str: &str, mut build_fn: F) -> Result<()> where
-            F: FnMut(&Yaml) -> Result<()> {
+/// The returned value should be a Vector containing the paths of all the files that were included.
+pub fn compile_rule<F>(str: &str, mut build_fn: F) -> Result<Vec<PathBuf>> where
+            F: FnMut(&Yaml) -> Result<Vec<PathBuf>> {
     let docs = YamlLoader::load_from_str(str);
     match docs {
         Err(e) => {
@@ -233,8 +234,8 @@ pub fn compile_rule<F>(str: &str, mut build_fn: F) -> Result<()> where
     }
 }
 
-fn process_include<F>(current_file: &Path, new_file_name: &str, mut read_new_file: F) -> Result<()>
-                    where F: FnMut(&Path) -> Result<()> {
+pub fn process_include<F>(current_file: &Path, new_file_name: &str, mut read_new_file: F) -> Result<Vec<PathBuf>>
+                    where F: FnMut(&Path) -> Result<Vec<PathBuf>> {
     let parent_path = current_file.parent();
     if parent_path.is_none() {
         bail!("Internal error: {:?} is not a valid file name", current_file);
@@ -248,7 +249,10 @@ fn process_include<F>(current_file: &Path, new_file_name: &str, mut read_new_fil
                                  new_file.to_str().unwrap(), msg),
     };
 
-    return read_new_file(new_file.as_path());
+    let mut included_files = read_new_file(new_file.as_path())?;
+    let mut files_read = vec![new_file];
+    files_read.append(&mut included_files);
+    return Ok(files_read);
 }
 
 /// As the name says, TreeOrString is either a Tree (Element) or a String
@@ -1167,19 +1171,18 @@ impl fmt::Display for SpeechPattern {
 }
 
 impl SpeechPattern  {
-    fn build(dict: &Yaml, file: &Path, rules: &mut SpeechRules) -> Result<()> {
+    fn build(dict: &Yaml, file: &Path, rules: &mut SpeechRules) -> Result<Option<Vec<PathBuf>>> {
         // Rule::SpeechPattern
         //   build { "pattern_name", "tag_name", "pattern", "replacement" }
         // or recurse via include: file_name
 
         // debug!("\nbuild_speech_pattern: dict:\n{}", yaml_to_string(dict, 0));
-
         if let Some(include_file_name) = find_str(dict, "include") {
             let do_include_fn = |new_file: &Path| {
-                rules.read_patterns(&[Some(new_file.to_path_buf()), None, None])
+                rules.read_patterns(new_file)
             };
 
-            return process_include(file, include_file_name, do_include_fn);
+            return Ok( Some(process_include(file, include_file_name, do_include_fn)?) );
         }
 
         let pattern_name = find_str(dict, "name");
@@ -1268,7 +1271,7 @@ impl SpeechPattern  {
             }
         }
 
-        return Ok( () );
+        return Ok(None);
     }
 
     fn is_match(&self, context: &Context, mathml: Element) -> Result<bool> {
@@ -1710,12 +1713,12 @@ impl  fmt::Display for UnicodeDef {
 }
 
 impl UnicodeDef {
-    fn build(unicode_def: &Yaml, file_name: &Path, speech_rules: &SpeechRules, use_short: bool) -> Result<()> {
+    fn build(unicode_def: &Yaml, file_name: &Path, speech_rules: &SpeechRules, use_short: bool) -> Result<Option<Vec<PathBuf>>> {
         if let Some(include_file_name) = find_str(unicode_def, "include") {
             let do_include_fn = |new_file: &Path| {
                 speech_rules.read_unicode(Some(new_file.to_path_buf()), use_short)
             };
-            return process_include(file_name, include_file_name, do_include_fn);
+            return Ok( Some(process_include(file_name, include_file_name, do_include_fn)?) );
         }
         // key: char, value is replacement or array of replacements
         let dictionary = unicode_def.as_hash();
@@ -1751,7 +1754,7 @@ impl UnicodeDef {
                             error!("*** Character '{}' (0x{:X}) is repeated", ch, ch as u32);
                         }
                     }
-                    return Ok( () );
+                    return Ok(None);
                 }
             }
         }
@@ -1762,9 +1765,9 @@ impl UnicodeDef {
                                                                         char::from_u32(ch).unwrap(), ch))?.replacements).is_some() {
             error!("*** Character '{}' (0x{:X}) is repeated", char::from_u32(ch).unwrap(), ch);
         }
-        return Ok( () );
+        return Ok(None);
 
-        fn process_range(def_range: &str, replacements: &Yaml, mut unicode_table: RefMut<HashMap<u32,Vec<Replacement>>>) -> Result<()> {
+        fn process_range(def_range: &str, replacements: &Yaml, mut unicode_table: RefMut<HashMap<u32,Vec<Replacement>>>) -> Result<Option<Vec<PathBuf>>> {
             // should be a character range (e.g., "A-Z")
             // iterate over that range and also substitute the char for '.' in the 
             let mut range = def_range.split('-');
@@ -1780,7 +1783,7 @@ impl UnicodeDef {
                                         .chain_err(|| format!("In definition of char: '{}'", def_range))?.replacements);
             };
 
-            return Ok( () );            
+            return Ok(None);            
         }
 
         fn substitute_ch(yaml: &Yaml, ch: &str) -> Yaml {
@@ -1929,51 +1932,28 @@ thread_local!{
 
 impl SpeechRules {
     pub fn new(name: RulesFor, translate_single_chars_only: bool) -> SpeechRules {
-        use crate::definitions::read_definitions_file;
-        let pref_manager = PreferenceManager::get();
-        let mut error = pref_manager.borrow().get_error().to_string();
-
-        if pref_manager.borrow().get_error().is_empty() {
-            let read_files = read_definitions_file(pref_manager.borrow_mut().get_definitions_file(name != RulesFor::Braille));
-            match read_files {
-                Ok(_) => {
-                    // debug!("SpeechRules new for {}, tts {}", name, pref_manager.borrow().pref_to_string("TTS"));
-                    let unicode = if name == RulesFor::Braille {
-                        (
-                            Rc::new( RefCell::new (HashMap::with_capacity(497)) ),
-                            Rc::new( RefCell::new (HashMap::with_capacity(2497)) )
-                        )
-                    } else {
-                        (
-                            SPEECH_UNICODE_SHORT.with(Rc::clone),
-                            SPEECH_UNICODE_FULL. with(Rc::clone)
-                        )
-                    };
-
-                    let rules = SpeechRules {
-                        error: Default::default(),
-                        name,
-                        rules: HashMap::with_capacity(if name == RulesFor::Intent {1023} else {31}),                       // lazy load them
-                        unicode_short: unicode.0,       // lazy load them
-                        unicode_full: unicode.1,        // lazy load them
-                        translate_single_chars_only,
-                        pref_manager,
-                    };
-                    return rules;
-                },
-                Err(e) => error = crate::interface::errors_to_string(&e),
-            }
+        let unicode = if name == RulesFor::Braille {
+            (
+                Rc::new( RefCell::new (HashMap::with_capacity(497)) ),
+                Rc::new( RefCell::new (HashMap::with_capacity(2497)) )
+            )
+        } else {
+            (
+                SPEECH_UNICODE_SHORT.with(Rc::clone),
+                SPEECH_UNICODE_FULL. with(Rc::clone)
+            )
         };
+
         return SpeechRules {
-            error,
+            error: Default::default(),
             name,
-            rules: HashMap::with_capacity(1),
-            unicode_short: Rc::new( RefCell::new (HashMap::with_capacity(1)) ),
-            unicode_full: Rc::new( RefCell::new (HashMap::with_capacity(1)) ),
-            translate_single_chars_only: true,
-            pref_manager,
+            rules: HashMap::with_capacity(if name == RulesFor::Intent {1023} else {31}),                       // lazy load them
+            unicode_short: unicode.0,       // lazy load them
+            unicode_full: unicode.1,        // lazy load them
+            translate_single_chars_only,
+            pref_manager: PreferenceManager::get(),
         };
-    }
+}
 
     pub fn get_error(&self) -> Option<&str> {
         return if self.error.is_empty() {
@@ -1984,7 +1964,7 @@ impl SpeechRules {
     }
 
     pub fn initialize_all_rules() -> Result<()> {
-        // this forces initialization of things beyond just the speech rules (e.g, the defs.yaml files get read)
+        // this forces initialization (SpeechRules::new()) of things beyond just the speech rules (e.g, the defs.yaml files get read)
         INTENT_RULES.with(|speech_rules| -> Result<()> {
             if let Some(e) = speech_rules.borrow().get_error() {bail!("{}", e)} else {Ok(())}
         })?;
@@ -2005,7 +1985,10 @@ impl SpeechRules {
 
     pub fn read_files(&mut self) -> Result<()> {
         if self.rules.is_empty() {
-            let rule_file = self.pref_manager.borrow().get_rule_file(&self.name).clone();
+            let rule_file = {
+                // inside a block to limit extent of borrow
+                self.pref_manager.borrow().get_rule_file(&self.name).to_path_buf()
+            };
             self.read_patterns(&rule_file)?;
 
         }
@@ -2069,36 +2052,34 @@ impl SpeechRules {
         return Ok( () );
     }
 
-    fn read_patterns(&mut self, path: &Locations) -> Result<()> {
-        if let Some(p) = &path[0] {
-            // info!("Reading rule file: {}", p.to_str().unwrap());
-            let rule_file_contents = read_to_string_shim(p.as_path()).expect("cannot read file");
-
-            let rules_build_fn = |pattern: &Yaml| {
-                self.build_speech_patterns(pattern, p)
-                    .chain_err(||format!("in file {:?}", p.to_str().unwrap()))
-            };
-            return compile_rule(&rule_file_contents, rules_build_fn)
-                    .chain_err(||format!("in file {:?}", p.to_str().unwrap()));
-        }
-        return Ok(());
+    fn read_patterns(&mut self, path: &Path) -> Result<Vec<PathBuf>> {
+        // info!("Reading rule file: {}", p.to_str().unwrap());
+        let rule_file_contents = read_to_string_shim(path).expect("cannot read file");
+        let rules_build_fn = |pattern: &Yaml| {
+            self.build_speech_patterns(pattern, path)
+                .chain_err(||format!("in file {:?}", path.to_str().unwrap()))
+        };
+        return compile_rule(&rule_file_contents, rules_build_fn)
+                .chain_err(||format!("in file {:?}", path.to_str().unwrap()));
     }
 
-    fn build_speech_patterns(&mut self, patterns: &Yaml, file_name: &Path) -> Result<()> {
+    fn build_speech_patterns(&mut self, patterns: &Yaml, file_name: &Path) -> Result<Vec<PathBuf>> {
         // Rule::SpeechPatternList
         let patterns_vec = patterns.as_vec();
         if patterns_vec.is_none() {
             bail!(yaml_type_err(patterns, "array"));
         }
         let patterns_vec = patterns.as_vec().unwrap();
-
+        let mut files_read = vec![file_name.to_path_buf()];
         for entry in patterns_vec.iter() {
-            SpeechPattern::build(entry, file_name, self)?;
+            if let Some(mut added_files) = SpeechPattern::build(entry, file_name, self)? {
+                files_read.append(&mut added_files);
+            }
         }
-        return Ok( () );  
+        return Ok(files_read);  
     }
     
-    fn read_unicode(&self, path: Option<PathBuf>, use_short: bool) -> Result<()> {
+    fn read_unicode(&self, path: Option<PathBuf>, use_short: bool) -> Result<Vec<PathBuf>> {
         let path = match path {
             Some(p) => p,
             None => {
@@ -2109,7 +2090,8 @@ impl SpeechRules {
                 } else {
                     pref_manager.get_speech_unicode_file()
                 };
-                if use_short {unicode_files.0} else {unicode_files.1}
+                let unicode_files = if use_short {unicode_files.0} else {unicode_files.1};
+                unicode_files.to_path_buf()
             }
         };
 
@@ -2121,11 +2103,14 @@ impl SpeechRules {
             if unicode_defs.is_none() {
                 bail!("File '{}' does not begin with an array", yaml_to_type(unicode_def_list));
             };
+            let mut files_read = vec![path.to_path_buf()];
             for unicode_def in unicode_defs.unwrap() {
-                UnicodeDef::build(unicode_def, &path, self, use_short)
-                        .chain_err(|| {format!("In file {:?}", path.to_str())})?;
+                if let Some(mut added_files) = UnicodeDef::build(unicode_def, &path, self, use_short)
+                                                                .chain_err(|| {format!("In file {:?}", path.to_str())})? {
+                    files_read.append(&mut added_files);
+                }
             };
-            return Ok(());
+            return Ok(files_read);  
         };
 
         return compile_rule(&unicode_file_contents, unicode_build_fn)
@@ -2189,13 +2174,10 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
 
         // no rules matched -- poorly written rule file -- let flow through to default error
         // report error message with file name
-        let mut file_name = "unknown";
         let speech_manager = self.speech_rules.pref_manager.borrow();
-        if let Some(path) = &speech_manager.get_rule_file(&self.speech_rules.name)[0] {
-            file_name= path.to_str().unwrap();
-        }
+        let file_name = speech_manager.get_rule_file(&self.speech_rules.name);
         // FIX: handle error appropriately 
-        bail!("\nNo match found!\nMissing patterns in {} for MathML.\n{}", file_name, mml_to_string(&mathml)); 
+        bail!("\nNo match found!\nMissing patterns in {} for MathML.\n{}", file_name.to_string_lossy(), mml_to_string(&mathml)); 
     }
 
     fn find_match<T:TreeOrString<'c, 'm, T>>(&'r mut self, rule_vector: &[Box<SpeechPattern>], mathml: Element<'c>) -> Result<Option<T>> {

@@ -923,6 +923,72 @@ impl IsInDefinition {
 }
 
 
+pub struct DefinitionValue;
+impl DefinitionValue {
+    /// Returns true if `test_str` is in `set_name`
+    /// Returns an error if `set_name` is not defined
+    pub fn is_defined_in(test_str: &str, set_name: &str) -> Result<String, Error> {
+        return DEFINITIONS.with(|definitions| {
+            let definitions = definitions.borrow();
+            if let Some(map) = definitions.get_hashmap(set_name) {
+                return Ok( match map.get(test_str) {
+                    None => String::default(),
+                    Some(str) => str.clone(),
+                });
+            }
+            return Err( Error::Other( format!("\n  DefinitionValue: '{}' is not defined in definitions.yaml", set_name) ) );
+        });
+    }
+}
+
+/**
+ * Returns true if the node is a bracketed expr with the indicated left/right chars
+ * element/string -- element (converted to string)/string to test
+ * left -- string (like "[") or empty
+ * right -- string (like "]") or empty
+ * requires_comma - boolean, optional (check the top level of 'node' for commas
+ */
+// 'requiresComma' is useful for checking parenthesized expressions vs function arg lists and other lists
+ impl Function for DefinitionValue {
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(2)?;
+        let set_name = args.pop_string()?;
+        match &args[0] {
+            Value::String(str) => return match DefinitionValue::is_defined_in(str, &set_name) {
+                Ok(result) => Ok( Value::String( result ) ),
+                Err(e) => Err(e),
+            },
+            Value::Nodeset(nodes) => {
+                return if nodes.size() == 0 {
+                    Ok( Value::String("".to_string()) )    // trivially not in definition
+                } else {
+                    let node = validate_one_node(nodes.clone(), "DefinitionValue")?;
+                    if let Node::Element(e) = node {
+                        let text = get_text_from_element(e);
+                        if text.is_empty() {
+                            Ok( Value::String("".to_string()) )
+                        } else {
+                            match DefinitionValue::is_defined_in(&text, &set_name) {
+                                Ok(result) => Ok( Value::String( result ) ),
+                                Err(e) => Err(e),
+                            }          
+                        }
+                    } else {
+                        Ok( Value::String("".to_string()) )       // trivially not in definition                    }
+                    }
+                }
+            },
+            _ => Err( Error::Other("DefinitionValue:: neither a node nor a string is passed for first argument".to_string()) ),
+        }
+    }
+}
+
+
 pub struct DistanceFromLeaf;
 impl DistanceFromLeaf {
     fn distance(element: Element, use_left_side: bool, treat_2d_elements_as_tokens: bool) -> usize {
@@ -1141,6 +1207,7 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("ToCommonFraction", ToCommonFraction);
     context.set_function("IsBracketed", IsBracketed);
     context.set_function("IsInDefinition", IsInDefinition);
+    context.set_function("DefinitionValue", DefinitionValue);
     context.set_function("BaseNode", BaseNode);
     context.set_function("IfThenElse", IfThenElse);
     context.set_function("DistanceFromLeaf", DistanceFromLeaf);
@@ -1160,11 +1227,8 @@ mod tests {
 
 
     fn init_word_list() {
-        let result = crate::definitions::read_definitions_file(&[
-            Some(PathBuf::from("Rules/Languages/en/definitions.yaml")),
-            Some(PathBuf::from("Rules/definitions.yaml")),
-            None
-        ]);
+        let file_and_time = crate::prefs::FilesAndTimes::new( PathBuf::from("Rules/Languages/en/definitions.yaml") );
+        let result = crate::definitions::read_definitions_file(&file_and_time);
         if let Err(e) = result {
             panic!("unable to read 'Rules/Languages/en/definitions.yaml\n{}", e.to_string());
         }
