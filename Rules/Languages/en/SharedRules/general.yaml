@@ -990,19 +990,19 @@
   replace:
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
-  - test:
-    - if: ".='→' or .='⟶'"
-      then_test:
-        if: "$Verbosity='Terse'"
-        then: [{t: "forms"}]      # phrase(hydrogen and oxygen 'forms' water )
-        else: [{t: "reacts to form"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
-    - else_if: ".='⇌' or .='⮖'"
-      then: [{t: "is in equilibrium with"}]      # phrase(a reactant 'is in equilibrium with' a product)
-    - else_if: ".='⭴'"
-      then: [{t: "is in equilibrium biased to the left with"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
-    - else_if: ".='⭵'"
-      then: [{t: "is in equilibrium biased to the right with"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
-      else: [x: "."]
+  - test: 
+    - if: "DEBUG(.)='→' or .='⟶'" 
+      then_test: 
+        if: "$Verbosity='Terse'" 
+        then: [t: "forms"]      # phrase(hydrogen and oxygen 'forms' water ) 
+        else: [t: "reacts to form"]      # phrase(hydrogen and oxygen 'reacts to form' water) 
+    - else_if: ".='⇌' or .='\u1f8d2'" 
+      then: [t: "is in equilibrium with"]      # phrase(a reactant 'is in equilibrium with' a product) 
+    - else_if: ".='\u1f8d4'" 
+      then: [t: "is in equilibrium biased to the left with"]      # phrase(the reactant 'is in equilibrium biased to the left with' the product) 
+    - else_if: ".='\u1f8d3'" 
+      then: [t: "is in equilibrium biased to the right with"]      # phrase(the reactant 'is in equilibrium biased to the right with' the product) 
+      else: [x: "*"] 
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator
