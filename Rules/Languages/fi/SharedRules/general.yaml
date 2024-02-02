@@ -999,25 +999,25 @@
   replace:
     x: "text()"
 
-- name: chemical-arrow-operator
-  tag: chemical-arrow-operator
-  match: "."
-  replace:
-  # FIX: this might be better/more efficient if in unicode.yaml
-  - bookmark: "@id"
-  - test:
-    - if: ".='→' or .='⟶'"
-      then_test:
-        if: "$Verbosity='Terse'"
-        then: [{T: "muodostaa"}]      # phrase(hydrogen and oxygen 'forms' water )
-        else: [{T: "reagoi"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
-    - else_if: ".='⇌' or .='\u1f8d2'"
-      then: [{T: "on tasapainossa"}]      # phrase(a reactant 'is in equilibrium with' a product)
-    - else_if: ".='\u1f8d4'"
-      then: [{T: "on tasapainossa vasemmalle"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
-    - else_if: ".='\u1f8d3'"
-      then: [{T: "on tasapainossa oikealle"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
-      else: [x: "*"]
+- name: chemical-arrow-operator 
+  tag: chemical-arrow-operator 
+  match: "." 
+  replace: 
+  # FIX: this might be better/more efficient if in unicode.yaml 
+  - bookmark: "@id" 
+  - test: 
+    - if: "DEBUG(.)='→' or .='⟶'" 
+      then_test: 
+        if: "$Verbosity='Terse'" 
+        then: [t: "muodostaa"]      # phrase(hydrogen and oxygen 'forms' water ) 
+        else: [t: "reagoi"]      # phrase(hydrogen and oxygen 'reacts to form' water) 
+    - else_if: ".='⇌' or .='\u1f8d2'" 
+      then: [t: "on tasapainossa"]      # phrase(a reactant 'is in equilibrium with' a product) 
+    - else_if: ".='\u1f8d4'" 
+      then: [t: "on tasapainoissa vasemmalle"]      # phrase(the reactant 'is in equilibrium biased to the left with' the product) 
+    - else_if: ".='\u1f8d3'" 
+      then: [t: "on tasapainossa oikealle"]      # phrase(the reactant 'is in equilibrium biased to the right with' the product) 
+      else: [x: "*"] 
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator
