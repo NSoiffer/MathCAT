@@ -299,27 +299,23 @@ impl PreferenceManager {
 
         let mut system_prefs_file = self.rules_dir.to_path_buf();
         system_prefs_file.push("prefs.yaml");
-        if should_update_system_prefs {
-            if is_file_shim(&system_prefs_file) {
-                let defaults = DEFAULT_USER_PREFERENCES.with(|defaults| defaults.clone());
-                prefs = Preferences::read_file(&system_prefs_file, defaults)?;
-                self.sys_prefs_file = Some( FileAndTime::new_with_time(system_prefs_file.clone()) );
-            } else {
-                error!("MathCAT couldn't open file system preference file '{}'.\nUsing fallback defaults which may be inappropriate.",
-                            system_prefs_file.to_str().unwrap());
-            };
-        }
+        if is_file_shim(&system_prefs_file) {
+            let defaults = DEFAULT_USER_PREFERENCES.with(|defaults| defaults.clone());
+            prefs = Preferences::read_file(&system_prefs_file, defaults)?;
+            self.sys_prefs_file = Some( FileAndTime::new_with_time(system_prefs_file.clone()) );
+        } else {
+            error!("MathCAT couldn't open file system preference file '{}'.\nUsing fallback defaults which may be inappropriate.",
+                        system_prefs_file.to_str().unwrap());
+        };
 
         let mut user_prefs_file = dirs::config_dir();
-        if should_update_user_prefs {
-            if let Some(mut user_prefs_file_path_buf) = user_prefs_file {
-                user_prefs_file_path_buf.push("MathCAT/prefs.yaml");
-                if is_file_shim(&user_prefs_file_path_buf) {
-                    prefs = Preferences::read_file(&user_prefs_file_path_buf, prefs)?;
-                    self.user_prefs_file = Some( FileAndTime::new_with_time(user_prefs_file_path_buf.clone()) );
-                }           
-                user_prefs_file = Some(user_prefs_file_path_buf);
-            }
+        if let Some(mut user_prefs_file_path_buf) = user_prefs_file {
+            user_prefs_file_path_buf.push("MathCAT/prefs.yaml");
+            if is_file_shim(&user_prefs_file_path_buf) {
+                prefs = Preferences::read_file(&user_prefs_file_path_buf, prefs)?;
+                self.user_prefs_file = Some( FileAndTime::new_with_time(user_prefs_file_path_buf.clone()) );
+            }           
+            user_prefs_file = Some(user_prefs_file_path_buf);
         }
 
         if prefs.prefs.is_empty() {
@@ -327,7 +323,7 @@ impl PreferenceManager {
                 None => "No user config directory".to_string(),
                 Some(file) => file.to_string_lossy().to_string(),
             };
-            bail!("Didn't find preferences in rule director ('{}') or user directory ('{}')", &system_prefs_file.to_string_lossy(), user_prefs_file_name);
+            bail!("Didn't find preferences in rule directory ('{}') or user directory ('{}')", &system_prefs_file.to_string_lossy(), user_prefs_file_name);
         }
         self.user_prefs = prefs;
         return Ok( () );
