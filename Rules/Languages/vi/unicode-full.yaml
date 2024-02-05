@@ -58,8 +58,8 @@
  - "{":                                             #  0x7b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "mở nẹp"]                         #   (en: 'open brace')
-        else: [t: "đùi trái"]                       #   (en: 'left brace')
+        then: [t: "mở ngoặc nhọn"]                         #   (en: 'open brace')
+        else: [t: "mở ngoặc nhọn"]                       #   (en: 'left brace')
  - "|":                                             #  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
      - test:
@@ -74,10 +74,10 @@
  - "}":                                             #  0x7d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [t: "đóng nẹp"]                       #   (en: 'close brace')
-        else: [t: "đúng nẹp"]                       #   (en: 'right brace')
+        then: [T: "đóng ngoặc nhọn"]                       #   (en: 'close brace')
+        else: [T: "đóng ngoặc nhọn"]                       #   (en: 'right brace')
 
- - "~": [t: "tilde"]                                #  0x7e
+ - "~": [T: "dấu ngã"]                                #  0x7e
  - " ": [t: ""]                                     #  0xa0
  - "¢": [t: "xu"]                                   #  0xa2 (en: 'cents')
  - "£": [t: "bảng"]                                 #  0xa3 (en: 'pounds')

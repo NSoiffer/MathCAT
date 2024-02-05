@@ -1,5 +1,4 @@
 ---
-
 - name: intent-literal-silent
   tag: [mi, mo, mn]
   match: "contains(@data-intent-property, ':silent:')"
@@ -36,7 +35,7 @@
       else: {pause: short}
   - x: "*[1]"
   - test:
-    - if: $ClearSpeak_Roots = 'EndRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+    - if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
       - pause: short
       - T: hết căn
@@ -84,7 +83,7 @@
       then: {T: của}
   - x: "*[1]"
   - test:
-      if: $ClearSpeak_Roots = 'EndRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
+      if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
       - pause: short
       - T: hết căn
@@ -724,16 +723,16 @@
   - "  $ClearSpeak_ImpliedTimes = 'MoreImpliedTimes'"
   - " or "
   - "  following-sibling::*[1]["
-  - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|') or self::m:binomial or" # followed by parens
+  - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|') or self::m:binomial or" # followed by parens
   - "    ( (self::m:msup or self::m:msub or self::m:msubsup or self::m:power) and " # followed by msup, etc.
-  - "       *[1][self::m:mrow][IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|')]" # base has parens
+  - "       *[1][self::m:mrow][IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # base has parens
   - "    )"
   - "  ]"
   # other possibility is the preceding element has parens (but not the following)
   # this is not mentioned in the ClearSpeak rules or examples but seems like it should say "times". E.g, |x| y
   - " or "
   - "  preceding-sibling::*[1]["
-  - "    IsBracketed(., '(', ')') or IsBracketed(., '[(]', ']') or IsBracketed(., '|', '|')]" # followed by parens
+  - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
   - T: nhân

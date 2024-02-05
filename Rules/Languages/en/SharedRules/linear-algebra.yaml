@@ -15,7 +15,7 @@
       - t: "of"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
   - test:
-      if: "not(IsNode(*[1], 'simple'))"
+      if: "not(IsNode(*[1], 'simple')) and $Impairment = 'Blindness'"
       then: [t: "end determinant"]      # phrase('end determinant' of a matrix)
 
 - name: norm
@@ -33,7 +33,7 @@
       - t: "of"      # phrase(this is the mean 'of' the data)
   - x: "*[1]"
   - test:
-      if: "not(IsNode(*[1], 'simple'))"
+      if: "not(IsNode(*[1], 'simple')) and $Impairment = 'Blindness'"
       then: [t: "end norm"]      # phrase('end norm' that is a measure of distance)
 
 

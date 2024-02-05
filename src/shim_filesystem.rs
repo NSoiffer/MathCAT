@@ -81,6 +81,10 @@ cfg_if! {
                 Some(fs) => fs == "dir",
             };
         }
+        pub fn read_dir_shim(path: &Path) ->  Result<impl Iterator<Item=std::io::Result<std::fs::DirEntry>>> {
+            return Ok(std::iter::empty::<std::io::Result<std::fs::DirEntry>>());
+        }
+        
         
         pub fn canonicalize_shim(path: &Path) -> std::io::Result<PathBuf> {
             // FIX:  need to deal with ".."???
@@ -129,20 +133,14 @@ cfg_if! {
             // file_name should be path name starting at Rules dir: e.g, "Rules/en/navigate.yaml"
             OVERRIDE_FILE_NAME.with(|name| *name.borrow_mut() = file_name.to_string().replace("/", "\\"));
             OVERRIDE_FILE_CONTENTS.with(|contents| *contents.borrow_mut() = file_contents.to_string());
-            crate::speech::SpeechRules::invalidate(
-                crate::prefs::FilesChanged {
-                    speech_rules: true, speech_unicode_short: true, speech_unicode_full: true, 
-                    braille_rules: true, braille_unicode_short: true, braille_unicode_full: true, 
-                    navigate_rules: true, overview_rules: true,
-                    intent: true, defs: true
-                }
-            )
+            crate::speech::SpeechRules::invalidate();
         }
 
         use sxd_document::parser;
         use sxd_document::Package;
         thread_local! {
             // FIX: use include! macro (static DIRECTORY_TREE: ... = include!(...))
+            //    The file to include would be the result of something added to build.rs to create directory.xml that mimics what's below
             static DIRECTORY_TREE: RefCell<Package> = RefCell::new(
                     parser::parse(r"
                     <dir name='Rules'>
@@ -190,6 +188,7 @@ cfg_if! {
         }        
     } else {
         use crate::errors::*;
+
         pub fn is_file_shim(path: &Path) -> bool {
             return path.is_file();
         }
@@ -198,12 +197,16 @@ cfg_if! {
             return path.is_dir();
         }
         
+        pub fn read_dir_shim(path: &Path) ->  Result<impl Iterator<Item=std::io::Result<std::fs::DirEntry>>> {
+            return path.read_dir().chain_err(|| format!("while trying to read directory {}", path.to_str().unwrap()));
+        }
+        
         pub fn canonicalize_shim(path: &Path) -> std::io::Result<PathBuf> {
             return path.canonicalize();
         }
         
         pub fn read_to_string_shim(path: &Path) -> Result<String> {
-            debug!("Reading file '{}'", path.to_str().unwrap());
+            info!("Reading file '{}'", path.to_str().unwrap());
             return std::fs::read_to_string(path).chain_err(|| format!("while trying to read {}", path.to_str().unwrap()));
         }     
     }

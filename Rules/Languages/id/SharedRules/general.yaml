@@ -248,10 +248,23 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{T: limit}]
-      else: [{T: 'limit '}]
+      then: [t: ""]           # phrase('the' limit as x approaches 1)
+  - test:
+    - if: "*[1][.='lim']"
+      then: [t: "limit"]
+    - else_if: "*[1][.='limsup']"
+      then_test:
+          if: "$Verbosity='Terse'"
+          then: [t: "lim sup"]
+          else: [t: "limit superior"]
+    - else_if: "*[1][.='liminf']"
+      then_test:
+          if: "$Verbosity='Terse'"
+          then: [t: "lim inf"]
+          else: [t: "limit inferior"]
+    - else: [x: "*[1]"]
+  - t: ""                      # phrase(the limit 'as' x approaches 1)
   - x: "*[2]"
-  - pause: short
 
 - name: vector
   tag: modified-variable
@@ -937,11 +950,11 @@
         if: "name(preceding-sibling::*[1]) = 'chemical-nuclide'"
         then: [{T: "membusuk menjadi"}]
         else: [{T: "hasil"}]
-    - else_if: ".='⇌' or .='⮖'"
+    - else_if: ".='⇌' or .='\u1f8d2'"
       then: [{T: "berada dalam kesetimbangan dengan"}]
-    - else_if: ".='⭴'"
+    - else_if: ".='\u1f8d4'"
       then: [{T: "berada dalam kesetimbangan bias ke kiri dengan"}]
-    - else_if: ".='⭵'"
+    - else_if: ".='\u1f8d3'"
       then: [{T: "berada dalam kesetimbangan bias ke kanan dengan"}]
       else: [{x: .}]
 

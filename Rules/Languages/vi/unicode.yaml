@@ -14,6 +14,8 @@
 
  - "0-9": [T: "."]
 
+ - " ": [t: " "]                                 # 0x20
+
  - "!": [T: giai thừa]                           # 0x21
  - "\"": [T: nháy kép]                     # 0x22
  - "#": [T: báo số]                              # 0x23
@@ -304,7 +306,7 @@
    #  - test: 
     #     if: "$Verbosity!='Terse'"
      #    then: [T: "the"]
-     - T: tam giác
+     - T: đen ta
  - "∇":                                          # 0x2207
    #  - test: 
     #     if: "$Verbosity!='Terse'"
@@ -444,26 +446,26 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: {T: trùng với}
- - "≤":                                          # 0x2264
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: {T: nhỏ hơn hoặc bằng}
- - "≥":                                          # 0x2265
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: {T: lớn hơn hoặc bằng}
+ - "≤": [T: nhỏ hơn hoặc bằng]                                         # 0x2264
+     #- test: 
+         #if: "$Verbosity!='Terse'"
+         #then: {T: nhỏ hơn hoặc bằng}
+ - "≥": [T: lớn hơn hoặc bằng]                                         # 0x2265
+     #- test: 
+         #if: "$Verbosity!='Terse'"
+         #then: {T: lớn hơn hoặc bằng}
  - "≦": [T: nhỏ hơn hoặc bằng]             # 0x2266
  - "≧": [T: lớn hơn hoặc bằng]          # 0x2267
  - "≺": [T: precedes]                            # 0x227a
  - "≻": [T: succeeds]                            # 0x227b
- - "⊂":                                          # 0x2282
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: {T: chứa trong}
- - "⊃":                                          # 0x2283
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: {T: chứa}
+ - "⊂": [T: chứa trong]                                         # 0x2282
+     #- test: 
+         #if: "$Verbosity!='Terse'"
+         #then: {T: chứa trong}
+ - "⊃": [T: chứa]                                         # 0x2283
+     #- test: 
+         #if: "$Verbosity!='Terse'"
+         #then: {T: chứa}
  - "⊄":                                          # 0x2284
    #  - test: 
     #     if: "$Verbosity!='Terse'"
@@ -474,11 +476,11 @@
     #     if: "$Verbosity!='Terse'"
      #    then: [T: is]
      - T: không chứa
- - "⊆":                                          # 0x2286
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: {T: chứa trong}
- - "⊇":                                          # 0x2287
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: {T: chứa}
+ - "⊆": [T: chứa trong hoặc bằng]                                         # 0x2286
+     #- test: 
+         #if: "$Verbosity!='Terse'"
+         #then: {T: chứa trong}
+ - "⊇": [T: chứa hoặc bằng]                                         # 0x2287
+     #- test: 
+         #if: "$Verbosity!='Terse'"
+         #then: {T: chứa}

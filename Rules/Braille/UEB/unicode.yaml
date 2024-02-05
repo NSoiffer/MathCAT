@@ -52,7 +52,7 @@
  - "⊳": [t: "⠈⠸⠜"]             # 0x22B3 (Contains as normal subgroup)
  - "⊴": [t: "⠸⠸⠣"]             # 0x22B4 (Normal subgroup of or equal)
  - "⊵": [t: "⠸⠸⠜"]             # 0x22B5 (Contains as normal subgroup or equal)
- - "⊻": [t: "⠈⠖⠠⠱"]           # 0x22bb (Xor)
+ - "⊻": [t: "𝟙⠈⠖⠠⠱"]           # 0x22bb (Xor)
  - "⋬": [t: "⠨⠸⠣"]             # 0x22EC (not normal subgroup) -- this isn't the same as what is in GTM 10, but that similar has no Unicode equiv
  - "⋭": [t: "⠨⠸⠣"]             # 0x22ED (does not contain as normal subgroup) -- this isn't the same as what is in GTM 10, but that similar has no Unicode equiv
  - "⊢": [t: "⠸⠒"]               # 0x22a2 (Right tack)
@@ -81,6 +81,8 @@
  - "}": [t: "c⠸c⠜"]               # 0x007D (Right curly bracket)
  - "〈": [t: "o⠈⠣"]               # 0x2329 (Left angle bracket)
  - "〉": [t: "c⠈⠜"]               # 0x232A (Right angle bracket)
+ - "⟨": [t: "o⠈⠣"]               # 0x27E8 (Left angle bracket)
+ - "⟩": [t: "c⠈⠜"]               # 0x27E9 (Right angle bracket)
  - "|":                # 0x007C (Vertical line)
     - test:
         if: "preceding-sibling::* and following-sibling::*"
@@ -100,6 +102,9 @@
  - "_": [t: "⠨⠤"]               # 0x005F (Low line (underscore))
  - "~": [t: "⠈⠔"]               # 0x007E (Tilde (swung dash))
  - "¢": [t: "⠈⠉"]               # 0x00A2 (Cents sign)
+ - "‐": [t: "⠤"]                # 0x2010 (Hyphen)
+ - "–": [t: "⠠⠤"]               # 0x2013 (En Dash)
+ - "―": [t: "⠐⠠⠤"]              # 0x2015 (Horizontal Bar)
  - "‖": [t: "⠸⠳"]               # 0x2016
  - "€": [t: "⠈⠑"]               # 0x20AC (Euro sign)
  - "₣": [t: "⠈⠋"]               # 0x20A3 (French franc sign)
@@ -116,6 +121,8 @@
  - "′": [t: "1⠶"]                # 0x2032 (Prime sign)
  - "″": [t: "1⠶⠶"]               # 0x2033 (Double prime sign)
  - "‴": [t: "1⠶⠶⠶"]              # 0x2034 (Triple prime sign)
+ - "℃": [t: "⠘⠚⠠⠉"]             # 0x2103 (Degrees Celsius)
+ - "℉": [t: "⠘⠚⠠⠋"]             # 0x2109 (Degrees Fahrenheit)
  - "Å": [t: "⠠⠘⠫⠁"]             # 0x212B (Angstrom symbol)
  - "Å": [t: "⠠⠘⠫⠁"]             # 0x00C5 (WIRIS uses this for Angstrom)
  - "∀": [t: "⠘⠁"]               # 0x2200 (For all)
@@ -143,15 +150,17 @@
  - "⟂": [t: "⠼⠤"]               # 0x27C2 (Perpendicular)
  - "⊥": [t: "⠼⠤"]               # 0x22A5 (Up tack (perpendicular))
  - "⊦": [t: "⠸⠒"]               # 0x22A6 (Assertion (is a theorem))
- - "⊣": [t: "⠈⠸⠒"]              # 0x22A3 (Left tack (reverse assertion))
  - "⊨": [t: "⠘⠸⠒"]              # 0x22A8 (TRUE (is valid))
  - "⊬": [t: "⠸⠒⠈⠱"]             # 0x22AC (Does not prove)
  - "⊭": [t: "⠘⠸⠒⠈⠱"]            # 0x22AD (Not TRUE)
  - "⫅": [t: "⠘⠣⠰⠻⠐⠶"]         # 0x2AC5 (Subset above equals)
  - "⫆": [t: "⠘⠜⠰⠻⠐⠶"]         # 0x2AC6 (Superset above equals)
  - "⫤": [t: "⠨⠸⠒"]              # 0x2AE4 (Vertical bar double left turnstile)
+ - "⬠": [t: "1⠫⠼⠑t"]            # 0x2B20 (White Pentagon)
+ - "⬡": [t: "1⠫⠼⠋t"]            # 0x2B21 (White Hexagon)
  - "✓": [t: "⠈⠩"]               # 0x2713 (Check mark (tick))
- - "⦵": [t: "⠨⠚"]               # 0x29B5 (Plimsoll sign (standard state))
+ - "⦵": [t: "⠨⠚"]               # 0x29B5 (Plimsoll sign)
+ - "⮖": [t: "1⠐⠠⠤⠯⠫⠿"]          # 0x2B96 (MEDIUM SMALL WHITE CIRCLE WITH HORIZONTAL BAR (standard state))
  - "←": [t: "1⠳⠪"]              # 0x2190 (Leftwards arrow)
  - "↑": [t: "1⠳⠬"]              # 0x2191 (Upwards arrow)
  - "→": [t: "1⠳⠕"]              # 0x2192 (Rightwards arrow)
@@ -194,7 +203,7 @@
  - "⇃": [t: "1⠳⠠⠗⠩"]            # 0x21C3 (Downwards harpoon with barb leftwards)
  - "⇄": [t: "1⠳⠕⠻⠳⠪"]           # 0x21C4 (Rightwards arrow over leftwards arrow)
  - "⇅": [t: "1⠳⠬⠿⠳⠩"]           # 0x21C5 (Upwards arrow left of Downwards arrow)
- - "⇌": [t: "⠘⠸⠶"]              # 0x21CC (Rightwards harpoon over leftwards harpoon (equilibrium))
+ - "⇌": [t: "1⠘⠸⠶"]              # 0x21CC (Rightwards harpoon over leftwards harpoon (equilibrium))
  - "⇐": [t: "1⠳⠶⠪"]             # 0x21D0 (Leftwards double arrow)
  - "⇑": [t: "1⠳⠶⠬"]             # 0x21D1 (Upwards double arrow)
  - "⇒": [t: "1⠳⠶⠕"]             # 0x21D2 (Rightwards double arrow)
@@ -207,10 +216,32 @@
  - "⇣": [t: "1⠳⠂⠩"]             # 0x21E3 (Downwards dashed arrow)
  - "⟵": [t: "1⠳⠒⠒⠒⠪"]           # 0x27F5 (Long leftwards arrow)
  - "⟶": [t: "1⠳⠒⠒⠒⠕"]           # 0x27F6 (Long rightwards arrow)
- - "⥂": [t: "⠸⠶"]               # 0x2942 (Rightwards arrow above short leftwards arrow (equilibrium, trend to the right))
- - "⥄": [t: "⠈⠸⠶"]              # 0x2944 (Short rightwards arrow above leftwards arrow (equilibrium, trend to the left))
+ - "⥂": [t: "1⠸⠶"]               # 0x2942 (Rightwards arrow above short leftwards arrow (equilibrium, trend to the right))
+ - "⥄": [t: "1⠈⠸⠶"]              # 0x2944 (Short rightwards arrow above leftwards arrow (equilibrium, trend to the left))
+
+# These repeat the short arrow version because that is what is in the spec, but the spec should really use the long version
+ - "🣒": [t: "1⠘⠸⠶"]               # 0x1f8d2 (Long rightwards harpoon over leftwards harpoon (equilibrium))
+ - "🣓": [t: "1⠸⠶"]                # 0x1f8d3 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the right))
+ - "🣔": [t: "1⠈⠸⠶"]               # 0x1f8d4 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the left))
+ 
+# Mappings for some new Unicode chemistry arrows/symbols
+# These need to be verified -- 0x1f8d1, 0x1f8d2, and 0x1f8d3 conflict with GTM 16 (uses short arrow when really should be long)
+ - "🣐": [t: "1⠳⠒⠒⠒⠕⠻⠳⠒⠒⠒⠪"]           # 0x1F8D0 LONG RIGHTWARDS ARROW OVER LONG LEFTWARDS ARROW
+#  - "🣒": [t: "1⠘⠸⠶"]               # 0x1f8d2 (Long rightwards harpoon over leftwards harpoon (equilibrium))
+#  - "🣓": [t: "1⠸⠶"]                # 0x1f8d3 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the right))
+#  - "🣔": [t: "1⠈⠸⠶"]               # 0x1f8d4 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the left))
+#  - "🣑": [t: "1⠳⠒⠒⠒⠈⠗⠕⠻⠳⠒⠒⠒⠠⠗⠪"]     # 0x1F8D1 LONG RIGHTWARDS HARPOON OVER LONG LEFTWARDS HARPOON
+#  - "🣒": [t: "1⠳⠒⠒⠒⠈⠗⠕⠻⠳⠒⠠⠗⠪"]         # 0x1F8D2 LONG RIGHTWARDS HARPOON ABOVESHORT LEFTWARDS HARPOON
+#  - "🣓": [t: "1⠳⠒⠈⠗⠕⠻⠳⠒⠒⠒⠠⠗⠪"]         # 0x1F8D3 SHORT RIGHTWARDS HARPOON ABOVELONG LEFTWARDS HARPOON
+#  - "🣔": [t: "1⠳⠒⠒⠒⠈⠗⠪⠻⠳⠒⠠⠗⠕"]         # 0x1F8D4 LONG LEFTWARDS HARPOON ABOVESHORT RIGHTWARDS HARPOON
+ - "🣕": [t: "1⠳⠒⠈⠗⠪⠻⠳⠒⠒⠒⠠⠗⠕"]         # 0x1F8D5 SHORT LEFTWARDS HARPOON ABOVELONG RIGHTWARDS HARPOON
+ - "🣖": [t: "1⠳⠒⠒⠒⠕⠯⠠⠭"]                # 0x1F8D6 LONG RIGHTWARDS ARROW WITH THROUGH X
+ - "🣗": [t: "1⠐⠠⠤⠯⠫⠿"]                    # 0x1F8D7 LONG RIGHTWARDS ARROW WITH DOUBLE SLASH
+
  - "△": [t: "1⠫⠼⠉t"]            # 0x25B3 (Triangle)
+ - "▫": [t: "1⠫⠼⠙t"]             # 0x25AB (Small white Square)
  - "□": [t: "1⠫⠼⠙t"]            # 0x25A1 (Square)
+ - "◻": [t: "1⠫⠼⠙t"]            # 0x25FB (Square)
  - "▤": [t: "⠨⠫⠼⠙t"]            # 0x25A4 (Square with horizontal fill)
  - "▥": [t: "⠨⠫⠼⠙t"]            # 0x25A5 (Square with vertical fill)
  - "▦": [t: "⠨⠫⠼⠙t"]            # 0x25A6 (Square with orthogonal crosshatch fill)
@@ -256,26 +287,28 @@
      - test:
         - if: "self::m:mn"
           then: [t: "N⠐"]
-        - else_if: "following-sibling::*[1][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]"
-          then: [t: "𝐖"]
-          else: [t: "W"]
+        - else_if: "@data-added='missing-content' or @data-empty-in-2D or @width > 1.1"
+          then: [t: "⠬"]       # omission
+        - else_if: "@width < 0.25"
+          then: [t: ""]       # tweaking space -- ignore
+          else: [t: "W"]      # space in text or wide enough space
  - ",":                        # 0x2c (Comma)
      - test:
         if: "self::m:mn"
         then: [t: "N⠂"]
-        else: [t: ",W"]
+        else: [t: "c,W"]
  - ".":                        # 0x2e (Period)
      - test:
         if: "self::m:mn"
         then: [t: "N⠲"]
-        else: [t: "."]
+        else: [t: "c."]
  - ":":                         # 0x003A (Colon)
         # We can't normally tell spacing, but it *should* have a space in function mapping and set builder notation if the author used appropriate notation
         # The canonicalization code makes this guess and adds "data-space-after"
     - test:
         if: "@data-space-after or (../self::m:mrow and ancestor::*[2][IsBracketed(., '{', '}')]) or following-sibling::*[1]/*[2][IsInDefinition(., 'Arrows')]" # "Arrows" is a bit broad...
         then: [t: "1⠒W"]
-        else: [t: "1⠒"]
+        else: [t: "1c⠒"]
 
  - "-":                        # 0x2d (Minus sign or hyphen)
      - test:
@@ -1522,4 +1555,3 @@
  - "⅝": [t: "#N⠑N⠌N⠓"]          # 0x215D (Vulgar Fraction Five Eighths)
  - "⅞": [t: "#N⠛N⠌N⠓"]          # 0x215E (Vulgar Fraction Seven Eighths)
  - "↉": [t: "#N⠚N⠌N⠑"]          # 0x2189 (Vulgar Fraction Zero Thirds)
-
