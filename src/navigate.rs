@@ -1423,7 +1423,6 @@ mod tests {
           </mrow>
         </mrow>
        </math>";
-        set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         init_default_prefs(mathml_str, "Simple");
         set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
@@ -1496,7 +1495,6 @@ mod tests {
           </mtr>
         </mtable>
        </math>";
-        set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         init_default_prefs(mathml_str, "Enhanced");
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
