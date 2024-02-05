@@ -322,7 +322,7 @@
   - x: "*[2]"
   - test:
       if: "$ClearSpeak_Exponents != 'Ordinal'"
-      then: [{v: "potência de"}]      # phrase(2 raised to the 'power' 7)
+      then: [{t: "potência de"}]      # phrase(2 raised to the 'power' 7)
 
 - name: simple-var
   tag: power
