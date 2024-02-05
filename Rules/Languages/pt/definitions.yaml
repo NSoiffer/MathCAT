@@ -1,9 +1,9 @@
 ---
-[
 # Lines starting with "#" are a comment
 # Each definition in this file is of the form
-#   name: [ "...", "..." "..." ],
+#   name: [ "...", "..." "..." ]
 
+- include: "../../definitions.yaml"
 
 # ----------------  Cardinal and Ordinal Numbers  --------------------------
 # The following definitions are used to convert numbers to words
@@ -24,85 +24,83 @@
 #   The minimum length is 10.
 
 # For English, a regular pattern starts at twenty
-    NumbersOnes: [
+- NumbersOnes: [
          "zero", "um", "dois", "três", "quatro", "cinco", "seis", "sete", "oito", "nove",
          "dez", "onze", "doze", "treze", "quatorze", "quinze", "dezesseis",
          "dezessete", "dezoito", "dezenove"
-    ],
+    ]
 
-    NumbersOrdinalOnes: [
+- NumbersOrdinalOnes: [
          "zero", "primeiro", "segundo", "terceiro", "quarto", "quinto", "sexto", "sétimo", "oitavo", "nono",
          "décimo", "décimo primeiro", "décimo segundo", "décimo terceiro", "décimo quarto", "décimo quinto", "décimo sexto",
          "décimo sétimo", "décimo oitavo", "décimo nono"
-    ],
+    ]
 
-    NumbersOrdinalPluralOnes: [
+- NumbersOrdinalPluralOnes: [
          "zero", "primeiros", "segundos", "terços", "quartos", "quintos", "sextos", "sétimos", "oitavos", "nonos",
          "décimos", "décimos primeiros", "décimos segundos", "décimos terceiros", "décimos quartos", "décimos quintos", "décimos sextos",
          "décimos sétimos", "décimos oitavos", "décimos nonos"
-    ],
+    ]
 
     # stop when regularity begins
-    NumbersOrdinalFractionalOnes: [
+- NumbersOrdinalFractionalOnes: [
          "zero", "um", "meio", "terço", "quarto", "quinto", "sexto", "sétimo", "oitavo", "nono",
          "décimo", "onze avos", "doze avos", "treze avos", "quatorze avos", "quinze avos", "dezesseis avos", "dezessete avos",
          "dezoito avos", "dezenove avos"
-    ],
+    ]
 
     # stop when regularity begins
-    NumbersOrdinalFractionalPluralOnes: [
+- NumbersOrdinalFractionalPluralOnes: [
          "zeros", "primeiros", "metades"
-    ],
+    ]
 
 
     # What to use for multiples of 10
-    NumbersTens: [
+- NumbersTens: [
          "", "dez", "vinte", "trinta", "quarenta", "cinquenta", "sessenta", "setenta", "oitenta", "noventa"
-    ],
+    ]
 
-    NumbersOrdinalTens: [
+- NumbersOrdinalTens: [
          "", "décimo", "vigésimo", "trigésimo", "quadragésimo", "quinquagésimo", "sextagésimo", "septuagésimo", "octagésimo", "nonagésimo"
-    ],
+    ]
 
-    NumbersOrdinalPluralTens: [
+- NumbersOrdinalPluralTens: [
          "", "décimos", "vigésimos", "trigésimos", "quadragésimos", "quinquagésimos", "sextagésimos", "septuagésimos", "octagésimos", "nonagésimos"
-    ],
+    ]
 
 
-    NumbersHundreds: [
+- NumbersHundreds: [
        "", "cem", "duzentos", "trezentos", "quatrocentos", "quinhentos",
          "seiscentos", "setecentos", "oitocentos", "novecentos"
-    ],
+    ]
 
-    NumbersOrdinalHundreds: [
+- NumbersOrdinalHundreds: [
        "", "centésimo", "ducentésimo", "trecentésimo", "quadringentésimo", "quingentésimo",
          "sexcentésimo", "septingentésimo", "octingentésimo", "nongentésimo"
-    ],
+    ]
 
-    NumbersOrdinalPluralHundreds: [
+- NumbersOrdinalPluralHundreds: [
        "", "centésimos", "ducentésimos", "trecentésimos", "quadringentésimos", "quingentésimos",
          "sexcentésimos", "septingentésimos", "octingentésimos", "nongentésimos"
-    ],
+    ]
 
     # At this point, hopefully the language is regular. If not, code needs to be written
-    NumbersLarge: [
+- NumbersLarge: [
          "", "mil", "milhão", "bilhão", "trilhão", "quatrilhão",
          "quintilhão", "sextilhão", "septilhão", "octilhão", "nonilhão",
-    ],
+    ]
 
-    NumbersPluralLarge: [
+- NumbersPluralLarge: [
          "", "milhões", "bilhões", "trilhões", "quatrilhões",
          "quintilhões", "sextilhões", "septilhões", "octilhões", "nonilhões",
-    ],
+    ]
       
-    NumbersOrdinalLarge: [
+- NumbersOrdinalLarge: [
          "décimo", "centésimo", "milésimo", "milionésimo", "bilionésimo", "trilionésimo", "quatrilionésimo",
          "quintilionésimo", "sextilionésimo", "septilionésimo", "octilionésimo", "nonilionésimo"
-    ],
+    ]
       
-    NumbersOrdinalPluralLarge: [
+- NumbersOrdinalPluralLarge: [
          "décimos", "centésimos", "milésimos", "milionésimos", "bilionésimos", "trilionésimos", "quatrilionésimos",
          "quintilionésimos", "sextilionésimos", "septillionésimos", "octilionésimos", "nonillionésimos"
     ]
-
-]
