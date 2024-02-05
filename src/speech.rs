@@ -12,6 +12,8 @@ use sxd_xpath::context::Evaluation;
 use sxd_xpath::{Context, Factory, Value, XPath};
 use sxd_xpath::nodeset::Node;
 use std::fmt;
+use std::time::SystemTime;
+use crate::definitions::read_definitions_file;
 use crate::errors::*;
 use crate::prefs::*;
 use yaml_rust::{YamlLoader, Yaml, yaml::Hash};
@@ -80,9 +82,12 @@ pub fn overview_mathml(mathml: Element, nav_node_id: &str) -> Result<String> {
 
 
 fn intent_rules<'m>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, doc: Document<'m>, mathml: Element, nav_node_id: &'m str) -> Result<Element<'m>> {
-    SpeechRules::update()?;
     rules.with(|rules| {
-        rules.borrow_mut().read_files()?;
+        {
+            let mut rules = rules.borrow_mut();     // limit scope of borrow by enclosing in a block
+            rules.update()?;
+            rules.read_files()?;
+        }
         let rules = rules.borrow();
         // debug!("speak_rules:\n{}", mml_to_string(&mathml));
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, doc, nav_node_id);
@@ -100,9 +105,12 @@ fn intent_rules<'m>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>,
 /// Speak the MathML
 /// If 'nav_node_id' is not an empty string, then the element with that id will have [[...]] around it
 fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, mathml: Element, nav_node_id: &str) -> Result<String> {
-    SpeechRules::update()?;
     rules.with(|rules| {
-        rules.borrow_mut().read_files()?;
+        {
+            let mut rules = rules.borrow_mut();     // limit scope of borrow by enclosing in a block
+            rules.update()?;
+            rules.read_files()?;
+        }
         let rules = rules.borrow();
         // debug!("speak_rules:\n{}", mml_to_string(&mathml));
         let new_package = Package::new();
@@ -1835,6 +1843,7 @@ impl UnicodeDef {
 
  type RuleTable = HashMap<String, Vec<Box<SpeechPattern>>>;
  type UnicodeTable = Rc<RefCell<HashMap<u32,Vec<Replacement>>>>;
+ type FilesAndTimesShared = Rc<RefCell<FilesAndTimes>>;
 
  #[derive(Debug, Clone, Copy, PartialEq, Eq)]
  pub enum RulesFor {
@@ -1858,6 +1867,109 @@ impl UnicodeDef {
     }
  }
 
+ 
+#[derive(Debug, Clone)]
+pub struct FileAndTime {
+    file: PathBuf,
+    time: SystemTime,
+}
+
+impl FileAndTime {
+    fn new(file: PathBuf) -> FileAndTime {
+        return FileAndTime {
+            file,
+            time: SystemTime::UNIX_EPOCH,
+        }
+    }
+
+    pub fn new_with_time(file: PathBuf) -> FileAndTime {
+        return FileAndTime {
+            time: FileAndTime::get_metadata(&file),
+            file,
+        }
+    }
+
+    pub fn is_up_to_date(&self) -> bool {
+        let file_mod_time = FileAndTime::get_metadata(&self.file);
+        return self.time >= file_mod_time;
+    }
+
+    fn get_metadata(path: &Path) -> SystemTime {
+        use std::fs;
+        if !cfg!(target_family = "wasm") {
+            let metadata = fs::metadata(path);
+            if let Ok(metadata) = metadata {
+                if let Ok(mod_time) = metadata.modified() {
+                    return mod_time;
+                }
+            }
+        }
+        return SystemTime::UNIX_EPOCH
+    }
+
+}
+#[derive(Debug, Default)]
+pub struct FilesAndTimes {
+    // ft[0] is the main file -- other files are included by it (or recursively)
+    // We could be a little smarter about invalidation by tracking what file is the parent (including file),
+    // but it seems more complicated than it is worth
+    ft: Vec<FileAndTime>
+}
+
+impl FilesAndTimes {
+    pub fn new(start_path: PathBuf) -> FilesAndTimes {
+        let mut ft = Vec::with_capacity(8);
+        ft.push( FileAndTime::new(start_path) );
+        return FilesAndTimes{ ft };
+    }
+
+    fn invalidate(&mut self) {
+        // just enough so that is_valid() will say that this does match a flushed out value
+        if !self.ft.is_empty() {
+            self.ft[0].time = SystemTime::UNIX_EPOCH;
+        }
+    }
+
+    /// Returns true if the main file matches the corresponding preference location and files' times are all current
+    pub fn is_file_up_to_date(&self, pref_path: &Path) -> bool {
+        if cfg!(target_family = "wasm") {
+            return !self.ft.is_empty();
+        }
+
+        // if the time isn't set or the path is different from the prefernce (which might have changed), return false
+        if self.ft.is_empty() || self.ft[0].time == SystemTime::UNIX_EPOCH || self.as_path() != pref_path {
+            return false;
+        }
+
+        // check the time stamp on the included files -- if the head file hasn't changed, the the paths for the included files will the same
+        for file in &self.ft {
+            if !file.is_up_to_date() {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    fn set_files_and_times(&mut self, new_files: Vec<PathBuf>)  {
+        self.ft.clear();
+        for path in new_files {
+            let time = FileAndTime::get_metadata(&path);      // do before move below
+            self.ft.push( FileAndTime{ file: path, time })
+        }
+    }
+
+    pub fn as_path(&self) -> &Path {
+        assert!(!self.ft.is_empty());
+        return &self.ft[0].file;
+    }
+
+    pub fn paths(&self) -> Vec<PathBuf> {
+        return self.ft.iter().map(|ft| ft.file.clone()).collect::<Vec<PathBuf>>();
+    }
+
+}
+
+
 /// `SpeechRulesWithContext` encapsulates a named group of speech rules (e.g, "ClearSpeak")
 /// along with the preferences to be used for speech.
 // Note: if we can't read the files, an error message is stored in the structure and needs to be checked.
@@ -1867,10 +1979,14 @@ pub struct SpeechRules {
     error: String,
     name: RulesFor,
     pub pref_manager: Rc<RefCell<PreferenceManager>>,
-    rules: RuleTable,                       // the speech rules used (partitioned into MathML tags in hashmap, then linearly searched)
-    translate_single_chars_only: bool,      // strings like "half" don't want 'a's translated, but braille does
-    unicode_short: UnicodeTable,            // the short list of rules used for Unicode characters
-    unicode_full:  UnicodeTable,            // the long remaining rules used for Unicode characters
+    rules: RuleTable,                              // the speech rules used (partitioned into MathML tags in hashmap, then linearly searched)
+    rule_files: FilesAndTimes,                     // files that were read
+    translate_single_chars_only: bool,             // strings like "half" don't want 'a's translated, but braille does
+    unicode_short: UnicodeTable,                   // the short list of rules used for Unicode characters
+    unicode_short_files: FilesAndTimesShared,     // files that were read
+    unicode_full:  UnicodeTable,                   // the long remaining rules used for Unicode characters
+    unicode_full_files: FilesAndTimesShared,      // files that were read
+    definitions_files: FilesAndTimesShared,       // files that were read
 }
 
 impl fmt::Display for SpeechRules {
@@ -1906,11 +2022,45 @@ impl<'c, 's:'c, 'm:'c> fmt::Display for SpeechRulesWithContext<'c, 's,'m> {
 }
 
 thread_local!{
+    /// SPEECH_UNICODE_SHORT is shared among several rules, so "RC" is used
     static SPEECH_UNICODE_SHORT: UnicodeTable =
         Rc::new( RefCell::new( HashMap::with_capacity(497) ) );
         
+    /// SPEECH_UNICODE_FULL is shared among several rules, so "RC" is used
     static SPEECH_UNICODE_FULL: UnicodeTable =
         Rc::new( RefCell::new( HashMap::with_capacity(6997) ) );
+        
+    /// BRAILLE_UNICODE_SHORT is shared among several rules, so "RC" is used
+    static BRAILLE_UNICODE_SHORT: UnicodeTable =
+        Rc::new( RefCell::new( HashMap::with_capacity(497) ) );
+        
+    /// BRAILLE_UNICODE_FULL is shared among several rules, so "RC" is used
+    static BRAILLE_UNICODE_FULL: UnicodeTable =
+        Rc::new( RefCell::new( HashMap::with_capacity(6997) ) );
+
+    /// SPEECH_DEFINITION_FILES_AND_TIMES is shared among several rules, so "RC" is used
+    static SPEECH_DEFINITION_FILES_AND_TIMES: FilesAndTimesShared =
+        Rc::new( RefCell::new(FilesAndTimes::default()) );
+        
+    /// BRAILLE_DEFINITION_FILES_AND_TIMES is shared among several rules, so "RC" is used
+    static BRAILLE_DEFINITION_FILES_AND_TIMES: FilesAndTimesShared =
+        Rc::new( RefCell::new(FilesAndTimes::default()) );
+        
+    /// SPEECH_UNICODE_SHORT_FILES_AND_TIMES is shared among several rules, so "RC" is used
+    static SPEECH_UNICODE_SHORT_FILES_AND_TIMES: FilesAndTimesShared =
+        Rc::new( RefCell::new(FilesAndTimes::default()) );
+        
+    /// SPEECH_UNICODE_FULL_FILES_AND_TIMES is shared among several rules, so "RC" is used
+    static SPEECH_UNICODE_FULL_FILES_AND_TIMES: FilesAndTimesShared =
+        Rc::new( RefCell::new(FilesAndTimes::default()) );
+        
+    /// BRAILLE_UNICODE_SHORT_FILES_AND_TIMES is shared among several rules, so "RC" is used
+    static BRAILLE_UNICODE_SHORT_FILES_AND_TIMES: FilesAndTimesShared =
+        Rc::new( RefCell::new(FilesAndTimes::default()) );
+        
+    /// BRAILLE_UNICODE_FULL_FILES_AND_TIMES is shared among several rules, so "RC" is used
+    static BRAILLE_UNICODE_FULL_FILES_AND_TIMES: FilesAndTimesShared =
+        Rc::new( RefCell::new(FilesAndTimes::default()) );
         
     /// The current set of speech rules
     // maybe this should be a small cache of rules in case people switch rules/prefs?
@@ -1932,15 +2082,17 @@ thread_local!{
 
 impl SpeechRules {
     pub fn new(name: RulesFor, translate_single_chars_only: bool) -> SpeechRules {
-        let unicode = if name == RulesFor::Braille {
+        let globals = if name == RulesFor::Braille {
             (
-                Rc::new( RefCell::new (HashMap::with_capacity(497)) ),
-                Rc::new( RefCell::new (HashMap::with_capacity(2497)) )
+                (BRAILLE_UNICODE_SHORT.with(Rc::clone), BRAILLE_UNICODE_SHORT_FILES_AND_TIMES.with(Rc::clone)),
+                (BRAILLE_UNICODE_FULL. with(Rc::clone), BRAILLE_UNICODE_FULL_FILES_AND_TIMES.with(Rc::clone)),
+                BRAILLE_DEFINITION_FILES_AND_TIMES.with(Rc::clone),
             )
         } else {
             (
-                SPEECH_UNICODE_SHORT.with(Rc::clone),
-                SPEECH_UNICODE_FULL. with(Rc::clone)
+                (SPEECH_UNICODE_SHORT.with(Rc::clone), SPEECH_UNICODE_SHORT_FILES_AND_TIMES.with(Rc::clone)),
+                (SPEECH_UNICODE_FULL. with(Rc::clone), SPEECH_UNICODE_FULL_FILES_AND_TIMES.with(Rc::clone)),
+                SPEECH_DEFINITION_FILES_AND_TIMES.with(Rc::clone),
             )
         };
 
@@ -1948,8 +2100,12 @@ impl SpeechRules {
             error: Default::default(),
             name,
             rules: HashMap::with_capacity(if name == RulesFor::Intent {1023} else {31}),                       // lazy load them
-            unicode_short: unicode.0,       // lazy load them
-            unicode_full: unicode.1,        // lazy load them
+            rule_files: FilesAndTimes::default(),
+            unicode_short: globals.0.0,       // lazy load them
+            unicode_short_files: globals.0.1,
+            unicode_full: globals.1.0,        // lazy load them
+            unicode_full_files: globals.1.1,
+            definitions_files: globals.2,
             translate_single_chars_only,
             pref_manager: PreferenceManager::get(),
         };
@@ -1963,98 +2119,51 @@ impl SpeechRules {
         }
     }
 
-    pub fn initialize_all_rules() -> Result<()> {
-        // this forces initialization (SpeechRules::new()) of things beyond just the speech rules (e.g, the defs.yaml files get read)
-        INTENT_RULES.with(|speech_rules| -> Result<()> {
-            if let Some(e) = speech_rules.borrow().get_error() {bail!("{}", e)} else {Ok(())}
-        })?;
-        SPEECH_RULES.with(|speech_rules| -> Result<()> {
-            if let Some(e) = speech_rules.borrow().get_error() {bail!("{}", e)} else {Ok(())}
-        })?;
-        BRAILLE_RULES.with(|speech_rules| -> Result<()> {
-            if let Some(e) = speech_rules.borrow().get_error() {bail!("{}", e)} else {Ok(())}
-        })?;
-        NAVIGATION_RULES.with(|speech_rules| -> Result<()> {
-            if let Some(e) = speech_rules.borrow().get_error() {bail!("{}", e)} else {Ok(())}
-        })?;
-        OVERVIEW_RULES.with(|speech_rules| -> Result<()> {
-            if let Some(e) = speech_rules.borrow().get_error() {bail!("{}", e)} else {Ok(())}
-        })?;
-        return Ok( () );
-    }
-
     pub fn read_files(&mut self) -> Result<()> {
-        if self.rules.is_empty() {
-            let rule_file = {
-                // inside a block to limit extent of borrow
-                self.pref_manager.borrow().get_rule_file(&self.name).to_path_buf()
-            };
-            self.read_patterns(&rule_file)?;
-
+        let rule_file = self.pref_manager.borrow().get_rule_file(&self.name).to_path_buf();     // need to create PathBuf to avoid a move/use problem
+        if self.rules.is_empty() || !self.rule_files.is_file_up_to_date(&rule_file) {
+            self.rules.clear();
+            let files_read = self.read_patterns(&rule_file)?;
+            self.rule_files.set_files_and_times(files_read);
         }
-        if self.unicode_short.borrow().is_empty()  {
-            self.read_unicode(None, true)?;
+
+        let pref_manager = self.pref_manager.borrow();
+        let unicode_pref_files = if self.name == RulesFor::Braille {pref_manager.get_braille_unicode_file()} else {pref_manager.get_speech_unicode_file()};
+
+        if !self.unicode_short_files.borrow().is_file_up_to_date(unicode_pref_files.0) {
+            self.unicode_short.borrow_mut().clear();
+            self.unicode_short_files.borrow_mut().set_files_and_times(self.read_unicode(None, true)?);
+        }
+
+        if !self.definitions_files.borrow().is_file_up_to_date(pref_manager.get_definitions_file(self.name != RulesFor::Braille)) {
+            self.definitions_files.borrow_mut().set_files_and_times(read_definitions_file(self.name != RulesFor::Braille)?);
         }
         return Ok( () );
     }
 
-    pub fn invalidate(changes: FilesChanged) {
-        SPEECH_RULES.with(|rules| {
-            let mut rules = rules.borrow_mut();
-            if changes.speech_rules {
-                rules.rules.clear();
-            }
-            if changes.speech_unicode_short  {
-                rules.unicode_short.borrow_mut().clear();
-            }
-            if changes.speech_unicode_full {
-                rules.unicode_full.borrow_mut().clear();
-            }
-        });
-        BRAILLE_RULES.with(|rules| {
-            let mut rules = rules.borrow_mut();
-            if changes.braille_rules {
-                rules.rules.clear();
-            }
-            if changes.braille_unicode_short  {
-                rules.unicode_short.borrow_mut().clear();
-            }
-            if changes.braille_unicode_full {
-                rules.unicode_full.borrow_mut().clear();
-            }
-        });
-        if changes.intent {
-            INTENT_RULES.with(|rules| {
-                rules.borrow_mut().rules.clear();
-                // unicode files are shared with speech and updated/cleared there
-            });
+    pub fn update(&mut self) -> Result<()> {
+        let pref_manager = self.pref_manager.borrow();
+        if !self.rule_files.is_file_up_to_date(pref_manager.get_rule_file(&self.name)) {
+            self.rule_files.invalidate();
         }
-        if changes.navigate_rules {
-            NAVIGATION_RULES.with(|rules| {
-                rules.borrow_mut().rules.clear();
-            });
-        }
-        if changes.overview_rules {
-            OVERVIEW_RULES.with(|rules| {
-                rules.borrow_mut().rules.clear();
-            });
-        }
-        PreferenceManager::get().borrow_mut().invalidate(&changes);
-    }
 
-    pub fn update() -> Result<()> {
-        // Note: PreferenceManager::get() can't be part of the "if let ..." as its scope apparently includes the call to invalidate() which causes a borrow problem
-        let files_changed = PreferenceManager::get().borrow_mut().is_up_to_date()?;
-        if let Some(files_changed) = files_changed {
-            SpeechRules::invalidate(files_changed);
+        let unicode_pref_files = if self.name == RulesFor::Braille {pref_manager.get_braille_unicode_file()} else {pref_manager.get_speech_unicode_file()};
+        if !self.unicode_short_files.borrow().is_file_up_to_date(unicode_pref_files.0) {
+            self.unicode_short_files.borrow_mut().invalidate();
         }
-        PreferenceManager::get().borrow_mut().initialize(PathBuf::new())?;
+        if !self.unicode_full_files.borrow().is_file_up_to_date(unicode_pref_files.1) {
+            self.unicode_full_files.borrow_mut().invalidate();
+        }
+
+        if !self.definitions_files.borrow().is_file_up_to_date(pref_manager.get_definitions_file(self.name != RulesFor::Braille)) {
+            self.definitions_files.borrow_mut().invalidate();
+        }
         return Ok( () );
     }
 
     fn read_patterns(&mut self, path: &Path) -> Result<Vec<PathBuf>> {
         // info!("Reading rule file: {}", p.to_str().unwrap());
-        let rule_file_contents = read_to_string_shim(path).expect("cannot read file");
+        let rule_file_contents = read_to_string_shim(path).chain_err(|| format!("cannot read file '{}'", path.to_str().unwrap()))?;
         let rules_build_fn = |pattern: &Yaml| {
             self.build_speech_patterns(pattern, path)
                 .chain_err(||format!("in file {:?}", path.to_str().unwrap()))
@@ -2118,7 +2227,40 @@ impl SpeechRules {
     }
 }
 
-use crate::prefs::FilesChanged;
+
+cfg_if! {
+    if #[cfg(target_family = "wasm")] {
+        pub fn invalidate_all() {
+            SPEECH_RULES.with( |rules| {
+                let mut rules = rules.borrow_mut();
+                rules.rule_files.invalidate();
+                rules.unicode_short_files.borrow_mut().invalidate();
+                rules.unicode_full_files.borrow_mut().invalidate();
+                rules.definitions_files.borrow_mut().invalidate();
+            });
+            BRAILLE_RULES.with( |rules| {
+                let mut rules = rules.borrow_mut();
+                rules.rule_files.invalidate();
+                rules.unicode_short_files.borrow_mut().invalidate();
+                rules.unicode_full_files.borrow_mut().invalidate();
+                rules.definitions_files.borrow_mut().invalidate();
+            });
+
+            // these share the unicode and def files with SPEECH_RULES, so need to invalidate them
+            NAVIGATION_RULES.with( |rules| {
+                rules.borrow_mut().rule_files.invalidate();
+            });
+            OVERVIEW_RULES.with( |rules| {
+                rules.borrow_mut().rule_files.invalidate();
+            });
+            INTENT_RULES.with( |rules| {
+                rules.borrow_mut().rule_files.invalidate();
+            });
+        }
+    }
+}
+
+
 /// We track three different lifetimes:
 ///   'c -- the lifetime of the context and mathml
 ///   's -- the lifetime of the speech rules (which is static)
@@ -2432,20 +2574,23 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
 
         fn replace_single_char<'c, 's:'c, 'm, 'r>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, ch: char, mathml: Element<'c>) -> Result<String> {
             let ch_as_u32 = ch as u32;
-            let mut unicode = rules_with_context.speech_rules.unicode_short.borrow();
+            let rules = rules_with_context.speech_rules;
+            let mut unicode = rules.unicode_short.borrow();
             let mut replacements = unicode.get( &ch_as_u32 );
             if replacements.is_none() {
                 // see if it in the full unicode table (if it isn't loaded already)
-                if rules_with_context.speech_rules.unicode_full.borrow().is_empty() {
-                    info!("*** Loading full unicode {} for char '{}'/{:#06x}", rules_with_context.speech_rules.name, ch, ch_as_u32);
-                    rules_with_context.speech_rules.read_unicode(None, false)?;
-                    info!("# Unicode defs = {}/{}", rules_with_context.speech_rules.unicode_short.borrow().len(), rules_with_context.speech_rules.unicode_full.borrow().len());
-
+                let pref_manager = rules.pref_manager.borrow();
+                let unicode_pref_files = if rules.name == RulesFor::Braille {pref_manager.get_braille_unicode_file()} else {pref_manager.get_speech_unicode_file()};        
+                if rules.unicode_full.borrow().is_empty() || !rules.unicode_full_files.borrow().is_file_up_to_date(unicode_pref_files.1) {
+                    info!("*** Loading full unicode {} for char '{}'/{:#06x}", rules.name, ch, ch_as_u32);
+                    rules.unicode_full.borrow_mut().clear();
+                    rules.unicode_full_files.borrow_mut().set_files_and_times(rules.read_unicode(None, false)?);
+                    info!("# Unicode defs = {}/{}", rules.unicode_short.borrow().len(), rules.unicode_full.borrow().len());
                 }
-                unicode = rules_with_context.speech_rules.unicode_full.borrow();
+                unicode = rules.unicode_full.borrow();
                 replacements = unicode.get( &ch_as_u32 );
                 if replacements.is_none() {
-                    // debug!("*** Did not find unicode {} for char '{}'/{:#06x}", rules_with_context.speech_rules.name, ch, ch_as_u32);
+                    // debug!("*** Did not find unicode {} for char '{}'/{:#06x}", rules.name, ch, ch_as_u32);
                     rules_with_context.translate_count = 0;     // not in loop
                     return Ok(String::from(ch));   // no replacement, so just return the char and hope for the best
                 }
@@ -2479,6 +2624,9 @@ pub fn braille_replace_chars(str: &str, mathml: Element) -> Result<String> {
 
 #[cfg(test)]
 mod tests {
+    #[allow(unused_imports)]
+    use crate::init_logger;
+
     use super::*;
 
     #[test]
@@ -2584,6 +2732,43 @@ mod tests {
         let result = MyXPath::add_debug_string_arg(str);
         assert!(result.is_ok());
         assert_eq!(result.unwrap(), r#"DEBUG(ClearSpeak_Matrix = 'Combinatorics', "ClearSpeak_Matrix = 'Combinatorics'" ) and IsBracketed(., '(', ')')"#);
+    }
+
+    
+    #[test]
+    fn test_up_to_date() {
+        use crate::interface::*;
+        use std::fs;
+        use std::thread::sleep;
+        use std::time::Duration;
+        // initialize and move to a directory where making a time change doesn't really matter
+        set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_preference("Language".to_string(), "zz-aa".to_string()).unwrap();
+        // not much is support in zz
+        if let Err(e) = set_mathml("<math><mi>x</mi></math>".to_string()) {
+            error!("{}", crate::errors_to_string(&e));
+            panic!("Should not be an error in setting MathML")
+        }
+
+        // files are read in due to setting the MathML -- record the time
+        SPEECH_RULES.with(|rules| {
+            let start_main_file = rules.borrow().unicode_short_files.borrow().ft[0].clone();
+
+            // open the file, read all the contents, then write them back so the time changes
+            let contents = fs::read(&start_main_file.file).expect(&format!("Failed to read file {} during test", &start_main_file.file.to_string_lossy()));
+            #[allow(unused_must_use)] { 
+                fs::write(start_main_file.file, contents);
+                sleep(Duration::from_millis(10));
+            }
+
+            // speak should cause the file stored to have a new time
+            if let Err(e) = get_spoken_text() {
+                error!("{}", crate::errors_to_string(&e));
+                panic!("Should not be an error in speech")
+            }
+            let updated_main_file = rules.borrow().unicode_short_files.borrow().ft[0].clone();
+            assert!(start_main_file.time < updated_main_file.time);
+        });
     }
 
     // #[test]

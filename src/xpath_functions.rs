@@ -19,7 +19,7 @@
 
 use sxd_document::dom::{Element, ChildOfElement};
 use sxd_xpath::{Value, Context, context, function::*, nodeset::*};
-use crate::definitions::DEFINITIONS;
+use crate::definitions::SPEECH_DEFINITIONS;
 use regex::Regex;
 use crate::pretty_print::mml_to_string;
 use std::cell::Ref;
@@ -395,7 +395,7 @@ impl ToOrdinal {
     // ordinals often have an irregular start (e.g., "half") before becoming regular.
     // if the number is irregular, return the ordinal form, otherwise return 'None'.
     fn compute_irregular_fractional_speech(number: &str, plural: bool) -> Option<String> {
-        DEFINITIONS.with(|definitions| {
+        SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             let words = if plural {
                 definitions.get_vec("NumbersOrdinalFractionalPluralOnes").unwrap()
@@ -422,7 +422,7 @@ impl ToOrdinal {
         lazy_static! {
             static ref NO_DIGIT: Regex = Regex::new(r"[^\d]").unwrap();    // match anything except a digit
         }
-        DEFINITIONS.with(|definitions| {
+        SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             let numbers_large = definitions.get_vec("NumbersLarge").unwrap();
             // check to see if the number is too big or is not an integer or has non-digits
@@ -536,7 +536,7 @@ impl ToOrdinal {
 
     fn hundreds_to_words(number: &[usize], words: &[Ref<Vec<String>>; 3]) -> String {
         assert!( number.len() == 3 );
-        return DEFINITIONS.with(|definitions| {
+        return SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             if number[0] != 0 && number[1] == 0 && number[2] == 0 {
                 return words[0][number[0]].clone();
@@ -865,7 +865,7 @@ impl IsInDefinition {
     /// Returns true if `test_str` is in `set_name`
     /// Returns an error if `set_name` is not defined
     pub fn is_defined_in(test_str: &str, set_name: &str) -> Result<bool, Error> {
-        return DEFINITIONS.with(|definitions| {
+        return SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             if let Some(set) = definitions.get_hashset(set_name) {
                 return Ok( set.contains(test_str) );
@@ -928,7 +928,7 @@ impl DefinitionValue {
     /// Returns true if `test_str` is in `set_name`
     /// Returns an error if `set_name` is not defined
     pub fn is_defined_in(test_str: &str, set_name: &str) -> Result<String, Error> {
-        return DEFINITIONS.with(|definitions| {
+        return SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             if let Some(map) = definitions.get_hashmap(set_name) {
                 return Ok( match map.get(test_str) {
@@ -1221,14 +1221,13 @@ pub fn add_builtin_functions(context: &mut Context) {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
     use sxd_document::parser;
     use crate::interface::{trim_element, get_element};
 
 
     fn init_word_list() {
-        let file_and_time = crate::prefs::FilesAndTimes::new( PathBuf::from("Rules/Languages/en/definitions.yaml") );
-        let result = crate::definitions::read_definitions_file(&file_and_time);
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        let result = crate::definitions::read_definitions_file(true);
         if let Err(e) = result {
             panic!("unable to read 'Rules/Languages/en/definitions.yaml\n{}", e.to_string());
         }

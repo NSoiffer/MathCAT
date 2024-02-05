@@ -18,9 +18,12 @@ static UEB_PREFIXES: phf::Set<char> = phf_set! {
 /// braille the MathML
 /// If 'nav_node_id' is not an empty string, then the element with that id will have dots 7 & 8 turned on as per the pref
 pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<String> {
-    crate::speech::SpeechRules::update()?;
     return BRAILLE_RULES.with(|rules| {
-        rules.borrow_mut().read_files()?;
+        {
+            let mut rules = rules.borrow_mut();     // limit scope of borrow by enclosing in a block
+            rules.update()?;
+            rules.read_files()?;
+        }
         let rules = rules.borrow();
         let new_package = Package::new();
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id);
@@ -1191,7 +1194,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                     },
                     '𝟙' => {
                         // '𝟙' should have forced G1 Word mode
-                        assert!(true, "Internal error: '𝟙' found in G2 mode: index={} in '{}'", i, raw_braille);
+                        error!("Internal error: '𝟙' found in G2 mode: index={} in '{}'", i, raw_braille);
                         i += 1;
                     }
                     'N' => {
@@ -1931,10 +1934,10 @@ impl BrailleChars {
         return Ok(result.to_string());
 
         fn add_separator(text: String) -> String {
-            use crate::definitions::DEFINITIONS;
+            use crate::definitions::BRAILLE_DEFINITIONS;
             if let Some(text_without_arc) = text.strip_prefix("arc") {
                 // "." after arc (7.5.3)
-                let is_function_name = DEFINITIONS.with(|definitions| {
+                let is_function_name = BRAILLE_DEFINITIONS.with(|definitions| {
                     let definitions = definitions.borrow();
                     let set = definitions.get_hashset("CMUFunctionNames").unwrap();
                     return set.contains(&text);

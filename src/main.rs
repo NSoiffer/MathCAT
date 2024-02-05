@@ -252,7 +252,7 @@ fn main() {
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
 
-  set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
+  set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),
@@ -275,7 +275,7 @@ fn main() {
   // info!("#xpath = {}; duplicates = {}", xpath_counts.0, xpath_counts.1);
   info!("Time taken (second time for speech + braille): {}ms", instant.elapsed().as_millis());
 
-  timing_test(expr, 0);
+  timing_test(expr, 100);
 
 }
 

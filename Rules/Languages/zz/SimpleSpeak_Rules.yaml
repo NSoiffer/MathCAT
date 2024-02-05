@@ -1,0 +1,54 @@
+---
+
+-
+  name: default
+  tag: math
+  match: "."
+  replace: [x: "*"]
+-
+  name: default
+  tag: mrow
+  match: "."
+  replace: [x: "*"]
+-
+  name: default
+  tag: mi
+  match: "."
+  replace: [x: "text()"]
+-
+  name: default
+  tag: mn
+  match: "."
+  replace: [x: "text()"]
+-
+  name: default
+  tag: mo
+  match: "."
+  replace: [x: "text()"]
+-
+  name: squared
+  tag: msup
+  match: "*[2][self::mn][text()='2']"
+  replace: [x: "*[1]", t: "squared"]
+-
+  name: default
+  tag: particular-value-of
+  match: "."
+  replace:
+    - x: "*[1]"
+    - t: raised to the
+    - x: "*[2]"
+    - t: power
+-
+  name: default
+  tag: square-root
+  match: "."
+  replace:
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [t: the]
+    - t: square root of
+    - x: "*[1]"
+    - test:
+        if: "$Blind"
+        then: [t: end square root]

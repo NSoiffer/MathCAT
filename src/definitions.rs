@@ -127,40 +127,33 @@ impl Definitions {
 thread_local!{
     /// Global variable containing all of the definitions.
     /// See [`Definitions`] for more details.
-    pub static DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::new() );
+    pub static SPEECH_DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::new() );
+    pub static BRAILLE_DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::new() );
 }
 
-/// Reads the `definitions.yaml` files specified by `locations`.
+/// Reads the `definitions.yaml` files specified by current_files -- these are presumed to need updating. 
 ///
 /// If there is a failure during read, the error is propagated to the caller
-pub fn read_definitions_file(files: &FilesAndTimes) -> Result<Option<Vec<PathBuf>>> {
+pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
     // for each file in `locations`, read the contents and process them
-    // we cache the last location (saves 3-4ms on startup/switching): creating the SpeechRules calls this for each rule
-    thread_local!{
-        static LOCATION_CACHE: RefCell<PathBuf> =
-                RefCell::new( PathBuf::default() );
-    }
-    let file_path = files.as_path();
-    if files.is_valid() && LOCATION_CACHE.with(|cache| file_path == cache.borrow().as_path()) {
-        return Ok( Some((*files).paths()) );
-    } else {
-        LOCATION_CACHE.with(|cache| {
-            let mut cache = cache.borrow_mut();
-            *cache = file_path.to_path_buf();
-        })
-    }
+    let pref_manager = PreferenceManager::get();
+    let pref_manager = pref_manager.borrow();
+    let file_path = pref_manager.get_definitions_file(use_speech_defs);
+    let definitions = if use_speech_defs {&SPEECH_DEFINITIONS} else {&BRAILLE_DEFINITIONS};
+    definitions.with( |defs| defs.borrow_mut().name_to_var_mapping.clear() );
     let mut new_files = vec![file_path.to_path_buf()];
-    let files_read = read_one_definitions_file(file_path).chain_err(|| format!("in file '{}", file_path.to_string_lossy()))?;
-    verify_definitions()?;
+    let mut files_read = read_one_definitions_file(use_speech_defs, file_path).chain_err(|| format!("in file '{}", file_path.to_string_lossy()))?;
+    verify_definitions(use_speech_defs)?;
+    new_files.append(&mut files_read);
 
     // merge the contents of `TrigFunctions` into a set that contains all the function names (from `AdditionalFunctionNames`).
-    DEFINITIONS.with(|defs| {
+    definitions.with(|defs| {
         let mut defs = defs.borrow_mut();
         let all_functions = build_all_functions_set(&defs);
         let name_to_mapping = &mut defs.name_to_var_mapping;
         name_to_mapping.insert("FunctionNames".to_string(), Contains::Set( Rc::new( RefCell::new( all_functions ) ) ));
     });
-    return Ok( Some(new_files) );
+    return Ok(new_files);
 
     fn build_all_functions_set(defs: &RefMut<Definitions>) -> HashSet<String> {
         let trig_functions = defs.get_hashset("TrigFunctionNames").unwrap();
@@ -172,7 +165,7 @@ pub fn read_definitions_file(files: &FilesAndTimes) -> Result<Option<Vec<PathBuf
     }
 }
 
-fn verify_definitions() -> Result<()> {
+fn verify_definitions(use_speech_defs: bool) -> Result<()> {
     // all of the 'numbers-xxx' files should be either size 0 or multiples of tens except:
     //   ...-ones
     //   numbers-plural, which should have a single entry
@@ -187,7 +180,8 @@ fn verify_definitions() -> Result<()> {
                 "NumbersOrdinalFractionalPluralOnes", "NumbersOrdinalFractionalOnes"
         ];
     }
-    return DEFINITIONS.with(|definitions| {
+    let definitions = if use_speech_defs {&SPEECH_DEFINITIONS} else {&BRAILLE_DEFINITIONS};
+    return definitions.with(|definitions| {
         // verify that all the named functions used in the code exist
         // FIX: is there a way to gather them automatically?
         let definitions = definitions.borrow();
@@ -221,7 +215,7 @@ fn verify_definitions() -> Result<()> {
 }
 
 use crate::speech::*;
-fn read_one_definitions_file(path: &Path) -> Result<Vec<PathBuf>> {
+fn read_one_definitions_file(use_speech_defs: bool, path: &Path) -> Result<Vec<PathBuf>> {
     // read in the file contents   
     let definition_file_contents = read_to_string_shim(path)
             .chain_err(|| format!("trying to read {}", path.to_str().unwrap()))?;
@@ -234,7 +228,7 @@ fn read_one_definitions_file(path: &Path) -> Result<Vec<PathBuf>> {
         let vec = crate::speech::as_vec_checked(variable_def_list)
                     .chain_err(||format!("in file {:?}", path.to_str()))?;
         for variable_def in vec {
-            if let Some(mut added_files) = build_values(variable_def, path).chain_err(||format!("in file {:?}", path.to_str()))? {
+            if let Some(mut added_files) = build_values(variable_def, use_speech_defs, path).chain_err(||format!("in file {:?}", path.to_str()))? {
                 files_read.append(&mut added_files);
             }
         }
@@ -251,7 +245,7 @@ fn read_one_definitions_file(path: &Path) -> Result<Vec<PathBuf>> {
 /// name: {a, b, c} -- assume a hash set
 /// name: {a: A, b: B, c: C} -- assume a hashmap
 /// Returns all the files that were read
-fn build_values(definition: &Yaml, path: &Path) -> Result<Option<Vec<PathBuf>>> {
+fn build_values(definition: &Yaml, use_speech_defs: bool, path: &Path) -> Result<Option<Vec<PathBuf>>> {
     // Rule::Definition
     let dictionary = crate::speech::as_hash_checked(definition)?;
     if dictionary.len()!=1 {
@@ -261,16 +255,26 @@ fn build_values(definition: &Yaml, path: &Path) -> Result<Option<Vec<PathBuf>>> 
     let def_name = key.as_str().ok_or_else(|| format!("definition list name '{}' is not a string", yaml_to_type(key)))?;
     if def_name == "include" {
         let do_include_fn = |new_file: &Path| {
-            read_one_definitions_file(new_file)
+            read_one_definitions_file(use_speech_defs, new_file)
         };
         let include_file_name = value.as_str().ok_or_else(|| format!("definition list include name '{}' is not a string", yaml_to_type(value)))?;
         return Ok( Some(crate::speech::process_include(path, include_file_name, do_include_fn)?) );
     }
 
     let result;
-    if value.is_array() {
+    if def_name.starts_with("Numbers") || def_name.ends_with("_vec") {
          result = Contains::Vec( Rc::new( RefCell::new( get_vec_values(value.as_vec().unwrap())? ) ) );
     } else {
+        // match value.as_vec() {
+        //     Some(vec) => {
+        //         result = Contains::Set( Rc::new( RefCell::new( get_set_values(vec)? ) ) );            },
+        //     None => {
+        //         let dict = value.as_hash().ok_or_else(|| format!("definition list value '{}' is not an array or dictionary", yaml_to_type(value)))?;
+        //         result = Contains::Map( Rc::new( RefCell::new( get_map_values(dict)
+        //                     .chain_err(||format!("while reading value '{}'", def_name))? ) ) );
+
+        //     },
+        // }
         let dict = value.as_hash().ok_or_else(|| format!("definition list value '{}' is not an array or dictionary", yaml_to_type(value)))?;
         if dict.is_empty() {
             result = Contains::Set( Rc::new( RefCell::new( HashSet::with_capacity(0) ) ) );
@@ -279,16 +283,22 @@ fn build_values(definition: &Yaml, path: &Path) -> Result<Option<Vec<PathBuf>>> 
             let (_, entry_value) = dict.iter().next().unwrap();
             if entry_value.is_null() {
                 result = Contains::Set( Rc::new( RefCell::new( get_set_values(dict)
-                            .chain_err(||format!("while reading value '{}'", def_name))? ) ) );
-            } else {
-                result = Contains::Map( Rc::new( RefCell::new( get_map_values(dict)
-                            .chain_err(||format!("while reading value '{}'", def_name))? ) ) );
-
+                            .chain_err(||format!("while reading value '{}'", def_name))? ) ) );            } else {
+                // peak and see if this is a set or a map
+                let (_, entry_value) = dict.iter().next().unwrap();
+                if entry_value.is_null() {
+                    result = Contains::Set( Rc::new( RefCell::new( get_set_values(dict)
+                                .chain_err(||format!("while reading value '{}'", def_name))? ) ) );
+                } else {
+                    result = Contains::Map( Rc::new( RefCell::new( get_map_values(dict)
+                                .chain_err(||format!("while reading value '{}'", def_name))? ) ) );
+                }
             }
         }
     };
 
-    return DEFINITIONS.with(|definitions| {
+    let definitions = if use_speech_defs {&SPEECH_DEFINITIONS} else {&BRAILLE_DEFINITIONS};
+    return definitions.with(|definitions| {
         let name_definition_map = &mut definitions.borrow_mut().name_to_var_mapping;
         name_definition_map.insert(def_name.to_string(), result);
         return Ok(None);
@@ -342,19 +352,45 @@ mod tests {
 
     #[test]
     fn test_vec() {
-        let likely_function_names = r#"[LikelyFunctionNames: ["f", "g", "h", "F", "G", "H", "[A-Za-z]+"]]"#;
+        let numbers = r#"[NumbersTens: ["", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"]]"#;
         let defs_build_fn = |variable_def_list: &Yaml| {
             // Rule::DefinitionList
             //debug!("variable_def_list {} is\n{}", yaml_to_type(variable_def_list), yaml_to_string(variable_def_list, 0));
             for variable_def in variable_def_list.as_vec().unwrap() {
-                if let Err(e) = build_values(variable_def, &Path::new("")) {
+                if let Err(e) = build_values(variable_def, true, &Path::new("")) {
+                    bail!("{}", crate::interface::errors_to_string(&e.chain_err(||format!("in file {:?}", numbers))));
+                }
+            }
+            return Ok(vec![]);
+        };
+        compile_rule(&numbers, defs_build_fn).unwrap();
+        SPEECH_DEFINITIONS.with(|defs| {
+            let defs = defs.borrow();
+            let names = defs.get_vec("NumbersTens");
+            assert!(names.is_some());
+            let names = names.unwrap();
+            assert_eq!(names.len(), 10);
+            assert_eq!(names[0], "");
+            assert_eq!(names[9], "ninety");
+        });
+    }
+
+
+    #[test]
+    fn test_set() {
+        let likely_function_names = r#"[LikelyFunctionNames: {"f", "g", "h", "F", "G", "H", "[A-Za-z]+"}]"#;
+        let defs_build_fn = |variable_def_list: &Yaml| {
+            // Rule::DefinitionList
+            //debug!("variable_def_list {} is\n{}", yaml_to_type(variable_def_list), yaml_to_string(variable_def_list, 0));
+            for variable_def in variable_def_list.as_vec().unwrap() {
+                if let Err(e) = build_values(variable_def, true, &Path::new("")) {
                     bail!("{}", crate::interface::errors_to_string(&e.chain_err(||format!("in file {:?}", likely_function_names))));
                 }
             }
             return Ok(vec![]);
         };
         compile_rule(&likely_function_names, defs_build_fn).unwrap();
-        DEFINITIONS.with(|defs| {
+        SPEECH_DEFINITIONS.with(|defs| {
             let defs = defs.borrow();
             let names = defs.get_hashset("LikelyFunctionNames");
             assert!(names.is_some());
@@ -372,14 +408,14 @@ mod tests {
             // Rule::DefinitionList
             //debug!("variable_def_list {} is\n{}", yaml_to_type(variable_def_list), yaml_to_string(variable_def_list, 0));
             for variable_def in variable_def_list.as_vec().unwrap() {
-                if let Err(e) = build_values(variable_def, &Path::new("")) {
+                if let Err(e) = build_values(variable_def, true, &Path::new("")) {
                     bail!("{}", crate::interface::errors_to_string(&e.chain_err(||format!("in file {:?}", units))));
                 }
             }
             return Ok(vec![]);
         };
         compile_rule(&units, defs_build_fn).unwrap();
-        DEFINITIONS.with(|defs| {
+        SPEECH_DEFINITIONS.with(|defs| {
             let defs = defs.borrow();
             let names = defs.get_hashmap("Units");
             assert!(names.is_some());

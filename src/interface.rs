@@ -8,7 +8,6 @@ use sxd_document::parser;
 use sxd_document::Package;
 use sxd_document::dom::*;
 use crate::errors::*;
-use crate::prefs::FilesChanged;
 use regex::{Regex, Captures};
 use phf::phf_map;
 
@@ -70,6 +69,15 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
     NAVIGATION_STATE.with(|nav_stack| {
         nav_stack.borrow_mut().reset();
     });
+
+    // We need the main definitions files to be read in so canonicalize can work.
+    // This call reads all of them for the current preferences, but that's ok since they will likely be used
+    crate::speech::SPEECH_RULES.with(|rules| {
+        let mut rules = rules.borrow_mut();     // limit scope of borrow by enclosing in a block
+        rules.update()?;
+        rules.read_files()
+    })?;
+
     return MATHML_INSTANCE.with(|old_package| {
         static HTML_ENTITIES_MAPPING: phf::Map<&str, &str> = include!("entities.in");
 
@@ -101,7 +109,7 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
         if let Err(e) = new_package {
             bail!("Invalid MathML input:\n{}\nError is: {}", &mathml_str, &e.to_string());
         }
-        crate::speech::SpeechRules::initialize_all_rules()?;
+        // crate::speech::SpeechRules::initialize_all_rules()?;
 
         let new_package = new_package.unwrap();
         let mathml = get_element(&new_package);
@@ -185,8 +193,6 @@ pub fn get_preference(name: String) -> Result<String> {
 /// 
 /// Be careful setting preferences -- these potentially override user settings, so only preferences that really need setting should be set.
 pub fn set_preference(name: String, value: String) -> Result<()> {
-    let old_value = get_preference(name.clone())?;      // make sure it is a valid preference
-    
     if name == "Language" {
         // check the format
         if !( value == "Auto" ||
@@ -213,20 +219,13 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
                     pref_manager.set_api_float_pref(&name, to_float(&name, &value)?);    
                 },
                 _ => {
-                    pref_manager.set_api_string_pref(&name, &value);
+                    pref_manager.set_api_string_pref(&name, &value)?;
                 },
             }
         };
         return Ok::<(), Error>( () );
     })?;
 
-    if old_value == value {
-        return Ok( () );            // nothing changed
-    }
-
-    if let Some(changed) = FilesChanged::new(&name) {
-        crate::speech::SpeechRules::invalidate(changed);
-    }
     return Ok( () );
 
     fn to_float(name: &str, value: &str) -> Result<f64> {

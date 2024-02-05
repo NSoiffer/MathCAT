@@ -859,7 +859,7 @@ impl CanonicalizeContext {
 
 				// common bug: trig functions, lim, etc., should be mi
 				// same for ellipsis ("…")
-				return crate::definitions::DEFINITIONS.with(|definitions| {
+				return crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
 					if ["…", "⋯", "∞"].contains(&text) ||
 					   definitions.borrow().get_hashset("FunctionNames").unwrap().contains(text) ||
 					   definitions.borrow().get_hashset("GeometryShapes").unwrap().contains(text) {
@@ -1386,7 +1386,7 @@ impl CanonicalizeContext {
 				return None;
 			}
 
-			return crate::definitions::DEFINITIONS.with(|definitions| {
+			return crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
 				// change "arc" "cos" to "arccos" -- we look forward because calling loop stores previous node
 				let following_text = as_text(following_sibling);
 				if definitions.borrow().get_hashset("TrigFunctionNames").unwrap().contains(following_text) {
@@ -1760,7 +1760,7 @@ impl CanonicalizeContext {
 				let preceding_sibling_name = name(&preceding_sibling);
 				if preceding_sibling_name == "mi" || preceding_sibling_name == "mo" || preceding_sibling_name == "mtext" {
 					let preceding_text = as_text(preceding_sibling);
-					return crate::definitions::DEFINITIONS.with(|definitions| {
+					return crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
 						let defs = definitions.borrow();
 						let prefix_ops = defs.get_hashset("GeometryPrefixOperators").unwrap();
 						let shapes = defs.get_hashset("GeometryShapes").unwrap();
@@ -1846,7 +1846,7 @@ impl CanonicalizeContext {
 			if ["flow", "flux"].contains(&text.as_str()) {
 				return merge_from_text(mi, &text, following_siblings);
 			}
-			let is_function_name = crate::definitions::DEFINITIONS.with(|definitions| {
+			let is_function_name = crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
 				let definitions = definitions.borrow();
 				return definitions.get_hashset("FunctionNames").unwrap().contains(&text);
 			});
@@ -3120,7 +3120,7 @@ impl CanonicalizeContext {
 			return FunctionNameCertainty::False;
 		}
 		// debug!("    is_function_name({}), {} following nodes", base_name, if right_siblings.is_none() {"No".to_string()} else {right_siblings.unwrap().len().to_string()});
-		return crate::definitions::DEFINITIONS.with(|defs| {
+		return crate::definitions::SPEECH_DEFINITIONS.with(|defs| {
 			// names that are always function names (e.g, "sin" and "log")
 			let defs = defs.borrow();
 			let names = defs.get_hashset("FunctionNames").unwrap();
@@ -3590,7 +3590,7 @@ impl CanonicalizeContext {
 			if base_name.is_empty() {
 				return false;
 			}
-			return crate::definitions::DEFINITIONS.with(|defs| {
+			return crate::definitions::SPEECH_DEFINITIONS.with(|defs| {
 				// names that are always function names (e.g, "sin" and "log")
 				let defs = defs.borrow();
 				let names = defs.get_hashset("TrigFunctionNames").unwrap();

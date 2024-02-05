@@ -53,10 +53,10 @@ pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow_mut();
         let mut prefs = rules.pref_manager.borrow_mut();
-        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
-        prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
-        prefs.set_user_prefs("Verbosity", "Medium");
-        prefs.set_user_prefs("Impairment", "Blindness");
+        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "").unwrap();         // makes testing simpler
+        prefs.set_user_prefs("PauseFactor", "100").unwrap();                         // makes testing simpler
+        prefs.set_user_prefs("Verbosity", "Medium").unwrap();
+        prefs.set_user_prefs("Impairment", "Blindness").unwrap();
     });
 
     set_preference("Language".to_string(), language.to_string()).unwrap();
@@ -73,9 +73,9 @@ pub fn test_prefs(language: &str, speech_style: &str, test_prefs: Vec<(&str, &st
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow_mut();
         let mut prefs = rules.pref_manager.borrow_mut();
-        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
-        prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
-        prefs.set_user_prefs("Verbosity", "Medium");
+        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "").unwrap();         // makes testing simpler
+        prefs.set_user_prefs("PauseFactor", "100").unwrap();                         // makes testing simpler
+        prefs.set_user_prefs("Verbosity", "Medium").unwrap();
     });
 
     set_preference("Language".to_string(), language.to_string()).unwrap();

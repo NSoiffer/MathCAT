@@ -88,7 +88,7 @@ pub fn are_strs_canonically_equal_with_locale(test: &str, target: &str, block_se
     use crate::canonicalize::canonicalize;
     // this forces initialization
     crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
-    crate::speech::SPEECH_RULES.with(|_| true);
+    crate::speech::SPEECH_RULES.with(|rules|  rules.borrow_mut().read_files().unwrap());
     set_preference("BlockSeparators".to_string(), block_separators.to_string()).unwrap();
     set_preference("DecimalSeparators".to_string(), decimal_separators.to_string()).unwrap();
     

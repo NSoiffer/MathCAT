@@ -324,8 +324,11 @@ fn do_navigate_command_and_param(mathml: Element, command: NavigationCommand, pa
 
 pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) -> Result<String> {   
     // first check to see if nav file has been changed -- don't bother checking in loop below
-    SpeechRules::update()?;
-    NAVIGATION_RULES.with(|rules| { rules.borrow_mut().read_files() })?;
+    NAVIGATION_RULES.with(|rules| {
+            let mut rules = rules.borrow_mut();
+            rules.update()?;
+            rules.read_files()
+    })?;
 
     if mathml.children().is_empty() {
         bail!("MathML has not been set -- can't navigate");
@@ -418,7 +421,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         // transfer some values that might have been set into the prefs
         let context = rules_with_context.get_context();     // need to recompute or we have a multiple borrow problem
         nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
-        rules.pref_manager.as_ref().borrow_mut().set_user_prefs("NavMode", &nav_state.mode);
+        rules.pref_manager.as_ref().borrow_mut().set_user_prefs("NavMode", &nav_state.mode)?;
 
         let nav_position = match context_get_variable(context, "NavNode", mathml)?.0 {
             None => NavigationPosition::default(),
