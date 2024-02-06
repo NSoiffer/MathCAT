@@ -83,11 +83,7 @@ pub fn overview_mathml(mathml: Element, nav_node_id: &str) -> Result<String> {
 
 fn intent_rules<'m>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, doc: Document<'m>, mathml: Element, nav_node_id: &'m str) -> Result<Element<'m>> {
     rules.with(|rules| {
-        {
-            let mut rules = rules.borrow_mut();     // limit scope of borrow by enclosing in a block
-            rules.update()?;
-            rules.read_files()?;
-        }
+        rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
         // debug!("speak_rules:\n{}", mml_to_string(&mathml));
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, doc, nav_node_id);
@@ -106,11 +102,7 @@ fn intent_rules<'m>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>,
 /// If 'nav_node_id' is not an empty string, then the element with that id will have [[...]] around it
 fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, mathml: Element, nav_node_id: &str) -> Result<String> {
     rules.with(|rules| {
-        {
-            let mut rules = rules.borrow_mut();     // limit scope of borrow by enclosing in a block
-            rules.update()?;
-            rules.read_files()?;
-        }
+        rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
         // debug!("speak_rules:\n{}", mml_to_string(&mathml));
         let new_package = Package::new();
@@ -1923,13 +1915,6 @@ impl FilesAndTimes {
         return FilesAndTimes{ ft };
     }
 
-    fn invalidate(&mut self) {
-        // just enough so that is_valid() will say that this does match a flushed out value
-        if !self.ft.is_empty() {
-            self.ft[0].time = SystemTime::UNIX_EPOCH;
-        }
-    }
-
     /// Returns true if the main file matches the corresponding preference location and files' times are all current
     pub fn is_file_up_to_date(&self, pref_path: &Path) -> bool {
         if cfg!(target_family = "wasm") {
@@ -2137,26 +2122,6 @@ impl SpeechRules {
 
         if !self.definitions_files.borrow().is_file_up_to_date(pref_manager.get_definitions_file(self.name != RulesFor::Braille)) {
             self.definitions_files.borrow_mut().set_files_and_times(read_definitions_file(self.name != RulesFor::Braille)?);
-        }
-        return Ok( () );
-    }
-
-    pub fn update(&mut self) -> Result<()> {
-        let pref_manager = self.pref_manager.borrow();
-        if !self.rule_files.is_file_up_to_date(pref_manager.get_rule_file(&self.name)) {
-            self.rule_files.invalidate();
-        }
-
-        let unicode_pref_files = if self.name == RulesFor::Braille {pref_manager.get_braille_unicode_file()} else {pref_manager.get_speech_unicode_file()};
-        if !self.unicode_short_files.borrow().is_file_up_to_date(unicode_pref_files.0) {
-            self.unicode_short_files.borrow_mut().invalidate();
-        }
-        if !self.unicode_full_files.borrow().is_file_up_to_date(unicode_pref_files.1) {
-            self.unicode_full_files.borrow_mut().invalidate();
-        }
-
-        if !self.definitions_files.borrow().is_file_up_to_date(pref_manager.get_definitions_file(self.name != RulesFor::Braille)) {
-            self.definitions_files.borrow_mut().invalidate();
         }
         return Ok( () );
     }

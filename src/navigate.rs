@@ -325,9 +325,7 @@ fn do_navigate_command_and_param(mathml: Element, command: NavigationCommand, pa
 pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) -> Result<String> {   
     // first check to see if nav file has been changed -- don't bother checking in loop below
     NAVIGATION_RULES.with(|rules| {
-            let mut rules = rules.borrow_mut();
-            rules.update()?;
-            rules.read_files()
+        rules.borrow_mut().read_files()
     })?;
 
     if mathml.children().is_empty() {

@@ -275,7 +275,7 @@ fn main() {
   // info!("#xpath = {}; duplicates = {}", xpath_counts.0, xpath_counts.1);
   info!("Time taken (second time for speech + braille): {}ms", instant.elapsed().as_millis());
 
-  timing_test(expr, 100);
+  timing_test(expr, 200);
 
 }
 
@@ -285,21 +285,21 @@ fn timing_test(expr: &str, n_loops: usize) {
   }
   
   let n_loops_float = n_loops as f64;
-  let instant = Instant::now();
-  for _ in 0..n_loops {
-    if let Err(e) = set_mathml(expr.to_string()) {
-      panic!("Error: exiting -- {}", errors_to_string(&e));
-    };
-    match get_spoken_text() {
-      Ok(_) =>( ),
-      Err(e) => panic!("{}", errors_to_string(&e)),
-    }
-    match get_braille("".to_string()) {
-      Ok(_) => (),
-      Err(e) => panic!("{}", errors_to_string(&e)),
-    }
-  }
-  info!("Time taken (time for set, speech, {} braille averaged over 100 loops): {}ms", get_preference("BrailleCode".to_string()).unwrap(), instant.elapsed().as_millis() as f64/n_loops_float);
+  // let instant = Instant::now();
+  // for _ in 0..n_loops {
+  //   if let Err(e) = set_mathml(expr.to_string()) {
+  //     panic!("Error: exiting -- {}", errors_to_string(&e));
+  //   };
+  //   match get_spoken_text() {
+  //     Ok(_) =>( ),
+  //     Err(e) => panic!("{}", errors_to_string(&e)),
+  //   }
+  //   match get_braille("".to_string()) {
+  //     Ok(_) => (),
+  //     Err(e) => panic!("{}", errors_to_string(&e)),
+  //   }
+  // }
+  // info!("Time taken (time for set, speech, {} braille averaged over {} loops): {}ms", get_preference("BrailleCode".to_string()).unwrap(), n_loops, instant.elapsed().as_millis() as f64/n_loops_float);
 
   let instant = Instant::now();
   for _ in 0..n_loops {
@@ -307,36 +307,39 @@ fn timing_test(expr: &str, n_loops: usize) {
       panic!("Error: exiting -- {}", errors_to_string(&e));
     };
   }
-  info!("Time taken (time for set averaged over 100 loops): {}ms", instant.elapsed().as_millis() as f64/n_loops_float);
+  info!("Time taken (time for set averaged over {} loops): {}ms", n_loops, instant.elapsed().as_millis() as f64/n_loops_float);
 
-  let instant = Instant::now();
-  for _ in 0..n_loops {
-    match get_spoken_text() {
-      Ok(_) =>( ),
-      Err(e) => panic!("{}", errors_to_string(&e)),
-    }
-  }
-  info!("Time taken (time for speech averaged over 100 loops): {}ms", instant.elapsed().as_millis() as f64/n_loops_float);
+  // let instant = Instant::now();
+  // for _ in 0..n_loops {
+  //   match get_spoken_text() {
+  //     Ok(_) =>( ),
+  //     Err(e) => panic!("{}", errors_to_string(&e)),
+  //   }
+  // }
+  // info!("Time taken (time for get_spoken_text() averaged over {} loops): {}ms", n_loops, instant.elapsed().as_millis() as f64/n_loops_float);
 
-  set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
-  get_braille("".to_string()).unwrap();
-  let instant = Instant::now();
-  for _ in 0..n_loops {
-    match get_braille("".to_string()) {
-      Ok(_) => (),
-      Err(e) => panic!("{}", errors_to_string(&e)),
-    }
-  }
-  info!("Time taken (time for {} braille averaged over 100 loops): {}ms", get_preference("BrailleCode".to_string()).unwrap(), instant.elapsed().as_millis() as f64/n_loops_float);
+  // set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
+  // get_braille("".to_string()).unwrap();
+  // let instant = Instant::now();
+  // for _ in 0..n_loops {
+  //   match get_braille("".to_string()) {
+  //     Ok(_) => (),
+  //     Err(e) => panic!("{}", errors_to_string(&e)),
+  //   }
+  // }
+  // info!("Time taken (time for {} braille averaged over {} loops): {}ms", get_preference("BrailleCode".to_string()).unwrap(), n_loops, instant.elapsed().as_millis() as f64/n_loops_float);
 
-  set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
-  get_braille("".to_string()).unwrap();
-  let instant = Instant::now();
-  for _ in 0..n_loops {
-    match get_braille("".to_string()) {
-      Ok(_) => (),
-      Err(e) => panic!("{}", errors_to_string(&e)),
-    }
-  }
-  info!("Time taken (time for {} braille averaged over 100 loops): {}ms", get_preference("BrailleCode".to_string()).unwrap(), instant.elapsed().as_millis() as f64/n_loops_float);
+  //   if let Err(e) = set_mathml(expr.to_string()) {
+  //     panic!("Error: exiting -- {}", errors_to_string(&e));
+  //   };
+  // set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
+  // get_braille("".to_string()).unwrap();
+  // let instant = Instant::now();
+  // for _ in 0..n_loops {
+  //   match get_braille("".to_string()) {
+  //     Ok(_) => (),
+  //     Err(e) => panic!("{}", errors_to_string(&e)),
+  //   }
+  // }
+  // info!("Time taken (time for {} braille averaged over {} loops): {}ms", get_preference("BrailleCode".to_string()).unwrap(), n_loops, instant.elapsed().as_millis() as f64/n_loops_float);
 }

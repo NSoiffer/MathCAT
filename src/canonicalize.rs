@@ -318,13 +318,11 @@ pub fn create_mathml_element<'a>(doc: &Document<'a>, name: &str) -> Element<'a> 
 }
 
 pub fn is_fence(mo: Element) -> bool {
-	return CanonicalizeContext::new()
-			.find_operator(mo, None, None, None).is_fence();
+	return CanonicalizeContext::find_operator(None, mo, None, None, None).is_fence();
 }
 
 pub fn is_relational_op(mo: Element) -> bool {
-	return CanonicalizeContext::new()
-			.find_operator(mo, None, None, None).priority == *EQUAL_PRIORITY;
+	return CanonicalizeContext::find_operator(None, mo, None, None, None).priority == *EQUAL_PRIORITY;
 }
 
 pub fn set_mathml_name(element: Element, new_name: &str) {
@@ -2473,11 +2471,11 @@ impl CanonicalizeContext {
 				let i_last = mrow_children.len()-1;
 				let last_child = as_element(mrow_children[i_last]);
 				if name(&last_child) == "mo" &&
-				   CanonicalizeContext::new().find_operator(last_child, None, None, None).is_right_fence() {
+				   CanonicalizeContext::find_operator(None, last_child, None, None, None).is_right_fence() {
 					for i_child in (0..i_last).rev() {
 						let child = as_element(mrow_children[i_child]);
 						if name(&child) == "mo" &&
-						   CanonicalizeContext::new().find_operator(child, None, None, None).is_left_fence() {
+						   CanonicalizeContext::find_operator(None, child, None, None, None).is_left_fence() {
 							// FIX: should make sure left and right match. Should also count for nested parens
 							return Some(i_child);
 						}
@@ -2863,7 +2861,7 @@ impl CanonicalizeContext {
 	//   e.g., n!!n -- ((n!)!)*n or (n!)*(!n)  -- the latter doesn't make semantic sense though
 	// FIX:  the above ignores mspace and other nodes that need to be skipped to determine the right node to determine airity
 	// FIX:  the postfix problem above should be addressed
-	fn find_operator<'a>(&self, mo_node: Element<'a>, previous_operator: Option<&'static OperatorInfo>,
+	fn find_operator<'a>(context: Option<&CanonicalizeContext>, mo_node: Element<'a>, previous_operator: Option<&'static OperatorInfo>,
 						previous_node: Option<Element<'a>>, next_node: Option<Element<'a>>) -> &'static OperatorInfo {
 		// get the unicode value and return the OpKeyword associated with it
 		assert!( name(&mo_node) == "mo");
@@ -2871,7 +2869,10 @@ impl CanonicalizeContext {
 		// if a form has been given, that takes precedence
 		let form = mo_node.attribute_value("form");
 		let op_type =  match form {
-			None => compute_type_from_position(self, previous_operator, previous_node, next_node),
+			None => match context {
+				None => OperatorTypes::POSTFIX,		// what compute_type_from_position returns when the other args to this are all None
+				Some(context) => compute_type_from_position(context, previous_operator, previous_node, next_node),
+			},
 			Some(form) => match form.to_lowercase().as_str() {
 				"prefix" => OperatorTypes::PREFIX,
 				"postfix" => OperatorTypes::POSTFIX,
@@ -3044,7 +3045,7 @@ impl CanonicalizeContext {
 			} else {
 				let next_next_children = next_child.following_siblings();
 				let next_next_child = if next_next_children.is_empty() { None } else { Some( as_element(next_next_children[0]) )};
-				Some( self.find_operator(next_child, operator_versions.infix,
+				Some( CanonicalizeContext::find_operator(Some(self), next_child, operator_versions.infix,
 									top(parse_stack).last_child_in_mrow(), next_next_child) )
 			};
 												  
@@ -3466,7 +3467,7 @@ impl CanonicalizeContext {
 				let children = mrow.children();
 				// debug!("looking for left fence: len={}, {:#?}", children.len(), self.find_operator(as_element(children[0]),None, None, Some(as_element(children[1])) ));
 				if children.len() == 2 && (name(&as_element(children[0])) != "mo" ||
-				   !self.find_operator(as_element(children[0]),
+				   !CanonicalizeContext::find_operator(Some(self), as_element(children[0]),
 								None, Some(as_element(children[0])), Some(mrow) ).is_left_fence()) {
 					// the mrow did *not* start with an open (hence no push)
 					// since parser really wants balanced parens to keep stack state right, we do a push here
@@ -3648,7 +3649,7 @@ impl CanonicalizeContext {
 				let next_node = if i_child + 1 < num_children {Some(as_element(children[i_child+1]))} else {None};
 				current_op = OperatorPair{
 					ch: as_text(base_of_child),
-					op: self.find_operator(base_of_child, previous_op,
+					op: CanonicalizeContext::find_operator(Some(self), base_of_child, previous_op,
 							top(&parse_stack).last_child_in_mrow(), next_node)
 				};
 	

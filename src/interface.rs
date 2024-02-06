@@ -73,9 +73,7 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
     // We need the main definitions files to be read in so canonicalize can work.
     // This call reads all of them for the current preferences, but that's ok since they will likely be used
     crate::speech::SPEECH_RULES.with(|rules| {
-        let mut rules = rules.borrow_mut();     // limit scope of borrow by enclosing in a block
-        rules.update()?;
-        rules.read_files()
+        rules.borrow_mut().read_files()
     })?;
 
     return MATHML_INSTANCE.with(|old_package| {
@@ -109,7 +107,6 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
         if let Err(e) = new_package {
             bail!("Invalid MathML input:\n{}\nError is: {}", &mathml_str, &e.to_string());
         }
-        // crate::speech::SpeechRules::initialize_all_rules()?;
 
         let new_package = new_package.unwrap();
         let mathml = get_element(&new_package);

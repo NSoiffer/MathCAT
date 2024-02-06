@@ -19,11 +19,7 @@ static UEB_PREFIXES: phf::Set<char> = phf_set! {
 /// If 'nav_node_id' is not an empty string, then the element with that id will have dots 7 & 8 turned on as per the pref
 pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<String> {
     return BRAILLE_RULES.with(|rules| {
-        {
-            let mut rules = rules.borrow_mut();     // limit scope of borrow by enclosing in a block
-            rules.update()?;
-            rules.read_files()?;
-        }
+        rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
         let new_package = Package::new();
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id);
@@ -352,7 +348,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
 
-  debug!("Before:  \"{}\"", raw_braille);
+//   debug!("Before:  \"{}\"", raw_braille);
     // replacements might overlap at boundaries (e.g., whitespace) -- need to repeat
     let mut start = 0;
     let mut result = String::with_capacity(raw_braille.len()+ raw_braille.len()/4);  // likely upper bound
@@ -369,7 +365,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     if !raw_braille.is_empty() && ( start < raw_braille.len()-1 || "WP,".contains(raw_braille.chars().nth_back(0).unwrap()) ) {       // see comment about $end above
         result.push_str(&raw_braille[start..]);
     }
-  debug!("ELIs:    \"{}\"", result);  
+//   debug!("ELIs:    \"{}\"", result);  
 
     let result = NUM_IND_ENCLOSED_LIST.replace_all(&result, "wn${1}");
 
@@ -379,7 +375,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
 
     let result = REMOVE_SPACE_BEFORE_PUNCTUATION_151.replace_all(&result, "$1");
     let result = REMOVE_SPACE_AFTER_PUNCTUATION_151.replace_all(&result, "$1");
-  debug!("spaces:  \"{}\"", result);
+//   debug!("spaces:  \"{}\"", result);
 
     let result = DOTS_99_A_2.replace_all(&result, "N⠨mN");
 
@@ -388,17 +384,17 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     let result = MULTI_177_2.replace_all(&result, "${1}m${2}");
     let result = MULTI_177_3.replace_all(&result, "${1}m$2");
     let result = MULTI_177_5.replace_all(&result, "${1}m$2");
-  debug!("MULTI:   \"{}\"", result);
+//   debug!("MULTI:   \"{}\"", result);
 
     let result = NUM_IND_9A.replace_all(&result, "${start}${minus}n");
-    debug!("IND_9A:  \"{}\"", result);
+    // debug!("IND_9A:  \"{}\"", result);
     let result = NUM_IND_9C.replace_all(&result, "${1}${2}n");
     let result = NUM_IND_9D.replace_all(&result, "${1}n");
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
     let result = NUM_IND_9E_SHAPE.replace_all(&result, "${mod}n");
     let result = NUM_IND_9F.replace_all(&result, "${1}${2}n");
 
-  debug!("IND_9F:  \"{}\"", result);
+//   debug!("IND_9F:  \"{}\"", result);
 
     // 9b: insert after punctuation (optional minus sign)
     // common punctuation adds a space, so 9a handled it. Here we deal with other "punctuation" 
@@ -417,7 +413,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     let result = NO_SPACE_AFTER_COMMA.replace_all(&result, "⠠P⠴");
 
     let result = REMOVE_AFTER_PUNCT_IND.replace_all(&result, "$1$2");
-  debug!("Punct38: \"{}\"", &result);
+//   debug!("Punct38: \"{}\"", &result);
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         match NEMETH_INDICATOR_REPLACEMENTS.get(&cap[0]) {
