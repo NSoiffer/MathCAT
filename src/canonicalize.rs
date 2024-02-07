@@ -7,6 +7,8 @@
 //! * mrows are added based on operator priorities from the MathML Operator Dictionary
 #![allow(clippy::needless_return)]
 use crate::errors::*;
+use std::rc::Rc;
+use std::cell::RefCell;
 use sxd_document::dom::*;
 use sxd_document::QName;
 use phf::{phf_map, phf_set};
@@ -405,16 +407,6 @@ pub fn canonicalize(mathml: Element) -> Result<Element> {
 	return context.canonicalize(mathml);
 }
 
-struct CanonicalizeContext {
-	decimal_separator: Regex,
-	block_separator: Regex,
-	digit_only_decimal_number: Regex,
-	block_3digit_pattern: Regex,
-	block_3_5digit_pattern: Regex,
-	block_4digit_hex_pattern: Regex,
-	block_1digit_pattern: Regex,		// used when generator puts each digit into a single mn
-}
-
 #[derive(Debug, PartialEq)]
 enum FunctionNameCertainty {
 	True,
@@ -443,24 +435,29 @@ lazy_static! {
 }
 
 
-impl CanonicalizeContext {
-	fn new() -> CanonicalizeContext {
-		let pref_manager = crate::prefs::PreferenceManager::get();
-		let pref_manager = pref_manager.borrow();
-		let block_separator_pref = pref_manager.pref_to_string("BlockSeparators");
-		let decimal_separator_pref = pref_manager.pref_to_string("DecimalSeparators");
+struct CanonicalizeContextPatterns {
+	decimal_separator: Regex,
+	block_separator: Regex,
+	digit_only_decimal_number: Regex,
+	block_3digit_pattern: Regex,
+	block_3_5digit_pattern: Regex,
+	block_4digit_hex_pattern: Regex,
+	block_1digit_pattern: Regex,		// used when generator puts each digit into a single mn
+}
 
-		let block_separator = Regex::new(&format!("[{}]", regex::escape(&block_separator_pref))).unwrap();
-		let decimal_separator = Regex::new(&format!("[{}]", regex::escape(&decimal_separator_pref))).unwrap();
+impl CanonicalizeContextPatterns {
+	fn new(block_separator_pref: &str, decimal_separator_pref: &str) -> CanonicalizeContextPatterns {
+		let block_separator = Regex::new(&format!("[{}]", regex::escape(block_separator_pref))).unwrap();
+		let decimal_separator = Regex::new(&format!("[{}]", regex::escape(decimal_separator_pref))).unwrap();
 		// allows just "." and also matches an empty string, but those are ruled out elsewhere
-		let digit_only_decimal_number = Regex::new(&format!(r"^\d*{}?\d*$", regex::escape(&decimal_separator_pref))).unwrap();
-		let block_3digit_pattern = get_number_pattern_regex(&block_separator_pref, &decimal_separator_pref, 3, 3);
-		let block_3_5digit_pattern = get_number_pattern_regex(&block_separator_pref, &decimal_separator_pref, 3, 5);
+		let digit_only_decimal_number = Regex::new(&format!(r"^\d*{}?\d*$", regex::escape(decimal_separator_pref))).unwrap();
+		let block_3digit_pattern = get_number_pattern_regex(block_separator_pref, decimal_separator_pref, 3, 3);
+		let block_3_5digit_pattern = get_number_pattern_regex(block_separator_pref, decimal_separator_pref, 3, 5);
 		// Note: on en.wikipedia.org/wiki/Decimal_separator, show '3.14159 26535 89793 23846'
 		let block_4digit_hex_pattern =  Regex::new(r"^[0-9a-fA-F]{4}([ \u00A0\u202F][0-9a-fA-F]{4})*$").unwrap();
 		let block_1digit_pattern =  Regex::new(r"^((\d(\uFFFF\d)?)(\d([, \u00A0\u202F]\d){2})*)?([\.](\d(\uFFFF\d)*)?)?$").unwrap();
 
-		return CanonicalizeContext {
+		return CanonicalizeContextPatterns {
 			block_separator,
 			decimal_separator,
 			digit_only_decimal_number,
@@ -470,6 +467,7 @@ impl CanonicalizeContext {
 			block_1digit_pattern
 		};
 
+		
 		fn get_number_pattern_regex(block_separator: &str, decimal_separator: &str, n_sep_before: usize, n_sep_after: usize) -> Regex {
 			// the following is a generalization of a regex like ^(\d*|\d{1,3}([, ]?\d{3})*)(\.(\d*|(\d{3}[, ])*\d{1,3}))?$
 			// that matches something like '1 234.567 8' and '1,234.', but not '1,234.12,34
@@ -477,6 +475,63 @@ impl CanonicalizeContext {
 							n_sep_before, regex::escape(block_separator), n_sep_before, regex::escape(decimal_separator),
 							n_sep_after, regex::escape(block_separator), n_sep_after) ).unwrap();
 		}
+	}
+}
+
+/// Profiling showed that creating new contexts was very time consuming because creating the RegExs is very expensive
+/// Profiling set_mathml (which does the canonicalization) spends 65% of the time in Regex::new, of which half of it is spent in this initialization.
+struct CanonicalizeContextPatternsCache {
+	block_separator_pref: String,
+	decimal_separator_pref: String,
+	patterns: Rc<CanonicalizeContextPatterns>,
+}
+
+thread_local!{
+    static PATTERN_CACHE: RefCell<CanonicalizeContextPatternsCache> = RefCell::new(CanonicalizeContextPatternsCache::new());
+}
+
+impl CanonicalizeContextPatternsCache {
+	fn new() -> CanonicalizeContextPatternsCache {
+		let pref_manager = crate::prefs::PreferenceManager::get();
+		let pref_manager = pref_manager.borrow();
+		let block_separator_pref = pref_manager.pref_to_string("BlockSeparators");
+		let decimal_separator_pref = pref_manager.pref_to_string("DecimalSeparators");
+		return CanonicalizeContextPatternsCache {
+			patterns: Rc::new( CanonicalizeContextPatterns::new(&block_separator_pref, &decimal_separator_pref) ),
+			block_separator_pref,
+			decimal_separator_pref
+		}
+	}
+
+	fn get() -> Rc<CanonicalizeContextPatterns> {
+		return PATTERN_CACHE.with( |cache| {
+			let pref_manager_rc = crate::prefs::PreferenceManager::get();
+			let pref_manager = pref_manager_rc.borrow();
+			let block_separator_pref = pref_manager.pref_to_string("BlockSeparators");
+			let decimal_separator_pref = pref_manager.pref_to_string("DecimalSeparators");
+
+			let mut cache = cache.borrow_mut();
+			if block_separator_pref != cache.block_separator_pref || decimal_separator_pref != cache.decimal_separator_pref {
+				// update the cache
+				cache.patterns = Rc::new( CanonicalizeContextPatterns::new(&block_separator_pref, &decimal_separator_pref) );
+				cache.block_separator_pref = block_separator_pref;
+				cache.decimal_separator_pref = decimal_separator_pref;
+			}
+			return cache.patterns.clone();
+		})
+	}
+}
+
+struct CanonicalizeContext {
+	patterns: Rc<CanonicalizeContextPatterns>,
+}
+
+
+impl CanonicalizeContext {
+	fn new() -> CanonicalizeContext {
+		return CanonicalizeContext {
+			patterns: CanonicalizeContextPatternsCache::get(),
+		};
 	}
 
 	fn canonicalize<'a>(&self, mut mathml: Element<'a>) -> Result<Element<'a>> {
@@ -1665,12 +1720,12 @@ impl CanonicalizeContext {
 					// if Roman numeral, don't merge (move on)
 					// or if the 'mn' has ',', '.', or space, consider it correctly parsed and move on
 					if is_roman_number_match(leaf_child_text) ||
-						context.block_separator.is_match(leaf_child_text) ||
-						(context.decimal_separator.is_match(leaf_child_text) && leaf_child_text.len() > 1) {
+						context.patterns.block_separator.is_match(leaf_child_text) ||
+						(context.patterns.decimal_separator.is_match(leaf_child_text) && leaf_child_text.len() > 1) {
 						i += 1;
 						continue;
 					}
-				} else if child_name != "mo" || !context.decimal_separator.is_match(as_text(child)) {
+				} else if child_name != "mo" || !context.patterns.decimal_separator.is_match(as_text(child)) {
 					i += 1;
 					continue;
 				}
@@ -1685,16 +1740,16 @@ impl CanonicalizeContext {
 						let sibling_name = name(&sibling);
 						if sibling_name == "mn" {
 							let leaf_text = as_text(sibling);
-							let is_block_separator = context.block_separator.is_match(leaf_text);
-							let is_decimal_separator = context.decimal_separator.is_match(leaf_text);
+							let is_block_separator = context.patterns.block_separator.is_match(leaf_text);
+							let is_decimal_separator = context.patterns.decimal_separator.is_match(leaf_text);
 							if is_roman_number_match(leaf_text) || is_block_separator || is_decimal_separator {
 								// consider this mn correctly parsed
 								break;
 							}
 						} else if sibling_name=="mo" || sibling_name=="mtext" {
 							let leaf_text = as_text(sibling);
-							let is_block_separator = context.block_separator.is_match(leaf_text);
-							let is_decimal_separator = context.decimal_separator.is_match(leaf_text);
+							let is_block_separator = context.patterns.block_separator.is_match(leaf_text);
+							let is_decimal_separator = context.patterns.decimal_separator.is_match(leaf_text);
 							if !(is_block_separator || is_decimal_separator) || 
 								(is_decimal_separator && has_decimal_separator) {
 								// not a separator or (it is decimal separator and we've already seen a decimal separator)
@@ -1917,11 +1972,11 @@ impl CanonicalizeContext {
 			// 		context.block_3digit_pattern.is_match(text),
 			// 		context.block_3_5digit_pattern.is_match(text),
 			// 		context.block_1digit_pattern.is_match(text));
-			if !(context.digit_only_decimal_number.is_match(text) ||
-				 context.block_3digit_pattern.is_match(text) ||
-				 context.block_3_5digit_pattern.is_match(text) ||
-				 context.block_4digit_hex_pattern.is_match(text) ||
-				 ((text.len() > 5 || context.decimal_separator.is_match(text)) && context.block_1digit_pattern.is_match(text)) ) {
+			if !(context.patterns.digit_only_decimal_number.is_match(text) ||
+				 context.patterns.block_3digit_pattern.is_match(text) ||
+				 context.patterns.block_3_5digit_pattern.is_match(text) ||
+				 context.patterns.block_4digit_hex_pattern.is_match(text) ||
+				 ((text.len() > 5 || context.patterns.decimal_separator.is_match(text)) && context.patterns.block_1digit_pattern.is_match(text)) ) {
 					return false;
 			}
 
@@ -1963,7 +2018,7 @@ impl CanonicalizeContext {
 		// 	let mut n_decimal_pt = 0;
 		// 	for &child_as_element in children.iter().take(end).skip(start) {
 		// 		let child = as_element(child_as_element);
-		// 		if context.decimal_separator.is_match(as_text(child))  {
+		// 		if context.patterns.decimal_separator.is_match(as_text(child))  {
 		// 			n_decimal_pt += 1;
 		// 		}
 		// 	}
@@ -1991,7 +2046,7 @@ impl CanonicalizeContext {
 				return false;	// last was not "mo", so can't be a period
 			}
 
-			if !context.decimal_separator.is_match(as_text(last_child)) {
+			if !context.patterns.decimal_separator.is_match(as_text(last_child)) {
 				return false;
 			}
 
@@ -2000,7 +2055,7 @@ impl CanonicalizeContext {
 			return !as_element(children[0]).preceding_siblings().iter()
 					.any(|&child| {
 						let child = as_element(child);
-						name(&child) == "mn" && context.decimal_separator.is_match(as_text(child))
+						name(&child) == "mn" && context.patterns.decimal_separator.is_match(as_text(child))
 					});
 		}
 
