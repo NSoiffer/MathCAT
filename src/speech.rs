@@ -2723,9 +2723,9 @@ mod tests {
         }
 
         set_preference("CheckRuleFiles".to_string(), "All".to_string()).unwrap();
-        assert!(is_file_time_same(), "file's time did not get updated");
+        assert!(!is_file_time_same(), "file's time did not get updated");
         set_preference("CheckRuleFiles".to_string(), "None".to_string()).unwrap();
-        assert!(!is_file_time_same(), "file's time was wrongly updated (preference 'CheckRuleFiles' should have prevented updating)");
+        assert!(is_file_time_same(), "file's time was wrongly updated (preference 'CheckRuleFiles' should have prevented updating)");
 
         // change a file, cause read_files to be called, and return if MathCAT noticed the change and updated its time
         fn is_file_time_same() -> bool {
