@@ -90,6 +90,7 @@ impl Preferences{
         prefs.insert("CapitalLetters_Pitch".to_string(), Yaml::Real("0.0".to_string()));
         prefs.insert("CapitalLetters_Beep".to_string(), Yaml::Boolean(false));
         prefs.insert("IntentErrorRecovery".to_string(), Yaml::String("IgnoreIntent".to_string()));    // also Error
+        prefs.insert("CheckRuleFiles".to_string(), Yaml::String("All".to_string()));    // avoid checking for rule files being changed (40% speedup!) (All, Prefs, None)
         return Preferences{ prefs };
     }
 
@@ -249,7 +250,7 @@ impl PreferenceManager {
     /// If rules_dir is an empty PathBuf, the existing rules_dir is used (an error if it doesn't exist)
     pub fn initialize(&mut self, rules_dir: PathBuf) -> Result<()> {
         self.set_rules_dir(&rules_dir)?;
-        self.set_preferences()?;
+        self.set_preference_files()?;
         self.set_all_files(&rules_dir)?;
         return Ok( () );
     }
@@ -282,7 +283,7 @@ impl PreferenceManager {
 
     /// Read the preferences from the files (if not up to date) and set the preferences and preference files
     /// Returns failure if the files don't exist or have errors
-    fn set_preferences(&mut self) -> Result<()> {
+    pub fn set_preference_files(&mut self) -> Result<()> {
         // first, read in the preferences -- need to determine which files to read next
         // the prefs files are in the rules dir and the user dir; differs from other files
         if self.api_prefs.prefs.is_empty() {
@@ -325,6 +326,7 @@ impl PreferenceManager {
             };
             bail!("Didn't find preferences in rule directory ('{}') or user directory ('{}')", &system_prefs_file.to_string_lossy(), user_prefs_file_name);
         }
+        self.set_based_on_changes(&prefs)?;
         self.user_prefs = prefs;
         return Ok( () );
     }
@@ -378,6 +380,36 @@ impl PreferenceManager {
         return Ok( () );
     }
 
+    /// If some preferences have changed, we may need to recompute other ones
+    /// The key prefs are Language, SpeechStyle, and BrailleCode
+    fn set_based_on_changes(&mut self, new_prefs: &Preferences) -> Result<()> {
+        let old_language = self.user_prefs.prefs.get("Language");       // not set if first time
+        if old_language.is_none() {
+            return Ok( () );            // if "Language" isn't set yet, nothing else is either -- first time through, so no updating needed.
+        }
+        let old_language = old_language.unwrap();
+        let new_language = new_prefs.prefs.get("Language").unwrap();
+        if old_language != new_language {
+            let language_dir = self.rules_dir.to_path_buf().join("Languages");
+            self.set_speech_files(&language_dir, new_language.as_str().unwrap())?;  // also sets style file
+        } else {
+            let old_speech_style = self.user_prefs.prefs.get("SpeechStyle").unwrap();
+            let new_speech_style = new_prefs.prefs.get("SpeechStyle").unwrap();
+            let language_dir = self.rules_dir.to_path_buf().join("Languages");
+            if old_speech_style != new_speech_style {
+                self.set_speech_files(&language_dir, new_speech_style.as_str().unwrap())?;
+            }
+        }
+
+        let old_braille_code = self.user_prefs.prefs.get("BrailleCode").unwrap();
+        let new_braille_code = new_prefs.prefs.get("BrailleCode").unwrap();
+        if old_braille_code != new_braille_code {
+            let braille_code_dir = self.rules_dir.to_path_buf().join("Braille");
+            self.set_braille_files(&braille_code_dir, new_braille_code.as_str().unwrap())?;  // also sets style file
+        }
+
+        return Ok( () );
+    }
 
     /// Find a file matching `file_name` by starting in the regional directory and looking to the language.
     /// If that fails, fall back to looking for the default repeating the same process -- something needs to be found or MathCAT crashes
@@ -549,24 +581,29 @@ impl PreferenceManager {
             panic!("Internal error: set_api_string_pref called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
+        self.reset_preferences(key, value)?;
+        self.api_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+
+        return Ok( () );
+    }
+
+    fn reset_preferences(&mut self, changed_pref: &str, changed_value: &str) -> Result<()> {
         let language_dir = self.rules_dir.to_path_buf().join("Languages");
-        match key {
+        match changed_pref {
             "Language" => {
-                self.set_speech_files(&language_dir, value)?
+                self.set_speech_files(&language_dir, changed_value)?
             },
             "SpeechStyle" => {
                 let language = self.pref_to_string("Language");
                 let language = if language.as_str() == "Auto" {"en"} else {language.as_str()};       // avoid 'temp value dropped while borrowed' error
-                self.set_style_file(&language_dir, language, value)?
+                self.set_style_file(&language_dir, language, changed_value)?
             },
             "BrailleCode" => {
                 let braille_dir = self.rules_dir.to_path_buf().join("Braille");
-                self.set_braille_files(&braille_dir, value)?
+                self.set_braille_files(&braille_dir, changed_value)?
             },
             _ => (),
         }
-        self.api_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
-
         return Ok( () );
     }
 
@@ -640,22 +677,7 @@ impl PreferenceManager {
             panic!("Internal error: set_user_prefs called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
         
-        let language_dir = self.rules_dir.to_path_buf().join("Languages");
-        match key {
-            "Language" => {
-                self.set_speech_files(&language_dir, value)?;
-            },
-            "SpeechStyle" => {
-                let language = self.pref_to_string("Language");
-                let language = if language.as_str() == "Auto" {"en"} else {language.as_str()};       // avoid 'temp value dropped while borrowed' error
-                self.set_style_file(&language_dir, language, value)?;
-            },
-            "BrailleCode" => {
-                let braille_dir = self.rules_dir.to_path_buf().join("Braille");
-                self.set_braille_files(&braille_dir, value)?;
-            },
-            _ => (),
-        }
+        self.reset_preferences(key, value)?;
         self.user_prefs.set_string_value(key, value);
         return Ok(());
     }

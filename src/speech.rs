@@ -1916,15 +1916,16 @@ impl FilesAndTimes {
     }
 
     /// Returns true if the main file matches the corresponding preference location and files' times are all current
-    pub fn is_file_up_to_date(&self, pref_path: &Path) -> bool {
-        if cfg!(target_family = "wasm") {
-            return !self.ft.is_empty();
-        }
+    pub fn is_file_up_to_date(&self, pref_path: &Path, should_ignore_file_time: bool) -> bool {
 
         // if the time isn't set or the path is different from the prefernce (which might have changed), return false
         if self.ft.is_empty() || self.ft[0].time == SystemTime::UNIX_EPOCH || self.as_path() != pref_path {
             return false;
         }
+        if should_ignore_file_time || cfg!(target_family = "wasm") {
+            return !self.ft.is_empty();
+        }
+
 
         // check the time stamp on the included files -- if the head file hasn't changed, the the paths for the included files will the same
         for file in &self.ft {
@@ -2105,8 +2106,13 @@ impl SpeechRules {
     }
 
     pub fn read_files(&mut self) -> Result<()> {
+        let check_rule_files = self.pref_manager.borrow().pref_to_string("CheckRuleFiles");
+        if check_rule_files != "None" {  // "Prefs" or "All" are other values
+            self.pref_manager.borrow_mut().set_preference_files()?;
+        }
+        let should_ignore_file_time = self.pref_manager.borrow().pref_to_string("CheckRuleFiles") != "All";     // ignore for "None", "Prefs"
         let rule_file = self.pref_manager.borrow().get_rule_file(&self.name).to_path_buf();     // need to create PathBuf to avoid a move/use problem
-        if self.rules.is_empty() || !self.rule_files.is_file_up_to_date(&rule_file) {
+        if self.rules.is_empty() || !self.rule_files.is_file_up_to_date(&rule_file, should_ignore_file_time) {
             self.rules.clear();
             let files_read = self.read_patterns(&rule_file)?;
             self.rule_files.set_files_and_times(files_read);
@@ -2115,12 +2121,15 @@ impl SpeechRules {
         let pref_manager = self.pref_manager.borrow();
         let unicode_pref_files = if self.name == RulesFor::Braille {pref_manager.get_braille_unicode_file()} else {pref_manager.get_speech_unicode_file()};
 
-        if !self.unicode_short_files.borrow().is_file_up_to_date(unicode_pref_files.0) {
+        if !self.unicode_short_files.borrow().is_file_up_to_date(unicode_pref_files.0, should_ignore_file_time) {
             self.unicode_short.borrow_mut().clear();
             self.unicode_short_files.borrow_mut().set_files_and_times(self.read_unicode(None, true)?);
         }
 
-        if !self.definitions_files.borrow().is_file_up_to_date(pref_manager.get_definitions_file(self.name != RulesFor::Braille)) {
+        if self.definitions_files.borrow().ft.is_empty() || !self.definitions_files.borrow().is_file_up_to_date(
+                            pref_manager.get_definitions_file(self.name != RulesFor::Braille),
+                            should_ignore_file_time
+        ) {
             self.definitions_files.borrow_mut().set_files_and_times(read_definitions_file(self.name != RulesFor::Braille)?);
         }
         return Ok( () );
@@ -2545,8 +2554,9 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
             if replacements.is_none() {
                 // see if it in the full unicode table (if it isn't loaded already)
                 let pref_manager = rules.pref_manager.borrow();
-                let unicode_pref_files = if rules.name == RulesFor::Braille {pref_manager.get_braille_unicode_file()} else {pref_manager.get_speech_unicode_file()};        
-                if rules.unicode_full.borrow().is_empty() || !rules.unicode_full_files.borrow().is_file_up_to_date(unicode_pref_files.1) {
+                let unicode_pref_files = if rules.name == RulesFor::Braille {pref_manager.get_braille_unicode_file()} else {pref_manager.get_speech_unicode_file()};
+                let should_ignore_file_time = pref_manager.pref_to_string("CheckRuleFiles") == "All";
+                if rules.unicode_full.borrow().is_empty() || !rules.unicode_full_files.borrow().is_file_up_to_date(unicode_pref_files.1, should_ignore_file_time) {
                     info!("*** Loading full unicode {} for char '{}'/{:#06x}", rules.name, ch, ch_as_u32);
                     rules.unicode_full.borrow_mut().clear();
                     rules.unicode_full_files.borrow_mut().set_files_and_times(rules.read_unicode(None, false)?);
@@ -2703,9 +2713,6 @@ mod tests {
     #[test]
     fn test_up_to_date() {
         use crate::interface::*;
-        use std::fs;
-        use std::thread::sleep;
-        use std::time::Duration;
         // initialize and move to a directory where making a time change doesn't really matter
         set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         set_preference("Language".to_string(), "zz-aa".to_string()).unwrap();
@@ -2715,25 +2722,33 @@ mod tests {
             panic!("Should not be an error in setting MathML")
         }
 
-        // files are read in due to setting the MathML -- record the time
-        SPEECH_RULES.with(|rules| {
-            let start_main_file = rules.borrow().unicode_short_files.borrow().ft[0].clone();
+        set_preference("CheckRuleFiles".to_string(), "All".to_string()).unwrap();
+        assert!(is_file_time_same(), "file's time did not get updated");
+        set_preference("CheckRuleFiles".to_string(), "None".to_string()).unwrap();
+        assert!(!is_file_time_same(), "file's time was wrongly updated (preference 'CheckRuleFiles' should have prevented updating)");
 
-            // open the file, read all the contents, then write them back so the time changes
-            let contents = fs::read(&start_main_file.file).expect(&format!("Failed to read file {} during test", &start_main_file.file.to_string_lossy()));
-            #[allow(unused_must_use)] { 
-                fs::write(start_main_file.file, contents);
-                sleep(Duration::from_millis(10));
-            }
+        // change a file, cause read_files to be called, and return if MathCAT noticed the change and updated its time
+        fn is_file_time_same() -> bool {
+            // read and write a unicode file in a test dir
+            // files are read in due to setting the MathML
 
-            // speak should cause the file stored to have a new time
-            if let Err(e) = get_spoken_text() {
-                error!("{}", crate::errors_to_string(&e));
-                panic!("Should not be an error in speech")
-            }
-            let updated_main_file = rules.borrow().unicode_short_files.borrow().ft[0].clone();
-            assert!(start_main_file.time < updated_main_file.time);
-        });
+            use std::time::Duration;
+            return SPEECH_RULES.with(|rules| {
+                let start_main_file = rules.borrow().unicode_short_files.borrow().ft[0].clone();
+
+                // open the file, read all the contents, then write them back so the time changes
+                let contents = std::fs::read(&start_main_file.file).expect(&format!("Failed to read file {} during test", &start_main_file.file.to_string_lossy()));
+                std::fs::write(start_main_file.file, contents).unwrap();
+                std::thread::sleep(Duration::from_millis(5));       // pause a little to make sure the time changes
+
+                // speak should cause the file stored to have a new time
+                if let Err(e) = get_spoken_text() {
+                    error!("{}", crate::errors_to_string(&e));
+                    panic!("Should not be an error in speech")
+                }
+                return rules.borrow().unicode_short_files.borrow().ft[0].time == start_main_file.time;
+            });
+        }    
     }
 
     // #[test]
