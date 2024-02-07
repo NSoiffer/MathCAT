@@ -123,7 +123,7 @@ Rust is quite efficient. On a Core I7-770K machine (higher end processor circa 2
 </math>
 takes about 4ms to generate the ClearSpeak string
 "_e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren squared, end exponent_" along with the Nemeth braille string "⠑⠘⠤⠹⠂⠌⠆⠼⠈⠡⠷⠹⠭⠤⠨⠍⠌⠨⠎⠼⠾⠘⠘⠆".
-This time is split approximately: 2ms to cleanup the MathML + 1ms for speech generation + 1ms for braille generation.
+This time is split approximately: 2ms to cleanup the MathML + 1ms for speech generation + 1ms for braille generation. This includes time to make sure all the rule files are up to date, which turns out is quite expensive. A preference can be added to turn that check off (the file checks are mainly useful for debugging). With the check turned off, the time drops to 2.3ms.
 <details>
 <summary>Click to see the MathML for this expression</summary>
 <pre>
