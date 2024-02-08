@@ -250,23 +250,24 @@
       then: {T: "neliö"}      # phrase(25 equals 5 'squared')
       else: {T: "kuutio"}      # phrase(625 equals 5 'cubed')
 
-- name: function-power
-  tag: power
-  match:
-  - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
-  replace:
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: {T: ""}      # phrase('the' third power of 2)
-  - bookmark: "*[2]/@id"
-  - test:
-      if: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
-      then: [{x: "ToOrdinal(*[2])"}]
-      else: [{x: "*[2]"}]
-    # FI: better way? The phrase in Finnish would be "luvun kuusi toinen potenssi" -> "number six's second power", refactor logic?
-  - T: "potenssi"      # phrase(the third 'power of' 6)
-  - pause: short
-  - x: "*[1]"
+# FI: this grammar doesn't work in Finnish, so commented out
+# - name: function-power
+#   tag: power
+#   match:
+#   - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
+#   replace:
+#   - test:
+#       if: "$Verbosity!='Terse'"
+#       then: {T: ""}      # phrase('the' third power of 2)
+#   - bookmark: "*[2]/@id"
+#   - test:
+#       if: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
+#       then: [{x: "ToOrdinal(*[2])"}]
+#       else: [{x: "*[2]"}]
+#     # FI: better way? The phrase in Finnish would be "luvun kuusi toinen potenssi" -> "number six's second power", refactor logic?
+#   - T: "potenssi"      # phrase(the third 'power of' 6)
+#   - pause: short
+#   - x: "*[1]"
 
 - name: AfterPower-nested
   tag: power
