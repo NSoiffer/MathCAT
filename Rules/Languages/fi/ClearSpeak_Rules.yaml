@@ -264,7 +264,6 @@
 #       if: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
 #       then: [{x: "ToOrdinal(*[2])"}]
 #       else: [{x: "*[2]"}]
-#     # FI: better way? The phrase in Finnish would be "luvun kuusi toinen potenssi" -> "number six's second power", refactor logic?
 #   - T: "potenssi"      # phrase(the third 'power of' 6)
 #   - pause: short
 #   - x: "*[1]"
