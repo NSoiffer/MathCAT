@@ -76,7 +76,7 @@ pub fn get_preference(name: String) -> Result<String>
 /// * Voice -- set a voice to use (not implemented)
 /// * Gender -- set pick any voice of the given gender (not implemented)
 /// * Bookmark -- set to `true` if a `mark`/`bookmark` should be part of the returned speech (used for sync highlighting)
-/// * CheckRuleFiles -- check to see if the rules files have changed since the last call. Values are "All" (default), "Prefs" (only the system and user prefs.yaml files), and "None"
+/// * CheckRuleFiles -- check to see if the rules files have changed since the last call. Values are "All", "Prefs"  (default) (only the system and user prefs.yaml files), and "None". There is about a 40% speedup changing from "All" to "None" and about a 10% speedup changing from "Prefs" to "None". 
 ///
 /// These are use to control speech and pitch changes for capital letters:
 /// * CapitalLetters_UseWord -- say "cap" (or whatever is appropriate for the language) [default: true]
