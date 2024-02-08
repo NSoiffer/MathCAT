@@ -12,9 +12,10 @@ Kääntämisen jälkeen (vuonna 2024) lisätään pistekirjoitustuki pistenäyt�
 
 ## Testaa suomenkielistä MathCAT-lisäosaa NVDA-ruudunlukijalla
 
-Testaamiseen tarvitset NVDA-ruudunlukijan, joka on saatavilla vain Windows-käyttöjärjestelmälle. Tällä hetkellä MathCATin testiversiota ei voi ladata ja testata NVDA:n lisäosakaupasta. Jos haluat testata suomenkielistä MathCAT-lisäsoaa, niin ota yhteyttä Sami Määttään, [sami.maatta@celia.fi](mailto:sami.maatta@celia.fi).
+Testaamiseen tarvitset NVDA-ruudunlukijan, joka on saatavilla vain Windows-käyttöjärjestelmälle. <!-- Tällä hetkellä MathCATin testiversiota ei voi ladata ja testata NVDA:n lisäosakaupasta. Jos haluat testata suomenkielistä MathCAT-lisäsoaa, niin ota yhteyttä Sami Määttään, [sami.maatta@celia.fi](mailto:sami.maatta@celia.fi). 
+-->
 
-<!-- ### Tiedostojen lähettäminen sähköpostitse
+### Tiedostojen lähettäminen sähköpostitse
 
 Voin lähettää testaamiseen vaadittavat tiedostot sähköpostitse, niin GitHubia ei tarvitse osata käyttää. Lähetä sähköpostia osoitteeseen [sami.maatta@celia.fi](mailto:sami.maatta@celia.fi) otsikolla "MathCAT testaaminen", niin lähetän tiedostot. Noudata sitten ohjeita kohdasta 3 eteenpäin.
 
@@ -34,7 +35,7 @@ Voin lähettää testaamiseen vaadittavat tiedostot sähköpostitse, niin GitHub
 8. Valitse luentatavaksi <code>ClearSpeak</code>. Se on käännetty. <code>SimpleSpeak</code> on myös suomenkielinen, mutta sen käännökset on tehty automaattisesti eli tulos ei ole kovin hyvä.
 9. Voit nyt testata matematiikan kaavojen luentaa eri sivuilla, jos matematiikka on esitetty MathML-koodilla. [Kokeile esimerkiksi tekemääni testisivustoa](https://samimaattacelia.github.io/math-fi.html). Se ei ole kuitenkaan kattava, joten voit kokeilla esimerkiksi Wikipedian matematiikkasivuja. Niissä oleva matematiikka on esitetty MathML-koodilla.
 
-Jos huomaat puutteita luennassa tai käännöksissä, niin voit lähettää palautetta suoraan Sami Määtälle, [sami.maatta@celia.fi](mailto:sami.maatta@celia.fi) tai lisätä GitHubin avulla "issuen". -->
+Jos huomaat puutteita luennassa tai käännöksissä, niin voit lähettää palautetta suoraan Sami Määtälle, [sami.maatta@celia.fi](mailto:sami.maatta@celia.fi) tai lisätä GitHubin avulla "issuen".
 
 ## Edistyminen
 
