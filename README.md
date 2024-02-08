@@ -46,7 +46,10 @@ Jos huomaat puutteita luennassa tai käännöksissä, niin voit lähettää pala
   - [ ] Oikoluku suomeksi
   - [ ] Oikoluku ruotsiksi (perustuen ruotsinkieliseen käännökseen)
   - [ ] Korjaukset oikoluvun perusteella
-- [ ] Pistekirjoitustuki suomeksi (0 %)
+  - [ ] Automaattisten testien kirjoittaminen oikoluvun perusteella
+- [ ] Pistekirjoitustuki suomeksi (15 %)
+   - [ ] Suomalaisten matematiikan pistemerkkien oikoluku
+   - [ ] Automaattisten testien kirjoittaminen
 
 </div>
 

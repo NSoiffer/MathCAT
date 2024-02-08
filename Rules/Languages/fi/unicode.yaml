@@ -408,7 +408,7 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "on"]                        	# 	(en: 'is', google translation)
-     - T: "yhdensuntainen"                   	    # 	(en: 'parallel to', google: 'samansuuntainen')
+     - T: "yhdensuuntainen"                   	    # 	(en: 'parallel to', google: 'samansuuntainen')
  - "∦":                                         	#  0x2226
      - test: 
          if: "$Verbosity!='Terse'"
