@@ -546,7 +546,7 @@ impl PreferenceManager {
     }
 
     /// Return the definitions.yaml file locations.
-    pub fn get_definitions_file(&self, use_speech_defs: bool) -> &PathBuf {
+    pub fn get_definitions_file(&self, use_speech_defs: bool) -> &Path {
         if !self.error.is_empty() {
             panic!("Internal error: get_definitions_file called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
