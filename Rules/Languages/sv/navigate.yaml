@@ -108,7 +108,7 @@
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
       then: [T: "basen"]          # phrase(the 'base' of the power)
-      else: [T: "nedre gränsen"]   # phrase(the 'lower limit' of the function is zero)
+      else: [T: "nedre index"]   # phrase(the 'lower limit' of the function is zero)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -119,7 +119,7 @@
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
       then: [T: "basen"]         # phrase(the 'base' of the power)
-      else: [T: "övre gränsen"]  # phrase(the 'upper limit' of the function is zero)
+      else: [T: "övre index"]  # phrase(the 'upper limit' of the function is zero)
   - pause: "medium"
 
 - name: into-or-out-of
@@ -131,8 +131,8 @@
     - if: "count($Child2D/preceding-sibling::*)=0"
       then: [T: "basen"]           # phrase(the 'base' of the power)
     - else_if: "count($Child2D/preceding-sibling::*)=1"
-      then: [T: "nedre gränsen"]    # phrase(the 'lower limit' of the function is zero)
-      else: [T: "övre gränsen"]   # phrase(the 'upper limit' of the function is zero)
+      then: [T: "nedre index"]    # phrase(the 'lower limit' of the function is zero)
+      else: [T: "övre index"]   # phrase(the 'upper limit' of the function is zero)
   - pause: "medium"
 
 - name: into-or-out-of

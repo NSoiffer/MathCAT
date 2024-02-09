@@ -117,10 +117,11 @@
   - pause: short
   - x: "*[3]"
   - pause: short
-  - T: "minus samma uttryck"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
+  - T: "och"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
+  # SWEDISH: Removed the expansion of the expression, keeping the output closer to what is actually shown visually.
   - test:
       if: "$Verbosity!='Terse'"
-      then: [T: "evaluerat för nedre värdet"]      # phrase(results were 'evaluated at' a given point)
+      then: [T: "nedre värdet"]      # phrase(results were 'evaluated at' a given point)
       else: [T: "nedre värde"]
   - pause: short
   # SWEDISH: Added a verbosity setting test to allow a shorter form.
