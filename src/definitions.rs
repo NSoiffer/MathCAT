@@ -194,7 +194,10 @@ fn verify_definitions(use_speech_defs: bool) -> Result<()> {
         }
         for name in USED_VECTORS.iter() {
             if !name_definition_map.contains_key(*name) {
-                bail!("Required (array) name '{}' is missing from 'definitions.yaml'", *name);
+                let pref_manager = PreferenceManager::get();
+                let pref_manager = pref_manager.borrow();
+                let def_file = pref_manager.get_definitions_file(use_speech_defs);            
+                bail!("Required (array) name '{}' is missing from '{}'", *name, def_file.to_string_lossy());
             }
         }
         for (name,collection) in name_definition_map.iter() {
@@ -206,7 +209,12 @@ fn verify_definitions(use_speech_defs: bool) -> Result<()> {
                             bail!("{} has wrong number of values: {}", name, v.len());
                         }
                     },
-                    _ =>  bail!("{} is not a vector!", name),
+                    _ => {
+                        let pref_manager = PreferenceManager::get();
+                        let pref_manager = pref_manager.borrow();
+                        let def_file = pref_manager.get_definitions_file(use_speech_defs);                    
+                        bail!("{} is not a vector! Defined in {}", name, def_file.to_string_lossy());
+                    },
                 }
             }
         };
