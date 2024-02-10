@@ -63,7 +63,7 @@ Timeline:
 2024
 * ✓ Jan: Automatic builds for the various repos
 * Jan: Portuguese translation
-* Jan/Feb: More translations (Swedish and Finnish speech and braille)
+* Winter-Spring: More translations (Swedish and Finnish speech and braille)
 * Feb: Units and Currency
 * Spring: add more inference/speech rules based on W3C's Math WG core list
 * Spring: analyze books to better determine what should be in the Unicode short file (hopefully get someone to help with this)
