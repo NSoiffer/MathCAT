@@ -448,7 +448,10 @@ impl PreferenceManager {
         for os_path in lang_dir.ancestors() {   // ancestor returns self and ancestors
             let path = PathBuf::from(os_path).join(file_name);
             if is_file_shim(&path) {
-                return Ok(path);
+                // we make an exception for definitions.yaml -- there a language specific checks for Hundreds, etc
+                if !(file_name == "definitions.yaml" && os_path.ends_with("Rules")) {
+                    return Ok(path);
+                }
             };
             if looking_for_style_file && alternative_style_file.is_none() {
                 if let Ok(alt_file_path) = find_any_style_file(os_path) {
