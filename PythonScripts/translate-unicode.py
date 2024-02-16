@@ -409,6 +409,48 @@ def translate_definition(start: int, lines: list[str], translated_lines: list[st
         i += 1
     return i
 
+def build_euro(lang: str):
+    sre = get_sre_euro_dict()
+    list(sre).sort()
+    print(f"Translations: SRE={len(sre)}")
+    with open("latex-braille-unicode.yaml", 'w', encoding='utf8') as out_stream:
+        out_stream.write("---\n")
+        for ch, braille in sre.items():
+            if ch == '"':
+                ch = '\\"'
+            elif ch == '\\':
+                ch = '\\\\'
+            elif ch == '\\127':
+                ch = '\\x7F'
+            first_part = f' - "{ch}": [t: "{braille}"]'
+            try:
+                comment = ''
+                if ch == '\\\\' or ch == '\\"':
+                    comment = hex(ord(ch[1]))
+                elif len(ch) == 1 or len(ch) == 2:
+                    comment = hex(ord(ch))
+                # elif len(ch) == 2:   # \t, etc
+                #     comment =
+                else:
+                    comment = "0" + ch[1:]
+                out_stream.write('{:32}# {}\n'.format(first_part, comment))
+            except:
+                print(f"failed to write a line for ch={ch}")
+
+
+def get_sre_euro_dict():
+    dict = {}
+    full_path = SRE_Location + "\\" + "euro" + "\\" + "characters" + "\\"
+    for filename in os.listdir(full_path):
+        if filename == "Braille.json":
+            continue
+        with open(full_path+filename, 'r', encoding='utf8') as in_stream:
+            print("\nReading file {}".format(full_path+filename) )
+            sre_data = json.load(in_stream)
+            sre_data = sre_data[2]
+            dict.update(sre_data)
+    return dict
+
 
 
 import sys
@@ -424,8 +466,9 @@ ACCESS8_Location = r"C:\dev\Access8Math\addon\globalPlugins\Access8Math\locale\s
 # (sre_only, mp_only, differ, same) = dict_compare("it", get_sre_unicode_dict(SRE_Location, "it"), get_mathplayer_unicode_dict(MP_Location, "it"))
 
 language = "zh-cn"
-build_new_translation("..", language, "unicode")
-build_new_translation("..", language, "unicode-full")
+# build_new_translation("..", language, "unicode")
+# build_new_translation("..", language, "unicode-full")
 
 # see translate_definitions comments -- you need to manually copy the file to google translate. 
 # translate_definitions("..", language)
+build_euro("euro")
