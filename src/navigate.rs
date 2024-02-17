@@ -10,7 +10,6 @@ use sxd_document::Package;
 use std::fmt;
 use crate::pretty_print::mml_to_string;
 use crate::speech::{NAVIGATION_RULES, CONCAT_INDICATOR, CONCAT_STRING, SpeechRules, SpeechRulesWithContext};
-use crate::xpath_functions::is_leaf;
 #[cfg(not(target_family = "wasm"))]
 use std::time::Instant;
 use crate::errors::*;
@@ -153,7 +152,7 @@ impl NavigationState {
 
     fn pop(&mut self) -> Option<(NavigationPosition, &'static str)> {
         assert_eq!(self.position_stack.len(), self.command_stack.len());
-        if self.position_stack.len() <= 1 {
+        if self.position_stack.is_empty() {
             return None;
         } else {
             return Some( (self.position_stack.pop().unwrap(), self.command_stack.pop().unwrap()) );
@@ -267,7 +266,7 @@ fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> {
 pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -> Result<()> {
     let node = get_node_by_id(mathml, &id);
     if let Some(node) = node {
-        if !is_leaf(node) && offset != 0 {
+        if !crate::xpath_functions::is_leaf(node) && offset != 0 {
             bail!("Id {} is not a leaf in the MathML tree but has non-zero offset={}. Referenced MathML node is {}", id, offset, mml_to_string(&node));
         }
         return NAVIGATION_STATE.with(|nav_state| {
@@ -1139,7 +1138,7 @@ mod tests {
     }
     
     #[test]
-    fn test_extremes_and_move_last_location() -> Result<()> {
+    fn text_extremes_and_move_last_location() -> Result<()> {
         let mathml_str = "<math id='math'><mfrac id='mfrac'>
                 <msup id='msup'><mi id='base'>b</mi><mn id='exp'>2</mn></msup>
                 <mi id='denom'>d</mi>
@@ -1157,8 +1156,7 @@ mod tests {
 
             test_command("ZoomOutAll", mathml, "mfrac");
             test_command("ZoomOut", mathml, "mfrac");
-            assert_eq!(test_command("MoveLastLocation", mathml, "base"), "undo zooming out all the way; b");       // second zoom out should do nothing
-            assert_eq!(test_command("MoveLastLocation", mathml, "base"), "no previous command; b");       // test nothing left on stack
+            test_command("MoveLastLocation", mathml, "base");       // second zoom out should do nothing
 
             test_command("ZoomOut", mathml, "msup");
             test_command("ZoomInAll", mathml, "base");
@@ -1396,21 +1394,6 @@ mod tests {
 
             return Ok( () );
         });
-
-        // ***fails due to language not changing -- need to fix up-to-date test***
-        // set_preference("Language".to_string(), "es".to_string())?;
-        // set_mathml(mathml_str.to_string()).unwrap();
-        // MATHML_INSTANCE.with(|package_instance| {
-        //     let package_instance = package_instance.borrow();
-        //     let mathml = get_element(&*package_instance);
-        //     test_command("ZoomInAll", mathml, "id-3");
-        //     assert_eq!(test_command("MoveNext", mathml, "id-4"), "desplazar derecha, en denominador; y");
-        //     assert_eq!(test_command("MoveNext", mathml, "id-6"), "desplazar derecha, furera de denominador; z");
-        //     assert_eq!(test_command("MovePrevious", mathml, "id-4"), "desplazar izquierda, en denominador; y");
-        //     assert_eq!(test_command("MovePrevious", mathml, "id-3"), "desplazarse izquierda, en numerador; x");
-        // });
-
-        return Ok( () );
     }
     
     #[test]

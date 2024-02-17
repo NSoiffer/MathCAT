@@ -2383,7 +2383,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         let mut chars = braille.chars();
 
         // the 'b' for baseline indicator is really part of the previous token, so it needs to be highlighted but isn't because it is not Unicode braille
-        let baseline_indicator_hack = PreferenceManager::get().borrow().get_user_prefs().to_string("BrailleCode") == "Nemeth";
+        let baseline_indicator_hack = PreferenceManager::get().borrow().pref_to_string("BrailleCode") == "Nemeth";
         for ch in chars.by_ref() {
             let modified_ch = add_dots_to_braille_char(ch, baseline_indicator_hack);
             i_bytes += ch.len_utf8();

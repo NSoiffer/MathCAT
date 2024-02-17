@@ -860,7 +860,7 @@ impl IsBracketed {
     }
 }
 
-struct IsInDefinition;
+pub struct IsInDefinition;
 impl IsInDefinition {
     /// Returns true if `test_str` is in `set_name`
     /// Returns an error if `set_name` is not defined

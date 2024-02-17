@@ -241,7 +241,7 @@ pub fn get_braille(nav_node_id: String) -> Result<String> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
-        let braille = crate::braille::braille_mathml(mathml, &nav_node_id)?;
+        let braille = crate::braille::braille_mathml(mathml, nav_node_id)?.0;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( braille );
     });
