@@ -629,7 +629,7 @@ fn mhchem_barbed_equilibrium() {
 
 #[test]
 fn mhchem_roman_in_superscript() {
-      let expr = " <math>
+      let expr = "<math>
       <mrow>
         <mmultiscripts>
           <mi>Fe</mi>
@@ -640,7 +640,7 @@ fn mhchem_roman_in_superscript() {
         <mmultiscripts>
           <mi>Fe</mi>
           <none></none>
-          <mi data-number='3'>III</mi>
+          <mi>III</mi>
         </mmultiscripts>
         <mo>&#x2063;</mo>
         <mmultiscripts>

@@ -3,9 +3,11 @@ use sxd_document::dom::Element;
 use sxd_document::Package;
 use crate::errors::*;
 use crate::pretty_print::mml_to_string;
+use crate::prefs::PreferenceManager;
+use std::cell::Ref;
 use regex::{Captures, Regex, RegexSet};
 use phf::{phf_map, phf_set};
-use crate::speech::{BRAILLE_RULES, SpeechRulesWithContext};
+use crate::speech::{BRAILLE_RULES, SpeechRulesWithContext, make_quoted_string};
 use std::ops::Range;
 
 static UEB_PREFIXES: phf::Set<char> = phf_set! {
@@ -26,12 +28,15 @@ pub fn braille_mathml(mathml: Element, nav_node_id: String) -> Result<(String, u
                         .chain_err(|| "Pattern match/replacement failure!")?;
         let braille_string = braille_string.replace(' ', "");
         let pref_manager = rules_with_context.get_rules().pref_manager.borrow();
-        let highlight_style = pref_manager.get_user_prefs().to_string("BrailleNavHighlight");
-        let braille_code = pref_manager.get_user_prefs().to_string("BrailleCode");
+        let highlight_style = pref_manager.pref_to_string("BrailleNavHighlight");
+        let braille_code = pref_manager.pref_to_string("BrailleCode");
         let braille = match braille_code.as_str() {
             "Nemeth" => nemeth_cleanup(braille_string),
-            "UEB" => ueb_cleanup(braille_string),
-            "Vietnam" => vietnam_cleanup(braille_string),   // FIX: probably needs some specialized cleanup
+            "UEB" => ueb_cleanup(pref_manager, braille_string),
+            "Vietnam" => vietnam_cleanup(pref_manager, braille_string),
+            "CMU" => cmu_cleanup(pref_manager, braille_string), 
+            "Finnish" => finnish_cleanup(pref_manager, braille_string),
+            "Swedish" => swedish_cleanup(pref_manager, braille_string),
             _ => braille_string,    // probably needs cleanup if someone has another code, but this will have to get added by hand
         };
 
@@ -414,10 +419,11 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         // The problem is that the numbers are hidden inside of mover -- this might be more general than rule 99_2.
         static ref DOTS_99_A_2: Regex = Regex::new(r"𝑁⠨mN").unwrap();
 
+        // Punctuation is one or two chars. There are (currently) only 3 2-char punct chars (—‘’) -- we explicitly list them below
         static ref REMOVE_SPACE_BEFORE_PUNCTUATION_151: Regex = 
-            Regex::new(r"w(P.[\u2800-\u28FF]?|[\u2800-\u28FF]?⠾)").unwrap();
+            Regex::new(r"w(P.[⠤⠦⠠]?|[\u2800-\u28FF]?⠾)").unwrap();
         static ref REMOVE_SPACE_AFTER_PUNCTUATION_151: Regex = 
-            Regex::new(r"(P.[\u2800-\u28FF]?|[\u2800-\u28FF]?⠷)w").unwrap();
+            Regex::new(r"(P.[⠤⠦⠠]?|[\u2800-\u28FF]?⠷)w").unwrap();
 
         // Multipurpose indicator insertion
         // 149 -- consecutive comparison operators have no space -- instead a multipurpose indicator is used (doesn't require a regex)
@@ -480,6 +486,10 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         // Before 79b (punctuation)
         static ref REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: Regex = Regex::new(r"(?:[↑↓]+[b𝑏]?|[b𝑏])([Ww,P]|$)").unwrap();
 
+        static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[↑↓]+b)").unwrap();
+
+        // Most commas have a space after them, but not when followed by a close quote (others?)
+        static ref NO_SPACE_AFTER_COMMA: Regex = Regex::new(r",P⠴").unwrap();      // captures both single and double close quote
         static ref REMOVE_LEVEL_IND_BEFORE_BASELINE: Regex = Regex::new(r"(?:[↑↓]+)([b𝑏])").unwrap();
 
         // Except for the four chars above, the unicode rules always include a punctuation indicator.
@@ -509,10 +519,10 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     if !raw_braille.is_empty() && ( start < raw_braille.len()-1 || "WP,".contains(raw_braille.chars().nth_back(0).unwrap()) ) {       // see comment about $end above
         result.push_str(&raw_braille[start..]);
     }
+//   debug!("ELIs:    \"{}\"", result);  
 
     let result = NUM_IND_ENCLOSED_LIST.replace_all(&result, "wn${1}");
 
-//   debug!("ELIs:    \"{}\"", result);  
     // Remove blanks before and after braille indicators
     let result = REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
     let result = REMOVE_SPACE_AFTER_BRAILLE_INDICATORS.replace_all(&result, "$1$2");
@@ -531,6 +541,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
 //   debug!("MULTI:   \"{}\"", result);
 
     let result = NUM_IND_9A.replace_all(&result, "${start}${minus}n");
+    // debug!("IND_9A:  \"{}\"", result);
     let result = NUM_IND_9C.replace_all(&result, "${1}${2}n");
     let result = NUM_IND_9D.replace_all(&result, "${1}n");
     let result = NUM_IND_9E.replace_all(&result, "${face}n");
@@ -552,6 +563,8 @@ fn nemeth_cleanup(raw_braille: String) -> String {
 //   debug!("Punct  : \"{}\"", &result);
     let result = REMOVE_LEVEL_IND_BEFORE_BASELINE.replace_all(&result, "$1");
 //   debug!("Bseline: \"{}\"", &result);
+
+    let result = NO_SPACE_AFTER_COMMA.replace_all(&result, "⠠P⠴");
 
     let result = REMOVE_AFTER_PUNCT_IND.replace_all(&result, "$1$2");
 //   debug!("Punct38: \"{}\"", &result);
@@ -586,19 +599,20 @@ static UEB_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "I" => "⠨",     // italic
     "R" => "",      // roman
     // "E" => "⠰",     // English
-    "1" => "⠰",     // Grade 1 symbol
-    "L" => "",     // Letter left in to assist in locating letters
-    "D" => "XXX",     // German (Deutsche) -- from prefs
-    "G" => "⠨",     // Greek
-    "V" => "⠨⠈",    // Greek Variants
-    // "H" => "⠠⠠",    // Hebrew
-    // "U" => "⠈⠈",    // Russian
+    "1" => "⠰",      // Grade 1 symbol
+    "𝟙" => "⠰⠰",     // Grade 1 word
+    "L" => "",       // Letter left in to assist in locating letters
+    "D" => "XXX",    // German (Deutsche) -- from prefs
+    "G" => "⠨",      // Greek
+    "V" => "⠨⠈",     // Greek Variants
+    // "H" => "⠠⠠",  // Hebrew
+    // "U" => "⠈⠈",  // Russian
     "C" => "⠠",      // capital
     "𝐶" => "⠠",      // capital that never should get word indicator (from chemical element)
     "N" => "⠼",     // number indicator
     "t" => "⠱",     // shape terminator
     "W" => "⠀",     // whitespace
-    "𝐖"=> "⠀",     // whitespace
+    "𝐖"=> "⠀",     // whitespace (hard break -- basically, it separates exprs)
     "s" => "⠆",     // typeface single char indicator
     "w" => "⠂",     // typeface word indicator
     "e" => "⠄",     // typeface & capital terminator 
@@ -643,7 +657,7 @@ static SHORT_FORMS: phf::Set<&str> = phf_set! {
 };
 
 static LETTER_PREFIXES: phf::Set<char> = phf_set! {
-    'B', 'I', '𝔹', 'S', 'T', 'D', 'C', '𝐶'
+    'B', 'I', '𝔹', 'S', 'T', 'D', 'C', '𝐶', '𝑐',
 };
 
 lazy_static! {
@@ -652,7 +666,7 @@ lazy_static! {
     // Note: fraction over is not listed due to example 42(4) which shows a space before the "/"
     // static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex = 
     //     Regex::new(r"(⠄⠄⠄|⠤⠤⠤)W+([⠼⠸⠪])").unwrap();
-    static ref REPLACE_INDICATORS: Regex =Regex::new(r"([1SB𝔹TIREDGVHP𝐶CLMNW𝐖swe,.-—―#ocb])").unwrap();  
+    static ref REPLACE_INDICATORS: Regex =Regex::new(r"([1𝟙SB𝔹TIREDGVHP𝐶𝑐CLMNW𝐖swe,.-—―#ocb])").unwrap();  
     static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
 }
 
@@ -661,28 +675,26 @@ fn is_short_form(chars: &[char]) -> bool {
     return SHORT_FORMS.contains(&chars_as_string);
 }
 
-fn ueb_cleanup(raw_braille: String) -> String {
-    // debug!("ueb_cleanup: start={}", raw_braille);
+fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
+    debug!("ueb_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
 
+    let use_only_grade1 = pref_manager.pref_to_string("UEB_START_MODE").as_str() == "Grade1";
     
     // '𝐖' is a hard break -- basically, it separates exprs
     let mut result = result.split('𝐖')
-                        .map(|str| pick_start_mode(str) + "W")
+                        .map(|str| pick_start_mode(str, use_only_grade1) + "W")
                         .collect::<String>();
     result.pop();   // we added a 'W' at the end that needs to be removed.
 
     let result = result.replace("tW", "W");
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
-    let pref_manager = crate::prefs::PreferenceManager::get();
-    let pref_manager = pref_manager.borrow();
-    let prefs = pref_manager.get_user_prefs();
-    let double_struck = prefs.to_string("UEB_DoubleStruck");
-    let sans_serif = prefs.to_string("UEB_SansSerif");
-    let fraktur = prefs.to_string("UEB_Fraktur");
-    let greek_variant = prefs.to_string("Vietnam_GreekVariant");
+    let double_struck = pref_manager.pref_to_string("UEB_DoubleStruck");
+    let sans_serif = pref_manager.pref_to_string("UEB_SansSerif");
+    let fraktur = pref_manager.pref_to_string("UEB_Fraktur");
+    let greek_variant = pref_manager.pref_to_string("Vietnam_GreekVariant");
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         let matched_char = &cap[0];
@@ -704,7 +716,7 @@ fn ueb_cleanup(raw_braille: String) -> String {
    
     return result.to_string();
 
-    fn pick_start_mode(raw_braille: &str) -> String {
+    fn pick_start_mode(raw_braille: &str, use_only_grade1: bool) -> String {
         // Need to decide what the start mode should be
         // From http://www.brailleauthority.org/ueb/ueb_math_guidance/final_for_posting_ueb_math_guidance_may_2019_102419.pdf
         //   Unless a math expression can be correctly represented with only a grade 1 symbol indicator in the first three cells
@@ -712,37 +724,77 @@ fn ueb_cleanup(raw_braille: String) -> String {
         //   begin the expression with a grade 1 word indicator (or a passage indicator if the expression includes spaces)
         // Apparently "only a grade 1 symbol..." means at most one grade 1 symbol based on some examples (GTM 6.4, example 4)
         // debug!("before determining mode:  '{}'", raw_braille);
+
+        // a bit ugly because we need to store the string if we have cap passage mode
+        let raw_braille_string = if is_cap_passage_mode_good(raw_braille) {convert_to_cap_passage_mode(raw_braille)} else {String::default()};
+        let raw_braille = if raw_braille_string.is_empty() {raw_braille} else {&raw_braille_string};
+        if use_only_grade1 {
+            return remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage); 
+        }
         let grade2 = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade2, UEB_Duration::Symbol);
-        // debug!("Symbol mode:  '{}'", grade2);
+        debug!("Symbol mode:  '{}'", grade2);
 
         if is_grade2_string_ok(&grade2) {
             return grade2;
         } else {
-            let grade1_word = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Word);
-            // debug!("Word mode:    '{}'", grade1_word);
-            
             // BANA says use g1 word mode if spaces are present, but that's not what their examples do
             // A conversation with Ms. DeAndrea from BANA said that they mean use passage mode if ≥3 "segments" (≥2 blanks)
-            // However, it is pointless to go into passage mode if the internal string is the same as word mode
-            let mut grade1_passage = "".to_string();
-            let mut n_blanks = 0;
-            if grade1_word.chars().any(|ch| {
-                if ch == 'W' {
-                    n_blanks += 1;
-                }
-                n_blanks == 2
-            }) {
-                grade1_passage = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage);
-                // debug!("Passage mode: '{}'", &grade1_passage);
-            }
-            if grade1_passage.is_empty() || grade1_passage == grade1_word {
-                return "⠰⠰".to_string() + &grade1_word;
+            // The G1 Word mode might not be at the start (iceb.rs:omission_3_6_7)
+            let grade1_word = try_grade1_word_mode(raw_braille);
+            debug!("Word mode:    '{}'", grade1_word);
+            if !grade1_word.is_empty() {
+                return grade1_word;
             } else {
+                let grade1_passage = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage);
                 return "⠰⠰⠰".to_string() + &grade1_passage + "⠰⠄";
             }
         }
 
-        /// Return true if the BANA guidelines say it is ok to start with grade 2
+        /// Return true if at least three cap letters and no lower case letters
+        fn is_cap_passage_mode_good(braille: &str) -> bool {
+            let mut n_caps = 0;
+            let mut is_cap_mode = false;
+            let mut cap_mode = UEB_Duration::Symbol;    // real value set when is_cap_mode is set to true
+            let mut chars = braille.chars();
+
+            // look CL or CCL for caps (CC runs until we get whitespace)
+            // if we find an L not in caps mode, we return false
+            // Note: caps can be C𝐶, whitespace can be W𝐖
+            // FIX: something like triangle ABC are purposely not in word mode and should probably only count as a single capital, not as 3 caps
+            //   Maybe could detect this by looking for consequitive CLx patterns (another bool var?)
+            while let Some(ch) = chars.next() {
+                if ch == 'L' {
+                    if !is_cap_mode {
+                        return false;
+                    }
+                    chars.next();       // skip letter
+                    if cap_mode == UEB_Duration::Symbol {
+                        is_cap_mode = false;
+                    }
+                } else if ch == 'C' || ch == '𝐶' {
+                    if is_cap_mode {
+                        assert!(cap_mode == UEB_Duration::Symbol);
+                        cap_mode = UEB_Duration::Word;
+                    } else {
+                        is_cap_mode = true;
+                        n_caps += 1;
+                        cap_mode = UEB_Duration::Symbol;
+                    }
+                } else if ch == 'W' || ch == '𝐖' {
+                    if is_cap_mode {
+                        assert!(cap_mode == UEB_Duration::Word);
+                    }
+                    is_cap_mode = false;                    
+                }
+            }
+            return n_caps > 4;
+        }
+
+        fn convert_to_cap_passage_mode(braille: &str) -> String {
+            return "⠠⠠⠠".to_string() + &braille.replace(['C', '𝐶'], "") + "⠠⠄";
+        }
+
+        /// Return true if the BANA or ICEB guidelines say it is ok to start with grade 2
         fn is_grade2_string_ok(grade2_braille: &str) -> bool {
             // BANA says use grade 2 if there is not more than one grade one symbol or single letter standing alone.
             // The exact quote from their guidance:
@@ -751,12 +803,14 @@ fn ueb_cleanup(raw_braille: String) -> String {
             //    begin the expression with a grade 1 word indicator
             // Note: I modified this slightly to exclude the cap indicator in the count. That allows three more ICEB rule to pass and seems
             //    like it is a reasonable thing to do.
+            // Another modification is allow a single G1 indicator to occur after whitespace later on
+            //    because ICEB examples show it and it seems better than going to passage mode if it is the only G1 indicator
 
             // Because of the 'L's which go away, we have to put a little more work into finding the first three chars
             let chars = grade2_braille.chars().collect::<Vec<char>>();
             let mut n_real_chars = 0;  // actually number of chars
             let mut found_g1 = false;
-            let mut i = 0;      // chars starts on the 4th char
+            let mut i = 0;
             while i < chars.len() {
                 let ch = chars[i];
                 if ch == '1' && !is_forced_grade1(&chars, i) {
@@ -767,22 +821,29 @@ fn ueb_cleanup(raw_braille: String) -> String {
                 } else if !"𝐶CLobc".contains(ch) {
                     if n_real_chars == 2 {
                         i += 1;
-                        break;      // this is the third real char
+                        break;              // this is the third real char
                     };
                     n_real_chars += 1;
                 }
                 i += 1
             }
 
-            // if we find another g1 that isn't forced and isn't standing alone, we are done
+            // if we find *another* g1 that isn't forced and isn't standing alone, we are done
+            // I've added a 'follows whitespace' clause for test iceb.rs:omission_3_6_2 to the standing alone rule
             // we only allow one standing alone example -- not sure if BANA guidance has this limit, but GTM 11_5_5_3 seems better with it
+            // Same for GTM 1_7_3_1 (passage mode is mentioned also)
             let mut is_standing_alone_already_encountered = false;
+            let mut is_after_whitespace = false;
             while i < chars.len() {
                 let ch = chars[i];
-                if ch == '1' && !is_forced_grade1(&chars, i) {
-                    if !is_single_letter_on_right(&chars, i) || is_standing_alone_already_encountered {
+                if ch == 'W' {
+                    is_after_whitespace = true;
+                } else if ch == '1' && !is_forced_grade1(&chars, i) {
+                    if is_standing_alone_already_encountered ||
+                       ((found_g1 || !is_after_whitespace) && !is_single_letter_on_right(&chars, i)) {
                         return false;
                     }
+                    found_g1 = true;
                     is_standing_alone_already_encountered = true; 
                 }
                 i += 1;
@@ -795,8 +856,8 @@ fn ueb_cleanup(raw_braille: String) -> String {
         fn is_forced_grade1(chars: &[char], i: usize) -> bool {
             // A '1' is forced if 'a-j' follows a digit
             assert_eq!(chars[i], '1', "'is_forced_grade1' didn't start with '1'");
-            // check that a-j follows the '1'
-            if i+1 < chars.len() && LETTER_NUMBERS.contains(&unhighlight(chars[i+1])) {
+            // check that a-j follows the '1' -- we have '1Lx' where 'x' is the letter to check
+            if i+2 < chars.len() && LETTER_NUMBERS.contains(&unhighlight(chars[i+2])) {
                 // check for a number before the '1'
                 // this will be 'N' followed by LETTER_NUMBERS or the number ".", ",", or " "
                 for j in (0..i).rev() {
@@ -835,6 +896,31 @@ fn ueb_cleanup(raw_braille: String) -> String {
             }
             return true;
         }
+
+        fn try_grade1_word_mode(raw_braille: &str) -> String {
+            // this isn't quite right, but pretty close -- try splitting at 'W' (words)
+            // only one of the parts can be in word mode and none of the others can have '1' unless forced
+            let mut g1_words = Vec::default();
+            let mut found_word_mode = false;
+            for raw_word in raw_braille.split('W') {
+                let word = remove_unneeded_mode_changes(raw_word, UEB_Mode::Grade2, UEB_Duration::Symbol);
+                debug!("try_grade1_word_mode: word='{}'", word);
+                let word_chars = word.chars().collect::<Vec<char>>();
+                let needs_word_mode = word_chars.iter().enumerate()
+                    .any(|(i, &ch) | ch == '1' && !is_forced_grade1(&word_chars, i));
+                if needs_word_mode {
+                    if found_word_mode {
+                        return "".to_string();
+                    }
+                    found_word_mode = true;
+                    g1_words.push("⠰⠰".to_string() + &remove_unneeded_mode_changes(raw_word, UEB_Mode::Grade1, UEB_Duration::Word)
+                    );
+                } else {
+                    g1_words.push(word);
+                }
+            }
+            return if found_word_mode {g1_words.join("W")} else {"".to_string()};
+        }
     }
 }
 
@@ -852,15 +938,15 @@ fn typeface_to_word_mode(braille: &str) -> String {
     while i < chars.len() {
         let ch = chars[i];
         if HAS_TYPEFACE.is_match(ch.to_string().as_str()) {
-            let is_next_char_target = is_next_char(&chars[i+1..], ch);
+            let i_next_char_target = find_next_char(&chars[i+1..], ch);
             if word_mode.contains(&ch) {
-                if !is_next_char_target {
+                if i_next_char_target.is_none() {
                     word_mode.retain(|&item| item!=ch);  // drop the char since word mode is done
                     word_mode_end.push(ch);   // add the char to signal to add end sequence
                 }
             } else {
                 result.push(ch);
-                if is_next_char_target {
+                if i_next_char_target.is_some() {
                     result.push('w');     // typeface word indicator
                     word_mode.push(ch);      // starting word mode for this char
                 } else {
@@ -890,6 +976,7 @@ fn typeface_to_word_mode(braille: &str) -> String {
 }
 
 fn capitals_to_word_mode(braille: &str) -> String {
+    use std::iter::FromIterator;
     // debug!("before capitals fix:  '{}'", braille);
 
     let mut result = "".to_string();
@@ -900,42 +987,45 @@ fn capitals_to_word_mode(braille: &str) -> String {
     while i < chars.len() {
         let ch = chars[i];
         if ch == 'C' {
-            let is_next_char_cap_c = is_next_char(&chars[i+1..], 'C');  // next letter sequence "C..."
-            if is_next_char_cap_c {
-                if is_next_char_start_of_section_12_modifier(&chars[i+1..]) {
+            // '𝑐' should only occur after a 'C', so we don't have top-level check for it
+            let mut next_non_cap = i+1;
+            while let Some(i_next) = find_next_char(&chars[next_non_cap..], '𝑐') {
+                next_non_cap += i_next + 1; // C/𝑐, L, letter
+            }
+            if find_next_char(&chars[next_non_cap..], 'C').is_some() { // next letter sequence "C..."
+                if is_next_char_start_of_section_12_modifier(&chars[next_non_cap+1..]) {
                     // to me this is tricky -- section 12 modifiers apply to the previous item
-                    // the last clause of the "item" def is the previous "individual symbol" which ICEB 2.1 say is:
+                    // the last clause of the "item" def is the previous adividual symbol" which ICEB 2.1 say is:
                     //   braille sign: one or more consecutive braille characters comprising a unit,
                     //     consisting of a root on its own or a root preceded by one or more
                     //     prefixes (also referred to as braille symbol)
                     // this means the capital indicator needs to be stated and can't be part of a word or passage
                     is_word_mode = false;
-                    result.push('C');
-                    i += 1;
+                    result.push_str(String::from_iter(&chars[i..next_non_cap]).as_str());
+                    i = next_non_cap;
                     continue;
                 }
-                if !is_word_mode {
-                    // start word mode
-                    result.push('C');
+                if is_word_mode {
+                    i += 1;     // skip the 'C'
+                } else {
+                    // start word mode -- need an extra 'C'
                     result.push('C');
                     is_word_mode = true;
-                } // else if word mode, don't emit the 'C'
-            } else if !is_word_mode {
-                result.push('C');
+                }
+            } else if is_word_mode {
+                i += 1;         // skip the 'C'
             }
-            if chars[i+1] == 'G' {
-                // Greek letters are a bit exceptional in that the pattern is "CGLx" -- push and bump 'i'
-                result.push('G');
-                i += 1;
+            if chars[next_non_cap] == 'G' {
+                // Greek letters are a bit exceptional in that the pattern is "CGLx" -- bump 'i'
+                next_non_cap += 1;
             }
-            if chars[i+1] != 'L' {
-                error!("capitals_to_word_mode: internal error: didn't find L after C.");
+            if chars[next_non_cap] != 'L' {
+                error!("capitals_to_word_mode: internal error: didn't find L after C in '{}'.",
+                       chars[i..next_non_cap+2].iter().collect::<String>().as_str());
             }
-            if i+2 < chars.len() {
-                result.push(chars[i+1]);    // eat 'L'
-                result.push(chars[i+2]);    // eat letter
-            }
-            i += 3 // eat "C", etc
+            let i_braille_char = next_non_cap + 2;
+            result.push_str(String::from_iter(&chars[i..i_braille_char]).as_str());
+            i = i_braille_char;
         } else if ch == 'L' {       // must be lowercase -- uppercase consumed above
             // assert!(LETTERS.contains(&unhighlight(chars[i+1]))); not true for other alphabets
             if is_word_mode {
@@ -992,7 +1082,7 @@ fn capitals_to_word_mode(braille: &str) -> String {
     }    
 }
 
-fn is_next_char(chars: &[char], target: char) -> bool {        
+fn find_next_char(chars: &[char], target: char) -> Option<usize> {        
     // first find the L or N and eat the char so that we are at the potential start of where the target lies
     // debug!("Looking for '{}' in '{}'", target, chars.iter().collect::<String>());
     for i_end in 0..chars.len() {
@@ -1000,17 +1090,17 @@ fn is_next_char(chars: &[char], target: char) -> bool {
             // skip the next char to get to the real start, and then look for the target
             // stop when L/N signals past potential target or we hit some non L/N char (actual braille)
             // debug!("   after L/N '{}'", chars[i_end+2..].iter().collect::<String>());
-            for &ch in chars.iter().skip(i_end+2) {
+            for (i, &ch) in chars.iter().enumerate().skip(i_end+2) {
                 if ch == 'L' || ch == 'N' || !LETTER_PREFIXES.contains(&ch) {
-                    return false;
+                    return None;
                 } else if ch == target {
                     // debug!("   found target");
-                    return true;
+                    return Some(i);
                 }
             }
         }
     }
-    return false;
+    return None;
 }
 
 #[allow(non_camel_case_types)]
@@ -1043,8 +1133,15 @@ static LEFT_INTERVENING_CHARS: phf::Set<char> = phf_set! {  // see RUEB 2.6.2
     // opening chars have prefix 'o', so not in set ['(', '{', '[', '"', '\'', '“', '‘', '«'] 
 };
 
-fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_duration: UEB_Duration) -> String {
+/// Return value for use_g1_word_mode()
+#[derive(Debug, PartialEq)]
+enum Grade1WordIndicator {
+    NotInWord,        // no '𝟙' in the current/next word
+    InWord,           // '𝟙' in the current/next word
+    NotInChars,       // no '𝟙' in the entire string (optimization for common case)
+}
 
+fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_duration: UEB_Duration) -> String {
     // FIX: need to be smarter about moving on wrt to typeforms/typefaces, caps, bold/italic. [maybe just let them loop through the default?]
     let mut mode = start_mode;
     let mut duration = start_duration;
@@ -1053,6 +1150,17 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
     let mut cap_word_mode = false;     // only set to true in G2 to prevent contractions
     let mut result = String::default();
     let chars = raw_braille.chars().collect::<Vec<char>>();
+    let mut g1_word_indicator = Grade1WordIndicator::NotInChars;        // almost always true (and often irrelevent)
+    if mode == UEB_Mode::Grade2 || duration == UEB_Duration::Symbol {
+        g1_word_indicator = use_g1_word_mode(&chars);
+        if g1_word_indicator == Grade1WordIndicator::InWord {
+            mode = UEB_Mode::Grade1;
+            if duration == UEB_Duration::Symbol {
+                duration = UEB_Duration::Word;     // if Passage mode, leave as is
+                result.push('𝟙')
+            }
+        }
+    }
     let mut i = 0;
     while i < chars.len() {
         let ch = chars[i];
@@ -1109,9 +1217,16 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                         // moving out of numeric mode
                         result.push(ch);
                         i += 1;
-                        mode = if "W𝐖-—―".contains(ch) {start_mode} else {UEB_Mode::Grade1};     // space, hyphen, dash(short & long) RUEB 6.5.1
-                        if mode == UEB_Mode::Grade2 {
-                            start_g2_letter = None;        // will be set to real letter
+                        if "W𝐖-—―".contains(ch) {
+                            mode = start_mode;
+                            if mode == UEB_Mode::Grade2 {
+                                start_g2_letter = None;        // will be set to real letter
+                            }
+                            if start_duration != UEB_Duration::Passage {
+                                duration = UEB_Duration::Symbol;
+                            }
+                        } else {
+                            mode = UEB_Mode::Grade1
                         }
                     },
                 }
@@ -1135,7 +1250,8 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                         result.push(ch);
                         i += 1;
                     },
-                    '1' => {
+                    '1' | '𝟙' => {
+                        assert!(ch == '1' || duration != UEB_Duration::Symbol);     // if '𝟙', should be Word or Passage duration
                         // nothing to do -- let the default case handle the following chars
                         i += 1;
                     },
@@ -1226,6 +1342,11 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                         mode = UEB_Mode::Grade1;
                         duration = UEB_Duration::Symbol;
                     },
+                    '𝟙' => {
+                        // '𝟙' should have forced G1 Word mode
+                        error!("Internal error: '𝟙' found in G2 mode: index={} in '{}'", i, raw_braille);
+                        i += 1;
+                    }
                     'N' => {
                         result.push(ch);
                         result.push(chars[i+1]);
@@ -1258,6 +1379,18 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
                 }
             },
         }
+
+        if (ch == 'W' || ch == '𝐖') && g1_word_indicator != Grade1WordIndicator::NotInChars &&
+           (mode == UEB_Mode::Grade2 || duration == UEB_Duration::Symbol) {
+            g1_word_indicator = use_g1_word_mode(&chars[i..]);
+            if g1_word_indicator == Grade1WordIndicator::InWord {
+                mode = UEB_Mode::Grade1;
+                if duration == UEB_Duration::Symbol {
+                    duration = UEB_Duration::Word;     // if Passage mode, leave as is
+                    result.push('𝟙')
+                }
+            }
+        }
     }
     if mode == UEB_Mode::Grade2 {
         if let Some(start) = start_g2_letter {
@@ -1266,6 +1399,20 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
     }
 
     return result;
+
+
+    fn use_g1_word_mode(chars: &[char]) -> Grade1WordIndicator {
+        debug!("use_g1_word_mode: chars='{:?}'", chars);
+        for &ch in chars {
+            if ch == 'W' || ch == '𝐖' {
+                return Grade1WordIndicator::NotInWord;       // reached a word boundary
+            }
+            if ch == '𝟙' {
+                return Grade1WordIndicator::InWord;        // need word mode in this "word"
+            }
+        }
+        return Grade1WordIndicator::NotInChars;               // 
+    }
 }
 
 /// Returns a tuple:
@@ -1354,43 +1501,78 @@ fn stands_alone(chars: &[char], i: usize) -> (bool, &[char], usize) {
     }
 }
 
+
 /// Return a modified result if chars can be contracted.
 /// Otherwise, the original string is returned
 fn handle_contractions(chars: &[char], mut result: String) -> String {
     struct Replacement {
-        pattern: &'static str,
+        pattern: String,
         replacement: &'static str
     }
 
-    // It would be much better from an extensibility point of view to read the table in from a file
-    // FIX: this would be much easier to read/maintain if ASCII braille were used
-    // FIX:   (without the "L"s) and the CONTRACTIONS table built as a lazy static
-    static CONTRACTIONS: &[Replacement] = &[
-        Replacement{ pattern: "L⠁L⠝L⠙", replacement: "L⠯" },           // and
-        Replacement{ pattern: "L⠋L⠕L⠗", replacement: "L⠿" },           // for
-        Replacement{ pattern: "L⠕L⠋", replacement: "L⠷" },             // of
-        Replacement{ pattern: "L⠞L⠓L⠑", replacement: "L⠮" },           // the
-        Replacement{ pattern: "L⠺L⠊L⠞L⠓", replacement: "L⠾" },         // with
-        Replacement{ pattern: "L⠉L⠓", replacement: "L⠡" },              // ch
-        Replacement{ pattern: "L⠊L⠝", replacement: "L⠔" },              // in
-
-        // cc -- don't match if after/before a cap letter -- no/can't use negative pattern (?!...) in regex package
-        // figure this out -- also applies to ea, bb, ff, and gg (not that they matter)
-        // cc may be important for "arccos", but RUEB doesn't apply it to "arccosine", so maybe not
-        // Replacement{ pattern: "L⠉L⠉", replacement: "L⠒" },              // cc -- don't match if after/before a cap letter
-        
-        
-        Replacement{ pattern: "L⠎L⠓", replacement: "L⠩" },              // sh
-        Replacement{ pattern: "L⠁L⠗", replacement: "L⠜" },              // ar
-        Replacement{ pattern: "L⠑L⠗", replacement: "L⠻" },              // er
-        Replacement{ pattern: "(?P<s>L.)L⠍L⠑L⠝L⠞", replacement: "${s}L⠰L⠞" }, // ment
-        Replacement{ pattern: "(?P<s>L.)L⠞L⠊L⠕L⠝", replacement: "${s}L⠰L⠝" } ,// tion
-        Replacement{ pattern: "(?P<s>L.)L⠑L⠁(?P<e>L.)", replacement: "${s}L⠂${e}" },  // ea
+    const ASCII_TO_UNICODE: &[char] = &[
+        '⠀', '⠮', '⠐', '⠼', '⠫', '⠩', '⠯', '⠄', '⠷', '⠾', '⠡', '⠬', '⠠', '⠤', '⠨', '⠌',
+        '⠴', '⠂', '⠆', '⠒', '⠲', '⠢', '⠖', '⠶', '⠦', '⠔', '⠱', '⠰', '⠣', '⠿', '⠜', '⠹',
+        '⠈', '⠁', '⠃', '⠉', '⠙', '⠑', '⠋', '⠛', '⠓', '⠊', '⠚', '⠅', '⠇', '⠍', '⠝', '⠕',
+        '⠏', '⠟', '⠗', '⠎', '⠞', '⠥', '⠧', '⠺', '⠭', '⠽', '⠵', '⠪', '⠳', '⠻', '⠘', '⠸',
     ];
 
+    fn to_unicode_braille(ascii: &str) -> String {
+        let mut unicode = String::with_capacity(4*ascii.len());   // 'L' + 3 bytes for braille char
+        for ch in ascii.as_bytes() {
+            unicode.push('L');
+            unicode.push(ASCII_TO_UNICODE[(ch.to_ascii_uppercase() - 32) as usize])
+        }
+        return unicode;
+    }
+
+    // It would be much better from an extensibility point of view to read the table in from a file
     lazy_static! {
-        static ref CONTRACTION_PATTERNS: RegexSet = init_patterns(CONTRACTIONS);
-        static ref CONTRACTION_REGEX: Vec<Regex> = init_regex(CONTRACTIONS);
+        static ref CONTRACTIONS: Vec<Replacement> = vec![
+            // 10.3: Strong contractions
+            Replacement{ pattern: to_unicode_braille("and"), replacement: "L⠯"},
+            Replacement{ pattern: to_unicode_braille("for"), replacement: "L⠿"},
+            Replacement{ pattern: to_unicode_braille("of"), replacement: "L⠷"},
+            Replacement{ pattern: to_unicode_braille("the"), replacement: "L⠮"},
+            Replacement{ pattern: to_unicode_braille("with"), replacement: "L⠾"},
+            
+            // 10.8: final-letter groupsigns (this need to preceed 'en' and any other shorter contraction)
+            Replacement{ pattern: "(?P<s>L.)L⠍L⠑L⠝L⠞".to_string(), replacement: "${s}L⠰L⠞" }, // ment
+            Replacement{ pattern: "(?P<s>L.)L⠞L⠊L⠕L⠝".to_string(), replacement: "${s}L⠰L⠝" } ,// tion
+
+            // 10.4: Strong groupsigns
+            Replacement{ pattern: to_unicode_braille("ch"), replacement: "L⠡"},
+            Replacement{ pattern: to_unicode_braille("gh"), replacement: "L⠣"},
+            Replacement{ pattern: to_unicode_braille("sh"), replacement: "L⠩"},
+            Replacement{ pattern: to_unicode_braille("th"), replacement: "L⠹"},
+            Replacement{ pattern: to_unicode_braille("wh"), replacement: "L⠱"},
+            Replacement{ pattern: to_unicode_braille("ed"), replacement: "L⠫"},
+            Replacement{ pattern: to_unicode_braille("er"), replacement: "L⠻"},
+            Replacement{ pattern: to_unicode_braille("ou"), replacement: "L⠳"},
+            Replacement{ pattern: to_unicode_braille("ow"), replacement: "L⠪"},
+            Replacement{ pattern: to_unicode_braille("st"), replacement: "L⠌"},
+            Replacement{ pattern: "(?P<s>L.)L⠊L⠝L⠛".to_string(), replacement: "${s}L⠬" },  // 'ing', not at start
+            Replacement{ pattern: to_unicode_braille("ar"), replacement: "L⠜"},
+
+            // 10.6.5: Lower groupsigns preceeded and followed by letters
+            // FIX: don't match if after/before a cap letter -- can't use negative pattern (?!...) in regex package
+            // Note: removed cc because "arccos" shouldn't be contracted (10.11.1), but there is no way to know about compound words
+            // Add it back after implementing a lookup dictionary of exceptions
+            Replacement{ pattern: "(?P<s>L.)L⠑L⠁(?P<e>L.)".to_string(), replacement: "${s}L⠂${e}" },  // ea
+            Replacement{ pattern: "(?P<s>L.)L⠃L⠃(?P<e>L.)".to_string(), replacement: "${s}L⠆${e}" },  // bb
+            // Replacement{ pattern: "(?P<s>L.)L⠉L⠉(?P<e>L.)".to_string(), replacement: "${s}L⠒${e}" },  // cc
+            Replacement{ pattern: "(?P<s>L.)L⠋L⠋(?P<e>L.)".to_string(), replacement: "${s}L⠖${e}" },  // ff
+            Replacement{ pattern: "(?P<s>L.)L⠛L⠛(?P<e>L.)".to_string(), replacement: "${s}L⠶${e}" },  // gg
+
+            // 10.6.8: Lower groupsigns ("in" also 10.5.4 lower wordsigns)
+            // FIX: these need restrictions about only applying when upper dots are present
+            Replacement{ pattern: to_unicode_braille("en"), replacement: "⠢"},
+            Replacement{ pattern: to_unicode_braille("in"), replacement: "⠔"},
+           
+        ];
+
+        static ref CONTRACTION_PATTERNS: RegexSet = init_patterns(&CONTRACTIONS);
+        static ref CONTRACTION_REGEX: Vec<Regex> = init_regex(&CONTRACTIONS);
     }
 
     let mut chars_as_str = chars.iter().collect::<String>();
@@ -1409,9 +1591,9 @@ fn handle_contractions(chars: &[char], mut result: String) -> String {
 
 
     fn init_patterns(contractions: &[Replacement]) -> RegexSet {
-        let mut vec = Vec::with_capacity(contractions.len());
+        let mut vec: Vec<&str> = Vec::with_capacity(contractions.len());
         for contraction in contractions {
-            vec.push(contraction.pattern);
+            vec.push(&contraction.pattern);
         }
         return RegexSet::new(&vec).unwrap();
     }
@@ -1419,7 +1601,7 @@ fn handle_contractions(chars: &[char], mut result: String) -> String {
     fn init_regex(contractions: &[Replacement]) -> Vec<Regex> {
         let mut vec = Vec::with_capacity(contractions.len());
         for contraction in contractions {
-            vec.push(Regex::new(contraction.pattern).unwrap());
+            vec.push(Regex::new(&contraction.pattern).unwrap());
         }
         return vec;
     }
@@ -1439,21 +1621,22 @@ static VIETNAM_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "1" => "⠠",     // Grade 1 symbol
     "L" => "",     // Letter left in to assist in locating letters
     "D" => "XXX",     // German (Deutsche) -- from prefs
-    "G" => "⠸",     // Greek
+    "G" => "⠰",     // Greek
     "V" => "XXX",    // Greek Variants
     // "H" => "⠠⠠",    // Hebrew
     // "U" => "⠈⠈",    // Russian
     "C" => "⠨",      // capital
+    "𝑐" => "",       // second or latter braille cell of a capital letter
     "𝐶" => "⠨",      // capital that never should get word indicator (from chemical element)
     "N" => "⠼",     // number indicator
     "t" => "⠱",     // shape terminator
     "W" => "⠀",     // whitespace"
     "𝐖"=> "⠀",     // whitespace
     "s" => "⠆",     // typeface single char indicator
-    "w" => "⠂",     // typeface word indicator
-    "e" => "⠄",     // typeface & capital terminator 
+    "w" => "",     // typeface word indicator
+    "e" => "",     // typeface & capital terminator 
     "o" => "",       // flag that what follows is an open indicator (used for standing alone rule)
-    "c" => "",       // flag that what follows is an close indicator (used for standing alone rule)
+    "c" => "",     // flag that what follows is an close indicator (used for standing alone rule)
     "b" => "",       // flag that what follows is an open or close indicator (used for standing alone rule)
     "," => "⠂",     // comma
     "." => "⠲",     // period
@@ -1464,7 +1647,7 @@ static VIETNAM_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 
 };
 
-fn vietnam_cleanup(raw_braille: String) -> String {
+fn vietnam_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     debug!("vietnam_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
@@ -1475,13 +1658,10 @@ fn vietnam_cleanup(raw_braille: String) -> String {
     debug!("   after typeface/caps={}", &result);
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
-    let pref_manager = crate::prefs::PreferenceManager::get();
-    let pref_manager = pref_manager.borrow();
-    let prefs = pref_manager.get_user_prefs();
-    let double_struck = prefs.to_string("Vietnam_DoubleStruck");
-    let sans_serif = prefs.to_string("Vietnam_SansSerif");
-    let fraktur = prefs.to_string("Vietnam_Fraktur");
-    let greek_variant = prefs.to_string("Vietnam_GreekVariant");
+    let double_struck = pref_manager.pref_to_string("Vietnam_DoubleStruck");
+    let sans_serif = pref_manager.pref_to_string("Vietnam_SansSerif");
+    let fraktur = pref_manager.pref_to_string("Vietnam_Fraktur");
+    let greek_variant = pref_manager.pref_to_string("Vietnam_GreekVariant");
 
     // This reuses the code just for getting rid of unnecessary "L"s and "N"s
     let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
@@ -1508,9 +1688,289 @@ fn vietnam_cleanup(raw_braille: String) -> String {
     return result.to_string();
 }
 
+
+static CMU_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
+    // "S" => "XXX",    // sans-serif -- from prefs
+    "B" => "⠔",     // bold
+    "𝔹" => "⠬",     // blackboard -- from prefs
+    // "T" => "⠈",     // script
+    "I" => "⠔",     // italic -- same as bold
+    // "R" => "",      // roman
+    // "E" => "⠰",     // English
+    "1" => "⠐",     // Grade 1 symbol -- used here for a-j after number
+    "L" => "",     // Letter left in to assist in locating letters
+    "D" => "⠠",     // German (Gothic)
+    "G" => "⠈",     // Greek
+    "V" => "⠈⠬",    // Greek Variants
+    // "H" => "⠠⠠",    // Hebrew
+    // "U" => "⠈⠈",    // Russian
+    "C" => "⠨",      // capital
+    "𝐶" => "⠨",      // capital that never should get word indicator (from chemical element)
+    "N" => "⠼",     // number indicator
+    "𝑁" => "",      // continue number
+    // "t" => "⠱",     // shape terminator
+    "W" => "⠀",     // whitespace"
+    "𝐖"=> "⠀",     // whitespace
+    // "𝘄" => "⠀",    // add whitespace if char to the left has dots 1, 2, or 3 -- special rule handled separately, so commented out
+    "s" => "",     // typeface single char indicator
+    // "w" => "⠂",     // typeface word indicator
+    // "e" => "⠄",     // typeface & capital terminator 
+    // "o" => "",       // flag that what follows is an open indicator (used for standing alone rule)
+    // "c" => "",       // flag that what follows is an close indicator (used for standing alone rule)
+    // "b" => "",       // flag that what follows is an open or close indicator (used for standing alone rule)
+    "," => "⠂",     // comma
+    "." => "⠄",     // period
+    "-" => "⠤",     // hyphen
+    "—" => "⠤⠤",   // normal dash (2014) -- assume all normal dashes are unified here [RUEB appendix 3]
+    // "―" => "⠐⠤⠤",  // long dash (2015) -- assume all long dashes are unified here [RUEB appendix 3]
+    "#" => "⠼",      // signals to end/restart of numeric mode (mixed fractions)
+};
+
+
+fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
+    lazy_static! {
+        static ref ADD_WHITE_SPACE: Regex = Regex::new(r"𝘄(.)|𝘄$").unwrap();
+    }
+
+    debug!("cmu_cleanup: start={}", raw_braille);
+    // let result = typeface_to_word_mode(&raw_braille);
+
+    // let result = result.replace("tW", "W");
+    let result = raw_braille.replace("CG", "⠘")
+                                .replace("𝔹C", "⠩")
+                                .replace("DC", "⠰");
+    // let result = result.replace("CC", "⠸"); 
+
+    // these typeforms need to get pulled from user-prefs as they are transcriber-defined
+    // let double_struck = pref_manager.pref_to_string("CMU_DoubleStruck");
+    // let sans_serif = pref_manager.pref_to_string("CMU_SansSerif");
+    // let fraktur = pref_manager.pref_to_string("CMU_Fraktur");
+
+    debug!("Before remove mode changes: '{}'", &result);
+    // This reuses the code just for getting rid of unnecessary "L"s and "N"s
+    let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
+    let result = result.replace("𝑁N", "");
+    debug!(" After remove mode changes: '{}'", &result);
+
+    let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
+        match CMU_INDICATOR_REPLACEMENTS.get(&cap[0]) {
+            None => {error!("REPLACE_INDICATORS and CMU_INDICATOR_REPLACEMENTS are not in sync"); ""},
+            Some(&ch) => ch,
+        }
+    });
+    let result = ADD_WHITE_SPACE.replace_all(&result, |cap: &Captures| {
+        if cap.get(1).is_none() {
+            return "⠀".to_string();
+        } else {
+            // debug!("ADD_WHITE_SPACE match='{}', has left dots = {}", &cap[1], has_left_dots(cap[1].chars().next().unwrap()));
+            let mut next_chars = cap[1].chars();
+            let next_char = next_chars.next().unwrap();
+            assert!(next_chars.next().is_none());
+            return (if has_left_dots(next_char) {"⠀"} else {""}).to_string() + &cap[1];
+        }
+    });
+    
+    // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces
+    let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
+    let result = result.trim_start_matches('⠀');            // don't trip end (e.g., see once::vector_11_2_5)
+    return result.to_string();
+
+    fn has_left_dots(ch: char) -> bool {
+        // Unicode braille is set up so dot 1 is 2^0, dot 2 is 2^1, etc
+        return ( (ch as u32 - 0x2800) >> 4 ) > 0;
+    }
+}
+
+
+
+static SWEDISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
+    "S" => "XXX",    // sans-serif -- from prefs
+    "B" => "⠨",     // bold
+    "𝔹" => "XXX",     // blackboard -- from prefs
+    "T" => "⠈",     // script
+    "I" => "⠨",     // italic
+    "R" => "",      // roman
+    // "E" => "⠰",     // English
+    "1" => "⠱",     // Grade 1 symbol (used for number followed by a letter)
+    "L" => "",     // Letter left in to assist in locating letters
+    "D" => "XXX",     // German (Deutsche) -- from prefs
+    "G" => "⠰",     // Greek
+    "V" => "XXX",    // Greek Variants
+    // "H" => "⠠⠠",    // Hebrew
+    // "U" => "⠈⠈",    // Russian
+    "C" => "⠠",      // capital
+    "𝑐" => "",       // second or latter braille cell of a capital letter
+    "𝐶" => "⠠",      // capital that never should get word indicator (from chemical element)
+    "N" => "⠼",     // number indicator
+    "t" => "⠱",     // shape terminator
+    "W" => "⠀",     // whitespace"
+    "𝐖"=> "⠀",     // whitespace
+    "s" => "⠆",     // typeface single char indicator
+    "w" => "",     // typeface word indicator
+    "e" => "",     // typeface & capital terminator 
+    "o" => "",       // flag that what follows is an open indicator (used for standing alone rule)
+    "c" => "",     // flag that what follows is an close indicator (used for standing alone rule)
+    "b" => "",       // flag that what follows is an open or close indicator (used for standing alone rule)
+    "," => "⠂",     // comma
+    "." => "⠲",     // period
+    "-" => "-",     // hyphen
+    "—" => "⠠⠤",   // normal dash (2014) -- assume all normal dashes are unified here [RUEB appendix 3]
+    "―" => "⠐⠠⠤",  // long dash (2015) -- assume all long dashes are unified here [RUEB appendix 3]
+    "#" => "",      // signals end of script
+
+};
+
+
+static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
+    "S" => "XXX",    // sans-serif -- from prefs
+    "B" => "⠨",     // bold
+    "𝔹" => "XXX",     // blackboard -- from prefs
+    "T" => "⠈",     // script
+    "I" => "⠨",     // italic
+    "R" => "",      // roman
+    "E" => "⠰",     // English
+    "1" => "⠀",     // Grade 1 symbol (used for number followed by a letter)
+    "L" => "",     // Letter left in to assist in locating letters
+    "D" => "XXX",     // German (Deutsche) -- from prefs
+    "G" => "⠨",     // Greek
+    "V" => "XXX",    // Greek Variants
+    // "H" => "⠠⠠",    // Hebrew
+    // "U" => "⠈⠈",    // Russian
+    "C" => "⠠",      // capital
+    "𝑐" => "",       // second or latter braille cell of a capital letter
+    "𝐶" => "⠠",      // capital that never should get whitespace in front (from chemical element)
+    "N" => "⠼",     // number indicator
+    "n" => "⠼",     // number indicator for drop numbers (special case with close parens)
+    "t" => "⠱",     // shape terminator
+    "W" => "⠀",     // whitespace"
+    "𝐖"=> "⠀",     // whitespace
+    "s" => "⠆",     // typeface single char indicator
+    "w" => "",     // typeface word indicator
+    "e" => "",     // typeface & capital terminator 
+    "," => "⠂",     // comma
+    "." => "⠲",     // period
+    "-" => "-",     // hyphen
+    "—" => "⠠⠤",   // normal dash (2014) -- assume all normal dashes are unified here [RUEB appendix 3]
+    "―" => "⠐⠠⠤",  // long dash (2015) -- assume all long dashes are unified here [RUEB appendix 3]
+    "(" => "⠦",     // Not really needed, but done for consistancy with ")"
+    ")" => "⠴",     // Needed for rules with drop numbers to avoid mistaking for dropped 0
+    "↑" => "⠬",     // superscript
+    "↓" => "⠡",     // subscript
+    "#" => "",      // signals end of script
+    "Z" => "⠐",     // signals end of index of root, integrand/lim from function ("zone change")
+
+};
+
+fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
+    lazy_static! {
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏C𝐶LlMmb↑↓Nn𝑁WwZ,()])").unwrap();          
+        // Numbers need to end with a space, but sometimes there is one there for other reasons
+        static ref DROP_NUMBER_SEPARATOR: Regex = Regex::new(r"(n.)\)").unwrap();
+        static ref NUMBER_MATCH: Regex = Regex::new(r"((N.)+[^WN𝐶#↑↓Z])").unwrap();
+    }
+
+    debug!("finnish_cleanup: start={}", raw_braille);
+    let result = DROP_NUMBER_SEPARATOR.replace_all(&raw_braille, |cap: &Captures| {
+        // match includes the char after the number -- insert the whitespace before it
+        // debug!("DROP_NUMBER_SEPARATOR match='{}'", &cap[1]);
+        return cap[1].to_string() + "𝐶)";       // hack to use "𝐶" instead of dot 6 directly, but works for NUMBER_MATCH
+    });
+    let result = result.replace('n', "N");  // avoids having to modify remove_unneeded_mode_changes()
+    let result = NUMBER_MATCH.replace_all(&result, |cap: &Captures| {
+        // match includes the char after the number -- insert the whitespace before it
+        // debug!("NUMBER_MATCH match='{}'", &cap[1]);
+        let mut chars = cap[0].chars();
+        let last_char = chars.next_back().unwrap(); // unwrap safe since several chars were matched
+        return chars.as_str().to_string() + "W" + &last_char.to_string();
+    });
+
+    // FIX: need to implement this -- this is just a copy of the Vietnam code
+    let result = result.replace("CG", "⠘")
+                                    .replace("𝔹C", "⠩")
+                                    .replace("DC", "⠰");
+
+    debug!("   after typeface/caps={}", &result);
+
+    // these typeforms need to get pulled from user-prefs as they are transcriber-defined
+    let double_struck = pref_manager.pref_to_string("Vietnam_DoubleStruck");
+    let sans_serif = pref_manager.pref_to_string("Vietnam_SansSerif");
+    let fraktur = pref_manager.pref_to_string("Vietnam_Fraktur");
+    let greek_variant = pref_manager.pref_to_string("Vietnam_GreekVariant");
+
+    // This reuses the code just for getting rid of unnecessary "L"s and "N"s
+    let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
+    debug!("   remove_unneeded_mode_changes={}", &result);
+
+
+    let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
+        let matched_char = &cap[0];
+        match matched_char {
+            "𝔹" => &double_struck,
+            "S" => &sans_serif,
+            "D" => &fraktur,
+            "V" => &greek_variant,
+            _ => match FINNISH_INDICATOR_REPLACEMENTS.get(matched_char) {
+                None => {error!("REPLACE_INDICATORS and SWEDISH_INDICATOR_REPLACEMENTS are not in sync: missing '{}'", matched_char); ""},
+                Some(&ch) => ch,
+            },
+        }
+    });
+
+    // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces
+    // let result = result.trim_start_matches('⠀').trim_end_matches('⠀');
+    let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
+   
+    return result.to_string();
+}
+
+
+fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
+    // FIX: need to implement this -- this is just a copy of the Vietnam code
+    debug!("swedish_cleanup: start={}", raw_braille);
+    let result = typeface_to_word_mode(&raw_braille);
+    let result = capitals_to_word_mode(&result);
+
+    let result = result.replace("CG", "⠘")
+                                    .replace("𝔹C", "⠩")
+                                    .replace("DC", "⠰");
+
+    debug!("   after typeface/caps={}", &result);
+
+    // these typeforms need to get pulled from user-prefs as they are transcriber-defined
+    let double_struck = pref_manager.pref_to_string("Vietnam_DoubleStruck");
+    let sans_serif = pref_manager.pref_to_string("Vietnam_SansSerif");
+    let fraktur = pref_manager.pref_to_string("Vietnam_Fraktur");
+    let greek_variant = pref_manager.pref_to_string("Vietnam_GreekVariant");
+
+    // This reuses the code just for getting rid of unnecessary "L"s and "N"s
+    let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
+
+
+    let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
+        let matched_char = &cap[0];
+        match matched_char {
+            "𝔹" => &double_struck,
+            "S" => &sans_serif,
+            "D" => &fraktur,
+            "V" => &greek_variant,
+            _ => match SWEDISH_INDICATOR_REPLACEMENTS.get(matched_char) {
+                None => {error!("REPLACE_INDICATORS and SWEDISH_INDICATOR_REPLACEMENTS are not in sync: missing '{}'", matched_char); ""},
+                Some(&ch) => ch,
+            },
+        }
+    });
+
+    // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces
+    // let result = result.trim_start_matches('⠀').trim_end_matches('⠀');
+    let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
+   
+    return result.to_string();
+}
+
+
 /************** Braille xpath functionality ***************/
 use crate::canonicalize::{name, as_element, as_text};
-use crate::xpath_functions::{is_leaf, IsBracketed};
+use crate::xpath_functions::{is_leaf, IsBracketed, validate_one_node};
 use sxd_document::dom::ParentOfChild;
 use sxd_xpath::{Value, context, nodeset::*};
 use sxd_xpath::function::{Function, Args};
@@ -1628,10 +2088,14 @@ impl BrailleChars {
         let result = match code {
             "Nemeth" => BrailleChars::get_braille_nemeth_chars(node, text_range),
             "UEB" => BrailleChars:: get_braille_ueb_chars(node, text_range),
+            "CMU" => BrailleChars:: get_braille_cmu_chars(node, text_range),
+            "Vietnam" => BrailleChars:: get_braille_vietnam_chars(node, text_range),
+"Swedish" => BrailleChars:: get_braille_ueb_chars(node, text_range),    // FIX: need to figure out what to implement
+            "Finnish" => BrailleChars:: get_braille_ueb_chars(node, text_range),    // FIX: need to figure out what to implement
             _ => return Err(sxd_xpath::function::Error::Other(format!("get_braille_chars: unknown braille code '{}'", code)))
         };
         return match result {
-            Ok(string) => Ok(string),
+            Ok(string) => Ok(make_quoted_string(string)),
             Err(err) => return Err(sxd_xpath::function::Error::Other(err.to_string())),
         }
     }
@@ -1644,9 +2108,6 @@ impl BrailleChars {
             // Indicators: C: capital, L: letter, N: number, P: punctuation, M: multipurpose
             static ref PICK_APART_CHAR: Regex = 
                 Regex::new(r"(?P<face>[SB𝔹TIR]*)(?P<lang>[EDGVHU]?)(?P<cap>C?)(?P<letter>L?)(?P<num>[N]?)(?P<char>.)").unwrap();
-        }
-        if !is_leaf(node) {
-            bail!("BrailleChars called on non-leaf element '{}'", mml_to_string(&node));
         }
         let math_variant = node.attribute_value("mathvariant");
         // FIX: cover all the options -- use phf::Map
@@ -1759,8 +2220,134 @@ impl BrailleChars {
                 + &caps["greek"]
                 + &caps["char"]
         });
+        debug!("get_braille_ueb_chars: '{}'", &result);
         return Ok(result.to_string())
     }
+
+    fn get_braille_cmu_chars(node: Element, text_range: Option<Range<usize>>) -> Result<String> {
+        // In CMU, we need to replace spaces used for number blocks with "."
+        // For other numbers, we need to add "." to create digit blocks
+
+        lazy_static! {
+            static ref HAS_TYPEFACE: Regex = Regex::new(".*?(double-struck|script|fraktur|sans-serif).*").unwrap();
+            static ref PICK_APART_CHAR: Regex = 
+                 Regex::new(r"(?P<bold>B??)(?P<italic>I??)(?P<face>[S𝔹TD]??)s??(?P<cap>C??)(?P<greek>G??)(?P<char>[NL].)").unwrap();
+        }
+    
+        let math_variant = node.attribute_value("mathvariant");
+        let text = BrailleChars::substring(as_text(node), &text_range);
+        let text = add_separator(text);
+
+        let braille_chars = crate::speech::braille_replace_chars(&text, node)?;
+
+        // debug!("get_braille_ueb_chars: before/after unicode.yaml: '{}'/'{}'", text, braille_chars);
+        if math_variant.is_none() {         // nothing we need to do
+            return Ok(braille_chars);
+        }
+        // mathvariant could be "sans-serif-bold-italic" -- get the parts
+        let math_variant = math_variant.unwrap();
+        let bold = math_variant.contains("bold");
+        let italic = math_variant.contains("italic");
+        let typeface = match HAS_TYPEFACE.find(math_variant) {
+            None => "",
+            Some(m) => match m.as_str() {
+                "double-struck" => "𝔹",
+                "script" => "T",
+                "fraktur" => "D",
+                "sans-serif" => "S",
+                //  don't consider monospace as a typeform
+                _ => "",
+            },
+        };
+        let result = PICK_APART_CHAR.replace_all(&braille_chars, |caps: &Captures| {
+            // debug!("captures: {:?}", caps);
+            // debug!("  bold: {:?}, italic: {:?}, face: {:?}, cap: {:?}, char: {:?}",
+            //        &caps["bold"], &caps["italic"], &caps["face"], &caps["cap"], &caps["char"]);
+            if bold || !caps["bold"].is_empty() {"B"} else {""}.to_string()
+                + if italic || !caps["italic"].is_empty() {"I"} else {""}
+                + if !&caps["face"].is_empty() {&caps["face"]} else {typeface}
+                + &caps["cap"]
+                + &caps["greek"]
+                + &caps["char"]
+        });
+        return Ok(result.to_string());
+
+        fn add_separator(text: String) -> String {
+            use crate::definitions::BRAILLE_DEFINITIONS;
+            if let Some(text_without_arc) = text.strip_prefix("arc") {
+                // "." after arc (7.5.3)
+                let is_function_name = BRAILLE_DEFINITIONS.with(|definitions| {
+                    let definitions = definitions.borrow();
+                    let set = definitions.get_hashset("CMUFunctionNames").unwrap();
+                    return set.contains(&text);
+                });
+                if is_function_name {
+                    return "arc.".to_string() + text_without_arc;
+                }
+            } 
+            return text;  
+        }
+    }
+
+    fn get_braille_vietnam_chars(node: Element, text_range: Option<Range<usize>>) -> Result<String> {
+        // this is basically the same as for ueb except:
+        // 1. we deal with switching '.' and ',' if in English style for numbers
+        // 2. if it is identified as a Roman Numeral, we make all but the first char lower case because they shouldn't get a cap indicator
+        // 3. double letter chemical elements should NOT be part of a cap word sequence
+        if name(&node) == "mn" {
+            // text of element is modified by these if needed
+            lower_case_roman_numerals(node);
+            switch_if_english_style_number(node);
+        }
+        let mut result = BrailleChars::get_braille_ueb_chars(node, text_range)?;
+        if let Some(value) = node.attribute_value("data-chem-element") {
+            if value != "1" {
+                result = result.replace("CL", "𝐶L");
+            }
+        }
+        return Ok(result);
+
+        fn lower_case_roman_numerals(mn_node: Element) {
+            if mn_node.attribute("data-roman-numeral").is_some() {
+                // if a roman numeral, all ASCII so we can optimize
+                let text = as_text(mn_node);
+                let mut new_text = String::from(&text[..1]);
+                new_text.push_str(text[1..].to_ascii_lowercase().as_str());    // works for single char too
+                mn_node.set_text(&new_text);
+            }
+        }
+        fn switch_if_english_style_number(mn_node: Element) {
+            let text = as_text(mn_node);
+            let dot = text.find('.');
+            let comma = text.find(',');
+            match (dot, comma) {
+                (None, None) => (),
+                (Some(dot), Some(comma)) => {
+                    if comma < dot {
+                        // switch dot/comma -- using "\x01" as a temp when switching the the two chars
+                        let switched = text.replace('.', "\x01").replace(',', ".").replace('\x01', ",");
+                        mn_node.set_text(&switched);
+                    }
+                },
+                (Some(dot), None) => {
+                    // If it starts with a '.', a leading 0, or if there is only one '.' and not three chars after it
+                    if dot==0 ||
+                       (dot==1 && text.starts_with('0')) ||
+                       (text[dot+1..].find('.').is_none() && text[dot+1..].len()!=3) {
+                        mn_node.set_text(&text.replace('.', ","));
+                    }
+                },
+                (None, Some(comma)) => {
+                    // if there is more than one ",", than it can't be a decimal separator
+                    if text[comma+1..].find(',').is_some() {
+                        mn_node.set_text(&text.replace(',', "."));
+                    }
+                },
+            }
+        }
+
+    }
+
 
     fn is_in_enclosed_list(node: Element) -> bool {
         // Nemeth Rule 10 defines an enclosed list:
@@ -1773,7 +2360,7 @@ impl BrailleChars {
         //       Items are separated by commas, can not have other punctuation (except ellipsis and dash)
         let mut parent = node.parent().unwrap().element().unwrap(); // safe since 'math' is always at root
         while name(&parent) == "mrow" {
-            if IsBracketed::is_bracketed(&parent, "", "", true, false) {
+            if IsBracketed::is_bracketed(parent, "", "", true, false) {
                 for child in parent.children() {
                     if !child_meets_conditions(as_element(child)) {
                         return false;
@@ -1795,7 +2382,7 @@ impl BrailleChars {
                     return text=="?" || text=="-?-" || text.is_empty();   // various forms of "fill in missing content" (see also Nemeth_Rules.yaml, "omissions")
                 },
                 "mrow" => {
-                    if IsBracketed::is_bracketed(&node, "", "", false, false) {
+                    if IsBracketed::is_bracketed(node, "", "", false, false) {
                         return child_meets_conditions(as_element(node.children()[1]));
                     } else {
                         for child in node.children() {
@@ -1840,38 +2427,383 @@ impl BrailleChars {
 impl Function for BrailleChars {
     /**
      * Returns a string with the correct number of nesting chars (could be an empty string)
-     * @param(node) -- current node
+     * @param(node) -- current node or string
      * @param(char) -- char (string) that should be repeated
      * Note: as a side effect, an attribute with the value so repeated calls to this or a child will be fast
      */
-     fn evaluate<'d>(&self,
-                            _context: &context::Evaluation<'_, 'd>,
-                            args: Vec<Value<'d>>)
-                            -> StdResult<Value<'d>, XPathError>
-        {
-            let mut args = Args(args);
-            if let Err(e) = args.exactly(2).or_else(|_| args.exactly(4)) {
-                return Err( XPathError::Other(format!("BrailleChars requires 2 or 4 args: {}", e)));
-            };
+    fn evaluate<'d>(&self,
+                        context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> StdResult<Value<'d>, XPathError>
+    {
+        use crate::canonicalize::create_mathml_element;
+        let mut args = Args(args);
+        if let Err(e) = args.exactly(2).or_else(|_| args.exactly(4)) {
+            return Err( XPathError::Other(format!("BrailleChars requires 2 or 4 args: {}", e)));
+        };
 
-            let range = if args.len() == 4 {
-                let end = args.pop_number()? as usize - 1;      // non-inclusive at end, 0-based
-                let start = args.pop_number()? as usize - 1;    // inclusive at start, a 0-based
-                Some(start..end)
-            } else {
-                None
-            };
-            let braille_code = args.pop_string()?;
-            let node = crate::xpath_functions::validate_one_node(args.pop_nodeset()?, "BrailleChars")?;
-            if let Node::Element(el) = node {
-                assert!( is_leaf(el) );
-                return Ok( Value::String( BrailleChars::get_braille_chars(el, &braille_code, range)? ) );
-            } else {
-                // not an element, so nothing to do
-                return Ok( Value::String("".to_string()) );
+        let range = if args.len() == 4 {
+            let end = args.pop_number()? as usize - 1;      // non-inclusive at end, 0-based
+            let start = args.pop_number()? as usize - 1;    // inclusive at start, a 0-based
+            Some(start..end)
+        } else {
+            None
+        };
+        let braille_code = args.pop_string()?;
+        let v: Value<'_> = args.0.pop().ok_or(XPathError::ArgumentMissing)?;
+        let node = match v {
+            Value::Nodeset(nodes) => {
+                validate_one_node(nodes, "BrailleChars")?.element().unwrap()
+            },
+            Value::Number(n) => {
+                let new_node = create_mathml_element(&context.node.document(), "mn");
+                new_node.set_text(&n.to_string());
+                new_node
+            },
+            Value::String(s) => {
+                let new_node = create_mathml_element(&context.node.document(), "mi");   // FIX: try to guess mi vs mo???
+                new_node.set_text(&s);
+                new_node
+            },
+            _ => {
+                return Ok( Value::String("".to_string()) ) // not an element, so nothing to do
+            },
+        };
+
+        if !is_leaf(node) {
+            return Err( XPathError::Other(format!("BrailleChars called on non-leaf element '{}'", mml_to_string(&node))) );
+        }
+        return Ok( Value::String( BrailleChars::get_braille_chars(node, &braille_code, range)? ) );
+    }
+}
+
+pub struct NeedsToBeGrouped;
+impl NeedsToBeGrouped {
+    // ordinals often have an irregular start (e.g., "half") before becoming regular.
+    // if the number is irregular, return the ordinal form, otherwise return 'None'.
+    fn needs_grouping_for_cmu(element: Element, _is_base: bool) -> bool {
+        let node_name = name(&element);
+        let children = element.children();
+        if node_name == "mrow" {
+            // check for bracketed exprs
+            if IsBracketed::is_bracketed(element, "", "", false, true) {
+                return false;
+            }
+
+            // check for prefix and postfix ops at start or end (=> len()==2, prefix is first op, postfix is last op)
+            if children.len() == 2 &&
+                (name( &as_element(children[0])) == "mo" || name( &as_element(children[1])) == "mo") {
+                return false;
+            }
+
+            if children.len() != 3 {  // ==3, need to check if it a linear fraction
+                return true;
+            }
+            let operator = as_element(children[1]);
+            if name(&operator) != "mo" || as_text(operator) != "/" {
+                return true;
             }
         }
+
+        if !(node_name == "mrow" || node_name == "mfrac") {
+            return false;
+        }
+        // check for numeric fractions (regular fractions need brackets, not numeric fractions), either as an mfrac or with "/"
+        // if the fraction starts with a "-", it is still a numeric fraction that doesn't need parens
+        let mut numerator = as_element(children[0]);
+        let denominator = as_element(children[children.len()-1]);
+        let decimal_separator = crate::interface::get_preference("DecimalSeparators".to_string()).unwrap()
+                                                        .chars().next().unwrap_or('.');
+        if is_integer(denominator, decimal_separator) {
+            // check numerator being either an integer "- integer"
+            if name(&numerator) == "mrow" {
+                let numerator_children = numerator.children();
+                if !(numerator_children.len() == 2 &&
+                        name(&as_element(numerator_children[0])) == "mo" &&
+                        as_text(as_element(numerator_children[0])) == "-") {
+                    return true;
+                }
+                numerator = as_element(numerator_children[1]);
+            }
+            return !is_integer(numerator, decimal_separator);
+        }
+        return true;
+
+        fn is_integer(mathml: Element, decimal_serparator: char) -> bool {
+            return name(&mathml) == "mn" && !as_text(mathml).contains(decimal_serparator)
+        }
     }
+
+    /// FIX: what needs to be implemented?
+    fn needs_grouping_for_finnish(mathml: Element, is_base: bool) -> bool {
+        use crate::xpath_functions::IsInDefinition;
+        let mut node_name = name(&mathml);
+        if mathml.attribute_value("data-roman-numeral").is_some() {
+            node_name = "mi";           // roman numerals don't follow number rules
+        }
+
+        // FIX: the leaf rules are from UEB -- check the Swedish rules
+        match node_name {
+            "mn" => {   
+                if !is_base {
+                    return false;
+                }                                                                                        // clause 1
+                // two 'mn's can be adjacent, in which case we need to group the 'mn' to make it clear it is separate (see bug #204)
+                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let grandparent = if name(&parent) == "math" {parent} else {parent.parent().unwrap().element().unwrap()};
+                if name(&grandparent) != "mrow" {
+                    return false;
+                }
+                let preceding = parent.preceding_siblings();
+                if preceding.len()  < 2 {
+                    return false;
+                }
+                // any 'mn' would be separated from this node by invisible times
+                let previous_child = as_element(preceding[preceding.len()-1]);
+                if name(&previous_child) == "mo" && as_text(previous_child) == "\u{2062}" {
+                    let previous_child = as_element(preceding[preceding.len()-2]);
+                    return name(&previous_child) == "mn"
+                } else {
+                    return false;
+                }
+            },
+            "mi" | "mo" | "mtext" => {
+                let text = as_text(mathml);
+                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let parent_name = name(&parent);   // there is always a "math" node
+                if is_base && (parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") && !text.contains([' ', '\u{00A0}']) {
+                    return false;
+                }
+                let mut chars = text.chars();
+                let first_char = chars.next().unwrap();             // canonicalization assures it isn't empty;
+                let is_one_char = chars.next().is_none();
+                // '¨', etc., brailles as two chars -- there probably is some exception list but I haven't found it -- these are the ones I know about
+                return !((is_one_char && !['¨', '″', '‴', '⁗'].contains(&first_char)) ||                       // clause 8
+                            // "lim", "cos", etc., appear not to get parens, but the rules don't mention it (tests show it)
+                            IsInDefinition::is_defined_in(text, "FunctionNames").unwrap() ||
+                            IsInDefinition::is_defined_in(text, "Arrows").unwrap() ||          // clause 4
+                            IsInDefinition::is_defined_in(text, "GeometryShapes").unwrap());   // clause 5
+            },
+            "mrow" => {
+                // check for bracketed exprs
+                if IsBracketed::is_bracketed(mathml, "", "", false, true) {
+                    return false;
+                }
+
+                let parent = mathml.parent().unwrap().element().unwrap(); // safe since 'math' is always at root
+                if name(&parent) == "mfrac" {
+                    let children = mathml.children();
+                    if mathml.preceding_siblings().is_empty() {
+                        // numerator: check for mulitplication -- doesn't need grouping in numerator
+                        if children.len() >= 3 {
+                            let operator = as_element(children[1]);
+                            if name(&operator) == "mo" {
+                                let ch = as_text(operator);
+                                if ch == "\u{2062}" || ch == "⋅" || ch == "×"  {
+                                    return false;
+                                }
+                            }
+                        }
+                        return true;
+                    } else {
+                        // denominator
+                        return true;
+                    }
+
+                }
+                // check for prefix at start
+                // example 7.12 has "2-" in superscript and is grouped, so we don't consider postfix ops
+                let children = mathml.children();
+                if children.len() == 2 &&
+                    (name( &as_element(children[0])) == "mo") {
+                    return false;
+                }
+                return true;
+            },
+            _ => return false,
+        }
+    }
+
+    // ordinals often have an irregular start (e.g., "half") before becoming regular.
+    // if the number is irregular, return the ordinal form, otherwise return 'None'.
+    fn needs_grouping_for_swedish(mathml: Element, is_base: bool) -> bool {
+        use crate::xpath_functions::IsInDefinition;
+        let mut node_name = name(&mathml);
+        if mathml.attribute_value("data-roman-numeral").is_some() {
+            node_name = "mi";           // roman numerals don't follow number rules
+        }
+
+        // FIX: the leaf rules are from UEB -- check the Swedish rules
+        match node_name {
+            "mn" => {   
+                if !is_base {
+                    return false;
+                }                                                                                        // clause 1
+                // two 'mn's can be adjacent, in which case we need to group the 'mn' to make it clear it is separate (see bug #204)
+                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let grandparent = if name(&parent) == "math" {parent} else {parent.parent().unwrap().element().unwrap()};
+                if name(&grandparent) != "mrow" {
+                    return false;
+                }
+                let preceding = parent.preceding_siblings();
+                if preceding.len()  < 2 {
+                    return false;
+                }
+                // any 'mn' would be separated from this node by invisible times
+                let previous_child = as_element(preceding[preceding.len()-1]);
+                if name(&previous_child) == "mo" && as_text(previous_child) == "\u{2062}" {
+                    let previous_child = as_element(preceding[preceding.len()-2]);
+                    return name(&previous_child) == "mn"
+                } else {
+                    return false;
+                }
+            },
+            "mi" | "mo" | "mtext" => {
+                let text = as_text(mathml);
+                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let parent_name = name(&parent);   // there is always a "math" node
+                if is_base && (parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") && !text.contains([' ', '\u{00A0}']) {
+                    return false;
+                }
+                let mut chars = text.chars();
+                let first_char = chars.next().unwrap();             // canonicalization assures it isn't empty;
+                let is_one_char = chars.next().is_none();
+                // '¨', etc., brailles as two chars -- there probably is some exception list but I haven't found it -- these are the ones I know about
+                return !((is_one_char && !['¨', '″', '‴', '⁗'].contains(&first_char)) ||                       // clause 8
+                            // "lim", "cos", etc., appear not to get parens, but the rules don't mention it (tests show it)
+                            IsInDefinition::is_defined_in(text, "FunctionNames").unwrap() ||
+                            IsInDefinition::is_defined_in(text, "Arrows").unwrap() ||          // clause 4
+                            IsInDefinition::is_defined_in(text, "GeometryShapes").unwrap());   // clause 5
+            },
+            "mrow" => {
+                // check for bracketed exprs
+                if IsBracketed::is_bracketed(mathml, "", "", false, true) {
+                    return false;
+                }
+
+                // check for prefix at start
+                // example 7.12 has "2-" in superscript and is grouped, so we don't consider postfix ops
+                let children = mathml.children();
+                if children.len() == 2 &&
+                    (name( &as_element(children[0])) == "mo") {
+                    return false;
+                }
+                return true;
+            },
+            _ => return false,
+        }
+    }
+
+    /// Returns true if the element needs grouping symbols
+    /// Bases need extra attention because if they are a number and the item to the left is one, that needs distinguishing
+    fn needs_grouping_for_ueb(mathml: Element, is_base: bool) -> bool {
+        // From GTM 7.1
+        // 1. An entire number, i.e. the initiating numeric symbol and all succeeding symbols within the numeric mode thus
+        //     established (which would include any interior decimal points, commas, separator spaces, or simple numeric fraction lines).
+        // 2. An entire general fraction, enclosed in fraction indicators.
+        // 3. An entire radical expression, enclosed in radical indicators.
+        // 4. An arrow.
+        // 5. An arbitrary shape.
+        // 6. Any expression enclosed in matching pairs of round parentheses, square brackets or curly braces.
+        // 7. Any expression enclosed in the braille grouping indicators.   [Note: not possible here]
+        // 8. If none of the foregoing apply, the item is simply the [this element's] individual symbol.
+
+        use crate::xpath_functions::IsInDefinition;
+        let mut node_name = name(&mathml);
+        if mathml.attribute_value("data-roman-numeral").is_some() {
+            node_name = "mi";           // roman numerals don't follow number rules
+        }
+        match node_name {
+            "mn" => {   
+                if !is_base {
+                    return false;
+                }                                                                                        // clause 1
+                // two 'mn's can be adjacent, in which case we need to group the 'mn' to make it clear it is separate (see bug #204)
+                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let grandparent = if name(&parent) == "math" {parent} else {parent.parent().unwrap().element().unwrap()};
+                if name(&grandparent) != "mrow" {
+                    return false;
+                }
+                let preceding = parent.preceding_siblings();
+                if preceding.len()  < 2 {
+                    return false;
+                }
+                // any 'mn' would be separated from this node by invisible times
+                let previous_child = as_element(preceding[preceding.len()-1]);
+                if name(&previous_child) == "mo" && as_text(previous_child) == "\u{2062}" {
+                    let previous_child = as_element(preceding[preceding.len()-2]);
+                    return name(&previous_child) == "mn"
+                } else {
+                    return false;
+                }
+            },
+            "mi" | "mo" | "mtext" => {
+                let text = as_text(mathml);
+                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let parent_name = name(&parent);   // there is always a "math" node
+                if is_base && (parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") && !text.contains([' ', '\u{00A0}']) {
+                    return false;
+                }
+                let mut chars = text.chars();
+                let first_char = chars.next().unwrap();             // canonicalization assures it isn't empty;
+                let is_one_char = chars.next().is_none();
+                // '¨', etc., brailles as two chars -- there probably is some exception list but I haven't found it -- these are the ones I know about
+                return !((is_one_char && !['¨', '″', '‴', '⁗'].contains(&first_char)) ||                       // clause 8
+                            // "lim", "cos", etc., appear not to get parens, but the rules don't mention it (tests show it)
+                            IsInDefinition::is_defined_in(text, "FunctionNames").unwrap() ||
+                            IsInDefinition::is_defined_in(text, "Arrows").unwrap() ||          // clause 4
+                            IsInDefinition::is_defined_in(text, "GeometryShapes").unwrap());   // clause 5
+            },
+            "mfrac" => return false,                                                     // clause 2 (test GTM 8.2(4) shows numeric fractions are not special)                                 
+            "msqrt" | "mroot" => return false,                                           // clause 3
+                    // clause 6 only mentions three grouping chars, I'm a little suspicious of that, but that's what it says
+            "mrow" => return !(IsBracketed::is_bracketed(mathml, "(", ")", false, false) ||  
+                                IsBracketed::is_bracketed(mathml, "[", "]", false, false) || 
+                                IsBracketed::is_bracketed(mathml, "{", "}", false, false) ),
+            "msub" | "msup" | "msubsup" => {
+                // I'm a little dubious about the false value, but see GTM 7.7(2)
+                if !is_base {
+                    return true;
+                } 
+                // need to group nested scripts in base -- see GTM 12.2(2)                                         
+                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let parent_name = name(&parent);   // there is always a "math" node
+                return parent_name == "munder" || parent_name == "mover" || parent_name == "munderover";
+            },
+            _ => return true,
+        }
+
+    }
+}
+
+impl Function for NeedsToBeGrouped {
+    // convert a node to an ordinal number
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> StdResult<Value<'d>, XPathError>
+    {
+        let mut args = Args(args);
+        args.exactly(3)?;
+        let is_base = args.pop_boolean()?;
+        let braille_code = args.pop_string()?;
+        let node = validate_one_node(args.pop_nodeset()?, "NeedsToBeGrouped")?;
+        if let Node::Element(e) = node {
+            let answer = match braille_code.as_str() {
+                "CMU" => NeedsToBeGrouped::needs_grouping_for_cmu(e, is_base),
+                "UEB" => NeedsToBeGrouped::needs_grouping_for_ueb(e, is_base),
+                "Finnish" => NeedsToBeGrouped::needs_grouping_for_finnish(e, is_base),
+                "Swedish" => NeedsToBeGrouped::needs_grouping_for_swedish(e, is_base),
+                _ => return Err(XPathError::Other(format!("NeedsToBeGrouped: braille code arg '{:?}' is not a known code ('UEB', 'CMU', or 'Swedish')", braille_code))),
+            };
+            return Ok( Value::Boolean( answer ) );
+        }
+
+        return Err(XPathError::Other(format!("NeedsToBeGrouped: first arg '{:?}' is not a node", node)));
+    }
+}
+    
+    
     
 #[cfg(test)]
 mod tests {
@@ -1883,20 +2815,20 @@ mod tests {
     #[test]
     fn ueb_highlight_24() -> Result<()> {       // issue 24
         init_logger();
-        let mathml_str = "<math display='block' id='M8o41h70-0'>
-                <mrow id='M8o41h70-1'>
-                <mn id='M8o41h70-2'>4</mn>
-                <mo id='M8o41h70-3'>&#x2062;</mo>
-                <mi id='M8o41h70-4'>a</mi>
-                <mo id='M8o41h70-5'>&#x2062;</mo>
-                <mi id='M8o41h70-6'>c</mi>
+        let mathml_str = "<math display='block' id='id-0'>
+            <mrow id='id-1'>
+                <mn id='id-2'>4</mn>
+                <mo id='id-3'>&#x2062;</mo>
+                <mi id='id-4'>a</mi>
+                <mo id='id-5'>&#x2062;</mo>
+                <mi id='id-6'>c</mi>
             </mrow>
         </math>";
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         set_mathml(mathml_str.to_string()).unwrap();
         set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
         set_preference("BrailleNavHighlight".to_string(), "All".to_string()).unwrap();
-        let braille = get_braille("M8o41h70-2".to_string())?;
+        let braille = get_braille("id-2".to_string())?;
         assert_eq!("⣼⣙⠰⠁⠉", braille);
         set_navigation_node("M8o41h70-2".to_string(), 0)?;
         assert_eq!( get_braille_position()?, (0,1));
@@ -1972,6 +2904,22 @@ mod tests {
             N_PROBES.with(|n| {println!("test {:2} # probes = {}", i, n.borrow())});
             assert_eq!(answers[i], id, "\nNemeth test ith position={}", i);
         }
+        return Ok( () );
+    }
+    
+    #[test]
+    #[allow(non_snake_case)]
+    fn test_UEB_start_mode() -> Result<()> {
+        let mathml_str = "<math><msup><mi>x</mi><mi>n</mi></msup></math>";
+        crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
+        set_mathml(mathml_str.to_string()).unwrap();
+        set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
+        set_preference("UEB_START_MODE".to_string(), "Grade2".to_string()).unwrap();
+        let braille = get_braille("".to_string())?;
+        assert_eq!("⠭⠰⠔⠝", braille, "Grade2");
+        set_preference("UEB_START_MODE".to_string(), "Grade1".to_string()).unwrap();
+        let braille = get_braille("".to_string())?;
+        assert_eq!("⠭⠔⠝", braille, "Grade1");
         return Ok( () );
     }
 }

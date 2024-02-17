@@ -1,5 +1,29 @@
 ---
 -
+  name: whitespace-omission
+  tag: "!*"
+  match: "not(self::m:math) and not($MatchingWhitespace) and (@data-previous-space-width >= 0.7 or @data-following-space-width >= 0.7)"
+  replace:
+   - with:
+      variables: [MatchingWhitespace: "true()"]
+      replace:
+      - test:
+        - if: "@data-previous-space-width > 1.1"
+          then: [t: "⠿"]
+          # non-breaking space width; also avoid spaces added after commas in scripts (78_1)
+        - else_if: "@data-previous-space-width >= 0.7 and
+                    ($NewScriptContext='' or not(preceding-sibling::*[1][self::m:mo and .=',']))"
+          then: [t: "W"]
+      - x: "."
+      - test:
+        - if: "@data-following-space-width > 1.1"
+          then: [t: "⠿"]
+          # non-breaking space width; also avoid spaces added after commas in scripts (78_1)
+        - else_if: "@data-following-space-width >= 0.7 and
+                    ($NewScriptContext='' or not(self::m:mo and .=','))"
+          then: [t: "W"]
+
+-
    name: default
    tag: msqrt
    match: "."
@@ -16,7 +40,7 @@
    - T: "⠩⠔"
    - test:
       if:   # FIX: need to add arbitrary shapes here (see also msub/msup)
-      - "*[2][self::m:mn or"
+      - "*[2][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
               # next test is to make sure there is just one symbol
       - "     ((self::m:mi or self::m:mo) and string-length(text())=1) or"
       - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
@@ -49,8 +73,13 @@
    replace: 
    - T: "#"    # signal end of previous numeric mode
    - x: "*[1]"
-   - t: "N⠌"
-   - x: "*[2]"
+   - test:
+      if: "$Vietnam_UseDropNumbers"
+      then:
+      - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Vietnam')"   # drop numbers for the denominator
+      else:
+      - T: "N⠌"
+      - x: "*[2]"
 
 -
    name: simple-number
@@ -59,8 +88,13 @@
    replace: 
    - T: "#"    # signal end of any previous numeric mode (probably not needed, but...)
    - x: "*[1]"
-   - T: "N⠌"
-   - x: "*[2]"
+   - test:
+      if: "$Vietnam_UseDropNumbers"
+      then:
+      - x: "BrailleChars(translate(*[2], '0123456789', '\ue000\ue001\ue002\ue003\ue004\ue005\ue006\ue007\ue008\ue009'), 'Vietnam')"   # drop numbers for the denominator
+      else:
+      - T: "N⠌"
+      - x: "*[2]"
 
 -
    name: default
@@ -95,7 +129,6 @@
      - x: "*[2]/*[2]/*[1]/*[1]"
      - x: "*[3]"
 
-
 #
 # Matrix/Determinant rules
 # matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
@@ -111,6 +144,14 @@
       - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
    replace: [x: "*[2]"]
 -
+   name: default-cases
+   tag: mrow
+   variables:
+      - RowStart: "*[1]"
+      - RowEnd: "''"
+   match: "*[2][self::m:mtable] and count(*)=2 and *[1][.='{' or .='[' or .='(']"
+   replace: [x: "*[2]"]
+-
    name: default-mtable
    tag: mtable
    match: "."
@@ -120,6 +161,9 @@
   tag: [mtr, mlabeledtr]
   match: "."
   replace:
+   - test:
+      if: "preceding-sibling::*"
+      then: [t: "⣍"]
    - test: 
       if: "count(parent::*) > 1"
       then: [t: "⠠"]
@@ -153,32 +197,50 @@
       # else nothing to braille
 
 -
-   name: no-content
-   tag: math
-   match: "not(*)"      # empty
-   replace: [t: "W"]    # not sure that is right, but this shouldn't happen
+  name: no-content
+  tag: math
+  match: "not(*)"      # empty
+  replace: [t: "W"]    # not sure that is right, but this shouldn't happen
 
 -
-   name: default
-   tag: math
-   match: "."
-   variables:
-      - RowStart: "''"           # empty string -- it needs to be set
-      - RowEnd: "''"             # empty string -- it needs to be set
-      - NewScriptContext: "''"    # empty string -- it needs to be set
-   replace: [x: "*"]
+  name: default
+  tag: math
+  match: "."
+  variables:
+  - RowStart: "''"           # empty string -- it needs to be set
+  - RowEnd: "''"             # empty string -- it needs to be set
+  - NewScriptContext: "''"    # empty string -- it needs to be set
+  - MatchingWhitespace: "false()"
+  replace: [x: "*"]
 
 -
-    name: empty-mrow
-    tag: mrow
-    match: "not(*)"
-    replace: [t: "W"] # not sure what is correct -- if in a fraction, probably something is better than nothing
+  name: empty-mrow
+  tag: mrow
+  match: "not(*)"
+  replace: [t: "W"] # not sure what is correct -- if in a fraction, probably something is better than nothing
 
 -
-   name: default
-   tag: mrow
-   match: "."
-   replace: [x: "*"]
+  name: default
+  tag: mrow
+  match: "."
+  replace: [x: "*"]
+
+- name: chemical-formula-operator-bond
+  tag: mo
+  match: "@data-chemical-bond"
+  replace:
+  # FIX: this might be better/more efficient if in unicode.yaml
+  - bookmark: "@id"
+  - test:
+    - if: "text()='-' or text() = ':'"
+      then: [t: "⠤"]
+    - else_if: "text()='=' or text() = '∷'"
+      then: [t: "⠭"]
+    - else_if: "text()='≡'"
+      then: [t: "⠿"]
+    - else_if: "text()='≣'"
+      then: [t: "⠸⠠⠤"]      # see #237 -- not defined, so use UEB
+      else: [x: "text()"]    # shouldn't happen
 
 -
    # add space after these ops when they are prefix operators
@@ -213,133 +275,122 @@
          then: [t: ""]
 
 -
-   # Non-breaking whitespace is added to the start/end of numbers in cases of adjoining text to help the parse.
-   # These generate a different char inside of a number, so we peel them off here because it doesn't seem possible
-   # to ask "what character position am I inside of an mn?" in unicode.yaml
-   # Here we deal with the messy abnormal case separately
-   name: peel-off-spaces
-   tag: [mn, mi]
-   match: "starts-with(., '\u00A0') or substring(., string-length(.), 1)='\u00A0'"
-   replace:
-   - test:
-      if: "starts-with(., '\u00A0')"
-      then:
-      - t: ""
-      - test:
-         if: "substring(., string-length(.), 1)='\u00A0'"
-         then:
-         - x: "BrailleChars(., 'UEB', 2, string-length(.))"
-         - test:
-            if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
-            then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
-            else: [t: ""]
-         else:
-         - x: "BrailleChars(., 'UEB', 2, string-length(.)+1)"
-      else:
-      - test:
-         if: "substring(., string-length(.), 1)='\u00A0'"
-         then:
-         - x: "BrailleChars(., 'UEB', 1, string-length(.))"
-         - test:
-            if: following-sibling::*[2][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]  # '*[2]' to skip invisible times
-            then: [t: "𝐖"]   # BANA 5(a) -- Units are treated as separate exprs
-            else: [t: ""]
-         else:
-         - x: "BrailleChars(., 'UEB', 1, string-length(.)+1)"
+  name: default
+  tag: mn
+  match: "."
+  replace:
+  - x: "BrailleChars(., 'Vietnam')"
+
+- 
+  name: sin
+  tag: mi
+  match: "text()='sin'"
+  replace:
+  - t: "⠻⠎"
+   
+- 
+  name: cos
+  tag: mi
+  match: "text()='cos'"
+  replace:
+  - t: "⠻⠉"
+   
+- 
+  name: tan
+  tag: mi
+  match: "text()='tan'"
+  replace:
+  - t: "⠻⠞"
+   
+- 
+  name: cot
+  tag: mi
+  match: "text()='cot'"
+  replace:
+  - t: "⠻⠉⠞"
+   
+- 
+  name: arcsin
+  tag: mi
+  match: "text()='arcsin'"
+  replace:
+  - t: "⠁⠗⠉⠻⠎"
+   
+- 
+  name: arccos
+  tag: mi
+  match: "text()='arccos'"
+  replace:
+  - t: "⠁⠗⠉⠻⠉"
+   
+- 
+  name: arctan
+  tag: mi
+  match: "text()='arctan'"
+  replace:
+  - t: "⠁⠗⠉⠻⠞"
+   
+- 
+  name: arccot
+  tag: mi
+  match: "text()='arccot'"
+  replace:
+  - t: "⠁⠗⠉⠻⠉⠞"
 
 -
-   name: default
-   tag: mn
-   match: "."
-   replace:
-   - x: "BrailleChars(., 'UEB')"
-
-- 
-   name: sin
-   tag: mi
-   match: "text()='sin'"
-   replace:
-   - t: "⠻⠎"
-   
-- 
-   name: cos
-   tag: mi
-   match: "text()='cos'"
-   replace:
-   - t: "⠻⠉"
-   
-- 
-   name: tan
-   tag: mi
-   match: "text()='tan'"
-   replace:
-   - t: "⠻⠞"
-   
-- 
-   name: cot
-   tag: mi
-   match: "text()='cot'"
-   replace:
-   - t: "⠻⠉⠞"
-   
-- 
-   name: arcsin
-   tag: mi
-   match: "text()='arcsin'"
-   replace:
-   - t: "⠁⠗⠉⠻⠎"
-   
-- 
-   name: arccos
-   tag: mi
-   match: "text()='arccos'"
-   replace:
-   - t: "⠁⠗⠉⠻⠉"
-   
-- 
-   name: arctan
-   tag: mi
-   match: "text()='arctan'"
-   replace:
-   - t: "⠁⠗⠉⠻⠞"
-   
-- 
-   name: arccot
-   tag: mi
-   match: "text()='arccot'"
-   replace:
-   - t: "⠁⠗⠉⠻⠉⠞"
-
--
-   # FIX: need to deal with all caps
-   name: default
-   tag: [mi, mtext]
-   match: "."
-   replace:
-      - x: "BrailleChars(., 'UEB')"
+  # FIX: need to deal with all caps
+  name: default
+  tag: [mi, mtext]
+  match: "."
+  replace:
+  - test:
+      if:
+      - "IsInDefinition(., 'Units') or"
+      - "(string-length(.)=1 and @mathvariant='normal' and"
+          # avoid chemical elements and also states (e.g., "(g)")
+      - " not(@data-chem-element) and parent::*[1][not(@data-chem-equation='1')]"
+      - ")"
+      then: [t: "W"]
+  - x: "BrailleChars(., 'Vietnam')"
       
 
 -
-   name: default
-   tag: mstyle
-   match: "."
-   replace:
-   - test:
+  name: default
+  tag: mstyle
+  match: "."
+  replace:
+  - test:
       if: "*"
       then: [x: "*"]
       # else do nothing -- no content
 
+-
+  # this captures the output for the mhchem's "<=>", "<<=>", and "<=>>" output (there are no Unicode arrows for them)
+  # this isn't a perfect match, but should be good enough and allows merging all three (see github.com/NSoiffer/MathCAT/issues/60)
+  name: chemistry-mhchem-equilibrium-arrow
+  tag: mover
+  match:
+  -    "*[1][substring(., 1, 1)='↽'] and"
+  -    "*[2][substring(., string-length(), 1)='⇀']"
+  replace:
+  - test:
+      if: "*[1][self::m:mrow]"
+      then_test:
+          if: "*[2][self::m:mrow]"
+          then: [x: "'🣑'"]    # \u1f8d1 this is currently unassigned and may get used by UTC at some point (<=>)
+          else: [x: "'🣓'"]    # \u1f8d3 this is currently unassigned and may get used by UTC at some point (<<=>)
+      else: [x: "'🣒'"]        # \u1f8d2 this is currently unassigned and may get used by UTC at some point (<==>>)
 
 -
-   name: angle   # angles need a shape indicator -- not sure this is the best test (three letters in base, have invisible separators)
-   tag: mover
-   match: "*[2][text()='^'] and *[1][
-              self::m:mrow and count(*)=5 and
-              *[1][self::m:mi] and *[2][text()='\u2063'] and *[3][self::m:mi] and *[4][text()='\u2063'] and *[5][self::m:mi]
-            ]"
-   replace:
-   - t: "⠫⠛"     # shape indicator, g
-   - x: "*[1]"
+  name: angle   # angles need a shape indicator -- not sure this is the best test (three letters in base, have invisible separators)
+  tag: mover
+  match: "*[2][text()='^'] and *[1][
+            self::m:mrow and count(*)=5 and
+            *[1][self::m:mi] and *[2][text()='\u2063'] and *[3][self::m:mi] and *[4][text()='\u2063'] and *[5][self::m:mi]
+          ]"
+  replace:
+  - t: "⠫⠛"     # shape indicator, g
+  - x: "*[1]"
 
 -
    name: single-char-exceptions    # GTM 12
@@ -349,7 +400,7 @@
    - test:
       # omit grouping indicators in the following cases
       if:   # FIX: need to add arbitrary shapes here (also for mroot)
-      - "(*[1][self::m:mn or"
+      - "(*[1][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
               # next test is to make sure there is just one symbol
       - "     ((self::m:mi or self::m:mo) and string-length(text())=1) or"
       - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
@@ -370,7 +421,7 @@
       then: [t: "⠠"]
    - test:
       - if: "*[2][text()='_' or text()='¯']"
-        then: [t: "⠱"]
+        then: [T: "⠨⠱"]
       - else_if: "*[2][text()='→']"
         then: [T: "⠨⠔⠳⠕"]
       - else_if: "*[2][text()='.' or text()='˙']"
@@ -417,7 +468,7 @@
       - test:
          # omit grouping indicators in the following cases
          if:   # FIX: need to add arbitrary shapes here (also for mroot) also multi-char leaf translations except mi
-         - "*[2][self::m:mn or"
+         - "*[2][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
               # next test is to make sure there is just one symbol
               # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
          - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -432,6 +483,15 @@
          - t: "⠱"
    - t: "#"   # signal end script/numeric mode
 
+- name: log-base-power
+  tag: msubsup
+  match: "*[1][.='log']"
+  replace:
+  - x: "*[1]"   # log
+  - T: "⠔"
+  - x: "*[3]"   # superscript
+  - T: "⠢"
+  - x: "*[2]"   # supscript
 
 -
    name: msubsup_default_mmultiscripts_equiv
@@ -441,11 +501,14 @@
    - test:
       # omit grouping indicators in the following cases
       if:   # FIX: need to add arbitrary shapes here (also for mroot)
-      - "(*[1][self::m:mn or self::m:mi or self::m:mo or"
+      - "*[1][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
+                     # next test is to make sure there is just one symbol
+                     # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
+      - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
       - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
       - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
       - "     IsInDefinition(., 'Arrows')"
-      - "    ])"
+      - "    ]"
       then: [x: "*[1]"]
       else:
       - t: "⠣"
@@ -456,12 +519,12 @@
       replace:
       - test:
          - if: "self::m:munderover"
-           then: [t: "⠨⠢"]
+           then: [t: "⠢"]    
            else: [t: "⠢"]
       - test:
          # omit grouping indicators in the following cases
          if:   # FIX: need to add arbitrary shapes here (also for mroot) also multi-char leaf translations except mi
-         - "*[2][self::m:mn or"
+         - "*[2][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
               # next test is to make sure there is just one symbol
               # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
          - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -476,12 +539,12 @@
          - t: "⠜"
       - test:
          - if: "self::m:munderover"
-           then: [t: "⠨⠔"]
-           else: [t: "⠔"]
+           then: [T: "⠔"]     
+           else: [T: "⠔"]
       - test:
          # omit grouping indicators in the following cases
          if:   # FIX: need to add arbitrary shapes here (also for mroot) also multi-char leaf translations except mi
-         - "*[3][self::m:mn or"
+         - "*[3][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
               # next test is to make sure there is just one symbol
               # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
          - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -506,6 +569,7 @@
    - NumChildren: "count(*)"       # need to stash this since the count is wrong inside '*[...]' below
    - Postscripts: "*[position()>1 and position() < (last() + ($NumChildren mod 2) -count($Prescripts))]"
    replace:
+   - x: "*[1]"
    - test:
       if: "$Prescripts"
       then:
@@ -515,11 +579,11 @@
          - with:
             variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
             replace:
-            - t: "⠢"
+            - t: "⠢⠮"
             - test:
                # omit grouping indicators in the following cases
                if:   # FIX: need to add arbitrary shapes here (also for mroot)
-               - "$Prescripts[1][self::m:mn or"
+               - "$Prescripts[1][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
                   # next test is to make sure there is just one symbol
                   # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
                - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -538,11 +602,11 @@
          - with:
             variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
             replace:
-            - t: "⠔"
+            - t: "⠔⠞"
             - test:
                # omit grouping indicators in the following cases
                if:   # FIX: need to add arbitrary shapes here (also for mroot)
-               - "$Prescripts[2][self::m:mn or"
+               - "$Prescripts[2][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
                   # next test is to make sure there is just one symbol
                   # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
                - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -564,11 +628,11 @@
             - with:
                variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
                replace:
-               - t: "⠢"
+               - t: "⠢⠮"
                - test:
                   # omit grouping indicators in the following cases
                   if:   # FIX: need to add arbitrary shapes here (also for mroot)
-                  - "$Prescripts[3][self::m:mn or"
+                  - "$Prescripts[3][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
                      # next test is to make sure there is just one symbol
                      # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
                   - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -587,11 +651,11 @@
             - with:
                variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
                replace:
-               - t: "⠔"
+               - t: "⠔⠞"
                - test:
                   # omit grouping indicators in the following cases
                   if:   # FIX: need to add arbitrary shapes here (also for mroot)
-                  - "$Prescripts[4][self::m:mn or"
+                  - "$Prescripts[4][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
                      # next test is to make sure there is just one symbol
                      # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
                   - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -608,7 +672,6 @@
             if: "count($Prescripts) > 4"   # give up and just dump them out so at least the content is there
             then: [x: "$Prescripts[position() > 4]"]
 
-   - x: "*[1]"
    - test:
       if: "$Postscripts"
       then:
@@ -622,7 +685,7 @@
             - test:
                # omit grouping indicators in the following cases
                if:   # FIX: need to add arbitrary shapes here (also for mroot)
-               - "$Postscripts[1][self::m:mn or"
+               - "$Postscripts[1][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
                   # next test is to make sure there is just one symbol
                   # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
                - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -645,7 +708,7 @@
             - test:
                # omit grouping indicators in the following cases
                if:   # FIX: need to add arbitrary shapes here (also for mroot)
-               - "$Postscripts[2][self::m:mn or"
+               - "$Postscripts[2][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
                   # next test is to make sure there is just one symbol
                   # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
                - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -671,7 +734,7 @@
                - test:
                   # omit grouping indicators in the following cases
                   if:   # FIX: need to add arbitrary shapes here (also for mroot)
-                  - "$Postscripts[3][self::m:mn or"
+                  - "$Postscripts[3][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
                      # next test is to make sure there is just one symbol
                      # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
                   - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -694,7 +757,7 @@
                - test:
                   # omit grouping indicators in the following cases
                   if:   # FIX: need to add arbitrary shapes here (also for mroot)
-                  - "$Postscripts[4][self::m:mn or"
+                  - "$Postscripts[4][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
                      # next test is to make sure there is just one symbol
                      # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
                   - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -720,7 +783,7 @@
                   - test:
                      # omit grouping indicators in the following cases
                      if:   # FIX: need to add arbitrary shapes here (also for mroot)
-                     - "$Postscripts[5][self::m:mn or"
+                     - "$Postscripts[5][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
                         # next test is to make sure there is just one symbol
                         # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
                      - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -743,7 +806,7 @@
                   - test:
                      # omit grouping indicators in the following cases
                      if:   # FIX: need to add arbitrary shapes here (also for mroot)
-                     - "$Postscripts[6][self::m:mn or"
+                     - "$Postscripts[6][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
                         # next test is to make sure there is just one symbol
                         # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
                      - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -769,7 +832,7 @@
                      - test:
                         # omit grouping indicators in the following cases
                         if:   # FIX: need to add arbitrary shapes here (also for mroot)
-                        - "$Postscripts[7][self::m:mn or"
+                        - "$Postscripts[7][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
                            # next test is to make sure there is just one symbol
                            # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
                         - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -792,7 +855,7 @@
                      - test:
                         # omit grouping indicators in the following cases
                         if:   # FIX: need to add arbitrary shapes here (also for mroot)
-                        - "$Postscripts[8][self::m:mn or"
+                        - "$Postscripts[8][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
                            # next test is to make sure there is just one symbol
                            # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
                         - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
@@ -908,7 +971,7 @@
       if:   # FIX: need to add arbitrary shapes here (also for mroot) also multi-char leaf translations except mi
             # next test is to make sure there is just one symbol
             # FIX: the double dot test is likely wrong, but I can't find what other exceptions there are 
-      - "*[1][self::m:mn or"
+      - "*[1][(self::m:mn and not(@data-roman-numeral and string-length(text())>1)) or"
       - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
       - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
       - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
@@ -953,7 +1016,7 @@
            then: [t: "⠳⠺⠗⠣"]                                                           
    - test:
       if: "contains(@notation,'top')"
-      then: [t: "⠱"]                                                                
+      then: [T: "⠨⠱"]                                                                
    - test:
       if: "contains(@notation,'bottom')"
       then: [t: "⠠⠱"]                                                                
@@ -986,7 +1049,7 @@
          if: "string(@lquote)!=''"
          then: [x: "@lquote"]
          else: [t: "⠄⠄"]
-      - x: "BrailleChars(., 'UEB')"
+      - x: "BrailleChars(., 'Vietnam')"
       - test:
          if: "string(@rquote)!=''"
          then: [x: "@rquote"]

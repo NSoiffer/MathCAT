@@ -28,7 +28,7 @@ MathCAT is written in Rust and can be built to interface with many languages. To
 
 MathCAT uses a number of heuristics that try to repair poor MathML and put it in a recommended format. For example, TeX converters and WYSIWYG editors will take "1,234+1" and break the number "1,234" apart at the comma. MathCAT recognizes that and folds the number into a single `mn`. Other repairs are structural such as creating `mrow`s based on information from MathML's operator dictionary and adding invisible function application, multiplication, addition (mixed fractions), and separators (e.g, between the $i$ and $j$ in $a\_{ij}$) when it seems appropriate. This simplifies speech and Nemeth generation and may be useful to other apps. Currently the cleanup is not exposed in an API, but potentially it could be another service of MathCAT. In general, MathCAT is somewhat conservative in its repair. However, it likely will do the wrong thing in some cases, but the hope is it does the right thing much, much more frequently. Finding common mistakes of translators to MathML and patching up the poor MathML is an ongoing project.
 
-## Current Status (updated 8/1/23)
+## Current Status (updated 8/14/23)
 MathCAT is under active development. Initial speech, navigation, and braille (Nemeth, UEB) generation is complete and [NVDA add-on](https://addons.nvda-project.org/addons/MathCAT.en.html) now exists. It should be usable as a MathPlayer replacement for those using the English version or one of the supported translations. It is not as complete or polished in some ways as MathPlayer though. However, it supports both Nemeth and UEB technical braille generation. The Nemeth braille is substantially better than that provided by MathPlayer and other MathML → Nemeth translators. It also includes integration with navigation (uses dots 7 and 8 to indicate the navigation node). Because of the high quality braille output, [BrailleBlaster](https://www.brailleblaster.org/) uses MathCAT for braille generation from MathML.
 
 A number of other AT are working to incorporate MathCAT into their products. Notable among these groups is Vispero/JAWS. No release date for a version of JAWS with MathCAT has been announced yet. [Other companies: if you have incorporated MathCAT into your product and would like to be mentioned here, please contact me by email or add an issue to update the documentation]
@@ -51,19 +51,31 @@ Timeline:
 * ✓ Nov/Dec: Work on at least one translation of MathCAT to another language (pushed back from late spring). Have Indonesian and Vietnamese translations.
 
 2023
-* Spring 2023: add more inference/speech rules (at least units and currency) [on hold due to Math WG intent discussions continuing]
-* Spring 2023: analyze books to better determine what should be in the Unicode short file (hopefully get someone to help with this)
 * Spring 2023: translation work
   * ✓ Create some tools to simplify generation of the Unicode files in different languages
   * Create some tools to help update other languages when the English version changes (adds new rules) [critical]
   * ✓ Add phrases so better starting points for translations can be generated
-  * Work with translators and fix any problems they might turn up
+  * ✓ Work with translators and fix any problems they might turn up
   * Work with translators to hopefully add many languages (added Spanish translation)
 * ✓ (mostly) Summer 2023: Vietnamese braille code 
-* Early 2024: work on UEB → MathML translation and explore UEB → Nemeth math translator
-* Fall 2023: potentially work on 2D Nemeth generation along with Nemeth input
-* Early 2024: work on UEB → MathML translation and explore UEB → Nemeth math translator
+* ✓August/Sept: Add CMU braille code (Spanish and Portuguese standard)
 
+2024
+* ✓ Jan: Automatic builds for the various repos
+* Jan: Portuguese translation
+* Winter-Spring: More translations (Swedish and Finnish speech and braille)
+* Feb: Units and Currency
+* Spring: add more inference/speech rules based on W3C's Math WG core list
+* Spring: analyze books to better determine what should be in the Unicode short file (hopefully get someone to help with this)
+* Spring: more translations
+* Spring/Summer/Fall: work on tools to help maintain translations
+* Summer: explore adding ASCIIMath and LaTeX importers (there are Rust packages for these, but I haven't checked quality and completeness)
+* July: vacation 😎 and ICCHP conference
+* Fall: potentially work on UEB → MathML translation and explore UEB → Nemeth math translator
+
+Longer term
+* other braille input
+* potentially work on 2D Nemeth generation along with other braille codes
 
 
 These plans are very tentative and will likely change based on feedback from users and AT developers.
@@ -111,43 +123,45 @@ Rust is quite efficient. On a Core I7-770K machine (higher end processor circa 2
 </math>
 takes about 4ms to generate the ClearSpeak string
 "_e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren squared, end exponent_" along with the Nemeth braille string "⠑⠘⠤⠹⠂⠌⠆⠼⠈⠡⠷⠹⠭⠤⠨⠍⠌⠨⠎⠼⠾⠘⠘⠆".
-This time is split approximately: 2ms to cleanup the MathML + 1ms for speech generation + 1ms for braille generation.
-The MathML for this expression is:
-```
-<math>
-  <mrow>
-    <msup>
-      <mi>e</mi>
-      <mrow>
-        <mo>&#x2212;</mo>
-        <mfrac>
-          <mn>1</mn>
-          <mn>2</mn>
-        </mfrac>
-        <msup>
-          <mrow>
-            <mrow>
-              <mo>(</mo>
-              <mrow>
-                <mfrac>
-                  <mrow>
-                    <mi>x</mi>
-                    <mo>&#x2212;</mo>
-                    <mi>&#x03BC;</mi>
-                  </mrow>
-                  <mi>&#x03C3;</mi>
-                </mfrac>
-              </mrow>
-              <mo>)</mo>
-            </mrow>
-          </mrow>
-          <mn>2</mn>
-        </msup>
-      </mrow>
-    </msup>
-  </mrow>
-</math>
-```
+This time is split approximately: 2ms to cleanup the MathML + 1ms for speech generation + 1ms for braille generation. This includes time to make sure all the rule files are up to date, which turns out is quite expensive. A preference can be set to turn the checks off (the file checks are mainly useful for debugging). With the check turned off, the time drops to 2.3ms.
+<details>
+<summary>Click to see the MathML for this expression</summary>
+<pre>
+&lt;math&gt;
+  &lt;mrow&gt;
+    &lt;msup&gt;
+      &lt;mi&gt;e&lt;/mi&gt;
+      &lt;mrow&gt;
+        &lt;mo&gt;&#x2212;&lt;/mo&gt;
+        &lt;mfrac&gt;
+          &lt;mn&gt;1&lt;/mn&gt;
+          &lt;mn&gt;2&lt;/mn&gt;
+        &lt;/mfrac&gt;
+        &lt;msup&gt;
+          &lt;mrow&gt;
+            &lt;mrow&gt;
+              &lt;mo&gt;(&lt;/mo&gt;
+              &lt;mrow&gt;
+                &lt;mfrac&gt;
+                  &lt;mrow&gt;
+                    &lt;mi&gt;x&lt;/mi&gt;
+                    &lt;mo&gt;&#x2212;&lt;/mo&gt;
+                    &lt;mi&gt;&#x03BC;&lt;/mi&gt;
+                  &lt;/mrow&gt;
+                  &lt;mi&gt;&#x03C3;&lt;/mi&gt;
+                &lt;/mfrac&gt;
+              &lt;/mrow&gt;
+              &lt;mo&gt;)&lt;/mo&gt;
+            &lt;/mrow&gt;
+          &lt;/mrow&gt;
+          &lt;mn&gt;2&lt;/mn&gt;
+        &lt;/msup&gt;
+      &lt;/mrow&gt;
+    &lt;/msup&gt;
+  &lt;/mrow&gt;
+&lt;/math&gt;
+</pre>
+</details>
 
 MathCAT uses external rules to generate speech and braille.
 These take about 40ms to load; this load only happens the first time the rules are used, or if the speech style, language, or other external preference is changed. An additional 50ms are required to load the full Unicode files for speech and braille,
@@ -169,10 +183,14 @@ Several people helped out in various ways with the project. I am very grateful f
 * Sam Dooley, Murray Sargent, and Volker Sorge -- provided tables of Nemeth translations of characters and Nemeth tests
 
 Translators:
+* Chinese (Traditional) -- Hon-Jang Yang
 * Indonesian -- Dr. Pinta Deniyanti Sampoerno, M.Si; Dr. Meiliasari, S.Pd., M.Sc; and Ari Hendarno, S.Pd., M.kom
 * Spanish -- Noelia Ruiz Martínez (also help with NVDA addon development) and María Allo Roldán
 * Vietnamese -- Dang Hoai Phúc and Trang Pham
 * Others??? -- please volunteer so I can list you here...
+
+The initial translation of many braille characters for braille codes developed in 2024 and beyond was greatly helped by a spreadsheet given to me by Georgious Kouroupetroglou and is the work of a larger team. For more details, see:
+* [MathBrailleCodes Repository](https://access.uoa.gr/mathbraille/index.php/en/), Speech and Accessibility Lab, National and Kapodistrian University of Athens, Greece: P. Riga, T. Antonakopoulou, D. Kouvaras, S. Lentas and G. Kouroupetroglou (2021) “[The BrailleMathCodes Repository](https://access.uoa.gr/mathbraille/index.php/en/)”, Proceedings of the 4th International Workshop on “[Digitization and e-Inclusion in Mathematics and Science 2021](https://workshop.sciaccess.net/deims2021/DEIMS2021_Proceedings.zip)” DEIMS2021, February 18-19, 2021, Tokyo, pp. 105-114. 
 
 Thanks to everyone who volunteered!
 

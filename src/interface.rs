@@ -69,8 +69,14 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
     NAVIGATION_STATE.with(|nav_stack| {
         nav_stack.borrow_mut().reset();
     });
+
+    // We need the main definitions files to be read in so canonicalize can work.
+    // This call reads all of them for the current preferences, but that's ok since they will likely be used
+    crate::speech::SPEECH_RULES.with(|rules| {
+        rules.borrow_mut().read_files()
+    })?;
+
     return MATHML_INSTANCE.with(|old_package| {
-        // FIX: convert this to an included file once I get the full entity list
         static HTML_ENTITIES_MAPPING: phf::Map<&str, &str> = include!("entities.in");
 
         let mut error_message = "".to_string();     // can't return a result inside the replace_all, so we do this hack of setting the message and then returning the error
@@ -101,7 +107,6 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
         if let Err(e) = new_package {
             bail!("Invalid MathML input:\n{}\nError is: {}", &mathml_str, &e.to_string());
         }
-        crate::speech::SpeechRules::initialize_all_rules()?;
 
         let new_package = new_package.unwrap();
         let mathml = get_element(&new_package);
@@ -124,7 +129,7 @@ pub fn get_spoken_text() -> Result<String> {
         let new_package = Package::new();
         let intent = crate::speech::intent_from_mathml(mathml, new_package.as_document())?;
         debug!("Intent tree:\n{}", mml_to_string(&intent));
-        let speech = crate::speech::speak_intent(intent)?;
+        let speech = crate::speech::speak_mathml(intent, "")?;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( speech );
     });
@@ -139,7 +144,7 @@ pub fn get_overview_text() -> Result<String> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
-        let speech = crate::speech::overview_mathml(mathml)?;
+        let speech = crate::speech::overview_mathml(mathml, "")?;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( speech );
     });
@@ -148,20 +153,18 @@ pub fn get_overview_text() -> Result<String> {
 /// Get the value of the named preference.
 /// None is returned if `name` is not a known preference.
 pub fn get_preference(name: String) -> Result<String> {
-    use yaml_rust::Yaml;
+    use crate::prefs::NO_PREFERENCE;
     return crate::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow();
         let pref_manager = rules.pref_manager.borrow();
-        let prefs = pref_manager.merge_prefs();
-        return match prefs.get(&name) {
-            None => bail!("No preference named '{}'", &name),
-            Some(yaml) => match yaml {
-                Yaml::String(s) => Ok(s.clone()),
-                Yaml::Boolean(b)  => Ok( (if *b {"true"} else {"false"}).to_string() ),
-                Yaml::Integer(i)   => Ok( format!("{}", *i)),
-                Yaml::Real(s)   => Ok(s.clone()),
-                _                       => bail!("Internal error in get_preference -- unknown YAML type"),            
-            },
+        let mut value = pref_manager.pref_to_string(&name);
+        if value == NO_PREFERENCE {
+            value = pref_manager.pref_to_string(&name);
+        }
+        if value == NO_PREFERENCE {
+            bail!("No preference named '{}'", &name);
+        } else {
+            return Ok(value);
         }
     });
 }
@@ -185,73 +188,46 @@ pub fn get_preference(name: String) -> Result<String> {
 /// The values are persistent and extend beyond calls to [`set_mathml`].
 /// A value can be overwritten by calling this function again with a different value.
 /// 
-/// FIX: Some preferences are both API and user preferences and something such as '!name' should be used for overrides. Not implemented yet.
+/// Be careful setting preferences -- these potentially override user settings, so only preferences that really need setting should be set.
 pub fn set_preference(name: String, value: String) -> Result<()> {
-    return crate::speech::SPEECH_RULES.with(|rules| {
-        let mut rules = rules.borrow_mut();
+    if name == "Language" {
+        // check the format
+        if !( value == "Auto" ||
+                value.len() == 2 ||
+                (value.len() == 5 && value.as_bytes()[2] == b'-') ) {
+            bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value);
+        }
+    }
+    
+    crate::speech::SPEECH_RULES.with(|rules| {
+        let rules = rules.borrow_mut();
         if let Some(error_string) = rules.get_error() {
             bail!("{}", error_string);
         }
-        // note: Rust complains if I set
-        //    pref_manager = rules.pref_manager.borrow_mut()
-        // here/upfront, so it is borrowed separately below. That way its borrowed lifetime is small
-        let files_changed;
-        {
-            use crate::prefs::NO_PREFERENCE;
-            let mut pref_manager = rules.pref_manager.borrow_mut();
-            if pref_manager.get_api_prefs().to_string(&name) != NO_PREFERENCE {
-                match name.as_str() {
-                    "Pitch" | "Rate" | "Volume" | "CapitalLetters_Pitch"=> {
-                        pref_manager.set_api_float_pref(&name, to_float(&name, &value)?);    
-                    },
-                    "Bookmark" | "CapitalLetters_UseWord" | "CapitalLetters_Beep" => {
-                        pref_manager.set_api_boolean_pref(&name, value.to_lowercase()=="true");    
-                    },
-                    _ => {
-                        pref_manager.set_api_string_pref(&name, &value);
-                    }
-                }
-                files_changed = None;
-            } else if pref_manager.get_user_prefs().to_string(name.as_str()) == NO_PREFERENCE {
-                bail!("set_preference: {} is not a known preference", &name); 
-            } else {
-                files_changed = pref_manager.set_user_prefs(&name, &value);     // assume string valued
-            }
-        }
 
-        match name.as_str() {
-            "SpeechStyle" => {
-                if let Some(files_changed) = files_changed {
-                    rules.invalidate(files_changed);
-                }
-            },
-            "Language" => {
-                // check the format
-                if !( value == "Auto" ||
-                      value.len() == 2 ||
-                      (value.len() == 5 && value.as_bytes()[2] == b'-') ) {
-                        bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value);
-                      }
-                if let Some(files_changed) = files_changed {
-                    rules.invalidate(files_changed);
-                }
-            },
-            "BrailleCode" => {
-                crate::speech::BRAILLE_RULES.with(|braille_rules| {
-                    if let Some(files_changed) = files_changed {
-                        braille_rules.borrow_mut().invalidate(files_changed);
-                    }
-                })
-            },
-            _ => {
+        // we set the value even if it was the same as the old value because this might override a potentially changed future user value
+        let mut pref_manager = rules.pref_manager.borrow_mut();
+        let lower_case_value = value.to_lowercase();
+        if lower_case_value == "true" || lower_case_value == "false" {
+            pref_manager.set_api_boolean_pref(&name, value.to_lowercase()=="true"); 
+        } else { 
+            match name.as_str() {
+                "Pitch" | "Rate" | "Volume" | "CapitalLetters_Pitch"=> {
+                    pref_manager.set_api_float_pref(&name, to_float(&name, &value)?);    
+                },
+                _ => {
+                    pref_manager.set_api_string_pref(&name, &value)?;
+                },
             }
-        }
-        return Ok( () );
-    });
+        };
+        return Ok::<(), Error>( () );
+    })?;
+
+    return Ok( () );
 
     fn to_float(name: &str, value: &str) -> Result<f64> {
-        match value.parse::<f64>() {
-            Ok(val) => return Ok(val),
+        return match value.parse::<f64>() {
+            Ok(val) => Ok(val),
             Err(_) => bail!("SetPreference: preference'{}'s value '{}' must be a float", name, value),
         };
     }
@@ -265,7 +241,7 @@ pub fn get_braille(nav_node_id: String) -> Result<String> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
-        let braille = crate::braille::braille_mathml(mathml, nav_node_id)?.0;
+        let braille = crate::braille::braille_mathml(mathml, &nav_node_id)?;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok( braille );
     });
@@ -462,10 +438,16 @@ fn trim_doc(doc: &Document) {
 
 /// Not really meant to be public -- used by tests in some packages
 pub fn trim_element(e: &Element) {
-    const TEMP_NBSP: &str = "\u{F8FB}";
-
     // "<mtext>this is text</mtext" results in 3 text children
     // these are combined into one child as it makes code downstream simpler
+    
+    // space, tab, newline, carriage return all get collapsed to a single space
+    const WHITESPACE: &[char] = &[' ', '\u{0009}', '\u{000A}', '\u{000D}'];
+    lazy_static! {
+        static ref WHITESPACE_MATCH: Regex = Regex::new(r#"[ \u{0009}\u{000A}\u{000D}]+"#).unwrap();
+    }
+
+
     if is_leaf(*e) {
         // Assume it is HTML inside of the leaf -- turn the HTML into a string
         make_leaf_element(*e);
@@ -488,19 +470,18 @@ pub fn trim_element(e: &Element) {
         }
     }
 
-    // hack to avoid non-breaking whitespace from being removed -- move to a unique non-whitespace char then back
-    let trimmed_text = single_text.replace(' ', TEMP_NBSP).trim().replace(TEMP_NBSP, " ");
+    // CSS considers only space, tab, linefeed, and carriage return as collapsable whitespace
     if !(is_leaf(*e) || name(e) == "intent-literal" || single_text.is_empty()) {  // intent-literal comes from testing intent
         // FIX: we have a problem -- what should happen???
         // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash
-        if !trimmed_text.is_empty() {
+        if !single_text.trim_matches(WHITESPACE).is_empty() {
             error!("trim_element: both element and textual children which shouldn't happen -- ignoring text '{}'", single_text);
         }
         return;
     }
     if e.children().is_empty() && !single_text.is_empty() {
         // debug!("Combining text in {}: '{}' -> '{}'", e.name().local_part(), single_text, trimmed_text);
-        e.set_text(&trimmed_text);
+        e.set_text(&WHITESPACE_MATCH.replace_all(&single_text, " "));
     }
 
     fn make_leaf_element(mathml_leaf: Element) {
@@ -515,37 +496,31 @@ pub fn trim_element(e: &Element) {
 
         // gather up the text
         let mut text ="".to_string();
-        let mut previous_element_was_text = false;
         for child in children {
-            let (child_text, space) = match child {
+            let child_text = match child {
                 ChildOfElement::Element(child) => {
-                    previous_element_was_text = false;
                     if name(&child) == "mglyph" {
-                        (child.attribute_value("alt").unwrap_or("").to_string(), " ")
+                        child.attribute_value("alt").unwrap_or("").to_string()
                     } else {
-                        (gather_text(child), " ")
+                        gather_text(child)
                     }
                 },
                 ChildOfElement::Text(t) => {
-                    let space = !previous_element_was_text;
-                    previous_element_was_text = true;
-                    (t.text().to_string(), if space {" "} else {""})
+                    // debug!("ChildOfElement::Text: '{}'", t.text());
+                    t.text().to_string()
                 },
-                _ => ("".to_string(), ""),
+                _ => "".to_string(),
             };
             if !child_text.is_empty() {
-                // hack to avoid non-breaking whitespace from being removed -- move to a unique non-whitespace
-                text = text + space + child_text.replace(' ', TEMP_NBSP).trim_start();
+                text += &child_text;
             } 
 
         }
 
         // get rid of the old children and replace with the text we just built
         mathml_leaf.clear_children();
-
-        // move hack back to non-breaking whitespace
-        let trimmed_text = text.trim().replace(TEMP_NBSP, " ");
-        mathml_leaf.set_text(&trimmed_text);
+        mathml_leaf.set_text(WHITESPACE_MATCH.replace_all(&text, " ").trim_matches(WHITESPACE));
+        // debug!("make_leaf_element: text is '{}'", crate::canonicalize::as_text(mathml_leaf));
 
         /// gather up all the contents of the element and return them with a leading space
         fn gather_text(html: Element) -> String {
@@ -553,12 +528,13 @@ pub fn trim_element(e: &Element) {
             for child in html.children() {
                 match child {
                     ChildOfElement::Element(child) => {
-                        text = text + " " + gather_text(child).trim_start();
+                        text += &gather_text(child);
                     },
                     ChildOfElement::Text(t) => text += t.text(),
                     _ => (),
                 }
             }
+            // debug!("gather_text: '{}'", text);
             return text;
         }
     }
@@ -764,9 +740,9 @@ mod tests {
             </math>";
         let result_str = "<math>
             <mrow>
-                <mi>X 23braid</mi>
+                <mi>X23braid</mi>
                 <mo>+</mo>
-                <mi>132braid Y</mi>
+                <mi>132braidY</mi>
                 <mo>=</mo>
                 <mi>13braid</mi>
             </mrow>
@@ -830,35 +806,35 @@ mod tests {
         // MathCAT will check the env var "MathCATRulesDir" as an override, so the following test might succeed if we don't override the env var
         env::set_var("MathCATRulesDir", "MathCATRulesDir");
         assert!(set_rules_dir("someInvalidRulesDir".to_string()).is_err());
-        assert!(set_rules_dir(super::super::abs_rules_dir_path()).is_ok());
+        assert!(set_rules_dir(super::super::abs_rules_dir_path()).is_ok(), "\nset_rules_dir to '{}' failed", super::super::abs_rules_dir_path());
         assert!(set_mathml("<math><mn>1</mn></math>".to_string()).is_ok());
     }
 
     #[test]
     fn single_html_in_mtext() {
-        let test = "<math><mn>1</mn> <mtext>a<p>para 1</p>aa</mtext> <mi>y</mi></math>";
-        let target = "<math><mn>1</mn> <mtext>a para 1 aa</mtext> <mi>y</mi></math>";
+        let test = "<math><mn>1</mn> <mtext>a<p> para  1</p>bc</mtext> <mi>y</mi></math>";
+        let target = "<math><mn>1</mn> <mtext>a para 1bc</mtext> <mi>y</mi></math>";
         assert!(are_parsed_strs_equal(test, target));
     }
 
     #[test]
     fn multiple_html_in_mtext() {
-        let test = "<math><mn>1</mn> <mtext>a<p>para 1</p><p>para 2</p>aa</mtext> <mi>y</mi></math>";
-        let target = "<math><mn>1</mn> <mtext>a para 1 para 2 aa</mtext> <mi>y</mi></math>";
+        let test = "<math><mn>1</mn> <mtext>a<p>para 1</p> <p>para 2</p>bc  </mtext> <mi>y</mi></math>";
+        let target = "<math><mn>1</mn> <mtext>apara 1 para 2bc</mtext> <mi>y</mi></math>";
         assert!(are_parsed_strs_equal(test, target));
     }
 
     #[test]
     fn nested_html_in_mtext() {
-        let test = "<math><mn>1</mn> <mtext>a<ol><li>first</li><li>second</li></ol>aa</mtext> <mi>y</mi></math>";
-        let target = "<math><mn>1</mn> <mtext>a first second aa</mtext> <mi>y</mi></math>";
+        let test = "<math><mn>1</mn> <mtext>a <ol><li>first</li><li>second</li></ol> bc</mtext> <mi>y</mi></math>";
+        let target = "<math><mn>1</mn> <mtext>a firstsecond bc</mtext> <mi>y</mi></math>";
         assert!(are_parsed_strs_equal(test, target));
     }
 
     #[test]
     fn empty_html_in_mtext() {
-        let test = "<math><mn>1</mn> <mtext>a<br/>aa</mtext> <mi>y</mi></math>";
-        let target = "<math><mn>1</mn> <mtext>a aa</mtext> <mi>y</mi></math>";
+        let test = "<math><mn>1</mn> <mtext>a<br/>bc</mtext> <mi>y</mi></math>";
+        let target = "<math><mn>1</mn> <mtext>abc</mtext> <mi>y</mi></math>";
         assert!(are_parsed_strs_equal(test, target));
     }
 }

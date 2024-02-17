@@ -387,6 +387,19 @@ fn punct_37_16_1() {
 }
 
 #[test]
+fn punct_37_17_1() {
+    let expr = "<math><mn>0</mn><mo>,</mo><mo>”</mo></math>";
+    test_braille("Nemeth", expr, "⠼⠴⠠⠸⠴");
+}
+
+#[test]
+fn punct_38_1_2() {
+    let expr = "<math><mo>’</mo><mn>49</mn></math>";
+    // Corrected: the green book has the quote mark encoded as if the character was a double quote (”), but this seems like a typo 
+    test_braille("Nemeth", expr, "⠴⠠⠼⠲⠔");
+}
+
+#[test]
 fn punct_38_4_12() {
     let expr = "<math><mi>rate</mi><mo>×</mo><mi>time</mi><mo>.</mo></math>";
     test_braille("Nemeth", expr, "⠗⠁⠞⠑⠈⠡⠞⠊⠍⠑⠲");
@@ -413,7 +426,6 @@ fn colon_40_1() {
 
 #[test]
 fn colon_40_1_mtext() {
-    init_logger();
     let expr = "<math><mtext>3:30</mtext></math>";
     test_braille("Nemeth", expr, "⠼⠒⠸⠒⠼⠒⠴");
 }
@@ -471,6 +483,12 @@ fn omission_57_1() {
 }
 
 #[test]
+fn omission_57_3() {
+    let expr = " <math><mn>7</mn><mo>&#xD7;</mo><mn>2</mn><mo>?</mo><mn>14</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠶⠈⠡⠆⠀⠿⠀⠼⠂⠲");
+}
+
+#[test]
 fn omission_57_4() {
     let expr = "<math><mo>?</mo><mo>+</mo><mo>?</mo><mo>=</mo><mn>10</mn></math>";
     test_braille("Nemeth", expr, "⠿⠬⠿⠀⠨⠅⠀⠼⠂⠴");
@@ -501,7 +519,7 @@ fn omission_57_7() {
 
 #[test]
 fn omission_57_8() {
-    let expr = "<math><mn>5</mn><mo>×</mo><mn>25</mn><mo>=</mo><mspace width='1em'/></math>";
+    let expr = "<math><mn>5</mn><mo>×</mo><mn>25</mn><mo>=</mo><mspace width='1.5em'/></math>";
     test_braille("Nemeth", expr, "⠼⠢⠈⠡⠆⠢⠀⠨⠅⠀⠿");
 }
 
@@ -1419,21 +1437,39 @@ fn nested_sqrt_105_4() {
 }
 
 #[test]
-fn shape_110_1() {
-    let expr = "<math><mo>∠</mo><mn>1</mn></math>";
-    test_braille("Nemeth", expr, "⠫⠪⠀⠼⠂");
-}
-
-#[test]
 fn menclose_111_a_4() {
     let expr = "<math><menclose notation='phasorangle'><mrow><mn>30</mn><mo>&#xB0;</mo></mrow></menclose></math>";
     test_braille("Nemeth", expr, "⠫⠪⠸⠫⠼⠒⠴⠘⠨⠡⠐⠻");
 }
 
 #[test]
-fn menclose_115_1() {
+fn menclose_111_a_1() {
     let expr = "<math><menclose notation='circle'><mi>A</mi></menclose></math>";
     test_braille("Nemeth", expr, "⠫⠉⠸⠫⠠⠁⠻");
+}
+
+#[test]
+fn shape_115_a_1() {
+    let expr = "<math><mo>∠</mo><mn>1</mn></math>";
+    test_braille("Nemeth", expr, "⠫⠪⠀⠼⠂");
+}
+
+#[test]
+fn shape_115_a_3() {
+    let expr = "<math><mo>&#x25CB;</mo><mi>R</mi></math>";
+    test_braille("Nemeth", expr, "⠫⠉⠀⠠⠗");
+}
+
+#[test]
+fn shape_115_a_6() {
+    let expr = "<math><mo>∟</mo><mi>A</mi></math>";
+    test_braille("Nemeth", expr, "⠫⠪⠨⠗⠻⠀⠠⠁");
+}
+
+#[test]
+fn shape_115_a_11() {
+    let expr = "<math><mi>m</mi><mo>&#x2220;</mo><mi>A</mi><mi>B</mi><mi>C</mi></math>";
+    test_braille("Nemeth", expr, "⠍⠫⠪⠀⠠⠁⠠⠃⠠⠉");
 }
 
 #[test]
@@ -1557,6 +1593,13 @@ fn ratio_151_10() {
 fn ratio_151_11() {
     let expr = "<math><mi>a</mi><mo>+</mo><mi>b</mi><mo>:</mo><mi>b</mi><mo>∷</mo><mi>c</mi><mo>+</mo><mi>d</mi><mo>:</mo><mi>d</mi></math>";
     test_braille("Nemeth", expr, "⠁⠬⠃⠀⠐⠂⠀⠃⠀⠰⠆⠀⠉⠬⠙⠀⠐⠂⠀⠙");
+}
+
+#[test]
+fn space_after_punct_bug_152() {
+    // this was a bug involving a bad cleanup rule for whitespace after punctuation
+    let expr = "<math><mn>7</mn><mover><mo>=</mo><mo>?</mo></mover><mn>8</mn></math>";
+    test_braille("Nemeth", expr, "⠼⠶⠀⠐⠨⠅⠣⠸⠦⠻⠀⠼⠦");
 }
 
 #[test]

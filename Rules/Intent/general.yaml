@@ -41,7 +41,7 @@
   
 -
   name: roman_numeral
-  tag: [mi, mtext]
+  tag: [mi, mn, mtext]
   match: "@data-number"
   replace: 
   - intent:
@@ -266,9 +266,21 @@
       children: [x: "*[2]"]
 
 -
+  name: log-base-power
+  tag: msubsup
+  match:
+  - "*[1][self::m:mi][text()='log']"
+  replace:
+  - intent:
+      name: log-base-power
+      children:
+      - x: "*[2]"
+      - x: "*[3]"
+
+-
   name: bigop
   tag: [msub, munder]
-  match: "IsLargeOp(*[1]) or contains(@data-intent-property, ':largeop:')"
+  match: "IsInDefinition(*[1], 'LargeOperators') or contains(@data-intent-property, ':largeop:')"
   replace: 
   - intent:
       name: "large-op"    # Fix: the name in the spreadsheet needs updating/fixing
@@ -278,12 +290,13 @@
 -
   name: limit
   tag: [msub, munder]
-  match: "*[1][text()='lim']"
+  variables: [NoSpacesBase: "translate(*[1], ' \u00A0\u2004\u2005\u2006\u2007\u2008\u2009\u200A','')"]   # Sometimes these have (weird) spaces in them
+  match: "*[1][$NoSpacesBase='lim' or $NoSpacesBase='limsup' or $NoSpacesBase='liminf']"
   replace: 
   - intent:
-      name: "limit"    # Fix: the name in the spreadsheet needs updating/fixing
+      name: "limit"
       children:
-      - x: "*[1]"
+      - x: "$NoSpacesBase"
       - x: "*[2]"
 
 -
@@ -315,9 +328,9 @@
           if: "*[1][self::m:mrow]"
           then_test:
               if: "*[2][self::m:mrow]"
-              then: [t: "\u2B96"]    # this is currently unassigned and may get used by UTC at some point (<=>)
-              else: [t: "\u2B74"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
-          else: [t: "\u2B75"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
+              then: [t: "\u1f8d2"]    # this is currently unassigned and may get used by UTC at some point (<=>)
+              else: [t: "\u1f8d4"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
+          else: [t: "\u1f8d3"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
 
 -
   # need to include the name of the element so the rules know whether to say "sub" or "super"
@@ -494,7 +507,7 @@
   - "*[2][self::m:mrow][count(*)=2] and"                        # exponent is an mrow with children...
   - "*[2]/*[1][self::m:mo][text()='-'] and"                     #   '-'
   - "*[2]/*[2][self::m:mn][text()=1] and"                       #  and '1'
-  - "*[1][self::m:mi] and IsNode(*[1], 'trig_name') and"        # base is a trig function name (e.g, sin, sinh)
+  - "*[1][self::m:mi] and IsInDefinition(*[1], 'TrigFunctionNames') and"        # base is a trig function name (e.g, sin, sinh)
   - "following-sibling::*[1][self::m:mo][text()='\u2061']"      # and msup is followed by invisible function apply
   replace:
   - intent:
@@ -506,7 +519,7 @@
 -
   name: bigop
   tag: [msubsup, munderover]
-  match: "IsLargeOp(*[1]) or contains(@data-intent-property, ':largeop:')"
+  match: "IsInDefinition(*[1], 'LargeOperators') or contains(@data-intent-property, ':largeop:')"
   replace: 
   - intent:
       name: "large-op"    # Fix: the name in the spreadsheet needs updating/fixing
@@ -582,7 +595,9 @@
 -
   name: mtable-matrix-property
   tag: mtable
-  match: "contains(@data-intent-property, ':matrix:')"
+  match:
+  - "contains(@data-intent-property, ':matrix:') or"
+  - "..[self::m:mrow and (IsBracketed(., '(', ')') or IsBracketed(., '[', ']'))]"
   replace:
   - intent:
       name: "matrix"
@@ -592,7 +607,7 @@
 -
   name: mtable-determinant-property
   tag: mtable
-  match: "contains(@data-intent-property, ':determinant:')"
+  match: "contains(@data-intent-property, ':determinant:') or ..[self::m:mrow and IsBracketed(., '|', '|')]"
   replace:
   - intent:
       name: "determinant"
@@ -602,7 +617,9 @@
 -
   name: mtable-cases-property
   tag: mtable
-  match: "contains(@data-intent-property, ':cases:')"
+  match:
+  - "contains(@data-intent-property, ':cases:') or"
+  - "..[self::m:mrow and count(*)=2 and *[1][text()='{']]"
   replace:
   - intent:
       name: "cases"
@@ -651,10 +668,12 @@
   match: "count(*)=2 and *[1][text()='{'] and *[2][self::m:mtable]"
   replace:
   - intent:
-      name: "cases"
+      name: "intent-wrapper"
       children:
-      - x: "*[2]/*"
-
+      - intent:
+          name: "cases"
+          id: "*[2]/@id"
+          children: [x: "*[2]/*"]
 
 -
   # if there is a relational op in the first row, assume that's true of all rows and call them equations

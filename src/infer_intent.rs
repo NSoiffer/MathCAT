@@ -20,7 +20,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
         Ok(intent) => return Ok(intent),
         Err(e) => {
             // lookup what we should do for error recovery
-            let intent_preference = rules_with_context.get_rules().pref_manager.borrow().get_api_prefs().to_string("IntentErrorRecovery");
+            let intent_preference = rules_with_context.get_rules().pref_manager.borrow().pref_to_string("IntentErrorRecovery");
             if intent_preference == "Error" {
                 return Err(e);
             } else {
@@ -429,7 +429,7 @@ mod tests {
 		use crate::interface::*;
 		// this forces initialization
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
-        crate::speech::SpeechRules::initialize_all_rules().unwrap();
+        // crate::speech::SpeechRules::initialize_all_rules().unwrap();
         set_preference("IntentErrorRecovery".to_string(), intent_error_recovery.to_string()).unwrap();
         let package1 = &parser::parse(mathml).expect("Failed to parse test input");
         let mathml = get_element(package1);

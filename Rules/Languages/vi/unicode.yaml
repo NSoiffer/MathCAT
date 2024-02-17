@@ -14,6 +14,8 @@
 
  - "0-9": [T: "."]
 
+ - " ": [t: " "]                                 # 0x20
+
  - "!": [T: giai thừa]                           # 0x21
  - "\"": [T: nháy kép]                     # 0x22
  - "#": [T: báo số]                              # 0x23
@@ -75,7 +77,7 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [T: mở ngoặc vuông]
         else: [T: ngoặc vuông trái]                            
- - "\\": [T: chéo ngược]                         # 0x5c
+ - "\\": [T: hiệu]                         # 0x5c
  - "]":                                          # 0x5d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
@@ -92,13 +94,13 @@
  - "|":                                          # 0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" in side of sets is handled at the mrow level, same for 'sets'
      - test:
-        - if: $SpeechStyle != 'ClearSpeak'
+        - if: "$SpeechStyle != 'ClearSpeak' or not(preceding-sibling::*) or not(following-sibling::*)"
           then: [T: gạch đứng]
         - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
           then: [T: sao cho]
         - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
-          then: [T: được cho] 
-        - else: [T: phân chia]                   
+          then: [T: sao cho] 
+        - else: [T: sao cho]                   
 
  - "}":                                          # 0x7d
     - test:
@@ -162,31 +164,31 @@
  - "β": [T: bê ta]                                # 0x3b2
  - "γ": [T: gam ma]                               # 0x3b3
  - "δ": [T: đen ta]                               # 0x3b4
- - "ε": [T: ép xi lon]                             # 0x3b5
+ - "ε": [T: ép si lon]                             # 0x3b5
  - "ζ": [T: dê ta]                                # 0x3b6
  - "η": [T: ê ta]                                 # 0x3b7
- - "θ": [T: thê ta]                               # 0x3b8
+ - "θ": [T: tê ta]                               # 0x3b8
  - "ι": [T: i ô ta]                                # 0x3b9
- - "κ": [T: ca ba]                               # 0x3ba
+ - "κ": [T: k pa]                               # 0x3ba
  - "λ": [T: lam đa]                               # 0x3bb
  - "μ": [T: mu]                                  # 0x3bc
  - "ν": [T: nu]                                  # 0x3bd
- - "ξ": [T: giai]                                 # 0x3be
- - "ο": [T: o mi ron]                             # 0x3bf
- - "π": [T: bi]                                  # 0x3c0
+ - "ξ": [T: xi]                                 # 0x3be
+ - "ο": [T: o mi rong]                             # 0x3bf
+ - "π": [T: pi]                                  # 0x3c0
  - "ρ": [T: rô]                                 # 0x3c1
  - "ς": [T: xích ma cuối]                         # 0x3c2
  - "σ": [T: xích ma]                               # 0x3c3
- - "τ": [T: tau]                                 # 0x3c4
- - "υ": [T: ấp xi lon]                             # 0x3c5
+ - "τ": [T: tô]                                 # 0x3c4
+ - "υ": [T: ấp si lon]                             # 0x3c5
  - "φ": [T: phi]                                 # 0x3c6
  - "χ": [T: cai]                                 # 0x3c7
- - "ψ": [T: psi]                                 # 0x3c8
+ - "ψ": [T: bờ si]                                 # 0x3c8
  - "ω": [T: ô mê ga]                               # 0x3c9
  - "ϕ": [T: phi]                                 # 0x3d5
- - "ϖ": [T: bi]                                  # 0x3d6
- - "ϵ": [T: ép xi lon]                             # 0x3f5
- - "϶": [T: ép xi lon đảo ngược]                    # 0x3f6
+ - "ϖ": [T: pi]                                  # 0x3d6
+ - "ϵ": [T: ép si lon]                             # 0x3f5
+ - "϶": [T: ép si lon đảo ngược]                    # 0x3f6
  - "А":                                          # 0x410
      - T: a
      - test: 
@@ -216,7 +218,7 @@
  - "⁢": [T: ""]                                   # 0x2062
  - "⁣": [T: ""]                                   # 0x2063
  - "⁤": [T: "và"]                                # 0x2064
- - "′": [T: đạo hàm]                               # 0x2032
+ - "′": [T: phẩy]                               # 0x2032
  - "″": [T: đạo hàm cấp hai]                        # 0x2033
  - "‴": [T: đạo hàm cấp ba]                        # 0x2034
  - "‵": [T: nguyên hàm]                      # 0x2035
@@ -287,10 +289,10 @@
  - "→":                                          # 0x2192
      - test:
         if: "ancestor::*[2][self::m:limit]"
-        then: [T: "tiếp cận"]
+        then: [T: "tiến đến"]
         else: [T: "mũi tên phải"]
  - "↓": [T: mũi tên xuống]                     # 0x2193
- - "⇒": [T: mũi tên đôi hướng phải]             # 0x21d2
+ - "⇒": [T: suy ra]             # 0x21d2
  - "∀": [T: với mọi]                             # 0x2200
  - "∂":                                          # 0x2202
       - test: 
@@ -304,7 +306,7 @@
    #  - test: 
     #     if: "$Verbosity!='Terse'"
      #    then: [T: "the"]
-     - T: tam giác
+     - T: đen ta
  - "∇":                                          # 0x2207
    #  - test: 
     #     if: "$Verbosity!='Terse'"
@@ -327,17 +329,17 @@
               - else: [T: thuộc về]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [T: là một phần tử của]
+                then: [T: thuộc]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [T: là một phần tử của]
+                then: [T: thuộc]
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: thuộc]
-              - else: [T: thuộc về]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+              - else: [T: thuộc]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
  - "∉":                                          # 0x2209
     # rule is identical to 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [T: không là phần tử thuộc]
+        then: [T: không thuộc]
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set
@@ -345,22 +347,22 @@
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: không thuộc]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [T: không là phần tử thuộc]
+                then: [T: không thuộc]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [T: không là phần tử thuộc]
+                then: [T: không thuộc]
               - else: [T: không thuộc về]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [T: không là phần tử thuộc]
+                then: [T: không thuộc]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [T: không là phần tử thuộc]
+                then: [T: không thuộc]
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: không thuộc]
-              - else: [T: không thuộc về]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+              - else: [T: không thuộc]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
  - "∊":                                          # 0x220a
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [T: là phần tử của]
+        then: [T: thuộc]
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set
@@ -368,18 +370,18 @@
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: thuộc]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [T: phần tử của]
+                then: [T: thuộc]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [T: phần tử của]
-              - else: [T: thuộc về]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+                then: [T: thuộc]
+              - else: [T: thuộc]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [T: là một phần tử của]
+                then: [T: thuộc]
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [T: là một phần tử của]
+                then: [T: thuộc]
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: thuộc]
-              - else: [T: thuộc về]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+              - else: [T: thuộc]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
  - "∏": [T: pi]                             # 0x220f
  - "∐": [T: pi ngược]                           # 0x2210
  - "∑": [T: tổng]                                 # 0x2211
@@ -444,41 +446,41 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: {T: trùng với}
- - "≤":                                          # 0x2264
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: {T: nhỏ hơn hoặc bằng}
- - "≥":                                          # 0x2265
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: {T: lớn hơn hoặc bằng}
+ - "≤": [T: nhỏ hơn hoặc bằng]                                         # 0x2264
+     #- test: 
+         #if: "$Verbosity!='Terse'"
+         #then: {T: nhỏ hơn hoặc bằng}
+ - "≥": [T: lớn hơn hoặc bằng]                                         # 0x2265
+     #- test: 
+         #if: "$Verbosity!='Terse'"
+         #then: {T: lớn hơn hoặc bằng}
  - "≦": [T: nhỏ hơn hoặc bằng]             # 0x2266
  - "≧": [T: lớn hơn hoặc bằng]          # 0x2267
  - "≺": [T: precedes]                            # 0x227a
  - "≻": [T: succeeds]                            # 0x227b
- - "⊂":                                          # 0x2282
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: {T: là tập hợp con của}
- - "⊃":                                          # 0x2283
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: {T: là tập cha của}
+ - "⊂": [T: chứa trong]                                         # 0x2282
+     #- test: 
+         #if: "$Verbosity!='Terse'"
+         #then: {T: chứa trong}
+ - "⊃": [T: chứa]                                         # 0x2283
+     #- test: 
+         #if: "$Verbosity!='Terse'"
+         #then: {T: chứa}
  - "⊄":                                          # 0x2284
    #  - test: 
     #     if: "$Verbosity!='Terse'"
      #    then: [T: is]
-     - T: không là tập con của
+     - T: không chứa trong
  - "⊅":                                          # 0x2285
    #  - test: 
     #     if: "$Verbosity!='Terse'"
      #    then: [T: is]
-     - T: không là tập cha của
- - "⊆":                                          # 0x2286
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: {T: là tập hợp con của}
- - "⊇":                                          # 0x2287
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: {T: là tập hợp cha của}
+     - T: không chứa
+ - "⊆": [T: chứa trong hoặc bằng]                                         # 0x2286
+     #- test: 
+         #if: "$Verbosity!='Terse'"
+         #then: {T: chứa trong}
+ - "⊇": [T: chứa hoặc bằng]                                         # 0x2287
+     #- test: 
+         #if: "$Verbosity!='Terse'"
+         #then: {T: chứa}

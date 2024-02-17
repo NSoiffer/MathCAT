@@ -38,6 +38,8 @@ fn limit() {
             </mrow>
         </math>";
     test("en", "SimpleSpeak", expr, "the limit as x approaches 0, of, fraction, sine of x, over x, end fraction;");
+    test_prefs("en", "SimpleSpeak", vec![("Impairment", "LearningDisability")], expr,
+            "the limit as x approaches 0, of; sine of x, over x;");
 }
 
 #[test]
@@ -134,9 +136,11 @@ fn simple_msubsup() {
 
 #[test]
 fn non_simple_msubsup() {
-    let expr = "<math><msubsup><mi>i</mi><mrow><mi>j</mi><mo>&#x2212;</mo><mn>2</mn></mrow><mi>k</mi></msubsup></math>";
-    test("en", "SimpleSpeak", expr, "i sub j minus 2 end sub, to the k-th");
-    test("en", "ClearSpeak", expr, "i sub j minus 2 end sub, to the k-th power");
+  let expr = "<math><msubsup><mi>i</mi><mrow><mi>j</mi><mo>&#x2212;</mo><mn>2</mn></mrow><mi>k</mi></msubsup></math>";
+  test("en", "SimpleSpeak", expr, "i sub j minus 2 end sub, to the k-th");
+  test("en", "ClearSpeak", expr, "i sub j minus 2 end sub, to the k-th power");
+  test_prefs("en", "SimpleSpeak", vec![("Impairment", "LearningDisability")], expr,
+          "i sub j minus 2, to the k-th");
 }
 
 #[test]
@@ -244,7 +248,7 @@ fn ignore_comma() {
       </mstyle>
     </mrow>
 </math>";
-    test("en", "SimpleSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
+    test("en", "SimpleSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power,");
 }
 
 #[test]
@@ -292,4 +296,23 @@ fn ignore_period_and_space() {
 fn mn_with_space() {
     let expr = "<math><mn>1 234 567</mn></math>";
     test("en", "SimpleSpeak", expr, "1234567");
+}
+
+#[test]
+fn bug_199_2pi() {
+  let expr = "<math>
+      <mrow>
+        <mo stretchy=\"false\" form=\"prefix\">[</mo>
+        <mspace width=\"0.333em\"></mspace>
+        <mn>0</mn>
+        <mspace width=\"0.333em\"></mspace>
+        <mo>,</mo>
+        <mspace width=\"0.333em\"></mspace>
+        <mn>2</mn>
+        <mi>π</mi>
+        <mspace width=\"0.333em\"></mspace>
+        <mo stretchy=\"false\" form=\"postfix\">)</mo>
+      </mrow>
+    </math>";
+  test("en", "SimpleSpeak",expr, "the closed open interval from 0 to 2 pi");
 }
