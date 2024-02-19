@@ -170,7 +170,7 @@ fn main() {
   //     </mrow>
   //   </math>";
   let expr=r#"
-  <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <math display='block'>
   <mrow>
     <msup>
       <mi>e</mi>
@@ -228,9 +228,9 @@ fn main() {
   info!("Version = '{}'", get_version());
   set_preference("Language".to_string(), "en".to_string()).unwrap();
   set_preference("TTS".to_string(), "None".to_string()).unwrap();
-  set_preference("Verbosity".to_string(), "Medium".to_string()).unwrap();
+  set_preference("Verbosity".to_string(), "Medium,".to_string()).unwrap();
   set_preference("Impairment".to_string(), "Blindness".to_string()).unwrap();
-  // set_preference("SpeechOverrides_CapitalLetters".to_string(), "".to_string()).unwrap();
+  set_preference("SpeechOverrides_CapitalLetters".to_string(), "".to_string()).unwrap();
   // set_preference("CapitalLetters_UseWord".to_string(), "true".to_string()).unwrap();
   // set_preference("CapitalLetters_Pitch".to_string(), "30".to_string()).unwrap();
   set_preference("CapitalLetters_Beep".to_string(), "true".to_string()).unwrap();

@@ -988,7 +988,6 @@ impl DefinitionValue {
     }
 }
 
-
 pub struct DistanceFromLeaf;
 impl DistanceFromLeaf {
     fn distance(element: Element, use_left_side: bool, treat_2d_elements_as_tokens: bool) -> usize {
