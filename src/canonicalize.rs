@@ -2249,8 +2249,7 @@ impl CanonicalizeContext {
 			let mut children = mrow.children();
 			// check to see if mrow of all psuedo scripts
 			if children.iter().all(|&child| {
-				let child = as_element(child);
-				name(&child) == "mo" && PSEUDO_SCRIPTS.contains(as_text(child))
+				is_pseudo_script(as_element(child))
 			}) {
 				let parent = mrow.parent().unwrap().element().unwrap();  // must exist
 				let is_first_child = mrow.preceding_siblings().is_empty();
@@ -2272,7 +2271,7 @@ impl CanonicalizeContext {
 			let mut found = false;
 			while i < children.len() {
 				let child = as_element(children[i]);
-				if (name(&child) == "mo" && PSEUDO_SCRIPTS.contains(as_text(child))) ||
+				if is_pseudo_script(child) ||
 				   child.attribute("data-pseudo-script").is_some() {
 					let msup = create_mathml_element(&child.document(), "msup");
 					msup.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
@@ -2289,6 +2288,27 @@ impl CanonicalizeContext {
 				mrow.replace_children(children)
 			}
 			return mrow;
+
+			fn is_pseudo_script(child: Element) -> bool {
+				if name(&child) == "mo" {
+					let text = as_text(child);
+					if PSEUDO_SCRIPTS.contains(as_text(child)) {
+						if text == "*" {
+							// could be infix "*" -- this is a weak check to see if what follows is potentially an operand
+							let following_siblings = child.following_siblings();
+							if  following_siblings.is_empty() {
+								return true;
+							}
+							let first_child = as_element(following_siblings[0]);
+							return name(&first_child) != "mo" || ["(", "[", "{"].contains(&text);
+						} else {
+							return true;
+						}
+					}
+				}
+				return false;
+			}
+
 		}
 
 		fn handle_convert_to_mmultiscripts(children: &mut Vec<ChildOfElement>) {
