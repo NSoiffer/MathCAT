@@ -129,6 +129,7 @@ thread_local!{
     /// See [`Definitions`] for more details.
     pub static SPEECH_DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::new() );
     pub static BRAILLE_DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::new() );
+    pub static DEFINITIONS: &'static std::thread::LocalKey<RefCell<Definitions>> = &SPEECH_DEFINITIONS;
 }
 
 /// Reads the `definitions.yaml` files specified by current_files -- these are presumed to need updating. 
@@ -143,7 +144,9 @@ pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
     definitions.with( |defs| defs.borrow_mut().name_to_var_mapping.clear() );
     let mut new_files = vec![file_path.to_path_buf()];
     let mut files_read = read_one_definitions_file(use_speech_defs, file_path).chain_err(|| format!("in file '{}", file_path.to_string_lossy()))?;
-    verify_definitions(use_speech_defs)?;
+    if use_speech_defs {
+        verify_speech_definitions(use_speech_defs)?;
+    }
     new_files.append(&mut files_read);
 
     // merge the contents of `TrigFunctions` into a set that contains all the function names (from `AdditionalFunctionNames`).
@@ -165,7 +168,7 @@ pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
     }
 }
 
-fn verify_definitions(use_speech_defs: bool) -> Result<()> {
+fn verify_speech_definitions(use_speech_defs: bool) -> Result<()> {
     // all of the 'numbers-xxx' files should be either size 0 or multiples of tens except:
     //   ...-ones
     //   numbers-plural, which should have a single entry
