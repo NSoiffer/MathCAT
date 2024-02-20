@@ -19,10 +19,11 @@
 
 use sxd_document::dom::{Element, ChildOfElement};
 use sxd_xpath::{Value, Context, context, function::*, nodeset::*};
-use crate::definitions::SPEECH_DEFINITIONS;
+use crate::definitions::{Definitions, SPEECH_DEFINITIONS, BRAILLE_DEFINITIONS};
 use regex::Regex;
 use crate::pretty_print::mml_to_string;
-use std::cell::Ref;
+use std::cell::{Ref, RefCell};
+use std::thread::LocalKey;
 use phf::phf_set;
 use sxd_xpath::function::Error as XPathError;
 
@@ -864,10 +865,9 @@ pub struct IsInDefinition;
 impl IsInDefinition {
     /// Returns true if `test_str` is in `set_name`
     /// Returns an error if `set_name` is not defined
-    pub fn is_defined_in(test_str: &str, set_name: &str) -> Result<bool, Error> {
-        return SPEECH_DEFINITIONS.with(|definitions| {
-            let definitions = definitions.borrow();
-            if let Some(set) = definitions.get_hashset(set_name) {
+    pub fn is_defined_in(test_str: &str, defs: &'static LocalKey<RefCell<Definitions>>, set_name: &str) -> Result<bool, Error> {
+        return defs.with(|definitions| {
+            if let Some(set) = definitions.borrow().get_hashset(set_name) {
                 return Ok( set.contains(test_str) );
             }
             return Err( Error::Other( format!("\n  IsInDefinition: '{}' is not defined in definitions.yaml", set_name) ) );
@@ -890,10 +890,21 @@ impl IsInDefinition {
                         -> Result<Value<'d>, Error>
     {
         let mut args = Args(args);
-        args.exactly(2)?;
+        // FIX: temporarily accept two args as assume SPEECH_DEFINITIONS until the Rule files are fixed
+        args.at_least(2)?;
+        args.at_most(3)?;
         let set_name = args.pop_string()?;
+        let definitions = if args.len() == 2 {
+            match args.pop_string()?.as_str() {
+                "Speech" => &SPEECH_DEFINITIONS,
+                "Braille" => &BRAILLE_DEFINITIONS,
+                _ => return Err( Error::Other("IsInDefinition:: second argument must be either 'Speech' or 'Braille'".to_string()) )
+            }
+        } else {
+            &SPEECH_DEFINITIONS
+        };
         match &args[0] {
-            Value::String(str) => return match IsInDefinition::is_defined_in(str, &set_name) {
+            Value::String(str) => return match IsInDefinition::is_defined_in(str, definitions, &set_name) {
                 Ok(result) => Ok( Value::Boolean( result ) ),
                 Err(e) => Err(e),
             },
@@ -907,7 +918,7 @@ impl IsInDefinition {
                         if text.is_empty() {
                             Ok( Value::Boolean(false) )
                         } else {
-                            match IsInDefinition::is_defined_in(&text, &set_name) {
+                            match IsInDefinition::is_defined_in(&text, definitions, &set_name) {
                                 Ok(result) => Ok( Value::Boolean( result ) ),
                                 Err(e) => Err(e),
                             }          

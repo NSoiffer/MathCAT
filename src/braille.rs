@@ -2,6 +2,7 @@
 use strum_macros::Display;
 use sxd_document::dom::{Element, ChildOfElement};
 use sxd_document::Package;
+use crate::definitions::SPEECH_DEFINITIONS;
 use crate::errors::*;
 use crate::pretty_print::mml_to_string;
 use crate::prefs::PreferenceManager;
@@ -2633,9 +2634,9 @@ impl NeedsToBeGrouped {
                 // '¨', etc., brailles as two chars -- there probably is some exception list but I haven't found it -- these are the ones I know about
                 return !((is_one_char && !['¨', '″', '‴', '⁗'].contains(&first_char)) ||                       // clause 8
                             // "lim", "cos", etc., appear not to get parens, but the rules don't mention it (tests show it)
-                            IsInDefinition::is_defined_in(text, "FunctionNames").unwrap() ||
-                            IsInDefinition::is_defined_in(text, "Arrows").unwrap() ||          // clause 4
-                            IsInDefinition::is_defined_in(text, "GeometryShapes").unwrap());   // clause 5
+                            IsInDefinition::is_defined_in(text, &SPEECH_DEFINITIONS, "FunctionNames").unwrap() ||
+                            IsInDefinition::is_defined_in(text, &SPEECH_DEFINITIONS, "Arrows").unwrap() ||          // clause 4
+                            IsInDefinition::is_defined_in(text, &SPEECH_DEFINITIONS, "GeometryShapes").unwrap());   // clause 5
             },
             "mrow" => {
                 // check for bracketed exprs
@@ -2724,9 +2725,9 @@ impl NeedsToBeGrouped {
                 // '¨', etc., brailles as two chars -- there probably is some exception list but I haven't found it -- these are the ones I know about
                 return !((is_one_char && !['¨', '″', '‴', '⁗'].contains(&first_char)) ||                       // clause 8
                             // "lim", "cos", etc., appear not to get parens, but the rules don't mention it (tests show it)
-                            IsInDefinition::is_defined_in(text, "FunctionNames").unwrap() ||
-                            IsInDefinition::is_defined_in(text, "Arrows").unwrap() ||          // clause 4
-                            IsInDefinition::is_defined_in(text, "GeometryShapes").unwrap());   // clause 5
+                            IsInDefinition::is_defined_in(text, &SPEECH_DEFINITIONS, "FunctionNames").unwrap() ||
+                            IsInDefinition::is_defined_in(text, &SPEECH_DEFINITIONS, "Arrows").unwrap() ||          // clause 4
+                            IsInDefinition::is_defined_in(text, &SPEECH_DEFINITIONS, "GeometryShapes").unwrap());   // clause 5
             },
             "mrow" => {
                 // check for bracketed exprs
@@ -2803,9 +2804,9 @@ impl NeedsToBeGrouped {
                 // '¨', etc., brailles as two chars -- there probably is some exception list but I haven't found it -- these are the ones I know about
                 return !((is_one_char && !['¨', '″', '‴', '⁗'].contains(&first_char)) ||                       // clause 8
                             // "lim", "cos", etc., appear not to get parens, but the rules don't mention it (tests show it)
-                            IsInDefinition::is_defined_in(text, "FunctionNames").unwrap() ||
-                            IsInDefinition::is_defined_in(text, "Arrows").unwrap() ||          // clause 4
-                            IsInDefinition::is_defined_in(text, "GeometryShapes").unwrap());   // clause 5
+                            IsInDefinition::is_defined_in(text, &SPEECH_DEFINITIONS, "FunctionNames").unwrap() ||
+                            IsInDefinition::is_defined_in(text, &SPEECH_DEFINITIONS, "Arrows").unwrap() ||          // clause 4
+                            IsInDefinition::is_defined_in(text, &SPEECH_DEFINITIONS, "GeometryShapes").unwrap());   // clause 5
             },
             "mfrac" => return false,                                                     // clause 2 (test GTM 8.2(4) shows numeric fractions are not special)                                 
             "msqrt" | "mroot" => return false,                                           // clause 3
