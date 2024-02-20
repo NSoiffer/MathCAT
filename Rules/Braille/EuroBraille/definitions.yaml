@@ -1,0 +1,9 @@
+---
+- include: "../../definitions.yaml"
+
+- NoSpacesBefore: {
+  #FIX: this needs expanding
+    "(", ")", "[", "]", "{", "}", "|",
+    ",", ";",
+    "!", "/"
+  }
