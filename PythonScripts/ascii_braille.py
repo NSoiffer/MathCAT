@@ -26,7 +26,7 @@ def u2a(unicode:str):
 
 ASCII_TO_UNICODE = "⠀⠮⠐⠼⠫⠩⠯⠄⠷⠾⠡⠬⠠⠤⠨⠌⠴⠂⠆⠒⠲⠢⠖⠶⠦⠔⠱⠰⠣⠿⠜⠹⠈⠁⠃⠉⠙⠑⠋⠛⠓⠊⠚⠅⠇⠍⠝⠕⠏⠟⠗⠎⠞⠥⠧⠺⠭⠽⠵⠪⠳⠻⠘⠸"
 def ascii_to_unicode(ascii: str):
-    result = "";
+    result = ""
     ascii = ascii.upper()
     for ch in ascii:
         i = ord(ch) - 32
@@ -47,6 +47,36 @@ def generate_ascii_to_unicode():
     for ch in to_unicode:
         result += ch
     print(result)
+
+import json
+
+
+def read_euro_braille_file() -> dict[str, str]:
+    # I had to purge the control chars from the file because I was getting an error like:
+    #   json.decoder.JSONDecodeError: Invalid \escape: line 12 column 4 (char 125)
+    with open("euro-braille-dict.txt", 'r', encoding='utf8') as in_stream:
+        return json.loads(in_stream.read(), strict=True)
+
+
+ASCII_TO_EURO_BRAILLE: dict[str, str] = read_euro_braille_file()
+
+
+def ascii_to_euro_braille(ascii: str):
+    result = ""
+    for ch in ascii:
+        result += ASCII_TO_EURO_BRAILLE.get(ch)
+    return result
+
+
+def a2eb(ascii: str):
+    return ascii_to_euro_braille(ascii)
+
+
+def a2eb_loop():
+    text = input("text: ")
+    while text != "":
+        print(ascii_to_euro_braille(text))
+        text = input("text: ")
 
 
 # Major hack

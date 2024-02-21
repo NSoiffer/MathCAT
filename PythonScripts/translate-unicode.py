@@ -1,5 +1,8 @@
 # Translate unicode characters into the target language
 # This makes use of three sources: SRE's translations, MathPlayer's translations, and Google translate.
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+
 
 # The google translate is done via https://github.com/ffreemt/google-stranslate (pip install itranslate)
 # from itranslate import itranslate as translate
@@ -429,8 +432,6 @@ def build_euro(lang: str):
                     comment = hex(ord(ch[1]))
                 elif len(ch) == 1 or len(ch) == 2:
                     comment = hex(ord(ch))
-                # elif len(ch) == 2:   # \t, etc
-                #     comment =
                 else:
                     comment = "0" + ch[1:]
                 out_stream.write('{:32}# {}\n'.format(first_part, comment))
@@ -452,9 +453,18 @@ def get_sre_euro_dict():
     return dict
 
 
+def write_euro_braille_file():
+    file = open("EuroBraille-dict.txt", 'w', encoding='utf8')
+    file.write('{\n')
+    for key, value in get_sre_euro_dict().items():
+        if key == '"':
+            key = '\\"'
+        elif key == '\\':
+            key = '\\\\'
+        file.write('  "%s": "%s",\n' % (key, value))
+    file.write('}\n')
+    file.close()
 
-import sys
-sys.stdout.reconfigure(encoding='utf-8')
 
 # if os.path.exists("unicode.yaml"):
 #   os.remove("unicode.yaml")
