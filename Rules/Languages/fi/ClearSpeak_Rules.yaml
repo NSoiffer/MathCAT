@@ -218,7 +218,7 @@
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='GeneralEndFrac'"
       then:
       - pause: short
-      - T: "murtoluku loppu"      # phrase(the fraction with 3 over 4 'end fraction')
+      - T: "loppu murtoluku"      # phrase(the fraction with 3 over 4 'end fraction')
       - pause: short
 
 # rules for functions raised to a power
