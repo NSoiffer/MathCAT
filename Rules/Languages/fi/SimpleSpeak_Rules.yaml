@@ -30,7 +30,7 @@
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{T: "juuri loppu"}, {pause: short}]  # phrase(start the square root of x 'end of root')
+      else: [{T: "loppu juuri"}, {pause: short}]  # phrase(start the square root of x 'end of root')
 
 - name: default
   tag: root
@@ -64,7 +64,7 @@
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{T: "juuri loppu"}, {pause: short}]      # phrase(start the fifth root of x 'end of root')
+      else: [{T: "loppu juuri"}, {pause: short}]      # phrase(start the fifth root of x 'end of root')
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
@@ -120,7 +120,7 @@
       then: [{pause: short}]
   - x: "*[2]"
   - pause: short
-  - T: "murtoluku loppu"      # phrase(start 7 over 8 'end of fraction')
+  - T: "loppu murtoluku"      # phrase(start 7 over 8 'end of fraction')
   - pause: medium
 
 # rules for functions raised to a power
@@ -230,7 +230,7 @@
   - T: "potenssiin"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
   - pause: short
-  - T: "potenssi loppu"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+  - T: "loppu potenssi"      # phrase(start 2 raised to the exponent 4 'end of exponent')
 
 - name: default
   tag: power
