@@ -174,16 +174,17 @@
       then: {T: "neliö"}      # phrase(5 'squared' equals 25)
       else: {T: "kuutio"}      # phrase(5 'cubed' equals 125)
 
-- name: simple-integer
-  tag: power
-  match: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
-  replace:
-  - x: "*[1]"
-  - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
-  - test:
-      if: "*[2][.>0]"
-      then: {x: "ToOrdinal(*[2])"} # FI: when is this triggered?
-      else: {x: "*[2]"}
+# FI: toOrdinal isn't natural in Finnish in this form, so commented out. If there was more sophisticated conjugation on other words, it could work.
+# - name: simple-integer
+#   tag: power
+#   match: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
+#   replace:
+#   - x: "*[1]"
+#   - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
+#   - test:
+#       if: "*[2][.>0]"
+#       then: {x: "ToOrdinal(*[2])"} # FI: when is this triggered?
+#       else: {x: "*[2]"}
 
 - name: simple-negative-integer
   tag: power
