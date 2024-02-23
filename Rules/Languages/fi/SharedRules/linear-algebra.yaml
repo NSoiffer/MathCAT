@@ -16,7 +16,7 @@
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple'))"
-      then: [T: "determinantti loppu"]      # phrase('end determinant' of a matrix)
+      then: [T: "loppu determinantti"]      # phrase('end determinant' of a matrix)
 
 - name: norm
   tag: norm
@@ -34,7 +34,7 @@
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple'))"
-      then: [T: "normi loppu"]      # phrase('end norm' that is a measure of distance)
+      then: [T: "loppu normi"]      # phrase('end norm' that is a measure of distance)
 
 
 - name: subscripted-norm
