@@ -145,22 +145,24 @@
       if: "*[2][text()=2]"
       then: {T: "neliö"}      # phrase(5 'squared' equals 25)
       else: {T: "kuutio"}      # phrase(5 'cubed' equals 125)
-- name: function-power
-  tag: power
-  match:
-  - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
-  replace:
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: {T: ""}      # # phrase('the' fourth power of 10)
-  - bookmark: "*[2]/@id"
-  - test:
-      if: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
-      then: [{x: "ToOrdinal(*[2])"}]
-      else: [{x: "*[2]"}]
-  - T: "potenssi"      # phrase(the fourth 'power of' 2)
-  - pause: short
-  - x: "*[1]"
+
+# FI: This grammar doesn't work in Finnish so commented out
+# - name: function-power
+#   tag: power
+#   match:
+#   - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
+#   replace:
+#   - test:
+#       if: "$Verbosity!='Terse'"
+#       then: {T: ""}      # # phrase('the' fourth power of 10)
+#   - bookmark: "*[2]/@id"
+#   - test:
+#       if: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
+#       then: [{x: "ToOrdinal(*[2])"}]
+#       else: [{x: "*[2]"}]
+#   - T: "potenssi"      # phrase(the fourth 'power of' 2)
+#   - pause: short
+#   - x: "*[1]"
 
 # non-function rules for power
 - name: squared-or-cubed
