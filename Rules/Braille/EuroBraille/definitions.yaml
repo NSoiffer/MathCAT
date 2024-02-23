@@ -5,7 +5,8 @@
   #FIX: this needs expanding
     "(", ")", "[", "]", "{", "}", "|",
     ",", ";",
-    "!", "/"
+    "!", "/",
+    "⁡", "⁢", "⁣","⁤",          # 0x2061 - 0x2064 (invisible chars)
   }
 
 - LateXFunctionNames: {

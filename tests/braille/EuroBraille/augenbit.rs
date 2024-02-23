@@ -54,7 +54,7 @@ fn augenbit0_2_4 () {
 
 #[test]
 fn augenbit0_3_1 () {
-    let expr = "<math><mi>n</mi><mo>&#x2192;</mo><mo>&#x221E;</mo></math>";
+    let expr = "<math><mi>n</mi><mo>→</mo><mo>∞</mo></math>";
     test_braille("EuroBraille", expr, "⠝⠀⡌⠞⠕⠀⡌⠊⠝⠋⠞⠽");
 }
 
@@ -98,9 +98,33 @@ fn augenbit1_1_1 () {
 }
 
 #[test]
+fn augenbit1_2_3 () {
+    let expr = r#"<math><mn>9</mn><mo>&#x2212;</mo><mn>3</mn><mo>&#x2260;</mo><mn>5</mn></math>"#;
+    test_braille("EuroBraille", expr, "⠪⠀⠤⠩⠀⡌⠝⠕⠞⠶⠀⠱");
+}
+
+#[test]
+fn augenbit1_3_2 () {
+    let expr = r#"<math><mi>x</mi><mo>&#xB1;</mo><mn>3</mn></math>"#;
+    test_braille("EuroBraille", expr, "⠭⠀⡌⠏⠍⠀⠩");
+}
+
+#[test]
 fn augenbit1_3_3 () {
     let expr = r#"<math><mi>x</mi><mo>&#xB1;</mo><mn>3</mn></math>"#;
     test_braille("EuroBraille", expr, "⠭⠀⡌⠏⠍⠀⠩");
+}
+
+#[test]
+fn augenbit1_5_7 () {
+    // put number together -- editor created "<mn>0</mn><mo>,</mo><mn>1</mn>" and canonicalize didn't fix it
+    let expr = r#"<math><mrow>
+            <mn>0,1</mn>
+            <mover><mn>6</mn><mo accent="true">&#x2015;</mo></mover>
+            <mo>=</mo>
+            <mn>1</mn><mrow><mo>/</mo></mrow><mn>6</mn>
+        </mrow></math>"#;
+    test_braille("EuroBraille", expr, "⠬⠂⠡⡌⠕⠧⠑⠗⠇⠊⠝⠑⠷⠫⠾⠀⠶⠡⠲⠫");
 }
 
 #[test]
@@ -146,9 +170,20 @@ fn augenbit1_7_12 () {
 }
 
 #[test]
+fn augenbit1_8_2 () {
+    let expr = r#"<math><mi mathvariant="normal">&#x25B3;</mi><mi>A</mi><mi>B</mi><mi>C</mi></math>"#;
+    test_braille("EuroBraille", expr, "⡌⠞⠗⠊⠁⠝⠛⠇⠑⠀⡁⡃⡉");
+}
+
+#[test]
+fn augenbit1_8_4 () {
+    let expr = r#"<math><mi>&#x3B1;</mi><mo>,</mo><mi>&#x3B2;</mi><mo>,</mo><mi>&#x3B3;</mi><mo>,</mo><mi>&#x3B4;</mi><mo>,</mo><mi>&#x3F5;</mi></math>"#;
+    test_braille("EuroBraille", expr, "⡌⠁⠇⠏⠓⠁⠂⠀⡌⠃⠑⠞⠁⠂⠀⡌⠛⠁⠍⠍⠁⠂⠀⡌⠙⠑⠇⠞⠁⠂⠀⡌⠑⠏⠎⠊⠇⠕⠝");
+}
+
+#[test]
 fn augenbit2_1_4 () {
     // original display code contains forced spaces not in the output -- they are cleaned up here
-    init_logger();
     let expr = r#"<math>
             <msup><mi>f</mi><mo>'</mo> </msup><mo>(</mo><mi>x</mi><mo>)</mo><mo>,</mo>
             <msup><mi>f</mi><mo>''</mo></msup><mo>(</mo><mi>x</mi><mo>)</mo>
@@ -168,7 +203,6 @@ fn augenbit2_3_2 () {
                 </mtable>
             </mfenced></math>"#;
     // set number preferences to European style
-    libmathcat::set_preference("BlockSeparators".to_string(), ". ".to_string()).unwrap();
-    libmathcat::set_preference("DecimalSeparators".to_string(), ",".to_string()).unwrap();  
-    test_braille("EuroBraille", expr, "⡌⠧⠑⠉⠷⠟⠾⠀⠶⠀⡌⠃⠑⠛⠊⠝⠷⠏⠍⠁⠞⠗⠊⠭⠾⠀⠤⠱⠀⡌⡌⠀⠬⠂⠱⠀⡌⡌⠀⠅⠖⠹⠀⡌⠑⠝⠙⠷⠏⠍⠁⠞⠗⠊⠭⠾");
+    test_braille_prefs("EuroBraille", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, 
+                "⡌⠧⠑⠉⠷⠟⠾⠀⠶⠀⡌⠃⠑⠛⠊⠝⠷⠏⠍⠁⠞⠗⠊⠭⠾⠀⠤⠱⠀⡌⡌⠀⠬⠂⠱⠀⡌⡌⠀⠅⠖⠹⠀⡌⠑⠝⠙⠷⠏⠍⠁⠞⠗⠊⠭⠾");
 }

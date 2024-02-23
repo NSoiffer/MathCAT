@@ -2025,11 +2025,11 @@ fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 
 fn eurobraille_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     lazy_static! {
-        static ref REMOVE_SPACE: Regex =Regex::new(r"⠀([⡮⡸])").unwrap();          // '^', '_'
+        static ref REMOVE_SPACE: Regex =Regex::new(r"⠀([⡮⡸⠂⠆⠴⡾⠾])").unwrap();          // '^', '_', ',', ';', ')', ']', '}'
     }
     // debug!("eurobraille_cleanup: start={}", raw_braille);
-    let result = REMOVE_SPACE.replace(&raw_braille, "$1");
-    let result = COLLAPSE_SPACES.replace_all(&result, "⠀");     // probably not needed
+    let result = COLLAPSE_SPACES.replace_all(&raw_braille, "⠀");     // probably not needed
+    let result = REMOVE_SPACE.replace_all(&result, "$1");
     let result = result.trim_matches('⠀');
    
     return result.to_string();

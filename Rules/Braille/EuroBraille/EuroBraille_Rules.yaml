@@ -230,7 +230,7 @@
       # then: [t: "⠀"]
       if: "parent::m:mrow"
       then_test:
-          if: "DEBUG(not(DEBUG(IsInDefinition(., 'Braille', 'NoSpacesBefore'))))"
+          if: "not(IsInDefinition(., 'Braille', 'NoSpacesBefore'))"
           then: [t: "⠀"]
   - x: "text()"
   - test:
@@ -357,7 +357,7 @@
           - x: "'{'"
           - x: "*[3]"
           - x: "'}'"
-
+  - t: "⠀"    # need to separate script from what follows
 -
   name: default
   tag: mmultiscripts
@@ -375,50 +375,44 @@
           if: "preceding-sibling::*"
           then: [x: "'{}'"]         # empty base not needed if this is the only expr
       - test:
-          if: "not($Prescripts[1][self::m:none])"
-          then:
-          - test:
+          if: "not(DEBUG($Prescripts[1])[self::m:none])"
+          then_test:
               if: "$Prescripts[1][IsNode(., 'leaf') and string-length(.) = 1]"
-              then:
+              then: [x: "$Prescripts[1]"]
+              else:
               - x: "'_{'"
               - x: "$Prescripts[1]"
-              - t: "'}'"
-              else: [x: "$Prescripts[1]"]
+              - x: "'}'"
       - test:
           if: "not($Prescripts[2][self::m:none])"
-          then:
-          - test:
+          then_test:
               if: "$Prescripts[2][IsNode(., 'leaf') and string-length(.) = 1]"
-              then:
+              then: [x: "$Prescripts[2]"]
+              else:
               - x: "'^{'"
               - x: "$Prescripts[2]"
-              - t: "'}'"
-              else: [x: "$Prescripts[2]"]
+              - x: "'}'"
       - test:
           if: "count($Prescripts)>2"
           then:
           - test:
               if: "not($Prescripts[3][self::m:none])"
-              then:
-              - t: "1⠢"
-              - test:
-                  if: "NeedsToBeGrouped($Prescripts[3], 'UEB', false())"
-                  then:
-                  - t: "1⠣"
+              then_test:
+                  if: "$Prescripts[3][IsNode(., 'leaf') and string-length(.) = 1]"
+                  then: [x: "$Prescripts[3]"]
+                  else:
+                  - x: "'_{'"
                   - x: "$Prescripts[3]"
-                  - t: "1⠜"
-                  else: [x: "$Prescripts[3]"]
+                  - x: "'}'"
           - test:
               if: "not($Prescripts[4][self::m:none])"
-              then:
-              - t: "1⠔"
-              - test:
-                  if: "NeedsToBeGrouped($Prescripts[4], 'UEB', false())"
-                  then:
-                  - t: "1⠣"
+              then_test:
+                  if: "$Prescripts[4][IsNode(., 'leaf') and string-length(.) = 1]"
+                  then: [x: "$Prescripts[4]"]
+                  else:
+                  - x: "'^{'"
                   - x: "$Prescripts[4]"
-                  - t: "1⠜"
-                  else: [x: "$Prescripts[4]"]
+                  - x: "'}'"
           - test:
               if: "count($Prescripts) > 4"   # give up and just dump them out so at least the content is there
               then: [x: "$Prescripts[position() > 4]"]
@@ -429,106 +423,90 @@
       then:
       - test:
           if: "not($Postscripts[1][self::m:none])"
-          then:
-          - t: "1⠢"
-          - test:
-              if: "NeedsToBeGrouped($Postscripts[1], 'UEB', false())"
-              then:
-              - t: "1⠣"
+          then_test:
+              if: "$Postscripts[1][IsNode(., 'leaf') and string-length(.) = 1]"
+              then: [x: "$Postscripts[1]"]
+              else:
+              - x: "'_{'"
               - x: "$Postscripts[1]"
-              - t: "1⠜"
-              else: [x: "$Postscripts[1]"]
+              - x: "'}'"
       - test:
           if: "not($Postscripts[2][self::m:none])"
-          then:
-          - t: "1⠔"
-          - test:
-              if: "NeedsToBeGrouped($Postscripts[2], 'UEB', false())"
-              then:
-              - t: "1⠣"
+          then_test:
+              if: "$Postscripts[2][IsNode(., 'leaf') and string-length(.) = 1]"
+              then: [x: "$Postscripts[2]"]
+              else:
+              - x: "'^{'"
               - x: "$Postscripts[2]"
-              - t: "1⠜"
-              else: [x: "$Postscripts[2]"]
+              - x: "'}'"
       - test:
           if: "count($Postscripts)>2"
           then:
           - test:
               if: "not($Postscripts[3][self::m:none])"
-              then:
-              - t: "1⠢"
-              - test:
-                  if: "NeedsToBeGrouped($Postscripts[3], 'UEB', false())"
-                  then:
-                  - t: "1⠣"
+              then_test:
+                  if: "$Postscripts[3][IsNode(., 'leaf') and string-length(.) = 1]"
+                  then: [x: "$Postscripts[3]"]
+                  else:
+                  - x: "'_{'"
                   - x: "$Postscripts[3]"
-                  - t: "1⠜"
-                  else: [x: "$Postscripts[3]"]
+                  - x: "'}'"
           - test:
               if: "not($Postscripts[4][self::m:none])"
-              then:
-              - t: "1⠔"
-              - test:
-                  if: "NeedsToBeGrouped($Postscripts[4], 'UEB', false())"
-                  then:
-                  - t: "1⠣"
+              then_test:
+                  if: "$Postscripts[4][IsNode(., 'leaf') and string-length(.) = 1]"
+                  then: [x: "$Postscripts[4]"]
+                  else:
+                  - x: "'^{'"
                   - x: "$Postscripts[4]"
-                  - t: "1⠜"
-                  else: [x: "$Postscripts[4]"]
+                  - x: "'}'"
           - test:
               if: "count($Postscripts)>4"
               then:
               - test:
                   if: "not($Postscripts[5][self::m:none])"
-                  then:
-                  - t: "1⠢"
-                  - test:
-                      if: "NeedsToBeGrouped($Postscripts[5], 'UEB', false())"
-                      then:
-                      - t: "1⠣"
+                  then_test:
+                      if: "$Postscripts[5][IsNode(., 'leaf') and string-length(.) = 1]"
+                      then: [x: "$Postscripts[5]"]
+                      else:
+                      - x: "'_{'"
                       - x: "$Postscripts[5]"
-                      - t: "1⠜"
-                      else: [x: "$Postscripts[5]"]
+                      - x: "'}'"
               - test:
                   if: "not($Postscripts[6][self::m:none])"
-                  then:
-                  - t: "1⠔"
-                  - test:
-                      if: "NeedsToBeGrouped($Postscripts[6], 'UEB', false())"
-                      then:
-                      - t: "1⠣"
+                  then_test:
+                      if: "$Postscripts[6][IsNode(., 'leaf') and string-length(.) = 1]"
+                      then: [x: "$Postscripts[6]"]
+                      else:
+                      - x: "'^{'"
                       - x: "$Postscripts[6]"
-                      - t: "1⠜"
-                      else: [x: "$Postscripts[6]"]
+                      - x: "'}'"
               - test:
                   if: "count($Postscripts)>6"
                   then:
                   - test:
                       if: "not($Postscripts[7][self::m:none])"
-                      then:
-                      - t: "1⠢"
-                      - test:
-                          if: "NeedsToBeGrouped($Postscripts[7], 'UEB', false())"
-                          then:
-                          - t: "1⠣"
+                      then_test:
+                          if: "$Postscripts[7][IsNode(., 'leaf') and string-length(.) = 1]"
+                          then: [x: "$Postscripts[7]"]
+                          else:
+                          - x: "'_{'"
                           - x: "$Postscripts[7]"
-                          - t: "1⠜"
-                          else: [x: "$Postscripts[7]"]
+                          - x: "'}'"
                   - test:
                       if: "not($Postscripts[8][self::m:none])"
-                      then:
-                      - t: "1⠔"
-                      - test:
-                          if: "NeedsToBeGrouped($Postscripts[8], 'UEB', false())"
-                          then:
-                          - t: "1⠣"
+                      then_test:
+                          if: "$Postscripts[8][IsNode(., 'leaf') and string-length(.) = 1]"
+                          then: [x: "$Postscripts[8]"]
+                          else:
+                          - x: "'^{'"
                           - x: "$Postscripts[8]"
-                          - t: "1⠜"
-                          else: [x: "$Postscripts[8]"]
+                          - x: "'}'"
                   - test:
                       if: "count($Postscripts) > 8"   # give up and just dump them out so at least the content is there
                       then:
                       - x: "$Postscripts[position() > 8]"
-  - t: "#"   # signal end script/numeric mode
+  - t: "⠀"    # need to separate script from what follows
                 
 
 -
@@ -624,9 +602,9 @@
   - test:
       if: "NeedsToBeGrouped(*[1], 'UEB', false())"
       then:
-      - t: "1⠣"
+      - t: "'{'"
       - x: "*[1]"
-      - t: "1⠜"
+      - t: "'}'"
       else: [x: "*[1]"]
 
   # - test:
