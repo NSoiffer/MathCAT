@@ -960,7 +960,7 @@ impl DefinitionValue {
         args.exactly(2)?;
         let set_name = args.pop_string()?;
         match &args[0] {
-            Value::String(str) => return match DefinitionValue::is_defined_in(str, &set_name) {
+            Value::String(str) => return match DefinitionValue::definition_value(str, &set_name) {
                 Ok(result) => Ok( Value::String( result ) ),
                 Err(e) => Err(e),
             },
@@ -974,7 +974,7 @@ impl DefinitionValue {
                         if text.is_empty() {
                             Ok( Value::String("".to_string()) )
                         } else {
-                            match DefinitionValue::is_defined_in(&text, &set_name) {
+                            match DefinitionValue::definition_value(&text, &set_name) {
                                 Ok(result) => Ok( Value::String( result ) ),
                                 Err(e) => Err(e),
                             }          
