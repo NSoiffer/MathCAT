@@ -102,7 +102,7 @@
       then: [{pause: short}]
   - x: "*[2]"
   - pause: short
-  - T: "murtoluku loppu"          # phrase("start of fraction x over y 'end over'")
+  - T: "loppu murtoluku"          # phrase("start of fraction x over y 'end over'")
   - pause: medium
 
 
@@ -122,7 +122,7 @@
   - pause: short
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-      then: [T: "juuri loppu"] # phrase("root of x 'end root symbol'")
+      then: [T: "loppu juuri"] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
 - name: structure-default
@@ -143,7 +143,7 @@
   - pause: short
   - test:
       if: "not(IsNode(*[2],'leaf'))"
-      then: [T: "juuri loppu"] # phrase("root of x 'end root symbol'")
+      then: [T: "loppu juuri"] # phrase("root of x 'end root symbol'")
 
 
 - name: simple-sub
@@ -164,7 +164,7 @@
   - x: "*[1]"
   - T: "ala"               # phrase(x 'sub' 2)
   - x: "*[2]"
-  - T: "ala loppu"           # phrase(x sub 2 'end of sub')
+  - T: "loppu ala"           # phrase(x sub 2 'end of sub')
   - pause: short
 
 
@@ -196,7 +196,7 @@
           - x: "*[last()]"
           - test:
               if: "not(IsNode(*[last()], 'simple'))"
-              then: [T: "ylä loppu"]      # phrase(x super 2 'end of super')
+              then: [T: "loppu ylä"]      # phrase(x super 2 'end of super')
           else:
           - T: "potenssiin"            # phrase(5 'raised to the' second power equals 25)
           - x: "*[last()]"
@@ -311,7 +311,7 @@
                   then:
                   - T: "ja vaihtelevat etumääreet"      # phrase(in this case there are values 'and alternating prescripts')
                   - x: "$Prescripts[position() > 4]"
-                  - T: "etumääreet loppu"      # phrase(This is where 'end prescripts' occurs)
+                  - T: "loppu etumääreet"      # phrase(This is where 'end prescripts' occurs)
   - test:
       if: "$Postscripts"
       then:
@@ -396,7 +396,7 @@
                           then:
                           - T: "ja vaihtelevia määreitä"      # phrase(this situation involves complexities 'and alternating scripts')
                           - x: "$Postscripts[position() > 8]"
-                          - T: "määreet loppu"      # phrase(At this point 'end scripts' occurs)
+                          - T: "loppu määreet"      # phrase(At this point 'end scripts' occurs)
 
 - name: default
   tag: mtable
@@ -579,7 +579,7 @@
       else: [x: "*"]
   - test:
       if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
-      then: [T: "rajaus loppu"]      # phrase(reached the 'end enclosure' point) # FI: better translation?
+      then: [T: "loppu rajaus"]      # phrase(reached the 'end enclosure' point) # FI: better translation?
   - pause: short
 
 - name: semantics

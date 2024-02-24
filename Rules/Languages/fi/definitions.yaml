@@ -75,7 +75,7 @@
          "", "kymmenes", "kahdeskymmenes", "kolmaskymmenes", "neljäskymmenes", "viideskymmenes", "kuudeskymmenes", "seitsemäskymmenes", "kahdeksaskymmenes", "yhdeksäskymmenes"
     ],
 
-#      # translation is weird, are these used in Finnish that much?
+#     FI: these are not used in this context in Finnish almost at all
 #     NumbersOrdinalPluralTens: [
 #          "", "kymmenennet", "kahdetkymmenennet", "kolmetkymmenennet", "neljätkymmenennet", "viidetkymmenennet", "kuudetkymmenennet", "seitsemätkymmenennet", "kahdeksatkymmenennet", "yhdeksätkymmenennet"
 #     ],
@@ -96,7 +96,7 @@
          "kuudessadas", "seitsemässadas", "kahdeksassadas", "yhdeksässadas"
     ],
 
-#      # how should these be translated? weirdness going on... context for these?
+#     FI: not used in Finnish in this context
 #     NumbersOrdinalPluralHundreds: [
 #        "", "sadannet", "kahdet sadannet", "kolmet sadannet", "neljät sadannet", "viidet sadannet",
 #          "kuudet sadannet", "seitsemät sadannet", "kahdeksat sadannet", "yhdeksät sadannet"

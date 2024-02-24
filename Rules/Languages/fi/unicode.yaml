@@ -53,7 +53,7 @@
         then_test:
             if: "$Verbosity='Terse'"
             then: [T: "auki"]                  	    #  0x28	(en: 'open', google translation)
-            else: [T: "sulku auki"]             	#  0x28	(en: 'open paren', google: 'avoin sulku')
+            else: [T: "auki sulku"]             	#  0x28	(en: 'open paren', google: 'avoin sulku')
         else: [T: "vasen sulku"]                    #  0x28	(en: 'left paren', google: 'vasen sulku')
  - ")":                                         	#  0x29
     - test:
@@ -61,7 +61,7 @@
         then_test:
             if: "$Verbosity='Terse'"
             then: [T: "kiinni"]                 	#  0x29	(en: 'close', google translation)
-            else: [T: "sulku kiinni"]           	#  0x29	(en: 'close paren', google: 'sulje sulku')
+            else: [T: "kiinni sulku"]           	#  0x29	(en: 'close paren', google: 'sulje sulku')
         else: [T: "oikea sulku"]               	    #  0x29	(en: 'right paren', google: 'oikea sulku')
 
  - "*":                                         	#  0x2a
@@ -114,13 +114,13 @@
  - "[":                                         	#  0x5b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [T: "hakasulku auki"]             	# 	(en: 'open bracket', google translation)
+        then: [T: "auki hakasulku"]             	# 	(en: 'open bracket', google translation)
         else: [T: "vasen hakasulku"]             	# 	(en: 'left bracket', google: 'vasen kiinnike')
  - "\\": [T: "kenoviiva"]                  	        #  0x5c	(en: 'back slash', google: 'takaviiva')
  - "]":                                         	#  0x5d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [T: "hakasulku kiinni"]             	# 	(en: 'close bracket', google translation)
+        then: [T: "kiinni hakasulku"]             	# 	(en: 'close bracket', google translation)
         else: [T: "oikea hakasulku"]            	# 	(en: 'right bracket', google: 'oikea kiinnike')
  - "^": [T: "hattu"]                     	#  0x5e	(en: 'hat', google: 'hattu')
  - "_": [T: "alaviiva"]                         	#  0x5f	(en: 'under bar', google: 'baarin alla')
@@ -128,7 +128,7 @@
  - "{":                                         	#  0x7b
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [T: "aaltosulku auki"]                # 	(en: 'open brace', google translation)
+        then: [T: "auki aaltosulku"]                # 	(en: 'open brace', google translation)
         else: [T: "vasen aaltosulku"]            	# 	(en: 'left brace', google: 'vasen ahdin')
  - "|":                                         	#  0x7c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
@@ -144,7 +144,7 @@
  - "}":                                         	#  0x7d
     - test:
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
-        then: [T: "aaltosulku kiinni"]              # 	(en: 'close brace', google translation)
+        then: [T: "kiinni aaltosulku"]              # 	(en: 'close brace', google translation)
         else: [T: "oikea aaltosulku"]          	    # 	(en: 'right brace', google: 'oikea ahdin')
 
  - "~": [T: "tilde"]                            	#  0x7e

@@ -30,7 +30,7 @@
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{T: "juuri loppu"}, {pause: short}]  # phrase(start the square root of x 'end of root')
+      else: [{T: "loppu juuri"}, {pause: short}]  # phrase(start the square root of x 'end of root')
 
 - name: default
   tag: root
@@ -64,7 +64,7 @@
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{T: "juuri loppu"}, {pause: short}]      # phrase(start the fifth root of x 'end of root')
+      else: [{T: "loppu juuri"}, {pause: short}]      # phrase(start the fifth root of x 'end of root')
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
@@ -120,7 +120,7 @@
       then: [{pause: short}]
   - x: "*[2]"
   - pause: short
-  - T: "murtoluku loppu"      # phrase(start 7 over 8 'end of fraction')
+  - T: "loppu murtoluku"      # phrase(start 7 over 8 'end of fraction')
   - pause: medium
 
 # rules for functions raised to a power
@@ -145,22 +145,24 @@
       if: "*[2][text()=2]"
       then: {T: "neliö"}      # phrase(5 'squared' equals 25)
       else: {T: "kuutio"}      # phrase(5 'cubed' equals 125)
-- name: function-power
-  tag: power
-  match:
-  - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
-  replace:
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: {T: ""}      # # phrase('the' fourth power of 10)
-  - bookmark: "*[2]/@id"
-  - test:
-      if: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
-      then: [{x: "ToOrdinal(*[2])"}]
-      else: [{x: "*[2]"}]
-  - T: "potenssi"      # phrase(the fourth 'power of' 2)
-  - pause: short
-  - x: "*[1]"
+
+# FI: This grammar doesn't work in Finnish so commented out
+# - name: function-power
+#   tag: power
+#   match:
+#   - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
+#   replace:
+#   - test:
+#       if: "$Verbosity!='Terse'"
+#       then: {T: ""}      # # phrase('the' fourth power of 10)
+#   - bookmark: "*[2]/@id"
+#   - test:
+#       if: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
+#       then: [{x: "ToOrdinal(*[2])"}]
+#       else: [{x: "*[2]"}]
+#   - T: "potenssi"      # phrase(the fourth 'power of' 2)
+#   - pause: short
+#   - x: "*[1]"
 
 # non-function rules for power
 - name: squared-or-cubed
@@ -174,16 +176,17 @@
       then: {T: "neliö"}      # phrase(5 'squared' equals 25)
       else: {T: "kuutio"}      # phrase(5 'cubed' equals 125)
 
-- name: simple-integer
-  tag: power
-  match: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
-  replace:
-  - x: "*[1]"
-  - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
-  - test:
-      if: "*[2][.>0]"
-      then: {x: "ToOrdinal(*[2])"} # FI: when is this triggered?
-      else: {x: "*[2]"}
+# FI: toOrdinal isn't natural in Finnish in this form, so commented out. If there was more sophisticated conjugation on other words, it could work.
+# - name: simple-integer
+#   tag: power
+#   match: "*[2][self::m:mn][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
+#   replace:
+#   - x: "*[1]"
+#   - T: "potenssiin"      # phrase(15 raised 'to the' second power equals 225)
+#   - test:
+#       if: "*[2][.>0]"
+#       then: {x: "ToOrdinal(*[2])"} # FI: when is this triggered?
+#       else: {x: "*[2]"}
 
 - name: simple-negative-integer
   tag: power
@@ -227,7 +230,7 @@
   - T: "potenssiin"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
   - pause: short
-  - T: "potenssi loppu"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+  - T: "loppu potenssi"      # phrase(start 2 raised to the exponent 4 'end of exponent')
 
 - name: default
   tag: power

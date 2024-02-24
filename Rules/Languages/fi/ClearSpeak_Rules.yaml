@@ -38,7 +38,7 @@
     - if: "$ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'"
       then:
       - pause: short
-      - T: "juuri loppu"      # phrase(the square root of x 'end root')
+      - T: "loppu juuri"      # phrase(the square root of x 'end root')
       - pause: medium
     - else_if: "IsNode(*[1], 'simple')"
       then: [{pause: short}]
@@ -86,7 +86,7 @@
       if: $ClearSpeak_Roots = 'RootEnd' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
       - pause: short
-      - T: "juuri loppu"      # phrase(start the fifth root of x 'end root')
+      - T: "loppu juuri"      # phrase(start the fifth root of x 'end root')
       - pause: medium
       else_test:
         if: IsNode(*[1], 'simple')
@@ -169,7 +169,7 @@
       if: "$ClearSpeak_Fractions='OverEndFrac' or ($ClearSpeak_Fractions='EndFrac' and not( ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and *[1][*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and *[2][*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] ) )"
       then:
       - pause: short
-      - T: "murtoluku loppu"      # phrase(7 over 8 'end fraction')
+      - T: "loppu murtoluku"      # phrase(7 over 8 'end fraction')
       - pause: short
 
 - # fraction with text or numbers followed by text in both numerator and denominator
@@ -197,7 +197,7 @@
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='OverEndFrac'"
       then:
       - pause: short
-      - T: "murtoluku loppu"      # phrase(7 over 8 'end fraction')
+      - T: "loppu murtoluku"      # phrase(7 over 8 'end fraction')
       - pause: short
 
 - name: default
@@ -218,7 +218,7 @@
       if: "$ClearSpeak_Fractions='EndFrac' or $ClearSpeak_Fractions='GeneralEndFrac'"
       then:
       - pause: short
-      - T: "murtoluku loppu"      # phrase(the fraction with 3 over 4 'end fraction')
+      - T: "loppu murtoluku"      # phrase(the fraction with 3 over 4 'end fraction')
       - pause: short
 
 # rules for functions raised to a power
@@ -279,7 +279,7 @@
   - pause: short
   - x: "*[2]"
   - pause: short
-  - T: "potenssi loppu"      # phrase(5 raised to the exponent x plus 1 'end exponent')
+  - T: "loppu potenssi"      # phrase(5 raised to the exponent x plus 1 'end exponent')
 
 - name: AfterPower-default
   tag: power
@@ -454,7 +454,7 @@
   - pause: short
   - x: "*[2]"
   - pause: short
-  - T: "potenssi loppu"      # phrase(and now 'end exponent' has been reached)
+  - T: "loppu potenssi"      # phrase(and now 'end exponent' has been reached)
 
 - name: default
   tag: power
@@ -484,8 +484,8 @@
       if: "$ClearSpeak_AbsoluteValue = 'AbsEnd'"
       then:
       - pause: short
-      - x: "$WordToSay" # FI: changed order
       - T: "loppu"      # phrase('end' absolute value)
+      - x: "$WordToSay"
   - pause: short
 
 - name: set

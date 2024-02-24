@@ -177,7 +177,7 @@
   - test:
       if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
       then: [{pause: short}]
-      else: [{pause: short}, {T: "itseisarvo loppu"}, {pause: short}]      # phrase(show 'end absolute value' position)
+      else: [{pause: short}, {T: "loppu itseisarvo"}, {pause: short}]      # phrase(show 'end absolute value' position)
 
 - name: negative
   tag: negative
@@ -207,8 +207,8 @@
       then:
       - test:
           if: "$Verbosity='Verbose'"
-          then: {T: "alaindeksi loppu"}      # phrase(this is the 'end subscript' position)
-          else: {T: "ala loppu"}      # phrase(this is the 'end sub' position)
+          then: {T: "loppu alaindeksi"}      # phrase(this is the 'end subscript' position)
+          else: {T: "loppu ala"}      # phrase(this is the 'end sub' position)
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -318,8 +318,8 @@
       then:
       - test:
           if: "$Verbosity='Verbose'"
-          then: {T: "alaindeksi loppu"}      # phrase(this is the 'end subscript' position)
-          else: {T: "ala loppu"}      # phrase(this is the 'end sub' position)
+          then: {T: "loppu alaindeksi"}      # phrase(this is the 'end subscript' position)
+          else: {T: "loppu ala"}      # phrase(this is the 'end sub' position)
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -623,8 +623,8 @@
       - T: ""      # phrase('end' of matrix)
       - test:
           if: $ClearSpeak_Matrix = 'EndVector'
-          then: {T: "vektori loppu"}      # phrase(the 2 column 'end vector')
-          else: {T: "matriisi loppu"}      # phrase(the 2 by 2 'end matrix')
+          then: {T: "loppu vektori"}      # phrase(the 2 column 'end vector')
+          else: {T: "loppu matriisi"}      # phrase(the 2 by 2 'end matrix')
 
 - name: default-column-matrix
   tag: matrix
@@ -642,7 +642,7 @@
   - x: "*" # select the rows (mtr)
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
-      then: [{T: "matriisi loppu"}]      # phrase(the 'end of matrix' has been reached)
+      then: [{T: "loppu matriisi"}]      # phrase(the 'end of matrix' has been reached)
 
 - name: 1x2-or-3-matrix
   tag: matrix
@@ -668,8 +668,8 @@
       - T: ""      # phrase(the 'end' of matrix has been reached) # FI: maybe change logic?
       - test:
           if: $ClearSpeak_Matrix = 'EndMatrix'
-          then: {T: "matriisi loppu"}      # phrase(the 2 by 2 'matrix')
-          else: {T: "vektori loppu"}      # phrase(the 2 by 1 'vector')
+          then: {T: "loppu matriisi"}      # phrase(the 2 by 2 'matrix')
+          else: {T: "loppu vektori"}      # phrase(the 2 by 1 'vector')
 
 - name: default-row-matrix
   tag: matrix
@@ -719,8 +719,8 @@
       - T: ""      # phrase(the 'end' of matrix has been reached)
       - test:
           if: "self::m:determinant"
-          then: {T: "determinantti loppu"}      # phrase(the 2 by 2 'determinant')
-          else: {T: "matriisi loppu"}      # phrase(the 2 by 2 'matrix')
+          then: {T: "loppu determinantti"}      # phrase(the 2 by 2 'determinant')
+          else: {T: "loppu matriisi"}      # phrase(the 2 by 2 'matrix')
 
 - name: default-matrix
   tag: [matrix, determinant]
