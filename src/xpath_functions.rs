@@ -925,14 +925,15 @@ impl IsInDefinition {
 
 pub struct DefinitionValue;
 impl DefinitionValue {
-    /// Returns true if `test_str` is in `set_name`
+    /// Returns the value associated with `key` in `set_name`. If `key` is not in `set_name`, `key` is returned
+    ///   Consider looking up "km" -- if there is no definition, using 'km' is a reasonable fallback
     /// Returns an error if `set_name` is not defined
-    pub fn is_defined_in(test_str: &str, set_name: &str) -> Result<String, Error> {
+    pub fn definition_value(key: &str, set_name: &str) -> Result<String, Error> {
         return SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             if let Some(map) = definitions.get_hashmap(set_name) {
-                return Ok( match map.get(test_str) {
-                    None => String::default(),
+                return Ok( match map.get(key) {
+                    None => key.to_string(),
                     Some(str) => str.clone(),
                 });
             }
