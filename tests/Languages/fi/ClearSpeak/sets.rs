@@ -5,7 +5,7 @@ fn complex() {
     let expr = "<math>
                     <mi>ℂ</mi>
                 </math>";
-    test("en", "ClearSpeak", expr, "the complex numbers");
+    test("fi", "ClearSpeak", expr, "kompleksiluvut");
 }
 
 #[test]
@@ -13,7 +13,7 @@ fn natural() {
     let expr = "<math>
                     <mi>ℕ</mi>
                 </math>";
-    test("en", "ClearSpeak", expr, "the natural numbers");
+    test("fi", "ClearSpeak", expr, "luonnolliset luvut");
 }
 
 #[test]
@@ -21,7 +21,7 @@ fn rationals() {
     let expr = "<math>
                     <mi>ℚ</mi>
                 </math>";
-    test("en", "ClearSpeak", expr, "the rational numbers");
+    test("fi", "ClearSpeak", expr, "rationaaliluvut");
 }
 
 #[test]
@@ -29,7 +29,7 @@ fn reals() {
     let expr = "<math>
                     <mi>ℝ</mi>
                 </math>";
-    test("en", "ClearSpeak", expr, "the real numbers");
+    test("fi", "ClearSpeak", expr, "reaaliluvut");
 }
 
 #[test]
@@ -37,7 +37,7 @@ fn integers() {
     let expr = "<math>
                     <mi>ℤ</mi>
                 </math>";
-    test("en", "ClearSpeak", expr, "the integers");
+    test("fi", "ClearSpeak", expr, "kokonaisluvut");
 }
 
 
@@ -50,7 +50,7 @@ fn msup_complex() {
                     <mn>2</mn>
                 </msup>
                 </math>";
-    test("en", "ClearSpeak", expr, "C 2");
+    test("fi", "ClearSpeak", expr, "C 2");
 }
 
 #[test]
@@ -61,7 +61,7 @@ fn msup_natural() {
                     <mn>2</mn>
                 </msup>
             </math>";
-    test("en", "ClearSpeak", expr, "N 2");
+    test("fi", "ClearSpeak", expr, "N 2");
 }
 
 #[test]
@@ -72,7 +72,7 @@ fn msup_rationals() {
                     <mn>2</mn>
                 </msup>
             </math>";
-    test("en", "ClearSpeak", expr, "Q 2");
+    test("fi", "ClearSpeak", expr, "Q 2");
 }
 
 #[test]
@@ -83,7 +83,7 @@ fn msup_reals() {
                     <mn>3</mn>
                 </msup>
             </math>";
-    test("en", "ClearSpeak", expr, "R 3");
+    test("fi", "ClearSpeak", expr, "R 3");
 }
 
 #[test]
@@ -94,7 +94,7 @@ fn msup_integers() {
                     <mn>4</mn>
                 </msup>
             </math>";
-    test("en", "ClearSpeak", expr, "Z 4");
+    test("fi", "ClearSpeak", expr, "Z 4");
 }
 
 #[test]
@@ -105,7 +105,7 @@ fn msup_positive_integers() {
                     <mo>+</mo>
                 </msup>
             </math>";
-    test("en", "ClearSpeak", expr, "the positive integers");
+    test("fi", "ClearSpeak", expr, "positiiviset kokonaisluvut");
 }
 
 #[test]
@@ -116,7 +116,7 @@ fn msup_negative_integers() {
                     <mo>-</mo>
                 </msup>
             </math>";
-    test("en", "ClearSpeak", expr, "the negative integers");
+    test("fi", "ClearSpeak", expr, "negatiiviset kokonaisluvut");
 }
 
 #[test]
@@ -127,7 +127,7 @@ fn msup_positive_rationals() {
                     <mo>+</mo>
                 </msup>
             </math>";
-    test("en", "ClearSpeak", expr, "the positive rational numbers");
+    test("fi", "ClearSpeak", expr, "positiiviset rationaaliluvut");
 }
 
 #[test]
@@ -138,7 +138,7 @@ fn msup_negative_rationals() {
                     <mo>-</mo>
                 </msup>
             </math>";
-    test("en", "ClearSpeak", expr, "the negative rational numbers");
+    test("fi", "ClearSpeak", expr, "negatiiviset rationaaliluvut");
 }
 
 #[test]
@@ -146,7 +146,7 @@ fn empty_set() {
     let expr = "<math>
                 <mo>{</mo> <mo>}</mo>
             </math>";
-    test("en", "ClearSpeak", expr, "the empty set");
+    test("fi", "ClearSpeak", expr, "tyhjä joukko");
 }
 
 #[test]
@@ -170,7 +170,7 @@ fn set_with_colon() {
     let expr = "<math>
                     <mo>{</mo> <mrow><mi>x</mi><mo>:</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow> <mo>}</mo>
             </math>";
-    test("en", "ClearSpeak", expr, "the set of all x such that x is greater than 2");
+    test("fi", "ClearSpeak", expr, "joukko kaikki x siten että x on suurempi kuin 2");
 }
 
 #[test]
