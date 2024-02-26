@@ -8,7 +8,7 @@ fn common_fraction_half() {
     let expr = "<math>
                     <mfrac> <mn>1</mn> <mn>2</mn> </mfrac>
                 </math>";
-    test("en", "ClearSpeak", expr, "1 half");
+    test("fi", "ClearSpeak", expr, "1 kahdesosa");
 }
 
 #[test]
@@ -16,7 +16,7 @@ fn common_fraction_thirds() {
     let expr = "<math>
                     <mfrac> <mn>2</mn> <mn>3</mn> </mfrac>
                 </math>";
-    test("en", "ClearSpeak", expr, "2 thirds");
+    test("fi", "ClearSpeak", expr, "2 kolmasosaa");
 }
 
 #[test]
@@ -70,7 +70,7 @@ fn mixed_number() {
                     <mn>3</mn>
                     <mfrac> <mn>1</mn> <mn>2</mn> </mfrac>
                 </math>";
-    test("en", "ClearSpeak", expr, "3 and 1 half");
+    test("fi", "ClearSpeak", expr, "3 ja 1 kahdesosa");
 }
 
 #[test]
@@ -80,7 +80,7 @@ fn explicit_mixed_number() {
                     <mo>&#x2064;</mo>
                     <mfrac> <mn>1</mn> <mn>8</mn> </mfrac>
                 </math>";
-    test("en", "ClearSpeak", expr, "3 and 1 eighth");
+    test("fi", "ClearSpeak", expr, "3 ja 1 kahdeksasosa");
 }
 
 #[test]
@@ -89,7 +89,7 @@ fn mixed_number_big() {
                     <mn>3</mn>
                     <mfrac> <mn>7</mn> <mn>83</mn> </mfrac>
                 </math>";
-    test("en", "ClearSpeak", expr, "3 and 7 over 83");
+    test("fi", "ClearSpeak", expr, "3 ja 7 per 83");
 }
 
 #[test]
@@ -97,7 +97,7 @@ fn simple_text() {
     let expr = "<math>
     <mfrac> <mi>rise</mi> <mi>run</mi> </mfrac>
                 </math>";
-    test("en", "ClearSpeak", expr, "rise over run");
+    test("fi", "ClearSpeak", expr, "rise per run");
 }
 
 #[test]
@@ -110,7 +110,7 @@ fn number_and_text() {
                 <mn>3</mn><mtext>gallons</mtext></mrow>
             </mfrac>
         </math>";
-    test("en", "ClearSpeak", expr, "2 miles over 3 gallons");
+    test("fi", "ClearSpeak", expr, "2 miles per 3 gallons");
 }
 
 
@@ -165,7 +165,7 @@ fn semi_nested_fraction() {
                     </mfrac>
                 </mrow>
                 </math>";
-    test("en", "ClearSpeak", expr, "2 thirds x over 6");
+    test("fi", "ClearSpeak", expr, "2 kolmasosaa x per 6");
 }
 
 #[test]
@@ -255,5 +255,5 @@ fn binomial() {
                     <mfrac linethickness='0'> <mn>7</mn> <mn>3</mn> </mfrac>
                     <mo>)</mo>
                 </math>";
-    test("en", "ClearSpeak", expr, "2 times 7 choose 3");
+    test("fi", "ClearSpeak", expr, "2 kertaa 7 yli 3");
 }
