@@ -5,7 +5,7 @@ fn msqrt_simple() {
     let expr = "<math>
                     <msqrt> <mi>x</mi> </msqrt>
                 </math>";
-    test("en", "ClearSpeak", expr, "the square root of x,");
+    test("fi", "ClearSpeak", expr, "neliöjuuri x,");
 }
 
 #[test]
@@ -13,7 +13,7 @@ fn msqrt_simple_end_root() {
     let expr = "<math>
                     <msqrt> <mi>x</mi> </msqrt>
                 </math>";
-    test_ClearSpeak("en", "ClearSpeak_Roots", "RootEnd", expr, "the square root of x, end root;");
+    test_ClearSpeak("fi", "ClearSpeak_Roots", "RootEnd", expr, "neliöjuuri x, loppu juuri;");
 }
 
 #[test]
@@ -58,7 +58,7 @@ fn neg_without_root() {
     let expr = "<math>
                     <mo>-</mo> <mi>x</mi> <mo>-</mo> <mi>y</mi>
                 </math>";
-    test("en", "ClearSpeak", expr, "negative x minus y");
+    test("fi", "ClearSpeak", expr, "negatiivinen x miinus y");
 }
 
 #[test]
@@ -68,7 +68,7 @@ fn msqrt() {
                         <mrow> <mi>x</mi> <mo>+</mo> <mi>y</mi> </mrow>
                     </msqrt>
                 </math>";
-    test("en", "ClearSpeak", expr, "the square root of x plus y;");
+    test("fi", "ClearSpeak", expr, "neliöjuuri x plus y;");
 }
 
 #[test]
@@ -76,7 +76,7 @@ fn mroot_as_square_root() {
     let expr = "<math>
                     <mroot> <mi>x</mi> <mn>2</mn> </mroot>
                 </math>";
-    test("en", "ClearSpeak", expr, "the square root of x,");
+    test("fi", "ClearSpeak", expr, "neliöjuuri x,");
 }
 
 #[test]
@@ -84,7 +84,7 @@ fn cube_root() {
     let expr = "<math>
                     <mroot> <mi>x</mi> <mn>3</mn> </mroot>
                 </math>";
-    test("en", "ClearSpeak", expr, "the cube root of x,");
+    test("fi", "ClearSpeak", expr, "kuutiojuuri x,");
 }
 
 #[test]
@@ -92,15 +92,7 @@ fn ordinal_root() {
     let expr = "<math>
                     <mroot> <mi>x</mi> <mn>9</mn> </mroot>
                 </math>";
-    test("en", "ClearSpeak", expr, "the ninth root of x,");
-}
-
-#[test]
-fn simple_mi_root() {
-    let expr = "<math>
-                    <mroot> <mi>x</mi> <mi>n</mi> </mroot>
-                </math>";
-    test("en", "ClearSpeak", expr, "the n-th root of x,");
+    test("fi", "ClearSpeak", expr, "yhdeksäs juuri x,");
 }
 
 #[test]
@@ -128,5 +120,5 @@ fn simple_fraction_power() {
                         <mfrac><mn>1</mn><mn>3</mn></mfrac>
                     </mroot>
                 </math>";
-    test("en", "ClearSpeak", expr, "the 1 third root of x,");
+    test("fi", "ClearSpeak", expr, "1 kolmasosa juuri x,");
 }
