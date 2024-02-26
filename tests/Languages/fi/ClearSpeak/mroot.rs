@@ -16,23 +16,21 @@ fn msqrt_simple_end_root() {
     test_ClearSpeak("fi", "ClearSpeak_Roots", "RootEnd", expr, "neliöjuuri x, loppu juuri;");
 }
 
-// FI: commented out because of not passing, have to look into it
-// #[test]
-// fn msqrt_simple_positive() {
-//     let expr = "<math>
-//                     <msqrt> <mi>x</mi> </msqrt>
-//                 </math>";
-//     test_ClearSpeak("en", "ClearSpeak_Roots", "PosNegSqRoot", expr, "positiivinen neliöjuuri x,");
-// }
+#[test]
+fn msqrt_simple_positive() {
+    let expr = "<math>
+                    <msqrt> <mi>x</mi> </msqrt>
+                </math>";
+    test_ClearSpeak("en", "ClearSpeak_Roots", "PosNegSqRoot", expr, "the positive square root of x,");
+}
 
-// FI: commented out because of not passing, have to look into it
-// #[test]
-// fn msqrt_simple_pos_end_root() {
-//     let expr = "<math>
-//                     <msqrt> <mi>x</mi> </msqrt>
-//                 </math>";
-//     test_ClearSpeak("en", "ClearSpeak_Roots", "PosNegSqRootEnd", expr, "positiivinen neliöjuuri x, loppu juuri;");
-// }
+#[test]
+fn msqrt_simple_pos_end_root() {
+    let expr = "<math>
+                    <msqrt> <mi>x</mi> </msqrt>
+                </math>";
+    test_ClearSpeak("en", "ClearSpeak_Roots", "PosNegSqRootEnd", expr, "the positive square root of x, end root;");
+}
 
 #[test]
 fn msqrt_simple_pos_end_with_neg_root() {
@@ -97,23 +95,21 @@ fn ordinal_root() {
     test("fi", "ClearSpeak", expr, "yhdeksäs juuri x,");
 }
 
-// FI: commented out because of not passing, have to look into it
-// #[test]
-// fn simple_mi_root() {
-//     let expr = "<math>
-//                     <mroot> <mi>x</mi> <mi>n</mi> </mroot>
-//                 </math>";
-//     test("fi", "ClearSpeak", expr, "n nes juuri x,");
-// }
+#[test]
+fn simple_mi_root() {
+    let expr = "<math>
+                    <mroot> <mi>x</mi> <mi>n</mi> </mroot>
+                </math>";
+    test("en", "ClearSpeak", expr, "the n-th root of x,");
+}
 
-// FI: commented out because of not passing, have to look into it
-// #[test]
-// fn mroot_simple_pos_end_root() {
-//     let expr = "<math>
-//                 <mroot> <mi>x</mi> <mi>t</mi> </mroot>
-//                 </math>";
-//     test_ClearSpeak("fi", "ClearSpeak_Roots", "PosNegSqRootEnd", expr, "positiivinen t nes juuri x, loppu juuri;");
-// }
+#[test]
+fn mroot_simple_pos_end_root() {
+    let expr = "<math>
+                <mroot> <mi>x</mi> <mi>t</mi> </mroot>
+                </math>";
+    test_ClearSpeak("en", "ClearSpeak_Roots", "PosNegSqRootEnd", expr, "the positive t-th root of x, end root;");
+}
 
 #[test]
 fn mroot_simple_end_root() {
