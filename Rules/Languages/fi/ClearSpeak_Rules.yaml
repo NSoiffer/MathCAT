@@ -626,7 +626,7 @@
         - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
           then: [{T: "luonnollinen logaritmi"}]      # phrase(the 'natural log' of x)
           else: [{SPELL: "'ln'"}]
-      - T: ""      # phrase(the natural log 'of' x)
+      - T: "arvolla"      # phrase(the natural log 'of' x)
       - pause: short
   - x: "*[3]"
 
