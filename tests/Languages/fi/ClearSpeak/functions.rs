@@ -40,7 +40,7 @@ fn hyperbolic_trig_names() {
 #[test]
 fn inverse_trig() {
     let expr = "<math><msup><mi>sin</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
-    test("en", "ClearSpeak", expr, "inverse sine of x");
+    test("fi", "ClearSpeak", expr, "käänteis sini arvolla x");
 }
 
 #[test]
@@ -60,13 +60,13 @@ fn inverse_trig_arc() {
 #[test]
 fn trig_squared() {
     let expr = "<math><msup><mi>sin</mi><mn>2</mn></msup><mi>x</mi></math>";
-    test("en", "ClearSpeak", expr, "sine squared of x");
+    test("fi", "ClearSpeak", expr, "sini neliö arvolla x");
 }
 
 #[test]
 fn trig_cubed() {
     let expr = "<math><msup><mi>tan</mi><mn>3</mn></msup><mi>x</mi></math>";
-    test("en", "ClearSpeak", expr, "tangent cubed of x");
+    test("fi", "ClearSpeak", expr, "tangentti kuutio arvolla x");
 }
 
 #[test]
@@ -85,7 +85,7 @@ fn trig_power_other() {
 #[test]
 fn simple_log() {
     let expr = "<math> <mrow>  <mi>log</mi><mi>x</mi></mrow> </math>";
-    test("en", "ClearSpeak", expr, "log x");
+    test("fi", "ClearSpeak", expr, "logaritmi x");
 }
 
 #[test]
@@ -109,7 +109,7 @@ fn normal_log_with_base() {
 #[test]
 fn simple_ln() {
     let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
-    test("en", "ClearSpeak", expr, "l n x");
+    test("fi", "ClearSpeak", expr, "l n x");
 }
 
 #[test]
@@ -122,8 +122,8 @@ fn normal_ln() {
 #[test]
 fn simple_natural_log() {
     let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
-    test_ClearSpeak("en", "ClearSpeak_Log", "LnAsNaturalLog",expr,
-        "natural log x");
+    test_ClearSpeak("fi", "ClearSpeak_Log", "LnAsNaturalLog",expr,
+        "luonnollinen logaritmi x");
 }
 
     
@@ -138,26 +138,26 @@ fn natural_log() {
 #[test]
 fn explicit_function_call_with_parens() {
     let expr = "<math><mrow><mi>t</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow></math>";
-    test("en", "ClearSpeak", expr, "t of x");
+    test("fi", "ClearSpeak", expr, "t arvolla x");
 }
 
 
 #[test]
 fn explicit_times_with_parens() {
     let expr = "<math><mrow><mi>t</mi><mo>&#x2062;</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow></math>";
-    test("en", "ClearSpeak", expr, "t times x");
+    test("fi", "ClearSpeak", expr, "t kertaa x");
 }
 
 #[test]
 fn explicit_function_call() {
     let expr = "<math><mrow><mi>t</mi><mo>&#x2061;</mo><mrow><mi>x</mi></mrow></mrow></math>";
-    test("en", "ClearSpeak", expr, "t of x");
+    test("fi", "ClearSpeak", expr, "t arvolla x");
 }
 
 #[test]
 fn explicit_times() {
     let expr = "<math><mrow><mi>t</mi><mo>&#x2062;</mo><mrow><mi>x</mi></mrow></mrow></math>";
-    test("en", "ClearSpeak", expr, "t x");
+    test("fi", "ClearSpeak", expr, "t x");
 }
 
 
@@ -177,8 +177,8 @@ fn test_functions_none_pref_multiple_args() {
     let expr = "<math>
         <mi>B</mi> <mrow><mo>(</mo> <mrow> <mn>2</mn><mo>,</mo><mn>6</mn></mrow> <mo>)</mo></mrow>
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_Functions", "None",expr,
-        "cap b times, open paren 2 comma 6, close paren");
+    test_ClearSpeak("fi", "ClearSpeak_Functions", "None",expr,
+        "iso b kertaa, auki sulku 2 pilkku 6, kiinni sulku");
 }
 
 
@@ -188,7 +188,7 @@ fn test_functions_none_pref_multiple_args() {
 #[test]
 fn no_times_binomial() {
     let expr = "<math><mrow><mi>x</mi> <mo>&#x2062;</mo> <mi>y</mi></mrow></math>";
-    test("en", "ClearSpeak", expr, "x y");
+    test("fi", "ClearSpeak", expr, "x y");
 }
 
 #[test]
@@ -197,7 +197,7 @@ fn times_following_paren() {
         <mn>2</mn>
         <mrow>  <mo>(</mo> <mn>3</mn>  <mo>)</mo> </mrow>
         </mrow></math>";
-    test("en", "ClearSpeak", expr, "2 times 3");
+    test("fi", "ClearSpeak", expr, "2 kertaa 3");
 }
 
 #[test]
@@ -206,7 +206,7 @@ fn times_preceding_paren() {
         <mrow>  <mo>(</mo> <mn>2</mn>  <mo>)</mo> </mrow>
         <mn>3</mn>
         </mrow></math>";
-    test("en", "ClearSpeak", expr, "2 times 3");
+    test("fi", "ClearSpeak", expr, "2 kertaa 3");
 }
 
 #[test]
@@ -233,28 +233,28 @@ fn more_implied_times() {
     </msup>
     </mrow>
     </mrow></math>";
-    test_ClearSpeak("en", "ClearSpeak_ImpliedTimes", "MoreImpliedTimes",expr,
-        "open paren 2 times x, close paren squared");
+    test_ClearSpeak("fi", "ClearSpeak_ImpliedTimes", "MoreImpliedTimes",expr,
+        "auki sulku 2 kertaa x, kiinni sulku neliö");
 }
 
 #[test]
 fn explicit_times_more_implied_times() {
     let expr = "<math><mrow><mi>t</mi><mo>&#x2062;</mo><mrow><mi>x</mi></mrow></mrow></math>";
-    test_ClearSpeak("en", "ClearSpeak_ImpliedTimes", "MoreImpliedTimes",expr, "t times x");
+    test_ClearSpeak("fi", "ClearSpeak_ImpliedTimes", "MoreImpliedTimes",expr, "t kertaa x");
 }
 
 #[test]
 fn explicit_times_none_simple_right() {
     let expr = "<math><mn>2</mn><mo>[</mo><mn>3</mn> <mo>]</mo></math>";
-    test_ClearSpeak("en", "ClearSpeak_ImpliedTimes", "None",
-        expr, "2, open bracket 3 close bracket");
+    test_ClearSpeak("fi", "ClearSpeak_ImpliedTimes", "None",
+        expr, "2, auki hakasulku 3 kiinni hakasulku");
 }
 
 #[test]
 fn explicit_times_none_simple_left() {
     let expr = "<math><mo>(</mo><mn>2</mn><mo>&#x2212;</mo><mn>1</mn><mo>)</mo><mi>x</mi></math>";
-    test_ClearSpeak("en", "ClearSpeak_ImpliedTimes", "None",
-        expr, "open paren 2 minus 1, close paren; x");
+    test_ClearSpeak("fi", "ClearSpeak_ImpliedTimes", "None",
+        expr, "auki sulku 2 miinus 1, kiinni sulku; x");
 }
 
 #[test]
@@ -285,7 +285,7 @@ fn explicit_times_none_superscript() {
         <mo>)</mo></mrow>
         <mi>x</mi>
         </mrow></math>";
-        test("en", "ClearSpeak", expr, "25 times x");
+        test("fi", "ClearSpeak", expr, "25 kertaa x");
     }
 
     #[test]
@@ -296,7 +296,7 @@ fn explicit_times_none_superscript() {
         <mrow><mi>x</mi><mi>y</mi></mrow>
         <mo>)</mo></mrow>
         </mrow></math>";
-        test("en", "ClearSpeak", expr, "b x y");
+        test("fi", "ClearSpeak", expr, "b x y");
     }
 
     #[test]
@@ -307,7 +307,7 @@ fn explicit_times_none_superscript() {
         <mrow><mo>&#x2212;</mo><mn>2</mn></mrow>
         <mo>)</mo></mrow>
         </mrow></math>";
-        test("en", "ClearSpeak", expr, "2 plus negative 2");
+        test("fi", "ClearSpeak", expr, "2 plus negatiivinen 2");
     }
 
 
@@ -320,7 +320,7 @@ fn explicit_times_none_superscript() {
         </mrow>
         <mo>+</mo><mn>1</mn>
         </mrow></math>";
-        test("en", "ClearSpeak", expr, "negative 2 x, plus 1");
+        test("fi", "ClearSpeak", expr, "negatiivinen 2 x, plus 1");
     }
 
     #[test]
@@ -336,7 +336,7 @@ fn explicit_times_none_superscript() {
         </msup>
         </mrow>
     </mrow></math>";
-        test("en", "ClearSpeak", expr, "open paren 2 x close paren squared");
+        test("fi", "ClearSpeak", expr, "auki sulku 2 x kiinni sulku neliö");
     }
 
     #[test]
@@ -349,7 +349,7 @@ fn explicit_times_none_superscript() {
             <mfrac> <mn>1</mn><mn>2</mn></mfrac>
             <mo>)</mo></mrow></mrow>
     </mrow></math>";
-        test("en", "ClearSpeak", expr, "2 plus 1 half");
+        test("fi", "ClearSpeak", expr, "2 plus 1 kahdesosa");
     }
 
 
