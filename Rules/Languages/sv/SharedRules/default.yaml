@@ -210,11 +210,11 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [T: "modifierat"]      # phrase(phrase(x 'modified' with y above it)
+      then: [T: "kommenterat uttryck"]      # phrase(phrase(x 'modified' with y above it)
   - x: "*[1]"
-  - T: "med"      # phrase(x 'with' z below it)
+  - T: "med kommentar under"      # phrase(x 'with' z below it)
   - x: "*[2]"
-  - T: "under"      # phrase(x with z 'below' it)
+  - T: "slut kommentar"      # phrase(x with z 'below' it)
 
 - name: diacriticals
   tag: mover
@@ -229,11 +229,11 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [T: "modifierat"]      # phrase(phrase(x 'modified' with y above it)
+      then: [T: "kommenterat uttryck"]      # phrase(phrase(x 'modified' with y above it)
   - x: "*[1]"
-  - T: "med"         # phrase(x modified 'with' y above it)
+  - T: "med kommentar över"         # phrase(x modified 'with' y above it)
   - x: "*[2]"
-  - T: "ovanför"        # phrase(x modified 'with' y above it)
+  - T: "slut kommentar"        # phrase(x modified 'with' y above it)
 
 - name: default
   tag: munderover
@@ -241,13 +241,13 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [T: "modifierat"]      # phrase(the equation has been 'modified')
+      then: [T: "kommenterat uttryck"]      # phrase(the equation has been 'modified')
   - x: "*[1]"
-  - T: "med"         # phrase(x modified 'with' y above it)
+  - T: "med kommentar under"         # phrase(x modified 'with' y above it)
   - x: "*[2]"
-  - T: "under och"    # phrase(x modified with y 'below and' y above it)
+  - T: "och kommentar över"    # phrase(x modified with y 'below and' y above it)
   - x: "*[3]"
-  - T: "ovanför"        # phrase(x modified with y 'above' it)
+  - T: "slut kommentar"        # phrase(x modified with y 'above' it)
 
 - name: default
   #   Here we support up to 2 prescripts and up to 4 postscripts -- that should cover all reasonable cases
