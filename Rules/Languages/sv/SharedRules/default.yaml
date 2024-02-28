@@ -212,8 +212,11 @@
       if: "not(IsNode(*[1], 'leaf'))"
       then: [T: "kommenterat uttryck"]      # phrase(phrase(x 'modified' with y above it)
   - x: "*[1]"
+  - pause: short
   - T: "med kommentar under"      # phrase(x 'with' z below it)
+  - pause: short
   - x: "*[2]"
+  - pause: short
   - T: "slut kommentar"      # phrase(x with z 'below' it)
 
 - name: diacriticals
@@ -231,8 +234,11 @@
       if: "not(IsNode(*[1], 'leaf'))"
       then: [T: "kommenterat uttryck"]      # phrase(phrase(x 'modified' with y above it)
   - x: "*[1]"
+  - pause: short
   - T: "med kommentar över"         # phrase(x modified 'with' y above it)
+  - pause: short
   - x: "*[2]"
+  - pause: short
   - T: "slut kommentar"        # phrase(x modified 'with' y above it)
 
 - name: default
@@ -243,10 +249,15 @@
       if: "not(IsNode(*[1], 'leaf'))"
       then: [T: "kommenterat uttryck"]      # phrase(the equation has been 'modified')
   - x: "*[1]"
+  - pause: short
   - T: "med kommentar under"         # phrase(x modified 'with' y above it)
+  - pause: short
   - x: "*[2]"
+  - pause: short
   - T: "och kommentar över"    # phrase(x modified with y 'below and' y above it)
+  - pause: short
   - x: "*[3]"
+  - pause: short
   - T: "slut kommentar"        # phrase(x modified with y 'above' it)
 
 - name: default
