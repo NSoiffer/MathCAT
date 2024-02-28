@@ -174,7 +174,7 @@
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
   - bookmark: "./@id"
-  - t: "negative"      # phrase('negative' numbers are those less than 0)
+  - t: "minus"      # phrase('negative' numbers are those less than 0)
   - x: "*[1]"
 
 - name: positive
@@ -190,7 +190,7 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - t: "sub"      # phrase(the subscripted variable a 'sub' i)
+  - t: "index"      # phrase(the subscripted variable a 'sub' i)
   - x: "*[2]"
   - test:
       if: "DEBUG(not(IsNode(*[2],'leaf')))"
@@ -296,7 +296,7 @@
   - test:
       if: "$Verbosity='Verbose'"
       then: {t: "index"}      # phrase(a 'subscript' may be used to indicate an index)
-      else: {t: "sub"}      # phrase(the result is 'sub' optimal)
+      else: {t: "index"}      # phrase(the result is 'sub' optimal)
   - x: "*[2]"
   - test:
       if: "DEBUG(not(IsNode(*[2],'leaf')))"
@@ -742,7 +742,7 @@
       then: [{t: "index"}]      # phrase(H 'subscript' 2)
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{t: "sub"}]      # phrase(H 'sub' 2)
+        then: [{t: "index"}]      # phrase(H 'sub' 2)
   - x: "*[3]"
 
 - name: chemistry-msup
@@ -797,7 +797,7 @@
               then: [{t: "index"}]      # phrase(a 'subscript' may be used to indicate an index)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "sub"}]      # phrase(here is a 'sub' total)
+                then: [{t: "index"}]      # phrase(here is a 'sub' total)
           - x: "$Prescripts[1]"
           - pause: "short"
       - test:
@@ -822,7 +822,7 @@
                   then: [{t: "index"}]      # phrase(H 'subscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "sub"}]      # phrase(H 'sub' 2)
+                    then: [{t: "index"}]      # phrase(H 'sub' 2)
               - x: "$Prescripts[3]"
               - pause: "short"
   - x: "*[1]" # base
@@ -837,7 +837,7 @@
               then: [{t: "index"}]      # phrase(phrase(H 'subscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "sub"}]      # phrase(phrase(H 'sub' 2)
+                then: [{t: "index"}]      # phrase(phrase(H 'sub' 2)
           - x: "$Postscripts[1]"
           - pause: "short"
       - test:
@@ -862,7 +862,7 @@
                   then: [{t: "index"}]      # phrase(H 'subscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "sub"}]          # phrase(H 'sub' 2)
+                    then: [{t: "index"}]          # phrase(H 'sub' 2)
               - x: "$Postscripts[3]"
               - pause: "short"
           - test:
@@ -887,7 +887,7 @@
                       then: [{t: "index"}]    # phrase(H 'subscript' 2)
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{t: "sub"}]        # phrase(H 'sub' 2)
+                        then: [{t: "index"}]        # phrase(H 'sub' 2)
                   - x: "$Postscripts[5]"
                   - pause: "short"
               - test:
@@ -912,7 +912,7 @@
                           then: [{t: "index"}]      # phrase(H 'subscript' 2)
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{t: "sub"}]      # phrase(H 'sub' 2)
+                            then: [{t: "index"}]      # phrase(H 'sub' 2)
                       - x: "$Postscripts[7]"
                       - pause: "short"
                   - test:

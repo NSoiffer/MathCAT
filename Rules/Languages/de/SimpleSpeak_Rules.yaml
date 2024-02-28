@@ -24,7 +24,7 @@
   - t: "quadratwurzel"      # phrase(the 'square root' of x)
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "of"}   # phrase(the square root 'of' x)
+      then: {t: "aus"}   # phrase(the square root 'of' x)
       else: {pause: short}
   - x: "*[1]"
   - test:
@@ -36,9 +36,9 @@
   tag: root
   match: "."
   replace:
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [{t: "the"}]
+  # - test:
+  #     if: "$Verbosity!='Terse'"
+  #     then: [{t: "die"}]
   - test:
       if: "*[2][self::m:mn]"
       then_test:
@@ -47,7 +47,7 @@
       - else_if: "*[2][text()='3']"
         then: [{t: "würfelwurzel"}]        # phrase(the 'cube root' of x)
       - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {t: "root"}]        # phrase(the square 'root' of x)
+        then: [{x: "ToOrdinal(*[2])"}, {t: "wurzelexponent "}]        # phrase(the square 'root' of x)
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
@@ -55,15 +55,15 @@
           - x: "*[2]"
           - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: [{x: "*[2]"}]
-      - t: "root"        # phrase(the square 'root' of)
+      - t: "anfang wurzel"        # phrase(the square 'root' of)
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "of"}]        # phrase(the square root 'of' x)
+      then: [{t: "aus"}]        # phrase(the square root 'of' x)
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{t: "ende der wurzel"}, {pause: short}]      # phrase(start the fifth root of x 'end of root')
+      else: [{t: "ende wurzel"}, {pause: short}]      # phrase(start the fifth root of x 'end of root')
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
@@ -165,40 +165,40 @@
       then: {t: "quadrat"}      # phrase(5 'squared' equals 25)
       else: {t: "chorned"}      # phrase(5 'cubed' equals 125)
 
-- name: simple-integer
-  tag: power
-  match: "*[2][self::m:mn][not(contains(., '.'))]"
-  replace:
-  - x: "*[1]"
-  - t: "to the"      # phrase(15 raised 'to the' second power equals 225)
-  - test:
-      if: "*[2][.>0]"
-      then: {x: "ToOrdinal(*[2])"}
-      else: {x: "*[2]"}
-- name: simple-negative-integer
-  tag: power
-  match:
-  - "*[2][self::m:negative and"
-  - "     *[1][self::m:mn][not(contains(., '.'))]]"
-  replace:
-  - x: "*[1]"
-  - t: "to the"      # phrase(15 raised 'to the' second power equals 225)
-  - x: "*[2]"
-- name: simple-var
-  tag: power
-  match: "*[2][self::m:mi][string-length(.)=1]"
-  replace:
-  - x: "*[1]"
-  - t: "to the"      # phrase(15 raised 'to the' second power equals 225)
-  - x: "*[2]"
-  - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+# - name: simple-integer
+#   tag: power
+#   match: "*[2][self::m:mn][not(contains(., '.'))]"
+#   replace:
+#   - x: "*[1]"
+#   - t: "hoch"      # phrase(15 raised 'to the' second power equals 225)
+#   - test:
+#       if: "*[2][.>0]"
+#       then: {x: "ToOrdinal(*[2])"}
+#       else: {x: "*[2]"}
+# - name: simple-negative-integer
+#   tag: power
+#   match:
+#   - "*[2][self::m:negative and"
+#   - "     *[1][self::m:mn][not(contains(., '.'))]]"
+#   replace:
+#   - x: "*[1]"
+#   - t: "hoch"      # phrase(15 raised 'to the' second power equals 225)
+#   - x: "*[2]"
+# - name: simple-var
+#   tag: power
+#   match: "*[2][self::m:mi][string-length(.)=1]"
+#   replace:
+#   - x: "*[1]"
+#   - t: "to the"      # phrase(15 raised 'to the' second power equals 225)
+#   - x: "*[2]"
+#   - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
 
 - name: simple
   tag: power
   match: "IsNode(*[2], 'leaf')"
   replace:
   - x: "*[1]"
-  - t: "to the"      # phrase(15 raised 'to the' second power equals 225)
+  - t: "hoch"      # phrase(15 raised 'to the' second power equals 225)
   - x: "*[2]"
 
 - name: nested
@@ -213,18 +213,18 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - t: "raised to the"      # phrase(15 'raised to the' second power equals 225)
+  - t: "mit exponent"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
   - pause: short
-  - t: "ende des exponenten"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+  - t: "ende exponent"      # phrase(start 2 raised to the exponent 4 'end of exponent')
 - name: default
   tag: power
   match: "."
   replace:
   - x: "*[1]"
-  - t: "raised to the"      # phrase(15 'raised to the' second power equals 225)
+  - t: "hoch"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
-  - t: "power"      # phrase(15 raised to the second 'power' equals 225)
+  - t: "ende exponent"      # phrase(15 raised to the second 'power' equals 225)
 
 #
 # Some rules on mrows

@@ -1,5 +1,6 @@
 ---
 [
+    include: "../../definitions.yaml",
 # Lines starting with "#" are a comment
 # Each definition in this file is of the form
 #   name: [ "...", "..." "..." ],
