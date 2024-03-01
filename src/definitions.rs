@@ -144,9 +144,6 @@ pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
     definitions.with( |defs| defs.borrow_mut().name_to_var_mapping.clear() );
     let mut new_files = vec![file_path.to_path_buf()];
     let mut files_read = read_one_definitions_file(use_speech_defs, file_path).chain_err(|| format!("in file '{}", file_path.to_string_lossy()))?;
-    if use_speech_defs {
-        verify_speech_definitions(use_speech_defs)?;
-    }
     new_files.append(&mut files_read);
 
     // merge the contents of `TrigFunctions` into a set that contains all the function names (from `AdditionalFunctionNames`).
@@ -166,63 +163,6 @@ pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
         }
         return all_functions;
     }
-}
-
-fn verify_speech_definitions(use_speech_defs: bool) -> Result<()> {
-    // all of the 'numbers-xxx' files should be either size 0 or multiples of tens except:
-    //   ...-ones
-    //   numbers-plural, which should have a single entry
-    lazy_static! {
-        static ref USED_SETS: Vec<&'static str> = vec!["TrigFunctionNames", "AdditionalFunctionNames", "LikelyFunctionNames", 
-                                "LargeOperators"];
-        static ref USED_VECTORS: Vec<&'static str> = vec![
-                "NumbersHundreds", "NumbersTens", "NumbersOnes",
-                "NumbersOrdinalPluralLarge", "NumbersOrdinalLarge", "NumbersLarge",
-                "NumbersOrdinalPluralHundreds", "NumbersOrdinalPluralTens", "NumbersOrdinalPluralOnes",
-                "NumbersOrdinalHundreds", "NumbersOrdinalTens", "NumbersOrdinalOnes",
-                "NumbersOrdinalFractionalPluralOnes", "NumbersOrdinalFractionalOnes"
-        ];
-    }
-    let definitions = if use_speech_defs {&SPEECH_DEFINITIONS} else {&BRAILLE_DEFINITIONS};
-    return definitions.with(|definitions| {
-        // verify that all the named functions used in the code exist
-        // FIX: is there a way to gather them automatically?
-        let definitions = definitions.borrow();
-        let name_definition_map = &definitions.name_to_var_mapping;
-
-        for name in USED_SETS.iter() {
-            if !name_definition_map.contains_key(*name) {
-                bail!("Required (set) name '{}' is missing from 'definitions.yaml'", *name);
-            }
-        }
-        for name in USED_VECTORS.iter() {
-            if !name_definition_map.contains_key(*name) {
-                let pref_manager = PreferenceManager::get();
-                let pref_manager = pref_manager.borrow();
-                let def_file = pref_manager.get_definitions_file(use_speech_defs);            
-                bail!("Required (array) name '{}' is missing from '{}'", *name, def_file.to_string_lossy());
-            }
-        }
-        for (name,collection) in name_definition_map.iter() {
-            if name.contains("number") && !name.contains("fraction") {
-                match collection {
-                    Contains::Vec(v) => {
-                        let v = v.borrow();
-                        if v.is_empty() || v.len() % 10 != 0 {
-                            bail!("{} has wrong number of values: {}", name, v.len());
-                        }
-                    },
-                    _ => {
-                        let pref_manager = PreferenceManager::get();
-                        let pref_manager = pref_manager.borrow();
-                        let def_file = pref_manager.get_definitions_file(use_speech_defs);                    
-                        bail!("{} is not a vector! Defined in {}", name, def_file.to_string_lossy());
-                    },
-                }
-            }
-        };
-        return Ok( () )
-    });
 }
 
 use crate::speech::*;
