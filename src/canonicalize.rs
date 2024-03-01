@@ -1022,7 +1022,8 @@ impl CanonicalizeContext {
 				}
 
 				// FIX: this should be setting children, not mathml
-				let mathml =  if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
+				let mathml =  if element_name == "mrow" ||
+							(children.len() > 1 && ELEMENTS_WITH_ONE_CHILD.contains(element_name)) {
 					let merged = merge_dots(mathml);	// FIX -- switch to passing in children
 					let merged = merge_primes(merged);
 					let merged = merge_chars(merged, &IS_UNDERSCRORE);
@@ -2246,6 +2247,7 @@ impl CanonicalizeContext {
 				"′", "″", "‴", "‵", "‶", "‷", "⁗",
 			};
 	
+			assert!(name(&mrow) == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(name(&mrow)), "non-mrow passed to handle_pseudo_scripts: {}", mml_to_string(&mrow));
 			let mut children = mrow.children();
 			// check to see if mrow of all psuedo scripts
 			if children.iter().all(|&child| {
@@ -2293,6 +2295,14 @@ impl CanonicalizeContext {
 				if name(&child) == "mo" {
 					let text = as_text(child);
 					if PSEUDO_SCRIPTS.contains(as_text(child)) {
+						// don't script a pseudo-script
+						let preceding_siblings = child.preceding_siblings();
+						if !preceding_siblings.is_empty() {
+							let last_child = as_element(preceding_siblings[preceding_siblings.len()-1]);
+							if name(&last_child) == "mo" && PSEUDO_SCRIPTS.contains(as_text(last_child)) {
+								return false;
+							}
+						}
 						if text == "*" {
 							// could be infix "*" -- this is a weak check to see if what follows is potentially an operand
 							let following_siblings = child.following_siblings();
