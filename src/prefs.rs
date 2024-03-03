@@ -58,6 +58,7 @@ impl Preferences{
     fn user_defaults() -> Preferences {
         let mut prefs = PreferenceHashMap::with_capacity(39);
         prefs.insert("Language".to_string(), Yaml::String("en".to_string()));
+        prefs.insert("LanguageAuto".to_string(), Yaml::String("".to_string()));     // illegal value so change will be recognized
         prefs.insert("SpeechStyle".to_string(), Yaml::String("ClearSpeak".to_string()));
         prefs.insert("Verbosity".to_string(), Yaml::String("medium".to_string()));
         prefs.insert("SpeechOverrides_CapitalLetters".to_string(), Yaml::String("".to_string())); // important for testing
@@ -579,18 +580,36 @@ impl PreferenceManager {
     /// 
     /// Note: changing the language, speech style, or braille code might fail if the files don't exist.
     ///   If this happens, the preference is not set and an error is returned.
+    /// If "LanguageAuto" is set, we assume "Language" has already be checked to be "Auto"
     pub fn set_api_string_pref(&mut self, key: &str, value: &str) -> Result<()> {
         if !self.error.is_empty() {
             panic!("Internal error: set_api_string_pref called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
-        self.reset_preferences(key, value)?;
-        self.api_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+        // don't do an update if the value hasn't changed
+        if let Some(pref_value) = self.user_prefs.prefs.get(key) {
+            if pref_value.as_str().unwrap() != value {
+                self.reset_preferences(key, value)?;
+            } else if let Some(pref_value) = self.api_prefs.prefs.get(key) {
+                if pref_value.as_str().unwrap() != value {
+                    self.reset_preferences(key, value)?;
+                }
+            }
+        }
 
+        self.api_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
         return Ok( () );
     }
 
-    fn reset_preferences(&mut self, changed_pref: &str, changed_value: &str) -> Result<()> {
+    fn reset_preferences(&mut self, changed_pref: &str, changed_value: &str) -> Result<()> {        
+        if changed_pref == "Language" && changed_value == "Auto" {
+            // Language must have had a non-Auto value -- set LanguageAuto to old value so (probable) next change to LanguageAuto works well
+            self.api_prefs.prefs.insert("LanguageAuto".to_string(),
+                                self.api_prefs.prefs.get("Language").unwrap().clone() );
+            return Ok( () );
+        }
+
+        let changed_pref = if changed_pref == "LanguageAuto" {"Language"} else {changed_pref};
         let language_dir = self.rules_dir.to_path_buf().join("Languages");
         match changed_pref {
             "Language" => {

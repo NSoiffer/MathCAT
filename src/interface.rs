@@ -190,13 +190,18 @@ pub fn get_preference(name: String) -> Result<String> {
 /// 
 /// Be careful setting preferences -- these potentially override user settings, so only preferences that really need setting should be set.
 pub fn set_preference(name: String, value: String) -> Result<()> {
-    if name == "Language" {
+    // "LanguageAuto" allows setting the language dir without actually changing the value of "Language" from Auto
+    if name == "Language" || name == "LanguageAuto" {
         // check the format
         if !( value == "Auto" ||
-                value.len() == 2 ||
-                (value.len() == 5 && value.as_bytes()[2] == b'-') ) {
+              value.len() == 2 ||
+              (value.len() == 5 && value.as_bytes()[2] == b'-') ) {
             bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value);
         }
+        if name == "LanguageAuto" && value == "Auto" {
+            bail!("'LanguageAuto' can not have the value 'Auto'");
+        }
+
     }
     
     crate::speech::SPEECH_RULES.with(|rules| {
@@ -207,6 +212,12 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
 
         // we set the value even if it was the same as the old value because this might override a potentially changed future user value
         let mut pref_manager = rules.pref_manager.borrow_mut();
+        if name == "LanguageAuto" {
+            let language_pref = pref_manager.pref_to_string("Language");
+            if language_pref != "Auto" {
+                bail!("'LanguageAuto' can only be used when 'Language' has the value 'Auto'; Language={}", language_pref);
+            }
+        }
         let lower_case_value = value.to_lowercase();
         if lower_case_value == "true" || lower_case_value == "false" {
             pref_manager.set_api_boolean_pref(&name, value.to_lowercase()=="true"); 
