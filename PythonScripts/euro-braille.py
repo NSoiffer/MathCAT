@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 from html_table_extractor.extractor import Extractor
 from typing import TextIO
 import sys
+import xml.etree.ElementTree as ET
+import re
 sys.stdout.reconfigure(encoding='utf-8')
 
 
@@ -58,6 +60,80 @@ def create_unicode_from_list_of_symbols_html(out_file: str):
                 write_line(unicode, latex, out_stream)
 
 
+UNICODE_CH_PATTERN = re.compile(r' - "(.)"')
+
+
+def get_unicode_yaml_chars() -> set[str]:
+    answer = set()
+    with open("../Rules/Languages/en/unicode.yaml", "r", encoding='utf8') as unicode_stream:
+        for line in unicode_stream.readlines():
+            matched = UNICODE_CH_PATTERN.match(line)
+            if matched and ord(matched.group(1)) > 127:
+                answer.add(matched.group(1))
+        for ch in range(ord('Α'), ord('Ω')):   # these are a range in unicode.yaml, so the pattern doesn't match
+            answer.add(chr(ch))
+    return answer
+
+
+# The chars in unicode.yaml (others go into unicode-full.yaml)
+UNICODE_CHARS_SHORT = get_unicode_yaml_chars()
+
+
+def extract_latex(in_file):
+    tree = ET.parse(in_file)
+    root = tree.getroot()
+    all_chars = root.find("charlist")
+
+    with open("latex-braille-unicode.yaml", 'w', encoding='utf8') as short_stream:
+        with open("latex-braille-unicode-full.yaml", 'w', encoding='utf8') as full_stream:
+            short_stream.write("---\n")
+            full_stream.write("---\n")
+            for char in all_chars:
+                ch = convert_to_char(char.get("id"))
+                if len(ch) == 1 and ord(ch) < 128:
+                    continue
+
+                stream = short_stream if ch in UNICODE_CHARS_SHORT else full_stream
+                latex = char.find("latex")
+                var_latex = char.find("varlatex")
+                ams_latex = char.find("ams")
+                math_latex = char.find("mathlatex")
+                # if latex is None and not(var_latex is None and math_latex is None):
+                #     print(f"No latex for ch: {ch}/{char.get('id')}" +
+                #         "" if var_latex is None else f"var_latex={var_latex.text}" +
+                #         "" if math_latex is None else f"math_latex={math_latex.text}"
+                #     )
+                #     continue
+
+                names_seen = []
+                for latex_name in [latex, var_latex, ams_latex, math_latex]:
+                    if latex_name is None:
+                        continue
+                    latex_name = latex_name.text.strip()
+                    if latex_name in names_seen:
+                        continue
+                    if latex_name.startswith('\\up') and "\\" + latex_name[3:] in names_seen:  # "\upiota", etc, is skipped
+                        continue
+                    if len(names_seen) > 0:
+                        stream.write('# ')    # alternative name
+                    write_line(ch, latex_name, stream)
+                    names_seen.append(latex_name)
+
+
+def convert_to_char(str: str) -> str:
+    # str is 'Uddddd' or 'Uddddd-ddddd'
+    str = str.split("U")[1]  # strip leading 'U'
+    answer = ""
+    for char_str in str.split("-"):
+        # FIX: need to add backslash is str becomes ""
+        ch = chr(int(char_str, base=16))
+        if (ch == '"' or ch == '\\'):
+            answer += "\\"
+        answer += ch
+
+    return answer
+
+
 def create_greek_letters(out_file: str):
     # the HTML file has rowspans in it -- hence the use of table extractor
     with open("greek-letters.txt", encoding='utf8') as in_stream:
@@ -74,26 +150,32 @@ def create_greek_letters(out_file: str):
 
 
 def write_line(ch: str, latex: str, out_stream: TextIO):
+    def hex_string(ch: str) -> str:
+        comment = ''
+        if ch == '\\\\' or ch == '\\"':
+            comment = hex(ord(ch[1]))
+        elif len(ch) == 1:
+            comment = hex(ord(ch))
+        else:
+            comment = "0" + ch[1:]
+        return comment
+    
     if ch == '"':
         ch = '\\"'
     elif ch == '\\':
         ch = '\\\\'
     elif ch == '\\127':
         ch = '\\x7F'
-    braille = ascii_to_euro_braille(latex + ' ')
+    space = '' if ch.startswith('\\') and not(ch.endswith('}')) else ' '
+    braille = ascii_to_euro_braille(latex + space)
     first_part = f' - "{ch}": [t: "{braille}"]'
     try:
-        comment = ''
-        if ch == '\\\\' or ch == '\\"':
-            comment = hex(ord(ch[1]))
-        elif len(ch) == 1 or len(ch) == 2:
-            comment = hex(ord(ch))
-        else:
-            comment = "0" + ch[1:]
-        out_stream.write('{:40}# {} ({})\n'.format(first_part, comment, latex))
+        out_stream.write('{:40}# {} ({})\n'.format(first_part, hex_string(ch), latex))
     except:
-        print(f"failed to write a line for ch='{ch}'")
+        print(f"failed to write a line for ch='{ch}/{hex_string(ch)}'")
+
 
 
 # create_unicode_from_list_of_symbols_html("euro-symbols2.yaml")
-create_greek_letters("greek-letters.yaml")
+# create_greek_letters("greek-letters.yaml")
+extract_latex("c:\\dev\\mathml-refresh\\xml-entities\\unicode.xml")
