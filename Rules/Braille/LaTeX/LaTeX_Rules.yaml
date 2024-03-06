@@ -14,7 +14,7 @@
         - else_if: "@data-previous-space-width > 1.1"
           then: [t: "⠬"]
         - else_if: "@data-previous-space-width >= 0.25"      # thickspace
-          then: [t: " "]
+          then: [t: "𝐖"]
       - x: "."
       - test:
         - if: "(@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']) and @data-following-space-width >= 0.25" # BANA 5.3(a)
@@ -22,7 +22,7 @@
         - else_if: "@data-following-space-width > 1.1"
           then: [t: "⠬"]
         - else_if: "@data-following-space-width >= 0.25"      # thickspace
-          then: [t: " "]
+          then: [t: "𝐖"]
 
 -
   name: omission-intent
@@ -44,9 +44,12 @@
   match: "."
   replace: 
   # example show use of {}s even when not needed, so no testing
-  - x: "'\\sqrt{'"
+  - test:
+      if: "$LaTeX_UseShortName"
+      then: [t: "\\s{"]
+      else: [t: "\\sqrt{"]
   - x: "*[1]"
-  - x: "'}'"
+  - t: "}"
 
 
 -
@@ -55,11 +58,14 @@
   match: "."
   replace: 
   # example show use of {}s even when not needed, so no testing
-  - x: "'\\sqrt['"
+  - test:
+      if: "$LaTeX_UseShortName"
+      then: [t: "\\s["]
+      else: [t: "\\sqrt["]
   - x: "*[2]"
-  - x: "']{'"
+  - t: "]{"
   - x: "*[1]"
-  - x: "'}'"
+  - t: "}"
 
 -
   name: default
@@ -67,11 +73,14 @@
   match: "."
   replace: 
   # example show use of {}s even when not needed, so no testing
-  - x: "'\\frac{'"
+  - test:
+      if: "$LaTeX_UseShortName"
+      then: [t: "\\f{"]
+      else: [t: "\\frac{"]
   - x: "*[1]"
-  - x: "'}{'"
+  - t: "}{"
   - x: "*[2]"
-  - x: "'}'"
+  - t: "}"
 
 -
   #GTM 14.3.3 (not sure what else vertical juxtaposition applies to)
@@ -79,22 +88,22 @@
   tag: mrow
   match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][@linethickness=0]"
   replace: 
-  - x: "'\\binom{'"
+  - t: "\\binom{"
   - x: "*[2]/*[1]"
-  - x: "'}{'"
+  - t: "}{"
   - x: "*[2]/*[2]"
-  - x: "'}'"
+  - t: "}"
 
 
 - name: binomial-table
   tag: mrow
   match: "IsBracketed(., '(', ')') and *[2][self::m:mtable][count(*)=2 and count(*[1])=1] and contains(@intent, 'binomial(')"
   replace:
-  - x: "'\\binom{'"
+  - t: "\\binom{"
   - x: "*[2]/*[1]/*[1]/*[1]"
-  - x: "'}{'"
+  - t: "}{"
   - x: "*[2]/*[2]/*[1]/*[1]"
-  - x: "'}'"
+  - t: "}"
 
 # FIX: implement (use \begin{pmatrix} x; & y; & z-3 \end{pmatrix})
 # Matrix/Determinant rules
@@ -114,13 +123,13 @@
   - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or"
   - " IsBracketed(., '|', '|') or IsBracketed(., '‖', '‖') or IsBracketed(., '{', '}') )"
   replace:
-  - x: "'\\begin{'"
+  - t: "\\begin{"
   - x: "string($MatrixType)"     # need to get $MatrixType eval'd so that it is converted to braille (doesn't work if I do it in 'variables') 
-  - x: "'} '"
+  - t: "}𝐖"
   - x: "*[2]"
-  - x: "'\\end{'"
+  - t: "\\end{"
   - x: "string($MatrixType)"     # need to get $MatrixType eval'd so that it is converted to braille (doesn't work if I do it in 'variables') 
-  - x: "'} '"
+  - t: "}𝐖"
 
 -
   name: default-mtable
@@ -144,7 +153,7 @@
   - x: "*"
   - test: 
       if: "following-sibling::*"
-      then: [x: "' \\\\ '"]
+      then: [t: "𝐖\\\\𝐖"]
 
 -
   name: default
@@ -154,13 +163,13 @@
   - x: "*"
   - test:
       if: "following-sibling::*"
-      then: [x: "' & '"]
+      then: [t: "𝐖&𝐖"]
 
 -
   name: no-content
   tag: math
   match: "not(*)"      # empty
-  replace: [x: "' '"]    # not sure that is right, but this shouldn't happen
+  replace: [t: "𝐖"]    # not sure that is right, but this shouldn't happen
 
 -
   name: default
@@ -174,7 +183,7 @@
   name: empty-mrow
   tag: mrow
   match: "not(*)"
-  replace: [x: "' '"] # not sure what is correct -- if in a fraction, probably something is better than nothing
+  replace: [t: "𝐖"] # not sure what is correct -- if in a fraction, probably something is better than nothing
 
 -
   name: default
@@ -196,15 +205,6 @@
   replace:
   - t: "⠬"   # empty space for omission
 
-
--
-  name: escaped-char
-  tag: mo
-  match: "translate(., '&%$#_{}', '')=''"
-  replace:
-  - x: "'\\'" 
-  - x: "text()"
-
 # FIX: need to deal with ~ ^ \
 #  they have macros \textasciitilde, \textasciicircum, and \textbackslash
 #  these probably aren't appropriate for EuroBraille
@@ -217,7 +217,7 @@
   - x: "text()"
   - test:
       if: "not(preceding-sibling::*)"
-      then: [t: "⠀"]
+      then: [t: "𝐖"]
 
 -
   name: default
@@ -227,15 +227,15 @@
   replace:
   - test:
       # if: "DEBUG(parent::m:mrow and DEBUG(not(DEBUG(IsInDefinition(DEBUG(.), 'Braille', 'NoSpacesBefore')))))"
-      # then: [t: "⠀"]
+      # then: [t: "𝐖"]
       if: "parent::m:mrow"
       then_test:
           if: "not(IsInDefinition(., 'Braille', 'NoSpacesBefore'))"
-          then: [t: "⠀"]
+          then: [t: "𝐖"]
   - x: "text()"
   - test:
       if: "parent::m:mrow and (.=',' or .=';')"     # are there others???
-      then: [t: "⠀"]
+      then: [t: "𝐖"]
 
 
 -
@@ -249,11 +249,11 @@
   # FIX: need to deal with all caps
   name: named-functions
   tag: [mi, mtext]
-  match: "IsInDefinition(., 'Braille', 'LateXFunctionNames')"
+  match: "IsInDefinition(., 'Braille', 'LateXFunctionNames') and not($LaTeX_UseShortName)"
   replace:
-  - x: "'\\'"
+  - t: "\\"
   - x: "text()"
-  - t: "⠀"
+  - t: "𝐖"
     
 -
   # FIX: need to deal with all caps
@@ -283,42 +283,45 @@
   -    "*[1][substring(., 1, 1)='↽'] and"
   -    "*[2][substring(., string-length(), 1)='⇀']"
   replace:
-  - t: "⠀"
+  - t: "𝐖"
   - test:
       if: "*[1][self::m:mrow]"
       then_test:
           if: "*[2][self::m:mrow]"
-          then: [x: "'🣒'"]    # this is currently unassigned and may get used by UTC at some point (<=>)
-          else: [x: "'🣔'"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
-      else: [x: "'🣓'"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
-  - t: " "
+          then: [t: "🣒"]    # this is currently unassigned and may get used by UTC at some point (<=>)
+          else: [t: "🣔"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
+      else: [t: "🣓"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
+  - t: "𝐖"
 
 -
   name: "hat"
   tag: "mover"
   match: "*[2][.='^']"
   replace:
-  - x: "'\\hat{'"
+  - t: "\\hat{"
   - x: "*[1]"
-  - x: "'}'"
+  - t: "}"
 
 -
   name: "bar"
   tag: "mover"
   match: "*[2][.='_' or .='¯']"
   replace:
-  - x: "'\\overline{'"
+  - test:
+      if: "$LaTeX_UseShortName"
+      then: [t: "\\ol{"]
+      else: [t: "\\overline{"]
   - x: "*[1]"
-  - x: "'}'"
+  - t: "}"
 
 -
   name: "vector"
   tag: "mover"
   match: "*[2][.='→']"
   replace:
-  - x: "'\\vec{'"
+  - t: "\\vec{"
   - x: "*[1]"
-  - x: "'}'"
+  - t: "}"
 
 -
   name: pseudo-scripts
@@ -337,27 +340,27 @@
   - x: "*[1]"
   - test:
       if: "self::m:msup or self::m:mover"
-      then: [x: "'^'"]
-      else: [x: "'_'"]
+      then: [t: "^"]
+      else: [t: "_"]
   - test:
       if: "*[2][IsNode(., 'leaf') and string-length(.) = 1]"
       then: [x: "*[2]"]
       else:
-      - x: "'{'"
+      - t: "{"
       - x: "*[2]"
-      - x: "'}'"
+      - t: "}"
   - test:
       if: "self::m:msubsup or self::m:munderover"
       then:
-      - x: "'^'"
+      - t: "^"
       - test:
           if: "*[3][IsNode(., 'leaf') and string-length(.) = 1]"
           then: [x: "*[3]"]
           else:
-          - x: "'{'"
+          - t: "{"
           - x: "*[3]"
-          - x: "'}'"
-  - t: "⠀"    # need to separate script from what follows
+          - t: "}"
+  - t: "𝐖"    # need to separate script from what follows
 -
   name: default
   tag: mmultiscripts
@@ -373,25 +376,25 @@
       then:
       - test:
           if: "preceding-sibling::*"
-          then: [x: "'{}'"]         # empty base not needed if this is the only expr
+          then: [t: "{}"]         # empty base not needed if this is the only expr
       - test:
           if: "not(DEBUG($Prescripts[1])[self::m:none])"
           then_test:
               if: "$Prescripts[1][IsNode(., 'leaf') and string-length(.) = 1]"
               then: [x: "$Prescripts[1]"]
               else:
-              - x: "'_{'"
+              - t: "_{"
               - x: "$Prescripts[1]"
-              - x: "'}'"
+              - t: "}"
       - test:
           if: "not($Prescripts[2][self::m:none])"
           then_test:
               if: "$Prescripts[2][IsNode(., 'leaf') and string-length(.) = 1]"
               then: [x: "$Prescripts[2]"]
               else:
-              - x: "'^{'"
+              - t: "^{"
               - x: "$Prescripts[2]"
-              - x: "'}'"
+              - t: "}"
       - test:
           if: "count($Prescripts)>2"
           then:
@@ -401,18 +404,18 @@
                   if: "$Prescripts[3][IsNode(., 'leaf') and string-length(.) = 1]"
                   then: [x: "$Prescripts[3]"]
                   else:
-                  - x: "'_{'"
+                  - t: "_{"
                   - x: "$Prescripts[3]"
-                  - x: "'}'"
+                  - t: "}"
           - test:
               if: "not($Prescripts[4][self::m:none])"
               then_test:
                   if: "$Prescripts[4][IsNode(., 'leaf') and string-length(.) = 1]"
                   then: [x: "$Prescripts[4]"]
                   else:
-                  - x: "'^{'"
+                  - t: "^{"
                   - x: "$Prescripts[4]"
-                  - x: "'}'"
+                  - t: "}"
           - test:
               if: "count($Prescripts) > 4"   # give up and just dump them out so at least the content is there
               then: [x: "$Prescripts[position() > 4]"]
@@ -427,18 +430,18 @@
               if: "$Postscripts[1][IsNode(., 'leaf') and string-length(.) = 1]"
               then: [x: "$Postscripts[1]"]
               else:
-              - x: "'_{'"
+              - t: "_{"
               - x: "$Postscripts[1]"
-              - x: "'}'"
+              - t: "}"
       - test:
           if: "not($Postscripts[2][self::m:none])"
           then_test:
               if: "$Postscripts[2][IsNode(., 'leaf') and string-length(.) = 1]"
               then: [x: "$Postscripts[2]"]
               else:
-              - x: "'^{'"
+              - t: "^{"
               - x: "$Postscripts[2]"
-              - x: "'}'"
+              - t: "}"
       - test:
           if: "count($Postscripts)>2"
           then:
@@ -448,18 +451,18 @@
                   if: "$Postscripts[3][IsNode(., 'leaf') and string-length(.) = 1]"
                   then: [x: "$Postscripts[3]"]
                   else:
-                  - x: "'_{'"
+                  - t: "_{"
                   - x: "$Postscripts[3]"
-                  - x: "'}'"
+                  - t: "}"
           - test:
               if: "not($Postscripts[4][self::m:none])"
               then_test:
                   if: "$Postscripts[4][IsNode(., 'leaf') and string-length(.) = 1]"
                   then: [x: "$Postscripts[4]"]
                   else:
-                  - x: "'^{'"
+                  - t: "^{"
                   - x: "$Postscripts[4]"
-                  - x: "'}'"
+                  - t: "}"
           - test:
               if: "count($Postscripts)>4"
               then:
@@ -469,18 +472,18 @@
                       if: "$Postscripts[5][IsNode(., 'leaf') and string-length(.) = 1]"
                       then: [x: "$Postscripts[5]"]
                       else:
-                      - x: "'_{'"
+                      - t: "_{"
                       - x: "$Postscripts[5]"
-                      - x: "'}'"
+                      - t: "}"
               - test:
                   if: "not($Postscripts[6][self::m:none])"
                   then_test:
                       if: "$Postscripts[6][IsNode(., 'leaf') and string-length(.) = 1]"
                       then: [x: "$Postscripts[6]"]
                       else:
-                      - x: "'^{'"
+                      - t: "^{"
                       - x: "$Postscripts[6]"
-                      - x: "'}'"
+                      - t: "}"
               - test:
                   if: "count($Postscripts)>6"
                   then:
@@ -490,23 +493,23 @@
                           if: "$Postscripts[7][IsNode(., 'leaf') and string-length(.) = 1]"
                           then: [x: "$Postscripts[7]"]
                           else:
-                          - x: "'_{'"
+                          - t: "_{"
                           - x: "$Postscripts[7]"
-                          - x: "'}'"
+                          - t: "}"
                   - test:
                       if: "not($Postscripts[8][self::m:none])"
                       then_test:
                           if: "$Postscripts[8][IsNode(., 'leaf') and string-length(.) = 1]"
                           then: [x: "$Postscripts[8]"]
                           else:
-                          - x: "'^{'"
+                          - t: "^{"
                           - x: "$Postscripts[8]"
-                          - x: "'}'"
+                          - t: "}"
                   - test:
                       if: "count($Postscripts) > 8"   # give up and just dump them out so at least the content is there
                       then:
                       - x: "$Postscripts[position() > 8]"
-  - t: "⠀"    # need to separate script from what follows
+  - t: "𝐖"    # need to separate script from what follows
                 
 
 -
@@ -541,14 +544,14 @@
       then:
       # - test:
       #       if: "$AddSpaces"
-      #       then: [t: " "]
+      #       then: [t: "𝐖"]
       - t: "1⠫⠼⠙"                                  # square (no rectangle in UEB)
   - test:
       if: "contains(@notation,'circle')"
       then:
       # - test:
       #    if: "$AddSpaces"
-      #    then: [t: " "]
+      #    then: [t: "𝐖"]
       - t: "1⠫⠿"                                  # circle (no oval in UEB)
 # ??? What should happen with arrow?
 #  If there is a box/circle with arrows only and an empty child,
@@ -619,7 +622,7 @@
           - else_if: "contains(@notation,'leftarrow')" 
             then: [t: "1⠳⠪"]                                                           
           - else_if: "contains(@notation,'uparrow')" 
-            then: [t: "1⠳⠬ "]                                                           
+            then: [t: "1⠳⠬𝐖"]                                                           
           - else_if: "contains(@notation,'downarrow')" 
             then: [t: "1⠳⠩"]                                                           
           - else_if: "contains(@notation,'northeastarrow')" 
@@ -657,7 +660,7 @@
       - t: "⠻"                   # terminate shape
     # - test:
     #    if: "$AddSpaces"
-    #    then: [t: " "]
+    #    then: [t: "𝐖"]
   - test:
       if: "contains(concat(' ', normalize-space(@notation), ' '), ' right ')"                  #avoid 'rightarrow'
       then: [t: "⠸"]

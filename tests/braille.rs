@@ -22,7 +22,7 @@ mod braille {
         mod vi;
     }
 
-    mod EuroBraille {
+    mod LaTeX {
         mod augenbit;
     }
 }

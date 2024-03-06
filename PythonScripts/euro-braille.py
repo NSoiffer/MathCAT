@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 from html_table_extractor.extractor import Extractor
 from typing import TextIO
 import sys
+from string import ascii_uppercase, ascii_lowercase
 import xml.etree.ElementTree as ET
 import re
 sys.stdout.reconfigure(encoding='utf-8')
@@ -79,7 +80,28 @@ def get_unicode_yaml_chars() -> set[str]:
 UNICODE_CHARS_SHORT = get_unicode_yaml_chars()
 
 
+def get_short_dict() -> dict[str, str]:
+    with open("euro-braille-short.csv", "r", encoding='utf8') as stream:
+        answer = {}
+        for line in stream.readlines():
+            parts: list[str] = list(filter(lambda x: x != '', line.split(' ')))
+            short_name = parts[0].strip()
+            latex_name = parts[1].strip()
+            answer[latex_name] = short_name
+        for ch in ascii_lowercase + ascii_uppercase:
+            answer[f'\\mathbb{{{ch}}}'] = f'\\{ch}'
+        return answer
+
+
 def extract_latex(in_file):
+    short_names = get_short_dict()
+    overrides = {
+        "*": "*", "{": "\\{", "}": "\\}", "|": "|",
+        "°": "°", "ϵ": "\\epsilon", "≠": "\\not=",   # varepsilon
+        "′": "'", "″": "''", "‴": "'''",
+        "△": "\\triangle", "→": "\\to",
+    }
+
     tree = ET.parse(in_file)
     root = tree.getroot()
     all_chars = root.find("charlist")
@@ -90,34 +112,68 @@ def extract_latex(in_file):
             full_stream.write("---\n")
             for char in all_chars:
                 ch = convert_to_char(char.get("id"))
-                if len(ch) == 1 and ord(ch) < 128:
+                if len(ch) > 1:
+                    continue
+                code = ord(ch)
+                if code < 0x20:
+                    continue
+                if ch in overrides:
+                    latex_name = overrides[ch]
+                    write_line(ch, latex_name, short_names.get(latex_name, ''), short_stream)
                     continue
 
-                stream = short_stream if ch in UNICODE_CHARS_SHORT else full_stream
-                latex = char.find("latex")
-                var_latex = char.find("varlatex")
-                ams_latex = char.find("ams")
-                math_latex = char.find("mathlatex")
-                # if latex is None and not(var_latex is None and math_latex is None):
-                #     print(f"No latex for ch: {ch}/{char.get('id')}" +
-                #         "" if var_latex is None else f"var_latex={var_latex.text}" +
-                #         "" if math_latex is None else f"math_latex={math_latex.text}"
-                #     )
-                #     continue
+                # add in ASCII and the Greek block
+                stream = short_stream if ch in UNICODE_CHARS_SHORT or code < 0x7F or (0x0370 <= code and code <= 0x03fF) else full_stream
 
-                names_seen = []
-                for latex_name in [latex, var_latex, ams_latex, math_latex]:
+                # I wish there was a simple way to choose the names.
+                # Based on what David Carlisle (who maintains unicode.xml) recomends,
+                #   'math_latex' is the preferred field except for the alphabets (I only exclude Greek and math alphanumerics)
+                #   For those, math_latex is more technically correct but not what most latex users are accustomed to
+                names_seen: list[str] = []
+                for style in ["mathlatex", "latex", "varlatex", "ams"]:
+                    latex_name = char.find(style)
                     if latex_name is None:
                         continue
-                    latex_name = latex_name.text.strip()
-                    if latex_name in names_seen:
+                    latex_name:str = latex_name.text.strip()
+                    # the fontencoding char won't happen and the \unicode (two ellipsis entries) have short names for the latex style
+                    if latex_name.startswith('{\\fontencoding{') or latex_name.startswith('\\unicode'):
                         continue
-                    if latex_name.startswith('\\up') and "\\" + latex_name[3:] in names_seen:  # "\upiota", etc, is skipped
+                    if not latex_name.startswith('\\') and not latex_name.startswith('{') and code >= 0x7F:
+                        latex_name = '\\' + latex_name  # some are missing the initial \
+                    if latex_name.startswith('\\mathchar'):
+                        continue    # seems to happen once -- not sure what that is about
+                    if style == 'mathlatex':
+                        if code < 0x7F:
+                            continue    # use the latex names
+                        if 0x0370 <= code and code <= 0x03fF:
+                            continue    # Greek block
+                        if 0x1D400 <= code and code <= 0x1D7FF:
+                            continue    # alphanumerics
+                        if latex_name.startswith('\\Bbb'):      # some blackboard chars (ℝ, etc) not in math alphanumerics
+                            continue
+                        if latex_name.startswith('\\mbox'):
+                            continue    # the alternative name avoids that and so is better
+                    if latex_name.lower().find('theta') != -1:
+                        latex_name = latex_name.replace("text", "")  # don't care about upright theta
+                    elif ch == '$':
+                        latex_name = '\\$'
+                    elif ch == '\\':
+                        latex_name = '\\backslash'  # avoid '\textbackslash'
+                    elif latex_name.startswith("\\mitBbb"):
+                        latex_name = latex_name.replace("\\mitBbb", "")     # exponential e, etc
+                    if latex_name in names_seen:
                         continue
                     if len(names_seen) > 0:
                         stream.write('# ')    # alternative name
-                    write_line(ch, latex_name, stream)
+                    write_line(ch, latex_name, short_names.get(latex_name, ''), stream)
                     names_seen.append(latex_name)
+
+            # write the invisible chars out
+            short_stream.write('\n # invisible chars\n')
+            write_line(chr(0x2061), '', '', short_stream)
+            write_line(chr(0x2062), '', '', short_stream)
+            write_line(chr(0x2063), '', '', short_stream)
+            write_line(chr(0x2064), '', '', short_stream)
 
 
 def convert_to_char(str: str) -> str:
@@ -127,11 +183,70 @@ def convert_to_char(str: str) -> str:
     for char_str in str.split("-"):
         # FIX: need to add backslash is str becomes ""
         ch = chr(int(char_str, base=16))
-        if (ch == '"' or ch == '\\'):
-            answer += "\\"
+        # if (ch == '"' or ch == '\\'):
+        #     answer += "\\"
         answer += ch
 
     return answer
+
+
+def write_line(ch: str, latex: str, short: str, out_stream: TextIO):
+    def hex_string(ch: str) -> str:
+        comment = ''
+        if ch == '\\\\' or ch == '\\"':
+            comment = hex(ord(ch[1]))
+        elif len(ch) == 1:
+            comment = hex(ord(ch))
+        else:
+            comment = "0" + ch[1:]
+        return comment
+    
+    if ord(ch) < 0x7F and len(latex) <= 1:
+        return        # probably an ASCII char
+
+    if ch == '"':
+        ch = '\\"'
+    elif ch == '\\':
+        ch = '\\\\'
+    elif ch == '\\127':
+        ch = '\\x7F'
+    elif ch == "°":
+        latex = "°"     # special case in their code
+    short_space = '𝐖' if short.startswith('\\') and not short.endswith('}') and len(short) > 2 else ''
+    long_space = '𝐖' if latex.startswith('\\') and not latex.endswith('}') and len(latex) > 2 else ''
+    try:
+        # write untranslated text
+        latex = latex.replace('\\', '\\\\').replace('"', '\\"')
+        short = short.replace('\\', '\\\\').replace('"', '\\"')
+        if short == '':
+            first_part_char = f' - "{ch}": [t: "{latex + long_space}"]'
+            out_stream.write(f'{first_part_char:<40} # {hex_string(ch)}\n')
+        else:
+            first_part_char = f' - "{ch}":'
+            first_part_short = f'         then: [t: "{short + short_space}"]'
+            first_part_long = f'         else: [t: "{latex + long_space}"]'
+            out_stream.write(f'{first_part_char:<40} # {hex_string(ch)}\n')
+            out_stream.write('     - test:\n')
+            out_stream.write('         if: "$LaTeX_UseShortName"\n')
+            out_stream.write(f'{first_part_short}\n')
+            out_stream.write(f'{first_part_long}\n')  # not sure why, but this gives better alignment
+        # write the translated dots
+        # braille = ascii_to_euro_braille(latex + space)
+        # if short == '':
+        #     first_part_char = f' - "{ch}": [t: "{braille}"]'
+        #     out_stream.write(f'{first_part_char:<40} # {hex_string(ch)} ({latex})\n')
+        # else:
+        #     short_braille = ascii_to_euro_braille(short+space)  # fix spacing
+        #     first_part_char = f' - "{ch}":'
+        #     first_part_short = f'         else: [t: "{short_braille}"]'
+        #     first_part_long = f'         then: [t: "{braille}"]'
+        #     out_stream.write(f'{first_part_char:<40} # {hex_string(ch)}\n')
+        #     out_stream.write('     - test:\n')
+        #     out_stream.write('         if: "$LaTeX_UseShortName=\'True\'"\n')
+        #     out_stream.write(f'{first_part_long:<34} # {latex}\n')  # not sure why, but this gives better alignment
+        #     out_stream.write(f'{first_part_short:<36} # {short}\n')
+    except:
+        print(f"failed to write a line for ch='{ch}/{hex_string(ch)}'")
 
 
 def create_greek_letters(out_file: str):
@@ -148,31 +263,6 @@ def create_greek_letters(out_file: str):
             for unicode, latex in all_entries:
                 write_line(unicode, latex, out_stream)
 
-
-def write_line(ch: str, latex: str, out_stream: TextIO):
-    def hex_string(ch: str) -> str:
-        comment = ''
-        if ch == '\\\\' or ch == '\\"':
-            comment = hex(ord(ch[1]))
-        elif len(ch) == 1:
-            comment = hex(ord(ch))
-        else:
-            comment = "0" + ch[1:]
-        return comment
-    
-    if ch == '"':
-        ch = '\\"'
-    elif ch == '\\':
-        ch = '\\\\'
-    elif ch == '\\127':
-        ch = '\\x7F'
-    space = '' if ch.startswith('\\') and not(ch.endswith('}')) else ' '
-    braille = ascii_to_euro_braille(latex + space)
-    first_part = f' - "{ch}": [t: "{braille}"]'
-    try:
-        out_stream.write('{:40}# {} ({})\n'.format(first_part, hex_string(ch), latex))
-    except:
-        print(f"failed to write a line for ch='{ch}/{hex_string(ch)}'")
 
 
 
