@@ -54,7 +54,7 @@
           then:
           - x: "*[2]"
           # How to handle pronounce?
-          - PRONOUNCE: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+          - PRONOUNCE: [{text: "nes"}, {ipa: "nes"}, {sapi5: "nes"}, {eloquence: "nes"}]
           else: [{x: "*[2]"}]
       - T: "juuri"        # phrase(the square 'root' of)
   - test:
