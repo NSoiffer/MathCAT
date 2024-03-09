@@ -105,7 +105,6 @@
   - x: "*[2]/*[2]/*[1]/*[1]"
   - t: "}"
 
-# FIX: implement (use \begin{pmatrix} x; & y; & z-3 \end{pmatrix})
 # Matrix/Determinant rules
 # matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
 # we don't do spatial layout, instead the beginning/ending of each row uses the enlarged bracketing chars
@@ -118,16 +117,21 @@
                  IfThenElse(*[1][.='|'], 'vmatrix',
                  IfThenElse(*[1][.='‖'], 'Vmatrix','Bmatrix')
                 )))"
+  - ShortMatrixType: "IfThenElse(*[1][.='('], 'bpm', 
+                 IfThenElse(*[1][.='['], 'bbm',
+                 IfThenElse(*[1][.='|'], 'bvm',
+                 IfThenElse(*[1][.='‖'], 'bVm','bBm')
+                )))"
   match:
   - "*[2][self::m:mtable] and"
   - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or"
   - " IsBracketed(., '|', '|') or IsBracketed(., '‖', '‖') or IsBracketed(., '{', '}') )"
   replace:
-  - t: "\\begin{"
+  - t: "𝐖\\begin{"
   - x: "string($MatrixType)"     # need to get $MatrixType eval'd so that it is converted to braille (doesn't work if I do it in 'variables') 
   - t: "}𝐖"
   - x: "*[2]"
-  - t: "\\end{"
+  - t: "𝐖\\end{"
   - x: "string($MatrixType)"     # need to get $MatrixType eval'd so that it is converted to braille (doesn't work if I do it in 'variables') 
   - t: "}𝐖"
 
@@ -226,7 +230,7 @@
   match: "."
   replace:
   - test:
-      # if: "DEBUG(parent::m:mrow and DEBUG(not(DEBUG(IsInDefinition(DEBUG(.), 'Braille', 'NoSpacesBefore')))))"
+      # if: "parent::m:mrow and not(IsInDefinition(., 'Braille', 'NoSpacesBefore'))"
       # then: [t: "𝐖"]
       if: "parent::m:mrow"
       then_test:
@@ -298,9 +302,9 @@
   tag: "mover"
   match: "*[2][.='^']"
   replace:
-  - t: "\\hat{"
+  - t: "𝐖\\hat{"
   - x: "*[1]"
-  - t: "}"
+  - t: "}𝐖"
 
 -
   name: "bar"
@@ -533,62 +537,54 @@
   name: default
   tag: menclose
   match: "."
-  # FIX: can't find a rule that says anything about comparison operator spacing and enclosure
-  variables: [AddSpaces: "parent::*[self::m:mrow] and *[1][ self::m:mo and IsInDefinition(., 'NemethComparisonOperators')]"]
   replace:
   - test:
       if: "contains(concat(' ', normalize-space(@notation), ' '), ' left ')"                  #avoid 'leftarrow'
-      then: [t: "⠸"]
+      then: [t: "|'"]
   - test:
       if: "contains(@notation,'box')"                  # box and roundedbox
       then:
-      # - test:
-      #       if: "$AddSpaces"
-      #       then: [t: "𝐖"]
-      - t: "1⠫⠼⠙"                                  # square (no rectangle in UEB)
+      - t: "\\boxed{𝐖"                                  # square 
   - test:
       if: "contains(@notation,'circle')"
       then:
-      # - test:
-      #    if: "$AddSpaces"
-      #    then: [t: "𝐖"]
-      - t: "1⠫⠿"                                  # circle (no oval in UEB)
+      - t: "\\circle{"                                  # circle
 # ??? What should happen with arrow?
 #  If there is a box/circle with arrows only and an empty child,
 #     then it acts like the arrow is the child
 #  If there are only arrows for 'notation', then maybe rule 112 applies (superposition),
 #     but the examples aren't similar. In that case, the arrow acts like 'box' and the child is the content... maybe  
-# 
-#  - test:
-#      if: "contains(@notation,'leftarrow')"
-#      then: [t: left arrow, pause: short]
-#  - test:
-#      if: "contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')"
-#      then: [t: right arrow, pause: short]
-#  - test:
-#      if: "contains(@notation,'northeastarrow')"
-#      then: [t: northeast arrow, pause: short]
-#  - test:
-#      if: "contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')"
-#      then: [t: southeast arrow, pause: short]
-#  - test:
-#      if: "contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')"
-#      then: [t: southwest arrow, pause: short]
-#  - test:
-#      if: "contains(@notation,'northwestarrow')"
-#      then: [t: northwest arrow, pause: short]
-#  - test:
-#      if: "contains(@notation,'updownarrow')"
-#      then: [t: double ended vertical arrow, pause: short]
-#  - test:
-#      if: "contains(@notation,'leftrightarrow')"
-#      then: [t: double ended horizontal arrow, pause: short]
-#  - test:
-#      if: "contains(@notation,'northeastsouthwestarrow')"
-#      then: [t: double ended up diagonal arrow, pause: short]
-#  - test:
-#      if: "contains(@notation,'northwestsoutheastarrow')"
-#      then: [t: double ended down diagonal arrow, pause: short]
+
+  - test:
+      if: "contains(@notation,'leftarrow')"
+      then: [t: left arrow, pause: short]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')"
+      then: [t: right arrow, pause: short]
+  - test:
+      if: "contains(@notation,'northeastarrow')"
+      then: [t: northeast arrow, pause: short]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')"
+      then: [t: southeast arrow, pause: short]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')"
+      then: [t: southwest arrow, pause: short]
+  - test:
+      if: "contains(@notation,'northwestarrow')"
+      then: [t: northwest arrow, pause: short]
+  - test:
+      if: "contains(@notation,'updownarrow')"
+      then: [t: double ended vertical arrow, pause: short]
+  - test:
+      if: "contains(@notation,'leftrightarrow')"
+      then: [t: double ended horizontal arrow, pause: short]
+  - test:
+      if: "contains(@notation,'northeastsouthwestarrow')"
+      then: [t: double ended up diagonal arrow, pause: short]
+  - test:
+      if: "contains(@notation,'northwestsoutheastarrow')"
+      then: [t: double ended down diagonal arrow, pause: short]
 #  - test:
 #      if: ".[contains(@notation,'actuarial')]"
 #      then: [t: actuarial symbol, pause: short]
@@ -601,52 +597,52 @@
 #  - test:
 #      if: ".[contains(@notation,'radical')]"
 #      then: [t: square root, pause: short]
+  - test:
+      if: "contains(@notation,'top')"
+      then: [t: "\\overline"]                                                                
+  - test:
+      if: "contains(@notation,'bottom')"
+      then: [t: "\\underline"]                                                                
 
   - test:
-      if: "NeedsToBeGrouped(*[1], 'UEB', false())"
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' left ')"                  #avoid 'leftarrow'
       then:
       - t: "'{'"
       - x: "*[1]"
       - t: "'}'"
       else: [x: "*[1]"]
 
-  # - test:
-  #    if: "contains(@notation,'phasorangle')"  #FIX: what should this be???
-  #    then: [t: "⠫⠪⠸⠫"]
-  - test:
-      if: "contains(@notation,'arrow')"    # all the arrows
-      then:
-      - test:
-          - if: "contains(@notation,'rightarrow')" 
-            then: [t: "1⠳⠕"]                                                           
-          - else_if: "contains(@notation,'leftarrow')" 
-            then: [t: "1⠳⠪"]                                                           
-          - else_if: "contains(@notation,'uparrow')" 
-            then: [t: "1⠳⠬𝐖"]                                                           
-          - else_if: "contains(@notation,'downarrow')" 
-            then: [t: "1⠳⠩"]                                                           
-          - else_if: "contains(@notation,'northeastarrow')" 
-            then: [t: "1⠳⠎"]                                                           
-          - else_if: "contains(@notation,'southeastarrow')" 
-            then: [t: "1⠳⠣"]                                                           
-          - else_if: "contains(@notation,'northwestarrow')" 
-            then: [t: "1⠳⠱"]                                                           
-          - else_if: "contains(@notation,'southwestarrow')" 
-            then: [t: "1⠳⠜"]                                                           
-          - else_if: "contains(@notation,'leftrightarrow')" 
-            then: [t: "1⠳⠺⠗⠕"]                                                           
-          - else_if: "contains(@notation,'updownarrow')" 
-            then: [t: "1⠳⠺⠗⠬"]                                                           
-          - else_if: "contains(@notation,'northeastsouthwestarrow')" 
-            then: [t: "1⠳⠺⠗⠎"]                                                           
-          - else_if: "contains(@notation,'northwestsoutheastarrow')" 
-            then: [t: "1⠳⠺⠗⠣"]                                                           
-  - test:
-      if: "contains(@notation,'top')"
-      then: [t: "⠱"]                                                                
-  - test:
-      if: "contains(@notation,'bottom')"
-      then: [t: "⠠⠱"]                                                                
+# - test:
+#    if: "contains(@notation,'phasorangle')"  #FIX: what should this be???
+#    then: [t: "⠫⠪⠸⠫"]
+# - test:
+#     if: "contains(@notation,'arrow')"    # all the arrows
+#     then:
+#     - test:
+#         - if: "contains(@notation,'rightarrow')" 
+#           then: [t: "1⠳⠕"]                                                           
+#         - else_if: "contains(@notation,'leftarrow')" 
+#           then: [t: "1⠳⠪"]                                                           
+#         - else_if: "contains(@notation,'uparrow')" 
+#           then: [t: "1⠳⠬𝐖"]                                                           
+#         - else_if: "contains(@notation,'downarrow')" 
+#           then: [t: "1⠳⠩"]                                                           
+#         - else_if: "contains(@notation,'northeastarrow')" 
+#           then: [t: "1⠳⠎"]                                                           
+#         - else_if: "contains(@notation,'southeastarrow')" 
+#           then: [t: "1⠳⠣"]                                                           
+#         - else_if: "contains(@notation,'northwestarrow')" 
+#           then: [t: "1⠳⠱"]                                                           
+#         - else_if: "contains(@notation,'southwestarrow')" 
+#           then: [t: "1⠳⠜"]                                                           
+#         - else_if: "contains(@notation,'leftrightarrow')" 
+#           then: [t: "1⠳⠺⠗⠕"]                                                           
+#         - else_if: "contains(@notation,'updownarrow')" 
+#           then: [t: "1⠳⠺⠗⠬"]                                                           
+#         - else_if: "contains(@notation,'northeastsouthwestarrow')" 
+#           then: [t: "1⠳⠺⠗⠎"]                                                           
+#         - else_if: "contains(@notation,'northwestsoutheastarrow')" 
+#           then: [t: "1⠳⠺⠗⠣"]                                                           
   - test:
       if: "contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
             contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike')"

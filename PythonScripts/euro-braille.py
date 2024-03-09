@@ -23,42 +23,56 @@ def create_unicode_from_latex_symbols_html(out_file: str):
             unicode_list = list(map(lambda x: x.find('p').contents[0].split(' ')[0], foo))
             combined = sorted(zip(unicode_list, latex_list))
             for unicode, latex in combined:
-                write_line(unicode, latex, out_stream)
+                write_line(unicode, latex, "", out_stream)
 
 
-def create_unicode_from_list_of_symbols_html(out_file: str):
+def get_unicode_standard_symbols() -> dict[str, list[str]]:
     # the HTML file has rowspans in it -- hence the use of table extractor
     with open("List of mathematical symbols by subject.htm", encoding='utf8') as in_stream:
-        with open(out_file, 'w', encoding='utf8') as out_stream:
-            file_contents = BeautifulSoup(in_stream, features="html.parser")
-            tables = file_contents.select('table')
-            if tables is None:
-                print("didn't find 'tables'")
-                return
-            all_entries = []
-            i = 0
-            for table in tables:
-                # print(f"table {i}")
-                table_string = table.decode()
-                extractor = Extractor(table_string)
-                extractor.parse()
-                rows = extractor.return_list()
-                i_latex = 3 if len(rows[1]) == 6 else 4
-                # print(f"row 2='{rows[2]}'")
-                for row in rows[1:]:
-                    try:
-                        unicode = row[1].strip()
-                    except:
-                        print(f"Error in getting unicode in {row}")
-                    if len(unicode) == 1:       # filter out "det", etc
-                        latex: str = row[i_latex].split(',')[0].strip()
-                        if latex.startswith('\\'): # filter out ASCII and some other oddballs
-                            # print(f"unicode={unicode}, latex={latex}")
+        file_contents = BeautifulSoup(in_stream, features="html.parser")
+        tables = file_contents.select('table')
+        if tables is None:
+            print("didn't find 'tables'")
+            return {}
+        all_entries: list[tuple[str, str]] = []
+        i = 0
+        for table in tables:
+            # print(f"table {i}")
+            table_string = table.decode()
+            extractor = Extractor(table_string)
+            extractor.parse()
+            rows = extractor.return_list()
+            i_latex = 3 if len(rows[1]) == 6 else 4
+            # print(f"row 2='{rows[2]}'")
+            for row in rows[1:]:
+                try:
+                    unicode = row[1].text
+                    if not isinstance(unicode, str):
+                        continue
+                    unicode = unicode.strip()
+                    # print(f"unicode='{unicode}' latex='{row[i_latex]}', latex type={type(row[i_latex])}")
+                    # print(f"  latex='{row[i_latex]}, type={type(row[i_latex])}")
+                except (IndexError, TypeError, AttributeError) as err:
+                    print(f"Error in getting unicode in {row}\nError is '{err}'")
+                if len(unicode) == 1:                          # filter out "det", etc
+                    latex_col = row[i_latex]
+                    for code in latex_col.select('code'):
+                        # print(f"  *** code='{code.text}', type={type(code.text)}")
+                        latex: str = code.text.strip()
+                        if latex.startswith('\\'):
+                            # filter out ASCII and some other oddballs
                             all_entries.append((unicode, latex))
-                i += 1
-            all_entries = sorted(list(dict.fromkeys(all_entries)))
-            for unicode, latex in all_entries:
-                write_line(unicode, latex, out_stream)
+            i += 1
+        print(f'all_entries len={len(all_entries)}')
+        answer: dict[str, list[str]] = {}
+        for (key, val) in all_entries:
+            if key in answer:
+                if val not in answer[key]:
+                    answer[key].append(val)
+            else:
+                answer[key] = [val]
+        print(f'answer len={len(list(answer))}')
+        return answer
 
 
 UNICODE_CH_PATTERN = re.compile(r' - "(.)"')
@@ -89,41 +103,83 @@ def get_short_dict() -> dict[str, str]:
             latex_name = parts[1].strip()
             answer[latex_name] = short_name
         for ch in ascii_lowercase + ascii_uppercase:
-            answer[f'\\mathbb{{{ch}}}'] = f'\\{ch}'
+            answer[f'\\mathbb𝐖{ch}'] = f'\\{ch}'
         return answer
+
+
+CHAR_IN_BRACES = re.compile(r'(\\.+)\{(.)\}')
 
 
 def extract_latex(in_file):
     short_names = get_short_dict()
+    standard_names = get_unicode_standard_symbols()
+    print(f'len standard names = {len(standard_names)}')
     overrides = {
-        "*": "*", "{": "\\{", "}": "\\}", "|": "|",
+        "*": "*", "{": "\\{", "}": "\\}", "|": "|", "%": "%",
         "°": "°", "ϵ": "\\epsilon", "≠": "\\not=",   # varepsilon
         "′": "'", "″": "''", "‴": "'''",
+        "≤": "\\le", "≥": "\\ge",
+        "\\cdotp": "\\cdots", "\\varnothing": "\\emptyset",
         "△": "\\triangle", "→": "\\to",
+        "‰": "\\permil",
     }
 
     tree = ET.parse(in_file)
-    root = tree.getroot()
-    all_chars = root.find("charlist")
+    root: ET.Element = tree.getroot()
+    all_char_elements = root.find("charlist")
+    if all_char_elements is None:
+        print(f"Didn't find XML root in {in_file}!")
+        exit(1)
 
     with open("latex-braille-unicode.yaml", 'w', encoding='utf8') as short_stream:
         with open("latex-braille-unicode-full.yaml", 'w', encoding='utf8') as full_stream:
             short_stream.write("---\n")
             full_stream.write("---\n")
-            for char in all_chars:
-                ch = convert_to_char(char.get("id"))
+            for char_element in all_char_elements:
+                if char_element is None:
+                    print("char_element is None!")
+                    continue
+                ch = char_element.get("id")
+                if ch is None:
+                    print('char_element.get("id") is None!')
+                    continue
+                ch = convert_to_char(ch)
                 if len(ch) > 1:
                     continue
                 code = ord(ch)
                 if code < 0x20:
                     continue
+                # add in ASCII and the Greek block
+                is_in_common_char_blocks = code < 0x7F or (0x0370 <= code and code <= 0x03fF)
+                stream = short_stream if ch in UNICODE_CHARS_SHORT or is_in_common_char_blocks else full_stream
+                # use the standard name unless the char is in the override dict (if it and the standard name is an option, write it first)
+                if ch in standard_names:
+                    latex_names = standard_names[ch]
+                    is_overridden = ch in overrides
+                    first_time = True
+                    if is_overridden:
+                        latex_name = overrides[ch]
+                        write_line(ch, latex_name, short_names.get(latex_name, ''), False, stream)
+                        first_time = False
+                    # print(f"standard name list for {ch}: {latex_names}")
+                    for latex_name in latex_names:
+                        is_commented = False
+                        if is_overridden and latex_name == overrides[ch]:
+                            continue
+                        if first_time:
+                            first_time = False
+                        else:
+                            is_commented = True    # alternative name
+                        if CHAR_IN_BRACES.search(latex_name):   # probably a better way to do this
+                            latex_name = CHAR_IN_BRACES.sub(lambda match: f'{match.group(1)}𝐖{match.group(2)}', latex_name,)
+                        write_line(ch, latex_name, short_names.get(latex_name, ''), is_commented, stream)
+                    continue
                 if ch in overrides:
+                    print(f"found override for '{ch}': {overrides[ch]}")
                     latex_name = overrides[ch]
-                    write_line(ch, latex_name, short_names.get(latex_name, ''), short_stream)
+                    write_line(ch, latex_name, short_names.get(latex_name, ''), False, stream)
                     continue
 
-                # add in ASCII and the Greek block
-                stream = short_stream if ch in UNICODE_CHARS_SHORT or code < 0x7F or (0x0370 <= code and code <= 0x03fF) else full_stream
 
                 # I wish there was a simple way to choose the names.
                 # Based on what David Carlisle (who maintains unicode.xml) recomends,
@@ -131,11 +187,15 @@ def extract_latex(in_file):
                 #   For those, math_latex is more technically correct but not what most latex users are accustomed to
                 names_seen: list[str] = []
                 for style in ["mathlatex", "latex", "varlatex", "ams"]:
-                    latex_name = char.find(style)
+                    latex_name = char_element.find(style)
                     if latex_name is None:
                         continue
-                    latex_name:str = latex_name.text.strip()
-                    # the fontencoding char won't happen and the \unicode (two ellipsis entries) have short names for the latex style
+                    latex_name = latex_name.text
+                    if latex_name is None:
+                        continue
+                    latex_name = latex_name.strip()
+                    # the fontencoding char won't happen
+                    # the \unicode (two ellipsis entries) have short names for the latex style
                     if latex_name.startswith('{\\fontencoding{') or latex_name.startswith('\\unicode'):
                         continue
                     if not latex_name.startswith('\\') and not latex_name.startswith('{') and code >= 0x7F:
@@ -161,19 +221,22 @@ def extract_latex(in_file):
                         latex_name = '\\backslash'  # avoid '\textbackslash'
                     elif latex_name.startswith("\\mitBbb"):
                         latex_name = latex_name.replace("\\mitBbb", "")     # exponential e, etc
+                    elif CHAR_IN_BRACES.search(latex_name):   # probably a better way to do this
+                        latex_name = CHAR_IN_BRACES.sub(lambda match: f'{match.group(1)}𝐖{match.group(2)}', latex_name,)
                     if latex_name in names_seen:
                         continue
+                    is_commented = False
                     if len(names_seen) > 0:
-                        stream.write('# ')    # alternative name
-                    write_line(ch, latex_name, short_names.get(latex_name, ''), stream)
+                        is_commented = True    # alternative name
+                    write_line(ch, latex_name, short_names.get(latex_name, ''), is_commented, stream)
                     names_seen.append(latex_name)
 
             # write the invisible chars out
             short_stream.write('\n # invisible chars\n')
-            write_line(chr(0x2061), '', '', short_stream)
-            write_line(chr(0x2062), '', '', short_stream)
-            write_line(chr(0x2063), '', '', short_stream)
-            write_line(chr(0x2064), '', '', short_stream)
+            write_line(chr(0x2061), '', '', False, short_stream)
+            write_line(chr(0x2062), '', '', False, short_stream)
+            write_line(chr(0x2063), '', '', False,  short_stream)
+            write_line(chr(0x2064), '', '', False, short_stream)
 
 
 def convert_to_char(str: str) -> str:
@@ -190,7 +253,7 @@ def convert_to_char(str: str) -> str:
     return answer
 
 
-def write_line(ch: str, latex: str, short: str, out_stream: TextIO):
+def write_line(ch: str, latex: str, short: str, is_commented: bool, out_stream: TextIO):
     def hex_string(ch: str) -> str:
         comment = ''
         if ch == '\\\\' or ch == '\\"':
@@ -200,7 +263,7 @@ def write_line(ch: str, latex: str, short: str, out_stream: TextIO):
         else:
             comment = "0" + ch[1:]
         return comment
-    
+
     if ord(ch) < 0x7F and len(latex) <= 1:
         return        # probably an ASCII char
 
@@ -218,16 +281,17 @@ def write_line(ch: str, latex: str, short: str, out_stream: TextIO):
         # write untranslated text
         latex = latex.replace('\\', '\\\\').replace('"', '\\"')
         short = short.replace('\\', '\\\\').replace('"', '\\"')
+        comment = "#" if is_commented else ""
         if short == '':
-            first_part_char = f' - "{ch}": [t: "{latex + long_space}"]'
+            first_part_char = f'{comment} - "{ch}": [t: "{latex + long_space}"]'
             out_stream.write(f'{first_part_char:<40} # {hex_string(ch)}\n')
         else:
-            first_part_char = f' - "{ch}":'
-            first_part_short = f'         then: [t: "{short + short_space}"]'
-            first_part_long = f'         else: [t: "{latex + long_space}"]'
+            first_part_char = f'{comment} - "{ch}":'
+            first_part_short = f'{comment}         then: [t: "{short + short_space}"]'
+            first_part_long = f'{comment}         else: [t: "{latex + long_space}"]'
             out_stream.write(f'{first_part_char:<40} # {hex_string(ch)}\n')
-            out_stream.write('     - test:\n')
-            out_stream.write('         if: "$LaTeX_UseShortName"\n')
+            out_stream.write(f'{comment}     - test:\n')
+            out_stream.write(f'{comment}         if: "$LaTeX_UseShortName"\n')
             out_stream.write(f'{first_part_short}\n')
             out_stream.write(f'{first_part_long}\n')  # not sure why, but this gives better alignment
         # write the translated dots
@@ -245,7 +309,7 @@ def write_line(ch: str, latex: str, short: str, out_stream: TextIO):
         #     out_stream.write('         if: "$LaTeX_UseShortName=\'True\'"\n')
         #     out_stream.write(f'{first_part_long:<34} # {latex}\n')  # not sure why, but this gives better alignment
         #     out_stream.write(f'{first_part_short:<36} # {short}\n')
-    except:
+    except IOError:
         print(f"failed to write a line for ch='{ch}/{hex_string(ch)}'")
 
 
@@ -261,9 +325,7 @@ def create_greek_letters(out_file: str):
                     all_entries.append((parts[0].strip(), parts[1].strip()))
             all_entries = sorted(all_entries)
             for unicode, latex in all_entries:
-                write_line(unicode, latex, out_stream)
-
-
+                write_line(unicode, latex, "", False, out_stream)
 
 
 # create_unicode_from_list_of_symbols_html("euro-symbols2.yaml")
