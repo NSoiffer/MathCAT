@@ -50,7 +50,7 @@
 \pll       \parallel             parallel
 \r>        \rangle               Winkelklammer rechts
 \ra        \rightarrow           einfacher Pfeil nach rechts
-\Ra        \rightarrow           doppelter Pfeil nach rechts
+\Ra        \Rightarrow           doppelter Pfeil nach rechts
 \s         \sqrt                 Wurzel
 \sbs       \subset               Untermenge
 \sbse      \subseteq             Untermenge und gleich

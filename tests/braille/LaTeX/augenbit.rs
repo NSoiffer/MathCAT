@@ -117,6 +117,26 @@ fn augenbit1_3_3 () {
 }
 
 #[test]
+fn augenbit1_3_6 () {
+    let expr = r#"<math><mi>x</mi><mo>&#x2264;</mo><mn>10</mn></math>"#;
+    test_braille_prefs("LaTeX", vec![("LaTeX_UseShortName", "false" )], expr, r"x \le 10");
+    test_braille_prefs("LaTeX", vec![("LaTeX_UseShortName", "true")], expr, r"x <=10");
+}
+
+#[test]
+fn augenbit1_3_10 () {
+    let expr = r#"<math><mi>&#x3C0;</mi><mo>&#x2248;</mo><mn>3</mn><mo>,</mo><mn>14</mn></math>"#;
+    test_braille_prefs("LaTeX", vec![("LaTeX_UseShortName", "false"), ("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, r"\pi \approx 3,14");
+    test_braille_prefs("LaTeX", vec![("LaTeX_UseShortName", "true" ), ("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, r"~p \apx 3,14");
+}
+
+#[test]
+fn augenbit1_3_14 () {
+    let expr = r#"<math><mi>a</mi><mover><mo>=</mo><mo>^</mo></mover><mi>b</mi></math>"#;
+    test_braille("LaTeX", expr, r"a \hat{=} b");
+}
+
+#[test]
 fn augenbit1_5_2 () {
     let expr = r#"<math><mfrac><mn>1</mn><mi>x</mi></mfrac></math>"#;
     test_braille_prefs("LaTeX", vec![("LaTeX_UseShortName", "false" )], expr, r"\frac{1}{x}");
@@ -132,7 +152,14 @@ fn augenbit1_5_7 () {
             <mo>=</mo>
             <mn>1</mn><mrow><mo>/</mo></mrow><mn>6</mn>
         </mrow></math>"#;
-    test_braille("LaTeX", expr, r"0,1\overline{6} =1/6");
+    test_braille_prefs("LaTeX", vec![("LaTeX_UseShortName", "false" )], expr, r"0,1\overline{6} =1/6");
+    test_braille_prefs("LaTeX", vec![("LaTeX_UseShortName", "true")], expr, r"0,1\ol{6} =1/6");
+}
+
+#[test]
+fn augenbit1_5_8 () {
+    let expr = r#"<math><mn>75</mn><mo>%</mo><mo>=</mo><mn>3</mn><mo>/</mo><mn>4</mn></math>"#;
+    test_braille("LaTeX", expr, r"75% =3/4");
 }
 
 #[test]
@@ -141,7 +168,8 @@ fn augenbit1_6_8 () {
             <mroot><msup><mi>a</mi><mn>2</mn></msup><mn>3</mn></mroot><mo>=</mo>
             <msup><mi>a</mi><mrow><mn>2</mn><mo>/</mo><mn>3</mn></mrow></msup>
         </math>"#;
-    test_braille("LaTeX", expr, r"\sqrt[3]{a^2} =a^{2/3}");
+    test_braille_prefs("LaTeX", vec![("LaTeX_UseShortName", "false" )], expr, r"\sqrt[3]{a^2} =a^{2/3}");
+    test_braille_prefs("LaTeX", vec![("LaTeX_UseShortName", "true")], expr, r"\s[3]{a^2} =a^{2/3}");
 }
 
 #[test]
@@ -191,6 +219,22 @@ fn augenbit1_8_4 () {
 }
 
 #[test]
+fn augenbit2_1_3 () {
+    // original display code contains forced spaces not in the output -- they are cleaned up here
+    let expr = r#"<math >
+        <munder>
+        <mo movablelimits="true">lim</mo>
+        <mrow>
+            <mi>x</mi>
+            <mo accent="false" stretchy="false">&#x2192;</mo>
+            <msub><mi>x</mi><mn>0</mn></msub>
+        </mrow>
+        </munder>
+    </math>"#;
+    test_braille("LaTeX", expr, r"\lim_{x \to x_0}");
+}
+
+#[test]
 fn augenbit2_1_4 () {
     // original display code contains forced spaces not in the output -- they are cleaned up here
     let expr = r#"<math>
@@ -198,6 +242,17 @@ fn augenbit2_1_4 () {
             <msup><mi>f</mi><mo>''</mo></msup><mo>(</mo><mi>x</mi><mo>)</mo>
         </math>"#;
     test_braille("LaTeX", expr, r"f'(x), f''(x)");
+}
+
+#[test]
+fn augenbit2_2_2 () {
+    // original display code contains forced spaces not in the output -- they are cleaned up here
+    let expr = r#"<math>
+        <mo minsize="2.047em" maxsize="2.047em">(</mo>
+        <mfrac linethickness="0"><mi>n</mi><mi>k</mi></mfrac>
+        <mo minsize="2.047em" maxsize="2.047em">)</mo>
+    </math>"#;
+    test_braille("LaTeX", expr, r"\binom{n}{k}");
 }
 
 #[test]
@@ -214,4 +269,19 @@ fn augenbit2_3_2 () {
     // set number preferences to European style
     test_braille_prefs("LaTeX", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, 
                 r"\vec{q} = \begin{pmatrix} -5 \\ 0,5 \\ k+4 \end{pmatrix}");
+}
+
+#[test]
+fn augenbit2_3_4 () {
+    let expr = r#"<math>
+        <mo>(</mo>
+        <mtable columnspacing="1em" rowspacing="4pt">
+        <mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd><mtd><mi>c</mi></mtd></mtr>
+        <mtr><mtd><mi>d</mi></mtd><mtd><mi>e</mi></mtd><mtd><mi>f</mi></mtd></mtr>
+        </mtable>
+        <mo>)</mo>
+    </math>"#;
+    // set number preferences to European style
+    test_braille_prefs("LaTeX", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, 
+                r"\begin{pmatrix} a & b & c \\ d & e & f \end{pmatrix}");
 }
