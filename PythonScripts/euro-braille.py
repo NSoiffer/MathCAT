@@ -26,6 +26,19 @@ def create_unicode_from_latex_symbols_html(out_file: str):
                 write_line(unicode, latex, "", out_stream)
 
 
+COMMENT = """\
+# This file is derived from a number of sources.
+# This tries to conform to the "spec" augenbit.de/wiki/index.php?title=LaTeX-Manual_LaTeX_Grundregeln (and linked files)
+# The short names come from MathLib.tex that is linked from above
+# Where there is not a conflict, the next source of names comes from "standard" LaTeX names listed in
+#   en.wikipedia.org/wiki/List_of_mathematical_symbols_by_subject
+# Otherwise they are based on the XML entities document (w3c.github.io/xml-entities).
+#  That references the data file github.com/w3c/xml-entities/blob/gh-pages/unicode.xml
+#  The fields in that are used are ["mathlatex", "latex", "varlatex", "ams"], with different names added as comments.
+# Note: there is some filtering of unlikely names, so the above is not 100% as to the output, but it is close.
+"""
+
+
 def get_unicode_standard_symbols() -> dict[str, list[str]]:
     # the HTML file has rowspans in it -- hence the use of table extractor
     with open("List of mathematical symbols by subject.htm", encoding='utf8') as in_stream:
@@ -133,8 +146,10 @@ def extract_latex(in_file):
 
     with open("latex-braille-unicode.yaml", 'w', encoding='utf8') as short_stream:
         with open("latex-braille-unicode-full.yaml", 'w', encoding='utf8') as full_stream:
-            short_stream.write("---\n")
-            full_stream.write("---\n")
+            short_stream.write(COMMENT)
+            full_stream.write(COMMENT)
+            short_stream.write("\n---\n")
+            full_stream.write("\n---\n")
             for char_element in all_char_elements:
                 if char_element is None:
                     print("char_element is None!")
