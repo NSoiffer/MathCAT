@@ -154,7 +154,11 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [t: "close bracket"]
         else: [t: "right bracket"]
- - "^": [t: "hat"]                                # 0x5e
+ - "^":                                           # 0x5e
+    - test:
+        if: "parent::m:modified-variable or parent::m:mover"
+        then: [t: "hat"]
+        else: [t: "caret"]
  - "_": [t: "under bar"]                          # 0x5f
  - "`": [t: "grave"]                              # 0x60
  - "{":                                         # 0x7b

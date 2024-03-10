@@ -316,3 +316,9 @@ fn bug_199_2pi() {
     </math>";
   test("en", "SimpleSpeak",expr, "the closed open interval from 0 to 2 pi");
 }
+
+#[test]
+fn caret_and_hat() {
+  let expr = "<math><mi>x</mi><mo>^</mo><mn>2</mn><mo>+</mo><mover><mi>y</mi><mo>^</mo></mover></math>";
+  test("en", "SimpleSpeak",expr, "x caret 2 plus y hat,");
+}
