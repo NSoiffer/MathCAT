@@ -524,7 +524,6 @@
   #
   # We place left and right outside of other notations because that doesn't require anything special in LaTeX
   # The order of the matches potentially might matter for display, but for comprehension, it shouldn't matter
-
   name: default
   tag: menclose
   match: "."
