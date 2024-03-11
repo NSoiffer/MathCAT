@@ -24,6 +24,7 @@ mod braille {
 
     mod LaTeX {
         mod augenbit;
+        mod other;
     }
 }
 

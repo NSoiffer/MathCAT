@@ -518,73 +518,81 @@
 
 -
   # Note: @notation can contain more than one value
-  # I don't think UEB has a good way to represent all notations, especially when in combination
-  # Note:
-  #   Shape indicator: ⠫
-  #   Physical enclosure: ⠪  (think plus inside of a circle)
-  #   Superposition indicator: ⠯  (think contour integral)
-  #   Cancellation: ⠈⠱ (line through previous char -- will use for horizontal, vertical, diagonal lines)
-  #   Line over/under: use GTM 12 bar rule (over ⠱, under ⠠⠱)
-  #   Horizontal juxtaposition indicator: ⠿
-  #   Vertical juxtaposition indicator: ⠻ (think ≗)
-  #   Termination indicator: ⠱ 
+  # LateX doesn't have a way to deal with most of these, so I've made up something that is probably readable.
+  # Because notation can have multiple values, there is a match to open the construct and another to close it.
+  # The MathCAT rules don't have a way to loop through the values, so they all have to be listed out.
   #
-  # We place left and right outside of other notations
-  # Boxes and circle are does as physical enclosure (shape before base)
-  # Arrows are done as superposition (after base)
-  # top and bottom are done as "bars" (GTM 12) (after base)
+  # We place left and right outside of other notations because that doesn't require anything special in LaTeX
+  # The order of the matches potentially might matter for display, but for comprehension, it shouldn't matter
 
   name: default
   tag: menclose
   match: "."
+  variables:
+  - IsBox: "contains(concat(' ', normalize-space(@notation), ' '), ' left ') and
+            contains(@notation,'top') and contains(@notation,'bottom') and
+            contains(concat(' ', normalize-space(@notation), ' '), ' right ')"                     # avoid 'leftarrow' and'rightarrow'
+
   replace:
   - test:
-      if: "contains(concat(' ', normalize-space(@notation), ' '), ' left ')"                  #avoid 'leftarrow'
-      then: [t: "|'"]
+      if: "not($IsBox) and contains(concat(' ', normalize-space(@notation), ' '), ' left ')"                  # avoid 'leftarrow'
+      then: [t: "|"]
   - test:
-      if: "contains(@notation,'box')"                  # box and roundedbox
+      if: "contains(@notation,'box') or $IsBox"                  # box and roundedbox
       then:
-      - t: "\\boxed{𝐖"                                  # square 
+      - t: "\\boxed{"                                  # square 
   - test:
       if: "contains(@notation,'circle')"
       then:
       - t: "\\circle{"                                  # circle
-# ??? What should happen with arrow?
-#  If there is a box/circle with arrows only and an empty child,
-#     then it acts like the arrow is the child
-#  If there are only arrows for 'notation', then maybe rule 112 applies (superposition),
-#     but the examples aren't similar. In that case, the arrow acts like 'box' and the child is the content... maybe  
-
+  - test:
+      if: "contains(@notation,'updiagonalstrike')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'downdiagonalstrike')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'verticalstrike')"
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'horizontalstrike')"
+      then: [t: "\\overwrite{"]
   - test:
       if: "contains(@notation,'leftarrow')"
-      then: [t: left arrow, pause: short]
+      then: [t: "\\overwrite{"]
   - test:
-      if: "contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')"
-      then: [t: right arrow, pause: short]
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')"  # avoid "leftrightarrow" match
+      then: [t: "\\overwrite{"]
   - test:
       if: "contains(@notation,'northeastarrow')"
-      then: [t: northeast arrow, pause: short]
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(@notation,'uparrow')"
+      then: [t: "\\overwrite{"]
   - test:
       if: "contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')"
-      then: [t: southeast arrow, pause: short]
+      then: [t: "\\overwrite{"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')"
+      then: [t: "\\overwrite{"]
   - test:
       if: "contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')"
-      then: [t: southwest arrow, pause: short]
+      then: [t: "\\overwrite{"]
   - test:
       if: "contains(@notation,'northwestarrow')"
-      then: [t: northwest arrow, pause: short]
+      then: [t: "\\overwrite{"]
   - test:
       if: "contains(@notation,'updownarrow')"
-      then: [t: double ended vertical arrow, pause: short]
+      then: [t: "\\overwrite{"]
   - test:
       if: "contains(@notation,'leftrightarrow')"
-      then: [t: double ended horizontal arrow, pause: short]
+      then: [t: "\\overwrite{"]
   - test:
       if: "contains(@notation,'northeastsouthwestarrow')"
-      then: [t: double ended up diagonal arrow, pause: short]
+      then: [t: "\\overwrite{"]
   - test:
       if: "contains(@notation,'northwestsoutheastarrow')"
-      then: [t: double ended down diagonal arrow, pause: short]
+      then: [t: "\\overwrite{"]
 #  - test:
 #      if: ".[contains(@notation,'actuarial')]"
 #      then: [t: actuarial symbol, pause: short]
@@ -598,68 +606,91 @@
 #      if: ".[contains(@notation,'radical')]"
 #      then: [t: square root, pause: short]
   - test:
-      if: "contains(@notation,'top')"
-      then: [t: "\\overline"]                                                                
+      if: "not($IsBox) and contains(@notation,'top')"
+      then: [t: "\\overline{"]                                                                
   - test:
-      if: "contains(@notation,'bottom')"
-      then: [t: "\\underline"]                                                                
+      if: "not($IsBox) and contains(@notation,'bottom')"
+      then: [t: "\\underline{"]                                                                
+
+  - x: "*[1]"
 
   - test:
-      if: "contains(concat(' ', normalize-space(@notation), ' '), ' left ')"                  #avoid 'leftarrow'
+      if: "$IsBox or contains(@notation,'box')"                  # box and roundedbox
       then:
-      - t: "'{'"
-      - x: "*[1]"
-      - t: "'}'"
-      else: [x: "*[1]"]
-
-# - test:
-#    if: "contains(@notation,'phasorangle')"  #FIX: what should this be???
-#    then: [t: "⠫⠪⠸⠫"]
-# - test:
-#     if: "contains(@notation,'arrow')"    # all the arrows
-#     then:
-#     - test:
-#         - if: "contains(@notation,'rightarrow')" 
-#           then: [t: "1⠳⠕"]                                                           
-#         - else_if: "contains(@notation,'leftarrow')" 
-#           then: [t: "1⠳⠪"]                                                           
-#         - else_if: "contains(@notation,'uparrow')" 
-#           then: [t: "1⠳⠬𝐖"]                                                           
-#         - else_if: "contains(@notation,'downarrow')" 
-#           then: [t: "1⠳⠩"]                                                           
-#         - else_if: "contains(@notation,'northeastarrow')" 
-#           then: [t: "1⠳⠎"]                                                           
-#         - else_if: "contains(@notation,'southeastarrow')" 
-#           then: [t: "1⠳⠣"]                                                           
-#         - else_if: "contains(@notation,'northwestarrow')" 
-#           then: [t: "1⠳⠱"]                                                           
-#         - else_if: "contains(@notation,'southwestarrow')" 
-#           then: [t: "1⠳⠜"]                                                           
-#         - else_if: "contains(@notation,'leftrightarrow')" 
-#           then: [t: "1⠳⠺⠗⠕"]                                                           
-#         - else_if: "contains(@notation,'updownarrow')" 
-#           then: [t: "1⠳⠺⠗⠬"]                                                           
-#         - else_if: "contains(@notation,'northeastsouthwestarrow')" 
-#           then: [t: "1⠳⠺⠗⠎"]                                                           
-#         - else_if: "contains(@notation,'northwestsoutheastarrow')" 
-#           then: [t: "1⠳⠺⠗⠣"]                                                           
+      - t: "}"                                  # square 
   - test:
-      if: "contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
-            contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike')"
+      if: "contains(@notation,'circle')"
       then:
-      - t: "1⠈⠱"                        # cancellation
+      - t: "}"                                  # circle
   - test:
-      if:
-      - "not($AddSpaces) and contains(@notation,'box') or contains(@notation,'circle') or"
-      - "contains(@notation,'arrow') or contains(@notation,'phasorangle')" 
-      then:
-      - t: "⠻"                   # terminate shape
-    # - test:
-    #    if: "$AddSpaces"
-    #    then: [t: "𝐖"]
+      if: "contains(@notation,'updiagonalstrike')"
+      then: [t: "}{\\senwline}"]
   - test:
-      if: "contains(concat(' ', normalize-space(@notation), ' '), ' right ')"                  #avoid 'rightarrow'
-      then: [t: "⠸"]
+      if: "contains(@notation,'downdiagonalstrike')"
+      then: [t: "}{\\neswline}"]
+  - test:
+      if: "contains(@notation,'verticalstrike')"
+      then: [t: "}{\\vline}"]
+  - test:
+      if: "contains(@notation,'horizontalstrike')"
+      then: [t: "}{\\hline}"]
+  - test:
+      if: "contains(@notation,'leftarrow')"
+      then: [t: "}{\\longleftarrow}"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')"  # avoid "leftrightarrow" match
+      then: [t: "}{\\longrightarrow}"]
+  - test:
+      if: "contains(@notation,'northeastarrow')"
+      then: [t: "}{\\nearrow}"]
+  - test:
+      if: "contains(@notation,'uparrow')"
+      then: [t: "}{\\uparrow}"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')"
+      then: [t: "}{\\searrow}"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')"
+      then: [t: "}{\\downarrow}"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')"
+      then: [t: "}{\\swarrow}"]
+  - test:
+      if: "contains(@notation,'northwestarrow')"
+      then: [t: "}{\\nwarrow}"]
+  - test:
+      if: "contains(@notation,'updownarrow')"
+      then: [t: "}{\\updownarrow}"]
+  - test:
+      if: "contains(@notation,'leftrightarrow')"
+      then: [t: "}{\\longleftrightarrow}"]
+  - test:
+      if: "contains(@notation,'northeastsouthwestarrow')"
+      then: [t: "}{\\neswarrow}"]
+  - test:
+      if: "contains(@notation,'northwestsoutheastarrow')"
+      then: [t: "}{\\nwsearrow}"]
+#  - test:
+#      if: ".[contains(@notation,'actuarial')]"
+#      then: [t: actuarial symbol, pause: short]
+#  - test:
+#      if: ".[contains(@notation,'madrub')]"
+#      then: [t: arabic factorial symbol, pause: short]
+#  - test:
+#      if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']"      # default
+#      then: [t: long division symbol, pause: short]
+#  - test:
+#      if: ".[contains(@notation,'radical')]"
+#      then: [t: square root, pause: short]
+  - test:
+      if: "not($IsBox) and contains(@notation,'top')"
+      then: [t: "}"]                                                                
+  - test:
+      if: "not($IsBox) and contains(@notation,'bottom')"
+      then: [t: "}"]                                                                
+  - test:
+      if: "not($IsBox) and contains(concat(' ', normalize-space(@notation), ' '), ' right ')"                  #avoid 'rightarrow'
+      then: [t: "|"]
 
 -
   name: default
