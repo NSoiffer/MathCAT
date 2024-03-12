@@ -8,7 +8,7 @@
       if: "$Verbosity='Verbose'"
       then:
       - T: ""      # phrase('the' square root of 25 equals 5)
-  - T: "determinantti"      # phrase(the 'determinant' of a matrix)
+  - T: "行列式"      # phrase(the 'determinant' of a matrix)
   - test:
       if: "$Verbosity!='Terse'"
       then:
@@ -16,7 +16,7 @@
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple'))"
-      then: [T: "loppu determinantti"]      # phrase('end determinant' of a matrix)
+      then: [T: "結束行列式"]      # phrase('end determinant' of a matrix)
 
 - name: norm
   tag: norm
@@ -26,15 +26,15 @@
       if: "$Verbosity='Verbose'"
       then:
       - T: ""      # phrase('the' square root of 25 equals 5)
-  - T: "normi"      # phrase(the 'norm' can be a measure of distance)
+  - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - T: ""      # phrase(this is the mean 'of' the data)
-  - x: "*[1]"
-  - test:
-      if: "not(IsNode(*[1], 'simple'))"
-      then: [T: "loppu normi"]      # phrase('end norm' that is a measure of distance)
+      - T: "的"      # phrase(this is the mean 'of' the data)
+  - T: "範數"      # phrase(the 'norm' can be a measure of distance)
+  #- test:
+  #    if: "not(IsNode(*[1], 'simple'))"
+  #    then: [t: "結束範數"]      # phrase('end norm' that is a measure of distance)
 
 
 - name: subscripted-norm
@@ -45,20 +45,20 @@
       if: "$Verbosity='Verbose'"
       then:
       - T: ""      # phrase('the' square root of 25 equals 5)
-  - x: "*[2]"
-  - T: "normi"      # phrase(the 'norm' can be a measure of distance)
+  - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - T: ""      # phrase(systems 'of' linear equations)
-  - x: "*[1]"
+      - T: "的"      # phrase(systems 'of' linear equations)
+  - x: "*[2]"
+  - T: "範數"      # phrase(the 'norm' can be a measure of distance)
 
 - name: transpose
   tag: transpose
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - T: "transponoi"      # phrase(this will 'transpose' the values)
+  - T: "的 轉置"      # phrase(this will 'transpose' the values)
 - name: trace
   tag: trace
   match: "not(@data-intent-property)"
@@ -67,12 +67,12 @@
       if: "$Verbosity='Verbose'"
       then:
       - T: ""      # phrase('the' square root of 25 equals 5)
-  - T: "jälki"      # phrase('trace' of a matrix)
+  - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - T: ""      # phrase(systems 'of' linear equations)
-  - x: "*[1]"
+      - T: "的"      # phrase(systems 'of' linear equations)
+  - T: "跡"      # phrase('trace' of a matrix)
 
 - name: dimension
   tag: dimension
@@ -82,12 +82,12 @@
       if: "$Verbosity='Verbose'"
       then:
       - T: ""      # phrase('the' square root of 25 equals 5)
-  - T: "dimensio"      # phrase(the 'dimension' of the matrix)
+  - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - T: ""      # phrase(systems 'of' linear equations)
-  - x: "*[1]"
+      - T: "的"      # phrase(systems 'of' linear equations)
+  - T: "維數"      # phrase(the 'dimension' of the matrix)
 
 - name: homomorphism
   tag: homomorphism
@@ -97,12 +97,12 @@
       if: "$Verbosity='Verbose'"
       then:
       - T: ""      # phrase('the' square root of 25 equals 5)
-  - T: "homomorfismi"      # phrase('homomorphism' indicates similarity of form)
+  - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - T: ""      # phrase(systems 'of' linear equations)
-  - x: "*[1]"
+      - T: "的"      # phrase(systems 'of' linear equations)
+  - T: "同態"      # phrase('homomorphism' indicates similarity of form)
 
 - name: kernel
   tag: kernel
@@ -112,10 +112,10 @@
       if: "$Verbosity='Verbose'"
       then:
       - T: ""      # phrase('the' square root of 25 equals 5)
-  - T: "ydin"      # phrase(this is the 'kernel' of the function)
+  - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - T: ""      # phrase(systems 'of' linear equations)
-  - x: "*[1]"
+      - T: "的"      # phrase(systems 'of' linear equations)
+  - T: "核"      # phrase(this is the 'kernel' of the function)
 

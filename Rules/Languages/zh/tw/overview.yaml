@@ -29,53 +29,55 @@
   - test:
       if: "IsNode(*[1], 'simple') and IsNode(*[2], 'simple')"
       then:
-      - x: "*[1]"
-      - t: "over"
       - x: "*[2]"
+      - T: "分之"
+      - x: "*[1]"
       else:
-      - t: "fraction"
+      - T: "分數"
 
 - name: default
   tag: msqrt
   match: "."
   replace:
-  - t: "square root"
+  - T: "根號"
   - test:
       if: "IsNode(*[1], 'simple')"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "of"}
+          then: {T: ""}
       - x: "*[1]"
 
 - name: default
   tag: mroot
   match: "."
   replace:
+  - T: "根號"
+  - x: "*[1]"
+  - test:
+    if: "IsNode(*[1], 'simple')"
+    then:
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: {T: "的"}
   - test:
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][text()='2']"
-        then: {t: "square root"}
+        then: {T: "平方根"}
       - else_if: "*[2][text()='3']"
-        then: {t: "cube root"}
-      - else_if: "*[2][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
-        then: [{x: "ToOrdinal(*[2])"}, {t: "root"}]
+        then: {T: "立方根"}
+      - else_if: "*[2][not(contains(., '.'))]"
+        then: [{x: "*[2]"}, {T: "次方根"}]
+      - else: [{x: "*[2]"}, {T: "次方根"}]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
           then:
           - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+          #- pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
           else: {x: "*[2]"}
-      - t: "root"
-  - test:
-      if: "IsNode(*[1], 'simple')"
-      then:
-      - test:
-          if: "$Verbosity!='Terse'"
-          then: {t: "of"}
-      - x: "*[1]"
+      - T: "次方根"
 
 - name: default
   tag: mtable
@@ -83,24 +85,24 @@
   - "*[2][self::m:mtable] and"
   - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
   replace:
-  - t: "the"
+  - T: ""
   - x: count(*[2]/*)
-  - t: "by"
+  - T: "乘"
   - x: count(*[2]/*[self::m:mtr][1]/*)
   - test:
       if: "*[1][text()='|']" # just need to check the first bracket since we know it must be (, [, or |
-      then: {t: "determinant"}
-      else: {t: "matrix"}
+      then: {T: "行列式"}
+      else: {T: "矩陣"}
 
 - name: default
   tag: mtable
   match: "."
   replace:
-  - t: "the"
+  - T: ""
   - x: count(*[2]/*)
-  - t: "by"
+  - T: "乘"
   - x: count(*[2]/*[self::m:mtr][1]/*)
-  - t: "table"
+  - T: "表"
 
 - name: short-mrow
   tag: mrow
@@ -124,6 +126,6 @@
   - pause: auto
   - x: "*[5]"
   - pause: auto
-  - t: "and so on"
+  - T: "等等"
 
 - include: "SimpleSpeak_Rules.yaml"
