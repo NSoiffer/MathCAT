@@ -7,12 +7,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "line -segmentti"      # phrase('the line segment from' A to B)
+      - T: "jana"      # phrase('the line segment from' A to B)
       - x: "*[1]"
-      - t: " -"                         # phrase(the line segment from A 'to' B)
+      - T: ""                         # phrase(the line segment from A 'to' B)
       - x: "*[2]"
       else:
-      - t: "line -segmentti"               # phrase(the 'line segment' A  B)
+      - T: "jana"               # phrase(the 'line segment' A  B)
       - x: "*[1]"
       - x: "*[2]"
 
@@ -23,12 +23,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "ray"             # phrase('the ray from' A to B)
+      - T: "puolisuora"             # phrase('the ray from' A to B)
       - x: "*[1]"
-      - t: " "                       # phrase(the ray from A 'to' B)
+      - T: ""                       # phrase(the ray from A 'to' B)
       - x: "*[2]"
       else:
-      - t: "ray"                      # phrase(the 'ray'A  B)
+      - T: "puolisuora"                      # phrase(the 'ray'A  B)
       - x: "*[1]"
       - x: "*[2]"
 
@@ -38,8 +38,8 @@
   replace:
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "the"}]            # phrase('the' arc A B C)
-  - t: "kaari"                        # phrase(the 'arc' A B C)
+      then: [{T: ""}]            # phrase('the' arc A B C)
+  - T: "kaari"                        # phrase(the 'arc' A B C)
   - x: "*[1]"
   - x: "*[2]"
 
@@ -50,9 +50,9 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "kulman mitta"      # phrase('the measure of the angle' ABC)
+      - T: "kulman suuruus"      # phrase('the measure of the angle' ABC)
       else:
-      - t: "kulman mitta"      # phrase('measure of angle' ABC)
+      - T: "kulman suuruus"      # phrase('measure of angle' ABC)
   - x: "*[1]"
   - x: "*[2]"
   - x: "*[3]"

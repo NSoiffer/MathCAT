@@ -8,24 +8,24 @@
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "the"      # phrase('the' square root of 25 equals 5)
+      - T: ""      # phrase('the' square root of 25 equals 5)
   - bookmark: "*[2]/@id"
   - test:
     - if: "*[2][text()='+']"
-      then: [{t: "positiivisten"}]      # phrase(set of all 'positive' integers less than 10)
-      else: [{t: "negatiivisten"}]      # phrase(set of all 'negative' integers less than minus 10)
+      then: [{T: "positiiviset"}]      # phrase(set of all 'positive' integers less than 10)
+      else: [{T: "negatiiviset"}]      # phrase(set of all 'negative' integers less than minus 10)
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][text()='ℂ']"
-      then: [{t: "kompleksinumerot"}]      # phrase('complex numbers' consist of two parts)
+      then: [{T: "kompleksiluvut"}]      # phrase('complex numbers' consist of two parts)
     - else_if: "*[1][text()='ℕ']"
-      then: [{t: "luonnolliset numerot"}]      # phrase('natural numbers' are numbers from 1 to infinity)
+      then: [{T: "luonnolliset luvut"}]      # phrase('natural numbers' are numbers from 1 to infinity)
     - else_if: "*[1][text()='ℚ']"
-      then: [{t: "rationaaliset numerot"}]      # phrase('rational numbers' are the fraction of 2 integers)
+      then: [{T: "rationaaliluvut"}]      # phrase('rational numbers' are the fraction of 2 integers)
     - else_if: "*[1][text()='ℝ']"
-      then: [{t: "real numerot"}]      # phrase('real numbers' can be both positive and negative)
+      then: [{T: "reaaliluvut"}]      # phrase('real numbers' can be both positive and negative)
     - else_if: "*[1][text()='ℤ']"
-      then: [{t: "kokonaisluvut"}]      # phrase(positive 'integers' are natural numbers above 0)
+      then: [{T: "kokonaisluvut"}]      # phrase(positive 'integers' are natural numbers above 0)
       else: [{x: "*[1][text()]"}] # shouldn't happen
 
 - name: dimension-number-sets
@@ -37,15 +37,15 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][text()='ℂ']"
-      then: [{t: "c"}]      # phrase(the letter 'C' used to represent complex number)
+      then: [{T: "C"}]      # phrase(the letter 'C' used to represent complex number)
     - else_if: "*[1][text()='ℕ']"
-      then: [{t: "n"}]      # phrase(the letter 'N' may represent natural numbers)
+      then: [{T: "N"}]      # phrase(the letter 'N' may represent natural numbers)
     - else_if: "*[1][text()='ℚ']"
-      then: [{t: "q"}]      # phrase(the letter 'Q' may represent rational numbers)
+      then: [{T: "Q"}]      # phrase(the letter 'Q' may represent rational numbers)
     - else_if: "*[1][text()='ℝ']"
-      then: [{t: "r"}]      # phrase(the letter 'R' may represent real numbers)
+      then: [{T: "R"}]      # phrase(the letter 'R' may represent real numbers)
     - else_if: "*[1][text()='ℤ']"
-      then: [{t: "z"}]      # phrase(the letter 'Z' may represent integers)
+      then: [{T: "Z"}]      # phrase(the letter 'Z' may represent integers)
       else: [{x: "*[1][text()]"}] # shouldn't happen
   - bookmark: "*[2]/@id"
   - x: "*[2]"
@@ -57,15 +57,15 @@
   - bookmark: "@id"
   - test:
     - if: "text()='ℂ'"
-      then: [{t: "kompleksinumerot"}]      # phrase('the complex numbers' include 2 parts)
+      then: [{T: "kompleksiluvut"}]      # phrase('the complex numbers' include 2 parts)
     - else_if: "text()='ℕ'"
-      then: [{t: "luonnolliset numerot"}]      # phrase('the natural numbers' begin at 1)
+      then: [{T: "luonnolliset luvut"}]      # phrase('the natural numbers' begin at 1)
     - else_if: "text()='ℚ'"
-      then: [{t: "rationaaliset numerot"}]      # phrase('the rational numbers' are the fraction of 2 integers)
+      then: [{T: "rationaaliluvut"}]      # phrase('the rational numbers' are the fraction of 2 integers)
     - else_if: "text()='ℝ'"
-      then: [{t: "todelliset numerot"}]      # phrase('the real numbers' can be both positive and negative)
+      then: [{T: "reaaliluvut"}]      # phrase('the real numbers' can be both positive and negative)
     - else_if: "text()='ℤ'"
-      then: [{t: "kokonaisluvut"}]      # phrase('the integers' are natural numbers above 0)
+      then: [{T: "kokonaisluvut"}]      # phrase('the integers' are natural numbers above 0)
       else: [x: "text()"] # shouldn't happen
 
 - name: real-part
@@ -73,14 +73,14 @@
   match: "."
   replace:
   - bookmark: "@id"
-  - t: "todellinen osa"      # phrase('the real part' of a complex number does not include the imaginary part)
+  - T: "reaaliosa"      # phrase('the real part' of a complex number does not include the imaginary part)
 
 - name: imaginary-part
   tag: imaginary-part
   match: "."
   replace:
   - bookmark: "@id"
-  - t: "kuvitteellinen osa"      # phrase('the imaginary part' is part of a complex number)
+  - T: "imaginaariosa"      # phrase('the imaginary part' is part of a complex number)
 
 # rules on scripted vertical bars ('evaluated at')
 - name: evaluated-at-2
@@ -89,7 +89,7 @@
   replace:
   - x: "*[1]"
   - pause: auto
-  - t: "evaluated at"      # phrase(results were 'evaluated at' a given point)
+  - T: "arvolla"      # phrase(results were 'evaluated at' a given point) # FI: might be different depending on the context
   - pause: auto
   - x: "*[2]"
 
@@ -99,10 +99,10 @@
   replace:
   - x: "*[1]"
   - pause: auto
-  - t: "evaluated at"      # phrase(results were 'evaluated at' this point)
+  - T: "arvolla"      # phrase(results were 'evaluated at' this point)
   - pause: auto
   - x: "*[3]"
-  - t: "minus the same expression evaluated at"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
+  - T: "miinus sama lauseke arvolla"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
   - x: "*[2]"
 
 - name: binomial
@@ -110,7 +110,7 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - t: "valita"      # phrase(you can 'choose' a number at random)
+  - T: "yli"      # phrase(you can 'choose' a number at random) # FI: what does the phrase mean? Translation now means '1 choose 2'
   - x: "*[2]"
 
 - name: permutation
@@ -118,7 +118,7 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[2]"
-  - t: "permutations of"      # phrase(the solution  involves several 'permutations of' values)
+  - T: "permutaatio"      # phrase(the solution  involves several 'permutations of' values)
   - x: "*[1]"
 
 - name: intervals
@@ -128,18 +128,28 @@
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "the"      # phrase('the' square root of 25 equals 5)
-  - x: "translate(name(.),'-', ' ')"
+      - T: ""      # phrase('the' square root of 25 equals 5)
+  # - x: "translate(name(.),'-', ' ')"
+  # FI: The translate function doesn't work for non-English. Used the solution below instead.
+  - test:
+     - if: "self::m:open-interval"
+       then: [T: "avoin väli"]
+     - else_if: "self::m:open-closed-interval"
+       then: [T: "vasemmalta puoliavoin väli"]
+     - else_if: "self::m:closed-interval"
+       then: [T: "suljettu väli"]
+     - else_if: "self::m:closed-open-interval"
+       then: [T: "oikealta puoliavoin väli"]
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: ": n vähentäminen"      # phrase(subtracting 5 'from' 10 gives 5)
+      - T: "luvusta"      # phrase(subtracting 5 'from' 10 gives 5)
       - x: "*[1]"
-      - t: "arvoon"      # phrase(adding 6 'to' 6 equals  12)
+      - T: "lukuun"      # phrase(adding 6 'to' 6 equals  12)
       - x: "*[2]"
       else:
       - x: "*[1]"
-      - t: "pilkkua"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
+      - T: "pilkku"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
       - x: "*[2]"
 
 - name: default-point
@@ -149,10 +159,10 @@
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - t: "the"      # phrase('the' square root of 25 equals 5)
-  - t: "point"      # phrase(a decimal 'point' indicates the fraction component of a number)
+      - T: ""      # phrase('the' square root of 25 equals 5)
+  - T: "piste"      # phrase(a decimal 'point' indicates the fraction component of a number)
   - x: "*[1]"
-  - t: "pilkkua"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
+  - T: "pilkku"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
   - x: "*[2]"
 
 - name: absolute-value
@@ -161,20 +171,20 @@
   replace:
   - test:
       if: "$Verbosity='Terse'"
-      then: [{t: "absoluuttinen arvo"}]      # phrase(the 'absolute value' of a number represents its distance from 0)
-      else: [{t: "luku"}]      # phrase('the absolute value of' a number represents its distance from 0)
+      then: [{T: "itseisarvo"}]      # phrase(the 'absolute value' of a number represents its distance from 0)
+      else: [{T: "itseisarvo"}]      # phrase('the absolute value of' a number represents its distance from 0)
   - x: "*[1]"
   - test:
       if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
       then: [{pause: short}]
-      else: [{pause: short}, {t: "lopun absoluuttinen arvo"}, {pause: short}]      # phrase(show 'end absolute value' position)
+      else: [{pause: short}, {T: "loppu itseisarvo"}, {pause: short}]      # phrase(show 'end absolute value' position)
 
 - name: negative
   tag: negative
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
   - bookmark: "./@id"
-  - t: "negatiiviset"      # phrase('negative' numbers are those less than 0)
+  - T: "negatiivinen"      # phrase('negative' infinity)
   - x: "*[1]"
 
 - name: positive
@@ -182,7 +192,7 @@
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
   - bookmark: "./@id"
-  - t: "positiiviseen"      # phrase(multiplying two negatives results in a 'positive' number)
+  - T: "positiivinen"      # phrase(multiplying two negatives results in a 'positive' number)
   - x: "*[1]"
 
 - name: subscript
@@ -190,15 +200,15 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - t: "sub"      # phrase(the subscripted variable a 'sub' i)
+  - T: "ala"      # phrase(the subscripted variable a 'sub' i)
   - x: "*[2]"
   - test:
       if: "DEBUG(not(IsNode(*[2],'leaf')))"
       then:
       - test:
           if: "$Verbosity='Verbose'"
-          then: {t: "end comption"}      # phrase(this is the 'end subscript' position)
-          else: {t: "loppu -ala"}      # phrase(this is the 'end sub' position)
+          then: {T: "loppu alaindeksi"}      # phrase(this is the 'end subscript' position)
+          else: {T: "loppu ala"}      # phrase(this is the 'end sub' position)
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -210,15 +220,18 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "the"}]      # phrase('the' square root of 25 equals 5)
+      then: [{T: ""}]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
-  - t: ": n vähentäminen"      # phrase(subtracting 5 'from' 10 gives 5)
+  - T: "käy"      # phrase(subtracting 5 'from' 10 gives 5)
+  - pause: short # FI: added pause for clarity
   - x: "*[2]"
-  - t: "arvoon"      # phrase(adding 6 'to' 6 equals  12)
+  - T: "lukuun"      # phrase(adding 6 'to' 6 equals  12)
   - x: "*[3]"
   - test:
       if: "following-sibling::*"
-      then: [{t: "of"}]      # phrase(the square root 'of' 25 equals 5)
+      # then: [{T: ""}]      # phrase(the square root 'of' 25 equals 5)
+      then:
+        pause: medium # FI: added for Finnish # needs a test
 
 - name: bigop-under
   tag: large-op
@@ -226,13 +239,15 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "the"}]      # phrase('the' square root of 25 equals 5)
+      then: [{T: ""}]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
-  - t: "yli"      # phrase(2 'over' 3 equals two thirds)
+  - T: "yli"      # phrase(2 'over' 3 equals two thirds)
   - x: "*[2]"
   - test:
       if: "following-sibling::*"
-      then: [{t: "of"}]      # phrase(the square root 'of' 25 equals 5)
+      # then: [{T: ""}]      # phrase(the square root 'of' 25 equals 5)
+      then:
+        pause: short # FI: added for Finnish # needs a test
 
 - name: largeop
   tag: mrow
@@ -240,9 +255,9 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "the"}]      # phrase('the' square root of 25 equals 5)
+      then: [{T: ""}]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
-  - t: "of"      # phrase(the square root 'of' 25 equals 5)
+  - T: ""     # phrase(the square root 'of' 25 equals 5)
   - x: "*[2]"
 
 - name: limit
@@ -251,8 +266,8 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [{t: "the limit as"}]      # phrase('the limit as' indicated by this result)
-      else: [{t: "limit as"}]      # phrase(the 'limit as' indicated by this result)
+      then: [{T: "raja-arvo kun"}]      # phrase('the limit as' indicated by this result)
+      else: [{T: "raja-arvo"}]      # phrase(the 'limit as' indicated by this result)
   - x: "*[2]"
   - pause: short
 
@@ -260,7 +275,7 @@
   tag: modified-variable
   match: "count(*)=2 and *[2][text()='→']"
   replace:
-  - t: "vektori"      # phrase(the 'vector' reflects size and direction)
+  - T: "vektori"      # phrase(the 'vector' reflects size and direction)
   - x: "*[1]"
 
 - name: default
@@ -282,8 +297,8 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Terse'"
-        then: {t: "super"}      # phrase(this is a 'super' set of numbers)
-        else: {t: "superscript"}      # phrase(a 'superscript' number indicates raised to a power)
+        then: {T: "yli"}      # phrase(this is a 'super' set of numbers) # FI: have to check the context
+        else: {T: "yläindeksi"}      # phrase(a 'superscript' number indicates raised to a power)
   - x: "*[2]"
   - pause: short
 
@@ -295,16 +310,16 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: {t: "subscript"}      # phrase(a 'subscript' may be used to indicate an index)
-      else: {t: "sub"}      # phrase(the result is 'sub' optimal)
+      then: {T: "alaindeksi"}      # phrase(a 'subscript' may be used to indicate an index)
+      else: {T: "ala"}      # phrase(the result is 'sub' optimal)
   - x: "*[2]"
   - test:
       if: "DEBUG(not(IsNode(*[2],'leaf')))"
       then:
       - test:
           if: "$Verbosity='Verbose'"
-          then: {t: "end comption"}      # phrase(this is the 'end subscript' position)
-          else: {t: "loppu -ala"}      # phrase(this is the 'end sub' position)
+          then: {T: "loppu alaindeksi"}      # phrase(this is the 'end subscript' position)
+          else: {T: "loppu ala"}      # phrase(this is the 'end sub' position)
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -313,8 +328,8 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Verbose'"
-        then: {t: "superscript"}      # phrase(a 'superscript' number indicates raised to a power)
-        else: {t: "super"}      # phrase(this is a 'super' set of numbers)
+        then: {T: "yläindeksi"}      # phrase(a 'superscript' number indicates raised to a power)
+        else: {T: "yli"}      # phrase(this is a 'super' set of numbers) # FI: does this mean "superset" or "superscript"?
   - x: "*[3]"
   - pause: short
 
@@ -323,7 +338,7 @@
   match: "text()='sin'"
   replace:
   - bookmark: "@id"
-  - t: "sini"      # phrase(the 'sine' of the angle)
+  - T: "sini"      # phrase(the 'sine' of the angle)
 - name: cos
   tag: mi
   match: "text()='cos'"
@@ -331,8 +346,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "cos"}      # phrase('cos' is the abbreviation for cosine)
-      else: {t: "kosini"}      # phrase(find the 'cosine' in a right-angle triangle)
+      then: {T: "kos"}      # phrase('cos' is the abbreviation for cosine)
+      else: {T: "kosini"}      # phrase(find the 'cosine' in a right-angle triangle)
 - name: tan
   tag: mi
   match: "text()='tan' or text()='tg'"
@@ -340,8 +355,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "tan"}      # phrase(the 'tan' is the ratio of the opposite to the adjacent side of a right-angled triangle)
-      else: {t: "tangentti"}      # phrase(a 'tangent' is a straight line that touches a curve)
+      then: {T: "tan"}      # phrase(the 'tan' is the ratio of the opposite to the adjacent side of a right-angled triangle)
+      else: {T: "tangentti"}      # phrase(a 'tangent' is a straight line that touches a curve)
 - name: sec
   tag: mi
   match: "text()='sec'"
@@ -349,8 +364,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "etsiä"}      # phrase(to 'seek' a solution)
-      else: {t: "secant"}      # phrase(a 'secant' intersects a curve at two or more points)
+      then: {T: "sek"}      # phrase(to 'seek' a solution)
+      else: {T: "sekantti"}      # phrase(a 'secant' intersects a curve at two or more points)
 - name: csc
   tag: mi
   match: "text()='csc'"
@@ -358,8 +373,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "cosecant"}      # phrase(we will 'cosecant' a solution)
-      else: {t: "cosecant"}      # phrase(the 'cosecant' is the reciprocal of the secant)
+      then: {T: "kosekant"}      # phrase(we will 'cosecant' a solution)
+      else: {T: "kosekantti"}      # phrase(the 'cosecant' is the reciprocal of the secant)
 - name: cot
   tag: mi
   match: "text()='cot'"
@@ -367,8 +382,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "kotangentti"}      # phrase(find the 'cotangent' in a right-angle triangle)
-      else: {t: "kohde"}      # phrase(the 'cotangent' is the reciprocal of the tangent)
+      then: {T: "kotan"}      # phrase(find the 'cotangent' in a right-angle triangle)
+      else: {T: "kotangentti"}      # phrase(the 'cotangent' is the reciprocal of the tangent)
 
 - name: sinh
   tag: mi
@@ -377,8 +392,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "sinch"}      # phrase(the word 'sinch' is an abbreviation for hyperbolic sine)
-      else: {t: "hyperbolista sinia"}      # phrase(the 'hyperbolic sine' is used in mathematics)
+      then: {T: "sinh"}      # phrase(the word 'sinch' is an abbreviation for hyperbolic sine) # FI: should listen to this
+      else: {T: "hyperbolinen sini"}      # phrase(the 'hyperbolic sine' is used in mathematics)
 - name: cosh
   tag: mi
   match: "text()='cosh'"
@@ -386,8 +401,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "cosh"}      # phrase('cosh' is an abbreviation of hyperbolic cosine)
-      else: {t: "hyperbolinen kosini"}      # phrase(the 'hyperbolic cosine' is a mathematical function)
+      then: {T: "kosh"}      # phrase('cosh' is an abbreviation of hyperbolic cosine)
+      else: {T: "hyperbolinen kosini"}      # phrase(the 'hyperbolic cosine' is a mathematical function)
 - name: tanh
   tag: mi
   match: "text()='tanh'"
@@ -395,8 +410,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "tanch"}      # phrase('tanch' is shorthand for hyperbolic tangent)
-      else: {t: "hyperbolinen tangentti"}      # phrase('hyperbolic tangent' is a mathematical function)
+      then: {T: "tanh"}      # phrase('tanch' is shorthand for hyperbolic tangent) # FI: have to listen to this
+      else: {T: "hyperbolinen tangentti"}      # phrase('hyperbolic tangent' is a mathematical function)
 - name: sech
   tag: mi
   match: "text()='sech'"
@@ -404,8 +419,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "sheck"}      # phrase('sheck' is shorthand for hyperbolic secant)
-      else: {t: "hyperbolinen secant"}      # phrase('hyperbolic secant' is a mathematical function)
+      then: {T: "sekanth"}      # phrase('sheck' is shorthand for hyperbolic secant)
+      else: {T: "hyperbolinen sekantti"}      # phrase('hyperbolic secant' is a mathematical function)
 - name: csch
   tag: mi
   match: "text()='csch'"
@@ -413,8 +428,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "cosheck"}      # phrase('cosheck' is shorthand for hyperbolic cosecant)
-      else: {t: "hyperbolinen cosecant"}      # phrase('hyperbolic cosecant' is a mathematical function)
+      then: {T: "kosekanth"}      # phrase('cosheck' is shorthand for hyperbolic cosecant)
+      else: {T: "hyperbolinen kosekantti"}      # phrase('hyperbolic cosecant' is a mathematical function)
 - name: coth
   tag: mi
   match: "text()='coth'"
@@ -422,8 +437,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
-      then: {t: "cotanch"}      # phrase('cotanch' is shorthand for hyperbolic cotangent)
-      else: {t: "hyperbolinen kotangentti"}      # phrase(the 'hyperbolic cotangent' is a mathematical function)
+      then: {T: "kotanh"}      # phrase('cotanch' is shorthand for hyperbolic cotangent)
+      else: {T: "hyperbolinen kotangentti"}      # phrase(the 'hyperbolic cotangent' is a mathematical function)
 
 - # handle both log and ln
   name: log
@@ -439,21 +454,21 @@
       if: "$log_is_simple"
       then_test:
       - if: "*[1][text()='log']"
-        then: [{t: "log"}]      # phrase(the 'log' function is used in mathematics)
+        then: [{T: "logaritmi"}]      # phrase(the 'log' function is used in mathematics)
       - else_if: "$Verbosity='Terse'"
-        then: [{spell: "'ln'"}]
-        else: [{t: "natural log"}]      # phrase(the 'natural log' function is used in mathematics)
+        then: [{SPELL: "'ln'"}]
+        else: [{T: "luonnollinen logaritmi"}]      # phrase(the 'natural log' function is used in mathematics)
       else:
       - test:
           if: "$Verbosity!='Terse' and not(log_is_simple)"
-          then: {t: "the"}      # phrase('the' square root of 25 equals 5)
+          then: {T: ""}      # phrase('the' square root of 25 equals 5)
       - test:
         - if: "*[1][text()='log']"
-          then: [{t: "log"}]      # phrase(the 'log' function is used in mathematics)
+          then: [{T: "logaritmi"}]      # phrase(the 'log' function is used in mathematics)
         - else_if: "$Verbosity='Terse'"
-          then: [{spell: "'ln'"}]
-          else: [{t: "natural log"}]      # phrase(the 'natural log' function is used in mathematics)
-      - t: "of"      # phrase(5 is the square root 'of' 25)
+          then: [{SPELL: "'ln'"}]
+          else: [{T: "luonnollinen logaritmi"}]      # phrase(the 'natural log' function is used in mathematics)
+      - T: ""     # phrase(5 is the square root 'of' 25)
       - pause: short
   - x: "*[3]"
 
@@ -464,8 +479,8 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "the"}      # phrase('the' square root of 25 equals 5)
-  - t: "lokipohja"      # phrase(the 'log base' is often base 10)
+      then: {T: ""}      # phrase('the' square root of 25 equals 5)
+  - T: "logaritmi kantaluku"      # phrase(the 'log base' is often base 10)
   - x: "*[1]"
 
 - name: log-base-power
@@ -475,19 +490,19 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "the"}      # phrase('the' square root of 25 equals 5)
-  - t: "lokipohja"      # phrase(the 'log base' is often base 10)
+      then: {T: ""}      # phrase('the' square root of 25 equals 5)
+  - T: "logaritmi kantaluku"      # phrase(the 'log base' is often base 10)
   - x: "*[1]"
   - pause: medium
   - test:
       - if: "*[2][text()=2]"
-        then: [t: "squared"]     
+        then: [T: "neliö"]     
       - else_if: "*[2][text()=3]"
-        then: [t: "cubed"]
+        then: [T: "kuutio"]
         else:  # don't bother with special cases as this isn't likely to happen
-        - t: "raised to the"      # phrase(x 'raised to the' second power)
+        - T: "potenssiin"      # phrase(x 'raised to the' second power)
         - x: "*[2]"
-        - t: "voimaan"      # phrase(x raised to the second 'power')
+        # - T: "potenssi"      # phrase(x raised to the second 'power')
   - pause: short
 
 - name: multi-line
@@ -503,13 +518,13 @@
   - x: "$LineCount"
   - test:
     - if: "self::m:cases"
-      then: [{t: "tapaus"}]      # phrase(this is the first 'case' of three cases)
+      then: [{T: "tapaus"}]      # phrase(this is the first 'case' of three cases)
     - else_if: "self::m:equations"
-      then: [{t: "yhtälö"}]      # phrase(this is the first 'equation' of three equations)
-      else: [{t: "rivi"}]      # phrase(this is the first 'line' of three lines)
+      then: [{T: "yhtälö"}]      # phrase(this is the first 'equation' of three equations)
+      else: [{T: "rivi"}]      # phrase(this is the first 'line' of three lines)
   - test:
     - if: "$LineCount != 1"
-      then: [{ct: "s"}] # plural
+      then: [{CT: "t"}] # plural # FI: more logic for different plurals, '-t' for now
   - pause: short
   - x: "*"
 
@@ -521,22 +536,22 @@
       if: "parent::m:equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
            count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']]) != 0"
       then:
-      - t: "next line"
+      - T: "seuraava rivi"
       else_test:
         if: "$LineCount != 1"
         then:
         - test:
           - if: "parent::m:cases"
-            then: [{t: "tapaus"}]     # phrase('case' 1 of 10 cases)
+            then: [{T: "tapaus"}]     # phrase('case' 1 of 10 cases)
           - else_if: "parent::m:equations"
-            then: [{t: "yhtälö"}] # phrase('equation' 1 of 10 equations)
-            else: [{t: "line"}]     # phrase('line 1 of 10 lines)
+            then: [{T: "yhtälö"}] # phrase('equation' 1 of 10 equations)
+            else: [{T: "rivi"}]     # phrase('line 1 of 10 lines)
         - x: "count(preceding-sibling::*)+1"
 
   - test:
       if: .[self::m:mlabeledtr]
       then:
-      - t: "tarralla"      # phrase(the diagram is complete 'with label')
+      - T: "merkinnällä"      # phrase(the diagram is complete 'with label')
       - x: "*[1]/*"
   - pause: medium
   - test:
@@ -573,14 +588,14 @@
   variables: [{IsColumnSilent: true()}]
   match: "count(*)=1 and *[self::m:mtr][count(*) = 1]"
   replace:
-  - ot: "the"      # phrase('the' 1 by 1 matrix M)
-  - t: "1: 1"      # phrase(the '1 by 1' matrix)
+  # - OT: ""      # phrase('the' 1 by 1 matrix M)
+  - T: "1 kertaa 1"      # phrase(the '1 by 1' matrix)
   - test:
       if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
-      then: {t: "determinantti"}      # phrase(the 2 by 2 'determinant'))
-      else: {t: "matriisi"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "determinantti"}      # phrase(the 2 by 2 'determinant'))
+      else: {T: "matriisi"}      # phrase(the 2 by 2 'matrix')
       
-  - t: "merkinnällä"      # phrase(the 2 by 2 matrix 'with entry' x)
+  - T: "merkinnällä"      # phrase(the 2 by 2 matrix 'with entry' x)
   - x: "*[1]/*"
 
 # simpler reading methods for smaller matrices if the entries are simple
@@ -593,41 +608,41 @@
   - count(*)<=3 and # at least two rows
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   replace:
-  - t: "the"      # phrase('the' 2 by 2 matrix M)
+  - T: ""      # phrase('the' 2 by 2 matrix M)
   - x: count(*)
-  - t: "1 sarake"      # phrase(the 2 'by 1 column' matrix)
+  - T: "kertaa 1 sarake"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {t: "vektori"}      # phrase(the 2 by 2 'vector')
-      else: {t: "matriisi"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "vektori"}      # phrase(the 2 by 2 'vector')
+      else: {T: "matriisi"}      # phrase(the 2 by 2 'matrix')
   - pause: long
   - x: "*/*"
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
-      - t: "loppu"      # phrase('end' of matrix)
+      - T: ""      # phrase('end' of matrix)
       - test:
           if: $ClearSpeak_Matrix = 'EndVector'
-          then: {t: "vektori"}      # phrase(the 2 column 'vector')
-          else: {t: "matriisi"}      # phrase(the 2 by 2 'matrix')
+          then: {T: "loppu vektori"}      # phrase(the 2 column 'end vector')
+          else: {T: "loppu matriisi"}      # phrase(the 2 by 2 'end matrix')
 
 - name: default-column-matrix
   tag: matrix
   variables: [{IsColumnSilent: true()}]
   match: "*[self::m:mtr][count(*) = 1]"
   replace:
-  - t: "the"      # phrase('the' 2 by 2 matrix M)
+  - T: ""      # phrase('the' 2 by 2 matrix M)
   - x: "count(*)"
-  - t: "1 sarake"      # phrase(the 2 'by 1 column' matrix)
+  - T: "kertaa 1 sarake"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {t: "vektori"}      # phrase(the 2 column 'vector')
-      else: {t: "matriisi"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "vektori"}      # phrase(the 2 column 'vector')
+      else: {T: "matriisi"}      # phrase(the 2 by 2 'matrix')
   - pause: long
   - x: "*" # select the rows (mtr)
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
-      then: [{t: "end matrix"}]      # phrase(the 'end of matrix' has been reached)
+      then: [{T: "loppu matriisi"}]      # phrase(the 'end of matrix' has been reached)
 
 - name: 1x2-or-3-matrix
   tag: matrix
@@ -638,47 +653,47 @@
   - count(*[1]/*)<=3 and # at least two cols
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   replace:
-  - t: "1"      # phrase('the 1 by' 2 matrix)
+  - T: "1 kertaa"      # phrase('the 1 by' 2 matrix)
   - x: count(*/*)
-  - t: "rivi"      # phrase(the 1 by 4 'row' matrix)
+  - T: "rivi"      # phrase(the 1 by 4 'row' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {t: "1"}      # phrase('the 1 by' 2 row 'vector')
-      else: {t: "1"}      # phrase('the 1 by' 2 'matrix')
+      then: {T: "vektori"}      # phrase(the 1 by 2 row 'vector') # FI: what is the context?
+      else: {T: "matriisi"}      # phrase(the 1 by 2 'matrix')
   - pause: long
   - x: "*/*"
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
-      - t: "loppu"      # phrase(the 'end' of matrix has been reached)
+      - T: ""      # phrase(the 'end' of matrix has been reached) # FI: maybe change logic?
       - test:
           if: $ClearSpeak_Matrix = 'EndMatrix'
-          then: {t: "matriisi"}      # phrase(the 2 by 2 'matrix')
-          else: {t: "vektori"}      # phrase(the 2 by 1 'vector')
+          then: {T: "loppu matriisi"}      # phrase(the 2 by 2 'matrix')
+          else: {T: "loppu vektori"}      # phrase(the 2 by 1 'vector')
 
 - name: default-row-matrix
   tag: matrix
   variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
   match: "count(*)=1" # one row
   replace:
-  - t: "1"      # phrase('the 1 by' 2 matrix)
+  - T: "1 kertaa"      # phrase('the 1 by' 2 matrix)
   - x: "count(*/*)"
-  - t: "rivi"      # phrase(the 1 by 2 'row' matrix)
+  - T: "rivi"      # phrase(the 1 by 2 'row' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
-      then: {t: "vektori"}      # phrase(the 2 by 1 'vector')
-      else: {t: "matriisi"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "vektori"}      # phrase(the 2 by 1 'vector')
+      else: {T: "matriisi"}      # phrase(the 2 by 2 'matrix')
   - pause: long
   - pause: medium
   - x: "*/*" # select the cols (mtd)
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
-      - t: "loppu"      # phrase(the 'end' of matrix has been reached)
+      - T: "loppu"      # phrase(the 'end' of matrix has been reached)
       - test:
           if: $ClearSpeak_Matrix = 'EndMatrix'
-          then: {t: "matriisi"}      # phrase(the 2 by 2 'matrix')
-          else: {t: "vektori"}      # phrase(the 2 by 1 'vector')
+          then: {T: "matriisi"}      # phrase(the 2 by 2 'matrix')
+          else: {T: "vektori"}      # phrase(the 2 by 1 'vector')
 
 - name: simple-small-matrix
   tag: [matrix, determinant]
@@ -688,48 +703,48 @@
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   variables: [{IsColumnSilent: "$SpeechStyle = 'SimpleSpeak' or ($SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum')"}]
   replace:
-  - t: "the"      # phrase('the' 1 by 2 matrix M)
+  - T: ""      # phrase('the' 1 by 2 matrix M)
   - x: count(*)
-  - t: "by"      # phrase(the 1 'by' 2 matrix)
+  - T: "kertaa"      # phrase(the 1 'by' 2 matrix)
   - x: count(*[self::m:mtr][1]/*)
   - test:
       if: "self::m:determinant"
-      then: {t: "determinantti"}      # phrase(the 2 by 2 'determinant')
-      else: {t: "matriisi"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "determinantti"}      # phrase(the 2 by 2 'determinant')
+      else: {T: "matriisi"}      # phrase(the 2 by 2 'matrix')
   - pause: long
   - x: "*"
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
-      - t: "loppu"      # phrase(the 'end' of matrix has been reached)
+      - T: ""      # phrase(the 'end' of matrix has been reached)
       - test:
           if: "self::m:determinant"
-          then: {t: "determinantti"}      # phrase(the 2 by 2 'determinant')
-          else: {t: "matriisi"}      # phrase(the 2 by 2 'matrix')
+          then: {T: "loppu determinantti"}      # phrase(the 2 by 2 'determinant')
+          else: {T: "loppu matriisi"}      # phrase(the 2 by 2 'matrix')
 
 - name: default-matrix
   tag: [matrix, determinant]
   variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
   match: "not(@data-intent-property)"
   replace:
-  - t: "the"      # phrase('the' 1 by 2 matrix M)
+  - T: ""      # phrase('the' 1 by 2 matrix M)
   - x: "count(*)"
-  - t: "by"      # phrase(the 1 'by' 2 matrix)
+  - T: "kertaa"      # phrase(the 1 'by' 2 matrix)
   - x: "count(*[self::m:mtr][1]/*)"
   - test:
       if: "self::m:determinant"
-      then: {t: "determinantti"}      # phrase(the 2 by 2 'determinant')
-      else: {t: "matriisi"}      # phrase(the 2 by 2 'matrix')
+      then: {T: "determinantti"}      # phrase(the 2 by 2 'determinant')
+      else: {T: "matriisi"}      # phrase(the 2 by 2 'matrix')
   - pause: long
   - x: "*"
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
-      - t: "loppu"      # phrase(the 'end' of matrix has been reached)
+      - T: "loppu"      # phrase(the 'end' of matrix has been reached)
       - test:
           if: "self::m:determinant"
-          then: {t: "determinantti"}      # phrase(the 2 by 2 'determinant')
-          else: {t: "matrix"}      # phrase(the 2 by 2 'matrix's)
+          then: {T: "determinantti"}      # phrase(the 2 by 2 'determinant')
+          else: {T: "matriisi"}      # phrase(the 2 by 2 'matrix's)
 
 - name: chemistry-msub
 
@@ -739,10 +754,10 @@
   - x: "*[2]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "alaindeksi"}]      # phrase(H 'subscript' 2)
+      then: [{T: "alaindeksi"}]      # phrase(H 'subscript' 2)
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{t: "sub"}]      # phrase(H 'sub' 2)
+        then: [{T: "ala"}]      # phrase(H 'sub' 2)
   - x: "*[3]"
 
 - name: chemistry-msup
@@ -752,10 +767,10 @@
   - x: "*[2]"
   - test:
       if: "$Verbosity='Verbose'"
-      then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+      then: [{T: "yläindeksi"}]      # phrase(H 'superscript' 2)
       else_test:
         if: "$Verbosity='Medium'"
-        then: [{t: "super"}]      # phrase(H 'super' 2)
+        then: [{T: "ylä"}]      # phrase(H 'super' 2)
   - x: "*[3]"
   - test:
       if: "following-sibling::*[1][text()='+' or text()='-']" # a little lazy -- assumes chemistry superscripts end with + or -
@@ -783,10 +798,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+              then: [{T: "yläindeksi"}]      # phrase(H 'superscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "super"}]      # phrase(H 'super' 2)
+                then: [{T: "ylä"}]      # phrase(H 'super' 2)
           - x: "$Prescripts[2]"
           - pause: "short"
       - test:
@@ -794,10 +809,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "subscript"}]      # phrase(a 'subscript' may be used to indicate an index)
+              then: [{T: "alaindeksi"}]      # phrase(a 'subscript' may be used to indicate an index)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "sub"}]      # phrase(here is a 'sub' total)
+                then: [{T: "ala"}]      # phrase(here is a 'sub' total)
           - x: "$Prescripts[1]"
           - pause: "short"
       - test:
@@ -808,10 +823,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+                  then: [{T: "yläindeksi"}]      # phrase(H 'superscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "super"}]      # phrase(H 'super' 2)
+                    then: [{T: "ylä"}]      # phrase(H 'super' 2)
               - x: "$Prescripts[4]"
               - pause: "short"
           - test:
@@ -819,10 +834,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "alaindeksi"}]      # phrase(H 'subscript' 2)
+                  then: [{T: "alaindeksi"}]      # phrase(H 'subscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "sub"}]      # phrase(H 'sub' 2)
+                    then: [{T: "ala"}]      # phrase(H 'sub' 2)
               - x: "$Prescripts[3]"
               - pause: "short"
   - x: "*[1]" # base
@@ -834,10 +849,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "alaindeksi"}]      # phrase(phrase(H 'subscript' 2)
+              then: [{T: "alaindeksi"}]      # phrase(phrase(H 'subscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "sub"}]      # phrase(phrase(H 'sub' 2)
+                then: [{T: "ala"}]      # phrase(phrase(H 'sub' 2)
           - x: "$Postscripts[1]"
           - pause: "short"
       - test:
@@ -845,10 +860,10 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
-              then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+              then: [{T: "yläindeksi"}]      # phrase(H 'superscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
-                then: [{t: "super"}]          # phrase(H 'super' 2)
+                then: [{T: "ylä"}]          # phrase(H 'super' 2)
           - x: "$Postscripts[2]"
           - pause: "short"
       - test:
@@ -859,10 +874,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "alaindeksi"}]      # phrase(H 'subscript' 2)
+                  then: [{T: "alaindeksi"}]      # phrase(H 'subscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "sub"}]          # phrase(H 'sub' 2)
+                    then: [{T: "ala"}]          # phrase(H 'sub' 2)
               - x: "$Postscripts[3]"
               - pause: "short"
           - test:
@@ -870,10 +885,10 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
-                  then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+                  then: [{T: "yläindeksi"}]      # phrase(H 'superscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
-                    then: [{t: "super"}]          # phrase(H 'super' 2)
+                    then: [{T: "ylä"}]          # phrase(H 'super' 2)
               - x: "$Postscripts[4]"
               - pause: "short"
           - test:
@@ -884,10 +899,10 @@
                   then:
                   - test:
                       if: "$Verbosity='Verbose'"
-                      then: [{t: "alaindeksi"}]    # phrase(H 'subscript' 2)
+                      then: [{T: "alaindeksi"}]    # phrase(H 'subscript' 2)
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{t: "sub"}]        # phrase(H 'sub' 2)
+                        then: [{T: "ala"}]        # phrase(H 'sub' 2)
                   - x: "$Postscripts[5]"
                   - pause: "short"
               - test:
@@ -895,10 +910,10 @@
                   then:
                   - test:
                       if: "$Verbosity='Verbose'"
-                      then: [{t: "superscript"}]  # phrase(H 'superscript' 2)
+                      then: [{T: "yläindeksi"}]  # phrase(H 'superscript' 2)
                       else_test:
                         if: "$Verbosity='Medium'"
-                        then: [{t: "super"}]      # phrase(H 'super' 2)
+                        then: [{T: "ylä"}]      # phrase(H 'super' 2)
                   - x: "$Postscripts[6]"
                   - pause: "short"
               - test:
@@ -909,10 +924,10 @@
                       then:
                       - test:
                           if: "$Verbosity='Verbose'"
-                          then: [{t: "alaindeksi"}]      # phrase(H 'subscript' 2)
+                          then: [{T: "alaindeksi"}]      # phrase(H 'subscript' 2)
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{t: "sub"}]      # phrase(H 'sub' 2)
+                            then: [{T: "ala"}]      # phrase(H 'sub' 2)
                       - x: "$Postscripts[7]"
                       - pause: "short"
                   - test:
@@ -920,10 +935,10 @@
                       then:
                       - test:
                           if: "$Verbosity='Verbose'"
-                          then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+                          then: [{T: "yläindeksi"}]      # phrase(H 'superscript' 2)
                           else_test:
                             if: "$Verbosity='Medium'"
-                            then: [{t: "super"}]      # phrase(H 'super' 2)
+                            then: [{T: "ylä"}]      # phrase(H 'super' 2)
                       - x: "$Postscripts[8]"
                       - pause: "short"
       - test:
@@ -953,12 +968,12 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: ".='s'"
-      then: [{t: "kiinteä"}]      # phrase(Boron is a 'solid' in its natural state)
+      then: [{T: "kiinteä"}]      # phrase(Boron is a 'solid' in its natural state)
     - else_if: ".='l'"
-      then: [{t: "neste"}]      # phrase(water is a 'liquid')
+      then: [{T: "neste"}]      # phrase(water is a 'liquid')
     - else_if: ".='g'"
-      then: [{t: "kaasu"}]      # phrase(hydrogen is a 'gas' )
-      else: [{t: "vesipitoinen"}]      # phrase(an 'aqueous' solution is contained in water)
+      then: [{T: "kaasu"}]      # phrase(hydrogen is a 'gas' )
+      else: [{T: "vesiliuoksessa"}]      # phrase(an 'aqueous' solution is contained in water)
   - pause: short
 
 - name: chemical-formula-operator-bond
@@ -969,13 +984,13 @@
   - bookmark: "@id"
   - test:
     - if: "text()='-' or text() = ':'"
-      then: [{t: "yksi sidos"}]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
+      then: [{T: "yksinkertainen sidos"}]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
     - else_if: "text()='=' or text() = '∷'"
-      then: [{t: "double bond"}]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
+      then: [{T: "kaksinkertainen sidos"}]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
     - else_if: "text()='≡'"
-      then: [{t: "kolminkertainen sidos"}]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
+      then: [{T: "kolminkertainen sidos"}]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
     - else_if: "text()='≣'"
-      then: [{t: "nelinkertainen sidos"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
+      then: [{T: "nelinkertainen sidos"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
       else: [{x: "text()"}]
 
 - name: chemical-formula-operator
@@ -984,25 +999,25 @@
   replace:
     x: "text()"
 
-- name: chemical-arrow-operator
-  tag: chemical-arrow-operator
-  match: "."
-  replace:
-  # FIX: this might be better/more efficient if in unicode.yaml
-  - bookmark: "@id"
-  - test:
-    - if: ".='→' or .='⟶'"
-      then_test:
-        if: "$Verbosity='Terse'"
-        then: [{t: "muodostaa"}]      # phrase(hydrogen and oxygen 'forms' water )
-        else: [{t: "reagoi muodostamaan"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
-    - else_if: ".='⇌' or .='⮖'"
-      then: [{t: "on tasapainossa"}]      # phrase(a reactant 'is in equilibrium with' a product)
-    - else_if: ".='⭴'"
-      then: [{t: "on tasapainossa, joka on puolueellinen vasemmalle"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
-    - else_if: ".='⭵'"
-      then: [{t: "on tasapainossa, joka on puolueellinen oikealle"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
-      else: [x: "."]
+- name: chemical-arrow-operator 
+  tag: chemical-arrow-operator 
+  match: "." 
+  replace: 
+  # FIX: this might be better/more efficient if in unicode.yaml 
+  - bookmark: "@id" 
+  - test: 
+    - if: "DEBUG(.)='→' or .='⟶'" 
+      then_test: 
+        if: "$Verbosity='Terse'" 
+        then: [t: "muodostaa"]      # phrase(hydrogen and oxygen 'forms' water ) 
+        else: [t: "reagoi"]      # phrase(hydrogen and oxygen 'reacts to form' water) 
+    - else_if: ".='⇌' or .='\u1f8d2'" 
+      then: [t: "on tasapainossa"]      # phrase(a reactant 'is in equilibrium with' a product) 
+    - else_if: ".='\u1f8d4'" 
+      then: [t: "on tasapainoissa vasemmalle"]      # phrase(the reactant 'is in equilibrium biased to the left with' the product) 
+    - else_if: ".='\u1f8d3'" 
+      then: [t: "on tasapainossa oikealle"]      # phrase(the reactant 'is in equilibrium biased to the right with' the product) 
+      else: [x: "*"] 
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator
@@ -1015,7 +1030,7 @@
   tag: none
   match: "../../*[self::m:chemical-formula or self::m:chemical-nuclide]"
   replace:
-  - t: "" # don't say anything
+  - T: "" # don't say anything
 
 - name: ignore-intent-wrapper
   tag: intent-wrapper

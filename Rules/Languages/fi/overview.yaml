@@ -59,7 +59,7 @@
         then: {t: "square root"}
       - else_if: "*[2][text()='3']"
         then: {t: "cube root"}
-      - else_if: "*[2][not(contains(., '.'))]"
+      - else_if: "*[2][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
         then: [{x: "ToOrdinal(*[2])"}, {t: "root"}]
       else:
       - test:
