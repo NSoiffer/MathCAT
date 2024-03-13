@@ -21,5 +21,10 @@ mod braille {
     mod Vietnam {
         mod vi;
     }
+
+    mod LaTeX {
+        mod augenbit;
+        mod other;
+    }
 }
 

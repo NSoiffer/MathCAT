@@ -169,55 +169,24 @@ fn main() {
   //       </msup>
   //     </mrow>
   //   </math>";
-  let expr=r#"
-  <math display='block'>
+
+  let expr = r#"
+  <math>
+  <mfrac>
+  <msup>
+    <mo arg="0">&#x2146;</mo>
+    <mn arg="3">2</mn>
+  </msup>
   <mrow>
+    <mo arg="0">&#x2146;</mo>
     <msup>
-      <mi>e</mi>
-      <mrow>
-        <mo>&#x2212;</mo>
-        <mfrac>
-          <mn>1</mn>
-          <mn>2</mn>
-        </mfrac>
-        <msup>
-          <mrow>
-            <mrow>
-              <mo>(</mo>
-              <mrow>
-                <mfrac>
-                  <mrow>
-                    <mi>x</mi>
-                    <mo>&#x2212;</mo>
-                    <mi>&#x03BC;</mi>
-                  </mrow>
-                  <mi>&#x03C3;</mi>
-                </mfrac>
-              </mrow>
-              <mo>)</mo>
-            </mrow>
-          </mrow>
-          <mn>2</mn>
-        </msup>
-      </mrow>
+      <mi arg="2">x</mi>
+      <mn arg="3">2</mn>
     </msup>
   </mrow>
+</mfrac>
 </math>
-               "#;
-
-//   let expr = "
-//   <math display='block'>
-//   <mrow displaystyle='true' data-changed='added'>
-//     <mrow data-changed='added'>
-//       <mi>A</mi>
-//       <mo data-changed='added'>&#x2062;</mo>
-//       <mi>x</mi>
-//     </mrow>
-//     <mo>+</mo>
-//     <mi>b</mi>
-//   </mrow>
-//  </math>
-//     ";
+    "#;
   // let expr= "<math><mrow><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>";
   let instant = Instant::now();
   let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../Rules");
@@ -252,7 +221,7 @@ fn main() {
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
 
-  set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
+  set_preference("BrailleCode".to_string(), "LaTeX".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),
@@ -275,7 +244,7 @@ fn main() {
   // info!("#xpath = {}; duplicates = {}", xpath_counts.0, xpath_counts.1);
   info!("Time taken (second time for speech + braille): {}ms", instant.elapsed().as_millis());
 
-  timing_test(expr, 200);
+  timing_test(expr, 0);
 
 }
 

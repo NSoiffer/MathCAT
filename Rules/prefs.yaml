@@ -81,6 +81,9 @@
       SansSerif:    "⠈⠼"    # first transcriber-defined typeform prefix indicator
       GreekVariant: "⠸"     # default to Greek
 
+    LaTeX:
+      UseShortName: false   # Use the short form for the latex (e.g., "~a" instead of "\alpha")
+
 
   Other:
     DecimalSeparators: "." # [default]

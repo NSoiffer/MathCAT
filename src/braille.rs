@@ -39,7 +39,8 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
             "CMU" => cmu_cleanup(pref_manager, braille_string), 
             "Finnish" => finnish_cleanup(pref_manager, braille_string),
             "Swedish" => swedish_cleanup(pref_manager, braille_string),
-            _ => braille_string,    // probably needs cleanup if someone has another code, but this will have to get added by hand
+            "LaTeX" => LaTeX_cleanup(pref_manager, braille_string),
+            _ => braille_string.trim_matches('⠀').to_string(),    // probably needs cleanup if someone has another code, but this will have to get added by hand
         };
 
         return Ok(
@@ -2017,6 +2018,26 @@ fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
     // Remove unicode blanks at start and end -- do this after the substitutions because ',' introduces spaces
     // let result = result.trim_start_matches('⠀').trim_end_matches('⠀');
     let result = COLLAPSE_SPACES.replace_all(&result, "⠀");
+   
+    return result.to_string();
+}
+
+#[allow(non_snake_case)]
+fn LaTeX_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
+    lazy_static! {
+        // static ref REMOVE_SPACE: Regex =Regex::new(r"⠀([⡮⡸⠂⠆⠴⡾⠾])").unwrap();          // '^', '_', ',', ';', ')', ']', '}'
+        static ref REMOVE_SPACE: Regex =Regex::new(r" ([\^_,;)\]}])").unwrap();          // '^', '_', ',', ';', ')', ']', '}'
+        static ref COLLAPSE_SPACES: Regex = Regex::new(r" +").unwrap();
+    }
+    debug!("LaTeX_cleanup: start={}", raw_braille);
+    let result = raw_braille.replace("𝐖", " ");
+    // let result = COLLAPSE_SPACES.replace_all(&raw_braille, "⠀"); 
+    let result = COLLAPSE_SPACES.replace_all(&result, " ");
+    debug!("After collapse: {}", &result);
+    let result = REMOVE_SPACE.replace_all(&result, "$1");
+    debug!("After remove: {}", &result);
+    // let result = result.trim_matches('⠀');
+    let result = result.trim_matches(' ');
    
     return result.to_string();
 }
