@@ -94,7 +94,7 @@ fn augenbit0_5_1 () {
 #[test]
 fn augenbit1_1_1 () {
     let expr = r#"<math><mo>{</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>,</mo><mn>4</mn><mo>}</mo></math>"#;
-    test_braille("LaTeX", expr, r"\{ 1, 2, 3, 4 \}");
+    test_braille("LaTeX", expr, r"\{1, 2, 3, 4\}");
 }
 
 #[test]
@@ -268,7 +268,7 @@ fn augenbit2_3_2 () {
             </mfenced></math>"#;
     // set number preferences to European style
     test_braille_prefs("LaTeX", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, 
-                r"\vec{q} = \begin{pmatrix} -5 \\ 0,5 \\ k+4 \end{pmatrix}");
+                r"\vec{q} = \begin{pmatrix} -5 \\ 0,5 \\ k +4 \end{pmatrix}");
 }
 
 #[test]
