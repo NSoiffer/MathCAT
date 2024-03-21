@@ -26,5 +26,10 @@ mod braille {
         mod augenbit;
         mod other;
     }
+
+    mod ASCIIMath {
+        mod augenbit;
+        mod other;
+    }
 }
 
