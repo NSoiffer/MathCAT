@@ -234,7 +234,8 @@ fn build_values(definition: &Yaml, use_speech_defs: bool, path: &Path) -> Result
             let (_, entry_value) = dict.iter().next().unwrap();
             if entry_value.is_null() {
                 result = Contains::Set( Rc::new( RefCell::new( get_set_values(dict)
-                            .chain_err(||format!("while reading value '{}'", def_name))? ) ) );            } else {
+                            .chain_err(||format!("while reading value '{}'", def_name))? ) ) );
+            } else {
                 // peak and see if this is a set or a map
                 let (_, entry_value) = dict.iter().next().unwrap();
                 if entry_value.is_null() {

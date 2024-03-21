@@ -40,6 +40,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
             "Finnish" => finnish_cleanup(pref_manager, braille_string),
             "Swedish" => swedish_cleanup(pref_manager, braille_string),
             "LaTeX" => LaTeX_cleanup(pref_manager, braille_string),
+            "ASCIIMath" => ASCIIMath_cleanup(pref_manager, braille_string),
             _ => braille_string.trim_matches('⠀').to_string(),    // probably needs cleanup if someone has another code, but this will have to get added by hand
         };
 
@@ -2025,7 +2026,6 @@ fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 #[allow(non_snake_case)]
 fn LaTeX_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     lazy_static! {
-        // static ref REMOVE_SPACE: Regex =Regex::new(r"⠀([⡮⡸⠂⠆⠴⡾⠾])").unwrap();          // '^', '_', ',', ';', ')', ']', '}'
         static ref REMOVE_SPACE: Regex =Regex::new(r" ([\^_,;)\]}])").unwrap();          // '^', '_', ',', ';', ')', ']', '}'
         static ref COLLAPSE_SPACES: Regex = Regex::new(r" +").unwrap();
     }
@@ -2035,6 +2035,29 @@ fn LaTeX_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
     let result = COLLAPSE_SPACES.replace_all(&result, " ");
     debug!("After collapse: {}", &result);
     let result = REMOVE_SPACE.replace_all(&result, "$1");
+    debug!("After remove: {}", &result);
+    // let result = result.trim_matches('⠀');
+    let result = result.trim_matches(' ');
+   
+    return result.to_string();
+}
+
+#[allow(non_snake_case)]
+fn ASCIIMath_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
+    lazy_static! {
+        static ref REMOVE_SPACE_BEFORE_OP: Regex = Regex::new(r#"([\w\d]) +([^\w\d"]|[\^_,;)\]}])"#).unwrap();
+        static ref REMOVE_SPACE_AFTER_OP: Regex =  Regex::new(r#"([^\^_,;)\]}\w\d"]) +([\w\d])"#).unwrap();
+        static ref COLLAPSE_SPACES: Regex = Regex::new(r" +").unwrap();
+    }
+    debug!("ASCIIMath_cleanup: start={}", raw_braille);
+    let result  = raw_braille.replace("|𝐖__|", "|𝐰__|");    // protect the whitespace to prevent misintrepretation as lfloor
+    let result = result.replace("𝐖", " ");
+    let result = COLLAPSE_SPACES.replace_all(&result, " ");
+    debug!("After collapse: {}", &result);
+    let result = REMOVE_SPACE_BEFORE_OP.replace_all(&result, "$1$2");
+    let result = REMOVE_SPACE_AFTER_OP.replace_all(&result, "$1$2");
+    let result = result.replace("𝐰", " ");     // spaces around relational operators
+    let result = COLLAPSE_SPACES.replace_all(&result, " ");
     debug!("After remove: {}", &result);
     // let result = result.trim_matches('⠀');
     let result = result.trim_matches(' ');

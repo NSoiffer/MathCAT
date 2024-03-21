@@ -6,6 +6,7 @@ import sys
 from string import ascii_uppercase, ascii_lowercase
 import xml.etree.ElementTree as ET
 import re
+import json
 sys.stdout.reconfigure(encoding='utf-8')
 
 
@@ -26,7 +27,7 @@ def create_unicode_from_latex_symbols_html(out_file: str):
                 write_line(unicode, latex, "", out_stream)
 
 
-COMMENT = """\
+LATEX_COMMENT = """\
 # This file is derived from a number of sources.
 # This tries to conform to the "spec" augenbit.de/wiki/index.php?title=LaTeX-Manual_LaTeX_Grundregeln (and linked files)
 # The short names come from MathLib.tex that is linked from above
@@ -146,8 +147,8 @@ def extract_latex(in_file):
 
     with open("latex-braille-unicode.yaml", 'w', encoding='utf8') as short_stream:
         with open("latex-braille-unicode-full.yaml", 'w', encoding='utf8') as full_stream:
-            short_stream.write(COMMENT)
-            full_stream.write(COMMENT)
+            short_stream.write(LATEX_COMMENT)
+            full_stream.write(LATEX_COMMENT)
             short_stream.write("\n---\n")
             full_stream.write("\n---\n")
             for char_element in all_char_elements:
@@ -194,7 +195,6 @@ def extract_latex(in_file):
                     latex_name = overrides[ch]
                     write_line(ch, latex_name, short_names.get(latex_name, ''), False, stream)
                     continue
-
 
                 # I wish there was a simple way to choose the names.
                 # Based on what David Carlisle (who maintains unicode.xml) recomends,
@@ -279,8 +279,8 @@ def write_line(ch: str, latex: str, short: str, is_commented: bool, out_stream: 
             comment = "0" + ch[1:]
         return comment
 
-    if ord(ch) < 0x7F and len(latex) <= 1:
-        return        # probably an ASCII char
+    # if ord(ch) < 0x7F and len(latex) <= 1:
+    #     return        # probably an ASCII char
 
     if ch == '"':
         ch = '\\"'
@@ -343,6 +343,68 @@ def create_greek_letters(out_file: str):
                 write_line(unicode, latex, "", False, out_stream)
 
 
+def create_ascii_math(out_file: str):
+    with open("ascii-math-symbols.js", encoding='utf8') as in_stream:
+        with open(out_file, 'w', encoding='utf8') as out_stream:
+            all_entries = []
+            lines = in_stream.readlines()
+            json_as_str = '['
+            # weed out the comments
+            for line in lines:
+                if line.startswith('{'):
+                    json_as_str += line
+            json_as_str += ']'
+            ascii_math_data = json.loads(json_as_str)
+            for entry in ascii_math_data:
+                if entry['tag'] in ['mi', 'mo', 'mtext']:
+                    asscii_math = entry['input']
+                    if entry['input'].isalpha():
+                        asscii_math = '𝐖' + entry['input'] + '𝐖'
+                    all_entries.append((entry['output'], asscii_math))
+            all_entries = sorted(all_entries)
+
+            # add in the ASCII chars (without them, unicode-full will get loaded)
+            # first collect the ascii chars that have a representation
+            defined_ascii_chars = set()
+            for unicode, ascci_math in all_entries:
+                if len(unicode) > 1:
+                    continue
+                if ord(unicode) > 127:
+                    break
+                defined_ascii_chars.add(ord(unicode))
+            # now add the ascii chars
+            for i in range(0x20, 0x7F):
+                if i not in defined_ascii_chars:
+                    all_entries.append((chr(i), chr(i)))
+            all_entries = sorted(all_entries)
+
+            print(f'#all_entries={len(all_entries)}')
+            function_names = ''
+            with open("temp.json", 'w', encoding='utf8') as temp_stream:
+                for entry in ascii_math_data:
+                    if entry['tag'] in ['mi', 'mo', 'mtext']:
+                        if len(entry['output']) > 1:
+                            function_names += ', "' + entry['output'] + '"'
+                            if entry['output'] != entry['output']:
+                                print(f"input and output don't match: '{entry['output']}' != '{entry['output']}'")
+                    else:
+                        temp_stream.write(f"{entry}\n")
+
+            print(f"function names:\n{function_names}\n")
+            out_stream.write("\n---\n")
+            for unicode, ascci_math in all_entries:
+                if len(unicode) == 1:
+                    write_line(unicode, ascci_math.replace(' ', '𝐖'), "", False, out_stream)
+
+            # write the invisible chars out
+            out_stream.write('\n # invisible chars\n')
+            write_line(chr(0x2061), '', '', False, out_stream)
+            write_line(chr(0x2062), '', '', False, out_stream)
+            write_line(chr(0x2063), '', '', False,  out_stream)
+            write_line(chr(0x2064), '', '', False, out_stream)
+
+
 # create_unicode_from_list_of_symbols_html("euro-symbols2.yaml")
 # create_greek_letters("greek-letters.yaml")
-extract_latex("c:\\dev\\mathml-refresh\\xml-entities\\unicode.xml")
+# extract_latex("c:\\dev\\mathml-refresh\\xml-entities\\unicode.xml")
+create_ascii_math("ascii-math-unicode.yaml")

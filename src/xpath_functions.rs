@@ -882,6 +882,9 @@ impl IsInDefinition {
             if let Some(set) = definitions.borrow().get_hashset(set_name) {
                 return Ok( set.contains(test_str) );
             }
+            if let Some(hashmap) = definitions.borrow().get_hashmap(set_name) {
+                return Ok( hashmap.contains_key(test_str) );
+            }
             return Err( Error::Other( format!("\n  IsInDefinition: '{}' is not defined in definitions.yaml", set_name) ) );
         });
     }
@@ -906,6 +909,7 @@ impl IsInDefinition {
         args.at_least(2)?;
         args.at_most(3)?;
         let set_name = args.pop_string()?;
+        // FIX: this (len == 1) is temporary until all the usages are switched to the (new) 3-arg form
         let definitions = if args.len() == 2 {
             match args.pop_string()?.as_str() {
                 "Speech" => &SPEECH_DEFINITIONS,
@@ -951,10 +955,9 @@ impl DefinitionValue {
     /// Returns the value associated with `key` in `set_name`. If `key` is not in `set_name`, `key` is returned
     ///   Consider looking up "km" -- if there is no definition, using 'km' is a reasonable fallback
     /// Returns an error if `set_name` is not defined
-    pub fn definition_value(key: &str, set_name: &str) -> Result<String, Error> {
-        return SPEECH_DEFINITIONS.with(|definitions| {
-            let definitions = definitions.borrow();
-            if let Some(map) = definitions.get_hashmap(set_name) {
+    pub fn definition_value(key: &str, defs: &'static LocalKey<RefCell<Definitions>>, set_name: &str) -> Result<String, Error> {
+        return defs.with(|definitions| {
+            if let Some(map) = definitions.borrow().get_hashmap(set_name) {
                 return Ok( match map.get(key) {
                     None => key.to_string(),
                     Some(str) => str.clone(),
@@ -980,10 +983,15 @@ impl DefinitionValue {
                         -> Result<Value<'d>, Error>
     {
         let mut args = Args(args);
-        args.exactly(2)?;
+        args.exactly(3)?;
         let set_name = args.pop_string()?;
+        let definitions = match args.pop_string()?.as_str() {
+            "Speech" => &SPEECH_DEFINITIONS,
+            "Braille" => &BRAILLE_DEFINITIONS,
+            _ => return Err( Error::Other("IsInDefinition:: second argument must be either 'Speech' or 'Braille'".to_string()) )
+        };
         match &args[0] {
-            Value::String(str) => return match DefinitionValue::definition_value(str, &set_name) {
+            Value::String(str) => return match DefinitionValue::definition_value(str, definitions, &set_name) {
                 Ok(result) => Ok( Value::String( result ) ),
                 Err(e) => Err(e),
             },
@@ -997,7 +1005,7 @@ impl DefinitionValue {
                         if text.is_empty() {
                             Ok( Value::String("".to_string()) )
                         } else {
-                            match DefinitionValue::definition_value(&text, &set_name) {
+                            match DefinitionValue::definition_value(&text, definitions, &set_name) {
                                 Ok(result) => Ok( Value::String( result ) ),
                                 Err(e) => Err(e),
                             }          

@@ -171,22 +171,13 @@ fn main() {
   //   </math>";
 
   let expr = r#"
-  <math>
-  <mfrac>
-  <msup>
-    <mo arg="0">&#x2146;</mo>
-    <mn arg="3">2</mn>
-  </msup>
-  <mrow>
-    <mo arg="0">&#x2146;</mo>
-    <msup>
-      <mi arg="2">x</mi>
-      <mn arg="3">2</mn>
-    </msup>
-  </mrow>
-</mfrac>
-</math>
-    "#;
+      <math>
+      <mover>
+        <mi>x</mi>
+        <mo accent="false" stretchy="false">^</mo>
+      </mover>
+    </math>
+      "#;
   // let expr= "<math><mrow><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>";
   let instant = Instant::now();
   let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../Rules");
@@ -221,7 +212,7 @@ fn main() {
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
  
 
-  set_preference("BrailleCode".to_string(), "LaTeX".to_string()).unwrap();
+  set_preference("BrailleCode".to_string(), "ASCIIMath".to_string()).unwrap();
   match get_braille("".to_string()) {
     Ok(braille) => info!("Computed braille string:\n   '{}'", braille),
     Err(e) => panic!("{}", errors_to_string(&e)),
