@@ -7,6 +7,7 @@ use std::cell::RefCell;
 use sxd_document::parser;
 use sxd_document::Package;
 use sxd_document::dom::*;
+use crate::canonicalize::{as_text, create_mathml_element};
 use crate::errors::*;
 use regex::{Regex, Captures};
 use phf::phf_map;
@@ -246,6 +247,7 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
 
 /// Get the braille associated with the MathML that was set by [`set_mathml`].
 /// The braille returned depends upon the preference for the `code` preference (default `Nemeth`).
+/// If 'nav_node_id' is given, it is highlighted based on the value of `BrailleNavHighlight` (default: `EndPoints`)
 pub fn get_braille(nav_node_id: String) -> Result<String> {
     // use std::time::{Instant};
     // let instant = Instant::now();
@@ -254,6 +256,42 @@ pub fn get_braille(nav_node_id: String) -> Result<String> {
         let mathml = get_element(&package_instance);
         let braille = crate::braille::braille_mathml(mathml, &nav_node_id)?.0;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
+        return Ok( braille );
+    });
+}
+
+/// Get the braille associated with the current navigation focus of the MathML that was set by [`set_mathml`].
+/// The braille returned depends upon the preference for the `code` preference (default `Nemeth`).
+/// The returned braille is brailled as if the current navigation focus is the entire expression to be brailled.
+pub fn get_navigation_braille() -> Result<String> {
+    return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&package_instance);
+        let nav_mathml = NAVIGATION_STATE.with(|nav_stack| {
+            return match nav_stack.borrow_mut().get_navigation_mathml(mathml) {
+                Err(e) => Err(e),
+                Ok( (found, offset) ) => {
+                    // get the MathML node and wrap it inside of a <math> element
+                    // if the offset is given, we need to get the character it references
+                    let internal_mathml;
+                    if offset == 0 {
+                        internal_mathml = found;
+                    } else if !is_leaf(found) {
+                        bail!("Internal error: non-zero offset '{}' on a non-leaf element '{}'", offset, name(&found));
+                    } else if let Some(ch) = as_text(found).chars().nth(offset) {
+                        internal_mathml = create_mathml_element(&found.document(), name(&found));
+                        internal_mathml.set_text(&ch.to_string());
+                    } else {
+                        bail!("Internal error: offset '{}' on leaf element '{}' doesn't exist", offset, mml_to_string(&found));
+                    }
+                    let new_mathml = create_mathml_element(&found.document(), "math");
+                    new_mathml.append_child(internal_mathml);
+                    Ok(new_mathml)
+                },
+            }
+        } )?;
+
+        let braille = crate::braille::braille_mathml(nav_mathml, "")?.0;
         return Ok( braille );
     });
 }
@@ -325,8 +363,7 @@ pub fn set_navigation_node(id: String, offset: usize) -> Result<()> {
     });
 }
 
-/// Return the MathML associated with the current (navigation) node.
-/// The returned result is the `id` of the node and the offset (0-based) from that node (not yet implemented)
+/// Return the MathML associated with the current (navigation) node and the offset (0-based) from that mathml (not yet implemented)
 /// The offset is needed for token elements that have multiple characters.
 pub fn get_navigation_mathml() -> Result<(String, usize)> {
     return MATHML_INSTANCE.with(|package_instance| {
