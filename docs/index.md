@@ -68,6 +68,9 @@ Timeline:
 * Spring: add more inference/speech rules based on W3C's Math WG core list
 * Spring: analyze books to better determine what should be in the Unicode short file (hopefully get someone to help with this)
 * Spring: more translations
+* ✓ (added) German LaTeX braille 
+* ✓ (added) ASCIIMath (braille) 
+* ✓ (added) Copy as options: LaTeX, ASCIIMath
 * Spring/Summer/Fall: work on tools to help maintain translations
 * Summer: explore adding ASCIIMath and LaTeX importers (there are Rust packages for these, but I haven't checked quality and completeness)
 * July: vacation 😎 and ICCHP conference
