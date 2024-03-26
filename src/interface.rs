@@ -7,6 +7,7 @@ use std::cell::RefCell;
 use sxd_document::parser;
 use sxd_document::Package;
 use sxd_document::dom::*;
+use crate::canonicalize::{as_text, create_mathml_element};
 use crate::errors::*;
 use regex::{Regex, Captures};
 use phf::phf_map;
@@ -73,9 +74,7 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
     // We need the main definitions files to be read in so canonicalize can work.
     // This call reads all of them for the current preferences, but that's ok since they will likely be used
     crate::speech::SPEECH_RULES.with(|rules| {
-        let mut rules = rules.borrow_mut();     // limit scope of borrow by enclosing in a block
-        rules.update()?;
-        rules.read_files()
+        rules.borrow_mut().read_files()
     })?;
 
     return MATHML_INSTANCE.with(|old_package| {
@@ -109,7 +108,6 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
         if let Err(e) = new_package {
             bail!("Invalid MathML input:\n{}\nError is: {}", &mathml_str, &e.to_string());
         }
-        // crate::speech::SpeechRules::initialize_all_rules()?;
 
         let new_package = new_package.unwrap();
         let mathml = get_element(&new_package);
@@ -193,13 +191,18 @@ pub fn get_preference(name: String) -> Result<String> {
 /// 
 /// Be careful setting preferences -- these potentially override user settings, so only preferences that really need setting should be set.
 pub fn set_preference(name: String, value: String) -> Result<()> {
-    if name == "Language" {
+    // "LanguageAuto" allows setting the language dir without actually changing the value of "Language" from Auto
+    if name == "Language" || name == "LanguageAuto" {
         // check the format
         if !( value == "Auto" ||
-                value.len() == 2 ||
-                (value.len() == 5 && value.as_bytes()[2] == b'-') ) {
+              value.len() == 2 ||
+              (value.len() == 5 && value.as_bytes()[2] == b'-') ) {
             bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value);
         }
+        if name == "LanguageAuto" && value == "Auto" {
+            bail!("'LanguageAuto' can not have the value 'Auto'");
+        }
+
     }
     
     crate::speech::SPEECH_RULES.with(|rules| {
@@ -210,6 +213,12 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
 
         // we set the value even if it was the same as the old value because this might override a potentially changed future user value
         let mut pref_manager = rules.pref_manager.borrow_mut();
+        if name == "LanguageAuto" {
+            let language_pref = pref_manager.pref_to_string("Language");
+            if language_pref != "Auto" {
+                bail!("'LanguageAuto' can only be used when 'Language' has the value 'Auto'; Language={}", language_pref);
+            }
+        }
         let lower_case_value = value.to_lowercase();
         if lower_case_value == "true" || lower_case_value == "false" {
             pref_manager.set_api_boolean_pref(&name, value.to_lowercase()=="true"); 
@@ -238,14 +247,51 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
 
 /// Get the braille associated with the MathML that was set by [`set_mathml`].
 /// The braille returned depends upon the preference for the `code` preference (default `Nemeth`).
+/// If 'nav_node_id' is given, it is highlighted based on the value of `BrailleNavHighlight` (default: `EndPoints`)
 pub fn get_braille(nav_node_id: String) -> Result<String> {
     // use std::time::{Instant};
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
-        let braille = crate::braille::braille_mathml(mathml, &nav_node_id)?;
+        let braille = crate::braille::braille_mathml(mathml, &nav_node_id)?.0;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
+        return Ok( braille );
+    });
+}
+
+/// Get the braille associated with the current navigation focus of the MathML that was set by [`set_mathml`].
+/// The braille returned depends upon the preference for the `code` preference (default `Nemeth`).
+/// The returned braille is brailled as if the current navigation focus is the entire expression to be brailled.
+pub fn get_navigation_braille() -> Result<String> {
+    return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&package_instance);
+        let nav_mathml = NAVIGATION_STATE.with(|nav_stack| {
+            return match nav_stack.borrow_mut().get_navigation_mathml(mathml) {
+                Err(e) => Err(e),
+                Ok( (found, offset) ) => {
+                    // get the MathML node and wrap it inside of a <math> element
+                    // if the offset is given, we need to get the character it references
+                    let internal_mathml;
+                    if offset == 0 {
+                        internal_mathml = found;
+                    } else if !is_leaf(found) {
+                        bail!("Internal error: non-zero offset '{}' on a non-leaf element '{}'", offset, name(&found));
+                    } else if let Some(ch) = as_text(found).chars().nth(offset) {
+                        internal_mathml = create_mathml_element(&found.document(), name(&found));
+                        internal_mathml.set_text(&ch.to_string());
+                    } else {
+                        bail!("Internal error: offset '{}' on leaf element '{}' doesn't exist", offset, mml_to_string(&found));
+                    }
+                    let new_mathml = create_mathml_element(&found.document(), "math");
+                    new_mathml.append_child(internal_mathml);
+                    Ok(new_mathml)
+                },
+            }
+        } )?;
+
+        let braille = crate::braille::braille_mathml(nav_mathml, "")?.0;
         return Ok( braille );
     });
 }
@@ -307,8 +353,17 @@ pub fn do_navigate_command(command: String) -> Result<String> {
     });
 }
 
-/// Return the MathML associated with the current (navigation) node.
-/// The returned result is the `id` of the node and the offset (0-based) from that node (not yet implemented)
+/// Given an 'id' and an offset (for tokens), set the navigation node to that id.
+/// An error is returned if the 'id' doesn't exist
+pub fn set_navigation_node(id: String, offset: usize) -> Result<()> {
+    return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&package_instance);
+        return set_navigation_node_from_id(mathml, id, offset);
+    });
+}
+
+/// Return the MathML associated with the current (navigation) node and the offset (0-based) from that mathml (not yet implemented)
 /// The offset is needed for token elements that have multiple characters.
 pub fn get_navigation_mathml() -> Result<(String, usize)> {
     return MATHML_INSTANCE.with(|package_instance| {
@@ -336,6 +391,26 @@ pub fn get_navigation_mathml_id() -> Result<(String, usize)> {
     });
 }
 
+/// Return the start and end braille character positions associated with the current (navigation) node.
+pub fn get_braille_position() -> Result<(usize, usize)> {
+    return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&package_instance);
+        let nav_node = get_navigation_mathml_id()?;
+        let (_, start, end) = crate::braille::braille_mathml(mathml, &nav_node.0)?;
+        return Ok( (start, end) )
+    });
+}
+
+/// Given a 0-based braille position, return the smallest MathML node enclosing it.
+/// This node might be a leaf with an offset.
+pub fn get_navigation_node_from_braille_position(position: usize) -> Result<(String, usize)> {
+    return MATHML_INSTANCE.with(|package_instance| {
+        let package_instance = package_instance.borrow();
+        let mathml = get_element(&package_instance);
+        return crate::braille::get_navigation_node_from_braille_position(mathml, position);
+    })
+}
 
 /// Convert the returned error from set_mathml, etc., to a useful string for display
 pub fn errors_to_string(e:&Error) -> String {

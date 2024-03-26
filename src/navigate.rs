@@ -261,6 +261,29 @@ fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> {
     return None;
 }
 
+/// Search the mathml for the id and set the navigation node to that id
+/// Resets the navigation stack
+pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -> Result<()> {
+    let node = get_node_by_id(mathml, &id);
+    if let Some(node) = node {
+        if !crate::xpath_functions::is_leaf(node) && offset != 0 {
+            bail!("Id {} is not a leaf in the MathML tree but has non-zero offset={}. Referenced MathML node is {}", id, offset, mml_to_string(&node));
+        }
+        return NAVIGATION_STATE.with(|nav_state| {
+            let mut nav_state = nav_state.borrow_mut();
+            nav_state.reset();
+            nav_state.push(NavigationPosition{
+                current_node: id,
+                current_node_offset: offset
+            }, "None");
+            return Ok( () );
+        })
+    } else {
+        bail!("Id {} not found in MathML {}", id, mml_to_string(&mathml));
+    }
+
+}
+
 // FIX: think of a better place to put this, and maybe a better interface
 pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: Element<'c>) -> Result<(Option<String>, Option<f64>)> {
     // First return tuple value is string-value (if string, bool, or single node) or None
@@ -325,9 +348,7 @@ fn do_navigate_command_and_param(mathml: Element, command: NavigationCommand, pa
 pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) -> Result<String> {   
     // first check to see if nav file has been changed -- don't bother checking in loop below
     NAVIGATION_RULES.with(|rules| {
-            let mut rules = rules.borrow_mut();
-            rules.update()?;
-            rules.read_files()
+        rules.borrow_mut().read_files()
     })?;
 
     if mathml.children().is_empty() {

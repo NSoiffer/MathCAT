@@ -105,7 +105,7 @@ def translate_phrases(phrases_to_translate: list[str], lang) -> list[str]:
             time.sleep(TIMEOUT)       # try to avoid google banning us
     return translations + do_translation_chunk(phrases_chunks_to_translate)
 
-argetWord = re.compile(r"'([^']+)'")
+TargetWord = re.compile(r"'([^']+)'")
 TextString = re.compile(r'([ \[{][oc]?t: )"([^"]+)"')
 def substitute_in_translated_phrase(line, translated_phrase, translated_word) -> str:
     has_phrase = PhraseToTranslate.search(line)

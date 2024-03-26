@@ -100,7 +100,7 @@ def write_letters_and_digits(out_stream):
     write_yaml_line(out_stream, "ℰ", "TCL⠑","2130", "Script Capital E")
     write_yaml_line(out_stream, "ℱ", "TCL⠋","2131", "Script Capital F")
     write_yaml_line(out_stream, "ℳ", "TCL⠍","2133", "Script Capital M")
-    write_yaml_line(out_stream, "ℴ", "TL⠕","21334", "Script Small O")
+    write_yaml_line(out_stream, "ℴ", "TL⠕","2134", "Script Small O")
 
 
     # bold script

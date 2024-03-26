@@ -7,6 +7,8 @@
 //! * mrows are added based on operator priorities from the MathML Operator Dictionary
 #![allow(clippy::needless_return)]
 use crate::errors::*;
+use std::rc::Rc;
+use std::cell::RefCell;
 use sxd_document::dom::*;
 use sxd_document::QName;
 use phf::{phf_map, phf_set};
@@ -318,13 +320,11 @@ pub fn create_mathml_element<'a>(doc: &Document<'a>, name: &str) -> Element<'a> 
 }
 
 pub fn is_fence(mo: Element) -> bool {
-	return CanonicalizeContext::new()
-			.find_operator(mo, None, None, None).is_fence();
+	return CanonicalizeContext::find_operator(None, mo, None, None, None).is_fence();
 }
 
 pub fn is_relational_op(mo: Element) -> bool {
-	return CanonicalizeContext::new()
-			.find_operator(mo, None, None, None).priority == *EQUAL_PRIORITY;
+	return CanonicalizeContext::find_operator(None, mo, None, None, None).priority == *EQUAL_PRIORITY;
 }
 
 pub fn set_mathml_name(element: Element, new_name: &str) {
@@ -407,16 +407,6 @@ pub fn canonicalize(mathml: Element) -> Result<Element> {
 	return context.canonicalize(mathml);
 }
 
-struct CanonicalizeContext {
-	decimal_separator: Regex,
-	block_separator: Regex,
-	digit_only_decimal_number: Regex,
-	block_3digit_pattern: Regex,
-	block_3_5digit_pattern: Regex,
-	block_4digit_hex_pattern: Regex,
-	block_1digit_pattern: Regex,		// used when generator puts each digit into a single mn
-}
-
 #[derive(Debug, PartialEq)]
 enum FunctionNameCertainty {
 	True,
@@ -445,24 +435,29 @@ lazy_static! {
 }
 
 
-impl CanonicalizeContext {
-	fn new() -> CanonicalizeContext {
-		let pref_manager = crate::prefs::PreferenceManager::get();
-		let pref_manager = pref_manager.borrow();
-		let block_separator_pref = pref_manager.pref_to_string("BlockSeparators");
-		let decimal_separator_pref = pref_manager.pref_to_string("DecimalSeparators");
+struct CanonicalizeContextPatterns {
+	decimal_separator: Regex,
+	block_separator: Regex,
+	digit_only_decimal_number: Regex,
+	block_3digit_pattern: Regex,
+	block_3_5digit_pattern: Regex,
+	block_4digit_hex_pattern: Regex,
+	block_1digit_pattern: Regex,		// used when generator puts each digit into a single mn
+}
 
-		let block_separator = Regex::new(&format!("[{}]", regex::escape(&block_separator_pref))).unwrap();
-		let decimal_separator = Regex::new(&format!("[{}]", regex::escape(&decimal_separator_pref))).unwrap();
+impl CanonicalizeContextPatterns {
+	fn new(block_separator_pref: &str, decimal_separator_pref: &str) -> CanonicalizeContextPatterns {
+		let block_separator = Regex::new(&format!("[{}]", regex::escape(block_separator_pref))).unwrap();
+		let decimal_separator = Regex::new(&format!("[{}]", regex::escape(decimal_separator_pref))).unwrap();
 		// allows just "." and also matches an empty string, but those are ruled out elsewhere
-		let digit_only_decimal_number = Regex::new(&format!(r"^\d*{}?\d*$", regex::escape(&decimal_separator_pref))).unwrap();
-		let block_3digit_pattern = get_number_pattern_regex(&block_separator_pref, &decimal_separator_pref, 3, 3);
-		let block_3_5digit_pattern = get_number_pattern_regex(&block_separator_pref, &decimal_separator_pref, 3, 5);
+		let digit_only_decimal_number = Regex::new(&format!(r"^\d*{}?\d*$", regex::escape(decimal_separator_pref))).unwrap();
+		let block_3digit_pattern = get_number_pattern_regex(block_separator_pref, decimal_separator_pref, 3, 3);
+		let block_3_5digit_pattern = get_number_pattern_regex(block_separator_pref, decimal_separator_pref, 3, 5);
 		// Note: on en.wikipedia.org/wiki/Decimal_separator, show '3.14159 26535 89793 23846'
 		let block_4digit_hex_pattern =  Regex::new(r"^[0-9a-fA-F]{4}([ \u00A0\u202F][0-9a-fA-F]{4})*$").unwrap();
 		let block_1digit_pattern =  Regex::new(r"^((\d(\uFFFF\d)?)(\d([, \u00A0\u202F]\d){2})*)?([\.](\d(\uFFFF\d)*)?)?$").unwrap();
 
-		return CanonicalizeContext {
+		return CanonicalizeContextPatterns {
 			block_separator,
 			decimal_separator,
 			digit_only_decimal_number,
@@ -472,6 +467,7 @@ impl CanonicalizeContext {
 			block_1digit_pattern
 		};
 
+		
 		fn get_number_pattern_regex(block_separator: &str, decimal_separator: &str, n_sep_before: usize, n_sep_after: usize) -> Regex {
 			// the following is a generalization of a regex like ^(\d*|\d{1,3}([, ]?\d{3})*)(\.(\d*|(\d{3}[, ])*\d{1,3}))?$
 			// that matches something like '1 234.567 8' and '1,234.', but not '1,234.12,34
@@ -479,6 +475,63 @@ impl CanonicalizeContext {
 							n_sep_before, regex::escape(block_separator), n_sep_before, regex::escape(decimal_separator),
 							n_sep_after, regex::escape(block_separator), n_sep_after) ).unwrap();
 		}
+	}
+}
+
+/// Profiling showed that creating new contexts was very time consuming because creating the RegExs is very expensive
+/// Profiling set_mathml (which does the canonicalization) spends 65% of the time in Regex::new, of which half of it is spent in this initialization.
+struct CanonicalizeContextPatternsCache {
+	block_separator_pref: String,
+	decimal_separator_pref: String,
+	patterns: Rc<CanonicalizeContextPatterns>,
+}
+
+thread_local!{
+    static PATTERN_CACHE: RefCell<CanonicalizeContextPatternsCache> = RefCell::new(CanonicalizeContextPatternsCache::new());
+}
+
+impl CanonicalizeContextPatternsCache {
+	fn new() -> CanonicalizeContextPatternsCache {
+		let pref_manager = crate::prefs::PreferenceManager::get();
+		let pref_manager = pref_manager.borrow();
+		let block_separator_pref = pref_manager.pref_to_string("BlockSeparators");
+		let decimal_separator_pref = pref_manager.pref_to_string("DecimalSeparators");
+		return CanonicalizeContextPatternsCache {
+			patterns: Rc::new( CanonicalizeContextPatterns::new(&block_separator_pref, &decimal_separator_pref) ),
+			block_separator_pref,
+			decimal_separator_pref
+		}
+	}
+
+	fn get() -> Rc<CanonicalizeContextPatterns> {
+		return PATTERN_CACHE.with( |cache| {
+			let pref_manager_rc = crate::prefs::PreferenceManager::get();
+			let pref_manager = pref_manager_rc.borrow();
+			let block_separator_pref = pref_manager.pref_to_string("BlockSeparators");
+			let decimal_separator_pref = pref_manager.pref_to_string("DecimalSeparators");
+
+			let mut cache = cache.borrow_mut();
+			if block_separator_pref != cache.block_separator_pref || decimal_separator_pref != cache.decimal_separator_pref {
+				// update the cache
+				cache.patterns = Rc::new( CanonicalizeContextPatterns::new(&block_separator_pref, &decimal_separator_pref) );
+				cache.block_separator_pref = block_separator_pref;
+				cache.decimal_separator_pref = decimal_separator_pref;
+			}
+			return cache.patterns.clone();
+		})
+	}
+}
+
+struct CanonicalizeContext {
+	patterns: Rc<CanonicalizeContextPatterns>,
+}
+
+
+impl CanonicalizeContext {
+	fn new() -> CanonicalizeContext {
+		return CanonicalizeContext {
+			patterns: CanonicalizeContextPatternsCache::get(),
+		};
 	}
 
 	fn canonicalize<'a>(&self, mut mathml: Element<'a>) -> Result<Element<'a>> {
@@ -969,7 +1022,8 @@ impl CanonicalizeContext {
 				}
 
 				// FIX: this should be setting children, not mathml
-				let mathml =  if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
+				let mathml =  if element_name == "mrow" ||
+							(children.len() > 1 && ELEMENTS_WITH_ONE_CHILD.contains(element_name)) {
 					let merged = merge_dots(mathml);	// FIX -- switch to passing in children
 					let merged = merge_primes(merged);
 					let merged = merge_chars(merged, &IS_UNDERSCRORE);
@@ -1667,12 +1721,12 @@ impl CanonicalizeContext {
 					// if Roman numeral, don't merge (move on)
 					// or if the 'mn' has ',', '.', or space, consider it correctly parsed and move on
 					if is_roman_number_match(leaf_child_text) ||
-						context.block_separator.is_match(leaf_child_text) ||
-						(context.decimal_separator.is_match(leaf_child_text) && leaf_child_text.len() > 1) {
+						context.patterns.block_separator.is_match(leaf_child_text) ||
+						(context.patterns.decimal_separator.is_match(leaf_child_text) && leaf_child_text.len() > 1) {
 						i += 1;
 						continue;
 					}
-				} else if child_name != "mo" || !context.decimal_separator.is_match(as_text(child)) {
+				} else if child_name != "mo" || !context.patterns.decimal_separator.is_match(as_text(child)) {
 					i += 1;
 					continue;
 				}
@@ -1687,16 +1741,16 @@ impl CanonicalizeContext {
 						let sibling_name = name(&sibling);
 						if sibling_name == "mn" {
 							let leaf_text = as_text(sibling);
-							let is_block_separator = context.block_separator.is_match(leaf_text);
-							let is_decimal_separator = context.decimal_separator.is_match(leaf_text);
+							let is_block_separator = context.patterns.block_separator.is_match(leaf_text);
+							let is_decimal_separator = context.patterns.decimal_separator.is_match(leaf_text);
 							if is_roman_number_match(leaf_text) || is_block_separator || is_decimal_separator {
 								// consider this mn correctly parsed
 								break;
 							}
 						} else if sibling_name=="mo" || sibling_name=="mtext" {
 							let leaf_text = as_text(sibling);
-							let is_block_separator = context.block_separator.is_match(leaf_text);
-							let is_decimal_separator = context.decimal_separator.is_match(leaf_text);
+							let is_block_separator = context.patterns.block_separator.is_match(leaf_text);
+							let is_decimal_separator = context.patterns.decimal_separator.is_match(leaf_text);
 							if !(is_block_separator || is_decimal_separator) || 
 								(is_decimal_separator && has_decimal_separator) {
 								// not a separator or (it is decimal separator and we've already seen a decimal separator)
@@ -1919,11 +1973,11 @@ impl CanonicalizeContext {
 			// 		context.block_3digit_pattern.is_match(text),
 			// 		context.block_3_5digit_pattern.is_match(text),
 			// 		context.block_1digit_pattern.is_match(text));
-			if !(context.digit_only_decimal_number.is_match(text) ||
-				 context.block_3digit_pattern.is_match(text) ||
-				 context.block_3_5digit_pattern.is_match(text) ||
-				 context.block_4digit_hex_pattern.is_match(text) ||
-				 ((text.len() > 5 || context.decimal_separator.is_match(text)) && context.block_1digit_pattern.is_match(text)) ) {
+			if !(context.patterns.digit_only_decimal_number.is_match(text) ||
+				 context.patterns.block_3digit_pattern.is_match(text) ||
+				 context.patterns.block_3_5digit_pattern.is_match(text) ||
+				 context.patterns.block_4digit_hex_pattern.is_match(text) ||
+				 ((text.len() > 5 || context.patterns.decimal_separator.is_match(text)) && context.patterns.block_1digit_pattern.is_match(text)) ) {
 					return false;
 			}
 
@@ -1965,7 +2019,7 @@ impl CanonicalizeContext {
 		// 	let mut n_decimal_pt = 0;
 		// 	for &child_as_element in children.iter().take(end).skip(start) {
 		// 		let child = as_element(child_as_element);
-		// 		if context.decimal_separator.is_match(as_text(child))  {
+		// 		if context.patterns.decimal_separator.is_match(as_text(child))  {
 		// 			n_decimal_pt += 1;
 		// 		}
 		// 	}
@@ -1993,7 +2047,7 @@ impl CanonicalizeContext {
 				return false;	// last was not "mo", so can't be a period
 			}
 
-			if !context.decimal_separator.is_match(as_text(last_child)) {
+			if !context.patterns.decimal_separator.is_match(as_text(last_child)) {
 				return false;
 			}
 
@@ -2002,7 +2056,7 @@ impl CanonicalizeContext {
 			return !as_element(children[0]).preceding_siblings().iter()
 					.any(|&child| {
 						let child = as_element(child);
-						name(&child) == "mn" && context.decimal_separator.is_match(as_text(child))
+						name(&child) == "mn" && context.patterns.decimal_separator.is_match(as_text(child))
 					});
 		}
 
@@ -2193,11 +2247,11 @@ impl CanonicalizeContext {
 				"′", "″", "‴", "‵", "‶", "‷", "⁗",
 			};
 	
+			assert!(name(&mrow) == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(name(&mrow)), "non-mrow passed to handle_pseudo_scripts: {}", mml_to_string(&mrow));
 			let mut children = mrow.children();
 			// check to see if mrow of all psuedo scripts
 			if children.iter().all(|&child| {
-				let child = as_element(child);
-				name(&child) == "mo" && PSEUDO_SCRIPTS.contains(as_text(child))
+				is_pseudo_script(as_element(child))
 			}) {
 				let parent = mrow.parent().unwrap().element().unwrap();  // must exist
 				let is_first_child = mrow.preceding_siblings().is_empty();
@@ -2219,7 +2273,7 @@ impl CanonicalizeContext {
 			let mut found = false;
 			while i < children.len() {
 				let child = as_element(children[i]);
-				if (name(&child) == "mo" && PSEUDO_SCRIPTS.contains(as_text(child))) ||
+				if is_pseudo_script(child) ||
 				   child.attribute("data-pseudo-script").is_some() {
 					let msup = create_mathml_element(&child.document(), "msup");
 					msup.set_attribute_value(CHANGED_ATTR, ADDED_ATTR_VALUE);
@@ -2236,6 +2290,35 @@ impl CanonicalizeContext {
 				mrow.replace_children(children)
 			}
 			return mrow;
+
+			fn is_pseudo_script(child: Element) -> bool {
+				if name(&child) == "mo" {
+					let text = as_text(child);
+					if PSEUDO_SCRIPTS.contains(as_text(child)) {
+						// don't script a pseudo-script
+						let preceding_siblings = child.preceding_siblings();
+						if !preceding_siblings.is_empty() {
+							let last_child = as_element(preceding_siblings[preceding_siblings.len()-1]);
+							if name(&last_child) == "mo" && PSEUDO_SCRIPTS.contains(as_text(last_child)) {
+								return false;
+							}
+						}
+						if text == "*" {
+							// could be infix "*" -- this is a weak check to see if what follows is potentially an operand
+							let following_siblings = child.following_siblings();
+							if  following_siblings.is_empty() {
+								return true;
+							}
+							let first_child = as_element(following_siblings[0]);
+							return name(&first_child) != "mo" || ["(", "[", "{"].contains(&text);
+						} else {
+							return true;
+						}
+					}
+				}
+				return false;
+			}
+
 		}
 
 		fn handle_convert_to_mmultiscripts(children: &mut Vec<ChildOfElement>) {
@@ -2473,11 +2556,11 @@ impl CanonicalizeContext {
 				let i_last = mrow_children.len()-1;
 				let last_child = as_element(mrow_children[i_last]);
 				if name(&last_child) == "mo" &&
-				   CanonicalizeContext::new().find_operator(last_child, None, None, None).is_right_fence() {
+				   CanonicalizeContext::find_operator(None, last_child, None, None, None).is_right_fence() {
 					for i_child in (0..i_last).rev() {
 						let child = as_element(mrow_children[i_child]);
 						if name(&child) == "mo" &&
-						   CanonicalizeContext::new().find_operator(child, None, None, None).is_left_fence() {
+						   CanonicalizeContext::find_operator(None, child, None, None, None).is_left_fence() {
 							// FIX: should make sure left and right match. Should also count for nested parens
 							return Some(i_child);
 						}
@@ -2801,7 +2884,7 @@ impl CanonicalizeContext {
 		if !is_base && (parent_name == "mover" || parent_name == "munder" || parent_name == "munderover") {
 			// canonicalize various diacritics for munder, mover, munderover
 			mo_text = match mo_text {
-				"_" | "\u{02C9}"| "\u{0304}"| "\u{0305}"| "\u{2212}" |
+				"_" | "\u{02C9}"| "\u{0304}"| "\u{0305}"| "\u{332}" | "\u{2212}" |
 				"\u{2010}" | "\u{2011}" | "\u{2012}" | "\u{2013}" | "\u{2014}" | "\u{2015}" | "\u{203e}" => "\u{00AF}",
 				"\u{02BC}" => "`",
 				"\u{02DC}" | "\u{223C}" => "~",		// use ASCII for diacriticals
@@ -2863,7 +2946,7 @@ impl CanonicalizeContext {
 	//   e.g., n!!n -- ((n!)!)*n or (n!)*(!n)  -- the latter doesn't make semantic sense though
 	// FIX:  the above ignores mspace and other nodes that need to be skipped to determine the right node to determine airity
 	// FIX:  the postfix problem above should be addressed
-	fn find_operator<'a>(&self, mo_node: Element<'a>, previous_operator: Option<&'static OperatorInfo>,
+	fn find_operator<'a>(context: Option<&CanonicalizeContext>, mo_node: Element<'a>, previous_operator: Option<&'static OperatorInfo>,
 						previous_node: Option<Element<'a>>, next_node: Option<Element<'a>>) -> &'static OperatorInfo {
 		// get the unicode value and return the OpKeyword associated with it
 		assert!( name(&mo_node) == "mo");
@@ -2871,7 +2954,10 @@ impl CanonicalizeContext {
 		// if a form has been given, that takes precedence
 		let form = mo_node.attribute_value("form");
 		let op_type =  match form {
-			None => compute_type_from_position(self, previous_operator, previous_node, next_node),
+			None => match context {
+				None => OperatorTypes::POSTFIX,		// what compute_type_from_position returns when the other args to this are all None
+				Some(context) => compute_type_from_position(context, previous_operator, previous_node, next_node),
+			},
 			Some(form) => match form.to_lowercase().as_str() {
 				"prefix" => OperatorTypes::PREFIX,
 				"postfix" => OperatorTypes::POSTFIX,
@@ -3044,7 +3130,7 @@ impl CanonicalizeContext {
 			} else {
 				let next_next_children = next_child.following_siblings();
 				let next_next_child = if next_next_children.is_empty() { None } else { Some( as_element(next_next_children[0]) )};
-				Some( self.find_operator(next_child, operator_versions.infix,
+				Some( CanonicalizeContext::find_operator(Some(self), next_child, operator_versions.infix,
 									top(parse_stack).last_child_in_mrow(), next_next_child) )
 			};
 												  
@@ -3466,7 +3552,7 @@ impl CanonicalizeContext {
 				let children = mrow.children();
 				// debug!("looking for left fence: len={}, {:#?}", children.len(), self.find_operator(as_element(children[0]),None, None, Some(as_element(children[1])) ));
 				if children.len() == 2 && (name(&as_element(children[0])) != "mo" ||
-				   !self.find_operator(as_element(children[0]),
+				   !CanonicalizeContext::find_operator(Some(self), as_element(children[0]),
 								None, Some(as_element(children[0])), Some(mrow) ).is_left_fence()) {
 					// the mrow did *not* start with an open (hence no push)
 					// since parser really wants balanced parens to keep stack state right, we do a push here
@@ -3648,7 +3734,7 @@ impl CanonicalizeContext {
 				let next_node = if i_child + 1 < num_children {Some(as_element(children[i_child+1]))} else {None};
 				current_op = OperatorPair{
 					ch: as_text(base_of_child),
-					op: self.find_operator(base_of_child, previous_op,
+					op: CanonicalizeContext::find_operator(Some(self), base_of_child, previous_op,
 							top(&parse_stack).last_child_in_mrow(), next_node)
 				};
 	

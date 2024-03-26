@@ -129,6 +129,7 @@ thread_local!{
     /// See [`Definitions`] for more details.
     pub static SPEECH_DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::new() );
     pub static BRAILLE_DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::new() );
+    pub static DEFINITIONS: &'static std::thread::LocalKey<RefCell<Definitions>> = &SPEECH_DEFINITIONS;
 }
 
 /// Reads the `definitions.yaml` files specified by current_files -- these are presumed to need updating. 
@@ -143,7 +144,6 @@ pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
     definitions.with( |defs| defs.borrow_mut().name_to_var_mapping.clear() );
     let mut new_files = vec![file_path.to_path_buf()];
     let mut files_read = read_one_definitions_file(use_speech_defs, file_path).chain_err(|| format!("in file '{}", file_path.to_string_lossy()))?;
-    verify_definitions(use_speech_defs)?;
     new_files.append(&mut files_read);
 
     // merge the contents of `TrigFunctions` into a set that contains all the function names (from `AdditionalFunctionNames`).
@@ -163,55 +163,6 @@ pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
         }
         return all_functions;
     }
-}
-
-fn verify_definitions(use_speech_defs: bool) -> Result<()> {
-    // all of the 'numbers-xxx' files should be either size 0 or multiples of tens except:
-    //   ...-ones
-    //   numbers-plural, which should have a single entry
-    lazy_static! {
-        static ref USED_SETS: Vec<&'static str> = vec!["TrigFunctionNames", "AdditionalFunctionNames", "LikelyFunctionNames", 
-                                "LargeOperators"];
-        static ref USED_VECTORS: Vec<&'static str> = vec![
-                "NumbersHundreds", "NumbersTens", "NumbersOnes",
-                "NumbersOrdinalPluralLarge", "NumbersOrdinalLarge", "NumbersLarge",
-                "NumbersOrdinalPluralHundreds", "NumbersOrdinalPluralTens", "NumbersOrdinalPluralOnes",
-                "NumbersOrdinalHundreds", "NumbersOrdinalTens", "NumbersOrdinalOnes",
-                "NumbersOrdinalFractionalPluralOnes", "NumbersOrdinalFractionalOnes"
-        ];
-    }
-    let definitions = if use_speech_defs {&SPEECH_DEFINITIONS} else {&BRAILLE_DEFINITIONS};
-    return definitions.with(|definitions| {
-        // verify that all the named functions used in the code exist
-        // FIX: is there a way to gather them automatically?
-        let definitions = definitions.borrow();
-        let name_definition_map = &definitions.name_to_var_mapping;
-
-        for name in USED_SETS.iter() {
-            if !name_definition_map.contains_key(*name) {
-                bail!("Required (set) name '{}' is missing from 'definitions.yaml'", *name);
-            }
-        }
-        for name in USED_VECTORS.iter() {
-            if !name_definition_map.contains_key(*name) {
-                bail!("Required (array) name '{}' is missing from 'definitions.yaml'", *name);
-            }
-        }
-        for (name,collection) in name_definition_map.iter() {
-            if name.contains("number") && !name.contains("fraction") {
-                match collection {
-                    Contains::Vec(v) => {
-                        let v = v.borrow();
-                        if v.is_empty() || v.len() % 10 != 0 {
-                            bail!("{} has wrong number of values: {}", name, v.len());
-                        }
-                    },
-                    _ =>  bail!("{} is not a vector!", name),
-                }
-            }
-        };
-        return Ok( () )
-    });
 }
 
 use crate::speech::*;
@@ -283,7 +234,8 @@ fn build_values(definition: &Yaml, use_speech_defs: bool, path: &Path) -> Result
             let (_, entry_value) = dict.iter().next().unwrap();
             if entry_value.is_null() {
                 result = Contains::Set( Rc::new( RefCell::new( get_set_values(dict)
-                            .chain_err(||format!("while reading value '{}'", def_name))? ) ) );            } else {
+                            .chain_err(||format!("while reading value '{}'", def_name))? ) ) );
+            } else {
                 // peak and see if this is a set or a map
                 let (_, entry_value) = dict.iter().next().unwrap();
                 if entry_value.is_null() {

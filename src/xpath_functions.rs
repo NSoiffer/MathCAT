@@ -19,10 +19,11 @@
 
 use sxd_document::dom::{Element, ChildOfElement};
 use sxd_xpath::{Value, Context, context, function::*, nodeset::*};
-use crate::definitions::SPEECH_DEFINITIONS;
+use crate::definitions::{Definitions, SPEECH_DEFINITIONS, BRAILLE_DEFINITIONS};
 use regex::Regex;
 use crate::pretty_print::mml_to_string;
-use std::cell::Ref;
+use std::cell::{Ref, RefCell};
+use std::thread::LocalKey;
 use phf::phf_set;
 use sxd_xpath::function::Error as XPathError;
 
@@ -398,9 +399,9 @@ impl ToOrdinal {
         SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             let words = if plural {
-                definitions.get_vec("NumbersOrdinalFractionalPluralOnes").unwrap()
+                definitions.get_vec("NumbersOrdinalFractionalPluralOnes")?
             } else {
-                definitions.get_vec("NumbersOrdinalFractionalOnes").unwrap()
+                definitions.get_vec("NumbersOrdinalFractionalOnes")?
             };
             let number_as_int: usize = number.parse().unwrap(); // already verified it is only digits
             if number_as_int < words.len() {
@@ -418,27 +419,27 @@ impl ToOrdinal {
      *   plural -- true if answer should be plural
      * Returns the string representation of that number or an error message
      */
-    fn convert(number: &str, fractional: bool, plural: bool) -> String {
+    fn convert(number: &str, fractional: bool, plural: bool) -> Option<String> {
         lazy_static! {
             static ref NO_DIGIT: Regex = Regex::new(r"[^\d]").unwrap();    // match anything except a digit
         }
         SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
-            let numbers_large = definitions.get_vec("NumbersLarge").unwrap();
+            let numbers_large = definitions.get_vec("NumbersLarge")?;
             // check to see if the number is too big or is not an integer or has non-digits
             if number.is_empty() || number.len() > 3*numbers_large.len() || number.contains(".,") {
-                return String::from(number);
+                return Some(String::from(number));
             }
             if NO_DIGIT.is_match(number) {
                 // this shouldn't have been part of an mn, so likely an error. Log a warning
                 // FIX: log a warning that a non-number was passed to convert()
-                return String::from(number);
+                return Some(String::from(number));
             }
 
             // first deal with the abnormalities of fractional ordinals (one half, etc). That simplifies what remains
             if fractional {
                 if let Some(string) = ToOrdinal::compute_irregular_fractional_speech(number, plural) {
-                    return string;
+                    return Some(string);
                 }
             }
 
@@ -475,22 +476,22 @@ impl ToOrdinal {
             if digits.len() > 3 { 
                 // speak this first groups as cardinal numbers
                 let words = [
-                    definitions.get_vec("NumbersHundreds").unwrap(),
-                    definitions.get_vec("NumbersTens").unwrap(),
-                    definitions.get_vec("NumbersOnes").unwrap(),
+                    definitions.get_vec("NumbersHundreds")?,
+                    definitions.get_vec("NumbersTens")?,
+                    definitions.get_vec("NumbersOnes")?,
                 ];
                 answer = digits[0..digits.len()-3]
                             .chunks(3)
                             .enumerate()
                             .map(|(i, chunk)| {
                                 if chunk[0] != 0 || chunk[1] != 0 || chunk[2] != 0 {
-                                    ToOrdinal::hundreds_to_words(chunk, &words) + " " + 
-                                        &large_words[num_thousands_at_end + digits.len()/3 - 1 - i] + " "
+                                    Some(ToOrdinal::hundreds_to_words(chunk, &words)? + " " + 
+                                        &large_words[num_thousands_at_end + digits.len()/3 - 1 - i] + " ")
                                 } else {
-                                    "".to_string()
+                                    Some("".to_string())
                                 }
-                                })
-                            .collect::<Vec<String>>()
+                            })
+                            .collect::<Option<Vec<String>>>()?
                             .join("");  // can't use " " because 1000567 would get extra space in the middle
                 if num_thousands_at_end > 0 {
                     // add on "billionths", etc and we are done
@@ -499,63 +500,63 @@ impl ToOrdinal {
                     } else {
                         definitions.get_vec("NumbersOrdinalLarge")
                     };
-                    return answer + &large_words.unwrap()[num_thousands_at_end];
+                    return Some(answer + &large_words?[num_thousands_at_end]);
                 }
             };
 
             // all that is left is to speak the hundreds part, possibly followed by "thousands", "billions", etc
             let words = match (num_thousands_at_end > 0, plural) {
                 (true, _) => [
-                    definitions.get_vec("NumbersHundreds").unwrap(),
-                    definitions.get_vec("NumbersTens").unwrap(),
-                    definitions.get_vec("NumbersOnes").unwrap(),
+                    definitions.get_vec("NumbersHundreds")?,
+                    definitions.get_vec("NumbersTens")?,
+                    definitions.get_vec("NumbersOnes")?,
                 ],
                 (false, true) => [
-                    definitions.get_vec("NumbersOrdinalPluralHundreds").unwrap(),
-                    definitions.get_vec("NumbersOrdinalPluralTens").unwrap(),
-                    definitions.get_vec("NumbersOrdinalPluralOnes").unwrap(),
+                    definitions.get_vec("NumbersOrdinalPluralHundreds")?,
+                    definitions.get_vec("NumbersOrdinalPluralTens")?,
+                    definitions.get_vec("NumbersOrdinalPluralOnes")?,
                 ],
                 (false, false) => [
-                    definitions.get_vec("NumbersOrdinalHundreds").unwrap(),
-                    definitions.get_vec("NumbersOrdinalTens").unwrap(),
-                    definitions.get_vec("NumbersOrdinalOnes").unwrap(),
+                    definitions.get_vec("NumbersOrdinalHundreds")?,
+                    definitions.get_vec("NumbersOrdinalTens")?,
+                    definitions.get_vec("NumbersOrdinalOnes")?,
                 ],
             };
-            answer += &ToOrdinal::hundreds_to_words(&digits[digits.len()-3..], &words);
+            answer += &ToOrdinal::hundreds_to_words(&digits[digits.len()-3..], &words)?;
             if num_thousands_at_end > 0 {
                 let large_words = if plural {
-                    definitions.get_vec("NumbersOrdinalPluralLarge").unwrap()
+                    definitions.get_vec("NumbersOrdinalPluralLarge")?
                 } else {
-                    definitions.get_vec("NumbersOrdinalLarge").unwrap()
+                    definitions.get_vec("NumbersOrdinalLarge")?
                 };
                 answer = answer + " " + &large_words[num_thousands_at_end];
             }
-            return answer;
+            return Some(answer);
         })
     }
 
-    fn hundreds_to_words(number: &[usize], words: &[Ref<Vec<String>>; 3]) -> String {
+    fn hundreds_to_words(number: &[usize], words: &[Ref<Vec<String>>; 3]) -> Option<String> {
         assert!( number.len() == 3 );
         return SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             if number[0] != 0 && number[1] == 0 && number[2] == 0 {
-                return words[0][number[0]].clone();
+                return Some(words[0][number[0]].clone());
             }
 
-            let mut hundreds = definitions.get_vec("NumbersHundreds").unwrap()[number[0]].clone();
+            let mut hundreds = definitions.get_vec("NumbersHundreds")?[number[0]].clone();
             if !hundreds.is_empty() {
                 hundreds += " ";
             }
 
             if number[1] != 0 && number[2] == 0 {
-                return hundreds + &words[1][number[1]];
+                return Some(hundreds + &words[1][number[1]]);
             }
 
             if 10*number[1] < words[2].len() {
                 // usurp regular ordering to handle something like '14'
-                return hundreds + &words[2][10*number[1] + number[2]];
+                return Some(hundreds + &words[2][10*number[1] + number[2]]);
             } else {
-                return hundreds + &definitions.get_vec("NumbersTens").unwrap()[number[1]] + " " + &words[2][number[2]];
+                return Some(hundreds + &definitions.get_vec("NumbersTens")?[number[1]] + " " + &words[2][number[2]]);
             }
         });
     }
@@ -580,8 +581,16 @@ impl Function for ToOrdinal {
         }
         let node = validate_one_node(args.pop_nodeset()?, "ToOrdinal")?;
         return match node {
-            Node::Text(t) =>  Ok( Value::String( ToOrdinal::convert(t.text(), fractional, plural) ) ),
-            Node::Element(e) => Ok( Value::String( ToOrdinal::convert(&get_text_from_element(e), fractional, plural) ) ),
+            Node::Text(t) =>  Ok( Value::String(
+                match ToOrdinal::convert(t.text(), fractional, plural) {
+                    None => t.text().to_string(),
+                    Some(ord) => ord,
+                } ) ),
+            Node::Element(e) => Ok( Value::String(
+                match ToOrdinal::convert(&get_text_from_element(e), fractional, plural) {
+                    None => get_text_from_element(e).to_string(),
+                    Some(ord) => ord,
+                } ) ),
             _   =>  Err( Error::ArgumentNotANodeset{actual: ArgumentType::String} ),
         }
     }
@@ -614,7 +623,11 @@ impl Function for ToCommonFraction {
             let denom = children[1].element().unwrap();
             let denom = get_text_from_element( denom );
             let mut answer = num.clone() + " ";
-            answer += &ToOrdinal::convert(&denom, true, num!="1");
+            answer += &match ToOrdinal::convert(&denom, true, num!="1") {
+                None => denom,
+                Some(ord) => ord,
+            };
+
             return Ok( Value::String( answer ) );    
         } else {
             return Err( Error::Other( "ToCommonFraction -- argument is not an element".to_string()) );
@@ -864,11 +877,13 @@ pub struct IsInDefinition;
 impl IsInDefinition {
     /// Returns true if `test_str` is in `set_name`
     /// Returns an error if `set_name` is not defined
-    pub fn is_defined_in(test_str: &str, set_name: &str) -> Result<bool, Error> {
-        return SPEECH_DEFINITIONS.with(|definitions| {
-            let definitions = definitions.borrow();
-            if let Some(set) = definitions.get_hashset(set_name) {
+    pub fn is_defined_in(test_str: &str, defs: &'static LocalKey<RefCell<Definitions>>, set_name: &str) -> Result<bool, Error> {
+        return defs.with(|definitions| {
+            if let Some(set) = definitions.borrow().get_hashset(set_name) {
                 return Ok( set.contains(test_str) );
+            }
+            if let Some(hashmap) = definitions.borrow().get_hashmap(set_name) {
+                return Ok( hashmap.contains_key(test_str) );
             }
             return Err( Error::Other( format!("\n  IsInDefinition: '{}' is not defined in definitions.yaml", set_name) ) );
         });
@@ -890,10 +905,22 @@ impl IsInDefinition {
                         -> Result<Value<'d>, Error>
     {
         let mut args = Args(args);
-        args.exactly(2)?;
+        // FIX: temporarily accept two args as assume SPEECH_DEFINITIONS until the Rule files are fixed
+        args.at_least(2)?;
+        args.at_most(3)?;
         let set_name = args.pop_string()?;
+        // FIX: this (len == 1) is temporary until all the usages are switched to the (new) 3-arg form
+        let definitions = if args.len() == 2 {
+            match args.pop_string()?.as_str() {
+                "Speech" => &SPEECH_DEFINITIONS,
+                "Braille" => &BRAILLE_DEFINITIONS,
+                _ => return Err( Error::Other("IsInDefinition:: second argument must be either 'Speech' or 'Braille'".to_string()) )
+            }
+        } else {
+            &SPEECH_DEFINITIONS
+        };
         match &args[0] {
-            Value::String(str) => return match IsInDefinition::is_defined_in(str, &set_name) {
+            Value::String(str) => return match IsInDefinition::is_defined_in(str, definitions, &set_name) {
                 Ok(result) => Ok( Value::Boolean( result ) ),
                 Err(e) => Err(e),
             },
@@ -907,7 +934,7 @@ impl IsInDefinition {
                         if text.is_empty() {
                             Ok( Value::Boolean(false) )
                         } else {
-                            match IsInDefinition::is_defined_in(&text, &set_name) {
+                            match IsInDefinition::is_defined_in(&text, definitions, &set_name) {
                                 Ok(result) => Ok( Value::Boolean( result ) ),
                                 Err(e) => Err(e),
                             }          
@@ -925,14 +952,14 @@ impl IsInDefinition {
 
 pub struct DefinitionValue;
 impl DefinitionValue {
-    /// Returns true if `test_str` is in `set_name`
+    /// Returns the value associated with `key` in `set_name`. If `key` is not in `set_name`, `key` is returned
+    ///   Consider looking up "km" -- if there is no definition, using 'km' is a reasonable fallback
     /// Returns an error if `set_name` is not defined
-    pub fn is_defined_in(test_str: &str, set_name: &str) -> Result<String, Error> {
-        return SPEECH_DEFINITIONS.with(|definitions| {
-            let definitions = definitions.borrow();
-            if let Some(map) = definitions.get_hashmap(set_name) {
-                return Ok( match map.get(test_str) {
-                    None => String::default(),
+    pub fn definition_value(key: &str, defs: &'static LocalKey<RefCell<Definitions>>, set_name: &str) -> Result<String, Error> {
+        return defs.with(|definitions| {
+            if let Some(map) = definitions.borrow().get_hashmap(set_name) {
+                return Ok( match map.get(key) {
+                    None => key.to_string(),
                     Some(str) => str.clone(),
                 });
             }
@@ -956,10 +983,15 @@ impl DefinitionValue {
                         -> Result<Value<'d>, Error>
     {
         let mut args = Args(args);
-        args.exactly(2)?;
+        args.exactly(3)?;
         let set_name = args.pop_string()?;
+        let definitions = match args.pop_string()?.as_str() {
+            "Speech" => &SPEECH_DEFINITIONS,
+            "Braille" => &BRAILLE_DEFINITIONS,
+            _ => return Err( Error::Other("IsInDefinition:: second argument must be either 'Speech' or 'Braille'".to_string()) )
+        };
         match &args[0] {
-            Value::String(str) => return match DefinitionValue::is_defined_in(str, &set_name) {
+            Value::String(str) => return match DefinitionValue::definition_value(str, definitions, &set_name) {
                 Ok(result) => Ok( Value::String( result ) ),
                 Err(e) => Err(e),
             },
@@ -973,7 +1005,7 @@ impl DefinitionValue {
                         if text.is_empty() {
                             Ok( Value::String("".to_string()) )
                         } else {
-                            match DefinitionValue::is_defined_in(&text, &set_name) {
+                            match DefinitionValue::definition_value(&text, definitions, &set_name) {
                                 Ok(result) => Ok( Value::String( result ) ),
                                 Err(e) => Err(e),
                             }          
@@ -987,7 +1019,6 @@ impl DefinitionValue {
         }
     }
 }
-
 
 pub struct DistanceFromLeaf;
 impl DistanceFromLeaf {
@@ -1236,93 +1267,93 @@ mod tests {
     #[test]
     fn ordinal_one_digit() {
         init_word_list();
-        assert_eq!("zeroth", ToOrdinal::convert("0", false, false));
-        assert_eq!("second", ToOrdinal::convert("2", false, false));
-        assert_eq!("ninth", ToOrdinal::convert("9", false, false));
+        assert_eq!("zeroth", ToOrdinal::convert("0", false, false).unwrap());
+        assert_eq!("second", ToOrdinal::convert("2", false, false).unwrap());
+        assert_eq!("ninth", ToOrdinal::convert("9", false, false).unwrap());
 
-        assert_eq!("zeroth", ToOrdinal::convert("0", false, true));
-        assert_eq!("seconds", ToOrdinal::convert("2", false, true));
-        assert_eq!("ninths", ToOrdinal::convert("9", false, true));
+        assert_eq!("zeroth", ToOrdinal::convert("0", false, true).unwrap());
+        assert_eq!("seconds", ToOrdinal::convert("2", false, true).unwrap());
+        assert_eq!("ninths", ToOrdinal::convert("9", false, true).unwrap());
 
-        assert_eq!("first", ToOrdinal::convert("1", true, false));
-        assert_eq!("half", ToOrdinal::convert("2", true, false));
-        assert_eq!("half", ToOrdinal::convert("02", true, false));
-        assert_eq!("ninth", ToOrdinal::convert("9", true, false));
+        assert_eq!("first", ToOrdinal::convert("1", true, false).unwrap());
+        assert_eq!("half", ToOrdinal::convert("2", true, false).unwrap());
+        assert_eq!("half", ToOrdinal::convert("02", true, false).unwrap());
+        assert_eq!("ninth", ToOrdinal::convert("9", true, false).unwrap());
 
-        assert_eq!("halves", ToOrdinal::convert("2", true, true));
-        assert_eq!("halves", ToOrdinal::convert("002", true, true));
-        assert_eq!("ninths", ToOrdinal::convert("9", true, true));
+        assert_eq!("halves", ToOrdinal::convert("2", true, true).unwrap());
+        assert_eq!("halves", ToOrdinal::convert("002", true, true).unwrap());
+        assert_eq!("ninths", ToOrdinal::convert("9", true, true).unwrap());
     }
 
     #[test]
     fn ordinal_two_digit() {
         init_word_list();
-        assert_eq!("tenth", ToOrdinal::convert("10", false, false));
-        assert_eq!("seventeenth", ToOrdinal::convert("17", false, false));
-        assert_eq!("thirty second", ToOrdinal::convert("32", false, false));
-        assert_eq!("fortieth", ToOrdinal::convert("40", false, false));
+        assert_eq!("tenth", ToOrdinal::convert("10", false, false).unwrap());
+        assert_eq!("seventeenth", ToOrdinal::convert("17", false, false).unwrap());
+        assert_eq!("thirty second", ToOrdinal::convert("32", false, false).unwrap());
+        assert_eq!("fortieth", ToOrdinal::convert("40", false, false).unwrap());
 
-        assert_eq!("tenths", ToOrdinal::convert("10", false, true));
-        assert_eq!("sixteenths", ToOrdinal::convert("16", false, true));
-        assert_eq!("eighty eights", ToOrdinal::convert("88", false, true));
-        assert_eq!("fiftieths", ToOrdinal::convert("50", false, true));
+        assert_eq!("tenths", ToOrdinal::convert("10", false, true).unwrap());
+        assert_eq!("sixteenths", ToOrdinal::convert("16", false, true).unwrap());
+        assert_eq!("eighty eights", ToOrdinal::convert("88", false, true).unwrap());
+        assert_eq!("fiftieths", ToOrdinal::convert("50", false, true).unwrap());
 
-        assert_eq!("eleventh", ToOrdinal::convert("11", true, false));
-        assert_eq!("forty fourth", ToOrdinal::convert("44", true, false));
-        assert_eq!("ninth", ToOrdinal::convert("9", true, false));
-        assert_eq!("ninth", ToOrdinal::convert("00000009", true, false));
-        assert_eq!("sixtieth", ToOrdinal::convert("60", true, false));
+        assert_eq!("eleventh", ToOrdinal::convert("11", true, false).unwrap());
+        assert_eq!("forty fourth", ToOrdinal::convert("44", true, false).unwrap());
+        assert_eq!("ninth", ToOrdinal::convert("9", true, false).unwrap());
+        assert_eq!("ninth", ToOrdinal::convert("00000009", true, false).unwrap());
+        assert_eq!("sixtieth", ToOrdinal::convert("60", true, false).unwrap());
 
-        assert_eq!("tenths", ToOrdinal::convert("10", true, true));
-        assert_eq!("tenths", ToOrdinal::convert("0010", true, true));
-        assert_eq!("elevenths", ToOrdinal::convert("11", true, true));
-        assert_eq!("nineteenths", ToOrdinal::convert("19", true, true));
-        assert_eq!("twentieths", ToOrdinal::convert("20", true, true));
+        assert_eq!("tenths", ToOrdinal::convert("10", true, true).unwrap());
+        assert_eq!("tenths", ToOrdinal::convert("0010", true, true).unwrap());
+        assert_eq!("elevenths", ToOrdinal::convert("11", true, true).unwrap());
+        assert_eq!("nineteenths", ToOrdinal::convert("19", true, true).unwrap());
+        assert_eq!("twentieths", ToOrdinal::convert("20", true, true).unwrap());
     }
 
     #[test]
     fn ordinal_three_digit() {
         init_word_list();
-        assert_eq!("one hundred first", ToOrdinal::convert("101", false, false));
-        assert_eq!("two hundred tenth", ToOrdinal::convert("210", false, false));
-        assert_eq!("four hundred thirty second", ToOrdinal::convert("432", false, false));
-        assert_eq!("four hundred second", ToOrdinal::convert("402", false, false));
+        assert_eq!("one hundred first", ToOrdinal::convert("101", false, false).unwrap());
+        assert_eq!("two hundred tenth", ToOrdinal::convert("210", false, false).unwrap());
+        assert_eq!("four hundred thirty second", ToOrdinal::convert("432", false, false).unwrap());
+        assert_eq!("four hundred second", ToOrdinal::convert("402", false, false).unwrap());
 
-        assert_eq!("one hundred first", ToOrdinal::convert("101", true, false));
-        assert_eq!("two hundred second", ToOrdinal::convert("202", true, false));
-        assert_eq!("four hundred thirty second", ToOrdinal::convert("432", true, false));
-        assert_eq!("five hundred third", ToOrdinal::convert("503", true, false));
+        assert_eq!("one hundred first", ToOrdinal::convert("101", true, false).unwrap());
+        assert_eq!("two hundred second", ToOrdinal::convert("202", true, false).unwrap());
+        assert_eq!("four hundred thirty second", ToOrdinal::convert("432", true, false).unwrap());
+        assert_eq!("five hundred third", ToOrdinal::convert("503", true, false).unwrap());
 
-        assert_eq!("three hundred elevenths", ToOrdinal::convert("311", false, true));
-        assert_eq!("four hundred ninety ninths", ToOrdinal::convert("499", false, true));
-        assert_eq!("nine hundred ninetieths", ToOrdinal::convert("990", false, true));
-        assert_eq!("six hundred seconds", ToOrdinal::convert("602", false, true));
+        assert_eq!("three hundred elevenths", ToOrdinal::convert("311", false, true).unwrap());
+        assert_eq!("four hundred ninety ninths", ToOrdinal::convert("499", false, true).unwrap());
+        assert_eq!("nine hundred ninetieths", ToOrdinal::convert("990", false, true).unwrap());
+        assert_eq!("six hundred seconds", ToOrdinal::convert("602", false, true).unwrap());
 
-        assert_eq!("seven hundredths", ToOrdinal::convert("700", true, true));
-        assert_eq!("one hundredths", ToOrdinal::convert("100", true, true));
-        assert_eq!("eight hundred seventeenths", ToOrdinal::convert("817", true, true));
+        assert_eq!("seven hundredths", ToOrdinal::convert("700", true, true).unwrap());
+        assert_eq!("one hundredths", ToOrdinal::convert("100", true, true).unwrap());
+        assert_eq!("eight hundred seventeenths", ToOrdinal::convert("817", true, true).unwrap());
     }
     #[test]
     fn ordinal_large() {
         init_word_list();
-        assert_eq!("one thousandth", ToOrdinal::convert("1000", false, false));
-        assert_eq!("two thousand one hundredth", ToOrdinal::convert("2100", false, false));
-        assert_eq!("thirty thousandth", ToOrdinal::convert("30000", false, false));
-        assert_eq!("four hundred thousandth", ToOrdinal::convert("400000", false, false));
+        assert_eq!("one thousandth", ToOrdinal::convert("1000", false, false).unwrap());
+        assert_eq!("two thousand one hundredth", ToOrdinal::convert("2100", false, false).unwrap());
+        assert_eq!("thirty thousandth", ToOrdinal::convert("30000", false, false).unwrap());
+        assert_eq!("four hundred thousandth", ToOrdinal::convert("400000", false, false).unwrap());
 
-        assert_eq!("four hundred thousandth", ToOrdinal::convert("400000", true, false));
-        assert_eq!("five hundred thousand second", ToOrdinal::convert("500002", true, false));
-        assert_eq!("six millionth", ToOrdinal::convert("6000000", true, false));
-        assert_eq!("sixty millionth", ToOrdinal::convert("60000000", true, false));
+        assert_eq!("four hundred thousandth", ToOrdinal::convert("400000", true, false).unwrap());
+        assert_eq!("five hundred thousand second", ToOrdinal::convert("500002", true, false).unwrap());
+        assert_eq!("six millionth", ToOrdinal::convert("6000000", true, false).unwrap());
+        assert_eq!("sixty millionth", ToOrdinal::convert("60000000", true, false).unwrap());
 
-        assert_eq!("seven billionths", ToOrdinal::convert("7000000000", false, true));
-        assert_eq!("eight trillionths", ToOrdinal::convert("8000000000000", false, true));
-        assert_eq!("nine quadrillionths", ToOrdinal::convert("9000000000000000", false, true));
-        assert_eq!("one quintillionth", ToOrdinal::convert("1000000000000000000", false, false));
+        assert_eq!("seven billionths", ToOrdinal::convert("7000000000", false, true).unwrap());
+        assert_eq!("eight trillionths", ToOrdinal::convert("8000000000000", false, true).unwrap());
+        assert_eq!("nine quadrillionths", ToOrdinal::convert("9000000000000000", false, true).unwrap());
+        assert_eq!("one quintillionth", ToOrdinal::convert("1000000000000000000", false, false).unwrap());
 
-        assert_eq!("nine billion eight hundred seventy six million five hundred forty three thousand two hundred tenths", ToOrdinal::convert("9876543210", true, true));
-        assert_eq!("nine billion five hundred forty three thousand two hundred tenths", ToOrdinal::convert("9000543210", true, true));
-        assert_eq!("zeroth", ToOrdinal::convert("00000", false, false));
+        assert_eq!("nine billion eight hundred seventy six million five hundred forty three thousand two hundred tenths", ToOrdinal::convert("9876543210", true, true).unwrap());
+        assert_eq!("nine billion five hundred forty three thousand two hundred tenths", ToOrdinal::convert("9000543210", true, true).unwrap());
+        assert_eq!("zeroth", ToOrdinal::convert("00000", false, false).unwrap());
     }
 
 
