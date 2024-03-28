@@ -90,7 +90,7 @@
     - test:
         if: "parent::*[1][self::m:mn]"
         then: [T: "punkt"]                       #  (en: 'point', google translation)
-        else: [T: "punkt"]                       #  (en: 'dot')
+        else: [T: "prick"]                       #  (en: 'dot')
  - "/": [T: "delat med"]                         #  0x2f (en: 'divided by')
  - ":": [T: "kolon"]                             #  0x3a (en: 'colon')
  - ";": [T: "semikolon"]                         #  0x3b (en: 'semicolon')

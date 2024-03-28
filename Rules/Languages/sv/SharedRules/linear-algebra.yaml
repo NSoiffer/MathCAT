@@ -58,7 +58,7 @@
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - T: "transponera"      # phrase(this will 'transpose' the values)
+  - T: "transponat"      # phrase(this will 'transpose' the values)
   
 - name: trace
   tag: trace
