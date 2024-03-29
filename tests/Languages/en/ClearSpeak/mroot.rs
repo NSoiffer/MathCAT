@@ -130,3 +130,14 @@ fn simple_fraction_power() {
                 </math>";
     test("en", "ClearSpeak", expr, "the 1 third root of x,");
 }
+
+#[test]
+fn root_decimal_index() {
+    let expr = "<math>
+                    <mroot>
+                        <mi>x</mi> 
+                        <mn>12.5</mn>
+                    </mroot>
+                </math>";
+    test("en", "ClearSpeak", expr, "the 12.5 root of x,");
+}

@@ -48,6 +48,7 @@
         then: [t: "cube root"]        # phrase(the 'cube root' of x)
       - else_if: "*[2][not(contains(., '.'))]"
         then: [x: "ToOrdinal(*[2])", t: "root"]        # phrase(the square 'root' of x)
+        else: [x: "*[2]", t: "root"]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
@@ -75,7 +76,7 @@
   variables: [IsPlural: "*[1]!=1"]
   replace:
   - x: "*[1]"
-  - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
+  - x: "ToOrdinal(*[2], true(), DEBUG($IsPlural))"   # extra args specify fractional ordinal and whether it is plural
 
 - name: common-fraction-mixed-number
   tag: fraction

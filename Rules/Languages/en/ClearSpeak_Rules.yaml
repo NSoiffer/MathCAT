@@ -70,6 +70,7 @@
         then: [t: "cube root"]      # phrase(5 is the 'cube root' of 625)
       - else_if: "*[2][not(contains(., '.'))]"
         then: [x: "ToOrdinal(*[2])", t: "root"]      # phrase(the square 'root' of 25)
+        else: [x: "*[2]", t: "root"]
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
