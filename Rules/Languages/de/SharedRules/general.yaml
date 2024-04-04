@@ -25,7 +25,7 @@
     - else_if: "*[1][text()='ℝ']"
       then: [{t: "reelle zahlen"}]      # phrase('real numbers' can be both positive and negative)
     - else_if: "*[1][text()='ℤ']"
-      then: [{t: "ganzzahlen"}]      # phrase(positive 'integers' are natural numbers above 0)
+      then: [{t: "ganze zahlen"}]      # phrase(positive 'integers' are natural numbers above 0)
       else: [{x: "*[1][text()]"}] # shouldn't happen
 
 - name: dimension-number-sets
