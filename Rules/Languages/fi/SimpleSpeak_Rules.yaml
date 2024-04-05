@@ -236,7 +236,6 @@
   tag: power
   match: "."
   replace:
-  # This logic might have to be changed completely - or it might just work?
   - x: "*[1]"
   - T: "potenssiin"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
