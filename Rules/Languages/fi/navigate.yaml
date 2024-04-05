@@ -1665,7 +1665,7 @@
       - T: "puhu kaava liikkumisen jälkeen"                # phrase('speak expression after move')
       - set_variables: [Overview: "'false'"]
       else:
-      - T: "yleiskatsaus kaava liikkumisen jälkeen"          # phrase('overview of expression after move')
+      - T: "yleiskatsaus kaavasta liikkumisen jälkeen"          # phrase('overview of expression after move')
       - set_variables: [Overview: "'true'"]
   - pause: long
 
