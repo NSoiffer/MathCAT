@@ -18,8 +18,8 @@ mod braille {
         mod once;
     }
 
-    // mod Vietnam {
-    //     mod vi;
-    // }
+    mod Vietnam {
+        mod vi;
+    }
 }
 

@@ -92,6 +92,7 @@
         "caligraphic",
         "canonicalization",
         "canonicalize",
+        "Canonicalize",
         "canonicalized",
         "canonicalizing",
         "𝐶𝑐",
@@ -432,4 +433,11 @@
     "includeDocumentStart": true,
     "editor.tabSize": 4,
     "editor.useTabStops": true,
+    "cmake.configureOnOpen": false,
+
+    "python.analysis.typeCheckingMode": "basic",
+    "python.analysis.diagnosticMode": "workspace",
+    "flake8.args": [
+        "--max-line-length=130",
+    ], 
 }

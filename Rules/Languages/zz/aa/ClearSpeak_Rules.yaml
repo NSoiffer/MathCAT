@@ -1,0 +1,10 @@
+---
+- include: "../ClearSpeak_Rules.yaml"
+
+-
+  name: override
+  tag: mn
+  match: "."
+  replace:
+  - x: "text()"
+  - t: "from zz-aa"

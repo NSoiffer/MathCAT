@@ -178,9 +178,22 @@
 
  - " ":                        # 0xA0 (non-breaking space)
     - test:
-        if: "self::m:mn"
+      - if: "self::m:mn" 
         then: [t: "⠀"]
-        else: [t: "W"]
+        #   # part of longer string or part of preceeding or following text
+      - else_if: "@data-added='missing-content' or @data-empty-in-2D or @width > 1.1"
+        then: [t: "⠿"]       # omission
+      - else_if: "(string-length(.) > 1 or preceding-sibling::*[1][self::m:mtext and .!=','] or following-sibling::*[1][self::m:mtext])"
+        then: [t: "W"]
+        # treat mo like 0x2061 (function apply)
+      - else_if: "self::m:mo and
+                  (preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')] or
+                   @data-function-likelihood and
+                   IsInDefinition(BaseNode(.), 'FunctionNames') and
+                   not(following-sibling::*[1][IsBracketed(., '', '')])
+                  )" 
+        then: [t: "w"]      # follows a function name, so lowercase
+
  - "!":                          # 0x21 (Factorial)
     - test:
         if: "self::m:mo"
@@ -347,16 +360,12 @@
  - "‰": [t: "`00"]
  - "′": [t: "⠄"]                # 0x2032 (Prime)
  - "″": [t: "⠄⠄"]               # 0x2033 (Double prime)
- - "⁡":                         # 0x2061⁡ (invisible function apply)
+ - "⁡":                          # 0x2061⁡ (invisible function apply)
     # add a space if name doesn't have brackets after it or is in FunctionNames list 
     - test:
         if: "not(following-sibling::*[1][IsBracketed(., '', '')]) or preceding-sibling::*[1][IsInDefinition(BaseNode(.), 'FunctionNames')]" 
         then: [t: "w"]      # follows a function name, so lowercase
- - "⁢":                       # 0x2062 -- what's right???  "⠈⠡" (times) is not right -- if a number before and after, we need a space
-    - test:
-        if: "preceding-sibling::*[1][self::m:mn] and following-sibling::*[1][self::m:mn]"
-        then: [t: "W"]
-        else: [t: ""]
+ - "⁢": [t: ""]                 # 0x2062
  - "⁣":                         # 0x2063 (Invisible Comma -- treat like a normal comma when in a subscript[issue #40]) else ignore
     - test:
           # test if first ancestor that isn't an mrow is a script tag (rule 78)
@@ -384,3 +393,5 @@
  - "∞": [t: "⠠⠿"]               # 0x221E (Infinity)
  - "∣": [t: "⠳"]              # 0x2223 (Divides)
  - "∫": [t: "⠮"]                # 0x222B (Integral)
+ - "℃": [t: "⠘⠨⠡⠀⠰⠠⠉"]          # 0x2103 (Degrees Celsius)
+ - "℉": [t: "⠘⠨⠡⠀⠰⠠⠋"]          # 0x2109 (Degrees Fahrenheit)

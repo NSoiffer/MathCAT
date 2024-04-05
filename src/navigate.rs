@@ -245,8 +245,10 @@ fn convert_last_char_to_number(str: &str) -> usize {
 /// Get the node associated with 'id'
 /// This can be called on an intent tree -- it does not make use of is_leaf()
 fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> {
-    if mathml.attribute_value("id").unwrap() == id {
-        return Some(mathml);
+    if let Some(mathml_id) = mathml.attribute_value("id") {
+        if mathml_id == id {
+            return Some(mathml);
+        }
     }
 
     for child in mathml.children() {
@@ -257,6 +259,29 @@ fn get_node_by_id<'a>(mathml: Element<'a>, id: &str) -> Option<Element<'a>> {
         }
     }
     return None;
+}
+
+/// Search the mathml for the id and set the navigation node to that id
+/// Resets the navigation stack
+pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -> Result<()> {
+    let node = get_node_by_id(mathml, &id);
+    if let Some(node) = node {
+        if !crate::xpath_functions::is_leaf(node) && offset != 0 {
+            bail!("Id {} is not a leaf in the MathML tree but has non-zero offset={}. Referenced MathML node is {}", id, offset, mml_to_string(&node));
+        }
+        return NAVIGATION_STATE.with(|nav_state| {
+            let mut nav_state = nav_state.borrow_mut();
+            nav_state.reset();
+            nav_state.push(NavigationPosition{
+                current_node: id,
+                current_node_offset: offset
+            }, "None");
+            return Ok( () );
+        })
+    } else {
+        bail!("Id {} not found in MathML {}", id, mml_to_string(&mathml));
+    }
+
 }
 
 // FIX: think of a better place to put this, and maybe a better interface
@@ -322,8 +347,9 @@ fn do_navigate_command_and_param(mathml: Element, command: NavigationCommand, pa
 
 pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) -> Result<String> {   
     // first check to see if nav file has been changed -- don't bother checking in loop below
-    SpeechRules::update()?;
-    NAVIGATION_RULES.with(|rules| { rules.borrow_mut().read_files() })?;
+    NAVIGATION_RULES.with(|rules| {
+        rules.borrow_mut().read_files()
+    })?;
 
     if mathml.children().is_empty() {
         bail!("MathML has not been set -- can't navigate");
@@ -416,7 +442,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         // transfer some values that might have been set into the prefs
         let context = rules_with_context.get_context();     // need to recompute or we have a multiple borrow problem
         nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
-        rules.pref_manager.as_ref().borrow_mut().set_user_prefs("NavMode", &nav_state.mode);
+        rules.pref_manager.as_ref().borrow_mut().set_user_prefs("NavMode", &nav_state.mode)?;
 
         let nav_position = match context_get_variable(context, "NavNode", mathml)?.0 {
             None => NavigationPosition::default(),
@@ -688,7 +714,7 @@ fn key_press_to_command_and_param(
             command = NavigationCommand::Exit;
             param = NavigationParam::Last;
             },
-        0x30|0x31|0x32|0x33|0x34|0x35|0x36|0x37|0x38|0x39 => {  // '0' ... '9'
+        0x30..=0x39 => {  // '0' ... '9'
             command = choose_command(shift_key, control_key, NavigationCommand::Move, NavigationCommand::Read, NavigationCommand::SetPlacemarker, NavigationCommand::Describe);
             static PLACE_MARKER: &[NavigationParam] = &[
                 NavigationParam::Placemarker0,
@@ -1418,7 +1444,6 @@ mod tests {
           </mrow>
         </mrow>
        </math>";
-        set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         init_default_prefs(mathml_str, "Simple");
         set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
         return MATHML_INSTANCE.with(|package_instance| {
@@ -1491,7 +1516,6 @@ mod tests {
           </mtr>
         </mtable>
        </math>";
-        set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         init_default_prefs(mathml_str, "Enhanced");
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
@@ -1754,6 +1778,36 @@ mod tests {
     }
 
     #[test]
+    fn chem_speech() -> Result<()> {
+        // this comes from bug 218
+        let mathml_str = "<math data-latex='H_2SO_4' display='block' id='id-0' data-id-added='true'>
+            <mrow data-changed='added' data-chem-formula='5' id='id-1' data-id-added='true'>
+                <msub data-latex='H_2' data-chem-formula='1' id='id-2' data-id-added='true'>
+                    <mi data-latex='H' data-chem-element='1' id='id-3' data-id-added='true'>H</mi>
+                    <mn data-latex='2' id='id-4' data-id-added='true'>2</mn>
+                </msub>
+                <mo data-changed='added' data-chem-formula-op='0' id='id-5' data-id-added='true'>&#x2063;</mo>
+                <mi data-latex='S' data-chem-element='1' id='id-6' data-id-added='true'>S</mi>
+                <mo data-changed='added' data-chem-formula-op='0' id='id-7' data-id-added='true'>&#x2063;</mo>
+                <msub data-latex='O_4' data-chem-formula='1' id='id-8' data-id-added='true'>
+                    <mi data-latex='O' data-chem-element='1' id='id-9' data-id-added='true'>O</mi>
+                    <mn data-latex='4' id='id-10' data-id-added='true'>4</mn>
+                </msub>
+            </mrow>
+        </math>";
+        init_default_prefs(mathml_str, "Enhanced");
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomIn", mathml, "id-2");
+            let speech = test_command("MoveNext", mathml, "id-6");
+            // tables need to check their parent for proper speech
+            assert_eq!(speech, "move right, cap s,");
+            return Ok( () );
+        });
+    }
+
+    #[test]
     fn determinant_speech() -> Result<()> {
         let mathml_str = "<math id='math'>
             <mrow id='mrow'>
@@ -1821,6 +1875,37 @@ mod tests {
         });
     }
 
+    #[test]
+    fn base_superscript() -> Result<()> {
+        // bug #217 -- zoom into base of parenthesized script 
+        let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
+            <msup data-changed='added' id='id-1' data-id-added='true'>
+                <mrow data-changed='added' id='id-2' data-id-added='true'>
+                    <mo stretchy='false' id='id-3' data-id-added='true'>(</mo>
+                    <mrow data-changed='added' id='id-4' data-id-added='true'>
+                        <mn id='id-5' data-id-added='true'>2</mn>
+                        <mo data-changed='added' id='id-6' data-id-added='true'>&#x2062;</mo>
+                        <mi id='id-7' data-id-added='true'>x</mi>
+                    </mrow>
+                    <mo stretchy='false' id='id-8' data-id-added='true'>)</mo>
+                </mrow>
+                <mn id='id-9' data-id-added='true'>2</mn>
+            </msup>
+        </math>";
+        init_default_prefs(mathml_str, "Enhanced");
+        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            let speech = test_command("ZoomIn", mathml, "id-4");
+            // tables need to check their parent for proper speech
+            assert_eq!(speech, "zoom in; in base; 2 x");
+            let speech = test_command("MoveNext", mathml, "id-9");
+            assert_eq!(speech, "move right, in superscript; 2");
+            return Ok( () );
+        });
+    }
+
     
     #[test]
     fn basic_language_test() -> Result<()> {
@@ -1848,6 +1933,7 @@ mod tests {
         test_language("es", mathml_str);
         test_language("id", mathml_str);
         test_language("vi", mathml_str);
+        test_language("zh-tw", mathml_str);
         return Ok( () );
 
         fn test_language(lang: &str, mathml_str: &str) {

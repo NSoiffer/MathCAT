@@ -51,20 +51,31 @@ Timeline:
 * ✓ Nov/Dec: Work on at least one translation of MathCAT to another language (pushed back from late spring). Have Indonesian and Vietnamese translations.
 
 2023
-* Spring 2023: add more inference/speech rules (at least units and currency) [on hold due to Math WG intent discussions continuing]
-* Spring 2023: analyze books to better determine what should be in the Unicode short file (hopefully get someone to help with this)
 * Spring 2023: translation work
   * ✓ Create some tools to simplify generation of the Unicode files in different languages
   * Create some tools to help update other languages when the English version changes (adds new rules) [critical]
   * ✓ Add phrases so better starting points for translations can be generated
-  * Work with translators and fix any problems they might turn up
+  * ✓ Work with translators and fix any problems they might turn up
   * Work with translators to hopefully add many languages (added Spanish translation)
 * ✓ (mostly) Summer 2023: Vietnamese braille code 
-* August: maybe Spanish braille code (potentially French and Portuguese also as they are supposedly similar)
-* Early 2024: work on UEB → MathML translation and explore UEB → Nemeth math translator
-* Fall 2023: potentially work on 2D Nemeth generation along with Nemeth input
-* Early 2024: work on UEB → MathML translation and explore UEB → Nemeth math translator
+* ✓August/Sept: Add CMU braille code (Spanish and Portuguese standard)
 
+2024
+* ✓ Jan: Automatic builds for the various repos
+* Jan: Portuguese translation
+* Winter-Spring: More translations (Swedish and Finnish speech and braille)
+* Feb: Units and Currency
+* Spring: add more inference/speech rules based on W3C's Math WG core list
+* Spring: analyze books to better determine what should be in the Unicode short file (hopefully get someone to help with this)
+* Spring: more translations
+* Spring/Summer/Fall: work on tools to help maintain translations
+* Summer: explore adding ASCIIMath and LaTeX importers (there are Rust packages for these, but I haven't checked quality and completeness)
+* July: vacation 😎 and ICCHP conference
+* Fall: potentially work on UEB → MathML translation and explore UEB → Nemeth math translator
+
+Longer term
+* other braille input
+* potentially work on 2D Nemeth generation along with other braille codes
 
 
 These plans are very tentative and will likely change based on feedback from users and AT developers.
@@ -112,7 +123,7 @@ Rust is quite efficient. On a Core I7-770K machine (higher end processor circa 2
 </math>
 takes about 4ms to generate the ClearSpeak string
 "_e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren squared, end exponent_" along with the Nemeth braille string "⠑⠘⠤⠹⠂⠌⠆⠼⠈⠡⠷⠹⠭⠤⠨⠍⠌⠨⠎⠼⠾⠘⠘⠆".
-This time is split approximately: 2ms to cleanup the MathML + 1ms for speech generation + 1ms for braille generation.
+This time is split approximately: 2ms to cleanup the MathML + 1ms for speech generation + 1ms for braille generation. This includes time to make sure all the rule files are up to date, which turns out is quite expensive. A preference can be set to turn the checks off (the file checks are mainly useful for debugging). With the check turned off, the time drops to 2.3ms.
 <details>
 <summary>Click to see the MathML for this expression</summary>
 <pre>
@@ -172,10 +183,14 @@ Several people helped out in various ways with the project. I am very grateful f
 * Sam Dooley, Murray Sargent, and Volker Sorge -- provided tables of Nemeth translations of characters and Nemeth tests
 
 Translators:
+* Chinese (Traditional) -- Hon-Jang Yang
 * Indonesian -- Dr. Pinta Deniyanti Sampoerno, M.Si; Dr. Meiliasari, S.Pd., M.Sc; and Ari Hendarno, S.Pd., M.kom
 * Spanish -- Noelia Ruiz Martínez (also help with NVDA addon development) and María Allo Roldán
 * Vietnamese -- Dang Hoai Phúc and Trang Pham
 * Others??? -- please volunteer so I can list you here...
+
+The initial translation of many braille characters for braille codes developed in 2024 and beyond was greatly helped by a spreadsheet given to me by Georgious Kouroupetroglou and is the work of a larger team. For more details, see:
+* [MathBrailleCodes Repository](https://access.uoa.gr/mathbraille/index.php/en/), Speech and Accessibility Lab, National and Kapodistrian University of Athens, Greece: P. Riga, T. Antonakopoulou, D. Kouvaras, S. Lentas and G. Kouroupetroglou (2021) “[The BrailleMathCodes Repository](https://access.uoa.gr/mathbraille/index.php/en/)”, Proceedings of the 4th International Workshop on “[Digitization and e-Inclusion in Mathematics and Science 2021](https://workshop.sciaccess.net/deims2021/DEIMS2021_Proceedings.zip)” DEIMS2021, February 18-19, 2021, Tokyo, pp. 105-114. 
 
 Thanks to everyone who volunteered!
 
