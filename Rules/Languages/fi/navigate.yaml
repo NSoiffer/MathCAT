@@ -1386,7 +1386,7 @@
       then:
       - T: "ei voi liikkua vasemmalle"                                   # phrase('cannot move left' in expression)
   - with:
-      variables: [Move2D: "'end of'", Child2D: "$EdgeNode/*[1]"]         # FI: should this be translated?
+      variables: [Move2D: "'loppu'", Child2D: "$EdgeNode/*[1]"]         
       replace: [x: "$EdgeNode"]
   - pause: long
 
