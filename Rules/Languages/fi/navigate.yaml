@@ -207,9 +207,9 @@
         - else_if: "$PreviousNavCommand = 'ZoomOutAll'"
           then: [T: "kumoa täysi zoomaus kauemmas"]                # phrase('undo zooming out all the way')
         - else_if: "$PreviousNavCommand = 'MovePrevious' or $PreviousNavCommand = 'MovePreviousZoom'"
-          then: [T: "kumoa liikkuminen vasemmalle"]                # phrase('undo move left')
+          then: [T: "kumoa liiku vasemmalle"]                # phrase('undo move left')
         - else_if: "$PreviousNavCommand = 'MoveNext' or $PreviousNavCommand = 'MoveNextZoom'"
-          then: [T: "kumoa liikkuminen oikealle"]                  # phrase('undo move right')
+          then: [T: "kumoa liiku oikealle"]                  # phrase('undo move right')
         - else_if: "$PreviousNavCommand = 'None'"
           then: [T: "ei aiempaa komentoa"]                         # phrase('no previous command')
       - pause: "long"
