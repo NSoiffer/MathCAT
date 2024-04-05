@@ -80,6 +80,7 @@ impl Preferences{
     // default values needed in case nothing else gets set 
     fn api_defaults() -> Preferences {
         let mut prefs = PreferenceHashMap::with_capacity(19);
+        prefs.insert("Language".to_string(), Yaml::String("en".to_string()));  // needed when setting LanguageAuto
         prefs.insert("TTS".to_string(), Yaml::String("none".to_string()));
         prefs.insert("Pitch".to_string(), Yaml::Real("0.0".to_string()));
         prefs.insert("Rate".to_string(), Yaml::Real("180.0".to_string()));
