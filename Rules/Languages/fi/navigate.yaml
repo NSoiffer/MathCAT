@@ -201,7 +201,7 @@
         - if: "$PreviousNavCommand = 'ZoomIn'"
           then: [T: "kumoa siirry lähemmäs"]                       # phrase('undo zoom in')
         - else_if: "$PreviousNavCommand = 'ZoomOut'"
-          then: [T: "kumoa siirry kauemmas"]                       # phrase('undo zoom out')
+          then: [T: "kumoa siirry ulommas"]                       # phrase('undo zoom out')
         - else_if: "$PreviousNavCommand = 'ZoomInAll'"
           then: [T: "kumoa sisin taso"]                # phrase('undo zooming in all the way')
         - else_if: "$PreviousNavCommand = 'ZoomOutAll'"
