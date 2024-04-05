@@ -409,7 +409,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
       then: [T: "täysi zoomaus kauemmas", pause: "medium"]            # phrase('zoomed out all the the way')
   - with:
-      variables: [Move2D: "'pois'", Child2D: "."]
+      variables: [Move2D: "'ulos'", Child2D: "."]
       replace: [x: ".."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1"]
@@ -504,7 +504,7 @@
           then: [x: ".."] # auto-zoom: move out a level and retry
           else:
           - with:
-              variables: [Move2D: "'pois'", Child2D: "."] # FI: should this be translated?
+              variables: [Move2D: "'ulos'", Child2D: "."] 
               replace: [x: ".."]
           - test:
               if: "parent::m:mtd"
@@ -1206,7 +1206,7 @@
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'pois'", Child2D: "."]         # FI: should this be translated?
+              variables: [Move2D: "'ulos'", Child2D: "."]         
               replace: [x: ".."]
       - test:
           if: "following-sibling::*"
@@ -1310,7 +1310,7 @@
       if: "preceding-sibling::* and following-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'pois'", Child2D: "."] # FI: should this be translated?
+          variables: [Move2D: "'ulos'", Child2D: "."] 
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
@@ -1555,7 +1555,7 @@
       if: "count(preceding-sibling::*) > 2 and preceding-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'pois'", Child2D: "."]           # FI: should this be translated?
+          variables: [Move2D: "'ulos'", Child2D: "."]           
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
