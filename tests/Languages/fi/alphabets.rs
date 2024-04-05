@@ -6,24 +6,24 @@ use crate::common::*;
 #[test]
 fn special_alphabet_chars() {
   let expr = "<math> <mi>ℌ</mi><mo>,</mo><mi>ℭ</mi></math>";
-  test("en", "SimpleSpeak", expr, "fraktur cap h comma fraktur cap c");
+  test("fi", "SimpleSpeak", expr, "fraktuura iso h pilkku fraktuura iso c");
   let expr = "<math> <mi>ℍ</mi><mo>,</mo><mi>ℿ</mi></math>";
-  test("en", "SimpleSpeak", expr, "double struck cap h comma double struck cap pi");
+  test("fi", "SimpleSpeak", expr, "kaksiviivainen iso h, pilkku kaksiviivainen iso pii");
   let expr = "<math> <mi>ℐ</mi><mo>,</mo><mi>ℳ</mi></math>";
-  test("en", "SimpleSpeak", expr, "script cap i comma script cap m");
+  test("fi", "SimpleSpeak", expr, "kauno iso i pilkku kauno iso m");
 }
 
 #[test]
 fn greek() {
     let expr = "<math> <mi>Α</mi><mo>,</mo><mi>Ω</mi></math>";
-    test("en", "SimpleSpeak", expr, "cap alpha comma cap omega");
+    test("fi", "SimpleSpeak", expr, "iso alfa pilkku iso oomega");
     let expr = "<math> <mi>α</mi><mo>,</mo><mi>ω</mi></math>";
-    test("en", "SimpleSpeak", expr, "alpha comma omega");
+    test("fi", "SimpleSpeak", expr, "alfa pilkku oomega");
     // MathType private space versions
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("en", "SimpleSpeak", expr, "double struck cap delta, comma double struck cap upsilon");
+    test("fi", "SimpleSpeak", expr, "kaksoisviivainen iso delta, pilkku kaksoisviivainen iso ypsilon");
     let expr = "<math> <mi>α</mi><mo>,</mo><mi>ω</mi></math>";
-    test("en", "SimpleSpeak", expr, "alpha comma omega");
+    test("fi", "SimpleSpeak", expr, "alfa pilkku oomega");
 }
 
 #[test]
