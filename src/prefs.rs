@@ -80,7 +80,6 @@ impl Preferences{
     // default values needed in case nothing else gets set 
     fn api_defaults() -> Preferences {
         let mut prefs = PreferenceHashMap::with_capacity(19);
-        // prefs.insert("Language".to_string(), Yaml::String("en".to_string()));  // needed when setting LanguageAuto
         prefs.insert("TTS".to_string(), Yaml::String("none".to_string()));
         prefs.insert("Pitch".to_string(), Yaml::Real("0.0".to_string()));
         prefs.insert("Rate".to_string(), Yaml::Real("180.0".to_string()));
@@ -759,6 +758,16 @@ mod tests {
 
             pref_manager.set_user_prefs("Language", "zz").unwrap();
             assert_eq!(&pref_manager.pref_to_string("Language"), "zz");
+            assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "SimpleSpeak");
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/SimpleSpeak_Rules.yaml"));
+
+            // make sure language stays the same
+            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "ClearSpeak");
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+
+            // make sure language stays the same
+            pref_manager.set_user_prefs("SpeechStyle", "SimpleSpeak").unwrap();
             assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "SimpleSpeak");
             assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/SimpleSpeak_Rules.yaml"));
         });
