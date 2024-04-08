@@ -48,6 +48,7 @@
   tag: mfrac
   match: "."
   replace:
+  - t: "𝐖"
   - test:
       # ASCIIMath treats dx, dy, dz, and dt specially and doesn't require grouping
       if: "*[1][self::m:mi or (self::m:mn and not(contains(., '., '))) or
@@ -66,6 +67,7 @@
       - t: "("
       - x: "*[2]"
       - t: ")"
+  - t: "𝐖"
 
 -
   name: binomial-frac
