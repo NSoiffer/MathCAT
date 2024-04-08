@@ -75,31 +75,31 @@ fn bold_fraktur() {
 #[test]
 fn double_struck() {
     let expr = "<math> <mi>𝔸</mi><mo>,</mo><mi>𝕐</mi></math>";
-    test("en", "SimpleSpeak", expr, "double struck cap eigh, comma double struck cap y");
+    test("fi", "SimpleSpeak", expr, "kaksoisviivainen iso a, pilkku kaksoisviivainen iso y");
     let expr = "<math> <mi>𝕒</mi><mo>,</mo><mi>𝕫</mi></math>";
-    test("en", "SimpleSpeak", expr, "double struck eigh comma double struck z");
+    test("fi", "SimpleSpeak", expr, "kaksoisviivainen a pilkku kaksoisviivainen z");
     let expr = "<math> <mi>𝟘</mi><mo>,</mo><mi>𝟡</mi></math>";
-    test("en", "SimpleSpeak", expr, "double struck 0 comma double struck 9");
+    test("fi", "SimpleSpeak", expr, "kaksoisviivainen 0 pilkku kaksoisviivainen 9");
     // MathType private space versions
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("en", "SimpleSpeak", expr, "double struck cap eigh, comma double struck cap y");
+    test("fi", "SimpleSpeak", expr, "kaksoisviivainen iso a, pilkku kaksoisviivainen iso y");
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("en", "SimpleSpeak", expr, "double struck eigh comma double struck z");
+    test("fi", "SimpleSpeak", expr, "kaksoisviivainen a pilkku kaksoisviivainen z");
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("en", "SimpleSpeak", expr, "double struck 0 comma double struck 9");
+    test("fi", "SimpleSpeak", expr, "kaksoisviivainen 0 pilkku kaksoisviivainen 9");
 }
 
 #[test]
 fn script() {
     let expr = "<math> <mi>𝒜</mi><mo>,</mo><mi>𝒵</mi></math>";
-    test("en", "SimpleSpeak", expr, "script cap eigh comma script cap z");
+    test("fi", "SimpleSpeak", expr, "kauno iso a pilkku kauno iso z");
     let expr = "<math> <mi>𝒶</mi><mo>,</mo><mi>𝓏</mi></math>";
-    test("en", "SimpleSpeak", expr, "script eigh comma script z");
+    test("fi", "SimpleSpeak", expr, "kauno a pilkku kauno z");
     // MathType private space versions
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("en", "SimpleSpeak", expr, "script cap eigh comma script cap z");
+    test("fi", "SimpleSpeak", expr, "kauno iso a pilkku kauno iso z");
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("en", "SimpleSpeak", expr, "script eigh comma script z");
+    test("fi", "SimpleSpeak", expr, "kauno a pilkku kauno z");
 }
 
 #[test]
