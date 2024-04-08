@@ -88,7 +88,6 @@ fn augenbit1_6_8 () {
 #[test]
 fn augenbit1_6_11() {
     // this is a slightly cleaned up version that comes for the original example (via MathJax)
-    init_logger();
     let expr = r#" <math> <mrow>
         <msubsup>
             <mrow></mrow>

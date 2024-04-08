@@ -233,3 +233,9 @@ fn text_and_space() {
     </math>"#;
     test_braille("ASCIIMath", expr, r#"a\ "some text"\ b"#);
 }
+
+#[test]
+fn mixed_fraction() {
+    let expr = r#"<math><mn>2</mn><mfrac><mi>1</mi><mn>2</mn></mfrac></math>"#;
+    test_braille("ASCIIMath", expr, r#"2 1/2"#);
+}
