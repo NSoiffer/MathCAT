@@ -107,12 +107,12 @@ fn bold_script() {
     let expr = "<math> <mi>𝓐</mi><mo>,</mo><mi>𝓩</mi></math>";
     test("en", "SimpleSpeak", expr, "script bold cap eigh comma script bold cap z");
     let expr = "<math> <mi>𝓪</mi><mo>,</mo><mi>𝔃</mi></math>";
-    test("en", "SimpleSpeak", expr, "script bold eigh comma script bold z");
+    test("fi", "SimpleSpeak", expr, "lihavoitu kauno a pilkku lihavoitu kauno z");
     // MathType private space versions
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
     test("en", "SimpleSpeak", expr, "script bold cap eigh comma script bold cap z");
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("en", "SimpleSpeak", expr, "script bold eigh comma script bold z");
+    test("fi", "SimpleSpeak", expr, "lihavoitu kauno a pilkku lihavoitu kauno z");
 }
 
 #[test]
