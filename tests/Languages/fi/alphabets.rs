@@ -29,13 +29,13 @@ fn greek() {
 #[test]
 fn cap_cyrillic() {
     let expr = "<math> <mi>А</mi><mo>,</mo><mi>Я</mi></math>";
-    test("en", "SimpleSpeak", expr, "cap a comma cap ya");
+    test("fi", "SimpleSpeak", expr, "iso a pilkku iso jaa");
 }
 
 #[test]
 fn parenthesized() {
     let expr = "<math> <mi>⒜</mi><mo>,</mo><mi>⒵</mi></math>";
-    test("en", "SimpleSpeak", expr, "parenthesized eigh comma parenthesized z");
+    test("fi", "SimpleSpeak", expr, "suluissa a pilkku suluissa z");
 }
 
 #[test]
@@ -43,33 +43,33 @@ fn circled() {
     let expr = "<math> <mi>Ⓐ</mi><mo>,</mo><mi>Ⓩ</mi></math>";
     test("en", "SimpleSpeak", expr, "circled cap eigh comma circled cap z");
     let expr = "<math> <mi>ⓐ</mi><mo>,</mo><mi>ⓩ</mi></math>";
-    test("en", "SimpleSpeak", expr, "circled eigh comma circled z");
+    test("fi", "SimpleSpeak", expr, "ympyröity a pilkku ympyröity z");
 }
 
 #[test]
 fn fraktur() {
     let expr = "<math> <mi>𝔄</mi><mo>,</mo><mi>𝔜</mi></math>";
-    test("en", "SimpleSpeak", expr, "fraktur cap eigh comma fraktur cap y");
+    test("fi", "SimpleSpeak", expr, "fraktuura iso a pilkku fraktuura iso y");
     let expr = "<math> <mi>𝔞</mi><mo>,</mo><mi>𝔷</mi></math>";
-    test("en", "SimpleSpeak", expr, "fraktur eigh comma fraktur z");
+    test("fi", "SimpleSpeak", expr, "fraktuura a pilkku fraktuura z");
     // MathType private space versions
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("en", "SimpleSpeak", expr, "fraktur cap eigh comma fraktur cap y");
+    test("fi", "SimpleSpeak", expr, "fraktuura iso a pilkku fraktuura iso y");
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("en", "SimpleSpeak", expr, "fraktur eigh comma fraktur z");
+    test("fi", "SimpleSpeak", expr, "fraktuura a pilkku fraktuura z");
 }
 
 #[test]
 fn bold_fraktur() {
     let expr = "<math> <mi>𝕬</mi><mo>,</mo><mi>𝖅</mi></math>";
-    test("en", "SimpleSpeak", expr, "fraktur bold cap eigh, comma fraktur bold cap z");
+    test("fi", "SimpleSpeak", expr, "fraktuura lihavoitu iso a, pilkku fraktuura lihavoitu iso z");
     let expr = "<math> <mi>𝖆</mi><mo>,</mo><mi>𝖟</mi></math>";
-    test("en", "SimpleSpeak", expr, "fraktur bold eigh comma fraktur bold z");
+    test("fi", "SimpleSpeak", expr, "fraktuura lihavoitu a, pilkku fraktuura lihavoitu z");
     // MathType private space versions
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("en", "SimpleSpeak", expr, "fraktur bold cap eigh, comma fraktur bold cap z");
+    test("fi", "SimpleSpeak", expr, "fraktuura lihavoitu iso a, pilkku fraktuura lihavoitu iso z");
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("en", "SimpleSpeak", expr, "fraktur bold eigh comma fraktur bold z");
+    test("fi", "SimpleSpeak", expr, "fraktuura lihavoitu a, pilkku fraktuura lihavoitu z");
 }
 
 #[test]
