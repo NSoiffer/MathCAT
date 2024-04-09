@@ -5,7 +5,7 @@ fn multiplication() {
     let expr = "<math>
                     <mn>2</mn><mo>×</mo><mn>3</mn>
                 </math>";
-    test("en", "ClearSpeak", expr, "2 times 3");
+    test("fi", "ClearSpeak", expr, "2 kertaa 3");
 }
 
 #[test]
@@ -13,7 +13,7 @@ fn multiplication_by() {
     let expr = "<math>
                     <mn>2</mn><mo>×</mo><mn>3</mn>
                 </math>";
-    test_ClearSpeak("en", "ClearSpeak_MultSymbolX", "By", expr, "2 by 3");
+    test_ClearSpeak("fi", "ClearSpeak_MultSymbolX", "By", expr, "2 kertaa 3");
 }
 
 #[test]
@@ -21,7 +21,7 @@ fn multiplication_cross() {
     let expr = "<math>
                     <mi>u</mi><mo>×</mo><mi>v</mi>
                 </math>";
-    test_ClearSpeak("en", "ClearSpeak_MultSymbolX", "Cross", expr, "u cross v");
+    test_ClearSpeak("fi", "ClearSpeak_MultSymbolX", "Cross", expr, "u risti v");
 }
 
 #[test]
@@ -44,7 +44,7 @@ fn ellipses_auto_end() {
             <mo>,</mo>
             <mi>…</mi>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_Ellipses", "Auto", expr, "1 comma 2 comma 3 comma dot dot dot");
+    test_ClearSpeak("fi", "ClearSpeak_Ellipses", "Auto", expr, "1 pilkku 2 pilkku 3 pilkku piste piste piste");
 }
 
 #[test]
@@ -62,8 +62,8 @@ fn ellipses_auto_middle() {
                 <mn>20</mn>
             </mrow>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_Ellipses", "Auto", expr,
-            "1 comma 2 comma 3 comma dot dot dot comma 20");
+    test_ClearSpeak("fi", "ClearSpeak_Ellipses", "Auto", expr,
+            "1 pilkku 2 pilkku 3 pilkku piste piste piste pilkku 20");
 }
 
 #[test]
@@ -135,8 +135,8 @@ fn vertical_line_auto() {
     let expr = "<math>
         <mn>3</mn><mo>|</mo><mn>6</mn>
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Auto", expr,
-            "3 divides 6");
+    test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "Auto", expr,
+            "3 jakaa 6");
 }
 
 #[test]
@@ -144,8 +144,8 @@ fn vertical_line_divides() {
     let expr = "<math>
         <mn>3</mn><mo>|</mo><mn>6</mn>
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Divides", expr,
-            "3 divides 6");
+    test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "Divides", expr,
+            "3 jakaa 6");
 }
 
     #[test]
@@ -153,8 +153,8 @@ fn vertical_line_divides() {
         let expr = "<math>
             <mn>3</mn><mo>|</mo><mn>6</mn>
         </math>";
-        test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Given", expr,
-                "3 given 6");
+        test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "Given", expr,
+                "3 ehdolla 6");
     }
 
     #[test]
@@ -188,8 +188,8 @@ fn vertical_line_set() {
         </mrow>
         <mo>}</mo>    
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Auto", expr,
-            "the set of all x such that x is greater than 0");
+    test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "Auto", expr,
+            "joukko kaikki x siten että x on suurempi kuin 0");
 }
 
 
@@ -206,8 +206,8 @@ fn vertical_line_set_such_that() {
         </mrow>
         <mo>}</mo>    
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "SuchThat", expr,
-            "the set of all x such that x is greater than 0");
+    test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "SuchThat", expr,
+            "joukko kaikki x siten että x on suurempi kuin 0");
 }
 
 #[test]
