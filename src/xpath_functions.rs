@@ -423,22 +423,38 @@ impl ToOrdinal {
         lazy_static! {
             static ref NO_DIGIT: Regex = Regex::new(r"[^\d]").unwrap();    // match anything except a digit
         }
-        SPEECH_DEFINITIONS.with(|definitions| {
+        return SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             let numbers_large = definitions.get_vec("NumbersLarge")?;
-            // check to see if the number is too big or is not an integer or has non-digits
-            if number.is_empty() || number.len() > 3*numbers_large.len() || number.contains(".,") {
+
+            let pref_manager = crate::prefs::PreferenceManager::get();
+            let pref_manager = pref_manager.borrow();
+            let block_separators = pref_manager.pref_to_string("BlockSeparators");
+            let decimal_separator = pref_manager.pref_to_string("DecimalSeparators");
+
+            // check number validity (has digits, not a decimal)
+            if number.is_empty() ||  number.contains(&decimal_separator) {
                 return Some(String::from(number));
             }
-            if NO_DIGIT.is_match(number) {
+            // remove any block separators
+            let number = match clean_number(number, &block_separators) {
+                None => return Some(String::from(number)),
+                Some(num) => num,
+            };
+    
+            // check to see if the number is too big or is not an integer or has non-digits
+            if number.len() > 3*numbers_large.len() {
+                return Some(number);
+            }
+            if NO_DIGIT.is_match(&number) {
                 // this shouldn't have been part of an mn, so likely an error. Log a warning
                 // FIX: log a warning that a non-number was passed to convert()
-                return Some(String::from(number));
+                return Some(number);
             }
 
             // first deal with the abnormalities of fractional ordinals (one half, etc). That simplifies what remains
             if fractional {
-                if let Some(string) = ToOrdinal::compute_irregular_fractional_speech(number, plural) {
+                if let Some(string) = ToOrdinal::compute_irregular_fractional_speech(&number, plural) {
                     return Some(string);
                 }
             }
@@ -532,8 +548,33 @@ impl ToOrdinal {
                 answer = answer + " " + &large_words[num_thousands_at_end];
             }
             return Some(answer);
-        })
+        });
+
+        /// Remove block separators and convert alphanumeric digits to ascii digits
+        fn clean_number(number: &str, block_separators: &str) -> Option<String> {
+            let mut answer = String::with_capacity(number.len());
+            for ch in number.chars() {
+                if block_separators.contains(ch) {
+                    continue;
+                }
+                if ch.is_ascii_digit() {
+                    answer.push(ch);
+                } else {
+                    let shifted_ch = match ch {
+                        '𝟎'..='𝟗' => ch as u32 -'𝟎' as u32 + '0' as u32,
+                        '𝟘'..='𝟡' => ch as u32 -'𝟘' as u32 + '0' as u32,
+                        '𝟢'..='𝟫' => ch as u32 -'𝟢' as u32 + '0' as u32,
+                        '𝟬'..='𝟵' => ch as u32 -'𝟬' as u32 + '0' as u32,
+                        '𝟶'..='𝟿' => ch as u32 -'𝟶' as u32 + '0' as u32,
+                        _ => return None,
+                    };
+                    answer.push(char::from_u32(shifted_ch).unwrap());
+                }
+            }
+            return Some(answer);
+        }
     }
+
 
     fn hundreds_to_words(number: &[usize], words: &[Ref<Vec<String>>; 3]) -> Option<String> {
         assert!( number.len() == 3 );
