@@ -1350,6 +1350,7 @@ mod tests {
         assert_eq!("elevenths", ToOrdinal::convert("11", true, true).unwrap());
         assert_eq!("nineteenths", ToOrdinal::convert("19", true, true).unwrap());
         assert_eq!("twentieths", ToOrdinal::convert("20", true, true).unwrap());
+        assert_eq!("nineteenths", ToOrdinal::convert("𝟏𝟗", true, true).unwrap());
     }
 
     #[test]
