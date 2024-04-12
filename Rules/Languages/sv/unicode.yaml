@@ -241,7 +241,7 @@
  - "–": [T: "tankstreck"]                        #  0x2013 (en: 'en dash')
  - "—": [T: "långt tankstreck"]                  #  0x2014 (en: 'em dash')
  - "―": [T: "horisontellt streck"]                #  0x2015 (en: 'horizontal bar')
- - "‖": [T: "dubbelt lodstreck"]          #  0x2016 (en: 'double vertical line')
+ - "‖": [T: "dubbla lodstreck"]          #  0x2016 (en: 'double vertical line')
  - "…":                                          #  0x2026
     test:
         if:
@@ -275,11 +275,11 @@
  - "℃": [T: "grader celsius"]                    #  0x2103 (en: 'degrees celsius')
  - "℉": [T: "grader fahrenheit"]                 #  0x2109 (en: 'degrees fahrenheit')
  - "ℋℛℓ":                                        #  0x210b
-    - T: "skrivstil"                        #  (en: 'script', google: 'manus')
+    - T: "skrivstilt"                        #  (en: 'script', google: 'manus')
     - spell: "translate('.', 'ℋℛℓ', 'HRl')"
  - "ℎ": [T: "plancks konstant"]                   #  0x210e
  - "ℜ":                                          #  0x211c
-    - T: "frakturstil"                       #  (en: 'fraktur', google: 'fraktur')
+    - T: "fraktur"                       #  (en: 'fraktur', google: 'fraktur')
     - spell: "'R'"
 
  - "Ω": [T: "ohm"]                               #  0x2126 (en: 'ohms')
@@ -289,15 +289,15 @@
     - spell: "translate('.', 'ⅆⅇⅈⅉ', 'deij')"
     - T: "med dubbelstreck kursiv"                     #  (en: 'double-struck italic')
 
- - "←": [T: "vänsterpil"]                    #  0x2190 (en: 'leftwards arrow')
- - "↑": [T: "uppåtpil"]                         #  0x2191 (en: 'upwards arrow')
+ - "←": [T: "vänster-pil"]                    #  0x2190 (en: 'leftwards arrow')
+ - "↑": [T: "uppåt-pil"]                         #  0x2191 (en: 'upwards arrow')
  - "→":                                          #  0x2192
      - test:
         if: "ancestor::*[2][self::m:limit]"
         then: [T: "går mot"]               #  (en: 'approaches', google translation)
-        else: [T: "högerpil"]                #  (en: 'right arrow')
+        else: [T: "höger-pil"]                #  (en: 'right arrow')
 
- - "↓": [T: "neråtpil"]                         #  0x2193 (en: 'downwards arrow')
+ - "↓": [T: "nedåt-pil"]                         #  0x2193 (en: 'downwards arrow')
  - "⇒": [T: "medför"]                 #  0x21d2 (en: 'rightwards double arrow')
  - "∀": [T: "för alla"]                          #  0x2200 (en: 'for all')
  - "∂": [T: "dell"]                                         #  0x2202
@@ -413,9 +413,9 @@
          then: [T: "är"]                         #  (en: 'is', google translation)
      - T: "proportionell mot"                    #  (en: 'proportional to')
  - "∞": [T: "oändligheten"]                        #  0x221e (en: 'infinity')
- - "∟": [T: "höger vinkel"]                      #  0x221f (en: 'right angle')
+ - "∟": [T: "rät vinkel"]                      #  0x221f (en: 'right angle')
  - "∠": [T: "vinkel"]                            #  0x2220 (en: 'angle')
- - "∡": [T: "mätt vinkel"]                       #  0x2221 (en: 'measured angle')
+ - "∡": [T: "uppmätt vinkel"]                       #  0x2221 (en: 'measured angle')
  - "∣": [T: "delar"]                             #  0x2223 (en: 'divides')
  - "∤": [T: "delar inte"]                        #  0x2224 (en: 'does not divide')
  - "∥":                                          #  0x2225
@@ -443,7 +443,7 @@
      - T: "till"                            #  (en: 'to')
  - "∷": [T: "som"]                        #  0x2237 (en: 'as', MathPlayer: 'proportion', google: 'som')
  - "∼": [T: "tilde"]                      #  0x223c (en: 'varies with')
- - "∽": [T: "omvänd tilde"]                     #  0x223d (en: 'reversed tilde')
+ - "∽": [T: "spegelvänd tilde"]                     #  0x223d (en: 'reversed tilde')
  - "∾":                                          #  0x223e
      # - test: 
      #     if: "$Verbosity!='Terse'"
@@ -482,8 +482,8 @@
          if: "$Verbosity!='Terse'"
          then: [T: "är"]                         #  (en: 'is', google translation)
      - T: "större än eller lika med"             #  (en: 'greater than or equal to')
- - "≺": [T: "kommer före"]                       #  0x227a (en: 'precedes')
- - "≻": [T: "kommer efter"]                      #  0x227b (en: 'succeeds')
+ - "≺": [T: "föregår"]                       #  0x227a (en: 'precedes')
+ - "≻": [T: "följer"]                      #  0x227b (en: 'succeeds')
  - "⊂":                                          #  0x2282
      - test: 
          if: "$Verbosity!='Terse'"
