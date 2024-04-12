@@ -5231,7 +5231,6 @@ mod canonicalize_tests {
 
 	#[test]
 	fn digit_block_non_ascii_int() {
-		init_logger();
         let test_str = "<math><mn>𝟏𝟐</mn><mo>,</mo><mn>3𝟰𝟻</mn><mo>+</mo>
 								    <mn>𝟙</mn><mo>,</mo><mn>𝟬𝟬𝟬</mn></math>";
         let target_str = " <math>

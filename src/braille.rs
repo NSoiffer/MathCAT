@@ -2941,7 +2941,6 @@ mod tests {
     // This test probably should be repeated for each braille code and be taken out of here
     fn test_find_mathml_from_braille() -> Result<()> { 
         use std::time::Instant;
-        init_logger();
         let mathml_str = "<math id='id-0'>
         <mrow data-changed='added' id='id-1'>
           <mi id='id-2'>x</mi>
