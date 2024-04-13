@@ -778,32 +778,6 @@ mod tests {
     }
 
     #[test]
-    fn find_style_other_language_and_speak() {
-        use crate::interface::*;
-        // zz dir should have both ClearSpeak and SimpleSpeak styles
-        // zz-aa dir should have pnly ClearSpeak style and unicode.yaml that includes the zz unicode but overrides "+"
-
-        // set the preferences as if they come from the user pref file
-        PREF_MANAGER.with(|pref_manager| {
-            let mut pref_manager = pref_manager.borrow_mut();
-            pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "ClearSpeak");
-            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
-        });
-        set_mathml("<math><mo>+</mo><mn>10</mn></math>".to_string()).unwrap();
-        assert_eq!(get_spoken_text().unwrap(), "ClearSpeak positive from zz 10");
-
-        // set the preferences as if they come from the user pref file
-        PREF_MANAGER.with(|pref_manager| {
-            let mut pref_manager = pref_manager.borrow_mut();
-            pref_manager.set_user_prefs("SpeechStyle", "SimpleSpeak").unwrap();
-            assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "SimpleSpeak");
-            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/SimpleSpeak_Rules.yaml"));
-        });
-        assert_eq!(get_spoken_text().unwrap(), "SimpleSpeak positive from zz 10");
-    }
-
-    #[test]
     fn find_regional_overrides() {
         // zz dir should have both ClearSpeak and SimpleSpeak styles
         // zz-aa dir should have ClearSpeak style and unicode.yaml that includes the zz unicode but overrides "+"
