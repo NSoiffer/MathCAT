@@ -358,7 +358,7 @@ impl PreferenceManager {
         self.speech_defs = PreferenceManager::find_file(language_dir, language, Some("en"), "definitions.yaml")?;
 
         match new_speech_style {
-            Some(style_name) => self.set_style_file(language_dir, language, &style_name)?,
+            Some(style_name) => self.set_style_file(language_dir, language, style_name)?,
             // use the old style name if one isn't given
             None => self.set_style_file(language_dir, language, &self.pref_to_string("SpeechStyle"))?,
         }
