@@ -1875,9 +1875,9 @@ impl FileAndTime {
     }
 
     // used for debugging preference settings
-    // pub fn debug_get_file(&self) -> Option<&str> {
-    //     return self.file.to_str();
-    // }
+    pub fn debug_get_file(&self) -> Option<&str> {
+        return self.file.to_str();
+    }
 
     pub fn new_with_time(file: PathBuf) -> FileAndTime {
         return FileAndTime {
