@@ -339,7 +339,7 @@ impl PreferenceManager {
         let language = self.pref_to_string("Language");
         let language = if language.as_str() == "Auto" {"en"} else {language.as_str()};       // avoid 'temp value dropped while borrowed' error
         let language_dir = rules_dir.to_path_buf().join("Languages");
-        self.set_speech_files(&language_dir, language)?;  // also sets style file
+        self.set_speech_files(&language_dir, language, None)?;  // also sets style file
 
         let braille_code = self.pref_to_string("BrailleCode");
         let braille_dir = rules_dir.to_path_buf().join("Braille");
@@ -347,7 +347,7 @@ impl PreferenceManager {
         return Ok(());
     }
 
-    fn set_speech_files(&mut self, language_dir: &Path, language: &str) -> Result<()> {
+    fn set_speech_files(&mut self, language_dir: &Path, language: &str, new_speech_style: Option<&str>) -> Result<()> {
         self.intent = PreferenceManager::find_file(language_dir, language, Some("en"), "intent.yaml")?;
         self.overview = PreferenceManager::find_file(language_dir, language, Some("en"), "overview.yaml")?;
         self.navigation = PreferenceManager::find_file(language_dir, language, Some("en"), "navigate.yaml")?;
@@ -357,8 +357,11 @@ impl PreferenceManager {
 
         self.speech_defs = PreferenceManager::find_file(language_dir, language, Some("en"), "definitions.yaml")?;
 
-        let style_name = self.pref_to_string("SpeechStyle");
-        self.set_style_file(language_dir, language, &style_name)?;
+        match new_speech_style {
+            Some(style_name) => self.set_style_file(language_dir, language, &style_name)?,
+            // use the old style name if one isn't given
+            None => self.set_style_file(language_dir, language, &self.pref_to_string("SpeechStyle"))?,
+        }
         return Ok( () );
     }
 
@@ -392,13 +395,13 @@ impl PreferenceManager {
         let new_language = new_prefs.prefs.get("Language").unwrap();
         if old_language != new_language {
             let language_dir = self.rules_dir.to_path_buf().join("Languages");
-            self.set_speech_files(&language_dir, new_language.as_str().unwrap())?;  // also sets style file
+            self.set_speech_files(&language_dir, new_language.as_str().unwrap(), None)?;  // also sets style file
         } else {
             let old_speech_style = self.user_prefs.prefs.get("SpeechStyle").unwrap();
             let new_speech_style = new_prefs.prefs.get("SpeechStyle").unwrap();
             let language_dir = self.rules_dir.to_path_buf().join("Languages");
             if old_speech_style != new_speech_style {
-                self.set_speech_files(&language_dir, new_speech_style.as_str().unwrap())?;
+                self.set_speech_files(&language_dir, new_language.as_str().unwrap(), new_speech_style.as_str())?;
             }
         }
 
@@ -448,6 +451,7 @@ impl PreferenceManager {
         let lang_dir = lang_dir.unwrap();
         for os_path in lang_dir.ancestors() {   // ancestor returns self and ancestors
             let path = PathBuf::from(os_path).join(file_name);
+            // debug!("find_file: checking file: {}", path.to_string_lossy());
             if is_file_shim(&path) {
                 // we make an exception for definitions.yaml -- there a language specific checks for Hundreds, etc
                 if !(file_name == "definitions.yaml" && os_path.ends_with("Rules")) {
@@ -617,7 +621,7 @@ impl PreferenceManager {
         let language_dir = self.rules_dir.to_path_buf().join("Languages");
         match changed_pref {
             "Language" => {
-                self.set_speech_files(&language_dir, changed_value)?
+                self.set_speech_files(&language_dir, changed_value, None)?
             },
             "SpeechStyle" => {
                 let language = self.pref_to_string("Language");
@@ -774,10 +778,35 @@ mod tests {
     }
 
     #[test]
+    fn find_style_other_language_and_speak() {
+        use crate::interface::*;
+        // zz dir should have both ClearSpeak and SimpleSpeak styles
+        // zz-aa dir should have pnly ClearSpeak style and unicode.yaml that includes the zz unicode but overrides "+"
+
+        // set the preferences as if they come from the user pref file
+        PREF_MANAGER.with(|pref_manager| {
+            let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
+            assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "ClearSpeak");
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+        });
+        set_mathml("<math><mo>+</mo><mn>10</mn></math>".to_string()).unwrap();
+        assert_eq!(get_spoken_text().unwrap(), "ClearSpeak positive from zz 10");
+
+        // set the preferences as if they come from the user pref file
+        PREF_MANAGER.with(|pref_manager| {
+            let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.set_user_prefs("SpeechStyle", "SimpleSpeak").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "SimpleSpeak");
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/SimpleSpeak_Rules.yaml"));
+        });
+        assert_eq!(get_spoken_text().unwrap(), "SimpleSpeak positive from zz 10");
+    }
+
+    #[test]
     fn find_regional_overrides() {
         // zz dir should have both ClearSpeak and SimpleSpeak styles
         // zz-aa dir should have ClearSpeak style and unicode.yaml that includes the zz unicode but overrides "+"
-        // 
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
@@ -899,5 +928,42 @@ mod tests {
             pref_manager.set_user_prefs("BrailleCode", "UEB").unwrap();
             assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Braille)), PathBuf::from("Braille/UEB/UEB_Rules.yaml"));
         });
+    }
+
+    #[test]
+    #[ignore]   // this is an ugly test for #262 -- it changes the prefs file and so is a bad thing in general
+    fn test_up_to_date() {
+        init_logger();
+        use std::fs;
+        use std::thread::sleep;
+        use std::time::Duration;
+        use crate::interface;
+        PREF_MANAGER.with(|pref_manager| {
+            let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
+            assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "ClearSpeak");
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+        });
+        interface::set_mathml("<math><mo>+</mo><mn>10</mn></math>".to_string()).unwrap();
+        assert_eq!(interface::get_spoken_text().unwrap(), "ClearSpeak positive from zz 10");
+        
+        let mut file_path = PathBuf::default();
+        let mut contents = vec![];
+        PREF_MANAGER.with(|pref_manager| {
+            let pref_manager = pref_manager.borrow();
+            if let Some(file_name) = pref_manager.user_prefs_file.as_ref().unwrap().debug_get_file() {
+                file_path = PathBuf::from(file_name);
+                contents = fs::read(&file_path).expect(&format!("Failed to write file {} during test", file_name));
+                let changed_contents = String::from_utf8(contents.clone()).unwrap()
+                                .replace("SpeechStyle: ClearSpeak", "SpeechStyle: SimpleSpeak");
+                fs::write(&file_path, changed_contents).unwrap();
+                sleep(Duration::from_millis(5));  // make sure the time changes enough to be recognized
+            }
+        });
+        assert_eq!(interface::get_spoken_text().unwrap(), "SimpleSpeak positive from zz 10");
+        fs::write(&file_path, contents).unwrap();
+
+                // assert_eq!(&pref_manager.pref_to_string("SpeechStyle"), "SimpleSpeak");
+                // assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.speech.as_path()), PathBuf::from("Languages/zz/SimpleSpeak_Rules.yaml"));
     }
 }
