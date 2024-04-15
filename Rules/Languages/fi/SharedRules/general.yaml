@@ -518,13 +518,27 @@
   - x: "$LineCount"
   - test:
     - if: "self::m:cases"
-      then: [{T: "tapaus"}]      # phrase(this is the first 'case' of three cases)
+      then: 
+        - test: 
+          - if: "$LineCount != 1"
+            then: [{T: "tapausta"}] # FI: plural, needs test
+            else: [{T: "tapaus"}] # phrase(this is the first 'equation' of three equations)
     - else_if: "self::m:equations"
-      then: [{T: "yhtälö"}]      # phrase(this is the first 'equation' of three equations)
-      else: [{T: "rivi"}]      # phrase(this is the first 'line' of three lines)
-  - test:
-    - if: "$LineCount != 1"
-      then: [{CT: "t"}] # plural # FI: more logic for different plurals, '-t' for now
+      then: 
+        - test: 
+          - if: "$LineCount != 1"
+            then: [{T: "yhtälöä"}] # FI: plural, needs test     
+            else: [{T: "yhtälö"}] # phrase(this is the first 'equation' of three equations)
+      else: 
+        - test: 
+          - if: "$LineCount != 1"
+            then: [{T: "riviä"}] # FI: plural, needs test
+            else: [{T: "rivi"}] # phrase(this is the first 'line' of three lines)
+
+
+  # - test:
+  #   - if: "$LineCount != 1"
+  #     then: [{CT: "t"}] # plural # FI: more logic for different plurals, '-t' for now
   - pause: short
   - x: "*"
 
