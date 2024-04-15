@@ -186,7 +186,7 @@ fn main() {
     panic!("Error: exiting -- {}", errors_to_string(&e));  }
 
   info!("Version = '{}'", get_version());
-  set_preference("Language".to_string(), "en".to_string()).unwrap();
+  set_preference("Language".to_string(), "pt".to_string()).unwrap();
   set_preference("TTS".to_string(), "None".to_string()).unwrap();
   set_preference("Verbosity".to_string(), "Medium,".to_string()).unwrap();
   set_preference("Impairment".to_string(), "Blindness".to_string()).unwrap();

@@ -1977,7 +1977,9 @@ impl CanonicalizeContext {
 				 context.patterns.block_3digit_pattern.is_match(text) ||
 				 context.patterns.block_3_5digit_pattern.is_match(text) ||
 				 context.patterns.block_4digit_hex_pattern.is_match(text) ||
-				 ((text.len() > 5 || context.patterns.decimal_separator.is_match(text)) && context.patterns.block_1digit_pattern.is_match(text)) ) {
+				 ( (text.chars().count() > 5 || context.patterns.decimal_separator.is_match(text)) &&
+				   context.patterns.block_1digit_pattern.is_match(text) )
+				) {
 					return false;
 			}
 
@@ -5222,6 +5224,20 @@ mod canonicalize_tests {
 				<mn>12,345</mn>
 				<mo>+</mo>
 				<mn>1,000</mn>
+				</mrow>
+			</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+	fn digit_block_non_ascii_int() {
+        let test_str = "<math><mn>𝟏𝟐</mn><mo>,</mo><mn>3𝟰𝟻</mn><mo>+</mo>
+								    <mn>𝟙</mn><mo>,</mo><mn>𝟬𝟬𝟬</mn></math>";
+        let target_str = " <math>
+				<mrow data-changed='added'>
+				<mn>𝟏𝟐,3𝟰𝟻</mn>
+				<mo>+</mo>
+				<mn>𝟙,𝟬𝟬𝟬</mn>
 				</mrow>
 			</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));

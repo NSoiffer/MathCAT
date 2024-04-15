@@ -2030,7 +2030,7 @@ fn LaTeX_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
         static ref COLLAPSE_SPACES: Regex = Regex::new(r" +").unwrap();
     }
     debug!("LaTeX_cleanup: start={}", raw_braille);
-    let result = raw_braille.replace("𝐖", " ");
+    let result = raw_braille.replace('𝐖', " ");
     // let result = COLLAPSE_SPACES.replace_all(&raw_braille, "⠀"); 
     let result = COLLAPSE_SPACES.replace_all(&result, " ");
     debug!("After collapse: {}", &result);
@@ -2051,12 +2051,12 @@ fn ASCIIMath_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String)
     }
     debug!("ASCIIMath_cleanup: start={}", raw_braille);
     let result  = raw_braille.replace("|𝐖__|", "|𝐰__|");    // protect the whitespace to prevent misintrepretation as lfloor
-    let result = result.replace("𝐖", " ");
+    let result = result.replace('𝐖', " ");
     let result = COLLAPSE_SPACES.replace_all(&result, " ");
     debug!("After collapse: {}", &result);
     let result = REMOVE_SPACE_BEFORE_OP.replace_all(&result, "$1$2");
     let result = REMOVE_SPACE_AFTER_OP.replace_all(&result, "$1$2");
-    let result = result.replace("𝐰", " ");     // spaces around relational operators
+    let result = result.replace('𝐰', " ");     // spaces around relational operators
     let result = COLLAPSE_SPACES.replace_all(&result, " ");
     debug!("After remove: {}", &result);
     // let result = result.trim_matches('⠀');
@@ -2941,7 +2941,6 @@ mod tests {
     // This test probably should be repeated for each braille code and be taken out of here
     fn test_find_mathml_from_braille() -> Result<()> { 
         use std::time::Instant;
-        init_logger();
         let mathml_str = "<math id='id-0'>
         <mrow data-changed='added' id='id-1'>
           <mi id='id-2'>x</mi>
