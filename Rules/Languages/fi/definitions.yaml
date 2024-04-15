@@ -107,7 +107,7 @@
 # FI: these are used for the denominator of a fraction when the numerator is larger than 1.
 # FI: not ordinals in Finnish. For example: 'tuhannesosaa', means 'thousandth part' in partitive form.
 - NumbersOrdinalPluralHundreds: [
-    "", "sadasosa", "kahdessadasosaa", "kolmassadasosaa", "neljässadasosaa", "viidessadasosaa",
+    "", "sadasosaa", "kahdessadasosaa", "kolmassadasosaa", "neljässadasosaa", "viidessadasosaa",
       "kuudessadasosaa", "seitsemässadasosaa", "kahdeksassadasosaa", "yhdeksässadasosaa"
   ]
 
