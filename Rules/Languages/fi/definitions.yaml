@@ -24,7 +24,6 @@
 # The definitions for the "ones" should extend until a regular pattern begins
 #   The minimum length is 10.
 
-# For Finnish the regular pattern starts at... where?
 - NumbersOnes: [
       "nolla", "yksi", "kaksi", "kolme", "neljä", "viisi", "kuusi", "seitsemän", "kahdeksan", "yhdeksän",
       "kymmenen", "yksitoista", "kaksitoista", "kolmetoista", "neljätoista", "viisitoista", "kuusitoista",
@@ -37,37 +36,36 @@
       "seitsemästoista", "kahdeksastoista", "yhdeksästoista"
   ]
 
-     # check translation, should it be done differently?
+# FI: not used in Finnish in the way implemented in MathCAT
 # - NumbersOrdinalPluralOnes: [
 #          "nolla", "ensimmäiset", "toiset", "kolmannet", "neljännet", "viidennet", "kuudennet", "seitsemännet", "kahdeksannet", "yhdeksännet",
 #          "kymmenennet", "yhdennettoista", "kahdennettoista", "kolmannettoista", "neljännettoista", "viidennettoista", "kuudennettoista",
 #          "seitsemännettoista", "kahdeksannettoista", "yhdeksännettoista"
 #   ]
 
-     # FI: proper try for translation. Assuming that all of these are only used for fractions.
+# FI: these are used for the denominator of a fraction
 - NumbersOrdinalPluralOnes: [
       "nollannes", "ensimmäinen", "kahdesosaa", "kolmasosaa", "neljäsosaa", "viidesosaa", "kuudesosaa", "seitsemäsosaa", "kahdeksasosaa", "yhdeksäsosaa",
       "kymmenesosaa", "yhdestoistaosaa", "kahdestoistaosaa", "kolmastoistaosaa", "neljästoistaosaa", "viidestoistaosaa", "kuudestoistaosaa",
       "seitsemästoistaosaa", "kahdeksastoistaosaa", "yhdeksästoistaosaa"
   ]
 
-    # stop when regularity begins
-    # FI: says "one whole" in Finnish when it's 1/1
+# stop when regularity begins
+# FI: these are used for the denominator of a fraction
+# FI: says "one whole" in Finnish when it's 1/1
 - NumbersOrdinalFractionalOnes: [
       "nollasosa", "kokonainen", "kahdesosa", "kolmasosa", "neljäsosa", "viidesosa", "kuudesosa", "seitsemäsosa", "kahdeksasosa", "yhdeksäsosa",
       "kymmenesosa", "yhdestoistaosa", "kahdestoistaosa", "kolmastoistaosa", "neljästoistaosa", "viidestoistaosa", "kuudestoistaosa",
       "seitsemästoistaosa", "kahdeksastoistaosa", "yhdeksästoistaosa"
   ]
 
-    # stop when regularity begins
+# stop when regularity begins
 - NumbersOrdinalFractionalPluralOnes: [
       "nollannesosaa", "kokonainen", "kahdesosaa", "kolmasosaa", "neljäsosaa", "viidesosaa", "kuudesosaa", "seitsemäsosaa", "kahdeksasosaa", "yhdeksäsosaa",
       "kymmenesosaa", "yhdestoistaosaa", "kahdestoistaosaa", "kolmastoistaosaa", "neljästoistaosaa", "viidestoistaosaa", "kuudestoistaosaa",
       "seitsemästoistaosaa", "kahdeksastoistaosaa", "yhdeksästoistaosaa"
   ]
 
-
-    # What to use for multiples of 10
 - NumbersTens: [
       "", "kymmenen", "kaksikymmentä", "kolmekymmentä", "neljäkymmentä", "viisikymmentä", "kuusikymmentä", "seitsemänkymmentä", "kahdeksankymmentä", "yhdeksänkymmentä"
   ]
@@ -76,12 +74,12 @@
     "", "kymmenes", "kahdeskymmenes", "kolmaskymmenes", "neljäskymmenes", "viideskymmenes", "kuudeskymmenes", "seitsemäskymmenes", "kahdeksaskymmenes", "yhdeksäskymmenes"
   ]
 
-#     FI: these are not used in this context in Finnish almost at all
+# FI: not used in Finnish in the way implemented in MathCAT
 # - NumbersOrdinalPluralTens: [
 #          "", "kymmenennet", "kahdetkymmenennet", "kolmetkymmenennet", "neljätkymmenennet", "viidetkymmenennet", "kuudetkymmenennet", "seitsemätkymmenennet", "kahdeksatkymmenennet", "yhdeksätkymmenennet"
 #   ]
 
-# FI: assuming that these are only used in fractions
+# FI: these are used for the denominator of a fraction
 - NumbersOrdinalPluralTens: [
     "", "kymmenesosaa", "kahdeskymmenesosaa", "kolmaskymmenesosaa", "neljäskymmenesosaa", "viideskymmenesosaa", "kuudeskymmenesosaa", "seitsemäskymmenesosaa", "kahdesaskymmenesosaa", "yhdeksäskymmenesosaa"
   ]
@@ -97,24 +95,21 @@
       "kuudessadas", "seitsemässadas", "kahdeksassadas", "yhdeksässadas"
   ]
 
-#     FI: not used in Finnish in this context
+# FI: not used in Finnish in the way implemented in MathCAT
 # - NumbersOrdinalPluralHundreds: [
 #        "", "sadannet", "kahdet sadannet", "kolmet sadannet", "neljät sadannet", "viidet sadannet",
 #          "kuudet sadannet", "seitsemät sadannet", "kahdeksat sadannet", "yhdeksät sadannet"
 #   ]
 
+# FI: these are used in the denominator of a fraction, not ordinals. For example: 'sadasosa' means 'hundreth part'
 - NumbersOrdinalPluralHundreds: [
     "", "sadasosa", "kahdessadasosaa", "kolmassadasosaa", "neljäsadasosaa", "viidessadasosaa",
       "kuudessadasosaa", "seitsemässadasosaa", "kahdeksassadasosaa", "yhdeksässadasosaa"
   ]
 
-      
 
-    # At this point, hopefully the language is regular. If not, code needs to be written
-
-    # Is Finnish regular when it comes to this point? Requires thinking. At least "kolme tuhatta" is missing.
-
-    # In Finnish, the long scale is used. Should it be skipped or added as "thousand billions"?
+# Is Finnish regular when it comes to this point? Requires thinking. At least "kolme tuhatta" is missing.
+# FI: the long scale is used in Finnish.
 - NumbersLarge: [
     "", "tuhat", "miljoona", "miljardi", "biljoona", "tuhat biljoonaa",
     "triljoona", "tuhat triljoonaa", "kvadriljoona", "tuhat kvadriljoonaa", "kvintiljoona",
@@ -125,13 +120,13 @@
     "triljoonas", "tuhannes triljoonas", "kvadriljoonas", "tuhannes kvadriljoonas", "kvintiljoonas"
   ]
       
-#      # confusing, I don't get it
+# FI: not used in Finnish in the way implemented in MathCAT
 # - NumbersOrdinalPluralLarge: [
 #          "", "tuhannet", "miljoonannet", "miljardinnet", "tuhannet biljoonannet", "kvadriljoonasosat",
 #          "miljoonasosat", "kuusimiljoonasosat", "septimiljardisosat", "oktilliososat", "ei-miljoonasosat"
 #     ]
 
-         # confusing, I don't get it
+# FI: these are used in the denominator of a fraction, not ordinals. For example: 'tuhannesosaa', means 'thousandth part'.
 - NumbersOrdinalPluralLarge: [
     "", "tuhannesosaa", "miljoonasosaa", "miljardisosaa", "biljoonasosaa", "tuhannes biljoonasosaa",
     "triljoonasosaa", "tuhannes triljoonasosaa", "kvadriljoonasosaa", "tuhannes kvadriljoonasosaa", "kvintiljoonasosaa"
