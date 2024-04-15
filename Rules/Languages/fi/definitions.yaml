@@ -103,7 +103,7 @@
 
 # FI: these are used in the denominator of a fraction, not ordinals. For example: 'sadasosa' means 'hundreth part'
 - NumbersOrdinalPluralHundreds: [
-    "", "sadasosa", "kahdessadasosaa", "kolmassadasosaa", "neljäsadasosaa", "viidessadasosaa",
+    "", "sadasosa", "kahdessadasosaa", "kolmassadasosaa", "neljässadasosaa", "viidessadasosaa",
       "kuudessadasosaa", "seitsemässadasosaa", "kahdeksassadasosaa", "yhdeksässadasosaa"
   ]
 
