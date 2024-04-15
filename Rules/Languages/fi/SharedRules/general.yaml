@@ -536,7 +536,7 @@
             else: [{T: "rivi"}] # phrase(this is the first 'line' of three lines)
   # - test:
   #   - if: "$LineCount != 1"
-  #     then: [{CT: "t"}] # plural # FI: more logic for different plurals, '-t' for now
+  #     then: [{CT: "t"}] # plural
   - pause: short
   - x: "*"
 
