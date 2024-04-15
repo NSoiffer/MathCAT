@@ -136,7 +136,7 @@
         - if: "$SpeechStyle != 'ClearSpeak' or not(preceding-sibling::*) or not(following-sibling::*)"
           then: [T: "pystysuora viiva"]         	# 	(en: 'vertical line', google translation)
         - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
-          then: [T: "jolle pätee"]                	# 	(en: 'such that', google translation)
+          then: [T: "siten että"]                	# 	(en: 'such that', google translation)
         - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
           then: [T: "ehdolla"]                  	# 	(en: 'given', google translation)
         - else: [T: "jakaa"]               	        # 	(en: 'divides', google: 'jakaa')
