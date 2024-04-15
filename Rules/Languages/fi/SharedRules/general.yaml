@@ -110,7 +110,7 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - T: "yli"      # phrase(you can 'choose' a number at random) # FI: what does the phrase mean? Translation now means '1 choose 2'
+  - T: "yli"      # phrase(you can 'choose' a number at random)
   - x: "*[2]"
 
 - name: permutation
