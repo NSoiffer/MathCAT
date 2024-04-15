@@ -488,12 +488,12 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "är en"]                      #  (en: 'is a', google translation)
-     - T: "äkta delmängd av"                     #  (en: 'subset of')
+     - T: "delmängd av"                     #  (en: 'subset of')
  - "⊃":                                          #  0x2283
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "är en"]                      #  (en: 'is a', google translation)
-     - T: "äkta övermängd till"                     #  (en: 'superset of')
+     - T: "övermängd till"                     #  (en: 'superset of')
  - "⊄":                                          #  0x2284
      - test: 
          if: "$Verbosity!='Terse'"

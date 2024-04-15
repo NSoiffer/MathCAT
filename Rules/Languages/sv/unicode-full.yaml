@@ -607,9 +607,9 @@
  - "⇏": [T: "struken dubbel-streckad höger-pil"]           #  0x21cf    (en: 'rightwards double arrow with stroke')
  - "⇐": [T: "dubbel-streckad vänster-pil"]                 #  0x21d0    (en: 'leftwards double arrow')
  - "⇑": [T: "dubbel-streckad uppåt-pil"]                      #  0x21d1    (en: 'upwards double arrow')
- - "⇒": [T: "dubbel-streckad höger-pil"]                   #  0x21d2    (en: 'rightwards double arrow')
+ - "⇒": [T: "medför"]                   #  0x21d2    (en: 'rightwards double arrow')
  - "⇓": [T: "dubbel-streckad nedåt-pil"]                      #  0x21d3    (en: 'downwards double arrow')
- - "⇔": [T: "dubbel-streckad dubbel-riktad pil"]       #  0x21d4    (en: 'left right double arrow')
+ - "⇔": [T: "är ekvivalent med"]       #  0x21d4    (en: 'left right double arrow')
  - "⇕": [T: "dubbel-streckad dubbel-riktad vertikal pil"]            #  0x21d5    (en: 'up down double arrow')
  - "⇖": [T: "dubbel-streckad pil åt nord-väst"]                #  0x21d6    (en: 'north west double arrow')
  - "⇗": [T: "dubbel-streckad pil åt nord-ost"]                 #  0x21d7    (en: 'north east double arrow')
@@ -827,7 +827,7 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "är"]                            #     (en: 'is', google translation)
-     - t: "homotetisk"                              #     (en: 'homothetic to', MathPlayer: 'homothetic', google: 'homotetisk till')
+     - t: "homotetisk till"                              #     (en: 'homothetic to', MathPlayer: 'homothetic', google: 'homotetisk till')
  - "∼": [T: "är proportionell mot"]                       #  0x223c    (en: 'varies with')
  - "∽": [T: "är proportionell mot"]                        #  0x223d    (en: 'reversed tilde')
  - "∾":                                             #  0x223e
@@ -890,7 +890,7 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "är"]                            #     (en: 'is', google translation)
-     - T: "är geometriskt ekvivalent med"                 #     (en: 'geometrically equivalent to', MathPlayer: 'geometriskt lika med', google: 'geometriskt motsvarande')
+     - T: "geometriskt ekvivalent med"                 #     (en: 'geometrically equivalent to', MathPlayer: 'geometriskt lika med', google: 'geometriskt motsvarande')
  - "≏":                                             #  0x224f
     # - test: 
     #     if: "$Verbosity!='Terse'"
@@ -1220,13 +1220,13 @@
     # - test: 
     #     if: "$Verbosity!='Terse'"
     #     then: [t: "är"]                            #     (en: 'is', google translation)
-     - T: "vänster semi-direkt product"              #     (en: 'the left semidirect product of')
+     - T: "vänster semi-direkt produkt"              #     (en: 'the left semidirect product of')
  - "⋌":                                             #  0x22cc
     # - test: 
     #     if: "$Verbosity!='Terse'"
     #     then: [t: "är"]                            #     (en: 'is', google translation)
      - T: "höger semi-direkt produkt"                #     (en: 'the right semidirect product of')
- - "⋍": [T: "omvänt tilde lika med"]                #  0x22cd    (en: 'reversed tilde equals')
+ - "⋍": [T: "asymptotiskt lika med"]                #  0x22cd    (en: 'reversed tilde equals')
  - "⋎": [T: "disjunktion"]                     #  0x22ce
  - "⋏": [T: "konjunktion"]                    #  0x22cf    (en: 'curly logical and')
  - "⋐":                                             #  0x22d0
@@ -1253,7 +1253,7 @@
     # - test: 
     #     if: "$Verbosity!='Terse'"
     #     then: [t: "de"]                            #     (en: 'the', google translation)
-     - T: "äkta snittet av"                                #     (en: 'proper intersection of', MathPlayer: 'pitchfork', google: 'korrekt skärningspunkt av')
+     - T: "äkta snittet"                                #     (en: 'proper intersection of', MathPlayer: 'pitchfork', google: 'korrekt skärningspunkt av')
  - "⋕":                                             #  0x22d5
     # - test: 
     #     if: "$Verbosity!='Terse'"
@@ -1875,7 +1875,7 @@
  - "⥽": [T: "fisk-stjärt åt höger"]                  #  0x297d    (en: 'right fish tail')
  - "⥾": [T: "fisk-stjärt uppåt"]         #  0x297e    (en: 'up fish tail')
  - "⥿": [T: "fisk-stjärt nedåt"]                     #  0x297f    (en: 'down fish tail')
- - "⦀": [T: "trippla vertikala streck"]             #  0x2980    (en: 'triple vertical bar delimiter', google: 'trippel vertikal bar avgränsare')
+ - "⦀": [T: "trippla lodstreck"]             #  0x2980    (en: 'triple vertical bar delimiter', google: 'trippel vertikal bar avgränsare')
  - "⦁": [T: "punkt z-notation"]              #  0x2981    (en: 'z notation spot', google: 'z notation spot')
  - "⦂": [T: "kolon z-notation"]              #  0x2982    (en: 'z notation type colon', google: 'z notationstyp kolon')
  - "⦃": [T: "vänster vit klammer-parentes"]                  #  0x2983    (en: 'left white brace', google: 'vänster vit stag')
@@ -1978,7 +1978,7 @@
  - "⧤": [t: "lika med och lutande parallel med tilde över"]    #  0x29e4    (en: 'equals sign and slanted parallel with tilde above')
  - "⧥": [t: "identisk med och lutande parallell"]        #  0x29e5    (en: 'identical to and slanted parallel')
  - "⧦": [t: "lika med med vertikala streck vid ändarna"]                         #  0x29e6
- - "⧧": [t: "termodynamik"]                         #  0x29e7    (en: 'thermodynamic', google: 'termodynamisk')
+ - "⧧": [t: "termodynamisk"]                         #  0x29e7    (en: 'thermodynamic', google: 'termodynamisk')
  - "⧨": [T: "triangel nedåt vänster halva fylld"]    #  0x29e8    (en: 'down pointing triangle with left half black', google: 'ner pekande triangel med vänster halvsvart')
  - "⧩": [T: "triangel nedåt höger halva fylld"]    #  0x29e9    (en: 'down pointing triangle with right half black', google: 'ner pekande triangel med höger halvsvart')
  - "⧪": [T: "fylld diamant med nedåt-pil"]           #  0x29ea    (en: 'black diamond with down arrow', google: 'svart diamant med nedpil')
@@ -2088,8 +2088,8 @@
  - "⩒": [T: "eller med prick över"]    #  0x2a52    (en: 'logical or with dot above', google: 'logisk eller med punkt ovan')
  - "⩓": [T: "dubbla och"]                   #  0x2a53    (en: 'double logical and')
  - "⩔": [T: "dubbla eller"]                    #  0x2a54    (en: 'double logical or')
- - "⩕": [T: "två överlappande och"]             #  0x2a55    (en: 'two intersecting logical and')
- - "⩖": [T: "två överlappande eller"]           #  0x2a56    (en: 'two intersecting logical or')
+ - "⩕": [T: "två och-tecken"]             #  0x2a55    (en: 'two intersecting logical and')
+ - "⩖": [T: "två eller-tecken"]           #  0x2a56    (en: 'two intersecting logical or')
  - "⩗": [T: "sluttande eller"]                #  0x2a57    (en: 'sloping large or')
  - "⩘": [T: "sluttande och"]                  #  0x2a58    (en: 'sloping large and')
  - "⩙": [T: "och som överlappar med eller"]    #  0x2a59    (en: 'logical or overlapping logical and', google: 'logisk eller överlappande logisk och')
@@ -2232,7 +2232,7 @@
  - "⫢": [T: "trippelt vändkors"]    #  0x2ae2    (en: 'vertical bar triple right turnstile', google: 'vertikal bar trippel höger turnstile')
  - "⫣": [T: "spegelvänt vändkors med vertikalt streck"]    #  0x2ae3    (en: 'double vertical bar left turnstile', google: 'dubbel vertikal stång vänster turnstile')
  - "⫤": [T: "dubbelt spegelvänt vändkors"]    #  0x2ae4    (en: 'vertical bar double left turnstile')
- - "⫥": [T: "dubbelslagett spegelvänt vändkors"]    #  0x2ae5    (en: 'double vertical bar double left turnstile', google: 'dubbel vertikal stång dubbel vänster vridstil')
+ - "⫥": [T: "dubbelslaget spegelvänt vändkors"]    #  0x2ae5    (en: 'double vertical bar double left turnstile', google: 'dubbel vertikal stång dubbel vänster vridstil')
  - "⫦": [T: "vändkors med vertikalt streck på"]    #  0x2ae6    (en: 'long dash from left member of double vertical')
  - "⫧": [T: "nedåtroterat kort vändkors med horisontellt streck över"]           #  0x2ae7    (en: 'short down tack with overbar')
  - "⫨": [T: "uppåtroterat kort vändkors med horisontellt streck under"]               #  0x2ae8    (en: 'short up tack with underbar')
@@ -2247,8 +2247,8 @@
  - "⫱": [T: "nedåtroterat vändkors circle below"]            #  0x2af1    (en: 'down tack with circle below')
  - "⫲": [T: "parallell med horisontellt streck"]     #  0x2af2    (en: 'parallel with horizontal stroke')
  - "⫳": [T: "parallell med tilde"]         #  0x2af3    (en: 'parallel with tilde operator')
- - "⫴": [T: "trippla vertikala streck"]             #  0x2af4    (en: 'triple vertical bar binary relation', google: 'trippel vertikal bar binär relation')
- - "⫵": [T: "trippla vertikala streck med horisontellt streck"]    #  0x2af5    (en: 'triple vertical bar with horizontal stroke', google: 'trippel vertikal stång med horisontellt slag')
+ - "⫴": [T: "trippla lodstreck"]             #  0x2af4    (en: 'triple vertical bar binary relation', google: 'trippel vertikal bar binär relation')
+ - "⫵": [T: "trippla lodstreck med horisontellt streck"]    #  0x2af5    (en: 'triple vertical bar with horizontal stroke', google: 'trippel vertikal stång med horisontellt slag')
  - "⫶": [T: "trippelkolon"]                         #  0x2af6    (en: 'triple colon operator', google: 'trippel kolonoperatör')
  - "⫷": [T: "trippla mindre än"]      #  0x2af7    (en: 'triple nested less than', google: 'trippel kapslade mindre än')
  - "⫸": [T: "trippla större än"]      #  0x2af8    (en: 'triple nested greater than', google: 'trippel kapslad större än')
@@ -2840,7 +2840,7 @@
  - "": [t: "dubbel-pil nord-ost syd-ost"]             #  0xeb3f    (en: 'double arrow northeast southeast', google translation)
  - "": [t: "moturs pil i halvcircel åt vänster"]       #  0xeb40    (en: 'anticlockwise left semicircle arrow', google translation)
  - "": [t: "medurs pil i halvcirkel åt vänster"]         #  0xeb41    (en: 'clockwise left semicircle arrow', google translation)
- - "": [t: "dubbelriktad pil i vänster öppen cirkel"]    #  0xeb42    (en: 'left open circle left right arrow', google translation)
+ - "": [t: "dubbel-riktad pil i vänster öppen cirkel"]    #  0xeb42    (en: 'left open circle left right arrow', google translation)
  - "": [t: "höger-pil över tilde"]                #  0xeb44    (en: 'rightwards arrow over tilde', google translation)
  - "": [t: "vänster-pil över tilde"]               #  0xeb45    (en: 'leftwards arrow over tilde', google translation)
  - "": [t: "vänster harpun över streck"]             #  0xeb48    (en: 'leftwards harpoon over bar', google translation)
@@ -2850,7 +2850,7 @@
  - "": [t: "ihoptryckt vänster-pil"]              #  0xeb4c    (en: 'squat black leftwards arrow', google translation)
  - "": [t: "medurs höger halvcirkel-pil"]           #  0xeb50    (en: 'clockwise right semicircle arrow', google translation)
  - "": [t: "moturs höger halvcirkel-pil"]         #  0xeb51    (en: 'anticlockwise right semicircle arrow', google translation)
- - "": [t: "dubbelriktad pil i vänster öppen cirkel"]    #  0xeb52    (en: 'left open circle left right harpoon', google translation)
+ - "": [t: "dubbel-riktad pil i vänster öppen cirkel"]    #  0xeb52    (en: 'left open circle left right harpoon', google translation)
  - "": [t: "uppåt-pil till vänster om vertikalt streck"]    #  0xeb58    (en: 'upwards arrow leftwards of vertical bar', google translation)
  - "": [t: "nedåt-pil till vänster om vertikalt streck"]    #  0xeb59    (en: 'downwards arrow leftwards of vertical bar', google translation)
  - "": [t: "uppåt-pil till höger om vertikalt streck"]    #  0xeb5a    (en: 'upwards arrow rightwards of vertical bar', google translation)
@@ -2865,7 +2865,7 @@
  - "": [t: "nedåt harpun till vänster om vertikalt streck"]    #  0xeb69    (en: 'downwards harpoon leftwards of vertical bar', google translation)
  - "": [t: "uppåt harpun till höger om vertikalt streck"]    #  0xeb6a    (en: 'upwards harpoon rightwards of vertical bar', google translation)
  - "": [t: "nedåt harpun till höger om vertikalt streck"]    #  0xeb6b    (en: 'downwards harpoon rightwards of vertical bar', google translation)
- - "": [t: "vertikal dubbelriktad pil förlängare"]         #  0xeb6c    (en: 'vertical double arrow extender', google translation)
+ - "": [t: "vertikal dubbel-riktad pil förlängare"]         #  0xeb6c    (en: 'vertical double arrow extender', google translation)
  - "": [t: "vertikal harpun med hulling vänster förlängare"]    #  0xeb6d    (en: 'vertical harpoon with barb left extender', google translation)
  - "": [t: "vertikal harpun med hulling höger förlängare"]    #  0xeb6e    (en: 'vertical harpoon with barb right extender', google translation)
  - "": [t: "höger harpun över vänster harpun höger"]    #  0xeb6f    (en: 'right harpoon over left harpoon right', google translation)
@@ -2873,7 +2873,7 @@
  - "": [t: "vänster harpun över höger harpun höger"]    #  0xeb71    (en: 'left harpoon over right harpoon right', google translation)
  - "": [t: "vänster harpun över höger harpun vänster"]    #  0xeb72    (en: 'left harpoon over right harpoon left', google translation)
  - "": [t: "vänster-pil från streck pilspets"]       #  0xeb73    (en: 'leftwards arrow from bar arrowhead', google translation)
- - "": [t: "dubbelriktad pil från streck förlängare"]    #  0xeb74    (en: 'leftwards rightwards arrow from bar extender', google translation)
+ - "": [t: "dubbel-riktad pil från streck förlängare"]    #  0xeb74    (en: 'leftwards rightwards arrow from bar extender', google translation)
  - "": [t: "vänster-pil från streck med svans"]            #  0xeb75    (en: 'leftwards arrow from bar tail', google translation)
  - "": [t: "höger-pil från streck med svans"]             #  0xeb76    (en: 'rightwards arrow from bar tail', google translation)
  - "": [t: "höger-pil från streck pilspets"]        #  0xeb77    (en: 'rightwards arrow from bar arrowhead', google translation)
@@ -2897,7 +2897,7 @@
  - "": [t: "nedåt-pil till vänster om pilspets uppåt"]     #  0xeb89    (en: 'downwards arrow leftwards of upwards arrow top', google translation)
  - "": [t: "uppåt-pil till vänster om pilspets nedåt"]    #  0xeb8a    (en: 'upwards arrow leftwards of downwards arrow top', google translation)
  - "": [t: "nedåt-pil till vänster om pilspets uppåt"]    #  0xeb8b    (en: 'downwards arrow leftwards of upwards arrow bottom', google translation)
- - "": [t: "dubbelriktad pil förlängare"]     #  0xeb8c    (en: 'leftwards rightwards arrows extender', google translation)
+ - "": [t: "dubbel-riktad pil förlängare"]     #  0xeb8c    (en: 'leftwards rightwards arrows extender', google translation)
  - "": [t: "nord-ost-pil förlängare"]            #  0xeb8d    (google translation)
  - "": [t: "nord-väst-pil förlängare"]            #  0xeb8e    (google translation)
  - "": [t: "nedåt-pekande klammer-parentes vänster"]                #  0xec00    (en: 'down pointing brace left', google translation)
