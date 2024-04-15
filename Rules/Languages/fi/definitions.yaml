@@ -43,7 +43,8 @@
 #          "seitsemännettoista", "kahdeksannettoista", "yhdeksännettoista"
 #   ]
 
-# FI: these are used for the denominator of a fraction
+# FI: these are used for the denominator of a fraction when the numerator is larger than 1
+# FI: not ordinals in Finnish. For example: 'tuhannesosaa', means 'thousandth part' in partitive form.
 - NumbersOrdinalPluralOnes: [
       "nollannes", "ensimmäinen", "kahdesosaa", "kolmasosaa", "neljäsosaa", "viidesosaa", "kuudesosaa", "seitsemäsosaa", "kahdeksasosaa", "yhdeksäsosaa",
       "kymmenesosaa", "yhdestoistaosaa", "kahdestoistaosaa", "kolmastoistaosaa", "neljästoistaosaa", "viidestoistaosaa", "kuudestoistaosaa",
@@ -51,7 +52,7 @@
   ]
 
 # stop when regularity begins
-# FI: these are used for the denominator of a fraction
+# FI: not ordinals in Finnish. For example: 'kahdesosa', means 'second part'.
 # FI: says "one whole" in Finnish when it's 1/1
 - NumbersOrdinalFractionalOnes: [
       "nollasosa", "kokonainen", "kahdesosa", "kolmasosa", "neljäsosa", "viidesosa", "kuudesosa", "seitsemäsosa", "kahdeksasosa", "yhdeksäsosa",
@@ -60,6 +61,7 @@
   ]
 
 # stop when regularity begins
+# FI: not ordinals in Finnish. For example: 'kahdesosaa', means 'second part' in partitive form.
 - NumbersOrdinalFractionalPluralOnes: [
       "nollannesosaa", "kokonainen", "kahdesosaa", "kolmasosaa", "neljäsosaa", "viidesosaa", "kuudesosaa", "seitsemäsosaa", "kahdeksasosaa", "yhdeksäsosaa",
       "kymmenesosaa", "yhdestoistaosaa", "kahdestoistaosaa", "kolmastoistaosaa", "neljästoistaosaa", "viidestoistaosaa", "kuudestoistaosaa",
@@ -79,7 +81,8 @@
 #          "", "kymmenennet", "kahdetkymmenennet", "kolmetkymmenennet", "neljätkymmenennet", "viidetkymmenennet", "kuudetkymmenennet", "seitsemätkymmenennet", "kahdeksatkymmenennet", "yhdeksätkymmenennet"
 #   ]
 
-# FI: these are used for the denominator of a fraction
+# FI: these are used for the denominator of a fraction when the numerator is larger than 1
+# FI: not ordinals in Finnish. For example: 'tuhannesosaa', means 'thousandth part' in partitive form.
 - NumbersOrdinalPluralTens: [
     "", "kymmenesosaa", "kahdeskymmenesosaa", "kolmaskymmenesosaa", "neljäskymmenesosaa", "viideskymmenesosaa", "kuudeskymmenesosaa", "seitsemäskymmenesosaa", "kahdesaskymmenesosaa", "yhdeksäskymmenesosaa"
   ]
@@ -101,20 +104,19 @@
 #          "kuudet sadannet", "seitsemät sadannet", "kahdeksat sadannet", "yhdeksät sadannet"
 #   ]
 
-# FI: these are used in the denominator of a fraction, not ordinals. For example: 'sadasosa' means 'hundreth part'
+# FI: these are used for the denominator of a fraction when the numerator is larger than 1.
+# FI: not ordinals in Finnish. For example: 'tuhannesosaa', means 'thousandth part' in partitive form.
 - NumbersOrdinalPluralHundreds: [
     "", "sadasosa", "kahdessadasosaa", "kolmassadasosaa", "neljässadasosaa", "viidessadasosaa",
       "kuudessadasosaa", "seitsemässadasosaa", "kahdeksassadasosaa", "yhdeksässadasosaa"
   ]
 
-
-# Is Finnish regular when it comes to this point? Requires thinking. At least "kolme tuhatta" is missing.
 # FI: the long scale is used in Finnish.
 - NumbersLarge: [
     "", "tuhat", "miljoona", "miljardi", "biljoona", "tuhat biljoonaa",
     "triljoona", "tuhat triljoonaa", "kvadriljoona", "tuhat kvadriljoonaa", "kvintiljoona",
   ]
-      
+
 - NumbersOrdinalLarge: [
     "", "tuhannes", "miljoonas", "miljardis", "biljoonas", "tuhannes biljoonas",
     "triljoonas", "tuhannes triljoonas", "kvadriljoonas", "tuhannes kvadriljoonas", "kvintiljoonas"
@@ -126,7 +128,8 @@
 #          "miljoonasosat", "kuusimiljoonasosat", "septimiljardisosat", "oktilliososat", "ei-miljoonasosat"
 #     ]
 
-# FI: these are used in the denominator of a fraction, not ordinals. For example: 'tuhannesosaa', means 'thousandth part'.
+# FI: these are used for the denominator of a fraction when the numerator is larger than 1.
+# FI: not ordinals in Finnish. For example: 'tuhannesosaa', means 'thousandth part' in partitive form.
 - NumbersOrdinalPluralLarge: [
     "", "tuhannesosaa", "miljoonasosaa", "miljardisosaa", "biljoonasosaa", "tuhannes biljoonasosaa",
     "triljoonasosaa", "tuhannes triljoonasosaa", "kvadriljoonasosaa", "tuhannes kvadriljoonasosaa", "kvintiljoonasosaa"
