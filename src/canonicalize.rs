@@ -341,13 +341,16 @@ pub fn replace_children<'a>(mathml: Element<'a>, replacements: Vec<Element<'a>>)
 
 	let parent = mathml.parent().unwrap().element().unwrap();
 	if ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(name(&parent)) {
-		// make sure that MAYBE_CHEMISTRY is set since we aren't using the new element directly
-		add_attrs(mathml, replacements[0].attributes());
-
 		// wrap in an mrow
 		let mrow = create_mathml_element(&mathml.document(), "mrow");
+		add_attrs(mrow, replacements[0].attributes());
 		mrow.append_children(replacements);
-		return mathml;
+		let mut new_children = Vec::with_capacity(parent.children().len());
+		for child in parent.children() {
+			new_children.push( if as_element(child) == mathml {ChildOfElement::Element(mrow)} else {child});
+		}
+		parent.replace_children(new_children);
+		return mrow;
 	} else {
 		// replace the children of the parent with 'replacements' inserted in place of 'mathml'
 		let mut new_children = mathml.preceding_siblings();
@@ -1318,7 +1321,6 @@ impl CanonicalizeContext {
 				}
 				if let Some(elements) = convert_leaves_to_chem_elements(mathml) {
 					// children are already marked as chemical elements
-					// debug!("clean_chemistry_leaf: {}", mml_to_string(&mathml));
 					return replace_children(mathml, elements);
 				} else {
 					let likely_chemistry = likely_chem_element(mathml);
