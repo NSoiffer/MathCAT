@@ -423,7 +423,7 @@ static ELEMENTS_WITH_ONE_CHILD: phf::Set<&str> = phf_set! {
 };
 
 static ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN: phf::Set<&str> = phf_set! {
-	"mfrac", "mroot", "msub", "msup", "msubsup","munder", "mover", "munderover", "mmultiscripts", "mlongdiv"
+	"mfrac", "mroot", "msub", "msup", "msubsup","munder", "mover", "munderover"
 };
 
 static EMPTY_ELEMENTS: phf::Set<&str> = phf_set! {
