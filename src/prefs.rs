@@ -5,7 +5,7 @@
 //! In the future, there will hopefully be a nice UI that writes out the YAML file.
 //!
 //! AT prefs are set via the API given in the [crate::interface] module.
-//! These in turn call [`PreferenceManager::set_api_string_pref`] and [`PreferenceManager::set_api_float_pref`].
+//! These in turn call [`PreferenceManager::set_string_pref`] and [`PreferenceManager::set_api_float_pref`].
 //! Ultimately, user and api prefs are stored in a hashmap.
 //!
 //! Preferences can be found in a few places:
@@ -585,23 +585,29 @@ impl PreferenceManager {
     /// Note: changing the language, speech style, or braille code might fail if the files don't exist.
     ///   If this happens, the preference is not set and an error is returned.
     /// If "LanguageAuto" is set, we assume "Language" has already be checked to be "Auto"
-    pub fn set_api_string_pref(&mut self, key: &str, value: &str) -> Result<()> {
+    pub fn set_string_pref(&mut self, key: &str, value: &str) -> Result<()> {
         if !self.error.is_empty() {
-            panic!("Internal error: set_api_string_pref called on invalid PreferenceManager -- error message\n{}", &self.error);
+            panic!("Internal error: set_string_pref called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
         // don't do an update if the value hasn't changed
-        if let Some(pref_value) = self.user_prefs.prefs.get(key) {
+        let mut is_user_pref = true;
+        if let Some(pref_value) = self.api_prefs.prefs.get(key) {
+            if pref_value.as_str().unwrap() != value {
+                is_user_pref = false;
+                self.reset_preferences(key, value)?;
+            }
+        } else if let Some(pref_value) = self.user_prefs.prefs.get(key) {
             if pref_value.as_str().unwrap() != value {
                 self.reset_preferences(key, value)?;
-            } else if let Some(pref_value) = self.api_prefs.prefs.get(key) {
-                if pref_value.as_str().unwrap() != value {
-                    self.reset_preferences(key, value)?;
-                }
             }
         }
 
-        self.api_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+        if is_user_pref {
+            self.user_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+        } else {
+            self.api_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+        }
         return Ok( () );
     }
 
@@ -859,20 +865,23 @@ mod tests {
 
     #[test]
     fn test_language_change() {
+        // set_preference borrows the pref manager, so the previous borrow's lifetime needs to be ended before using it
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("Language", "en").unwrap();
-            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap();
+        });
+        crate::interface::set_preference("Language".to_string(), "en".to_string()).unwrap();
+        crate::interface::set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        PREF_MANAGER.with(|pref_manager| {
+            let pref_manager = pref_manager.borrow_mut();
             assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Speech)), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
         });
 
-
-        // set_preference borrows the pref manager, so the previous borrow's lifetime needed to be ended by here
         crate::interface::set_preference("Language".to_string(), "zz".to_string()).unwrap();
-        let pref_manager = PreferenceManager::get();
-        let pref_manager = pref_manager.borrow();
-        assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Speech)), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+        PREF_MANAGER.with(|pref_manager| {
+            let pref_manager = pref_manager.borrow_mut();
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Speech)), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+        });
     }
     
     #[test]
