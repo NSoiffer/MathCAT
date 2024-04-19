@@ -60,15 +60,15 @@ impl Preferences{
         prefs.insert("Language".to_string(), Yaml::String("en".to_string()));
         prefs.insert("LanguageAuto".to_string(), Yaml::String("".to_string()));     // illegal value so change will be recognized
         prefs.insert("SpeechStyle".to_string(), Yaml::String("ClearSpeak".to_string()));
-        prefs.insert("Verbosity".to_string(), Yaml::String("medium".to_string()));
+        prefs.insert("Verbosity".to_string(), Yaml::String("Medium".to_string()));
         prefs.insert("SpeechOverrides_CapitalLetters".to_string(), Yaml::String("".to_string())); // important for testing
         prefs.insert("Blind".to_string(), Yaml::Boolean(true));
         prefs.insert("MathRate".to_string(), Yaml::String("100.0".to_string()));
         prefs.insert("PauseFactor".to_string(), Yaml::String("100.0".to_string()));
-        prefs.insert("NavMode".to_string(), Yaml::String("enhanced".to_string()));
-        prefs.insert("Overview".to_string(), Yaml::String("read".to_string()));
+        prefs.insert("NavMode".to_string(), Yaml::String("Enhanced".to_string()));
+        prefs.insert("Overview".to_string(), Yaml::Boolean(false));
         prefs.insert("ResetOverView".to_string(), Yaml::Boolean(true));
-        prefs.insert("NavVerbosity".to_string(), Yaml::String("verbose".to_string()));
+        prefs.insert("NavVerbosity".to_string(), Yaml::String("Verbose".to_string()));
         prefs.insert("AutoZoomOut".to_string(), Yaml::Boolean(true));
         prefs.insert("BrailleCode".to_string(), Yaml::String("Nemeth".to_string()));
         prefs.insert("BrailleNavHighlight".to_string(), Yaml::String("EndPoints".to_string()));
