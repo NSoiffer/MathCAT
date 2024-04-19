@@ -228,7 +228,7 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
                     pref_manager.set_api_float_pref(&name, to_float(&name, &value)?);    
                 },
                 _ => {
-                    pref_manager.set_api_string_pref(&name, &value)?;
+                    pref_manager.set_string_pref(&name, &value)?;
                 },
             }
         };

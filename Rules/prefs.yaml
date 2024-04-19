@@ -86,6 +86,6 @@
 
 
   Other:
-    CopyAs: "MathML"       # LaTeX, ASCIIMath
+    CopyAs: "MathML"       # MathML, LaTeX, ASCIIMath
     DecimalSeparators: "." # [default]
     BlockSeparators: ", \u00A0\u202F" # [default -- includes two forms of non-breaking spaces]

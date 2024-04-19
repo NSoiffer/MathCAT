@@ -2945,7 +2945,7 @@ mod tests {
         <mrow data-changed='added' id='id-1'>
           <mi id='id-2'>x</mi>
           <mo id='id-3'>=</mo>
-          <mfrac data-mjx-texclass='ORD' id='id-4'>
+          <mfrac id='id-4'>
             <mrow id='id-5'>
               <mrow data-changed='added' id='id-6'>
                 <mo id='id-7'>-</mo>
@@ -2990,8 +2990,8 @@ mod tests {
             debug!("\n===  i={}  ===", i);
             let instant = Instant::now();
             let (id, _offset) = crate::interface::get_navigation_node_from_braille_position(i)?;
-            N_PROBES.with(|n| {println!("test {:2} #probes = {}", i, n.borrow())});
-            println!("Time taken: {}ms", instant.elapsed().as_millis());
+            N_PROBES.with(|n| {debug!("test {:2} #probes = {}", i, n.borrow())});
+            debug!("Time taken: {}ms", instant.elapsed().as_millis());
             assert_eq!(answers[i], id, "\nNemeth test ith position={}", i);
         }
 
@@ -3004,8 +3004,8 @@ mod tests {
             debug!("\n===  i={}  ===", i);
             let instant = Instant::now();
             let (id, _offset) = crate::interface::get_navigation_node_from_braille_position(i)?;
-            N_PROBES.with(|n| {println!("test {:2} #probes = {}", i, n.borrow())});
-            println!("Time taken: {}ms", instant.elapsed().as_millis());
+            N_PROBES.with(|n| {debug!("test {:2} #probes = {}", i, n.borrow())});
+            debug!("Time taken: {}ms", instant.elapsed().as_millis());
             assert_eq!(answers[i], id, "\nUEB test ith position={}", i);
         }
 
@@ -3018,8 +3018,8 @@ mod tests {
             debug!("\n===  i={}  ===", i);
             let instant = Instant::now();
             let (id, _offset) = crate::interface::get_navigation_node_from_braille_position(i)?;
-            N_PROBES.with(|n| {println!("test {:2} #probes = {}", i, n.borrow())});
-            println!("Time taken: {}ms", instant.elapsed().as_millis());
+            N_PROBES.with(|n| {debug!("test {:2} #probes = {}", i, n.borrow())});
+            debug!("Time taken: {}ms", instant.elapsed().as_millis());
             assert_eq!(answers[i], id, "\nUEB test ith position={}", i);
         }
         return Ok( () );

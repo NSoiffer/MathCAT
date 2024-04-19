@@ -5,7 +5,7 @@
 //! In the future, there will hopefully be a nice UI that writes out the YAML file.
 //!
 //! AT prefs are set via the API given in the [crate::interface] module.
-//! These in turn call [`PreferenceManager::set_api_string_pref`] and [`PreferenceManager::set_api_float_pref`].
+//! These in turn call [`PreferenceManager::set_string_pref`] and [`PreferenceManager::set_api_float_pref`].
 //! Ultimately, user and api prefs are stored in a hashmap.
 //!
 //! Preferences can be found in a few places:
@@ -60,15 +60,15 @@ impl Preferences{
         prefs.insert("Language".to_string(), Yaml::String("en".to_string()));
         prefs.insert("LanguageAuto".to_string(), Yaml::String("".to_string()));     // illegal value so change will be recognized
         prefs.insert("SpeechStyle".to_string(), Yaml::String("ClearSpeak".to_string()));
-        prefs.insert("Verbosity".to_string(), Yaml::String("medium".to_string()));
+        prefs.insert("Verbosity".to_string(), Yaml::String("Medium".to_string()));
         prefs.insert("SpeechOverrides_CapitalLetters".to_string(), Yaml::String("".to_string())); // important for testing
         prefs.insert("Blind".to_string(), Yaml::Boolean(true));
         prefs.insert("MathRate".to_string(), Yaml::String("100.0".to_string()));
         prefs.insert("PauseFactor".to_string(), Yaml::String("100.0".to_string()));
-        prefs.insert("NavMode".to_string(), Yaml::String("enhanced".to_string()));
-        prefs.insert("Overview".to_string(), Yaml::String("read".to_string()));
+        prefs.insert("NavMode".to_string(), Yaml::String("Enhanced".to_string()));
+        prefs.insert("Overview".to_string(), Yaml::Boolean(false));
         prefs.insert("ResetOverView".to_string(), Yaml::Boolean(true));
-        prefs.insert("NavVerbosity".to_string(), Yaml::String("verbose".to_string()));
+        prefs.insert("NavVerbosity".to_string(), Yaml::String("Verbose".to_string()));
         prefs.insert("AutoZoomOut".to_string(), Yaml::Boolean(true));
         prefs.insert("BrailleCode".to_string(), Yaml::String("Nemeth".to_string()));
         prefs.insert("BrailleNavHighlight".to_string(), Yaml::String("EndPoints".to_string()));
@@ -95,7 +95,7 @@ impl Preferences{
         return Preferences{ prefs };
     }
 
-    fn read_file(file: &Path, mut base_prefs: Preferences) -> Result<Preferences> {
+    fn read_prefs_file(file: &Path, mut base_prefs: Preferences) -> Result<Preferences> {
         let file_name = file.to_str().unwrap();
         let docs;
         match read_to_string_shim(file) {
@@ -269,6 +269,9 @@ impl PreferenceManager {
     pub fn merge_prefs(&self) -> PreferenceHashMap {
         let mut merged_prefs = self.user_prefs.prefs.clone();
         merged_prefs.extend(self.api_prefs.prefs.clone());
+        debug!("user: NavVerbosity {}, merged {}",
+                self.user_prefs.prefs.get("NavVerbosity").unwrap().as_str().unwrap(),
+                merged_prefs.get("NavVerbosity").unwrap().as_str().unwrap());
         return merged_prefs;
     }
 
@@ -303,7 +306,7 @@ impl PreferenceManager {
         system_prefs_file.push("prefs.yaml");
         if is_file_shim(&system_prefs_file) {
             let defaults = DEFAULT_USER_PREFERENCES.with(|defaults| defaults.clone());
-            prefs = Preferences::read_file(&system_prefs_file, defaults)?;
+            prefs = Preferences::read_prefs_file(&system_prefs_file, defaults)?;
             self.sys_prefs_file = Some( FileAndTime::new_with_time(system_prefs_file.clone()) );
         } else {
             error!("MathCAT couldn't open file system preference file '{}'.\nUsing fallback defaults which may be inappropriate.",
@@ -314,9 +317,10 @@ impl PreferenceManager {
         if let Some(mut user_prefs_file_path_buf) = user_prefs_file {
             user_prefs_file_path_buf.push("MathCAT/prefs.yaml");
             if is_file_shim(&user_prefs_file_path_buf) {
-                prefs = Preferences::read_file(&user_prefs_file_path_buf, prefs)?;
-                self.user_prefs_file = Some( FileAndTime::new_with_time(user_prefs_file_path_buf.clone()) );
-            }           
+                prefs = Preferences::read_prefs_file(&user_prefs_file_path_buf, prefs)?;
+            }
+            // set the time otherwise keeps needing to do updates
+            self.user_prefs_file = Some( FileAndTime::new_with_time(user_prefs_file_path_buf.clone()) );         
             user_prefs_file = Some(user_prefs_file_path_buf);
         }
 
@@ -585,23 +589,30 @@ impl PreferenceManager {
     /// Note: changing the language, speech style, or braille code might fail if the files don't exist.
     ///   If this happens, the preference is not set and an error is returned.
     /// If "LanguageAuto" is set, we assume "Language" has already be checked to be "Auto"
-    pub fn set_api_string_pref(&mut self, key: &str, value: &str) -> Result<()> {
+    pub fn set_string_pref(&mut self, key: &str, value: &str) -> Result<()> {
         if !self.error.is_empty() {
-            panic!("Internal error: set_api_string_pref called on invalid PreferenceManager -- error message\n{}", &self.error);
+            panic!("Internal error: set_string_pref called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
 
         // don't do an update if the value hasn't changed
-        if let Some(pref_value) = self.user_prefs.prefs.get(key) {
+        let mut is_user_pref = true;
+        if let Some(pref_value) = self.api_prefs.prefs.get(key) {
+            if pref_value.as_str().unwrap() != value {
+                is_user_pref = false;
+                self.reset_preferences(key, value)?;
+            }
+        } else if let Some(pref_value) = self.user_prefs.prefs.get(key) {
             if pref_value.as_str().unwrap() != value {
                 self.reset_preferences(key, value)?;
-            } else if let Some(pref_value) = self.api_prefs.prefs.get(key) {
-                if pref_value.as_str().unwrap() != value {
-                    self.reset_preferences(key, value)?;
-                }
             }
         }
 
-        self.api_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+        debug!("Setting ({}) {} to {}", if is_user_pref {"user"} else {"sys"}, key, value);
+        if is_user_pref {
+            self.user_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+        } else {
+            self.api_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+        }
         return Ok( () );
     }
 
@@ -840,39 +851,59 @@ mod tests {
     #[test]
     fn test_prefs() {
         PREF_MANAGER.with(|pref_manager| {
-            let mut pref_manager = pref_manager.borrow_mut();
-            pref_manager.initialize(abs_rules_dir_path()).unwrap();
+            // first test with internal settings
+            {
+                let mut pref_manager = pref_manager.borrow_mut();
+                pref_manager.initialize(abs_rules_dir_path()).unwrap();
+    
+                pref_manager.set_user_prefs("Language", "en").unwrap();
+                pref_manager.set_user_prefs("ClearSpeak_AbsoluteValue", "Determinant").unwrap();
+                pref_manager.set_user_prefs("ResetNavMode", "true").unwrap();
+                pref_manager.set_user_prefs("BrailleCode", "Nemeth").unwrap();
+                assert_eq!(pref_manager.pref_to_string("Language").as_str(), "en");
+                assert_eq!(pref_manager.pref_to_string("SubjectArea").as_str(), "General");
+                assert_eq!(pref_manager.pref_to_string("ClearSpeak_AbsoluteValue").as_str(), "Determinant");
+                assert_eq!(pref_manager.pref_to_string("ResetNavMode").as_str(), "true");
+                assert_eq!(pref_manager.pref_to_string("BrailleCode").as_str(), "Nemeth");
+                assert_eq!(pref_manager.pref_to_string("X_Y_Z").as_str(), NO_PREFERENCE);
+            }
 
-            pref_manager.set_user_prefs("Language", "en").unwrap();
-            pref_manager.set_user_prefs("SubjectArea", "General").unwrap();
-            pref_manager.set_user_prefs("ClearSpeak_AbsoluteValue", "Auto").unwrap();
-            pref_manager.set_user_prefs("ResetNavMode", "false").unwrap();
-            pref_manager.set_user_prefs("BrailleCode", "Nemeth").unwrap();
-            assert_eq!(pref_manager.pref_to_string("Language").as_str(), "en");
-            assert_eq!(pref_manager.pref_to_string("SubjectArea").as_str(), "General");
-            assert_eq!(pref_manager.pref_to_string("ClearSpeak_AbsoluteValue").as_str(), "Auto");
-            assert_eq!(pref_manager.pref_to_string("ResetNavMode").as_str(), "false");
-            assert_eq!(pref_manager.pref_to_string("BrailleCode").as_str(), "Nemeth");
-            assert_eq!(pref_manager.pref_to_string("X_Y_Z").as_str(), NO_PREFERENCE);
+            // now test with the interface
+            {
+                use crate::interface::{set_preference, get_preference};
+                set_preference("Language".to_string(), "zz".to_string()).unwrap();
+                set_preference("ClearSpeak_AbsoluteValue".to_string(), "Cardinality".to_string()).unwrap();
+                set_preference("Overview".to_string(), "true".to_string()).unwrap();
+                set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
+                assert_eq!(&get_preference("Language".to_string()).unwrap(), "zz");
+                assert_eq!(&get_preference("ClearSpeak_AbsoluteValue".to_string()).unwrap(), "Cardinality");
+                assert_eq!(&get_preference("Overview".to_string()).unwrap(), "true");
+                assert_eq!(&get_preference("BrailleCode".to_string()).unwrap(), "UEB");
+                assert!(&get_preference("X_Y_Z".to_string()).is_err());
+
+            }
         });
     }
 
     #[test]
     fn test_language_change() {
+        // set_preference borrows the pref manager, so the previous borrow's lifetime needs to be ended before using it
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
-            pref_manager.set_user_prefs("Language", "en").unwrap();
-            pref_manager.set_user_prefs("SpeechStyle", "ClearSpeak").unwrap();
+        });
+        crate::interface::set_preference("Language".to_string(), "en".to_string()).unwrap();
+        crate::interface::set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        PREF_MANAGER.with(|pref_manager| {
+            let pref_manager = pref_manager.borrow_mut();
             assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Speech)), PathBuf::from("Languages/en/ClearSpeak_Rules.yaml"));
         });
 
-
-        // set_preference borrows the pref manager, so the previous borrow's lifetime needed to be ended by here
         crate::interface::set_preference("Language".to_string(), "zz".to_string()).unwrap();
-        let pref_manager = PreferenceManager::get();
-        let pref_manager = pref_manager.borrow();
-        assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Speech)), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+        PREF_MANAGER.with(|pref_manager| {
+            let pref_manager = pref_manager.borrow_mut();
+            assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Speech)), PathBuf::from("Languages/zz/ClearSpeak_Rules.yaml"));
+        });
     }
     
     #[test]
@@ -901,6 +932,17 @@ mod tests {
 
             pref_manager.set_user_prefs("BrailleCode", "UEB").unwrap();
             assert_eq!(rel_path(&pref_manager.rules_dir, pref_manager.get_rule_file(&RulesFor::Braille)), PathBuf::from("Braille/UEB/UEB_Rules.yaml"));
+
+            // make sure they show up when building context for speech generation
+            let merged_prefs = pref_manager.merge_prefs();
+            assert_eq!(merged_prefs.get("Verbosity").unwrap().as_str().unwrap(), "Terse");
+        });
+
+        crate::interface::set_preference("NavVerbosity".to_string(), "Terse".to_string()).unwrap();
+        PREF_MANAGER.with(|pref_manager| {
+            let pref_manager = pref_manager.borrow_mut();
+            let merged_prefs = pref_manager.merge_prefs();
+            assert_eq!(merged_prefs.get("NavVerbosity").unwrap().as_str().unwrap(), "Terse");
         });
     }
 
