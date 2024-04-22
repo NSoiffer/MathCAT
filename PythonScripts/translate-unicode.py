@@ -96,8 +96,6 @@ def translate_char_line(ch: str, line:str, mathplayer: dict, sre: dict, access8:
             result['original'] = match_obj.group(1)
             result['translation'] = translation
             result['alternatives'] = alternatives
-            if line.find('divided by') != -1:
-                print(f"  divided by translation: {translation}")
             return 't: "{}"'.format(translation)
         else:
             return line
@@ -476,9 +474,17 @@ ACCESS8_Location = r"C:\dev\Access8Math\addon\globalPlugins\Access8Math\locale\s
 # (sre_only, mp_only, differ, same) = dict_compare("it", get_sre_unicode_dict(SRE_Location, "it"), get_mathplayer_unicode_dict(MP_Location, "it"))
 
 language = "zh-cn"
+<<<<<<< HEAD
 # build_new_translation("..", language, "unicode")
 # build_new_translation("..", language, "unicode-full")
 
 # see translate_definitions comments -- you need to manually copy the file to google translate. 
 translate_definitions("..", language)
 # build_euro("euro")
+=======
+build_new_translation("..", language, "unicode")
+build_new_translation("..", language, "unicode-full")
+
+# see translate_definitions comments -- you need to manually copy the file to google translate. 
+translate_definitions("..", language)
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
