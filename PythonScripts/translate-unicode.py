@@ -234,7 +234,7 @@ def translate_words(words_to_translate: set[str], lang):
     word_list = list(words_to_translate)
     word_list.sort()    # make deterministic for debugging
     char_count = 0
-    words_to_translate = []
+    words_to_translate = set()
     for word in word_list:
         words_to_translate.add(word)
         char_count += len(word)
@@ -242,7 +242,7 @@ def translate_words(words_to_translate: set[str], lang):
             do_translation_chunk(words_to_translate)
             print("Translated {} words...".format(len(words_to_translate)))
             char_count = 0
-            words_to_translate = []
+            words_to_translate = set()
             time.sleep(TIMEOUT)       # try to avoid google banning us
     do_translation_chunk(words_to_translate)
     return translations
@@ -480,5 +480,5 @@ language = "zh-cn"
 # build_new_translation("..", language, "unicode-full")
 
 # see translate_definitions comments -- you need to manually copy the file to google translate. 
-# translate_definitions("..", language)
-build_euro("euro")
+translate_definitions("..", language)
+# build_euro("euro")

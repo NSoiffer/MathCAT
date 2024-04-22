@@ -170,8 +170,7 @@ def build_all_translations(path_to_mathcat: str, lang: str, subdir="") -> None:
             build_new_translation(path_to_mathcat, lang, os.path.join(subdir, entry))            
 
 
-
-language = 'el'
+language = 'zh-cn'
 if not os.path.exists(language):
     os.makedirs(language)
 if not os.path.exists(language+"/SharedRules"):
