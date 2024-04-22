@@ -1668,11 +1668,17 @@
       if: "$Overview = 'true'"
       then:
       - t: "移动后说话"                # phrase('speak expression after move')
+<<<<<<< HEAD
       - pause: long
       - set_variables: [Overview: "'false'"]
       else:
       - t: "移动后表达概述"          # phrase('overview of expression after move')
       - pause: long
+=======
+      - set_variables: [Overview: "'false'"]
+      else:
+      - t: "移动后表达概述"          # phrase('overview of expression after move')
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       - set_variables: [Overview: "'true'"]
 
 - name: current
@@ -1687,7 +1693,10 @@
           then: [t: "读"]                                  # phrase('read' next entry in table) 
           else: [t: "描述"]                              # phrase('describe' next entry in table)     
       - t: "当前"                                         # phrase('current' entry in table)
+<<<<<<< HEAD
       - pause: long
+=======
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - set_variables: [NavNode: "@id"]
 
 # this needs to be near the end because we only test for 'Describe', "Read", etc., and we don't want to get 'DescribeNext', etc.

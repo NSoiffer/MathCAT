@@ -8,10 +8,34 @@
   - test:
       if: "$Verbosity!='Terse'"
       then:
+<<<<<<< HEAD
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      - T: ""      # phrase('the' square root of 25 equals 5)
+  - bookmark: "*[2]/@id"
+  - test:
+    - if: "*[2][text()='+']"
+      then: [{T: "正"}]      # phrase(set of all 'positive' integers less than 10)
+      else: [{T: "負"}]      # phrase(set of all 'negative' integers less than minus 10)
+  - bookmark: "*[1]/@id"
+  - test:
+    - if: "*[1][text()='ℂ']"
+      then: [{T: "複數集"}]      # phrase('complex numbers' consist of two parts)
+    - else_if: "*[1][text()='ℕ']"
+      then: [{T: "自然數集"}]      # phrase('natural numbers' are numbers from 1 to infinity)
+    - else_if: "*[1][text()='ℚ']"
+      then: [{T: "有理數集"}]      # phrase('rational numbers' are the fraction of 2 integers)
+    - else_if: "*[1][text()='ℝ']"
+      then: [{T: "實數集"}]      # phrase('real numbers' can be both positive and negative)
+    - else_if: "*[1][text()='ℤ']"
+      then: [{T: "整數集"}]      # phrase(positive 'integers' are natural numbers above 0)
+========
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       - t: "这"      # phrase('the' square root of 25 equals 5)
   - bookmark: "*[2]/@id"
   - test:
     - if: "*[2][text()='+']"
+<<<<<<< HEAD
       then: [t: "正"]      # phrase(set of all 'positive' integers less than 10)
       else: [t: "负"]      # phrase(set of all 'negative' integers less than minus 10)
   - bookmark: "*[1]/@id"
@@ -27,6 +51,24 @@
     - else_if: "*[1][text()='ℤ']"
       then: [t: "整数"]      # phrase(positive 'integers' are natural numbers above 0)
       else: [x: "*[1][text()]"] # shouldn't happen
+=======
+      then: [{t: "正"}]      # phrase(set of all 'positive' integers less than 10)
+      else: [{t: "负"}]      # phrase(set of all 'negative' integers less than minus 10)
+  - bookmark: "*[1]/@id"
+  - test:
+    - if: "*[1][text()='ℂ']"
+      then: [{t: "复数数字"}]      # phrase('complex numbers' consist of two parts)
+    - else_if: "*[1][text()='ℕ']"
+      then: [{t: "自然数"}]      # phrase('natural numbers' are numbers from 1 to infinity)
+    - else_if: "*[1][text()='ℚ']"
+      then: [{t: "理性数字"}]      # phrase('rational numbers' are the fraction of 2 integers)
+    - else_if: "*[1][text()='ℝ']"
+      then: [{t: "实数"}]      # phrase('real numbers' can be both positive and negative)
+    - else_if: "*[1][text()='ℤ']"
+      then: [{t: "整数"}]      # phrase(positive 'integers' are natural numbers above 0)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+      else: [{x: "*[1][text()]"}] # shouldn't happen
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: dimension-number-sets
 
@@ -37,6 +79,7 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: "*[1][text()='ℂ']"
+<<<<<<< HEAD
       then: [t: " c"]      # phrase(the letter 'C' used to represent complex number)
     - else_if: "*[1][text()='ℕ']"
       then: [t: " n"]      # phrase(the letter 'N' may represent natural numbers)
@@ -47,6 +90,30 @@
     - else_if: "*[1][text()='ℤ']"
       then: [t: " z"]      # phrase(the letter 'Z' may represent integers)
       else: [x: "*[1][text()]"] # shouldn't happen
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: [{T: "C"}]      # phrase(the letter 'C' used to represent complex number)
+    - else_if: "*[1][text()='ℕ']"
+      then: [{T: "N"}]      # phrase(the letter 'N' may represent natural numbers)
+    - else_if: "*[1][text()='ℚ']"
+      then: [{T: "Q"}]      # phrase(the letter 'Q' may represent rational numbers)
+    - else_if: "*[1][text()='ℝ']"
+      then: [{T: "R"}]      # phrase(the letter 'R' may represent real numbers)
+    - else_if: "*[1][text()='ℤ']"
+      then: [{T: "Z"}]      # phrase(the letter 'Z' may represent integers)
+========
+      then: [{t: " c"}]      # phrase(the letter 'C' used to represent complex number)
+    - else_if: "*[1][text()='ℕ']"
+      then: [{t: " n"}]      # phrase(the letter 'N' may represent natural numbers)
+    - else_if: "*[1][text()='ℚ']"
+      then: [{t: " q"}]      # phrase(the letter 'Q' may represent rational numbers)
+    - else_if: "*[1][text()='ℝ']"
+      then: [{t: " r"}]      # phrase(the letter 'R' may represent real numbers)
+    - else_if: "*[1][text()='ℤ']"
+      then: [{t: " z"}]      # phrase(the letter 'Z' may represent integers)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+      else: [{x: "*[1][text()]"}] # shouldn't happen
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - bookmark: "*[2]/@id"
   - x: "*[2]"
 
@@ -57,6 +124,7 @@
   - bookmark: "@id"
   - test:
     - if: "text()='ℂ'"
+<<<<<<< HEAD
       then: [t: "复数"]      # phrase('the complex numbers' include 2 parts)
     - else_if: "text()='ℕ'"
       then: [t: "自然数"]      # phrase('the natural numbers' begin at 1)
@@ -66,6 +134,29 @@
       then: [t: "实数"]      # phrase('the real numbers' can be both positive and negative)
     - else_if: "text()='ℤ'"
       then: [t: "整数"]      # phrase('the integers' are natural numbers above 0)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: [{T: "複數集"}]      # phrase('the complex numbers' include 2 parts)
+    - else_if: "text()='ℕ'"
+      then: [{T: "自然數集"}]      # phrase('the natural numbers' begin at 1)
+    - else_if: "text()='ℚ'"
+      then: [{T: "有理數集"}]      # phrase('the rational numbers' are the fraction of 2 integers)
+    - else_if: "text()='ℝ'"
+      then: [{T: "實數集"}]      # phrase('the real numbers' can be both positive and negative)
+    - else_if: "text()='ℤ'"
+      then: [{T: "整數集"}]      # phrase('the integers' are natural numbers above 0)
+========
+      then: [{t: "复数"}]      # phrase('the complex numbers' include 2 parts)
+    - else_if: "text()='ℕ'"
+      then: [{t: "自然数"}]      # phrase('the natural numbers' begin at 1)
+    - else_if: "text()='ℚ'"
+      then: [{t: "理性数字"}]      # phrase('the rational numbers' are the fraction of 2 integers)
+    - else_if: "text()='ℝ'"
+      then: [{t: "实数"}]      # phrase('the real numbers' can be both positive and negative)
+    - else_if: "text()='ℤ'"
+      then: [{t: "整数"}]      # phrase('the integers' are natural numbers above 0)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       else: [x: "text()"] # shouldn't happen
 
 - name: real-part
@@ -73,14 +164,30 @@
   match: "."
   replace:
   - bookmark: "@id"
+<<<<<<< HEAD
   - t: "实际部分"      # phrase('the real part' of a complex number does not include the imaginary part)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+  - T: "實部"      # phrase('the real part' of a complex number does not include the imaginary part)
+========
+  - t: "实际部分"      # phrase('the real part' of a complex number does not include the imaginary part)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: imaginary-part
   tag: imaginary-part
   match: "."
   replace:
   - bookmark: "@id"
+<<<<<<< HEAD
   - t: "假想部分"      # phrase('the imaginary part' is part of a complex number)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+  - T: "虛部"      # phrase('the imaginary part' is part of a complex number)
+========
+  - t: "假想部分"      # phrase('the imaginary part' is part of a complex number)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 # rules on scripted vertical bars ('evaluated at')
 - name: evaluated-at-2
@@ -89,7 +196,15 @@
   replace:
   - x: "*[1]"
   - pause: auto
+<<<<<<< HEAD
   - t: "评估"      # phrase(results were 'evaluated at' a given point)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+  - T: "取值在"      # phrase(results were 'evaluated at' a given point)
+========
+  - t: "评估"      # phrase(results were 'evaluated at' a given point)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - pause: auto
   - x: "*[2]"
 
@@ -99,10 +214,23 @@
   replace:
   - x: "*[1]"
   - pause: auto
+<<<<<<< HEAD
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+  - T: "取值在"      # phrase(results were 'evaluated at' this point)
+  - pause: auto
+  - x: "*[3]"
+  - T: "減去相同的式子取值在"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
+========
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - t: "评估"      # phrase(results were 'evaluated at' this point)
   - pause: auto
   - x: "*[3]"
   - t: "减去在"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
+<<<<<<< HEAD
+=======
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[2]"
 
 - name: binomial
@@ -110,16 +238,30 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
+<<<<<<< HEAD
   - t: "选择"      # phrase(you can 'choose' a number at random)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+  - T: "選"      # phrase(you can 'choose' a number at random)
+========
+  - t: "选择"      # phrase(you can 'choose' a number at random)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[2]"
 
 - name: permutation
   tag: permutation-symbol
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
+<<<<<<< HEAD
   - x: "*[2]"
   - t: "排列"      # phrase(the solution  involves several 'permutations of' values)
   - x: "*[1]"
+=======
+  - x: "*[1]"
+  - T: "排列"      # phrase(the solution  involves several 'permutations of' values)
+  - x: "*[2]"
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: intervals
   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
@@ -128,11 +270,49 @@
   - test:
       if: "$Verbosity!='Terse'"
       then:
+<<<<<<< HEAD
       - t: "这"      # phrase('the' square root of 25 equals 5)
   - x: "translate(name(.),'-', ' ')"
   - test:
       if: "$Verbosity!='Terse'"
       then:
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      - T: ""      # phrase('the' square root of 25 equals 5)
+  #- x: "translate(name(.),'-',' ')"
+========
+      - t: "这"      # phrase('the' square root of 25 equals 5)
+  - x: "translate(name(.),'-', ' ')"
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+  - test:
+      if: name(.) = 'open-interval'
+      then:
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      - T: "開區間"
+      else_test:
+        if: name(.) = 'closed-interval'
+        then:
+        - T: "閉區間"
+        else_test:
+          if: name(.) = 'open-closed-interval'
+          then:
+          - T: "開閉區間"
+          else_test:
+            if: name(.) = 'closed-open-interval'
+            then:
+            - T: "閉開區間"
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: "從"      # phrase(subtracting 5 'from' 10 gives 5)
+      - x: "*[1]"
+      - T: "到"      # phrase(adding 6 'to' 6 equals  12)
+      - x: "*[2]"
+      else:
+      - x: "*[1]"
+      - T: "逗號"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
+========
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       - t: "从"      # phrase(subtracting 5 'from' 10 gives 5)
       - x: "*[1]"
       - t: "添加到"      # phrase(adding 6 'to' 6 equals  12)
@@ -140,6 +320,10 @@
       else:
       - x: "*[1]"
       - t: "逗号"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
+<<<<<<< HEAD
+=======
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       - x: "*[2]"
 
 - name: default-point
@@ -149,16 +333,30 @@
   - test:
       if: "$Verbosity!='Terse'"
       then:
+<<<<<<< HEAD
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      - T: ""      # phrase('the' square root of 25 equals 5)
+  - T: "點"      # phrase(a decimal 'point' indicates the fraction component of a number)
+  - x: "*[1]"
+  - T: "逗號"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
+========
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       - t: "这"      # phrase('the' square root of 25 equals 5)
   - t: "点"      # phrase(a decimal 'point' indicates the fraction component of a number)
   - x: "*[1]"
   - t: "逗号"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
+<<<<<<< HEAD
+=======
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[2]"
 
 - name: absolute-value
   tag: absolute-value
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
+<<<<<<< HEAD
   - test:
       if: "$Verbosity='Terse'"
       then: [t: "绝对值"]      # phrase(the 'absolute value' of a number represents its distance from 0)
@@ -168,13 +366,43 @@
       if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
       then: [pause: short]
       else: [pause: short, t: "最终绝对值", pause: short]      # phrase(show 'end absolute value' position)
+=======
+  - x: "*[1]"
+  - T: "的"
+  - test:
+      if: "$Verbosity='Terse'"
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: [{T: "絕對值"}]      # phrase(the 'absolute value' of a number represents its distance from 0)
+      else: [{T: "絕對值"}]      # phrase('the absolute value of' a number represents its distance from 0)
+  #- test:
+  #    if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
+  #    then: [{pause: short}]
+  #    else: [{pause: short}, {t: "結束絕對值"}, {pause: short}]      # phrase(show 'end absolute value' position)
+========
+      then: [{t: "绝对值"}]      # phrase(the 'absolute value' of a number represents its distance from 0)
+      else: [{t: "绝对值"}]      # phrase('the absolute value of' a number represents its distance from 0)
+  - x: "*[1]"
+  - test:
+      if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
+      then: [{pause: short}]
+      else: [{pause: short}, {t: "最终绝对值"}, {pause: short}]      # phrase(show 'end absolute value' position)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: negative
   tag: negative
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
   - bookmark: "./@id"
+<<<<<<< HEAD
   - t: "负"      # phrase('negative' numbers are those less than 0)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+  - T: "負"      # phrase('negative' numbers are those less than 0)
+========
+  - t: "负"      # phrase('negative' numbers are those less than 0)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[1]"
 
 - name: positive
@@ -182,7 +410,15 @@
   match: "count(*)=1 and not(@data-intent-property)"
   replace:
   - bookmark: "./@id"
+<<<<<<< HEAD
   - t: "正"      # phrase(multiplying two negatives results in a 'positive' number)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+  - T: "正"      # phrase(multiplying two negatives results in a 'positive' number)
+========
+  - t: "正"      # phrase(multiplying two negatives results in a 'positive' number)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[1]"
 
 - name: subscript
@@ -190,6 +426,7 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
+<<<<<<< HEAD
   - t: " sub"      # phrase(the subscripted variable a 'sub' i)
   - x: "*[2]"
   - test:
@@ -200,6 +437,30 @@
           then: [t: "最终下标"]      # phrase(this is the 'end subscript' position)
           else: [t: "最终子"]      # phrase(this is the 'end sub' position)
   - pause: short
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+  - T: "下標"      # phrase(the subscripted variable a 'sub' i)
+========
+  - t: " sub"      # phrase(the subscripted variable a 'sub' i)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+  - x: "*[2]"
+  - test:
+      if: "DEBUG(not(IsNode(*[2],'leaf')))"
+      then:
+      - test:
+          if: "$Verbosity='Verbose'"
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+          then: {T: "結束下標"}      # phrase(this is the 'end subscript' position)
+          else: {T: "結束下標"}      # phrase(this is the 'end sub' position)
+========
+          then: {t: "最终下标"}      # phrase(this is the 'end subscript' position)
+          else: {t: "最终子"}      # phrase(this is the 'end sub' position)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+      - pause: short
+      else_test:
+          if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
+          then: [pause: short]
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: bigop-both
   tag: large-op
@@ -207,15 +468,34 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
+<<<<<<< HEAD
       then: [t: "这"]      # phrase('the' square root of 25 equals 5)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: [{T: ""}]      # phrase('the' square root of 25 equals 5)
+  - x: "*[1]"
+  - T: "從"      # phrase(subtracting 5 'from' 10 gives 5)
+  - x: "*[2]"
+  - T: "到"      # phrase(adding 6 'to' 6 equals  12)
+========
+      then: [{t: "这"}]      # phrase('the' square root of 25 equals 5)
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[1]"
   - t: "从"      # phrase(subtracting 5 'from' 10 gives 5)
   - x: "*[2]"
   - t: "添加到"      # phrase(adding 6 'to' 6 equals  12)
+<<<<<<< HEAD
   - x: "*[3]"
   - test:
       if: "following-sibling::*"
       then: [t: "的"]      # phrase(the square root 'of' 25 equals 5)
+=======
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+  - x: "*[3]"
+  - test:
+      if: "following-sibling::*"
+      then: [{T: "項目"}]      # phrase(the square root 'of' 25 equals 5)
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: bigop-under
   tag: large-op
@@ -223,6 +503,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
+<<<<<<< HEAD
       then: [t: "这"]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
   - t: "超过"      # phrase(2 'over' 3 equals two thirds)
@@ -230,6 +511,21 @@
   - test:
       if: "following-sibling::*"
       then: [t: "的"]      # phrase(the square root 'of' 25 equals 5)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: [{T: ""}]      # phrase('the' square root of 25 equals 5)
+  - x: "*[1]"
+  - T: "下層"      # phrase(2 'over' 3 equals two thirds)
+========
+      then: [{t: "这"}]      # phrase('the' square root of 25 equals 5)
+  - x: "*[1]"
+  - t: "超过"      # phrase(2 'over' 3 equals two thirds)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+  - x: "*[2]"
+  - test:
+      if: "following-sibling::*"
+      then: [{T: "項目"}]      # phrase(the square root 'of' 25 equals 5)
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: largeop
   tag: mrow
@@ -237,9 +533,19 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
+<<<<<<< HEAD
       then: [t: "这"]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
   - t: "的"      # phrase(the square root 'of' 25 equals 5)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: [{T: ""}]      # phrase('the' square root of 25 equals 5)
+========
+      then: [{t: "这"}]      # phrase('the' square root of 25 equals 5)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+  - x: "*[1]"
+  - T: "項目"      # phrase(the square root 'of' 25 equals 5)
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[2]"
 
 - name: limit
@@ -248,6 +554,7 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
+<<<<<<< HEAD
       then: [t: "x接近1的"]           # phrase('the' limit as x approaches 1)
   - test:
     - if: "*[1][.='lim']"
@@ -264,6 +571,15 @@
           else: [t: "限制较低"]
     - else: [x: "*[1]"]
   - t: "as"                      # phrase(the limit 'as' x approaches 1)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: [{T: "極限"}]      # phrase('the limit as' indicated by this result)
+      else: [{T: "極限"}]      # phrase(the 'limit as' indicated by this result)
+========
+      then: [{t: "极限"}]      # phrase('the limit as' indicated by this result)
+      else: [{t: "限制"}]      # phrase(the 'limit as' indicated by this result)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[2]"
   - pause: short
 
@@ -271,7 +587,11 @@
   tag: modified-variable
   match: "count(*)=2 and *[2][text()='→']"
   replace:
+<<<<<<< HEAD
   - t: "向量"      # phrase(the 'vector' reflects size and direction)
+=======
+  - T: "向量"      # phrase(the 'vector' reflects size and direction)
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[1]"
 
 - name: default
@@ -293,8 +613,18 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Terse'"
+<<<<<<< HEAD
         then: [t: "超级"]      # phrase(this is a 'super' set of numbers)
         else: [t: "上标"]      # phrase(a 'superscript' number indicates raised to a power)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+        then: {T: "上標"}      # phrase(this is a 'super' set of numbers)
+        else: {T: "上標"}      # phrase(a 'superscript' number indicates raised to a power)
+========
+        then: {t: "超级"}      # phrase(this is a 'super' set of numbers)
+        else: {t: "上标"}      # phrase(a 'superscript' number indicates raised to a power)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[2]"
   - pause: short
 
@@ -306,6 +636,7 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
       then: [t: "下标"]      # phrase(a 'subscript' may be used to indicate an index)
       else: [t: "子"]      # phrase(the result is 'sub' optimal)
   - x: "*[2]"
@@ -316,6 +647,28 @@
           if: "$Verbosity='Verbose'"
           then: [t: "最终下标"]      # phrase(this is the 'end subscript' position)
           else: [t: "最终子"]      # phrase(this is the 'end sub' position)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "下標"}      # phrase(a 'subscript' may be used to indicate an index)
+      else: {T: "下標"}      # phrase(the result is 'sub' optimal)
+========
+      then: {t: "下标"}      # phrase(a 'subscript' may be used to indicate an index)
+      else: {t: "子"}      # phrase(the result is 'sub' optimal)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+  - x: "*[2]"
+  - test:
+      if: "DEBUG(not(IsNode(*[2],'leaf')))"
+      then:
+      - test:
+          if: "$Verbosity='Verbose'"
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+          then: {T: "結束下標"}      # phrase(this is the 'end subscript' position)
+          else: {T: "結束下標"}      # phrase(this is the 'end sub' position)
+========
+          then: {t: "最终下标"}      # phrase(this is the 'end subscript' position)
+          else: {t: "最终子"}      # phrase(this is the 'end sub' position)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       - pause: short
       else_test:
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
@@ -324,8 +677,18 @@
       if: "name(.)='say-super'"
       then_test:
         if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
         then: [t: "上标"]      # phrase(a 'superscript' number indicates raised to a power)
         else: [t: "超级"]      # phrase(this is a 'super' set of numbers)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+        then: {T: "上標"}      # phrase(a 'superscript' number indicates raised to a power)
+        else: {T: "上標"}      # phrase(this is a 'super' set of numbers)
+========
+        then: {t: "上标"}      # phrase(a 'superscript' number indicates raised to a power)
+        else: {t: "超级"}      # phrase(this is a 'super' set of numbers)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[3]"
   - pause: short
 
@@ -334,7 +697,11 @@
   match: "text()='sin'"
   replace:
   - bookmark: "@id"
+<<<<<<< HEAD
   - t: "正弦"      # phrase(the 'sine' of the angle)
+=======
+  - T: "sine"      # phrase(the 'sine' of the angle)
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 - name: cos
   tag: mi
   match: "text()='cos'"
@@ -342,8 +709,18 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
+<<<<<<< HEAD
       then: [t: " cos"]      # phrase('cos' is the abbreviation for cosine)
       else: [t: "余弦"]      # phrase(find the 'cosine' in a right-angle triangle)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "cos"}      # phrase('cos' is the abbreviation for cosine)
+      else: {T: "cosine"}      # phrase(find the 'cosine' in a right-angle triangle)
+========
+      then: {t: " cos"}      # phrase('cos' is the abbreviation for cosine)
+      else: {t: "余弦"}      # phrase(find the 'cosine' in a right-angle triangle)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 - name: tan
   tag: mi
   match: "text()='tan' or text()='tg'"
@@ -351,8 +728,18 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
+<<<<<<< HEAD
       then: [t: "棕褐色"]      # phrase(the 'tan' is the ratio of the opposite to the adjacent side of a right-angled triangle)
       else: [t: "切线"]      # phrase(a 'tangent' is a straight line that touches a curve)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "tan"}      # phrase(the 'tan' is the ratio of the opposite to the adjacent side of a right-angled triangle)
+      else: {T: "tangent"}      # phrase(a 'tangent' is a straight line that touches a curve)
+========
+      then: {t: "棕褐色"}      # phrase(the 'tan' is the ratio of the opposite to the adjacent side of a right-angled triangle)
+      else: {t: "切线"}      # phrase(a 'tangent' is a straight line that touches a curve)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 - name: sec
   tag: mi
   match: "text()='sec'"
@@ -360,8 +747,18 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
+<<<<<<< HEAD
       then: [t: "寻求"]      # phrase(to 'seek' a solution)
       else: [t: "割线"]      # phrase(a 'secant' intersects a curve at two or more points)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "secant"}      # phrase(to 'seek' a solution)
+      else: {T: "secant"}      # phrase(a 'secant' intersects a curve at two or more points)
+========
+      then: {t: "寻求"}      # phrase(to 'seek' a solution)
+      else: {t: "割线"}      # phrase(a 'secant' intersects a curve at two or more points)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 - name: csc
   tag: mi
   match: "text()='csc'"
@@ -369,8 +766,18 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
+<<<<<<< HEAD
       then: [t: "共同"]      # phrase(we will 'cosecant' a solution)
       else: [t: " cosecant"]      # phrase(the 'cosecant' is the reciprocal of the secant)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "cosecant"}      # phrase(we will 'cosecant' a solution)
+      else: {T: "cosecant"}      # phrase(the 'cosecant' is the reciprocal of the secant)
+========
+      then: {t: "共同"}      # phrase(we will 'cosecant' a solution)
+      else: {t: " cosecant"}      # phrase(the 'cosecant' is the reciprocal of the secant)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 - name: cot
   tag: mi
   match: "text()='cot'"
@@ -378,8 +785,18 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
+<<<<<<< HEAD
       then: [t: " cotangent"]      # phrase(find the 'cotangent' in a right-angle triangle)
       else: [t: " cotangent"]      # phrase(the 'cotangent' is the reciprocal of the tangent)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "cotangent"}      # phrase(find the 'cotangent' in a right-angle triangle)
+      else: {T: "cotangent"}      # phrase(the 'cotangent' is the reciprocal of the tangent)
+========
+      then: {t: " cotangent"}      # phrase(find the 'cotangent' in a right-angle triangle)
+      else: {t: " cotangent"}      # phrase(the 'cotangent' is the reciprocal of the tangent)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: sinh
   tag: mi
@@ -388,8 +805,18 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
+<<<<<<< HEAD
       then: [t: " sinch"]      # phrase(the word 'sinch' is an abbreviation for hyperbolic sine)
       else: [t: "双曲线正弦"]      # phrase(the 'hyperbolic sine' is used in mathematics)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "sinch"}      # phrase(the word 'sinch' is an abbreviation for hyperbolic sine)
+      else: {T: "hyperbolic sine"}      # phrase(the 'hyperbolic sine' is used in mathematics)
+========
+      then: {t: " sinch"}      # phrase(the word 'sinch' is an abbreviation for hyperbolic sine)
+      else: {t: "双曲线正弦"}      # phrase(the 'hyperbolic sine' is used in mathematics)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 - name: cosh
   tag: mi
   match: "text()='cosh'"
@@ -397,8 +824,18 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
+<<<<<<< HEAD
       then: [t: " cosh"]      # phrase('cosh' is an abbreviation of hyperbolic cosine)
       else: [t: "双曲余弦"]      # phrase(the 'hyperbolic cosine' is a mathematical function)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "cosh"}      # phrase('cosh' is an abbreviation of hyperbolic cosine)
+      else: {T: "hyperbolic cosine"}      # phrase(the 'hyperbolic cosine' is a mathematical function)
+========
+      then: {t: " cosh"}      # phrase('cosh' is an abbreviation of hyperbolic cosine)
+      else: {t: "双曲余弦"}      # phrase(the 'hyperbolic cosine' is a mathematical function)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 - name: tanh
   tag: mi
   match: "text()='tanh'"
@@ -406,8 +843,18 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
+<<<<<<< HEAD
       then: [t: " tanch"]      # phrase('tanch' is shorthand for hyperbolic tangent)
       else: [t: "双曲线切线"]      # phrase('hyperbolic tangent' is a mathematical function)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "tanch"}      # phrase('tanch' is shorthand for hyperbolic tangent)
+      else: {T: "hyperbolic tangent"}      # phrase('hyperbolic tangent' is a mathematical function)
+========
+      then: {t: " tanch"}      # phrase('tanch' is shorthand for hyperbolic tangent)
+      else: {t: "双曲线切线"}      # phrase('hyperbolic tangent' is a mathematical function)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 - name: sech
   tag: mi
   match: "text()='sech'"
@@ -415,8 +862,18 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
+<<<<<<< HEAD
       then: [t: " sheck"]      # phrase('sheck' is shorthand for hyperbolic secant)
       else: [t: "双曲线割线"]      # phrase('hyperbolic secant' is a mathematical function)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "sheck"}      # phrase('sheck' is shorthand for hyperbolic secant)
+      else: {T: "hyperbolic secant"}      # phrase('hyperbolic secant' is a mathematical function)
+========
+      then: {t: " sheck"}      # phrase('sheck' is shorthand for hyperbolic secant)
+      else: {t: "双曲线割线"}      # phrase('hyperbolic secant' is a mathematical function)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 - name: csch
   tag: mi
   match: "text()='csch'"
@@ -424,8 +881,18 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
+<<<<<<< HEAD
       then: [t: " cosheck"]      # phrase('cosheck' is shorthand for hyperbolic cosecant)
       else: [t: "双曲线整合"]      # phrase('hyperbolic cosecant' is a mathematical function)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "cosheck"}      # phrase('cosheck' is shorthand for hyperbolic cosecant)
+      else: {T: "hyperbolic cosecant"}      # phrase('hyperbolic cosecant' is a mathematical function)
+========
+      then: {t: " cosheck"}      # phrase('cosheck' is shorthand for hyperbolic cosecant)
+      else: {t: "双曲线整合"}      # phrase('hyperbolic cosecant' is a mathematical function)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 - name: coth
   tag: mi
   match: "text()='coth'"
@@ -433,6 +900,7 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity='Terse'"
+<<<<<<< HEAD
       then: [t: " cotanch"]      # phrase('cotanch' is shorthand for hyperbolic cotangent)
       else: [t: "双曲线cotangent"]      # phrase(the 'hyperbolic cotangent' is a mathematical function)
 - name: exponential
@@ -453,11 +921,24 @@
       if: "$Verbosity='Terse'"
       then: [t: " cov"]      # phrase('Cov' is shorthand for the covariance function)
       else: [t: "协方差"]      # phrase('covariance' function)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "cotanch"}      # phrase('cotanch' is shorthand for hyperbolic cotangent)
+      else: {T: "hyperbolic cotangent"}      # phrase(the 'hyperbolic cotangent' is a mathematical function)
+========
+      then: {t: " cotanch"}      # phrase('cotanch' is shorthand for hyperbolic cotangent)
+      else: {t: "双曲线cotangent"}      # phrase(the 'hyperbolic cotangent' is a mathematical function)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - # handle both log and ln
   name: log
   tag: mrow
+<<<<<<< HEAD
   variables: [log_is_simple: "IsNode(*[3],'simple')"]
+=======
+  variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   match:
   - "count(*)=3 and"
   - "*[1][self::m:mi][text()='log' or text()='ln'] and"
@@ -468,6 +949,7 @@
       if: "$log_is_simple"
       then_test:
       - if: "*[1][text()='log']"
+<<<<<<< HEAD
         then: [t: "日志"]      # phrase(the 'log' function is used in mathematics)
       - else_if: "$Verbosity='Terse'"
         then: [spell: "'ln'"]
@@ -483,6 +965,41 @@
           then: [spell: "'ln'"]
           else: [t: "自然日志"]      # phrase(the 'natural log' function is used in mathematics)
       - t: "的"      # phrase(5 is the square root 'of' 25)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+        then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
+      - else_if: "$Verbosity='Terse'"
+        then: [{SPELL: "'ln'"}]
+        else: [{SPELL: "'ln'"}]      # phrase(the 'natural log' function is used in mathematics)
+      else:
+      - test:
+          if: "$Verbosity!='Terse' and not(log_is_simple)"
+          then: {T: ""}      # phrase('the' square root of 25 equals 5)
+      - test:
+        - if: "*[1][text()='log']"
+          then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
+        - else_if: "$Verbosity='Terse'"
+          then: [{SPELL: "'ln'"}]
+          else: [{SPELL: "'ln'"}]      # phrase(the 'natural log' function is used in mathematics)
+      - T: ""      # phrase(5 is the square root 'of' 25)
+========
+        then: [{t: "日志"}]      # phrase(the 'log' function is used in mathematics)
+      - else_if: "$Verbosity='Terse'"
+        then: [{spell: "'ln'"}]
+        else: [{t: "自然日志"}]      # phrase(the 'natural log' function is used in mathematics)
+      else:
+      - test:
+          if: "$Verbosity!='Terse' and not(log_is_simple)"
+          then: {t: "这"}      # phrase('the' square root of 25 equals 5)
+      - test:
+        - if: "*[1][text()='log']"
+          then: [{t: "日志"}]      # phrase(the 'log' function is used in mathematics)
+        - else_if: "$Verbosity='Terse'"
+          then: [{spell: "'ln'"}]
+          else: [{t: "自然日志"}]      # phrase(the 'natural log' function is used in mathematics)
+      - t: "的"      # phrase(5 is the square root 'of' 25)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       - pause: short
   - x: "*[3]"
 
@@ -493,8 +1010,18 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity!='Terse'"
+<<<<<<< HEAD
       then: [t: "这"]      # phrase('the' square root of 25 equals 5)
   - t: "日志基础"      # phrase(the 'log base' is often base 10)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: ""}      # phrase('the' square root of 25 equals 5)
+  - T: "log 底"      # phrase(the 'log base' is often base 10)
+========
+      then: {t: "这"}      # phrase('the' square root of 25 equals 5)
+  - t: "日志基础"      # phrase(the 'log base' is often base 10)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[1]"
 
 - name: log-base-power
@@ -504,12 +1031,23 @@
   - bookmark: "@id"
   - test:
       if: "$Verbosity!='Terse'"
+<<<<<<< HEAD
       then: [t: "这"]      # phrase('the' square root of 25 equals 5)
   - t: "日志基础"      # phrase(the 'log base' is often base 10)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: ""}      # phrase('the' square root of 25 equals 5)
+  - T: "log 底"      # phrase(the 'log base' is often base 10)
+========
+      then: {t: "这"}      # phrase('the' square root of 25 equals 5)
+  - t: "日志基础"      # phrase(the 'log base' is often base 10)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[1]"
   - pause: medium
   - test:
       - if: "*[2][text()=2]"
+<<<<<<< HEAD
         then: [t: "平方"]     
       - else_if: "*[2][text()=3]"
         then: [t: "立方体"]
@@ -517,6 +1055,19 @@
         - t: "提高到"      # phrase(x 'raised to the' second power)
         - x: "*[2]"
         - t: "力量"      # phrase(x raised to the second 'power')
+=======
+        then: [T: "平方"]     
+      - else_if: "*[2][text()=3]"
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+        then: [T: "立方"]
+========
+        then: [t: "立方体"]
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+        else:  # don't bother with special cases as this isn't likely to happen
+        - T: "的"      # phrase(x 'raised to the' second power)
+        - x: "*[2]"
+        - T: "次方"      # phrase(x raised to the second 'power')
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - pause: short
 
 - name: multi-line
@@ -532,6 +1083,7 @@
   - x: "$LineCount"
   - test:
     - if: "self::m:cases"
+<<<<<<< HEAD
       then: [t: "案例"]      # phrase(this is the first 'case' of three cases)
     - else_if: "self::m:equations"
       then: [t: "方程式"]      # phrase(this is the first 'equation' of three equations)
@@ -539,6 +1091,22 @@
   - test:
     - if: "$LineCount != 1"
       then: [ct: "s"] # plural
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: [{T: "情況"}]      # phrase(this is the first 'case' of three cases)
+    - else_if: "self::m:equations"
+      then: [{T: "方程"}]      # phrase(this is the first 'equation' of three equations)
+      else: [{T: "列"}]      # phrase(this is the first 'line' of three lines)
+========
+      then: [{t: "案例"}]      # phrase(this is the first 'case' of three cases)
+    - else_if: "self::m:equations"
+      then: [{t: "方程式"}]      # phrase(this is the first 'equation' of three equations)
+      else: [{t: "线"}]      # phrase(this is the first 'line' of three lines)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+  - test:
+    - if: "$LineCount != 1"
+      then: [{CT: ""}] # plural
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - pause: short
   - x: "*"
 
@@ -550,27 +1118,61 @@
       if: "parent::m:equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
            count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']]) != 0"
       then:
+<<<<<<< HEAD
       - t: "下线"
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      - T: "下一列"
+========
+      - t: "下线"
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       else_test:
         if: "$LineCount != 1"
         then:
         - test:
           - if: "parent::m:cases"
+<<<<<<< HEAD
             then: [t: "案例"]     # phrase('case' 1 of 10 cases)
           - else_if: "parent::m:equations"
             then: [t: "方程式"] # phrase('equation' 1 of 10 equations)
             else: [t: "线"]     # phrase('line 1 of 10 lines)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+            then: [{T: "情況"}]     # phrase('case' 1 of 10 cases)
+          - else_if: "parent::m:equations"
+            then: [{T: "方程"}] # phrase('equation' 1 of 10 equations)
+            else: [{T: "列"}]     # phrase('line 1 of 10 lines)
+========
+            then: [{t: "案例"}]     # phrase('case' 1 of 10 cases)
+          - else_if: "parent::m:equations"
+            then: [{t: "方程式"}] # phrase('equation' 1 of 10 equations)
+            else: [{t: "线"}]     # phrase('line 1 of 10 lines)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
         - x: "count(preceding-sibling::*)+1"
 
   - test:
       if: .[self::m:mlabeledtr]
       then:
+<<<<<<< HEAD
       - t: "标签"      # phrase(the diagram is complete 'with label')
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      - T: "帶有標籤"      # phrase(the diagram is complete 'with label')
+========
+      - t: "标签"      # phrase(the diagram is complete 'with label')
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       - x: "*[1]/*"
   - pause: medium
   - test:
       if: .[self::m:mlabeledtr]
+<<<<<<< HEAD
       then: [x: "*[position()>1]"]
+=======
+      then: [{x: "*[position()>1]"}]
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       else: {x: "*"}
 
 - name: default-multiline
@@ -584,6 +1186,7 @@
     - if: "count(following-sibling::*) > 0"
       then_test:
         if: "$LongPause"
+<<<<<<< HEAD
         then: [pause: medium]
         else: [pause: short]
     - else_if: "count(../following-sibling::*) > 0"
@@ -592,6 +1195,16 @@
         then: [pause: long]
         else: [pause: medium]
       else: [pause: long]
+=======
+        then: {pause: medium}
+        else: {pause: short}
+    - else_if: "count(../following-sibling::*) > 0"
+      then_test:
+        if: "$LongPause"
+        then: {pause: long}
+        else: {pause: medium}
+      else: {pause: long}
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 # Matrix/Determinant rules
 # matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
@@ -599,41 +1212,88 @@
 # the rules either speak the <mtr>s (to get "row n") or the <mtd>s. "column n" spoken if $IsColumnSilent is false
 - name: 1x1-matrix
   tag: [matrix, determinant]
+<<<<<<< HEAD
   variables: [IsColumnSilent: true()]
   match: "count(*)=1 and *[self::m:mtr][count(*) = 1]"
   replace:
+=======
+  variables: [{IsColumnSilent: true()}]
+  match: "count(*)=1 and *[self::m:mtr][count(*) = 1]"
+  replace:
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+  - OT: ""      # phrase('the' 1 by 1 matrix M)
+  - T: "1 乘 1"      # phrase(the '1 by 1' matrix)
+  - test:
+      if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
+      then: {T: "行列式"}      # phrase(the 2 by 2 'determinant'))
+      else: {T: "矩陣"}      # phrase(the 2 by 2 'matrix')
+      
+  - T: "成員"      # phrase(the 2 by 2 matrix 'with entry' x)
+========
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - ot: "这"      # phrase('the' 1 by 1 matrix M)
   - t: " 1 x 1"      # phrase(the '1 by 1' matrix)
   - test:
       if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
+<<<<<<< HEAD
       then: [t: "决定因素"]      # phrase(the 2 by 2 'determinant'))
       else: [t: "矩阵"]      # phrase(the 2 by 2 'matrix')
       
   - t: "带入口"      # phrase(the 2 by 2 matrix 'with entry' x)
+=======
+      then: {t: "决定因素"}      # phrase(the 2 by 2 'determinant'))
+      else: {t: "矩阵"}      # phrase(the 2 by 2 'matrix')
+      
+  - t: "带入口"      # phrase(the 2 by 2 matrix 'with entry' x)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[1]/*"
 
 # simpler reading methods for smaller matrices if the entries are simple
 - name: 2-or-3x1-matrix
   tag: matrix
+<<<<<<< HEAD
   variables: [IsColumnSilent: true()]
+=======
+  variables: [{IsColumnSilent: true()}]
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   match:
   - "$ClearSpeak_Matrix != 'SpeakColNum' and " # "simple" isn't used for this preference
   - "*[self::m:mtr][count(*) = 1] and " # one column
   - count(*)<=3 and # at least two rows
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   replace:
+<<<<<<< HEAD
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+  - T: ""      # phrase('the' 2 by 2 matrix M)
+  - x: count(*)
+  - T: "乘 1"      # phrase(the 2 'by 1 column' matrix)
+  - test:
+      if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
+      then: {T: "向量"}      # phrase(the 2 by 2 'vector')
+      else: {T: "矩陣"}      # phrase(the 2 by 2 'matrix')
+========
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - t: "这"      # phrase('the' 2 by 2 matrix M)
   - x: count(*)
   - t: "by 1列"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
+<<<<<<< HEAD
       then: [t: "向量"]      # phrase(the 2 by 2 'vector')
       else: [t: "矩阵"]      # phrase(the 2 by 2 'matrix')
+=======
+      then: {t: "向量"}      # phrase(the 2 by 2 'vector')
+      else: {t: "矩阵"}      # phrase(the 2 by 2 'matrix')
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - pause: long
   - x: "*/*"
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
+<<<<<<< HEAD
       - t: "结束"      # phrase('end' of matrix)
       - test:
           if: $ClearSpeak_Matrix = 'EndVector'
@@ -652,21 +1312,71 @@
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: [t: "向量"]      # phrase(the 2 column 'vector')
       else: [t: "矩阵"]      # phrase(the 2 by 2 'matrix')
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      - T: "結束"      # phrase('end' of matrix)
+      - test:
+          if: $ClearSpeak_Matrix = 'EndVector'
+          then: {T: "向量"}      # phrase(the 2 column 'vector')
+          else: {T: "矩陣"}      # phrase(the 2 by 2 'matrix')
+========
+      - t: "结束"      # phrase('end' of matrix)
+      - test:
+          if: $ClearSpeak_Matrix = 'EndVector'
+          then: {t: "向量"}      # phrase(the 2 column 'vector')
+          else: {t: "矩阵"}      # phrase(the 2 by 2 'matrix')
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+
+- name: default-column-matrix
+  tag: matrix
+  variables: [{IsColumnSilent: true()}]
+  match: "*[self::m:mtr][count(*) = 1]"
+  replace:
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+  - T: ""      # phrase('the' 2 by 2 matrix M)
+========
+  - t: "这"      # phrase('the' 2 by 2 matrix M)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+  - x: "count(*)"
+  - T: "乘 1"      # phrase(the 2 'by 1 column' matrix)
+  - test:
+      if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "向量"}      # phrase(the 2 column 'vector')
+      else: {T: "矩陣"}      # phrase(the 2 by 2 'matrix')
+========
+      then: {t: "向量"}      # phrase(the 2 column 'vector')
+      else: {t: "矩阵"}      # phrase(the 2 by 2 'matrix')
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - pause: long
   - x: "*" # select the rows (mtr)
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
+<<<<<<< HEAD
       then: [t: "矩阵的结尾"]      # phrase(the 'end of matrix' has been reached)
 
 - name: 1x2-or-3-matrix
   tag: matrix
   variables: [IsColumnSilent: "$SpeechStyle = 'SimpleSpeak' or ($SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum')"]
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: [{T: "結束"}]      # phrase(the 'end of matrix' has been reached)
+========
+      then: [{t: "矩阵的结尾"}]      # phrase(the 'end of matrix' has been reached)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+
+- name: 1x2-or-3-matrix
+  tag: matrix
+  variables: [{IsColumnSilent: "$SpeechStyle = 'SimpleSpeak' or ($SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum')"}]
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   match:
   - "$ClearSpeak_Matrix != 'SpeakColNum' and " # "simple" isn't used for this preference
   - count(*)=1  and # one row
   - count(*[1]/*)<=3 and # at least two cols
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   replace:
+<<<<<<< HEAD
   - t: "1 by"      # phrase('the 1 by' 2 matrix)
   - x: count(*/*)
   - t: "排"      # phrase(the 1 by 4 'row' matrix)
@@ -674,11 +1384,26 @@
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: [t: "1 by"]      # phrase('the 1 by' 2 row 'vector')
       else: [t: "1 by"]      # phrase('the 1 by' 2 'matrix')
+=======
+  - T: "1 乘"      # phrase('the 1 by' 2 matrix)
+  - x: count(*/*)
+  - T: ""      # phrase(the 1 by 4 'row' matrix)
+  - test:
+      if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "向量"}      # phrase('the 1 by' 2 row 'vector')
+      else: {T: "矩陣"}      # phrase('the 1 by' 2 'matrix')
+========
+      then: {t: "1 by"}      # phrase('the 1 by' 2 row 'vector')
+      else: {t: "1 by"}      # phrase('the 1 by' 2 'matrix')
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - pause: long
   - x: "*/*"
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
+<<<<<<< HEAD
       - t: "结束"      # phrase(the 'end' of matrix has been reached)
       - test:
           if: $ClearSpeak_Matrix = 'EndMatrix'
@@ -697,17 +1422,66 @@
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: [t: "向量"]      # phrase(the 2 by 1 'vector')
       else: [t: "矩阵"]      # phrase(the 2 by 2 'matrix')
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      - T: "結束"      # phrase(the 'end' of matrix has been reached)
+      - test:
+          if: $ClearSpeak_Matrix = 'EndMatrix'
+          then: {T: "矩陣"}      # phrase(the 2 by 2 'matrix')
+          else: {T: "向量"}      # phrase(the 2 by 1 'vector')
+========
+      - t: "结束"      # phrase(the 'end' of matrix has been reached)
+      - test:
+          if: $ClearSpeak_Matrix = 'EndMatrix'
+          then: {t: "矩阵"}      # phrase(the 2 by 2 'matrix')
+          else: {t: "向量"}      # phrase(the 2 by 1 'vector')
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+
+- name: default-row-matrix
+  tag: matrix
+  variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
+  match: "count(*)=1" # one row
+  replace:
+  - T: "1 乘"      # phrase('the 1 by' 2 matrix)
+  - x: "count(*/*)"
+  - T: ""      # phrase(the 1 by 2 'row' matrix)
+  - test:
+      if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: {T: "向量"}      # phrase(the 2 by 1 'vector')
+      else: {T: "矩陣"}      # phrase(the 2 by 2 'matrix')
+========
+      then: {t: "向量"}      # phrase(the 2 by 1 'vector')
+      else: {t: "矩阵"}      # phrase(the 2 by 2 'matrix')
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - pause: long
   - pause: medium
   - x: "*/*" # select the cols (mtd)
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
+<<<<<<< HEAD
       - t: "结束"      # phrase(the 'end' of matrix has been reached)
       - test:
           if: $ClearSpeak_Matrix = 'EndMatrix'
           then: [t: "矩阵"]      # phrase(the 2 by 2 'matrix')
           else: [t: "向量"]      # phrase(the 2 by 1 'vector')
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      - T: "結束"      # phrase(the 'end' of matrix has been reached)
+      - test:
+          if: $ClearSpeak_Matrix = 'EndMatrix'
+          then: {T: "矩陣"}      # phrase(the 2 by 2 'matrix')
+          else: {T: "向量"}      # phrase(the 2 by 1 'vector')
+========
+      - t: "结束"      # phrase(the 'end' of matrix has been reached)
+      - test:
+          if: $ClearSpeak_Matrix = 'EndMatrix'
+          then: {t: "矩阵"}      # phrase(the 2 by 2 'matrix')
+          else: {t: "向量"}      # phrase(the 2 by 1 'vector')
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: simple-small-matrix
   tag: [matrix, determinant]
@@ -715,21 +1489,43 @@
   - "$ClearSpeak_Matrix != 'SpeakColNum' and " # "simple" isn't used for this preference
   - (count(*)<=3 and count(*[1]/*)<=3) and # no bigger than a 3x3 matrix
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
+<<<<<<< HEAD
   variables: [IsColumnSilent: "$SpeechStyle = 'SimpleSpeak' or ($SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum')"]
   replace:
+=======
+  variables: [{IsColumnSilent: "$SpeechStyle = 'SimpleSpeak' or ($SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum')"}]
+  replace:
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+  - T: ""      # phrase('the' 1 by 2 matrix M)
+  - x: count(*)
+  - T: "乘"      # phrase(the 1 'by' 2 matrix)
+  - x: count(*[self::m:mtr][1]/*)
+  - test:
+      if: "self::m:determinant"
+      then: {T: "行列式"}      # phrase(the 2 by 2 'determinant')
+      else: {T: "矩陣"}      # phrase(the 2 by 2 'matrix')
+========
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - t: "这"      # phrase('the' 1 by 2 matrix M)
   - x: count(*)
   - t: "by"      # phrase(the 1 'by' 2 matrix)
   - x: count(*[self::m:mtr][1]/*)
   - test:
       if: "self::m:determinant"
+<<<<<<< HEAD
       then: [t: "决定因素"]      # phrase(the 2 by 2 'determinant')
       else: [t: "矩阵"]      # phrase(the 2 by 2 'matrix')
+=======
+      then: {t: "决定因素"}      # phrase(the 2 by 2 'determinant')
+      else: {t: "矩阵"}      # phrase(the 2 by 2 'matrix')
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - pause: long
   - x: "*"
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
+<<<<<<< HEAD
       - t: "结束"      # phrase(the 'end' of matrix has been reached)
       - test:
           if: "self::m:determinant"
@@ -741,24 +1537,77 @@
   variables: [IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"]
   match: "not(@data-intent-property)"
   replace:
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      - T: "結束"      # phrase(the 'end' of matrix has been reached)
+      - test:
+          if: "self::m:determinant"
+          then: {T: "行列式"}      # phrase(the 2 by 2 'determinant')
+          else: {T: "矩陣"}      # phrase(the 2 by 2 'matrix')
+========
+      - t: "结束"      # phrase(the 'end' of matrix has been reached)
+      - test:
+          if: "self::m:determinant"
+          then: {t: "决定因素"}      # phrase(the 2 by 2 'determinant')
+          else: {t: "矩阵"}      # phrase(the 2 by 2 'matrix')
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+
+- name: default-matrix
+  tag: [matrix, determinant]
+  variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
+  match: "not(@data-intent-property)"
+  replace:
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+  - T: ""      # phrase('the' 1 by 2 matrix M)
+  - x: "count(*)"
+  - T: "乘"      # phrase(the 1 'by' 2 matrix)
+  - x: "count(*[self::m:mtr][1]/*)"
+  - test:
+      if: "self::m:determinant"
+      then: {T: "行列式"}      # phrase(the 2 by 2 'determinant')
+      else: {T: "矩陣"}      # phrase(the 2 by 2 'matrix')
+========
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - t: "这"      # phrase('the' 1 by 2 matrix M)
   - x: "count(*)"
   - t: "by"      # phrase(the 1 'by' 2 matrix)
   - x: "count(*[self::m:mtr][1]/*)"
   - test:
       if: "self::m:determinant"
+<<<<<<< HEAD
       then: [t: "决定因素"]      # phrase(the 2 by 2 'determinant')
       else: [t: "矩阵"]      # phrase(the 2 by 2 'matrix')
+=======
+      then: {t: "决定因素"}      # phrase(the 2 by 2 'determinant')
+      else: {t: "矩阵"}      # phrase(the 2 by 2 'matrix')
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - pause: long
   - x: "*"
   - test:
       if: "$ClearSpeak_Matrix = 'EndMatrix' or $ClearSpeak_Matrix = 'EndVector'"
       then:
+<<<<<<< HEAD
       - t: "结束"      # phrase(the 'end' of matrix has been reached)
       - test:
           if: "self::m:determinant"
           then: [t: "决定因素"]      # phrase(the 2 by 2 'determinant')
           else: [t: "矩阵"]      # phrase(the 2 by 2 'matrix's)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      - T: "結束"      # phrase(the 'end' of matrix has been reached)
+      - test:
+          if: "self::m:determinant"
+          then: {T: "行列式"}      # phrase(the 2 by 2 'determinant')
+          else: {T: "矩陣"}      # phrase(the 2 by 2 'matrix's)
+========
+      - t: "结束"      # phrase(the 'end' of matrix has been reached)
+      - test:
+          if: "self::m:determinant"
+          then: {t: "决定因素"}      # phrase(the 2 by 2 'determinant')
+          else: {t: "矩阵"}      # phrase(the 2 by 2 'matrix's)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: chemistry-msub
 
@@ -768,10 +1617,24 @@
   - x: "*[2]"
   - test:
       if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
       then: [t: "下标"]      # phrase(H 'subscript' 2)
       else_test:
         if: "$Verbosity='Medium'"
         then: [t: "ub"]      # phrase(H 'sub' 2)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: [{T: "下標"}]      # phrase(H 'subscript' 2)
+      else_test:
+        if: "$Verbosity='Medium'"
+        then: [{T: "下標"}]      # phrase(H 'sub' 2)
+========
+      then: [{t: "下标"}]      # phrase(H 'subscript' 2)
+      else_test:
+        if: "$Verbosity='Medium'"
+        then: [{t: "下标"}]      # phrase(H 'sub' 2)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[3]"
 
 - name: chemistry-msup
@@ -781,6 +1644,7 @@
   - x: "*[2]"
   - test:
       if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
       then: [t: "superscript"]      # phrase(H 'superscript' 2)
       else_test:
         if: "$Verbosity='Medium'"
@@ -789,6 +1653,23 @@
   - test:
       if: "following-sibling::*[1][text()='+' or text()='-']" # a little lazy -- assumes chemistry superscripts end with + or -
       then: [pause: medium]
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: [{T: "上標"}]      # phrase(H 'superscript' 2)
+      else_test:
+        if: "$Verbosity='Medium'"
+        then: [{T: "上標"}]      # phrase(H 'super' 2)
+========
+      then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+      else_test:
+        if: "$Verbosity='Medium'"
+        then: [{t: "super"}]      # phrase(H 'super' 2)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+  - x: "*[3]"
+  - test:
+      if: "following-sibling::*[1][text()='+' or text()='-']" # a little lazy -- assumes chemistry superscripts end with + or -
+      then: [{pause: medium}]
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 -
   # There currently is no way to do sub/super for n-ary number of args
@@ -812,10 +1693,24 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
               then: [t: "superscript"]      # phrase(H 'superscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
                 then: [t: "super"]      # phrase(H 'super' 2)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+              then: [{T: "上標"}]      # phrase(H 'superscript' 2)
+              else_test:
+                if: "$Verbosity='Medium'"
+                then: [{T: "上標"}]      # phrase(H 'super' 2)
+========
+              then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+              else_test:
+                if: "$Verbosity='Medium'"
+                then: [{t: "super"}]      # phrase(H 'super' 2)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
           - x: "$Prescripts[2]"
           - pause: "short"
       - test:
@@ -823,10 +1718,21 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
               then: [t: "下标"]      # phrase(a 'subscript' may be used to indicate an index)
               else_test:
                 if: "$Verbosity='Medium'"
                 then: [t: "子"]      # phrase(here is a 'sub' total)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+              then: [{T: "下標"}]      # phrase(a 'subscript' may be used to indicate an index)
+========
+              then: [{t: "下标"}]      # phrase(a 'subscript' may be used to indicate an index)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+              else_test:
+                if: "$Verbosity='Medium'"
+                then: [{T: "下標"}]      # phrase(here is a 'sub' total)
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
           - x: "$Prescripts[1]"
           - pause: "short"
       - test:
@@ -837,10 +1743,24 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
                   then: [t: "superscript"]      # phrase(H 'superscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
                     then: [t: "super"]      # phrase(H 'super' 2)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+                  then: [{T: "上標"}]      # phrase(H 'superscript' 2)
+                  else_test:
+                    if: "$Verbosity='Medium'"
+                    then: [{T: "上標"}]      # phrase(H 'super' 2)
+========
+                  then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+                  else_test:
+                    if: "$Verbosity='Medium'"
+                    then: [{t: "super"}]      # phrase(H 'super' 2)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
               - x: "$Prescripts[4]"
               - pause: "short"
           - test:
@@ -848,10 +1768,24 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
                   then: [t: "下标"]      # phrase(H 'subscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
                     then: [t: "ub"]      # phrase(H 'sub' 2)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+                  then: [{T: "下標"}]      # phrase(H 'subscript' 2)
+                  else_test:
+                    if: "$Verbosity='Medium'"
+                    then: [{T: "下標"}]      # phrase(H 'sub' 2)
+========
+                  then: [{t: "下标"}]      # phrase(H 'subscript' 2)
+                  else_test:
+                    if: "$Verbosity='Medium'"
+                    then: [{t: "下标"}]      # phrase(H 'sub' 2)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
               - x: "$Prescripts[3]"
               - pause: "short"
   - x: "*[1]" # base
@@ -863,10 +1797,24 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
               then: [t: "下标"]      # phrase(phrase(H 'subscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
                 then: [t: "ub"]      # phrase(phrase(H 'sub' 2)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+              then: [{T: "下標"}]      # phrase(phrase(H 'subscript' 2)
+              else_test:
+                if: "$Verbosity='Medium'"
+                then: [{T: "下標"}]      # phrase(phrase(H 'sub' 2)
+========
+              then: [{t: "下标"}]      # phrase(phrase(H 'subscript' 2)
+              else_test:
+                if: "$Verbosity='Medium'"
+                then: [{t: "下标"}]      # phrase(phrase(H 'sub' 2)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
           - x: "$Postscripts[1]"
           - pause: "short"
       - test:
@@ -874,10 +1822,24 @@
           then:
           - test:
               if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
               then: [t: "superscript"]      # phrase(H 'superscript' 2)
               else_test:
                 if: "$Verbosity='Medium'"
                 then: [t: "super"]          # phrase(H 'super' 2)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+              then: [{T: "上標"}]      # phrase(H 'superscript' 2)
+              else_test:
+                if: "$Verbosity='Medium'"
+                then: [{T: "上標"}]          # phrase(H 'super' 2)
+========
+              then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+              else_test:
+                if: "$Verbosity='Medium'"
+                then: [{t: "super"}]          # phrase(H 'super' 2)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
           - x: "$Postscripts[2]"
           - pause: "short"
       - test:
@@ -888,10 +1850,24 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
                   then: [t: "下标"]      # phrase(H 'subscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
                     then: [t: "ub"]          # phrase(H 'sub' 2)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+                  then: [{T: "下標"}]      # phrase(H 'subscript' 2)
+                  else_test:
+                    if: "$Verbosity='Medium'"
+                    then: [{T: "下標"}]          # phrase(H 'sub' 2)
+========
+                  then: [{t: "下标"}]      # phrase(H 'subscript' 2)
+                  else_test:
+                    if: "$Verbosity='Medium'"
+                    then: [{t: "下标"}]          # phrase(H 'sub' 2)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
               - x: "$Postscripts[3]"
               - pause: "short"
           - test:
@@ -899,10 +1875,24 @@
               then:
               - test:
                   if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
                   then: [t: "superscript"]      # phrase(H 'superscript' 2)
                   else_test:
                     if: "$Verbosity='Medium'"
                     then: [t: "super"]          # phrase(H 'super' 2)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+                  then: [{T: "上標"}]      # phrase(H 'superscript' 2)
+                  else_test:
+                    if: "$Verbosity='Medium'"
+                    then: [{T: "上標"}]          # phrase(H 'super' 2)
+========
+                  then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+                  else_test:
+                    if: "$Verbosity='Medium'"
+                    then: [{t: "super"}]          # phrase(H 'super' 2)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
               - x: "$Postscripts[4]"
               - pause: "short"
           - test:
@@ -913,10 +1903,24 @@
                   then:
                   - test:
                       if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
                       then: [t: "下标"]    # phrase(H 'subscript' 2)
                       else_test:
                         if: "$Verbosity='Medium'"
                         then: [t: "ub"]        # phrase(H 'sub' 2)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+                      then: [{T: "下標"}]    # phrase(H 'subscript' 2)
+                      else_test:
+                        if: "$Verbosity='Medium'"
+                        then: [{T: "下標"}]        # phrase(H 'sub' 2)
+========
+                      then: [{t: "下标"}]    # phrase(H 'subscript' 2)
+                      else_test:
+                        if: "$Verbosity='Medium'"
+                        then: [{t: "下标"}]        # phrase(H 'sub' 2)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
                   - x: "$Postscripts[5]"
                   - pause: "short"
               - test:
@@ -924,10 +1928,24 @@
                   then:
                   - test:
                       if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
                       then: [t: "superscript"]  # phrase(H 'superscript' 2)
                       else_test:
                         if: "$Verbosity='Medium'"
                         then: [t: "super"]      # phrase(H 'super' 2)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+                      then: [{T: "上標"}]  # phrase(H 'superscript' 2)
+                      else_test:
+                        if: "$Verbosity='Medium'"
+                        then: [{T: "上標"}]      # phrase(H 'super' 2)
+========
+                      then: [{t: "superscript"}]  # phrase(H 'superscript' 2)
+                      else_test:
+                        if: "$Verbosity='Medium'"
+                        then: [{t: "super"}]      # phrase(H 'super' 2)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
                   - x: "$Postscripts[6]"
                   - pause: "short"
               - test:
@@ -938,10 +1956,24 @@
                       then:
                       - test:
                           if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
                           then: [t: "下标"]      # phrase(H 'subscript' 2)
                           else_test:
                             if: "$Verbosity='Medium'"
                             then: [t: "ub"]      # phrase(H 'sub' 2)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+                          then: [{T: "下標"}]      # phrase(H 'subscript' 2)
+                          else_test:
+                            if: "$Verbosity='Medium'"
+                            then: [{T: "下標"}]      # phrase(H 'sub' 2)
+========
+                          then: [{t: "下标"}]      # phrase(H 'subscript' 2)
+                          else_test:
+                            if: "$Verbosity='Medium'"
+                            then: [{t: "下标"}]      # phrase(H 'sub' 2)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
                       - x: "$Postscripts[7]"
                       - pause: "short"
                   - test:
@@ -949,15 +1981,33 @@
                       then:
                       - test:
                           if: "$Verbosity='Verbose'"
+<<<<<<< HEAD
                           then: [t: "superscript"]      # phrase(H 'superscript' 2)
                           else_test:
                             if: "$Verbosity='Medium'"
                             then: [t: "super"]      # phrase(H 'super' 2)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+                          then: [{T: "上標"}]      # phrase(H 'superscript' 2)
+                          else_test:
+                            if: "$Verbosity='Medium'"
+                            then: [{T: "上標"}]      # phrase(H 'super' 2)
+========
+                          then: [{t: "superscript"}]      # phrase(H 'superscript' 2)
+                          else_test:
+                            if: "$Verbosity='Medium'"
+                            then: [{t: "super"}]      # phrase(H 'super' 2)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
                       - x: "$Postscripts[8]"
                       - pause: "short"
       - test:
           if: "$Postscripts[last()][not(self::m:none)] and following-sibling::*[1][text()='+' or text()='-']"
+<<<<<<< HEAD
           then: [pause: medium]
+=======
+          then: [{pause: medium}]
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: chemistry
 
@@ -972,7 +2022,11 @@
   match: "."
   replace:
   - bookmark: "@id"
+<<<<<<< HEAD
   - spell: text()
+=======
+  - SPELL: text()
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - pause: short
 
 - name: chemical-state
@@ -982,12 +2036,30 @@
   - bookmark: "*[1]/@id"
   - test:
     - if: ".='s'"
+<<<<<<< HEAD
       then: [t: "坚实"]      # phrase(Boron is a 'solid' in its natural state)
     - else_if: ".='l'"
       then: [t: "液体"]      # phrase(water is a 'liquid')
     - else_if: ".='g'"
       then: [t: "气"]      # phrase(hydrogen is a 'gas' )
       else: [t: "水性"]      # phrase(an 'aqueous' solution is contained in water)
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: [{T: "固體"}]      # phrase(Boron is a 'solid' in its natural state)
+    - else_if: ".='l'"
+      then: [{T: "液體"}]      # phrase(water is a 'liquid')
+    - else_if: ".='g'"
+      then: [{T: "氣體"}]      # phrase(hydrogen is a 'gas' )
+      else: [{T: "水溶液"}]      # phrase(an 'aqueous' solution is contained in water)
+========
+      then: [{t: "坚实"}]      # phrase(Boron is a 'solid' in its natural state)
+    - else_if: ".='l'"
+      then: [{t: "液体"}]      # phrase(water is a 'liquid')
+    - else_if: ".='g'"
+      then: [{t: "气"}]      # phrase(hydrogen is a 'gas' )
+      else: [{t: "水性"}]      # phrase(an 'aqueous' solution is contained in water)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - pause: short
 
 - name: chemical-formula-operator-bond
@@ -998,6 +2070,7 @@
   - bookmark: "@id"
   - test:
     - if: "text()='-' or text() = ':'"
+<<<<<<< HEAD
       then: [t: "单键"]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
     - else_if: "text()='=' or text() = '∷'"
       then: [t: "双键"]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
@@ -1006,6 +2079,26 @@
     - else_if: "text()='≣'"
       then: [t: "四倍键"]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
       else: [x: "text()"]
+=======
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+      then: [{T: "單鍵"}]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
+    - else_if: "text()='=' or text() = '∷'"
+      then: [{T: "雙鍵"}]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
+    - else_if: "text()='≡'"
+      then: [{T: "三鍵"}]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
+    - else_if: "text()='≣'"
+      then: [{T: "四鍵"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
+========
+      then: [{t: "单键"}]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
+    - else_if: "text()='=' or text() = '∷'"
+      then: [{t: "双键"}]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
+    - else_if: "text()='≡'"
+      then: [{t: "三键"}]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
+    - else_if: "text()='≣'"
+      then: [{t: "四倍键"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+      else: [{x: "text()"}]
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: chemical-formula-operator
   tag: chemical-formula-operator
@@ -1020,6 +2113,7 @@
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
   - test:
+<<<<<<< HEAD
     - if: "DEBUG(.)='→' or .='⟶'"
       then_test:
         if: "$Verbosity='Terse'"
@@ -1032,6 +2126,32 @@
     - else_if: ".='\u1f8d3'"
       then: [t: "产品"]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
       else: [x: "*"]
+=======
+    - if: ".='→' or .='⟶'"
+      then_test:
+        if: "$Verbosity='Terse'"
+<<<<<<<< HEAD:Rules/Languages/zh/tw/SharedRules/general.yaml
+        then: [{T: "形成"}]      # phrase(hydrogen and oxygen 'forms' water )
+        else: [{T: "反應形成"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
+    - else_if: ".='⇌' or .='\u1f8d2'"
+      then: [{T: "左右平衡"}]      # phrase(a reactant 'is in equilibrium with' a product)
+    - else_if: ".='\u1f8d4'"
+      then: [{T: "偏左平衡"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
+    - else_if: ".='\u1f8d3'"
+      then: [{T: "偏右平衡"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
+      else: [x: "*"]
+========
+        then: [{t: "形式"}]      # phrase(hydrogen and oxygen 'forms' water )
+        else: [{t: "反应形成"}]      # phrase(hydrogen and oxygen 'reacts to form' water)
+    - else_if: ".='⇌' or .='⮖'"
+      then: [{t: "产品"}]      # phrase(a reactant 'is in equilibrium with' a product)
+    - else_if: ".='⭴'"
+      then: [{t: "处于左侧的平衡"}]      # phrase(the reactant 'is in equilibrium biased to the left with' the product)
+    - else_if: ".='⭵'"
+      then: [{t: "产品"}]      # phrase(the reactant 'is in equilibrium biased to the right with' the product)
+      else: [x: "."]
+>>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe:Rules/Languages/zh/cn/SharedRules/general.yaml
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: chemical-equation-operator
   tag: chemical-equation-operator
@@ -1044,7 +2164,11 @@
   tag: none
   match: "../../*[self::m:chemical-formula or self::m:chemical-nuclide]"
   replace:
+<<<<<<< HEAD
   - t: "" # don't say anything
+=======
+  - T: "" # don't say anything
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: ignore-intent-wrapper
   tag: intent-wrapper

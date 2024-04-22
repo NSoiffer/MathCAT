@@ -89,8 +89,13 @@
   - x: count(*[2]/*[self::m:mtr][1]/*)
   - test:
       if: "*[1][text()='|']" # just need to check the first bracket since we know it must be (, [, or |
+<<<<<<< HEAD
       then: [t: "决定因素"]
       else: [t: "矩阵"]
+=======
+      then: {t: "决定因素"}
+      else: {t: "矩阵"}
+>>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
 - name: default
   tag: mtable
