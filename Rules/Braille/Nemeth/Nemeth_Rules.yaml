@@ -388,7 +388,7 @@
    # primes don't get a superscript indicator
    name: skip-super
    tag: msup
-   match: "*[2][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
+   match: "*[2][self::m:mo][string-length(.)=1 and translate(., '′″‴⁗⋅∙•', '')='']"
    replace:
    - x: "*"
 
@@ -435,8 +435,10 @@
    tag: msub
    variables:
      # we include ∑ and ∏ because Nemeth uses the look-alike Greek letters for them, and hence considers the large ops to be Greek letters
-   - BaseOkForNumericScript: "*[1][BaseNode(.)[(self::m:mi and (string-length()=1 or IsInDefinition(., 'FunctionNames'))) or
-                                               (self::m:mo and (text()='∑' or text()='∏'))]]"
+   - BaseOkForNumericScript: "*[1][BaseNode(.)[
+            (self::m:mi and (string-length()=1 or @data-chem-element or IsInDefinition(., 'FunctionNames'))) or
+            (self::m:mo and (text()='∑' or text()='∏'))]
+          ]"
    match: "*[2][self::m:mn] and ($NewScriptContext = '') and $BaseOkForNumericScript"
    replace:
    - x: "*[1]"
