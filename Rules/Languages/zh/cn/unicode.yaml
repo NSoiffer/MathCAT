@@ -10,7 +10,7 @@
  - "b-z": 
     - test: 
         if: "$TTS='none'"
-        then: [t: "a"]                          	# 	(en: '.', google translation)
+        then: [t: "."]                          	# 	(en: '.', google translation)
         else: [spell: "'.'"]                       
 
  # Capital letters are a little tricky: users can pick their favorite word (something that was requested) and 
@@ -60,7 +60,7 @@
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
         replace: [spell: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]
 
- - "0-9": [t: "大写 a"]                           	# 	(en: '.', google: 'A')
+ - "0-9": [t: "."]                           	# 	(en: '.', google: 'A')
 
  - " ": [t: " "]                                	#  0x20	(google translation)
 

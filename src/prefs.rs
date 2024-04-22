@@ -432,6 +432,7 @@ impl PreferenceManager {
         let mut lang_dir = get_language_dir(rules_dir, lang);
         let mut default_lang = default_lang;
         if lang_dir.is_none() {
+            warn!("Warning: didn't find language directory '{}', using default language '{}'", lang, default_lang.unwrap_or("no default"));
             // try again with the default lang if there is one
             if default_lang.is_some() {
                 lang_dir = get_language_dir(rules_dir, default_lang.unwrap());
