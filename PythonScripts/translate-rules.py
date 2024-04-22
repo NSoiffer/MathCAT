@@ -47,11 +47,8 @@ def collect_phrases_to_translate(file_to_translate: str) -> (list[str], list[str
             word = WordToTranslate.search(line)
             if word:
                 words.append(word.group(1))
-<<<<<<< HEAD
 
         print(f"#phrases={len(phrases)}, #words={len(words)}")
-=======
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
         return (phrases, words)
 
 # break up the words into chunks to make google translate happy (and to run faster) and return a dictionary of word: translation
@@ -73,17 +70,12 @@ def translate_phrases(phrases_to_translate: list[str], lang) -> list[str]:
         # print("***Phrases to translate: {}\n".format(phrases))
         translated_phrases_str: str = GoogleTranslate.translate(phrases_string, src='en', dest=lang).text
         translated_phrases_str = translated_phrases_str.replace('。', '.')   # happens for Chinese
-<<<<<<< HEAD
 
         translated_phrases_str = translated_phrases_str.replace('"', "'").replace("“", "'").replace("”", "'")    # google occasionally changes quotes
         translated_phrases_str = translated_phrases_str.replace("«", "'").replace("»", "'")    # google occasionally changes quotes to this form
         translated_phrases_str = translated_phrases_str.replace("、", ",")   # Chinese comma
         translated_phrases_str = translated_phrases_str.lower()
 
-=======
-        translated_phrases_str = translated_phrases_str.replace('"', "'").replace("“", "'").replace("”", "'")    # google occasionally changes quotes
-        translated_phrases_str = translated_phrases_str.replace("、", ",")   # Chinese comma
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
         translated_phrases_list = translated_phrases_str.split('.\n')
         if len(translated_phrases_list) != len(phrases):
             print("\n!!!Problem in translation: size of translations ({}) differs from phrases to translate ({})\n".format(len(translated_phrases_list), len(phrases)))
@@ -133,10 +125,6 @@ def substitute_in_translated_phrase(line, translated_phrase, translated_word) ->
     elif text_words:
         print(f"Failed to find quoted part in translation \"{translated_phrase}\", \
                using '{translated_word}\n   original line: {line}")
-<<<<<<< HEAD
-
-=======
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
         replacement = text_words.group(1) + '"' + translated_word + '"'    # add the surrounding context back
         new_line = TextString.sub(replacement, line)
     return new_line
@@ -165,10 +153,6 @@ def build_new_translation(path_to_mathcat: str, lang: str, rule_file_name: str) 
     (phrases_to_translate, words_to_translate) = collect_phrases_to_translate(file_to_translate)
     phrase_translations = translate_phrases(phrases_to_translate, lang)
     word_translations = translate_phrases(words_to_translate, lang)
-<<<<<<< HEAD
-
-=======
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
     print(f"file:{rule_file_name}: #phrases={len(phrase_translations)}, #words={len(word_translations)}")
     create_new_file(file_to_translate, os.path.join(lang, rule_file_name), phrase_translations, word_translations)
     print("done\n")
@@ -184,12 +168,7 @@ def build_all_translations(path_to_mathcat: str, lang: str, subdir="") -> None:
             build_new_translation(path_to_mathcat, lang, os.path.join(subdir, entry))            
 
 
-<<<<<<< HEAD
 language = 'zh-cn'
-=======
-
-language = 'fi'
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 if not os.path.exists(language):
     os.makedirs(language)
 if not os.path.exists(language+"/SharedRules"):
