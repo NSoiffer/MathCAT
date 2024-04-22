@@ -13,7 +13,6 @@ fn bond_2_1() {
 
 #[test]
 fn bond_2_2() {
-    init_logger();
     let expr = r#"<math><msub><mi mathvariant="normal">H</mi><mn>2</mn></msub><mi mathvariant="normal">C</mi><mo>=</mo>
                         <msub><mi>CH</mi><mn>2</mn></msub></math>"#;
     test_braille("Nemeth", expr, "⠠⠓⠆⠠⠉⠸⠶⠻⠠⠉⠠⠓⠆");
@@ -82,7 +81,7 @@ fn arrow_bond_2_2_2_d() {
     let expr = r#"<math>
          <msub><mi>RNH</mi><mn>2</mn></msub><mo>+</mo><mi>RX</mi><mo>&#x2192;</mo>
          <msub><mi mathvariant="normal">R</mi><mn>2</mn></msub>
-            <msubsup><mi>NH</mi><mn>2</mn><mo>+</mo></msubsup><msup><mi mathvariant="normal">X</mi><mo>-</mo></msup></math>"#;
+            <msup><msub><mi>NH</mi><mn>2</mn></msub><mo>+</mo></msup><msup><mi mathvariant="normal">X</mi><mo>-</mo></msup></math>"#;
     test_braille("Nemeth", expr, "⠠⠗⠠⠝⠠⠓⠆⠬⠠⠗⠠⠭⠀⠫⠕⠀⠠⠗⠆⠠⠝⠠⠓⠆⠐⠘⠬⠐⠠⠭⠘⠤");
 }
 
