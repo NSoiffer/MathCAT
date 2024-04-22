@@ -39,7 +39,7 @@
 use sxd_document::dom::*;
 use crate::canonicalize::*;
 use crate::pretty_print::mml_to_string;
-use crate::xpath_functions::is_leaf;
+use crate::xpath_functions::{is_leaf, IsNode};
 use regex::Regex;
 use crate::xpath_functions::IsBracketed;
 use phf::{phf_map, phf_set};
@@ -67,7 +67,7 @@ static CHEM_FORMULA_OPERATOR: &str = "data-chem-formula-op";
 static CHEM_EQUATION_OPERATOR: &str = "data-chem-equation-op";
 
 /// mark a new chem element that happened due to splitting a leaf
-static SPLIT_TOKEN: &str = "data-split";
+pub static SPLIT_TOKEN: &str = "data-split";
 
 /// mark a new chem element that happened due to merging two leaves
 static MERGED_TOKEN: &str = "data-merged";
@@ -355,6 +355,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
             return None;    // didn't find a valid chem element
         }
         new_children.iter().skip(1).for_each(|&el| {el.set_attribute_value(SPLIT_TOKEN, "true");});
+        // debug!("split_string_chem_element: {} -> {:?}", String::from_utf8(token_string.to_vec()).unwrap(), new_children.len());
         return Some(new_children);
     }
 
@@ -526,6 +527,23 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
             }
         }
         return false;
+    } else if IsNode::is_scripted(&mathml) &&
+              name(&as_element(mathml.children()[0])) == "mi" &&
+              as_element(mathml.children()[0]).attribute(SPLIT_TOKEN).is_some() {
+        // undo a split that happened in a scripted element
+        // we put the preceding elements into the base and call merge_element on the last element of the base
+        // let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+        // debug!("parent before merge:\n{}", mml_to_string(&parent));
+        let split_element = as_element(mathml.children()[0]);
+        let mut preceding_children = mathml.preceding_siblings();
+        let mut script_children = mathml.children();
+        preceding_children.append(&mut script_children);
+        mathml.replace_children(preceding_children);            // script temporariy has wrong number of children!
+        // debug!("After making bad script:\n{}", mml_to_string(&mathml));
+        if let Err(err) = merge_element(split_element) {
+            panic!("{}", err);
+        }
+        return true;
     } else {
         let mut answer = false;
         for child in mathml.children() {
@@ -566,8 +584,8 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
     }
 
     fn merge_element(mathml: Element) -> Result<()> {
-        assert!(is_leaf(mathml));
         // debug!("merge_element: {}", mml_to_string(&mathml));
+        assert!(is_leaf(mathml));
         mathml.remove_attribute(SPLIT_TOKEN);
         let mut preceding_children = mathml.preceding_siblings();
         // debug!("preceding_children: {}", preceding_children.iter().map(|&el| name(&as_element(el)).to_string()).collect::<Vec<String>>().join(", "));
@@ -1115,6 +1133,7 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
 
     let mut empty_superscript = false;
     if tag_name == "msup" || tag_name == "msubsup" {
+        // debug!("likely_adorned_chem_formula: mathml\n{}", mml_to_string(&mathml));
         let superscript = as_element(children[if tag_name == "msup" {1} else {2}]);
         empty_superscript = name(&superscript) == "mtext" && as_text(superscript).trim().is_empty();
         if !empty_superscript {
@@ -1211,7 +1230,7 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
             let lower_children = pre_lower.children();
             let minus = as_element(lower_children[0]);
             let one = as_element(lower_children[1]);
-            // not yet normalized, so we need to compare against ASCII minus and u+2022
+            // not yet normalized, so we need to compare against ASCII minus and u+2212
             return name(&minus) == "mo" && (as_text(minus) == "-" || as_text(minus) == "−") && 
                    name(&one) == "mn"   && as_text(one) == "1";
         } else {
@@ -1474,6 +1493,7 @@ static SHORT_SINGLE_LETTER_ELEMENT_FORMULAE: phf::Set<&str> = phf_set! {
 
     // others
     "CH_3", /* methyl */
+    "NH_3",  // ammonium
 };
 
 /// Returns true if the formula is composed of 1 or 2 single letter elements and it matches a known compound/ion
@@ -1562,6 +1582,7 @@ static CHEMICAL_ELEMENTS: phf::Map<&str, u32> = phf_map! {
     // These stand for methyl, ethyl, alkyl, acetyl and phenyl and apparently are quite commonly used ("Ac" is already a chemical)
     // A full(er?) list is at en.wikipedia.org/wiki/Skeletal_formula#Alkyl_groups and in following sections
     "Me" => 0, "Et" => 0, "R" => 0, /* "Ac" => 0, */ "Ph" => 0,
+    "X" => 0, /* treated as an unknown */
 };
 pub fn is_chemical_element(node: Element) -> bool {
 	// FIX: allow name to be in an mrow (e.g., <mi>N</mi><mi>a</mi>
@@ -2157,6 +2178,53 @@ mod chem_tests {
                     <mi>aq</mi>
                     <mo>)</mo>
                 </mrow>
+            </mrow>
+        </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn chemtype_ammonia() {
+        let test = r#"<math><msub><mi>NH</mi><mn>3</mn></msub></math>"#;
+        let target = " <math>
+            <mrow data-changed='added' data-chem-formula='5'>
+            <mi mathvariant='normal' data-chem-element='1'>N</mi>
+            <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
+            <msub data-chem-formula='1'>
+                <mi mathvariant='normal' data-chem-element='1' data-split='true'>H</mi>
+                <mn>3</mn>
+            </msub>
+            </mrow>
+        </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn mhchem_ammonia() {
+        let test = r#"<math>
+            <mrow>
+                <mi data-mjx-auto-op="false">NH</mi>
+                <msub>
+                    <mpadded width="0">
+                    <mphantom>
+                        <mi>A</mi>
+                    </mphantom>
+                    </mpadded>
+                    <mpadded height="0">
+                    <mn>3</mn>
+                    </mpadded>
+                </msub>
+            </mrow>
+        </math>"#;
+        let target = " <math>
+            <mrow data-chem-formula='5'>
+                <mi mathvariant='normal' data-chem-element='1'>N</mi>
+                <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
+                <mmultiscripts data-chem-formula='1'>
+                    <mi mathvariant='normal' data-chem-element='1' data-split='true'>H</mi>
+                    <mn>3</mn>
+                    <none></none>
+                </mmultiscripts>
             </mrow>
         </math>";
         assert!(are_strs_canonically_equal(test, target));

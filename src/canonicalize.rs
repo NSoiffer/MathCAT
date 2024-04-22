@@ -12,7 +12,7 @@ use std::cell::RefCell;
 use sxd_document::dom::*;
 use sxd_document::QName;
 use phf::{phf_map, phf_set};
-use crate::xpath_functions::{IsBracketed, is_leaf};
+use crate::xpath_functions::{IsBracketed, is_leaf, IsNode};
 use std::ptr::eq as ptr_eq;
 use crate::pretty_print::*;
 use regex::Regex;
@@ -331,8 +331,11 @@ pub fn set_mathml_name(element: Element, new_name: &str) {
 	element.set_name(QName::with_namespace_uri(Some("http://www.w3.org/1998/Math/MathML"), new_name));
 }
 
+/// Replace 'mathml' in the parent (must exist since this only happens for leaves) with the 'replacements' (new children).
+/// This handles adding mrows if needed.
+/// 
+/// Returns first replacement
 pub fn replace_children<'a>(mathml: Element<'a>, replacements: Vec<Element<'a>>) -> Element<'a> {
-	// replace the children of the parent (must exist since this only happens for leaves) with the new children
 	if replacements.len() == 1 {
 		// rather than replace the children, the children are already in place, so we can optimize a little
 		add_attrs(mathml, replacements[0].attributes());
@@ -341,15 +344,21 @@ pub fn replace_children<'a>(mathml: Element<'a>, replacements: Vec<Element<'a>>)
 
 	let parent = mathml.parent().unwrap().element().unwrap();
 	if ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(name(&parent)) {
-		// wrap in an mrow
+		// gather up the preceding/following siblings before mucking with the tree structure (mrow.append_children below)
+		let mut new_children = mathml.preceding_siblings();
+		let mut following_siblings = mathml.following_siblings();
+
+		// debug!("\nreplace_children: mathml\n{}", mml_to_string(&mathml));
+		// debug!("replace_children: parent before replace\n{}", mml_to_string(&parent));
+		// wrap an mrow around the replacements and then replace 'mathml' with that
 		let mrow = create_mathml_element(&mathml.document(), "mrow");
 		add_attrs(mrow, replacements[0].attributes());
 		mrow.append_children(replacements);
-		let mut new_children = Vec::with_capacity(parent.children().len());
-		for child in parent.children() {
-			new_children.push( if as_element(child) == mathml {ChildOfElement::Element(mrow)} else {child});
-		}
+		new_children.push(ChildOfElement::Element(mrow));
+		new_children.append(&mut following_siblings);
 		parent.replace_children(new_children);
+		// debug!("replace_children: parent\n{}", mml_to_string(&parent));
+		// debug!("replace_children: returned mrow\n{}", mml_to_string(&mrow));
 		return mrow;
 	} else {
 		// replace the children of the parent with 'replacements' inserted in place of 'mathml'
@@ -1054,7 +1063,18 @@ impl CanonicalizeContext {
 								if new_child_name == "mi" || new_child_name == "mtext" {
 									// can't do this above in 'match' because this changes the tree and
 									// lifting single element mrows messes with structure in a conflicting way
+									// Note: if clean_chemistry_leaf() made changes, they don't need cleaning because they will be "ok" mi's
 									clean_chemistry_leaf(as_element(mathml.children()[i]));
+									if i == 0 {
+										// If the attach call does something, children are inserted *before* 'mathml'
+										// We return the new start at the expense of re-cleaning the script
+										// This is needed because anything before the returned element will be lost
+										let start_of_change = attach_script_to_last_split_element(mathml);
+										// crate::canonicalize::assure_mathml(start_of_change.parent().unwrap().element().unwrap()).unwrap();    // FIX: find a recovery -- we're in deep trouble if this isn't true
+										if start_of_change != mathml {
+											return self.clean_mathml(start_of_change);	// clean replacement, but can't add to left
+										}
+									}										
 								}			
 								i += 1;
 							}
@@ -1099,7 +1119,6 @@ impl CanonicalizeContext {
 						}
 					}
 					let mathml = if element_name == "mmultiscripts" {clean_mmultiscripts(mathml).unwrap()} else {mathml};
-					// debug!("some scripted element...\n{}", mml_to_string(&mathml));	
 					if !is_chemistry_off(mathml) {
 						let likely_chemistry = likely_adorned_chem_formula(mathml);
 						// debug!("likely_chemistry={}, {}", likely_chemistry, mml_to_string(&mathml));
@@ -1310,6 +1329,7 @@ impl CanonicalizeContext {
 			return width;
 		}
 
+		/// Splits the leaf element into chemical elements if needed
 		fn clean_chemistry_leaf(mathml: Element) -> Element {
 			if !(is_chemistry_off(mathml) || mathml.attribute(MAYBE_CHEMISTRY).is_some()) {
 				assert!(name(&mathml)=="mi" || name(&mathml)=="mtext");
@@ -1328,6 +1348,34 @@ impl CanonicalizeContext {
 						mathml.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
 					}
 				};
+			}
+			return mathml;
+		}
+
+		fn attach_script_to_last_split_element(mathml: Element) -> Element {
+			if !IsNode::is_scripted(&mathml) {
+				return mathml;
+			}
+			let base = as_element(mathml.children()[0]);
+			if name(&base) != "mrow" {
+				return mathml;
+			}
+			let base_children = base.children();
+			let i_last_base = base_children.len()-1;
+			let last_child = as_element(base_children[i_last_base]);
+			if last_child.attribute(SPLIT_TOKEN).is_some() {
+				// remove the last child from the base of the script and create a new script whose base is just that child
+				base.remove_child(last_child);
+				let mut script_children = mathml.children();
+				script_children[0] = ChildOfElement::Element(last_child);
+				mathml.replace_children(script_children);
+
+				// create what will be mrow with all but the last chem element children appended with new script element
+				let mut base_children = base_children[..i_last_base].iter().map(|&el| as_element(el)).collect::<Vec<Element>>();
+				base_children.push(mathml);
+				
+				// stick the future mrow in place of the script element
+				return replace_children(mathml, base_children);
 			}
 			return mathml;
 		}
@@ -3622,7 +3670,6 @@ impl CanonicalizeContext {
 		// We have operand-operand and know we want multiplication at this point. 
 		// Check for special case where we want multiplication to bind more tightly than function app (e.g, sin 2x, sin -2xy)
 		// We only want to do this for simple args
-		use crate::xpath_functions::IsNode;
 		// debug!("  is_trig_arg: prev {}, current {}, Stack:", element_summary(previous_child), element_summary(current_child));
 		// parse_stack.iter().for_each(|stack_info| debug!("    {}", stack_info));
 		if !IsNode::is_simple(current_child) {
