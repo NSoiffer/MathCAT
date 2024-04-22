@@ -95,24 +95,16 @@
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1],'leaf'))"
-<<<<<<< HEAD
       then: [pause: short]
-=======
-      then: [{pause: short}]
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - t: " x"               # phrase("the fraction x 'over' y")
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then: [pause: short]
   - x: "*[2]"
   - pause: short
-<<<<<<< HEAD
   - test:
       if: "$Impairment = 'Blindness'"
       then: [t: "启动分数x在y"]          # phrase("start of fraction x over y 'end over'")
-=======
-  - t: "启动分数x在y"          # phrase("start of fraction x over y 'end over'")
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - pause: medium
 
 
@@ -131,11 +123,7 @@
   - x: "*[1]"
   - pause: short
   - test:
-<<<<<<< HEAD
       if: "not(IsNode(*[1],'leaf')) or $Impairment = 'Blindness'"
-=======
-      if: "not(IsNode(*[1],'leaf'))"
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       then: [t: " x"] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
@@ -168,11 +156,7 @@
   - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
-<<<<<<< HEAD
       then: [t: "ub"]      # phrase(x 'sub' 2)
-=======
-      then: [t: "下标"]      # phrase(x 'sub' 2)
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[2]"
 
 - name: default
@@ -180,17 +164,11 @@
   match: "count(*)=2"
   replace:
   - x: "*[1]"
-<<<<<<< HEAD
   - t: "ub"               # phrase(x 'sub' 2)
   - x: "*[2]"
   - test:
       if: "$Impairment = 'Blindness'"
       then: [t: "sub的末端"]           # phrase(x sub 2 'end of sub')
-=======
-  - t: "下标"               # phrase(x 'sub' 2)
-  - x: "*[2]"
-  - t: "sub的末端"           # phrase(x sub 2 'end of sub')
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - pause: short
 
 
@@ -199,11 +177,7 @@
   match: "."
   replace:
   - x: "*[1]"
-<<<<<<< HEAD
   - t: "ub"              # phrase(x 'sub' 2)
-=======
-  - t: "下标"              # phrase(x 'sub' 2)
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - x: "*[2]"
 
 - name: structure
@@ -214,11 +188,7 @@
   - test:
       if: "name(.)='msubsup'"
       then:
-<<<<<<< HEAD
       - t: "ub"          # phrase(x 'sub' 2)
-=======
-      - t: "下标"          # phrase(x 'sub' 2)
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       - x: "*[2]"
   - test:
       if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
@@ -229,11 +199,7 @@
           - t: "super"      # phrase(x 'super' 2)
           - x: "*[last()]"
           - test:
-<<<<<<< HEAD
               if: "not(IsNode(*[last()], 'simple')) or $Impairment = 'Blindness'"
-=======
-              if: "not(IsNode(*[last()], 'simple'))"
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
               then: [t: "超级2"]      # phrase(x super 2 'end of super')
           else:
           - t: "提高到"            # phrase(5 'raised to the' second power equals 25)

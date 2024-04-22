@@ -15,11 +15,7 @@
       - t: "的"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
   - test:
-<<<<<<< HEAD
       if: "not(IsNode(*[1], 'simple')) and $Impairment = 'Blindness'"
-=======
-      if: "not(IsNode(*[1], 'simple'))"
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       then: [t: "结束决定因素"]      # phrase('end determinant' of a matrix)
 
 - name: norm
@@ -37,11 +33,7 @@
       - t: "的"      # phrase(this is the mean 'of' the data)
   - x: "*[1]"
   - test:
-<<<<<<< HEAD
       if: "not(IsNode(*[1], 'simple')) and $Impairment = 'Blindness'"
-=======
-      if: "not(IsNode(*[1], 'simple'))"
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
       then: [t: "结束规范"]      # phrase('end norm' that is a measure of distance)
 
 

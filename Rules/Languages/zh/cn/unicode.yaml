@@ -60,13 +60,9 @@
         # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
         replace: [spell: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]
 
-<<<<<<< HEAD
- - "0-9": [t: "."]                           	# 	(en: '.', google: 'A')
+ - "0-9": [t: "大写 a"]                           	# 	(en: '.', google: 'A')
 
  - " ": [t: " "]                                	#  0x20	(google translation)
-=======
- - "0-9": [t: "大写 a"]                           	# 	(en: '.', google: 'A')
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
 
  - "!":                                         	#  0x21
     - test:
@@ -158,15 +154,11 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [t: "关闭括号"]                       	# 	(en: 'close bracket', google translation)
         else: [t: "中括号右边部分"]                    	# 	(en: 'right bracket', google: '正确的支架')
-<<<<<<< HEAD
  - "^":                                         	#  0x5e
     - test:
         if: "parent::m:modified-variable or parent::m:mover"
         then: [t: "帽子"]                         	# 	(en: 'hat', google translation)
         else: [t: "音调符号"]                       	# 	(en: 'caret', google: '商店')
-=======
- - "^": [t: "音调符号"]                             	#  0x5e	(en: 'hat', google: '帽子')
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
  - "_": [t: "下划线"]                              	#  0x5f	(en: 'under bar', google: '在酒吧下')
  - "`": [t: "重音"]                               	#  0x60	(en: 'grave', google: '坟')
  - "{":                                         	#  0x7b

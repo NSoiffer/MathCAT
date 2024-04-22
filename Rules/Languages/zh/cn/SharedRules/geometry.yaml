@@ -38,11 +38,7 @@
   replace:
   - test:
       if: "$Verbosity='Verbose'"
-<<<<<<< HEAD
       then: [t: "这"]            # phrase('the' arc A B C)
-=======
-      then: [{t: "这"}]            # phrase('the' arc A B C)
->>>>>>> 1ea31dbcef6d676ce1231377256fda80365858fe
   - t: "弧"                        # phrase(the 'arc' A B C)
   - x: "*[1]"
   - x: "*[2]"
