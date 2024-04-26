@@ -131,6 +131,7 @@
   tag: binomial
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
+  - pause: short
   - x: "*[1]"
   - T: "över"      # phrase(you can 'choose' a number at random)
   - x: "*[2]"
@@ -157,21 +158,28 @@
      - if: "self::m:open-interval"
        then: [T: "öppna intervallet"]
      - else_if: "self::m:open-closed-interval"
-       then: [T: "öppna stängda intervallet"]
+       then: [T: "halvöppna intervallet"]
      - else_if: "self::m:closed-interval"
-       then: [T: "stängda intervallet"]
-       else: [T: "stängda öppna intervallet"]
+       then: [T: "slutna intervallet"]
+       else: [T: "halvöppna intervallet"]
+#  - test:
+#      if: "$Verbosity!='Terse'"
+#      then:
+  - T: "från"      # phrase(subtracting 5 'from' 10 gives 5)
   - test:
-      if: "$Verbosity!='Terse'"
-      then:
-      - T: "från"      # phrase(subtracting 5 'from' 10 gives 5)
-      - x: "*[1]"
-      - T: "till"      # phrase(adding 6 'to' 6 equals  12)
-      - x: "*[2]"
-      else:
-      - x: "*[1]"
-      - T: "komma"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
-      - x: "*[2]"
+    - if: "self::m:closed-open-interval"
+      then: [T: "och med"]
+  - x: "*[1]"
+  - T: "till"      # phrase(adding 6 'to' 6 equals  12)
+  - test:
+    - if: "self::m:open-closed-interval"
+      then: [T: "och med"]
+  - x: "*[2]"
+# removed this option because it doesn't clarify in which end half-open intervals are open
+#      else:
+#      - x: "*[1]"
+#      - T: "komma"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
+#      - x: "*[2]"
 
 - name: default-point
   tag: point

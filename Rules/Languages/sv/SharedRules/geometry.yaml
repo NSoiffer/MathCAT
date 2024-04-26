@@ -23,12 +23,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - T: "strålen från"             # phrase('the ray from' A to B)
+      - T: "den riktade sträckan från"             # phrase('the ray from' A to B)
       - x: "*[1]"
       - T: "till"                       # phrase(the ray from A 'to' B)
       - x: "*[2]"
       else:
-      - T: "strålen"                      # phrase(the 'ray'A  B)
+      - T: "den riktade sträckan"                      # phrase(the 'ray'A  B)
       - x: "*[1]"
       - x: "*[2]"
 

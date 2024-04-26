@@ -541,13 +541,13 @@
  - "↗":                                             #  0x2197
     - test:
         if: "ancestor::*[2][self::m:limit]"
-        then: [T: "går underifrån mot"]    #     (en: 'approaches from below', google translation)
+        then: [T: "går vänsterifrån mot"]    #     (en: 'approaches from below', google translation)
         else: [T: "nord-ost-pil"]                 #     (en: 'north east arrow')
 
  - "↘":                                             #  0x2198
     - test:
         if: "ancestor::*[2][self::m:limit]"
-        then: [T: "går ovanifrån mot"]    #     (en: 'approaches from above', google translation)
+        then: [T: "går högerifrån mot"]    #     (en: 'approaches from above', google translation)
         else: [T: "syd-ost-pil"]                  #     (en: 'south east arrow')
 
  - "↙": [T: "syd-väst-pil"]                       #  0x2199    (en: 'south west arrow')
@@ -675,7 +675,7 @@
  - "∇":                                             #  0x2207
      - test: 
          if: "$Verbosity!='Terse'"
-         then: [T: "gradienten"]
+         then: [T: "gradienten av"]
          else: [T: "grad"]                            #     (en: 'the', google translation)
     # - t: "gradient (nabla)"                        #     (en: 'gradient of', google: 'lutning av')
  - "∈":                                             #  0x2208

@@ -68,11 +68,12 @@
   #     if: "$Verbosity='Verbose'"
   #     then:
   #     - t: "the"      # phrase('the' square root of 25 equals 5)
-  - T: "spåret"      # phrase('trace' of a matrix)
-  - test:
-      if: "$Verbosity!='Terse'"
-      then:
-      - T: "av"      # phrase(systems 'of' linear equations)
+  - T: "spåret av"      # phrase('trace' of a matrix)
+ # SWEDISH: 'av' behövs även i Terse
+ # - test:
+ #     if: "$Verbosity!='Terse'"
+ #     then:
+ #     - T: "av"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
 
 - name: dimension
@@ -98,11 +99,11 @@
   #     if: "$Verbosity='Verbose'"
   #     then:
   #     - t: "the"      # phrase('the' square root of 25 equals 5)
-  - T: "homomorfismen"      # phrase('homomorphism' indicates similarity of form)
-  - test:
-      if: "$Verbosity!='Terse'"
-      then:
-      - T: "av"      # phrase(systems 'of' linear equations)
+  - T: "homomorfism"      # phrase('homomorphism' indicates similarity of form)
+ # - test:
+ #     if: "$Verbosity!='Terse'"
+ #     then:
+ #     - T: "av"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
 
 - name: kernel
@@ -117,6 +118,6 @@
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - T: "av"      # phrase(systems 'of' linear equations)
+      - T: "till"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
 
