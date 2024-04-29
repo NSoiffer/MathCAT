@@ -62,14 +62,13 @@
           then: [t: "negative"]      # phrase(minus 6 is a 'negative' number)
           else: [t: "positive"]      # phrase(10 is a 'positive' number)
   - test:
-      if: "*[2][self::m:mn]"
+      if: "*[2][self::m:mn and not(contains(., '.'))]"
       then_test:
       - if: "*[2][text()='2']"
         then: [t: "square root"]      # phrase(5 is the 'square root' of 25)
       - else_if: "*[2][text()='3']"
         then: [t: "cube root"]      # phrase(5 is the 'cube root' of 625)
-      - else_if: "*[2][not(contains(., '.'))]"
-        then: [x: "ToOrdinal(*[2])", t: "root"]      # phrase(the square 'root' of 25)
+      - else: [x: "ToOrdinal(*[2])", t: "root"]      # phrase(the square 'root' of 25)
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"

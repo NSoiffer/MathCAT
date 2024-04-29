@@ -269,9 +269,6 @@ impl PreferenceManager {
     pub fn merge_prefs(&self) -> PreferenceHashMap {
         let mut merged_prefs = self.user_prefs.prefs.clone();
         merged_prefs.extend(self.api_prefs.prefs.clone());
-        debug!("user: NavVerbosity {}, merged {}",
-                self.user_prefs.prefs.get("NavVerbosity").unwrap().as_str().unwrap(),
-                merged_prefs.get("NavVerbosity").unwrap().as_str().unwrap());
         return merged_prefs;
     }
 
@@ -949,7 +946,6 @@ mod tests {
     #[test]
     #[ignore]   // this is an ugly test for #262 -- it changes the prefs file and so is a bad thing in general
     fn test_up_to_date() {
-        init_logger();
         use std::fs;
         use std::thread::sleep;
         use std::time::Duration;
