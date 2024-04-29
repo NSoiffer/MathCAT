@@ -51,9 +51,9 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [T: "start parentes"]                   #  0x28 (en: 'open', google translation)
-            else: [T: "vänster parentes"]          #  0x28 (en: 'open paren')
-        else: [T: "vänster parentes"]            #  0x28 (en: 'left paren')
+            then: [T: "start-parentes"]                   #  0x28 (en: 'open', google translation)
+            else: [T: "vänster-parentes"]          #  0x28 (en: 'open paren')
+        else: [T: "vänster-parentes"]            #  0x28 (en: 'left paren')
     - pause: short
  - ")":                                          #  0x29
     - pause: short
@@ -61,9 +61,9 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then_test:
             if: "$Verbosity='Terse'"
-            then: [T: "slut parentes"]                   #  0x29 (en: 'close', google translation)
-            else: [T: "höger parentes"]          #  0x29 (en: 'close paren')
-        else: [T: "höger parentes"]              #  0x29 (en: 'right paren')
+            then: [T: "slut-parentes"]                   #  0x29 (en: 'close', google translation)
+            else: [T: "höger-parentes"]          #  0x29 (en: 'close paren')
+        else: [T: "höger-parentes"]              #  0x29 (en: 'right paren')
 
  - "*":                                          #  0x2a
     test:
@@ -334,10 +334,11 @@
               #   then: [T: "medlem av"]            #  (en: 'member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "element i"]          #  (en: 'element of', google translation)
-              - else: [T: "tillhör"]             #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'belonging to')
+              - else: [T: "tillhörande"]             #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'belonging to')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [T: "är ett element i"]         #  (en: 'is an element of', google translation)
+              #  then: [T: "är ett element i"]         #  (en: 'is an element of', google translation)
+                then: [T: "i"] # SWEDISH: using this construction instead for more correct grammar in many cases
               # - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
               #   then: [T: "är medlem av"]   #  (en: 'is a member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
@@ -361,7 +362,7 @@
               #   then: [T: "inte medlem av"]       #  (en: 'not member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "inte element i"]     #  (en: 'not element of', google translation)
-              - else: [T: "tillhör inte"]        #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'not belonging to')
+              - else: [T: "inte tillhörande"]        #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'not belonging to')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "är inte ett element i"]    #  (en: 'is not an element of', google translation)
@@ -398,7 +399,7 @@
               - else: [T: "tillhör"]             #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'belongs to')
  - "∏": [T: "produkten"]                           #  0x220f (en: 'product')
  - "∐": [T: "koprodukten"]                   #  0x2210 (en: 'co-product', MathPlayer: 'coproduct', google: 'samprodukt')
- - "∑": [T: "summan"]                             #  0x2211 (en: 'sum')
+ - "∑": [T: "summa"]                             #  0x2211 (en: 'sum')
  - "−": [T: "minus"]                             #  0x2212
  - "∓": [T: "minus plus"]                        #  0x2213 (en: 'minus or plus')
  - "∗": [T: "gånger"]                      #  0x2217 (en: 'times')

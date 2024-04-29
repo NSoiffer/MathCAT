@@ -154,8 +154,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {T: "i kvadrat"}      # phrase(5 'squared' equals 25)
-      else: {T: "i kubik"}      # phrase(5 'cubed' equals 125)
+      then: {T: "kvadrat"}      # phrase(5 'squared' equals 25)
+      else: {T: "kubik"}      # phrase(5 'cubed' equals 125)
 
 - name: function-power
   tag: power
@@ -189,8 +189,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {T: "i kvadrat"}      # phrase(5 'squared' equals 25)
-      else: {T: "i kubik"}      # phrase(5 'cubed' equals 125)
+      then: {T: "kvadrat"}      # phrase(5 'squared' equals 25)
+      else: {T: "kubik"}      # phrase(5 'cubed' equals 125)
 
 - name: simple-integer
   tag: power

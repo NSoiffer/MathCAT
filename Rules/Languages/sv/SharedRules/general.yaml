@@ -140,8 +140,9 @@
   tag: permutation-symbol
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
+  - T: "antalet permutationer av"
   - x: "*[2]"
-  - T: "permutationer av"      # phrase(the solution  involves several 'permutations of' values)
+  - T: "element ur"      # phrase(the solution  involves several 'permutations of' values)
   - x: "*[1]"
 
 - name: intervals

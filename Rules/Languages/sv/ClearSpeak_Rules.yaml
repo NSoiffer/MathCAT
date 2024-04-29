@@ -347,7 +347,7 @@
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
-  - T: "i kvadrat"      # phrase(7 'squared' equals 49)
+  - T: "kvadrat"      # phrase(7 'squared' equals 49)
 
 - name: cubed
   tag: power
@@ -355,7 +355,7 @@
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
-  - T: "i kubik"      # phrase(5 'cubed' equals 125)
+  - T: "kubik"      # phrase(5 'cubed' equals 125)
 
 - name: simple-integer
   tag: power
