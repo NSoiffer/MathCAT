@@ -946,7 +946,6 @@ mod tests {
     #[test]
     #[ignore]   // this is an ugly test for #262 -- it changes the prefs file and so is a bad thing in general
     fn test_up_to_date() {
-        init_logger();
         use std::fs;
         use std::thread::sleep;
         use std::time::Duration;
