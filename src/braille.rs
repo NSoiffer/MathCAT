@@ -10,6 +10,7 @@ use std::cell::Ref;
 use regex::{Captures, Regex, RegexSet};
 use phf::{phf_map, phf_set};
 use crate::speech::{BRAILLE_RULES, SpeechRulesWithContext, make_quoted_string};
+use crate::canonicalize::get_parent;
 use std::ops::Range;
 
 static UEB_PREFIXES: phf::Set<char> = phf_set! {
@@ -2456,7 +2457,7 @@ impl BrailleChars {
         // 5: no relational operator may appear within the list
         // 6: the list must have at least 2 items.
         //       Items are separated by commas, can not have other punctuation (except ellipsis and dash)
-        let mut parent = node.parent().unwrap().element().unwrap(); // safe since 'math' is always at root
+        let mut parent = get_parent(node); // safe since 'math' is always at root
         while name(&parent) == "mrow" {
             if IsBracketed::is_bracketed(parent, "", "", true, false) {
                 for child in parent.children() {
@@ -2466,7 +2467,7 @@ impl BrailleChars {
                 }
                 return true;
             }
-            parent = parent.parent().unwrap().element().unwrap();
+            parent = get_parent(parent);
         }
         return false;
 
@@ -2647,8 +2648,8 @@ impl NeedsToBeGrouped {
                     return false;
                 }                                                                                        // clause 1
                 // two 'mn's can be adjacent, in which case we need to group the 'mn' to make it clear it is separate (see bug #204)
-                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
-                let grandparent = if name(&parent) == "math" {parent} else {parent.parent().unwrap().element().unwrap()};
+                let parent = get_parent(mathml);   // there is always a "math" node
+                let grandparent = if name(&parent) == "math" {parent} else {get_parent(parent)};
                 if name(&grandparent) != "mrow" {
                     return false;
                 }
@@ -2667,7 +2668,7 @@ impl NeedsToBeGrouped {
             },
             "mi" | "mo" | "mtext" => {
                 let text = as_text(mathml);
-                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let parent = get_parent(mathml);   // there is always a "math" node
                 let parent_name = name(&parent);   // there is always a "math" node
                 if is_base && (parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") && !text.contains([' ', '\u{00A0}']) {
                     return false;
@@ -2688,7 +2689,7 @@ impl NeedsToBeGrouped {
                     return false;
                 }
 
-                let parent = mathml.parent().unwrap().element().unwrap(); // safe since 'math' is always at root
+                let parent = get_parent(mathml); // safe since 'math' is always at root
                 if name(&parent) == "mfrac" {
                     let children = mathml.children();
                     if mathml.preceding_siblings().is_empty() {
@@ -2738,8 +2739,8 @@ impl NeedsToBeGrouped {
                     return false;
                 }                                                                                        // clause 1
                 // two 'mn's can be adjacent, in which case we need to group the 'mn' to make it clear it is separate (see bug #204)
-                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
-                let grandparent = if name(&parent) == "math" {parent} else {parent.parent().unwrap().element().unwrap()};
+                let parent = get_parent(mathml);   // there is always a "math" node
+                let grandparent = if name(&parent) == "math" {parent} else {get_parent(parent)};
                 if name(&grandparent) != "mrow" {
                     return false;
                 }
@@ -2758,7 +2759,7 @@ impl NeedsToBeGrouped {
             },
             "mi" | "mo" | "mtext" => {
                 let text = as_text(mathml);
-                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let parent = get_parent(mathml);   // there is always a "math" node
                 let parent_name = name(&parent);   // there is always a "math" node
                 if is_base && (parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") && !text.contains([' ', '\u{00A0}']) {
                     return false;
@@ -2817,8 +2818,8 @@ impl NeedsToBeGrouped {
                     return false;
                 }                                                                                        // clause 1
                 // two 'mn's can be adjacent, in which case we need to group the 'mn' to make it clear it is separate (see bug #204)
-                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
-                let grandparent = if name(&parent) == "math" {parent} else {parent.parent().unwrap().element().unwrap()};
+                let parent = get_parent(mathml);   // there is always a "math" node
+                let grandparent = if name(&parent) == "math" {parent} else {get_parent(parent)};
                 if name(&grandparent) != "mrow" {
                     return false;
                 }
@@ -2837,7 +2838,7 @@ impl NeedsToBeGrouped {
             },
             "mi" | "mo" | "mtext" => {
                 let text = as_text(mathml);
-                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let parent = get_parent(mathml);   // there is always a "math" node
                 let parent_name = name(&parent);   // there is always a "math" node
                 if is_base && (parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") && !text.contains([' ', '\u{00A0}']) {
                     return false;
@@ -2864,7 +2865,7 @@ impl NeedsToBeGrouped {
                     return true;
                 } 
                 // need to group nested scripts in base -- see GTM 12.2(2)                                         
-                let parent = mathml.parent().unwrap().element().unwrap();   // there is always a "math" node
+                let parent = get_parent(mathml);   // there is always a "math" node
                 let parent_name = name(&parent);   // there is always a "math" node
                 return parent_name == "munder" || parent_name == "mover" || parent_name == "munderover";
             },

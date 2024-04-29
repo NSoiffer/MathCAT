@@ -26,10 +26,7 @@ use std::cell::{Ref, RefCell};
 use std::thread::LocalKey;
 use phf::phf_set;
 use sxd_xpath::function::Error as XPathError;
-
-
-
-use crate::canonicalize::{as_element, name};
+use crate::canonicalize::{as_element, name, get_parent};
 
 // useful utility functions
 // note: child of an element is a ChildOfElement, so sometimes it is useful to have parallel functions,
@@ -334,6 +331,11 @@ static MATHML_2D_NODES: phf::Set<&str> = phf_set! {
 static MATHML_MODIFIED_NODES: phf::Set<&str> = phf_set! {
     "msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts",
 };
+
+pub fn is_modified(element: Element) -> bool {
+    return MATHML_MODIFIED_NODES.contains(name(&element));
+}
+
 
 // Should mstack and mlongdiv be included here?
 static MATHML_SCRIPTED_NODES: phf::Set<&str> = phf_set! {
@@ -1120,7 +1122,7 @@ impl EdgeNode {
             return Some(element);
         };
 
-        let parent = element.parent().unwrap().element().unwrap();   // there is always a "math" node
+        let parent = get_parent(element);   // there is always a "math" node
         let parent_name = name(&parent);
 
         // first check to see if we have the special case of punctuation as last child of math/mrow element
@@ -1133,7 +1135,7 @@ impl EdgeNode {
 
         if !use_left_side && !element.following_siblings().is_empty() {  // not at right side
             // check for the special case that the parent is an mrow and the grandparent is <math> and we have punctuation
-            let grandparent = parent.parent().unwrap().element().unwrap();
+            let grandparent = get_parent(parent);
             if name(&grandparent) == "math" &&
                parent_name == "mrow" && parent.children().len() == 2 {      // right kind of mrow
                 let text = get_text_from_element( as_element(parent.children()[1]) );
