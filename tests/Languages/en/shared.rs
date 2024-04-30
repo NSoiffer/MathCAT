@@ -63,6 +63,18 @@ fn binomial_mmultiscripts() {
     test("en", "SimpleSpeak", expr, "n choose m");
 }
 
+#[test]
+fn binomial_mmultiscripts_other() {
+    let expr = "<math><mmultiscripts><mi>C</mi><mi>m</mi><none/><mprescripts/><none/><mi>n</mi></mmultiscripts></math>";
+    test("en", "SimpleSpeak", expr, "n choose m");
+}
+
+#[test]
+fn binomial_subscript() {  // C_{n,k}
+    let expr = "<math><msub><mi>C</mi><mrow><mi>n</mi><mo>,</mo><mi>m</mi></mrow></msub></math>";
+    test("en", "SimpleSpeak", expr, "n choose m");
+}
+
 
 #[test]
 fn permutation_mmultiscripts() {
