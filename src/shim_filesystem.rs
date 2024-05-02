@@ -11,11 +11,11 @@ use std::path::{Path, PathBuf};
 // However, they are also useful for other builds because there really isn't another good way to get at the rules.
 // Other build scripts can extract these files and unzip to their needed locations.
 // I'm not thrilled with this solution as it seems hacky, but I don't know another way for crates to allow for each access to data.
+pub static ZIPPED_RULE_FILES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"),"/rules.zip"));
 
 
 cfg_if! {
     if #[cfg(target_family = "wasm")] {
-        pub static ZIPPED_RULE_FILES: &[u8] = include_bytes!(concat!(std:env::var("OUT_DIR"),"/rules.zip"));
         use std::cell::RefCell;
 
         fn file_system_type_from(path: &Path) -> Option<&str> {

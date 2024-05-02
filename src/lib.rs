@@ -60,6 +60,7 @@ mod pretty_print;
 mod chemistry;
 
 pub mod shim_filesystem; // really just for override_file_for_debugging_rules, but the config seems to throw it off
+pub use shim_filesystem::ZIPPED_RULE_FILES;
 pub use interface::*;
 
 #[cfg(test)]
