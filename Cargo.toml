@@ -1,6 +1,6 @@
 [package]
 name = "mathcat"
-version = "0.5.4"
+version = "0.5.5"
 authors = ["Neil Soiffer <soiffer@alum.mit.edu>"]
 license = "MIT"
 description = "MathCAT: Math Capable Assistive Technology ('Speech and braille from MathML')"
