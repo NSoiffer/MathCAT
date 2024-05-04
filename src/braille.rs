@@ -29,6 +29,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id);
         let braille_string = rules_with_context.match_pattern::<String>(mathml)
                         .chain_err(|| "Pattern match/replacement failure!")?;
+        // debug!("braille_mathml: braille string: {}", &braille_string);
         let braille_string = braille_string.replace(' ', "");
         let pref_manager = rules_with_context.get_rules().pref_manager.borrow();
         let highlight_style = pref_manager.pref_to_string("BrailleNavHighlight");
@@ -285,9 +286,9 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
         };
         N_PROBES.with(|n| {*n.borrow_mut() += 1});
         let (_, start, end) = braille_mathml(mathml, node_id)?;
-        debug!("find_navigation_node ({}): start/end={}/{};  target_position={}", name(&node), start, end, target_position);
+        // debug!("find_navigation_node ({}): start/end={}/{};  target_position={}", name(&node), start, end, target_position);
         if target_position < start {
-            debug!("  return due to target_position {} < start {}", target_position, start);
+            // debug!("  return due to target_position {} < start {}", target_position, start);
             return Ok( SearchState {
                 status: SearchStatus::LookLeft,
                 node,
@@ -296,7 +297,7 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
             } );
         }
         if target_position > end {
-            debug!("  return due to target_position {} > end {}", target_position, end);
+            // debug!("  return due to target_position {} > end {}", target_position, end);
             return Ok( SearchState {
                 status: SearchStatus::LookRight,
                 node,
@@ -325,16 +326,16 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
         while i_left < i_right {
             let i_guess = guess_fn(i_left, i_right, call_start, target_position);
             let status = find_navigation_node(mathml, as_element(children[i_guess]), target_position)?;
-            debug!("  in loop: status: {}, i_left {}, i_guess {}, i_right {}; highlight({}, {})", status.status, i_left, i_guess, i_right, status.highlight_start, status.highlight_end);
+            // debug!("  in loop: status: {}, i_left {}, i_guess {}, i_right {}; highlight({}, {})", status.status, i_left, i_guess, i_right, status.highlight_start, status.highlight_end);
             match status.status {
                 SearchStatus::Found => {
                     return Ok(status);
                 },
                 SearchStatus::LookInParent => {
                     let (_, start, end) = braille_mathml(mathml, node_id)?;
-                    debug!("  parent ({}) braille: start/end={}/{};  target_position={}", node_name, start, end, target_position);
+                    // debug!("  parent ({}) braille: start/end={}/{};  target_position={}", node_name, start, end, target_position);
                     if start <= target_position && target_position <= end {
-                        debug!("  ..found: id={}", node_id);
+                        // debug!("  ..found: id={}", node_id);
                         return Ok( SearchState{
                             status: SearchStatus::Found,
                             node,
@@ -356,7 +357,7 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
                 },
             }
         }
-        debug!("..end of loop: look in parent of {} has start/end={}/{}", node_name, start, end);
+        // debug!("..end of loop: look in parent of {} has start/end={}/{}", node_name, start, end);
         return Ok( SearchState{
             status: if start <= target_position && target_position <= end {SearchStatus::Found} else {SearchStatus::LookInParent},
             node,
@@ -1705,14 +1706,14 @@ static VIETNAM_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 };
 
 fn vietnam_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
-    debug!("vietnam_cleanup: start={}", raw_braille);
+    // debug!("vietnam_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
 
     let result = result.replace("tW", "W");
     let result = result.replace("CG", "⠸");    // capital Greek letters are problematic in Vietnam braille
     let result = result.replace("CC", "⠸");    // capital word more is the same as capital Greek letters
-    debug!("   after typeface/caps={}", &result);
+    // debug!("   after typeface/caps={}", &result);
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
     let double_struck = pref_manager.pref_to_string("Vietnam_DoubleStruck");
@@ -1926,7 +1927,7 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
         static ref NUMBER_MATCH: Regex = Regex::new(r"((N.)+[^WN𝐶#↑↓Z])").unwrap();
     }
 
-    debug!("finnish_cleanup: start={}", raw_braille);
+    // debug!("finnish_cleanup: start={}", raw_braille);
     let result = DROP_NUMBER_SEPARATOR.replace_all(&raw_braille, |cap: &Captures| {
         // match includes the char after the number -- insert the whitespace before it
         // debug!("DROP_NUMBER_SEPARATOR match='{}'", &cap[1]);
@@ -1946,7 +1947,7 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
                                     .replace("𝔹C", "⠩")
                                     .replace("DC", "⠰");
 
-    debug!("   after typeface/caps={}", &result);
+    // debug!("   after typeface/caps={}", &result);
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
     let double_struck = pref_manager.pref_to_string("Vietnam_DoubleStruck");
@@ -1956,7 +1957,7 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 
     // This reuses the code just for getting rid of unnecessary "L"s and "N"s
     let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
-    debug!("   remove_unneeded_mode_changes={}", &result);
+    // debug!("   remove_unneeded_mode_changes={}", &result);
 
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
@@ -1983,7 +1984,7 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 
 fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     // FIX: need to implement this -- this is just a copy of the Vietnam code
-    debug!("swedish_cleanup: start={}", raw_braille);
+    // debug!("swedish_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
 
@@ -1991,7 +1992,7 @@ fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
                                     .replace("𝔹C", "⠩")
                                     .replace("DC", "⠰");
 
-    debug!("   after typeface/caps={}", &result);
+    // debug!("   after typeface/caps={}", &result);
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
     let double_struck = pref_manager.pref_to_string("Vietnam_DoubleStruck");
@@ -2030,13 +2031,13 @@ fn LaTeX_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
         static ref REMOVE_SPACE: Regex =Regex::new(r" ([\^_,;)\]}])").unwrap();          // '^', '_', ',', ';', ')', ']', '}'
         static ref COLLAPSE_SPACES: Regex = Regex::new(r" +").unwrap();
     }
-    debug!("LaTeX_cleanup: start={}", raw_braille);
+    // debug!("LaTeX_cleanup: start={}", raw_braille);
     let result = raw_braille.replace('𝐖', " ");
     // let result = COLLAPSE_SPACES.replace_all(&raw_braille, "⠀"); 
     let result = COLLAPSE_SPACES.replace_all(&result, " ");
-    debug!("After collapse: {}", &result);
+    // debug!("After collapse: {}", &result);
     let result = REMOVE_SPACE.replace_all(&result, "$1");
-    debug!("After remove: {}", &result);
+    // debug!("After remove: {}", &result);
     // let result = result.trim_matches('⠀');
     let result = result.trim_matches(' ');
    
@@ -2050,16 +2051,16 @@ fn ASCIIMath_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String)
         static ref REMOVE_SPACE_AFTER_OP: Regex =  Regex::new(r#"([^\^_,;)\]}\w\d"]) +([\w\d])"#).unwrap();
         static ref COLLAPSE_SPACES: Regex = Regex::new(r" +").unwrap();
     }
-    debug!("ASCIIMath_cleanup: start={}", raw_braille);
+    // debug!("ASCIIMath_cleanup: start={}", raw_braille);
     let result  = raw_braille.replace("|𝐖__|", "|𝐰__|");    // protect the whitespace to prevent misintrepretation as lfloor
     let result = result.replace('𝐖', " ");
     let result = COLLAPSE_SPACES.replace_all(&result, " ");
-    debug!("After collapse: {}", &result);
+    // debug!("After collapse: {}", &result);
     let result = REMOVE_SPACE_BEFORE_OP.replace_all(&result, "$1$2");
     let result = REMOVE_SPACE_AFTER_OP.replace_all(&result, "$1$2");
     let result = result.replace('𝐰', " ");     // spaces around relational operators
     let result = COLLAPSE_SPACES.replace_all(&result, " ");
-    debug!("After remove: {}", &result);
+    // debug!("After remove: {}", &result);
     // let result = result.trim_matches('⠀');
     let result = result.trim_matches(' ');
    
@@ -2319,7 +2320,7 @@ impl BrailleChars {
                 + &caps["greek"]
                 + &caps["char"]
         });
-        debug!("get_braille_ueb_chars: '{}'", &result);
+        // debug!("get_braille_ueb_chars: '{}'", &result);
         return Ok(result.to_string())
     }
 
