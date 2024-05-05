@@ -71,7 +71,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
         if start.is_none() {
             assert!(end.is_none());
             let end = braille.chars().count();
-            return (braille, 0, end/3);
+            return (braille, 0, end);
         };
 
         let end = end.unwrap();         // always exists if start exists
@@ -317,7 +317,7 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
             } );
         }
 
-        let node_name = name(&node);
+        // let node_name = name(&node);  // used in debug!()
         let children = node.children();
         let mut i_left = 0;                         // inclusive
         let mut i_right = children.len();           // exclusive
