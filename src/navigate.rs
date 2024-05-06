@@ -380,7 +380,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                 nav_state.pop();
             }
 
-            // If no speech happened for some calls, we try the call the call again (e.g, no speech for invisible times).
+            // If no speech happened for some calls, we try the call again (e.g, no speech for invisible times).
             // To prevent to infinite loop, we limit the number of tries
             const LOOP_LIMIT: usize = 3;
             let mut cumulative_speech = String::with_capacity(120);
@@ -484,7 +484,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         let nav_mathml = get_node_by_id(mathml, &nav_position.current_node);
         if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", mathml)?.0.unwrap() == "true" {
             // Speak/Overview of where we landed (if we are supposed to speak it)
-            let node_speech = speak(rules_with_context, mathml, nav_position.current_node, use_read_rules)?;
+            let node_speech = speak(mathml, nav_position.current_node, use_read_rules)?;
             // debug!("node_speech: '{}'", node_speech);
             if node_speech.is_empty() {
                 // try again in loop
@@ -523,10 +523,10 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
     }
 }
 
-fn speak<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, mathml: Element<'c>, nav_node_id: String, full_read: bool) -> Result<String> {
+fn speak(mathml: Element, nav_node_id: String, full_read: bool) -> Result<String> {
     if full_read {
-        let intent = crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?;
-        debug!("intent: {}", mml_to_string(&intent));
+        let new_package = Package::new();
+        let intent = crate::speech::intent_from_mathml(mathml, new_package.as_document())?;
 
         // In something like x^3, we might be looking for the '3', but it will be "cubed", so we don't find it.
         // Or we might be on a "(" surrounding a matrix and that isn't part of the intent

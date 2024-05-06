@@ -482,7 +482,8 @@ impl<'r> InsertChildren {
                 if nodes.size() == 0 {
                     bail!("During replacement, no matching element found");
                 };
-                let n_nodes = nodes.size();
+                let nodes = nodes.document_order();
+                let n_nodes = nodes.len();
                 let mut expanded_result = Vec::with_capacity(n_nodes + (n_nodes+1)*self.replacements.replacements.len());
                 expanded_result.push(
                     Replacement::XPath(
@@ -732,7 +733,8 @@ impl<'r> TranslateExpression {
             match id {
                 None => bail!("'translate' value '{}' is not a string or an attribute value (correct by using '@id'??):\n", self.id),
                 Some(id) => {
-                    let speech = speak_mathml(intent_from_mathml(mathml, rules_with_context.get_document())?, &id)?;
+                    let new_package = Package::new();
+                    let speech = speak_mathml(intent_from_mathml(mathml, new_package.as_document())?, &id)?;
                     return T::from_string(speech, rules_with_context.doc);
                 }
             }

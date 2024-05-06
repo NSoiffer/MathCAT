@@ -267,26 +267,35 @@ pub fn get_navigation_braille() -> Result<String> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
+        let new_package = Package::new();           // used if we need to create a new tree
+        let new_doc = new_package.as_document();
         let nav_mathml = NAVIGATION_STATE.with(|nav_stack| {
             return match nav_stack.borrow_mut().get_navigation_mathml(mathml) {
                 Err(e) => Err(e),
                 Ok( (found, offset) ) => {
                     // get the MathML node and wrap it inside of a <math> element
                     // if the offset is given, we need to get the character it references
-                    let internal_mathml;
                     if offset == 0 {
-                        internal_mathml = found;
+                        if name(&found) == "math" {
+                            Ok(found)
+                        } else {
+                            let new_mathml = create_mathml_element(&new_doc, "math");
+                            new_mathml.append_child(copy_mathml(found));
+                            new_doc.root().append_child(new_mathml);
+                            Ok(new_mathml)
+                        }
                     } else if !is_leaf(found) {
                         bail!("Internal error: non-zero offset '{}' on a non-leaf element '{}'", offset, name(&found));
                     } else if let Some(ch) = as_text(found).chars().nth(offset) {
-                        internal_mathml = create_mathml_element(&found.document(), name(&found));
+                        let internal_mathml = create_mathml_element(&new_doc, name(&found));
                         internal_mathml.set_text(&ch.to_string());
+                        let new_mathml = create_mathml_element(&new_doc, "math");
+                        new_mathml.append_child(internal_mathml);
+                        new_doc.root().append_child(new_mathml);
+                        Ok(new_mathml)
                     } else {
                         bail!("Internal error: offset '{}' on leaf element '{}' doesn't exist", offset, mml_to_string(&found));
                     }
-                    let new_mathml = create_mathml_element(&found.document(), "math");
-                    new_mathml.append_child(internal_mathml);
-                    Ok(new_mathml)
                 },
             }
         } )?;
@@ -295,6 +304,7 @@ pub fn get_navigation_braille() -> Result<String> {
         return Ok( braille );
     });
 }
+
 
 /// Given a key code along with the modifier keys, the current node is moved accordingly (or value reported in some cases).
 /// `key` is the [keycode](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode#constants_for_keycode_value) for the key (in JavaScript, `ev.key_code`)
@@ -412,7 +422,33 @@ pub fn get_navigation_node_from_braille_position(position: usize) -> Result<(Str
     })
 }
 
+
+
+// utility functions
+
+/// Copy (recursively) the (MathML) element and return the new one.
+/// The Element type does not copy and modifying the structure of an element's child will modify the element, so we need a copy
 /// Convert the returned error from set_mathml, etc., to a useful string for display
+fn copy_mathml(mathml: Element) -> Element {
+    // If it represents MathML, the 'Element' can only have Text and Element children along with attributes
+    let children = mathml.children();
+    let new_mathml = create_mathml_element(&mathml.document(), name(&mathml));
+    if is_leaf(mathml) {
+        mathml.attributes().iter().for_each(|attr| {new_mathml.set_attribute_value(attr.name(), attr.value());});
+		new_mathml.set_text(as_text(mathml));
+    } else {
+        let mut new_children = Vec::with_capacity(children.len());
+        for child in children {
+            let child = as_element(child);
+            let new_child = copy_mathml(child);
+            child.attributes().iter().for_each(|attr| {new_child.set_attribute_value(attr.name(), attr.value());});
+            new_children.push(new_child);
+        }
+        new_mathml.append_children(new_children);
+    }
+    return new_mathml;
+}
+
 pub fn errors_to_string(e:&Error) -> String {
     let mut result = String::default();
     let mut first_time = true;
