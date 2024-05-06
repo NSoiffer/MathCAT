@@ -108,6 +108,7 @@ pub fn test_ClearSpeak_prefs(language: &str, prefs: Vec<(&str, &str)>, mathml: &
 #[allow(non_snake_case)]
 pub fn test_braille(code: &str, mathml: &str, braille: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
+    set_preference("BrailleNavHighlight".to_string(), "Off".to_string()).unwrap();
     set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
     set_preference("LaTeX_UseShortName".to_string(), "false".to_string()).unwrap();
     // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically
