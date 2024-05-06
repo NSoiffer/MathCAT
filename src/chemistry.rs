@@ -163,7 +163,7 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
             }
             if child_name == "mo" {
                 let likely_chemistry_op = likely_chem_formula_operator(child);
-                debug!("clean_mrow_children_restructure_pass -- in mo: likely {}, {}", likely_chemistry_op, mml_to_string(&child));
+                // debug!("clean_mrow_children_restructure_pass -- in mo: likely {}, {}", likely_chemistry_op, mml_to_string(&child));
                 if likely_chemistry_op >= 0 {
                     // if possible chemistry to left and right, then override text for operator lookup
                     // note: on the right, we haven't set chem flag for operators yet, so we skip them
@@ -364,7 +364,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
             return None;
         }
         new_children[new_children.len()-1].set_attribute_value(SPLIT_TOKEN, "true");
-        debug!("split_string_chem_element: {} -> {:?}", String::from_utf8(token_string.to_vec()).unwrap(), new_children.len());
+        // debug!("split_string_chem_element: {} -> {:?}", String::from_utf8(token_string.to_vec()).unwrap(), new_children.len());
         return Some(new_children);
     }
 
@@ -529,9 +529,9 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
             if let Err(err) = merge_element(mathml) {
                 panic!("{}", err);
             }
-            debug!("After merge_element:{}", mml_to_string(&mathml));
-            let parent = get_parent(mathml);
-            debug!("After merge_element: -- parent{}", mml_to_string(&parent));
+            // debug!("After merge_element:{}", mml_to_string(&mathml));
+            // let parent = get_parent(mathml);
+            // debug!("After merge_element: -- parent{}", mml_to_string(&parent));
 
         } else if let Some(changed_value) = mathml.attribute_value(CHANGED_ATTR) {
             if changed_value == ADDED_ATTR_VALUE {
@@ -546,8 +546,8 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
         // undo a split that happened in a scripted element
         // we put the preceding elements into the base and call merge_element on the last element of the base
         // The first and/or the last child in the sequence could be a script that needs to be unwrapped
-        let parent = get_parent(mathml);   // there is always a "math" node
-        debug!("parent before merge:\n{}", mml_to_string(&parent));
+        // let parent = get_parent(mathml);   // there is always a "math" node
+        // debug!("parent before merge:\n{}", mml_to_string(&parent));
 
         // deal with the last element ('mathml')
          // new_base_children will turn into an mrow of mi's, the element that should be merged
@@ -596,9 +596,9 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
                         let children = mathml.children().iter().map(|&el| as_element(el)).collect::<Vec<Element>>();
                         mathml.remove_attribute(CHANGED_ATTR);  // if just one child, the attrs are pushed onto the child
                         // debug!("mrow attrs: {}", crate::pretty_print::format_attrs(&mathml.attributes()));
-                        debug!("is_changed_after_unmarking: before replace - parent\n{}", mml_to_string(&parent));
+                        // debug!("is_changed_after_unmarking: before replace - parent\n{}", mml_to_string(&parent));
                         replace_children(mathml, children);
-                        debug!("is_changed_after_unmarking: parent\n{}", mml_to_string(&parent));
+                        // debug!("is_changed_after_unmarking: parent\n{}", mml_to_string(&parent));
 
                     }
                 }
@@ -626,7 +626,7 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
         // debug!("merge_element parent: {}", mml_to_string(&get_parent(mathml)));
         assert!(is_leaf(mathml));
         let mut preceding_children = mathml.preceding_siblings();
-        debug!("preceding_children: {}", preceding_children.iter().map(|&el| name(&as_element(el)).to_string()).collect::<Vec<String>>().join(", "));
+        // debug!("preceding_children: {}", preceding_children.iter().map(|&el| name(&as_element(el)).to_string()).collect::<Vec<String>>().join(", "));
         if preceding_children.is_empty() {
             // handle:
             // * case where we have mi mmultiscripts mi ... where the second mi needs to join with the first (see test mhchem_so4)
@@ -829,7 +829,7 @@ fn likely_chem_subscript(subscript: Element) -> isize {
             return 2;
         }
     } else if subscript_name == "mrow" {
-        debug!("likely_chem_subscript:\n{}", mml_to_string(&subscript));
+        // debug!("likely_chem_subscript:\n{}", mml_to_string(&subscript));
         let children = subscript.children();
         if children.len() == 3 && IsBracketed::is_bracketed(subscript, "(", ")", false, true) {
             return likely_chem_subscript(as_element(children[1]));
@@ -937,7 +937,7 @@ fn likely_chem_superscript(sup: Element) -> isize {
 /// * fences around a chemical formula
 /// * an mrow made up of only chemical formulas
 fn likely_chem_formula(mathml: Element) -> isize {
-    debug!("start likely_chem_formula:\n{}", mml_to_string(&mathml));
+    // debug!("start likely_chem_formula:\n{}", mml_to_string(&mathml));
     if let Some(value) = get_marked_value(mathml) {
         return value;       // already marked
     }
@@ -975,14 +975,14 @@ fn likely_chem_formula(mathml: Element) -> isize {
                     };
                 }
             }
-            debug!("NOT_CHEMISTRY:\n{}", mml_to_string(&mathml));
+            // debug!("NOT_CHEMISTRY:\n{}", mml_to_string(&mathml));
             NOT_CHEMISTRY
         }
     };
     if likelihood >= 0 {
         mathml.set_attribute_value(MAYBE_CHEMISTRY, &likelihood.to_string());
     }
-    debug!("likely_chem_formula {}:\n{}", likelihood, mml_to_string(&mathml));
+    // debug!("likely_chem_formula {}:\n{}", likelihood, mml_to_string(&mathml));
 
     return likelihood;
 
@@ -1005,7 +1005,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
         for child in mrow.children() {
             let child = as_element(child);
             let likely = likely_chem_formula(child);
-            debug!("   in mrow: likely={}, likelihood={}", likely, likelihood);
+            // debug!("   in mrow: likely={}, likelihood={}", likely, likelihood);
             match likely.cmp(&0) {
                 Ordering::Greater => { 
                     likelihood += likely + last_was_likely_formula;
@@ -1188,7 +1188,7 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
     let children = mathml.children();
     let mut likelihood = 0;
     let mut is_empty_subscript = false;
-    debug!("likely_adorned_chem_formula:\n{}", mml_to_string(&mathml));
+    // debug!("likely_adorned_chem_formula:\n{}", mml_to_string(&mathml));
     if tag_name == "msub" || tag_name == "msubsup" {
         // subscripts should be just a number, although they could be 'n' or '2n' or other exprs.
         let subscript = as_element(children[1]);
@@ -1263,13 +1263,13 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
             let mut i = 0;
             while i < postscripts.len() {
                 let sub = as_element(postscripts[i]);
-                debug!("sub: {}", mml_to_string(&sub));
+                // debug!("sub: {}", mml_to_string(&sub));
                 if name(&sub) != "none" {
                     likelihood += likely_chem_subscript(sub);
                 } 
                 let sup = as_element(postscripts[i+1]);
                 if name(&sup) != "none" {
-                    debug!("sup: {}", mml_to_string(&sub));
+                    // debug!("sup: {}", mml_to_string(&sub));
                     likelihood += likely_chem_superscript(sup);
                 }
                 i += 2;
@@ -1282,7 +1282,7 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
     if base_name == "mi" || base_name == "mtext" {
         likelihood += likely_chem_element(base);
     } else if base_name == "mrow" {
-        debug!("mrow addition:\n{}", mml_to_string(&base));
+        // debug!("mrow addition:\n{}", mml_to_string(&base));
         // a safe minor canonicalization that allows "short_form" calculations if appropriate
         if (IsBracketed::is_bracketed(base, "(", ")", false, false) ||
             IsBracketed::is_bracketed(base, "[", "]", false, false)) &&

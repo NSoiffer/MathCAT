@@ -350,8 +350,8 @@ pub fn replace_children<'a>(mathml: Element<'a>, replacements: Vec<Element<'a>>)
 		let mut new_children = mathml.preceding_siblings();
 		let mut following_siblings = mathml.following_siblings();
 
-		debug!("\nreplace_children: mathml\n{}", mml_to_string(&mathml));
-		debug!("replace_children: parent before replace\n{}", mml_to_string(&parent));
+		// debug!("\nreplace_children: mathml\n{}", mml_to_string(&mathml));
+		// debug!("replace_children: parent before replace\n{}", mml_to_string(&parent));
 		// wrap an mrow around the replacements and then replace 'mathml' with that
 		let mrow = create_mathml_element(&mathml.document(), "mrow");
 		add_attrs(mrow, replacements[0].attributes());
@@ -359,8 +359,8 @@ pub fn replace_children<'a>(mathml: Element<'a>, replacements: Vec<Element<'a>>)
 		new_children.push(ChildOfElement::Element(mrow));
 		new_children.append(&mut following_siblings);
 		parent.replace_children(new_children);
-		debug!("replace_children: parent\n{}", mml_to_string(&parent));
-		debug!("replace_children: returned mrow\n{}", mml_to_string(&mrow));
+		// debug!("replace_children: parent\n{}", mml_to_string(&parent));
+		// debug!("replace_children: returned mrow\n{}", mml_to_string(&mrow));
 		return mrow;
 	} else {
 		// replace the children of the parent with 'replacements' inserted in place of 'mathml'
@@ -564,16 +564,16 @@ impl CanonicalizeContext {
 		CanonicalizeContext::assure_mathml(mathml)?;
 		let mathml = self.clean_mathml(mathml).unwrap();	// 'math' is never removed
 		self.assure_nary_tag_has_one_child(mathml);
-		debug!("Not chemistry -- retry:\n{}", mml_to_string(&mathml));
+		// debug!("Not chemistry -- retry:\n{}", mml_to_string(&mathml));
 		let mut converted_mathml = self.canonicalize_mrows(mathml)
 				.chain_err(|| format!("while processing\n{}", mml_to_string(&mathml)))?;
 		if !crate::chemistry::scan_and_mark_chemistry(converted_mathml) {
-			debug!("canonicalize before canonicalize_mrows:\n{}", mml_to_string(&converted_mathml));
+			// debug!("canonicalize before canonicalize_mrows:\n{}", mml_to_string(&converted_mathml));
 			self.assure_nary_tag_has_one_child(converted_mathml);
 			converted_mathml = self.canonicalize_mrows(mathml)
 				.chain_err(|| format!("while processing\n{}", mml_to_string(&mathml)))?;
 		}
-		debug!("\nMathML after canonicalize:\n{}", mml_to_string(&converted_mathml));
+		// debug!("\nMathML after canonicalize:\n{}", mml_to_string(&converted_mathml));
 		return Ok(converted_mathml);
 	}
 		
@@ -758,7 +758,7 @@ impl CanonicalizeContext {
 		
 
 		// begin by cleaning up empty elements
-		debug!("clean_mathml\n{}", mml_to_string(&mathml));
+		// debug!("clean_mathml\n{}", mml_to_string(&mathml));
 		let element_name = name(&mathml);
 		let parent_name = if element_name == "math" {
 			"math".to_string()
@@ -1127,7 +1127,7 @@ impl CanonicalizeContext {
 					let mathml = if element_name == "mmultiscripts" {clean_mmultiscripts(mathml).unwrap()} else {mathml};
 					if !is_chemistry_off(mathml) {
 						let likely_chemistry = likely_adorned_chem_formula(mathml);
-						debug!("likely_chemistry={}, {}", likely_chemistry, mml_to_string(&mathml));
+						// debug!("likely_chemistry={}, {}", likely_chemistry, mml_to_string(&mathml));
 						if likely_chemistry >= 0 {
 							mathml.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
 						}
@@ -1380,7 +1380,7 @@ impl CanonicalizeContext {
 			if last_child.attribute(SPLIT_TOKEN).is_none() {
 				return mathml;
 			}
-			debug!("attach_scripts_to_split_element -- start: \n{}", mml_to_string(&mathml));
+			// debug!("attach_scripts_to_split_element -- start: \n{}", mml_to_string(&mathml));
 			let mut mathml_replacement = Vec::with_capacity(base_children.len());
 			if name(&mathml) == "mmultiscripts" {
 				// pull any prescript (should be at most one prefix pair) into the first child
@@ -1400,7 +1400,7 @@ impl CanonicalizeContext {
 					new_mmultiscript.append_children(new_mmultiscript_children);
 					let likely = likely_adorned_chem_formula(new_mmultiscript);
 					new_mmultiscript.set_attribute_value(MAYBE_CHEMISTRY, &likely.to_string());
-					debug!("attach_scripts_to_split_element -- new_mmultiscript: \n{}", mml_to_string(&new_mmultiscript));
+					// debug!("attach_scripts_to_split_element -- new_mmultiscript: \n{}", mml_to_string(&new_mmultiscript));
 					if n_multiscripts_children == 4 {
 						// we stripped all the children so only the (modified) base exists
 						// create mrow(new_mmultiscript, mathml[0])
@@ -1419,7 +1419,7 @@ impl CanonicalizeContext {
 			new_mathml_children[0] = ChildOfElement::Element(base);
 			mathml.replace_children(new_mathml_children);
 			mathml_replacement.push(mathml);
-			debug!("attach_scripts_to_split_element -- after adjusting ({} replacement children): \n{}", mathml_replacement.len(), mml_to_string(&mathml));
+			// debug!("attach_scripts_to_split_element -- after adjusting ({} replacement children): \n{}", mathml_replacement.len(), mml_to_string(&mathml));
 			return replace_children(mathml, mathml_replacement);
 		}
 
@@ -2443,12 +2443,12 @@ impl CanonicalizeContext {
 			// if we are going forward and hit a sub/superscript with a base, then those scripts become postscripts ("other_scripts")
 			// if we are going backwards, we never add prescripts
 
-			let parent = get_parent(as_element(mrow_children[i]));
-			debug!("convert_to_mmultiscripts (i={}) -- PARENT:\n{}", i, mml_to_string(&parent));
+			// let parent = get_parent(as_element(mrow_children[i]));
+			// debug!("convert_to_mmultiscripts (i={}) -- PARENT:\n{}", i, mml_to_string(&parent));
 
 			let i_base = choose_base_of_mmultiscripts(mrow_children, i);
 			let mut base = as_element(mrow_children[i_base]);
-			debug!("convert_to_mmultiscripts -- base\n{}", mml_to_string(&base));
+			// debug!("convert_to_mmultiscripts -- base\n{}", mml_to_string(&base));
 			let base_name = name(&base);
 			let mut prescripts = vec![];
 			let mut postscripts = vec![];
@@ -2488,7 +2488,7 @@ impl CanonicalizeContext {
 				// gather up the postscripts (if any)
 				while i_postscript < mrow_children.len() {
 					let script = as_element(mrow_children[i_postscript]);
-					debug!("script: {}", mml_to_string(&script));
+					// debug!("script: {}", mml_to_string(&script));
 					// if name(&script) == "msub" && i_postscript+1 < mrow_children.len() {
 					// 	let superscript = as_element(mrow_children[i_postscript+1]);
 					// 	if name(&superscript) == "msup" && CanonicalizeContext::is_empty_element(as_element(superscript.children()[0])) {
@@ -2497,7 +2497,7 @@ impl CanonicalizeContext {
 					// 		i_postscript += 1;
 					// 	}
 					// }
-					debug!("adding postscript\n{}", mml_to_string(&script));
+					// debug!("adding postscript\n{}", mml_to_string(&script));
 					if !add_to_scripts(script, &mut postscripts) {
 						break;
 					}
@@ -2532,8 +2532,8 @@ impl CanonicalizeContext {
 				script.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
 			}
 
-			debug!("convert_to_mmultiscripts -- converted script:\n{}", mml_to_string(&script));
-			debug!("convert_to_mmultiscripts (at end) -- #children={}", mrow_children.len());
+			// debug!("convert_to_mmultiscripts -- converted script:\n{}", mml_to_string(&script));
+			// debug!("convert_to_mmultiscripts (at end) -- #children={}", mrow_children.len());
 			return i_multiscript + 1;		// child to start on next
 		}
 
@@ -2544,7 +2544,7 @@ impl CanonicalizeContext {
 			}
 			let base = as_element(el.children()[0]);
 			if !CanonicalizeContext::is_empty_element(base) { // prescript that really should be a postscript
-				debug!("add_to_scripts: not empty base:\n{}", mml_to_string(&base));
+				// debug!("add_to_scripts: not empty base:\n{}", mml_to_string(&base));
 				return false;
 			}
 			if script_name == "msub" {
