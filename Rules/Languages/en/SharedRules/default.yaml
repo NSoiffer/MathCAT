@@ -72,7 +72,7 @@
   replace: [x: "*"]
 
 
-- name: structure-simple
+- name: literal-simple
   # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
   # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
   # are never simple, then any 'over' applies only to enclosing "fraction...end fraction" pair.
@@ -86,7 +86,7 @@
   - x: "*[2]"
   - pause: short
 
-- name: structure-default
+- name: literal-default
   tag: mfrac
   match: "."
   replace:
@@ -109,7 +109,7 @@
 
 
 # not sure what really should be said for these since we should not assume they are square roots
-- name: structure-default
+- name: literal-default
   tag: msqrt
   match: "."
   replace:
@@ -127,7 +127,7 @@
       then: [t: "end root symbol"] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
-- name: structure-default
+- name: literal-default
   tag: mroot
   match: "."
   replace:
@@ -172,7 +172,7 @@
   - pause: short
 
 
-- name: structure
+- name: literal
   tag: msub
   match: "."
   replace:
@@ -180,7 +180,7 @@
   - t: "sub"              # phrase(x 'sub' 2)
   - x: "*[2]"
 
-- name: structure
+- name: literal
   tag: [msup, msubsup]
   match: "."
   replace:
@@ -194,7 +194,7 @@
       if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
       then:  [x: "*[last()]"]
       else_test:
-          if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"  # FIX: is this test necessary?
+          if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"  # FIX: is this test necessary?
           then:
           - t: "super"      # phrase(x 'super' 2)
           - x: "*[last()]"

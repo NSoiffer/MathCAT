@@ -84,7 +84,7 @@ static CHEM_EQUATION_ARROWS: phf::Set<char> = phf_set! {
 
 pub fn is_chemistry_off(mathml: Element) -> bool {
     lazy_static! {
-        static ref INTENT_STRUCTURE: Regex = Regex::new(r":structure([ \t\n:(]|$)").unwrap(); 
+        static ref INTENT_STRUCTURE: Regex = Regex::new(r"literal([ \t\n:(]|$)").unwrap(); 
     }
     if let Some(intent) = mathml.attribute_value("intent") {
         if INTENT_STRUCTURE.is_match(intent) {
