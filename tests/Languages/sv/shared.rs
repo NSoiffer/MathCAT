@@ -18,7 +18,7 @@ fn modified_vars() {
         <mover> <mi>x</mi> <mo>^</mo> </mover> <mo>+</mo>
         <mover> <mi>t</mi> <mo>→</mo> </mover>
         </mrow> </math>";
-    test("en", "SimpleSpeak", expr, 
+    test("sv", "SimpleSpeak", expr, 
         "eigh grave, b tilde, c breve, b check, c grave; plus; \
             x dot, y dot, z double dot, u triple dot, v quadruple dot; plus x hat, plus vector t");
 }
@@ -37,7 +37,7 @@ fn limit() {
             </mfrac>
             </mrow>
         </math>";
-    test("en", "SimpleSpeak", expr, "the limit as x approaches 0, of, fraction, sine of x, over x, end fraction;");
+    test("sv", "SimpleSpeak", expr, "the limit as x approaches 0, of, fraction, sine of x, over x, end fraction;");
 }
 
 #[test]
@@ -51,33 +51,33 @@ fn limit_from_below() {
                 <mrow>  <mi>sin</mi>  <mo>&#x2061;</mo> <mi>x</mi> </mrow>
             </mrow>
         </math>";
-    test("en", "SimpleSpeak", expr, "the limit as x approaches from below 0, of sine of x");
+    test("sv", "SimpleSpeak", expr, "the limit as x approaches from below 0, of sine of x");
 }
 
 
 #[test]
 fn binomial_mmultiscripts() {
     let expr = "<math><mmultiscripts><mi>C</mi><mi>m</mi><none/><mprescripts/><mi>n</mi><none/></mmultiscripts></math>";
-    test("en", "SimpleSpeak", expr, "n choose m");
+    test("sv", "SimpleSpeak", expr, "n choose m");
 }
 
 
 #[test]
 fn permutation_mmultiscripts() {
     let expr = "<math><mmultiscripts><mi>P</mi><mi>k</mi><none/><mprescripts/><mi>n</mi><none/></mmultiscripts></math>";
-    test("en", "SimpleSpeak", expr, "k permutations of n");
+    test("sv", "SimpleSpeak", expr, "k permutations of n");
 }
 
 #[test]
 fn permutation_mmultiscripts_sup() {
     let expr = "<math><mmultiscripts><mi>P</mi><mi>k</mi><none/><mprescripts/><none/><mi>n</mi></mmultiscripts></math>";
-    test("en", "SimpleSpeak", expr, "k permutations of n");
+    test("sv", "SimpleSpeak", expr, "k permutations of n");
 }
 
 #[test]
 fn permutation_msubsup() {
     let expr = "<math><msubsup><mi>P</mi><mi>k</mi><mi>n</mi></msubsup></math>";
-    test("en", "SimpleSpeak", expr, "k permutations of n");
+    test("sv", "SimpleSpeak", expr, "k permutations of n");
 }
 
 #[test]
@@ -85,9 +85,9 @@ fn tensor_mmultiscripts() {
     let expr = "<math><mmultiscripts>
             <mi>R</mi> <mi>i</mi><none/> <none/><mi>j</mi> <mi>k</mi><none/> <mi>l</mi><none/> 
         </mmultiscripts></math>";
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+    test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
             "cap r with 4 postscripts, subscript i superscript j subscript k subscript l");
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
+    test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
             "cap r with 4 postscripts, sub i super j sub k sub l");
 }
 
@@ -97,21 +97,21 @@ fn huge_num_mmultiscripts() {
             <mi>R</mi> <mi>i</mi><none/> <none/><mi>j</mi> <mi>k</mi><none/> <mi>l</mi><none/> <mi>m</mi><none/>
             <mprescripts/> <mi>I</mi><none/> <none/><mi>J</mi> <mi>K</mi><none/> <mi>L</mi><none/>
         </mmultiscripts></math>";
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+    test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
             "cap r with 4 prescripts, pre subscript cap i, pre superscript cap j and alternating prescripts cap k none cap l none end prescripts and with 5 postscripts, subscript i superscript j subscript k subscript l and alternating scripts m none end scripts");
 }
 
 #[test]
 fn prime() {
     let expr = "<math> <msup><mi>x</mi><mo >&#x2032;</mo></msup> </math>";
-    test("en", "SimpleSpeak", expr, "x prime,");
+    test("sv", "SimpleSpeak", expr, "x prime,");
 }
 
 #[test]
 fn given() {
     let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
-    test("en", "SimpleSpeak", expr, "cap p, open paren, cap eigh vertical line cap b; close paren");
-    test("en", "ClearSpeak", expr,  "cap p, open paren, cap eigh divides cap b, close paren");  // not good, but follows the spec
+    test("sv", "SimpleSpeak", expr, "cap p, open paren, cap eigh vertical line cap b; close paren");
+    test("sv", "ClearSpeak", expr,  "cap p, open paren, cap eigh divides cap b, close paren");  // not good, but follows the spec
 }
 
 #[test]
@@ -129,14 +129,14 @@ fn simple_msubsup() {
             </msubsup>
             </mstyle>
         </math>";
-    test("en", "ClearSpeak", expr, "x sub k, to the i-th power");
+    test("sv", "ClearSpeak", expr, "x sub k, to the i-th power");
 }
 
 #[test]
 fn non_simple_msubsup() {
     let expr = "<math><msubsup><mi>i</mi><mrow><mi>j</mi><mo>&#x2212;</mo><mn>2</mn></mrow><mi>k</mi></msubsup></math>";
-    test("en", "SimpleSpeak", expr, "i sub j minus 2 end sub, to the k-th");
-    test("en", "ClearSpeak", expr, "i sub j minus 2 end sub, to the k-th power");
+    test("sv", "SimpleSpeak", expr, "i sub j minus 2 end sub, to the k-th");
+    test("sv", "ClearSpeak", expr, "i sub j minus 2 end sub, to the k-th power");
 }
 
 #[test]
@@ -157,7 +157,7 @@ fn presentation_mathml_in_semantics() {
             </annotation-xml>
         </semantics>
     </math>";
-    test("en", "ClearSpeak", expr, "x sub k, to the i-th power");
+    test("sv", "ClearSpeak", expr, "x sub k, to the i-th power");
 }
 
 #[test]
@@ -201,13 +201,13 @@ fn ignore_period() {
       </annotation-xml>
     </semantics>  
   </math>";
-    test("en", "SimpleSpeak", expr, "cap p; open paren, cap eigh and cap b; close paren; is equal to; cap p, open paren, cap eigh intersection cap b; close paren; is equal to, cap p of cap eigh, cap p of cap b");
+    test("sv", "SimpleSpeak", expr, "cap p; open paren, cap eigh and cap b; close paren; is equal to; cap p, open paren, cap eigh intersection cap b; close paren; is equal to, cap p of cap eigh, cap p of cap b");
 }
 
 #[test]
 fn ignore_mtext_period() {
     let expr = "<math><mrow><mrow><mo>{</mo><mn>2</mn><mo>}</mo></mrow><mtext>.</mtext></mrow></math>";
-    test("en", "SimpleSpeak", expr, "the set 2");
+    test("sv", "SimpleSpeak", expr, "the set 2");
 }
 
 #[test]
@@ -244,7 +244,7 @@ fn ignore_comma() {
       </mstyle>
     </mrow>
 </math>";
-    test("en", "SimpleSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
+    test("sv", "SimpleSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
 }
 
 #[test]
@@ -284,12 +284,12 @@ fn ignore_period_and_space() {
         </mstyle>
       </mrow>
 </math>";
-    test("en", "ClearSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
+    test("sv", "ClearSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
 }
 
 
 #[test]
 fn mn_with_space() {
     let expr = "<math><mn>1 234 567</mn></math>";
-    test("en", "SimpleSpeak", expr, "1234567");
+    test("sv", "SimpleSpeak", expr, "1234567");
 }

@@ -6,8 +6,8 @@ use crate::common::*;
 #[test]
 fn silent_intent_mi() {
     let expr = "<math> <mn>2</mn> <mi intent=':silent'>x</mi></math>";
-    test("en", "SimpleSpeak", expr, "2");
-    test("en", "ClearSpeak", expr, "2");
+    test("sv", "SimpleSpeak", expr, "2");
+    test("sv", "ClearSpeak", expr, "2");
 }
 
 #[test]
@@ -17,8 +17,8 @@ fn silent_intent_msup() {
             <mi arg='H' mathvariant='normal'>H</mi>
             <mn arg='n'>2</mn>
         </msup></math>";
-    test("en", "SimpleSpeak", expr, "cap h 2");
-    test("en", "ClearSpeak", expr, "cap h 2");
+    test("sv", "SimpleSpeak", expr, "cap h 2");
+    test("sv", "ClearSpeak", expr, "cap h 2");
 }
 
 #[test]
@@ -28,8 +28,8 @@ fn silent_intent_underscore() {
             <mi arg='H' mathvariant='normal'>H</mi>
             <mn arg='n'>2</mn>
         </msup></math>";
-    test("en", "SimpleSpeak", expr, "cap h 2");
-    test("en", "ClearSpeak", expr, "cap h 2");
+    test("sv", "SimpleSpeak", expr, "cap h 2");
+    test("sv", "ClearSpeak", expr, "cap h 2");
 }
 
 #[test]
@@ -39,5 +39,5 @@ fn intent_prob_x() {
         <mi arg='arg'>x</mi>
         <mi arg='op' intent='probability' mathvariant='normal'>P</mi>
     </msup></math>";
-    test("en", "ClearSpeak", expr, "probability of, x");
+    test("sv", "ClearSpeak", expr, "probability of, x");
 }
