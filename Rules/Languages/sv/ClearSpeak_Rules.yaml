@@ -593,54 +593,85 @@
           - T: "mängden"      # phrase(this is a 'set' of integers)
       - x: "*[1]"
 
-- # intervals are controlled by a ClearSpeak Preference -- parens/brackets don't have to match, so we avoid IsBracketed
-  # alternatively, we could have four (or ten) rules, but there is a lot of duplication if we do that
-  # this one rule handles all ten cases listed as part $ClearSpeak_Paren = 'Interval'
-  # note that *[2] is an mrow with X, ",", Y, so getting X or Y is a double index
-  name: ClearSpeak-intervals # avoid overriding with default "intervals" name
+#- # intervals are controlled by a ClearSpeak Preference -- parens/brackets don't have to match, so we avoid IsBracketed
+#  # alternatively, we could have four (or ten) rules, but there is a lot of duplication if we do that
+#  # this one rule handles all ten cases listed as part $ClearSpeak_Paren = 'Interval'
+#  # note that *[2] is an mrow with X, ",", Y, so getting X or Y is a double index
+#  name: ClearSpeak-intervals # avoid overriding with default "intervals" name
+#  variables:
+#  - is_intervals_start_infinity: "*[1][self::m:negative and *[1][text()='∞']]"
+#  - is_intervals_end_infinity: "*[2][text()='∞'or (self::m:positive and *[1][text()='∞'])]"
+#  tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
+#  match: "."
+#  replace:
+#  - T: "intervallet från"      # phrase('the interval from' a to b)
+#  - x: "*[1]"
+#  - T: "till"      # phrase(the interval from a 'to' b)
+#  - x: "*[2]"
+#  - pause: short
+#  - test:
+#      if: "not($is_intervals_start_infinity)"
+#      then:
+#      - test:
+#          if: "starts-with(name(.), 'open')"
+#          then: [{T: "inte"}]      # phrase(the interval from a to b 'not' including b)
+#      - T: "inklusive"      # phrase(the interval from a to b not 'including' b)
+#      - x: "*[1]"
+#    # logic to deal with [not] arg #1
+#  - test:
+#      if: "not($is_intervals_start_infinity or $is_intervals_end_infinity)"
+#      then_test:
+#      - if: "name(.)='open-interval'"
+#        then: [{T: "eller"}]      # phrase(the interval including a 'or' b )
+#      - else_if: "name(.)='closed-interval'"
+#        then: [{T: "och"}]      # phrase(the interval including a 'and' b)
+#        else: [{T: "men"}]      # phrase(the interval including a 'but' not b)
+#    # some ugly logic dealing with connectives: or, but, but, and (cleaner to be part of next clause?)
+#  - test:
+#      if: not($is_intervals_end_infinity)
+#      then:
+#      - test:
+#          # there is some asymmetry to the test because of the and/or/but logic above
+#          if: not( name(.)='open-interval' or name(.)='closed-interval' ) or $is_intervals_start_infinity
+#          then:
+#          - test:
+#              if: "name(.) = 'open-interval' or name(.) = 'closed-open-interval'"
+#              then: [{T: "inte"}]      # phrase(the interval 'not' including a)
+#          - T: "inklusive"      # phrase(the interval not 'including' a)
+#      - x: "*[2]"
+
+    # onto the [not] [including]... part
+
+ # SWEDISH: rewrote the intervals function to better deal with Swedish convention of speaking intervals
+- name: ClearSpeak-intervals # avoid overriding with default "intervals" name
   variables:
   - is_intervals_start_infinity: "*[1][self::m:negative and *[1][text()='∞']]"
   - is_intervals_end_infinity: "*[2][text()='∞'or (self::m:positive and *[1][text()='∞'])]"
   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
   match: "."
   replace:
+  - test:
+    - if: "$Verbosity!='Terse'"
+      then:
+      - T: "det"
+  - test:
+    - if: "name(.)='open-interval'"
+      then: [T: "öppna"]
+    - else_if: "name(.)='open-closed-interval' or name(.)='closed-open-interval'"
+      then: [T: "halvöppna"]
+    - else_if: "name(.)='closed-interval'"
+      then: [T: "slutna"]
   - T: "intervallet från"      # phrase('the interval from' a to b)
+  - test:
+    - if: "name(.)='closed-open-interval'"
+      then: [T: "och med"]
   - x: "*[1]"
   - T: "till"      # phrase(the interval from a 'to' b)
+  - test:
+      - if: "name(.)='open-closed-interval'"
+        then: [T: "och med"] 
   - x: "*[2]"
-  - pause: short
-  - test:
-      if: "not($is_intervals_start_infinity)"
-      then:
-      - test:
-          if: "starts-with(name(.), 'open')"
-          then: [{T: "inte"}]      # phrase(the interval from a to b 'not' including b)
-      - T: "inklusive"      # phrase(the interval from a to b not 'including' b)
-      - x: "*[1]"
-    # logic to deal with [not] arg #1
-  - test:
-      if: "not($is_intervals_start_infinity or $is_intervals_end_infinity)"
-      then_test:
-      - if: "name(.)='open-interval'"
-        then: [{T: "eller"}]      # phrase(the interval including a 'or' b )
-      - else_if: "name(.)='closed-interval'"
-        then: [{T: "och"}]      # phrase(the interval including a 'and' b)
-        else: [{T: "men"}]      # phrase(the interval including a 'but' not b)
-    # some ugly logic dealing with connectives: or, but, but, and (cleaner to be part of next clause?)
-  - test:
-      if: not($is_intervals_end_infinity)
-      then:
-      - test:
-          # there is some asymmetry to the test because of the and/or/but logic above
-          if: not( name(.)='open-interval' or name(.)='closed-interval' ) or $is_intervals_start_infinity
-          then:
-          - test:
-              if: "name(.) = 'open-interval' or name(.) = 'closed-open-interval'"
-              then: [{T: "inte"}]      # phrase(the interval 'not' including a)
-          - T: "inklusive"      # phrase(the interval not 'including' a)
-      - x: "*[2]"
 
-    # onto the [not] [including]... part
 - name: binomial-frac-vector
   tag: matrix
   match:

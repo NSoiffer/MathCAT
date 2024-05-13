@@ -15,7 +15,7 @@ fn trig_names() {
     <mi>csc</mi><mi>&#x03D5;</mi><mo>+</mo>
     <mi>cot</mi><mi>&#x03C6;</mi>
     </mrow></math>";
-    test("sv", "ClearSpeak", expr, "sine of x plus cosine of y plus tangent of z plus secant of alpha, plus cosecant of phi, plus cotangent of phi");
+    test("sv", "ClearSpeak", expr, "sinus av x plus cosinus av y plus tangens av z plus sekans av alfa, plus cosekans av fi, plus cotangens av fi");
 }
 
 #[test]
@@ -28,82 +28,77 @@ fn hyperbolic_trig_names() {
     <mi>csch</mi><mi>&#x03D5;</mi><mo>+</mo>
     <mi>coth</mi><mi>&#x03C6;</mi>
     </mrow></math>";
-    test("sv", "ClearSpeak", expr, "hyperbolic sine of x, plus \
-                                hyperbolic cosine of y, plus \
-                                hyperbolic tangent of z, plus \
-                                hyperbolic secant of alpha, plus \
-                                hyperbolic cosecant of phi, plus \
-                                hyperbolic cotangent of phi");
+    test("sv", "ClearSpeak", expr, "sinus hyperbolicus av x, plus cosinus hyperbolicus av y, plus tangens hyperbolicus av z, plus sekans hyperbolicus av alfa, plus cosekans hyperbolicus av fi, plus cotangens hyperbolicus av fi");
 }
 
 
 #[test]
 fn inverse_trig() {
     let expr = "<math><msup><mi>sin</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
-    test("sv", "ClearSpeak", expr, "inverse sine of x");
+    test("sv", "ClearSpeak", expr, "invers sinus av x");
 }
 
 #[test]
 fn inverse_trig_trig_inverse() {
     let expr = "<math><msup><mi>tan</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
     test_ClearSpeak("sv", "ClearSpeak_Trig", "TrigInverse",expr,
-        "tangent inverse of x");
+        "tangens invers av x");
 }
 
 #[test]
 fn inverse_trig_arc() {
     let expr = "<math><msup><mi>cosh</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
     test_ClearSpeak("sv", "ClearSpeak_Trig", "ArcTrig",expr,
-        "arc hyperbolic cosine of x");
+        "arc cosinus hyperbolicus av x");
 }
 
 #[test]
 fn trig_squared() {
     let expr = "<math><msup><mi>sin</mi><mn>2</mn></msup><mi>x</mi></math>";
-    test("sv", "ClearSpeak", expr, "sine squared of x");
+    test("sv", "ClearSpeak", expr, "sinus kvadrat av x");
 }
 
 #[test]
 fn trig_cubed() {
     let expr = "<math><msup><mi>tan</mi><mn>3</mn></msup><mi>x</mi></math>";
-    test("sv", "ClearSpeak", expr, "tangent cubed of x");
+    test("sv", "ClearSpeak", expr, "tangens kubik av x");
 }
 
 #[test]
 fn trig_fourth() {
     let expr = "<math><msup><mi>sec</mi><mn>4</mn></msup><mi>x</mi></math>";
-    test("sv", "ClearSpeak", expr, "the fourth power of, secant of x");
+    test("sv", "ClearSpeak", expr, "sekans upphöjt till 4, av x");
 }
 
 
 #[test]
 fn trig_power_other() {
     let expr = "<math><msup><mi>sinh</mi><mrow>><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
-    test("sv", "ClearSpeak", expr, "the n minus 1 power of, hyperbolic sine of x");
+    test("sv", "ClearSpeak", expr, "sinus hyperbolicus upphöjt till n minus 1, av x");
 }
 
 #[test]
 fn simple_log() {
     let expr = "<math> <mrow>  <mi>log</mi><mi>x</mi></mrow> </math>";
-    test("sv", "ClearSpeak", expr, "log x");
+    test("sv", "ClearSpeak", expr, "logg x");
 }
 
 #[test]
 fn normal_log() {
     let expr = "<math><mrow><mi>log</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("sv", "ClearSpeak", expr, "the log of, open paren x plus y, close paren");
+    test("sv", "ClearSpeak", expr, "logg av, vänster-parentes; x plus y; höger-parentes");
 }
 
 #[test]
 fn simple_log_with_base() {
     let expr = "<math> <mrow>  <msub><mi>log</mi><mi>b</mi></msub><mi>x</mi></mrow> </math>";
-    test("sv", "ClearSpeak", expr, "the log base b of x");
+    test("sv", "ClearSpeak", expr, "logaritmen med bas b av x");
 }
 
 #[test]
 fn normal_log_with_base() {
     let expr = "<math><mrow><msub><mi>log</mi><mi>b</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("sv", "ClearSpeak", expr, "the log base b of, open paren x plus y, close paren");
+    test("sv", "ClearSpeak", expr, "logaritmen med bas b av, vänster-parentes; x plus y; höger-parentes");
 }
 
 #[test]
@@ -115,7 +110,7 @@ fn simple_ln() {
 #[test]
 fn normal_ln() {
     let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("sv", "ClearSpeak", expr, "the l n of, open paren x plus y, close paren");
+    test("sv", "ClearSpeak", expr, "l n, vänster-parentes; x plus y; höger-parentes");
 }
 
     
@@ -123,7 +118,7 @@ fn normal_ln() {
 fn simple_natural_log() {
     let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
     test_ClearSpeak("sv", "ClearSpeak_Log", "LnAsNaturalLog",expr,
-        "natural log x");
+        "naturliga logaritmen x");
 }
 
     
@@ -131,27 +126,27 @@ fn simple_natural_log() {
 fn natural_log() {
     let expr = "<math><mi>ln</mi><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></math>";
     test_ClearSpeak("sv", "ClearSpeak_Log", "LnAsNaturalLog",expr,
-        "the natural log of, open paren x plus y, close paren");
+        "naturliga logaritmen av, vänster-parentes; x plus y; höger-parentes");
 }
 
 
 #[test]
 fn explicit_function_call_with_parens() {
     let expr = "<math><mrow><mi>t</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow></math>";
-    test("sv", "ClearSpeak", expr, "t of x");
+    test("sv", "ClearSpeak", expr, "t av x");
 }
 
 
 #[test]
 fn explicit_times_with_parens() {
     let expr = "<math><mrow><mi>t</mi><mo>&#x2062;</mo><mrow><mo>(</mo><mi>x</mi><mo>)</mo></mrow></mrow></math>";
-    test("sv", "ClearSpeak", expr, "t times x");
+    test("sv", "ClearSpeak", expr, "t gånger x");
 }
 
 #[test]
 fn explicit_function_call() {
     let expr = "<math><mrow><mi>t</mi><mo>&#x2061;</mo><mrow><mi>x</mi></mrow></mrow></math>";
-    test("sv", "ClearSpeak", expr, "t of x");
+    test("sv", "ClearSpeak", expr, "t av x");
 }
 
 #[test]
@@ -169,7 +164,7 @@ fn test_functions_none_pref() {
     <mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("sv", "ClearSpeak_Functions", "None",expr,
-        "the log of, open paren x plus y, close paren; plus, f times, open paren x plus y, close paren");
+        "logg, vänster-parentes; x plus y; höger-parentes; plus; f gånger, vänster-parentes; x plus y; höger-parentes");
 }
 
 #[test]
@@ -178,7 +173,7 @@ fn test_functions_none_pref_multiple_args() {
         <mi>B</mi> <mrow><mo>(</mo> <mrow> <mn>2</mn><mo>,</mo><mn>6</mn></mrow> <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("sv", "ClearSpeak_Functions", "None",expr,
-        "cap b times, open paren 2 comma 6, close paren");
+        "versal b gånger, vänster-parentes; 2 komma 6; höger-parentes");
 }
 
 
@@ -197,7 +192,7 @@ fn times_following_paren() {
         <mn>2</mn>
         <mrow>  <mo>(</mo> <mn>3</mn>  <mo>)</mo> </mrow>
         </mrow></math>";
-    test("sv", "ClearSpeak", expr, "2 times 3");
+    test("sv", "ClearSpeak", expr, "2 gånger 3");
 }
 
 #[test]
@@ -206,7 +201,7 @@ fn times_preceding_paren() {
         <mrow>  <mo>(</mo> <mn>2</mn>  <mo>)</mo> </mrow>
         <mn>3</mn>
         </mrow></math>";
-    test("sv", "ClearSpeak", expr, "2 times 3");
+    test("sv", "ClearSpeak", expr, "2 gånger 3");
 }
 
 #[test]
@@ -217,7 +212,7 @@ fn no_times_sqrt() {
         <mo>=</mo>
         <msqrt> <mrow>  <mi>a</mi><mi>b</mi></mrow> </msqrt>
         </mrow></math>";
-    test("sv", "ClearSpeak", expr, "the square root of eigh; the square root of b; is equal to, the square root of eigh b,");
+    test("sv", "ClearSpeak", expr, "kvadratroten ur a; kvadratroten ur b; lika med, kvadratroten ur a b,");
 }
 
 #[test]
@@ -234,27 +229,27 @@ fn more_implied_times() {
     </mrow>
     </mrow></math>";
     test_ClearSpeak("sv", "ClearSpeak_ImpliedTimes", "MoreImpliedTimes",expr,
-        "open paren 2 times x, close paren squared");
+        "vänster-parentes; 2 gånger x; höger-parentes kvadrat");
 }
 
 #[test]
 fn explicit_times_more_implied_times() {
     let expr = "<math><mrow><mi>t</mi><mo>&#x2062;</mo><mrow><mi>x</mi></mrow></mrow></math>";
-    test_ClearSpeak("sv", "ClearSpeak_ImpliedTimes", "MoreImpliedTimes",expr, "t times x");
+    test_ClearSpeak("sv", "ClearSpeak_ImpliedTimes", "MoreImpliedTimes",expr, "t gånger x");
 }
 
 #[test]
 fn explicit_times_none_simple_right() {
     let expr = "<math><mn>2</mn><mo>[</mo><mn>3</mn> <mo>]</mo></math>";
     test_ClearSpeak("sv", "ClearSpeak_ImpliedTimes", "None",
-        expr, "2, open bracket 3 close bracket");
+        expr, "2, start hak-parentes, 3, slut hak-parentes");
 }
 
 #[test]
 fn explicit_times_none_simple_left() {
     let expr = "<math><mo>(</mo><mn>2</mn><mo>&#x2212;</mo><mn>1</mn><mo>)</mo><mi>x</mi></math>";
     test_ClearSpeak("sv", "ClearSpeak_ImpliedTimes", "None",
-        expr, "open paren 2 minus 1, close paren; x");
+        expr, "vänster-parentes; 2 minus 1; höger-parentes; x");
 }
 
 #[test]
@@ -271,7 +266,7 @@ fn explicit_times_none_superscript() {
     </math>";
     test_ClearSpeak_prefs("sv", 
         vec![("ClearSpeak_ImpliedTimes", "None"), ("ClearSpeak_Functions", "None")],
-        expr, "f open paren x close paren; is equal to; x squared, open paren x plus 1, close paren");
+        expr, "f, vänster-parentes, x, höger-parentes; lika med; x kvadrat, vänster-parentes; x plus 1; höger-parentes");
 }
 
 /*
@@ -285,7 +280,7 @@ fn explicit_times_none_superscript() {
         <mo>)</mo></mrow>
         <mi>x</mi>
         </mrow></math>";
-        test("sv", "ClearSpeak", expr, "25 times x");
+        test("sv", "ClearSpeak", expr, "25 gånger x");
     }
 
     #[test]
@@ -307,7 +302,7 @@ fn explicit_times_none_superscript() {
         <mrow><mo>&#x2212;</mo><mn>2</mn></mrow>
         <mo>)</mo></mrow>
         </mrow></math>";
-        test("sv", "ClearSpeak", expr, "2 plus negative 2");
+        test("sv", "ClearSpeak", expr, "2 plus minus 2");
     }
 
 
@@ -320,7 +315,7 @@ fn explicit_times_none_superscript() {
         </mrow>
         <mo>+</mo><mn>1</mn>
         </mrow></math>";
-        test("sv", "ClearSpeak", expr, "negative 2 x, plus 1");
+        test("sv", "ClearSpeak", expr, "minus 2 x, plus 1");
     }
 
     #[test]
@@ -336,7 +331,7 @@ fn explicit_times_none_superscript() {
         </msup>
         </mrow>
     </mrow></math>";
-        test("sv", "ClearSpeak", expr, "open paren 2 x close paren squared");
+        test("sv", "ClearSpeak", expr, "vänster-parentes; 2 x; höger-parentes kvadrat");
     }
 
     #[test]
@@ -349,7 +344,7 @@ fn explicit_times_none_superscript() {
             <mfrac> <mn>1</mn><mn>2</mn></mfrac>
             <mo>)</mo></mrow></mrow>
     </mrow></math>";
-        test("sv", "ClearSpeak", expr, "2 plus 1 half");
+        test("sv", "ClearSpeak", expr, "2 plus, en halv");
     }
 
 
