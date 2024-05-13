@@ -1,0 +1,516 @@
+# This file is derived from a number of sources.
+# This tries to conform to the "spec" augenbit.de/wiki/index.php?title=LaTeX-Manual_LaTeX_Grundregeln (and linked files)
+# The short names come from MathLib.tex that is linked from above
+# Where there is not a conflict, the next source of names comes from "standard" LaTeX names listed in
+#   en.wikipedia.org/wiki/List_of_mathematical_symbols_by_subject
+# Otherwise they are based on the XML entities document (w3c.github.io/xml-entities).
+#  That references the data file github.com/w3c/xml-entities/blob/gh-pages/unicode.xml
+#  The fields in that are used are ["mathlatex", "latex", "varlatex", "ams"], with different names added as comments.
+# Note: there is some filtering of unlikely names, so the above is not 100% as to the output, but it is close.
+
+---
+ - " ": [t: "\\space𝐖"]                  # 0x20
+ - "#": [t: "\\#"]                       # 0x23
+ - "$": [t: "\\$"]                       # 0x24
+# - "%": [t: "\\%"]                      # 0x25
+ - "&": [t: "\\&"]                       # 0x26
+ - "'": [t: "\\textquotesingle𝐖"]        # 0x27
+# - "*": [t: "\\ast𝐖"]                   # 0x2a
+ - ":": [t: "\\colon𝐖"]                  # 0x3a
+ - "<": [t: "\\lt𝐖"]                     # 0x3c
+ - "\\":                                 # 0x5c
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\bs𝐖"]
+         else: [t: "\\backslash𝐖"]
+ - "^": [t: "\\^{}"]                     # 0x5e
+ - "_": [t: "\\_"]                       # 0x5f
+ - "`": [t: "\\textasciigrave𝐖"]         # 0x60
+ - "{": [t: "\\{"]                       # 0x7b
+# - "|": [t: "\\vert𝐖"]                  # 0x7c
+# - "|": [t: "\\mid𝐖"]                   # 0x7c
+ - "}": [t: "\\}"]                       # 0x7d
+ - "~": [t: "\\textasciitilde𝐖"]         # 0x7e
+ - " ": [t: "\\~"]                       # 0xa0
+ - "¬": [t: "\\lnot𝐖"]                   # 0xac
+ - "°": [t: "°"]                         # 0xb0
+ - "±": [t: "\\pm𝐖"]                     # 0xb1
+ - "´": [t: "\\textasciiacute𝐖"]         # 0xb4
+ - "·": [t: "\\cdotp𝐖"]                  # 0xb7
+# - "·": [t: "\\cdot𝐖"]                  # 0xb7
+ - "×":                                  # 0xd7
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\x"]
+         else: [t: "\\times𝐖"]
+ - "÷": [t: "\\div𝐖"]                    # 0xf7
+ - "̀": [t: "\\grave𝐖"]                  # 0x300
+# - "̀": [t: "\\`"]                      # 0x300
+ - "́": [t: "\\acute𝐖"]                  # 0x301
+# - "́": [t: "\\'"]                      # 0x301
+ - "̂": [t: "\\hat{}"]                   # 0x302
+ - "̃": [t: "\\tilde𝐖"]                  # 0x303
+# - "̃": [t: "\\~"]                      # 0x303
+ - "̄": [t: "\\bar𝐖"]                    # 0x304
+# - "̄": [t: "\\="]                      # 0x304
+ - "̅":                                  # 0x305
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\ol𝐖"]
+         else: [t: "\\overline𝐖"]
+ - "̆": [t: "\\breve𝐖"]                  # 0x306
+# - "̆": [t: "\\u"]                      # 0x306
+ - "̇": [t: "\\dot𝐖"]                    # 0x307
+# - "̇": [t: "\\."]                      # 0x307
+ - "Ά": [t: "\\'𝐖A𝐖"]                    # 0x386
+ - "Έ": [t: "\\'𝐖E𝐖"]                    # 0x388
+ - "Ή": [t: "\\'𝐖H𝐖"]                    # 0x389
+ - "Ί": [t: "\\'{}𝐖I𝐖"]                  # 0x38a
+ - "Ό": [t: "\\'{}O𝐖"]                   # 0x38c
+ - "Ύ": [t: "\\mathrm{'Y}"]              # 0x38e
+ - "Ώ": [t: "\\mathrm{'\\Omega}"]        # 0x38f
+ - "ΐ": [t: "\\acute{\\ddot{\\iota}}"]   # 0x390
+ - "Α":                                  # 0x391
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~A"]
+         else: [t: "\\Alpha𝐖"]
+ - "Β":                                  # 0x392
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~B"]
+         else: [t: "\\Beta𝐖"]
+ - "Γ":                                  # 0x393
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~G"]
+         else: [t: "\\Gamma𝐖"]
+ - "Δ":                                  # 0x394
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~D"]
+         else: [t: "\\Delta𝐖"]
+ - "Ε":                                  # 0x395
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~E"]
+         else: [t: "\\Epsilon𝐖"]
+ - "Ζ":                                  # 0x396
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~Z"]
+         else: [t: "\\Zeta𝐖"]
+ - "Η":                                  # 0x397
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~J"]
+         else: [t: "\\Eta𝐖"]
+ - "Θ":                                  # 0x398
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~H"]
+         else: [t: "\\Theta𝐖"]
+ - "Ι":                                  # 0x399
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~I"]
+         else: [t: "\\Iota𝐖"]
+ - "Κ":                                  # 0x39a
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~K"]
+         else: [t: "\\Kappa𝐖"]
+ - "Λ":                                  # 0x39b
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~L"]
+         else: [t: "\\Lambda𝐖"]
+ - "Μ": [t: "\\M"]                       # 0x39c
+ - "Ν": [t: "\\N"]                       # 0x39d
+ - "Ξ":                                  # 0x39e
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~X"]
+         else: [t: "\\Xi𝐖"]
+ - "Ο":                                  # 0x39f
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~O"]
+         else: [t: "\\O"]
+ - "Π":                                  # 0x3a0
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~P"]
+         else: [t: "\\Pi𝐖"]
+ - "Ρ":                                  # 0x3a1
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~R"]
+         else: [t: "\\Rho𝐖"]
+ - "Σ":                                  # 0x3a3
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~S"]
+         else: [t: "\\Sigma𝐖"]
+ - "Τ":                                  # 0x3a4
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~T"]
+         else: [t: "\\Tau𝐖"]
+ - "Υ":                                  # 0x3a5
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~U"]
+         else: [t: "\\Upsilon𝐖"]
+ - "Φ":                                  # 0x3a6
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~F"]
+         else: [t: "\\Phi𝐖"]
+ - "Χ":                                  # 0x3a7
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~C"]
+         else: [t: "\\Chi𝐖"]
+ - "Ψ":                                  # 0x3a8
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~Y"]
+         else: [t: "\\Psi𝐖"]
+ - "Ω":                                  # 0x3a9
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~W"]
+         else: [t: "\\Omega𝐖"]
+ - "Ϊ": [t: "\\mathrm{\\ddot𝐖I}"]        # 0x3aa
+ - "Ϋ": [t: "\\mathrm{\\ddot𝐖Y}"]        # 0x3ab
+ - "ά": [t: "\\'{$\\alpha$}"]            # 0x3ac
+ - "έ": [t: "\\acute{\\epsilon}"]        # 0x3ad
+ - "ή": [t: "\\acute{\\eta}"]            # 0x3ae
+ - "ί": [t: "\\acute{\\iota}"]           # 0x3af
+ - "ΰ": [t: "\\acute{\\ddot{\\upsilon}}"] # 0x3b0
+ - "α":                                  # 0x3b1
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~a"]
+         else: [t: "\\alpha𝐖"]
+ - "β":                                  # 0x3b2
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~b"]
+         else: [t: "\\beta𝐖"]
+ - "γ":                                  # 0x3b3
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~g"]
+         else: [t: "\\gamma𝐖"]
+ - "δ":                                  # 0x3b4
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~d"]
+         else: [t: "\\delta𝐖"]
+ - "ε": [t: "\\varepsilon𝐖"]             # 0x3b5
+ - "ζ":                                  # 0x3b6
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~z"]
+         else: [t: "\\zeta𝐖"]
+ - "η":                                  # 0x3b7
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~j"]
+         else: [t: "\\eta𝐖"]
+ - "θ":                                  # 0x3b8
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~h"]
+         else: [t: "\\theta𝐖"]
+ - "ι":                                  # 0x3b9
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~i"]
+         else: [t: "\\iota𝐖"]
+ - "κ":                                  # 0x3ba
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~k"]
+         else: [t: "\\kappa𝐖"]
+ - "λ":                                  # 0x3bb
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~l"]
+         else: [t: "\\lambda𝐖"]
+ - "μ":                                  # 0x3bc
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~m"]
+         else: [t: "\\mu𝐖"]
+ - "ν":                                  # 0x3bd
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~n"]
+         else: [t: "\\nu𝐖"]
+ - "ξ":                                  # 0x3be
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~x"]
+         else: [t: "\\xi𝐖"]
+ - "ο":                                  # 0x3bf
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~o"]
+         else: [t: "\\o"]
+ - "π":                                  # 0x3c0
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~p"]
+         else: [t: "\\pi𝐖"]
+ - "ρ":                                  # 0x3c1
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~r"]
+         else: [t: "\\rho𝐖"]
+ - "ς": [t: "\\varsigma𝐖"]               # 0x3c2
+ - "σ":                                  # 0x3c3
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~s"]
+         else: [t: "\\sigma𝐖"]
+ - "τ":                                  # 0x3c4
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~t"]
+         else: [t: "\\tau𝐖"]
+ - "υ":                                  # 0x3c5
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~u"]
+         else: [t: "\\upsilon𝐖"]
+ - "φ": [t: "\\varphi𝐖"]                 # 0x3c6
+ - "χ":                                  # 0x3c7
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~c"]
+         else: [t: "\\chi𝐖"]
+ - "ψ":                                  # 0x3c8
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~y"]
+         else: [t: "\\psi𝐖"]
+ - "ω":                                  # 0x3c9
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~w"]
+         else: [t: "\\omega𝐖"]
+ - "ϊ": [t: "\\ddot{\\iota}"]            # 0x3ca
+ - "ϋ": [t: "\\ddot{\\upsilon}"]         # 0x3cb
+ - "ό": [t: "\\'𝐖o𝐖"]                    # 0x3cc
+ - "ύ": [t: "\\acute{\\upsilon}"]        # 0x3cd
+ - "ώ": [t: "\\acute{\\omega}"]          # 0x3ce
+ - "ϐ": [t: "\\Pisymbol{ppi022}{87}"]    # 0x3d0
+ - "ϑ": [t: "\\vartheta𝐖"]               # 0x3d1
+ - "ϒ":                                  # 0x3d2
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~U"]
+         else: [t: "\\Upsilon𝐖"]
+ - "ϕ":                                  # 0x3d5
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~f"]
+         else: [t: "\\phi𝐖"]
+ - "ϖ": [t: "\\varpi𝐖"]                  # 0x3d6
+ - "Ϛ": [t: "\\Stigma𝐖"]                 # 0x3da
+ - "Ϝ": [t: "\\Digamma𝐖"]                # 0x3dc
+ - "ϝ": [t: "\\digamma𝐖"]                # 0x3dd
+ - "Ϟ": [t: "\\Koppa𝐖"]                  # 0x3de
+ - "Ϡ": [t: "\\Sampi𝐖"]                  # 0x3e0
+ - "ϰ": [t: "\\varkappa𝐖"]               # 0x3f0
+ - "ϱ": [t: "\\varrho𝐖"]                 # 0x3f1
+ - "ϴ":                                  # 0x3f4
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~H"]
+         else: [t: "\\Theta𝐖"]
+ - "ϵ":                                  # 0x3f5
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~e"]
+         else: [t: "\\epsilon𝐖"]
+ - "϶": [t: "\\backepsilon𝐖"]            # 0x3f6
+ - "–": [t: "\\textendash𝐖"]             # 0x2013
+ - "—": [t: "\\---𝐖"]                    # 0x2014
+# - "—": [t: "\\textemdash𝐖"]            # 0x2014
+ - "―": [t: "\\horizbar𝐖"]               # 0x2015
+# - "―": [t: "\\rule{1em}{1pt}"]         # 0x2015
+ - "‖": [t: "\\Vert𝐖"]                   # 0x2016
+# - "‖": [t: "\\|"]                      # 0x2016
+# - "‖": [t: "\\lVert𝐖"]                 # 0x2016
+# - "‖": [t: "\\rVert𝐖"]                 # 0x2016
+ - "…":                                  # 0x2026
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\ld𝐖"]
+         else: [t: "\\ldots𝐖"]
+ - "′": [t: "'"]                         # 0x2032
+ - "″": [t: "''"]                        # 0x2033
+ - "‴": [t: "'''"]                       # 0x2034
+ - "ℎ": [t: "\\Planckconst𝐖"]            # 0x210e
+ - "ℜ": [t: "\\Re𝐖"]                     # 0x211c
+ - "Ω":                                  # 0x2126
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~W"]
+         else: [t: "\\Omega𝐖"]
+ - "Å": [t: "\\Angstrom𝐖"]               # 0x212b
+# - "Å": [t: "\\AA𝐖"]                    # 0x212b
+ - "←":                                  # 0x2190
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\la𝐖"]
+         else: [t: "\\leftarrow𝐖"]
+ - "↑":                                  # 0x2191
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\ua𝐖"]
+         else: [t: "\\uparrow𝐖"]
+ - "→": [t: "\\to𝐖"]                     # 0x2192
+# - "→": [t: "\\rarr𝐖"]                  # 0x2192
+# - "→":                                 # 0x2192
+#     - test:
+#         if: "$LaTeX_UseShortName"
+#         then: [t: "\\ra𝐖"]
+#         else: [t: "\\rightarrow𝐖"]
+ - "↓":                                  # 0x2193
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\da𝐖"]
+         else: [t: "\\downarrow𝐖"]
+ - "⇒":                                  # 0x21d2
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\Ra𝐖"]
+         else: [t: "\\Rightarrow𝐖"]
+ - "∀":                                  # 0x2200
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\fa𝐖"]
+         else: [t: "\\forall𝐖"]
+ - "∂": [t: "\\partial𝐖"]                # 0x2202
+ - "∃":                                  # 0x2203
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\ex𝐖"]
+         else: [t: "\\exists𝐖"]
+ - "∄": [t: "\\nexists𝐖"]                # 0x2204
+ - "∅": [t: "\\varnothing𝐖"]             # 0x2205
+ - "∆":                                  # 0x2206
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "~D"]
+         else: [t: "\\Delta𝐖"]
+# - "∆":                                 # 0x2206
+#     - test:
+#         if: "$LaTeX_UseShortName"
+#         then: [t: "\\tri𝐖"]
+#         else: [t: "\\triangle𝐖"]
+ - "∇": [t: "\\nabla𝐖"]                  # 0x2207
+ - "∈": [t: "\\in𝐖"]                     # 0x2208
+ - "∉": [t: "\\notin𝐖"]                  # 0x2209
+# - "∉": [t: "\\not\\in𝐖"]               # 0x2209
+ - "∊": [t: "\\smallin𝐖"]                # 0x220a
+ - "∏": [t: "\\prod𝐖"]                   # 0x220f
+ - "∐": [t: "\\coprod𝐖"]                 # 0x2210
+ - "∑": [t: "\\sum𝐖"]                    # 0x2211
+ - "−": [t: "\\minus𝐖"]                  # 0x2212
+# - "−": [t: "\\-"]                      # 0x2212
+ - "∓": [t: "\\mp𝐖"]                     # 0x2213
+ - "∗": [t: "\\ast𝐖"]                    # 0x2217
+ - "∘": [t: "\\circ𝐖"]                   # 0x2218
+ - "√": [t: "\\sqrt{}"]                  # 0x221a
+ - "∝": [t: "\\propto𝐖"]                 # 0x221d
+ - "∞":                                  # 0x221e
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\8"]
+         else: [t: "\\infty𝐖"]
+ - "∟": [t: "\\rightangle𝐖"]             # 0x221f
+ - "∠": [t: "\\angle𝐖"]                  # 0x2220
+ - "∡": [t: "\\measuredangle𝐖"]          # 0x2221
+ - "∣": [t: "\\mid𝐖"]                    # 0x2223
+ - "∤": [t: "\\nmid𝐖"]                   # 0x2224
+ - "∥":                                  # 0x2225
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\pll𝐖"]
+         else: [t: "\\parallel𝐖"]
+ - "∦": [t: "\\nparallel𝐖"]              # 0x2226
+ - "∧": [t: "\\wedge𝐖"]                  # 0x2227
+# - "∧": [t: "\\land𝐖"]                  # 0x2227
+ - "∨": [t: "\\vee𝐖"]                    # 0x2228
+# - "∨": [t: "\\lor𝐖"]                   # 0x2228
+ - "∩": [t: "\\cap𝐖"]                    # 0x2229
+ - "∪": [t: "\\cup𝐖"]                    # 0x222a
+ - "∫": [t: "\\int𝐖"]                    # 0x222b
+ - "∬": [t: "\\iint𝐖"]                   # 0x222c
+ - "∭": [t: "\\iiint𝐖"]                  # 0x222d
+ - "∮": [t: "\\oint𝐖"]                   # 0x222e
+ - "∶": [t: "\\mathratio𝐖"]              # 0x2236
+ - "∷": [t: "\\Colon𝐖"]                  # 0x2237
+ - "∼": [t: "\\sim𝐖"]                    # 0x223c
+ - "∽": [t: "\\backsim𝐖"]                # 0x223d
+ - "∾": [t: "\\invlazys𝐖"]               # 0x223e
+# - "∾": [t: "\\lazysinv𝐖"]              # 0x223e
+ - "∿": [t: "\\sinewave𝐖"]               # 0x223f
+ - "≠": [t: "\\not=𝐖"]                   # 0x2260
+# - "≠": [t: "\\neq𝐖"]                   # 0x2260
+# - "≠": [t: "\\ne𝐖"]                    # 0x2260
+ - "≡":                                  # 0x2261
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\eqv𝐖"]
+         else: [t: "\\equiv𝐖"]
+ - "≤":                                  # 0x2264
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "<="]
+         else: [t: "\\le𝐖"]
+# - "≤": [t: "\\leq𝐖"]                   # 0x2264
+ - "≥":                                  # 0x2265
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: ">="]
+         else: [t: "\\ge𝐖"]
+# - "≥": [t: "\\geq𝐖"]                   # 0x2265
+ - "≦": [t: "\\leqq𝐖"]                   # 0x2266
+ - "≧": [t: "\\geqq𝐖"]                   # 0x2267
+ - "≺": [t: "\\prec𝐖"]                   # 0x227a
+ - "≻": [t: "\\succ𝐖"]                   # 0x227b
+ - "⊂":                                  # 0x2282
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\sbs𝐖"]
+         else: [t: "\\subset𝐖"]
+ - "⊃":                                  # 0x2283
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\sps𝐖"]
+         else: [t: "\\supset𝐖"]
+ - "⊄": [t: "\\not\\subset𝐖"]            # 0x2284
+ - "⊅": [t: "\\not\\supset𝐖"]            # 0x2285
+ - "⊆":                                  # 0x2286
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\sbse𝐖"]
+         else: [t: "\\subseteq𝐖"]
+ - "⊇":                                  # 0x2287
+     - test:
+         if: "$LaTeX_UseShortName"
+         then: [t: "\\spse𝐖"]
+         else: [t: "\\supseteq𝐖"]
+
+ # invisible chars
+ - "⁡": [t: ""]                          # 0x2061
+ - "⁢": [t: ""]                          # 0x2062
+ - "⁣": [t: ""]                          # 0x2063
+ - "⁤": [t: ""]                          # 0x2064

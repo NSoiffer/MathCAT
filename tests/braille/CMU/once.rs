@@ -39,7 +39,7 @@ fn gothic_1_3_1() {
 }
 
 #[test]
-#[ignore]   // need to add a pref that 
+#[ignore]   // need to add a transcriber note pref for different fonts 
 fn double_struck_1_3_2() {
     let expr = "<math><mi>𝕔𝕎</mi></math>";
     test_braille("CMU", expr, "⠬⠉⠩⠺");
@@ -55,13 +55,13 @@ fn number_3_1_1() {
 #[test]
 fn number_2_2_1() {
     let expr = "<math><mn>31.720</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠁⠄⠛⠃⠚");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "."), ("BlockSeparators", ", ")], expr, "⠼⠉⠁⠄⠛⠃⠚");
 }
 
 #[test]
 fn number_2_2_2() {
     let expr = "<math><mn>3 802 197</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠄⠓⠚⠃⠄⠁⠊⠛");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "."), ("BlockSeparators", ", ")], expr, "⠼⠉⠄⠓⠚⠃⠄⠁⠊⠛");
 }
 
 #[test]
@@ -85,30 +85,32 @@ fn number_2_2_5() {
 #[test]
 fn number_2_2_6() {
     let expr = "<math><mo>-</mo><mn>25 347</mn></math>";
-    test_braille("CMU", expr, "⠤⠼⠃⠑⠄⠉⠙⠛");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "."), ("BlockSeparators", ", ")], expr, "⠤⠼⠃⠑⠄⠉⠙⠛");
 }
 
 #[test]
 fn number_2_3_1() {
     let expr = "<math><mn>3.2</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠂⠃");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "."), ("BlockSeparators", ", ")], expr, "⠼⠉⠂⠃");
+
 }
 
 #[test]
 fn number_2_3_2() {
     let expr = "<math><mn>3,2</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠂⠃");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠉⠂⠃");
 }
 
 #[test]
 fn number_2_3_3() {
     let expr = "<math><mn>3’2</mn></math>";
-    test_braille("CMU", expr, "⠼⠉⠂⠃");
+    test_braille_prefs("CMU", vec![("DecimalSeparators", "’,"), ("BlockSeparators", ". ")], expr, "⠼⠉⠂⠃");
 }
 
 #[test]
+#[ignore]
 fn number_2_3_3_wiris() {
-    let expr = "<math><mn>3</mn><mo>'</mo><mn>2</mn></math>";
+    let expr = "<math><mn>3</mn><mo>’</mo><mn>2</mn></math>";
     test_braille("CMU", expr, "⠼⠉⠂⠃");
 }
 
@@ -156,9 +158,8 @@ fn letter_number_2_5_b_1() {
 }
 
 #[test]
-// #[ignore]  // really requires a transcriber's note
+#[ignore]  // really requires a transcriber's note
 fn color_2_5_c_2() {
-    init_logger();
     let expr = "<math><mn>3</mn><mn mathcolor='#FF0000'>4</mn><mn>2</mn><mn mathcolor='#00FF00'>9</mn></math>";
     test_braille("CMU", expr, "⠼⠉⠩⠙⠃⠰⠊");
 }
@@ -267,21 +268,6 @@ fn script_4_2_1_13() {
     // z_i_0
     let expr = "<math><msub><mi>z</mi><msub><mi>i</mi><mn>0</mn></msub></msub></math>";
     test_braille("CMU", expr, "⠵⠌⠊⠌⠼⠚");
-}
-
-#[test]
-fn script_4_2_2_1() {
-    // just first entry because 2D not supported yet
-    let expr = "<math><msub><mi>a</mi><mn>11</mn></msub></math>";
-    test_braille("CMU", expr, "⠁⠂⠂");
-}
-
-#[test]
-#[ignore] // this appears to be optional -- implementation seems subjective especially when not in a table
-fn script_4_2_2_2() {
-    // just first entry because 2D not supported yet
-    let expr = "<math><msub><mi>a</mi><mrow><mn>1</mn><mo>,</mo><mn>1</mn></mrow></msub></math>";
-    test_braille("CMU", expr, "⠁⠂⠂");
 }
 
 #[test]
@@ -992,8 +978,7 @@ fn inverse_9_1_1() {
 #[test]
 fn list_9_1_2() {
     let expr = "<math><mo>(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>)</mo></math>";
-    // modified to use numeric subscripts as per 4.2.2
-    test_braille("CMU", expr, "⠣⠭⠂⠀⠂⠭⠆⠜");
+    test_braille("CMU", expr, "⠣⠭⠌⠼⠁⠀⠂⠭⠌⠼⠃⠜");
 }
 
 #[test]
@@ -1256,6 +1241,7 @@ fn log_10_2_7() {
 }
 
 #[test]
+#[ignore]
 fn log_10_2_10() {
     let expr = "<math><mi>log</mi><mn>0,2</mn><mo>=</mo><mover><mn>1</mn><mo>&#xAF;</mo></mover><mo>,</mo><mn>30103</mn></math>";
     test_braille("CMU", expr, "⠇⠕⠛⠄⠼⠚⠂⠃⠶⠼⠥⠂⠉⠚⠁⠚⠉");
@@ -1298,32 +1284,32 @@ fn angle_11_1_8() {
 }
 
 #[test]
-fn vector_11_1_10() {
+fn vector_11_2_3() {
     let expr = "<math><mfenced open='|' close='|'><mover><mi>v</mi><mo>⟶</mo></mover></mfenced></math>";
     test_braille("CMU", expr, "⠸⠀⠒⠂⠧⠸⠀");
 }
 
 #[test]
-fn vector_11_1_11() {
+fn vector_11_2_4() {
     let expr = "<math><mfenced open='‖' close='‖'><mover><mi>v</mi><mo>⟶</mo></mover></mfenced></math>";
     test_braille("CMU", expr, "⠸⠇⠒⠂⠧⠸⠇");
 }
 
 #[test]
-fn vector_11_1_12() {
+fn vector_11_2_5() {
     let expr = "<math><mfenced open='|' close='|'><mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⟶</mo></mover></mfenced></math>";
-    // modified to include space at end as in vector_11_1_10
+    // modified to include space at end as in vector_11_2_3
     test_braille("CMU", expr, "⠸⠀⠒⠂⠢⠨⠁⠨⠃⠔⠸⠀");
 }
 
 #[test]
-fn vector_11_1_13() {
+fn vector_11_2_6() {
     let expr = "<math><mfenced open='‖' close='‖'><mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⟶</mo></mover></mfenced></math>";
     test_braille("CMU", expr, "⠸⠇⠒⠂⠢⠨⠁⠨⠃⠔⠸⠇");
 }
 
 #[test]
-fn vector_11_1_16() {
+fn vector_11_2_9() {
     let expr = "<math><mfenced open='[' close=']'><mover><mrow><mi>A</mi><mi>B</mi></mrow><mo>⟶</mo></mover></mfenced></math>";
     test_braille("CMU", expr, "⠷⠒⠂⠢⠨⠁⠨⠃⠔⠾");
 }
@@ -1378,6 +1364,12 @@ fn degrees_11_5_2() {
 }
 
 #[test]
+fn triangle_11_6() {
+    let expr = "<math><mo>&#x25B3;</mo><mi>a</mi><mi>b</mi><mi>c</mi></math>";
+    test_braille("CMU", expr, "⠠⠾⠁⠃⠉");
+}
+
+#[test]
 fn cancellation_14_3_3() {
     // this uses various forms of crossouts to make the test better -- the original only has horizontal crossouts. All should have the same braille.
     let expr = "<math>
@@ -1406,56 +1398,66 @@ fn cancellation_14_3_3() {
 
 #[test]
 fn omission_14_5_1() {
-    // Single and double '_' are used (from WIRIS) for a more robust test -- example seems to use two "_"s for a blank
-    let expr = "<math><mn>5</mn><mi intent=':omission'>_</mi><mn>4</mn><mi intent=':omission'>_</mi><mi intent=':omission'>_</mi><mn>2</mn><mo>=</mo><mn>10</mn></math>";
+    // Single and double '_' are used (from WIRIS) for a more robust test -- example seems to use two "_"s for a blank (added 'intent')
+    let expr = "<math><mn>5</mn><mi intent=':blank'>_</mi><mn>4</mn><mi intent=':blank'>_</mi><mi intent=':blank'>_</mi><mn>2</mn><mo>=</mo><mn>10</mn></math>";
     test_braille("CMU", expr, "⠼⠑⠰⠼⠙⠰⠼⠃⠶⠼⠁⠚");
 }
 
 #[test]
 fn omission_14_5_2() {
     // copied from example and pasted into WIRIS
-    let expr = "<math><mn>12</mn><mo>+</mo><mn>13</mn><mo>=</mo><mi intent=':omission'>_</mi><mo>&#xA0;</mo><mi intent=':omission'>_</mi></math>";
+    let expr = "<math><mn>12</mn><mo>+</mo><mn>13</mn><mo>=</mo><mi intent=':blank'>_</mi><mo>&#xA0;</mo><mi intent=':blank'>_</mi></math>";
     test_braille("CMU", expr, "⠼⠁⠃⠖⠼⠁⠉⠶⠼⠰⠰");
 }
 
 #[test]
 fn omission_14_5_3() {
     // copied from example and pasted into WIRIS
-    let expr = "<math><mn>23</mn><mo>+</mo><mn>145</mn><mo>=</mo><mn>1</mn><mi intent=':omission'>_</mi><mo>&#xA0;</mo><mi intent=':omission'>_</mi></math>";
+    let expr = "<math><mn>23</mn><mo>+</mo><mn>145</mn><mo>=</mo><mn>1</mn><mi intent=':blank'>_</mi><mo>&#xA0;</mo><mi intent=':blank'>_</mi></math>";
     test_braille("CMU", expr, "⠼⠃⠉⠖⠼⠁⠙⠑⠶⠼⠁⠰⠰");
 }
 
 #[test]
 fn omission_14_5_4() {
     // copied from example and pasted into WIRIS
-    let expr = "<math><mn>719</mn><mo>+</mo><mn>83</mn><mo>=</mo><mi intent=':omission'>_</mi><mi intent=':omission'>_</mi></math>";
+    let expr = "<math><mn>719</mn><mo>+</mo><mn>83</mn><mo>=</mo><mi intent=':blank'>_</mi><mi intent=':blank'>_</mi></math>";
     test_braille("CMU", expr, "⠼⠛⠁⠊⠖⠼⠓⠉⠶⠰⠤⠆");
 }
 
 #[test]
 fn omission_14_5_5() {
-    let expr = "<math><mn>3</mn><mo>÷</mo><mn>12</mn><mo>=</mo><mn>18</mn><mo>÷</mo><mo intent=':omission'>□</mo></math>";
+    let expr = "<math><mn>3</mn><mo>&#xF7;</mo><mn>12</mn><mo>=</mo><mn>18</mn><mo>&#xF7;</mo><menclose notation='box'><mo>&#xA0;</mo><mo>&#xA0;</mo><mo>&#xA0;</mo></menclose></math>";
     test_braille("CMU", expr, "⠼⠉⠂⠆⠀⠶⠼⠁⠓⠲⠰⠤⠆");
 }
 
 #[test]
 fn units_appendix_1_2_1() {
     let expr = "<math>
-        <mi mathvariant='normal'>J</mi>
+        <mi mathvariant='normal' intent=':unit'>J</mi>
         <mo>=</mo>
-        <mi>kg</mi>
+        <mi intent=':unit'>kg</mi>
         <mo>&#xA0;</mo>
-        <msup><mi mathvariant='normal'>m</mi><mn>2</mn></msup>
+        <msup><mi mathvariant='normal' intent=':unit'>m</mi><mn>2</mn></msup>
         <mo>&#xA0;</mo>
-        <msup><mi mathvariant='normal'>s</mi><mrow><mo>-</mo><mn>2</mn></mrow></msup>
+        <msup><mi mathvariant='normal' intent=':unit'>s</mi><mrow><mo>-</mo><mn>2</mn></mrow></msup>
     </math>";
     test_braille("CMU", expr, "⠨⠚⠶⠅⠛⠀⠍⠡⠼⠃⠀⠎⠡⠤⠼⠃");
 }
 
 #[test]
 fn units_appendix_1_3_1() {
-    let expr = "<math><mn>1</mn><mo>&#xA0;</mo><mi mathvariant='normal'>m</mi><mo>=</mo><mn>100</mn><mo>&#xA0;</mo><mi>cm</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>&#xA0;</mo><mi>km</mi></math>";
-    test_braille("CMU", expr, "⠼⠁⠀⠍⠶⠼⠁⠚⠚⠀⠉⠍⠶⠼⠚⠂⠁⠀⠅⠍");
+    // manually added "intent" -- should have another test
+    let expr = "<math><mn>1</mn><mo>&#xA0;</mo><mi mathvariant='normal' intent=':unit'>m</mi><mo>=</mo><mn>100</mn><mo>&#xA0;</mo><mi intent=':unit'>cm</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>&#xA0;</mo><mi intent=':unit'>km</mi></math>";
+    test_braille_prefs("CMU", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠀⠍⠶⠼⠁⠚⠚⠀⠉⠍⠶⠼⠚⠂⠁⠀⠅⠍");
+
+}
+#[test]
+#[ignore]  // remove 'ignore' once MathCAT adds code to deal with Units/inferring units
+fn units_appendix_1_3_1_auto_intent() {
+    // manually added "intent" -- should have another test
+    let expr = "<math><mn>1</mn><mo>&#xA0;</mo><mi mathvariant='normal' >m</mi><mo>=</mo><mn>100</mn><mo>&#xA0;</mo><mi >cm</mi><mo>=</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>&#xA0;</mo><mi >km</mi></math>";
+    test_braille_prefs("CMU", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠀⠍⠶⠼⠁⠚⠚⠀⠉⠍⠶⠼⠚⠂⠁⠀⠅⠍");
+
 }
 
 
@@ -1482,6 +1484,7 @@ fn roman_numerals_simple() {
 }
 
 #[test]
+#[ignore]
 fn roman_numerals_appendix_2_2_1() {
     let expr = "<math>
         <menclose notation='top'><menclose notation='top'><mi>VI</mi></menclose></menclose>

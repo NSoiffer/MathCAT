@@ -46,6 +46,7 @@ extern crate cfg_if;
 
 
 pub mod interface;
+pub use shim_filesystem::ZIPPED_RULE_FILES;
 mod canonicalize;
 mod infer_intent;
 pub mod speech;
@@ -59,7 +60,6 @@ mod pretty_print;
 mod chemistry;
 
 pub mod shim_filesystem; // really just for override_file_for_debugging_rules, but the config seems to throw it off
-pub use shim_filesystem::ZIPPED_RULE_FILES;
 pub use interface::*;
 
 #[cfg(test)]
@@ -82,13 +82,15 @@ pub fn abs_rules_dir_path() -> String {
 }
 
 #[cfg(test)]
-pub fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
-    use crate::interface::*;
+pub fn are_strs_canonically_equal_with_locale(test: &str, target: &str, block_separators: &str, decimal_separators: &str) -> bool {
+    use crate::{interface::*, pretty_print::mml_to_string};
     use sxd_document::parser;
     use crate::canonicalize::canonicalize;
     // this forces initialization
     crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
-    crate::speech::SPEECH_RULES.with(|_| true);
+    crate::speech::SPEECH_RULES.with(|rules|  rules.borrow_mut().read_files().unwrap());
+    set_preference("BlockSeparators".to_string(), block_separators.to_string()).unwrap();
+    set_preference("DecimalSeparators".to_string(), decimal_separators.to_string()).unwrap();
     
     let package1 = &parser::parse(test).expect("Failed to parse test input");
     let mathml = get_element(package1);
@@ -103,7 +105,13 @@ pub fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
 
     match is_same_element(&mathml_test, &mathml_target) {
         Ok(_) => return true,
-        Err(e) => panic!("{}", e),
+        Err(e) => panic!("{}\nResult:\n{}\nTarget:\n{}", e, mml_to_string(&mathml_test), mml_to_string(&mathml_target)),
     }
+}
+
+#[cfg(test)]
+// sets locale to be US standard
+pub fn are_strs_canonically_equal(test: &str, target: &str) -> bool {
+    return are_strs_canonically_equal_with_locale(test, target, ", \u{00A0}\u{202F}", ".");
 }
 
