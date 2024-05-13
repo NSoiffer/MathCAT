@@ -28,6 +28,7 @@ use std::path::{Path, PathBuf};
 use crate::speech::{as_str_checked, RulesFor, FileAndTime};
 use std::collections::HashMap;
 use crate::shim_filesystem::*;
+use zip::ZipArchive;
 use crate::errors::*;
 
 /// Use to indicate preference not found with Preference::to_string()
@@ -349,6 +350,7 @@ impl PreferenceManager {
     }
 
     fn set_speech_files(&mut self, language_dir: &Path, language: &str, new_speech_style: Option<&str>) -> Result<()> {
+        PreferenceManager::unzip_files(language_dir, language);
         self.intent = PreferenceManager::find_file(language_dir, language, Some("en"), "intent.yaml")?;
         self.overview = PreferenceManager::find_file(language_dir, language, Some("en"), "overview.yaml")?;
         self.navigation = PreferenceManager::find_file(language_dir, language, Some("en"), "navigate.yaml")?;
@@ -374,6 +376,8 @@ impl PreferenceManager {
 
     fn set_braille_files(&mut self, braille_rules_dir: &Path, braille_code_name: &str) -> Result<()> {
         // Fix: Currently the braille code and directly it lives have to have the same name
+        PreferenceManager::unzip_files(braille_rules_dir, braille_code_name);
+
         let braille_file = braille_code_name.to_string() + "_Rules.yaml";
 
         self.braille = PreferenceManager::find_file(braille_rules_dir, braille_code_name, Some("UEB"), &(braille_file))?;
@@ -416,6 +420,35 @@ impl PreferenceManager {
         return Ok( () );
     }
 
+    /// Unzip the files if needed
+    /// Returns true if it unzipped them
+    fn unzip_files(path: &Path, language: &str) -> bool {
+        let dir = match PreferenceManager::get_language_dir(path, language) {
+            None => return false,
+            Some(dir) => dir,
+        };
+        // FIX: for regional variations, this doesn't necessarily work
+        let test_file = dir.join("unicode.yaml");
+        if is_file_shim(&test_file) {
+            return false;
+        }
+        let zip_file = dir.join(&(language.to_string() + ".zip"));
+        // Fix: Need to add wasm version (can't use read_to_string because it wants UTF-8)
+        let archive = match std::fs::read(&zip_file) {
+            Err(e) => {
+                debug!("Couldn't open zip file {}. {}", zip_file.to_str().unwrap(), e.to_string());
+                return false              // maybe files exist in parent???
+            },
+            Ok(contents) => std::io::Cursor::new(contents),
+        };
+    
+        let mut zip_archive = ZipArchive::new(archive).unwrap();
+
+        // FIX: this needs to have a shim for wasm version
+        zip_archive.extract(".").expect("Zip extraction failed");
+        return true;
+    }
+
     /// Find a file matching `file_name` by starting in the regional directory and looking to the language.
     /// If that fails, fall back to looking for the default repeating the same process -- something needs to be found or MathCAT crashes
     fn find_file(rules_dir: &Path, lang: &str, default_lang: Option<&str>, file_name: &str) -> Result<PathBuf> {
@@ -426,12 +459,12 @@ impl PreferenceManager {
         // returns the location of the file_name found
 
         // start by trying to find a dir that exists
-        let mut lang_dir = get_language_dir(rules_dir, lang);
+        let mut lang_dir = PreferenceManager::get_language_dir(rules_dir, lang);
         let mut default_lang = default_lang;
         if lang_dir.is_none() {
             // try again with the default lang if there is one
             if default_lang.is_some() {
-                lang_dir = get_language_dir(rules_dir, default_lang.unwrap());
+                lang_dir = PreferenceManager::get_language_dir(rules_dir, default_lang.unwrap());
                 if lang_dir.is_none() {
                     // We are done for -- MathCAT can't do anything without the required files!
                     bail!("Wasn't able to find/read directory for language {}\n
@@ -486,26 +519,6 @@ impl PreferenceManager {
                Looking for file: {}",
             rules_dir.to_str().unwrap(), lang, file_name);
 
-        fn get_language_dir(rules_dir: &Path, lang: &str) -> Option<PathBuf> {
-            // return 'Rules/Language/fr', 'Rules/Language/en/gb', etc, if they exist.
-            // fall back to main language, and then to default_dir if language dir doesn't exist
-            let mut full_path = rules_dir.to_path_buf();
-            let lang_parts = lang.split('-');
-            for part in lang_parts {
-                full_path.push(Path::new(part));
-                if !is_dir_shim(&full_path) {
-                    break;
-                }
-            }
-    
-            // make sure something got added...
-            if rules_dir == full_path {
-                return None;    // didn't find a dir
-            } else {
-                return Some(full_path);
-            }
-        }
-
         // try to find a xxx_Rules.yaml file -- returns an error if none is found ()
         fn find_any_style_file(path: &Path) -> Result<PathBuf> {    
             // try to find a xxx_Rules.yaml file
@@ -520,6 +533,27 @@ impl PreferenceManager {
             bail!{"didn't find file"}
         }
     }
+
+    fn get_language_dir(rules_dir: &Path, lang: &str) -> Option<PathBuf> {
+        // return 'Rules/Language/fr', 'Rules/Language/en/gb', etc, if they exist.
+        // fall back to main language, and then to default_dir if language dir doesn't exist
+        let mut full_path = rules_dir.to_path_buf();
+        let lang_parts = lang.split('-');
+        for part in lang_parts {
+            full_path.push(Path::new(part));
+            if !is_dir_shim(&full_path) {
+                break;
+            }
+        }
+
+        // make sure something got added...
+        if rules_dir == full_path {
+            return None;    // didn't find a dir
+        } else {
+            return Some(full_path);
+        }
+    }
+
     
     /// Return the speech rule style file locations.
     pub fn get_rule_file(&self, name: &RulesFor) -> &Path {

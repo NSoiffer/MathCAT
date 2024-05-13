@@ -46,7 +46,9 @@ extern crate cfg_if;
 
 
 pub mod interface;
+#[cfg(feature = "include-zip")]
 pub use shim_filesystem::ZIPPED_RULE_FILES;
+
 mod canonicalize;
 mod infer_intent;
 pub mod speech;

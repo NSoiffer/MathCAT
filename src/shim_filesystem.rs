@@ -11,6 +11,7 @@ use std::path::{Path, PathBuf};
 // However, they are also useful for other builds because there really isn't another good way to get at the rules.
 // Other build scripts can extract these files and unzip to their needed locations.
 // I'm not thrilled with this solution as it seems hacky, but I don't know another way for crates to allow for each access to data.
+#[cfg(feature = "include-zip")]
 pub static ZIPPED_RULE_FILES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"),"/rules.zip"));
 
 
@@ -207,7 +208,10 @@ cfg_if! {
         
         pub fn read_to_string_shim(path: &Path) -> Result<String> {
             info!("Reading file '{}'", path.to_str().unwrap());
-            return std::fs::read_to_string(path).chain_err(|| format!("while trying to read {}", path.to_str().unwrap()));
+            match std::fs::read_to_string(path) {
+                Ok(str) => return Ok(str),
+                Err(e) => bail!("Read error while trying to read {}: {}", path.to_str().unwrap(), e),
+            }
         }     
     }
 }
