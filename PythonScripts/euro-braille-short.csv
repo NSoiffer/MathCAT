@@ -1,0 +1,114 @@
+<=         \le                   kleiner gleich
+<<         \ll                   viel kleiner
+>=         \ge                   groesser gleich
+>>         \gg                   viel groesser
+\8         \infty                unendlich
+\apx       \approx               etwa
+\be        \begin{equation}   
+\bea       \begin{eqnarray}
+\beas      \begin{eqnarray*}
+\bs        \backslash            Backslash
+\cd        \cdots                mittige Dots
+\da        \downarrow            einfacher Pfeil nach unten
+\dd        \ddots                diagonale Dots
+\Do        \o                    kleines daenisches 'o'
+\ee        \end{equation}
+\eea       \end{eqnarray}
+\eeas      \end{eqnarray*}
+\eqv       \equiv                aequivalent
+\es        \emptyset             leere Menge
+\ex        \exists               es existiert
+\f         \frac                 Bruch
+\fa        \forall               fuer alle    
+\fmf                             Rahmen um einfache Formel
+\fsf                             Rahmen um mehrzeilige Formel
+\inn       \int\nolimits         Integral nolimits
+\inl       \int\limits           Integral limits
+\l<        \langle               Winkelklammer links
+\la        \leftarrow            einfacher Pfeil nach links
+\ld        \ldots                line Dots
+\lgla      \longleftarrow        langer Pfeil nach links
+\lglra     \longleftrightarrow   langer Pfeil nach links und rechts
+\lgmt      \longmapsto           langer folgt-aus-Pfeil
+\lgra      \longrightarrow       langer Pfeil nach rechts
+\lra       \leftrightarrow       einfacher Pfeil nach links und rechts
+\Lra       \leftrightarrow       doppelter Pfeil nach links und rechts
+\lt        \leadsto              fuehrt-zu-Pfeil
+\mt        \mapsto               folgt-aus-Pfeil
+\n         \not                  Negation
+\o+        \oplus
+\o-        \ominus
+\o.        \opoint
+\o/        \oslash
+\oin       \oint\nolimits        Kreisintegral nolimits
+\oil       \oint\limits          Kreisintegral limits
+\ol        \overline             Ueberstrich
+\ox        \otimes
+\pn        \prod\nolimits        Produkt nolimits
+\pl        \prod\limits          Produkt limits
+\Pl        \l                    kleines polnisches 'l'
+\pll       \parallel             parallel
+\r>        \rangle               Winkelklammer rechts
+\ra        \rightarrow           einfacher Pfeil nach rechts
+\Ra        \Rightarrow           doppelter Pfeil nach rechts
+\s         \sqrt                 Wurzel
+\sbs       \subset               Untermenge
+\sbse      \subseteq             Untermenge und gleich
+\sps       \supset               Obermenge
+\spse      \supseteq             Obermenge und gleich
+\sun       \sum\nolimits         Summe nolimits
+\sul       \sum\limits           Summe limits
+\tri       \triangle             Dreieck
+\ua        \uparrow              einfacher Pfeil nach unten
+\uda       \updownarrow          einfacher Pfeil nach unten und oben
+\ul        \underline            Unterstrich
+\vd        \vdots                vertikale Dots
+\x         \times
+~a         \alpha
+~b         \beta
+~g         \gamma
+~d         \delta
+~e         \epsilon
+~z         \zeta
+~j         \eta
+~h         \theta
+~i         \iota
+~k         \kappa
+~l         \lambda
+~m         \mu
+~n         \nu
+~x         \xi
+~o         \o
+~p         \pi
+~r         \rho
+~s         \sigma
+~t         \tau
+~u         \upsilon
+~f         \phi
+~c         \chi
+~y         \psi
+~w         \omega
+~A         \Alpha
+~B         \Beta
+~G         \Gamma
+~D         \Delta
+~E         \Epsilon
+~Z         \Zeta
+~J         \Eta
+~H         \Theta
+~I         \Iota
+~K         \Kappa
+~L         \Lambda
+~M         \Mu
+~N         \Nu
+~X         \Xi
+~O         \O
+~P         \Pi
+~R         \Rho
+~S         \Sigma
+~T         \Tau
+~U         \Upsilon
+~F         \Phi
+~C         \Chi
+~Y         \Psi
+~W         \Omega

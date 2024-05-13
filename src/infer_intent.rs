@@ -429,7 +429,7 @@ mod tests {
 		use crate::interface::*;
 		// this forces initialization
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
-        crate::speech::SpeechRules::initialize_all_rules().unwrap();
+        // crate::speech::SpeechRules::initialize_all_rules().unwrap();
         set_preference("IntentErrorRecovery".to_string(), intent_error_recovery.to_string()).unwrap();
         let package1 = &parser::parse(mathml).expect("Failed to parse test input");
         let mathml = get_element(package1);

@@ -1,12 +1,14 @@
 ---
-[
+- include: "../../definitions.yaml"
 # Lines starting with "#" are a comment
 # Each definition in this file is of the form
-#   name: [ "...", "..." "..." ],
+# - name: { "...", "..." "..." }
+# For numbers, 
+# - name: [] "...", "..." "..." ]
 
-  Units: [
+- Units: {
     "cm", "km", "hm", "dam", "dm", "mm", "tấn", "tạ", "yến", "kg", "hg", "dag", "lít", "ml", "ft", "in"
-  ],
+  }
 
 # ----------------  Cardinal and Ordinal Numbers  --------------------------
 # The following definitions are used to convert numbers to words
@@ -27,84 +29,82 @@
 #   The minimum length is 10.
 
 # For English, a regular pattern starts at twenty
-  NumbersOnes: [
+- NumbersOnes: [
       "không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín",
       "mười", "mười một", "mười hai", "mười ba", "mười bốn", "mười lăm", "mười sáu",
       "mười bảy", "mười tám", "mười chín"
-  ],
+  ]
 
-  NumbersOrdinalOnes: [
+- NumbersOrdinalOnes: [
       "không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín",
       "mười", "mười một", "mười hai", "mười ba", "mười bốn", "mười lăm", "mười sáu",
       "mười bảy", "mười tám", "mười chín"
-  ],
+  ]
 
-  NumbersOrdinalPluralOnes: [
+- NumbersOrdinalPluralOnes: [
       "không", "một", "hai", "ba", "bốn", "năm", "sáu", "bảy", "tám", "chín",
       "mười", "mười một", "mười hai", "mười ba", "mười bốn", "mười lăm", "mười sáu",
       "mười bảy", "mười tám", "mười chín"
-  ],
+  ]
 
   # stop when regularity begins
-  NumbersOrdinalFractionalOnes: [
+- NumbersOrdinalFractionalOnes: [
 #        "zero", "first", "half"
       "phân không", "phần một", "phần hai", "phần ba", "phần tư", "phần năm", "phần sáu", "phần bảy", "phần tám", "phần chín",
       "phần mười", "phần mười một", "phần mười hai", "phần mười ba", "phần mười bốn", "phần mười lăm", "phần mười sáu",
       "phần mười bảy", "phần mười tám", "phần mười chín"
 
-  ],
+  ]
 
   # stop when regularity begins
-  NumbersOrdinalFractionalPluralOnes: [
+- NumbersOrdinalFractionalPluralOnes: [
 #        "zeros", "firsts", "halves"
       "phân không", "phần một", "phần hai", "phần ba", "phần tư", "phần năm", "phần sáu", "phần bảy", "phần tám", "phần chín",
       "phần mười", "phần mười một", "phần mười hai", "phần mười ba", "phần mười bốn", "phần mười lăm", "phần mười sáu",
       "phần mười bảy", "phần mười tám", "phần mười chín"
 
-  ],
+  ]
 
 
   # What to use for multiples of 10
-  NumbersTens: [
+- NumbersTens: [
       "", "mười", "hai mươi", "ba mươi", "bốn mươi", "năm mươi", "sáu mươi", "bảy mươi", "tám mươi", "chín mươi"
-  ],
+  ]
 
-  NumbersOrdinalTens: [
+- NumbersOrdinalTens: [
       "", "mười", "hai mươi", "ba mươi", "bốn mươi", "năm mươi", "sáu mươi", "bảy mươi", "tám mươi", "chín mươi"
-  ],
+  ]
 
-  NumbersOrdinalPluralTens: [
+- NumbersOrdinalPluralTens: [
       "", "mười", "hai mươi", "ba mươi", "bốn mươi", "năm mươi", "sáu mươi", "bảy mươi", "tám mươi", "chín mươi"
-  ],
+  ]
 
 
-  NumbersHundreds: ["", "một trăm", "hai trăm", "ba trăm", "bốn trăm", "năm trăm",
+- NumbersHundreds: ["", "một trăm", "hai trăm", "ba trăm", "bốn trăm", "năm trăm",
       "sáu trăm", "bảy trăm", "tám trăm", "chín trăm"
-  ],
+  ]
 
-  NumbersOrdinalHundreds: ["", "một trăm", "hai trăm", "ba trăm", "bốn trăm", "năm trăm",
+- NumbersOrdinalHundreds: ["", "một trăm", "hai trăm", "ba trăm", "bốn trăm", "năm trăm",
       "sáu trăm", "bảy trăm", "tám trăm", "chín trăm"
-  ],
+  ]
 
-  NumbersOrdinalPluralHundreds: ["", "một trăm", "hai trăm", "ba trăm", "bốn trăm", "năm trăm",
+- NumbersOrdinalPluralHundreds: ["", "một trăm", "hai trăm", "ba trăm", "bốn trăm", "năm trăm",
       "sáu trăm", "bảy trăm", "tám trăm", "chín trăm"
-  ],
+  ]
     
 
   # At this point, hopefully the language is regular. If not, code needs to be written
-  NumbersLarge: [
+- NumbersLarge: [
       "", "ngàn", "triệu", "tỉ", "ngàn tỉ", "triệu tỷ",
       "quintillion", "sextillion", "septillion", "octillion", "nonillion",
-  ],
+  ]
     
-  NumbersOrdinalLarge: [
+- NumbersOrdinalLarge: [
       "", "ngàn", "triệu", "tỉ", "ngàn tỉ", "quadrillionth",
       "quintillionth", "sextillionth", "septillionth", "octillionth", "nonillionth"
-  ],
+  ]
     
-  NumbersOrdinalPluralLarge: [
+- NumbersOrdinalPluralLarge: [
       "", "ngàn", "triệu", "tỉ", "ngàn tỉ", "quadrillionths",
       "quintillionths", "sextillionths", "septillionths", "octillionths", "nonillionths"
   ]
-
-]

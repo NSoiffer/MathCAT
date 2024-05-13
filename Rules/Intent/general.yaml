@@ -122,9 +122,9 @@
       - x: "*[2]/*[1]"
       - x: "*[2]/*[2]"
 
-
 -
-  # C with pre-subscript 'n' and post-subscript 'm'
+  # C with pre-subscript 'n' and post-subscript 'm'. The 'n' can be either in the sub or super position
+  # See https://en.wikipedia.org/wiki/Binomial_coefficient#History_and_notation
   name: binomial-mmultiscripts
   tag: mmultiscripts
   variables:
@@ -132,14 +132,28 @@
   - Postscripts: "m:mprescripts/preceding-sibling::*[position() < last()]"
   match: 
   - "*[1][self::m:mi and text()='C'] and"
-  - "count($Prescripts)=2 and $Prescripts[2][self::m:none] and "
+  - "count($Prescripts)=2 and ($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none]) and "
   - "count($Postscripts)=2 and $Postscripts[2][self::m:none]"
   replace:
   - intent:
       name: binomial
       children:
-      - x: "$Prescripts[1]"
+      - x: "IfThenElse(name($Prescripts[2])='none', $Prescripts[1], $Prescripts[2])"
       - x: "$Postscripts[1]"
+
+
+-
+  name: binomial-msub   # C_{n,k}
+  tag: msub
+  match:
+  - "*[1][self::m:mi and text()='C'] and"
+  - "*[2][self::m:mrow and count(*)=3 and *[2][.=',']]"
+  replace:
+  - intent:
+      name: binomial
+      children:
+      - x: "*[2]/*[1]"
+      - x: "*[2]/*[3]"
 
 -
   # P with pre-sub or superscript 'n' and post-subscript 'k' (https://en.wikipedia.org/wiki/Permutation#k-permutations_of_n)
@@ -290,12 +304,13 @@
 -
   name: limit
   tag: [msub, munder]
-  match: "*[1][text()='lim']"
+  variables: [NoSpacesBase: "translate(*[1], ' \u00A0\u2004\u2005\u2006\u2007\u2008\u2009\u200A','')"]   # Sometimes these have (weird) spaces in them
+  match: "*[1][$NoSpacesBase='lim' or $NoSpacesBase='limsup' or $NoSpacesBase='liminf']"
   replace: 
   - intent:
-      name: "limit"    # Fix: the name in the spreadsheet needs updating/fixing
+      name: "limit"
       children:
-      - x: "*[1]"
+      - x: "$NoSpacesBase"
       - x: "*[2]"
 
 -
