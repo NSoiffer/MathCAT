@@ -357,7 +357,7 @@ fn explicit_times_none_superscript() {
         <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("sv", "ClearSpeak_Paren", "Interval",expr,
-    "the interval from c to d, not including c or d");
+    "det öppna intervallet från c till d");
 }
 
 #[test]
@@ -368,7 +368,7 @@ fn explicit_times_none_superscript() {
         <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("sv", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from c to d, including c but not including d");
+    "det halvöppna intervallet från och med c till d");
 }
 
 
@@ -380,7 +380,7 @@ fn parens_interval_open_closed() {
     <mo>]</mo></mrow>
     </math>";
     test_ClearSpeak("sv", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from c to d, not including c but including d");
+    "det halvöppna intervallet från c till och med d");
 }
 
 
@@ -392,7 +392,7 @@ fn parens_interval_closed_closed() {
     <mo>]</mo></mrow>
 </math>";
 test_ClearSpeak("sv", "ClearSpeak_Paren", "Interval ",expr,
-"the interval from c to d, including c and d");
+"det slutna intervallet från c till d");
 }
 
     #[test]
@@ -403,7 +403,7 @@ test_ClearSpeak("sv", "ClearSpeak_Paren", "Interval ",expr,
         <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("sv", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from negative infinity to d, not including d");
+    "det öppna intervallet från minus oändligheten till d");
 }
 
     #[test]
@@ -414,7 +414,7 @@ test_ClearSpeak("sv", "ClearSpeak_Paren", "Interval ",expr,
         <mo>]</mo></mrow>
     </math>";
     test_ClearSpeak("sv", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from negative infinity to d, including d");
+    "det halvöppna intervallet från minus oändligheten till och med d");
 }
 
 
@@ -426,7 +426,7 @@ fn parens_interval_open_open_infinity() {
     <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("sv", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from c to infinity, not including c");
+    "det öppna intervallet från c till oändligheten");
 }
 
 
@@ -438,7 +438,7 @@ fn parens_interval_closed_open_infinity() {
         <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("sv", "ClearSpeak_Paren", "Interval ",expr,
-"the interval from c to infinity, including c");
+"det halvöppna intervallet från och med c till oändligheten");
 }
 
 #[test]
@@ -449,7 +449,7 @@ fn parens_interval_neg_infinity_to_infinity() {
         <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("sv", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from negative infinity to infinity,");
+    "det öppna intervallet från minus oändligheten till oändligheten");
 }
 
 #[test]
@@ -460,5 +460,5 @@ fn parens_interval_neg_infinity_to_pos_infinity() {
     <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("sv", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from negative infinity to positive infinity,");
+    "det öppna intervallet från minus oändligheten till plus oändligheten");
 }
