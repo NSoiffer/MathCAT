@@ -3419,32 +3419,32 @@
 
  - "𝜜-𝜴":                                           #  0x1d71c - 0x1d734
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝜜𝜝𝜞𝜟𝜠𝜡𝜢𝜣𝜤𝜥𝜦𝜧𝜨𝜩𝜪𝜫𝜬𝜭𝜮𝜯𝜰𝜱𝜲𝜳𝜴', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                           #  0xf47c - 0xf494
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝜶-𝝎":                                           #  0x1d736 - 0x1d74e
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝜶𝜷𝜸𝜹𝜺𝜻𝜼𝜽𝜾𝜿𝝀𝝁𝝂𝝃𝝄𝝅𝝆𝝇𝝈𝝉𝝊𝝋𝝌𝝍𝝎', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                           #  0xf496 - 0xf4ae
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "𝝏𝝐𝝑𝝒𝝓𝝔𝝕":                                       #  0x1d74f - 0x1d755
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝝏𝝐𝝑𝝒𝝓𝝔𝝕', '∂εθκφρπ')"
 
  - "":                                       #  0xf422 - 0xf43a
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', '∂εθκφρπ')"
 
  - "𝜵": [T: "fetstilt kursivt nabla"]                  #  0x1d735    (en: 'bold italic nabla', google translation)
@@ -3478,32 +3478,32 @@
 
  - "𝞐-𝞨":                                           #  0x1d790 - 0x1d7a8
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝞐𝞑𝞒𝞓𝞔𝞕𝞖𝞗𝞘𝞙𝞚𝞛𝞜𝞝𝞞𝞟𝞠𝞡𝞢𝞣𝞤𝞥𝞦𝞧𝞨', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                           #  0xf4f0 - 0xf508
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝞪-𝟂":                                           #  0x1d7aa - 0x1d7c2
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝞪𝞫𝞬𝞭𝞮𝞯𝞰𝞱𝞲𝞳𝞴𝞵𝞶𝞷𝞸𝞹𝞺𝞻𝞼𝞽𝞾𝞿𝟀𝟁𝟂', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                           #  0xf50a - 0xf522
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "𝟃𝟄𝟅𝟆𝟇𝟈𝟉":                                       #  0x1d7c3 - 0x1d7c9
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝟃𝟄𝟅𝟆𝟇𝟈𝟉', '∂εθκφρπ')"
 
  - "":                                       #  0xf523 - 0xf529
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', '∂εθκφρπ')"
 
  - "": [T: "fetstilt nabla"]                          #  0xf509    (en: 'bold nabla', google translation)

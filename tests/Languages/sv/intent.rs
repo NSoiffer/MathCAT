@@ -17,8 +17,8 @@ fn silent_intent_msup() {
             <mi arg='H' mathvariant='normal'>H</mi>
             <mn arg='n'>2</mn>
         </msup></math>";
-    test("sv", "SimpleSpeak", expr, "cap h 2");
-    test("sv", "ClearSpeak", expr, "cap h 2");
+    test("sv", "SimpleSpeak", expr, "versal h 2");
+    test("sv", "ClearSpeak", expr, "versal h 2");
 }
 
 #[test]
@@ -28,8 +28,8 @@ fn silent_intent_underscore() {
             <mi arg='H' mathvariant='normal'>H</mi>
             <mn arg='n'>2</mn>
         </msup></math>";
-    test("sv", "SimpleSpeak", expr, "cap h 2");
-    test("sv", "ClearSpeak", expr, "cap h 2");
+    test("sv", "SimpleSpeak", expr, "versal h 2");
+    test("sv", "ClearSpeak", expr, "versal h 2");
 }
 
 #[test]
@@ -37,7 +37,7 @@ fn intent_prob_x() {
     let expr = "<math>
     <msup intent='$op($arg)'>
         <mi arg='arg'>x</mi>
-        <mi arg='op' intent='probability' mathvariant='normal'>P</mi>
+        <mi arg='op' intent='sannolikheten' mathvariant='normal'>P</mi>
     </msup></math>";
-    test("sv", "ClearSpeak", expr, "probability of, x");
+    test("sv", "ClearSpeak", expr, "sannolikheten av, x");
 }
