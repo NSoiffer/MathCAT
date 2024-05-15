@@ -5,7 +5,7 @@ fn complex() {
     let expr = "<math>
                     <mi>ℂ</mi>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "the complex numbers");
+    test("sv", "SimpleSpeak", expr, "de komplexa talen");
 }
 
 #[test]
@@ -13,7 +13,7 @@ fn natural() {
     let expr = "<math>
                     <mi>ℕ</mi>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "the natural numbers");
+    test("sv", "SimpleSpeak", expr, "de naturliga talen");
 }
 
 #[test]
@@ -21,7 +21,7 @@ fn rationals() {
     let expr = "<math>
                     <mi>ℚ</mi>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "the rational numbers");
+    test("sv", "SimpleSpeak", expr, "de rationella talen");
 }
 
 #[test]
@@ -29,7 +29,7 @@ fn reals() {
     let expr = "<math>
                     <mi>ℝ</mi>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "the real numbers");
+    test("sv", "SimpleSpeak", expr, "de reella talen");
 }
 
 #[test]
@@ -37,7 +37,7 @@ fn integers() {
     let expr = "<math>
                     <mi>ℤ</mi>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "the integers");
+    test("sv", "SimpleSpeak", expr, "heltalen");
 }
 
 
@@ -105,7 +105,7 @@ fn msup_positive_integers() {
                     <mo>+</mo>
                 </msup>
             </math>";
-    test("sv", "SimpleSpeak", expr, "the positive integers");
+    test("sv", "SimpleSpeak", expr, "de positiva heltalen");
 }
 
 #[test]
@@ -116,7 +116,7 @@ fn msup_negative_integers() {
                     <mo>-</mo>
                 </msup>
             </math>";
-    test("sv", "SimpleSpeak", expr, "the negative integers");
+    test("sv", "SimpleSpeak", expr, "de negativa heltalen");
 }
 
 #[test]
@@ -127,7 +127,7 @@ fn msup_positive_rationals() {
                     <mo>+</mo>
                 </msup>
             </math>";
-    test("sv", "SimpleSpeak", expr, "the positive rational numbers");
+    test("sv", "SimpleSpeak", expr, "de positiva rationella talen");
 }
 
 #[test]
@@ -138,7 +138,7 @@ fn msup_negative_rationals() {
                     <mo>-</mo>
                 </msup>
             </math>";
-    test("sv", "SimpleSpeak", expr, "the negative rational numbers");
+    test("sv", "SimpleSpeak", expr, "de negativa rationella talen");
 }
 
 #[test]
@@ -146,7 +146,7 @@ fn empty_set() {
     let expr = "<math>
                 <mo>{</mo> <mo>}</mo>
             </math>";
-    test("sv", "SimpleSpeak", expr, "the empty set");
+    test("sv", "SimpleSpeak", expr, "den tomma mängden");
 }
 
 #[test]
@@ -154,7 +154,7 @@ fn single_element_set() {
     let expr = "<math>
                 <mo>{</mo> <mn>12</mn><mo>}</mo>
             </math>";
-    test("sv", "SimpleSpeak", expr, "the set 12");
+    test("sv", "SimpleSpeak", expr, "mängden 12");
 }
 
 #[test]
@@ -162,7 +162,7 @@ fn multiple_element_set() {
     let expr = "<math>
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-    test("sv", "SimpleSpeak", expr, "the set 5 comma 10 comma 15");
+    test("sv", "SimpleSpeak", expr, "mängden 5 komma 10 komma 15");
 }
 
 #[test]
@@ -170,7 +170,7 @@ fn set_with_colon() {
     let expr = "<math>
                     <mo>{</mo> <mrow><mi>x</mi><mo>:</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow> <mo>}</mo>
             </math>";
-    test("sv", "SimpleSpeak", expr, "the set of all x such that x is greater than 2");
+    test("sv", "SimpleSpeak", expr, "mängden av alla x sådana att x är större än 2");
 }
 
 #[test]
@@ -178,7 +178,7 @@ fn set_with_bar() {
     let expr = "<math>
                     <mo>{</mo> <mrow><mi>x</mi><mo>|</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow> <mo>}</mo>
             </math>";
-    test("sv", "SimpleSpeak", expr, "the set of all x such that x is greater than 2");
+    test("sv", "SimpleSpeak", expr, "mängden av alla x sådana att x är större än 2");
 }
 
 #[test]
@@ -186,7 +186,7 @@ fn element_alone() {
     let expr = "<math>
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
-    test("sv", "SimpleSpeak", expr, "3 plus 2 i, is not an element of, the real numbers");
+    test("sv", "SimpleSpeak", expr, "3 plus 2 i, inte tillhörande de reella talen");
 }
 
 #[test]
@@ -202,7 +202,7 @@ fn element_under_sum() {
             </mfrac>
         </math>";
     test("sv", "SimpleSpeak", expr,
-                    "the sum over i an element of the integers of; fraction, 1 over, i squared, end fraction;");
+                    "summa över i tillhörande heltalen, av; division, 1 genom, i kvadrat, slut division;");
 }
 
 #[test]
@@ -220,7 +220,7 @@ fn complicated_set_with_colon() {
             <mn>7</mn>
             <mo>}</mo>
         </math>";
-    test("sv", "SimpleSpeak", expr, "the set of all x an element of the integers such that 2 is less than x is less than 7");
+    test("sv", "SimpleSpeak", expr, "mängden av alla x tillhörande heltalen sådana att 2 är mindre än x är mindre än 7");
 }
 
 #[test]
@@ -234,5 +234,5 @@ fn complicated_set_with_mtext() {
         <mo>}</mo>
         </math>";
     test("sv", "SimpleSpeak", expr, 
-            "the set of all x an element of the natural numbers such that x is an even number");
+            "mängden av alla x tillhörande de naturliga talen sådana att x is an even number");
 }
