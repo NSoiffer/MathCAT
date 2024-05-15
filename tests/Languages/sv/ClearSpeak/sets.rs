@@ -5,7 +5,7 @@ fn complex() {
     let expr = "<math>
                     <mi>ℂ</mi>
                 </math>";
-    test("sv", "ClearSpeak", expr, "the complex numbers");
+    test("sv", "ClearSpeak", expr, "de komplexa talen");
 }
 
 #[test]
@@ -13,7 +13,7 @@ fn natural() {
     let expr = "<math>
                     <mi>ℕ</mi>
                 </math>";
-    test("sv", "ClearSpeak", expr, "the natural numbers");
+    test("sv", "ClearSpeak", expr, "de naturliga talen");
 }
 
 #[test]
@@ -21,7 +21,7 @@ fn rationals() {
     let expr = "<math>
                     <mi>ℚ</mi>
                 </math>";
-    test("sv", "ClearSpeak", expr, "the rational numbers");
+    test("sv", "ClearSpeak", expr, "de rationella talen");
 }
 
 #[test]
@@ -29,7 +29,7 @@ fn reals() {
     let expr = "<math>
                     <mi>ℝ</mi>
                 </math>";
-    test("sv", "ClearSpeak", expr, "the real numbers");
+    test("sv", "ClearSpeak", expr, "de reella talen");
 }
 
 #[test]
@@ -37,7 +37,7 @@ fn integers() {
     let expr = "<math>
                     <mi>ℤ</mi>
                 </math>";
-    test("sv", "ClearSpeak", expr, "the integers");
+    test("sv", "ClearSpeak", expr, "heltalen");
 }
 
 
@@ -105,7 +105,7 @@ fn msup_positive_integers() {
                     <mo>+</mo>
                 </msup>
             </math>";
-    test("sv", "ClearSpeak", expr, "the positive integers");
+    test("sv", "ClearSpeak", expr, "de positiva heltalen");
 }
 
 #[test]
@@ -116,7 +116,7 @@ fn msup_negative_integers() {
                     <mo>-</mo>
                 </msup>
             </math>";
-    test("sv", "ClearSpeak", expr, "the negative integers");
+    test("sv", "ClearSpeak", expr, "de negativa heltalen");
 }
 
 #[test]
@@ -127,7 +127,7 @@ fn msup_positive_rationals() {
                     <mo>+</mo>
                 </msup>
             </math>";
-    test("sv", "ClearSpeak", expr, "the positive rational numbers");
+    test("sv", "ClearSpeak", expr, "de positiva rationella talen");
 }
 
 #[test]
@@ -138,7 +138,7 @@ fn msup_negative_rationals() {
                     <mo>-</mo>
                 </msup>
             </math>";
-    test("sv", "ClearSpeak", expr, "the negative rational numbers");
+    test("sv", "ClearSpeak", expr, "de negativa rationella talen");
 }
 
 #[test]
@@ -146,7 +146,7 @@ fn empty_set() {
     let expr = "<math>
                 <mo>{</mo> <mo>}</mo>
             </math>";
-    test("sv", "ClearSpeak", expr, "the empty set");
+    test("sv", "ClearSpeak", expr, "den tomma mängden");
 }
 
 #[test]
@@ -154,7 +154,7 @@ fn single_element_set() {
     let expr = "<math>
                 <mo>{</mo> <mn>12</mn><mo>}</mo>
             </math>";
-    test("sv", "ClearSpeak", expr, "the set 12");
+    test("sv", "ClearSpeak", expr, "mängden 12");
 }
 
 #[test]
@@ -162,7 +162,7 @@ fn multiple_element_set() {
     let expr = "<math>
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-    test("sv", "ClearSpeak", expr, "the set 5 comma 10 comma 15");
+    test("sv", "ClearSpeak", expr, "mängden 5 komma 10 komma 15");
 }
 
 #[test]
@@ -170,7 +170,7 @@ fn set_with_colon() {
     let expr = "<math>
                     <mo>{</mo> <mrow><mi>x</mi><mo>:</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow> <mo>}</mo>
             </math>";
-    test("sv", "ClearSpeak", expr, "the set of all x such that x is greater than 2");
+    test("sv", "ClearSpeak", expr, "mängden av alla x sådana att x är större än 2");
 }
 
 #[test]
@@ -178,7 +178,7 @@ fn set_with_bar() {
     let expr = "<math>
                     <mo>{</mo> <mrow><mi>x</mi><mo>|</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow> <mo>}</mo>
             </math>";
-    test("sv", "ClearSpeak", expr, "the set of all x such that x is greater than 2");
+    test("sv", "ClearSpeak", expr, "mängden av alla x sådana att x är större än 2");
 }
 
 #[test]
@@ -186,7 +186,7 @@ fn element_alone() {
     let expr = "<math>
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
-    test("sv", "ClearSpeak", expr, "3 plus 2 i, is not a member of, the real numbers");
+    test("sv", "ClearSpeak", expr, "3 plus 2 i, är inte ett element i, de reella talen");
 }
 
 #[test]
@@ -202,7 +202,7 @@ fn element_under_sum() {
             </mfrac>
         </math>";
     test("sv", "ClearSpeak", expr,
-                    "the sum over i is a member of the integers of; the fraction with numerator 1; and denominator i squared;");
+                    "summa över i i heltalen, av; division med täljaren 1; och nämnaren i kvadrat;");
 }
 
 #[test]
@@ -220,7 +220,7 @@ fn complicated_set_with_colon() {
             <mn>7</mn>
             <mo>}</mo>
         </math>";
-    test("sv", "ClearSpeak", expr, "the set of all x in the integers such that 2 is less than x is less than 7");
+    test("sv", "ClearSpeak", expr, "mängden av alla x i heltalen sådana att 2 är mindre än x är mindre än 7");
 }
 
 #[test]
@@ -230,11 +230,11 @@ fn complicated_set_with_mtext() {
         <mo>{</mo>
         <mrow> <mi>x</mi><mo>∈</mo><mi>ℕ</mi></mrow>
         <mo>|</mo>
-        <mrow><mi>x</mi> <mtext>is an even number</mtext> </mrow>
+        <mrow><mi>x</mi> <mtext>är ett jämnt tal</mtext> </mrow>
         <mo>}</mo>
         </math>";
     test("sv", "ClearSpeak", expr, 
-            "the set of all x in the natural numbers such that x is an even number");
+            "mängden av alla x i de naturliga talen sådana att x är ett jämnt tal");
 }
 
 
@@ -252,7 +252,7 @@ fn set_with_bar_member() {
             <mo>}</mo>
             </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "the set of all x member of the integers such that x is greater than 5");
+                expr, "mängden av alla x tillhörande heltalen sådana att x är större än 5");
 }
 
 #[test]
@@ -261,7 +261,7 @@ fn element_alone_member() {
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "3 plus 2 i, is not a member of, the real numbers");
+                expr, "3 plus 2 i, är inte ett element i, de reella talen");
 }
 
 #[test]
@@ -277,7 +277,7 @@ fn element_under_sum_member() {
             </mfrac>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "the sum over i is a member of the integers of; the fraction with numerator 1; and denominator i squared;");
+                expr, "summa över i i heltalen, av; division med täljaren 1; och nämnaren i kvadrat;");
 }
 
 
@@ -295,7 +295,7 @@ fn set_with_bar_element() {
             <mo>}</mo>
             </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "the set of all x element of the integers such that x is greater than 5");
+                expr, "mängden av alla x element i heltalen sådana att x är större än 5");
 }
 
 #[test]
@@ -304,7 +304,7 @@ fn element_alone_element() {
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "3 plus 2 i, is not an element of, the real numbers");
+                expr, "3 plus 2 i, tillhör inte de reella talen");
 }
 
 #[test]
@@ -320,7 +320,7 @@ fn element_under_sum_element() {
             </mfrac>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "the sum over i is an element of the integers of; the fraction with numerator 1; and denominator i squared;");
+                expr, "summa över i i heltalen, av; division med täljaren 1; och nämnaren i kvadrat;");
 }
 
 #[test]
@@ -337,7 +337,7 @@ fn set_with_bar_in() {
             <mo>}</mo>
             </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "In",
-                expr, "the set of all x in the integers such that x is greater than 5");
+                expr, "mängden av alla x i heltalen sådana att x är större än 5");
 }
 
 #[test]
@@ -346,7 +346,7 @@ fn element_alone_in() {
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "In",
-                expr, "3 plus 2 i, is not in the real numbers");
+                expr, "3 plus 2 i, är inte i de reella talen");
 }
 
 #[test]
@@ -362,7 +362,7 @@ fn element_under_sum_in() {
             </mfrac>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "In",
-                expr, "the sum over i is in the integers of; the fraction with numerator 1; and denominator i squared;");
+                expr, "summa över i är i heltalen, av; division med täljaren 1; och nämnaren i kvadrat;");
 }
 
 #[test]
@@ -379,7 +379,7 @@ fn set_with_bar_belongs() {
             <mo>}</mo>
             </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Belongs",
-                expr, "the set of all x belonging to the integers such that x is greater than 5");
+                expr, "mängden av alla x tillhörande heltalen sådana att x är större än 5");
 }
 
 #[test]
@@ -388,7 +388,7 @@ fn element_alone_belongs() {
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Belongs",
-                expr, "3 plus 2 i, does not belong to, the real numbers");
+                expr, "3 plus 2 i, tillhör inte de reella talen");
 }
 
 #[test]
@@ -404,7 +404,7 @@ fn element_under_sum_belongs() {
             </mfrac>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Belongs",
-                expr, "the sum over i belongs to the integers of; the fraction with numerator 1; and denominator i squared;");
+                expr, "summa över i tillhör heltalen, av; division med täljaren 1; och nämnaren i kvadrat;");
 }
 
 
@@ -422,7 +422,7 @@ fn set_member_woall() {
             <mo>}</mo>
             </math>";
             test_ClearSpeak_prefs("sv", vec![("ClearSpeak_SetMemberSymbol", "Member"), ("ClearSpeak_Sets", "woAll")],
-                expr, "the set of x member of the integers such that x is greater than 5");
+                expr, "mängden av x tillhörande heltalen sådana att x är större än 5");
 }
 
 #[test]
@@ -430,7 +430,7 @@ fn multiple_element_set_woall() {
     let expr = "<math>
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-    test_ClearSpeak("sv", "ClearSpeak_Sets", "woAll", expr, "the set 5 comma 10 comma 15");
+    test_ClearSpeak("sv", "ClearSpeak_Sets", "woAll", expr, "mängden 5 komma 10 komma 15");
 }
 
 #[test]
@@ -438,7 +438,7 @@ fn multiple_element_set_silent_bracket() {
     let expr = "<math>
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-            test_ClearSpeak("sv", "ClearSpeak_Sets", "SilentBracket", expr, "5 comma 10 comma 15");
+            test_ClearSpeak("sv", "ClearSpeak_Sets", "SilentBracket", expr, "5 komma 10 komma 15");
         }
 
 #[test]
@@ -447,6 +447,6 @@ fn silent_bracket() {
                 <mo>{</mo><mrow><mi>x</mi><mo>|</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow><mo>}</mo>
             </math>";
             test_ClearSpeak("sv", "ClearSpeak_Sets", "SilentBracket", expr,
-                    "the set of all x such that x is greater than 2");
+                    "mängden av alla x sådana att x är större än 2");
         }
 
