@@ -87,7 +87,7 @@ fn tensor_mmultiscripts() {
     test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
             "versal r med 4 höger índex, nedsänkt i upphöjt j nedsänkt k nedsänkt l");
     test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
-            "cap r with 4 postscripts, sub i super j sub k sub l");
+            "versal r med 4 höger índex, nedsänkt i upphöjt j nedsänkt k nedsänkt l");
 }
 
 #[test]
@@ -110,7 +110,7 @@ fn prime() {
 fn given() {
     let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
     test("sv", "SimpleSpeak", expr, "versal p; vänster-parentes; versal a lodstreck versal b; höger-parentes");
-    test("sv", "ClearSpeak", expr,  "cap p, open paren, cap eigh divides cap b, close paren");  // not good, but follows the spec
+    test("sv", "ClearSpeak", expr,  "versal p; vänster-parentes; versal a delar versal b; höger-parentes");  // not good, but follows the spec
 }
 
 #[test]
@@ -135,7 +135,7 @@ fn simple_msubsup() {
 fn non_simple_msubsup() {
     let expr = "<math><msubsup><mi>i</mi><mrow><mi>j</mi><mo>&#x2212;</mo><mn>2</mn></mrow><mi>k</mi></msubsup></math>";
     test("sv", "SimpleSpeak", expr, "i nedsänkt j minus 2 slut nedsänkt, upphöjt till k,");
-    test("sv", "ClearSpeak", expr, "i sub j minus 2 end sub, to the k-th power");
+    test("sv", "ClearSpeak", expr, "i nedsänkt j minus 2 slut nedsänkt, upphöjt till k,");
 }
 
 #[test]
