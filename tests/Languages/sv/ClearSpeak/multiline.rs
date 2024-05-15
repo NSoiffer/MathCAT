@@ -30,9 +30,9 @@ fn case_1() {
             </mtable></mrow> </mrow></mrow>
         </math>
    ";
-   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Auto", expr, "f av x lika med; 3 fall, \ 
-                fall 1; minus 1 if x, är mindre än 0; \
-                fall 2; 0 if x, lika med 0; \
+   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Auto", expr, "f av x lika med; 3 fall,  
+                fall 1; minus 1 if x, är mindre än 0; 
+                fall 2; 0 if x, lika med 0; 
                 fall 3; 1 if x, är större än 0;");
 }
 
@@ -46,8 +46,8 @@ fn equation_auto() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Auto", expr, "2 rader, \
-                rad 1; x plus y, lika med, 7; \
+   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Auto", expr, "2 rader, 
+                rad 1; x plus y, lika med, 7; 
                 rad 2; 2 x plus 3 y, lika med, 17;");
 }
 
@@ -61,8 +61,8 @@ fn equation_case() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Case", expr, "2 fall, \
-                fall 1; x plus y, lika med, 7; \
+   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Case", expr, "2 fall, 
+                fall 1; x plus y, lika med, 7; 
                 fall 2; 2 x plus 3 y, lika med, 17;");
 }
 
@@ -76,8 +76,8 @@ fn equation_constraint() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Constraint", expr, "2 avgränsningar, \
-                avgränsning 1; x plus y, lika med, 7; \
+   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Constraint", expr, "2 avgränsningar, 
+                avgränsning 1; x plus y, lika med, 7; 
                 avgränsning 2; 2 x plus 3 y, lika med, 17;");
 }
 
@@ -91,8 +91,8 @@ fn equation_equation() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Equation", expr, "2 ekvationer, \
-                ekvation 1; x plus y, lika med, 7; \
+   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Equation", expr, "2 ekvationer, 
+                ekvation 1; x plus y, lika med, 7; 
                 ekvation 2; 2 x plus 3 y, lika med, 17;");
 }
 
@@ -106,8 +106,8 @@ fn equation_line() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Line", expr, "2 rader, \
-                rad 1; x plus y, lika med, 7; \
+   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Line", expr, "2 rader, 
+                rad 1; x plus y, lika med, 7; 
                 rad 2; 2 x plus 3 y, lika med, 17;");
 }
 
@@ -121,8 +121,8 @@ fn equation_none() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "None", expr, "\
-                2, x plus y, lika med, 7; \
+   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "None", expr, "
+                2, x plus y, lika med, 7; 
                 2 x plus 3 y, lika med, 17;");
 }
 
@@ -136,8 +136,8 @@ fn equation_row() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Row", expr, "2 rader, \
-                rad 1; x plus y, lika med, 7; \
+   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Row", expr, "2 rader, 
+                rad 1; x plus y, lika med, 7; 
                 rad 2; 2 x plus 3 y, lika med, 17;");
 }
 
@@ -151,7 +151,7 @@ fn equation_step() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Step", expr, "2 steg, \
-                steg 1; x plus y, lika med, 7; \
+   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Step", expr, "2 steg, 
+                steg 1; x plus y, lika med, 7; 
                 steg 2; 2 x plus 3 y, lika med, 17;");
 }
