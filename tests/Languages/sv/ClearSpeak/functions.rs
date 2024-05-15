@@ -86,7 +86,7 @@ fn simple_log() {
 #[test]
 fn normal_log() {
     let expr = "<math><mrow><mi>log</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("sv", "ClearSpeak", expr, "logg av, vänster-parentes; x plus y; höger-parentes");
+    test("sv", "ClearSpeak", expr, "logg, vänster-parentes; x plus y; höger-parentes");
 }
 
 #[test]
@@ -126,7 +126,7 @@ fn simple_natural_log() {
 fn natural_log() {
     let expr = "<math><mi>ln</mi><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></math>";
     test_ClearSpeak("sv", "ClearSpeak_Log", "LnAsNaturalLog",expr,
-        "naturliga logaritmen av, vänster-parentes; x plus y; höger-parentes");
+    "naturliga logaritmen, vänster-parentes; x plus y; höger-parentes");
 }
 
 
@@ -315,7 +315,7 @@ fn explicit_times_none_superscript() {
         </mrow>
         <mo>+</mo><mn>1</mn>
         </mrow></math>";
-        test("sv", "ClearSpeak", expr, "minus 2 x, plus 1");
+        test("sv", "ClearSpeak", expr, "minus 2 x plus 1");
     }
 
     #[test]

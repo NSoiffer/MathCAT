@@ -5,7 +5,7 @@ fn menclose_actuarial() {
     let expr = "<math>
                     <menclose notation='actuarial'>  <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi> </menclose>
                 </math>";
-    test("sv", "ClearSpeak", expr, "aktuariell symbol, omsluter 3 plus 2 i, slut omslutning");
+    test("sv", "ClearSpeak", expr, "aktuariell symbol, omsluter 3 plus 2 i, slut omslutning,");
 }
 
 #[test]
@@ -117,7 +117,7 @@ fn menclose_other_double_arrows() {
     let expr = "<math>
                     <menclose notation='updownarrow leftrightarrow northeastsouthwestarrow'>  <mfrac><mn>3</mn><mn>2</mn></mfrac> </menclose>
                 </math>";
-    test("sv", "ClearSpeak", expr, "dubbelriktad vertikal pil, dubbelriktad horisontell pil, dubbelriktad diagonal uppåtpil, omsluter, 3 halva, slut omslutning");
+    test("sv", "ClearSpeak", expr, "dubbelriktad vertikal pil, dubbelriktad horisontell pil, dubbelriktad diagonal uppåtpil, omsluter, 3 halva, slut omslutning,");
 }
 
 #[test]
@@ -189,5 +189,5 @@ fn simple_speak_menclose_top_bottom() {
     let expr = "<math>
                     <menclose notation='top bottom'>  <mfrac><mn>3</mn><mn>2</mn></mfrac> </menclose>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "linje ovanför, under, omsluter 3 halva, slut omslutning,");
+    test("sv", "SimpleSpeak", expr, "linje ovanför, under, omsluter, 3 halva, slut omslutning,");
 }
