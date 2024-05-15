@@ -25,7 +25,7 @@ fn common_fraction_tenths() {
                     <mfrac> <mn>17</mn> <mn>10</mn> </mfrac>
                 </math>";
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "17 tiondelar");
-///    test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "17 tenths");
+    test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "17 tenths");
 }
 
 #[test]
@@ -35,7 +35,7 @@ fn not_ClearSpeak_common_fraction_tenths() {
                     <mfrac> <mn>89</mn> <mn>10</mn> </mfrac>
                 </math>";
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "89 genom 10,");
-///    test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "89 tenths");
+    test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "89 tenths");
 }
 
 #[test]
