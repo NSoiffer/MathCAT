@@ -28,11 +28,11 @@ fn hyperbolic_trig_names() {
     <mi>csch</mi><mi>&#x03D5;</mi><mo>+</mo>
     <mi>coth</mi><mi>&#x03C6;</mi>
     </mrow></math>";
-    test("sv", "sinus hyperbolicus av x,\
-                plus cosinus hyperbolicus av y,\
-                plus tangens hyperbolicus av z,\
-                plus sekans hyperbolicus av alfa,\
-                plus cosekans hyperbolicus av fi,\
+    test("sv", "sinus hyperbolicus av x, \
+                plus cosinus hyperbolicus av y, \
+                plus tangens hyperbolicus av z, \
+                plus sekans hyperbolicus av alfa, \
+                plus cosekans hyperbolicus av fi, \
                 plus cotangens hyperbolicus av fi");
 }
 
