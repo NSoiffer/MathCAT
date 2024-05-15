@@ -186,7 +186,7 @@ fn element_alone() {
     let expr = "<math>
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
-    test("sv", "SimpleSpeak", expr, "3 plus 2 i, inte tillhörande de reella talen");
+    test("sv", "SimpleSpeak", expr, "3 plus 2 i, inte tillhörande, de reella talen");
 }
 
 #[test]
