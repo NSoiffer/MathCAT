@@ -40,7 +40,7 @@ fn norm() {
     </mrow>
 </math>
 ";
-  test("sv", "SimpleSpeak", expr, "normen of f");
+  test("sv", "SimpleSpeak", expr, "normen av f");
 }
 
 #[test]
