@@ -15,7 +15,7 @@ fn trig_names() {
     <mi>csc</mi><mi>&#x03D5;</mi><mo>+</mo>
     <mi>cot</mi><mi>&#x03C6;</mi>
     </mrow></math>";
-    test("sv", "SimpleSpeak", expr, "sine of x plus cosine of y plus tangent of z plus secant of alpha, plus cosecant of phi, plus cotangent of phi");
+    test("sv", "SimpleSpeak", expr, "sinus av x plus cosinus av y plus tangens av z plus sekans av alfa, plus cosekans av fi, plus cotangens av fi");
 }
 
 #[test]
