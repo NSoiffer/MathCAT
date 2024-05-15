@@ -148,10 +148,10 @@ fn matrix_3x1_not_simple() {
             rad 1; x; \
             rad 2; a; \
             rad 3; division, x genom, x plus 1, slut division;");
-    test("sv", "ClearSpeak",  expr, "the 3 by 1 column matrix; \
-            row 1; x; \
-            row 2; eigh; \
-            row 3; the fraction with numerator x; and denominator x plus 1;");
+    test("sv", "ClearSpeak",  expr, "3 gånger-ett kolumn-matris; \
+            rad 1; x; \
+            rad 2; a; \
+            rad 3; division med täljaren x; och nämnaren x plus 1;");
 }
 
 #[test]
@@ -539,7 +539,7 @@ fn simple_absolute_value() {
   test("sv", "ClearSpeak",  expr, "absolutbeloppet av x,");
   test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse"), ("ClearSpeak_AbsoluteValue", "Auto")], expr, "absolutbeloppet av x,");
   test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_AbsoluteValue", "AbsEnd")],
-             expr, "the absolute value of x, end absolute value,");
+             expr, "absolutbeloppet av x, slut absolutbelopp,");
 }
   
 #[test]
@@ -551,7 +551,7 @@ let expr = "<math>
   </math>";
   test("sv", "ClearSpeak", expr, "absolutbeloppet av x plus 1,");
   test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse"), ("ClearSpeak_AbsoluteValue", "AbsEnd")],
-             expr, "absolute value of x plus 1, end absolute value,");
+             expr, "absolutbeloppet av x plus 1, slut absolutbelopp,");
 }
 
 #[test]
