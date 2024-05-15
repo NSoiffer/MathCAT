@@ -3,31 +3,31 @@ use crate::common::*;
 #[test]
 fn transpose() {
   let expr = "<math> <msup><mi>M</mi><mi>T</mi></msup> </math>";
-  test("sv", "SimpleSpeak", expr, "cap m transpose");
+  test("sv", "SimpleSpeak", expr, "versal m transponat");
 }
 
 #[test]
 fn trace() {
   let expr = "<math> <mi>Tr</mi><mi>M</mi> </math>";
-  test("sv", "SimpleSpeak", expr, "trace of cap m");
+  test("sv", "SimpleSpeak", expr, "spåret av versal m");
 }
 
 #[test]
 fn dimension() {
   let expr = "<math> <mi>Dim</mi><mi>M</mi> </math>";
-  test("sv", "SimpleSpeak", expr, "dimension of cap m");
+  test("sv", "SimpleSpeak", expr, "dimensionen av versal m");
 }
 
 #[test]
 fn homomorphism() {
   let expr = "<math> <mi>Hom</mi><mo>(</mo><mi>M</mi><mo>)</mo> </math>";
-  test("sv", "SimpleSpeak", expr, "homomorphism of cap m");
+  test("sv", "SimpleSpeak", expr, "homomorfism versal m");
 }
 
 #[test]
 fn kernel() {
   let expr = "<math> <mi>ker</mi><mrow><mo>(</mo><mi>L</mi><mo>)</mo></mrow> </math>";
-  test("sv", "SimpleSpeak", expr, "kernel of cap l");
+  test("sv", "SimpleSpeak", expr, "noll-rummet till versal l");
 }
 
 #[test]
@@ -40,7 +40,7 @@ fn norm() {
     </mrow>
 </math>
 ";
-  test("sv", "SimpleSpeak", expr, "norm of f");
+  test("sv", "SimpleSpeak", expr, "normen of f");
 }
 
 #[test]
@@ -56,5 +56,5 @@ fn norm_subscripted() {
     </msub>
 </math>
 ";
-  test("sv", "SimpleSpeak", expr, "p norm of f");
+  test("sv", "SimpleSpeak", expr, "p normen av f");
 }
