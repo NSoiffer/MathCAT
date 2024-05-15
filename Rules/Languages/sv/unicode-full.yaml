@@ -3267,22 +3267,22 @@
 
  - "𝑨-𝒁":                                           #  0x1d468 - 0x1d481
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                           #  0xf2c8 - 0xf2e1
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝒂-𝒛":                                           #  0x1d482 - 0x1d49b
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                           #  0xf2e2 - 0xf2fb
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝖠-𝖹":                                           #  0x1d5a0 - 0x1d5b9
@@ -3329,22 +3329,22 @@
 
  - "𝘼-𝙕":                                           #  0x1d63c - 0x1d655
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                           #  0xf39c - 0xf3b5
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝙖-𝙯":                                           #  0x1d656 - 0x1d66f
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                           #  0xf3b6 - 0xf3cf
     # - t: "bold italic"
-    - T: "fetstilt kursivt"                                    #     (en: 'bold', google translation)
+    - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝙰-𝚉":                                           #  0x1d670 - 0x1d689
