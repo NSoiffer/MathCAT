@@ -320,7 +320,7 @@
  - "∈":                                          #  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [T: "tillhör"]              #  (en: 'an element of', google translation)
+        then: [T: "tillhörande"]              #  (en: 'an element of', google translation)
         # then: [T: "ett element av"]              #  (en: 'an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         # SWEDISH: Changed the non-ClearSpeak option to "tillhör", as that makes more sense in Swedish.
@@ -348,7 +348,7 @@
     # rule is identical to 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [T: "tillhör inte"]      #  (en: 'is not an element of', google translation)
+        then: [T: "inte tillhörande"]      #  (en: 'is not an element of', google translation)
         # then: [T: "är inte ett element av"]      #  (en: 'is not an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         # SWEDISH: Changed the non-ClearSpeak option to "tillhör", as that makes more sense in Swedish.
@@ -374,7 +374,7 @@
  - "∊":                                          #  0x220a
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [T: "tillhör"]           #  (en: 'is an element of', google translation)
+        then: [T: "tillhörande"]           #  (en: 'is an element of', google translation)
         # then: [T: "är ett element av"]           #  (en: 'is an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         # SWEDISH: Changed the non-ClearSpeak option to "tillhör", as that makes more sense in Swedish.
@@ -388,7 +388,7 @@
               #   then: [T: "medlem av"]            #  (en: 'member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "element i"]          #  (en: 'element of', google translation)
-              - else: [T: "tillhör"]             #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'belonging to')
+              - else: [T: "tillhörande"]             #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'belonging to')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "är ett element i"]         #  (en: 'is an element of', google translation)
