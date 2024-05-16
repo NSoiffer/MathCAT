@@ -37,7 +37,7 @@ fn menclose_top_bottom() {
     let expr = "<math>
                     <menclose notation='top bottom'>  <mfrac><mn>3</mn><mn>2</mn></mfrac> </menclose>
                 </math>";
-    test("sv", "ClearSpeak", expr, "linje ovanför, under, omsluter 3 halva, slut omslutning,");
+    test("sv", "ClearSpeak", expr, "linje ovanför, under, omsluter, 3 halva, slut omslutning,");
 }
 
 #[test]
@@ -189,5 +189,5 @@ fn simple_speak_menclose_top_bottom() {
     let expr = "<math>
                     <menclose notation='top bottom'>  <mfrac><mn>3</mn><mn>2</mn></mfrac> </menclose>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "linje ovanför, under, omsluter, 3 halva, slut omslutning,");
+    test("sv", "SimpleSpeak", expr, "linje ovanför, under, omsluter 3 halva, slut omslutning,");
 }

@@ -157,12 +157,12 @@ fn sans_serif() {
 #[test]
 fn sans_serif_bold() {
     let expr = "<math> <mi>𝗔</mi><mo>,</mo><mi>𝗭</mi></math>";
-    test("sv", "SimpleSpeak", expr, "fetstilt versal a, komma fetstilt versal z");
+    test("sv", "SimpleSpeak", expr, "fetstilt versal a komma fetstilt versal z");
     let expr = "<math> <mi>𝗮</mi><mo>,</mo><mi>𝘇</mi></math>";
     test("sv", "SimpleSpeak", expr, "fetstilt a komma fetstilt z");
     // MathType private space versions
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("sv", "SimpleSpeak", expr, "fetstilt versal a, komma fetstilt versal z");
+    test("sv", "SimpleSpeak", expr, "fetstilt versal a komma fetstilt versal z");
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
     test("sv", "SimpleSpeak", expr, "fetstilt a komma fetstilt z");
 }
@@ -183,12 +183,12 @@ fn sans_serif_italic() {
 #[test]
 fn sans_serif_bold_italic() {
     let expr = "<math> <mi>𝘼</mi><mo>,</mo><mi>𝙕</mi></math>";
-    test("sv", "SimpleSpeak", expr, "fetstilt versal a, komma fetstilt versal z");
+    test("sv", "SimpleSpeak", expr, "fetstilt versal a komma fetstilt versal z");
     let expr = "<math> <mi>𝙖</mi><mo>,</mo><mi>𝙯</mi></math>";
     test("sv", "SimpleSpeak", expr, "fetstilt a komma fetstilt z");
     // MathType private space versions
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
-    test("sv", "SimpleSpeak", expr, "fetstilt versal a, komma fetstilt versal z");
+    test("sv", "SimpleSpeak", expr, "fetstilt versal a komma fetstilt versal z");
     let expr = "<math> <mi></mi><mo>,</mo><mi></mi></math>";
     test("sv", "SimpleSpeak", expr, "fetstilt a komma fetstilt z");
 }
@@ -339,5 +339,5 @@ fn enclosed_numbers() {
   let expr = "<math> <mi>⒈</mi><mo>,</mo><mi>⒐</mi></math>";
   test("sv", "SimpleSpeak", expr, "1 med punkt komma 9 med punkt");
   let expr = "<math> <mi>⓵</mi><mo>,</mo><mi>⓽</mi></math>";
-  test("sv", "SimpleSpeak", expr, "double circled 1 comma double circled 9");
+  test("sv", "SimpleSpeak", expr, "1 i dubbel cirkel komma 9 i dubbel cirkel");
 }

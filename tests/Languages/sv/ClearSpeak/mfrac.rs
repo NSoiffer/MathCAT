@@ -24,8 +24,7 @@ fn common_fraction_tenths() {
     let expr = "<math>
                     <mfrac> <mn>17</mn> <mn>10</mn> </mfrac>
                 </math>";
-    test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, ",17 tiondelar");
-//    test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "17 tenths");
+    test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, ", 17 tiondelar");
 }
 
 #[test]
@@ -145,7 +144,7 @@ fn nested_simple_fractions() {
     test_prefs("sv", "ClearSpeak", vec![("ClearSpeak_Fractions", "GeneralEndFrac")], expr,
     "division med täljaren division med täljaren 1; och nämnaren 2; slut division; och nämnaren division med täljaren 2; och nämnaren 3; slut division; slut division,");
     test_prefs("sv", "ClearSpeak", vec![("ClearSpeak_Fractions", "OverEndFrac")], expr,
-            "1 over 2, end fraction, over 2 over 3, end fraction; end fraction,");
+    ", division; bråk, 1 genom 2, slut bråk, genom, bråk, 2 genom 3, slut bråk; slut division,");
 }
 
 

@@ -30,8 +30,7 @@ fn case_1() {
             </mtable></mrow> </mrow></mrow>
         </math>
    ";
-   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Auto", expr, "f av x lika med; 3 fall,  
-                fall 1; minus 1 if x, är mindre än 0; fall 2; 0 if x, lika med 0; fall 3; 1 if x, är större än 0;");
+   test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Auto", expr, "f av x lika med; 3 fall, fall 1; minus 1 if x, är mindre än 0; fall 2; 0 if x, lika med 0; fall 3; 1 if x, är större än 0;");
 }
 
 #[test]

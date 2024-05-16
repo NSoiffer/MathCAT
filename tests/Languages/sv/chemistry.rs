@@ -12,8 +12,8 @@ fn salt() {
 fn water() {
   let expr = "<math><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></math>";
   test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "versal h, 2 versal o,");
-  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "cap h, sub 2 cap o,");
-  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "cap h, subscript 2, cap o,");
+  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "versal h, nedsänkt 2, versal o,");
+  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "versal h, nedre index 2, versal o,");
 }
 
 #[test]
@@ -36,8 +36,8 @@ fn aluminum_sulfate() {
   let expr = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
           <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
   test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "versal a l, 2; start-parentes; versal s, versal o, 4; slut-parentes 3");
-  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "cap eigh l, sub 2; open paren, cap s, cap o, sub 4; close paren sub 3");
-  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "cap eigh l, subscript 2; open paren, cap s, cap o, subscript 4; close paren subscript 3");
+  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "versal a l, nedsänkt 2; vänster-parentes; versal s, versal o, nedsänkt 4; höger-parentes nedsänkt 3");
+  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "versal a l, nedre index 2; vänster-parentes; versal s, versal o, nedre index 4; höger-parentes nedre index 3");
 }
 
 #[test]
@@ -71,13 +71,11 @@ fn dichlorine_hexoxide() {
       </msup>
     </mrow></math>";
   test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Terse")], 
-    expr, "open bracket, cap c l, cap o, 2, close bracket plus; open bracket, cap c l, cap o, 4, close bracket minus");
+    expr, "start hak-parentes; versal c l, versal o, 2; slut hak-parentes plus; start hak-parentes; versal c l, versal o, 4; slut hak-parentes minus");
   test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Medium")], 
-    expr, "open bracket, cap c l, cap o, sub 2; close bracket super plus; \
-                          open bracket, cap c l, cap o, sub 4; close bracket super minus");
+    expr, "start hak-parentes; versal c l, versal o, nedsänkt 2; slut hak-parentes upphöjt plus; start hak-parentes; versal c l, versal o, nedsänkt 4; slut hak-parentes upphöjt minus");
   test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")], 
-    expr, "open bracket, cap c l, cap o, subscript 2; close bracket superscript plus; \
-                          open bracket, cap c l, cap o, subscript 4; close bracket superscript minus");
+    expr, "start hak-parentes; versal c l, versal o, nedre index 2; slut hak-parentes övre index plus; start hak-parentes; versal c l, versal o, nedre index 4; slut hak-parentes övre index minus");
 }
 
 
@@ -141,9 +139,9 @@ fn beta_decay() {
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse")], expr,
     "14, 6, versal c; bildar, 14, 7, versal n; plus 0, minus 1, e,");
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
-      "super 14, sub 6, cap c; reacts to form; super 14, sub 7, cap n; plus super 0, sub negative 1, e,");
+    "upphöjt 14, nedsänkt 6, versal c; reaktion bildar; upphöjt 14, nedsänkt 7, versal n; plus, upphöjt 0, nedsänkt minus 1, e,");
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-      "superscript 14, subscript 6, cap c; reacts to form; superscript 14, subscript 7, cap n; plus, superscript 0, subscript negative 1, e,");
+    "övre index 14, nedre index 6, versal c; reaktion bildar; övre index 14, nedre index 7, versal n; plus, övre index 0, nedre index minus 1, e,");
 }
 
 #[test]
@@ -405,9 +403,9 @@ fn mhchem_beta_decay() {
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse")], expr,
     "14, 6, versal c; bildar, 14, 7, versal n; plus 0, minus 1, e,");
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
-      "super 14, sub 6, cap c; reacts to form; super 14, sub 7, cap n; plus super 0, sub negative 1, e,");
+    "upphöjt 14, nedsänkt 6, versal c; reaktion bildar; upphöjt 14, nedsänkt 7, versal n; plus, upphöjt 0, nedsänkt minus 1, e,");
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-      "superscript 14, subscript 6, cap c; reacts to form; superscript 14, subscript 7, cap n; plus, superscript 0, subscript negative 1, e,");
+    "övre index 14, nedre index 6, versal c; reaktion bildar; övre index 14, nedre index 7, versal n; plus, övre index 0, nedre index minus 1, e,");
 }
 
 #[test]
@@ -466,8 +464,8 @@ fn mhchem_so4_2plus() {
     </mrow>
   </math>";
   test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "versal s; versal o, 4, 2 plus,");
-  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "cap s; cap o, sub 4, super 2 plus,");
-  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "cap s; cap o, subscript 4, superscript 2 plus,");
+  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "versal s; versal o, nedsänkt 4, upphöjt 2 plus,");
+  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "versal s; versal o, nedre index 4, övre index 2 plus,");
 }
 
 

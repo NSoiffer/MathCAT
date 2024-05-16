@@ -261,7 +261,7 @@ fn element_alone_member() {
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "3 plus 2 i, är inte ett element i, de reella talen");
+                expr, "3 plus 2 i, tillhör inte de reella talen");
 }
 
 #[test]
@@ -277,7 +277,7 @@ fn element_under_sum_member() {
             </mfrac>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "summa över i i heltalen, av; division med täljaren 1; och nämnaren i kvadrat;");
+                expr, "summa över i tillhör heltalen, av; division med täljaren 1; och nämnaren i kvadrat;");
 }
 
 
@@ -304,7 +304,7 @@ fn element_alone_element() {
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "3 plus 2 i, tillhör inte de reella talen");
+                expr, "3 plus 2 i, är inte ett element i, de reella talen");
 }
 
 #[test]

@@ -30,7 +30,7 @@ fn ellipses_auto_start() {
             <mi>…</mi><mo>,</mo>
             <mo>-</mo><mn>2</mn><mo>,</mo><mo>-</mo><mn>1</mn><mo>,</mo><mn>0</mn>
         </math>";
-    test("sv", "ClearSpeak", expr, "punkt punkt punkt komma minus 2 komma minus 1 komma 0 komma 1 komma 2 komma punkt punkt punkt");
+    test("sv", "ClearSpeak", expr, "punkt punkt punkt komma minus 2 komma minus 1 komma 0");
 }
 
 #[test]
