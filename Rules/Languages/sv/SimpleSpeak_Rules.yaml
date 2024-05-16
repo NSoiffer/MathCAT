@@ -18,9 +18,6 @@
   tag: square-root
   match: "."
   replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: {t: "the"}    # phrase('the' square root of x)
   - T: "kvadratroten"      # phrase(the 'square root' of x)
   - test:
       if: "$Verbosity!='Terse'"
@@ -36,9 +33,6 @@
   tag: root
   match: "."
   replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: [{t: "the"}]
   - test:
       if: "*[2][self::m:mn]"
       then_test:
@@ -49,17 +43,8 @@
       - else_if: "*[2][not(contains(., ','))]"
         then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]        # phrase(the square 'root' of x)
       else:
-      # - test:
-      #     if: "*[2][self::m:mi][string-length(.)=1]"
-      #     then:
-      #     - x: "*[2]"
-      #     - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-      #     else: {x: "*[2]"}
       - T: "roten av grad"      # phrase(the square 'root' of 36)
       - x: "*[2]"
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: {T: "ur"}      # phrase(the square root 'of' 36)
   # SWEDISH: Removed verbosity settings.
   - T: "ur"      # phrase(the square root 'of' 36)
   - x: "*[1]"
@@ -75,7 +60,6 @@
   match:
   - "*[1][self::m:mn][not(contains(., '.')) and text()<20]   and"
   - "*[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]"
-  # replace: [{x: ToCommonFraction(.)}]
   # SWEDISH: Alternative logic for handling correct reading out of common fractions.
   variables: [IsPlural: "*[1]!=1"]
   replace:
@@ -91,7 +75,6 @@
   - "preceding-sibling::*[1][self::m:mo][text()='⁤'] and" # preceding element is invisible plus
   - "*[1][self::m:mn][not(contains(., '.'))]   and"
   - "*[2][self::m:mn][not(contains(., '.')) and text()<=10]"
-  # replace: [{x: ToCommonFraction(.)}]
   # SWEDISH: Alternative logic for handling correct reading out of common fractions.
   variables: [IsPlural: "*[1]!=1"]
   replace:
@@ -161,18 +144,6 @@
   tag: power
   match:
   - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
-  # replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: {t: "the"}      # # phrase('the' fourth power of 10)
-  # - bookmark: "*[2]/@id"
-  # - test:
-  #     if: "*[2][self::m:mn][not(contains(., '.'))]"
-  #     then: [{x: "ToOrdinal(*[2])"}]
-  #     else: [{x: "*[2]"}]
-  # - t: "kraften"      # phrase(the fourth 'power of' 2)
-  # - pause: short
-  # - x: "*[1]"
   replace:
   - x: "*[1]"
   - T: "upphöjt till"
@@ -195,13 +166,6 @@
 - name: simple-integer
   tag: power
   match: "*[2][self::m:mn][not(contains(., '.'))]"
-  # replace:
-  # - x: "*[1]"
-  # - t: "till"      # phrase(15 raised 'to the' second power equals 225)
-  # - test:
-  #     if: "*[2][.>0]"
-  #     then: {x: "ToOrdinal(*[2])"}
-  #     else: {x: "*[2]"}
   replace:
   - x: "*[1]"
   - T: "upphöjt till"
@@ -213,10 +177,6 @@
   match:
   - "*[2][self::m:negative and"
   - "     *[1][self::m:mn][not(contains(., '.'))]]"
-  # replace:
-  # - x: "*[1]"
-  # - t: "till"      # phrase(15 raised 'to the' second power equals 225)
-  # - x: "*[2]"
   replace:
   - x: "*[1]"
   - T: "upphöjt till"
@@ -226,11 +186,6 @@
 - name: simple-var
   tag: power
   match: "*[2][self::m:mi][string-length(.)=1]"
-  # replace:
-  # - x: "*[1]"
-  # - t: "till"      # phrase(15 raised 'to the' second power equals 225)
-  # - x: "*[2]"
-  # - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
   replace:
   - x: "*[1]"
   - T: "upphöjt till"
@@ -240,10 +195,6 @@
 - name: simple
   tag: power
   match: "IsNode(*[2], 'leaf')"
-  # replace:
-  # - x: "*[1]"
-  # - t: "till"      # phrase(15 raised 'to the' second power equals 225)
-  # - x: "*[2]"
   replace:
   - x: "*[1]"
   - T: "upphöjt till"
@@ -274,7 +225,6 @@
   - x: "*[1]"
   - T: "upphöjt till"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
-  # - t: "power"      # phrase(15 raised to the second 'power' equals 225)
 
 #
 # Some rules on mrows
@@ -292,17 +242,11 @@
       - T: "tomma mängden"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
       then:
-      # - test:
-      #     if: "$Verbosity!='Terse'"
-      #     then: {t: "the"}      # phrase('the' set of all integers)
       - T: "mängden av alla"      # phrase(the 'set of all' positive integers less than 10)
       - x: "*[1]/*[1]"
       - T: "sådana att"      # phrase(x 'such that' x is less than y)
       - x: "*[1]/*[3]"
       else:
-      # - test:
-      #     if: "$Verbosity!='Terse'"
-      #     then: {t: "the"}      # phrase('the' set of integers)
       - T: "mängden"      # phrase(here is a 'set' of numbers)
       - x: "*[1]"
 
