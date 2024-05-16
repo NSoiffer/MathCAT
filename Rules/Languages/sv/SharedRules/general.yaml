@@ -153,7 +153,6 @@
       if: "$Verbosity!='Terse'"
       then:
       - T: "det"      # phrase('the' square root of 25 equals 5)
-  # - x: "translate(name(.),'-', ' ')"
   # SWEDISH: The translate function doesn't work for non-English. Used the solution below instead.
   - test:
      - if: "self::m:open-interval"
@@ -163,9 +162,6 @@
      - else_if: "self::m:closed-interval"
        then: [T: "slutna intervallet"]
        else: [T: "halvöppna intervallet"]
-#  - test:
-#      if: "$Verbosity!='Terse'"
-#      then:
   - T: "från"      # phrase(subtracting 5 'from' 10 gives 5)
   - test:
     - if: "self::m:closed-open-interval"
@@ -186,10 +182,6 @@
   tag: point
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then:
-  #     - t: "the"      # phrase('the' square root of 25 equals 5)
   - T: "punkt"      # phrase(a decimal 'point' indicates the fraction component of a number)
   - x: "*[1]"
   - T: "komma"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
@@ -234,7 +226,6 @@
       if: "$Verbosity='Verbose'"
       then: {T: "nedre index"}
       else: {T: "nedsänkt"}
-  # - T: "nedsänkt"      # phrase(the subscripted variable a 'sub' i)
   # SWEDISH: Added verbosity test for the start announcement.
   - x: "*[2]"
   - test:
@@ -253,9 +244,6 @@
   tag: large-op
   match: "count(*) = 3"
   replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: [{t: "the"}]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
   - T: "från"      # phrase(subtracting 5 'from' 10 gives 5)
   - x: "*[2]"
@@ -271,9 +259,6 @@
   tag: large-op
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: [{t: "the"}]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
   - T: "över"      # phrase(2 'over' 3 equals two thirds)
   - x: "*[2]"
@@ -286,9 +271,6 @@
   tag: mrow
   match: "count(*)=2 and IsInDefinition(*[1], 'LargeOperators')"
   replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: [{t: "the"}]      # phrase('the' square root of 25 equals 5)
   - x: "*[1]"
   - T: "av"      # phrase(the square root 'of' 25 equals 5)
   - x: "*[2]"
@@ -297,10 +279,6 @@
   tag: limit
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: [{t: "gränsen som"}]      # phrase('the limit as' indicated by this result)
-  #     else: [{t: "gränsen som"}]      # phrase(the 'limit as' indicated by this result)
   - T: "gränsvärdet då"                 # phrase(the 'limit as' indicated by this result)
   - x: "*[2]"
   - pause: short
@@ -512,9 +490,6 @@
         then: [{spell: "'ln'"}]
         else: [{T: "naturliga logaritmen"}]      # phrase(the 'natural log' function is used in mathematics)
       else:
-      # - test:
-      #     if: "$Verbosity!='Terse' and not(log_is_simple)"
-      #     then: {t: "the"}      # phrase('the' square root of 25 equals 5)
       - test:
         - if: "*[1][text()='log']"
           then: [{T: "logg"}]      # phrase(the 'log' function is used in mathematics)
@@ -557,7 +532,6 @@
         else:  # don't bother with special cases as this isn't likely to happen
         - T: "upphöjt till"      # phrase(x 'raised to the' second power)
         - x: "*[2]"
-        # - t: "makten"      # phrase(x raised to the second 'power')
   - pause: short
 
 - name: multi-line
@@ -589,9 +563,6 @@
         - if: "$LineCount != 1"
           then: [{T: "rader"}]
           else: [{T: "raden"}]      # phrase(this is the first 'line' of three lines)
-  # - test:
-  #   - if: "$LineCount != 1"
-  #     then: [{ct: "s"}] # plural
   - pause: short
   - x: "*"
 
@@ -654,7 +625,6 @@
   variables: [{IsColumnSilent: true()}]
   match: "count(*)=1 and *[self::m:mtr][count(*) = 1]"
   replace:
-  # - ot: "the"      # phrase('the' 1 by 1 matrix M)
   - T: "ett-gånger-ett"      # phrase(the '1 by 1' matrix)
   - test:
       if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
@@ -674,7 +644,6 @@
   - count(*)<=3 and # at least two rows
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   replace:
-  # - t: "the"      # phrase('the' 2 by 2 matrix M)
   - x: count(*)
   - T: "gånger-ett"      # phrase(the 2 'by 1 column' matrix)
   - test:
@@ -697,7 +666,6 @@
   variables: [{IsColumnSilent: true()}]
   match: "*[self::m:mtr][count(*) = 1]"
   replace:
-  # - t: "the"      # phrase('the' 2 by 2 matrix M)
   - x: "count(*)"
   - T: "gånger-ett"      # phrase(the 2 'by 1 column' matrix)
   - test:
@@ -726,7 +694,6 @@
   replace:
   - T: "ett-gånger"      # phrase('the 1 by' 2 matrix)
   - x: count(*/*)
-  # - t: "rad"      # phrase(the 1 by 4 'row' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: {T: "rad-vektor"}      # phrase('the 1 by' 2 row 'vector')
@@ -749,7 +716,6 @@
   replace:
   - T: "ett-gånger"      # phrase('the 1 by' 2 matrix)
   - x: "count(*/*)"
-  # - t: "rad"      # phrase(the 1 by 2 'row' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: {T: "rad-vektor"}      # phrase(the 2 by 1 'vector')
@@ -774,7 +740,6 @@
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   variables: [{IsColumnSilent: "$SpeechStyle = 'SimpleSpeak' or ($SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix != 'SpeakColNum')"}]
   replace:
-  # - t: "the"      # phrase('the' 1 by 2 matrix M)
   - x: count(*)
   - T: "gånger"      # phrase(the 1 'by' 2 matrix)
   - x: count(*[self::m:mtr][1]/*)
@@ -798,7 +763,6 @@
   variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
   match: "not(@data-intent-property)"
   replace:
-  # - t: "the"      # phrase('the' 1 by 2 matrix M)
   - x: "count(*)"
   - T: "gånger"      # phrase(the 1 'by' 2 matrix)
   - x: "count(*[self::m:mtr][1]/*)"

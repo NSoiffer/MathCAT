@@ -36,9 +36,6 @@
   tag: arc
   match: "count(*)=2"
   replace:
-  # - test:
-  #     if: "$Verbosity='Verbose'"
-  #     then: [{t: "the"}]            # phrase('the' arc A B C)
   - T: "bågen"                        # phrase(the 'arc' A B C)
   - x: "*[1]"
   - x: "*[2]"

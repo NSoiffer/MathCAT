@@ -112,9 +112,6 @@
   tag: msqrt
   match: "."
   replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: [t: "the"]    # phrase("'the' root of x")
   - T: "rotsymbolen"
   - test:
       if: "$Verbosity!='Terse'"
@@ -130,9 +127,6 @@
   tag: mroot
   match: "."
   replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: [t: "the"]   # phrase("'the' root of x")
   - T: "rotsymbolen"
   - T: "med index"      # phrase("the root of x 'with index' 5")
   - x: "*[1]"
