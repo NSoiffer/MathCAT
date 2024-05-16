@@ -439,10 +439,6 @@
  - "ℎ": [T: "plancks constant"]                      #  0x210e
  - "ℏ": [T: "h streck"]                                            #  0x210f
     # SWEDISH: finns bara ett sätt att säga h streck
-    # - test: 
-    #     if: "($Verbosity='Terse')"
-    #     then: [t: "h bar"]                         #     (google translation)
-    #     else: [t: "h streck"]                      #     (en: 'reduced planck constant')
 
  - "ℐℒ℘ℬℰℱℳ":                                       #  0x2110, 0x2112, 0x2118, 0x2130, 0x2131, 0x2133
     - T: "skrivstilt"                                 #     (en: 'script')
@@ -655,9 +651,6 @@
  - "⇿": [T: "dubbel-riktad pil med öppen spets"]    #  0x21ff    (en: 'left right open headed arrow')
  - "∀": [T: "för alla"]                             #  0x2200    (en: 'for all')
  - "∁":                                             #  0x2201
-   #   - test: 
-   #       if: "$Verbosity!='Terse'"
-   #      then: [t: "de"]                            #     (en: 'the', google translation)
      - T: "komplementet av"                              #     (en: 'complement of')
  - "∂":                                             #  0x2202
      - test: 
@@ -668,16 +661,12 @@
  - "∄": [T: "det finns inte"]                   #  0x2204    (en: 'there does not exist')
  - "∅": [T: "tomma mängden"]                        #  0x2205    (en: 'empty set')
  - "∆":                                             #  0x2206
-     #- test: 
-     #    if: "$Verbosity!='Terse'"
-     #    then: [t: "de"]                            #     (en: 'the', google translation)
      - T: "laplacianen av"                               #     (en: 'laplacian of')
  - "∇":                                             #  0x2207
      - test: 
          if: "$Verbosity!='Terse'"
          then: [T: "gradienten av"]
          else: [T: "grad"]                            #     (en: 'the', google translation)
-    # - t: "gradient (nabla)"                        #     (en: 'gradient of', google: 'lutning av')
  - "∈":                                             #  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
@@ -769,19 +758,10 @@
         else: [T: "gånger"]          #     (en: 'times')
 
  - "√":                                             #  0x221a
-    # - test: 
-    #     if: "$Verbosity!='Terse'"
-    #     then: [t: "de"]                            #     (en: 'the', google translation)
      - T: "kvadratroten ur"                                 #     (en: 'square root of')
  - "∛":                                             #  0x221b
-    # - test: 
-    #     if: "$Verbosity!='Terse'"
-    #     then: [t: "de"]                            #     (en: 'the', google translation)
      - T: "kubikroten ur"                                #     (en: 'cube root of')
  - "∜":                                             #  0x221c
-    # - test: 
-    #     if: "$Verbosity!='Terse'"
-    #     then: [t: "de"]                            #     (en: 'the', google translation)
      - T: "fjärderoten ur"                               #     (en: 'fourth root of')
  - "∝":                                             #  0x221d
      - test: 
@@ -811,9 +791,6 @@
  - "∴": [T: "alltså"]                               #  0x2234    (en: 'therefore')
  - "∵": [T: "eftersom"]                         #  0x2235    (en: 'because')
  - "∶":                                             #  0x2236
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "till"                             #     (en: 'to')
  - "∷": [T: "som"]                          #  0x2237    (en: 'as', MathPlayer: 'proportion', google: 'som')
  - "∸": [t: "punkt minus"]                          #  0x2238    (en: 'dot minus')
@@ -831,53 +808,26 @@
  - "∼": [T: "är proportionell mot"]                       #  0x223c    (en: 'varies with')
  - "∽": [T: "är proportionell mot"]                        #  0x223d    (en: 'reversed tilde')
  - "∾":                                             #  0x223e
-    # - test: 
-    #     if: "$Verbosity!='Terse'"
-    #     then: [t: "är"]                            #     (en: 'is', google translation)
      - t: "omvänt långdraget s"                     #     (en: 'most positive', MathPlayer: 'inverted lazy s', google: 'mest positiva')
  - "∿": [T: "sinuskurva"]                           #  0x223f    (en: 'sine wave')
  - "≀": [T: "kransprodukt"]                         #  0x2240    (en: 'wreath product')
  - "≁": [T: "inte proportionell mot"]                           #  0x2241    (en: 'not tilde')
  - "≂": [T: "minus tilde"]                          #  0x2242    (SRE: 'minus och tilde')
  - "≃":                                             #  0x2243
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "asymptotiskt lika med"              #     (en: 'asymptotically equal to', MathPlayer: 'asymptotically lika med', google: 'asymptotiskt lika med')
  - "≄":                                             #  0x2244
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "inte asymptotiskt lika med"         #     (en: 'not asymptotically equal to', MathPlayer: 'inte asymptotically lika med', google: 'inte asymptotiskt lika med')
  - "≅":                                             #  0x2245
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "ungefär lika med"               #     (en: 'approximately equal to', MathPlayer: 'approximativt lika med', google: 'ungefär lika med')
  - "≆":                                             #  0x2246
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "ungefär men inte faktiskt lika med"    #     (en: 'approximately but not actually equal to', MathPlayer: 'approximativt men inte faktiskt lika med', google: 'ungefär men inte faktiskt lika med')
  - "≇":                                             #  0x2247
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "varken ungefär eller fakiskt lika med"    #     (en: 'neither approximately nor actually equal to', MathPlayer: 'varken approximativt eller fakiskt lika med', google: 'varken ungefär eller faktiskt lika med')
  - "≈":                                             #  0x2248
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "ungefär lika med"                         #     (en: 'almost equal to', SRE: 'är nästan lika med')
  - "≉":                                             #  0x2249
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "inte ungefär lika med"                    #     (en: 'not almost equal to', SRE: 'är inte nästan lika med')
  - "≊":                                             #  0x224a
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "ungefär lika med eller lika med"              #     (en: 'almost equal or equal to', SRE: 'är nästan lika eller lika med')
  - "≋": [t: "trippla tilde"]                        #  0x224b    (en: 'triple tilde')
  - "≌": [T: "är alla lika med"]                     #  0x224c    (en: 'are all equal to', MathPlayer: 'alla lika med')
@@ -892,33 +842,18 @@
          then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "geometriskt ekvivalent med"                 #     (en: 'geometrically equivalent to', MathPlayer: 'geometriskt lika med', google: 'geometriskt motsvarande')
  - "≏":                                             #  0x224f
-    # - test: 
-    #     if: "$Verbosity!='Terse'"
-    #     then: [t: "de"]                            #     (en: 'the', google translation)
      - t: "differensen mellan"                      #     (en: 'difference between')
  - "≐": [T: "närmar sig gränsvärdet"]                   #  0x2250    (en: 'approaches the limit')
  - "≑":                                             #  0x2251
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "geometriskt lika med"                    #     (en: 'geometrically equal to', SRE: 'är geometriskt lika med')
  - "≒":                                             #  0x2252
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "ungefär lika med"    #     (en: 'approximately equal to or the image of', MathPlayer: 'uppskattningsvis lika med eller i likhet med', google: 'ungefär lika med eller bilden av')
  - "≓":                                             #  0x2253
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                            #     (en: 'is the', google translation)
      - T: "ungefär lika med"    #     (en: 'image of or approximately equal to', MathPlayer: 'i likhet med eller uppskattningsvis lika med', google: 'bild av eller ungefär lika med')
  - "≔": [T: "definieras som"]                    #  0x2254    (en: 'colon equals', MathPlayer: 'kolon lika med', google: 'kolon är lika med')
  - "≕": [t: "lika med kolon"]                    #  0x2255    (en: 'equals colon', MathPlayer: 'lika med kolon')
  - "≖": [T: "ring i lika med"]                      #  0x2256    (en: 'ring in equal to', SRE: 'är ring i lika med')
  - "≗":                                             #  0x2257
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                            #     (en: 'is', google translation)
      - t: "ring lika med"                           #     (en: 'approximately equal to')
  - "≘": [T: "motsvarar"]                            #  0x2258    (en: 'corresponds to')
  - "≙": [t: "skattar"]                              #  0x2259    (en: 'estimates')
@@ -932,15 +867,9 @@
  - "≜": [T: "dellta lika med"]                       #  0x225c    (en: 'delta equals')
  - "≝": [T: "per definition lika med"]              #  0x225d    (en: 'is defined to be')
  - "≞":                                             #  0x225e
-    # - test: 
-    #     if: "$Verbosity!='Terse'"
-    #     then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "mäts med"                                #     (en: 'measured by')
  - "≟": [T: "ifrågasatt likhet"]                  #  0x225f    (en: 'has an unknown relationship with')
  - "≠":                                             #  0x2260
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                            #     (en: 'is', google translation)
      - T: "inte lika med"                           #     (en: 'not equal to')
  - "≡":                                             #  0x2261
  # SWEDISH: This symbol can mean different things. Can MathML differ between them? If so, build a test?
@@ -1137,9 +1066,6 @@
  - "⊣": [T: "bevisar inte"]                         #  0x22a3    (en: 'does not yield')
  - "⊤": [t: "sanning"]                             #  0x22a4    (en: 'top')
  - "⊥":                                             #  0x22a5
-    # - test: 
-    #     if: "$Verbosity!='Terse'"
-    #     then: [t: "är"]                            #     (en: 'is', google translation)
      - T: "motsägelse"                       #     (en: 'bottom', MathPlayer: 'up tack', google: 'botten')
  - "⊦": [T: "reduceras till"]                            #  0x22a6    (en: 'reduces to')
  - "⊧": [T: "innebär"]                             #  0x22a7    (en: 'models', MathPlayer: 'models')
@@ -1207,24 +1133,12 @@
  - "⋇": [T: "delat med gånger"]                      #  0x22c7    (en: 'division times')
  - "⋈": [T: "naturlig join"]                                #  0x22c8    (en: 'bowtie', MathPlayer: 'bowtie')
  - "⋉":                                             #  0x22c9
-    #- test: 
-    #    if: "$Verbosity!='Terse'"
-    #    then: [t: "är"]                             #     (en: 'is', google translation)
     - T: "vänster semi-join"    #     (en: 'the left normal factor semidirect product of')
  - "⋊":                                             #  0x22ca
-    # - test: 
-    #     if: "$Verbosity!='Terse'"
-    #     then: [t: "är"]                            #     (en: 'is', google translation)
      - T: "höger semi-join"    #     (en: 'the right normal factor semidirect product of')
  - "⋋":                                             #  0x22cb
-    # - test: 
-    #     if: "$Verbosity!='Terse'"
-    #     then: [t: "är"]                            #     (en: 'is', google translation)
      - T: "vänster semi-direkt produkt"              #     (en: 'the left semidirect product of')
  - "⋌":                                             #  0x22cc
-    # - test: 
-    #     if: "$Verbosity!='Terse'"
-    #     then: [t: "är"]                            #     (en: 'is', google translation)
      - T: "höger semi-direkt produkt"                #     (en: 'the right semidirect product of')
  - "⋍": [T: "asymptotiskt lika med"]                #  0x22cd    (en: 'reversed tilde equals')
  - "⋎": [T: "disjunktion"]                     #  0x22ce
@@ -1240,24 +1154,12 @@
          then: [T: "är en"]                            #     (en: 'is', google translation)
      - T: "dubbel övermängd till"                       #     (en: 'a double superset of')
  - "⋒":                                             #  0x22d2
-    # - test: 
-    #     if: "$Verbosity!='Terse'"
-    #     then: [t: "de"]                            #     (en: 'the', google translation)
      - T: "dubbla snittet"                           #     (en: 'double intersection of')
  - "⋓":                                             #  0x22d3
-    # - test: 
-    #     if: "$Verbosity!='Terse'"
-    #     then: [t: "de"]                            #     (en: 'the', google translation)
      - T: "dubbla unionen"                            #     (en: 'double union of')
  - "⋔":                                             #  0x22d4
-    # - test: 
-    #     if: "$Verbosity!='Terse'"
-    #     then: [t: "de"]                            #     (en: 'the', google translation)
      - T: "äkta snittet"                                #     (en: 'proper intersection of', MathPlayer: 'pitchfork', google: 'korrekt skärningspunkt av')
  - "⋕":                                             #  0x22d5
-    # - test: 
-    #     if: "$Verbosity!='Terse'"
-    #     then: [t: "är"]                            #     (en: 'is', google translation)
      - T: "lika med och och parallell med"             #     (en: 'equal to and parallel to')
  - "⋖": [T: "mindre än med punkt"]                #  0x22d6    (en: 'less than with dot')
  - "⋗": [T: "större än med punkt"]                  #  0x22d7    (en: 'greater than with dot')
@@ -3266,22 +3168,18 @@
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝑨-𝒁":                                           #  0x1d468 - 0x1d481
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝑨𝑩𝑪𝑫𝑬𝑭𝑮𝑯𝑰𝑱𝑲𝑳𝑴𝑵𝑶𝑷𝑸𝑹𝑺𝑻𝑼𝑽𝑾𝑿𝒀𝒁', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                           #  0xf2c8 - 0xf2e1
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝒂-𝒛":                                           #  0x1d482 - 0x1d49b
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝒂𝒃𝒄𝒅𝒆𝒇𝒈𝒉𝒊𝒋𝒌𝒍𝒎𝒏𝒐𝒑𝒒𝒓𝒔𝒕𝒖𝒗𝒘𝒙𝒚𝒛', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                           #  0xf2e2 - 0xf2fb
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
@@ -3313,37 +3211,29 @@
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  - "𝘈-𝘡":                                           #  0x1d608 - 0x1d621
-    # - t: "italic"
     - spell: "translate('.', '𝘈𝘉𝘊𝘋𝘌𝘍𝘎𝘏𝘐𝘑𝘒𝘓𝘔𝘕𝘖𝘗𝘘𝘙𝘚𝘛𝘜𝘝𝘞𝘟𝘠𝘡', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
  - "-":                                           #  0xf368 - 0xf381
-      # - t: "italic"
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝘢-𝘻":                                           #  0x1d622 - 0x1d63b
-      # - t: "italic"
     - spell: "translate('.', '𝘢𝘣𝘤𝘥𝘦𝘧𝘨𝘩𝘪𝘫𝘬𝘭𝘮𝘯𝘰𝘱𝘲𝘳𝘴𝘵𝘶𝘷𝘸𝘹𝘺𝘻', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                           #  0xf382 - 0xf39b
-      # - t: "italic"
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "𝘼-𝙕":                                           #  0x1d63c - 0x1d655
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝘼𝘽𝘾𝘿𝙀𝙁𝙂𝙃𝙄𝙅𝙆𝙇𝙈𝙉𝙊𝙋𝙌𝙍𝙎𝙏𝙐𝙑𝙒𝙓𝙔𝙕', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                           #  0xf39c - 0xf3b5
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝙖-𝙯":                                           #  0x1d656 - 0x1d66f
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝙖𝙗𝙘𝙙𝙚𝙛𝙜𝙝𝙞𝙟𝙠𝙡𝙢𝙣𝙤𝙥𝙦𝙧𝙨𝙩𝙪𝙫𝙬𝙭𝙮𝙯', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                           #  0xf3b6 - 0xf3cf
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
@@ -3391,59 +3281,47 @@
     - spell: "translate('.', '', '∂εθκφρπ')"
 
  - "𝛢-𝛺":                                           #  0x1d6e2 - 0x1d6fa
-      # - t: "italic"
     - spell: "translate('.', '𝛢𝛣𝛤𝛥𝛦𝛧𝛨𝛩𝛪𝛫𝛬𝛭𝛮𝛯𝛰𝛱𝛲𝛳𝛴𝛵𝛶𝛷𝛸𝛹𝛺', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                           #  0xf442 - 0xf45a
-      # - t: "italic"
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝛼-𝜔":                                           #  0x1d6fc - 0x1d714
-      # - t: "italic"
     - spell: "translate('.', '𝛼𝛽𝛾𝛿𝜀𝜁𝜂𝜃𝜄𝜅𝜆𝜇𝜈𝜉𝜊𝜋𝜌𝜍𝜎𝜏𝜐𝜑𝜒𝜓𝜔', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                           #  0xf45c - 0xf474
-      # - t: "italic"
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "": [T: "kursivt nabla"]                         #  0xf45b    (en: 'italic nabla', google translation)
  - "𝛻": [T: "kursivt nabla"]                         #  0x1d6fb    (en: 'italic nabla', google translation)
 
  - "𝜕𝜖𝜗𝜘𝜙𝜚𝜛":                                       #  0x1d715 - 0x1d71b
-      # - t: "italic"
     - spell: "translate('.', '𝜕𝜖𝜗𝜘𝜙𝜚𝜛', '∂εθκφρπ')"
 
  - "":                                       #  0xf475  - 0xf47b
-      # - t: "italic"
     - spell: "translate('.', '', '∂εθκφρπ')"
 
  - "𝜜-𝜴":                                           #  0x1d71c - 0x1d734
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝜜𝜝𝜞𝜟𝜠𝜡𝜢𝜣𝜤𝜥𝜦𝜧𝜨𝜩𝜪𝜫𝜬𝜭𝜮𝜯𝜰𝜱𝜲𝜳𝜴', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                           #  0xf47c - 0xf494
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝜶-𝝎":                                           #  0x1d736 - 0x1d74e
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝜶𝜷𝜸𝜹𝜺𝜻𝜼𝜽𝜾𝜿𝝀𝝁𝝂𝝃𝝄𝝅𝝆𝝇𝝈𝝉𝝊𝝋𝝌𝝍𝝎', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                           #  0xf496 - 0xf4ae
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "𝝏𝝐𝝑𝝒𝝓𝝔𝝕":                                       #  0x1d74f - 0x1d755
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝝏𝝐𝝑𝝒𝝓𝝔𝝕', '∂εθκφρπ')"
 
  - "":                                       #  0xf422 - 0xf43a
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', '∂εθκφρπ')"
 
@@ -3477,32 +3355,26 @@
  - "𝝯": [T: "fetstilt nabla"]                          #  0x1d76f    (en: 'bold nabla', google translation)
 
  - "𝞐-𝞨":                                           #  0x1d790 - 0x1d7a8
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝞐𝞑𝞒𝞓𝞔𝞕𝞖𝞗𝞘𝞙𝞚𝞛𝞜𝞝𝞞𝞟𝞠𝞡𝞢𝞣𝞤𝞥𝞦𝞧𝞨', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "-":                                           #  0xf4f0 - 0xf508
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "𝞪-𝟂":                                           #  0x1d7aa - 0x1d7c2
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝞪𝞫𝞬𝞭𝞮𝞯𝞰𝞱𝞲𝞳𝞴𝞵𝞶𝞷𝞸𝞹𝞺𝞻𝞼𝞽𝞾𝞿𝟀𝟁𝟂', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "-":                                           #  0xf50a - 0xf522
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', 'αβγδεζηθικλμνξοπρςστυφχψω')"
 
  - "𝟃𝟄𝟅𝟆𝟇𝟈𝟉":                                       #  0x1d7c3 - 0x1d7c9
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '𝟃𝟄𝟅𝟆𝟇𝟈𝟉', '∂εθκφρπ')"
 
  - "":                                       #  0xf523 - 0xf529
-    # - t: "bold italic"
     - T: "fetstilt"                                    #     (en: 'bold', google translation)
     - spell: "translate('.', '', '∂εθκφρπ')"
 
