@@ -62,12 +62,6 @@
       - else_if: "*[2][not(contains(., ','))]"
         then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]
       else:
-      # - test:
-      #     if: "*[2][self::m:mi][string-length(.)=1]"
-      #     then:
-      #     - x: "*[2]"
-      #     - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-      #     else: {x: "*[2]"}
       - T: "roten av grad"
       - x: "*[2]"
   - test:
@@ -84,7 +78,6 @@
   - "*[2][self::m:mtable] and"
   - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
   replace:
-  # - t: "the"
   - x: count(*[2]/*)
   - T: "gånger"
   - x: count(*[2]/*[self::m:mtr][1]/*)
@@ -97,7 +90,6 @@
   tag: mtable
   match: "."
   replace:
-  # - t: "the"
   - x: count(*[2]/*)
   - T: "gånger"
   - x: count(*[2]/*[self::m:mtr][1]/*)

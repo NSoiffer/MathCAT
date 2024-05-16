@@ -100,9 +100,6 @@
          then: [T: "är"]                         #  (en: 'is', google translation)
      - T: "mindre än"                            #  (en: 'less than')
  - "=":                                          #  0x3d
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                         #  (en: 'is equal to', google translation)
      # SWEDISH: We remove "är" from all occurrences of = after consulting our mathematician advisor.
      - T: "lika med"                             #  (en: 'equals', MathPlayer: 'lika med', google: 'lika')
 
@@ -301,27 +298,16 @@
  - "⇒": [T: "medför"]                 #  0x21d2 (en: 'rightwards double arrow')
  - "∀": [T: "för alla"]                          #  0x2200 (en: 'for all')
  - "∂": [T: "dell"]                                         #  0x2202
-     # - test: 
-     #     if: "$Verbosity='Terse'"
-     #     then: [t: "partiell"]                   #  (en: 'partial', google translation)
-     #     else: [t: "partiell"]                   #  (en: 'partial derivative', google: 'partiellt derivat')
      # SWEDISH: This is only refered to as "del" in Swedish, but we write "dell" for correct pronounciation.
  - "∃": [T: "det finns"]                     #  0x2203 (en: 'there exists')
  - "∄": [T: "det finns inte"]                #  0x2204 (en: 'there does not exist')
  - "∅": [T: "tomma mängden"]                     #  0x2205 (en: 'empty set')
  - "∆": [T: "laplacianen av"]                     # 0x2206 (en: 'laplacian of')
-     #- test: 
-     #    if: "$Verbosity!='Terse'"
-     #    then: [t: "de"]                         #  (en: 'the', google translation)
  - "∇": [T: "gradienten av"]                     # 0x2207 (en: 'gradient of', google: 'lutning av')
-     # - test: 
-     #   if: "$Verbosity!='Terse'"
-     #   then: [t: "de"]                         #  (en: 'the', google translation)
  - "∈":                                          #  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
         then: [T: "tillhörande"]              #  (en: 'an element of', google translation)
-        # then: [T: "ett element av"]              #  (en: 'an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         # SWEDISH: Changed the non-ClearSpeak option to "tillhör", as that makes more sense in Swedish.
         # SWEDISH: The word "medlem" is not commonly used in set theory, so we removed that rule. If the parsing has set the parameter to "Member" it will fall under the "else" case.
@@ -330,17 +316,12 @@
             then_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: "i"]                   #  (en: 'in', google translation)
-              # - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-              #   then: [T: "medlem av"]            #  (en: 'member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "element i"]          #  (en: 'element of', google translation)
               - else: [T: "tillhörande"]             #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'belonging to')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Element'
-              #  then: [T: "är ett element i"]         #  (en: 'is an element of', google translation)
                 then: [T: "i"] # SWEDISH: using this construction instead for more correct grammar in many cases
-              # - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-              #   then: [T: "är medlem av"]   #  (en: 'is a member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: "är i"]                #  (en: 'is in', google translation)
               - else: [T: "tillhör"]             #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'belongs to')
@@ -349,7 +330,6 @@
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
         then: [T: "inte tillhörande"]      #  (en: 'is not an element of', google translation)
-        # then: [T: "är inte ett element av"]      #  (en: 'is not an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         # SWEDISH: Changed the non-ClearSpeak option to "tillhör", as that makes more sense in Swedish.
         # SWEDISH: The word "medlem" is not commonly used in set theory, so we removed that rule. If the parsing has set the parameter to "Member" it will fall under the "else" case.
@@ -358,16 +338,12 @@
             then_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: "inte i"]              #  (en: 'not in', google translation)
-              # - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-              #   then: [T: "inte medlem av"]       #  (en: 'not member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "inte element i"]     #  (en: 'not element of', google translation)
               - else: [T: "inte tillhörande"]        #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'not belonging to')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "är inte ett element i"]    #  (en: 'is not an element of', google translation)
-              # - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-              #   then: [T: "är inte medlem av"] #  (en: 'is not a member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: "är inte i"]           #  (en: 'is not in', google translation)
               - else: [T: "tillhör inte"]        #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'does not belong to')
@@ -375,7 +351,6 @@
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
         then: [T: "tillhörande"]           #  (en: 'is an element of', google translation)
-        # then: [T: "är ett element av"]           #  (en: 'is an element of', google translation)
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         # SWEDISH: Changed the non-ClearSpeak option to "tillhör", as that makes more sense in Swedish.
         # SWEDISH: The word "medlem" is not commonly used in set theory, so we removed that rule. If the parsing has set the parameter to "Member" it will fall under the "else" case.
@@ -384,16 +359,12 @@
             then_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: "i"]                   #  (en: 'in', google translation)
-              # - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-              #   then: [T: "medlem av"]            #  (en: 'member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "element i"]          #  (en: 'element of', google translation)
               - else: [T: "tillhörande"]             #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'belonging to')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "är ett element i"]         #  (en: 'is an element of', google translation)
-              # - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-              #   then: [T: "är medlem av"]   #  (en: 'is a member of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
                 then: [T: "är i"]                #  (en: 'is in', google translation)
               - else: [T: "tillhör"]             #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'belongs to')
@@ -405,9 +376,6 @@
  - "∗": [T: "gånger"]                      #  0x2217 (en: 'times')
  - "∘": [T: "och"]                               #  0x2218 (en: 'composed with')
  - "√": [T: "kvadratroten ur"]                    #  0x221a (en: 'square root of')
-     # - test: 
-     #   if: "$Verbosity!='Terse'"
-     #   then: [t: "de"]                         #  (en: 'the', google translation)
  - "∝":                                          #  0x221d
      - test: 
          if: "$Verbosity!='Terse'"
@@ -438,30 +406,18 @@
  - "∭": [T: "trippel-integralen"]                  #  0x222d (en: 'triple integral')
  - "∮": [T: "kurvintegralen"]                      #  0x222e (en: 'contour integral')
  - "∶":                                          #  0x2236
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                         #  (en: 'is', google translation)
      - T: "till"                            #  (en: 'to')
  - "∷": [T: "som"]                        #  0x2237 (en: 'as', MathPlayer: 'proportion', google: 'som')
  - "∼": [T: "tilde"]                      #  0x223c (en: 'varies with')
  - "∽": [T: "spegelvänd tilde"]                     #  0x223d (en: 'reversed tilde')
  - "∾":                                          #  0x223e
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [t: "är"]                         #  (en: 'is', google translation)
      # SWEDISH: Could not find any examples of how this character is used and what specific meaning it has. In ClearSpeak rules, it is
      #          translated as "omvänt långdraget s".
      - T: "omvänt långdraget s"                  #  (en: 'most positive', MathPlayer: 'inverted lazy s', google: 'mest positiva')
  - "∿": [T: "sinuskurva"]                        #  0x223f (en: 'sine wave')
  - "≠":                                          #  0x2260
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                         #  (en: 'is', google translation)
      - T: "inte lika med"                        #  (en: 'not equal to')
  - "≡":                                          #  0x2261
-     # - test: 
-     #     if: "$Verbosity!='Terse'"
-     #     then: [T: "är"]                         #  (en: 'is', google translation)
      - T: "identisk med"                         #  (en: 'identical to')
  - "≤":                                          #  0x2264
      - test: 
