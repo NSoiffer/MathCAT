@@ -17,9 +17,6 @@
   tag: square-root
   match: "."
   replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: {t: "the"}      # phrase('the' square root of 25)
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
@@ -28,7 +25,6 @@
           if: parent::*[self::m:negative]
           then: [{T: "negativa"}]      # phrase(minus 4 is a 'negative' number)
           else: [{T: "positiva"}]      # phrase(10 is a 'positive' number)
-  # - T: "kvadratroten"      # phrase(8 is the 'square root' of 64)
   - test:
       if: "$Verbosity!='Terse'"
       then: {T: "kvadratroten ur"}      # phrase(the square root 'of' 5)
@@ -48,9 +44,6 @@
   tag: root
   match: "."
   replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: {t: "the"}      # phrase(6 is 'the' square root of 36)
   - test:
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
@@ -71,17 +64,8 @@
       - else_if: "*[2][not(contains(., ','))]"   # SWEDISH: Changed decimal point to comma.
         then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]      # phrase(the square 'root' of 25)
       else:
-      # - test:
-      #     if: "*[2][self::m:mi][string-length(.)=1]"
-      #     then:
-      #     - x: "*[2]"
-      #     - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-      #     else: {x: "*[2]"}
       - T: "roten av grad"      # phrase(the square 'root' of 36)
       - x: "*[2]"
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: {T: "ur"}      # phrase(the square root 'of' 36)
   # SWEDISH: Removed verbosity settings.
   - T: "ur"      # phrase(the square root 'of' 36)
   - x: "*[1]"
@@ -132,7 +116,6 @@
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
   - "*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
   - "*[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
-  # replace: [{x: ToCommonFraction(.)}]
   # SWEDISH: Alternative logic for handling correct reading out of common fractions.
   variables: [IsPlural: "*[1]!=1"]
   replace:
@@ -150,7 +133,6 @@
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
   - "*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
   - "*[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
-  # replace: [{x: ToCommonFraction(.)}]
   # SWEDISH: Alternative logic for handling correct reading out of common fractions.
   variables: [IsPlural: "*[1]!=1"]
   replace:
@@ -170,16 +152,12 @@
   replace:
   - pause: short
   - test:
-      # if: "$ClearSpeak_Fractions='FracOver'"
-      # then:
       # SWEDISH: Made a test to differentiate between "division" and "bråk", where "bråk" should have integers as both nominator and denominator. We do however allow single identifiers as well.
-      # - test:
       if: "(*[1][self::m:mn][not(contains(., ','))] or *[1][self::m:mi][string-length(.)=1]) and (*[2][self::m:mn][not(contains(., ','))] or *[2][self::m:mi][string-length(.)=1])"
       then:
       - test:
           if: "$Verbosity!='Terse'"
           then: [T: "bråk"]    # [{ot: "the"}]
-          # else: [T: "bråk"]      # phrase(the 'fraction' with 3 over 4)
       - pause: short
       else:
       - test:
@@ -191,10 +169,7 @@
   - x: "*[2]"
   - test:
       # very ugly!!! -- replicate nested ordinal fraction as they are an exception
-      # if: "$ClearSpeak_Fractions='OverEndFrac' or ($ClearSpeak_Fractions='EndFrac' and not( ($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and *[1][*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] and *[2][*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and *[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))] ] ) )"
-      # then:
       # SWEDISH: Included the same differentiating test here, as above.
-      # - test:
       if: "(*[1][self::m:mn][not(contains(., ','))] or *[1][self::m:mi][string-length(.)=1]) and (*[2][self::m:mn][not(contains(., ','))] or *[2][self::m:mi][string-length(.)=1])"
       then:
       - pause: short
@@ -242,7 +217,6 @@
   tag: fraction
   match: "."
   replace:
-  # - ot: "the"      # phrase(5 is 'the' square toot of 25)
   - test:
       if: "$Verbosity!='Terse'"
       then: [T: "division med täljaren"]      # phrase(the 'fraction with numerator' 6)
@@ -296,22 +270,11 @@
       if: "*[2][text()='2']"
       then: {T: "kvadrat"}      # phrase(25 equals 5 'squared')
       else: {T: "kubik"}      # phrase(625 equals 5 'cubed')
+
 - name: function-power
   tag: power
   match:
   - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
-  # replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: {t: "den"}      # phrase('the' third power of 2)
-  # - bookmark: "*[2]/@id"
-  # - test:
-  #     if: "*[2][self::m:mn][not(contains(., ','))]"
-  #     then: [{x: "ToOrdinal(*[2])"}]
-  #     else: [{x: "*[2]"}]
-  # - t: "kraften"      # phrase(the third 'power of' 6)
-  # - pause: short
-  # - x: "*[1]"
   replace:
   - x: "*[1]"
   - T: "upphöjt till"
@@ -360,16 +323,6 @@
 - name: simple-integer
   tag: power
   match: "*[2][self::m:mn][not(contains(., ','))]"
-  # replace:
-  # - x: "*[1]"
-  # - t: "till"      # phrase(2 raised 'to the' power 7)
-  # - test:
-  #     if: "*[2][.>0]"
-  #     then: {x: "ToOrdinal(*[2])"}
-  #     else: {x: "*[2]"}
-  # - test:
-  #     if: "$ClearSpeak_Exponents != 'Ordinal'"
-  #     then: [{t: "power"}]      # phrase(2 raised to the 'power' 7)
   replace:
   - x: "*[1]"
   - T: "upphöjt till"
@@ -383,13 +336,6 @@
   - "*[2][self::m:negative and"
   - "     *[1][self::m:mn][not(contains(., ','))]"
   - "    ]"
-  # replace:
-  # - x: "*[1]"
-  # - t: "till"      # phrase(2 raised 'to the' power 7)
-  # - x: "*[2]"
-  # - test:
-  #     if: "$ClearSpeak_Exponents != 'Ordinal'"
-  #     then: [{t: "power"}]      # phrase(2 raised to the 'power' 7)
   replace:
   - x: "*[1]"
   - T: "upphöjt till"
@@ -400,14 +346,6 @@
 - name: simple-var
   tag: power
   match: "*[2][self::m:mi][string-length(.)=1]"
-  # replace:
-  # - x: "*[1]"
-  # - t: "till"      # phrase(3 raised 'to the' power 7)
-  # - x: "*[2]"
-  # - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-  # - test:
-  #     if: "$ClearSpeak_Exponents != 'Ordinal'"
-  #     then: [{t: "power"}]      # phrase(2 raised to the 'power' 7)
   replace:
   - x: "*[1]"
   - T: "upphöjt till"
@@ -440,7 +378,6 @@
   - x: "*[1]"
   - T: "upphöjt till"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  # - t: "makten"      # phrase(x raised to the second 'power')
 
 - # - [xxx]^n
   name: nested-negative-squared-or-cubed
@@ -461,7 +398,6 @@
   - x: "*[1]"
   - T: "upphöjt till"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  # - t: "makten"      # phrase(x raised to the second 'power')
 
 - # [xxx] var^n
   name: nested-var-squared-or-cubed
@@ -484,7 +420,6 @@
   - x: "*[1]"
   - T: "upphöjt till"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  # - t: "makten"      # phrase(x raised to the second 'power')
 
 - # -[xxx] var^n
   name: nested-negative-var-squared-or-cubed
@@ -509,7 +444,6 @@
   - x: "*[1]"
   - T: "upphöjt till"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  # - t: "makten"      # phrase(x raised to the second 'power')
 
 - name: default-exponent-power
   tag: power
@@ -530,7 +464,6 @@
   - x: "*[1]"
   - T: "upphöjt till"      # phrase(x 'raised to the' second power)
   - x: "*[2]"
-  # - t: "makten"      # phrase(x raised to the second 'power')
 
 #
 # Some rules on mrows
@@ -544,9 +477,6 @@
   - WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinaliteten', 'absolutbeloppet')"
   - EndToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinalitet', 'absolutbelopp')"
   replace:
-  # - test:
-  #     if: "$Verbosity!='Terse'"
-  #     then: {t: "the"}      # phrase('the' absolute value of 25)
   - x: "$WordToSay"
   - T: "av"      # phrase(the absolute value 'of' 25)
   - x: "*[1]"
@@ -573,9 +503,6 @@
       - T: "tomma mängden"      # phrase(the 'empty set')
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
       then:
-      # - test:
-      #    if: "$Verbosity!='Terse'"
-      #    then: {t: "the"}      # phrase('the' set of all integers)
       - T: "mängden av"      # phrase(this is a 'set of' numbers)
       - test:
           if: $ClearSpeak_Sets != 'woAll'
@@ -587,9 +514,6 @@
       - test:
           if: $ClearSpeak_Sets != 'SilentBracket'
           then:
-          # - test:
-          #     if: "$Verbosity!='Terse'"
-          #     then: {t: "the"}      # phrase('the' set of integers)
           - T: "mängden"      # phrase(this is a 'set' of integers)
       - x: "*[1]"
 
@@ -597,49 +521,6 @@
 #  # alternatively, we could have four (or ten) rules, but there is a lot of duplication if we do that
 #  # this one rule handles all ten cases listed as part $ClearSpeak_Paren = 'Interval'
 #  # note that *[2] is an mrow with X, ",", Y, so getting X or Y is a double index
-#  name: ClearSpeak-intervals # avoid overriding with default "intervals" name
-#  variables:
-#  - is_intervals_start_infinity: "*[1][self::m:negative and *[1][text()='∞']]"
-#  - is_intervals_end_infinity: "*[2][text()='∞'or (self::m:positive and *[1][text()='∞'])]"
-#  tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
-#  match: "."
-#  replace:
-#  - T: "intervallet från"      # phrase('the interval from' a to b)
-#  - x: "*[1]"
-#  - T: "till"      # phrase(the interval from a 'to' b)
-#  - x: "*[2]"
-#  - pause: short
-#  - test:
-#      if: "not($is_intervals_start_infinity)"
-#      then:
-#      - test:
-#          if: "starts-with(name(.), 'open')"
-#          then: [{T: "inte"}]      # phrase(the interval from a to b 'not' including b)
-#      - T: "inklusive"      # phrase(the interval from a to b not 'including' b)
-#      - x: "*[1]"
-#    # logic to deal with [not] arg #1
-#  - test:
-#      if: "not($is_intervals_start_infinity or $is_intervals_end_infinity)"
-#      then_test:
-#      - if: "name(.)='open-interval'"
-#        then: [{T: "eller"}]      # phrase(the interval including a 'or' b )
-#      - else_if: "name(.)='closed-interval'"
-#        then: [{T: "och"}]      # phrase(the interval including a 'and' b)
-#        else: [{T: "men"}]      # phrase(the interval including a 'but' not b)
-#    # some ugly logic dealing with connectives: or, but, but, and (cleaner to be part of next clause?)
-#  - test:
-#      if: not($is_intervals_end_infinity)
-#      then:
-#      - test:
-#          # there is some asymmetry to the test because of the and/or/but logic above
-#          if: not( name(.)='open-interval' or name(.)='closed-interval' ) or $is_intervals_start_infinity
-#          then:
-#          - test:
-#              if: "name(.) = 'open-interval' or name(.) = 'closed-open-interval'"
-#              then: [{T: "inte"}]      # phrase(the interval 'not' including a)
-#          - T: "inklusive"      # phrase(the interval not 'including' a)
-#      - x: "*[2]"
-
     # onto the [not] [including]... part
 
  # SWEDISH: rewrote the intervals function to better deal with Swedish convention of speaking intervals
@@ -720,9 +601,6 @@
         then: [{T: "naturliga logaritmen"}]      # phrase(the 'natural log' of the product of 2 numbers)
         else: [{spell: "'ln'"}]
       else:
-      # - test:
-      #     if: "$Verbosity!='Terse' and not(log_is_simple)"
-      #     then: {t: "the"}      # phrase('the' square root of 25)
       - test:
         - if: "*[1][text()='log']"
           then:
@@ -790,11 +668,7 @@
               - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
                 then: [{T: "steg"}]      # phrase(this is the first 'step' of three steps)
                 else: [{T: "steg"}]      # phrase(this is the first 'step' of three steps)
-          # else 'None -- don't say anything'
           # SWEDISH: Every expression had to be inflected separately.
-      # - test:
-      #   - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
-      #     then: [{ct: "s"}] # plural      # phrase(shown by the letter 's')
       - pause: short
   - x: "*"
 
