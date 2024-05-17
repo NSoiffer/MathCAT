@@ -454,10 +454,10 @@
       if: "$log_is_simple"
       then_test:
       - if: "*[1][text()='log']"
-        then: [{T: "logaritmi"}]      # phrase(the 'log' function is used in mathematics)
+        then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
       - else_if: "$Verbosity='Terse'"
         then: [{SPELL: "'ln'"}]
-        else: [{T: "luonnollinen logaritmi"}]      # phrase(the 'natural log' function is used in mathematics)
+        else: [{T: "luonnollinen log"}]      # phrase(the 'natural log' function is used in mathematics)
       else:
       - test:
           if: "$Verbosity!='Terse' and not(log_is_simple)"

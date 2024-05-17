@@ -612,9 +612,9 @@
       if: "$log_is_simple"
       then_test:
       - if: "*[1][text()='log']"
-        then: [{T: "logaritmi"}]      # phrase(the 'log' of x)
+        then: [{T: "log"}]      # phrase(the 'log' of x)
       - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
-        then: [{T: "luonnollinen logaritmi"}]      # phrase(the 'natural log' of the product of 2 numbers)
+        then: [{T: "luonnollinen log"}]      # phrase(the 'natural log' of the product of 2 numbers)
         else: [{SPELL: "'ln'"}]
       else:
       - test:
@@ -622,7 +622,7 @@
           then: {T: ""}      # phrase('the' square root of 25)
       - test:
         - if: "*[1][text()='log']"
-          then: [{T: "log"}]
+          then: [{T: "logaritmi"}]
         - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
           then: [{T: "luonnollinen logaritmi"}]      # phrase(the 'natural log' of x)
           else: [{SPELL: "'ln'"}]
