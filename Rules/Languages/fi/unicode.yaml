@@ -332,7 +332,7 @@
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "kuuluu"]       	# 	(en: 'is an element of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
-                then: [T: "on joukossa"]          	# 	(en: 'is in', google translation)
+                then: [T: "kuuluu"]          	# 	(en: 'is in', google translation)
               - else: [T: "kuuluu joukkoon"]    	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belongs to', google: 'kuuluu')
  - "∉":                                         	#  0x2209 # fi: some elements (pun) of this translation has to be tested
     # rule is identical to 0x2208
@@ -379,7 +379,7 @@
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "kuuluu"]       	# 	(en: 'is an element of', google translation)
               - else_if: $ClearSpeak_SetMemberSymbol = 'In'
-                then: [T: "on joukossa"]          	# 	(en: 'is in', google translation)
+                then: [T: "kuuluu"]          	# 	(en: 'is in', google translation)
               - else: [T: "kuuluu joukkoon"]	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belongs to', google: 'kuuluu')
  - "∏": [T: "tulo"]                             	#  0x220f	(en: 'product', google: 'tuote')
  - "∐": [T: "kotulo"]                        	#  0x2210	(en: 'co-product', google: 'yhteistuote')
