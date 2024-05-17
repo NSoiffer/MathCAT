@@ -509,7 +509,7 @@
       - T: "joukko"      # phrase(this is a 'set of' numbers)
       - test:
           if: $ClearSpeak_Sets != 'woAll'
-          then: [{T: "kaikki"}]      # phrase(the set of 'all' integers)
+          then: [{T: "kaikilla"}]      # phrase(the set of 'all' integers)
       - x: "*[1]/*[1]"
       - T: "siten että"      # phrase(the set S 'such that' x is less than y)
       - x: "*[1]/*[3]"
