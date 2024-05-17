@@ -480,7 +480,7 @@
   - test:
       if: "$Verbosity!='Terse'"
       then: {T: ""}      # phrase('the' square root of 25 equals 5)
-  - T: "logaritmi kantaluku"      # phrase(the 'log base' is often base 10)
+  - T: "log kanta"      # phrase(the 'log base' is often base 10)
   - x: "*[1]"
 
 - name: log-base-power
@@ -491,7 +491,7 @@
   - test:
       if: "$Verbosity!='Terse'"
       then: {T: ""}      # phrase('the' square root of 25 equals 5)
-  - T: "logaritmi kantaluku"      # phrase(the 'log base' is often base 10)
+  - T: "log kanta"      # phrase(the 'log base' is often base 10)
   - x: "*[1]"
   - pause: medium
   - test:
