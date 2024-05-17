@@ -89,7 +89,7 @@
   replace:
   - x: "*[1]"
   - pause: auto
-  - T: "arvolla"      # phrase(results were 'evaluated at' a given point) # FI: might be different depending on the context
+  - T: "sijoitus"      # phrase(results were 'evaluated at' a given point)
   - pause: auto
   - x: "*[2]"
 
@@ -99,7 +99,7 @@
   replace:
   - x: "*[1]"
   - pause: auto
-  - T: "arvolla"      # phrase(results were 'evaluated at' this point)
+  - T: "sijoitus"      # phrase(results were 'evaluated at' this point)
   - pause: auto
   - x: "*[3]"
   - T: "miinus sama lauseke arvolla"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
