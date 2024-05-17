@@ -15,7 +15,7 @@ fn trig_names() {
     <mi>csc</mi><mi>&#x03D5;</mi><mo>+</mo>
     <mi>cot</mi><mi>&#x03C6;</mi>
     </mrow></math>";
-    test("en", "ClearSpeak", expr, "sine of x plus cosine of y plus tangent of z plus secant of alpha, plus cosecant of phi, plus cotangent of phi");
+    test("fi", "ClearSpeak", expr, "sini arvolla x, plus kosini arvolla y, plus tangentti arvolla z, plus sekantti arvolla alfa, plus, kosekantti arvolla suora fii, plus kotangentti arvolla fii");
 }
 
 #[test]
@@ -28,12 +28,7 @@ fn hyperbolic_trig_names() {
     <mi>csch</mi><mi>&#x03D5;</mi><mo>+</mo>
     <mi>coth</mi><mi>&#x03C6;</mi>
     </mrow></math>";
-    test("en", "ClearSpeak", expr, "hyperbolic sine of x, plus \
-                                hyperbolic cosine of y, plus \
-                                hyperbolic tangent of z, plus \
-                                hyperbolic secant of alpha, plus \
-                                hyperbolic cosecant of phi, plus \
-                                hyperbolic cotangent of phi");
+    test("fi", "ClearSpeak", expr, "hyperbolinen sini arvolla x, plus, hyperbolinen kosini arvolla y, plus, hyperbolinen tangentti, arvolla z, plus, hyperbolinen sekantti, arvolla alfa; plus, hyperbolinen kosekantti, arvolla suora fii; plus, hyperbolinen kotangentti, arvolla fii");
 }
 
 
@@ -46,15 +41,15 @@ fn inverse_trig() {
 #[test]
 fn inverse_trig_trig_inverse() {
     let expr = "<math><msup><mi>tan</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
-    test_ClearSpeak("en", "ClearSpeak_Trig", "TrigInverse",expr,
-        "tangent inverse of x");
+    test_ClearSpeak("fi", "ClearSpeak_Trig", "TrigInverse",expr,
+        "käänteis tangentti arvolla x");
 }
 
 #[test]
 fn inverse_trig_arc() {
     let expr = "<math><msup><mi>cosh</mi><mrow><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
-    test_ClearSpeak("en", "ClearSpeak_Trig", "ArcTrig",expr,
-        "arc hyperbolic cosine of x");
+    test_ClearSpeak("fi", "ClearSpeak_Trig", "ArcTrig",expr,
+        "arkus hyperbolinen kosini, arvolla x");
 }
 
 #[test]
@@ -72,38 +67,38 @@ fn trig_cubed() {
 #[test]
 fn trig_fourth() {
     let expr = "<math><msup><mi>sec</mi><mn>4</mn></msup><mi>x</mi></math>";
-    test("en", "ClearSpeak", expr, "the fourth power of, secant of x");
+    test("fi", "ClearSpeak", expr, "sekantti potenssiin 4, arvolla x");
 }
 
 
 #[test]
 fn trig_power_other() {
     let expr = "<math><msup><mi>sinh</mi><mrow>><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msup><mi>x</mi></math>";
-    test("en", "ClearSpeak", expr, "the n minus 1 power of, hyperbolic sine of x");
+    test("fi", "ClearSpeak", expr, "hyperbolinen sini potenssiin n miinus 1; arvolla x");
 }
 
 #[test]
 fn simple_log() {
     let expr = "<math> <mrow>  <mi>log</mi><mi>x</mi></mrow> </math>";
-    test("fi", "ClearSpeak", expr, "logaritmi x");
+    test("fi", "ClearSpeak", expr, "log x");
 }
 
 #[test]
 fn normal_log() {
     let expr = "<math><mrow><mi>log</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("en", "ClearSpeak", expr, "the log of, open paren x plus y, close paren");
+    test("fi", "ClearSpeak", expr, "logaritmi arvolla, auki sulku x plus y, kiinni sulku");
 }
 
 #[test]
 fn simple_log_with_base() {
     let expr = "<math> <mrow>  <msub><mi>log</mi><mi>b</mi></msub><mi>x</mi></mrow> </math>";
-    test("en", "ClearSpeak", expr, "the log base b of x");
+    test("fi", "ClearSpeak", expr, "log kanta b arvolla x");
 }
 
 #[test]
 fn normal_log_with_base() {
     let expr = "<math><mrow><msub><mi>log</mi><mi>b</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("en", "ClearSpeak", expr, "the log base b of, open paren x plus y, close paren");
+    test("fi", "ClearSpeak", expr, "log kanta b arvolla, auki sulku x plus y, kiinni sulku");
 }
 
 #[test]
@@ -115,7 +110,7 @@ fn simple_ln() {
 #[test]
 fn normal_ln() {
     let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("en", "ClearSpeak", expr, "the l n of, open paren x plus y, close paren");
+    test("fi", "ClearSpeak", expr, "l n arvolla, auki sulku x plus y, kiinni sulku");
 }
 
     
@@ -123,15 +118,15 @@ fn normal_ln() {
 fn simple_natural_log() {
     let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
     test_ClearSpeak("fi", "ClearSpeak_Log", "LnAsNaturalLog",expr,
-        "luonnollinen logaritmi x");
+        "luonnollinen log x");
 }
 
     
 #[test]
 fn natural_log() {
     let expr = "<math><mi>ln</mi><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></math>";
-    test_ClearSpeak("en", "ClearSpeak_Log", "LnAsNaturalLog",expr,
-        "the natural log of, open paren x plus y, close paren");
+    test_ClearSpeak("fi", "ClearSpeak_Log", "LnAsNaturalLog",expr,
+        "luonnollinen logaritmi arvolla, auki sulku x plus y, kiinni sulku");
 }
 
 
@@ -168,8 +163,8 @@ fn test_functions_none_pref() {
     <mo>+</mo>
     <mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_Functions", "None",expr,
-        "the log of, open paren x plus y, close paren; plus, f times, open paren x plus y, close paren");
+    test_ClearSpeak("fi", "ClearSpeak_Functions", "None",expr,
+        "logaritmi arvolla, auki sulku x plus y, kiinni sulku; plus, f kertaa, auki sulku x plus y, kiinni sulku");
 }
 
 #[test]
@@ -217,7 +212,7 @@ fn no_times_sqrt() {
         <mo>=</mo>
         <msqrt> <mrow>  <mi>a</mi><mi>b</mi></mrow> </msqrt>
         </mrow></math>";
-    test("en", "ClearSpeak", expr, "the square root of eigh; the square root of b; is equal to, the square root of eigh b,");
+    test("fi", "ClearSpeak", expr, "neliöjuuri a, neliöjuuri b; on yhtä suuri kuin, neliöjuuri a b,");
 }
 
 #[test]
@@ -269,9 +264,9 @@ fn explicit_times_none_superscript() {
 <mi>x</mi><mo>+</mo><mn>1</mn></mrow>
 <mo>)</mo></mrow>
     </math>";
-    test_ClearSpeak_prefs("en", 
+    test_ClearSpeak_prefs("fi", 
         vec![("ClearSpeak_ImpliedTimes", "None"), ("ClearSpeak_Functions", "None")],
-        expr, "f open paren x close paren; is equal to; x squared, open paren x plus 1, close paren");
+        expr, "f, auki sulku x kiinni sulku; on yhtä suuri kuin; x neliö, auki sulku x plus 1, kiinni sulku");
 }
 
 /*
@@ -361,8 +356,8 @@ fn explicit_times_none_superscript() {
         <mrow> <mi>c</mi><mo>,</mo><mi>d</mi></mrow>
         <mo>)</mo></mrow>
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_Paren", "Interval",expr,
-    "the interval from c to d, not including c or d");
+    test_ClearSpeak("fi", "ClearSpeak_Paren", "Interval",expr,
+    "väli c d, ei sisältäen c tai d");
 }
 
 #[test]
@@ -372,8 +367,8 @@ fn explicit_times_none_superscript() {
         <mrow> <mi>c</mi><mo>,</mo><mi>d</mi></mrow>
         <mo>)</mo></mrow>
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from c to d, including c but not including d");
+    test_ClearSpeak("fi", "ClearSpeak_Paren", "Interval ",expr,
+    "väli c d, sisältäen c mutta ei sisältäen d");
 }
 
 
@@ -384,8 +379,8 @@ fn parens_interval_open_closed() {
         <mrow> <mi>c</mi><mo>,</mo><mi>d</mi></mrow>
     <mo>]</mo></mrow>
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from c to d, not including c but including d");
+    test_ClearSpeak("fi", "ClearSpeak_Paren", "Interval ",expr,
+    "väli c d, ei sisältäen c mutta sisältäen d");
 }
 
 
@@ -396,8 +391,8 @@ fn parens_interval_closed_closed() {
     <mrow> <mi>c</mi><mo>,</mo><mi>d</mi></mrow>
     <mo>]</mo></mrow>
 </math>";
-test_ClearSpeak("en", "ClearSpeak_Paren", "Interval ",expr,
-"the interval from c to d, including c and d");
+test_ClearSpeak("fi", "ClearSpeak_Paren", "Interval ",expr,
+"väli c d, sisältäen c ja d");
 }
 
     #[test]
@@ -407,8 +402,8 @@ test_ClearSpeak("en", "ClearSpeak_Paren", "Interval ",expr,
         <mrow><mo>-</mo> <mi>∞</mi><mo>,</mo><mi>d</mi></mrow>
         <mo>)</mo></mrow>
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from negative infinity to d, not including d");
+    test_ClearSpeak("fi", "ClearSpeak_Paren", "Interval ",expr,
+    "väli negatiivinen ääretön d, ei sisältäen d");
 }
 
     #[test]
@@ -418,8 +413,8 @@ test_ClearSpeak("en", "ClearSpeak_Paren", "Interval ",expr,
         <mrow> <mo>-</mo> <mi>∞</mi><mo>,</mo><mi>d</mi></mrow>
         <mo>]</mo></mrow>
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from negative infinity to d, including d");
+    test_ClearSpeak("fi", "ClearSpeak_Paren", "Interval ",expr,
+    "väli negatiivinen ääretön d, sisältäen d");
 }
 
 
@@ -430,8 +425,8 @@ fn parens_interval_open_open_infinity() {
         <mrow> <mi>c</mi><mo>,</mo><mi>∞</mi></mrow>
     <mo>)</mo></mrow>
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from c to infinity, not including c");
+    test_ClearSpeak("fi", "ClearSpeak_Paren", "Interval ",expr,
+    "väli c ääretön, ei sisältäen c");
 }
 
 
@@ -442,8 +437,8 @@ fn parens_interval_closed_open_infinity() {
         <mrow> <mi>c</mi><mo>,</mo><mi>∞</mi></mrow>
         <mo>)</mo></mrow>
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_Paren", "Interval ",expr,
-"the interval from c to infinity, including c");
+    test_ClearSpeak("fi", "ClearSpeak_Paren", "Interval ",expr,
+"väli c ääretön, sisältäen c");
 }
 
 #[test]
@@ -453,8 +448,8 @@ fn parens_interval_neg_infinity_to_infinity() {
         <mrow><mo>-</mo> <mi>∞</mi><mo>,</mo><mi>∞</mi></mrow>
         <mo>)</mo></mrow>
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from negative infinity to infinity,");
+    test_ClearSpeak("fi", "ClearSpeak_Paren", "Interval ",expr,
+    "väli negatiivinen ääretön ääretön,");
 }
 
 #[test]
@@ -464,6 +459,6 @@ fn parens_interval_neg_infinity_to_pos_infinity() {
         <mrow><mo>-</mo> <mi>∞</mi><mo>,</mo><mo>+</mo><mi>∞</mi></mrow>
     <mo>)</mo></mrow>
     </math>";
-    test_ClearSpeak("en", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from negative infinity to positive infinity,");
+    test_ClearSpeak("fi", "ClearSpeak_Paren", "Interval ",expr,
+    "väli negatiivinen ääretön positiivinen ääretön,");
 }
