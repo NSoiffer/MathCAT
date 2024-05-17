@@ -24,8 +24,8 @@ fn common_fraction_tenths() {
     let expr = "<math>
                     <mfrac> <mn>17</mn> <mn>10</mn> </mfrac>
                 </math>";
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "17 tenths");
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "17 tenths");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "17 kymmenesosaa");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "17 kymmenesosaa");
 }
 
 #[test]
@@ -34,8 +34,8 @@ fn not_ClearSpeak_common_fraction_tenths() {
     let expr = "<math>
                     <mfrac> <mn>89</mn> <mn>10</mn> </mfrac>
                 </math>";
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "89 over 10");
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "89 tenths");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "89 per 10");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "89 kymmenesosaa");
 }
 
 #[test]
@@ -51,16 +51,16 @@ fn non_simple_fraction() {
         </mfrac>
         </mrow>
     </math>";
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "the fraction with numerator; x plus y; and denominator x minus y;");
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "the fraction with numerator; x plus y; and denominator x minus y;");
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Over")], expr, "x plus y over x minus y");
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "FracOver")], expr, "the fraction x plus y over x minus y");
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "General")], expr, "the fraction with numerator; x plus y; and denominator x minus y;");
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "EndFrac")], expr, "the fraction with numerator; x plus y; and denominator x minus y; end fraction,");
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "GeneralEndFrac")], expr, "the fraction with numerator; x plus y; and denominator x minus y; end fraction,");
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "OverEndFrac")], expr, "x plus y over x minus y, end fraction,");
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Per")], expr, "x plus y per x minus y");
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose"),("ClearSpeak_Fractions", "Auto")], expr, "the fraction with numerator; x plus y; and denominator x minus y; end fraction,");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y;");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y;");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Over")], expr, "x plus y per x miinus y");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "FracOver")], expr, "murtoluku x plus y per x miinus y");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "General")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y;");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "EndFrac")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y; loppu murtoluku,");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "GeneralEndFrac")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y; loppu murtoluku,");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "OverEndFrac")], expr, "x plus y per x miinus y, loppu murtoluku,");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Per")], expr, "x plus y per x miinus y");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose"),("ClearSpeak_Fractions", "Auto")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y; loppu murtoluku,");
 }
 
 
@@ -134,18 +134,18 @@ fn nested_simple_fractions() {
                 </mfrac>
                 </mrow>
             </math>";
-    test_prefs("en", "ClearSpeak", vec![("ClearSpeak_Fractions", "Auto")], expr, "1 half over 2 thirds");
-    test_prefs("en", "ClearSpeak", vec![("ClearSpeak_Fractions", "Ordinal")], expr, "1 half over 2 thirds");
-    test_prefs("en", "ClearSpeak", vec![("ClearSpeak_Fractions", "Over")], expr, "1 over 2 over 2 over 3");
-    test_prefs("en", "ClearSpeak", vec![("ClearSpeak_Fractions", "FracOver")], expr,
-            "the fraction the fraction 1 over 2 over the fraction 2 over 3");
-    test_prefs("en", "ClearSpeak", vec![("ClearSpeak_Fractions", "General")], expr,
-            "the fraction with numerator the fraction with numerator 1; and denominator 2; and denominator the fraction with numerator 2; and denominator 3;");
-    test_prefs("en", "ClearSpeak", vec![("ClearSpeak_Fractions", "EndFrac")], expr, "1 half over 2 thirds");
-    test_prefs("en", "ClearSpeak", vec![("ClearSpeak_Fractions", "GeneralEndFrac")], expr,
-            "the fraction with numerator the fraction with numerator 1; and denominator 2; end fraction; and denominator the fraction with numerator 2; and denominator 3; end fraction; end fraction,");
-    test_prefs("en", "ClearSpeak", vec![("ClearSpeak_Fractions", "OverEndFrac")], expr,
-            "1 over 2, end fraction, over 2 over 3, end fraction; end fraction,");
+    test_prefs("fi", "ClearSpeak", vec![("ClearSpeak_Fractions", "Auto")], expr, "1 kahdesosa per 2 kolmasosaa");
+    test_prefs("fi", "ClearSpeak", vec![("ClearSpeak_Fractions", "Ordinal")], expr, "1 kahdesosa per 2 kolmasosaa");
+    test_prefs("fi", "ClearSpeak", vec![("ClearSpeak_Fractions", "Over")], expr, "1 per 2 per 2 per 3");
+    test_prefs("fi", "ClearSpeak", vec![("ClearSpeak_Fractions", "FracOver")], expr,
+            "murtoluku murtoluku 1 per 2 per murtoluku 2 per 3");
+    test_prefs("fi", "ClearSpeak", vec![("ClearSpeak_Fractions", "General")], expr,
+            "murtoluku osoittaja murtoluku osoittaja 1; ja nimittäjä 2; ja nimittäjä murtoluku osoittaja 2; ja nimittäjä 3;");
+    test_prefs("fi", "ClearSpeak", vec![("ClearSpeak_Fractions", "EndFrac")], expr, "1 kahdesosa per 2 kolmasosaa");
+    test_prefs("fi", "ClearSpeak", vec![("ClearSpeak_Fractions", "GeneralEndFrac")], expr,
+            "murtoluku osoittaja murtoluku osoittaja 1; ja nimittäjä 2; loppu murtoluku; ja nimittäjä murtoluku osoittaja 2; ja nimittäjä 3; loppu murtoluku; loppu murtoluku,");
+    test_prefs("fi", "ClearSpeak", vec![("ClearSpeak_Fractions", "OverEndFrac")], expr,
+    "1 per 2, loppu murtoluku, per 2 per 3, loppu murtoluku; loppu murtoluku,");
 }
 
 
@@ -190,7 +190,7 @@ fn general_nested_fraction() {
         </mrow>
     </math>
                     ";
-    test("en", "ClearSpeak", expr, "the fraction with numerator; 10 over n; and denominator 2 over n;");
+    test("fi", "ClearSpeak", expr, "murtoluku osoittaja; 10 per n; ja nimittäjä 2 per n;");
 }
 
 #[test]
@@ -215,14 +215,14 @@ fn complex_nested_fraction() {
         </mrow>
     </math>
                     ";
-    test("en", "ClearSpeak", expr, "the fraction with numerator; the fraction with numerator; n plus 10; and denominator n; and denominator 2 over n;");
+    test("fi", "ClearSpeak", expr, "murtoluku osoittaja; murtoluku osoittaja; n plus 10; ja nimittäjä n; ja nimittäjä 2 per n;");
 }
 
 #[test]
 fn simple_function() {
     let expr = "<math><mfrac><mrow><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow><mn>2</mn></mfrac></math>";
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "f of x over 2");
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr, "f of x over 2, end fraction,");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "f arvolla x per 2");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr, "f arvolla x per 2, loppu murtoluku,");
 }
 
 #[test]
@@ -231,8 +231,8 @@ fn function_over_function() {
             <mrow><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
             <mrow><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
         </mfrac></math>";
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "f of x over g of x");
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr, "f of x over g of x, end fraction,");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "f arvolla x per g arvolla x");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr, "f arvolla x per g arvolla x, loppu murtoluku,");
 }
 
 #[test]
@@ -241,10 +241,10 @@ fn non_simple_function_over_function() {
             <mrow><mi>f</mi><mo>(</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo>)</mo></mrow>
             <mrow><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
         </mfrac></math>";
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr,
-             "the fraction with numerator; f of, open paren x plus 1, close paren; and denominator g of x;");
-    test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr,
-             "the fraction with numerator; f of, open paren x plus 1, close paren; and denominator g of x; end fraction,");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr,
+             "murtoluku osoittaja; f arvolla, auki sulku x plus 1, kiinni sulku; ja nimittäjä g arvolla x;");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr,
+             "murtoluku osoittaja; f arvolla, auki sulku x plus 1, kiinni sulku; ja nimittäjä g arvolla x; loppu murtoluku,");
 }
 
 #[test]
