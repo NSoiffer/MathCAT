@@ -230,7 +230,7 @@
   replace:
   - test:
       if: $ClearSpeak_Trig = 'TrigInverse'
-      then: [{x: "*[1]"}, {bookmark: "*[2]/@id"}, {T: "käänteis"}]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
+      then: [{T: "käänteis"}, {x: "*[1]"}, {bookmark: "*[2]/@id"}]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
       else_test:
         if: $ClearSpeak_Trig = 'ArcTrig'
         then: [{bookmark: "*[2]/@id"}, {T: "arkus"}, {x: "*[1]"}]      # phrase(the 'arc' of a circle)
