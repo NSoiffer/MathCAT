@@ -30,7 +30,7 @@ fn ellipses_auto_start() {
             <mi>…</mi><mo>,</mo>
             <mo>-</mo><mn>2</mn><mo>,</mo><mo>-</mo><mn>1</mn><mo>,</mo><mn>0</mn>
         </math>";
-    test("en", "ClearSpeak", expr, "dot dot dot comma negative 2 comma negative 1 comma 0");
+    test("fi", "ClearSpeak", expr, "piste piste piste pilkku negatiivinen 2 pilkku negatiivinen 1 pilkku 0");
 }
 
 #[test]
@@ -73,8 +73,8 @@ fn ellipses_auto_both() {
             <mo>-</mo><mn>2</mn><mo>,</mo><mo>-</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>2</mn>
             <mo>,</mo><mi>…</mi>
        </math>";
-    test_ClearSpeak("en", "ClearSpeak_Ellipses", "Auto", expr,
-            "dot dot dot comma negative 2 comma negative 1 comma 0 comma 1 comma 2 comma dot dot dot");
+    test_ClearSpeak("fi", "ClearSpeak_Ellipses", "Auto", expr,
+            "piste piste piste pilkku negatiivinen 2 pilkku negatiivinen 1 pilkku 0 pilkku 1 pilkku 2 pilkku piste piste piste");
 }
 
 #[test]
@@ -83,7 +83,7 @@ fn ellipses_and_so_on_start() {
             <mi>…</mi><mo>,</mo>
             <mo>-</mo><mn>2</mn><mo>,</mo><mo>-</mo><mn>1</mn><mo>,</mo><mn>0</mn>
         </math>";
-        test_ClearSpeak("en", "ClearSpeak_Ellipses", "AndSoOn", expr, "dot dot dot comma negative 2 comma negative 1 comma 0");
+        test_ClearSpeak("fi", "ClearSpeak_Ellipses", "AndSoOn", expr, "piste piste piste pilkku negatiivinen 2 pilkku negatiivinen 1 pilkku 0");
 }
 
 #[test]
@@ -97,7 +97,7 @@ fn ellipses_and_so_on_end() {
             <mo>,</mo>
             <mi>…</mi>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_Ellipses", "AndSoOn", expr, "1 comma 2 comma 3 and so on");
+    test_ClearSpeak("fi", "ClearSpeak_Ellipses", "AndSoOn", expr, "1 pilkku 2 pilkku 3 ja niin edelleen");
 }
 
 #[test]
@@ -115,8 +115,8 @@ fn ellipses_and_so_on_middle() {
                 <mn>20</mn>
             </mrow>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_Ellipses", "AndSoOn", expr,
-            "1 comma 2 comma 3 and so on up to 20");
+    test_ClearSpeak("fi", "ClearSpeak_Ellipses", "AndSoOn", expr,
+            "1 pilkku 2 pilkku 3 ja niin edelleen kunnes, 20");
 }
 
 #[test]
@@ -126,8 +126,8 @@ fn ellipses_and_so_on_both() {
             <mo>-</mo><mn>2</mn><mo>,</mo><mo>-</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>2</mn>
             <mo>,</mo><mi>…</mi>
        </math>";
-    test_ClearSpeak("en", "ClearSpeak_Ellipses", "AndSoOn", expr,
-            "dot dot dot comma negative 2 comma negative 1 comma 0 comma 1 comma 2 comma dot dot dot");
+    test_ClearSpeak("fi", "ClearSpeak_Ellipses", "AndSoOn", expr,
+            "piste piste piste pilkku negatiivinen 2 pilkku negatiivinen 1 pilkku 0 pilkku 1 pilkku 2 pilkku piste piste piste");
 }
 
 #[test]
@@ -171,8 +171,8 @@ fn vertical_line_divides() {
                     <mo>)</mo>
                 </mrow>
             </math>";
-        test_ClearSpeak_prefs("en", vec![("ClearSpeak_VerticalLine", "Given"), ("ClearSpeak_ImpliedTimes", "None")]
-                        , expr, "cap p, open paren, cap eigh given cap b, close paren");
+        test_ClearSpeak_prefs("fi", vec![("ClearSpeak_VerticalLine", "Given"), ("ClearSpeak_ImpliedTimes", "None")]
+                        , expr, "iso p, auki sulku, iso a ehdolla iso b, kiinni sulku");
     }
 
 #[test]
@@ -189,7 +189,7 @@ fn vertical_line_set() {
         <mo>}</mo>    
     </math>";
     test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "Auto", expr,
-            "joukko kaikki x siten että x on suurempi kuin 0");
+            "joukko kaikilla x siten että x on suurempi kuin 0");
 }
 
 
@@ -207,7 +207,7 @@ fn vertical_line_set_such_that() {
         <mo>}</mo>    
     </math>";
     test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "SuchThat", expr,
-            "joukko kaikki x siten että x on suurempi kuin 0");
+            "joukko kaikilla x siten että x on suurempi kuin 0");
 }
 
 #[test]
@@ -224,8 +224,8 @@ fn vertical_line_set_given() {
         <mo>}</mo>    
     </math>";
     // the rules for set will override all the options -- ClearSpeak spec should be clarified
-    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Given", expr,
-            "the set of all x such that x is greater than 0");
+    test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "Given", expr,
+            "joukko kaikilla x siten että x on suurempi kuin 0");
 }
 
 #[test]
@@ -245,8 +245,8 @@ fn vertical_line_set_and_abs() {
             </mrow>
             <mo>}</mo>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Auto", expr,
-        "the set of all x such that the absolute value of x; is greater than 2");
+    test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "Auto", expr,
+        "joukko kaikilla x siten että itseisarvo x; on suurempi kuin 2");
 }
 
 #[test]
@@ -267,8 +267,8 @@ fn vertical_line_evaluated_at() {
                 </mrow>
             </msub>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Auto", expr,
-        "f of x evaluated at, x is equal to 5");
+    test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "Auto", expr,
+        "f arvolla x, sijoitus, x on yhtä suuri kuin 5");
 }
 
 #[test]
@@ -286,8 +286,8 @@ fn vertical_line_evaluated_at_both() {
                 <mn>1</mn>
             </msubsup>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Auto", expr,
-        "x squared plus x, evaluated at 1 minus the same expression evaluated at 0");
+    test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "Auto", expr,
+        "x neliö plus x, sijoitus 1 miinus sama lauseke arvolla 0");
 }
 #[test]
 fn vertical_line_evaluated_at_divides() {
@@ -307,8 +307,8 @@ fn vertical_line_evaluated_at_divides() {
                 </mrow>
             </msub>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Divides", expr,
-        "f of x evaluated at, x is equal to 5");
+    test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "Divides", expr,
+        "f arvolla x, sijoitus, x on yhtä suuri kuin 5");
 }
 
 #[test]
@@ -326,6 +326,6 @@ fn vertical_line_evaluated_at_both_given() {
                 <mn>1</mn>
             </msubsup>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_VerticalLine", "Given", expr,
-        "x squared plus x, evaluated at 1 minus the same expression evaluated at 0");
+    test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "Given", expr,
+        "x neliö plus x, sijoitus 1 miinus sama lauseke arvolla 0");
 }
