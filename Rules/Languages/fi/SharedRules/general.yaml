@@ -224,6 +224,7 @@
   - x: "*[1]"
   - T: "käy"      # phrase(subtracting 5 'from' 10 gives 5)
   - pause: short # FI: added pause for clarity
+  - T: "luvusta"
   - x: "*[2]"
   - pause: short # FI: added pause for clarity
   - T: "lukuun"      # phrase(adding 6 'to' 6 equals  12)
