@@ -143,9 +143,9 @@
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - T: "luvusta"      # phrase(subtracting 5 'from' 10 gives 5)
+      - T: "luvusta"      # FI: "from number", needs a better translation for anything else than a number, maybe this could be omitted
       - x: "*[1]"
-      - T: "lukuun"      # phrase(adding 6 'to' 6 equals  12)
+      - T: "lukuun"      # FI: "to number"
       - x: "*[2]"
       else:
       - x: "*[1]"
