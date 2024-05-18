@@ -214,7 +214,7 @@
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
           then: [pause: short]
 
-- name: bigop-both
+- name: bigop-both # FI: there should be separate rule for integrals, since in Finnish we can talk about sub and sup of integral
   tag: large-op
   match: "count(*) = 3"
   replace:
