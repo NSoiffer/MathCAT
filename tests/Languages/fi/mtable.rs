@@ -538,7 +538,7 @@ fn simple_cardinality_value() {
     <mrow><mrow><mo>|</mo> <mi>S</mi> <mo>|</mo></mrow></mrow>
   </math>";
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_AbsoluteValue", "Cardinality")], expr,
-             "the cardinality of cap s,");
+             "kardinaliteetti s,");
 }
   
 // Test preferences
