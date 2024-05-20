@@ -262,7 +262,7 @@
           then: {T: ""}      # phrase('the' set of all integers)
       - T: "joukko"      # phrase(the 'set of all' positive integers less than 10)
       - x: "*[1]/*[1]"
-      - T: "siten, että"      # phrase(x 'such that' x is less than y)
+      - T: "siten että"      # phrase(x 'such that' x is less than y)
       - x: "*[1]/*[3]"
       else:
       - test:
