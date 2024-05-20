@@ -18,9 +18,8 @@ fn modified_vars() {
         <mover> <mi>x</mi> <mo>^</mo> </mover> <mo>+</mo>
         <mover> <mi>t</mi> <mo>→</mo> </mover>
         </mrow> </math>";
-    test("en", "SimpleSpeak", expr, 
-        "eigh grave, b tilde, c breve, b check, c grave; plus; \
-            x dot, y dot, z double dot, u triple dot, v quadruple dot; plus x hat, plus vector t");
+    test("fi", "SimpleSpeak", expr, 
+        "a gravis, b tilde, c lyhyysmerkki, b hattu, c gravis; plus; x piste, y piste, z piste piste, u kolmoispiste, v nelinkertainen piste; plus x hattu, plus vektori t");
 }
 
 #[test]
@@ -37,7 +36,7 @@ fn limit() {
             </mfrac>
             </mrow>
         </math>";
-    test("fi", "SimpleSpeak", expr, "the limit as x approaches 0, of, fraction, sine of x, over x, end fraction;");
+    test("fi", "SimpleSpeak", expr, "raja-arvo kun x lähestyy 0; arvolla, murtoluku, sini arvolla x, per x, loppu murtoluku;");
 }
 
 #[test]
@@ -51,33 +50,33 @@ fn limit_from_below() {
                 <mrow>  <mi>sin</mi>  <mo>&#x2061;</mo> <mi>x</mi> </mrow>
             </mrow>
         </math>";
-    test("en", "SimpleSpeak", expr, "the limit as x approaches from below 0, of sine of x");
+    test("fi", "SimpleSpeak", expr, "raja-arvo kun x lähestyy alhaalta 0; arvolla sini arvolla x");
 }
 
 
 #[test]
 fn binomial_mmultiscripts() {
     let expr = "<math><mmultiscripts><mi>C</mi><mi>m</mi><none/><mprescripts/><mi>n</mi><none/></mmultiscripts></math>";
-    test("en", "SimpleSpeak", expr, "n choose m");
+    test("fi", "SimpleSpeak", expr, "n yli m");
 }
 
 
 #[test]
 fn permutation_mmultiscripts() {
     let expr = "<math><mmultiscripts><mi>P</mi><mi>k</mi><none/><mprescripts/><mi>n</mi><none/></mmultiscripts></math>";
-    test("en", "SimpleSpeak", expr, "k permutations of n");
+    test("fi", "SimpleSpeak", expr, "k permutaatio n");
 }
 
 #[test]
 fn permutation_mmultiscripts_sup() {
     let expr = "<math><mmultiscripts><mi>P</mi><mi>k</mi><none/><mprescripts/><none/><mi>n</mi></mmultiscripts></math>";
-    test("en", "SimpleSpeak", expr, "k permutations of n");
+    test("fi", "SimpleSpeak", expr, "k permutaatio n");
 }
 
 #[test]
 fn permutation_msubsup() {
     let expr = "<math><msubsup><mi>P</mi><mi>k</mi><mi>n</mi></msubsup></math>";
-    test("en", "SimpleSpeak", expr, "k permutations of n");
+    test("fi", "SimpleSpeak", expr, "k permutaatio n");
 }
 
 #[test]
@@ -85,10 +84,10 @@ fn tensor_mmultiscripts() {
     let expr = "<math><mmultiscripts>
             <mi>R</mi> <mi>i</mi><none/> <none/><mi>j</mi> <mi>k</mi><none/> <mi>l</mi><none/> 
         </mmultiscripts></math>";
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-            "cap r with 4 postscripts, subscript i superscript j subscript k subscript l");
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
-            "cap r with 4 postscripts, sub i super j sub k sub l");
+    test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+            "iso r jolla on 4 jälkikirjoitusta, alaindeksi i yläindeksi j alaindeksi k alaindeksi l");
+    test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
+            "iso r jolla on 4 jälkikirjoitusta, ala i ylä j ala k ala l");
 }
 
 #[test]
@@ -97,21 +96,21 @@ fn huge_num_mmultiscripts() {
             <mi>R</mi> <mi>i</mi><none/> <none/><mi>j</mi> <mi>k</mi><none/> <mi>l</mi><none/> <mi>m</mi><none/>
             <mprescripts/> <mi>I</mi><none/> <none/><mi>J</mi> <mi>K</mi><none/> <mi>L</mi><none/>
         </mmultiscripts></math>";
-    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-            "cap r with 4 prescripts, pre subscript cap i, pre superscript cap j and alternating prescripts cap k none cap l none end prescripts and with 5 postscripts, subscript i superscript j subscript k subscript l and alternating scripts m none end scripts");
+    test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
+            "iso r 4 etumäärettä, etualaindeksi iso i, etuyläindeksi iso j ja vaihtelevat etumääreet iso k none iso l none loppu etumääreet ja jolla on 5 jälkikirjoitusta, alaindeksi i yläindeksi j alaindeksi k alaindeksi l ja vaihtelevia määreitä m none loppu määreet");
 }
 
 #[test]
 fn prime() {
     let expr = "<math> <msup><mi>x</mi><mo >&#x2032;</mo></msup> </math>";
-    test("en", "SimpleSpeak", expr, "x prime,");
+    test("fi", "SimpleSpeak", expr, "x pilkku,");
 }
 
 #[test]
 fn given() {
     let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
-    test("en", "SimpleSpeak", expr, "cap p, open paren, cap eigh vertical line cap b; close paren");
-    test("en", "ClearSpeak", expr,  "cap p, open paren, cap eigh divides cap b, close paren");  // not good, but follows the spec
+    test("fi", "SimpleSpeak", expr, "iso p; auki sulku, iso a pystysuora viiva iso b; kiinni sulku");
+    test("fi", "ClearSpeak", expr,  "iso p, auki sulku, iso a jakaa iso b, kiinni sulku");  // not good, but follows the spec
 }
 
 #[test]
@@ -129,14 +128,14 @@ fn simple_msubsup() {
             </msubsup>
             </mstyle>
         </math>";
-    test("en", "ClearSpeak", expr, "x sub k, to the i-th power");
+    test("fi", "ClearSpeak", expr, "x ala k, potenssiin i");
 }
 
 #[test]
 fn non_simple_msubsup() {
     let expr = "<math><msubsup><mi>i</mi><mrow><mi>j</mi><mo>&#x2212;</mo><mn>2</mn></mrow><mi>k</mi></msubsup></math>";
-    test("en", "SimpleSpeak", expr, "i sub j minus 2 end sub, to the k-th");
-    test("en", "ClearSpeak", expr, "i sub j minus 2 end sub, to the k-th power");
+    test("fi", "SimpleSpeak", expr, "i ala j miinus 2 loppu ala, potenssiin k");
+    test("fi", "ClearSpeak", expr, "i ala j miinus 2 loppu ala, potenssiin k");
 }
 
 #[test]
@@ -157,7 +156,7 @@ fn presentation_mathml_in_semantics() {
             </annotation-xml>
         </semantics>
     </math>";
-    test("en", "ClearSpeak", expr, "x sub k, to the i-th power");
+    test("fi", "ClearSpeak", expr, "x ala k, potenssiin i");
 }
 
 #[test]
@@ -201,13 +200,13 @@ fn ignore_period() {
       </annotation-xml>
     </semantics>  
   </math>";
-    test("en", "SimpleSpeak", expr, "cap p; open paren, cap eigh and cap b; close paren; is equal to; cap p, open paren, cap eigh intersection cap b; close paren; is equal to, cap p of cap eigh, cap p of cap b");
+    test("fi", "SimpleSpeak", expr, "iso p; auki sulku, iso a and iso b; kiinni sulku; on yhtä suuri kuin; iso p, auki sulku, iso a leikkaus iso b, kiinni sulku; on yhtä suuri kuin; iso p arvolla iso a; iso p arvolla iso b");
 }
 
 #[test]
 fn ignore_mtext_period() {
     let expr = "<math><mrow><mrow><mo>{</mo><mn>2</mn><mo>}</mo></mrow><mtext>.</mtext></mrow></math>";
-    test("en", "SimpleSpeak", expr, "the set 2");
+    test("fi", "SimpleSpeak", expr, "joukko 2");
 }
 
 #[test]
@@ -244,7 +243,7 @@ fn ignore_comma() {
       </mstyle>
     </mrow>
 </math>";
-    test("en", "SimpleSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
+    test("fi", "SimpleSpeak", expr, "suora fii arvolla x, on yhtä suuri kuin; c, e potenssiin negatiivinen h neliö, x neliö");
 }
 
 #[test]
@@ -284,12 +283,12 @@ fn ignore_period_and_space() {
         </mstyle>
       </mrow>
 </math>";
-    test("en", "ClearSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
+    test("fi", "ClearSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power");
 }
 
 
 #[test]
 fn mn_with_space() {
     let expr = "<math><mn>1 234 567</mn></math>";
-    test("en", "SimpleSpeak", expr, "1234567");
+    test("fi", "SimpleSpeak", expr, "1234567");
 }
