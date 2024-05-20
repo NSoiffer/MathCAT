@@ -474,10 +474,12 @@
   match: "."
   variables: [{WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Kardinaliteetti', 'kardinaliteetti', 'itseisarvo')"}]
   replace:
+  # FI: not needed
   # - test:
   #     if: "$Verbosity!='Terse'"
   #     then: {T: ""}      # phrase('the' absolute value of 25)
   - x: "$WordToSay"
+  # FI: not needed
   # - T: ""      # phrase(the absolute value 'of' 25)
   - x: "*[1]"
   - test:
