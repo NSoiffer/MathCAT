@@ -609,7 +609,7 @@
       then: {T: "determinantti"}      # phrase(the 2 by 2 'determinant'))
       else: {T: "matriisi"}      # phrase(the 2 by 2 'matrix')
       
-  - T: "merkinnällä"      # phrase(the 2 by 2 matrix 'with entry' x)
+  # - T: "merkinnällä"      # phrase(the 2 by 2 matrix 'with entry' x)
   - x: "*[1]/*"
 
 # simpler reading methods for smaller matrices if the entries are simple
