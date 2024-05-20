@@ -30,10 +30,7 @@ fn case_1() {
             </mtable></mrow> </mrow></mrow>
         </math>
    ";
-    test("en", "SimpleSpeak", expr, "f of x is equal to; 3 cases, \
-                case 1; negative 1 if x; is less than 0; \
-                case 2; 0 if x, is equal to 0; \
-                case 3; 1 if x, is greater than 0;");
+    test("fi", "SimpleSpeak", expr, "f arvolla x, on yhtä suuri kuin; 3 tapausta, tapaus 1; negatiivinen 1 if x; on pienempi kuin 0; tapaus 2; 0 if x, on yhtä suuri kuin 0; tapaus 3; 1 if x, on suurempi kuin 0;");
 }
 
 #[test]
@@ -71,7 +68,5 @@ fn equation_1() {
       </mtable></mrow>
     </math>
    ";
-    test("en", "SimpleSpeak", expr, "2 equations, \
-                equation 1; x plus y, is equal to, 7; \
-                equation 2; 2 x plus 3 y, is equal to, 17;");
+    test("fi", "SimpleSpeak", expr, "2 yhtälöä, yhtälö 1; x plus y, on yhtä suuri kuin, 7; yhtälö 2; 2 x plus 3 y, on yhtä suuri kuin, 17;");
 }
