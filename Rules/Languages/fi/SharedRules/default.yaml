@@ -326,7 +326,7 @@
               - test:
                   if: "$Prescripts"
                   then: [T: "ja"]      # phrase(10 is greater than 8 'and' less than 15)
-              - T: "arvolla"      # phrase(substitute x 'with' y)
+              - T: "jolla on"      
               - x: "count($Postscripts) div 2"
               - T: "jälkikirjoitusta"      # phrase(this material includes several 'postscripts')
               - pause: short
