@@ -8,7 +8,7 @@ fn squared() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>2</mn> </msup>
                 </math>";
-    test("en", "SimpleSpeak", expr, "x squared");
+    test("fi", "SimpleSpeak", expr, "x neliö");
 }
 
 #[test]
@@ -16,7 +16,7 @@ fn cubed() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>3</mn> </msup>
                 </math>";
-    test("en", "SimpleSpeak", expr, "x cubed");
+    test("fi", "SimpleSpeak", expr, "x kuutio");
 }
 
 #[test]
@@ -24,7 +24,7 @@ fn cubed() {
         let expr = "<math>
                         <msup> <mi>x</mi> <mn>4</mn> </msup>
                     </math>";
-        test("en", "SimpleSpeak", expr, "x to the fourth");
+        test("fi", "SimpleSpeak", expr, "x potenssiin 4");
     }
 
 #[test]
@@ -32,7 +32,7 @@ fn simple_mi_power() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mi>n</mi> </msup>
                 </math>";
-  test("en", "SimpleSpeak", expr, "x to the n-th");
+  test("fi", "SimpleSpeak", expr, "x potenssiin n");
 }
 
 #[test]
@@ -40,7 +40,7 @@ fn zero_power() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>0</mn> </msup>
                 </math>";
-    test("en", "SimpleSpeak", expr, "x to the 0");
+    test("fi", "SimpleSpeak", expr, "x potenssiin 0");
 }
 
 
@@ -49,7 +49,7 @@ fn decimal_power() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>2.0</mn> </msup>
                 </math>";
-    test("en", "SimpleSpeak", expr, "x to the 2.0");
+    test("fi", "SimpleSpeak", expr, "x potenssiin 2.0");
 }
 
 #[test]
@@ -63,7 +63,7 @@ fn non_simple_power() {
       </msup>
       </mrow>
                 </math>";
-    test("en", "SimpleSpeak", expr, "3 raised to the y plus 2 power");
+    test("fi", "SimpleSpeak", expr, "3 potenssiin y plus 2");
 }
 
 #[test]
@@ -74,7 +74,7 @@ fn negative_power() {
                         <mrow> <mo>-</mo> <mn>2</mn> </mrow>
                     </msup>
                 </math>";
-    test("en", "SimpleSpeak", expr, "x to the negative 2");
+    test("fi", "SimpleSpeak", expr, "x potenssiin negatiivinen 2");
 }
 
 #[test]
@@ -85,7 +85,7 @@ fn simple_fraction_power() {
                       <mfrac><mn>1</mn><mn>3</mn></mfrac>
                   </msup>
               </math>";
-  test("en", "SimpleSpeak", expr, "x raised to the 1 third power");
+  test("fi", "SimpleSpeak", expr, "x potenssiin 1 kolmasosa");
 }
 
 #[test]
@@ -104,7 +104,7 @@ fn nested_squared_power_with_coef() {
       </msup>
       </mrow>
       </math>";
-  test("en", "SimpleSpeak", expr, "3 raised to the 2 x squared power");
+  test("fi", "SimpleSpeak", expr, "3 potenssiin 2 x neliö");
 }
 
 #[test]
@@ -124,7 +124,7 @@ fn nested_squared_power_with_neg_coef() {
     </msup>
     </mrow>
   </math>";
-  test("en", "SimpleSpeak", expr, "3 raised to the negative 2 x squared power");
+  test("fi", "SimpleSpeak", expr, "3 potenssiin negatiivinen 2 x neliö");
 }
 
 
@@ -139,7 +139,7 @@ fn nested_cubed_power() {
       </msup>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "y raised to the 4 fifths cubed power");
+  test("fi", "SimpleSpeak", expr, "y potenssiin 4 viidesosaa kuutio");
 }
 
 #[test]
@@ -156,7 +156,7 @@ fn nested_cubed_power_with_neg_base() {
         </mrow>
     </msup>
     </math>";
-  test("en", "SimpleSpeak", expr, "y raised to the negative 4 fifths cubed power");
+  test("fi", "SimpleSpeak", expr, "y potenssiin negatiivinen 4 viidesosaa kuutio");
 }
 
 #[test]
@@ -178,7 +178,7 @@ fn nested_number_times_squared() {
         </msup>
         </mrow>
         </math>";
-  test("en", "SimpleSpeak", expr, "e raised to the 1 half x squared power");
+  test("fi", "SimpleSpeak", expr, "e potenssiin 1 kahdesosa x neliö");
 }
 
 #[test]
@@ -200,7 +200,7 @@ fn nested_negative_number_times_squared() {
     </msup>
     </mrow>
     </math>";
-  test("en", "SimpleSpeak", expr, "e raised to the negative 1 half x squared power");
+  test("fi", "SimpleSpeak", expr, "e potenssiin negatiivinen 1 kahdesosa, x neliö");
 }
 
 #[test]
@@ -219,7 +219,7 @@ fn nested_expr_to_tenth() {
       </msup>
       </mrow>
       </math>";
-  test("en", "SimpleSpeak", expr, "3 raised to the 3 to the tenth power");
+  test("fi", "SimpleSpeak", expr, "3 potenssiin 3 potenssiin 10");
 }
 
 #[test]
@@ -241,7 +241,7 @@ fn nested_non_simple_squared_exp() {
       </msup>
       </mrow>
       </math>";
-  test("en", "SimpleSpeak", expr, "3 raised to the open paren x plus 1, close paren squared power");
+  test("fi", "SimpleSpeak", expr, "3 potenssiin auki sulku x plus 1, kiinni sulku neliö");
 }
 
 #[test]
@@ -255,7 +255,7 @@ fn nested_simple_power() {
       </msup>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "t raised to the 4 fifths to the n-th power");
+  test("fi", "SimpleSpeak", expr, "t potenssiin 4 viidesosaa potenssiin n");
 }
 
 #[test]
@@ -269,7 +269,7 @@ fn nested_end_exponent_power() {
       </msup>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "t raised to the 4 fifths raised to the n plus 1 power, end exponent");
+  test("fi", "SimpleSpeak", expr, "t potenssiin 4 viidesosaa potenssiin n plus 1, loppu potenssi");
 }
 
 #[test]
@@ -283,7 +283,7 @@ fn nested_end_exponent_neg_power() {
       </msup>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "t raised to the 4 fifths to the negative 3, end exponent");
+  test("fi", "SimpleSpeak", expr, "t potenssiin 4 viidesosaa potenssiin negatiivinen 3, loppu potenssi");
 }
 
 #[test]
@@ -314,7 +314,7 @@ fn nested_complex_power() {
       </msup>
       </mrow>
       </math>";
-  test("en", "SimpleSpeak", expr, "e raised to the negative 1 half times; open paren, fraction, x minus mu, over sigma, end fraction; close paren squared power");
+  test("fi", "SimpleSpeak", expr, "e potenssiin negatiivinen 1 kahdesosa, kertaa; auki sulku; murtoluku, x miinus myy, per sigma, loppu murtoluku; kiinni sulku neliö");
 }
 
 #[test]
@@ -328,5 +328,5 @@ fn default_power() {
       </mfrac>
     </msup>
   </math>";
-  test("en", "SimpleSpeak", expr, "t raised to the fraction, b plus 1, over 3, end fraction; power");
+  test("fi", "SimpleSpeak", expr, "t potenssiin murtoluku, b plus 1, per 3, loppu murtoluku;");
 }
