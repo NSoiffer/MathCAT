@@ -607,7 +607,7 @@
   variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
   match:
   - "count(*)=3 and"
-  - "*[1][self::m:mi][text()='log' or text()='ln'] and"
+  - "*[1][self::m:mi][text()='log' or text()='ln' or text()='lg'] and"
   - "*[2][self::m:mo][text()='⁡']"
   replace:
   - test:
@@ -615,6 +615,8 @@
       then_test:
       - if: "*[1][text()='log']"
         then: [{T: "log"}]      # phrase(the 'log' of x)
+      - else_if: "*[1][text()='lg']"
+        then: [{SPELL: 'lg'}] # phrase(the 'lg' of x)
       - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
         then: [{T: "luonnollinen log"}]      # phrase(the 'natural log' of the product of 2 numbers)
         else: [{SPELL: "'ln'"}]
