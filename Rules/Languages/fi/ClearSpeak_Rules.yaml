@@ -627,7 +627,11 @@
       #     then: {T: ""}      # phrase('the' square root of 25)
       - test:
         - if: "*[1][text()='log']"
-          then: [{T: "logaritmi"}]
+          then:
+          - test:
+            - if: "$Verbosity='Verbose'"
+              then: [{T: "logaritmi"}]
+              else: [{T: "log"}]
         - else_if: "*[1][text()]='lg'"
           then:
           - test:
