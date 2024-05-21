@@ -56,7 +56,7 @@
   - test:
       if: "string-length(.) = 1 and text() != '_'"       # need unicode.tdl to kick in for single letter tokens
       then: [x: "text()"]
-      else: [x: "translate(., '-_', '  ')" ]   # from intent literals
+      else: [x: "translate(., '-_\u00A0', '  ')" ]   # from intent literals
 
 - name: default
   tag: ms
@@ -72,7 +72,7 @@
   replace: [x: "*"]
 
 
-- name: structure-simple
+- name: literal-simple
   # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
   # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
   # are never simple, then any 'over' applies only to enclosing "fraction...end fraction" pair.
@@ -86,7 +86,7 @@
   - x: "*[2]"
   - pause: short
 
-- name: structure-default
+- name: literal-default
   tag: mfrac
   match: "."
   replace:
@@ -128,7 +128,7 @@
   - pause: short
 
 
-- name: structure
+- name: literal
   tag: msub
   match: "."
   replace:
@@ -136,7 +136,7 @@
   - T: "subíndice"
   - x: "*[2]"
 
-- name: structure
+- name: literal
   tag: [msup, msubsup]
   match: "."
   replace:
@@ -150,7 +150,7 @@
       if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
       then:  [x: "*[last()]"]
       else_test:
-          if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"  # FIX: is this test necessary?
+          if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"  # FIX: is this test necessary?
           then:
           - T: "superíndice"
           - x: "*[last()]"

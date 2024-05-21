@@ -3,9 +3,9 @@
 
 ## Information for AT and Other Library Users
 
-When calling from python, the general ordering is:
+When using MathCAT, the general ordering of calls is:
 1. The location of the MathCAT `Rules` directory is set [SetRulesDir]
-1. Whatever preferences the AT needs to set, it is done with calls to [`SetPreference`]. Typically the `Language` and TTS engine to use (if any -- strongly recommended) are given. 
+1. Whatever preferences the AT needs to set, it is done with calls to [`SetPreference`]. Typically the `Language` and `TTS` engine to use (if any -- strongly recommended) are given. 
 2. The MathML is sent over via [`SetMathML`].
 3. AT calls to get the speech [`GetSpokenText`] and calls [`GetBraille`] to get the (Unicode) braille. If the id of a node is given, then the corresponding braille cells will be highlighted.
 
@@ -27,6 +27,8 @@ Currently the value is always '0' -- this feature needs more implementation work
 It is also possible to find out what preferences are currently set by calling [`GetPreference`]
 
 All functions return a potential error code.
+
+Note: MathCAT does a lot of work to clean up bad MathML. In particular, numbers with commas and periods are often split into pieces by MathML generators. MathCAT tries to put them back together, but to do that, it needs to know the locale's format for block separators and decimal separators. For example, in the US, "1,234.0" is a valid number, but in Europe, it is not a number because the `,` is a decimal separator. The locale is based on the country the document was authored for, not the language being used to speak the math. The two preferences that control what a legal number looks like are `BlockSeparators` and `DecimalSeparators`. Callers should set these values when they are known. They default to the US style of numbers.
 
 ## Rust Users
 MathCAT is written in Rust, so all you need to do is build MathCAT and in your project's Cargo.toml file add something like
@@ -74,6 +76,7 @@ pub fn get_preference(name: String) -> Result<String>
 /// * Voice -- set a voice to use (not implemented)
 /// * Gender -- set pick any voice of the given gender (not implemented)
 /// * Bookmark -- set to `true` if a `mark`/`bookmark` should be part of the returned speech (used for sync highlighting)
+/// * CheckRuleFiles -- check to see if the rules files have changed since the last call. Values are "All", "Prefs"  (default) (only the system and user prefs.yaml files), and "None". There is about a 40% speedup changing from "All" to "None" and about a 10% speedup changing from "Prefs" to "None". 
 ///
 /// These are use to control speech and pitch changes for capital letters:
 /// * CapitalLetters_UseWord -- say "cap" (or whatever is appropriate for the language) [default: true]

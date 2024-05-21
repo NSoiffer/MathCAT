@@ -11,59 +11,47 @@
   tag: mn
   match: "starts-with(text(), '-')"
   replace:
-  - t: "minus"        # phrase(x 'minus' y)
+  - T: "minus"        # phrase(x 'minus' y)
   - x: "translate(text(), '-_', '')"
 
 - name: default
   tag: square-root
   match: "."
   replace:
+  - T: "kvadratroten"      # phrase(the 'square root' of x)
   - test:
       if: "$Verbosity!='Terse'"
-      then: {t: "the"}    # phrase('the' square root of x)
-  - t: "kvadratroten"      # phrase(the 'square root' of x)
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: {t: "av"}   # phrase(the square root 'of' x)
+      then: {T: "ur"}   # phrase(the square root 'of' x)
       else: {pause: short}
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{t: "end of root"}, {pause: short}]  # phrase(start the square root of x 'end of root')
+      else: [{T: "slut rot"}, {pause: short}]  # phrase(start the square root of x 'end of root')
 
 - name: default
   tag: root
   match: "."
   replace:
   - test:
-      if: "$Verbosity!='Terse'"
-      then: [{t: "the"}]
-  - test:
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][text()='2']"
-        then: [{t: "kvadratroten"}]        # phrase(the 'square root' of x)
+        then: [{T: "kvadratroten"}]        # phrase(the 'square root' of x)
       - else_if: "*[2][text()='3']"
-        then: [{t: "kubroten"}]        # phrase(the 'cube root' of x)
-      - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {t: "rot"}]        # phrase(the square 'root' of x)
+        then: [{T: "kubikroten"}]        # phrase(the 'cube root' of x)
+      - else_if: "*[2][not(contains(., ','))]"
+        then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]        # phrase(the square 'root' of x)
       else:
-      - test:
-          if: "*[2][self::m:mi][string-length(.)=1]"
-          then:
-          - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-          else: [{x: "*[2]"}]
-      - t: "roten"        # phrase(the square 'root' of)
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [{t: "av"}]        # phrase(the square root 'of' x)
+      - T: "roten av grad"      # phrase(the square 'root' of 36)
+      - x: "*[2]"
+  # SWEDISH: Removed verbosity settings.
+  - T: "ur"      # phrase(the square root 'of' 36)
   - x: "*[1]"
   - test:
       if: IsNode(*[1], 'leaf')
       then: [{pause: short}]
-      else: [{t: "end of root"}, {pause: short}]      # phrase(start the fifth root of x 'end of root')
+      else: [{T: "slut rot"}, {pause: short}]      # phrase(start the fifth root of x 'end of root')
 
 # Fraction rules
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
@@ -72,14 +60,29 @@
   match:
   - "*[1][self::m:mn][not(contains(., '.')) and text()<20]   and"
   - "*[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]"
-  replace: [{x: ToCommonFraction(.)}]
+  # SWEDISH: Alternative logic for handling correct reading out of common fractions.
+  variables: [IsPlural: "*[1]!=1"]
+  replace:
+  - test:
+      if: "*[1]=1"
+      then: [T: "en"]
+      else: [x: "*[1]"]
+  - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
+
 - name: common-fraction-mixed-number
   tag: fraction
   match:
   - "preceding-sibling::*[1][self::m:mo][text()='⁤'] and" # preceding element is invisible plus
   - "*[1][self::m:mn][not(contains(., '.'))]   and"
-  - "*[2][self::m:mn][not(contains(., '.'))]"
-  replace: [{x: ToCommonFraction(.)}]
+  - "*[2][self::m:mn][not(contains(., '.')) and text()<=10]"
+  # SWEDISH: Alternative logic for handling correct reading out of common fractions.
+  variables: [IsPlural: "*[1]!=1"]
+  replace:
+  - test:
+      if: "*[1]=1"
+      then: [T: "en"]
+      else: [x: "*[1]"]
+  - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 - name: simple
   # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
@@ -91,7 +94,7 @@
   - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
   replace:
   - x: "*[1]"
-  - t: "över"      # phrase(the fraction 3 'over' 4)
+  - T: "genom"      # phrase(the fraction 3 'over' 4)
   - x: "*[2]"
   - pause: short
 
@@ -99,19 +102,19 @@
   tag: fraction
   match: "."
   replace:
-  - t: "fraktionen"      # phrase(the 'fraction' 3 over 4)
+  - T: "division"      # phrase(the 'fraction' 3 over 4)
   - pause: short
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1],'leaf'))"
       then: [{pause: short}]
-  - t: "över"      # phrase(the fraction 3 'over' 4)
+  - T: "genom"      # phrase(the fraction 3 'over' 4)
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then: [{pause: short}]
   - x: "*[2]"
   - pause: short
-  - t: "slutet av fraktionen"      # phrase(start 7 over 8 'end of fraction')
+  - T: "slut division"      # phrase(start 7 over 8 'end of fraction')
   - pause: medium
 
 # rules for functions raised to a power
@@ -121,7 +124,7 @@
   tag: inverse-function
   match: "."
   replace:
-  - t: "inverse"      # phrase(the 'inverse' of f)
+  - T: "invers"      # phrase(the 'inverse' of f)
   - x: "*[1]"
 
 - name: function-squared-or-cubed
@@ -134,24 +137,19 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {t: "squared"}      # phrase(5 'squared' equals 25)
-      else: {t: "cubed"}      # phrase(5 'cubed' equals 125)
+      then: {T: "kvadrat"}      # phrase(5 'squared' equals 25)
+      else: {T: "kubik"}      # phrase(5 'cubed' equals 125)
+
 - name: function-power
   tag: power
   match:
   - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
   replace:
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: {t: "the"}      # # phrase('the' fourth power of 10)
-  - bookmark: "*[2]/@id"
-  - test:
-      if: "*[2][self::m:mn][not(contains(., '.'))]"
-      then: [{x: "ToOrdinal(*[2])"}]
-      else: [{x: "*[2]"}]
-  - t: "kraften"      # phrase(the fourth 'power of' 2)
-  - pause: short
   - x: "*[1]"
+  - T: "upphöjt till"
+  - bookmark: "*[2]/@id"
+  - x: "*[2]"
+  - pause: short
 
 # non-function rules for power
 - name: squared-or-cubed
@@ -162,19 +160,18 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {t: "squared"}      # phrase(5 'squared' equals 25)
-      else: {t: "cubed"}      # phrase(5 'cubed' equals 125)
+      then: {T: "kvadrat"}      # phrase(5 'squared' equals 25)
+      else: {T: "kubik"}      # phrase(5 'cubed' equals 125)
 
 - name: simple-integer
   tag: power
   match: "*[2][self::m:mn][not(contains(., '.'))]"
   replace:
   - x: "*[1]"
-  - t: "till"      # phrase(15 raised 'to the' second power equals 225)
-  - test:
-      if: "*[2][.>0]"
-      then: {x: "ToOrdinal(*[2])"}
-      else: {x: "*[2]"}
+  - T: "upphöjt till"
+  - x: "*[2]"
+  - pause: short
+
 - name: simple-negative-integer
   tag: power
   match:
@@ -182,24 +179,27 @@
   - "     *[1][self::m:mn][not(contains(., '.'))]]"
   replace:
   - x: "*[1]"
-  - t: "till"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "upphöjt till"
   - x: "*[2]"
+  - pause: short
+
 - name: simple-var
   tag: power
   match: "*[2][self::m:mi][string-length(.)=1]"
   replace:
   - x: "*[1]"
-  - t: "till"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "upphöjt till"
   - x: "*[2]"
-  - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
+  - pause: short
 
 - name: simple
   tag: power
   match: "IsNode(*[2], 'leaf')"
   replace:
   - x: "*[1]"
-  - t: "till"      # phrase(15 raised 'to the' second power equals 225)
+  - T: "upphöjt till"
   - x: "*[2]"
+  - pause: short
 
 - name: nested
   # it won't end in "power" if the exponent is simple enough
@@ -213,18 +213,18 @@
   - "    ]"
   replace:
   - x: "*[1]"
-  - t: "höjt till"      # phrase(15 'raised to the' second power equals 225)
+  - T: "upphöjt till"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
   - pause: short
-  - t: "end of exponent"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+  - T: "slut exponent"      # phrase(start 2 raised to the exponent 4 'end of exponent')
+
 - name: default
   tag: power
   match: "."
   replace:
   - x: "*[1]"
-  - t: "höjt till"      # phrase(15 'raised to the' second power equals 225)
+  - T: "upphöjt till"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
-  - t: "power"      # phrase(15 raised to the second 'power' equals 225)
 
 #
 # Some rules on mrows
@@ -238,22 +238,16 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "den"}      # phrase('the' empty set)
-      - t: "tom uppsättning"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
+          then: {T: "den"}      # phrase('the' empty set)
+      - T: "tomma mängden"      # phrase(when a set contains no value it is called an 'empty set' and this is valid)
     - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
       then:
-      - test:
-          if: "$Verbosity!='Terse'"
-          then: {t: "the"}      # phrase('the' set of all integers)
-      - t: "uppsättningen av alla"      # phrase(the 'set of all' positive integers less than 10)
+      - T: "mängden av alla"      # phrase(the 'set of all' positive integers less than 10)
       - x: "*[1]/*[1]"
-      - t: "så att"      # phrase(x 'such that' x is less than y)
+      - T: "sådana att"      # phrase(x 'such that' x is less than y)
       - x: "*[1]/*[3]"
       else:
-      - test:
-          if: "$Verbosity!='Terse'"
-          then: {t: "the"}      # phrase('the' set of integers)
-      - t: "uppsättning"      # phrase(here is a 'set' of numbers)
+      - T: "mängden"      # phrase(here is a 'set' of numbers)
       - x: "*[1]"
 
 - name: times
@@ -276,7 +270,7 @@
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # followed by parens
   - " )"
   replace:
-  - t: "times"      # phrase(7 'times' 5 equals 35)
+  - T: "gånger"      # phrase(7 'times' 5 equals 35)
 
 - name: no-say-parens
   tag: mrow

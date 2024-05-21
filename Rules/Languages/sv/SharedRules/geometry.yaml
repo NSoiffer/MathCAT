@@ -7,12 +7,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "linjesegmentet från"      # phrase('the line segment from' A to B)
+      - T: "linje-segmentet från"      # phrase('the line segment from' A to B)
       - x: "*[1]"
-      - t: "till"                         # phrase(the line segment from A 'to' B)
+      - T: "till"                         # phrase(the line segment from A 'to' B)
       - x: "*[2]"
       else:
-      - t: "linjesegmentet"               # phrase(the 'line segment' A  B)
+      - T: "linje-segmentet"               # phrase(the 'line segment' A  B)
       - x: "*[1]"
       - x: "*[2]"
 
@@ -23,12 +23,12 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "ray från"             # phrase('the ray from' A to B)
+      - T: "den riktade sträckan från"             # phrase('the ray from' A to B)
       - x: "*[1]"
-      - t: "till"                       # phrase(the ray from A 'to' B)
+      - T: "till"                       # phrase(the ray from A 'to' B)
       - x: "*[2]"
       else:
-      - t: "ray"                      # phrase(the 'ray'A  B)
+      - T: "den riktade sträckan"                      # phrase(the 'ray'A  B)
       - x: "*[1]"
       - x: "*[2]"
 
@@ -36,10 +36,7 @@
   tag: arc
   match: "count(*)=2"
   replace:
-  - test:
-      if: "$Verbosity='Verbose'"
-      then: [{t: "the"}]            # phrase('the' arc A B C)
-  - t: "arc"                        # phrase(the 'arc' A B C)
+  - T: "bågen"                        # phrase(the 'arc' A B C)
   - x: "*[1]"
   - x: "*[2]"
 
@@ -50,9 +47,9 @@
   - test:
       if: "$Verbosity='Verbose'"
       then:
-      - t: "måttet på vinkeln"      # phrase('the measure of the angle' ABC)
+      - T: "måttet på vinkeln"      # phrase('the measure of the angle' ABC)
       else:
-      - t: "mått på vinkel"      # phrase('measure of angle' ABC)
+      - T: "vinkeln"      # phrase('measure of angle' ABC)
   - x: "*[1]"
   - x: "*[2]"
   - x: "*[3]"

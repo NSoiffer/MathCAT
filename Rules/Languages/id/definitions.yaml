@@ -1,8 +1,11 @@
 ---
-[
+- include: "../../definitions.yaml"
+
 # Lines starting with "#" are a comment
 # Each definition in this file is of the form
-#   name: [ "...", "..." "..." ],
+# - name: { "...", "..." "..." }
+# For numbers, 
+# - name: [] "...", "..." "..." ]
 
 # ----------------  Cardinal and Ordinal Numbers  --------------------------
 # The following definitions are used to convert numbers to words
@@ -23,76 +26,74 @@
 #   The minimum length is 10.
 
 # For English, a regular pattern starts at twenty
-    NumbersOnes: [
+- NumbersOnes: [
         "nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan",
         "sepuluh", "sebelas", "dua belas", "tiga belas", "empat belas", "lima belas", "enam belas",
         "tujuh belas", "delapan belas", "sembilan belas"
-    ],
+    ]
 
-    NumbersOrdinalOnes: [
+- NumbersOrdinalOnes: [
         "nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan",
         "sepuluh", "sebelas", "dua belas", "tiga belas", "empat belas", "lima belas", "enam belas",
         "tujuh belas", "delapan belas", "sembilan belas"
-    ],
+    ]
 
-    NumbersOrdinalPluralOnes: [
+- NumbersOrdinalPluralOnes: [
         "nol", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan",
         "sepuluh", "sebelas", "dua belas", "tiga belas", "empat belas", "lima belas", "enam belas",
         "tujuh belas", "delapan belas", "sembilan belas"
-    ],
+    ]
 
     # stop when regularity begins
-    NumbersOrdinalFractionalOnes: [
+- NumbersOrdinalFractionalOnes: [
         "pernol", "persatu", "perdua", "pertiga", "perempat", "perlima", "perenam", "pertujuh", "perdelapan", "persembilan", "persepuluh", "persebelas", "perduabelas", "pertigabelas", "perempatbelas", "perlimabelas", "perenambelas", "pertujuhbelas", "perdelapanbelas", "persembilanbelas"
-    ],
+    ]
 
     # stop when regularity begins
-    NumbersOrdinalFractionalPluralOnes: [
+- NumbersOrdinalFractionalPluralOnes: [
         "pernol", "persatu", "perdua", "pertiga", "perempat", "perlima", "perenam", "pertujuh", "perdelapan", "persembilan", "persepuluh", "persebelas", "perduabelas", "pertigabelas", "perempatbelas", "perlimabelas", "perenambelas", "pertujuhbelas", "perdelapanbelas", "persembilanbelas"
-    ],
+    ]
 
 
     # What to use for multiples of 10
-    NumbersTens: [
+- NumbersTens: [
         "", "sepuluh", "dua puluh", "tiga puluh", "empat puluh", "lima puluh", "enam puluh", "tujuh puluh", "delapan puluh", "sembilan puluh"
-    ],
+    ]
 
-    NumbersOrdinalTens: [
+- NumbersOrdinalTens: [
         "", "sepuluh", "dua puluh", "tiga puluh", "empat puluh", "lima puluh", "enam puluh", "tujuh puluh", "delapan puluh", "sembilan puluh"
-    ],
+    ]
 
-    NumbersOrdinalPluralTens: [
+- NumbersOrdinalPluralTens: [
         "", "sepuluh", "dua puluh", "tiga puluh", "empat puluh", "lima puluh", "enam puluh", "tujuh puluh", "delapan puluh", "sembilan puluh"
-    ],
+    ]
 
 
-    NumbersHundreds: ["", "seratus", "dua ratus", "tiga ratus", "empat ratus", "lima ratus",
+- NumbersHundreds: ["", "seratus", "dua ratus", "tiga ratus", "empat ratus", "lima ratus",
         "enam ratus", "tujuh ratus", "delapan ratus", "sembilan ratus"
-    ],
+    ]
 
-    NumbersOrdinalHundreds: ["", "seratus", "dua ratus", "tiga ratus", "empat ratus", "lima ratus",
+- NumbersOrdinalHundreds: ["", "seratus", "dua ratus", "tiga ratus", "empat ratus", "lima ratus",
         "enam ratus", "tujuh ratus", "delapan ratus", "sembilan ratus"
-    ],
+    ]
 
-    NumbersOrdinalPluralHundreds: ["", "seratus", "dua ratus", "tiga ratus", "empat ratus", "lima ratus",
+- NumbersOrdinalPluralHundreds: ["", "seratus", "dua ratus", "tiga ratus", "empat ratus", "lima ratus",
         "enam ratus", "tujuh ratus", "delapan ratus", "sembilan ratus"
-    ],
+    ]
 
 
     # At this point, hopefully the language is regular. If not, code needs to be written
-    NumbersLarge: [
-        "", "ribu", "juta", "miliar", "triliun", "kuadriliun",
-        "quintillion", "sextillion", "septillion", "octillion", "nonillion"
-    ],
-      
-    NumbersOrdinalLarge: [
-        "", "ribu", "juta", "miliar", "triliun", "kuadriliun",
-        "quintillion", "sextillion", "septillion", "octillion", "nonillion"
-    ],
-      
-    NumbersOrdinalPluralLarge: [
+- NumbersLarge: [
         "", "ribu", "juta", "miliar", "triliun", "kuadriliun",
         "quintillion", "sextillion", "septillion", "octillion", "nonillion"
     ]
-
-]
+      
+- NumbersOrdinalLarge: [
+        "", "ribu", "juta", "miliar", "triliun", "kuadriliun",
+        "quintillion", "sextillion", "septillion", "octillion", "nonillion"
+    ]
+      
+- NumbersOrdinalPluralLarge: [
+        "", "ribu", "juta", "miliar", "triliun", "kuadriliun",
+        "quintillion", "sextillion", "septillion", "octillion", "nonillion"
+    ]
