@@ -293,10 +293,10 @@ fn mn_with_space() {
     test("fi", "SimpleSpeak", expr, "1234567");
 }
 
-/// Tests for expressions that appear in the Finnish matriculation exams 
+/// Tests for expressions that appear in the Finnish matriculation exams (FinME)
 
 #[test]
-fn difference_quotinent() {
+fn FinME_difference_quotinent() {
   let expr = "<math>
   <mrow>
     <mrow>
@@ -375,7 +375,7 @@ test("fi", "SimpleSpeak", expr, "iso d f arvolla a; on yhtä suuri kuin, f pilkk
 }
 
 #[test]
-fn Quadratic_equation() {
+fn FinME_Quadratic_equation() {
     let expr ="<math>
     <mi>x</mi>
     <mo>=</mo>
@@ -407,7 +407,7 @@ fn Quadratic_equation() {
 }
 
 #[test]
-fn normal_distribution_e() {
+fn FinME_normal_distribution_e() {
     let expr = "<math>
     <mrow>
       <msup>
@@ -446,7 +446,7 @@ fn normal_distribution_e() {
 }
 
 #[test]
-fn triangle_inequality() {
+fn FinME_triangle_inequality() {
     let expr = "<math>
     <mo>|</mo>
     <mrow>
@@ -480,7 +480,7 @@ fn triangle_inequality() {
 }
 
 #[test]
-fn arithmetic_sum() {
+fn FinME_arithmetic_sum() {
     let expr="<math>
     <msub>
       <mi>a</mi>
@@ -521,4 +521,115 @@ fn arithmetic_sum() {
     ";
     test("fi", "ClearSpeak", expr, "a ala 1 plus a ala 2 plus piste piste piste plus a ala n; on yhtä suuri kuin; n; murtoluku osoittaja; a ala 1 plus a ala 2; ja nimittäjä 2;");
     test("fi", "SimpleSpeak", expr, "a ala 1 plus a ala 2 plus piste piste piste plus a ala n; on yhtä suuri kuin; n; murtoluku, a ala 1 plus a ala 2, per 2, loppu murtoluku;")
+}
+
+#[test]
+fn FinME_geometric_sum() {
+    let expr ="
+    <math>
+      <msub>
+        <mi>S</mi>
+        <mi>n</mi>
+      </msub>
+      <mo>=</mo>
+      <msub>
+        <mi>a</mi>
+        <mn>1</mn>
+      </msub>
+      <mo>+</mo>
+      <msub>
+        <mi>a</mi>
+        <mn>1</mn>
+      </msub>
+      <mo>⁢</mo>
+      <mi>q</mi>
+      <mo>+</mo>
+      <msub>
+        <mi>a</mi>
+        <mn>1</mn>
+      </msub>
+      <mo>⁢</mo>
+      <msup>
+        <mi>q</mi>
+        <mn>2</mn>
+      </msup>
+      <mo>+</mo>
+      <mo>⋯</mo>
+      <mo>+</mo>
+      <msub>
+        <mi>a</mi>
+        <mn>1</mn>
+      </msub>
+      <mo>⁢</mo>
+      <msup>
+        <mi>q</mi>
+        <mrow>
+          <mi>n</mi>
+          <mo>−</mo>
+          <mn>1</mn>
+        </mrow>
+      </msup>
+      <mo>=</mo>
+      <msub>
+        <mi>a</mi>
+        <mn>1</mn>
+      </msub>
+      <mo>⋅</mo>
+      <mfrac>
+        <mrow>
+          <mn>1</mn>
+          <mo>−</mo>
+          <msup>
+            <mi>q</mi>
+            <mi>n</mi>
+          </msup>
+        </mrow>
+        <mrow>
+          <mn>1</mn>
+          <mo>−</mo>
+          <mi>q</mi>
+        </mrow>
+      </mfrac>
+    </math>
+    ";
+    test("fi", "ClearSpeak", expr, "iso s ala n on yhtä suuri kuin; a ala 1 plus a ala 1 q plus a ala 1 q toiseen, plus piste piste piste plus, a ala 1 q potenssiin n miinus 1; on yhtä suuri kuin; a ala 1 kertaa; murtoluku osoittaja; 1 miinus q potenssiin n; ja nimittäjä 1 miinus q;");
+    test("fi", "SimpleSpeak", expr, "iso s ala n on yhtä suuri kuin; a ala 1 plus a ala 1 q plus a ala 1 q toiseen, plus piste piste piste plus, a ala 1 q potenssiin n miinus 1; on yhtä suuri kuin; a ala 1 kertaa; murtoluku, 1 miinus q potenssiin n, per, 1 miinus q, loppu murtoluku;")
+}
+
+
+#[test]
+fn FinME_absolute_value_defition() {
+    let expr ="<math>
+    <mrow>
+      <mo>|</mo>
+      <mi>a</mi>
+      <mo>|</mo>
+    </mrow>
+    <mo>=</mo>
+    <mrow>
+      <mo>{</mo>
+      <mrow>
+        <mtable>
+          <mtr>
+            <mtd>
+              <mrow>
+                <mi>a</mi><mtext>&#x00A0;jos&#x00A0;</mtext><mi>a</mi>
+                <mo>≥</mo><mn>0</mn>
+              </mrow>
+            </mtd>
+          </mtr>
+          <mtr>
+            <mtd>
+              <mrow>
+                <mo>−</mo><mi>a</mi><mtext>&#x00A0;jos&#x00A0;</mtext>
+                <mi>a</mi><mo>&lt;</mo><mn>0</mn>
+              </mrow>
+            </mtd>
+          </mtr>
+        </mtable>
+      </mrow>
+    </mrow>
+  </math>";
+  test("fi", "ClearSpeak", expr, "itseisarvo a; on yhtä suuri kuin; 2 tapausta, tapaus 1; a jos a; on suurempi tai yhtä suuri kuin 0; tapaus 2; negatiivinen a jos a; on pienempi kuin 0;");
+  test("fi", "SimpleSpeak", expr, "itseisarvo a; on yhtä suuri kuin; 2 tapausta, tapaus 1; a jos a; on suurempi tai yhtä suuri kuin 0; tapaus 2; negatiivinen a jos a; on pienempi kuin 0;")
 }
