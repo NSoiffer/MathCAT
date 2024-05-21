@@ -601,7 +601,7 @@
       then: [{x: "*[position()>1]"}]
       else: {x: "*"}
 
-- # handle both log and ln
+- # handle log, lg and ln
   name: ClearSpeak-log
   tag: mrow
   variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
