@@ -380,28 +380,28 @@ fn Quadratic_equation() {
     <mi>x</mi>
     <mo>=</mo>
     <mfrac>
-    <mrow>
-    <mo>−</mo>
-    <mi>b</mi>
-    <mi>±</mi>
-    <msqrt>
-    <msup>
-    <mi>b</mi>
-    <mn>2</mn>
-    </msup>
-    <mo>−</mo>
-    <mn>4</mn>
-    <mi>a</mi>
-    <mi>b</mi>
-    </msqrt>
-    </mrow>
-    <mrow>
-    <mn>2</mn>
-    <mn>a</mn>
-    </mrow>
+      <mrow>
+        <mo>−</mo>
+        <mi>b</mi>
+        <mi>±</mi>
+        <msqrt>
+          <msup>
+            <mi>b</mi>
+            <mn>2</mn>
+          </msup>
+          <mo>−</mo>
+          <mn>4</mn>
+          <mi>a</mi>
+          <mi>b</mi>
+        </msqrt>
+      </mrow>
+      <mrow>
+        <mn>2</mn>
+        <mn>a</mn>
+      </mrow>
     </mfrac>
-    </math>
-    ";
+  </math>
+  ";
     test("fi", "ClearSpeak", expr ,"x on yhtä suuri kuin; murtoluku osoittaja; negatiivinen b plus-miinus; neliöjuuri b toiseen miinus 4 a b; ja nimittäjä 2 a;");
     test("fi", "SimpleSpeak", expr, "x on yhtä suuri kuin; murtoluku, negatiivinen b plus-miinus; neliöjuuri b toiseen miinus 4 a b loppu juuri; per, 2 a, loppu murtoluku;")
 }
@@ -448,16 +448,15 @@ fn normal_distribution_e() {
 #[test]
 fn triangle_inequality() {
     let expr = "<math>
-    
     <mo>|</mo>
     <mrow>
-    <mo>|</mo>
-    <mi>a</mi>
-    <mo>|</mo>
-    <mo>-</mo>
-    <mo>|</mo>
-    <mi>b</mi>
-    <mo>|</mo>
+      <mo>|</mo>
+      <mi>a</mi>
+      <mo>|</mo>
+      <mo>-</mo>
+      <mo>|</mo>
+      <mi>b</mi>
+      <mo>|</mo>
     </mrow>
     <mo>|</mo>
     <mo>≤</mo>
@@ -474,8 +473,52 @@ fn triangle_inequality() {
     <mo>|</mo>
     <mi>b</mi>
     <mo>|</mo>
-    </math>
+  </math>
     ";
     test("fi", "ClearSpeak", expr, "itseisarvo itseisarvo a, miinus itseisarvo b; on pienempi tai yhtä suuri kuin; itseisarvo a plus b; on pienempi tai yhtä suuri kuin; itseisarvo a, plus itseisarvo b,");
     test("fi", "SimpleSpeak", expr, "itseisarvo itseisarvo a, miinus itseisarvo b; loppu itseisarvo; on pienempi tai yhtä suuri kuin; itseisarvo a plus b, loppu itseisarvo; on pienempi tai yhtä suuri kuin; itseisarvo a, plus itseisarvo b,");
+}
+
+#[test]
+fn arithmetic_sum() {
+    let expr="<math>
+    <msub>
+      <mi>a</mi>
+      <mn>1</mn>
+    </msub>
+    <mo>+</mo>
+    <msub>
+      <mi>a</mi>
+      <mn>2</mn>
+    </msub>
+    <mo>+</mo>
+    <mo>⋯</mo>
+    <mo>+</mo>
+    <msub>
+      <mi>a</mi>
+      <mi>n</mi>
+    </msub>
+    <mo>=</mo>
+    <mrow>
+      <mi>n</mi>
+      <mo>⁢</mo>
+      <mfrac>
+        <mrow>
+          <msub>
+            <mi>a</mi>
+            <mn>1</mn>
+          </msub>
+          <mo>+</mo>
+          <msub>
+            <mi>a</mi>
+            <mn>2</mn>
+          </msub>
+        </mrow>
+        <mn>2</mn>
+      </mfrac>
+    </mrow>
+  </math>
+    ";
+    test("fi", "ClearSpeak", expr, "a ala 1 plus a ala 2 plus piste piste piste plus a ala n; on yhtä suuri kuin; n; murtoluku osoittaja; a ala 1 plus a ala 2; ja nimittäjä 2;");
+    test("fi", "SimpleSpeak", expr, "a ala 1 plus a ala 2 plus piste piste piste plus a ala n; on yhtä suuri kuin; n; murtoluku, a ala 1 plus a ala 2, per 2, loppu murtoluku;")
 }
