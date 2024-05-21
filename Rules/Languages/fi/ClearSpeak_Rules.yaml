@@ -616,7 +616,7 @@
       - if: "*[1][text()='log']"
         then: [{T: "log"}]      # phrase(the 'log' of x)
       - else_if: "*[1][text()='lg']"
-        then: [{SPELL: 'lg'}] # phrase(the 'lg' of x)
+        then: [{SPELL: "'lg'"}] # phrase(the 'lg' of x)
       - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
         then: [{T: "luonnollinen log"}]      # phrase(the 'natural log' of the product of 2 numbers)
         else: [{SPELL: "'ln'"}]
