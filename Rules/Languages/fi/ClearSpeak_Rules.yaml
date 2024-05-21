@@ -607,7 +607,7 @@
   variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
   match:
   - "count(*)=3 and"
-  - "*[1][self::m:mi][text()='log' or text()='ln' or text()='lg'] and"
+  - "*[1][self::m:mi][text()='log' or text()='lg' or text()='ln'] and"
   - "*[2][self::m:mo][text()='⁡']"
   replace:
   - test:
