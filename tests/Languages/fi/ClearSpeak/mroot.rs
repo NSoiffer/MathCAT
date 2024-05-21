@@ -115,6 +115,15 @@ fn mroot_simple_pos_end_root() {
 fn mroot_simple_end_root() {
     let expr = "<math>
                     <mroot> <mrow> <mi>x</mi> <mo>+</mo> <mi>y</mi> </mrow> 
+                    <mn>5</mn></mroot>
+                </math>";
+    test_ClearSpeak("fi", "ClearSpeak_Roots", "RootEnd", expr, "viides juuri x plus y, loppu juuri;");
+}
+
+#[test]
+fn mroot_above_20_simple_end_root() {
+    let expr = "<math>
+                    <mroot> <mrow> <mi>x</mi> <mo>+</mo> <mi>y</mi> </mrow> 
                     <mn>21</mn></mroot>
                 </math>";
     test_ClearSpeak("fi", "ClearSpeak_Roots", "RootEnd", expr, "21 juuri x plus y, loppu juuri;");
