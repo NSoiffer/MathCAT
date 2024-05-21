@@ -86,13 +86,16 @@ fn simple_log() {
 #[test]
 fn normal_log() {
     let expr = "<math><mrow><mi>log</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("fi", "ClearSpeak", expr, "logaritmi arvolla, auki sulku x plus y, kiinni sulku");
+    test("fi", "ClearSpeak", expr, "log arvolla, auki sulku x plus y, kiinni sulku");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
+            "logaritmi arvolla, auki sulku x plus y, kiinni sulku");
 }
 
 #[test]
 fn simple_log_with_base() {
     let expr = "<math> <mrow>  <msub><mi>log</mi><mi>b</mi></msub><mi>x</mi></mrow> </math>";
     test("fi", "ClearSpeak", expr, "log kanta b arvolla x");
+    
 }
 
 #[test]
@@ -111,8 +114,23 @@ fn simple_ln() {
 fn normal_ln() {
     let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
     test("fi", "ClearSpeak", expr, "l n arvolla, auki sulku x plus y, kiinni sulku");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
+            "luonnollinen logaritmi arvolla, auki sulku x plus y, kiinni sulku");
 }
 
+#[test]
+fn simple_lg() {
+    let expr = "<math> <mrow>  <mi>lg</mi><mi>x</mi></mrow> </math>";
+    test("fi", "ClearSpeak", expr, "l g x");
+}
+
+#[test]
+fn normal_lg() {
+    let expr = "<math><mrow><mi>lg</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
+    test("fi", "ClearSpeak", expr, "l g arvolla, auki sulku x plus y, kiinni sulku");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
+            "kymmenkantainen logaritmi arvolla, auki sulku x plus y, kiinni sulku");
+}
     
 #[test]
 fn simple_natural_log() {
@@ -127,6 +145,7 @@ fn natural_log() {
     let expr = "<math><mi>ln</mi><mo>(</mo><mi>x</mi><mo>+</mo><mi>y</mi><mo>)</mo></math>";
     test_ClearSpeak("fi", "ClearSpeak_Log", "LnAsNaturalLog",expr,
         "luonnollinen logaritmi arvolla, auki sulku x plus y, kiinni sulku");
+        
 }
 
 
@@ -164,7 +183,7 @@ fn test_functions_none_pref() {
     <mi>f</mi><mo>&#x2061;</mo><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("fi", "ClearSpeak_Functions", "None",expr,
-        "logaritmi arvolla, auki sulku x plus y, kiinni sulku; plus, f kertaa, auki sulku x plus y, kiinni sulku");
+        "log arvolla, auki sulku x plus y, kiinni sulku; plus, f kertaa, auki sulku x plus y, kiinni sulku");
 }
 
 #[test]
