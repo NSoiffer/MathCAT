@@ -638,7 +638,7 @@
             - if: "$Verbosity='Verbose'"
               then: [{T: "kymmenkantainen logaritmi"}]
               else: [{SPELL: "'lg'"}]
-        - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
+        - else_if: $ClearSpeak_Log = 'LnAsNaturalLog' or $Verbosity='Verbose'
           then: [{T: "luonnollinen logaritmi"}]      # phrase(the 'natural log' of x)
           else: [{SPELL: "'ln'"}]
       - T: "arvolla"      # phrase(the natural log 'of' x)
