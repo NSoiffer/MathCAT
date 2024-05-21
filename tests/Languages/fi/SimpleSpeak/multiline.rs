@@ -12,25 +12,25 @@ fn case_1() {
             <mtr>
                 <mtd>
                 <mrow>
-                <mo>&#x2212;</mo><mn>1</mn><mtext>&#x00A0;if&#x00A0;</mtext><mi>x</mi><mo>&#x003C;</mo><mn>0</mn></mrow>
+                <mo>&#x2212;</mo><mn>1</mn><mtext>&#x00A0;jos&#x00A0;</mtext><mi>x</mi><mo>&#x003C;</mo><mn>0</mn></mrow>
                 </mtd>
             </mtr>
             <mtr>
                 <mtd>
                 <mrow>
-                <mn>0</mn><mtext>&#x00A0;if&#x00A0;</mtext><mi>x</mi><mo>=</mo><mn>0</mn></mrow>
+                <mn>0</mn><mtext>&#x00A0;jos&#x00A0;</mtext><mi>x</mi><mo>=</mo><mn>0</mn></mrow>
                 </mtd>
             </mtr>
             <mtr>
                 <mtd>
                 <mrow>
-                <mn>1</mn><mtext>&#x00A0;if&#x00A0;</mtext><mi>x</mi><mo>&#x003E;</mo><mn>0</mn></mrow>
+                <mn>1</mn><mtext>&#x00A0;jos&#x00A0;</mtext><mi>x</mi><mo>&#x003E;</mo><mn>0</mn></mrow>
                 </mtd>
             </mtr>
             </mtable></mrow> </mrow></mrow>
         </math>
    ";
-    test("fi", "SimpleSpeak", expr, "f arvolla x, on yhtä suuri kuin; 3 tapausta, tapaus 1; negatiivinen 1 if x; on pienempi kuin 0; tapaus 2; 0 if x, on yhtä suuri kuin 0; tapaus 3; 1 if x, on suurempi kuin 0;");
+    test("fi", "SimpleSpeak", expr, "f arvolla x, on yhtä suuri kuin; 3 tapausta, tapaus 1; negatiivinen 1 jos x; on pienempi kuin 0; tapaus 2; 0 jos x, on yhtä suuri kuin 0; tapaus 3; 1 jos x, on suurempi kuin 0;");
 }
 
 #[test]
