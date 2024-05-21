@@ -72,7 +72,21 @@ fn simple_log() {
 #[test]
 fn normal_log() {
     let expr = "<math><mrow><mi>log</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("fi", "SimpleSpeak", expr, "logaritmi, auki sulku x plus y, kiinni sulku");
+    test("fi", "SimpleSpeak", expr, "log, auki sulku x plus y, kiinni sulku");
+}
+
+#[test]
+fn simple_lg() {
+    let expr = "<math> <mrow>  <mi>lg</mi><mi>x</mi></mrow> </math>";
+    test("fi", "SimpleSpeak", expr, "kymmenkantainen logaritmi x");
+    test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "l g x");
+}
+
+#[test]
+fn normal_lg() {
+    let expr = "<math><mrow><mi>lg</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
+    test("fi", "SimpleSpeak", expr, "l g, auki sulku x plus y, kiinni sulku");
+    test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "l g, auki x plus y kiinni");
 }
 
 #[test]
