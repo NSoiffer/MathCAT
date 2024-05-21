@@ -144,7 +144,7 @@
   - test:
       if: "*[2][text()=2]"
       then: {T: "neliö"}      # phrase(5 'squared' equals 25)
-      else: {T: "kuutio"}      # phrase(5 'cubed' equals 125)
+      else: {T: "kolmanteen"}      # phrase(5 'cubed' equals 125)
 
 # FI: This grammar doesn't work in Finnish so commented out
 # - name: function-power
@@ -174,7 +174,7 @@
   - test:
       if: "*[2][text()=2]"
       then: {T: "neliö"}      # phrase(5 'squared' equals 25)
-      else: {T: "kuutio"}      # phrase(5 'cubed' equals 125)
+      else: {T: "kolmanteen"}      # phrase(5 'cubed' equals 125)
 
 # FI: toOrdinal isn't natural in Finnish in this form, so commented out. If there was more sophisticated conjugation on other words, it could work.
 # - name: simple-integer

@@ -500,7 +500,7 @@
       - if: "*[2][text()=2]"
         then: [T: "neliö"]     
       - else_if: "*[2][text()=3]"
-        then: [T: "kuutio"]
+        then: [T: "kolmanteen"]
         else:  # don't bother with special cases as this isn't likely to happen
         - T: "potenssiin"      # phrase(x 'raised to the' second power)
         - x: "*[2]"

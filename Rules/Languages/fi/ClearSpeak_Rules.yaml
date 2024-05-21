@@ -248,7 +248,7 @@
       if: "*[2][text()='2']"
       # better way?
       then: {T: "neliö"}      # phrase(25 equals 5 'squared')
-      else: {T: "kuutio"}      # phrase(625 equals 5 'cubed')
+      else: {T: "kolmanteen"}      # phrase(625 equals 5 'cubed')
 
 # FI: this grammar doesn't work in Finnish, so commented out
 # - name: function-power
@@ -304,7 +304,7 @@
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
-  - T: "kuutio"      # phrase(5 'cubed' equals 125)
+  - T: "kolmanteen"      # phrase(5 'cubed' equals 125)
 
 # FI: this needs refactoring, maybe just simplifying?
 - name: simple-integer
