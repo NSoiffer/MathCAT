@@ -47,7 +47,7 @@ fn trig_squared() {
 #[test]
 fn trig_cubed() {
     let expr = "<math><msup><mi>tan</mi><mn>3</mn></msup><mi>x</mi></math>";
-    test("fi", "SimpleSpeak", expr, "tangentti kuutio arvolla x");
+    test("fi", "SimpleSpeak", expr, "tangentti kolmanteen arvolla x");
 }
 
 #[test]

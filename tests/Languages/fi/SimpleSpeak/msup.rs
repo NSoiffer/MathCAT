@@ -16,7 +16,7 @@ fn cubed() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>3</mn> </msup>
                 </math>";
-    test("fi", "SimpleSpeak", expr, "x kuutio");
+    test("fi", "SimpleSpeak", expr, "x kolmanteen");
 }
 
 #[test]
@@ -139,7 +139,7 @@ fn nested_cubed_power() {
       </msup>
     </msup>
   </math>";
-  test("fi", "SimpleSpeak", expr, "y potenssiin 4 viidesosaa kuutio");
+  test("fi", "SimpleSpeak", expr, "y potenssiin 4 viidesosaa kolmanteen");
 }
 
 #[test]
@@ -156,7 +156,7 @@ fn nested_cubed_power_with_neg_base() {
         </mrow>
     </msup>
     </math>";
-  test("fi", "SimpleSpeak", expr, "y potenssiin negatiivinen 4 viidesosaa kuutio");
+  test("fi", "SimpleSpeak", expr, "y potenssiin negatiivinen 4 viidesosaa kolmanteen");
 }
 
 #[test]

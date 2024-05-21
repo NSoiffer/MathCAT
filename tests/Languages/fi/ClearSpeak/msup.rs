@@ -20,7 +20,7 @@ fn cubed() {
   let expr = "<math>
                   <msup> <mi>x</mi> <mn>3</mn> </msup>
               </math>";
-  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "x kuutio");
+  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "x kolmanteen");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "x potenssiin 3");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "x potenssiin 3");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "x potenssiin 3,");
@@ -159,7 +159,7 @@ fn nested_cubed_power() {
       </msup>
     </msup>
   </math>";
-  test("fi", "ClearSpeak", expr, "y potenssiin 4 viidesosaa kuutio");
+  test("fi", "ClearSpeak", expr, "y potenssiin 4 viidesosaa kolmanteen");
 }
 
 #[test]
@@ -176,7 +176,7 @@ fn nested_cubed_power_with_neg_base() {
         </mrow>
     </msup>
     </math>";
-  test("fi", "ClearSpeak", expr, "y potenssiin negatiivinen 4 viidesosaa kuutio");
+  test("fi", "ClearSpeak", expr, "y potenssiin negatiivinen 4 viidesosaa kolmanteen");
 }
 
 #[test]
