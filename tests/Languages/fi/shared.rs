@@ -633,3 +633,134 @@ fn FinME_absolute_value_defition() {
   test("fi", "ClearSpeak", expr, "itseisarvo a; on yhtä suuri kuin; 2 tapausta, tapaus 1; a jos a; on suurempi tai yhtä suuri kuin 0; tapaus 2; negatiivinen a jos a; on pienempi kuin 0;");
   test("fi", "SimpleSpeak", expr, "itseisarvo a; on yhtä suuri kuin; 2 tapausta, tapaus 1; a jos a; on suurempi tai yhtä suuri kuin 0; tapaus 2; negatiivinen a jos a; on pienempi kuin 0;")
 }
+
+#[test]
+fn FinME_mroot_msup_rule() {
+    let expr = "<math>
+    <mrow>
+      <msup>
+        <mi>a</mi>
+        <mfrac>
+          <mi>m</mi>
+          <mi>n</mi>
+        </mfrac>
+      </msup>
+      <mo>=</mo>
+      <mroot>
+        <msup>
+          <mi>a</mi>
+          <mi>m</mi>
+        </msup>
+        <mi>n</mi>
+      </mroot>
+      <mo>=</mo>
+      <mo>(</mo>
+      <mroot>
+        <mi>a</mi>
+        <mi>n</mi>
+      </mroot>
+      <msup>
+        <mo>)</mo>
+        <mi>m</mi>
+      </msup>
+    </mrow>
+  </math>";
+  test("fi", "ClearSpeak", expr, "a potenssiin m per n, on yhtä suuri kuin, nnes juuri a potenssiin m; on yhtä suuri kuin; auki sulku nnes juuri a; kiinni sulku potenssiin m");
+  test("fi", "SimpleSpeak", expr, "a potenssiin m per n; on yhtä suuri kuin, nnes juuri a potenssiin m loppu juuri; on yhtä suuri kuin; auki sulku nnes juuri a; kiinni sulku potenssiin m")
+}
+
+#[test]
+fn FinME_newton_binomial() {
+    let expr = "<math>
+    <mrow>
+      <msup>
+        <mrow>
+          <mo>(</mo>
+          <mi>a</mi>
+          <mo>+</mo>
+          <mi>b</mi>
+          <mo>)</mo>
+        </mrow>
+        <mi>n</mi>
+      </msup>
+      <mo>=</mo>
+      <mrow>
+        <munderover>
+          <mo>∑</mo>
+          <mrow>
+            <mi>k</mi>
+            <mo>=</mo>
+            <mn>0</mn>
+          </mrow>
+          <mi>n</mi>
+        </munderover>
+      </mrow>
+      <mrow>
+      <mo>(</mo>
+        <mfrac linethickness='0'>
+          <mi>n</mi>
+          <mi>k</mi>
+        </mfrac>
+        <mo>)</mo>
+      </mrow>
+      <mo>&#8290;</mo>
+      <msup>
+        <mi>a</mi>
+        <mrow>
+          <mi>n</mi>
+          <mo>−</mo>
+          <mi>k</mi>
+        </mrow>
+      </msup>
+      <mo>&#8290;</mo>
+      <msup>
+        <mi>b</mi>
+        <mi>k</mi>
+      </msup>
+      <mo>=</mo>
+      <mrow>
+        <munderover>
+          <mo>∑</mo>
+          <mrow>
+            <mi>k</mi>
+            <mo>=</mo>
+            <mn>0</mn>
+          </mrow>
+          <mi>n</mi>
+        </munderover>
+      </mrow>
+      <mfrac>
+        <mrow>
+          <mi>n</mi>
+          <mo>!</mo>
+        </mrow>
+        <mrow>
+          <mi>k</mi>
+          <mo>!</mo>
+          <mo>(</mo>
+          <mi>n</mi>
+          <mo>−</mo>
+          <mi>k</mi>
+          <mo>)</mo>
+          <mo>!</mo>
+        </mrow>
+      </mfrac>
+      <mo>&#8290;</mo>
+      <msup>
+        <mi>a</mi>
+        <mrow>
+          <mi>n</mi>
+          <mo>−</mo>
+          <mi>k</mi>
+        </mrow>
+      </msup>
+      <mo>&#8290;</mo>
+      <msup>
+        <mi>b</mi>
+        <mi>k</mi>
+      </msup>
+    </mrow>
+  </math>";
+  test("fi", "ClearSpeak", expr, "auki sulku a plus b, kiinni sulku potenssiin n; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; n yli k a potenssiin n miinus k, b potenssiin k; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; murtoluku osoittaja; n kertoma; ja nimittäjä k kertoma, auki sulku n miinus k, kiinni sulku; kertoma;, a potenssiin n miinus k, b potenssiin k");
+  test("fi", "SimpleSpeak", expr, "auki sulku a plus b, kiinni sulku potenssiin n; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; n yli k a potenssiin n miinus k, b potenssiin k; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; murtoluku, n kertoma, per, k kertoma, auki sulku n miinus k, kiinni sulku; kertoma, loppu murtoluku;, a potenssiin n miinus k, b potenssiin k")
+}
