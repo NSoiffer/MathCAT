@@ -53,9 +53,10 @@ pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow_mut();
         let mut prefs = rules.pref_manager.borrow_mut();
-        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
-        prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
-        prefs.set_user_prefs("Verbosity", "Medium");
+        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "").unwrap();         // makes testing simpler
+        prefs.set_user_prefs("PauseFactor", "100").unwrap();                         // makes testing simpler
+        prefs.set_user_prefs("Verbosity", "Medium").unwrap();
+        prefs.set_user_prefs("Impairment", "Blindness").unwrap();
     });
 
     set_preference("Language".to_string(), language.to_string()).unwrap();
@@ -72,9 +73,9 @@ pub fn test_prefs(language: &str, speech_style: &str, test_prefs: Vec<(&str, &st
     libmathcat::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow_mut();
         let mut prefs = rules.pref_manager.borrow_mut();
-        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "");         // makes testing simpler
-        prefs.set_user_prefs("PauseFactor", "100");                         // makes testing simpler
-        prefs.set_user_prefs("Verbosity", "Medium");
+        prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "").unwrap();         // makes testing simpler
+        prefs.set_user_prefs("PauseFactor", "100").unwrap();                         // makes testing simpler
+        prefs.set_user_prefs("Verbosity", "Medium").unwrap();
     });
 
     set_preference("Language".to_string(), language.to_string()).unwrap();
@@ -107,9 +108,11 @@ pub fn test_ClearSpeak_prefs(language: &str, prefs: Vec<(&str, &str)>, mathml: &
 #[allow(non_snake_case)]
 pub fn test_braille(code: &str, mathml: &str, braille: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
+    set_preference("BrailleNavHighlight".to_string(), "Off".to_string()).unwrap();
     set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
+    set_preference("LaTeX_UseShortName".to_string(), "false".to_string()).unwrap();
     // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically
-    log::debug!("\nsetting Language");
+    // log::debug!("\nsetting Language");
     match code {
         "Vietnam" => set_preference("Language".to_string(), "vi".to_string()).unwrap(),
         "CMU" => set_preference("Language".to_string(), "es".to_string()).unwrap(),
@@ -123,3 +126,31 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
         Err(e) => panic!("{}", errors_to_string(&e)),
     };    
 }
+
+#[allow(dead_code)]     // used in testing
+pub fn test_braille_prefs(code: &str, test_prefs: Vec<(&str, &str)>, mathml: &str, braille: &str) {
+    set_rules_dir(abs_rules_dir_path()).unwrap();
+    set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
+
+    // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically
+    // log::debug!("\nsetting Language");
+    match code {
+        "Vietnam" => set_preference("Language".to_string(), "vi".to_string()).unwrap(),
+        "CMU" => set_preference("Language".to_string(), "es".to_string()).unwrap(),
+        "UEB" | "Nemeth" | _ => set_preference("Language".to_string(), "en".to_string()).unwrap(),
+    }
+
+    set_preference("UEB_UseSpacesAroundAllOperators".to_string(), "false".to_string()).unwrap();         // makes testing simpler
+    for (pref_name, pref_value) in test_prefs.clone() {
+        set_preference(pref_name.to_string(), pref_value.to_string()).unwrap();
+    };
+
+    if let Err(e) = set_mathml(mathml.to_string()) {
+        panic!("{}", errors_to_string(&e));
+    };
+    match get_braille("".to_string()) {
+        Ok(result) => assert_eq!(braille, &result),
+        Err(e) => panic!("{}", errors_to_string(&e)),
+    };    
+}
+

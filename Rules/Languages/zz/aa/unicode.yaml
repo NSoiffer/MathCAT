@@ -1,0 +1,7 @@
+---
+- include: "../unicode.yaml"
+# change value
+- "+": [t: "aa plus"]               # 0x2b
+
+# additional value
+- ",": [t: "aa comma"]              # 0x2b

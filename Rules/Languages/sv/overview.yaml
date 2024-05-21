@@ -30,22 +30,22 @@
       if: "IsNode(*[1], 'simple') and IsNode(*[2], 'simple')"
       then:
       - x: "*[1]"
-      - t: "over"
+      - T: "genom"
       - x: "*[2]"
       else:
-      - t: "fraction"
+      - T: "bråk"
 
 - name: default
   tag: msqrt
   match: "."
   replace:
-  - t: "square root"
+  - T: "roten"
   - test:
       if: "IsNode(*[1], 'simple')"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "of"}
+          then: {T: "ur"}
       - x: "*[1]"
 
 - name: default
@@ -56,25 +56,20 @@
       if: "*[2][self::m:mn]"
       then_test:
       - if: "*[2][text()='2']"
-        then: {t: "square root"}
+        then: {T: "kvadratroten"}
       - else_if: "*[2][text()='3']"
-        then: {t: "cube root"}
-      - else_if: "*[2][not(contains(., '.'))]"
-        then: [{x: "ToOrdinal(*[2])"}, {t: "root"}]
+        then: {T: "kubikroten"}
+      - else_if: "*[2][not(contains(., ','))]"
+        then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]
       else:
-      - test:
-          if: "*[2][self::m:mi][string-length(.)=1]"
-          then:
-          - x: "*[2]"
-          - pronounce: [{text: "-th"}, {ipa: "θ"}, {sapi5: "th"}, {eloquence: "T"}]
-          else: {x: "*[2]"}
-      - t: "root"
+      - T: "roten av grad"
+      - x: "*[2]"
   - test:
       if: "IsNode(*[1], 'simple')"
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: {t: "of"}
+          then: {T: "ur"}
       - x: "*[1]"
 
 - name: default
@@ -83,24 +78,22 @@
   - "*[2][self::m:mtable] and"
   - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
   replace:
-  - t: "the"
   - x: count(*[2]/*)
-  - t: "by"
+  - T: "gånger"
   - x: count(*[2]/*[self::m:mtr][1]/*)
   - test:
       if: "*[1][text()='|']" # just need to check the first bracket since we know it must be (, [, or |
-      then: {t: "determinant"}
-      else: {t: "matrix"}
+      then: {T: "determinant"}
+      else: {T: "matris"}
 
 - name: default
   tag: mtable
   match: "."
   replace:
-  - t: "the"
   - x: count(*[2]/*)
-  - t: "by"
+  - T: "gånger"
   - x: count(*[2]/*[self::m:mtr][1]/*)
-  - t: "table"
+  - T: "tabell"
 
 - name: short-mrow
   tag: mrow
@@ -124,6 +117,6 @@
   - pause: auto
   - x: "*[5]"
   - pause: auto
-  - t: "and so on"
+  - T: "och så vidare"
 
 - include: "SimpleSpeak_Rules.yaml"

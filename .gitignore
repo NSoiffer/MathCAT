@@ -30,6 +30,7 @@ PythonScripts/encrypt.py
 PythonScripts/intent-coverage.py
 PythonScripts/PythonScripts.zip
 PythonScripts/google-defs.yaml
+BrailleDocs
 
 src/errors.rs
 src/pattern.pest

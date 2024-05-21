@@ -7,7 +7,7 @@ This page is a work-in-progress.
 If you plan to work on MathCAT development, you need to make use of github:
 1. Fork the MathCAT repo at `github.com/NSoiffer/MathCAT`
 2. Clone the the forked copy so you have a local copy to work on.
-3. Checkout the "translation" branch and work in that branch.
+3. Checkout the branch I create for your work (typically the country code for your translation) and work in that branch.
 
 If you are unfamiliar with these steps, a simple search will turn up lots of places that describe how to do them. They are simple, so don't get put off by your unfamiliarity.
 
@@ -19,13 +19,16 @@ If you are a translator, please contact @NSoiffer and he will set up an initial 
 into `ClearSpeak_Rules.yaml` and `SimpleSpeak_Rules.yaml`. They need to be translated also.
 <br/>
 <br/>
+Note: The MathCAT settings dialog looks for files named `XXX_Rules.yaml` and adds them to pull down menu for the language. You don't need to use the SimpleSpeak and ClearSpeak names. If you only want to do one translation (e.g, SimpleSpeak), but don't want to delete `ClearSpeak_Rules.yaml` rename it to something like `ClearSpeak_Rules.yaml.untranslated`.
+<br/>
+<br/>
 These files have auto-generated initial translations. Even though they are translated, `t:` (see below) is used, not the upper case `T:`. This is because each translation should be verified to be correct and when verified, then change to the uppercase version.
 See below for more comments about the auto translations.
 
     * In some languages it doesn't make sense to says "_the_ square root of x" (and maybe "of"). If that is the case, just change those to empty strings.
     * Some languages, the word order changes -- feel free to move the words around, but pay attention to the indentation.
     Indentation is meaningful in YAML. 
-    * In some languages, you may want to add words that aren't in the English version, perhaps before or after existing phrases. Feel free to add them -- they can be added in only certain cases if needed. Please contact @NSoiffer if you need help with this.
+    * In some languages, you may want to add words that aren't in the English version, perhaps before or after existing phrases. Feel free to add them -- they can be conditionally added using `test` if needed. Please contact @NSoiffer if you need help with this.
     * Pausing between words/phrases can greatly help make understandable. The pausing is choosen based on English. You should adjust pauses based on what sounds good in speech synthesizers for your language. It is very simple to add, remove, or change the amount of pauses. All pauses are scaled to the current speech rate.
 3. The unicode files (`unicode.yaml` and `unicode-full.yaml`). These contain characters like `<` and `∫`.
     * You should start with translating `unicode.yaml`. These represent the vast majority of math symbols used. Currently the list is based on experience as to which are the most commonly used Unicode symbols, but I plan to make use of statistics from actual books to refine the list even further. There are about 270 characters to translate in `unicode.yaml`, although ~50 of them are Greek letters (which is hopefully simple).
@@ -100,25 +103,48 @@ Translating the settings dialog: this is a separate process from translating the
 
 ### Automatic tests for your translation
 Testing is very important! MathCAT is written in Rust and has a large number of automated tests. These tests take advantage of the builtin Rust test system. Hence, to write and verify your own tests, you need to [download and install Rust](https://www.rust-lang.org/tools/install). You do not need to know Rust -- you will simply change some strings from what they are in English to what you think they should be in your language.
-In the `tests\Languages` directory, there is a file `en.rs` and a directory `en`. For the sake of discussion, let's assume you are doing a French translation, then your country code is `fr`.
+
+For the sake of discussion, let's assume you are doing a French translation, then your country code is `fr`.
+
+To start, in the tests directory, open `languages.rs` and add the line `mod fr;` after `mod en;` or any other similar line for a different language.
+
+In the `tests\Languages` directory, there is a file `en.rs` and a directory `en`. 
 1. Copy `en.rs` to `fr.rs`.
 2. Copy the `en` directory to `fr`.
 3. If you only choose one speech style (e.g., "SimpleSpeak), edit `fr.rs` and remove the lines starting `mod ClearSpeak {` all the way down to the matching `}`. In the `fr` directory, remove the subdirectory `ClearSpeak`.
-4. Start editing the files, first doing a global change of `en` to `fr` and then replacing the English string with the appropriate French (or whatever language you added) string.
+4. Although it is good translate all the files, it is probably ok to just translate a few of them, especially at the start. In `fr.rs`, comment out any untranslated file by adding `//` in front of the untranslated files. E.g., if you didn't translate the SimpleSpeak file `geometry.yaml`, then the line should look like `// mod geometry;`
+5. Start editing the files, first doing a global change of `"en"` to `"fr"` and then replacing the English string with the appropriate French (or whatever language you added) string.
+
+An example of a test is
+```
+#[test]
+fn common_fraction_half() {
+    let expr = "<math>
+                    <mfrac> <mn>1</mn> <mn>2</mn> </mfrac>
+                </math>";
+    test("en", "SimpleSpeak", expr, "1 half");
+}
+```
+For French, the "test" line would change to:
+```
+    test("fr", "SimpleSpeak", expr, "un demi");
+```
 
 Now that you have some tests translated, try running the automated tests.
 As a check that everything is set up properly, verify that the English version of the tests are working
 ```
-cargo test en
+cargo test Languages::en
 ```
 If that is working, try your tests. Again assuming your created a `fr` version:
 ```
-cargo test fr
+cargo test Languages::fr
 ```
 MathCAT adds pausing in places and in the test strings, these appear as `,` and `;`. You may need to adjust your expected output by adding or removing those. If those pauses seem inappropriate, you will need to add or remove `pause: xxx` from the appropriate place in the one of the `Rules\fr` files.
 
+__A suggestion__: it might be fastest if you run the tests in your language before changing the expected output. All the tests will fail but you will see failure messages that show the speech that MathCAT generated (in your language). _If it is correct_, simply copy it in place of the English. Once you've done that for all the "errors", rerun the tests and hopefully there won't be anymore errors.
 
 
+### Keeping the translation up-to-date
 To be written...
 
 I hope to eventually have a tool that will
@@ -141,7 +167,7 @@ For both UEB and Nemeth, some cleanup code needed to be written in Rust. If you 
 
 To try out your braille translation, you can do so immediately. Please see the instructions above for doing a language translation where it instructs on copying the files to `%AppData%\nvda\addons\MathCAT\globalPlugins\MathCAT\Rules\Languages`. Change languages to `Braille` and most things will be the same.
 
-For automated testing, the instructions above should be followed. The current tests are taken from braille guides for Nemeth/UEB, and you may want to do the same. Unlikely for a language translation, use `test_braille` as is done for Nemeth/UEB.
+For automated testing, the instructions above should be followed. The current tests are taken from braille guides for Nemeth/UEB, and you may want to do the same. See the tests in the Nemeth or UEB directories for examples of what braille tests look like.
 
 ## Understanding MathCAT Error Message
 If there is a problem with a rule that causes an error, these print to the terminal console if you are running MathCAT directly or to NVDA's log if you are using NVDA.

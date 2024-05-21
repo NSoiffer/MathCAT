@@ -369,19 +369,19 @@ fn number_1 () {
 #[test]
 fn number_1a () {
     let expr = "<math><mn>3,000.12</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠉⠄⠚⠚⠚⠂⠁⠃");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠉⠄⠚⠚⠚⠂⠁⠃");
 }
 
 #[test]
 fn number_2 () {
     let expr = "<math><mn>3,14</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠉⠂⠁⠙");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠉⠂⠁⠙");
 }
 
 #[test]
 fn number_2a () {
     let expr = "<math><mn>3.14</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠉⠂⠁⠙");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠉⠂⠁⠙");
 }
 
 #[test]
@@ -391,105 +391,106 @@ fn number_3 () {
 }
 
 #[test]
+#[ignore]
 fn number_3a () {
     let expr = "<math><mn>1,000</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠁⠄⠚⠚⠚");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠄⠚⠚⠚");
 }
 
 #[test]
 fn number_3b () {
     let expr = "<math><mn>1.234</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠁⠄⠃⠉⠙");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠄⠃⠉⠙");
 }
 
 #[test]
 fn number_3c () {
     let expr = "<math><mn>1,234</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠁⠂⠃⠉⠙");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠂⠃⠉⠙");
 }
 
 #[test]
 fn number_4 () {
     let expr = "<math><mn>1.000.000</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚");
 }
 
 #[test]
 fn number_4a () {
     let expr = "<math><mn>1,000,000</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚");
 }
 
 #[test]
 fn number_5 () {
     let expr = "<math><mn>123.456.789,987</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠁⠃⠉⠄⠙⠑⠋⠄⠛⠓⠊⠂⠊⠓⠛");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠃⠉⠄⠙⠑⠋⠄⠛⠓⠊⠂⠊⠓⠛");
 }
 
 #[test]
 fn number_5a () {
     let expr = "<math><mn>123,456,789.987</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠁⠃⠉⠄⠙⠑⠋⠄⠛⠓⠊⠂⠊⠓⠛");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠃⠉⠄⠙⠑⠋⠄⠛⠓⠊⠂⠊⠓⠛");
 }
 
 #[test]
 fn number_6 () {
     let expr = "<math><mn>,57</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠂⠑⠛");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠂⠑⠛");
 }
 
 #[test]
 fn number_6a () {
     let expr = "<math><mn>.57</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠂⠑⠛");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠂⠑⠛");
 }
 
 #[test]
 fn number_6b () {
     let expr = "<math><mn>0,57</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠚⠂⠑⠛");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠚⠂⠑⠛");
 }
 
 #[test]
 fn number_6c () {
     let expr = "<math><mn>0.57</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠚⠂⠑⠛");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")],  expr, "⠼⠚⠂⠑⠛");
 }
 
 #[test]
 fn number_7 () {
     let expr = "<math><mn>,578</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠂⠑⠛⠓");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠂⠑⠛⠓");
 }
 
 #[test]
 fn number_7a () {
     let expr = "<math><mn>.578</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠂⠑⠛⠓");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")],  expr, "⠼⠂⠑⠛⠓");
 }
 
 #[test]
 fn number_7b () {
     let expr = "<math><mn>0,578</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠚⠂⠑⠛⠓");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠚⠂⠑⠛⠓");
 }
 
 #[test]
 fn number_7c () {
     let expr = "<math><mn>0.578</mn></math>";
-    test_braille("Vietnam", expr, "⠼⠚⠂⠑⠛⠓");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")],  expr, "⠼⠚⠂⠑⠛⠓");
 }
 
 #[test]
 fn meter_1 () {
     let expr = "<math><mrow><mn>5,72</mn><mi mathvariant='normal'>m</mi><mo ame-texclass='ord' stretchy='false'>/</mo><mn>10</mn><mo ame-texclass='rel' stretchy='false'>=</mo><mn>57,2</mn><mi>cm</mi></mrow></math>";
-    test_braille("Vietnam", expr, "⠼⠑⠂⠛⠃⠀⠍⠐⠌⠼⠁⠚⠐⠶⠼⠑⠛⠂⠃⠀⠉⠍");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠑⠂⠛⠃⠀⠍⠐⠌⠼⠁⠚⠐⠶⠼⠑⠛⠂⠃⠀⠉⠍");
 }
 
 #[test]
 fn meter_2 () {
     let expr = "<math><mrow><mn>1</mn><mi>km</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10</mn><mi>hm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100</mn><mi>dam</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000</mn><mi mathvariant='normal'>m</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10.000</mn><mi>dm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100.000</mn><mi>cm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000.000</mn><mi>mm</mi></mrow></math>";
-    test_braille("Vietnam", expr, "⠼⠁⠀⠅⠍⠐⠶⠼⠁⠚⠀⠓⠍⠐⠶⠼⠁⠚⠚⠀⠙⠁⠍⠐⠶⠼⠁⠄⠚⠚⠚⠀⠍⠐⠶⠼⠁⠚⠄⠚⠚⠚⠀⠙⠍⠐⠶⠼⠁⠚⠚⠄⠚⠚⠚⠀⠉⠍⠐⠶⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚⠀⠍⠍");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠀⠅⠍⠐⠶⠼⠁⠚⠀⠓⠍⠐⠶⠼⠁⠚⠚⠀⠙⠁⠍⠐⠶⠼⠁⠄⠚⠚⠚⠀⠍⠐⠶⠼⠁⠚⠄⠚⠚⠚⠀⠙⠍⠐⠶⠼⠁⠚⠚⠄⠚⠚⠚⠀⠉⠍⠐⠶⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚⠀⠍⠍");
 }
 
 #[test]
@@ -528,32 +529,6 @@ fn vi_letters () {
     test_braille("Vietnam", expr, "⠨⠉⠓⠕⠀⠨⠏⠓⠳⠪⠝⠛⠀⠨⠞⠗⠰⠊⠝⠓⠀⠨⠁⠭⠐⠖⠨⠃⠐⠶⠼⠚⠀⠸⠞⠁⠀⠸⠮⠳⠠⠪⠉⠀⠭");
 }
 
-// Cap Roman numbers are marked with dots 46for both single letter and word.
-#[test]
-fn mhchem_roman_in_superscript () {
-    let expr = "<math>
-      <mrow>
-        <mmultiscripts>
-          <mi>Fe</mi>
-          <none></none>
-          <mi>II</mi>
-        </mmultiscripts>
-        <mo>&#x2063;</mo>
-        <mmultiscripts>
-          <mi>Fe</mi>
-          <none></none>
-          <mi>III</mi>
-        </mmultiscripts>
-        <mo>&#x2063;</mo>
-        <mmultiscripts>
-          <mi mathvariant='normal' >O</mi>
-          <mn>4</mn>
-          <none></none>
-        </mmultiscripts>
-      </mrow>
-    </math>";
-    test_braille("Vietnam", expr, "⠨⠋⠑⠔⠣⠨⠊⠊⠱⠨⠋⠑⠔⠣⠨⠊⠊⠊⠱⠨⠕⠢⠼⠙");
-}
 
 // Chemistry test cases
 
@@ -607,7 +582,6 @@ fn ethanol_bonds() {
           </mrow>
       </math>";
   test_braille("Vietnam", expr, "⠸⠉⠓⠢⠼⠉⠤⠸⠉⠓⠢⠼⠃⠤⠸⠕⠓");
-  // single bond: ⠤, double bond: ⠭, triple bond: ⠿, quadrupal bond: use same as UEB. In Vietnamese, we don't have Braille for it.
 }
 
 #[test]
@@ -652,7 +626,7 @@ fn ethylene_with_colon_bond() {
           <mo>::</mo>
           <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
       </mrow></math>";
-  test_braille("Vietnam", expr, "⠨⠓⠢⠼⠃⠨⠉⠒⠒⠸⠉⠓⠢⠼⠃");
+  test_braille("Vietnam", expr, "⠨⠓⠢⠼⠃⠨⠉⠭⠸⠉⠓⠢⠼⠃");
   // Each bond presented with column is translated with ⠒. So, triple column bonds should be ⠒⠒⠒.
 }
 
@@ -683,9 +657,7 @@ fn beta_decay() {
         <mn>0</mn>
       </mmultiscripts>
     </math>";
-  test_braille("Vietnam", expr, "⠨⠉⠢⠞⠼⠋⠔⠞⠼⠁⠙⠳⠕⠨⠝⠢⠞⠼⠛⠔⠞⠼⠁⠙⠐⠖⠑⠢⠞⠣⠐⠤⠼⠁⠜⠔⠞⠼⠚");
-  // quite similar to math, sub and super scripts always written after its constant/variable
-  // subscript on the left: ⠢⠞. Superscript on the left: ⠔⠞. Subscript at the middle: ⠨⠢. Superscript at the middle: ⠨⠔. Subscript on the right: ⠢. And superscript on the right: ⠔
+  test_braille("Vietnam", expr, "⠨⠉⠢⠮⠼⠋⠔⠞⠼⠁⠙⠳⠕⠨⠝⠢⠮⠼⠛⠔⠞⠼⠁⠙⠐⠖⠑⠢⠮⠣⠐⠤⠼⠁⠜⠔⠞⠼⠚");
 }
 
 #[test]

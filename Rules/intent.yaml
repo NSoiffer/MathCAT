@@ -8,7 +8,7 @@
 -
   name: turn-off
   tag: "!*"     # turn off matching -- runs before specific rules
-  match: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"
+  match: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
   replace:
   - test:
       - if: "*"
