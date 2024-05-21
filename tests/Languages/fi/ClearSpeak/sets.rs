@@ -170,7 +170,7 @@ fn set_with_colon() {
     let expr = "<math>
                     <mo>{</mo> <mrow><mi>x</mi><mo>:</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow> <mo>}</mo>
             </math>";
-    test("fi", "ClearSpeak", expr, "joukko kaikki x siten että x on suurempi kuin 2");
+    test("fi", "ClearSpeak", expr, "joukko kaikilla x siten että x on suurempi kuin 2");
 }
 
 #[test]
@@ -178,7 +178,7 @@ fn set_with_bar() {
     let expr = "<math>
                     <mo>{</mo> <mrow><mi>x</mi><mo>|</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow> <mo>}</mo>
             </math>";
-    test("fi", "ClearSpeak", expr, "joukko kaikki x siten että x on suurempi kuin 2");
+    test("fi", "ClearSpeak", expr, "joukko kaikilla x siten että x on suurempi kuin 2");
 }
 
 #[test]
@@ -220,7 +220,7 @@ fn complicated_set_with_colon() {
             <mn>7</mn>
             <mo>}</mo>
         </math>";
-    test("fi", "ClearSpeak", expr, "joukko kaikki x kuuluu kokonaisluvut siten että 2 on pienempi kuin x on pienempi kuin 7");
+    test("fi", "ClearSpeak", expr, "joukko kaikilla x kuuluu kokonaisluvut siten että 2 on pienempi kuin x on pienempi kuin 7");
 }
 
 #[test]
@@ -234,7 +234,7 @@ fn complicated_set_with_mtext() {
         <mo>}</mo>
         </math>";
     test("fi", "ClearSpeak", expr, 
-            "joukko kaikki x kuuluu luonnolliset luvut siten että x on parillinen luku");
+            "joukko kaikilla x kuuluu luonnolliset luvut siten että x on parillinen luku");
 }
 
 
@@ -252,7 +252,7 @@ fn set_with_bar_member() {
             <mo>}</mo>
             </math>";
     test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "joukko kaikki x kuuluu kokonaisluvut siten että x on suurempi kuin 5");
+                expr, "joukko kaikilla x kuuluu kokonaisluvut siten että x on suurempi kuin 5");
 }
 
 #[test]
@@ -295,7 +295,7 @@ fn set_with_bar_element() {
             <mo>}</mo>
             </math>";
     test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "joukko kaikki x kuuluu kokonaisluvut siten että x on suurempi kuin 5");
+                expr, "joukko kaikilla x kuuluu kokonaisluvut siten että x on suurempi kuin 5");
 }
 
 #[test]
@@ -337,7 +337,7 @@ fn set_with_bar_in() {
             <mo>}</mo>
             </math>";
     test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "In",
-                expr, "joukko kaikki x kuuluu kokonaisluvut siten että x on suurempi kuin 5");
+                expr, "joukko kaikilla x kuuluu kokonaisluvut siten että x on suurempi kuin 5");
 }
 
 #[test]
@@ -379,7 +379,7 @@ fn set_with_bar_belongs() {
             <mo>}</mo>
             </math>";
     test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Belongs",
-                expr, "joukko kaikki x kuuluu joukkoon kokonaisluvut siten että x on suurempi kuin 5");
+                expr, "joukko kaikilla x kuuluu joukkoon kokonaisluvut siten että x on suurempi kuin 5");
 }
 
 #[test]
@@ -447,6 +447,6 @@ fn silent_bracket() {
                 <mo>{</mo><mrow><mi>x</mi><mo>|</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow><mo>}</mo>
             </math>";
             test_ClearSpeak("fi", "ClearSpeak_Sets", "SilentBracket", expr,
-                    "joukko kaikki x siten että x on suurempi kuin 2");
+                    "joukko kaikilla x siten että x on suurempi kuin 2");
         }
 
