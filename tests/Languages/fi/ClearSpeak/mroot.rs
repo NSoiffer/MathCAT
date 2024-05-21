@@ -130,6 +130,17 @@ fn mroot_above_20_simple_end_root() {
 }
 
 #[test]
+fn variable_mroot() {
+    let expr = "<math>
+                    <mroot>
+                        <mi>x</mi> 
+                        <mrow><mi>n</mi><mo>+</mo><mn>1</mn></mrow>
+                    </mroot>
+                </math>";
+    test("fi", "ClearSpeak", expr, "n plus 1 juuri x,");
+}
+
+#[test]
 fn simple_fraction_power() {
     let expr = "<math>
                     <mroot>
