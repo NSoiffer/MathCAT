@@ -621,9 +621,10 @@
         then: [{T: "luonnollinen log"}]      # phrase(the 'natural log' of the product of 2 numbers)
         else: [{SPELL: "'ln'"}]
       else:
-      - test:
-          if: "$Verbosity!='Terse' and not(log_is_simple)"
-          then: {T: ""}      # phrase('the' square root of 25)
+      # FI: not needed
+      # - test:
+      #     if: "$Verbosity!='Terse' and not(log_is_simple)"
+      #     then: {T: ""}      # phrase('the' square root of 25)
       - test:
         - if: "*[1][text()='log']"
           then: [{T: "logaritmi"}]
