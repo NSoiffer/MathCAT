@@ -461,10 +461,10 @@
         then: [{SPELL: "'ln'"}]
         else: [{T: "luonnollinen log"}]      # phrase(the 'natural log' function is used in mathematics)
       else:
-      - test:
-          if: "$Verbosity!='Terse' and not(log_is_simple)"
-          # FI: not needed
-          # then: {T: ""}      # phrase('the' square root of 25 equals 5)
+      # FI: not needed
+      # - test:
+      #     if: "$Verbosity!='Terse' and not(log_is_simple)"
+      #     then: {T: ""}      # phrase('the' square root of 25 equals 5)
       - test:
         - if: "*[1][text()='log']"
           then: [{T: "logaritmi"}]      # phrase(the 'log' function is used in mathematics)
