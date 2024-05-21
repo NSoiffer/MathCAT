@@ -8,7 +8,7 @@ fn squared() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>2</mn> </msup>
                 </math>";
-    test("fi", "SimpleSpeak", expr, "x neliö");
+    test("fi", "SimpleSpeak", expr, "x toiseen");
 }
 
 #[test]
@@ -104,7 +104,7 @@ fn nested_squared_power_with_coef() {
       </msup>
       </mrow>
       </math>";
-  test("fi", "SimpleSpeak", expr, "3 potenssiin 2 x neliö");
+  test("fi", "SimpleSpeak", expr, "3 potenssiin 2 x toiseen");
 }
 
 #[test]
@@ -124,7 +124,7 @@ fn nested_squared_power_with_neg_coef() {
     </msup>
     </mrow>
   </math>";
-  test("fi", "SimpleSpeak", expr, "3 potenssiin negatiivinen 2 x neliö");
+  test("fi", "SimpleSpeak", expr, "3 potenssiin negatiivinen 2 x toiseen");
 }
 
 
@@ -178,7 +178,7 @@ fn nested_number_times_squared() {
         </msup>
         </mrow>
         </math>";
-  test("fi", "SimpleSpeak", expr, "e potenssiin 1 kahdesosa x neliö");
+  test("fi", "SimpleSpeak", expr, "e potenssiin 1 kahdesosa x toiseen");
 }
 
 #[test]
@@ -200,7 +200,7 @@ fn nested_negative_number_times_squared() {
     </msup>
     </mrow>
     </math>";
-  test("fi", "SimpleSpeak", expr, "e potenssiin negatiivinen 1 kahdesosa, x neliö");
+  test("fi", "SimpleSpeak", expr, "e potenssiin negatiivinen 1 kahdesosa, x toiseen");
 }
 
 #[test]
@@ -241,7 +241,7 @@ fn nested_non_simple_squared_exp() {
       </msup>
       </mrow>
       </math>";
-  test("fi", "SimpleSpeak", expr, "3 potenssiin auki sulku x plus 1, kiinni sulku neliö");
+  test("fi", "SimpleSpeak", expr, "3 potenssiin auki sulku x plus 1, kiinni sulku toiseen");
 }
 
 #[test]
@@ -314,7 +314,7 @@ fn nested_complex_power() {
       </msup>
       </mrow>
       </math>";
-  test("fi", "SimpleSpeak", expr, "e potenssiin negatiivinen 1 kahdesosa, kertaa; auki sulku; murtoluku, x miinus myy, per sigma, loppu murtoluku; kiinni sulku neliö");
+  test("fi", "SimpleSpeak", expr, "e potenssiin negatiivinen 1 kahdesosa, kertaa; auki sulku; murtoluku, x miinus myy, per sigma, loppu murtoluku; kiinni sulku toiseen");
 }
 
 #[test]

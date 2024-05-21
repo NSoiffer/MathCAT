@@ -55,7 +55,7 @@ fn inverse_trig_arc() {
 #[test]
 fn trig_squared() {
     let expr = "<math><msup><mi>sin</mi><mn>2</mn></msup><mi>x</mi></math>";
-    test("fi", "ClearSpeak", expr, "sini neliö arvolla x");
+    test("fi", "ClearSpeak", expr, "sini toiseen arvolla x");
 }
 
 #[test]
@@ -229,7 +229,7 @@ fn more_implied_times() {
     </mrow>
     </mrow></math>";
     test_ClearSpeak("fi", "ClearSpeak_ImpliedTimes", "MoreImpliedTimes",expr,
-        "auki sulku 2 kertaa x, kiinni sulku neliö");
+        "auki sulku 2 kertaa x, kiinni sulku toiseen");
 }
 
 #[test]
@@ -266,7 +266,7 @@ fn explicit_times_none_superscript() {
     </math>";
     test_ClearSpeak_prefs("fi", 
         vec![("ClearSpeak_ImpliedTimes", "None"), ("ClearSpeak_Functions", "None")],
-        expr, "f, auki sulku x kiinni sulku; on yhtä suuri kuin; x neliö, auki sulku x plus 1, kiinni sulku");
+        expr, "f, auki sulku x kiinni sulku; on yhtä suuri kuin; x toiseen, auki sulku x plus 1, kiinni sulku");
 }
 
 /*
@@ -331,7 +331,7 @@ fn explicit_times_none_superscript() {
         </msup>
         </mrow>
     </mrow></math>";
-        test("fi", "ClearSpeak", expr, "auki sulku 2 x kiinni sulku neliö");
+        test("fi", "ClearSpeak", expr, "auki sulku 2 x kiinni sulku toiseen");
     }
 
     #[test]

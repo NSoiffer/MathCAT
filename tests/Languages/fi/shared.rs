@@ -243,7 +243,7 @@ fn ignore_comma() {
       </mstyle>
     </mrow>
 </math>";
-    test("fi", "SimpleSpeak", expr, "suora fii arvolla x, on yhtä suuri kuin; c, e potenssiin negatiivinen h neliö, x neliö");
+    test("fi", "SimpleSpeak", expr, "suora fii arvolla x, on yhtä suuri kuin; c, e potenssiin negatiivinen h toiseen, x toiseen");
 }
 
 #[test]
@@ -402,8 +402,8 @@ fn Quadratic_equation() {
     </mfrac>
     </math>
     ";
-    test("fi", "ClearSpeak", expr ,"x on yhtä suuri kuin; murtoluku osoittaja; negatiivinen b plus-miinus; neliöjuuri b neliö miinus 4 a b; ja nimittäjä 2 a;");
-    test("fi", "SimpleSpeak", expr, "x on yhtä suuri kuin; murtoluku, negatiivinen b plus-miinus; neliöjuuri b neliö miinus 4 a b loppu juuri; per, 2 a, loppu murtoluku;")
+    test("fi", "ClearSpeak", expr ,"x on yhtä suuri kuin; murtoluku osoittaja; negatiivinen b plus-miinus; neliöjuuri b toiseen miinus 4 a b; ja nimittäjä 2 a;");
+    test("fi", "SimpleSpeak", expr, "x on yhtä suuri kuin; murtoluku, negatiivinen b plus-miinus; neliöjuuri b toiseen miinus 4 a b loppu juuri; per, 2 a, loppu murtoluku;")
 }
 
 #[test]
@@ -441,7 +441,7 @@ fn normal_distribution_e() {
       </msup>
     </mrow>
   </math>";
-  test("fi", "ClearSpeak", expr, "e potenssiin, negatiivinen 1 kahdesosa, kertaa; auki sulku; murtoluku osoittaja; x miinus myy; ja nimittäjä sigma; kiinni sulku neliö, loppu potenssi");
-  test("fi", "SimpleSpeak", expr, "e potenssiin negatiivinen 1 kahdesosa, kertaa; auki sulku; murtoluku, x miinus myy, per sigma, loppu murtoluku; kiinni sulku neliö");
+  test("fi", "ClearSpeak", expr, "e potenssiin, negatiivinen 1 kahdesosa, kertaa; auki sulku; murtoluku osoittaja; x miinus myy; ja nimittäjä sigma; kiinni sulku toiseen, loppu potenssi");
+  test("fi", "SimpleSpeak", expr, "e potenssiin negatiivinen 1 kahdesosa, kertaa; auki sulku; murtoluku, x miinus myy, per sigma, loppu murtoluku; kiinni sulku toiseen");
 }
 

@@ -41,7 +41,7 @@ fn inverse_trig() {
 #[test]
 fn trig_squared() {
     let expr = "<math><msup><mi>sin</mi><mn>2</mn></msup><mi>x</mi></math>";
-    test("fi", "SimpleSpeak", expr, "sini neliö arvolla x");
+    test("fi", "SimpleSpeak", expr, "sini toiseen arvolla x");
 }
 
 #[test]
@@ -239,7 +239,7 @@ fn no_times_sqrt() {
         </msup>
         </mrow>
     </mrow></math>";
-        test("fi", "SimpleSpeak", expr, "auki sulku 2 x kiinni sulku neliö");
+        test("fi", "SimpleSpeak", expr, "auki sulku 2 x kiinni sulku toiseen");
     }
 
     #[test]

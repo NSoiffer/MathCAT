@@ -287,7 +287,7 @@ fn vertical_line_evaluated_at_both() {
             </msubsup>
         </math>";
     test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "Auto", expr,
-        "x neliö plus x, sijoitus 1 miinus sama lauseke arvolla 0");
+        "x toiseen plus x, sijoitus 1 miinus sama lauseke arvolla 0");
 }
 #[test]
 fn vertical_line_evaluated_at_divides() {
@@ -327,5 +327,5 @@ fn vertical_line_evaluated_at_both_given() {
             </msubsup>
         </math>";
     test_ClearSpeak("fi", "ClearSpeak_VerticalLine", "Given", expr,
-        "x neliö plus x, sijoitus 1 miinus sama lauseke arvolla 0");
+        "x toiseen plus x, sijoitus 1 miinus sama lauseke arvolla 0");
 }
