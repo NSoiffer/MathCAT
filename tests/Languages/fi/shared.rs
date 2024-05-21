@@ -292,3 +292,156 @@ fn mn_with_space() {
     let expr = "<math><mn>1 234 567</mn></math>";
     test("fi", "SimpleSpeak", expr, "1234567");
 }
+
+/// Tests for expressions that appear in the Finnish matriculation exams 
+
+#[test]
+fn difference_quotinent() {
+  let expr = "<math>
+  <mrow>
+    <mrow>
+      <mi>D</mi>
+    </mrow>
+    <mi>f</mi>
+    <mo>(</mo>
+    <mi>a</mi>
+    <mo>)</mo>
+    <mo>=</mo>
+    <msup>
+      <mi>f</mi>
+      <mo>′</mo>
+    </msup>
+    <mo>(</mo>
+    <mi>a</mi>
+    <mo>)</mo>
+    <mo>=</mo>
+    <munder>
+      <mi>lim</mi>
+      <mrow>
+        <mi>x</mi>
+        <mo>→</mo>
+        <mi>a</mi>
+      </mrow>
+    </munder>
+    <mo>⁡</mo>
+    <mfrac>
+      <mrow>
+        <mi>f</mi>
+        <mo>(</mo>
+        <mi>x</mi>
+        <mo>)</mo>
+        <mo>−</mo>
+        <mi>f</mi>
+        <mo>(</mo>
+        <mi>a</mi>
+        <mo>)</mo>
+      </mrow>
+      <mrow>
+        <mi>x</mi>
+        <mo>−</mo>
+        <mi>a</mi>
+      </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <munder>
+      <mi>lim</mi>
+      <mrow>
+        <mi>h</mi>
+        <mo>→</mo>
+        <mn>0</mn>
+      </mrow>
+    </munder>
+    <mo>⁡</mo>
+    <mfrac>
+      <mrow>
+        <mi>f</mi>
+        <mo>(</mo>
+        <mi>a</mi>
+        <mo>+</mo>
+        <mi>h</mi>
+        <mo>)</mo>
+        <mo>−</mo>
+        <mi>f</mi>
+        <mo>(</mo>
+        <mi>a</mi>
+        <mo>)</mo>
+      </mrow>
+      <mi>h</mi>
+    </mfrac>
+  </mrow>
+</math>";
+test("fi", "ClearSpeak", expr, "iso d f arvolla a; on yhtä suuri kuin, f pilkku, arvolla a, on yhtä suuri kuin; murtoluku osoittaja; f arvolla x, miinus f arvolla a; ja nimittäjä x miinus a; on yhtä suuri kuin; raja-arvo kun h lähestyy 0; arvolla; murtoluku osoittaja; f arvolla, auki sulku a plus h, kiinni sulku; miinus f arvolla a; ja nimittäjä h;");
+test("fi", "SimpleSpeak", expr, "iso d f arvolla a; on yhtä suuri kuin, f pilkku, arvolla a, on yhtä suuri kuin; raja-arvo kun x lähestyy a; arvolla; murtoluku, f arvolla x, miinus f arvolla a, per, x miinus a, loppu murtoluku; on yhtä suuri kuin; raja-arvo kun h lähestyy 0; arvolla; murtoluku, f arvolla, auki sulku a plus h, kiinni sulku; miinus f arvolla a, per h, loppu murtoluku;");
+}
+
+#[test]
+fn Quadratic_equation() {
+    let expr ="<math>
+    <mi>x</mi>
+    <mo>=</mo>
+    <mfrac>
+    <mrow>
+    <mo>−</mo>
+    <mi>b</mi>
+    <mi>±</mi>
+    <msqrt>
+    <msup>
+    <mi>b</mi>
+    <mn>2</mn>
+    </msup>
+    <mo>−</mo>
+    <mn>4</mn>
+    <mi>a</mi>
+    <mi>b</mi>
+    </msqrt>
+    </mrow>
+    <mrow>
+    <mn>2</mn>
+    <mn>a</mn>
+    </mrow>
+    </mfrac>
+    </math>
+    ";
+    test("fi", "ClearSpeak", expr ,"x on yhtä suuri kuin; murtoluku osoittaja; negatiivinen b plus-miinus; neliöjuuri b neliö miinus 4 a b; ja nimittäjä 2 a;");
+    test("fi", "SimpleSpeak", expr, "x on yhtä suuri kuin; murtoluku, negatiivinen b plus-miinus; neliöjuuri b neliö miinus 4 a b loppu juuri; per, 2 a, loppu murtoluku;")
+}
+
+#[test]
+fn normal_distribution_e() {
+    let expr = "<math>
+    <mrow>
+      <msup>
+        <mi>e</mi>
+        <mrow>
+          <mo>−</mo>
+          <mfrac>
+            <mn>1</mn>
+            <mn>2</mn>
+          </mfrac>
+          <msup>
+            <mrow>
+              <mrow>
+                <mo>(</mo>
+                <mrow>
+                  <mfrac>
+                    <mrow>
+                      <mi>x</mi>
+                      <mo>−</mo>
+                      <mi>μ</mi>
+                    </mrow>
+                    <mi>σ</mi>
+                  </mfrac>
+                </mrow>
+                <mo>)</mo>
+              </mrow>
+            </mrow>
+            <mn>2</mn>
+          </msup>
+        </mrow>
+      </msup>
+    </mrow>
+  </math>";
+  test("fi", "ClearSpeak", expr, "e potenssiin, negatiivinen 1 kahdesosa, kertaa; auki sulku; murtoluku osoittaja; x miinus myy; ja nimittäjä sigma; kiinni sulku neliö, loppu potenssi");
+  test("fi", "SimpleSpeak", expr, "e potenssiin negatiivinen 1 kahdesosa, kertaa; auki sulku; murtoluku, x miinus myy, per sigma, loppu murtoluku; kiinni sulku neliö");
+}
+
