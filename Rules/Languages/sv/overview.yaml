@@ -1,0 +1,122 @@
+---
+# Provide an overview/outline/description of the math
+# MathPlayer just tried to shorten things like "mfrac" by just saying "fraction"
+#   For mrow, it say up to 5 operands and just say "and n more things" for the rest
+# This results in strings of varying length. Given human memory is about 7 words long,
+#   it would be better to aim for 7 words (maybe aim for a range of 6-10 words).
+# Idea:
+#   Start by generating a terse form of the speech
+#   At every step when the strings are being joined
+#     a) if the #words <= 7, return the joined string
+#     b) otherwise, set verbosity to 'overview' and regenerate the expression and use that
+# There is a balance that you want to maximize the info given, so 10 words is likely better then 3.
+#   That might mean that at the top level, we may want to allow the first few children to expand
+
+- name: default
+  tag: math
+  match: "."
+  replace: [{x: "*[1]"}]
+
+- name: default
+  tag: [mi, mn, mo, mtext]
+  match: "."
+  replace: [{x: text()}]
+
+- name: default
+  tag: mfrac
+  match: "."
+  replace:
+  - test:
+      if: "IsNode(*[1], 'simple') and IsNode(*[2], 'simple')"
+      then:
+      - x: "*[1]"
+      - T: "genom"
+      - x: "*[2]"
+      else:
+      - T: "bråk"
+
+- name: default
+  tag: msqrt
+  match: "."
+  replace:
+  - T: "roten"
+  - test:
+      if: "IsNode(*[1], 'simple')"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: {T: "ur"}
+      - x: "*[1]"
+
+- name: default
+  tag: mroot
+  match: "."
+  replace:
+  - test:
+      if: "*[2][self::m:mn]"
+      then_test:
+      - if: "*[2][text()='2']"
+        then: {T: "kvadratroten"}
+      - else_if: "*[2][text()='3']"
+        then: {T: "kubikroten"}
+      - else_if: "*[2][not(contains(., ','))]"
+        then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]
+      else:
+      - T: "roten av grad"
+      - x: "*[2]"
+  - test:
+      if: "IsNode(*[1], 'simple')"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: {T: "ur"}
+      - x: "*[1]"
+
+- name: default
+  tag: mtable
+  match:
+  - "*[2][self::m:mtable] and"
+  - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
+  replace:
+  - x: count(*[2]/*)
+  - T: "gånger"
+  - x: count(*[2]/*[self::m:mtr][1]/*)
+  - test:
+      if: "*[1][text()='|']" # just need to check the first bracket since we know it must be (, [, or |
+      then: {T: "determinant"}
+      else: {T: "matris"}
+
+- name: default
+  tag: mtable
+  match: "."
+  replace:
+  - x: count(*[2]/*)
+  - T: "gånger"
+  - x: count(*[2]/*[self::m:mtr][1]/*)
+  - T: "tabell"
+
+- name: short-mrow
+  tag: mrow
+  match: "count(*)<6"
+  replace:
+  - insert:
+      nodes: "*"
+      replace: [{pause: auto}]
+
+- name: long-mrow
+  tag: mrow
+  match: "."
+  replace:
+  - x: "*[1]"
+  - pause: auto
+  - x: "*[2]"
+  - pause: auto
+  - x: "*[3]"
+  - pause: auto
+  - x: "*[4]"
+  - pause: auto
+  - x: "*[5]"
+  - pause: auto
+  - T: "och så vidare"
+
+- include: "SimpleSpeak_Rules.yaml"
