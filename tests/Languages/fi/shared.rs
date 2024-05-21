@@ -445,3 +445,37 @@ fn normal_distribution_e() {
   test("fi", "SimpleSpeak", expr, "e potenssiin negatiivinen 1 kahdesosa, kertaa; auki sulku; murtoluku, x miinus myy, per sigma, loppu murtoluku; kiinni sulku toiseen");
 }
 
+#[test]
+fn triangle_inequality() {
+    let expr = "<math>
+    
+    <mo>|</mo>
+    <mrow>
+    <mo>|</mo>
+    <mi>a</mi>
+    <mo>|</mo>
+    <mo>-</mo>
+    <mo>|</mo>
+    <mi>b</mi>
+    <mo>|</mo>
+    </mrow>
+    <mo>|</mo>
+    <mo>≤</mo>
+    <mo>|</mo>
+    <mi>a</mi>
+    <mo>+</mo>
+    <mi>b</mi>
+    <mo>|</mo>
+    <mo>≤</mo>
+    <mo>|</mo>
+    <mi>a</mi>
+    <mo>|</mo>
+    <mo>+</mo>
+    <mo>|</mo>
+    <mi>b</mi>
+    <mo>|</mo>
+    </math>
+    ";
+    test("fi", "ClearSpeak", expr, "itseisarvo itseisarvo a, miinus itseisarvo b; on pienempi tai yhtä suuri kuin; itseisarvo a plus b; on pienempi tai yhtä suuri kuin; itseisarvo a, plus itseisarvo b,");
+    test("fi", "SimpleSpeak", expr, "itseisarvo itseisarvo a, miinus itseisarvo b; loppu itseisarvo; on pienempi tai yhtä suuri kuin; itseisarvo a plus b, loppu itseisarvo; on pienempi tai yhtä suuri kuin; itseisarvo a, plus itseisarvo b,");
+}
