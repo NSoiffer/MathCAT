@@ -448,7 +448,7 @@
   variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
   match:
   - "count(*)=3 and"
-  - "*[1][self::m:mi][text()='log' or text()='ln'] and"
+  - "*[1][self::m:mi][text()='log' or text()='lg' or text()='ln'] and"
   - "*[2][self::m:mo][text()='⁡']"
   replace:
   - bookmark: "*[1]/@id"
@@ -457,6 +457,11 @@
       then_test:
       - if: "*[1][text()='log']"
         then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
+      - else_if: "*[1][text()='lg']"
+        then_test:
+        - if: "$Verbosity='Terse'"
+          then: [{SPELL: "'lg'"}]
+          else: [{T: "kymmenkantainen logaritmi"}]
       - else_if: "$Verbosity='Terse'"
         then: [{SPELL: "'ln'"}]
         else: [{T: "luonnollinen log"}]      # phrase(the 'natural log' function is used in mathematics)
@@ -467,7 +472,9 @@
       #     then: {T: ""}      # phrase('the' square root of 25 equals 5)
       - test:
         - if: "*[1][text()='log']"
-          then: [{T: "logaritmi"}]      # phrase(the 'log' function is used in mathematics)
+          then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
+        - else_if: "*[1][text()='lg']"
+          then: [{SPELL: "'lg'"}]      # phrase(the 'log' function is used in mathematics)
         - else_if: "$Verbosity='Terse'"
           then: [{SPELL: "'ln'"}]
           else: [{T: "luonnollinen logaritmi"}]      # phrase(the 'natural log' function is used in mathematics)
