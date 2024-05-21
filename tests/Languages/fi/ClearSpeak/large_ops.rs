@@ -10,7 +10,7 @@ fn sum_both() {
         </munderover>
         <mi>n</mi>
     </math>";
-    test("fi", "ClearSpeak", expr, "summa käy, n on yhtä suuri kuin 1, lukuun 10; n");
+    test("fi", "ClearSpeak", expr, "summa käy, luvusta n on yhtä suuri kuin 1, lukuun 10; n");
 }
 
 #[test]
@@ -34,7 +34,7 @@ fn sum_both_msubsup() {
         </msubsup>
         <mi>n</mi>
     </math>";
-    test("fi", "ClearSpeak", expr, "summa käy, n on yhtä suuri kuin 1, lukuun 10; n");
+    test("fi", "ClearSpeak", expr, "summa käy, luvusta n on yhtä suuri kuin 1, lukuun 10; n");
 }
 
 #[test]
@@ -68,7 +68,7 @@ fn product_both() {
         </munderover>
         <mi>n</mi>
     </math>";
-    test("fi", "ClearSpeak", expr, "tulo käy, n on yhtä suuri kuin 1, lukuun 10; n");
+    test("fi", "ClearSpeak", expr, "tulo käy, luvusta n on yhtä suuri kuin 1, lukuun 10; n");
 }
 
 #[test]
@@ -102,7 +102,7 @@ fn intersection_both() {
         </munderover>
         <msub><mi>S</mi><mi>i</mi></msub>
     </math>";
-    test("fi", "ClearSpeak", expr, "monikkoleikkaus käy, i on yhtä suuri kuin 1, lukuun 10; iso s ala i");
+    test("fi", "ClearSpeak", expr, "monikkoleikkaus käy, luvusta i on yhtä suuri kuin 1, lukuun 10; iso s ala i");
 }
 
 #[test]
@@ -136,7 +136,7 @@ fn union_both() {
         </munderover>
         <msub><mi>S</mi><mi>i</mi></msub>
     </math>";
-    test("fi", "ClearSpeak", expr, "monikkounioni käy, i on yhtä suuri kuin 1, lukuun 10; iso s ala i");
+    test("fi", "ClearSpeak", expr, "monikkounioni käy, luvusta i on yhtä suuri kuin 1, lukuun 10; iso s ala i");
 }
 
 #[test]
@@ -173,7 +173,7 @@ fn integral_both() {
             </mrow>
             <mtext>&#x2009;</mtext><mi>d</mi><mi>x</mi>
         </math>";
-    test("fi", "ClearSpeak", expr, "integraali käy, 0, lukuun 1; f arvolla x; d x");
+    test("fi", "ClearSpeak", expr, "integraali käy, luvusta 0, lukuun 1; f arvolla x; d x");
 }
 
 #[test]
