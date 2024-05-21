@@ -498,7 +498,7 @@
   - pause: medium
   - test:
       - if: "*[2][text()=2]"
-        then: [T: "neliö"]     
+        then: [T: "toiseen"]     
       - else_if: "*[2][text()=3]"
         then: [T: "kolmanteen"]
         else:  # don't bother with special cases as this isn't likely to happen

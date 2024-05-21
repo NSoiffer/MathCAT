@@ -247,7 +247,7 @@
   - test:
       if: "*[2][text()='2']"
       # better way?
-      then: {T: "neliö"}      # phrase(25 equals 5 'squared')
+      then: {T: "toiseen"}      # phrase(25 equals 5 'squared')
       else: {T: "kolmanteen"}      # phrase(625 equals 5 'cubed')
 
 # FI: this grammar doesn't work in Finnish, so commented out
@@ -296,7 +296,7 @@
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
-  - T: "neliö"      # phrase(7 'squared' equals 49)
+  - T: "toiseen"      # phrase(7 'squared' equals 49)
 
 - name: cubed
   tag: power
