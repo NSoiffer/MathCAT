@@ -66,6 +66,10 @@ zip = { version = "0.6.2", default-features = false, features = ["deflate"] }
 name = "libmathcat"
 crate-type = ["rlib", "cdylib"]
 
+[profile.test]
+debug = false
+opt-level = 1    # adds a few seconds to the compile, but cuts testing time by ~75% (~90 secs on 5/24)
+
 [profile.release]
 debug = false
 lto = true
