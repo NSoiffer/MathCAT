@@ -474,8 +474,8 @@
   match: "."
   # SWEDISH: Differentiate between the initial and ending declaration of the terms.
   variables:
-  - WordToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinaliteten', 'absolutbeloppet')"
-  - EndToSay: "IfThenElse($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinalitet', 'absolutbelopp')"
+  - WordToSay: "IFTHENELSE($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinaliteten', 'absolutbeloppet')"
+  - EndToSay: "IFTHENELSE($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinalitet', 'absolutbelopp')"
   replace:
   - x: "$WordToSay"
   - T: "av"      # phrase(the absolute value 'of' 25)

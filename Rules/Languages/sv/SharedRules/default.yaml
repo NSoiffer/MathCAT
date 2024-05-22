@@ -6,10 +6,10 @@
   replace:
   - with:
       variables:
-      - ClearSpeak_Fractions: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Fractions='Auto', 'EndFrac', $ClearSpeak_Fractions)"
-      - ClearSpeak_AbsoluteValue: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_AbsoluteValue='Auto', 'AbsEnd', $ClearSpeak_AbsoluteValue)"
-      - ClearSpeak_Roots: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Roots='Auto', 'RootEnd', $ClearSpeak_Roots)"
-      - ClearSpeak_Matrix: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Matrix='Auto', 'EndMatrix', $ClearSpeak_Matrix)"
+      - ClearSpeak_Fractions: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_Fractions='Auto', 'EndFrac', $ClearSpeak_Fractions)"
+      - ClearSpeak_AbsoluteValue: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_AbsoluteValue='Auto', 'AbsEnd', $ClearSpeak_AbsoluteValue)"
+      - ClearSpeak_Roots: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_Roots='Auto', 'RootEnd', $ClearSpeak_Roots)"
+      - ClearSpeak_Matrix: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_Matrix='Auto', 'EndMatrix', $ClearSpeak_Matrix)"
       replace:
       - test:
           if: "$MathRate = 100"
@@ -273,8 +273,8 @@
       then:
       - with:
           variables:
-          - PreSubscript: "IfThenElse($Verbosity='Verbose', 'nedsänkt', 'nedsänkt')"
-          - PreSuperscript: "IfThenElse($Verbosity='Verbose', 'upphöjt', 'upphöjt')"
+          - PreSubscript: "IFTHENELSE($Verbosity='Verbose', 'nedsänkt', 'nedsänkt')"
+          - PreSuperscript: "IFTHENELSE($Verbosity='Verbose', 'upphöjt', 'upphöjt')"
           replace:
           - test: # only bother announcing if there is more than one prescript
               if: "count($Prescripts) > 2"
@@ -324,8 +324,8 @@
       then:
       - with:
           variables:
-          - PostSubscript: "IfThenElse($Verbosity='Verbose', 'nedsänkt', 'nedsänkt')"
-          - PostSuperscript: "IfThenElse($Verbosity='Verbose', 'upphöjt', 'upphöjt')"
+          - PostSubscript: "IFTHENELSE($Verbosity='Verbose', 'nedsänkt', 'nedsänkt')"
+          - PostSuperscript: "IFTHENELSE($Verbosity='Verbose', 'upphöjt', 'upphöjt')"
           replace:
           - test: # only bother announcing if there is more than one postscript
               if: "count($Postscripts) > 2"

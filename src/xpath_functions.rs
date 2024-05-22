@@ -1284,6 +1284,7 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("DefinitionValue", DefinitionValue);
     context.set_function("BaseNode", BaseNode);
     context.set_function("IfThenElse", IfThenElse);
+    context.set_function("IFTHENELSE", IfThenElse);
     context.set_function("DistanceFromLeaf", DistanceFromLeaf);
     context.set_function("EdgeNode", EdgeNode);
     context.set_function("FontSizeGuess", FontSizeGuess);
