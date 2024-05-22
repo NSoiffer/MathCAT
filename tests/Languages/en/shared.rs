@@ -305,12 +305,6 @@ fn ignore_period_and_space() {
 
 
 #[test]
-fn mn_with_space() {
-    let expr = "<math><mn>1 234 567</mn></math>";
-    test("en", "SimpleSpeak", expr, "1234567");
-}
-
-#[test]
 fn bug_199_2pi() {
   let expr = "<math>
       <mrow>
@@ -333,4 +327,19 @@ fn bug_199_2pi() {
 fn caret_and_hat() {
   let expr = "<math><mi>x</mi><mo>^</mo><mn>2</mn><mo>+</mo><mover><mi>y</mi><mo>^</mo></mover></math>";
   test("en", "SimpleSpeak",expr, "x caret 2 plus y hat,");
+}
+
+#[test]
+fn mn_with_space() {
+  set_preference("BlockSeparators".to_string(), " ,".to_string()).unwrap();   // this may need to change if testing another language
+  let expr = "<math><mn>1 234 567</mn></math>";
+  test("en", "SimpleSpeak", expr, "1234567");
+}
+
+#[test]
+fn mn_with_block_and_decimal_separators() {
+  set_preference("DecimalSeparators".to_string(), ".".to_string()).unwrap();   // this may need to change if testing another language
+  set_preference("BlockSeparators".to_string(), " ,".to_string()).unwrap();    // this may need to change if testing another language
+  let expr = "<math><mn>1,234.56</mn></math>";                                       // may want to change this for another language
+  test("en", "SimpleSpeak", expr, "1234.56");
 }

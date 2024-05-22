@@ -289,6 +289,7 @@ fn ignore_period_and_space() {
 
 #[test]
 fn mn_with_space() {
-    let expr = "<math><mn>1 234 567</mn></math>";
-    test("sv", "SimpleSpeak", expr, "1 234 567"); // borde detta vara så här?
+  set_preference("BlockSeparators".to_string(), " .".to_string()).unwrap();
+  let expr = "<math><mn>1 234 567</mn></math>";
+  test("sv", "SimpleSpeak", expr, "1234567"); // borde detta vara så här?
 }

@@ -4,7 +4,7 @@
 use regex::Regex;
 extern crate lazy_static;
 use lazy_static::lazy_static;
-use libmathcat::interface::*;
+pub use libmathcat::interface::*;
 
 #[allow(dead_code)] 
 pub fn init_logger() {
