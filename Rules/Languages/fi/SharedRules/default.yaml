@@ -39,7 +39,7 @@
   replace:
   - bookmark: "@id"
   # FIX: removing the digit block separators is likely locale dependent
-  - x: "translate(., ' ,`', '')"   # remove digit block separators
+  - x: "translate(., ' `', '')"   # remove digit block separators
 
 - name: default
   tag: [mo, mtext]
