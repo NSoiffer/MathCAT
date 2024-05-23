@@ -45,11 +45,19 @@ fn zero_power() {
 
 
 #[test]
-fn decimal_power() {
+fn decimal_period_power() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>2.0</mn> </msup>
                 </math>";
     test("fi", "SimpleSpeak", expr, "x potenssiin 2.0");
+}
+
+#[test]
+fn decimal_comma_power() {
+    let expr = "<math>
+                    <msup> <mi>x</mi> <mn>2,0</mn> </msup>
+                </math>";
+    test("fi", "SimpleSpeak", expr, "x potenssiin 2,0");
 }
 
 #[test]
