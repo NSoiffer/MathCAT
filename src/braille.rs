@@ -228,7 +228,7 @@ fn unhighlight(ch: char) -> char {
 use std::cell::RefCell;
 thread_local!{
     /// Count number of probes -- get a sense of how well algorithm is working (for debugging)
-    static N_PROBES: RefCell<usize> = RefCell::new(0);
+    static N_PROBES: RefCell<usize> = const { RefCell::new(0) };
 }
 
 

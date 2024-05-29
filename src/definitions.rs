@@ -129,7 +129,7 @@ thread_local!{
     /// See [`Definitions`] for more details.
     pub static SPEECH_DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::new() );
     pub static BRAILLE_DEFINITIONS: RefCell<Definitions> = RefCell::new( Definitions::new() );
-    pub static DEFINITIONS: &'static std::thread::LocalKey<RefCell<Definitions>> = &SPEECH_DEFINITIONS;
+    pub static DEFINITIONS: &'static std::thread::LocalKey<RefCell<Definitions>> = const { &SPEECH_DEFINITIONS };
 }
 
 /// Reads the `definitions.yaml` files specified by current_files -- these are presumed to need updating. 
