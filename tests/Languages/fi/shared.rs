@@ -1189,3 +1189,55 @@ let expr = "<math>
 test("fi", "ClearSpeak", expr, "iso p arvolla; auki sulku, iso x on pienempi tai yhtä suuri kuin k; kiinni sulku; on yhtä suuri kuin; summa käy, luvusta i on yhtä suuri kuin 0, lukuun itseisarvo k,; n yli i p potenssiin i kertaa; auki sulku 1 miinus p, kiinni sulku potenssiin n miinus i");
 test("fi", "SimpleSpeak", expr, "iso p arvolla; auki sulku, iso x on pienempi tai yhtä suuri kuin k; kiinni sulku; on yhtä suuri kuin; summa käy, luvusta i on yhtä suuri kuin 0, lukuun itseisarvo k,; n yli i p potenssiin i kertaa; auki sulku 1 miinus p, kiinni sulku potenssiin n miinus i");
 }
+
+#[test]
+fn FinME_standard_normal_disributon_cumul() {
+let expr = "<math>
+<mrow>
+  <mrow>
+    <mi>Φ</mi>
+  </mrow>
+  <mo>(</mo>
+  <mi>x</mi>
+  <mo>)</mo>
+  <mo>=</mo>
+</mrow>
+<mrow>
+  <mfrac>
+    <mn>1</mn>
+    <msqrt>
+      <mrow>
+        <mn>2</mn>
+        <mi>π</mi>
+      </mrow>
+    </msqrt>
+  </mfrac>
+  <msubsup>
+    <mo>∫</mo>
+    <mrow>
+      <mo>−</mo>
+      <mi>∞</mi>
+    </mrow>
+    <mi>x</mi>
+  </msubsup>
+  <msup>
+    <mi>e</mi>
+    <mrow>
+      <mo>−</mo>
+      <mfrac>
+        <msup>
+          <mi>t</mi>
+          <mn>2</mn>
+        </msup>
+        <mn>2</mn>
+      </mfrac>
+    </mrow>
+  </msup>
+  <mtext>&#x2009;</mtext>
+  <mi>d</mi>
+  <mi>x</mi>
+</mrow>
+</math>";
+test("fi", "ClearSpeak", expr, "iso fii arvolla x, on yhtä suuri kuin; murtoluku osoittaja 1; ja nimittäjä neliöjuuri 2 pii; integraali käy, luvusta negatiivinen ääretön, lukuun x; e potenssiin negatiivinen murtoluku osoittaja; t toiseen; ja nimittäjä 2; d x");
+test("fi", "SimpleSpeak", expr, "iso fii arvolla x, on yhtä suuri kuin; murtoluku, 1 per, neliöjuuri 2 pii loppu juuri; loppu murtoluku; integraali käy, luvusta negatiivinen ääretön, lukuun x; e potenssiin negatiivinen murtoluku, t toiseen, per 2, loppu murtoluku; d x");
+}
