@@ -331,15 +331,12 @@ fn caret_and_hat() {
 
 #[test]
 fn mn_with_space() {
-  set_preference("BlockSeparators".to_string(), " ,".to_string()).unwrap();   // this may need to change if testing another language
   let expr = "<math><mn>1 234 567</mn></math>";
-  test("en", "SimpleSpeak", expr, "1234567");
+  test_prefs("en", "SimpleSpeak", vec![("DecimalSeparators", "."), ("BlockSeparators", " ,")], expr, "1234567");
 }
 
 #[test]
 fn mn_with_block_and_decimal_separators() {
-  set_preference("DecimalSeparators".to_string(), ".".to_string()).unwrap();   // this may need to change if testing another language
-  set_preference("BlockSeparators".to_string(), " ,".to_string()).unwrap();    // this may need to change if testing another language
   let expr = "<math><mn>1,234.56</mn></math>";                                       // may want to change this for another language
-  test("en", "SimpleSpeak", expr, "1234.56");
+  test_prefs("en", "SimpleSpeak", vec![("DecimalSeparators", "."), ("BlockSeparators", " ,")], expr, "1234.56");
 }

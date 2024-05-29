@@ -54,6 +54,7 @@ pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
         let rules = rules.borrow_mut();
         let mut prefs = rules.pref_manager.borrow_mut();
         prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "").unwrap();         // makes testing simpler
+        prefs.set_user_prefs("MathRate", "100").unwrap();                            // makes testing simpler
         prefs.set_user_prefs("PauseFactor", "100").unwrap();                         // makes testing simpler
         prefs.set_user_prefs("Verbosity", "Medium").unwrap();
         prefs.set_user_prefs("Impairment", "Blindness").unwrap();
@@ -74,6 +75,7 @@ pub fn test_prefs(language: &str, speech_style: &str, test_prefs: Vec<(&str, &st
         let rules = rules.borrow_mut();
         let mut prefs = rules.pref_manager.borrow_mut();
         prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "").unwrap();         // makes testing simpler
+        prefs.set_user_prefs("MathRate", "100").unwrap();                            // makes testing simpler
         prefs.set_user_prefs("PauseFactor", "100").unwrap();                         // makes testing simpler
         prefs.set_user_prefs("Verbosity", "Medium").unwrap();
     });

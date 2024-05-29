@@ -289,7 +289,12 @@ fn ignore_period_and_space() {
 
 #[test]
 fn mn_with_space() {
-  set_preference("BlockSeparators".to_string(), " .".to_string()).unwrap();
   let expr = "<math><mn>1 234 567</mn></math>";
-  test("sv", "SimpleSpeak", expr, "1234567"); // borde detta vara så här?
+  test_prefs("sv", "SimpleSpeak", vec![("DecimalSeparators",","), ("BlockSeparators", " .")], expr, "1234567");
+}
+
+#[test]
+fn mn_with_block_and_decimal_separators() {
+  let expr = "<math><mn>1.234,56</mn></math>";                                       // may want to change this for another language
+  test_prefs("en", "SimpleSpeak", vec![("DecimalSeparators", ","), ("BlockSeparators", " .")], expr, "1234,56");
 }
