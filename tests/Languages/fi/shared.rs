@@ -764,3 +764,162 @@ fn FinME_newton_binomial() {
   test("fi", "ClearSpeak", expr, "auki sulku a plus b, kiinni sulku potenssiin n; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; n yli k a potenssiin n miinus k, b potenssiin k; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; murtoluku osoittaja; n kertoma; ja nimittäjä k kertoma, auki sulku n miinus k, kiinni sulku; kertoma;, a potenssiin n miinus k, b potenssiin k");
   test("fi", "SimpleSpeak", expr, "auki sulku a plus b, kiinni sulku potenssiin n; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; n yli k a potenssiin n miinus k, b potenssiin k; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; murtoluku, n kertoma, per, k kertoma, auki sulku n miinus k, kiinni sulku; kertoma, loppu murtoluku;, a potenssiin n miinus k, b potenssiin k")
 }
+
+#[test]
+fn FinME_secant_algorithm() {
+    let expr ="<math>
+    <mrow>
+      <msub>
+        <mi>x</mi>
+        <mrow>
+          <mi>n</mi>
+          <mo>+</mo>
+          <mn>1</mn>
+        </mrow>
+      </msub>
+      <mo>=</mo>
+    </mrow>
+    <mrow>
+      <msub>
+        <mi>x</mi>
+        <mi>n</mi>
+      </msub>
+      <mo>−</mo>
+    </mrow>
+    <mrow>
+      <mfrac>
+        <mrow>
+          <msub>
+            <mi>x</mi>
+            <mi>n</mi>
+          </msub>
+          <mo>−</mo>
+          <msub>
+            <mi>x</mi>
+            <mrow>
+              <mi>n</mi>
+              <mo>−</mo>
+              <mn>1</mn>
+            </mrow>
+          </msub>
+        </mrow>
+        <mrow>
+          <mi>f</mi>
+          <mo>&#x2061;</mo>
+          <mo>(</mo>
+          <msub>
+            <mi>x</mi>
+            <mi>n</mi>
+          </msub>
+          <mo>)</mo>
+          <mo>−</mo>
+          <mi>f</mi>
+          <mo>&#x2061;</mo>
+          <mo>(</mo>
+          <msub>
+            <mi>x</mi>
+            <mrow>
+              <mi>n</mi>
+              <mo>−</mo>
+              <mn>1</mn>
+            </mrow>
+          </msub>
+          <mo>)</mo>
+        </mrow>
+      </mfrac>
+      <mo>⁢</mo>
+      <mi>f</mi>
+      <mo>&#x2061;</mo>
+      <mo>(</mo>
+      <msub>
+        <mi>x</mi>
+        <mi>n</mi>
+      </msub>
+      <mo>)</mo>
+    </mrow>
+  </math>";
+  test("fi", "ClearSpeak", expr, "x ala n plus 1 loppu ala; on yhtä suuri kuin; x ala n miinus; murtoluku osoittaja; x ala n miinus, x ala n miinus 1 loppu ala; ja nimittäjä f arvolla, auki sulku x ala n kiinni sulku; miinus; f arvolla; auki sulku, x ala n miinus 1 loppu ala; kiinni sulku; f arvolla, auki sulku x ala n kiinni sulku");
+  test("fi", "SimpleSpeak", expr, "x ala n plus 1 loppu ala; on yhtä suuri kuin; x ala n miinus; murtoluku, x ala n miinus, x ala n miinus 1 loppu ala; per, f arvolla, auki sulku x ala n kiinni sulku; miinus; f arvolla; auki sulku, x ala n miinus 1 loppu ala; kiinni sulku, loppu murtoluku; f arvolla, auki sulku x ala n kiinni sulku");
+}
+
+#[test]
+fn Fin_ME_law_of_sines() {
+    let expr = "<math>
+    <mfrac>
+      <mi>a</mi>
+      <mrow>
+        <mrow>
+          <mi>sin</mi>
+          <mo>⁡</mo>
+        </mrow>
+        <mi>α</mi>
+      </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+      <mi>b</mi>
+      <mrow>
+        <mrow>
+          <mi>sin</mi>
+          <mo>⁡</mo>
+        </mrow>
+        <mi>β</mi>
+      </mrow>
+    </mfrac>
+    <mo>=</mo>
+    <mfrac>
+      <mi>c</mi>
+      <mrow>
+        <mrow>
+          <mi>sin</mi>
+          <mo>⁡</mo>
+        </mrow>
+        <mi>γ</mi>
+      </mrow>
+    </mfrac>
+  </math>";
+  test("fi", "ClearSpeak", expr, "murtoluku osoittaja a; ja nimittäjä sini arvolla alfa; on yhtä suuri kuin; murtoluku osoittaja b; ja nimittäjä sini arvolla beeta; on yhtä suuri kuin; murtoluku osoittaja c; ja nimittäjä sini arvolla gamma;");
+  test("fi", "SimpleSpeak", expr, "murtoluku, a per, sini arvolla alfa, loppu murtoluku; on yhtä suuri kuin; murtoluku, b per, sini arvolla beeta, loppu murtoluku; on yhtä suuri kuin; murtoluku, c per, sini arvolla gamma, loppu murtoluku;");
+}
+
+#[test]
+fn FinME_vectors() {
+let expr = "<math>
+<mrow>
+  <mrow>
+    <mover>
+      <mi>v</mi>
+      <mo>→</mo>
+    </mover>
+  </mrow>
+  <mo>=</mo>
+</mrow>
+<mrow>
+  <msub>
+    <mi>x</mi>
+    <mn>1</mn>
+  </msub>
+  <mrow>
+    <mover>
+      <mi>i</mi>
+      <mo>→</mo>
+    </mover>
+  </mrow>
+  <mo>+</mo>
+</mrow>
+<mrow>
+  <msub>
+    <mi>y</mi>
+    <mn>1</mn>
+  </msub>
+  <mrow>
+    <mover>
+      <mi>j</mi>
+      <mo>→</mo>
+    </mover>
+  </mrow>
+</mrow>
+</math>";
+test("fi", "ClearSpeak", expr, "vektori v on yhtä suuri kuin; x ala 1 vektori i, plus; y ala 1 vektori j");
+test("fi", "SimpleSpeak", expr, "vektori v on yhtä suuri kuin; x ala 1 vektori i, plus; y ala 1 vektori j");
+}
