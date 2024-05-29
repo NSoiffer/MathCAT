@@ -8,14 +8,14 @@ use std::path::Path;
 use std::path::PathBuf;
 
 use zip::result::ZipResult;
-use zip::write::FileOptions;
+use zip::write::{FileOptions, SimpleFileOptions};
 use zip::CompressionMethod;
 use zip::ZipWriter;
 
 fn zip_dir<T: Write + Seek>(
     path: &Path,
     target: T,
-    options: FileOptions,
+    options: SimpleFileOptions
 ) -> ZipResult<T> {
     let mut zip = ZipWriter::new(target);
 
@@ -32,7 +32,7 @@ fn zip_dir<T: Write + Seek>(
 fn zip_entry<T: Write + Seek>(
     zip: &mut ZipWriter<T>,
     entry: DirEntry,
-    options: FileOptions,
+    options: SimpleFileOptions,
 ) -> io::Result<()> {
     let path = entry.path();
 

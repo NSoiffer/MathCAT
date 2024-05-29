@@ -57,8 +57,8 @@ zip = { version = "2.1", default-features = false, features = ["deflate"] }
 
 [build-dependencies]
 bitflags = "1.2.1"
-phf = { version = "0.8.0", features = ["macros"] }
-zip = { version = "0.6.2", default-features = false, features = ["deflate"] }
+phf = { version = "0.11", features = ["macros"] }
+zip = { version = "2.1", default-features = false, features = ["deflate"] }
 
 [lib]
 name = "libmathcat"
