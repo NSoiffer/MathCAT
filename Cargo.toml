@@ -1,6 +1,6 @@
 [package]
 name = "mathcat"
-version = "0.5.7"
+version = "0.5.8"
 authors = ["Neil Soiffer <soiffer@alum.mit.edu>"]
 license = "MIT"
 description = "MathCAT: Math Capable Assistive Technology ('Speech and braille from MathML')"
@@ -23,7 +23,7 @@ strum_macros = "0.26"
 error-chain = "0.12.4"
 regex = "1.10"
 dirs = "5.0"
-bitflags = "2.5"   # there is a newer version, but it causes compile problems
+bitflags = "2.5"
 phf = { version = "0.11", features = ["macros"] }
 rand = "0.8"
 roman = "0.1"
