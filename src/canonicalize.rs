@@ -112,7 +112,6 @@ bitflags! {
 		const UNSPECIFIED=0xf;		// 'and-ing will match anything
 	}
 }
-
 // OperatorInfo is a key structure for parsing.
 // They OperatorInfo is this program's representation of MathML's Operator Dictionary.
 // The OperatorTypes say how the operator can group (can be overridden with @form="..." on an element).
