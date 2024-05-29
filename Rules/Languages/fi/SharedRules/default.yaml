@@ -39,6 +39,7 @@
   replace:
   - bookmark: "@id"
   # FIX: removing the digit block separators is likely locale dependent
+  # FI: removed both decimal separators, can be changed later, so that decimal period . is ignored
   - x: "translate(., ' `', '')"   # remove digit block separators
 
 - name: default
