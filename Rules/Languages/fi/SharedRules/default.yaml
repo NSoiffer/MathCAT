@@ -39,7 +39,8 @@
   replace:
   - bookmark: "@id"
   # FIX: removing the digit block separators is likely locale dependent
-  - x: "translate(., ' ,`', '')"   # remove digit block separators
+  # FI: removed both decimal separators, can be changed later, so that decimal period . is ignored
+  - x: "translate(., ' `', '')"   # remove digit block separators
 
 - name: default
   tag: [mo, mtext]
@@ -272,9 +273,9 @@
           - test: # only bother announcing if there is more than one prescript
               if: "count($Prescripts) > 2"
               then:
-              - T: ""      # phrase(substitute x 'with' y)
+              # - T: ""      # phrase(substitute x 'with' y)
               - x: "count($Prescripts) div 2"
-              - T: "etumääre"      # phrase(in this equation certain 'prescripts' apply)
+              - T: "etumäärettä"      # phrase(in this equation certain 'prescripts' apply)
               - pause: short
           - test:
               if: "not($Prescripts[1][self::m:none])"
@@ -326,7 +327,7 @@
               - test:
                   if: "$Prescripts"
                   then: [T: "ja"]      # phrase(10 is greater than 8 'and' less than 15)
-              - T: "arvolla"      # phrase(substitute x 'with' y)
+              - T: "jolla on"      
               - x: "count($Postscripts) div 2"
               - T: "jälkikirjoitusta"      # phrase(this material includes several 'postscripts')
               - pause: short
@@ -509,17 +510,17 @@
           else:
           - test:
               if: ".[contains(@notation,'updiagonalstrike')]"
-              then: [T: "ylös diagonaalisesti", pause: short]      # phrase(the line runs 'up diagonal')
+              then: [T: "ylös viistoon", pause: short]      # phrase(the line runs 'up diagonal')
           - test:
               if: ".[contains(@notation,'downdiagonalstrike')]"
-              then: [T: "alas diagonaalisesti", pause: short]      # phrase(the line runs 'down diagonal')
+              then: [T: "alas viistoon", pause: short]      # phrase(the line runs 'down diagonal')
       - test:
           if: ".[contains(@notation,'verticalstrike')]"
           then: [T: "pystysuora", pause: short]      # phrase(the line is  'vertical')
       - test:
           if: ".[contains(@notation,'horizontalstrike')]"
           then: [T: "vaakasuora", pause: short]      # phrase(the line is 'horizontal')
-      - T: "yliviivaa"      # phrase(please 'cross out' the incorrect answer)
+      - T: "yliviivaus"      # phrase(please 'cross out' the incorrect answer)
       - pause: short
   - test:
       if: ".[contains(@notation,'uparrow')]"
@@ -559,7 +560,7 @@
       then: [T: "nuoli ylös alas oikealle alas", pause: short]      # phrase(trend is indicated by the 'double ended down diagonal arrow')
   - test:
       if: ".[contains(@notation,'actuarial')]"
-      then: [T: "kirjanpitosymboli", pause: short]      # phrase(the 'actuarial symbol' represents a specific quantity)
+      then: [T: "kirjanpitomerkki", pause: short]      # phrase(the 'actuarial symbol' represents a specific quantity)
   - test:
       if: ".[contains(@notation,'madrub')]"
       then: [T: "arabialainen kertoma", pause: short]      # phrase(the 'arabic factorial symbol' represents a factorial operation)
