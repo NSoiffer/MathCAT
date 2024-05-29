@@ -1,6 +1,7 @@
 //! The build.rs file is necessary to generate rules.zip.
 //! rules.zip are needed so there is a way to get the rules dir into the build since your can't get from the crate.
 //! The expectation is that most builds (with the exception of WASM builds) will need a build.rs file to extract the rules.
+#![allow(clippy::needless_return)]
 
 use std::fs::{read_dir, File};
 use std::io::{self, Read, Seek, Write};
@@ -8,8 +9,6 @@ use std::path::{Path, PathBuf};
 
 // use zip::result::ZipResult;
 use zip::write::{ZipWriter, SimpleFileOptions};
-use zip::result::ZipResult;
-use zip::write::{FileOptions, SimpleFileOptions};
 use zip::CompressionMethod;
 
 fn zip_dir(rules_dir: &Path, sub_dir_name: &str, archive_zip: &mut ZipWriter<File>, options: SimpleFileOptions) -> Result<(), std::io::Error> {
@@ -64,7 +63,7 @@ fn add_file_to_zip<W: Write + Seek>(
 ) -> io::Result<()> {
     zip.start_file_from_path(path, options)?;
 
-    let mut file = File::open(&path)?;
+    let mut file = File::open(path)?;
     let mut buffer = Vec::new();
 
     file.read_to_end(&mut buffer)?;
@@ -117,7 +116,7 @@ fn main() {
 
     let mut archive_zip = ZipWriter::new(archive_zip_file);
     
-    if let Err(e) = zip_dir(&rules_dir, "Languages", &mut archive_zip, zip_options.clone()) {
+    if let Err(e) = zip_dir(&rules_dir, "Languages", &mut archive_zip, zip_options) {
         panic!("Error: {}", e);
     }
     if let Err(e) = zip_dir(&rules_dir, "Braille", &mut archive_zip, zip_options) {

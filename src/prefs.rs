@@ -434,7 +434,7 @@ impl PreferenceManager {
         if is_file_shim(&test_file) {
             return false;
         }
-        let zip_file = dir.join(&(language.to_string() + ".zip"));
+        let zip_file = dir.join(language.to_string() + ".zip");
         // Fix: Need to add wasm version (can't use read_to_string because it wants UTF-8)
         let archive = match std::fs::read(&zip_file) {
             Err(e) => {
