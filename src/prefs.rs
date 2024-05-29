@@ -63,8 +63,8 @@ impl Preferences{
         prefs.insert("Verbosity".to_string(), Yaml::String("Medium".to_string()));
         prefs.insert("SpeechOverrides_CapitalLetters".to_string(), Yaml::String("".to_string())); // important for testing
         prefs.insert("Blind".to_string(), Yaml::Boolean(true));
-        prefs.insert("MathRate".to_string(), Yaml::String("100.0".to_string()));
-        prefs.insert("PauseFactor".to_string(), Yaml::String("100.0".to_string()));
+        prefs.insert("MathRate".to_string(), Yaml::Real("100.0".to_string()));
+        prefs.insert("PauseFactor".to_string(), Yaml::Real("100.0".to_string()));
         prefs.insert("NavMode".to_string(), Yaml::String("Enhanced".to_string()));
         prefs.insert("Overview".to_string(), Yaml::Boolean(false));
         prefs.insert("ResetOverView".to_string(), Yaml::Boolean(true));
@@ -73,6 +73,8 @@ impl Preferences{
         prefs.insert("BrailleCode".to_string(), Yaml::String("Nemeth".to_string()));
         prefs.insert("BrailleNavHighlight".to_string(), Yaml::String("EndPoints".to_string()));
         prefs.insert("UEB_START_MODE".to_string(), Yaml::String("Grade2".to_string()));
+        prefs.insert("DecimalSeparators".to_string(), Yaml::String(".".to_string()));
+        prefs.insert("BlockSeparators".to_string(), Yaml::String(", \u{00A0}\u{202F}".to_string()));
     
         return Preferences{ prefs };
     }
@@ -602,6 +604,8 @@ impl PreferenceManager {
             if pref_value.as_str().unwrap() != value {
                 self.reset_preferences(key, value)?;
             }
+        } else {
+            bail!("{} is an unknown MathCAT preference!", key);
         }
 
         debug!("Setting ({}) {} to {}", if is_user_pref {"user"} else {"sys"}, key, value);

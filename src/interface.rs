@@ -224,7 +224,8 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
             pref_manager.set_api_boolean_pref(&name, value.to_lowercase()=="true"); 
         } else { 
             match name.as_str() {
-                "Pitch" | "Rate" | "Volume" | "CapitalLetters_Pitch"=> {
+                "Pitch" | "Rate" | "Volume" | "CapitalLetters_Pitch" | "MathRate" | "PauseFactor" => {
+
                     pref_manager.set_api_float_pref(&name, to_float(&name, &value)?);    
                 },
                 _ => {
