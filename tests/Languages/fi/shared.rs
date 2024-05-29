@@ -923,3 +923,269 @@ let expr = "<math>
 test("fi", "ClearSpeak", expr, "vektori v on yhtä suuri kuin; x ala 1 vektori i, plus; y ala 1 vektori j");
 test("fi", "SimpleSpeak", expr, "vektori v on yhtä suuri kuin; x ala 1 vektori i, plus; y ala 1 vektori j");
 }
+
+#[test]
+fn FinME_compound_derivate_rule() {
+let expr = "<math>
+<mrow>
+  <mrow>
+    <mi>D</mi>
+  </mrow>
+  <mrow>
+    <mo>(</mo>
+    <mi>g</mi>
+    <mo>∘</mo>
+    <mi>f</mi>
+    <mo>)</mo>
+  </mrow>
+  <mo>=</mo>
+</mrow>
+<mrow>
+  <mrow>
+    <mi>D</mi>
+  </mrow>
+  <mi>g</mi>
+  <mo>(</mo>
+  <mi>f</mi>
+  <mo>(</mo>
+  <mi>x</mi>
+  <mo>)</mo>
+  <mo>)</mo>
+  <mo>=</mo>
+</mrow>
+<mrow>
+  <msup>
+    <mi>g</mi>
+    <mo>′</mo>
+  </msup>
+  <mo>(</mo>
+  <mi>f</mi>
+  <mo>(</mo>
+  <mi>x</mi>
+  <mo>)</mo>
+  <mo>)</mo>
+  <msup>
+    <mi>f</mi>
+    <mo>′</mo>
+  </msup>
+  <mo>(</mo>
+  <mi>x</mi>
+  <mo>)</mo>
+</mrow>
+</math>";
+test("fi", "ClearSpeak", expr, "iso d, auki sulku g yhdistetty f, kiinni sulku; on yhtä suuri kuin; iso d, g arvolla f arvolla x; on yhtä suuri kuin; g pilkku, arvolla f arvolla x; f pilkku, arvolla x");
+test("fi", "SimpleSpeak", expr, "iso d, auki sulku g yhdistetty f, kiinni sulku; on yhtä suuri kuin; iso d, g arvolla f arvolla x; on yhtä suuri kuin; g pilkku, arvolla f arvolla x; f pilkku, arvolla x");
+}
+
+#[test]
+fn FinME_integration_in_parts() {
+let expr = "<math>
+<mrow>
+  <mo>∫</mo>
+  <msup>
+    <mi>f</mi>
+    <mo>′</mo>
+  </msup>
+  <mrow>
+    <mo>(</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+  </mrow>
+  <mi>g</mi>
+  <mrow>
+    <mo>(</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+  </mrow>
+  <mtext>&#x2009;</mtext>
+  <mi>d</mi>
+  <mi>x</mi>
+  <mo>=</mo>
+</mrow>
+<mrow>
+  <mi>f</mi>
+  <mrow>
+    <mo>(</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+  </mrow>
+  <mi>g</mi>
+  <mrow>
+    <mo>(</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+  </mrow>
+  <mo>−</mo>
+</mrow>
+<mrow>
+  <mo>∫</mo>
+  <msup>
+    <mi>g</mi>
+    <mo>′</mo>
+  </msup>
+  <mrow>
+    <mo>(</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+  </mrow>
+  <mi>f</mi>
+  <mrow>
+    <mo>(</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+  </mrow>
+  <mtext>&#x2009;</mtext>
+  <mi>d</mi>
+  <mi>x</mi>
+</mrow>
+</math>";
+test("fi", "ClearSpeak", expr, "integraali f pilkku, arvolla x, g arvolla x, d x; on yhtä suuri kuin; f arvolla x, g arvolla x; miinus; integraali g pilkku, arvolla x, f arvolla x, d x");
+test("fi", "SimpleSpeak", expr, "integraali f pilkku, arvolla x, g arvolla x, d x; on yhtä suuri kuin; f arvolla x, g arvolla x; miinus; integraali g pilkku, arvolla x, f arvolla x, d x");
+}
+
+#[test]
+fn FinME_simpsons_rule() {
+let expr = "<math>
+<mrow>
+  <msubsup>
+    <mo>∫</mo>
+    <mi>a</mi>
+    <mi>b</mi>
+  </msubsup>
+  <mi>f</mi>
+  <mo>(</mo>
+  <mi>x</mi>
+  <mo>)</mo>
+  <mtext>&#x2009;</mtext>
+  <mi>d</mi>
+  <mi>x</mi>
+  <mo>≈</mo>
+</mrow>
+<mrow>
+  <mfrac>
+    <mi>h</mi>
+    <mn>3</mn>
+  </mfrac>
+  <mrow>
+    <mo>(</mo>
+    <mi>f</mi>
+    <mo>(</mo>
+    <msub>
+      <mi>x</mi>
+      <mn>0</mn>
+    </msub>
+    <mo>)</mo>
+    <mo>+</mo>
+    <mn>4</mn>
+    <mi>f</mi>
+    <mo>(</mo>
+    <msub>
+      <mi>x</mi>
+      <mn>1</mn>
+    </msub>
+    <mo>)</mo>
+    <mo>+</mo>
+    <mn>2</mn>
+    <mi>f</mi>
+    <mo>(</mo>
+    <msub>
+      <mi>x</mi>
+      <mn>2</mn>
+    </msub>
+    <mo>)</mo>
+    <mo>+</mo>
+    <mn>4</mn>
+    <mi>f</mi>
+    <mo>(</mo>
+    <msub>
+      <mi>x</mi>
+      <mn>3</mn>
+    </msub>
+    <mo>)</mo>
+    <mo>+</mo>
+    <mo>⋯</mo>
+    <mo>+</mo>
+    <mn>4</mn>
+    <mi>f</mi>
+    <mo>(</mo>
+    <msub>
+      <mi>x</mi>
+      <mrow>
+        <mi>n</mi>
+        <mo>−</mo>
+        <mn>1</mn>
+      </mrow>
+    </msub>
+    <mo>)</mo>
+    <mo>+</mo>
+    <mi>f</mi>
+    <mo>(</mo>
+    <msub>
+      <mi>x</mi>
+      <mi>n</mi>
+    </msub>
+    <mo>)</mo>
+    <mo>)</mo>
+  </mrow>
+</mrow>
+</math>";
+test("fi", "ClearSpeak", expr, "integraali käy, luvusta a, lukuun b; f arvolla x, d x; on likimäärin yhtä suuri kuin; h per 3 kertaa; auki sulku; f arvolla, auki sulku x ala 0 kiinni sulku; plus, 4, f arvolla, auki sulku x ala 1 kiinni sulku; plus, 2, f arvolla, auki sulku x ala 2 kiinni sulku; plus, 4, f arvolla, auki sulku x ala 3 kiinni sulku; plus piste piste piste plus; 4; f arvolla; auki sulku, x ala n miinus 1 loppu ala; kiinni sulku; plus, f arvolla, auki sulku x ala n kiinni sulku; kiinni sulku");
+test("fi", "SimpleSpeak", expr, "integraali käy, luvusta a, lukuun b; f arvolla x, d x; on likimäärin yhtä suuri kuin; h per 3, kertaa; auki sulku; f arvolla, auki sulku x ala 0 kiinni sulku; plus, 4, f arvolla, auki sulku x ala 1 kiinni sulku; plus, 2, f arvolla, auki sulku x ala 2 kiinni sulku; plus, 4, f arvolla, auki sulku x ala 3 kiinni sulku; plus piste piste piste plus; 4; f arvolla; auki sulku, x ala n miinus 1 loppu ala; kiinni sulku; plus, f arvolla, auki sulku x ala n kiinni sulku; kiinni sulku");
+}
+
+#[test]
+fn FinME_binomials_cumulative_function() {
+let expr = "<math>
+<mrow>
+  <mi>P</mi>
+  <mo>&#x2061;</mo>
+  <mo>(</mo>
+  <mi>X</mi>
+  <mo>≤</mo>
+  <mi>k</mi>
+  <mo>)</mo>
+  <mo>=</mo>
+</mrow>
+<mrow>
+  <msubsup>
+    <mo>∑</mo>
+    <mrow>
+      <mi>i</mi>
+      <mo>=</mo>
+      <mn>0</mn>
+    </mrow>
+    <mrow>
+      <mo>|</mo>
+      <mi>k</mi>
+      <mo>|</mo>
+    </mrow>
+  </msubsup>
+  <mrow>
+    <mo>(</mo>
+    <mfrac linethickness='0'>
+      <mi>n</mi>
+      <mi>i</mi>
+    </mfrac>
+    <mo>)</mo>
+  </mrow>
+  <msup>
+    <mi>p</mi>
+    <mi>i</mi>
+  </msup>
+  <mo>(</mo>
+  <mn>1</mn>
+  <mo>−</mo>
+  <mi>p</mi>
+  <msup>
+    <mo>)</mo>
+    <mrow>
+      <mi>n</mi>
+      <mo>−</mo>
+      <mi>i</mi>
+    </mrow>
+  </msup>
+</mrow>
+</math>";
+test("fi", "ClearSpeak", expr, "iso p arvolla; auki sulku, iso x on pienempi tai yhtä suuri kuin k; kiinni sulku; on yhtä suuri kuin; summa käy, luvusta i on yhtä suuri kuin 0, lukuun itseisarvo k,; n yli i p potenssiin i kertaa; auki sulku 1 miinus p, kiinni sulku potenssiin n miinus i");
+test("fi", "SimpleSpeak", expr, "iso p arvolla; auki sulku, iso x on pienempi tai yhtä suuri kuin k; kiinni sulku; on yhtä suuri kuin; summa käy, luvusta i on yhtä suuri kuin 0, lukuun itseisarvo k,; n yli i p potenssiin i kertaa; auki sulku 1 miinus p, kiinni sulku potenssiin n miinus i");
+}
