@@ -100,7 +100,9 @@ lazy_static!{
 
 // Operators are either PREFIX, INFIX, or POSTFIX, but can also have other properties such as LEFT_FENCE
 bitflags! {
+	#[derive(Clone, Debug, Copy, PartialEq, Eq)]
 	struct OperatorTypes: u32 {
+		const NONE		= 0x0;
 		const PREFIX	= 0x1;
 		const INFIX		= 0x2;
 		const POSTFIX	= 0x4;
@@ -110,7 +112,6 @@ bitflags! {
 		const UNSPECIFIED=0xf;		// 'and-ing will match anything
 	}
 }
-
 // OperatorInfo is a key structure for parsing.
 // They OperatorInfo is this program's representation of MathML's Operator Dictionary.
 // The OperatorTypes say how the operator can group (can be overridden with @form="..." on an element).
@@ -180,31 +181,31 @@ impl OperatorVersions {
 
 impl OperatorInfo {
 	fn is_prefix(&self) -> bool {
-		return (self.op_type.bits & OperatorTypes::PREFIX.bits) != 0;
+		return (self.op_type & OperatorTypes::PREFIX) != OperatorTypes::NONE;
 	}
 
 	fn is_infix(&self) -> bool {
-		return (self.op_type.bits & OperatorTypes::INFIX.bits) != 0;
+		return (self.op_type & OperatorTypes::INFIX) != OperatorTypes::NONE;
 	}
 
 	fn is_postfix(&self) -> bool {
-		return (self.op_type.bits & OperatorTypes::POSTFIX.bits) != 0;
+		return (self.op_type & OperatorTypes::POSTFIX) != OperatorTypes::NONE;
 	}
 
 	fn is_left_fence(&self) -> bool {
-		return self.op_type.bits & OperatorTypes::LEFT_FENCE.bits == OperatorTypes::LEFT_FENCE.bits;
+		return self.op_type & OperatorTypes::LEFT_FENCE == OperatorTypes::LEFT_FENCE;
 	}
 
 	fn is_right_fence(&self) -> bool {
-		return self.op_type.bits & OperatorTypes::RIGHT_FENCE.bits ==OperatorTypes::RIGHT_FENCE.bits;
+		return self.op_type & OperatorTypes::RIGHT_FENCE ==OperatorTypes::RIGHT_FENCE;
 	}
 
 	fn is_fence(&self) -> bool {
-		return (self.op_type.bits & (OperatorTypes::LEFT_FENCE.bits | OperatorTypes::RIGHT_FENCE.bits)) != 0;
+		return (self.op_type & (OperatorTypes::LEFT_FENCE | OperatorTypes::RIGHT_FENCE)) != OperatorTypes::NONE;
 	}
 
 	fn is_operator_type(&self, op_type: OperatorTypes) -> bool {
-		return self.op_type.bits & op_type.bits != 0;
+		return self.op_type & op_type != OperatorTypes::NONE;
 	}
 
 	fn is_plus_or_minus(&self) -> bool {
