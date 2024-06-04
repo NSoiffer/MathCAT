@@ -3,7 +3,6 @@
 //! The expectation is that most builds (with the exception of WASM builds) will need a build.rs file to extract the rules.
 #![allow(clippy::needless_return)]
 
-use std::ffi::OsStr;
 use std::fs::{read_dir, DirBuilder, File, remove_file, remove_dir};
 use std::io::{self, Read, Seek, Write};
 use std::path::{Path, PathBuf};
@@ -19,11 +18,10 @@ use zip::CompressionMethod;
 /// For example, if we have the input ".../Rules/Langauges", then we create a zip file for each subdir with yaml files in it.
 ///    So we get out_dir/Rules/Langauges/en/en.zip, out_dir/Rules/Langauges/es/es.zip, etc.
 /// The resulting archive will reproduce the Rules tree but with the yaml files zipped up per/directory.
-fn zip_dir(rules_dir: &Path, sub_dir_name: &str, archive_zip: &mut ZipWriter<File>, options: SimpleFileOptions, out_dir: &OsStr) -> Result<(), std::io::Error> {
+fn zip_dir(rules_dir: &Path, sub_dir_name: &str, archive_zip: &mut ZipWriter<File>, options: SimpleFileOptions, out_dir: &Path) -> Result<(), std::io::Error> {
     // There are a number of paths to keep track of so that the resulting zip archive reproduces the appropriate paths
     let relative_rules_sub_dir = PathBuf::from("Rules").join(sub_dir_name);
     let rules_sub_dir = rules_dir.join(sub_dir_name);
-    let out_dir = PathBuf::from(&out_dir);
     println!("using out_dir {:?}", out_dir.to_str());
     for entry in read_dir(rules_sub_dir)? {
         let entry = entry?;
@@ -78,12 +76,51 @@ fn zip_dir(rules_dir: &Path, sub_dir_name: &str, archive_zip: &mut ZipWriter<Fil
     return Ok( () );
 }
 
+/// This differs from `zip_dir` in that it does _not_ zip up the directory. Each individual file is zipped so that when the full archive
+/// is unzipped, the directory contents do not need to be unzipped.
+/// For example, Rules/prefs.yaml and Rules/Intent/general.yaml will exists in the unzipped archive.
+fn zip_other_files(rules_dir: &Path, archive_zip: &mut ZipWriter<File>, options: SimpleFileOptions, out_dir: &Path, current_out_dir: &Path) -> Result<(), std::io::Error> {
+    // FIX: this shares a lot in common with `zip_dir` -- can they be merged without creating something much more complicated?
+    // this is used when zipping -- files are added to the zip file relative to this
+    if  std::env::set_current_dir(&out_dir).is_err() {
+        println!("cargo::warning=couldn't change to directory '{}'", &out_dir.display());
+        return Err(std::io::Error::new(std::io::ErrorKind::Other,
+            format!("couldn't change to directory '{}'", &out_dir.display())));
+    }
+    for entry in read_dir(rules_dir)? {
+        let entry = entry?;
+        let entry_path = entry.path();
+        let entry_name = entry_path.components().last().unwrap().as_os_str().to_str().unwrap();
+
+        // println!("trying dir entry {:?}", entry_path.to_str());
+        if entry_path.is_dir(){
+            if entry_name == "Intent" {       // handled elsewhere
+                zip_other_files(&rules_dir.join("Intent"), archive_zip, options, out_dir, &current_out_dir.join("Intent"))?;
+            }
+        } else if let Some(suffix) = &entry_path.extension() {
+            let suffix = suffix.to_ascii_lowercase();
+            if suffix == "yaml" || suffix == "yml" {
+                // make sure the appropriate directory exists in 'out'
+                DirBuilder::new().recursive(true).create(&current_out_dir).unwrap();
+                let out_dir_file_name = current_out_dir.join(entry_name);  // e.g., ...out/Rules/prefs.yaml
+                // println!("cargo::warning=out_dir_file_name '{}'", &out_dir_file_name.display());
+                std::fs::copy(&entry_path, &out_dir_file_name)?;
+                let relative_out_dir = out_dir_file_name.strip_prefix(out_dir).unwrap();
+                add_file_to_zip(archive_zip, relative_out_dir, options)?;
+
+            }
+        }
+    }
+    return Ok( () );
+}
+
+
 fn add_file_to_zip<W: Write + Seek>(
     zip: &mut ZipWriter<W>,
     path: &Path,
     options: SimpleFileOptions,
 ) -> io::Result<()> {
-    println!("add_file_to_zip: file='{}'", path.to_str().unwrap());
+    // println!("cargo::warning=add_file_to_zip: file='{}'", path.to_str().unwrap());
 
     zip.start_file_from_path(path, options)?;
 
@@ -126,6 +163,9 @@ fn main() {
     // let archive = PathBuf::from(concat!(env!("OUT_DIR"),"/rules.zip"));
 
     let out_dir = std::env::var_os("OUT_DIR").unwrap();
+    let out_dir = PathBuf::from(&out_dir);
+    let rules_out_dir = PathBuf::from(&out_dir).join("Rules");
+
     let archive_path = PathBuf::from(&out_dir).join("rules.zip");     // A zip file containing all the zip files.
     println!("zip file location: '{:?}'", archive_path.to_str());
 
@@ -140,11 +180,16 @@ fn main() {
     };
 
     let mut archive_zip = ZipWriter::new(archive_zip_file);
-    
-    if let Err(e) = zip_dir(&rules_dir, "Languages", &mut archive_zip, zip_options, &out_dir) {
+
+        
+    if let Err(e) = zip_other_files(&rules_dir, &mut archive_zip, zip_options, &out_dir, &rules_out_dir) {
         panic!("Error: {}", e);
     }
-    if let Err(e) = zip_dir(&rules_dir, "Braille", &mut archive_zip, zip_options, &out_dir) {
+    
+    if let Err(e) = zip_dir(&rules_dir.join("Languages"), &mut archive_zip, zip_options, &out_dir, &rules_out_dir) {
+        panic!("Error: {}", e);
+    }
+    if let Err(e) = zip_dir(&rules_dir.join("Braille"), &mut archive_zip, zip_options, &out_dir, &rules_out_dir) {
         panic!("Error: {}", e);
     }
     if let Err(e) = archive_zip.finish() {
