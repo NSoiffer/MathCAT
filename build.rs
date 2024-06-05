@@ -84,7 +84,7 @@ fn zip_other_files(rules_dir: &Path, archive_zip: &mut ZipWriter<File>, options:
             let suffix = suffix.to_ascii_lowercase();
             if suffix == "yaml" || suffix == "yml" {
                 // make sure the appropriate directory exists in 'out'
-                DirBuilder::new().recursive(true).create(&current_out_dir).unwrap();
+                DirBuilder::new().recursive(true).create(current_out_dir).unwrap();
                 let out_dir_file_name = current_out_dir.join(entry_name);  // e.g., ...out/Rules/prefs.yaml
                 std::fs::copy(&entry_path, &out_dir_file_name)?;
                 let relative_out_dir = out_dir_file_name.strip_prefix(out_dir).unwrap();
