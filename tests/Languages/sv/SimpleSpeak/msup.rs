@@ -47,9 +47,9 @@ fn zero_power() {
 #[test]
 fn decimal_power() {
     let expr = "<math>
-                    <msup> <mi>x</mi> <mn>2.0</mn> </msup>
+                    <msup> <mi>x</mi> <mn>2,0</mn> </msup>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "x upphöjt till 2.0,");
+    test("sv", "SimpleSpeak", expr, "x upphöjt till 2,0,");
 }
 
 #[test]

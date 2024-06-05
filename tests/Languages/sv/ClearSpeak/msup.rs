@@ -63,12 +63,12 @@ fn simple_mi_power() {
 #[test]
 fn decimal_power() {
   let expr = "<math>
-                  <msup> <mn>3</mn> <mn>5.0</mn> </msup>
+                  <msup> <mn>3</mn> <mn>5,0</mn> </msup>
               </math>";
-  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "3 upphöjt till 5.0,");
-  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "3 upphöjt till 5.0,");
-  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "3 upphöjt till 5.0,");
-  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 upphöjt till 5.0,");
+  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "3 upphöjt till 5,0");
+  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "3 upphöjt till 5,0");
+  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "3 upphöjt till 5,0");
+  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 upphöjt till 5,0,");
 }
 
 #[test]
