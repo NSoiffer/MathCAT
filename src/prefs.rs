@@ -26,7 +26,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::path::{Path, PathBuf};
 use crate::speech::{as_str_checked, RulesFor, FileAndTime};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use crate::shim_filesystem::*;
 use zip::ZipArchive;
 use crate::errors::*;
@@ -211,6 +211,7 @@ thread_local!{
 pub struct PreferenceManager {
     rules_dir: PathBuf,                   // full path to rules dir
     error: String,                        // empty/default string if fields are set, otherwise error message
+    is_already_unzipped: HashSet<String>, // when a language/braille code dir is unzipped, it is marked here
     user_prefs: Preferences,              // prefs that come from reading prefs.yaml (system and user locations)
     api_prefs: Preferences,               // prefs set by API calls (along with some defaults not in the user settings such as "pitch")
     sys_prefs_file: Option<FileAndTime>,  // the system prefs.yaml file
@@ -254,6 +255,7 @@ impl PreferenceManager {
     /// If rules_dir is an empty PathBuf, the existing rules_dir is used (an error if it doesn't exist)
     pub fn initialize(&mut self, rules_dir: PathBuf) -> Result<()> {
         self.set_rules_dir(&rules_dir)?;
+        self.is_already_unzipped.clear();
         self.set_preference_files()?;
         self.set_all_files(&rules_dir)?;
         return Ok( () );
@@ -352,7 +354,7 @@ impl PreferenceManager {
     }
 
     fn set_speech_files(&mut self, language_dir: &Path, language: &str, new_speech_style: Option<&str>) -> Result<()> {
-        PreferenceManager::unzip_files(language_dir, language);
+        self.unzip_files(language_dir, language)?;
         self.intent = PreferenceManager::find_file(language_dir, language, Some("en"), "intent.yaml")?;
         self.overview = PreferenceManager::find_file(language_dir, language, Some("en"), "overview.yaml")?;
         self.navigation = PreferenceManager::find_file(language_dir, language, Some("en"), "navigate.yaml")?;
@@ -378,7 +380,7 @@ impl PreferenceManager {
 
     fn set_braille_files(&mut self, braille_rules_dir: &Path, braille_code_name: &str) -> Result<()> {
         // Fix: Currently the braille code and directly it lives have to have the same name
-        PreferenceManager::unzip_files(braille_rules_dir, braille_code_name);
+        self.unzip_files(braille_rules_dir, braille_code_name)?;
 
         let braille_file = braille_code_name.to_string() + "_Rules.yaml";
 
@@ -424,22 +426,30 @@ impl PreferenceManager {
 
     /// Unzip the files if needed
     /// Returns true if it unzipped them
-    fn unzip_files(path: &Path, language: &str) -> bool {
+    fn unzip_files(&mut self, path: &Path, language: &str) -> Result<bool> {
         let dir = match PreferenceManager::get_language_dir(path, language) {
-            None => return false,
+            None => return Ok(false),
             Some(dir) => dir,
         };
-        // FIX: for regional variations, this doesn't necessarily work
-        let test_file = dir.join("unicode.yaml");
-        if is_file_shim(&test_file) {
-            return false;
-        }
         let zip_file = dir.join(language.to_string() + ".zip");
+        let zip_file_string = zip_file.to_string_lossy().to_string();
+        if self.is_already_unzipped.contains(&zip_file.to_string_lossy().to_string()) {
+            return Ok(false);
+        }
         // Fix: Need to add wasm version (can't use read_to_string because it wants UTF-8)
         let archive = match std::fs::read(&zip_file) {
             Err(e) => {
-                debug!("Couldn't open zip file {}. {}", zip_file.to_str().unwrap(), e.to_string());
-                return false              // maybe files exist in parent???
+                // maybe started out with all the files unzipped?
+                match read_dir_shim(path) {
+                    Err(e) => bail!("unzip_files: couldn't read directory '{}'\n  error is {}", path.display(), e.to_string()),
+                    Ok(read_dir_iter) => {
+                        if read_dir_iter.count() > 1 {
+                            self.is_already_unzipped.insert(zip_file_string);
+                            return Ok(false);
+                        }
+                        bail!("Couldn't open zip file {}. {}", zip_file.to_str().unwrap(), e.to_string());
+                    }
+                }
             },
             Ok(contents) => std::io::Cursor::new(contents),
         };
@@ -447,8 +457,9 @@ impl PreferenceManager {
         let mut zip_archive = ZipArchive::new(archive).unwrap();
 
         // FIX: this needs to have a shim for wasm version
-        zip_archive.extract(".").expect("Zip extraction failed");
-        return true;
+        zip_archive.extract(dir).expect("Zip extraction failed");
+        self.is_already_unzipped.insert(zip_file_string);
+        return Ok(true);
     }
 
     /// Find a file matching `file_name` by starting in the regional directory and looking to the language.
