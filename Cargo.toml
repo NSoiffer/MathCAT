@@ -11,7 +11,6 @@ edition = "2018"
 exclude = ["src/main.rs"]    # should have "Rules/", but then one can't run build.rs to build the zip file
 
 [features]
-default = ["include-zip"]
 "include-zip" = []
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
