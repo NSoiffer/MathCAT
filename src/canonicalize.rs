@@ -1887,7 +1887,7 @@ impl CanonicalizeContext {
 		}
 
 		/// Return true if we find a comma that doesn't have an <mn> on both sides
-		fn is_comma_not_part_of_a_number(children: &mut Vec<ChildOfElement>)-> bool {
+		fn is_comma_not_part_of_a_number(children: &[ChildOfElement])-> bool {
 			let n_children = children.len();
 			if n_children == 0 {
 				return false;
@@ -1895,10 +1895,9 @@ impl CanonicalizeContext {
 			let mut previous_child = as_element(children[0]);
 			for i in 1..n_children {
 				let child = as_element(children[i]);
-				if name(&child) == "mo" && as_text(child) == "," && i+1 < n_children {
-					if name(&previous_child) != "mn" || name(&as_element(children[i+1])) != "mn" {
-						return true;
-					}
+				if name(&child) == "mo" && as_text(child) == "," && i+1 < n_children &&
+				   (name(&previous_child) != "mn" || name(&as_element(children[i+1])) != "mn") {
+					return true;
 				}
 				previous_child = child;
 			}
