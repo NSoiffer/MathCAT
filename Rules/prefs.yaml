@@ -89,3 +89,4 @@
     CopyAs: "MathML"       # MathML, LaTeX, ASCIIMath
     DecimalSeparators: "." # [default]
     BlockSeparators: ", \u00A0\u202F" # [default -- includes two forms of non-breaking spaces]
+    DecimalSeparator: "Auto" # Auto, '.', ','
