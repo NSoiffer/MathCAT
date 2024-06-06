@@ -574,7 +574,7 @@ impl CanonicalizeContext {
 			converted_mathml = self.canonicalize_mrows(mathml)
 				.chain_err(|| format!("while processing\n{}", mml_to_string(&mathml)))?;
 		}
-		// debug!("\nMathML after canonicalize:\n{}", mml_to_string(&converted_mathml));
+		debug!("\nMathML after canonicalize:\n{}", mml_to_string(&converted_mathml));
 		return Ok(converted_mathml);
 	}
 		
@@ -1797,6 +1797,12 @@ impl CanonicalizeContext {
 		/// look for potential numbers by looking for sequences with commas, spaces, and decimal points
 		fn merge_number_blocks(context: &CanonicalizeContext, parent_mrow: Element, children: &mut Vec<ChildOfElement>) {
 			// debug!("parent:\n{}", mml_to_string(&parent_mrow));
+			// If we find a comma that is not part of a number, don't form a number
+			//   (see https://github.com/NSoiffer/MathCAT/issues/271)
+			// Unfortunately, we can't do this in the loop below because we might discover the "not part of a number" after a number has been formed
+			if is_comma_not_part_of_a_number(children) {
+				return;
+			}
 			let mut i = 0;
 			while i < children.len() {		// length might change after a merge
 				// {
@@ -1828,6 +1834,7 @@ impl CanonicalizeContext {
 				// potential start of a number
 				let mut end = i + 1;
 				let mut has_decimal_separator = false;
+				let mut not_a_number = false;
 				if i < children.len() {
 					// look at the right siblings and pull in the longest sequence of number/separators -- then check it for validity
 					for sibling in children[i+1..].iter() {
@@ -1848,6 +1855,7 @@ impl CanonicalizeContext {
 							if !(is_block_separator || is_decimal_separator) || 
 								(is_decimal_separator && has_decimal_separator) {
 								// not a separator or (it is decimal separator and we've already seen a decimal separator)
+								not_a_number = is_decimal_separator && has_decimal_separator;	// e.g., 1.2.3 or 1,2,3
 								break;
 							}
 							has_decimal_separator |= is_decimal_separator;
@@ -1857,6 +1865,10 @@ impl CanonicalizeContext {
 						}
 						end += 1;			// increment at end so we can tell the difference between a 'break' and end of loop
 					}
+				}
+				if not_a_number {
+					i = end + 1;
+					continue;	// continue looking in the rest of the mrow
 				}
 				if ignore_final_punctuation(context, parent_mrow, &children[i..end]) {
 					end -= 1;
@@ -1872,6 +1884,25 @@ impl CanonicalizeContext {
 				}
 				i += 1;
 			}
+		}
+
+		/// Return true if we find a comma that doesn't have an <mn> on both sides
+		fn is_comma_not_part_of_a_number(children: &mut Vec<ChildOfElement>)-> bool {
+			let n_children = children.len();
+			if n_children == 0 {
+				return false;
+			}
+			let mut previous_child = as_element(children[0]);
+			for i in 1..n_children {
+				let child = as_element(children[i]);
+				if name(&child) == "mo" && as_text(child) == "," && i+1 < n_children {
+					if name(&previous_child) != "mn" || name(&as_element(children[i+1])) != "mn" {
+						return true;
+					}
+				}
+				previous_child = child;
+			}
+			return false;
 		}
 
 		/// If we have something like 'shape' ABC, we split the ABC and add IMPLIED_SEPARATOR_HIGH_PRIORITY between them
@@ -2063,10 +2094,10 @@ impl CanonicalizeContext {
 
 			let text = text.trim();	// could be space got merged into an mn (e.g., braille::UEB::iceb::expr_3_1_6)
 			// debug!("  text='{}', decimal num={}, 3 digit match={}, 3-5 match={}, 1 digit={}", &text,
-			// 		context.digit_only_decimal_number.is_match(text),
-			// 		context.block_3digit_pattern.is_match(text),
-			// 		context.block_3_5digit_pattern.is_match(text),
-			// 		context.block_1digit_pattern.is_match(text));
+			// 		context.patterns.digit_only_decimal_number.is_match(text),
+			// 		context.patterns.block_3digit_pattern.is_match(text),
+			// 		context.patterns.block_3_5digit_pattern.is_match(text),
+			// 		context.patterns.block_1digit_pattern.is_match(text));
 			if !(context.patterns.digit_only_decimal_number.is_match(text) ||
 				 context.patterns.block_3digit_pattern.is_match(text) ||
 				 context.patterns.block_3_5digit_pattern.is_match(text) ||
@@ -5505,6 +5536,35 @@ mod canonicalize_tests {
 		</mrow>
 	   </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn not_digit_block_negative_numbers_euro() {
+        let test_str = "<math><mrow>
+			<mo>-</mo><mn>1</mn><mo>,</mo>
+			<mo>-</mo><mn>2</mn><mo>,</mo>
+			<mo>-</mo><mn>3</mn><mo>,</mo>
+			<mo>&#x2026;</mo>
+		</mrow></math>";
+        let target_str = "<math><mrow>
+				<mrow data-changed='added'>
+					<mo>-</mo>
+					<mn>1</mn>
+				</mrow>
+				<mo>,</mo>
+				<mrow data-changed='added'>
+					<mo>-</mo>
+					<mn>2</mn>
+				</mrow>
+				<mo>,</mo>
+				<mrow data-changed='added'>
+					<mo>-</mo>
+					<mn>3</mn>
+				</mrow>
+				<mo>,</mo>
+				<mi>…</mi>
+			</mrow></math>";
+    	assert!(are_strs_canonically_equal_with_locale(test_str, target_str, " .", ","));
 	}
 
 	#[test]
