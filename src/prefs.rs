@@ -27,6 +27,7 @@ use std::rc::Rc;
 use std::path::{Path, PathBuf};
 use crate::speech::{as_str_checked, RulesFor, FileAndTime};
 use std::collections::{HashMap, HashSet};
+use phf::phf_set;
 use crate::shim_filesystem::*;
 use zip::ZipArchive;
 use crate::errors::*;
@@ -355,6 +356,7 @@ impl PreferenceManager {
 
     fn set_speech_files(&mut self, language_dir: &Path, language: &str, new_speech_style: Option<&str>) -> Result<()> {
         self.unzip_files(language_dir, language)?;
+        self.set_separators(language)?;
         self.intent = PreferenceManager::find_file(language_dir, language, Some("en"), "intent.yaml")?;
         self.overview = PreferenceManager::find_file(language_dir, language, Some("en"), "overview.yaml")?;
         self.navigation = PreferenceManager::find_file(language_dir, language, Some("en"), "navigate.yaml")?;
@@ -461,6 +463,29 @@ impl PreferenceManager {
         self.is_already_unzipped.insert(zip_file_string);
         return Ok(true);
     }
+
+    /// Set BlockSeparators and DecimalSeparators
+    fn set_separators(&mut self, language: &str) -> Result<()> {
+        static USE_DECIMAL_SEPARATOR: phf::Set<&str> = phf_set! {
+            "en", "bn", "km", "el-cy", "tr-cy", "zh", "es-do", "ar", "es-sv", "es-gt", "es-hn", "hi", "as", "gu", "kn", "ks",
+            "ml", "mr", "ne", "or", "pa", "sa", "sd", "ta", "te", "ur", "he", "ja", "sw", "ko", "de-li", "ms", "dv", "mt", "es-mx", "my"
+        };
+        
+        let decimal_separator = self.pref_to_string("DecimalSeparator");
+        if !["Auto",",","."].contains(&decimal_separator.as_str()) {
+            return Ok( () );
+        }
+        let mut use_period = decimal_separator == ".";
+        if decimal_separator == "Auto" {
+            // if we don't have a match for the lang-country, then just try lang
+            use_period = USE_DECIMAL_SEPARATOR.contains(language) || USE_DECIMAL_SEPARATOR.contains(language.split('-').next().unwrap());
+        }
+        // debug!("set_separators: use_period: {}", use_period);
+        self.set_string_pref("BlockSeparators",   if !use_period {"."} else {", \u{00A0}\u{202F}"})?;
+        self.set_string_pref("DecimalSeparators", if  use_period {"."} else {", \u{00A0}\u{202F}"})?;
+        return Ok( () );
+    }
+
 
     /// Find a file matching `file_name` by starting in the regional directory and looking to the language.
     /// If that fails, fall back to looking for the default repeating the same process -- something needs to be found or MathCAT crashes
