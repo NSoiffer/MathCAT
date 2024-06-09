@@ -21,7 +21,7 @@ use crate::tts::*;
 use crate::pretty_print::{mml_to_string, yaml_to_string};
 use std::path::Path;
 use std::rc::Rc;
-use crate::shim_filesystem::read_to_string_shim;
+use crate::shim_filesystem::{read_to_string_shim, canonicalize_shim};
 use crate::canonicalize::{as_element, create_mathml_element, set_mathml_name, name};
 
 pub const NAV_NODE_SPEECH_NOT_FOUND: &str = "NAV_NODE_NOT_FOUND";
@@ -240,7 +240,24 @@ pub fn process_include<F>(current_file: &Path, new_file_name: &str, mut read_new
     if parent_path.is_none() {
         bail!("Internal error: {:?} is not a valid file name", current_file);
     }
-    let mut new_file = parent_path.unwrap().to_path_buf();
+    let mut new_file = match canonicalize_shim(parent_path.unwrap()) {
+        Ok(path) => path,
+        Err(e) => bail!("process_include: canonicalize failed for {} with message {}", parent_path.unwrap().display(), e.to_string()),
+    };
+
+    // the referenced file might be in a directory that hasn't been zipped up -- find the dir and call the unzip function
+    for unzip_dir in new_file.ancestors() {
+        if unzip_dir.ends_with("Rules") {
+            break;      // nothing to unzip
+        }
+        if unzip_dir.ends_with("Languages") || unzip_dir.ends_with("Braille") {
+            // get the subdir ...Rules/Braille/en/...
+            // could have ...Rules/Braille/definitions.yaml, so 'next()' doesn't exist in this case, but the file wasn't zipped up
+            if let Some(subdir) = new_file.strip_prefix(unzip_dir).unwrap().iter().next() {
+                PreferenceManager::unzip_files(unzip_dir, subdir.to_str().unwrap())?;
+            }
+        }
+    }
     new_file.push(new_file_name);
     info!("...processing include: {}...", new_file_name);
     let new_file = match crate::shim_filesystem::canonicalize_shim(new_file.as_path()) {
