@@ -147,19 +147,36 @@ pub fn read_definitions_file(use_speech_defs: bool) -> Result<Vec<PathBuf>> {
     new_files.append(&mut files_read);
 
     // merge the contents of `TrigFunctions` into a set that contains all the function names (from `AdditionalFunctionNames`).
-    definitions.with(|defs| {
+    return definitions.with(|defs| {
         let mut defs = defs.borrow_mut();
-        let all_functions = build_all_functions_set(&defs);
-        let name_to_mapping = &mut defs.name_to_var_mapping;
-        name_to_mapping.insert("FunctionNames".to_string(), Contains::Set( Rc::new( RefCell::new( all_functions ) ) ));
+        make_all_set_references_valid(&mut defs);
+        return Ok(new_files);
     });
-    return Ok(new_files);
+    
 
-    fn build_all_functions_set(defs: &RefMut<Definitions>) -> HashSet<String> {
+    /// Make references to all used set be valid by creating empty sets if they weren't defined
+    fn make_all_set_references_valid(defs: &mut RefMut<Definitions>) {
+        // FIX: this list is created by hand -- it would be better if there was a way to create the list Automatically
+        // Note: "FunctionNames" is created in build_all_functions_set() if not already set
+        let used_set_names = ["GeometryPrefixOperators", "LikelyFunctionNames", "TrigFunctionNames", "AdditionalFunctionNames", "Arrows", "GeometryShapes"];
+        // let name_to_mapping = defs.name_to_var_mapping.borrow_mut();
+        for set_name in used_set_names {
+            if defs.get_hashset(set_name).is_none() {
+                defs.name_to_var_mapping.insert(set_name.to_string(), Contains::Set( Rc::new( RefCell::new( HashSet::with_capacity(0) ) ) ));
+            }
+        }
+        if defs.get_hashset("FunctionNames").is_none() {
+            let all_functions = build_all_functions_set(defs);
+            defs.name_to_var_mapping.insert("FunctionNames".to_string(), Contains::Set( Rc::new( RefCell::new( all_functions ) ) ));
+        }
+    }
+
+    /// merge "TrigFunctions" and "AdditionalFunctionNames" into a new set named "FunctionNames"
+    fn build_all_functions_set(defs: &mut RefMut<Definitions>) -> HashSet<String> {
         let trig_functions = defs.get_hashset("TrigFunctionNames").unwrap();
         let mut all_functions = defs.get_hashset("AdditionalFunctionNames").unwrap().clone();
-        for trig_function in trig_functions.iter() {
-            all_functions.insert(trig_function.clone());
+        for trig_name in trig_functions.iter() {
+            all_functions.insert(trig_name.clone());
         }
         return all_functions;
     }
