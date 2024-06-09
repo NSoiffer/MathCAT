@@ -207,10 +207,14 @@ cfg_if! {
         }
         
         pub fn read_to_string_shim(path: &Path) -> Result<String> {
-            info!("Reading file '{}'", path.to_str().unwrap());
-            match std::fs::read_to_string(path) {
+            let path = match path.canonicalize() {
+                Ok(path) => path,
+                Err(e) => bail!("Read error while trying to canonicalize in read_to_string_shim {}: {}", path.display(), e),
+            };
+            info!("Reading file '{}'", &path.display());
+            match std::fs::read_to_string(&path) {
                 Ok(str) => return Ok(str),
-                Err(e) => bail!("Read error while trying to read {}: {}", path.to_str().unwrap(), e),
+                Err(e) => bail!("Read error while trying to read {}: {}", &path.display(), e),
             }
         }     
     }
