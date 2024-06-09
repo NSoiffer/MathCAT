@@ -934,11 +934,10 @@ impl IsInDefinition {
 }
 
 /**
- * Returns true if the node is a bracketed expr with the indicated left/right chars
+ * Returns true if the text is contained in the set defined in Speech or Braille.
  * element/string -- element (converted to string)/string to test
- * left -- string (like "[") or empty
- * right -- string (like "]") or empty
- * requires_comma - boolean, optional (check the top level of 'node' for commas
+ * speech or braille
+ * setname -- the set in which the string is to be searched
  */
 // 'requiresComma' is useful for checking parenthesized expressions vs function arg lists and other lists
  impl Function for IsInDefinition {
