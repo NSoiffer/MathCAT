@@ -300,7 +300,7 @@
   tag: mo
   match:
      - "..[self::m:mrow and count(*) = 2] and not(preceding-sibling::*) and"
-     - "IsInDefinition(., 'GeometryPrefixOperators')"
+     - "IsInDefinition(., 'Braille', 'GeometryPrefixOperators')"
   replace:
      - x: "text()"
      - t: "w"
@@ -337,10 +337,10 @@
   - test:
       if: "parent::*[self::m:mrow] and not(@data-chemical-bond) and
            not(@data-chem-equation-op and (.='↑' or .='↓')) and
-           IsInDefinition(substring(., 1, 1), 'NemethComparisonOperators')"
+           IsInDefinition(substring(., 1, 1), 'Braille', 'NemethComparisonOperators')"
       then:
           - test:   # Spacing and NemethPunctAndOpenBeforeSymbols test is Rule 151, NemethComparisonOperators test is Rule 149 
-              if: "not( preceding-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols')] )"
+              if: "not( preceding-sibling::*[1][IsInDefinition(., 'Braille', 'NemethPunctAndOpenBeforeSymbols')] )"
               then: [t: "w"]
           - test:
               if: "$NewScriptContext!=''" # Rule 79g
@@ -352,36 +352,36 @@
       if: "string-length(text()) > 1"
       then:
       - test:
-          if: "IsInDefinition(substring(., 1, 1), 'NemethComparisonOperators') and IsInDefinition(substring(., 2, 1), 'NemethComparisonOperators')"
+          if: "IsInDefinition(substring(., 1, 1), 'Braille', 'NemethComparisonOperators') and IsInDefinition(substring(., 2, 1), 'Braille', 'NemethComparisonOperators')"
           then: [t: "m"]
       - x: "BrailleChars(., 'Nemeth', 2, 3)"
       - test:
           if: "string-length(text()) > 2"
           then:
           - test:
-              if: "IsInDefinition(substring(., 2, 1), 'NemethComparisonOperators') and IsInDefinition(substring(., 3, 1), 'NemethComparisonOperators')"
+              if: "IsInDefinition(substring(., 2, 1), 'Braille', 'NemethComparisonOperators') and IsInDefinition(substring(., 3, 1), 'Braille', 'NemethComparisonOperators')"
               then: [t: "m"]
           - x: "BrailleChars(., 'Nemeth', 3, 4)"
           - test:
               if: "string-length(text()) > 3"
               then:
               - test:
-                  if: "IsInDefinition(substring(., 3, 1), 'NemethComparisonOperators') and IsInDefinition(substring(., 4, 1), 'NemethComparisonOperators')"
+                  if: "IsInDefinition(substring(., 3, 1), 'Braille', 'NemethComparisonOperators') and IsInDefinition(substring(., 4, 1), 'Braille', 'NemethComparisonOperators')"
                   then: [t: "m"]
               - x: "BrailleChars(., 'Nemeth', 4, 5)"
               - test:
                   if: "string-length(text()) > 4"
                   then:
                   - test:
-                      if: "IsInDefinition(substring(., 4, 1), 'NemethComparisonOperators') and IsInDefinition(substring(., 5, 1), 'NemethComparisonOperators')"
+                      if: "IsInDefinition(substring(., 4, 1), 'Braille', 'NemethComparisonOperators') and IsInDefinition(substring(., 5, 1), 'Braille', 'NemethComparisonOperators')"
                       then: [t: "m"]
                   - x: "BrailleChars(., 'Nemeth', 5, string-length(text())+1)"    # punt on the rest
   - test:  # NemethPunctAndOpenAfterSymbols test is Rule 151, NemethComparisonOperators test is Rule 149 
            # tilde test is a guess as to what is right -- all tildes and in a prefix location, don't treat as comparison operator
       if: "parent::*[self::m:mrow] and not(@data-chemical-bond) and
-           IsInDefinition(substring(., string-length(.), 1), 'NemethComparisonOperators') and
+           IsInDefinition(substring(., string-length(.), 1), 'Braille', 'NemethComparisonOperators') and
            not( translate(., '∼', '')='' and not(preceding-sibling::*) ) and
-           not( following-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols')] )"
+           not( following-sibling::*[1][IsInDefinition(., 'Braille', 'NemethPunctAndOpenAfterSymbols')] )"
       then: [t: "w"]
 
 - name: default
@@ -507,7 +507,7 @@
    variables:
      # we include ∑ and ∏ because Nemeth uses the look-alike Greek letters for them, and hence considers the large ops to be Greek letters
    - BaseOkForNumericScript: "*[1][BaseNode(.)[
-            (self::m:mi and (string-length()=1 or @data-chem-element or IsInDefinition(., 'FunctionNames'))) or
+            (self::m:mi and (string-length()=1 or @data-chem-element or IsInDefinition(., 'Braille', 'FunctionNames'))) or
             (self::m:mo and (text()='∑' or text()='∏'))]
           ]"
    match: "*[2][self::m:mn] and ($NewScriptContext = '') and $BaseOkForNumericScript"
@@ -608,7 +608,7 @@
    variables:
    - OldScriptContext: "$NewScriptContext"
    # we include ∑ and ∏ because Nemeth uses the look-alike Greek letters for them, and hence considers the large ops to be Greek letters
-   - BaseOkForNumericScript: "*[1][BaseNode(.)[(self::m:mi and (string-length()=1 or IsInDefinition(., 'FunctionNames'))) or
+   - BaseOkForNumericScript: "*[1][BaseNode(.)[(self::m:mi and (string-length()=1 or IsInDefinition(., 'Braille', 'FunctionNames'))) or
                                                (self::m:mo and (text()='∑' or text()='∏'))]]"
    # computing the number of postscripts is messy because of <mprescripts> being optionally present -- we use "mod" to get the count right
    - Prescripts: "m:mprescripts/following-sibling::*"
@@ -902,7 +902,7 @@
    match: "."
    variables:
    - NotNested: "$NewUnderContext='' and $NewOverContext=''"
-   - AddSpaces: "IsInDefinition(BaseNode(.), 'NemethComparisonOperators')"
+   - AddSpaces: "IsInDefinition(BaseNode(.), 'Braille', 'NemethComparisonOperators')"
    replace:
    - test:
       if: "$AddSpaces"
@@ -991,7 +991,7 @@
   match: "."
   variables:
      [
-        AddSpaces: "parent::*[self::m:mrow] and *[1][ self::m:mo and IsInDefinition(., 'NemethComparisonOperators')]",
+        AddSpaces: "parent::*[self::m:mrow] and *[1][ self::m:mo and IsInDefinition(., 'Braille', 'Braille', 'NemethComparisonOperators')]",
      ]
   replace:
      - test:

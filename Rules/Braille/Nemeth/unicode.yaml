@@ -193,9 +193,9 @@
         then: [t: "W"]
         # treat mo like 0x2061 (function apply)
       - else_if: "self::m:mo and
-                  (preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')] or
+                  (preceding-sibling::*[1][IsInDefinition(., 'Braille', 'GeometryShapes')] or
                    @data-function-likelihood and
-                   IsInDefinition(BaseNode(.), 'FunctionNames') and
+                   IsInDefinition(BaseNode(.), 'Braille', 'FunctionNames') and
                    not(following-sibling::*[1][IsBracketed(., '', '')])
                   )" 
         then: [t: "w"]      # follows a function name, so lowercase
@@ -289,7 +289,7 @@
           else:
           - t: "P⠒"
           - test:
-              if: "@data-space-after or ancestor::*[2][IsBracketed(., '{', '}')] or following-sibling::*[1]/*[2][IsInDefinition(., 'Arrows')]" # "Arrows" is a bit broad...
+              if: "@data-space-after or ancestor::*[2][IsBracketed(., '{', '}')] or following-sibling::*[1]/*[2][IsInDefinition(., 'Braille', 'Arrows')]" # "Arrows" is a bit broad...
               then: [t: "W"]
  - ";": [t: "P⠆"]               # 0x003B (Semicolon)
  - "<": [t: "⠐⠅"]             # 0x003C (Less-than sign)
@@ -329,8 +329,8 @@
     - test:
         if:
           - "not("
-          - "  (not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols')]]) or"
-          - "  (preceding-sibling::*[1][IsInDefinition(., 'NemethCurrencyBeforeSymbols')])"
+          - "  (not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][IsInDefinition(., 'Braille', 'NemethPunctAndOpenBeforeSymbols')]]) or"
+          - "  (preceding-sibling::*[1][IsInDefinition(., 'Braille', 'NemethCurrencyBeforeSymbols')])"
           - ")"
         then: [t: "W"]
     - t: "⠤⠤⠤⠤"
@@ -338,9 +338,9 @@
         if:
           - "not("
           - "  name(parent::*[1])='mrow' and ("
-          - "    (following-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols')]) or "
-          - "    (not(following-sibling::*) and parent::*[1][name(.)='mrow' and following-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols')]]) or "
-          - "    (following-sibling::*[1][text() = '\u2062'] and following-sibling::*[2][IsInDefinition(., 'NemethCurrencyAfterSymbols')])"
+          - "    (following-sibling::*[1][IsInDefinition(., 'Braille', 'NemethPunctAndOpenAfterSymbols')]) or "
+          - "    (not(following-sibling::*) and parent::*[1][name(.)='mrow' and following-sibling::*[1][IsInDefinition(., 'Braille', 'NemethPunctAndOpenAfterSymbols')]]) or "
+          - "    (following-sibling::*[1][text() = '\u2062'] and following-sibling::*[2][IsInDefinition(., 'Braille', 'NemethCurrencyAfterSymbols')])"
           - "  )"
           - ")"
         then: [t: "W"]
@@ -351,8 +351,8 @@
     - test:
         if:
           - "not("
-          - "  (not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenBeforeSymbols')]]) or"
-          - "  (preceding-sibling::*[1][text() = '\u2062'] and preceding-sibling::*[2][IsInDefinition(., 'NemethCurrencyBeforeSymbols')])"
+          - "  (not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][IsInDefinition(., 'Braille', 'NemethPunctAndOpenBeforeSymbols')]]) or"
+          - "  (preceding-sibling::*[1][text() = '\u2062'] and preceding-sibling::*[2][IsInDefinition(., 'Braille', 'NemethCurrencyBeforeSymbols')])"
           - ")"
         then: [t: "W"]
     - t: "⠄⠄⠄"
@@ -360,9 +360,9 @@
         if:
           - "not("
           - "  name(parent::*[1])='mrow' and ("
-          - "    (following-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols')]) or "
-          - "    (not(following-sibling::*) and parent::*[1][name(.)='mrow' and following-sibling::*[1][IsInDefinition(., 'NemethPunctAndOpenAfterSymbols')]]) or "
-          - "    (following-sibling::*[1][text() = '\u2062'] and following-sibling::*[2][IsInDefinition(., 'NemethCurrencyAfterSymbols')])"
+          - "    (following-sibling::*[1][IsInDefinition(., 'Braille', 'NemethPunctAndOpenAfterSymbols')]) or "
+          - "    (not(following-sibling::*) and parent::*[1][name(.)='mrow' and following-sibling::*[1][IsInDefinition(., 'Braille', 'NemethPunctAndOpenAfterSymbols')]]) or "
+          - "    (following-sibling::*[1][text() = '\u2062'] and following-sibling::*[2][IsInDefinition(., 'Braille', 'NemethCurrencyAfterSymbols')])"
           - "  )"
           - ")"
         then: [t: "W"]
@@ -372,7 +372,7 @@
  - "⁡":                          # 0x2061⁡ (invisible function apply)
     # add a space if name doesn't have brackets after it or is in FunctionNames list 
     - test:
-        if: "not(following-sibling::*[1][IsBracketed(., '', '')]) or preceding-sibling::*[1][IsInDefinition(BaseNode(.), 'FunctionNames')]" 
+        if: "not(following-sibling::*[1][IsBracketed(., '', '')]) or preceding-sibling::*[1][IsInDefinition(BaseNode(.), 'Braille', 'FunctionNames')]" 
         then: [t: "w"]      # follows a function name, so lowercase
  - "⁢": [t: ""]                 # 0x2062
  - "⁣":                         # 0x2063 (Invisible Comma -- treat like a normal comma when in a subscript[issue #40]) else ignore

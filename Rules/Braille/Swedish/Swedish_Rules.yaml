@@ -241,7 +241,7 @@
    variables: # ratio not spaced in UEB
    - AddSpaces: "$UseSpacesAroundAllOperators or
                        ( parent::*[self::m:mrow] and $NewScriptContext='' and 
-                         .!='∶' and IsInDefinition(., 'NemethComparisonOperators') )"
+                         .!='∶' and IsInDefinition(., 'Braille', 'NemethComparisonOperators') )"
    match: "."
    replace:
       - test:
@@ -319,7 +319,7 @@
   name: default
   tag: [msub, msup, munder, mover]
   match: "."
-  variables: [AddSpaces: "(self::m:munder or self::m:mover) and IsInDefinition(BaseNode(*[1]), 'NemethComparisonOperators')"]
+  variables: [AddSpaces: "(self::m:munder or self::m:mover) and IsInDefinition(BaseNode(*[1]), 'Braille', 'NemethComparisonOperators')"]
   replace:
   - test:
       if: "$AddSpaces"
@@ -363,7 +363,7 @@
   name: msubsup_default_mmultiscripts_equiv
   tag: [msubsup, munderover] # mmultiscripts with only sub/sup postscript
   match: "count(*)=3"    # catches mmultiscripts equiv
-  variables: [AddSpaces: "IsInDefinition(BaseNode(*[1]), 'NemethComparisonOperators')"]
+  variables: [AddSpaces: "IsInDefinition(BaseNode(*[1]), 'Braille', 'NemethComparisonOperators')"]
   replace:
   - test:
       if: "$AddSpaces"
@@ -640,7 +640,7 @@
    tag: menclose
    match: "."
    # FIX: can't find a rule that says anything about comparison operator spacing and enclosure
-   variables: [AddSpaces: "parent::*[self::m:mrow] and *[1][ self::m:mo and IsInDefinition(., 'NemethComparisonOperators')]"]
+   variables: [AddSpaces: "parent::*[self::m:mrow] and *[1][ self::m:mo and IsInDefinition(., 'Braille', 'NemethComparisonOperators')]"]
    replace:
    - test:
       if: "contains(concat(' ', normalize-space(@notation), ' '), ' left ')"                  #avoid 'leftarrow'
