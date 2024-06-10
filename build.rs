@@ -62,6 +62,19 @@ fn zip_dir(rules_dir: &Path, archive_zip: &mut ZipWriter<File>, options: SimpleF
                     remove_dir(&current_out_dir_zip_path)?;
                 }
             }
+        } else if let Some(suffix) = &entry_path.extension() {
+            // definitions.yaml, others???
+            let suffix = suffix.to_ascii_lowercase();
+            if suffix == "yaml" || suffix == "yml" {
+                // make sure the appropriate directory exists in 'out'
+                DirBuilder::new().recursive(true).create(current_out_dir).unwrap();
+                let entry_name = entry_path.components().last().unwrap().as_os_str().to_str().unwrap();
+                let out_dir_file_name = current_out_dir.join(entry_name);  // e.g., ...out/Rules/prefs.yaml
+                std::fs::copy(&entry_path, &out_dir_file_name)?;
+                let relative_out_dir = out_dir_file_name.strip_prefix(out_dir).unwrap();
+                add_file_to_zip(archive_zip, relative_out_dir, relative_out_dir, options)?;
+
+            }
         }
     }
     return Ok( () );
