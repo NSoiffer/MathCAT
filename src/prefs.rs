@@ -35,6 +35,11 @@ use crate::errors::*;
 /// Use to indicate preference not found with Preference::to_string()
 pub static NO_PREFERENCE: &str = "\u{FFFF}";
 
+lazy_static! {
+    static ref DEFAULT_LANG: Yaml = Yaml::String("en".to_string());
+}
+
+
 // Preferences are recorded here
 /// Preferences are stored in a HashMap. It maps the name of the pref (a String) to its value (stored as YAML string/float)
 pub type PreferenceHashMap = HashMap<String, Yaml>;
@@ -332,8 +337,14 @@ impl PreferenceManager {
             };
             bail!("Didn't find preferences in rule directory ('{}') or user directory ('{}')", &system_prefs_file.to_string_lossy(), user_prefs_file_name);
         }
-        self.set_based_on_changes(&prefs)?;
+        self.set_files_based_on_changes(&prefs)?;
         self.user_prefs = prefs;
+
+        // set computed values for BLOCK_SEPARATORS and DECIMAL_SEPARAORS (a little messy about the language due immutable and mutable borrows)
+        let language = self.user_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone();
+        let language = language.as_str().unwrap();
+        self.set_separators(language)?;
+        
         return Ok( () );
     }
 
@@ -354,7 +365,6 @@ impl PreferenceManager {
 
     fn set_speech_files(&mut self, language_dir: &Path, language: &str, new_speech_style: Option<&str>) -> Result<()> {
         PreferenceManager::unzip_files(language_dir, language)?;
-        self.set_separators(language)?;
         self.intent = PreferenceManager::find_file(language_dir, language, Some("en"), "intent.yaml")?;
         self.overview = PreferenceManager::find_file(language_dir, language, Some("en"), "overview.yaml")?;
         self.navigation = PreferenceManager::find_file(language_dir, language, Some("en"), "navigate.yaml")?;
@@ -379,7 +389,7 @@ impl PreferenceManager {
     }
 
     fn set_braille_files(&mut self, braille_rules_dir: &Path, braille_code_name: &str) -> Result<()> {
-        // Fix: Currently the braille code and directly it lives have to have the same name
+        // Fix: Currently the braille code and the directory it lives in have to have the same name
         PreferenceManager::unzip_files(braille_rules_dir, braille_code_name)?;
 
         let braille_file = braille_code_name.to_string() + "_Rules.yaml";
@@ -394,12 +404,13 @@ impl PreferenceManager {
     }
 
     /// If some preferences have changed, we may need to recompute other ones
-    /// The key prefs are Language, SpeechStyle, and BrailleCode
-    fn set_based_on_changes(&mut self, new_prefs: &Preferences) -> Result<()> {
+    /// The key prefs are Language, SpeechStyle, and BrailleCode, along with DecimalSeparator
+    fn set_files_based_on_changes(&mut self, new_prefs: &Preferences) -> Result<()> {
         let old_language = self.user_prefs.prefs.get("Language");       // not set if first time
         if old_language.is_none() {
             return Ok( () );            // if "Language" isn't set yet, nothing else is either -- first time through, so no updating needed.
         }
+
         let old_language = old_language.unwrap();
         let new_language = new_prefs.prefs.get("Language").unwrap();
         if old_language != new_language {
@@ -468,24 +479,45 @@ impl PreferenceManager {
     }
 
     /// Set BlockSeparators and DecimalSeparators
-    fn set_separators(&mut self, language: &str) -> Result<()> {
+    fn set_separators(&mut self, language_country: &str) -> Result<()> {
+        // This list was generated from https://en.wikipedia.org/wiki/Decimal_separator#Countries_using_decimal_point
+        // The countries were then mapped to language(s) using https://en.wikipedia.org/wiki/List_of_official_languages_by_country_and_territory
+        // When a language was used in other countries that used a "," separator, the language+country is listed 
+        //   Sometimes there are muliple languages used in a country -- they are all listed, sometimes with a country code
+        // The country code isn't used when the language is used in smaller countries (i.e, when "." is more likely correct)
+        //   This decision is sometimes a bit arbitrary
+        //   For example, Swahili (sw) is used in: Democratic Republic of the Congo, Kenya, Rwanda, Tanzania, and Uganda.
+        //   Of these, Kenya, Tanzania, and Uganda are listed as using "." and I include Swahili in the list below.
         static USE_DECIMAL_SEPARATOR: phf::Set<&str> = phf_set! {
             "en", "bn", "km", "el-cy", "tr-cy", "zh", "es-do", "ar", "es-sv", "es-gt", "es-hn", "hi", "as", "gu", "kn", "ks",
-            "ml", "mr", "ne", "or", "pa", "sa", "sd", "ta", "te", "ur", "he", "ja", "sw", "ko", "de-li", "ms", "dv", "mt", "es-mx", "my"
+            "ml", "mr", "ne", "or", "pa", "sa", "sd", "ta", "te", "ur", "he", "ja", "sw", "ko", "de-li", "ms", "dv", "mt", "es-mx", "my",
+            "af-na", "es-ni", "es-pa", "fil", "ms-sg", "si", "th",
         };
         
+        if language_country == "Auto" {
+            return Ok( () );        // "Auto" doesn't tell us anything
+        }
         let decimal_separator = self.pref_to_string("DecimalSeparator");
         if !["Auto",",","."].contains(&decimal_separator.as_str()) {
             return Ok( () );
         }
+        let language_country = language_country.to_ascii_lowercase();
+        let language_country = &language_country;
+        let mut lang_country_split = language_country.split('-');
+        let language = lang_country_split.next().unwrap_or("");
+        let country = lang_country_split.next().unwrap_or("");
         let mut use_period = decimal_separator == ".";
         if decimal_separator == "Auto" {
             // if we don't have a match for the lang-country, then just try lang
-            use_period = USE_DECIMAL_SEPARATOR.contains(language) || USE_DECIMAL_SEPARATOR.contains(language.split('-').next().unwrap());
+            use_period = USE_DECIMAL_SEPARATOR.contains(language_country) || USE_DECIMAL_SEPARATOR.contains(language);
         }
         // debug!("set_separators: use_period: {}", use_period);
-        self.set_string_pref("BlockSeparators",   if !use_period {"."} else {", \u{00A0}\u{202F}"})?;
-        self.set_string_pref("DecimalSeparators", if  use_period {"."} else {", \u{00A0}\u{202F}"})?;
+        self.set_string_pref("DecimalSeparators", if use_period {"."} else {","})?;
+        let mut block_separators =  (if use_period {", \u{00A0}\u{202F}"} else {". \u{00A0}\u{202F}"}).to_string();
+        if country == "ch" || country == "li" { // Switzerland and Liechtenstein
+            block_separators.push('\'');
+        }
+        self.set_string_pref("BlockSeparators", &block_separators)?;
         return Ok( () );
     }
 
@@ -671,30 +703,34 @@ impl PreferenceManager {
         if let Some(pref_value) = self.api_prefs.prefs.get(key) {
             if pref_value.as_str().unwrap() != value {
                 is_user_pref = false;
-                self.reset_preferences(key, value)?;
+                self.reset_files_from_preference_change(key, value)?;
             }
         } else if let Some(pref_value) = self.user_prefs.prefs.get(key) {
             if pref_value.as_str().unwrap() != value {
-                self.reset_preferences(key, value)?;
+                self.reset_files_from_preference_change(key, value)?;
             }
         } else {
             bail!("{} is an unknown MathCAT preference!", key);
         }
 
-        debug!("Setting ({}) {} to {}", if is_user_pref {"user"} else {"sys"}, key, value);
+        debug!("Setting ({}) {} to '{}'", if is_user_pref {"user"} else {"sys"}, key, value);
         if is_user_pref {
+            let is_decimal_separators_changed = key == "DecimalSeparator" && self.user_prefs.prefs.get("DecimalSeparator").unwrap().as_str().unwrap() != value;
+            let is_language_changed = key == "Language" && self.user_prefs.prefs.get("Language").unwrap().as_str().unwrap() != value;
             self.user_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+            if is_decimal_separators_changed || is_language_changed {
+                // set computed values for BLOCK_SEPARATORS and DECIMAL_SEPARAORS (a little messy about the language due immutable and mutable borrows)
+                let language = self.user_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone();
+                let language = language.as_str().unwrap();
+                self.set_separators(language)?;
+            }
         } else {
             self.api_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
         }
         return Ok( () );
     }
 
-    fn reset_preferences(&mut self, changed_pref: &str, changed_value: &str) -> Result<()> {
-        lazy_static! {
-            static ref DEFAULT_LANG: Yaml = Yaml::String("en".to_string());
-        }
-       
+    fn reset_files_from_preference_change(&mut self, changed_pref: &str, changed_value: &str) -> Result<()> {       
         if changed_pref == "Language" && changed_value == "Auto" {
             // Language must have had a non-Auto value -- set LanguageAuto to old value so (probable) next change to LanguageAuto works well
             self.api_prefs.prefs.insert("LanguageAuto".to_string(),
@@ -792,8 +828,17 @@ impl PreferenceManager {
             panic!("Internal error: set_user_prefs called on invalid PreferenceManager -- error message\n{}", &self.error);
         };
         
-        self.reset_preferences(key, value)?;
-        self.user_prefs.set_string_value(key, value);
+        self.reset_files_from_preference_change(key, value)?;
+        let is_decimal_separators_changed = key == "DecimalSeparator" && self.user_prefs.prefs.get("DecimalSeparator").unwrap().as_str().unwrap() != value;
+        let is_language_changed = key == "Language" && self.user_prefs.prefs.get("Language").unwrap().as_str().unwrap() != value;
+        self.user_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+        if is_decimal_separators_changed || is_language_changed {
+            // set computed values for BLOCK_SEPARATORS and DECIMAL_SEPARAORS (a little messy about the language due immutable and mutable borrows)
+            let language = self.user_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone();
+            let language = language.as_str().unwrap();
+            self.set_separators(language)?;
+        }
+
         return Ok(());
     }
 }
@@ -819,6 +864,53 @@ mod tests {
     fn rel_path<'a>(rules_dir: &'a Path, path: &'a Path) -> &'a Path {
         let stripped_path = path.strip_prefix(rules_dir).unwrap();
         return stripped_path;    
+    }
+
+    #[test]
+    fn separators() {
+        init_logger();
+        PREF_MANAGER.with(|pref_manager| {
+            let mut pref_manager = pref_manager.borrow_mut();
+            pref_manager.initialize(abs_rules_dir_path()).unwrap();
+            pref_manager.set_user_prefs("Language", "en").unwrap();
+            pref_manager.set_user_prefs("DecimalSeparator", "Auto").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ".");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ", \u{00A0}\u{202F}");
+
+            pref_manager.set_user_prefs("Language", "sv").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ",");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ". \u{00A0}\u{202F}");
+
+            // test potentially ambiguous language (defaults to comma decimal separator)
+            pref_manager.set_user_prefs("Language", "es").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ",");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ". \u{00A0}\u{202F}");
+
+            // test country override
+            pref_manager.set_user_prefs("Language", "es-mx").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ".");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ", \u{00A0}\u{202F}");
+
+            pref_manager.set_user_prefs("DecimalSeparator", ",").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ",");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ". \u{00A0}\u{202F}");
+
+            pref_manager.set_user_prefs("DecimalSeparator", ".").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ".");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ", \u{00A0}\u{202F}");
+
+            // set to illegal value -- should leave values as before
+            pref_manager.set_user_prefs("DecimalSeparator", ";").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ".");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), ", \u{00A0}\u{202F}");
+
+            // manual
+            pref_manager.set_user_prefs("DecimalSeparators", ",").unwrap();
+            pref_manager.set_user_prefs("BlockSeparators", " ").unwrap();
+            pref_manager.set_user_prefs("DecimalSeparator", "None").unwrap();
+            assert_eq!(&pref_manager.pref_to_string("DecimalSeparators"), ",");
+            assert_eq!(&pref_manager.pref_to_string("BlockSeparators"), " ");
+        });
     }
 
     #[test]
