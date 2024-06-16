@@ -12,17 +12,11 @@
 # There is a balance that you want to maximize the info given, so 10 words is likely better then 3.
 #   That might mean that at the top level, we may want to allow the first few children to expand
 
-- name: default
-  tag: math
-  match: "."
-  replace: [{x: "*[1]"}]
 
-- name: default
-  tag: [mi, mn, mo, mtext]
-  match: "."
-  replace: [{x: text()}]
+- include: "SimpleSpeak_Rules.yaml"
 
-- name: default
+
+- name: overview-default
   tag: mfrac
   match: "."
   replace:
@@ -35,7 +29,7 @@
       else:
       - T: "phân số"
 
-- name: default
+- name: overview-default
   tag: msqrt
   match: "."
   replace:
@@ -48,7 +42,7 @@
           then: {T: của}
       - x: "*[1]"
 
-- name: default
+- name: overview-default
   tag: mroot
   match: "."
   replace:
@@ -77,8 +71,8 @@
           then: {T: của}
       - x: "*[1]"
 
-- name: default
-  tag: mtable
+- name: matrix-override
+  tag: mrow
   match:
   - "*[2][self::m:mtable] and"
   - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
@@ -92,7 +86,7 @@
   - T: nhân
   - x: count(*[2]/*[self::m:mtr][1]/*)
 
-- name: default
+- name: overview-default
   tag: mtable
   match: "."
   replace:
@@ -125,5 +119,3 @@
   - x: "*[5]"
   - pause: auto
   - T: "và vân vân"
-
-- include: "SimpleSpeak_Rules.yaml"

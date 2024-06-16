@@ -12,17 +12,9 @@
 # There is a balance that you want to maximize the info given, so 10 words is likely better then 3.
 #   That might mean that at the top level, we may want to allow the first few children to expand
 
-- name: default
-  tag: math
-  match: "."
-  replace: [{x: "*[1]"}]
+- include: "SimpleSpeak_Rules.yaml"
 
-- name: default
-  tag: [mi, mn, mo, mtext]
-  match: "."
-  replace: [{x: text()}]
-
-- name: default
+- name: overview-default
   tag: mfrac
   match: "."
   replace:
@@ -35,7 +27,7 @@
       else:
       - T: "bråk"
 
-- name: default
+- name: overview-default
   tag: msqrt
   match: "."
   replace:
@@ -48,7 +40,7 @@
           then: {T: "ur"}
       - x: "*[1]"
 
-- name: default
+- name: overview-default
   tag: mroot
   match: "."
   replace:
@@ -72,8 +64,8 @@
           then: {T: "ur"}
       - x: "*[1]"
 
-- name: default
-  tag: mtable
+- name: matrix-override
+  tag: mrow
   match:
   - "*[2][self::m:mtable] and"
   - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
@@ -86,7 +78,7 @@
       then: {T: "determinant"}
       else: {T: "matris"}
 
-- name: default
+- name: overview-default
   tag: mtable
   match: "."
   replace:
@@ -118,5 +110,3 @@
   - x: "*[5]"
   - pause: auto
   - T: "och så vidare"
-
-- include: "SimpleSpeak_Rules.yaml"

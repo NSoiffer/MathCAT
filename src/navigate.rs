@@ -1980,6 +1980,15 @@ mod tests {
                 test_command("MovePrevious", mathml, "2");
                 test_command("MovePrevious", mathml, "2");
             });
+            
+            // simple sanity check that "overview.yaml" doesn't have a syntax error
+            set_preference("Overview".to_string(), "True".to_string()).unwrap();
+            set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
+            MATHML_INSTANCE.with(|package_instance| {
+                let package_instance = package_instance.borrow();
+                let mathml = get_element(&*package_instance);
+                test_command("ZoomIn", mathml, "2");
+            });
         }
     }
 }
