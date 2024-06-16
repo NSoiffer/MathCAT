@@ -13,8 +13,6 @@
 #   That might mean that at the top level, we may want to allow the first few children to expand
 
 
-- include: "SimpleSpeak_Rules.yaml"
-
 - name: overview-default
   tag: mfrac
   match: "."
@@ -118,3 +116,5 @@
   - x: "*[5]"
   - pause: auto
   - t: "and so on"
+
+- include: "SimpleSpeak_Rules.yaml"

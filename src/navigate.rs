@@ -72,15 +72,15 @@ pub struct NavigationState {
     // it might be better to use a linked for the stacks, with the first node being the top
     // these two stacks should be kept in sync.
     position_stack: Vec<NavigationPosition>,    // all positions, so we can go back to them
-    command_stack: Vec<&'static str>,                 // all commands, so we can undo them
+    command_stack: Vec<&'static str>,           // all commands, so we can undo them
     place_markers: [NavigationPosition; MAX_PLACE_MARKERS],
     where_am_i: NavigationPosition,             // current 'where am i' location
 
     #[cfg(target_family = "wasm")]
-    where_am_i_start_time: usize,           // FIX: for web
+    where_am_i_start_time: usize,               // FIX: for web
     #[cfg(not(target_family = "wasm"))]
     where_am_i_start_time: Instant,
-    mode: String,                         // one of "Character", "Simple", or "Enhanced"
+    mode: String,                               // one of "Character", "Simple", or "Enhanced"
     speak_overview: bool,                       // true => describe after move; false => (standard) speech rules
 }
 
@@ -211,6 +211,7 @@ impl NavigationState {
             context.set_variable("PlaceMarkerOffset", position.current_node_offset as f64);
         }
            
+        context.set_variable("Overview", self.speak_overview);
         context.set_variable("ReadZoomLevel", (if self.mode == "Enhanced" {-1} else {1}) as f64);
         context.set_variable("MatchCounter", 0 as f64);
 
@@ -442,6 +443,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         // transfer some values that might have been set into the prefs
         let context = rules_with_context.get_context();     // need to recompute or we have a multiple borrow problem
         nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
+        nav_state.speak_overview = context_get_variable(context, "Overview", mathml)?.0.unwrap() == "true";
         rules.pref_manager.as_ref().borrow_mut().set_user_prefs("NavMode", &nav_state.mode)?;
 
         let nav_position = match context_get_variable(context, "NavNode", mathml)?.0 {
@@ -459,8 +461,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         } else if nav_command.starts_with("Describe") {
             false
         } else {
-            let overview = context_get_variable(context, "Overview", mathml)?.0.unwrap();
-            overview == "false"
+            !nav_state.speak_overview
         };
 
         if (nav_command.starts_with("Move") || nav_command.starts_with("Zoom")) && nav_command != "MoveLastLocation" {
@@ -1903,6 +1904,60 @@ mod tests {
             assert_eq!(speech, "zoom in; in base; 2 x");
             let speech = test_command("MoveNext", mathml, "id-9");
             assert_eq!(speech, "move right, in superscript; 2");
+            return Ok( () );
+        });
+    }
+
+    #[test]
+    fn read_and_describe_fraction() -> Result<()> {
+        let mathml_str = "<math id='math'>
+            <mrow id='mrow'>
+                <mfrac id='frac'>
+                    <mrow id='numerator'><mi>b</mi><mo>+</mo><mn>1</mn></mrow>
+                <mn id='denom'>3</mn>
+                </mfrac>
+                <mo id='minus'>-</mo>
+                <mn id='3'>3</mn>
+            </mrow>
+        </math>";
+        init_default_prefs(mathml_str, "Enhanced");
+        set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomIn", mathml, "frac");
+            let speech = test_command("ReadCurrent", mathml, "frac");
+            assert_eq!(speech, "read current; fraction, b plus 1, over 3, end fraction;");
+            let speech = test_command("DescribeCurrent", mathml, "frac");
+            assert_eq!(speech, "describe current; fraction");
+            return Ok( () );
+        });
+    }
+
+
+    #[test]
+    fn read_and_describe_mrow() -> Result<()> {
+        let mathml_str = "<math id='math'>
+            <mrow id='mrow'>
+                <mn>1</mn><mo>+</mo>
+                <mn>2</mn><mo>+</mo>
+                <mn>3</mn><mo>+</mo>
+                <mn>4</mn><mo>+</mo>
+                <mn>5</mn><mo>+</mo>
+                <mn>6</mn><mo>+</mo>
+                <mn>7</mn>
+            </mrow>
+        </math>";
+        init_default_prefs(mathml_str, "Enhanced");
+        set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomOutAll", mathml, "mrow");
+            let speech = test_command("ReadCurrent", mathml, "mrow");
+            assert_eq!(speech, "read current; 1 plus 2 plus 3 plus 4 plus 5 plus 6 plus 7");
+            let speech = test_command("DescribeCurrent", mathml, "mrow");
+            assert_eq!(speech, "describe current; 1 plus 2 plus 3 and so on");
             return Ok( () );
         });
     }

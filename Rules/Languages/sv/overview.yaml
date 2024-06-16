@@ -12,8 +12,6 @@
 # There is a balance that you want to maximize the info given, so 10 words is likely better then 3.
 #   That might mean that at the top level, we may want to allow the first few children to expand
 
-- include: "SimpleSpeak_Rules.yaml"
-
 - name: overview-default
   tag: mfrac
   match: "."
@@ -110,3 +108,5 @@
   - x: "*[5]"
   - pause: auto
   - T: "och så vidare"
+
+- include: "SimpleSpeak_Rules.yaml"
