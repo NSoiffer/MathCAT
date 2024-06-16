@@ -1935,6 +1935,7 @@ mod tests {
         test_language("id", mathml_str);
         test_language("vi", mathml_str);
         test_language("zh-tw", mathml_str);
+        test_language("sv", mathml_str);
         return Ok( () );
 
         fn test_language(lang: &str, mathml_str: &str) {
