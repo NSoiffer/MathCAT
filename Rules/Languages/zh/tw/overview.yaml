@@ -55,11 +55,11 @@
   - T: "根號"
   - x: "*[1]"
   - test:
-    if: "IsNode(*[1], 'simple')"
-    then:
-    - test:
-        if: "$Verbosity!='Terse'"
-        then: {T: "的"}
+      if: "IsNode(*[1], 'simple')"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: {T: "的"}
   - test:
       if: "*[2][self::m:mn]"
       then_test:
