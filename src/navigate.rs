@@ -884,6 +884,7 @@ mod tests {
         set_preference("Language".to_string(), "en".to_string()).unwrap();
         set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
         set_preference("Verbosity".to_string(), "Medium".to_string()).unwrap();
+        set_preference("Overview".to_string(), "False".to_string()).unwrap();
         set_mathml(mathml.to_string()).unwrap();
     }
 
