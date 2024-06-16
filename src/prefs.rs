@@ -479,6 +479,7 @@ impl PreferenceManager {
     }
 
     /// Set BlockSeparators and DecimalSeparators
+    /// FIX: changing these values could change the parse, so we really should reparse the original expr, but that doesn't exist anymore (store the original string???)
     fn set_separators(&mut self, language_country: &str) -> Result<()> {
         // This list was generated from https://en.wikipedia.org/wiki/Decimal_separator#Countries_using_decimal_point
         // The countries were then mapped to language(s) using https://en.wikipedia.org/wiki/List_of_official_languages_by_country_and_territory
@@ -494,13 +495,15 @@ impl PreferenceManager {
             "af-na", "es-ni", "es-pa", "fil", "ms-sg", "si", "th",
         };
         
-        if language_country == "Auto" {
-            return Ok( () );        // "Auto" doesn't tell us anything
-        }
         let decimal_separator = self.pref_to_string("DecimalSeparator");
-        if !["Auto",",","."].contains(&decimal_separator.as_str()) {
+        if !["Auto", ",", "."].contains(&decimal_separator.as_str()) {
             return Ok( () );
         }
+
+        if language_country == "Auto" && decimal_separator == "Auto" {
+            return Ok( () );        // "Auto" doesn't tell us anything -- we will get called again when Language is set
+        }
+
         let language_country = language_country.to_ascii_lowercase();
         let language_country = &language_country;
         let mut lang_country_split = language_country.split('-');
@@ -512,12 +515,12 @@ impl PreferenceManager {
             use_period = USE_DECIMAL_SEPARATOR.contains(language_country) || USE_DECIMAL_SEPARATOR.contains(language);
         }
         // debug!("set_separators: use_period: {}", use_period);
-        self.set_string_pref("DecimalSeparators", if use_period {"."} else {","})?;
+        self.user_prefs.prefs.insert("DecimalSeparators".to_string(), Yaml::String((if use_period {"."} else {","}).to_string()));
         let mut block_separators =  (if use_period {", \u{00A0}\u{202F}"} else {". \u{00A0}\u{202F}"}).to_string();
-        if country == "ch" || country == "li" { // Switzerland and Liechtenstein
+        if country == "ch" || country == "li" { // Switzerland and Liechtenstein also use ` as a block separator, at least in some cases
             block_separators.push('\'');
         }
-        self.set_string_pref("BlockSeparators", &block_separators)?;
+        self.user_prefs.prefs.insert("BlockSeparators".to_string(), Yaml::String(block_separators));
         return Ok( () );
     }
 
@@ -715,13 +718,14 @@ impl PreferenceManager {
 
         debug!("Setting ({}) {} to '{}'", if is_user_pref {"user"} else {"sys"}, key, value);
         if is_user_pref {
-            let is_decimal_separators_changed = key == "DecimalSeparator" && self.user_prefs.prefs.get("DecimalSeparator").unwrap().as_str().unwrap() != value;
+            // a little messy about the DecimalSeparator due immutable and mutable borrows
+            let current_decimal_separator = self.user_prefs.prefs.get("DecimalSeparator").unwrap().clone().as_str().unwrap();
+            let is_decimal_separators_changed = key == "DecimalSeparator" && current_decimal_separator != value;
             let is_language_changed = key == "Language" && self.user_prefs.prefs.get("Language").unwrap().as_str().unwrap() != value;
             self.user_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
-            if is_decimal_separators_changed || is_language_changed {
-                // set computed values for BLOCK_SEPARATORS and DECIMAL_SEPARAORS (a little messy about the language due immutable and mutable borrows)
-                let language = self.user_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone();
-                let language = language.as_str().unwrap();
+            if is_decimal_separators_changed || (current_decimal_separator == "Auto" && is_language_changed) {
+                // a little messy about the language due immutable and mutable borrows
+                let language = self.user_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone().as_str().unwrap();
                 self.set_separators(language)?;
             }
         } else {
