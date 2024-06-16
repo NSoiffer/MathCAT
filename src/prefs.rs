@@ -719,13 +719,15 @@ impl PreferenceManager {
         debug!("Setting ({}) {} to '{}'", if is_user_pref {"user"} else {"sys"}, key, value);
         if is_user_pref {
             // a little messy about the DecimalSeparator due immutable and mutable borrows
-            let current_decimal_separator = self.user_prefs.prefs.get("DecimalSeparator").unwrap().clone().as_str().unwrap();
+            let current_decimal_separator = self.user_prefs.prefs.get("DecimalSeparator").unwrap().clone();
+            let current_decimal_separator = current_decimal_separator.as_str().unwrap();
             let is_decimal_separators_changed = key == "DecimalSeparator" && current_decimal_separator != value;
             let is_language_changed = key == "Language" && self.user_prefs.prefs.get("Language").unwrap().as_str().unwrap() != value;
             self.user_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
             if is_decimal_separators_changed || (current_decimal_separator == "Auto" && is_language_changed) {
-                // a little messy about the language due immutable and mutable borrows
-                let language = self.user_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone().as_str().unwrap();
+                // a little messy about the language due immutable and mutable borrows)
+                let language = self.user_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone();
+                let language = language.as_str().unwrap();
                 self.set_separators(language)?;
             }
         } else {
