@@ -192,12 +192,23 @@ pub fn get_preference(name: String) -> Result<String> {
 /// Be careful setting preferences -- these potentially override user settings, so only preferences that really need setting should be set.
 pub fn set_preference(name: String, value: String) -> Result<()> {
     // "LanguageAuto" allows setting the language dir without actually changing the value of "Language" from Auto
+    let mut value = value;
     if name == "Language" || name == "LanguageAuto" {
         // check the format
-        if !( value == "Auto" ||
-              value.len() == 2 ||
-              (value.len() == 5 && value.as_bytes()[2] == b'-') ) {
-            bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value);
+        if value != "Auto" {
+            // could get es, es-419, or en-us-nyc ...  we only care about the first two parts so we clean it up a little
+            let mut lang_country_split = value.split('-');
+            let language = lang_country_split.next().unwrap_or("");
+            let country = lang_country_split.next().unwrap_or("");
+            if language.len() != 2 {
+                bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value);
+            }
+            let mut new_lang_country = language.to_string();     // need a temp value because 'country' is borrowed from 'value' above
+            if country != "" {
+                new_lang_country.push('-');
+                new_lang_country.push_str(country);
+            }
+            value = new_lang_country;
         }
         if name == "LanguageAuto" && value == "Auto" {
             bail!("'LanguageAuto' can not have the value 'Auto'");

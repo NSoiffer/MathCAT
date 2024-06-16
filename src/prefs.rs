@@ -493,6 +493,7 @@ impl PreferenceManager {
             "en", "bn", "km", "el-cy", "tr-cy", "zh", "es-do", "ar", "es-sv", "es-gt", "es-hn", "hi", "as", "gu", "kn", "ks",
             "ml", "mr", "ne", "or", "pa", "sa", "sd", "ta", "te", "ur", "he", "ja", "sw", "ko", "de-li", "ms", "dv", "mt", "es-mx", "my",
             "af-na", "es-ni", "es-pa", "fil", "ms-sg", "si", "th",
+            "es-419", // latin america
         };
         
         let decimal_separator = self.pref_to_string("DecimalSeparator");
