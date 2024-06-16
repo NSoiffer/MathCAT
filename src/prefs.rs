@@ -874,7 +874,6 @@ mod tests {
 
     #[test]
     fn separators() {
-        init_logger();
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();
