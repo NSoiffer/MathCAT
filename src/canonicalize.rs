@@ -1596,6 +1596,10 @@ impl CanonicalizeContext {
 
 		/// merge a following mstyle that has the same attrs
 		fn merge_adjacent_similar_mstyles(mathml: Element) {
+			if ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(name(&get_parent(mathml))) {
+				// FIX: look to see if all of the children (might be more than just the adjacent one) have the same attr and then pull them up to the parent
+				return;		// can't remove subsequent child 
+			}
 			let following_siblings = mathml.following_siblings();
 			if following_siblings.is_empty() {
 				return;
