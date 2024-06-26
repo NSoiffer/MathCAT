@@ -5701,6 +5701,27 @@ mod canonicalize_tests {
 	}
 
 	#[test]
+	fn mstyle_merge_bug_272() {
+        let test_str = r#"<math>
+			<msup>
+				<mstyle mathvariant="bold" mathsize="normal">
+					<mn>6</mn>
+				</mstyle>
+				<mstyle mathvariant="bold" mathsize="normal">
+					<mn>9</mn>
+				</mstyle>
+			</msup>
+		</math>"#;
+    	let target_str = "<math>
+			<msup>
+			<mn mathsize='normal' mathvariant='bold'>𝟔</mn>
+			<mn mathsize='normal' mathvariant='bold'>𝟗</mn>
+			</msup>
+		</math>";
+		assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
     fn lift_script() {
         let test_str = "<math xmlns='http://www.w3.org/1998/Math/MathML' >
 		<mrow>
