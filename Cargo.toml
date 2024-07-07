@@ -1,6 +1,6 @@
 [package]
 name = "mathcat"
-version = "0.6.3"
+version = "0.6.4"
 authors = ["Neil Soiffer <soiffer@alum.mit.edu>"]
 license = "MIT"
 description = "MathCAT: Math Capable Assistive Technology ('Speech and braille from MathML')"
@@ -33,7 +33,14 @@ radix_fmt = "1.0"
 log = "0.4"
 env_logger = "0.11"
 cfg-if = "1.0"
+[target.'cfg(target_family = "wasm")'.dependencies]
+zip = { version = "2.1", default-features = false, features = ["deflate"] }
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
 zip = { version = "2.1", default-features = false, features = ["bzip2"] }
+
+[dependencies.getrandom]
+version = "0.2"
+features = ["js"]
 
 # # dependencies because of need to build wasm version for file i/o
 # yew = "0.18.0"
@@ -60,7 +67,10 @@ zip = { version = "2.1", default-features = false, features = ["bzip2"] }
 [build-dependencies]
 bitflags = "2.5"
 error-chain = "0.12.4"
-zip = { version = "2.1", default-features = false, features = ["bzip2"] }
+[target.'cfg(target_family = "wasm")'.build-dependencies]
+zip = { version = "2.1", default-features = false, features = ["deflate"] }
+[target.'cfg(not(target_family = "wasm"))'.build-dependencies]
+zip = { version = "2.1", default-features = false, features = ["deflate"] }
 
 [lib]
 name = "libmathcat"
@@ -68,7 +78,7 @@ crate-type = ["rlib", "cdylib"]
 
 [profile.test]
 debug = true
-opt-level = 0    # adds a few seconds to the compile, but cuts testing time by ~75% (~90 secs on 5/24)
+opt-level = 1    # adds a few seconds to the compile, but cuts testing time by ~75% (~90 secs on 5/24)
 
 [profile.release]
 debug = false

@@ -168,9 +168,16 @@ fn main() {
     }
     let archive_path = PathBuf::from("rules.zip");     // A zip file containing all the zip files.
     // println!("cargo::warning=zip file location: '{:?}'", archive_path.to_str());
-
-    let zip_options = SimpleFileOptions::default().compression_method(CompressionMethod::BZIP2)
+    let compile_target = std::env::var("CARGO_CFG_TARGET_FAMILY").unwrap(); // build.rs has target_family = build machine, not real target
+    let compression_method = if compile_target == "wasm" {
+        CompressionMethod::DEFLATE     // although BZIP2 seems better in terms of smaller, it won't compile for WASM
+    } else {
+        CompressionMethod::BZIP2
+    };
+    let zip_options = SimpleFileOptions::default().compression_method(compression_method)
                     .compression_level(Some(9));
+    // let zip_options = SimpleFileOptions::default()
+    //                 .compression_level(Some(9));
 
     // println!("cargo::warning=rules directory '{:?}'", &rules_dir.to_string_lossy());
     let archive_zip_file = match File::create(&archive_path) {
