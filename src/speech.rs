@@ -254,7 +254,7 @@ pub fn process_include<F>(current_file: &Path, new_file_name: &str, mut read_new
             // get the subdir ...Rules/Braille/en/...
             // could have ...Rules/Braille/definitions.yaml, so 'next()' doesn't exist in this case, but the file wasn't zipped up
             if let Some(subdir) = new_file.strip_prefix(unzip_dir).unwrap().iter().next() {
-                PreferenceManager::unzip_files(unzip_dir, subdir.to_str().unwrap())?;
+                PreferenceManager::unzip_files(unzip_dir, subdir.to_str().unwrap()).ok();   // ok if err/doesn't exist
             }
         }
     }
@@ -1943,11 +1943,14 @@ impl FilesAndTimes {
     pub fn is_file_up_to_date(&self, pref_path: &Path, should_ignore_file_time: bool) -> bool {
 
         // if the time isn't set or the path is different from the prefernce (which might have changed), return false
-        if self.ft.is_empty() || self.ft[0].time == SystemTime::UNIX_EPOCH || self.as_path() != pref_path {
+        if self.ft.is_empty() || self.as_path() != pref_path {
             return false;
         }
         if should_ignore_file_time || cfg!(target_family = "wasm") {
-            return !self.ft.is_empty();
+            return true;
+        }
+        if  self.ft[0].time == SystemTime::UNIX_EPOCH {
+            return false;
         }
 
 
@@ -2222,39 +2225,6 @@ impl SpeechRules {
 
         return compile_rule(&unicode_file_contents, unicode_build_fn)
                     .chain_err(||format!("in file {:?}", path.to_str().unwrap()));
-    }
-}
-
-
-cfg_if! {
-    if #[cfg(target_family = "wasm")] {
-        pub fn invalidate_all() {
-            SPEECH_RULES.with( |rules| {
-                let mut rules = rules.borrow_mut();
-                rules.rule_files.invalidate();
-                rules.unicode_short_files.borrow_mut().invalidate();
-                rules.unicode_full_files.borrow_mut().invalidate();
-                rules.definitions_files.borrow_mut().invalidate();
-            });
-            BRAILLE_RULES.with( |rules| {
-                let mut rules = rules.borrow_mut();
-                rules.rule_files.invalidate();
-                rules.unicode_short_files.borrow_mut().invalidate();
-                rules.unicode_full_files.borrow_mut().invalidate();
-                rules.definitions_files.borrow_mut().invalidate();
-            });
-
-            // these share the unicode and def files with SPEECH_RULES, so need to invalidate them
-            NAVIGATION_RULES.with( |rules| {
-                rules.borrow_mut().rule_files.invalidate();
-            });
-            OVERVIEW_RULES.with( |rules| {
-                rules.borrow_mut().rule_files.invalidate();
-            });
-            INTENT_RULES.with( |rules| {
-                rules.borrow_mut().rule_files.invalidate();
-            });
-        }
     }
 }
 

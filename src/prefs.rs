@@ -29,7 +29,6 @@ use crate::speech::{as_str_checked, RulesFor, FileAndTime};
 use std::collections::{HashMap, HashSet};
 use phf::phf_set;
 use crate::shim_filesystem::*;
-use zip::ZipArchive;
 use crate::errors::*;
 
 /// Use to indicate preference not found with Preference::to_string()
@@ -259,6 +258,12 @@ impl PreferenceManager {
     /// 
     /// If rules_dir is an empty PathBuf, the existing rules_dir is used (an error if it doesn't exist)
     pub fn initialize(&mut self, rules_dir: PathBuf) -> Result<()> {
+        #[cfg(not(target_family = "wasm"))]
+        let rules_dir = match rules_dir.canonicalize() {
+            Err(e) => bail!("set_rules_dir: could not canonicalize path {}: {}", rules_dir.display(), e.to_string()),
+            Ok(rules_dir) =>  rules_dir,
+        };
+
         self.set_rules_dir(&rules_dir)?;
         self.set_preference_files()?;
         self.set_all_files(&rules_dir)?;
@@ -439,7 +444,7 @@ impl PreferenceManager {
     /// Returns true if it unzipped them
     pub fn unzip_files(path: &Path, language: &str) -> Result<bool> {
         thread_local!{
-            /// when a language/braille code dir is unzipped, it is marked here
+            /// when a language/braille code dir is unzipped, it is recorded here
             static UNZIPPED_FILES: RefCell<HashSet<String>> = RefCell::new( HashSet::with_capacity(31));
         }
         
@@ -447,35 +452,19 @@ impl PreferenceManager {
             None => return Ok(false),
             Some(dir) => dir,
         };
-        let zip_file = dir.join(language.to_string() + ".zip");
-        let zip_file_string = zip_file.to_string_lossy().to_string();
-        if UNZIPPED_FILES.with( |unzipped_files| unzipped_files.borrow().contains(&zip_file.to_string_lossy().to_string())) {
+        let zip_file_name = language.to_string() + ".zip";
+        let zip_file_path = dir.join(&zip_file_name);
+        let zip_file_string = zip_file_path.to_string_lossy().to_string();
+        if UNZIPPED_FILES.with( |unzipped_files| unzipped_files.borrow().contains(&zip_file_string)) {
             return Ok(false);
         }
-        // Fix: Need to add wasm version (can't use read_to_string because it wants UTF-8)
-        let archive = match std::fs::read(&zip_file) {
-            Err(e) => {
-                // maybe started out with all the files unzipped?
-                match read_dir_shim(path) {
-                    Err(e) => bail!("unzip_files: couldn't read directory '{}'\n  error is {}", path.display(), e.to_string()),
-                    Ok(read_dir_iter) => {
-                        if read_dir_iter.count() > 1 {
-                            UNZIPPED_FILES.with( |unzipped_files| unzipped_files.borrow_mut().insert(zip_file_string) );
-                            return Ok(false);
-                        }
-                        bail!("Couldn't open zip file {}. {}", zip_file.to_str().unwrap(), e.to_string());
-                    }
-                }
-            },
-            Ok(contents) => std::io::Cursor::new(contents),
-        };
-    
-        let mut zip_archive = ZipArchive::new(archive).unwrap();
 
-        // FIX: this needs to have a shim for wasm version
-        zip_archive.extract(dir).expect("Zip extraction failed");
+        let result = match zip_extract_shim(&dir, &zip_file_name) {
+            Err(e) => bail!("Couldn't open zip file {}: {}.", zip_file_string, e),
+            Ok(result) => result,
+        };
         UNZIPPED_FILES.with( |unzipped_files| unzipped_files.borrow_mut().insert(zip_file_string) );
-        return Ok(true);
+        return Ok(result);
     }
 
     /// Set BlockSeparators and DecimalSeparators
@@ -581,7 +570,7 @@ impl PreferenceManager {
         }
 
         if let Some(result) = alternative_style_file {
-            debug!("find_file: found alternative_style_file '{}'", result.to_string_lossy());
+            // debug!("find_file: found alternative_style_file '{}'", result.to_string_lossy());
             return Ok(result);     // found an alternative style file in the same lang dir
         }
 
@@ -600,14 +589,10 @@ impl PreferenceManager {
         fn find_any_style_file(path: &Path) -> Result<PathBuf> {    
             // try to find a xxx_Rules.yaml file
             // we find the first file because this is the deepest (most language specific) speech rule file
-            for entry in read_dir_shim(path)?.flatten() {
-                let alt_file_path = entry.path();
-                let file_name = alt_file_path.to_string_lossy();
-                if is_file_shim(&alt_file_path) && file_name.ends_with("_Rules.yaml") {
-                    return Ok(alt_file_path);
-                }
+            match find_file_in_dir_that_ends_with_shim(path, "_Rules.yaml") {
+                None => bail!{"didn't find file"},
+                Some(file_name) => return Ok(PathBuf::from(file_name)),
             }
-            bail!{"didn't find file"}
         }
     }
 
@@ -615,20 +600,15 @@ impl PreferenceManager {
         // return 'Rules/Language/fr', 'Rules/Language/en/gb', etc, if they exist.
         // fall back to main language, and then to default_dir if language dir doesn't exist
         let mut full_path = rules_dir.to_path_buf();
-        let lang_parts = lang.split('-');
-        for part in lang_parts {
-            full_path.push(Path::new(part));
-            if !is_dir_shim(&full_path) {
-                break;
+        full_path.push(lang.replace('-', "/"));
+        for parent in full_path.ancestors() {
+            if is_dir_shim(parent) {
+                return Some(parent.to_path_buf());
+            } else if parent == rules_dir {
+                return None
             }
         }
-
-        // make sure something got added...
-        if rules_dir == full_path {
-            return None;    // didn't find a dir
-        } else {
-            return Some(full_path);
-        }
+        return None;        // shouldn't happen
     }
 
     
@@ -717,7 +697,7 @@ impl PreferenceManager {
             bail!("{} is an unknown MathCAT preference!", key);
         }
 
-        debug!("Setting ({}) {} to '{}'", if is_user_pref {"user"} else {"sys"}, key, value);
+        // debug!("Setting ({}) {} to '{}'", if is_user_pref {"user"} else {"sys"}, key, value);
         if is_user_pref {
             // a little messy about the DecimalSeparator due immutable and mutable borrows
             let current_decimal_separator = self.user_prefs.prefs.get("DecimalSeparator").unwrap().clone();
