@@ -49,29 +49,37 @@
       children: [x: "@data-number"]
 
 -
-  name: negative
+  name: positive-or-negative
   tag: mrow
-  match: "count(*)=2 and *[1][self::m:mo][text()='-']"
+  match: "count(*)=2 and *[1][self::m:mo][text()='+' or text='-']"
+  variables:
+  - AtLeftEdgeOfMTD: "name(EdgeNode(., 'left', 'mtd')) = 'mtd'"
+  - ContinuedColumn: "ancestor::m:mtable[@data-intent-property[
+                    contains(., ':piecewise:') or
+                    contains(., ':lines:') or
+                    contains(., ':system-of-equations:')
+                    ]]"
+  - InContinuedRow: "parent::m:mtr[@data-intent-property[contains(., ':continued-row:')]]"
+  - FirstColumn: "DEBUG(parent::m:mtd/*[1]=.)"
   replace:
-  - intent:
-      name: "negative"
-      children: [x: "*[2]"]
-               
--
-  name: positive
-  tag: mrow
-  match: "count(*)=2 and *[1][self::m:mo][text()='+']"
-  replace:
-  - intent:
-      name: "positive"
-      children: [x: "*[2]"]
+  - test:
+      # don't use postive/negative if a continued data cell
+      if: "$AtLeftEdgeOfMTD and $ContinuedColumn and (not($FirstColumn) or $InContinuedRow)"
+      then:
+      - intent:
+          xpath-name: "IfThenElse(*[1][self::m:mo][text()='+'], 'plus', 'minus')"
+          children: [x: "*[2]"]
+      else:
+      - intent:
+          xpath-name: "IfThenElse(*[1][self::m:mo][text()='+'], 'positive', 'negative')"
+          children: [x: "*[2]"]
                
 
 -
   # (a,b) has many interpretations; (a, b] (etc) have fewer interpretations.
   # as an interval, it represents a set and hence a clue that it is an interval is that a set operator comes
   #   before or after it. '=' is also common.
-  # They also commonly stand by themselves, but so does the interpretation as a point or gcd, so we don't include (xxx, yyy) in the inference
+  # They also commonly stand by themselves, but so does the interpretation as a point or gcd, so we don't inclub (xxx, yyy) in the inference
   name: interval
   tag: mrow
   match: 
@@ -632,7 +640,7 @@
   name: mtable-cases-property
   tag: mtable
   match:
-  - "contains(@data-intent-property, ':cases:') or"
+  - "contains(@data-intent-property, ':piecewise:') or"
   - "..[self::m:mrow and count(*)=2 and *[1][text()='{']]"
   replace:
   - intent:
@@ -643,7 +651,7 @@
 -
   name: mtable-equations-property
   tag: mtable
-  match: "contains(@data-intent-property, ':equations:')"
+  match: "contains(@data-intent-property, ':system-of-equation:')"
   replace:
   - intent:
       name: "equations"
@@ -661,20 +669,20 @@
       - x: "*"
 
 
-# -
-#   name: mtable-property-is-set
-#   tag: mtable
-#   variables: [MTableProperty: "IfThenElse(contains(DEBUG(@data-intent-property), ':matrix:'), 'matrix',
-#                                IfThenElse(contains(@data-intent-property, ':determinant:'), 'determinant',
-#                                IfThenElse(contains(@data-intent-property, ':cases:'), 'cases',
-#                                IfThenElse(contains(@data-intent-property, ':equations:'), 'equations',
-#                                IfThenElse(contains(@data-intent-property, ':lines:'), 'lines','')))))"]
-#   match: "DEBUG($MTableProperty) !=''"
-#   replace:
-#   - intent:
-#       name: "$MTableProperty"    # doesn't work -- "name:" is not an xpath expr
-#       children:
-#       - x: "*"
+-
+  name: mtable-property-is-set
+  tag: mtable
+  variables: [MTableProperty: "IfThenElse(contains(@data-intent-property, ':matrix:'), 'matrix',
+                               IfThenElse(contains(@data-intent-property, ':determinant:'), 'determinant',
+                               IfThenElse(contains(@data-intent-property, ':piecewise:'), 'piecewise',
+                               IfThenElse(contains(@data-intent-property, ':system-of-equation:'), 'system-of-equations',
+                               IfThenElse(contains(@data-intent-property, ':lines:'), 'lines','')))))"]
+  match: "$MTableProperty !=''"
+  replace:
+  - intent:
+      xpath-name: "$MTableProperty"
+      children:
+      - x: "*"
 
 -
   name: cases

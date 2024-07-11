@@ -527,7 +527,8 @@
   variables:
     # Wikipedia has some tables where all the entire first column is empty (e.g., https://en.wikipedia.org/wiki/List_of_trigonometric_identities)
   - LineCountTry: "count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']])"
-  - LineCount: "IfThenElse($LineCountTry=0, count(*/*[1]), $LineCountTry)"
+  - LineCountAllRows: "IfThenElse($LineCountTry=0, count(*/*[1]), $LineCountTry)"
+  - LineCount: "$LineCountAllRows - count(*[contains(@data-intent-property, ':continued-row:')])"
   replace:
   - x: "$LineCount"
   - test:
@@ -552,7 +553,7 @@
       then:
       - t: "next line"
       else_test:
-        if: "$LineCount != 1"
+        if: "not($LineCount=1 or contains(@data-intent-property, ':continued-row:'))"
         then:
         - test:
           - if: "parent::m:cases"
@@ -560,7 +561,7 @@
           - else_if: "parent::m:equations"
             then: [t: "equation"] # phrase('equation' 1 of 10 equations)
             else: [t: "line"]     # phrase('line 1 of 10 lines)
-        - x: "count(preceding-sibling::*)+1"
+        - x: "count(preceding-sibling::*)+1-count(preceding-sibling::*[contains(@data-intent-property, ':continued-row:')])"
 
   - test:
       if: .[self::m:mlabeledtr]
@@ -761,7 +762,6 @@
           else: [t: "matrix"]      # phrase(the 2 by 2 'matrix's)
 
 - name: chemistry-msub
-
   tag: [chemical-formula]
   match: "*[1][text()='msub']"
   replace:
@@ -773,6 +773,14 @@
         if: "$Verbosity='Medium'"
         then: [t: "sub"]      # phrase(H 'sub' 2)
   - x: "*[3]"
+
+- name: dimension-by
+  tag: mrow
+  match: dimension-product
+  replace:
+  - insert:
+      nodes: "*"
+      replace: [t: "by", pause: auto]      # phrase(3 'by' 5 matrix)
 
 - name: chemistry-msup
   tag: [chemical-formula]
