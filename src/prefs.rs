@@ -369,7 +369,7 @@ impl PreferenceManager {
     }
 
     fn set_speech_files(&mut self, language_dir: &Path, language: &str, new_speech_style: Option<&str>) -> Result<()> {
-        PreferenceManager::unzip_files(language_dir, language)?;
+        PreferenceManager::unzip_files(language_dir, language, Some("en"))?;
         self.intent = PreferenceManager::find_file(language_dir, language, Some("en"), "intent.yaml")?;
         self.overview = PreferenceManager::find_file(language_dir, language, Some("en"), "overview.yaml")?;
         self.navigation = PreferenceManager::find_file(language_dir, language, Some("en"), "navigate.yaml")?;
@@ -395,7 +395,7 @@ impl PreferenceManager {
 
     fn set_braille_files(&mut self, braille_rules_dir: &Path, braille_code_name: &str) -> Result<()> {
         // Fix: Currently the braille code and the directory it lives in have to have the same name
-        PreferenceManager::unzip_files(braille_rules_dir, braille_code_name)?;
+        PreferenceManager::unzip_files(braille_rules_dir, braille_code_name, Some("UEB"))?;
 
         let braille_file = braille_code_name.to_string() + "_Rules.yaml";
 
@@ -442,16 +442,13 @@ impl PreferenceManager {
 
     /// Unzip the files if needed
     /// Returns true if it unzipped them
-    pub fn unzip_files(path: &Path, language: &str) -> Result<bool> {
+    pub fn unzip_files(path: &Path, language: &str, default_lang: Option<&str>) -> Result<bool> {
         thread_local!{
             /// when a language/braille code dir is unzipped, it is recorded here
             static UNZIPPED_FILES: RefCell<HashSet<String>> = RefCell::new( HashSet::with_capacity(31));
         }
         
-        let dir = match PreferenceManager::get_language_dir(path, language) {
-            None => return Ok(false),
-            Some(dir) => dir,
-        };
+        let dir = PreferenceManager::get_language_dir(path, language, default_lang)?;
         let zip_file_name = language.to_string() + ".zip";
         let zip_file_path = dir.join(&zip_file_name);
         let zip_file_string = zip_file_path.to_string_lossy().to_string();
@@ -525,30 +522,11 @@ impl PreferenceManager {
         // returns the location of the file_name found
 
         // start by trying to find a dir that exists
-        let mut lang_dir = PreferenceManager::get_language_dir(rules_dir, lang);
-        let mut default_lang = default_lang;
-        if lang_dir.is_none() {
-            // try again with the default lang if there is one
-            if default_lang.is_some() {
-                lang_dir = PreferenceManager::get_language_dir(rules_dir, default_lang.unwrap());
-                if lang_dir.is_none() {
-                    // We are done for -- MathCAT can't do anything without the required files!
-                    bail!("Wasn't able to find/read directory for language {}\n
-                           Wasn't able to find/read MathCAT default language directory: {}",
-                          lang, rules_dir.join(default_lang.unwrap_or("")).as_os_str().to_str().unwrap());
-                }
-
-                // the default lang dir exists -- prevent retrying with it.
-                default_lang = None;
-                warn!("Couldn't find rules for language {}, ", lang)
-            }
-        }
-
+        let lang_dir = PreferenceManager::get_language_dir(rules_dir, lang, default_lang)?;
         // now find the file name in the dirs
         // we start with the deepest dir and walk back to towards Rules
         let mut alternative_style_file = None;      // back up in case we don't find the target style in lang_dir
         let looking_for_style_file = file_name.ends_with("_Rules.yaml");
-        let lang_dir = lang_dir.unwrap();
         for os_path in lang_dir.ancestors() {   // ancestor returns self and ancestors
             let path = PathBuf::from(os_path).join(file_name);
             // debug!("find_file: checking file: {}", path.to_string_lossy());
@@ -596,19 +574,32 @@ impl PreferenceManager {
         }
     }
 
-    fn get_language_dir(rules_dir: &Path, lang: &str) -> Option<PathBuf> {
+    fn get_language_dir(rules_dir: &Path, lang: &str, default_lang: Option<&str>) -> Result<PathBuf> {
         // return 'Rules/Language/fr', 'Rules/Language/en/gb', etc, if they exist.
         // fall back to main language, and then to default_dir if language dir doesn't exist
         let mut full_path = rules_dir.to_path_buf();
         full_path.push(lang.replace('-', "/"));
         for parent in full_path.ancestors() {
-            if is_dir_shim(parent) {
-                return Some(parent.to_path_buf());
-            } else if parent == rules_dir {
-                return None
+            if parent == rules_dir {
+                break;
+            } else if is_dir_shim(parent) {
+                return Ok(parent.to_path_buf());
             }
         }
-        return None;        // shouldn't happen
+
+        // didn't find the language -- try again with the default language
+        match default_lang {
+            Some(default_lang) => {
+                warn!("Couldn't find rules for language {}, ", lang);
+                return PreferenceManager::get_language_dir(rules_dir, default_lang, None);
+            },
+            None => {
+                // We are done for -- MathCAT can't do anything without the required files!
+                bail!("Wasn't able to find/read directory for language {}\n
+                        Wasn't able to find/read MathCAT default language directory: {}",
+                        lang, rules_dir.join(default_lang.unwrap_or("")).as_os_str().to_str().unwrap());
+            }
+        }
     }
 
     
