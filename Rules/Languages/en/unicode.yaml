@@ -350,7 +350,11 @@
  - "∈":                                          # 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "an element of"]
+        then:
+        - test: 
+            if: "$Verbosity!='Terse'"
+            then: [t: "is"]
+        - t: "an element of"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set
@@ -374,7 +378,11 @@
     # rule is identical to 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "is not an element of"]
+        then:
+        - test: 
+            if: "$Verbosity!='Terse'"
+            then: [t: "is"]
+        - t: "not an element of"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set
@@ -397,7 +405,11 @@
  - "∊":                                          # 0x220a
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "is an element of"]
+        then:
+        - test: 
+            if: "$Verbosity!='Terse'"
+            then: [t: "is"]
+        - t: "an element of"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set
