@@ -9,6 +9,7 @@ use crate::common::*;
 //                 <mo>=</mo><mn>1</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>3</mn></math>";
 //     test_braille("Swedish", expr, "⠼⠋⠀⠐⠶⠀⠼⠁⠐⠦⠼⠃⠐⠦⠼⠉⠀⠐⠶⠀⠼⠁⠐⠖⠼⠃⠐⠖⠼⠉");
 // }
+// TESTAR TIMS KLONADE REPO!
 
 #[test]
 fn ex_6_1 {
