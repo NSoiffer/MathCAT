@@ -141,7 +141,7 @@ fn ex_6_20 {
     test_braille("Swedish", expr, "p123456;p236;p1;p256;p12;p1256;p1;p36;p12;p123456;p356; p2356; p123456;p236;p2345;p1;p1345;p123456;p236;p23;p1;p256;p23;p12;p1256;p3456;p12;p123456;p356; p1256;p1256; p2345;p1;p1345;p123456;p236;p23;p1;p36;p23;p12;p1256;p3456;p12;p123456;p356;p123456;p356;");
 }
 #[test]
-fn ex_6_20 {
+fn ex_6_21 {
     let expr = "<math><mrow><mo>(</mo><mtable equalrows='true' equalcolumns='true'><mtr><mtd><mi>n</mi></mtd></mtr><mtr><mtd><mi>k</mi></mtd></mtr></mtable><mo>)</mo>
                 <mo>=</mo><mfrac><mrow><mi>n</mi><mo>!</mo></mrow><mrow><mo>(</mo><mi>n</mi><mo>&#x2212;</mo><mi>k</mi><mo>)</mo><mo>!</mo><mi>k</mi><mo>!</mo></mrow>
                 </mfrac></mrow></math>";
