@@ -9,7 +9,76 @@ use crate::common::*;
 //                 <mo>=</mo><mn>1</mn><mo>+</mo><mn>2</mn><mo>+</mo><mn>3</mn></math>";
 //     test_braille("Swedish", expr, "⠼⠋⠀⠐⠶⠀⠼⠁⠐⠦⠼⠃⠐⠦⠼⠉⠀⠐⠶⠀⠼⠁⠐⠖⠼⠃⠐⠖⠼⠉");
 // }
-// TESTAR TIMS KLONADE REPO!
+
+// KAPITEL 5
+
+#[test]
+fn ex_5_1 {
+    let expr = "<math><mrow><mn>5</mn><mo>+</mo><mn>12</mn></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p15; p256; p3456;p1;p12;");
+}
+#[test]
+fn ex_5_2 {
+    let expr = "<math><mrow><mn>9,99</mn><mo>+</mo><mn>0,001</mn></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p24;p2;p24;p24; p256; p3456;p245;p2;p245;p245;p1;");
+}
+#[test]
+fn ex_5_3 {
+    let expr = "<math><mrow><mrow><mn>1</mn><mo>/</mo><mn>2</mn></mrow><mo>+</mo><mrow><mn>1</mn><mo>/</mo><mn>2</mn></mrow></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p1;p34;p3456;p12 p256; p3456;p1;p34;p3456;p12");
+}
+#[test]
+fn ex_5_4 {
+    let expr = "<math><mrow><mi>y</mi><mo>=</mo><mn>5</mn><mo>+</mo><mi>x</mi></mrow></math>";
+    test_braille("Swedish", expr, "p13456; p2356; p3456;p15; p256; p1346;");
+}
+#[test]
+fn ex_5_5 {
+    let expr = "<math><mrow><mn>613</mn><mo>&#x2212;</mo><mn>221</mn></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p124;p1;p14; p36; p3456;p12;p12;p1;");
+}
+#[test]
+fn ex_5_6 {
+    let expr = "<math><mrow><mn>10,1</mn><mo>&#x2212;</mo><mn>3,05</mn></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p1;p245;p2;p1; p36; p3456;p14;p2;p245;p15;");
+}
+#[test]
+fn ex_5_7 {
+    let expr = "<math><mrow><mn>3</mn><mfrac><mn>1</mn><mn>4</mn></mfrac><mo>&#x2212;</mo><mn>1</mn><mfrac><mn>3</mn><mn>4</mn></mfrac></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p14;p3456;p1;p1256;p3456;p145; p36; p3456;p1;p3456;p14;p1256;p3456;p145;");
+}
+#[test]
+fn ex_5_8 {
+    let expr = "<math><mrow><mn>0,5</mn><mo>+</mo><mn>3,4</mn><mo>+</mo><mn>6</mn><mo>&#x2212;</mo><mn>7,5</mn><mo>&#x2212;</mo><mn>0,02</mn></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p245;p2;p15; p256; p3456;p14;p2;p145; p256; p3456;p124; p36; p3456;p1245;p2;p15; p36; p3456;p245;p2;p245;p12;");
+}
+#[test]
+fn ex_5_9 {
+    let expr = "<math><mrow><mi>&#x03B1;</mi><mo>&#x00B1;</mo><mn>2</mn><mi>&#x03C0;</mi></mrow></math>";
+    test_braille("Swedish", expr, "p56;p1; p46;p256;p36; p3456;p12;p56;p1234;");
+}
+#[test]
+fn ex_5_10 {
+    let expr = "<math><mrow><mn>15</mn><mo>&#x22C5;</mo><mn>13</mn></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p1;p15; p12456;p3; p3456;p1;p14;");
+}
+#[test]
+fn ex_5_11 {
+    let expr = "<math><mrow><mn>4.5</mn><mo>&#x22C5;</mo><mn>1.4</mn></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p145;p3;p15; p12456;p3; p3456;p1;p3;p145;");
+}
+#[test]
+fn ex_5_12 {
+    let expr = "<math><mrow><mn>2</mn><mi>a</mi><mi>b</mi><mo>&#x22C5;</mo><mn>2</mn><mi>a</mi><mi>b</mi><mo>&#x22C5;</mo><mn>2</mn><mi>a</mi><mi>b</mi></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p12;p156;p1;p12; p12456;p3; p3456;p12;p156;p1;p12; p12456;p3; p3456;p12;p156;p1;p12;");
+}
+#[test]
+fn ex_5_13 {
+    let expr = "<math><mrow><mstyle mathvariant='bold' mathsize='normal'><mi><mi>r</mi></mi></mstyle><mo>&#x00B7;</mo><mstyle mathvariant='bold' mathsize='normal'><mi><mi>n</mi></mi></mstyle><mo>=</mo><mstyle mathvariant='bold' mathsize='normal'><mi><mi>s</mi></mi></mstyle><mo>&#x00B7;</mo><mstyle mathvariant='bold' mathsize='normal'><mi><mi>n</mi></mi></mstyle></mrow></math>";
+    test_braille("Swedish", expr, "p46;p1235; p46;p12456;p3; p46;p1345; p2356; p46;p234; p46;p12456;p3; p46;p1345;");
+}
+
+// KAPITEL 6
 
 #[test]
 fn ex_6_1 {
