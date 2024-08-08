@@ -75,7 +75,37 @@ fn ex_5_12 {
 #[test]
 fn ex_5_13 {
     let expr = "<math><mrow><mstyle mathvariant='bold' mathsize='normal'><mi><mi>r</mi></mi></mstyle><mo>&#x00B7;</mo><mstyle mathvariant='bold' mathsize='normal'><mi><mi>n</mi></mi></mstyle><mo>=</mo><mstyle mathvariant='bold' mathsize='normal'><mi><mi>s</mi></mi></mstyle><mo>&#x00B7;</mo><mstyle mathvariant='bold' mathsize='normal'><mi><mi>n</mi></mi></mstyle></mrow></math>";
-    test_braille("Swedish", expr, "p46;p1235; p46;p12456;p3; p46;p1345; p2356; p46;p234; p46;p12456;p3; p46;p1345;");
+    test_braille("Swedish", expr, "p46;p1235;p46;p12456;p3;p46;p1345; p2356; p46;p234;p46;p12456;p3;p46;p1345;");
+}
+#[test]
+fn ex_5_14 {
+    let expr = "<math><mrow><mtext>LET&#x00A0;</mtext><mi>C</mi><mo>=</mo><mi>A</mi><mo>*</mo><mi>B</mi></mrow></math>";
+    test_braille("Swedish", expr, "p6;p6;p123;p15;p2345; p6;p14; p2356; p6;p1;p35;p6;p12;");
+}
+#[test]
+fn ex_5_15 {
+    let expr = "<math><mrow><mn>24</mn><mo>&#x00D7;</mo><mn>36</mn></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p12;p145; p12456;p1346; p3456;p14;p124;");
+}
+#[test]
+fn ex_5_16 {
+    let expr = "<math><mrow><mfrac><mrow><mn>231</mn></mrow><mn>7</mn></mfrac></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p12;p14;p1;p1256;p3456;p1245;");
+}
+#[test]
+fn ex_5_17 {
+    let expr = "<math><mrow><mfrac><mrow><mn>0,64</mn></mrow><mrow><mn>0,08</mn></mrow></mfrac></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p245;p2;p124;p145;p1256;p3456;p245;p2;p245;p125;");
+}
+#[test]
+fn ex_5_18 {
+    let expr = "<math><mrow><mrow><mrow><mn>0,2</mn></mrow><mo>/</mo><mrow><mn>0,004</mn></mrow></mrow></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p245;p2;p12;p34;p3456;p245;p2;p245;p245;p145;");
+}
+#[test]
+fn ex_5_19 {
+    let expr = "<math><mrow><mtext>Ritningen&#x00A0;var&#x00A0;i&#x00A0;skala&#x00A0;</mtext><mn>1</mn><mo>:</mo><mn>100</mn></mrow></math>";
+    test_braille("Swedish", expr, "p6;p1235;p24;p2345;p1345;p24;p1345;p1245;p15;p1345; p1236;p1;p1235; p24; p234;p13;p1;p123;p1; p3456;p1;p25;p3456;p1;p245;p245;");
 }
 
 // KAPITEL 6
