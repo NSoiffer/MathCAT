@@ -278,4 +278,22 @@ fn ex_7_5 {
                 </mrow></math>";
     test_braille("Swedish", expr, "p1356;p346;p1345; p2356; p236;p1235;p15;p45;p346;p24;p56;p125;p156;p356;p346;p1345; p2356; p1235;p346;p1345;p15;p45;p346;p24;p1345;p56;p125;p156;");
 }
+#[test]
+fn ex_7_6 {
+    let expr = "<math><mrow><msup><mi>e</mi><mrow><mo>&#x2212;</mo><mo>(</mo><mfrac><mi>&#x03C0;</mi><mn>2</mn></mfrac><mo>+</mo><mn>2</mn><mi>n</mi><mi>&#x03C0;</mi>
+                <mo>)</mo><mo>+</mo><mi>i</mi><mi>ln</mi><mn>2</mn></mrow></msup></mrow></math>";
+    test_braille("Swedish", expr, "p15;p45;p346;p36;p236;p56;p1234;p1256;p3456;p12;p256;p3456;p12;p1345;p56;p1234;p356; p256; p24;p123;p1345;p3456;p12;p156;");
+}
+#[test]
+fn ex_7_7 {
+    let expr = "<math><mrow><msup><mn>2</mn><mrow><msup><mn>2</mn><mrow><mi>n</mi><mo>&#x2212;</mo><mn>1</mn></mrow></msup></mrow></msup></mrow></math>";
+    test_braille("Swedish", expr, "p3456;p12;p45;p346:p3456;p12;p45;p346;p1345;p36;p3456;p1;p156;p156;");
+}
+#[test]
+fn ex_7_8 {
+    let expr = "<math><mrow><mmultiscripts><mi>log</mi><mprescripts/><none/><mi>a</mi></mmultiscripts><mi>x</mi><mo>+</mo><mmultiscripts><mi>log</mi><mprescripts/>
+                <none/><mi>a</mi></mmultiscripts><mi>y</mi><mo>=</mo><mmultiscripts><mi>log</mi><mprescripts/><none/><mi>a</mi></mmultiscripts><mi>x</mi>
+                <mi>y</mi></mrow></math>";
+    test_braille("Swedish", expr, "p346;p1;p123;p135;p1245; p1346; p256; p346;p1;p123;p135;p1245; p13456; p2356; p346;p1;p123;p135;p1245; p1346;p13456;");
+}
 
