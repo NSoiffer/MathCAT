@@ -423,7 +423,7 @@
   - Postscripts: "*[position()>1 and position() < (last() + ($NumChildren mod 2) -count($Prescripts))]"
   replace:
   - test:
-      if: "DEBUG($Prescripts)"
+      if: "$Prescripts"
       then:
       - t: "\\𝐰"        # empty base not needed if this is the only expr
       - test:
@@ -436,7 +436,7 @@
               - x: "$Prescripts[1]"
               - t: ")"
       - test:
-          if: "DEBUG(not($Prescripts[2][self::m:none]))"
+          if: "not($Prescripts[2][self::m:none])"
           then_test:
               if: "$Prescripts[2][IsNode(., 'leaf') and string-length(.) = 1]"
               then: [x: "$Prescripts[2]"]

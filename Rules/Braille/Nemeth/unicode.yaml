@@ -274,7 +274,7 @@
         #   The canonicalization code makes this guess and adds "data-space-after"
     - test:
         - if: "@intent='ratio' or
-             ( (@intent and DEBUG(starts-with(@intent, '_'))) and
+             ( (@intent and starts-with(@intent, '_')) and
                ../self::m:mrow and
                not(ancestor::*[2][IsBracketed(., '[', ']')]) and
                not( preceding-sibling::*[2][text()=':'] or following-sibling::*[2][text()=':']) and 
