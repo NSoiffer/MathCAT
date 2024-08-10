@@ -510,7 +510,7 @@
 - name: multi-line
   #   that eliminates the need for the if: else_if: ...
   # IDEA:  set a variable with the word to say for the row (e.g., RowLabel = Row/Case/Line/...)
-  tag: [cases, equations, lines]
+  tag: [piecewise, system-of-equations, lines]
   match: "."
   variables:
     # Wikipedia has some tables where all the entire first column is empty (e.g., https://en.wikipedia.org/wiki/List_of_trigonometric_identities)
@@ -519,9 +519,9 @@
   replace:
   - x: "$LineCount"
   - test:
-    - if: "self::m:cases"
+    - if: "self::m:piecewise"
       then: [{T: "情況"}]      # phrase(this is the first 'case' of three cases)
-    - else_if: "self::m:equations"
+    - else_if: "self::m:system-of-equations"
       then: [{T: "方程"}]      # phrase(this is the first 'equation' of three equations)
       else: [{T: "列"}]      # phrase(this is the first 'line' of three lines)
   - test:
@@ -532,10 +532,10 @@
 
 - name: default-multiline
   tag: [mtr, mlabeledtr]
-  match: "parent::m:cases or parent::m:equations or parent::m:lines"
+  match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
   replace:
   - test:
-      if: "parent::m:equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
+      if: "parent::m:system-of-equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
            count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']]) != 0"
       then:
       - T: "下一列"
@@ -543,9 +543,9 @@
         if: "$LineCount != 1"
         then:
         - test:
-          - if: "parent::m:cases"
+          - if: "parent::m:piecewise"
             then: [{T: "情況"}]     # phrase('case' 1 of 10 cases)
-          - else_if: "parent::m:equations"
+          - else_if: "parent::m:system-of-equations"
             then: [{T: "方程"}] # phrase('equation' 1 of 10 equations)
             else: [{T: "列"}]     # phrase('line 1 of 10 lines)
         - x: "count(preceding-sibling::*)+1"
@@ -563,7 +563,7 @@
 
 - name: default-multiline
   tag: mtd
-  match: "parent::*[parent::m:cases or parent::m:equations or parent::m:lines]"
+  match: "parent::*[parent::m:piecewise or parent::m:system-of-equations or parent::m:lines]"
   variables: [LongPause: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultiLinePausesBetweenColumns = 'Long'"]
   replace:
   - x: "*"
