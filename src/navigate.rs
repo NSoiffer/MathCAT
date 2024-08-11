@@ -1870,9 +1870,9 @@ mod tests {
             test_command("ZoomIn", mathml, "open");
             let speech = test_command("MoveNext", mathml, "table");
             // tables need to check their parent for proper speech
-            assert_eq!(speech, "move right, 2 cases, case 1; negative x comma, if x is less than 0; case 2; positive x comma, if x, is greater than or equal to 0;");
+            assert_eq!(speech, "move right, 2 cases, case 1; negative x comma if x is less than 0; case 2; positive x comma if x, is greater than or equal to 0;");
             let speech = test_command("ZoomIn", mathml, "row-1");
-            assert_eq!(speech, "zoom in; case 1; negative x comma, if x is less than 0;");
+            assert_eq!(speech, "zoom in; case 1; negative x comma if x is less than 0;");
             return Ok( () );
         });
     }
