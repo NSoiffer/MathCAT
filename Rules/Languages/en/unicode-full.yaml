@@ -698,29 +698,6 @@
          if: "$Verbosity!='Terse'"
          then: [t: "the"]
      - t: "gradient of"
- - "∈":                                          # 0x2208
-     - test:
-        if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "an element of"]
-        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
-        else_test:
-            if: "../../self::m:set or ../../../self::m:set" # inside a set
-            then_test:
-              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "in"]
-              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "member of"]
-              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "element of"]
-              - else: [t: "belonging to"]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
-            else_test:
-              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
-                then: [t: "is a member of"]
-              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
-                then: [t: "is an element of"]
-              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
-                then: [t: "is in"]
-              - else: [t: "belongs to"]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
  - "∉":                                          # 0x2209
     # rule is identical to 0x2208
      - test:
@@ -748,7 +725,11 @@
  - "∊":                                          # 0x220a
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "is an element of"]
+        then:
+        - test:
+            if: "$Verbosity!='Terse' and not(parent::m:set)"    # "the set x is an element of ..." sounds bad
+            then: [t: "is"]
+        - t: "an element of"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set

@@ -186,7 +186,7 @@
  - "~": [t: "tilde"]                               # 0x7e
  - " ":                                            # 0xa0
     - test:
-        if: "@data-empty-in-2D and ../../../../*[name(.)!='equations']"
+        if: "@data-empty-in-2D"
         then: [t: "empty"]                         # want to say something for fraction (etc) with empty child
         else: [t: ""]                            
 
@@ -351,8 +351,8 @@
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
         then:
-        - test: 
-            if: "$Verbosity!='Terse'"
+        - test:
+            if: "$Verbosity!='Terse' and not(ancestor::*[self::m:set])"    # "the set x is an element of ..." sounds bad"
             then: [t: "is"]
         - t: "an element of"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
@@ -407,7 +407,7 @@
         if: "$SpeechStyle != 'ClearSpeak'"
         then:
         - test: 
-            if: "$Verbosity!='Terse'"
+            if: "$Verbosity!='Terse' and not(ancestor::*[self::m:set])"    # "the set x is an element of ..." sounds bad"
             then: [t: "is"]
         - t: "an element of"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
