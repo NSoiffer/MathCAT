@@ -448,6 +448,8 @@ impl PreferenceManager {
             static UNZIPPED_FILES: RefCell<HashSet<String>> = RefCell::new( HashSet::with_capacity(31));
         }
         
+        // ignore regional subdirs
+        let language = language.split('-').next().unwrap_or(language);
         let dir = PreferenceManager::get_language_dir(path, language, default_lang)?;
         let zip_file_name = language.to_string() + ".zip";
         let zip_file_path = dir.join(&zip_file_name);
