@@ -449,7 +449,6 @@ impl PreferenceManager {
         }
         
         // ignore regional subdirs
-        let language = language.split('-').next().unwrap_or(language);
         let dir = PreferenceManager::get_language_dir(path, language, default_lang)?;
         let zip_file_name = language.to_string() + ".zip";
         let zip_file_path = dir.join(&zip_file_name);
@@ -459,8 +458,17 @@ impl PreferenceManager {
         }
 
         let result = match zip_extract_shim(&dir, &zip_file_name) {
-            Err(e) => bail!("Couldn't open zip file {}: {}.", zip_file_string, e),
-            Ok(result) => result,
+            Err(e) => {
+                if language.contains('-') {
+                    // try again in parent dir of regional language
+                    let language = language.split('-').next().unwrap_or(language);
+                    return PreferenceManager::unzip_files(path, language, default_lang);
+                }
+                bail!("Couldn't open zip file {}: {}.", zip_file_string, e)
+            },
+            Ok(result) => {
+                result
+            },
         };
         UNZIPPED_FILES.with( |unzipped_files| unzipped_files.borrow_mut().insert(zip_file_string) );
         return Ok(result);
