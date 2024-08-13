@@ -319,4 +319,38 @@ fn ex_7_12 {
     let expr = "<math><mrow><msubsup><mrow><mi mathvariant="normal">SO</mi></mrow><mn>4</mn><mrow><mn>2</mn><mo>&#x2212;</mo></mrow></msubsup></mrow></math>";
     test_braille("Swedish", expr, "p6;p6;p234;p135;p126;p3456;p145;p45;p346;p12;p36;p156;");
 }
+#[test]
+fn ex_7_13 {
+    let expr = "<math><mrow><mmultiscripts><mi mathvariant="normal">H</mi><mn>1</mn><mo>+</mo><mprescripts/><mn>1</mn><mn>1</mn></mmultiscripts></mrow></math>";
+    test_braille("Swedish", expr, "p126;p3456;p1;p346;p3456;p1;p6;p125;p126;p3456;p1;p346;p256;");
+}
+#[test]
+fn ex_7_14 {
+    let expr = "<math><mrow><munder><mrow><mi>lim</mi></mrow><mrow><mi>n</mi><mo>&#x2192;</mo><mo>&#x221E;</mo></mrow></munder><msub><mi>a</mi><mi>n</mi></msub>
+                <mtext>&#x00A0;existerar&#x00A0;</mtext><mo>&#x21D4;</mo><munder><mrow><mi>lim</mi></mrow><mtable columnalign='left'><mtr><mtd><mrow><mi>m</mi>
+                <mo>&#x2192;</mo><mo>&#x221E;</mo></mrow></mtd></mtr><mtr><mtd><mrow><mi>n</mi><mo>&#x2192;</mo><mo>&#x221E;</mo></mrow></mtd></mtr></mtable></munder>
+                <mo>&#x007C;</mo><msub><mi>a</mi><mi>m</mi></msub><mo>&#x2212;</mo><msub><mi>a</mi><mi>n</mi></msub><mo>&#x007C;</mo><mo>=</mo><mn>0</mn></mrow></math>";
+    test_braille("Swedish", expr, "p123;p24;p134;p45;p126;p126;p1345;p25;p135;p3456;p123456;p156; p1;p126;p1345; p15;p1346;p24;p234;p2345;p15;p1235;p1;p1235; p246;p2356;p135; p123;p24;p134;p45;p126;p126;p134;p25;p135;p3456;p123456;p156;p45;p126;p126;p1345;p25;p135;p3456;p123456;p156; p456;p1;p126;p134;p36;p1;p126;p1345;p456; p2356; p3456;p245;");
+}
+#[test]
+fn ex_7_15 {
+    let expr = "<math><mrow><msup><mi>a</mi><mrow><mo>&#x2212;</mo><mi>b</mi></mrow></msup></mrow></math>";
+    test_braille("Swedish", expr, "p1;p346;p36;p12;");
+}
+#[test]
+fn ex_7_16 {
+    let expr = "<math><mrow><mi>a</mi><mover accent='true'><mi>b</mi><mo>&#x00AF;</mo></mover></mrow></math>";
+    test_braille("Swedish", expr, "p1;p12;p346;p346;p36;");
+}
+#[test]
+fn ex_7_17 {
+    let expr = "<math><mrow><mover accent='true'><mi>y</mi><mo>&#x02DC;</mo></mover><mo>=</mo><mi>y</mi></mrow></math>";
+    test_braille("Swedish", expr, "p13456;p346;p346;p25; p2356; p13456;");
+}
+#[test]
+fn ex_7_18 {
+    let expr = "<math><mrow><munder accentunder='true'><munder accentunder='true'><mi>v</mi><mo stretchy='true'>&#xAF;</mo></munder><mo stretchy='true'>&#xAF;</mo></munder>
+                <mo>=</mo><munder accentunder='true'><mi>v</mi><mo stretchy='true'>&#xAF;</mo></munder></mrow></math>";
+    test_braille("Swedish", expr, "p1236;p126;p126;p2356; p2356; p1236;p126;p126;p36;");
+}
 
