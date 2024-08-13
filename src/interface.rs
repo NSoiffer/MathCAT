@@ -40,9 +40,11 @@ fn init_mathml_instance() -> RefCell<Package> {
 }
 
 /// Set the Rules directory
-/// IMPORTANT: this should be the very first call to MathCAT unless the environment var MathCATRulesDir is set
+/// IMPORTANT: this should be the very first call to MathCAT. If 'dir' is an empty string, the envirnoment var 'MathCATRulesDir' is tried.
 pub fn set_rules_dir(dir: String) -> Result<()> {
     use std::path::PathBuf;
+    use std::ffi::OsString;
+    let dir = if dir.is_empty() {std::env::var_os("MathCATRulesDir").unwrap_or(OsString::default()).to_str().unwrap().to_string()} else {dir};
     let pref_manager = crate::prefs::PreferenceManager::get();
     return pref_manager.borrow_mut().initialize(PathBuf::from(dir));
 }
