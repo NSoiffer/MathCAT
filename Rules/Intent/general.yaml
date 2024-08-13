@@ -51,16 +51,13 @@
 -
   name: positive-or-negative
   tag: mrow
-  match: "count(*)=2 and *[1][self::m:mo][text()='+' or text='-']"
+  match: "count(*)=2 and *[1][self::m:mo][text()='+' or text()='-']"
   variables:
-  - AtLeftEdgeOfMTD: "name(EdgeNode(., 'left', 'mtd')) = 'mtd'"
-  - ContinuedColumn: "ancestor::m:mtable[@data-intent-property[
-                    contains(., ':piecewise:') or
-                    contains(., ':lines:') or
-                    contains(., ':system-of-equations:')
-                    ]]"
-  - InContinuedRow: "parent::m:mtr[@data-intent-property[contains(., ':continued-row:')]]"
-  - FirstColumn: "DEBUG(parent::m:mtd/*[1]=.)"
+  - AtLeftEdge: "EdgeNode(., 'left', 'mtd')"
+  - AtLeftEdgeOfMTD: "name($AtLeftEdge) = 'mtd'"
+  - ContinuedColumn: "$TableProperty='lines' or $TableProperty='system-of-equations' or $TableProperty='piecewise'"
+  - InContinuedRow: "parent::m:mtd[parent::m:mtr[@data-intent-property[contains(., ':continued-row:')]]]"
+  - FirstColumn: "$AtLeftEdge/../*[1]=$AtLeftEdge"   # first child of mtr...
   replace:
   - test:
       # don't use postive/negative if a continued data cell
@@ -614,110 +611,107 @@
 
 # generic mtable: treat as multiline equations of some sort
 # if a property is set, handle that first
--
-  name: mtable-matrix-property
-  tag: mtable
-  match:
-  - "contains(@data-intent-property, ':matrix:') or"
-  - "..[self::m:mrow and (IsBracketed(., '(', ')') or IsBracketed(., '[', ']'))]"
-  replace:
-  - intent:
-      name: "matrix"
-      children:
-      - x: "*"
 
 -
-  name: mtable-determinant-property
-  tag: mtable
-  match: "contains(@data-intent-property, ':determinant:') or ..[self::m:mrow and IsBracketed(., '|', '|')]"
+  name: "piecewise"
+  tag: mrow
+  match: "count(*)=2 and *[1][text()='{'] and *[2][self::m:mtable]"
   replace:
-  - intent:
-      name: "determinant"
-      children:
-      - x: "*"
-      
--
-  name: mtable-cases-property
-  tag: mtable
-  match:
-  - "contains(@data-intent-property, ':piecewise:') or"
-  - "..[self::m:mrow and count(*)=2 and *[1][text()='{']]"
-  replace:
-  - intent:
-      name: "cases"
-      children:
-      - x: "*"
-
--
-  name: mtable-equations-property
-  tag: mtable
-  match: "contains(@data-intent-property, ':system-of-equation:')"
-  replace:
-  - intent:
-      name: "equations"
-      children:
-      - x: "*"
-
--
-  name: mtable-lines-property
-  tag: mtable
-  match: "contains(@data-intent-property, ':lines:')"
-  replace:
-  - intent:
-      name: "lines"
-      children:
-      - x: "*"
-
+  - x: "*[2]"
 
 -
   name: mtable-property-is-set
   tag: mtable
-  variables: [MTableProperty: "IfThenElse(contains(@data-intent-property, ':matrix:'), 'matrix',
-                               IfThenElse(contains(@data-intent-property, ':determinant:'), 'determinant',
+  variables: [MTableProperty: "IfThenElse(contains(@data-intent-property, ':grid:'), 
+                                IfThenElse(parent::m:mrow[IsBracketed(., '|', '|')], 'determinant', 'matrix'),
                                IfThenElse(contains(@data-intent-property, ':piecewise:'), 'piecewise',
-                               IfThenElse(contains(@data-intent-property, ':system-of-equation:'), 'system-of-equations',
-                               IfThenElse(contains(@data-intent-property, ':lines:'), 'lines','')))))"]
+                               IfThenElse(contains(@data-intent-property, ':system-of-equation:'), 'system-of-equation',
+                               IfThenElse(contains(@data-intent-property, ':lines:'), 'lines',''))))"]
   match: "$MTableProperty !=''"
   replace:
-  - intent:
-      xpath-name: "$MTableProperty"
-      children:
-      - x: "*"
-
--
-  name: cases
-  tag: mrow
-  match: "count(*)=2 and *[1][text()='{'] and *[2][self::m:mtable]"
-  replace:
-  - intent:
-      name: "intent-wrapper"
-      children:
+  - with:
+      variables:
+      - TableProperty: "$MTableProperty"
+      - IsColumnSilent: "not(contains(@data-intent-property, ':grid:'))"
+      replace:
       - intent:
-          name: "cases"
-          id: "*[2]/@id"
-          children: [x: "*[2]/*"]
+          xpath-name: "$MTableProperty"
+          children:
+          - x: "*"
 
 -
-  # if there is a relational op in the first row, assume that's true of all rows and call them equations
-  name: equations
+  name: mtable-matrix-property
   tag: mtable
-      # xpath hack: transform the chars we care about to an unlikely char and then see if that char exists
+  match:
+  - "..[self::m:mrow and (IsBracketed(., '(', ')') or IsBracketed(., '[', ']'))]"
+  replace:
+  - with:
+      variables:
+      - TableProperty: "'matrix'"
+      - IsColumnSilent: "false()"
+      replace:
+      - intent:
+          name: "matrix"
+          children:
+          - x: "*"
+
+-
+  name: mtable-determinant-property
+  tag: mtable
+  match: "..[self::m:mrow and IsBracketed(., '|', '|')]"
+  replace:
+  - with:
+      variables:
+      - TableProperty: "'determinant'"
+      - IsColumnSilent: "false()"
+      replace:
+      - intent:
+          name: "determinant"
+          children:
+          - x: "*"
+
+-
+  name: mtable-piecewise-property
+  tag: mtable
+  match:
+  - "..[self::m:mrow and count(*)=2 and *[1][text()='{']]"
+  replace:
+  - with:
+      variables:
+      - TableProperty: "'piecewise'"
+      - IsColumnSilent: "true()"
+      replace:
+      - intent:
+          name: "piecewise"
+          children:
+          - x: "*"
+
+-
+  name: mtable-equations-property
+  tag: mtable
   match: "count(*) > 0 and *[1][contains(translate(., '=≠<>≤≥≦≧', '='), '=')]"
   replace:
-  - intent:
-      name: "equations"
-      children:
-      - x: "*"
-
+  - with:
+      variables:
+      - TableProperty: "'system-of-equations'"
+      - IsColumnSilent: "true()"
+      replace:
+      - intent:
+          name: "system-of-equations"
+          children:
+          - x: "*"
 
 -
-  # don't know anything about them -- think of them as "lines"
-  name: lines
+  name: mtable-lines-property
   tag: mtable
-  match: "."
+  match: "."   # default is "lines, so no need to test contains(@data-intent-property, ':lines:')
   replace:
-  - intent:
-      name: "lines"
-      children:
-      - x: "*"
-
+  - with:
+      variables:
+      - TableProperty: "'lines'"
+      - IsColumnSilent: "true()"
+      replace:
+      - intent:
+          name: "lines"
+          children:
+          - x: "*"
