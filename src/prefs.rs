@@ -579,7 +579,7 @@ impl PreferenceManager {
             // we find the first file because this is the deepest (most language specific) speech rule file
             match find_file_in_dir_that_ends_with_shim(path, "_Rules.yaml") {
                 None => bail!{"didn't find file"},
-                Some(file_name) => return Ok(PathBuf::from(file_name)),
+                Some(file_name) => return Ok(path.to_path_buf().join(file_name)),
             }
         }
     }
