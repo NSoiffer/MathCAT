@@ -229,7 +229,7 @@
   # SWEDISH: Added verbosity test for the start announcement.
   - x: "*[2]"
   - test:
-      if: "DEBUG(not(IsNode(*[2],'leaf')))"
+      if: "not(IsNode(*[2],'leaf'))"
       then:
       - test:
           if: "$Verbosity='Verbose'"
@@ -325,7 +325,7 @@
       else: {T: "nedsänkt"}            # phrase(the result is 'sub' optimal)
   - x: "*[2]"
   - test:
-      if: "DEBUG(not(IsNode(*[2],'leaf')))"
+      if: "not(IsNode(*[2],'leaf'))"
       then:
       - test:
           if: "$Verbosity='Verbose'"

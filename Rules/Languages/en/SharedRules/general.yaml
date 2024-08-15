@@ -595,7 +595,7 @@
   variables: [LongPause: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultiLinePausesBetweenColumns = 'Long'"]
   replace:
   - test:
-      if: "DEBUG(IsInDefinition(*[1], 'ComparisonOperators'))"
+      if: "IsInDefinition(*[1], 'ComparisonOperators')"
       then: [pause: short]
   - test:
       if: "*[1][@data-added!='missing-content']"

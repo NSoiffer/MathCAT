@@ -210,7 +210,7 @@
   - T: "下標"      # phrase(the subscripted variable a 'sub' i)
   - x: "*[2]"
   - test:
-      if: "DEBUG(not(IsNode(*[2],'leaf')))"
+      if: "not(IsNode(*[2],'leaf'))"
       then:
       - test:
           if: "$Verbosity='Verbose'"
@@ -316,7 +316,7 @@
       else: {T: "下標"}      # phrase(the result is 'sub' optimal)
   - x: "*[2]"
   - test:
-      if: "DEBUG(not(IsNode(*[2],'leaf')))"
+      if: "not(IsNode(*[2],'leaf'))"
       then:
       - test:
           if: "$Verbosity='Verbose'"

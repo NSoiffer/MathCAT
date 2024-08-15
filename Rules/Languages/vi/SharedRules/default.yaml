@@ -47,7 +47,7 @@
           - t: "hóa trị"
           - x: "@data-number"
           else:
-          - x: "DEBUG(@data-number)"
+          - x: "@data-number"
       - test:
           if: "$Verbosity = 'Verbose'"
           then: [t: "la mã"]
