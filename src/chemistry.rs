@@ -641,8 +641,10 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
             }
         }
         // Note: there was an invisible U+2063, but it was removed before we got here
-        let mut merged_text = "".to_string();
-        for child in preceding_children {
+        // The parent mrow could have many children that couldn't have been part of a split -- only consider feasible children to split (mi/mtext)
+        // To figure this out, we walk backwards adding the text in reverse and then reverse that text in the end
+        let mut merged_text = Vec::default();
+        for &child in preceding_children.iter().rev() {
             let child = as_element(child);
             // because this is before canonicalization, there could be an mrow with just mi/mtext
             if name(&child) == "mrow" && child.children().len() == 1 && child.attribute("intent").is_none() {
@@ -653,11 +655,13 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
                 child.replace_children(child.children());
             }
             if name(&child) != "mi" && name(&child) != "mtext" {
-                bail!("Internal error: bad structure before split element: {}; expected first char of split", mml_to_string(&child));
+                break;
             }
-            merged_text.push_str(as_text(child));
+            merged_text.push(as_text(child));
             child.remove_from_parent();
         }
+        merged_text.reverse();
+        let mut merged_text = merged_text.join("");
         merged_text.push_str(as_text(mathml));
         mathml.set_text(&merged_text);
         mathml.remove_attribute("mathvariant");
