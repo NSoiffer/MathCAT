@@ -211,6 +211,12 @@ fn p19_vector_cross_product () {
 }
 
 #[test]
+fn p20_pair_of_equations () {
+    let expr = r#"<math><mover><mi>a</mi><mo accent='false'>¯</mo></mover><mo>&#215;</mo><mover><mi>b</mi><mo accent='false'>¯</mo></mover></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"{2 x +y =0, x -y =5}");
+}
+
+#[test]
 fn augenbit1_6_11() {
     // this is a slightly cleaned up version that comes for the original example (via MathJax)
     let expr = r#" <math> <mrow>
