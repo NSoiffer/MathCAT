@@ -1,84 +1,176 @@
 // Tests based on the Finnish flavor of ASCIIMath located on the Finnish delegation for braille's "Matematiikan, fysiikan ja kemian merkinnät elektronisissa oppikirjoissa" (https://www.pistekirjoitus.fi/julkaisut/matematiikka-ja-tietotekniikka/).
-// Tests will be named according to the page and its position on the page in the specification and then some identifying word.
+// Tests will be named according to the page and some identification.
 use crate::common::*;
 
 
 #[test]
-fn p12_1_equal () {
+fn p12_equal () {
     let expr = r#"<math><mn>3</mn><mo>+</mo><mn>4</mn><mo>=</mo><mn>7</mn></math>"#;
     test_braille("ASCIIMath-fi", expr, r"3 +4 =7");
 }
 
 #[test]
-fn p12_2_not_equal () {
+fn p12_not_equal () {
     let expr = r#"<math><mn>5</mn><mo>&#x2212;</mo><mn>2</mn><mo>&#8800;</mo><mn>2</mn></math>"#;
     test_braille("ASCIIMath-fi", expr, r"5 -2 !=2");
 }
 
 #[test]
-fn p12_3_opposite () {
+fn p12_opposite () {
     let expr = r#"<math><mn>9</mn><mo>&#x2212;</mo><mn>3</mn><mo>&#x2260;</mo><mn>5</mn></math>"#;
     test_braille("ASCIIMath-fi", expr, r"9 -3 != 5");
 }
 
 #[test]
-fn p12_4_multiplication_visible_op () {
+fn p12_multiplication_visible_op () {
     let expr = r#"<math><mn>27</mn><mo>&#183;</mo><mn>3</mn></math>"#;
     test_braille("ASCIIMath-fi", expr, r"27 *3");
 }
 
 #[test]
-fn p12_5_simple_frac () {
+fn p12_simple_frac () {
     let expr = r#"<math><mfrac><mn>1</mn><mn>3</mn></mfrac></math>"#;
     test_braille("ASCIIMath-fi", expr, r"1/3");
 }
 
 #[test]
-fn p12_9_ratio () {
+fn p12_ratio () {
     let expr = r#"<math><mn>1</mn><mo>:</mo><mn>1000</mn></math>"#;
     test_braille_prefs("ASCIIMath-fi", expr, r"1 :1000");
 }
 
 #[test]
-fn p12_10_fractional () {
+fn p12_fractional () {
     let expr = r#"<math><mfrac><mrow><mn>6</mn><mo>&#8290;</mo><mi>x</mi><mo>+</mo><mn>3</mn><mo>&#8290;</mo><mi>x</mi></mrow><mrow><mrow><mn>6</mn><mo>&#8290;</mo><mi>x</mi><mo>&#x2212;</mo><mn>4</mn><mo>&#8290;</mo><mi>x</mi></mrow></mfrac></math>"#;
     test_braille("ASCIIMath-fi", expr, r"(6 x +3 x) /(6 x -4 x)");
 }
 
 #[test]
-fn p12_11_absolute_value_eq () {
+fn p12_absolute_value_eq () {
     let expr = r#"<math><mo>|</mo><mo>&#x2212;</mo><mo>(</mo><mn>2</mn><mo>+</mo><mn>5</mn><mo>)</mo><mo>|</mo><mo>=</mo><mo>|</mo><mn>&#x2212;7</mn><mo>|</mo><mo>=</mo><mn>7</mn></math>"#;
     test_braille("ASCIIMath-fi", expr, r"|-(2 +5)| =|-7| =7");
 }
 
 #[test]
-fn p12_13_natural_numbers () {
+fn p12_natural_numbers () {
     let expr = r#"<math><mi>&#x2115;</mi><mo>=</mo><mo>{</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mn>3</mn><mo>&#8230;</mo><mo>}</mo></math>"#;
     test_braille("ASCIIMath-fi", expr, r"NN ={0, 1, 2, 3, ...}");
 }
 
 #[test]
-fn p12_14_whole_numbers () {
+fn p12_whole_numbers () {
     let expr = r#"<math><mi>&#8484;</mi><mo>=</mo><mo>{</mo><mo>&#8230;</mo><mo>,</mo><mo>&#x2212;</mo><mn>2</mn><mo>,</mo><mo>&#x2212;</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo>,</mo><mn>2</mn><mo>,</mo><mo>&#8230;</mo><mo>}</mo></math>"#;
     test_braille("ASCIIMath-fi", expr, r"ZZ ={..., -2, 1, 0, 1, 2, ...}");
 }
 
 #[test]
-fn p23_3_pi () {
+fn p13_pi () {
     let expr = r#"<math><mi>&#x3C0;</mi><mo>&#x2248;</mo><mn>3</mn><mo>,</mo><mn>14</mn></math>"#;
     test_braille_prefs("ASCIIMath", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, r"~p ~~3,14");
 }
 
 #[test]
-fn p13_4_less_than () {
+fn p13_less_than () {
     let expr = r#"<math><mi>x</mi><mo>&#60;</mo><mn>18</mn></math>"#;
     test_braille("ASCIIMath-fi", expr, r"x < 18");
 }
 
 #[test]
-fn p13_5_greater_or_equal () {
+fn p13_greater_or_equal () {
     let expr = r#"<math><mn>2</mn><mo>&#8290;</mo><mi>x</mi><mo>&#8805;</mo><mn>6</mn></math>"#;
     test_braille("ASCIIMath-fi", expr, r"2 x >= 6");
+}
+
+#[test]
+fn p13_fraction_with_invisible_plus () {
+    let expr = r#"<math><mn>3</mn><mo>&#8292;</mo><mfrac><mn>5</mn><mn>6</mn></mfrac></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"3#5/6");
+}
+
+#[test]
+fn p13_fraction_without_invisible_plus () {
+    let expr = r#"<math><mn>3</mn><mfrac><mn>5</mn><mn>6</mn></mfrac></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"3#5/6");
+}
+
+#[test]
+fn p13_fractional_no_paren () { 
+    // The numerator doesn't require parentheses to be read correctly.
+    let expr = r#"<math><mfrac><mrow><mn>4</mn><mo>&#8290;</mo><mi>x</mi></mrow><mrow><mo >(</mo><mn>1</mn><mo>−</mo><mi>x</mi><mo>)</mo></mrow></mfrac></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"4 x /(1 -x)");
+}
+
+#[test]
+fn p13_fractional () {
+    let expr = r#"<math><mfrac><mrow><mn>5</mn><mo>+</mo><mi>x</mi></mrow><mrow><mn>5</mn><mo>&#8290;</mo><mi>x</mi></mrow></mfrac></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"(5 +x) /(5 x)");
+}
+
+#[test]
+fn p13_fractional_simplifying_with_paren () {
+    let expr = r#"<math><mfrac><mrow><mn>5</mn><mo>+</mo><mn>7</mn></mrow><mrow><mn>2</mn><mo>&#183;</mo><mi>3</mi></mrow></mfrac><mo>=</mo><mfrac><mn>12</mn><mn>6</mn></mfrac></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"(5 +7) /(2 *3) =12 /6");
+}
+
+#[test]
+fn p14_long_fractional () {
+    let expr = r#"<math><mfrac><mfrac><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>−</mo><mn>7</mn><mo>&#8290;</mo><mi>x</mi><mo>+</mo><mn>12</mn></mrow><mrow><mn>4</mn><mo>&#8290;</mo><mi>x</mi><mo>−</mo><mn>20</mn></mrow></mfrac><mfrac><mrow><msup><mi>x</mi><mn>2</mn></msup><mo>−</mo><mn>8</mn><mo>&#8290;</mo><mi>x</mi><mo>+</mo><mn>15</mn></mrow><mrow><mn>4</mn><mo>&#8290;</mo><mi>x</mi><mo>−</mo><mn>16</mn></mrow></mfrac></mfrac></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"((x^2 -7 x +12) /(4 x -20)) /((x^2 -8 x +15) /(4 x -16))");
+}
+
+#[test]
+fn p15_exponent_plus () {
+    let expr = r#"<math><msup><mn>3</mn><mn>2</mn></msup><mo>+</mo><msup><mn>4</mn><mn>2</mn></msup</math>"#;
+    test_braille("ASCIIMath-fi", expr, r"3^2 +4^2");
+}
+
+#[test]
+fn p15_exponent_with_negative_base_in_paren () {
+    let expr = r#"<math><msup><mrow><mo>(</mo><mo>−</mo><mn>2</mn><mo>)</mo></mrow><mn>2</mn></msup></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"(-2)^2");
+}
+
+#[test]
+fn p15_exponent_with_plus_equation () {
+    let expr = r#"<math><msup><mn>2</mn><mrow><mn>3</mn><mo>+</mo><mn>5</mn></mrow></msup></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"2^(3 +5)");
+}
+
+#[test]
+fn p16_sqrt () {
+    let expr = r#"<math><msqrt><mn>25</mn></msqrt></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"sqrt(25)");
+}
+
+#[test]
+fn p16_root3 () {
+    let expr = r#"<math><mroot><mn>27</mn><mn>3</mn></mroot></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"root3(27)");
+}
+
+#[test]
+fn p16_root_equation () {
+    let expr = r#"<math><mroot><mn>32</mn><mn>5</mn></mroot><mo>+</mo><mroot><mn>1</mn><mn>6</mn></mroot></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"root5(32) +root6(1)");
+}
+
+#[test]
+fn p18_tangent_90_degrees_infinity () {
+    let expr = r#"<math><mi>tan</mi><mo>&#8289;</mo><mo>⁡(</mo><mn>90</mn><mi>&#176;</mi><mo>)</mo><mo>=</mo><mi>∞</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"tan 90^@ =oo");
+}
+
+#[test]
+fn p18_degrees () {
+    let expr = r#"<math><mn>90</mn><mi>&#176;</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"90 ^@");
+}
+
+#[test]
+fn p18_cosines () {
+    let expr = r#"<math><msup><mi>cos</mi><mn>2</mn></msup><mo>&#8289;⁡</mo><mi>x</mi><mo>−</mo><mn>2</mn><mo>&#8290;</mo><mi>cos</mi><mo>&#8289;⁡</mo><mi>x</mi><mo>+</mo><mn>1</mn><mo>=</mo><mn>0</mn></math>
+"#;
+    test_braille("ASCIIMath-fi", expr, r"cos^2 x -2 cos x +1 =0");
 }
 
 #[test]
