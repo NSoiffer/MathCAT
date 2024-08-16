@@ -174,15 +174,40 @@ fn p18_cosines () {
 }
 
 #[test]
-fn p18_vector_with_line () {
+fn p19_vector_with_line () {
     let expr = r#"<math><mover><mi>OB</mi><mo accent='false'>¯</mo></mover></math>"#;
     test_braille("ASCIIMath-fi", expr, r"vec OB");
 }
 
 #[test]
-fn p18_vector_with_arrow () {
+fn p19_vector_with_arrow () {
     let expr = r#"<math><mover><mi>OB</mi><mo accent='false'>&#8594;</mo></mover></math>"#;
     test_braille("ASCIIMath-fi", expr, r"vec OB");
+}
+
+#[test]
+fn p19_vector_projection () {
+    let expr = r#"<math><msub><mover><mi>a</mi><mo accent='false'>¯</mo></mover><mi>b</mi></msub></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"vec a_b");
+}
+
+#[test]
+fn p19_unit_vector () {
+    let expr = r#"<math><msup><mover><mi>a</mi><mo accent='false'>¯</mo></mover><mn>0</mn></msup></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"vec a^0");
+}
+
+#[test]
+fn p19_vector_dot_product () {
+    // Notice that dot product (middle dot) in vectors has space around the dot.
+    let expr = r#"<math><mover><mi>a</mi><mo accent='false'>¯</mo></mover><mo>&#183;</mo><mover><mi>b</mi><mo accent='false'>¯</mo></mover></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"vec a * vec b");
+}
+
+#[test]
+fn p19_vector_cross_product () {
+    let expr = r#"<math><mover><mi>a</mi><mo accent='false'>¯</mo></mover><mo>&#215;</mo><mover><mi>b</mi><mo accent='false'>¯</mo></mover></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"vec a xx vec b");
 }
 
 #[test]
