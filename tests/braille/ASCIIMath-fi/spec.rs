@@ -174,6 +174,18 @@ fn p18_cosines () {
 }
 
 #[test]
+fn p18_vector_with_line () {
+    let expr = r#"<math><mover><mi>OB</mi><mo accent='false'>¯</mo></mover></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"vec OB");
+}
+
+#[test]
+fn p18_vector_with_arrow () {
+    let expr = r#"<math><mover><mi>OB</mi><mo accent='false'>&#8594;</mo></mover></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"vec OB");
+}
+
+#[test]
 fn augenbit1_6_11() {
     // this is a slightly cleaned up version that comes for the original example (via MathJax)
     let expr = r#" <math> <mrow>
