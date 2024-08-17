@@ -348,7 +348,7 @@
       - "IsInDefinition(., 'Braille', 'Units') or"
       - "(string-length(.)=1 and @mathvariant='normal' and"
           # avoid chemical elements and also states (e.g., "(g)")
-      - " not(@data-chem-element) and parent::*[1][not(@data-chem-equation='1')]"
+      - " not(@data-chem-element) and parent::*[1][not(@data-chem-equation>='1')]"
       - ")"
       then: [t: "W"]
   - x: "BrailleChars(., 'Vietnam')"
