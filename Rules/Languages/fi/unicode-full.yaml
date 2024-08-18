@@ -1437,7 +1437,7 @@
     - SPELL: "translate('.', '⒜⒝⒞⒟⒠⒡⒢⒣⒤⒥⒦⒧⒨⒩⒪⒫⒬⒭⒮⒯⒰⒱⒲⒳⒴⒵', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "Ⓐ-Ⓩ":
-    - T: "iso ympyröity"                              	# 	(en: 'circled', google translation)
+    - T: "ympyröity"                              	# 	(en: 'circled', google translation)
     - SPELL: "translate('.', 'ⒶⒷⒸⒹⒺⒻⒼⒽⒾⒿⓀⓁⓂⓃⓄⓅⓆⓇⓈⓉⓊⓋⓌⓍⓎⓏ', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "ⓐ-ⓩ":                                       	#  0x24d0 - 0x24e9

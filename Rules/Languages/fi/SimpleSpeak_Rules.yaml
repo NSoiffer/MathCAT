@@ -143,8 +143,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {T: "neliö"}      # phrase(5 'squared' equals 25)
-      else: {T: "kuutio"}      # phrase(5 'cubed' equals 125)
+      then: {T: "toiseen"}      # phrase(5 'squared' equals 25)
+      else: {T: "kolmanteen"}      # phrase(5 'cubed' equals 125)
 
 # FI: This grammar doesn't work in Finnish so commented out
 # - name: function-power
@@ -173,8 +173,8 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][text()=2]"
-      then: {T: "neliö"}      # phrase(5 'squared' equals 25)
-      else: {T: "kuutio"}      # phrase(5 'cubed' equals 125)
+      then: {T: "toiseen"}      # phrase(5 'squared' equals 25)
+      else: {T: "kolmanteen"}      # phrase(5 'cubed' equals 125)
 
 # FI: toOrdinal isn't natural in Finnish in this form, so commented out. If there was more sophisticated conjugation on other words, it could work.
 # - name: simple-integer
@@ -236,7 +236,6 @@
   tag: power
   match: "."
   replace:
-  # This logic might have to be changed completely - or it might just work?
   - x: "*[1]"
   - T: "potenssiin"      # phrase(15 'raised to the' second power equals 225)
   - x: "*[2]"
@@ -263,7 +262,7 @@
           then: {T: ""}      # phrase('the' set of all integers)
       - T: "joukko"      # phrase(the 'set of all' positive integers less than 10)
       - x: "*[1]/*[1]"
-      - T: "siten, että"      # phrase(x 'such that' x is less than y)
+      - T: "siten että"      # phrase(x 'such that' x is less than y)
       - x: "*[1]/*[3]"
       else:
       - test:

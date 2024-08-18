@@ -154,7 +154,7 @@ fn single_element_set() {
     let expr = "<math>
                 <mo>{</mo> <mn>12</mn><mo>}</mo>
             </math>";
-    test("en", "ClearSpeak", expr, "the set 12");
+    test("fi", "ClearSpeak", expr, "joukko 12");
 }
 
 #[test]
@@ -162,7 +162,7 @@ fn multiple_element_set() {
     let expr = "<math>
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-    test("en", "ClearSpeak", expr, "the set 5 comma 10 comma 15");
+    test("fi", "ClearSpeak", expr, "joukko 5 pilkku 10 pilkku 15");
 }
 
 #[test]
@@ -170,7 +170,7 @@ fn set_with_colon() {
     let expr = "<math>
                     <mo>{</mo> <mrow><mi>x</mi><mo>:</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow> <mo>}</mo>
             </math>";
-    test("fi", "ClearSpeak", expr, "joukko kaikki x siten että x on suurempi kuin 2");
+    test("fi", "ClearSpeak", expr, "joukko kaikilla x siten että x on suurempi kuin 2");
 }
 
 #[test]
@@ -178,7 +178,7 @@ fn set_with_bar() {
     let expr = "<math>
                     <mo>{</mo> <mrow><mi>x</mi><mo>|</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow> <mo>}</mo>
             </math>";
-    test("en", "ClearSpeak", expr, "the set of all x such that x is greater than 2");
+    test("fi", "ClearSpeak", expr, "joukko kaikilla x siten että x on suurempi kuin 2");
 }
 
 #[test]
@@ -186,7 +186,7 @@ fn element_alone() {
     let expr = "<math>
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
-    test("en", "ClearSpeak", expr, "3 plus 2 i, is not a member of, the real numbers");
+    test("fi", "ClearSpeak", expr, "3 plus 2 i, ei kuulu reaaliluvut");
 }
 
 #[test]
@@ -201,8 +201,8 @@ fn element_under_sum() {
                 <mrow> <msup>  <mi>i</mi> <mn>2</mn> </msup> </mrow>
             </mfrac>
         </math>";
-    test("en", "ClearSpeak", expr,
-                    "the sum over i is a member of the integers of; the fraction with numerator 1; and denominator i squared;");
+    test("fi", "ClearSpeak", expr,
+                    "summa yli i kuuluu kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen;");
 }
 
 #[test]
@@ -220,7 +220,7 @@ fn complicated_set_with_colon() {
             <mn>7</mn>
             <mo>}</mo>
         </math>";
-    test("en", "ClearSpeak", expr, "the set of all x in the integers such that 2 is less than x is less than 7");
+    test("fi", "ClearSpeak", expr, "joukko kaikilla x kuuluu kokonaisluvut siten että 2 on pienempi kuin x on pienempi kuin 7");
 }
 
 #[test]
@@ -230,11 +230,11 @@ fn complicated_set_with_mtext() {
         <mo>{</mo>
         <mrow> <mi>x</mi><mo>∈</mo><mi>ℕ</mi></mrow>
         <mo>|</mo>
-        <mrow><mi>x</mi> <mtext>is an even number</mtext> </mrow>
+        <mrow><mi>x</mi> <mtext>on parillinen luku</mtext> </mrow>
         <mo>}</mo>
         </math>";
-    test("en", "ClearSpeak", expr, 
-            "the set of all x in the natural numbers such that x is an even number");
+    test("fi", "ClearSpeak", expr, 
+            "joukko kaikilla x kuuluu luonnolliset luvut siten että x on parillinen luku");
 }
 
 
@@ -251,8 +251,8 @@ fn set_with_bar_member() {
             <mn>5</mn>
             <mo>}</mo>
             </math>";
-    test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "the set of all x member of the integers such that x is greater than 5");
+    test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Member",
+                expr, "joukko kaikilla x kuuluu kokonaisluvut siten että x on suurempi kuin 5");
 }
 
 #[test]
@@ -260,8 +260,8 @@ fn element_alone_member() {
     let expr = "<math>
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "3 plus 2 i, is not a member of, the real numbers");
+    test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Member",
+                expr, "3 plus 2 i, ei kuulu reaaliluvut");
 }
 
 #[test]
@@ -276,8 +276,8 @@ fn element_under_sum_member() {
                 <mrow> <msup>  <mi>i</mi> <mn>2</mn> </msup> </mrow>
             </mfrac>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "the sum over i is a member of the integers of; the fraction with numerator 1; and denominator i squared;");
+    test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Member",
+                expr, "summa yli i kuuluu kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen;");
 }
 
 
@@ -294,8 +294,8 @@ fn set_with_bar_element() {
             <mn>5</mn>
             <mo>}</mo>
             </math>";
-    test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "the set of all x element of the integers such that x is greater than 5");
+    test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Element",
+                expr, "joukko kaikilla x kuuluu kokonaisluvut siten että x on suurempi kuin 5");
 }
 
 #[test]
@@ -303,8 +303,8 @@ fn element_alone_element() {
     let expr = "<math>
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "3 plus 2 i, is not an element of, the real numbers");
+    test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Element",
+                expr, "3 plus 2 i, ei kuulu reaaliluvut");
 }
 
 #[test]
@@ -319,8 +319,8 @@ fn element_under_sum_element() {
                 <mrow> <msup>  <mi>i</mi> <mn>2</mn> </msup> </mrow>
             </mfrac>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "the sum over i is an element of the integers of; the fraction with numerator 1; and denominator i squared;");
+    test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Element",
+                expr, "summa yli i kuuluu kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen;");
 }
 
 #[test]
@@ -336,8 +336,8 @@ fn set_with_bar_in() {
             <mn>5</mn>
             <mo>}</mo>
             </math>";
-    test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "In",
-                expr, "the set of all x in the integers such that x is greater than 5");
+    test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "In",
+                expr, "joukko kaikilla x kuuluu kokonaisluvut siten että x on suurempi kuin 5");
 }
 
 #[test]
@@ -345,8 +345,8 @@ fn element_alone_in() {
     let expr = "<math>
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "In",
-                expr, "3 plus 2 i, is not in the real numbers");
+    test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "In",
+                expr, "3 plus 2 i, ei ole joukossa reaaliluvut");
 }
 
 #[test]
@@ -361,8 +361,8 @@ fn element_under_sum_in() {
                 <mrow> <msup>  <mi>i</mi> <mn>2</mn> </msup> </mrow>
             </mfrac>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "In",
-                expr, "the sum over i is in the integers of; the fraction with numerator 1; and denominator i squared;");
+    test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "In",
+                expr, "summa yli i kuuluu kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen;");
 }
 
 #[test]
@@ -378,8 +378,8 @@ fn set_with_bar_belongs() {
             <mn>5</mn>
             <mo>}</mo>
             </math>";
-    test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "Belongs",
-                expr, "the set of all x belonging to the integers such that x is greater than 5");
+    test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Belongs",
+                expr, "joukko kaikilla x kuuluu joukkoon kokonaisluvut siten että x on suurempi kuin 5");
 }
 
 #[test]
@@ -387,8 +387,8 @@ fn element_alone_belongs() {
     let expr = "<math>
             <mn>3</mn><mo>+</mo><mn>2</mn><mi>i</mi><mo>∉</mo><mi>ℝ</mi>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "Belongs",
-                expr, "3 plus 2 i, does not belong to, the real numbers");
+    test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Belongs",
+                expr, "3 plus 2 i, ei kuulu joukkoon reaaliluvut");
 }
 
 #[test]
@@ -403,8 +403,8 @@ fn element_under_sum_belongs() {
                 <mrow> <msup>  <mi>i</mi> <mn>2</mn> </msup> </mrow>
             </mfrac>
         </math>";
-    test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "Belongs",
-                expr, "the sum over i belongs to the integers of; the fraction with numerator 1; and denominator i squared;");
+    test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Belongs",
+                expr, "summa yli i kuuluu joukkoon kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen;");
 }
 
 
@@ -421,8 +421,8 @@ fn set_member_woall() {
             <mn>5</mn>
             <mo>}</mo>
             </math>";
-            test_ClearSpeak_prefs("en", vec![("ClearSpeak_SetMemberSymbol", "Member"), ("ClearSpeak_Sets", "woAll")],
-                expr, "the set of x member of the integers such that x is greater than 5");
+            test_ClearSpeak_prefs("fi", vec![("ClearSpeak_SetMemberSymbol", "Member"), ("ClearSpeak_Sets", "woAll")],
+                expr, "joukko x kuuluu kokonaisluvut siten että x on suurempi kuin 5");
 }
 
 #[test]
@@ -430,15 +430,15 @@ fn multiple_element_set_woall() {
     let expr = "<math>
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-    test_ClearSpeak("en", "ClearSpeak_Sets", "woAll", expr, "the set 5 comma 10 comma 15");
+    test_ClearSpeak("fi", "ClearSpeak_Sets", "woAll", expr, "joukko 5 pilkku 10 pilkku 15");
 }
 
 #[test]
 fn multiple_element_set_silent_bracket() {
-    let expr = "<math>
+    let expr = "<math>joukko 5 pilkku 10 pilkku 15
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-            test_ClearSpeak("en", "ClearSpeak_Sets", "SilentBracket", expr, "5 comma 10 comma 15");
+            test_ClearSpeak("fi", "ClearSpeak_Sets", "SilentBracket", expr, "5 pilkku 10 pilkku 15");
         }
 
 #[test]
@@ -446,7 +446,7 @@ fn silent_bracket() {
     let expr = "<math>
                 <mo>{</mo><mrow><mi>x</mi><mo>|</mo><mi>x</mi><mo>&#x003E;</mo><mn>2</mn></mrow><mo>}</mo>
             </math>";
-            test_ClearSpeak("en", "ClearSpeak_Sets", "SilentBracket", expr,
-                    "the set of all x such that x is greater than 2");
+            test_ClearSpeak("fi", "ClearSpeak_Sets", "SilentBracket", expr,
+                    "joukko kaikilla x siten että x on suurempi kuin 2");
         }
 

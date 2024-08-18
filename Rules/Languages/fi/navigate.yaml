@@ -199,17 +199,17 @@
       then:
       - test:
         - if: "$PreviousNavCommand = 'ZoomIn'"
-          then: [T: "kumoa zoomaa lähemmäs"]                       # phrase('undo zoom in')
+          then: [T: "kumoa siirry lähemmäs"]                       # phrase('undo zoom in')
         - else_if: "$PreviousNavCommand = 'ZoomOut'"
-          then: [T: "kumoa zoomaa kauemmas"]                       # phrase('undo zoom out')
+          then: [T: "kumoa siirry ulommas"]                       # phrase('undo zoom out')
         - else_if: "$PreviousNavCommand = 'ZoomInAll'"
-          then: [T: "kumoa täysi zoomaus lähemmäs"]                # phrase('undo zooming in all the way')
+          then: [T: "kumoa sisin taso"]                # phrase('undo zooming in all the way')
         - else_if: "$PreviousNavCommand = 'ZoomOutAll'"
-          then: [T: "kumoa täysi zoomaus kauemmas"]                # phrase('undo zooming out all the way')
+          then: [T: "kumoa uloin taso"]                # phrase('undo zooming out all the way')
         - else_if: "$PreviousNavCommand = 'MovePrevious' or $PreviousNavCommand = 'MovePreviousZoom'"
-          then: [T: "kumoa liikkuminen vasemmalle"]                # phrase('undo move left')
+          then: [T: "kumoa liiku vasemmalle"]                # phrase('undo move left')
         - else_if: "$PreviousNavCommand = 'MoveNext' or $PreviousNavCommand = 'MoveNextZoom'"
-          then: [T: "kumoa liikkuminen oikealle"]                  # phrase('undo move right')
+          then: [T: "kumoa liiku oikealle"]                  # phrase('undo move right')
         - else_if: "$PreviousNavCommand = 'None'"
           then: [T: "ei aiempaa komentoa"]                         # phrase('no previous command')
       - pause: "long"
@@ -234,7 +234,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
-      then: [T: "täysi zoomaus lähelle", pause: "long"]    # phrase('zoomed in all of the way')
+      then: [T: "sisin taso", pause: "long"]    # phrase('zoomed in all of the way')
   - test:
       if: "$ReadZoomLevel!=-1"
       then:
@@ -251,7 +251,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [T: "zoomaa lähemmäs", pause: "long"]                 # phrase('zoom in')
+      then: [T: "siirry sisemmäs", pause: "long"]                 # phrase('zoom in')
   - set_variables: [NavNode: "*[2]/*[1]/@id"]
 
 # special case of zooming into a table -- move to the first row
@@ -261,7 +261,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [T: "zoomaa lähemmäs", pause: "long"]               # phrase('zoom in')
+      then: [T: "siirry sisemmäs", pause: "long"]               # phrase('zoom in')
   - set_variables: [NavNode: "*[1]/@id"]
 
 - name: zoom-in-mrow-in-math
@@ -285,7 +285,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [T: "zoomaa lähemmäs", pause: "long"]                        # phrase('zoom in')
+      then: [T: "siirry sisemmäs", pause: "long"]                        # phrase('zoom in')
   - with:
       variables: [MatchCounter: "$MatchCounter + 1"]
       replace:
@@ -301,23 +301,23 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [T: "zoomaa lähemmäs", pause: "long"]                      # phrase('zoom in')
+      then: [T: "siirry sisemmäs", pause: "long"]                      # phrase('zoom in')
   - test:
     - if: "self::m:mtr or self::m:mlabeledtr"
       then:
       - with:
-          variables: [Move2D: "'sisään'", Child2D: "*[1]/*[1]"]   # phrase('in' the denominator) # FI: should this be translated?
+          variables: [Move2D: "'sisään'", Child2D: "*[1]/*[1]"]   # phrase('in' the denominator)
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/*[1]/@id"] # skip mtd
     - else_if: "*[1][self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]" # auto zoom
       then:
       - with:
-          variables: [Move2D: "'sisään'", Child2D: "*[1]/*[2]"]   # phrase('in' the denominator) # FI: should this be translated?
+          variables: [Move2D: "'sisään'", Child2D: "*[1]/*[2]"]   # phrase('in' the denominator)
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/*[2]/@id"] # skip mtd
       else:
       - with:
-          variables: [Move2D: "'sisään'", Child2D: "*[1]"]        # phrase('in' the denominator) # FI: should this be translated?
+          variables: [Move2D: "'sisään'", Child2D: "*[1]"]        # phrase('in' the denominator)
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/@id"]
 
@@ -327,9 +327,9 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [T: "zoomaa lähemmäs", pause: "long"]                   # phrase('zoom in')
+      then: [T: "siirry sisemmäs", pause: "long"]                   # phrase('zoom in')
   - with:
-      variables: [Move2D: "'sisään'", Child2D: "*[1]"]          # phrase('in' the denominator) # FI: should this be translated?
+      variables: [Move2D: "'sisään'", Child2D: "*[1]"]          # phrase('in' the denominator)
       replace: [x: "."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNextZoom'"]
@@ -341,9 +341,9 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [T: "zoomaa lähemmäs", pause: "long"]                 # phrase('zoom in')
+      then: [T: "siirry sisemmäs", pause: "long"]                 # phrase('zoom in')
   - with:
-      variables: [Move2D: "'sisään'", Child2D: "*[1]"]        # phrase('in' the denominator) # FI: should this be translated?
+      variables: [Move2D: "'sisään'", Child2D: "*[1]"]        # phrase('in' the denominator)
       replace: [x: "."]
   - test:
       if: "$NavMode='Character'"
@@ -367,9 +367,9 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [T: "täysi zoomaus lähemmäs", pause: "medium"]                 # phrase('zoom in all the way')
+      then: [T: "sisin taso", pause: "medium"]                 # phrase('zoom in all the way')
   - with:
-      variables: [Move2D: "'sisään'", Child2D: "*[1]"]              # phrase('in' the denominator) # FI: should this be translated?
+      variables: [Move2D: "'sisään'", Child2D: "*[1]"]              # phrase('in' the denominator) 
       replace: [x: "."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1"]
@@ -381,7 +381,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
-      then: [T: "täysi zoomaus kauemmas", pause: "long"]        # phrase('zoomed out all the the way')
+      then: [T: "uloin taso", pause: "long"]        # phrase('zoomed out all the the way')
   - set_variables: [NavNode: "*[1]/@id"] # no-op for $NavCommand = 'ZoomOut'
 
 - name: zoom-out-top
@@ -407,9 +407,9 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
-      then: [T: "täysi zoomaus kauemmas", pause: "medium"]            # phrase('zoomed out all the the way')
+      then: [T: "uloin taso", pause: "medium"]            # phrase('zoomed out all the the way')
   - with:
-      variables: [Move2D: "'pois'", Child2D: "."]
+      variables: [Move2D: "'ulos'", Child2D: "."]
       replace: [x: ".."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1"]
@@ -426,7 +426,7 @@
   replace:
   # don't bother with MatchCounter since we only get here if > 1
   - with:
-      variables: [Move2D: "'sisään'", Child2D: "*[1]"]            # phrase('in' the denominator) # FI: should this be translated?
+      variables: [Move2D: "'sisään'", Child2D: "*[1]"]            # phrase('in' the denominator) 
       replace: [x: "."]
   - test:
     - if: "count(*)> 1 or IsNode(., 'leaf') or self::m:msqrt or self::m:menclose"
@@ -443,12 +443,12 @@
       if: "$ReadZoomLevel >= DistanceFromLeaf(., false, $NavMode!='Character')"
       then:
       # - with:
-      #     variables: [Move2D: "'sisään'", Child2D: "following-sibling::*[1]"]    # phrase('in' the denominator) # FI: should this be translated?
+      #     variables: [Move2D: "'sisään'", Child2D: "following-sibling::*[1]"]    # phrase('in' the denominator) 
       #     replace: [x: ".."]
       - set_variables: [NavNode: "@id"]
       else:
       - with:
-          variables: [Move2D: "'sisään'", Child2D: "*[1]"]                        # phrase('in' the denominator) # FI: should this be translated?
+          variables: [Move2D: "'sisään'", Child2D: "*[1]"]                        # phrase('in' the denominator) 
           replace: [x: "."]
       - x: "*[1]"
 
@@ -462,12 +462,12 @@
       if: "$ReadZoomLevel >= DistanceFromLeaf(., true, $NavMode!='Character')"
       then:
       # - with:
-      #     variables: [Move2D: "'sisään'", Child2D: "preceding-sibling::*[1]"]     # phrase('in' the denominator) # FI: should this be translated?
+      #     variables: [Move2D: "'sisään'", Child2D: "preceding-sibling::*[1]"]     # phrase('in' the denominator) 
       #     replace: [x: ".."]
       - set_variables: [NavNode: "@id"]
       else:
       - with:
-          variables: [Move2D: "'sisään'", Child2D: "*[last()]"]                     # phrase('in' the denominator) # FI: should this be translated?
+          variables: [Move2D: "'sisään'", Child2D: "*[last()]"]                     # phrase('in' the denominator) 
           replace: [x: "."]
       - x: "*[last()]"
 
@@ -480,7 +480,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [T: "zoomaa kauemmas", pause: "medium"]                  # phrase('zoom out' of expression)
+      then: [T: "siirry ulommas", pause: "medium"]                  # phrase('zoom out' of expression)
   # we need to speak it here
   - T: "rivi"                                                  # phrase(the first 'row' of the matrix)
     # if we let the speech rules speak the row, it is given just the MathML for the row, so the row # will always be '1'
@@ -498,13 +498,13 @@
       replace:
       - test:
           if: "$MatchCounter = 1 and $NavVerbosity = 'Verbose'"
-          then: [T: "zoomaa kauemmas", pause: "medium"]              # phrase('zoom out' of the expression)
+          then: [T: "siirry ulommas", pause: "medium"]              # phrase('zoom out' of the expression)
       - test:
           if: "$NavMode='Enhanced' and parent::*[self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]"
           then: [x: ".."] # auto-zoom: move out a level and retry
           else:
           - with:
-              variables: [Move2D: "'pois'", Child2D: "."] # FI: should this be translated?
+              variables: [Move2D: "'ulos'", Child2D: "."] 
               replace: [x: ".."]
           - test:
               if: "parent::m:mtd"
@@ -1079,7 +1079,7 @@
           then: [x: "$Following"]
           else:
           - with:
-              variables: [Move2D: "'sisään'", Child2D: "$Following"]        # phrase('in' the denominator) # FI: should this be translated?
+              variables: [Move2D: "'sisään'", Child2D: "$Following"]        # phrase('in' the denominator) 
               replace: [x: ".."]
           - with:
               variables: [NavCommand: "'MoveNextZoom'"]
@@ -1101,7 +1101,7 @@
           then: [x: "$Preceding"]
           else:
           - with:
-              variables: [Move2D: "'sisään'", Child2D: "$Preceding"]          # phrase('in' the denominator) # FI: should this be translated?
+              variables: [Move2D: "'sisään'", Child2D: "$Preceding"]          # phrase('in' the denominator) 
               replace: [x: ".."]
           - with:
               variables: [NavCommand: "'MovePreviousZoom'"]
@@ -1202,11 +1202,11 @@
           if: "following-sibling::*"
           then:
           - with:
-              variables: [Move2D: "'sisään'", Child2D: "."]             # phrase('in' the denominator) # FI: should this be translated?
+              variables: [Move2D: "'sisään'", Child2D: "."]             # phrase('in' the denominator) 
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'pois'", Child2D: "."]         # FI: should this be translated?
+              variables: [Move2D: "'ulos'", Child2D: "."]         
               replace: [x: ".."]
       - test:
           if: "following-sibling::*"
@@ -1310,14 +1310,14 @@
       if: "preceding-sibling::* and following-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'pois'", Child2D: "."] # FI: should this be translated?
+          variables: [Move2D: "'ulos'", Child2D: "."] 
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
           replace: [x: "following-sibling::*[1]"]          # skip over 'none'
       else:
       - with:
-          variables: [Move2D: "'sisään'", Child2D: "following-sibling::*[1]"]       # phrase('in' the denominator) # FI: should this be translated?
+          variables: [Move2D: "'sisään'", Child2D: "following-sibling::*[1]"]       # phrase('in' the denominator) 
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNextZoom'"]
@@ -1386,7 +1386,7 @@
       then:
       - T: "ei voi liikkua vasemmalle"                                   # phrase('cannot move left' in expression)
   - with:
-      variables: [Move2D: "'end of'", Child2D: "$EdgeNode/*[1]"]         # FI: should this be translated?
+      variables: [Move2D: "'loppu'", Child2D: "$EdgeNode/*[1]"]         
       replace: [x: "$EdgeNode"]
   - pause: long
 
@@ -1444,11 +1444,11 @@
           if: "preceding-sibling::*"
           then:
           - with:
-              variables: [Move2D: "'sisään'", Child2D: "."]             # phrase('in' the denominator) # FI: should this be translated?
+              variables: [Move2D: "'sisään'", Child2D: "."]             # phrase('in' the denominator) 
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'pois'", Child2D: "."]         # FI: should this be translated?
+              variables: [Move2D: "'ulos'", Child2D: "."]         
               replace: [x: ".."]
       - test:
           if: "preceding-sibling::*"
@@ -1487,7 +1487,7 @@
       if: "not(parent::m:mrow)"
       then:
       - with:
-          variables: [Move2D: "'sisään'", Child2D: "preceding-sibling::*[1]"]         # phrase('in' the denominator) # FI: should this be translated?
+          variables: [Move2D: "'sisään'", Child2D: "preceding-sibling::*[1]"]         # phrase('in' the denominator) 
           replace: [x: ".."]
   - set_variables: [NavNode: "preceding-sibling::*[1]/*[2]/@id"]
 
@@ -1555,7 +1555,7 @@
       if: "count(preceding-sibling::*) > 2 and preceding-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'pois'", Child2D: "."]           # FI: should this be translated?
+          variables: [Move2D: "'ulos'", Child2D: "."]           
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
@@ -1573,7 +1573,7 @@
           - T: "vasemmalle"                                            # phrase(move 'left')
           - pause: short
       - with:
-          variables: [Move2D: "'sisään'", Child2D: "preceding-sibling::*[1]"]               # phrase('in' the denominator) # FI: should this be translated?
+          variables: [Move2D: "'sisään'", Child2D: "preceding-sibling::*[1]"]               # phrase('in' the denominator) 
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MovePreviousZoom'"]
@@ -1665,7 +1665,7 @@
       - T: "puhu kaava liikkumisen jälkeen"                # phrase('speak expression after move')
       - set_variables: [Overview: "'false'"]
       else:
-      - T: "yleiskatsaus kaava liikkumisen jälkeen"          # phrase('overview of expression after move')
+      - T: "yleiskatsaus kaavasta liikkumisen jälkeen"          # phrase('overview of expression after move')
       - set_variables: [Overview: "'true'"]
   - pause: long
 

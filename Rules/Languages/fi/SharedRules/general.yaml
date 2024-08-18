@@ -89,7 +89,7 @@
   replace:
   - x: "*[1]"
   - pause: auto
-  - T: "arvolla"      # phrase(results were 'evaluated at' a given point) # FI: might be different depending on the context
+  - T: "sijoitus"      # phrase(results were 'evaluated at' a given point)
   - pause: auto
   - x: "*[2]"
 
@@ -99,7 +99,7 @@
   replace:
   - x: "*[1]"
   - pause: auto
-  - T: "arvolla"      # phrase(results were 'evaluated at' this point)
+  - T: "sijoitus"      # phrase(results were 'evaluated at' this point)
   - pause: auto
   - x: "*[3]"
   - T: "miinus sama lauseke arvolla"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
@@ -110,7 +110,7 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - T: "yli"      # phrase(you can 'choose' a number at random) # FI: what does the phrase mean? Translation now means '1 choose 2'
+  - T: "yli"      # phrase(you can 'choose' a number at random)
   - x: "*[2]"
 
 - name: permutation
@@ -143,9 +143,9 @@
   - test:
       if: "$Verbosity!='Terse'"
       then:
-      - T: "luvusta"      # phrase(subtracting 5 'from' 10 gives 5)
+      - T: "luvusta"      # FI: "from number", needs a better translation for anything else than a number, maybe this could be omitted
       - x: "*[1]"
-      - T: "lukuun"      # phrase(adding 6 'to' 6 equals  12)
+      - T: "lukuun"      # FI: "to number"
       - x: "*[2]"
       else:
       - x: "*[1]"
@@ -214,7 +214,7 @@
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
           then: [pause: short]
 
-- name: bigop-both
+- name: bigop-both # FI: there should be separate rule for integrals, since in Finnish we can talk about sub and sup of integral
   tag: large-op
   match: "count(*) = 3"
   replace:
@@ -224,14 +224,16 @@
   - x: "*[1]"
   - T: "käy"      # phrase(subtracting 5 'from' 10 gives 5)
   - pause: short # FI: added pause for clarity
+  - T: "luvusta"
   - x: "*[2]"
+  - pause: short # FI: added pause for clarity
   - T: "lukuun"      # phrase(adding 6 'to' 6 equals  12)
   - x: "*[3]"
   - test:
       if: "following-sibling::*"
       # then: [{T: ""}]      # phrase(the square root 'of' 25 equals 5)
       then:
-        pause: medium # FI: added for Finnish # needs a test
+        pause: medium # FI: added for Finnish, needs a test
 
 - name: bigop-under
   tag: large-op
@@ -247,7 +249,7 @@
       if: "following-sibling::*"
       # then: [{T: ""}]      # phrase(the square root 'of' 25 equals 5)
       then:
-        pause: short # FI: added for Finnish # needs a test
+        pause: short # FI: added for Finnish, needs a test
 
 - name: largeop
   tag: mrow
@@ -446,7 +448,7 @@
   variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
   match:
   - "count(*)=3 and"
-  - "*[1][self::m:mi][text()='log' or text()='ln'] and"
+  - "*[1][self::m:mi][text()='log' or text()='lg' or text()='ln'] and"
   - "*[2][self::m:mo][text()='⁡']"
   replace:
   - bookmark: "*[1]/@id"
@@ -454,21 +456,30 @@
       if: "$log_is_simple"
       then_test:
       - if: "*[1][text()='log']"
-        then: [{T: "logaritmi"}]      # phrase(the 'log' function is used in mathematics)
+        then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
+      - else_if: "*[1][text()='lg']"
+        then_test:
+        - if: "$Verbosity='Terse'"
+          then: [{SPELL: "'lg'"}]
+          else: [{T: "kymmenkantainen logaritmi"}]
       - else_if: "$Verbosity='Terse'"
         then: [{SPELL: "'ln'"}]
-        else: [{T: "luonnollinen logaritmi"}]      # phrase(the 'natural log' function is used in mathematics)
+        else: [{T: "luonnollinen log"}]      # phrase(the 'natural log' function is used in mathematics)
       else:
-      - test:
-          if: "$Verbosity!='Terse' and not(log_is_simple)"
-          then: {T: ""}      # phrase('the' square root of 25 equals 5)
+      # FI: not needed
+      # - test:
+      #     if: "$Verbosity!='Terse' and not(log_is_simple)"
+      #     then: {T: ""}      # phrase('the' square root of 25 equals 5)
       - test:
         - if: "*[1][text()='log']"
-          then: [{T: "logaritmi"}]      # phrase(the 'log' function is used in mathematics)
+          then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
+        - else_if: "*[1][text()='lg']"
+          then: [{SPELL: "'lg'"}]      # phrase(the 'log' function is used in mathematics)
         - else_if: "$Verbosity='Terse'"
           then: [{SPELL: "'ln'"}]
           else: [{T: "luonnollinen logaritmi"}]      # phrase(the 'natural log' function is used in mathematics)
-      - T: ""     # phrase(5 is the square root 'of' 25)
+      #  FI: not needed
+      # - T: ""     # phrase(5 is the square root 'of' 25)
       - pause: short
   - x: "*[3]"
 
@@ -480,7 +491,7 @@
   - test:
       if: "$Verbosity!='Terse'"
       then: {T: ""}      # phrase('the' square root of 25 equals 5)
-  - T: "logaritmi kantaluku"      # phrase(the 'log base' is often base 10)
+  - T: "log kanta"      # phrase(the 'log base' is often base 10)
   - x: "*[1]"
 
 - name: log-base-power
@@ -491,14 +502,14 @@
   - test:
       if: "$Verbosity!='Terse'"
       then: {T: ""}      # phrase('the' square root of 25 equals 5)
-  - T: "logaritmi kantaluku"      # phrase(the 'log base' is often base 10)
+  - T: "log kanta"      # phrase(the 'log base' is often base 10)
   - x: "*[1]"
   - pause: medium
   - test:
       - if: "*[2][text()=2]"
-        then: [T: "neliö"]     
+        then: [T: "toiseen"]     
       - else_if: "*[2][text()=3]"
-        then: [T: "kuutio"]
+        then: [T: "kolmanteen"]
         else:  # don't bother with special cases as this isn't likely to happen
         - T: "potenssiin"      # phrase(x 'raised to the' second power)
         - x: "*[2]"
@@ -518,13 +529,25 @@
   - x: "$LineCount"
   - test:
     - if: "self::m:cases"
-      then: [{T: "tapaus"}]      # phrase(this is the first 'case' of three cases)
+      then: 
+        - test: 
+          - if: "$LineCount != 1"
+            then: [{T: "tapausta"}] # FI: plural, needs test
+            else: [{T: "tapaus"}] # phrase(this is the first 'equation' of three equations)
     - else_if: "self::m:equations"
-      then: [{T: "yhtälö"}]      # phrase(this is the first 'equation' of three equations)
-      else: [{T: "rivi"}]      # phrase(this is the first 'line' of three lines)
-  - test:
-    - if: "$LineCount != 1"
-      then: [{CT: "t"}] # plural # FI: more logic for different plurals, '-t' for now
+      then: 
+        - test: 
+          - if: "$LineCount != 1"
+            then: [{T: "yhtälöä"}] # FI: plural, needs test     
+            else: [{T: "yhtälö"}] # phrase(this is the first 'equation' of three equations)
+      else: 
+        - test: 
+          - if: "$LineCount != 1"
+            then: [{T: "riviä"}] # FI: plural, needs test
+            else: [{T: "rivi"}] # phrase(this is the first 'line' of three lines)
+  # - test:
+  #   - if: "$LineCount != 1"
+  #     then: [{CT: "t"}] # plural
   - pause: short
   - x: "*"
 
@@ -595,7 +618,7 @@
       then: {T: "determinantti"}      # phrase(the 2 by 2 'determinant'))
       else: {T: "matriisi"}      # phrase(the 2 by 2 'matrix')
       
-  - T: "merkinnällä"      # phrase(the 2 by 2 matrix 'with entry' x)
+  # - T: "merkinnällä"      # phrase(the 2 by 2 matrix 'with entry' x)
   - x: "*[1]/*"
 
 # simpler reading methods for smaller matrices if the entries are simple
