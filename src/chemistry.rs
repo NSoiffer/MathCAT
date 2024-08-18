@@ -110,7 +110,7 @@ pub fn clean_chemistry_mrow(mathml: Element) {
     clean_mrow_children_mark_pass(&children);
 }
 
-/// Do some aggressive structural changes and if they make this look like a chemistry formula, make it as one else remove other marks
+/// Do some aggressive structural changes and if they make this look like a chemistry formula, mark it as one else remove other marks
 /// Note: the element is replaced with a new restructured element if it is marked as chemistry
 ///        Pass 1:
 ///        a) for any run of mi/mtext that can be re-split into chem elements, split them and mark them if it is at least 3 chars long.
@@ -398,7 +398,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
 /// If it is, it is marked with either data-chem-equation or data-chem-formula
 /// This function assumes proper structure
 /// 
-/// Returns false if not chemistry -- added attrs, mrows, and leaves are removed in preparation for a second parse
+/// Returns true if not chemistry -- added attrs, mrows, and leaves are removed in preparation for a second parse
 pub fn scan_and_mark_chemistry(mathml: Element) -> bool {
     if is_chemistry_off(mathml) {
         return true;
@@ -455,7 +455,7 @@ fn get_marked_value(mathml: Element) -> Option<isize> {
 
 /// Sets the attr 'chem'
 /// Recurse through all the children that have MAYBE_CHEMISTRY set
-pub fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
+fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
     let tag_name = name(&mathml);
     if let Some(maybe_attr) = mathml.attribute(MAYBE_CHEMISTRY) {
         maybe_attr.remove_from_parent();
@@ -498,7 +498,7 @@ pub fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
     }
 }
 
-/// returns true if no MAYBE_CHEMISTRY's occur within the element
+/// returns true if MAYBE_CHEMISTRY's occur within the element
 fn has_maybe_chemistry(mathml: Element) -> bool {
     if mathml.attribute(MAYBE_CHEMISTRY).is_some() {
         return true;
@@ -581,7 +581,18 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
     } else {
         let mut answer = false;
         for child in mathml.children() {
-            answer |= is_changed_after_unmarking_chemistry(as_element(child));
+            let child = as_element(child);
+            if name(&child) == "mtd" {
+                assert_eq!(child.children().len(), 1);
+                // let mtd_child = as_element(child.children()[0]);
+                // if mtd_child.attribute(CHEM_FORMULA).is_none() && mtd_child.attribute(CHEM_EQUATION).is_none() {
+                // } else {
+
+                // }
+                answer = true;
+            } else {
+                answer |= is_changed_after_unmarking_chemistry(child);
+            }
         }
         if name(&mathml) == "mrow" {
             if let Some(changed_value) = mathml.attribute_value(CHANGED_ATTR) {
@@ -746,7 +757,7 @@ fn is_chemistry_sanity_check(mathml: Element) -> bool {
 /// Looks at the children of the element and uses heuristics to decide whether this is a chemical equation.
 /// This assumes canonicalization of characters has happened
 fn likely_chem_equation(mathml: Element) -> isize {
-    if name(&mathml) != "mrow" {
+    if name(&mathml) != "mrow" && name(&mathml) != "mtd" {
         return NOT_CHEMISTRY;
     }
 
@@ -799,6 +810,23 @@ fn likely_chem_equation(mathml: Element) -> isize {
                 } else {
                     likely
                 }     
+            },
+            // no need to check for mtr or mtd because they only exist in a table and the recursion is dealt with here.
+            "mtable" => {
+                for mrow in child.children() {
+                    let mrow = as_element(mrow);
+                    for mtd in mrow.children() {
+                        let mtd = as_element(mtd);
+                        let mut likely = likely_chem_formula(mtd);
+                        if likely < CHEMISTRY_THRESHOLD {
+                            likely = likely_chem_equation(mtd);
+                        }     
+                        if likely < CHEMISTRY_THRESHOLD {
+                            is_changed_after_unmarking_chemistry(mtd);
+                        }     
+                    }
+                }
+                NOT_CHEMISTRY
             },
             "semantics" => {
                 likely_chem_equation(get_presentation_element(mathml).1)
@@ -957,9 +985,6 @@ fn likely_chem_formula(mathml: Element) -> isize {
             likely_chem_formula(as_element(mathml.children()[0]));  // set MAYBE_CHEMISTRY attribute
             likely_adorned_chem_formula(mathml)
         },
-        "semantics" => {
-            likely_chem_formula(get_presentation_element(mathml).1)
-        },
         "mrow" => {
             let chem_state = likely_chem_state(mathml);
             if chem_state > 0 {
@@ -967,10 +992,29 @@ fn likely_chem_formula(mathml: Element) -> isize {
             } else {
                 likely_mrow_chem_formula(mathml)
             }
-
+        },
+        "mtable" => {
+            for mrow in mathml.children() {
+                let mrow = as_element(mrow);
+                for mtd in mrow.children() {
+                    let mtd = as_element(mtd);
+                    let mut likely = likely_chem_formula(mtd);
+                    if likely < CHEMISTRY_THRESHOLD {
+                        likely = likely_chem_equation(mtd);
+                    }     
+                    if likely < CHEMISTRY_THRESHOLD {
+                        is_changed_after_unmarking_chemistry(mtd);
+                    }     
+                }
+            }
+            NOT_CHEMISTRY
+        },
+        "semantics" => {
+            likely_chem_formula(get_presentation_element(mathml).1)
         },
         _ => {
             if !is_leaf(mathml) {
+                // mfrac, msqrt, etc
                 for child in mathml.children() {
                     let child = as_element(child);
                     let likelihood = likely_chem_formula(child);
@@ -1515,7 +1559,7 @@ pub fn likely_chem_state(mathml: Element) -> isize {
         if contents_name == "mi" || contents_name == "mtext" {
             let text = as_text(contents);
             if text == "s" || text == "l" ||text == "g" ||text == "aq" {
-                return text.as_bytes().len() as isize;       // hack to count chars -- works because all are ASCII
+                return text.as_bytes().len() as isize + 1;       // hack to count chars -- works because all are ASCII 
             };
         }
      }
@@ -2227,7 +2271,7 @@ mod chem_tests {
             <mrow><mo>(</mo><mrow><mi>aq</mi></mrow><mo>)</mo></mrow>
         </mrow></math>";
         let target = "<math>
-            <mrow data-chem-formula='10'>
+            <mrow data-chem-formula='11'>
                 <mi data-chem-element='3'>Fe</mi>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
                 <msub data-chem-formula='3'>
@@ -2235,7 +2279,7 @@ mod chem_tests {
                     <mn>3</mn>
                 </msub>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                <mrow data-chem-formula='2'>
+                <mrow data-chem-formula='3'>
                     <mo>(</mo>
                     <mi>aq</mi>
                     <mo>)</mo>
@@ -2253,7 +2297,7 @@ mod chem_tests {
             <mi>(aq)</mi>
         </mrow></math>";
         let target = "<math>
-            <mrow data-chem-formula='10'>
+            <mrow data-chem-formula='11'>
                 <mi data-chem-element='3'>Fe</mi>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
                 <msub data-chem-formula='3'>
@@ -2261,7 +2305,7 @@ mod chem_tests {
                     <mn>3</mn>
                 </msub>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                <mrow data-chem-formula='2'>
+                <mrow data-chem-formula='3'>
                     <mo>(</mo>
                     <mi>aq</mi>
                     <mo>)</mo>
@@ -2451,14 +2495,14 @@ mod chem_tests {
             </mrow>
             </math>";
         let target = "<math>
-            <mrow data-chem-formula='16'>
+            <mrow data-chem-formula='18'>
                 <mmultiscripts data-chem-formula='4'>
                     <mi data-chem-element='3'>Na</mi>
                     <none></none>
                     <mo>+</mo>
                 </mmultiscripts>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                <mrow data-changed='added' data-chem-formula='2'>
+                <mrow data-changed='added' data-chem-formula='3'>
                     <mo stretchy='false'>(</mo>
                     <mi>aq</mi>
                     <mo stretchy='false'>)</mo>
@@ -2470,7 +2514,7 @@ mod chem_tests {
                     <mo>-</mo>
                 </mmultiscripts>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                <mrow data-changed='added' data-chem-formula='2'>
+                <mrow data-changed='added' data-chem-formula='3'>
                     <mo stretchy='false' data-previous-space-width='0.111'>(</mo>
                     <mi>aq</mi>
                     <mo stretchy='false'>)</mo>
@@ -2620,15 +2664,15 @@ mod chem_tests {
         </mrow>
       </math>";
         let target = "<math>
-            <mrow data-chem-formula='8'>
+            <mrow data-chem-formula='9'>
                 <mn>2</mn>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2062;</mo>
-                <mrow data-changed='added' data-chem-formula='8'>
+                <mrow data-changed='added' data-chem-formula='9'>
                     <mi mathvariant='normal' data-previous-space-width='0.167' data-chem-element='1'>H</mi>
                     <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
                     <mi data-split='true' data-chem-element='3'>Cl</mi>
                     <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                    <mrow data-changed='added' data-chem-formula='2'>
+                    <mrow data-changed='added' data-chem-formula='3'>
                     <mo stretchy='false' data-previous-space-width='0.111'>(</mo>
                     <mi>aq</mi>
                     <mo stretchy='false'>)</mo>
@@ -2827,6 +2871,152 @@ mod chem_tests {
         </mrow>
     </math>";
     assert!(are_strs_canonically_equal(test, target));
+    }
+
+    
+    #[test]
+    fn merge_bug_274() {
+        init_logger();
+        let test = r#"
+        <math>
+            <mrow>
+                <mtable>
+                    <mtr>
+                        <mtd>
+                            <mrow>
+                                <msub><mtext>H</mtext><mn>2</mn></msub>
+                                <mtext>g</mtext>
+                                <mtext/>
+                                <mtext>+</mtext>
+                                <mtext/>
+                                <msub><mrow><mtext>Cl</mtext></mrow><mn>2</mn></msub>
+                                <mo stretchy="false">(</mo>
+                                <mtext>g</mtext>
+                                <mo stretchy="false">)</mo>
+                                <mo>&#x2192;</mo>
+                                <mn>2</mn>
+                                <mtext>HCl(g)</mtext>
+                            </mrow>
+                        </mtd>
+                    </mtr>
+                    <mtr>
+                        <mtd>
+                            <mrow>
+                                <mn>1</mn>
+                                <mo>:</mo>
+                                <mn>1</mn>
+                                <mo>:</mo>
+                                <mn>2</mn>
+                            </mrow>
+                        </mtd>
+                    </mtr>
+                    <mtr>
+                        <mtd>
+                            <mrow>
+                                <mn>1</mn>
+                                <mtext/>
+                                <msub><mtext>H</mtext><mn>2</mn></msub>
+                                <mtext/>
+                                <mtext>to</mtext>
+                                <mtext/>
+                                <mn>1</mn>
+                                <mtext/>
+                                <msub><mrow><mtext>Cl</mtext></mrow><mn>2</mn></msub>
+                                <mtext/>
+                                <mtext>to</mtext>
+                                <mtext/>
+                                <mtext>2</mtext>
+                                <mtext/>
+                                <mtext>HCl</mtext>
+                            </mrow>
+                        </mtd>
+                    </mtr>
+                </mtable>
+            </mrow>
+        </math>
+        "#;
+        let target = "
+            <math>
+            <mtable>
+                <mtr>
+                <mtd data-maybe-chemistry='9'>
+                    <mrow data-maybe-chemistry='9'>
+                    <mrow data-changed='added' data-maybe-chemistry='8'>
+                        <mrow data-changed='added' data-maybe-chemistry='1'>
+                        <msub data-maybe-chemistry='1'>
+                            <mtext data-maybe-chemistry='1'>H</mtext>
+                            <mn>2</mn>
+                        </msub>
+                        <mo data-changed='added' data-maybe-chemistry='0'>&#x2062;</mo>
+                        <mtext data-maybe-chemistry='0'>g</mtext>
+                        </mrow>
+                        <mo data-chem-equation-op='1' data-maybe-chemistry='1'>+</mo>
+                        <mrow data-changed='added' data-maybe-chemistry='6'>
+                        <msub data-maybe-chemistry='3'>
+                            <mtext data-maybe-chemistry='3'>Cl</mtext>
+                            <mn>2</mn>
+                        </msub>
+                        <mo data-changed='added' data-maybe-chemistry='0'>&#x2063;</mo>
+                        <mrow data-changed='added' data-maybe-chemistry='2'>
+                            <mo stretchy='false'>(</mo>
+                            <mtext>g</mtext>
+                            <mo stretchy='false'>)</mo>
+                        </mrow>
+                        </mrow>
+                    </mrow>
+                    <mo data-chem-equation-op='1' data-maybe-chemistry='1'>→</mo>
+                    <mrow data-changed='added' data-maybe-chemistry='0'>
+                        <mn data-maybe-chemistry='0'>2</mn>
+                        <mo data-changed='added' data-maybe-chemistry='0'>&#x2062;</mo>
+                        <mtext data-maybe-chemistry='0'>HCl(g)</mtext>
+                    </mrow>
+                    </mrow>
+                </mtd>
+                </mtr>
+                <mtr>
+                <mtd>
+                    <mrow>
+                    <mn>1</mn>
+                    <mo>:</mo>
+                    <mn>1</mn>
+                    <mo>:</mo>
+                    <mn>2</mn>
+                    </mrow>
+                </mtd>
+                </mtr>
+                <mtr>
+                <mtd data-maybe-chemistry='7'>
+                    <mrow data-maybe-chemistry='7'>
+                    <mn data-maybe-chemistry='0'>1</mn>
+                    <mo data-changed='added' data-maybe-chemistry='0'>&#x2062;</mo>
+                    <msub data-maybe-chemistry='1'>
+                        <mtext data-maybe-chemistry='1'>H</mtext>
+                        <mn>2</mn>
+                    </msub>
+                    <mo data-changed='added' data-maybe-chemistry='0'>&#x2062;</mo>
+                    <mtext data-maybe-chemistry='0'>to</mtext>
+                    <mo data-changed='added' data-maybe-chemistry='0'>&#x2062;</mo>
+                    <mn data-maybe-chemistry='0'>1</mn>
+                    <mo data-changed='added' data-maybe-chemistry='0'>&#x2062;</mo>
+                    <msub data-maybe-chemistry='3'>
+                        <mtext data-maybe-chemistry='3'>Cl</mtext>
+                        <mn>2</mn>
+                    </msub>
+                    <mo data-changed='added' data-maybe-chemistry='0'>&#x2062;</mo>
+                    <mtext data-maybe-chemistry='0'>to</mtext>
+                    <mo data-changed='added' data-maybe-chemistry='0'>&#x2062;</mo>
+                    <mtext data-maybe-chemistry='0'>2</mtext>
+                    <mo data-changed='added' data-maybe-chemistry='0'>&#x2062;</mo>
+                    <mi data-maybe-chemistry='1' mathvariant='normal'>H</mi>
+                    <mo data-changed='added' data-maybe-chemistry='0'>&#x2062;</mo>
+                    <mi data-maybe-chemistry='3' data-split='true'>Cl</mi>
+                    </mrow>
+                </mtd>
+                </mtr>
+            </mtable>
+            </math>
+        ";
+        assert!(are_strs_canonically_equal(test, target));
     }
 
 }
