@@ -24,7 +24,7 @@ def create_unicode_from_latex_symbols_html(out_file: str):
             unicode_list = list(map(lambda x: x.find('p').contents[0].split(' ')[0], foo))
             combined = sorted(zip(unicode_list, latex_list))
             for unicode, latex in combined:
-                write_line(unicode, latex, "", out_stream)
+                write_line(unicode, latex, "", False, out_stream)
 
 
 LATEX_COMMENT = """\
@@ -92,12 +92,15 @@ def get_unicode_standard_symbols() -> dict[str, list[str]]:
 UNICODE_CH_PATTERN = re.compile(r' - "(.)"')
 
 
-def get_unicode_yaml_chars() -> set[str]:
+def get_unicode_yaml_chars(file: str, include_ascii: bool) -> set[str]:
+    """Returns a set of all the chars 'file' (full path).
+       If 'include_ascii' is False, ASCII chars are excluded.
+    """
     answer = set()
-    with open("../Rules/Languages/en/unicode.yaml", "r", encoding='utf8') as unicode_stream:
+    with open(file, "r", encoding='utf8') as unicode_stream:
         for line in unicode_stream.readlines():
             matched = UNICODE_CH_PATTERN.match(line)
-            if matched and ord(matched.group(1)) > 127:
+            if matched and (include_ascii or ord(matched.group(1)) > 127):
                 answer.add(matched.group(1))
         for ch in range(ord('Α'), ord('Ω')):   # these are a range in unicode.yaml, so the pattern doesn't match
             answer.add(chr(ch))
@@ -105,7 +108,7 @@ def get_unicode_yaml_chars() -> set[str]:
 
 
 # The chars in unicode.yaml (others go into unicode-full.yaml)
-UNICODE_CHARS_SHORT = get_unicode_yaml_chars()
+UNICODE_CHARS_SHORT = get_unicode_yaml_chars("../Rules/Languages/en/unicode.yaml", False)
 
 
 def get_short_dict() -> dict[str, str]:
@@ -168,7 +171,8 @@ def extract_latex(in_file):
                 # add in ASCII and the Greek block
                 is_in_common_char_blocks = code < 0x7F or (0x0370 <= code and code <= 0x03fF)
                 stream = short_stream if ch in UNICODE_CHARS_SHORT or is_in_common_char_blocks else full_stream
-                # use the standard name unless the char is in the override dict (if it and the standard name is an option, write it first)
+                # use the standard name unless the char is in the override dict
+                #  if it and the standard name is an option, write it first
                 if ch in standard_names:
                     latex_names = standard_names[ch]
                     is_overridden = ch in overrides
@@ -404,7 +408,57 @@ def create_ascii_math(out_file: str):
             write_line(chr(0x2064), '', '', False, out_stream)
 
 
+# create a list of chars for lambda conversion
+def print_lambda_list():
+    chars_as_set = get_unicode_yaml_chars("../Rules/Braille/UEB/unicode.yaml", True)
+    print(*sorted(chars_as_set), sep="\n")
+
+
+def missing_unicode_chars() -> None:
+    """Make sure all the math chars in unicode.xml are listed in one of MathCAT's unicode files"""
+    tree = ET.parse(r"c:\dev\mathml-refresh\xml-entities\unicode.xml")
+    root: ET.Element = tree.getroot()
+    print(f"Root='{root}")
+    all_char_elements = root.find("charlist")
+    if all_char_elements is None:
+        print(r"Didn't find XML root in c:\dev\mathml-refresh\xml-entities\unicode.xml!")
+        exit(1)
+    all_unicode_math_chars = set()
+    for char_element in all_char_elements:
+        if char_element is None:
+            print("char_element is None!")
+            continue
+        unicode_data = char_element.find("unicodedata")
+        if unicode_data is None:
+            continue
+        mathclass = unicode_data.get("mathclass", default="none")
+        if mathclass == "none" or mathclass == "A" or mathclass == "G":  # Alphabetic and Glyph classes
+            continue
+        # if unicode_data.get("category", default="none") != "Sm":
+        #     continue
+        ch = char_element.get("id")
+        if ch is None:
+            print('char_element.get("id") is None!')
+            continue
+        ch = convert_to_char(ch)
+        if len(ch) > 1:
+            continue
+        all_unicode_math_chars.add(ch)
+    print(f"#all_unicode_math_chars = {len(all_unicode_math_chars)}")
+    mathcat_chars = get_unicode_yaml_chars("../Rules/Languages/en/unicode.yaml", True) \
+        .union(get_unicode_yaml_chars("../Rules/Languages/en/unicode-full.yaml", True))
+    print(f"#mathcat_chars = {len(mathcat_chars)}")
+    missing_chars = all_unicode_math_chars.difference(mathcat_chars)
+    print(f"#mathcat_chars = {len(missing_chars)}")
+
+    with open("missing_chars.yaml", 'w', encoding='utf8') as out_stream:
+        for ch in sorted(missing_chars):
+            write_line(ch, '', '', False, out_stream)
+
+
 # create_unicode_from_list_of_symbols_html("euro-symbols2.yaml")
 # create_greek_letters("greek-letters.yaml")
-# extract_latex("c:\\dev\\mathml-refresh\\xml-entities\\unicode.xml")
-create_ascii_math("ascii-math-unicode.yaml")
+# extract_latex(r"c:\dev\mathml-refresh\xml-entities\unicode.xml")
+# create_ascii_math("ascii-math-unicode.yaml")
+# print_lambda_list()
+missing_unicode_chars()
