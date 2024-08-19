@@ -217,6 +217,80 @@ fn p20_pair_of_equations () {
 }
 
 #[test]
+fn p22_belongs_to_a_set () {
+    let expr = r#"<math><mi>x</mi><mo>&#8712;</mo><mi>A</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"x in A");
+}
+
+#[test]
+fn p22_does_not_belong_to_a_set () {
+    let expr = r#"<math><mn>3</mn><mo>&#8713;</mo><mi>B</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"3 !in B");
+}
+
+#[test]
+fn p22_subset_right () {
+    let expr = r#"<math><mi>A</mi><mo>&#8834;</mo><mi>B</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"A sub B");
+}
+
+#[test]
+fn p22_subset_left () {
+    let expr = r#"<math><mi>B</mi><mo>&#x2283;</mo><mi>A</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"B sup A");
+}
+
+#[test]
+fn p22_not_subset () {
+    let expr = r#"<math><mi>A</mi><mo>&#8836;</mo><mi>B</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"B !sup A");
+}
+
+#[test]
+fn p22_union () {
+    let expr = r#"<math><mi>A</mi><mo>&#8746;</mo><mi>B</mi><mo>=</mo><mo>{</mo><mi>a</mi><mo>,</mo><mi>b</mi><mo>,</mo><mi>c</mi><mo>}</mo></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"A uu B ={a, b, c}");
+}
+
+
+
+#[test]
+fn p22_intersection_empty_set () {
+    let expr = r#"<math><mi>A</mi><mo>&#8745;</mo><mi>B</mi><mo>=</mo><mi>&#8709;</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"G nn H =O");
+}
+
+#[test]
+fn p22_negation () {
+    let expr = r#"<math><mo>&#172;</mo><mi>p</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"not p");
+}
+
+#[test]
+fn p23_logical_and () {
+    let expr = r#"<math><mi>p</mi><mo>&#8743;</mo><mi>q</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"p ^^ q");
+}
+
+#[test]
+fn p23_logical_or () {
+    let expr = r#"<math><mi>p</mi><mo>&#8744;</mo><mi>q</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"p vv q");
+}
+
+#[test]
+fn p23_logical_implication () {
+    let expr = r#"<math><mi>p</mi><mo>&#8594;</mo><mi>q</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"p --> q");
+}
+
+#[test]
+fn p22_function_defition () {
+    let expr = r#"<math><mi>f</mi><mo>:</mo><mi>x</mi><mo>→</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"f: x -> f(x)");
+}
+
+#[test]
 fn augenbit1_6_11() {
     // this is a slightly cleaned up version that comes for the original example (via MathJax)
     let expr = r#" <math> <mrow>
