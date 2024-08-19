@@ -285,7 +285,7 @@ fn p23_logical_implication () {
 }
 
 #[test]
-fn p22_function_defition () {
+fn p23_function_definition () {
     let expr = r#"<math><mi>f</mi><mo>:</mo><mi>x</mi><mo>→</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></math>"#;
     test_braille("ASCIIMath-fi", expr, r"f: x -> f(x)");
 }
