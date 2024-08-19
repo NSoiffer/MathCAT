@@ -291,6 +291,202 @@ fn p23_function_definition () {
 }
 
 #[test]
+fn p23_4x4_matrix () {
+    let expr = r#"<math>
+      <mrow>
+      <mrow><mo>(</mo>
+        <mtable>
+          <mtr>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+          </mtr>
+          <mtr>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          </mtr>
+          <mtr>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          </mtr>
+          <mtr>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          <mtd>
+            <mn>0</mn>
+          </mtd>
+          <mtd>
+            <mn>1</mn>
+          </mtd>
+          </mtr>
+        </mtable>
+      <mo>)</mo></mrow></mrow>
+    </math>"#;
+    test_braille("ASCIIMath-fi", expr, r"((1 0 0 1), (0 1 0 0), (0 0 1 0), (1 0 0 1))");
+}
+
+#[test]
+fn p24_function_definition () {
+    let expr = r#"<math>
+      <mrow>
+      <mrow><mo>|</mo>
+        <mtable>
+          <mtr>
+          <mtd>
+            <mi>a</mi>
+            <mo>+</mo>
+            <mi>b</mi>
+          </mtd>
+          <mtd>
+            <mi>a</mi>
+            <mo>-</mo>
+            <mi>b</mi>
+          </mtd>
+          </mtr>
+          <mtr>
+          <mtd>
+            <mi>a</mi>
+            <mo>-</mo>
+            <mi>b</mi>
+          </mtd>
+          <mtd>
+            <mi>a</mi>
+            <mo>+</mo>
+            <mi>b</mi>
+          </mtd>
+          </mtr>
+          
+        </mtable>
+      <mo>|</mo></mrow></mrow>
+</math>"#;
+    test_braille("ASCIIMath-fi", expr, r"|(a +b, a -b), (a -b, a +b)|");
+}
+
+#[test]
+fn p25_binomial () {
+    // original display code contains forced spaces not in the output -- they are cleaned up here
+    let expr = r#"<math>
+        <mo minsize="2.047em" maxsize="2.047em">(</mo>
+        <mfrac linethickness="0"><mi>n</mi><mi>k</mi></mfrac>
+        <mo minsize="2.047em" maxsize="2.047em">)</mo>
+    </math>"#;
+    test_braille("ASCIIMath-fi", expr, r"((n), (k))");
+}
+
+#[test]
+fn p25_factorial () {
+    let expr = r#"<math><mi>5</mi><mo>!</mo></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"5!");
+}
+
+#[test]
+fn p25_conditional_probability () {
+    let expr = r#"<math><mi>P</mi><mo>&#8289;</mo><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"P(A | B)");
+}
+
+#[test]
+fn p25_x_average () {
+    // This might prove to be wrong mark up, but this way there won't be mix up with vectors.
+    let expr = r#"<math><mover><mi>x</mi><mo>¯</mo></mover></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"bar x");
+}
+
+#[test]
+fn p26_expected_value () {
+    // This might prove to be wrong mark up, but this way there won't be mix up with vectors.
+    let expr = r#"<math><mi>E</mi><mo>&#8289;</mo><mo>(</mo><mi>X</mi><mo>)</mo><mo>=</mo><mi>&#956;</mi><mo>=</mo><msub><mo>∑</mo><mi>i</mi></msub><mo>(</mo><msub><mi>p</mi><mi>i</mi></msub><mo>&#8290;</mo><msub><mi>x</mi><mi>i</mi></msub><mo>)</mo></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"E(X) =~m =sum_i (p_i x_i)");
+}
+
+#[test]
+fn p26_msupsub () {
+    let expr = r#"<math><msubsup><mi>C</mi><mi>k</mi><mi>n</mi></msubsup></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"(C_k)^n");
+}
+
+#[test]
+fn p26_derivation_fraction () {
+    // This might prove difficult, because of contradictory mark up in asciimath. If special case can't be coded, then this should regular rules for fractions and multiplication with variables.
+    let expr = r#"<math><mfrac><mrow><mi>d</mi><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow><mrow><mi>d</mi><mi>x</mi></mrow></mfrac></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"df(x)/dx");
+}
+
+#[test]
+fn p26_derivation_prime_regular () {
+    // The ' doesn't have to be escaped, right? The r(aw string) does it already.
+    let expr = r#"<math><msup><mi>f</mi><mo>'</mo></msup><mo>&#8289;</mo><mo>(</mo><mi>x</mi><mo>)</mo></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"f'(x)");
+}
+
+#[test]
+fn p26_derivation_prime_alternative () {
+    // The ' doesn't have to be escaped, right? The r(aw string) does it already.
+    let expr = r#"<math><msup><mi>f</mi><mi>&#x2032;</mi></msup><mo>&#8289;</mo><mo>(</mo><mi>x</mi><mo>)</mo></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"f'(x)");
+}
+
+#[test]
+fn p26_derivation_prime_2_alternative () {
+    // The ' doesn't have to be escaped, right? The r(aw string) does it already.
+    let expr = r#"<math><msup><mi>f</mi><mrow><mi>&#x2032;</mi><mi>&#x2032;</mi></mrow></msup><mo>&#8289;</mo><mo>(</mo><mi>x</mi><mo>)</mo></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"f''(x)");
+}
+
+#[test]
+fn p26_derivation_cap_d () {
+    // Should there be an operator between D and f? Which one? Another question is that is D an operator or not? Here it is marked up as such.
+    let expr = r#"<math><mo>D</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"Df(x)");
+}
+
+#[test]
+fn p26_derivation_cap_d_to_two () {
+    // Notice whitespace after D^2, compared to p26_derication_cap_d
+    let expr = r#"<math><msup><mo>D</mo><mn>2</mn></msup><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"D^2 f(x)");
+}
+
+#[test]
+fn p26_partial_derivatives () {
+    let expr = r#"<math><mfrac><mrow><mi>𝜕</mi><mi>y</mi></mrow><mrow><mi>𝜕</mi><mi>x</mi></mrow></mfrac></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"del y /(del x)");
+}
+
+#[test]
 fn augenbit1_6_11() {
     // this is a slightly cleaned up version that comes for the original example (via MathJax)
     let expr = r#" <math> <mrow>
@@ -303,6 +499,7 @@ fn augenbit1_6_11() {
         </mrow></math>"#;
     test_braille("ASCIIMath-fi", expr, r"\ _(95)^(238)U");
 }
+
 
 
 #[test]
@@ -361,16 +558,6 @@ fn augenbit2_1_4 () {
     test_braille("ASCIIMath-fi", expr, r"f'(x), f''(x)");
 }
 
-#[test]
-fn augenbit2_2_2 () {
-    // original display code contains forced spaces not in the output -- they are cleaned up here
-    let expr = r#"<math>
-        <mo minsize="2.047em" maxsize="2.047em">(</mo>
-        <mfrac linethickness="0"><mi>n</mi><mi>k</mi></mfrac>
-        <mo minsize="2.047em" maxsize="2.047em">)</mo>
-    </math>"#;
-    test_braille("ASCIIMath-fi", expr, r"((n), (k))");
-}
 
 #[test]
 fn augenbit2_3_2 () {
