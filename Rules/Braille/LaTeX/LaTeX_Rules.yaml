@@ -359,7 +359,7 @@
       if: "self::m:munderover"
       then: [t: "\\overset{"]
   - test:
-      if: "DEBUG(self::m:munder or self::m:undermover)"
+      if: "self::m:munder or self::m:undermover"
       then: [t: "\\underset{"]
       else: [t: "\\overset{"]
   - x: "*[2]"
@@ -387,7 +387,7 @@
           if: "preceding-sibling::*"
           then: [t: "{}"]         # empty base not needed if this is the only expr
       - test:
-          if: "not(DEBUG($Prescripts[1])[self::m:none])"
+          if: "not($Prescripts[1][self::m:none])"
           then_test:
               if: "$Prescripts[1][IsNode(., 'leaf') and string-length(.) = 1]"
               then: [x: "$Prescripts[1]"]

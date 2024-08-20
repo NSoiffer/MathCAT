@@ -6,10 +6,6 @@
 # For numbers, 
 # - name: [] "...", "..." "..." ]
 
-- Units: {
-    "cm", "km", "hm", "dam", "dm", "mm", "tấn", "tạ", "yến", "kg", "hg", "dag", "lít", "ml", "ft", "in"
-  }
-
 # ----------------  Cardinal and Ordinal Numbers  --------------------------
 # The following definitions are used to convert numbers to words
 # The are mainly used for ordinals, of which there are two cases:

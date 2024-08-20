@@ -4,7 +4,7 @@
 use regex::Regex;
 extern crate lazy_static;
 use lazy_static::lazy_static;
-use libmathcat::interface::*;
+pub use libmathcat::interface::*;
 
 #[allow(dead_code)] 
 pub fn init_logger() {
@@ -22,6 +22,11 @@ pub fn abs_rules_dir_path() -> String {
     return std::env::current_exe().unwrap().parent().unwrap()
                 .join("../../../Rules")
                 .to_str().unwrap().to_string();
+    // use std::path::PathBuf;
+    // let out_dir = std::env::var_os("OUT_DIR").unwrap();
+    // println!("abs_rules_dir_path: out_dir={:?}", out_dir);
+    // let out_dir = PathBuf::from(&out_dir);
+    // return PathBuf::from(&out_dir).join("Rules").to_string_lossy().to_string();
 }
 
 
@@ -54,6 +59,7 @@ pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
         let rules = rules.borrow_mut();
         let mut prefs = rules.pref_manager.borrow_mut();
         prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "").unwrap();         // makes testing simpler
+        prefs.set_user_prefs("MathRate", "100").unwrap();                            // makes testing simpler
         prefs.set_user_prefs("PauseFactor", "100").unwrap();                         // makes testing simpler
         prefs.set_user_prefs("Verbosity", "Medium").unwrap();
         prefs.set_user_prefs("Impairment", "Blindness").unwrap();
@@ -74,6 +80,7 @@ pub fn test_prefs(language: &str, speech_style: &str, test_prefs: Vec<(&str, &st
         let rules = rules.borrow_mut();
         let mut prefs = rules.pref_manager.borrow_mut();
         prefs.set_user_prefs("SpeechOverrides_CapitalLetters", "").unwrap();         // makes testing simpler
+        prefs.set_user_prefs("MathRate", "100").unwrap();                            // makes testing simpler
         prefs.set_user_prefs("PauseFactor", "100").unwrap();                         // makes testing simpler
         prefs.set_user_prefs("Verbosity", "Medium").unwrap();
     });
@@ -108,6 +115,7 @@ pub fn test_ClearSpeak_prefs(language: &str, prefs: Vec<(&str, &str)>, mathml: &
 #[allow(non_snake_case)]
 pub fn test_braille(code: &str, mathml: &str, braille: &str) {
     set_rules_dir(abs_rules_dir_path()).unwrap();
+    set_preference("BrailleNavHighlight".to_string(), "Off".to_string()).unwrap();
     set_preference("BrailleCode".to_string(), code.to_string()).unwrap();
     set_preference("LaTeX_UseShortName".to_string(), "false".to_string()).unwrap();
     // FIX: this shouldn't need to be done -- need to figure out how to get definitions set automatically

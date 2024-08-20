@@ -46,6 +46,9 @@ extern crate cfg_if;
 
 
 pub mod interface;
+#[cfg(feature = "include-zip")]
+pub use shim_filesystem::ZIPPED_RULE_FILES;
+
 mod canonicalize;
 mod infer_intent;
 pub mod speech;
@@ -59,7 +62,6 @@ mod pretty_print;
 mod chemistry;
 
 pub mod shim_filesystem; // really just for override_file_for_debugging_rules, but the config seems to throw it off
-pub use shim_filesystem::ZIPPED_RULE_FILES;
 pub use interface::*;
 
 #[cfg(test)]
@@ -79,6 +81,11 @@ pub fn abs_rules_dir_path() -> String {
     return std::env::current_exe().unwrap().parent().unwrap()
                 .join("../../../Rules")
                 .to_str().unwrap().to_string();
+    // use std::path::PathBuf;
+    // let out_dir = std::env::var_os("OUT_DIR").unwrap();
+    // println!("abs_rules_dir_path: out_dir={:?}", out_dir);
+    // let out_dir = PathBuf::from(&out_dir);
+    // return PathBuf::from(&out_dir).join("Rules").to_string_lossy().to_string();
 }
 
 #[cfg(test)]

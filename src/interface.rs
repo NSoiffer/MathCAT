@@ -40,9 +40,11 @@ fn init_mathml_instance() -> RefCell<Package> {
 }
 
 /// Set the Rules directory
-/// IMPORTANT: this should be the very first call to MathCAT unless the environment var MathCATRulesDir is set
+/// IMPORTANT: this should be the very first call to MathCAT. If 'dir' is an empty string, the envirnoment var 'MathCATRulesDir' is tried.
 pub fn set_rules_dir(dir: String) -> Result<()> {
     use std::path::PathBuf;
+    use std::ffi::OsString;
+    let dir = if dir.is_empty() {std::env::var_os("MathCATRulesDir").unwrap_or(OsString::default()).to_str().unwrap().to_string()} else {dir};
     let pref_manager = crate::prefs::PreferenceManager::get();
     return pref_manager.borrow_mut().initialize(PathBuf::from(dir));
 }
@@ -192,12 +194,23 @@ pub fn get_preference(name: String) -> Result<String> {
 /// Be careful setting preferences -- these potentially override user settings, so only preferences that really need setting should be set.
 pub fn set_preference(name: String, value: String) -> Result<()> {
     // "LanguageAuto" allows setting the language dir without actually changing the value of "Language" from Auto
+    let mut value = value;
     if name == "Language" || name == "LanguageAuto" {
         // check the format
-        if !( value == "Auto" ||
-              value.len() == 2 ||
-              (value.len() == 5 && value.as_bytes()[2] == b'-') ) {
-            bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value);
+        if value != "Auto" {
+            // could get es, es-419, or en-us-nyc ...  we only care about the first two parts so we clean it up a little
+            let mut lang_country_split = value.split('-');
+            let language = lang_country_split.next().unwrap_or("");
+            let country = lang_country_split.next().unwrap_or("");
+            if language.len() != 2 {
+                bail!("Improper format for 'Language' preference '{}'. Should be of form 'en' or 'en-gb'", value);
+            }
+            let mut new_lang_country = language.to_string();     // need a temp value because 'country' is borrowed from 'value' above
+            if country != "" {
+                new_lang_country.push('-');
+                new_lang_country.push_str(country);
+            }
+            value = new_lang_country;
         }
         if name == "LanguageAuto" && value == "Auto" {
             bail!("'LanguageAuto' can not have the value 'Auto'");
@@ -224,7 +237,8 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
             pref_manager.set_api_boolean_pref(&name, value.to_lowercase()=="true"); 
         } else { 
             match name.as_str() {
-                "Pitch" | "Rate" | "Volume" | "CapitalLetters_Pitch"=> {
+                "Pitch" | "Rate" | "Volume" | "CapitalLetters_Pitch" | "MathRate" | "PauseFactor" => {
+
                     pref_manager.set_api_float_pref(&name, to_float(&name, &value)?);    
                 },
                 _ => {
@@ -267,26 +281,35 @@ pub fn get_navigation_braille() -> Result<String> {
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
+        let new_package = Package::new();           // used if we need to create a new tree
+        let new_doc = new_package.as_document();
         let nav_mathml = NAVIGATION_STATE.with(|nav_stack| {
             return match nav_stack.borrow_mut().get_navigation_mathml(mathml) {
                 Err(e) => Err(e),
                 Ok( (found, offset) ) => {
                     // get the MathML node and wrap it inside of a <math> element
                     // if the offset is given, we need to get the character it references
-                    let internal_mathml;
                     if offset == 0 {
-                        internal_mathml = found;
+                        if name(&found) == "math" {
+                            Ok(found)
+                        } else {
+                            let new_mathml = create_mathml_element(&new_doc, "math");
+                            new_mathml.append_child(copy_mathml(found));
+                            new_doc.root().append_child(new_mathml);
+                            Ok(new_mathml)
+                        }
                     } else if !is_leaf(found) {
                         bail!("Internal error: non-zero offset '{}' on a non-leaf element '{}'", offset, name(&found));
                     } else if let Some(ch) = as_text(found).chars().nth(offset) {
-                        internal_mathml = create_mathml_element(&found.document(), name(&found));
+                        let internal_mathml = create_mathml_element(&new_doc, name(&found));
                         internal_mathml.set_text(&ch.to_string());
+                        let new_mathml = create_mathml_element(&new_doc, "math");
+                        new_mathml.append_child(internal_mathml);
+                        new_doc.root().append_child(new_mathml);
+                        Ok(new_mathml)
                     } else {
                         bail!("Internal error: offset '{}' on leaf element '{}' doesn't exist", offset, mml_to_string(&found));
                     }
-                    let new_mathml = create_mathml_element(&found.document(), "math");
-                    new_mathml.append_child(internal_mathml);
-                    Ok(new_mathml)
                 },
             }
         } )?;
@@ -295,6 +318,7 @@ pub fn get_navigation_braille() -> Result<String> {
         return Ok( braille );
     });
 }
+
 
 /// Given a key code along with the modifier keys, the current node is moved accordingly (or value reported in some cases).
 /// `key` is the [keycode](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/keyCode#constants_for_keycode_value) for the key (in JavaScript, `ev.key_code`)
@@ -412,7 +436,33 @@ pub fn get_navigation_node_from_braille_position(position: usize) -> Result<(Str
     })
 }
 
+
+
+// utility functions
+
+/// Copy (recursively) the (MathML) element and return the new one.
+/// The Element type does not copy and modifying the structure of an element's child will modify the element, so we need a copy
 /// Convert the returned error from set_mathml, etc., to a useful string for display
+fn copy_mathml(mathml: Element) -> Element {
+    // If it represents MathML, the 'Element' can only have Text and Element children along with attributes
+    let children = mathml.children();
+    let new_mathml = create_mathml_element(&mathml.document(), name(&mathml));
+    if is_leaf(mathml) {
+        mathml.attributes().iter().for_each(|attr| {new_mathml.set_attribute_value(attr.name(), attr.value());});
+		new_mathml.set_text(as_text(mathml));
+    } else {
+        let mut new_children = Vec::with_capacity(children.len());
+        for child in children {
+            let child = as_element(child);
+            let new_child = copy_mathml(child);
+            child.attributes().iter().for_each(|attr| {new_child.set_attribute_value(attr.name(), attr.value());});
+            new_children.push(new_child);
+        }
+        new_mathml.append_children(new_children);
+    }
+    return new_mathml;
+}
+
 pub fn errors_to_string(e:&Error) -> String {
     let mut result = String::default();
     let mut first_time = true;

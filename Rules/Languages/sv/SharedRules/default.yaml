@@ -1,0 +1,669 @@
+---
+#default rules shared among several speech rules
+- name: default
+  tag: math
+  match: "."
+  replace:
+  - with:
+      variables:
+      - ClearSpeak_Fractions: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_Fractions='Auto', 'EndFrac', $ClearSpeak_Fractions)"
+      - ClearSpeak_AbsoluteValue: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_AbsoluteValue='Auto', 'AbsEnd', $ClearSpeak_AbsoluteValue)"
+      - ClearSpeak_Roots: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_Roots='Auto', 'RootEnd', $ClearSpeak_Roots)"
+      - ClearSpeak_Matrix: "IFTHENELSE($Verbosity='Verbose' and $ClearSpeak_Matrix='Auto', 'EndMatrix', $ClearSpeak_Matrix)"
+      replace:
+      - test:
+          if: "$MathRate = 100"
+          then: [x: "*"]
+          else:
+          - rate:
+              value: "$MathRate"
+              replace: [x: "*"]
+
+- name: empty-mrow
+  tag: mrow
+  match: "not(*)"
+  replace:
+  - T: " " # say nothing -- placeholder
+
+- name: default
+  tag: mrow
+  match: "."
+  replace:
+  - insert:
+      nodes: "*"
+      replace: [pause: auto]
+
+- name: default
+  tag: mn
+  match: "."
+  replace:
+  - bookmark: "@id"
+  - x: "translate(., $BlockSeparators, '')"   # remove digit block separators
+
+- name: default
+  tag: [mo, mtext]
+  match: "."
+  replace:
+  - bookmark: "@id"
+  - x: "text()"
+
+- name: default
+  tag: mi
+  match: "."
+  replace:
+  - bookmark: "@id"
+  - test:
+      if: "string-length(.) = 1 and text() != '_'"       # need unicode.tdl to kick in for single letter tokens
+      then: [x: "text()"]
+      else: [x: "translate(., '-_', '  ')" ]   # from intent literals
+
+- name: default
+  tag: ms
+  match: "."
+  replace:
+  - T: "strängen"      # phrase('the string' is long)
+  - pause: short
+  - x: "text()"
+
+- name: default
+  tag: mstyle
+  match: "."
+  replace: [x: "*"]
+
+
+- name: structure-simple
+  # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
+  # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
+  # are never simple, then any 'over' applies only to enclosing "fraction...end fraction" pair.
+  tag: mfrac
+  match:
+  - "(IsNode(*[1],'leaf') and IsNode(*[2],'leaf')) and"
+  - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
+  replace:
+  - x: "*[1]"
+  - T: "genom"               # phrase("the fraction x 'over' y")
+  - x: "*[2]"
+  - pause: short
+
+- name: structure-default
+  tag: mfrac
+  match: "."
+  replace:
+  - T: "start"              # phrase("'start'  fraction x over y end of fraction")
+  - pause: short
+  - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1],'leaf'))"
+      then: [{pause: short}]
+  - T: "genom"               # phrase("the fraction x 'over' y")
+  - test:
+      if: "not(IsNode(*[2],'leaf'))"
+      then: [{pause: short}]
+  - x: "*[2]"
+  - pause: short
+  - T: "slut division"          # phrase("start of fraction x over y 'end over'")
+  - pause: medium
+
+
+# not sure what really should be said for these since we should not assume they are square roots
+- name: structure-default
+  tag: msqrt
+  match: "."
+  replace:
+  - T: "rotsymbolen"
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [T: "ur"]    # phrase("the root 'of' x")
+  - x: "*[1]"
+  - pause: short
+  - test:
+      if: "not(IsNode(*[1],'leaf'))"
+      then: [T: "slut rotsymbol"] # phrase("root of x 'end root symbol'")
+
+# not sure what really should be said for these since we should not assume they are square roots
+- name: structure-default
+  tag: mroot
+  match: "."
+  replace:
+  - T: "rotsymbolen"
+  - T: "med index"      # phrase("the root of x 'with index' 5")
+  - x: "*[1]"
+  # SWEDISH: Check if the order of base and index is correct!
+  - pause: short
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [T: "ur"]   # phrase("the root 'of' x")
+  - x: "*[2]"
+  - pause: short
+  - test:
+      if: "not(IsNode(*[2],'leaf'))"
+      then: [T: "slut rotsymbol"] # phrase("root of x 'end root symbol'")
+
+
+- name: simple-sub
+  tag: particular-value-of
+  # invisible comma -- want "x sub 1 1" without "end sub"
+  match: "count(*)=2 and (IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][text()='⁣']])"
+  replace:
+  - x: "*[1]"
+  - test:
+      if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
+      then: [T: "nedsänkt"]      # phrase(x 'sub' 2)
+  - x: "*[2]"
+
+- name: default
+  tag: particular-value-of
+  match: "count(*)=2"
+  replace:
+  - x: "*[1]"
+  - T: "nedsänkt"               # phrase(x 'sub' 2)
+  - x: "*[2]"
+  - T: "slut nedsänkt"           # phrase(x sub 2 'end of sub')
+  - pause: short
+
+
+- name: structure
+  tag: msub
+  match: "."
+  replace:
+  - x: "*[1]"
+  - T: "nedsänkt"              # phrase(x 'sub' 2)
+  - x: "*[2]"
+
+- name: structure
+  tag: [msup, msubsup]
+  match: "."
+  replace:
+  - x: "*[1]"
+  - test:
+      if: "name(.)='msubsup'"
+      then:
+      - T: "nedsänkt"          # phrase(x 'sub' 2)
+      - x: "*[2]"
+  - test:
+      if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
+      then:  [x: "*[last()]"]
+      else_test:
+          if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"  # FIX: is this test necessary?
+          then:
+          - T: "upphöjt"      # phrase(x 'super' 2)
+          - x: "*[last()]"
+          - test:
+              if: "not(IsNode(*[last()], 'simple'))"
+              then: [T: "slut upphöjt"]      # phrase(x super 2 'end of super')
+          else:
+          - T: "upphöjt till"            # phrase(5 'raised to the' second power equals 25)
+          - x: "*[last()]"
+          # - t: "power"                    # phrase(5 raised to the second 'power' equals 25)
+
+- name: default
+  tag: munder
+  match: "."
+  replace:
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [T: "kommenterat uttryck"]      # phrase(phrase(x 'modified' with y above it)
+  - x: "*[1]"
+  - pause: short
+  - T: "med kommentar under"      # phrase(x 'with' z below it)
+  - pause: short
+  - x: "*[2]"
+  - pause: short
+  - T: "slut kommentar"      # phrase(x with z 'below' it)
+
+- name: diacriticals
+  tag: mover
+  match: "*[1][self::m:mi] and *[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^~→¯_', '')='']"
+  replace:
+  - x: "*[1]"
+  - x: "*[2]"
+
+- name: default
+  tag: mover
+  match: "."
+  replace:
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [T: "kommenterat uttryck"]      # phrase(phrase(x 'modified' with y above it)
+  - x: "*[1]"
+  - pause: short
+  - T: "med kommentar över"         # phrase(x modified 'with' y above it)
+  - pause: short
+  - x: "*[2]"
+  - pause: short
+  - T: "slut kommentar"        # phrase(x modified 'with' y above it)
+
+- name: default
+  tag: munderover
+  match: "."
+  replace:
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [T: "kommenterat uttryck"]      # phrase(the equation has been 'modified')
+  - x: "*[1]"
+  - pause: short
+  - T: "med kommentar under"         # phrase(x modified 'with' y above it)
+  - pause: short
+  - x: "*[2]"
+  - pause: short
+  - T: "och kommentar över"    # phrase(x modified with y 'below and' y above it)
+  - pause: short
+  - x: "*[3]"
+  - pause: short
+  - T: "slut kommentar"        # phrase(x modified with y 'above' it)
+
+- name: default
+  #   Here we support up to 2 prescripts and up to 4 postscripts -- that should cover all reasonable cases
+  #   If there are more, we just dump them out without regard to sup/super :-(
+  # FIX: this could use more special cases 
+  # There is (currently) no way in MathCAT to deal with n-ary arguments other than "all" ('*') or an individual entry ('*[1]').
+  tag: mmultiscripts
+  match: "."
+  variables:
+  # computing the number of postscripts is messy because of <mprescripts> being optionally present -- we use "mod" to get the count right
+  - Prescripts: "m:mprescripts/following-sibling::*"
+  - NumChildren: "count(*)" # need to stash this since the count is wrong inside '*[...]' below
+  - Postscripts: "*[position()>1 and position() < (last() + ($NumChildren mod 2) -count($Prescripts))]"
+  replace:
+  - x: "*[1]"
+  - test:
+      if: "$Prescripts" # more common case
+      then:
+      - with:
+          variables:
+          - PreSubscript: "IFTHENELSE($Verbosity='Verbose', 'nedsänkt', 'nedsänkt')"
+          - PreSuperscript: "IFTHENELSE($Verbosity='Verbose', 'upphöjt', 'upphöjt')"
+          replace:
+          - test: # only bother announcing if there is more than one prescript
+              if: "count($Prescripts) > 2"
+              then:
+              - T: "med"      # phrase(substitute x 'with' y)
+              - x: "count($Prescripts) div 2"
+              - T: "vänster index"      # phrase(in this equation certain 'prescripts' apply)
+              - pause: short
+          - test:
+              if: "not($Prescripts[1][self::m:none])"
+              then:
+              - x: "$PreSubscript"
+              - x: "$Prescripts[1]"
+          - test:
+              if: "not($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none])"
+              then: [T: "och"]      # phrase(10 is greater than 8 'and' less than 15)
+          - test:
+              if: "not($Prescripts[2][self::m:none])"
+              then:
+              - x: "$PreSuperscript"
+              - x: "$Prescripts[2]"
+          - pause: short
+          - test:
+              if: "count($Prescripts) > 2" # more common case
+              then:
+              - test:
+                  if: "not($Prescripts[3][self::m:none])"
+                  then:
+                  - x: "$PreSubscript"
+                  - x: "$Prescripts[3]"
+              - test:
+                  if: "not($Prescripts[3][self::m:none] or $Prescripts[4][self::m:none])"
+                  then: [T: "och"]      # phrase(10 is grater than 8 'and' less than 15)
+              - test:
+                  if: "not($Prescripts[4][self::m:none])"
+                  then:
+                  - x: "$PreSuperscript"
+                  - x: "$Prescripts[4]"
+              - test:
+                  if: "count($Prescripts) > 4" # give up and just dump them out so at least the content is there
+                  then:
+                  - T: "och resterande vänster index"      # phrase(in this case there are values 'and alternating prescripts')
+                  - x: "$Prescripts[position() > 4]"
+                  - T: "slut vänster index"      # phrase(This is where 'end prescripts' occurs)
+  - test:
+      if: "$Postscripts"
+      then:
+      - with:
+          variables:
+          - PostSubscript: "IFTHENELSE($Verbosity='Verbose', 'nedsänkt', 'nedsänkt')"
+          - PostSuperscript: "IFTHENELSE($Verbosity='Verbose', 'upphöjt', 'upphöjt')"
+          replace:
+          - test: # only bother announcing if there is more than one postscript
+              if: "count($Postscripts) > 2"
+              then:
+              - test:
+                  if: "$Prescripts"
+                  then: [T: "och"]      # phrase(10 is greater than 8 'and' less than 15)
+              - T: "med"      # phrase(substitute x 'with' y)
+              - x: "count($Postscripts) div 2"
+              - T: "höger índex"      # phrase(this material includes several 'postscripts')
+              - pause: short
+          - test:
+              if: "not($Postscripts[1][self::m:none])"
+              then:
+              - x: "$PostSubscript"
+              - x: "$Postscripts[1]"
+          - test:
+              if: "not($Postscripts[1][self::m:none] or $Postscripts[2][self::m:none])"
+              then: [T: "och"]      # phrase(10 is greater than 8 'and' less than 15)
+          - test:
+              if: "not($Postscripts[2][self::m:none])"
+              then:
+              - x: "$PostSuperscript"
+              - x: "$Postscripts[2]"
+          - test:
+              if: "count($Postscripts) > 2"
+              then:
+              - test:
+                  if: "not($Postscripts[3][self::m:none])"
+                  then:
+                  - x: "$PostSubscript"
+                  - x: "$Postscripts[3]"
+              - test:
+                  if: "not($Postscripts[3][self::m:none] or $Postscripts[4][self::m:none])"
+                  then: [T: "och"]      # phrase(10 is greater than 8 'and' less than 15)
+              - test:
+                  if: "not($Postscripts[4][self::m:none])"
+                  then:
+                  - x: "$PostSuperscript"
+                  - x: "$Postscripts[4]"
+              - test:
+                  if: "count($Postscripts) > 4"
+                  then:
+                  - test:
+                      if: "not($Postscripts[5][self::m:none])"
+                      then:
+                      - x: "$PostSubscript"
+                      - x: "$Postscripts[5]"
+                  - test:
+                      if: "not($Postscripts[5][self::m:none] or $Postscripts[6][self::m:none])"
+                      then: [T: "och"]      # phrase(10 is greater than 8 'and' less than 15)
+                  - test:
+                      if: "not($Postscripts[6][self::m:none])"
+                      then:
+                      - x: "$PostSuperscript"
+                      - x: "$Postscripts[6]"
+                  - test:
+                      if: "count($Postscripts) > 6"
+                      then:
+                      - test:
+                          if: "not($Postscripts[7][self::m:none])"
+                          then:
+                          - x: "$PostSubscript"
+                          - x: "$Postscripts[7]"
+                      - test:
+                          if: "not($Postscripts[7][self::m:none] or $Postscripts[8][self::m:none])"
+                          then: [T: "och"]      # phrase(10 is less than 15 'and' greater than 5)
+                      - test:
+                          if: "not($Postscripts[8][self::m:none])"
+                          then:
+                          - x: "$PostSuperscript"
+                          - x: "$Postscripts[8]"
+                      - test:
+                          if: "count($Postscripts) > 8" # give up and just dump them out so at least the content is there
+                          then:
+                          - T: "och resterande höger index"      # phrase(this situation involves complexities 'and alternating scripts')
+                          - x: "$Postscripts[position() > 8]"
+                          - T: "slut index"      # phrase(At this point 'end scripts' occurs)
+
+- name: default
+  tag: mtable
+  variables: [IsColumnSilent: false()]
+  match: "."
+  replace:
+  - T: "tabell med"      # phrase(the 'table with' 3 rows)
+  - x: count(*)
+  - test:
+      if: count(*)=1
+      then: [T: "rad"]      # phrase(the table with 1 'row')
+      else: [T: "rader"]      # phrase(the table with 3 'rows')
+  - T: "och"      # phrase(the table with 3 rows 'and' 4 columns)
+  - x: "count(*[1]/*)"
+  - test:
+      if: "count(*[1]/*)=1"
+      then: [T: "kolumn"]      # phrase(the table with 3 rows and 1 'column')
+      else: [T: "kolumner"]      # phrase(the table with 3 rows and 4 'columns')
+  - pause: long
+  - x: "*"
+
+- name: default
+  # callers/context should do that.
+  # this may get called from navigation -- in that case, there is no context to speak the row #, so don't do it
+  tag: [mtr, mlabeledtr]
+  match: "."
+  replace:
+  - T: "rad"      # phrase(the first 'row' of a matrix)
+  - x: "count(preceding-sibling::*)+1"
+  - test:
+      if: .[self::m:mlabeledtr]
+      then:
+      - T: "med etiketten"      # phrase(the line 'with label' first equation)
+      - x: "*[1]/*"
+      - pause: short
+  - pause: medium
+  - test:
+      if: .[self::m:mlabeledtr]
+      then: [{x: "*[position()>1]"}]
+      else: {x: "*"}
+
+- name: default
+  tag: mtd
+  match: "."
+  replace:
+  - test:
+      #  ClearSpeak normally speaks "column 1" even though it says the row number, which is a waste...
+      #  The following is commented out but the count(...)!=0 probably belongs in other rule sets
+      #   if: not($IsColumnSilent) and ($ClearSpeak_Matrix = 'SpeakColNum' or count(preceding-sibling::*) != 0)
+      if: "not($IsColumnSilent)"
+      then:
+      - T: "kolumn"      # phrase(the first 'column' of the matrix)
+      - x: "count(preceding-sibling::*)+1"
+      - pause: medium
+  - x: "*"
+  - test:
+    # short pause after each element; medium pause if last element in a row; long pause for last element in matrix
+    - if: count(following-sibling::*) > 0
+      then: {pause: short}
+    - else_if: count(../following-sibling::*) > 0
+      then: {pause: medium}
+      else: {pause: long}
+
+
+- name: empty-box
+  # The ordering below is the order in which words come out when there is more than one value
+  # Note: @notation can contain more than one value
+  tag: menclose
+  match: "@notation='box' and *[self::m:mtext and text()=' ']"
+  replace:
+  - T: "tom ruta"      # phrase(the 'empty box' contains no values)
+  # SWEDISH: Find a better translation than "ruta".
+
+- name: default
+  # The ordering below is the order in which words come out when there is more than one value
+  # Note: @notation can contain more than one value
+  tag: menclose
+  match: "."
+  replace:
+  - test:
+      if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
+      then: [T: "box", pause: short]      # phrase(the 'box' around the expression)
+  - test:
+      if: ".[contains(@notation,'roundedbox')]"
+      then: [T: "rundad box", pause: short]      # phrase(the 'round box' around the expression)
+  - test:
+      if: ".[contains(@notation,'circle')]"
+      then: [T: "cirkel", pause: short]      # phrase(the 'circle' around the expression)
+  - test:
+      if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or contains(concat(' ', normalize-space(@notation), ' '), ' right ') or contains(@notation,'top') or contains(@notation,'bottom') ]"
+      then:
+      - T: "linje"      # phrase(draw a straight 'line' on the page)
+      - test:
+          if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
+          then: [T: "vänster", pause: short]      # phrase(line on 'left' of the expression)
+      - test:
+          if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"
+          then: [T: "höger", pause: short]      # phrase(line on 'right' of the expression)
+      - test:
+          if: ".[contains(@notation,'top')]"
+          then: [T: "ovanför", pause: short]      # phrase(line on 'top' of the expression)
+      - test:
+          if: ".[contains(@notation,'bottom')]"
+          then: [T: "under", pause: short]      # phrase(line on the 'bottom' of the expression)
+  - test:
+      if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
+      then:
+      - test:
+          if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
+          then: [T: "kryss", pause: short] # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+          else:
+          - test:
+              if: ".[contains(@notation,'updiagonalstrike')]"
+              then: [T: "diagonal uppåt", pause: short]      # phrase(the line runs 'up diagonal')
+          - test:
+              if: ".[contains(@notation,'downdiagonalstrike')]"
+              then: [T: "diagonal nedåt", pause: short]      # phrase(the line runs 'down diagonal')
+      - test:
+          if: ".[contains(@notation,'verticalstrike')]"
+          then: [T: "vertikal", pause: short]      # phrase(the line is  'vertical')
+      - test:
+          if: ".[contains(@notation,'horizontalstrike')]"
+          then: [T: "horisontell", pause: short]      # phrase(the line is 'horizontal')
+      - T: "överstrykning"      # phrase(please 'cross out' the incorrect answer)
+      - pause: short
+  - test:
+      if: ".[contains(@notation,'uparrow')]"
+      then: [T: "uppåt-pil", pause: short]      # phrase(direction is shown by the 'up arrow')
+  - test:
+      if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
+      then: [T: "nedåt-pil", pause: short]      # phrase(the trend is shown by the 'down arrow')
+  - test:
+      if: ".[contains(@notation,'leftarrow')]"
+      then: [T: "vänster-pil", pause: short]      # phrase(the 'left arrow' indicates going back)
+  - test:
+      if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
+      then: [T: "höger-pil", pause: short]      # phrase(the 'right arrow' indicates moving forward)
+  - test:
+      if: ".[contains(@notation,'northeastarrow')]"
+      then: [T: "nordost-pil", pause: short]      # phrase(direction is indicated by the 'northeast arrow')
+  - test:
+      if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
+      then: [T: "sydost-pil", pause: short]      # phrase(direction is shown by the 'southeast arrow')
+  - test:
+      if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
+      then: [T: "sydväst-pil", pause: short]      # phrase(direction is shown by the 'southwest arrow')
+  - test:
+      if: ".[contains(@notation,'northwestarrow')]"
+      then: [T: "nordväst-pil", pause: short]      # phrase(direction is shown by the 'northwest arrow')
+  - test:
+      if: ".[contains(@notation,'updownarrow')]"
+      then: [T: "dubbelriktad vertikal pil", pause: short]      # phrase(upward movement is indicated by the 'double ended vertical arrow')
+  - test:
+      if: ".[contains(@notation,'leftrightarrow')]"
+      then: [T: "dubbelriktad horisontell pil", pause: short]      # phrase(progress is indicated by the 'double ended horizontal arrow')
+  - test:
+      if: ".[contains(@notation,'northeastsouthwestarrow')]"
+      then: [T: "dubbelriktad diagonal uppåtpil", pause: short]      # phrase(trend is indicated by the 'double ended up diagonal arrow')
+  - test:
+      if: ".[contains(@notation,'northwestsoutheastarrow')]"
+      then: [T: "dubbelriktad diagonal nedåtpil", pause: short]      # phrase(trend is indicated by the 'double ended down diagonal arrow')
+  - test:
+      if: ".[contains(@notation,'actuarial')]"
+      then: [T: "aktuariell symbol", pause: short]      # phrase(the 'actuarial symbol' represents a specific quantity)
+  - test:
+      if: ".[contains(@notation,'madrub')]"
+      then: [T: "arabisk fakultet", pause: short]      # phrase(the 'arabic factorial symbol' represents a factorial operation)
+  - test:
+      if: ".[contains(@notation,'phasorangle')]"
+      then: [T: "fasorvinkel", pause: short]      # phrase(the 'phasor angle' is used to measure electrical current)
+  - test:
+      if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']" # default
+      then: [T: "lång division", pause: short]      # phrase(the 'long division symbol' indicates  a long division calculation)
+  - test:
+      if: ".[contains(@notation,'radical')]"
+      then: [T: "kvadratrot", pause: short]      # phrase(5 is the 'square root' of 25)
+  - T: "omsluter"      # phrase(parentheses are 'enclosing' part of the equation)
+  - test:
+      if: "*[self::m:mtext and text()=' ']"
+      then: [T: "blanksteg"]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)   # SWEDISH: is this reasonable?
+      else: [x: "*"]
+  - test:
+      if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
+      then: [pause: short, T: "slut omslutning"]      # phrase(reached the 'end enclosure' point)
+  - pause: short
+
+- name: semantics
+  tag: "semantics"
+  match: "*[@encoding='MathML-Presentation']"
+  replace:
+  - x: "*[@encoding='MathML-Presentation']/*[1]"
+
+- name: semantics-default
+  tag: "semantics"
+  match: .
+  replace:
+  - x: "*[1]"
+
+- name: apply-function
+  tag: "apply-function"
+  match: .
+  replace:
+  - x: "*[1]"
+  - T: "tillämpad på"      # phrase(the function sine 'applied to' x plus y)
+  - x: "*[2]"
+
+
+# Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
+- name: silent-intent
+  # uncaught intent -- speak as arg1 arg2 ....
+  tag: "*"
+  match: "contains(@data-intent-property, ':silent:') and count(*)>0"
+  replace:
+  - x: "*"
+
+- name: prefix-intent
+  # uncaught intent -- speak as arg1 arg2 ....
+  tag: "*"
+  match: "contains(@data-intent-property, ':prefix:') and count(*)>0"
+  replace:
+  - x: "translate(name(.), '-_', '  ')"
+  - x: "*"
+  - pause: short
+
+- name: postfix-intent
+  # uncaught intent -- speak as arg1 arg2 ....
+  tag: "*"
+  match: "contains(@data-intent-property, ':postfix:') and count(*)>0"
+  replace:
+  - pause: short
+  - x: "*"
+  - x: "translate(name(.), '-_', '  ')"
+
+
+- name: infix-intent
+  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  tag: "*"
+  match: "contains(@data-intent-property, ':infix:') and count(*)>0"
+  replace:
+  - pause: short
+  - insert:
+      nodes: "*"
+      replace: [x: "translate(name(.), '-_', '  ')", pause: auto]
+  - pause: short
+
+
+- name: function-intent
+  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  tag: "*"
+  match: count(*)>0
+  replace:
+  - x: "translate(name(.), '-_', '  ')"
+  - T: "av"      # phrase(sine 'of' 5)
+  - pause: short
+  - insert:
+      nodes: "*"
+      replace: [T: "", pause: short]      # phrase(f of x 'comma' y)
+      # SWEDISH: After correspondance with a mathematician we have decided to not have any punctuation between variables, but a short pause. Length of pause needs to be tested.
+
+- name: default-text
+  # unknown leaf -- just speak the text -- could be a literal intent
+  tag: "*"
+  match: "."
+  replace:
+  - x: "translate(name(), '-_', ' ')"

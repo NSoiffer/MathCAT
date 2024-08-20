@@ -185,6 +185,22 @@
   - t: "positive"      # phrase(multiplying two negatives results in a 'positive' number)
   - x: "*[1]"
 
+- name: minus
+  tag: minus
+  match: "count(*)=1 and not(@data-intent-property)"
+  replace:
+  - bookmark: "./@id"
+  - t: "minus"      # phrase('negative' numbers are those less than 0)
+  - x: "*[1]"
+
+- name: plus
+  tag: plus
+  match: "count(*)=1 and not(@data-intent-property)"
+  replace:
+  - bookmark: "./@id"
+  - t: "plus"      # phrase(multiplying two negatives results in a 'positive' number)
+  - x: "*[1]"
+
 - name: subscript
   tag: sub
   match: "count(*)=2 and not(@data-intent-property)"
@@ -522,18 +538,18 @@
 - name: multi-line
   #   that eliminates the need for the if: else_if: ...
   # IDEA:  set a variable with the word to say for the row (e.g., RowLabel = Row/Case/Line/...)
-  tag: [cases, equations, lines]
+  tag: [piecewise, system-of-equations, lines]
   match: "."
   variables:
     # Wikipedia has some tables where all the entire first column is empty (e.g., https://en.wikipedia.org/wiki/List_of_trigonometric_identities)
-  - LineCountTry: "count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']])"
-  - LineCount: "IfThenElse($LineCountTry=0, count(*/*[1]), $LineCountTry)"
+  - LineCount: "count(*[not(contains(@data-intent-property, ':continued-row:'))])"
+  - NextLineIsContinuedRow: "false()"   # default value
   replace:
   - x: "$LineCount"
   - test:
-    - if: "self::m:cases"
+    - if: "self::m:piecewise"
       then: [t: "case"]      # phrase(this is the first 'case' of three cases)
-    - else_if: "self::m:equations"
+    - else_if: "self::m:system-of-equations"
       then: [t: "equation"]      # phrase(this is the first 'equation' of three equations)
       else: [t: "line"]      # phrase(this is the first 'line' of three lines)
   - test:
@@ -541,33 +557,33 @@
       then: [ct: "s"] # plural
   - pause: short
   - x: "*"
+  - pause: long
+
 
 - name: default-multiline
   tag: [mtr, mlabeledtr]
-  match: "parent::m:cases or parent::m:equations or parent::m:lines"
+  match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
+  variables: [NextLineIsContinuedRow: "following-sibling::*[1][contains(@data-intent-property, ':continued-row:')]"]
   replace:
   - test:
-      if: "parent::m:equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
-           count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']]) != 0"
+      if: "not($LineCount=1 or contains(@data-intent-property, ':continued-row:'))"
       then:
-      - t: "next line"
-      else_test:
-        if: "$LineCount != 1"
-        then:
-        - test:
-          - if: "parent::m:cases"
-            then: [t: "case"]     # phrase('case' 1 of 10 cases)
-          - else_if: "parent::m:equations"
-            then: [t: "equation"] # phrase('equation' 1 of 10 equations)
-            else: [t: "line"]     # phrase('line 1 of 10 lines)
-        - x: "count(preceding-sibling::*)+1"
+      - test:
+        - if: "parent::m:piecewise"
+          then: [t: "case"]     # phrase('case' 1 of 10 cases)
+        - else_if: "parent::m:system-of-equations"
+          then: [t: "equation"] # phrase('equation' 1 of 10 equations)
+          else: [t: "line"]     # phrase('line 1 of 10 lines)
+      - x: "count(preceding-sibling::*[not(contains(@data-intent-property, ':continued-row:'))]) + 1"
 
   - test:
       if: .[self::m:mlabeledtr]
       then:
       - t: "with label"      # phrase(the diagram is complete 'with label')
       - x: "*[1]/*"
-  - pause: medium
+  - test:
+      if: "not(contains(@data-intent-property, ':continued-row:'))"
+      then: [pause: medium]
   - test:
       if: .[self::m:mlabeledtr]
       then: [x: "*[position()>1]"]
@@ -575,23 +591,28 @@
 
 - name: default-multiline
   tag: mtd
-  match: "parent::*[parent::m:cases or parent::m:equations or parent::m:lines]"
+  match: "parent::*[parent::m:piecewise or parent::m:system-of-equations or parent::m:lines]"
   variables: [LongPause: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultiLinePausesBetweenColumns = 'Long'"]
   replace:
-  - x: "*"
   - test:
-    # short pause after each element; medium pause if last element in a row; long pause for last element in matrix unless ClearSpeak override
-    - if: "count(following-sibling::*) > 0"
+      if: "IsInDefinition(*[1], 'ComparisonOperators')"
+      then: [pause: short]
+  - test:
+      if: "*[1][@data-added!='missing-content']"
+      then: [x: " *"]
+  - test:
+    # no pause after each element; medium pause if last element in a row; long pause for last element in matrix unless ClearSpeak override
+    - if: "count(following-sibling::*) = 0 and not($NextLineIsContinuedRow)"
       then_test:
-        if: "$LongPause"
-        then: [pause: medium]
-        else: [pause: short]
-    - else_if: "count(../following-sibling::*) > 0"
-      then_test:
-        if: "$LongPause"
-        then: [pause: long]
-        else: [pause: medium]
-      else: [pause: long]
+          if: "count(../following-sibling::*) > 0"
+          then_test:
+              if: "$LongPause"
+              then: [pause: long]
+              else: [pause: medium]
+      else_test:
+          if: "IsInDefinition(*[1], 'ComparisonOperators')"
+          then: [pause: short]
+          else: [pause: auto]
 
 # Matrix/Determinant rules
 # matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
@@ -761,7 +782,6 @@
           else: [t: "matrix"]      # phrase(the 2 by 2 'matrix's)
 
 - name: chemistry-msub
-
   tag: [chemical-formula]
   match: "*[1][text()='msub']"
   replace:
@@ -773,6 +793,14 @@
         if: "$Verbosity='Medium'"
         then: [t: "sub"]      # phrase(H 'sub' 2)
   - x: "*[3]"
+
+- name: dimension-by
+  tag: mrow
+  match: dimension-product
+  replace:
+  - insert:
+      nodes: "*"
+      replace: [t: "by", pause: auto]      # phrase(3 'by' 5 matrix)
 
 - name: chemistry-msup
   tag: [chemical-formula]
@@ -1020,7 +1048,7 @@
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
   - test:
-    - if: "DEBUG(.)='→' or .='⟶'"
+    - if: ".='→' or .='⟶'"
       then_test:
         if: "$Verbosity='Terse'"
         then: [t: "forms"]      # phrase(hydrogen and oxygen 'forms' water )

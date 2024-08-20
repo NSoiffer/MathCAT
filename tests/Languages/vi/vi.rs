@@ -143,7 +143,6 @@ fn ethylene_with_colon_bond() {
 
 #[test]
 fn mhchem_roman_in_superscript() {
-  init_logger();
   let expr = " <math>
       <mrow>
         <mmultiscripts>
