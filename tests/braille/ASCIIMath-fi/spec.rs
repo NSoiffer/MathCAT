@@ -780,6 +780,12 @@ fn p27_quadratic_formula() {
 }
 
 #[test]
+fn p27_chem_atom_notation() {
+    let expr = r#"<math><mmultiscripts><mi>O</mi><mprescripts/><mn>8</mn><mn>16</mn></mmultiscripts></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"_8^16O");
+}
+
+#[test]
 fn augenbit1_6_11() {
     // this is a slightly cleaned up version that comes for the original example (via MathJax)
     let expr = r#" <math> <mrow>
