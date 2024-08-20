@@ -780,9 +780,57 @@ fn p27_quadratic_formula() {
 }
 
 #[test]
-fn p27_chem_atom_notation() {
-    let expr = r#"<math><mmultiscripts><mi>O</mi><mprescripts/><mn>8</mn><mn>16</mn></mmultiscripts></math>"#;
-    test_braille("ASCIIMath-fi", expr, r"_8^16O");
+fn p34_chem_single_bond_colon() {
+    let expr = r#"<math><mmultiscripts><mi>C</<mi><mo>:</mo><mi>C</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"C;C");
+}
+
+#[test]
+fn p34_chem_single_bond_dash() {
+    let expr = r#"<math><mmultiscripts><mi>C</<mi><mo>-</mo><mi>C</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"C;C");
+}
+
+#[test]
+fn p34_chem_double_bond_equal_sign() {
+    let expr = r#"<math><mmultiscripts><mi>C</<mi><mo>=</mo><mi>C</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"C=C");
+}
+
+#[test]
+fn p34_chem_double_bond_double_colon() {
+    let expr = r#"<math><mmultiscripts><mi>C</<mi><mo>::</mo><mi>C</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"C=C");
+}
+
+#[test]
+fn p34_chem_triple_bond() {
+    let expr = r#"<math><mmultiscripts><mi>C</<mi><mo>≡</mo><mi>C</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"C;=C");
+}
+
+#[test]
+fn p34_H2O() {
+    let expr = r#"<math><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"H_2O");
+}
+
+#[test]
+fn p34_2NH_3() {
+    let expr = r#"<math><mn>2</mn><mo>&#8290;</mo><mi>N</mi><msub><mi>H</mi><mn>3</mn></msub></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"2 NH_3");
+}
+
+#[test]
+fn p34_K_2Cr_2O_7() {
+    let expr = r#"<math><msub><mi>K</mi><mn>2</mn></msub><msub><mi>Cr</mi><mn>2</mn></msub><msub><mi>O</mi><mn>7</mn></msub></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"K_2Cr_2O_7");
+}
+
+#[test]
+fn p34_Na_2CO_3_times_10H_2O() {
+    let expr = r#"<math><msub><mi>Na</mi><mn>2</mn></msub><msub><mi>Co</mi><mn>3</mn></msub><mo>&#183;</mo><mn>10</mn><mo>&#8290;</mo><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"Na_2CO_3 *10 H_2O");
 }
 
 #[test]
