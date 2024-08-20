@@ -834,6 +834,19 @@ fn p34_Na_2CO_3_times_10H_2O() {
 }
 
 #[test]
+fn p34_Na_plus() {
+    // Is + a variable or operator here? I would say a variable.
+    let expr = r#"<math><msup><mi>Na</mi><mi>+</mi></msup></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"Na^+");
+}
+
+#[test]
+fn p34_Na_plus() {
+    let expr = r#"<math><msup><mi>Cu</mi><mrow><mn>2<mi>+</mi></mrow></msup></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"Cu^(2 +)");
+}
+
+#[test]
 fn augenbit1_6_11() {
     // this is a slightly cleaned up version that comes for the original example (via MathJax)
     let expr = r#" <math> <mrow>
