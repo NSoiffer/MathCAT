@@ -47,7 +47,10 @@
       - else_if: "*[2][text()='3']"
         then: [{T: "kuutiojuuri"}]        # phrase(the 'cube root' of x)
       - else_if: "*[2][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
-        then: [{x: "ToOrdinal(*[2])"}, {T: "juuri"}]        # phrase(the square 'root' of x)
+        then_test:
+            if: "*[2][.<=20]"
+            then: [{x: "ToOrdinal(*[2])"}, {T: "juuri"}]      # phrase(the square 'root' of 25)
+            else: [{x: "*[2]"}, {T: "juuri"}]      # phrase(the square 'root' of 25)
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
