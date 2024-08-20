@@ -487,6 +487,299 @@ fn p26_partial_derivatives () {
 }
 
 #[test]
+fn p26_gradient () {
+    let expr = r#"<math><mi>&#8711;</mi><mi>f</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"grad f");
+}
+
+#[test]
+fn p26_gradients_with_space () {
+    let expr = r#"<math><mi>&#8711;</mi><mi>f</mi><mi>&#8711;</mi><mi>g</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"grad f grad g");
+}
+
+#[test]
+fn p26_inverse_function () {
+    let expr = r#"<math>
+  <mrow>
+    <msup>
+      <mi>f</mi>
+      <mrow>
+        <mo>−</mo>
+        <mn>1</mn>
+      </mrow>
+    </msup>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mo>{</mo>
+    <mo>(</mo>
+    <mi>y</mi>
+    <mo>,</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+    <mo>∈</mo>
+  </mrow>
+  <mrow>
+    <mi>B</mi>
+    <mo>×</mo>
+  </mrow>
+  <mrow>
+    <mi>A</mi>
+    <mi>|</mi>
+    <mi>y</mi>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mi>f</mi>
+    <mo>(</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+    <mo>}</mo>
+  </mrow>
+</math>"#;
+    test_braille("ASCIIMath-fi", expr, r"f^-1 ={(y, x) in (B xx A) | y =f(x)}");
+}
+
+#[test]
+fn p26_lg() {
+    let expr = r#"<math>
+    <mi>lg</mi>
+    <mo>&#8289;</mo>
+    <mo>(</mo>
+    <mn>5</mn>
+    <mo>&#8290;</mo>
+    <mi>a</mi>
+    <mo>)</mo>
+    <mo>=</mo>
+    <mi>lg</mi>
+    <mo>&#8289;</mo>
+    <mi>a</mi>
+    <mo>+</mo>
+    <mi>lg</mi>
+    <mo>&#8289;</mo>
+    <mn>5</mn>
+</math>"#;
+    test_braille("ASCIIMath-fi", expr, r"lg (5 a) =lg a +lg 5");
+}
+
+#[test]
+fn p26_log_additional() {
+    let expr = r#"<math>
+    <mi>log</mi>
+    <mo>&#8289;</mo>
+    <mo>(</mo>
+    <mn>5</mn>
+    <mo>&#8290;</mo>
+    <mi>a</mi>
+    <mo>)</mo>
+    <mo>=</mo>
+    <mi>log</mi>
+    <mo>&#8289;</mo>
+    <mi>a</mi>
+    <mo>+</mo>
+    <mi>log</mi>
+    <mo>&#8289;</mo>
+    <mn>5</mn>
+</math>"#;
+    test_braille("ASCIIMath-fi", expr, r"log (5 a) =log a +log 5");
+}
+
+#[test]
+fn p26_limit_from_positive_side() {
+    let expr = r#"<math>
+  <mrow>
+    <msub>
+      <mi>lim</mi>
+      <mrow>
+        <mi>x</mi>
+        <mo>→</mo>
+        <msup>
+          <mn>0</mn>
+          <mo>+</mo>
+        </msup>
+      </mrow>
+    </msub>
+  </mrow>
+  <mrow>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mi>f</mi>
+    <mo>(</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+  </mrow>
+</math>"#;
+    test_braille("ASCIIMath-fi", expr, r"lim_(x -> 0 +) f(x)");
+}
+
+#[test]
+fn p26_limit_of_fractional() {
+    let expr = r#"<math>
+  <mrow>
+    <msub>
+      <mi>lim</mi>
+      <mrow>
+        <mi>x</mi>
+        <mo>→</mo>
+        <mn>1</mn>
+      </mrow>
+    </msub>
+  </mrow>
+  <mrow>
+    <mfrac>
+      <mrow>
+        <msup>
+          <mi>x</mi>
+          <mn>4</mn>
+        </msup>
+        <mo>−</mo>
+        <mi>x</mi>
+      </mrow>
+      <mrow>
+        <msup>
+          <mi>x</mi>
+          <mn>4</mn>
+        </msup>
+        <mo>−</mo>
+        <mn>1</mn>
+      </mrow>
+    </mfrac>
+  </mrow>
+</math>"#;
+    test_braille("ASCIIMath-fi", expr, r"lim_(x -> 1) [(x^4 -x) /(x^4 -1)]");
+}
+
+#[test]
+fn p26_simple_integral() {
+    // Should the integrals 'dx' be in one <mi> or two?
+    let expr = r#"<math>
+  <mrow>
+    <mo>∫</mo>
+    <msup>
+      <mi>x</mi>
+      <mn>2</mn>
+    </msup>
+    <mi>dx</mi>
+  </mrow>
+</math>"#;
+    test_braille("ASCIIMath-fi", expr, r"int x^2 dx");
+}
+
+#[test]
+fn p26_integral_with_bounds() {
+    let expr = r#"<math>
+  <mrow>
+    <msubsup>
+      <mo>∫</mo>
+      <mi>π</mi>
+      <mrow>
+        <mn>2</mn>
+        <mo>&#8290;</mo>
+        <mi>π</mi>
+      </mrow>
+    </msubsup>
+    <msup>
+      <mi>tan</mi>
+      <mn>2</mn>
+    </msup>
+  </mrow>
+  <mo>&#8289;</mo>
+    <mi>x</mi>
+    <mi>dx</mi>
+</math>"#;
+    test_braille("ASCIIMath-fi", expr, r"int x^2 dx");
+}
+
+#[test]
+fn p26_sum() {
+    let expr = r#"<math>
+  <mrow>
+    <msubsup>
+      <mo>∑</mo>
+      <mrow>
+        <mi>i</mi>
+        <mo>=</mo>
+        <mn>0</mn>
+      </mrow>
+      <mi>n</mi>
+    </msubsup>
+    <mo>(</mo>
+    <msub>
+      <mi>f</mi>
+      <mi>i</mi>
+    </msub>
+    <mo>&#8290;</mo>
+    <msub>
+      <mi>x</mi>
+      <mi>i</mi>
+    </msub>
+    <mo>)</mo>
+  </mrow>
+</math>"#;
+    test_braille("ASCIIMath-fi", expr, r"int x^2 dx");
+}
+
+#[test]
+fn p26_sequence() {
+    let expr = r#"<math>
+  <mrow>
+    <mo>(</mo>
+    <msub>
+      <mi>x</mi>
+      <mi>n</mi>
+    </msub>
+    <msubsup>
+      <mo>)</mo>
+      <mrow>
+        <mi>n</mi>
+        <mo>=</mo>
+        <mn>1</mn>
+      </mrow>
+      <mi>∞</mi>
+    </msubsup>
+  </mrow>
+</math>"#;
+    test_braille("ASCIIMath-fi", expr, r"(x_n)_(n =1)^oo");
+}
+
+#[test]
+fn p27_follows_normal_distribution() {
+    let expr = r#"<math>
+  <mrow>
+    <mi>p</mi>
+    <mo>~</mo>
+    <mi>N</mi>
+    <mo>(</mo>
+    <mn>58</mn>
+    <mo>,</mo>
+    <mn>2</mn>
+    <mo>)</mo>
+  </mrow>
+</math>"#;
+    test_braille("ASCIIMath-fi", expr, r"p ~ N(58, 2)");
+}
+
+#[test]
+fn p27_quadratic_formula() {
+    let expr = r#"<math>
+        <mi>x</mi>
+        <mo>=</mo>
+        <mfrac>
+        <mrow>
+            <mo>-</mo>
+            <mi>b</mi>
+            <mo>&#xB1;</mo>
+            <msqrt><mrow><msup><mi>b</mi><mn>2</mn></msup><mo>-</mo><mn>4</mn><mi>a</mi><mi>c</mi></mrow></msqrt>
+        </mrow>
+        <mrow><mn>2</mn><mi>a</mi></mrow>
+        </mfrac>
+    </math>"#;
+    test_braille("ASCIIMath-fi", expr, r"x =(-b +-sqrt(b^2 -4 a c)) /(2 a)");
+}
+
+#[test]
 fn augenbit1_6_11() {
     // this is a slightly cleaned up version that comes for the original example (via MathJax)
     let expr = r#" <math> <mrow>
