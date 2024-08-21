@@ -214,6 +214,21 @@
           if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
           then: [pause: short]
 
+- name: integral-both
+  tag: large-op
+  replace:
+  - x: "*[1]"
+  - pause: short
+  - T: "alaraja"
+  - x: "*[2]"
+  - pause: short
+  - T: "yläraja"      # phrase(adding 6 'to' 6 equals  12)
+  - x: "*[3]"
+  - test:
+      if: "following-sibling::*"
+      then:
+        pause: medium
+
 - name: bigop-both # FI: there should be separate rule for integrals, since in Finnish we can talk about sub and sup of integral
   tag: large-op
   match: "count(*) = 3"
@@ -250,22 +265,6 @@
       # then: [{T: ""}]      # phrase(the square root 'of' 25 equals 5)
       then:
         pause: short # FI: added for Finnish, needs a test
-
-- name: integral-both
-  tag: large-op
-  match: "count(*)=3 and *[1][.='∫']"
-  replace:
-  - x: "*[1]"
-  - pause: short
-  - T: "alaraja"
-  - x: "*[2]"
-  - pause: short
-  - T: "yläraja"      # phrase(adding 6 'to' 6 equals  12)
-  - x: "*[3]"
-  - test:
-      if: "following-sibling::*"
-      then:
-        pause: medium
 
 
 - name: largeop
