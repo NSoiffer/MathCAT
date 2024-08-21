@@ -220,17 +220,17 @@
   replace:
   - x: "*[1]"
   - pause: short
-  - T: "alaraja"
+  - T: "alaraja" # FI: integral 'lower bound' upper bound function f(x) 
   - x: "*[2]"
   - pause: short
-  - T: "yläraja"      # phrase(adding 6 'to' 6 equals  12)
+  - T: "yläraja" # FI: integral lower bound 'upper bound' function f(x) 
   - x: "*[3]"
   - test:
       if: "following-sibling::*"
       then:
         pause: medium
 
-- name: bigop-both # FI: there should be separate rule for integrals, since in Finnish we can talk about sub and sup of integral
+- name: bigop-both
   tag: large-op
   match: "count(*) = 3"
   replace:
@@ -249,7 +249,7 @@
       if: "following-sibling::*"
       # then: [{T: ""}]      # phrase(the square root 'of' 25 equals 5)
       then:
-        pause: medium # FI: added for Finnish, needs a test
+        pause: medium
 
 - name: bigop-under
   tag: large-op
