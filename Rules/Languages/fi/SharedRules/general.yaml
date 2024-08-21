@@ -251,6 +251,23 @@
       then:
         pause: short # FI: added for Finnish, needs a test
 
+- name: integral-both
+  tag: large-op
+  match: "count(*)=3 and *[1][.='∫']"
+  replace:
+  - x: "*[1]"
+  - pause: short
+  - T: "alaraja"
+  - x: "*[2]"
+  - pause: short
+  - T: "yläraja"      # phrase(adding 6 'to' 6 equals  12)
+  - x: "*[3]"
+  - test:
+      if: "following-sibling::*"
+      then:
+        pause: medium
+
+
 - name: largeop
   tag: mrow
   match: "count(*)=2 and IsInDefinition(*[1], 'LargeOperators')"
@@ -261,6 +278,8 @@
   - x: "*[1]"
   - T: ""     # phrase(the square root 'of' 25 equals 5)
   - x: "*[2]"
+
+
 
 - name: limit
   tag: limit
