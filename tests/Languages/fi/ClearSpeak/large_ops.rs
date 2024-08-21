@@ -173,7 +173,7 @@ fn integral_both() {
             </mrow>
             <mtext>&#x2009;</mtext><mi>d</mi><mi>x</mi>
         </math>";
-    test("fi", "ClearSpeak", expr, "integraali käy, luvusta 0, lukuun 1; f arvolla x; d x");
+    test("fi", "ClearSpeak", expr, "integraali, alaraja 0, yläraja 1; f arvolla x; d x");
 }
 
 #[test]

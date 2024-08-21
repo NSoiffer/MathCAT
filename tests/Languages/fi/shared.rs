@@ -1129,8 +1129,8 @@ let expr = "<math>
   </mrow>
 </mrow>
 </math>";
-test("fi", "ClearSpeak", expr, "integraali käy, luvusta a, lukuun b; f arvolla x, d x; on likimäärin yhtä suuri kuin; h per 3 kertaa; auki sulku; f arvolla, auki sulku x ala 0 kiinni sulku; plus, 4, f arvolla, auki sulku x ala 1 kiinni sulku; plus, 2, f arvolla, auki sulku x ala 2 kiinni sulku; plus, 4, f arvolla, auki sulku x ala 3 kiinni sulku; plus piste piste piste plus; 4; f arvolla; auki sulku, x ala n miinus 1 loppu ala; kiinni sulku; plus, f arvolla, auki sulku x ala n kiinni sulku; kiinni sulku");
-test("fi", "SimpleSpeak", expr, "integraali käy, luvusta a, lukuun b; f arvolla x, d x; on likimäärin yhtä suuri kuin; h per 3, kertaa; auki sulku; f arvolla, auki sulku x ala 0 kiinni sulku; plus, 4, f arvolla, auki sulku x ala 1 kiinni sulku; plus, 2, f arvolla, auki sulku x ala 2 kiinni sulku; plus, 4, f arvolla, auki sulku x ala 3 kiinni sulku; plus piste piste piste plus; 4; f arvolla; auki sulku, x ala n miinus 1 loppu ala; kiinni sulku; plus, f arvolla, auki sulku x ala n kiinni sulku; kiinni sulku");
+test("fi", "ClearSpeak", expr, "integraali, alaraja a, yläraja b; f arvolla x, d x; on likimäärin yhtä suuri kuin; h per 3 kertaa; auki sulku; f arvolla, auki sulku x ala 0 kiinni sulku; plus, 4, f arvolla, auki sulku x ala 1 kiinni sulku; plus, 2, f arvolla, auki sulku x ala 2 kiinni sulku; plus, 4, f arvolla, auki sulku x ala 3 kiinni sulku; plus piste piste piste plus; 4; f arvolla; auki sulku, x ala n miinus 1 loppu ala; kiinni sulku; plus, f arvolla, auki sulku x ala n kiinni sulku; kiinni sulku");
+test("fi", "SimpleSpeak", expr, "integraali, alaraja a, yläraja b; f arvolla x, d x; on likimäärin yhtä suuri kuin; h per 3, kertaa; auki sulku; f arvolla, auki sulku x ala 0 kiinni sulku; plus, 4, f arvolla, auki sulku x ala 1 kiinni sulku; plus, 2, f arvolla, auki sulku x ala 2 kiinni sulku; plus, 4, f arvolla, auki sulku x ala 3 kiinni sulku; plus piste piste piste plus; 4; f arvolla; auki sulku, x ala n miinus 1 loppu ala; kiinni sulku; plus, f arvolla, auki sulku x ala n kiinni sulku; kiinni sulku");
 }
 
 #[test]
@@ -1238,6 +1238,6 @@ let expr = "<math>
   <mi>x</mi>
 </mrow>
 </math>";
-test("fi", "ClearSpeak", expr, "iso fii arvolla x, on yhtä suuri kuin; murtoluku osoittaja 1; ja nimittäjä neliöjuuri 2 pii; integraali käy, luvusta negatiivinen ääretön, lukuun x; e potenssiin negatiivinen murtoluku osoittaja; t toiseen; ja nimittäjä 2; d x");
-test("fi", "SimpleSpeak", expr, "iso fii arvolla x, on yhtä suuri kuin; murtoluku, 1 per, neliöjuuri 2 pii loppu juuri; loppu murtoluku; integraali käy, luvusta negatiivinen ääretön, lukuun x; e potenssiin negatiivinen murtoluku, t toiseen, per 2, loppu murtoluku; d x");
+test("fi", "ClearSpeak", expr, "iso fii arvolla x, on yhtä suuri kuin; murtoluku osoittaja 1; ja nimittäjä neliöjuuri 2 pii; integraali, alaraja negatiivinen ääretön, yläraja x; e potenssiin negatiivinen murtoluku osoittaja; t toiseen; ja nimittäjä 2; d x");
+test("fi", "SimpleSpeak", expr, "iso fii arvolla x, on yhtä suuri kuin; murtoluku, 1 per, neliöjuuri 2 pii loppu juuri; loppu murtoluku; integraali, alaraja negatiivinen ääretön, yläraja x; e potenssiin negatiivinen murtoluku, t toiseen, per 2, loppu murtoluku; d x");
 }
