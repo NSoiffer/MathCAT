@@ -69,7 +69,10 @@
       - else_if: "*[2][text()='3']"
         then: {T: "kuutiojuuri"}      # phrase(5 is the 'cube root' of 625)
       - else_if: "*[2][not(contains(., ','))]" # FI: Changed decimal point to decimal comma
-        then: [{x: "ToOrdinal(*[2])"}, {T: "juuri"}]      # phrase(the square 'root' of 25) # FI: this needs to be changed so that when the index is bigger than 20, it doesn't use ToOrdinal() function. This already has a test "mroot_above_20_simple_end_root"
+        then_test:
+            if: "*[2][.<=20]"
+            then: [{x: "ToOrdinal(*[2])"}, {T: "juuri"}]      # phrase(the square 'root' of 25)
+            else: [{x: "*[2]"}, {T: "juuri"}]      # phrase(the square 'root' of 25)
       else:
       - test:
           if: "*[2][self::m:mi][string-length(.)=1]"
