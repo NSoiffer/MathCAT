@@ -216,6 +216,7 @@
 
 - name: integral-both
   tag: large-op
+  match: "count(*)=3 and *[1][.='∫']"
   replace:
   - x: "*[1]"
   - pause: short
