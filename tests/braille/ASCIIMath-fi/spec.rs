@@ -841,7 +841,7 @@ fn p34_Na_plus() {
 }
 
 #[test]
-fn p34_Na_plus() {
+fn p34_Cu_to_2_plus() {
     let expr = r#"<math><msup><mi>Cu</mi><mrow><mn>2<mi>+</mi></mrow></msup></math>"#;
     test_braille("ASCIIMath-fi", expr, r"Cu^(2 +)");
 }
