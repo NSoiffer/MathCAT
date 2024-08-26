@@ -7,7 +7,7 @@ fn menclose_strikes () {
     let expr = r#"<math><menclose notation='updiagonalstrike downdiagonalstrike verticalstrike horizontalstrike'>
         <mi>x</mi>
     </menclose></math>"#;
-    test_braille("ASCIIMath", expr, r"\cancel(x)");
+    test_braille("ASCIIMath-fi", expr, r"\cancel(x)");
 }
 
 #[test]
@@ -15,8 +15,8 @@ fn menclose_box_and_circle () {
     let expr = r#"<math><menclose notation='box circle'>
         <mi>x</mi>
     </menclose></math>"#;
-    // box and circle aren't part of ASCIIMath
-    test_braille("ASCIIMath", expr, r"|overline(underline(x))|");
+    // box and circle aren't part of ASCIIMath-fi
+    test_braille("ASCIIMath-fi", expr, r"|overline(underline(x))|");
 }
 
 #[test]
@@ -25,7 +25,7 @@ fn menclose_sides () {
         <menclose notation='left right '><mi>x</mi> </menclose>
         <menclose notation='top bottom'><mi>x</mi> </menclose>
     </math>"#;
-    test_braille("ASCIIMath", expr, r"|x|overline(underline(x))");
+    test_braille("ASCIIMath-fi", expr, r"|x|overline(underline(x))");
 }
 
 #[test]
@@ -33,7 +33,7 @@ fn menclose_all_sides() {
     let expr = r#"<math><menclose notation='left right top bottom'>
         <mi>x</mi>
     </menclose></math>"#;
-    test_braille("ASCIIMath", expr, r"|overline(underline(x))|");
+    test_braille("ASCIIMath-fi", expr, r"|overline(underline(x))|");
 }
 
 #[test]
@@ -41,8 +41,8 @@ fn menclose_diagonal_arrows() {
     let expr = r#"<math><menclose notation='northeastarrow southeastarrow southwestarrow northwestarrow'>
         <mi>x</mi>
     </menclose></math>"#;
-    // arrows aren't part of ASCIIMath
-    test_braille("ASCIIMath", expr, r"x");
+    // arrows aren't part of ASCIIMath-fi
+    test_braille("ASCIIMath-fi", expr, r"x");
 }
 
 #[test]
@@ -51,8 +51,8 @@ fn menclose_double_arrows() {
     let expr = r#"<math><menclose notation='updownarrow leftrightarrow northeastsouthwestarrow  northwestsoutheastarrow '>
         <mi>x</mi>
     </menclose></math>"#;
-    // arrows aren't part of ASCIIMath
-    test_braille("ASCIIMath", expr, r"x");
+    // arrows aren't part of ASCIIMath-fi
+    test_braille("ASCIIMath-fi", expr, r"x");
 }
 
 #[test]
@@ -60,8 +60,8 @@ fn menclose_horiz_and_vert_arrows() {
     let expr = r#"<math><menclose notation='uparrow downarrow leftarrow rightarrow'>
         <mi>x</mi>
     </menclose></math>"#;
-    // arrows aren't part of ASCIIMath
-    test_braille("ASCIIMath", expr, r"x");
+    // arrows aren't part of ASCIIMath-fi
+    test_braille("ASCIIMath-fi", expr, r"x");
 }
 
 
@@ -81,7 +81,7 @@ fn char_test() {
             <mi>x</mi><mo>,</mo><mi>h</mi>
         </mstyle>
     </math>"#;
-    test_braille("ASCIIMath", expr, r"bb A, bbb A, CC, cc l, cc P, tt X, fr H, fr z, sf t, x, h");
+    test_braille("ASCIIMath-fi", expr, r"bb A, bbb A, CC, cc l, cc P, tt X, fr H, fr z, sf t, x, h");
 }
 
 #[test]
@@ -99,17 +99,17 @@ fn quadratic_formula() {
         <mrow><mn>2</mn><mi>a</mi></mrow>
         </mfrac>
     </math>"#;
-    test_braille("ASCIIMath", expr, r"x = (-b+-sqrt(b^2-4ac))/(2a)");
+    test_braille("ASCIIMath-fi", expr, r"x = (-b+-sqrt(b^2-4ac))/(2a)");
 }
 
 #[test]
-fn porportional() {
+fn proportional() {
     let expr = r#"<math>
         <mi>a</mi>
         <mo>&#x221D;</mo>
         <mi>b</mi>
     </math>"#;
-    test_braille("ASCIIMath", expr, r"a prop b");
+    test_braille("ASCIIMath-fi", expr, r"a ~ b");
 }
 
 #[test]
@@ -127,7 +127,7 @@ fn bracketing() {
         <mo>&#x232A;</mo>
         </mrow>
     </math>"#;
-    test_braille("ASCIIMath", expr, r"x = <<|__|a-b| __|>>");
+    test_braille("ASCIIMath-fi", expr, r"x = <<|__|a-b| __|>>");
 }
 
 #[test]
@@ -142,7 +142,7 @@ fn dydx() {
         <mrow><mi>d</mi><mi>x</mi></mrow>
         </mfrac>
     </math>"#;
-    test_braille("ASCIIMath", expr, r"f'(x) = dy/dx");
+    test_braille("ASCIIMath-fi", expr, r"f'(x) = dy/dx");
 }
 
 #[test]
@@ -153,7 +153,7 @@ fn dqdp() {
         <mrow><mi>d</mi><mi>p</mi></mrow>
         </mfrac>
     </math>"#;
-    test_braille("ASCIIMath", expr, r"(dq)/(dp)");
+    test_braille("ASCIIMath-fi", expr, r"(dq)/(dp)");
 }
 
 #[test]
@@ -163,7 +163,7 @@ fn norm() {
         <mover><mi>x</mi><mo stretchy="false">&#x2192;</mo></mover>
         <mo>&#x2225;</mo>
     </math>"#;
-    test_braille("ASCIIMath", expr, r"norm(vec x)");
+    test_braille("ASCIIMath-fi", expr, r"|vec x|");
 }
 
 #[test]
@@ -189,7 +189,7 @@ fn above_and_below() {
         <mrow><mi>x</mi><mo>&#x2192;</mo><mi>y</mi></mrow>
         </mover>
     </math>"#;
-    test_braille("ASCIIMath", expr, r"ubrace(1+2), obrace(x-y), underset(x->y)(->), overset(x->y)(lArr)");
+    test_braille("ASCIIMath-fi", expr, r"ubrace(1+2), obrace(x-y), underset(x->y)(->), overset(x->y)(lArr)");
 }
 
 #[test]
@@ -207,7 +207,7 @@ fn dots_and_bars() {
         <mo>,</mo>
         <mover><mi>y</mi><mo>..</mo></mover>
     </math>"#;
-    test_braille("ASCIIMath", expr, r"hat x, bar x, ul(x+y), vec bb x, dot x, ddot y");
+    test_braille("ASCIIMath-fi", expr, r"hat x, bar x, ul(x+y), vec bb x, dot x, ddot y");
 }
 
 #[test]
@@ -217,7 +217,7 @@ fn backslash() {
         <mo>\</mo>
         <mi>b</mi>
     </math>"#;
-    test_braille("ASCIIMath", expr, r"a\\b");
+    test_braille("ASCIIMath-fi", expr, r"a\\b");
 }
 
 #[test]
@@ -231,11 +231,11 @@ fn text_and_space() {
         <mo>&#xA0;</mo>
         <mi>b</mi>
     </math>"#;
-    test_braille("ASCIIMath", expr, r#"a\ "some text"\ b"#);
+    test_braille("ASCIIMath-fi", expr, r#"a\ "some text"\ b"#);
 }
 
 #[test]
 fn mixed_fraction() {
     let expr = r#"<math><mn>2</mn><mfrac><mi>1</mi><mn>2</mn></mfrac></math>"#;
-    test_braille("ASCIIMath", expr, r#"2 1/2"#);
+    test_braille("ASCIIMath-fi", expr, r#"2#1/2"#);
 }
