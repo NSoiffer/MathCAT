@@ -433,7 +433,7 @@ fn p26_expected_value () {
 }
 
 #[test]
-fn p26_msupsub () {
+fn p26_msubsup () {
     let expr = r#"<math><msubsup><mi>C</mi><mi>k</mi><mi>n</mi></msubsup></math>"#;
     test_braille("ASCIIMath-fi", expr, r"(C_k)^n");
 }
