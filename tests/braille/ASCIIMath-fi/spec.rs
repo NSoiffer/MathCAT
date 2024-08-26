@@ -847,6 +847,118 @@ fn p34_Cu_to_2_plus() {
 }
 
 #[test]
+fn p35_Mg_S_chemical_equation() {
+    let expr = r#"<math>
+      <mi>Mg</mi><mo>+</mo><mi>S</mi>
+      <mo>&#x2192;</mo>
+      <msup>
+        <mi>Mg</mi>
+        <mrow><mn>2</mn><mi>+</mi></mrow>
+      </msup>
+      <mo>+</mo>
+      <msup>
+        <mi>S</mi>
+        <mrow><mn>2</mn><mi>+</mi></mrow>
+      </msup>
+      
+    </math>"#;
+    test_braille("ASCIIMath-fi", expr, r"Mg +S -> Mg^(2 +) +S^(2 -)");
+}
+
+#[test]
+fn p34_Cu_to_2_plus() {
+    let expr = r#"<math><msup><mi>Ag</mi><mrow><mi>+</mi> </mrow></msup>
+<msup><mi>S</mi><mrow><mi>+</mi> </mrow></msup><mo>&#x2192;</mo><mi>AgCl</mi></math>"#;
+    test_braille("ASCIIMath-fi", expr, r"Ag^+ +Cl^- -> AgCl");
+}
+
+#[test]
+fn chem_aq() {
+    let expr = r#"<math>
+    <mrow>
+      <mn>2</mn>
+      <mstyle scriptlevel='0'>
+        <mspace width='0.167em'></mspace>
+      </mstyle>
+      <mrow>
+        <mi>HCl</mi>
+      </mrow>
+      <mspace width='0.111em'></mspace>
+      <mo stretchy='false'>(</mo>
+      <mrow>
+        <mi>aq</mi>
+      </mrow>
+      <mo stretchy='false'>)</mo>
+      <mrow></mrow>
+      <mo>+</mo>
+      <mrow></mrow>
+      <mn>2</mn>
+      <mstyle scriptlevel='0'>
+        <mspace width='0.167em'></mspace>
+      </mstyle>
+      <mrow>
+        <mi>Na</mi>
+      </mrow>
+      <mspace width='0.111em'></mspace>
+      <mo stretchy='false'>(</mo>
+      <mrow>
+        <mi mathvariant='normal'>s</mi>
+      </mrow>
+      <mo stretchy='false'>)</mo>
+      <mrow></mrow>
+      <mrow>
+        <mo stretchy='false'>&#x27F6;</mo>
+      </mrow>
+      <mrow></mrow>
+      <mn>2</mn>
+      <mstyle scriptlevel='0'>
+        <mspace width='0.167em'></mspace>
+      </mstyle>
+      <mrow>
+        <mi>NaCl</mi>
+      </mrow>
+      <mspace width='0.111em'></mspace>
+      <mo stretchy='false'>(</mo>
+      <mrow>
+        <mi>aq</mi>
+      </mrow>
+      <mo stretchy='false'>)</mo>
+      <mrow></mrow>
+      <mo>+</mo>
+      <mrow></mrow>
+      <mrow>
+        <mi mathvariant='normal'>H</mi>
+      </mrow>
+      <msub>
+        <mrow>
+          <mrow>
+            <mpadded width='0'>
+              <mphantom>
+                <mi>A</mi>
+              </mphantom>
+            </mpadded>
+          </mrow>
+        </mrow>
+        <mrow>
+          <mrow>
+            <mpadded height='0'>
+              <mn>2</mn>
+            </mpadded>
+          </mrow>
+        </mrow>
+      </msub>
+      <mspace width='0.111em'></mspace>
+      <mo stretchy='false'>(</mo>
+      <mrow>
+        <mi mathvariant='normal'>g</mi>
+      </mrow>
+      <mo stretchy='false'>)</mo>
+    </mrow>
+  </math>"#;
+    test_braille("ASCIIMath-fi", expr, r"2HCl (aq) +2Na (s) -> 2NaCl (aq) +H_2 (g)");
+}
+
+#[test]
 fn augenbit1_6_11() {
     // this is a slightly cleaned up version that comes for the original example (via MathJax)
     let expr = r#" <math> <mrow>
