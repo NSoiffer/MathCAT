@@ -780,6 +780,19 @@ fn p27_quadratic_formula() {
 }
 
 #[test]
+fn p35_atomic_numbers() {
+  let expr = r#" <math> <mrow>
+      <msubsup>
+          <mrow></mrow>
+          <mrow><mn>92</mn></mrow>
+          <mrow><mn>232</mn></mrow>
+      </msubsup>
+      <mrow><mi mathvariant="normal">U</mi></mrow>
+      </mrow></math>"#;
+  test_braille("ASCIIMath-fi", expr, r"_92^232U");
+}
+
+#[test]
 fn p34_chem_single_bond_colon() {
     let expr = r#"<math><mmultiscripts><mi>C</<mi><mo>:</mo><mi>C</mi></math>"#;
     test_braille("ASCIIMath-fi", expr, r"C;C");
@@ -873,7 +886,7 @@ fn p34_Cu_to_2_plus() {
 }
 
 #[test]
-fn chem_aq() {
+fn chem_equations_with_states() {
     let expr = r#"<math>
     <mrow>
       <mn>2</mn>
@@ -959,17 +972,13 @@ fn chem_aq() {
 }
 
 #[test]
-fn augenbit1_6_11() {
-    // this is a slightly cleaned up version that comes for the original example (via MathJax)
-    let expr = r#" <math> <mrow>
-        <msubsup>
-            <mrow></mrow>
-            <mrow><mn>95</mn></mrow>
-            <mrow><mn>238</mn></mrow>
-        </msubsup>
-        <mrow><mi mathvariant="normal">U</mi></mrow>
-        </mrow></math>"#;
-    test_braille("ASCIIMath-fi", expr, r"\ _(95)^(238)U");
+fn p34_chem_text_over_arrow() {
+    let expr = r#"<math>
+<msub><mi>CaCo</mi><mn>3</mn></msub><mo>(</mo><mi>s</mi><mo>)</mo>
+    <mover><mo>&#x27F6;</mo><mtext>kuumennus</mtext></mover>
+    <mi>CaO</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>+</mo><msub><mi>CO</mi><mn>2</mn></msub><mo>(</mo><mi>g</mi><mo>)</mo>
+</math>"#;
+    test_braille("ASCIIMath-fi", expr, r"CaCO_3 (s) -> kuumennus -> CaO (s) +CO_2 (g)");
 }
 
 
@@ -999,9 +1008,9 @@ fn augenbit1_8_2 () {
 }
 
 #[test]
-fn augenbit1_8_4 () {
+fn some_greek_letters () {
     let expr = r#"<math><mi>&#x3B1;</mi><mo>,</mo><mi>&#x3B2;</mi><mo>,</mo><mi>&#x3B3;</mi><mo>,</mo><mi>&#x3B4;</mi><mo>,</mo><mi>&#x3B5;</mi></math>"#;
-    test_braille("ASCIIMath-fi", expr, r"alpha, beta, gamma, delta, epsilon");
+    test_braille("ASCIIMath-fi", expr, r"~a, ~b, ~g, ~d, ~e");
 }
 
 #[test]
