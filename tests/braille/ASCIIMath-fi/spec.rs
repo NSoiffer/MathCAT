@@ -794,31 +794,31 @@ fn p35_atomic_numbers() {
 
 #[test]
 fn p34_chem_single_bond_colon() {
-    let expr = r#"<math><mmultiscripts><mi>C</<mi><mo>:</mo><mi>C</mi></math>"#;
+    let expr = r#"<math><mi>C</<mi><mo>:</mo><mi>C</mi></math>"#;
     test_braille("ASCIIMath-fi", expr, r"C;C");
 }
 
 #[test]
 fn p34_chem_single_bond_dash() {
-    let expr = r#"<math><mmultiscripts><mi>C</<mi><mo>-</mo><mi>C</mi></math>"#;
+    let expr = r#"<math><mi>C</<mi><mo>-</mo><mi>C</mi></math>"#;
     test_braille("ASCIIMath-fi", expr, r"C;C");
 }
 
 #[test]
 fn p34_chem_double_bond_equal_sign() {
-    let expr = r#"<math><mmultiscripts><mi>C</<mi><mo>=</mo><mi>C</mi></math>"#;
+    let expr = r#"<math><mi>C</<mi><mo>=</mo><mi>C</mi></math>"#;
     test_braille("ASCIIMath-fi", expr, r"C=C");
 }
 
 #[test]
 fn p34_chem_double_bond_double_colon() {
-    let expr = r#"<math><mmultiscripts><mi>C</<mi><mo>::</mo><mi>C</mi></math>"#;
+    let expr = r#"<math><mi>C</<mi><mo>::</mo><mi>C</mi></math>"#;
     test_braille("ASCIIMath-fi", expr, r"C=C");
 }
 
 #[test]
 fn p34_chem_triple_bond() {
-    let expr = r#"<math><mmultiscripts><mi>C</<mi><mo>≡</mo><mi>C</mi></math>"#;
+    let expr = r#"<math><mi>C</<mi><mo>≡</mo><mi>C</mi></math>"#;
     test_braille("ASCIIMath-fi", expr, r"C;=C");
 }
 
@@ -980,8 +980,6 @@ fn p34_chem_text_over_arrow() {
 </math>"#;
     test_braille("ASCIIMath-fi", expr, r"CaCO_3 (s) -> kuumennus -> CaO (s) +CO_2 (g)");
 }
-
-
 
 #[test]
 fn augenbit1_7_7 () {
