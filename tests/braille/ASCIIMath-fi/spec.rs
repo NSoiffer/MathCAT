@@ -848,14 +848,13 @@ fn p34_Na_2CO_3_times_10H_2O() {
 
 #[test]
 fn p34_Na_plus() {
-    // Is + a variable or operator here? I would say a variable.
-    let expr = r#"<math><msup><mi>Na</mi><mi>+</mi></msup></math>"#;
+    let expr = r#"<math><msup><mi>Na</mi><mo>+</mo></msup></math>"#;
     test_braille("ASCIIMath-fi", expr, r"Na^+");
 }
 
 #[test]
 fn p34_Cu_to_2_plus() {
-    let expr = r#"<math><msup><mi>Cu</mi><mrow><mn>2<mi>+</mi></mrow></msup></math>"#;
+    let expr = r#"<math><msup><mi>Cu</mi><mrow><mn>2<mo>+</mo></mrow></msup></math>"#;
     test_braille("ASCIIMath-fi", expr, r"Cu^(2 +)");
 }
 
@@ -866,12 +865,12 @@ fn p35_Mg_S_chemical_equation() {
       <mo>&#x2192;</mo>
       <msup>
         <mi>Mg</mi>
-        <mrow><mn>2</mn><mi>+</mi></mrow>
+        <mrow><mn>2</mn><mo>+</mo></mrow>
       </msup>
       <mo>+</mo>
       <msup>
         <mi>S</mi>
-        <mrow><mn>2</mn><mi>+</mi></mrow>
+        <mrow><mn>2</mn><mo>+</mo></mrow>
       </msup>
       
     </math>"#;
@@ -880,8 +879,8 @@ fn p35_Mg_S_chemical_equation() {
 
 #[test]
 fn p34_Cu_to_2_plus() {
-    let expr = r#"<math><msup><mi>Ag</mi><mrow><mi>+</mi> </mrow></msup>
-<msup><mi>S</mi><mrow><mi>+</mi> </mrow></msup><mo>&#x2192;</mo><mi>AgCl</mi></math>"#;
+    let expr = r#"<math><msup><mi>Ag</mi><mrow><mo>+</mo> </mrow></msup>
+<msup><mi>S</mi><mrow><mo>+</mo> </mrow></msup><mo>&#x2192;</mo><mi>AgCl</mi></math>"#;
     test_braille("ASCIIMath-fi", expr, r"Ag^+ +Cl^- -> AgCl");
 }
 
