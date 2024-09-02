@@ -880,7 +880,7 @@ fn p35_Mg_S_chemical_equation() {
 #[test]
 fn p34_Cu_to_2_plus() {
     let expr = r#"<math><msup><mi>Ag</mi><mrow><mo>+</mo> </mrow></msup>
-<msup><mi>S</mi><mrow><mo>+</mo> </mrow></msup><mo>&#x2192;</mo><mi>AgCl</mi></math>"#;
+<msup><mi>S</mi><mrow><mo>+</mo> </mrow></msup><mo>&#x2192;</mo><mi>Ag</mi><mi>Cl</mi></math>"#;
     test_braille("ASCIIMath-fi", expr, r"Ag^+ +Cl^- -> AgCl");
 }
 
@@ -894,6 +894,7 @@ fn chem_equations_with_states() {
       </mstyle>
       <mrow>
         <mi>HCl</mi>
+        <mi>Cl</mi>
       </mrow>
       <mspace width='0.111em'></mspace>
       <mo stretchy='false'>(</mo>
@@ -927,7 +928,8 @@ fn chem_equations_with_states() {
         <mspace width='0.167em'></mspace>
       </mstyle>
       <mrow>
-        <mi>NaCl</mi>
+        <mi>Na</mi>
+        <mi>Cl</mi>
       </mrow>
       <mspace width='0.111em'></mspace>
       <mo stretchy='false'>(</mo>
@@ -973,9 +975,9 @@ fn chem_equations_with_states() {
 #[test]
 fn p34_chem_text_over_arrow() {
     let expr = r#"<math>
-<msub><mi>CaCo</mi><mn>3</mn></msub><mo>(</mo><mi>s</mi><mo>)</mo>
+<mi>Ca</mi><msub><mi>Co</mi><mn>3</mn></msub><mo>(</mo><mi>s</mi><mo>)</mo>
     <mover><mo>&#x27F6;</mo><mtext>kuumennus</mtext></mover>
-    <mi>CaO</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>+</mo><msub><mi>CO</mi><mn>2</mn></msub><mo>(</mo><mi>g</mi><mo>)</mo>
+    <mi>Ca</mi><mi>O</mi><mo>(</mo><mi>s</mi><mo>)</mo><mo>+</mo><msub><mi>C</mi><mi>O</mi><mn>2</mn></msub><mo>(</mo><mi>g</mi><mo>)</mo>
 </math>"#;
     test_braille("ASCIIMath-fi", expr, r"CaCO_3 (s) -> kuumennus -> CaO (s) +CO_2 (g)");
 }
