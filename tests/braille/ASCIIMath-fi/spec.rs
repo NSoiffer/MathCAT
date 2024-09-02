@@ -969,7 +969,7 @@ fn chem_equations_with_states() {
       <mo stretchy='false'>)</mo>
     </mrow>
   </math>"#;
-    test_braille("ASCIIMath-fi", expr, r"2HCl (aq) +2Na (s) -> 2NaCl (aq) +H_2 (g)");
+    test_braille("ASCIIMath-fi", expr, r"2 HCl (aq) +2 Na (s) -> 2 NaCl (aq) +H_2 (g)");
 }
 
 #[test]
