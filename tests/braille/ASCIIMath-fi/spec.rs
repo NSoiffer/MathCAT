@@ -893,7 +893,7 @@ fn chem_equations_with_states() {
         <mspace width='0.167em'></mspace>
       </mstyle>
       <mrow>
-        <mi>HCl</mi>
+        <mi>H</mi>
         <mi>Cl</mi>
       </mrow>
       <mspace width='0.111em'></mspace>
