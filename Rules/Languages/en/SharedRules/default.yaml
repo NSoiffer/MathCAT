@@ -211,7 +211,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]      # phrase(phrase(x 'modified' with y above it)
+      then: [t: "quantity"]      # phrase(phrase(x 'quantity' with y above it)
   - x: "*[1]"
   - t: "with"      # phrase(x 'with' z below it)
   - x: "*[2]"
@@ -230,7 +230,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]      # phrase(phrase(x 'modified' with y above it)
+      then: [t: "quantity"]      # phrase(phrase(the 'quantity' x plus 1 with y above it)
   - x: "*[1]"
   - t: "with"         # phrase(x modified 'with' y above it)
   - x: "*[2]"
@@ -242,7 +242,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]      # phrase(the equation has been 'modified')
+      then: [t: "quantity"]      # phrase(the 'quantity' x plus 1 with y above it)
   - x: "*[1]"
   - t: "with"         # phrase(x modified 'with' y above it)
   - x: "*[2]"
