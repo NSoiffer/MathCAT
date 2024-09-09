@@ -649,7 +649,7 @@
   - x: "*[3]"
 
 - name: ClearSpeak-multi-line
-  tag: [cases, equations, lines] # these are ignored in favor of the ClearSpeak prefs
+  tag: [piecewise, system-of-equations, lines] # these are ignored in favor of the ClearSpeak prefs
   match: "."
   replace:
   - x: "count(*)"
