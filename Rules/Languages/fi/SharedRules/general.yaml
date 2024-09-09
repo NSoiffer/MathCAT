@@ -538,7 +538,7 @@
 - name: multi-line
   #   that eliminates the need for the if: else_if: ...
   # IDEA:  set a variable with the word to say for the row (e.g., RowLabel = Row/Case/Line/...)
-  tag: [cases, equations, lines]
+  tag: [piecewise, equations, lines]
   match: "."
   variables:
     # Wikipedia has some tables where all the entire first column is empty (e.g., https://en.wikipedia.org/wiki/List_of_trigonometric_identities)
