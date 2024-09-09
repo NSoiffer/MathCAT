@@ -703,7 +703,7 @@
 
 - name: ClearSpeak-default-multiline
   tag: [mtr, mlabeledtr]
-  match: "parent::m:piecewise or parent::m:equations or parent::m:lines"
+  match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
   replace:
   - test:
     - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
