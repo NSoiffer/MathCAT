@@ -538,7 +538,7 @@
 - name: multi-line
   #   that eliminates the need for the if: else_if: ...
   # IDEA:  set a variable with the word to say for the row (e.g., RowLabel = Row/Case/Line/...)
-  tag: [piecewise, equations, lines]
+  tag: [piecewise, system-of-equations, lines]
   match: "."
   variables:
     # Wikipedia has some tables where all the entire first column is empty (e.g., https://en.wikipedia.org/wiki/List_of_trigonometric_identities)
@@ -553,7 +553,7 @@
           - if: "$LineCount != 1"
             then: [{T: "tapausta"}] # FI: plural, needs test
             else: [{T: "tapaus"}] # phrase(this is the first 'equation' of three equations)
-    - else_if: "self::m:equations"
+    - else_if: "self::m:system-of-equations"
       then: 
         - test: 
           - if: "$LineCount != 1"
@@ -572,10 +572,10 @@
 
 - name: default-multiline
   tag: [mtr, mlabeledtr]
-  match: "parent::m:piecewise or parent::m:equations or parent::m:lines"
+  match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
   replace:
   - test:
-      if: "parent::m:equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
+      if: "parent::m:system-of-equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
            count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']]) != 0"
       then:
       - T: "seuraava rivi"
@@ -585,7 +585,7 @@
         - test:
           - if: "parent::m:piecewise"
             then: [{T: "tapaus"}]     # phrase('case' 1 of 10 cases)
-          - else_if: "parent::m:equations"
+          - else_if: "parent::m:system-of-equations"
             then: [{T: "yhtälö"}] # phrase('equation' 1 of 10 equations)
             else: [{T: "rivi"}]     # phrase('line 1 of 10 lines)
         - x: "count(preceding-sibling::*)+1"
@@ -603,7 +603,7 @@
 
 - name: default-multiline
   tag: mtd
-  match: "parent::*[parent::m:piecewise or parent::m:equations or parent::m:lines]"
+  match: "parent::*[parent::m:piecewise or parent::m:system-of-equations or parent::m:lines]"
   variables: [LongPause: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultiLinePausesBetweenColumns = 'Long'"]
   replace:
   - x: "*"
