@@ -66,7 +66,7 @@
 
  - "!":                                            # 0x21
     - test:
-        if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
         then_test:
             if: "$Verbosity = 'Terse'"
             then: [t: "bang"]                      # 0x21
@@ -186,7 +186,7 @@
  - "~": [t: "tilde"]                               # 0x7e
  - " ":                                            # 0xa0
     - test:
-        if: "@data-empty-in-2D and ../../../../*[name(.)!='equations']"
+        if: "@data-empty-in-2D"
         then: [t: "empty"]                         # want to say something for fraction (etc) with empty child
         else: [t: ""]                            
 
@@ -288,7 +288,7 @@
  - "⁡":                                          # 0x2061
     - test:
         if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
-             not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':structure:')])"
+             not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])"
         then: [t: "of"]
  - "⁢": [t: ""]                                   # 0x2062
  - "⁣": [t: ""]                                   # 0x2063
@@ -350,7 +350,11 @@
  - "∈":                                          # 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "an element of"]
+        then:
+        - test:
+            if: "$Verbosity!='Terse' and not(ancestor::*[self::m:set])"    # "the set x is an element of ..." sounds bad"
+            then: [t: "is"]
+        - t: "an element of"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set
@@ -374,7 +378,11 @@
     # rule is identical to 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "is not an element of"]
+        then:
+        - test: 
+            if: "$Verbosity!='Terse'"
+            then: [t: "is"]
+        - t: "not an element of"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set
@@ -397,7 +405,11 @@
  - "∊":                                          # 0x220a
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
-        then: [t: "is an element of"]
+        then:
+        - test: 
+            if: "$Verbosity!='Terse' and not(ancestor::*[self::m:set])"    # "the set x is an element of ..." sounds bad"
+            then: [t: "is"]
+        - t: "an element of"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
         else_test:
             if: "../../self::m:set or ../../../self::m:set" # inside a set

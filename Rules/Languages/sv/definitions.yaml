@@ -1,0 +1,124 @@
+---
+- include: "../../definitions.yaml"
+# Lines starting with "#" are a comment
+# Each definition in this file is of the form
+#   name: [ "...", "..." "..." ],
+
+
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
+# The following definitions are used to convert numbers to words
+# The are mainly used for ordinals, of which there are two cases:
+# 1. Regular ordinals: first, second, third, ...
+# 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
+#    When used in the denominator of fractions, a plural version might be
+#    used (e.g., two halves, two thirds)
+# Although a lot of languages are regular after a few entries, for generality,
+# the following lists should be filled out even though they are the same
+# or easily derived from others in many languages (e.g, an 's' is added for plurals).
+# The larger ordinal numbers (e.g, millionth) is used when there are only
+# '0's after that decimal place (e.g., 23000000).:w
+
+# All definitions start 0, 10, 100, etc.
+
+# The definitions for the "ones" should extend until a regular pattern begins
+#   The minimum length is 10.
+
+# For English, a regular pattern starts at twenty
+- NumbersOnes: [
+         "noll", "en", "två", "tre", "fyra", "fem", "sex", "sju", "åtta", "nio",
+         "tio", "elva", "tolv", "tretton", "fjorton", "femton", "sexton",
+         "sjutton", "arton", "nitton"
+    ]
+
+- NumbersOrdinalOnes: [
+         "nollte", "första", "andra", "tredje", "fjärde", "femte", "sjätte", "sjunde", "åttonde", "nionde",
+         "tionde", "elfte", "tolfte", "trettonde", "fjortonde", "femtonde", "sextonde",
+         "sjuttonde", "artonde", "nittonde"
+    ]
+
+- NumbersOrdinalPluralOnes: [
+         "nollte", "första", "andra", "tredje", "fjärde", "femte", "sjätte", "sjunde", "åttonde", "nionde",
+         "tionde", "elfte", "tolfte", "trettonde", "fjortonde", "femtonde", "sextonde",
+         "sjuttonde", "artonde", "nittonde"
+    ]
+
+    # stop when regularity begins
+- NumbersOrdinalFractionalOnes: [
+         "nolltedel", "hel", "halv", "tredjedel", "fjärdedel", "femtedel", "sjättedel", "sjundedel", "åttondel", "niondel", "tiondel", "elftedel",
+         "tolftedel", "trettondel", "fjortondel", "femtondel", "sextondel", "sjuttondel", "artondel", "nittondel"
+    ]
+
+    # stop when regularity begins
+- NumbersOrdinalFractionalPluralOnes: [
+         "nolltedelar", "hela", "halva", "tredjedelar", "fjärdedelar", "femtedelar", "sjättedelar", "sjundedelar", "åttondelar", "niondelar",
+         "tiondelar", "elftedelar", "tolftedelar", "trettondelar", "fjortondelar", "femtondelar", "sextondelar",
+         "sjuttondelar", "artondelar", "nittondelar"
+    ]
+
+
+    # What to use for multiples of 10
+- NumbersTens: [
+         "", "tio", "tjugo", "trettio", "fyrtio", "femtio", "sextio", "sjuttio", "åttio", "nittio"
+    ]
+
+- NumbersOrdinalTens: [
+         "", "tionde", "tjugonde", "trettionde", "fyrtionde", "femtionde", "sextionde", "sjuttionde", "åttionde", "nittionde"
+    ]
+
+- NumbersOrdinalPluralTens: [
+         "", "tiondelar", "tjugondelar", "trettiondelar", "fyrtiondelar", "femtiondelar", "sextiondelar", "sjuttiondelar", "åttiondelar", "nittiondelar"
+    ]
+
+
+- NumbersHundreds: [
+       "", "etthundra", "tvåhundra", "trehundra", "fyrahundra", "femhundra",
+         "sexhundra", "sjuhundra", "åttahundra", "niohundra"
+    ]
+
+- NumbersOrdinalHundreds: [
+       "", "hundrade", "tvåhundrade", "trehundrade", "fyrahundrade", "femhundrade",
+         "sexhundrade", "sjuhundrade", "åttahundrade", "niohundrade"
+    ]
+
+- NumbersOrdinalPluralHundreds: [
+       "", "en hundradel", "två hundradelar", "tre hundradelar", "fyra hundradelar", "fem hundradelar",
+         "sex hundradelar", "sju hundradelar", "åtta hundradelar", "nio hundradelar"
+    ]
+      
+
+    # At this point, hopefully the language is regular. If not, code needs to be written
+- NumbersLarge: [
+         "", "tusen", "miljon", "miljard", "biljon", "biljard",
+         "triljon", "triljard", "kvadriljon", "kvadriljard", "kvintiljon",
+         "kvintiljard","sextiljon","sextiljard","septiljon","septiljard",
+         "oktiljon","oktiljard","noniljon","noniljard","deciljon",
+         "deciljard","undeciljon","undeciljard","duodeciljon","tredeciljon",
+         "tredeciljard","quattuordeciljon","uattuordeciljard","quindeciljon","quindeciljard",
+         "sexdeciljon","sexdeciljard","septendeciljon","septendeciljard",
+         "octodeciljon","octodeciljard","novemdeciljon","novemdeciljard","vigintiljon",
+         "vigintiljard","unvigintiljon","unvigintiljard","centiljon","centiljard"
+    ]
+      
+- NumbersOrdinalLarge: [
+         "", "tusende", "miljonte", "miljardte", "biljonte", "biljardte",
+         "triljonte", "triljardte", "kvadriljonte", "kvadriljardte", "kvintiljonte",
+         "kvintiljardte","sextiljonte","sextiljardte","septiljonte","septiljardte",
+         "oktiljonte","oktiljardte","noniljonte","noniljardte","deciljonte",
+         "deciljardte","undeciljonte","undeciljardte","duodeciljonte","tredeciljonte",
+         "tredeciljardte","quattuordeciljonte","uattuordeciljardte","quindeciljonte","quindeciljardte",
+         "sexdeciljonte","sexdeciljardte","septendeciljonte","septendeciljardte",
+         "octodeciljonte","octodeciljardte","novemdeciljonte","novemdeciljardte","vigintiljonte",
+         "vigintiljardte","unvigintiljonte","unvigintiljardte","centiljonte","centiljardte"
+    ]
+      
+- NumbersOrdinalPluralLarge: [
+         "", "tusendelar", "miljondelar", "miljarddelar", "biljondelar", "biljarddelar",
+         "triljondelar", "triljarddelar", "kvadriljondelar", "kvadriljarddelar", "kvintiljondelar",
+         "kvintiljarddelar","sextiljondelar","sextiljarddelar","septiljondelar","septiljarddelar",
+         "oktiljondelar","oktiljarddelar","noniljondelar","noniljarddelar","deciljondelar",
+         "deciljarddelar","undeciljondelar","undeciljarddelar","duodeciljondelar","tredeciljondelar",
+         "tredeciljarddelar","quattuordeciljondelar","uattuordeciljarddelar","quindeciljondelar","quindeciljarddelar",
+         "sexdeciljondelar","sexdeciljarddelar","septendeciljondelar","septendeciljarddelar",
+         "octodeciljondelar","octodeciljarddelar","novemdeciljondelar","novemdeciljarddelar","vigintiljondelar",
+         "vigintiljarddelar","unvigintiljondelar","unvigintiljarddelar","centiljondelar","centiljarddelar"
+    ]

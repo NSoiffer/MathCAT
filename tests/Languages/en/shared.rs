@@ -63,6 +63,18 @@ fn binomial_mmultiscripts() {
     test("en", "SimpleSpeak", expr, "n choose m");
 }
 
+#[test]
+fn binomial_mmultiscripts_other() {
+    let expr = "<math><mmultiscripts><mi>C</mi><mi>m</mi><none/><mprescripts/><none/><mi>n</mi></mmultiscripts></math>";
+    test("en", "SimpleSpeak", expr, "n choose m");
+}
+
+#[test]
+fn binomial_subscript() {  // C_{n,k}
+    let expr = "<math><msub><mi>C</mi><mrow><mi>n</mi><mo>,</mo><mi>m</mi></mrow></msub></math>";
+    test("en", "SimpleSpeak", expr, "n choose m");
+}
+
 
 #[test]
 fn permutation_mmultiscripts() {
@@ -293,12 +305,6 @@ fn ignore_period_and_space() {
 
 
 #[test]
-fn mn_with_space() {
-    let expr = "<math><mn>1 234 567</mn></math>";
-    test("en", "SimpleSpeak", expr, "1234567");
-}
-
-#[test]
 fn bug_199_2pi() {
   let expr = "<math>
       <mrow>
@@ -321,4 +327,16 @@ fn bug_199_2pi() {
 fn caret_and_hat() {
   let expr = "<math><mi>x</mi><mo>^</mo><mn>2</mn><mo>+</mo><mover><mi>y</mi><mo>^</mo></mover></math>";
   test("en", "SimpleSpeak",expr, "x caret 2 plus y hat,");
+}
+
+#[test]
+fn mn_with_space() {
+  let expr = "<math><mn>1 234 567</mn></math>";
+  test_prefs("en", "SimpleSpeak", vec![("DecimalSeparators", "."), ("BlockSeparators", " ,")], expr, "1234567");
+}
+
+#[test]
+fn mn_with_block_and_decimal_separators() {
+  let expr = "<math><mn>1,234.56</mn></math>";                                       // may want to change this for another language
+  test_prefs("en", "SimpleSpeak", vec![("DecimalSeparators", "."), ("BlockSeparators", " ,")], expr, "1234.56");
 }

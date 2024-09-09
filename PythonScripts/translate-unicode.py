@@ -1,5 +1,8 @@
 # Translate unicode characters into the target language
 # This makes use of three sources: SRE's translations, MathPlayer's translations, and Google translate.
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+
 
 # The google translate is done via https://github.com/ffreemt/google-stranslate (pip install itranslate)
 # from itranslate import itranslate as translate
@@ -200,16 +203,16 @@ MAX_CHARS_IN_CHUNK = 4500  # 4500 sometimes failed (language code "no")
 TIMEOUT = 2
 import time
 
-def translate_words(words_to_translate: set, lang):
+def translate_words(words_to_translate: set[str], lang):
     if lang == 'nb' or lang == 'nn':
         lang = 'no'  # google doesn't know those variants, but SRE uses them
     translations = {}
 
-    def do_translation_chunk(words: list):
+    def do_translation_chunk(words: set[str]):
         # translate doesn't handle a list properly -- use ".\n" to separate words
-        word_string = ".\n".join(words)
+        word_string = ".\n".join(list(words))
         # chunk_translations = translate(words, from_lang='en', to_lang=lang, url=TRANSLATE_URL)
-        translated_words_str = GoogleTranslate.translate(word_string, src='en', dest=lang).text.lower()
+        translated_words_str: str = GoogleTranslate.translate(word_string, src='en', dest=lang).text.lower()
         # Chinese has "." translated to "。"
         translated_words_str = translated_words_str.replace('。', '.')
         translated_words = translated_words_str.split('.\n')
@@ -233,7 +236,7 @@ def translate_words(words_to_translate: set, lang):
     char_count = 0
     words_to_translate = []
     for word in word_list:
-        words_to_translate.append(word)
+        words_to_translate.add(word)
         char_count += len(word)
         if char_count >= MAX_CHARS_IN_CHUNK:
             do_translation_chunk(words_to_translate)
@@ -429,8 +432,6 @@ def build_euro(lang: str):
                     comment = hex(ord(ch[1]))
                 elif len(ch) == 1 or len(ch) == 2:
                     comment = hex(ord(ch))
-                # elif len(ch) == 2:   # \t, etc
-                #     comment =
                 else:
                     comment = "0" + ch[1:]
                 out_stream.write('{:32}# {}\n'.format(first_part, comment))
@@ -452,9 +453,18 @@ def get_sre_euro_dict():
     return dict
 
 
+def write_euro_braille_file():
+    file = open("EuroBraille-dict.txt", 'w', encoding='utf8')
+    file.write('{\n')
+    for key, value in get_sre_euro_dict().items():
+        if key == '"':
+            key = '\\"'
+        elif key == '\\':
+            key = '\\\\'
+        file.write('  "%s": "%s",\n' % (key, value))
+    file.write('}\n')
+    file.close()
 
-import sys
-sys.stdout.reconfigure(encoding='utf-8')
 
 # if os.path.exists("unicode.yaml"):
 #   os.remove("unicode.yaml")

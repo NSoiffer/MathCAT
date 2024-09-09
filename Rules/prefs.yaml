@@ -81,7 +81,12 @@
       SansSerif:    "⠈⠼"    # first transcriber-defined typeform prefix indicator
       GreekVariant: "⠸"     # default to Greek
 
+    LaTeX:
+      UseShortName: false   # Use the short form for the latex (e.g., "~a" instead of "\alpha")
+
 
   Other:
+    CopyAs: "MathML"       # MathML, LaTeX, ASCIIMath
     DecimalSeparators: "." # [default]
     BlockSeparators: ", \u00A0\u202F" # [default -- includes two forms of non-breaking spaces]
+    DecimalSeparator: "Auto" # Auto, '.', ',', Custom

@@ -1,5 +1,10 @@
 ---
 - include: "../../definitions.yaml"
+
+- OperatorIntentRenaming: {
+    "dimension-product": "by"
+    }
+
 # Lines starting with "#" are a comment
 # Each definition in this file is of the form
 # - name: { "...", "..." "..." }

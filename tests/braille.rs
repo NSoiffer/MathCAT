@@ -5,6 +5,7 @@ mod common;
 mod braille {
     mod Nemeth {
         mod rules;
+        mod chemistry;
         mod SRE_Nemeth72;
         mod SRE_NemethBase;
         mod AataNemeth;
@@ -20,6 +21,16 @@ mod braille {
 
     mod Vietnam {
         mod vi;
+    }
+
+    mod LaTeX {
+        mod augenbit;
+        mod other;
+    }
+
+    mod ASCIIMath {
+        mod augenbit;
+        mod other;
     }
 }
 

@@ -6,6 +6,7 @@ mod Languages {
     mod zh;
     mod en;
     mod fi;
+    mod sv;
     // mod vi {
     //     mod vi;
     // }

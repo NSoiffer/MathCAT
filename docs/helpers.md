@@ -45,7 +45,7 @@ __NOTE__: I am most of the way through the process of changing the rules to make
 
 ### Marking text as translated
 These files are YAML files and their content is described later in this page.
-In all of these files, the text to translate will have the YAML key name `t` (and very rarely `ot`, `ct`, `spell`, and `pronounce`). When you make a translation, you should capitalize them (e.g, `T` and `SPELL`) to indicate that the file has been translated.
+In all of these files, the text to translate will have the YAML key name `t` (and very rarely `ot`, `ct`, `spell`, `pronounce`, and `IfThenElse`). When you make a translation, you should capitalize them (e.g, `T`, `IFTHENELSE`) to indicate that the file has been translated.
 
 As an example, here are two rules from `unicode.yaml`:
 ```
@@ -65,6 +65,11 @@ If you were translating this to French, the words after the `t:` would get chang
          if: "$Verbosity!='Terse'"
          then: [T: "est"]
      - T: "supérieur à"
+```
+
+Note: `IfThenElse` may not require a translation but should be changed regardless so you know that has been looked at. Here's an example where no translation is needed because the "then" and "else" parts (`count(*/*[1])` and `$LineCountTry` respectively) are not words:
+```
+ - LineCount: "IfThenElse($LineCountTry=0, count(*/*[1]), $LineCountTry)"
 ```
 
 See below for a discussion of what can be used in a rule file.
@@ -113,7 +118,22 @@ In the `tests\Languages` directory, there is a file `en.rs` and a directory `en`
 2. Copy the `en` directory to `fr`.
 3. If you only choose one speech style (e.g., "SimpleSpeak), edit `fr.rs` and remove the lines starting `mod ClearSpeak {` all the way down to the matching `}`. In the `fr` directory, remove the subdirectory `ClearSpeak`.
 4. Although it is good translate all the files, it is probably ok to just translate a few of them, especially at the start. In `fr.rs`, comment out any untranslated file by adding `//` in front of the untranslated files. E.g., if you didn't translate the SimpleSpeak file `geometry.yaml`, then the line should look like `// mod geometry;`
-5. Start editing the files, first doing a global change of `en` to `fr` and then replacing the English string with the appropriate French (or whatever language you added) string.
+5. Start editing the files, first doing a global change of `"en"` to `"fr"` and then replacing the English string with the appropriate French (or whatever language you added) string.
+
+An example of a test is
+```
+#[test]
+fn common_fraction_half() {
+    let expr = "<math>
+                    <mfrac> <mn>1</mn> <mn>2</mn> </mfrac>
+                </math>";
+    test("en", "SimpleSpeak", expr, "1 half");
+}
+```
+For French, the "test" line would change to:
+```
+    test("fr", "SimpleSpeak", expr, "un demi");
+```
 
 Now that you have some tests translated, try running the automated tests.
 As a check that everything is set up properly, verify that the English version of the tests are working
@@ -126,8 +146,10 @@ cargo test Languages::fr
 ```
 MathCAT adds pausing in places and in the test strings, these appear as `,` and `;`. You may need to adjust your expected output by adding or removing those. If those pauses seem inappropriate, you will need to add or remove `pause: xxx` from the appropriate place in the one of the `Rules\fr` files.
 
+__A suggestion__: it might be fastest if you run the tests in your language before changing the expected output. All the tests will fail but you will see failure messages that show the speech that MathCAT generated (in your language). _If it is correct_, simply copy it in place of the English. Once you've done that for all the "errors", rerun the tests and hopefully there won't be anymore errors.
 
 
+### Keeping the translation up-to-date
 To be written...
 
 I hope to eventually have a tool that will

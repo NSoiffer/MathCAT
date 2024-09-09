@@ -38,8 +38,7 @@
   match: "."
   replace:
   - bookmark: "@id"
-  # FIX: removing the digit block separators is likely locale dependent
-  - x: "translate(., ' ,`', '')"   # remove digit block separators
+  - x: "translate(., $BlockSeparators, '')"   # remove digit block separators
 
 - name: default
   tag: [mo, mtext]
@@ -72,7 +71,7 @@
   replace: [x: "*"]
 
 
-- name: structure-simple
+- name: literal-simple
   # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
   # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
   # are never simple, then any 'over' applies only to enclosing "fraction...end fraction" pair.
@@ -86,7 +85,7 @@
   - x: "*[2]"
   - pause: short
 
-- name: structure-default
+- name: literal-default
   tag: mfrac
   match: "."
   replace:
@@ -109,7 +108,7 @@
 
 
 # not sure what really should be said for these since we should not assume they are square roots
-- name: structure-default
+- name: literal-default
   tag: msqrt
   match: "."
   replace:
@@ -127,7 +126,7 @@
       then: [t: "end root symbol"] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
-- name: structure-default
+- name: literal-default
   tag: mroot
   match: "."
   replace:
@@ -172,7 +171,7 @@
   - pause: short
 
 
-- name: structure
+- name: literal
   tag: msub
   match: "."
   replace:
@@ -180,7 +179,7 @@
   - t: "sub"              # phrase(x 'sub' 2)
   - x: "*[2]"
 
-- name: structure
+- name: literal
   tag: [msup, msubsup]
   match: "."
   replace:
@@ -194,7 +193,7 @@
       if: "*[last()][translate(., '′″‴⁗†‡°*', '')='']"
       then:  [x: "*[last()]"]
       else_test:
-          if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"  # FIX: is this test necessary?
+          if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"  # FIX: is this test necessary?
           then:
           - t: "super"      # phrase(x 'super' 2)
           - x: "*[last()]"
@@ -212,7 +211,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]      # phrase(phrase(x 'modified' with y above it)
+      then: [t: "quantity"]      # phrase(phrase(x 'quantity' with y above it)
   - x: "*[1]"
   - t: "with"      # phrase(x 'with' z below it)
   - x: "*[2]"
@@ -231,7 +230,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]      # phrase(phrase(x 'modified' with y above it)
+      then: [t: "quantity"]      # phrase(phrase(the 'quantity' x plus 1 with y above it)
   - x: "*[1]"
   - t: "with"         # phrase(x modified 'with' y above it)
   - x: "*[2]"
@@ -243,7 +242,7 @@
   replace:
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
-      then: [t: "modified"]      # phrase(the equation has been 'modified')
+      then: [t: "quantity"]      # phrase(the 'quantity' x plus 1 with y above it)
   - x: "*[1]"
   - t: "with"         # phrase(x modified 'with' y above it)
   - x: "*[2]"

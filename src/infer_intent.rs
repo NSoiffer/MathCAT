@@ -52,7 +52,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
                 bail!("Error in intent value: extra unparsed intent '{}' in intent attribute value '{}'", lex_state.remaining_str, intent_str);
             }
             assert!(lex_state.remaining_str.is_empty());
-            debug!("Resulting intent: {}", crate::pretty_print::mml_to_string(&result));
+            // debug!("Resulting intent: {}", crate::pretty_print::mml_to_string(&result));
             return Ok(result);
         }
         bail!("Internal error: infer_intent() called on MathML with no intent arg:\n{}", mml_to_string(&mathml));
