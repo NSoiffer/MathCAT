@@ -854,7 +854,7 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "is"]
-     - t: "approximately equal to"
+     - t: "congruent to"
  - "≆":                                          # 0x2246
      - test: 
          if: "$Verbosity!='Terse'"
@@ -864,22 +864,22 @@
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "is"]
-     - t: "neither approximately nor actually equal to"
+     - t: "not congruent to"
  - "≈":                                          # 0x2248
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "is"]
-     - t: "almost equal to"
+     - t: "approximately equal to"
  - "≉":                                          # 0x2249
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "is"]
-     - t: "not almost equal to"
+     - t: "not approximately equal to"
  - "≊":                                          # 0x224a
      - test: 
          if: "$Verbosity!='Terse'"
          then: [t: "is"]
-     - t: "almost equal or equal to"
+     - t: "approximately equal or equal to"
  - "≋": [t: "triple tilde"]                        # 0x224b
  - "≌": [t: "are all equal to"]                    # 0x224c
  - "≍":                                          # 0x224d
