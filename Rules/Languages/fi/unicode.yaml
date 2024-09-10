@@ -150,7 +150,7 @@
  - "~": [T: "tilde"]                            	#  0x7e
  - " ":                                         	#  0xa0
     - test:
-        if: "@data-empty-in-2D and ../../../../*[name(.)!='equations']"
+        if: "@data-empty-in-2D and ../../../../*[name(.)!='system-of-equations']"
         then: [T: "tyhjä"]                      	#  want to say something for fraction (etc) with empty child	(en: 'empty', google translation)
         else: [T: ""]                            
 
