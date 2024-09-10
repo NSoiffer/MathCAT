@@ -854,6 +854,8 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
                         assert!(cap_mode == UEB_Duration::Word);
                     }
                     is_cap_mode = false;                    
+                } else if ch == '1' && is_cap_mode {
+                    break;
                 }
             }
             return n_caps > 4;
