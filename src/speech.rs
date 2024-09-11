@@ -607,7 +607,7 @@ impl<'r> Intent {
         };
         
         for attr in mathml.attributes() {
-            result.set_attribute_value(attr.name(), attr.value());           
+            result.set_attribute_value(attr.name(), attr.value());
         }
         if let Some(id) = &self.id {
             result.set_attribute_value("id", id.evaluate(rules_with_context.get_context(), mathml)?.string().as_str());
@@ -1099,7 +1099,7 @@ impl<'r> MyXPath {
                         } else {            // must be ')'
                             count -= 1;
                             if count == 0 {
-                                let i_end = xpath.len() - remainder.len() + i_paren; 
+                                let i_end = xpath.len() - remainder.len() + i_paren;
                                 let escaped_arg = &xpath[debug_start+6..i_end].to_string().replace('"', "\\\"");
                                 let contents = MyXPath::add_debug_string_arg(&xpath[debug_start+6..i_end])?;
                                 return Ok( string_start + &contents + ", \"" + escaped_arg + "\" "
@@ -1157,7 +1157,7 @@ impl<'r> MyXPath {
                 bail!( "{}\n\n",
                 e.to_string()           // remove confusing parts of error message from xpath
                 .replace("OwnedPrefixedName { prefix: None, local_part:", "")
-                .replace(" }", "") );    
+                .replace(" }", "") )
             }
         };
     }
@@ -1358,7 +1358,7 @@ impl<'r> TestArray {
             if !if_part.is_badvalue() {
                 // first case: if:, then:, optional else:
                 let condition = Some( MyXPath::build(if_part)? );
-                let then_part = TestOrReplacements::build(test, "then", "then_test", true)?; 
+                let then_part = TestOrReplacements::build(test, "then", "then_test", true)?;
                 let else_part = TestOrReplacements::build(test, "else", "else_test", false)?;
                 let n_keys = if else_part.is_none() {2} else {3};
                 if test.as_hash().unwrap().len() > n_keys {
@@ -1437,7 +1437,7 @@ impl<'r> TestOrReplacements {
             if key_required {
                 bail!(format!("Missing one of '{}'/'{}:' as part of 'test:'\n{}\n   \
                     Suggestion: add the missing key or indent so it is contained in 'test'",
-                    replace_key, test_key, yaml_to_string(test, 2)));    
+                    replace_key, test_key, yaml_to_string(test, 2)))
             } else {
                 return Ok( None );
             }
@@ -1687,7 +1687,7 @@ impl<'c, 'r> ContextStack<'c> {
             let qname = QName::new(def.name.as_str());
             self.base.set_variable(qname, new_value);
         }
-        self.old_values.push(old_values); 
+        self.old_values.push(old_values);
         return Ok( () );
     }
 
@@ -1803,7 +1803,7 @@ impl UnicodeDef {
                                         .chain_err(|| format!("In definition of char: '{}'", def_range))?.replacements);
             };
 
-            return Ok(None);            
+            return Ok(None)
         }
 
         fn substitute_ch(yaml: &Yaml, ch: &str) -> Yaml {
@@ -2187,7 +2187,7 @@ impl SpeechRules {
                 files_read.append(&mut added_files);
             }
         }
-        return Ok(files_read);  
+        return Ok(files_read)
     }
     
     fn read_unicode(&self, path: Option<PathBuf>, use_short: bool) -> Result<Vec<PathBuf>> {
@@ -2221,7 +2221,7 @@ impl SpeechRules {
                     files_read.append(&mut added_files);
                 }
             };
-            return Ok(files_read);  
+            return Ok(files_read)
         };
 
         return compile_rule(&unicode_file_contents, unicode_build_fn)
@@ -2288,7 +2288,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         let speech_manager = self.speech_rules.pref_manager.borrow();
         let file_name = speech_manager.get_rule_file(&self.speech_rules.name);
         // FIX: handle error appropriately 
-        bail!("\nNo match found!\nMissing patterns in {} for MathML.\n{}", file_name.to_string_lossy(), mml_to_string(&mathml)); 
+        bail!("\nNo match found!\nMissing patterns in {} for MathML.\n{}", file_name.to_string_lossy(), mml_to_string(&mathml));
     }
 
     fn find_match<T:TreeOrString<'c, 'm, T>>(&'r mut self, rule_vector: &[Box<SpeechPattern>], mathml: Element<'c>) -> Result<Option<T>> {
@@ -2536,7 +2536,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                 return replace_single_char(self, ch, mathml)
             } else {
                 // more than one char -- fix up non-breaking space
-                return Ok(str.replace('\u{00A0}', " ").replace(['\u{2061}', '\u{2062}', '\u{2063}', '\u{2064}'], ""));    
+                return Ok(str.replace('\u{00A0}', " ").replace(['\u{2061}', '\u{2062}', '\u{2063}', '\u{2064}'], ""))
             }
         };
 

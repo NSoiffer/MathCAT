@@ -50,7 +50,7 @@ fn main() {
 //      </msup>
 //    </mrow>
 //  </math>
-// "#; 
+// "#;
   // let expr = "<math display='inline' xmlns='http://www.w3.org/1998/Math/MathML'>
   //       <msup intent='power($base(2, $base),silly($exp,-1.))'>
   //       <mi arg='base'>x</mi>
@@ -174,12 +174,19 @@ fn main() {
   //   </math>";
 
   let expr = r#"
-<math><mrow><mtable columnalign="left"><mtr columnalign="left"><mtd columnalign="left"><mrow><mtext>╬ö</mtext><mi>H</mi><mtext></mtext><mtext>for</mtext><mtext></mtext><mtext>Equation</mtext><mtext></mtext><mtext>c</mtext></mrow></mtd><mtd columnalign="left"><mrow><mo>=</mo><mrow><mo>(</mo><mrow><mn>188</mn><mtext></mtext><mtext>kJ</mtext></mrow><mo>)</mo></mrow><mrow><mo>(</mo><mn>2</mn><mo>)</mo></mrow></mrow></mtd></mtr><mtr columnalign="left"><mtd columnalign="left"><mrow /></mtd><mtd columnalign="left"><mrow><mo>=</mo><mn>376</mn><mtext></mtext><mtext>kJ</mtext></mrow></mtd></mtr></mtable></mrow></math>
-   "#;
+    <math>
+     <mrow>
+      <mtable intent=":lines">
+       <mtr> <mtd> <mi>y</mi></mtd>  <mtd><mo>=</mo> </mtd>  <mtd><mn>7</mn><mo>-</mo><mn>1</mn></mtd>  </mtr>
+       <mtr> <mtd></mtd>  <mtd><mo>=</mo></mtd>  <mtd><mrow><mn>6</mn></mrow></mtd> </mtr>
+      </mtable></mrow>
+    </math>
+    "#;
   // let expr= "<math><mrow><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>";
   let instant = Instant::now();
   let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../Rules");
   let rules_dir = rules_dir.as_os_str().to_str().unwrap().to_string();
+  // let rules_dir = "".to_string();    // Use MathCATRulesDir, potentially pointing to a zipped version
   if let Err(e) = set_rules_dir(rules_dir) {
     panic!("Error: exiting -- {}", errors_to_string(&e));  }
 

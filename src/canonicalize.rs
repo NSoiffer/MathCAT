@@ -992,7 +992,7 @@ impl CanonicalizeContext {
 
 				// normalize width ems
 				let width = mathml.attribute_value("width").unwrap_or("0em");
-				let normalized_width = crate::xpath_functions::FontSizeGuess::em_from_value(width); 
+				let normalized_width = crate::xpath_functions::FontSizeGuess::em_from_value(width);
 				mathml.set_attribute_value("data-width", &normalized_width.to_string());
 				return Some(mathml);
 			},
@@ -2068,7 +2068,7 @@ impl CanonicalizeContext {
 		// Check if start..end is a number
 		fn is_likely_a_number(context: &CanonicalizeContext, mrow: Element, children: &[ChildOfElement]) -> bool {
 			lazy_static! {
-				static ref IS_HEX_BLOCK: Regex = Regex::new("[a-eh-z]").unwrap(); 
+				static ref IS_HEX_BLOCK: Regex = Regex::new("[a-eh-z]").unwrap();
 			}
 			// Note: the children of math_or_mrow aren't valid ('children' represents the current state)
 			let end = children.len();
@@ -3004,7 +3004,7 @@ impl CanonicalizeContext {
 
 	fn canonicalize_mo_text(&self, mo: Element) {
 		// lazy_static! {
-		// 	static ref IS_LIKELY_SCALAR_VARIABLE: Regex = Regex::new("[a-eh-z]").unwrap(); 
+		// 	static ref IS_LIKELY_SCALAR_VARIABLE: Regex = Regex::new("[a-eh-z]").unwrap();
 		// }
 		
 		let mut mo_text = as_text(mo);
@@ -3456,7 +3456,7 @@ impl CanonicalizeContext {
 		fn is_comma_arg(open: &str, following_nodes: &[ChildOfElement]) -> bool {
 			// following_nodes are nodes after "("
 			if following_nodes.len() == 1 {
-				return false; 
+				return false;
 			}
 
 			let first_child = as_element(following_nodes[1]);

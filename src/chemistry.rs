@@ -84,7 +84,7 @@ static CHEM_EQUATION_ARROWS: phf::Set<char> = phf_set! {
 
 pub fn is_chemistry_off(mathml: Element) -> bool {
     lazy_static! {
-        static ref INTENT_STRUCTURE: Regex = Regex::new(r"literal([ \t\n:(]|$)").unwrap(); 
+        static ref INTENT_STRUCTURE: Regex = Regex::new(r"literal([ \t\n:(]|$)").unwrap();
     }
     if let Some(intent) = mathml.attribute_value("intent") {
         if INTENT_STRUCTURE.is_match(intent) {
@@ -551,7 +551,7 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
 
         // deal with the last element ('mathml')
          // new_base_children will turn into an mrow of mi's, the element that should be merged
-        let mut new_base_children = mathml.preceding_siblings(); 
+        let mut new_base_children = mathml.preceding_siblings();
 
         // deal with the first element (if it needs unwrapping, it has only prescripts)
         let first_element = as_element(new_base_children[0]);
@@ -875,7 +875,7 @@ fn likely_chem_subscript(subscript: Element) -> isize {
         }     
     }
     // could be a variable 'n' or something else -- just not likely
-    return -3;     
+    return -3
 }
 
 fn small_roman_to_number(text: &str) -> &str {
@@ -894,8 +894,8 @@ fn likely_chem_superscript(sup: Element) -> isize {
     //  these can stand alone, be followed by +/- or have a number in front "(2•)-"" [examples from mhchem documentation]
     // roman numerals are "oxidation state" and range from -4 to +9
     lazy_static! {
-        static ref MULTIPLE_PLUS_OR_MINUS_OR_DOT: Regex = Regex::new(r"^\++$|^-+$|^\U{2212}+$|^[⋅∙•][-+\U{2212}]*$").unwrap(); 
-        static ref SINGLE_PLUS_OR_MINUS_OR_DOT: Regex = Regex::new(r"^[+-\U{2212}⋅∙•]$").unwrap(); 
+        static ref MULTIPLE_PLUS_OR_MINUS_OR_DOT: Regex = Regex::new(r"^\++$|^-+$|^\U{2212}+$|^[⋅∙•][-+\U{2212}]*$").unwrap();
+        static ref SINGLE_PLUS_OR_MINUS_OR_DOT: Regex = Regex::new(r"^[+-\U{2212}⋅∙•]$").unwrap();
     }
     static DOTS: &[char; 3] = &['⋅', '∙', '•'];
     let sup_name = name(&sup);
@@ -959,7 +959,7 @@ fn likely_chem_superscript(sup: Element) -> isize {
             return likely;
         }
     }
-    return NOT_CHEMISTRY;     
+    return NOT_CHEMISTRY
 }
 
 
@@ -1273,7 +1273,7 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
             postscripts = &children[1..3]; // empty
         } else if children.len() == 3 || children.len() == 5 {   // just postscripts (simultanious or offset)
             prescripts = &children[0..0]; // empty
-            postscripts = &children[1..]; 
+            postscripts = &children[1..];
         } else {
             return NOT_CHEMISTRY;
         };
@@ -1570,7 +1570,7 @@ pub fn likely_chem_state(mathml: Element) -> isize {
 pub fn likely_chem_element(mathml: Element) -> isize {
     static NUCLEAR_SYMBOLS: [&str; 6] = ["e", "p", "n", "α", "β","γ"];
 
-    assert!(name(&mathml) == "mi" || name(&mathml) == "mtext", "{} is not 'mi' or 'mtext'", name(&mathml));   
+    assert!(name(&mathml) == "mi" || name(&mathml) == "mtext", "{} is not 'mi' or 'mtext'", name(&mathml));
     let text = as_text(mathml);
     if as_text(mathml).trim().is_empty() {
         return 0;   // whitespace
@@ -1740,7 +1740,7 @@ mod chem_tests {
         use sxd_document::parser;
         use crate::interface::{get_element, trim_element};
 
-        let new_package = parser::parse(&test);    
+        let new_package = parser::parse(&test);
         if let Err(e) = new_package {
             panic!("Invalid MathML input:\n{}\nError is: {}", &test, &e.to_string());
         }
@@ -1792,7 +1792,7 @@ mod chem_tests {
         assert!( !parse_mathml_string(test, |mathml| is_structural( &collect_elements(mathml).unwrap() )) );
         let test = "<mrow> <mi>B</mi> <mo>&#x2063;</mo> <mi>C</mi> <mo>&#x2063;</mo> <mi>O</mi></mrow>";
         assert!( !parse_mathml_string(test, |mathml| is_structural( &collect_elements(mathml).unwrap() )) );
-        let test = "<mrow> <mi>H</mi> <mo>&#x2063;</mo> <mi>O</mi> <mo>&#x2063;</mo> <mi>H</mi></mrow>"; 
+        let test = "<mrow> <mi>H</mi> <mo>&#x2063;</mo> <mi>O</mi> <mo>&#x2063;</mo> <mi>H</mi></mrow>";
         assert!( parse_mathml_string(test, |mathml| is_structural( &collect_elements(mathml).unwrap() )) );
         let test = "<mrow data-chem-formula='9'>
                 <mmultiscripts data-chem-formula='1'>
@@ -1810,7 +1810,7 @@ mod chem_tests {
                 <mn>2</mn>
                 <none></none>
                 </mmultiscripts>
-            </mrow>"; 
+            </mrow>";
         assert!( parse_mathml_string(test, |mathml| is_structural( &collect_elements(mathml).unwrap() )) );
     }
 

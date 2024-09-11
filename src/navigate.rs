@@ -370,7 +370,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         return NAVIGATION_RULES.with(|rules| {
             let rules = rules.borrow();
             let new_package = Package::new();
-            let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), ""); 
+            let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), "");
             
             nav_state.mode = rules.pref_manager.as_ref().borrow().pref_to_string("NavMode");
 

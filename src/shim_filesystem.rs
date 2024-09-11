@@ -241,13 +241,11 @@ cfg_if! {
             match dir.read_dir() {
                 Err(_) => return None,    // empty
                 Ok(read_dir) => {
-                    for dir_entry in read_dir {
-                        if let Ok(entry) = dir_entry {
-                            let file_name = entry.file_name();
-                            let file_name = file_name.to_string_lossy();  // avoid temp value being dropped
-                            if file_name.ends_with(ending) {
-                                return Some(file_name.to_string());
-                            }
+                    for dir_entry in read_dir.flatten() {
+                        let file_name = dir_entry.file_name();
+                        let file_name = file_name.to_string_lossy();  // avoid temp value being dropped
+                        if file_name.ends_with(ending) {
+                            return Some(file_name.to_string());
                         }
                     }
                     return None;
@@ -276,7 +274,7 @@ cfg_if! {
             return match std::fs::read(&zip_file) {
                 Err(e) => {
                     // no zip file? -- maybe started out with all the files unzipped? See if there is a .yaml file
-                    match find_file_in_dir_that_ends_with_shim(&dir, ".yaml") {
+                    match find_file_in_dir_that_ends_with_shim(dir, ".yaml") {
                         None => bail!("{}", e),
                         Some(_file_name) => Ok(false),
                     }

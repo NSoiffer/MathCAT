@@ -27,7 +27,7 @@
 extern crate yaml_rust;
 use yaml_rust::yaml::Hash;
 use yaml_rust::Yaml;
-use crate::errors::*; 
+use crate::errors::*;
 use crate::prefs::*;
 use std::{cell::RefCell, cell::Ref, cell::RefMut, collections::HashSet,  rc::Rc};
 use std::{collections::HashMap, path::Path, path::PathBuf};

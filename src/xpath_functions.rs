@@ -72,7 +72,7 @@ fn is_tag(e: Element, name: &str) -> bool {
 // Same as 'is_tag', but for ChildOfElement
 fn is_COE_tag(coe: &ChildOfElement, name: &str) -> bool {
     let element = coe.element();
-    return element.is_some() && is_tag(element.unwrap(), name);  
+    return element.is_some() && is_tag(element.unwrap(), name)
 }
 
 /// Should be an internal structure for implementation of the IsNode, but it was useful in one place in a separate module.
@@ -671,7 +671,7 @@ impl Function for ToCommonFraction {
                 Some(ord) => ord,
             };
 
-            return Ok( Value::String( answer ) );    
+            return Ok( Value::String( answer ) )
         } else {
             return Err( Error::Other( "ToCommonFraction -- argument is not an element".to_string()) );
         }
@@ -1085,7 +1085,7 @@ impl DistanceFromLeaf {
 
 /**
  * Returns distance from the current node to the leftmost/rightmost leaf (if char, then = 0, if token, then 1).
-  if the node is a bracketed expr with the indicated left/right chars
+ * If the node is a bracketed expr with the indicated left/right chars
  * node -- node(s) to test
  * left_side -- (bool) traverse leftmost child to leaf
  * treat2D_elements_as_tokens -- (bool) 2D notations such as fractions are treated like leaves 

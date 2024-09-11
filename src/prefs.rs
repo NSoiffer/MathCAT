@@ -12,6 +12,7 @@
 //! 1. Language-independent prefs found in the Rules dir
 //! 2. Language-specific prefs
 //! 3. Language-region-specific prefs
+//! 
 //! If there are multiple definitions, the later ones overwrite the former ones.
 //! This means that region-specific variants will overwrite more general variants.
 //!
@@ -47,7 +48,7 @@ pub struct Preferences {
     prefs: PreferenceHashMap        // FIX: pub so can get at iterator, should add iterator to Preferences instead
 }
 
-use std::fmt; 
+use std::fmt;
 impl fmt::Display for Preferences {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut pref_vec: Vec<(&String, &Yaml)> = self.prefs.iter().collect();
@@ -331,7 +332,7 @@ impl PreferenceManager {
                 prefs = Preferences::read_prefs_file(&user_prefs_file_path_buf, prefs)?;
             }
             // set the time otherwise keeps needing to do updates
-            self.user_prefs_file = Some( FileAndTime::new_with_time(user_prefs_file_path_buf.clone()) );         
+            self.user_prefs_file = Some( FileAndTime::new_with_time(user_prefs_file_path_buf.clone()) );
             user_prefs_file = Some(user_prefs_file_path_buf);
         }
 
@@ -851,7 +852,7 @@ mod tests {
     /// strip .../Rules from file path
     fn rel_path<'a>(rules_dir: &'a Path, path: &'a Path) -> &'a Path {
         let stripped_path = path.strip_prefix(rules_dir).unwrap();
-        return stripped_path;    
+        return stripped_path
     }
 
     #[test]

@@ -132,7 +132,7 @@ fn is_complex(v: &Yaml) -> bool {
                 0 => false,
                 1 => {
                     let (key,val) = h.iter().next().unwrap();
-                    return !(is_scalar(key) && is_scalar(val));            
+                    return !(is_scalar(key) && is_scalar(val))
                 },
                 _ => true,
             }

@@ -219,7 +219,7 @@ fn highlight(ch: char) -> char {
 fn unhighlight(ch: char) -> char {
     let ch_as_u32 = ch as u32;
     if (0x28C0..0x28FF).contains(&ch_as_u32) {              // 0x28C0..0x28FF all have dots 7 & 8 on
-        return unsafe{char::from_u32_unchecked(ch_as_u32 & 0x283F)};    
+        return unsafe{char::from_u32_unchecked(ch_as_u32 & 0x283F)};
     } else {
         return ch;
     }
@@ -505,13 +505,13 @@ fn nemeth_cleanup(raw_braille: String) -> String {
 
         // keep between numeric subscript and digit ('M' added by subscript rule)
         static ref MULTI_177_3: Regex = 
-            Regex::new(r"([N𝑁].)M([N𝑁].)").unwrap(); 
+            Regex::new(r"([N𝑁].)M([N𝑁].)").unwrap();
 
         // Add after decimal pt for non-digits except for comma and punctuation
         // Note: since "." can be in the middle of a number, there is not necessarily a "N"
         // Although not mentioned in 177_5, don't add an 'M' before an 'm'
         static ref MULTI_177_5: Regex = 
-            Regex::new(r"([N𝑁]⠨)([^⠂⠆⠒⠲⠢⠖⠶⠦⠔N𝑁,Pm])").unwrap(); 
+            Regex::new(r"([N𝑁]⠨)([^⠂⠆⠒⠲⠢⠖⠶⠦⠔N𝑁,Pm])").unwrap();
 
 
         // Pattern for rule II.9a (add numeric indicator at start of line or after a space)
@@ -520,29 +520,29 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         // 3. optional typeface indicator
         // 4. number (N)
         static ref NUM_IND_9A: Regex = 
-            Regex::new(r"(?P<start>^|[,Ww])(?P<minus>⠤?)N").unwrap();  
+            Regex::new(r"(?P<start>^|[,Ww])(?P<minus>⠤?)N").unwrap();
 
         // Needed after section mark(§), paragraph mark(¶), #, or *
         static ref NUM_IND_9C: Regex = 
-            Regex::new(r"(⠤?)(⠠⠷|⠠⠳|⠠⠈⠷)N").unwrap();  
+            Regex::new(r"(⠤?)(⠠⠷|⠠⠳|⠠⠈⠷)N").unwrap();
 
         // Needed after section mark(§), paragraph mark(¶), #, or *
         static ref NUM_IND_9D: Regex = 
-            Regex::new(r"(⠈⠠⠎|⠈⠠⠏|⠨⠼|⠈⠼)N").unwrap();  
+            Regex::new(r"(⠈⠠⠎|⠈⠠⠏|⠨⠼|⠈⠼)N").unwrap();
 
         // Needed after a typeface change or interior shape modifier indicator
-        static ref NUM_IND_9E: Regex = Regex::new(r"(?P<face>[SBTIR]+?)N").unwrap();  
-        static ref NUM_IND_9E_SHAPE: Regex = Regex::new(r"(?P<mod>⠸⠫)N").unwrap();  
+        static ref NUM_IND_9E: Regex = Regex::new(r"(?P<face>[SBTIR]+?)N").unwrap();
+        static ref NUM_IND_9E_SHAPE: Regex = Regex::new(r"(?P<mod>⠸⠫)N").unwrap();
 
         // Needed after hyphen that follows a word, abbreviation, or punctuation (caution about rule 11d)
         // Note -- hyphen might encode as either "P⠤" or "⠤" depending on the tag used
-        static ref NUM_IND_9F: Regex = Regex::new(r"([Ll].[Ll].|P.)(P?⠤)N").unwrap();  
+        static ref NUM_IND_9F: Regex = Regex::new(r"([Ll].[Ll].|P.)(P?⠤)N").unwrap();
 
         // Enclosed list exception
         // Normally we don't add numeric indicators in enclosed lists (done in get_braille_nemeth_chars).
         // The green book says "at the start" of an item, don't add the numeric indicator.
         // The NFB list exceptions after function abbreviations and angles, but what this really means is "after a space"
-        static ref NUM_IND_ENCLOSED_LIST: Regex = Regex::new(r"w([⠂⠆⠒⠲⠢⠖⠶⠦⠔⠴])").unwrap();  
+        static ref NUM_IND_ENCLOSED_LIST: Regex = Regex::new(r"w([⠂⠆⠒⠲⠢⠖⠶⠦⠔⠴])").unwrap();
 
         // Punctuation chars (Rule 38.6 says don't use before ",", "hyphen", "-", "…")
         // Never use punctuation indicator before these (38-6)
@@ -552,7 +552,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         // Rule II.9b (add numeric indicator after punctuation [optional minus[optional .][digit]
         //  because this is run after the above rule, some cases are already caught, so don't
         //  match if there is already a numeric indicator
-        static ref NUM_IND_9B: Regex = Regex::new(r"(?P<punct>P..?)(?P<minus>⠤?)N").unwrap();  
+        static ref NUM_IND_9B: Regex = Regex::new(r"(?P<punct>P..?)(?P<minus>⠤?)N").unwrap();
 
         // Before 79b (punctuation)
         static ref REMOVE_LEVEL_IND_BEFORE_SPACE_COMMA_PUNCT: Regex = Regex::new(r"(?:[↑↓]+[b𝑏]?|[b𝑏])([Ww,P]|$)").unwrap();
@@ -566,8 +566,8 @@ fn nemeth_cleanup(raw_braille: String) -> String {
         //   Beginning of line or after a space (V 38.1)
         //   After a word (38.4)
         //   2nd or subsequent punctuation (includes, "-", etc) (38.7)
-        static ref REMOVE_AFTER_PUNCT_IND: Regex = Regex::new(r"(^|[Ww]|[Ll].[Ll].)P(.)").unwrap();  
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏CLlMmb𝑏↑↓Nn𝑁Ww,])").unwrap();          
+        static ref REMOVE_AFTER_PUNCT_IND: Regex = Regex::new(r"(^|[Ww]|[Ll].[Ll].)P(.)").unwrap();
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏CLlMmb𝑏↑↓Nn𝑁Ww,])").unwrap();
         static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
     }
 
@@ -588,7 +588,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     if !raw_braille.is_empty() && ( start < raw_braille.len()-1 || "WP,".contains(raw_braille.chars().nth_back(0).unwrap()) ) {       // see comment about $end above
         result.push_str(&raw_braille[start..]);
     }
-//   debug!("ELIs:    \"{}\"", result);  
+//   debug!("ELIs:    \"{}\"", result);
 
     let result = NUM_IND_ENCLOSED_LIST.replace_all(&result, "wn${1}");
 
@@ -735,7 +735,7 @@ lazy_static! {
     // Note: fraction over is not listed due to example 42(4) which shows a space before the "/"
     // static ref REMOVE_SPACE_BEFORE_BRAILLE_INDICATORS: Regex = 
     //     Regex::new(r"(⠄⠄⠄|⠤⠤⠤)W+([⠼⠸⠪])").unwrap();
-    static ref REPLACE_INDICATORS: Regex =Regex::new(r"([1𝟙SB𝔹TIREDGVHP𝐶𝑐CLMNW𝐖swe,.-—―#ocb])").unwrap();  
+    static ref REPLACE_INDICATORS: Regex =Regex::new(r"([1𝟙SB𝔹TIREDGVHP𝐶𝑐CLMNW𝐖swe,.-—―#ocb])").unwrap();
     static ref COLLAPSE_SPACES: Regex = Regex::new(r"⠀⠀+").unwrap();
 }
 
@@ -798,7 +798,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
         let raw_braille_string = if is_cap_passage_mode_good(raw_braille) {convert_to_cap_passage_mode(raw_braille)} else {String::default()};
         let raw_braille = if raw_braille_string.is_empty() {raw_braille} else {&raw_braille_string};
         if use_only_grade1 {
-            return remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage); 
+            return remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade1, UEB_Duration::Passage);
         }
         let grade2 = remove_unneeded_mode_changes(raw_braille, UEB_Mode::Grade2, UEB_Duration::Symbol);
         // debug!("Symbol mode:  '{}'", grade2);
@@ -853,7 +853,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
                     if is_cap_mode {
                         assert!(cap_mode == UEB_Duration::Word);
                     }
-                    is_cap_mode = false;                    
+                    is_cap_mode = false;
                 } else if ch == '1' && is_cap_mode {
                     break;
                 }
@@ -915,7 +915,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
                         return false;
                     }
                     found_g1 = true;
-                    is_standing_alone_already_encountered = true; 
+                    is_standing_alone_already_encountered = true;
                 }
                 i += 1;
             }
@@ -1126,7 +1126,7 @@ fn capitals_to_word_mode(braille: &str) -> String {
                 // skip the next char to get to the real start, and then look for the modifier string or next L/N
                 // debug!("   after L '{}'", chars[i_end+2..].iter().collect::<String>());
                 for i in i_end+2..chars_len {
-                    let ch = chars[i]; 
+                    let ch = chars[i];
                     if ch == '1' {
                         // Fix: there's probably a much better way to check if we have a match against one of "⠱", "⠘⠱", "⠘⠲", "⠸⠱", "⠐⠱ ", "⠨⠸⠱"
                         if chars[i+1] == '⠱' {
@@ -1810,7 +1810,7 @@ fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> St
     let result = raw_braille.replace("CG", "⠘")
                                 .replace("𝔹C", "⠩")
                                 .replace("DC", "⠰");
-    // let result = result.replace("CC", "⠸"); 
+    // let result = result.replace("CC", "⠸");
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
     // let double_struck = pref_manager.pref_to_string("CMU_DoubleStruck");
@@ -1934,7 +1934,7 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 
 fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     lazy_static! {
-        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏C𝐶LlMmb↑↓Nn𝑁WwZ,()])").unwrap();          
+        static ref REPLACE_INDICATORS: Regex =Regex::new(r"([SB𝔹TIREDGVHUP𝐏C𝐶LlMmb↑↓Nn𝑁WwZ,()])").unwrap();
         // Numbers need to end with a space, but sometimes there is one there for other reasons
         static ref DROP_NUMBER_SEPARATOR: Regex = Regex::new(r"(n.)\)").unwrap();
         static ref NUMBER_MATCH: Regex = Regex::new(r"((N.)+[^WN𝐶#↑↓Z])").unwrap();
@@ -2046,7 +2046,7 @@ fn LaTeX_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> 
     }
     // debug!("LaTeX_cleanup: start={}", raw_braille);
     let result = raw_braille.replace('𝐖', " ");
-    // let result = COLLAPSE_SPACES.replace_all(&raw_braille, "⠀"); 
+    // let result = COLLAPSE_SPACES.replace_all(&raw_braille, "⠀");
     let result = COLLAPSE_SPACES.replace_all(&result, " ");
     // debug!("After collapse: {}", &result);
     let result = REMOVE_SPACE.replace_all(&result, "$1");
@@ -2398,7 +2398,7 @@ impl BrailleChars {
                     return "arc.".to_string() + text_without_arc;
                 }
             } 
-            return text;  
+            return text;
         }
     }
 
