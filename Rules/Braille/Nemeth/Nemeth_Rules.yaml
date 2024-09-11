@@ -892,9 +892,9 @@
       then_test:
           # there is a bug in the xpath package so \u1f8d2 (etc) aren't read properly, so we need to use the actual char
           if: "*[2][self::m:mrow]"
-          then: [x: "'🣒'"]    # 0x1f8d2 --  this is currently unassigned and may get used by UTC at some point (<=>)
-          else: [t: "'🣔'"]    # 0x1f8d4 -- this is currently unassigned and may get used by UTC at some point (<<=>)
-      else: [t: "'🣓'"]        # 0x1f8d3 -- this is currently unassigned and may get used by UTC at some point (<==>>)
+          then: [x: "'🣑'"]    # 0x1f8d1 -- this is currently unassigned and may get used by UTC at some point (<=>)
+          else: [x: "'🣓'"]    # 0x1f8d3 -- this is currently unassigned and may get used by UTC at some point (<<=>)
+      else: [x: "'🣒'"]        # 0x1f8d2 -- this is currently unassigned and may get used by UTC at some point (<=>>)
 
 -
    name: default

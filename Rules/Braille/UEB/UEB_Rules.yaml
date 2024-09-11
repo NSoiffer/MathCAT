@@ -302,9 +302,9 @@
       if: "*[1][self::m:mrow]"
       then_test:
           if: "*[2][self::m:mrow]"
-          then: [x: "'🣒'"]    # this is currently unassigned and may get used by UTC at some point (<=>)
-          else: [x: "'🣔'"]    # this is currently unassigned and may get used by UTC at some point (<<=>)
-      else: [x: "'🣓'"]        # this is currently unassigned and may get used by UTC at some point (<==>>)
+          then: [x: "'🣑'"]    # 0x1f8d1 -- this is currently unassigned and may get used by UTC at some point (<=>)
+          else: [x: "'🣓'"]    # 0x1f8d3 -- this is currently unassigned and may get used by UTC at some point (<<=>)
+      else: [x: "'🣒'"]        # 0x1f8d2 -- this is currently unassigned and may get used by UTC at some point (<=>>)
   - t: "W"
 
 -
