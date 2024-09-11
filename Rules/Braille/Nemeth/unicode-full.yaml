@@ -2155,7 +2155,11 @@
  - "⟿": [t: "⠀⠫⠢⠤⠔⠒⠢⠤⠔⠒⠢⠕⠀"]    # 0x27FF (Long rightwards squiggle arrow)
  - "⤡": [t: "⠀⠫⠘⠪⠒⠒⠕⠀"]         # 0x2921 (North west and south east arrow)
  - "⤢": [t: "⠀⠫⠰⠪⠒⠒⠕⠀"]         # 0x2922 (North east and south west arrow)
- - "🣐": [t: "⠫⠒⠒⠕⠫⠪⠒⠒"]         # 0x1f8d0 (Long rightwards arrow over leftwards arrow (equilibrium))
+ - "🣐":                            # 0x1f8d0 (Long rightwards arrow over leftwards arrow (equilibrium))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠒⠕⠫⠪⠒"]
+          else: [t: "⠫⠒⠒⠈⠕⠫⠠⠪⠒⠒"]
  - "🣑":                            # 0x1f8d1 (Long rightwards harpoon over leftwards harpoon (equilibrium))
       - test:
           if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
@@ -2196,11 +2200,9 @@
           if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
           then: [t: "⠫⠪⠒⠒⠫⠒⠕"]
           else: [t: "⠫⠈⠪⠒⠒⠫⠒⠠⠕"]
-#  - "🣕":                             # couldn't find 0x1f8d5 equiv (Short leftwards harpoon over long rightwards harpoon (equilibrium, trend to the left))
-#       - test:
-#           if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
-#           then: [t: "⠫⠪⠒⠫⠒⠒⠕"]
-#           else: [t: "⠫⠈⠪⠒⠫⠒⠒⠠⠕"]
+ - "🣖": [t: "⠌⠫⠒⠒⠕"]            # 0x1f8d6 (long rightwards arrow with through X)
+ - "🣗": [t: "⠌⠫⠒⠒⠕"]            # 0x1f8d7 (long rightwards arrow with double slash) chem code says it is same as 0x1f8d6
+
 
  - "⦃": [t: "⠨⠸⠷"]              # 0x2983 (Left white curly bracket)
  - "⦄": [t: "⠨⠸⠾"]              # 0x2984 (Right white curly bracket)
@@ -2313,6 +2315,7 @@
  - "⬰": [t: "⠨⠡⠈⠫⠪⠒⠒⠻"]       # 0x2B30 (Left arrow w small circle)
  - "⬱": [t: "⠫⠪⠒⠒⠫⠪⠒⠒⠫⠪⠒⠒"]   # 0x2B31 (Three leftwards arrows)
  - "⬲": [t: "⠫⠪⠒⠒⠈⠫⠉⠸⠫⠬⠻"]    # 0x2B32 (Left arrow w circled plus)
+ - "⮖": [t: "⠨⠡"]              # 0x2B96 (Standard State Symbol)
  - "⯃": [t: "⠫⠸⠦"]              # 0x2BC3 (Horizontal black octagon)
 
  # SRE lists this as a custom transcription
