@@ -47,7 +47,7 @@ fn check_answer(test: &str, target: &str, failure_message: &str) {
     match get_spoken_text() {
         Ok(speech) => assert_eq!(target, strip_spaces(speech), "\ntest with {} failed", failure_message),
         Err(e) => panic!("{}", errors_to_string(&e)),
-    };    
+    };
 }
 
 // Compare the result of speaking the mathml input to the output 'speech'
@@ -131,7 +131,7 @@ pub fn test_braille(code: &str, mathml: &str, braille: &str) {
     match get_braille("".to_string()) {
         Ok(result) => assert_eq!(braille, &result),
         Err(e) => panic!("{}", errors_to_string(&e)),
-    };    
+    };
 }
 
 #[allow(dead_code)]     // used in testing
@@ -158,6 +158,6 @@ pub fn test_braille_prefs(code: &str, test_prefs: Vec<(&str, &str)>, mathml: &st
     match get_braille("".to_string()) {
         Ok(result) => assert_eq!(braille, &result),
         Err(e) => panic!("{}", errors_to_string(&e)),
-    };    
+    };
 }
 
