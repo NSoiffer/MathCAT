@@ -1877,7 +1877,7 @@ static SWEDISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "W" => "⠀",     // whitespace"
     "𝐖"=> "⠀",     // whitespace
     "s" => "⠆",     // typeface single char indicator
-    "w" => "",     // typeface word indicator
+    "w" => "⠀",     // whitespace after function name
     "e" => "",     // typeface & capital terminator 
     "o" => "",       // flag that what follows is an open indicator (used for standing alone rule)
     "c" => "",     // flag that what follows is an close indicator (used for standing alone rule)
@@ -2015,6 +2015,7 @@ fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 
     // This reuses the code just for getting rid of unnecessary "L"s and "N"s
     let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
+    // debug!("   after removing mode changes={}", &result);
 
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
