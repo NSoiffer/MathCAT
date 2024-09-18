@@ -116,7 +116,7 @@ fn ex_6_2() {
 #[test]
 fn ex_6_3() {
     let expr= r#"<math><mrow><mfrac><mn>3</mn><mn>4</mn></mfrac><mo>+</mo><mfrac><mn>1</mn><mn>3</mn></mfrac><mo>=</mo>
-                <mfrac><mn>9</mn><mrow<mn>12</mn></mrow></mfrac><mo>+</mo><mfrac><mn>4</mn><mrow><mn>12</mn></mrow>
+                <mfrac><mn>9</mn><mrow><mn>12</mn></mrow></mfrac><mo>+</mo><mfrac><mn>4</mn><mrow><mn>12</mn></mrow>
                 </mfrac><mo>=</mo><mfrac><mrow><mn>13</mn></mrow><mrow><mn>12</mn></mrow></mfrac></mrow></math>"#;
     test_braille("Swedish", expr, "⠼⠉⠳⠼⠙⠀⠲⠀⠼⠁⠳⠼⠉⠀⠶⠀⠼⠊⠳⠼⠁⠃⠀⠲⠀⠼⠙⠳⠼⠁⠃⠀⠶⠀⠼⠁⠉⠳⠼⠁⠃");
 }
@@ -160,6 +160,7 @@ fn ex_6_9() {
 }
 #[test]
 fn ex_6_10() {
+    init_logger();
     let expr= r#"<math><mrow><mn>3</mn><mrow><mn>1</mn><mo>/</mo><mn>4</mn></mrow><mo>&#x2212;</mo><mn>1</mn><mrow><mn>3</mn><mo>/</mo><mn>4</mn></mrow>
                 <mo>=</mo><mn>2</mn><mrow><mn>5</mn><mo>/</mo><mn>4</mn></mrow><mo>&#x2212;</mo><mn>1</mn><mrow><mn>3</mn><mo>/</mo><mn>4</mn></mrow>
                 <mo>=</mo><mn>1</mn><mrow><mn>2</mn><mo>/</mo><mn>4</mn></mrow><mo>=</mo><mn>1</mn><mrow><mn>1</mn><mo>/</mo><mn>2</mn></mrow>
@@ -280,7 +281,7 @@ fn ex_7_6() {
 #[test]
 fn ex_7_7() {
     let expr= r#"<math><mrow><msup><mn>2</mn><mrow><msup><mn>2</mn><mrow><mi>n</mi><mo>&#x2212;</mo><mn>1</mn></mrow></msup></mrow></msup></mrow></math>"#;
-    test_braille("Swedish", expr, "⠼⠃⠘p346:⠼⠃⠘⠬⠝⠤⠼⠁⠱⠱");
+    test_braille("Swedish", expr, "⠼⠃⠘⠬:⠼⠃⠘⠬⠝⠤⠼⠁⠱⠱");
 }
 #[test]
 fn ex_7_8() {
@@ -294,7 +295,7 @@ fn ex_7_9() {
     let expr= r#"<math><mrow><msup><mi>e</mi><mrow><mo>&#x2212;</mo><msup><mi>x</mi><mn>2</mn></msup><mo>/</mo><mn>4</mn><mi>a</mi><mo>&#x2212;</mo>
                 <msup><mi>y</mi><mn>2</mn></msup><mo>/</mo><mn>4</mn><mi>b</mi><mo>&#x2212;</mo><msup><mi>z</mi><mn>2</mn></msup><mo>/</mo><mn>4</mn><mi>c</mi></mrow>
                 </msup></mrow></math>"#;
-    test_braille("Swedish", expr, "⠑⠘⠬⠤⠭⠬:⠼⠃⠌⠼⠙⠱⠁⠤⠽⠬⠼⠃⠌⠼⠙⠱⠃⠤⠵⠬⠼⠃⠌⠼⠙⠱⠉⠱");
+    test_braille("Swedish", expr, "⠑⠘⠬⠤⠭⠬⠼⠃⠌⠼⠙⠱⠁⠤⠽⠬⠼⠃⠌⠼⠙⠱⠃⠤⠵⠬⠼⠃⠌⠼⠙⠱⠉⠱");
 }
 #[test]
 fn ex_7_10() {
