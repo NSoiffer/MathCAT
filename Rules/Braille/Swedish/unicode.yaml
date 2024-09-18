@@ -86,14 +86,15 @@
  - "⅝": [t: "N⠑⠌N⠓"]                # 0x215D (vulgar fraction five eighths)
  - "⅞": [t: "N⠛⠌N⠓ "]                # 0x215E (vulgar fraction seven eighths)
  - "↉": [t: "N⠚⠌N⠉"]                # 0x2189 (vulgar fraction zero thirds)
- - "←": [t: "⠪⠒"]                # 0x2190 (left pointing arrow)
- - "↑": [t: "⠘⠦⠥⠏⠊⠇⠘⠴"]                # 0x2191 (arrow pointing up)
- - "↓": [t: "⠘⠦⠝⠏⠊⠇⠘⠴⠀"]                # 0x2193 (arrow pointing down)
- - "↔": [t: "⠪⠒⠕"]                # 0x2194 (horizontal two-way arrow)
- - "↖": [t: "⠘⠦⠝⠧⠏⠊⠇⠘⠴"]                # 0x2196 (north west arrow)
- - "↗": [t: "⠘⠦⠝⠕⠏⠊⠇⠘⠴"]                # 0x2197 (north east arrow)
- - "↘": [t: "⠘⠦⠎⠕⠏⠊⠇⠘⠴"]                # 0x2198 (south east arrow)
- - "↙": [t: "⠘⠦⠎⠧⠏⠊⠇⠘⠴"]                # 0x2199 (south west arrow)
+ - "←": [t: "⠪⠒"]                   # 0x2190 (left pointing arrow)
+ - "↑": [t: "⠘⠦⠥⠏⠊⠇⠘⠴"]            # 0x2191 (arrow pointing up)
+ - "→": [t: " ⠒⠕"]                    # 0x2192 (right arrow)
+ - "↓": [t: "⠘⠦⠝⠏⠊⠇⠘⠴⠀"]           # 0x2193 (arrow pointing down)
+ - "↔": [t: "⠪⠒⠕"]                   # 0x2194 (horizontal two-way arrow)
+ - "↖": [t: "⠘⠦⠝⠧⠏⠊⠇⠘⠴"]           # 0x2196 (north west arrow)
+ - "↗": [t: "⠘⠦⠝⠕⠏⠊⠇⠘⠴"]           # 0x2197 (north east arrow)
+ - "↘": [t: "⠘⠦⠎⠕⠏⠊⠇⠘⠴"]           # 0x2198 (south east arrow)
+ - "↙": [t: "⠘⠦⠎⠧⠏⠊⠇⠘⠴"]           # 0x2199 (south west arrow)
  - "↦": [t: "⠸⠒⠕"]                # 0x21A6 (rightwards arrow from bar (maps to))
  - "↷": [t: "⠘⠦⠁⠧⠃⠘⠴"]                # 0x21B7 (clockwise top semicircle arrow)
  - "↼": [t: "⠘⠦⠧⠓⠁⠗⠏⠥⠝⠘⠴"]                # 0x21BC (leftwards harpoon with barb upwards)
@@ -184,6 +185,9 @@
  - "○": [t: "⠻⠉"]                # 0x25CB (circle)
  - "⟨": [t: "⠠⠦"]                # 0x27E8 (left angle bracket ( angular parenthesis ))
 
+ - "…": [t: "⠄⠄⠄"]                # 0x2026 (ellipsis)
+ - "*": [t: "⠔"]                # 0x002A (asterisk)
+
 
 
  - " ":                        # 0x20 (Space)
@@ -203,33 +207,14 @@
         if: "self::m:mn"
         then: [t: "N⠂"]
         else: [t: ",W"]
- - ":":                         # 0x003A (Colon)
-        # Sometimes a colon is meant to be a ratio/mathord and sometimes a map/punct.
-        # The latter has a space after it.
-        # If in an mrow, guess it is infix and checks the operator. This is pretty weak!
-        # Field extensions "[K:F]" and trilinear coordinates "a:b:c" don't want extra space
-        # Time doesn't want an extra space -- the am/pm get wrapped in an mrow with the minutes after the colon
-    - test:
-        if:
-        - "ancestor::*[2][IsBracketed(., '{', '}')] or "       # field extension
-        - "preceding-sibling::*[2][text()=':'] or following-sibling::*[2][text()=':'] or"  # trilinear form
-          # ratios tend to have similar left and right sides
-        - "name(preceding-sibling::*[1]) = name(following-sibling::*[1]) or"
-          # am/pm test
-        - "(name(preceding-sibling::*[1]) = 'mn' and "
-        - "  following-sibling::*[1][self::m:mrow and count(*)=3 and *[1][self::m:mn] and "
-        - "     *[3][translate(., 'APM\u00A0', 'apm') = 'am' or translate(., 'APM\u00A0', 'apm') = 'pm']"
-        - " ])"
-        then: [t: "⠒"]
-        else: [t: "⠒W"]
+ - ":": [t: "⠒"]
 
- - "⁡": [t: ""]                         # 0x2061⁡ (invisible function apply)
-    #- test:
-        #if:
-        #- "preceding-sibling::*[1][self::m:mi and substring(., string-length(.), 1)!=' '] and " # avoid scripted function names and one that end with spaces
-        #- "following-sibling::*[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']" # GTM 9.3.2
-        #then: [t: "W"]
-        #else: [t: ""]
+ - "⁡":                          # 0x2061⁡ (invisible function apply)
+    # add a space if name doesn't have brackets after it or is in FunctionNames list 
+    - test:
+        if: "not(following-sibling::*[1][self::m:mfrac or IsBracketed(., '', '')]) and preceding-sibling::*[1][IsInDefinition(BaseNode(.), 'Braille', 'FunctionNames')]" 
+        then: [t: "w"]      # follows a function name, so lowercase
+        else: [t: ""]
 
  - "⁢": [t: ""]                        # 0x2062 (invisible times)
     #- test:
@@ -243,7 +228,12 @@
         #then: [t: "W"]
         #else: [t: ""]
  - "⁣": [t: ""]                 # 0x2063⁡ (invisible separator)
- - "⁤": [t: ""]                 # 0x2064 (invisible plus)
+ - "⁤":                         # 0x2064 (invisible plus)
+    - test:
+        if: "following-sibling::*[1][self::m:mrow]"   # should be a mixed fraction where the fraction is linear
+        then: [t: "W"]      # 
+        else: [t: ""]
+    
 
  # we stick the drop numbers into the private use area for consistency
  - "\ue000": [t: "N⠴"]               # 0 

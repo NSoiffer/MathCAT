@@ -94,9 +94,21 @@
    - x: "*[2]"
 
 -
+   name: nested-fraction
+   tag: mfrac
+   match: "DEBUG(*[1])[self::m:mfrac] or *[2][self::m:mfrac]"
+   replace: 
+   - t: "⠿⠦"
+   - x: "*[1]"
+   - t: "⠳⠳"
+   - x: "*[2]"
+   - t: "⠿⠴"
+
+-
    name: simple-fraction
    tag: mfrac
-   match: "not(NeedsToBeGrouped(*[1], 'Swedish', true()) or NeedsToBeGrouped(*[2], 'Swedish', true()))"
+   match: "not(preceding-sibling::*[1][. ='\u2061' and IsInDefinition(preceding-sibling::*[1], 'Braille', 'TrigFunctionNames')]) and
+           not(NeedsToBeGrouped(*[1], 'Swedish', true()) or NeedsToBeGrouped(*[2], 'Swedish', true()))"
    replace: 
    - x: "*[1]"
    - t: "⠳"
@@ -241,7 +253,8 @@
    variables: # ratio not spaced in UEB
    - AddSpaces: "$UseSpacesAroundAllOperators or
                        ( parent::*[self::m:mrow] and $NewScriptContext='' and 
-                         .!='∶' and IsInDefinition(., 'Braille', 'NemethComparisonOperators') )"
+                         .!='∶' and not(ancestor::*[self::m:mfrac]) and
+                         (IsInDefinition(., 'Braille', 'NemethComparisonOperators') or IsInDefinition(., 'Braille', 'BinaryOperators')))"
    match: "."
    replace:
       - test:
