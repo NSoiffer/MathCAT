@@ -71,7 +71,7 @@
  - "€": [t: "⠘⠑"]                # 0x20AC (euro)
  - "ℵ": [t: "⠻⠘⠁"]                # 0x2135 (alef)
  - "⅐": [t: "N⠁⠌N⠛"]                # 0x2150 (vulgar fraction one seventh)
- - "⅑": [t: "N⠁⠌N⠊ "]                # 0x2151 (vulgar fraction one ninth)
+ - "⅑": [t: "N⠁⠌N⠊"]                # 0x2151 (vulgar fraction one ninth)
  - "⅒": [t: "N⠁⠌N⠁⠚"]                # 0x2152 (vulgar fraction one tenth)
  - "⅓": [t: "N⠁⠌N⠉"]                # 0x2153 (vulgar fraction one third)
  - "⅔": [t: "N⠃⠌N⠉"]                # 0x2154 (vulgar fraction two thirds)
@@ -81,14 +81,14 @@
  - "⅘": [t: "N⠙⠌N⠑"]                # 0x2158 (vulgar fraction four fifths)
  - "⅙": [t: "N⠁⠌N⠋"]                # 0x2159 (vulgar fraction one sixth)
  - "⅚": [t: "N⠑⠌N⠋"]                # 0x215A (vulgar fraction five sixths)
- - "⅛": [t: "N⠁⠌N⠓ "]                # 0x215B (vulgar fraction one eighth)
+ - "⅛": [t: "N⠁⠌N⠓"]                # 0x215B (vulgar fraction one eighth)
  - "⅜": [t: "N⠉⠌N⠓"]                # 0x215C (vulgar fraction three eighths)
  - "⅝": [t: "N⠑⠌N⠓"]                # 0x215D (vulgar fraction five eighths)
- - "⅞": [t: "N⠛⠌N⠓ "]                # 0x215E (vulgar fraction seven eighths)
+ - "⅞": [t: "N⠛⠌N⠓"]                # 0x215E (vulgar fraction seven eighths)
  - "↉": [t: "N⠚⠌N⠉"]                # 0x2189 (vulgar fraction zero thirds)
  - "←": [t: "⠪⠒"]                   # 0x2190 (left pointing arrow)
  - "↑": [t: "⠘⠦⠥⠏⠊⠇⠘⠴"]            # 0x2191 (arrow pointing up)
- - "→": [t: " ⠒⠕"]                    # 0x2192 (right arrow)
+ - "→": [t: "⠒⠕"]                    # 0x2192 (right arrow)
  - "↓": [t: "⠘⠦⠝⠏⠊⠇⠘⠴⠀"]           # 0x2193 (arrow pointing down)
  - "↔": [t: "⠪⠒⠕"]                   # 0x2194 (horizontal two-way arrow)
  - "↖": [t: "⠘⠦⠝⠧⠏⠊⠇⠘⠴"]           # 0x2196 (north west arrow)
@@ -187,6 +187,7 @@
 
  - "…": [t: "⠄⠄⠄"]                # 0x2026 (ellipsis)
  - "*": [t: "⠔"]                # 0x002A (asterisk)
+ - "∗": [t: "⠔"]                # 0x2217 (asterisk)
 
 
 
@@ -443,8 +444,8 @@
  - "δ": [t: "GL⠙"]              # 0x3b4 
  - "ε": [t: "GL⠑"]              # 0x3b5 
  - "ζ": [t: "GL⠵"]              # 0x3b6 
- - "η": [t: "GL⠱"]             # 0x3b7 
- - "θ": [t: "GL⠹"]              # 0x3b8 
+ - "η": [t: "GL⠚"]              # 0x3b7
+ - "θ": [t: "GL⠓"]              # 0x3b8
  - "ι": [t: "GL⠊"]              # 0x3b9 
  - "κ": [t: "GL⠅"]              # 0x3ba 
  - "λ": [t: "GL⠇"]              # 0x3bb 
@@ -454,7 +455,7 @@
  - "ο": [t: "GL⠕"]              # 0x3bf 
  - "π": [t: "GL⠏"]              # 0x3c0 
  - "ρ": [t: "GL⠗"]              # 0x3c1 
- - "ς": [t: "GL⠎"]              # 0x3c2 
+#  - "ς": [t: "GL⠎"]              # 0x3c2 
  - "σ": [t: "GL⠎"]              # 0x3c3 
  - "τ": [t: "GL⠞"]              # 0x3c4 
  - "υ": [t: "GL⠥"]              # 0x3c5 
@@ -470,8 +471,8 @@
  - "Δ": [t: "CGL⠙"]             # 0x394 
  - "Ε": [t: "CGL⠑"]             # 0x395 
  - "Ζ": [t: "CGL⠵"]             # 0x396 
- - "Η": [t: "CGL⠱ "]            # 0x397 
- - "Θ": [t: "CGL⠹"]             # 0x398 
+ - "Η": [t: "CGL⠚"]             # 0x397 
+ - "Θ": [t: "CGL⠓"]             # 0x398 
  - "Ι": [t: "CGL⠊"]             # 0x399 
  - "Κ": [t: "CGL⠅"]             # 0x39a 
  - "Λ": [t: "CGL⠇"]             # 0x39b 
