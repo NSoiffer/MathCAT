@@ -268,7 +268,7 @@ fn ex_7_4() {
 #[test]
 fn ex_7_5() {
     let expr= r#"<math><mrow><msup><mi>z</mi><mi>n</mi></msup><mo>=</mo><msup><mrow><mo>(</mo><mi>r</mi><msup><mi>e</mi><mrow><mi>i</mi><mi>&#x03B8;</mi></mrow></msup>
-                <mo>)</mo></mrow><mi>n</mi></msup><mo>=</mo><msup><mi>r</mi><mi>r</mi></msup><msup><mi>e</mi><mrow><mi>i</mi><mi>n</mi><mi>&#x03B8;</mi></mrow></msup>
+                <mo>)</mo></mrow><mi>n</mi></msup><mo>=</mo><msup><mi>r</mi><mi>n</mi></msup><msup><mi>e</mi><mrow><mi>i</mi><mi>n</mi><mi>&#x03B8;</mi></mrow></msup>
                 </mrow></math>"#;
     test_braille("Swedish", expr, "⠵⠬⠝⠀⠶⠀⠦⠗⠑⠘⠬⠊⠰⠓⠱⠴⠬⠝⠀⠶⠀⠗⠬⠝⠑⠘⠬⠊⠝⠰⠓⠱");
 }
@@ -281,7 +281,7 @@ fn ex_7_6() {
 #[test]
 fn ex_7_7() {
     let expr= r#"<math><mrow><msup><mn>2</mn><mrow><msup><mn>2</mn><mrow><mi>n</mi><mo>&#x2212;</mo><mn>1</mn></mrow></msup></mrow></msup></mrow></math>"#;
-    test_braille("Swedish", expr, "⠼⠃⠘⠬:⠼⠃⠘⠬⠝⠤⠼⠁⠱⠱");
+    test_braille("Swedish", expr, "⠼⠃⠘⠬⠼⠃⠘⠬⠝⠤⠼⠁⠱⠱");
 }
 #[test]
 fn ex_7_8() {
@@ -310,7 +310,7 @@ fn ex_7_11() {
 }
 #[test]
 fn ex_7_12() {
-    let expr= r#"<math><mrow><msubsup><mrow><mi mathvariant="normal">SO</mi></mrow><mn>4</mn><mrow><mn>2</mn><mo>&#x2212;</mo></mrow></msubsup></mrow></math>"#;
+    let expr= r#"<math><mrow><msubsup><mrow><mi mathvariant="normal">S</mi><mi mathvariant="normal">O</mi></mrow><mn>4</mn><mrow><mn>2</mn><mo>&#x2212;</mo></mrow></msubsup></mrow></math>"#;
     test_braille("Swedish", expr, "⠠⠠⠎⠕⠣⠼⠙⠘⠬⠃⠤⠱");
 }
 #[test]
@@ -359,14 +359,14 @@ fn ex_7_20() {
 }
 #[test]
 fn ex_7_21() {
-    let expr= r#"<math><mrow><mi>b</mi><mo>&#x2217;</mo><mi>a</mi><mo>=</mo><mover accent='true'><mrow><mi>a</mi><mo>*</mo><mi>b</mi></mrow><mo stretchy='true'>&#x00AF;</mo>
+    let expr= r#"<math><mrow><mi>b</mi><mo>*</mo><mi>a</mi><mo>=</mo><mover accent='true'><mrow><mi>a</mi><mo>*</mo><mi>b</mi></mrow><mo stretchy='true'>&#x00AF;</mo>
                 </mover></mrow></math>"#;
     test_braille("Swedish", expr, "⠃⠔⠁⠀⠶⠀⠘⠁⠔⠃⠱⠬⠬⠤");
 }
 #[test]
 fn ex_7_22() {
     let expr= r#"<math><mrow><mover accent='true'><mrow><mi>A</mi><mi>B</mi></mrow><mo stretchy='true'>&#x2192;</mo></mover></mrow></math>"#;
-    test_braille("Swedish", expr, "⠘⠠⠠⠁⠃⠱⠬⠬⠤⠕");
+    test_braille("Swedish", expr, "⠘⠠⠠⠁⠃⠱⠬⠬⠒⠕");
 }
 #[test]
 fn ex_7_23() {
