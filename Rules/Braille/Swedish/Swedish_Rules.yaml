@@ -327,6 +327,14 @@
       else: [x: "*[1]"]
   - x: "*[2]"
 
+-
+  name: double-munder    # Section 7 (special case double underbar)
+  tag: munder
+  match: "*[1][self::m:munder and *[2][. = '¯']] and *[2][. = '¯']"
+  replace:
+  - x: "*[1]/*[1]"
+  - t: "⠣⠣⠶"
+
 
 -
   name: default
