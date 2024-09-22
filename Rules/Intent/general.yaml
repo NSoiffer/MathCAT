@@ -623,7 +623,7 @@
   name: mtable-property-is-set
   tag: mtable
   variables: [MTableProperty: "IfThenElse(contains(@data-intent-property, ':grid:'), 
-                                IfThenElse(parent::m:mrow[IsBracketed(., '|', '|')], 'determinant', 'matrix'),
+                               IfThenElse(parent::m:mrow[IsBracketed(., '|', '|')], 'determinant', 'matrix'),
                                IfThenElse(contains(@data-intent-property, ':piecewise:'), 'piecewise',
                                IfThenElse(contains(@data-intent-property, ':system-of-equation:'), 'system-of-equation',
                                IfThenElse(contains(@data-intent-property, ':lines:'), 'lines',''))))"]
