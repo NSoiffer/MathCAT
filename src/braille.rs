@@ -1855,13 +1855,13 @@ fn cmu_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String) -> St
 
 
 static SWEDISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
+    // FIX: this needs cleaning up -- not all of these are used
     "S" => "XXX",    // sans-serif -- from prefs
     "B" => "⠨",     // bold
     "𝔹" => "XXX",     // blackboard -- from prefs
     "T" => "⠈",     // script
     "I" => "⠨",     // italic
     "R" => "",      // roman
-    // "E" => "⠰",     // English
     "1" => "⠱",     // Grade 1 symbol (used for number followed by a letter)
     "L" => "",     // Letter left in to assist in locating letters
     "D" => "XXX",     // German (Deutsche) -- from prefs
@@ -1876,9 +1876,10 @@ static SWEDISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "t" => "⠱",     // shape terminator
     "W" => "⠀",     // whitespace"
     "𝐖"=> "⠀",     // whitespace
-    "s" => "⠆",     // typeface single char indicator
     "w" => "⠀",     // whitespace after function name
+    "s" => "",     // typeface single char indicator
     "e" => "",     // typeface & capital terminator 
+    "E" => "⠱",     // empty base -- see index of radical
     "o" => "",       // flag that what follows is an open indicator (used for standing alone rule)
     "c" => "",     // flag that what follows is an close indicator (used for standing alone rule)
     "b" => "",       // flag that what follows is an open or close indicator (used for standing alone rule)
@@ -1893,6 +1894,7 @@ static SWEDISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
 
 
 static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
+    // FIX: this needs cleaning up -- not all of these are used
     "S" => "XXX",    // sans-serif -- from prefs
     "B" => "⠨",     // bold
     "𝔹" => "XXX",     // blackboard -- from prefs
@@ -1997,7 +1999,11 @@ fn finnish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 
 fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     // FIX: need to implement this -- this is just a copy of the Vietnam code
-    // debug!("swedish_cleanup: start={}", raw_braille);
+    lazy_static! {
+        // Empty bases are ok if they follow whitespace
+        static ref EMPTY_BASE: Regex = Regex::new(r"(^|[W𝐖w])E").unwrap();
+    }
+    debug!("swedish_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
 
@@ -2005,7 +2011,7 @@ fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
                                     .replace("𝔹C", "⠩")
                                     .replace("DC", "⠰");
 
-    // debug!("   after typeface/caps={}", &result);
+    debug!("   after typeface/caps={}", &result);
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
     let double_struck = pref_manager.pref_to_string("Vietnam_DoubleStruck");
@@ -2015,9 +2021,10 @@ fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 
     // This reuses the code just for getting rid of unnecessary "L"s and "N"s
     let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
-    // debug!("   after removing mode changes={}", &result);
+    debug!("   after removing mode changes={}", &result);
 
 
+    let result = EMPTY_BASE.replace_all(&result, "$1");
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         let matched_char = &cap[0];
         match matched_char {
@@ -2204,7 +2211,7 @@ impl BrailleChars {
             "UEB" => BrailleChars:: get_braille_ueb_chars(node, text_range),
             "CMU" => BrailleChars:: get_braille_cmu_chars(node, text_range),
             "Vietnam" => BrailleChars:: get_braille_vietnam_chars(node, text_range),
-"Swedish" => BrailleChars:: get_braille_ueb_chars(node, text_range),    // FIX: need to figure out what to implement
+            "Swedish" => BrailleChars:: get_braille_ueb_chars(node, text_range),    // FIX: need to figure out what to implement
             "Finnish" => BrailleChars:: get_braille_ueb_chars(node, text_range),    // FIX: need to figure out what to implement
             _ => return Err(sxd_xpath::function::Error::Other(format!("get_braille_chars: unknown braille code '{}'", code)))
         };
@@ -2302,7 +2309,7 @@ impl BrailleChars {
     
         let math_variant = node.attribute_value("mathvariant");
         let text = BrailleChars::substring(as_text(node), &text_range);
-        let braille_chars = crate::speech::braille_replace_chars(&text, node)?;
+        let mut braille_chars = crate::speech::braille_replace_chars(&text, node)?;
 
         // debug!("get_braille_ueb_chars: before/after unicode.yaml: '{}'/'{}'", text, braille_chars);
         if math_variant.is_none() {         // nothing we need to do
@@ -2310,8 +2317,14 @@ impl BrailleChars {
         }
         // mathvariant could be "sans-serif-bold-italic" -- get the parts
         let math_variant = math_variant.unwrap();
-        let bold = math_variant.contains("bold");
         let italic = math_variant.contains("italic");
+        if italic & !braille_chars.contains('I') {
+            braille_chars = "I".to_string() + &braille_chars;
+        }
+        let bold = math_variant.contains("bold");
+        if bold & !braille_chars.contains('B') {
+            braille_chars = "B".to_string() + &braille_chars;
+        }
         let typeface = match HAS_TYPEFACE.find(math_variant) {
             None => "",
             Some(m) => match m.as_str() {
@@ -2747,31 +2760,8 @@ impl NeedsToBeGrouped {
             node_name = "mi";           // roman numerals don't follow number rules
         }
 
-        // FIX: the leaf rules are from UEB -- check the Swedish rules
         match node_name {
-            "mn" => {   
-                if !is_base {
-                    return false;
-                }                                                                                        // clause 1
-                // two 'mn's can be adjacent, in which case we need to group the 'mn' to make it clear it is separate (see bug #204)
-                let parent = get_parent(mathml);   // there is always a "math" node
-                let grandparent = if name(&parent) == "math" {parent} else {get_parent(parent)};
-                if name(&grandparent) != "mrow" {
-                    return false;
-                }
-                let preceding = parent.preceding_siblings();
-                if preceding.len()  < 2 {
-                    return false;
-                }
-                // any 'mn' would be separated from this node by invisible times
-                let previous_child = as_element(preceding[preceding.len()-1]);
-                if name(&previous_child) == "mo" && as_text(previous_child) == "\u{2062}" {
-                    let previous_child = as_element(preceding[preceding.len()-2]);
-                    return name(&previous_child) == "mn"
-                } else {
-                    return false;
-                }
-            },
+            "mn" => return false,
             "mi" | "mo" | "mtext" => {
                 let text = as_text(mathml);
                 let parent = get_parent(mathml);   // there is always a "math" node
@@ -2804,6 +2794,15 @@ impl NeedsToBeGrouped {
                 }
                 return true;
             },
+            "mfrac" => {
+                // exclude simple fractions -- they are not bracketed with start/end marks
+                let children = mathml.children();
+                return !(NeedsToBeGrouped::needs_grouping_for_swedish(as_element(children[0]), true) ||
+                         NeedsToBeGrouped::needs_grouping_for_swedish(as_element(children[0]), true));
+            },
+            // At least for msup (Ex 7.7, and 7.32 and maybe more), spec seems to feel grouping is not needed.
+            // "msub" | "msup" | "msubsup" | "munder" | "mover" | "munderover" => return true,
+            "mtable" => return true,    // Fix: should check for trivial cases that don't need grouping
             _ => return false,
         }
     }

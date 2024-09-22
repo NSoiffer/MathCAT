@@ -23,7 +23,6 @@
  - ")": [t: "⠴"]                # 0x0029 (right parenthesis)
  - "+": [t: "⠲"]                # 0x002B (regular plus)
  - "-": [t: "⠤"]                # 0x002D (hyphen)
- - ".": [t: "⠂"]                # 0x002E (decimal point (American and Continental))
  - "/": [t: "⠌"]                # 0x002F (diagonal fraction line)
  - "0": [t: "N⠚"]                # 0x0030 (digit zero)
  - "1": [t: "N⠁"]                # 0x0031 (digit one)
@@ -42,22 +41,24 @@
  - "@": [t: "⠘⠷"]                # 0x0040 (at)
  - "[": [t: "⠷"]                # 0x005B (left square bracket)
  - "]": [t: "⠾"]                # 0x005D (right square bracket)
- - "_": [t: "⠤"]                # 0x005F (low line (underscore))
- - "¯": [t: "⠤"]                # 0x00AF (macron)
+ - "^": [t: "⠘⠤"]                # 0x005E (circumflex)
+ - "_": [t: "⠘⠤"]                # 0x005F (low line (underscore))
+ - "¯": [t: "⠘⠤"]                # 0x00AF (macron)
 
  - "{": [t: "⠠⠷"]                # 0x007B (left curly brace)
  - "|": [t: "⠸"]                # 0x007C (divides)
- - "~": [t: "⠒"]                # 0x007E (tilde)
+ - "~": [t: "⠘⠒"]                # 0x007E (tilde)
  - "}": [t: "⠠⠾"]                # 0x007D (right curly brace)
  - "¢": [t: "⠘⠉"]                # 0x00A2 (cent)
  - "£": [t: "⠘⠇"]                # 0x00A3 (pound sterling)
  - "¥": [t: "⠘⠽"]                # 0x00A5 (yen sign)
  - "¬": [t: "⠒⠲"]                # 0x00AC (not (negation in formal logic))
  - "°": [t: "⠻⠛"]                # 0x00B0 (degree sign)
- - "±": [t: "⠨⠲⠤"]                # 0x00B1 (plus or minus)
- - "¼": [t: "⠼⠁⠌⠼⠙"]                # 0x00BC (vulgar fraction one quarter)
- - "½": [t: "⠼⠁⠌⠼⠃"]                # 0x00BD (vulgar fraction one half)
- - "¾": [t: "⠼⠉⠌⠼⠙"]                # 0x00BE (vulgar fraction three quarters)
+ - "±": [t: "⠨⠲⠤"]               # 0x00B1 (plus or minus)
+ - "·": [t: "⠻⠄"]                # 0x00B7 (Multiplication dot (times))
+ - "¼": [t: "⠼⠁⠌⠼⠙"]            # 0x00BC (vulgar fraction one quarter)
+ - "½": [t: "⠼⠁⠌⠼⠃"]            # 0x00BD (vulgar fraction one half)
+ - "¾": [t: "⠼⠉⠌⠼⠙"]            # 0x00BE (vulgar fraction three quarters)
  - "×": [t: "⠻⠭"]                # 0x00D7 (  multiplication sign)
  - "÷": [t: "⠒⠔"]                # 0x00F7 (division sign ( divided by ))
  - "ב": [t: "⠻⠘⠃"]                # 0x05D1 (  beth)
@@ -185,7 +186,11 @@
  - "○": [t: "⠻⠉"]                # 0x25CB (circle)
  - "⟨": [t: "⠠⠦"]                # 0x27E8 (left angle bracket ( angular parenthesis ))
 
- - "…": [t: "⠄⠄⠄"]                # 0x2026 (ellipsis)
+ - "…":                          # 0x2026 (ellipsis) -- no matter where they occur, they seem to always have spaces around them.
+     - t: "W⠄⠄⠄"
+     - test:
+        if: "not(following-sibling::*[1][self::m:mo and .=','])"
+        then: [t: "W"]
  - "*": [t: "⠔"]                # 0x002A (asterisk)
  - "∗": [t: "⠔"]                # 0x2217 (asterisk)
 
@@ -203,17 +208,28 @@
         - else_if: "following-sibling::*[1][@class='MathML-unit' or BaseNode(.)[@class='MathML-unit']]"
           then: [t: "𝐖"]
           else: [t: "W"]
+ - ".":                        # 0x2E (Period/FullStop)
+     - test:
+        if: "self::m:mn"
+        then: [t: "N⠄"]
+        else: [t: "⠄"]
  - ",":                        # 0x2c (Comma)
      - test:
         if: "self::m:mn"
         then: [t: "N⠂"]
         else: [t: ",W"]
- - ":": [t: "⠒"]
+ - ":": [t: "⠒"]               # 0x3a
 
  - "⁡":                          # 0x2061⁡ (invisible function apply)
-    # add a space if name doesn't have brackets after it or is in FunctionNames list 
+    # add a space if name doesn't have brackets after it or is in FunctionNames list and isn't off the baseline
+    # we always have to add a space if what follows is a letter
     - test:
-        if: "not(following-sibling::*[1][self::m:mfrac or IsBracketed(., '', '')]) and preceding-sibling::*[1][IsInDefinition(BaseNode(.), 'Braille', 'FunctionNames')]" 
+        if: "preceding-sibling::*[1][IsInDefinition(BaseNode(.), 'Braille', 'FunctionNames')] and
+             (following-sibling::*[1][
+                  IsNode(., 'leaf') and 
+                  translate(substring(., 1, 1), 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = ''] or
+              ($NewScriptContext='' andnot(ancestor::*[self::m:mfrac]) and following-sibling::*[1][not(self::m:mfrac or IsBracketed(., '', ''))])
+             )" 
         then: [t: "w"]      # follows a function name, so lowercase
         else: [t: ""]
 
