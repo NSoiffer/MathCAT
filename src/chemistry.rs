@@ -364,7 +364,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
             return None;
         }
         new_children[new_children.len()-1].set_attribute_value(SPLIT_TOKEN, "true");
-        // debug!("split_string_chem_element: {} -> {:?}", String::from_utf8(token_string.to_vec()).unwrap(), new_children.len());
+        // debug!("split_string_chem_element: {} -> {}", String::from_utf8(token_string.to_vec()).unwrap(), new_children.len());
         return Some(new_children);
     }
 
@@ -2003,6 +2003,29 @@ mod chem_tests {
                 </mmultiscripts>
             </mrow>
        </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn add_script_bug_287() {
+        let test = r#"<math><mrow>
+            <msubsup>
+                <mrow><mi mathvariant="normal">SO</mi></mrow>
+                <mn>4</mn>
+                <mrow><mn>2</mn><mo>&#x2212;</mo></mrow>
+            </msubsup>
+            </mrow></math>"#;
+        let target = r#"<math>
+            <mrow data-changed='added' data-chem-formula='6'>
+                <mi mathvariant='normal' data-chem-element='1'>S</mi>
+                <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
+                <msubsup data-chem-formula='4'>
+                    <mi mathvariant='normal' data-split='true' data-chem-element='1'>O</mi>
+                    <mn>4</mn>
+                    <mrow data-chem-formula='3'><mn>2</mn><mo>-</mo></mrow>
+                </msubsup>
+            </mrow>
+            </math>"#;
         assert!(are_strs_canonically_equal(test, target));
     }
 

@@ -365,12 +365,15 @@ pub fn replace_children<'a>(mathml: Element<'a>, replacements: Vec<Element<'a>>)
 		return mrow;
 	} else {
 		// replace the children of the parent with 'replacements' inserted in place of 'mathml'
+		// debug!("\nreplace_children: mathml\n{}", mml_to_string(&mathml));
+		// debug!("replace_children: parent before replace\n{}", mml_to_string(&parent));
 		let mut new_children = mathml.preceding_siblings();
 		let i_first_new_child = new_children.len();
 		let mut replacements = replacements.iter().map(|&el| ChildOfElement::Element(el)).collect::<Vec<ChildOfElement>>();
 		new_children.append(&mut replacements);
 		new_children.append(&mut mathml.following_siblings());
 		parent.replace_children(new_children);
+		// debug!("replace_children: (will return child[{}]) parent after replace\n{}", i_first_new_child, mml_to_string(&parent));
 		return as_element(parent.children()[i_first_new_child]);
 	}
 }
@@ -1069,20 +1072,20 @@ impl CanonicalizeContext {
 									// lifting single element mrows messes with structure in a conflicting way
 									// Note: if clean_chemistry_leaf() made changes, they don't need cleaning because they will be "ok" mi's
 									clean_chemistry_leaf(as_element(mathml.children()[i]));
-									if i == 0 {
-										// If the attach call does something, children are inserted *before* 'mathml'
-										// We return the new start at the expense of re-cleaning the script
-										// This is needed because anything before the returned element will be lost
-										let start_of_change = attach_scripts_to_split_element(mathml);
-										if name(&start_of_change) == "mrow" {
-											start_of_change.remove_attribute(MAYBE_CHEMISTRY);	  // was lifted, and not set -- remove and it will be computed later
-										}
-										// crate::canonicalize::assure_mathml(get_parent(start_of_change)).unwrap();    // FIX: find a recovery -- we're in deep trouble if this isn't true
-										if start_of_change != mathml {
-											return self.clean_mathml(start_of_change);	// clean replacement, but can't add to left
-										}
-									}										
-								}			
+								} else {
+									// If the attach call does something, children are inserted *before* child (i.e., into parent)
+									// We return the new start at the expense of re-cleaning the script
+									// This is needed because anything before the returned element will be lost
+									let start_of_change = attach_scripts_to_split_element(new_child);
+									if name(&start_of_change) == "mrow" {
+										start_of_change.remove_attribute(MAYBE_CHEMISTRY);	  // was lifted, and not set -- remove and it will be computed later
+									}
+									// crate::canonicalize::assure_mathml(get_parent(start_of_change)).unwrap();    // FIX: find a recovery -- we're in deep trouble if this isn't true
+									if start_of_change != child {
+										// debug!("clean_mathml: start_of_change != mathml -- mathml={}", mml_to_string(&mathml));
+										return self.clean_mathml(mathml);	// restart cleaning
+									}
+								}										
 								i += 1;
 							}
 						}
