@@ -106,7 +106,7 @@ fn equations_13_4_1() {
 }
 
 #[test]
-fn lim_14_3() {
+fn lim_14_2_3() {
     let expr= r#"<math><munder><mi>lim</mi><mrow><mi>x</mi><mo>&#x2192;</mo><mo>+</mo><mo>&#x221E;</mo></mrow></munder>
         <mfrac><mrow><mi>ln</mi><mo>(</mo><mi>x</mi><mo>+</mo><mn>2</mn><mo>)</mo></mrow><mi>x</mi></mfrac><mo>=</mo><mn>0</mn></math>"#;
     test_braille("French", expr, " ⠇⠊⠍⠢⠢⠰⠭⠸⠱⠖⠘⠉⠆⠇⠝⠦⠭⠖⠣⠴⠌⠭⠶⠼");
