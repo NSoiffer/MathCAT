@@ -426,7 +426,7 @@
  - "′": [t: "⠔"]                # 0x2032 (apostrophe)
  - "″": [t: "⠔⠔"]                # 0x2033 (double prime)
  - "€": [t: "p4;p15;"]                # 0x20AC (euro)
- - "←": [t: "⠣⠤"]                # 0x2190 (left pointing arrow)
+ - "←": [t: "W⠣⠤W"]                # 0x2190 (left pointing arrow)
  - "→": [t: "W⠤⠱W"]               # 0x2192 (right pointing arrow)
  - "↔": [t: "W⠣⠤⠱W"]                # 0x2194 (horizontal two-way arrow)
  - "↗": [t: "W⠔⠱W"]                # 0x2197 (north east arrow)
