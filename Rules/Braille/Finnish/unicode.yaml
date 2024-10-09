@@ -353,12 +353,12 @@
  - "ς": [t: "GL⠎"]              # 0x3c2 
  - "σ": [t: "GL⠎"]              # 0x3c3 
  - "τ": [t: "GL⠞"]              # 0x3c4 
- - "υ": [t: "GLp13456;"]              # 0x3c5 
+ - "υ": [t: "GL⠽"]              # 0x3c5 
  - "φ": [T: "GL⠋"]              # 0x3c6 
  - "ϕ": [T: "GL⠋"]              # 0x3c6 
- - "χ": [T: "GLp125;"]              # 0x3c7 
- - "ψ": [t: "GLp12346;"]              # 0x3c8 
- - "ω": [t: "GLp245;"]             # 0x3c9
+ - "χ": [T: "GL⠓"]              # 0x3c7 
+ - "ψ": [t: "GL⠯"]              # 0x3c8 
+ - "ω": [t: "GL⠚"]             # 0x3c9
 
  - "Α": [t: "CGL⠁"]             # 0x391 
  - "Β": [t: "CGL⠃"]             # 0x392 
@@ -380,15 +380,15 @@
  - "΢": [t: "CGL⠎"]             # 0x3a2 
  - "Σ": [t: "CGL⠎"]             # 0x3a3 
  - "Τ": [t: "CGL⠞"]             # 0x3a4 
- - "Υ": [t: "CGLp13456;"]         # 0x3a5 
+ - "Υ": [t: "CGL⠽"]         # 0x3a5 
  - "Φ": [t: "CGL⠋"]             # 0x3a6 
- - "Χ": [T: "CGLp125;"]             # 0x3a7 
- - "Ψ": [t: "CGLp12346;"]             # 0x3a8 
- - "Ω": [t: "CGLp245;"]             # 0x3a9
+ - "Χ": [T: "CGL⠓"]             # 0x3a7 
+ - "Ψ": [t: "CGL⠯"]             # 0x3a8 
+ - "Ω": [t: "CGL⠚"]             # 0x3a9
 
 # FI: These could be removed, because they are the same as above?
  - "µ": [t: "GL⠍"]              # 0x00B5 (Micro (Greek mu))
- - "Ω": [t: "CGLp245;"]             # 0x2126 (Ohm sign (capital Greek omega))
+ - "Ω": [t: "CGL⠚"]             # 0x2126 (Ohm sign (capital Greek omega))
  - "∆": [t: "CGL⠙"]             # 0x2206 (Increment (capital Greek delta))
  - "∏": [t: "CGL⠏"]             # 0x220F (Product (capital Greek pi))
  - "∑": [t: "CGL⠎"]             # 0x2211 (Sum (capital Greek sigma))
@@ -415,7 +415,7 @@
  - "|": [t: "⠸"]                # 0x007C (vertical bar)
  - "}": [t: "⠻"]                # 0x007D (right curly brace)
  - "~": [t: "p46;p2356;"]                # 0x007E (simple tilde (is related to, is similar)) FI: in context of geometry. Tilde has different braille in general text.
- - "¢": [t: "p234;p1345;p2345;"]                # 0x00A2 (cent)
+ - "¢": [t: "⠎⠝⠞"]                # 0x00A2 (cent)
  - "£": [t: "⠇"]                # 0x00A3 (pound sterling)
  - "§": [t: "⠼"]                # 0x00A7 (single section mark)
  - "¬": [t: "W⠳⠲"]                # 0x00AC (not (negation in formal logic))
@@ -425,7 +425,7 @@
  - "‰": [t: "⠒⠹"]                # 0x2030 (per mille sign)
  - "′": [t: "⠔"]                # 0x2032 (apostrophe)
  - "″": [t: "⠔⠔"]                # 0x2033 (double prime)
- - "€": [t: "p4;p15;"]                # 0x20AC (euro)
+ - "€": [t: "⠈⠑"]                # 0x20AC (euro)
  - "←": [t: "W⠣⠤W"]                # 0x2190 (left pointing arrow)
  - "→": [t: "W⠤⠱W"]               # 0x2192 (right pointing arrow)
  - "↔": [t: "W⠣⠤⠱W"]                # 0x2194 (horizontal two-way arrow)
