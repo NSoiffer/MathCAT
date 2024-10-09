@@ -474,7 +474,7 @@
  - "≙": [t: "W⠒⠒"]                # 0x2259 (caret over equals sign)
  - "≠": [t: "W⠐⠶"]                # 0x2260 (not equal to)
  - "≡": [t: "W⠰⠶"]                # 0x2261 (identify (is congruent to, is identical with))
- - "≢": [t: "W⠐⠰⠶"]                # 0x2262 (is not identical to)
+ - "≢": [t: "W⠐⠰⠶"]                # 0x2262 (is not identical to) FI: Not in the specification, but can be used.
  - "≤": [t: "W⠣⠶W"]                # 0x2264 (bar under less than sign (is less than or equal to))
  - "≥": [t: "W⠱⠶W"]                # 0x2265 (bar under greater than sign (is greater than or equal to))
  - "≪": [t: "W⠣⠣W"]                # 0x226A (nest of two less than signs with straight sides (is small compared with))
