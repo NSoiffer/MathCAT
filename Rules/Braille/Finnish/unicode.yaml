@@ -406,7 +406,7 @@
  - "/": [t: "W⠌"]                # 0x002F (diagonal fraction line)
  - "÷": [t: "W⠌"]               # 0x00F7 FI: Used as division sign.
 
- - "W:": [t: "⠒"]                # 0x003A (colon)
+ - ":": [t: "W⠒"]                # 0x003A (colon)
  - "<": [t: "W⠣W"]                # 0x003C (less than sign)
  - "=": [t: "W⠶"]                # 0x003D (regular equals sign)
  - ">": [t: "W⠱W"]                # 0x003E (greater than sign ( regular ))
