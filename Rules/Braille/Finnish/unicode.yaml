@@ -481,8 +481,8 @@
  - "≫": [t: "W⠱⠱W"]                # 0x226B (nest of two greater than signs with straight sides (is large compared with))
  - "≮": [t: "W⠐⠣W"]                # 0x226E (not less than)
  - "≯": [t: "W⠐⠱W"]                # 0x226F (not greater than)
- - "≰": [t: "W⠐⠣⠶W"]                # 0x2270 (neither less-than nor equal to)
- - "≱": [t: "W⠐⠱⠶W"]                # 0x2271 (neither greater-than nor equal to)
+ - "≰": [t: "W⠐⠣⠶W"]                # 0x2270 (neither less-than nor equal to) FI: Not in the specification, but can be used.
+ - "≱": [t: "W⠐⠱⠶W"]                # 0x2271 (neither greater-than nor equal to) FI: Not in the specification, but can be used.
  - "⊂": [t: "W⠳⠪"]                # 0x2282 (inclusion sign ( is contained in, is a subset of ))
  - "⊄": [t: "W⠳⠐⠪"]                # 0x2284 (not a subset of)
  - "⊆": [t: "W⠳⠶⠪"]                # 0x2286 (bar under inclusion sign (is a subset of))
