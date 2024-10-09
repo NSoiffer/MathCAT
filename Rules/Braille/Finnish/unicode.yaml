@@ -404,6 +404,7 @@
  - "-": [t: "W⠤"]                # 0x002D (hyphen)
  - ".": [t: "⠄"]                # 0x002E # FI: used as a thousand separator
  - "/": [t: "W⠌"]                # 0x002F (diagonal fraction line)
+ - "÷": [t: "W⠌"]               # 0x00F7 FI: Used as division sign.
 
  - "W:": [t: "⠒"]                # 0x003A (colon)
  - "<": [t: "W⠣W"]                # 0x003C (less than sign)
