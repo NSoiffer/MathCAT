@@ -468,7 +468,7 @@
  - "∩": [t: "W⠳⠦"]                # 0x2229 (intersection sign ( cap ))
  - "∪": [t: "W⠳⠖"]                # 0x222A (union sign)
  - "∫": [t: "⠮"]                # 0x222B (single integral)
- - "≁": [t: "W⠐⠨⠶"]                # 0x2241 (not tilde)
+ - "≁": [t: "⠐p45;"]                # 0x2241 (not tilde) FI: Not in the specification, so this is a construction
  - "≅": [t: "W⠰⠶"]                # 0x2245 (equals sign under tilde)
  - "≈": [t: "W⠸⠶"]                # 0x2248 (double tilde)
  - "≙": [t: "W⠒⠒"]                # 0x2259 (caret over equals sign)
