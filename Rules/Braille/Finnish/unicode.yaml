@@ -432,12 +432,13 @@
  - "↔": [t: "W⠣⠤⠱W"]                # 0x2194 (horizontal two-way arrow)
  - "↗": [t: "W⠔⠱W"]                # 0x2197 (north east arrow)
  - "↘": [t: "W⠢⠱W"]                # 0x2198 (south east arrow)
+ - "↖": [t: "W⠣⠢W"]                # 0x2196 (north west arrow)
+ - "↙": [t: "W⠣⠔W"]                # 0x2199 (south west arrow)
+ - "↚": [t: "W⠐⠣⠤W"]                # 0x219A (leftwards arrow with stroke) FI: not in Finnish specification, but can be added
+ - "↛": [t: "W⠐⠤⠱W"]                # 0x219B (rightwards arrow with stroke) FI: not in Finnish specification, but can be added
+ - "↮": [t: "W⠐⠣⠤⠱W"]
 
-# FI: not in Finnish specification
-#  - "↚": [t: "⠐⠣⠤"]                # 0x219A (leftwards arrow with stroke)
-#  - "↛": [t: "⠐⠤⠱"]                # 0x219B (rightwards arrow with stroke)
-
- - "⇐": [t: "W⠣⠤⠤W"]                # 0x21D0 (leftwards double arrow)
+ - "⇐": [t: "W⠣⠤⠤W"]                # 0x21D0 (leftwards double arrow) FI: not in Finnish specification, but can be added
  - "⇒": [t: "W⠤⠤⠱W"]                # 0x21D2 (rightwards double arrow (implication))
  - "⇔": [t: "W⠣⠤⠤⠱W"]                # 0x21D4 (left right double arrow (double implication, equivalence))
  - "⇍": [t: "W⠐⠣⠤⠤W"]                # 0x21CD (leftwards double arrow with stroke)
