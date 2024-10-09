@@ -494,6 +494,7 @@
  - "▭": [t: "⠫⠗"]                # 0x25AD (rectangle)
  - "▱": [t: "⠫⠏"]                # 0x25B1 (parallelogram)
  - "△": [t: "⠫⠙"]                # 0x25B3 (regular triangle (equilateral)  )
+ - "⌒": [t: "⠫⠁"]
  - "⟨": [t: "⠣"]                # 0x27E8 (left angle bracket ( angular parenthesis ))
  - "⪥": [t: "W⠱⠣W"]                # 0x2AA5 (greater than sign followed by less than sign)
  - "⫫": [t: "W⠼⠧W"]                # 0x2AEB (double up tack (conditionally independent))
