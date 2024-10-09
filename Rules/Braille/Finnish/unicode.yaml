@@ -471,6 +471,9 @@
  - "∩": [t: "W⠳⠦"]                # 0x2229 (intersection sign ( cap ))
  - "∪": [t: "W⠳⠖"]                # 0x222A (union sign)
  - "∫": [t: "⠮"]                # 0x222B (single integral)
+ - "∬": [t: "⠮⠮"]               # # 0x222C (double integral) FI: not in the specification
+ - "∭": [t: "⠮⠮⠮"]              # 0x222D (triple integral) FI: not in the specification
+ - "∂": [t: "⠈⠙"]                # 0x2202 (partial derivative (round d))
  - "≁": [t: "⠐p46;p2356;"]                # 0x2241 (not tilde) FI: Not in the specification, so this is a construction. Used in the context of geometry. Tilde has different braille in general text.
  - "≅": [t: "W⠰⠶"]                # 0x2245 (equals sign under tilde)
  - "≈": [t: "W⠸⠶"]                # 0x2248 (double tilde, almost equal to)
