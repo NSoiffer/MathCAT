@@ -414,7 +414,7 @@
  - "{": [t: "⠫"]                # 0x007B ( left curly brace)
  - "|": [t: "⠸"]                # 0x007C (vertical bar)
  - "}": [t: "⠻"]                # 0x007D (right curly brace)
- - "~": [t: "p45;"]                # 0x007E (simple tilde (is related to, is similar))
+ - "~": [t: "p46;p2356;"]                # 0x007E (simple tilde (is related to, is similar)) FI: in context of geometry. Tilde has different braille in general text.
  - "¢": [t: "p234;p1345;p2345;"]                # 0x00A2 (cent)
  - "£": [t: "⠇"]                # 0x00A3 (pound sterling)
  - "§": [t: "⠼"]                # 0x00A7 (single section mark)
@@ -468,7 +468,7 @@
  - "∩": [t: "W⠳⠦"]                # 0x2229 (intersection sign ( cap ))
  - "∪": [t: "W⠳⠖"]                # 0x222A (union sign)
  - "∫": [t: "⠮"]                # 0x222B (single integral)
- - "≁": [t: "⠐p45;"]                # 0x2241 (not tilde) FI: Not in the specification, so this is a construction
+ - "≁": [t: "⠐p46;p2356;"]                # 0x2241 (not tilde) FI: Not in the specification, so this is a construction. Used in the context of geometry. Tilde has different braille in general text.
  - "≅": [t: "W⠰⠶"]                # 0x2245 (equals sign under tilde)
  - "≈": [t: "W⠸⠶"]                # 0x2248 (double tilde)
  - "≙": [t: "W⠒⠒"]                # 0x2259 (caret over equals sign)
