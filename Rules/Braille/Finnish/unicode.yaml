@@ -111,9 +111,9 @@
  - "x": [t: "L⠭"]               # 0x78 
  - "y": [t: "L⠽"]               # 0x79 
  - "z": [t: "L⠵"]               # 0x7a
- - "å": [t: "Lp16;"]           # FI: Finnish alphabet
+ - "å": [t: "L⠡"]           # FI: Finnish alphabet
  - "ä": [t: "L⠜"]           # FI: Finnish alphabet
- - "ö": [t: "Lp246;"]           # FI: Finnish alphabet
+ - "ö": [t: "L⠪"]           # FI: Finnish alphabet
 
  - "đ": [t: "L⠮"]
  - "á": [t: "L⠔L⠁"]
@@ -329,9 +329,9 @@
         then: [t: "𝐶L⠽"]
         else: [t: "CL⠽"]
  - "Z": [t: "CL⠵"]              # 0x5a
- - "Å": [t: "CLp16;"]           # FI: Finnish alphabet
+ - "Å": [t: "CL⠡"]           # FI: Finnish alphabet
  - "Ä": [t: "CL⠜"]           # FI: Finnish alphabet
- - "Ö": [t: "CLp246;"]           # FI: Finnish alphabet
+ - "Ö": [t: "CL⠪"]           # FI: Finnish alphabet
 
  - "α": [t: "GL⠁"]              # 0x3b1 
  - "β": [t: "GL⠃"]              # 0x3b2 
