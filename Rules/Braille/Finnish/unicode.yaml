@@ -442,8 +442,9 @@
  - "⇒": [t: "W⠤⠤⠱W"]                # 0x21D2 (rightwards double arrow (implication))
  - "⇔": [t: "W⠣⠤⠤⠱W"]                # 0x21D4 (left right double arrow (double implication, equivalence))
  - "⇍": [t: "W⠐⠣⠤⠤W"]                # 0x21CD (leftwards double arrow with stroke)
- - "⇎": [t: "W⠐⠣⠤⠤⠱W"]                # 0x21CE (left right double arrow with stroke (not equivalent))
  - "⇏": [t: "W⠐⠤⠤⠱W"]                # 0x21CF (rightwards double arrow with stroke (does not imply))
+ - "⇎": [t: "W⠐⠣⠤⠤⠱W"]                # 0x21CE (left right double arrow with stroke (not equivalent))
+
  - "∀": [t: "⠳⠂"]                # 0x2200 (universal quantifier (for all, for each, for every))
  - "∃": [t: "⠳⠢"]                # 0x2203 (existential quantifier (there exists, for some))
  - "∄": [t: "⠳⠐⠢"]                # 0x2204 (does not exist)
