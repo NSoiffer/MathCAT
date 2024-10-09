@@ -386,7 +386,7 @@
  - "Ψ": [t: "CGL⠯"]             # 0x3a8 
  - "Ω": [t: "CGL⠚"]             # 0x3a9
 
-# FI: These could be removed, because they are the same as above?
+# FI: These Greek letters could be removed, because they are the same as above?
  - "µ": [t: "GL⠍"]              # 0x00B5 (Micro (Greek mu))
  - "Ω": [t: "CGL⠚"]             # 0x2126 (Ohm sign (capital Greek omega))
  - "∆": [t: "CGL⠙"]             # 0x2206 (Increment (capital Greek delta))
