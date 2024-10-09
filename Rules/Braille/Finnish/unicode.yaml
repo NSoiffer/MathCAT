@@ -27,7 +27,7 @@
  - "7": [t: "N⠛"]                # 0x0037 (digit seven)
  - "8": [t: "N⠓"]                # 0x0038 (digit eight)
  - "9": [t: "N⠊"]                # 0x0039 (digit nine)
- - "≈": [t: "W⠸⠶"]                # 0x2248 (double tilde)
+ - "≈": [t: "W⠸⠶"]                # 0x2248 (almost equal to)
  - "⋅": [t: "W⠄"]                # 0x22C5 (dot,and times)
  - "〉": [t: "⠣"]                # 0x232A (right angle bracket ( angular parenthesis ))
  - "⟨": [t: "⠱"]                # 0x27E8 (left angle bracket ( angular parenthesis ))
@@ -470,7 +470,7 @@
  - "∫": [t: "⠮"]                # 0x222B (single integral)
  - "≁": [t: "⠐p46;p2356;"]                # 0x2241 (not tilde) FI: Not in the specification, so this is a construction. Used in the context of geometry. Tilde has different braille in general text.
  - "≅": [t: "W⠰⠶"]                # 0x2245 (equals sign under tilde)
- - "≈": [t: "W⠸⠶"]                # 0x2248 (double tilde)
+ - "≈": [t: "W⠸⠶"]                # 0x2248 (double tilde, almost equal to)
  - "≙": [t: "W⠒⠒"]                # 0x2259 (caret over equals sign)
  - "≠": [t: "W⠐⠶"]                # 0x2260 (not equal to)
  - "≡": [t: "W⠰⠶"]                # 0x2261 (identify (is congruent to, is identical with))
