@@ -451,6 +451,7 @@
  - "∇": [t: "⠸⠲"]                # 0x2207 (del (nabla, gradient) , inverted triangle)
  - "∈": [t: "W⠳⠔"]                # 0x2208 (membership (is an element of))
  - "∉": [t: "W⠳⠐⠔"]                # 0x2209 (is not an element of)
+ - "∁": [t: "W⠳⠤"]              # 0x2201 (complement)
 
 # FI: Same as the Greek letters. Are these needed?
 #  - "∏": [t: "⠸⠏"]                # 0x220F (n-ary product)
