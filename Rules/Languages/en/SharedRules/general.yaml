@@ -206,7 +206,9 @@
   match: "count(*)=2 and not(@data-intent-property)"
   replace:
   - x: "*[1]"
-  - t: "sub"      # phrase(the subscripted variable a 'sub' i)
+  - test:
+      if: "not($Verbosity='Terse' and DEBUG(*[2])[self::m:mn and not(DEBUG(translate(., '.,', '')!=.))])"  # just say "x 1" for terse vs "x sub 1"
+      then: [t: "sub"]      # phrase(x 'sub' 2)
   - x: "*[2]"
   - test:
       if: "not(IsNode(*[2],'leaf')) and $Impairment = 'Blindness'"
