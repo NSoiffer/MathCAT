@@ -271,7 +271,7 @@ cfg_if! {
 
         pub fn zip_extract_shim(dir: &Path, zip_file_name: &str) -> Result<bool> {
             let zip_file = dir.join(zip_file_name);
-            return match std::fs::read(&zip_file) {
+            return match std::fs::read(zip_file) {
                 Err(e) => {
                     // no zip file? -- maybe started out with all the files unzipped? See if there is a .yaml file
                     match find_file_in_dir_that_ends_with_shim(dir, ".yaml") {

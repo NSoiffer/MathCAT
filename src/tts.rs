@@ -206,21 +206,21 @@ pub enum TTSCommandValue {
 impl TTSCommandValue {
     fn get_num(&self) -> f64 {
         match self {
-            TTSCommandValue::Number(n) => return *n,
+            TTSCommandValue::Number(n) => *n,
             _ => panic!("Internal error: TTSCommandValue is not a number"),
         }
     }
 
     fn get_string(&self) -> &String {
         match self {
-            TTSCommandValue::String(s) => return s,
+            TTSCommandValue::String(s) => s,
             _ => panic!("Internal error: TTSCommandValue is not a string"),
         }
     }
 
     fn get_pronounce(&self) -> &Pronounce {
         match self {
-            TTSCommandValue::Pronounce(p) => return p,
+            TTSCommandValue::Pronounce(p) => p,
             _ => panic!("Internal error: TTSCommandValue is not a 'pronounce' command'"),
         }
     }
@@ -243,10 +243,10 @@ impl fmt::Display for TTSCommandRule {
             TTSCommandValue::Pronounce(p) => p.to_string(),
         };
         if self.command == TTSCommand::Pause {
-            return write!(f, "pause: {}", value);
+            write!(f, "pause: {}", value)
         } else {
-            return write!(f, "{}: {}{}", self.command, value, self.replacements);
-        };
+            write!(f, "{}: {}{}", self.command, value, self.replacements)
+        }
     }
 }
 
@@ -256,11 +256,11 @@ impl TTSCommandRule {
         value: TTSCommandValue,
         replacements: ReplacementArray,
     ) -> TTSCommandRule {
-        return TTSCommandRule {
+        TTSCommandRule {
             command,
             value,
             replacements,
-        };
+        }
     }
 }
 
@@ -343,11 +343,11 @@ impl TTS {
             }
             _ => TTSCommandValue::String(tts_str_value.to_string()),
         };
-        return Ok(Box::new(TTSCommandRule::new(
+        Ok(Box::new(TTSCommandRule::new(
             tts_enum,
             tts_command_value,
             replacements,
-        )));
+        )))
     }
 
     /// The rule called to execute the TTSCommand `command`
@@ -364,7 +364,7 @@ impl TTS {
         rules_with_context: &'r mut SpeechRulesWithContext<'c, 's, 'm>,
         mathml: Element<'c>,
     ) -> Result<T> {
-        return T::replace_tts(self, command, prefs, rules_with_context, mathml);
+        T::replace_tts(self, command, prefs, rules_with_context, mathml)
     }
 
     pub fn replace_string<'c, 's: 'c, 'm, 'r>(
@@ -537,7 +537,7 @@ impl TTS {
             match value {
                 TTSCommandValue::XPath(xpath) => {
                     let id = xpath.replace::<String>(rules_with_context, mathml)?;
-                    return Ok(format!("<{}='{}'/>", tag_and_attr, id));
+                    Ok(format!("<{}='{}'/>", tag_and_attr, id))
                 }
                 _ => bail!(
                     "Implementation error: found bookmark value that did not evaluate to a string"
@@ -579,7 +579,7 @@ impl TTS {
                 return crate::speech::CONCAT_INDICATOR.to_string() + &p.text;
             }
         };
-        return "".to_string();
+        "".to_string()
     }
 
     fn get_string_sapi5(
@@ -588,7 +588,7 @@ impl TTS {
         prefs: &PreferenceManager,
         is_start_tag: bool,
     ) -> String {
-        return match &command.command {
+        match &command.command {
             TTSCommand::Pause => {
                 if is_start_tag {
                     let amount = command.value.get_num();
@@ -675,7 +675,7 @@ impl TTS {
             TTSCommand::Bookmark => {
                 panic!("Internal error: bookmarks should have been handled earlier")
             }
-        };
+        }
     }
 
     fn get_string_ssml(
@@ -684,7 +684,7 @@ impl TTS {
         prefs: &PreferenceManager,
         is_start_tag: bool,
     ) -> String {
-        return match &command.command {
+        match &command.command {
             TTSCommand::Pause => {
                 if is_start_tag {
                     let amount = command.value.get_num();
@@ -774,15 +774,15 @@ impl TTS {
             TTSCommand::Bookmark => {
                 panic!("Internal error: bookmarks should have been handled earlier")
             }
-        };
+        }
     }
 
     fn get_pause_multiplier(prefs: &PreferenceManager) -> f64 {
-        return prefs
+        prefs
             .pref_to_string("PauseFactor")
             .parse::<f64>()
             .unwrap_or(100.)
-            / 100.0;
+            / 100.0
     }
 
     /// Compute the length of the pause to use.
@@ -827,11 +827,11 @@ impl TTS {
             TTSCommandValue::Number(pause as f64),
             ReplacementArray::build_empty(),
         );
-        return match self {
+        match self {
             TTS::None => self.get_string_none(&command, prefs, true),
             TTS::SSML => self.get_string_ssml(&command, prefs, true),
             TTS::SAPI5 => self.get_string_sapi5(&command, prefs, true),
-        };
+        }
     }
 
     /// Take the longest of the pauses
@@ -843,11 +843,11 @@ impl TTS {
     /// Until evidence points otherwise, use 'longest'.
     pub fn merge_pauses(&self, str: &str) -> String {
         // we need specialized merges for each TTS engine because we need to know the format of the commands
-        return match self {
+        match self {
             TTS::None => self.merge_pauses_none(str),
             TTS::SSML => self.merge_pauses_ssml(str),
             TTS::SAPI5 => self.merge_pauses_sapi5(str),
-        };
+        }
     }
 
     fn merge_pauses_none(&self, str: &str) -> String {
@@ -860,7 +860,7 @@ impl TTS {
         for cap in MULTIPLE_PAUSES.captures_iter(str) {
             merges_string = merges_string.replace(&cap[0], ";");
         }
-        return merges_string;
+        merges_string
     }
 
     fn merge_pauses_xml<F>(
@@ -883,7 +883,7 @@ impl TTS {
             }
             merges_string = merges_string.replace(&cap[0], &replace_with(amount));
         }
-        return merges_string;
+        merges_string
     }
 
     fn merge_pauses_sapi5(&self, str: &str) -> String {
@@ -892,7 +892,7 @@ impl TTS {
             static ref PAUSE_AMOUNT: Regex = Regex::new(r"msec=.*?(\d+)").unwrap();   // amount after 'time'
         }
         let replacement = |amount: usize| format!("<silence msec=='{}ms'/>", amount);
-        return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement);
+        TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement)
     }
 
     fn merge_pauses_ssml(&self, str: &str) -> String {
@@ -901,6 +901,6 @@ impl TTS {
             static ref PAUSE_AMOUNT: Regex = Regex::new(r"time=.*?(\d+)").unwrap();   // amount after 'time'
         }
         let replacement = |amount: usize| format!("<break time='{}ms'/>", amount);
-        return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement);
+        TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement)
     }
 }
