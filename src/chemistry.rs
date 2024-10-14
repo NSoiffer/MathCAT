@@ -1305,7 +1305,7 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
                     let base_name = name(&base);
                     if base_name == "mi" || base_name == "mtext" {
                         if let Some(atomic_number) = CHEMICAL_ELEMENT_ATOMIC_NUMBER.get(as_text(base)) {
-                            if as_text(pre_subscript) == &atomic_number.to_string() {
+                            if as_text(pre_subscript) == atomic_number.to_string() {
                                 likelihood = CHEMISTRY_THRESHOLD;
                             }
                         }
