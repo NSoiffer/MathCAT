@@ -204,10 +204,6 @@ impl TTSCommandValue {
 <<<<<<< HEAD
             TTSCommandValue::String(s) => return s,
             _                                  => panic!("Internal error: TTSCommandValue is not a string"),
-=======
-            TTSCommandValue::String(s) => s,
-            _ => panic!("Internal error: TTSCommandValue is not a string"),
->>>>>>> 5e9e9a7acf7c96de535519dd0710798feba6158f
         }
     }
 
