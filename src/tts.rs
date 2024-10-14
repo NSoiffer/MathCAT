@@ -251,23 +251,11 @@ impl fmt::Display for TTSCommandRule {
 
 
 impl TTSCommandRule {
-<<<<<<< HEAD
     pub fn new(command: TTSCommand, value: TTSCommandValue, replacements: ReplacementArray) -> TTSCommandRule {
         return TTSCommandRule{
             command,
             value,
             replacements
-=======
-    pub fn new(
-        command: TTSCommand,
-        value: TTSCommandValue,
-        replacements: ReplacementArray,
-    ) -> TTSCommandRule {
-        TTSCommandRule {
-            command,
-            value,
-            replacements,
->>>>>>> 5e9e9a7acf7c96de535519dd0710798feba6158f
         }
     }
 }
