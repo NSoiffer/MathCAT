@@ -201,25 +201,15 @@ impl TTSCommandValue {
 
     fn get_string(&self) -> &String {
         match self {
-<<<<<<< HEAD
             TTSCommandValue::String(s) => return s,
             _                                  => panic!("Internal error: TTSCommandValue is not a string"),
-=======
-            TTSCommandValue::String(s) => s,
-            _ => panic!("Internal error: TTSCommandValue is not a string"),
->>>>>>> 5e9e9a7acf7c96de535519dd0710798feba6158f
         }
     }
 
     fn get_pronounce(&self) -> &Pronounce {
         match self {
-<<<<<<< HEAD
             TTSCommandValue::Pronounce(p) => return p,
             _                               => panic!("Internal error: TTSCommandValue is not a 'pronounce' command'"),
-=======
-            TTSCommandValue::Pronounce(p) => p,
-            _ => panic!("Internal error: TTSCommandValue is not a 'pronounce' command'"),
->>>>>>> 5e9e9a7acf7c96de535519dd0710798feba6158f
         }
         
     }
@@ -242,10 +232,10 @@ impl fmt::Display for TTSCommandRule {
             TTSCommandValue::Pronounce(p) => p.to_string(),
         };
         if self.command == TTSCommand::Pause {
-            write!(f, "pause: {}", value)
+            return write!(f, "pause: {}", value);
         } else {
-            write!(f, "{}: {}{}", self.command, value, self.replacements)
-        }
+            return write!(f, "{}: {}{}", self.command, value, self.replacements);
+        };
     }
 }
 
@@ -335,15 +325,7 @@ impl TTS {
                 TTSCommandValue::String(tts_str_value.to_string())
             },
         };
-<<<<<<< HEAD
         return Ok( Box::new( TTSCommandRule::new(tts_enum, tts_command_value, replacements) ) );
-=======
-        Ok(Box::new(TTSCommandRule::new(
-            tts_enum,
-            tts_command_value,
-            replacements,
-        )))
->>>>>>> 5e9e9a7acf7c96de535519dd0710798feba6158f
     }
     
     /// The rule called to execute the TTSCommand `command`
@@ -353,19 +335,8 @@ impl TTS {
     /// A string is returned for the speech engine.
     ///
     /// `auto` pausing is handled at a later phase and a special char is used for it
-<<<<<<< HEAD
     pub fn replace<'c, 's:'c, 'm:'c, 'r, T:TreeOrString<'c, 'm, T>>(&self, command: &TTSCommandRule, prefs: &PreferenceManager, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's, 'm>, mathml: Element<'c>) -> Result<T> {
         return T::replace_tts(self, command, prefs, rules_with_context, mathml);
-=======
-    pub fn replace<'c, 's: 'c, 'm: 'c, 'r, T: TreeOrString<'c, 'm, T>>(
-        &self,
-        command: &TTSCommandRule,
-        prefs: &PreferenceManager,
-        rules_with_context: &'r mut SpeechRulesWithContext<'c, 's, 'm>,
-        mathml: Element<'c>,
-    ) -> Result<T> {
-        T::replace_tts(self, command, prefs, rules_with_context, mathml)
->>>>>>> 5e9e9a7acf7c96de535519dd0710798feba6158f
     }
 
     pub fn replace_string<'c, 's:'c, 'm, 'r>(&self, command: &TTSCommandRule, prefs: &PreferenceManager, rules_with_context: &'r mut SpeechRulesWithContext<'c, 's, 'm>, mathml: Element<'c>) -> Result<String> {
@@ -476,7 +447,7 @@ impl TTS {
             if result.is_empty() {
                 result += " ";
             }
-            result += &command.replacements.replace::<String>(rules_with_context, mathml)?;
+            result += &command.replacements.replace::<String>(rules_with_context, mathml)?;    
         }
 
         let end_tag = match self {
@@ -496,17 +467,9 @@ impl TTS {
             match value {
                 TTSCommandValue::XPath(xpath) => {
                     let id = xpath.replace::<String>(rules_with_context, mathml)?;
-<<<<<<< HEAD
                     return Ok( format!("<{}='{}'/>", tag_and_attr, id) );
                 },
                 _ => bail!("Implementation error: found bookmark value that did not evaluate to a string"),
-=======
-                    Ok(format!("<{}='{}'/>", tag_and_attr, id))
-                }
-                _ => bail!(
-                    "Implementation error: found bookmark value that did not evaluate to a string"
-                ),
->>>>>>> 5e9e9a7acf7c96de535519dd0710798feba6158f
             }
         }
     
@@ -541,9 +504,8 @@ impl TTS {
                 return crate::speech::CONCAT_INDICATOR.to_string() + &p.text;
             }
         };
-        "".to_string()
+        return "".to_string();
     }
-<<<<<<< HEAD
     
     fn get_string_sapi5(&self, command: &TTSCommandRule, prefs: &PreferenceManager, is_start_tag: bool) -> String  {
         return match &command.command {
@@ -551,32 +513,6 @@ impl TTS {
                 let amount = command.value.get_num();
                 if amount == PAUSE_AUTO {
                     PAUSE_AUTO_STR.to_string()
-=======
-
-    fn get_string_sapi5(
-        &self,
-        command: &TTSCommandRule,
-        prefs: &PreferenceManager,
-        is_start_tag: bool,
-    ) -> String {
-        match &command.command {
-            TTSCommand::Pause => {
-                if is_start_tag {
-                    let amount = command.value.get_num();
-                    if amount == PAUSE_AUTO {
-                        PAUSE_AUTO_STR.to_string()
-                    } else {
-                        let amount = amount * TTS::get_pause_multiplier(prefs);
-                        if amount > MIN_PAUSE {
-                            format!(
-                                "<silence msec=='{}ms'/>",
-                                (amount * 180.0 / prefs.get_rate()).round()
-                            )
-                        } else {
-                            "".to_string()
-                        }
-                    }
->>>>>>> 5e9e9a7acf7c96de535519dd0710798feba6158f
                 } else {
                     let amount = amount * TTS::get_pause_multiplier(prefs);
                     if amount > MIN_PAUSE {
@@ -602,7 +538,6 @@ impl TTS {
                     format!("<pron sym='{}'>{}", &command.value.get_pronounce().sapi5, &command.value.get_pronounce().text)
                 } else {
                     String::from("</pron>")
-<<<<<<< HEAD
                 },
             TTSCommand::Bookmark => panic!("Internal error: bookmarks should have been handled earlier"),
         };
@@ -610,23 +545,6 @@ impl TTS {
 
     fn get_string_ssml(&self, command: &TTSCommandRule, prefs: &PreferenceManager, is_start_tag: bool) -> String  {
         return match &command.command {
-=======
-                }
-            }
-            TTSCommand::Bookmark => {
-                panic!("Internal error: bookmarks should have been handled earlier")
-            }
-        }
-    }
-
-    fn get_string_ssml(
-        &self,
-        command: &TTSCommandRule,
-        prefs: &PreferenceManager,
-        is_start_tag: bool,
-    ) -> String {
-        match &command.command {
->>>>>>> 5e9e9a7acf7c96de535519dd0710798feba6158f
             TTSCommand::Pause => {
                 if is_start_tag {
                     let amount = command.value.get_num();
@@ -643,7 +561,6 @@ impl TTS {
                 } else {
                     "".to_string()
                 }
-<<<<<<< HEAD
             },
             TTSCommand::Pitch => if is_start_tag {format!("<prosody pitch='{}%'>", command.value.get_num())} else {String::from("</prosody>")},
             TTSCommand::Rate =>  if is_start_tag {format!("<prosody rate='{}%'>", command.value.get_num())} else {String::from("</prosody>")},
@@ -658,91 +575,11 @@ impl TTS {
                 String::from("</phoneme>")
             },
         TTSCommand::Bookmark => panic!("Internal error: bookmarks should have been handled earlier"),
-=======
-            }
-            TTSCommand::Pitch => {
-                if is_start_tag {
-                    format!("<prosody pitch='{}%'>", command.value.get_num())
-                } else {
-                    String::from("</prosody>")
-                }
-            }
-            TTSCommand::Rate => {
-                if is_start_tag {
-                    format!("<prosody rate='{}%'>", command.value.get_num())
-                } else {
-                    String::from("</prosody>")
-                }
-            }
-            TTSCommand::Volume => {
-                if is_start_tag {
-                    format!("<prosody volume='{}db'>", command.value.get_num())
-                } else {
-                    String::from("</prosody>")
-                }
-            }
-            TTSCommand::Audio => {
-                if is_start_tag {
-                    format!("<audio src='{}'>", command.value.get_string())
-                } else {
-                    String::from("</audio>")
-                }
-            } // only 'beep' is supported for now
-            TTSCommand::Gender => {
-                if is_start_tag {
-                    format!(
-                        "<voice required='gender=\"{}\"'>",
-                        command.value.get_string()
-                    )
-                } else {
-                    String::from("</voice>")
-                }
-            }
-            TTSCommand::Voice => {
-                if is_start_tag {
-                    format!("<voice required='{}'>", command.value.get_string())
-                } else {
-                    String::from("</voice>")
-                }
-            }
-            TTSCommand::Spell => {
-                if is_start_tag {
-                    format!(
-                        "<say-as interpret-as='characters'>{}",
-                        command.value.get_string()
-                    )
-                } else {
-                    String::from("</say-as>")
-                }
-            }
-            TTSCommand::Pronounce => {
-                if is_start_tag {
-                    format!(
-                        "<phoneme alphabet='ipa' ph='{}'>{}",
-                        &command.value.get_pronounce().ipa,
-                        &command.value.get_pronounce().text
-                    )
-                } else {
-                    String::from("</phoneme>")
-                }
-            }
-            TTSCommand::Bookmark => {
-                panic!("Internal error: bookmarks should have been handled earlier")
-            }
->>>>>>> 5e9e9a7acf7c96de535519dd0710798feba6158f
         }
     }
 
     fn get_pause_multiplier(prefs: &PreferenceManager) -> f64 {
-<<<<<<< HEAD
         return prefs.pref_to_string("PauseFactor").parse::<f64>().unwrap_or(100.)/100.0;
-=======
-        prefs
-            .pref_to_string("PauseFactor")
-            .parse::<f64>()
-            .unwrap_or(100.)
-            / 100.0
->>>>>>> 5e9e9a7acf7c96de535519dd0710798feba6158f
     }
 
     /// Compute the length of the pause to use.
@@ -773,7 +610,7 @@ impl TTS {
         if after_len < 3 {
             // hack to prevent pausing before "of" in exprs like "the fourth power of secant, of x"
             // if it should pause anywhere, it should be after the "of"
-            return "".to_string();
+            return "".to_string(); 
         }
         let pause = std::cmp::min(3000, ((2 * before_len + after_len)/48) * 128);
         // create a TTSCommandRule so we reuse code
@@ -782,20 +619,12 @@ impl TTS {
             TTSCommandValue::Number(pause as f64),
             ReplacementArray::build_empty(),
         );
-<<<<<<< HEAD
         return match self {
             TTS::None  => self.get_string_none(&command, prefs, true),
             TTS::SSML  => self.get_string_ssml(&command, prefs, true),
             TTS::SAPI5 => self.get_string_sapi5(&command, prefs, true),
         };
 
-=======
-        match self {
-            TTS::None => self.get_string_none(&command, prefs, true),
-            TTS::SSML => self.get_string_ssml(&command, prefs, true),
-            TTS::SAPI5 => self.get_string_sapi5(&command, prefs, true),
-        }
->>>>>>> 5e9e9a7acf7c96de535519dd0710798feba6158f
     }
 
     /// Take the longest of the pauses
@@ -807,17 +636,11 @@ impl TTS {
     /// Until evidence points otherwise, use 'longest'.
     pub fn merge_pauses(&self, str: &str) -> String {
         // we need specialized merges for each TTS engine because we need to know the format of the commands
-<<<<<<< HEAD
         return match self {
             TTS::None  => self.merge_pauses_none(str),
             TTS::SSML  => self.merge_pauses_ssml(str),
-=======
-        match self {
-            TTS::None => self.merge_pauses_none(str),
-            TTS::SSML => self.merge_pauses_ssml(str),
->>>>>>> 5e9e9a7acf7c96de535519dd0710798feba6158f
             TTS::SAPI5 => self.merge_pauses_sapi5(str),
-        }
+        };        
     }
 
     fn merge_pauses_none(&self, str: &str) -> String {
@@ -830,7 +653,7 @@ impl TTS {
         for cap in MULTIPLE_PAUSES.captures_iter(str) {
             merges_string = merges_string.replace(&cap[0], ";");
         }
-        merges_string
+        return merges_string;
     }
 
     fn merge_pauses_xml<F>(str: &str, full_attr_re: &Regex, sub_attr_re: &Regex, replace_with: F) -> String 
@@ -846,7 +669,7 @@ impl TTS {
             };
             merges_string = merges_string.replace(&cap[0], &replace_with(amount));
         }
-        merges_string
+        return merges_string;
     }
 
     fn merge_pauses_sapi5(&self, str: &str) -> String {
@@ -855,7 +678,7 @@ impl TTS {
             static ref PAUSE_AMOUNT: Regex = Regex::new(r"msec=.*?(\d+)").unwrap();   // amount after 'time'
         }
         let replacement = |amount: usize| format!("<silence msec=='{}ms'/>", amount);
-        TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement)
+        return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement);
     }
 
     fn merge_pauses_ssml(&self, str: &str) -> String {
@@ -864,6 +687,6 @@ impl TTS {
             static ref PAUSE_AMOUNT: Regex = Regex::new(r"time=.*?(\d+)").unwrap();   // amount after 'time'
         }
         let replacement = |amount: usize| format!("<break time='{}ms'/>", amount);
-        TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement)
+        return TTS::merge_pauses_xml(str, &CONSECUTIVE_BREAKS, &PAUSE_AMOUNT, replacement);
     }
 }
