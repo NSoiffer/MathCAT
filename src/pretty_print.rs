@@ -476,8 +476,7 @@ fn need_quotes(string: &str) -> bool {
 
     string.is_empty()
         || need_quotes_spaces(string)
-        || string.starts_with(|character: char| matches!(character,
-            '&' | '*' | '?' | '|' | '-' | '<' | '>' | '=' | '!' | '%' | '@') )
+        || string.starts_with(['&', '*', '?', '|', '-', '<', '>', '=', '!', '%', '@'])
         || string.contains(|character: char| matches!(character,
             ':'
             | '{'
