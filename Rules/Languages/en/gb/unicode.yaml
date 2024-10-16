@@ -28,4 +28,13 @@
         if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
         then: [t: "close square bracket"]
         else: [t: "right square bracket"]
-
+ - "{":                                         # 0x7b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [t: "open curly bracket"]
+        else: [t: "left curly bracket"]                            
+ - "}":                                          # 0x7d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [t: "close curly bracket"]
+        else: [t: "right curly bracket"]                            
