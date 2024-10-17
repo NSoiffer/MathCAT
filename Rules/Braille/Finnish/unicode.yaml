@@ -398,8 +398,8 @@
  - "$": [T: "⠮"]                # 0x0024 (dollar sign)
  - "%": [T: "⠹"]                # 0x0025 (percent sign)
  - "&": [T: "⠯"]                # 0x0026 (ampersand (and, logical product))
- - "(": [t: "("]                # 0x0028 (left parenthesis -- handled later)
- - ")": [t: ")"]                # 0x0029 (right parenthesis -- handled later)
+ - "(": [T: "("]                # 0x0028 (left parenthesis -- handled later)
+ - ")": [T: ")"]                # 0x0029 (right parenthesis -- handled later)
  - "+": [T: "W⠖"]                # 0x002B (regular plus)
  - "-": [T: "W⠤"]                # 0x002D (hyphen)
  - ".": [T: "⠄"]                # 0x002E # FI: used as a thousand separator
