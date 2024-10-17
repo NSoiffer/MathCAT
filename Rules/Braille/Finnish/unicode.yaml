@@ -393,8 +393,12 @@
  - "∏": [T: "CGL⠏"]             # 0x220F (Product (capital Greek pi))
  - "∑": [T: "CGL⠎"]             # 0x2211 (Sum (capital Greek sigma))
 
- - "!": [T: "⠲"]                # 0x0021 (exclamation point) 
- - "!": [T: "⠠⠲"]                # FI: braille for the factorial, probably requires a test
+ - "!":                        # 0x0021 (exclamation point) 
+    - test:
+        if: "self::m:mtext"
+        then: [t: "⠲"]          # FI: regular exaclamation point in text
+        else: [t: "⠠⠲"]         # FI: factorial
+
  - "$": [T: "⠮"]                # 0x0024 (dollar sign)
  - "%": [T: "⠹"]                # 0x0025 (percent sign)
  - "&": [T: "⠯"]                # 0x0026 (ampersand (and, logical product))
