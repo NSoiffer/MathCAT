@@ -447,7 +447,7 @@ impl TTS {
             if result.is_empty() {
                 result += " ";
             }
-            result += &command.replacements.replace::<String>(rules_with_context, mathml)?;
+            result += &command.replacements.replace::<String>(rules_with_context, mathml)?;    
         }
 
         let end_tag = match self {
@@ -610,7 +610,7 @@ impl TTS {
         if after_len < 3 {
             // hack to prevent pausing before "of" in exprs like "the fourth power of secant, of x"
             // if it should pause anywhere, it should be after the "of"
-            return "".to_string();
+            return "".to_string(); 
         }
         let pause = std::cmp::min(3000, ((2 * before_len + after_len)/48) * 128);
         // create a TTSCommandRule so we reuse code
@@ -640,7 +640,7 @@ impl TTS {
             TTS::None  => self.merge_pauses_none(str),
             TTS::SSML  => self.merge_pauses_ssml(str),
             TTS::SAPI5 => self.merge_pauses_sapi5(str),
-        };
+        };        
     }
 
     fn merge_pauses_none(&self, str: &str) -> String {

@@ -5875,12 +5875,12 @@ mod canonicalize_tests {
 				<mn>14</mn>
 			</mmultiscripts></math>";
         let target_str = "<math>
-			<mmultiscripts data-chem-formula='6'>
-				<mtext data-chem-element='1'>C</mtext>
-				<mprescripts></mprescripts>
-				<mn>6</mn>
-				<mn>14</mn>
-			</mmultiscripts>
+		<mmultiscripts data-chem-formula='6'>
+		<mtext data-chem-element='1'>C</mtext>
+		<mprescripts></mprescripts>
+		<mn>6</mn>
+		<mn>14</mn>
+		</mmultiscripts>
 		</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
