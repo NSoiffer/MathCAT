@@ -842,8 +842,9 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
                     }
                 } else if ch == 'C' || ch == '𝐶' {
                     if is_cap_mode {
-                        assert!(cap_mode == UEB_Duration::Symbol);
-                        cap_mode = UEB_Duration::Word;
+                        if cap_mode == UEB_Duration::Symbol {
+                            cap_mode = UEB_Duration::Word;
+                        }
                     } else {
                         is_cap_mode = true;
                         n_caps += 1;
