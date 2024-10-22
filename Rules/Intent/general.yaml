@@ -550,7 +550,8 @@
 - 
   name: set
   tag: mrow
-  match: "IsBracketed(., '{', '}')"
+  # sets have { }s and should have at least one of ",∈∉|" (vertical bar is "such that")
+  match: "IsBracketed(., '{', '}') and . != translate(., ',∈∉|', '')"
   replace: 
   - intent:
       name: "set"
