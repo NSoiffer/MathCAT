@@ -792,7 +792,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
         //   or before a single letter standing alone anywhere in the expression,
         //   begin the expression with a grade 1 word indicator (or a passage indicator if the expression includes spaces)
         // Apparently "only a grade 1 symbol..." means at most one grade 1 symbol based on some examples (GTM 6.4, example 4)
-        // debug!("before determining mode:  '{}'", raw_braille);
+        debug!("before determining mode:  '{}'", raw_braille);
 
         // a bit ugly because we need to store the string if we have cap passage mode
         let raw_braille_string = if is_cap_passage_mode_good(raw_braille) {convert_to_cap_passage_mode(raw_braille)} else {String::default()};
@@ -819,7 +819,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
             }
         }
 
-        /// Return true if at least three cap letters and no lower case letters
+        /// Return true if at least five (= # of cap passage indicators) cap indicators and no lower case letters
         fn is_cap_passage_mode_good(braille: &str) -> bool {
             let mut n_caps = 0;
             let mut is_cap_mode = false;
@@ -829,8 +829,6 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
             // look CL or CCL for caps (CC runs until we get whitespace)
             // if we find an L not in caps mode, we return false
             // Note: caps can be C𝐶, whitespace can be W𝐖
-            // FIX: something like triangle ABC are purposely not in word mode and should probably only count as a single capital, not as 3 caps
-            //   Maybe could detect this by looking for consequitive CLx patterns (another bool var?)
             while let Some(ch) = chars.next() {
                 if ch == 'L' {
                     if !is_cap_mode {
@@ -847,9 +845,9 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
                         }
                     } else {
                         is_cap_mode = true;
-                        n_caps += 1;
                         cap_mode = UEB_Duration::Symbol;
                     }
+                    n_caps += 1;
                 } else if ch == 'W' || ch == '𝐖' {
                     if is_cap_mode {
                         assert!(cap_mode == UEB_Duration::Word);
@@ -859,6 +857,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
                     break;
                 }
             }
+            debug!("n_caps={}", n_caps);
             return n_caps > 4;
         }
 

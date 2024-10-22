@@ -154,5 +154,5 @@ fn caps_bug_295() {
                             <mi>R</mi><mo>⁢</mo><mi>S</mi><mo>+</mo>
                             <mi>Q</mi><mo>⁢</mo><mi>R</mi></math>
 ";
-    test_braille("UEB", expr, "⠠⠠⠏⠟⠐⠖⠠⠠⠟⠗⠀⠐⠶⠀⠠⠠⠗⠎⠐⠖⠠⠠⠟⠗");
+    test_braille("UEB", expr, "⠠⠠⠠⠏⠟⠐⠖⠟⠗⠀⠐⠶⠀⠗⠎⠐⠖⠟⠗⠠⠄");
 }
