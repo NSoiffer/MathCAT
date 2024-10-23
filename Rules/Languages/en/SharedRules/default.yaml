@@ -154,7 +154,7 @@
   replace:
   - x: "*[1]"
   - test:
-      if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
+      if: "not($Verbosity='Terse' and *[2][self::m:mn and not(translate(., '.,', '')!=.)])"  # just say "x 1" for terse vs "x sub 1"
       then: [t: "sub"]      # phrase(x 'sub' 2)
   - x: "*[2]"
 
@@ -176,7 +176,9 @@
   match: "."
   replace:
   - x: "*[1]"
-  - t: "sub"              # phrase(x 'sub' 2)
+  - test:
+      if: "not($Verbosity='Terse' and *[2][self::m:mn and not(translate(., '.,', '')!=.)])"  # just say "x 1" for terse vs "x sub 1"
+      then: [t: "sub"]      # phrase(x 'sub' 2)
   - x: "*[2]"
 
 - name: literal
@@ -201,9 +203,15 @@
               if: "not(IsNode(*[last()], 'simple')) or $Impairment = 'Blindness'"
               then: [t: "end super"]      # phrase(x super 2 'end of super')
           else:
-          - t: "raised to the"            # phrase(5 'raised to the' second power equals 25)
+          - test:
+              if: "$Verbosity='Verbose'"
+              then: [t: "superscript"]
+              else: [t: "super"]
           - x: "*[last()]"
-          - t: "power"                    # phrase(5 raised to the second 'power' equals 25)
+          - test:
+              if: "$Verbosity='Verbose'"
+              then: [t: "end superscript"]
+              else: [t: "end super"]
 
 - name: default
   tag: munder

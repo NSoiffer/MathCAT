@@ -197,7 +197,7 @@ fn dots_2_37_b() {
 }
 
 #[test]
-fn yeilds_3_1() {
+fn yields_3_1() {
     let expr = r#"<math><msub><mi>CH</mi><mn>4</mn></msub><mo>(</mo><mi mathvariant="normal">g</mi><mo>)</mo><mo>+</mo>
                 <mn>2</mn><msub><mi mathvariant="normal">O</mi><mn>2</mn></msub><mo>(</mo><mi mathvariant="normal">g</mi><mo>)</mo>
                 <mo>&#x2192;</mo>

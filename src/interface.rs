@@ -18,6 +18,32 @@ use crate::navigate::*;
 use crate::pretty_print::mml_to_string;
 use crate::xpath_functions::is_leaf;
 
+#[cfg(feature = "enable-logs")]
+use std::sync::Once;
+#[cfg(feature = "enable-logs")]
+static INIT: Once = Once::new();
+
+fn enable_logs() {
+    #[cfg(feature = "enable-logs")]
+    INIT.call_once(||{
+        #[cfg(target_os = "android")]
+        {
+            extern crate log;
+            extern crate android_logger;
+            
+            use log::*;
+            use android_logger::*;
+        
+            android_logger::init_once(
+                Config::default()
+                .with_max_level(LevelFilter::Trace)
+                .with_tag("MathCat")
+            );    
+            trace!("Activated Android logger!");  
+        }    
+    });
+}
+
 // wrap up some common functionality between the call from 'main' and AT
 fn cleanup_mathml(mathml: Element) -> Result<Element> {
     trim_element(&mathml);
@@ -40,6 +66,7 @@ fn init_mathml_instance() -> RefCell<Package> {
 /// Set the Rules directory
 /// IMPORTANT: this should be the very first call to MathCAT. If 'dir' is an empty string, the envirnoment var 'MathCATRulesDir' is tried.
 pub fn set_rules_dir(dir: String) -> Result<()> {
+    enable_logs();
     use std::path::PathBuf;
     let dir = if dir.is_empty() {
         std::env::var_os("MathCATRulesDir")
@@ -56,6 +83,7 @@ pub fn set_rules_dir(dir: String) -> Result<()> {
 
 /// Returns the version number (from Cargo.toml) of the build
 pub fn get_version() -> String {
+    enable_logs();
     const VERSION: &str = env!("CARGO_PKG_VERSION");
     return VERSION.to_string();
 }
@@ -64,6 +92,7 @@ pub fn get_version() -> String {
 /// This returns canonical MathML with 'id's set on any node that doesn't have an id.
 /// The ids can be used for sync highlighting if the `Bookmark` API preference is true.
 pub fn set_mathml(mathml_str: String) -> Result<String> {
+    enable_logs();
     lazy_static! {
         // if these are present when resent to MathJaX, MathJaX crashes (https://github.com/mathjax/MathJax/issues/2822)
         static ref MATHJAX_V2: Regex = Regex::new(r#"class *= *['"]MJX-.*?['"]"#).unwrap();
@@ -125,6 +154,7 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
 /// Get the spoken text of the MathML that was set.
 /// The speech takes into account any AT or user preferences.
 pub fn get_spoken_text() -> Result<String> {
+    enable_logs();
     // use std::time::{Instant};
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
@@ -143,6 +173,7 @@ pub fn get_spoken_text() -> Result<String> {
 /// The speech takes into account any AT or user preferences.
 /// Note: this implementation for is currently minimal and should not be used.
 pub fn get_overview_text() -> Result<String> {
+    enable_logs();
     // use std::time::{Instant};
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
@@ -157,6 +188,7 @@ pub fn get_overview_text() -> Result<String> {
 /// Get the value of the named preference.
 /// None is returned if `name` is not a known preference.
 pub fn get_preference(name: String) -> Result<String> {
+    enable_logs();
     use crate::prefs::NO_PREFERENCE;
     return crate::speech::SPEECH_RULES.with(|rules| {
         let rules = rules.borrow();
@@ -194,6 +226,7 @@ pub fn get_preference(name: String) -> Result<String> {
 ///
 /// Be careful setting preferences -- these potentially override user settings, so only preferences that really need setting should be set.
 pub fn set_preference(name: String, value: String) -> Result<()> {
+    enable_logs();
     // "LanguageAuto" allows setting the language dir without actually changing the value of "Language" from Auto
     let mut value = value;
     if name == "Language" || name == "LanguageAuto" {
@@ -268,6 +301,7 @@ pub fn set_preference(name: String, value: String) -> Result<()> {
 /// The braille returned depends upon the preference for the `code` preference (default `Nemeth`).
 /// If 'nav_node_id' is given, it is highlighted based on the value of `BrailleNavHighlight` (default: `EndPoints`)
 pub fn get_braille(nav_node_id: String) -> Result<String> {
+    enable_logs();
     // use std::time::{Instant};
     // let instant = Instant::now();
     return MATHML_INSTANCE.with(|package_instance| {
@@ -283,6 +317,7 @@ pub fn get_braille(nav_node_id: String) -> Result<String> {
 /// The braille returned depends upon the preference for the `code` preference (default `Nemeth`).
 /// The returned braille is brailled as if the current navigation focus is the entire expression to be brailled.
 pub fn get_navigation_braille() -> Result<String> {
+    enable_logs();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
@@ -383,6 +418,7 @@ pub fn do_navigate_keypress(
 ///
 /// When done with Navigation, call with `Exit`
 pub fn do_navigate_command(command: String) -> Result<String> {
+    enable_logs();
     let command = NAV_COMMANDS.get_key(&command); // gets a &'static version of the command
     if command.is_none() {
         bail!("Unknown command in call to DoNavigateCommand()");
@@ -398,6 +434,7 @@ pub fn do_navigate_command(command: String) -> Result<String> {
 /// Given an 'id' and an offset (for tokens), set the navigation node to that id.
 /// An error is returned if the 'id' doesn't exist
 pub fn set_navigation_node(id: String, offset: usize) -> Result<()> {
+    enable_logs();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
@@ -424,6 +461,7 @@ pub fn get_navigation_mathml() -> Result<(String, usize)> {
 /// `offset` (not yet implemented)
 /// The offset is needed for token elements that have multiple characters.
 pub fn get_navigation_mathml_id() -> Result<(String, usize)> {
+    enable_logs();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
@@ -435,6 +473,7 @@ pub fn get_navigation_mathml_id() -> Result<(String, usize)> {
 
 /// Return the start and end braille character positions associated with the current (navigation) node.
 pub fn get_braille_position() -> Result<(usize, usize)> {
+    enable_logs();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
@@ -447,6 +486,7 @@ pub fn get_braille_position() -> Result<(usize, usize)> {
 /// Given a 0-based braille position, return the smallest MathML node enclosing it.
 /// This node might be a leaf with an offset.
 pub fn get_navigation_node_from_braille_position(position: usize) -> Result<(String, usize)> {
+    enable_logs();
     return MATHML_INSTANCE.with(|package_instance| {
         let package_instance = package_instance.borrow();
         let mathml = get_element(&package_instance);
@@ -484,6 +524,7 @@ fn copy_mathml(mathml: Element) -> Element {
 }
 
 pub fn errors_to_string(e: &Error) -> String {
+    enable_logs();
     let mut result = String::default();
     let mut first_time = true;
     for e in e.iter() {
@@ -534,6 +575,7 @@ fn add_ids(mathml: Element) -> Element {
 }
 
 pub fn get_element(package: &Package) -> Element {
+    enable_logs();
     let doc = package.as_document();
     let mut result = None;
     for root_child in doc.root().children() {
@@ -721,6 +763,7 @@ fn is_same_doc(doc1: &Document, doc2: &Document) -> Result<()> {
 // Not really meant to be public -- used by tests in some packages
 #[allow(dead_code)]
 pub fn is_same_element(e1: &Element, e2: &Element) -> Result<()> {
+    enable_logs();
     if name(e1) != name(e2) {
         bail!("Names not the same: {}, {}", name(e1), name(e2));
     }

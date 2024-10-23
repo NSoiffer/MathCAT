@@ -1083,7 +1083,7 @@ impl<'r> MyXPath {
             
         loop {
             // debug!("  add_debug_string_arg: count={}, remainder='{}'", count, remainder);
-            let next = remainder.find(|c| c=='(' || c==')');
+            let next = remainder.find(['(', ')']);
             match next {
                 None => bail!("Did not find closing paren for DEBUG in\n{}", xpath),
                 Some(i_paren) => {

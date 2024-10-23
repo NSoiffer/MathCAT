@@ -42,37 +42,40 @@
    tag: msqrt
    match: .
    replace: 
-   - t: "⠩"
    - test:
       if: "NeedsToBeGrouped(*[1], 'Swedish', true())"
       then:
-      - t: "⠘"
+      - t: "⠘⠩"
       - x: "*[1]"
       - t: "⠱"
-      else: [x: "*"]
+      else:
+      - t: "⠩"
+      - x: "*[1]"
 
 -
-   name: default
-   tag: mroot
-   match: "."
-   replace: 
-   - t: "⠬"   # superscript
-   # index is first
-   - test:
+  name: default
+  tag: mroot
+  match: "."
+  replace: 
+  # index is first
+  - test:
       if: "NeedsToBeGrouped(*[2], 'Swedish', false())"
       then:
-      - t: "⠘"
+      - t: "⠘⠬"
       - x: "*[2]"
       - t: "⠱"
-      else: [x: "*[2]"]
-   - t: "⠩"   # root
-   - test:
+      else:
+      - t: "E⠬"   # "E"mpty base followed by superscript indicator
+      - x: "*[2]"
+  - test:
       if: "NeedsToBeGrouped(*[1], 'Swedish', true())"
       then:
-      - t: "⠘"
+      - t: "⠘⠩"
       - x: "*[1]"
       - t: "⠱"
-      else: [x: "*[1]"]
+      else:
+      - t: "⠩"
+      - x: "*[1]"
         
                
 # Fraction rules
@@ -94,13 +97,39 @@
    - x: "*[2]"
 
 -
+   name: nested-fraction
+   tag: mfrac
+   match: "*[self::m:mfrac] or */*[self::m:mfrac]"
+   replace: 
+   - test:
+      if: "not(*[1][self::m:mfrac])"
+      then: [t: "⠿⠦"]
+   - x: "*[1]"
+   - t: "⠳⠳"
+   - x: "*[2]"
+   - test:
+      if: "not(*[1][self::m:mfrac])"
+      then: [t: "⠿⠴"]
+
+-  # needs to be after nested-fraction rule as long as this rule uses the NeedsToBeGrouped test
    name: simple-fraction
    tag: mfrac
-   match: "not(NeedsToBeGrouped(*[1], 'Swedish', true()) or NeedsToBeGrouped(*[2], 'Swedish', true()))"
+   # first clause due to Ex. 6.8
+   match: "not(preceding-sibling::*[1][. ='\u2061' and IsInDefinition(preceding-sibling::*[1], 'Braille', 'TrigFunctionNames')]) and
+           not(NeedsToBeGrouped(*[1], 'Swedish', true()) or NeedsToBeGrouped(*[2], 'Swedish', true()))"
    replace: 
    - x: "*[1]"
    - t: "⠳"
    - x: "*[2]"
+
+-
+   name: nested-linear-fraction
+   tag: mrow
+   match: "*[2][.='/'] and (*[1][self::m:mfrac] or *[3][self::m:mfrac])"
+   replace: 
+   - x: "*[1]"
+   - t: "⠌⠌"
+   - x: "*[3]"
 
 -
    name: default
@@ -114,14 +143,14 @@
    - t: "⠿⠴"
 
 -
-   #GTM 14.3.3 (not sure what else vertical juxtaposition applies to)
+   # 6.5 
    name: binomial-frac
    tag: mrow
    match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][@linethickness=0]"
    replace: 
    - x: "*[1]"
    - x: "*[2]/*[1]"
-   - t: "⠰⠻"
+   - t: "⠘⠳"
    - x: "*[2]/*[2]"
    - x: "*[3]"
 
@@ -131,7 +160,7 @@
   replace:
      - x: "*[1]"
      - x: "*[2]/*[1]/*[1]/*[1]"
-     - t: "⠰⠻"
+     - t: "⠘⠳"
      - x: "*[2]/*[2]/*[1]/*[1]"
      - x: "*[3]"
 
@@ -140,20 +169,36 @@
 # matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
 # we don't do spatial layout, instead the beginning/ending of each row uses the enlarged bracketing chars
 -
-   name: default-matrix
-   tag: mrow
-   variables:
-      - RowStart: "*[1]"
-      - RowEnd: "*[3]"
-   match:
-      - "*[2][self::m:mtable] and"
-      - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
-   replace: [x: "*[2]"]
+  name: default-matrix
+  tag: mrow
+  variables:
+    - RowStart: "*[1]"
+    - RowEnd: "*[3]"
+  match:
+    - "*[2][self::m:mtable] and"
+    - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
+  replace: [x: "*[2]"]
+
 -
-   name: default-mtable
-   tag: mtable
-   match: "."
-   replace: [x: "*"]
+  # this is a bit hacky -- people sometimes use mtable to get multiple conditions in integrals, sums, etc.
+  # this makes each row treated as a bracked munder line
+  name: mtable-in-munder
+  tag: mtr
+  match: "../../*[../self::m:munder and position()=2]"
+  replace:
+  - test:
+      if: "preceding-sibling::*"   # munder will contribute it's own grouping symbols
+      then: [t: "⠘⠣⠣"]
+  - x: "*"
+  - test:
+      if: "following-sibling::*"   # munder will contribute it's own grouping symbols
+      then: [t: "⠱"]
+
+-
+  name: default-mtable
+  tag: mtable
+  match: "."
+  replace: [x: "*"]
 -
   name: default
   tag: [mtr, mlabeledtr]
@@ -220,7 +265,6 @@
    match: "."
    replace: [x: "*"]
 
-
 -
    # operator omission
    name: operator-omission
@@ -241,7 +285,8 @@
    variables: # ratio not spaced in UEB
    - AddSpaces: "$UseSpacesAroundAllOperators or
                        ( parent::*[self::m:mrow] and $NewScriptContext='' and 
-                         .!='∶' and IsInDefinition(., 'Braille', 'NemethComparisonOperators') )"
+                         .!='∶' and not(ancestor::*[self::m:mfrac]) and
+                         (IsInDefinition(., 'Braille', 'NemethComparisonOperators') or IsInDefinition(., 'Braille', 'BinaryOperators')))"
    match: "."
    replace:
       - test:
@@ -250,7 +295,11 @@
             - test:
                if: "preceding-sibling::*"
                then: [t: "W"]
-      - x: "text()"
+      # can't call BrailleChars() for U+2061 because that needs the appropriate context. But need to do it for bold/italic, so we have the following hack
+      - test:
+          if: "@mathvariant"
+          then: [x: "BrailleChars(., 'Swedish')"]
+          else: [x: "text()"]
       - test:
          if: "$AddSpaces and following-sibling::*" 
          then: [t: "W"]
@@ -308,22 +357,93 @@
   - test:
       if: "NeedsToBeGrouped(*[1], 'Swedish', true())"
       then:
-      - t: "1⠣"
+      - t: "⠘"
       - x: "*[1]"
-      - t: "1⠜"
+      - t: "⠱"
       else: [x: "*[1]"]
   - x: "*[2]"
 
+# Some special cases for mover and munder
+-
+  name: over-specials    # Section 7.1
+  tag: mover
+  match: "*[2][self::m:mo and count(.)=1 and translate(., '¯~^→⟶', '')='']"
+  replace:
+  - test:
+        if: "NeedsToBeGrouped(*[1], 'Swedish', true())"
+        then:
+        - t: "⠘"
+        - x: "*[1]"
+        - t: "⠱"
+        else: [x: "*[1]"]
+  - t: "⠬⠬"
+  - test:
+    - if: "*[2][.='¯']"
+      then: [t: "⠤"]
+    - else_if: "*[2][.='~']"
+      then: [t: "⠒"]
+    - else_if: "*[2][.='^']"
+      then: [t: "⠖"]
+      else: [x: "*[2]"]  # right arrow has the correct output
+
+-
+  name: under-over-specials    # Section 7.1 (this catches what should be an munderover)
+  tag: munder
+  match: "*[1][self::m:mover and *[2][self::m:mo and count(.)=1 and translate(., '¯~^→⟶', '')='']] and
+          *[2][self::m:mo and count(.)=1 and (.='¯' or .='ˇ')]"
+  replace:
+  - test:
+        if: "NeedsToBeGrouped(*[1]/*[1], 'Swedish', true())"
+        then:
+        - t: "⠘"
+        - x: "*[1]/*[1]"
+        - t: "⠱"
+        else: [x: "*[1]/*[1]"]
+  - t: "⠣⠣"
+  - test:
+    - if: "*[2][.='¯']"
+      then: [t: "⠤"]
+      else: [t: "⠶"]  # 'ˇ'
+  - t: "⠬⠬"
+  - test:
+    - if: "*[1]/*[2][.='¯']"
+      then: [t: "⠤"]
+    - else_if: "*[1]/*[2][.='~']"
+      then: [t: "⠒"]
+    - else_if: "*[1]/*[2][.='^']"
+      then: [t: "⠖"]
+      else: [t: "⠒⠕"]  # right arrow
+
+-
+  name: double-munder    # Section 7 (special case double underbar)
+  tag: munder
+  match: "*[1][self::m:munder and *[2][. = '¯']] and *[2][. = '¯']"
+  replace:
+  - x: "*[1]/*[1]"
+  - t: "⠣⠣⠶"
+
+-
+  name: under-specials    # Section 7.1
+  tag: munder
+  match: "*[2][self::m:mo and count(.)=1 and (.='¯' or .='ˇ')]"
+  replace:
+  - test:
+        if: "NeedsToBeGrouped(*[1], 'Swedish', true())"
+        then:
+        - t: "⠘"
+        - x: "*[1]"
+        - t: "⠱"
+        else: [x: "*[1]"]
+  - test:
+    - if: "*[2][.='¯']"
+      then: [t: "⠣⠣⠤"]
+      else: [t: "⠣⠣⠶"]  # 'ˇ'
 
 -
   name: default
   tag: [msub, msup, munder, mover]
   match: "."
-  variables: [AddSpaces: "(self::m:munder or self::m:mover) and IsInDefinition(BaseNode(*[1]), 'Braille', 'NemethComparisonOperators')"]
   replace:
-  - test:
-      if: "$AddSpaces"
-      then: [t: "W"]
   - test:
         if: "(self::m:munder or self::m:mover) and NeedsToBeGrouped(*[1], 'Swedish', true())"
         then:
@@ -354,20 +474,15 @@
           then: [t: "⠱"]
   - t: "#"   # signal end script/numeric mode
   - test:
-      if: "$AddSpaces"
+      if: "IsInDefinition(*[1], 'Braille', 'LargeOperators') or *[1][self::m:mi and .='lim'] and
+           $NewScriptContext='' and not(ancestor::*[self::m:mfrac])"
       then: [t: "W"]
-
-
 
 -
   name: msubsup_default_mmultiscripts_equiv
   tag: [msubsup, munderover] # mmultiscripts with only sub/sup postscript
   match: "count(*)=3"    # catches mmultiscripts equiv
-  variables: [AddSpaces: "IsInDefinition(BaseNode(*[1]), 'Braille', 'NemethComparisonOperators')"]
   replace:
-  - test:
-      if: "$AddSpaces"
-      then: [t: "W"]
   - test:
       if: "self::m:mundermover and NeedsToBeGrouped(*[1], 'Swedish', true())"
       then:
@@ -387,9 +502,17 @@
           then: [t: "⠘"]
       - test:
           if: "self::m:msubsup"
-          then: [t: "⠣"]
-          else: [t: "⠣⠣"]
-      - x: "*[2]"
+          then:
+          - t: "⠣"
+          - x: "*[2]"
+          else:  # munderover
+          - t: "⠣⠣"
+          - test:
+            - if: "*[2][.='¯']"
+              then: [t: "⠤"]
+            - else_if: "*[2][.='ˇ']"
+              then: [t: "⠶"]  # 'ˇ'
+              else: [x: "*[2]"]  
       - test:
           if: "$FirstScriptNeedsToBeGrouped"
           then: [t: "⠱"]
@@ -399,15 +522,26 @@
           then: [t: "⠘"]
       - test:
           if: "self::m:msubsup"
-          then: [t: "⠬"]
-          else: [t: "⠬⠬"]  # mover
-      - x: "*[3]"
+          then:
+          - t: "⠬"
+          - x: "*[3]"
+          else:
+          - t: "⠬⠬"  # mover
+          - test:
+            - if: "*[3][.='¯']"
+              then: [t: "⠤"]
+            - else_if: "*[3][.='~']"
+              then: [t: "⠒"]
+            - else_if: "*[3][.='^']"
+              then: [t: "⠖"]
+              else: [t: "*[3]"]  # works for right arrow also
       - test:
           if: "$SecondScriptNeedsToBeGrouped"
           then: [t: "⠱"]
       - t: "#"   # signal end script/numeric mode
   - test:
-      if: "$AddSpaces"
+      if: "IsInDefinition(*[1], 'Braille', 'LargeOperators') or *[1][self::m:mi and .='lim'] and
+           $NewScriptContext='' and not(ancestor::*[self::m:mfrac])"
       then: [t: "W"]
 
 -
@@ -429,13 +563,13 @@
          - with:
             variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
             replace:
-            - t: "1⠢"
+            - t: "⠣"
             - test:
                 if: "NeedsToBeGrouped($Prescripts[1], 'Swedish', true())"
                 then:
-                - t: "1⠣"
+                - t: "⠣"
                 - x: "$Prescripts[1]"
-                - t: "1⠜"
+                - t: "⠱"
                 else: [x: "$Prescripts[1]"]
       - test:
          if: "not($Prescripts[2][self::m:none])"
@@ -443,13 +577,13 @@
          - with:
             variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
             replace:
-            - t: "1⠔"
+            - t: "⠬"
             - test:
                 if: "NeedsToBeGrouped($Prescripts[2], 'Swedish', false())"
                 then:
-                - t: "1⠣"
+                - t: "⠘"
                 - x: "$Prescripts[2]"
-                - t: "1⠜"
+                - t: "⠱"
                 else: [x: "$Prescripts[2]"]
       - test:
          if: "count($Prescripts)>2"
@@ -460,13 +594,13 @@
             - with:
                variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
                replace:
-               - t: "1⠢"
+               - t: "⠣"
                - test:
                   if: "NeedsToBeGrouped($Prescripts[3], 'Swedish', false())"
                   then:
-                  - t: "1⠣"
+                  - t: "⠘"
                   - x: "$Prescripts[3]"
-                  - t: "1⠜"
+                  - t: "⠱"
                   else: [x: "$Prescripts[3]"]
          - test:
             if: "not($Prescripts[4][self::m:none])"
@@ -474,13 +608,13 @@
             - with:
                variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
                replace:
-               - t: "1⠔"
+               - t: "⠬"
                - test:
                   if: "NeedsToBeGrouped($Prescripts[4], 'Swedish', false())"
                   then:
-                  - t: "1⠣"
+                  - t: "⠘"
                   - x: "$Prescripts[4]"
-                  - t: "1⠜"
+                  - t: "⠱"
                   else: [x: "$Prescripts[4]"]
          - test:
             if: "count($Prescripts) > 4"   # give up and just dump them out so at least the content is there
@@ -496,13 +630,13 @@
          - with:
             variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
             replace:
-            - t: "1⠢"
+            - t: "⠣"
             - test:
                 if: "NeedsToBeGrouped($Postscripts[1], 'Swedish', false())"
                 then:
-                - t: "1⠣"
+                - t: "⠘"
                 - x: "$Postscripts[1]"
-                - t: "1⠜"
+                - t: "⠱"
                 else: [x: "$Postscripts[1]"]
       - test:
          if: "not($Postscripts[2][self::m:none])"
@@ -510,13 +644,13 @@
          - with:
             variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
             replace:
-            - t: "1⠔"
+            - t: "⠬"
             - test:
                 if: "NeedsToBeGrouped($Postscripts[2], 'Swedish', false())"
                 then:
-                - t: "1⠣"
+                - t: "⠘"
                 - x: "$Postscripts[2]"
-                - t: "1⠜"
+                - t: "⠱"
                 else: [x: "$Postscripts[2]"]
       - test:
          if: "count($Postscripts)>2"
@@ -527,13 +661,13 @@
             - with:
                variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
                replace:
-               - t: "1⠢"
+               - t: "⠣"
                - test:
                   if: "NeedsToBeGrouped($Postscripts[3], 'Swedish', false())"
                   then:
-                  - t: "1⠣"
+                  - t: "⠘"
                   - x: "$Postscripts[3]"
-                  - t: "1⠜"
+                  - t: "⠱"
                   else: [x: "$Postscripts[3]"]
          - test:
             if: "not($Postscripts[4][self::m:none])"
@@ -541,13 +675,13 @@
             - with:
                variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
                replace:
-               - t: "1⠔"
+               - t: "⠬"
                - test:
                   if: "NeedsToBeGrouped($Postscripts[4], 'Swedish', false())"
                   then:
-                  - t: "1⠣"
+                  - t: "⠘"
                   - x: "$Postscripts[4]"
-                  - t: "1⠜"
+                  - t: "⠱"
                   else: [x: "$Postscripts[4]"]
          - test:
             if: "count($Postscripts)>4"
@@ -558,13 +692,13 @@
                - with:
                   variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
                   replace:
-                  - t: "1⠢"
+                  - t: "⠣"
                   - test:
                       if: "NeedsToBeGrouped($Postscripts[5], 'Swedish', false())"
                       then:
-                      - t: "1⠣"
+                      - t: "⠘"
                       - x: "$Postscripts[5]"
-                      - t: "1⠜"
+                      - t: "⠱"
                       else: [x: "$Postscripts[5]"]
             - test:
                if: "not($Postscripts[6][self::m:none])"
@@ -572,13 +706,13 @@
                - with:
                   variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
                   replace:
-                  - t: "1⠔"
+                  - t: "⠬"
                   - test:
                       if: "NeedsToBeGrouped($Postscripts[6], 'Swedish', false())"
                       then:
-                      - t: "1⠣"
+                      - t: "⠘"
                       - x: "$Postscripts[6]"
-                      - t: "1⠜"
+                      - t: "⠱"
                       else: [x: "$Postscripts[6]"]
             - test:
                if: "count($Postscripts)>6"
@@ -589,13 +723,13 @@
                   - with:
                      variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
                      replace:
-                     - t: "1⠢"
+                     - t: "⠣"
                      - test:
                         if: "NeedsToBeGrouped($Postscripts[7], 'Swedish', false())"
                         then:
-                        - t: "1⠣"
+                        - t: "⠘"
                         - x: "$Postscripts[7]"
-                        - t: "1⠜"
+                        - t: "⠱"
                         else: [x: "$Postscripts[7]"]
                - test:
                   if: "not($Postscripts[8][self::m:none])"
@@ -603,13 +737,13 @@
                   - with:
                      variables: [NewScriptContext: "in"]   # value doesn't matter -- just can't be empty string
                      replace:
-                     - t: "1⠔"
+                     - t: "⠬"
                      - test:
                         if: "NeedsToBeGrouped($Postscripts[8], 'Swedish', false())"
                         then:
-                        - t: "1⠣"
+                        - t: "⠘"
                         - x: "$Postscripts[8]"
-                        - t: "1⠜"
+                        - t: "⠱"
                         else: [x: "$Postscripts[8]"]
                - test:
                   if: "count($Postscripts) > 8"   # give up and just dump them out so at least the content is there
@@ -711,9 +845,9 @@
    - test:
       if: "NeedsToBeGrouped(*[1], 'Swedish', false())"
       then:
-      - t: "1⠣"
+      - t: "⠘"
       - x: "*[1]"
-      - t: "1⠜"
+      - t: "⠱"
       else: [x: "*[1]"]
 
    # - test:

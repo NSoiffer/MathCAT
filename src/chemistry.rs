@@ -364,7 +364,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
             return None;
         }
         new_children[new_children.len()-1].set_attribute_value(SPLIT_TOKEN, "true");
-        // debug!("split_string_chem_element: {} -> {:?}", String::from_utf8(token_string.to_vec()).unwrap(), new_children.len());
+        // debug!("split_string_chem_element: {} -> {}", String::from_utf8(token_string.to_vec()).unwrap(), new_children.len());
         return Some(new_children);
     }
 
@@ -376,7 +376,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
             return None;    // can't be an chemical letter
         }
         let chem_element = unsafe{ str::from_utf8_unchecked(&bytes_str[..n]) };
-        if CHEMICAL_ELEMENTS.contains_key( chem_element ) {
+        if CHEMICAL_ELEMENT_ELECTRONEGATIVITIES.contains_key( chem_element ) {
             return Some( new_chemical_element(doc, chem_element) );
         }
 
@@ -1109,7 +1109,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
 fn is_order_ok(mrow: Element) -> bool {
     assert_eq!(name(&mrow), "mrow");
     if let Some(elements) = collect_elements(mrow) {
-        if elements.iter().any(|&e| !CHEMICAL_ELEMENTS.contains_key(e)) {
+        if elements.iter().any(|&e| !CHEMICAL_ELEMENT_ELECTRONEGATIVITIES.contains_key(e)) {
             return false;
         }
         let n_elements = elements.len();
@@ -1207,7 +1207,7 @@ fn is_ordered_by_electronegativity(elements: &[&str]) -> bool {
     // HPO_4^2 (Monohydrogen phosphate) doesn't fit this pattern, nor does HCO_3^- (Hydrogen carbonate) and some others
     // FIX: drop "H" from the ordering??
     assert!(!elements.len() > 1);   // already handled
-    return elements.windows(2).all(|pair| CHEMICAL_ELEMENTS.get(pair[0]).unwrap() < CHEMICAL_ELEMENTS.get(pair[1]).unwrap());
+    return elements.windows(2).all(|pair| CHEMICAL_ELEMENT_ELECTRONEGATIVITIES.get(pair[0]).unwrap() < CHEMICAL_ELEMENT_ELECTRONEGATIVITIES.get(pair[1]).unwrap());
 }
 
 fn is_generalized_salt(elements: &[&str]) -> bool {
@@ -1300,7 +1300,16 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
                 // fix could make sure they are integers
                 likelihood += 1;        // looking like an atomic number                
                 if pre_subscript_name == "mn" {
-                    likelihood += 1;        // looking even more like an atomic number                
+                    // make sure the atomic number matches the base
+                    let base = as_element(children[0]);
+                    let base_name = name(&base);
+                    if base_name == "mi" || base_name == "mtext" {
+                        if let Some(atomic_number) = CHEMICAL_ELEMENT_ATOMIC_NUMBER.get(as_text(base)) {
+                            if as_text(pre_subscript) == atomic_number.to_string() {
+                                likelihood = CHEMISTRY_THRESHOLD;
+                            }
+                        }
+                    }
                 }
             } else {
                 return NOT_CHEMISTRY;
@@ -1696,7 +1705,7 @@ fn convert_to_short_form(mathml: Element) -> Result<String> {
 /// That list uses a horizontal line for the Lanthanide and Actinide Series.
 /// Because I had already ordered the elements before realizing that, I opened a gap and started the higher ones again with a '1' in front.
 /// The list is missing recent (unstable) elements -- I added them with the same value as the element above them in the periodic table.
-static CHEMICAL_ELEMENTS: phf::Map<&str, u32> = phf_map! {
+static CHEMICAL_ELEMENT_ELECTRONEGATIVITIES: phf::Map<&str, u32> = phf_map! {
 	"Ac" => 40, "Ag" => 155, "Al" => 163, "Am" => 29, "Ar" => 4, "As" => 172, "At" => 181, "Au" => 154,
     "B" => 164, "Ba" => 14, "Be" => 18, "Bh" => 137, "Bi" => 170, "Bk" => 27, "Br" => 183,
 	"C" => 169, "Ca" => 16, "Cd" => 158, "Ce" => 56, "Cf" => 26, "Cl" => 184, "Cm" => 28, "Cn" => 157, "Co" => 148, "Cr" => 136, "Cs" => 8, "Cu" => 156,
@@ -1716,6 +1725,23 @@ static CHEMICAL_ELEMENTS: phf::Map<&str, u32> = phf_map! {
     "Me" => 0, "Et" => 0, "R" => 0, /* "Ac" => 0, */ "Ph" => 0,
     "X" => 0, /* treated as an unknown */
 };
+
+// A map of the chemical elements and their atomic numbers
+static CHEMICAL_ELEMENT_ATOMIC_NUMBER: phf::Map<&str, u32> = phf_map! {
+    "H" => 1, "He" => 2, "Li" => 3, "Be" => 4, "B" => 5, "C" => 6, "N" => 7, "O" => 8, "F" => 9, "Ne" => 10,
+    "Na" => 11, "Mg" => 12, "Al" => 13, "Si" => 14, "P" => 15, "S" => 16, "Cl" => 17, "Ar" => 18, "K" => 19, "Ca" => 20,
+    "Sc" => 21, "Ti" => 22, "V" => 23, "Cr" => 24, "Mn" => 25, "Fe" => 26, "Co" => 27, "Ni" => 28, "Cu" => 29, "Zn" => 30,
+    "Ga" => 31, "Ge" => 32, "As" => 33, "Se" => 34, "Br" => 35, "Kr" => 36, "Rb" => 37, "Sr" => 38, "Y" => 39, "Zr" => 40,
+    "Nb" => 41, "Mo" => 42, "Tc" => 43, "Ru" => 44, "Rh" => 45, "Pd" => 46, "Ag" => 47, "Cd" => 48, "In" => 49, "Sn" => 50,
+    "Sb" => 51, "Te" => 52, "I" => 53, "Xe" => 54, "Cs" => 55, "Ba" => 56, "La" => 57, "Ce" => 58, "Pr" => 59, "Nd" => 60, 
+    "Pm" => 61, "Sm" => 62, "Eu" => 63, "Gd" => 64, "Tb" => 65, "Dy" => 66, "Ho" => 67, "Er" => 68, "Tm" => 69, "Yb" => 70,
+    "Lu" => 71, "Hf" => 72, "Ta" => 73, "W" => 74, "Re" => 75, "Os" => 76, "Ir" => 77, "Pt" => 78, "Au" => 79, "Hg" => 80,
+    "Tl" => 81, "Pb" => 82, "Bi" => 83, "Po" => 84, "At" => 85, "Rn" => 86, "Fr" => 87, "Ra" => 88, "Ac" => 89, "Th" => 90,
+    "Pa" => 91, "U" => 92, "Np" => 93, "Pu" => 94, "Am" => 95, "Cm" => 96, "Bk" => 97, "Cf" => 98, "Es" => 99, "Fm" => 100,
+    "Md" => 101, "No" => 102, "Lr" => 103, "Rf" => 104, "Db" => 105, "Sg" => 106, "Bh" => 107, "Hs" => 108, "Mt" => 109, "Ds" => 110,
+    "Rg" => 111, "Cn" => 112, "Nh" => 113, "Fl" => 114, "Mc" => 115, "Lv" => 116, "Ts" => 117, "Og" => 118, 
+};
+
 pub fn is_chemical_element(node: Element) -> bool {
 	// FIX: allow name to be in an mrow (e.g., <mi>N</mi><mi>a</mi>
 	let name = name(&node);
@@ -1724,7 +1750,7 @@ pub fn is_chemical_element(node: Element) -> bool {
 	}
 
 	let text = as_text(node);
-	return CHEMICAL_ELEMENTS.contains_key(text);
+	return CHEMICAL_ELEMENT_ELECTRONEGATIVITIES.contains_key(text);
 }
 
 
@@ -2003,6 +2029,29 @@ mod chem_tests {
                 </mmultiscripts>
             </mrow>
        </math>";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+
+    #[test]
+    fn add_script_bug_287() {
+        let test = r#"<math><mrow>
+            <msubsup>
+                <mrow><mi mathvariant="normal">SO</mi></mrow>
+                <mn>4</mn>
+                <mrow><mn>2</mn><mo>&#x2212;</mo></mrow>
+            </msubsup>
+            </mrow></math>"#;
+        let target = r#"<math>
+            <mrow data-changed='added' data-chem-formula='6'>
+                <mi mathvariant='normal' data-chem-element='1'>S</mi>
+                <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
+                <msubsup data-chem-formula='4'>
+                    <mi mathvariant='normal' data-split='true' data-chem-element='1'>O</mi>
+                    <mn>4</mn>
+                    <mrow data-chem-formula='3'><mn>2</mn><mo>-</mo></mrow>
+                </msubsup>
+            </mrow>
+            </math>"#;
         assert!(are_strs_canonically_equal(test, target));
     }
 
