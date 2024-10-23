@@ -893,4 +893,15 @@ fn mhchem_roman_in_superscript() {
   // all Roman numbers with single or multiple cap letters, are all used only dot 46.
 }
 
+#[test]
+fn overparen() {
+    let expr = "<math><mover accent="false"><mrow><mi>A</mi><mi>B</mi></mrow><mo accent="true">&#x23DC;</mo></mover></math>";
+    test_braille("Vietnam", expr, "⠫⠠⠗⠸⠁⠃");
+}
+
+#[test]
+fn vi_text() {
+    let expr = "<math><mtext>h&#x1ED9;i &#x111;o&#xE0;n qu&#x1EA3;n quy&#x1EBF;t khuy&#x1EBF;t</mtext></math>";
+    test_braille("Vietnam", expr, "⠓⠠⠹⠊ ⠮⠰⠕⠁⠝ ⠟⠥⠢⠁⠝ ⠟⠥⠔⠽⠣⠞ ⠅⠓⠔⠥⠽⠣⠞");
+}
 
