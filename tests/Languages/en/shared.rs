@@ -340,3 +340,26 @@ fn mn_with_block_and_decimal_separators() {
   let expr = "<math><mn>1,234.56</mn></math>";                                       // may want to change this for another language
   test_prefs("en", "SimpleSpeak", vec![("DecimalSeparators", "."), ("BlockSeparators", " ,")], expr, "1234.56");
 }
+
+#[test]
+fn divergence() {
+  let expr = "<math><mo>&#x2207;</mo><mo>&#xB7;</mo><mi mathvariant='normal'>F</mi></math>";                                       // may want to change this for another language
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "div of cap f");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "divergence of cap f");
+}
+
+#[test]
+fn curl() {
+  let expr = "<math><mo>&#x2207;</mo><mo>&#xD7;</mo><mi mathvariant='normal'>F</mi></math>";          
+  // may want to change this for another language
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "curl of cap f");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "curl of cap f");
+}
+
+#[test]
+fn gradient() {
+  let expr = "<math><mo>&#x2207;</mo><mi mathvariant='normal'>F</mi></math>";          
+  // may want to change this for another language
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "del cap f");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "gradient of cap f");
+}

@@ -26,11 +26,9 @@
             xpath-name: "name(.)"
             children: []
 
--
-   include: "Intent/geometry.yaml"
-
--
-   include: "Intent/linear-algebra.yaml"
+- include: "Intent/geometry.yaml"
+- include: "Intent/linear-algebra.yaml"
+- include: "Intent/calculus.yaml"
 
 -
   # this is last because other rules are/should be(???) more specific

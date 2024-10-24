@@ -1,0 +1,17 @@
+---
+-
+  name: divergence_and_curl
+  tag: mrow
+  match: "count(*)=3 and *[1][self::m:mo and .='∇'] and *[2][self::m:mo and .='·' or .='×']"
+  replace:
+  - intent:
+      xpath-name: "IfThenElse(*[2]='·', 'divergence', 'curl')"
+      children: [x: "*[3]"]
+-
+  name: gradient
+  tag: mrow
+  match: "count(*)=2 and *[1][self::m:mo and .='∇']"
+  replace:
+  - intent:
+      name: "gradient"
+      children: [x: "*[2]"]
