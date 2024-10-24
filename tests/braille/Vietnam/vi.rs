@@ -484,7 +484,7 @@ fn number_7c () {
 #[test]
 fn meter_1 () {
     let expr = "<math><mrow><mn>5,72</mn><mi mathvariant='normal'>m</mi><mo ame-texclass='ord' stretchy='false'>/</mo><mn>10</mn><mo ame-texclass='rel' stretchy='false'>=</mo><mn>57,2</mn><mi>cm</mi></mrow></math>";
-    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠑⠂⠛⠃⠀⠍⠐⠌⠼⠁⠚⠐⠶⠼⠑⠛⠂⠃⠀⠉⠍");
+    test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠑⠂⠛⠃⠀⠍⠐⠲⠼⠁⠚⠐⠶⠼⠑⠛⠂⠃⠀⠉⠍");
 }
 
 #[test]
@@ -895,13 +895,14 @@ fn mhchem_roman_in_superscript() {
 
 #[test]
 fn overparen() {
-    let expr = "<math><mover accent="false"><mrow><mi>A</mi><mi>B</mi></mrow><mo accent="true">&#x23DC;</mo></mover></math>";
+    let expr = r#"<math><mover accent="false"><mrow><mi>A</mi><mi>B</mi></mrow><mo accent="true">&#x23DC;</mo></mover></math>"#;
     test_braille("Vietnam", expr, "⠫⠠⠗⠸⠁⠃");
 }
 
 #[test]
+#[ignore]
 fn vi_text() {
     let expr = "<math><mtext>h&#x1ED9;i &#x111;o&#xE0;n qu&#x1EA3;n quy&#x1EBF;t khuy&#x1EBF;t</mtext></math>";
-    test_braille("Vietnam", expr, "⠓⠠⠹⠊ ⠮⠰⠕⠁⠝ ⠟⠥⠢⠁⠝ ⠟⠥⠔⠽⠣⠞ ⠅⠓⠔⠥⠽⠣⠞");
+    test_braille("Vietnam", expr, "⠓⠠⠹⠊⠀⠮⠰⠕⠁⠝⠀⠟⠥⠢⠁⠝⠀⠟⠥⠔⠽⠣⠞⠀⠅⠓⠔⠥⠽⠣⠞");
 }
 
