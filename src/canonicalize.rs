@@ -3886,9 +3886,9 @@ impl CanonicalizeContext {
 					if name(&base_of_previous_child) != "mo" {
 						let likely_function_name = self.is_function_name(previous_child, Some(&children[i_child..]));
 						if name(&base_of_child) == "mtext" && as_text(base_of_child) == "\u{00A0}" {
-							current_child.set_attribute_value("data-function-likelihood", &(likely_function_name == FunctionNameCertainty::True).to_string());
-							current_child.remove_attribute("data-was-mo");
-							set_mathml_name(current_child, "mo");
+							base_of_child.set_attribute_value("data-function-likelihood", &(likely_function_name == FunctionNameCertainty::True).to_string());
+							base_of_child.remove_attribute("data-was-mo");
+							set_mathml_name(base_of_child, "mo");
 							let mut top_of_stack = parse_stack.pop().unwrap();
 							top_of_stack.add_child_to_mrow(current_child, OperatorPair{ ch: "\u{00A0}", op: &INVISIBLE_FUNCTION_APPLICATION});		// whitespace -- make part of mrow to keep out of parse
 							parse_stack.push(top_of_stack);
@@ -5721,6 +5721,28 @@ mod canonicalize_tests {
 			<mn mathsize='normal' mathvariant='bold'>𝟗</mn>
 			</msup>
 		</math>";
+		assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+
+	#[test]
+	fn munder_mspace_bug_296() {
+		// this was a "typo" bug that should have looking embellished base
+        let test_str = r#"<math>
+			<mrow><mn>5</mn><mfrac><mn>9</mn><mrow><mn>10</mn></mrow></mfrac>
+				<munder accentunder="true"><mspace width="2.7em" /><mo stretchy="true">_</mo></munder>
+				</mrow></math>"#;
+    	let target_str = "<math><mrow>
+				<mrow data-changed='added'>
+					<mn>5</mn>
+					<mo data-changed='added'>&#x2064;</mo>
+					<mfrac> <mn>9</mn><mn>10</mn> </mfrac>
+				</mrow>
+				<munder accentunder='true'>
+					<mo width='2.7em' data-changed='was-mspace' data-width='2.7' data-empty-in-2D='true' data-function-likelihood='false'> </mo>
+					<mo stretchy='true'>¯</mo>
+				</munder>
+			</mrow></math>";
 		assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
