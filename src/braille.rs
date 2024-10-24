@@ -792,7 +792,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
         //   or before a single letter standing alone anywhere in the expression,
         //   begin the expression with a grade 1 word indicator (or a passage indicator if the expression includes spaces)
         // Apparently "only a grade 1 symbol..." means at most one grade 1 symbol based on some examples (GTM 6.4, example 4)
-        debug!("before determining mode:  '{}'", raw_braille);
+        // debug!("before determining mode:  '{}'", raw_braille);
 
         // a bit ugly because we need to store the string if we have cap passage mode
         let raw_braille_string = if is_cap_passage_mode_good(raw_braille) {convert_to_cap_passage_mode(raw_braille)} else {String::default()};
@@ -857,7 +857,6 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
                     break;
                 }
             }
-            debug!("n_caps={}", n_caps);
             return n_caps > 4;
         }
 
@@ -2003,7 +2002,7 @@ fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
         // Empty bases are ok if they follow whitespace
         static ref EMPTY_BASE: Regex = Regex::new(r"(^|[W𝐖w])E").unwrap();
     }
-    debug!("swedish_cleanup: start={}", raw_braille);
+    // debug!("swedish_cleanup: start={}", raw_braille);
     let result = typeface_to_word_mode(&raw_braille);
     let result = capitals_to_word_mode(&result);
 
@@ -2011,7 +2010,7 @@ fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
                                     .replace("𝔹C", "⠩")
                                     .replace("DC", "⠰");
 
-    debug!("   after typeface/caps={}", &result);
+    // debug!("   after typeface/caps={}", &result);
 
     // these typeforms need to get pulled from user-prefs as they are transcriber-defined
     let double_struck = pref_manager.pref_to_string("Vietnam_DoubleStruck");
@@ -2021,7 +2020,7 @@ fn swedish_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) ->
 
     // This reuses the code just for getting rid of unnecessary "L"s and "N"s
     let result = remove_unneeded_mode_changes(&result, UEB_Mode::Grade1, UEB_Duration::Passage);
-    debug!("   after removing mode changes={}", &result);
+    // debug!("   after removing mode changes={}", &result);
 
 
     let result = EMPTY_BASE.replace_all(&result, "$1");
