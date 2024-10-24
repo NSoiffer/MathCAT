@@ -169,3 +169,9 @@ fn mhchem_roman_in_superscript() {
   // when Roman numbers written on superscript at the middle, it should be added prefix text "hóa trị" then + the number
 }
 
+#[test]
+fn overparen() {
+  let expr = "<math><mover accent="false"><mrow><mi>A</mi><mi>B</mi></mrow><mo accent="true">&#x23DC;</mo></mover></math>";
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "cung a hoa, b hoa");
+}
+

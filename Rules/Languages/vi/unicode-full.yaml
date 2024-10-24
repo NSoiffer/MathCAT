@@ -1232,7 +1232,7 @@
  - "⋄": [t: "người vận hành kim cương"]             #  0x22c4   (en: 'diamond operator')
  - "⋅": [T: "nhân"]                                 #  0x22c5
  - "⋆": [T: "nhân"]                                 #  0x22c6
- - "⋇": [t: "thời gian phân chia"]                  #  0x22c7   (en: 'division times')
+ - "⋇": [T: "nhân chia"]                  #  0x22c7   (en: 'division times')
  - "⋈": [t: "bowtie"]                               #  0x22c8
  - "⋉":                                             #  0x22c9
      - test: 
