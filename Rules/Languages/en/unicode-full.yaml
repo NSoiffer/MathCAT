@@ -3638,14 +3638,22 @@
  - "＾": [t: "hat"]                                 # 0xff3e
  - "｜":                                            # 0xff5c
     # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
-     - test:
-        - if: "$SpeechStyle != 'ClearSpeak' or not(preceding-sibling::*) or not(following-sibling::*)"
-          then: [t: "vertical line"]
-        - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
-          then: [t: "such that"]
-        - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
-          then: [t: "given"] 
-        - else: [t: "divides"]                   
+     - with:
+        variables: [DefaultToGiven: "count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and ../../../*[1][.='P']"] # P(A|B)
+        replace:
+        - test:
+            - if: "$SpeechStyle != 'ClearSpeak'"
+              then_test:
+                  if: "$DefaultToGiven"
+                  then: [t: "given"]
+                  else: [t: "vertical line"]
+            - else_if: "not(preceding-sibling::*) or not(following-sibling::*)"
+              then: [t: "vertical line"]
+            - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+              then: [t: "such that"]
+            - else_if: "$ClearSpeak_VerticalLine = 'Given' or $DefaultToGiven"
+              then: [t: "given"] 
+            - else: [t: "divides"]                   
  - "～": [t: "tilde"]                               # 0xff5e
  - "￢": [t: "not"]                                 # 0xffe2
  - "￩": [t: "left arrow"]                           # 0xffe9
