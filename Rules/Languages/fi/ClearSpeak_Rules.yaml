@@ -799,5 +799,6 @@
 
 - include: "SharedRules/geometry.yaml"
 - include: "SharedRules/linear-algebra.yaml"
+- include: "SharedRules/calculus.yaml"
 - include: "SharedRules/general.yaml"
 - include: "SharedRules/default.yaml"
