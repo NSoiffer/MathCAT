@@ -900,9 +900,56 @@ fn overparen() {
 }
 
 #[test]
-#[ignore]
-fn vi_text() {
-    let expr = "<math><mtext>h&#x1ED9;i &#x111;o&#xE0;n qu&#x1EA3;n quy&#x1EBF;t khuy&#x1EBF;t</mtext></math>";
-    test_braille("Vietnam", expr, "⠓⠠⠹⠊⠀⠮⠰⠕⠁⠝⠀⠟⠥⠢⠁⠝⠀⠟⠥⠔⠽⠣⠞⠀⠅⠓⠔⠥⠽⠣⠞");
+fn vi_text1() {
+    let expr = "<math><mtext>quy&#x1EBF;t gi&#x1EC1;ng qu&#xE1; gi&#x1EC7;t h&#x1EB1;ng h&#x1ECF;i l&#x1ED7;i</mtext></math>";
+    test_braille("Vietnam", expr, "⠟⠥⠔⠽⠣⠞⠀⠛⠊⠰⠣⠝⠛ ⠟⠥⠔⠁⠀⠛⠊⠠⠣⠞⠀⠓⠰⠜⠝⠛⠀⠓⠢⠕⠊⠀⠇⠤⠹⠊");
+}
+
+#[test]
+fn vi_text2() {
+    let expr = "<math><mtext>thi&#x1EBF;t hi&#x1EC1;n bi&#x1EC3;n di&#x1EC5;n &#x111;i&#x1EC7;n gi&#x1EBF;t</mtext></math>";
+    test_braille("Vietnam", expr, "⠞⠓⠔⠊⠣⠞⠀⠓⠰⠊⠣⠝⠀⠃⠢⠊⠣⠝⠀⠙⠤⠊⠣⠝⠀⠮⠠⠊⠣⠝⠀⠛⠊⠔⠣⠞");
+}
+
+#[test]
+fn vi_text31() {
+    let expr = "<math><mtext>thu&#x1EA5;n thu&#x1EA7;n chu&#x1EA9;n lu&#x1EAD;n qu&#x1EA5;n qu&#x1EA7;n qu&#x1EA9;n qu&#x1EAB;n qu&#x1EAD;n</mtext></math>";
+    test_braille("Vietnam", expr, "⠞⠓⠔⠥⠡⠝ ⠞⠓⠰⠥⠡⠝ ⠉⠓⠢⠥⠡⠝ ⠇⠠⠥⠡⠝ ⠟⠥⠔⠡⠝ ⠟⠥⠰⠡⠝ ⠟⠥⠢⠡⠝ ⠟⠥⠤⠡⠝ ⠟⠥⠠⠡⠝");
+}
+
+#[test]
+fn vi_text32() {
+    let expr = "<math><mtext>thu&#x1EBF; hu&#x1EC1; tu&#x1EC7; qu&#x1EBF; qu&#x1EC7;</mtext></math>";
+    test_braille("Vietnam", expr, "⠞⠓⠔⠥⠣ ⠓⠰⠥⠣ ⠞⠠⠥⠣ ⠟⠥⠔⠣ ⠟⠥⠠⠣");
+}
+
+#[test]
+fn vi_text33() {
+    let expr = "<math><mtext>mu&#x1ED1;ng tru&#x1ED3;ng cu&#x1ED5;ng cu&#x1ED7;ng chu&#x1ED9;ng thu&#x1EDF; qu&#x1EDF;</mtext></math>";
+    test_braille("Vietnam", expr, "⠍⠔⠥⠹⠝⠛ ⠞⠗⠰⠥⠹⠝⠛ ⠉⠢⠥⠹⠝⠛ ⠉⠤⠥⠹⠝⠛ ⠉⠓⠠⠥⠹⠝⠛ ⠞⠓⠢⠥⠪ ⠟⠥⠢⠪");
+}
+
+#[test]
+fn vi_text34() {
+    let expr = "<math><mtext>bu&#xFD;t th&#xF9;y h&#x1EE7;y l&#x169;y ng&#x1EE5;y qu&#xFD; qu&#xFD;t qu&#x1EF3; qu&#x1EF7; qu&#x1EF9; qu&#x1EF5;</mtext></math>";
+	test_braille("Vietnam", expr, "⠃⠔⠥⠽⠞ ⠞⠓⠰⠥⠽ ⠓⠢⠥⠽ ⠇⠤⠥⠽ ⠝⠛⠠⠥⠽ ⠟⠥⠔⠽ ⠟⠥⠔⠽⠞ ⠟⠥⠰⠽ ⠟⠥⠢⠽ ⠟⠥⠤⠽ ⠟⠥⠠⠽");
+}
+
+#[test]
+fn vi_text35() {
+    let expr = "<math><mtext>khuy&#x1EBF;t thuy&#x1EC1;n chuy&#x1EC3;n truy&#x1EC7;n quy&#x1EBF;t quy&#x1EC1;n quy&#x1EC3;n quy&#x1EC7;n</mtext></math>";
+    test_braille("Vietnam", expr, "⠅⠓⠔⠥⠽⠣⠞ ⠞⠓⠰⠥⠽⠣⠝ ⠉⠓⠢⠥⠽⠣⠝ ⠞⠗⠠⠥⠽⠣⠝ ⠟⠥⠔⠽⠣⠞ ⠟⠥⠰⠽⠣⠝ ⠟⠥⠢⠽⠣⠝ ⠟⠥⠠⠽⠣⠝");
+}
+
+#[test]
+fn vi_text41() {
+    let expr = "<math><mtext>tho&#xE1;t cho&#xE0;ng lo&#xE3;ng ho&#x1EA1;t tho&#x1EAF;c ho&#x1EB7;c kho&#xE9;n</mtext></math>";
+    test_braille("Vietnam", expr, "⠞⠓⠔⠕⠁⠞ ⠉⠓⠰⠕⠁⠝⠛ ⠇⠤⠕⠁⠝⠛ ⠓⠠⠕⠁⠞ ⠞⠓⠔⠕⠜⠉ ⠓⠠⠕⠜⠉ ⠅⠓⠔⠕⠑⠝");
+}
+
+#[test]
+fn vi_text42() {
+    let expr = "<math><mtext>th&#x1B0;&#x1EDB;t c&#x1B0;&#x1EE3;c y&#x1EBF;n y&#x1EC3;n</mtext></math>";
+    test_braille("Vietnam", expr, "⠞⠓⠔⠳⠪⠞ ⠉⠠⠳⠪⠉ ⠔⠽⠣⠝ ⠢⠽⠣⠝");
 }
 
