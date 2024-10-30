@@ -637,6 +637,7 @@
 - name: ClearSpeak-multi-line
   tag: [piecewise, system-of-equations, lines] # these are ignored in favor of the ClearSpeak prefs
   match: "."
+  variables: [IsColumnSilent: true()]
   replace:
   - x: "count(*)"
   - test:

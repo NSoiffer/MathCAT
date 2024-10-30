@@ -546,6 +546,7 @@
     # Wikipedia has some tables where all the entire first column is empty (e.g., https://en.wikipedia.org/wiki/List_of_trigonometric_identities)
   - LineCount: "count(*[not(contains(@data-intent-property, ':continued-row:'))])"
   - NextLineIsContinuedRow: "false()"   # default value
+  - IsColumnSilent: true()
   replace:
   - x: "$LineCount"
   - test:
