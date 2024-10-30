@@ -526,6 +526,7 @@
   # IDEA:  set a variable with the word to say for the row (e.g., RowLabel = Row/Case/Line/...)
   tag: [piecewise, system-of-equations, lines]
   match: "."
+  variables: [IsColumnSilent: true()]
   replace:
   - x: "count(*)"
   - test:

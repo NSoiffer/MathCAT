@@ -631,15 +631,10 @@
                                IfThenElse(contains(@data-intent-property, ':lines:'), 'lines',''))))"]
   match: "$MTableProperty !=''"
   replace:
-  - with:
-      variables:
-      - TableProperty: "$MTableProperty"
-      - IsColumnSilent: "not(contains(@data-intent-property, ':grid:'))"
-      replace:
-      - intent:
-          xpath-name: "$MTableProperty"
-          children:
-          - x: "*"
+  - intent:
+      xpath-name: "$MTableProperty"
+      children:
+      - x: "*"
 
 -
   name: mtable-matrix-property
@@ -650,7 +645,6 @@
   - with:
       variables:
       - TableProperty: "'matrix'"
-      - IsColumnSilent: "false()"
       replace:
       - intent:
           name: "matrix"
@@ -665,7 +659,6 @@
   - with:
       variables:
       - TableProperty: "'determinant'"
-      - IsColumnSilent: "false()"
       replace:
       - intent:
           name: "determinant"
@@ -681,7 +674,6 @@
   - with:
       variables:
       - TableProperty: "'piecewise'"
-      - IsColumnSilent: "true()"
       replace:
       - intent:
           name: "piecewise"
@@ -696,7 +688,6 @@
   - with:
       variables:
       - TableProperty: "'system-of-equations'"
-      - IsColumnSilent: "true()"
       replace:
       - intent:
           name: "system-of-equations"
@@ -711,7 +702,6 @@
   - with:
       variables:
       - TableProperty: "'lines'"
-      - IsColumnSilent: "true()"
       replace:
       - intent:
           name: "lines"

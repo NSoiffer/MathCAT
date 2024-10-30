@@ -543,6 +543,7 @@
     # Wikipedia has some tables where all the entire first column is empty (e.g., https://en.wikipedia.org/wiki/List_of_trigonometric_identities)
   - LineCountTry: "count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']])"
   - LineCount: "IFTHENELSE($LineCountTry=0, count(*/*[1]), $LineCountTry)"
+  - IsColumnSilent: true()
   replace:
   - x: "$LineCount"
   - test:
