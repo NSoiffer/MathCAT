@@ -22,13 +22,13 @@ fn number_2() {
 #[test]
 fn number_1a() {
     let expr = "<math><mn>3,000.12</mn></math>";
-    test("vi", "ClearSpeak", expr, "3.000,12");
+    test("vi", "ClearSpeak", expr, "3,000.12");
 }
 
 #[test]
 fn number_2a() {
     let expr = "<math><mn>3.14</mn></math>";
-    test("vi", "ClearSpeak", expr, "3,14");
+    test("vi", "ClearSpeak", expr, "3.14");
 }
 
 #[test]
@@ -75,7 +75,7 @@ fn sulfate() {
 fn aluminum_sulfate() {
   let expr = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
           <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
-  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "a l, 2; mở ngoặc đơn, s , o , 4, đóng ngoặc đơn tất cả 3 lần");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "a l, 2; mở ngoặc đơn, s , o , 4, đóng ngoặc đơn 3");
   // "tất cả #X lần" phrase is just applied for chemistry case, not for math. "#X" is the sub 3.
 }
 
