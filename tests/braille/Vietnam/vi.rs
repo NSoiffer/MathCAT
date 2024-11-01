@@ -338,13 +338,13 @@ fn greek_1_1 () {
 
 #[test]
 fn log_b2 () {
-    let expr = "<math><mrow><msubsup><mi mathvariant='normal' ame-texclass='op'>log</mi><mn>3</mn><mn>2</mn></msubsup><mo>&#x2061;</mo><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mn>2</mn><msub><mi mathvariant='normal' ame-texclass='op'>log</mi><mn>2</mn></msub><mo>&#x2061;</mo><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mn>3</mn><mo ame-texclass='rel' stretchy='false'>=</mo><mn>0</mn></mrow></math>";
+    let expr = "<math><mrow><msubsup><mi mathvariant='normal' ame-texclass='op'>log</mi><mn>3</mn><mn>2</mn></msubsup><mo>&#x2061;</mo><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mn>2</mn><msub><mi mathvariant='normal' ame-texclass='op'>log</mi><mn>2</mn></msub><mo>&#x2061;</mo><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mn>3</mn><mo stretchy='false'>=</mo><mn>0</mn></mrow></math>";
     test_braille("Vietnam", expr, "⠇⠕⠛⠔⠼⠃⠢⠼⠉⠭⠐⠖⠼⠃⠇⠕⠛⠢⠼⠃⠭⠐⠖⠼⠉⠐⠶⠼⠚");
 }
 
 #[test]
 fn rnumber_1_1 () {
-    let expr = r#"<math><mrow><mi>A</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mo ame-texclass='open' fence='true' stretchy='false'>{</mo><mi>x</mi><mo ame-texclass='rel' stretchy='false'>&#x2208;</mo><mi>R</mi><mo ame-texclass='fence' fence='true' stretchy='false'>|</mo><msup><mi>x</mi><mn>2</mn></msup><mo ame-texclass='rel' stretchy='false'>&#x2265;</mo><mn>1</mn><mo ame-texclass='close' fence='true' stretchy='false'>}</mo></mrow></math>"#;
+    let expr = r#"<math><mrow><mi>A</mi><mo stretchy='false'>=</mo><mo ame-texclass='open' fence='true' stretchy='false'>{</mo><mi>x</mi><mo stretchy='false'>&#x2208;</mo><mi>R</mi><mo ame-texclass='fence' fence='true' stretchy='false'>|</mo><msup><mi>x</mi><mn>2</mn></msup><mo stretchy='false'>&#x2265;</mo><mn>1</mn><mo ame-texclass='close' fence='true' stretchy='false'>}</mo></mrow></math>"#;
     test_braille("Vietnam", expr, "⠨⠁⠐⠶⠸⠣⠭⠈⠑⠨⠗⠸⠳⠭⠔⠼⠃⠐⠕⠶⠼⠁⠸⠜");
 }
 
@@ -483,25 +483,25 @@ fn number_7c () {
 
 #[test]
 fn meter_1 () {
-    let expr = "<math><mrow><mn>5,72</mn><mi mathvariant='normal'>m</mi><mo ame-texclass='ord' stretchy='false'>/</mo><mn>10</mn><mo ame-texclass='rel' stretchy='false'>=</mo><mn>57,2</mn><mi>cm</mi></mrow></math>";
+    let expr = "<math><mrow><mn>5,72</mn><mi mathvariant='normal'>m</mi><mo ame-texclass='ord' stretchy='false'>/</mo><mn>10</mn><mo stretchy='false'>=</mo><mn>57,2</mn><mi>cm</mi></mrow></math>";
     test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠑⠂⠛⠃⠀⠍⠐⠲⠼⠁⠚⠐⠶⠼⠑⠛⠂⠃⠀⠉⠍");
 }
 
 #[test]
 fn meter_2 () {
-    let expr = "<math><mrow><mn>1</mn><mi>km</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10</mn><mi>hm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100</mn><mi>dam</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000</mn><mi mathvariant='normal'>m</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10.000</mn><mi>dm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100.000</mn><mi>cm</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000.000</mn><mi>mm</mi></mrow></math>";
+    let expr = "<math><mrow><mn>1</mn><mi>km</mi><mo stretchy='false'>=</mo><mn>10</mn><mi>hm</mi><mo stretchy='false'>=</mo><mn>100</mn><mi>dam</mi><mo stretchy='false'>=</mo><mn>1.000</mn><mi mathvariant='normal'>m</mi><mo stretchy='false'>=</mo><mn>10.000</mn><mi>dm</mi><mo stretchy='false'>=</mo><mn>100.000</mn><mi>cm</mi><mo stretchy='false'>=</mo><mn>1.000.000</mn><mi>mm</mi></mrow></math>";
     test_braille_prefs("Vietnam", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "⠼⠁⠀⠅⠍⠐⠶⠼⠁⠚⠀⠓⠍⠐⠶⠼⠁⠚⠚⠀⠙⠁⠍⠐⠶⠼⠁⠄⠚⠚⠚⠀⠍⠐⠶⠼⠁⠚⠄⠚⠚⠚⠀⠙⠍⠐⠶⠼⠁⠚⠚⠄⠚⠚⠚⠀⠉⠍⠐⠶⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚⠀⠍⠍");
 }
 
 #[test]
 fn gram_1 () {
-    let expr = "<math><mrow><mn>1</mn><mi>t&#x1EA5;n</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10</mn><mi>t&#x1EA1;</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100</mn><mi>y&#x1EBF;n</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000</mn><mi>kg</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>10.000</mn><mi>hg</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>100.000</mn><mi>dag</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000.000</mn><mi mathvariant='normal'>g</mi></mrow></math>";
+    let expr = "<math><mrow><mn>1</mn><mi>tấn</mi><mo stretchy='false'>=</mo><mn>10</mn><mi>tạ</mi><mo stretchy='false'>=</mo><mn>100</mn><mi>yến</mi><mo stretchy='false'>=</mo><mn>1.000</mn><mi>kg</mi><mo stretchy='false'>=</mo><mn>10.000</mn><mi>hg</mi><mo stretchy='false'>=</mo><mn>100.000</mn><mi>dag</mi><mo stretchy='false'>=</mo><mn>1.000.000</mn><mi mathvariant='normal'>g</mi></mrow></math>";
     test_braille("Vietnam", expr, "⠼⠁⠀⠞⠔⠡⠝⠐⠶⠼⠁⠚⠀⠞⠠⠁⠐⠶⠼⠁⠚⠚⠀⠽⠔⠣⠝⠐⠶⠼⠁⠄⠚⠚⠚⠀⠅⠛⠐⠶⠼⠁⠚⠄⠚⠚⠚⠀⠓⠛⠐⠶⠼⠁⠚⠚⠄⠚⠚⠚⠀⠙⠁⠛⠐⠶⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚⠀⠛");
 }
 
 #[test]
 fn liquid_1 () {
-    let expr = "<math><mrow><mn>1</mn><mi>l&#xED;t</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1</mn><mi mathvariant='normal'>l</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>1.000</mn><mi>ml</mi></mrow></math>";
+    let expr = "<math><mrow><mn>1</mn><mi>l&#xED;t</mi><mo stretchy='false'>=</mo><mn>1</mn><mi mathvariant='normal'>l</mi><mo stretchy='false'>=</mo><mn>1.000</mn><mi>ml</mi></mrow></math>";
     test_braille("Vietnam", expr, "⠼⠁⠀⠇⠔⠊⠞⠐⠶⠼⠁⠀⠇⠐⠶⠼⠁⠄⠚⠚⠚⠀⠍⠇");
 }
 
@@ -513,19 +513,19 @@ fn feet_1 () {
 
 #[test]
 fn cap_1 () {
-    let expr = "<math><mrow><mi>A</mi><mi>B</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mi>C</mi><mi>d</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mi>e</mi><mi>F</mi></mrow></math>";
+    let expr = "<math><mrow><mi>A</mi><mi>B</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mi>C</mi><mi>d</mi><mo stretchy='false'>=</mo><mi>e</mi><mi>F</mi></mrow></math>";
     test_braille("Vietnam", expr, "⠸⠁⠃⠐⠖⠨⠉⠙⠐⠶⠑⠨⠋");
 }
 
 #[test]
 fn cap_2 () {
-    let expr = "<math><mrow><mi>AB</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mi>Cd</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mi>eF</mi></mrow></math>";
+    let expr = "<math><mrow><mi>AB</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mi>Cd</mi><mo stretchy='false'>=</mo><mi>eF</mi></mrow></math>";
     test_braille("Vietnam", expr, "⠸⠁⠃⠐⠖⠨⠉⠙⠐⠶⠑⠨⠋");
 }
 
 #[test]
 fn vi_letters () {
-    let expr = "<math><mrow><mtext>Cho Ph&#x1B0;&#x1A1;ng Tr&#xEC;nh</mtext><mtext>&#xA0;</mtext><mi>A</mi><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mi>B</mi><mo ame-texclass='rel' stretchy='false'>=</mo><mn>0</mn><mtext>&#xA0;</mtext><mtext>TA &#x110;&#x1AF;&#x1EE2;C</mtext><mtext>&#xA0;</mtext><mi>x</mi></mrow></math>";
+    let expr = "<math><mrow><mtext>Cho Ph&#x1B0;&#x1A1;ng Tr&#xEC;nh</mtext><mtext>&#xA0;</mtext><mi>A</mi><mi>x</mi><mo ame-texclass='bin' stretchy='false'>+</mo><mi>B</mi><mo stretchy='false'>=</mo><mn>0</mn><mtext>&#xA0;</mtext><mtext>TA &#x110;&#x1AF;&#x1EE2;C</mtext><mtext>&#xA0;</mtext><mi>x</mi></mrow></math>";
     test_braille("Vietnam", expr, "⠨⠉⠓⠕⠀⠨⠏⠓⠳⠪⠝⠛⠀⠨⠞⠗⠰⠊⠝⠓⠀⠨⠁⠭⠐⠖⠨⠃⠐⠶⠼⠚⠀⠸⠞⠁⠀⠸⠮⠳⠠⠪⠉⠀⠭");
 }
 
@@ -901,6 +901,7 @@ fn overparen() {
 
 #[test]
 fn vi_text1() {
+  init_logger();
     let expr = "<math><mtext>quyết giềng quá giệt hằng hỏi lỗi</mtext></math>";
     test_braille("Vietnam", expr, "⠟⠥⠔⠽⠣⠞⠀⠛⠊⠰⠣⠝⠛⠀⠟⠥⠔⠁⠀⠛⠊⠠⠣⠞⠀⠓⠰⠜⠝⠛⠀⠓⠢⠕⠊⠀⠇⠤⠹⠊");
 }
