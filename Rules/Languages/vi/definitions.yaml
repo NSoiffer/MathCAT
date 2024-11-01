@@ -1,10 +1,15 @@
 ---
 - include: "../../definitions.yaml"
+
 # Lines starting with "#" are a comment
 # Each definition in this file is of the form
 # - name: { "...", "..." "..." }
 # For numbers, 
 # - name: [] "...", "..." "..." ]
+
+- KnownWords: {
+    "tạ", "yến", "và"
+  }
 
 # ----------------  Cardinal and Ordinal Numbers  --------------------------
 # The following definitions are used to convert numbers to words
