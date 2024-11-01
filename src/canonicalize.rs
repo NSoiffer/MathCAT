@@ -1990,23 +1990,24 @@ impl CanonicalizeContext {
 				'ỉ', 'ĩ', 'ị', 'ỏ', 'ọ', 'ồ', 'ổ', 'ỗ', 'ố', 'ộ', 'ơ', 'ờ', 'ở', 'ỡ', 'ớ', 'ợ',
 				'ủ', 'ũ', 'ụ', 'ư', 'ừ', 'ử', 'ữ', 'ứ', 'ự', 'ỳ', 'ỷ', 'ỹ', 'ỵ', 
 			};
-			if as_text(mi).len() > 1 {
+			let parent = get_parent(mi);	// not canonicalized into mrows, so parent could be "math"
+			let parent_name = name(&parent);
+			if as_text(mi).len() > 1 || !(parent_name == "mrow" || parent_name == "math") {
 				return None;
 			}
-			let following_siblings = mi.following_siblings();
-			// quick check to rule common cases
-			if following_siblings.len() < 2 ||
-			   name(&as_element(following_siblings[0])) != "mi" ||
-			   name(&as_element(following_siblings[1])) != "mi" {
-				return None;
-			}
-			// we have at least three <mi>s -- find out what the longest stretch is
 			let mut text =  as_text(mi).to_string();
-			for &child in &following_siblings {   // referenced to avoid a move
-				let child = as_element(child);
-				if name(&child) != "mi" {
-					break;		// because of the earlier check of two <mi>s, we know we have at least three chars
-				}
+			let following_siblings = mi.following_siblings();
+			let following_mi_siblings: Vec<Element> = following_siblings.iter()
+						.map_while(|&child| {
+							let child = as_element(child);
+							if name(&child) == "mi" && as_text(child).chars().count() == 1 {Some(child)} else {None}
+						})
+						.collect();
+			if following_mi_siblings.is_empty() {
+				return None;
+			}
+		
+			for &child in &following_mi_siblings {   // referenced to avoid a move
 				let mut chars = as_text(child).chars();
 				chars.next();	// advance to second char
 				if chars.next().is_some() {
@@ -2014,30 +2015,39 @@ impl CanonicalizeContext {
 				}
 				text.push_str(as_text(child));
 			}
+			debug!("merge_mi_sequence: text={}", &text);
+			if let Some(answer) = crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
+				let definitions = definitions.borrow();
+				if definitions.get_hashset("FunctionNames").unwrap().contains(&text) {
+					return Some(merge_from_text(mi, &text, &following_mi_siblings));
+				}
+				// unlike "FunctionNames", "KnownWords" might not exist
+				if let Some(word_map) = definitions.get_hashset("KnownWords") {
+					if word_map.contains(&text) {
+						return Some(merge_from_text(mi, &text, &following_mi_siblings));
+					}
+				}
+				return None;
+			}) {
+				return answer;
+			}
+
+			// don't be too agressive combining mi's when they are short
+			if text.chars().count() < 3 {
+				return None;
+			}
 			// If it is a word, it needs a vowel
 			// FIX: this check needs to be internationalized to include accented vowels, other alphabets
 			if !text.chars().any(|ch| VOWELS.contains(&ch)) {
 				return None;
 			}
 
-			let following_siblings: Vec<Element> = following_siblings[..text.chars().count()-1].iter()
-						.map(|&child| as_element(child))
-						.collect();
-			
-			// I asked bard and chatgpt for formula words that are alphabetical, and they failed.
+			// I asked bard and chatgpt for formula words that are alphabetical (see below about 'abc'), and they failed.
 			// I did find "flow" and "flux" in a list elsewhere -- I'm sure there are more. Probably other languages need to be handled
 			// Check for them here, and anything else that's alphabetical we avoid turning into a word
 			// FIX: this is English-centric
 			if ["flow", "flux"].contains(&text.as_str()) {
-				return merge_from_text(mi, &text, following_siblings);
-			}
-			let is_function_name = crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
-				let definitions = definitions.borrow();
-				return definitions.get_hashset("FunctionNames").unwrap().contains(&text);
-			});
-			if is_function_name {
-				return merge_from_text(mi, &text, following_siblings);
-			
+				return merge_from_text(mi, &text, &following_mi_siblings);
 			}
 		
 			// now for some hueristics to rule out a sequence of variables
@@ -2058,11 +2068,11 @@ impl CanonicalizeContext {
 			}
 
 			// FIX: should add more huerestics to rule out words
-			return merge_from_text(mi, &text, following_siblings);
+			return merge_from_text(mi, &text, &following_mi_siblings);
 
-			fn merge_from_text<'a>(mi: Element<'a>, text: &str, following_siblings: Vec<Element>) -> Option<Element<'a>> {
+			fn merge_from_text<'a>(mi: Element<'a>, text: &str, following_siblings: &[Element]) -> Option<Element<'a>> {
 				// remove trailing mi's
-				following_siblings.into_iter().for_each(|sibling| sibling.remove_from_parent());
+				following_siblings.iter().for_each(|sibling| sibling.remove_from_parent());
 				mi.set_text(text);
 				return Some(mi);
 			}
