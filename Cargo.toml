@@ -1,6 +1,6 @@
 [package]
 name = "mathcat"
-version = "0.6.4"
+version = "0.6.5"
 authors = ["Neil Soiffer <soiffer@alum.mit.edu>"]
 license = "MIT"
 description = "MathCAT: Math Capable Assistive Technology ('Speech and braille from MathML')"
@@ -9,6 +9,7 @@ homepage = "https://nsoiffer.github.io/MathCAT/"
 documentation = "https://nsoiffer.github.io/MathCAT/"
 edition = "2018"
 exclude = ["src/main.rs"]    # should have "Rules/", but then one can't run build.rs to build the zip file
+
 
 [features]
 "include-zip" = []
@@ -74,7 +75,7 @@ error-chain = "0.12.4"
 [target.'cfg(target_family = "wasm")'.build-dependencies]
 zip = { version = "2.1", default-features = false, features = ["deflate"] }
 [target.'cfg(not(target_family = "wasm"))'.build-dependencies]
-zip = { version = "2.1", default-features = false, features = ["deflate"] }
+zip = { version = "2.1", default-features = false, features = ["bzip2"] }
 
 [lib]
 name = "libmathcat"
