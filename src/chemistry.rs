@@ -546,33 +546,44 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
         // undo a split that happened in a scripted element
         // we put the preceding elements into the base and call merge_element on the last element of the base
         // The first and/or the last child in the sequence could be a script that needs to be unwrapped
-        // let parent = get_parent(mathml);   // there is always a "math" node
+        let mut parent = get_parent(mathml);   // there is always a "math" node
+        // debug!("mathml:\n{}", mml_to_string(&mathml));
         // debug!("parent before merge:\n{}", mml_to_string(&parent));
+        // debug!("grandparent before merge:\n{}", mml_to_string(&get_parent(parent)));
 
-        // deal with the last element ('mathml')
-         // new_base_children will turn into an mrow of mi's, the element that should be merged
-        let mut new_base_children = mathml.preceding_siblings();
+        let mut preceding_children = mathml.preceding_siblings();
+        // could be no preceding children to canonicalization creating mrows (see issue #303), so might need to use parent, etc
+        while preceding_children.is_empty() {
+            preceding_children = parent.preceding_siblings();
+            parent = get_parent(parent);
+            if name(&parent) == "math" {
+                // this shouldn't happen -- rather than crash, let's do something
+                error!("is_changed_after_unmarking_chemistry: error no preceding children to merge. mathml=\n{}", mml_to_string(&mathml));
+                return false;
+            }
+        }
 
         // deal with the first element (if it needs unwrapping, it has only prescripts)
-        let first_element = as_element(new_base_children[0]);
-        if name(&first_element) == "mmultiscripts" {
+        let first_element_of_split = as_element(preceding_children[preceding_children.len()-1]);
+        if name(&first_element_of_split) == "mmultiscripts" {
             // take the base and make it the first child of preceding_children (what will get merged)
             // put the rest of the elements (the prescripts) at the end of the parent last element (mathml) which must be an mmultiscripts
-            let first_element_children = first_element.children();
+            let first_element_children = first_element_of_split.children();
             assert_eq!(name(&mathml), "mmultiscripts");
             let mut script_children = mathml.children();
             assert_eq!(script_children.len() % 2, 1);  // doesn't have <mprescripts/>
-            new_base_children[0] = first_element_children[0];
+            preceding_children[0] = first_element_children[0];
             script_children.push(first_element_children[1]);
             script_children.push(first_element_children[2]);
             script_children.push(first_element_children[3]);
             mathml.replace_children(script_children);
-            first_element.remove_from_parent();
+            first_element_of_split.remove_from_parent();
         }
-        let mut children_of_last = mathml.children();
-        let split_child = as_element(children_of_last[0]);
-        new_base_children.append(&mut children_of_last);
-        mathml.replace_children(new_base_children);     // temporarily has bad number of children 
+        let mut children_of_script = mathml.children();
+        let split_child = as_element(children_of_script[0]);
+        let mut new_script_children = vec![ChildOfElement::Element(first_element_of_split)];
+        new_script_children.append(&mut children_of_script);
+        mathml.replace_children(new_script_children);     // temporarily has bad number of children 
         // debug!("After making bad script:\n{}", mml_to_string(&mathml));
         if let Err(err) = merge_element(split_child) {
             panic!("{}", err);
@@ -2925,7 +2936,6 @@ mod chem_tests {
     
     #[test]
     fn merge_bug_274() {
-        init_logger();
         let test = r#"
         <math>
             <mrow>
@@ -3065,6 +3075,48 @@ mod chem_tests {
             </mtable>
             </math>
         ";
+        assert!(are_strs_canonically_equal(test, target));
+    }
+    
+    #[test]
+    fn merge_bug_303() {
+        let test = r#"
+            <math>
+                <mn>2</mn>
+                <msup><mtext>OH</mtext><mo>−</mo></msup>
+                <mo stretchy="false">(</mo>
+                <mtext>aq</mtext>
+                <mo stretchy="false">)</mo>
+                <mo>+</mo>
+                <mtext>C</mtext>
+                <msup><mtext>u</mtext><mrow><mn>2</mn><mo>+</mo></mrow></msup>
+            </math>
+        "#;
+        let target = "
+            <math>
+                <mrow data-changed='added'>
+                <mrow data-changed='added'>
+                    <mn>2</mn>
+                    <mo data-changed='added'>&#x2062;</mo>
+                    <mrow data-changed='added'>
+                        <msup><mi>OH</mi><mo>-</mo></msup>
+                        <mo data-changed='added'>&#x2061;</mo>
+                        <mrow data-changed='added'>
+                            <mo stretchy='false'>(</mo>
+                            <mtext>aq</mtext>
+                            <mo stretchy='false'>)</mo>
+                        </mrow>
+                    </mrow>
+                </mrow>
+                <mo>+</mo>
+                <mrow data-changed='added'>
+                    <mtext>C</mtext>
+                    <mo data-changed='added'>&#x2062;</mo>
+                    <msup> <mtext>u</mtext> <mrow><mn>2</mn><mo>+</mo></mrow> </msup>
+                </mrow>
+                </mrow>
+            </math>
+           ";
         assert!(are_strs_canonically_equal(test, target));
     }
 
