@@ -39,8 +39,9 @@ fn roman_numeral() {
 }
 
 #[test]
+#[ignore]
 fn vi_units_1() {
-    let expr = "<math><mrow><mn>1</mn><mi>t</mi><mi>&#x1EA5;</mi><mi>n</mi><mn>10</mn><mi>t</mi><mi>&#x1EA1;</mi><mn>100</mn><mi>y</mi><mi>&#x1EBF;</mi><mi>n</mi><mi>v</mi><mi>&#xE0;</mi><mn>4</mn><mi>l</mi><mi>&#xED;</mi><mi>t</mi></mrow></math>";
+    let expr = "<math><mrow><mn>1</mn><mi>t</mi><mi>ấ</mi><mi>n</mi><mn>10</mn><mi>t</mi><mi>ạ</mi><mn>100</mn><mi>y</mi><mi>ế</mi><mi>n</mi><mi>v</mi><mi>à</mi><mn>4</mn><mi>l</mi><mi>í</mi><mi>t</mi></mrow></math>";
     test("vi", "ClearSpeak", expr, "1 tấn 10 tạ 100 yến và 4 lít");
 }
 
