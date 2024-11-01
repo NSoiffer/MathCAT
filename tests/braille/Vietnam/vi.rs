@@ -496,7 +496,7 @@ fn meter_2 () {
 #[test]
 fn gram_1 () {
     let expr = "<math><mrow><mn>1</mn><mi>tấn</mi><mo stretchy='false'>=</mo><mn>10</mn><mi>tạ</mi><mo stretchy='false'>=</mo><mn>100</mn><mi>yến</mi><mo stretchy='false'>=</mo><mn>1.000</mn><mi>kg</mi><mo stretchy='false'>=</mo><mn>10.000</mn><mi>hg</mi><mo stretchy='false'>=</mo><mn>100.000</mn><mi>dag</mi><mo stretchy='false'>=</mo><mn>1.000.000</mn><mi mathvariant='normal'>g</mi></mrow></math>";
-    test_braille("Vietnam", expr, "⠼⠁⠀⠞⠔⠡⠝⠐⠶⠼⠁⠚⠀⠞⠠⠁⠐⠶⠼⠁⠚⠚⠀⠽⠔⠣⠝⠐⠶⠼⠁⠄⠚⠚⠚⠀⠅⠛⠐⠶⠼⠁⠚⠄⠚⠚⠚⠀⠓⠛⠐⠶⠼⠁⠚⠚⠄⠚⠚⠚⠀⠙⠁⠛⠐⠶⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚⠀⠛");
+    test_braille("Vietnam", expr, "⠼⠁⠀⠞⠔⠡⠝⠐⠶⠼⠁⠚⠀⠞⠠⠁⠐⠶⠼⠁⠚⠚⠀⠔⠽⠣⠝⠐⠶⠼⠁⠄⠚⠚⠚⠀⠅⠛⠐⠶⠼⠁⠚⠄⠚⠚⠚⠀⠓⠛⠐⠶⠼⠁⠚⠚⠄⠚⠚⠚⠀⠙⠁⠛⠐⠶⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚⠀⠛");
 }
 
 #[test]
