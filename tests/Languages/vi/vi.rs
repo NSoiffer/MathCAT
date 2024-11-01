@@ -22,13 +22,13 @@ fn number_2() {
 #[test]
 fn number_1a() {
     let expr = "<math><mn>3,000.12</mn></math>";
-    test("vi", "ClearSpeak", expr, "3.000,12");
+    test_prefs("vi", "ClearSpeak", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "3.000,12");
 }
 
 #[test]
 fn number_2a() {
     let expr = "<math><mn>3.14</mn></math>";
-    test("vi", "ClearSpeak", expr, "3,14");
+    test_prefs("vi", "ClearSpeak", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "3,14");
 }
 
 #[test]
