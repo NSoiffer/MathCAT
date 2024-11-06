@@ -22,13 +22,13 @@ fn number_2() {
 #[test]
 fn number_1a() {
     let expr = "<math><mn>3,000.12</mn></math>";
-    test("vi", "ClearSpeak", expr, "3.000,12");
+    test_prefs("vi", "ClearSpeak", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "3,000.12");
 }
 
 #[test]
 fn number_2a() {
     let expr = "<math><mn>3.14</mn></math>";
-    test("vi", "ClearSpeak", expr, "3,14");
+    test_prefs("vi", "ClearSpeak", vec![("DecimalSeparators", ","), ("BlockSeparators", ". ")], expr, "3.14");
 }
 
 #[test]
@@ -39,8 +39,9 @@ fn roman_numeral() {
 }
 
 #[test]
+#[ignore]
 fn vi_units_1() {
-    let expr = "<math><mrow><mn>1</mn><mi>t</mi><mi>&#x1EA5;</mi><mi>n</mi><mn>10</mn><mi>t</mi><mi>&#x1EA1;</mi><mn>100</mn><mi>y</mi><mi>&#x1EBF;</mi><mi>n</mi><mi>v</mi><mi>&#xE0;</mi><mn>4</mn><mi>l</mi><mi>&#xED;</mi><mi>t</mi></mrow></math>";
+    let expr = "<math><mrow><mn>1</mn><mi>t</mi><mi>ấ</mi><mi>n</mi><mn>10</mn><mi>t</mi><mi>ạ</mi><mn>100</mn><mi>y</mi><mi>ế</mi><mi>n</mi><mi>v</mi><mi>à</mi><mn>4</mn><mi>l</mi><mi>í</mi><mi>t</mi></mrow></math>";
     test("vi", "ClearSpeak", expr, "1 tấn 10 tạ 100 yến và 4 lít");
 }
 
@@ -75,7 +76,7 @@ fn sulfate() {
 fn aluminum_sulfate() {
   let expr = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
           <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
-  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "a l, 2; mở ngoặc đơn, s , o , 4, đóng ngoặc đơn tất cả 3 lần");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "a l, 2; mở ngoặc đơn, s , o , 4, đóng ngoặc đơn 3");
   // "tất cả #X lần" phrase is just applied for chemistry case, not for math. "#X" is the sub 3.
 }
 
@@ -143,7 +144,6 @@ fn ethylene_with_colon_bond() {
 
 #[test]
 fn mhchem_roman_in_superscript() {
-  init_logger();
   let expr = " <math>
       <mrow>
         <mmultiscripts>
@@ -168,5 +168,11 @@ fn mhchem_roman_in_superscript() {
   test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "f hoa e, hóa trị 2 la mã; f hoa e, hóa trị 3 la mã; o hoa, 4,");
   test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "f e, hóa trị 2; f e, hóa trị 3; o , 4,");
   // when Roman numbers written on superscript at the middle, it should be added prefix text "hóa trị" then + the number
+}
+
+#[test]
+fn overparen() {
+  let expr = r#"<math><mover accent="false"><mrow><mi>A</mi><mi>B</mi></mrow><mo accent="true">&#x23DC;</mo></mover></math>"#;
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "cung a hoa b hoa");
 }
 

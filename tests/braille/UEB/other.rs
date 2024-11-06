@@ -140,3 +140,19 @@ fn contractions_5() {
     let expr = "<math><mi>Real</mi><mo>(</mo><mi>z</mi><mo>)</mo></math>";
     test_braille("UEB", expr, "⠠⠗⠂⠇⠐⠣⠵⠐⠜");
 }
+
+#[test]
+fn caps_bug_279() {
+    let expr = "<math><mfrac><mrow><mi>A</mi><mi>B</mi></mrow><mi>B</mi></mfrac></math>";
+    test_braille("UEB", expr, "⠰⠰⠷⠠⠠⠁⠃⠨⠌⠠⠃⠾");
+}
+
+#[test]
+fn caps_bug_295() {
+    let expr = "<math><mi>P</mi><mo>⁢</mo><mi>Q</mi><mo>+</mo>
+                            <mi>Q</mi><mo>⁢</mo><mi>R</mi><mo>=</mo>
+                            <mi>R</mi><mo>⁢</mo><mi>S</mi><mo>+</mo>
+                            <mi>Q</mi><mo>⁢</mo><mi>R</mi></math>
+";
+    test_braille("UEB", expr, "⠠⠠⠠⠏⠟⠐⠖⠟⠗⠀⠐⠶⠀⠗⠎⠐⠖⠟⠗⠠⠄");
+}

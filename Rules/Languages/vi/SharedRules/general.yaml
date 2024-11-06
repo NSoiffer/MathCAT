@@ -524,14 +524,15 @@
 - #   that eliminates the need for the if: else_if: ...
   name: multi-line
   # IDEA:  set a variable with the word to say for the row (e.g., RowLabel = Row/Case/Line/...)
-  tag: [cases, equations, lines]
+  tag: [piecewise, system-of-equations, lines]
   match: "."
+  variables: [IsColumnSilent: true()]
   replace:
   - x: "count(*)"
   - test:
-    - if: "self::m:cases"
+    - if: "self::m:piecewise"
       then: [{T: "trường hợp"}]
-    - else_if: "self::m:equations"
+    - else_if: "self::m:system-of-equations"
       then: [{T: "biểu thức"}]
       else: [{T: "dòng"}]
     #- test:
@@ -542,12 +543,12 @@
 
 - name: default-multiline
   tag: [mtr, mlabeledtr]
-  match: "parent::m:cases or parent::m:equations or parent::m:lines"
+  match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
   replace:
   - test:
-    - if: "parent::m:cases"
+    - if: "parent::m:piecewise"
       then: [{T: "trường hợp"}]
-    - else_if: "parent::m:equations"
+    - else_if: "parent::m:system-of-equations"
       then: [{T: "biểu thức"}]
       else: [{T: "dòng"}]
   - x: "count(preceding-sibling::*)+1"
@@ -564,7 +565,7 @@
 
 - name: default-multiline
   tag: mtd
-  match: "parent::*[parent::m:cases or parent::m:equations or parent::m:lines]"
+  match: "parent::*[parent::m:piecewise or parent::m:system-of-equations or parent::m:lines]"
   replace:
   - x: "*"
   - test:

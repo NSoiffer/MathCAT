@@ -26,10 +26,7 @@ use std::cell::{Ref, RefCell};
 use std::thread::LocalKey;
 use phf::phf_set;
 use sxd_xpath::function::Error as XPathError;
-
-
-
-use crate::canonicalize::{as_element, name};
+use crate::canonicalize::{as_element, name, get_parent};
 
 // useful utility functions
 // note: child of an element is a ChildOfElement, so sometimes it is useful to have parallel functions,
@@ -75,7 +72,7 @@ fn is_tag(e: Element, name: &str) -> bool {
 // Same as 'is_tag', but for ChildOfElement
 fn is_COE_tag(coe: &ChildOfElement, name: &str) -> bool {
     let element = coe.element();
-    return element.is_some() && is_tag(element.unwrap(), name);  
+    return element.is_some() && is_tag(element.unwrap(), name)
 }
 
 /// Should be an internal structure for implementation of the IsNode, but it was useful in one place in a separate module.
@@ -335,6 +332,11 @@ static MATHML_MODIFIED_NODES: phf::Set<&str> = phf_set! {
     "msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts",
 };
 
+pub fn is_modified(element: Element) -> bool {
+    return MATHML_MODIFIED_NODES.contains(name(&element));
+}
+
+
 // Should mstack and mlongdiv be included here?
 static MATHML_SCRIPTED_NODES: phf::Set<&str> = phf_set! {
     "msub", "msup", "msubsup", "mmultiscripts",
@@ -423,22 +425,38 @@ impl ToOrdinal {
         lazy_static! {
             static ref NO_DIGIT: Regex = Regex::new(r"[^\d]").unwrap();    // match anything except a digit
         }
-        SPEECH_DEFINITIONS.with(|definitions| {
+        return SPEECH_DEFINITIONS.with(|definitions| {
             let definitions = definitions.borrow();
             let numbers_large = definitions.get_vec("NumbersLarge")?;
-            // check to see if the number is too big or is not an integer or has non-digits
-            if number.is_empty() || number.len() > 3*numbers_large.len() || number.contains(".,") {
+
+            let pref_manager = crate::prefs::PreferenceManager::get();
+            let pref_manager = pref_manager.borrow();
+            let block_separators = pref_manager.pref_to_string("BlockSeparators");
+            let decimal_separator = pref_manager.pref_to_string("DecimalSeparators");
+
+            // check number validity (has digits, not a decimal)
+            if number.is_empty() ||  number.contains(&decimal_separator) {
                 return Some(String::from(number));
             }
-            if NO_DIGIT.is_match(number) {
+            // remove any block separators
+            let number = match clean_number(number, &block_separators) {
+                None => return Some(String::from(number)),
+                Some(num) => num,
+            };
+    
+            // check to see if the number is too big or is not an integer or has non-digits
+            if number.len() > 3*numbers_large.len() {
+                return Some(number);
+            }
+            if NO_DIGIT.is_match(&number) {
                 // this shouldn't have been part of an mn, so likely an error. Log a warning
                 // FIX: log a warning that a non-number was passed to convert()
-                return Some(String::from(number));
+                return Some(number);
             }
 
             // first deal with the abnormalities of fractional ordinals (one half, etc). That simplifies what remains
             if fractional {
-                if let Some(string) = ToOrdinal::compute_irregular_fractional_speech(number, plural) {
+                if let Some(string) = ToOrdinal::compute_irregular_fractional_speech(&number, plural) {
                     return Some(string);
                 }
             }
@@ -532,8 +550,33 @@ impl ToOrdinal {
                 answer = answer + " " + &large_words[num_thousands_at_end];
             }
             return Some(answer);
-        })
+        });
+
+        /// Remove block separators and convert alphanumeric digits to ascii digits
+        fn clean_number(number: &str, block_separators: &str) -> Option<String> {
+            let mut answer = String::with_capacity(number.len());
+            for ch in number.chars() {
+                if block_separators.contains(ch) {
+                    continue;
+                }
+                if ch.is_ascii_digit() {
+                    answer.push(ch);
+                } else {
+                    let shifted_ch = match ch {
+                        '𝟎'..='𝟗' => ch as u32 -'𝟎' as u32 + '0' as u32,
+                        '𝟘'..='𝟡' => ch as u32 -'𝟘' as u32 + '0' as u32,
+                        '𝟢'..='𝟫' => ch as u32 -'𝟢' as u32 + '0' as u32,
+                        '𝟬'..='𝟵' => ch as u32 -'𝟬' as u32 + '0' as u32,
+                        '𝟶'..='𝟿' => ch as u32 -'𝟶' as u32 + '0' as u32,
+                        _ => return None,
+                    };
+                    answer.push(char::from_u32(shifted_ch).unwrap());
+                }
+            }
+            return Some(answer);
+        }
     }
+
 
     fn hundreds_to_words(number: &[usize], words: &[Ref<Vec<String>>; 3]) -> Option<String> {
         assert!( number.len() == 3 );
@@ -628,7 +671,7 @@ impl Function for ToCommonFraction {
                 Some(ord) => ord,
             };
 
-            return Ok( Value::String( answer ) );    
+            return Ok( Value::String( answer ) )
         } else {
             return Err( Error::Other( "ToCommonFraction -- argument is not an element".to_string()) );
         }
@@ -891,11 +934,10 @@ impl IsInDefinition {
 }
 
 /**
- * Returns true if the node is a bracketed expr with the indicated left/right chars
+ * Returns true if the text is contained in the set defined in Speech or Braille.
  * element/string -- element (converted to string)/string to test
- * left -- string (like "[") or empty
- * right -- string (like "]") or empty
- * requires_comma - boolean, optional (check the top level of 'node' for commas
+ * speech or braille
+ * setname -- the set in which the string is to be searched
  */
 // 'requiresComma' is useful for checking parenthesized expressions vs function arg lists and other lists
  impl Function for IsInDefinition {
@@ -1043,7 +1085,7 @@ impl DistanceFromLeaf {
 
 /**
  * Returns distance from the current node to the leftmost/rightmost leaf (if char, then = 0, if token, then 1).
-  if the node is a bracketed expr with the indicated left/right chars
+ * If the node is a bracketed expr with the indicated left/right chars
  * node -- node(s) to test
  * left_side -- (bool) traverse leftmost child to leaf
  * treat2D_elements_as_tokens -- (bool) 2D notations such as fractions are treated like leaves 
@@ -1079,7 +1121,7 @@ impl EdgeNode {
             return Some(element);
         };
 
-        let parent = element.parent().unwrap().element().unwrap();   // there is always a "math" node
+        let parent = get_parent(element);   // there is always a "math" node
         let parent_name = name(&parent);
 
         // first check to see if we have the special case of punctuation as last child of math/mrow element
@@ -1092,7 +1134,7 @@ impl EdgeNode {
 
         if !use_left_side && !element.following_siblings().is_empty() {  // not at right side
             // check for the special case that the parent is an mrow and the grandparent is <math> and we have punctuation
-            let grandparent = parent.parent().unwrap().element().unwrap();
+            let grandparent = get_parent(parent);
             if name(&grandparent) == "math" &&
                parent_name == "mrow" && parent.children().len() == 2 {      // right kind of mrow
                 let text = get_text_from_element( as_element(parent.children()[1]) );
@@ -1241,6 +1283,7 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("DefinitionValue", DefinitionValue);
     context.set_function("BaseNode", BaseNode);
     context.set_function("IfThenElse", IfThenElse);
+    context.set_function("IFTHENELSE", IfThenElse);
     context.set_function("DistanceFromLeaf", DistanceFromLeaf);
     context.set_function("EdgeNode", EdgeNode);
     context.set_function("FontSizeGuess", FontSizeGuess);
@@ -1309,6 +1352,7 @@ mod tests {
         assert_eq!("elevenths", ToOrdinal::convert("11", true, true).unwrap());
         assert_eq!("nineteenths", ToOrdinal::convert("19", true, true).unwrap());
         assert_eq!("twentieths", ToOrdinal::convert("20", true, true).unwrap());
+        assert_eq!("nineteenths", ToOrdinal::convert("𝟏𝟗", true, true).unwrap());
     }
 
     #[test]

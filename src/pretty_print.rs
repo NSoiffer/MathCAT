@@ -132,7 +132,7 @@ fn is_complex(v: &Yaml) -> bool {
                 0 => false,
                 1 => {
                     let (key,val) = h.iter().next().unwrap();
-                    return !(is_scalar(key) && is_scalar(val));            
+                    return !(is_scalar(key) && is_scalar(val))
                 },
                 _ => true,
             }
@@ -476,8 +476,7 @@ fn need_quotes(string: &str) -> bool {
 
     string.is_empty()
         || need_quotes_spaces(string)
-        || string.starts_with(|character: char| matches!(character,
-            '&' | '*' | '?' | '|' | '-' | '<' | '>' | '=' | '!' | '%' | '@') )
+        || string.starts_with(['&', '*', '?', '|', '-', '<', '>', '=', '!', '%', '@'])
         || string.contains(|character: char| matches!(character,
             ':'
             | '{'

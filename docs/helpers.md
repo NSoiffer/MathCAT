@@ -45,7 +45,7 @@ __NOTE__: I am most of the way through the process of changing the rules to make
 
 ### Marking text as translated
 These files are YAML files and their content is described later in this page.
-In all of these files, the text to translate will have the YAML key name `t` (and very rarely `ot`, `ct`, `spell`, and `pronounce`). When you make a translation, you should capitalize them (e.g, `T` and `SPELL`) to indicate that the file has been translated.
+In all of these files, the text to translate will have the YAML key name `t` (and very rarely `ot`, `ct`, `spell`, `pronounce`, and `IfThenElse`). When you make a translation, you should capitalize them (e.g, `T`, `IFTHENELSE`) to indicate that the file has been translated.
 
 As an example, here are two rules from `unicode.yaml`:
 ```
@@ -65,6 +65,11 @@ If you were translating this to French, the words after the `t:` would get chang
          if: "$Verbosity!='Terse'"
          then: [T: "est"]
      - T: "supérieur à"
+```
+
+Note: `IfThenElse` may not require a translation but should be changed regardless so you know that has been looked at. Here's an example where no translation is needed because the "then" and "else" parts (`count(*/*[1])` and `$LineCountTry` respectively) are not words:
+```
+ - LineCount: "IfThenElse($LineCountTry=0, count(*/*[1]), $LineCountTry)"
 ```
 
 See below for a discussion of what can be used in a rule file.

@@ -1624,7 +1624,7 @@
  - "‖": [t: "⠳⠳"]               # 0x2016
  - "†": [t: "⠸⠻"]               # 0x2020
  - "‡": [t: "⠸⠸⠻"]              # 0x2021
- - "•": [t: "⠔⠔"]               # 0x2022
+ - "•": [t: "⠡"]                # 0x2022
  - "․": [t: "⠄"]                # 0x2024
  - "‥": [t: "⠄⠄"]               # 0x2025
  - "′": [t: "⠄"]                # 0x2032
@@ -1845,8 +1845,16 @@
  - "Ü": [t: "⠠⠈⠥"]              # 0xdc
  - "Ý": [t: "⠠⠈⠽"]              # 0xdd
  - "←": [t: "⠫⠪⠒⠒"]             # 0x2190
- - "↑": [t: "⠫⠣⠒⠒⠕"]            # 0x2191
- - "↓": [t: "⠫⠩⠒⠒⠕"]            # 0x2193
+ - "↑":                          # 0x2191
+    - test:
+        if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+        then: [t: "⠫⠣"]
+        else: [t: "⠫⠣⠒⠒⠕"]
+ - "↓":                          # 0x2193
+    - test:
+        if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+        then: [t: "⠫⠩"]
+        else: [t: "⠫⠩⠒⠒⠕"]
  - "↔": [t: "⠫⠪⠒⠒⠕"]            # 0x2194
  - "↕": [t: "⠫⠣⠩⠪⠒⠒⠕"]          # 0x2195
  - "↖": [t: "⠫⠘⠪⠒⠒"]            # 0x2196
@@ -1965,8 +1973,17 @@
  - "⇁": [t: "⠫⠒⠒⠠⠕"]            # 0x21c1
  - "⇂": [t: "⠫⠪⠒⠒⠈⠕"]           # 0x21c2
  - "⇃": [t: "⠫⠩⠒⠒⠠⠕"]           # 0x21c3
- - "⇋": [t: "⠫⠈⠪⠒⠒⠫⠒⠒⠈⠕"]       # 0x21cb
- - "⇌": [t: "⠫⠒⠒⠈⠕⠫⠈⠪⠒⠒"]       # 0x21cc
+ - "⇋":                          # 0x21cb
+     - test:
+        if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+        then: [t: "⠫⠪⠒⠫⠒⠕"]
+        else: [t: "⠫⠈⠪⠒⠒⠫⠒⠒⠈⠕"]
+ - "⇌":                          # 0x21cc
+     - test:
+        if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+        then: [t: "⠫⠒⠕⠫⠪⠒"]
+        else: [t: "⠫⠒⠒⠈⠕⠫⠈⠪⠒⠒"]
+
  - "℔": [t: "⠳"]                # 0x2114
  - "™": [t: "⠘⠞"]               # 0x2122
  - "Å": [t: "⠈⠠⠁"]              # 0x212b
@@ -2138,12 +2155,54 @@
  - "⟿": [t: "⠀⠫⠢⠤⠔⠒⠢⠤⠔⠒⠢⠕⠀"]    # 0x27FF (Long rightwards squiggle arrow)
  - "⤡": [t: "⠀⠫⠘⠪⠒⠒⠕⠀"]         # 0x2921 (North west and south east arrow)
  - "⤢": [t: "⠀⠫⠰⠪⠒⠒⠕⠀"]         # 0x2922 (North east and south west arrow)
- - "🣐": [t: "⠫⠒⠒⠕⠫⠪⠒⠒"]         # 0x1f8d0 (Long rightwards arrow over leftwards arrow (equilibrium))
- - "🣑": [t: "⠫⠒⠒⠈⠕⠫⠠⠪⠒⠒"]      # 0x1f8d1 (Long rightwards harpoon over leftwards harpoon (equilibrium))
- - "🣒": [t: "⠫⠒⠒⠈⠕⠫⠠⠪⠒"]       # 0x1f8d2 (Long rightwards harpoon over leftwards harpoon (equilibrium))
- - "🣓": [t: "⠫⠒⠈⠕⠫⠠⠪⠒⠒"]       # 0x1f8d3 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the right))
- - "🣔": [t: "⠫⠈⠪⠒⠒⠫⠒⠠⠕"]       # 0x1f8d4 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the left))
- - "🣕": [t: "⠫⠈⠪⠒⠫⠒⠒⠠⠕"]       # 0x1f8d5 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the left))
+ - "🣐":                            # 0x1f8d0 (Long rightwards arrow over leftwards arrow (equilibrium))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠒⠕⠫⠪⠒"]
+          else: [t: "⠫⠒⠒⠈⠕⠫⠠⠪⠒⠒"]
+ - "🣑":                            # 0x1f8d1 (Long rightwards harpoon over leftwards harpoon (equilibrium))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠒⠕⠫⠪⠒"]
+          else: [t: "⠫⠒⠒⠈⠕⠫⠠⠪⠒⠒"]
+ - "🣒":                            # 0x1f8d2 (Long rightwards harpoon over short leftwards harpoon (equilibrium))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠒⠒⠕⠫⠪⠒"]
+          else: [t: "⠫⠒⠒⠈⠕⠫⠈⠪⠒⠒"]
+ - "🣓":                            # 0x1f8d3 (Short rightwards harpoon over long leftwards harpoon (equilibrium, trend to the right))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠒⠕⠫⠪⠒⠒"]
+          else: [t: "⠫⠒⠈⠕⠫⠠⠪⠒⠒"]
+ - "🣔":                            # 0x1f8d4 (Long leftwards harpoon over short rightwards harpoon (equilibrium, trend to the left))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠪⠒⠒⠫⠒⠕"]
+          else: [t: "⠫⠈⠪⠒⠒⠫⠒⠠⠕"]
+ - "🣕":                             # 0x1f8d5 (Short leftwards harpoon over long rightwards harpoon (equilibrium, trend to the left))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠪⠒⠫⠒⠒⠕"]
+          else: [t: "⠫⠈⠪⠒⠫⠒⠒⠠⠕"]
+ - "⥂":                            # 0x2942 (Long rightwards harpoon over short leftwards harpoon (equilibrium))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠒⠒⠕⠫⠪⠒"]
+          else: [t: "⠫⠒⠒⠈⠕⠫⠈⠪⠒⠒"]
+ - "⥄":                            # 0x2944 (Short rightwards harpoon over long leftwards harpoon (equilibrium, trend to the right))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠒⠕⠫⠪⠒⠒"]
+          else: [t: "⠫⠒⠈⠕⠫⠠⠪⠒⠒"]
+ - "⥃":                            # 0x2943 (Long leftwards harpoon over short rightwards harpoon (equilibrium, trend to the left))
+      - test:
+          if: "@data-chem-equation-op or ancestor-or-self::*[contains(@intent, ':chemical-equation')]"
+          then: [t: "⠫⠪⠒⠒⠫⠒⠕"]
+          else: [t: "⠫⠈⠪⠒⠒⠫⠒⠠⠕"]
+ - "🣖": [t: "⠌⠫⠒⠒⠕"]            # 0x1f8d6 (long rightwards arrow with through X)
+ - "🣗": [t: "⠌⠫⠒⠒⠕"]            # 0x1f8d7 (long rightwards arrow with double slash) chem code says it is same as 0x1f8d6
+
 
  - "⦃": [t: "⠨⠸⠷"]              # 0x2983 (Left white curly bracket)
  - "⦄": [t: "⠨⠸⠾"]              # 0x2984 (Right white curly bracket)
@@ -2256,6 +2315,7 @@
  - "⬰": [t: "⠨⠡⠈⠫⠪⠒⠒⠻"]       # 0x2B30 (Left arrow w small circle)
  - "⬱": [t: "⠫⠪⠒⠒⠫⠪⠒⠒⠫⠪⠒⠒"]   # 0x2B31 (Three leftwards arrows)
  - "⬲": [t: "⠫⠪⠒⠒⠈⠫⠉⠸⠫⠬⠻"]    # 0x2B32 (Left arrow w circled plus)
+ - "⮖": [t: "⠨⠡"]              # 0x2B96 (Standard State Symbol)
  - "⯃": [t: "⠫⠸⠦"]              # 0x2BC3 (Horizontal black octagon)
 
  # SRE lists this as a custom transcription

@@ -6,98 +6,149 @@
 //! but changes are pretty rare and it didn't seem worth it (this may need to be revisited).
 
 use std::path::{Path, PathBuf};
+use crate::errors::*;
+
 
 // The zipped files are needed by WASM builds.
 // However, they are also useful for other builds because there really isn't another good way to get at the rules.
 // Other build scripts can extract these files and unzip to their needed locations.
 // I'm not thrilled with this solution as it seems hacky, but I don't know another way for crates to allow for each access to data.
+#[cfg(feature = "include-zip")]
 pub static ZIPPED_RULE_FILES: &[u8] = include_bytes!(concat!(env!("OUT_DIR"),"/rules.zip"));
 
 
 cfg_if! {
     if #[cfg(target_family = "wasm")] {
-        use std::cell::RefCell;
+        // For the WASM build, we build a fake file system based on ZIPPED_RULE_FILES.
+        // That stream encodes other zip files that must be unzipped.
 
-        fn file_system_type_from(path: &Path) -> Option<&str> {
-            // Return "file" or "dir" if a match, otherwise None
-            use sxd_document::dom::*;
-            use std::path::Component;
-            use crate::interface::get_element;
-            use crate::canonicalize::name;
+        // We have a problem in that ZIPPED_RULE_FILES has a static lifetime but the contained zip files, when unzipped, are on the stack with a different lifetime.
+        // One solution would be to introduce an enum that forks between the two.
+        // The slightly hacky but slightly less code solution that is adopted is to use Option<>, with None representing the static case
+        // Note: Rc is used because there are borrowing/lifetime issues without being able to clone the data that goes into the HashMap
+        use std::cell::RefCell;
+        use std::rc::Rc;
+        use std::io::Cursor;
+        use std::io::Read;
+        use std::collections::{HashSet, HashMap};
+
+        #[derive(Debug)]
+        struct FilesEntry {
+            data: Rc<Option<Vec<u8>>>,
+            index: usize,
+        }
+        thread_local! {
+            // mapping the file names to whether they are are directory or a file (if a file, where to find it in the zip archive)
+            static DIRECTORIES: RefCell<HashSet<String>> = RefCell::new(HashSet::with_capacity(31));
+            static FILES: RefCell<HashMap< String, FilesEntry >> = RefCell::new(HashMap::with_capacity(511));
+        }
         
-            return DIRECTORY_TREE.with(|files| {
-                let files = files.borrow();
-                let files = get_element(&*files);
-                // the path should be "Rules/..."
-                // we don't use a for loop because if we hit a file, we need to check if there are further components (hence, no match)
-                let mut children = vec![ChildOfElement::Element(files)];
-                let mut components = path.components();
-                let mut next_component = components.next();
-                let mut matched_dir = None;
-                // debug!("path='{}'", path.to_str().unwrap());
-                while let Some(component) = next_component {
-                    if let Component::Normal(os_str) = component {
-                        let component_name = os_str.to_str().unwrap();
-                        matched_dir = None;
-                        for child in &children {
-                            if let ChildOfElement::Element(child) = child {
-                                if child.attribute_value("name").unwrap() == component_name {
-                                    if name(&child) == "dir" {
-                                        matched_dir = Some("dir");
-                                        children = child.children();
-                                        break;
-                                    } else { // name = "file"
-                                        return if components.next().is_none() {Some("file")} else {None};
-                                    }
-                                }    
+        fn read_zip_file(containing_dir: &Path, zip_file: Option<Vec<u8>>) -> Result<()> {
+            // Return "file" or "dir" if a match, otherwise None
+            let zip_file = Rc::new(zip_file);
+            FILES.with(|files| {
+                let mut files = files.borrow_mut();
+                DIRECTORIES.with(|dirs| {
+                    let mut dirs = dirs.borrow_mut();
+                    let mut archive = match zip_file.as_ref() {
+                        None => {
+                            let buf_reader = Cursor::new(ZIPPED_RULE_FILES);
+                            zip::ZipArchive::new(buf_reader).unwrap()
+                        },
+                        Some(zip_file) => {
+                            let buf_reader = Cursor::new((zip_file).as_ref());
+                            match zip::ZipArchive::new(buf_reader) {
+                                Err(e) => bail!("read_zip_file: failed to create ZipArchive in dir {}: {}", containing_dir.display(), e),
+                                Ok(archive) => archive,
+                            }
+                        }
+                    };
+                    for i in 0..archive.len() {
+                        let file = archive.by_index(i).unwrap();
+                        // A little bit of safety/sanity checking
+                        let path = match file.enclosed_name() {
+                            Some(path) => containing_dir.to_path_buf().join(path),
+                            None => {
+                                bail!("Entry {} has a suspicious path (outside of archive)", file.name());
                             }
                         };
-                        if matched_dir.is_none() {
-                            return matched_dir;
+                        // debug!("read_zip_file: file path='{}'", path.display());
+                        // add all the dirs up to the containing dir -- skip the first one as that is a file
+                        // for files like unicode.yaml, this loop is a no-op, but for files in the Shared folder, it will go one time.
+                        for parent in path.ancestors().skip(1) {
+                            if parent == containing_dir {
+                                break;
+                            }
+                            dirs.insert(parent.to_str().unwrap_or_default().to_string());
                         }
-                    } else {
-                        error!("Expected Component::Normal, found {:?}", component);
-                        return None;
+                        if file.is_file() {
+                            files.insert(path.to_str().unwrap_or_default().to_string(), FilesEntry{ data: zip_file.clone(), index: i});
+                        } else if file.is_dir() {
+                            dirs.insert(path.to_str().unwrap_or_default().to_string());
+                        } else {
+                            bail!("read_zip_file: {} is neither a file nor a directory", path.display());
+                        }
                     };
-                    next_component = components.next();
-                };
-                // ran out of components -- must be at a "dir"
-                return matched_dir;
-            });
+                    // debug!("files={:?}", files.keys());
+                    // debug!("dirs={:?}", dirs);
+                    return Ok( () );
+                })
+            })
         }
         
         pub fn is_file_shim(path: &Path) -> bool {
-            let fs = file_system_type_from(path);
-            return match fs {
-                None => false,
-                Some(fs) => fs == "file",
-            };
+            if FILES.with(|files| files.borrow().is_empty()) {
+                let empty_path = PathBuf::new();
+                read_zip_file(&empty_path, None).unwrap_or(());
+            }
+            return FILES.with(|files| files.borrow().contains_key(path.to_str().unwrap_or_default()) );
         }
         
         pub fn is_dir_shim(path: &Path) -> bool {
-            let fs = file_system_type_from(path);
-            return match fs {
-                None => false,
-                Some(fs) => fs == "dir",
-            };
+            if FILES.with(|files| files.borrow().is_empty()) {
+                let empty_path = PathBuf::new();
+                read_zip_file(&empty_path, None).unwrap_or(());
+            }
+            return DIRECTORIES.with(|dirs| dirs.borrow().contains(path.to_str().unwrap_or_default()) );
         }
-        pub fn read_dir_shim(path: &Path) ->  Result<impl Iterator<Item=std::io::Result<std::fs::DirEntry>>> {
-            return Ok(std::iter::empty::<std::io::Result<std::fs::DirEntry>>());
+
+        pub fn find_file_in_dir_that_ends_with_shim(dir: &Path, ending: &str) -> Option<String> {
+            // FIX: this is very inefficient -- maybe gather up all the info in read_zip_file()?
+            // look for files that have 'path' as a prefix
+            return FILES.with(|files| {
+                let files = files.borrow();
+
+                let dir_name = dir.to_str().unwrap_or_default();
+                for file_name in files.keys() {
+                    if file_name.strip_prefix(dir_name).is_some() && file_name.ends_with(ending) {
+                        return Some(file_name.clone());
+                    };
+                }
+                return None;
+            });
         }
         
         
         pub fn canonicalize_shim(path: &Path) -> std::io::Result<PathBuf> {
-            // FIX:  need to deal with ".."???
-            return Ok( path.to_path_buf() );
+            use std::ffi::OsStr;
+            let dot_dot = OsStr::new("..");
+            let mut result = PathBuf::new();
+            for part in path.iter() {
+                if dot_dot == part {
+                    result.pop();
+                } else {
+                    result.push(part);
+                }
+            }
+            return Ok(result);
         }
         
-        pub fn read_to_string_shim(path: &Path) -> Result<String, crate::errors::Error> {
-            use std::io::Cursor;
-            use std::io::Read;
-
-            let file_name = path.to_str().unwrap().replace("/", "\\");
+        pub fn read_to_string_shim(path: &Path) -> Result<String> {
+            let path = canonicalize_shim(path).unwrap();        // can't fail
+            let file_name = path.to_str().unwrap_or_default();
+            // Is this the debugging override?
             if let Some(contents) = OVERRIDE_FILE_NAME.with(|override_name| {
-                if file_name.as_str() == override_name.borrow().as_str() {
+                if file_name == override_name.borrow().as_str() {
                     debug!("override read_to_string_shim: {}",file_name);
                     return OVERRIDE_FILE_CONTENTS.with(|contents| return Some(contents.borrow().clone()));
                 } else {
@@ -106,22 +157,64 @@ cfg_if! {
             }) {
                 return Ok(contents);
             };
+
             debug!("read_to_string_shim: {}",file_name);
+
+            return FILES.with(|files| {
+                let files = files.borrow();
+                let zip_file = match files.get(file_name) {
+                    None => bail!("Didn't find file '{}'", file_name),
+                    Some(data) => data,
+                };
+                let mut archive = match zip_file.data.as_ref() {
+                    None => {
+                        let buf_reader = Cursor::new(ZIPPED_RULE_FILES);
+                        zip::ZipArchive::new(buf_reader).unwrap()
+                    },
+                    Some(zip_file) => {
+                        let buf_reader = Cursor::new((zip_file).as_ref());
+                        zip::ZipArchive::new(buf_reader).unwrap()
+                    }
+                };
+                // for name in archive.file_names() {
+                //     debug!(" File: {}", name);
+                // };
+                let mut file = match archive.by_index(zip_file.index) {
+                    Ok(file) => file,
+                    Err(..) => {
+                        panic!("Didn't find {} in zip archive", file_name);
+                    }
+                };
+    
+                let mut contents = String::new();
+                if let Err(e) = file.read_to_string(&mut contents) {
+                    bail!("read_to_string: {}", e);
+                }
+                return Ok(contents);
+            });
+        }
+
+        pub fn zip_extract_shim(dir: &Path, zip_file_name: &str) -> Result<bool> {
+            let zip_file_path = dir.join(zip_file_name);
+            let full_zip_file_name = zip_file_path.to_str().unwrap_or_default();
+
+            // first, extract full_zip_file_name from ZIPPED_RULE_FILES
             let buf_reader = Cursor::new(ZIPPED_RULE_FILES);
             let mut archive = zip::ZipArchive::new(buf_reader).unwrap();
-            // for name in archive.file_names() {
-            //     debug!(" File: {}", name);
-            // };
-            let mut file = match archive.by_name(&file_name) {
+            let mut file = match archive.by_name(full_zip_file_name) {
                 Ok(file) => file,
                 Err(..) => {
-                    panic!("Didn't find {} in zip archive", file_name);
+                    bail!("Didn't find {} in dir {} in zip archive", zip_file_name, dir.display());
                 }
             };
 
-            let mut contents = String::new();
-            file.read_to_string(&mut contents).unwrap();
-            return Ok(contents);
+            // now add them to FILES
+            let mut zip_file_bytes: Vec<u8> = Vec::with_capacity(file.size() as usize);
+            if let Err(e) = file.read_to_end(&mut zip_file_bytes) {
+                bail!("Failed to extract file {} (size={}): {}", zip_file_path.display(), file.size(), e);
+            }
+            read_zip_file(dir, Some(zip_file_bytes))?;
+            return Ok(true);
         }
 
         thread_local! {
@@ -133,62 +226,9 @@ cfg_if! {
             // file_name should be path name starting at Rules dir: e.g, "Rules/en/navigate.yaml"
             OVERRIDE_FILE_NAME.with(|name| *name.borrow_mut() = file_name.to_string().replace("/", "\\"));
             OVERRIDE_FILE_CONTENTS.with(|contents| *contents.borrow_mut() = file_contents.to_string());
-            crate::speech::SpeechRules::invalidate();
+            crate::interface::set_rules_dir("Rules".to_string()).unwrap();       // force reinitialization after the change
         }
-
-        use sxd_document::parser;
-        use sxd_document::Package;
-        thread_local! {
-            // FIX: use include! macro (static DIRECTORY_TREE: ... = include!(...))
-            //    The file to include would be the result of something added to build.rs to create directory.xml that mimics what's below
-            static DIRECTORY_TREE: RefCell<Package> = RefCell::new(
-                    parser::parse(r"
-                    <dir name='Rules'>
-                        <file name='definitions.yaml'/>
-                        <file name='intent.yaml'/>
-                        <file name='prefs.yaml'/>
-                        <dir name='Intent'>
-                            <file name='general.yaml'/>
-                            <file name='geometry.yaml'/>
-                            <file name='linear-algebra.yaml'/>
-                        </dir>
-                        <dir name='Braille'>
-                            <dir name='Nemeth'>
-                                <file name='Nemeth_Rules.yaml'/>
-                                <file name='unicode.yaml'/>
-                                <file name='unicode-full.yaml'/>
-                            </dir>
-                            <dir name='UEB'>
-                                <file name='UEB_Rules.yaml'/>
-                                <file name='unicode.yaml'/>
-                                <file name='unicode-full.yaml'/>
-                            </dir>
-                        </dir>
-                        <dir name='Languages'>
-                            <dir name='en'>
-                                <dir name='SharedRules'>
-                                    <file name='default.yaml'/>
-                                    <file name='general.yaml'/>
-                                    <file name='geometry.yaml'/>
-                                    <file name='linear-algebra.yaml'/>
-                                    <file name='menclose.yaml'/>
-                                </dir>
-                                <file name='ClearSpeak_Rules.yaml'/>
-                                <file name='definitions.yaml'/>
-                                <file name='navigate.yaml'/>
-                                <file name='overview.yaml'/>
-                                <file name='SimpleSpeak_Rules.yaml'/>
-                                <file name='unicode.yaml'/>
-                                <file name='unicode-full.yaml'/>
-                            </dir>
-                        </dir>
-                    </dir>")
-                    .expect("Internal error in creating web assembly files: didn't parse initializer string")
-            );
-        }        
     } else {
-        use crate::errors::*;
-
         pub fn is_file_shim(path: &Path) -> bool {
             return path.is_file();
         }
@@ -197,8 +237,20 @@ cfg_if! {
             return path.is_dir();
         }
         
-        pub fn read_dir_shim(path: &Path) ->  Result<impl Iterator<Item=std::io::Result<std::fs::DirEntry>>> {
-            return path.read_dir().chain_err(|| format!("while trying to read directory {}", path.to_str().unwrap()));
+        pub fn find_file_in_dir_that_ends_with_shim(dir: &Path, ending: &str) -> Option<String> {
+            match dir.read_dir() {
+                Err(_) => return None,    // empty
+                Ok(read_dir) => {
+                    for dir_entry in read_dir.flatten() {
+                        let file_name = dir_entry.file_name();
+                        let file_name = file_name.to_string_lossy();  // avoid temp value being dropped
+                        if file_name.ends_with(ending) {
+                            return Some(file_name.to_string());
+                        }
+                    }
+                    return None;
+                }
+            }
         }
         
         pub fn canonicalize_shim(path: &Path) -> std::io::Result<PathBuf> {
@@ -206,8 +258,34 @@ cfg_if! {
         }
         
         pub fn read_to_string_shim(path: &Path) -> Result<String> {
-            info!("Reading file '{}'", path.to_str().unwrap());
-            return std::fs::read_to_string(path).chain_err(|| format!("while trying to read {}", path.to_str().unwrap()));
-        }     
+            let path = match path.canonicalize() {
+                Ok(path) => path,
+                Err(e) => bail!("Read error while trying to canonicalize in read_to_string_shim {}: {}", path.display(), e),
+            };
+            info!("Reading file '{}'", &path.display());
+            match std::fs::read_to_string(&path) {
+                Ok(str) => return Ok(str),
+                Err(e) => bail!("Read error while trying to read {}: {}", &path.display(), e),
+            }
+        }
+
+        pub fn zip_extract_shim(dir: &Path, zip_file_name: &str) -> Result<bool> {
+            let zip_file = dir.join(zip_file_name);
+            return match std::fs::read(zip_file) {
+                Err(e) => {
+                    // no zip file? -- maybe started out with all the files unzipped? See if there is a .yaml file
+                    match find_file_in_dir_that_ends_with_shim(dir, ".yaml") {
+                        None => bail!("{}", e),
+                        Some(_file_name) => Ok(false),
+                    }
+                },
+                Ok(contents) => {
+                    let archive = std::io::Cursor::new(contents);
+                    let mut zip_archive = zip::ZipArchive::new(archive).unwrap();
+                    zip_archive.extract(dir).expect("Zip extraction failed");
+                    Ok(true)
+                },
+            };
+        }
     }
 }

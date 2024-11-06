@@ -63,6 +63,18 @@ fn binomial_mmultiscripts() {
     test("en", "SimpleSpeak", expr, "n choose m");
 }
 
+#[test]
+fn binomial_mmultiscripts_other() {
+    let expr = "<math><mmultiscripts><mi>C</mi><mi>m</mi><none/><mprescripts/><none/><mi>n</mi></mmultiscripts></math>";
+    test("en", "SimpleSpeak", expr, "n choose m");
+}
+
+#[test]
+fn binomial_subscript() {  // C_{n,k}
+    let expr = "<math><msub><mi>C</mi><mrow><mi>n</mi><mo>,</mo><mi>m</mi></mrow></msub></math>";
+    test("en", "SimpleSpeak", expr, "n choose m");
+}
+
 
 #[test]
 fn permutation_mmultiscripts() {
@@ -112,8 +124,8 @@ fn prime() {
 #[test]
 fn given() {
     let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
-    test("en", "SimpleSpeak", expr, "cap p, open paren, cap eigh vertical line cap b; close paren");
-    test("en", "ClearSpeak", expr,  "cap p, open paren, cap eigh divides cap b, close paren");  // not good, but follows the spec
+    test("en", "SimpleSpeak", expr, "cap p, open paren, cap eigh given cap b, close paren");
+    test("en", "ClearSpeak", expr,  "cap p, open paren, cap eigh given cap b, close paren");  // not good, but follows the spec
 }
 
 #[test]
@@ -293,12 +305,6 @@ fn ignore_period_and_space() {
 
 
 #[test]
-fn mn_with_space() {
-    let expr = "<math><mn>1 234 567</mn></math>";
-    test("en", "SimpleSpeak", expr, "1234567");
-}
-
-#[test]
 fn bug_199_2pi() {
   let expr = "<math>
       <mrow>
@@ -321,4 +327,39 @@ fn bug_199_2pi() {
 fn caret_and_hat() {
   let expr = "<math><mi>x</mi><mo>^</mo><mn>2</mn><mo>+</mo><mover><mi>y</mi><mo>^</mo></mover></math>";
   test("en", "SimpleSpeak",expr, "x caret 2 plus y hat,");
+}
+
+#[test]
+fn mn_with_space() {
+  let expr = "<math><mn>1 234 567</mn></math>";
+  test_prefs("en", "SimpleSpeak", vec![("DecimalSeparators", "."), ("BlockSeparators", " ,")], expr, "1234567");
+}
+
+#[test]
+fn mn_with_block_and_decimal_separators() {
+  let expr = "<math><mn>1,234.56</mn></math>";                                       // may want to change this for another language
+  test_prefs("en", "SimpleSpeak", vec![("DecimalSeparators", "."), ("BlockSeparators", " ,")], expr, "1234.56");
+}
+
+#[test]
+fn divergence() {
+  let expr = "<math><mo>&#x2207;</mo><mo>&#xB7;</mo><mi mathvariant='normal'>F</mi></math>";                                       // may want to change this for another language
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "div of cap f");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "divergence of cap f");
+}
+
+#[test]
+fn curl() {
+  let expr = "<math><mo>&#x2207;</mo><mo>&#xD7;</mo><mi mathvariant='normal'>F</mi></math>";          
+  // may want to change this for another language
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "curl of cap f");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "curl of cap f");
+}
+
+#[test]
+fn gradient() {
+  let expr = "<math><mo>&#x2207;</mo><mi mathvariant='normal'>F</mi></math>";          
+  // may want to change this for another language
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "del cap f");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "gradient of cap f");
 }

@@ -72,15 +72,15 @@ pub struct NavigationState {
     // it might be better to use a linked for the stacks, with the first node being the top
     // these two stacks should be kept in sync.
     position_stack: Vec<NavigationPosition>,    // all positions, so we can go back to them
-    command_stack: Vec<&'static str>,                 // all commands, so we can undo them
+    command_stack: Vec<&'static str>,           // all commands, so we can undo them
     place_markers: [NavigationPosition; MAX_PLACE_MARKERS],
     where_am_i: NavigationPosition,             // current 'where am i' location
 
     #[cfg(target_family = "wasm")]
-    where_am_i_start_time: usize,           // FIX: for web
+    where_am_i_start_time: usize,               // FIX: for web
     #[cfg(not(target_family = "wasm"))]
     where_am_i_start_time: Instant,
-    mode: String,                         // one of "Character", "Simple", or "Enhanced"
+    mode: String,                               // one of "Character", "Simple", or "Enhanced"
     speak_overview: bool,                       // true => describe after move; false => (standard) speech rules
 }
 
@@ -211,6 +211,7 @@ impl NavigationState {
             context.set_variable("PlaceMarkerOffset", position.current_node_offset as f64);
         }
            
+        context.set_variable("Overview", self.speak_overview);
         context.set_variable("ReadZoomLevel", (if self.mode == "Enhanced" {-1} else {1}) as f64);
         context.set_variable("MatchCounter", 0 as f64);
 
@@ -369,7 +370,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         return NAVIGATION_RULES.with(|rules| {
             let rules = rules.borrow();
             let new_package = Package::new();
-            let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), ""); 
+            let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), "");
             
             nav_state.mode = rules.pref_manager.as_ref().borrow().pref_to_string("NavMode");
 
@@ -380,7 +381,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                 nav_state.pop();
             }
 
-            // If no speech happened for some calls, we try the call the call again (e.g, no speech for invisible times).
+            // If no speech happened for some calls, we try the call again (e.g, no speech for invisible times).
             // To prevent to infinite loop, we limit the number of tries
             const LOOP_LIMIT: usize = 3;
             let mut cumulative_speech = String::with_capacity(120);
@@ -442,6 +443,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         // transfer some values that might have been set into the prefs
         let context = rules_with_context.get_context();     // need to recompute or we have a multiple borrow problem
         nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
+        nav_state.speak_overview = context_get_variable(context, "Overview", mathml)?.0.unwrap() == "true";
         rules.pref_manager.as_ref().borrow_mut().set_user_prefs("NavMode", &nav_state.mode)?;
 
         let nav_position = match context_get_variable(context, "NavNode", mathml)?.0 {
@@ -459,8 +461,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         } else if nav_command.starts_with("Describe") {
             false
         } else {
-            let overview = context_get_variable(context, "Overview", mathml)?.0.unwrap();
-            overview == "false"
+            !nav_state.speak_overview
         };
 
         if (nav_command.starts_with("Move") || nav_command.starts_with("Zoom")) && nav_command != "MoveLastLocation" {
@@ -484,7 +485,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         let nav_mathml = get_node_by_id(mathml, &nav_position.current_node);
         if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", mathml)?.0.unwrap() == "true" {
             // Speak/Overview of where we landed (if we are supposed to speak it)
-            let node_speech = speak(rules_with_context, mathml, nav_position.current_node, use_read_rules)?;
+            let node_speech = speak(mathml, nav_position.current_node, use_read_rules)?;
             // debug!("node_speech: '{}'", node_speech);
             if node_speech.is_empty() {
                 // try again in loop
@@ -523,10 +524,10 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
     }
 }
 
-fn speak<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, mathml: Element<'c>, nav_node_id: String, full_read: bool) -> Result<String> {
+fn speak(mathml: Element, nav_node_id: String, full_read: bool) -> Result<String> {
     if full_read {
-        let intent = crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?;
-        debug!("intent: {}", mml_to_string(&intent));
+        let new_package = Package::new();
+        let intent = crate::speech::intent_from_mathml(mathml, new_package.as_document())?;
 
         // In something like x^3, we might be looking for the '3', but it will be "cubed", so we don't find it.
         // Or we might be on a "(" surrounding a matrix and that isn't part of the intent
@@ -884,6 +885,7 @@ mod tests {
         set_preference("Language".to_string(), "en".to_string()).unwrap();
         set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
         set_preference("Verbosity".to_string(), "Medium".to_string()).unwrap();
+        set_preference("Overview".to_string(), "False".to_string()).unwrap();
         set_mathml(mathml.to_string()).unwrap();
     }
 
@@ -1868,9 +1870,9 @@ mod tests {
             test_command("ZoomIn", mathml, "open");
             let speech = test_command("MoveNext", mathml, "table");
             // tables need to check their parent for proper speech
-            assert_eq!(speech, "move right, 2 cases, case 1; negative x comma, if x is less than 0; case 2; positive x comma, if x, is greater than or equal to 0;");
+            assert_eq!(speech, "move right, 2 cases, case 1; negative x comma if x is less than 0; case 2; positive x comma if x, is greater than or equal to 0;");
             let speech = test_command("ZoomIn", mathml, "row-1");
-            assert_eq!(speech, "zoom in; case 1; negative x comma, if x is less than 0;");
+            assert_eq!(speech, "zoom in; case 1; negative x comma if x is less than 0;");
             return Ok( () );
         });
     }
@@ -1906,6 +1908,60 @@ mod tests {
         });
     }
 
+    #[test]
+    fn read_and_describe_fraction() -> Result<()> {
+        let mathml_str = "<math id='math'>
+            <mrow id='mrow'>
+                <mfrac id='frac'>
+                    <mrow id='numerator'><mi>b</mi><mo>+</mo><mn>1</mn></mrow>
+                <mn id='denom'>3</mn>
+                </mfrac>
+                <mo id='minus'>-</mo>
+                <mn id='3'>3</mn>
+            </mrow>
+        </math>";
+        init_default_prefs(mathml_str, "Enhanced");
+        set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomIn", mathml, "frac");
+            let speech = test_command("ReadCurrent", mathml, "frac");
+            assert_eq!(speech, "read current; fraction, b plus 1, over 3, end fraction;");
+            let speech = test_command("DescribeCurrent", mathml, "frac");
+            assert_eq!(speech, "describe current; fraction");
+            return Ok( () );
+        });
+    }
+
+
+    #[test]
+    fn read_and_describe_mrow() -> Result<()> {
+        let mathml_str = "<math id='math'>
+            <mrow id='mrow'>
+                <mn>1</mn><mo>+</mo>
+                <mn>2</mn><mo>+</mo>
+                <mn>3</mn><mo>+</mo>
+                <mn>4</mn><mo>+</mo>
+                <mn>5</mn><mo>+</mo>
+                <mn>6</mn><mo>+</mo>
+                <mn>7</mn>
+            </mrow>
+        </math>";
+        init_default_prefs(mathml_str, "Enhanced");
+        set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            test_command("ZoomOutAll", mathml, "mrow");
+            let speech = test_command("ReadCurrent", mathml, "mrow");
+            assert_eq!(speech, "read current; 1 plus 2 plus 3 plus 4 plus 5 plus 6 plus 7");
+            let speech = test_command("DescribeCurrent", mathml, "mrow");
+            assert_eq!(speech, "describe current; 1 plus 2 plus 3 and so on");
+            return Ok( () );
+        });
+    }
+
     
     #[test]
     fn basic_language_test() -> Result<()> {
@@ -1934,6 +1990,7 @@ mod tests {
         test_language("id", mathml_str);
         test_language("vi", mathml_str);
         test_language("zh-tw", mathml_str);
+        test_language("sv", mathml_str);
         return Ok( () );
 
         fn test_language(lang: &str, mathml_str: &str) {
@@ -1977,6 +2034,15 @@ mod tests {
                 test_command("MovePrevious", mathml, "x");
                 test_command("MovePrevious", mathml, "2");
                 test_command("MovePrevious", mathml, "2");
+            });
+            
+            // simple sanity check that "overview.yaml" doesn't have a syntax error
+            set_preference("Overview".to_string(), "True".to_string()).unwrap();
+            set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
+            MATHML_INSTANCE.with(|package_instance| {
+                let package_instance = package_instance.borrow();
+                let mathml = get_element(&*package_instance);
+                test_command("ZoomIn", mathml, "2");
             });
         }
     }

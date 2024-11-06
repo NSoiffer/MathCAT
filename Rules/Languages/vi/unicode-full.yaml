@@ -1232,7 +1232,7 @@
  - "⋄": [t: "người vận hành kim cương"]             #  0x22c4   (en: 'diamond operator')
  - "⋅": [T: "nhân"]                                 #  0x22c5
  - "⋆": [T: "nhân"]                                 #  0x22c6
- - "⋇": [t: "thời gian phân chia"]                  #  0x22c7   (en: 'division times')
+ - "⋇": [T: "nhân chia"]                  #  0x22c7   (en: 'division times')
  - "⋈": [t: "bowtie"]                               #  0x22c8
  - "⋉":                                             #  0x22c9
      - test: 
@@ -1433,6 +1433,7 @@
  - "⌵": [t: "cấm"]                                  #  0x2335   (en: 'countersink')
  - "⍰": [t: "hộp không xác định"]                   #  0x2370   (en: 'unknown box')
  - "⎕": [t: "hộp"]                                  #  0x2395   (en: 'box')
+ - "⏜": [t: "cung"]                        #  0x23DC   (en: 'top paren')
  - "⏞": [t: "nẹp trên cùng"]                        #  0x23DE   (en: 'top brace')
  - "⏟": [t: "niềng răng dưới cùng"]                 #  0x23DF   (en: 'bottom brace')
  - "①-⑨":                                           #  0x2460 - 0x2469

@@ -742,19 +742,13 @@
   match: "$NavCommand='MoveCellUp'"
   replace:
   - test:
+      if: "$NavVerbosity = 'Verbose'"
+      then:
+      - t: "move to previous row"                              # phrase('move to previous row' to the previous row in the table)
+      - pause: medium
+  - test:
       if: "preceding-sibling::*"
       then:
-      - test:
-          if: "$NavVerbosity = 'Verbose'"
-          then:
-          - t: "move up"                              # phrase('move up' to the previous row in the table)
-          - pause: medium
-      - test:
-          if: "$NavVerbosity != 'Terse'"
-          then:
-          - t: "row"                                  # phrase(the previous 'row' in the table)
-          - x: "count(preceding-sibling::*)"
-          - pause: medium
       - test:
           if: "$NavMode='Character'"
           then:
@@ -772,19 +766,13 @@
   match: "$NavCommand='MoveCellDown'"
   replace:
   - test:
+      if: "$NavVerbosity = 'Verbose'"
+      then:
+      - t: "move to next row"                          # phrase('move to next row' to the next row in the table)
+      - pause: medium
+  - test:
       if: "following-sibling::*"
       then:
-      - test:
-          if: "$NavVerbosity = 'Verbose'"
-          then:
-          - t: "move down"                          # phrase('move down' to the next row in the table)
-          - pause: medium
-      - test:
-          if: "$NavVerbosity != 'Terse'"
-          then:
-          - t: "row"                                # phrase(the previous 'row' in the table)
-          - x: "count(preceding-sibling::*)+2"
-          - pause: medium
       - test:
           if: "$NavMode='Character'"
           then:
@@ -796,6 +784,32 @@
       else:
       - t: "no next row"                          # phrase('no next row' in the table)
       - set_variables: [SpeakExpression: "'false'"]
+
+- name: move-cell-previous
+  # if a row is selected, there is no previous/next column, so this is trivial
+  tag: [mtr, mlabeledtr]
+  match: "$NavCommand='MoveCellPrevious'"
+  replace:
+  - test:
+      if: "$NavVerbosity = 'Verbose'"
+      then:
+      - t: "move to previous column"                              # phrase('move to previous column' to the previous row in the table)
+      - pause: medium
+  - t: "no previous column"                          # phrase('no previous column' in the table)
+  - set_variables: [SpeakExpression: "'false'"]
+
+- name: move-cell-next
+  # if a row is selected, there is no previous/next column, so this is trivial
+  tag: [mtr, mlabeledtr]
+  match: "$NavCommand='MoveCellNext'"
+  replace:
+  - test:
+      if: "$NavVerbosity = 'Verbose'"
+      then:
+      - t: "move to next column"                              # phrase('move up' to the previous row in the table)
+      - pause: medium
+  - t: "no next column"                          # phrase('no next row' in the table)
+  - set_variables: [SpeakExpression: "'false'"]
 
 - name: default-read-cell
   tag: "*"

@@ -1,0 +1,87 @@
+---
+
+- name: scalar-determinant
+  tag: determinant
+  match: "count(*)=1 and not(*[1][self::m:mtr])"
+  replace:
+  - T: "determinanten"      # phrase(the 'determinant' of a matrix)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "av"      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [T: "slut determinant"]      # phrase('end determinant' of a matrix)
+
+- name: norm
+  tag: norm
+  match: "count(*)=1 and not(@data-intent-property)"
+  replace:
+  - T: "normen"      # phrase(the 'norm' can be a measure of distance)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "av"      # phrase(this is the mean 'of' the data)
+  - x: "*[1]"
+  - test:
+      if: "not(IsNode(*[1], 'simple'))"
+      then: [T: "slut norm"]      # phrase('end norm' that is a measure of distance)
+
+
+- name: subscripted-norm
+  tag: subscripted-norm
+  match: count(*)=2 and "not(@data-intent-property)"
+  replace:
+  - x: "*[2]"
+  - T: "normen"      # phrase(the 'norm' can be a measure of distance)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "av"      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+
+- name: transpose
+  tag: transpose
+  match: "count(*)=1 and not(@data-intent-property)"
+  replace:
+  - x: "*[1]"
+  - T: "transponat"      # phrase(this will 'transpose' the values)
+  
+- name: trace
+  tag: trace
+  match: "not(@data-intent-property)"
+  replace:
+  - T: "spåret av"      # phrase('trace' of a matrix)
+ # SWEDISH: 'av' behövs även i Terse
+  - x: "*[1]"
+
+- name: dimension
+  tag: dimension
+  match: "count(*)=1 and not(@data-intent-property)"
+  replace:
+  - T: "dimensionen"      # phrase(the 'dimension' of the matrix)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "av"      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+
+- name: homomorphism
+  tag: homomorphism
+  match: "count(*)=1 and not(@data-intent-property)"
+  replace:
+  - T: "homomorfism"      # phrase('homomorphism' indicates similarity of form)
+  - x: "*[1]"
+
+- name: kernel
+  tag: kernel
+  match: "count(*)=1 and not(@data-intent-property)"
+  replace:
+  - T: "noll-rummet"      # phrase(this is the 'kernel' of the function)
+  - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - T: "till"      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+

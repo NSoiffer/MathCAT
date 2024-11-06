@@ -644,15 +644,16 @@
   - x: "*[3]"
 
 - name: ClearSpeak-multi-line
-  tag: [cases, equations, lines] # these are ignored in favor of the ClearSpeak prefs
+  tag: [piecewise, system-of-equations, lines] # these are ignored in favor of the ClearSpeak prefs
   match: "."
+  variables: [IsColumnSilent: true()]
   replace:
   - x: "count(*)"
   - test:
     - if: $ClearSpeak_MultiLineOverview = 'Auto'
       then:
       - test:
-        - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:cases) or $ClearSpeak_MultiLineLabel = 'Case'"
+        - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
           then: [{T: "caso"}]
         - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
           then: [{T: "línea"}]
@@ -673,10 +674,10 @@
 
 - name: ClearSpeak-default-multiline
   tag: [mtr, mlabeledtr]
-  match: "parent::m:cases or parent::m:equations or parent::m:lines"
+  match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
   replace:
   - test:
-    - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:cases) or $ClearSpeak_MultiLineLabel = 'Case'"
+    - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
       then: [{T: "caso"}]
     - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
       then: [{T: "línea"}]
@@ -767,5 +768,6 @@
 
 - include: "SharedRules/geometry.yaml"
 - include: "SharedRules/linear-algebra.yaml"
+- include: "SharedRules/calculus.yaml"
 - include: "SharedRules/general.yaml"
 - include: "SharedRules/default.yaml"

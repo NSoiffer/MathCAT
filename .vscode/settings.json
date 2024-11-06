@@ -438,5 +438,10 @@
     "python.analysis.typeCheckingMode": "basic",
     "flake8.args": [
         "--max-line-length=130",
-    ], 
+    ],
+    "files.associations": {
+        "bzlib_private.h": "c",
+        "stdlib.h": "c"
+    },
+    
 }

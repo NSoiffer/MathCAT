@@ -2,6 +2,14 @@
 - include: "../ClearSpeak_Rules.yaml"
 
 -
+  name: positive
+  tag: positive
+  match: "."
+  replace:
+  - t: "positive from zz-aa"
+  - x: "*[1]"
+
+-
   name: override
   tag: mn
   match: "."

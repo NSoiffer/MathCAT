@@ -1,0 +1,38 @@
+---
+
+- name: divergence
+  tag: divergence
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [t: "divergence"]      # phrase('divergence' from the mean)
+      else: [t: "div"]      # phrase('divergence' from the mean)
+  - t: "of"      # phrase(systems 'of' linear equations)
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [pause: short]
+  - x: "*[1]"
+
+- name: curl
+  tag: curl
+  match: "."
+  replace:
+  - t: "curl of"      # phrase(the 'curl of' a field)
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [pause: short]
+  - x: "*[1]"
+
+- name: gradient
+  tag: gradient
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity!='Terse'"
+      then: [t: "gradient of"]      # phrase('divergence' from the mean)
+      else: [t: "del"]      # phrase('divergence' from the mean)
+  - test:
+      if: "not(IsNode(*[1], 'leaf'))"
+      then: [pause: short]
+  - x: "*[1]"

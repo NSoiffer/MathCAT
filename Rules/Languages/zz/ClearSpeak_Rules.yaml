@@ -52,3 +52,32 @@
     - test:
         if: "$Blind"
         then: [t: end square root]
+
+
+-
+  name: positive
+  tag: positive
+  match: "."
+  replace:
+  - t: "ClearSpeak positive from zz"
+  - x: "*[1]"
+
+
+- name: function-intent
+  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  tag: "*"
+  match: count(*)>0
+  replace:
+  - x: "translate(name(.), '-_', '  ')"
+  - t: "of"      # phrase(sine 'of' 5)
+  - pause: short
+  - insert:
+      nodes: "*"
+      replace: [t: "comma", pause: auto]      # phrase(f of x 'comma' y)
+
+- name: default-text
+  # unknown leaf -- just speak the text -- could be a literal intent
+  tag: "*"
+  match: "."
+  replace:
+  - x: "translate(name(), '-_', ' ')"

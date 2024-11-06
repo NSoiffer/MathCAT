@@ -1,13 +1,14 @@
 ---
 - include: "../../definitions.yaml"
+
 # Lines starting with "#" are a comment
 # Each definition in this file is of the form
 # - name: { "...", "..." "..." }
 # For numbers, 
 # - name: [] "...", "..." "..." ]
 
-- Units: {
-    "cm", "km", "hm", "dam", "dm", "mm", "tấn", "tạ", "yến", "kg", "hg", "dag", "lít", "ml", "ft", "in"
+- KnownWords: {
+    "tạ", "yến", "và"
   }
 
 # ----------------  Cardinal and Ordinal Numbers  --------------------------

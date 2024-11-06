@@ -49,29 +49,34 @@
       children: [x: "@data-number"]
 
 -
-  name: negative
+  name: positive-or-negative
   tag: mrow
-  match: "count(*)=2 and *[1][self::m:mo][text()='-']"
+  match: "count(*)=2 and *[1][self::m:mo][text()='+' or text()='-']"
+  variables:
+  - AtLeftEdge: "EdgeNode(., 'left', 'mtd')"
+  - AtLeftEdgeOfMTD: "name($AtLeftEdge) = 'mtd'"
+  - ContinuedColumn: "$TableProperty='lines' or $TableProperty='system-of-equations' or $TableProperty='piecewise'"
+  - InContinuedRow: "parent::m:mtd[parent::m:mtr[@data-intent-property[contains(., ':continued-row:')]]]"
+  - FirstColumn: "$AtLeftEdge/../*[1]=$AtLeftEdge"   # first child of mtr...
   replace:
-  - intent:
-      name: "negative"
-      children: [x: "*[2]"]
-               
--
-  name: positive
-  tag: mrow
-  match: "count(*)=2 and *[1][self::m:mo][text()='+']"
-  replace:
-  - intent:
-      name: "positive"
-      children: [x: "*[2]"]
+  - test:
+      # don't use postive/negative if a continued data cell
+      if: "$AtLeftEdgeOfMTD and $ContinuedColumn and (not($FirstColumn) or $InContinuedRow)"
+      then:
+      - intent:
+          xpath-name: "IfThenElse(*[1][self::m:mo][text()='+'], 'plus', 'minus')"
+          children: [x: "*[2]"]
+      else:
+      - intent:
+          xpath-name: "IfThenElse(*[1][self::m:mo][text()='+'], 'positive', 'negative')"
+          children: [x: "*[2]"]
                
 
 -
   # (a,b) has many interpretations; (a, b] (etc) have fewer interpretations.
   # as an interval, it represents a set and hence a clue that it is an interval is that a set operator comes
   #   before or after it. '=' is also common.
-  # They also commonly stand by themselves, but so does the interpretation as a point or gcd, so we don't include (xxx, yyy) in the inference
+  # They also commonly stand by themselves, but so does the interpretation as a point or gcd, so we don't inclub (xxx, yyy) in the inference
   name: interval
   tag: mrow
   match: 
@@ -122,9 +127,9 @@
       - x: "*[2]/*[1]"
       - x: "*[2]/*[2]"
 
-
 -
-  # C with pre-subscript 'n' and post-subscript 'm'
+  # C with pre-subscript 'n' and post-subscript 'm'. The 'n' can be either in the sub or super position
+  # See https://en.wikipedia.org/wiki/Binomial_coefficient#History_and_notation
   name: binomial-mmultiscripts
   tag: mmultiscripts
   variables:
@@ -132,14 +137,28 @@
   - Postscripts: "m:mprescripts/preceding-sibling::*[position() < last()]"
   match: 
   - "*[1][self::m:mi and text()='C'] and"
-  - "count($Prescripts)=2 and $Prescripts[2][self::m:none] and "
+  - "count($Prescripts)=2 and ($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none]) and "
   - "count($Postscripts)=2 and $Postscripts[2][self::m:none]"
   replace:
   - intent:
       name: binomial
       children:
-      - x: "$Prescripts[1]"
+      - x: "IfThenElse(name($Prescripts[2])='none', $Prescripts[1], $Prescripts[2])"
       - x: "$Postscripts[1]"
+
+
+-
+  name: binomial-msub   # C_{n,k}
+  tag: msub
+  match:
+  - "*[1][self::m:mi and text()='C'] and"
+  - "*[2][self::m:mrow and count(*)=3 and *[2][.=',']]"
+  replace:
+  - intent:
+      name: binomial
+      children:
+      - x: "*[2]/*[1]"
+      - x: "*[2]/*[3]"
 
 -
   # P with pre-sub or superscript 'n' and post-subscript 'k' (https://en.wikipedia.org/wiki/Permutation#k-permutations_of_n)
@@ -531,7 +550,9 @@
 - 
   name: set
   tag: mrow
-  match: "IsBracketed(., '{', '}')"
+  # sets have { }s and should have at least one of ",∈∉|" (vertical bar is "such that") or be the empty set
+  match: "IsBracketed(., '{', '}') and
+          (count(*)=2 or (count(*)=3 and IsNode(*[2], 'leaf')) or . != translate(., ',∈∉|:', ''))"
   replace: 
   - intent:
       name: "set"
@@ -592,110 +613,97 @@
 
 # generic mtable: treat as multiline equations of some sort
 # if a property is set, handle that first
+
+-
+  name: "piecewise"
+  tag: mrow
+  match: "count(*)=2 and *[1][text()='{'] and *[2][self::m:mtable]"
+  replace:
+  - x: "*[2]"
+
+-
+  name: mtable-property-is-set
+  tag: mtable
+  variables: [MTableProperty: "IfThenElse(contains(@data-intent-property, ':grid:'), 
+                               IfThenElse(parent::m:mrow[IsBracketed(., '|', '|')], 'determinant', 'matrix'),
+                               IfThenElse(contains(@data-intent-property, ':piecewise:'), 'piecewise',
+                               IfThenElse(contains(@data-intent-property, ':system-of-equation:'), 'system-of-equation',
+                               IfThenElse(contains(@data-intent-property, ':lines:'), 'lines',''))))"]
+  match: "$MTableProperty !=''"
+  replace:
+  - intent:
+      xpath-name: "$MTableProperty"
+      children:
+      - x: "*"
+
 -
   name: mtable-matrix-property
   tag: mtable
   match:
-  - "contains(@data-intent-property, ':matrix:') or"
   - "..[self::m:mrow and (IsBracketed(., '(', ')') or IsBracketed(., '[', ']'))]"
   replace:
-  - intent:
-      name: "matrix"
-      children:
-      - x: "*"
+  - with:
+      variables:
+      - TableProperty: "'matrix'"
+      replace:
+      - intent:
+          name: "matrix"
+          children:
+          - x: "*"
 
 -
   name: mtable-determinant-property
   tag: mtable
-  match: "contains(@data-intent-property, ':determinant:') or ..[self::m:mrow and IsBracketed(., '|', '|')]"
+  match: "..[self::m:mrow and IsBracketed(., '|', '|')]"
   replace:
-  - intent:
-      name: "determinant"
-      children:
-      - x: "*"
-      
+  - with:
+      variables:
+      - TableProperty: "'determinant'"
+      replace:
+      - intent:
+          name: "determinant"
+          children:
+          - x: "*"
+
 -
-  name: mtable-cases-property
+  name: mtable-piecewise-property
   tag: mtable
   match:
-  - "contains(@data-intent-property, ':cases:') or"
   - "..[self::m:mrow and count(*)=2 and *[1][text()='{']]"
   replace:
-  - intent:
-      name: "cases"
-      children:
-      - x: "*"
+  - with:
+      variables:
+      - TableProperty: "'piecewise'"
+      replace:
+      - intent:
+          name: "piecewise"
+          children:
+          - x: "*"
 
 -
   name: mtable-equations-property
   tag: mtable
-  match: "contains(@data-intent-property, ':equations:')"
+  match: "count(*) > 0 and *[1][contains(translate(., '=≠<>≤≥≦≧', '='), '=')]"
   replace:
-  - intent:
-      name: "equations"
-      children:
-      - x: "*"
+  - with:
+      variables:
+      - TableProperty: "'system-of-equations'"
+      replace:
+      - intent:
+          name: "system-of-equations"
+          children:
+          - x: "*"
 
 -
   name: mtable-lines-property
   tag: mtable
-  match: "contains(@data-intent-property, ':lines:')"
+  match: "."   # default is "lines, so no need to test contains(@data-intent-property, ':lines:')
   replace:
-  - intent:
-      name: "lines"
-      children:
-      - x: "*"
-
-
-# -
-#   name: mtable-property-is-set
-#   tag: mtable
-#   variables: [MTableProperty: "IfThenElse(contains(DEBUG(@data-intent-property), ':matrix:'), 'matrix',
-#                                IfThenElse(contains(@data-intent-property, ':determinant:'), 'determinant',
-#                                IfThenElse(contains(@data-intent-property, ':cases:'), 'cases',
-#                                IfThenElse(contains(@data-intent-property, ':equations:'), 'equations',
-#                                IfThenElse(contains(@data-intent-property, ':lines:'), 'lines','')))))"]
-#   match: "DEBUG($MTableProperty) !=''"
-#   replace:
-#   - intent:
-#       name: "$MTableProperty"    # doesn't work -- "name:" is not an xpath expr
-#       children:
-#       - x: "*"
-
--
-  name: cases
-  tag: mrow
-  match: "count(*)=2 and *[1][text()='{'] and *[2][self::m:mtable]"
-  replace:
-  - intent:
-      name: "intent-wrapper"
-      children:
+  - with:
+      variables:
+      - TableProperty: "'lines'"
+      replace:
       - intent:
-          name: "cases"
-          id: "*[2]/@id"
-          children: [x: "*[2]/*"]
-
--
-  # if there is a relational op in the first row, assume that's true of all rows and call them equations
-  name: equations
-  tag: mtable
-      # xpath hack: transform the chars we care about to an unlikely char and then see if that char exists
-  match: "count(*) > 0 and *[1][contains(translate(., '=≠<>≤≥≦≧', '='), '=')]"
-  replace:
-  - intent:
-      name: "equations"
-      children:
-      - x: "*"
-
-
--
-  # don't know anything about them -- think of them as "lines"
-  name: lines
-  tag: mtable
-  match: "."
-  replace:
-  - intent:
-      name: "lines"
-      children:
-      - x: "*"
-
+          name: "lines"
+          children:
+          - x: "*"

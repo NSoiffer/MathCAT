@@ -8,7 +8,7 @@
 
 - "!":                                            # 0x21
   - test:
-      if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"
+      if: "ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
       then_test:
           if: "$Verbosity = 'Terse'"
           then: [t: "bang"]                      # 0x21

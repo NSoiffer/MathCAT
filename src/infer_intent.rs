@@ -52,7 +52,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
                 bail!("Error in intent value: extra unparsed intent '{}' in intent attribute value '{}'", lex_state.remaining_str, intent_str);
             }
             assert!(lex_state.remaining_str.is_empty());
-            debug!("Resulting intent: {}", crate::pretty_print::mml_to_string(&result));
+            // debug!("Resulting intent: {}", crate::pretty_print::mml_to_string(&result));
             return Ok(result);
         }
         bail!("Internal error: infer_intent() called on MathML with no intent arg:\n{}", mml_to_string(&mathml));
@@ -87,7 +87,7 @@ lazy_static! {
     //  Furthermore an NCName cannot begin with a number, dot or minus character although they can appear later in an NCName.
     // NC_NAME from www.w3.org/TR/REC-xml/#sec-common-syn, with "\pL" for letters 
 
-    static ref CONCEPT_OR_LITERAL: Regex = Regex::new(r"^[_\pL][_\pL\pMn\-.\d·]*").unwrap(); 
+    static ref CONCEPT_OR_LITERAL: Regex = Regex::new(r"^[_\pL][_\pL\pMn\-.\d·]*").unwrap();
     static ref PROPERTY: Regex = Regex::new(r"^:[_\pL][_\pL\pMn\-.\d·]*").unwrap();     // : NC_NAME
     static ref ARG_REF: Regex = Regex::new(r"^\$[_\pL][_\pL\pMn\-.\d·]*").unwrap();     // $ NC_NAME
     static ref NUMBER: Regex = Regex::new(r"^-?[0-9]+(\.[0-9]+)?").unwrap();
@@ -190,7 +190,7 @@ impl<'i> LexState<'i> {
             self.remaining_str = self.remaining_str[1..].trim_start();
         } else {
             self.set_token(self.remaining_str)?;
-            self.remaining_str = self.remaining_str[self.token.as_str().len()..].trim_start(); 
+            self.remaining_str = self.remaining_str[self.token.as_str().len()..].trim_start();
 }    
         return Ok(&self.token);
     }
@@ -390,7 +390,7 @@ fn find_arg<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithCon
                 // check to see if this mathml has an intent value -- if so the value is the value of its intent value
                 if let Some(intent_str) = mathml.attribute_value("intent") {
                     let mut lex_state = LexState::init(intent_str.trim())?;
-                    return Ok( Some( build_intent(rules_with_context, &mut lex_state, mathml)? ) ); 
+                    return Ok( Some( build_intent(rules_with_context, &mut lex_state, mathml)? ) );
                 } else {
                     return Ok( Some( rules_with_context.match_pattern::<Element<'m>>(mathml)? ) );
                 }
@@ -422,7 +422,7 @@ fn find_arg<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithCon
 mod tests {
     #[allow(unused_imports)]
     use crate::init_logger;
-    use sxd_document::parser;    
+    use sxd_document::parser;
 
 
     fn test_intent(mathml: &str, target: &str, intent_error_recovery: &str) -> bool {

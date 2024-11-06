@@ -1,2 +1,2 @@
 ---
-- include: "../../Languages/en/definitions.yaml"
+- include: "../definitions.yaml"

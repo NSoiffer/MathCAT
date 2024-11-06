@@ -132,7 +132,7 @@
   name: default
   tag: mfrac
   match: "."
-  variables: [AddGrouping: "preceding-sibling::*[2][self::m:mi][IsInDefinition(., 'CMUFunctionNames')]"] # '2' skip invis function apply
+  variables: [AddGrouping: "preceding-sibling::*[2][self::m:mi][IsInDefinition(., 'Braille', 'CMUFunctionNames')]"] # '2' skip invis function apply
   replace: 
   # Inferring from the examples 7.5.2(11) and 7.7(2) fractions are bracketed after log/trig functions
   # FIX: try to find exact rule
@@ -259,7 +259,7 @@
   - "IsBracketed(., '|', '|') and $NextRealChild and"
   - "( $NextRealChild[self::m:msqrt] or $NextRealChild[self::m:mroot] or"    # have indicator with dots in first half
   - "  (IsNode($NextRealChild, '2D') and $NextRealChild[*[1][self::m:mrow and not(IsBracketed(., '', ''))]]) or"  # grouping char added which has dots in first half 
-  - "  IsInDefinition(substring($NextRealChild, 1, 1), 'CMUCharsWithDotsOnLeft')"
+  - "  IsInDefinition(substring($NextRealChild, 1, 1), 'Braille', 'CMUCharsWithDotsOnLeft')"
   - ")"
   replace:
   - x: "*"
@@ -448,7 +448,7 @@
       else: [x: "*[2]"]
   - test:
       # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
+      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
       then:
       - x: "*[1]"
       else:
@@ -463,7 +463,7 @@
   replace: 
   - test:
       # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
+      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
       then:
       - x: "*[1]"
       else:
@@ -488,7 +488,7 @@
         else: [t: "⠂⠢"]   # wavy line
   - test:
       # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
+      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
       then:
       - x: "*[1]"
       else:
@@ -505,7 +505,7 @@
   replace: 
   - test:
       # FIX: Including CMUFunctionNames is a guess based on an example in 10.1.1 which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
+      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
       then:
       - x: "*[1]"
       else:
@@ -540,7 +540,7 @@
       else: [x: "*[2]"]  # maybe not right, but do something
   - test:
       # FIX: CMUFunctionNames is a guess based on 7.2(1) and 7.1(2) which involves "lim" without explanation
-      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))]"
+      if: "IsBracketed(*[1], '', '') or *[1][IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))]"
       then:
       - x: "*[1]"
       else:
@@ -1133,7 +1133,7 @@
               if: "$IsCancellation"
               then: [t: "⠻"]                   # cancellation
           - test:
-              if: "*[1][(IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'CMUFunctionNames'))) or IsBracketed(., '', '')]"
+              if: "*[1][(IsNode(., 'leaf') and (string-length(.) = 1 or IsInDefinition(., 'Braille', 'CMUFunctionNames'))) or IsBracketed(., '', '')]"
               then: [x: "*[1]"]
               else:
               - t: "⠢"
@@ -1208,7 +1208,7 @@
   #     - "     ((self::m:mi or self::m:mo) and string-length(text())=1 and text()!='¨') or"
   #     - "     self::m:mfrac or self::m:msqrt or self::m:mroot or"
   #     - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
-  #     - "     IsInDefinition(., 'Arrows')"
+  #     - "     IsInDefinition(., 'Braille', 'Arrows')"
   #     - "    ]"
   #     then: [x: "*[1]"]
   #     else:

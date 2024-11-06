@@ -1,0 +1,40 @@
+---
+ - include: "../unicode.yaml"
+
+ - "(":                                            # 0x28
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then_test:
+            if: "$Verbosity='Terse'"
+            then: [t: "open"]                     # 0x28
+            else: [t: "open bracket"]               # 0x28
+        else: [t: "left bracket"]                   # 0x28                         
+ - ")":                                          # 0x29
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then_test:
+            if: "$Verbosity='Terse'"
+            then: [t: "close"]                   # 0x29
+            else: [t: "close bracket"]             # 0x29
+        else: [t: "right bracket"]                 # 0x29                 
+
+ - "[":                                          # 0x5b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [t: "open square bracket"]
+        else: [t: "left square bracket"]                            
+ - "]":                                          # 0x5d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [t: "close square bracket"]
+        else: [t: "right square bracket"]
+ - "{":                                         # 0x7b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [t: "open curly bracket"]
+        else: [t: "left curly bracket"]                            
+ - "}":                                          # 0x7d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [t: "close curly bracket"]
+        else: [t: "right curly bracket"]                            

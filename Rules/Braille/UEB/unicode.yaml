@@ -219,24 +219,18 @@
  - "⥂": [t: "1⠸⠶"]               # 0x2942 (Rightwards arrow above short leftwards arrow (equilibrium, trend to the right))
  - "⥄": [t: "1⠈⠸⠶"]              # 0x2944 (Short rightwards arrow above leftwards arrow (equilibrium, trend to the left))
 
-# These repeat the short arrow version because that is what is in the spec, but the spec should really use the long version
- - "🣒": [t: "1⠘⠸⠶"]               # 0x1f8d2 (Long rightwards harpoon over leftwards harpoon (equilibrium))
- - "🣓": [t: "1⠸⠶"]                # 0x1f8d3 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the right))
- - "🣔": [t: "1⠈⠸⠶"]               # 0x1f8d4 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the left))
- 
 # Mappings for some new Unicode chemistry arrows/symbols
+# These repeat the short arrow version because that is what is in the spec (GTM 16), but the spec should really use the long version
+ - "🣑": [t: "1⠘⠸⠶"]               # 0x1F8D1 LONG RIGHTWARDS HARPOON OVER LONG LEFTWARDS HARPOON (equilibrium)
+ - "🣒": [t: "1⠐⠸⠶"]               # 0x1f8d2 LONG RIGHTWARDS HARPOON ABOVE SHORT LEFTWARDS HARPOON(equilibrium, trend to the right)
+ - "🣓": [t: "1⠈⠸⠶"]                # 0x1f8d3 SHORT RIGHTWARDS HARPOON ABOVE LONG LEFTWARDS HARPOON (equilibrium, trend to the left))
+ 
 # These need to be verified -- 0x1f8d1, 0x1f8d2, and 0x1f8d3 conflict with GTM 16 (uses short arrow when really should be long)
  - "🣐": [t: "1⠳⠒⠒⠒⠕⠻⠳⠒⠒⠒⠪"]           # 0x1F8D0 LONG RIGHTWARDS ARROW OVER LONG LEFTWARDS ARROW
-#  - "🣒": [t: "1⠘⠸⠶"]               # 0x1f8d2 (Long rightwards harpoon over leftwards harpoon (equilibrium))
-#  - "🣓": [t: "1⠸⠶"]                # 0x1f8d3 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the right))
-#  - "🣔": [t: "1⠈⠸⠶"]               # 0x1f8d4 (Long rightwards harpoon over leftwards harpoon (equilibrium, trend to the left))
-#  - "🣑": [t: "1⠳⠒⠒⠒⠈⠗⠕⠻⠳⠒⠒⠒⠠⠗⠪"]     # 0x1F8D1 LONG RIGHTWARDS HARPOON OVER LONG LEFTWARDS HARPOON
-#  - "🣒": [t: "1⠳⠒⠒⠒⠈⠗⠕⠻⠳⠒⠠⠗⠪"]         # 0x1F8D2 LONG RIGHTWARDS HARPOON ABOVESHORT LEFTWARDS HARPOON
-#  - "🣓": [t: "1⠳⠒⠈⠗⠕⠻⠳⠒⠒⠒⠠⠗⠪"]         # 0x1F8D3 SHORT RIGHTWARDS HARPOON ABOVELONG LEFTWARDS HARPOON
-#  - "🣔": [t: "1⠳⠒⠒⠒⠈⠗⠪⠻⠳⠒⠠⠗⠕"]         # 0x1F8D4 LONG LEFTWARDS HARPOON ABOVESHORT RIGHTWARDS HARPOON
  - "🣕": [t: "1⠳⠒⠈⠗⠪⠻⠳⠒⠒⠒⠠⠗⠕"]         # 0x1F8D5 SHORT LEFTWARDS HARPOON ABOVELONG RIGHTWARDS HARPOON
  - "🣖": [t: "1⠳⠒⠒⠒⠕⠯⠠⠭"]                # 0x1F8D6 LONG RIGHTWARDS ARROW WITH THROUGH X
- - "🣗": [t: "1⠐⠠⠤⠯⠫⠿"]                    # 0x1F8D7 LONG RIGHTWARDS ARROW WITH DOUBLE SLASH
+ - "🣗": [t: "1⠳⠒⠒⠒⠕⠯⠣⠸⠌⠸⠌⠜"]          # 0x1F8D7 LONG RIGHTWARDS ARROW WITH DOUBLE SLASH
+#  - "": [t: ""]                  # 0x1F8D8 LONG LEFT RIGHT ARROW WITH DEPENDENT LOBE (no clue what to do)
 
  - "△": [t: "1⠫⠼⠉t"]            # 0x25B3 (Triangle)
  - "▫": [t: "1⠫⠼⠙t"]             # 0x25AB (Small white Square)
@@ -306,7 +300,7 @@
         # We can't normally tell spacing, but it *should* have a space in function mapping and set builder notation if the author used appropriate notation
         # The canonicalization code makes this guess and adds "data-space-after"
     - test:
-        if: "@data-space-after or (../self::m:mrow and ancestor::*[2][IsBracketed(., '{', '}')]) or following-sibling::*[1]/*[2][IsInDefinition(., 'Arrows')]" # "Arrows" is a bit broad...
+        if: "@data-space-after or (../self::m:mrow and ancestor::*[2][IsBracketed(., '{', '}')]) or following-sibling::*[1]/*[2][IsInDefinition(., 'Braille', 'Arrows')]" # "Arrows" is a bit broad...
         then: [t: "1⠒W"]
         else: [t: "1c⠒"]
 

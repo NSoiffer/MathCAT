@@ -1,0 +1,56 @@
+---
+
+- name: line-segment
+  tag: line-segment
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: "linje-segmentet från"      # phrase('the line segment from' A to B)
+      - x: "*[1]"
+      - T: "till"                         # phrase(the line segment from A 'to' B)
+      - x: "*[2]"
+      else:
+      - T: "linje-segmentet"               # phrase(the 'line segment' A  B)
+      - x: "*[1]"
+      - x: "*[2]"
+
+- name: geometry-ray
+  tag: ray
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: "den riktade sträckan från"             # phrase('the ray from' A to B)
+      - x: "*[1]"
+      - T: "till"                       # phrase(the ray from A 'to' B)
+      - x: "*[2]"
+      else:
+      - T: "den riktade sträckan"                      # phrase(the 'ray'A  B)
+      - x: "*[1]"
+      - x: "*[2]"
+
+- name: geometry-arc
+  tag: arc
+  match: "count(*)=2"
+  replace:
+  - T: "bågen"                        # phrase(the 'arc' A B C)
+  - x: "*[1]"
+  - x: "*[2]"
+
+- name: measure-of-angle
+  tag: measure-of-angle
+  match: "count(*)=3"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - T: "måttet på vinkeln"      # phrase('the measure of the angle' ABC)
+      else:
+      - T: "vinkeln"      # phrase('measure of angle' ABC)
+  - x: "*[1]"
+  - x: "*[2]"
+  - x: "*[3]"
+
