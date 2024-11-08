@@ -50,6 +50,8 @@
     ResetOverview: true        # remember previous value and use it
     NavVerbosity: Medium        # Terse, Medium, Full (words to say for nav command)
     AutoZoomOut: true           # Auto zoom out of 2D exprs (use shift-arrow to force zoom out if unchecked)
+    CopyAs: "MathML"       # MathML, LaTeX, ASCIIMath
+
 
   Braille:
     BrailleCode: "Nemeth"                # Any supported braille code (currently Nemeth, UEB)
@@ -86,7 +88,6 @@
 
 
   Other:
-    CopyAs: "MathML"       # MathML, LaTeX, ASCIIMath
     DecimalSeparators: "." # [default]
     BlockSeparators: ", \u00A0\u202F" # [default -- includes two forms of non-breaking spaces]
     DecimalSeparator: "Auto" # Auto, '.', ',', Custom
