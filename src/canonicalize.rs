@@ -780,13 +780,12 @@ impl CanonicalizeContext {
 		if mathml.children().is_empty() && !EMPTY_ELEMENTS.contains(element_name) {
 			if element_name == "mrow" && mathml.attribute("intent").is_none() {
 				// if it is an empty mrow that doesn't need to be there, get rid of it. Otherwise, replace it with an mtext
+				if parent_name == "mmultiscripts" {	// MathML Core dropped "none" in favor of <mrow/>, but MathCAT is written with <none/>
+					set_mathml_name(mathml, "none");
+					return Some(mathml);
+				}
 				if parent_requires_child {
-					if parent_name == "mmultiscripts" {	// MathML Core dropped "none" in favor of <mrow/>, but MathCAT is written with <none/>
-						set_mathml_name(mathml, "none");
-						return Some(mathml);
-					} else {
-						return Some( CanonicalizeContext::make_empty_element(mathml) );
-					}
+					return Some( CanonicalizeContext::make_empty_element(mathml) );
 				} else {
 					return None;
 				}
