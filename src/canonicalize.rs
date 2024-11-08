@@ -5916,6 +5916,31 @@ mod canonicalize_tests {
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
+	#[test]
+    fn empty_mrows_in_mmultiscripts_306() {
+        let test_str = "<math display='block'>
+			<mmultiscripts intent='_permutation:prefix(_of,$k,_from,$n)'>
+				<mi>P</mi>
+				<mi arg='k'>k</mi>
+				<mrow/>
+				<mprescripts/>
+				<mrow/>
+				<mi arg='n'>n</mi>
+			</mmultiscripts>
+		</math>";
+        let target_str = "<math display='block'>
+			<mmultiscripts intent='_permutation:prefix(_of,$k,_from,$n)'>
+				<mi>P</mi>
+				<mi arg='k'>k</mi>
+				<none></none>
+				<mprescripts></mprescripts>
+				<none></none>
+				<mi arg='n'>n</mi>
+			</mmultiscripts>
+		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
 
 	#[test]
 	#[ignore]	// this fails -- need to figure out grabbing base from previous or next child
