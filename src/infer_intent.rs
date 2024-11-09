@@ -87,10 +87,10 @@ lazy_static! {
     //  Furthermore an NCName cannot begin with a number, dot or minus character although they can appear later in an NCName.
     // NC_NAME from www.w3.org/TR/REC-xml/#sec-common-syn, with "\pL" for letters 
 
-    static ref CONCEPT_OR_LITERAL: Regex = Regex::new(r"^[_\pL][_\pL\pMn\-.\d·]*").unwrap();
-    static ref PROPERTY: Regex = Regex::new(r"^:[_\pL][_\pL\pMn\-.\d·]*").unwrap();     // : NC_NAME
-    static ref ARG_REF: Regex = Regex::new(r"^\$[_\pL][_\pL\pMn\-.\d·]*").unwrap();     // $ NC_NAME
-    static ref NUMBER: Regex = Regex::new(r"^-?[0-9]+(\.[0-9]+)?").unwrap();
+    static ref CONCEPT_OR_LITERAL: Regex = Regex::new(r#"^[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@,()\[\]{}'"]*"#).unwrap();  // more permissive than an NC_NAME but simpler
+    static ref PROPERTY: Regex = Regex::new(r#"^:[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@,()\[\]{}'"]*"#).unwrap();     // : NC_NAME
+    static ref ARG_REF: Regex = Regex::new(r#"^\$[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@,()\[\]{}'"]*"#).unwrap();     // $ NC_NAME
+    static ref NUMBER: Regex = Regex::new(r#"^-?[0-9]+(\.[0-9]+)?"#).unwrap();
 }
 
 static TERMINALS_AS_U8: [u8; 3] = [b'(', b',', b')'];
@@ -787,5 +787,12 @@ mod tests {
                 <mo>)</mo>
             </mrow>";
         assert!(test_intent(mathml, target, "IgnoreIntent"));
-    }
+    }   
+
+    #[test]
+    fn plane1_char_in_concept_name() {
+        let mathml = "<math><mrow><mo intent='🐇'>&#x1F407;</mo><mi>X</mi></mrow></math>";
+        let intent = "<math><mrow><mi>🐇</mi><mi>X</mi></mrow></math>";
+        assert!(test_intent(mathml, intent, "Error"));
+    }   
 }
