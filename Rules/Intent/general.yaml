@@ -624,11 +624,13 @@
 -
   name: mtable-property-is-set
   tag: mtable
-  variables: [MTableProperty: "IfThenElse(contains(@data-intent-property, ':grid:'), 
-                               IfThenElse(parent::m:mrow[IsBracketed(., '|', '|')], 'determinant', 'matrix'),
+  variables: [MTableProperty: "IfThenElse(contains(@data-intent-property, ':array:'), 'array',
+                               IfThenElse(contains(@data-intent-property, ':matrix:'), 'matrix',
+                               IfThenElse(contains(@data-intent-property, ':determinant:'), 'determinant',
                                IfThenElse(contains(@data-intent-property, ':piecewise:'), 'piecewise',
                                IfThenElse(contains(@data-intent-property, ':system-of-equation:'), 'system-of-equation',
-                               IfThenElse(contains(@data-intent-property, ':lines:'), 'lines',''))))"]
+                               IfThenElse(contains(@data-intent-property, ':lines:'), 'lines',
+                                 ''))))))"]   # '' is what to say if none match"
   match: "$MTableProperty !=''"
   replace:
   - intent:
