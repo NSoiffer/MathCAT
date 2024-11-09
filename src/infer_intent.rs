@@ -85,11 +85,17 @@ lazy_static! {
     // The practical restrictions of NCName are that it cannot contain several symbol characters like
     //  !, ", #, $, %, &, ', (, ), *, +, ,, /, :, ;, <, =, >, ?, @, [, \, ], ^, `, {, |, }, ~, and whitespace characters
     //  Furthermore an NCName cannot begin with a number, dot or minus character although they can appear later in an NCName.
-    // NC_NAME from www.w3.org/TR/REC-xml/#sec-common-syn, with "\pL" for letters 
-
-    static ref CONCEPT_OR_LITERAL: Regex = Regex::new(r#"^[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@,()\[\]{}'"]*"#).unwrap();  // more permissive than an NC_NAME but simpler
-    static ref PROPERTY: Regex = Regex::new(r#"^:[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@,()\[\]{}'"]*"#).unwrap();     // : NC_NAME
-    static ref ARG_REF: Regex = Regex::new(r#"^\$[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@,()\[\]{}'"]*"#).unwrap();     // $ NC_NAME
+    // NC_NAME defined in www.w3.org/TR/REC-xml/#sec-common-syn, but is complicated
+    //   We follow NC_NAME for the basic latin block, but then allow everything
+    static ref CONCEPT_OR_LITERAL: Regex = Regex::new(
+        r#"^[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#     // NC_NAME but simpler
+    ).unwrap();
+    static ref PROPERTY: Regex = Regex::new(
+        r#"^:[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#    // : NC_NAME
+    ).unwrap();
+    static ref ARG_REF: Regex = Regex::new(
+        r#"^\$[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*"#   // $ NC_NAME
+    ).unwrap();
     static ref NUMBER: Regex = Regex::new(r#"^-?[0-9]+(\.[0-9]+)?"#).unwrap();
 }
 
