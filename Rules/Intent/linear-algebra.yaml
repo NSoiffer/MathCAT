@@ -22,12 +22,9 @@
     - "IsBracketed(., '|', '|') and  *[2][self::m:mtable]"
   replace:
   - intent:
-      name: "intent-wrapper"
-      children:
-      - intent:
-          name: "determinant"
-          id: "*[2]/@id"
-          children: [x: "*[2]/*"]
+      name: "determinant"
+      id: "*[2]/@id"
+      children: [x: "*[2]/*"]
 
 -
   # parens or brackets around an mtable
@@ -37,12 +34,9 @@
     - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']')) and *[2][self::m:mtable]"
   replace:
   - intent:
-      name: "intent-wrapper"
-      children:
-      - intent:
-          name: "matrix"
-          id: "*[2]/@id"
-          children: [x: "*[2]/*"]
+      name: "matrix"
+      id: "*[2]/@id"
+      children: [x: "*[2]/*"]
 
 -
   name: norm
