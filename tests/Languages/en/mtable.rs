@@ -988,3 +988,40 @@ fn matrix_binomial() {
     </math>";
   test_ClearSpeak("en", "ClearSpeak_Matrix", "Combinatorics", expr, "3 choose 2");
 }
+
+#[test]
+fn unknown_mtable_property() {
+  let expr = "<math display='block'>
+      <mtable intent='equation:prefix($e1,$e1x)'>
+        <mtr arg='e1'>
+        <mtd columnalign='right'>
+          <mi>a</mi>
+        </mtd>
+        <mtd columnalign='center'>
+          <mo>=</mo>
+        </mtd>
+        <mtd intent='_($lhs)' columnalign='left'>
+          <mrow arg='lhs'>
+          <mi>b</mi>
+          <mo>+</mo>
+          <mi>c</mi>
+          <mo>&#x2212;</mo>
+          <mi>d</mi>
+        </mrow>
+        </mtd>
+        </mtr>
+        <mtr arg='e1x'>
+        <mtd intent='_' columnalign='right'></mtd>
+        <mtd intent='_' columnalign='center'></mtd>
+        <mtd arg='rhs' columnalign='left'>
+          <mo form='infix'>+</mo>
+          <mi>e</mi>
+          <mo>&#x2212;</mo>
+          <mi>f</mi>
+        </mtd>
+        </mtr>
+      </mtable>
+    </math>";
+    test("en", "ClearSpeak",  expr,
+         "equation row 1; column 1; eigh, column 2; is equal to, b plus c minus d row 2; column 3; plus e minus f;");
+}
