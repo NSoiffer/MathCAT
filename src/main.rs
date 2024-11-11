@@ -174,13 +174,13 @@ fn main() {
   //   </math>";
 
   let expr = r#"
-    <math>
-     <mrow>
-      <mtable intent=":lines">
-       <mtr> <mtd> <mi>y</mi></mtd>  <mtd><mo>=</mo> </mtd>  <mtd><mn>7</mn><mo>-</mo><mn>1</mn></mtd>  </mtr>
-       <mtr> <mtd></mtd>  <mtd><mo>=</mo></mtd>  <mtd><mrow><mn>6</mn></mrow></mtd> </mtr>
-      </mtable></mrow>
-    </math>
+<math display='block'>
+ <mn>1.5</mn><mi intent=':unit'>km</mi>
+ <mn>2</mn><mi intent=':unit' mathvariant='normal'>Ω</mi>
+ <mn>1</mn><mi id='ohm-id' mathvariant='normal'>Ω</mi>
+ <mo>+</mo>
+ <mn>3</mn><mi intent=':unit' mathvariant='normal'>ft</mi>
+ </math>
     "#;
   // let expr= "<math><mrow><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>";
   let instant = Instant::now();
