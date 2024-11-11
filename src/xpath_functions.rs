@@ -994,14 +994,13 @@ impl IsInDefinition {
 
 pub struct DefinitionValue;
 impl DefinitionValue {
-    /// Returns the value associated with `key` in `set_name`. If `key` is not in `set_name`, `key` is returned
-    ///   Consider looking up "km" -- if there is no definition, using 'km' is a reasonable fallback
+    /// Returns the value associated with `key` in `set_name`. If `key` is not in `set_name`, an emptry string is returned
     /// Returns an error if `set_name` is not defined
     pub fn definition_value(key: &str, defs: &'static LocalKey<RefCell<Definitions>>, set_name: &str) -> Result<String, Error> {
         return defs.with(|definitions| {
             if let Some(map) = definitions.borrow().get_hashmap(set_name) {
                 return Ok( match map.get(key) {
-                    None => key.to_string(),
+                    None => "".to_string(),
                     Some(str) => str.clone(),
                 });
             }
