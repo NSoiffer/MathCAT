@@ -387,9 +387,9 @@
   - test:
     - if: "$IsSingular"  # invisible times should have been added
       then: [x: "concat('\uF8FE', $Word)"]
-    - else_if: "DefinitionValue($Word, 'Speech', 'PluralForm') != ''"
+    - else_if: "DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
       # HACK: '\uF8FE' is used internally for the concatination char by 'ct' -- this gets the prefix concatinated to the base
-      then: [x: "concat('\uF8FE', DefinitionValue($Word, 'Speech', 'PluralForm'))"]
+      then: [x: "concat('\uF8FE', DefinitionValue($Word, 'Speech', 'PluralForms'))"]
       else: [x: "concat('\uF8FE', $Word)", ct: "s"]
       #- x: "concat('\uF8FE', DefinitionValue(substring(., 2), 'Speech', 'SIUnits'))"
 

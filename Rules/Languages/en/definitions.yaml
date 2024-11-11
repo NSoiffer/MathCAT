@@ -107,7 +107,7 @@
     "mi": "mile",
   }
 
-- PluralForm: {
+- PluralForms: {
   # FIX: this needs to be flushed out
     "inch": "inches",
     "foot": "feet",
