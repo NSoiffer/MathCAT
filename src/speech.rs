@@ -23,6 +23,8 @@ use std::path::Path;
 use std::rc::Rc;
 use crate::shim_filesystem::{read_to_string_shim, canonicalize_shim};
 use crate::canonicalize::{as_element, create_mathml_element, set_mathml_name, name};
+use regex::Regex;
+
 
 pub const NAV_NODE_SPEECH_NOT_FOUND: &str = "NAV_NODE_NOT_FOUND";
 
@@ -530,13 +532,20 @@ impl<'r> InsertChildren {
 }
 
 
+lazy_static! {
+    static ref ATTR_NAME_VALUE: Regex = Regex::new(
+        // match name='value', where name is sort of an NCNAME (see CONCEPT_OR_LITERAL in infer_intent.rs)
+        r#"(?P<name>[^\s\u{0}-\u{40}\[\\\]^`\u{7B}-\u{BF}][^\s\u{0}-\u{2C}/:;<=>?@\[\\\]^`\u{7B}-\u{BF}]*)\s*=\s*'(?P<value>[^']+)'"#
+    ).unwrap();
+}
+
 // structure used when "intent:" is encountered in a rule
 // the name is either a string or an xpath that needs evaluation. 99% of the time it is a string
 #[derive(Debug, Clone)]
 struct Intent {
     name: Option<String>,           // name of node
     xpath: Option<MyXPath>,         // alternative to directly using the string
-    id: Option<MyXPath>,             // optional id attr (default to the id of the node being replaced)
+    attrs: String,                  // optional attrs -- format "attr1='val1' [attr2='val2'...]"
     children: ReplacementArray,     // children of node
 }
 
@@ -547,11 +556,9 @@ impl fmt::Display for Intent {
         } else {
             self.xpath.as_ref().unwrap().to_string()
         };
-        let default_id = MyXPath::new("'Auto'".to_string()).unwrap();
-        let id = self.id.as_ref().unwrap_or(&default_id);
-        return write!(f, "intent: {}: {},  id='{}'>\n      children: {}",
+        return write!(f, "intent: {}: {},  attrs='{}'>\n      children: {}",
                         if self.name.is_some() {"name"} else {"xpath-name"}, name,
-                        id,
+                        self.attrs,
                         &self.children);
     }
 }
@@ -568,7 +575,7 @@ impl<'r> Intent {
             bail!("Missing 'name' or 'xpath-name' as part of 'intent'.\n    \
                   Suggestion: add 'name:' or if present, indent so it is contained in 'intent'");
         }
-        let id = &yaml_dict["id"];
+        let attrs = &yaml_dict["attrs"];
         let replace = &yaml_dict["children"];
         if replace.is_badvalue() {
             bail!("Missing 'children' as part of 'intent'.\n    \
@@ -577,7 +584,7 @@ impl<'r> Intent {
         return Ok( Box::new( Intent {
             name: if name.is_badvalue() {None} else {Some(as_str_checked(name).chain_err(|| "'name'")?.to_string())},
             xpath: if xpath_name.is_badvalue() {None} else {Some(MyXPath::build(xpath_name).chain_err(|| "'intent'")?)},
-            id: if id.is_badvalue() {None} else {Some(MyXPath::build(id).chain_err(|| "'intent'")?)},
+            attrs: if attrs.is_badvalue() {"".to_string()} else {as_str_checked(attrs).chain_err(|| "'attrs'")?.to_string()},
             children: ReplacementArray::build(replace).chain_err(|| "'children:'")?,
         } ) );
     }
@@ -609,12 +616,21 @@ impl<'r> Intent {
         for attr in mathml.attributes() {
             result.set_attribute_value(attr.name(), attr.value());
         }
-        if let Some(id) = &self.id {
-            result.set_attribute_value("id", id.evaluate(rules_with_context.get_context(), mathml)?.string().as_str());
+
+        if !self.attrs.is_empty() {
+            debug!("Intent::replace attrs = \"{}\"", &self.attrs);
+            for cap in ATTR_NAME_VALUE.captures_iter(&self.attrs) {
+                let value_as_xpath = MyXPath::new(cap["value"].to_string()).chain_err(||"attr value inside 'intent'")?;
+                let value = value_as_xpath.evaluate(rules_with_context.get_context(), mathml)
+                        .chain_err(||"attr xpath evaluation value inside 'intent'")?;
+                debug!("Intent::replace  name={}, value={}, xpath value={}", &cap["name"], &cap["value"], &value.clone().into_string());
+                result.set_attribute_value(&cap["name"], &value.into_string());
+            };
         }
 
         // debug!("Result from 'intent:'\n{}", mml_to_string(&result));
         return T::from_element(result);
+
 
         /// "lift" up the children any "TEMP_NAME" child -- could short circuit when only one child
         fn lift_children(result: Element) -> Element {
