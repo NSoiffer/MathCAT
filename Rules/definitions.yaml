@@ -5,20 +5,6 @@
 # - name: [] "...", "..." "..." ]
 
 
-- SI_Units: {
-    "A": "amp",
-    "cd": "candela",
-    "K": "kelvin",
-    "K": "kelvin",
-    "g": "gram",
-    "m": "meter",
-    "mol": "mole",
-    "s": "second",
-    "″": "second",
-    "\"": "second",
-    "sec": "second",
-  }
-
   # ---------------- Large Operators  ----------------------------------
 - LargeOperators: {
     "⅀", # double struck

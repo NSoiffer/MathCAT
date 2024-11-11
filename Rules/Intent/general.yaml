@@ -395,6 +395,19 @@
       - x: "text()"
 
 -
+  name: unit
+  tag: [mi, mtext]
+  match: "@class='MathML-unit' or contains(@intent, ':unit')"
+      # would like to use forced mathvariant='normal', but it captures things it shouldn't in the tests like "H" and "F" (calculus)
+      # or (self::m:mi and string-length(.)=1 and @mathvariant='normal' and DefinitionValue(., 'Speech', 'SIUnits') != '')"
+  replace:
+  - intent:
+      name: "mi"
+      attrs: "data-intent-property='\":unit:\"'"   # the value ":unit:" needs to be an xpath string, hence the escaped quotes
+      children:
+      - x: "text()"
+
+-
   name: chemical-formula-op
   tag: [mo]
   match: "@data-chem-formula-op"

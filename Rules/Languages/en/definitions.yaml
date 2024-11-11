@@ -3,7 +3,115 @@
 
 - OperatorIntentRenaming: {
     "dimension-product": "by"
-    }
+  }
+
+- SIPrefixes: {
+    "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hecto", "da": "decka",
+    "d": "deci", "c": "centi", "m": "milli", "µ": "micro", "n": "nano", "p": "pico", "f": "femto", "a": "atto", "z": "zepto", "y": "yocto"
+  }
+
+- SIUnits: {
+    # base units
+    "A": "amp",
+    "cd": "candela",
+    "K": "kelvin",
+    "K": "kelvin",
+    "g": "gram",
+    "m": "metre",     # British spelling works for US also
+    "mol": "mole",
+    "s": "second",
+    "″": "second",
+    "\"": "second",
+    "sec": "second",
+
+    # derived units
+    "Bq": "becquerel",
+    "C": "coulomb",
+    "°C": "degree celsius",
+    "℃": "degree celsius",
+    "F": "farad",
+    "Gy": "gray",
+    "H": "henry",
+    "Hz": "hertz",
+    "J": "joule",
+    "kat": "kattel",
+    "lm": "lumen",
+    "lx": "lux",
+    "N": "newton",
+    "Ω": "ohm",       # Greek Cap letter
+    "Ω": "ohm",       # OHM SIGN
+    "Pa": "pascal",
+    "rad": "radian",
+    "S": "siemens",
+    "Sv": "sievert",
+    "sr": "sterradion",
+    "T": "tesla",
+    "V": "volt",
+    "W": "watt",
+    "Wb": "weber",
+
+    # accepted (plus a few variants)
+    "l": "litre",     # British spelling works for US also
+    "L": "litre",     # British spelling works for US also
+    "ℓ": "litre",     # British spelling works for US also
+    "′": "minute",
+    "'": "minute",
+    "min": "minute",
+    "Hr": "hour",
+    "h": "hour",
+    "d": "day",
+    "dy": "day",
+    "B": "bel",
+    "°": "degree",
+    "deg": "degree",
+    "Np": "neper",
+    "t": "metric ton",
+  }
+
+# There are some clashes with SI Units with prefixes and other common units
+- SIExceptions: {
+    "Pa",   # pascals (not petaannums)
+    "dB",   # decibels (not decibytes)
+    "cd",   # candelas (not centidays)
+    "ch",   # chains (not centihours)
+    "pt",   # pint (not picometric tons)
+    "ft",   # feet (not femtotonnes)
+    "yd",   # yards (not yoctodays)
+
+    # FIX: think about these
+    "am",   # arcminute (not attometers)
+    "as",   # arcsecond (not attoseconds)
+  }
+- OtherUnits: {
+    "dB": "decibel",
+    "ha": "hectare",
+    "amu": "atomic mass unit",
+    "u": "atomic mass unit",
+    "au": "astronomical unit",
+    "AU": "astronomical unit",
+    "Da": "dalton",
+    "eV": "electronvolt",
+    "arcmin": "arcminute",
+    "amin": "arcminute",
+    "am": "arcminute",
+    "MOA": "arcminute",
+    "arcsec": "arcsecond",
+    "asec": "arcsecond",
+    "as": "arcsecond",
+  }
+
+- EnglishUnits: {
+  # FIX: this needs to be flushed out
+    "in": "inch",
+    "ft": "foot",
+    "mi": "mile",
+  }
+
+- PluralForm: {
+  # FIX: this needs to be flushed out
+    "inch": "inches",
+    "foot": "feet",
+  }
 
 # Lines starting with "#" are a comment
 # Each definition in this file is of the form

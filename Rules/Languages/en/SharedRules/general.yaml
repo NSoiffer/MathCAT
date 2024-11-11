@@ -347,6 +347,54 @@
   - x: "*[3]"
   - pause: short
 
+
+- name: unit
+  tag: mi
+  match: "$Verbosity != 'Terse' and contains(@data-intent-property, ':unit')"
+  variables:
+  - IsSingular: "preceding-sibling::*[2][self::m:mn and . = 1]"   # invisible times should have been added
+  - Prefix: "' '"
+  - Word: "''"  
+  replace:
+  - bookmark: "@id"
+  - test:
+      # is the whole string match a SI Unit without a prefix?
+    - if: "DefinitionValue(., 'Speech', 'SIUnits') != ''"
+      then:
+      - set_variables: [Word: "DefinitionValue(., 'Speech', 'SIUnits')"]
+      # does the first character "da" (the only none-single letter prefix)
+    - else_if: "string-length(.) >= 3 and substring(., 1, 2) = 'da' and DefinitionValue(substring(., 3), 'Speech', 'SIUnits') != ''"
+      then:
+      - set_variables:
+        - Prefix: "DefinitionValue('da', 'Speech', 'SIPrefixes')"
+        - Word: "DefinitionValue(substring(., 3), 'Speech', 'SIUnits')"
+      # does the first character match a prefix
+    - else_if: "string-length(.) >= 2 and DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != ''
+                and not(IsInDefinition(., 'Speech', 'SIExceptions'))"
+      then:
+      - set_variables:
+        - Prefix: "DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes')"
+        - Word: "DefinitionValue(substring(., 2), 'Speech', 'SIUnits')"
+    - else_if: "DefinitionValue(., 'Speech', 'OtherUnits') != ''"
+      then:
+      - set_variables: [Word: "DefinitionValue(., 'Speech', 'OtherUnits')"]
+    - else_if: "DefinitionValue(., 'Speech', 'EnglishUnits') != ''"
+      then:
+      - set_variables: [Word: "DefinitionValue(., 'Speech', 'EnglishUnits')"]
+    - else:
+        x: "text()"
+  - x: "$Prefix"
+  - test:
+    - if: "$IsSingular"  # invisible times should have been added
+      then: [x: "concat('\uF8FE', $Word)"]
+    - else_if: "DefinitionValue($Word, 'Speech', 'PluralForm') != ''"
+      # HACK: '\uF8FE' is used internally for the concatination char by 'ct' -- this gets the prefix concatinated to the base
+      then: [x: "concat('\uF8FE', DefinitionValue($Word, 'Speech', 'PluralForm'))"]
+      else: [x: "concat('\uF8FE', $Word)", ct: "s"]
+      #- x: "concat('\uF8FE', DefinitionValue(substring(., 2), 'Speech', 'SIUnits'))"
+
+      
+
 - name: sin
   tag: mi
   match: "text()='sin'"

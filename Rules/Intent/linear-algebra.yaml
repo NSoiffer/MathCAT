@@ -23,7 +23,7 @@
   replace:
   - intent:
       name: "determinant"
-      id: "*[2]/@id"
+      attrs: "id='*[2]/@id'"
       children: [x: "*[2]/*"]
 
 -
@@ -35,7 +35,7 @@
   replace:
   - intent:
       name: "matrix"
-      id: "*[2]/@id"
+      attrs: "id='*[2]/@id'"
       children: [x: "*[2]/*"]
 
 -
