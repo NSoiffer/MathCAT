@@ -39,14 +39,14 @@
       name: imaginary-part
       children: []
   
-# -
-#   name: roman_numeral
-#   tag: [mi, mn, mtext]
-#   match: "@data-number"
-#   replace: 
-#   - intent:
-#       name: mn
-#       children: [x: "@data-number"]
+-
+  name: roman_numeral
+  tag: [mi, mn, mtext]
+  match: "@data-number"
+  replace: 
+  - intent:
+      name: mn
+      children: [x: "@data-number"]
 
 -
   name: positive-or-negative
@@ -400,6 +400,26 @@
   match: "@class='MathML-unit' or contains(@intent, ':unit')"
       # would like to use forced mathvariant='normal', but it captures things it shouldn't in the tests like "H" and "F" (calculus)
       # or (self::m:mi and string-length(.)=1 and @mathvariant='normal' and DefinitionValue(., 'Speech', 'SIUnits') != '')"
+  replace:
+  - intent:
+      name: "mi"
+      attrs: "data-intent-property='\":unit:\"'"   # the value ":unit:" needs to be an xpath string, hence the escaped quotes
+      children:
+      - x: "text()"
+
+- # this is attempt to catch units when some has created a non-italic word that matches a unit
+  # other mtext unit cases were caught above
+  name: mtext-inference-unit
+  tag: mtext
+  match: "DefinitionValue(., 'Speech', 'SIUnits') != '' or
+          DefinitionValue(., 'Speech', 'UnitsWithoutPrefixes') != '' or 
+          DefinitionValue(., 'Speech', 'EnglishUnits') != '' or
+          (string-length(.) >= 3 and
+           substring(., 1, 2) = 'da' and 
+           DefinitionValue(substring(., 3), 'Speech', 'SIUnits') != '') or
+          (string-length(.) >= 2 and
+           DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != '' and
+           DefinitionValue(substring(., 2), 'Speech', 'SIUnits') != '')"
   replace:
   - intent:
       name: "mi"
