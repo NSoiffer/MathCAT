@@ -162,18 +162,6 @@
     "mpg": "mile per gallon",
   }
 
-- PluralForms: {
-  # FIX: this needs to be flushed out
-    "inch": "inches", "square inch": "square inches", "cubic inch": "cubic inches",
-    "foot": "feet", "square foot": "square feet", "cubic foot": "cubic feet",
-    "board foot": "board feet",
-    "degree celsius": "degrees celsius",
-    "degree fahrenheit": "degrees fahrenheit",
-    "hertz": "hertz",
-    "siemens": "siemens",
-    "revolution per minute": "revolutions per minute",
-  }
-
 - KnownWords: {
     "tạ", "yến", "và"
   }
