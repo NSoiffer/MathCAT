@@ -411,7 +411,6 @@
         - else_if: "DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
           then: [x: "DefinitionValue(concat('\uF8FE', $Word), 'Speech', 'PluralForms')"]
           else: [x: "concat('\uF8FE', $Word)", ct: "s"]
-      #- x: "concat('\uF8FE', DefinitionValue(substring(., 2), 'Speech', 'SIUnits'))"
 
     
 - name: sin
