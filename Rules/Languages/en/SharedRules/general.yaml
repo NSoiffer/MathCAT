@@ -369,10 +369,7 @@
     - else_if: "DefinitionValue(., 'Speech', 'UnitsWithoutPrefixes') != ''"
       then:
       - set_variables: [Word: "DefinitionValue(., 'Speech', 'UnitsWithoutPrefixes')"]
-
-    # U.S., Liberia and Myanmar are only countries that officially use english units, but other countries with English dominance still use a few
-    # FIX: maybe include Hindi and other Indian languages
-    - else_if: "(substring($Language, 1, 2) = 'en' or $Language = 'my') and DefinitionValue(., 'Speech', 'EnglishUnits') != ''"
+    - else_if: "DefinitionValue(., 'Speech', 'EnglishUnits') != ''"
       then:
       - set_variables: [Word: "DefinitionValue(., 'Speech', 'EnglishUnits')"]
 
@@ -416,8 +413,7 @@
           else: [x: "concat('\uF8FE', $Word)", ct: "s"]
       #- x: "concat('\uF8FE', DefinitionValue(substring(., 2), 'Speech', 'SIUnits'))"
 
-      
-
+    
 - name: sin
   tag: mi
   match: "text()='sin'"
