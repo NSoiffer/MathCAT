@@ -36,7 +36,7 @@
 
 # Rules for speaking what happens when moving into or out of a notation
 - name: into-or-out-of
-  tag: mfrac
+  tag: [mfrac, fraction]
   match: "$Move2D != ''"
   replace:
   - x: "$Move2D"

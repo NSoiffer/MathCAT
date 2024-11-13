@@ -88,6 +88,16 @@
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 
+# Units (e.g., meters per second)
+- name: per-fraction
+  tag: fraction
+  match: "*[1][contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])] and
+          *[2][contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])]"
+  replace:
+  - x: "*[1]"
+  - t: "per"      # phrase('5 meters 'per' second)
+  - x: "*[2]"
+
 - name: simple
   # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
   # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
