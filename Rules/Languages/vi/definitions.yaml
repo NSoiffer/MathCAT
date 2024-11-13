@@ -7,6 +7,173 @@
 # For numbers, 
 # - name: [] "...", "..." "..." ]
 
+- SIPrefixes: {
+    "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hecto", "da": "decka",
+    "d": "deci", "c": "centi", "m": "milli", "µ": "micro", "n": "nano", "p": "pico", "f": "femto", "a": "atto", "z": "zepto", "y": "yocto", "r": "ronto", "q": "quecto"
+  }
+
+# this is a list of all units that accept SIPrefixes
+# from www.bipm.org/documents/20126/41483022/SI-Brochure-9-EN.pdf
+#   Prefixes may be used with any of the 29 SI units with special names
+#   The SI prefixes can be used with several of accepted units, but not, for example, with the non-SI units of time.
+- SIUnits: {
+    # base units
+    "A": "amp",
+    "cd": "candela",
+    "K": "kelvin", "K": "kelvin", # U+212A
+    "g": "gram",
+    "m": "metre",     # British spelling works for US also
+    "mol": "mole",
+    "s": "second", "″": "second", "\"": "second", "sec": "second",  # "sec" not actually legal
+
+    # derived units
+    "Bq": "becquerel",
+    "C": "coulomb",
+    "°C": "degree celsius", "℃": "degree celsius",
+    "F": "farad",
+    "Gy": "gray",
+    "H": "henry",
+    "Hz": "hertz",
+    "J": "joule",
+    "kat": "kattel",
+    "lm": "lumen",
+    "lx": "lux",
+    "N": "newton",
+    "Ω": "ohm", "Ω": "ohm",       # Greek Cap letter, U+2126 OHM SIGN
+    "Pa": "pascal",
+    "rad": "radian",
+    "S": "siemens",
+    "Sv": "sievert",
+    "sr": "sterradion",
+    "T": "tesla",
+    "V": "volt",
+    "W": "watt",
+    "Wb": "weber",
+
+    # accepted (plus a few variants) that take SI prefixes
+    "l": "litre", "L": "litre", "ℓ": "litre",               # British spelling works for US also
+    "t": "metric ton",
+    "Da": "dalton",
+    "amu": "atomic mass unit", "u": "atomic mass unit",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
+    "au": "astronomical unit", "AU": "astronomical unit",
+    "eV": "electronvolt",
+  }
+
+
+- UnitsWithoutPrefixes: {
+    # time
+    "′": "minute", "'": "minute","min": "minute",
+    "h": "hour", "hr": "hour", "Hr": "hour",
+    "d": "day", "dy": "day",
+    "w": "week", "wk": "week",
+    "y": "year", "yr": "year",    
+
+    # angles (could be temperature)
+    "°": "degree", "deg": "degree",
+    "arcmin": "arcminute",
+    "amin": "arcminute",
+    "am": "arcminute",
+    "MOA": "arcminute",
+    "arcsec": "arcsecond",
+    "asec": "arcsecond",
+    "as": "arcsecond",
+
+    # other accepted units that don't take SI prefixes
+    "ha": "hectare",
+    "Np": "neper",
+    "B": "bel",
+    "dB": "decibel",
+
+    # distance
+    "ltyr": "light year", "ly": "light year",
+    "pc": "parsec",
+    "Å": "angstrom", "Å": "angstrom",           # U+00C5 and U+212B
+    "fm": "fermi",
+
+    # others
+    "atm": "atmosphere",
+    "bar": "bar",
+    "cal": "calorie",
+    "Ci": "curie",
+    "grad": "gradian",
+    "M": "molar",
+    "R": "roentgen",
+    "rpm": "revolution per minute",
+    "℧": "mho",
+    "dyn": "dyne",
+    "erg": "erg",
+
+  }
+
+  # this will only be used if the language is English, so it can be empty for other countries
+- EnglishUnits: {
+    # length
+    "in": "inch",
+    "ft": "foot",
+    "mi": "mile",
+    "rd": "rod",
+    "li": "link",
+    "ch": "chain",
+
+    # area
+    "sq in": "square inch", "sq. in": "square inch", "sq. in.": "square inch",
+    "sq ft": "square foot", "sq. ft": "square foot", "sq. ft.": "square foot",
+    "sq yd": "square yard", "sq. yd": "square yard", "sq. yd.": "square yard",
+    "sq mi": "square mile", "sq. mi": "square mile", "sq. mi.": "square mile",
+    "ac": "acre",
+    "FBM": "board foot",
+
+    # volume
+    "cu in": "cubic inch", "cu. in": "cubic inch", "cu. in.": "cubic inch",
+    "cu ft": "cubic foot", "cu. ft": "cubic foot", "cu. ft.": "cubic foot",
+    "cu yd": "cubic yard", "cu. yd": "cubic yard", "cu. yd.": "cubic yard",
+    "bbl": "barrel", "BBL": "barrel",
+    "pk": "peck",
+    "bu": "bushel",
+    "tsp": "teaspoon",
+    "tbl": "tablespoon",
+
+    # liquid
+    "fl dr": "fluid drams",
+    "fl oz": "fluid ounce",
+    "gi": "gill",
+    "cp": "cup", "cup": "cup",
+    "pt": "pint",
+    "qt": "quart",
+    "gal": "gallon",
+
+    # weight
+    "gr": "grain",
+    "dr": "dram",
+    "oz": "ounce", "℥": "ounce",
+    "lb": "pound",
+    "cwt": "hundredweight",
+    "dwt": "pennyweight",
+    "oz t": "troy ounce",
+    "lb t": "troy pound",
+
+    # energy
+    "hp": "horsepower",
+    "BTU": "BTU",
+    "°F": "degree fahrenheit", "℉": "degree fahrenheit",
+
+    # other
+    "mph": "mile per hour",
+    "mpg": "mile per gallon",
+  }
+
+- PluralForms: {
+  # FIX: this needs to be flushed out
+    "inch": "inches", "square inch": "square inches", "cubic inch": "cubic inches",
+    "foot": "feet", "square foot": "square feet", "cubic foot": "cubic feet",
+    "board foot": "board feet",
+    "degree celsius": "degrees celsius",
+    "degree fahrenheit": "degrees fahrenheit",
+    "hertz": "hertz",
+    "siemens": "siemens",
+    "revolution per minute": "revolutions per minute",
+  }
+
 - KnownWords: {
     "tạ", "yến", "và"
   }
