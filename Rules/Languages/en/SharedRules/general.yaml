@@ -359,8 +359,8 @@
   variables:
     # we need to look at preceding-sibling::*[2] because invisible times should have been added
     # if in a fraction, only count if we are in the numerator
-  - IsSingular: "DEBUG(parent::m:mrow and preceding-sibling::*[2][self::m:mn and . = 1]) or  
-                 DEBUG(ancestor::*[2][self::m:mrow] and parent::m:fraction and
+  - IsSingular: "(parent::m:mrow and preceding-sibling::*[2][self::m:mn and . = 1]) or  
+                 (ancestor::*[2][self::m:mrow] and parent::m:fraction and
                   (preceding-sibling::* or parent::*[preceding-sibling::*[2][self::m:mn and . = 1]])
                  )"
   - Prefix: "''"

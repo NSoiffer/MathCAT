@@ -354,7 +354,12 @@
   tag: mi
   match: "$Verbosity != 'Terse' and contains(@data-intent-property, ':unit')"
   variables:
-  - IsSingular: "preceding-sibling::*[2][self::m:mn and . = 1]"   # invisible times should have been added
+    # we need to look at preceding-sibling::*[2] because invisible times should have been added
+    # if in a fraction, only count if we are in the numerator
+  - IsSingular: "(parent::m:mrow and preceding-sibling::*[2][self::m:mn and . = 1]) or  
+                 (ancestor::*[2][self::m:mrow] and parent::m:fraction and
+                  (preceding-sibling::* or parent::*[preceding-sibling::*[2][self::m:mn and . = 1]])
+                 )"
   - Prefix: "''"
   - Word: "''"  
   replace:
