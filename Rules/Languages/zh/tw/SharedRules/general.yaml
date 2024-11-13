@@ -335,6 +335,77 @@
   - x: "*[3]"
   - pause: short
 
+
+# the order of matching is
+# 1. does it match the base of an SI unit
+# 2. does it match an English unit (if in an English language)
+# 3. does it match an SI prefix followed by an SI that accepts SI prefixes
+# Due to this order, some things like "ft" and "cd" mean "feet" vs "femto-tonnes" and "pints" vs "pico-tonnes"
+- name: unit
+  tag: mi
+  match: "$Verbosity != 'Terse' and contains(@data-intent-property, ':unit')"
+  variables:
+  - IsSingular: "preceding-sibling::*[2][self::m:mn and . = 1]"   # invisible times should have been added
+  - Prefix: "''"
+  - Word: "''"  
+  replace:
+  - bookmark: "@id"
+  - test:
+    # is the whole string match a SI Unit without a prefix?
+    - if: "DefinitionValue(., 'Speech', 'SIUnits') != ''"
+      then:
+      - set_variables: [Word: "DefinitionValue(., 'Speech', 'SIUnits')"]
+    - else_if: "DefinitionValue(., 'Speech', 'UnitsWithoutPrefixes') != ''"
+      then:
+      - set_variables: [Word: "DefinitionValue(., 'Speech', 'UnitsWithoutPrefixes')"]
+    - else_if: "DefinitionValue(., 'Speech', 'EnglishUnits') != ''"
+      then:
+      - set_variables: [Word: "DefinitionValue(., 'Speech', 'EnglishUnits')"]
+
+    # do the first two chars match "da" and the reminader match an SIUnit
+    - else_if: "string-length(.) >= 3 and 
+                substring(., 1, 2) = 'da' and
+                DefinitionValue(substring(., 3), 'Speech', 'SIUnits') != ''"
+      then:
+      - set_variables:
+        - Prefix: "DefinitionValue('da', 'Speech', 'SIPrefixes')"
+        - Word: "DefinitionValue(substring(., 3), 'Speech', 'SIUnits')"
+
+    # does the first char match a prefix and the reminader match an SIUnit
+    - else_if: "string-length(.) >= 2 and 
+                DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != ''  and
+                DefinitionValue(substring(., 2), 'Speech', 'SIUnits') != ''"
+      then:
+      - set_variables:
+        - Prefix: "DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes')"
+        - Word: "DefinitionValue(substring(., 2), 'Speech', 'SIUnits')"
+
+    # not a known unit -- just speak the text
+    - else:
+        x: "text()"
+  # somewhat complicated logic to avoid spaces around "-" as in "centi-grams" vs "centi - grams" -- probably doesn't matter
+  - test:
+      if: "$Prefix = ''"
+      then:
+      - test:
+        - if: "$IsSingular"
+          # HACK: '\uF8FE' is used internally for the concatination char by 'ct' -- this gets the prefix concatinated to the base
+          then: [x: "$Word"]
+        - else_if: "DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
+          then: [x: "DefinitionValue($Word, 'Speech', 'PluralForms')"]
+          else: [x: "$Word", ct: "s"]
+      else:
+      - x: "$Prefix"
+      - ct: "-"
+      - test:
+        - if: "$IsSingular"
+          # HACK: '\uF8FE' is used internally for the concatination char by 'ct' -- this gets the prefix concatinated to the base
+          then: [x: "concat('\uF8FE', $Word)"]
+        - else_if: "DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
+          then: [x: "DefinitionValue(concat('\uF8FE', $Word), 'Speech', 'PluralForms')"]
+          else: [x: "concat('\uF8FE', $Word)", ct: "s"]
+
+
 - name: sin
   tag: mi
   match: "text()='sin'"
