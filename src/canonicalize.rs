@@ -1802,22 +1802,21 @@ impl CanonicalizeContext {
 
 		/// look for potential numbers by looking for sequences with commas, spaces, and decimal points
 		fn merge_number_blocks(context: &CanonicalizeContext, parent_mrow: Element, children: &mut Vec<ChildOfElement>) {
-			// debug!("parent:\n{}", mml_to_string(&parent_mrow));
+			debug!("parent:\n{}", mml_to_string(&parent_mrow));
 			// If we find a comma that is not part of a number, don't form a number
 			//   (see https://github.com/NSoiffer/MathCAT/issues/271)
 			// Unfortunately, we can't do this in the loop below because we might discover the "not part of a number" after a number has been formed
-			if is_comma_not_part_of_a_number(children) {
-				return;
-			}
+			let do_not_merge_comma = is_comma_not_part_of_a_number(children);
+			debug!("  do_not_merge_comma={}", do_not_merge_comma);
 			let mut i = 0;
 			while i < children.len() {		// length might change after a merge
-				// {
-				// 	debug!("merge_number_blocks: top of loop");
-				// 	for (i_child, &child) in children[i..].iter().enumerate() {
-				// 		let child = as_element(child);
-				// 		debug!("child #{}: {}", i+i_child, mml_to_string(&child));
-				// 	}
-				// }
+				{
+					debug!("merge_number_blocks: top of loop");
+					for (i_child, &child) in children[i..].iter().enumerate() {
+						let child = as_element(child);
+						debug!("child #{}: {}", i+i_child, mml_to_string(&child));
+					}
+				}
 				let child = as_element(children[i]);
 				let child_name = name(&child);
 
@@ -1828,11 +1827,13 @@ impl CanonicalizeContext {
 					// or if the 'mn' has ',', '.', or space, consider it correctly parsed and move on
 					if is_roman_number_match(leaf_child_text) ||
 						context.patterns.block_separator.is_match(leaf_child_text) ||
-						(context.patterns.decimal_separator.is_match(leaf_child_text) && leaf_child_text.len() > 1) {
+						(leaf_child_text.len() > 1 && context.patterns.decimal_separator.is_match(leaf_child_text)) {
 						i += 1;
 						continue;
 					}
-				} else if child_name != "mo" || !context.patterns.decimal_separator.is_match(as_text(child)) {
+				} else if child_name != "mo" ||
+						  (do_not_merge_comma && as_text(child) == ",") ||
+						  !context.patterns.decimal_separator.is_match(as_text(child)) {
 					i += 1;
 					continue;
 				}
@@ -1858,8 +1859,9 @@ impl CanonicalizeContext {
 							let leaf_text = as_text(sibling);
 							let is_block_separator = context.patterns.block_separator.is_match(leaf_text);
 							let is_decimal_separator = context.patterns.decimal_separator.is_match(leaf_text);
-							if !(is_block_separator || is_decimal_separator) || 
-								(is_decimal_separator && has_decimal_separator) {
+							if (leaf_text == "," && do_not_merge_comma) ||
+							   !(is_block_separator || is_decimal_separator) || 
+							   (is_decimal_separator && has_decimal_separator) {
 								// not a separator or (it is decimal separator and we've already seen a decimal separator)
 								not_a_number = is_decimal_separator && has_decimal_separator;	// e.g., 1.2.3 or 1,2,3
 								break;
@@ -5593,6 +5595,51 @@ mod canonicalize_tests {
 			<mn>9</mn><mo>,</mo><mi>…</mi><mo>,</mo><mn>11</mn><mo>,</mo>
 			<mn>5</mn><mo>,</mo><mrow data-changed='added'><mo>.</mo><mo>.</mo></mrow>
 			<mo>,</mo><mn>8</mn></mrow></math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+
+	#[test]
+    fn no_merge_271() {
+        let test_str = "<math><mrow><mo>{</mo>
+				<mrow><mn>2</mn><mo>,</mo><mn>4</mn><mo>,</mo><mn>6</mn></mrow>
+			<mo>}</mo></mrow></math>";
+        let target_str = "<math><mrow><mo>{</mo>
+				<mrow><mn>2</mn><mo>,</mo><mn>4</mn><mo>,</mo><mn>6</mn></mrow>
+			<mo>}</mo></mrow></math>";
+    	assert!(are_strs_canonically_equal_with_locale(test_str, target_str, " .", ","));
+	}
+
+	#[test]
+    fn not_digit_block_271() {
+        let test_str = "<math><mrow>
+				<mi>…</mi><mo>,</mo>
+				<mo>-</mo><mn>2</mn><mo>,</mo>
+				<mo>-</mo><mn>1</mn><mo>,</mo>
+				<mn>0</mn>
+			</mrow></math>";
+        let target_str = "<math> <mrow>
+			<mi>…</mi>
+			<mo>,</mo>
+			<mrow data-changed='added'><mo>-</mo><mn>2</mn></mrow>
+			<mo>,</mo>
+			<mrow data-changed='added'><mo>-</mo><mn>1</mn></mrow>
+			<mo>,</mo>
+			<mn>0</mn>
+			</mrow></math>";
+    	assert!(are_strs_canonically_equal_with_locale(test_str, target_str, " .", ","));
+	}
+
+	#[test]
+    fn merge_decimal_in_list_271() {
+        let test_str = "<math><mi>x</mi><mo>,</mo><mn>2</mn><mo>.</mo><mn>5</mn><mi>g</mi><mo>,</mo><mn>3</mn></math>";
+        let target_str = "<math> <mrow data-changed='added'>
+				<mi>x</mi>
+				<mo>,</mo>
+				<mrow data-changed='added'> <mn>2.5</mn> <mo data-changed='added'>&#x2062;</mo> <mi>g</mi> </mrow>
+				<mo>,</mo>
+				<mn>3</mn>
+			</mrow> </math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
