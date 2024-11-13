@@ -132,6 +132,37 @@ fn denominator_simple_fraction() {
 
 
 #[test]
+fn frac_with_units() {
+    let expr = "
+    <math>
+        <mrow>
+        <mn>62</mn>
+        <mfrac>
+        <mi intent=':unit'>mi</mi>
+        <mi intent=':unit'>hr</mi>
+        </mfrac>
+        </mrow>
+    </math>";
+    test("en", "SimpleSpeak", expr, "62 miles per hour");
+}
+
+#[test]
+fn singular_frac_with_units() {
+    let expr = "
+    <math>
+        <mrow>
+        <mn>1</mn>
+        <mfrac>
+        <mi intent=':unit'>gal</mi>
+        <mi intent=':unit'>mi</mi>
+        </mfrac>
+        </mrow>
+    </math>";
+    test("en", "SimpleSpeak", expr, "1 gallon per mile");
+}
+
+
+#[test]
 fn mixed_number() {
     let expr = "<math>
                     <mn>3</mn>

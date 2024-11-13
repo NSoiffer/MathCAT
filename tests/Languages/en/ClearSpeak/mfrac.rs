@@ -63,6 +63,21 @@ fn non_simple_fraction() {
     test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose"),("ClearSpeak_Fractions", "Auto")], expr, "the fraction with numerator; x plus y; and denominator x minus y; end fraction,");
 }
 
+#[test]
+fn frac_with_units() {
+    let expr = "
+    <math>
+        <mrow>
+        <mn>62</mn>
+        <mfrac>
+        <mi intent=':unit'>mi</mi>
+        <mi intent=':unit'>hr</mi>
+        </mfrac>
+        </mrow>
+    </math>";
+    test("en", "ClearSpeak", expr, "62 miles per hour");
+}
+
 
 #[test]
 fn mixed_number() {
