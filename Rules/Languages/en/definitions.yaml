@@ -170,6 +170,8 @@
     "hertz": "hertz",
     "siemens": "siemens",
     "revolution per minute": "revolutions per minute",
+    "mile per hour": "miles per hour",
+    "mile per gallon": "miles per gallon",
   }
 
 # Lines starting with "#" are a comment
