@@ -6,6 +6,172 @@
 # For numbers, 
 # - name: [] "...", "..." "..." ]
 
+- SIPrefixes: {
+    "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hecto", "da": "deka",
+    "d": "deci", "c": "centi", "m": "mili", "µ": "micro", "n": "nano", "p": "pico", "f": "femto", "a": "atto", "z": "zepto", "y": "yocto", "r": "ronto", "q": "quecto"
+  }
+
+# this is a list of all units that accept SIPrefixes
+# from www.bipm.org/documents/20126/41483022/SI-Brochure-9-EN.pdf
+#   Prefixes may be used with any of the 29 SI units with special names
+#   The SI prefixes can be used with several of accepted units, but not, for example, with the non-SI units of time.
+- SIUnits: {
+    # base units
+    "A": "amperio",
+    "cd": "candela",
+    "K": "kelvin", "K": "kelvin", # U+212A
+    "g": "gramo",
+    "m": "metro",     # British spelling works for US also
+    "mol": "mol",
+    "s": "segundo", "″": "segundo", "\"": "segundo", "sec": "segundo",  # "sec" not actually legal
+
+    # derived units
+    "Bq": "becquerel",
+    "C": "culombio",
+    "°C": "grado Celsius", "℃": "grado Celsius",
+    "F": "faradio",
+    "Gy": "gray",
+    "H": "henrio",
+    "Hz": "hercio",
+    "J": "julio",
+    "kat": "katal",
+    "lm": "lumen",
+    "lx": "lux",
+    "N": "newton",
+    "Ω": "ohmio", "Ω": "ohmio",       # Greek Cap letter, U+2126 OHM SIGN
+    "Pa": "pascal",
+    "rad": "radián",
+    "S": "siemens",
+    "Sv": "sievert",
+    "sr": "estereorradián",
+    "T": "tesla",
+    "V": "voltio",
+    "W": "vatio",
+    "Wb": "weber",
+
+    # accepted (plus a few variants) that take SI prefixes
+    "l": "litro", "L": "litro", "ℓ": "litro",               # British spelling works for US also
+    "t": "tonelada métrica",
+    "Da": "dalton",
+    "amu": "unidad de masa atómica", "u": "unidad de masa atómica",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
+    "au": "unidad astronómica", "AU": "unidad astronómica",
+    "eV": "electronvoltio",
+  }
+
+
+- UnitsWithoutPrefixes: {
+    # time
+    "′": "minuto", "'": "minuto","min": "minuto",
+    "h": "hora", "hr": "hora", "Hr": "hora",
+    "d": "día", "dy": "día",
+    "w": "semana", "wk": "semana",
+    "y": "año", "yr": "año",    
+
+    # angles (could be temperature)
+    "°": "grado", "deg": "grado",
+    "arcmin": "minuto de arco",
+    "amin": "minuto de arco",
+    "am": "minuto de arco",
+    "MOA": "minuto de arco",
+    "arcsec": "segundo de arco",
+    "asec": "segundo de arco",
+    "as": "segundo de arco",
+
+    # other accepted units that don't take SI prefixes
+    "ha": "hectárea",
+    "Np": "néper",
+    "B": "belio",
+    "dB": "decibelio",
+
+    # distance
+    "ltyr": "año luz", "ly": "año luz",
+    "pc": "parsec",
+    "Å": "ángstrom", "Å": "ángstrom",           # U+00C5 and U+212B
+    "fm": "fermio",
+
+    # others
+    "atm": "atmósfera",
+    "bar": "bar",
+    "cal": "caloría",
+    "Ci": "curio",
+    "grad": "gradián",
+    "M": "molar",
+    "R": "roentgen",
+    "rpm": "revolución por minuto",
+    "℧": "mho",
+    "dyn": "dina",
+    "erg": "ergio",
+  }
+
+
+  # this will only be used if the language is English, so it can be empty for other countries
+- EnglishUnits: {
+    # length
+    "in": "inch",
+    "ft": "foot",
+    "mi": "mile",
+    "rd": "rod",
+    "li": "link",
+    "ch": "chain",
+
+    # area
+    "sq in": "square inch", "sq. in": "square inch", "sq. in.": "square inch",
+    "sq ft": "square foot", "sq. ft": "square foot", "sq. ft.": "square foot",
+    "sq yd": "square yard", "sq. yd": "square yard", "sq. yd.": "square yard",
+    "sq mi": "square mile", "sq. mi": "square mile", "sq. mi.": "square mile",
+    "ac": "acre",
+    "FBM": "board foot",
+
+    # volume
+    "cu in": "cubic inch", "cu. in": "cubic inch", "cu. in.": "cubic inch",
+    "cu ft": "cubic foot", "cu. ft": "cubic foot", "cu. ft.": "cubic foot",
+    "cu yd": "cubic yard", "cu. yd": "cubic yard", "cu. yd.": "cubic yard",
+    "bbl": "barrel", "BBL": "barrel",
+    "pk": "peck",
+    "bu": "bushel",
+    "tsp": "teaspoon",
+    "tbl": "tablespoon",
+
+    # liquid
+    "fl dr": "fluid drams",
+    "fl oz": "fluid ounce",
+    "gi": "gill",
+    "cp": "cup", "cup": "cup",
+    "pt": "pint",
+    "qt": "quart",
+    "gal": "gallon",
+
+    # weight
+    "gr": "grain",
+    "dr": "dram",
+    "oz": "ounce", "℥": "ounce",
+    "lb": "pound",
+    "cwt": "hundredweight",
+    "dwt": "pennyweight",
+    "oz t": "troy ounce",
+    "lb t": "troy pound",
+
+    # energy
+    "hp": "horsepower",
+    "BTU": "BTU",
+    "°F": "degree fahrenheit", "℉": "degree fahrenheit",
+
+    # other
+    "mph": "mile per hour",
+    "mpg": "mile per gallon",
+  }
+
+- PluralForms: {
+  # FIX: this needs to be flushed out
+    "inch": "inches", "square inch": "square inches", "cubic inch": "cubic inches",
+    "foot": "feet", "square foot": "square feet", "cubic foot": "cubic feet",
+    "board foot": "board feet",
+    "degree celsius": "degrees celsius",
+    "degree fahrenheit": "degrees fahrenheit",
+    "hertz": "hertz",
+    "siemens": "siemens",
+    "revolution per minute": "revolutions per minute",
+  }
 
 # ----------------  Cardinal and Ordinal Numbers  --------------------------
 # The following definitions are used to convert numbers to words
