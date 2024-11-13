@@ -345,12 +345,6 @@
   tag: mi
   match: "$Verbosity != 'Terse' and contains(@data-intent-property, ':unit')"
   variables:
-    # we need to look at preceding-sibling::*[2] because invisible times should have been added
-    # if in a fraction, only count if we are in the numerator
-  - IsSingular: "(parent::m:mrow and preceding-sibling::*[2][self::m:mn and . = 1]) or  
-                 (ancestor::*[2][self::m:mrow] and parent::m:fraction and
-                  (preceding-sibling::* or parent::*[preceding-sibling::*[2][self::m:mn and . = 1]])
-                 )"
   - Prefix: "''"
   - Word: "''"  
   replace:
@@ -367,19 +361,15 @@
       then:
       - set_variables: [Word: "DefinitionValue(., 'Speech', 'EnglishUnits')"]
 
-    # do the first two chars match "da" and the reminader match an SIUnit
-    - else_if: "string-length(.) >= 3 and 
-                substring(., 1, 2) = 'da' and
-                DefinitionValue(substring(., 3), 'Speech', 'SIUnits') != ''"
+    # does the first character "da" (the only none-single letter prefix)
+    - else_if: "string-length(.) >= 3 and substring(., 1, 2) = 'da' and DefinitionValue(substring(., 3), 'Speech', 'SIUnits') != ''"
       then:
       - set_variables:
         - Prefix: "DefinitionValue('da', 'Speech', 'SIPrefixes')"
         - Word: "DefinitionValue(substring(., 3), 'Speech', 'SIUnits')"
 
-    # does the first char match a prefix and the reminader match an SIUnit
-    - else_if: "string-length(.) >= 2 and 
-                DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != ''  and
-                DefinitionValue(substring(., 2), 'Speech', 'SIUnits') != ''"
+    # does the first character match a prefix
+    - else_if: "string-length(.) >= 2 and DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != ''"
       then:
       - set_variables:
         - Prefix: "DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes')"
@@ -391,14 +381,7 @@
   # somewhat complicated logic to avoid spaces around "-" as in "centi-grams" vs "centi - grams" -- probably doesn't matter
   - test:
       if: "$Prefix = ''"
-      then:
-      - test:
-        - if: "$IsSingular"
-          # HACK: '\uF8FE' is used internally for the concatination char by 'ct' -- this gets the prefix concatinated to the base
-          then: [x: "$Word"]
-        - else_if: "DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
-          then: [x: "DefinitionValue($Word, 'Speech', 'PluralForms')"]
-          else: [x: "$Word", ct: "s"]
+      then: [x: "$Word"]
       else:
       - x: "$Prefix"
       - ct: "-"
