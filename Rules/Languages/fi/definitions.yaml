@@ -98,6 +98,7 @@
     "cal": "kalori", # kaloria
     "Ci": "curie", # curieta
     "grad": "gooni", # goonia # FI: other possible names are graadi or uusaste
+    "M": "molaarinen", # FI: Has no plural form!
     "R": "röntgen", # röntgeniä
     "rpm": "kierros minuutissa", # kierrosta minuutissa
     "℧": "mho", # mhota
