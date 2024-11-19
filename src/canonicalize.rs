@@ -4029,7 +4029,7 @@ pub fn add_attrs<'a>(mathml: Element<'a>, attrs: &[Attribute]) -> Element<'a> {
 		"intent", "arg",
 	};
 	
-	debug!(   "Adding back {} attr(s) to {}", attrs.len(), name(&mathml));
+	// debug!(   "Adding back {} attr(s) to {}", attrs.len(), name(&mathml));
 	// remove non-global attrs
 	for attr in mathml.attributes() {
 		let attr_name = attr.name().local_part();
