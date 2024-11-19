@@ -162,7 +162,7 @@ fn multiple_element_set() {
     let expr = "<math>
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-    test("en", "ClearSpeak", expr, "the set 5 comma 10 comma 15");
+    test("en", "ClearSpeak", expr, "the set 5 comma, 10 comma, 15");
 }
 
 #[test]
@@ -430,7 +430,7 @@ fn multiple_element_set_woall() {
     let expr = "<math>
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-    test_ClearSpeak("en", "ClearSpeak_Sets", "woAll", expr, "the set 5 comma 10 comma 15");
+    test_ClearSpeak("en", "ClearSpeak_Sets", "woAll", expr, "the set 5 comma, 10 comma, 15");
 }
 
 #[test]
@@ -438,7 +438,7 @@ fn multiple_element_set_silent_bracket() {
     let expr = "<math>
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-            test_ClearSpeak("en", "ClearSpeak_Sets", "SilentBracket", expr, "5 comma 10 comma 15");
+            test_ClearSpeak("en", "ClearSpeak_Sets", "SilentBracket", expr, "5 comma, 10 comma, 15");
         }
 
 #[test]
