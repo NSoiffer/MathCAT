@@ -339,7 +339,7 @@ pub fn set_mathml_name(element: Element, new_name: &str) {
 pub fn replace_children<'a>(mathml: Element<'a>, replacements: Vec<Element<'a>>) -> Element<'a> {
 	if replacements.len() == 1 {
 		// rather than replace the children, the children are already in place, so we can optimize a little
-		add_attrs(mathml, replacements[0].attributes());
+		add_attrs(mathml, &replacements[0].attributes());
 		return mathml;
 	}
 
@@ -355,12 +355,12 @@ pub fn replace_children<'a>(mathml: Element<'a>, replacements: Vec<Element<'a>>)
 		// debug!("replace_children: parent before replace\n{}", mml_to_string(&parent));
 		// wrap an mrow around the replacements and then replace 'mathml' with that
 		let mrow = create_mathml_element(&mathml.document(), "mrow");
-		add_attrs(mrow, replacements[0].attributes());
+		add_attrs(mrow, &replacements[0].attributes());
 		mrow.append_children(replacements);
 		new_children.push(ChildOfElement::Element(mrow));
 		new_children.append(&mut following_siblings);
 		parent.replace_children(new_children);
-		// debug!("replace_children: parent\n{}", mml_to_string(&parent));
+		debug!("replace_children: parent\n{}", mml_to_string(&parent));
 		// debug!("replace_children: returned mrow\n{}", mml_to_string(&mrow));
 		return mrow;
 	} else {
@@ -964,7 +964,7 @@ impl CanonicalizeContext {
 						// "lift" the child up so all the links (e.g., siblings) are correct
 						mathml.replace_children(new_mathml.children());
 						set_mathml_name(mathml, name(&new_mathml));
-						add_attrs(mathml, new_mathml.attributes());
+						add_attrs(mathml, &new_mathml.attributes());
 						return Some(mathml);
 					} else if parent_requires_child {
 						// need a placeholder -- make it empty mtext
@@ -1025,7 +1025,7 @@ impl CanonicalizeContext {
 							// "lift" the child up so all the links (e.g., siblings) are correct
 							mathml.replace_children(new_mathml.children());
 							set_mathml_name(mathml, name(&new_mathml));
-							add_attrs(mathml, new_mathml.attributes());
+							add_attrs(mathml, &new_mathml.attributes());
 							return Some(mathml);
 						} else if parent_requires_child {
 							let empty = CanonicalizeContext::make_empty_element(mathml);
@@ -1101,7 +1101,7 @@ impl CanonicalizeContext {
 					let child = as_element(children[0]);
 					mathml.replace_children(child.children());
 					set_mathml_name(mathml, name(&child));
-					add_attrs(mathml, child.attributes());
+					add_attrs(mathml, &child.attributes());
 					return Some(mathml);		// child has already been cleaned, so we can return
 				}
 
@@ -2569,7 +2569,7 @@ impl CanonicalizeContext {
 
 			script.replace_children(new_children);
 			let lifted_base = as_element(mrow_children[i_multiscript]);
-			add_attrs(script, lifted_base.attributes());
+			add_attrs(script, &lifted_base.attributes());
 			script.remove_attribute("data-split");		// doesn't make sense on mmultiscripts
 			script.remove_attribute("mathvariant");		// doesn't make sense on mmultiscripts
 			mrow_children[i_multiscript] = ChildOfElement::Element(script);
@@ -2580,7 +2580,7 @@ impl CanonicalizeContext {
 				script.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
 			}
 
-			// debug!("convert_to_mmultiscripts -- converted script:\n{}", mml_to_string(&script));
+			debug!("convert_to_mmultiscripts -- converted script:\n{}", mml_to_string(&script));
 			// debug!("convert_to_mmultiscripts (at end) -- #children={}", mrow_children.len());
 			return i_multiscript + 1;		// child to start on next
 		}
@@ -4013,7 +4013,7 @@ impl CanonicalizeContext {
 		}
 	
 		parsed_mrow.remove_attribute(CHANGED_ATTR);
-		return Ok( add_attrs(parsed_mrow, saved_mrow_attrs) );
+		return Ok( add_attrs(parsed_mrow, &saved_mrow_attrs) );
 	}	
 }
 
@@ -4022,14 +4022,14 @@ fn top<'s, 'a:'s, 'op:'a>(vec: &'s[StackInfo<'a, 'op>]) -> &'s StackInfo<'a, 'op
 	return &vec[vec.len()-1];
 }
 // Replace the attrs of 'mathml' with 'attrs' and keep the global attrs of 'mathml' (i.e, lift 'attrs' to 'mathml' for replacing children)
-pub fn add_attrs<'a>(mathml: Element<'a>, attrs: Vec<Attribute>) -> Element<'a> {
+pub fn add_attrs<'a>(mathml: Element<'a>, attrs: &[Attribute]) -> Element<'a> {
 	static GLOBAL_ATTRS: phf::Set<&str> = phf_set! {
 		"class", "dir", "displaystyle", "id", "mathbackground", "mathcolor", "mathsize",
 		"mathvariant", "nonce", "scriptlevel", "style", "tabindex",
 		"intent", "arg",
 	};
 	
-	// debug!(   "Adding back {} attr(s) to {}", attrs.len(), name(&mathml));
+	debug!(   "Adding back {} attr(s) to {}", attrs.len(), name(&mathml));
 	// remove non-global attrs
 	for attr in mathml.attributes() {
 		let attr_name = attr.name().local_part();
