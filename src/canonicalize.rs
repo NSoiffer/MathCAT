@@ -844,6 +844,12 @@ impl CanonicalizeContext {
 					}
 					return Some(mathml);
 				} else if OPERATORS.get(text).is_some() {
+					if  let Some(intent_value) = mathml.attribute_value("intent") {
+						// if it is a unit, it might be seconds, minutes, feet, ... not an operator
+						if intent_value.contains(":unit") {
+							return Some(mathml);
+						}
+					}
 					set_mathml_name(mathml, "mo");
 					return Some(mathml);
 				} else if let Some(result) = merge_arc_trig(mathml) {
