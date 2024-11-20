@@ -269,7 +269,7 @@ fn si_accepted() {
                 1 steradiaani, pilkku; 2 steradiaania, pilkku, \
                 1 annum, pilkku; 2 annumia, pilkku; \
                 1 kaarisekuntia, pilkku; 2 kaarisekuntia, pilkku, \
-                1 bittiä, pilkku, 2 bittiä, pilkku, \
+                1 bitti, pilkku, 2 bittiä, pilkku, \
                 1 tavu, pilkku, 2 tavua, pilkku, \
                 1 baudi, pilkku, 2 baudia");
 }
@@ -444,22 +444,22 @@ fn without_prefix_powers_of_2() {
         <mn>1</mn><mi intent=":unit">YiB</mi><mo>,</mo><mn>2</mn><mi intent=":unit">YiB</mi>
     </math>"#;
     test("fi", "SimpleSpeak", expr, 
-        "1 kibi-bittiä, pilkku; 2 kibi-bittiäa, pilkku; \
-                1 mebi-bittiä, pilkku; 2 mebi-bittiäa, pilkku; \
-                1 gibi-bittiä, pilkku; 2 gibi-bittiäa, pilkku; \
-                1 tebi-bittiä, pilkku; 2 tebi-bittiäa, pilkku; \
-                1 pebi-bittiä, pilkku; 2 pebi-bittiäa, pilkku; \
-                1 exbi-bittiä, pilkku; 2 exbi-bittiäa, pilkku; \
-                1 zebi-bittiä, pilkku; 2 zebi-bittiäa, pilkku; \
-                1 yobi-bittiä, pilkku; 2 yobi-bittiäa, pilkku, \
+        "1 kibi-bitti, pilkku; 2 kibi-bittiä, pilkku; \
+                1 mebi-bitti, pilkku; 2 mebi-bittiä, pilkku; \
+                1 gibi-bitti, pilkku; 2 gibi-bittiä, pilkku; \
+                1 tebi-bitti, pilkku; 2 tebi-bittiä, pilkku; \
+                1 pebi-bitti, pilkku; 2 pebi-bittiä, pilkku; \
+                1 eksbi-bitti, pilkku; 2 eksbi-bittiä, pilkku; \
+                1 tsebi-bitti, pilkku; 2 tsebi-bittiä, pilkku; \
+                1 jobi-bitti, pilkku; 2 jobi-bittiä, pilkku, \
                 1 kibi-tavu, pilkku; 2 kibi-tavua, pilkku, \
                 1 mebi-tavu, pilkku; 2 mebi-tavua, pilkku, \
                 1 gibi-tavu, pilkku; 2 gibi-tavua, pilkku, \
                 1 tebi-tavu, pilkku; 2 tebi-tavua, pilkku, \
                 1 pebi-tavu, pilkku; 2 pebi-tavua, pilkku, \
-                1 exbi-tavu, pilkku; 2 exbi-tavua, pilkku, \
-                1 zebi-tavu, pilkku; 2 zebi-tavua, pilkku, \
-                1 yobi-tavu, pilkku; 2 yobi-tavua");
+                1 eksbi-tavu, pilkku; 2 eksbi-tavua, pilkku, \
+                1 tsebi-tavu, pilkku; 2 tsebi-tavua, pilkku, \
+                1 jobi-tavu, pilkku; 2 jobi-tavua");
 }
 
 
