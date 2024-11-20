@@ -352,7 +352,7 @@
       then:
       - set_variables: [Word: "DefinitionValue(., 'Speech', 'EnglishUnits')"]
 
-    # do the first two chars match "da" and the reminader match an SIUnit
+    # do the first two chars match "da" and the remainder match an SIUnit
     - else_if: "string-length(.) >= 3 and 
                 substring(., 1, 2) = 'da' and
                 DefinitionValue(substring(., 3), 'Speech', 'SIUnits') != ''"
@@ -361,7 +361,7 @@
         - Prefix: "DefinitionValue('da', 'Speech', 'SIPrefixes')"
         - Word: "DefinitionValue(substring(., 3), 'Speech', 'SIUnits')"
 
-    # does the first char match a prefix and the reminader match an SIUnit
+    # does the first char match a prefix and the remainder match an SIUnit
     - else_if: "string-length(.) >= 2 and 
                 DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != ''  and
                 DefinitionValue(substring(., 2), 'Speech', 'SIUnits') != ''"
@@ -388,7 +388,7 @@
           then:
           - test:
             - if: "$IsSingular"
-              # HACK: '\uF8FE' is used internally for the concatination char by 'ct' -- this gets the prefix concatinated to the base
+              # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets the prefix concatinated to the base
               then: [x: "$Word"]
             - else_if: "DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
               then: [x: "DefinitionValue($Word, 'Speech', 'PluralForms')"]
@@ -397,7 +397,7 @@
           - x: "$Prefix"
           - test:
             - if: "$IsSingular"
-              # HACK: '\uF8FE' is used internally for the concatination char by 'ct' -- this gets the prefix concatinated to the base
+              # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets the prefix concatinated to the base
               then: [x: "concat('\uF8FE', $Word)"]
             - else_if: "DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
               then: [x: "concat('\uF8FE', DefinitionValue($Word, 'Speech', 'PluralForms'))"]
