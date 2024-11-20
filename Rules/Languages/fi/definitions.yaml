@@ -114,8 +114,8 @@
     "erg": "ergi", # ergiä
 
     # powers of 2 used with bits and bytes
-    "Kib": "kibi-bittiä", "Mib": "mebi-bittiä", "Gib": "gibi-bittiä", "Tib": "tebi-bittiä", "Pib": "pebi-bittiä", "Eib": "exbi-bittiä", "Zib": "zebi-bittiä", "Yib": "yobi-bittiä",
-    "KiB": "kibi-tavu", "MiB": "mebi-tavu", "GiB": "gibi-tavu", "TiB": "tebi-tavu", "PiB": "pebi-tavu", "EiB": "exbi-tavu", "ZiB": "zebi-tavu", "YiB": "yobi-tavu",
+    "Kib": "kibibittiä", "Mib": "mebibittiä", "Gib": "gibibittiä", "Tib": "tebibittiä", "Pib": "pebibittiä", "Eib": "eksbibittiä", "Zib": "tsebibittiä", "Yib": "jobibittiä",
+    "KiB": "kibitavu", "MiB": "mebitavu", "GiB": "gibitavu", "TiB": "tebitavu", "PiB": "pebitavu", "EiB": "eksbitavu", "ZiB": "tsebitavu", "YiB": "jobitavu",
   }
 
   # this will only be used if the language is English, so it can be empty for other countries
