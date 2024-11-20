@@ -415,7 +415,7 @@ fn without_prefix_other() {
                 1 kalori, pilkku; 2 kaloria, pilkku, \
                 1 curie, pilkku; 2 curieta, pilkku, \
                 1 gooni, pilkku; 2 goonia, pilkku; \
-                1 molaarinen, pilkku; 2 molaarinena, pilkku, \
+                1 molaarinen, pilkku; 2 molaarinen, pilkku, \
                 1 röntgen, pilkku; 2 röntgeniä, pilkku; \
                 1 kierros minuutissa, pilkku; 2 kierrosta minuutissa, pilkku, \
                 1 mho, pilkku, 2 mhota, pilkku, \
