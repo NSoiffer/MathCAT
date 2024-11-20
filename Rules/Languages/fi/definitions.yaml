@@ -61,7 +61,7 @@
     "sr": "steradiaani", # steradiaania
   
     # others that take a prefix
-    "a": "annum",               # should only take positive powers
+    "a": "annum", # annumia               # should only take positive powers
     "as": "kaarisekunti", # kaarisekuntia
 
     # technically wrong, but used in practice with SI Units
@@ -230,7 +230,8 @@
     "pebibitti": "pebibittiä", 
     "eksbibitti": "eksbibittiä", 
     "tsebibitti": "tsebibittiä",
-    "jobibitti": "jobibittiä"
+    "jobibitti": "jobibittiä",
+    "annum": "annumia"
   }
 
 
