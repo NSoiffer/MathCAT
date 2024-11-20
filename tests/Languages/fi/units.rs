@@ -38,31 +38,31 @@ fn prefix_sweep() {
         <mi intent=":unit">rg</mi><mo>,</mo>
         <mi intent=":unit">qg</mi>
         </math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "quetta-grams, comma, \
-                ronna-grams, comma, \
-                yotta-grams, comma, \
-                zetta-grams, comma, \
-                exa-grams, comma, \
-                peta-grams, comma, \
-                tera-grams, comma, \
-                giga-grams, comma, \
-                mega-grams, comma, \
-                kilo-grams, comma, \
-                hecto-grams, comma, \
-                deka-grams, comma, \
-                deci-grams, comma, \
-                centi-grams, comma, \
-                milli-grams, comma, \
-                micro-grams, comma, \
-                nano-grams, comma, \
-                pico-grams, comma, \
-                femto-grams, comma, \
-                atto-grams, comma, \
-                zepto-grams, comma, \
-                yocto-grams, comma, \
-                ronto-grams, comma, \
-                quecto-grams");
+    test("fi", "SimpleSpeak", expr, 
+        "kvetta-grammaa, pilkku, \
+                ronna-grammaa, pilkku, \
+                jotta-grammaa, pilkku; \
+                tsetta-grammaa, pilkku, \
+                eksa-grammaa, pilkku, \
+                peta-grammaa, pilkku, \
+                tera-grammaa, pilkku, \
+                giga-grammaa, pilkku, \
+                mega-grammaa, pilkku, \
+                kilo-grammaa, pilkku, \
+                hekto-grammaa, pilkku, \
+                deka-grammaa, pilkku, \
+                desi-grammaa, pilkku; \
+                sentti-grammaa, pilkku, \
+                milli-grammaa, pilkku, \
+                mikro-grammaa, pilkku, \
+                nano-grammaa, pilkku, \
+                piko-grammaa, pilkku, \
+                femto-grammaa, pilkku, \
+                atto-grammaa, pilkku, \
+                zepto-grammaa, pilkku, \
+                jokto-grammaa, pilkku, \
+                ronto-grammaa, pilkku; \
+                kvekto-grammaa");
 }
 
 #[test]
@@ -80,18 +80,18 @@ fn si_base() {
         <mn>1</mn><mi intent=":unit">&quot;</mi><mo>,</mo><mn>2</mn><mi intent=":unit">&quot;</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">sec</mi><mo>,</mo><mn>2</mn><mi intent=":unit">sec</mi>
     </math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1 amp, comma, 2 amps, comma, \
-                1 candela, comma; 2 candelas, comma, \
-                1 kelvin, comma, 2 kelvins, comma, \
-                1 kelvin, comma, 2 kelvins, comma, \
-                1 gram, comma, 2 grams, comma, \
-                1 metre, comma, 2 metres, comma, \
-                1 mole, comma, 2 moles, comma, \
-                1 second, comma, 2 seconds, comma, \
-                1 second, comma, 2 seconds, comma, \
-                1 second, comma, 2 seconds, comma, \
-                1 second, comma, 2 seconds");
+    test("fi", "SimpleSpeak", expr, 
+        "1 ampeeri, pilkku; 2 ampeeria, pilkku, \
+                1 kandela, pilkku; 2 kandelaa, pilkku, \
+                1 kelvin, pilkku, 2 kelviniä, pilkku, \
+                1 kelvin, pilkku, 2 kelviniä, pilkku, \
+                1 gramma, pilkku; 2 grammaa, pilkku, \
+                1 metri, pilkku, 2 metriä, pilkku, \
+                1 mooli, pilkku; 2 moolia, pilkku, \
+                1 sekunti, pilkku; 2 sekuntia, pilkku, \
+                1 sekunti, pilkku; 2 sekuntia, pilkku, \
+                1 sekunti, pilkku; 2 sekuntia, pilkku, \
+                1 sekunti, pilkku; 2 sekuntia");
 }
 
 #[test]
@@ -107,16 +107,16 @@ fn si_base_with_prefixes() {
         <mn>1</mn><mi intent=":unit">ms</mi><mo>,</mo><mn>2</mn><mi intent=":unit">µs</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">nsec</mi><mo>,</mo><mn>2</mn><mi intent=":unit">psec</mi>
     </math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1 quetta-amp, comma; 2 ronna-amps, comma; \
-                1 yotta-candela, comma; 2 zetta-candelas, comma; \
-                1 exa-kelvin, comma; 2 peta-kelvins, comma; \
-                1 tera-kelvin, comma; 2 giga-kelvins, comma; \
-                1 mega-gram, comma; 2 kilo-grams, comma; \
-                1 hecto-metre, comma; 2 deka-metres, comma; \
-                1 deci-mole, comma; 2 centi-moles, comma; \
-                1 milli-second, comma; 2 micro-seconds, comma; \
-                1 nano-second, comma; 2 pico-seconds");
+    test("fi", "SimpleSpeak", expr, 
+        "1 kvetta-ampeeri, pilkku; 2 ronna-ampeeria, pilkku; \
+                1 jotta-kandela, pilkku; 2 tsetta-kandelaa; pilkku; \
+                1 eksa-kelvin, pilkku; 2 peta-kelviniä, pilkku; \
+                1 tera-kelvin, pilkku; 2 giga-kelviniä, pilkku; \
+                1 mega-gramma, pilkku; 2 kilo-grammaa, pilkku; \
+                1 hekto-metri, pilkku; 2 deka-metriä, pilkku; \
+                1 desi-mooli, pilkku; 2 sentti-moolia, pilkku; \
+                1 milli-sekunti, pilkku; 2 mikro-sekuntia, pilkku; \
+                1 nano-sekunti, pilkku; 2 piko-sekuntia");
 }
 
 
@@ -136,19 +136,19 @@ fn si_derived_1() {
         <mn>1</mn><mi intent=":unit">lm</mi><mo>,</mo><mn>2</mn><mi intent=":unit">lm</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">lx</mi><mo>,</mo><mn>2</mn><mi intent=":unit">lx</mi>
     </math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1 becquerel, comma; 2 becquerels, comma, \
-                1 coulomb, comma; 2 coulombs, comma; \
-                1 degree celsius, comma; 2 degrees celsius, comma; \
-                1 degree celsius, comma; 2 degrees celsius, comma, \
-                1 farad, comma, 2 farads, comma, \
-                1 gray, comma, 2 grays, comma, \
-                1 henry, comma, 2 henrys, comma, \
-                1 hertz, comma, 2 hertz, comma, \
-                1 joule, comma, 2 joules, comma, \
-                1 kattel, comma, 2 kattels, comma, \
-                1 lumen, comma, 2 lumens, comma, \
-                1 lux, comma, 2 luxs");
+    test("fi", "SimpleSpeak", expr, 
+        "1 bekrel, pilkku, 2 bekreliä, pilkku, \
+                1 kolumbi, pilkku; 2 kolumbia, pilkku; \
+                1 aste celsiusta, pilkku; 2 astetta celsiusta, pilkku; \
+                1 aste celsiusta, pilkku; 2 astetta celsiusta, pilkku, \
+                1 faradi, pilkku; 2 faradia, pilkku, \
+                1 grei, pilkku, 2 greitä, pilkku, \
+                1 henry, pilkku, 2 henryä, pilkku, \
+                1 hertsi, pilkku, 2 hertsiä, pilkku, \
+                1 joule, pilkku; 2 joulea, pilkku, \
+                1 kattel, pilkku, 2 kattelia, pilkku, \
+                1 lumen, pilkku, 2 lumenia, pilkku, \
+                1 luks, pilkku, 2 luksia");
 }
 
 #[test]
@@ -167,19 +167,19 @@ fn si_derived_1_with_prefixes() {
         <mn>1</mn><mi intent=":unit">m°C</mi><mo>,</mo><mn>2</mn><mi intent=":unit">µ°C</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">p℃</mi><mo>,</mo><mn>2</mn><mi intent=":unit">n℃</mi>
     </math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1 quetta-becquerel, comma; 2 ronna-becquerels; comma; \
-                1 yotta-coulombs, comma; 2 zetta-coulombs, comma; \
-                1 exa-farad, comma; 2 peta-farads, comma; \
-                1 tera-gray, comma; 2 giga-grays, comma; \
-                1 mega-henry, comma; 2 kilo-henrys, comma; \
-                1 deka-hertz, comma; 2 deci-hertz, comma; \
-                1 centi-joule, comma; 2 milli-joules, comma; \
-                1 micro-kattel, comma; 2 nano-kattels, comma; \
-                1 pico-lumen, comma; 2 femto-lumens, comma; \
-                1 atto-lux, comma; 2 zepto-luxs, comma; \
-                1 milli-degree celsius; comma; 2 micro-degrees celsius; comma; \
-                1 pico-degree celsius; comma; 2 nano-degrees celsius");
+    test("fi", "SimpleSpeak", expr, 
+        "1 kvetta-bekrel, pilkku; 2 ronna-bekreliä, pilkku; \
+                1 jotta-kolumbia, pilkku; 2 tsetta-kolumbia; pilkku; \
+                1 eksa-faradi, pilkku; 2 peta-faradia, pilkku; \
+                1 tera-grei, pilkku; 2 giga-greitä, pilkku; \
+                1 mega-henry, pilkku; 2 kilo-henryä, pilkku; \
+                1 deka-hertsi, pilkku; 2 desi-hertsiä, pilkku; \
+                1 sentti-joule, pilkku; 2 milli-joulea, pilkku; \
+                1 mikro-kattel, pilkku; 2 nano-kattelia, pilkku; \
+                1 piko-lumen, pilkku; 2 femto-lumenia, pilkku; \
+                1 atto-luks, pilkku; 2 zepto-luksia, pilkku; \
+                1 milli-aste celsiusta; pilkku; 2 mikro-astetta celsiusta; pilkku; \
+                1 piko-aste celsiusta; pilkku; 2 nano-astetta celsiusta");
 }
 
 #[test]
@@ -196,17 +196,17 @@ fn si_derived_2() {
         <mn>1</mn><mi intent=":unit">W</mi><mo>,</mo><mn>2</mn><mi intent=":unit">W</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">Wb</mi><mo>,</mo><mn>2</mn><mi intent=":unit">Wb</mi>
     </math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1 newton, comma, 2 newtons, comma, \
-                1 ohm, comma, 2 ohms, comma, \
-                1 ohm, comma, 2 ohms, comma, \
-                1 pascal, comma, 2 pascals, comma, \
-                1 siemens, comma, 2 siemens, comma, \
-                1 sievert, comma; 2 sieverts, comma, \
-                1 tesla, comma, 2 teslas, comma, \
-                1 volt, comma, 2 volts, comma, \
-                1 watt, comma, 2 watts, comma, \
-                1 weber, comma, 2 webers");
+    test("fi", "SimpleSpeak", expr, 
+        "1 newton, pilkku, 2 newtonia, pilkku, \
+                1 ohm, pilkku, 2 ohmia, pilkku, \
+                1 ohm, pilkku, 2 ohmia, pilkku, \
+                1 pascal, pilkku, 2 pascalia, pilkku, \
+                1 siemens, pilkku; 2 siemensiä, pilkku, \
+                1 sievert, pilkku; 2 sievertiä, pilkku, \
+                1 tesla, pilkku; 2 teslaa, pilkku, \
+                1 volt, pilkku, 2 volttia, pilkku, \
+                1 watti, pilkku, 2 wattia, pilkku, \
+                1 weber, pilkku, 2 weberiä");
 }
 
 #[test]
@@ -223,17 +223,17 @@ fn si_derived_2_with_prefixes() {
         <mn>1</mn><mi intent=":unit">GW</mi><mo>,</mo><mn>2</mn><mi intent=":unit">TW</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">PWb</mi><mo>,</mo><mn>2</mn><mi intent=":unit">EWb</mi>
     </math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1 quecto-newton, comma; 2 ronto-newtons, comma; \
-                1 yocto-ohm, comma; 2 zepto-ohms, comma; \
-                1 atto-ohm, comma; 2 femto-ohms, comma; \
-                1 pico-pascal, comma; 2 nano-pascals, comma; \
-                1 micro-siemens, comma; 2 milli-siemens, comma; \
-                1 centi-sievert, comma; 2 deci-sieverts, comma; \
-                1 deka-tesla, comma; 2 hecto-teslas, comma; \
-                1 kilo-volt, comma; 2 mega-volts, comma; \
-                1 giga-watt, comma; 2 tera-watts, comma; \
-                1 peta-weber, comma; 2 exa-webers");
+    test("fi", "SimpleSpeak", expr, 
+        "1 kvekto-newton, pilkku; 2 ronto-newtonia, pilkku; \
+                1 jokto-ohm, pilkku; 2 zepto-ohmia, pilkku; \
+                1 atto-ohm, pilkku; 2 femto-ohmia, pilkku; \
+                1 piko-pascal, pilkku; 2 nano-pascalia, pilkku; \
+                1 mikro-siemens, pilkku; 2 milli-siemensiä, pilkku; \
+                1 sentti-sievert, pilkku; 2 desi-sievertiä, pilkku; \
+                1 deka-tesla, pilkku; 2 hekto-teslaa, pilkku; \
+                1 kilo-volt, pilkku; 2 mega-volttia, pilkku; \
+                1 giga-watti, pilkku; 2 tera-wattia, pilkku; \
+                1 peta-weber, pilkku; 2 eksa-weberiä");
 }
 
 
@@ -256,22 +256,22 @@ fn si_accepted() {
         <mn>1</mn><mi intent=":unit">B</mi><mo>,</mo><mn>2</mn><mi intent=":unit">B</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">Bd</mi><mo>,</mo><mn>2</mn><mi intent=":unit">Bd</mi>
     </math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1 litre, comma, 2 litres, comma, \
-                1 litre, comma, 2 litres, comma, \
-                1 litre, comma, 2 litres, comma, \
-                1 metric ton, comma; 2 metric tons, comma, \
-                1 dalton, comma, 2 daltons, comma, \
-                1 neper, comma, 2 nepers, comma; \
-                1 atomic mass unit, comma; 2 atomic mass units, comma; \
-                1 electronvolt, comma; 2 electronvolts, comma, \
-                1 radian, comma, 2 radians, comma, \
-                1 sterradion, comma; 2 sterradions, comma, \
-                1 annum, comma, 2 annums, comma, \
-                1 arcsecond, comma; 2 arcseconds, comma, \
-                1 bit, comma, 2 bits, comma, \
-                1 byte, comma, 2 bytes, comma, \
-                1 baud, comma, 2 bauds");
+    test("fi", "SimpleSpeak", expr, 
+        "1 litra, pilkku; 2 litraa, pilkku, \
+                1 litra, pilkku; 2 litraa, pilkku, \
+                1 litra, pilkku; 2 litraa, pilkku, \
+                1 tonni, pilkku; 2 tonnia, pilkku, \
+                1 dalton, pilkku, 2 daltonia, pilkku, \
+                1 neper, pilkku, 2 neperiä, pilkku; \
+                1 atomimassayksikkö, pilkku; 2 atomimassayksikköä, pilkku; \
+                1 elektronivoltti, pilkku; 2 elektronivolttia, pilkku, \
+                1 radiaani, pilkku; 2 radiaania, pilkku; \
+                1 steradiaani, pilkku; 2 steradiaania, pilkku, \
+                1 annum, pilkku; 2 annuma, pilkku; \
+                1 kaarisekuntia, pilkku; 2 kaarisekuntiaa, pilkku, \
+                1 bittiä, pilkku, 2 bittiä, pilkku, \
+                1 tavu, pilkku, 2 tavua, pilkku, \
+                1 baudi, pilkku, 2 baudi");
 }
 
 #[test]
@@ -293,22 +293,22 @@ fn si_accepted_with_prefixes() {
         <mn>1</mn><mi intent=":unit">GB</mi><mo>,</mo><mn>2</mn><mi intent=":unit">TB</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">TBd</mi><mo>,</mo><mn>2</mn><mi intent=":unit">EBd</mi>
     </math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1 quetta-litre, comma; 2 ronna-litres, comma; \
-                1 yotta-litre, comma; 2 zetta-litres, comma; \
-                1 exa-litre, comma; 2 peta-litres, comma; \
-                1 tera-metric ton, comma; 2 giga-metric tons; comma; \
-                1 mega-dalton, comma; 2 kilo-daltons, comma; \
-                1 deci-neper, comma; 2 centi-nepers, comma; \
-                1 hecto-atomic mass unit; comma; 2 deka-atomic mass units; comma; \
-                1 milli-electronvolt, comma; 2 micro-electronvolts; comma; \
-                1 nano-radian, comma; 2 pico-radians, comma; \
-                1 femto-sterradion, comma; 2 atto-sterradions; comma; \
-                1 giga-annum, comma; 2 mega-annums, comma; \
-                1 zepto-arcsecond, comma; 2 yocto-arcseconds; comma; \
-                1 kilo-bit, comma; 2 mega-bits, comma; \
-                1 giga-byte, comma; 2 tera-bytes, comma; \
-                1 tera-baud, comma; 2 exa-bauds");
+    test("fi", "SimpleSpeak", expr, 
+        "1 kvetta-litra, pilkku; 2 ronna-litraa, pilkku; \
+                1 jotta-litra, pilkku; 2 tsetta-litraa, pilkku; \
+                1 eksa-litra, pilkku; 2 peta-litraa, pilkku; \
+                1 tera-tonni, pilkku; 2 giga-tonnia, pilkku; \
+                1 mega-dalton, pilkku; 2 kilo-daltonia, pilkku; \
+                1 desi-neper, pilkku; 2 sentti-neperiä, pilkku; \
+                1 hekto-atomimassayksikkö; pilkku; 2 deka-atomimassayksikköä; pilkku; \
+                1 milli-elektronivoltti; pilkku; 2 mikro-elektronivolttia; pilkku; \
+                1 nano-radiaani, pilkku; 2 piko-radiaania, pilkku; \
+                1 femto-steradiaani, pilkku; 2 atto-steradiaania; pilkku; \
+                1 giga-annum, pilkku; 2 mega-annuma, pilkku; \
+                1 zepto-kaarisekuntia; pilkku; 2 jokto-kaarisekuntiaa; pilkku; \
+                1 kilo-bittiä, pilkku; 2 mega-bittiä, pilkku; \
+                1 giga-tavu, pilkku; 2 tera-tavua, pilkku; \
+                1 tera-baudi, pilkku; 2 eksa-baudi");
 }
 
 #[test]
@@ -329,21 +329,21 @@ fn without_prefix_time() {
         <mn>1</mn><mi intent=":unit">y</mi><mo>,</mo><mn>2</mn><mi intent=":unit">y</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">yr</mi><mo>,</mo><mn>2</mn><mi intent=":unit">yr</mi>
     </math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1 second, comma, 2 seconds, comma, \
-                1 second, comma, 2 seconds, comma, \
-                1 minute, comma, 2 minutes, comma, \
-                1 minute, comma, 2 minutes, comma, \
-                1 minute, comma, 2 minutes, comma, \
-                1 hour, comma, 2 hours, comma, \
-                1 hour, comma, 2 hours, comma, \
-                1 hour, comma, 2 hours, comma, \
-                1 day, comma, 2 days, comma, \
-                1 day, comma, 2 days, comma, \
-                1 week, comma, 2 weeks, comma, \
-                1 week, comma, 2 weeks, comma, \
-                1 year, comma, 2 years, comma, \
-                1 year, comma, 2 years");
+    test("fi", "SimpleSpeak", expr, 
+        "1 sekunti, pilkku; 2 sekuntia, pilkku, \
+                1 sekunti, pilkku; 2 sekuntia, pilkku, \
+                1 minuutti, pilkku; 2 minuuttia, pilkku, \
+                1 minuutti, pilkku; 2 minuuttia, pilkku, \
+                1 minuutti, pilkku; 2 minuuttia, pilkku, \
+                1 tunti, pilkku; 2 tuntia, pilkku, \
+                1 tunti, pilkku; 2 tuntia, pilkku, \
+                1 tunti, pilkku; 2 tuntia, pilkku; \
+                1 vuorokausi, pilkku; 2 vuorokautta, pilkku; \
+                1 vuorokausi, pilkku; 2 vuorokautta, pilkku, \
+                1 viikko, pilkku; 2 viikkoa, pilkku, \
+                1 viikko, pilkku; 2 viikkoa, pilkku, \
+                1 vuosi, pilkku, 2 vuotta, pilkku, \
+                1 vuosi, pilkku, 2 vuotta");
 }
 
 #[test]
@@ -358,15 +358,15 @@ fn without_prefix_angles() {
         <mn>1</mn><mi intent=":unit">arcsec</mi><mo>,</mo><mn>2</mn><mi intent=":unit">arcsec</mi><mo>,</mo> 
         <mn>1</mn><mi intent=":unit">asec</mi><mo>,</mo><mn>2</mn><mi intent=":unit">asec</mi>
     </math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1 degree, comma, 2 degrees, comma, \
-                1 degree, comma, 2 degrees, comma, \
-                1 arcminute, comma; 2 arcminutes, comma, \
-                1 arcminute, comma; 2 arcminutes, comma, \
-                1 arcminute, comma; 2 arcminutes, comma, \
-                1 arcminute, comma; 2 arcminutes, comma, \
-                1 arcsecond, comma; 2 arcseconds, comma, \
-                1 arcsecond, comma; 2 arcseconds");
+    test("fi", "SimpleSpeak", expr, 
+        "1 aste, pilkku, 2 astetta, pilkku, \
+                1 aste, pilkku, 2 astetta, pilkku; \
+                1 kaariminuutti, pilkku; 2 kaariminuuttia, pilkku; \
+                1 kaariminuutti, pilkku; 2 kaariminuuttia, pilkku; \
+                1 kaariminuutti, pilkku; 2 kaariminuuttia, pilkku; \
+                1 kaariminuutti, pilkku; 2 kaariminuuttia, pilkku; \
+                1 kaarisekuntia, pilkku; 2 kaarisekuntiaa, pilkku; \
+                1 kaarisekuntia, pilkku; 2 kaarisekuntiaa");
 }
 
 #[test]
@@ -379,13 +379,13 @@ fn without_prefix_distance() {
         <mn>1</mn><mi intent=":unit">Å</mi><mo>,</mo><mn>2</mn><mi intent=":unit">Å</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">fm</mi><mo>,</mo><mn>2</mn><mi intent=":unit">fm</mi>
     </math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1 astronomical unit, comma; 2 astronomical units, comma, \
-                1 light year, comma; 2 light years, comma, \
-                1 parsec, comma, 2 parsecs, comma, \
-                1 angstrom, comma; 2 angstroms, comma, \
-                1 angstrom, comma; 2 angstroms, comma, \
-                1 fermi, comma, 2 fermis");
+    test("fi", "SimpleSpeak", expr, 
+        "1 astroniminen yksikkö, pilkku; 2 astroniminen yksikköa, pilkku, \
+                1 valovuosi, pilkku; 2 valovuotta, pilkku, \
+                1 parsek, pilkku, 2 parsekia, pilkku; \
+                1 ångström, pilkku; 2 ångströmiä, pilkku; \
+                1 ångström, pilkku; 2 ångströmiä, pilkku, \
+                1 fermi, pilkku, 2 fermiä");
 }
 
 #[test]
@@ -406,21 +406,21 @@ fn without_prefix_other() {
         <mn>1</mn><mi intent=":unit">dyn</mi><mo>,</mo><mn>2</mn><mi intent=":unit">dyn</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">erg</mi><mo>,</mo><mn>2</mn><mi intent=":unit">erg</mi>
     </math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1 hectare, comma; 2 hectares, comma, \
-                1 decibel, comma; 2 decibels, comma, \
-                1 atmosphere, comma; 2 atmospheres, comma; \
-                1 atomic mass unit, comma; 2 atomic mass units, comma, \
-                1 bar, comma, 2 bars, comma, \
-                1 calorie, comma; 2 calories, comma, \
-                1 curie, comma, 2 curies, comma, \
-                1 gradian, comma; 2 gradians, comma, \
-                1 molar, comma, 2 molars, comma, \
-                1 roentgen, comma; 2 roentgens, comma; \
-                1 revolution per minute, comma; 2 revolutions per minute, comma, \
-                1 m-h-o, comma, 2 m-h-os, comma, \
-                1 dyne, comma, 2 dynes, comma, \
-                1 erg, comma, 2 ergs");
+    test("fi", "SimpleSpeak", expr, 
+        "1 hehtaari, pilkku; 2 hehtaaria, pilkku, \
+                1 desibeli, pilkku; 2 desibeliä, pilkku; \
+                1 normaali-ilmakehä, pilkku; 2 normaali-ilmakehää, pilkku; \
+                1 atomimassayksikkö, pilkku; 2 atomimassayksikköä, pilkku, \
+                1 baari, pilkku; 2 baaria, pilkku, \
+                1 kalori, pilkku; 2 kaloria, pilkku, \
+                1 curie, pilkku; 2 curiea, pilkku, \
+                1 gooni, pilkku; 2 goonia, pilkku; \
+                1 molaarinen, pilkku; 2 molaarinena, pilkku, \
+                1 röntgen, pilkku; 2 röntgeniä, pilkku; \
+                1 kierros minuutissa, pilkku; 2 kierrosta minuutissa, pilkku, \
+                1 mho, pilkku, 2 mhota, pilkku, \
+                1 dyne, pilkku, 2 dyneä, pilkku, \
+                1 ergi, pilkku, 2 ergiä");
 }
 
 #[test]
@@ -443,23 +443,23 @@ fn without_prefix_powers_of_2() {
         <mn>1</mn><mi intent=":unit">ZiB</mi><mo>,</mo><mn>2</mn><mi intent=":unit">ZiB</mi><mo>,</mo> 
         <mn>1</mn><mi intent=":unit">YiB</mi><mo>,</mo><mn>2</mn><mi intent=":unit">YiB</mi>
     </math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1 kibi-bit, comma; 2 kibi-bits, comma, \
-                1 mebi-bit, comma; 2 mebi-bits, comma, \
-                1 gibi-bit, comma; 2 gibi-bits, comma, \
-                1 tebi-bit, comma; 2 tebi-bits, comma, \
-                1 pebi-bit, comma; 2 pebi-bits, comma, \
-                1 exbi-bit, comma; 2 exbi-bits, comma, \
-                1 zebi-bit, comma; 2 zebi-bits, comma, \
-                1 yobi-bit, comma; 2 yobi-bits, comma, \
-                1 kibi-byte, comma; 2 kibi-bytes, comma, \
-                1 mebi-byte, comma; 2 mebi-bytes, comma, \
-                1 gibi-byte, comma; 2 gibi-bytes, comma, \
-                1 tebi-byte, comma; 2 tebi-bytes, comma, \
-                1 pebi-byte, comma; 2 pebi-bytes, comma, \
-                1 exbi-byte, comma; 2 exbi-bytes, comma, \
-                1 zebi-byte, comma; 2 zebi-bytes, comma, \
-                1 yobi-byte, comma; 2 yobi-bytes");
+    test("fi", "SimpleSpeak", expr, 
+        "1 kibi-bittiä, pilkku; 2 kibi-bittiäa, pilkku; \
+                1 mebi-bittiä, pilkku; 2 mebi-bittiäa, pilkku; \
+                1 gibi-bittiä, pilkku; 2 gibi-bittiäa, pilkku; \
+                1 tebi-bittiä, pilkku; 2 tebi-bittiäa, pilkku; \
+                1 pebi-bittiä, pilkku; 2 pebi-bittiäa, pilkku; \
+                1 exbi-bittiä, pilkku; 2 exbi-bittiäa, pilkku; \
+                1 zebi-bittiä, pilkku; 2 zebi-bittiäa, pilkku; \
+                1 yobi-bittiä, pilkku; 2 yobi-bittiäa, pilkku, \
+                1 kibi-tavu, pilkku; 2 kibi-tavua, pilkku, \
+                1 mebi-tavu, pilkku; 2 mebi-tavua, pilkku, \
+                1 gibi-tavu, pilkku; 2 gibi-tavua, pilkku, \
+                1 tebi-tavu, pilkku; 2 tebi-tavua, pilkku, \
+                1 pebi-tavu, pilkku; 2 pebi-tavua, pilkku, \
+                1 exbi-tavu, pilkku; 2 exbi-tavua, pilkku, \
+                1 zebi-tavu, pilkku; 2 zebi-tavua, pilkku, \
+                1 yobi-tavu, pilkku; 2 yobi-tavua");
 }
 
 
@@ -473,9 +473,9 @@ fn si_other_numbers() {
                             <mn>1235</mn><mi intent=":unit">daN</mi><mo>,</mo>
                             <mn>2.5</mn><mi intent=":unit">&#xB5;sec</mi><mo>,</mo>
                             <mn>32.34</mn><mi intent=":unit">mol</mi></math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "1.0 litre, comma; 2.0 metres, comma; x milli-seconds, comma; y micro-seconds, comma, \
-                deka-grams, comma; 1235 deka-newtons; comma; 2.5 micro-seconds; comma; 32.34 moles");
+    test("fi", "SimpleSpeak", expr, 
+        "1.0 litra, pilkku, 2.0 metriä, pilkku; x milli-sekuntia, pilkku; y mikro-sekuntia, pilkku, \
+                deka-grammaa, pilkku; 1235 deka-newtonia, pilkku; 2.5 mikro-sekuntia; pilkku; 32.34 moolia");
 }
 
 
@@ -487,7 +487,7 @@ fn test_mtext_inference() {
                 <mn>3</mn><mtext>Pa</mtext><mo>,</mo>
                 <mn>4.5</mn><mtext>mT</mtext>
             <mo>]</mo></math>"#;
-    test("en", "SimpleSpeak", expr, 
-        "open bracket; 1 metric ton, comma; 2 peta-amps, comma, \
-                3 pascals, comma; 4.5 milli-teslas; close bracket");
+    test("fi", "SimpleSpeak", expr, 
+        "auki hakasulku; 1 tonni, pilkku; 2 peta-ampeeria, pilkku, \
+                3 pascalia, pilkku; 4.5 milli-teslaa; kiinni hakasulku");
 }

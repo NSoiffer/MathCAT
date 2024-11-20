@@ -12,23 +12,23 @@
   }
 
 # this is a list of all units that accept SIPrefixes
-# from www.bipm.org/documents/20126/41483022/SI-Brochure-9-EN.pdf
+# from www.bipm.org/documents/20126/41483022/SIBrochure-9-EN.pdf
 #   Prefixes may be used with any of the 29 SI units with special names
 #   The SI prefixes can be used with several of accepted units, but not, for example, with the non-SI units of time.
 - SIUnits: {
     # base units
     "A": "amperio",
     "cd": "candela",
-    "K": "kelvin", "K": "kelvin", # U+212A
+    "K": "grado kelvin", "K": "grado kelvin", # U+212A
     "g": "gramo",
     "m": "metro",     # British spelling works for US also
     "mol": "mol",
-    "s": "segundo", "″": "segundo", "\"": "segundo", "sec": "segundo",  # "sec" not actually legal
+    "s": "segundo", "sec": "segundo",  # "sec" not actually legal
 
     # derived units
     "Bq": "becquerel",
     "C": "culombio",
-    "°C": "grado Celsius", "℃": "grado Celsius",
+    "°C": "grado Celsius", "℃": "grado Celsius",  # should only take negative powers
     "F": "faradio",
     "Gy": "gray",
     "H": "henrio",
@@ -40,57 +40,66 @@
     "N": "newton",
     "Ω": "ohmio", "Ω": "ohmio",       # Greek Cap letter, U+2126 OHM SIGN
     "Pa": "pascal",
-    "rad": "radián",
     "S": "siemens",
     "Sv": "sievert",
-    "sr": "estereorradián",
     "T": "tesla",
     "V": "voltio",
     "W": "vatio",
     "Wb": "weber",
 
     # accepted (plus a few variants) that take SI prefixes
-    "l": "litro", "L": "litro", "ℓ": "litro",               # British spelling works for US also
-    "t": "tonelada métrica",
+    "l": "litro", "L": "litro", "ℓ": "litro", # Should only take negative powers; British spelling works for US also
+    "t": "tonelada",             # should only take positive powers
     "Da": "dalton",
-    "amu": "unidad de masa atómica", "u": "unidad de masa atómica",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
-    "au": "unidad astronómica", "AU": "unidad astronómica",
+    "Np": "néper",               # should only take negative powers
+    "u": "unidad de masa atómica",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
     "eV": "electronvoltio",
+    "rad": "radián",             # should only take negative powers
+    "sr": "estereorradián",      # should only take negative powers
+
+    # others that take a prefix
+    "a": "año",                 # should only take positive powers
+    "as": "segundo de arco",    # see en.wikipedia.org/wiki/Minute_and_second_of_arc
+
+    # technically wrong, but used in practice with SI Units (and only positive powers)
+    "b": "bit",                 # should only take positive powers
+    "B": "byte",                # should only take positive powers
+    "Bd": "baudio",             # should only take positive powers
   }
 
 
 - UnitsWithoutPrefixes: {
     # time
+    "″": "segundo", "\"": "segundo", 
     "′": "minuto", "'": "minuto","min": "minuto",
     "h": "hora", "hr": "hora", "Hr": "hora",
     "d": "día", "dy": "día",
     "w": "semana", "wk": "semana",
     "y": "año", "yr": "año",    
 
-    # angles (could be temperature)
-    "°": "grado", "deg": "grado",
+    # angles
+    "°": "grado", "deg": "grado", # should only take negative powers
     "arcmin": "minuto de arco",
     "amin": "minuto de arco",
     "am": "minuto de arco",
     "MOA": "minuto de arco",
     "arcsec": "segundo de arco",
     "asec": "segundo de arco",
-    "as": "segundo de arco",
-
-    # other accepted units that don't take SI prefixes
-    "ha": "hectárea",
-    "Np": "néper",
-    "B": "belio",
-    "dB": "decibelio",
 
     # distance
+    "au": "unidad astronómica", "AU": "unidad astronómica",
     "ltyr": "año luz", "ly": "año luz",
     "pc": "parsec",
     "Å": "ángstrom", "Å": "ángstrom",           # U+00C5 and U+212B
     "fm": "fermio",
 
     # others
+    "ha": "hectárea",
+    # "B": "belio",    # "B" more commonly means bytes
+    "dB": "decibelio", # already loglogarithmic, so not used with SI prefixes
+
     "atm": "atmósfera",
+    "amu": "unidad de masa atómica",
     "bar": "bar",
     "cal": "caloría",
     "Ci": "curio",
@@ -101,6 +110,17 @@
     "℧": "mho",
     "dyn": "dina",
     "erg": "ergio",
+
+    # special case overrides because prefixes with the base "metro" all get accents
+    "Qm": "quettámetro", "Rm": "ronnámetro", "Ym": "yottámetro", "Zm": "zettámetro", "Em": "exámetro", "Pm": "petámetro",
+      "Tm": "terámetro", "Gm": "gigámetro", "Mm": "megámetro", "km": "kilómetro", "hm": "hectómetro", "dam": "dekámetro",
+    "dm": "decímetro", "cm": "centímetro", "mm": "milímetro", "µm": "micrómetro", "nm": "nanómetro", "pm": "picómetro",
+    #  conflicts: "fm": "femtómetro", "am": "attómetro",
+    "zm": "zeptómetro", "ym": "yoctómetro", "rm": "rontómetro", "qm": "quectómetro",
+  
+    # powers of 2 used with bits and bytes
+    "Kib": "kibibit", "Mib": "mebibit", "Gib": "gibibit", "Tib": "tebibit", "Pib": "pebibit", "Eib": "exbibit", "Zib": "zebibit", "Yib": "yobibit",
+    "KiB": "kibibyte", "MiB": "mebibyte", "GiB": "gibibyte", "TiB": "tebibyte", "PiB": "pebibyte", "EiB": "exbibyte", "ZiB": "zebibyte", "YiB": "yobibyte",
   }
 
 
@@ -163,11 +183,14 @@
 
 - PluralForms: {
   # FIX: this needs to be flushed out
+    "lumen": "lúmenes",
+    "kelvin": "kelvin",
+    "grado Celsius": "grados Celsius",
+    "grado Fahrenheit": "grados Fahrenheit",
+
     "inch": "inches", "square inch": "square inches", "cubic inch": "cubic inches",
     "foot": "feet", "square foot": "square feet", "cubic foot": "cubic feet",
     "board foot": "board feet",
-    "degree celsius": "degrees celsius",
-    "degree fahrenheit": "degrees fahrenheit",
     "hertz": "hertz",
     "siemens": "siemens",
     "revolution per minute": "revolutions per minute",

@@ -301,14 +301,13 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
     }
 
     // we play games with the string to avoid allocation...
-    let token_string = as_text(mathml).as_bytes();
-    if token_string.iter().any(|&ch| ch >=128) {
+    let token_string = as_text(mathml);
+    if token_string.chars().any(|ch| !ch.is_ascii()) {
         return None;    // chemical elements are ASCII
     }
     let doc = mathml.document();
-    let token_len = token_string.len();
-    if token_len > 1 {
-        return split_string_chem_element(&doc, token_string);
+    if token_string.len() > 1 {   // safe because all chars are ASCII
+        return split_string_chem_element(&doc, mathml);
     }   
     let parent = get_parent(mathml);
     let parent_name = name(&parent);
@@ -319,7 +318,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
     return answer;
 
 
-    fn merge_tokens_chem_element<'a>(doc: &Document<'a>, leaf: Element<'a>, token_string: &[u8], following_siblings: &[ChildOfElement<'a>]) -> Option<Vec<Element<'a>>> {
+    fn merge_tokens_chem_element<'a>(doc: &Document<'a>, leaf: Element<'a>, token_string: &str, following_siblings: &[ChildOfElement<'a>]) -> Option<Vec<Element<'a>>> {
         if following_siblings.is_empty() {
             return None;
         }
@@ -332,7 +331,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
         if second_element_text.len() != 1 {
             return None;
         }
-        let chem_token_string = vec![token_string[0], second_element_text.as_bytes()[0]];
+        let chem_token_string = vec![token_string.as_bytes()[0], second_element_text.as_bytes()[0]];
         if let Some(chem_element) = get_chem_element(doc, &chem_token_string, 2) {
             leaf.set_text(as_text(chem_element));
             leaf.set_attribute_value(MAYBE_CHEMISTRY, chem_element.attribute_value(MAYBE_CHEMISTRY).unwrap());
@@ -343,7 +342,9 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
         return None;
     }
 
-    fn split_string_chem_element<'a>(doc: &Document<'a>, token_string: &[u8]) -> Option<Vec<Element<'a>>> {
+    /// split the string which has been checked to be all ASCII chars
+    fn split_string_chem_element<'a>(doc: &Document<'a>, leaf: Element<'a>) -> Option<Vec<Element<'a>>> {
+        let token_string = as_text(leaf).as_bytes();
         let token_len = token_string.len();
         let mut j = 0;
         let mut new_children = Vec::with_capacity(token_string.len());
@@ -363,6 +364,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
         if new_children.len() <= 1 {
             return None;
         }
+        add_attrs(new_children[new_children.len()-1], &leaf.attributes());
         new_children[new_children.len()-1].set_attribute_value(SPLIT_TOKEN, "true");
         // debug!("split_string_chem_element: {} -> {}", String::from_utf8(token_string.to_vec()).unwrap(), new_children.len());
         return Some(new_children);
@@ -673,7 +675,7 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
                 // "lift" the child up so all the links (e.g., siblings) are correct
                 let child = as_element(child.children()[0]);
                 set_mathml_name(child, name(&child));
-                crate::canonicalize::add_attrs(child, child.attributes());
+                crate::canonicalize::add_attrs(child, &child.attributes());
                 child.replace_children(child.children());
             }
             if name(&child) != "mi" && name(&child) != "mtext" {
@@ -2408,17 +2410,17 @@ mod chem_tests {
                 </msub>
             </mrow>
         </math>"#;
-        let target = " <math>
+        let target = "<math>
             <mrow data-chem-formula='5'>
                 <mi mathvariant='normal' data-chem-element='1'>N</mi>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                <mmultiscripts data-chem-formula='1'>
-                    <mi mathvariant='normal' data-chem-element='1' data-split='true'>H</mi>
-                    <mn>3</mn>
-                    <none></none>
+                <mmultiscripts data-mjx-auto-op='false' data-chem-formula='1'>
+                <mi mathvariant='normal' data-mjx-auto-op='false' data-split='true' data-chem-element='1'>H</mi>
+                <mn>3</mn>
+                <none></none>
                 </mmultiscripts>
             </mrow>
-        </math>";
+            </math>";
         assert!(are_strs_canonically_equal(test, target));
     }
 

@@ -397,18 +397,18 @@
 -
   name: unit
   tag: [mi, mtext]
-  match: "@class='MathML-unit' or contains(@intent, ':unit')"
-      # would like to use forced mathvariant='normal', but it captures things it shouldn't in the tests like "H" and "F" (calculus)
-      # or (self::m:mi and string-length(.)=1 and @mathvariant='normal' and DefinitionValue(., 'Speech', 'SIUnits') != '')"
+  match: "@class='MathML-unit' or contains(@data-intent-property, ':unit')"
   replace:
   - intent:
-      name: "mi"
+      name: "unit"
       attrs: "data-intent-property='\":unit:\"'"   # the value ":unit:" needs to be an xpath string, hence the escaped quotes
       children:
       - x: "text()"
 
 - # this is attempt to catch units when some has created a non-italic word that matches a unit
   # other mtext unit cases were caught above
+  # would like to use forced mathvariant='normal', but it captures things it shouldn't in the tests like "H" and "F" (calculus)
+  # or (self::m:mi and string-length(.)=1 and @mathvariant='normal' and DefinitionValue(., 'Speech', 'SIUnits') != '')"
   name: mtext-inference-unit
   tag: mtext
   match: "DefinitionValue(., 'Speech', 'SIUnits') != '' or
@@ -422,7 +422,7 @@
            DefinitionValue(substring(., 2), 'Speech', 'SIUnits') != '')"
   replace:
   - intent:
-      name: "mi"
+      name: "unit"
       attrs: "data-intent-property='\":unit:\"'"   # the value ":unit:" needs to be an xpath string, hence the escaped quotes
       children:
       - x: "text()"

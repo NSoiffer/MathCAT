@@ -72,7 +72,11 @@
             - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
                # except if expression starts with '…'
             - "../*[1][text()='…'] "
-        then: [T: "coma"]                       	# 	(en: 'comma', google translation)
+        then:
+        - T: "coma"                         # 	(en: 'comma', google translation)
+        - test:
+            if: "$Verbosity != Terse"
+            then: [pause: short]
         # else silent
 
  - "-": [T: "menos"]                            	#  0x2d	(en: 'minus')

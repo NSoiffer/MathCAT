@@ -618,12 +618,12 @@ impl<'r> Intent {
         }
 
         if !self.attrs.is_empty() {
-            debug!("Intent::replace attrs = \"{}\"", &self.attrs);
+            // debug!("Intent::replace attrs = \"{}\"", &self.attrs);
             for cap in ATTR_NAME_VALUE.captures_iter(&self.attrs) {
                 let value_as_xpath = MyXPath::new(cap["value"].to_string()).chain_err(||"attr value inside 'intent'")?;
                 let value = value_as_xpath.evaluate(rules_with_context.get_context(), mathml)
                         .chain_err(||"attr xpath evaluation value inside 'intent'")?;
-                debug!("Intent::replace  name={}, value={}, xpath value={}", &cap["name"], &cap["value"], &value.clone().into_string());
+                // debug!("Intent::replace  name={}, value={}, xpath value={}", &cap["name"], &cap["value"], &value.clone().into_string());
                 result.set_attribute_value(&cap["name"], &value.into_string());
             };
         }

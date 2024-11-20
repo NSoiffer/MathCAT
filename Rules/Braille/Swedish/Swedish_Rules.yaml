@@ -99,17 +99,13 @@
 -
    name: nested-fraction
    tag: mfrac
-   match: "*[self::m:mfrac] or */*[self::m:mfrac]"
+   match: "*[self::m:mfrac or (self::m:mrow and *[2]='/')] or */*[self::m:mfrac]"
    replace: 
-   - test:
-      if: "not(*[1][self::m:mfrac])"
-      then: [t: "⠿⠦"]
+   - t: "⠿⠦"
    - x: "*[1]"
    - t: "⠳⠳"
    - x: "*[2]"
-   - test:
-      if: "not(*[1][self::m:mfrac])"
-      then: [t: "⠿⠴"]
+   - t: "⠿⠴"
 
 -  # needs to be after nested-fraction rule as long as this rule uses the NeedsToBeGrouped test
    name: simple-fraction
@@ -351,7 +347,7 @@
 
 -
   name: single-char-exceptions    # RUEB 3.11 -- ° and various prime/minute/seconds aren't treated as if superscripts
-  tag: [msup]
+  tag: msup
   match: "*[2][translate(., \"'*`ª°²³´¹º‘’“”‟′″‴‵‶‷⁗\",'')='']"
   replace:
   - test:
