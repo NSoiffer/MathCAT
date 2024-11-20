@@ -380,7 +380,7 @@ fn without_prefix_distance() {
         <mn>1</mn><mi intent=":unit">fm</mi><mo>,</mo><mn>2</mn><mi intent=":unit">fm</mi>
     </math>"#;
     test("fi", "SimpleSpeak", expr, 
-        "1 astroniminen yksikkö, pilkku; 2 astroniminen yksikköa, pilkku, \
+        "1 astronominen yksikkö, pilkku; 2 astronominen yksikköa, pilkku, \
                 1 valovuosi, pilkku; 2 valovuotta, pilkku, \
                 1 parsek, pilkku, 2 parsekia, pilkku; \
                 1 ångström, pilkku; 2 ångströmiä, pilkku; \
