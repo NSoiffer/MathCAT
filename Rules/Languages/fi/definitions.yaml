@@ -41,7 +41,7 @@
     "lm": "lumen", # lumenia
     "lx": "luks", # luksia
     "N": "newton", # newtonia
-    "Ω": "ohm", "Ω": "ohm",       # Greek Cap letter, U+2126 OHM SIGN # ohmia
+    "Ω": "ohm", "Ω": "ohm",  # ohmia     # Greek Cap letter, U+2126 OHM SIGN 
     "Pa": "pascal", # pascalia
     "S": "siemens", # siemensiä
     "Sv": "sievert", # sievertiä
@@ -51,11 +51,11 @@
     "Wb": "weber", # weberiä"
 
     # accepted (plus a few variants) that take SI prefixes
-    "l": "litra", "L": "litra", "ℓ": "litra",               # litraa
+    "l": "litra", "L": "litra", "ℓ": "litra", # litraa
     "t": "tonni", # tonnia
     "Da": "dalton", # daltonia
     "Np": "neper", # neperiä
-    "u": "atomimassayksikkö",     # atomimassayksikköä
+    "u": "atomimassayksikkö", # atomimassayksikköä
     "eV": "elektronivoltti", # elektronivolttia
     "rad": "radiaani", # radiaania
     "sr": "steradiaani", # steradiaania
