@@ -65,9 +65,9 @@
     "as": "kaarisekuntia", # kaarisekuntia
 
     # technically wrong, but used in practice with SI Units
-    "b": "bittiä",               # should only take positive powers
-    "B": "tavu",              # should only take positive powers
-    "Bd": "baudi",             # should only take positive powers
+    "b": "bitti",  # bittiä              # should only take positive powers
+    "B": "tavu",   # tavua           # should only take positive powers
+    "Bd": "baudi", # baudia            # should only take positive powers
   }
 
 
@@ -114,8 +114,22 @@
     "erg": "ergi", # ergiä
 
     # powers of 2 used with bits and bytes
-    "Kib": "kibibittiä", "Mib": "mebibittiä", "Gib": "gibibittiä", "Tib": "tebibittiä", "Pib": "pebibittiä", "Eib": "eksbibittiä", "Zib": "tsebibittiä", "Yib": "jobibittiä",
-    "KiB": "kibitavu", "MiB": "mebitavu", "GiB": "gibitavu", "TiB": "tebitavu", "PiB": "pebitavu", "EiB": "eksbitavu", "ZiB": "tsebitavu", "YiB": "jobitavu",
+    "Kib": "kibibitti", # kibibittiä
+    "Mib": "mebibitti", # mebibittiä
+    "Gib": "gibibitti", # gibibittiä
+    "Tib": "tebibitti", # tebibittiä
+    "Pib": "pebibitti", # pebibittiä
+    "Eib": "eksbibitti", # eksbibittiä
+    "Zib": "tsebibitti", # tsebibittiä
+    "Yib": "jobibitti", # jobibittiä
+    "KiB": "kibitavu", # kibitavua
+    "MiB": "mebitavu", # mebitavua
+    "GiB": "gibitavu", # gibitavua
+    "TiB": "tebitavu", # tebitavua
+    "PiB": "pebitavu", # eksbitavua
+    "EiB": "eksbitavu", # eksbitavua
+    "ZiB": "tsebitavu", # tsebitavua
+    "YiB": "jobitavu", # jobitavua
   }
 
   # this will only be used if the language is English, so it can be empty for other countries
