@@ -361,7 +361,7 @@
 # 3. does it match an SI prefix followed by an SI that accepts SI prefixes
 # Due to this order, some things like "ft" and "cd" mean "feet" vs "femto-tonnes" and "pints" vs "pico-tonnes"
 - name: unit
-  tag: mi
+  tag: unit
   match: "$Verbosity != 'Terse' and contains(@data-intent-property, ':unit')"
   variables:
     # we need to look at preceding-sibling::*[2] because invisible times should have been added
@@ -386,7 +386,7 @@
       then:
       - set_variables: [Word: "DefinitionValue(., 'Speech', 'EnglishUnits')"]
 
-    # do the first two chars match "da" and the reminader match an SIUnit
+    # do the first two chars match "da" and the remainder match an SIUnit
     - else_if: "string-length(.) >= 3 and 
                 substring(., 1, 2) = 'da' and
                 DefinitionValue(substring(., 3), 'Speech', 'SIUnits') != ''"
@@ -395,7 +395,7 @@
         - Prefix: "DefinitionValue('da', 'Speech', 'SIPrefixes')"
         - Word: "DefinitionValue(substring(., 3), 'Speech', 'SIUnits')"
 
-    # does the first char match a prefix and the reminader match an SIUnit
+    # does the first char match a prefix and the remainder match an SIUnit
     - else_if: "string-length(.) >= 2 and 
                 DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != ''  and
                 DefinitionValue(substring(., 2), 'Speech', 'SIUnits') != ''"
@@ -404,16 +404,18 @@
         - Prefix: "DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes')"
         - Word: "DefinitionValue(substring(., 2), 'Speech', 'SIUnits')"
 
-    # not a known unit -- just speak the text
+    # not a known unit -- just speak the text, possibly as a plural
     - else:
-        x: "text()"
+      - set_variables:
+        - Word: "text()"
+
   # somewhat complicated logic to avoid spaces around "-" as in "centi-grams" vs "centi - grams" -- probably doesn't matter
   - test:
       if: "$Prefix = ''"
       then:
       - test:
         - if: "$IsSingular"
-          # HACK: '\uF8FE' is used internally for the concatination char by 'ct' -- this gets the prefix concatinated to the base
+          # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets the prefix concatinated to the base
           then: [x: "$Word"]
         - else_if: "DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
           then: [x: "DefinitionValue($Word, 'Speech', 'PluralForms')"]
@@ -423,10 +425,10 @@
       - ct: "-"
       - test:
         - if: "$IsSingular"
-          # HACK: '\uF8FE' is used internally for the concatination char by 'ct' -- this gets the prefix concatinated to the base
+          # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets the prefix concatinated to the base
           then: [x: "concat('\uF8FE', $Word)"]
         - else_if: "DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
-          then: [x: "DefinitionValue(concat('\uF8FE', $Word), 'Speech', 'PluralForms')"]
+          then: [x: "concat('\uF8FE', DefinitionValue($Word, 'Speech', 'PluralForms'))"]
           else: [x: "concat('\uF8FE', $Word)", ct: "a"]
 
 

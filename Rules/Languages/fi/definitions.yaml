@@ -43,10 +43,8 @@
     "N": "newton", # newtonia
     "Ω": "ohm", "Ω": "ohm",       # Greek Cap letter, U+2126 OHM SIGN # ohmia
     "Pa": "pascal", # pascalia
-    "rad": "radiaani", # radiaania
     "S": "siemens", # siemensiä
     "Sv": "sievert", # sievertiä
-    "sr": "steradiaani", # steradiaania
     "T": "tesla", # teslaa
     "V": "volt", # volttia
     "W": "watti", # wattia
@@ -56,9 +54,20 @@
     "l": "litra", "L": "litra", "ℓ": "litra",               # litraa
     "t": "tonni", # tonnia
     "Da": "dalton", # daltonia
-    "amu": "atomimassayksikkö", "u": "atomimassayksikkö",     # atomimassayksikköä
-    "au": "astroniminen yksikkö", "AU": "astronominen yksikkö", # astronomista yksikköä
+    "Np": "neper", # neperiä
+    "u": "atomimassayksikkö",     # atomimassayksikköä
     "eV": "elektronivoltti", # elektronivolttia
+    "rad": "radiaani", # radiaania
+    "sr": "steradiaani", # steradiaania
+  
+    # others that take a prefix
+    "a": "annum",               # should only take positive powers
+    "as": "kaarisekuntia", # kaarisekuntia
+
+    # technically wrong, but used in practice with SI Units
+    "b": "bittiä",               # should only take positive powers
+    "B": "tavu",              # should only take positive powers
+    "Bd": "baudi",             # should only take positive powers
   }
 
 
@@ -78,21 +87,20 @@
     "MOA": "kaariminuutti", # kaariminuuttia
     "arcsec": "kaarisekuntia", # kaarisekuntia
     "asec": "kaarisekuntia", # kaarisekuntia
-    "as": "kaarisekuntia", # kaarisekuntia
-
-    # other accepted units that don't take SI prefixes
-    "ha": "hehtaari", # hehtaaria
-    "Np": "neper", # neperiä
-    "B": "beli", # beliä
-    "dB": "desibeli", # desibeliä
 
     # distance
+    "au": "astroniminen yksikkö", "AU": "astronominen yksikkö", # astronomista yksikköä
     "ltyr": "valovuosi", "ly": "valovuosi", # valovuotta
     "pc": "parsek", # parsekia
     "Å": "ångström", "Å": "ångström",  # ångströmiä # U+00C5 and U+212B
     "fm": "fermi", # fermiä
 
     # others
+    "ha": "hehtaari", # hehtaaria
+    # "B": "beli", # beliä        # "B" more commonly means bytes
+    "dB": "desibeli", # desibeliä
+
+    "amu": "atomimassayksikkö",
     "atm": "normaali-ilmakehä", # normaali-ilmakehää
     "bar": "baari", # baaria
     "cal": "kalori", # kaloria
@@ -105,6 +113,9 @@
     "dyn": "dyne", # dyneä
     "erg": "ergi", # ergiä
 
+    # powers of 2 used with bits and bytes
+    "Kib": "kibi-bittiä", "Mib": "mebi-bittiä", "Gib": "gibi-bittiä", "Tib": "tebi-bittiä", "Pib": "pebi-bittiä", "Eib": "exbi-bittiä", "Zib": "zebi-bittiä", "Yib": "yobi-bittiä",
+    "KiB": "kibi-tavu", "MiB": "mebi-tavu", "GiB": "gibi-tavu", "TiB": "tebi-tavu", "PiB": "pebi-tavu", "EiB": "exbi-tavu", "ZiB": "zebi-tavu", "YiB": "yobi-tavu",
   }
 
   # this will only be used if the language is English, so it can be empty for other countries
@@ -156,9 +167,8 @@
   # FIX: this needs to be flushed out
     "aste celsiusta": "astetta celsiusta",
     "aste fahrenheitia": "astetta fahrenheitia",
-    "hertsi": "hertsiä",
-    "siemens": "siemensiä",
-    "kierros minuutissa": "kierrosta minuutissa",
+    "bittiä": "bittiä",
+    "baudi": "baudi",
     "kelvin": "kelviniä",
     "metri": "metriä",
     "bekrel": "bekreliä",
@@ -175,7 +185,7 @@
     "sievert": "sievertiä",
     "volt": "volttia",
     "watti": "wattia",
-    "weber": "weberiä"",
+    "weber": "weberiä",
     "dalton": "daltonia",
     "atomimassayksikkö": "atomimassayksikköä",
     "astronominen yksikkö": "astronomista yksikköä",
