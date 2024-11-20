@@ -7,7 +7,7 @@
 
 
 - SIPrefixes: {
-    "Q": "kvetta", "R": "ronna", "Y": "jotta", "Z": "tsetta", "E": "eksa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hekto", "da": "deka",
+    "Q": "kvetta", "R": "ronna", "Y": "jotta", "Z": "tsetta", "E": "eksa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hehto", "da": "deka",
     "d": "desi", "c": "sentti", "m": "milli", "µ": "mikro", "n": "nano", "p": "piko", "f": "femto", "a": "atto", "z": "zepto", "y": "jokto", "r": "ronto", "q": "kvekto"
   }
 
@@ -30,7 +30,7 @@
 
     # derived units
     "Bq": "bekrel", # bekreliä
-    "C": "kolumbi", # kolumbia
+    "C": "kulombi", # kulombia
     "°C": "aste celsiusta", "℃": "aste celsiusta", # astetta celsiusta
     "F": "faradi", # faradia
     "Gy": "grei", # greitä
@@ -41,7 +41,7 @@
     "lm": "lumen", # lumenia
     "lx": "luks", # luksia
     "N": "newton", # newtonia
-    "Ω": "ohm", "Ω": "ohm",       # Greek Cap letter, U+2126 OHM SIGN # ohmia
+    "Ω": "ohm", "Ω": "ohm",  # ohmia     # Greek Cap letter, U+2126 OHM SIGN 
     "Pa": "pascal", # pascalia
     "S": "siemens", # siemensiä
     "Sv": "sievert", # sievertiä
@@ -51,23 +51,23 @@
     "Wb": "weber", # weberiä"
 
     # accepted (plus a few variants) that take SI prefixes
-    "l": "litra", "L": "litra", "ℓ": "litra",               # litraa
+    "l": "litra", "L": "litra", "ℓ": "litra", # litraa
     "t": "tonni", # tonnia
     "Da": "dalton", # daltonia
     "Np": "neper", # neperiä
-    "u": "atomimassayksikkö",     # atomimassayksikköä
+    "u": "atomimassayksikkö", # atomimassayksikköä
     "eV": "elektronivoltti", # elektronivolttia
     "rad": "radiaani", # radiaania
     "sr": "steradiaani", # steradiaania
   
     # others that take a prefix
-    "a": "annum",               # should only take positive powers
-    "as": "kaarisekuntia", # kaarisekuntia
+    "a": "annum", # annumia               # should only take positive powers
+    "as": "kaarisekunti", # kaarisekuntia
 
     # technically wrong, but used in practice with SI Units
-    "b": "bittiä",               # should only take positive powers
-    "B": "tavu",              # should only take positive powers
-    "Bd": "baudi",             # should only take positive powers
+    "b": "bitti",  # bittiä              # should only take positive powers
+    "B": "tavu",   # tavua           # should only take positive powers
+    "Bd": "baudi", # baudia            # should only take positive powers
   }
 
 
@@ -85,11 +85,11 @@
     "amin": "kaariminuutti", # kaariminuuttia
     "am": "kaariminuutti", # kaariminuuttia
     "MOA": "kaariminuutti", # kaariminuuttia
-    "arcsec": "kaarisekuntia", # kaarisekuntia
-    "asec": "kaarisekuntia", # kaarisekuntia
+    "arcsec": "kaarisekunti", # kaarisekuntia
+    "asec": "kaarisekunti", # kaarisekuntia
 
     # distance
-    "au": "astroniminen yksikkö", "AU": "astronominen yksikkö", # astronomista yksikköä
+    "au": "astronominen yksikkö", "AU": "astronominen yksikkö", # astronomista yksikköä
     "ltyr": "valovuosi", "ly": "valovuosi", # valovuotta
     "pc": "parsek", # parsekia
     "Å": "ångström", "Å": "ångström",  # ångströmiä # U+00C5 and U+212B
@@ -114,8 +114,22 @@
     "erg": "ergi", # ergiä
 
     # powers of 2 used with bits and bytes
-    "Kib": "kibi-bittiä", "Mib": "mebi-bittiä", "Gib": "gibi-bittiä", "Tib": "tebi-bittiä", "Pib": "pebi-bittiä", "Eib": "exbi-bittiä", "Zib": "zebi-bittiä", "Yib": "yobi-bittiä",
-    "KiB": "kibi-tavu", "MiB": "mebi-tavu", "GiB": "gibi-tavu", "TiB": "tebi-tavu", "PiB": "pebi-tavu", "EiB": "exbi-tavu", "ZiB": "zebi-tavu", "YiB": "yobi-tavu",
+    "Kib": "kibibitti", # kibibittiä
+    "Mib": "mebibitti", # mebibittiä
+    "Gib": "gibibitti", # gibibittiä
+    "Tib": "tebibitti", # tebibittiä
+    "Pib": "pebibitti", # pebibittiä
+    "Eib": "eksbibitti", # eksbibittiä
+    "Zib": "tsebibitti", # tsebibittiä
+    "Yib": "jobibitti", # jobibittiä
+    "KiB": "kibitavu", # kibitavua
+    "MiB": "mebitavu", # mebitavua
+    "GiB": "gibitavu", # gibitavua
+    "TiB": "tebitavu", # tebitavua
+    "PiB": "pebitavu", # eksbitavua
+    "EiB": "eksbitavu", # eksbitavua
+    "ZiB": "tsebitavu", # tsebitavua
+    "YiB": "jobitavu", # jobitavua
   }
 
   # this will only be used if the language is English, so it can be empty for other countries
@@ -167,8 +181,7 @@
   # FIX: this needs to be flushed out
     "aste celsiusta": "astetta celsiusta",
     "aste fahrenheitia": "astetta fahrenheitia",
-    "bittiä": "bittiä",
-    "baudi": "baudi",
+    "bitti": "bittiä",
     "kelvin": "kelviniä",
     "metri": "metriä",
     "bekrel": "bekreliä",
@@ -209,7 +222,17 @@
     "teelusikka": "teelusikallista",
     "ruokalusikka": "ruokalusikallista",
     "maili tunnissa": "mailia tunnissa",
-    "maili gallonalla": "mailia gallonalla"
+    "maili gallonalla": "mailia gallonalla",
+    "kibibitti": "kibibittiä"
+    "mebibitti": "mebibittiä", 
+    "gibibitti": "gibibittiä", 
+    "tebibitti": "tebibittiä", 
+    "pebibitti": "pebibittiä", 
+    "eksbibitti": "eksbibittiä", 
+    "tsebibitti": "tsebibittiä",
+    "jobibitti": "jobibittiä",
+    "annum": "annumia",
+    "curie": "curieta"
   }
 
 
