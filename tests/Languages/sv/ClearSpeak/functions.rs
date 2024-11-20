@@ -173,7 +173,7 @@ fn test_functions_none_pref_multiple_args() {
         <mi>B</mi> <mrow><mo>(</mo> <mrow> <mn>2</mn><mo>,</mo><mn>6</mn></mrow> <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("sv", "ClearSpeak_Functions", "None",expr,
-        "versal b gånger, vänster-parentes; 2 komma 6; höger-parentes");
+        "versal b gånger; vänster-parentes; 2 komma, 6; höger-parentes");
 }
 
 

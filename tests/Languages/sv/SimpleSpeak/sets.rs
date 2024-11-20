@@ -162,7 +162,7 @@ fn multiple_element_set() {
     let expr = "<math>
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-    test("sv", "SimpleSpeak", expr, "mängden 5 komma 10 komma 15");
+    test("sv", "SimpleSpeak", expr, "mängden 5 komma, 10 komma, 15");
 }
 
 #[test]
