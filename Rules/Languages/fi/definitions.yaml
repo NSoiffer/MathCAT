@@ -30,7 +30,7 @@
 
     # derived units
     "Bq": "bekrel", # bekreliä
-    "C": "kolumbi", # kolumbia
+    "C": "kulombi", # kulombia
     "°C": "aste celsiusta", "℃": "aste celsiusta", # astetta celsiusta
     "F": "faradi", # faradia
     "Gy": "grei", # greitä

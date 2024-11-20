@@ -138,7 +138,7 @@ fn si_derived_1() {
     </math>"#;
     test("fi", "SimpleSpeak", expr, 
         "1 bekrel, pilkku, 2 bekreliä, pilkku, \
-                1 kolumbi, pilkku; 2 kolumbia, pilkku; \
+                1 kulombi, pilkku; 2 kulombia, pilkku; \
                 1 aste celsiusta, pilkku; 2 astetta celsiusta, pilkku; \
                 1 aste celsiusta, pilkku; 2 astetta celsiusta, pilkku, \
                 1 faradi, pilkku; 2 faradia, pilkku, \
@@ -169,7 +169,7 @@ fn si_derived_1_with_prefixes() {
     </math>"#;
     test("fi", "SimpleSpeak", expr, 
         "1 kvetta-bekrel, pilkku; 2 ronna-bekreliä, pilkku; \
-                1 jotta-kolumbia, pilkku; 2 tsetta-kolumbia; pilkku; \
+                1 jotta-kulombia, pilkku; 2 tsetta-kulombia; pilkku; \
                 1 eksa-faradi, pilkku; 2 peta-faradia, pilkku; \
                 1 tera-grei, pilkku; 2 giga-greitä, pilkku; \
                 1 mega-henry, pilkku; 2 kilo-henryä, pilkku; \
