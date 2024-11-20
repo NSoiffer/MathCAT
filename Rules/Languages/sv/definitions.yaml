@@ -21,12 +21,12 @@
     "g": "gram",
     "m": "metre",     # British spelling works for US also
     "mol": "mole",
-    "s": "second", "″": "second", "\"": "second", "sec": "second",  # "sec" not actually legal
+    "s": "second", "sec": "second",  # "sec" not actually legal
 
     # derived units
     "Bq": "becquerel",
     "C": "coulomb",
-    "°C": "degree celsius", "℃": "degree celsius",
+    "°C": "degree celsius", "℃": "degree celsius", # should only take negative powers
     "F": "farad",
     "Gy": "gray",
     "H": "henry",
@@ -38,56 +38,65 @@
     "N": "newton",
     "Ω": "ohm", "Ω": "ohm",       # Greek Cap letter, U+2126 OHM SIGN
     "Pa": "pascal",
-    "rad": "radian",
     "S": "siemens",
     "Sv": "sievert",
-    "sr": "sterradion",
     "T": "tesla",
     "V": "volt",
     "W": "watt",
     "Wb": "weber",
 
     # accepted (plus a few variants) that take SI prefixes
-    "l": "litre", "L": "litre", "ℓ": "litre",               # British spelling works for US also
-    "t": "metric ton",
+    "l": "litre", "L": "litre", "ℓ": "litre",  # Should only take negative powers; British spelling works for US also
+    "t": "metric ton",           # should only take positive powers
     "Da": "dalton",
-    "amu": "atomic mass unit", "u": "atomic mass unit",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
-    "au": "astronomical unit", "AU": "astronomical unit",
+    "Np": "neper",               # should only take negative powers
+    "u": "atomic mass unit",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
     "eV": "electronvolt",
+    "rad": "radian",             # should only take negative powers
+    "sr": "sterradion",          # should only take negative powers      
+  
+    # others that take a prefix
+    "a": "annum",               # should only take positive powers
+    "as": "arcsecond",          # see en.wikipedia.org/wiki/Minute_and_second_of_arc
+
+    # technically wrong, but used in practice with SI Units
+    "b": "bit",               # should only take positive powers
+    "B": "byte",              # should only take positive powers
+    "Bd": "baud",             # should only take positive powers
   }
 
 
 - UnitsWithoutPrefixes: {
     # time
+    "″": "second", "\"": "second",
     "′": "minute", "'": "minute","min": "minute",
     "h": "hour", "hr": "hour", "Hr": "hour",
     "d": "day", "dy": "day",
     "w": "week", "wk": "week",
     "y": "year", "yr": "year",    
 
-    # angles (could be temperature)
-    "°": "degree", "deg": "degree",
+    # angles
+    "°": "degree", "deg": "degree", # should only take negative powers
     "arcmin": "arcminute",
     "amin": "arcminute",
     "am": "arcminute",
     "MOA": "arcminute",
     "arcsec": "arcsecond",
     "asec": "arcsecond",
-    "as": "arcsecond",
-
-    # other accepted units that don't take SI prefixes
-    "ha": "hectare",
-    "Np": "neper",
-    "B": "bel",
-    "dB": "decibel",
 
     # distance
+    "au": "astronomical unit", "AU": "astronomical unit",
     "ltyr": "light year", "ly": "light year",
     "pc": "parsec",
     "Å": "angstrom", "Å": "angstrom",           # U+00C5 and U+212B
     "fm": "fermi",
 
     # others
+    "ha": "hectare",
+    # "B": "bel",    # "B" more commonly means bytes
+    "dB": "decibel", # already loglogarithmic, so not used with SI prefixes
+
+    "amu": "atomic mass unit",
     "atm": "atmosphere",
     "bar": "bar",
     "cal": "calorie",
@@ -96,10 +105,13 @@
     "M": "molar",
     "R": "roentgen",
     "rpm": "revolution per minute",
-    "℧": "mho",
+    "℧": "m-h-o",
     "dyn": "dyne",
     "erg": "erg",
 
+    # powers of 2 used with bits and bytes
+    "Kib": "kibi-bit", "Mib": "mebi-bit", "Gib": "gibi-bit", "Tib": "tebi-bit", "Pib": "pebi-bit", "Eib": "exbi-bit", "Zib": "zebi-bit", "Yib": "yobi-bit",
+    "KiB": "kibi-byte", "MiB": "mebi-byte", "GiB": "gibi-byte", "TiB": "tebi-byte", "PiB": "pebi-byte", "EiB": "exbi-byte", "ZiB": "zebi-byte", "YiB": "yobi-byte",
   }
 
   # this will only be used if the language is English, so it can be empty for other countries
@@ -169,6 +181,8 @@
     "hertz": "hertz",
     "siemens": "siemens",
     "revolution per minute": "revolutions per minute",
+    "mile per hour": "miles per hour",
+    "mile per gallon": "miles per gallon",
   }
 
 
