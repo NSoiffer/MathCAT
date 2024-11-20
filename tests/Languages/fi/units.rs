@@ -49,7 +49,7 @@ fn prefix_sweep() {
                 giga-grammaa, pilkku, \
                 mega-grammaa, pilkku, \
                 kilo-grammaa, pilkku, \
-                hekto-grammaa, pilkku, \
+                hehto-grammaa, pilkku, \
                 deka-grammaa, pilkku, \
                 desi-grammaa, pilkku; \
                 sentti-grammaa, pilkku, \
@@ -113,7 +113,7 @@ fn si_base_with_prefixes() {
                 1 eksa-kelvin, pilkku; 2 peta-kelviniä, pilkku; \
                 1 tera-kelvin, pilkku; 2 giga-kelviniä, pilkku; \
                 1 mega-gramma, pilkku; 2 kilo-grammaa, pilkku; \
-                1 hekto-metri, pilkku; 2 deka-metriä, pilkku; \
+                1 hehto-metri, pilkku; 2 deka-metriä, pilkku; \
                 1 desi-mooli, pilkku; 2 sentti-moolia, pilkku; \
                 1 milli-sekunti, pilkku; 2 mikro-sekuntia, pilkku; \
                 1 nano-sekunti, pilkku; 2 piko-sekuntia");
@@ -230,7 +230,7 @@ fn si_derived_2_with_prefixes() {
                 1 piko-pascal, pilkku; 2 nano-pascalia, pilkku; \
                 1 mikro-siemens, pilkku; 2 milli-siemensiä, pilkku; \
                 1 sentti-sievert, pilkku; 2 desi-sievertiä, pilkku; \
-                1 deka-tesla, pilkku; 2 hekto-teslaa, pilkku; \
+                1 deka-tesla, pilkku; 2 hehto-teslaa, pilkku; \
                 1 kilo-volt, pilkku; 2 mega-volttia, pilkku; \
                 1 giga-watti, pilkku; 2 tera-wattia, pilkku; \
                 1 peta-weber, pilkku; 2 eksa-weberiä");
@@ -300,7 +300,7 @@ fn si_accepted_with_prefixes() {
                 1 tera-tonni, pilkku; 2 giga-tonnia, pilkku; \
                 1 mega-dalton, pilkku; 2 kilo-daltonia, pilkku; \
                 1 desi-neper, pilkku; 2 sentti-neperiä, pilkku; \
-                1 hekto-atomimassayksikkö; pilkku; 2 deka-atomimassayksikköä; pilkku; \
+                1 hehto-atomimassayksikkö; pilkku; 2 deka-atomimassayksikköä; pilkku; \
                 1 milli-elektronivoltti; pilkku; 2 mikro-elektronivolttia; pilkku; \
                 1 nano-radiaani, pilkku; 2 piko-radiaania, pilkku; \
                 1 femto-steradiaani, pilkku; 2 atto-steradiaania; pilkku; \

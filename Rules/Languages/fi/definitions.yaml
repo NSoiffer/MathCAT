@@ -7,7 +7,7 @@
 
 
 - SIPrefixes: {
-    "Q": "kvetta", "R": "ronna", "Y": "jotta", "Z": "tsetta", "E": "eksa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hekto", "da": "deka",
+    "Q": "kvetta", "R": "ronna", "Y": "jotta", "Z": "tsetta", "E": "eksa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hehto", "da": "deka",
     "d": "desi", "c": "sentti", "m": "milli", "µ": "mikro", "n": "nano", "p": "piko", "f": "femto", "a": "atto", "z": "zepto", "y": "jokto", "r": "ronto", "q": "kvekto"
   }
 
