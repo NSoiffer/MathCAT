@@ -268,7 +268,7 @@ fn si_accepted() {
                 1 radiaani, pilkku; 2 radiaania, pilkku; \
                 1 steradiaani, pilkku; 2 steradiaania, pilkku, \
                 1 annum, pilkku; 2 annuma, pilkku; \
-                1 kaarisekuntia, pilkku; 2 kaarisekuntiaa, pilkku, \
+                1 kaarisekuntia, pilkku; 2 kaarisekuntia, pilkku, \
                 1 bittiä, pilkku, 2 bittiä, pilkku, \
                 1 tavu, pilkku, 2 tavua, pilkku, \
                 1 baudi, pilkku, 2 baudi");
@@ -305,7 +305,7 @@ fn si_accepted_with_prefixes() {
                 1 nano-radiaani, pilkku; 2 piko-radiaania, pilkku; \
                 1 femto-steradiaani, pilkku; 2 atto-steradiaania; pilkku; \
                 1 giga-annum, pilkku; 2 mega-annuma, pilkku; \
-                1 zepto-kaarisekuntia; pilkku; 2 jokto-kaarisekuntiaa; pilkku; \
+                1 zepto-kaarisekuntia; pilkku; 2 jokto-kaarisekuntia; pilkku; \
                 1 kilo-bittiä, pilkku; 2 mega-bittiä, pilkku; \
                 1 giga-tavu, pilkku; 2 tera-tavua, pilkku; \
                 1 tera-baudi, pilkku; 2 eksa-baudi");
@@ -365,8 +365,8 @@ fn without_prefix_angles() {
                 1 kaariminuutti, pilkku; 2 kaariminuuttia, pilkku; \
                 1 kaariminuutti, pilkku; 2 kaariminuuttia, pilkku; \
                 1 kaariminuutti, pilkku; 2 kaariminuuttia, pilkku; \
-                1 kaarisekuntia, pilkku; 2 kaarisekuntiaa, pilkku; \
-                1 kaarisekuntia, pilkku; 2 kaarisekuntiaa");
+                1 kaarisekuntia, pilkku; 2 kaarisekuntia, pilkku; \
+                1 kaarisekuntia, pilkku; 2 kaarisekuntia");
 }
 
 #[test]
