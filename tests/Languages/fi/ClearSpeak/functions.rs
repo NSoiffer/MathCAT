@@ -192,7 +192,7 @@ fn test_functions_none_pref_multiple_args() {
         <mi>B</mi> <mrow><mo>(</mo> <mrow> <mn>2</mn><mo>,</mo><mn>6</mn></mrow> <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("fi", "ClearSpeak_Functions", "None",expr,
-        "iso b kertaa, auki sulku 2 pilkku 6, kiinni sulku");
+        "iso b kertaa, auki sulku 2 pilkku, 6, kiinni sulku");
 }
 
 
