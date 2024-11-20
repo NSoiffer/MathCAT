@@ -271,7 +271,7 @@ fn si_accepted() {
                 1 kaarisekuntia, pilkku; 2 kaarisekuntia, pilkku, \
                 1 bittiä, pilkku, 2 bittiä, pilkku, \
                 1 tavu, pilkku, 2 tavua, pilkku, \
-                1 baudi, pilkku, 2 baudi");
+                1 baudi, pilkku, 2 baudia");
 }
 
 #[test]
