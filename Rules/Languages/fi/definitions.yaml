@@ -62,7 +62,7 @@
   
     # others that take a prefix
     "a": "annum",               # should only take positive powers
-    "as": "kaarisekuntia", # kaarisekuntia
+    "as": "kaarisekunti", # kaarisekuntia
 
     # technically wrong, but used in practice with SI Units
     "b": "bitti",  # bittiä              # should only take positive powers
@@ -85,8 +85,8 @@
     "amin": "kaariminuutti", # kaariminuuttia
     "am": "kaariminuutti", # kaariminuuttia
     "MOA": "kaariminuutti", # kaariminuuttia
-    "arcsec": "kaarisekuntia", # kaarisekuntia
-    "asec": "kaarisekuntia", # kaarisekuntia
+    "arcsec": "kaarisekunti", # kaarisekuntia
+    "asec": "kaarisekunti", # kaarisekuntia
 
     # distance
     "au": "astronominen yksikkö", "AU": "astronominen yksikkö", # astronomista yksikköä
