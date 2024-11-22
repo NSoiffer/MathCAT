@@ -5,8 +5,8 @@
 #   name: [ "...", "..." "..." ],
 
 - SIPrefixes: {
-    "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hecto", "da": "deka",
-    "d": "deci", "c": "centi", "m": "milli", "µ": "micro", "n": "nano", "p": "pico", "f": "femto", "a": "atto", "z": "zepto", "y": "yocto", "r": "ronto", "q": "quecto"
+    "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hekto", "da": "deka",
+    "d": "deci", "c": "centi", "m": "milli", "µ": "mikro", "n": "nano", "p": "piko", "f": "femto", "a": "atto", "z": "zepto", "y": "yokto", "r": "ronto", "q": "quekto"
   }
 
 # this is a list of all units that accept SIPrefixes
@@ -15,24 +15,24 @@
 #   The SI prefixes can be used with several of accepted units, but not, for example, with the non-SI units of time.
 - SIUnits: {
     # base units
-    "A": "amp",
+    "A": "ampère",
     "cd": "candela",
     "K": "kelvin", "K": "kelvin", # U+212A
     "g": "gram",
-    "m": "metre",     # British spelling works for US also
-    "mol": "mole",
-    "s": "second", "sec": "second",  # "sec" not actually legal
+    "m": "meter",     # British spelling works for US also
+    "mol": "mol",
+    "s": "sekund", "sek": "sekund",  # "sec" not actually legal
 
     # derived units
     "Bq": "becquerel",
     "C": "coulomb",
-    "°C": "degree celsius", "℃": "degree celsius", # should only take negative powers
+    "°C": "grad celsius", "℃": "grad celsius", # should only take negative powers
     "F": "farad",
     "Gy": "gray",
     "H": "henry",
     "Hz": "hertz",
     "J": "joule",
-    "kat": "kattel",
+    "kat": "katal",
     "lm": "lumen",
     "lx": "lux",
     "N": "newton",
@@ -46,18 +46,18 @@
     "Wb": "weber",
 
     # accepted (plus a few variants) that take SI prefixes
-    "l": "litre", "L": "litre", "ℓ": "litre",  # Should only take negative powers; British spelling works for US also
-    "t": "metric ton",           # should only take positive powers
+    "l": "liter", "L": "liter", "ℓ": "liter",  # Should only take negative powers; British spelling works for US also
+    "t": "ton",           # should only take positive powers
     "Da": "dalton",
     "Np": "neper",               # should only take negative powers
-    "u": "atomic mass unit",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
-    "eV": "electronvolt",
+    "u": "atommassenhet",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
+    "eV": "elektronvolt",
     "rad": "radian",             # should only take negative powers
-    "sr": "sterradion",          # should only take negative powers      
+    "sr": "sterradian",          # should only take negative powers      
   
     # others that take a prefix
     "a": "annum",               # should only take positive powers
-    "as": "arcsecond",          # see en.wikipedia.org/wiki/Minute_and_second_of_arc
+    "as": "bågsekund",          # see en.wikipedia.org/wiki/Minute_and_second_of_arc
 
     # technically wrong, but used in practice with SI Units
     "b": "bit",               # should only take positive powers
@@ -68,45 +68,45 @@
 
 - UnitsWithoutPrefixes: {
     # time
-    "″": "second", "\"": "second",
-    "′": "minute", "'": "minute","min": "minute",
-    "h": "hour", "hr": "hour", "Hr": "hour",
-    "d": "day", "dy": "day",
-    "w": "week", "wk": "week",
-    "y": "year", "yr": "year",    
+    "″": "sekund", "\"": "sekund",
+    "′": "minut", "'": "minut","min": "minut",
+    "h": "timme", "hr": "timme", "Hr": "timme", "tim": "timme",
+    "d": "dag", "dy": "dag",
+    "w": "vecka", "wk": "vecka", "v": "vecka",
+    "y": "år", "yr": "år",    
 
     # angles
-    "°": "degree", "deg": "degree", # should only take negative powers
-    "arcmin": "arcminute",
-    "amin": "arcminute",
-    "am": "arcminute",
-    "MOA": "arcminute",
-    "arcsec": "arcsecond",
-    "asec": "arcsecond",
+    "°": "grad", "deg": "grad", # should only take negative powers
+    "arcmin": "bågminut",
+    "amin": "bågminut",
+    "am": "bågminut",
+    "MOA": "bågminut",
+    "arcsec": "bågsekund",
+    "asec": "bågsekund",
 
     # distance
-    "au": "astronomical unit", "AU": "astronomical unit",
-    "ltyr": "light year", "ly": "light year",
-    "pc": "parsec",
-    "Å": "angstrom", "Å": "angstrom",           # U+00C5 and U+212B
+    "au": "astronomisk enhet", "AU": "astronomisk enhet",
+    "ltyr": "ljusår", "ly": "ljusår",
+    "pc": "parsek",
+    "Å": "ångström", "Å": "ångström",           # U+00C5 and U+212B
     "fm": "fermi",
 
     # others
-    "ha": "hectare",
+    "ha": "hektar",
     # "B": "bel",    # "B" more commonly means bytes
     "dB": "decibel", # already loglogarithmic, so not used with SI prefixes
 
-    "amu": "atomic mass unit",
-    "atm": "atmosphere",
+    "amu": "atommassenhet",
+    "atm": "atmosfär",
     "bar": "bar",
-    "cal": "calorie",
+    "cal": "kalori",
     "Ci": "curie",
-    "grad": "gradian",
+    "grad": "gon",
     "M": "molar",
-    "R": "roentgen",
-    "rpm": "revolution per minute",
+    "R": "röntgen",
+    "rpm": "varv per minut",
     "℧": "m-h-o",
-    "dyn": "dyne",
+    "dyn": "dyn",
     "erg": "erg",
 
     # powers of 2 used with bits and bytes
@@ -115,38 +115,39 @@
   }
 
   # this will only be used if the language is English, so it can be empty for other countries
+  # not necessarily! imperial units can still occur in e.g. Swedish textbooks: "Exercise: convert this into proper units", also some are usen in Swedish cook-books. /Tim
 - EnglishUnits: {
     # length
-    "in": "inch",
-    "ft": "foot",
+    "in": "tum",
+    "ft": "fot",
     "mi": "mile",
     "rd": "rod",
     "li": "link",
     "ch": "chain",
 
     # area
-    "sq in": "square inch", "sq. in": "square inch", "sq. in.": "square inch",
-    "sq ft": "square foot", "sq. ft": "square foot", "sq. ft.": "square foot",
-    "sq yd": "square yard", "sq. yd": "square yard", "sq. yd.": "square yard",
-    "sq mi": "square mile", "sq. mi": "square mile", "sq. mi.": "square mile",
-    "ac": "acre",
+    "sq in": "kvadrattum", "sq. in": "kvadrattum", "sq. in.": "kvadrattum",
+    "sq ft": "kvadratfot", "sq. ft": "kvadratfot", "sq. ft.": "kvadratfot",
+    "sq yd": "kvadratyard", "sq. yd": "kvadratyard", "sq. yd.": "kvadratyard",
+    "sq mi": "kvadratmile", "sq. mi": "kvadratmile", "sq. mi.": "kvadratmile",
+    "ac": "engelskt tunnland",
     "FBM": "board foot",
 
     # volume
-    "cu in": "cubic inch", "cu. in": "cubic inch", "cu. in.": "cubic inch",
-    "cu ft": "cubic foot", "cu. ft": "cubic foot", "cu. ft.": "cubic foot",
-    "cu yd": "cubic yard", "cu. yd": "cubic yard", "cu. yd.": "cubic yard",
-    "bbl": "barrel", "BBL": "barrel",
+    "cu in": "kubiktum", "cu. in": "kubiktum", "cu. in.": "kubiktum",
+    "cu ft": "kubikfot", "cu. ft": "kubikfot", "cu. ft.": "kubikfot",
+    "cu yd": "kubikyard", "cu. yd": "kubikyard", "cu. yd.": "kubikyard",
+    "bbl": "fat", "BBL": "fat",
     "pk": "peck",
-    "bu": "bushel",
-    "tsp": "teaspoon",
-    "tbl": "tablespoon",
+    "bu": "skäppa",
+    "tsp": "tesked", "tsk": "tesked",
+    "tbl": "matsked", "tbsp": "matsked", "msk": "matsked",
 
     # liquid
-    "fl dr": "fluid drams",
+    "fl dr": "fluid dram",
     "fl oz": "fluid ounce",
     "gi": "gill",
-    "cp": "cup", "cup": "cup",
+    "cp": "kopp", "cup": "kopp",
     "pt": "pint",
     "qt": "quart",
     "gal": "gallon",
@@ -154,17 +155,17 @@
     # weight
     "gr": "grain",
     "dr": "dram",
-    "oz": "ounce", "℥": "ounce",
-    "lb": "pound",
+    "oz": "uns", "℥": "uns",
+    "lb": "pund",
     "cwt": "hundredweight",
     "dwt": "pennyweight",
-    "oz t": "troy ounce",
-    "lb t": "troy pound",
+    "oz t": "troyuns",
+    "lb t": "troypund",
 
     # energy
-    "hp": "horsepower",
-    "BTU": "BTU",
-    "°F": "degree fahrenheit", "℉": "degree fahrenheit",
+    "hp": "hästkraft",
+    "BTU": "B-T-U",
+    "°F": "grad fahrenheit", "℉": "grad fahrenheit",
 
     # other
     "mph": "mile per hour",
@@ -172,15 +173,60 @@
   }
 
 - PluralForms: {
-  # FIX: this needs to be flushed out
-    "inch": "inches", "square inch": "square inches", "cubic inch": "cubic inches",
-    "foot": "feet", "square foot": "square feet", "cubic foot": "cubic feet",
-    "board foot": "board feet",
-    "degree celsius": "degrees celsius",
-    "degree fahrenheit": "degrees fahrenheit",
-    "hertz": "hertz",
-    "siemens": "siemens",
-    "revolution per minute": "revolutions per minute",
+  # SWEDISH: this should be complete. Units not listed here are not modified when pluralised. /Tim
+    "sekund": "sekunder",
+    "grad celcius": "grader celcius",
+    "atommassenhet": "atommassenheter",
+    "radian": "radianer",
+    "steradian": "steradianer",
+    "bågsekund": "bågsekunder",
+    "bit": "bits",
+    "byte": "bytes",
+    "baud": "bauds",
+    "minut": "minuter",
+    "timme": "timmar",
+    "dag": "dagar",
+    "vecka": "veckor",
+    "grad": "grader",
+    "bågminut": "bågminuter",
+    "astronomisk enhet": "astronomiska enheter",
+    "atmosfär": "atmosfärer",
+    "kalori": "kalorier",
+    "kibi-bit": "kibi-bits", 
+    "mebi-bit": "mebi-bits", 
+    "gibi-bit": "gibi-bits", 
+    "tebi-bit": "tebi-bits",
+    "pebi-bit": "pebi-bits",
+    "exbi-bit": "exbi-bits", 
+    "zebi-bit": "zebi-bits", 
+    "yobi-bit": "yobi-bits",
+    "kibi-byte": "kibi-bytes",
+    "mebi-byte": "mebi-bytes",
+    "gibi-byte": "gibi-bytes", 
+    "tebi-byte": "tebi-bytes",
+    "pebi-byte": "pebi-bytes", 
+    "exbi-byte": "exbi-bytes", 
+    "zebi-byte": "zebi-bytes",
+    "yobi-byte": yobi-bytes",
+    "mile": "miles",
+    "rod": "rods",
+    "link": "links",
+    "chain": "chains",
+    "kvadratmile": "kvadratmiles",
+    "engelskt tunnland": "engelska tunnland",
+    "skäppa": "skäppor",
+    "tesked": "teskedar",
+    "matsked": "matskedar",
+    "fluid dram": "fluid drams",
+    "fluid ounce": "fluid ounces",
+    "kopp": "koppar",
+    "pint": "pints",
+    "quart": "quarts",
+    "grain": "grains",
+    "hundredweight": "hundredweights",
+    "pennyweight": "pennyweights",
+    "hästkraft": "hästkrafter",
+    "grad fahrenheit": "grader fahrenheit",
     "mile per hour": "miles per hour",
     "mile per gallon": "miles per gallon",
   }
