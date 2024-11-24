@@ -91,7 +91,7 @@ fn si_base() {
 				1 detik koma 2 detik koma \
 				1 detik koma 2 detik koma \
 				1 detik koma 2 detik koma \
-1 sec koma 2 sec");
+                1 sec koma 2 sec");
 }
 
 #[test]
@@ -116,7 +116,7 @@ fn si_base_with_prefixes() {
 				1 hekto-meter, koma 2 deka-meter, koma \
 				1 desi-mole, koma 2 senti-mole, koma \
 				1 mili-detik, koma 2 mikro-detik, koma \
-1 nsec koma 2 psec");
+                1 nsec koma 2 psec");
 }
 
 
@@ -148,7 +148,7 @@ fn si_derived_1() {
 				1 joule koma 2 joule koma \
 				1 kattel, koma 2 kattel, koma \
 				1 lumen koma 2 lumen koma \
-1 lux koma 2 lux");
+                1 lux koma 2 lux");
 }
 
 #[test]
@@ -177,7 +177,7 @@ fn si_derived_1_with_prefixes() {
 				1 senti-joule, koma 2 mili-joule, koma \
 				1 mikro-kattel, koma 2 nano-kattel, koma \
 				1 piko-lumen, koma 2 femto-lumen, koma \
-1 atto-lux, koma 2 zepto-lux, koma, 1 mili-derajat celsius, koma, 2 mikro-derajat celsius, koma, 1 piko-derajat celsius, koma, 2 nano-derajat celsius");
+                1 atto-lux, koma 2 zepto-lux, koma, 1 mili-derajat celsius, koma, 2 mikro-derajat celsius, koma, 1 piko-derajat celsius, koma, 2 nano-derajat celsius");
 }
 
 #[test]
@@ -204,7 +204,7 @@ fn si_derived_2() {
 				1 tesla koma 2 tesla koma \
 				1 volt koma 2 volt koma \
 				1 watt koma 2 watt koma \
-1 weber koma 2 weber");
+                1 weber koma 2 weber");
 }
 
 #[test]
@@ -231,7 +231,7 @@ fn si_derived_2_with_prefixes() {
 				1 deka-tesla, koma 2 hekto-tesla, koma \
 				1 kilo-volt, koma 2 mega-volt, koma \
 				1 giga-watt, koma 2 tera-watt, koma \
-1 peta-weber, koma 2 exa-weber");
+                1 peta-weber, koma 2 exa-weber");
 }
 
 
@@ -269,7 +269,7 @@ fn si_accepted() {
 				1 arcsecond, koma 2 arcsecond, koma \
 				1 bit koma 2 bit koma \
 				1 byte koma 2 byte koma \
-1 baud koma 2 baud");
+                1 baud koma 2 baud");
 }
 
 #[test]
@@ -341,7 +341,7 @@ fn without_prefix_time() {
 				1 minggu, koma 2 minggu, koma \
 				1 minggu, koma 2 minggu, koma \
 				1 tahun koma 2 tahun koma \
-1 tahun koma 2 tahun");
+                1 tahun koma 2 tahun");
 }
 
 #[test]
@@ -364,7 +364,7 @@ fn without_prefix_angles() {
 				1 arcminute, koma 2 arcminute, koma \
 				1 arcminute, koma 2 arcminute, koma \
 				1 arcsecond, koma 2 arcsecond, koma \
-1 arcsecond, koma 2 arcsecond");
+                1 arcsecond, koma 2 arcsecond");
 }
 
 #[test]
@@ -383,7 +383,7 @@ fn without_prefix_distance() {
 				1 parsec, koma 2 parsec, koma \
 				1 angstrom, koma 2 angstrom, koma \
 				1 angstrom, koma 2 angstrom, koma \
-1 fermi koma 2 fermi");
+                1 fermi koma 2 fermi");
 }
 
 #[test]
@@ -418,7 +418,7 @@ fn without_prefix_other() {
 				1 revolusi per menit, koma 2 revolusi per menit, koma \
 				1 m-h-o koma 2 m-h-o koma \
 				1 dyne koma 2 dyne koma \
-1 erg koma 2 erg");
+                1 erg koma 2 erg");
 }
 
 #[test]
@@ -457,7 +457,7 @@ fn without_prefix_powers_of_2() {
 				1 pebi-byte, koma 2 pebi-byte, koma \
 				1 exbi-byte, koma 2 exbi-byte, koma \
 				1 zebi-byte, koma 2 zebi-byte, koma \
-1 yobi-byte, koma 2 yobi-byte");
+                1 yobi-byte, koma 2 yobi-byte");
 }
 
 
