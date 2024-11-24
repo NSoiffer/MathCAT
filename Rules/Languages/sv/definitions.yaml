@@ -53,7 +53,7 @@
     "u": "atommassenhet",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
     "eV": "elektronvolt",
     "rad": "radian",             # should only take negative powers
-    "sr": "sterradian",          # should only take negative powers      
+    "sr": "steradian",          # should only take negative powers      
   
     # others that take a prefix
     "a": "annum",               # should only take positive powers
@@ -175,7 +175,7 @@
 - PluralForms: {
   # SWEDISH: this should be complete. Units not listed here are not modified when pluralised. /Tim
     "sekund": "sekunder",
-    "grad celcius": "grader celcius",
+    "grad celsius": "grader celsius",
     "atommassenhet": "atommassenheter",
     "radian": "radianer",
     "steradian": "steradianer",
@@ -207,7 +207,7 @@
     "pebi-byte": "pebi-bytes", 
     "exbi-byte": "exbi-bytes", 
     "zebi-byte": "zebi-bytes",
-    "yobi-byte": yobi-bytes",
+    "yobi-byte": "yobi-bytes",
     "mile": "miles",
     "rod": "rods",
     "link": "links",
