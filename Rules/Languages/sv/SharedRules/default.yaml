@@ -335,7 +335,7 @@
                   then: [T: "och"]      # phrase(10 is greater than 8 'and' less than 15)
               - T: "med"      # phrase(substitute x 'with' y)
               - x: "count($Postscripts) div 2"
-              - T: "höger índex"      # phrase(this material includes several 'postscripts')
+              - T: "höger index"      # phrase(this material includes several 'postscripts')
               - pause: short
           - test:
               if: "not($Postscripts[1][self::m:none])"

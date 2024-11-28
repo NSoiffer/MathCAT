@@ -3085,7 +3085,7 @@
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        replace: [T: "ligatur ae"]                  #     (en: 'ligature ae', google translation)
+        replace: [T: "ligatur a e"]                  #     (en: 'ligature ae', google translation)
  - "":                                             #  0xf19b
     - test: 
         if: "$CapitalLetters_Beep"
