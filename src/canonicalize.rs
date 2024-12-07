@@ -234,7 +234,7 @@ struct StackInfo<'a, 'op>{
 	is_operand: bool,			// true if child at end of mrow is an operand (as opposed to an operator)
 }
 
-impl<'a, 'op> fmt::Display for StackInfo<'a, 'op> {
+impl fmt::Display for StackInfo<'_, '_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "StackInfo(op={}/{}, is_operand={}, mrow({}",
 				show_invisible_op_char(self.op_pair.ch), self.op_pair.op.priority, self.is_operand,
@@ -4055,7 +4055,7 @@ pub fn add_attrs<'a>(mathml: Element<'a>, attrs: &[Attribute]) -> Element<'a> {
 }
 
 
-pub fn name<'a>(node: &'a Element<'a>) -> &str {
+pub fn name<'a>(node: &'a Element<'a>) -> &'a str {
 	return node.name().local_part();
 }
 

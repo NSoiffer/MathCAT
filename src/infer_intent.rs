@@ -7,7 +7,7 @@
 
 use sxd_document::dom::*;
 use crate::speech::SpeechRulesWithContext;
-use crate::canonicalize::{as_element, as_text, name, create_mathml_element, set_mathml_name};
+use crate::canonicalize::{as_element, as_text, name, create_mathml_element, set_mathml_name, INTENT_ATTR};
 use crate::errors::*;
 use std::fmt;
 use crate::pretty_print::mml_to_string;
@@ -24,7 +24,6 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
             if intent_preference == "Error" {
                 return Err(e);
             } else {
-                const INTENT_ATTR: &str = "intent";
                 let saved_intent_attr = mathml.attribute_value(INTENT_ATTR).unwrap();
                 mathml.remove_attribute(INTENT_ATTR);
                 // can't call intent_from_mathml() because we have already borrowed_mut -- we call a more internal version
@@ -43,7 +42,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
     }
 
     fn catch_errors_building_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, mathml: Element<'c>) -> Result<Element<'m>> {
-        if let Some(intent_str) = mathml.attribute_value("intent") {
+        if let Some(intent_str) = mathml.attribute_value(INTENT_ATTR) {
             // debug!("Before intent: {}", crate::pretty_print::mml_to_string(&mathml));
             let mut lex_state = LexState::init(intent_str.trim())?;
             let result = build_intent(rules_with_context, &mut lex_state, mathml)
@@ -102,7 +101,7 @@ lazy_static! {
 static TERMINALS_AS_U8: [u8; 3] = [b'(', b',', b')'];
 // static TERMINALS: [char; 3] = ['(', ',',')'];
 
-// 'i -- "i" for the lifetime of the "intent" string
+// 'i -- "i" for the lifetime of the INTENT_ATTR string
 #[derive(Debug, PartialEq, Eq, Clone)]
 enum Token<'i> {
     Terminal(&'i str),  // "(", ",", ")"
@@ -113,7 +112,7 @@ enum Token<'i> {
     None,               // out of characters
 }
 
-impl<'i> fmt::Display for Token<'i> {
+impl fmt::Display for Token<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return write!(f, "{}",
             match self {
@@ -128,7 +127,7 @@ impl<'i> fmt::Display for Token<'i> {
     }
 }
 
-impl<'i> Token<'i> {
+impl Token<'_> {
     fn is_terminal(&self, terminal: &str) -> bool {
         if let Token::Terminal(value) = *self {
             return value == terminal;
@@ -154,7 +153,7 @@ struct LexState<'i> {
     remaining_str: &'i str,     // always trimmed
 }
 
-impl<'i> fmt::Display for LexState<'i> {
+impl fmt::Display for LexState<'_> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         return writeln!(f, "token: {}, remaining: '{}'", self.token, self.remaining_str);
     }
@@ -236,11 +235,11 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
                 intent = create_mathml_element(&doc, name(&mathml));
                 intent.set_attribute_value(INTENT_PROPERTY, &properties);
             } else {
-                let saved_intent = mathml.attribute_value("intent").unwrap();
-                mathml.remove_attribute("intent");
+                let saved_intent = mathml.attribute_value(INTENT_ATTR).unwrap();
+                mathml.remove_attribute(INTENT_ATTR);
                 mathml.set_attribute_value(INTENT_PROPERTY, &properties);   // needs to be set before the pattern match
                 intent = rules_with_context.match_pattern::<Element<'m>>(mathml)?;
-                mathml.set_attribute_value("intent", saved_intent);
+                mathml.set_attribute_value(INTENT_ATTR, saved_intent);
             }
             return Ok(intent);      // if we start with properties, then there can only be properties
         },
@@ -394,7 +393,7 @@ fn find_arg<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithCon
             // debug!("looking for '{}', found arg='{}'", name, arg_val);
             if name == arg_val {
                 // check to see if this mathml has an intent value -- if so the value is the value of its intent value
-                if let Some(intent_str) = mathml.attribute_value("intent") {
+                if let Some(intent_str) = mathml.attribute_value(INTENT_ATTR) {
                     let mut lex_state = LexState::init(intent_str.trim())?;
                     return Ok( Some( build_intent(rules_with_context, &mut lex_state, mathml)? ) );
                 } else {
@@ -406,7 +405,7 @@ fn find_arg<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithCon
         }
     }
 
-    if no_check_inside && mathml.attribute_value("intent").is_some() {
+    if no_check_inside && mathml.attribute_value(INTENT_ATTR).is_some() {
         return Ok(None);           // don't look inside 'intent'
     }
 
