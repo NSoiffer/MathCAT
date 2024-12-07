@@ -2,7 +2,6 @@ use crate::common::*;
 
 #[test]
 fn case_1() {
-    // init_logger();
     let expr = "<math>
             <mrow>
             <mi>f</mi><mrow><mo>(</mo>
@@ -38,7 +37,6 @@ fn case_1() {
 
 #[test]
 fn equation_1() {
-    // init_logger();
     let expr = "<math>
      <mrow>
       <mtable>
