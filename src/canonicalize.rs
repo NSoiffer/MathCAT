@@ -23,6 +23,8 @@ use crate::chemistry::*;
 const DECIMAL_SEPARATOR: &str = ".";
 pub const CHANGED_ATTR: &str = "data-changed";
 pub const ADDED_ATTR_VALUE: &str = "added";
+pub const INTENT_ATTR: &str = "intent";
+pub const MATHML_NAME_ATTR: &str = "data-from-mathml";
 const MFENCED_ATTR_VALUE: &str = "from_mfenced";
 const EMPTY_IN_2D: &str = "data-empty-in-2D";
 const SPACE_AFTER: &str = "data-space-after";
@@ -699,7 +701,7 @@ impl CanonicalizeContext {
 	
 	fn is_empty_element(el: Element) -> bool {
 		return (is_leaf(el) && as_text(el).trim().is_empty()) ||
-			   (name(&el) == "mrow" && el.children().is_empty() && el.attribute("intent").is_none());
+			   (name(&el) == "mrow" && el.children().is_empty() && el.attribute(INTENT_ATTR).is_none());
 	}
 
 
@@ -730,7 +732,7 @@ impl CanonicalizeContext {
 	fn is_ok_to_merge_mrow_child(mrow: Element) -> bool {
 		assert_eq!(name(&mrow), "mrow");
 		assert!(mrow.children().len() == 1);
-		return mrow.attribute("intent").is_none();		// could check if child is referenced, but that's a chunk of code
+		return mrow.attribute(INTENT_ATTR).is_none();		// could check if child is referenced, but that's a chunk of code
 	}
 
 	/// This function does some cleanup of MathML (mostly fixing bad MathML)
@@ -754,7 +756,7 @@ impl CanonicalizeContext {
 			static ref IS_PRIME: Regex = Regex::new(r"['′″‴⁗]").unwrap();
 
 			// Note: including intervening spaces in what is likely a symbol of omission preserves any notion of separate digits (e.g., "_ _ _")
-			static ref IS_UNDERSCRORE: Regex = Regex::new(r"^[_\u{00A0}]+$").unwrap();        }
+			static ref IS_UNDERSCORE: Regex = Regex::new(r"^[_\u{00A0}]+$").unwrap();        }
 
 		static CURRENCY_SYMBOLS: phf::Set<&str> = phf_set! {
 			"$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿" // could add more currencies...
@@ -778,7 +780,7 @@ impl CanonicalizeContext {
 		};
 		
 		if mathml.children().is_empty() && !EMPTY_ELEMENTS.contains(element_name) {
-			if element_name == "mrow" && mathml.attribute("intent").is_none() {
+			if element_name == "mrow" && mathml.attribute(INTENT_ATTR).is_none() {
 				// if it is an empty mrow that doesn't need to be there, get rid of it. Otherwise, replace it with an mtext
 				if parent_name == "mmultiscripts" {	// MathML Core dropped "none" in favor of <mrow/>, but MathCAT is written with <none/>
 					set_mathml_name(mathml, "none");
@@ -832,7 +834,7 @@ impl CanonicalizeContext {
 					mathml.set_text(dash);
 					return Some(mathml);
 				} else if text.contains('_') {
-					// if left or right are an mo, leave as is. Otherwis convert to an mo.
+					// if left or right are an mo, leave as is. Otherwise convert to an mo.
 					let preceding_siblings = mathml.preceding_siblings();
 					let following_siblings = mathml.following_siblings();
 					if preceding_siblings.is_empty() || following_siblings.is_empty() {
@@ -844,7 +846,7 @@ impl CanonicalizeContext {
 					}
 					return Some(mathml);
 				} else if OPERATORS.get(text).is_some() {
-					if  let Some(intent_value) = mathml.attribute_value("intent") {
+					if  let Some(intent_value) = mathml.attribute_value(INTENT_ATTR) {
 						// if it is a unit, it might be seconds, minutes, feet, ... not an operator
 						if intent_value.contains(":unit") {
 							return Some(mathml);
@@ -1023,7 +1025,7 @@ impl CanonicalizeContext {
 				let children = mathml.children();
 				if element_name == "mrow" {
 					// handle special cases of empty mrows and mrows which just one element
-					if children.is_empty() && mathml.attribute("intent").is_none() {
+					if children.is_empty() && mathml.attribute(INTENT_ATTR).is_none() {
 						return if parent_requires_child {Some(mathml)} else {None};
 					} else if children.len() == 1 && CanonicalizeContext::is_ok_to_merge_mrow_child(mathml) {
 						let is_from_mhchem = is_from_mhchem_hack(mathml);
@@ -1050,7 +1052,7 @@ impl CanonicalizeContext {
 							(children.len() > 1 && ELEMENTS_WITH_ONE_CHILD.contains(element_name)) {
 					let merged = merge_dots(mathml);	// FIX -- switch to passing in children
 					let merged = merge_primes(merged);
-					let merged = merge_chars(merged, &IS_UNDERSCRORE);
+					let merged = merge_chars(merged, &IS_UNDERSCORE);
 					handle_pseudo_scripts(merged)
 				} else {
 					mathml
@@ -1211,7 +1213,7 @@ impl CanonicalizeContext {
 				return false;
 			}
 
-			if let Some(intent_value) = mathml.attribute_value("intent") {
+			if let Some(intent_value) = mathml.attribute_value(INTENT_ATTR) {
 				if intent_value != "ratio" || !intent_value.starts_with('_') {
 					return false;
 				}
@@ -1397,26 +1399,26 @@ impl CanonicalizeContext {
 				let n_multiscripts_children = multiscripts_children.len();
 				let potential_mprescripts_element = as_element(multiscripts_children[n_multiscripts_children-3]);
 				if name(&potential_mprescripts_element) == "mprescripts" {		// we have potential chem prescripts
-					// create a new mmultiscipts elements with first child as its base mathml's prescripts as the new element's prescripts
-					let mut new_mmultiscript_children = Vec::with_capacity(4);
-					new_mmultiscript_children.push(base_children[0]);
+					// create a new mmultiscripts elements with first child as its base mathml's prescripts as the new element's prescripts
+					let mut new_mmultiscripts_children = Vec::with_capacity(4);
+					new_mmultiscripts_children.push(base_children[0]);
 					base.remove_child(as_element(base_children[0]));
-					new_mmultiscript_children.push(multiscripts_children[n_multiscripts_children-3]);
-					new_mmultiscript_children.push(multiscripts_children[n_multiscripts_children-2]);
-					new_mmultiscript_children.push(multiscripts_children[n_multiscripts_children-1]);
+					new_mmultiscripts_children.push(multiscripts_children[n_multiscripts_children-3]);
+					new_mmultiscripts_children.push(multiscripts_children[n_multiscripts_children-2]);
+					new_mmultiscripts_children.push(multiscripts_children[n_multiscripts_children-1]);
 
-					let new_mmultiscript = create_mathml_element(&base.document(), "mmultiscripts");
-					new_mmultiscript.append_children(new_mmultiscript_children);
-					let likely = likely_adorned_chem_formula(new_mmultiscript);
-					new_mmultiscript.set_attribute_value(MAYBE_CHEMISTRY, &likely.to_string());
-					// debug!("attach_scripts_to_split_element -- new_mmultiscript: \n{}", mml_to_string(&new_mmultiscript));
+					let new_mmultiscripts = create_mathml_element(&base.document(), "mmultiscripts");
+					new_mmultiscripts.append_children(new_mmultiscripts_children);
+					let likely = likely_adorned_chem_formula(new_mmultiscripts);
+					new_mmultiscripts.set_attribute_value(MAYBE_CHEMISTRY, &likely.to_string());
+					// debug!("attach_scripts_to_split_element -- new_mmultiscripts: \n{}", mml_to_string(&new_mmultiscripts));
 					if n_multiscripts_children == 4 {
 						// we stripped all the children so only the (modified) base exists
-						// create mrow(new_mmultiscript, mathml[0])
-						let children = vec![new_mmultiscript, base];
+						// create mrow(new_mmultiscripts, mathml[0])
+						let children = vec![new_mmultiscripts, base];
 						return replace_children(mathml, children);
 					}
-					mathml_replacement.push(new_mmultiscript);
+					mathml_replacement.push(new_mmultiscripts);
 				}
 			}
 
@@ -1980,7 +1982,7 @@ impl CanonicalizeContext {
 		}
 
 		/// If we have something like 'V e l o c i t y', merge that into a single <mi>
-		/// We only do this for sequences of at least three chars, and also exclude things like consequtive letter (e.g., 'x y z')
+		/// We only do this for sequences of at least three chars, and also exclude things like consecutive letter (e.g., 'x y z')
 		/// The returned (mi) element reuses 'mi'
 		fn merge_mi_sequence(mi: Element) -> Option<Element> {
 			// The best solution would be to use a dictionary of words, or maybe restricted to words in a formula,
@@ -2038,7 +2040,7 @@ impl CanonicalizeContext {
 				return answer;
 			}
 
-			// don't be too agressive combining mi's when they are short
+			// don't be too aggressive combining mi's when they are short
 			if text.chars().count() < 3 {
 				return None;
 			}
@@ -2056,7 +2058,7 @@ impl CanonicalizeContext {
 				return merge_from_text(mi, &text, &following_mi_siblings);
 			}
 		
-			// now for some hueristics to rule out a sequence of variables
+			// now for some heuristics to rule out a sequence of variables
 			// rule out sequences like 'abc' and also 'axy'
 			let mut chars = text.chars();
 			let mut left = chars.next().unwrap();		// at least 3 chars
@@ -2073,7 +2075,7 @@ impl CanonicalizeContext {
 				return None;
 			}
 
-			// FIX: should add more huerestics to rule out words
+			// FIX: should add more heuristics to rule out words
 			return merge_from_text(mi, &text, &following_mi_siblings);
 
 			fn merge_from_text<'a>(mi: Element<'a>, text: &str, following_siblings: &[Element]) -> Option<Element<'a>> {
@@ -2398,7 +2400,7 @@ impl CanonicalizeContext {
 	
 			assert!(name(&mrow) == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(name(&mrow)), "non-mrow passed to handle_pseudo_scripts: {}", mml_to_string(&mrow));
 			let mut children = mrow.children();
-			// check to see if mrow of all psuedo scripts
+			// check to see if mrow of all pseudo scripts
 			if children.iter().all(|&child| {
 				is_pseudo_script(as_element(child))
 			}) {
