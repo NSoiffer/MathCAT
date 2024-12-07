@@ -86,7 +86,7 @@ pub fn is_chemistry_off(mathml: Element) -> bool {
     lazy_static! {
         static ref INTENT_STRUCTURE: Regex = Regex::new(r"literal([ \t\n:(]|$)").unwrap();
     }
-    if let Some(intent) = mathml.attribute_value("intent") {
+    if let Some(intent) = mathml.attribute_value(INTENT_ATTR) {
         if INTENT_STRUCTURE.is_match(intent) {
             return true;
         }
@@ -302,7 +302,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
 
     // we play games with the string to avoid allocation...
     let token_string = as_text(mathml);
-    if token_string.chars().any(|ch| !ch.is_ascii()) {
+    if token_string.is_ascii() {
         return None;    // chemical elements are ASCII
     }
     let doc = mathml.document();
@@ -378,7 +378,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
             return None;    // can't be an chemical letter
         }
         let chem_element = unsafe{ str::from_utf8_unchecked(&bytes_str[..n]) };
-        if CHEMICAL_ELEMENT_ELECTRONEGATIVITIES.contains_key( chem_element ) {
+        if CHEMICAL_ELEMENT_ELECTRONEGATIVITY.contains_key( chem_element ) {
             return Some( new_chemical_element(doc, chem_element) );
         }
 
@@ -671,7 +671,7 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
         for &child in preceding_children.iter().rev() {
             let child = as_element(child);
             // because this is before canonicalization, there could be an mrow with just mi/mtext
-            if name(&child) == "mrow" && child.children().len() == 1 && child.attribute("intent").is_none() {
+            if name(&child) == "mrow" && child.children().len() == 1 && child.attribute(INTENT_ATTR).is_none() {
                 // "lift" the child up so all the links (e.g., siblings) are correct
                 let child = as_element(child.children()[0]);
                 set_mathml_name(child, name(&child));
@@ -1122,7 +1122,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
 fn is_order_ok(mrow: Element) -> bool {
     assert_eq!(name(&mrow), "mrow");
     if let Some(elements) = collect_elements(mrow) {
-        if elements.iter().any(|&e| !CHEMICAL_ELEMENT_ELECTRONEGATIVITIES.contains_key(e)) {
+        if elements.iter().any(|&e| !CHEMICAL_ELEMENT_ELECTRONEGATIVITY.contains_key(e)) {
             return false;
         }
         let n_elements = elements.len();
@@ -1217,10 +1217,10 @@ fn is_alphabetical(elements: &[&str]) -> bool {
 }
 
 fn is_ordered_by_electronegativity(elements: &[&str]) -> bool {
-    // HPO_4^2 (Monohydrogen phosphate) doesn't fit this pattern, nor does HCO_3^- (Hydrogen carbonate) and some others
+    // HPO_4^2 (Mono-hydrogen phosphate) doesn't fit this pattern, nor does HCO_3^- (Hydrogen carbonate) and some others
     // FIX: drop "H" from the ordering??
     assert!(!elements.len() > 1);   // already handled
-    return elements.windows(2).all(|pair| CHEMICAL_ELEMENT_ELECTRONEGATIVITIES.get(pair[0]).unwrap() < CHEMICAL_ELEMENT_ELECTRONEGATIVITIES.get(pair[1]).unwrap());
+    return elements.windows(2).all(|pair| CHEMICAL_ELEMENT_ELECTRONEGATIVITY.get(pair[0]).unwrap() < CHEMICAL_ELEMENT_ELECTRONEGATIVITY.get(pair[1]).unwrap());
 }
 
 fn is_generalized_salt(elements: &[&str]) -> bool {
@@ -1284,7 +1284,7 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
         } else if children.len() == 6 && name(&as_element(children[3]))=="mprescripts" {  // pre and postscripts
             prescripts = &children[4..6];
             postscripts = &children[1..3]; // empty
-        } else if children.len() == 3 || children.len() == 5 {   // just postscripts (simultanious or offset)
+        } else if children.len() == 3 || children.len() == 5 {   // just postscripts (simultaneous or offset)
             prescripts = &children[0..0]; // empty
             postscripts = &children[1..];
         } else {
@@ -1718,7 +1718,7 @@ fn convert_to_short_form(mathml: Element) -> Result<String> {
 /// That list uses a horizontal line for the Lanthanide and Actinide Series.
 /// Because I had already ordered the elements before realizing that, I opened a gap and started the higher ones again with a '1' in front.
 /// The list is missing recent (unstable) elements -- I added them with the same value as the element above them in the periodic table.
-static CHEMICAL_ELEMENT_ELECTRONEGATIVITIES: phf::Map<&str, u32> = phf_map! {
+static CHEMICAL_ELEMENT_ELECTRONEGATIVITY: phf::Map<&str, u32> = phf_map! {
 	"Ac" => 40, "Ag" => 155, "Al" => 163, "Am" => 29, "Ar" => 4, "As" => 172, "At" => 181, "Au" => 154,
     "B" => 164, "Ba" => 14, "Be" => 18, "Bh" => 137, "Bi" => 170, "Bk" => 27, "Br" => 183,
 	"C" => 169, "Ca" => 16, "Cd" => 158, "Ce" => 56, "Cf" => 26, "Cl" => 184, "Cm" => 28, "Cn" => 157, "Co" => 148, "Cr" => 136, "Cs" => 8, "Cu" => 156,
@@ -1763,7 +1763,7 @@ pub fn is_chemical_element(node: Element) -> bool {
 	}
 
 	let text = as_text(node);
-	return CHEMICAL_ELEMENT_ELECTRONEGATIVITIES.contains_key(text);
+	return CHEMICAL_ELEMENT_ELECTRONEGATIVITY.contains_key(text);
 }
 
 

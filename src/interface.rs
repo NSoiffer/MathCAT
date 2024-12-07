@@ -64,7 +64,7 @@ fn init_mathml_instance() -> RefCell<Package> {
 }
 
 /// Set the Rules directory
-/// IMPORTANT: this should be the very first call to MathCAT. If 'dir' is an empty string, the envirnoment var 'MathCATRulesDir' is tried.
+/// IMPORTANT: this should be the very first call to MathCAT. If 'dir' is an empty string, the environment var 'MathCATRulesDir' is tried.
 pub fn set_rules_dir(dir: String) -> Result<()> {
     enable_logs();
     use std::path::PathBuf;
