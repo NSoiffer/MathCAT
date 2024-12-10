@@ -7,8 +7,8 @@
 # - name: [] "...", "..." "..." ]
 
 - SIPrefixes: {
-    "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hecto", "da": "deka",
-    "d": "deci", "c": "centi", "m": "milli", "µ": "micro", "n": "nano", "p": "pico", "f": "femto", "a": "atto", "z": "zepto", "y": "yocto", "r": "ronto", "q": "quecto"
+    "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "仟", "h": "hecto", "da": "deka",
+    "d": "deci", "c": "centi", "m": "毫", "µ": "微", "n": "奈", "p": "pico", "f": "femto", "a": "atto", "z": "zepto", "y": "yocto", "r": "ronto", "q": "quecto"
   }
 
 # this is a list of all units that accept SIPrefixes
@@ -19,16 +19,16 @@
     # base units
     "A": "安培",
     "cd": "燭光",
-    "K": "凱氏", "K": "kelvin", # U+212A
+    "K": "凱氏", "K": "凱氏", # U+212A
     "g": "克",
     "m": "公尺",     # British spelling works for US also
     "mol": "莫耳",
-    "s": "秒", "″": "second", "\"": "second", "sec": "second",  # "sec" not actually legal
+    "s": "秒", "″": "秒", "\"": "秒", "sec": "秒",  # "sec" not actually legal
 
     # derived units
     "Bq": "貝克",
     "C": "庫侖",
-    "°C": "攝氏度", "℃": "degree celsius",
+    "°C": "攝氏度", "℃": "攝氏度",
     "F": "法拉",
     "Gy": "格雷",
     "H": "亨利",
@@ -38,7 +38,7 @@
     "lm": "流明",
     "lx": "勒克斯",
     "N": "牛頓",
-    "Ω": "歐姆", "Ω": "ohm",       # Greek Cap letter, U+2126 OHM SIGN
+    "Ω": "歐姆", "Ω": "歐姆",       # Greek Cap letter, U+2126 OHM SIGN
     "Pa": "帕",
     "rad": "弳",
     "S": "西門子",
@@ -53,9 +53,21 @@
     "l": "公升", "L": "公升", "ℓ": "公升",               # British spelling works for US also
     "t": "公噸",
     "Da": "道爾頓",
+    "Np": "奈培",       # nepar        # should only take negative powers
     "amu": "原子質量單位", "u": "原子質量單位",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
     "au": "天文單位", "AU": "天文單位",
     "eV": "電子伏特",
+    
+    # copy from english version by hjy
+    # others that take a prefix
+    "a": "annum",               # should only take positive powers
+    "as": "弧秒",          # see en.wikipedia.org/wiki/Minute_and_second_of_arc
+
+    # Copy from english version by hjy
+    # technically wrong, but used in practice with SI Units
+    "b": "位元",               # should only take positive powers
+    "B": "位元組",              # should only take positive powers
+    "Bd": "baud",             # should only take positive powers
   }
 
 
@@ -115,17 +127,17 @@
     "ch": "鏈",
 
     # area
-    "sq in": "平方英寸", "sq. in": "square inch", "sq. in.": "square inch",
-    "sq ft": "平方英尺", "sq. ft": "square foot", "sq. ft.": "square foot",
-    "sq yd": "平方碼", "sq. yd": "square yard", "sq. yd.": "square yard",
-    "sq mi": "平方英里", "sq. mi": "square mile", "sq. mi.": "square mile",
+    "sq in": "平方英寸", "sq. in": "平方英寸", "sq. in.": "平方英寸",
+    "sq ft": "平方英尺", "sq. ft": "平方英尺", "sq. ft.": "平方英尺",
+    "sq yd": "平方碼", "sq. yd": "平方碼", "sq. yd.": "平方碼",
+    "sq mi": "平方英里", "sq. mi": "平方英里", "sq. mi.": "平方英里",
     "ac": "英畝",
     "FBM": "板英尺",
 
     # volume
-    "cu in": "立方英寸", "cu. in": "cubic inch", "cu. in.": "cubic inch",
-    "cu ft": "立方英尺", "cu. ft": "cubic foot", "cu. ft.": "cubic foot",
-    "cu yd": "立方碼", "cu. yd": "cubic yard", "cu. yd.": "cubic yard",
+    "cu in": "立方英寸", "cu. in": "立方英寸", "cu. in.": "立方英寸",
+    "cu ft": "立方英尺", "cu. ft": "立方英尺", "cu. ft.": "立方英尺",
+    "cu yd": "立方碼", "cu. yd": "立方碼", "cu. yd.": "立方碼",
     "bbl": "桶", "BBL": "桶",
     "pk": "配克",
     "bu": "蒲式耳",

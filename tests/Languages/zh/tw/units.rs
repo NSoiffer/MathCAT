@@ -39,32 +39,33 @@ fn prefix_sweep() {
         <mi intent=":unit">qg</mi>
         </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "quetta-grams, comma, \
-                ronna-grams, comma, \
-                yotta-grams, comma, \
-                zetta-grams, comma, \
-                exa-grams, comma, \
-                peta-grams, comma, \
-                tera-grams, comma, \
-                giga-grams, comma, \
-                mega-grams, comma, \
-                kilo-grams, comma, \
-                hecto-grams, comma, \
-                deka-grams, comma, \
-                deci-grams, comma, \
-                centi-grams, comma, \
-                milli-grams, comma, \
-                micro-grams, comma, \
-                nano-grams, comma, \
-                pico-grams, comma, \
-                femto-grams, comma, \
-                atto-grams, comma, \
-                zepto-grams, comma, \
-                yocto-grams, comma, \
-                ronto-grams, comma, \
-                quecto-grams");
+        "quetta-克 逗號 \
+                ronna-克 逗號 \
+                yotta-克 逗號 \
+                zetta-克 逗號 \
+                exa-克 逗號 \
+                peta-克 逗號 \
+                tera-克 逗號 \
+                giga-克 逗號 \
+                mega-克 逗號 \
+                仟-克 逗號 \
+                hecto-克 逗號 \
+                deka-克 逗號 \
+                deci-克 逗號 \
+                centi-克 逗號 \
+                毫-克 逗號 \
+                微-克 逗號 \
+                奈-克 逗號 \
+                pico-克 逗號 \
+                femto-克 逗號 \
+                atto-克 逗號 \
+                zepto-克 逗號 \
+                yocto-克 逗號 \
+                ronto-克 逗號 \
+                quecto-克");
 }
 
+// 為什麼秒、克後面沒有暫停","，但公尺、安培等兩個字以上就會有","？
 #[test]
 fn si_base() {
     let expr = r#"<math>
@@ -81,17 +82,17 @@ fn si_base() {
         <mn>1</mn><mi intent=":unit">sec</mi><mo>,</mo><mn>2</mn><mi intent=":unit">sec</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 安培, 逗號, 2 amps, comma, \
-                1 candela, comma; 2 candelas, comma, \
-                1 kelvin, comma, 2 kelvins, comma, \
-                1 kelvin, comma, 2 kelvins, comma, \
-                1 gram, comma, 2 grams, comma, \
-                1 metre, comma, 2 metres, comma, \
-                1 mole, comma, 2 moles, comma, \
-                1 second, comma, 2 seconds, comma, \
-                1 second, comma, 2 seconds, comma, \
-                1 second, comma, 2 seconds, comma, \
-                1 second, comma, 2 seconds");
+        "1 安培, 逗號 2 安培, 逗號 \
+                1 燭光, 逗號 2 燭光, 逗號 \
+                1 凱氏, 逗號 2 凱氏, 逗號 \
+                1 凱氏, 逗號 2 凱氏, 逗號 \
+                1 克 逗號 2 克 逗號 \
+                1 公尺, 逗號 2 公尺, 逗號 \
+                1 莫耳, 逗號 2 莫耳, 逗號 \
+                1 秒 逗號 2 秒 逗號 \
+                1 秒 逗號 2 秒 逗號 \
+                1 秒 逗號 2 秒 逗號 \
+                1 秒 逗號 2 秒");
 }
 
 #[test]
@@ -108,15 +109,15 @@ fn si_base_with_prefixes() {
         <mn>1</mn><mi intent=":unit">nsec</mi><mo>,</mo><mn>2</mn><mi intent=":unit">psec</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 quetta-amp, comma; 2 ronna-amps, comma; \
-                1 yotta-candela, comma; 2 zetta-candelas, comma; \
-                1 exa-kelvin, comma; 2 peta-kelvins, comma; \
-                1 tera-kelvin, comma; 2 giga-kelvins, comma; \
-                1 mega-gram, comma; 2 kilo-grams, comma; \
-                1 hecto-metre, comma; 2 deka-metres, comma; \
-                1 deci-mole, comma; 2 centi-moles, comma; \
-                1 milli-second, comma; 2 micro-seconds, comma; \
-                1 nano-second, comma; 2 pico-seconds");
+        "1 quetta-安培, 逗號, 2 ronna-安培, 逗號, \
+                1 yotta-燭光, 逗號, 2 zetta-燭光, 逗號 \
+                1 exa-凱氏, 逗號 2 peta-凱氏, 逗號 \
+                1 tera-凱氏, 逗號 2 giga-凱氏, 逗號 \
+                1 mega-克, 逗號 2 仟-克, 逗號, \
+                1 hecto-公尺, 逗號 2 deka-公尺, 逗號 \
+                1 deci-莫耳, 逗號, 2 centi-莫耳, 逗號 \
+                1 毫-秒, 逗號 2 微-秒, 逗號 \
+                1 奈-秒, 逗號 2 pico-秒");
 }
 
 
@@ -137,18 +138,18 @@ fn si_derived_1() {
         <mn>1</mn><mi intent=":unit">lx</mi><mo>,</mo><mn>2</mn><mi intent=":unit">lx</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 becquerel, comma; 2 becquerels, comma, \
-                1 coulomb, comma; 2 coulombs, comma; \
-                1 degree celsius, comma; 2 degrees celsius, comma; \
-                1 degree celsius, comma; 2 degrees celsius, comma, \
-                1 farad, comma, 2 farads, comma, \
-                1 gray, comma, 2 grays, comma, \
-                1 henry, comma, 2 henrys, comma, \
-                1 hertz, comma, 2 hertz, comma, \
-                1 joule, comma, 2 joules, comma, \
-                1 kattel, comma, 2 kattels, comma, \
-                1 lumen, comma, 2 lumens, comma, \
-                1 lux, comma, 2 luxs");
+        "1 貝克, 逗號 2 貝克, 逗號 \
+                1 庫侖, 逗號 2 庫侖, 逗號 \
+                1 攝氏度, 逗號 2 攝氏度, 逗號 \
+                1 攝氏度, 逗號 2 攝氏度, 逗號 \
+                1 法拉, 逗號 2 法拉, 逗號 \
+                1 格雷, 逗號 2 格雷, 逗號 \
+                1 亨利, 逗號 2 亨利, 逗號 \
+                1 赫茲, 逗號 2 赫茲, 逗號 \
+                1 焦耳, 逗號 2 焦耳, 逗號 \
+                1 kattel, 逗號 2 kattel, 逗號 \
+                1 流明, 逗號 2 流明, 逗號 \
+                1 勒克斯, 逗號 2 勒克斯");
 }
 
 #[test]
@@ -168,18 +169,18 @@ fn si_derived_1_with_prefixes() {
         <mn>1</mn><mi intent=":unit">p℃</mi><mo>,</mo><mn>2</mn><mi intent=":unit">n℃</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 quetta-becquerel, comma; 2 ronna-becquerels; comma; \
-                1 yotta-coulombs, comma; 2 zetta-coulombs, comma; \
-                1 exa-farad, comma; 2 peta-farads, comma; \
-                1 tera-gray, comma; 2 giga-grays, comma; \
-                1 mega-henry, comma; 2 kilo-henrys, comma; \
-                1 deka-hertz, comma; 2 deci-hertz, comma; \
-                1 centi-joule, comma; 2 milli-joules, comma; \
-                1 micro-kattel, comma; 2 nano-kattels, comma; \
-                1 pico-lumen, comma; 2 femto-lumens, comma; \
-                1 atto-lux, comma; 2 zepto-luxs, comma; \
-                1 milli-degree celsius; comma; 2 micro-degrees celsius; comma; \
-                1 pico-degree celsius; comma; 2 nano-degrees celsius");
+        "1 quetta-貝克, 逗號, 2 ronna-貝克, 逗號, \
+                1 yotta-庫侖, 逗號, 2 zetta-庫侖, 逗號 \
+                1 exa-法拉, 逗號 2 peta-法拉, 逗號 \
+                1 tera-格雷, 逗號 2 giga-格雷, 逗號 \
+                1 mega-亨利, 逗號 2 仟-亨利, 逗號 \
+                1 deka-赫茲, 逗號 2 deci-赫茲, 逗號, \
+                1 centi-焦耳, 逗號 2 毫-焦耳, 逗號 \
+                1 微-kattel, 逗號 2 奈-kattel, 逗號 \
+                1 pico-流明, 逗號, 2 femto-流明, 逗號, \
+                1 atto-勒克斯, 逗號, 2 zepto-勒克斯, 逗號, \
+                1 毫-攝氏度, 逗號, 2 微-攝氏度, 逗號, \
+                1 pico-攝氏度, 逗號, 2 奈-攝氏度");
 }
 
 #[test]
@@ -197,16 +198,16 @@ fn si_derived_2() {
         <mn>1</mn><mi intent=":unit">Wb</mi><mo>,</mo><mn>2</mn><mi intent=":unit">Wb</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 newton, comma, 2 newtons, comma, \
-                1 ohm, comma, 2 ohms, comma, \
-                1 ohm, comma, 2 ohms, comma, \
-                1 pascal, comma, 2 pascals, comma, \
-                1 siemens, comma, 2 siemens, comma, \
-                1 sievert, comma; 2 sieverts, comma, \
-                1 tesla, comma, 2 teslas, comma, \
-                1 volt, comma, 2 volts, comma, \
-                1 watt, comma, 2 watts, comma, \
-                1 weber, comma, 2 webers");
+        "1 牛頓, 逗號 2 牛頓, 逗號 \
+                1 歐姆, 逗號 2 歐姆, 逗號 \
+                1 歐姆, 逗號 2 歐姆, 逗號 \
+                1 帕 逗號 2 帕 逗號 \
+                1 西門子, 逗號 2 西門子, 逗號 \
+                1 西弗, 逗號 2 西弗, 逗號 \
+                1 特士拉, 逗號 2 特士拉, 逗號 \
+                1 伏特, 逗號 2 伏特, 逗號 \
+                1 瓦特, 逗號 2 瓦特, 逗號 \
+                1 韋伯, 逗號 2 韋伯");
 }
 
 #[test]
@@ -224,16 +225,16 @@ fn si_derived_2_with_prefixes() {
         <mn>1</mn><mi intent=":unit">PWb</mi><mo>,</mo><mn>2</mn><mi intent=":unit">EWb</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 quecto-newton, comma; 2 ronto-newtons, comma; \
-                1 yocto-ohm, comma; 2 zepto-ohms, comma; \
-                1 atto-ohm, comma; 2 femto-ohms, comma; \
-                1 pico-pascal, comma; 2 nano-pascals, comma; \
-                1 micro-siemens, comma; 2 milli-siemens, comma; \
-                1 centi-sievert, comma; 2 deci-sieverts, comma; \
-                1 deka-tesla, comma; 2 hecto-teslas, comma; \
-                1 kilo-volt, comma; 2 mega-volts, comma; \
-                1 giga-watt, comma; 2 tera-watts, comma; \
-                1 peta-weber, comma; 2 exa-webers");
+        "1 quecto-牛頓, 逗號, 2 ronto-牛頓, 逗號, \
+                1 yocto-歐姆, 逗號, 2 zepto-歐姆, 逗號 \
+                1 atto-歐姆, 逗號, 2 femto-歐姆, 逗號 \
+                1 pico-帕, 逗號 2 奈-帕, 逗號, \
+                1 微-西門子, 逗號, 2 毫-西門子, 逗號, \
+                1 centi-西弗, 逗號 2 deci-西弗, 逗號, \
+                1 deka-特士拉, 逗號, 2 hecto-特士拉, 逗號 \
+                1 仟-伏特, 逗號 2 mega-伏特, 逗號 \
+                1 giga-瓦特, 逗號 2 tera-瓦特, 逗號 \
+                1 peta-韋伯, 逗號 2 exa-韋伯");
 }
 
 
@@ -257,21 +258,21 @@ fn si_accepted() {
         <mn>1</mn><mi intent=":unit">Bd</mi><mo>,</mo><mn>2</mn><mi intent=":unit">Bd</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 litre, comma, 2 litres, comma, \
-                1 litre, comma, 2 litres, comma, \
-                1 litre, comma, 2 litres, comma, \
-                1 metric ton, comma; 2 metric tons, comma, \
-                1 dalton, comma, 2 daltons, comma, \
-                1 neper, comma, 2 nepers, comma; \
-                1 atomic mass unit, comma; 2 atomic mass units, comma; \
-                1 electronvolt, comma; 2 electronvolts, comma, \
-                1 radian, comma, 2 radians, comma, \
-                1 sterradion, comma; 2 sterradions, comma, \
-                1 annum, comma, 2 annums, comma, \
-                1 arcsecond, comma; 2 arcseconds, comma, \
-                1 bit, comma, 2 bits, comma, \
-                1 byte, comma, 2 bytes, comma, \
-                1 baud, comma, 2 bauds");
+        "1 公升, 逗號 2 公升, 逗號 \
+                1 公升, 逗號 2 公升, 逗號 \
+                1 公升, 逗號 2 公升, 逗號 \
+                1 公噸, 逗號 2 公噸, 逗號 \
+                1 道爾頓, 逗號 2 道爾頓, 逗號 \
+                1 奈培, 逗號 2 奈培, 逗號 \
+                1 原子質量單位, 逗號 2 原子質量單位, 逗號 \
+                1 電子伏特, 逗號 2 電子伏特, 逗號 \
+                1 弳 逗號 2 弳 逗號 \
+                1 sterradion, 逗號 2 sterradion, 逗號 \
+                1 annum, 逗號 2 annum, 逗號 \
+                1 弧秒, 逗號 2 弧秒, 逗號 \
+                1 位元, 逗號 2 位元, 逗號 \
+                1 位元組, 逗號 2 位元組, 逗號 \
+                1 baud 逗號 2 baud");
 }
 
 #[test]
@@ -294,21 +295,21 @@ fn si_accepted_with_prefixes() {
         <mn>1</mn><mi intent=":unit">TBd</mi><mo>,</mo><mn>2</mn><mi intent=":unit">EBd</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 quetta-litre, comma; 2 ronna-litres, comma; \
-                1 yotta-litre, comma; 2 zetta-litres, comma; \
-                1 exa-litre, comma; 2 peta-litres, comma; \
-                1 tera-metric ton, comma; 2 giga-metric tons; comma; \
-                1 mega-dalton, comma; 2 kilo-daltons, comma; \
-                1 deci-neper, comma; 2 centi-nepers, comma; \
-                1 hecto-atomic mass unit; comma; 2 deka-atomic mass units; comma; \
-                1 milli-electronvolt, comma; 2 micro-electronvolts; comma; \
-                1 nano-radian, comma; 2 pico-radians, comma; \
-                1 femto-sterradion, comma; 2 atto-sterradions; comma; \
-                1 giga-annum, comma; 2 mega-annums, comma; \
-                1 zepto-arcsecond, comma; 2 yocto-arcseconds; comma; \
-                1 kilo-bit, comma; 2 mega-bits, comma; \
-                1 giga-byte, comma; 2 tera-bytes, comma; \
-                1 tera-baud, comma; 2 exa-bauds");
+        "1 quetta-公升, 逗號, 2 ronna-公升, 逗號, \
+                1 yotta-公升, 逗號, 2 zetta-公升, 逗號 \
+                1 exa-公升, 逗號 2 peta-公升, 逗號 \
+                1 tera-公噸, 逗號 2 giga-公噸, 逗號, \
+                1 mega-道爾頓, 逗號, 2 仟-道爾頓, 逗號 \
+                1 deci-奈培, 逗號, 2 centi-奈培, 逗號, \
+                1 hecto-原子質量單位; 逗號, 2 deka-原子質量單位; 逗號, \
+                1 毫-電子伏特, 逗號, 2 微-電子伏特, 逗號 \
+                1 奈-弳, 逗號 2 pico-弳, 逗號, \
+                1 femto-sterradion, 逗號, 2 atto-sterradion, 逗號 \
+                1 giga-annum, 逗號 2 mega-annum, 逗號, \
+                1 zepto-弧秒, 逗號, 2 yocto-弧秒, 逗號 \
+                1 仟-位元, 逗號 2 mega-位元, 逗號, \
+                1 giga-位元組, 逗號, 2 tera-位元組, 逗號 \
+                1 tera-baud, 逗號 2 exa-baud");
 }
 
 #[test]
@@ -330,20 +331,20 @@ fn without_prefix_time() {
         <mn>1</mn><mi intent=":unit">yr</mi><mo>,</mo><mn>2</mn><mi intent=":unit">yr</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 second, comma, 2 seconds, comma, \
-                1 second, comma, 2 seconds, comma, \
-                1 minute, comma, 2 minutes, comma, \
-                1 minute, comma, 2 minutes, comma, \
-                1 minute, comma, 2 minutes, comma, \
-                1 hour, comma, 2 hours, comma, \
-                1 hour, comma, 2 hours, comma, \
-                1 hour, comma, 2 hours, comma, \
-                1 day, comma, 2 days, comma, \
-                1 day, comma, 2 days, comma, \
-                1 week, comma, 2 weeks, comma, \
-                1 week, comma, 2 weeks, comma, \
-                1 year, comma, 2 years, comma, \
-                1 year, comma, 2 years");
+        "1 秒 逗號 2 秒 逗號 \
+                1 秒 逗號 2 秒 逗號 \
+                1 分 逗號 2 分 逗號 \
+                1 分 逗號 2 分 逗號 \
+                1 分 逗號 2 分 逗號 \
+                1 時 逗號 2 時 逗號 \
+                1 時 逗號 2 時 逗號 \
+                1 時 逗號 2 時 逗號 \
+                1 天 逗號 2 天 逗號 \
+                1 天 逗號 2 天 逗號 \
+                1 週 逗號 2 週 逗號 \
+                1 週 逗號 2 週 逗號 \
+                1 年 逗號 2 年 逗號 \
+                1 年 逗號 2 年");
 }
 
 #[test]
@@ -359,14 +360,14 @@ fn without_prefix_angles() {
         <mn>1</mn><mi intent=":unit">asec</mi><mo>,</mo><mn>2</mn><mi intent=":unit">asec</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 degree, comma, 2 degrees, comma, \
-                1 degree, comma, 2 degrees, comma, \
-                1 arcminute, comma; 2 arcminutes, comma, \
-                1 arcminute, comma; 2 arcminutes, comma, \
-                1 arcminute, comma; 2 arcminutes, comma, \
-                1 arcminute, comma; 2 arcminutes, comma, \
-                1 arcsecond, comma; 2 arcseconds, comma, \
-                1 arcsecond, comma; 2 arcseconds");
+        "1 度 逗號 2 度 逗號 \
+                1 度 逗號 2 度 逗號 \
+                1 弧分, 逗號 2 弧分, 逗號 \
+                1 弧分, 逗號 2 弧分, 逗號 \
+                1 弧分, 逗號 2 弧分, 逗號 \
+                1 弧分, 逗號 2 弧分, 逗號 \
+                1 弧秒, 逗號 2 弧秒, 逗號 \
+                1 弧秒, 逗號 2 弧秒");
 }
 
 #[test]
@@ -380,12 +381,12 @@ fn without_prefix_distance() {
         <mn>1</mn><mi intent=":unit">fm</mi><mo>,</mo><mn>2</mn><mi intent=":unit">fm</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 astronomical unit, comma; 2 astronomical units, comma, \
-                1 light year, comma; 2 light years, comma, \
-                1 parsec, comma, 2 parsecs, comma, \
-                1 angstrom, comma; 2 angstroms, comma, \
-                1 angstrom, comma; 2 angstroms, comma, \
-                1 fermi, comma, 2 fermis");
+        "1 天文單位, 逗號 2 天文單位, 逗號 \
+                1 光年, 逗號 2 光年, 逗號 \
+                1 秒差距, 逗號 2 秒差距, 逗號 \
+                1 埃 逗號 2 埃 逗號 \
+                1 埃 逗號 2 埃 逗號 \
+                1 費米, 逗號 2 費米");
 }
 
 #[test]
@@ -407,20 +408,20 @@ fn without_prefix_other() {
         <mn>1</mn><mi intent=":unit">erg</mi><mo>,</mo><mn>2</mn><mi intent=":unit">erg</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 hectare, comma; 2 hectares, comma, \
-                1 decibel, comma; 2 decibels, comma, \
-                1 atmosphere, comma; 2 atmospheres, comma; \
-                1 atomic mass unit, comma; 2 atomic mass units, comma, \
-                1 bar, comma, 2 bars, comma, \
-                1 calorie, comma; 2 calories, comma, \
-                1 curie, comma, 2 curies, comma, \
-                1 gradian, comma; 2 gradians, comma, \
-                1 molar, comma, 2 molars, comma, \
-                1 roentgen, comma; 2 roentgens, comma; \
-                1 revolution per minute, comma; 2 revolutions per minute, comma, \
-                1 m-h-o, comma, 2 m-h-os, comma, \
-                1 dyne, comma, 2 dynes, comma, \
-                1 erg, comma, 2 ergs");
+        "1 公頃, 逗號 2 公頃, 逗號 \
+                1 分貝, 逗號 2 分貝, 逗號 \
+                1 大氣壓, 逗號 2 大氣壓, 逗號 \
+                1 原子質量單位, 逗號 2 原子質量單位, 逗號 \
+                1 巴 逗號 2 巴 逗號 \
+                1 卡 逗號 2 卡 逗號 \
+                1 居里, 逗號 2 居里, 逗號 \
+                1 百分度, 逗號 2 百分度, 逗號 \
+                1 體積莫耳濃度, 逗號 2 體積莫耳濃度, 逗號 \
+                1 倫琴, 逗號 2 倫琴, 逗號 \
+                1 轉速每分鐘, 逗號 2 轉速每分鐘, 逗號 \
+                1 姆歐, 逗號 2 姆歐, 逗號 \
+                1 達因, 逗號 2 達因, 逗號 \
+                1 爾格, 逗號 2 爾格");
 }
 
 #[test]
@@ -444,22 +445,22 @@ fn without_prefix_powers_of_2() {
         <mn>1</mn><mi intent=":unit">YiB</mi><mo>,</mo><mn>2</mn><mi intent=":unit">YiB</mi>
     </math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1 kibi-bit, comma; 2 kibi-bits, comma, \
-                1 mebi-bit, comma; 2 mebi-bits, comma, \
-                1 gibi-bit, comma; 2 gibi-bits, comma, \
-                1 tebi-bit, comma; 2 tebi-bits, comma, \
-                1 pebi-bit, comma; 2 pebi-bits, comma, \
-                1 exbi-bit, comma; 2 exbi-bits, comma, \
-                1 zebi-bit, comma; 2 zebi-bits, comma, \
-                1 yobi-bit, comma; 2 yobi-bits, comma, \
-                1 kibi-byte, comma; 2 kibi-bytes, comma, \
-                1 mebi-byte, comma; 2 mebi-bytes, comma, \
-                1 gibi-byte, comma; 2 gibi-bytes, comma, \
-                1 tebi-byte, comma; 2 tebi-bytes, comma, \
-                1 pebi-byte, comma; 2 pebi-bytes, comma, \
-                1 exbi-byte, comma; 2 exbi-bytes, comma, \
-                1 zebi-byte, comma; 2 zebi-bytes, comma, \
-                1 yobi-byte, comma; 2 yobi-bytes");
+        "1 kibi-位元, 逗號 2 kibi-位元, 逗號 \
+                1 mebi-位元, 逗號 2 mebi-位元, 逗號 \
+                1 gibi-位元, 逗號 2 gibi-位元, 逗號 \
+                1 tebi-位元, 逗號 2 tebi-位元, 逗號 \
+                1 pebi-位元, 逗號 2 pebi-位元, 逗號 \
+                1 exbi-位元, 逗號 2 exbi-位元, 逗號 \
+                1 zebi-位元, 逗號 2 zebi-位元, 逗號 \
+                1 yobi-位元, 逗號 2 yobi-位元, 逗號 \
+                1 kibi-位元組, 逗號 2 kibi-位元組, 逗號 \
+                1 mebi-位元組, 逗號 2 mebi-位元組, 逗號 \
+                1 gibi-位元組, 逗號 2 gibi-位元組, 逗號 \
+                1 tebi-位元組, 逗號 2 tebi-位元組, 逗號 \
+                1 pebi-位元組, 逗號 2 pebi-位元組, 逗號 \
+                1 exbi-位元組, 逗號 2 exbi-位元組, 逗號 \
+                1 zebi-位元組, 逗號 2 zebi-位元組, 逗號 \
+                1 yobi-位元組, 逗號 2 yobi-位元組");
 }
 
 
@@ -474,8 +475,8 @@ fn si_other_numbers() {
                             <mn>2.5</mn><mi intent=":unit">&#xB5;sec</mi><mo>,</mo>
                             <mn>32.34</mn><mi intent=":unit">mol</mi></math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "1.0 litre, comma; 2.0 metres, comma; x milli-seconds, comma; y micro-seconds, comma, \
-                deka-grams, comma; 1235 deka-newtons; comma; 2.5 micro-seconds; comma; 32.34 moles");
+        "1.0 公升, 逗號 2.0 公尺, 逗號 x 毫-秒, 逗號 y 微-秒, 逗號 \
+                deka-克 逗號, 1235 deka-牛頓, 逗號 2.5 微-秒, 逗號 32.34 莫耳");
 }
 
 
@@ -488,6 +489,6 @@ fn test_mtext_inference() {
                 <mn>4.5</mn><mtext>mT</mtext>
             <mo>]</mo></math>"#;
     test("zh-tw", "SimpleSpeak", expr, 
-        "open bracket; 1 metric ton, comma; 2 peta-amps, comma, \
-                3 pascals, comma; 4.5 milli-teslas; close bracket");
+        "左中括; 1 公噸, 逗號 2 peta-安培, 逗號 \
+                3 帕 逗號, 4.5 毫-特士拉; 右中括");
 }
