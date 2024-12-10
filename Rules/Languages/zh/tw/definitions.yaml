@@ -7,8 +7,8 @@
 # - name: [] "...", "..." "..." ]
 
 - SIPrefixes: {
-    "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "仟", "h": "hecto", "da": "deka",
-    "d": "deci", "c": "centi", "m": "毫", "µ": "微", "n": "奈", "p": "pico", "f": "femto", "a": "atto", "z": "zepto", "y": "yocto", "r": "ronto", "q": "quecto"
+    "Q": "昆", "R": "羅", "Y": "佑", "Z": "皆", "E": "艾", "P": "拍", "T": "兆", "G": "吉", "M": "百萬", "k": "千", "h": "百", "da": "十",
+    "d": "分", "c": "厘", "m": "毫", "µ": "微", "n": "奈", "p": "皮", "f": "飛", "a": "阿", "z": "介", "y": "攸", "r": "絨", "q": "匱"
   }
 
 # this is a list of all units that accept SIPrefixes
@@ -21,7 +21,7 @@
     "cd": "燭光",
     "K": "凱氏", "K": "凱氏", # U+212A
     "g": "克",
-    "m": "公尺",     # British spelling works for US also
+    "m": "米",     # British spelling works for US also
     "mol": "莫耳",
     "s": "秒", "″": "秒", "\"": "秒", "sec": "秒",  # "sec" not actually legal
 
@@ -106,13 +106,17 @@
     "bar": "巴",
     "cal": "卡",
     "Ci": "居里",
-    "grad": "百分度",
+    "grad": "百分直角",
     "M": "體積莫耳濃度",
     "R": "倫琴",
     "rpm": "轉速每分鐘",
     "℧": "姆歐",
     "dyn": "達因",
     "erg": "爾格",
+    # copy from english version by hjy
+    # powers of 2 used with bits and bytes
+    "Kib": "kibi-位元", "Mib": "mebi-位元", "Gib": "gibi-位元", "Tib": "tebi-位元", "Pib": "pebi-位元", "Eib": "exbi-位元", "Zib": "zebi-位元", "Yib": "yobi-位元",
+    "KiB": "kibi-位元組", "MiB": "mebi-位元組", "GiB": "gibi-位元組", "TiB": "tebi-位元組", "PiB": "pebi-位元組", "EiB": "exbi-位元組", "ZiB": "zebi-位元組", "YiB": "yobi-位元組",
 
   }
 
