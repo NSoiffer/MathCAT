@@ -67,7 +67,7 @@
     # technically wrong, but used in practice with SI Units
     "b": "位元",               # should only take positive powers
     "B": "位元組",              # should only take positive powers
-    "Bd": "baud",             # should only take positive powers
+    "Bd": "鮑",             # should only take positive powers
   }
 
 
