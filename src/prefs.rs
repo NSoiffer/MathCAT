@@ -312,39 +312,45 @@ impl PreferenceManager {
             return Ok( () );            // no need to do anything else
         }
 
-        let mut prefs = Preferences::default();
 
-        let mut system_prefs_file = self.rules_dir.to_path_buf();
-        system_prefs_file.push("prefs.yaml");
-        if is_file_shim(&system_prefs_file) {
-            let defaults = DEFAULT_USER_PREFERENCES.with(|defaults| defaults.clone());
-            prefs = Preferences::read_prefs_file(&system_prefs_file, defaults)?;
-            self.sys_prefs_file = Some( FileAndTime::new_with_time(system_prefs_file.clone()) );
-        } else {
-            error!("MathCAT couldn't open file system preference file '{}'.\nUsing fallback defaults which may be inappropriate.",
-                        system_prefs_file.to_str().unwrap());
-        };
+        if self.user_prefs.prefs.is_empty() {
+            let mut prefs = Preferences::default();
 
-        let mut user_prefs_file = dirs::config_dir();
-        if let Some(mut user_prefs_file_path_buf) = user_prefs_file {
-            user_prefs_file_path_buf.push("MathCAT/prefs.yaml");
-            if is_file_shim(&user_prefs_file_path_buf) {
-                prefs = Preferences::read_prefs_file(&user_prefs_file_path_buf, prefs)?;
-            }
-            // set the time otherwise keeps needing to do updates
-            self.user_prefs_file = Some( FileAndTime::new_with_time(user_prefs_file_path_buf.clone()) );
-            user_prefs_file = Some(user_prefs_file_path_buf);
-        }
-
-        if prefs.prefs.is_empty() {
-            let user_prefs_file_name = match user_prefs_file {
-                None => "No user config directory".to_string(),
-                Some(file) => file.to_string_lossy().to_string(),
+            let mut system_prefs_file = self.rules_dir.to_path_buf();
+            system_prefs_file.push("prefs.yaml");
+            if is_file_shim(&system_prefs_file) {
+                let defaults = DEFAULT_USER_PREFERENCES.with(|defaults| defaults.clone());
+                prefs = Preferences::read_prefs_file(&system_prefs_file, defaults)?;
+                self.sys_prefs_file = Some( FileAndTime::new_with_time(system_prefs_file.clone()) );
+            } else {
+                error!("MathCAT couldn't open file system preference file '{}'.\nUsing fallback defaults which may be inappropriate.",
+                            system_prefs_file.to_str().unwrap());
             };
-            bail!("Didn't find preferences in rule directory ('{}') or user directory ('{}')", &system_prefs_file.to_string_lossy(), user_prefs_file_name);
+
+            let mut user_prefs_file = dirs::config_dir();
+            if let Some(mut user_prefs_file_path_buf) = user_prefs_file {
+                user_prefs_file_path_buf.push("MathCAT/prefs.yaml");
+                if is_file_shim(&user_prefs_file_path_buf) {
+                    prefs = Preferences::read_prefs_file(&user_prefs_file_path_buf, prefs)?;
+                }
+                // set the time otherwise keeps needing to do updates
+                self.user_prefs_file = Some( FileAndTime::new_with_time(user_prefs_file_path_buf.clone()) );
+                user_prefs_file = Some(user_prefs_file_path_buf);
+            }
+
+            if prefs.prefs.is_empty() {
+                let user_prefs_file_name = match user_prefs_file {
+                    None => "No user config directory".to_string(),
+                    Some(file) => file.to_string_lossy().to_string(),
+                };
+                bail!("Didn't find preferences in rule directory ('{}') or user directory ('{}')", &system_prefs_file.to_string_lossy(), user_prefs_file_name);
+            }
+
+            self.set_files_based_on_changes(&prefs)?;
+            self.user_prefs = prefs;
+        } else {
+            info!("set_rules_dir called again!");
         }
-        self.set_files_based_on_changes(&prefs)?;
-        self.user_prefs = prefs;
 
         // set computed values for BLOCK_SEPARATORS and DECIMAL_SEPARAORS (a little messy about the language due immutable and mutable borrows)
         let language = self.user_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone();
