@@ -35,9 +35,9 @@
 
 
 # Rules for speaking what happens when moving into or out of a notation
-- name: into-or-out-of
-  tag: [mfrac, fraction]
-  match: "$Move2D != ''"
+- name: into-or-out-of-mfrac
+  tag: "*"
+  match: "$Move2D != '' and (@data-from-mathml='mfrac' or self::m:mfrac)"
   replace:
   - x: "$Move2D"
   - test:
@@ -46,17 +46,17 @@
       else: [t: "denominator"]          # phrase(the 'denominator' of a fraction)
   - pause: "medium"
 
-- name: into-or-out-of
-  tag: msqrt
-  match: "$Move2D != ''"
+- name: into-or-out-of-msqrt
+  tag: "*"
+  match: "$Move2D != '' and (@data-from-mathml='msqrt' or self::m:msqrt)"
   replace:
   - x: "$Move2D"
   - t: "square root"                    # phrase(the 'square root' of x)
   - pause: "medium"
 
-- name: into-or-out-of
-  tag: mroot
-  match: "$Move2D != ''"
+- name: into-or-out-of-mroot
+  tag: "*"
+  match: "$Move2D != '' and (@data-from-mathml='mroot' or self::m:mroot)"
   replace:
   - x: "$Move2D"
   - test:
@@ -65,9 +65,9 @@
       else: [t: "root index"]         # phrase(the 'root index' of x is 3)
   - pause: "medium"
 
-- name: into-or-out-of
-  tag: msub
-  match: "$Move2D != ''"
+- name: into-or-out-of-msub
+  tag: "*"
+  match: "$Move2D != '' and (@data-from-mathml='msub' or self::m:msub)"
   replace:
   - x: "$Move2D"
   - test:
@@ -76,33 +76,33 @@
       else: [t: "subscript"]         # phrase(x with 'subscript' 2)
   - pause: "medium"
 
-- name: into-or-out-of
-  tag: msup
-  match: "$Move2D != ''"
+- name: into-or-out-of-msup
+  tag: "*"
+  match: "$Move2D != '' and (DEBUG(@data-from-mathml)='msup' or self::m:msup)"
   replace:
-  - x: "$Move2D"
+  - x: "DEBUG($Move2D)"
   - test:
-      if: "count($Child2D/preceding-sibling::*)=0"
+      if: "not($Child2D/preceding-sibling::*)"
       then: [t: "base"]            # phrase(the 'base' of the power)
       else: [t: "superscript"]     # phrase(x with 'superscript' 2)  # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
-- name: into-or-out-of
-  tag: msubsup
-  match: "$Move2D != ''"
+- name: into-or-out-of-msubsup
+  tag: "*"
+  match: "$Move2D != '' and (@data-from-mathml='msubsup' or self::m:msubsup)"
   replace:
   - x: "$Move2D"
   - test:
-    - if: "count($Child2D/preceding-sibling::*)=0"
+    - if: "not($Child2D/preceding-sibling::*)"
       then: [t: "base"]             # phrase(the 'base' of the power)
     - else_if: "count($Child2D/preceding-sibling::*)=1"
       then: [t: "subscript"]        # phrase(x with 'subscript' 2)
       else: [t: "superscript"]      # phrase(x with 'superscript' 2)  # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
-- name: into-or-out-of
-  tag: munder
-  match: "$Move2D != ''"
+- name: into-or-out-of-munder
+  tag: "*"
+  match: "$Move2D != '' and (@data-from-mathml='munder' or self::m:munder)"
   replace:
   - x: "$Move2D"
   - test:
@@ -111,9 +111,9 @@
       else: [t: "lower limit"]   # phrase(the 'lower limit' of the function is zero)
   - pause: "medium"
 
-- name: into-or-out-of
-  tag: mover
-  match: "$Move2D != ''"
+- name: into-or-out-of-mover
+  tag: "*"
+  match: "$Move2D != '' and @data-from-mathml='mover' or self::m:mover"
   replace:
   - x: "$Move2D"
   - test:
@@ -122,9 +122,9 @@
       else: [t: "upper limit"]  # phrase(the 'upper limit' of the function is zero)
   - pause: "medium"
 
-- name: into-or-out-of
-  tag: munderover
-  match: "$Move2D != ''"
+- name: into-or-out-of-munderover
+  tag: "*"
+  match: "$Move2D != '' and (@data-from-mathml='munderover' or self::m:munderover)"
   replace:
   - x: "$Move2D"
   - test:
@@ -135,9 +135,9 @@
       else: [t: "upper limit "]   # phrase(the 'upper limit' of the function is zero)
   - pause: "medium"
 
-- name: into-or-out-of
-  tag: mmultiscripts
-  match: "$Move2D != ''"
+- name: into-or-out-of-mmultiscripts
+  tag: "*"
+  match: "$Move2D != '' and (@data-from-mathml='mmultiscripts' or self::m:mmultiscripts)"
   replace:
   - test:
       if: "name($Child2D)!='none'"
@@ -153,17 +153,17 @@
             - else_if: "$Child2D/preceding-sibling::*[self::m:mprescripts]" # are we before mprescripts and hence are postscripts
               then:
               - test:   # in postscripts -- base shifts by one
-                  if: "$NumPrecedingSiblings mod 2 = 0"
-                  then: [t: "subscript"]       # phrase(x with 'subscript' 2)
-                  else: [t: "superscript"]     # phrase(x with 'superscript' 2)
+                  if: "$NumPrecedingSiblings mod 2 = 0" 
+                  then: [t: "pre-subscript"]       # phrase(x with 'subscript' 2)
+                  else: [t: "pre-superscript"]     # phrase(x with 'superscript' 2)
               else:
               - test:
                   if: "$NumPrecedingSiblings mod 2 = 0"
-                  then: [t: "superscript"]    # phrase(x with 'superscript' 2)
-                  else: [t: "subscript"]      # phrase(x with 'subscript' 2)
+                  then: [t: "superscript"]    # phrase(x with 'pre-superscript' 2)
+                  else: [t: "subscript"]      # phrase(x with 'pre-subscript' 2)
           - pause: "medium"
 
-- name: into-or-out-of
+- name: into-or-out-of-mtd
   tag: mtd
   match: "$Move2D = 'into'"
   replace:
@@ -172,7 +172,7 @@
   - x: "count($Child2D/preceding-sibling::*)+1"
   - pause: "medium"
 
-- name: into-or-out-of
+- name: into-or-out-of-mtr
   tag: [mtr, mlabeledtr]
   match: "$Move2D = 'into'"
   replace:
@@ -192,7 +192,7 @@
 
 
   tag: "*"
-  match: "$NavCommand = 'MoveLastLocation'"
+  match: "DEBUG($NavCommand) = 'MoveLastLocation'"
   replace:
   - test:
       if: "$NavVerbosity != 'Terse'"
@@ -247,7 +247,8 @@
   tag: mrow
   match:
   - "$NavCommand = 'ZoomIn' and count(*)=3 and "
-  - "*[2][self::m:mtable and (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))]"
+  - "*[2][(@data-from-mathml='mtable' or self::m:mtable) and
+          (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))]"
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
@@ -284,9 +285,11 @@
   # If there is only one child, this isn't an interesting move -- zoom in again
   tag: "*"
   match:
-  - "($NavCommand = 'ZoomIn' or "
+  - "DEBUG($NavCommand = 'ZoomIn' or "
   - "  ($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and $NavMode='Enhanced') and "
-  - "count(*)=1 and (*[1][self::m:mrow] and not(self::m:msqrt or self::m:menclose))"
+  - "count(*)=1 and
+     (*[1][self::m:mrow] and
+      not(@data-from-mathml='msqrt' or self::m:msqrt or @data-from-mathml='menclose' or self::m:menclose))"
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
@@ -314,7 +317,7 @@
           variables: [Move2D: "'in'", Child2D: "*[1]/*[1]"]   # phrase('in' the denominator)
           replace: [x: "."]
       - set_variables: [NavNode: "*[1]/*[1]/@id"] # skip mtd
-    - else_if: "*[1][self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)]" # auto zoom
+    - else_if: "DEBUG(*[1][self::m:mrow and IsBracketed(., '(', ')', false) or IsBracketed(., '[', ']', false)])" # auto zoom
       then:
       - with:
           variables: [Move2D: "'in'", Child2D: "*[1]"]   # phrase('in' the denominator)
@@ -434,7 +437,8 @@
       variables: [Move2D: "'in'", Child2D: "*[1]"]            # phrase('in' the denominator)
       replace: [x: "."]
   - test:
-    - if: "count(*)> 1 or IsNode(., 'leaf') or self::m:msqrt or self::m:menclose"
+    - if: "count(*)> 1 or IsNode(., 'leaf') or
+           @data-from-mathml='msqrt' or self::m:msqrt or @data-from-mathml='menclose' or self::m:menclose"
       then: [set_variables: [NavNode: "@id"]]
       else: [x: "*[1]"]
 
@@ -544,13 +548,22 @@
           if: "$NavCommand = 'MoveStart' or $NavCommand = 'MoveLineStart'"
           then:
           # move inside of the mrow inside of 'math' or inside the fraction, etc  (hence two levels down)
+          # Note: an apparent bug in the xpath code doesn't let me use IfThenElse for the 2 if: then: below
           - with:
               variables: [NavCommand: "'MoveNextZoom'"]
-              replace: [x: "*[1]/*[1]"]
+              replace:
+              - test:
+                  if: "*[1]/*[1]"    # could be a <math><mi>x</mi></math>, so no grandchild
+                  then: [x: "*[1]/*[1]"]
+                  else: [x: "*[1]"]
           else:
           - with:
               variables: [NavCommand: "'MovePreviousZoom'"]
-              replace: [x: "*[last()]/*[last()]"]
+              replace:
+              - test:
+                  if: "*[last()]/*[last()]"  # could be a <math><mi>x</mi></math>, so no grandchild
+                  then: [x: "*[last()]/*[last()]"]
+                  else: [x: "*[last()]"]
 
 # We stop when the parent is 2d (e.g., frac), but not if in leaf base of msub/msup/msubsup/mmultiscripts because that's really on the same line
 - name: move-to-start-or-end-2d
@@ -1175,7 +1188,7 @@
   tag: "*"
   match:
   - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
-  - "(self::m:math or name(EdgeNode(., 'right', 'math'))='math')" # at edge of math
+  - "DEBUG(self::m:math or name(EdgeNode(., 'right', 'math'))='math')" # at edge of math
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
@@ -1198,7 +1211,7 @@
   match:
   - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
   - "( not(following-sibling::*) or"
-  - "  ( $NavMode='Enhanced' and "
+  - "  DEBUG( $NavMode='Enhanced' and "
   - "    count(following-sibling::*)=1 and (IsBracketed(.., '(', ')') or IsBracketed(.., '[', ']'))"
   - "  )"
   - ")"
@@ -1218,7 +1231,7 @@
       variables: [MatchCounter: "$MatchCounter + 1", NavCommand: "'MoveNext'"]
       replace:
       - test:
-          if: "following-sibling::*"
+          if: "DEBUG(following-sibling::*)"
           then:
           - with:
               variables: [Move2D: "'in'", Child2D: "."]             # phrase('in' the denominator)
@@ -1269,7 +1282,6 @@
       then:
       - t: "row"                                                    # phrase(the previous 'row' in the table)
       - x: "count(preceding-sibling::*)+2"
-      - t: "column 1"                                               # phrase('column 1' in the table)
       - pause: medium
       - test:
           if: "$NavMode = 'Character'"
@@ -1278,7 +1290,7 @@
               variables: [NavCommand: "'MoveNextZoom'"]
               replace: [x: "following-sibling::*[1]"]
           else:
-          - set_variables: [NavNode: "following-sibling::*[1]/*[1]/*[1]/@id"]
+          - set_variables: [NavNode: "following-sibling::*[1]/@id"]
       else: [x: ".."] # try again for after
 
 - name: move-next-auto-zoom-parens
@@ -1289,7 +1301,7 @@
   - "$NavMode='Enhanced' and"
   - "parent::m:mrow and following-sibling::* and"
   - "following-sibling::*[1][self::m:mrow and count(*)=3 and " #exclude empty parens
-  - "       (IsBracketed(., '(', ')') or IsBracketed(., '[', ']'))"
+  - "       DEBUG(IsBracketed(., '(', ')') or IsBracketed(., '[', ']'))"
   - "   ]"
   replace:
   - test:
@@ -1357,13 +1369,20 @@
           else: [t: "describe"]                              # phrase('describe' next entry in table)     
       - t: "right"                                           # phrase(move 'right')                                           # phrase(move 'right')
       - pause: short
-  - test:
-      if: "IsNode(.., '2D')"
-      then:
-      - with:
-          variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]           # phrase('in' the denominator)
-          replace: [x: ".."]
-  - set_variables: [NavNode: "following-sibling::*[1]/@id"]
+  - with:
+      variables: [MatchCounter: "$MatchCounter + 1"]
+      replace:
+      - test:
+          if: "following-sibling::*[1][@data-from-mathml='none' or @data-from-mathml='mprescripts']"
+          then: [x: "following-sibling::*[1]"]
+          else:
+          - test:
+              if: "DEBUG(IsNode(.., '2D'))"
+              then:
+              - with:
+                  variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]           # phrase('in' the denominator)
+                  replace: [x: ".."]
+          - set_variables: [NavNode: "DEBUG(following-sibling::*[1]/@id)"]
 
 # ========  Move/Read/Describe Previous rules =================
 
@@ -1549,8 +1568,6 @@
           then:
           - t: "row"                                  # phrase('row' five in table)
           - x: "count(preceding-sibling::*)"
-          - t: "column"                               # phrase('column' five in table)
-          - x: "count(*)"
           - pause: medium
       - test:
           if: "$NavMode = 'Character'"
@@ -1559,7 +1576,7 @@
               variables: [NavCommand: "'MovePreviousZoom'"]
               replace: [x: "preceding-sibling::*[1]"]
           else:
-          - set_variables: [NavNode: "preceding-sibling::*[1]/*[last()]/*[last()]/@id"]
+          - set_variables: [NavNode: "preceding-sibling::*[1]/@id"]
       else: [x: ".."] # try again for after
 
 - name: move-previous-locked-zoom-level
@@ -1613,13 +1630,20 @@
           else: [t: "describe"]                              # phrase('describe' next entry in table)     
       - t: "left"                                            # phrase(move 'left')
       - pause: short
-  - test:
-      if: "IsNode(.., '2D')"
-      then:
-      - with:
-          variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]           # phrase('in' the denominator)
-          replace: [x: ".."]
-  - set_variables: [NavNode: "preceding-sibling::*[1]/@id"]
+  - with:
+      variables: [MatchCounter: "$MatchCounter + 1"]
+      replace:
+      - test:
+          if: "preceding-sibling::*[1][@data-from-mathml='none' or @data-from-mathml='mprescripts']"
+          then: [x: "preceding-sibling::*[1]"]
+          else:
+          - test:
+              if: "DEBUG(IsNode(.., '2D'))"
+              then:
+              - with:
+                  variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]           # phrase('in' the denominator)
+                  replace: [x: ".."]
+          - set_variables: [NavNode: "DEBUG(preceding-sibling::*[1]/@id)"]
 
 # ********* ReadZoomLevel toggle ***************
 # These set ::NavMode
