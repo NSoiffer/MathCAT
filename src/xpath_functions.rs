@@ -26,7 +26,7 @@ use std::cell::{Ref, RefCell};
 use std::thread::LocalKey;
 use phf::phf_set;
 use sxd_xpath::function::Error as XPathError;
-use crate::canonicalize::{as_element, name, get_parent};
+use crate::canonicalize::{as_element, name, get_parent, MATHML_NAME_ATTR};
 
 // useful utility functions
 // note: child of an element is a ChildOfElement, so sometimes it is useful to have parallel functions,
@@ -65,7 +65,8 @@ pub fn validate_one_node<'n>(nodes: Nodeset<'n>, func_name: &str) -> Result<Node
 
 // Return true if the element's name is 'name'
 fn is_tag(e: Element, name: &str) -> bool {
-    return e.name().local_part() == name;
+    // need to check name before the fallback of where the name came from
+    return e.name().local_part() == name || e.attribute_value(MATHML_NAME_ATTR).unwrap_or_default() == name;
 }
 
 #[allow(non_snake_case)]
@@ -306,11 +307,11 @@ impl IsNode {
 
     #[allow(non_snake_case)]
     pub fn is_2D(elem: &Element) -> bool {
-        return MATHML_2D_NODES.contains(name(elem));
+        return MATHML_2D_NODES.contains(elem.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(elem)));
     }
 
     pub fn is_scripted(elem: &Element) -> bool {
-        return MATHML_SCRIPTED_NODES.contains(name(elem));
+        return MATHML_SCRIPTED_NODES.contains(elem.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(elem)));
     }
 }
 
@@ -333,7 +334,7 @@ static MATHML_MODIFIED_NODES: phf::Set<&str> = phf_set! {
 };
 
 pub fn is_modified(element: Element) -> bool {
-    return MATHML_MODIFIED_NODES.contains(name(&element));
+    return MATHML_MODIFIED_NODES.contains(element.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&element)));
 }
 
 
@@ -343,7 +344,7 @@ static MATHML_SCRIPTED_NODES: phf::Set<&str> = phf_set! {
 };
 
 pub fn is_leaf(element: Element) -> bool {
-    return MATHML_LEAF_NODES.contains(name(&element));
+    return MATHML_LEAF_NODES.contains(element.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&element)));
 }
 
 impl Function for IsNode {
@@ -376,10 +377,10 @@ impl Function for IsNode {
                         if let Node::Element(e) = node {
                             match kind.as_str() {
                                 "simple" => IsNode::is_simple(e),
-                                "leaf"   => MATHML_LEAF_NODES.contains(name(&e)),
+                                "leaf"   => is_leaf_any_name(e),
                                 "2D" => IsNode::is_2D(&e),
-                                "modified" => MATHML_MODIFIED_NODES.contains(name(&e)),
-                                "scripted" => MATHML_SCRIPTED_NODES.contains(name(&e)),
+                                "modified" => MATHML_MODIFIED_NODES.contains(e.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&e))),
+                                "scripted" => MATHML_SCRIPTED_NODES.contains(e.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&e))),
                                 "common_fraction" => IsNode::is_common_fraction(e, usize::MAX, usize::MAX), 
                                 _        => true,       // can't happen due to check above
                             }    
@@ -390,6 +391,18 @@ impl Function for IsNode {
                     )
             )
         );
+
+        fn is_leaf_any_name(e: Element) -> bool {
+            let children = e.children();
+            if children.is_empty() {
+                return true;
+            } else if children.len() == 1 {
+                if let ChildOfElement::Text(_) = children[0] {
+                    return true;
+                }
+            }
+            return false
+        }
     }
 }
 
@@ -722,7 +735,6 @@ struct BaseNode;
  * Returns true if the node is a large op
  * @param(node)     -- node(s) to test -- should be an <mo>
  */
-
  impl BaseNode {
     /// Recursively find the base node
     /// The base node of a non scripted element is the element itself
@@ -937,7 +949,7 @@ impl IsInDefinition {
  * Returns true if the text is contained in the set defined in Speech or Braille.
  * element/string -- element (converted to string)/string to test
  * speech or braille
- * setname -- the set in which the string is to be searched
+ * set_name -- the set in which the string is to be searched
  */
 // 'requiresComma' is useful for checking parenthesized expressions vs function arg lists and other lists
  impl Function for IsInDefinition {
@@ -994,7 +1006,7 @@ impl IsInDefinition {
 
 pub struct DefinitionValue;
 impl DefinitionValue {
-    /// Returns the value associated with `key` in `set_name`. If `key` is not in `set_name`, an emptry string is returned
+    /// Returns the value associated with `key` in `set_name`. If `key` is not in `set_name`, an empty string is returned
     /// Returns an error if `set_name` is not defined
     pub fn definition_value(key: &str, defs: &'static LocalKey<RefCell<Definitions>>, set_name: &str) -> Result<String, Error> {
         return defs.with(|definitions| {
@@ -1068,10 +1080,11 @@ impl DistanceFromLeaf {
         let mut element = element;
         let mut distance = 1;
         loop {
+            debug!("distance -- element: {}", mml_to_string(&element));
             if is_leaf(element) {
                 return distance;
             }
-            if treat_2d_elements_as_tokens && MATHML_2D_NODES.contains(name(&element)) {
+            if treat_2d_elements_as_tokens && IsNode::is_2D(&element) {
                 return distance;
             }
             let children = element.children();
@@ -1115,13 +1128,13 @@ pub struct EdgeNode;
 impl EdgeNode {
     // Return the root of the ancestor tree if we are at the left/right side of a path from that to 'element'
     fn edge_node<'a>(element: Element<'a>, use_left_side: bool, stop_node_name: &str) -> Option<Element<'a>> {
-        let element_name = name(&element);
+        let element_name = element.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&element));
         if element_name == "math" {
             return Some(element);
         };
 
         let parent = get_parent(element);   // there is always a "math" node
-        let parent_name = name(&parent);
+        let parent_name = parent.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&parent));
 
         // first check to see if we have the special case of punctuation as last child of math/mrow element
         // it only matters if we are looking at the right edge
@@ -1134,7 +1147,8 @@ impl EdgeNode {
         if !use_left_side && !element.following_siblings().is_empty() {  // not at right side
             // check for the special case that the parent is an mrow and the grandparent is <math> and we have punctuation
             let grandparent = get_parent(parent);
-            if name(&grandparent) == "math" &&
+            let grandparent_name = grandparent.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&grandparent));
+            if grandparent_name == "math" &&
                parent_name == "mrow" && parent.children().len() == 2 {      // right kind of mrow
                 let text = get_text_from_element( as_element(parent.children()[1]) );
                 if text == "," || text == "." || text == ";" || text == "?" {
@@ -1146,7 +1160,7 @@ impl EdgeNode {
 
         // at an edge -- check to see the parent is desired root
         if parent_name == stop_node_name || 
-           (stop_node_name == "2D" && MATHML_2D_NODES.contains(name(&parent))) {
+           (stop_node_name == "2D" && IsNode::is_2D(&parent)) {
             return Some(parent);
         };
         
@@ -1250,7 +1264,7 @@ impl Function for FontSizeGuess {
 
 pub struct ReplaceAll;
 /// ReplaceAll(haystack, needle, replacement)
-///   Returns a string with all occurances of 'needle' replaced with 'replacement'
+///   Returns a string with all occurrences of 'needle' replaced with 'replacement'
 impl Function for ReplaceAll {
     fn evaluate<'d>(&self,
                         _context: &context::Evaluation<'_, 'd>,

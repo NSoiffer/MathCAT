@@ -439,12 +439,12 @@ mod tests {
         let package1 = &parser::parse(mathml).expect("Failed to parse test input");
         let mathml = get_element(package1);
         trim_element(&mathml);
-        debug!("test: {}", crate::pretty_print::mml_to_string(&mathml));
+        debug!("test:\n{}", crate::pretty_print::mml_to_string(&mathml));
         
         let package2 = &parser::parse(target).expect("Failed to parse target input");
         let target = get_element(package2);
         trim_element(&target);
-        debug!("target: {}", crate::pretty_print::mml_to_string(&target));
+        debug!("target:\n{}", crate::pretty_print::mml_to_string(&target));
 
         let result = match crate::speech::intent_from_mathml(mathml, package2.as_document()) {
             Ok(e) => e,
@@ -453,7 +453,7 @@ mod tests {
                 return false;       // could be intentional failure
             }
         };
-        debug!("result: {}", crate::pretty_print::mml_to_string(&result));
+        debug!("result:\n{}", crate::pretty_print::mml_to_string(&result));
         match is_same_element(&result, &target) {
 			Ok(_) => return true,
 			Err(e) => panic!("{}", e),
@@ -467,7 +467,7 @@ mod tests {
                 <mfrac linethickness='0'> <mn arg='n'>7</mn> <mn arg='m'>3</mn> </mfrac>
                 <mo>)</mo>
             </mrow>";
-        let intent = "<binomial> <mn arg='n'>7</mn> <mn arg='m'>3</mn>  </binomial>";
+        let intent = "<binomial> <mn data-from-mathml='mn' arg='n'>7</mn> <mn data-from-mathml='mn' arg='m'>3</mn>  </binomial>";
         assert!(test_intent(mathml, intent, "Error"));
     }
 
@@ -478,14 +478,14 @@ mod tests {
                 <mi arg='n'>n</mi>
                 <mi arg='m'>m</mi>
             </msubsup>";
-        let intent = "<binomial> <mi arg='n'>n</mi> <mi arg='m'>m</mi></binomial>";
+        let intent = "<binomial> <mi data-from-mathml='mi' arg='n'>n</mi> <mi data-from-mathml='mi' arg='m'>m</mi></binomial>";
         assert!(test_intent(mathml, intent, "Error"));
     }
 
     #[test]
     fn silent_underscore() {
         let mathml = "<mrow><mi intent='__-'>silent</mi><mo>+</mo><mi>e</mi></mrow>";
-        let intent = "<mrow>=<mi>__-</mi><mo>+</mo><mi>e</mi></mrow>";
+        let intent = "<mrow data-from-mathml='mrow'>=<mi>__-</mi><mo data-from-mathml='mo'>+</mo><mi data-from-mathml='mi'>e</mi></mrow>";
         assert!(test_intent(mathml, intent, "Error"));
     }
 
@@ -506,8 +506,8 @@ mod tests {
             </mrow>";
         let intent = "<foo data-intent-property=':silent:int:'>
                                 <mi data-intent-property=':positive-int:int:'>bar</mi>
-                                <mi arg='a' data-intent-property=':foo:bar:foo-bar:'>a</mi>
-                                <mi arg='b' data-intent-property=':number:'>b</mi>
+                                <mi data-from-mathml='mi' arg='a' data-intent-property=':foo:bar:foo-bar:'>a</mi>
+                                <mi data-from-mathml='mi' arg='b' data-intent-property=':number:'>b</mi>
                             </foo>";
         assert!(test_intent(mathml, intent, "Error"));
     }
@@ -582,7 +582,7 @@ mod tests {
                 <mi arg='b'>B</mi>
                 <mi arg='c'>C</mi>
             </mrow>";
-        let intent = "<map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> <mi arg='c'>C</mi> </map>";
+        let intent = "<map> <mi data-from-mathml='mi' arg='a'>A</mi> <mi data-from-mathml='mi' arg='b'>B</mi> <mi data-from-mathml='mi' arg='c'>C</mi> </map>";
         assert!(test_intent(mathml, intent, "Error"));
     }
 
@@ -606,7 +606,8 @@ mod tests {
                 </mover>
                 <mi arg='b'>B</mi>
             </mrow>";
-        let intent = "<apply-function><map> <mi>congruence</mi></map> <mi arg='a'>A</mi> <mi arg='b'>B</mi> </apply-function>";
+        let intent = "<apply-function><map> <mi>congruence</mi></map>\n
+                            <mi data-from-mathml='mi' arg='a'>A</mi> <mi data-from-mathml='mi' arg='b'>B</mi> </apply-function>";
         assert!(test_intent(mathml, intent, "Error"));
     }
 
@@ -640,7 +641,7 @@ mod tests {
             </mrow>";
         let intent = "<apply-function>
                     <map><mi>congruence</mi></map>
-                    <mi arg='a'>A</mi> <mi arg='b'>B</mi>
+                    <mi data-from-mathml='mi' arg='a'>A</mi> <mi data-from-mathml='mi' arg='b'>B</mi>
                 </apply-function>";
         assert!(test_intent(mathml, intent, "Error"));
     }
@@ -659,12 +660,12 @@ mod tests {
         let intent = "<apply-function>
                 <pre data-intent-property=':prefix:'>
                     <in data-intent-property=':infix:'>
-                        <mi arg='a'>A</mi>
+                        <mi data-from-mathml='mi' arg='a'>A</mi>
                         <mi>x</mi>
                     </in>
                 </pre>
                 <post data-intent-property=':postfix:'>
-                    <mi arg='b'>B</mi>
+                    <mi data-from-mathml='mi' arg='b'>B</mi>
                 </post>
             </apply-function>";
         assert!(test_intent(mathml, intent, "Error"));
@@ -683,8 +684,8 @@ mod tests {
             </mrow>";
         let intent = "<apply-function>
             <map data-intent-property=':prefix:'>  <mi>congruence</mi> </map>
-            <mi arg='a'>A</mi>
-            <mi arg='b'>B</mi>
+            <mi data-from-mathml='mi' arg='a'>A</mi>
+            <mi data-from-mathml='mi' arg='b'>B</mi>
         </apply-function>";
         assert!(test_intent(mathml, intent, "Error"));
     }
@@ -750,10 +751,10 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let target = "<mrow intent='factorial()'>
-                <mi arg='a'>a</mi>
+        let target = "<mrow data-from-mathml='mrow' intent='factorial()'>
+                <mi data-from-mathml='mi' arg='a'>a</mi>
                 <mi>plus</mi>
-                <mi arg='b'>b</mi>
+                <mi data-from-mathml='mi' arg='b'>b</mi>
                 <mi>factorial</mi>
         </mrow>";
         assert!(test_intent(mathml, target, "IgnoreIntent"));
@@ -775,7 +776,8 @@ mod tests {
                 <mfrac linethickness='0'> <mn arg='n'>7</mn> <mn arg='m'>3</mn> </mfrac>
                 <mo>)</mo>
             </mrow>";
-        let target = "<binomial data-intent-property='binomial($n,)'> <mn arg='n'>7</mn> <mn arg='m'>3</mn>  </binomial>";
+        let target = "<binomial data-intent-property='binomial($n,)'> \n
+                             <mn data-from-mathml='mn' arg='n'>7</mn> <mn data-from-mathml='mn' arg='m'>3</mn>  </binomial>";
         assert!(!test_intent(mathml, target, "Error"));
     }
 
@@ -786,10 +788,10 @@ mod tests {
                 <mfrac linethickness='0'> <mn arg='n'>7</mn> <mn arg='m'>3</mn> </mfrac>
                 <mo>)</mo>
             </mrow>";
-        let target = "<mrow intent='binomial($n,)'>
-                <mo>(</mo>
-                <fraction linethickness='0'> <mn arg='n'>7</mn> <mn arg='m'>3</mn> </fraction>
-                <mo>)</mo>
+        let target = "<mrow data-from-mathml='mrow' intent='binomial($n,)'>
+                <mo data-from-mathml='mo'>(</mo>
+                <fraction data-from-mathml='mfrac' linethickness='0'> <mn data-from-mathml='mn' arg='n'>7</mn> <mn data-from-mathml='mn' arg='m'>3</mn> </fraction>
+                <mo data-from-mathml='mo'>)</mo>
             </mrow>";
         assert!(test_intent(mathml, target, "IgnoreIntent"));
     }   
@@ -797,7 +799,7 @@ mod tests {
     #[test]
     fn plane1_char_in_concept_name() {
         let mathml = "<math><mrow><mo intent='🐇'>&#x1F407;</mo><mi>X</mi></mrow></math>";
-        let intent = "<math><mrow><mi>🐇</mi><mi>X</mi></mrow></math>";
+        let intent = "<math data-from-mathml='math'><mrow data-from-mathml='mrow'><mi>🐇</mi><mi data-from-mathml='mi'>X</mi></mrow></math>";
         assert!(test_intent(mathml, intent, "Error"));
     }   
 }

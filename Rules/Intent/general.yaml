@@ -60,7 +60,7 @@
   - FirstColumn: "$AtLeftEdge/../*[1]=$AtLeftEdge"   # first child of mtr...
   replace:
   - test:
-      # don't use postive/negative if a continued data cell
+      # don't use positive/negative if a continued data cell
       if: "$AtLeftEdgeOfMTD and $ContinuedColumn and (not($FirstColumn) or $InContinuedRow)"
       then:
       - intent:
@@ -732,7 +732,7 @@
 -
   name: mtable-lines-property
   tag: mtable
-  match: "."   # default is "lines, so no need to test contains(@data-intent-property, ':lines:')
+  match: "count(*) > 0 and not(descendant::*[self::m:mo and not(.='-' or .='+')])"
   replace:
   - with:
       variables:
@@ -742,3 +742,23 @@
           name: "lines"
           children:
           - x: "*"
+
+-
+  # merge all the mtd into a single mtd
+  name: consolidate-mtd-entries
+  tag: mtr  # Fix: add support for mlabeledtr
+  match: "count(*) > 1 and
+          ($TableProperty = 'piecewise' or $TableProperty = 'system-of-equations' or $TableProperty = 'lines')"
+  replace:
+  - intent:
+      name: "mtr"
+      attrs: "id='@id'"
+      children:
+      - intent:
+          name: "mtd"
+          attrs: "id='*[1]/@id'"
+          children: 
+          - intent:
+              name: "mrow"
+              attrs: "id='*[2]/@id'"
+              children: [x: "*/*"]

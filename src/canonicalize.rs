@@ -339,14 +339,11 @@ pub fn set_mathml_name(element: Element, new_name: &str) {
 /// 
 /// Returns first replacement
 pub fn replace_children<'a>(mathml: Element<'a>, replacements: Vec<Element<'a>>) -> Element<'a> {
-	if replacements.len() == 1 {
-		// rather than replace the children, the children are already in place, so we can optimize a little
-		add_attrs(mathml, &replacements[0].attributes());
-		return mathml;
-	}
-
 	let parent = get_parent(mathml);
 	let parent_name = name(&parent);
+	// debug!("\nreplace_children: mathml\n{}", mml_to_string(&mathml));
+	// debug!("replace_children: parent before replace\n{}", mml_to_string(&parent));
+	// debug!("{} replacements:\n{}", replacements.len(), replacements.iter().map(|e| mml_to_string(e)).collect::<Vec<String>>().join("\n"));
 	if ELEMENTS_WITH_FIXED_NUMBER_OF_CHILDREN.contains(parent_name) ||
 	   parent_name == "mmultiscripts" {     // each child acts like the parent has a fixed number of children
 		// gather up the preceding/following siblings before mucking with the tree structure (mrow.append_children below)
@@ -362,13 +359,11 @@ pub fn replace_children<'a>(mathml: Element<'a>, replacements: Vec<Element<'a>>)
 		new_children.push(ChildOfElement::Element(mrow));
 		new_children.append(&mut following_siblings);
 		parent.replace_children(new_children);
-		debug!("replace_children: parent\n{}", mml_to_string(&parent));
+		// debug!("replace_children parent after: parent\n{}", mml_to_string(&parent));
 		// debug!("replace_children: returned mrow\n{}", mml_to_string(&mrow));
 		return mrow;
 	} else {
 		// replace the children of the parent with 'replacements' inserted in place of 'mathml'
-		// debug!("\nreplace_children: mathml\n{}", mml_to_string(&mathml));
-		// debug!("replace_children: parent before replace\n{}", mml_to_string(&parent));
 		let mut new_children = mathml.preceding_siblings();
 		let i_first_new_child = new_children.len();
 		let mut replacements = replacements.iter().map(|&el| ChildOfElement::Element(el)).collect::<Vec<ChildOfElement>>();
@@ -2023,7 +2018,7 @@ impl CanonicalizeContext {
 				}
 				text.push_str(as_text(child));
 			}
-			debug!("merge_mi_sequence: text={}", &text);
+			// debug!("merge_mi_sequence: text={}", &text);
 			if let Some(answer) = crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
 				let definitions = definitions.borrow();
 				if definitions.get_hashset("FunctionNames").unwrap().contains(&text) {
@@ -2588,7 +2583,7 @@ impl CanonicalizeContext {
 				script.set_attribute_value(MAYBE_CHEMISTRY, likely_chemistry.to_string().as_str());
 			}
 
-			debug!("convert_to_mmultiscripts -- converted script:\n{}", mml_to_string(&script));
+			// debug!("convert_to_mmultiscripts -- converted script:\n{}", mml_to_string(&script));
 			// debug!("convert_to_mmultiscripts (at end) -- #children={}", mrow_children.len());
 			return i_multiscript + 1;		// child to start on next
 		}
