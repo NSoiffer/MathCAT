@@ -13,8 +13,7 @@
 /// The general flow is that for every element that looks like a chem formula/equation, we mark it with data-likely-[equation/formula]
 /// After we are done marking "likely", we go back and either delete them or replace them with data-[equation/formula].
 /// Note: anything already marked with data-[equation/formula] doesn't need recomputation later (essentially the result is cached)
-
-
+///
 /// There is a chicken and egg problem with detecting chemistry: to more reliably detect it, we need good structure.
 /// However, to get the structure right (e.,g "=" being a double bond, not equality; chem elements being in 'mi's; ...),
 ///   we need to know "=" is part of a chemical formula.
@@ -302,7 +301,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
 
     // we play games with the string to avoid allocation...
     let token_string = as_text(mathml);
-    if token_string.is_ascii() {
+    if !token_string.is_ascii() {
         return None;    // chemical elements are ASCII
     }
     let doc = mathml.document();
@@ -314,11 +313,11 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
     if !(parent_name == "mrow" || parent_name == "math") {  // not canonicalized yet
         return None;    // only try to merge if in an mrow
     }
-    let answer = merge_tokens_chem_element(&doc, mathml, token_string, &mathml.following_siblings());
+    let answer = merge_tokens_chem_element(&doc, mathml, &mathml.following_siblings());
     return answer;
 
 
-    fn merge_tokens_chem_element<'a>(doc: &Document<'a>, leaf: Element<'a>, token_string: &str, following_siblings: &[ChildOfElement<'a>]) -> Option<Vec<Element<'a>>> {
+    fn merge_tokens_chem_element<'a>(doc: &Document<'a>, leaf: Element<'a>, following_siblings: &[ChildOfElement<'a>]) -> Option<Vec<Element<'a>>> {
         if following_siblings.is_empty() {
             return None;
         }
@@ -331,11 +330,12 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
         if second_element_text.len() != 1 {
             return None;
         }
+        let token_string = as_text(leaf);
         let chem_token_string = vec![token_string.as_bytes()[0], second_element_text.as_bytes()[0]];
         if let Some(chem_element) = get_chem_element(doc, &chem_token_string, 2) {
-            leaf.set_text(as_text(chem_element));
-            leaf.set_attribute_value(MAYBE_CHEMISTRY, chem_element.attribute_value(MAYBE_CHEMISTRY).unwrap());
-            leaf.set_attribute_value(MERGED_TOKEN, "true");
+            chem_element.set_text(as_text(chem_element));
+            chem_element.set_attribute_value(MAYBE_CHEMISTRY, chem_element.attribute_value(MAYBE_CHEMISTRY).unwrap());
+            chem_element.set_attribute_value(MERGED_TOKEN, "true");
             second_element.remove_from_parent();
             return Some(vec![chem_element]);
         }
@@ -545,8 +545,8 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
     } else if IsNode::is_scripted(&mathml) &&
               name(&as_element(mathml.children()[0])) == "mi" &&
               as_element(mathml.children()[0]).attribute(SPLIT_TOKEN).is_some() {
-        // undo a split that happened in a scripted element
-        // we put the preceding elements into the base and call merge_element on the last element of the base
+        // Undo a split that happened in a scripted element.
+        // We put the preceding elements into the base and call merge_element on the last element of the base
         // The first and/or the last child in the sequence could be a script that needs to be unwrapped
         let mut parent = get_parent(mathml);   // there is always a "math" node
         // debug!("mathml:\n{}", mml_to_string(&mathml));
@@ -617,9 +617,8 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
                     // We are left with only removing mrows with one child or mrows that are children of mrows (simpler test than ELEMENTS_WITH_ONE_CHILD)
                     let parent = get_parent(mathml);   // mathml is mrow, so parent always exists
                     if mathml.children().len() == 1 || name(&parent) == "mrow" {
-                        let children = mathml.children().iter().map(|&el| as_element(el)).collect::<Vec<Element>>();
+                        let children = mathml.children().iter().map(|&el| as_element(el)).collect::<Vec<Element>>();                        // debug!("is_changed_after_unmarking: before replace - mathml\n{}", mml_to_string(&mathml));
                         mathml.remove_attribute(CHANGED_ATTR);  // if just one child, the attrs are pushed onto the child
-                        // debug!("mrow attrs: {}", crate::pretty_print::format_attrs(&mathml.attributes()));
                         // debug!("is_changed_after_unmarking: before replace - parent\n{}", mml_to_string(&parent));
                         replace_children(mathml, children);
                         // debug!("is_changed_after_unmarking: parent\n{}", mml_to_string(&parent));
@@ -1769,7 +1768,8 @@ pub fn is_chemical_element(node: Element) -> bool {
 
 #[cfg(test)]
 mod chem_tests {
-	#[allow(unused_imports)]
+
+#[allow(unused_imports)]
 	use super::super::init_logger;
 	use super::super::are_strs_canonically_equal;
     use super::*;
