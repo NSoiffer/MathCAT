@@ -198,7 +198,8 @@
  - "~": [t: "tilde"]                               # 0x7e
  - " ":                                            # 0xa0
     - test:
-        if: "@data-empty-in-2D"
+        # could be mtext in mtd or mtext in an mrow that is a concatenation of mtd's. Is there a better solution?
+        if: "@data-empty-in-2D and not(ancestor::*[self::m:piecewise or self::m:system-of-equations or self::m:lines])"
         then: [t: "empty"]                         # want to say something for fraction (etc) with empty child
         else: [t: ""]                            
 
