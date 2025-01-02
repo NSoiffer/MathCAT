@@ -70,6 +70,6 @@ fn equation_1() {
     </math>
    ";
     test("en", "SimpleSpeak", expr, "2 equations, \
-                equation 1; x plus y, is equal to, 7; \
-                equation 2; 2 x plus 3 y, is equal to, 17;");
+                equation 1; x plus y, is equal to 7; \
+                equation 2; 2 x plus 3 y; is equal to 17;");
 }
