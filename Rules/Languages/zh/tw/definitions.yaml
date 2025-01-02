@@ -7,8 +7,8 @@
 # - name: [] "...", "..." "..." ]
 
 - SIPrefixes: {
-    "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hecto", "da": "deka",
-    "d": "deci", "c": "centi", "m": "milli", "µ": "micro", "n": "nano", "p": "pico", "f": "femto", "a": "atto", "z": "zepto", "y": "yocto", "r": "ronto", "q": "quecto"
+    "Q": "昆", "R": "羅", "Y": "佑", "Z": "皆", "E": "艾", "P": "拍", "T": "兆", "G": "吉", "M": "百萬", "k": "千", "h": "百", "da": "十",
+    "d": "分", "c": "厘", "m": "毫", "µ": "微", "n": "奈", "p": "皮", "f": "飛", "a": "阿", "z": "介", "y": "攸", "r": "絨", "q": "匱"
   }
 
 # this is a list of all units that accept SIPrefixes
@@ -17,160 +17,176 @@
 #   The SI prefixes can be used with several of accepted units, but not, for example, with the non-SI units of time.
 - SIUnits: {
     # base units
-    "A": "amp",
-    "cd": "candela",
-    "K": "kelvin", "K": "kelvin", # U+212A
-    "g": "gram",
-    "m": "metre",     # British spelling works for US also
-    "mol": "mole",
-    "s": "second", "″": "second", "\"": "second", "sec": "second",  # "sec" not actually legal
+    "A": "安培",
+    "cd": "燭光",
+    "K": "凱氏", "K": "凱氏", # U+212A
+    "g": "克",
+    "m": "米",     # British spelling works for US also
+    "mol": "莫耳",
+    "s": "秒", "″": "秒", "\"": "秒", "sec": "秒",  # "sec" not actually legal
 
     # derived units
-    "Bq": "becquerel",
-    "C": "coulomb",
-    "°C": "degree celsius", "℃": "degree celsius",
-    "F": "farad",
-    "Gy": "gray",
-    "H": "henry",
-    "Hz": "hertz",
-    "J": "joule",
+    "Bq": "貝克",
+    "C": "庫侖",
+    "°C": "攝氏度", "℃": "攝氏度",
+    "F": "法拉",
+    "Gy": "格雷",
+    "H": "亨利",
+    "Hz": "赫茲",
+    "J": "焦耳",
     "kat": "kattel",
-    "lm": "lumen",
-    "lx": "lux",
-    "N": "newton",
-    "Ω": "ohm", "Ω": "ohm",       # Greek Cap letter, U+2126 OHM SIGN
-    "Pa": "pascal",
-    "rad": "radian",
-    "S": "siemens",
-    "Sv": "sievert",
+    "lm": "流明",
+    "lx": "勒克斯",
+    "N": "牛頓",
+    "Ω": "歐姆", "Ω": "歐姆",       # Greek Cap letter, U+2126 OHM SIGN
+    "Pa": "帕",
+    "rad": "弳",
+    "S": "西門子",
+    "Sv": "西弗",
     "sr": "sterradion",
-    "T": "tesla",
-    "V": "volt",
-    "W": "watt",
-    "Wb": "weber",
+    "T": "特士拉",
+    "V": "伏特",
+    "W": "瓦特",
+    "Wb": "韋伯",
 
     # accepted (plus a few variants) that take SI prefixes
-    "l": "litre", "L": "litre", "ℓ": "litre",               # British spelling works for US also
-    "t": "metric ton",
-    "Da": "dalton",
-    "amu": "atomic mass unit", "u": "atomic mass unit",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
-    "au": "astronomical unit", "AU": "astronomical unit",
-    "eV": "electronvolt",
+    "l": "公升", "L": "公升", "ℓ": "公升",               # British spelling works for US also
+    "t": "公噸",
+    "Da": "道爾頓",
+    "Np": "奈培",       # nepar        # should only take negative powers
+    "amu": "原子質量單位", "u": "原子質量單位",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
+    "au": "天文單位", "AU": "天文單位",
+    "eV": "電子伏特",
+    
+    # copy from english version by hjy
+    # others that take a prefix
+    "a": "annum",               # should only take positive powers
+    "as": "弧秒",          # see en.wikipedia.org/wiki/Minute_and_second_of_arc
+
+    # Copy from english version by hjy
+    # technically wrong, but used in practice with SI Units
+    "b": "位元",               # should only take positive powers
+    "B": "位元組",              # should only take positive powers
+    "Bd": "鮑",             # should only take positive powers
   }
 
 
 - UnitsWithoutPrefixes: {
     # time
-    "′": "minute", "'": "minute","min": "minute",
-    "h": "hour", "hr": "hour", "Hr": "hour",
-    "d": "day", "dy": "day",
-    "w": "week", "wk": "week",
-    "y": "year", "yr": "year",    
+    "′": "分", "'": "分","min": "分",
+    "h": "時", "hr": "時", "Hr": "時",
+    "d": "天", "dy": "天",
+    "w": "週", "wk": "週",
+    "y": "年", "yr": "年",    
 
     # angles (could be temperature)
-    "°": "degree", "deg": "degree",
-    "arcmin": "arcminute",
-    "amin": "arcminute",
-    "am": "arcminute",
-    "MOA": "arcminute",
-    "arcsec": "arcsecond",
-    "asec": "arcsecond",
-    "as": "arcsecond",
+    "°": "度", "deg": "度",
+    "arcmin": "弧分",
+    "amin": "弧分",
+    "am": "弧分",
+    "MOA": "弧分",
+    "arcsec": "弧秒",
+    "asec": "弧秒",
+    "as": "弧秒",
 
     # other accepted units that don't take SI prefixes
-    "ha": "hectare",
-    "Np": "neper",
-    "B": "bel",
-    "dB": "decibel",
+    "ha": "公頃",
+    "Np": "奈培",
+    "B": "貝爾",
+    "dB": "分貝",
 
     # distance
-    "ltyr": "light year", "ly": "light year",
-    "pc": "parsec",
-    "Å": "angstrom", "Å": "angstrom",           # U+00C5 and U+212B
-    "fm": "fermi",
+    "ltyr": "光年", "ly": "光年",
+    "pc": "秒差距",
+    "Å": "埃", "Å": "埃",           # U+00C5 and U+212B
+    "fm": "費米",
 
     # others
-    "atm": "atmosphere",
-    "bar": "bar",
-    "cal": "calorie",
-    "Ci": "curie",
-    "grad": "gradian",
-    "M": "molar",
-    "R": "roentgen",
-    "rpm": "revolution per minute",
-    "℧": "mho",
-    "dyn": "dyne",
-    "erg": "erg",
+    "atm": "大氣壓",
+    "bar": "巴",
+    "cal": "卡",
+    "Ci": "居里",
+    "grad": "百分直角",
+    "M": "體積莫耳濃度",
+    "R": "倫琴",
+    "rpm": "轉速每分鐘",
+    "℧": "姆歐",
+    "dyn": "達因",
+    "erg": "爾格",
+    # copy from english version by hjy
+    # powers of 2 used with bits and bytes
+    "Kib": "kibi-位元", "Mib": "mebi-位元", "Gib": "gibi-位元", "Tib": "tebi-位元", "Pib": "pebi-位元", "Eib": "exbi-位元", "Zib": "zebi-位元", "Yib": "yobi-位元",
+    "KiB": "kibi-位元組", "MiB": "mebi-位元組", "GiB": "gibi-位元組", "TiB": "tebi-位元組", "PiB": "pebi-位元組", "EiB": "exbi-位元組", "ZiB": "zebi-位元組", "YiB": "yobi-位元組",
 
   }
 
   # this will only be used if the language is English, so it can be empty for other countries
 - EnglishUnits: {
     # length
-    "in": "inch",
-    "ft": "foot",
-    "mi": "mile",
-    "rd": "rod",
+    "in": "英寸",
+    "ft": "英尺",
+    "mi": "英里",
+    "rd": "桿",
     "li": "link",
-    "ch": "chain",
+    "ch": "鏈",
 
     # area
-    "sq in": "square inch", "sq. in": "square inch", "sq. in.": "square inch",
-    "sq ft": "square foot", "sq. ft": "square foot", "sq. ft.": "square foot",
-    "sq yd": "square yard", "sq. yd": "square yard", "sq. yd.": "square yard",
-    "sq mi": "square mile", "sq. mi": "square mile", "sq. mi.": "square mile",
-    "ac": "acre",
-    "FBM": "board foot",
+    "sq in": "平方英寸", "sq. in": "平方英寸", "sq. in.": "平方英寸",
+    "sq ft": "平方英尺", "sq. ft": "平方英尺", "sq. ft.": "平方英尺",
+    "sq yd": "平方碼", "sq. yd": "平方碼", "sq. yd.": "平方碼",
+    "sq mi": "平方英里", "sq. mi": "平方英里", "sq. mi.": "平方英里",
+    "ac": "英畝",
+    "FBM": "板英尺",
 
     # volume
-    "cu in": "cubic inch", "cu. in": "cubic inch", "cu. in.": "cubic inch",
-    "cu ft": "cubic foot", "cu. ft": "cubic foot", "cu. ft.": "cubic foot",
-    "cu yd": "cubic yard", "cu. yd": "cubic yard", "cu. yd.": "cubic yard",
-    "bbl": "barrel", "BBL": "barrel",
-    "pk": "peck",
-    "bu": "bushel",
-    "tsp": "teaspoon",
-    "tbl": "tablespoon",
+    "cu in": "立方英寸", "cu. in": "立方英寸", "cu. in.": "立方英寸",
+    "cu ft": "立方英尺", "cu. ft": "立方英尺", "cu. ft.": "立方英尺",
+    "cu yd": "立方碼", "cu. yd": "立方碼", "cu. yd.": "立方碼",
+    "bbl": "桶", "BBL": "桶",
+    "pk": "配克",
+    "bu": "蒲式耳",
+    "tsp": "茶匙",
+    "tbl": "大匙",
 
     # liquid
-    "fl dr": "fluid drams",
-    "fl oz": "fluid ounce",
-    "gi": "gill",
-    "cp": "cup", "cup": "cup",
-    "pt": "pint",
-    "qt": "quart",
-    "gal": "gallon",
+    "fl dr": "液量打蘭",
+    "fl oz": "液量盎司",
+    "gi": "及耳",
+    "cp": "杯", "cup": "杯",
+    "pt": "品脫",
+    "qt": "夸脫",
+    "gal": "加侖",
 
     # weight
-    "gr": "grain",
-    "dr": "dram",
-    "oz": "ounce", "℥": "ounce",
-    "lb": "pound",
-    "cwt": "hundredweight",
-    "dwt": "pennyweight",
-    "oz t": "troy ounce",
-    "lb t": "troy pound",
+    "gr": "格林",
+    "dr": "打蘭",
+    "oz": "盎司", "℥": "盎司",
+    "lb": "磅",
+    "cwt": "英擔",
+    "dwt": "英錢",
+    "oz t": "金衡盎司",
+    "lb t": "金衡磅",
 
     # energy
-    "hp": "horsepower",
-    "BTU": "BTU",
-    "°F": "degree fahrenheit", "℉": "degree fahrenheit",
+    "hp": "馬力",
+    "BTU": "英熱單位",
+    "°F": "華氏度", "℉": "華氏度",
 
     # other
-    "mph": "mile per hour",
-    "mpg": "mile per gallon",
+    "mph": "英里每小時",
+    "mpg": "英里每加侖",
   }
 
 - PluralForms: {
   # FIX: this needs to be flushed out
-    "inch": "inches", "square inch": "square inches", "cubic inch": "cubic inches",
-    "foot": "feet", "square foot": "square feet", "cubic foot": "cubic feet",
-    "board foot": "board feet",
-    "degree celsius": "degrees celsius",
-    "degree fahrenheit": "degrees fahrenheit",
-    "hertz": "hertz",
-    "siemens": "siemens",
-    "revolution per minute": "revolutions per minute",
+    "inch": "英寸", "square inch": "平方英寸", "cubic inch": "立方英寸",
+    "foot": "英尺", "square foot": "平方英尺", "cubic foot": "立方英尺",
+    "board foot": "板英尺",
+    "degree celsius": "攝氏度",
+    "degree fahrenheit": "華氏度",
+    "hertz": "赫茲",
+    "siemens": "西門子",
+    "revolution per minute": "轉速每分鐘",
   }
 
 
