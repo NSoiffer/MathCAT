@@ -72,6 +72,6 @@ fn equation_1() {
     </math>
    ";
     test("sv", "SimpleSpeak", expr, "2 ekvationer, \
-                ekvation 1; x plus y, lika med, 7; \
-                ekvation 2; 2 x plus 3 y, lika med, 17;");
+                ekvation 1; x plus y lika med 7; \
+                ekvation 2; 2 x plus 3 y; lika med 17;");
 }
