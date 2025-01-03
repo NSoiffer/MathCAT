@@ -72,6 +72,6 @@ fn equation_1() {
     </math>
    ";
     test("zh-tw", "SimpleSpeak", expr, "2 方程, \
-                方程 1; x 加 y, 等於, 7; \
-                方程 2; 2 x 加 3 y, 等於, 17;");
+                方程 1; x 加 y 等於 7; \
+                方程 2; 2 x 加 3 y; 等於 17;");
 }
