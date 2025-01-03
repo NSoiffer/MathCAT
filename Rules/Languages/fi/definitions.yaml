@@ -114,22 +114,22 @@
     "erg": "ergi", # ergiä
 
     # powers of 2 used with bits and bytes
-    "Kib": "kibibitti", # kibibittiä
-    "Mib": "mebibitti", # mebibittiä
-    "Gib": "gibibitti", # gibibittiä
-    "Tib": "tebibitti", # tebibittiä
-    "Pib": "pebibitti", # pebibittiä
-    "Eib": "eksbibitti", # eksbibittiä
-    "Zib": "tsebibitti", # tsebibittiä
-    "Yib": "jobibitti", # jobibittiä
-    "KiB": "kibitavu", # kibitavua
-    "MiB": "mebitavu", # mebitavua
-    "GiB": "gibitavu", # gibitavua
-    "TiB": "tebitavu", # tebitavua
-    "PiB": "pebitavu", # eksbitavua
-    "EiB": "eksbitavu", # eksbitavua
-    "ZiB": "tsebitavu", # tsebitavua
-    "YiB": "jobitavu", # jobitavua
+    "Kib": "kibi-bitti", # kibibittiä
+    "Mib": "mebi-bitti", # mebibittiä
+    "Gib": "gibi-bitti", # gibibittiä
+    "Tib": "tebi-bitti", # tebibittiä
+    "Pib": "pebi-bitti", # pebibittiä
+    "Eib": "eksbi-bitti", # eksbibittiä
+    "Zib": "tsebi-bitti", # tsebibittiä
+    "Yib": "jobi-bitti", # jobibittiä
+    "KiB": "kibi-tavu", # kibi-tavua
+    "MiB": "mebi-tavu", # mebitavua
+    "GiB": "gibi-tavu", # gibitavua
+    "TiB": "tebi-tavu", # tebitavua
+    "PiB": "pebi-tavu", # eksbitavua
+    "EiB": "eksbi-tavu", # eksbitavua
+    "ZiB": "tsebi-tavu", # tsebitavua
+    "YiB": "jobi-tavu", # jobitavua
   }
 
   # this will only be used if the language is English, so it can be empty for other countries
@@ -224,14 +224,14 @@
     "ruokalusikka": "ruokalusikallista",
     "maili tunnissa": "mailia tunnissa",
     "maili gallonalla": "mailia gallonalla",
-    "kibibitti": "kibibittiä",
-    "mebibitti": "mebibittiä", 
-    "gibibitti": "gibibittiä", 
-    "tebibitti": "tebibittiä", 
-    "pebibitti": "pebibittiä", 
-    "eksbibitti": "eksbibittiä", 
-    "tsebibitti": "tsebibittiä",
-    "jobibitti": "jobibittiä",
+    "kibi-bitti": "kibi-bittiä",
+    "mebi-bitti": "mebi-bittiä", 
+    "gibi-bitti": "gibi-bittiä", 
+    "tebi-bitti": "tebi-bittiä", 
+    "pebi-bitti": "pebi-bittiä", 
+    "eksbi-bitti": "eksbi-bittiä", 
+    "tsebi-bitti": "tsebi-bittiä",
+    "jobi-bitti": "jobi-bittiä",
     "annum": "annumia",
     "curie": "curieta"
   }
