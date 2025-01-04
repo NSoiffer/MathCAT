@@ -3,6 +3,7 @@
 mod common;
 
 mod Languages {
+    mod intent;
     mod zh;
     mod en;
     mod fi;

@@ -76,7 +76,9 @@
   # (a,b) has many interpretations; (a, b] (etc) have fewer interpretations.
   # as an interval, it represents a set and hence a clue that it is an interval is that a set operator comes
   #   before or after it. '=' is also common.
-  # They also commonly stand by themselves, but so does the interpretation as a point or gcd, so we don't inclub (xxx, yyy) in the inference
+  # They also commonly stand by themselves, but so does the interpretation as a point or gcd, so we don't include (xxx, yyy) in the inference
+  # Note [x,y] is also a commutator.
+  # Intervals are never contained in other intervals, so rule them out if there is an ancestor that could be an interval
   name: interval
   tag: mrow
   match: 
@@ -84,7 +86,9 @@
        # FIX: consider adding ]...[ versions
     - "(*[1][text()='(' or text()='['] and *[3][text()=')' or text()=']']) and"   # match bracketing
     - "(*[2][count(*)=3 and *[2][text()=',']]) and"                               # inside should have ','
-    - "not(ancestor::*[IsBracketed(., '{', '}')]) and "                           # intervals are not part of set notation (e.g, { (x,y)∈L | ...})
+    # intervals are not part of set notation (e.g, { (x,y)∈L | ...}) nor are they nested
+    - "not(ancestor::*[IsBracketed(., '{', '}') or IsBracketed(., '[', ']') or IsBracketed(., '(', ')')]) and "  
+    - "not(descendant::*[IsBracketed(., '{', '}') or IsBracketed(., '[', ']') or IsBracketed(., '(', ')')]) and "  
       # FIX: if both the first and third children of *[2] are mn, then make sure first <= third
     - "("
     - "  not(IsBracketed(., '(', ')')) or "                                                                   # (.,.) is very ambiguous -- need more clues

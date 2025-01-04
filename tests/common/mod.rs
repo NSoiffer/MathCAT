@@ -63,6 +63,8 @@ pub fn test(language: &str, style: &str, mathml: &str, speech: &str) {
         prefs.set_user_prefs("PauseFactor", "100").unwrap();                         // makes testing simpler
         prefs.set_user_prefs("Verbosity", "Medium").unwrap();
         prefs.set_user_prefs("Impairment", "Blindness").unwrap();
+        prefs.set_user_prefs("DecimalSeparators", ".").unwrap();
+        prefs.set_user_prefs("BlockSeparators", ", ").unwrap();
     });
 
     set_preference("Language".to_string(), language.to_string()).unwrap();
@@ -159,5 +161,63 @@ pub fn test_braille_prefs(code: &str, test_prefs: Vec<(&str, &str)>, mathml: &st
         Ok(result) => assert_eq!(braille, &result),
         Err(e) => panic!("{}", errors_to_string(&e)),
     };
+}
+
+#[allow(dead_code)]     // used in testing
+pub fn test_intent(mathml: &str, target: &str, test_prefs: Vec<(&str, &str)>) {
+    use sxd_document::{parser, dom::Element};
+    set_rules_dir(abs_rules_dir_path()).unwrap();
+    libmathcat::speech::SPEECH_RULES.with(|rules| {
+        let rules = rules.borrow_mut();
+        let mut prefs = rules.pref_manager.borrow_mut();
+        prefs.set_user_prefs("DecimalSeparators", ".").unwrap();
+        prefs.set_user_prefs("BlockSeparators", ", ").unwrap();
+    });
+
+    // crate::speech::SpeechRules::initialize_all_rules().unwrap();
+    set_preference("IntentErrorRecovery".to_string(), "Error".to_string()).unwrap();
+    for (pref_name, pref_value) in test_prefs.clone() {
+        set_preference(pref_name.to_string(), pref_value.to_string()).unwrap();
+    };
+
+    let package = &parser::parse(target).expect("Failed to parse target input");
+    let target = get_element(package);
+    trim_element(&target);
+
+    let canonical_mathml = match set_mathml(mathml.to_string()) {
+        Ok(e) => e,
+        Err(e) => panic!("In set_mathml: {}", libmathcat::errors_to_string(&e)),
+    };
+    let package = &parser::parse(&canonical_mathml).expect("Failed to parse target input");
+    let canonical_mathml = get_element(package);
+    trim_element(&canonical_mathml);
+    let computed_intent = match libmathcat::speech::intent_from_mathml(canonical_mathml, package.as_document()) {
+        Ok(e) => e,
+        Err(e) => panic!("in intent_from_mathml: {}", libmathcat::errors_to_string(&e)),
+    };
+    
+    // remove some attrs that make it harder to handwrite what the intent is:
+    //    'id' and 'data-id-added'; leaving 'data-from-mathml' as that is used by the code
+    clean_attrs(computed_intent);
+
+    match is_same_element(&computed_intent, &target) {
+        Ok(_) => return ,
+        Err(e) => panic!("{}", e),
+    }
+
+    fn clean_attrs<'a>(mathml: Element<'a>) -> Element<'a> {
+        mathml.remove_attribute("id");
+        mathml.remove_attribute("data-id-added");
+
+        let children = mathml.children();
+        if children.is_empty() || (children.len() == 1 && children[0].element().is_none()) {
+            return mathml;
+        }
+        
+        for child in children {
+            clean_attrs(child.element().unwrap());
+        }
+        return mathml;
+    }
 }
 
