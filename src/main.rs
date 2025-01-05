@@ -174,14 +174,19 @@ fn main() {
   //   </math>";
 
   let expr = r#"
-<math display='block'>
- <mn>1.5</mn><mi intent=':unit'>km</mi>
- <mn>2</mn><mi intent=':unit' mathvariant='normal'>Ω</mi>
- <mn>1</mn><mi id='ohm-id' mathvariant='normal'>Ω</mi>
- <mo>+</mo>
- <mn>3</mn><mi intent=':unit' mathvariant='normal'>ft</mi>
- </math>
-    "#;
+<math data-latex='\vec{A} \perp \vec{B}' display='block'>
+  <mrow data-changed='added'>
+    <mover data-latex='\vec{A}' data-mjx-texclass='ORD'>
+      <mi data-latex='A'>A</mi>
+      <mo stretchy='false'>→</mo>
+    </mover>
+    <mo data-latex='\perp'>⊥</mo>
+    <mover data-latex='\vec{B}' data-mjx-texclass='ORD'>
+      <mi data-latex='B'>B</mi>
+      <mo stretchy='false'>→</mo>
+    </mover>
+  </mrow>
+ </math>"#;
   // let expr= "<math><mrow><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>";
   let instant = Instant::now();
   let rules_dir = std::env::current_exe().unwrap().parent().unwrap().join("../../Rules");
@@ -195,7 +200,7 @@ fn main() {
   set_preference("DecimalSeparator".to_string(), "Auto".to_string()).unwrap();
   set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
   set_preference("TTS".to_string(), "None".to_string()).unwrap();
-  set_preference("Verbosity".to_string(), "Medium,".to_string()).unwrap();
+  set_preference("Verbosity".to_string(), "Verbose,".to_string()).unwrap();
   set_preference("Impairment".to_string(), "Blindness".to_string()).unwrap();
   set_preference("SpeechOverrides_CapitalLetters".to_string(), "".to_string()).unwrap();
   set_preference("MathRate".to_string(), "80".to_string()).unwrap();
@@ -207,16 +212,25 @@ fn main() {
   
   set_preference("Bookmark".to_string(), "false".to_string()).unwrap();
   set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();
-  // set_preference("DecimalSeparators".to_string(), ", ".to_string()).unwrap();
-  // set_preference("BlockSeparators".to_string(), ".".to_string()).unwrap();
+  // set_preference("DecimalSeparators".to_string(), ",".to_string()).unwrap();
+  // set_preference("BlockSeparators".to_string(), ". ".to_string()).unwrap();
   if let Err(e) = set_mathml(expr.to_string()) {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   };
 
+  // match do_navigate_command("MoveStart".to_string())  {
+  //   Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
+  //   Ok(speech) => info!("MoveStart speech: '{}'", speech),
+  // }
+  // match do_navigate_command("MoveNext".to_string()) {
+  //   Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
+  //   Ok(speech) => info!("MoveNext speech: '{}'", speech),
+  // }
   match get_spoken_text() {
     Ok(speech) => info!("Computed speech string:\n   '{}'", speech),
     Err(e) => panic!("{}", errors_to_string(&e)),
   }
+  debug!("Speech language is {}", get_preference("Language".to_string()).unwrap());
   debug!("DecimalSeparator: {:?}", get_preference("DecimalSeparator".to_string()).unwrap());
   debug!("DecimalSeparators: {:?}, BlockSeparators: {:?}", get_preference("DecimalSeparators".to_string()).unwrap(), get_preference("BlockSeparators".to_string()).unwrap());
   info!("SpeechStyle: {:?}", get_preference("SpeechStyle".to_string()).unwrap());
@@ -239,7 +253,7 @@ fn main() {
   // let xpath_counts = libmathcat::speech::xpath_count();
   // info!("#xpath = {}; duplicates = {}", xpath_counts.0, xpath_counts.1);
   info!("Time taken (second time for speech + braille): {}ms", instant.elapsed().as_millis());
-
+  // debug!("Hashmap sizes:\n{}", libmathcat::speech::SpeechRules::print_sizes());
   timing_test(expr, 0);
 
 }

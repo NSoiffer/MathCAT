@@ -2058,19 +2058,19 @@ impl<'c, 's:'c, 'm:'c> fmt::Display for SpeechRulesWithContext<'c, 's,'m> {
 thread_local!{
     /// SPEECH_UNICODE_SHORT is shared among several rules, so "RC" is used
     static SPEECH_UNICODE_SHORT: UnicodeTable =
-        Rc::new( RefCell::new( HashMap::with_capacity(497) ) );
+        Rc::new( RefCell::new( HashMap::with_capacity(500) ) );
         
     /// SPEECH_UNICODE_FULL is shared among several rules, so "RC" is used
     static SPEECH_UNICODE_FULL: UnicodeTable =
-        Rc::new( RefCell::new( HashMap::with_capacity(6997) ) );
+        Rc::new( RefCell::new( HashMap::with_capacity(6500) ) );
         
     /// BRAILLE_UNICODE_SHORT is shared among several rules, so "RC" is used
     static BRAILLE_UNICODE_SHORT: UnicodeTable =
-        Rc::new( RefCell::new( HashMap::with_capacity(497) ) );
+        Rc::new( RefCell::new( HashMap::with_capacity(500) ) );
         
     /// BRAILLE_UNICODE_FULL is shared among several rules, so "RC" is used
     static BRAILLE_UNICODE_FULL: UnicodeTable =
-        Rc::new( RefCell::new( HashMap::with_capacity(6997) ) );
+        Rc::new( RefCell::new( HashMap::with_capacity(5000) ) );
 
     /// SPEECH_DEFINITION_FILES_AND_TIMES is shared among several rules, so "RC" is used
     static SPEECH_DEFINITION_FILES_AND_TIMES: FilesAndTimesShared =
@@ -2133,7 +2133,7 @@ impl SpeechRules {
         return SpeechRules {
             error: Default::default(),
             name,
-            rules: HashMap::with_capacity(if name == RulesFor::Intent {1023} else {31}),                       // lazy load them
+            rules: HashMap::with_capacity(if name == RulesFor::Intent || name == RulesFor::Speech {500} else {50}),                       // lazy load them
             rule_files: FilesAndTimes::default(),
             unicode_short: globals.0.0,       // lazy load them
             unicode_short_files: globals.0.1,
@@ -2246,6 +2246,39 @@ impl SpeechRules {
 
         return compile_rule(&unicode_file_contents, unicode_build_fn)
                     .chain_err(||format!("in file {:?}", path.to_str().unwrap()));
+    }
+
+    pub fn print_sizes() -> String {
+        // let _ = &SPEECH_RULES.with_borrow(|rules| {
+        //     debug!("SPEECH RULES entries\n");
+        //     let rules = &rules.rules;
+        //     for (key, _) in rules.iter() {
+        //         debug!("key: {}", key);
+        //     }
+        // });
+        let mut answer = rule_size(&SPEECH_RULES, "SPEECH_RULES");
+        answer += &rule_size(&INTENT_RULES, "INTENT_RULES");
+        answer += &rule_size(&BRAILLE_RULES, "BRAILLE_RULES");
+        answer += &rule_size(&NAVIGATION_RULES, "NAVIGATION_RULES");
+        answer += &rule_size(&OVERVIEW_RULES, "OVERVIEW_RULES");
+        SPEECH_RULES.with_borrow(|rule| {
+            answer += &format!("Speech Unicode tables: short={}/{}, long={}/{}\n",
+                                rule.unicode_short.borrow().len(), rule.unicode_short.borrow().capacity(),
+                                rule.unicode_full.borrow().len(), rule.unicode_full.borrow().capacity());
+        });
+        BRAILLE_RULES.with_borrow(|rule| {
+            answer += &format!("Braille Unicode tables: short={}/{}, long={}/{}\n",
+                                rule.unicode_short.borrow().len(), rule.unicode_short.borrow().capacity(),
+                                rule.unicode_full.borrow().len(), rule.unicode_full.borrow().capacity());
+        });
+        return answer;
+
+        fn rule_size(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, name: &str) -> String {
+            rules.with_borrow(|rule| {
+                let hash_map = &rule.rules;
+                return format!("{}: {}/{}\n", name, hash_map.len(), hash_map.capacity());
+            })
+        }
     }
 }
 
