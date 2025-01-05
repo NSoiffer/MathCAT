@@ -123,7 +123,8 @@
 -
   name: binomial-frac
   tag: mrow
-  match: "IsBracketed(., '(', ')') and  *[2][self::m:mfrac][translate(@linethickness, 'abcdefghijklmnopqrstuvwxyz', '')=0]"
+  # "translate()" is used because it might be "0em" and we need to get rid of the "em"
+  match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][translate(@linethickness, 'abcdefghijklmnopqrstuvwxyz', '')=0]"
   replace:
   - intent:
       name: binomial
@@ -326,7 +327,7 @@
   name: modified-var
   tag: mover
   # breve, check, dot, double-dot, triple-dot, quadruple-dot, grave, hat, tilde, line/bar
-  match: "*[1][self::m:mi] and *[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^~→¯_', '')='']"
+  match: "*[1][self::m:mi] and *[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^~→⇀¯_', '')='']"
   replace:
   - intent:
       name: "modified-variable"
