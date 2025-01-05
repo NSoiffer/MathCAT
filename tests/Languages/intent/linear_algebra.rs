@@ -75,7 +75,6 @@ fn cross_product_vec_harpoon() {
 
 #[test]
 fn dot_product_bold_math_variant() {
-  init_logger();
   let mathml = r#"<math>
       <mi mathvariant='bold'>x</mi>
       <mo>&#x22C5;</mo>
