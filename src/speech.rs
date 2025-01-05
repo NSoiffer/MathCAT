@@ -87,7 +87,7 @@ fn intent_rules<'m>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>,
     rules.with(|rules| {
         rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
-        // debug!("speak_rules:\n{}", mml_to_string(&mathml));
+        // debug!("intent_rules:\n{}", mml_to_string(&mathml));
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, doc, nav_node_id);
         let intent =  rules_with_context.match_pattern::<Element<'m>>(mathml)
                     .chain_err(|| "Pattern match/replacement failure!")?;
