@@ -662,11 +662,7 @@
  - "∅": [T: "tomma mängden"]                        #  0x2205    (en: 'empty set')
  - "∆":                                             #  0x2206
      - T: "laplacianen av"                               #     (en: 'laplacian of')
- - "∇":                                             #  0x2207
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [T: "gradienten av"]
-         else: [T: "grad"]                            #     (en: 'the', google translation)
+ - "∇": [T: "gradienten av"]                     # 0x2207 (en: 'gradient of', google: 'lutning av')
  - "∈":                                             #  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"

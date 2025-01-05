@@ -364,11 +364,6 @@
         if: "$Verbosity!='Terse'"
         then: [T: '']
     - T: laplacian dari
-- "∇": # 0x2207
-    - test:
-        if: "$Verbosity!='Terse'"
-        then: [T: '']
-    - T: gradien dari
 - "∈": # 0x2208
     - test:
         if: "$SpeechStyle != 'ClearSpeak'"

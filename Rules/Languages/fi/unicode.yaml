@@ -310,11 +310,6 @@
          if: "$Verbosity!='Terse'"
          then: [T: ""]                       	    # 	(google translation)
      - T: "Laplacen operaattori"                    # 	(en: 'laplacian of', google: 'laplacian of')
- - "∇":                                         	#  0x2207
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [T: ""]                       	    # 	(google translation)
-     - T: "nabla"                               	# 	(en: 'gradient of', google: 'gradientti')
  - "∈":                                         	#  0x2208 # fi: some elements (pun) of this translation has to be tested
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"

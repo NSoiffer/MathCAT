@@ -307,11 +307,11 @@
     #     if: "$Verbosity!='Terse'"
      #    then: [T: "the"]
      - T: đen ta
- - "∇":                                          # 0x2207
-   #  - test: 
-    #     if: "$Verbosity!='Terse'"
-     #    then: [T: "the"]
-     - T: độ dốc của
+ - "∇":                                             #  0x2207
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: "các"]                           #   (en: 'the')
+     - t: "độ dốc của"                              #   (en: 'gradient of')
  - "∈":                                          # 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"

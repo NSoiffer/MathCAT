@@ -336,11 +336,6 @@
          if: "$Verbosity!='Terse'"
          then: [T: ""]                         	# 	(en: 'the', google translation)
      - T: "變化量"                                 	# 	(en: 'laplacian of')
- - "∇":                                         	#  0x2207
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [T: ""]                         	# 	(en: 'the', google translation)
-     - T: "梯度"                                  	# 	(en: 'gradient of')
  - "∈":                                         	#  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"

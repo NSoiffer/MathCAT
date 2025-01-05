@@ -355,11 +355,6 @@
          if: "$Verbosity!='Terse'"
          then: [t: "the"]
      - t: "laplacian of"
- - "∇":                                          # 0x2207
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "the"]
-     - t: "gradient of"
  - "∈":                                          # 0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"

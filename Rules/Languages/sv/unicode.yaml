@@ -307,7 +307,6 @@
  - "∄": [T: "det finns inte"]                #  0x2204 (en: 'there does not exist')
  - "∅": [T: "tomma mängden"]                     #  0x2205 (en: 'empty set')
  - "∆": [T: "laplacianen av"]                     # 0x2206 (en: 'laplacian of')
- - "∇": [T: "gradienten av"]                     # 0x2207 (en: 'gradient of', google: 'lutning av')
  - "∈":                                          #  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
