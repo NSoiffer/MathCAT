@@ -163,7 +163,7 @@ pub fn test_braille_prefs(code: &str, test_prefs: Vec<(&str, &str)>, mathml: &st
     };
 }
 
-#[allow(dead_code)]     // used in testing
+#[allow(dead_code)]
 pub fn test_intent(mathml: &str, target: &str, test_prefs: Vec<(&str, &str)>) {
     use sxd_document::{parser, dom::Element};
     set_rules_dir(abs_rules_dir_path()).unwrap();
@@ -184,14 +184,14 @@ pub fn test_intent(mathml: &str, target: &str, test_prefs: Vec<(&str, &str)>) {
     let target = get_element(package);
     trim_element(&target);
 
-    let canonical_mathml = match set_mathml(mathml.to_string()) {
-        Ok(e) => e,
-        Err(e) => panic!("In set_mathml: {}", libmathcat::errors_to_string(&e)),
-    };
-    let package = &parser::parse(&canonical_mathml).expect("Failed to parse target input");
-    let canonical_mathml = get_element(package);
-    trim_element(&canonical_mathml);
-    let computed_intent = match libmathcat::speech::intent_from_mathml(canonical_mathml, package.as_document()) {
+    let new_package = parser::parse(mathml);
+    if let Err(e) = new_package {
+        panic!("Invalid MathML:\n{}\nError is: {}", &mathml, &e.to_string());
+    }
+
+    let new_package = new_package.unwrap();
+    let mathml = get_element(&new_package);
+    let computed_intent = match libmathcat::get_intent(mathml, new_package.as_document()) {
         Ok(e) => e,
         Err(e) => panic!("in intent_from_mathml: {}", libmathcat::errors_to_string(&e)),
     };
@@ -202,7 +202,11 @@ pub fn test_intent(mathml: &str, target: &str, test_prefs: Vec<(&str, &str)>) {
 
     match is_same_element(&computed_intent, &target) {
         Ok(_) => return ,
-        Err(e) => panic!("{}", e),
+        Err(e) => {
+            println!("target:\n{}", libmathcat::pretty_print::mml_to_string(&target));
+            println!("computed intent:\n{}", libmathcat::pretty_print::mml_to_string(&computed_intent));
+            panic!("{}", e)
+        },
     }
 
     fn clean_attrs<'a>(mathml: Element<'a>) -> Element<'a> {

@@ -587,6 +587,15 @@ pub fn get_element(package: &Package) -> Element {
     return result.unwrap();
 }
 
+/// Get the intent after setting the MathML
+/// Used in testing
+#[allow(dead_code)]
+pub fn get_intent<'a>(mathml: Element<'a>, doc: Document<'a>) -> Result<Element<'a>> {
+    crate::speech::SPEECH_RULES.with(|rules|  rules.borrow_mut().read_files().unwrap());
+    let mathml = cleanup_mathml(mathml)?;
+    return crate::speech::intent_from_mathml(mathml, doc);
+}
+
 #[allow(dead_code)]
 fn trim_doc(doc: &Document) {
     for root_child in doc.root().children() {
