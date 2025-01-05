@@ -40,14 +40,14 @@ The default value is given in \[brackets\].
     [This site gives a list of options](https://www.venea.net/web/culture_code).
   * Description: this value determines the language to be used.
     If the regional variant is not found among the speech rules, the speech will fall back to using the main language. If speech rules for the main language can not be found, English ("en") is used.
-  * Status: currently only English, Indonesian, and Vietnamese are supported.
-    Support for other languages will added with help from volunteers.
+  * Status: currently only English, Spanish, Finnish, Indonesian, Swedish, Vietnamese, and Chinese are supported.
+    Support for other languages will be added with help from volunteers.
 
 * ✓SpeechStyle: [ClearSpeak]
   * Options:  Any implemented speech style (currently only ClearSpeak and SimpleSpeak)
-  * Description: a style of speech speech or coordinated philosophy about how to speak an expression.
-    * ClearSpeak with developed by ETS for use on high stake tests such as the SAT. The [ClearSpeak spec details are in this Word document](ClearSpeakRulesAndPreferences.docx).
-    * SimpleSpeak tries to minimize speech by speaking simple expressions such as $\frac{a}{b}$ quickly without bracketing words ("a over b"); these are distinguished from more complex expressions such as $\frac{a}{b+1}$ which will always have bracketing words ("fraction a over b plus 1 end fraction"). Expressions are never unambiguous in SimpleSpeak.
+  * Description: a style of speech or coordinated philosophy about how to speak an expression.
+    * ClearSpeak was developed by ETS for use on high-stakes tests such as the SAT. The [ClearSpeak spec details are in this Word document](ClearSpeakRulesAndPreferences.docx).
+    * SimpleSpeak tries to minimize speech by speaking simple expressions such as $\frac{a}{b}$ quickly without bracketing words ("a over b"); these are distinguished from more complex expressions such as $\frac{a}{b+1}$ which will always have bracketing words ("fraction a over b plus 1 end fraction").
   * Status: currently only ClearSpeak and SimpleSpeak are implemented, but MathSpeak will likely be implemented at some point.
 
 * ✓Verbosity: [Medium]  
@@ -56,14 +56,14 @@ The default value is given in \[brackets\].
     * Status: supported, but there will likely be improvements made over time
 
 * ✓MathRate: [100]
-    * Options: Number between 1 and 1000(?)
-    * Description: Changes the relative speech rate. The change is a percentage speed change from standard speech engine rate. '100' means the math reading rate is the same as that of the text rate.
+    * Options: Number between 1 and 100
+    * Description: Changes the relative speech rate. The change is a percentage speed change from the standard speech engine's rate. '100' means the math reading rate is the same as that of the text rate.
       This only works for implementations that tell MathCAT to generate speech engine tagging such as SSML.
     * Status: This should work in NVDA.
 
-* ✓PauseFactor: [1]
-    * Options: Number between 0 and 10
-    * Description: Changes the relative amount of pausing that MathCAT adds. 0 turns off all pausing and 10 makes the pauses 10 times longer than normal.
+* ✓PauseFactor: [50]
+    * Options: Number between 0 and 100
+    * Description: Changes the relative amount of pausing that MathCAT adds. 0 turns off all pausing and 100 makes the pauses 10 times longer than normal.
       This only works for implementations that tell MathCAT to generate speech engine tagging such as SSML.
     * Status: This should work in NVDA.
 
