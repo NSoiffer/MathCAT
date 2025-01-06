@@ -695,9 +695,13 @@
      - t: "laplacian of"
  - "∇":                                          # 0x2207
      - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "the"]
-     - t: "gradient of"
+        if: "$NavMode='Character'"
+        then: [t: "nabla"]
+        else:
+        - test:
+            if: "$Verbosity!='Terse'"
+            then: [t: "the"]
+        - t: "gradient of"
  - "∉":                                          # 0x2209
     # rule is identical to 0x2208
      - test:
