@@ -1,8 +1,6 @@
-/// Tests for:
-/// *  functions including trig functions, logs, and functions to powers
-/// *  implied times/functional call and explicit times/function call
-/// *  parens
-/// These are all intertwined, so they are in one file
+/// Inference tests for:
+/// *  Linear Algebra related things including vector and matrix functions
+/// *  Some tests that are related are in the calculus test file.
 use crate::common::*;
 
 
