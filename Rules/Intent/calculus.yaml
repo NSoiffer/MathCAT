@@ -4,10 +4,10 @@
   tag: mrow
   match: "count(*)=3 and
           *[1][ self::m:mo[.='∇' or .='𝛁'] or self::m:mover[*[1][.='∇' or .='𝛁'] and *[2][.='→' or .='⇀']] ] and
-          *[2][ self::m:mo and (.='⋅' or .='×') ]"
+          *[2][ self::m:mo and (.='⋅' or .='·' or .='×') ]"
   replace:
   - intent:
-      xpath-name: "IfThenElse(*[2]='⋅', 'divergence', 'curl')"
+      xpath-name: "IfThenElse(*[2][.='×'] , 'curl', 'divergence')"
       children: [x: "*[3]"]
 -
   name: gradient
