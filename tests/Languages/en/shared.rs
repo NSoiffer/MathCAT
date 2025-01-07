@@ -363,3 +363,22 @@ fn gradient() {
   test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "del cap f");
   test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "gradient of cap f");
 }
+
+#[test]
+fn literal_speak() {
+  let expr = r#"<math data-latex='\vec{A} \perp \vec{B}' display='block'>
+  <mrow data-changed='added'>
+    <mover data-latex='\vec{A}' data-mjx-texclass='ORD'>
+      <mi data-latex='A'>A</mi>
+      <mo stretchy='false'>→</mo>
+    </mover>
+    <mo intent='perpendicular-to'>⊥</mo>
+    <mover data-latex='\vec{B}' data-mjx-texclass='ORD'>
+      <mi data-latex='B'>B</mi>
+      <mo stretchy='false'>→</mo>
+    </mover>
+  </mrow>
+ </math>"#;          
+  // may want to change this for another language
+  test("en", "LiteralSpeak", expr, "cap eigh right arrow, perpendicular to, cap b right arrow");
+}
