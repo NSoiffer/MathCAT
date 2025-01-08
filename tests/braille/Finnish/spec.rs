@@ -267,6 +267,39 @@ fn p13_parentheses_invisible_times() {
     test_braille("Finnish", expr, "⠦⠼⠉⠀⠭⠀⠖⠼⠃⠀⠽⠴⠀⠦⠼⠃⠀⠭⠀⠤⠼⠁⠴");
 }
 
+#[test]
+fn p50_conditional_probability() {
+    let expr = "<math>
+  <mrow>
+    <mi>P</mi>
+    <mo>(</mo>
+    <mi>B</mi>
+    <mi>|</mi>
+    <mi>A</mi>
+    <mo>)</mo>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mfrac>
+      <mrow>
+        <mi>P</mi>
+        <mo>(</mo>
+        <mi>A</mi>
+        <mi>B</mi>
+        <mo>)</mo>
+      </mrow>
+      <mrow>
+        <mi>P</mi>
+        <mo>(</mo>
+        <mi>A</mi>
+        <mo>)</mo>
+      </mrow>
+    </mfrac>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠠⠏⠦⠠⠃⠀⠸⠀⠠⠁⠴⠀⠶⠠⠏⠦⠠⠁⠠⠎⠴⠀⠌⠠⠏⠦⠠⠁⠴");
+}
+
 // Not sure about this MathML markup.
 #[test]
 fn p50_alternative_derivative_1() {
