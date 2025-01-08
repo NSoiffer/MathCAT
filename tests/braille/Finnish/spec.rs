@@ -267,6 +267,58 @@ fn p13_parentheses_invisible_times() {
     test_braille("Finnish", expr, "⠦⠼⠉⠀⠭⠀⠖⠼⠃⠀⠽⠴⠀⠦⠼⠃⠀⠭⠀⠤⠼⠁⠴");
 }
 
+// After the root sign, dot 5 is used to signify 'change of zone' in the braille.
+#[test]
+fn p50_cube_root() {
+    let expr = "<math>
+  <mroot>
+    <mrow>
+      <mi>x</mi>
+      <mo>+</mo>
+      <mn>5</mn>
+    </mrow>
+    <mn>3</mn>
+  </mroot>
+</math>";
+    test_braille("Finnish", expr, "⠩⠼⠉⠐⠦⠭⠀⠖⠼⠑⠴");
+}
+
+#[test]
+fn p50_binomial_with_factorial() {
+    let expr = "<math>
+  <mrow>
+    <mrow>
+      <mo>(</mo>
+      <mfrac linethickness="0px">
+        <mn>6</mn>
+        <mn>4</mn>
+      </mfrac>
+      <mo>)</mo>
+    </mrow>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mfrac>
+      <mrow>
+        <mn>6</mn>
+        <mo>!</mo>
+      </mrow>
+      <mrow>
+        <mn>4</mn>
+        <mo>!</mo>
+        <mo>(</mo>
+        <mn>6</mn>
+        <mo>−</mo>
+        <mn>4</mn>
+        <mo>)</mo>
+        <mo>!</mo>
+      </mrow>
+    </mfrac>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠦⠼⠋⠯⠀⠼⠙⠴⠀⠶⠼⠋⠠⠲⠀⠌⠷⠼⠙⠠⠲⠀⠦⠼⠋⠀⠤⠼⠙⠠⠴⠠⠲⠾");
+}
+
 #[test]
 fn p50_conditional_probability() {
     let expr = "<math>
