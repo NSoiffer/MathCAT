@@ -267,6 +267,7 @@ fn p13_parentheses_invisible_times() {
     test_braille("Finnish", expr, "⠦⠼⠉⠀⠭⠀⠖⠼⠃⠀⠽⠴⠀⠦⠼⠃⠀⠭⠀⠤⠼⠁⠴");
 }
 
+// 'Change of zone' dot 5 is used after the limit subscript notation.
 #[test]
 fn p48_limit_right_hand_approaching_Finnish_notation() {
     let expr = "<math>
@@ -291,6 +292,7 @@ fn p48_limit_right_hand_approaching_Finnish_notation() {
     test_braille("Finnish", expr, "⠇⠊⠍⠡⠦⠭⠀⠤⠱⠀⠼⠚⠀⠖⠴⠐⠋⠦⠭⠴");
 }
 
+// 'Change of zone' dot 5 is used after the limit subscript notation.
 #[test]
 fn p48_limit_right_hand_approaching_Finnish_notation_with_msup() {
     let expr = "<math>
@@ -317,6 +319,7 @@ fn p48_limit_right_hand_approaching_Finnish_notation_with_msup() {
     test_braille("Finnish", expr, "⠇⠊⠍⠡⠦⠭⠀⠤⠱⠀⠼⠚⠬⠖⠴⠐⠋⠦⠭⠴");
 }
 
+// 'Change of zone' dot 5 is used after the limit subscript notation.
 #[test]
 fn limit_approaches_from_below() {
     let expr = "<math>
@@ -339,7 +342,6 @@ fn limit_approaches_from_below() {
 </math>";
     test_braille("Finnish", expr, "⠇⠊⠍⠡⠦⠭⠀⠔⠱⠀⠼⠚⠴⠐⠋⠦⠭⠴");
 }
-
 
 // This is a hack, so the Finnish substitution notation for integral would work. The intent is might be wrong, but that is what the notation means.
 #[test]
