@@ -267,6 +267,88 @@ fn p13_parentheses_invisible_times() {
     test_braille("Finnish", expr, "⠦⠼⠉⠀⠭⠀⠖⠼⠃⠀⠽⠴⠀⠦⠼⠃⠀⠭⠀⠤⠼⠁⠴");
 }
 
+// Not sure about this MathML markup.
+#[test]
+fn p50_alternative_derivative_1() {
+    let expr = "<math>
+  <mfrac>
+    <mrow>
+      <mi>d</mi>
+      <mi>ln</mi>
+      <mi>x</mi>
+    </mrow>
+    <mrow>
+      <mi>d</mi>
+      <mi>x</mi>
+    </mrow>
+  </mfrac>
+</math>";
+    test_braille("Finnish", expr, "⠙⠇⠝⠭⠀⠌⠙⠭");
+}
+
+// Not sure about this MathML markup.
+#[test]
+fn p50_alternative_derivative_2() {
+    let expr = "<math>
+  <mrow>
+    <mfrac>
+      <mi>d</mi>
+      <mrow>
+        <mi>d</mi>
+        <mi>x</mi>
+      </mrow>
+    </mfrac>
+    <mi>ln</mi>
+    <mi>x</mi>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠙⠀⠌⠙⠭⠀⠇⠝⠭");
+}
+
+#[test]
+fn p51_set_with_closure() {
+    let expr = "<math>
+<mi>𝜕</mi>
+<mi>A</mi> 
+<mo>=</mo>
+<mover>
+<mi>A</mi>
+<mo>‾</mo>
+</mover>
+<mo>∩</mo>
+<mover>
+<mrow>
+<mo>(</mo>
+<mi>X</mi>
+<mo>−</mo>
+<mi>A</mi>
+<mo>)</mo>
+</mrow>
+<mo>‾</mo>
+</mover>
+</math>";
+    test_braille("Finnish", expr, "⠈⠙⠠⠁⠀⠶⠠⠁⠱⠀⠳⠦⠦⠠⠭⠀⠳⠤⠠⠁⠴⠱");
+}
+
+#[test]
+fn p51_normal_distribution() {
+    let expr = "<math>
+  <mrow>
+    <mi>p</mi>
+    <mo>~</mo>
+  </mrow>
+  <mrow>
+    <mi>N</mi>
+    <mo>(</mo>
+    <mn>58</mn>
+    <mo>,</mo>
+    <mn>2</mo>
+    <mo>)</mo>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠏⠀⠨⠶⠠⠝⠦⠼⠑⠓⠂⠀⠼⠃⠴");
+}
+
 #[test]
 fn p52_right_circular_cone_volume() {
     let expr = "<math>
