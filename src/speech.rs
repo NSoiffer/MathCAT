@@ -88,15 +88,33 @@ fn intent_rules<'m>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>,
         rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
         // debug!("intent_rules:\n{}", mml_to_string(&mathml));
+        let should_set_literal_intent = rules.pref_manager.borrow().pref_to_string("SpeechStyle").as_str() == "LiteralSpeak";
+        let original_intent = mathml.attribute_value("intent");
+        if should_set_literal_intent {
+            if let Some(intent) = original_intent {
+                let intent = if intent.contains('(') {intent.replace('(', ":literal(")} else {intent.to_string() + ":literal"};
+                mathml.set_attribute_value("intent", &intent);
+            } else {
+                mathml.set_attribute_value("intent", ":literal");
+            };
+        }
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, doc, nav_node_id);
         let intent =  rules_with_context.match_pattern::<Element<'m>>(mathml)
                     .chain_err(|| "Pattern match/replacement failure!")?;
-        if name(&intent) == "TEMP_NAME" {   // unneeded extra layer
+        let answer = if name(&intent) == "TEMP_NAME" {   // unneeded extra layer
             assert_eq!(intent.children().len(), 1);
-            return Ok( as_element(intent.children()[0]) );
+            as_element(intent.children()[0])
         } else {
-            return Ok(intent);
+            intent
+        };
+        if should_set_literal_intent {
+            if let Some(original_intent) = original_intent {
+                mathml.set_attribute_value("intent", original_intent);
+            } else {
+                mathml.remove_attribute("intent");
+            }
         }
+        return Ok(answer);
     })
 }
 

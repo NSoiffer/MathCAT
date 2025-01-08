@@ -661,11 +661,16 @@
   match: count(*)>0
   replace:
   - x: "translate(name(.), '-_', '  ')"
-  - t: "of"      # phrase(sine 'of' 5)
-  - pause: short
+  - test:
+      if: "not(contains(@data-intent-property, ':literal:'))"
+      then: [t: "of", pause: short]      # phrase(sine 'of' 5)
   - insert:
       nodes: "*"
-      replace: [t: "comma", pause: auto]      # phrase(f of x 'comma' y)
+      replace:
+      - test:
+          if: "not(contains(@data-intent-property, ':literal:'))"
+          then: [t: "comma"]      # phrase(f of x 'comma' y)
+      - pause: auto
 
 - name: default-text
   # unknown leaf -- just speak the text -- could be a literal intent

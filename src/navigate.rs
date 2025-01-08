@@ -1921,7 +1921,6 @@ mod tests {
 
     #[test]
     fn absolute_value() -> Result<()> {
-        init_logger();
         let mathml_str = "<math id='math'>
                 <mrow id='expr'>
                     <mn id='2'>2</mn>

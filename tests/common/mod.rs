@@ -176,6 +176,7 @@ pub fn test_intent(mathml: &str, target: &str, test_prefs: Vec<(&str, &str)>) {
 
     // crate::speech::SpeechRules::initialize_all_rules().unwrap();
     set_preference("IntentErrorRecovery".to_string(), "Error".to_string()).unwrap();
+    set_preference("SpeechStyle".to_string(), "SimpleSpeak".to_string()).unwrap();      // avoids possibility of "LiteralSpeak"
     for (pref_name, pref_value) in test_prefs.clone() {
         set_preference(pref_name.to_string(), pref_value.to_string()).unwrap();
     };

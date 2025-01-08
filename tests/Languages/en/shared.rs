@@ -368,17 +368,91 @@ fn gradient() {
 fn literal_speak() {
   let expr = r#"<math data-latex='\vec{A} \perp \vec{B}' display='block'>
   <mrow data-changed='added'>
-    <mover data-latex='\vec{A}' data-mjx-texclass='ORD'>
+    <mover data-latex='\vec{A}'>
       <mi data-latex='A'>A</mi>
       <mo stretchy='false'>→</mo>
     </mover>
     <mo intent='perpendicular-to'>⊥</mo>
-    <mover data-latex='\vec{B}' data-mjx-texclass='ORD'>
+    <mover data-latex='\vec{B}'>
       <mi data-latex='B'>B</mi>
       <mo stretchy='false'>→</mo>
     </mover>
   </mrow>
- </math>"#;          
-  // may want to change this for another language
+ </math>"#; 
   test("en", "LiteralSpeak", expr, "cap eigh right arrow, perpendicular to, cap b right arrow");
+}
+
+#[test]
+fn literal_speak_with_name() {
+  let expr = r#"<math intent='forced($x)'>
+      <mrow arg="x">
+        <mi>f</mi>
+        <mo data-changed='added'>&#x2061;</mo>
+        <mrow data-changed='added'>
+          <mo>(</mo>
+          <mrow data-changed='added'>
+            <mi>x</mi>
+            <mo>!</mo>
+          </mrow>
+          <mo>)</mo>
+        </mrow>
+      </mrow>
+    </math>"#;
+  test("en", "LiteralSpeak", expr, "forced f, left paren x exclamation point, right paren");
+}
+
+#[test]
+fn literal_speak_with_property() {
+  let expr = r#"<math intent=':prefix'>
+      <mrow arg="x">
+        <mi>f</mi>
+        <mo data-changed='added'>&#x2061;</mo>
+        <mrow data-changed='added'>
+          <mo>(</mo>
+          <mrow data-changed='added'>
+            <mi>x</mi>
+            <mo>!</mo>
+          </mrow>
+          <mo>)</mo>
+        </mrow>
+      </mrow>
+    </math>"#; 
+  test("en", "LiteralSpeak", expr, "f, left paren x exclamation point, right paren");
+}
+
+#[test]
+fn literal_intent_property() {
+  let expr = r#"<math data-latex='\vec{A} \perp \vec{B}' display='block'>
+  <mrow intent=":literal">
+    <mover data-latex='\vec{A}'>
+      <mi data-latex='A'>A</mi>
+      <mo stretchy='false'>→</mo>
+    </mover>
+    <mo intent='perpendicular-to'>⊥</mo>
+    <mover data-latex='\vec{B}'>
+      <mi data-latex='B'>B</mi>
+      <mo stretchy='false'>→</mo>
+    </mover>
+  </mrow>
+ </math>"#; 
+  test("en", "SimpleSpeak", expr, "cap eigh right arrow, perpendicular to, cap b right arrow");
+}
+
+#[test]
+fn literal_intent_property_with_name() {
+  let expr = r#"<math intent='forced:literal($x)'>
+      <mrow arg="x">
+        <mi>f</mi>
+        <mo data-changed='added'>&#x2061;</mo>
+        <mrow data-changed='added'>
+          <mo>(</mo>
+          <mrow data-changed='added'>
+            <mi>x</mi>
+            <mo>!</mo>
+          </mrow>
+          <mo>)</mo>
+        </mrow>
+      </mrow>
+    </math>"#; 
+  test("en", "SimpleSpeak", expr, "forced f, open paren x exclamation point, close paren");
 }
