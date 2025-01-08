@@ -266,3 +266,98 @@ fn p13_parentheses_invisible_times() {
     let expr = "<math><mo>(</mo><mn>3</mn><mo>&#8290;</mo><mi>x</mi><mo>+</mo><mn>2</mn><mo>&#8290;</mo><mi>y</mi><mo>)</mo><mo>&#8290;</mo><mo>(</mo><mn>2</mn><mo>&#8290;</mo><mi>x</mi><mo>−</mo><mn>1</mn><mo>)</mo></math>";
     test_braille("Finnish", expr, "⠦⠼⠉⠀⠭⠀⠖⠼⠃⠀⠽⠴⠀⠦⠼⠃⠀⠭⠀⠤⠼⠁⠴");
 }
+
+#[test]
+fn p52_right_circular_cone_volume() {
+    let expr = "<math>
+  <mrow>
+    <mi>V</mi>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mfrac>
+      <mn>1</mn>
+      <mn>3</mn>
+    </mfrac>
+    <mi>π</mi>
+    <msup>
+      <mi>r</mi>
+      <mn>2</mn>
+    </msup>
+    <mi>h</mi>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠠⠧⠀⠶⠼⠁⠒⠀⠨⠏⠀⠗⠬⠀⠓");
+}
+
+#[test]
+fn p52_circular_cone_area_equation() {
+    let expr = "<math>
+  <mrow>
+    <mi>A</mi>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mi>π</mi>
+    <msup>
+      <mi>r</mi>
+      <mn>2</mn>
+    </msup>
+    <mo>+</mo>
+  </mrow>
+  <mrow>
+    <mi>π</mi>
+    <mi>r</mi>
+    <msqrt>
+      <mrow>
+        <msup>
+          <mi>r</mi>
+          <mn>2</mn>
+        </msup>
+        <mo>+</mo>
+        <msup>
+          <mi>h</mi>
+          <mn>2</mn>
+        </msup>
+      </mrow>
+    </msqrt>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠠⠁⠀⠶⠨⠏⠀⠗⠬⠀⠖⠨⠏⠀⠗⠀⠩⠦⠗⠬⠀⠖⠓⠬⠴");
+}
+
+#[test]
+fn p52_quadratic_formula() {
+    let expr = "<math>
+  <mrow>
+    <mi>x</mi>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mfrac>
+      <mrow>
+        <mo>−</mo>
+        <mi>b</mi>
+        <mo>±</mo>
+        <msqrt>
+          <mrow>
+            <msup>
+              <mi>b</mi>
+              <mn>2</mn>
+            </msup>
+            <mo>−</mo>
+            <mn>4</mn>
+            <mi>a</mi>
+            <mi>c</mi>
+          </mrow>
+        </msqrt>
+      </mrow>
+      <mrow>
+        <mn>2</mn>
+        <mi>a</mi>
+      </mrow>
+    </mfrac>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠭⠀⠶⠷⠤⠃⠀⠖⠤⠩⠦⠃⠬⠀⠤⠼⠙⠀⠁⠉⠴⠾⠀⠌⠦⠼⠃⠀⠁⠴");
+}
