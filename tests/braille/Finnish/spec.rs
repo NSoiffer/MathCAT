@@ -267,6 +267,20 @@ fn p13_parentheses_invisible_times() {
     test_braille("Finnish", expr, "⠦⠼⠉⠀⠭⠀⠖⠼⠃⠀⠽⠴⠀⠦⠼⠃⠀⠭⠀⠤⠼⠁⠴");
 }
 
+// Dots 156 to signify the bar over "arc"
+#[test]
+fn p45_arcsin_with_bar_over() {
+    let expr = "<math>
+<mover>
+<mi>arc</mi>
+<mo>‾</mo>
+</mover>
+<mi>sin</mi>
+<mi>x</mi>
+</math>";
+    test_braille("Finnish", expr, "⠁⠗⠉⠱⠀⠎⠊⠝⠀⠭");
+}
+
 // 'Change of zone' dot 5 is used after the limit subscript notation.
 #[test]
 fn p48_limit_right_hand_approaching_Finnish_notation() {
@@ -521,6 +535,8 @@ fn p50_alternative_derivative_2() {
 </math>";
     test_braille("Finnish", expr, "⠙⠀⠌⠙⠭⠀⠇⠝⠭");
 }
+
+
 
 #[test]
 fn p51_set_with_closure() {
