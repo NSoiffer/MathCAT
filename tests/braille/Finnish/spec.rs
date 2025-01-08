@@ -267,6 +267,136 @@ fn p13_parentheses_invisible_times() {
     test_braille("Finnish", expr, "⠦⠼⠉⠀⠭⠀⠖⠼⠃⠀⠽⠴⠀⠦⠼⠃⠀⠭⠀⠤⠼⠁⠴");
 }
 
+#[test]
+fn p48_limit_right_hand_approaching_Finnish_notation() {
+    let expr = "<math>
+  <mrow>
+    <msub>
+      <mi>lim</mi>
+      <mrow>
+        <mi>x</mi>
+        <mo>→</mo>
+        <mn>0</mn>
+        <mo>+</mo>
+      </mrow>
+    </msub>
+  </mrow>
+  <mrow>
+    <mi>f</mi>
+    <mo>(</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠇⠊⠍⠡⠦⠭⠀⠤⠱⠀⠼⠚⠀⠖⠴⠐⠋⠦⠭⠴");
+}
+
+#[test]
+fn p48_limit_right_hand_approaching_Finnish_notation_with_msup() {
+    let expr = "<math>
+  <mrow>
+    <msub>
+      <mi>lim</mi>
+      <mrow>
+        <mi>x</mi>
+        <mo>→</mo>
+        <msup>
+        <mn>0</mn>
+        <mo>+</mo>
+        </msup>
+      </mrow>
+    </msub>
+  </mrow>
+  <mrow>
+    <mi>f</mi>
+    <mo>(</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠇⠊⠍⠡⠦⠭⠀⠤⠱⠀⠼⠚⠬⠖⠴⠐⠋⠦⠭⠴");
+}
+
+#[test]
+fn limit_approaches_from_below() {
+    let expr = "<math>
+<munder>
+<mo>lim</mo>
+<mrow>
+<mi>x</mi>
+<mo>↗</mo>
+<mn>0</mn>
+</mrow>
+</munder>
+<mrow>
+<mrow>
+<mi>f</mi>
+<mo>(</mo>
+<mi>x</mi>
+<mo>)</mo>
+</mrow>
+</mrow>
+</math>";
+    test_braille("Finnish", expr, "⠇⠊⠍⠡⠦⠭⠀⠔⠱⠀⠼⠚⠴⠐⠋⠦⠭⠴");
+}
+
+
+// This is a hack, so the Finnish substitution notation for integral would work. The intent is might be wrong, but that is what the notation means.
+#[test]
+fn p49_integral_with_Finnish_notation_for_substitution() {
+    let expr = "<math>
+  <mrow>
+    <msubsup>
+      <mo>∫</mo>
+      <mn>0</mn>
+      <mn>4</mn>
+    </msubsup>
+    <msqrt>
+      <mi>x</mi>
+    </msqrt>
+    <mi>d</mi>
+    <mi>x</mi>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <msubsup>
+      <mo intent='substitution'>⧸</mo>
+      <mn>0</mn>
+      <mn>4</mn>
+    </msubsup>
+    <mfrac>
+      <mn>2</mn>
+      <mn>4</mn>
+    </mfrac>
+    <mi>x</mi>
+    <msqrt>
+      <mi>x</mi>
+    </msqrt>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠮⠢⠼⠚⠔⠼⠙⠐⠩⠭⠀⠙⠭⠀⠶⠸⠢⠼⠚⠔⠼⠙⠐⠦⠼⠃⠒⠀⠭⠀⠩⠭⠴");
+}
+
+#[test]
+fn p50_such_that_y_greater_than_x() {
+    let expr = "<math>
+    <mi>∀</mi>
+    <mi>x</mi>
+    <mo>∈</mo>
+    <mi>ℝ</mi>
+    <mo>,</mo>
+    <mi>∃</mi>
+    <mi>𝑦</mi>
+    <mo>∈</mo>
+    <mi>ℝ</mi>
+    <mi>y</mi>
+    <mo>;</mo>
+    <mo>&gt;</mo>
+    <mi>x</mi>
+</math>";
+    test_braille("Finnish", expr, "⠳⠂⠭⠀⠳⠔⠠⠗⠂⠀⠳⠢⠽⠀⠳⠔⠠⠗⠆⠀⠽⠀⠱⠀⠭");
+}
+
 // After the root sign, dot 5 is used to signify 'change of zone' in the braille.
 #[test]
 fn p50_cube_root() {
