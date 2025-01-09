@@ -289,7 +289,7 @@ fn p15_greater_than() {
 }
 
 #[test]
-fn p15_greater_or_equal_than() {
+fn p15_greater_than_or_equal_to() {
     let expr = "<math>
     <mn>2</mn>
     <mi>x</mi>
@@ -297,6 +297,53 @@ fn p15_greater_or_equal_than() {
     <mn>6</mn>
 </math>";
     test_braille("Finnish", expr, "⠼⠃⠀⠭⠀⠱⠶⠀⠼⠋");
+}
+
+#[test]
+fn p15_less_than_or_equal_to() {
+    let expr = "<math>
+    <mi>x</mi>
+    <mo>≤</mo>
+    <mn>18</mn>
+</math>";
+    test_braille("Finnish", expr, "⠭⠀⠣⠶⠀⠼⠁⠓");
+}
+
+// Fractions with 'dropped dots'.
+#[test]
+fn p15_fractions_minus() {
+    let expr = "<math>
+  <mrow>
+    <mo>(</mo>
+    <mn>1</mn>
+    <mo>&#8292;</mo>
+    <mfrac>
+      <mn>3</mn>
+      <mn>5</mn>
+    </mfrac>
+    <mo>−</mo>
+    <mfrac>
+      <mn>5</mn>
+      <mn>7</mn>
+    </mfrac>
+    <mo>)</mo>
+    <mo>−</mo>
+  </mrow>
+  <mrow>
+    <mo>(</mo>
+    <mfrac>
+      <mn>2</mn>
+      <mn>5</mn>
+    </mfrac>
+    <mo>−</mo>
+    <mfrac>
+      <mn>1</mn>
+      <mn>3</mn>
+    </mfrac>
+    <mo>)</mo>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠦⠼⠁⠼⠉⠢⠀⠤⠼⠑⠶⠠⠴⠀⠤⠦⠼⠃⠢⠀⠖⠼⠁⠒⠠⠴");
 }
 
 // Dots 156 to signify the bar over "arc"
