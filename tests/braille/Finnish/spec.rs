@@ -267,6 +267,38 @@ fn p13_parentheses_invisible_times() {
     test_braille("Finnish", expr, "⠦⠼⠉⠀⠭⠀⠖⠼⠃⠀⠽⠴⠀⠦⠼⠃⠀⠭⠀⠤⠼⠁⠴");
 }
 
+#[test]
+fn p15_less_than() {
+    let expr = "<math>
+    <mi>x</mi>
+    <mo>&lt;</mo>
+    <mn>18</mn>
+</math>";
+    test_braille("Finnish", expr, "⠭⠀⠣⠀⠼⠁⠓");
+}
+
+#[test]
+fn p15_greater_than() {
+    let expr = "<math>
+    <mn>2</mn>
+    <mi>x</mi>
+    <mo>&gt;</mo>
+    <mn>6</mn>
+</math>";
+    test_braille("Finnish", expr, "⠼⠃⠀⠭⠀⠱⠀⠼⠋");
+}
+
+#[test]
+fn p15_greater_or_equal_than() {
+    let expr = "<math>
+    <mn>2</mn>
+    <mi>x</mi>
+    <mo>≥</mo>
+    <mn>6</mn>
+</math>";
+    test_braille("Finnish", expr, "⠼⠃⠀⠭⠀⠱⠶⠀⠼⠋");
+}
+
 // Dots 156 to signify the bar over "arc"
 #[test]
 fn p45_arcsin_with_bar_over() {
