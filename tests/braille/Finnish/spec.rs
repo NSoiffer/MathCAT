@@ -346,6 +346,144 @@ fn p15_fractions_minus() {
     test_braille("Finnish", expr, "⠦⠼⠁⠼⠉⠢⠀⠤⠼⠑⠶⠠⠴⠀⠤⠦⠼⠃⠢⠀⠖⠼⠁⠒⠠⠴");
 }
 
+#[test]
+fn p16_division() {
+    let expr = "<math>
+    <mo>(</mo>
+    <mn>6</mn>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mn>3</mn>
+    <mi>x</mi>
+    <mo>)</mo>
+    <mo>:</mo>
+    <mn>3</mn>
+</math>";
+    test_braille("Finnish", expr, "⠦⠼⠋⠀⠭⠀⠖⠼⠉⠀⠭⠴⠀⠌⠼⠉");
+}
+
+#[test]
+fn p16_fractional() {
+    let expr = "<math>
+  <mfrac>
+    <mrow>
+      <mn>6</mn>
+      <mi>x</mi>
+      <mo>+</mo>
+      <mn>3</mn>
+      <mi>x</mi>
+    </mrow>
+    <mn>3</mn>
+  </mfrac>
+</math>";
+    test_braille("Finnish", expr, "⠦⠼⠋⠀⠭⠀⠖⠼⠉⠀⠭⠴⠀⠌⠼⠉");
+}
+
+#[test]
+fn p16_absolute_value() {
+    let expr = "<math>
+  <mrow>
+    <mi>|</mi>
+    <mo>−</mo>
+  </mrow>
+  <mrow>
+    <mo>(</mo>
+    <mn>2</mn>
+    <mo>+</mo>
+    <mn>3</mn>
+    <mo>)</mo>
+    <mi>|</mi>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mi>|</mi>
+    <mo>−</mo>
+  </mrow>
+  <mrow>
+    <mn>7</mn>
+    <mi>|</mi>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mn>7</mn>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠸⠤⠦⠼⠃⠀⠖⠼⠑⠴⠸⠀⠶⠸⠤⠼⠛⠸⠀⠶⠼⠛");
+}
+
+#[test]
+fn p16_parens_and_brackets() {
+    let expr = "<math>
+  <mrow>
+    <mn>92</mn>
+    <mo>+</mo>
+  </mrow>
+  <mrow>
+    <mo>[</mo>
+    <mo>−</mo>
+    <mn>2</mn>
+    <mo>⋅</mo>
+    <mo>(</mo>
+    <mn>18</mn>
+    <mo>+</mo>
+    <mn>5</mn>
+    <mo>)</mo>
+    <mo>]</mo>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠊⠃⠀⠖⠷⠤⠼⠃⠀⠄⠦⠼⠁⠓⠀⠖⠼⠑⠴⠾");
+}
+
+#[test]
+fn p16_sequence_of_natural_numbers() {
+    let expr = "<math>
+    <mi>N</mi>
+    <mo>=</mo>
+    <mo>{</mo>
+    <mn>0</mn>
+    <mo>,</mo>
+    <mn>1</mn>
+    <mo>,</mo>
+    <mn>2</mn>
+    <mo>,</mo>
+    <mn>3</mn>
+    <mo>,</mo>
+    <mi>...</mi>
+    <mo>}</mo>
+</math>";
+    test_braille("Finnish", expr, "⠠⠝⠀⠶⠫⠼⠚⠂⠀⠼⠁⠂⠀⠼⠃⠂⠀⠼⠉⠂⠀⠄⠄⠄⠻");
+}
+
+#[test]
+fn p17_multiple_operations() {
+    let expr = "<math>
+    <mn>5</mn>
+    <mo>⋅</mo>
+    <msup>
+      <mn>3</mn>
+      <mn>2</mn>
+    </msup>
+    <mo>+</mo>
+    <mo>(</mo>
+    <mn>81</mn>
+    <mo>−</mo>
+    <mn>60</mn>
+    <mo>)</mo>
+    <mo>:</mo>
+    <mn>3</mn>
+    <mo>−</mo>
+    <mo>(</mo>
+    <mn>2</mn>
+    <mo>+</mo>
+    <mn>4</mn>
+    <msup>
+      <mo>)</mo>
+      <mn>2</mn>
+    </msup>
+</math>";
+    test_braille("Finnish", expr, "⠼⠑⠀⠄⠼⠉⠬⠀⠖⠦⠼⠓⠁⠀⠤⠼⠋⠚⠴⠀⠌⠼⠉⠀⠤⠦⠼⠃⠀⠖⠼⠙⠴⠬");
+}
+
 // Dots 156 to signify the bar over "arc"
 #[test]
 fn p45_arcsin_with_bar_over() {
