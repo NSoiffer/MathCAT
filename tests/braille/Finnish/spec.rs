@@ -484,6 +484,64 @@ fn p17_multiple_operations() {
     test_braille("Finnish", expr, "⠼⠑⠀⠄⠼⠉⠬⠀⠖⠦⠼⠓⠁⠀⠤⠼⠋⠚⠴⠀⠌⠼⠉⠀⠤⠦⠼⠃⠀⠖⠼⠙⠴⠬");
 }
 
+#[test]
+fn p19_fractions_sum() {
+    let expr = "<math>
+  <mrow>
+    <mfrac>
+      <mn>3</mn>
+      <mn>4</mn>
+    </mfrac>
+    <mo>+</mo>
+  </mrow>
+  <mrow>
+    <mfrac>
+      <mn>1</mn>
+      <mn>4</mn>
+    </mfrac>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mn>1</mn>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠉⠲⠀⠖⠼⠁⠲⠀⠶⠼⠁");
+}
+
+#[test]
+fn p19_fractions_mixed_operations() {
+    let expr = "<math>
+  <mrow>
+    <mo>(</mo>
+    <mfrac>
+      <mn>3</mn>
+      <mn>4</mn>
+    </mfrac>
+    <mo>+</mo>
+    <mfrac>
+      <mn>5</mn>
+      <mn>6</mn>
+    </mfrac>
+    <mo>)</mo>
+    <mo>−</mo>
+  </mrow>
+  <mrow>
+    <mo>(</mo>
+    <mfrac>
+      <mn>3</mn>
+      <mn>5</mn>
+    </mfrac>
+    <mo>+</mo>
+    <mfrac>
+      <mn>1</mn>
+      <mn>2</mn>
+    </mfrac>
+    <mo>)</mo>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠦⠼⠉⠲⠀⠖⠼⠑⠖⠠⠴⠀⠤⠦⠼⠉⠢⠀⠖⠼⠁⠆⠠⠴");
+}
+
 // Dots 156 to signify the bar over "arc"
 #[test]
 fn p45_arcsin_with_bar_over() {
