@@ -1008,30 +1008,154 @@ fn p32_expected_value() {
     test_braille("Finnish", expr, "⠠⠑⠦⠭⠴⠀⠶⠨⠍⠀⠶⠸⠎⠡⠊⠐⠏⠡⠊⠐⠭⠡⠊");
 }
 
+// Dots 156 to signify the bar over "AB"
 #[test]
 fn p33_vector() {
     let expr = "<math>
-    <mi>E</mi>
-    <mo>(</mo>
-    <mi>x</mi>
-    <mo>)</mo>
+  <mrow>
+    <mover>
+        <mi>AB</mi>
+        <mo>‾</mo>
+    </mover>
     <mo>=</mo>
-    <mi>μ</mi>
-    <mo>=</mo>
-    <msub>
-      <mo>∑</mo>
+  </mrow>
+  <mrow>
+    <mn>3</mn>
+    <mover>
       <mi>i</mi>
-    </msub>
-    <msub>
-      <mi>p</mi>
-      <mi>i</mi>
-    </msub>
-    <msub>
-      <mi>x</mi>
-      <mi>i</mi>
-    </msub>
+      <mo>‾</mo>
+    </mover>
+    <mo>−</mo>
+  </mrow>
+  <mrow>
+    <mn>4</mn>
+    <mover>
+      <mi>j</mi>
+      <mo>‾</mo>
+    </mover>
+  </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠠⠑⠦⠭⠴⠀⠶⠨⠍⠀⠶⠸⠎⠡⠊⠐⠏⠡⠊⠐⠭⠡⠊");
+    test_braille("Finnish", expr, "⠠⠁⠠⠃⠱⠀⠶⠼⠉⠀⠊⠱⠀⠤⠼⠙⠀⠚⠱");
+}
+
+#[test]
+fn p33_parallel_vectors() {
+    let expr = "<math>
+  <mrow>
+    <mover>
+      <mi>a</mi>
+      <mo>‾</mo>
+    </mover>
+    <mo>∥</mo>
+  </mrow>
+  <mrow>
+    <mover>
+      <mi>b</mi>
+      <mo>‾</mo>
+    </mover>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠁⠱⠀⠸⠸⠀⠃⠱");
+}
+
+#[test]
+fn p34_vector_dot_product() {
+    let expr = "<math>
+  <mrow>
+    <mover>
+      <mi>v</mi>
+      <mo>‾</mo>
+    </mover>
+    <mo>⋅</mo>
+  </mrow>
+  <mrow>
+    <mover>
+      <mi>u</mi>
+      <mo>‾</mo>
+    </mover>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠧⠱⠀⠠⠥⠱");
+}
+
+#[test]
+fn p34_vector_cross_product() {
+    let expr = "<math>
+  <mrow>
+    <mover>
+      <mi>a</mi>
+      <mo>‾</mo>
+    </mover>
+      <mo>×</mo>
+    <mover>
+      <mi>b</mi>
+      <mo>‾</mo>
+    </mover>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠁⠱⠀⠰⠄⠃⠱");
+}
+
+#[test]
+fn p39_not_in_set() {
+    let expr = "<math>
+    <mn>3</mn>
+    <mo>∉</mo>
+    <mi>B</mi>
+</math>";
+    test_braille("Finnish", expr, "⠼⠉⠀⠳⠐⠔⠠⠃");
+}
+
+#[test]
+fn p39_subset() {
+    let expr = "<math>
+  <mrow>
+    <mi>B</mi>
+    <mo>⊂</mo>
+  </mrow>
+  <mrow>
+    <mi>A</mi>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠠⠃⠀⠳⠪⠠⠁");
+}
+
+#[test]
+fn p39_not_subset() {
+    let expr = "<math>
+    <mi>F</mi>
+    <mo>⊄</mo>
+    <mi>E</mi>
+</math>";
+    test_braille("Finnish", expr, "⠠⠋⠀⠳⠐⠪⠠⠑");
+}
+
+#[test]
+fn p39_equal_sets_with_mtext() {
+    let expr = "<math>
+  <mrow>
+    <mi>C</mi>
+    <mo>⊆</mo>
+  </mrow>
+  <mrow>
+    <mi>D</mi>
+    <mtext> ja </mtext>
+    <mi>D</mi>
+    <mo>⊆</mo>
+  </mrow>
+  <mrow>
+    <mi>C</mi>
+    <mo>⇔</mo>
+  </mrow>
+  <mrow>
+    <mi>C</mi>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mi>D</mi>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠠⠉⠀⠳⠶⠪⠠⠙⠀⠚⠁⠀⠠⠙⠀⠳⠶⠪⠠⠉⠀⠣⠤⠤⠱⠀⠠⠉⠀⠶⠠⠙");
 }
 
 // Dots 156 to signify the bar over "arc"
