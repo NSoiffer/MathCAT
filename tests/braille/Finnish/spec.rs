@@ -37,73 +37,74 @@ fn chemistry_2_8() {
 #[test]
 fn p7_no_grouping_in_four_digit_numbers() {
     let expr = "<math><mn>2000</mn></math>";
-    test_braille("Finnish", expr, "");
+    test_braille("Finnish", expr, "⠼⠃⠚⠚⠚");
 }
 
 #[test]
 fn p7_thousands_nbsp() {
     let expr = "<math><mn>2 000 000</mn></math>";
-    test_braille("Finnish", expr, "");
+    test_braille("Finnish", expr, "⠼⠃⠄⠚⠚⠚⠄⠚⠚⠚");
 }
 
 #[test]
 fn p7_thousands_point() {
     let expr = "<math><mn>2.000.000</mn></math>";
-    test_braille("Finnish", expr, "");
+    test_braille("Finnish", expr, "⠼⠃⠄⠚⠚⠚⠄⠚⠚⠚");
 }
 
 #[test]
 fn p7_thousands_space() {
     let expr = "<math><mn>2 000 000</mn></math>";
-    test_braille("Finnish", expr, "");
+    test_braille("Finnish", expr, "⠼⠃⠄⠚⠚⠚⠄⠚⠚⠚");
 }
 
 #[test]
 fn p7_decimal_comma() {
     let expr = "<math><mn>5,12575</mn></math>";
-    test_braille("Finnish", expr, "");
+    test_braille("Finnish", expr, "⠼⠑⠂⠁⠃⠑⠄⠛⠑");
 }
 
+// Now the point is transformed to comma. Maybe it should follow the text.
 #[test]
 fn p7_decimal_point() {
     let expr = "<math><mn>5.12575</mn></math>";
-    test_braille("Finnish", expr, "");
+    test_braille("Finnish", expr, "⠼⠑⠂⠁⠃⠑⠄⠛⠑");
 }
 
 #[test]
 fn p7_decimal_point_endless_no_grouping() {
     let expr = "<math><mn>1,234657234...</mn></math>";
-    test_braille("Finnish", expr, "");
+    test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
 }
 
 #[test]
 fn p7_decimal_point_endless_with_grouping_space() {
     let expr = "<math><mn>1,234 657 234...</mn></math>";
-    test_braille("Finnish", expr, "");
+    test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
 }
 
 #[test]
 fn p7_decimal_point_endless_with_grouping_nbsp() {
     let expr = "<math><mn>1,234 657 234...</mn></math>";
-    test_braille("Finnish", expr, "");
+    test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
 }
 
 #[test]
 fn p7_decimal_point_endless_with_grouping_nbsp_ellipses() {
     let expr = "<math><mn>1,234 657 234…</mn></math>";
-    test_braille("Finnish", expr, "");
+    test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
 }
 
 #[test]
 fn p7_decimal_point_endless_no_grouping_ellipses() {
     let expr = "<math><mn>1,234657234…</mn></math>";
-    test_braille("Finnish", expr, "");
+    test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
 }
 
 #[test]
 fn p7_decimal_point_endless_with_grouping_space_ellpses() {
     let expr = "<math><mn>1,234 657 234…</mn></math>";
-    test_braille("Finnish", expr, "");
+    test_braille("Finnish", expr, "⠼⠁⠂⠃⠉⠙⠄⠋⠑⠛⠄⠃⠉⠙⠄⠄⠄");
 }
 
 #[test]
@@ -1080,6 +1081,127 @@ fn p39_equal_sets_with_mtext() {
   </mrow>
 </math>";
     test_braille("Finnish", expr, "⠠⠉⠀⠳⠶⠪⠠⠙⠀⠚⠁⠀⠠⠙⠀⠳⠶⠪⠠⠉⠀⠣⠤⠤⠱⠀⠠⠉⠀⠶⠠⠙");
+}
+
+#[test]
+fn p39_set_of_points_in_R2() {
+    let expr = "<math>
+  <mrow>
+    <mi>A</mi>
+    <mo>×</mo>
+  </mrow>
+  <mrow>
+    <mi>B</mi>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mo>{</mo>
+    <mo>(</mo>
+    <mn>1</mn>
+    <mo>,</mo>
+    <mn>3</mn>
+    <mo>)</mo>
+    <mo>,</mo>
+    <mo>(</mo>
+    <mn>1</mn>
+    <mo>,</mo>
+    <mn>4</mn>
+    <mo>)</mo>
+    <mo>,</mo>
+    <mo>(</mo>
+    <mn>2</mn>
+    <mo>,</mo>
+    <mn>3</mn>
+    <mo>)</mo>
+    <mo>,</mo>
+    <mo>(</mo>
+    <mn>2</mn>
+    <mo>,</mo>
+    <mn>4</mn>
+    <mo>)</mo>
+    <mo>}</mo>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠠⠁⠀⠰⠄⠠⠃⠀⠶⠫⠦⠼⠁⠂⠀⠼⠉⠴⠂⠀⠦⠼⠁⠂⠀⠼⠙⠴⠂⠀⠦⠼⠃⠂⠀⠼⠉⠴⠂⠀⠦⠼⠃⠂⠀⠼⠙⠴⠻");
+}
+
+#[test]
+fn p40_not_p() {
+    let expr = "<math>
+    <mo>¬</mo>
+    <mi>p</mi>
+</math>";
+    test_braille("Finnish", expr, "⠳⠲⠏");
+}
+
+#[test]
+fn p40_p_and_q() {
+    let expr = "<math>
+    <mi>p</mi>
+    <mo>∧</mo>
+    <mi>q</mi>
+</math>";
+    test_braille("Finnish", expr, "⠏⠀⠳⠩⠀⠟");
+}
+
+#[test]
+fn p40_p_or_q() {
+    let expr = "<math>
+    <mi>p</mi>
+    <mo>∨</mo>
+    <mi>q</mi>
+</math>";
+    test_braille("Finnish", expr, "⠏⠀⠳⠬⠀⠟");
+}
+
+#[test]
+fn p41_function_definition() {
+    let expr = "<math>
+    <mi>f</mi>
+    <mo>:</mo>
+    <mi>x</mi>
+    <mo>→</mo>
+    <mi>f</mi>
+    <mo>(</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+</math>";
+    test_braille("Finnish", expr, "⠋⠒⠀⠭⠀⠤⠱⠀⠋⠦⠭⠴");
+}
+
+#[test]
+fn p41_inverse_function() {
+    let expr = "<math>
+    <msup>
+      <mi>f</mi>
+      <mrow>
+        <mo>−</mo>
+        <mn>1</mn>
+      </mrow>
+    </msup>
+    <mo>=</mo>
+  <mrow>
+    <mo>{</mo>
+    <mo>(</mo>
+    <mi>y</mi>
+    <mo>,</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+    <mo>∈</mo>
+    <mi>B</mi>
+    <mo>×</mo>
+    <mi>A</mi>
+    <mo>|</mo>
+    <mi>y</mi>
+    <mo>=</mo>
+    <mi>f</mi>
+    <mo>(</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+    <mo>}</mo>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠋⠬⠤⠼⠁⠀⠶⠫⠦⠽⠂⠀⠭⠴⠀⠳⠔⠠⠃⠀⠰⠄⠠⠁⠀⠸⠀⠽⠀⠶⠋⠦⠭⠴⠻");
 }
 
 // Dots 156 to signify the bar over "arc"
