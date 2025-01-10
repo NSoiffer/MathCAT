@@ -117,7 +117,7 @@
   - test:
       if: "$Verbosity!='Terse'"
       then: [t: "the"]    # phrase("'the' root of x")
-  - t: "root symbol"
+  - t: "root"
   - test:
       if: "$Verbosity!='Terse'"
       then: [t: "of"]    # phrase("the root 'of' x")
@@ -125,7 +125,7 @@
   - pause: short
   - test:
       if: "not(IsNode(*[1],'leaf')) or $Impairment = 'Blindness'"
-      then: [t: "end root symbol"] # phrase("root of x 'end root symbol'")
+      then: [t: "end root"] # phrase("root of x 'end root symbol'")
 
 # not sure what really should be said for these since we should not assume they are square roots
 - name: literal-default
@@ -135,13 +135,10 @@
   - test:
       if: "$Verbosity!='Terse'"
       then: [t: "the"]   # phrase("'the' root of x")
-  - t: "root symbol"
-  - t: "with index"      # phrase("the root of x 'with index' 5")
+  - t: "root with index" # phrase("the 'root with index' 3 of 5")
   - x: "*[1]"
   - pause: short
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [t: "of"]   # phrase("the root 'of' x")
+  - t: "of"              # phrase("the root 'of' x")
   - x: "*[2]"
   - pause: short
   - test:
