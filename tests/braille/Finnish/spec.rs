@@ -542,6 +542,78 @@ fn p19_fractions_mixed_operations() {
     test_braille("Finnish", expr, "⠦⠼⠉⠲⠀⠖⠼⠑⠖⠠⠴⠀⠤⠦⠼⠉⠢⠀⠖⠼⠁⠆⠠⠴");
 }
 
+// This is Finnish notation where the numerator and denomator is multiplied by the same expression that is in the pre-supercript. Structure is always: [multiplicator][parenthesis]
+#[test]
+fn p19_fraction_multiplication_Finnish_notation_multiscripts() {
+    let expr = "<math>
+  <mrow>
+    <mmultiscripts>
+      <mfrac>
+        <mi>a</mi>
+        <mi>c</mi>
+      </mfrac>
+      <mprescripts></mprescripts>
+      <none></none>
+      <mrow>
+        <mi>b</mi>
+        <mo>)</mo>
+      </mrow>
+    </mmultiscripts>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mfrac>
+      <mrow>
+        <mi>a</mi>
+        <mi>b</mi>
+      </mrow>
+      <mrow>
+        <mi>b</mi>
+        <mi>c</mi>
+      </mrow>
+    </mfrac>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠃⠜⠀⠁⠀⠌⠉⠀⠶⠁⠃⠀⠌⠃⠉");
+}
+
+// This is Finnish notation for dividing the numerator and denominator by the same expression. It is always of the form: [parenthesis][divisor]
+#[test]
+fn p19_fraction_division_Finnish_notation_msup() {
+    let expr = "<math>
+  <mrow>
+    <msup>
+      <mfrac>
+        <mrow>
+          <mi>a</mi>
+          <mi>b</mi>
+          <mi>c</mi>
+        </mrow>
+        <mrow>
+          <mi>a</mi>
+          <mi>d</mi>
+        </mrow>
+      </mfrac>
+      <mrow>
+        <mo>(</mo>
+        <mi>a</mi>
+      </mrow>
+    </msup>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mfrac>
+      <mrow>
+        <mi>b</mi>
+        <mi>c</mi>
+      </mrow>
+      <mi>d</mi>
+    </mfrac>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠁⠃⠉⠀⠌⠁⠙⠀⠣⠁⠀⠶⠃⠉⠀⠌⠙");
+}
+
 // Dots 156 to signify the bar over "arc"
 #[test]
 fn p45_arcsin_with_bar_over() {
