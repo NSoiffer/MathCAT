@@ -1204,6 +1204,146 @@ fn p41_inverse_function() {
     test_braille("Finnish", expr, "⠋⠬⠤⠼⠁⠀⠶⠫⠦⠽⠂⠀⠭⠴⠀⠳⠔⠠⠃⠀⠰⠄⠠⠁⠀⠸⠀⠽⠀⠶⠋⠦⠭⠴⠻");
 }
 
+#[test]
+fn p41_function_with_parts() {
+    let expr = "<math>
+            <mrow>
+            <mi>f</mi><mo>:</mo><mi>x</mi>
+<mo>→</mo><mrow><mo>{</mo> <mrow>
+            <mtable>
+            <mtr>
+                <mtd>
+                <mrow>
+                <mo>&#x2212;</mo><mn>1</mn><mo>,</mo><mi>x</mi><mo>≤</mo><mo>&#x2212;</mo><mn>1</mn></mrow>
+                </mtd>
+            </mtr>
+            <mtr>
+                <mtd>
+                <mrow>
+                <mn>0</mn><mo>,</mo><mi>x</mi><mo>=</mo><mn>0</mn></mrow>
+                </mtd>
+            </mtr>
+            <mtr>
+                <mtd>
+                <mrow>
+                <mn>1</mn><mo>,</mo><mi>x</mi><mo>&#x003E;</mo><mn>0</mn></mrow>
+                </mtd>
+            </mtr>
+            </mtable></mrow> </mrow></mrow>
+        </math>";
+    test_braille("Finnish", expr, "THE MATHML MARKUP IS NOT FINISHED");
+}
+
+#[test]
+fn p42_matrix() {
+    let expr = "<math>
+<mrow>
+<mo>(</mo>
+<mtable>
+	<mtr>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    <mtd>
+    <mn>0</mn>
+    </mtd>
+    <mtd>
+    <mn>0</mn>
+    </mtd>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    </mtr>
+	<mtr>
+    <mtd>
+    <mn>0</mn>
+    </mtd>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    <mtd>
+    <mn>0</mn>
+    </mtd>
+    <mtd>
+    <mn>0</mn>
+    </mtd>
+    </mtr>
+	<mtr>
+    <mtd>
+    <mn>0</mn>
+    </mtd>
+    <mtd>
+    <mn>0</mn>
+    </mtd>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    <mtd>
+    <mn>0</mn>
+    </mtd>
+    </mtr>
+	<mtr>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    <mtd>
+    <mn>0</mn>
+    </mtd>
+    <mtd>
+    <mn>0</mn>
+    </mtd>
+    <mtd>
+    <mn>1</mn>
+    </mtd>
+    </mtr>
+</mtable>
+<mo>)</mo>
+</mrow>
+</math>";
+    test_braille("Finnish", expr, "");
+}
+
+#[test]
+fn p42_determinant() {
+    let expr = "<math>
+<mrow>
+<mo>(</mo>
+<mtable>
+	<mtr>
+    <mtd>
+    <mi>a</mi>
+    <mo>+</mo>
+    <mi>b</mi>
+    </mtd>
+    <mtd>
+    <mi>a</mi>
+    <mo>−</mo>
+    <mi>b</mi>
+    </mtd>
+    </mtr>
+    <mtr>
+    <mtd>
+    <mi>a</mi>
+    <mo>−</mo>
+    <mi>b</mi>
+    </mtd>
+    <mtd>
+    <mi>a</mi>
+    <mo>+</mo>
+    <mi>b</mi>
+    </mtd>
+    </mtr>
+</mtable>
+<mo>)</mo>
+</mrow>
+<mo>=</mo>
+<mn>4</mn>
+<mi>a</mi>
+<mi>b</mi>
+</math>";
+    test_braille("Finnish", expr, "");
+}
+
 // Dots 156 to signify the bar over "arc"
 #[test]
 fn p45_arcsin_with_bar_over() {
