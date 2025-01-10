@@ -904,6 +904,136 @@ fn p26_exponent_multiplication_no_parens() {
     test_braille("Finnish", expr, "⠼⠃⠬⠼⠉⠀⠄⠼⠃⠬⠼⠑⠀⠶⠼⠃⠬⠦⠼⠉⠀⠖⠼⠑⠴⠀⠶⠼⠃⠬⠼⠓");
 }
 
+#[test]
+fn p27_exponent_to_large_number() {
+    let expr = "<math>
+  <mrow>
+    <msup>
+      <mn>2</mn>
+      <mn>20</mn>
+    </msup>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mn>1048576</mn>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠃⠬⠼⠃⠚⠀⠶⠼⠁⠄⠚⠙⠓⠄⠑⠛⠋");
+}
+
+#[test]
+fn p27_sqrt() {
+    let expr = "<math>
+  <mrow>
+    <msup>
+      <mn>4</mn>
+      <mfrac>
+        <mn>1</mn>
+        <mn>2</mn>
+      </mfrac>
+    </msup>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <msqrt>
+      <mn>4</mn>
+    </msqrt>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <mn>2</mn>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠙⠬⠼⠁⠰⠀⠶⠩⠼⠙⠀⠶⠼⠃");
+}
+
+#[test]
+fn p31_trig_tan_infinity() {
+    let expr = "<math>
+      <mi>tan</mi>
+      <mo>⁡</mo>
+      <mn>90</mn>
+      <mi>°</mi>
+      <mo>=</mo>
+      <mi>∞</mi>
+</math>";
+    test_braille("Finnish", expr, "⠞⠁⠝⠀⠼⠊⠚⠀⠴⠀⠶⠿");
+}
+
+// This would probably need alternative markup and test case as well.
+#[test]
+fn p31_degrees_minutes_seconds() {
+    let expr = "<math>
+  <mrow>
+    <mn>30</mn>
+    <mi>°</mi>
+    <msup>
+      <mn>45</mn>
+      <mo>′</mo>
+    </msup>
+    <msup>
+      <mn>20</mn>
+      <mrow>
+        <mo>′′</mo>
+      </mrow>
+    </msup>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠉⠚⠀⠴⠀⠼⠙⠑⠀⠨⠀⠼⠃⠚⠀⠸");
+}
+
+#[test]
+fn p32_expected_value() {
+    let expr = "<math>
+    <mi>E</mi>
+    <mo>(</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+    <mo>=</mo>
+    <mi>μ</mi>
+    <mo>=</mo>
+    <msub>
+      <mo>∑</mo>
+      <mi>i</mi>
+    </msub>
+    <msub>
+      <mi>p</mi>
+      <mi>i</mi>
+    </msub>
+    <msub>
+      <mi>x</mi>
+      <mi>i</mi>
+    </msub>
+</math>";
+    test_braille("Finnish", expr, "⠠⠑⠦⠭⠴⠀⠶⠨⠍⠀⠶⠸⠎⠡⠊⠐⠏⠡⠊⠐⠭⠡⠊");
+}
+
+#[test]
+fn p33_vector() {
+    let expr = "<math>
+    <mi>E</mi>
+    <mo>(</mo>
+    <mi>x</mi>
+    <mo>)</mo>
+    <mo>=</mo>
+    <mi>μ</mi>
+    <mo>=</mo>
+    <msub>
+      <mo>∑</mo>
+      <mi>i</mi>
+    </msub>
+    <msub>
+      <mi>p</mi>
+      <mi>i</mi>
+    </msub>
+    <msub>
+      <mi>x</mi>
+      <mi>i</mi>
+    </msub>
+</math>";
+    test_braille("Finnish", expr, "⠠⠑⠦⠭⠴⠀⠶⠨⠍⠀⠶⠸⠎⠡⠊⠐⠏⠡⠊⠐⠭⠡⠊");
+}
+
 // Dots 156 to signify the bar over "arc"
 #[test]
 fn p45_arcsin_with_bar_over() {
