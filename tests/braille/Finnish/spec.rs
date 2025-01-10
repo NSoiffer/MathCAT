@@ -577,9 +577,30 @@ fn p19_fraction_multiplication_Finnish_notation_multiscripts() {
     test_braille("Finnish", expr, "⠃⠜⠀⠁⠀⠌⠉⠀⠶⠁⠃⠀⠌⠃⠉");
 }
 
+#[test]
+fn p19_fraction_multiplication_Finnish_notation_multiscripts_2() {
+    let expr = "<math>
+  <mrow>
+    <mmultiscripts>
+      <mfrac>
+        <mn>1</mn>
+        <mn>2</mn>
+      </mfrac>
+      <mprescripts></mprescripts>
+      <none></none>
+      <mrow>
+        <mn>6</mn>
+        <mo>)</mo>
+      </mrow>
+    </mmultiscripts>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠋⠜⠼⠁⠆");
+}
+
 // This is Finnish notation for dividing the numerator and denominator by the same expression. It is always of the form: [parenthesis][divisor]
 #[test]
-fn p19_fraction_division_Finnish_notation_msup() {
+fn p22_fraction_division_Finnish_notation_msup() {
     let expr = "<math>
   <mrow>
     <msup>
@@ -612,6 +633,275 @@ fn p19_fraction_division_Finnish_notation_msup() {
   </mrow>
 </math>";
     test_braille("Finnish", expr, "⠁⠃⠉⠀⠌⠁⠙⠀⠣⠁⠀⠶⠃⠉⠀⠌⠙");
+}
+
+#[test]
+fn p22_fraction_division_Finnish_notation_msup_2() {
+    let expr = "<math>
+  <msup>
+    <mfrac>
+      <mn>2</mn>
+      <mn>4</mn>
+    </mfrac>
+    <mrow>
+      <mo>(</mo>
+      <mn>2</mn>
+    </mrow>
+  </msup>
+</math>";
+    test_braille("Finnish", expr, "⠼⠃⠲⠣⠼⠃");
+}
+
+#[test]
+fn p23_equation_1_no_invisible_multiplication() {
+    let expr = "<math>
+    <mn>2</mn>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mn>3</mn>
+    <mo>=</mo>
+    <mo>−</mo>
+    <mn>3</mn>
+    <mi>x</mi>
+    <mo>−</mo>
+    <mn>7</mn>
+</math>";
+    test_braille("Finnish", expr, "⠼⠃⠀⠁⠉⠀⠌⠦⠼⠃⠀⠙⠴⠀⠣⠼⠃⠀⠶⠁⠉⠀⠌⠙");
+}
+
+#[test]
+fn p23_equation_1_with_invisible_multiplication() {
+    let expr = "<math>
+    <mn>2</mn>
+    <mo>&#8290;</mo>
+    <mi>x</mi>
+    <mo>+</mo>
+    <mn>3</mn>
+    <mo>=</mo>
+    <mo>−</mo>
+    <mn>3</mn>
+    <mo>&#8290;</mo>
+    <mi>x</mi>
+    <mo>−</mo>
+    <mn>7</mn>
+</math>";
+    test_braille("Finnish", expr, "⠼⠃⠀⠁⠉⠀⠌⠦⠼⠃⠀⠙⠴⠀⠣⠼⠃⠀⠶⠁⠉⠀⠌⠙");
+}
+
+#[test]
+fn p23_equation_solving_notation() {
+    let expr = "<math>
+    <mn>5</mn>
+    <mi>x</mi>
+    <mo>=</mo>
+    <mo>−</mo>
+    <mn>10</mn>
+    <mo>|</mo>
+    <mo>:</mo>
+    <mn>5</mn>
+</math>";
+    test_braille("Finnish", expr, "⠼⠑⠀⠭⠀⠶⠤⠼⠁⠚⠀⠀⠸⠀⠌⠼⠑");
+}
+
+#[test]
+fn p24_fraction() {
+    let expr = "<math>
+  <mfrac>
+    <mrow>
+      <mn>5</mn>
+      <mo>+</mo>
+      <mn>7</mn>
+    </mrow>
+    <mrow>
+      <mn>2</mn>
+      <mo>⋅</mo>
+      <mn>3</mn>
+    </mrow>
+  </mfrac>
+</math>";
+    test_braille("Finnish", expr, "⠼⠉⠀⠽⠀⠌⠼⠙⠀⠶⠼⠉⠲⠀⠽");
+}
+
+#[test]
+fn p24_fraction_2() {
+    let expr = "<math>
+  <mfrac>
+    <mrow>
+      <mn>4</mn>
+      <mo>&#8290;</mo>
+      <mi>x</mi>
+    </mrow>
+    <mrow>
+      <mn>2</mn>
+      <mo>&#8290;</mo>
+      <mo>(</mo>
+      <mn>1</mn>
+      <mo>−</mo>
+      <mi>x</mi>
+      <mo>)</mo>
+    </mrow>
+  </mfrac>
+</math>";
+    test_braille("Finnish", expr, "⠼⠙⠀⠭⠀⠌⠦⠼⠋⠀⠦⠼⠁⠀⠤⠭⠴⠴");
+}
+
+#[test]
+fn p25_long_fraction() {
+    let expr = "<math>
+  <mrow>
+    <mfrac>
+      <mrow>
+        <msup>
+          <mi>x</mi>
+          <mn>2</mn>
+        </msup>
+        <mo>−</mo>
+        <mn>7</mn>
+        <mi>x</mi>
+        <mo>+</mo>
+        <mn>12</mn>
+      </mrow>
+      <mrow>
+        <mn>4</mn>
+        <mi>x</mi>
+        <mo>−</mo>
+        <mn>20</mn>
+      </mrow>
+    </mfrac>
+    <mo>:</mo>
+  </mrow>
+  <mrow>
+    <mfrac>
+      <mrow>
+        <msup>
+          <mi>x</mi>
+          <mn>2</mn>
+        </msup>
+        <mo>−</mo>
+        <mn>8</mn>
+        <mi>x</mi>
+        <mo>+</mo>
+        <mn>15</mn>
+      </mrow>
+      <mrow>
+        <mn>4</mn>
+        <mi>x</mi>
+        <mo>−</mo>
+        <mn>16</mn>
+      </mrow>
+    </mfrac>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠦⠦⠭⠬⠀⠤⠼⠛⠀⠭⠀⠖⠼⠁⠃⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠃⠚⠴⠴⠀⠌⠦⠦⠭⠬⠀⠤⠼⠓⠀⠭⠀⠖⠼⠁⠑⠴⠀⠌⠦⠼⠙⠀⠭⠀⠤⠼⠁⠋⠴⠴");
+}
+
+#[test]
+fn p25_fraction_in_fraction() {
+    let expr = "<math>
+  <mfrac>
+    <mrow>
+      <mfrac>
+        <mn>1</mn>
+        <mn>2</mn>
+      </mfrac>
+      <mo>+</mo>
+      <mfrac>
+        <mn>1</mn>
+        <mn>3</mn>
+      </mfrac>
+    </mrow>
+    <mrow>
+      <mfrac>
+        <mn>1</mn>
+        <mn>4</mn>
+      </mfrac>
+      <mo>−</mo>
+      <mfrac>
+        <mn>1</mn>
+        <mn>5</mn>
+      </mfrac>
+    </mrow>
+  </mfrac>
+</math>";
+    test_braille("Finnish", expr, "⠦⠼⠁⠆⠀⠖⠼⠁⠒⠠⠴⠀⠌⠦⠼⠁⠲⠀⠤⠼⠁⠢⠠⠴");
+}
+
+#[test]
+fn p26_exponent_multiplication_with_parens() {
+    let expr = "<math>
+  <mrow>
+    <msup>
+      <mn>2</mn>
+      <mn>3</mn>
+    </msup>
+    <mo>⋅</mo>
+  </mrow>
+  <mrow>
+    <msup>
+      <mn>2</mn>
+      <mn>5</mn>
+    </msup>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <msup>
+      <mn>2</mn>
+      <mrow>
+        <mo>(</mo>
+        <mn>3</mn>
+        <mo>+</mo>
+        <mn>5</mn>
+        <mo>)</mo>
+      </mrow>
+    </msup>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <msup>
+      <mn>2</mn>
+      <mn>8</mn>
+    </msup>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠃⠬⠼⠉⠀⠄⠼⠃⠬⠼⠑⠀⠶⠼⠃⠬⠦⠼⠉⠀⠖⠼⠑⠴⠀⠶⠼⠃⠬⠼⠓");
+}
+
+#[test]
+fn p26_exponent_multiplication_no_parens() {
+    let expr = "<math>
+  <mrow>
+    <msup>
+      <mn>2</mn>
+      <mn>3</mn>
+    </msup>
+    <mo>⋅</mo>
+  </mrow>
+  <mrow>
+    <msup>
+      <mn>2</mn>
+      <mn>5</mn>
+    </msup>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <msup>
+      <mn>2</mn>
+      <mrow>
+        <mn>3</mn>
+        <mo>+</mo>
+        <mn>5</mn>
+      </mrow>
+    </msup>
+    <mo>=</mo>
+  </mrow>
+  <mrow>
+    <msup>
+      <mn>2</mn>
+      <mn>8</mn>
+    </msup>
+  </mrow>
+</math>";
+    test_braille("Finnish", expr, "⠼⠃⠬⠼⠉⠀⠄⠼⠃⠬⠼⠑⠀⠶⠼⠃⠬⠦⠼⠉⠀⠖⠼⠑⠴⠀⠶⠼⠃⠬⠼⠓");
 }
 
 // Dots 156 to signify the bar over "arc"
