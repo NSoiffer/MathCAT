@@ -1205,33 +1205,130 @@ fn p41_inverse_function() {
 }
 
 #[test]
-fn p41_function_with_parts() {
+fn p41_function_with_parts_with_arrow() {
     let expr = "<math>
-            <mrow>
-            <mi>f</mi><mo>:</mo><mi>x</mi>
-<mo>→</mo><mrow><mo>{</mo> <mrow>
+      <mi>f</mi>
+      <mo>:</mo>
+      <mi>x</mi>
+      <mo>→</mo>
+      <mrow>
+         <mo>{</mo>
+         <mrow>
             <mtable>
-            <mtr>
-                <mtd>
-                <mrow>
-                <mo>&#x2212;</mo><mn>1</mn><mo>,</mo><mi>x</mi><mo>≤</mo><mo>&#x2212;</mo><mn>1</mn></mrow>
-                </mtd>
-            </mtr>
-            <mtr>
-                <mtd>
-                <mrow>
-                <mn>0</mn><mo>,</mo><mi>x</mi><mo>=</mo><mn>0</mn></mrow>
-                </mtd>
-            </mtr>
-            <mtr>
-                <mtd>
-                <mrow>
-                <mn>1</mn><mo>,</mo><mi>x</mi><mo>&#x003E;</mo><mn>0</mn></mrow>
-                </mtd>
-            </mtr>
-            </mtable></mrow> </mrow></mrow>
-        </math>";
-    test_braille("Finnish", expr, "THE MATHML MARKUP IS NOT FINISHED");
+               <mtr>
+                  <mtd>
+                     <mrow>
+                        <mn>&#x2212;1</mn>
+                        <mo>,</mo>
+                        <mi>x</mi>
+                        <mo>≤</mo>
+                        <mn>&#x2212;1</mn>
+                     </mrow>
+                  </mtd>
+               </mtr>
+               <mtr>
+                  <mtd>
+                     <mrow>
+                        <msup>
+                           <mi>x</mi>
+                           <mn>2</mn>
+                        </msup>
+                        <mo>+</mo>
+                        <mn>2</mn>
+                        <mi>x</mi>
+                        <mo>,</mo>
+                        <mn>&#x2212;1</mn>
+                        <mo>&lt;</mo>
+                        <mi>x</mi>
+                        <mo>≤</mo>
+                        <mn>1</mn>
+                     </mrow>
+                  </mtd>
+               </mtr>
+               <mtr>
+                  <mtd>
+                     <mrow>
+                        <mo>&#x2212;</mo>
+                        <mi>x</mi>
+                        <mo>+</mo>
+                        <mn>3</mn>
+                        <mo>,</mo>
+                        <mi>x</mi>
+                        <mo>&#x003E;</mo>
+                        <mn>1</mn>
+                     </mrow>
+                  </mtd>
+               </mtr>
+            </mtable>
+         </mrow>
+      </mrow>
+</math>
+";
+    test_braille("Finnish", expr, "⠋⠒⠀⠭⠀⠤⠱ (continues, but no consensus yet)");
+}
+
+fn function_with_parts() {
+  let expr = "<math>
+      <mi>f</mi>
+      <mo>(</mo>
+      <mi>x</mi>
+      <mo>)</mo>
+      <mo>=</mo>
+      <mrow>
+         <mo>{</mo>
+         <mrow>
+            <mtable>
+               <mtr>
+                  <mtd>
+                     <mrow>
+                        <mn>&#x2212;1</mn>
+                        <mo>,</mo>
+                        <mi>x</mi>
+                        <mo>≤</mo>
+                        <mn>&#x2212;1</mn>
+                     </mrow>
+                  </mtd>
+               </mtr>
+               <mtr>
+                  <mtd>
+                     <mrow>
+                        <msup>
+                           <mi>x</mi>
+                           <mn>2</mn>
+                        </msup>
+                        <mo>+</mo>
+                        <mn>2</mn>
+                        <mi>x</mi>
+                        <mo>,</mo>
+                        <mn>&#x2212;1</mn>
+                        <mo>&lt;</mo>
+                        <mi>x</mi>
+                        <mo>≤</mo>
+                        <mn>1</mn>
+                     </mrow>
+                  </mtd>
+               </mtr>
+               <mtr>
+                  <mtd>
+                     <mrow>
+                        <mo>&#x2212;</mo>
+                        <mi>x</mi>
+                        <mo>+</mo>
+                        <mn>3</mn>
+                        <mo>,</mo>
+                        <mi>x</mi>
+                        <mo>&#x003E;</mo>
+                        <mn>1</mn>
+                     </mrow>
+                  </mtd>
+               </mtr>
+            </mtable>
+         </mrow>
+      </mrow>
+</math>
+
+";
+  test_braille("Finnish", expr, "⠋⠦⠭⠴ ⠶ (continues, but no consensus yet)");
 }
 
 #[test]
@@ -1341,7 +1438,7 @@ fn p42_determinant() {
 <mi>a</mi>
 <mi>b</mi>
 </math>";
-    test_braille("Finnish", expr, "");
+    test_braille("Finnish", expr, "(no consensus yet)");
 }
 
 // Dots 156 to signify the bar over "arc"
