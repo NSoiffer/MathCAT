@@ -1,6 +1,15 @@
 ---
 -
-  name: divergence_and_curl
+  name: "laplacian"
+  tag: msup
+  match: "*[1][self::m:mo[.='∇' or .='𝛁']] and *[2][self::m:mn[.='2']]"
+  replace:
+  - intent:
+      name: "laplacian"
+      children: [x: "*[1]"]   # can't be empty, so we include the first child since at least it might be different
+
+-
+  name: divergence-and-curl
   tag: mrow
   match: "count(*)=3 and
           *[1][ self::m:mo[.='∇' or .='𝛁'] or self::m:mover[*[1][.='∇' or .='𝛁'] and *[2][.='→' or .='⇀']] ] and
@@ -9,12 +18,26 @@
   - intent:
       xpath-name: "IfThenElse(*[2][.='×'] , 'curl', 'divergence')"
       children: [x: "*[3]"]
+
 -
   name: gradient
   tag: mrow
   match: "count(*)=2 and 
-          *[1][ self::m:mo[.='∇' or .='𝛁'] or self::m:mover[*[1][.='∇' or .='𝛁'] and *[2][.='→' or .='⇀']] ]"
+          *[1][ self::m:mo[.='∇' or .='𝛁'] or self::m:mover[*[1][.='∇' or .='𝛁'] and *[2][.='→' or .='⇀']] ] and
+          name(BaseNode(*[2])) != 'mo'"
   replace:
   - intent:
       name: "gradient"
       children: [x: "*[2]"]
+
+-
+  name: vector-nabla
+  tag: mover
+  # normal modified-variable rule is only for "mi"
+  match: "*[1][self::m:mo[.='∇' or .='𝛁']]  and *[2][.='→' or .='⇀']"
+  replace:
+  - intent:
+      name: "modified-variable"
+      children:
+      - x: "*[1]"
+      - x: "*[2]"
