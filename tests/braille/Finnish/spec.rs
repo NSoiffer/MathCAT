@@ -12,22 +12,6 @@
 // For example, "fraction_6_1_1" is a fraction example from section 6.1, and is the first example there.
 use crate::common::*;
 
-// Original UEB tests (not translated yet)
-
-#[test]
-fn chemistry_2_4() {
-    // From MathType
-    let expr = "<math><msub><mtext>C</mtext><mn>2</mn></msub><msub><mtext>H</mtext><mn>5</mn></msub><mtext>OH</mtext></math>";
-    test_braille("Finnish", expr, "");
-}
-
-#[test]
-fn chemistry_2_8() {
-    // From MathType
-    let expr = "<math><msup><mrow><mtext>Cu</mtext></mrow><mrow><mn>2</mn><mo>+</mo></mrow></msup></math>";
-    test_braille("Finnish", expr, "");
-}
-
 // Finnish spec tests
 // Page and some other identification has been added to the function name, so you can figure out which expression the test in based on. Some tests are variations of the "official" test.
 
@@ -1849,4 +1833,60 @@ fn p52_quadratic_formula() {
   </mrow>
 </math>";
     test_braille("Finnish", expr, "⠭⠀⠶⠷⠤⠃⠀⠖⠤⠩⠦⠃⠬⠀⠤⠼⠙⠀⠁⠉⠴⠾⠀⠌⠦⠼⠃⠀⠁⠴");
+}
+
+#[test]
+fn p64_chemical_equation_1() {
+    // From MathType
+    let expr = "<math><msub><mtext>C</mtext><mn>2</mn></msub><msub><mtext>H</mtext><mn>5</mn></msub><mtext>OH</mtext></math>";
+    test_braille("Finnish", expr, "⠠⠉⠆⠠⠓⠢⠠⠕⠠⠓");
+}
+
+#[test]
+fn p64_sodium_ion() {
+    let expr = "<math><msup><mi>Na</mi><mo>+</mo></msup></math>";
+    test_braille("Finnish", expr, "⠠⠝⠁⠬⠖");
+}
+
+#[test]
+fn p64_copper_ion() {
+    // From MathType
+    let expr = "<math><msup><mrow><mtext>Cu</mtext></mrow><mrow><mn>2</mn><mo>+</mo></mrow></msup></math>";
+    test_braille("Finnish", expr, "⠠⠉⠕⠬⠦⠼⠃⠀⠖⠴");
+}
+
+#[test]
+fn p64_chemistry_1() {
+    let expr = "<math><msubsup><mrow><mi>S</mi><mi>O</mi></mrow><mn>4</mn><mrow><mn>2</mn><mo>+</mo></mrow></msubsup></math>";
+    test_braille("Finnish", expr, "⠠⠎⠠⠕⠲⠬⠦⠼⠃⠀⠤⠴");
+}
+
+#[test]
+fn p64_chemistry_bond_1() {
+    let expr = "<math><mi>H</mi><mo>-</mo><mi>H</mi></math>";
+    test_braille("Finnish", expr, "⠠⠓⠀⠒⠠⠓");
+}
+
+#[test]
+fn p64_chemistry_bond_1_alternative() {
+    let expr = "<math><mi>H</mi><mo>:</mo><mi>H</mi></math>";
+    test_braille("Finnish", expr, "⠠⠓⠀⠒⠠⠓");
+}
+
+#[test]
+fn p64_chemistry_bond_2() {
+    let expr = "<math><mi>O</mi><mo>=</mo><mi>O</mi></math>";
+    test_braille("Finnish", expr, "⠠⠕⠀⠒⠒⠠⠕");
+}
+
+#[test]
+fn p64_chemistry_bond_2_alternative() {
+    let expr = "<math><mi>O</mi><mo>∷</mo><mi>O</mi></math>";
+    test_braille("Finnish", expr, "⠠⠕⠀⠒⠒⠠⠕");
+}
+
+#[test]
+fn p64_chemistry_bond_3() {
+    let expr = "<math><mi>N</mi><mo>≡</mo><mi>N</mi></math>";
+    test_braille("Finnish", expr, "⠠⠝⠀⠒⠒⠒⠠⠝");
 }
