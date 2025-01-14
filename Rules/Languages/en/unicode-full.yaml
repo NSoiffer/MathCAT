@@ -700,7 +700,7 @@
  - "∇":                                          # 0x2207
      - test: 
         if: "$NavMode='Character' or $SpeechStyle='LiteralSpeak' or IsNode(parent::*[1], 'modified') or 
-             not(DEBUG(following-sibling::*[1][self::m:mo]))"
+             not(following-sibling::*[1][self::m:mo])"
         then: [t: "naabla"]
         else:
         - test:
@@ -2098,7 +2098,11 @@
  - "⨬": [t: "minus sign with rising dots"]         # 0x2a2c
  - "⨭": [t: "plus sign in left half circle"]       # 0x2a2d
  - "⨮": [t: "plus sign in right half circle"]      # 0x2a2e
- - "⨯": [t: "cross product"]             # 0x2a2f
+ - "⨯":                                             # 0x2a2f
+      - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: "cross"]
+         else: [t: "cross product"]
  - "⨰": [t: "multiplication sign with dot above"]  # 0x2a30
  - "⨱": [t: "multiplication sign with underbar"]   # 0x2a31
  - "⨲": [t: "semidirect product with bottom closed"] # 0x2a32
