@@ -769,7 +769,7 @@ impl fmt::Display for TranslateExpression {
 impl TranslateExpression {
     fn build(vars: &Yaml) -> Result<TranslateExpression> {
         // 'translate:' -- xpath (should evaluate to an id)
-        return Ok( TranslateExpression { id: MyXPath::build(vars).chain_err(|| "'set_variables'")? } );
+        return Ok( TranslateExpression { id: MyXPath::build(vars).chain_err(|| "'translate'")? } );
     }
         
     fn replace<'c, 's:'c, 'm:'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
