@@ -207,7 +207,7 @@
   replace:
   - x: "*[1]"
   - test:
-      if: "not($Verbosity='Terse' and DEBUG(*[2])[self::m:mn and not(DEBUG(translate(., '.,', '')!=.))])"  # just say "x 1" for terse vs "x sub 1"
+      if: "not($Verbosity='Terse' and *[2][self::m:mn and not(translate(., '.,', '')!=.)])"  # just say "x 1" for terse vs "x sub 1"
       then: [t: "sub"]      # phrase(x 'sub' 2)
   - x: "*[2]"
   - test:
@@ -287,7 +287,7 @@
 
 - name: vector
   tag: modified-variable
-  match: "count(*)=2 and *[2][text()='→']"
+  match: "count(*)=2 and *[2][.='→' or .='⇀']"
   replace:
   - t: "vector"      # phrase(the 'vector' reflects size and direction)
   - x: "*[1]"

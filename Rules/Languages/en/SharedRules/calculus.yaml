@@ -1,13 +1,19 @@
 ---
 
+- name: laplacian
+  tag: laplacian
+  match: "."
+  replace:
+  - t: "laplacian of"      # phrase(systems 'of' linear equations)
+
 - name: divergence
   tag: divergence
   match: "."
   replace:
   - test:
-      if: "$Verbosity='Verbose'"
-      then: [t: "divergence"]      # phrase('divergence' from the mean)
-      else: [t: "div"]      # phrase('divergence' from the mean)
+      if: "$Verbosity='Terse'"
+      then: [t: "dihv"]             # phrase('div' is short for divergence) -- note OneCore voices spell out "div"
+      else: [t: "divergence"]      # phrase('divergence' from the mean)
   - t: "of"      # phrase(systems 'of' linear equations)
   - test:
       if: "not(IsNode(*[1], 'leaf'))"

@@ -127,14 +127,14 @@
   # I tried using the range '𝐀'<=. and .<='𝐳', but that doesn't work (Rust's xpath has bugs with 32 bit Unicode chars)
   # ∇ can also signal a vector operation
   match: 
-    - "(.='\u22C5' or .='\u00B7') and
+    - "(.='⋅' or .='·') and
        preceding-sibling::*[1][ self::m:mover[*[2][.='→' or .='⇀' or .='^']] or
                                 BaseNode(.)[.='∇' or .='𝛁'] or
-                                descendant-or-self::*[self::m:mi and string-length(.)=1 and
-                                                      translate(., '𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳','')=''] ] and
+                                descendant-or-self::*[string-length(.)=1 and
+                                                      translate(., '∇𝛁𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳','')=''] ] and
        following-sibling::*[1][ self::m:mover[*[2][.='→' or .='⇀' or .='^']] or
-                                descendant-or-self::*[self::m:mi and string-length(.)=1 and
-                                                      translate(., '𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳','')=''] ]"
+                                descendant-or-self::*[string-length(.)=1 and
+                                                      translate(., '∇𝛁𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳','')=''] ]"
   replace:
   - intent:
       name: "dot-product"
@@ -147,11 +147,11 @@
     - ".='×' and
        preceding-sibling::*[1][ self::m:mover[*[2]='→' or *[2]='⇀' or *[2]='^'] or
                                 BaseNode(.)[.='∇' or .='𝛁'] or
-                                descendant-or-self::*[self::m:mi and string-length(.)=1 and
-                                                      translate(., '𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳','')=''] ] and
+                                descendant-or-self::*[string-length(.)=1 and
+                                                      translate(., '∇𝛁𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳','')=''] ] and
        following-sibling::*[1][ self::m:mover[*[2]='→' or *[2]='⇀' or *[2]='^'] or
-                                descendant-or-self::*[self::m:mi and string-length(.)=1 and
-                                                      translate(., '𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳','')=''] ]"
+                                descendant-or-self::*[string-length(.)=1 and
+                                                      translate(., '∇𝛁𝐀𝐁𝐂𝐃𝐄𝐅𝐆𝐇𝐈𝐉𝐊𝐋𝐌𝐍𝐎𝐏𝐐𝐑𝐒𝐓𝐔𝐕𝐖𝐗𝐘𝐙𝐚𝐛𝐜𝐝𝐞𝐟𝐠𝐡𝐢𝐣𝐤𝐥𝐦𝐧𝐨𝐩𝐪𝐫𝐬𝐭𝐮𝐯𝐰𝐱𝐲𝐳','')=''] ]"
   replace:
   - intent:
       name: "cross-product"

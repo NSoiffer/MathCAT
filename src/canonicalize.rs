@@ -28,6 +28,7 @@ pub const MATHML_NAME_ATTR: &str = "data-from-mathml";
 const MFENCED_ATTR_VALUE: &str = "from_mfenced";
 const EMPTY_IN_2D: &str = "data-empty-in-2D";
 const SPACE_AFTER: &str = "data-space-after";
+const ACT_AS_OPERATOR: &str = "data-acts_as_operator";
 // character to use instead of the text content for priority, etc.
 pub const CHEMICAL_BOND: &str ="data-chemical-bond";
 
@@ -751,8 +752,10 @@ impl CanonicalizeContext {
 			static ref IS_PRIME: Regex = Regex::new(r"['′″‴⁗]").unwrap();
 
 			// Note: including intervening spaces in what is likely a symbol of omission preserves any notion of separate digits (e.g., "_ _ _")
-			static ref IS_UNDERSCORE: Regex = Regex::new(r"^[_\u{00A0}]+$").unwrap();        }
+			static ref IS_UNDERSCORE: Regex = Regex::new(r"^[_\u{00A0}]+$").unwrap();
+        }
 
+			
 		static CURRENCY_SYMBOLS: phf::Set<&str> = phf_set! {
 			"$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿" // could add more currencies...
 		};
@@ -848,6 +851,19 @@ impl CanonicalizeContext {
 						}
 					}
 					set_mathml_name(mathml, "mo");
+
+					// For at least pandoc, ∇ is an 'mi' and it sometimes adds an invisible times -- remove them
+					let op = OPERATORS.get(text).unwrap();
+					let preceding_siblings = mathml.preceding_siblings();
+					if (op.is_infix() || op.is_postfix()) &&
+					   !preceding_siblings.is_empty() && CanonicalizeContext::is_invisible_char_element(as_element(preceding_siblings[0])) {
+						as_element(preceding_siblings[0]).remove_from_parent();
+					}
+					let following_siblings = mathml.following_siblings();
+					if (op.is_infix() || op.is_prefix()) &&
+					   !following_siblings.is_empty() && CanonicalizeContext::is_invisible_char_element(as_element(following_siblings[0])) {
+						as_element(following_siblings[0]).remove_from_parent();
+					}
 					return Some(mathml);
 				} else if let Some(result) = merge_arc_trig(mathml) {
 						return Some(result);
@@ -1048,6 +1064,7 @@ impl CanonicalizeContext {
 					let merged = merge_dots(mathml);	// FIX -- switch to passing in children
 					let merged = merge_primes(merged);
 					let merged = merge_chars(merged, &IS_UNDERSCORE);
+					let merged = merge_cross_or_dot_product_elements(merged);
 					handle_pseudo_scripts(merged)
 				} else {
 					mathml
@@ -2245,8 +2262,8 @@ impl CanonicalizeContext {
 			children.drain(start+1..end);
 		}
 
+		/// merge consecutive leaves containing any of the 'chars' into the first leaf -- probably used for omission with('_')
 		fn merge_chars<'a>(mrow: Element<'a>, pattern: &Regex) -> Element<'a> {
-			// merge consecutive <mi>s containing any of the 'chars' into one <mi> -- probably used for omission with('_')
 			let mut first_child = None;
 			let mut new_text = "".to_string();
 			for child in mrow.children() {
@@ -2281,6 +2298,49 @@ impl CanonicalizeContext {
 			if new_text.len() > 1{
 				// end of a run
 				first_child.unwrap().set_text(&new_text);
+			}
+			return mrow;
+		}
+
+		/// curl and divergence are handled as two character operators
+		/// if found, merge them into their own (new) mrow that has an intent on it
+		/// we can have '∇' or '𝛁', or those as vectors (inside an mover)
+		fn merge_cross_or_dot_product_elements(mrow: Element) -> Element {
+			let mut children = mrow.children();
+			let mut i = 0;
+			let mut is_previous_nabla = false;
+			let mut is_changed = false;
+			while i < children.len() - 1 {
+				let child = as_element(children[i]);
+				if is_previous_nabla {
+					if is_leaf(child) {
+						let text = as_text(child);
+						if text == "⋅" || text == "·"|| text == "×" {
+							let nabla_child = as_element(children[i-1]);
+							let nabla_text = as_text( get_possible_embellished_node(nabla_child) );
+							let new_mrow = create_mathml_element(&child.document(), "mrow");
+							new_mrow.set_attribute_value(ACT_AS_OPERATOR, nabla_text);
+							new_mrow.append_child(nabla_child);
+							new_mrow.append_child(child);
+							children[i-1] = ChildOfElement::Element(new_mrow);
+							children.remove(i);
+							is_changed = true;
+						}
+					}
+					is_previous_nabla = false;
+				} else {
+					let potential_nabla = if name(&child) == "mover" {as_element(child.children()[0])} else {child};
+					if is_leaf(potential_nabla) {
+						let text = as_text(potential_nabla);
+						if text == "∇" || text == "𝛁" {
+							is_previous_nabla = true;
+						}
+					}
+				}
+				i += 1;
+			}
+			if is_changed {
+				mrow.replace_children(children);
 			}
 			return mrow;
 		}
@@ -3601,7 +3661,7 @@ impl CanonicalizeContext {
 		}
 	}
 
-	// implied comma when two numbers are adjacent and are in a script position
+	/// implied comma when two numbers are adjacent and are in a script position
 	fn is_implied_comma<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>, mrow: &'a Element<'a>) -> bool {
 		if name(prev) != "mn" || name(current) != "mn" {
 			return false;
@@ -3615,7 +3675,7 @@ impl CanonicalizeContext {
 		return (name == "msub" || name == "msubsup" || name == "msup") && !mrow.preceding_siblings().is_empty();
 	}
 
-	// implied separator when two capital letters are adjacent or two chemical elements
+	/// implied separator when two capital letters are adjacent or two chemical elements
 	fn is_implied_chemical_bond<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>) -> bool {
 		// debug!("is_implied_chemical_bond: previous: {:?}", prev.preceding_siblings());
 		// debug!("is_implied_chemical_bond: following: {:?}", prev.following_siblings());
@@ -3642,8 +3702,8 @@ impl CanonicalizeContext {
 		}
 	}
 
-	// implied separator when two capital letters are adjacent or two chemical elements
-	// also for adjacent omission chars
+	/// implied separator when two capital letters are adjacent or two chemical elements
+	/// also for adjacent omission chars
 	fn is_implied_separator<'a>(&self, prev: &'a Element<'a>, current: &'a Element<'a>) -> bool {
 		if name(prev) != "mi" || name(current) != "mi" {
 			return false;
@@ -3663,6 +3723,18 @@ impl CanonicalizeContext {
 		}
 	}
 	
+	fn is_invisible_char_element(mathml: Element) -> bool {
+		if !is_leaf(mathml) {
+			return false
+		}
+		let text = as_text(mathml);
+		if text.len() != 3 {   // speed hack: invisible chars are three UTF-8 chars
+			return false;
+		} 
+		let ch = text.chars().next().unwrap();
+		return '\u{2061}' <= ch && ch <= '\u{2064}'
+	}
+
 	// Add the current operator if it's not n-ary to the stack
 	// 'current_child' and it the operator to the stack.
 	fn shift_stack<'s, 'a:'s, 'op:'a>(
@@ -3870,33 +3942,46 @@ impl CanonicalizeContext {
 			let mut current_child = self.canonicalize_mrows(as_element(children[i_child]))?;
 			children[i_child] = ChildOfElement::Element( current_child );
 			let base_of_child = get_possible_embellished_node(current_child);
-
+			let acts_as_ch = current_child.attribute_value(ACT_AS_OPERATOR);
 			let mut current_op = OperatorPair::new();
 			// figure what the current operator is -- it either comes from the 'mo' (if we have an 'mo') or it is implied
-			if name(&base_of_child) == "mo" &&
-			   !( base_of_child.children().is_empty() || as_text(base_of_child) == "\u{00A0}" ) { // shouldn't have empty mo node, but...
+			if (name(&base_of_child) == "mo" &&
+			    !( base_of_child.children().is_empty() || as_text(base_of_child) == "\u{00A0}" )) || // shouldn't have empty mo node, but...
+			   acts_as_ch.is_some() {
 				let previous_op = if top(&parse_stack).is_operand {None} else {Some( top(&parse_stack).op_pair.op )};
 				let next_node = if i_child + 1 < num_children {Some(as_element(children[i_child+1]))} else {None};
-				current_op = OperatorPair{
-					ch: as_text(base_of_child),
-					op: CanonicalizeContext::find_operator(Some(self), base_of_child, previous_op,
-							top(&parse_stack).last_child_in_mrow(), next_node)
-				};
-	
-				// deal with vertical bars which might be infix, open, or close fences
-				// note: mrow shrinks as we iterate through it (removing children from it)
-				current_op.op = self.determine_vertical_bar_op(
-					current_op.op,
-					base_of_child,
-					next_node,
-					&mut parse_stack,
-					self.n_vertical_bars_on_right(&children[i_child+1..], current_op.ch)
-				);
+				if let Some(acts_as_ch) = acts_as_ch {
+					// ∇× (etc) hack, including ∇ being a vector (maybe eventually others)
+					let temp_mo = create_mathml_element(&current_child.document(), "mo");
+					temp_mo.set_text(acts_as_ch);
+					current_op = OperatorPair{
+						ch: acts_as_ch,
+						op: CanonicalizeContext::find_operator(Some(self), temp_mo, previous_op,
+								top(&parse_stack).last_child_in_mrow(), next_node)
+					};
+				} else {
+					current_op = OperatorPair{
+						ch: as_text(base_of_child),
+						op: CanonicalizeContext::find_operator(Some(self), base_of_child, previous_op,
+								top(&parse_stack).last_child_in_mrow(), next_node)
+					};
+		
+					// deal with vertical bars which might be infix, open, or close fences
+					// note: mrow shrinks as we iterate through it (removing children from it)
+					current_op.op = self.determine_vertical_bar_op(
+						current_op.op,
+						base_of_child,
+						next_node,
+						&mut parse_stack,
+						self.n_vertical_bars_on_right(&children[i_child+1..], current_op.ch)
+					);
+				}
 			} else {
 				let previous_child = top(&parse_stack).last_child_in_mrow();
 				if let Some(previous_child) = previous_child {
 					let base_of_previous_child = get_possible_embellished_node(previous_child);
-					if name(&base_of_previous_child) != "mo" {
+					let acts_as_ch = previous_child.attribute_value(ACT_AS_OPERATOR);
+					if name(&base_of_previous_child) != "mo" && acts_as_ch.is_none() {
 						let likely_function_name = self.is_function_name(previous_child, Some(&children[i_child..]));
 						if name(&base_of_child) == "mtext" && as_text(base_of_child) == "\u{00A0}" {
 							base_of_child.set_attribute_value("data-function-likelihood", &(likely_function_name == FunctionNameCertainty::True).to_string());

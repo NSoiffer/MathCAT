@@ -119,3 +119,14 @@
       - t: "of"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
 
+- name: default
+  tag: dot-product
+  match: "."
+  replace:
+  - x: "IfThenElse($Verbosity='Terse', 'dot', 'dot product')"
+
+- name: default
+  tag: cross-product
+  match: "."
+  replace:
+  - x: "IfThenElse($Verbosity='Terse', 'cross', 'cross product')"
