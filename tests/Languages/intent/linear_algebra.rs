@@ -35,7 +35,7 @@ fn dot_product_vec_arrow() {
       </modified-variable>
     </mrow>
    </math>"#;
-    test_intent(mathml, intent, vec![]);
+  test_intent(mathml, intent, vec![]);
 }
 
 #[test]
@@ -68,7 +68,7 @@ fn cross_product_vec_harpoon() {
       </modified-variable>
     </mrow>
    </math>"#;
-    test_intent(mathml, intent, vec![]);
+  test_intent(mathml, intent, vec![]);
 }
 
 #[test]
@@ -85,7 +85,68 @@ fn dot_product_bold_math_variant() {
       <mi data-from-mathml='mi' mathvariant='bold'>𝐲</mi>
     </mrow>
    </math>"#;
-    test_intent(mathml, intent, vec![]);
+  test_intent(mathml, intent, vec![]);
+}
+
+#[test]
+fn dot_product_nabla() {
+  let mathml = r#"<math>
+  <mrow>
+    <mover>
+      <mrow>
+        <mi mathvariant="bold">n</mi>
+      </mrow>
+      <mo stretchy="false">^</mo>
+    </mover>
+  </mrow>
+  <mo>&#xD7;</mo>
+  <mi mathvariant="normal">&#x2207;</mi>
+  <mi>&#x3C8;</mi>
+</math>"#;
+  let intent = r#"<math data-from-mathml='math'>
+      <mrow data-from-mathml='mrow' data-changed='added'>
+        <modified-variable data-from-mathml='mover'>
+          <mi data-from-mathml='mi' mathvariant='bold'>𝐧</mi>
+          <mo data-from-mathml='mo' stretchy='false'>^</mo>
+        </modified-variable>
+        <cross-product data-from-mathml='mo'></cross-product>
+        <gradient data-from-mathml='mrow' data-changed='added'>
+          <mi data-from-mathml='mi'>ψ</mi>
+        </gradient>
+      </mrow>
+    </math>"#;
+  test_intent(mathml, intent, vec![]);
+}
+
+#[test]
+fn cross_product_nabla() {
+  let mathml = r#"<math>
+      <msup>
+        <mi mathvariant="normal">&#x2207;</mi>
+        <mo>&#x2032;</mo>
+      </msup>
+      <mo>&#xD7;</mo>
+      <mrow >
+        <mover>
+          <mi>r</mi>
+          <mo>&#x2192;</mo>
+        </mover>
+      </mrow>
+    </math>"#;
+  let intent = r#" <math data-from-mathml='math'>
+      <mrow data-from-mathml='mrow' data-changed='added'>
+        <skip-super data-from-mathml='msup'>
+          <mo data-from-mathml='mo' mathvariant='normal'>∇</mo>
+          <mo data-from-mathml='mo'>′</mo>
+        </skip-super>
+        <cross-product data-from-mathml='mo'></cross-product>
+        <modified-variable data-from-mathml='mover'>
+          <mi data-from-mathml='mi'>r</mi>
+          <mo data-from-mathml='mo'>→</mo>
+        </modified-variable>
+      </mrow>
+    </math>"#;
+  test_intent(mathml, intent, vec![]);
 }
 
 #[test]
@@ -130,7 +191,7 @@ fn cross_product_hat() {
         </modified-variable>
       </mrow>
     </math>"#;
-    test_intent(mathml, intent, vec![]);
+  test_intent(mathml, intent, vec![]);
 }
 
 #[test]
@@ -177,7 +238,7 @@ fn magnetic_flux_dot_product() {
         </mrow>
       </mrow>
     </math>"#;
-    test_intent(mathml, intent, vec![]);
+  test_intent(mathml, intent, vec![]);
 }
 
 #[test]
@@ -355,7 +416,6 @@ fn magnetic_field_cross_product() {
           </mrow>
         </mrow>
       </mrow>
-    </math>
-    "#;
-    test_intent(mathml, intent, vec![]);
+    </math>"#;
+  test_intent(mathml, intent, vec![]);
 }
