@@ -45,40 +45,48 @@
   variables: [Prefix: "''"]
   replace:
   - test:
-      if: "$MatchCounter = 0"
-      then:
-      - test:
-        - if: "starts-with($NavCommand, 'Zoom')"
-          then: [set_variables: [Prefix: "'zoom'"]]          # phrase('zoom' in to see more details)     
-        - else_if: "starts-with($NavCommand, 'Move')"
-          then: [set_variables: [Prefix: "'move'"]]          # phrase('move' to next entry in table)     
-        - else_if: "starts-with($NavCommand, 'Read')"
-          then: [set_variables: [Prefix: "'read'"]]          # phrase('read' to next entry in table)     
-        - else_if: "starts-with($NavCommand, 'Describe')"
-          then: [set_variables: [Prefix: "'describe'"]]      # phrase('describe' to next entry in table)     
-      - x: "$Prefix"
-      - test:
-        - if: "substring($NavCommand, string-length($Prefix)+1) = 'In'"
-          then: [t: "in"]                                  # phrase(zoom 'in' to see more details)
-        - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'InAll'"
-          # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets "ed" concatenated to "zoom"
-          then: [t: "\uF8FEed in all the way"]                     # phrase(zoom 'out all the way' to see more details)
-        - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'Out'"
-          then: [t: "out"]                                 # phrase(zoom 'out' to see more details)
-        - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'OutAll'"
-          # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets "ed" concatenated to "zoom"
-          then: [t: "\uF8FEed out all the way"]                     # phrase(zoom 'out all the way' to see more details)
-        - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'Next'"
-          then: [t: "right"]                               # phrase(move to the 'right')
-        - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'Previous'"
-          then: [t: "left"]                                # phrase(move to the 'left')
-        - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'Current'"
-          then: [t: "current"]                                 # phrase(who is the 'current' president)
-        - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'LineStart'"
-          then: [t: "to start of line"]                                 # phrase(move 'to start of line')
-        - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'LineEnd'"
-          then: [t: "to end of line"]                                 # phrase(move 'to end of line')
-      - pause: "medium"
+    - if: "$MatchCounter = 0 and $SayCommand = 'true'"
+      then_test:
+      - if: "self::m:math and starts-with($NavCommand, 'ZoomOut')"
+        then: [t: "zoomed out all the way", pause: "medium"]
+      - else_if: "IsNode(., 'leaf') and starts-with($NavCommand, 'ZoomIn')"
+        then: [t: "zoomed in all the way", pause: "medium"]
+        else:
+        - test:
+          - if: "starts-with($NavCommand, 'Zoom')"
+            then: [set_variables: [Prefix: "'zoom'"]]          # phrase('zoom' in to see more details)     
+          - else_if: "starts-with($NavCommand, 'Move')"
+            then: [set_variables: [Prefix: "'move'"]]          # phrase('move' to next entry in table)     
+          - else_if: "starts-with($NavCommand, 'Read')"
+            then: [set_variables: [Prefix: "'read'"]]          # phrase('read' to next entry in table)     
+          - else_if: "starts-with($NavCommand, 'Describe')"
+            then: [set_variables: [Prefix: "'describe'"]]      # phrase('describe' to next entry in table)
+        - test:
+            if: "$Prefix != ''"
+            then:
+            - x: "$Prefix"
+            - test:
+              - if: "substring($NavCommand, string-length($Prefix)+1) = 'In'"
+                then: [t: "in"]                                  # phrase(zoom 'in' to see more details)
+              - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'InAll'"
+                # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets "ed" concatenated to "zoom"
+                then: [t: "\uF8FEed in all the way"]                     # phrase(zoom 'out all the way' to see more details)
+              - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'Out'"
+                then: [t: "out"]                                 # phrase(zoom 'out' to see more details)
+              - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'OutAll'"
+                # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets "ed" concatenated to "zoom"
+                then: [t: "\uF8FEed out all the way"]                     # phrase(zoom 'out all the way' to see more details)
+              - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'Next'"
+                then: [t: "right"]                               # phrase(move to the 'right')
+              - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'Previous'"
+                then: [t: "left"]                                # phrase(move to the 'left')
+              - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'Current'"
+                then: [t: "current"]                                 # phrase(who is the 'current' president)
+              - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'LineStart'"
+                then: [t: "to start of line"]                                 # phrase(move 'to start of line')
+              - else_if: "substring($NavCommand, string-length($Prefix)+1) = 'LineEnd'"
+                then: [t: "to end of line"]                                 # phrase(move 'to end of line')
+            - pause: "medium"
   - set_variables: [MatchCounter: "1"]
 
 
