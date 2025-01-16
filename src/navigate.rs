@@ -448,6 +448,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         // transfer some values that might have been set into the prefs
         let context = rules_with_context.get_context();
         nav_state.speak_overview = context_get_variable(context, "Overview", mathml)?.0.unwrap() == "true";
+        nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
         rules.pref_manager.as_ref().borrow_mut().set_user_prefs("NavMode", &nav_state.mode)?;
 
         let nav_position = match context_get_variable(context, "NavNode", mathml)?.0 {
