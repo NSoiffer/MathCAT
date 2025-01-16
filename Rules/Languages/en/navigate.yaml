@@ -41,7 +41,7 @@
 # Rules for announcing the command
 - name: say-command
   tag: "!*"
-  match: "$SayCommand != ''"
+  match: "$SayCommand != ''"   # value should be '', 'true', or 'false'
   variables: [Prefix: "''"]
   replace:
   - test:
