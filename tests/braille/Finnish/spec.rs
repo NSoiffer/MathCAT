@@ -1188,6 +1188,8 @@ fn p41_inverse_function() {
     test_braille("Finnish", expr, "⠋⠬⠤⠼⠁⠀⠶⠫⠦⠽⠂⠀⠭⠴⠀⠳⠔⠠⠃⠀⠰⠄⠠⠁⠀⠸⠀⠽⠀⠶⠋⠦⠭⠴⠻");
 }
 
+
+// Two 5-dots separate the rows in the 2D math. Format: [whitespace][dot 5][dot 5][whitespace]. This is not an operator.
 #[test]
 fn p41_function_with_parts_with_arrow() {
     let expr = "<math>
@@ -1248,9 +1250,10 @@ fn p41_function_with_parts_with_arrow() {
       </mrow>
 </math>
 ";
-    test_braille("Finnish", expr, "⠋⠒⠀⠭⠀⠤⠱ (continues, but no consensus yet)");
+    test_braille("Finnish", expr, "⠋⠒⠀⠭⠀⠤⠱ ⠫⠤⠼⠁⠂⠀⠭⠀⠣⠶⠀⠤⠼⠁⠀⠐⠐⠀⠭⠬⠀⠖⠼⠃⠀⠭⠂⠀⠤⠼⠁⠀⠣⠀⠭⠀⠣⠶⠀⠼⠁⠀⠐⠐⠀⠤⠭⠀⠖⠼⠉⠂⠀⠭⠀⠱⠀⠼⠁⠻");
 }
 
+// Two 5-dots separate the rows in the 2D math. Format: [whitespace][dot 5][dot 5][whitespace]. This is not an operator.
 fn function_with_parts() {
   let expr = "<math>
       <mi>f</mi>
@@ -1309,12 +1312,11 @@ fn function_with_parts() {
             </mtable>
          </mrow>
       </mrow>
-</math>
-
-";
-  test_braille("Finnish", expr, "⠋⠦⠭⠴ ⠶ (continues, but no consensus yet)");
+</math>";
+  test_braille("Finnish", expr, "⠋⠦⠭⠴ ⠶⠫⠤⠼⠁⠂⠀⠭⠀⠣⠶⠀⠤⠼⠁⠀⠐⠐⠀⠭⠬⠀⠖⠼⠃⠀⠭⠂⠀⠤⠼⠁⠀⠣⠀⠭⠀⠣⠶⠀⠼⠁⠀⠐⠐⠀⠤⠭⠀⠖⠼⠉⠂⠀⠭⠀⠱⠀⠼⠁⠻");
 }
 
+// Two 5-dots separate the rows in the 2D math. Format: [whitespace][dot 5][dot 5][whitespace]. This is not an operator.
 #[test]
 fn p42_matrix() {
     let expr = "<math>
@@ -1381,14 +1383,15 @@ fn p42_matrix() {
 <mo>)</mo>
 </mrow>
 </math>";
-    test_braille("Finnish", expr, "");
+    test_braille("Finnish", expr, "⠦⠼⠁⠀⠼⠚⠀⠼⠚⠀⠼⠁⠴⠀⠐⠐⠀⠦⠼⠚⠀⠼⠁⠀⠼⠚⠀⠼⠚⠴⠀⠐⠐⠀⠦⠼⠚⠀⠼⠚⠀⠼⠁⠀⠼⠚⠴⠀⠐⠐⠀⠦⠼⠁⠀⠼⠚⠀⠼⠚⠀⠼⠁⠴");
 }
 
+// Two 5-dots separate the rows in the 2D math. Format: [whitespace][dot 5][dot 5][whitespace]. This is not an operator.
 #[test]
 fn p42_determinant() {
     let expr = "<math>
 <mrow>
-<mo>(</mo>
+<mo>|</mo>
 <mtable>
 	<mtr>
     <mtd>
@@ -1415,14 +1418,14 @@ fn p42_determinant() {
     </mtd>
     </mtr>
 </mtable>
-<mo>)</mo>
+<mo>|</mo>
 </mrow>
 <mo>=</mo>
 <mn>4</mn>
 <mi>a</mi>
 <mi>b</mi>
 </math>";
-    test_braille("Finnish", expr, "(no consensus yet)");
+    test_braille("Finnish", expr, "⠸⠁⠀⠖⠃⠀⠀⠁⠀⠤⠃⠸⠀⠐⠐⠀⠸⠁⠀⠤⠃⠀⠀⠁⠀⠖⠃⠸⠀⠶⠼⠙⠀⠁⠃");
 }
 
 // Dots 156 to signify the bar over "arc"
