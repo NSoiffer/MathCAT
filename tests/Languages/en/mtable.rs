@@ -990,6 +990,16 @@ fn matrix_binomial() {
 }
 
 #[test]
+fn matrix_times() {
+  let expr = "<math>
+    <mfenced><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable></mfenced>
+    <mfenced><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable></mfenced>
+  </math>";
+  test("en", "SimpleSpeak", expr,
+    "the 2 by 2 matrix; row 1; 1, 2; row 2; 3, 4; times, the 2 by 2 matrix; row 1; eigh, b; row 2; c, d;");
+}
+
+#[test]
 fn unknown_mtable_property() {
   let expr = "<math display='block'>
       <mtable intent='equation:prefix($e1,$e1x)'>
