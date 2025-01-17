@@ -279,11 +279,7 @@
             then: [T: "等等"]                     	# 	(en: 'and so on', google translation)
             else: [T: "等等"]                     	# 	(en: 'and so on up to', google translation)
 
- - "⁡":                                         	#  0x2061
-    - test:
-        if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
-             not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])"
-        then: [T: ""]                          	# 	(en: 'of', google translation)
+ - "⁡": [T: ""]                                  	# 	(en: 'of', google translation)
  - "⁢": [t: ""]                                 	#  0x2062
  - "⁣": [t: ""]                                 	#  0x2063
  - "⁤": [T: "又"]                                	#  0x2064	(en: 'and', google translation)(3 又 1/2)

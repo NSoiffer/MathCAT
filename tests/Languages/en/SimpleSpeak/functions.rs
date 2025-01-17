@@ -127,7 +127,7 @@ fn other_names() {
                 expr, "covariance x");
     let expr = "<math> <mrow><mi>exp</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow> </math>";
     test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
-                expr, "exp x");
+                expr, "exp of x");
     test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")],
                 expr, "exponential of x");
 }
