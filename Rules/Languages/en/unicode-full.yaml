@@ -2100,7 +2100,7 @@
  - "⨮": [t: "plus sign in right half circle"]      # 0x2a2e
  - "⨯":                                             # 0x2a2f
       - test: 
-         if: "$Verbosity!='Terse'"
+         if: "$Verbosity='Terse'"
          then: [t: "cross"]
          else: [t: "cross product"]
  - "⨰": [t: "multiplication sign with dot above"]  # 0x2a30
