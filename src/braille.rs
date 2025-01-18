@@ -531,7 +531,7 @@ fn nemeth_cleanup(raw_braille: String) -> String {
             Regex::new(r"(⠈⠠⠎|⠈⠠⠏|⠨⠼|⠈⠼)N").unwrap();
 
         // Needed after a typeface change or interior shape modifier indicator
-        static ref NUM_IND_9E: Regex = Regex::new(r"(?P<face>[SBTIR]+?)N").unwrap();
+        static ref NUM_IND_9E: Regex = Regex::new(r"(?P<face>[SB𝔹TIR]+?)N").unwrap();
         static ref NUM_IND_9E_SHAPE: Regex = Regex::new(r"(?P<mod>⠸⠫)N").unwrap();
 
         // Needed after hyphen that follows a word, abbreviation, or punctuation (caution about rule 11d)
