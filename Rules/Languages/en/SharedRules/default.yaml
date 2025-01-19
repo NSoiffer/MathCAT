@@ -641,7 +641,7 @@
 
 
 - name: infix-intent
-  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  # uncaught intent -- speak as arg1 foo arg2 [foo arg3....]
   tag: "*"
   match: "contains(@data-intent-property, ':infix:') and count(*)>0"
   replace:
