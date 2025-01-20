@@ -35,7 +35,7 @@ pub fn braille_mathml(mathml: Element, nav_node_id: &str) -> Result<(String, usi
         let highlight_style = pref_manager.pref_to_string("BrailleNavHighlight");
         let braille_code = pref_manager.pref_to_string("BrailleCode");
         let braille = match braille_code.as_str() {
-            "Nemeth" => nemeth_cleanup(braille_string),
+            "Nemeth" => nemeth_cleanup(pref_manager, braille_string),
             "UEB" => ueb_cleanup(pref_manager, braille_string),
             "Vietnam" => vietnam_cleanup(pref_manager, braille_string),
             "CMU" => cmu_cleanup(pref_manager, braille_string), 
@@ -429,7 +429,7 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
     }
 }
 
-fn nemeth_cleanup(raw_braille: String) -> String {
+fn nemeth_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> String {
     // Typeface: S: sans-serif, B: bold, T: script/blackboard, I: italic, R: Roman
     // Language: E: English, D: German, G: Greek, V: Greek variants, H: Hebrew, U: Russian
     // Indicators: C: capital, N: number, P: punctuation, M: multipurpose
@@ -439,11 +439,11 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     // SRE doesn't have H: Hebrew or U: Russian, so not encoded (yet)
     // Note: some "positive" patterns find cases to keep the char and transform them to the lower case version
     static NEMETH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
-        "S" => "⠈⠰",    // sans-serif
+        "S" => "⠠⠨",    // sans-serif
         "B" => "⠸",     // bold
-        "𝔹" => "⠈",     // blackboard
-        "T" => "⠈",     // script (mapped to be the same a blackboard)
-        "I" => "⠨",     // italic
+        "𝔹" => "⠨",     // blackboard
+        "T" => "⠈",     // script
+        "I" => "⠨",     // italic (mapped to be the same a blackboard)
         "R" => "",      // roman
         "E" => "⠰",     // English
         "D" => "⠸",     // German (Deutsche)
@@ -638,10 +638,25 @@ fn nemeth_cleanup(raw_braille: String) -> String {
     let result = REMOVE_AFTER_PUNCT_IND.replace_all(&result, "$1$2");
 //   debug!("Punct38: \"{}\"", &result);
 
+    // these typeforms need to get pulled from user-prefs as they are transcriber-defined
+    let sans_serif = pref_manager.pref_to_string("Nemeth_SansSerif");
+    let bold = pref_manager.pref_to_string("Nemeth_Bold");
+    let double_struck = pref_manager.pref_to_string("Nemeth_DoubleStruck");
+    let script = pref_manager.pref_to_string("Nemeth_Script");
+    let italic = pref_manager.pref_to_string("Nemeth_Italic");
+
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
-        match NEMETH_INDICATOR_REPLACEMENTS.get(&cap[0]) {
-            None => {error!("REPLACE_INDICATORS and NEMETH_INDICATOR_REPLACEMENTS are not in sync"); ""},
-            Some(&ch) => ch,
+        let matched_char = &cap[0];
+        match matched_char {
+            "S" => &sans_serif,
+            "B" => &bold,
+            "𝔹" => &double_struck,
+            "T" => &script,
+            "I" => &italic,
+            _ => match NEMETH_INDICATOR_REPLACEMENTS.get(&cap[0]) {
+                None => {error!("REPLACE_INDICATORS and NEMETH_INDICATOR_REPLACEMENTS are not in sync"); ""},
+                Some(&ch) => ch,
+            }
         }
     });
 
@@ -763,7 +778,7 @@ fn ueb_cleanup(pref_manager: Ref<PreferenceManager>, raw_braille: String) -> Str
     let double_struck = pref_manager.pref_to_string("UEB_DoubleStruck");
     let sans_serif = pref_manager.pref_to_string("UEB_SansSerif");
     let fraktur = pref_manager.pref_to_string("UEB_Fraktur");
-    let greek_variant = pref_manager.pref_to_string("Vietnam_GreekVariant");
+    let greek_variant = pref_manager.pref_to_string("UEB_GreekVariant");
 
     let result = REPLACE_INDICATORS.replace_all(&result, |cap: &Captures| {
         let matched_char = &cap[0];
