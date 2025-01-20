@@ -34,6 +34,6 @@ fn tilde_prefix_bug_244() {
 fn double_struck_bug_334() {
     // https://github.com/NSoiffer/MathCAT/issues/334 -- double struck was problem (⠼ was missing); test all of the scripted numbers here
     let expr = "<math><mn>𝟙</mn><mo>,</mo><mn>𝟐</mn><mo>,</mo><mn>𝟯</mn><mo>,</mo><mn>𝟺</mn></math>";
-    test_braille("Nemeth", expr, "⠈⠼⠂⠠⠀⠸⠼⠆⠠⠀⠈⠰⠸⠼⠒⠠⠀⠼⠲");
+    test_braille("Nemeth", expr, "⠨⠼⠂⠠⠀⠸⠼⠆⠠⠀⠠⠨⠸⠼⠒⠠⠀⠼⠲");
 }
 
