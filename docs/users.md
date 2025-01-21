@@ -11,9 +11,9 @@ Note: in NVDA, the options can be set by using the MathCAT preferences dialog. T
 
 MathCAT supports multiple modes of navigation. The means to begin navigating and end navigating will differ depending on the AT you are using. See the list below. The commands/key-strokes accepted by MathCAT are the same as those accepted by MathPlayer and are [listed in this document](nav-commands.md).
 The documentation describes many useful ways to navigate math. For those who just want to get started:
-* Use the arrows keys to move left/right or up/down a mathematical structure (e.g., into/out of a fraction)
+* Use the arrow keys to move left/right or up/down a mathematical structure (e.g., into/out of a fraction)
 * If inside of a table, CTRL+arrow will move by cell
-* Home/End move to the start/end of the expression
+* Home/End moves to the start/end of the expression
 * Space reads your current position
 * Shift+up/down will change the mode of navigation (see [navigation documentation](nav-commands.md))
 
@@ -22,7 +22,12 @@ To start navigation:
 
 MathCAT's navigation is the same in Word and in a browser.
 
-While navigating an expression, "control+c" copies the MathML for the current node in NVDA.
+While navigating an expression, "control+c" copies the math content of the current node in NVDA. The following formats are supported:
+
++ MathML (Default)
++ LaTeX
++ ASCIIMath
++ Speech
 
 
 ## Option List
@@ -125,13 +130,14 @@ ClearSpeak has a number of options. These were designed for authors to use, but 
 * ✓AutoZoomOut: true -- Auto zoom out of 2D exprs (use shift-arrow to force zoom out if unchecked).
   * `true`: if you are at the edge of a 2D expression (e.g., a fraction or superscript) and you try to move (left or right) out of it, then the move is allowed and the zoom level is set to that of the preceding/following item. 
   * `false`: moving (left or right) past the edge of a 2D expression is not allowed; you need to zoom out (perhaps repeatedly) until you are not at an edge to be able to move (left or right).
+* CopyMathAS: Determines the format in which to copy the math content of the current navigation node (MathML, LaTeX, ASCIIMath, or Speech).
 
 
 ### Braille Options
 * ✓BrailleCode: [Nemeth]
   * Options: Any implemented braille code
   * Description: the braille math code to use
-  * Status: currently only Nemeth, UEB, and Vietnam are supported. Other braille code support will depend upon help from others.
+  * Status: currently ASCIIMath, CMU, LaTeX, Nemeth, Swedish, UEB, and Vietnam are supported. Other braille code support will depend upon help from others.
 * ✓BrailleNavHighlight: [EndPoints]
   * Options: Off, FirstChar, EndPoints, All
   * Description:  highlight with dots 7 & 8 the currently selected navigation node
