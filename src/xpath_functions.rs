@@ -1080,7 +1080,7 @@ impl DistanceFromLeaf {
         let mut element = element;
         let mut distance = 1;
         loop {
-            debug!("distance -- element: {}", mml_to_string(&element));
+            // debug!("distance -- element: {}", mml_to_string(&element));
             if is_leaf(element) {
                 return distance;
             }
