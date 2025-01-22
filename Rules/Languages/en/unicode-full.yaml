@@ -450,9 +450,7 @@
     - spell: "translate('.', 'ℌℑℨℭ', 'HIZC')"
 
  - "ℍℙℾℿ":                                          # 0x210d, 0x2119, 0x213e, 0x213f
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', 'ℍℙℾℿ', 'HPΓΠ')" 
 
  - "ℎ": [t: "planck constant"]                     # 0x210e
@@ -693,20 +691,11 @@
          if: "following-sibling::*"
          then_test:
             if: "$Verbosity!='Terse'"
-            then: [t: "the laplacian of"]
-            else: [t: "laplacian of"]
-         else: [t: "laplacian"]
+            then: [t: "the LahPlahsian of"]     # "LahPlahsian" sounds better than "laplacian" in speech engines tested
+            else: [t: "LahPlahsian"]
+         else: [t: "LahPlahsian"]
 
- - "∇":                                          # 0x2207
-     - test: 
-        if: "$NavMode='Character' or $SpeechStyle='LiteralSpeak' or IsNode(parent::*[1], 'modified') or 
-             not(following-sibling::*[1][self::m:mo])"
-        then: [t: "nahblah"]
-        else:
-        - test:
-            if: "$Verbosity!='Terse'"
-            then: [t: "the"]
-        - t: "gradient of"
+ - "∇": [t: "nahblah"]                           # 0x2207
  - "∉":                                          # 0x2209
     # rule is identical to 0x2208
      - test:
@@ -3146,36 +3135,24 @@
  # double struck (blackboard bold) chars in math alphabetic block and also MathType private use area
  # Some of these are reserved because they were used in Plane 0 -- that shouldn't be an issue other than causing the other chars to not display
  - "𝔸-𝕐":    # 0x1d504 - 0x1d51d ('z' version is reserved)
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '𝔸𝔹𝔺𝔻𝔼𝔽𝔾𝔿𝕀𝕁𝕂𝕃𝕄𝕅𝕆𝕇𝕈𝕉𝕊𝕋𝕌𝕍𝕎𝕏𝕐', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                          # 0xf080 - 0xf098
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝕒-𝕫":    # 0x1d552 - 0x1d56b
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '𝕒𝕓𝕔𝕕𝕖𝕗𝕘𝕙𝕚𝕛𝕜𝕝𝕞𝕟𝕠𝕡𝕢𝕣𝕤𝕥𝕦𝕧𝕨𝕩𝕪𝕫', 'abcdefghijklmnopqrstuvwxyz')"
  - "-":    # 0xf09a - 0xf0b3
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
  - "𝟘-𝟡":    # 0x1d7d8 - 0x1d7e1
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '𝟘𝟙𝟚𝟛𝟜𝟝𝟞𝟟𝟠𝟡', '0123456789')"
  - "-":    # 0xf0c0 - 0xf0c9
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '', '0123456789')"
 
  - "": [t: "double struck nahblah"]                 # 0xf0ca
@@ -3273,15 +3250,11 @@
 
  # MathType only has a few of the cap Greek letters in PUA
  - "":                                          # 0xf201 - 0xf209
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '', 'ΔΨΛΠΣΘΓΩΥ')"
 
  - "-":    # 0xf220 - 0xf236
-    - test: 
-         if: "$Verbosity!='Terse'"
-         then: [t: "double struck"]
+    - t: "double struck"
     - spell: "translate('.', '', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ')"
 
  - "": [t: "double struck final sigma"]           # 0xf237
