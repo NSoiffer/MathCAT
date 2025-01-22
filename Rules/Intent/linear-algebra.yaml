@@ -11,6 +11,7 @@
   replace:
   - intent:
       name: "determinant"
+      attrs: "id='*[2]/@id' data-fixity='\"table\"'"
       children: [x: "*[2]"]
 
 -
@@ -23,7 +24,7 @@
   replace:
   - intent:
       name: "determinant"
-      attrs: "id='*[2]/@id'"
+      attrs: "id='*[2]/@id' data-fixity='\"table\"'"
       children: [x: "*[2]/*"]
 
 -
@@ -35,7 +36,7 @@
   replace:
   - intent:
       name: "matrix"
-      attrs: "id='*[2]/@id'"
+      attrs: "id='*[2]/@id' data-fixity='\"table\"'"
       children: [x: "*[2]/*"]
 
 -
@@ -46,6 +47,7 @@
   replace:
   - intent:
       name: "norm"
+      attrs: "id='@id' data-fixity='\"prefix\"'"
       children: [x: "*[2]"]
 
 
@@ -57,6 +59,7 @@
   replace:
   - intent:
       name: "subscripted-norm"
+      attrs: "id='@id' data-fixity='\"norm;subscript\"'"
       children:
       - x: "*[1]/*[2]"   # grab the contents of the bracketed expr
       - x: "*[2]"
@@ -68,6 +71,7 @@
   replace:
   - intent:
       name: "magnitude"
+      attrs: "id='@id' data-fixity='\"prefix\"'"
       children: [x: "*[2]"]
 
 -
@@ -78,7 +82,8 @@
   replace:
   - intent:
       name: "transpose"
-      children: [x: "*[1]"]
+        attrs: "id='@id' data-fixity='\"prefix\"'"
+    children: [x: "*[1]"]
 
 -
   name: trace
@@ -88,6 +93,7 @@
   replace:
   - intent:
       name: "trace"
+      attrs: "id='@id' data-fixity='\"prefix\"'"
       children: [x: "*[3]"]
 
 -
@@ -98,6 +104,7 @@
   replace:
   - intent:
       name: "dimension"
+      attrs: "id='@id' data-fixity='\"prefix\"'"
       children: [x: "*[3]"]
 
 -
@@ -108,6 +115,7 @@
   replace:
   - intent:
       name: "homomorphism"
+      attrs: "id='@id' data-fixity='\"prefix\"'"
       children: [x: "*[3]"]
 
 -
@@ -118,6 +126,7 @@
   replace:
   - intent:
       name: "kernel"
+      attrs: "id='@id' data-fixity='\"prefix\"'"
       children: [x: "*[3]"]
 
 -
@@ -138,6 +147,7 @@
   replace:
   - intent:
       name: "dot-product"
+      attrs: "id='@id'"
       children: []
 
 -
@@ -155,4 +165,5 @@
   replace:
   - intent:
       name: "cross-product"
+      attrs: "id='@id'"
       children: []

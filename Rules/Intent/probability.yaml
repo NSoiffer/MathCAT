@@ -6,6 +6,7 @@
   replace:
   - intent:
       name: "probability"
+      attrs: "id='@id'"
       children: [x: "text()"]
 
 -
@@ -15,4 +16,5 @@
   replace:
   - intent:
       name: "given"
+      attrs: "id='@id'"
       children: [x: "text()"]
