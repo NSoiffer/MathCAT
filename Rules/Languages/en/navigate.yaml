@@ -369,7 +369,7 @@
 
 - name: zoom-in-2D-not-enhanced
   tag: "*"
-  match: "$NavCommand = 'ZoomIn' and $NavMode!='Enhanced' and IsNode(., '2D')"
+  match: "$NavCommand = 'ZoomIn' and $NavMode!='Enhanced' and (IsNode(., '2D') or not(IsNode(., 'mathml')))"
   replace:
   - with:
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
@@ -463,7 +463,6 @@
   - "($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and "
   - "$NavMode = 'Enhanced'"
   replace:
-  # don't bother with MatchCounter since we only get here if > 1
   - with:
       variables: [Move2D: "'in'", Child2D: "*[1]"]            # phrase('in' the denominator)
       replace: [x: "."]
@@ -480,7 +479,7 @@
   replace:
   #don't bother with MatchCounter since we only get here if > 1
   - test:
-      if: "$ReadZoomLevel >= DistanceFromLeaf(., false, $NavMode!='Character')"
+      if: "DEBUG($ReadZoomLevel >= DistanceFromLeaf(DEBUG(.), false, $NavMode!='Character'))"
       then:
       # - with:
       #     variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]    # phrase('in' the denominator)
@@ -597,7 +596,7 @@
 - name: move-to-start-or-end-2d
   tag: "*"
   match:
-  - "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and IsNode(.., '2D') and"
+  - "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and (IsNode(.., '2D') or not(IsNode(., 'mathml'))) and"
   - "not( IsNode(., 'leaf') and (parent::m:msub or parent::m:msup or parent::m:msubsup or parent::m:mmultiscripts) )"
   replace:
   - test:
@@ -1180,7 +1179,8 @@
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
       replace: [x: "."]
   - test:
-      if: "following-sibling::*[1][.='\u2062' or .='\u2064'] and $NavMode='Enhanced'"   # invisible times and plus
+      if: "following-sibling::*[1][.='\u2062' or .='\u2064'] and
+           ($NavMode='Enhanced' or ($NavMode='Simple' and DEBUG(following-sibling::*[2][not(IsNode(., 'mathml'))])))"   # invisible times and plus
       then: [set_variables: [NavNode: "following-sibling::*[1]/@id"]]
       else: [x: "following-sibling::*[1]"]
 
@@ -1218,8 +1218,10 @@
         - else_if: "$NavCommand = 'ReadNext'"
           then: [t: "read"]                                  # phrase('read' next entry in table)     
           else: [t: "describe"]                              # phrase('describe' next entry in table)     
-      - t: "right, end of math"                              # phrase(move 'right, end of math')
-      - pause: long
+      - t: "right"                              # phrase(move 'right')
+      - pause: short
+  - t: "end of math"                              # phrase(move 'end of math')
+  - pause: long
   - set_variables: [SpeakExpression: "'false'"]
 
 - name: move-next-auto-zoom-up-one-level
@@ -1316,7 +1318,7 @@
   tag: "*"
   match:
   - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
-  - "$ReadZoomLevel>=0"
+  - "DEBUG($ReadZoomLevel)>=0"
   replace:
   - with:
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
@@ -1347,11 +1349,11 @@
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
       replace: [x: "."]
   - test:
-      if: "following-sibling::*[1][@data-from-mathml='none' or @data-from-mathml='mprescripts']"
+      if: "DEBUG(following-sibling::*[1][@data-from-mathml='none' or @data-from-mathml='mprescripts'])"
       then: [x: "following-sibling::*[1]"]
       else:
       - test:
-          if: "IsNode(.., '2D')"
+          if: "IsNode(.., '2D') or not(IsNode(.., 'mathml'))"
           then:
           - with:
               variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]           # phrase('in' the denominator)
@@ -1415,8 +1417,12 @@
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
       then:
-      - t: "cannot move left, start of math"                      # phrase('cannot move left, start of math')
-      - pause: medium
+      - t: "cannot move left"                      # phrase('cannot move left')
+      - pause: short
+  - with:
+      variables: [Move2D: "'start of'", Child2D: "."]
+      replace: [x: "."]
+  - pause: long
   - set_variables: [SpeakExpression: "'false'"]
 
 - name: move-previous-auto-zoom-up-one-level
@@ -1555,7 +1561,7 @@
       then: [x: "preceding-sibling::*[1]"]
       else:
       - test:
-          if: "IsNode(.., '2D')"
+          if: "IsNode(.., '2D') or not(IsNode(.., 'mathml'))"
           then:
           - with:
               variables: [Move2D: "'in'", Child2D: "preceding-sibling::*[1]"]           # phrase('in' the denominator)
