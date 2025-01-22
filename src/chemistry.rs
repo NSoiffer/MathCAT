@@ -542,7 +542,7 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
             }
         }
         return false;
-    } else if IsNode::is_scripted(&mathml) &&
+    } else if IsNode::is_scripted(mathml) &&
               name(&as_element(mathml.children()[0])) == "mi" &&
               as_element(mathml.children()[0]).attribute(SPLIT_TOKEN).is_some() {
         // Undo a split that happened in a scripted element.

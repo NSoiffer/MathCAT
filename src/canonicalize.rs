@@ -12,7 +12,7 @@ use std::cell::RefCell;
 use sxd_document::dom::*;
 use sxd_document::QName;
 use phf::{phf_map, phf_set};
-use crate::xpath_functions::{IsBracketed, is_leaf, IsNode, is_modified};
+use crate::xpath_functions::{IsBracketed, is_leaf, IsNode};
 use std::ptr::eq as ptr_eq;
 use crate::pretty_print::*;
 use regex::Regex;
@@ -601,15 +601,6 @@ impl CanonicalizeContext {
 
 	/// Return an error is some element is not MathML (only look at first child of <semantics>) or if it has the wrong number of children
 	fn assure_mathml(mathml: Element) -> Result<()> {
-		static ALL_MATHML_ELEMENTS: phf::Set<&str> = phf_set!{
-			"mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph",
-			"mfrac", "mroot", "msub", "msup", "msubsup","munder", "mover", "munderover", "mmultiscripts",
-			"mstack", "mlongdiv", "msgroup", "msrow", "mscarries", "mscarry", "msline",
-			"none", "mprescripts", "malignmark", "maligngroup",
-			"math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd", "mstyle",
-			"mrow", "mfenced", "mtable", "mtr", "mlabeledtr",
-		};
-
 		let n_children = mathml.children().len();
 		let element_name = name(&mathml);
 		if is_leaf(mathml) {
@@ -664,7 +655,7 @@ impl CanonicalizeContext {
 				return CanonicalizeContext::assure_mathml(presentation_element);
 			}
 		}
-		if !ALL_MATHML_ELEMENTS.contains(element_name) {
+		if !IsNode::is_mathml(mathml) {
 			if element_name == "annotation-xml" {
 				bail!("'annotation-xml' element is not child of 'semantics' element");
 			} else {
@@ -1064,7 +1055,6 @@ impl CanonicalizeContext {
 					let merged = merge_dots(mathml);	// FIX -- switch to passing in children
 					let merged = merge_primes(merged);
 					let merged = merge_chars(merged, &IS_UNDERSCORE);
-					let merged = merge_cross_or_dot_product_elements(merged);
 					handle_pseudo_scripts(merged)
 				} else {
 					mathml
@@ -1128,6 +1118,7 @@ impl CanonicalizeContext {
 				if element_name == "mrow" || ELEMENTS_WITH_ONE_CHILD.contains(element_name) {
 					merge_number_blocks(self, mathml, &mut children);
 					merge_whitespace(&mut children);
+					merge_cross_or_dot_product_elements(&mut children);
 					handle_convert_to_mmultiscripts(&mut children);
 				} else if element_name == "msub" || element_name == "msup" || 
 						  element_name == "msubsup" || element_name == "mmultiscripts"{
@@ -1170,7 +1161,7 @@ impl CanonicalizeContext {
 					clean_chemistry_mrow(mathml);
 				}
 				self.assure_nary_tag_has_one_child(mathml);
-				if crate::xpath_functions::IsNode::is_2D(&mathml) {
+				if crate::xpath_functions::IsNode::is_2D(mathml) {
 					CanonicalizeContext::mark_empty_content(mathml);
 				}
 
@@ -1390,7 +1381,7 @@ impl CanonicalizeContext {
 		///   attach any postscript to the last element in mrow
 		/// Return the modified element (which might now be an mrow)
 		fn attach_scripts_to_split_element(mathml: Element) -> Element {
-			if !IsNode::is_scripted(&mathml) {
+			if !IsNode::is_scripted(mathml) {
 				return mathml;
 			}
 			let base = as_element(mathml.children()[0]);
@@ -2305,11 +2296,9 @@ impl CanonicalizeContext {
 		/// curl and divergence are handled as two character operators
 		/// if found, merge them into their own (new) mrow that has an intent on it
 		/// we can have '∇' or '𝛁', or those as vectors (inside an mover)
-		fn merge_cross_or_dot_product_elements(mrow: Element) -> Element {
-			let mut children = mrow.children();
+		fn merge_cross_or_dot_product_elements(children: &mut Vec<ChildOfElement>) {
 			let mut i = 0;
 			let mut is_previous_nabla = false;
-			let mut is_changed = false;
 			while i < children.len() - 1 {
 				let child = as_element(children[i]);
 				if is_previous_nabla {
@@ -2324,7 +2313,6 @@ impl CanonicalizeContext {
 							new_mrow.append_child(child);
 							children[i-1] = ChildOfElement::Element(new_mrow);
 							children.remove(i);
-							is_changed = true;
 						}
 					}
 					is_previous_nabla = false;
@@ -2339,10 +2327,6 @@ impl CanonicalizeContext {
 				}
 				i += 1;
 			}
-			if is_changed {
-				mrow.replace_children(children);
-			}
-			return mrow;
 		}
 
 		fn merge_dots(mrow: Element) -> Element {
@@ -2464,7 +2448,7 @@ impl CanonicalizeContext {
 				if  is_first_child {
 					return mrow;	// FIX: what should happen
 				}
-				if crate::xpath_functions::IsNode::is_scripted(&parent) {
+				if crate::xpath_functions::IsNode::is_scripted(parent) {
 					return mrow;		// already in a script position
 				}
 				if name(&parent) == "mrow" {
@@ -4190,7 +4174,7 @@ fn create_mo<'a, 'd:'a>(doc: Document<'d>, ch: &'a str, attr_value: &str) -> Ele
 /// return 'node' or if it is adorned, return its base (recursive)
 pub fn get_possible_embellished_node(node: Element) -> Element {
 	let mut node = node;
-	while is_modified(node) {
+	while IsNode::is_modified(node) {
 		node = as_element(node.children()[0]);
 	}
 	return node;

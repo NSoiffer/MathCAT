@@ -305,15 +305,35 @@ impl IsNode {
         }
     }
 
-    #[allow(non_snake_case)]
-    pub fn is_2D(elem: &Element) -> bool {
-        return MATHML_2D_NODES.contains(elem.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(elem)));
+    pub fn is_mathml(elem: Element) -> bool {
+        // doesn't check MATHML_NAME_ATTR because we are interested in if it is an intent.
+        return ALL_MATHML_ELEMENTS.contains(name(&elem));
     }
 
-    pub fn is_scripted(elem: &Element) -> bool {
-        return MATHML_SCRIPTED_NODES.contains(elem.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(elem)));
+    #[allow(non_snake_case)]
+    pub fn is_2D(elem: Element) -> bool {
+        return MATHML_2D_NODES.contains(elem.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&elem)));
     }
-}
+
+    pub fn is_scripted(elem: Element) -> bool {
+        return MATHML_SCRIPTED_NODES.contains(elem.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&elem)));
+    }
+
+    pub fn is_modified(elem: Element) -> bool {
+        return MATHML_MODIFIED_NODES.contains(elem.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&elem)));
+    }
+    }
+
+/// All MathML elements, including a few that get cleaned away
+/// "semantics", "annotation-xml", "annotation" and Content MathML are not included
+static ALL_MATHML_ELEMENTS: phf::Set<&str> = phf_set!{
+    "mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph",
+    "mfrac", "mroot", "msub", "msup", "msubsup","munder", "mover", "munderover", "mmultiscripts",
+    "mstack", "mlongdiv", "msgroup", "msrow", "mscarries", "mscarry", "msline",
+    "none", "mprescripts", "malignmark", "maligngroup",
+    "math", "msqrt", "merror", "mpadded", "mphantom", "menclose", "mtd", "mstyle",
+    "mrow", "mfenced", "mtable", "mtr", "mlabeledtr",
+};
 
 static MATHML_LEAF_NODES: phf::Set<&str> = phf_set! {
 	"mi", "mo", "mn", "mtext", "ms", "mspace", "mglyph",
@@ -332,11 +352,6 @@ static MATHML_2D_NODES: phf::Set<&str> = phf_set! {
 static MATHML_MODIFIED_NODES: phf::Set<&str> = phf_set! {
     "msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts",
 };
-
-pub fn is_modified(element: Element) -> bool {
-    return MATHML_MODIFIED_NODES.contains(element.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&element)));
-}
-
 
 // Should mstack and mlongdiv be included here?
 static MATHML_SCRIPTED_NODES: phf::Set<&str> = phf_set! {
@@ -362,7 +377,7 @@ impl Function for IsNode {
         // FIX: there is some conflict problem with xpath errors and error-chain
         //                .chain_err(|e| format!("Second arg to is_leaf is not a string: {}", e.to_string()))?;
         match kind.as_str() {
-            "simple" | "leaf" | "common_fraction" | "2D" | "modified" | "scripted" => (), 
+            "simple" | "leaf" | "common_fraction" | "2D" | "modified" | "scripted" | "mathml" => (), 
             _ => return Err( Error::Other(format!("Unknown argument value '{}' for IsNode",  kind.as_str())) ),
         };
 
@@ -378,9 +393,10 @@ impl Function for IsNode {
                             match kind.as_str() {
                                 "simple" => IsNode::is_simple(e),
                                 "leaf"   => is_leaf_any_name(e),
-                                "2D" => IsNode::is_2D(&e),
-                                "modified" => MATHML_MODIFIED_NODES.contains(e.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&e))),
-                                "scripted" => MATHML_SCRIPTED_NODES.contains(e.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&e))),
+                                "2D" => IsNode::is_2D(e),
+                                "modified" => IsNode::is_modified(e),
+                                "scripted" => IsNode::is_scripted(e),
+                                "mathml" => IsNode::is_mathml(e),
                                 "common_fraction" => IsNode::is_common_fraction(e, usize::MAX, usize::MAX), 
                                 _        => true,       // can't happen due to check above
                             }    
@@ -1080,11 +1096,11 @@ impl DistanceFromLeaf {
         let mut element = element;
         let mut distance = 1;
         loop {
-            // debug!("distance -- element: {}", mml_to_string(&element));
+            debug!("distance={} -- element: {}", distance, mml_to_string(&element));
             if is_leaf(element) {
                 return distance;
             }
-            if treat_2d_elements_as_tokens && IsNode::is_2D(&element) {
+            if treat_2d_elements_as_tokens && (IsNode::is_2D(element) || !IsNode::is_mathml(element)) {
                 return distance;
             }
             let children = element.children();
@@ -1160,7 +1176,7 @@ impl EdgeNode {
 
         // at an edge -- check to see the parent is desired root
         if parent_name == stop_node_name || 
-           (stop_node_name == "2D" && IsNode::is_2D(&parent)) {
+           (stop_node_name == "2D" && IsNode::is_2D(parent)) {
             return Some(parent);
         };
         
