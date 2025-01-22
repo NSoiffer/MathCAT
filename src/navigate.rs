@@ -117,7 +117,7 @@ impl NavigationState {
             #[cfg(not(target_family = "wasm"))]
             where_am_i_start_time: Instant::now(),      // need to give it some value, and "default()" isn't an option
             mode: "".to_string(),                       // set latter when we have some context
-            speak_overview: false,                      // FIX should be $Overview
+            speak_overview: false,                      // set latter when we have some context
         };
     }
 
@@ -372,6 +372,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), "");
             
             nav_state.mode = rules.pref_manager.as_ref().borrow().pref_to_string("NavMode");
+            nav_state.speak_overview = rules.pref_manager.as_ref().borrow().pref_to_string("Overview") == "true";
 
             nav_state.init_navigation_context(rules_with_context.get_context(), nav_command, nav_state.top());
             
