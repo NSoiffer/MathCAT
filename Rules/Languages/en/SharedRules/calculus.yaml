@@ -2,13 +2,23 @@
 
 - name: laplacian
   tag: laplacian
-  match: "."
+  match: "count(*) <= 1"   # can be on ∇^2 or on enclosing mrow
   replace:
-  - t: "laplacian of"      # phrase(systems 'of' linear equations)
+  - t: "LahPlahsian"      # phrase('laplacian' of x)  -- "LahPlahsian" sounds better with speech engines tested
+  - test:
+      if: "count(*) = 1"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: [t: "of"]             # phrase('div' is short for divergence) -- note OneCore voices spell out "div"
+      - test:
+          if: "not(IsNode(*[1], 'leaf'))"
+          then: [pause: short]
+      - x: "*[1]"
 
 - name: divergence
   tag: divergence
-  match: "."
+  match: "count(*) = 1"
   replace:
   - test:
       if: "$Verbosity='Terse'"
@@ -21,7 +31,7 @@
 
 - name: curl
   tag: curl
-  match: "."
+  match: "count(*) = 1"
   replace:
   - t: "curl"      # phrase(the 'curl of' a field)
   - test:
@@ -34,7 +44,7 @@
 
 - name: gradient
   tag: gradient
-  match: "."
+  match: "count(*) = 1"
   replace:
   - test:
       if: "$Verbosity!='Terse'"

@@ -124,15 +124,23 @@
   match: "."
   variables: [OperatorName: "IfThenElse($Verbosity='Terse', 'dot', 'dot product')"]
   replace:
-  - insert:
-      nodes: "*"
-      replace: [x: "$OperatorName", pause: auto]
+  - test:
+      if: "*"
+      then:
+      - insert:
+          nodes: "*"
+          replace: [x: "$OperatorName", pause: auto]
+      else: [x: "$OperatorName", pause: auto]
 
 - name: default
   tag: cross-product
   match: "."
   variables: [OperatorName: "IfThenElse($Verbosity='Terse', 'cross', 'cross product')"]
   replace:
-  - insert:
-      nodes: "*"
-      replace: [x: "$OperatorName", pause: auto]
+  - test:
+      if: "*"
+      then:
+      - insert:
+          nodes: "*"
+          replace: [x: "$OperatorName", pause: auto]
+      else: [x: "$OperatorName", pause: auto]

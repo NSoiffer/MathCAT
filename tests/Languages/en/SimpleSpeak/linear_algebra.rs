@@ -58,3 +58,20 @@ fn norm_subscripted() {
 ";
   test("en", "SimpleSpeak", expr, "p norm of f");
 }
+
+#[test]
+fn not_gradient() {
+  // the nabla is at the end, so it can't be gradient because it doesn't operate on anything
+  let expr = r#"<math>
+  <mo>(</mo>
+  <mi>b</mi>
+  <mo>&#x22C5;</mo>
+  <mrow>
+    <mo>&#x2207;</mo>
+  </mrow>
+  <mo>)</mo>
+  <mi>a</mi>
+</math>
+"#;
+  test("en", "SimpleSpeak", expr, "open paren, b times nahblah, close paren; times eigh");
+}

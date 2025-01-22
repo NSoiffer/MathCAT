@@ -1,12 +1,26 @@
 ---
 -
   name: "laplacian"
-  tag: msup
-  match: "*[1][self::m:mo[.='∇' or .='𝛁']] and *[2][self::m:mn[.='2']]"
+  tag: mrow
+  match: "count(*)=2 and
+          *[1][self::m:msup and
+               *[1][ self::m:mo[.='∇' or .='𝛁'] or self::m:mover[*[1][.='∇'] and *[2][.='→' or .='⇀']] ] and
+               *[2][self::m:mn[.='2']]]"
   replace:
   - intent:
       name: "laplacian"
-      children: [x: "*[1]"]   # can't be empty, so we include the first child since at least it might be different
+      children: [x: "*[2]"]
+
+-
+  # could be stand alone operator -- catch this case
+  name: "laplacian"
+  tag: msup
+  match: "*[1][ self::m:mo[.='∇' or .='𝛁'] or self::m:mover[*[1][.='∇'] and *[2][.='→' or .='⇀']] ] and
+          *[2][self::m:mn[.='2']]"
+  replace:
+  - intent:
+      name: "laplacian"
+      children: []
 
 -
   name: divergence-and-curl
@@ -21,7 +35,7 @@
   name: gradient
   tag: mrow
   match: "count(*)=2 and 
-          *[1][ self::m:mo[.='∇' or .='𝛁'] or self::m:mover[*[1][.='∇' or .='𝛁'] and *[2][.='→' or .='⇀']] ] and
+          *[1][ self::m:mo[.='∇' or .='𝛁'] or self::m:mover[*[1][.='∇'] and *[2][.='→' or .='⇀']] ] and
           name(BaseNode(*[2])) != 'mo'"
   replace:
   - intent:

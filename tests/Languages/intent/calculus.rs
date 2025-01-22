@@ -6,19 +6,38 @@ use crate::common::*;
 #[test]
 fn laplacian() {
   let mathml = r#"<math>
-        <msup>
-            <mo>&#x2207;</mo>
-            <mn>2</mn>
-        </msup>
+        <msup> <mo>∇</mo> <mn>2</mn> </msup>
         <mi>&#x3C8;</mi>
     </math>"#;
   let intent = r#"<math data-from-mathml='math' >
-    <mrow data-from-mathml='mrow' data-changed='added'>
-      <laplacian data-from-mathml='msup'>
-        <mo data-from-mathml='mo'>∇</mo>
+      <laplacian data-from-mathml='mrow' data-changed='added'>
+        <mi data-from-mathml='mi'>ψ</mi>
       </laplacian>
-      <mi data-from-mathml='mi'>ψ</mi>
-    </mrow>
+   </math>"#;
+    test_intent(mathml, intent, vec![]);
+}
+
+#[test]
+fn laplacian_as_vector() {
+  let mathml = r#"<math>
+        <msup> <mover><mo>∇</mo><mo>&#x2192;</mo></mover> <mn>2</mn> </msup>
+        <mi>&#x3C8;</mi>
+    </math>"#;
+  let intent = r#"<math data-from-mathml='math' >
+      <laplacian data-from-mathml='mrow' data-changed='added'>
+        <mi data-from-mathml='mi'>ψ</mi>
+      </laplacian>
+   </math>"#;
+    test_intent(mathml, intent, vec![]);
+}
+
+#[test]
+fn laplacian_as_operator() {
+  let mathml = r#"<math>
+    <msup> <mo>𝛁</mo> <mn>2</mn> </msup>
+    </math>"#;
+  let intent = r#"<math data-from-mathml='math' >
+      <laplacian data-from-mathml='msup' />
    </math>"#;
     test_intent(mathml, intent, vec![]);
 }
