@@ -406,7 +406,7 @@
   replace:
   - intent:
       name: "unit"
-      attrs: "data-intent-property='\":unit:\"'"   # the value ":unit:" needs to be an xpath string, hence the escaped quotes
+      attrs: "id='@id' data-intent-property='\":unit:\"'"   # the value ":unit:" needs to be an xpath string, hence the escaped quotes
       children:
       - x: "text()"
 
@@ -428,7 +428,7 @@
   replace:
   - intent:
       name: "unit"
-      attrs: "data-intent-property='\":unit:\"'"   # the value ":unit:" needs to be an xpath string, hence the escaped quotes
+      attrs: "id='@id' data-intent-property='\":unit:\"'"   # the value ":unit:" needs to be an xpath string, hence the escaped quotes
       children:
       - x: "text()"
 
