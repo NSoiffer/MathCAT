@@ -479,7 +479,7 @@
   replace:
   #don't bother with MatchCounter since we only get here if > 1
   - test:
-      if: "DEBUG($ReadZoomLevel >= DistanceFromLeaf(DEBUG(.), false, $NavMode!='Character'))"
+      if: "DEBUG($ReadZoomLevel >= DistanceFromLeaf(., false, $NavMode!='Character'))"
       then:
       # - with:
       #     variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]    # phrase('in' the denominator)
@@ -596,11 +596,15 @@
 - name: move-to-start-or-end-2d
   tag: "*"
   match:
-  - "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and (IsNode(.., '2D') or not(IsNode(., 'mathml'))) and"
-  - "not( IsNode(., 'leaf') and (parent::m:msub or parent::m:msup or parent::m:msubsup or parent::m:mmultiscripts) )"
+  - "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and IsNode(DEBUG(..), '2D') and"
+  - "not( IsNode(., 'leaf') and"
+  - "     parent::*[1][self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or"
+  - "                  DEBUG(@data-from-mathml)='msub' or @data-from-mathml='msup' or"
+  - "                  @data-from-mathml='msubsup' or @data-from-mathml='mmultiscripts'"
+  - "                 ] )"
   replace:
   - test:
-      if: "$NavVerbosity = 'Verbose'"
+      if: "DEBUG($NavVerbosity = 'Verbose')"
       then:
       - test:
           if: "$NavCommand = 'MoveLineStart'"
@@ -619,7 +623,7 @@
         - with:
             variables: [NavCommand: "'MovePreviousZoom'"]
             replace: [x: "*[last()]"]
-      else: [set_variables: [NavNode: "@id"]]
+      else: [set_variables: [NavNode: "DEBUG(@id)"]]
 
 - name: move-to-start-or-end-default
   tag: "*"
