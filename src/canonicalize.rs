@@ -2297,6 +2297,9 @@ impl CanonicalizeContext {
 		/// if found, merge them into their own (new) mrow that has an intent on it
 		/// we can have '∇' or '𝛁', or those as vectors (inside an mover)
 		fn merge_cross_or_dot_product_elements(children: &mut Vec<ChildOfElement>) {
+			if children.is_empty() {
+				return;
+			}
 			let mut i = 0;
 			let mut is_previous_nabla = false;
 			while i < children.len() - 1 {
