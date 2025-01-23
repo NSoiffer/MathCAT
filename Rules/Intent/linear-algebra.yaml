@@ -82,8 +82,8 @@
   replace:
   - intent:
       name: "transpose"
-        attrs: "id='@id' data-fixity='\"prefix\"'"
-    children: [x: "*[1]"]
+      attrs: "id='@id' data-fixity='\"prefix\"'"
+      children: [x: "*[1]"]
 
 -
   name: trace
