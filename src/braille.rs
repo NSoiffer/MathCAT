@@ -411,7 +411,7 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
             let text = as_text(node);
             // len() is close since mn's probably have ASCII digits and lower case vars are common (count as) and other chars need extra braille chars
             // don't want to count invisible chars since they don't display and would give a length = 3
-            if text == "\u{2061}" || text == "\u{2062}"  {       // inivisble function apply/times (most common by far)
+            if text == "\u{2061}" || text == "\u{2062}"  {       // invisible function apply/times (most common by far)
                 return 0;
             }
             // FIX: this assumption is bad for 8-dot braille
@@ -1080,7 +1080,7 @@ fn capitals_to_word_mode(braille: &str) -> String {
             if find_next_char(&chars[next_non_cap..], 'C').is_some() { // next letter sequence "C..."
                 if is_next_char_start_of_section_12_modifier(&chars[next_non_cap+1..]) {
                     // to me this is tricky -- section 12 modifiers apply to the previous item
-                    // the last clause of the "item" def is the previous adividual symbol" which ICEB 2.1 say is:
+                    // the last clause of the "item" def is the previous indivisible symbol" which ICEB 2.1 say is:
                     //   braille sign: one or more consecutive braille characters comprising a unit,
                     //     consisting of a root on its own or a root preceded by one or more
                     //     prefixes (also referred to as braille symbol)
@@ -1235,7 +1235,7 @@ fn remove_unneeded_mode_changes(raw_braille: &str, start_mode: UEB_Mode, start_d
     let mut cap_word_mode = false;     // only set to true in G2 to prevent contractions
     let mut result = String::default();
     let chars = raw_braille.chars().collect::<Vec<char>>();
-    let mut g1_word_indicator = Grade1WordIndicator::NotInChars;        // almost always true (and often irrelevent)
+    let mut g1_word_indicator = Grade1WordIndicator::NotInChars;        // almost always true (and often irrelevant)
     if mode == UEB_Mode::Grade2 || duration == UEB_Duration::Symbol {
         g1_word_indicator = use_g1_word_mode(&chars);
         if g1_word_indicator == Grade1WordIndicator::InWord {
@@ -1621,11 +1621,11 @@ fn handle_contractions(chars: &[char], mut result: String) -> String {
             Replacement{ pattern: to_unicode_braille("the"), replacement: "L⠮"},
             Replacement{ pattern: to_unicode_braille("with"), replacement: "L⠾"},
             
-            // 10.8: final-letter groupsigns (this need to preceed 'en' and any other shorter contraction)
+            // 10.8: final-letter group signs (this need to precede 'en' and any other shorter contraction)
             Replacement{ pattern: "(?P<s>L.)L⠍L⠑L⠝L⠞".to_string(), replacement: "${s}L⠰L⠞" }, // ment
             Replacement{ pattern: "(?P<s>L.)L⠞L⠊L⠕L⠝".to_string(), replacement: "${s}L⠰L⠝" } ,// tion
 
-            // 10.4: Strong groupsigns
+            // 10.4: Strong group signs
             Replacement{ pattern: to_unicode_braille("ch"), replacement: "L⠡"},
             Replacement{ pattern: to_unicode_braille("gh"), replacement: "L⠣"},
             Replacement{ pattern: to_unicode_braille("sh"), replacement: "L⠩"},
@@ -1639,7 +1639,7 @@ fn handle_contractions(chars: &[char], mut result: String) -> String {
             Replacement{ pattern: "(?P<s>L.)L⠊L⠝L⠛".to_string(), replacement: "${s}L⠬" },  // 'ing', not at start
             Replacement{ pattern: to_unicode_braille("ar"), replacement: "L⠜"},
 
-            // 10.6.5: Lower groupsigns preceeded and followed by letters
+            // 10.6.5: Lower group signs preceded and followed by letters
             // FIX: don't match if after/before a cap letter -- can't use negative pattern (?!...) in regex package
             // Note: removed cc because "arccos" shouldn't be contracted (10.11.1), but there is no way to know about compound words
             // Add it back after implementing a lookup dictionary of exceptions
@@ -1649,7 +1649,7 @@ fn handle_contractions(chars: &[char], mut result: String) -> String {
             Replacement{ pattern: "(?P<s>L.)L⠋L⠋(?P<e>L.)".to_string(), replacement: "${s}L⠖${e}" },  // ff
             Replacement{ pattern: "(?P<s>L.)L⠛L⠛(?P<e>L.)".to_string(), replacement: "${s}L⠶${e}" },  // gg
 
-            // 10.6.8: Lower groupsigns ("in" also 10.5.4 lower wordsigns)
+            // 10.6.8: Lower group signs ("in" also 10.5.4 lower word signs)
             // FIX: these need restrictions about only applying when upper dots are present
             Replacement{ pattern: to_unicode_braille("en"), replacement: "⠢"},
             Replacement{ pattern: to_unicode_braille("in"), replacement: "⠔"},
@@ -1967,7 +1967,7 @@ static FINNISH_INDICATOR_REPLACEMENTS: phf::Map<&str, &str> = phf_map! {
     "-" => "-",     // hyphen
     "—" => "⠠⠤",   // normal dash (2014) -- assume all normal dashes are unified here [RUEB appendix 3]
     "―" => "⠐⠠⠤",  // long dash (2015) -- assume all long dashes are unified here [RUEB appendix 3]
-    "(" => "⠦",     // Not really needed, but done for consistancy with ")"
+    "(" => "⠦",     // Not really needed, but done for consistency with ")"
     ")" => "⠴",     // Needed for rules with drop numbers to avoid mistaking for dropped 0
     "↑" => "⠬",     // superscript
     "↓" => "⠡",     // subscript
@@ -2115,7 +2115,7 @@ fn ASCIIMath_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String)
         static ref COLLAPSE_SPACES: Regex = Regex::new(r" +").unwrap();
     }
     // debug!("ASCIIMath_cleanup: start={}", raw_braille);
-    let result  = raw_braille.replace("|𝐖__|", "|𝐰__|");    // protect the whitespace to prevent misintrepretation as lfloor
+    let result  = raw_braille.replace("|𝐖__|", "|𝐰__|");    // protect the whitespace to prevent misinterpretation as lfloor
     let result = result.replace('𝐖', " ");
     let result = COLLAPSE_SPACES.replace_all(&result, " ");
     // debug!("After collapse: {}", &result);
@@ -2698,8 +2698,8 @@ impl NeedsToBeGrouped {
         }
         return true;
 
-        fn is_integer(mathml: Element, decimal_serparator: char) -> bool {
-            return name(&mathml) == "mn" && !as_text(mathml).contains(decimal_serparator)
+        fn is_integer(mathml: Element, decimal_separator: char) -> bool {
+            return name(&mathml) == "mn" && !as_text(mathml).contains(decimal_separator)
         }
     }
 
@@ -2763,7 +2763,7 @@ impl NeedsToBeGrouped {
                 if name(&parent) == "mfrac" {
                     let children = mathml.children();
                     if mathml.preceding_siblings().is_empty() {
-                        // numerator: check for mulitplication -- doesn't need grouping in numerator
+                        // numerator: check for multiplication -- doesn't need grouping in numerator
                         if children.len() >= 3 {
                             let operator = as_element(children[1]);
                             if name(&operator) == "mo" {
