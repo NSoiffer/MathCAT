@@ -39,7 +39,7 @@
   name: ignore-punctuation
   tag: math
   match: "*[1][self::m:mrow and count(*)=2 and *[2][translate(.,'.,;:?', '')='']]"
-  variables: [TableProperty: "Grid"]
+  variables: [TableProperty: "''"]
   replace:
   - test:
       if: "*[1]/*[1]"
@@ -54,7 +54,7 @@
   name: default
   tag: math
   match: "."
-  variables: [TableProperty: "Grid"]
+  variables: [TableProperty: "''"]
   replace:
   - test:
       if: "*"
