@@ -21,7 +21,7 @@
   replace:
   - intent:
       name: "laplacian"
-      attrs: "id='@id' data-fixity='\"prefix\"'"
+      attrs: "id='@id'"
       children: []
 
 -
@@ -31,7 +31,7 @@
   replace:
   - intent:
       xpath-name: "IfThenElse(*[1]/*[2][.='×'] , 'curl', 'divergence')"
-      attrs: "id='@id' data-fixity='\"infix\"'"
+      attrs: "id='@id' data-fixity='\"prefix\"'"
       children: [x: "*[2]"]
 
 -
@@ -54,7 +54,7 @@
   replace:
   - intent:
       name: "modified-variable"
-      attrs: "id='@id'"
+      attrs: "id='@id' data-fixity='\"prefix\"'"
       children:
       - x: "*[1]"
       - x: "*[2]"
