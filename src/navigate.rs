@@ -431,7 +431,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?
         };
         let start_node = get_start_node(intent, nav_state)?;
-        // debug!("start_node\n{}", mml_to_string(&start_node));
+        debug!("start_node\n{}", mml_to_string(&start_node));
 
         let raw_speech_string = rules_with_context.match_pattern::<String>(start_node)
                     .chain_err(|| "Pattern match/replacement failure during math navigation!")?;
@@ -441,22 +441,22 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                                                 .replace(CONCAT_INDICATOR, "")                            
                                     )
                     .trim());
-        // debug!("Nav Speech: {}", speech);
+        debug!("Nav Speech: {}", speech);
 
         // FIX: add things that need to do a speech replacement based on some marker for "where am i" and others that loop ([Speak: id])???
         // what else needs to be done/set???
 
         // transfer some values that might have been set into the prefs
         let context = rules_with_context.get_context();
-        nav_state.speak_overview = context_get_variable(context, "Overview", mathml)?.0.unwrap() == "true";
-        nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
+        nav_state.speak_overview = context_get_variable(context, "Overview", intent)?.0.unwrap() == "true";
+        nav_state.mode = context_get_variable(context, "NavMode", intent)?.0.unwrap();
         rules.pref_manager.as_ref().borrow_mut().set_user_prefs("NavMode", &nav_state.mode)?;
 
-        let nav_position = match context_get_variable(context, "NavNode", mathml)?.0 {
+        let nav_position = match context_get_variable(context, "NavNode", intent)?.0 {
             None => NavigationPosition::default(),
             Some(node) => NavigationPosition {
                 current_node: node,
-                current_node_offset: context_get_variable(context, "NavNodeOffset", mathml)?.1.unwrap() as usize
+                current_node_offset: context_get_variable(context, "NavNodeOffset", intent)?.1.unwrap() as usize
             }
         };
 
@@ -482,17 +482,17 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         }
 
         if nav_command.starts_with("SetPlacemarker") {
-            if let Some(new_node_id) = context_get_variable(context, "NavNode", mathml)?.0 {
-                let offset = context_get_variable(context, "NavNodeOffset", mathml)?.1.unwrap() as usize;
+            if let Some(new_node_id) = context_get_variable(context, "NavNode", intent)?.0 {
+                let offset = context_get_variable(context, "NavNodeOffset", intent)?.1.unwrap() as usize;
                 nav_state.place_markers[convert_last_char_to_number(nav_command)] = NavigationPosition{ current_node: new_node_id, current_node_offset: offset};
             }
         }
 
-        let nav_mathml = get_node_by_id(mathml, &nav_position.current_node);
-        if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", mathml)?.0.unwrap() == "true" {
+        let nav_mathml = get_node_by_id(intent, &nav_position.current_node);
+        if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", intent)?.0.unwrap() == "true" {
             // Speak/Overview of where we landed (if we are supposed to speak it)
-            let node_speech = speak(mathml, nav_position.current_node, use_read_rules)?;
-            // debug!("node_speech: '{}'", node_speech);
+            let node_speech = speak(mathml, intent, nav_position.current_node, use_read_rules)?;
+            debug!("node_speech: '{}'", node_speech);
             if node_speech.is_empty() {
                 // try again in loop
                 return Ok( (speech, false));
@@ -530,17 +530,15 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
     }
 }
 
-fn speak(mathml: Element, nav_node_id: String, full_read: bool) -> Result<String> {
+fn speak(mathml: Element, intent: Element, nav_node_id: String, full_read: bool) -> Result<String> {
     if full_read {
-        let new_package = Package::new();
-        let intent = crate::speech::intent_from_mathml(mathml, new_package.as_document())?;
-
         // In something like x^3, we might be looking for the '3', but it will be "cubed", so we don't find it.
         // Or we might be on a "(" surrounding a matrix and that isn't part of the intent
         // We are probably safer in terms of getting the same speech if we retry intent starting at the nav node,
         //  but the node to speak is almost certainly trivial.
         // By speaking the non-intent tree, we are certain to speak on the next try
         if get_node_by_id(intent, &nav_node_id).is_some() {
+            debug!("speak: intent=\n{}", mml_to_string(&intent));
             match crate::speech::speak_mathml(intent, &nav_node_id) {
                 Ok(speech) => return Ok(speech),
                 Err(e) => {
