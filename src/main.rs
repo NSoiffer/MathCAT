@@ -174,7 +174,7 @@ fn main() {
   //   </math>";
 
   let expr = r#"
-<math display='block' intent:>
+<math display='block'>
 <mi data-chem-element='3' id='id-5' data-id-added='true'>Co</mi>
 </math>
 

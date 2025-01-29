@@ -14,13 +14,13 @@ use sxd_document::dom::*;
 // }
 
 /// Pretty-print the MathML represented by `element`.
-pub fn mml_to_string(e: &Element) -> String {
+pub fn mml_to_string(e: Element) -> String {
     return format_element(e, 0);
 }
 
 /// Pretty-print the MathML represented by `element`.
 /// * `indent` -- the amount of indentation to start with
-pub fn format_element(e: &Element, indent: usize) -> String {
+pub fn format_element(e: Element, indent: usize) -> String {
     // let namespace = match e.name().namespace_uri() {
     //     None => "".to_string(),
     //     Some(prefix) => prefix.to_string() + ":",
@@ -47,7 +47,7 @@ pub fn format_element(e: &Element, indent: usize) -> String {
         // recurse on each Element child
         for c in e.children() {
             if let ChildOfElement::Element(e) = c {
-                answer += &format_element(&e, indent+1);
+                answer += &format_element(e, indent+1);
             }
         }
     }

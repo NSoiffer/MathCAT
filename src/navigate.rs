@@ -172,7 +172,7 @@ impl NavigationState {
             let (position, _) = self.top().unwrap();
             return match get_node_by_id(mathml, &position.current_node) {
                 None => bail!("internal error: id '{}' was not found in mathml:\n{}",
-                                position.current_node, mml_to_string(&mathml)),
+                                position.current_node, mml_to_string(mathml)),
                 Some(found) => Ok( (found, position.current_node_offset) )
             };
         }
@@ -267,7 +267,7 @@ pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -
     let node = get_node_by_id(mathml, &id);
     if let Some(node) = node {
         if !crate::xpath_functions::is_leaf(node) && offset != 0 {
-            bail!("Id {} is not a leaf in the MathML tree but has non-zero offset={}. Referenced MathML node is {}", id, offset, mml_to_string(&node));
+            bail!("Id {} is not a leaf in the MathML tree but has non-zero offset={}. Referenced MathML node is {}", id, offset, mml_to_string(node));
         }
         return NAVIGATION_STATE.with(|nav_state| {
             let mut nav_state = nav_state.borrow_mut();
@@ -279,7 +279,7 @@ pub fn set_navigation_node_from_id(mathml: Element, id: String, offset: usize) -
             return Ok( () );
         })
     } else {
-        bail!("Id {} not found in MathML {}", id, mml_to_string(&mathml));
+        bail!("Id {} not found in MathML {}", id, mml_to_string(mathml));
     }
 
 }
@@ -320,7 +320,7 @@ pub fn context_get_variable<'c>(context: &Context<'c>, var_name: &str, mathml: E
                             .for_each(|(i, node)| {
                                 match node {
                                     sxd_xpath::nodeset::Node::Element(mathml) =>
-                                        error_message += &format!("#{}:\n{}",i, mml_to_string(mathml)),
+                                        error_message += &format!("#{}:\n{}",i, mml_to_string(*mathml)),
                                     _ => error_message += &format!("'{:?}'", node),
                                 }   
                             })    
@@ -357,7 +357,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
 
     return NAVIGATION_STATE.with(|nav_state| {
         let mut nav_state = nav_state.borrow_mut();
-        // debug!("MathML: {}", mml_to_string(&mathml));
+        // debug!("MathML: {}", mml_to_string(mathml));
         if nav_state.position_stack.is_empty() {
             // initialize to root node
             nav_state.push(NavigationPosition{
@@ -431,7 +431,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?
         };
         let start_node = get_start_node(intent, nav_state)?;
-        debug!("start_node\n{}", mml_to_string(&start_node));
+        debug!("start_node\n{}", mml_to_string(start_node));
 
         let raw_speech_string = rules_with_context.match_pattern::<String>(start_node)
                     .chain_err(|| "Pattern match/replacement failure during math navigation!")?;
@@ -538,7 +538,7 @@ fn speak(mathml: Element, intent: Element, nav_node_id: String, full_read: bool)
         //  but the node to speak is almost certainly trivial.
         // By speaking the non-intent tree, we are certain to speak on the next try
         if get_node_by_id(intent, &nav_node_id).is_some() {
-            debug!("speak: intent=\n{}", mml_to_string(&intent));
+            debug!("speak: intent=\n{}", mml_to_string(intent));
             match crate::speech::speak_mathml(intent, &nav_node_id) {
                 Ok(speech) => return Ok(speech),
                 Err(e) => {

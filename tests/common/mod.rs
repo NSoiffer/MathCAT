@@ -201,11 +201,11 @@ pub fn test_intent(mathml: &str, target: &str, test_prefs: Vec<(&str, &str)>) {
     //    'id' and 'data-id-added'; leaving 'data-from-mathml' as that is used by the code
     clean_attrs(computed_intent);
 
-    match is_same_element(&computed_intent, &target) {
+    match is_same_element(computed_intent, target) {
         Ok(_) => return ,
         Err(e) => {
-            println!("target:\n{}", libmathcat::pretty_print::mml_to_string(&target));
-            println!("computed intent:\n{}", libmathcat::pretty_print::mml_to_string(&computed_intent));
+            println!("target:\n{}", libmathcat::pretty_print::mml_to_string(target));
+            println!("computed intent:\n{}", libmathcat::pretty_print::mml_to_string(computed_intent));
             panic!("{}", e)
         },
     }

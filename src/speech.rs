@@ -87,7 +87,7 @@ fn intent_rules<'m>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>,
     rules.with(|rules| {
         rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
-        // debug!("intent_rules:\n{}", mml_to_string(&mathml));
+        // debug!("intent_rules:\n{}", mml_to_string(mathml));
         let should_set_literal_intent = rules.pref_manager.borrow().pref_to_string("SpeechStyle").as_str() == "LiteralSpeak";
         let original_intent = mathml.attribute_value("intent");
         if should_set_literal_intent {
@@ -101,7 +101,7 @@ fn intent_rules<'m>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>,
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, doc, nav_node_id);
         let intent =  rules_with_context.match_pattern::<Element<'m>>(mathml)
                     .chain_err(|| "Pattern match/replacement failure!")?;
-        let answer = if name(&intent) == "TEMP_NAME" {   // unneeded extra layer
+        let answer = if name(intent) == "TEMP_NAME" {   // unneeded extra layer
             assert_eq!(intent.children().len(), 1);
             as_element(intent.children()[0])
         } else {
@@ -124,7 +124,7 @@ fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, math
     rules.with(|rules| {
         rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
-        // debug!("speak_rules:\n{}", mml_to_string(&mathml));
+        // debug!("speak_rules:\n{}", mml_to_string(mathml));
         let new_package = Package::new();
         let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id);
         let mut speech_string = rules_with_context.match_pattern::<String>(mathml)
@@ -613,20 +613,20 @@ impl Intent {
         let result = self.children.replace::<Element<'m>>(rules_with_context, mathml)
                     .chain_err(||"replacing inside 'intent'")?;
         let mut result = lift_children(result);
-        if name(&result) != "TEMP_NAME" && name(&result) != "Unknown" {
+        if name(result) != "TEMP_NAME" && name(result) != "Unknown" {
             // this case happens when you have an 'intent' replacement as a direct child of an 'intent' replacement
             let temp = create_mathml_element(&result.document(), "TEMP_NAME");
             temp.append_child(result);
             result = temp;
         }
         if let Some(intent_name) = &self.name {
-            result.set_attribute_value(MATHML_FROM_NAME_ATTR, name(&mathml));
+            result.set_attribute_value(MATHML_FROM_NAME_ATTR, name(mathml));
             set_mathml_name(result, intent_name.as_str());
         } else if let Some(my_xpath) = &self.xpath{    // self.xpath_name must be != None
             let xpath_value = my_xpath.evaluate(rules_with_context.get_context(), mathml)?;
             match xpath_value {
                 Value::String(intent_name) => {
-                    result.set_attribute_value(MATHML_FROM_NAME_ATTR, name(&mathml));
+                    result.set_attribute_value(MATHML_FROM_NAME_ATTR, name(mathml));
                     set_mathml_name(result, intent_name.as_str())
                 },
                 _ => bail!("'xpath-name' value '{}' was not a string", &my_xpath),
@@ -650,19 +650,19 @@ impl Intent {
             };
         }
 
-        // debug!("Result from 'intent:'\n{}", mml_to_string(&result));
+        // debug!("Result from 'intent:'\n{}", mml_to_string(result));
         return T::from_element(result);
 
 
         /// "lift" up the children any "TEMP_NAME" child -- could short circuit when only one child
         fn lift_children(result: Element) -> Element {
-            // debug!("lift_children:\n{}", mml_to_string(&result));
+            // debug!("lift_children:\n{}", mml_to_string(result));
             result.replace_children(
                 result.children().iter()
                     .map(|&child_of_element| {
                         match child_of_element {
                             ChildOfElement::Element(child) => {
-                                if name(&child) == "TEMP_NAME" {
+                                if name(child) == "TEMP_NAME" {
                                     assert_eq!(child.children().len(), 1);
                                     child.children()[0]
                                 } else {
@@ -1339,7 +1339,7 @@ impl SpeechPattern  {
 
         // debug!("\nis_match: pattern='{}'", self.pattern_name);
         // debug!("    pattern_expr {:?}", self.pattern);
-        // debug!("is_match: mathml is\n{}", mml_to_string(&mathml));
+        // debug!("is_match: mathml is\n{}", mml_to_string(mathml));
         return Ok(
             match self.pattern.evaluate(context, mathml)? {
                 Value::Boolean(b)       => b,
@@ -2330,7 +2330,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
     }
 
     pub fn match_pattern<T:TreeOrString<'c, 'm, T>>(&'r mut self, mathml: Element<'c>) -> Result<T> {
-        // debug!("Looking for a match for: \n{}", mml_to_string(&mathml));
+        // debug!("Looking for a match for: \n{}", mml_to_string(mathml));
         let tag_name = mathml.name().local_part();
         let rules = &self.speech_rules.rules;
 
@@ -2359,7 +2359,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         let speech_manager = self.speech_rules.pref_manager.borrow();
         let file_name = speech_manager.get_rule_file(&self.speech_rules.name);
         // FIX: handle error appropriately 
-        bail!("\nNo match found!\nMissing patterns in {} for MathML.\n{}", file_name.to_string_lossy(), mml_to_string(&mathml));
+        bail!("\nNo match found!\nMissing patterns in {} for MathML.\n{}", file_name.to_string_lossy(), mml_to_string(mathml));
     }
 
     fn find_match<T:TreeOrString<'c, 'm, T>>(&'r mut self, rule_vector: &[Box<SpeechPattern>], mathml: Element<'c>) -> Result<Option<T>> {
@@ -2397,7 +2397,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                             The patterns are in {}.\n",
                             pattern.pattern_name, pattern.tag_name,
                             pattern.replacements.pretty_print_replacements(),
-                            mml_to_string(&mathml), pattern.pattern,
+                            mml_to_string(mathml), pattern.pattern,
                             pattern.file_name
                         )
                     ))
@@ -2416,7 +2416,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                 The patterns are in {}.\n",
                 pattern.pattern_name, pattern.tag_name,
                 pattern.pattern,
-                mml_to_string(&mathml),
+                mml_to_string(mathml),
                 pattern.file_name
             );
         }
@@ -2568,7 +2568,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
 
         let result = create_mathml_element(&self.doc, "TEMP_NAME");    // FIX: what name should be used?
         result.append_children(children);
-        // debug!("replace_nodes_tree\n{}\n====>>>>>\n", mml_to_string(&result));
+        // debug!("replace_nodes_tree\n{}\n====>>>>>\n", mml_to_string(result));
         return Ok( result );
     }
 

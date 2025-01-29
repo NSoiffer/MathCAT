@@ -71,7 +71,7 @@ fn is_tag(e: Element, name: &str) -> bool {
 
 #[allow(non_snake_case)]
 // Same as 'is_tag', but for ChildOfElement
-fn is_COE_tag(coe: &ChildOfElement, name: &str) -> bool {
+fn is_COE_tag(coe: ChildOfElement, name: &str) -> bool {
     let element = coe.element();
     return element.is_some() && is_tag(element.unwrap(), name)
 }
@@ -125,7 +125,7 @@ impl IsNode {
         }
 
         // same as 'to_str' but for ChildOfElement
-        fn coe_to_str<'a>(coe: &'a ChildOfElement) -> &'a str {
+        fn coe_to_str(coe: ChildOfElement) -> &str {
             // typically usage assumes 'coe' is a leaf
             let element_node = coe.element();
             if let Some(e) = element_node {
@@ -170,7 +170,7 @@ impl IsNode {
             if is_tag(elem, "mrow") && elem.children().len() == 2 {
                 let children = elem.children();
                 // better be negative of something at this point...
-                if is_COE_tag(&children[0], "mo") && is_equal(&children[0], '-') &&
+                if is_COE_tag(children[0], "mo") && is_equal(children[0], '-') &&
                    children[1].element().is_some() && is_trivially_simple(children[1].element().unwrap()) {
                     return true;
                 }
@@ -186,7 +186,7 @@ impl IsNode {
         }
 
         // return true if ChildOfElement has exactly text 'ch'
-        fn is_equal(coe: &ChildOfElement, ch: char) -> bool {
+        fn is_equal(coe: ChildOfElement, ch: char) -> bool {
             return coe_to_str(coe).starts_with(ch);
         }
 
@@ -207,16 +207,16 @@ impl IsNode {
                     return false;
                 }
                 if children.len() == 5 && 
-                   ( (name(&first_child) == "negative" && !is_COE_tag(&first_child.children()[0], "mn")) ||
-                     (name(&first_child) == "mrow"     && !is_COE_tag(&first_child.children()[1], "mn")) ) {
+                   ( (name(first_child) == "negative" && !is_COE_tag(first_child.children()[0], "mn")) ||
+                     (name(first_child) == "mrow"     && !is_COE_tag(first_child.children()[1], "mn")) ) {
                     return false;      // '-x y z' is too complicated () -- -2 x y is ok
                 }
             }
 
-            if !(is_COE_tag(&children[1], "mo") && 
-                    is_equal(&children[1], '\u{2062}') &&
-                 is_COE_tag(&children[2], "mi") &&
-                    coe_to_str(&children[2]).len()==1 ) {
+            if !(is_COE_tag(children[1], "mo") && 
+                    is_equal(children[1], '\u{2062}') &&
+                 is_COE_tag(children[2], "mi") &&
+                    coe_to_str(children[2]).len()==1 ) {
                 return false;
             }
 
@@ -225,10 +225,10 @@ impl IsNode {
             }
 
             // len == 5
-            return  is_COE_tag(&children[3], "mo") && 
-                        is_equal(&children[3], '\u{2062}') &&       // invisible times
-                    is_COE_tag(&children[4], "mi") &&
-                        coe_to_str(&children[4]).len()==1 ;
+            return  is_COE_tag(children[3], "mo") && 
+                        is_equal(children[3], '\u{2062}') &&       // invisible times
+                    is_COE_tag(children[4], "mi") &&
+                        coe_to_str(children[4]).len()==1 ;
         }
 
         // return true if the mrow is var° or num°
@@ -236,9 +236,9 @@ impl IsNode {
             assert!( is_tag(mrow, "mrow") );
             let children = mrow.children();
             return children.len() == 2 &&
-                is_equal(&children[1], '°') &&
-                (is_COE_tag(&children[0], "mi") ||
-                 is_COE_tag(&children[0], "mn") );
+                is_equal(children[1], '°') &&
+                (is_COE_tag(children[0], "mi") ||
+                 is_COE_tag(children[0], "mn") );
         }
 
         // fn_name &af; [simple arg or (simple arg)]
@@ -248,11 +248,11 @@ impl IsNode {
             if children.len() != 3 {
                 return false;
             }
-            if !(is_COE_tag(&children[1], "mo") && 
-                 is_equal(&children[1], '\u{2061}') ) {    // invisible function application
+            if !(is_COE_tag(children[1], "mo") && 
+                 is_equal(children[1], '\u{2061}') ) {    // invisible function application
                 return false;
             }
-            if !is_COE_tag(&children[0], "mi") {
+            if !is_COE_tag(children[0], "mi") {
                 return false;
             }
             let function_arg = children[2].element().unwrap();
@@ -307,20 +307,20 @@ impl IsNode {
 
     pub fn is_mathml(elem: Element) -> bool {
         // doesn't check MATHML_FROM_NAME_ATTR because we are interested in if it is an intent.
-        return ALL_MATHML_ELEMENTS.contains(name(&elem));
+        return ALL_MATHML_ELEMENTS.contains(name(elem));
     }
 
     #[allow(non_snake_case)]
     pub fn is_2D(elem: Element) -> bool {
-        return MATHML_2D_NODES.contains(elem.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(&elem)));
+        return MATHML_2D_NODES.contains(elem.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(elem)));
     }
 
     pub fn is_scripted(elem: Element) -> bool {
-        return MATHML_SCRIPTED_NODES.contains(elem.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(&elem)));
+        return MATHML_SCRIPTED_NODES.contains(elem.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(elem)));
     }
 
     pub fn is_modified(elem: Element) -> bool {
-        return MATHML_MODIFIED_NODES.contains(elem.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(&elem)));
+        return MATHML_MODIFIED_NODES.contains(elem.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(elem)));
     }
     }
 
@@ -359,7 +359,7 @@ static MATHML_SCRIPTED_NODES: phf::Set<&str> = phf_set! {
 };
 
 pub fn is_leaf(element: Element) -> bool {
-    return MATHML_LEAF_NODES.contains(name(&element));
+    return MATHML_LEAF_NODES.contains(name(element));
 }
 
 impl Function for IsNode {
@@ -685,7 +685,7 @@ impl Function for ToCommonFraction {
         let node = validate_one_node(args.pop_nodeset()?, "ToCommonFraction")?;
         if let Node::Element(frac) = node {
             if !IsNode::is_common_fraction(frac, usize::MAX, usize::MAX) {
-                return Err( Error::Other( format!("ToCommonFraction -- argument is not an 'mfrac': {}': ", mml_to_string(&frac))) );
+                return Err( Error::Other( format!("ToCommonFraction -- argument is not an 'mfrac': {}': ", mml_to_string(frac))) );
             }
     
             // everything has been verified, so we can just get the pieces and ignore potential error results
@@ -755,7 +755,7 @@ struct BaseNode;
     /// Recursively find the base node
     /// The base node of a non scripted element is the element itself
     fn base_node(node: Element) -> Element {
-        let name = name(&node);
+        let name = name(node);
         if ["msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts"].contains(&name) {
             return BaseNode::base_node(as_element(node.children()[0]));
         } else {
@@ -840,7 +840,7 @@ struct Debug;
                         .for_each(|(i, node)| {
                             match node {
                                 Node::Element(mathml) => debug!("#{}:\n{}",
-                                        i, mml_to_string(mathml)),
+                                        i, mml_to_string(*mathml)),
                                 _ => debug!("'{:?}'", node),
                             }   
                         })    
@@ -873,10 +873,10 @@ impl IsBracketed {
 
         let first_child = as_element(children[0]);
         let last_child = as_element(children[children.len()-1]);
-        // debug!("first_child: {}", crate::pretty_print::mml_to_string(&first_child));
-        // debug!("last_child: {}", crate::pretty_print::mml_to_string(&last_child));
-        if (left.is_empty()  && (name(&first_child) != "mo" || !is_fence(first_child))) ||
-           (right.is_empty() && (name(&last_child) != "mo"  || !is_fence(last_child))) {
+        // debug!("first_child: {}", crate::pretty_print::mml_to_string(first_child));
+        // debug!("last_child: {}", crate::pretty_print::mml_to_string(last_child));
+        if (left.is_empty()  && (name(first_child) != "mo" || !is_fence(first_child))) ||
+           (right.is_empty() && (name(last_child) != "mo"  || !is_fence(last_child))) {
             return false;
         }
 
@@ -1096,7 +1096,7 @@ impl DistanceFromLeaf {
         let mut element = element;
         let mut distance = 1;
         loop {
-            // debug!("distance={} -- element: {}", distance, mml_to_string(&element));
+            // debug!("distance={} -- element: {}", distance, mml_to_string(element));
             if is_leaf(element) {
                 return distance;
             }
@@ -1144,13 +1144,13 @@ pub struct EdgeNode;
 impl EdgeNode {
     // Return the root of the ancestor tree if we are at the left/right side of a path from that to 'element'
     fn edge_node<'a>(element: Element<'a>, use_left_side: bool, stop_node_name: &str) -> Option<Element<'a>> {
-        let element_name = element.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(&element));
+        let element_name = element.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(element));
         if element_name == "math" {
             return Some(element);
         };
 
         let parent = get_parent(element);   // there is always a "math" node
-        let parent_name = parent.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(&parent));
+        let parent_name = parent.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(parent));
 
         // first check to see if we have the special case of punctuation as last child of math/mrow element
         // it only matters if we are looking at the right edge
@@ -1163,7 +1163,7 @@ impl EdgeNode {
         if !use_left_side && !element.following_siblings().is_empty() {  // not at right side
             // check for the special case that the parent is an mrow and the grandparent is <math> and we have punctuation
             let grandparent = get_parent(parent);
-            let grandparent_name = grandparent.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(&grandparent));
+            let grandparent_name = grandparent.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(grandparent));
             if grandparent_name == "math" &&
                parent_name == "mrow" && parent.children().len() == 2 {      // right kind of mrow
                 let text = get_text_from_element( as_element(parent.children()[1]) );

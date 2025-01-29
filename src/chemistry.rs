@@ -98,7 +98,7 @@ pub fn clean_chemistry_mrow(mathml: Element) {
     if is_chemistry_off(mathml) {
         return;
     }
-    // debug!("clean_chemistry_mrow:\n{}", mml_to_string(&mathml));
+    // debug!("clean_chemistry_mrow:\n{}", mml_to_string(mathml));
     let mut children = mathml.children().iter()
                 .map(|child| as_element(*child))
                 .collect::<Vec<Element>>();
@@ -128,7 +128,7 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
             continue;
         } else {
             let child = old_children[i];
-            let child_name = name(&child);
+            let child_name = name(child);
             if  child_name == "mi" || (child_name == "mtext" && as_text(child).len() < 4) {
                 // break mi/mtext that is done as "(g)", etc. Even if it isn't 'g', 'l', etc., it probably shouldn't be an mi/text.
                 let text = as_text(child);
@@ -150,7 +150,7 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
             } else if i + 2 < old_children.len() {
                 // wrap with an mrow if we are not already an 'mrow'
                 let parent = get_parent(child); // safe since 'math' is always at root
-                if !(name(&parent) == "mrow" && i == 0 && old_children.len() == 3) {
+                if !(name(parent) == "mrow" && i == 0 && old_children.len() == 3) {
                     if let Some(paren_mrow) = make_mrow(old_children[i..i+3].try_into().unwrap()) {
                         // debug!("make_mrow added mrow");
                         new_children.push(paren_mrow);
@@ -162,7 +162,7 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
             }
             if child_name == "mo" {
                 let likely_chemistry_op = likely_chem_formula_operator(child);
-                // debug!("clean_mrow_children_restructure_pass -- in mo: likely {}, {}", likely_chemistry_op, mml_to_string(&child));
+                // debug!("clean_mrow_children_restructure_pass -- in mo: likely {}, {}", likely_chemistry_op, mml_to_string(child));
                 if likely_chemistry_op >= 0 {
                     // if possible chemistry to left and right, then override text for operator lookup
                     // note: on the right, we haven't set chem flag for operators yet, so we skip them
@@ -170,13 +170,13 @@ fn clean_mrow_children_restructure_pass<'a>(old_children: &[Element<'a>]) -> Opt
                     let following = child.following_siblings();
                     if !preceding.is_empty() && preceding.iter().all(|&child| {
                         let child = as_element(child);
-                        name(&child)=="mn" || child.attribute(MAYBE_CHEMISTRY).is_some()}) &&
+                        name(child)=="mn" || child.attribute(MAYBE_CHEMISTRY).is_some()}) &&
                         !following.is_empty() && following.iter().all(|&child| {
                             let child = as_element(child);
-                            name(&child)=="mo" || name(&child)=="mn" || child.attribute(MAYBE_CHEMISTRY).is_some()
+                            name(child)=="mo" || name(child)=="mn" || child.attribute(MAYBE_CHEMISTRY).is_some()
                         }) {
                         // "=", etc., should be treated as high priority separators
-                        // debug!("clean_mrow_children_restructure: child = {}", mml_to_string(&child));
+                        // debug!("clean_mrow_children_restructure: child = {}", mml_to_string(child));
                         child.set_attribute_value(CHEMICAL_BOND, "true");
                         child.set_attribute_value(CHEM_FORMULA_OPERATOR, &likely_chemistry_op.to_string());
                         child.set_attribute_value(MAYBE_CHEMISTRY, &likely_chemistry_op.to_string());
@@ -247,7 +247,7 @@ fn clean_mrow_children_mark_pass(children: &[Element]) {
         let child = children[i];
         if child.attribute(MAYBE_CHEMISTRY).is_some()  {
             if start.is_none() {
-                if name(&child) == "mo" {
+                if name(child) == "mo" {
                     // debug!(" start.is_none(): removing MAYBE_CHEMISTRY on {}", as_text(child));
                     child.remove_attribute(MAYBE_CHEMISTRY);
                     child.remove_attribute(CHEM_FORMULA_OPERATOR);
@@ -271,10 +271,10 @@ fn clean_mrow_children_mark_pass(children: &[Element]) {
 
 
     fn remove_operators_at_end_of_sequence(children: &[Element], start: usize, end: usize) -> bool {
-        // debug!("  looking for ops at end of {}..{}, last is:{}", start, end, mml_to_string(&children[end-1]));
+        // debug!("  looking for ops at end of {}..{}, last is:{}", start, end, mml_to_string(children[end-1]));
         for stop in (start..end).rev() {
             let end_child = children[stop];
-            if name(&end_child) == "mo" {
+            if name(end_child) == "mo" {
                 end_child.remove_attribute(MAYBE_CHEMISTRY);
             } else {
                 return true;
@@ -295,7 +295,7 @@ fn clean_mrow_children_mark_pass(children: &[Element]) {
 /// Returns a Vec of the chemical elements or None. If a merge happened, the tree is altered.
 pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> {
     // gather up all the consecutive mi/mtext
-    if !(name(&mathml) == "mi" || name(&mathml) == "mtext") {
+    if !(name(mathml) == "mi" || name(mathml) == "mtext") {
         return None;       // do nothing
     }
 
@@ -309,7 +309,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
         return split_string_chem_element(&doc, mathml);
     }   
     let parent = get_parent(mathml);
-    let parent_name = name(&parent);
+    let parent_name = name(parent);
     if !(parent_name == "mrow" || parent_name == "math") {  // not canonicalized yet
         return None;    // only try to merge if in an mrow
     }
@@ -322,7 +322,7 @@ pub fn convert_leaves_to_chem_elements(mathml: Element) -> Option<Vec<Element>> 
             return None;
         }
         let second_element = as_element(following_siblings[0]);
-        let second_element_name = name(&second_element);
+        let second_element_name = name(second_element);
         if second_element_name != "mi" && second_element_name != "mtext" {
             return None;
         }
@@ -407,8 +407,8 @@ pub fn scan_and_mark_chemistry(mathml: Element) -> bool {
     }
 
     let child = as_element(mathml.children()[0]);
-    // debug!("scan_and_mark_chemistry:\n{}", mml_to_string(&child));
-    assert_eq!(name(&mathml), "math");
+    // debug!("scan_and_mark_chemistry:\n{}", mml_to_string(child));
+    assert_eq!(name(mathml), "math");
     let is_chemistry = if let Some(latex) = mathml.attribute_value("data-latex") {
         // MathJax v4 includes this really useful info -- if it starts \ce -- we have Chemistry
         // need to determine if it is an equation or a formula
@@ -425,7 +425,7 @@ pub fn scan_and_mark_chemistry(mathml: Element) -> bool {
             set_marked_chemistry_attr(child, CHEM_FORMULA);
         }
 
-        if name(&child) == "mrow" && child.attribute(CHEM_FORMULA).is_none() {
+        if name(child) == "mrow" && child.attribute(CHEM_FORMULA).is_none() {
             // can't be both an equation and a formula...
             let likelihood = likely_chem_equation(child);
             if is_chemistry || likelihood >= CHEMISTRY_THRESHOLD {
@@ -434,7 +434,7 @@ pub fn scan_and_mark_chemistry(mathml: Element) -> bool {
             }
         }
     }
-    // debug!("...after marking:\n{}", mml_to_string(&child));
+    // debug!("...after marking:\n{}", mml_to_string(child));
 
     if child.attribute(CHEM_FORMULA).is_none() && child.attribute(CHEM_EQUATION).is_none() {
         if !has_maybe_chemistry(mathml) {
@@ -458,7 +458,7 @@ fn get_marked_value(mathml: Element) -> Option<isize> {
 /// Sets the attr 'chem'
 /// Recurse through all the children that have MAYBE_CHEMISTRY set
 fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
-    let tag_name = name(&mathml);
+    let tag_name = name(mathml);
     if let Some(maybe_attr) = mathml.attribute(MAYBE_CHEMISTRY) {
         maybe_attr.remove_from_parent();
 
@@ -476,7 +476,7 @@ fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
                 if tag_name != "mrow" && chem != CHEM_FORMULA{
                     // look at base -- if an mi/mtext then this is really a chemical formula
                     let base = as_element(mathml.children()[0]);
-                    let base_name = name(&base);
+                    let base_name = name(base);
                     if base_name == "mi" || base_name == "mtext" {
                         chem_name = CHEM_FORMULA;
                     }
@@ -531,9 +531,9 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
             if let Err(err) = merge_element(mathml) {
                 panic!("{}", err);
             }
-            // debug!("After merge_element:{}", mml_to_string(&mathml));
+            // debug!("After merge_element:{}", mml_to_string(mathml));
             // let parent = get_parent(mathml);
-            // debug!("After merge_element: -- parent{}", mml_to_string(&parent));
+            // debug!("After merge_element: -- parent{}", mml_to_string(parent));
 
         } else if let Some(changed_value) = mathml.attribute_value(CHANGED_ATTR) {
             if changed_value == ADDED_ATTR_VALUE {
@@ -543,35 +543,35 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
         }
         return false;
     } else if IsNode::is_scripted(mathml) &&
-              name(&as_element(mathml.children()[0])) == "mi" &&
+              name(as_element(mathml.children()[0])) == "mi" &&
               as_element(mathml.children()[0]).attribute(SPLIT_TOKEN).is_some() {
         // Undo a split that happened in a scripted element.
         // We put the preceding elements into the base and call merge_element on the last element of the base
         // The first and/or the last child in the sequence could be a script that needs to be unwrapped
         let mut parent = get_parent(mathml);   // there is always a "math" node
-        // debug!("mathml:\n{}", mml_to_string(&mathml));
-        // debug!("parent before merge:\n{}", mml_to_string(&parent));
-        // debug!("grandparent before merge:\n{}", mml_to_string(&get_parent(parent)));
+        // debug!("mathml:\n{}", mml_to_string(mathml));
+        // debug!("parent before merge:\n{}", mml_to_string(parent));
+        // debug!("grandparent before merge:\n{}", mml_to_string(get_parent(parent)));
 
         let mut preceding_children = mathml.preceding_siblings();
         // could be no preceding children to canonicalization creating mrows (see issue #303), so might need to use parent, etc
         while preceding_children.is_empty() {
             preceding_children = parent.preceding_siblings();
             parent = get_parent(parent);
-            if name(&parent) == "math" {
+            if name(parent) == "math" {
                 // this shouldn't happen -- rather than crash, let's do something
-                error!("is_changed_after_unmarking_chemistry: error no preceding children to merge. mathml=\n{}", mml_to_string(&mathml));
+                error!("is_changed_after_unmarking_chemistry: error no preceding children to merge. mathml=\n{}", mml_to_string(mathml));
                 return false;
             }
         }
 
         // deal with the first element (if it needs unwrapping, it has only prescripts)
         let first_element_of_split = as_element(preceding_children[preceding_children.len()-1]);
-        if name(&first_element_of_split) == "mmultiscripts" {
+        if name(first_element_of_split) == "mmultiscripts" {
             // take the base and make it the first child of preceding_children (what will get merged)
             // put the rest of the elements (the prescripts) at the end of the parent last element (mathml) which must be an mmultiscripts
             let first_element_children = first_element_of_split.children();
-            assert_eq!(name(&mathml), "mmultiscripts");
+            assert_eq!(name(mathml), "mmultiscripts");
             let mut script_children = mathml.children();
             assert_eq!(script_children.len() % 2, 1);  // doesn't have <mprescripts/>
             preceding_children[0] = first_element_children[0];
@@ -586,7 +586,7 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
         let mut new_script_children = vec![ChildOfElement::Element(first_element_of_split)];
         new_script_children.append(&mut children_of_script);
         mathml.replace_children(new_script_children);     // temporarily has bad number of children 
-        // debug!("After making bad script:\n{}", mml_to_string(&mathml));
+        // debug!("After making bad script:\n{}", mml_to_string(mathml));
         if let Err(err) = merge_element(split_child) {
             panic!("{}", err);
         }
@@ -595,7 +595,7 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
         let mut answer = false;
         for child in mathml.children() {
             let child = as_element(child);
-            if name(&child) == "mtd" {
+            if name(child) == "mtd" {
                 assert_eq!(child.children().len(), 1);
                 // let mtd_child = as_element(child.children()[0]);
                 // if mtd_child.attribute(CHEM_FORMULA).is_none() && mtd_child.attribute(CHEM_EQUATION).is_none() {
@@ -607,7 +607,7 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
                 answer |= is_changed_after_unmarking_chemistry(child);
             }
         }
-        if name(&mathml) == "mrow" {
+        if name(mathml) == "mrow" {
             if let Some(changed_value) = mathml.attribute_value(CHANGED_ATTR) {
                 // we added an mrow, we can remove it -- but this might be already processed which is the case if "data-id-added" is true (exists)
                 if changed_value == ADDED_ATTR_VALUE && mathml.attribute("data-id-added").is_none() {
@@ -616,12 +616,12 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
                     // Although they would never be added, elements with fixed number of children also shouldn't have the mrow go away
                     // We are left with only removing mrows with one child or mrows that are children of mrows (simpler test than ELEMENTS_WITH_ONE_CHILD)
                     let parent = get_parent(mathml);   // mathml is mrow, so parent always exists
-                    if mathml.children().len() == 1 || name(&parent) == "mrow" {
-                        let children = mathml.children().iter().map(|&el| as_element(el)).collect::<Vec<Element>>();                        // debug!("is_changed_after_unmarking: before replace - mathml\n{}", mml_to_string(&mathml));
+                    if mathml.children().len() == 1 || name(parent) == "mrow" {
+                        let children = mathml.children().iter().map(|&el| as_element(el)).collect::<Vec<Element>>();                        // debug!("is_changed_after_unmarking: before replace - mathml\n{}", mml_to_string(mathml));
                         mathml.remove_attribute(CHANGED_ATTR);  // if just one child, the attrs are pushed onto the child
-                        // debug!("is_changed_after_unmarking: before replace - parent\n{}", mml_to_string(&parent));
+                        // debug!("is_changed_after_unmarking: before replace - parent\n{}", mml_to_string(parent));
                         replace_children(mathml, children);
-                        // debug!("is_changed_after_unmarking: parent\n{}", mml_to_string(&parent));
+                        // debug!("is_changed_after_unmarking: parent\n{}", mml_to_string(parent));
 
                     }
                 }
@@ -634,22 +634,22 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
     fn unmerge_element(mathml: Element) {
         // a merged token occurs when two single letters get merged into one. Here we recreate the two tokens
         assert!(is_leaf(mathml));
-        // debug!("unmerge_element: {}", mml_to_string(&mathml));
+        // debug!("unmerge_element: {}", mml_to_string(mathml));
         let mut token_str = as_text(mathml).chars();
-        let first = create_mathml_element(&mathml.document(), name(&mathml));
+        let first = create_mathml_element(&mathml.document(), name(mathml));
         first.set_text(&token_str.next().unwrap().to_string());
-        let second = create_mathml_element(&mathml.document(), name(&mathml));
+        let second = create_mathml_element(&mathml.document(), name(mathml));
         second.set_text(&token_str.next().unwrap().to_string());
         replace_children(mathml, vec![first, second]);
     }
 
     /// Put the split pieces back together (undo the split)
     fn merge_element(mathml: Element) -> Result<()> {
-        // debug!("merge_element: {}", mml_to_string(&mathml));
-        // debug!("merge_element parent: {}", mml_to_string(&get_parent(mathml)));
+        // debug!("merge_element: {}", mml_to_string(mathml));
+        // debug!("merge_element parent: {}", mml_to_string(get_parent(mathml)));
         assert!(is_leaf(mathml));
         let mut preceding_children = mathml.preceding_siblings();
-        // debug!("preceding_children: {}", preceding_children.iter().map(|&el| name(&as_element(el)).to_string()).collect::<Vec<String>>().join(", "));
+        // debug!("preceding_children: {}", preceding_children.iter().map(|&el| name(as_element(el)).to_string()).collect::<Vec<String>>().join(", "));
         if preceding_children.is_empty() {
             // handle:
             // * case where we have mi mmultiscripts mi ... where the second mi needs to join with the first (see test mhchem_so4)
@@ -657,10 +657,10 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
             let parent = get_parent(mathml);   // mathml is leaf, so parent always exists
             preceding_children = parent.preceding_siblings();
             if preceding_children.is_empty() ||
-               !(name(&parent) == "mmultiscripts" ||
-                (name(&parent) == "mrow" && parent.attribute_value(CHANGED_ATTR).is_some() &&
+               !(name(parent) == "mmultiscripts" ||
+                (name(parent) == "mrow" && parent.attribute_value(CHANGED_ATTR).is_some() &&
                  parent.attribute_value(CHANGED_ATTR).unwrap() == ADDED_ATTR_VALUE)) {
-                    bail!("Internal error: {} should not have been split'", mml_to_string(&mathml));
+                    bail!("Internal error: {} should not have been split'", mml_to_string(mathml));
             }
         }
         // Note: there was an invisible U+2063, but it was removed before we got here
@@ -670,14 +670,14 @@ fn is_changed_after_unmarking_chemistry(mathml: Element) -> bool {
         for &child in preceding_children.iter().rev() {
             let child = as_element(child);
             // because this is before canonicalization, there could be an mrow with just mi/mtext
-            if name(&child) == "mrow" && child.children().len() == 1 && child.attribute(INTENT_ATTR).is_none() {
+            if name(child) == "mrow" && child.children().len() == 1 && child.attribute(INTENT_ATTR).is_none() {
                 // "lift" the child up so all the links (e.g., siblings) are correct
                 let child = as_element(child.children()[0]);
-                set_mathml_name(child, name(&child));
+                set_mathml_name(child, name(child));
                 crate::canonicalize::add_attrs(child, &child.attributes());
                 child.replace_children(child.children());
             }
-            if name(&child) != "mi" && name(&child) != "mtext" {
+            if name(child) != "mi" && name(child) != "mtext" {
                 break;
             }
             merged_text.push(as_text(child));
@@ -706,10 +706,10 @@ fn is_chemistry_sanity_check(mathml: Element) -> bool {
     //   the exception is if there are prescripts, in which as we might have radioactive decay so we don't require the sets to be equal
     // * otherwise, we gather up all the chemical elements and make sure the set is non-empty
     // * if it isn't an mrow, we leave it to likely_chem_equation() to rule it out
-    assert_eq!(name(&mathml), "math");
+    assert_eq!(name(mathml), "math");
     assert_eq!(mathml.children().len(), 1);
     let mathml = as_element(mathml.children()[0]);
-    if name(&mathml) == "mrow" {
+    if name(mathml) == "mrow" {
         let mrow_children = mathml.children();
         if mrow_children.len() == 3 && is_arrow_or_equal(as_element(mrow_children[1])) {
             let mut lhs_elements = HashSet::with_capacity(8);   // likely more than anything we'll encounter -- bigger affects '=' op
@@ -732,7 +732,7 @@ fn is_chemistry_sanity_check(mathml: Element) -> bool {
     
     fn is_arrow_or_equal(mathml: Element) -> bool {
         let base = get_possible_embellished_node(mathml);
-        if name(&base) != "mo" || mathml.attribute(CHEMICAL_BOND).is_some() {
+        if name(base) != "mo" || mathml.attribute(CHEMICAL_BOND).is_some() {
             return false;
         }
         let text = as_text(base);
@@ -741,9 +741,9 @@ fn is_chemistry_sanity_check(mathml: Element) -> bool {
     }
 
     fn gather_chemical_elements<'a>(mathml: Element<'a>, chem_elements: &mut HashSet<&'a str>) -> bool {
-        match name(&mathml) {
+        match name(mathml) {
             "mi" | "mtext" => {
-                // debug!("gather_chemical_elements: {}", mml_to_string(&mathml));
+                // debug!("gather_chemical_elements: {}", mml_to_string(mathml));
                 if is_chemical_element(mathml) {
                     chem_elements.insert(as_text(mathml));
                 }
@@ -769,11 +769,11 @@ fn is_chemistry_sanity_check(mathml: Element) -> bool {
 /// Looks at the children of the element and uses heuristics to decide whether this is a chemical equation.
 /// This assumes canonicalization of characters has happened
 fn likely_chem_equation(mathml: Element) -> isize {
-    if name(&mathml) != "mrow" && name(&mathml) != "mtd" {
+    if name(mathml) != "mrow" && name(mathml) != "mtd" {
         return NOT_CHEMISTRY;
     }
 
-    // debug!("start likely_chem_equation:\n{}", mml_to_string(&mathml));
+    // debug!("start likely_chem_equation:\n{}", mml_to_string(mathml));
 	// mrow -- check the children to see if we are likely to be a chemical equation
 
     // possible improvement -- give bonus points for consecutive (not counting invisible separators) chemical elements on top of the existing points
@@ -795,7 +795,7 @@ fn likely_chem_equation(mathml: Element) -> isize {
 			}
             // otherwise, check the last element as normal
         }
-        let tag_name = name(&child);
+        let tag_name = name(child);
         let likely = match tag_name {
             "mi" => likely_chem_element(child),
             "mn" => 0,       // not much info
@@ -863,7 +863,7 @@ fn likely_chem_equation(mathml: Element) -> isize {
 
 /// could be a number, a state ("(l)", "(g)", etc), or a number followed by a state
 fn likely_chem_subscript(subscript: Element) -> isize {
-    let subscript_name = name(&subscript);
+    let subscript_name = name(subscript);
     if  subscript_name == "mn" && !as_text(subscript).contains('.') {
         return 0;       // not really much chem info about an integer subscript
     } else if subscript_name == "mi" {
@@ -873,15 +873,15 @@ fn likely_chem_subscript(subscript: Element) -> isize {
             return 2;
         }
     } else if subscript_name == "mrow" {
-        // debug!("likely_chem_subscript:\n{}", mml_to_string(&subscript));
+        // debug!("likely_chem_subscript:\n{}", mml_to_string(subscript));
         let children = subscript.children();
         if children.len() == 3 && IsBracketed::is_bracketed(subscript, "(", ")", false, true) {
             return likely_chem_subscript(as_element(children[1]));
         }
         let i_first_child = as_element(children[0]);
         if children.len() == 2 &&
-           name(&i_first_child) == "mn" && !as_text(i_first_child).contains('.') &&
-           name (&as_element(children[1])) == "mrow" &&
+           name(i_first_child) == "mn" && !as_text(i_first_child).contains('.') &&
+           name(as_element(children[1])) == "mrow" &&
            likely_chem_state(as_element(children[1])) > 0 { // notation used in en.wikipedia.org/wiki/Electrolyte#Formation
                 return 2;
         }     
@@ -910,7 +910,7 @@ fn likely_chem_superscript(sup: Element) -> isize {
         static ref SINGLE_PLUS_OR_MINUS_OR_DOT: Regex = Regex::new(r"^[+-\U{2212}⋅∙•]$").unwrap();
     }
     static DOTS: &[char; 3] = &['⋅', '∙', '•'];
-    let sup_name = name(&sup);
+    let sup_name = name(sup);
     if sup_name == "mo" && MULTIPLE_PLUS_OR_MINUS_OR_DOT.is_match(as_text(sup)) {
         if as_text(sup).find(DOTS).is_some() {
             sup.set_attribute_value(MAYBE_CHEMISTRY, "1");
@@ -927,7 +927,7 @@ fn likely_chem_superscript(sup: Element) -> isize {
         if children.len() == 2 {
             let first = as_element(children[0]);
             let second = as_element(children[1]);
-            if name(&first) == "mn" && name(&second) == "mo" && !as_text(first).contains('.') {
+            if name(first) == "mn" && name(second) == "mo" && !as_text(first).contains('.') {
                 let second_text = as_text(second);
                 if SINGLE_PLUS_OR_MINUS_OR_DOT.is_match(second_text) {
                     if second_text.find(DOTS).is_some() {
@@ -943,12 +943,12 @@ fn likely_chem_superscript(sup: Element) -> isize {
         let mut text = "".to_string();
         for child in &children {    // 'children' used later, so need to borrow rather than move
             let child = as_element(*child);
-            if name(&child) == "mo" {
+            if name(child) == "mo" {
                 text.push_str(as_text(child));
             } else {
                 // could have something like 'mrow(mrow 2n, -)  (chem example 5-9) -- so fallback to still ok if ends with + or -
                 let last_super_child = as_element(children[children.len()-1]);
-                if name(&last_super_child) == "mo" {
+                if name(last_super_child) == "mo" {
                     let text = as_text(last_super_child);
                     if text == "+" || text == "-" {
                         sup.set_attribute_value(MAYBE_CHEMISTRY, "3");
@@ -961,7 +961,7 @@ fn likely_chem_superscript(sup: Element) -> isize {
         if MULTIPLE_PLUS_OR_MINUS_OR_DOT.is_match(&text) {
             for child in children {
                 let child = as_element(child);
-                if name(&child) == "mo" && as_text(child).find(DOTS).is_some() {
+                if name(child) == "mo" && as_text(child).find(DOTS).is_some() {
                     child.set_attribute_value(MAYBE_CHEMISTRY, "1");
                     child.set_attribute_value(CHEM_FORMULA_OPERATOR, "1");   // value doesn't really matter
                 }
@@ -981,12 +981,12 @@ fn likely_chem_superscript(sup: Element) -> isize {
 /// * fences around a chemical formula
 /// * an mrow made up of only chemical formulas
 fn likely_chem_formula(mathml: Element) -> isize {
-    // debug!("start likely_chem_formula:\n{}", mml_to_string(&mathml));
+    // debug!("start likely_chem_formula:\n{}", mml_to_string(mathml));
     if let Some(value) = get_marked_value(mathml) {
         return value;       // already marked
     }
 
-    let tag_name = name(&mathml);
+    let tag_name = name(mathml);
     let likelihood = match tag_name {
         // a parent may clear the chem flags if something says can't be chemistry (e.g, a non chemically valid script)
         "mi" => likely_chem_element(mathml),
@@ -1035,14 +1035,14 @@ fn likely_chem_formula(mathml: Element) -> isize {
                     };
                 }
             }
-            // debug!("NOT_CHEMISTRY:\n{}", mml_to_string(&mathml));
+            // debug!("NOT_CHEMISTRY:\n{}", mml_to_string(mathml));
             NOT_CHEMISTRY
         }
     };
     if likelihood >= 0 {
         mathml.set_attribute_value(MAYBE_CHEMISTRY, &likelihood.to_string());
     }
-    // debug!("likely_chem_formula {}:\n{}", likelihood, mml_to_string(&mathml));
+    // debug!("likely_chem_formula {}:\n{}", likelihood, mml_to_string(mathml));
 
     return likelihood;
 
@@ -1052,7 +1052,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
         let mut mrow = mrow;
         if (IsBracketed::is_bracketed(mrow, "(", ")", false, false) ||
             IsBracketed::is_bracketed(mrow, "[", "]", false, false)) &&
-           name(&as_element(mrow.children()[1]))  == "mrow" {
+           name(as_element(mrow.children()[1]))  == "mrow" {
             mrow = as_element(mrow.children()[1]);
         }
 
@@ -1069,16 +1069,16 @@ fn likely_chem_formula(mathml: Element) -> isize {
             match likely.cmp(&0) {
                 Ordering::Greater => { 
                     likelihood += likely + last_was_likely_formula;
-                    last_was_likely_formula = if name(&child) == "mo" {0} else {1};
+                    last_was_likely_formula = if name(child) == "mo" {0} else {1};
                 },
                 Ordering::Less => {
-                    // debug!("in likely_chem_formula: FALSE: likelihood={}, child\n{}", likelihood, mml_to_string(&child));
+                    // debug!("in likely_chem_formula: FALSE: likelihood={}, child\n{}", likelihood, mml_to_string(child));
                     is_chem_formula = false;
                     last_was_likely_formula = 0;
                     likelihood += likely;
                 },
                 Ordering::Equal => {
-                    if name(&child) == "mo" {
+                    if name(child) == "mo" {
                         let text = as_text(child);
                         if text != "\u{2062}" && text != "\u{2063}" {   // one of these, we don't change the status
                             last_was_likely_formula = 0;
@@ -1086,7 +1086,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
                     }
                 },
             }
-            // debug!("in likely_chem_formula likelihood={}, child\n{}", likelihood, mml_to_string(&child));
+            // debug!("in likely_chem_formula likelihood={}, child\n{}", likelihood, mml_to_string(child));
             // debug!("   likelihood={} (likely={})", likelihood, likely);
         }
 
@@ -1099,7 +1099,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
             // the children may have looked have looked right, but something has said "not likely"
             return NOT_CHEMISTRY;
         } else if likelihood < CHEMISTRY_THRESHOLD && is_short_formula(mrow) {
-                    // debug!("is_short_formula is true for:\n{}", mml_to_string(&mrow));
+                    // debug!("is_short_formula is true for:\n{}", mml_to_string(mrow));
                     return CHEMISTRY_THRESHOLD
         }
         return likelihood;
@@ -1119,7 +1119,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
 /// Note: "(OH)" doesn't fit with the above, and Susan Jolly suggests allowing any sequence that ends with H, so we allow that.
 /// Also, Susan Jolly suggested allowing any compound with C, H, and O
 fn is_order_ok(mrow: Element) -> bool {
-    assert_eq!(name(&mrow), "mrow");
+    assert_eq!(name(mrow), "mrow");
     if let Some(elements) = collect_elements(mrow) {
         if elements.iter().any(|&e| !CHEMICAL_ELEMENT_ELECTRONEGATIVITY.contains_key(e)) {
             return false;
@@ -1180,11 +1180,11 @@ fn collect_elements(mrow: Element) -> Option<Vec<&str>> {
     let mut elements = Vec::with_capacity(mrow.children().len()/2+1);       // don't bother with slots for operators
     for child in mrow.children() {
         let child = as_element(child);
-        match name(&child) {
+        match name(child) {
             "mi" | "mtext" => elements.push(as_text(child)),
             "msub" | "msup" | "mmultiscripts" => {
                 let base = as_element(child.children()[0]);
-                let base_name = name(&base);
+                let base_name = name(base);
                 if base_name == "mi" || base_name == "mtext" {
                     elements.push(as_text(base));
                 }   // else skip and let recursive likely_chem_formula call check the contents
@@ -1244,15 +1244,15 @@ fn is_generalized_salt(elements: &[&str]) -> bool {
 /// Note: 'mathml' is not necessarily canonicalized   
 pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
     // some simple sanity checks on the scripts...
-    let tag_name = name(&mathml);
+    let tag_name = name(mathml);
     let children = mathml.children();
     let mut likelihood = 0;
     let mut is_empty_subscript = false;
-    // debug!("likely_adorned_chem_formula:\n{}", mml_to_string(&mathml));
+    // debug!("likely_adorned_chem_formula:\n{}", mml_to_string(mathml));
     if tag_name == "msub" || tag_name == "msubsup" {
         // subscripts should be just a number, although they could be 'n' or '2n' or other exprs.
         let subscript = as_element(children[1]);
-        is_empty_subscript = name(&subscript) == "mtext" && as_text(subscript).trim().is_empty();
+        is_empty_subscript = name(subscript) == "mtext" && as_text(subscript).trim().is_empty();
         if !is_empty_subscript {
             likelihood += likely_chem_subscript(subscript);
         }
@@ -1260,9 +1260,9 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
 
     let mut empty_superscript = false;
     if tag_name == "msup" || tag_name == "msubsup" {
-        // debug!("likely_adorned_chem_formula: mathml\n{}", mml_to_string(&mathml));
+        // debug!("likely_adorned_chem_formula: mathml\n{}", mml_to_string(mathml));
         let superscript = as_element(children[if tag_name == "msup" {1} else {2}]);
-        empty_superscript = name(&superscript) == "mtext" && as_text(superscript).trim().is_empty();
+        empty_superscript = name(superscript) == "mtext" && as_text(superscript).trim().is_empty();
         if !empty_superscript {
             likelihood += likely_chem_superscript(superscript);
         }
@@ -1277,10 +1277,10 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
 
         let prescripts;
         let postscripts;
-        if children.len() == 4 && name(&as_element(children[1]))=="mprescripts" { // just prescripts
+        if children.len() == 4 && name(as_element(children[1]))=="mprescripts" { // just prescripts
             prescripts = &children[2..4];
             postscripts = &children[0..0]; // empty
-        } else if children.len() == 6 && name(&as_element(children[3]))=="mprescripts" {  // pre and postscripts
+        } else if children.len() == 6 && name(as_element(children[3]))=="mprescripts" {  // pre and postscripts
             prescripts = &children[4..6];
             postscripts = &children[1..3]; // empty
         } else if children.len() == 3 || children.len() == 5 {   // just postscripts (simultaneous or offset)
@@ -1292,10 +1292,10 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
 
         if !prescripts.is_empty() {
             let pre_subscript = as_element(prescripts[0]);
-            let pre_subscript_name = name(&pre_subscript);
+            let pre_subscript_name = name(pre_subscript);
 
             let pre_superscript = as_element(prescripts[1]);
-            let pre_superscript_name = name(&pre_superscript);
+            let pre_superscript_name = name(pre_superscript);
 
             // deal with special case of 'e' with prescripts of -1 and 0
             if is_adorned_electron(children[0], prescripts) {
@@ -1314,7 +1314,7 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
                 if pre_subscript_name == "mn" {
                     // make sure the atomic number matches the base
                     let base = as_element(children[0]);
-                    let base_name = name(&base);
+                    let base_name = name(base);
                     if base_name == "mi" || base_name == "mtext" {
                         if let Some(atomic_number) = CHEMICAL_ELEMENT_ATOMIC_NUMBER.get(as_text(base)) {
                             if as_text(pre_subscript) == atomic_number.to_string() {
@@ -1332,13 +1332,13 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
             let mut i = 0;
             while i < postscripts.len() {
                 let sub = as_element(postscripts[i]);
-                // debug!("sub: {}", mml_to_string(&sub));
-                if name(&sub) != "none" {
+                // debug!("sub: {}", mml_to_string(sub));
+                if name(sub) != "none" {
                     likelihood += likely_chem_subscript(sub);
                 } 
                 let sup = as_element(postscripts[i+1]);
-                if name(&sup) != "none" {
-                    // debug!("sup: {}", mml_to_string(&sub));
+                if name(sup) != "none" {
+                    // debug!("sup: {}", mml_to_string(sub));
                     likelihood += likely_chem_superscript(sup);
                 }
                 i += 2;
@@ -1347,11 +1347,11 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
     }
 
     let base = as_element(children[0]);
-    let base_name = name(&base);
+    let base_name = name(base);
     if base_name == "mi" || base_name == "mtext" {
         likelihood += likely_chem_element(base);
     } else if base_name == "mrow" {
-        // debug!("mrow addition:\n{}", mml_to_string(&base));
+        // debug!("mrow addition:\n{}", mml_to_string(base));
         // a safe minor canonicalization that allows "short_form" calculations if appropriate
         if (IsBracketed::is_bracketed(base, "(", ")", false, false) ||
             IsBracketed::is_bracketed(base, "[", "]", false, false)) &&
@@ -1376,16 +1376,16 @@ pub fn likely_adorned_chem_formula(mathml: Element) -> isize {
         let base = as_element(base);
         let pre_lower = as_element(prescripts[0]);
         let pre_upper = as_element(prescripts[1]);
-        if (name(&base) == "mi" || name(&base) == "mtext") && as_text(base) == "e" &&
-           name(&pre_upper) == "mn" && as_text(pre_upper) == "0" && 
-           name(&pre_lower) == "mrow" && pre_lower.children().len() == 2 {
+        if (name(base) == "mi" || name(base) == "mtext") && as_text(base) == "e" &&
+           name(pre_upper) == "mn" && as_text(pre_upper) == "0" && 
+           name(pre_lower) == "mrow" && pre_lower.children().len() == 2 {
             // looking '-' and '1'
             let lower_children = pre_lower.children();
             let minus = as_element(lower_children[0]);
             let one = as_element(lower_children[1]);
             // not yet normalized, so we need to compare against ASCII minus and u+2212
-            return name(&minus) == "mo" && (as_text(minus) == "-" || as_text(minus) == "−") && 
-                   name(&one) == "mn"   && as_text(one) == "1";
+            return name(minus) == "mo" && (as_text(minus) == "-" || as_text(minus) == "−") && 
+                   name(one) == "mn"   && as_text(one) == "1";
         } else {
             return false;
         }
@@ -1420,7 +1420,7 @@ fn likely_chem_formula_operator(mathml: Element) -> isize {
         '\u{2062}', '\u{2063}' // invisible separators
         };
 
-    assert_eq!(name(&mathml), "mo");
+    assert_eq!(name(mathml), "mo");
     let leaf_text = as_text(mathml);
     if CHEM_FORMULA_OPERATORS.contains(leaf_text) &&
        ( !(leaf_text == "=" || leaf_text == "∷" ) || is_legal_bond(mathml, BondType::DoubleBond) )  &&
@@ -1443,17 +1443,17 @@ fn likely_chem_formula_operator(mathml: Element) -> isize {
 
         let mut preceding_element = as_element(preceding[preceding.len()-1]);
         // special check for CH_2 -- double bond is really with C
-        if bond_type == BondType::DoubleBond && name(&preceding_element) == "msub" &&
+        if bond_type == BondType::DoubleBond && name(preceding_element) == "msub" &&
            preceding.len() > 1 &&  &convert_to_short_form(preceding_element).unwrap_or_default() == "H_2" {
             preceding_element = as_element(preceding[preceding.len()-2]);
             if !is_leaf(preceding_element) || as_text(preceding_element) != "C" {
                 return false;
             }
-        } else if name(&preceding_element) != "mi" && name(&preceding_element) != "mtext" {
+        } else if name(preceding_element) != "mi" && name(preceding_element) != "mtext" {
             return false;
         }
         let following_element = get_possible_embellished_node(as_element(following[0]));
-        if name(&following_element) != "mi" && name(&following_element) != "mtext" {
+        if name(following_element) != "mi" && name(following_element) != "mtext" {
             return false;
         }
         let preceding_text = as_text(preceding_element);
@@ -1505,10 +1505,10 @@ fn likely_chem_equation_operator(mathml: Element) -> isize {
         '·', '℃', '°', '‡', '∆', '×',
     };
 
-    let elem_name = name(&mathml);
+    let elem_name = name(mathml);
     if elem_name == "munder" || elem_name == "mover" || elem_name == "munderover" {
         let base = as_element(mathml.children()[0]);
-        if name(&base) == "mo" && is_in_set(as_text(base), &CHEM_EQUATION_ARROWS) {
+        if name(base) == "mo" && is_in_set(as_text(base), &CHEM_EQUATION_ARROWS) {
             base.set_attribute_value(MAYBE_CHEMISTRY, "1");
             base.set_attribute_value(CHEM_EQUATION_OPERATOR, "1");
             return 1;
@@ -1519,7 +1519,7 @@ fn likely_chem_equation_operator(mathml: Element) -> isize {
         }    
     }
 
-    if name(&mathml) == "mo" {
+    if name(mathml) == "mo" {
         let text = as_text(mathml);
         if is_in_set(text, &CHEM_EQUATION_OPERATORS) || is_in_set(text, &CHEM_EQUATION_ARROWS) {
             mathml.set_attribute_value(MAYBE_CHEMISTRY, "1");
@@ -1535,32 +1535,32 @@ fn likely_chem_equation_operator(mathml: Element) -> isize {
     /// Detects output of mhchem for some equilibrium arrows that currently (11/22) don't have Unicode points
     /// See github.com/NSoiffer/MathCAT/issues/60 for the patterns being matched
     fn is_hack_for_missing_arrows(mover: Element) -> bool {
-        assert_eq!(name(&mover), "mover");
+        assert_eq!(name(mover), "mover");
         let children = mover.children();
         let base = as_element(children[0]);
-        let mo_base = if name(&base) == "mrow" && base.children().len() == 2 {
+        let mo_base = if name(base) == "mrow" && base.children().len() == 2 {
             as_element(base.children()[0])
         } else {
             base
         };
         let upper = as_element(children[1]);
-        let mo_upper = if name(&upper) == "mrow" && upper.children().len() == 2 {
+        let mo_upper = if name(upper) == "mrow" && upper.children().len() == 2 {
             as_element(upper.children()[1])
         } else {
             upper
         };
         // slightly sloppy match, but almost certainly good enough
-        return name(&mo_base) == "mo" && name(&mo_upper) == "mo" && 
+        return name(mo_base) == "mo" && name(mo_upper) == "mo" && 
                 as_text(mo_base) == "↽" && as_text(mo_upper) == "⇀";
         }
 }
 
 fn is_equilibrium_constant(mut mathml: Element) -> bool {
-    if name(&mathml) == "msub" {
+    if name(mathml) == "msub" {
         mathml = as_element(mathml.children()[0]);
     }
 
-    return name(&mathml) == "mi" && as_text(mathml) == "K";
+    return name(mathml) == "mi" && as_text(mathml) == "K";
 }
 
 lazy_static! {
@@ -1576,7 +1576,7 @@ pub fn likely_chem_state(mathml: Element) -> isize {
     if IsBracketed::is_bracketed(mathml, "(", ")", false, false) ||
        IsBracketed::is_bracketed(mathml, "[", "]", false, false) {
         let contents = as_element(mathml.children()[1]);
-        let contents_name = name(&contents);
+        let contents_name = name(contents);
         if contents_name == "mi" || contents_name == "mtext" {
             let text = as_text(contents);
             if text == "s" || text == "l" ||text == "g" ||text == "aq" {
@@ -1591,7 +1591,7 @@ pub fn likely_chem_state(mathml: Element) -> isize {
 pub fn likely_chem_element(mathml: Element) -> isize {
     static NUCLEAR_SYMBOLS: [&str; 6] = ["e", "p", "n", "α", "β","γ"];
 
-    assert!(name(&mathml) == "mi" || name(&mathml) == "mtext", "{} is not 'mi' or 'mtext'", name(&mathml));
+    assert!(name(mathml) == "mi" || name(mathml) == "mtext", "{} is not 'mi' or 'mtext'", name(mathml));
     let text = as_text(mathml);
     if as_text(mathml).trim().is_empty() {
         return 0;   // whitespace
@@ -1652,10 +1652,10 @@ static SHORT_SINGLE_LETTER_ELEMENT_FORMULAE: phf::Set<&str> = phf_set! {
 /// Returns true if the formula is composed of 1 or 2 single letter elements and it matches a known compound/ion
 /// This might be called (via likely_adorned_chem_formula) unparsed
 fn is_short_formula(mrow: Element) -> bool {
-    assert_eq!(name(&mrow), "mrow");
+    assert_eq!(name(mrow), "mrow");
     let children = mrow.children();
     let n_children = children.len();
-    if n_children == 0 || n_children > 3 || (n_children == 3 && name(&as_element(children[1])) != "mo") {
+    if n_children == 0 || n_children > 3 || (n_children == 3 && name(as_element(children[1])) != "mo") {
         return false;
     }
 
@@ -1675,7 +1675,7 @@ fn is_short_formula(mrow: Element) -> bool {
 }
 
 fn convert_to_short_form(mathml: Element) -> Result<String> {
-    let mathml_name = name(&mathml);
+    let mathml_name = name(mathml);
     return match mathml_name {
         "mi" | "mtext" | "mn" | "mo" => Ok( as_text(mathml).to_string() ),
         "none" => Ok( "".to_string() ),
@@ -1686,11 +1686,11 @@ fn convert_to_short_form(mathml: Element) -> Result<String> {
             if is_mmultiscripts && children.len() != 3 {
                 bail!("mmultiscripts found with {} children -- not part of chemical formula", children.len());
             }
-            if mathml_name == "msub" || mathml_name == "msubsup" || (is_mmultiscripts && name(&as_element(children[1])) != "none") {
+            if mathml_name == "msub" || mathml_name == "msubsup" || (is_mmultiscripts && name(as_element(children[1])) != "none") {
                 result += "_";
                 result += &convert_to_short_form(as_element(children[1]))?;
             }
-            if mathml_name == "msup" || mathml_name == "msubsup" || (is_mmultiscripts && name(&as_element(children[2])) != "none") {
+            if mathml_name == "msup" || mathml_name == "msubsup" || (is_mmultiscripts && name(as_element(children[2])) != "none") {
                 result += "^";
                 result += &convert_to_short_form(as_element(children[if mathml_name=="msup" {1} else {2}]))?;
             }
@@ -1756,7 +1756,7 @@ static CHEMICAL_ELEMENT_ATOMIC_NUMBER: phf::Map<&str, u32> = phf_map! {
 
 pub fn is_chemical_element(node: Element) -> bool {
 	// FIX: allow name to be in an mrow (e.g., <mi>N</mi><mi>a</mi>
-	let name = name(&node);
+	let name = name(node);
 	if name != "mi" && name != "mtext" {
 		return false;
 	}

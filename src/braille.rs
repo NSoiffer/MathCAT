@@ -273,7 +273,7 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
         _ => {
             // weird state -- return the entire expr
             match mathml.attribute_value("id") {
-                None => bail!("'id' is not present on mathml: {}", mml_to_string(&mathml)),
+                None => bail!("'id' is not present on mathml: {}", mml_to_string(mathml)),
                 Some(id) => return Ok( (id.to_string(), 0) ),
             }
         }
@@ -285,11 +285,11 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
     fn find_navigation_node<'e>(mathml: Element<'e>, node: Element<'e>, target_position: usize) -> Result<SearchState<'e>> {
         let node_id = match node.attribute_value("id") {
             Some(id) => id,
-            None => bail!("'id' is not present on mathml: {}", mml_to_string(&node)),
+            None => bail!("'id' is not present on mathml: {}", mml_to_string(node)),
         };
         N_PROBES.with(|n| {*n.borrow_mut() += 1});
         let (braille, start, end) = braille_mathml(mathml, node_id)?;
-        // debug!("find_navigation_node ({}, id={}): start/end={}/{};  target_position={}", name(&node), node_id, start, end, target_position);
+        // debug!("find_navigation_node ({}, id={}): start/end={}/{};  target_position={}", name(node), node_id, start, end, target_position);
         if is_leaf(node) && start == 0 && end == braille.len()/3 {
             // nothing highlighted -- probably invisible char not represented in braille -- continue looking to the right
             return Ok( SearchState {
@@ -344,7 +344,7 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
                 },
                 SearchStatus::LookInParent => {
                     let (_, start, end) = braille_mathml(mathml, node_id)?;
-                    // debug!("  parent ({}) braille: start/end={}/{};  target_position={}", name(&node), start, end, target_position);
+                    // debug!("  parent ({}) braille: start/end={}/{};  target_position={}", name(node), start, end, target_position);
                     if start <= target_position && target_position <= end {
                         // debug!("  ..found: id={}", node_id);
                         return Ok( SearchState{
@@ -368,7 +368,7 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
                 },
             }
         }
-        // debug!("..end of loop: look in parent of {} has start/end={}/{}", name(&node), start, end);
+        // debug!("..end of loop: look in parent of {} has start/end={}/{}", name(node), start, end);
         return Ok( SearchState{
             status: if start <= target_position && target_position <= end {SearchStatus::Found} else {SearchStatus::LookInParent},
             node,
@@ -406,7 +406,7 @@ pub fn get_navigation_node_from_braille_position(mathml: Element, position: usiz
 
     fn estimate_braille_chars(child: ChildOfElement, n_number_indicator: usize) -> usize {
         let node = as_element(child);
-        let leaf_name = name(&node);
+        let leaf_name = name(node);
         if is_leaf(node) {
             let text = as_text(node);
             // len() is close since mn's probably have ASCII digits and lower case vars are common (count as) and other chars need extra braille chars
@@ -2146,10 +2146,10 @@ const FIRST_CHILD_ONLY: &[&str] = &["mroot", "msub", "msup", "msubsup", "munder"
 impl NemethNestingChars {
     // returns a 'repeat_char' corresponding to the Nemeth rules for nesting
     // note: this value is likely one char too long because the starting fraction is counted
-    fn nemeth_frac_value<'a>(node: &'a Element, repeat_char: &'a str) -> String {
+    fn nemeth_frac_value(node: Element, repeat_char: &str) -> String {
         let children = node.children();
         let name = name(node);
-        if is_leaf(*node) {
+        if is_leaf(node) {
             return "".to_string();
         } else if name == "mfrac" {
             // have we already computed the value?
@@ -2157,19 +2157,19 @@ impl NemethNestingChars {
                 return value.to_string();
             }
 
-            let num_value = NemethNestingChars::nemeth_frac_value(&as_element(children[0]), repeat_char);
-            let denom_value = NemethNestingChars::nemeth_frac_value(&as_element(children[1]), repeat_char);
+            let num_value = NemethNestingChars::nemeth_frac_value(as_element(children[0]), repeat_char);
+            let denom_value = NemethNestingChars::nemeth_frac_value(as_element(children[1]), repeat_char);
             let mut max_value = if num_value.len() > denom_value.len() {num_value} else {denom_value};
             max_value += repeat_char;
             node.set_attribute_value(NEMETH_FRAC_LEVEL, &max_value);
             return max_value;
         } else if FIRST_CHILD_ONLY.contains(&name) {
             // only look at the base -- ignore scripts/index
-            return NemethNestingChars::nemeth_frac_value(&as_element(children[0]), repeat_char);
+            return NemethNestingChars::nemeth_frac_value(as_element(children[0]), repeat_char);
         } else {
             let mut result = "".to_string();
             for child in children {
-                let value = NemethNestingChars::nemeth_frac_value(&as_element(child), repeat_char);
+                let value = NemethNestingChars::nemeth_frac_value(as_element(child), repeat_char);
                 if value.len() > result.len() {
                     result = value;
                 }
@@ -2178,7 +2178,7 @@ impl NemethNestingChars {
         }
     }
 
-    fn nemeth_root_value<'a>(node: &'a Element, repeat_char: &'a str) -> StdResult<String, XPathError> {
+    fn nemeth_root_value(node: Element, repeat_char: &str) -> StdResult<String, XPathError> {
         // returns the correct number of repeat_chars to use
         // note: because the highest count is toward the leaves and
         //    because this is a loop and not recursive, caching doesn't work without a lot of overhead
@@ -2187,7 +2187,7 @@ impl NemethNestingChars {
             let mut parent = e;
             let mut result = "".to_string();
             loop {
-                let name = name(&parent);
+                let name = name(parent);
                 if name == "math" {
                     return Ok( result );
                 }
@@ -2223,15 +2223,15 @@ impl Function for NemethNestingChars {
         let repeat_char = args.pop_string()?;
         let node = crate::xpath_functions::validate_one_node(args.pop_nodeset()?, "NestingChars")?;
         if let Node::Element(el) = node {
-            let name = name(&el);
+            let name = name(el);
             // it is likely a bug to call this one a non mfrac
             if name == "mfrac" {
                 // because it is called on itself, the fraction is counted one too many times -- chop one off
                 // this is slightly messy because we are chopping off a char, not a byte
                 const BRAILLE_BYTE_LEN: usize = "⠹".len();      // all Unicode braille symbols have the same number of bytes
-                return Ok( Value::String( NemethNestingChars::nemeth_frac_value(&el, &repeat_char)[BRAILLE_BYTE_LEN..].to_string() ) );
+                return Ok( Value::String( NemethNestingChars::nemeth_frac_value(el, &repeat_char)[BRAILLE_BYTE_LEN..].to_string() ) );
             } else if name == "msqrt" || name == "mroot" {
-                return Ok( Value::String( NemethNestingChars::nemeth_root_value(&el, &repeat_char)? ) );
+                return Ok( Value::String( NemethNestingChars::nemeth_root_value(el, &repeat_char)? ) );
             } else {
                 panic!("NestingChars chars should be used only on 'mfrac'. '{}' was passed in", name);
             }
@@ -2295,7 +2295,7 @@ impl BrailleChars {
         // also true (sort of) for capitalization -- if all caps, use double cap in front (assume abbr or Roman Numeral)
         
         // we only care about this for numbers and identifiers/text, so we filter for only those
-        let node_name = name(&node);
+        let node_name = name(node);
         let is_in_enclosed_list = node_name != "mo" && BrailleChars::is_in_enclosed_list(node);
         let is_mn_in_enclosed_list = is_in_enclosed_list && node_name == "mn";
         let mut typeface = "R".to_string();     // assumption is "R" and if attr or letter is different, something happens
@@ -2463,7 +2463,7 @@ impl BrailleChars {
         // 1. we deal with switching '.' and ',' if in English style for numbers
         // 2. if it is identified as a Roman Numeral, we make all but the first char lower case because they shouldn't get a cap indicator
         // 3. double letter chemical elements should NOT be part of a cap word sequence
-        if name(&node) == "mn" {
+        if name(node) == "mn" {
             // text of element is modified by these if needed
             lower_case_roman_numerals(node);
             switch_if_english_style_number(node);
@@ -2528,7 +2528,7 @@ impl BrailleChars {
         // 6: the list must have at least 2 items.
         //       Items are separated by commas, can not have other punctuation (except ellipsis and dash)
         let mut parent = get_parent(node); // safe since 'math' is always at root
-        while name(&parent) == "mrow" {
+        while name(parent) == "mrow" {
             if IsBracketed::is_bracketed(parent, "", "", true, false) {
                 for child in parent.children() {
                     if !child_meets_conditions(as_element(child)) {
@@ -2542,7 +2542,7 @@ impl BrailleChars {
         return false;
 
         fn child_meets_conditions(node: Element) -> bool {
-            let name = name(&node);
+            let name = name(node);
             return match name {
                 "mi" | "mn" => true,
                 "mo"  => !crate::canonicalize::is_relational_op(node),
@@ -2640,7 +2640,7 @@ impl Function for BrailleChars {
         };
 
         if !is_leaf(node) {
-            return Err( XPathError::Other(format!("BrailleChars called on non-leaf element '{}'", mml_to_string(&node))) );
+            return Err( XPathError::Other(format!("BrailleChars called on non-leaf element '{}'", mml_to_string(node))) );
         }
         return Ok( Value::String( BrailleChars::get_braille_chars(node, &braille_code, range)? ) );
     }
@@ -2651,7 +2651,7 @@ impl NeedsToBeGrouped {
     // ordinals often have an irregular start (e.g., "half") before becoming regular.
     // if the number is irregular, return the ordinal form, otherwise return 'None'.
     fn needs_grouping_for_cmu(element: Element, _is_base: bool) -> bool {
-        let node_name = name(&element);
+        let node_name = name(element);
         let children = element.children();
         if node_name == "mrow" {
             // check for bracketed exprs
@@ -2661,7 +2661,7 @@ impl NeedsToBeGrouped {
 
             // check for prefix and postfix ops at start or end (=> len()==2, prefix is first op, postfix is last op)
             if children.len() == 2 &&
-                (name( &as_element(children[0])) == "mo" || name( &as_element(children[1])) == "mo") {
+                (name(as_element(children[0])) == "mo" || name(as_element(children[1])) == "mo") {
                 return false;
             }
 
@@ -2669,7 +2669,7 @@ impl NeedsToBeGrouped {
                 return true;
             }
             let operator = as_element(children[1]);
-            if name(&operator) != "mo" || as_text(operator) != "/" {
+            if name(operator) != "mo" || as_text(operator) != "/" {
                 return true;
             }
         }
@@ -2685,10 +2685,10 @@ impl NeedsToBeGrouped {
                                                         .chars().next().unwrap_or('.');
         if is_integer(denominator, decimal_separator) {
             // check numerator being either an integer "- integer"
-            if name(&numerator) == "mrow" {
+            if name(numerator) == "mrow" {
                 let numerator_children = numerator.children();
                 if !(numerator_children.len() == 2 &&
-                        name(&as_element(numerator_children[0])) == "mo" &&
+                        name(as_element(numerator_children[0])) == "mo" &&
                         as_text(as_element(numerator_children[0])) == "-") {
                     return true;
                 }
@@ -2699,14 +2699,14 @@ impl NeedsToBeGrouped {
         return true;
 
         fn is_integer(mathml: Element, decimal_separator: char) -> bool {
-            return name(&mathml) == "mn" && !as_text(mathml).contains(decimal_separator)
+            return name(mathml) == "mn" && !as_text(mathml).contains(decimal_separator)
         }
     }
 
     /// FIX: what needs to be implemented?
     fn needs_grouping_for_finnish(mathml: Element, is_base: bool) -> bool {
         use crate::xpath_functions::IsInDefinition;
-        let mut node_name = name(&mathml);
+        let mut node_name = name(mathml);
         if mathml.attribute_value("data-roman-numeral").is_some() {
             node_name = "mi";           // roman numerals don't follow number rules
         }
@@ -2719,8 +2719,8 @@ impl NeedsToBeGrouped {
                 }                                                                                        // clause 1
                 // two 'mn's can be adjacent, in which case we need to group the 'mn' to make it clear it is separate (see bug #204)
                 let parent = get_parent(mathml);   // there is always a "math" node
-                let grandparent = if name(&parent) == "math" {parent} else {get_parent(parent)};
-                if name(&grandparent) != "mrow" {
+                let grandparent = if name(parent) == "math" {parent} else {get_parent(parent)};
+                if name(grandparent) != "mrow" {
                     return false;
                 }
                 let preceding = parent.preceding_siblings();
@@ -2729,9 +2729,9 @@ impl NeedsToBeGrouped {
                 }
                 // any 'mn' would be separated from this node by invisible times
                 let previous_child = as_element(preceding[preceding.len()-1]);
-                if name(&previous_child) == "mo" && as_text(previous_child) == "\u{2062}" {
+                if name(previous_child) == "mo" && as_text(previous_child) == "\u{2062}" {
                     let previous_child = as_element(preceding[preceding.len()-2]);
-                    return name(&previous_child) == "mn"
+                    return name(previous_child) == "mn"
                 } else {
                     return false;
                 }
@@ -2739,7 +2739,7 @@ impl NeedsToBeGrouped {
             "mi" | "mo" | "mtext" => {
                 let text = as_text(mathml);
                 let parent = get_parent(mathml);   // there is always a "math" node
-                let parent_name = name(&parent);   // there is always a "math" node
+                let parent_name = name(parent);   // there is always a "math" node
                 if is_base && (parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") && !text.contains([' ', '\u{00A0}']) {
                     return false;
                 }
@@ -2760,13 +2760,13 @@ impl NeedsToBeGrouped {
                 }
 
                 let parent = get_parent(mathml); // safe since 'math' is always at root
-                if name(&parent) == "mfrac" {
+                if name(parent) == "mfrac" {
                     let children = mathml.children();
                     if mathml.preceding_siblings().is_empty() {
                         // numerator: check for multiplication -- doesn't need grouping in numerator
                         if children.len() >= 3 {
                             let operator = as_element(children[1]);
-                            if name(&operator) == "mo" {
+                            if name(operator) == "mo" {
                                 let ch = as_text(operator);
                                 if ch == "\u{2062}" || ch == "⋅" || ch == "×"  {
                                     return false;
@@ -2784,7 +2784,7 @@ impl NeedsToBeGrouped {
                 // example 7.12 has "2-" in superscript and is grouped, so we don't consider postfix ops
                 let children = mathml.children();
                 if children.len() == 2 &&
-                    (name( &as_element(children[0])) == "mo") {
+                    (name(as_element(children[0])) == "mo") {
                     return false;
                 }
                 return true;
@@ -2797,7 +2797,7 @@ impl NeedsToBeGrouped {
     // if the number is irregular, return the ordinal form, otherwise return 'None'.
     fn needs_grouping_for_swedish(mathml: Element, is_base: bool) -> bool {
         use crate::xpath_functions::IsInDefinition;
-        let mut node_name = name(&mathml);
+        let mut node_name = name(mathml);
         if mathml.attribute_value("data-roman-numeral").is_some() {
             node_name = "mi";           // roman numerals don't follow number rules
         }
@@ -2807,7 +2807,7 @@ impl NeedsToBeGrouped {
             "mi" | "mo" | "mtext" => {
                 let text = as_text(mathml);
                 let parent = get_parent(mathml);   // there is always a "math" node
-                let parent_name = name(&parent);   // there is always a "math" node
+                let parent_name = name(parent);   // there is always a "math" node
                 if is_base && (parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") && !text.contains([' ', '\u{00A0}']) {
                     return false;
                 }
@@ -2831,7 +2831,7 @@ impl NeedsToBeGrouped {
                 // example 7.12 has "2-" in superscript and is grouped, so we don't consider postfix ops
                 let children = mathml.children();
                 if children.len() == 2 &&
-                    (name( &as_element(children[0])) == "mo") {
+                    (name(as_element(children[0])) == "mo") {
                     return false;
                 }
                 return true;
@@ -2864,7 +2864,7 @@ impl NeedsToBeGrouped {
         // 8. If none of the foregoing apply, the item is simply the [this element's] individual symbol.
 
         use crate::xpath_functions::IsInDefinition;
-        let mut node_name = name(&mathml);
+        let mut node_name = name(mathml);
         if mathml.attribute_value("data-roman-numeral").is_some() {
             node_name = "mi";           // roman numerals don't follow number rules
         }
@@ -2875,8 +2875,8 @@ impl NeedsToBeGrouped {
                 }                                                                                        // clause 1
                 // two 'mn's can be adjacent, in which case we need to group the 'mn' to make it clear it is separate (see bug #204)
                 let parent = get_parent(mathml);   // there is always a "math" node
-                let grandparent = if name(&parent) == "math" {parent} else {get_parent(parent)};
-                if name(&grandparent) != "mrow" {
+                let grandparent = if name(parent) == "math" {parent} else {get_parent(parent)};
+                if name(grandparent) != "mrow" {
                     return false;
                 }
                 let preceding = parent.preceding_siblings();
@@ -2885,9 +2885,9 @@ impl NeedsToBeGrouped {
                 }
                 // any 'mn' would be separated from this node by invisible times
                 let previous_child = as_element(preceding[preceding.len()-1]);
-                if name(&previous_child) == "mo" && as_text(previous_child) == "\u{2062}" {
+                if name(previous_child) == "mo" && as_text(previous_child) == "\u{2062}" {
                     let previous_child = as_element(preceding[preceding.len()-2]);
-                    return name(&previous_child) == "mn"
+                    return name(previous_child) == "mn"
                 } else {
                     return false;
                 }
@@ -2895,7 +2895,7 @@ impl NeedsToBeGrouped {
             "mi" | "mo" | "mtext" => {
                 let text = as_text(mathml);
                 let parent = get_parent(mathml);   // there is always a "math" node
-                let parent_name = name(&parent);   // there is always a "math" node
+                let parent_name = name(parent);   // there is always a "math" node
                 if is_base && (parent_name == "msub" || parent_name == "msup" || parent_name == "msubsup") && !text.contains([' ', '\u{00A0}']) {
                     return false;
                 }
@@ -2922,7 +2922,7 @@ impl NeedsToBeGrouped {
                 } 
                 // need to group nested scripts in base -- see GTM 12.2(2)                                         
                 let parent = get_parent(mathml);   // there is always a "math" node
-                let parent_name = name(&parent);   // there is always a "math" node
+                let parent_name = name(parent);   // there is always a "math" node
                 return parent_name == "munder" || parent_name == "mover" || parent_name == "munderover";
             },
             _ => return true,

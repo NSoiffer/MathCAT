@@ -44,7 +44,7 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
 
     fn catch_errors_building_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, mathml: Element<'c>) -> Result<Element<'m>> {
         if let Some(intent_str) = mathml.attribute_value(INTENT_ATTR) {
-            // debug!("Before intent: {}", crate::pretty_print::mml_to_string(&mathml));
+            // debug!("Before intent: {}", crate::pretty_print::mml_to_string(mathml));
             let mut lex_state = LexState::init(intent_str.trim())?;
             let result = build_intent(rules_with_context, &mut lex_state, mathml)
                         .chain_err(|| format!("occurs before '{}' in intent attribute value '{}'", lex_state.remaining_str, intent_str))?;
@@ -52,10 +52,10 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
                 bail!("Error in intent value: extra unparsed intent '{}' in intent attribute value '{}'", lex_state.remaining_str, intent_str);
             }
             assert!(lex_state.remaining_str.is_empty());
-            // debug!("Resulting intent:\n{}", crate::pretty_print::mml_to_string(&result));
+            // debug!("Resulting intent:\n{}", crate::pretty_print::mml_to_string(result));
             return Ok(result);
         }
-        bail!("Internal error: infer_intent() called on MathML with no intent arg:\n{}", mml_to_string(&mathml));
+        bail!("Internal error: infer_intent() called on MathML with no intent arg:\n{}", mml_to_string(mathml));
     }
 }
 
@@ -214,7 +214,7 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
     // debug!("  start build_intent: state: {}", lex_state);
     let doc = rules_with_context.get_document();
     let mut intent;
-    // debug!("    build_intent: start mathml name={}", name(&mathml));
+    // debug!("    build_intent: start mathml name={}", name(mathml));
     match lex_state.token {
         Token::Property(_) => {
             // We only have a property -- we want to keep this tag/element
@@ -224,15 +224,15 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
             //    Note: to avoid infinite loop, we need to remove the 'intent' so we don't end up back here; we put it back later
             let properties = get_properties(lex_state)?;    // advance state to see if funcall
             if lex_state.is_terminal("(") {
-                intent = create_mathml_element(&doc, name(&mathml));
+                intent = create_mathml_element(&doc, name(mathml));
                 intent.set_attribute_value(INTENT_PROPERTY, &properties);
-                intent.set_attribute_value(MATHML_FROM_NAME_ATTR, name(&mathml));
+                intent.set_attribute_value(MATHML_FROM_NAME_ATTR, name(mathml));
             } else {
                 let saved_intent = mathml.attribute_value(INTENT_ATTR).unwrap();
                 mathml.remove_attribute(INTENT_ATTR);
                 mathml.set_attribute_value(INTENT_PROPERTY, &properties);   // needs to be set before the pattern match
                 intent = rules_with_context.match_pattern::<Element<'m>>(mathml)?;
-                // debug!("Intent after pattern match:\n{}", mml_to_string(&intent));
+                // debug!("Intent after pattern match:\n{}", mml_to_string(intent));
                 mathml.set_attribute_value(INTENT_ATTR, saved_intent);
             }
             return Ok(intent);      // if we start with properties, then there can only be properties
@@ -243,7 +243,7 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
             // if the str is part of a larger intent and not the head (e.g., "a" in "f($x, a)", but not the "f" in it), then it is "made up"
             // debug!("    Token::ConceptOrLiteral, word={}, leaf_name={}", word, leaf_name);
             intent.set_attribute_value(MATHML_FROM_NAME_ATTR, 
-                if word == mathml.attribute_value(INTENT_ATTR).unwrap_or_default() {name(&mathml)} else {leaf_name});
+                if word == mathml.attribute_value(INTENT_ATTR).unwrap_or_default() {name(mathml)} else {leaf_name});
             intent.set_text(word);       // '-' and '_' get removed by the rules.
             lex_state.get_next()?;
             if let Token::Property(_) = lex_state.token {
@@ -269,7 +269,7 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
     if lex_state.is_terminal("(") {
         intent = build_function(intent, rules_with_context, lex_state, mathml)?;
     }
-    // debug!("    end build_intent: state: {}     piece: {}", lex_state, mml_to_string(&intent));
+    // debug!("    end build_intent: state: {}     piece: {}", lex_state, mml_to_string(intent));
     return Ok(intent);
 }
 
@@ -305,29 +305,29 @@ fn build_function<'b, 'r, 'c, 's:'c, 'm:'c>(
             rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>,
             lex_state: &mut LexState<'b>,
             mathml: Element<'c>) -> Result<Element<'m>> {
-    // debug!("  start build_function: name: {}, state: {}", name(&function_name), lex_state);
+    // debug!("  start build_function: name: {}, state: {}", name(function_name), lex_state);
     // application := intent '(' arguments? S ')'  where 'function_name' is 'intent'
     assert!(lex_state.is_terminal("("));
     let mut function = function_name;
-    function.set_attribute_value(MATHML_FROM_NAME_ATTR, name(&mathml));
+    function.set_attribute_value(MATHML_FROM_NAME_ATTR, name(mathml));
     while lex_state.is_terminal("(") {
         lex_state.get_next()?;
         if lex_state.is_terminal(")") {
             // grammar requires at least one argument
-            bail!("Illegal 'intent' syntax: missing argument for intent name '{}'", name(&function_name));
+            bail!("Illegal 'intent' syntax: missing argument for intent name '{}'", name(function_name));
         }
         let children = build_arguments(rules_with_context, lex_state, mathml)?;
         function = lift_function_name(rules_with_context.get_document(), function, children);
 
         if !lex_state.is_terminal(")") {
-            bail!("Illegal 'intent' syntax: missing ')' for intent name '{}'", name(&function_name));
+            bail!("Illegal 'intent' syntax: missing ')' for intent name '{}'", name(function_name));
         }
         lex_state.get_next()?;
     }
 
     let function = add_fixity_children(function);
     // debug!("  end build_function/# children: {}, #state: {}  ..[bfa] function name: {}",
-        // function.children().len(), lex_state, mml_to_string(&function));
+        // function.children().len(), lex_state, mml_to_string(function));
     return Ok(function);
 
     fn add_fixity_children(mathml: Element) -> Element {
@@ -341,7 +341,7 @@ fn build_function<'b, 'r, 'c, 's:'c, 'm:'c>(
         }
         let doc = mathml.document();
         if let Some(properties) = mathml.attribute_value(INTENT_PROPERTY) {
-            let op_name = name(&mathml);
+            let op_name = name(mathml);
             if let Some(property) = properties.rsplit(':').find(|&property| FIXITIES.contains(property)) {
                 // fixities don't do anything it there is just one child
                 // we also exclude fixity on mtable because they mess up the counts (see 'en::mtable::unknown_mtable_property')
@@ -411,15 +411,15 @@ fn build_arguments<'b, 'r, 'c, 's:'c, 'm:'c>(
 
 /// lift the children up to LITERAL_NAME
 fn lift_function_name<'m>(doc: Document<'m>, function_name: Element<'m>, children: Vec<Element<'m>>) -> Element<'m> {
-    // debug!("    lift_function_name: {}", name(&function_name));
-    // debug!("    lift_function_name: {}", mml_to_string(&function_name));
-    if name(&function_name) == "mi" || name(&function_name) == "mn" {   // FIX -- really want to test for all leaves, but not "data-from-mathml"
+    // debug!("    lift_function_name: {}", name(function_name));
+    // debug!("    lift_function_name: {}", mml_to_string(function_name));
+    if name(function_name) == "mi" || name(function_name) == "mn" {   // FIX -- really want to test for all leaves, but not "data-from-mathml"
         // simple/normal case of f(x,y)
         // don't want to say that this is a leaf -- doing so messes up because it potentially has children
         set_mathml_name(function_name, as_text(function_name));
         function_name.set_text("");
         function_name.replace_children(children);
-        if name(&function_name).find(|ch| ch!='_' && ch!='-').is_none() {
+        if name(function_name).find(|ch| ch!='_' && ch!='-').is_none() {
             let properties = function_name.attribute_value(INTENT_PROPERTY).unwrap_or(":").to_owned();
             function_name.set_attribute_value(INTENT_PROPERTY, &(properties + "silent:"));
         }
@@ -443,7 +443,7 @@ fn lift_function_name<'m>(doc: Document<'m>, function_name: Element<'m>, childre
 /// look for @arg=name in mathml
 /// if 'check_intent', then look at an @intent for this element (typically false for non-recursive calls)
 fn find_arg<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRulesWithContext<'c,'s,'m>, name: &str, mathml: Element<'c>, skip_self: bool, no_check_inside: bool) -> Result<Option<Element<'m>>> {
-    // debug!("Looking for '{}' in\n{}", name, mml_to_string(&mathml));
+    // debug!("Looking for '{}' in\n{}", name, mml_to_string(mathml));
     if !skip_self {
         if let Some(arg_val) = mathml.attribute_value("arg") {
             // debug!("looking for '{}', found arg='{}'", name, arg_val);
@@ -496,12 +496,12 @@ mod tests {
         let package1 = &parser::parse(mathml).expect("Failed to parse test input");
         let mathml = get_element(package1);
         trim_element(mathml, false);
-        debug!("test:\n{}", crate::pretty_print::mml_to_string(&mathml));
+        debug!("test:\n{}", crate::pretty_print::mml_to_string(mathml));
         
         let package2 = &parser::parse(target).expect("Failed to parse target input");
         let target = get_element(package2);
         trim_element(target,true);
-        debug!("target:\n{}", crate::pretty_print::mml_to_string(&target));
+        debug!("target:\n{}", crate::pretty_print::mml_to_string(target));
 
         let result = match crate::speech::intent_from_mathml(mathml, package2.as_document()) {
             Ok(e) => e,
@@ -510,8 +510,8 @@ mod tests {
                 return false;       // could be intentional failure
             }
         };
-        debug!("result:\n{}", crate::pretty_print::mml_to_string(&result));
-        match is_same_element(&result, &target) {
+        debug!("result:\n{}", crate::pretty_print::mml_to_string(result));
+        match is_same_element(result, target) {
 			Ok(_) => return true,
 			Err(e) => panic!("{}", e),
 		}
