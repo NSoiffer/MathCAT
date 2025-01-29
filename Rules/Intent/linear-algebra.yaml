@@ -11,33 +11,8 @@
   replace:
   - intent:
       name: "determinant"
-      attrs: "id='*[2]/@id' data-fixity='\"table\"'"
+      attrs: "id='*[2]/@id'"
       children: [x: "*[2]"]
-
--
-  # vertical bars around an mtable
-  # FIX: could add a check to make sure it was a square mtable
-  name: determinant
-  tag: mrow
-  match: 
-    - "IsBracketed(., '|', '|') and  *[2][self::m:mtable]"
-  replace:
-  - intent:
-      name: "determinant"
-      attrs: "id='*[2]/@id' data-fixity='\"table\"'"
-      children: [x: "*[2]/*"]
-
--
-  # parens or brackets around an mtable
-  name: matrix
-  tag: mrow
-  match: 
-    - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']')) and *[2][self::m:mtable]"
-  replace:
-  - intent:
-      name: "matrix"
-      attrs: "id='*[2]/@id' data-fixity='\"table\"'"
-      children: [x: "*[2]/*"]
 
 -
   name: norm
