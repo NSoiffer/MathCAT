@@ -55,9 +55,11 @@
   replace:
   - bookmark: "@id"
   - test:
-      if: "string-length(.) = 1 and text() != '_'"       # need unicode.tdl to kick in for single letter tokens
+    - if: "string-length(.) = 1 and text() != '_'"       # need unicode.tdl to kick in for single letter tokens
       then: [x: "text()"]
-      else: [x: "translate(., '-_\u00A0', '  ')" ]   # from intent literals or from extra spaces added (which get deleted)
+    - else_if: "@data-chem-element"                      # NavMode=Character needs this
+      then: [spell: "text()", pause: "short"]
+      else: [x: "translate(., '-_\u00A0', '  ')"]   # from intent literals or from extra spaces added (which get deleted)
 
 - name: default
   tag: ms
@@ -614,43 +616,19 @@
 
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
-- name: silent-intent
-  # uncaught intent -- speak as arg1 arg2 ....
+- name: prefix-infix-postfix-silent-intent
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':silent:') and count(*)>0"
+  match: "count(*)>0 and (
+            contains(@data-intent-property, ':prefix:') or
+            contains(@data-intent-property, ':infix:') or
+            contains(@data-intent-property, ':postfix:') or
+            contains(@data-intent-property, ':silent:')
+            )"
   replace:
-  - x: "*"
-
-- name: prefix-intent
-  # uncaught intent -- speak as arg1 arg2 ....
-  tag: "*"
-  match: "contains(@data-intent-property, ':prefix:') and count(*)>0"
-  replace:
-  - x: "translate(name(.), '-_', '  ')"
-  - x: "*"
-  - pause: short
-
-- name: postfix-intent
-  # uncaught intent -- speak as arg1 arg2 ....
-  tag: "*"
-  match: "contains(@data-intent-property, ':postfix:') and count(*)>0"
-  replace:
-  - pause: short
-  - x: "*"
-  - x: "translate(name(.), '-_', '  ')"
-
-
-- name: infix-intent
-  # uncaught intent -- speak as arg1 foo arg2 [foo arg3....]
-  tag: "*"
-  match: "contains(@data-intent-property, ':infix:') and count(*)>0"
-  replace:
-  - pause: short
   - insert:
       nodes: "*"
-      replace: [x: "translate(name(.), '-_', '  ')", pause: auto]
-  - pause: short
-
+      replace: [pause: auto]
 
 - name: function-intent
   # uncaught intent -- speak as foo of arg1 comma arg2 ....
