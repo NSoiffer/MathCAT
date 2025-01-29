@@ -242,7 +242,7 @@
   # could also be cardinality, length, ...
   name: absolute-value
   tag: mrow
-  match: "IsBracketed(., '|', '|')"
+  match: "count(*) = 3 and not(*[2][self::m:mtable]) and IsBracketed(., '|', '|')"
   replace:
   - intent:
       name: "absolute-value"
@@ -653,72 +653,89 @@
 # if a property is set, handle that first
 
 -
-  name: "piecewise"
-  tag: mrow
-  match: "count(*)=2 and *[1][text()='{'] and *[2][self::m:mtable]"
-  replace:
-  - x: "*[2]"
-
--
   name: mtable-property-is-set
   tag: mtable
-  variables: [MTableProperty: "IfThenElse(contains(@data-intent-property, ':array:'), 'array',
+  # any 'intent' property set overrides the inferred property
+  variables: [TableProperty: "IfThenElse(contains(@data-intent-property, ':array:'), 'array',
                                IfThenElse(contains(@data-intent-property, ':matrix:'), 'matrix',
                                IfThenElse(contains(@data-intent-property, ':determinant:'), 'determinant',
                                IfThenElse(contains(@data-intent-property, ':piecewise:'), 'piecewise',
-                               IfThenElse(contains(@data-intent-property, ':system-of-equation:'), 'system-of-equation',
+                               IfThenElse(contains(@data-intent-property, ':system-of-equations:'), 'system-of-equations',
                                IfThenElse(contains(@data-intent-property, ':lines:'), 'lines',
-                                 ''))))))"]   # '' is what to say if none match"
-  match: "$MTableProperty !=''"
+                                 $TableProperty))))))"]   # '' is what to say if none match"
+  match: "$TableProperty !=''"
   replace:
   - intent:
-      xpath-name: "$MTableProperty"
+      xpath-name: "$TableProperty"
       children:
       - x: "*"
 
 -
-  name: mtable-matrix-property
-  tag: mtable
-  match:
-  - "..[self::m:mrow and (IsBracketed(., '(', ')') or IsBracketed(., '[', ']'))]"
+  name: "piecewise"
+  tag: mrow
+  match: "count(*)=2 and *[1][text()='{'] and
+          *[2][self::m:mtable and not(
+                        contains(@data-intent-property, ':array:') or
+                        contains(@data-intent-property, ':matrix:') or
+                        contains(@data-intent-property, ':determinant:') or
+                        contains(@data-intent-property, 'system-of-equations:') or
+                        contains(@data-intent-property, ':lines:') )
+              ]"
   replace:
   - with:
-      variables:
-      - TableProperty: "'matrix'"
-      replace:
-      - intent:
-          name: "matrix"
-          children:
-          - x: "*"
+      variables: [TableProperty: "'piecewise'"]
+      replace: [x: "*[2]"]
 
 -
-  name: mtable-determinant-property
-  tag: mtable
-  match: "..[self::m:mrow and IsBracketed(., '|', '|')]"
+  name: matrix
+  tag: mrow
+  match:
+  - "count(*)=3 and (IsBracketed(., '(', ')') or IsBracketed(., '[', ']')) and
+          *[2][self::m:mtable and not(
+                        contains(@data-intent-property, ':piecewise:') or
+                        contains(@data-intent-property, ':matrix:') or
+                        contains(@data-intent-property, ':determinant:') or
+                        contains(@data-intent-property, 'system-of-equations:') or
+                        contains(@data-intent-property, ':lines:') )
+              ]"
   replace:
   - with:
-      variables:
-      - TableProperty: "'determinant'"
-      replace:
-      - intent:
-          name: "determinant"
-          children:
-          - x: "*"
+      variables: [TableProperty: "'matrix'"]
+      replace: [x: "*[2]"]
 
 -
-  name: mtable-piecewise-property
-  tag: mtable
+  name: determinant
+  tag: mrow
   match:
-  - "..[self::m:mrow and count(*)=2 and *[1][text()='{']]"
+  - "count(*)=3 and IsBracketed(., '|', '|') and
+          *[2][self::m:mtable and not(
+                        contains(@data-intent-property, ':array:') or
+                        contains(@data-intent-property, ':matrix:') or
+                        contains(@data-intent-property, ':piecewise:') or
+                        contains(@data-intent-property, 'system-of-equations:') or
+                        contains(@data-intent-property, ':lines:') )
+              ]"
   replace:
   - with:
-      variables:
-      - TableProperty: "'piecewise'"
-      replace:
-      - intent:
-          name: "piecewise"
-          children:
-          - x: "*"
+      variables: [TableProperty: "'determinant'"]
+      replace: [x: "*[2]"]
+
+-
+  name: piecewise
+  tag: mrow
+  match:
+  - "count(*)=2 and *[1][.='{'] and
+          *[2][self::m:mtable and not(
+                        contains(@data-intent-property, ':array:') or
+                        contains(@data-intent-property, ':matrix:') or
+                        contains(@data-intent-property, ':determinant:') or
+                        contains(@data-intent-property, 'system-of-equations:') or
+                        contains(@data-intent-property, ':lines:') )
+              ]"
+  replace:
+  - with:
+      variables: [TableProperty: "'piecewise'"]
+      replace: [x: "*[2]"]
 
 -
   name: mtable-equations-property
