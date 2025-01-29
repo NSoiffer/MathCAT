@@ -1001,8 +1001,9 @@ fn matrix_times() {
 
 #[test]
 fn unknown_mtable_property() {
+  init_logger();
   let expr = "<math display='block'>
-      <mtable intent='equation:prefix($e1,$e1x)'>
+      <mtable intent=':system-of-equations:prefix($e1,$e1x)'>
         <mtr arg='e1'>
         <mtd columnalign='right'>
           <mi>a</mi>
@@ -1033,5 +1034,5 @@ fn unknown_mtable_property() {
       </mtable>
     </math>";
     test("en", "ClearSpeak",  expr,
-         "equation row 1; column 1; eigh, column 2; is equal to, b plus c minus d row 2; column 3; plus e minus f;");
+         "2 lines, line 1; eigh is equal to, b plus c minus d; line 2; plus e minus f;");
 }
