@@ -14,7 +14,7 @@
 
 
 - name: overview-default
-  tag: mfrac
+  tag: [mfrac, fraction]
   match: "."
   replace:
   - test:
@@ -27,7 +27,7 @@
       - t: "fraction"
 
 - name: overview-default
-  tag: msqrt
+  tag: [msqrt, "square-root"]
   match: "."
   replace:
   - t: "square root"
@@ -40,7 +40,7 @@
       - x: "*[1]"
 
 - name: overview-default
-  tag: mroot
+  tag: [mroot, root]
   match: "."
   replace:
   - test:
