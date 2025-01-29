@@ -329,7 +329,7 @@
   - "($NavCommand = 'ZoomIn' or "
   - "  ($NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom') and $NavMode='Enhanced') and "
   - "count(*)=1 and
-     (*[1][self::m:mrow] and
+     (*[1][self::m:mrow or @data-from-mathml='mrow'] and
       not(@data-from-mathml='msqrt' or self::m:msqrt or @data-from-mathml='menclose' or self::m:menclose))"
   replace:
   - with:
@@ -479,7 +479,7 @@
   replace:
   #don't bother with MatchCounter since we only get here if > 1
   - test:
-      if: "DEBUG($ReadZoomLevel >= DistanceFromLeaf(., false, $NavMode!='Character'))"
+      if: "$ReadZoomLevel >= DistanceFromLeaf(., false, $NavMode!='Character')"
       then:
       # - with:
       #     variables: [Move2D: "'in'", Child2D: "following-sibling::*[1]"]    # phrase('in' the denominator)
@@ -596,15 +596,15 @@
 - name: move-to-start-or-end-2d
   tag: "*"
   match:
-  - "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and IsNode(DEBUG(..), '2D') and"
+  - "($NavCommand = 'MoveLineStart' or $NavCommand = 'MoveLineEnd') and IsNode(.., '2D') and"
   - "not( IsNode(., 'leaf') and"
   - "     parent::*[1][self::m:msub or self::m:msup or self::m:msubsup or self::m:mmultiscripts or"
-  - "                  DEBUG(@data-from-mathml)='msub' or @data-from-mathml='msup' or"
+  - "                  @data-from-mathml='msub' or @data-from-mathml='msup' or"
   - "                  @data-from-mathml='msubsup' or @data-from-mathml='mmultiscripts'"
   - "                 ] )"
   replace:
   - test:
-      if: "DEBUG($NavVerbosity = 'Verbose')"
+      if: "$NavVerbosity = 'Verbose'"
       then:
       - test:
           if: "$NavCommand = 'MoveLineStart'"
@@ -612,7 +612,7 @@
           else: [t: "move to end of line"] # "$NavCommand = 'MoveLineEnd'"  # phrase('move to end of line')
       - pause: "medium"
   - test:
-      if: "self::m:mrow"
+      if: "self::m:mrow or @data-from-mathml = 'mrow'"
       then_test:
         if: "$NavCommand = 'MoveLineStart'"
         then:
@@ -623,7 +623,7 @@
         - with:
             variables: [NavCommand: "'MovePreviousZoom'"]
             replace: [x: "*[last()]"]
-      else: [set_variables: [NavNode: "DEBUG(@id)"]]
+      else: [set_variables: [NavNode: "@id"]]
 
 - name: move-to-start-or-end-default
   tag: "*"
@@ -1184,7 +1184,7 @@
       replace: [x: "."]
   - test:
       if: "following-sibling::*[1][.='\u2062' or .='\u2064'] and
-           ($NavMode='Enhanced' or ($NavMode='Simple' and DEBUG(following-sibling::*[2][not(IsNode(., 'mathml'))])))"   # invisible times and plus
+           ($NavMode='Enhanced' or ($NavMode='Simple' and following-sibling::*[2][not(IsNode(., 'mathml'))]))"   # invisible times and plus
       then: [set_variables: [NavNode: "following-sibling::*[1]/@id"]]
       else: [x: "following-sibling::*[1]"]
 
@@ -1322,7 +1322,7 @@
   tag: "*"
   match:
   - "($NavCommand = 'MoveNext' or $NavCommand = 'ReadNext' or $NavCommand = 'DescribeNext') and"
-  - "DEBUG($ReadZoomLevel)>=0"
+  - "$ReadZoomLevel>=0"
   replace:
   - with:
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
@@ -1353,7 +1353,7 @@
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
       replace: [x: "."]
   - test:
-      if: "DEBUG(following-sibling::*[1][@data-from-mathml='none' or @data-from-mathml='mprescripts'])"
+      if: "following-sibling::*[1][@data-from-mathml='none' or @data-from-mathml='mprescripts']"
       then: [x: "following-sibling::*[1]"]
       else:
       - test:
