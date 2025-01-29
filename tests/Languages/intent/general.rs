@@ -7,7 +7,6 @@ use crate::common::*;
 
 #[test]
 fn binomial() {
-  init_logger();
   let mathml = "<math><mrow>
         <mo>(</mo>
         <mfrac linethickness='0'> <mn arg='n'>7</mn> <mn arg='m'>3</mn> </mfrac>

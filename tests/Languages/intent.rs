@@ -3,3 +3,4 @@
 mod general;
 mod calculus;
 mod linear_algebra;
+mod tables;

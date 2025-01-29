@@ -110,7 +110,7 @@ fn dot_product_nabla() {
           <mo data-from-mathml='mo' stretchy='false'>^</mo>
         </modified-variable>
         <cross-product data-from-mathml='mo'></cross-product>
-        <gradient data-from-mathml='mrow' data-changed='added'>
+        <gradient data-from-mathml='mrow' data-changed='added' data-fixity='prefix'>
           <mi data-from-mathml='mi'>ψ</mi>
         </gradient>
       </mrow>
