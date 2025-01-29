@@ -174,22 +174,10 @@ fn main() {
   //   </math>";
 
   let expr = r#"
-<math xmlns="http://www.w3.org/1998/Math/MathML">
-  <mo stretchy="false">(</mo>
-  <mi mathvariant="normal">∇</mi>
-  <mo>⋅</mo>
-  <mrow data-mjx-texclass="ORD">
-    <mi mathvariant="bold">A</mi>
-  </mrow>
-  <mo stretchy="false">)</mo>
-  <mo stretchy="false">(</mo>
-  <mi mathvariant="normal">∇</mi>
-  <mo>⋅</mo>
-  <mrow data-mjx-texclass="ORD">
-    <mi mathvariant="bold">B</mi>
-  </mrow>
-  <mo stretchy="false">)</mo>
+<math display='block' intent:>
+<mi data-chem-element='3' id='id-5' data-id-added='true'>Co</mi>
 </math>
+
 
       "#;
   // let expr= "<math><mrow><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>";
@@ -206,8 +194,8 @@ fn main() {
   set_preference("BrailleCode".to_string(), "UEB".to_string()).unwrap();
   set_preference("TTS".to_string(), "None".to_string()).unwrap();
   set_preference("Verbosity".to_string(), "Verbose".to_string()).unwrap();
-  set_preference("NavVerbosity".to_string(), "Terse".to_string()).unwrap();
-  set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
+  set_preference("NavVerbosity".to_string(), "Verbose".to_string()).unwrap();
+  set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
   set_preference("Impairment".to_string(), "Blindness".to_string()).unwrap();
   set_preference("SpeechOverrides_CapitalLetters".to_string(), "".to_string()).unwrap();
   set_preference("MathRate".to_string(), "80".to_string()).unwrap();
@@ -225,9 +213,9 @@ fn main() {
     panic!("Error: exiting -- {}", errors_to_string(&e));
   };
 
-  match do_navigate_command("MoveNext".to_string())  {
+  match do_navigate_command("ZoomIn".to_string())  {
     Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),
-    Ok(speech) => info!("\nMoveNext speech: '{}'", speech),
+    Ok(speech) => info!("\nZoomIn speech: '{}'", speech),
   }
   match do_navigate_command("MoveNext".to_string()) {
     Err(e) => panic!("Error: exiting -- {}", errors_to_string(&e)),

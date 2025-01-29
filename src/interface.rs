@@ -16,7 +16,7 @@ use crate::canonicalize::{as_element, name};
 
 use crate::navigate::*;
 use crate::pretty_print::mml_to_string;
-use crate::xpath_functions::is_leaf;
+use crate::xpath_functions::{is_leaf, IsNode};
 
 #[cfg(feature = "enable-logs")]
 use std::sync::Once;
@@ -46,7 +46,7 @@ fn enable_logs() {
 
 // wrap up some common functionality between the call from 'main' and AT
 fn cleanup_mathml(mathml: Element) -> Result<Element> {
-    trim_element(&mathml);
+    trim_element(mathml, false);
     let mathml = crate::canonicalize::canonicalize(mathml)?;
     let mathml = add_ids(mathml);
     return Ok(mathml);
@@ -600,7 +600,7 @@ pub fn get_intent<'a>(mathml: Element<'a>, doc: Document<'a>) -> Result<Element<
 fn trim_doc(doc: &Document) {
     for root_child in doc.root().children() {
         if let ChildOfRoot::Element(e) = root_child {
-            trim_element(&e);
+            trim_element(e, false);
         } else {
             doc.root().remove_child(root_child); // comment or processing instruction
         }
@@ -608,7 +608,7 @@ fn trim_doc(doc: &Document) {
 }
 
 /// Not really meant to be public -- used by tests in some packages
-pub fn trim_element(e: &Element) {
+pub fn trim_element(e: Element, allow_structure_in_leaves: bool) {
     // "<mtext>this is text</mtext" results in 3 text children
     // these are combined into one child as it makes code downstream simpler
 
@@ -618,9 +618,9 @@ pub fn trim_element(e: &Element) {
         static ref WHITESPACE_MATCH: Regex = Regex::new(r#"[ \u{0009}\u{000A}\u{000D}]+"#).unwrap();
     }
 
-    if is_leaf(*e) {
+    if is_leaf(e) && (!allow_structure_in_leaves || IsNode::is_mathml(e)) {
         // Assume it is HTML inside of the leaf -- turn the HTML into a string
-        make_leaf_element(*e);
+        make_leaf_element(e);
         return;
     }
 
@@ -628,7 +628,7 @@ pub fn trim_element(e: &Element) {
     for child in e.children() {
         match child {
             ChildOfElement::Element(c) => {
-                trim_element(&c);
+                trim_element(c, allow_structure_in_leaves);
             }
             ChildOfElement::Text(t) => {
                 single_text += t.text();
@@ -641,7 +641,7 @@ pub fn trim_element(e: &Element) {
     }
 
     // CSS considers only space, tab, linefeed, and carriage return as collapsable whitespace
-    if !(is_leaf(*e) || name(e) == "intent-literal" || single_text.is_empty()) {
+    if !(is_leaf(e) || name(&e) == "intent-literal" || single_text.is_empty()) {
         // intent-literal comes from testing intent
         // FIX: we have a problem -- what should happen???
         // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash

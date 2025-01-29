@@ -24,7 +24,7 @@ const DECIMAL_SEPARATOR: &str = ".";
 pub const CHANGED_ATTR: &str = "data-changed";
 pub const ADDED_ATTR_VALUE: &str = "added";
 pub const INTENT_ATTR: &str = "intent";
-pub const MATHML_NAME_ATTR: &str = "data-from-mathml";
+pub const MATHML_FROM_NAME_ATTR: &str = "data-from-mathml";
 const MFENCED_ATTR_VALUE: &str = "from_mfenced";
 const EMPTY_IN_2D: &str = "data-empty-in-2D";
 const SPACE_AFTER: &str = "data-space-after";
@@ -3719,7 +3719,7 @@ impl CanonicalizeContext {
 			return false;
 		} 
 		let ch = text.chars().next().unwrap();
-		return '\u{2061}' <= ch && ch <= '\u{2064}'
+		return ('\u{2061}'..='\u{2064}').contains(&ch);
 	}
 
 	// Add the current operator if it's not n-ary to the stack
@@ -4363,7 +4363,7 @@ mod canonicalize_tests {
         let test_str = "<math><foo><mi>f</mi></foo></math>";
         let package1 = &parser::parse(test_str).expect("Failed to parse test input");
 		let mathml = get_element(package1);
-		trim_element(&mathml);
+		trim_element(mathml, false);
 		assert!(canonicalize(mathml).is_err());
     }
 
@@ -4474,7 +4474,7 @@ mod canonicalize_tests {
 
 		let package1 = &parser::parse(test).expect("Failed to parse test input");
 		let mathml = get_element(package1);
-		trim_element(&mathml);
+		trim_element(mathml, false);
 		let mathml_test = canonicalize(mathml).unwrap();
 		let first_child = as_element( mathml_test.children()[0] );
 		assert_eq!(name(&first_child), "mrow");
@@ -4498,7 +4498,7 @@ mod canonicalize_tests {
 
 		let package1 = &parser::parse(test).expect("Failed to parse test input");
 		let mathml = get_element(package1);
-		trim_element(&mathml);
+		trim_element(mathml, false);
 		let mathml_test = canonicalize(mathml).unwrap();
 		let first_child = as_element( mathml_test.children()[0] );
 		assert_eq!(name(&first_child), "mrow");

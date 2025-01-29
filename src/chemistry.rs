@@ -1786,7 +1786,7 @@ mod chem_tests {
 
         let new_package = new_package.unwrap();
         let mathml = get_element(&new_package);
-        trim_element(&mathml);
+        trim_element(mathml, false);
         return test_mathml(mathml);
     }
 

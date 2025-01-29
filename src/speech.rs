@@ -22,7 +22,7 @@ use crate::pretty_print::{mml_to_string, yaml_to_string};
 use std::path::Path;
 use std::rc::Rc;
 use crate::shim_filesystem::{read_to_string_shim, canonicalize_shim};
-use crate::canonicalize::{as_element, create_mathml_element, set_mathml_name, name, MATHML_NAME_ATTR};
+use crate::canonicalize::{as_element, create_mathml_element, set_mathml_name, name, MATHML_FROM_NAME_ATTR};
 use regex::Regex;
 
 
@@ -139,7 +139,7 @@ fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, math
                     Some(end) => speech_string = speech_string[start+2..start+2+end].to_string(),
                 }
             } else {
-                bail!(NAV_NODE_SPEECH_NOT_FOUND);
+                bail!(NAV_NODE_SPEECH_NOT_FOUND); //  NAV_NODE_SPEECH_NOT_FOUND is tested for later
             }
         }
         return Ok( rules.pref_manager.borrow().get_tts()
@@ -620,13 +620,13 @@ impl Intent {
             result = temp;
         }
         if let Some(intent_name) = &self.name {
-            result.set_attribute_value(MATHML_NAME_ATTR, name(&mathml));
+            result.set_attribute_value(MATHML_FROM_NAME_ATTR, name(&mathml));
             set_mathml_name(result, intent_name.as_str());
         } else if let Some(my_xpath) = &self.xpath{    // self.xpath_name must be != None
             let xpath_value = my_xpath.evaluate(rules_with_context.get_context(), mathml)?;
             match xpath_value {
                 Value::String(intent_name) => {
-                    result.set_attribute_value(MATHML_NAME_ATTR, name(&mathml));
+                    result.set_attribute_value(MATHML_FROM_NAME_ATTR, name(&mathml));
                     set_mathml_name(result, intent_name.as_str())
                 },
                 _ => bail!("'xpath-name' value '{}' was not a string", &my_xpath),

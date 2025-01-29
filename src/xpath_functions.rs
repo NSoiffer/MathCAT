@@ -26,7 +26,7 @@ use std::cell::{Ref, RefCell};
 use std::thread::LocalKey;
 use phf::phf_set;
 use sxd_xpath::function::Error as XPathError;
-use crate::canonicalize::{as_element, name, get_parent, MATHML_NAME_ATTR};
+use crate::canonicalize::{as_element, name, get_parent, MATHML_FROM_NAME_ATTR};
 
 // useful utility functions
 // note: child of an element is a ChildOfElement, so sometimes it is useful to have parallel functions,
@@ -66,7 +66,7 @@ pub fn validate_one_node<'n>(nodes: Nodeset<'n>, func_name: &str) -> Result<Node
 // Return true if the element's name is 'name'
 fn is_tag(e: Element, name: &str) -> bool {
     // need to check name before the fallback of where the name came from
-    return e.name().local_part() == name || e.attribute_value(MATHML_NAME_ATTR).unwrap_or_default() == name;
+    return e.name().local_part() == name || e.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or_default() == name;
 }
 
 #[allow(non_snake_case)]
@@ -306,21 +306,21 @@ impl IsNode {
     }
 
     pub fn is_mathml(elem: Element) -> bool {
-        // doesn't check MATHML_NAME_ATTR because we are interested in if it is an intent.
+        // doesn't check MATHML_FROM_NAME_ATTR because we are interested in if it is an intent.
         return ALL_MATHML_ELEMENTS.contains(name(&elem));
     }
 
     #[allow(non_snake_case)]
     pub fn is_2D(elem: Element) -> bool {
-        return MATHML_2D_NODES.contains(elem.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&elem)));
+        return MATHML_2D_NODES.contains(elem.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(&elem)));
     }
 
     pub fn is_scripted(elem: Element) -> bool {
-        return MATHML_SCRIPTED_NODES.contains(elem.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&elem)));
+        return MATHML_SCRIPTED_NODES.contains(elem.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(&elem)));
     }
 
     pub fn is_modified(elem: Element) -> bool {
-        return MATHML_MODIFIED_NODES.contains(elem.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&elem)));
+        return MATHML_MODIFIED_NODES.contains(elem.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(&elem)));
     }
     }
 
@@ -359,7 +359,7 @@ static MATHML_SCRIPTED_NODES: phf::Set<&str> = phf_set! {
 };
 
 pub fn is_leaf(element: Element) -> bool {
-    return MATHML_LEAF_NODES.contains(element.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&element)));
+    return MATHML_LEAF_NODES.contains(name(&element));
 }
 
 impl Function for IsNode {
@@ -1096,7 +1096,7 @@ impl DistanceFromLeaf {
         let mut element = element;
         let mut distance = 1;
         loop {
-            debug!("distance={} -- element: {}", distance, mml_to_string(&element));
+            // debug!("distance={} -- element: {}", distance, mml_to_string(&element));
             if is_leaf(element) {
                 return distance;
             }
@@ -1144,13 +1144,13 @@ pub struct EdgeNode;
 impl EdgeNode {
     // Return the root of the ancestor tree if we are at the left/right side of a path from that to 'element'
     fn edge_node<'a>(element: Element<'a>, use_left_side: bool, stop_node_name: &str) -> Option<Element<'a>> {
-        let element_name = element.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&element));
+        let element_name = element.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(&element));
         if element_name == "math" {
             return Some(element);
         };
 
         let parent = get_parent(element);   // there is always a "math" node
-        let parent_name = parent.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&parent));
+        let parent_name = parent.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(&parent));
 
         // first check to see if we have the special case of punctuation as last child of math/mrow element
         // it only matters if we are looking at the right edge
@@ -1163,7 +1163,7 @@ impl EdgeNode {
         if !use_left_side && !element.following_siblings().is_empty() {  // not at right side
             // check for the special case that the parent is an mrow and the grandparent is <math> and we have punctuation
             let grandparent = get_parent(parent);
-            let grandparent_name = grandparent.attribute_value(MATHML_NAME_ATTR).unwrap_or(name(&grandparent));
+            let grandparent_name = grandparent.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or(name(&grandparent));
             if grandparent_name == "math" &&
                parent_name == "mrow" && parent.children().len() == 2 {      // right kind of mrow
                 let text = get_text_from_element( as_element(parent.children()[1]) );
@@ -1436,7 +1436,7 @@ mod tests {
         let package = parser::parse(mathml_str)
         .expect("failed to parse XML");
         let mathml = get_element(&package);
-        trim_element(&mathml);
+        trim_element(mathml, false);
         assert!(IsNode::is_simple(mathml), "{}", message);
     }
 
@@ -1446,7 +1446,7 @@ mod tests {
         let package = parser::parse(mathml_str)
         .expect("failed to parse XML");
         let mathml = get_element(&package);
-        trim_element(&mathml);
+        trim_element(mathml, false);
         assert!(!IsNode::is_simple(mathml), "{}", message);
     }
     #[test]
@@ -1490,7 +1490,7 @@ mod tests {
         let mathml = "<math><mfrac><mrow><mn>30</mn><mi>x</mi></mrow><mn>4</mn></mfrac></math>";
         let package = parser::parse(mathml).expect("failed to parse XML");
         let mathml = get_element(&package);
-        trim_element(&mathml);
+        trim_element(mathml, false);
         let fraction = as_element(mathml.children()[0]);
         let mn = as_element(as_element(fraction.children()[0]).children()[0]);
         assert_eq!(EdgeNode::edge_node(mn, true, "2D"), Some(fraction));
@@ -1505,7 +1505,7 @@ mod tests {
         let mathml = "<math><mrow><mfrac><mn>4</mn><mrow><mn>30</mn><mi>x</mi></mrow></mfrac><mo>.</mo></mrow></math>";
         let package = parser::parse(mathml).expect("failed to parse XML");
         let mathml = get_element(&package);
-        trim_element(&mathml);
+        trim_element(mathml, false);
         let fraction = as_element(as_element(mathml.children()[0]).children()[0]);
         let mi = as_element(as_element(fraction.children()[1]).children()[1]);
         assert_eq!(EdgeNode::edge_node(mi, true, "2D"), None);

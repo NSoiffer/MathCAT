@@ -101,13 +101,13 @@ pub fn are_strs_canonically_equal_with_locale(test: &str, target: &str, block_se
     
     let package1 = &parser::parse(test).expect("Failed to parse test input");
     let mathml = get_element(package1);
-    trim_element(&mathml);
+    trim_element(mathml, false);
     // debug!("test:\n{}", mml_to_string(&mathml));
     let mathml_test = canonicalize(mathml).unwrap();
    
     let package2 = &parser::parse(target).expect("Failed to parse target input");
     let mathml_target = get_element(package2);
-    trim_element(&mathml_target);
+    trim_element(mathml_target, false);
     // debug!("target:\n{}", mml_to_string(&mathml_target));
 
     match is_same_element(&mathml_test, &mathml_target) {
