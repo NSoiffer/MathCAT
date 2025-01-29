@@ -183,7 +183,7 @@ pub fn test_intent(mathml: &str, target: &str, test_prefs: Vec<(&str, &str)>) {
 
     let package = &parser::parse(target).expect("Failed to parse target input");
     let target = get_element(package);
-    trim_element(&target);
+    trim_element(target, true);
 
     let new_package = parser::parse(mathml);
     if let Err(e) = new_package {
