@@ -721,23 +721,6 @@
       replace: [x: "*[2]"]
 
 -
-  name: piecewise
-  tag: mrow
-  match:
-  - "count(*)=2 and *[1][.='{'] and
-          *[2][self::m:mtable and not(
-                        contains(@data-intent-property, ':array:') or
-                        contains(@data-intent-property, ':matrix:') or
-                        contains(@data-intent-property, ':determinant:') or
-                        contains(@data-intent-property, 'system-of-equations:') or
-                        contains(@data-intent-property, ':lines:') )
-              ]"
-  replace:
-  - with:
-      variables: [TableProperty: "'piecewise'"]
-      replace: [x: "*[2]"]
-
--
   name: mtable-equations-property
   tag: mtable
   match: "count(*) > 0 and *[1][contains(translate(., '=≠<>≤≥≦≧', '='), '=')]"
