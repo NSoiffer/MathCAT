@@ -1193,9 +1193,8 @@ impl MyXPath {
             Ok(val) => Ok( val ),
             Err(e) => {
                 bail!( "{}\n\n",
-                e.to_string()           // remove confusing parts of error message from xpath
-                .replace("OwnedPrefixedName { prefix: None, local_part:", "")
-                .replace(" }", "") )
+                     // remove confusing parts of error message from xpath
+                    e.to_string().replace("OwnedPrefixedName { prefix: None, local_part:", "").replace(" }", "") );
             }
         };
     }
