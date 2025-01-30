@@ -1068,7 +1068,6 @@ fn identity_matrix() {
 
 #[test]
 fn diagonal_matrix() {
-  init_logger();
   let expr = "<math>
       <mo>(</mo>
       <mtable>
