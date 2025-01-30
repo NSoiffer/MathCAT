@@ -714,6 +714,60 @@
   - t: "with entry"      # phrase(the 2 by 2 matrix 'with entry' x)
   - x: "*[1]/*"
 
+# simpler reading methods for special case matrices
+- name: zero-matrix
+  tag: matrix
+  # select all the non-zero entries -- if there are none of them, then it is a zero matrix
+  match: "not( */*/*[not(self::m:mn and .= 0)] )"
+  replace:
+  - t: "the"      # phrase('the' 1 by 2 matrix M)
+  - x: count(*)
+  - t: "by"       # phrase(the 1 'by' 2 matrix)
+  - x: count(*[self::m:mtr][1]/*)
+  - t: "zero matrix"   # phrase(the 2 by 2 'zero matrix')
+  - pause: long
+
+- name: identity-matrix
+  tag: matrix
+  # select all the non-zero entries...if they are not on the diagonal, or are != 1
+  #   if there are any of them, then this isn't an identity matrix
+  match:
+  - "count(*) = count(*[1]/*) and "
+  - "not( */*/*[not(self::m:mn and .= 0)]"
+  - "          [count(../preceding-sibling::*)!=count(../../preceding-sibling::*) or .!= 1]"
+  - "    )"
+  replace:
+  - t: "the"      # phrase('the' 1 by 2 matrix M)
+  - x: count(*)
+  - t: "by"       # phrase(the 1 'by' 2 matrix)
+  - x: count(*[self::m:mtr][1]/*)
+  - t: "identity matrix"   # phrase(the 2 by 2 'identity matrix')
+  - pause: long
+
+- name: diagonal-matrix
+  tag: matrix
+  # select all the non-zero entries...if they are not on the diagonal
+  #   if there are any of them, then this isn't an identity matrix
+  match:
+  - "count(*) = count(*[1]/*) and "
+  - "not( */*/*[not(self::m:mn and .= 0)]"
+  - "          [count(../preceding-sibling::*)!=count(../../preceding-sibling::*)]"
+  - "    )"
+  replace:
+  - t: "the"      # phrase('the' 1 by 2 matrix)
+  - x: count(*)
+  - t: "by"       # phrase(the 1 'by' 2 matrix)
+  - x: count(*[self::m:mtr][1]/*)
+  - t: "diagonal matrix"   # phrase(the 2 by 2 'diagonal matrix')
+  - pause: long
+  - insert:
+      # this lists the diagonal 'mtd's to be read, and they say "column nnn" before reading the contents
+      # there seems to be an xpath bug -- without the parens, the match fails for the
+      #   test Languages::en::mtable::diagonal_matrix due to match failure (the third matching element seems to be missing)
+      nodes: "(*/*/*[not(self::m:mn and .= 0)]/..)"
+      replace: [pause: auto]
+  - pause: long
+
 # simpler reading methods for smaller matrices if the entries are simple
 - name: 2-or-3x1-matrix
   tag: matrix

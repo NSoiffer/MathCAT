@@ -1001,7 +1001,6 @@ fn matrix_times() {
 
 #[test]
 fn unknown_mtable_property() {
-  init_logger();
   let expr = "<math display='block'>
       <mtable intent=':system-of-equations:prefix($e1,$e1x)'>
         <mtr arg='e1'>
@@ -1035,4 +1034,52 @@ fn unknown_mtable_property() {
     </math>";
     test("en", "ClearSpeak",  expr,
          "2 lines, line 1; eigh is equal to, b plus c minus d; line 2; plus e minus f;");
+}
+
+
+#[test]
+fn zero_matrix() {
+  let expr = "<math>
+      <mo>[</mo>
+      <mtable>
+        <mtr><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd></mtr>
+        <mtr><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd></mtr>
+      </mtable>
+      <mo>]</mo>
+  </math>";
+  test("en", "SimpleSpeak", expr,
+    "the 2 by 2 zero matrix;");
+}
+
+#[test]
+fn identity_matrix() {
+  let expr = "<math>
+      <mo>(</mo>
+      <mtable>
+        <mtr><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd></mtr>
+        <mtr><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd></mtr>
+        <mtr><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd></mtr>
+      </mtable>
+      <mo>)</mo>
+  </math>";
+  test("en", "SimpleSpeak", expr,
+    "the 3 by 3 identity matrix;");
+}
+
+#[test]
+fn diagonal_matrix() {
+  init_logger();
+  let expr = "<math>
+      <mo>(</mo>
+      <mtable>
+        <mtr><mtd><mn>2</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd></mtr>
+        <mtr><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd></mtr>
+        <mtr><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd><mtd><msup><mi>x</mi><mn>2</mn></msup></mtd></mtr>
+      </mtable>
+      <mo>)</mo>
+  </math>";
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
+      expr, "the 3 by 3 diagonal matrix; column 1; 2; column 2; 1; column 3; x squared;");
+  // test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")],
+  //     expr, "the 3 by 3 diagonal matrix; row 1, column 1, 2; row 2, column 2, 1; row 3, column 3, x squared");
 }
