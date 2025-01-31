@@ -10,7 +10,7 @@
       then:
       - test:
           if: "$Verbosity!='Terse'"
-          then: [t: "of"]             # phrase('div' is short for divergence) -- note OneCore voices spell out "div"
+          then: [t: "of"]             # phrase(function 'of' one variable) -- note OneCore voices spell out "div"
       - test:
           if: "not(IsNode(*[1], 'leaf'))"
           then: [pause: short]
@@ -36,7 +36,7 @@
   - t: "curl"      # phrase(the 'curl of' a field)
   - test:
       if: "$Verbosity!='Terse'"
-      then: [t: "of"]             # phrase('div' is short for divergence) -- note OneCore voices spell out "div"
+      then: [t: "of"]             # phrase(function 'of' one variable) -- note OneCore voices spell out "div"
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [pause: short]
