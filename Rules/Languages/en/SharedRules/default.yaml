@@ -616,15 +616,34 @@
 
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
-- name: prefix-infix-postfix-silent-intent
+- name: silent-intent
   # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "count(*)>0 and (
-            contains(@data-intent-property, ':prefix:') or
-            contains(@data-intent-property, ':infix:') or
-            contains(@data-intent-property, ':postfix:') or
-            contains(@data-intent-property, ':silent:')
-            )"
+  match: "count(*)>0 and contains(@data-intent-property, ':silent:')"
+  replace:
+  - x: "*"
+
+- name: prefix-intent
+  # uncaught intent -- the args have been inserted in the order of speech 
+  tag: "*"
+  match: "count(*)>0 and contains(@data-intent-property, ':prefix:')"
+  replace:
+  - x: "name(.)"
+  - x: "*"
+
+- name: postfix-intent
+  # uncaught intent -- the args have been inserted in the order of speech 
+  tag: "*"
+  match: "count(*)>0 and contains(@data-intent-property, ':postfix:')"
+  replace:
+  - x: "*"
+  - x: "name(.)"
+
+# Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
+- name: infix-intent
+  # uncaught intent -- the args have been inserted in the order of speech 
+  tag: "*"
+  match: "count(*)>0 and contains(@data-intent-property, ':infix:')"
   replace:
   - insert:
       nodes: "*"
