@@ -1580,7 +1580,7 @@ pub fn likely_chem_state(mathml: Element) -> isize {
         if contents_name == "mi" || contents_name == "mtext" {
             let text = as_text(contents);
             if text == "s" || text == "l" ||text == "g" ||text == "aq" {
-                return text.as_bytes().len() as isize + 1;       // hack to count chars -- works because all are ASCII 
+                return text.len() as isize + 1;       // hack to count chars -- works because all are ASCII 
             };
         }
      }
