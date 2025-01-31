@@ -1,6 +1,6 @@
 [package]
 name = "mathcat"
-version = "0.6.8-rc.4"
+version = "0.6.8-rc.5"
 authors = ["Neil Soiffer <soiffer@alum.mit.edu>"]
 license = "MIT"
 description = "MathCAT: Math Capable Assistive Technology ('Speech and braille from MathML')"
@@ -15,7 +15,9 @@ exclude = ["src/main.rs"]    # should have "Rules/", but then one can't run buil
 "include-zip" = []
 "enable-logs" = ["android_logger"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+# FIX: temporary -- need to replace error-chain package which has been deprecated
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(has_error_description_deprecated)'] }
 
 [dependencies]
 sxd-document = "0.3"
