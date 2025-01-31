@@ -8,6 +8,7 @@ use sxd_document::dom::Element;
 use sxd_document::Package;
 
 use std::fmt;
+use crate::canonicalize::{name, get_parent};
 use crate::pretty_print::mml_to_string;
 use crate::speech::{NAVIGATION_RULES, CONCAT_INDICATOR, CONCAT_STRING, SpeechRules, SpeechRulesWithContext};
 #[cfg(not(target_family = "wasm"))]
@@ -404,14 +405,15 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
 
     fn get_start_node<'m>(mathml: Element<'m>, nav_state: &RefMut<NavigationState>) -> Result<Element<'m>>  {
         let start_node_id =  match nav_state.top() {
-            None => mathml.attribute_value("id").unwrap().to_string(),
-            Some( (position, _) ) => position.current_node.clone(),
+            None => mathml.attribute_value("id").unwrap(),
+            Some( (position, _) ) => position.current_node.as_str(),
         };
 
-        return match get_node_by_id(mathml, &start_node_id) {
+        return match get_node_by_id(mathml, start_node_id) {
             Some(node) => Ok(node),
             None => {
-                bail!("Internal Error: didn't find id '{}' while attempting to start navigation", &start_node_id);
+                bail!("Internal Error: didn't find id '{}' while attempting to start navigation. MathML is\n{}",
+                      &start_node_id, mml_to_string(mathml));
             }
         };
     }
@@ -423,6 +425,14 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             loop_count: usize) -> Result<(String, bool)> {
         let context = rules_with_context.get_context();
         context.set_variable("MatchCounter", loop_count as f64);
+        context.set_variable("SpeechStyle",
+                             Value::String(
+                                if nav_state.mode == "Character" {
+                                    "LiteralSpeak".to_string()
+                                } else {
+                                    rules.pref_manager.borrow().pref_to_string("SpeechStyle")
+                                }
+                             ));
         nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
 
         let intent = if nav_state.mode == "Character" {
@@ -430,7 +440,27 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
         } else {
             crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?
         };
-        let start_node = get_start_node(intent, nav_state)?;
+
+        // we should always find the start node.
+        // however, if were were navigating by character, then switch the NavMode, the intent tree might not have that node in it
+        let start_node = match get_start_node(intent, nav_state) {
+            Ok(node) => node,
+            Err(_) => {
+                // find the node in the other tree (probably mathml) and walk up to find a parent that has an id in both
+                let other_tree = if nav_state.mode == "Character" {intent} else {mathml};
+                let mut found_node = get_start_node(other_tree, nav_state)?;
+                while name(found_node) != "math" {
+                    found_node = get_parent(found_node);
+                    debug!("found_node:\n{}", mml_to_string(found_node));
+                    if let Some(intent_node) = get_node_by_id(intent, found_node.attribute_value("id").unwrap_or_default()) {
+                        found_node = intent_node;
+                        break;
+                    }
+                }
+                found_node
+            }
+        };
+
         debug!("start_node\n{}", mml_to_string(start_node));
 
         let raw_speech_string = rules_with_context.match_pattern::<String>(start_node)
@@ -1915,6 +1945,43 @@ mod tests {
             assert_eq!(speech, "zoom in; in base; 2 x");
             let speech = test_command("MoveNext", mathml, "id-9");
             assert_eq!(speech, "move right; in superscript; 2");
+            return Ok( () );
+        });
+    }
+
+    #[test]
+    fn binomial_intent() -> Result<()> {
+        init_logger();
+        let mathml_str = "   <math display='block' id='id-0'>
+                <mrow intent='binomial($n,$k)' id='id-1'>
+                    <mo id='id-2'>(</mo>
+                    <mfrac linethickness='0pt' id='id-3'>
+                        <mi arg='n' id='id-4'>n</mi>
+                        <mi arg='k' id='id-5'>k</mi>
+                    </mfrac>
+                <mo id='id-6'>)</mo>
+                </mrow>
+            </math>";
+        init_default_prefs(mathml_str, "Character");
+        set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+        return MATHML_INSTANCE.with(|package_instance| {
+            let package_instance = package_instance.borrow();
+            let mathml = get_element(&*package_instance);
+            let speech = test_command("MoveStart", mathml, "id-2");
+            assert_eq!(speech, "move to start of math; open paren");
+
+            // was on char not on intent tree
+            set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
+            // let speech = test_command("ReadCurrent", mathml, "id-2");
+            // assert_eq!(speech, "read current; n choose k");
+            let speech = test_command("ZoomIn", mathml, "id-4");
+            assert_eq!(speech, "zoom in; n");
+            let speech = test_command("MoveNext", mathml, "id-5");
+            assert_eq!(speech, "move right; k");
+            let speech = test_command("MoveNext", mathml, "id-5");
+            assert_eq!(speech, "cannot move right, end of math;");
+            let speech = test_command("ZoomOut", mathml, "id-1");
+            assert_eq!(speech, "zoom out; n choose k");
             return Ok( () );
         });
     }

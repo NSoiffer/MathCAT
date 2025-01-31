@@ -227,6 +227,8 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
                 intent = create_mathml_element(&doc, name(mathml));
                 intent.set_attribute_value(INTENT_PROPERTY, &properties);
                 intent.set_attribute_value(MATHML_FROM_NAME_ATTR, name(mathml));
+                intent.set_attribute_value("id", mathml.attribute_value("id")
+                      .ok_or("no id on intent function name")?);
             } else {
                 let saved_intent = mathml.attribute_value(INTENT_ATTR).unwrap();
                 mathml.remove_attribute(INTENT_ATTR);
@@ -245,6 +247,9 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
             intent.set_attribute_value(MATHML_FROM_NAME_ATTR, 
                 if word == mathml.attribute_value(INTENT_ATTR).unwrap_or_default() {name(mathml)} else {leaf_name});
             intent.set_text(word);       // '-' and '_' get removed by the rules.
+            if let Some(id) = mathml.attribute_value("id") {
+                intent.set_attribute_value("id", id);
+            }
             lex_state.get_next()?;
             if let Token::Property(_) = lex_state.token {
                 let properties = get_properties(lex_state)?;
