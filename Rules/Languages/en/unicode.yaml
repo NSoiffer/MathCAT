@@ -209,9 +209,9 @@
  - "´": [t: "acute"]                            # 0xb4
  - "·":                                            # 0xB7
     - test:
-        if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
-        then: [t: "times"]
-        else: [t: "dot"]
+        if: "$SpeechStyle = 'LiteralSpeak' or not($SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultSymbolDot = 'Auto')"
+        then: [t: "dot"]
+        else: [t: "times"]
  - "×":                                          # 0xd7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
