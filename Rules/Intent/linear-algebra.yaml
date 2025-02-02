@@ -34,7 +34,7 @@
   replace:
   - intent:
       name: "subscripted-norm"
-      attrs: "id='@id' data-fixity='\"norm;subscript\"'"
+      attrs: "id='@id' data-fixity='\"prefix\"'"
       children:
       - x: "*[1]/*[2]"   # grab the contents of the bracketed expr
       - x: "*[2]"
