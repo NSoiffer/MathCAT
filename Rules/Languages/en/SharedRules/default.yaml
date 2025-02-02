@@ -647,23 +647,23 @@
   replace:
   - insert:
       nodes: "*"
-      replace: [pause: auto]
+      replace: [x: "name(.)", pause: auto]
 
 - name: function-intent
   # uncaught intent -- speak as foo of arg1 comma arg2 ....
   tag: "*"
-  match: count(*)>0
+  match: "count(*)>0"
   replace:
   - x: "translate(name(.), '-_', '  ')"
   - test:
       if: "not(contains(@data-intent-property, ':literal:'))"
-      then: [t: "of", pause: short]      # phrase(sine 'of' 5)
+      then: [t: "of", pause: auto]      # phrase(sine 'of' 5)
   - insert:
       nodes: "*"
       replace:
       - test:
           if: "not(contains(@data-intent-property, ':literal:'))"
-          then: [t: "comma"]      # phrase(f of x 'comma' y)
+          then: [x: "','"]      # phrase(f of x 'comma' y)
       - pause: auto
 
 - name: default-text
