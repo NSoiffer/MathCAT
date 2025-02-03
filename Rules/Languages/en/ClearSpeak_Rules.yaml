@@ -249,6 +249,7 @@
       if: "*[2][text()='2']"
       then: [t: "squared"]      # phrase(25 equals 5 'squared')
       else: [t: "cubed"]      # phrase(625 equals 5 'cubed')
+
 - name: function-power
   tag: power
   match:
