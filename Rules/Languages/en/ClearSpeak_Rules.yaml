@@ -748,6 +748,7 @@
   - "not( $ClearSpeak_ImpliedTimes = 'None' and "
   - "     (preceding-sibling::*[1][text()='⁢'] or following-sibling::*[1][text()='⁢']) ) and "
   - "IsNode(*[2], 'simple') and"
+  - "not(preceding-sibling::*[1][.='\u2062' and @data-function-guess]) and"
   - "not(ancestor-or-self::*[contains(@data-intent-property, ':literal:')])"
   # missing clause: 'a positive fraction that is spoken as an ordinal
   #   (either by the Ordinal preference or by the default rules)'
