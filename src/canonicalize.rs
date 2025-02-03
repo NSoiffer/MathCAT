@@ -18,6 +18,7 @@ use crate::pretty_print::*;
 use regex::Regex;
 use std::fmt;
 use crate::chemistry::*;
+use unicode_script::Script;
 
 // FIX: DECIMAL_SEPARATOR should be set by env, or maybe language
 const DECIMAL_SEPARATOR: &str = ".";
@@ -2007,11 +2008,20 @@ impl CanonicalizeContext {
 				return None;
 			}
 			let mut text =  as_text(mi).to_string();
+			let text_script = Script::from(text.chars().next().unwrap_or('a'));
 			let following_siblings = mi.following_siblings();
 			let following_mi_siblings: Vec<Element> = following_siblings.iter()
 						.map_while(|&child| {
 							let child = as_element(child);
-							if name(child) == "mi" && as_text(child).chars().count() == 1 {Some(child)} else {None}
+							let mut is_ok = false;
+							if name(child) == "mi" {
+								let mut text = as_text(child).chars();
+								let first_char = text.next().unwrap_or('a');
+								if text.next().is_none() && Script::from(first_char) == text_script {
+									is_ok = true;
+								}
+							}
+							if is_ok {Some(child)} else {None}
 						})
 						.collect();
 			if following_mi_siblings.is_empty() {
@@ -2051,14 +2061,6 @@ impl CanonicalizeContext {
 			// FIX: this check needs to be internationalized to include accented vowels, other alphabets
 			if !text.chars().any(|ch| VOWELS.contains(&ch)) {
 				return None;
-			}
-
-			// I asked bard and chatgpt for formula words that are alphabetical (see below about 'abc'), and they failed.
-			// I did find "flow" and "flux" in a list elsewhere -- I'm sure there are more. Probably other languages need to be handled
-			// Check for them here, and anything else that's alphabetical we avoid turning into a word
-			// FIX: this is English-centric
-			if ["flow", "flux"].contains(&text.as_str()) {
-				return merge_from_text(mi, &text, &following_mi_siblings);
 			}
 		
 			// now for some heuristics to rule out a sequence of variables
@@ -5775,6 +5777,8 @@ mod canonicalize_tests {
 			<mi>c</mi><mi>o</mi><mi>s</mi><mo>=</mo>
 			<mi>w</mi><mi>x</mi><mi>y</mi><mi>z</mi><mo>+</mo>
 			<mi>n</mi><mi>a</mi><mi>x</mi><mo>+</mo>
+  			<mi>i</mi><mi>ω</mi><mi>t</mi><mo>+</mo>
+			<mi>f</mi><mi>l</mi><mi>o</mi><mi>w</mi><mo>+</mo>
 			<mi>m</mi><mi>a</mi><mi>x</mi>
 		</math> 
 	";
@@ -5784,22 +5788,32 @@ mod canonicalize_tests {
 			<mo>=</mo>
 			<mrow data-changed='added'>
 				<mrow data-changed='added'>
-				<mi>w</mi>
-				<mo data-changed='added'>&#x2062;</mo>
-				<mi>x</mi>
-				<mo data-changed='added'>&#x2062;</mo>
-				<mi>y</mi>
-				<mo data-changed='added'>&#x2062;</mo>
-				<mi>z</mi>
+					<mi>w</mi>
+					<mo data-changed='added'>&#x2062;</mo>
+					<mi>x</mi>
+					<mo data-changed='added'>&#x2062;</mo>
+					<mi>y</mi>
+					<mo data-changed='added'>&#x2062;</mo>
+					<mi>z</mi>
 				</mrow>
 				<mo>+</mo>
 				<mrow data-changed='added'>
-				<mi>n</mi>
-				<mo data-changed='added'>&#x2062;</mo>
-				<mi>a</mi>
-				<mo data-changed='added'>&#x2062;</mo>
-				<mi>x</mi>
+					<mi>n</mi>
+					<mo data-changed='added'>&#x2062;</mo>
+					<mi>a</mi>
+					<mo data-changed='added'>&#x2062;</mo>
+					<mi>x</mi>
 				</mrow>
+				<mo>+</mo>
+				<mrow data-changed='added'>
+					<mi>i</mi>
+					<mo data-changed='added'>&#x2062;</mo>
+					<mi>ω</mi>
+					<mo data-changed='added'>&#x2062;</mo>
+					<mi>t</mi>
+				</mrow>
+				<mo>+</mo>
+				<mi>flow</mi>
 				<mo>+</mo>
 				<mi>max</mi>
 			</mrow>
