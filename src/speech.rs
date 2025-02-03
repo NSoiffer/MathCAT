@@ -1321,7 +1321,7 @@ impl SpeechPattern  {
                 None => rule_value.push(speech_pattern),
                 Some((i, _old_pattern)) => {
                     let old_rule = &rule_value[i];
-                    info!("\n***WARNING: replacing {}/'{}' in {} with rule from {}\n",
+                    info!("\n\n***WARNING***: replacing {}/'{}' in {} with rule from {}\n",
                             old_rule.tag_name, old_rule.pattern_name, old_rule.file_name, speech_pattern.file_name);
                     rule_value[i] = speech_pattern;
                 },
