@@ -2010,15 +2010,34 @@ impl CanonicalizeContext {
 			let mut text =  as_text(mi).to_string();
 			let text_script = Script::from(text.chars().next().unwrap_or('a'));
 			let following_siblings = mi.following_siblings();
-			let following_mi_siblings: Vec<Element> = following_siblings.iter()
+			let mut last_char_is_scripted = None;
+			let mut following_mi_siblings: Vec<Element> = following_siblings.iter()
 						.map_while(|&child| {
-							let child = as_element(child);
+							let mut child = as_element(child);
 							let mut is_ok = false;
+							if name(child) == "msub" || name(child) == "msup" {
+								// check if the *last* char in the sequence is scripted
+								// if so, we need to stop here anyway and deal with it specially
+								last_char_is_scripted = Some(child);		// need to remember the value -- cleared later if not ok
+								child = as_element(child.children()[0]);
+								while name(child) == "mrow" && child.children().len() == 1 {
+									// the base may be wrapped with mrows
+									child = as_element(child.children()[0]);
+								}
+							}
 							if name(child) == "mi" {
-								let mut text = as_text(child).chars();
-								let first_char = text.next().unwrap_or('a');
-								if text.next().is_none() && Script::from(first_char) == text_script {
+								let mut child_text = as_text(child).chars();
+								let first_char = child_text.next().unwrap_or('a');
+								if child_text.next().is_none() && Script::from(first_char) == text_script {
+									text.push(first_char);
 									is_ok = true;
+								}
+							}
+							if last_char_is_scripted.is_some() {
+								if is_ok {
+									is_ok = false;		// don't want to continue
+								} else {
+									last_char_is_scripted = None;	// reset to None
 								}
 							}
 							if is_ok {Some(child)} else {None}
@@ -2028,13 +2047,9 @@ impl CanonicalizeContext {
 				return None;
 			}
 		
-			for &child in &following_mi_siblings {   // referenced to avoid a move
-				let mut chars = as_text(child).chars();
-				chars.next();	// advance to second char
-				if chars.next().is_some() {
-					return None;		// if something in the sequence is more than a char, assume the others are correct
-				}
-				text.push_str(as_text(child));
+			if let Some(last) = last_char_is_scripted {
+				// add the last char to the run
+				following_mi_siblings.push(last);
 			}
 			// debug!("merge_mi_sequence: text={}", &text);
 			if let Some(answer) = crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
@@ -2083,11 +2098,26 @@ impl CanonicalizeContext {
 			// FIX: should add more heuristics to rule out words
 			return merge_from_text(mi, &text, &following_mi_siblings);
 
-			fn merge_from_text<'a>(mi: Element<'a>, text: &str, following_siblings: &[Element]) -> Option<Element<'a>> {
+			fn merge_from_text<'a>(mi: Element<'a>, text: &str, following_siblings: &[Element<'a>]) -> Option<Element<'a>> {
 				// remove trailing mi's
-				following_siblings.iter().for_each(|sibling| sibling.remove_from_parent());
-				mi.set_text(text);
-				return Some(mi);
+				let i_last_child = following_siblings.len()-1;
+				let last_child = following_siblings[i_last_child];
+				if name(last_child) == "mi" {
+					following_siblings.iter().for_each(|sibling| sibling.remove_from_parent());
+					mi.set_text(text);
+					return Some(mi);
+				} else {
+					// replace the base of the scripted element (the last child) with the run (e.g. 's i n^2' -> {sin}^2)
+					mi.remove_from_parent();
+					following_siblings[..i_last_child].iter().for_each(|sibling| sibling.remove_from_parent());
+					let mut base = as_element(last_child.children()[0]);
+					while name(base) == "mrow" && base.children().len() == 1 {
+						// the base may be wrapped with mrows
+						base = as_element(base.children()[0]);
+					}
+					base.set_text(text);
+					return Some(last_child);
+				}
 			}
 		}
 
@@ -5819,6 +5849,77 @@ mod canonicalize_tests {
 			</mrow>
 			</mrow>
 		</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn merge_mi_with_script_test() {
+        let test_str = "<math>
+			<mi>c</mi><mi>o</mi><msup><mi>s</mi><mn>2</mn></msup><mi>y</mi><mo>=</mo>
+			<mi>l</mi><mi>o</mi><msup><mi>g</mi><mn>2</mn></msup><mi>y</mi><mo>+</mo>
+			<mi>d</mi><mi>a</mi><msup><mi>g</mi><mn>2</mn></msup>
+		</math>";
+        let target_str = "<math>
+				<mrow data-changed='added'>
+					<mrow data-changed='added'>
+						<msup>
+							<mi>cos</mi>
+							<mn>2</mn>
+						</msup>
+						<mo data-changed='added'>&#x2061;</mo>
+						<mi>y</mi>
+					</mrow>
+					<mo>=</mo>
+					<mrow data-changed='added'>
+						<mrow data-changed='added'>
+							<msup>
+								<mi>log</mi>
+								<mn>2</mn>
+							</msup>
+							<mo data-changed='added'>&#x2061;</mo>
+							<mi>y</mi>
+						</mrow>
+						<mo>+</mo>
+						<mrow data-changed='added'>
+							<mi>d</mi>
+							<mo data-changed='added'>&#x2062;</mo>
+							<mi>a</mi>
+							<mo data-changed='added'>&#x2062;</mo>
+							<msup>
+								<mi>g</mi>
+								<mn>2</mn>
+							</msup>
+						</mrow>
+					</mrow>
+				</mrow>
+			</math>";
+        assert!(are_strs_canonically_equal(test_str, target_str));
+	}
+
+	#[test]
+    fn merge_mi_with_script_bug_333_test() {
+        let test_str = "<math>
+			<mi>l</mi><mi>o</mi><msub><mrow><mi>g</mi></mrow><mrow><mn>2</mn></mrow></msub><mo>=</mo>
+			<mi>l</mi><mi>i</mi><msub><mrow><mi>m</mi></mrow><mrow><mi>n</mi><mo>→</mo><mi>∞</mi></mrow></msub>
+		</math> 
+	";
+        let target_str = " <math>
+				<mrow data-changed='added'>
+				<msub>
+					<mi>log</mi>
+					<mn>2</mn>
+				</msub>
+				<mo>=</mo>
+				<msub>
+					<mi>lim</mi>
+					<mrow>
+					<mi>n</mi>
+					<mo>→</mo>
+					<mi>∞</mi>
+					</mrow>
+				</msub>
+				</mrow>
+			</math>";
         assert!(are_strs_canonically_equal(test_str, target_str));
 	}
 
