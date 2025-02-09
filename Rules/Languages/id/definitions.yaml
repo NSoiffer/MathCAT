@@ -95,7 +95,7 @@
     # others
     "ha": "hektar",
     # "B": "bel",    # "B" more commonly means bytes
-    "dB": "decibel", # already loglogarithmic, so not used with SI prefixes
+    "dB": "decibel", # already logarithmic, so not used with SI prefixes
 
     "amu": "satuan massa atom",
     "atm": "atmosfir",

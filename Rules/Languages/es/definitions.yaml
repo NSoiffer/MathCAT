@@ -96,7 +96,7 @@
     # others
     "ha": "hectárea",
     # "B": "belio",    # "B" more commonly means bytes
-    "dB": "decibelio", # already loglogarithmic, so not used with SI prefixes
+    "dB": "decibelio", # already logarithmic, so not used with SI prefixes
 
     "atm": "atmósfera",
     "amu": "unidad de masa atómica",
