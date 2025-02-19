@@ -37,3 +37,28 @@ fn double_struck_bug_334() {
     test_braille("Nemeth", expr, "⠨⠼⠂⠠⠀⠸⠼⠆⠠⠀⠠⠨⠸⠼⠒⠠⠀⠼⠲");
 }
 
+#[test]
+fn extra_indicators_bug_343() {
+    // https://github.com/NSoiffer/MathCAT/issues/343 -- extra indicators before baseline indicator due to -x^2, not there for x^2
+    let expr = "<math xmlns='http://www.w3.org/1998/Math/MathML'>
+                        <mrow>
+                        <msup>
+                            <mi>e</mi>
+                            <mrow>
+                            <mo>-</mo>
+                            <msup>
+                                <mi>x</mi>
+                                <mn>2</mn>
+                            </msup>
+                            </mrow>
+                        </msup>
+                        <mo>+</mo>
+                        <msub>
+                            <mi>C</mi>
+                            <mn>1</mn>
+                        </msub>
+                        </mrow>
+                    </math>";
+    test_braille("Nemeth", expr, "⠑⠘⠤⠭⠘⠘⠆⠐⠬⠠⠉⠂");
+}
+
