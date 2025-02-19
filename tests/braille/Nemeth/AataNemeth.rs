@@ -84,7 +84,7 @@ fn test_010() {
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">N</mi></mrow></mrow><mo>∪<!-- ∪ --></mo><mo fence=\"false\" stretchy=\"false\">{</mo>
         <msqrt><mn>2</mn></msqrt><mspace width=\"thinmathspace\"></mspace><mo fence=\"false\" stretchy=\"false\">}</mo></math>";
-    test_braille("Nemeth", expr, "⠠⠭⠀⠨⠅⠀⠈⠰⠠⠝⠨⠬⠨⠷⠜⠆⠻⠨⠾");
+    test_braille("Nemeth", expr, "⠠⠭⠀⠨⠅⠀⠨⠰⠠⠝⠨⠬⠨⠷⠜⠆⠻⠨⠾");
 }
 
 #[test]
@@ -98,7 +98,7 @@ fn test_012() {
     let expr = "<math>
         <mrow><msub>
         <mrow><mi mathvariant=\"double-struck\">Z</mi></mrow><mn>8</mn></msub></mrow></math>";
-    test_braille("Nemeth", expr, "⠈⠰⠠⠵⠦");
+    test_braille("Nemeth", expr, "⠨⠰⠠⠵⠦");
 }
 
 #[test]
@@ -116,7 +116,7 @@ fn test_013() {
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">Z</mi></mrow></mrow><mn>2</mn><mi>k</mi></msubsup><mo>}</mo></mrow></math>";
     // corrected: added space after ":"
-    test_braille("Nemeth", expr, "⠠⠉⠀⠨⠅⠀⠨⠷⠸⠰⠽⠸⠒⠀⠠⠛⠸⠰⠭⠀⠨⠅⠀⠸⠰⠽⠋⠕⠗⠸⠰⠭⠀⠈⠑⠀⠈⠰⠠⠵⠆⠘⠅⠐⠨⠾");
+    test_braille("Nemeth", expr, "⠠⠉⠀⠨⠅⠀⠨⠷⠸⠰⠽⠸⠒⠀⠠⠛⠸⠰⠭⠀⠨⠅⠀⠸⠰⠽⠋⠕⠗⠸⠰⠭⠀⠈⠑⠀⠨⠰⠠⠵⠆⠘⠅⠐⠨⠾");
 }
 
 #[test]
@@ -139,7 +139,7 @@ fn test_016() {
         <msup>
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">R</mi></mrow></mrow><mn>3</mn></msup></math>";
-    test_braille("Nemeth", expr, "⠈⠰⠠⠗⠘⠒");
+    test_braille("Nemeth", expr, "⠨⠰⠠⠗⠘⠒");
 }
 
 #[test]
@@ -1031,7 +1031,7 @@ fn test_153() {
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">Z</mi></mrow></mrow>
         <mrow><mn>240</mn></mrow></msub></math>";
-    test_braille("Nemeth", expr, "⠼⠶⠆⠀⠈⠑⠀⠈⠰⠠⠵⠆⠲⠴");
+    test_braille("Nemeth", expr, "⠼⠶⠆⠀⠈⠑⠀⠨⠰⠠⠵⠆⠲⠴");
 }
 
 #[test]
@@ -1088,7 +1088,7 @@ fn test_161() {
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">Z</mi></mrow></mrow>
         <mrow><mn>27</mn></mrow></msub></math>";
-    test_braille("Nemeth", expr, "⠈⠰⠠⠵⠆⠶");
+    test_braille("Nemeth", expr, "⠨⠰⠠⠵⠆⠶");
 }
 
 #[test]
@@ -1155,7 +1155,7 @@ fn test_171() {
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">Z</mi></mrow></mrow>
         <mrow><mn>471</mn></mrow></msub></math>";
-    test_braille("Nemeth", expr, "⠼⠒⠂⠆⠀⠈⠑⠀⠈⠰⠠⠵⠲⠶⠂");
+    test_braille("Nemeth", expr, "⠼⠒⠂⠆⠀⠈⠑⠀⠨⠰⠠⠵⠲⠶⠂");
 }
 
 #[test]
@@ -1284,7 +1284,7 @@ fn test_192() {
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">Z</mi></mrow></mrow>
         <mrow><mn>48</mn></mrow></msub></math>";
-    test_braille("Nemeth", expr, "⠈⠰⠠⠵⠲⠦");
+    test_braille("Nemeth", expr, "⠨⠰⠠⠵⠲⠦");
 }
 
 #[test]
@@ -1506,7 +1506,7 @@ fn test_224() {
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">Z</mi></mrow></mrow>
         <mrow><mn>80</mn></mrow></msub></math>";
-    test_braille("Nemeth", expr, "⠈⠰⠠⠵⠂⠴⠈⠡⠈⠰⠠⠵⠆⠲⠈⠡⠈⠰⠠⠵⠦⠴");
+    test_braille("Nemeth", expr, "⠨⠰⠠⠵⠂⠴⠈⠡⠨⠰⠠⠵⠆⠲⠈⠡⠨⠰⠠⠵⠦⠴");
 }
 
 #[test]
@@ -1623,7 +1623,7 @@ fn test_242() {
 #[test]
 fn test_243() {
     let expr = "<math><mrow><mrow><mi mathvariant=\"double-struck\">H</mi></mrow></mrow></math>";
-    test_braille("Nemeth", expr, "⠈⠰⠠⠓");
+    test_braille("Nemeth", expr, "⠨⠰⠠⠓");
 }
 
 #[test]
@@ -1644,7 +1644,7 @@ fn test_246() {
     let expr = "<math><mi>G</mi><msub><mi>L</mi><mn>2</mn></msub><mo stretchy=\"false\">(</mo>
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">R</mi></mrow></mrow><mo stretchy=\"false\">)</mo></math>";
-    test_braille("Nemeth", expr, "⠠⠛⠠⠇⠆⠷⠈⠰⠠⠗⠾");
+    test_braille("Nemeth", expr, "⠠⠛⠠⠇⠆⠷⠨⠰⠠⠗⠾");
 }
 
 #[test]
@@ -1664,7 +1664,7 @@ fn test_248() {
         <mrow><mi mathvariant=\"double-struck\">M</mi></mrow></mrow><mn>2</mn></msub><mo stretchy=\"false\">(</mo>
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">R</mi></mrow></mrow><mo stretchy=\"false\">)</mo></math>";
-    test_braille("Nemeth", expr, "⠈⠰⠠⠍⠆⠷⠈⠰⠠⠗⠾");
+    test_braille("Nemeth", expr, "⠨⠰⠠⠍⠆⠷⠨⠰⠠⠗⠾");
 }
 
 #[test]
@@ -1706,7 +1706,7 @@ fn test_254() {
         <mrow><mi mathvariant=\"double-struck\">P</mi></mrow></mrow><mo stretchy=\"false\">(</mo>
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">R</mi></mrow></mrow><mo stretchy=\"false\">)</mo></math>";
-    test_braille("Nemeth", expr, "⠈⠰⠠⠏⠷⠈⠰⠠⠗⠾");
+    test_braille("Nemeth", expr, "⠨⠰⠠⠏⠷⠨⠰⠠⠗⠾");
 }
 
 #[test]
@@ -1744,7 +1744,7 @@ fn test_259() {
         <msup>
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">R</mi></mrow></mrow><mn>2</mn></msup></math>";
-    test_braille("Nemeth", expr, "⠠⠞⠰⠠⠁⠸⠒⠀⠈⠰⠠⠗⠘⠆⠀⠫⠕⠀⠈⠰⠠⠗⠘⠆");
+    test_braille("Nemeth", expr, "⠠⠞⠰⠠⠁⠸⠒⠀⠨⠰⠠⠗⠘⠆⠀⠫⠕⠀⠨⠰⠠⠗⠘⠆");
 }
 
 #[test]
@@ -1758,7 +1758,7 @@ fn test_260() {
         <mrow><mo stretchy=\"false\">|</mo></mrow><mi>z</mi>
         <mrow><mo stretchy=\"false\">|</mo></mrow><mo>=</mo><mn>1</mn><mo fence=\"false\" stretchy=\"false\">}</mo></math>";
     // corrected: added space after ":"
-    test_braille("Nemeth", expr, "⠈⠰⠠⠞⠀⠨⠅⠀⠨⠷⠵⠀⠈⠑⠀⠈⠰⠠⠉⠘⠈⠼⠸⠒⠀⠳⠵⠳⠀⠨⠅⠀⠼⠂⠨⠾");
+    test_braille("Nemeth", expr, "⠨⠰⠠⠞⠀⠨⠅⠀⠨⠷⠵⠀⠈⠑⠀⠨⠰⠠⠉⠘⠈⠼⠸⠒⠀⠳⠵⠳⠀⠨⠅⠀⠼⠂⠨⠾");
 }
 
 #[test]
@@ -1792,7 +1792,7 @@ fn test_265() {
         <mrow><mi mathvariant=\"double-struck\">M</mi></mrow>
         <mrow><mi>m</mi><mo>×<!-- × --></mo><mi>n</mi></mrow></msub><mo stretchy=\"false\">(</mo><msub>
         <mrow><mi mathvariant=\"bold\">Z</mi></mrow><mn>2</mn></msub><mo stretchy=\"false\">)</mo></math>";
-    test_braille("Nemeth", expr, "⠈⠰⠠⠍⠰⠍⠈⠡⠝⠐⠷⠸⠰⠠⠵⠆⠾");
+    test_braille("Nemeth", expr, "⠨⠰⠠⠍⠰⠍⠈⠡⠝⠐⠷⠸⠰⠠⠵⠆⠾");
 }
 
 #[test]
@@ -1920,7 +1920,7 @@ fn test_284() {
         <msup>
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">R</mi></mrow></mrow><mi>m</mi></msup></math>";
-    test_braille("Nemeth", expr, "⠈⠰⠠⠗⠘⠍");
+    test_braille("Nemeth", expr, "⠨⠰⠠⠗⠘⠍");
 }
 
 #[test]
@@ -1980,7 +1980,7 @@ fn test_292() {
         <msup>
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">R</mi></mrow></mrow><mn>2</mn></msup></math>";
-    test_braille("Nemeth", expr, "⠧⠀⠈⠑⠀⠈⠰⠠⠗⠘⠆");
+    test_braille("Nemeth", expr, "⠧⠀⠈⠑⠀⠨⠰⠠⠗⠘⠆");
 }
 
 #[test]
@@ -2089,7 +2089,7 @@ fn test_307() {
         <msqrt><mn>3</mn></msqrt><mspace width=\"thinmathspace\"></mspace><mi>i</mi><mo stretchy=\"false\">]</mo><mo stretchy=\"false\">→<!-- → --></mo>
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">N</mi></mrow></mrow><mo>∪<!-- ∪ --></mo><mo fence=\"false\" stretchy=\"false\">{</mo><mn>0</mn><mo fence=\"false\" stretchy=\"false\">}</mo></math>";
-    test_braille("Nemeth", expr, "⠨⠝⠸⠒⠀⠈⠰⠠⠵⠈⠷⠜⠒⠻⠊⠈⠾⠀⠫⠕⠀⠈⠰⠠⠝⠨⠬⠨⠷⠴⠨⠾");
+    test_braille("Nemeth", expr, "⠨⠝⠸⠒⠀⠨⠰⠠⠵⠈⠷⠜⠒⠻⠊⠈⠾⠀⠫⠕⠀⠨⠰⠠⠝⠨⠬⠨⠷⠴⠨⠾");
 }
 
 #[test]
@@ -2166,7 +2166,7 @@ fn test_319() {
         <msup>
         <mrow>
         <mrow><mi mathvariant=\"double-struck\">C</mi></mrow></mrow><mo>∗<!-- ∗ --></mo></msup></math>";
-    test_braille("Nemeth", expr, "⠈⠰⠠⠉⠘⠈⠼");
+    test_braille("Nemeth", expr, "⠨⠰⠠⠉⠘⠈⠼");
 }
 
 #[test]

@@ -202,7 +202,7 @@ fn element_under_sum() {
             </mfrac>
         </math>";
     test("sv", "SimpleSpeak", expr,
-                    "summa över i tillhörande heltalen, av; division, 1 genom, i kvadrat, slut division;");
+                    "summa över i tillhörande heltalen, av; division, 1 genom, i kvadrat, slut division");
 }
 
 #[test]

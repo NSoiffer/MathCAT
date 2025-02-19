@@ -294,7 +294,7 @@
             - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
-            - "../*[1][text()='…']"
+            - "../*[1][.='…']"
         then: [T: "punkt punkt punkt"]              #     (en: 'dot dot dot', google translation)
         else_test:                                  #  must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"
@@ -662,11 +662,7 @@
  - "∅": [T: "tomma mängden"]                        #  0x2205    (en: 'empty set')
  - "∆":                                             #  0x2206
      - T: "laplacianen av"                               #     (en: 'laplacian of')
- - "∇":                                             #  0x2207
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [T: "gradienten av"]
-         else: [T: "grad"]                            #     (en: 'the', google translation)
+ - "∇": [T: "gradienten av"]                     # 0x2207 (en: 'gradient of', google: 'lutning av')
  - "∈":                                             #  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"

@@ -202,7 +202,7 @@ fn element_under_sum() {
             </mfrac>
         </math>";
     test("en", "ClearSpeak", expr,
-                    "the sum over i is a member of the integers of; the fraction with numerator 1; and denominator i squared;");
+                    "the sum over i is a member of the integers of; the fraction with numerator 1; and denominator i squared");
 }
 
 #[test]
@@ -277,7 +277,7 @@ fn element_under_sum_member() {
             </mfrac>
         </math>";
     test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "the sum over i is a member of the integers of; the fraction with numerator 1; and denominator i squared;");
+                expr, "the sum over i is a member of the integers of; the fraction with numerator 1; and denominator i squared");
 }
 
 
@@ -320,7 +320,7 @@ fn element_under_sum_element() {
             </mfrac>
         </math>";
     test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "the sum over i is an element of the integers of; the fraction with numerator 1; and denominator i squared;");
+                expr, "the sum over i is an element of the integers of; the fraction with numerator 1; and denominator i squared");
 }
 
 #[test]
@@ -362,7 +362,7 @@ fn element_under_sum_in() {
             </mfrac>
         </math>";
     test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "In",
-                expr, "the sum over i is in the integers of; the fraction with numerator 1; and denominator i squared;");
+                expr, "the sum over i is in the integers of; the fraction with numerator 1; and denominator i squared");
 }
 
 #[test]
@@ -404,7 +404,7 @@ fn element_under_sum_belongs() {
             </mfrac>
         </math>";
     test_ClearSpeak("en", "ClearSpeak_SetMemberSymbol", "Belongs",
-                expr, "the sum over i belongs to the integers of; the fraction with numerator 1; and denominator i squared;");
+                expr, "the sum over i belongs to the integers of; the fraction with numerator 1; and denominator i squared");
 }
 
 

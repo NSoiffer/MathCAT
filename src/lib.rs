@@ -58,7 +58,7 @@ mod prefs;
 mod tts;
 mod xpath_functions;
 mod definitions;
-mod pretty_print;
+pub mod pretty_print;
 mod chemistry;
 
 pub mod shim_filesystem; // really just for override_file_for_debugging_rules, but the config seems to throw it off
@@ -96,23 +96,24 @@ pub fn are_strs_canonically_equal_with_locale(test: &str, target: &str, block_se
     // this forces initialization
     crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
     crate::speech::SPEECH_RULES.with(|rules|  rules.borrow_mut().read_files().unwrap());
+    set_preference("Language".to_string(), "en".to_string()).unwrap();
     set_preference("BlockSeparators".to_string(), block_separators.to_string()).unwrap();
     set_preference("DecimalSeparators".to_string(), decimal_separators.to_string()).unwrap();
     
     let package1 = &parser::parse(test).expect("Failed to parse test input");
     let mathml = get_element(package1);
-    trim_element(&mathml);
-    // debug!("test:\n{}", mml_to_string(&mathml));
+    trim_element(mathml, false);
+    // debug!("test:\n{}", mml_to_string(mathml));
     let mathml_test = canonicalize(mathml).unwrap();
    
     let package2 = &parser::parse(target).expect("Failed to parse target input");
     let mathml_target = get_element(package2);
-    trim_element(&mathml_target);
-    // debug!("target:\n{}", mml_to_string(&mathml_target));
+    trim_element(mathml_target, false);
+    // debug!("target:\n{}", mml_to_string(mathml_target));
 
-    match is_same_element(&mathml_test, &mathml_target) {
+    match is_same_element(mathml_test, mathml_target) {
         Ok(_) => return true,
-        Err(e) => panic!("{}\nResult:\n{}\nTarget:\n{}", e, mml_to_string(&mathml_test), mml_to_string(&mathml_target)),
+        Err(e) => panic!("{}\nResult:\n{}\nTarget:\n{}", e, mml_to_string(mathml_test), mml_to_string(mathml_target)),
     }
 }
 

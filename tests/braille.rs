@@ -5,6 +5,7 @@ mod common;
 mod braille {
     mod Nemeth {
         mod rules;
+        mod other;
         mod chemistry;
         mod SRE_Nemeth72;
         mod SRE_NemethBase;

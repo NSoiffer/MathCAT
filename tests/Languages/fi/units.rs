@@ -169,7 +169,7 @@ fn si_derived_1_with_prefixes() {
     </math>"#;
     test("fi", "SimpleSpeak", expr, 
         "1 kvetta-bekrel, pilkku; 2 ronna-bekreliä, pilkku; \
-                1 jotta-kulombia, pilkku; 2 tsetta-kulombia; pilkku; \
+                1 jotta-kulombi, pilkku; 2 tsetta-kulombia; pilkku; \
                 1 eksa-faradi, pilkku; 2 peta-faradia, pilkku; \
                 1 tera-grei, pilkku; 2 giga-greitä, pilkku; \
                 1 mega-henry, pilkku; 2 kilo-henryä, pilkku; \
@@ -267,11 +267,11 @@ fn si_accepted() {
                 1 elektronivoltti, pilkku; 2 elektronivolttia, pilkku, \
                 1 radiaani, pilkku; 2 radiaania, pilkku; \
                 1 steradiaani, pilkku; 2 steradiaania, pilkku, \
-                1 annum, pilkku; 2 annumia, pilkku; \
-                1 kaarisekuntia, pilkku; 2 kaarisekuntia, pilkku, \
+                1 annum, pilkku, 2 annumia, pilkku; \
+                1 kaarisekunti, pilkku; 2 kaarisekuntia, pilkku, \
                 1 bitti, pilkku, 2 bittiä, pilkku, \
                 1 tavu, pilkku, 2 tavua, pilkku, \
-                1 baudi, pilkku, 2 baudia");
+                1 baudi, pilkku; 2 baudia");
 }
 
 #[test]
@@ -305,10 +305,10 @@ fn si_accepted_with_prefixes() {
                 1 nano-radiaani, pilkku; 2 piko-radiaania, pilkku; \
                 1 femto-steradiaani, pilkku; 2 atto-steradiaania; pilkku; \
                 1 giga-annum, pilkku; 2 mega-annumia, pilkku; \
-                1 zepto-kaarisekuntia; pilkku; 2 jokto-kaarisekuntia; pilkku; \
-                1 kilo-bittiä, pilkku; 2 mega-bittiä, pilkku; \
+                1 zepto-kaarisekunti, pilkku; 2 jokto-kaarisekuntia; pilkku; \
+                1 kilo-bitti, pilkku; 2 mega-bittiä, pilkku; \
                 1 giga-tavu, pilkku; 2 tera-tavua, pilkku; \
-                1 tera-baudi, pilkku; 2 eksa-baudi");
+                1 tera-baudi, pilkku; 2 eksa-baudia");
 }
 
 #[test]
@@ -365,8 +365,8 @@ fn without_prefix_angles() {
                 1 kaariminuutti, pilkku; 2 kaariminuuttia, pilkku; \
                 1 kaariminuutti, pilkku; 2 kaariminuuttia, pilkku; \
                 1 kaariminuutti, pilkku; 2 kaariminuuttia, pilkku; \
-                1 kaarisekuntia, pilkku; 2 kaarisekuntia, pilkku; \
-                1 kaarisekuntia, pilkku; 2 kaarisekuntia");
+                1 kaarisekunti, pilkku; 2 kaarisekuntia, pilkku; \
+                1 kaarisekunti, pilkku; 2 kaarisekuntia");
 }
 
 #[test]
@@ -380,7 +380,7 @@ fn without_prefix_distance() {
         <mn>1</mn><mi intent=":unit">fm</mi><mo>,</mo><mn>2</mn><mi intent=":unit">fm</mi>
     </math>"#;
     test("fi", "SimpleSpeak", expr, 
-        "1 astronominen yksikkö, pilkku; 2 astronominen yksikköa, pilkku, \
+        "1 astronominen yksikkö, pilkku; 2 astronomista yksikköä, pilkku, \
                 1 valovuosi, pilkku; 2 valovuotta, pilkku, \
                 1 parsek, pilkku, 2 parsekia, pilkku; \
                 1 ångström, pilkku; 2 ångströmiä, pilkku; \
@@ -456,8 +456,8 @@ fn without_prefix_powers_of_2() {
                 1 mebi-tavu, pilkku; 2 mebi-tavua, pilkku, \
                 1 gibi-tavu, pilkku; 2 gibi-tavua, pilkku, \
                 1 tebi-tavu, pilkku; 2 tebi-tavua, pilkku, \
-                1 pebi-tavu, pilkku; 2 pebi-tavua, pilkku, \
-                1 eksbi-tavu, pilkku; 2 eksbi-tavua, pilkku, \
+                1 pebi-tavu, pilkku; 2 pebi-tavua, pilkku; \
+                1 eksbi-tavu, pilkku; 2 eksbi-tavua, pilkku; \
                 1 tsebi-tavu, pilkku; 2 tsebi-tavua, pilkku, \
                 1 jobi-tavu, pilkku; 2 jobi-tavua");
 }
@@ -465,17 +465,17 @@ fn without_prefix_powers_of_2() {
 
 #[test]
 fn si_other_numbers() {
-    let expr = r#"<math><mn>1.0</mn><mi intent=":unit">l</mi><mo>,</mo>
-                            <mn>2.0</mn><mo>&#xA0;</mo><mi intent=":unit">m</mi><mo>,</mo>
+    let expr = r#"<math><mn>1,0</mn><mi intent=":unit">l</mi><mo>,</mo>
+                            <mn>2,0</mn><mo>&#xA0;</mo><mi intent=":unit">m</mi><mo>,</mo>
                             <mi>x</mi><mo>&#xA0;</mo><mi intent=":unit">ms</mi><mo>,</mo>
                             <mi>y</mi><mi intent=":unit">µs</mi><mo>,</mo>
                             <mi intent=":unit">dag</mi><mo>,</mo>
                             <mn>1235</mn><mi intent=":unit">daN</mi><mo>,</mo>
-                            <mn>2.5</mn><mi intent=":unit">&#xB5;sec</mi><mo>,</mo>
-                            <mn>32.34</mn><mi intent=":unit">mol</mi></math>"#;
+                            <mn>2,5</mn><mi intent=":unit">&#xB5;sec</mi><mo>,</mo>
+                            <mn>32,34</mn><mi intent=":unit">mol</mi></math>"#;
     test("fi", "SimpleSpeak", expr, 
-        "1.0 litra, pilkku, 2.0 metriä, pilkku; x milli-sekuntia, pilkku; y mikro-sekuntia, pilkku, \
-                deka-grammaa, pilkku; 1235 deka-newtonia, pilkku; 2.5 mikro-sekuntia; pilkku; 32.34 moolia");
+        "1,0 litraa, pilkku, 2,0 metriä, pilkku; x milli-sekuntia, pilkku; y mikro-sekuntia, pilkku, \
+                deka-grammaa, pilkku; 1235 deka-newtonia, pilkku; 2,5 mikro-sekuntia; pilkku; 32,34 moolia");
 }
 
 
@@ -485,9 +485,9 @@ fn test_mtext_inference() {
                 <mn>1</mn><mtext>t</mtext><mo>,</mo>
                 <mn>2</mn><mtext>PA</mtext><mo>,</mo>
                 <mn>3</mn><mtext>Pa</mtext><mo>,</mo>
-                <mn>4.5</mn><mtext>mT</mtext>
+                <mn>4,5</mn><mtext>mT</mtext>
             <mo>]</mo></math>"#;
     test("fi", "SimpleSpeak", expr, 
         "auki hakasulku; 1 tonni, pilkku; 2 peta-ampeeria, pilkku, \
-                3 pascalia, pilkku; 4.5 milli-teslaa; kiinni hakasulku");
+                3 pascalia, pilkku; 4,5 milli-teslaa; kiinni hakasulku");
 }

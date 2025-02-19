@@ -40,28 +40,28 @@ fn prefix_sweep() {
         </math>"#;
     test("sv", "SimpleSpeak", expr, 
         "quetta-gram, komma, \
-                ronna-gram, komma, \
-                yotta-gram, komma, \
-                zetta-gram, komma, \
-                exa-gram, komma, \
-                peta-gram, komma, \
-                tera-gram, komma, \
-                giga-gram, komma, \
-                mega-gram, komma, \
-                kilo-gram, komma, \
-                hekto-gram, komma, \
-                deka-gram, komma, \
-                deci-gram, komma, \
-                centi-gram, komma, \
-                milli-gram, komma, \
-                mikro-gram, komma, \
-                nano-gram, komma, \
-                piko-gram, komma, \
-                femto-gram, komma, \
-                atto-gram, komma, \
-                zepto-gram, komma, \
-                yokto-gram, komma, \
-                ronto-gram, komma, \
+                ronna-gram komma, \
+                yotta-gram komma, \
+                zetta-gram komma, \
+                exa-gram komma, \
+                peta-gram komma, \
+                tera-gram komma, \
+                giga-gram komma, \
+                mega-gram komma, \
+                kilo-gram komma, \
+                hekto-gram komma, \
+                deka-gram komma, \
+                deci-gram komma, \
+                centi-gram komma, \
+                milli-gram komma, \
+                mikro-gram komma, \
+                nano-gram komma, \
+                piko-gram komma, \
+                femto-gram komma, \
+                atto-gram komma, \
+                zepto-gram komma, \
+                yokto-gram komma, \
+                ronto-gram komma, \
                 quekto-gram");
 }
 
@@ -78,11 +78,11 @@ fn si_base() {
         <mn>1</mn><mi intent=":unit">s</mi><mo>,</mo><mn>2</mn><mi intent=":unit">s</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">″</mi><mo>,</mo><mn>2</mn><mi intent=":unit">″</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">&quot;</mi><mo>,</mo><mn>2</mn><mi intent=":unit">&quot;</mi><mo>,</mo>
-        <mn>1</mn><mi intent=":unit">sec</mi><mo>,</mo><mn>2</mn><mi intent=":unit">sec</mi>
+        <mn>1</mn><mi intent=":unit">sek</mi><mo>,</mo><mn>2</mn><mi intent=":unit">sek</mi>
     </math>"#;
     test("sv", "SimpleSpeak", expr, 
         "1 ampère, komma, 2 ampère, komma, \
-                1 candela, komma; 2 candela, komma, \
+                1 candela, komma, 2 candela, komma, \
                 1 kelvin, komma, 2 kelvin, komma, \
                 1 kelvin, komma, 2 kelvin, komma, \
                 1 gram, komma, 2 gram, komma, \
@@ -105,7 +105,7 @@ fn si_base_with_prefixes() {
         <mn>1</mn><mi intent=":unit">hm</mi><mo>,</mo><mn>2</mn><mi intent=":unit">dam</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">dmol</mi><mo>,</mo><mn>2</mn><mi intent=":unit">cmol</mi><mo>,</mo>
         <mn>1</mn><mi intent=":unit">ms</mi><mo>,</mo><mn>2</mn><mi intent=":unit">µs</mi><mo>,</mo>
-        <mn>1</mn><mi intent=":unit">nsec</mi><mo>,</mo><mn>2</mn><mi intent=":unit">psec</mi>
+        <mn>1</mn><mi intent=":unit">nsek</mi><mo>,</mo><mn>2</mn><mi intent=":unit">psek</mi>
     </math>"#;
     test("sv", "SimpleSpeak", expr, 
         "1 quetta-ampère, komma; 2 ronna-ampère, komma; \
@@ -137,8 +137,8 @@ fn si_derived_1() {
         <mn>1</mn><mi intent=":unit">lx</mi><mo>,</mo><mn>2</mn><mi intent=":unit">lx</mi>
     </math>"#;
     test("sv", "SimpleSpeak", expr, 
-        "1 becquerel, komma; 2 becquerel, komma, \
-                1 coulomb, komma; 2 coulomb, komma; \
+        "1 becquerel, komma, 2 becquerel, komma, \
+                1 coulomb, komma, 2 coulomb, komma; \
                 1 grad celsius, komma; 2 grader celsius, komma; \
                 1 grad celsius, komma; 2 grader celsius, komma, \
                 1 farad, komma, 2 farad, komma, \
@@ -146,7 +146,7 @@ fn si_derived_1() {
                 1 henry, komma, 2 henry, komma, \
                 1 hertz, komma, 2 hertz, komma, \
                 1 joule, komma, 2 joule, komma, \
-                1 kattel, komma, 2 kattel, komma, \
+                1 katal, komma, 2 katal, komma, \
                 1 lumen, komma, 2 lumen, komma, \
                 1 lux, komma, 2 lux");
 }
@@ -168,18 +168,18 @@ fn si_derived_1_with_prefixes() {
         <mn>1</mn><mi intent=":unit">p℃</mi><mo>,</mo><mn>2</mn><mi intent=":unit">n℃</mi>
     </math>"#;
     test("sv", "SimpleSpeak", expr, 
-        "1 quetta-becquerel, komma; 2 ronna-becquerel; komma; \
+        "1 quetta-becquerel, komma; 2 ronna-becquerel, komma; \
                 1 yotta-coulomb, komma; 2 zetta-coulomb, komma; \
                 1 exa-farad, komma; 2 peta-farad, komma; \
                 1 tera-gray, komma; 2 giga-gray, komma; \
                 1 mega-henry, komma; 2 kilo-henry, komma; \
                 1 deka-hertz, komma; 2 deci-hertz, komma; \
                 1 centi-joule, komma; 2 milli-joule, komma; \
-                1 mikro-kattel, komma; 2 nano-kattel, komma; \
+                1 mikro-katal, komma; 2 nano-katal, komma; \
                 1 piko-lumen, komma; 2 femto-lumen, komma; \
                 1 atto-lux, komma; 2 zepto-lux, komma; \
-                1 milli-grad celsius; komma; 2 mikro-grader celsius; komma; \
-                1 piko-grad celsius; komma; 2 nano-grader celsius");
+                1 milli-grad celsius, komma; 2 mikro-grader celsius; komma; \
+                1 piko-grad celsius, komma; 2 nano-grader celsius");
 }
 
 #[test]
@@ -202,7 +202,7 @@ fn si_derived_2() {
                 1 ohm, komma, 2 ohm, komma, \
                 1 pascal, komma, 2 pascal, komma, \
                 1 siemens, komma, 2 siemens, komma, \
-                1 sievert, komma; 2 sievert, komma, \
+                1 sievert, komma, 2 sievert, komma, \
                 1 tesla, komma, 2 tesla, komma, \
                 1 volt, komma, 2 volt, komma, \
                 1 watt, komma, 2 watt, komma, \
@@ -260,13 +260,13 @@ fn si_accepted() {
         "1 liter, komma, 2 liter, komma, \
                 1 liter, komma, 2 liter, komma, \
                 1 liter, komma, 2 liter, komma, \
-                1 ton, komma; 2 ton, komma, \
+                1 ton, komma, 2 ton, komma, \
                 1 dalton, komma, 2 dalton, komma, \
                 1 neper, komma, 2 neper, komma; \
                 1 atommassenhet, komma; 2 atommassenheter, komma; \
                 1 elektronvolt, komma; 2 elektronvolt, komma, \
                 1 radian, komma, 2 radianer, komma, \
-                1 steradian, komma; 2 steradianer, komma, \
+                1 steradian, komma, 2 steradianer, komma, \
                 1 annum, komma, 2 annum, komma, \
                 1 bågsekund, komma; 2 bågsekunder, komma, \
                 1 bit, komma, 2 bits, komma, \
@@ -297,15 +297,15 @@ fn si_accepted_with_prefixes() {
         "1 quetta-liter, komma; 2 ronna-liter, komma; \
                 1 yotta-liter, komma; 2 zetta-liter, komma; \
                 1 exa-liter, komma; 2 peta-liter, komma; \
-                1 tera-ton, komma; 2 giga-ton; komma; \
+                1 tera-ton, komma; 2 giga-ton, komma; \
                 1 mega-dalton, komma; 2 kilo-dalton, komma; \
                 1 deci-neper, komma; 2 centi-neper, komma; \
                 1 hekto-atommassenhet; komma; 2 deka-atommassenheter; komma; \
-                1 milli-elektronvolt, komma; 2 mikro-elektronvolt; komma; \
+                1 milli-elektronvolt, komma; 2 mikro-elektronvolt, komma; \
                 1 nano-radian, komma; 2 piko-radianer, komma; \
-                1 femto-steradian, komma; 2 atto-steradianer; komma; \
+                1 femto-steradian, komma; 2 atto-steradianer, komma; \
                 1 giga-annum, komma; 2 mega-annum, komma; \
-                1 zepto-bågsekund, komma; 2 yokto-bågsekunder; komma; \
+                1 zepto-bågsekund, komma; 2 yokto-bågsekunder, komma; \
                 1 kilo-bit, komma; 2 mega-bits, komma; \
                 1 giga-byte, komma; 2 tera-bytes, komma; \
                 1 tera-baud, komma; 2 exa-bauds");
@@ -361,12 +361,12 @@ fn without_prefix_angles() {
     test("sv", "SimpleSpeak", expr, 
         "1 grad, komma, 2 grader, komma, \
                 1 grad, komma, 2 grader, komma, \
-                1 bågminut, komma; 2 bågminut, komma, \
-                1 bågminut, komma; 2 bågminut, komma, \
-                1 bågminut, komma; 2 bågminut, komma, \
-                1 bågminut, komma; 2 bågminut, komma, \
-                1 bågsekund, komma; 2 bågsekund, komma, \
-                1 bågsekund, komma; 2 bågsekund");
+                1 bågminut, komma, 2 bågminuter, komma, \
+                1 bågminut, komma, 2 bågminuter, komma, \
+                1 bågminut, komma, 2 bågminuter, komma, \
+                1 bågminut, komma, 2 bågminuter, komma, \
+                1 bågsekund, komma; 2 bågsekunder, komma, \
+                1 bågsekund, komma; 2 bågsekunder");
 }
 
 #[test]
@@ -381,10 +381,10 @@ fn without_prefix_distance() {
     </math>"#;
     test("sv", "SimpleSpeak", expr, 
         "1 astronomisk enhet, komma; 2 astronomiska enheter, komma, \
-                1 ljusår, komma; 2 ljusår, komma, \
+                1 ljusår, komma, 2 ljusår, komma, \
                 1 parsek, komma, 2 parsek, komma, \
-                1 ångström, komma; 2 ångström, komma, \
-                1 ångström, komma; 2 ångström, komma, \
+                1 ångström, komma, 2 ångström, komma, \
+                1 ångström, komma, 2 ångström, komma, \
                 1 fermi, komma, 2 fermi");
 }
 
@@ -407,16 +407,16 @@ fn without_prefix_other() {
         <mn>1</mn><mi intent=":unit">erg</mi><mo>,</mo><mn>2</mn><mi intent=":unit">erg</mi>
     </math>"#;
     test("sv", "SimpleSpeak", expr, 
-        "1 hectare, komma; 2 hectare, komma, \
-                1 decibel, komma; 2 decibel, komma, \
-                1 atmosfär, komma; 2 atmosfärer, komma; \
+        "1 hektar, komma, 2 hektar, komma, \
+                1 decibel, komma, 2 decibel, komma, \
+                1 atmosfär, komma, 2 atmosfärer, komma; \
                 1 atommassenhet, komma; 2 atommassenheter, komma, \
                 1 bar, komma, 2 bar, komma, \
-                1 kalori, komma; 2 kalorier, komma, \
+                1 kalori, komma, 2 kalorier, komma, \
                 1 curie, komma, 2 curie, komma, \
-                1 gon, komma; 2 gon, komma, \
+                1 gon, komma, 2 gon, komma, \
                 1 molar, komma, 2 molar, komma, \
-                1 röntgen, komma; 2 röntgen, komma; \
+                1 röntgen, komma, 2 röntgen, komma; \
                 1 varv per minut, komma; 2 varv per minut, komma, \
                 1 m-h-o, komma, 2 m-h-o, komma, \
                 1 dyn, komma, 2 dyn, komma, \
@@ -444,38 +444,38 @@ fn without_prefix_powers_of_2() {
         <mn>1</mn><mi intent=":unit">YiB</mi><mo>,</mo><mn>2</mn><mi intent=":unit">YiB</mi>
     </math>"#;
     test("sv", "SimpleSpeak", expr, 
-        "1 kibi-bit, komma; 2 kibi-bits, komma, \
-                1 mebi-bit, komma; 2 mebi-bits, komma, \
-                1 gibi-bit, komma; 2 gibi-bits, komma, \
-                1 tebi-bit, komma; 2 tebi-bits, komma, \
-                1 pebi-bit, komma; 2 pebi-bits, komma, \
-                1 exbi-bit, komma; 2 exbi-bits, komma, \
-                1 zebi-bit, komma; 2 zebi-bits, komma, \
-                1 yobi-bit, komma; 2 yobi-bits, komma, \
-                1 kibi-byte, komma; 2 kibi-bytes, komma, \
-                1 mebi-byte, komma; 2 mebi-bytes, komma, \
-                1 gibi-byte, komma; 2 gibi-bytes, komma, \
-                1 tebi-byte, komma; 2 tebi-bytes, komma, \
-                1 pebi-byte, komma; 2 pebi-bytes, komma, \
-                1 exbi-byte, komma; 2 exbi-bytes, komma, \
-                1 zebi-byte, komma; 2 zebi-bytes, komma, \
-                1 yobi-byte, komma; 2 yobi-bytes");
+        "1 kibi-bit, komma, 2 kibi-bits, komma, \
+                1 mebi-bit, komma, 2 mebi-bits, komma, \
+                1 gibi-bit, komma, 2 gibi-bits, komma, \
+                1 tebi-bit, komma, 2 tebi-bits, komma, \
+                1 pebi-bit, komma, 2 pebi-bits, komma, \
+                1 exbi-bit, komma, 2 exbi-bits, komma, \
+                1 zebi-bit, komma, 2 zebi-bits, komma, \
+                1 yobi-bit, komma, 2 yobi-bits, komma, \
+                1 kibi-byte, komma, 2 kibi-bytes, komma, \
+                1 mebi-byte, komma, 2 mebi-bytes, komma, \
+                1 gibi-byte, komma, 2 gibi-bytes, komma, \
+                1 tebi-byte, komma, 2 tebi-bytes, komma, \
+                1 pebi-byte, komma, 2 pebi-bytes, komma, \
+                1 exbi-byte, komma, 2 exbi-bytes, komma, \
+                1 zebi-byte, komma, 2 zebi-bytes, komma, \
+                1 yobi-byte, komma, 2 yobi-bytes");
 }
 
 
 #[test]
 fn si_other_numbers() {
-    let expr = r#"<math><mn>1.0</mn><mi intent=":unit">l</mi><mo>,</mo>
-                            <mn>2.0</mn><mo>&#xA0;</mo><mi intent=":unit">m</mi><mo>,</mo>
+    let expr = r#"<math><mn>1,0</mn><mi intent=":unit">l</mi><mo>,</mo>
+                            <mn>2,0</mn><mo>&#xA0;</mo><mi intent=":unit">m</mi><mo>,</mo>
                             <mi>x</mi><mo>&#xA0;</mo><mi intent=":unit">ms</mi><mo>,</mo>
                             <mi>y</mi><mi intent=":unit">µs</mi><mo>,</mo>
                             <mi intent=":unit">dag</mi><mo>,</mo>
                             <mn>1235</mn><mi intent=":unit">daN</mi><mo>,</mo>
-                            <mn>2.5</mn><mi intent=":unit">&#xB5;sec</mi><mo>,</mo>
-                            <mn>32.34</mn><mi intent=":unit">mol</mi></math>"#;
+                            <mn>2,5</mn><mi intent=":unit">&#xB5;sek</mi><mo>,</mo>
+                            <mn>32,34</mn><mi intent=":unit">mol</mi></math>"#;
     test("sv", "SimpleSpeak", expr, 
-        "1.0 liter, komma; 2.0 meter, komma; x milli-sekunder, komma; y mikro-sekunder, komma, \
-                deka-gram, komma; 1235 deka-newton; komma; 2.5 mikro-sekunder; komma; 32.34 mol");
+        "1,0 liter, komma, 2,0 meter, komma; x milli-sekunder, komma; y mikro-sekunder, komma, \
+                deka-gram komma; 1235 deka-newton, komma; 2,5 mikro-sekunder, komma, 32,34 mol");
 }
 
 
@@ -485,9 +485,9 @@ fn test_mtext_inference() {
                 <mn>1</mn><mtext>t</mtext><mo>,</mo>
                 <mn>2</mn><mtext>PA</mtext><mo>,</mo>
                 <mn>3</mn><mtext>Pa</mtext><mo>,</mo>
-                <mn>4.5</mn><mtext>mT</mtext>
+                <mn>4,5</mn><mtext>mT</mtext>
             <mo>]</mo></math>"#;
     test("sv", "SimpleSpeak", expr, 
         "start hak-parentes; 1 ton, komma; 2 peta-ampère, komma, \
-                3 pascal, komma; 4.5 milli-tesla; slut hak-parentes");
+                3 pascal, komma; 4,5 milli-tesla; slut hak-parentes");
 }

@@ -30,7 +30,8 @@ fn case_1() {
             </mtable></mrow> </mrow></mrow>
         </math>
    ";
-   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Auto", expr, "f arvolla x, on yhtä suuri kuin; 3 tapausta, tapaus 1; negatiivinen 1 jos x; on pienempi kuin 0; tapaus 2; 0 jos x, on yhtä suuri kuin 0; tapaus 3; 1 jos x, on suurempi kuin 0;");
+   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Auto", expr,
+                   "f arvolla x, on yhtä suuri kuin; 3 tapausta, tapaus 1; negatiivinen 1 jos x; on pienempi kuin 0; tapaus 2; 0 jos x, on yhtä suuri kuin 0; tapaus 3; 1 jos x, on suurempi kuin 0");
 }
 
 #[test]
@@ -43,7 +44,8 @@ fn equation_auto() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Auto", expr, "2 riviä, rivi 1; x plus y, on yhtä suuri kuin, 7; rivi 2; 2 x plus 3 y, on yhtä suuri kuin, 17;");
+   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Auto", expr,
+                   "2 riviä, rivi 1; x plus y, on yhtä suuri kuin 7; rivi 2; 2 x plus 3 y; on yhtä suuri kuin 17");
 }
 
 #[test]
@@ -56,7 +58,8 @@ fn equation_case() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Case", expr, "2 tapausta, tapaus 1; x plus y, on yhtä suuri kuin, 7; tapaus 2; 2 x plus 3 y, on yhtä suuri kuin, 17;");
+   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Case", expr,
+                   "2 tapausta, tapaus 1; x plus y, on yhtä suuri kuin 7; tapaus 2; 2 x plus 3 y; on yhtä suuri kuin 17");
 }
 
 #[test]
@@ -69,7 +72,8 @@ fn equation_constraint() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Constraint", expr, "2 ehtoa, ehto 1; x plus y, on yhtä suuri kuin, 7; ehto 2; 2 x plus 3 y, on yhtä suuri kuin, 17;");
+   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Constraint", expr,
+                   "2 ehtoa, ehto 1; x plus y, on yhtä suuri kuin 7; ehto 2; 2 x plus 3 y; on yhtä suuri kuin 17");
 }
 
 #[test]
@@ -82,7 +86,8 @@ fn equation_equation() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Equation", expr, "2 yhtälöä, yhtälö 1; x plus y, on yhtä suuri kuin, 7; yhtälö 2; 2 x plus 3 y, on yhtä suuri kuin, 17;");
+   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Equation", expr,
+                   "2 yhtälöä, yhtälö 1; x plus y, on yhtä suuri kuin 7; yhtälö 2; 2 x plus 3 y; on yhtä suuri kuin 17");
 }
 
 #[test]
@@ -95,7 +100,8 @@ fn equation_line() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Line", expr, "2 riviä, rivi 1; x plus y, on yhtä suuri kuin, 7; rivi 2; 2 x plus 3 y, on yhtä suuri kuin, 17;");
+   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Line", expr,
+                   "2 riviä, rivi 1; x plus y, on yhtä suuri kuin 7; rivi 2; 2 x plus 3 y; on yhtä suuri kuin 17");
 }
 
 #[test]
@@ -108,7 +114,8 @@ fn equation_none() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "None", expr, "2, x plus y, on yhtä suuri kuin, 7; 2 x plus 3 y, on yhtä suuri kuin, 17;");
+   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "None", expr,
+                   "2, x plus y, on yhtä suuri kuin 7; 2 x plus 3 y; on yhtä suuri kuin 17");
 }
 
 #[test]
@@ -121,7 +128,8 @@ fn equation_row() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Row", expr, "2 riviä, rivillä 1; x plus y, on yhtä suuri kuin, 7; rivillä 2; 2 x plus 3 y, on yhtä suuri kuin, 17;");
+   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Row", expr,
+                   "2 riviä, rivillä 1; x plus y, on yhtä suuri kuin 7; rivillä 2; 2 x plus 3 y; on yhtä suuri kuin 17");
 }
 
 #[test]
@@ -134,5 +142,6 @@ fn equation_step() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Step", expr, "2 vaihetta, vaihe 1; x plus y, on yhtä suuri kuin, 7; vaihe 2; 2 x plus 3 y, on yhtä suuri kuin, 17;");
+   test_ClearSpeak("fi", "ClearSpeak_MultiLineLabel", "Step", expr,
+                   "2 vaihetta, vaihe 1; x plus y, on yhtä suuri kuin 7; vaihe 2; 2 x plus 3 y; on yhtä suuri kuin 17");
 }

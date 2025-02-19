@@ -307,6 +307,24 @@ fn letter_26_b_19() {
 }
 
 #[test]
+fn boldface_32_a_7() {
+    let expr = "<math><mn mathvariant='bold-fraktur'>a</mn></math>";
+    test_braille("Nemeth", expr, "⠸⠸⠁");
+}
+
+#[test]
+fn boldface_32_a_14() {
+    let expr = "<math><mn mathvariant='sans-serif'>H</mn></math>";
+    test_braille("Nemeth", expr, "⠠⠨⠰⠠⠓");
+}
+
+#[test]
+fn boldface_32_b_2() {
+    let expr = "<math><mn mathvariant='script'>2</mn></math>";
+    test_braille("Nemeth", expr, "⠈⠼⠆");
+}
+
+#[test]
 fn boldface_32_b_3() {
     let expr = "<math><mn mathvariant='bold'>345</mn></math>";
     test_braille("Nemeth", expr, "⠸⠼⠒⠲⠢");

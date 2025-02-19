@@ -12,8 +12,8 @@ fn matrix_1x1() {
         <mo>)</mo></mrow></mrow>
     </math>
                                 ";
-    test("sv", "ClearSpeak",  expr, "ett-gånger-ett matris med element 3;");
-    test("sv", "SimpleSpeak", expr, "ett-gånger-ett matris med element 3;");
+    test("sv", "ClearSpeak",  expr, "ett-gånger-ett matris med element 3");
+    test("sv", "SimpleSpeak", expr, "ett-gånger-ett matris med element 3");
 }
 
 #[test]
@@ -28,8 +28,8 @@ fn determinant_1x1() {
         <mo>|</mo></mrow></mrow>
     </math>
                                 ";
-    test("sv", "ClearSpeak",  expr, "ett-gånger-ett determinant med element 3;");
-    test("sv", "SimpleSpeak", expr, "ett-gånger-ett determinant med element 3;");
+    test("sv", "ClearSpeak",  expr, "ett-gånger-ett determinant med element 3");
+    test("sv", "SimpleSpeak", expr, "ett-gånger-ett determinant med element 3");
 }
 
 
@@ -52,8 +52,8 @@ fn matrix_1x2() {
       <mo>)</mo></mrow></mrow>
     </math>
                                 ";
-    test("sv", "ClearSpeak",  expr, "ett-gånger 2 rad-matris; 3, 5;");
-    test("sv", "SimpleSpeak", expr, "ett-gånger 2 rad-matris; 3, 5;");
+    test("sv", "ClearSpeak",  expr, "ett-gånger 2 rad-matris; 3, 5");
+    test("sv", "SimpleSpeak", expr, "ett-gånger 2 rad-matris; 3, 5");
 }
 
 
@@ -79,8 +79,8 @@ fn matrix_1x3() {
       <mo>)</mo></mrow></mrow>
     </math>
                                 ";
-    test("sv", "ClearSpeak", expr, "ett-gånger 3 rad-matris; minus x, 5, 12;");
-    test("sv", "SimpleSpeak", expr, "ett-gånger 3 rad-matris; minus x, 5, 12;");
+    test("sv", "ClearSpeak", expr, "ett-gånger 3 rad-matris; minus x, 5, 12");
+    test("sv", "SimpleSpeak", expr, "ett-gånger 3 rad-matris; minus x, 5, 12");
 }
 
 #[test]
@@ -107,8 +107,8 @@ fn matrix_2x1_not_simple() {
       <mo>)</mo></mrow></mrow>
     </math>
                                 ";
-    test("sv", "ClearSpeak", expr, "2 gånger-ett kolumn-matris; rad 1; x plus 1; rad 2; x minus 1;");
-    test("sv", "SimpleSpeak", expr, "2 gånger-ett kolumn-matris; rad 1; x plus 1; rad 2; x minus 1;");
+    test("sv", "ClearSpeak", expr, "2 gånger-ett kolumn-matris; rad 1; x plus 1; rad 2; x minus 1");
+    test("sv", "SimpleSpeak", expr, "2 gånger-ett kolumn-matris; rad 1; x plus 1; rad 2; x minus 1");
 }
 #[test]
 fn matrix_3x1_not_simple() {
@@ -147,11 +147,11 @@ fn matrix_3x1_not_simple() {
     test("sv", "SimpleSpeak", expr, "3 gånger-ett kolumn-matris; \
             rad 1; x; \
             rad 2; a; \
-            rad 3; division, x genom, x plus 1, slut division;");
+            rad 3; division, x genom, x plus 1, slut division");
     test("sv", "ClearSpeak",  expr, "3 gånger-ett kolumn-matris; \
             rad 1; x; \
             rad 2; a; \
-            rad 3; division med täljaren x; och nämnaren x plus 1;");
+            rad 3; division med täljaren x; och nämnaren x plus 1");
 }
 
 #[test]
@@ -180,8 +180,8 @@ fn determinant_2x2() {
         </mtable>
       <mo>|</mo></mrow></mrow>
                         </math>";
-    test("sv", "ClearSpeak",  expr, "2 gånger 2 determinant; rad 1; 2, 1; rad 2; 7, 5;");
-    test("sv", "SimpleSpeak", expr, "2 gånger 2 determinant; rad 1; 2, 1; rad 2; 7, 5;");
+    test("sv", "ClearSpeak",  expr, "2 gånger 2 determinant; rad 1; 2, 1; rad 2; 7, 5");
+    test("sv", "SimpleSpeak", expr, "2 gånger 2 determinant; rad 1; 2, 1; rad 2; 7, 5");
 }
 
 #[test]
@@ -217,8 +217,8 @@ fn matrix_2x3() {
       <mo>]</mo></mrow></mrow>
     </math>
                                 ";
-    test("sv", "ClearSpeak",  expr, "2 gånger 3 matris; rad 1; 3, 1, 4; rad 2; 0, 2, 6;");
-    test("sv", "SimpleSpeak", expr, "2 gånger 3 matris; rad 1; 3, 1, 4; rad 2; 0, 2, 6;");
+    test("sv", "ClearSpeak",  expr, "2 gånger 3 matris; rad 1; 3, 1, 4; rad 2; 0, 2, 6");
+    test("sv", "SimpleSpeak", expr, "2 gånger 3 matris; rad 1; 3, 1, 4; rad 2; 0, 2, 6");
 }
 
 #[test]
@@ -258,9 +258,9 @@ fn matrix_2x3_labeled() {
     </math>
                                 ";
     test("sv", "ClearSpeak",  expr,
-        "2 gånger 3 matris; rad 1 med etiketten (3 punkt 1); kolumn 2; 3, kolumn 3; 1, kolumn 4; 4; rad 2; kolumn 1; 0, kolumn 2; 2, kolumn 3; 6;");
+        "2 gånger 3 matris; rad 1 med etiketten (3 punkt 1); kolumn 2; 3, kolumn 3; 1, kolumn 4; 4; rad 2; kolumn 1; 0, kolumn 2; 2, kolumn 3; 6");
     test("sv", "SimpleSpeak", expr,
-        "2 gånger 3 matris; rad 1 med etiketten (3 punkt 1); kolumn 2; 3, kolumn 3; 1, kolumn 4; 4; rad 2; kolumn 1; 0, kolumn 2; 2, kolumn 3; 6;");
+        "2 gånger 3 matris; rad 1 med etiketten (3 punkt 1); kolumn 2; 3, kolumn 3; 1, kolumn 4; 4; rad 2; kolumn 1; 0, kolumn 2; 2, kolumn 3; 6");
 }
 
 #[test]
@@ -288,8 +288,8 @@ fn matrix_3x1() {
         </mtable> <mo>]</mo></mrow></mrow>
     </math>
                                 ";
-    test("sv", "ClearSpeak",  expr, "3 gånger-ett kolumn-matris; 1; 2; 3;");
-    test("sv", "SimpleSpeak", expr, "3 gånger-ett kolumn-matris; 1; 2; 3;");
+    test("sv", "ClearSpeak",  expr, "3 gånger-ett kolumn-matris; 1; 2; 3");
+    test("sv", "SimpleSpeak", expr, "3 gånger-ett kolumn-matris; 1; 2; 3");
 }
 
 #[test]
@@ -323,8 +323,8 @@ fn matrix_4x1() {
       <mo>)</mo></mrow></mrow>
     </math>
                                 ";
-    test("sv", "ClearSpeak",  expr, "4 gånger-ett kolumn-matris; rad 1; 3; rad 2; 6; rad 3; 1; rad 4; 2;");
-    test("sv", "SimpleSpeak", expr, "4 gånger-ett kolumn-matris; rad 1; 3; rad 2; 6; rad 3; 1; rad 4; 2;");
+    test("sv", "ClearSpeak",  expr, "4 gånger-ett kolumn-matris; rad 1; 3; rad 2; 6; rad 3; 1; rad 4; 2");
+    test("sv", "SimpleSpeak", expr, "4 gånger-ett kolumn-matris; rad 1; 3; rad 2; 6; rad 3; 1; rad 4; 2");
 }
 
 #[test]
@@ -362,9 +362,9 @@ fn matrix_4x1_labeled() {
     </math>
                                 ";
     test("sv", "ClearSpeak",  expr,
-        "4 gånger-ett kolumn-matris; rad 1; 3; rad 2; 6; rad 3; 1; rad 4 med etiketten (3 punkt 1); 2;");
+        "4 gånger-ett kolumn-matris; rad 1; 3; rad 2; 6; rad 3; 1; rad 4 med etiketten (3 punkt 1); 2");
     test("sv", "SimpleSpeak", expr,
-        "4 gånger-ett kolumn-matris; rad 1; 3; rad 2; 6; rad 3; 1; rad 4 med etiketten (3 punkt 1); 2;");
+        "4 gånger-ett kolumn-matris; rad 1; 3; rad 2; 6; rad 3; 1; rad 4 med etiketten (3 punkt 1); 2");
 }
 
 #[test]
@@ -392,8 +392,8 @@ fn matrix_1x4() {
       <mo>)</mo></mrow></mrow>
     </math>
                                 ";
-    test("sv", "ClearSpeak",  expr, "ett-gånger 4 rad-matris; kolumn 1; 3, kolumn 2; 6, kolumn 3; 1, kolumn 4; 2;");
-    test("sv", "SimpleSpeak", expr, "ett-gånger 4 rad-matris; kolumn 1; 3, kolumn 2; 6, kolumn 3; 1, kolumn 4; 2;");
+    test("sv", "ClearSpeak",  expr, "ett-gånger 4 rad-matris; kolumn 1; 3, kolumn 2; 6, kolumn 3; 1, kolumn 4; 2");
+    test("sv", "SimpleSpeak", expr, "ett-gånger 4 rad-matris; kolumn 1; 3, kolumn 2; 6, kolumn 3; 1, kolumn 4; 2");
 }
 
 #[test]
@@ -467,12 +467,12 @@ fn matrix_4x4() {
             rad 1; kolumn 1; 0, kolumn 2; 3, kolumn 3; 4, kolumn 4; 3; \
             rad 2; kolumn 1; 2, kolumn 2; 1, kolumn 3; 0, kolumn 4; 9; \
             rad 3; kolumn 1; 3, kolumn 2; 0, kolumn 3; 2, kolumn 4; 1; \
-            rad 4; kolumn 1; 6, kolumn 2; 2, kolumn 3; 9, kolumn 4; 0;");
+            rad 4; kolumn 1; 6, kolumn 2; 2, kolumn 3; 9, kolumn 4; 0");
     test("sv", "SimpleSpeak", expr, "4 gånger 4 matris; \
             rad 1; kolumn 1; 0, kolumn 2; 3, kolumn 3; 4, kolumn 4; 3; \
             rad 2; kolumn 1; 2, kolumn 2; 1, kolumn 3; 0, kolumn 4; 9; \
             rad 3; kolumn 1; 3, kolumn 2; 0, kolumn 3; 2, kolumn 4; 1; \
-            rad 4; kolumn 1; 6, kolumn 2; 2, kolumn 3; 9, kolumn 4; 0;");}
+            rad 4; kolumn 1; 6, kolumn 2; 2, kolumn 3; 9, kolumn 4; 0");}
 
 #[test]
 fn matrix_4x2() {
@@ -522,12 +522,12 @@ fn matrix_4x2() {
             rad 1; kolumn 1; 1, kolumn 2; 3; \
             rad 2; kolumn 1; 4, kolumn 2; 2; \
             rad 3; kolumn 1; 2, kolumn 2; 1; \
-            rad 4; kolumn 1; 0, kolumn 2; 5;");
+            rad 4; kolumn 1; 0, kolumn 2; 5");
     test("sv", "SimpleSpeak", expr, "4 gånger 2 matris; \
             rad 1; kolumn 1; 1, kolumn 2; 3; \
             rad 2; kolumn 1; 4, kolumn 2; 2; \
             rad 3; kolumn 1; 2, kolumn 2; 1; \
-            rad 4; kolumn 1; 0, kolumn 2; 5;");}
+            rad 4; kolumn 1; 0, kolumn 2; 5");}
 
 // put absolute value test here since it is related to determinate and is small for its own file
 #[test]
@@ -535,11 +535,11 @@ fn simple_absolute_value() {
   let expr = "<math>
     <mrow><mrow><mo>|</mo> <mi>x</mi> <mo>|</mo></mrow></mrow>
   </math>";
-  test("sv", "SimpleSpeak", expr, "absolutbeloppet av x,");
-  test("sv", "ClearSpeak",  expr, "absolutbeloppet av x,");
-  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse"), ("ClearSpeak_AbsoluteValue", "Auto")], expr, "absolutbeloppet av x,");
+  test("sv", "SimpleSpeak", expr, "absolutbeloppet av x");
+  test("sv", "ClearSpeak",  expr, "absolutbeloppet av x");
+  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse"), ("ClearSpeak_AbsoluteValue", "Auto")], expr, "absolutbeloppet av x");
   test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_AbsoluteValue", "AbsEnd")],
-             expr, "absolutbeloppet av x, slut absolutbelopp,");
+             expr, "absolutbeloppet av x, slut absolutbelopp");
 }
   
 #[test]
@@ -549,9 +549,9 @@ let expr = "<math>
       <mrow><mi>x</mi><mo>+</mo><mn>1</mn> </mrow>
     <mo>|</mo></mrow></mrow>
   </math>";
-  test("sv", "ClearSpeak", expr, "absolutbeloppet av x plus 1,");
+  test("sv", "ClearSpeak", expr, "absolutbeloppet av x plus 1");
   test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse"), ("ClearSpeak_AbsoluteValue", "AbsEnd")],
-             expr, "absolutbeloppet av x plus 1, slut absolutbelopp,");
+             expr, "absolutbeloppet av x plus 1, slut absolutbelopp");
 }
 
 #[test]
@@ -560,7 +560,7 @@ fn simple_cardinality_value() {
     <mrow><mrow><mo>|</mo> <mi>S</mi> <mo>|</mo></mrow></mrow>
   </math>";
   test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_AbsoluteValue", "Cardinality")], expr,
-             "kardinaliteten av versal s,");
+             "kardinaliteten av versal s");
 }
   
 // Test preferences
@@ -583,7 +583,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>)</mo></mrow></mrow>
   </math>";
   test_ClearSpeak("sv", "ClearSpeak_Matrix", "SpeakColNum",
-        expr, "2 gånger 2 matris; rad 1; kolumn 1; 2, kolumn 2; 1; rad 2; kolumn 1; 7, kolumn 2; 5;");
+        expr, "2 gånger 2 matris; rad 1; kolumn 1; 2, kolumn 2; 1; rad 2; kolumn 1; 7, kolumn 2; 5");
 }
 
 #[test]
@@ -606,7 +606,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>)</mo></mrow></mrow>
   </math>";
 test_ClearSpeak("sv", "ClearSpeak_Matrix", "SpeakColNum",
-        expr, "3 gånger-ett kolumn-matris; rad 1; 1; rad 2; 2; rad 3; 3;");
+        expr, "3 gånger-ett kolumn-matris; rad 1; 1; rad 2; 2; rad 3; 3");
 }
 
 #[test]
@@ -623,7 +623,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>]</mo></mrow></mrow>
   </math>";
 test_ClearSpeak("sv", "ClearSpeak_Matrix", "SpeakColNum",
-        expr, "ett-gånger 2 rad-matris; kolumn 1; 1, kolumn 2; 2;");
+        expr, "ett-gånger 2 rad-matris; kolumn 1; 1, kolumn 2; 2");
 }
 
 #[test]
@@ -642,7 +642,7 @@ let expr = "<math><mrow><mrow><mo>(</mo><mrow>
     </mrow><mo>)</mo></mrow></mrow></math>";
 test_ClearSpeak("sv", "ClearSpeak_Matrix", "SpeakColNum",
         expr, "2 gånger 2 matris; rad 1; kolumn 1; b nedsänkt 1 1, kolumn 2; b nedsänkt 1 2; \
-                    rad 2; kolumn 1; b nedsänkt 2 1, kolumn 2; b nedsänkt 2 2;");
+                    rad 2; kolumn 1; b nedsänkt 2 1, kolumn 2; b nedsänkt 2 2");
 }
 
 
@@ -665,7 +665,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>)</mo></mrow></mrow>
   </math>";
   test_ClearSpeak("sv", "ClearSpeak_Matrix", "SilentColNum",
-        expr, "2 gånger 2 matris; rad 1; 2, 1; rad 2; 7, 5;");
+        expr, "2 gånger 2 matris; rad 1; 2, 1; rad 2; 7, 5");
 }
 
 #[test]
@@ -688,7 +688,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>)</mo></mrow></mrow>
   </math>";
 test_ClearSpeak("sv", "ClearSpeak_Matrix", "SilentColNum",
-        expr, "3 gånger-ett kolumn-matris; 1; 2; 3;");
+        expr, "3 gånger-ett kolumn-matris; 1; 2; 3");
 }
 
 #[test]
@@ -705,7 +705,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>]</mo></mrow></mrow>
   </math>";
 test_ClearSpeak("sv", "ClearSpeak_Matrix", "SilentColNum",
-        expr, "ett-gånger 2 rad-matris; 1, 2;");
+        expr, "ett-gånger 2 rad-matris; 1, 2");
 }
 
 #[test]
@@ -724,7 +724,7 @@ let expr = "<math><mrow><mrow><mo>(</mo><mrow>
     </mrow><mo>)</mo></mrow></mrow></math>";
 test_ClearSpeak("sv", "ClearSpeak_Matrix", "SilentColNum",
         expr, "2 gånger 2 matris; rad 1; b nedsänkt 1 1, b nedsänkt 1 2; \
-                            rad 2; b nedsänkt 2 1, b nedsänkt 2 2;");
+                            rad 2; b nedsänkt 2 1, b nedsänkt 2 2");
 }
 
 
@@ -829,7 +829,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>)</mo></mrow></mrow>
   </math>";
   test_ClearSpeak("sv", "ClearSpeak_Matrix", "Vector",
-        expr, "2 gånger 2 matris; rad 1; 2, 1; rad 2; 7, 5;");
+        expr, "2 gånger 2 matris; rad 1; 2, 1; rad 2; 7, 5");
 }
 
 #[test]
@@ -852,7 +852,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>)</mo></mrow></mrow>
   </math>";
 test_ClearSpeak("sv", "ClearSpeak_Matrix", "Vector",
-        expr, "3 gånger-ett kolumn-vektor; 1; 2; 3;");
+        expr, "3 gånger-ett kolumn-vektor; 1; 2; 3");
 }
 
 #[test]
@@ -869,7 +869,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>]</mo></mrow></mrow>
   </math>";
 test_ClearSpeak("sv", "ClearSpeak_Matrix", "Vector",
-        expr, "ett-gånger 2 rad-vektor; 1, 2;");
+        expr, "ett-gånger 2 rad-vektor; 1, 2");
 }
 
 #[test]
@@ -888,7 +888,7 @@ let expr = "<math><mrow><mrow><mo>(</mo><mrow>
     </mrow><mo>)</mo></mrow></mrow></math>";
 test_ClearSpeak("sv", "ClearSpeak_Matrix", "Vector",
         expr, "2 gånger 2 matris; rad 1; kolumn 1; b nedsänkt 1 1, kolumn 2; b nedsänkt 1 2; \
-                                rad 2; kolumn 1; b nedsänkt 2 1, kolumn 2; b nedsänkt 2 2;");
+                                rad 2; kolumn 1; b nedsänkt 2 1, kolumn 2; b nedsänkt 2 2");
 }
 
 

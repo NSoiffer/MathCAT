@@ -169,7 +169,7 @@ fn si_derived_1_with_prefixes() {
     </math>"#;
     test("en", "SimpleSpeak", expr, 
         "1 quetta-becquerel, comma; 2 ronna-becquerels; comma; \
-                1 yotta-coulombs, comma; 2 zetta-coulombs, comma; \
+                1 yotta-coulomb, comma; 2 zetta-coulombs, comma; \
                 1 exa-farad, comma; 2 peta-farads, comma; \
                 1 tera-gray, comma; 2 giga-grays, comma; \
                 1 mega-henry, comma; 2 kilo-henrys, comma; \

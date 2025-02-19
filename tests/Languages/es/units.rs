@@ -83,8 +83,8 @@ fn si_base() {
     test("es", "SimpleSpeak", expr, 
         "1 amperio, coma, 2 amperios, coma, \
                 1 candela, coma, 2 candelas, coma, \
-                1 grado kelvin, coma, 2 grado kelvins, coma, \
-                1 grado kelvin, coma, 2 grado kelvins, coma, \
+                1 kelvin, coma, 2 kelvins, coma, \
+                1 kelvin, coma, 2 kelvins, coma, \
                 1 gramo, coma, 2 gramos, coma, \
                 1 metro, coma, 2 metros, coma, \
                 1 mol coma, 2 moles, coma, \
@@ -110,8 +110,8 @@ fn si_base_with_prefixes() {
     test("es", "SimpleSpeak", expr, 
         "1 quettaamperio, coma; 2 ronnaamperios, coma; \
                 1 yottacandela, coma; 2 zettacandelas, coma; \
-                1 exagrado kelvin, coma; 2 petagrado kelvins, coma; \
-                1 teragrado kelvin, coma; 2 gigagrado kelvins, coma, \
+                1 exakelvin, coma; 2 petakelvins, coma; \
+                1 terakelvin, coma; 2 gigakelvins, coma, \
                 1 megagramo, coma; 2 kilogramos, coma, \
                 1 hectómetro, coma, 2 dekámetros, coma, \
                 1 decimol, coma; 2 centimoles, coma; \
@@ -142,13 +142,13 @@ fn si_derived_1() {
 				1 grado Celsius, coma; 2 grados Celsius, coma, \
 				1 grado Celsius, coma; 2 grados Celsius, coma, \
 				1 faradio, coma, 2 faradios, coma, \
-				1 gray, coma, 2 grays, coma, \
+				1 gray, coma, 2 grais, coma, \
 				1 henrio, coma, 2 henrios, coma, \
 				1 hercio, coma, 2 hercios, coma, \
 				1 julio, coma, 2 julios, coma, \
 				1 katal, coma, 2 katales, coma, \
 				1 lumen, coma, 2 lúmenes, coma, \
-                1 lux coma, 2 luxs");
+                1 lux coma, 2 luxes");
 }
 
 #[test]
@@ -169,15 +169,15 @@ fn si_derived_1_with_prefixes() {
     </math>"#;
     test("es", "SimpleSpeak", expr, 
         "1 quettabecquerel, coma; 2 ronnabecquereles, coma; \
-                1 yottaculombios, coma; 2 zettaculombios, coma; \
+                1 yottaculombio, coma; 2 zettaculombios, coma; \
                 1 exafaradio, coma; 2 petafaradios, coma, \
-                1 teragray, coma, 2 gigagrays, coma; \
+                1 teragray, coma, 2 gigagráis, coma; \
                 1 megahenrio, coma; 2 kilohenrios, coma; \
                 1 dekahercio, coma; 2 decihercios, coma; \
                 1 centijulio, coma; 2 milijulios, coma; \
                 1 microkatal, coma; 2 nanokatales, coma, \
                 1 picolumen, coma; 2 femtolúmenes, coma, \
-                1 attolux, coma, 2 zeptoluxs, coma; \
+                1 attolux, coma, 2 zeptoluxes, coma; \
                 1 miligrado Celsius, coma; 2 microgrados Celsius, coma; \
                 1 picogrado Celsius, coma; 2 nanogrados Celsius");
 }
@@ -261,14 +261,14 @@ fn si_accepted() {
                 1 litro, coma, 2 litros, coma, \
                 1 litro, coma, 2 litros, coma, \
                 1 tonelada, coma, 2 toneladas, coma, \
-                1 dalton, coma, 2 daltons, coma, \
+                1 dalton, coma, 2 dáltones, coma, \
                 1 néper, coma, 2 néperes, coma; \
-                1 unidad de masa atómica, coma; 2 unidad de masa atómicas, coma; \
+                1 unidad de masa atómica, coma; 2 unidades de masa atómica, coma; \
                 1 electronvoltio, coma; 2 electronvoltios, coma, \
-                1 radi, coma, 2 radis, coma, \
-                1 estereorradi, coma, 2 estereorradis, coma, \
+                1 radián, coma, 2 radianes, coma, \
+                1 estereorradián, coma, 2 estereorradianes, coma, \
                 1 año, coma, 2 años, coma; \
-                1 segundo de arco, coma; 2 segundo de arcos, coma, \
+                1 segundo de arco, coma; 2 segundos de arco, coma, \
                 1 bit coma, 2 bits, coma, \
                 1 byte, coma, 2 bytes, coma, \
                 1 baudio, coma, 2 baudios");
@@ -298,14 +298,14 @@ fn si_accepted_with_prefixes() {
 				1 yottalitro, coma; 2 zettalitros, coma, \
 				1 exalitro, coma; 2 petalitros, coma; \
 				1 teratonelada, coma; 2 gigatoneladas, coma; \
-				1 megadalton, coma; 2 kilodaltons, coma; \
+				1 megadalton, coma; 2 kilodáltones, coma; \
 				1 decinéper, coma; 2 centinéperes, coma; \
-				1 hectounidad de masa atómica; coma; 2 dekaunidad de masa atómicas; coma; \
+				1 hectounidad de masa atómica; coma; 2 dekaunidad de masa atómica; coma; \
 				1 milielectronvoltio, coma; 2 microelectronvoltios, coma, \
-				1 nanoradi, coma, 2 picoradis, coma; \
-				1 femtoestereorradi, coma; 2 attoestereorradis, coma, \
+				1 nanorradián, coma, 2 picorradianes, coma; \
+				1 femtoestereorradián, coma; 2 attoestereorradianes, coma, \
 				1 gigaaño, coma, 2 megaaños, coma; \
-				1 zeptosegundo de arco, coma; 2 yoctosegundo de arcos, coma, \
+				1 zeptosegundo de arco, coma; 2 yoctosegundos de arco, coma, \
 				1 kilobit, coma, 2 megabits, coma, \
 				1 gigabyte, coma, 2 terabytes, coma; \
                 1 terabaudio, coma; 2 exabaudios");
@@ -361,12 +361,12 @@ fn without_prefix_angles() {
     test("es", "SimpleSpeak", expr, 
         "1 grado, coma, 2 grados, coma, \
                 1 grado, coma, 2 grados, coma; \
-                1 minuto de arco, coma; 2 minuto de arcos, coma; \
-                1 minuto de arco, coma; 2 minuto de arcos, coma; \
-                1 minuto de arco, coma; 2 minuto de arcos, coma; \
-                1 minuto de arco, coma; 2 minuto de arcos, coma; \
-                1 segundo de arco, coma; 2 segundo de arcos, coma; \
-                1 segundo de arco, coma; 2 segundo de arcos");
+                1 minuto de arco, coma; 2 minutos de arco, coma; \
+                1 minuto de arco, coma; 2 minutos de arco, coma; \
+                1 minuto de arco, coma; 2 minutos de arco, coma; \
+                1 minuto de arco, coma; 2 minutos de arco, coma; \
+                1 segundo de arco, coma; 2 segundos de arco, coma; \
+                1 segundo de arco, coma; 2 segundos de arco");
 }
 
 #[test]
@@ -380,8 +380,8 @@ fn without_prefix_distance() {
         <mn>1</mn><mi intent=":unit">fm</mi><mo>,</mo><mn>2</mn><mi intent=":unit">fm</mi>
     </math>"#;
     test("es", "SimpleSpeak", expr, 
-        "1 unidad astronómica, coma; 2 unidad astronómicas, coma, \
-                1 año luz, coma, 2 año luzs, coma, \
+        "1 unidad astronómica, coma; 2 unidades astronómicas, coma, \
+                1 año luz, coma, 2 años luz, coma, \
                 1 parsec, coma, 2 parsecs, coma, \
                 1 ángstrom, coma, 2 ángstroms, coma, \
                 1 ángstrom, coma, 2 ángstroms, coma, \
@@ -410,14 +410,14 @@ fn without_prefix_other() {
         "1 hectárea, coma, 2 hectáreas, coma, \
                 1 decibelio, coma, 2 decibelios, coma, \
                 1 atmósfera, coma, 2 atmósferas, coma; \
-                1 unidad de masa atómica, coma; 2 unidad de masa atómicas, coma, \
+                1 unidad de masa atómica, coma; 2 unidades de masa atómica, coma, \
                 1 bar coma, 2 bares, coma, \
                 1 caloría, coma, 2 calorías, coma, \
                 1 curio, coma, 2 curios, coma, \
-                1 gradi, coma, 2 gradis, coma, \
+                1 gradián, coma, 2 gradianes, coma, \
                 1 molar, coma, 2 molares, coma, \
-                1 roentgen, coma, 2 roentgens, coma; \
-                1 revolución por minuto, coma; 2 revolución por minutos, coma, \
+                1 roentgen, coma, 2 roéntgenes, coma; \
+                1 revolución por minuto, coma; 2 revoluciones por minuto, coma, \
                 1 mho coma, 2 mhos, coma, \
                 1 dina, coma, 2 dinas, coma, \
                 1 ergio, coma, 2 ergios");

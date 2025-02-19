@@ -4,6 +4,71 @@
 # Each definition in this file is of the form
 #   name: [ "...", "..." "..." ],
 
+
+# If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here for a prefix||infix||postfix||function fixity
+# If only one ":" is used, it the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
+# If no ":"s are used, the same speech is used for all forms
+# If bracketing words make sense, they are separated with ";"s
+# Intent mappings must specify whether they are "prefix", "infix", "postfix", or "function" with an "=" sign
+# If there are multiple fixities (e.g., see transpose), they are separated with "||
+#   for readability, spaces can be used around any of the delimiter characters
+# Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
+- IntentMappings: {
+    "indexed-by": "infix= ; nedsänkt: nedsänkt: nedre index; slut nedsänkt: slut nedsänkt: slut nedre index",
+    "modified-variable": "silent= ",
+    "say-super": "infix=upphöjt: övre index: övre index",   # used with 'mo' for superscripts (e.g, "<")
+    "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
+
+    "absolute-value": "function= ; absolutbeloppet; slut absolutbelopp",
+    "binomial": "infix=binomial; över; end binomial",
+    "limit": "prefix=gränsvärdet då",
+    "lim-sup": "prefix=lim sup as: the limit superior as: the limit superior as",
+    "lim-inf": "prefix=lim inf as: the limit inferior as : the limit inferior as",
+    "logarithm-with-base": "prefix=logg bas: logaritmen med bas: logaritmen med bas",
+    "minus": "infix=minus || prefix=minus",
+    "plus": "infix=plus || prefix=positivt",
+
+    "transpose": "postfix=transponat || function=transponat",
+    "norm": "function=; normen; slut norm",
+    "trace": "function=;spåret; slut spåret",
+    "dimension": "function=; dimensionen; slut dimensionen",
+    # "homomorphism": "function= ; homomorfism; slut homomorfism",                                # doesn't fit function pattern
+    # "kernel": "function= ; noll-rummet : noll-rummet till: noll-rummet till; slut noll-rummet", # doesn't fit function pattern
+    "vector": "function= ; vektor: vektorn: vektorn || prefix=vektor: vektorn: vektorn",
+    "cross-product": "infix=cross: cross product: cross product",
+    "dot-product": "infix=dot: dot product: dot:dot product",
+
+    "divergence": "function= ; div: divergence: divergence; end divergence",
+    "curl": "function= ; curl; end curl",
+    "gradient": "function= ; grad: gradient: gradient; end gradient",
+    "laplacian": "function=lahplahsian",   # speech engines don't do a good job with "laplacian"
+  }
+
+- NavigationParts: {
+    "large-op": "base, lower limit, upper limit",
+    "mfrac": "numerator;denominator",
+    "fraction": "numerator;denominator",
+    "msqrt": "root",
+    "square-root": "root",
+    "mroot": "root;root index",
+    "root": "root;root index",
+    "msub": "base;subscript",
+    "sub": "base;subscript",
+    "msup": "base;superscript",
+    "say-super": "base;superscript",
+    "skip-super": "base;superscript",
+    "power": "base;exponent",
+    "msubsup": "base;subscript;superscript",
+    "munder": "base;under limit",
+    "mover": "base;upper limit",
+    "munderover": "base;under limit;upper limit",
+
+    # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
+    # it's a hack to put them here, but at least they are grouped with the other navigation parts
+    "in": "in",
+    "out": "out of",
+  }
+
 - SIPrefixes: {
     "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hekto", "da": "deka",
     "d": "deci", "c": "centi", "m": "milli", "µ": "mikro", "n": "nano", "p": "piko", "f": "femto", "a": "atto", "z": "zepto", "y": "yokto", "r": "ronto", "q": "quekto"
@@ -53,7 +118,7 @@
     "u": "atommassenhet",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
     "eV": "elektronvolt",
     "rad": "radian",             # should only take negative powers
-    "sr": "sterradian",          # should only take negative powers      
+    "sr": "steradian",          # should only take negative powers      
   
     # others that take a prefix
     "a": "annum",               # should only take positive powers
@@ -94,7 +159,7 @@
     # others
     "ha": "hektar",
     # "B": "bel",    # "B" more commonly means bytes
-    "dB": "decibel", # already loglogarithmic, so not used with SI prefixes
+    "dB": "decibel", # already logarithmic, so not used with SI prefixes
 
     "amu": "atommassenhet",
     "atm": "atmosfär",
@@ -175,7 +240,7 @@
 - PluralForms: {
   # SWEDISH: this should be complete. Units not listed here are not modified when pluralised. /Tim
     "sekund": "sekunder",
-    "grad celcius": "grader celcius",
+    "grad celsius": "grader celsius",
     "atommassenhet": "atommassenheter",
     "radian": "radianer",
     "steradian": "steradianer",
@@ -207,7 +272,7 @@
     "pebi-byte": "pebi-bytes", 
     "exbi-byte": "exbi-bytes", 
     "zebi-byte": "zebi-bytes",
-    "yobi-byte": yobi-bytes",
+    "yobi-byte": "yobi-bytes",
     "mile": "miles",
     "rod": "rods",
     "link": "links",

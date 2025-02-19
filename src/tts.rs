@@ -646,13 +646,12 @@ impl TTS {
     fn merge_pauses_none(&self, str: &str) -> String {
         // punctuation used for pauses is ",", ";" 
         lazy_static! {
-            static ref MULTIPLE_PAUSES: Regex = Regex::new(r"[,;][,;]+").unwrap();   // two or more pauses
+            static ref SPACES: Regex = Regex::new(r"\s+([;,])").unwrap();   // two or more pauses
+            static ref MULTIPLE_PAUSES: Regex = Regex::new(r"([,;][,;]+)").unwrap();   // two or more pauses
         }
         // we reduce all sequences of two or more pauses to a single medium pause
-        let mut merges_string = str.to_string();
-        for cap in MULTIPLE_PAUSES.captures_iter(str) {
-            merges_string = merges_string.replace(&cap[0], ";");
-        }
+        let merges_string = SPACES.replace_all(str, "$1").to_string();
+        let merges_string = MULTIPLE_PAUSES.replace_all(&merges_string, ";").to_string();
         return merges_string;
     }
 

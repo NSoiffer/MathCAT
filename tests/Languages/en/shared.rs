@@ -37,9 +37,9 @@ fn limit() {
             </mfrac>
             </mrow>
         </math>";
-    test("en", "SimpleSpeak", expr, "the limit as x approaches 0, of, fraction, sine of x, over x, end fraction;");
+    test("en", "SimpleSpeak", expr, "the limit as x approaches 0, of, fraction, sine of x, over x, end fraction");
     test_prefs("en", "SimpleSpeak", vec![("Impairment", "LearningDisability")], expr,
-            "the limit as x approaches 0, of; sine of x, over x;");
+            "the limit as x approaches 0, of; sine of x, over x");
 }
 
 #[test]
@@ -74,7 +74,6 @@ fn binomial_subscript() {  // C_{n,k}
     let expr = "<math><msub><mi>C</mi><mrow><mi>n</mi><mo>,</mo><mi>m</mi></mrow></msub></math>";
     test("en", "SimpleSpeak", expr, "n choose m");
 }
-
 
 #[test]
 fn permutation_mmultiscripts() {
@@ -118,7 +117,7 @@ fn huge_num_mmultiscripts() {
 #[test]
 fn prime() {
     let expr = "<math> <msup><mi>x</mi><mo >&#x2032;</mo></msup> </math>";
-    test("en", "SimpleSpeak", expr, "x prime,");
+    test("en", "SimpleSpeak", expr, "x prime");
 }
 
 #[test]
@@ -260,7 +259,7 @@ fn ignore_comma() {
       </mstyle>
     </mrow>
 </math>";
-    test("en", "SimpleSpeak", expr, "phi of x is equal to; c, e raised to the negative h squared x squared power,");
+    test("en", "SimpleSpeak", expr, "phi of x is equal to; c times, e raised to the negative h squared, x squared power");
 }
 
 #[test]
@@ -326,7 +325,7 @@ fn bug_199_2pi() {
 #[test]
 fn caret_and_hat() {
   let expr = "<math><mi>x</mi><mo>^</mo><mn>2</mn><mo>+</mo><mover><mi>y</mi><mo>^</mo></mover></math>";
-  test("en", "SimpleSpeak",expr, "x caret 2 plus y hat,");
+  test("en", "SimpleSpeak",expr, "x caret 2 plus y hat");
 }
 
 #[test]
@@ -343,8 +342,9 @@ fn mn_with_block_and_decimal_separators() {
 
 #[test]
 fn divergence() {
+  init_logger();
   let expr = "<math><mo>&#x2207;</mo><mo>&#xB7;</mo><mi mathvariant='normal'>F</mi></math>";                                       // may want to change this for another language
-  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "div of cap f");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "dihv cap f");
   test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "divergence of cap f");
 }
 
@@ -352,7 +352,7 @@ fn divergence() {
 fn curl() {
   let expr = "<math><mo>&#x2207;</mo><mo>&#xD7;</mo><mi mathvariant='normal'>F</mi></math>";          
   // may want to change this for another language
-  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "curl of cap f");
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "curl cap f");
   test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "curl of cap f");
 }
 
@@ -362,4 +362,97 @@ fn gradient() {
   // may want to change this for another language
   test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "del cap f");
   test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "gradient of cap f");
+}
+
+#[test]
+fn literal_speak() {
+  let expr = r#"<math data-latex='\vec{A} \perp \vec{B}' display='block'>
+  <mrow data-changed='added'>
+    <mover data-latex='\vec{A}'>
+      <mi data-latex='A'>A</mi>
+      <mo stretchy='false'>→</mo>
+    </mover>
+    <mo intent='perpendicular-to'>⊥</mo>
+    <mover data-latex='\vec{B}'>
+      <mi data-latex='B'>B</mi>
+      <mo stretchy='false'>→</mo>
+    </mover>
+  </mrow>
+ </math>"#; 
+  test("en", "LiteralSpeak", expr, "cap eigh right arrow, perpendicular to, cap b right arrow");
+}
+
+#[test]
+fn literal_speak_with_name() {
+  let expr = r#"<math intent='forced($x)'>
+      <mrow arg="x">
+        <mi>f</mi>
+        <mo data-changed='added'>&#x2061;</mo>
+        <mrow data-changed='added'>
+          <mo>(</mo>
+          <mrow data-changed='added'>
+            <mi>x</mi>
+            <mo>!</mo>
+          </mrow>
+          <mo>)</mo>
+        </mrow>
+      </mrow>
+    </math>"#;
+  test("en", "LiteralSpeak", expr, "forced f, left paren x exclamation point, right paren");
+}
+
+#[test]
+fn literal_speak_with_property() {
+  let expr = r#"<math intent=':prefix'>
+      <mrow arg="x">
+        <mi>f</mi>
+        <mo data-changed='added'>&#x2061;</mo>
+        <mrow data-changed='added'>
+          <mo>(</mo>
+          <mrow data-changed='added'>
+            <mi>x</mi>
+            <mo>!</mo>
+          </mrow>
+          <mo>)</mo>
+        </mrow>
+      </mrow>
+    </math>"#; 
+  test("en", "LiteralSpeak", expr, "f, left paren x exclamation point, right paren");
+}
+
+#[test]
+fn literal_intent_property() {
+  let expr = r#"<math data-latex='\vec{A} \perp \vec{B}' display='block'>
+  <mrow intent=":literal">
+    <mover data-latex='\vec{A}'>
+      <mi data-latex='A'>A</mi>
+      <mo stretchy='false'>→</mo>
+    </mover>
+    <mo intent='perpendicular-to'>⊥</mo>
+    <mover data-latex='\vec{B}'>
+      <mi data-latex='B'>B</mi>
+      <mo stretchy='false'>→</mo>
+    </mover>
+  </mrow>
+ </math>"#; 
+  test("en", "SimpleSpeak", expr, "cap eigh right arrow, perpendicular to, cap b right arrow");
+}
+
+#[test]
+fn literal_intent_property_with_name() {
+  let expr = r#"<math intent='forced:literal($x)'>
+      <mrow arg="x">
+        <mi>f</mi>
+        <mo data-changed='added'>&#x2061;</mo>
+        <mrow data-changed='added'>
+          <mo>(</mo>
+          <mrow data-changed='added'>
+            <mi>x</mi>
+            <mo>!</mo>
+          </mrow>
+          <mo>)</mo>
+        </mrow>
+      </mrow>
+    </math>"#; 
+  test("en", "SimpleSpeak", expr, "forced f, open paren x exclamation point, close paren");
 }

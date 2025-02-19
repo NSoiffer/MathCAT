@@ -33,7 +33,7 @@ fn not_SimpleSpeak_common_fraction_tenths() {
     let expr = "<math>
                     <mfrac> <mn>89</mn> <mn>10</mn> </mfrac>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "89 genom 10,");
+    test("sv", "SimpleSpeak", expr, "89 genom 10");
 }
 
 #[test]
@@ -49,7 +49,7 @@ fn non_simple_fraction() {
         </mrow>
     </math>
                             ";
-    test("sv", "SimpleSpeak", expr, "division, x plus y, genom, x minus y, slut division;");
+    test("sv", "SimpleSpeak", expr, "division, x plus y, genom, x minus y, slut division");
 }
 
 #[test]
@@ -65,7 +65,7 @@ fn nested_fraction() {
         </mrow>
     </math>
                             ";
-    test("sv", "SimpleSpeak", expr, "division, x plus, division, 1 genom y, slut division; genom, x minus y, slut division;");
+    test("sv", "SimpleSpeak", expr, "division, x plus, division, 1 genom y, slut division; genom, x minus y, slut division");
 }
 
 
@@ -82,7 +82,7 @@ fn deeply_nested_fraction_msqrt() {
         </mrow>
     </math>
                             ";
-    test("sv", "SimpleSpeak", expr, "division, x plus, kvadratroten ur 1 genom y, slut rot; genom, x minus y, slut division;");
+    test("sv", "SimpleSpeak", expr, "division, x plus, kvadratroten ur 1 genom y, slut rot; genom, x minus y, slut division");
 }
 
 #[test]
@@ -98,7 +98,7 @@ fn deeply_nested_fraction_mrow_msqrt() {
         </mrow>
     </math>
                             ";
-    test("sv", "SimpleSpeak", expr, "division, x plus, kvadratroten ur 2 plus 1 genom y, slut rot; genom, x minus y, slut division;");
+    test("sv", "SimpleSpeak", expr, "division, x plus, kvadratroten ur 2 plus 1 genom y, slut rot; genom, x minus y, slut division");
 }
 
 #[test]
@@ -114,7 +114,7 @@ fn numerator_simple_fraction() {
         </mrow>
     </math>
                             ";
-    test("sv", "SimpleSpeak", expr, "division, x genom, x minus y, slut division;");
+    test("sv", "SimpleSpeak", expr, "division, x genom, x minus y, slut division");
 }
 
 #[test]
@@ -127,7 +127,7 @@ fn denominator_simple_fraction() {
         </mfrac>
     </math>
                             ";
-    test("sv", "SimpleSpeak", expr, "division, x minus y, genom x, slut division;");
+    test("sv", "SimpleSpeak", expr, "division, x minus y, genom x, slut division");
 }
 
 
@@ -156,7 +156,7 @@ fn mixed_number_big() {
                     <mn>3</mn>
                     <mfrac> <mn>7</mn> <mn>83</mn> </mfrac>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "3 och 7 genom 83,");
+    test("sv", "SimpleSpeak", expr, "3 och 7 genom 83");
 }
 
 #[test]
@@ -164,7 +164,7 @@ fn simple_text() {
     let expr = "<math>
     <mfrac> <mi>rise</mi> <mi>run</mi> </mfrac>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "rise genom run,");
+    test("sv", "SimpleSpeak", expr, "rise genom run");
 }
 
 #[test]
@@ -177,7 +177,7 @@ fn number_and_text() {
                 <mn>3</mn><mtext>gallons</mtext></mrow>
             </mfrac>
         </math>";
-    test("sv", "SimpleSpeak", expr, "division, 2 miles, genom, 3 gallons, slut division;");
+    test("sv", "SimpleSpeak", expr, "division, 2 miles, genom, 3 gallons, slut division");
 }
 
 
@@ -201,7 +201,7 @@ fn nested_simple_fractions() {
                 </mfrac>
                 </mrow>
             </math>";
-    test("sv", "SimpleSpeak", expr, "division, en halv, genom, 2 tredjedelar, slut division;");
+    test("sv", "SimpleSpeak", expr, "division, en halv, genom, 2 tredjedelar, slut division");
 }
 
 #[test]
@@ -212,5 +212,5 @@ fn binomial() {
                     <mfrac linethickness='0'> <mn>7</mn> <mn>3</mn> </mfrac>
                     <mo>)</mo>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "2 gånger, 7 över 3");
+    test("sv", "SimpleSpeak", expr, "2 gånger 7 över 3");
 }

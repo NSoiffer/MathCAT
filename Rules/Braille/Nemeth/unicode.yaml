@@ -218,7 +218,7 @@
  - "+":                         # 0x002B (Plus sign)
     - test:
         # Add multipurpose indicator before prefix '+' to avoid being the same as '∓' 
-        if: "not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][name(.)='mo' and text()='-']]"
+        if: "not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][name(.)='mo' and .='-']]"
         then: [t: "m⠬"]
         else: [t: "⠬"]
 
@@ -236,7 +236,7 @@
         if: "@data-chemical-bond"
         then: [t: "⠸⠒⠻"]
         else_test:
-            if: "not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][name(.)='mo' and (text()='+' or text()='-')]]"
+            if: "not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][name(.)='mo' and (.='+' or .='-')]]"
             then: [t: "m⠤"]
             else: [t: "⠤"] 
 
@@ -277,7 +277,7 @@
              ( (@intent and starts-with(@intent, '_')) and
                ../self::m:mrow and
                not(ancestor::*[2][IsBracketed(., '[', ']')]) and
-               not( preceding-sibling::*[2][text()=':'] or following-sibling::*[2][text()=':']) and 
+               not( preceding-sibling::*[2][.=':'] or following-sibling::*[2][.=':']) and 
                name(preceding-sibling::*[1]) = name(following-sibling::*[1]) and
                ( name(preceding-sibling::*[1]) != 'mrow' or
                  (preceding-sibling::*[1]/*[2][text()] = following-sibling::*[1]/*[2][text()]) )
@@ -340,7 +340,7 @@
           - "  name(parent::*[1])='mrow' and ("
           - "    (following-sibling::*[1][IsInDefinition(., 'Braille', 'NemethPunctAndOpenAfterSymbols')]) or "
           - "    (not(following-sibling::*) and parent::*[1][name(.)='mrow' and following-sibling::*[1][IsInDefinition(., 'Braille', 'NemethPunctAndOpenAfterSymbols')]]) or "
-          - "    (following-sibling::*[1][text() = '\u2062'] and following-sibling::*[2][IsInDefinition(., 'Braille', 'NemethCurrencyAfterSymbols')])"
+          - "    (following-sibling::*[1][.='\u2062'] and following-sibling::*[2][IsInDefinition(., 'Braille', 'NemethCurrencyAfterSymbols')])"
           - "  )"
           - ")"
         then: [t: "W"]
@@ -352,7 +352,7 @@
         if:
           - "not("
           - "  (not(preceding-sibling::*) and parent::*[1][name(.)='mrow' and preceding-sibling::*[1][IsInDefinition(., 'Braille', 'NemethPunctAndOpenBeforeSymbols')]]) or"
-          - "  (preceding-sibling::*[1][text() = '\u2062'] and preceding-sibling::*[2][IsInDefinition(., 'Braille', 'NemethCurrencyBeforeSymbols')])"
+          - "  (preceding-sibling::*[1][.='\u2062'] and preceding-sibling::*[2][IsInDefinition(., 'Braille', 'NemethCurrencyBeforeSymbols')])"
           - ")"
         then: [t: "W"]
     - t: "⠄⠄⠄"
@@ -362,7 +362,7 @@
           - "  name(parent::*[1])='mrow' and ("
           - "    (following-sibling::*[1][IsInDefinition(., 'Braille', 'NemethPunctAndOpenAfterSymbols')]) or "
           - "    (not(following-sibling::*) and parent::*[1][name(.)='mrow' and following-sibling::*[1][IsInDefinition(., 'Braille', 'NemethPunctAndOpenAfterSymbols')]]) or "
-          - "    (following-sibling::*[1][text() = '\u2062'] and following-sibling::*[2][IsInDefinition(., 'Braille', 'NemethCurrencyAfterSymbols')])"
+          - "    (following-sibling::*[1][.='\u2062'] and following-sibling::*[2][IsInDefinition(., 'Braille', 'NemethCurrencyAfterSymbols')])"
           - "  )"
           - ")"
         then: [t: "W"]

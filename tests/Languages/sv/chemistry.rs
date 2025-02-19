@@ -5,15 +5,15 @@ use crate::common::*;
 #[test]
 fn salt() {
   let expr = "<math><mi>Na</mi><mi>Cl</mi></math>";
-  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "versal n a, versal c l,");
+  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "versal n a, versal c l");
 }
 
 #[test]
 fn water() {
   let expr = "<math><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></math>";
-  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "versal h, 2 versal o,");
-  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "versal h, nedsänkt 2, versal o,");
-  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "versal h, nedre index 2, versal o,");
+  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "versal h, 2 versal o");
+  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "versal h, nedsänkt 2, versal o");
+  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "versal h, nedre index 2, versal o");
 }
 
 #[test]
@@ -54,7 +54,7 @@ fn ethanol_bonds() {
               <mi>H</mi>
           </mrow>
       </math>";
-  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "versal c, versal h, 3 enkelbindning versal c, versal h, 2 enkelbindning versal o, versal h,");
+  test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "versal c, versal h, 3 enkelbindning versal c, versal h, 2 enkelbindning versal o, versal h");
 
 }
 
@@ -96,7 +96,7 @@ fn ferric_chloride_aq() {
         <msub><mi>Cl</mi><mn>3</mn></msub>
         <mrow><mo>(</mo><mrow><mi>aq</mi></mrow><mo>)</mo></mrow>
     </mrow></math>";
-  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "versal f e, versal c l, 3 vattenlösning,");
+  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "versal f e, versal c l, 3 vattenlösning");
   }
 
 #[test]
@@ -137,11 +137,11 @@ fn beta_decay() {
       </mmultiscripts>
     </math>";
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse")], expr,
-    "14, 6, versal c; bildar, 14, 7, versal n; plus 0, minus 1, e,");
+    "14, 6, versal c; bildar, 14, 7, versal n; plus 0, minus 1, e");
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
-    "upphöjt 14, nedsänkt 6, versal c; reaktion bildar; upphöjt 14, nedsänkt 7, versal n; plus, upphöjt 0, nedsänkt minus 1, e,");
+    "upphöjt 14, nedsänkt 6, versal c; reaktion bildar; upphöjt 14, nedsänkt 7, versal n; plus, upphöjt 0, nedsänkt minus 1, e");
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-    "övre index 14, nedre index 6, versal c; reaktion bildar; övre index 14, nedre index 7, versal n; plus, övre index 0, nedre index minus 1, e,");
+    "övre index 14, nedre index 6, versal c; reaktion bildar; övre index 14, nedre index 7, versal n; plus, övre index 0, nedre index minus 1, e");
 }
 
 #[test]
@@ -401,11 +401,11 @@ fn mhchem_beta_decay() {
       </mrow>
     </math>";
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Terse")], expr,
-    "14, 6, versal c; bildar, 14, 7, versal n; plus 0, minus 1, e,");
+    "14, 6, versal c; bildar, 14, 7, versal n; plus 0, minus 1, e");
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
-    "upphöjt 14, nedsänkt 6, versal c; reaktion bildar; upphöjt 14, nedsänkt 7, versal n; plus, upphöjt 0, nedsänkt minus 1, e,");
+    "upphöjt 14, nedsänkt 6, versal c; reaktion bildar; upphöjt 14, nedsänkt 7, versal n; plus, upphöjt 0, nedsänkt minus 1, e");
     test_prefs("sv", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-    "övre index 14, nedre index 6, versal c; reaktion bildar; övre index 14, nedre index 7, versal n; plus, övre index 0, nedre index minus 1, e,");
+    "övre index 14, nedre index 6, versal c; reaktion bildar; övre index 14, nedre index 7, versal n; plus, övre index 0, nedre index minus 1, e");
 }
 
 #[test]
@@ -463,9 +463,9 @@ fn mhchem_so4_2plus() {
       </msup>
     </mrow>
   </math>";
-  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "versal s; versal o, 4, 2 plus,");
-  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "versal s; versal o, nedsänkt 4, upphöjt 2 plus,");
-  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "versal s; versal o, nedre index 4, övre index 2 plus,");
+  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "versal s; versal o, 4, 2 plus");
+  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "versal s; versal o, nedsänkt 4, upphöjt 2 plus");
+  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "versal s; versal o, nedre index 4, övre index 2 plus");
 }
 
 
@@ -553,7 +553,7 @@ fn mhchem_hcl_aq_etc() {
     </mrow>
   </math>";
   test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "2, versal h, versal c l, vattenlösning; plus, 2, versal n a, fast; bildar; 2, versal n a, versal c l, vattenlösning; plus, versal h, 2; gas,");
+      expr, "2, versal h, versal c l, vattenlösning; plus, 2, versal n a, fast; bildar; 2, versal n a, versal c l, vattenlösning; plus, versal h, 2; gas");
 
 }
 
@@ -619,7 +619,7 @@ fn mhchem_barbed_equilibrium() {
     </mrow>
   </math>";
   test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "versal h, 2; gas; plus; versal i, 2; gas; är i jämvikt med 2, versal h, versal i, gas,");
+      expr, "versal h, 2; gas; plus; versal i, 2; gas; är i jämvikt med 2, versal h, versal i, gas");
 }
 
 
@@ -648,7 +648,7 @@ fn mhchem_roman_in_superscript() {
       </mrow>
     </math>";
   test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "versal f e, 2; versal f e, 3; versal o, 4,");
+      expr, "versal f e, 2; versal f e, 3; versal o, 4");
 }
 
 

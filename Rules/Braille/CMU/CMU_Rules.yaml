@@ -93,7 +93,7 @@
   name: common-fraction-mixed-number
   tag: mfrac
   match:
-    - "preceding-sibling::*[1][self::m:mo][text()='\u2064'] and" # preceding element is invisible plus
+    - "preceding-sibling::*[1][self::m:mo][.='\u2064'] and" # preceding element is invisible plus
     - "*[1][self::m:mn][not(contains(., '.,'))]   and" 
     - "*[2][self::m:mn][not(contains(., '.,'))]"
   replace: 
@@ -443,7 +443,7 @@
   match: "*[2][self::m:mo and string-length(.) = 1 and translate(., '_¯═→⟶↔⟷←⟵.˙~^ˇ̊ ⌢⌣⏜⏝','')='']"
   replace: 
   - test:
-      if: "*[2][text()='=']"  # in case someone uses this for a double bar
+      if: "*[2][.='=']"  # in case someone uses this for a double bar
       then: [t: "⠈⠉⠈⠉"]
       else: [x: "*[2]"]
   - test:
@@ -481,9 +481,9 @@
   match: "*[2][self::m:mo and string-length(.) = 1 and translate(., '=¯〰﹏','')='']" # 0x3030, 0xFE4F ("_" canonicalized to "¯")
   replace: 
   - test:
-      - if: "*[2][text()='=']"  # in case someone uses this for a double bar
+      - if: "*[2][.='=']"  # in case someone uses this for a double bar
         then: [t: "⠈⠉⠈⠉"]
-      - else_if: "*[2][text()='¯']"
+      - else_if: "*[2][.='¯']"
         then: [t: "⠠⠤"]
         else: [t: "⠂⠢"]   # wavy line
   - test:
@@ -527,15 +527,15 @@
           if: "*[2][.='═']"
           then: [t: "⠠⠤⠠⠤"]
           else: [t: "⠠⠤"]
-    # - else_if: "*[2][text()='→']"
+    # - else_if: "*[2][.='→']"
     #   then: [t: "⠘⠱"]
-    # - else_if: "*[2][text()='.' or text()='˙']"
+    # - else_if: "*[2][.='.' or .='˙']"
     #   then: [t: "⠘⠲"]
-    - else_if: "*[2][text()='~']"
+    - else_if: "*[2][.='~']"
       then: [t: "⠐⠢"]
-    # - else_if: "*[2][text()='^']"
+    # - else_if: "*[2][.='^']"
     #   then: [t: "⠐⠱ "]
-    # - else_if: "*[2][text()='=']"
+    # - else_if: "*[2][.='=']"
     #   then: [t: "⠐⠱ "]
       else: [x: "*[2]"]  # maybe not right, but do something
   - test:

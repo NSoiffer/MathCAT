@@ -20,7 +20,7 @@
 
 - name: norm
   tag: norm
-  match: "count(*)=1 and not(@data-intent-property)"
+  match: "count(*)=1"
   replace:
   - test:
       if: "$Verbosity='Verbose'"
@@ -39,7 +39,7 @@
 
 - name: subscripted-norm
   tag: subscripted-norm
-  match: count(*)=2 and "not(@data-intent-property)"
+  match: "count(*)=2"
   replace:
   - test:
       if: "$Verbosity='Verbose'"
@@ -55,13 +55,13 @@
 
 - name: transpose
   tag: transpose
-  match: "count(*)=1 and not(@data-intent-property)"
+  match: "count(*)=1"
   replace:
   - x: "*[1]"
   - T: "的 轉置"      # phrase(this will 'transpose' the values)
 - name: trace
   tag: trace
-  match: "not(@data-intent-property)"
+  match: "count(*)=1"
   replace:
   - test:
       if: "$Verbosity='Verbose'"
@@ -76,7 +76,7 @@
 
 - name: dimension
   tag: dimension
-  match: "count(*)=1 and not(@data-intent-property)"
+  match: "count(*)=1"
   replace:
   - test:
       if: "$Verbosity='Verbose'"
@@ -91,7 +91,7 @@
 
 - name: homomorphism
   tag: homomorphism
-  match: "count(*)=1 and not(@data-intent-property)"
+  match: "count(*)=1"
   replace:
   - test:
       if: "$Verbosity='Verbose'"
@@ -106,7 +106,7 @@
 
 - name: kernel
   tag: kernel
-  match: "count(*)=1 and not(@data-intent-property)"
+  match: "count(*)=1"
   replace:
   - test:
       if: "$Verbosity='Verbose'"
