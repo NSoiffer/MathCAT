@@ -13,7 +13,7 @@
   tag: msup
   match:
   - "*[1][string-length(text())=1 and translate(., 'ℂℕℚℝℤ', '')=''] and" 
-  - "*[2][string-length(text())=1 and (text()='+' or text()='-' or self::m:mn)]" 
+  - "*[2][string-length(text())=1 and (.='+' or .='-' or self::m:mn)]" 
   replace:
   - intent:
       name: number-sets
@@ -24,7 +24,7 @@
 -
   name: real-part
   tag: mi
-  match: "(text()='Re' or text()='re' or text()='ℜ') and following-sibling::*[1][text()='\u2061']" # before function apply
+  match: "(.='Re' or .='re' or .='ℜ') and following-sibling::*[1][.='\u2061']" # before function apply
   replace:
   - intent:
       name: real-part
@@ -33,7 +33,7 @@
 -
   name: imaginary-part
   tag: mi
-  match: "(text()='Im' or text()='im' or text()='ℑ') and following-sibling::*[1][text()='\u2061']" # before function apply
+  match: "(.='Im' or .='im' or .='ℑ') and following-sibling::*[1][.='\u2061']" # before function apply
   replace: 
   - intent:
       name: imaginary-part
@@ -51,7 +51,7 @@
 -
   name: positive-or-negative
   tag: mrow
-  match: "count(*)=2 and *[1][self::m:mo][text()='+' or text()='-']"
+  match: "count(*)=2 and *[1][self::m:mo][.='+' or .='-']"
   variables:
   - AtLeftEdge: "EdgeNode(., 'left', 'mtd')"
   - AtLeftEdgeOfMTD: "name($AtLeftEdge) = 'mtd'"
@@ -64,11 +64,13 @@
       if: "$AtLeftEdgeOfMTD and $ContinuedColumn and (not($FirstColumn) or $InContinuedRow)"
       then:
       - intent:
-          xpath-name: "IfThenElse(*[1][self::m:mo][text()='+'], 'plus', 'minus')"
+          xpath-name: "IfThenElse(*[1][self::m:mo][.='+'], 'plus', 'minus')"
+          attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
           children: [x: "*[2]"]
       else:
       - intent:
-          xpath-name: "IfThenElse(*[1][self::m:mo][text()='+'], 'positive', 'negative')"
+          xpath-name: "IfThenElse(*[1][self::m:mo][.='+'], 'plus', 'minus')"
+          attrs: "data-intent-property='concat(data-intent-property, \":prefix:\")'"
           children: [x: "*[2]"]
                
 
@@ -84,8 +86,8 @@
   match: 
     - "count(*)=3 and "
        # FIX: consider adding ]...[ versions
-    - "(*[1][text()='(' or text()='['] and *[3][text()=')' or text()=']']) and"   # match bracketing
-    - "(*[2][count(*)=3 and *[2][text()=',']]) and"                               # inside should have ','
+    - "(*[1][.='(' or .='['] and *[3][.=')' or .=']']) and"   # match bracketing
+    - "(*[2][count(*)=3 and *[2][.=',']]) and"                               # inside should have ','
     # intervals are not part of set notation (e.g, { (x,y)∈L | ...}) nor are they nested
     - "not(ancestor::*[IsBracketed(., '{', '}') or IsBracketed(., '[', ']') or IsBracketed(., '(', ')')]) and "  
     - "not(descendant::*[IsBracketed(., '{', '}') or IsBracketed(., '[', ']') or IsBracketed(., '(', ')')]) and "  
@@ -95,22 +97,22 @@
     - "  $ClearSpeak_Paren = 'Interval' or "                                                                  # pref is set
     - " *[2]/*[1][contains(., '∞')] or "                                                                      # starts with infinity
     - " *[2]/*[3][contains(., '∞')] or "                                                                      # ends with infinity
-    - "  preceding-sibling::*[1][self::m:mo and ( text()='=' or IsInDefinition(., 'SubsetOperators') )] or "  # context hint
-    - "  following-sibling::*[1][self::m:mo and ( text()='=' or IsInDefinition(., 'SubsetOperators') )]"      # context hint
+    - "  preceding-sibling::*[1][self::m:mo and ( .='=' or IsInDefinition(., 'SubsetOperators') )] or "  # context hint
+    - "  following-sibling::*[1][self::m:mo and ( .='=' or IsInDefinition(., 'SubsetOperators') )]"      # context hint
     - ")"
   replace:
   - test:
-    - if: "*[1][text()='('] and *[3][text()=')']"
+    - if: "*[1][.='('] and *[3][.=')']"
       then:
       - intent:
           name: "open-interval"
           children: [x: "*[2]/*[1]", x: "*[2]/*[3]"]
-    - else_if: "*[1][text()='('] and *[3][text()=']']"
+    - else_if: "*[1][.='('] and *[3][.=']']"
       then:
       - intent:
           name: "open-closed-interval"
           children: [x: "*[2]/*[1]", x: "*[2]/*[3]"]
-    - else_if: "*[1][text()='['] and *[3][text()=']']"
+    - else_if: "*[1][.='['] and *[3][.=']']"
       then:
       - intent:
           name: "closed-interval"
@@ -128,6 +130,7 @@
   replace:
   - intent:
       name: binomial
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children:
       - x: "*[2]/*[1]"
       - x: "*[2]/*[2]"
@@ -141,12 +144,13 @@
   - Prescripts: "m:mprescripts/following-sibling::*"
   - Postscripts: "m:mprescripts/preceding-sibling::*[position() < last()]"
   match: 
-  - "*[1][self::m:mi and text()='C'] and"
+  - "*[1][self::m:mi and .='C'] and"
   - "count($Prescripts)=2 and ($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none]) and "
   - "count($Postscripts)=2 and $Postscripts[2][self::m:none]"
   replace:
   - intent:
       name: binomial
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children:
       - x: "IfThenElse(name($Prescripts[2])='none', $Prescripts[1], $Prescripts[2])"
       - x: "$Postscripts[1]"
@@ -156,11 +160,12 @@
   name: binomial-msub   # C_{n,k}
   tag: msub
   match:
-  - "*[1][self::m:mi and text()='C'] and"
+  - "*[1][self::m:mi and .='C'] and"
   - "*[2][self::m:mrow and count(*)=3 and *[2][.=',']]"
   replace:
   - intent:
       name: binomial
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children:
       - x: "*[2]/*[1]"
       - x: "*[2]/*[3]"
@@ -173,12 +178,13 @@
   - Prescripts: "m:mprescripts/following-sibling::*"
   - Postscripts: "m:mprescripts/preceding-sibling::*[position() < last()]"
   match: 
-  - "*[1][self::m:mi and text()='P'] and"
+  - "*[1][self::m:mi and .='P'] and"
   - "count($Prescripts)=2 and ($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none]) and "
   - "count($Postscripts)=2 and $Postscripts[2][self::m:none]"
   replace:
   - intent:
-      name: permutation-symbol
+      name: pochhammer
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children:
       - test:
           if: "$Prescripts[1][self::m:none]"
@@ -191,10 +197,11 @@
   name: permutation-msubsup
   tag: msubsup
   match: 
-  - "*[1][self::m:mi and text()='P']"
+  - "*[1][self::m:mi and .='P']"
   replace:
   - intent:
-      name: permutation-symbol
+      name: pochhammer
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children:
       - x: "*[3]"
       - x: "*[2]"
@@ -203,10 +210,11 @@
 -
   name: evaluated-at-msub
   tag: mrow
-  match: "count(*)=2 and *[2][self::m:msub and *[1][self::m:mo][text()='|']]"
+  match: "count(*)=2 and *[2][self::m:msub and *[1][self::m:mo][.='|']]"
   replace:
   - intent:
       name: "evaluate"
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children:
       - x: "*[1]"
       - x: "*[2]/*[2]"
@@ -214,7 +222,7 @@
 -
   name: evaluated-at-msubsup
   tag: mrow
-  match: "count(*)=2 and *[2][self::m:msubsup and *[1][self::m:mo][text()='|']]"
+  match: "count(*)=2 and *[2][self::m:msubsup and *[1][self::m:mo][.='|']]"
   replace: 
   - intent:
       name: "evaluate"
@@ -246,6 +254,7 @@
   replace:
   - intent:
       name: "absolute-value"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[2]"]
 
 -
@@ -255,16 +264,18 @@
   replace:
   - intent:
       name: "square-root"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[1]"]
 
 
 -
   name: sqrt
   tag: mroot
-  match: "*[2][self::m:mn and text()='2']"
+  match: "*[2][self::m:mn and .='2']"
   replace:
   - intent:
       name: "square-root"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[1]"]
 
 -
@@ -278,28 +289,29 @@
       - x: "*[1]"
       - x: "*[2]"
 
-
--
-  name: log-base
-  tag: msub
-  match:
-  - "*[1][self::m:mi][text()='log']"
+  
+- # handle log with a base
+  name: log-with-base
+  tag: [msub, msubsup]
+  match: "*[1][self::m:mi and .='log']"
   replace:
-  - intent:
-      name: log-base
-      children: [x: "*[2]"]
-
--
-  name: log-base-power
-  tag: msubsup
-  match:
-  - "*[1][self::m:mi][text()='log']"
-  replace:
-  - intent:
-      name: log-base-power
-      children:
-      - x: "*[2]"
-      - x: "*[3]"
+  - test:
+      if: "self::m:msub"
+      then:
+      - intent:
+          name: "logarithm-with-base"
+          attrs: "data-intent-property='concat(data-intent-property, \":prefix\")'"
+          children: [x: "*[2]"]    # grab the base
+      else:
+      - intent:
+          name: "power"
+          attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
+          children:
+          - intent:
+              name: "logarithm-with-base"
+              attrs: "data-intent-property='concat(data-intent-property, \":prefix:\")'"
+              children: [x: "*[2]"]  # grab the base
+          - x: "*[3]"       # grab the exponent
 
 -
   name: bigop
@@ -318,22 +330,33 @@
   match: "*[1][$NoSpacesBase='lim' or $NoSpacesBase='limsup' or $NoSpacesBase='liminf']"
   replace: 
   - intent:
-      name: "limit"
-      children:
-      - x: "$NoSpacesBase"
-      - x: "*[2]"
+      xpath-name: "IfThenElse($NoSpacesBase='lim', 'limit', IfThenElse($NoSpacesBase='limsup', 'limit-sup', 'limit-inf'))"
+      attrs: "data-intent-property='concat(data-intent-property, \":prefix:\")'"
+      children: [x: "*[2]"]
 
 -
   name: modified-var
   tag: mover
   # breve, check, dot, double-dot, triple-dot, quadruple-dot, grave, hat, tilde, line/bar
-  match: "*[1][self::m:mi] and *[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^~→⇀¯_', '')='']"
+  match: "*[1][self::m:mi] and *[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^~¯_', '')='']"
   replace:
   - intent:
       name: "modified-variable"
+      attrs: "data-intent-property='concat(data-intent-property, \":silent:\")'"
       children:
       - x: "*[1]"
       - x: "*[2]"
+
+-
+  name: vector
+  tag: mover
+  match: "*[1][self::m:mi] and *[2][.='→' or .='⇀']"
+  replace:
+  - intent:
+      name: "vector"
+      attrs: "data-intent-property='concat(data-intent-property, \":prefix:\")'"
+      children:
+      - x: "*[1]"
 
 
 -
@@ -406,7 +429,7 @@
   replace:
   - intent:
       name: "unit"
-      attrs: "id='@id' data-intent-property='\":unit:\"'"   # the value ":unit:" needs to be an xpath string, hence the escaped quotes
+      attrs: "data-intent-property='\":unit:\"'"   # the value ":unit:" needs to be an xpath string, hence the escaped quotes
       children:
       - x: "text()"
 
@@ -428,7 +451,7 @@
   replace:
   - intent:
       name: "unit"
-      attrs: "id='@id' data-intent-property='\":unit:\"'"   # the value ":unit:" needs to be an xpath string, hence the escaped quotes
+      attrs: "data-intent-property='\":unit:\"'"   # the value ":unit:" needs to be an xpath string, hence the escaped quotes
       children:
       - x: "text()"
 
@@ -469,7 +492,7 @@
   match:
     - "(@data-chem-formula or @data-chem-equation) and"
     - "IsBracketed(., '(', ')') and"
-    - "*[2][text()='s' or text()='l' or text()='g' or text()='aq']"
+    - "*[2][.='s' or .='l' or .='g' or .='aq']"
   replace:
   - intent:
       name: "chemical-state"
@@ -543,6 +566,7 @@
   replace:
   - intent:
       name: "skip-super"
+      attrs: "data-intent-property='concat(data-intent-property, \":silent:\")'"
       children: [x: "*"]
 
 -
@@ -552,6 +576,7 @@
   replace:
   - intent:
       name: "say-super"
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children: [x: "*"]
 
 # rules for functions raised to a power
@@ -562,10 +587,10 @@
   tag: msup
   match:
   - "*[2][self::m:mrow][count(*)=2] and"                        # exponent is an mrow with children...
-  - "*[2]/*[1][self::m:mo][text()='-'] and"                     #   '-'
-  - "*[2]/*[2][self::m:mn][text()=1] and"                       #  and '1'
+  - "*[2]/*[1][self::m:mo][.='-'] and"                     #   '-'
+  - "*[2]/*[2][self::m:mn][.=1] and"                       #  and '1'
   - "*[1][self::m:mi] and IsInDefinition(*[1], 'TrigFunctionNames') and"        # base is a trig function name (e.g, sin, sinh)
-  - "following-sibling::*[1][self::m:mo][text()='\u2061']"      # and msup is followed by invisible function apply
+  - "following-sibling::*[1][self::m:mo][.='\u2061']"      # and msup is followed by invisible function apply
   replace:
   - intent:
       name: "inverse-function"
@@ -605,7 +630,8 @@
   match: "."
   replace:
   - intent:
-      name: "particular-value-of"
+      name: "indexed-by"
+      attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
       children:
       - x: "*[1]"
       - x: "*[2]"
@@ -631,7 +657,8 @@
       name: "power"
       children:
       - intent:
-          name: "sub"
+          name: "indexed-by"
+          attrs: "data-intent-property='concat(data-intent-property, \":infix:\")'"
           children:
             - x: "*[1]"
             - x: "*[2]"
@@ -673,7 +700,7 @@
 -
   name: "piecewise"
   tag: mrow
-  match: "count(*)=2 and *[1][text()='{'] and
+  match: "count(*)=2 and *[1][.='{'] and
           *[2][self::m:mtable and not(
                         contains(@data-intent-property, ':array:') or
                         contains(@data-intent-property, ':matrix:') or

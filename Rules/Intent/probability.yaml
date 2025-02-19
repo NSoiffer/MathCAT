@@ -2,7 +2,7 @@
 -
   name: probability
   tag: mi
-  match: "(text()='P'" 
+  match: "(.='P'" 
   replace:
   - intent:
       name: "probability"
@@ -12,7 +12,7 @@
 -
   name: given
   tag: mo
-  match: "(text()='|' and count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and parent::preceding-sibling::*[last()][text()='P']" 
+  match: "(.='|' and count(preceding-sibling::*)=1 and count(following-sibling::*)=1 and parent::preceding-sibling::*[last()][.='P']" 
   replace:
   - intent:
       name: "given"

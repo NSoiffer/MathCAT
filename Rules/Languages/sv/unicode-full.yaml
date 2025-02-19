@@ -294,7 +294,7 @@
             - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
-            - "../*[1][text()='…']"
+            - "../*[1][.='…']"
         then: [T: "punkt punkt punkt"]              #     (en: 'dot dot dot', google translation)
         else_test:                                  #  must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"

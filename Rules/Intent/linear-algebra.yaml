@@ -22,7 +22,7 @@
   replace:
   - intent:
       name: "norm"
-      attrs: "id='@id' data-fixity='\"prefix\"'"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[2]"]
 
 
@@ -34,7 +34,7 @@
   replace:
   - intent:
       name: "subscripted-norm"
-      attrs: "id='@id' data-fixity='\"prefix\"'"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children:
       - x: "*[1]/*[2]"   # grab the contents of the bracketed expr
       - x: "*[2]"
@@ -46,62 +46,62 @@
   replace:
   - intent:
       name: "magnitude"
-      attrs: "id='@id' data-fixity='\"prefix\"'"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[2]"]
 
 -
   name: transpose
   tag: msup
   match: 
-    - "*[2][text()='T']"
+    - "*[2][.='T']"
   replace:
   - intent:
       name: "transpose"
-      attrs: "id='@id' data-fixity='\"prefix\"'"
+      attrs: "data-intent-property='concat(data-intent-property, \":postfix:\")'"
       children: [x: "*[1]"]
 
 -
   name: trace
   tag: mrow
   match: 
-    - "count(*)=3 and (*[1][text()='tr' or text()='Tr']) and *[2][text()='\u2061']"
+    - "count(*)=3 and (*[1][.='tr' or .='Tr']) and *[2][.='\u2061']"
   replace:
   - intent:
       name: "trace"
-      attrs: "id='@id' data-fixity='\"prefix\"'"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[3]"]
 
 -
   name: dimension
   tag: mrow
   match: 
-    - "count(*)=3 and (*[1][text()='dim' or text()='Dim']) and *[2][text()='\u2061']"
+    - "count(*)=3 and (*[1][.='dim' or .='Dim']) and *[2][.='\u2061']"
   replace:
   - intent:
       name: "dimension"
-      attrs: "id='@id' data-fixity='\"prefix\"'"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[3]"]
 
 -
   name: homomorphism
   tag: mrow
   match: 
-    - "count(*)=3 and (*[1][text()='hom' or text()='Hom']) and *[2][text()='\u2061']"
+    - "count(*)=3 and (*[1][.='hom' or .='Hom']) and *[2][.='\u2061']"
   replace:
   - intent:
       name: "homomorphism"
-      attrs: "id='@id' data-fixity='\"prefix\"'"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[3]"]
 
 -
   name: kernel
   tag: mrow
   match: 
-    - "count(*)=3 and (*[1][text()='ker' or text()='Ker']) and *[2][text()='\u2061']"
+    - "count(*)=3 and (*[1][.='ker' or .='Ker']) and *[2][.='\u2061']"
   replace:
   - intent:
       name: "kernel"
-      attrs: "id='@id' data-fixity='\"prefix\"'"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[3]"]
 
 -

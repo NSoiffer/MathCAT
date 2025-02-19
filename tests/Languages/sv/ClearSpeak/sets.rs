@@ -202,7 +202,7 @@ fn element_under_sum() {
             </mfrac>
         </math>";
     test("sv", "ClearSpeak", expr,
-                    "summa över i i heltalen, av; division med täljaren 1; och nämnaren i kvadrat;");
+                    "summa över i i heltalen, av; division med täljaren 1; och nämnaren i kvadrat");
 }
 
 #[test]
@@ -277,7 +277,7 @@ fn element_under_sum_member() {
             </mfrac>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "summa över i tillhör heltalen, av; division med täljaren 1; och nämnaren i kvadrat;");
+                expr, "summa över i tillhör heltalen, av; division med täljaren 1; och nämnaren i kvadrat");
 }
 
 
@@ -320,7 +320,7 @@ fn element_under_sum_element() {
             </mfrac>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "summa över i i heltalen, av; division med täljaren 1; och nämnaren i kvadrat;");
+                expr, "summa över i i heltalen, av; division med täljaren 1; och nämnaren i kvadrat");
 }
 
 #[test]
@@ -362,7 +362,7 @@ fn element_under_sum_in() {
             </mfrac>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "In",
-                expr, "summa över i är i heltalen, av; division med täljaren 1; och nämnaren i kvadrat;");
+                expr, "summa över i är i heltalen, av; division med täljaren 1; och nämnaren i kvadrat");
 }
 
 #[test]
@@ -404,7 +404,7 @@ fn element_under_sum_belongs() {
             </mfrac>
         </math>";
     test_ClearSpeak("sv", "ClearSpeak_SetMemberSymbol", "Belongs",
-                expr, "summa över i tillhör heltalen, av; division med täljaren 1; och nämnaren i kvadrat;");
+                expr, "summa över i tillhör heltalen, av; division med täljaren 1; och nämnaren i kvadrat");
 }
 
 

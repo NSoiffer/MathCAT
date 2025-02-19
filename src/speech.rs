@@ -18,6 +18,7 @@ use crate::errors::*;
 use crate::prefs::*;
 use yaml_rust::{YamlLoader, Yaml, yaml::Hash};
 use crate::tts::*;
+use crate::infer_intent::*;
 use crate::pretty_print::{mml_to_string, yaml_to_string};
 use std::path::Path;
 use std::rc::Rc;
@@ -147,7 +148,7 @@ fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, math
                         &speech_string.replace(CONCAT_STRING, "")
                                             .replace(CONCAT_INDICATOR, "")                            
                                     )
-                    .trim()) );
+                    .trim_start().trim_end_matches([' ', ',', ';'])) );
     })
 }
 
@@ -645,8 +646,12 @@ impl Intent {
                 let value_as_xpath = MyXPath::new(cap["value"].to_string()).chain_err(||"attr value inside 'intent'")?;
                 let value = value_as_xpath.evaluate(rules_with_context.get_context(), mathml)
                         .chain_err(||"attr xpath evaluation value inside 'intent'")?;
-                // debug!("Intent::replace  name={}, value={}, xpath value={}", &cap["name"], &cap["value"], &value.clone().into_string());
-                result.set_attribute_value(&cap["name"], &value.into_string());
+                let mut value = value.into_string();
+                if &cap["name"] == INTENT_PROPERTY {
+                    value = simplify_fixity_properties(&value)
+                }
+                // debug!("Intent::replace  name={}, value={}, xpath value={}", &cap["name"], &cap["value"], &value);
+                result.set_attribute_value(&cap["name"], &value);
             };
         }
 
@@ -789,8 +794,7 @@ impl TranslateExpression {
             match id {
                 None => bail!("'translate' value '{}' is not a string or an attribute value (correct by using '@id'??):\n", self.id),
                 Some(id) => {
-                    let new_package = Package::new();
-                    let speech = speak_mathml(intent_from_mathml(mathml, new_package.as_document())?, &id)?;
+                    let speech = speak_mathml(mathml, &id)?;
                     return T::from_string(speech, rules_with_context.doc);
                 }
             }
@@ -1164,7 +1168,7 @@ impl MyXPath {
 
     pub fn replace<'c, 's:'c, 'm:'c, T:TreeOrString<'c, 'm, T>>(&self, rules_with_context: &mut SpeechRulesWithContext<'c, 's,'m>, mathml: Element<'c>) -> Result<T> {
         if self.rc.string == "process-intent(.)" {
-            return T::from_element( crate::infer_intent::infer_intent(rules_with_context, mathml)? );
+            return T::from_element( infer_intent(rules_with_context, mathml)? );
         }
         
         let result = self.evaluate(&rules_with_context.context_stack.base, mathml)
@@ -2371,6 +2375,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
             }
             if pattern.is_match(&self.context_stack.base, mathml)
                     .chain_err(|| error_string(pattern, mathml) )? {
+                // debug!("  find_match: FOUND!!!");
                 if !pattern.match_uses_var_defs && pattern.var_defs.len() > 0 { // don't push them on twice
                     self.context_stack.push(pattern.var_defs.clone(), mathml)?;
                 }

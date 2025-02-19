@@ -10,7 +10,7 @@ fn laplacian() {
         <mi>&#x3C8;</mi>
     </math>"#;
   let intent = r#"<math data-from-mathml='math' >
-      <laplacian data-from-mathml='mrow' data-changed='added' data-fixity='prefix'>
+      <laplacian data-from-mathml='mrow' data-changed='added' data-intent-property=':function:'>
         <mi data-from-mathml='mi'>ψ</mi>
       </laplacian>
    </math>"#;
@@ -24,7 +24,7 @@ fn laplacian_as_vector() {
         <mi>&#x3C8;</mi>
     </math>"#;
   let intent = r#"<math data-from-mathml='math' >
-      <laplacian data-from-mathml='mrow' data-changed='added' data-fixity='prefix'>
+      <laplacian data-from-mathml='mrow' data-changed='added' data-intent-property=':function:'>
         <mi data-from-mathml='mi'>ψ</mi>
       </laplacian>
    </math>"#;
@@ -49,7 +49,7 @@ fn simple_gradient() {
         <mi>f</mi>
     </math>"#;
   let intent = r#"<math data-from-mathml='math'>
-        <gradient data-from-mathml='mrow' data-changed='added' data-fixity='prefix'>
+        <gradient data-from-mathml='mrow' data-changed='added' data-intent-property=':function:'>
             <mi data-from-mathml='mi'>f</mi>
         </gradient>
     </math>"#;
@@ -63,7 +63,7 @@ fn simple_bold_gradient() {
         <mi>f</mi>
     </math>"#;
   let intent = r#"<math data-from-mathml='math'>
-        <gradient data-from-mathml='mrow' data-changed='added' data-fixity='prefix'>
+        <gradient data-from-mathml='mrow' data-changed='added' data-intent-property=':function:'>
             <mi data-from-mathml='mi'>f</mi>
         </gradient>
        </math>"#;
@@ -78,7 +78,7 @@ fn simple_div() {
         <mi mathvariant="bold">f</mi>
      </math>"#;
   let intent = r#"<math data-from-mathml='math'>
-    <divergence data-from-mathml='mrow' data-changed='added' data-fixity='prefix'>
+    <divergence data-from-mathml='mrow' data-changed='added' data-intent-property=':function:'>
         <mi data-from-mathml='mi' mathvariant='bold'>𝐟</mi>
     </divergence> 
    </math>"#;
@@ -93,7 +93,7 @@ fn simple_curl() {
         <mi mathvariant="bold">f</mi>
     </math>"#;
   let intent = r#"<math data-from-mathml='math'>
-        <curl data-from-mathml='mrow' data-changed='added' data-fixity='prefix'>
+        <curl data-from-mathml='mrow' data-changed='added' data-intent-property=':function:'>
             <mi data-from-mathml='mi' mathvariant='bold'>𝐟</mi>
         </curl>
     </math>"#;
@@ -114,7 +114,7 @@ fn curl_in_mrow() {
     <mrow data-from-mathml='mrow' data-changed='added'>
         <mi data-from-mathml='mi'>r</mi>
         <mo data-from-mathml='mo' data-changed='added'>&#x2062;</mo>
-        <curl data-from-mathml='mrow' data-changed='added' data-fixity='prefix'>
+        <curl data-from-mathml='mrow' data-changed='added' data-intent-property=':function:'>
         <mi data-from-mathml='mi' mathvariant='bold'>𝐀</mi>
         </curl>
     </mrow>
@@ -132,7 +132,7 @@ fn gradient_vector() {
         <mi>f</mi>
     </math>"#;
   let intent = r#"<math data-from-mathml='math'>
-        <gradient data-from-mathml='mrow' data-changed='added' data-fixity='prefix'>
+        <gradient data-from-mathml='mrow' data-changed='added' data-intent-property=':function:'>
             <mi data-from-mathml='mi'>f</mi>
         </gradient>
     </math>"#;
@@ -153,11 +153,10 @@ fn curl_vector() {
         </mover>
     </math>"#;
   let intent = r#"<math data-from-mathml='math'>
-        <curl data-from-mathml='mrow' data-changed='added' data-fixity='prefix'>
-            <modified-variable data-from-mathml='mover'>
+        <curl data-from-mathml='mrow' data-changed='added' data-intent-property=':function:'>
+            <vector data-from-mathml='mover' data-intent-property=':prefix:'>
                 <mi data-from-mathml='mi'>f</mi>
-                <mo data-from-mathml='mo' stretchy='false'>→</mo>
-            </modified-variable>
+            </vector>
         </curl>
     </math>"#;
     test_intent(mathml, intent, vec![]);

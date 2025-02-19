@@ -71,7 +71,7 @@ fn trig_power_other() {
 #[test]
 fn simple_log() {
     let expr = "<math> <mrow>  <mi>log</mi><mi>x</mi></mrow> </math>";
-    test("en", "SimpleSpeak", expr, "log x");
+    test("en", "SimpleSpeak", expr, "the log of x");
 }
 
 #[test]
@@ -83,39 +83,35 @@ fn normal_log() {
 #[test]
 fn simple_log_with_base() {
     let expr = "<math> <mrow>  <msub><mi>log</mi><mi>b</mi></msub><mi>x</mi></mrow> </math>";
-    test("en", "SimpleSpeak", expr, "the log base b of x");
+    test("en", "SimpleSpeak", expr, "the log base b, of x");
 }
 
 #[test]
 fn normal_log_with_base() {
     let expr = "<math><mrow><msub><mi>log</mi><mi>b</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("en", "SimpleSpeak", expr, "the log base b of, open paren x plus y, close paren");
-}
-
-#[test]
-fn simple_ln() {
-    let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
-    test("en", "SimpleSpeak", expr, "natural log x");
+    test("en", "SimpleSpeak", expr, "the log base b, of, open paren x plus y, close paren");
 }
 
 #[test]
 fn normal_ln() {
     let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("en", "SimpleSpeak", expr, "the natural log of, open paren x plus y, close paren");
-}
-
-#[test]
-fn normal_ln_terse() {
-    let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
     test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
-                expr, "l n of, open x plus y close");
+                expr, "l n, open x plus y close");
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")],
+                expr, "the natural log of, open paren x plus y, close paren");
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")],
+                expr, "the natural log of, open paren x plus y, close paren");
 }
 
 #[test]
-fn simple_ln_terse() {
+fn simple_ln() {
     let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
     test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
                 expr, "l n x");
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Medium")],
+                expr, "the natural log of x");
+    test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")],
+                expr, "the natural log of x");
 }
 
 #[test]
@@ -194,9 +190,9 @@ fn no_times_sqrt() {
         <msqrt> <mrow>  <mi>a</mi><mi>b</mi></mrow> </msqrt>
         </mrow></math>";
     test("en", "SimpleSpeak", expr, 
-            "the square root of eigh; the square root of b; is equal to, the square root of eigh b end root,");
+            "the square root of eigh; the square root of b; is equal to, the square root of eigh b end root");
     test_prefs("en", "SimpleSpeak", vec![("Impairment", "LearningDisability")], expr,
-            "the square root of eigh; the square root of b; is equal to, the square root of eigh b,");
+            "the square root of eigh; the square root of b; is equal to, the square root of eigh b");
 }
 
 /*

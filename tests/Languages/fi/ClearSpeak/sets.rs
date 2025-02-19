@@ -202,7 +202,7 @@ fn element_under_sum() {
             </mfrac>
         </math>";
     test("fi", "ClearSpeak", expr,
-                    "summa yli i kuuluu kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen;");
+                    "summa yli i kuuluu kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen");
 }
 
 #[test]
@@ -277,7 +277,7 @@ fn element_under_sum_member() {
             </mfrac>
         </math>";
     test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Member",
-                expr, "summa yli i kuuluu kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen;");
+                expr, "summa yli i kuuluu kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen");
 }
 
 
@@ -320,7 +320,7 @@ fn element_under_sum_element() {
             </mfrac>
         </math>";
     test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Element",
-                expr, "summa yli i kuuluu kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen;");
+                expr, "summa yli i kuuluu kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen");
 }
 
 #[test]
@@ -362,7 +362,7 @@ fn element_under_sum_in() {
             </mfrac>
         </math>";
     test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "In",
-                expr, "summa yli i kuuluu kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen;");
+                expr, "summa yli i kuuluu kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen");
 }
 
 #[test]
@@ -404,7 +404,7 @@ fn element_under_sum_belongs() {
             </mfrac>
         </math>";
     test_ClearSpeak("fi", "ClearSpeak_SetMemberSymbol", "Belongs",
-                expr, "summa yli i kuuluu joukkoon kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen;");
+                expr, "summa yli i kuuluu joukkoon kokonaisluvut; murtoluku osoittaja 1; ja nimittäjä i toiseen");
 }
 
 

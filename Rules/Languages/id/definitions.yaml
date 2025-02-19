@@ -1,6 +1,67 @@
 ---
 - include: "../../definitions.yaml"
 
+
+# If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here for a prefix||infix||postfix||function fixity
+# If only one ":" is used, it the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
+# If no ":"s are used, the same speech is used for all forms
+# If bracketing words make sense, they are separated with ";"s
+# Intent mappings must specify whether they are "prefix", "infix", "postfix", or "function" with an "=" sign
+# If there are multiple fixities (e.g., see transpose), they are separated with "||
+#   for readability, spaces can be used around any of the delimiter characters
+# Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
+- IntentMappings: {
+    "indexed-by": "infix= ; indeks; akhir indeks",
+
+    "absolute-value": "function= ; nilai mutlak: nilai mutlak dari: nilai mutlak dari; akhir nilai mutlak",
+    "binomial": "infix=binomial; memilih; end binomial",
+    "limit": "prefix=raja-arvo: raja-arvo kun: raja-arvo kun",
+    "lim-sup": "prefix=lim sup as: the limit superior as: the limit superior as",
+    "lim-inf": "prefix=lim inf as: the limit inferior as : the limit inferior as",
+    "minus": "infix=kurang || prefix=negatif",
+    "plus": "infix=tambah || prefix=positif",
+
+    "transpose": "postfix=transpose || function=transpose",
+    "norm": "function=; norma: norma: norma dari; end norm",
+    "trace": "function=;jejak : jejak: jejak dari; end trace",
+    "dimension": "function=; dimensi : dimensi: dimensi dari; end dimension",
+    "homomorphism": "function= ; homomorfisme : homomorfisme: homomorfisme dari; end homomorphism",
+    "kernel": "function= ; kernel : kernel: kernel dari; end kernel",
+    "vector": "function= ; vector || prefix=vector",
+    "cross-product": "infix=cross: cross product: cross product",
+    "dot-product": "infix=dot: dot product: dot:dot product",
+
+    "divergence": "function= ; div: divergence: divergence; end divergence",
+    "curl": "function= ; curl; end curl",
+    "gradient": "function= ; grad: gradient: gradient; end gradient",
+    "laplacian": "function=lahplahsian",   # speech engines don't do a good job with "laplacian"
+  }
+
+- NavigationParts: {
+    "large-op": "base, lower limit, upper limit",
+    "mfrac": "numerator;denominator",
+    "fraction": "numerator;denominator",
+    "msqrt": "root",
+    "square-root": "root",
+    "mroot": "root;root index",
+    "root": "root;root index",
+    "msub": "base;subscript",
+    "sub": "base;subscript",
+    "msup": "base;superscript",
+    "say-super": "base;superscript",
+    "skip-super": "base;superscript",
+    "power": "base;exponent",
+    "msubsup": "base;subscript;superscript",
+    "munder": "base;under limit",
+    "mover": "base;upper limit",
+    "munderover": "base;under limit;upper limit",
+
+    # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
+    # it's a hack to put them here, but at least they are grouped with the other navigation parts
+    "in": "in",
+    "out": "out of",
+  }
+
 - OperatorIntentRenaming: {
     "dimension-product": "kali"
   }

@@ -24,15 +24,13 @@ fn dot_product_vec_arrow() {
     </math>"#;
   let intent = r#"<math data-from-mathml='math'>
     <mrow data-from-mathml='mrow' data-changed='added'>
-      <modified-variable data-from-mathml='mover'>
+      <vector data-from-mathml='mover' data-intent-property=':prefix:'>
         <mi data-from-mathml='mi' data-latex='A' >A</mi>
-        <mo data-from-mathml='mo' stretchy='false' >→</mo>
-      </modified-variable>
+      </vector>
       <dot-product data-from-mathml='mo' data-latex='\cdot' ></dot-product>
-      <modified-variable data-from-mathml='mover'>
+      <vector data-from-mathml='mover' data-intent-property=':prefix:'>
         <mi data-from-mathml='mi' data-latex='B'>B</mi>
-        <mo data-from-mathml='mo' stretchy='false'>→</mo>
-      </modified-variable>
+      </vector>
     </mrow>
    </math>"#;
   test_intent(mathml, intent, vec![]);
@@ -57,15 +55,13 @@ fn cross_product_vec_harpoon() {
     </math>"#;
   let intent = r#"<math data-from-mathml='math'>
     <mrow data-from-mathml='mrow' data-changed='added'>
-      <modified-variable data-from-mathml='mover'>
+      <vector data-from-mathml='mover' data-intent-property=':prefix:'>
         <mi data-from-mathml='mi' data-latex='A' >A</mi>
-        <mo data-from-mathml='mo' stretchy='false' >⇀</mo>
-      </modified-variable>
+      </vector>
       <cross-product data-from-mathml='mo'></cross-product>
-      <modified-variable data-from-mathml='mover'>
+      <vector data-from-mathml='mover' data-intent-property=':prefix:'>
         <mi data-from-mathml='mi' data-latex='B'>B</mi>
-        <mo data-from-mathml='mo' stretchy='false'>⇀</mo>
-      </modified-variable>
+      </vector>
     </mrow>
    </math>"#;
   test_intent(mathml, intent, vec![]);
@@ -105,12 +101,12 @@ fn dot_product_nabla() {
 </math>"#;
   let intent = r#"<math data-from-mathml='math'>
       <mrow data-from-mathml='mrow' data-changed='added'>
-        <modified-variable data-from-mathml='mover'>
+        <modified-variable data-from-mathml='mover' data-intent-property=':silent:'>
           <mi data-from-mathml='mi' mathvariant='bold'>𝐧</mi>
           <mo data-from-mathml='mo' stretchy='false'>^</mo>
         </modified-variable>
         <cross-product data-from-mathml='mo'></cross-product>
-        <gradient data-from-mathml='mrow' data-changed='added' data-fixity='prefix'>
+        <gradient data-from-mathml='mrow' data-changed='added' data-intent-property=':function:'>
           <mi data-from-mathml='mi'>ψ</mi>
         </gradient>
       </mrow>
@@ -135,15 +131,14 @@ fn cross_product_nabla() {
     </math>"#;
   let intent = r#" <math data-from-mathml='math'>
       <mrow data-from-mathml='mrow' data-changed='added'>
-        <skip-super data-from-mathml='msup'>
+        <skip-super data-from-mathml='msup' data-intent-property=':silent:'>
           <mo data-from-mathml='mo' mathvariant='normal'>∇</mo>
           <mo data-from-mathml='mo'>′</mo>
         </skip-super>
         <cross-product data-from-mathml='mo'></cross-product>
-        <modified-variable data-from-mathml='mover'>
+        <vector data-from-mathml='mover' data-intent-property=':prefix:'>
           <mi data-from-mathml='mi'>r</mi>
-          <mo data-from-mathml='mo'>→</mo>
-        </modified-variable>
+        </vector>
       </mrow>
     </math>"#;
   test_intent(mathml, intent, vec![]);
@@ -174,18 +169,18 @@ fn cross_product_hat() {
   let intent = r#" <math data-from-mathml='math'>
       <mrow data-from-mathml='mrow' data-changed='added'>
         <mrow data-from-mathml='mrow' data-changed='added'>
-          <modified-variable data-from-mathml='mover' data-latex='\hat{x}'>
+          <modified-variable data-from-mathml='mover' data-intent-property=':silent:' data-latex='\hat{x}'>
             <mi data-from-mathml='mi' data-latex='x'>x</mi>
             <mo data-from-mathml='mo' stretchy='false'>^</mo>
           </modified-variable>
           <cross-product data-from-mathml='mo' data-latex='\times'></cross-product>
-          <modified-variable data-from-mathml='mover' data-latex='\hat{y}'>
+          <modified-variable data-from-mathml='mover' data-intent-property=':silent:' data-latex='\hat{y}'>
             <mi data-from-mathml='mi' data-latex='y'>y</mi>
             <mo data-from-mathml='mo' stretchy='false'>^</mo>
           </modified-variable>
         </mrow>
         <mo data-from-mathml='mo' data-latex='='>=</mo>
-        <modified-variable data-from-mathml='mover' data-latex='\hat{z}'>
+        <modified-variable data-from-mathml='mover' data-intent-property=':silent:' data-latex='\hat{z}'>
           <mi data-from-mathml='mi' data-latex='z'>z</mi>
           <mo data-from-mathml='mo' stretchy='false'>^</mo>
         </modified-variable>
@@ -219,10 +214,10 @@ fn magnetic_flux_dot_product() {
     </math>"#;
   let intent = r#" <math data-from-mathml='math'>
       <mrow data-from-mathml='mrow' data-changed='added'>
-        <particular-value-of data-from-mathml='msub' data-latex='\Phi_B'>
+        <indexed-by data-from-mathml='msub' data-intent-property=':infix:' data-latex='\Phi_B'>
           <mi data-from-mathml='mi' data-latex='\Phi' mathvariant='normal'>Φ</mi>
           <mi data-from-mathml='mi' data-latex='B'>B</mi>
-        </particular-value-of>
+        </indexed-by>
         <mo data-from-mathml='mo' data-latex='='>=</mo>
         <mrow data-from-mathml='mrow' data-changed='added'>
           <mo data-from-mathml='mo' data-latex='\oint'>∮</mo>
@@ -334,27 +329,27 @@ fn magnetic_field_cross_product() {
   let intent = r#" <math data-from-mathml='math'>
       <mrow data-from-mathml='mrow' data-changed='added'>
         <mrow data-from-mathml='mrow' data-changed='added'>
-          <particular-value-of data-from-mathml='msub' data-latex='\mathbf B_2'>
+          <indexed-by data-from-mathml='msub' data-intent-property=':infix:' data-latex='\mathbf B_2'>
             <mi data-from-mathml='mi' data-latex='B' mathvariant='bold'>𝐁</mi>
             <mn data-from-mathml='mn' data-latex='2'>2</mn>
-          </particular-value-of>
+          </indexed-by>
           <mo data-from-mathml='mo' data-changed='added'>&#x2061;</mo>
           <mrow data-from-mathml='mrow' data-changed='added'>
             <mo data-from-mathml='mo' data-latex='(' stretchy='false'>(</mo>
-            <particular-value-of data-from-mathml='msub' data-latex='\mathbf r_1'>
+            <indexed-by data-from-mathml='msub' data-intent-property=':infix:' data-latex='\mathbf r_1'>
               <mi data-from-mathml='mi' data-latex='r' mathvariant='bold'>𝐫</mi>
               <mn data-from-mathml='mn' data-latex='1'>1</mn>
-            </particular-value-of>
+            </indexed-by>
             <mo data-from-mathml='mo' data-latex=')' stretchy='false'>)</mo>
           </mrow>
         </mrow>
         <mo data-from-mathml='mo' data-latex='='>=</mo>
         <mrow data-from-mathml='mrow' data-changed='added'>
           <fraction data-from-mathml='mfrac' data-latex='\frac{\mu_0}{4\pi}'>
-            <particular-value-of data-from-mathml='msub' data-latex='\mu_0 '>
+            <indexed-by data-from-mathml='msub' data-intent-property=':infix:' data-latex='\mu_0 '>
               <mi data-from-mathml='mi' data-latex='\mu'>μ</mi>
               <mn data-from-mathml='mn' data-latex='0'>0</mn>
-            </particular-value-of>
+            </indexed-by>
             <mrow data-from-mathml='mrow' data-latex='4\pi'>
               <mn data-from-mathml='mn' data-latex='4'>4</mn>
               <mo data-from-mathml='mo' data-changed='added'>&#x2062;</mo>
@@ -365,48 +360,48 @@ fn magnetic_field_cross_product() {
           <mrow data-from-mathml='mrow' data-changed='added'>
             <large-op data-from-mathml='munder' data-latex='\limits_{C_2}'>
               <mo data-from-mathml='mo' data-latex='\limits'>∮</mo>
-              <particular-value-of data-from-mathml='msub' data-latex='C_2'>
+              <indexed-by data-from-mathml='msub' data-intent-property=':infix:' data-latex='C_2'>
                 <mi data-from-mathml='mi' data-latex='C'>C</mi>
                 <mn data-from-mathml='mn' data-latex='2'>2</mn>
-              </particular-value-of>
+              </indexed-by>
             </large-op>
             <mrow data-from-mathml='mrow' data-changed='added'>
-              <particular-value-of data-from-mathml='msub' data-latex='I_2'>
+              <indexed-by data-from-mathml='msub' data-intent-property=':infix:' data-latex='I_2'>
                 <mi data-from-mathml='mi' data-latex='I'>I</mi>
                 <mn data-from-mathml='mn' data-latex='2'>2</mn>
-              </particular-value-of>
+              </indexed-by>
               <mo data-from-mathml='mo' data-changed='added'>&#x2062;</mo>
               <mi data-from-mathml='mi' data-latex='d'>d</mi>
               <mo data-from-mathml='mo' data-changed='added'>&#x2062;</mo>
-              <particular-value-of data-from-mathml='msub' data-latex='\mathbf s_2'>
+              <indexed-by data-from-mathml='msub' data-intent-property=':infix:' data-latex='\mathbf s_2'>
                 <mi data-from-mathml='mi' data-latex='s' mathvariant='bold'>𝐬</mi>
                 <mn data-from-mathml='mn' data-latex='2'>2</mn>
-              </particular-value-of>
+              </indexed-by>
               <cross-product data-from-mathml='mo' data-latex='\times'></cross-product>
               <fraction data-from-mathml='mfrac' data-latex='\frac{\mathbf r_1 - \mathbf r_2}{|\mathbf r_1 - \mathbf r_2|^3}'>
                 <mrow data-from-mathml='mrow' data-latex='\mathbf r_1  - \mathbf r_2 '>
-                  <particular-value-of data-from-mathml='msub' data-latex='\mathbf r_1'>
+                  <indexed-by data-from-mathml='msub' data-intent-property=':infix:' data-latex='\mathbf r_1'>
                     <mi data-from-mathml='mi' data-latex='r' mathvariant='bold'>𝐫</mi>
                     <mn data-from-mathml='mn' data-latex='1'>1</mn>
-                  </particular-value-of>
+                  </indexed-by>
                   <mo data-from-mathml='mo' data-latex='-'>-</mo>
-                  <particular-value-of data-from-mathml='msub' data-latex='\mathbf r_2'>
+                  <indexed-by data-from-mathml='msub' data-intent-property=':infix:' data-latex='\mathbf r_2'>
                     <mi data-from-mathml='mi' data-latex='r' mathvariant='bold'>𝐫</mi>
                     <mn data-from-mathml='mn' data-latex='2'>2</mn>
-                  </particular-value-of>
+                  </indexed-by>
                 </mrow>
                 <power data-from-mathml='msup' data-latex='|\mathbf r_1  - \mathbf r_2 |^3 '>
-                  <absolute-value data-from-mathml='mrow' data-changed='added'>
+                  <absolute-value data-from-mathml='mrow' data-intent-property=':function:' data-changed='added'>
                     <mrow data-from-mathml='mrow' data-changed='added'>
-                      <particular-value-of data-from-mathml='msub' data-latex='\mathbf r_1'>
+                      <indexed-by data-from-mathml='msub' data-intent-property=':infix:' data-latex='\mathbf r_1'>
                         <mi data-from-mathml='mi' data-latex='r' mathvariant='bold'>𝐫</mi>
                         <mn data-from-mathml='mn' data-latex='1'>1</mn>
-                      </particular-value-of>
+                      </indexed-by>
                       <mo data-from-mathml='mo' data-latex='-'>-</mo>
-                      <particular-value-of data-from-mathml='msub' data-latex='\mathbf r_2'>
+                      <indexed-by data-from-mathml='msub' data-intent-property=':infix:' data-latex='\mathbf r_2'>
                         <mi data-from-mathml='mi' data-latex='r' mathvariant='bold'>𝐫</mi>
                         <mn data-from-mathml='mn' data-latex='2'>2</mn>
-                      </particular-value-of>
+                      </indexed-by>
                     </mrow>
                   </absolute-value>
                   <mn data-from-mathml='mn' data-latex='3'>3</mn>

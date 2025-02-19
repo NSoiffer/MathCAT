@@ -499,27 +499,29 @@ pub fn get_navigation_node_from_braille_position(position: usize) -> Result<(Str
 /// Copy (recursively) the (MathML) element and return the new one.
 /// The Element type does not copy and modifying the structure of an element's child will modify the element, so we need a copy
 /// Convert the returned error from set_mathml, etc., to a useful string for display
-fn copy_mathml(mathml: Element) -> Element {
+pub fn copy_mathml(mathml: Element) -> Element {
     // If it represents MathML, the 'Element' can only have Text and Element children along with attributes
     let children = mathml.children();
     let new_mathml = create_mathml_element(&mathml.document(), name(mathml));
-    if is_leaf(mathml) {
-        mathml.attributes().iter().for_each(|attr| {
-            new_mathml.set_attribute_value(attr.name(), attr.value());
-        });
-        new_mathml.set_text(as_text(mathml));
-    } else {
-        let mut new_children = Vec::with_capacity(children.len());
-        for child in children {
-            let child = as_element(child);
-            let new_child = copy_mathml(child);
-            child.attributes().iter().for_each(|attr| {
-                new_child.set_attribute_value(attr.name(), attr.value());
-            });
-            new_children.push(new_child);
+    mathml.attributes().iter().for_each(|attr| {
+        new_mathml.set_attribute_value(attr.name(), attr.value());
+    });
+
+    // can't use is_leaf/as_text because this is also used with the intent tree
+    if children.len() == 1 {
+        if let Some(text) = children[0].text() {
+        new_mathml.set_text(text.text());
+        return new_mathml;
         }
-        new_mathml.append_children(new_children);
     }
+
+    let mut new_children = Vec::with_capacity(children.len());
+    for child in children {
+        let child = as_element(child);
+        let new_child = copy_mathml(child);
+        new_children.push(new_child);
+    }
+    new_mathml.append_children(new_children);
     return new_mathml;
 }
 

@@ -44,6 +44,21 @@ fn norm() {
 }
 
 #[test]
+fn norm_non_simple() {
+  let expr = "  <math>
+    <mrow>
+      <mo>∥</mo>
+      <mi>x</mi>
+      <mo>+</mo>
+      <mi>y</mi>
+      <mo>∥</mo>
+    </mrow>
+</math>
+";
+  test("en", "SimpleSpeak", expr, "norm of x plus y end norm");
+}
+
+#[test]
 fn norm_subscripted() {
   let expr = "  <math>
     <msub>

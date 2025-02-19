@@ -305,7 +305,7 @@
             - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
-            - "../*[1][text()='…']"
+            - "../*[1][.='…']"
         then: [t: "dot dot dot"]
         else_test:  # must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"
@@ -454,11 +454,7 @@
     - spell: "translate('.', 'ℍℙℾℿ', 'HPΓΠ')" 
 
  - "ℎ": [t: "planck constant"]                     # 0x210e
- - "ℏ":                                          # 0x210f
-     - test: 
-         if: "($Verbosity='Terse')"
-         then: [t: "h bar"]
-         else: [t: "reduced planck constant"]
+ - "ℏ": [t: "h bar"]                               # 0x210f
 
  - "ℐℒ℘ℬℰℱℳ":                          # 0x2110, 0x2112, 0x2118, 0x2130, 0x2131, 0x2133
     - t: "script"

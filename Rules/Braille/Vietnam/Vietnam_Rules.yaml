@@ -67,7 +67,7 @@
    name: common-fraction-mixed-number
    tag: mfrac
    match:
-      - "preceding-sibling::*[1][self::m:mo][text()='\u2064'] and" # preceding element is invisible plus
+      - "preceding-sibling::*[1][self::m:mo][.='\u2064'] and" # preceding element is invisible plus
       - "*[1][self::m:mn][not(contains(., '.'))]   and" 
       - "*[2][self::m:mn][not(contains(., '.'))]"
    replace: 
@@ -232,13 +232,13 @@
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
   - test:
-    - if: "text()='-' or text() = ':'"
+    - if: ".='-' or .=':'"
       then: [t: "⠤"]
-    - else_if: "text()='=' or text() = '∷'"
+    - else_if: ".='=' or .='∷'"
       then: [t: "⠭"]
-    - else_if: "text()='≡'"
+    - else_if: ".='≡'"
       then: [t: "⠿"]
-    - else_if: "text()='≣'"
+    - else_if: ".='≣'"
       then: [t: "⠸⠠⠤"]      # see #237 -- not defined, so use UEB
       else: [x: "text()"]    # shouldn't happen
 
@@ -284,56 +284,56 @@
 - 
   name: sin
   tag: mi
-  match: "text()='sin'"
+  match: ".='sin'"
   replace:
   - t: "⠻⠎"
    
 - 
   name: cos
   tag: mi
-  match: "text()='cos'"
+  match: ".='cos'"
   replace:
   - t: "⠻⠉"
    
 - 
   name: tan
   tag: mi
-  match: "text()='tan'"
+  match: ".='tan'"
   replace:
   - t: "⠻⠞"
    
 - 
   name: cot
   tag: mi
-  match: "text()='cot'"
+  match: ".='cot'"
   replace:
   - t: "⠻⠉⠞"
    
 - 
   name: arcsin
   tag: mi
-  match: "text()='arcsin'"
+  match: ".='arcsin'"
   replace:
   - t: "⠁⠗⠉⠻⠎"
    
 - 
   name: arccos
   tag: mi
-  match: "text()='arccos'"
+  match: ".='arccos'"
   replace:
   - t: "⠁⠗⠉⠻⠉"
    
 - 
   name: arctan
   tag: mi
-  match: "text()='arctan'"
+  match: ".='arctan'"
   replace:
   - t: "⠁⠗⠉⠻⠞"
    
 - 
   name: arccot
   tag: mi
-  match: "text()='arccot'"
+  match: ".='arccot'"
   replace:
   - t: "⠁⠗⠉⠻⠉⠞"
 
@@ -384,9 +384,9 @@
 -
   name: angle   # angles need a shape indicator -- not sure this is the best test (three letters in base, have invisible separators)
   tag: mover
-  match: "*[2][text()='^'] and *[1][
+  match: "*[2][.='^'] and *[1][
             self::m:mrow and count(*)=5 and
-            *[1][self::m:mi] and *[2][text()='\u2063'] and *[3][self::m:mi] and *[4][text()='\u2063'] and *[5][self::m:mi]
+            *[1][self::m:mi] and *[2][.='\u2063'] and *[3][self::m:mi] and *[4][.='\u2063'] and *[5][self::m:mi]
           ]"
   replace:
   - t: "⠫⠛"     # shape indicator, g
@@ -403,7 +403,7 @@
 -
    name: single-char-exceptions    # GTM 12
    tag: [mover, munder]
-   match: "*[2][string-length(.) = 1 and ( translate(., '_¯→.˙~^','')='' or (self::m:mover and text()='⌒') )]"
+   match: "*[2][string-length(.) = 1 and ( translate(., '_¯→.˙~^','')='' or (self::m:mover and .='⌒') )]"
    replace: 
    - test:
       # omit grouping indicators in the following cases
@@ -415,7 +415,7 @@
       - "     IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '{', '}') or"
       - "     IsInDefinition(., 'Braille', 'Arrows')"
       - "    ]) and"
-      - "not(*[1][self::m:mn] and preceding-sibling::*[1][text()='\u2062'][preceding-sibling::*[1][self::m:mn]])"  # need to make clear this 'mn' is base
+      - "not(*[1][self::m:mn] and preceding-sibling::*[1][.='\u2062'][preceding-sibling::*[1][self::m:mn]])"  # need to make clear this 'mn' is base
       then: [x: "*[1]"]
       else:
       - t: "⠣"
@@ -428,15 +428,15 @@
       if: "self::m:munder"
       then: [t: "⠠"]
    - test:
-      - if: "*[2][text()='_' or text()='¯']"
+      - if: "*[2][.='_' or .='¯']"
         then: [T: "⠨⠱"]
-      - else_if: "*[2][text()='→']"
+      - else_if: "*[2][.='→']"
         then: [T: "⠨⠔⠳⠕"]
-      - else_if: "*[2][text()='.' or text()='˙']"
+      - else_if: "*[2][.='.' or .='˙']"
         then: [t: "⠘⠲"]
-      - else_if: "*[2][text()='~']"
+      - else_if: "*[2][.='~']"
         then: [t: "⠸⠱"]
-      - else_if: "*[2][text()='^']"
+      - else_if: "*[2][.='^']"
         then: [t: "⠐⠱ "]
         else: [t: "⠨⠸⠱"]    # arc/⌒
 
@@ -455,7 +455,7 @@
       # omit grouping indicators in the following cases
       if:
       - "not((self::m:mover or self::m:munder) and "
-      - "    *[1][self::m:mn] and preceding-sibling::*[1][text()='\u2062'][preceding-sibling::*[1][self::m:mn]]"  # need to make clear this 'mn' is base
+      - "    *[1][self::m:mn] and preceding-sibling::*[1][.='\u2062'][preceding-sibling::*[1][self::m:mn]]"  # need to make clear this 'mn' is base
       - "   )"
       then: [x: "*[1]"]
       else:

@@ -33,7 +33,7 @@ fn case_1() {
     test("zh-tw", "SimpleSpeak", expr, "f x 等於; 3 情況, \
                 情況 1; 負 1 若 x, 小於 0; \
                 情況 2; 0 若 x, 等於 0; \
-                情況 3; 1 若 x, 大於 0;");
+                情況 3; 1 若 x, 大於 0");
 }
 
 #[test]
@@ -73,5 +73,5 @@ fn equation_1() {
    ";
     test("zh-tw", "SimpleSpeak", expr, "2 方程, \
                 方程 1; x 加 y 等於 7; \
-                方程 2; 2 x 加 3 y; 等於 17;");
+                方程 2; 2 x 加 3 y; 等於 17");
 }

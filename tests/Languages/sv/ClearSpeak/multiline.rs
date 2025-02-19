@@ -31,7 +31,7 @@ fn case_1() {
         </math>
    ";
    test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Auto", expr,
-                   "f av x lika med; 3 fall, fall 1; minus 1 if x, är mindre än 0; fall 2; 0 if x, lika med 0; fall 3; 1 if x, är större än 0;");
+                   "f av x lika med; 3 fall, fall 1; minus 1 if x, är mindre än 0; fall 2; 0 if x, lika med 0; fall 3; 1 if x, är större än 0");
 }
 
 #[test]
@@ -45,7 +45,7 @@ fn equation_auto() {
     </math>
    ";
    test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Auto", expr,
-                   "2 rader, rad 1; x plus y lika med 7; rad 2; 2 x plus 3 y; lika med 17;");
+                   "2 rader, rad 1; x plus y lika med 7; rad 2; 2 x plus 3 y; lika med 17");
 }
 
 #[test]
@@ -59,7 +59,7 @@ fn equation_case() {
     </math>
    ";
    test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Case", expr,
-                   "2 fall, fall 1; x plus y lika med 7; fall 2; 2 x plus 3 y; lika med 17;");
+                   "2 fall, fall 1; x plus y lika med 7; fall 2; 2 x plus 3 y; lika med 17");
 }
 
 #[test]
@@ -73,7 +73,7 @@ fn equation_constraint() {
     </math>
    ";
    test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Constraint", expr,
-                   "2 avgränsningar, avgränsning 1; x plus y lika med 7; avgränsning 2; 2 x plus 3 y; lika med 17;");
+                   "2 avgränsningar, avgränsning 1; x plus y lika med 7; avgränsning 2; 2 x plus 3 y; lika med 17");
 }
 
 #[test]
@@ -87,7 +87,7 @@ fn equation_equation() {
     </math>
    ";
    test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Equation", expr,
-                   "2 ekvationer, ekvation 1; x plus y lika med 7; ekvation 2; 2 x plus 3 y; lika med 17;");
+                   "2 ekvationer, ekvation 1; x plus y lika med 7; ekvation 2; 2 x plus 3 y; lika med 17");
 }
 
 #[test]
@@ -101,7 +101,7 @@ fn equation_line() {
     </math>
    ";
    test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Line", expr,
-                   "2 rader, rad 1; x plus y lika med 7; rad 2; 2 x plus 3 y; lika med 17;");
+                   "2 rader, rad 1; x plus y lika med 7; rad 2; 2 x plus 3 y; lika med 17");
 }
 
 #[test]
@@ -115,7 +115,7 @@ fn equation_none() {
     </math>
    ";
    test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "None", expr,
-                   "2, x plus y lika med 7; 2 x plus 3 y; lika med 17;");
+                   "2, x plus y lika med 7; 2 x plus 3 y; lika med 17");
 }
 
 #[test]
@@ -129,7 +129,7 @@ fn equation_row() {
     </math>
    ";
    test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Row", expr,
-                   "2 rader, rad 1; x plus y lika med 7; rad 2; 2 x plus 3 y; lika med 17;");
+                   "2 rader, rad 1; x plus y lika med 7; rad 2; 2 x plus 3 y; lika med 17");
 }
 
 #[test]
@@ -143,5 +143,5 @@ fn equation_step() {
     </math>
    ";
    test_ClearSpeak("sv", "ClearSpeak_MultiLineLabel", "Step", expr,
-                   "2 steg, steg 1; x plus y lika med 7; steg 2; 2 x plus 3 y; lika med 17;");
+                   "2 steg, steg 1; x plus y lika med 7; steg 2; 2 x plus 3 y; lika med 17");
 }

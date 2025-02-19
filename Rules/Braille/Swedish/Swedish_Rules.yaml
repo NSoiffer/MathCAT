@@ -87,7 +87,7 @@
    name: common-fraction-mixed-number
    tag: mfrac
    match:
-      - "preceding-sibling::*[1][self::m:mo][text()='\u2064'] and" # preceding element is invisible plus
+      - "preceding-sibling::*[1][self::m:mo][.='\u2064'] and" # preceding element is invisible plus
       - "*[1][self::m:mn][not(contains(., '.'))]   and" 
       - "*[2][self::m:mn][not(contains(., '.'))]"
    replace: 

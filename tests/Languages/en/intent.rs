@@ -46,12 +46,12 @@ fn infix_intent_one_arg() {
     let expr = r#"<math><mrow intent='testing:infix($x)'>
         <mi arg='x'>x</mi>
     </mrow> </math>"#;
-    test("en", "SimpleSpeak", expr, "x");
+    // Note: we say the intent name because there are infix plus/minus with a single arg due to continued rows or combined columns
+    test("en", "SimpleSpeak", expr, "testing x");
 }
 
 #[test]
 fn function_intent() {
-    init_logger();
     let expr = r#"<math><mrow intent='testing:function($x, $y, $z, 2)'>
         <mi arg='x'>x</mi>
         <mi arg='y'>y</mi>

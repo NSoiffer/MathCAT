@@ -9,7 +9,7 @@
   replace:
   - intent:
       name: "laplacian"
-      attrs: "id='@id' data-fixity='\"prefix\"'"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[2]"]
 
 -
@@ -31,7 +31,7 @@
   replace:
   - intent:
       xpath-name: "IfThenElse(*[1]/*[2][.='×'] , 'curl', 'divergence')"
-      attrs: "id='@id' data-fixity='\"prefix\"'"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[2]"]
 
 -
@@ -43,7 +43,7 @@
   replace:
   - intent:
       name: "gradient"
-      attrs: "id='@id' data-fixity='\"prefix\"'"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children: [x: "*[2]"]
 
 -
@@ -54,7 +54,7 @@
   replace:
   - intent:
       name: "modified-variable"
-      attrs: "id='@id' data-fixity='\"prefix\"'"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
       children:
       - x: "*[1]"
       - x: "*[2]"

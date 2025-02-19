@@ -71,7 +71,7 @@
                # speak "comma" when not adjacent to '…'
             - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
                # except if expression starts with '…'
-            - "../*[1][text()='…'] "
+            - "../*[1][.='…'] "
         then:
         - T: "coma"                         # 	(en: 'comma', google translation)
         - test:
@@ -239,7 +239,7 @@
             - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
-            - "../*[1][text()='…']"
+            - "../*[1][.='…']"
         then: [T: "puntos suspensivos"]          	# 	(en: 'dot dot dot', google translation)
         else_test:                              	#  must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"

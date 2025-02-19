@@ -11,6 +11,8 @@ use std::fmt;
 use crate::canonicalize::{name, get_parent};
 use crate::pretty_print::mml_to_string;
 use crate::speech::{NAVIGATION_RULES, CONCAT_INDICATOR, CONCAT_STRING, SpeechRules, SpeechRulesWithContext};
+use crate::infer_intent::add_fixity_children;
+use crate::interface::copy_mathml;
 #[cfg(not(target_family = "wasm"))]
 use std::time::Instant;
 use crate::errors::*;
@@ -435,24 +437,25 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                              ));
         nav_state.mode = context_get_variable(context, "NavMode", mathml)?.0.unwrap();
 
-        let intent = if nav_state.mode == "Character" {
-            mathml
+        let (intent, nav_intent) = if nav_state.mode == "Character" {
+            (mathml, mathml)
         } else {
-            crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?
+            let intent = crate::speech::intent_from_mathml(mathml, rules_with_context.get_document())?;
+            (intent, add_fixity_children(copy_mathml(intent)))
         };
 
         // we should always find the start node.
         // however, if were were navigating by character, then switch the NavMode, the intent tree might not have that node in it
-        let start_node = match get_start_node(intent, nav_state) {
+        let start_node = match get_start_node(nav_intent, nav_state) {
             Ok(node) => node,
             Err(_) => {
                 // find the node in the other tree (probably mathml) and walk up to find a parent that has an id in both
-                let other_tree = if nav_state.mode == "Character" {intent} else {mathml};
+                let other_tree = if nav_state.mode == "Character" {nav_intent} else {mathml};
                 let mut found_node = get_start_node(other_tree, nav_state)?;
                 while name(found_node) != "math" {
                     found_node = get_parent(found_node);
-                    debug!("found_node:\n{}", mml_to_string(found_node));
-                    if let Some(intent_node) = get_node_by_id(intent, found_node.attribute_value("id").unwrap_or_default()) {
+                    // debug!("found_node:\n{}", mml_to_string(found_node));
+                    if let Some(intent_node) = get_node_by_id(nav_intent, found_node.attribute_value("id").unwrap_or_default()) {
                         found_node = intent_node;
                         break;
                     }
@@ -461,7 +464,16 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             }
         };
 
-        debug!("start_node\n{}", mml_to_string(start_node));
+        // debug!("intent=\n{}", mml_to_string(intent));
+        // debug!("nav intent=\n{}", mml_to_string(nav_intent));
+        // debug!("start_node id={}\n{}", nav_state.top().unwrap().0.current_node.as_str(), mml_to_string(start_node));
+        // if name(start_node) != "math" {
+        //     let mut parent= get_parent(start_node);
+        //     if name(parent) != "math" {
+        //         parent = get_parent(parent);
+        //     }
+        //     debug!("parent or grandparent of start_node:\n{}", mml_to_string(parent));
+        // }
 
         let raw_speech_string = rules_with_context.match_pattern::<String>(start_node)
                     .chain_err(|| "Pattern match/replacement failure during math navigation!")?;
@@ -471,7 +483,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                                                 .replace(CONCAT_INDICATOR, "")                            
                                     )
                     .trim());
-        debug!("Nav Speech: {}", speech);
+        // debug!("Nav Speech: {}", speech);
 
         // FIX: add things that need to do a speech replacement based on some marker for "where am i" and others that loop ([Speak: id])???
         // what else needs to be done/set???
@@ -520,9 +532,9 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
 
         let nav_mathml = get_node_by_id(intent, &nav_position.current_node);
         if nav_mathml.is_some() && context_get_variable(context, "SpeakExpression", intent)?.0.unwrap() == "true" {
-            // Speak/Overview of where we landed (if we are supposed to speak it)
+            // Speak/Overview of where we landed (if we are supposed to speak it) -- use intent, not nav_intent
             let node_speech = speak(mathml, intent, nav_position.current_node, use_read_rules)?;
-            debug!("node_speech: '{}'", node_speech);
+            // debug!("node_speech: '{}'", node_speech);
             if node_speech.is_empty() {
                 // try again in loop
                 return Ok( (speech, false));
@@ -536,6 +548,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             return Ok( (speech, true) );
         };
     }
+
 
     fn pop_stack(nav_state: &mut NavigationState, count: usize) {
         // save the final state and pop the intermediate states that did nothing
@@ -568,7 +581,7 @@ fn speak(mathml: Element, intent: Element, nav_node_id: String, full_read: bool)
         //  but the node to speak is almost certainly trivial.
         // By speaking the non-intent tree, we are certain to speak on the next try
         if get_node_by_id(intent, &nav_node_id).is_some() {
-            debug!("speak: intent=\n{}", mml_to_string(intent));
+            // debug!("speak: intent=\n{}", mml_to_string(intent));
             match crate::speech::speak_mathml(intent, &nav_node_id) {
                 Ok(speech) => return Ok(speech),
                 Err(e) => {
@@ -900,12 +913,13 @@ mod tests {
                 Err(e) => panic!("\nStarting at '{}', '{} failed.\n{}",
                                         start_id, command, &crate::interface::errors_to_string(&e)),
                 Ok(nav_speech) => {
+                    let nav_speech = nav_speech.trim_end_matches(&[' ', ',', ';']);
                     // debug!("Full speech: {}", nav_speech);
                     if !result_id.is_empty() {
                         let (id, _) = nav_stack.borrow().get_navigation_mathml_id(mathml);
                         assert_eq!(result_id, id, "\nStarting at '{}', '{} failed.", start_id, command);
                     }
-                    return nav_speech;
+                    return nav_speech.to_string();
                 }
             };
         })
@@ -1347,16 +1361,16 @@ mod tests {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
             assert_eq!("zoomed in all the way; in base; open bracket", test_command("ZoomInAll", mathml, "id-3"));
-            assert_eq!("move right; in base; cap c o,", test_command("MoveNext", mathml, "id-5"));
+            assert_eq!("move right; in base; cap c o", test_command("MoveNext", mathml, "id-5"));
             assert_eq!("move right; in subscript; 6", test_command("MoveNext", mathml, "id-6"));
             assert_eq!("move right; out of subscript; close bracket", test_command("MoveNext", mathml, "id-8"));
             assert_eq!("move right; in superscript; 3", test_command("MoveNext", mathml, "id-11"));
             assert_eq!("move right; plus", test_command("MoveNext", mathml, "id-12"));
-            assert_eq!("cannot move right, end of math;", test_command("MoveNext", mathml, "id-12"));
+            assert_eq!("cannot move right, end of math", test_command("MoveNext", mathml, "id-12"));
             assert_eq!("move left; 3", test_command("MovePrevious", mathml, "id-11"));
             assert_eq!("move left; in base; close bracket", test_command("MovePrevious", mathml, "id-8"));
             assert_eq!("move left; in subscript; 6", test_command("MovePrevious", mathml, "id-6"));
-            assert_eq!("move left; in base; cap c o,", test_command("MovePrevious", mathml, "id-5"));
+            assert_eq!("move left; in base; cap c o", test_command("MovePrevious", mathml, "id-5"));
             assert_eq!("move left; out of base; open bracket", test_command("MovePrevious", mathml, "id-3"));
 
             return Ok( () );
@@ -1714,7 +1728,7 @@ mod tests {
             // WhereAmIAll doesn't change the stack
             let speech =test_command("WhereAmIAll", mathml, "exp");
             // should be 2 "inside" strings corresponding to steps to the root
-            assert_eq!(speech, "2; inside; b squared; inside; the fraction with numerator; b squared; and denominator d;");
+            assert_eq!(speech, "2; inside; b squared; inside; the fraction with numerator; b squared; and denominator d");
             return Ok( () );
         });
     }
@@ -1805,7 +1819,7 @@ mod tests {
             let mathml = get_element(&*package_instance);
             test_command("ZoomIn", mathml, "row-1");
             let speech = test_command("MoveNext", mathml, "row-2");
-            assert_eq!(speech, "move right; row 2; 5, negative 6;");
+            assert_eq!(speech, "move right; row 2; 5, negative 6");
             let speech = test_command("ZoomIn", mathml, "id-13");
             assert_eq!(speech, "zoom in; column 1; 5");
             return Ok( () );
@@ -1837,7 +1851,7 @@ mod tests {
             test_command("ZoomIn", mathml, "id-2");
             let speech = test_command("MoveNext", mathml, "id-6");
             // tables need to check their parent for proper speech
-            assert_eq!(speech, "move right; cap s,");
+            assert_eq!(speech, "move right; cap s");
             return Ok( () );
         });
     }
@@ -1866,17 +1880,17 @@ mod tests {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
             let speech = test_command("ZoomIn", mathml, "row-1");
-            assert_eq!(speech, "zoom in; row 1; 9, negative 13;");
+            assert_eq!(speech, "zoom in; row 1; 9, negative 13");
             let speech = test_command("MoveNext", mathml, "row-2");
-            assert_eq!(speech, "move right; row 2; 5, negative 6;");
+            assert_eq!(speech, "move right; row 2; 5, negative 6");
             let speech = test_command("MoveNext", mathml, "row-2");
-            assert_eq!(speech, "cannot move right, end of math;");
+            assert_eq!(speech, "cannot move right, end of math");
             let speech = test_command("ZoomIn", mathml, "id-13");
             assert_eq!(speech, "zoom in; column 1; 5");
             let speech = test_command("MoveNext", mathml, "row2-negative");
             assert_eq!(speech, "move right; column 2, negative 6");
             let speech = test_command("ZoomOutAll", mathml, "table");
-            assert_eq!(speech, "zoomed out all the way; the 2 by 2 determinant; row 1; 9, negative 13; row 2; 5, negative 6;");
+            assert_eq!(speech, "zoomed out all the way; the 2 by 2 determinant; row 1; 9, negative 13; row 2; 5, negative 6");
             return Ok( () );
         });
     }
@@ -1905,13 +1919,13 @@ mod tests {
             let mathml = get_element(&*package_instance);
             test_command("ZoomIn", mathml, "row-1");
             let speech = test_command("MovePrevious", mathml, "row-1");
-            assert_eq!(speech, "move left; start of math;");
+            assert_eq!(speech, "move left; start of math");
             let speech = test_command("MoveNext", mathml, "row-2");
             assert_eq!(speech, "move right; case 2; positive x comma; if x, is greater than or equal to 0");
             let speech = test_command("ZoomOut", mathml, "table");
-            assert_eq!(speech, "zoom out; 2 cases, case 1; negative x comma; if x is less than 0; case 2; positive x comma; if x, is greater than or equal to 0;");
+            assert_eq!(speech, "zoom out; 2 cases, case 1; negative x comma; if x is less than 0; case 2; positive x comma; if x, is greater than or equal to 0");
             let speech = test_command("ZoomIn", mathml, "row-1");
-            assert_eq!(speech, "zoom in; case 1; negative x comma; if x is less than 0;");
+            assert_eq!(speech, "zoom in; case 1; negative x comma; if x is less than 0");
             set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
             let speech = test_command("MovePrevious", mathml, "open");
             assert_eq!(speech, "move left; open brace");
@@ -1951,7 +1965,6 @@ mod tests {
 
     #[test]
     fn binomial_intent() -> Result<()> {
-        init_logger();
         let mathml_str = "   <math display='block' id='id-0'>
                 <mrow intent='binomial($n,$k)' id='id-1'>
                     <mo id='id-2'>(</mo>
@@ -1979,7 +1992,7 @@ mod tests {
             let speech = test_command("MoveNext", mathml, "id-5");
             assert_eq!(speech, "move right; k");
             let speech = test_command("MoveNext", mathml, "id-5");
-            assert_eq!(speech, "cannot move right, end of math;");
+            assert_eq!(speech, "cannot move right, end of math");
             let speech = test_command("ZoomOut", mathml, "id-1");
             assert_eq!(speech, "zoom out; n choose k");
             return Ok( () );
@@ -2006,11 +2019,11 @@ mod tests {
             let speech = test_command("ZoomIn", mathml, "2");
             assert_eq!(speech, "zoom in; 2");
             let speech = test_command("MoveNext", mathml, "abs");
-            assert_eq!(speech, "move right; the absolute value of x,");
+            assert_eq!(speech, "move right; the absolute value of x");
             let speech = test_command("ZoomIn", mathml, "x");
             assert_eq!(speech, "zoom in; x");
             let speech = test_command("MoveNext", mathml, "x");
-            assert_eq!(speech, "cannot move right, end of math;");
+            assert_eq!(speech, "cannot move right, end of math");
             set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
             let speech = test_command("MoveNext", mathml, "end");
             assert_eq!(speech, "move right; vertical line");
@@ -2041,7 +2054,7 @@ mod tests {
             let mathml = get_element(&*package_instance);
             test_command("ZoomIn", mathml, "frac");
             let speech = test_command("ReadCurrent", mathml, "frac");
-            assert_eq!(speech, "read current; fraction, b plus 1, over 3, end fraction;");
+            assert_eq!(speech, "read current; fraction, b plus 1, over 3, end fraction");
             let speech = test_command("DescribeCurrent", mathml, "frac");
             assert_eq!(speech, "describe current; fraction");
             return Ok( () );

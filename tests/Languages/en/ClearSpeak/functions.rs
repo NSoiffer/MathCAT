@@ -97,13 +97,13 @@ fn normal_log() {
 #[test]
 fn simple_log_with_base() {
     let expr = "<math> <mrow>  <msub><mi>log</mi><mi>b</mi></msub><mi>x</mi></mrow> </math>";
-    test("en", "ClearSpeak", expr, "the log base b of x");
+    test("en", "ClearSpeak", expr, "the log base b, of x");
 }
 
 #[test]
 fn normal_log_with_base() {
     let expr = "<math><mrow><msub><mi>log</mi><mi>b</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("en", "ClearSpeak", expr, "the log base b of, open paren x plus y, close paren");
+    test("en", "ClearSpeak", expr, "the log base b, of, open paren x plus y, close paren");
 }
 
 #[test]
@@ -217,7 +217,7 @@ fn no_times_sqrt() {
         <mo>=</mo>
         <msqrt> <mrow>  <mi>a</mi><mi>b</mi></mrow> </msqrt>
         </mrow></math>";
-    test("en", "ClearSpeak", expr, "the square root of eigh; the square root of b; is equal to, the square root of eigh b,");
+    test("en", "ClearSpeak", expr, "the square root of eigh; the square root of b; is equal to, the square root of eigh b");
 }
 
 #[test]
@@ -454,7 +454,7 @@ fn parens_interval_neg_infinity_to_infinity() {
         <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("en", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from negative infinity to infinity,");
+    "the interval from negative infinity to infinity");
 }
 
 #[test]
@@ -465,5 +465,5 @@ fn parens_interval_neg_infinity_to_pos_infinity() {
     <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("en", "ClearSpeak_Paren", "Interval ",expr,
-    "the interval from negative infinity to positive infinity,");
+    "the interval from negative infinity to positive infinity");
 }

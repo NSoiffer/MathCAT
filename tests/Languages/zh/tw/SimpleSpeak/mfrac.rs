@@ -49,7 +49,7 @@ fn non_simple_fraction() {
         </mrow>
     </math>
                             ";
-    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加 y 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加 y 結束分數");
 }
 
 #[test]
@@ -65,7 +65,7 @@ fn nested_fraction() {
         </mrow>
     </math>
                             ";
-    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加 分數 y 分之 1 結束分數; 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加 分數 y 分之 1 結束分數; 結束分數");
 }
 
 
@@ -82,7 +82,7 @@ fn deeply_nested_fraction_msqrt() {
         </mrow>
     </math>
                             ";
-    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加 根號 y 分之 1 結束根號; 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加 根號 y 分之 1 結束根號; 結束分數");
 }
 
 #[test]
@@ -98,7 +98,7 @@ fn deeply_nested_fraction_mrow_msqrt() {
         </mrow>
     </math>
                             ";
-    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加, 根號 2 加 y 分之 1 結束根號; 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之, x 加, 根號 2 加 y 分之 1 結束根號; 結束分數");
 }
 
 #[test]
@@ -114,7 +114,7 @@ fn numerator_simple_fraction() {
         </mrow>
     </math>
                             ";
-    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之 x 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 x 減 y, 分之 x 結束分數");
 }
 
 #[test]
@@ -127,7 +127,7 @@ fn denominator_simple_fraction() {
         </mfrac>
     </math>
                             ";
-    test("zh-tw", "SimpleSpeak", expr, "分數 x 分之, x 減 y 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 x 分之, x 減 y 結束分數");
 }
 
 
@@ -177,7 +177,7 @@ fn number_and_text() {
                 <mn>3</mn><mtext>gallons</mtext></mrow>
             </mfrac>
         </math>";
-    test("zh-tw", "SimpleSpeak", expr, "分數 3 gallons, 分之, 2 miles 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 3 gallons, 分之, 2 miles 結束分數");
 }
 
 
@@ -201,7 +201,7 @@ fn nested_simple_fractions() {
                 </mfrac>
                 </mrow>
             </math>";
-    test("zh-tw", "SimpleSpeak", expr, "分數 分數 3 分之 2 結束分數; 分之, 分數 2 分之 1 結束分數; 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "分數 分數 3 分之 2 結束分數; 分之, 分數 2 分之 1 結束分數; 結束分數");
 }
 
 #[test]

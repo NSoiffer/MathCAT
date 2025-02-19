@@ -143,9 +143,7 @@ impl IsNode {
         // returns true if the string is just a single *char* (which can be multiple bytes)
         fn is_single_char(str: &str) -> bool {
             let mut chars =  str.chars();
-            let first_char = chars.next();
-            let second_char = chars.next();
-            return first_char.is_some() && second_char.is_none();
+            return chars.next().is_some() && chars.next().is_none();
         }
 
         // checks the single element to see if it is simple (mn, mi that is a single char, common fraction)
@@ -175,7 +173,7 @@ impl IsNode {
                     return true;
                 }
             }
-            if is_tag(elem, "negative") && elem.children().len() == 1 {
+            if is_tag(elem, "minus") && elem.children().len() == 1 {
                 let child = elem.children()[0];
                 if let Some(e) = child.element() {
                     return is_trivially_simple(e);
@@ -207,7 +205,7 @@ impl IsNode {
                     return false;
                 }
                 if children.len() == 5 && 
-                   ( (name(first_child) == "negative" && !is_COE_tag(first_child.children()[0], "mn")) ||
+                   ( (name(first_child) == "minus" && first_child.children().len() == 1 && !is_COE_tag(first_child.children()[0], "mn")) ||
                      (name(first_child) == "mrow"     && !is_COE_tag(first_child.children()[1], "mn")) ) {
                     return false;      // '-x y z' is too complicated () -- -2 x y is ok
                 }
@@ -1215,6 +1213,91 @@ impl Function for EdgeNode {
     }
 }
 
+pub struct SpeakIntentName;
+/// SpeakIntentName(intent, verbosity)
+///   Returns a string corresponding to the intent name with the indicated verbosity
+impl Function for SpeakIntentName {
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(3)?;
+        let fixity = args.pop_string()?;
+        let verbosity = args.pop_string()?;
+        let intent_name = args.pop_string()?;
+        return Ok( Value::String(crate::infer_intent::intent_speech_for_name(&intent_name, &verbosity, &fixity)) );
+    }
+}
+
+pub struct SpeakBracketingIntentName;
+/// SpeakBracketingIntentName(name, verbosity, at_start_or_end)
+///   Returns a potentially empty string to use to bracket an intent expression (start foo... end foo)
+/// 
+impl SpeakBracketingIntentName {
+    fn bracketing_words(intent_name: &str, verbosity: &str, fixity: &str, at_start: bool) -> String {
+        crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
+            let definitions = definitions.borrow();
+            if let Some(intent_name_pattern) = definitions.get_hashmap("IntentMappings").unwrap().get(intent_name) {
+                // Split the pattern is: fixity-def [|| fixity-def]*
+                //   fixity-def := fixity=open; verbosity; close
+                //   verbosity := terse | medium | verbose
+                if let Some(matched_intent) = intent_name_pattern.split("||").find(|&entry| entry.trim().starts_with(fixity)) {
+                    let (_, matched_intent) = matched_intent.split_once("=").unwrap_or_default();
+                    let parts = matched_intent.trim().split(";").collect::<Vec<&str>>();
+                    if parts.len() == 1 {
+                        return "".to_string();
+                    }
+                    if parts.len() != 3 {
+                        error!("Intent '{}' has {} ';' separated parts, should have 3", intent_name, parts.len());
+                        return "".to_string();
+                    }
+                    let mut speech = (if at_start {parts[0]} else {parts[2]}).split(":").collect::<Vec<&str>>();
+                    match speech.len() {
+                        1 => return speech[0].to_string(),
+                        2 | 3 => {
+                            if speech.len() == 2 {
+                                warn!("Intent '{}'  has only two ':' separated parts, but should have three", intent_name);
+                                speech.push(speech[1]);
+                            }
+                            let bracketing_words = match verbosity {
+                                "Terse" => speech[0],
+                                "Medium" => speech[1],
+                                _ => speech[2],
+                            };
+                            return bracketing_words.to_string();
+                        },
+                        _ => {
+                            error!("Intent '{}' has too many ({}) operator names, should only have 2", intent_name, speech.len());
+                        },
+                    }
+                }   
+            };
+            return "".to_string();
+        })
+    }
+}
+
+impl Function for SpeakBracketingIntentName {
+    fn evaluate<'d>(&self,
+                        _context: &context::Evaluation<'_, 'd>,
+                        args: Vec<Value<'d>>)
+                        -> Result<Value<'d>, Error>
+    {
+        let mut args = Args(args);
+        args.exactly(4)?;
+        let start_or_end = args.pop_string()?;
+        if start_or_end != "start" && start_or_end != "end" {
+            return Err( Error::Other("SpeakBracketingIntentName: first argument must be either 'start' or 'end'".to_string()) );
+        }
+        let fixity = args.pop_string()?;
+        let verbosity = args.pop_string()?;
+        let name = args.pop_string()?;
+        return Ok( Value::String(SpeakBracketingIntentName:: bracketing_words(&name, &verbosity, &fixity, start_or_end == "start")) );
+    }
+}
+
 pub struct FontSizeGuess;
 /// FontSizeGuess(size_string)
 ///   returns a guess of the size in "ems"
@@ -1298,9 +1381,6 @@ impl Function for ReplaceAll {
 
 /// Add all the functions defined in this module to `context`.
 pub fn add_builtin_functions(context: &mut Context) {
-    // FIX: should be a static cache that gets regenerated on update
-    context.set_function("min", Min);       // missing in xpath 1.0
-    context.set_function("max", Max);       // missing in xpath 1.0
     context.set_function("NestingChars", crate::braille::NemethNestingChars);
     context.set_function("BrailleChars", crate::braille::BrailleChars);
     context.set_function("NeedsToBeGrouped", crate::braille::NeedsToBeGrouped);
@@ -1315,9 +1395,15 @@ pub fn add_builtin_functions(context: &mut Context) {
     context.set_function("IFTHENELSE", IfThenElse);
     context.set_function("DistanceFromLeaf", DistanceFromLeaf);
     context.set_function("EdgeNode", EdgeNode);
+    context.set_function("SpeakIntentName", SpeakIntentName);
+    context.set_function("SpeakBracketingIntentName", SpeakBracketingIntentName);
+    context.set_function("DEBUG", Debug);
+
+    // Not used: remove??
+    context.set_function("min", Min);       // missing in xpath 1.0
+    context.set_function("max", Max);       // missing in xpath 1.0
     context.set_function("FontSizeGuess", FontSizeGuess);
     context.set_function("ReplaceAll", ReplaceAll);
-    context.set_function("DEBUG", Debug);
 }
 
 

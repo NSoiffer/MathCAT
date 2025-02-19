@@ -13,7 +13,7 @@ fn binomial() {
         <mo>)</mo>
     </mrow></math>";
   let intent = "<math data-from-mathml='math'>
-        <binomial data-from-mathml='mrow'>
+        <binomial data-from-mathml='mrow' data-intent-property=':infix:'>
           <mn data-from-mathml='mn' arg='n'>7</mn>
           <mn data-from-mathml='mn' arg='m'>3</mn>
         </binomial>

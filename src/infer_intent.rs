@@ -6,6 +6,7 @@
 #![allow(clippy::needless_return)]
 
 use sxd_document::dom::*;
+use crate::prefs::PreferenceManager;
 use crate::speech::SpeechRulesWithContext;
 use crate::canonicalize::{as_element, as_text, name, create_mathml_element, set_mathml_name, INTENT_ATTR, MATHML_FROM_NAME_ATTR};
 use crate::errors::*;
@@ -58,6 +59,175 @@ pub fn infer_intent<'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
         bail!("Internal error: infer_intent() called on MathML with no intent arg:\n{}", mml_to_string(mathml));
     }
 }
+
+
+static FIXITIES: phf::Set<&str> = phf_set! {
+    "function", "infix", "prefix", "postfix", "silent", "other",
+};
+
+/// Eliminate all but the last fixity property
+pub fn simplify_fixity_properties(properties: &str) -> String {
+    let parts: Vec<&str> = properties.split(':').collect();
+    // debug!("simplify_fixity_properties {} parts from input: '{}'", parts.len(), properties);
+    let mut fixity_property = "";
+    let mut answer = ":".to_string();
+    for part in parts {
+        if FIXITIES.contains(part) {
+            fixity_property = part;
+        } else if !part.is_empty() {
+            answer.push_str(part);
+            answer.push(':');
+        }
+    }
+    if !fixity_property.is_empty() {
+        answer.push_str(fixity_property);
+        answer.push(':');
+    }
+    return answer;
+}
+
+/// Given the intent add the fixity property for the intent if it isn't given (and one exists)
+fn add_fixity(intent: Element) {
+    let properties = intent.attribute_value(INTENT_PROPERTY).unwrap_or_default();
+    if properties.split(":").all(|property| !FIXITIES.contains(property)) {
+        let intent_name = name(intent);
+        crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
+            let definitions = definitions.borrow();
+            if let Some(definition) = definitions.get_hashmap("IntentMappings").unwrap().get(intent_name) {
+                if let Some((fixity, _)) = definition.split_once("=") {
+                    let new_properties = (if properties.is_empty() {":"} else {properties}).to_string() + fixity + ":";
+                    intent.set_attribute_value(INTENT_PROPERTY, &new_properties);
+                    // debug!("Added fixity: new value '{}'", intent.attribute_value(INTENT_PROPERTY).unwrap());
+                }
+            };
+        });
+    }
+}
+
+
+/// Given some MathML, expand out any intents taking into account their fixity property
+/// This is recursive
+pub fn add_fixity_children(intent: Element) -> Element {
+    let children = intent.children();
+    if children.is_empty() || (children.len() == 1 && children[0].element().is_none()) {
+        return intent;
+    }
+
+    for child in children {
+        let child = as_element(child);
+        if child.attribute_value(INTENT_ATTR).is_some() {
+            add_fixity_child(child);
+        }
+    }
+    return intent;
+
+    fn add_fixity_child(mathml: Element) -> Element {        
+        let mut children = mathml.children();
+        if children.is_empty() {
+            return mathml;
+        }
+        // we also exclude fixity on mtable because they mess up the counts (see 'en::mtable::unknown_mtable_property')
+        if mathml.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or_default() == "mtable" {
+            return mathml;
+        }
+        let doc = mathml.document();
+        let properties = mathml.attribute_value(INTENT_PROPERTY).unwrap_or_default();
+        let fixity = properties.rsplit(':').find(|&property| FIXITIES.contains(property)).unwrap_or_default();
+        let intent_name = name(mathml);
+    
+        let op_name_id = mathml.attribute_value("id").unwrap_or("new-id");
+        match fixity {
+            "infix" => {
+                let mut new_children = Vec::with_capacity(2*children.len()-1);
+                new_children.push(children[0]);
+                for (i, &child) in children.iter().enumerate().skip(1) {
+                    new_children.push(create_operator_element(intent_name, fixity, op_name_id, i, &doc));
+                    new_children.push(child);
+                }
+                mathml.replace_children(new_children);
+            },
+            "prefix" => { 
+                children.insert(0, create_operator_element(intent_name, fixity, op_name_id, 1, &doc));                       
+                mathml.replace_children(children);
+            },
+            "postfix" => { 
+                children.push( create_operator_element(intent_name, fixity, op_name_id, 1, &doc));                       
+                mathml.replace_children(children);
+            },
+            "silent" => {
+                // children remain the same -- nothing to do
+            },
+            "other" => {
+                // a special case -- will be handled with specific rules (e.g., intervals need to add "from" and "to", not a single word)
+            },
+            _ => {  // "function" is the default
+                // build a function like notation function-name U+2061 <mrow> children </mrow>
+                let mut new_children = Vec::with_capacity(3);
+                let function_name = create_operator_element(intent_name, "function", op_name_id, 1, &doc);
+                new_children.push(function_name);
+                let invisible_apply_function = create_operator_element("mo", "infix", op_name_id, 2, &doc);
+                invisible_apply_function.element().unwrap().set_text("\u{2061}");
+                new_children.push(invisible_apply_function);
+                let mrow_wrapper = create_mathml_element(&doc, "mrow");
+                mrow_wrapper.set_attribute_value("id", (op_name_id.to_string() + "3").as_str());
+                mrow_wrapper.append_children(children);
+                new_children.push(ChildOfElement::Element(mrow_wrapper));
+                mathml.replace_children(new_children);
+                if fixity.is_empty() {
+                    mathml.set_attribute_value(INTENT_PROPERTY, ":function:");
+                }
+            },
+        }
+        return mathml;
+    
+        fn create_operator_element<'a>(intent_name: &str, fixity: &str, id: &str, id_inc: usize, doc: &Document<'a>) -> ChildOfElement<'a> {
+            let intent_name = intent_speech_for_name(intent_name, &PreferenceManager::get().borrow().pref_to_string("NavMode"), fixity);
+            let element = create_mathml_element(doc, &intent_name);
+            element.set_attribute_value("id", &format!("{}-{}",id, id_inc));
+            element.set_attribute_value(MATHML_FROM_NAME_ATTR, "mo");
+            return ChildOfElement::Element(element);
+        }
+    }
+}
+
+pub fn intent_speech_for_name(intent_name: &str, verbosity: &str, fixity: &str) -> String {
+    crate::definitions::SPEECH_DEFINITIONS.with(|definitions| {
+        let definitions = definitions.borrow();
+        if let Some(intent_name_pattern) = definitions.get_hashmap("IntentMappings").unwrap().get(intent_name) {
+            // Split the pattern is:
+            //   fixity-def [|| fixity-def]*
+            //   fixity-def := fixity=[open;] verbosity[; close]
+            //   verbosity := terse | medium | verbose
+            if let Some(matched_intent) = intent_name_pattern.split("||").find(|&entry| entry.trim().starts_with(fixity)) {
+                let (_, matched_intent) = matched_intent.split_once("=").unwrap_or_default();
+                let parts = matched_intent.trim().split(";").collect::<Vec<&str>>();
+                let mut operator_names = (if parts.len() > 1 {parts[1]} else {parts[0]}).split(":").collect::<Vec<&str>>();
+                match operator_names.len() {
+                    1 => return operator_names[0].trim().to_string(),
+                    2 | 3 => {
+                        if operator_names.len() == 2 {
+                            warn!("Intent '{}' has only two operator names, but should have three", intent_name);
+                            operator_names.push(operator_names[1]);
+                        }
+                        let intent_word = match verbosity {
+                            "Terse" => operator_names[0],
+                            "Medium" => operator_names[1],
+                            _ => operator_names[2],
+                        };
+                        return intent_word.trim().to_string();
+                    },
+                    _ => {
+                        error!("Intent '{}' has too many ({}) operator names, should only have 2", intent_name, operator_names.len());
+                        return intent_name.to_string();
+                    },
+                }
+            }
+        };
+        return intent_name.to_string();
+    })
+}
+
+
 
 // intent             := self-property-list | expression
 // self-property-list := property+ S    
@@ -237,6 +407,7 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
                 // debug!("Intent after pattern match:\n{}", mml_to_string(intent));
                 mathml.set_attribute_value(INTENT_ATTR, saved_intent);
             }
+            add_fixity(intent);
             return Ok(intent);      // if we start with properties, then there can only be properties
         },
         Token::ConceptOrLiteral(word) | Token::Number(word) => {
@@ -275,10 +446,12 @@ fn build_intent<'b, 'r, 'c, 's:'c, 'm:'c>(rules_with_context: &'r mut SpeechRule
         intent = build_function(intent, rules_with_context, lex_state, mathml)?;
     }
     // debug!("    end build_intent: state: {}     piece: {}", lex_state, mml_to_string(intent));
+    add_fixity(intent);
     return Ok(intent);
 }
 
-const INTENT_PROPERTY: &str = "data-intent-property";
+pub const INTENT_PROPERTY: &str = "data-intent-property";
+
 /// Get all the properties, stopping we don't have any more
 /// Returns the string of the properties terminated with an additional ":"
 fn get_properties(lex_state: &mut LexState) -> Result<String> {
@@ -293,7 +466,7 @@ fn get_properties(lex_state: &mut LexState) -> Result<String> {
         } else {
             properties.push(':');
             // debug!("      get_properties: returns {}", properties);
-            return Ok(properties);
+            return Ok(simplify_fixity_properties(&properties));
         }
     }
 }
@@ -330,63 +503,9 @@ fn build_function<'b, 'r, 'c, 's:'c, 'm:'c>(
         lex_state.get_next()?;
     }
 
-    let function = add_fixity_children(function);
     // debug!("  end build_function/# children: {}, #state: {}  ..[bfa] function name: {}",
         // function.children().len(), lex_state, mml_to_string(function));
     return Ok(function);
-
-    fn add_fixity_children(mathml: Element) -> Element {
-        static FIXITIES: phf::Set<&str> = phf_set! {
-            "function", "infix", "prefix", "postfix", "silent"
-        };
-        
-        let mut children = mathml.children();
-        if children.is_empty() {
-            return mathml;
-        }
-        let doc = mathml.document();
-        if let Some(properties) = mathml.attribute_value(INTENT_PROPERTY) {
-            let op_name = name(mathml);
-            if let Some(property) = properties.rsplit(':').find(|&property| FIXITIES.contains(property)) {
-                // fixities don't do anything it there is just one child
-                // we also exclude fixity on mtable because they mess up the counts (see 'en::mtable::unknown_mtable_property')
-                if children.len() == 1 || mathml.attribute_value(MATHML_FROM_NAME_ATTR).unwrap_or_default() == "mtable" {
-                    return mathml;
-                }
-                let op_name_id = mathml.attribute_value("id").unwrap_or("new-id");
-                match property {
-                    "infix" => {
-                        let mut new_children = Vec::with_capacity(2*children.len()-1);
-                        new_children.push(children[0]);
-                        for (i, &child) in children.iter().enumerate().skip(1) {
-                            new_children.push(create_operator_element(op_name, op_name_id, i, &doc));
-                            new_children.push(child);
-                        }
-                        mathml.replace_children(new_children);
-                    },
-                    "prefix" => { 
-                        children.insert(0, create_operator_element(op_name, op_name_id, 1, &doc));                       
-                        mathml.replace_children(children);
-                    },
-                    "postfix" => { 
-                        children.push( create_operator_element(op_name, op_name_id, 1, &doc));                       
-                        mathml.replace_children(children);
-                    },
-                    _ => {
-                        // FIX - implement other options
-                    },
-                }
-            }
-        }
-        return mathml;
-
-        fn create_operator_element<'a>(op_name: &str, id: &str, id_inc: usize, doc: &Document<'a>) -> ChildOfElement<'a> {
-            let element = create_mathml_element(doc, op_name);
-            element.set_attribute_value("id", &format!("{}-{}",id, id_inc));
-            element.set_attribute_value(MATHML_FROM_NAME_ATTR, "mo");
-            return ChildOfElement::Element(element);
-        }
-    }
 }
 
 // process all the args of a function
@@ -529,7 +648,7 @@ mod tests {
                 <mfrac linethickness='0'> <mn arg='n'>7</mn> <mn arg='m'>3</mn> </mfrac>
                 <mo>)</mo>
             </mrow>";
-        let intent = "<binomial data-from-mathml='mrow'> <mn data-from-mathml='mn' arg='n'>7</mn> <mn data-from-mathml='mn' arg='m'>3</mn>  </binomial>";
+        let intent = "<binomial data-from-mathml='mrow' data-intent-property=':infix:'> <mn data-from-mathml='mn' arg='n'>7</mn> <mn data-from-mathml='mn' arg='m'>3</mn>  </binomial>";
         assert!(test_intent(mathml, intent, "Error"));
     }
 
@@ -540,7 +659,7 @@ mod tests {
                 <mi arg='n'>n</mi>
                 <mi arg='m'>m</mi>
             </msubsup>";
-        let intent = "<binomial data-from-mathml='msubsup'> <mi data-from-mathml='mi' arg='n'>n</mi> <mi data-from-mathml='mi' arg='m'>m</mi></binomial>";
+        let intent = "<binomial data-from-mathml='msubsup' data-intent-property=':infix:'> <mi data-from-mathml='mi' arg='n'>n</mi> <mi data-from-mathml='mi' arg='m'>m</mi></binomial>";
         assert!(test_intent(mathml, intent, "Error"));
     }
 
@@ -573,7 +692,7 @@ mod tests {
                 <mo arg='p' intent='plus'>+</mo>
                 <mi arg='b' intent=':negative-int:int'>b</mi>
             </mrow>";
-        let intent = "<foo data-intent-property=':silent:int:' data-from-mathml='mrow'>
+        let intent = "<foo data-intent-property=':int:silent:' data-from-mathml='mrow'>
                                 <mi data-from-mathml='mi' data-intent-property=':positive-int:int:'>bar</mi>
                                 <mi data-from-mathml='mi' arg='a' data-intent-property=':foo:bar:foo-bar:'>a</mi>
                                 <mi data-from-mathml='mi' arg='b' data-intent-property=':number:'>b</mi>
@@ -647,7 +766,7 @@ mod tests {
                 <mi arg='b'>b</mi>
                 <mo arg='f' intent='factorial'>!</mo>
             </mrow>";
-        let intent = "<plus data-from-mathml='mrow'>
+        let intent = "<plus data-from-mathml='mrow' data-intent-property=':infix:'>
                                 <mi data-from-mathml='mi'>a</mi>
                                 <factorial data-from-mathml='mrow'>
                                     <mi data-from-mathml='mi'>b</mi>
@@ -706,7 +825,7 @@ mod tests {
         let mathml = "<mrow intent='vector(1, 0.0, 0.1, -23, -0.1234, last)'>
                 <mi>x</mi>
             </mrow>";
-        let intent = "<vector data-from-mathml='mrow'>
+        let intent = "<vector data-from-mathml='mrow' data-intent-property=':function:'>
                                 <mn data-from-mathml='mn'>1</mn>
                                 <mn data-from-mathml='mn'>0.0</mn>
                                 <mn data-from-mathml='mn'>0.1</mn>
@@ -761,7 +880,6 @@ mod tests {
                 <pre data-intent-property=':prefix:' data-from-mathml='mrow'>
                     <in data-intent-property=':infix:' data-from-mathml='mrow'>
                         <mi data-from-mathml='mi' arg='a'>A</mi>
-                        <in id='new-id-1' data-from-mathml='mo'></in>
                         <mi data-from-mathml='mi'>x</mi>
                     </in>
                 </pre>

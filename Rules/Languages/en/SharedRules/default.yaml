@@ -149,28 +149,24 @@
 
 
 - name: simple-sub
-  tag: particular-value-of
-  # invisible comma -- want "x sub 1 1" without "end sub"
-  match: "count(*)=2 and (IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][text()='⁣']])"
+  tag: indexed-by
+  # invisible comma -- want "x 1 when subscript is an integer"
+  match: "count(*)=2 and $Verbosity='Terse' and *[2][self::m:mn and translate(., '.,', '')=.]"
   replace:
   - x: "*[1]"
-  - test:
-      if: "not($Verbosity='Terse' and *[2][self::m:mn and not(translate(., '.,', '')!=.)])"  # just say "x 1" for terse vs "x sub 1"
-      then: [t: "sub"]      # phrase(x 'sub' 2)
   - x: "*[2]"
+  - pause: short
 
-- name: default
-  tag: particular-value-of
-  match: "count(*)=2"
+- name: no-end-sub
+  tag: indexed-by
+  match: "count(*)=2 and *[2][self::m:mrow and *[2][.='⁣']]"
   replace:
   - x: "*[1]"
   - t: "sub"               # phrase(x 'sub' 2)
   - x: "*[2]"
-  - test:
-      if: "$Impairment = 'Blindness'"
-      then: [t: "end sub"]           # phrase(x sub 2 'end of sub')
   - pause: short
 
+# otherwise let definitions/default infix handle it
 
 - name: literal
   tag: msub
@@ -181,6 +177,7 @@
       if: "not($Verbosity='Terse' and *[2][self::m:mn and not(translate(., '.,', '')!=.)])"  # just say "x 1" for terse vs "x sub 1"
       then: [t: "sub"]      # phrase(x 'sub' 2)
   - x: "*[2]"
+
 
 - name: literal
   tag: [msup, msubsup]
@@ -477,7 +474,7 @@
   # The ordering below is the order in which words come out when there is more than one value
   # Note: @notation can contain more than one value
   tag: menclose
-  match: "@notation='box' and *[self::m:mtext and text()=' ']"
+  match: "@notation='box' and *[self::m:mtext and .=' ']"
   replace:
   - t: "empty box"      # phrase(the 'empty box' contains no values)
 
@@ -586,7 +583,7 @@
       then: [t: "square root", pause: short]      # phrase(5 is the 'square root' of 25)
   - t: "enclosing"      # phrase(parentheses are 'enclosing' part of the equation)
   - test:
-      if: "*[self::m:mtext and text()=' ']"
+      if: "*[self::m:mtext and .=' ']"
       then: [t: "space"]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)
       else: [x: "*"]
   - test:
@@ -622,49 +619,89 @@
   match: "count(*)>0 and contains(@data-intent-property, ':silent:')"
   replace:
   - x: "*"
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: prefix-intent
   # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
   match: "count(*)>0 and contains(@data-intent-property, ':prefix:')"
   replace:
-  - x: "name(.)"
+  - x: "SpeakIntentName(name(.), $Verbosity, 'prefix')"
   - x: "*"
+  - test:
+      if: "not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'prefix', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: postfix-intent
   # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
   match: "count(*)>0 and contains(@data-intent-property, ':postfix:')"
   replace:
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'postfix', 'start')"]
   - x: "*"
-  - x: "name(.)"
+  - x: "SpeakIntentName(name(.), $Verbosity, 'postfix')"
 
-# Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: infix-intent
   # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
   match: "count(*)>0 and contains(@data-intent-property, ':infix:')"
   replace:
-  - insert:
-      nodes: "*"
-      replace: [x: "name(.)", pause: auto]
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'infix', 'start')"]
+  - test:
+      if: "count(*) = 1"  # in cases such as continued-row, plus/minus might have just one child
+      then:
+      - x: "SpeakIntentName(name(.), $Verbosity, 'infix')"
+      - pause: auto
+      - x: "*[1]"
+      else:
+      - insert:
+          nodes: "*"
+          replace: [x: "SpeakIntentName(name(.), $Verbosity, 'infix')", pause: auto]
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'infix', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"   # add (probably) a slightly longer pause if this came from a 2D node
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: function-intent
-  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  # uncaught intent -- speak as foo of arg1 comma arg2 .... The MathML spec requires arguments to functions
   tag: "*"
   match: "count(*)>0"
   replace:
-  - x: "translate(name(.), '-_', '  ')"
+  - x: "SpeakIntentName(name(.), $Verbosity, 'function')"
   - test:
-      if: "not(contains(@data-intent-property, ':literal:'))"
+      if: "$Verbosity != 'Terse' and not(contains(@data-intent-property, ':literal:')) and
+           not(count(*)=2 and (IsInDefinition(*[1], 'TrigFunctionNames') or IsInDefinition(name(.), 'TerseFunctionNames')) and IsNode(*[2], 'simple'))"
       then: [t: "of", pause: auto]      # phrase(sine 'of' 5)
   - insert:
       nodes: "*"
       replace:
       - test:
           if: "not(contains(@data-intent-property, ':literal:'))"
-          then: [x: "','"]      # phrase(f of x 'comma' y)
+          then: [x: "','"]
       - pause: auto
+  - test:
+      # speak "end ..." if not bracketed or last child is not simple and not last node
+      if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'function', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
+
 
 - name: default-text
   # unknown leaf -- just speak the text -- could be a literal intent

@@ -2072,14 +2072,14 @@ impl CanonicalizeContext {
 			if text.chars().count() < 3 {
 				return None;
 			}
-			// If it is a word, it needs a vowel
+			// If it is a word, it needs a vowel and it must be a letter
 			// FIX: this check needs to be internationalized to include accented vowels, other alphabets
-			if !text.chars().any(|ch| VOWELS.contains(&ch)) {
+			if !text.chars().any(|ch| VOWELS.contains(&ch) || !ch.is_ascii_alphabetic()) {
 				return None;
 			}
 		
 			// now for some heuristics to rule out a sequence of variables
-			// rule out sequences like 'abc' and also 'axy'
+			// rule out sequences like 'abc' and also 'axy' that are in alphabetical order
 			let mut chars = text.chars();
 			let mut left = chars.next().unwrap();		// at least 3 chars
 			let mut is_in_alphabetical_order = true;

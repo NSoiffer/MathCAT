@@ -92,13 +92,13 @@ fn normal_log() {
 #[test]
 fn simple_log_with_base() {
     let expr = "<math> <mrow>  <msub><mi>log</mi><mi>b</mi></msub><mi>x</mi></mrow> </math>";
-    test("sv", "ClearSpeak", expr, "logaritmen med bas b av x");
+    test("sv", "ClearSpeak", expr, "logaritmen med bas b, av x");
 }
 
 #[test]
 fn normal_log_with_base() {
     let expr = "<math><mrow><msub><mi>log</mi><mi>b</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("sv", "ClearSpeak", expr, "logaritmen med bas b av, vänster-parentes; x plus y; höger-parentes");
+    test("sv", "ClearSpeak", expr, "logaritmen med bas b, av, vänster-parentes; x plus y; höger-parentes");
 }
 
 #[test]
@@ -212,7 +212,7 @@ fn no_times_sqrt() {
         <mo>=</mo>
         <msqrt> <mrow>  <mi>a</mi><mi>b</mi></mrow> </msqrt>
         </mrow></math>";
-    test("sv", "ClearSpeak", expr, "kvadratroten ur a; kvadratroten ur b; lika med, kvadratroten ur a b,");
+    test("sv", "ClearSpeak", expr, "kvadratroten ur a; kvadratroten ur b; lika med, kvadratroten ur a b");
 }
 
 #[test]

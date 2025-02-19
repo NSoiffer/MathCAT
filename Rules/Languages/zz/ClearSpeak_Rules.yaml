@@ -28,7 +28,7 @@
 -
   name: squared
   tag: msup
-  match: "*[2][self::mn][text()='2']"
+  match: "*[2][self::mn][.='2']"
   replace: [x: "*[1]", t: "squared"]
 -
   name: default

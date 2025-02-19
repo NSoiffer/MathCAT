@@ -202,7 +202,7 @@ fn element_under_sum() {
             </mfrac>
         </math>";
     test("en", "SimpleSpeak", expr,
-                    "the sum over i is an element of the integers of; fraction, 1 over, i squared, end fraction;");
+                    "the sum over i is an element of the integers of; fraction, 1 over, i squared, end fraction");
 }
 
 #[test]
