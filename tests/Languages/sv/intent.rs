@@ -39,5 +39,5 @@ fn intent_prob_x() {
         <mi arg='arg'>x</mi>
         <mi arg='op' intent='sannolikheten' mathvariant='normal'>P</mi>
     </msup></math>";
-    test("sv", "ClearSpeak", expr, "sannolikheten av, x");
+    test("sv", "ClearSpeak", expr, "sannolikheten av x");
 }

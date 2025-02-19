@@ -5,15 +5,15 @@ use crate::common::*;
 #[test]
 fn salt() {
   let expr = "<math><mi>Na</mi><mi>Cl</mi></math>";
-  test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "iso n a, iso c l,");
+  test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "iso n a, iso c l");
 }
 
 #[test]
 fn water() {
   let expr = "<math><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></math>";
-  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "iso h, 2 iso o,");
-  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "iso h, ala 2 iso o,");
-  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "iso h, alaindeksi 2, iso o,");
+  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "iso h, 2 iso o");
+  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "iso h, ala 2 iso o");
+  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "iso h, alaindeksi 2, iso o");
 }
 
 #[test]
@@ -54,7 +54,7 @@ fn ethanol_bonds() {
               <mi>H</mi>
           </mrow>
       </math>";
-  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "iso c, iso h, 3 yksinkertainen sidos, iso c, iso h, 2 yksinkertainen sidos, iso o, iso h,");
+  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "iso c, iso h, 3 yksinkertainen sidos, iso c, iso h, 2 yksinkertainen sidos, iso o, iso h");
 
 }
 
@@ -96,7 +96,7 @@ fn ferric_chloride_aq() {
         <msub><mi>Cl</mi><mn>3</mn></msub>
         <mrow><mo>(</mo><mrow><mi>aq</mi></mrow><mo>)</mo></mrow>
     </mrow></math>";
-  test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "iso f e, iso c l, 3 vesiliuoksessa,");
+  test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "iso f e, iso c l, 3 vesiliuoksessa");
   }
 
 #[test]
@@ -137,11 +137,11 @@ fn beta_decay() {
       </mmultiscripts>
     </math>";
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Terse")], expr,
-      "14, 6, iso c; muodostaa; 14, 7, iso n; plus 0, negatiivinen 1, e,");
+      "14, 6, iso c; muodostaa; 14, 7, iso n; plus 0, negatiivinen 1, e");
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
-      "ylä 14, ala 6, iso c; reagoi; ylä 14, ala 7, iso n; plus, ylä 0, ala negatiivinen 1, e,");
+      "ylä 14, ala 6, iso c; reagoi; ylä 14, ala 7, iso n; plus, ylä 0, ala negatiivinen 1, e");
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-      "yläindeksi 14, alaindeksi 6, iso c; reagoi; yläindeksi 14, alaindeksi 7, iso n; plus, yläindeksi 0, alaindeksi negatiivinen 1, e,");
+      "yläindeksi 14, alaindeksi 6, iso c; reagoi; yläindeksi 14, alaindeksi 7, iso n; plus, yläindeksi 0, alaindeksi negatiivinen 1, e");
 }
 
 #[test]
@@ -401,11 +401,11 @@ fn mhchem_beta_decay() {
       </mrow>
     </math>";
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Terse")], expr,
-      "14, 6, iso c; muodostaa; 14, 7, iso n; plus 0, negatiivinen 1, e,");
+      "14, 6, iso c; muodostaa; 14, 7, iso n; plus 0, negatiivinen 1, e");
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
-      "ylä 14, ala 6, iso c; reagoi; ylä 14, ala 7, iso n; plus, ylä 0, ala negatiivinen 1, e,");
+      "ylä 14, ala 6, iso c; reagoi; ylä 14, ala 7, iso n; plus, ylä 0, ala negatiivinen 1, e");
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr,
-      "yläindeksi 14, alaindeksi 6, iso c; reagoi; yläindeksi 14, alaindeksi 7, iso n; plus, yläindeksi 0, alaindeksi negatiivinen 1, e,");
+      "yläindeksi 14, alaindeksi 6, iso c; reagoi; yläindeksi 14, alaindeksi 7, iso n; plus, yläindeksi 0, alaindeksi negatiivinen 1, e");
 }
 
 #[test]
@@ -463,9 +463,9 @@ fn mhchem_so4_2plus() {
       </msup>
     </mrow>
   </math>";
-  test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "iso s; iso o, 4, 2 plus,");
-  test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "iso s; iso o, ala 4, ylä 2 plus,");
-  test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "iso s; iso o, alaindeksi 4, yläindeksi 2 plus,");
+  test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "iso s; iso o, 4, 2 plus");
+  test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "iso s; iso o, ala 4, ylä 2 plus");
+  test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "iso s; iso o, alaindeksi 4, yläindeksi 2 plus");
 }
 
 
@@ -553,7 +553,7 @@ fn mhchem_hcl_aq_etc() {
     </mrow>
   </math>";
   test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "2, iso h, iso c l, vesiliuoksessa; plus, 2, iso n a, kiinteä; muodostaa; 2, iso n a, iso c l, vesiliuoksessa; plus, iso h, 2, kaasu,");
+      expr, "2, iso h, iso c l, vesiliuoksessa; plus, 2, iso n a, kiinteä; muodostaa; 2, iso n a, iso c l, vesiliuoksessa; plus, iso h, 2, kaasu");
 
 }
 
@@ -619,7 +619,7 @@ fn mhchem_barbed_equilibrium() {
     </mrow>
   </math>";
   test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "iso h, 2, kaasu; plus; iso i, 2, kaasu; on tasapainossa 2, iso h, iso i, kaasu,");
+      expr, "iso h, 2, kaasu; plus; iso i, 2, kaasu; on tasapainossa 2, iso h, iso i, kaasu");
 }
 
 
@@ -648,7 +648,7 @@ fn mhchem_roman_in_superscript() {
       </mrow>
     </math>";
   test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "iso f e, 2; iso f e, 3; iso o, 4,");
+      expr, "iso f e, 2; iso f e, 3; iso o, 4");
 }
 
 

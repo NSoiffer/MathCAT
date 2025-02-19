@@ -36,5 +36,5 @@ fn intent_prob_x() {
         <mi arg='arg'>x</mi>
         <mi arg='op' intent='probability' mathvariant='normal'>P</mi>
     </msup></math>";
-    test("zh-tw", "SimpleSpeak", expr, "probability, x");
+    test("zh-tw", "SimpleSpeak", expr, "probability x");
 }

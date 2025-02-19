@@ -46,9 +46,9 @@
   - test:
       if: "*[2][self::m:mn]"
       then_test:
-      - if: "*[2][text()='2']"
+      - if: "*[2][.='2']"
         then: {T: căn bậc hai}
-      - else_if: "*[2][text()='3']"
+      - else_if: "*[2][.='3']"
         then: {T: căn bậc ba}
       - else_if: "*[2][not(contains(., '.'))]"
         then: [{T: "căn bậc"}, {x: "ToOrdinal(*[2])"}]
@@ -75,7 +75,7 @@
   - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
   replace:
   - test:
-      if: "*[1][text()='|']" # just need to check the first bracket since we know it must be (, [, or |
+      if: "*[1][.='|']" # just need to check the first bracket since we know it must be (, [, or |
       then: {T: định thức}
       else: {T: ma trận}
   - x: count(*[2]/*)

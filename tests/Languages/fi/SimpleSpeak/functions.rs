@@ -66,65 +66,59 @@ fn trig_power_other() {
 #[test]
 fn simple_log() {
     let expr = "<math> <mrow>  <mi>log</mi><mi>x</mi></mrow> </math>";
-    test("fi", "SimpleSpeak", expr, "log x");
+    test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "log x");
+    test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "log arvolla x");
+    test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "log arvolla x");
 }
 
 #[test]
 fn normal_log() {
     let expr = "<math><mrow><mi>log</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("fi", "SimpleSpeak", expr, "log, auki sulku x plus y, kiinni sulku");
+    test("fi", "SimpleSpeak", expr, "log arvolla, auki sulku x plus y, kiinni sulku");
 }
 
 #[test]
 fn simple_lg() {
     let expr = "<math> <mrow>  <mi>lg</mi><mi>x</mi></mrow> </math>";
-    test("fi", "SimpleSpeak", expr, "kymmenkantainen logaritmi x");
     test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "l g x");
+    test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "l g arvolla x");
+    test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "kymmenkantainen logaritmi, arvolla x");
 }
 
 #[test]
 fn normal_lg() {
     let expr = "<math><mrow><mi>lg</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("fi", "SimpleSpeak", expr, "l g, auki sulku x plus y, kiinni sulku");
+    test("fi", "SimpleSpeak", expr, "l g arvolla, auki sulku x plus y, kiinni sulku");
     test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "l g, auki x plus y kiinni");
 }
 
 #[test]
 fn simple_log_with_base() {
     let expr = "<math> <mrow>  <msub><mi>log</mi><mi>b</mi></msub><mi>x</mi></mrow> </math>";
-    test("fi", "SimpleSpeak", expr, "log kanta b arvolla x");
+    test("fi", "SimpleSpeak", expr, "log kanta b, arvolla x");
 }
 
 #[test]
 fn normal_log_with_base() {
     let expr = "<math><mrow><msub><mi>log</mi><mi>b</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("fi", "SimpleSpeak", expr, "log kanta b arvolla, auki sulku x plus y, kiinni sulku");
+    test("fi", "SimpleSpeak", expr, "log kanta b, arvolla, auki sulku x plus y, kiinni sulku");
 }
 
 #[test]
 fn simple_ln() {
     let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
-    test("fi", "SimpleSpeak", expr, "luonnollinen log x");
+    test("fi", "SimpleSpeak", expr, "l n arvolla x");
 }
 
 #[test]
 fn normal_ln() {
     let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("fi", "SimpleSpeak", expr, "luonnollinen logaritmi, auki sulku x plus y, kiinni sulku");
-}
-
-#[test]
-fn normal_ln_terse() {
-    let expr = "<math><mrow><mi>ln</mi><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
     test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")],
                 expr, "l n, auki x plus y kiinni");
-}
-
-#[test]
-fn simple_ln_terse() {
-    let expr = "<math> <mrow>  <mi>ln</mi><mi>x</mi></mrow> </math>";
-    test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Terse")],
-                expr, "l n x");
+    test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Medium")],
+                expr, "l n arvolla, auki sulku x plus y, kiinni sulku");
+    test_prefs("fi", "SimpleSpeak", vec![("Verbosity", "Verbose")],
+                expr, "luonnollinen logaritmi, arvolla, auki sulku x plus y, kiinni sulku");
 }
 
 #[test]
@@ -189,7 +183,7 @@ fn no_times_sqrt() {
         <msqrt> <mrow>  <mi>a</mi><mi>b</mi></mrow> </msqrt>
         </mrow></math>";
     test("fi", "SimpleSpeak", expr, 
-            "neliöjuuri a, neliöjuuri b; on yhtä suuri kuin, neliöjuuri a b loppu juuri,");
+            "neliöjuuri a, neliöjuuri b; on yhtä suuri kuin, neliöjuuri a b loppu juuri");
 }
 
 /*

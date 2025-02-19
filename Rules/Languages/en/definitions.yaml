@@ -1,8 +1,94 @@
 ---
 - include: "../../definitions.yaml"
 
+# If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here for a prefix||infix||postfix||function fixity
+# If only one ":" is used, it the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
+# If no ":"s are used, the same speech is used for all forms
+# If bracketing words make sense, they are separated with ";"s
+# Intent mappings must specify whether they are "prefix", "infix", "postfix", or "function" with an "=" sign
+# If there are multiple fixities (e.g., see transpose), they are separated with "||
+#   for readability, spaces can be used around any of the delimiter characters
+# Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
+- IntentMappings: {
+    "indexed-by": "infix= ; sub; end sub: end sub: end subscript",
+    "modified-variable": "silent= ",
+    "say-super": "infix=super: superscript: superscript",   # used with 'mo' for superscripts (e.g, "<")
+    "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
+
+    "absolute-value": "function= ; absolute value: the absolute value: the absolute value; end absolute value",
+    "binomial": "infix=binomial; choose; end binomial",
+    # "closed-interval": "other=closed-interval; from,to; end closed-interval",
+    "greatest-common-divisor": "function=gcd: the gcd: the greatest common divisor",
+    "imaginary-part": "function=imaginary part, the imaginary part, the imaginary part",
+    "least-common-multiple": "function=lcm:the lcm:the least common multiple",
+    # "large-op": "infix=over || other=from,to",
+    "limit": "prefix=limit as: the limit as: the limit as",
+    "lim-sup": "prefix=lim sup as: the limit superior as: the limit superior as",
+    "lim-inf": "prefix=lim inf as: the limit inferior as : the limit inferior as",
+    "logarithm-with-base": "prefix=log base: the log base: the log base",
+    "natural-logarithm": "function=l n: natural log: natural log",
+    "minus": "infix=minus || prefix=negative",
+    "plus": "infix=plus || prefix=positive",
+    # "pochhammer": "infix=permutations of",  # arguments are in reverse order, so can't work here
+    "real-part": "function=the real part",
+
+    "transpose": "postfix=transpose || function=transpose",
+    "norm": "function=; norm: norm: norm; end norm",
+    "trace": "function=;trace : trace: the trace; end trace",
+    "dimension": "function=; dimension : dimension: the dimension; end dimension",
+    "homomorphism": "function= ; homomorphism : homomorphism: the homomorphism; end homomorphism",
+    "kernel": "function= ; kernel : kernel: the kernel; end kernel",
+    "vector": "function= ; vector || prefix=vector",
+    "cross-product": "infix=cross: cross product: cross product",
+    "dot-product": "infix=dot: dot product: dot:dot product",
+
+    "divergence": "function= ; dihv: divergence: divergence; end divergence",
+    "curl": "function= ; curl; end curl",
+    "gradient": "function= ; del: gradient: gradient; end gradient",
+    "laplacian": "function=lahplahsian",   # speech engines don't do a good job with "laplacian"
+  }
+  # Names of functions that in terse mode don't say "of" (or it's equivalent in other languages)
+
+- TerseFunctionNames: {
+    "divergence", "gradient", "curl"
+  }
+
+- NavigationParts: {
+    "large-op": "base, lower limit, upper limit",
+    "mfrac": "numerator;denominator",
+    "fraction": "numerator;denominator",
+    "msqrt": "root",
+    "square-root": "root",
+    "mroot": "root;root index",
+    "root": "root;root index",
+    "msub": "base;subscript",
+    "sub": "base;subscript",
+    "msup": "base;superscript",
+    "say-super": "base;superscript",
+    "skip-super": "base;superscript",
+    "power": "base;exponent",
+    "msubsup": "base;subscript;superscript",
+    "munder": "base;under limit",
+    "mover": "base;upper limit",
+    "munderover": "base;under limit;upper limit",
+
+    # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
+    # it's a hack to put them here, but at least they are grouped with the other navigation parts
+    "in": "in",
+    "out": "out of",
+  }
+
 - OperatorIntentRenaming: {
     "dimension-product": "by"
+  }
+
+- KnownWords: {
+    # MathCAT will put together some runs of three or more mi's (a common mistake), but skips those in alphabetical order.
+    # This is a list of exceptions so that they do get put together. Don't list words with repeated letters.
+
+    # I asked bard and chatgpt for formula words that are alphabetical, and they failed.
+    # Here are the words I managed to find, but it almost certainly not complete. Change the list for other languages.
+    "Abel", "aery", "ails", "airy", "amps", "cents", "flux", "flow", "knot",
   }
 
 - SIPrefixes: {
@@ -95,7 +181,7 @@
     # others
     "ha": "hectare",
     # "B": "bel",    # "B" more commonly means bytes
-    "dB": "decibel", # already loglogarithmic, so not used with SI prefixes
+    "dB": "decibel", # already logarithmic, so not used with SI prefixes
 
     "amu": "atomic mass unit",
     "atm": "atmosphere",

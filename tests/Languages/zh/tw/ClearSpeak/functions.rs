@@ -97,13 +97,13 @@ fn normal_log() {
 #[test]
 fn simple_log_with_base() {
     let expr = "<math> <mrow>  <msub><mi>log</mi><mi>b</mi></msub><mi>x</mi></mrow> </math>";
-    test("en", "ClearSpeak", expr, "the log base b of x");
+    test("en", "ClearSpeak", expr, "the log base b, of x");
 }
 
 #[test]
 fn normal_log_with_base() {
     let expr = "<math><mrow><msub><mi>log</mi><mi>b</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("en", "ClearSpeak", expr, "the log base b of, open paren x plus y, close paren");
+    test("en", "ClearSpeak", expr, "the log base b, of, open paren x plus y, close paren");
 }
 
 #[test]

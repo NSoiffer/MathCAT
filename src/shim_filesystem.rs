@@ -149,7 +149,7 @@ cfg_if! {
             // Is this the debugging override?
             if let Some(contents) = OVERRIDE_FILE_NAME.with(|override_name| {
                 if file_name == override_name.borrow().as_str() {
-                    debug!("override read_to_string_shim: {}",file_name);
+                    // debug!("override read_to_string_shim: {}",file_name);
                     return OVERRIDE_FILE_CONTENTS.with(|contents| return Some(contents.borrow().clone()));
                 } else {
                     return None;
@@ -158,7 +158,7 @@ cfg_if! {
                 return Ok(contents);
             };
 
-            debug!("read_to_string_shim: {}",file_name);
+            // debug!("read_to_string_shim: {}",file_name);
 
             return FILES.with(|files| {
                 let files = files.borrow();

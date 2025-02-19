@@ -5,15 +5,15 @@ use crate::common::*;
 #[test]
 fn salt() {
   let expr = "<math><mi>Na</mi><mi>Cl</mi></math>";
-  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 n a, 大寫 c l,");
+  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 n a, 大寫 c l");
 }
 
 #[test]
 fn water() {
   let expr = "<math><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></math>";
-  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 h, 2 大寫 o,");
-  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "大寫 h, 下標 2, 大寫 o,");
-  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "大寫 h, 下標 2, 大寫 o,");
+  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 h, 2 大寫 o");
+  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "大寫 h, 下標 2, 大寫 o");
+  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "大寫 h, 下標 2, 大寫 o");
 }
 
 #[test]
@@ -54,7 +54,7 @@ fn ethanol_bonds() {
               <mi>H</mi>
           </mrow>
       </math>";
-  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 c, 大寫 h, 3 單鍵 大寫 c, 大寫 h, 2 單鍵 大寫 o, 大寫 h,");
+  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 c, 大寫 h, 3 單鍵 大寫 c, 大寫 h, 2 單鍵 大寫 o, 大寫 h");
 
 }
 
@@ -99,7 +99,7 @@ fn ferric_chloride_aq() {
         <msub><mi>Cl</mi><mn>3</mn></msub>
         <mrow><mo>(</mo><mrow><mi>aq</mi></mrow><mo>)</mo></mrow>
     </mrow></math>";
-  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 f e, 大寫 c l, 3 水溶液,");
+  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 f e, 大寫 c l, 3 水溶液");
   }
 
 #[test]
@@ -140,11 +140,11 @@ fn beta_decay() {
       </mmultiscripts>
     </math>";
     test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")], expr,
-      "14, 6, 大寫 c; 形成, 14, 7, 大寫 n; 加 0, 負 1, e,");
+      "14, 6, 大寫 c; 形成, 14, 7, 大寫 n; 加 0, 負 1, e");
     test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
-      "上標 14, 下標 6, 大寫 c; 反應形成; 上標 14, 下標 7, 大寫 n; 加 上標 0, 下標 負 1, e,");
+      "上標 14, 下標 6, 大寫 c; 反應形成; 上標 14, 下標 7, 大寫 n; 加, 上標 0, 下標 負 1, e");
     test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-      "上標 14, 下標 6, 大寫 c; 反應形成; 上標 14, 下標 7, 大寫 n; 加 上標 0, 下標 負 1, e,");
+      "上標 14, 下標 6, 大寫 c; 反應形成; 上標 14, 下標 7, 大寫 n; 加, 上標 0, 下標 負 1, e");
 }
 
 #[test]
@@ -404,11 +404,11 @@ fn mhchem_beta_decay() {
       </mrow>
     </math>";
     test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")], expr,
-      "14, 6, 大寫 c; 形成, 14, 7, 大寫 n; 加 0, 負 1, e,");
+      "14, 6, 大寫 c; 形成, 14, 7, 大寫 n; 加 0, 負 1, e");
     test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
-      "上標 14, 下標 6, 大寫 c; 反應形成; 上標 14, 下標 7, 大寫 n; 加 上標 0, 下標 負 1, e,");
+      "上標 14, 下標 6, 大寫 c; 反應形成; 上標 14, 下標 7, 大寫 n; 加, 上標 0, 下標 負 1, e");
     test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-      "上標 14, 下標 6, 大寫 c; 反應形成; 上標 14, 下標 7, 大寫 n; 加 上標 0, 下標 負 1, e,");
+      "上標 14, 下標 6, 大寫 c; 反應形成; 上標 14, 下標 7, 大寫 n; 加, 上標 0, 下標 負 1, e");
 }
 
 #[test]
@@ -466,9 +466,9 @@ fn mhchem_so4_2plus() {
       </msup>
     </mrow>
   </math>";
-  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 s; 大寫 o, 4, 2 加,");
-  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "大寫 s; 大寫 o, 下標 4, 上標 2 加,");
-  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "大寫 s; 大寫 o, 下標 4, 上標 2 加,");
+  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "大寫 s; 大寫 o, 4, 2 加");
+  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Medium")], expr, "大寫 s; 大寫 o, 下標 4, 上標 2 加");
+  test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "大寫 s; 大寫 o, 下標 4, 上標 2 加");
 }
 
 
@@ -556,7 +556,7 @@ fn mhchem_hcl_aq_etc() {
     </mrow>
   </math>";
   test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "2, 大寫 h, 大寫 c l, 水溶液; 加, 2, 大寫 n a, 固體; 形成; 2, 大寫 n a, 大寫 c l, 水溶液; 加, 大寫 h, 2; 氣體,");
+      expr, "2, 大寫 h, 大寫 c l, 水溶液; 加, 2, 大寫 n a, 固體; 形成; 2, 大寫 n a, 大寫 c l, 水溶液; 加, 大寫 h, 2; 氣體");
 
 }
 
@@ -622,7 +622,7 @@ fn mhchem_barbed_equilibrium() {
     </mrow>
   </math>";
   test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "大寫 h, 2; 氣體; 加; 大寫 i, 2; 氣體; 左右平衡 2, 大寫 h, 大寫 i, 氣體,");
+      expr, "大寫 h, 2; 氣體; 加; 大寫 i, 2; 氣體; 左右平衡 2, 大寫 h, 大寫 i, 氣體");
 }
 
 
@@ -651,7 +651,7 @@ fn mhchem_roman_in_superscript() {
       </mrow>
     </math>";
   test_prefs("zh-tw", "SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "大寫 f e, 2; 大寫 f e, 3; 大寫 o, 4,");
+      expr, "大寫 f e, 2; 大寫 f e, 3; 大寫 o, 4");
 }
 
 

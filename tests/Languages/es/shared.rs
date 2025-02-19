@@ -37,7 +37,7 @@ fn limit() {
             </mfrac>
             </mrow>
         </math>";
-    test("en", "SimpleSpeak", expr, "the limit as x approaches 0, of, fraction, sine of x, over x, end fraction;");
+    test("en", "SimpleSpeak", expr, "the limit as x approaches 0, of, fraction, sine of x, over x, end fraction");
 }
 
 #[test]
@@ -104,7 +104,7 @@ fn huge_num_mmultiscripts() {
 #[test]
 fn prime() {
     let expr = "<math> <msup><mi>x</mi><mo >&#x2032;</mo></msup> </math>";
-    test("en", "SimpleSpeak", expr, "x prime,");
+    test("en", "SimpleSpeak", expr, "x prime");
 }
 
 #[test]

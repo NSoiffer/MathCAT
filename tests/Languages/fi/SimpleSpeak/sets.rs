@@ -202,7 +202,7 @@ fn element_under_sum() {
             </mfrac>
         </math>";
     test("fi", "SimpleSpeak", expr,
-                    "summa yli i kuuluu kokonaisluvut; murtoluku, 1 per, i toiseen, loppu murtoluku;");
+                    "summa yli i kuuluu kokonaisluvut; murtoluku, 1 per, i toiseen, loppu murtoluku");
 }
 
 #[test]

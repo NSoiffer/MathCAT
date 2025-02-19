@@ -81,7 +81,7 @@
    name: common-fraction-mixed-number
    tag: mfrac
    match:
-      - "preceding-sibling::*[1][self::m:mo][text()='\u2064'] and" # preceding element is invisible plus
+      - "preceding-sibling::*[1][self::m:mo][.='\u2064'] and" # preceding element is invisible plus
       - "*[1][self::m:mn][not(contains(., '.'))]   and" 
       - "*[2][self::m:mn][not(contains(., '.'))]"
    replace: 
@@ -310,7 +310,7 @@
 -
    name: single-char-exceptions    # GTM 12
    tag: [mover, munder]
-   match: "*[2][string-length(.) = 1 and ( translate(., '_¯→.·˙~^','')='' or (parent::m:mover and text()='⌒') )]"
+   match: "*[2][string-length(.) = 1 and ( translate(., '_¯→.·˙~^','')='' or (parent::m:mover and .='⌒') )]"
    replace: 
    - test:
          if: "NeedsToBeGrouped(*[1], 'UEB', true())"
@@ -326,15 +326,15 @@
       if: "self::m:munder"
       then: [t: "⠠"]
    - test:
-      - if: "*[2][text()='_' or text()='¯']"
+      - if: "*[2][.='_' or .='¯']"
         then: [t: "⠱"]
-      - else_if: "*[2][text()='→']"
+      - else_if: "*[2][.='→']"
         then: [t: "⠘⠱"]
-      - else_if: "*[2][text()='.' or text()='·' or text()='˙']"
+      - else_if: "*[2][.='.' or .='·' or .='˙']"
         then: [t: "⠘⠲"]
-      - else_if: "*[2][text()='~']"
+      - else_if: "*[2][.='~']"
         then: [t: "⠸⠱"]
-      - else_if: "*[2][text()='^']"
+      - else_if: "*[2][.='^']"
         then: [t: "⠐⠱ "]
         else: [t: "⠨⠸⠱"]    # arc/⌒
 

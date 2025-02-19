@@ -41,9 +41,9 @@
   - test:
       if: "*[2][self::m:mn]"
       then_test:
-      - if: "*[2][text()='2']"
+      - if: "*[2][.='2']"
         then: [{T: akar kuadrat}]
-      - else_if: "*[2][text()='3']"
+      - else_if: "*[2][.='3']"
         then: [{T: akar pangkat tiga}]
       - else_if: "*[2][not(contains(., '.'))]"
         then: [{x: "ToOrdinal(*[2])"}, {T: akar}]
@@ -75,7 +75,7 @@
 - name: common-fraction-mixed-number
   tag: fraction
   match:
-  - "preceding-sibling::*[1][self::m:mo][text()='⁤'] and" # preceding element is invisible plus
+  - "preceding-sibling::*[1][self::m:mo][.='⁤'] and" # preceding element is invisible plus
   - "*[1][self::m:mn][not(contains(., '.'))]   and"
   - "*[2][self::m:mn][not(contains(., '.'))]"
   replace: [{x: ToCommonFraction(.)}]
@@ -126,19 +126,19 @@
 - name: function-squared-or-cubed
   tag: power
   match:
-  - "*[2][self::m:mn][text()='2' or text()='3'] and"
-  - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
+  - "*[2][self::m:mn][.='2' or .='3'] and"
+  - "following-sibling::*[1][self::m:mo][.='⁡']" #invisible function apply
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
   - test:
-      if: "*[2][text()=2]"
+      if: "*[2][.=2]"
       then: {T: kuadrat}
       else: {T: kubik}
 - name: function-power
   tag: power
   match:
-  - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
+  - "following-sibling::*[1][self::m:mo][.='⁡']" #invisible function apply
   replace:
   - test:
       if: "$Verbosity!='Terse'"
@@ -155,12 +155,12 @@
 # non-function rules for power
 - name: squared-or-cubed
   tag: power
-  match: "*[2][self::m:mn][text()='2' or text()='3']"
+  match: "*[2][self::m:mn][.='2' or .='3']"
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
   - test:
-      if: "*[2][text()=2]"
+      if: "*[2][.=2]"
       then: {T: kuadrat}
       else: {T: kubik}
 
@@ -177,7 +177,7 @@
 - name: simple-negative-integer
   tag: power
   match:
-  - "*[2][self::m:negative and"
+  - "*[2][self::m:minus and count(*)=1 and"
   - "     *[1][self::m:mn][not(contains(., '.'))]]"
   replace:
   - x: "*[1]"
@@ -237,7 +237,7 @@
       - test:
           if: "$Verbosity!='Terse'"
           then: {T: "kosong"}
-    - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
+    - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
       then:
       - test:
           if: "$Verbosity!='Terse'"
@@ -255,12 +255,20 @@
   tag: mo
   match:
   # say "times" when invisible times is followed by parens or a superscript that has a base with parens or "|"s
+  # added: say times is the superscript is not simple
   # if we aren't sure if it is times or not, don't say anything
-  - "text()='⁢' and not(@data-function-guess) and ("
+  - ".='⁢' and"
+  - "not(@data-function-guess) and ("
+  - "not(ancestor-or-self::*[contains(@data-intent-property, ':literal:')]) and "
   - "  following-sibling::*[1]["
-  - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|') or self::m:binomial or" # followed by parens
-  - "    ( (self::m:msup or self::m:msub or self::m:msubsup or self::m:power) and " # followed by msup, etc.
-  - "       *[1][self::m:mrow][IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')]" # base has parens
+  - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|') or "
+  - "    self::m:matrix or self::m:determinant or self::m:binomial or" # followed by parens
+  - "    ( (self::m:msub or self::m:msubsup or
+           ((self::m:msup or self::m:power) and not(IsNode(*[1], 'leaf') and *[2][self::m:mn and (.=2 or '.=3')]))) and " # followed by msup, etc.
+  - "       (*[1][self::m:mrow[IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')] or "
+  - "            self::m:matrix or self::m:determinant] or" # base has parens
+  - "        not(IsNode(*[2], 'simple')) or "
+  - "        (self::m:msubsup and not(IsNode(*[3], 'simple'))))"
   - "    )"
   - "  ]"
   # other possibility is the preceding element has parens (but not the following)

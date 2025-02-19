@@ -289,7 +289,7 @@
     - test:
         if:
         - "ancestor::*[2][IsBracketed(., '{', '}')] or "       # field extension
-        - "preceding-sibling::*[2][text()=':'] or following-sibling::*[2][text()=':'] or"  # trilinear form
+        - "preceding-sibling::*[2][.=':'] or following-sibling::*[2][.=':'] or"  # trilinear form
           # ratios tend to have similar left and right sides
         - "name(preceding-sibling::*[1]) = name(following-sibling::*[1]) or"
           # am/pm test
@@ -322,7 +322,7 @@
         #- "           (self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '') or "
         #- "           (self::m:mrow and translate(*[last()], 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '')] and"
         #- "  following::*[1][self::m:mrow and count(*)=3 and "   # look for function apply
-        #- "     *[2][text()='⁡'] and *[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']]" 
+        #- "     *[2][.='⁡'] and *[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']]" 
         #then: [t: "W"]
         #else: [t: ""]
  - "⁣": [t: ""]                 # 0x2063⁡ (invisible separator)

@@ -11,7 +11,7 @@ fn squared() {
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "x toiseen");
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "x potenssiin 2");
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "x potenssiin 2");
-    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "x potenssiin 2,");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "x potenssiin 2");
 
 }
 
@@ -23,7 +23,7 @@ fn cubed() {
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "x kolmanteen");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "x potenssiin 3");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "x potenssiin 3");
-  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "x potenssiin 3,");
+  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "x potenssiin 3");
 }
 
 #[test]
@@ -34,7 +34,7 @@ fn ordinal_power() {
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "3 potenssiin 5");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "3 potenssiin 5");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "3 potenssiin 5");
-  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 potenssiin 5,");
+  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 potenssiin 5");
 }
 
 
@@ -46,7 +46,7 @@ fn zero_power() {
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "3 potenssiin 0");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "3 potenssiin 0");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "3 potenssiin 0");
-  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 potenssiin 0,");
+  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 potenssiin 0");
 }
 
 #[test]
@@ -57,7 +57,7 @@ fn simple_mi_power() {
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "4 potenssiin x");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "4 potenssiin x");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "4 potenssiin x");
-  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "4 potenssiin x,");
+  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "4 potenssiin x");
 }
 
 #[test]
@@ -68,7 +68,7 @@ fn decimal_period_power() {
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "3 potenssiin 5.0");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "3 potenssiin 5.0");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "3 potenssiin 5.0");
-  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 potenssiin 5.0,");
+  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 potenssiin 5.0");
 }
 
 #[test]
@@ -79,7 +79,7 @@ fn decimal_comma_power() {
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "3 potenssiin 5,0");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "3 potenssiin 5,0");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "3 potenssiin 5,0");
-  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 potenssiin 5,0,");
+  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 potenssiin 5,0");
 }
 
 #[test]
@@ -90,7 +90,7 @@ fn non_simple_power() {
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "3 potenssiin y plus 2");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "3 potenssiin y plus 2");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "3 potenssiin y plus 2");
-  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 potenssiin y plus 2,");
+  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 potenssiin y plus 2");
 }
 
 #[test]
@@ -101,7 +101,7 @@ fn negative_power() {
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "3 potenssiin negatiivinen 2");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "3 potenssiin negatiivinen 2");
   test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "3 potenssiin negatiivinen 2");
-  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 potenssiin negatiivinen 2,");
+  test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 potenssiin negatiivinen 2");
 }
 
 #[test]
@@ -348,5 +348,5 @@ fn default_power() {
       </mfrac>
     </msup>
   </math>";
-  test("fi", "ClearSpeak", expr, "t potenssiin murtoluku osoittaja; b plus 1; ja nimittäjä 3;");
+  test("fi", "ClearSpeak", expr, "t potenssiin murtoluku osoittaja; b plus 1; ja nimittäjä 3");
 }

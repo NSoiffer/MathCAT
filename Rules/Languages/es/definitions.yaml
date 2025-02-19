@@ -6,6 +6,71 @@
 # For numbers, 
 # - name: [] "...", "..." "..." ]
 
+
+# If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here for a prefix||infix||postfix||function fixity
+# If only one ":" is used, it the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
+# If no ":"s are used, the same speech is used for all forms
+# If bracketing words make sense, they are separated with ";"s
+# Intent mappings must specify whether they are "prefix", "infix", "postfix", or "function" with an "=" sign
+# If there are multiple fixities (e.g., see transpose), they are separated with "||
+#   for readability, spaces can be used around any of the delimiter characters
+# Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
+- IntentMappings: {
+    "indexed-by": "infix= ; subíndice; final del subíndice",
+    "modified-variable": "silent= ",
+    "say-super": "infix=superíndice",   # used with 'mo' for superscripts (e.g, "<")
+    "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
+
+    "absolute-value": "function= ; valor absoluto: el valor absoluto de: el valor absoluto de; final del valor absoluto",
+    "binomial": "infix=binomial; elegir; end binomial",
+    "limit": "prefix=límite cuando",
+    "lim-sup": "prefix=lim sup as: the limit superior as: the limit superior as",
+    "lim-inf": "prefix=lim inf as: the limit inferior as : the limit inferior as",
+    "logarithm-with-base": "prefix=log base: el log base: el log base",
+    "minus": "infix=menos || prefix=negativo",
+    "plus": "infix=más || prefix=positivo",
+
+    "transpose": "postfix=intercambiar || function=intercambiar",
+    "norm": "function=; regla: regla: la regla; fin de la regla",
+    "trace": "function=;traza : traza de: la traza de; fin de la traza",
+    "dimension": "function=; dimensión : dimensión de: la dimensión de; fin de la dimensión",
+    "homomorphism": "function= ; homomorfismo : homomorfismo de: el homomorfismo de; find de el homomorfismo",
+    "kernel": "function= ; núcleo : núcleo de: el núcleo de; fin de el núcleo",
+    "vector": "function= ; vector || prefix=vector",
+    "cross-product": "infix=cross: cross product: cross product",
+    "dot-product": "infix=dot: dot product: dot:dot product",
+
+    "divergence": "function= ; div: divergence: divergence; end divergence",
+    "curl": "function= ; curl; end curl",
+    "gradient": "function= ; grad: gradient: gradient; end gradient",
+    "laplacian": "function=lahplahsian",   # speech engines don't do a good job with "laplacian"
+  }
+
+- NavigationParts: {
+    "large-op": "base, lower limit, upper limit",
+    "mfrac": "numerator;denominator",
+    "fraction": "numerator;denominator",
+    "msqrt": "root",
+    "square-root": "root",
+    "mroot": "root;root index",
+    "root": "root;root index",
+    "msub": "base;subscript",
+    "sub": "base;subscript",
+    "msup": "base;superscript",
+    "say-super": "base;superscript",
+    "skip-super": "base;superscript",
+    "power": "base;exponent",
+    "msubsup": "base;subscript;superscript",
+    "munder": "base;under limit",
+    "mover": "base;upper limit",
+    "munderover": "base;under limit;upper limit",
+
+    # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
+    # it's a hack to put them here, but at least they are grouped with the other navigation parts
+    "in": "in",
+    "out": "out of",
+  }
+
 - SIPrefixes: {
     "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hecto", "da": "deka",
     "d": "deci", "c": "centi", "m": "mili", "µ": "micro", "n": "nano", "p": "pico", "f": "femto", "a": "atto", "z": "zepto", "y": "yocto", "r": "ronto", "q": "quecto"
@@ -96,7 +161,7 @@
     # others
     "ha": "hectárea",
     # "B": "belio",    # "B" more commonly means bytes
-    "dB": "decibelio", # already loglogarithmic, so not used with SI prefixes
+    "dB": "decibelio", # already logarithmic, so not used with SI prefixes
 
     "atm": "atmósfera",
     "amu": "unidad de masa atómica",

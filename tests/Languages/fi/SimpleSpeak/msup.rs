@@ -336,5 +336,5 @@ fn default_power() {
       </mfrac>
     </msup>
   </math>";
-  test("fi", "SimpleSpeak", expr, "t potenssiin murtoluku, b plus 1, per 3, loppu murtoluku;");
+  test("fi", "SimpleSpeak", expr, "t potenssiin murtoluku, b plus 1, per 3, loppu murtoluku");
 }
