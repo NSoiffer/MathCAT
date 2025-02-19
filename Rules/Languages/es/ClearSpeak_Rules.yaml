@@ -25,7 +25,7 @@
       then:
       - bookmark: "*[1]/@id"
       - test:
-          if: parent::*[self::m:minus and count(*)=1]]
+          if: parent::*[self::m:minus and count(*)=1]
           then: [{T: "menos"}]
           else: [{T: "positivo"}]
   - T: "raíz cuadrada"
