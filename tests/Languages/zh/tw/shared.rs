@@ -37,7 +37,7 @@ fn limit() {
             </mfrac>
             </mrow>
         </math>";
-    test("zh-tw", "SimpleSpeak", expr, "極限 x 趨近 0; 分數 x 分之, sine x 結束分數;");
+    test("zh-tw", "SimpleSpeak", expr, "極限 x 趨近 0; 分數 x 分之, sine x 結束分數");
 }
 
 #[test]
@@ -104,7 +104,7 @@ fn huge_num_mmultiscripts() {
 #[test]
 fn prime() {
     let expr = "<math> <msup><mi>x</mi><mo >&#x2032;</mo></msup> </math>";
-    test("zh-tw", "SimpleSpeak", expr, "x prime,");
+    test("zh-tw", "SimpleSpeak", expr, "x prime");
 }
 
 #[test]
@@ -128,7 +128,7 @@ fn simple_msubsup() {
             </msubsup>
             </mstyle>
         </math>";
-    test("zh-tw", "SimpleSpeak", expr, "x 下標 k, 的 i 次方");
+    test("zh-tw", "SimpleSpeak", expr, "x 下標 k 的 i 次方");
 }
 
 #[test]
@@ -155,7 +155,7 @@ fn presentation_mathml_in_semantics() {
             </annotation-xml>
         </semantics>
     </math>";
-    test("zh-tw", "SimpleSpeak", expr, "x 下標 k, 的 i 次方");
+    test("zh-tw", "SimpleSpeak", expr, "x 下標 k 的 i 次方");
 }
 
 #[test]
@@ -242,7 +242,7 @@ fn ignore_comma() {
       </mstyle>
     </mrow>
 </math>";
-    test("zh-tw", "SimpleSpeak", expr, "phi x 等於, c, e 的 負 h 平方 x 平方 次方");
+    test("zh-tw", "SimpleSpeak", expr, "phi x 等於, c 乘, e 的 負 h 平方 x 平方 次方");
 }
 
 #[test]

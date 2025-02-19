@@ -28,11 +28,11 @@
 -
   name: squared
   tag: msup
-  match: "*[2][self::mn][text()='2']"
+  match: "*[2][self::mn][.='2']"
   replace: [x: "*[1]", t: "squared"]
 -
   name: default
-  tag: particular-value-of
+  tag: indexed-by
   match: "."
   replace:
     - x: "*[1]"

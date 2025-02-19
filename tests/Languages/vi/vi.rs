@@ -48,13 +48,13 @@ fn vi_units_1() {
 #[test]
 fn salt() {
   let expr = "<math><mi>Na</mi><mi>Cl</mi></math>";
-  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "n a, c l,");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "n a, c l");
 }
 
 #[test]
 fn water() {
   let expr = "<math><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></math>";
-  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "h , 2 o ,");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "h, 2 o");
 }
 
 #[test]
@@ -69,14 +69,14 @@ fn sulfate() {
           <mrow><mo>[</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>]</mo></mrow>
           <mrow><mn>2</mn><mo>&#x2212;</mo></mrow>
       </msup></mrow></math>";
-  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "mở ngoặc vuông, s , o , 4, đóng ngoặc vuông 2 trừ");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "mở ngoặc vuông, s, o, 4, đóng ngoặc vuông 2 trừ");
 }
 
 #[test]
 fn aluminum_sulfate() {
   let expr = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
           <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
-  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "a l, 2; mở ngoặc đơn, s , o , 4, đóng ngoặc đơn 3");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "a l, 2; mở ngoặc đơn, s, o, 4, đóng ngoặc đơn 3");
   // "tất cả #X lần" phrase is just applied for chemistry case, not for math. "#X" is the sub 3.
 }
 
@@ -94,7 +94,7 @@ fn ethanol_bonds() {
               <mi>H</mi>
           </mrow>
       </math>";
-  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "c , h , 3 nối đơn c , h , 2 nối đơn o , h ,");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "c, h, 3 nối đơn c, h, 2 nối đơn o, h");
 }
 
 #[test]
@@ -109,7 +109,8 @@ fn dichlorine_hexoxide() {
         <mo>-</mo>
       </msup>
     </mrow></math>";
-  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "mở ngoặc vuông, c l, o , 2, đóng ngoặc vuông cộng; mở ngoặc vuông, c l, o , 4, đóng ngoặc vuông trừ");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr,
+             "mở ngoặc vuông, c l, o, 2, đóng ngoặc vuông cộng; mở ngoặc vuông, c l, o, 4, đóng ngoặc vuông trừ");
 }
 
 #[test]
@@ -119,7 +120,7 @@ fn ethylene_with_bond() {
           <mo>=</mo>
           <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
       </mrow></math>";
-  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "h , 2 c , nối đôi c , h , 2");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "h, 2 c, nối đôi c, h, 2");
 }
 
 #[test]
@@ -129,7 +130,7 @@ fn ferric_chloride_aq() {
         <msub><mi>Cl</mi><mn>3</mn></msub>
         <mrow><mo>(</mo><mrow><mi>aq</mi></mrow><mo>)</mo></mrow>
     </mrow></math>";
-  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "f e, c l, 3 thể lỏng,");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "f e, c l, 3 thể lỏng");
   }
 
 #[test]
@@ -139,7 +140,7 @@ fn ethylene_with_colon_bond() {
           <mo>::</mo>
           <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
       </mrow></math>";
-  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "h , 2 c , nối đôi c , h , 2");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "h, 2 c, nối đôi c, h, 2");
 }
 
 #[test]
@@ -165,8 +166,8 @@ fn mhchem_roman_in_superscript() {
         </mmultiscripts>
       </mrow>
     </math>";
-  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "f hoa e, hóa trị 2 la mã; f hoa e, hóa trị 3 la mã; o hoa, 4,");
-  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "f e, hóa trị 2; f e, hóa trị 3; o , 4,");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "f hoa e, hóa trị 2 la mã; f hoa e, hóa trị 3 la mã; o hoa, 4");
+  test_prefs("vi", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "f e, hóa trị 2; f e, hóa trị 3; o, 4");
   // when Roman numbers written on superscript at the middle, it should be added prefix text "hóa trị" then + the number
 }
 

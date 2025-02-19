@@ -5,7 +5,7 @@ fn msqrt_simple() {
     let expr = "<math>
                     <msqrt> <mi>x</mi> </msqrt>
                 </math>";
-    test("zh-tw", "SimpleSpeak", expr, "根號 x,");
+    test("zh-tw", "SimpleSpeak", expr, "根號 x");
 }
 
 #[test]
@@ -23,7 +23,7 @@ fn msqrt() {
                         <mrow> <mi>x</mi> <mo>+</mo> <mi>y</mi> </mrow>
                     </msqrt>
                 </math>";
-    test("zh-tw", "SimpleSpeak", expr, "根號 x 加 y 結束根號;");
+    test("zh-tw", "SimpleSpeak", expr, "根號 x 加 y 結束根號");
 }
 
 #[test]
@@ -31,7 +31,7 @@ fn mroot_as_square_root() {
     let expr = "<math>
                     <mroot> <mi>x</mi> <mn>2</mn> </mroot>
                 </math>";
-    test("zh-tw", "SimpleSpeak", expr, "根號 x,");
+    test("zh-tw", "SimpleSpeak", expr, "根號 x");
 }
 
 #[test]

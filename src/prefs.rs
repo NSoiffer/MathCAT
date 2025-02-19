@@ -287,7 +287,7 @@ impl PreferenceManager {
         return merged_prefs;
     }
 
-    /// Set the rules dir and return failure if it is a bad directory (non-existant, can't find all files, ...)
+    /// Set the rules dir and return failure if it is a bad directory (non-existent, can't find all files, ...)
     fn set_rules_dir(&mut self, rules_dir: &Path) -> Result<()> {
         // Fix: should make sure all files exists -- fail if not true
         if !is_dir_shim(rules_dir) {
@@ -352,7 +352,7 @@ impl PreferenceManager {
             info!("set_rules_dir called again!");
         }
 
-        // set computed values for BLOCK_SEPARATORS and DECIMAL_SEPARAORS (a little messy about the language due immutable and mutable borrows)
+        // set computed values for BLOCK_SEPARATORS and DECIMAL_SEPARATORS (a little messy about the language due immutable and mutable borrows)
         let language = self.user_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone();
         let language = language.as_str().unwrap();
         self.set_separators(language)?;
@@ -487,7 +487,7 @@ impl PreferenceManager {
         // This list was generated from https://en.wikipedia.org/wiki/Decimal_separator#Countries_using_decimal_point
         // The countries were then mapped to language(s) using https://en.wikipedia.org/wiki/List_of_official_languages_by_country_and_territory
         // When a language was used in other countries that used a "," separator, the language+country is listed 
-        //   Sometimes there are muliple languages used in a country -- they are all listed, sometimes with a country code
+        //   Sometimes there are multiple languages used in a country -- they are all listed, sometimes with a country code
         // The country code isn't used when the language is used in smaller countries (i.e, when "." is more likely correct)
         //   This decision is sometimes a bit arbitrary
         //   For example, Swahili (sw) is used in: Democratic Republic of the Congo, Kenya, Rwanda, Tanzania, and Uganda.
@@ -570,7 +570,7 @@ impl PreferenceManager {
         }
 
         if let Some(default_lang) = default_lang {
-            // try again with the default langauge (we're likely in trouble)
+            // try again with the default language (we're likely in trouble)
             return PreferenceManager::find_file(rules_dir, default_lang, None, file_name);
         }
         
@@ -828,7 +828,7 @@ impl PreferenceManager {
         let is_language_changed = key == "Language" && self.user_prefs.prefs.get("Language").unwrap().as_str().unwrap() != value;
         self.user_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
         if is_decimal_separators_changed || is_language_changed {
-            // set computed values for BLOCK_SEPARATORS and DECIMAL_SEPARAORS (a little messy about the language due immutable and mutable borrows)
+            // set computed values for BLOCK_SEPARATORS and DECIMAL_SEPARATORS (a little messy about the language due immutable and mutable borrows)
             let language = self.user_prefs.prefs.get("Language").unwrap_or(&DEFAULT_LANG).clone();
             let language = language.as_str().unwrap();
             self.set_separators(language)?;
@@ -923,7 +923,7 @@ mod tests {
     #[test]
     fn find_style_other_language() {
         // zz dir should have both ClearSpeak and SimpleSpeak styles
-        // zz-aa dir should have pnly ClearSpeak style and unicode.yaml that includes the zz unicode but overrides "+"
+        // zz-aa dir should have only ClearSpeak style and unicode.yaml that includes the zz unicode but overrides "+"
         PREF_MANAGER.with(|pref_manager| {
             let mut pref_manager = pref_manager.borrow_mut();
             pref_manager.initialize(abs_rules_dir_path()).unwrap();

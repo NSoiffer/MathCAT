@@ -45,9 +45,9 @@
   - test:
       if: "*[2][self::m:mn]"
       then_test:
-      - if: "*[2][text()='2']"
+      - if: "*[2][.='2']"
         then: {T: "kvadratroten"}
-      - else_if: "*[2][text()='3']"
+      - else_if: "*[2][.='3']"
         then: {T: "kubikroten"}
       - else_if: "*[2][not(contains(., ','))]"
         then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]
@@ -72,7 +72,7 @@
   - T: "gånger"
   - x: count(*[2]/*[self::m:mtr][1]/*)
   - test:
-      if: "*[1][text()='|']" # just need to check the first bracket since we know it must be (, [, or |
+      if: "*[1][.='|']" # just need to check the first bracket since we know it must be (, [, or |
       then: {T: "determinant"}
       else: {T: "matris"}
 

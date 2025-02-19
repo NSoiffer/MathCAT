@@ -21,13 +21,23 @@ fn dimension() {
 #[test]
 fn homomorphism() {
   let expr = "<math> <mi>Hom</mi><mo>(</mo><mi>M</mi><mo>)</mo> </math>";
-  test("sv", "SimpleSpeak", expr, "homomorfism versal m");
+  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Terse")],
+  expr, "endomorfismerna på versal m");
+  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Medium")],
+  expr, "mängden av endomorfismer på versal m");
+  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")],
+  expr, "mängden av endomorfismer på versal m");
 }
 
 #[test]
 fn kernel() {
   let expr = "<math> <mi>ker</mi><mrow><mo>(</mo><mi>L</mi><mo>)</mo></mrow> </math>";
-  test("sv", "SimpleSpeak", expr, "noll-rummet till versal l");
+  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Terse")],
+  expr, "noll-rummet versal l");
+  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Medium")],
+  expr, "noll-rummet till versal l");
+  test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")],
+  expr, "noll-rummet till versal l");
 }
 
 #[test]

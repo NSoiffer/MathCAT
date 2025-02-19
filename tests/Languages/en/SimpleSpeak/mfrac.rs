@@ -33,7 +33,7 @@ fn not_SimpleSpeak_common_fraction_tenths() {
     let expr = "<math>
                     <mfrac> <mn>89</mn> <mn>10</mn> </mfrac>
                 </math>";
-    test("en", "SimpleSpeak", expr, "89 over 10,");
+    test("en", "SimpleSpeak", expr, "89 over 10");
 }
 
 #[test]
@@ -49,7 +49,7 @@ fn non_simple_fraction() {
         </mrow>
     </math>
                             ";
-    test("en", "SimpleSpeak", expr, "fraction, x plus y, over, x minus y, end fraction;");
+    test("en", "SimpleSpeak", expr, "fraction, x plus y, over, x minus y, end fraction");
 }
 
 #[test]
@@ -65,7 +65,7 @@ fn nested_fraction() {
         </mrow>
     </math>
                             ";
-    test("en", "SimpleSpeak", expr, "fraction, x plus, fraction, 1 over y, end fraction; over, x minus y, end fraction;");
+    test("en", "SimpleSpeak", expr, "fraction, x plus, fraction, 1 over y, end fraction; over, x minus y, end fraction");
 }
 
 
@@ -82,7 +82,7 @@ fn deeply_nested_fraction_msqrt() {
         </mrow>
     </math>
                             ";
-    test("en", "SimpleSpeak", expr, "fraction, x plus, the square root of 1 over y, end root; over, x minus y, end fraction;");
+    test("en", "SimpleSpeak", expr, "fraction, x plus, the square root of 1 over y, end root; over, x minus y, end fraction");
 }
 
 #[test]
@@ -98,7 +98,7 @@ fn deeply_nested_fraction_mrow_msqrt() {
         </mrow>
     </math>
                             ";
-    test("en", "SimpleSpeak", expr, "fraction, x plus, the square root of 2 plus 1 over y, end root; over, x minus y, end fraction;");
+    test("en", "SimpleSpeak", expr, "fraction, x plus, the square root of 2 plus 1 over y, end root; over, x minus y, end fraction");
 }
 
 #[test]
@@ -114,7 +114,7 @@ fn numerator_simple_fraction() {
         </mrow>
     </math>
                             ";
-    test("en", "SimpleSpeak", expr, "fraction, x over, x minus y, end fraction;");
+    test("en", "SimpleSpeak", expr, "fraction, x over, x minus y, end fraction");
 }
 
 #[test]
@@ -127,7 +127,38 @@ fn denominator_simple_fraction() {
         </mfrac>
     </math>
                             ";
-    test("en", "SimpleSpeak", expr, "fraction, x minus y, over x, end fraction;");
+    test("en", "SimpleSpeak", expr, "fraction, x minus y, over x, end fraction");
+}
+
+
+#[test]
+fn frac_with_units() {
+    let expr = "
+    <math>
+        <mrow>
+        <mn>62</mn>
+        <mfrac>
+        <mi intent=':unit'>mi</mi>
+        <mi intent=':unit'>hr</mi>
+        </mfrac>
+        </mrow>
+    </math>";
+    test("en", "SimpleSpeak", expr, "62 miles per hour");
+}
+
+#[test]
+fn singular_frac_with_units() {
+    let expr = "
+    <math>
+        <mrow>
+        <mn>1</mn>
+        <mfrac>
+        <mi intent=':unit'>gal</mi>
+        <mi intent=':unit'>mi</mi>
+        </mfrac>
+        </mrow>
+    </math>";
+    test("en", "SimpleSpeak", expr, "1 gallon per mile");
 }
 
 
@@ -164,7 +195,7 @@ fn simple_text() {
     let expr = "<math>
     <mfrac> <mi>rise</mi> <mi>run</mi> </mfrac>
                 </math>";
-    test("en", "SimpleSpeak", expr, "rise over run,");
+    test("en", "SimpleSpeak", expr, "rise over run");
 }
 
 #[test]
@@ -177,7 +208,7 @@ fn number_and_text() {
                 <mn>3</mn><mtext>gallons</mtext></mrow>
             </mfrac>
         </math>";
-    test("en", "SimpleSpeak", expr, "fraction, 2 miles, over, 3 gallons, end fraction;");
+    test("en", "SimpleSpeak", expr, "fraction, 2 miles, over, 3 gallons, end fraction");
 }
 
 
@@ -201,7 +232,7 @@ fn nested_simple_fractions() {
                 </mfrac>
                 </mrow>
             </math>";
-    test("en", "SimpleSpeak", expr, "fraction, 1 half, over, 2 thirds, end fraction;");
+    test("en", "SimpleSpeak", expr, "fraction, 1 half, over, 2 thirds, end fraction");
 }
 
 #[test]
@@ -213,4 +244,37 @@ fn binomial() {
                     <mo>)</mo>
                 </math>";
     test("en", "SimpleSpeak", expr, "2 times 7 choose 3");
+}
+
+#[test]
+fn binomial_non_simple_top() {
+    let expr = "<math>
+                    <mn>2</mn>
+                    <mo>(</mo>
+                    <mfrac linethickness='0'> <mrow><mi>n</mi><mo>+</mo><mn>7</mn></mrow> <mn>3</mn> </mfrac>
+                    <mo>)</mo>
+                </math>";
+    test("en", "SimpleSpeak", expr, "2 times, binomial n plus 7 choose 3");
+}
+
+#[test]
+fn binomial_non_simple_bottom() {
+    let expr = "<math>
+                    <mn>2</mn>
+                    <mo>(</mo>
+                    <mfrac linethickness='0'> <mn>7</mn> <mrow><mi>k</mi><mo>+</mo><mn>3</mn></mrow> </mfrac>
+                    <mo>)</mo>
+                </math>";
+    test("en", "SimpleSpeak", expr, "2 times, 7 choose k plus 3 end binomial");
+}
+
+#[test]
+fn binomial_non_simple_top_and_bottom() {
+    let expr = "<math>
+                    <mn>2</mn>
+                    <mo>(</mo>
+                    <mfrac linethickness='0'> <mrow><mi>n</mi><mo>+</mo><mn>7</mn></mrow> <mrow><mi>k</mi><mo>+</mo><mn>3</mn></mrow> </mfrac>
+                    <mo>)</mo>
+                </math>";
+    test("en", "SimpleSpeak", expr, "2 times, binomial n plus 7 choose k plus 3 end binomial");
 }

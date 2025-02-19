@@ -8,6 +8,7 @@
 # Some of the weird letters (e.g., circled letters) I didn't translate with the above because
 #   they don't interact with rules since they are enclosed in other chars.
 
+ - "⨯": [t: "⠈⠡"]               # U+2A2F(VECTOR OR CROSS PRODUCT) -- make the same as 0x00D7 (Multiplication sign)
 
   # --- Nemeth Default Alphabet bold chars. ---
  - "𝐀": [t: "BECL⠁"]            # 0x1d400

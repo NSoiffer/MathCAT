@@ -16,7 +16,7 @@ use crate::canonicalize::{as_element, name};
 
 use crate::navigate::*;
 use crate::pretty_print::mml_to_string;
-use crate::xpath_functions::is_leaf;
+use crate::xpath_functions::{is_leaf, IsNode};
 
 #[cfg(feature = "enable-logs")]
 use std::sync::Once;
@@ -46,7 +46,7 @@ fn enable_logs() {
 
 // wrap up some common functionality between the call from 'main' and AT
 fn cleanup_mathml(mathml: Element) -> Result<Element> {
-    trim_element(&mathml);
+    trim_element(mathml, false);
     let mathml = crate::canonicalize::canonicalize(mathml)?;
     let mathml = add_ids(mathml);
     return Ok(mathml);
@@ -64,7 +64,7 @@ fn init_mathml_instance() -> RefCell<Package> {
 }
 
 /// Set the Rules directory
-/// IMPORTANT: this should be the very first call to MathCAT. If 'dir' is an empty string, the envirnoment var 'MathCATRulesDir' is tried.
+/// IMPORTANT: this should be the very first call to MathCAT. If 'dir' is an empty string, the environment var 'MathCATRulesDir' is tried.
 pub fn set_rules_dir(dir: String) -> Result<()> {
     enable_logs();
     use std::path::PathBuf;
@@ -144,7 +144,7 @@ pub fn set_mathml(mathml_str: String) -> Result<String> {
         let new_package = new_package.unwrap();
         let mathml = get_element(&new_package);
         let mathml = cleanup_mathml(mathml)?;
-        let mathml_string = mml_to_string(&mathml);
+        let mathml_string = mml_to_string(mathml);
         old_package.replace(new_package);
 
         return Ok(mathml_string);
@@ -162,7 +162,7 @@ pub fn get_spoken_text() -> Result<String> {
         let mathml = get_element(&package_instance);
         let new_package = Package::new();
         let intent = crate::speech::intent_from_mathml(mathml, new_package.as_document())?;
-        debug!("Intent tree:\n{}", mml_to_string(&intent));
+        debug!("Intent tree:\n{}", mml_to_string(intent));
         let speech = crate::speech::speak_mathml(intent, "")?;
         // info!("Time taken: {}ms", instant.elapsed().as_millis());
         return Ok(speech);
@@ -330,7 +330,7 @@ pub fn get_navigation_braille() -> Result<String> {
                     // get the MathML node and wrap it inside of a <math> element
                     // if the offset is given, we need to get the character it references
                     if offset == 0 {
-                        if name(&found) == "math" {
+                        if name(found) == "math" {
                             Ok(found)
                         } else {
                             let new_mathml = create_mathml_element(&new_doc, "math");
@@ -342,10 +342,10 @@ pub fn get_navigation_braille() -> Result<String> {
                         bail!(
                             "Internal error: non-zero offset '{}' on a non-leaf element '{}'",
                             offset,
-                            name(&found)
+                            name(found)
                         );
                     } else if let Some(ch) = as_text(found).chars().nth(offset) {
-                        let internal_mathml = create_mathml_element(&new_doc, name(&found));
+                        let internal_mathml = create_mathml_element(&new_doc, name(found));
                         internal_mathml.set_text(&ch.to_string());
                         let new_mathml = create_mathml_element(&new_doc, "math");
                         new_mathml.append_child(internal_mathml);
@@ -355,7 +355,7 @@ pub fn get_navigation_braille() -> Result<String> {
                         bail!(
                             "Internal error: offset '{}' on leaf element '{}' doesn't exist",
                             offset,
-                            mml_to_string(&found)
+                            mml_to_string(found)
                         );
                     }
                 }
@@ -451,7 +451,7 @@ pub fn get_navigation_mathml() -> Result<(String, usize)> {
         return NAVIGATION_STATE.with(|nav_stack| {
             return match nav_stack.borrow_mut().get_navigation_mathml(mathml) {
                 Err(e) => Err(e),
-                Ok((found, offset)) => Ok((mml_to_string(&found), offset)),
+                Ok((found, offset)) => Ok((mml_to_string(found), offset)),
             };
         });
     });
@@ -499,27 +499,29 @@ pub fn get_navigation_node_from_braille_position(position: usize) -> Result<(Str
 /// Copy (recursively) the (MathML) element and return the new one.
 /// The Element type does not copy and modifying the structure of an element's child will modify the element, so we need a copy
 /// Convert the returned error from set_mathml, etc., to a useful string for display
-fn copy_mathml(mathml: Element) -> Element {
+pub fn copy_mathml(mathml: Element) -> Element {
     // If it represents MathML, the 'Element' can only have Text and Element children along with attributes
     let children = mathml.children();
-    let new_mathml = create_mathml_element(&mathml.document(), name(&mathml));
-    if is_leaf(mathml) {
-        mathml.attributes().iter().for_each(|attr| {
-            new_mathml.set_attribute_value(attr.name(), attr.value());
-        });
-        new_mathml.set_text(as_text(mathml));
-    } else {
-        let mut new_children = Vec::with_capacity(children.len());
-        for child in children {
-            let child = as_element(child);
-            let new_child = copy_mathml(child);
-            child.attributes().iter().for_each(|attr| {
-                new_child.set_attribute_value(attr.name(), attr.value());
-            });
-            new_children.push(new_child);
+    let new_mathml = create_mathml_element(&mathml.document(), name(mathml));
+    mathml.attributes().iter().for_each(|attr| {
+        new_mathml.set_attribute_value(attr.name(), attr.value());
+    });
+
+    // can't use is_leaf/as_text because this is also used with the intent tree
+    if children.len() == 1 {
+        if let Some(text) = children[0].text() {
+        new_mathml.set_text(text.text());
+        return new_mathml;
         }
-        new_mathml.append_children(new_children);
     }
+
+    let mut new_children = Vec::with_capacity(children.len());
+    for child in children {
+        let child = as_element(child);
+        let new_child = copy_mathml(child);
+        new_children.push(new_child);
+    }
+    new_mathml.append_children(new_children);
     return new_mathml;
 }
 
@@ -587,11 +589,20 @@ pub fn get_element(package: &Package) -> Element {
     return result.unwrap();
 }
 
+/// Get the intent after setting the MathML
+/// Used in testing
+#[allow(dead_code)]
+pub fn get_intent<'a>(mathml: Element<'a>, doc: Document<'a>) -> Result<Element<'a>> {
+    crate::speech::SPEECH_RULES.with(|rules|  rules.borrow_mut().read_files().unwrap());
+    let mathml = cleanup_mathml(mathml)?;
+    return crate::speech::intent_from_mathml(mathml, doc);
+}
+
 #[allow(dead_code)]
 fn trim_doc(doc: &Document) {
     for root_child in doc.root().children() {
         if let ChildOfRoot::Element(e) = root_child {
-            trim_element(&e);
+            trim_element(e, false);
         } else {
             doc.root().remove_child(root_child); // comment or processing instruction
         }
@@ -599,7 +610,7 @@ fn trim_doc(doc: &Document) {
 }
 
 /// Not really meant to be public -- used by tests in some packages
-pub fn trim_element(e: &Element) {
+pub fn trim_element(e: Element, allow_structure_in_leaves: bool) {
     // "<mtext>this is text</mtext" results in 3 text children
     // these are combined into one child as it makes code downstream simpler
 
@@ -609,9 +620,9 @@ pub fn trim_element(e: &Element) {
         static ref WHITESPACE_MATCH: Regex = Regex::new(r#"[ \u{0009}\u{000A}\u{000D}]+"#).unwrap();
     }
 
-    if is_leaf(*e) {
+    if is_leaf(e) && (!allow_structure_in_leaves || IsNode::is_mathml(e)) {
         // Assume it is HTML inside of the leaf -- turn the HTML into a string
-        make_leaf_element(*e);
+        make_leaf_element(e);
         return;
     }
 
@@ -619,7 +630,7 @@ pub fn trim_element(e: &Element) {
     for child in e.children() {
         match child {
             ChildOfElement::Element(c) => {
-                trim_element(&c);
+                trim_element(c, allow_structure_in_leaves);
             }
             ChildOfElement::Text(t) => {
                 single_text += t.text();
@@ -632,7 +643,7 @@ pub fn trim_element(e: &Element) {
     }
 
     // CSS considers only space, tab, linefeed, and carriage return as collapsable whitespace
-    if !(is_leaf(*e) || name(e) == "intent-literal" || single_text.is_empty()) {
+    if !(is_leaf(e) || name(e) == "intent-literal" || single_text.is_empty()) {
         // intent-literal comes from testing intent
         // FIX: we have a problem -- what should happen???
         // FIX: For now, just keep the children and ignore the text and log an error -- shouldn't panic/crash
@@ -664,7 +675,7 @@ pub fn trim_element(e: &Element) {
         for child in children {
             let child_text = match child {
                 ChildOfElement::Element(child) => {
-                    if name(&child) == "mglyph" {
+                    if name(child) == "mglyph" {
                         child.attribute_value("alt").unwrap_or("").to_string()
                     } else {
                         gather_text(child)
@@ -728,7 +739,7 @@ fn is_same_doc(doc1: &Document, doc2: &Document) -> Result<()> {
         match c1 {
             ChildOfRoot::Element(e1) => {
                 if let ChildOfRoot::Element(e2) = c2 {
-                    is_same_element(e1, e2)?;
+                    is_same_element(*e1, *e2)?;
                 } else {
                     bail!("child #{}, first is element, second is something else", i);
                 }
@@ -762,7 +773,7 @@ fn is_same_doc(doc1: &Document, doc2: &Document) -> Result<()> {
 /// returns Ok() if two Documents are equal or some info where they differ in the Err
 // Not really meant to be public -- used by tests in some packages
 #[allow(dead_code)]
-pub fn is_same_element(e1: &Element, e2: &Element) -> Result<()> {
+pub fn is_same_element(e1: Element, e2: Element) -> Result<()> {
     enable_logs();
     if name(e1) != name(e2) {
         bail!("Names not the same: {}, {}", name(e1), name(e2));
@@ -787,7 +798,7 @@ pub fn is_same_element(e1: &Element, e2: &Element) -> Result<()> {
         match c1 {
             ChildOfElement::Element(child1) => {
                 if let ChildOfElement::Element(child2) = c2 {
-                    is_same_element(child1, child2)?;
+                    is_same_element(*child1, *child2)?;
                 } else {
                     bail!("{} child #{}, first is element, second is something else", name(e1), i);
                 }
@@ -877,12 +888,12 @@ mod tests {
         let target_package = &parser::parse(target).expect("Failed to parse input");
         let target_doc = target_package.as_document();
         trim_doc(&target_doc);
-        debug!("target:\n{}", mml_to_string(&get_element(&target_package)));
+        debug!("target:\n{}", mml_to_string(get_element(&target_package)));
 
         let test_package = &parser::parse(test).expect("Failed to parse input");
         let test_doc = test_package.as_document();
         trim_doc(&test_doc);
-        debug!("test:\n{}", mml_to_string(&get_element(&test_package)));
+        debug!("test:\n{}", mml_to_string(get_element(&test_package)));
 
         match is_same_doc(&test_doc, &target_doc) {
             Ok(_) => return true,
@@ -953,12 +964,12 @@ mod tests {
         let package1 = &parser::parse(whitespace_str).expect("Failed to parse input");
         let doc1 = package1.as_document();
         trim_doc(&doc1);
-        debug!("doc1:\n{}", mml_to_string(&get_element(&package1)));
+        debug!("doc1:\n{}", mml_to_string(get_element(&package1)));
 
         let package2 = parser::parse(different_str).expect("Failed to parse input");
         let doc2 = package2.as_document();
         trim_doc(&doc2);
-        debug!("doc2:\n{}", mml_to_string(&get_element(&package2)));
+        debug!("doc2:\n{}", mml_to_string(get_element(&package2)));
 
         assert!(is_same_doc(&doc1, &doc2).is_err());
     }

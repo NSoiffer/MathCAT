@@ -94,14 +94,14 @@ fn normal_log() {
 #[test]
 fn simple_log_with_base() {
     let expr = "<math> <mrow>  <msub><mi>log</mi><mi>b</mi></msub><mi>x</mi></mrow> </math>";
-    test("fi", "ClearSpeak", expr, "log kanta b arvolla x");
+    test("fi", "ClearSpeak", expr, "log kanta b, arvolla x");
     
 }
 
 #[test]
 fn normal_log_with_base() {
     let expr = "<math><mrow><msub><mi>log</mi><mi>b</mi></msub><mrow><mo>(</mo><mrow><mi>x</mi><mo>+</mo><mi>y</mi></mrow><mo>)</mo></mrow></mrow></math>";
-    test("fi", "ClearSpeak", expr, "log kanta b arvolla, auki sulku x plus y, kiinni sulku");
+    test("fi", "ClearSpeak", expr, "log kanta b, arvolla, auki sulku x plus y, kiinni sulku");
 }
 
 #[test]
@@ -192,7 +192,7 @@ fn test_functions_none_pref_multiple_args() {
         <mi>B</mi> <mrow><mo>(</mo> <mrow> <mn>2</mn><mo>,</mo><mn>6</mn></mrow> <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("fi", "ClearSpeak_Functions", "None",expr,
-        "iso b kertaa, auki sulku 2 pilkku 6, kiinni sulku");
+        "iso b kertaa, auki sulku 2 pilkku, 6, kiinni sulku");
 }
 
 
@@ -231,7 +231,7 @@ fn no_times_sqrt() {
         <mo>=</mo>
         <msqrt> <mrow>  <mi>a</mi><mi>b</mi></mrow> </msqrt>
         </mrow></math>";
-    test("fi", "ClearSpeak", expr, "neliöjuuri a, neliöjuuri b; on yhtä suuri kuin, neliöjuuri a b,");
+    test("fi", "ClearSpeak", expr, "neliöjuuri a, neliöjuuri b; on yhtä suuri kuin, neliöjuuri a b");
 }
 
 #[test]
@@ -468,7 +468,7 @@ fn parens_interval_neg_infinity_to_infinity() {
         <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("fi", "ClearSpeak_Paren", "Interval ",expr,
-    "väli negatiivinen ääretön ääretön,");
+    "väli negatiivinen ääretön ääretön");
 }
 
 #[test]
@@ -479,5 +479,5 @@ fn parens_interval_neg_infinity_to_pos_infinity() {
     <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("fi", "ClearSpeak_Paren", "Interval ",expr,
-    "väli negatiivinen ääretön positiivinen ääretön,");
+    "väli negatiivinen ääretön positiivinen ääretön");
 }

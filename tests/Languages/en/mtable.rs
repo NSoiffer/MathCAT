@@ -12,8 +12,8 @@ fn matrix_1x1() {
         <mo>)</mo></mrow></mrow>
     </math>
                                 ";
-    test("en", "ClearSpeak",  expr, "the 1 by 1 matrix with entry 3;");
-    test("en", "SimpleSpeak", expr, "the 1 by 1 matrix with entry 3;");
+    test("en", "ClearSpeak",  expr, "the 1 by 1 matrix with entry 3");
+    test("en", "SimpleSpeak", expr, "the 1 by 1 matrix with entry 3");
 }
 
 #[test]
@@ -28,8 +28,8 @@ fn determinant_1x1() {
         <mo>|</mo></mrow></mrow>
     </math>
                                 ";
-    test("en", "ClearSpeak",  expr, "the 1 by 1 determinant with entry 3;");
-    test("en", "SimpleSpeak", expr, "the 1 by 1 determinant with entry 3;");
+    test("en", "ClearSpeak",  expr, "the 1 by 1 determinant with entry 3");
+    test("en", "SimpleSpeak", expr, "the 1 by 1 determinant with entry 3");
 }
 
 
@@ -52,8 +52,8 @@ fn matrix_1x2() {
       <mo>)</mo></mrow></mrow>
     </math>
                                 ";
-    test("en", "ClearSpeak",  expr, "the 1 by 2 row matrix; 3, 5;");
-    test("en", "SimpleSpeak", expr, "the 1 by 2 row matrix; 3, 5;");
+    test("en", "ClearSpeak",  expr, "the 1 by 2 row matrix; 3, 5");
+    test("en", "SimpleSpeak", expr, "the 1 by 2 row matrix; 3, 5");
 }
 
 
@@ -79,8 +79,8 @@ fn matrix_1x3() {
       <mo>)</mo></mrow></mrow>
     </math>
                                 ";
-    test("en", "ClearSpeak", expr, "the 1 by 3 row matrix; negative x, 5, 12;");
-    test("en", "SimpleSpeak", expr, "the 1 by 3 row matrix; negative x, 5, 12;");
+    test("en", "ClearSpeak", expr, "the 1 by 3 row matrix; negative x, 5, 12");
+    test("en", "SimpleSpeak", expr, "the 1 by 3 row matrix; negative x, 5, 12");
 }
 
 #[test]
@@ -107,8 +107,8 @@ fn matrix_2x1_not_simple() {
       <mo>)</mo></mrow></mrow>
     </math>
                                 ";
-    test("en", "ClearSpeak", expr, "the 2 by 1 column matrix; row 1; x plus 1; row 2; x minus 1;");
-    test("en", "SimpleSpeak", expr, "the 2 by 1 column matrix; row 1; x plus 1; row 2; x minus 1;");
+    test("en", "ClearSpeak", expr, "the 2 by 1 column matrix; row 1; x plus 1; row 2; x minus 1");
+    test("en", "SimpleSpeak", expr, "the 2 by 1 column matrix; row 1; x plus 1; row 2; x minus 1");
 }
 #[test]
 fn matrix_3x1_not_simple() {
@@ -147,11 +147,11 @@ fn matrix_3x1_not_simple() {
     test("en", "SimpleSpeak", expr, "the 3 by 1 column matrix; \
             row 1; x; \
             row 2; eigh; \
-            row 3; fraction, x over, x plus 1, end fraction;");
+            row 3; fraction, x over, x plus 1, end fraction");
     test("en", "ClearSpeak",  expr, "the 3 by 1 column matrix; \
             row 1; x; \
             row 2; eigh; \
-            row 3; the fraction with numerator x; and denominator x plus 1;");
+            row 3; the fraction with numerator x; and denominator x plus 1");
 }
 
 #[test]
@@ -180,8 +180,8 @@ fn determinant_2x2() {
         </mtable>
       <mo>|</mo></mrow></mrow>
                         </math>";
-    test("en", "ClearSpeak",  expr, "the 2 by 2 determinant; row 1; 2, 1; row 2; 7, 5;");
-    test("en", "SimpleSpeak", expr, "the 2 by 2 determinant; row 1; 2, 1; row 2; 7, 5;");
+    test("en", "ClearSpeak",  expr, "the 2 by 2 determinant; row 1; 2, 1; row 2; 7, 5");
+    test("en", "SimpleSpeak", expr, "the 2 by 2 determinant; row 1; 2, 1; row 2; 7, 5");
 }
 
 #[test]
@@ -217,8 +217,8 @@ fn matrix_2x3() {
       <mo>]</mo></mrow></mrow>
     </math>
                                 ";
-    test("en", "ClearSpeak",  expr, "the 2 by 3 matrix; row 1; 3, 1, 4; row 2; 0, 2, 6;");
-    test("en", "SimpleSpeak", expr, "the 2 by 3 matrix; row 1; 3, 1, 4; row 2; 0, 2, 6;");
+    test("en", "ClearSpeak",  expr, "the 2 by 3 matrix; row 1; 3, 1, 4; row 2; 0, 2, 6");
+    test("en", "SimpleSpeak", expr, "the 2 by 3 matrix; row 1; 3, 1, 4; row 2; 0, 2, 6");
 }
 
 #[test]
@@ -259,10 +259,10 @@ fn matrix_2x3_labeled() {
                                 ";
     test("en", "ClearSpeak",  expr,
         "the 2 by 3 matrix; row 1 with label (3.1); column 2; 3, column 3; 1, column 4; 4; \
-                                   row 2; column 1; 0, column 2; 2, column 3; 6;");
+                                   row 2; column 1; 0, column 2; 2, column 3; 6");
     test("en", "SimpleSpeak", expr,
         "the 2 by 3 matrix; row 1 with label (3.1); column 2; 3, column 3; 1, column 4; 4; \
-                                   row 2; column 1; 0, column 2; 2, column 3; 6;");
+                                   row 2; column 1; 0, column 2; 2, column 3; 6");
 }
 
 #[test]
@@ -290,8 +290,8 @@ fn matrix_3x1() {
         </mtable> <mo>]</mo></mrow></mrow>
     </math>
                                 ";
-    test("en", "ClearSpeak",  expr, "the 3 by 1 column matrix; 1; 2; 3;");
-    test("en", "SimpleSpeak", expr, "the 3 by 1 column matrix; 1; 2; 3;");
+    test("en", "ClearSpeak",  expr, "the 3 by 1 column matrix; 1; 2; 3");
+    test("en", "SimpleSpeak", expr, "the 3 by 1 column matrix; 1; 2; 3");
 }
 
 #[test]
@@ -325,8 +325,8 @@ fn matrix_4x1() {
       <mo>)</mo></mrow></mrow>
     </math>
                                 ";
-    test("en", "ClearSpeak",  expr, "the 4 by 1 column matrix; row 1; 3; row 2; 6; row 3; 1; row 4; 2;");
-    test("en", "SimpleSpeak", expr, "the 4 by 1 column matrix; row 1; 3; row 2; 6; row 3; 1; row 4; 2;");
+    test("en", "ClearSpeak",  expr, "the 4 by 1 column matrix; row 1; 3; row 2; 6; row 3; 1; row 4; 2");
+    test("en", "SimpleSpeak", expr, "the 4 by 1 column matrix; row 1; 3; row 2; 6; row 3; 1; row 4; 2");
 }
 
 #[test]
@@ -364,9 +364,9 @@ fn matrix_4x1_labeled() {
     </math>
                                 ";
     test("en", "ClearSpeak",  expr,
-        "the 4 by 1 column matrix; row 1; 3; row 2; 6; row 3; 1; row 4 with label (3.1); 2;");
+        "the 4 by 1 column matrix; row 1; 3; row 2; 6; row 3; 1; row 4 with label (3.1); 2");
     test("en", "SimpleSpeak", expr,
-        "the 4 by 1 column matrix; row 1; 3; row 2; 6; row 3; 1; row 4 with label (3.1); 2;");
+        "the 4 by 1 column matrix; row 1; 3; row 2; 6; row 3; 1; row 4 with label (3.1); 2");
 }
 
 #[test]
@@ -394,8 +394,8 @@ fn matrix_1x4() {
       <mo>)</mo></mrow></mrow>
     </math>
                                 ";
-    test("en", "ClearSpeak",  expr, "the 1 by 4 row matrix; column 1; 3, column 2; 6, column 3; 1, column 4; 2;");
-    test("en", "SimpleSpeak", expr, "the 1 by 4 row matrix; column 1; 3, column 2; 6, column 3; 1, column 4; 2;");
+    test("en", "ClearSpeak",  expr, "the 1 by 4 row matrix; column 1; 3, column 2; 6, column 3; 1, column 4; 2");
+    test("en", "SimpleSpeak", expr, "the 1 by 4 row matrix; column 1; 3, column 2; 6, column 3; 1, column 4; 2");
 }
 
 #[test]
@@ -469,12 +469,12 @@ fn matrix_4x4() {
           row 1; column 1; 0, column 2; 3, column 3; 4, column 4; 3; \
           row 2; column 1; 2, column 2; 1, column 3; 0, column 4; 9; \
           row 3; column 1; 3, column 2; 0, column 3; 2, column 4; 1; \
-          row 4; column 1; 6, column 2; 2, column 3; 9, column 4; 0;");
+          row 4; column 1; 6, column 2; 2, column 3; 9, column 4; 0");
     test("en", "SimpleSpeak", expr, "the 4 by 4 matrix; \
           row 1; column 1; 0, column 2; 3, column 3; 4, column 4; 3; \
           row 2; column 1; 2, column 2; 1, column 3; 0, column 4; 9; \
           row 3; column 1; 3, column 2; 0, column 3; 2, column 4; 1; \
-          row 4; column 1; 6, column 2; 2, column 3; 9, column 4; 0;");}
+          row 4; column 1; 6, column 2; 2, column 3; 9, column 4; 0");}
 
 #[test]
 fn matrix_4x2() {
@@ -524,13 +524,13 @@ fn matrix_4x2() {
               row 1; column 1; 1, column 2; 3; \
               row 2; column 1; 4, column 2; 2; \
               row 3; column 1; 2, column 2; 1; \
-              row 4; column 1; 0, column 2; 5;\
+              row 4; column 1; 0, column 2; 5\
     ");
     test("en", "SimpleSpeak", expr, "the 4 by 2 matrix; \
               row 1; column 1; 1, column 2; 3; \
               row 2; column 1; 4, column 2; 2; \
               row 3; column 1; 2, column 2; 1; \
-              row 4; column 1; 0, column 2; 5;\
+              row 4; column 1; 0, column 2; 5\
     ");}
 
 // put absolute value test here since it is related to determinate and is small for its own file
@@ -539,11 +539,11 @@ fn simple_absolute_value() {
   let expr = "<math>
     <mrow><mrow><mo>|</mo> <mi>x</mi> <mo>|</mo></mrow></mrow>
   </math>";
-  test("en", "SimpleSpeak", expr, "the absolute value of x,");
-  test("en", "ClearSpeak",  expr, "the absolute value of x,");
-  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse"), ("ClearSpeak_AbsoluteValue", "Auto")], expr, "absolute value of x,");
+  test("en", "SimpleSpeak", expr, "the absolute value of x");
+  test("en", "ClearSpeak",  expr, "the absolute value of x");
+  test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse"), ("ClearSpeak_AbsoluteValue", "Auto")], expr, "absolute value of x");
   test_prefs("en", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_AbsoluteValue", "AbsEnd")],
-             expr, "the absolute value of x, end absolute value,");
+             expr, "the absolute value of x, end absolute value");
 }
   
 #[test]
@@ -553,9 +553,9 @@ let expr = "<math>
       <mrow><mi>x</mi><mo>+</mo><mn>1</mn> </mrow>
     <mo>|</mo></mrow></mrow>
   </math>";
-  test("en", "ClearSpeak", expr, "the absolute value of x plus 1,");
+  test("en", "ClearSpeak", expr, "the absolute value of x plus 1");
   test_prefs("en", "ClearSpeak", vec![("Verbosity", "Terse"), ("ClearSpeak_AbsoluteValue", "AbsEnd")],
-             expr, "absolute value of x plus 1, end absolute value,");
+             expr, "absolute value of x plus 1, end absolute value");
 }
 
 #[test]
@@ -564,7 +564,7 @@ fn simple_cardinality_value() {
     <mrow><mrow><mo>|</mo> <mi>S</mi> <mo>|</mo></mrow></mrow>
   </math>";
   test_prefs("en", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_AbsoluteValue", "Cardinality")], expr,
-             "the cardinality of cap s,");
+             "the cardinality of cap s");
 }
   
 // Test preferences
@@ -587,7 +587,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>)</mo></mrow></mrow>
   </math>";
   test_ClearSpeak("en", "ClearSpeak_Matrix", "SpeakColNum",
-        expr, "the 2 by 2 matrix; row 1; column 1; 2, column 2; 1; row 2; column 1; 7, column 2; 5;");
+        expr, "the 2 by 2 matrix; row 1; column 1; 2, column 2; 1; row 2; column 1; 7, column 2; 5");
 }
 
 #[test]
@@ -610,7 +610,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>)</mo></mrow></mrow>
   </math>";
 test_ClearSpeak("en", "ClearSpeak_Matrix", "SpeakColNum",
-        expr, "the 3 by 1 column matrix; row 1; 1; row 2; 2; row 3; 3;");
+        expr, "the 3 by 1 column matrix; row 1; 1; row 2; 2; row 3; 3");
 }
 
 #[test]
@@ -627,7 +627,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>]</mo></mrow></mrow>
   </math>";
 test_ClearSpeak("en", "ClearSpeak_Matrix", "SpeakColNum",
-        expr, "the 1 by 2 row matrix; column 1; 1, column 2; 2;");
+        expr, "the 1 by 2 row matrix; column 1; 1, column 2; 2");
 }
 
 #[test]
@@ -645,8 +645,8 @@ let expr = "<math><mrow><mrow><mo>(</mo><mrow>
     </mtable>
     </mrow><mo>)</mo></mrow></mrow></math>";
 test_ClearSpeak("en", "ClearSpeak_Matrix", "SpeakColNum",
-        expr, "the 2 by 2 matrix; row 1; column 1; b sub 1 1, column 2; b sub 1 2; \
-                                                row 2; column 1; b sub 2 1, column 2; b sub 2 2;");
+        expr, "the 2 by 2 matrix; row 1; column 1; b sub 1 1; column 2; b sub 1 2; \
+                                                row 2; column 1; b sub 2 1; column 2; b sub 2 2");
 }
 
 
@@ -669,7 +669,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>)</mo></mrow></mrow>
   </math>";
   test_ClearSpeak("en", "ClearSpeak_Matrix", "SilentColNum",
-        expr, "the 2 by 2 matrix; row 1; 2, 1; row 2; 7, 5;");
+        expr, "the 2 by 2 matrix; row 1; 2, 1; row 2; 7, 5");
 }
 
 #[test]
@@ -692,7 +692,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>)</mo></mrow></mrow>
   </math>";
 test_ClearSpeak("en", "ClearSpeak_Matrix", "SilentColNum",
-        expr, "the 3 by 1 column matrix; 1; 2; 3;");
+        expr, "the 3 by 1 column matrix; 1; 2; 3");
 }
 
 #[test]
@@ -709,7 +709,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>]</mo></mrow></mrow>
   </math>";
 test_ClearSpeak("en", "ClearSpeak_Matrix", "SilentColNum",
-        expr, "the 1 by 2 row matrix; 1, 2;");
+        expr, "the 1 by 2 row matrix; 1, 2");
 }
 
 #[test]
@@ -727,8 +727,8 @@ let expr = "<math><mrow><mrow><mo>(</mo><mrow>
     </mtable>
     </mrow><mo>)</mo></mrow></mrow></math>";
 test_ClearSpeak("en", "ClearSpeak_Matrix", "SilentColNum",
-        expr, "the 2 by 2 matrix; row 1; b sub 1 1, b sub 1 2; \
-                                                row 2; b sub 2 1, b sub 2 2;");
+        expr, "the 2 by 2 matrix; row 1; b sub 1 1; b sub 1 2; \
+                                                row 2; b sub 2 1; b sub 2 2");
 }
 
 
@@ -809,8 +809,8 @@ let expr = "<math><mrow><mrow><mo>(</mo><mrow>
     </mtable>
     </mrow><mo>)</mo></mrow></mrow></math>";
 test_ClearSpeak("en", "ClearSpeak_Matrix", "EndMatrix",
-        expr, "the 2 by 2 matrix; row 1; column 1; b sub 1 1, column 2; b sub 1 2; \
-                                                row 2; column 1; b sub 2 1, column 2; b sub 2 2; end matrix");
+        expr, "the 2 by 2 matrix; row 1; column 1; b sub 1 1; column 2; b sub 1 2; \
+                                                row 2; column 1; b sub 2 1; column 2; b sub 2 2; end matrix");
 }
 
 
@@ -833,7 +833,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>)</mo></mrow></mrow>
   </math>";
   test_ClearSpeak("en", "ClearSpeak_Matrix", "Vector",
-        expr, "the 2 by 2 matrix; row 1; 2, 1; row 2; 7, 5;");
+        expr, "the 2 by 2 matrix; row 1; 2, 1; row 2; 7, 5");
 }
 
 #[test]
@@ -856,7 +856,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>)</mo></mrow></mrow>
   </math>";
 test_ClearSpeak("en", "ClearSpeak_Matrix", "Vector",
-        expr, "the 3 by 1 column vector; 1; 2; 3;");
+        expr, "the 3 by 1 column vector; 1; 2; 3");
 }
 
 #[test]
@@ -873,7 +873,7 @@ let expr = "<math display='block' xmlns='http://www.w3.org/1998/Math/MathML'>
     <mo>]</mo></mrow></mrow>
   </math>";
 test_ClearSpeak("en", "ClearSpeak_Matrix", "Vector",
-        expr, "the 1 by 2 row vector; 1, 2;");
+        expr, "the 1 by 2 row vector; 1, 2");
 }
 
 #[test]
@@ -891,8 +891,8 @@ let expr = "<math><mrow><mrow><mo>(</mo><mrow>
     </mtable>
     </mrow><mo>)</mo></mrow></mrow></math>";
 test_ClearSpeak("en", "ClearSpeak_Matrix", "Vector",
-        expr, "the 2 by 2 matrix; row 1; column 1; b sub 1 1, column 2; b sub 1 2; \
-                                                row 2; column 1; b sub 2 1, column 2; b sub 2 2;");
+        expr, "the 2 by 2 matrix; row 1; column 1; b sub 1 1; column 2; b sub 1 2; \
+                                                row 2; column 1; b sub 2 1; column 2; b sub 2 2");
 }
 
 
@@ -973,8 +973,8 @@ let expr = "<math><mrow><mrow><mo>(</mo><mrow>
     </mtable>
     </mrow><mo>)</mo></mrow></mrow></math>";
 test_ClearSpeak("en", "ClearSpeak_Matrix", "EndVector",
-        expr, "the 2 by 2 matrix; row 1; column 1; b sub 1 1, column 2; b sub 1 2; \
-                                                row 2; column 1; b sub 2 1, column 2; b sub 2 2; end matrix");
+        expr, "the 2 by 2 matrix; row 1; column 1; b sub 1 1; column 2; b sub 1 2; \
+                                                 row 2; column 1; b sub 2 1; column 2; b sub 2 2; end matrix");
 }
 
 
@@ -987,4 +987,98 @@ fn matrix_binomial() {
       </mrow><mo>)</mo>
     </math>";
   test_ClearSpeak("en", "ClearSpeak_Matrix", "Combinatorics", expr, "3 choose 2");
+}
+
+#[test]
+fn matrix_times() {
+  let expr = "<math>
+    <mfenced><mtable><mtr><mtd><mn>1</mn></mtd><mtd><mn>2</mn></mtd></mtr><mtr><mtd><mn>3</mn></mtd><mtd><mn>4</mn></mtd></mtr></mtable></mfenced>
+    <mfenced><mtable><mtr><mtd><mi>a</mi></mtd><mtd><mi>b</mi></mtd></mtr><mtr><mtd><mi>c</mi></mtd><mtd><mi>d</mi></mtd></mtr></mtable></mfenced>
+  </math>";
+  test("en", "SimpleSpeak", expr,
+    "the 2 by 2 matrix; row 1; 1, 2; row 2; 3, 4; times, the 2 by 2 matrix; row 1; eigh, b; row 2; c, d");
+}
+
+#[test]
+fn unknown_mtable_property() {
+  let expr = "<math display='block'>
+      <mtable intent=':system-of-equations:prefix($e1,$e1x)'>
+        <mtr arg='e1'>
+        <mtd columnalign='right'>
+          <mi>a</mi>
+        </mtd>
+        <mtd columnalign='center'>
+          <mo>=</mo>
+        </mtd>
+        <mtd intent='_($lhs)' columnalign='left'>
+          <mrow arg='lhs'>
+          <mi>b</mi>
+          <mo>+</mo>
+          <mi>c</mi>
+          <mo>&#x2212;</mo>
+          <mi>d</mi>
+        </mrow>
+        </mtd>
+        </mtr>
+        <mtr arg='e1x'>
+        <mtd intent='_' columnalign='right'></mtd>
+        <mtd intent='_' columnalign='center'></mtd>
+        <mtd arg='rhs' columnalign='left'>
+          <mo form='infix'>+</mo>
+          <mi>e</mi>
+          <mo>&#x2212;</mo>
+          <mi>f</mi>
+        </mtd>
+        </mtr>
+      </mtable>
+    </math>";
+    test("en", "ClearSpeak",  expr,
+         "2 lines, line 1; eigh is equal to, b plus c minus d; line 2; plus e minus f");
+}
+
+
+#[test]
+fn zero_matrix() {
+  let expr = "<math>
+      <mo>[</mo>
+      <mtable>
+        <mtr><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd></mtr>
+        <mtr><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd></mtr>
+      </mtable>
+      <mo>]</mo>
+  </math>";
+  test("en", "SimpleSpeak", expr,
+    "the 2 by 2 zero matrix");
+}
+
+#[test]
+fn identity_matrix() {
+  let expr = "<math>
+      <mo>(</mo>
+      <mtable>
+        <mtr><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd></mtr>
+        <mtr><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd></mtr>
+        <mtr><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd></mtr>
+      </mtable>
+      <mo>)</mo>
+  </math>";
+  test("en", "SimpleSpeak", expr,
+    "the 3 by 3 identity matrix");
+}
+
+#[test]
+fn diagonal_matrix() {
+  let expr = "<math>
+      <mo>(</mo>
+      <mtable>
+        <mtr><mtd><mn>2</mn></mtd><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd></mtr>
+        <mtr><mtd><mn>0</mn></mtd><mtd><mn>1</mn></mtd><mtd><mn>0</mn></mtd></mtr>
+        <mtr><mtd><mn>0</mn></mtd><mtd><mn>0</mn></mtd><mtd><msup><mi>x</mi><mn>2</mn></msup></mtd></mtr>
+      </mtable>
+      <mo>)</mo>
+  </math>";
+  test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")],
+      expr, "the 3 by 3 diagonal matrix; column 1; 2; column 2; 1; column 3; x squared");
+  // test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")],
+  //     expr, "the 3 by 3 diagonal matrix; row 1, column 1, 2; row 2, column 2, 1; row 3, column 3, x squared");
 }

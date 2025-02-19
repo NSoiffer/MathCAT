@@ -162,7 +162,7 @@ fn multiple_element_set() {
     let expr = "<math>
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-    test("fi", "SimpleSpeak", expr, "joukko 5 pilkku 10 pilkku 15");
+    test("fi", "SimpleSpeak", expr, "joukko 5 pilkku, 10 pilkku, 15");
 }
 
 #[test]
@@ -202,7 +202,7 @@ fn element_under_sum() {
             </mfrac>
         </math>";
     test("fi", "SimpleSpeak", expr,
-                    "summa yli i kuuluu kokonaisluvut; murtoluku, 1 per, i toiseen, loppu murtoluku;");
+                    "summa yli i kuuluu kokonaisluvut; murtoluku, 1 per, i toiseen, loppu murtoluku");
 }
 
 #[test]

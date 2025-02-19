@@ -71,8 +71,12 @@
                # speak "comma" when not adjacent to '…'
             - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
                # except if expression starts with '…'
-            - "../*[1][text()='…'] "
-        then: [T: "coma"]                       	# 	(en: 'comma', google translation)
+            - "../*[1][.='…'] "
+        then:
+        - T: "coma"                         # 	(en: 'comma', google translation)
+        - test:
+            if: "$Verbosity != Terse"
+            then: [pause: short]
         # else silent
 
  - "-": [T: "menos"]                            	#  0x2d	(en: 'minus')
@@ -235,7 +239,7 @@
             - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
-            - "../*[1][text()='…']"
+            - "../*[1][.='…']"
         then: [T: "puntos suspensivos"]          	# 	(en: 'dot dot dot', google translation)
         else_test:                              	#  must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"
@@ -301,11 +305,6 @@
          if: "$Verbosity!='Terse'"
          then: [T: "el"]                        	# 	(en: 'the', google translation)
      - T: "incremento"                          	# 	(en: 'laplacian of')
- - "∇":                                         	#  0x2207
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [T: "el"]                        	# 	(en: 'the', google translation)
-     - T: "gradiente de"                           	# 	(en: 'gradient of', google: 'gradiente de')
  - "∈":                                         	#  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"

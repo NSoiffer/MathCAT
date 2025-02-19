@@ -901,7 +901,6 @@ fn overparen() {
 
 #[test]
 fn vi_text1() {
-  init_logger();
     let expr = "<math><mtext>quyết giềng quá giệt hằng hỏi lỗi</mtext></math>";
     test_braille("Vietnam", expr, "⠟⠥⠔⠽⠣⠞⠀⠛⠊⠰⠣⠝⠛⠀⠟⠥⠔⠁⠀⠛⠊⠠⠣⠞⠀⠓⠰⠜⠝⠛⠀⠓⠢⠕⠊⠀⠇⠤⠹⠊");
 }

@@ -31,9 +31,9 @@ fn case_1() {
         </math>
    ";
     test("sv", "SimpleSpeak", expr, "f av x lika med; 3 fall, \
-                fall 1; minus 1 if x, är mindre än 0; \
+                fall 1; minus 1 if x; är mindre än 0; \
                 fall 2; 0 if x, lika med 0; \
-                fall 3; 1 if x, är större än 0;");
+                fall 3; 1 if x, är större än 0");
 }
 
 #[test]
@@ -72,6 +72,6 @@ fn equation_1() {
     </math>
    ";
     test("sv", "SimpleSpeak", expr, "2 ekvationer, \
-                ekvation 1; x plus y, lika med, 7; \
-                ekvation 2; 2 x plus 3 y, lika med, 17;");
+                ekvation 1; x plus y lika med 7; \
+                ekvation 2; 2 x plus 3 y; lika med 17");
 }

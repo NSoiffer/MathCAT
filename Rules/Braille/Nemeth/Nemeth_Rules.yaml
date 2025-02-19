@@ -68,8 +68,8 @@
 - name: linear-mixed-number
   tag: mrow
   match:
-     - "preceding-sibling::*[1][self::m:mo][text()='\u2064'] and" # preceding element is invisible plus
-     - "*[2][self::m:mo][text() = '/']" # not really needed because invisible plus added only if true, but checking
+     - "preceding-sibling::*[1][self::m:mo][.='\u2064'] and" # preceding element is invisible plus
+     - "*[2][self::m:mo][.='/']" # not really needed because invisible plus added only if true, but checking
   replace:
      - t: "⠸⠹"
      - x: "*"
@@ -78,7 +78,7 @@
 - name: common-fraction-mixed-number
   tag: mfrac
   match:
-     - "preceding-sibling::*[1][self::m:mo][text()='\u2064'] and" # preceding element is invisible plus
+     - "preceding-sibling::*[1][self::m:mo][.='\u2064'] and" # preceding element is invisible plus
      - "*[1][self::m:mn][not(contains(., '.'))]   and"
      - "*[2][self::m:mn][not(contains(., '.'))]"
   replace:
@@ -211,7 +211,7 @@
   tag: mrow
   match:
      - "( IsBracketed(., '', '|') or IsBracketed(., '', '‖') or IsBracketed(., '', '⦀') ) and " # ends with single, double, or triple vertical bar
-     - "following-sibling::*[1][self::m:mo and text()='\u2062'] and"
+     - "following-sibling::*[1][self::m:mo and .='\u2062'] and"
      - "(  following-sibling::*[2][IsBracketed(., '|', '')] or " # starts with ... vertical bar
      - "   following-sibling::*[2][IsBracketed(., '‖', '')] or "
      - "   following-sibling::*[2][IsBracketed(., '⦀', '')] "
@@ -309,11 +309,11 @@
   # Note: ASCII "~" has been canonicalized to occur only in a diacritical position
   name: prefix-tilde
   tag: mo
-  match: "text()='∼' and not(preceding-sibling::*) and parent::m:mrow"
+  match: ".='∼' and not(preceding-sibling::*) and parent::m:mrow"
   replace:
   - x: "text()"
   - test:    # if there is a following tilde, it is buried in an mrow
-      if: "following-sibling::*[1][name(.)='mrow' and *[1][text()='∼']]"
+      if: "following-sibling::*[1][name(.)='mrow' and *[1][.='∼']]"
       then: [t: "m"]     # add multipurpose indicator (177_9)
 
 - # In the default rule below, we insert multipurpose indicators between chars -- don't do that for dashes (others???)
@@ -508,7 +508,7 @@
      # we include ∑ and ∏ because Nemeth uses the look-alike Greek letters for them, and hence considers the large ops to be Greek letters
    - BaseOkForNumericScript: "*[1][BaseNode(.)[
             (self::m:mi and (string-length()=1 or @data-chem-element or IsInDefinition(., 'Braille', 'FunctionNames'))) or
-            (self::m:mo and (text()='∑' or text()='∏'))]
+            (self::m:mo and (.='∑' or .='∏'))]
           ]"
    match: "*[2][self::m:mn] and ($NewScriptContext = '') and $BaseOkForNumericScript"
    replace:
@@ -609,7 +609,7 @@
    - OldScriptContext: "$NewScriptContext"
    # we include ∑ and ∏ because Nemeth uses the look-alike Greek letters for them, and hence considers the large ops to be Greek letters
    - BaseOkForNumericScript: "*[1][BaseNode(.)[(self::m:mi and (string-length()=1 or IsInDefinition(., 'Braille', 'FunctionNames'))) or
-                                               (self::m:mo and (text()='∑' or text()='∏'))]]"
+                                               (self::m:mo and (.='∑' or .='∏'))]]"
    # computing the number of postscripts is messy because of <mprescripts> being optionally present -- we use "mod" to get the count right
    - Prescripts: "m:mprescripts/following-sibling::*"
    - NumChildren: "count(*)"       # need to stash this since the count is wrong inside '*[...]' below
@@ -690,9 +690,9 @@
       - with:
           variables:
           - IsNumericSubscript: "$Postscripts[1][self::m:mn] and $NewScriptContext = '' and $BaseOkForNumericScript"
-          - IsPrimeSuperscript: "$Postscripts[2][self::m:mo][text()='′' or text()='″' or text()='‴' or text()='⁗']"
+          - IsPrimeSuperscript: "$Postscripts[2][self::m:mo][.='′' or .='″' or .='‴' or .='⁗']"
           # chem 5.3.1 says some superscripts come first (u2B96 is proposed char for standard state) -- not enough to trigger chemistry we look for the '∆'
-          - IsSuperscriptFirst: "$Postscripts[2][self::m:mo][text()='°' or text()='\u2B96' or text()='″' or text()='*' or text()='⋆'] and *[1]/*[1]='∆'"
+          - IsSuperscriptFirst: "$Postscripts[2][self::m:mo][.='°' or .='\u2B96' or .='″' or .='*' or .='⋆'] and *[1]/*[1]='∆'"
           replace:
           - test:
             - if: "$IsPrimeSuperscript"
@@ -839,7 +839,7 @@
 -
    name: contracted-form # NFB Lesson 12.5.1.b
    tag: munder
-   match: "*[1][(self::m:mi or self::m:mn or self::m:mtext) and string-length(text())=1] and *[2][text()='¯']"
+   match: "*[1][(self::m:mi or self::m:mn or self::m:mtext) and string-length(text())=1] and *[2][.='¯']"
    replace:
    - x: "*[1]"
    - t: "⠩⠱"
@@ -847,7 +847,7 @@
 -
    name: contracted-form #rule 86.b
    tag: mover
-   match: "*[1][(self::m:mi or self::m:mn or self::m:mtext) and string-length(text())=1] and *[2][text()='¯']"
+   match: "*[1][(self::m:mi or self::m:mn or self::m:mtext) and string-length(text())=1] and *[2][.='¯']"
    replace:
    - x: "*"
 
@@ -856,7 +856,7 @@
    tag: mover
    match:
    - "*[1][self::m:mn and string-length(text())=1 and translate(.,'1234567890', '') = ''] and"  # digit as base
-   - "*[2][self::m:mo and text()='˙']"                                                           # dot above
+   - "*[2][self::m:mo and .='˙']"                                                           # dot above
    variables:
    - OldOverContext: "$NewOverContext"
    - NewOverContext: "concat($NewOverContext, '⠣')"
@@ -865,14 +865,14 @@
       if: "not(preceding-sibling::*[2][
                self::m:mover and
                *[1][self::m:mn and string-length(text())=1 and translate(.,'1234567890', '') = ''] and
-               *[2][self::m:mo and text()='˙']])" 
+               *[2][self::m:mo and .='˙']])" 
       then: [t: "m"]            # first one
    - x: "*[1]"
    - test:   # '2' -- skip over added invisible times
       if: "not(following-sibling::*[2][
                self::m:mover and
                *[1][self::m:mn and string-length(text())=1 and translate(.,'1234567890', '') = ''] and
-               *[2][self::m:mo and text()='˙']])"
+               *[2][self::m:mo and .='˙']])"
       then:            # last one
       - x: "$NewOverContext"
       - x: "*[2]"

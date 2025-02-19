@@ -202,7 +202,7 @@ fn element_under_sum() {
             </mfrac>
         </math>";
     test("zh-tw", "SimpleSpeak", expr,
-                    "和 下層 i 屬於 整數集 項目; 分數 i 平方, 分之 1 結束分數;");
+                    "和 下層 i 屬於 整數集 項目; 分數 i 平方, 分之 1 結束分數");
 }
 
 #[test]
