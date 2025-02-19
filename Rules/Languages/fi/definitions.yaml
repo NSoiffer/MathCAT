@@ -17,18 +17,18 @@
 - IntentMappings: {
     "indexed-by": "infix= ; ala; loppu ala",
     "modified-variable": "silent= ",
-    "say-super": "infix=yli: yläindeksi: yläindeksi",   # used with 'mo' for superscripts (e.g, "<")
+    "say-super": "infix=ylä: yläindeksi: yläindeksi",   # used with 'mo' for superscripts (e.g, "<")
     "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
-
+ 
     "absolute-value": "function= ; itseisarvo; loppu itseisarvo",
-    "binomial": "infix=binomial; yli; end binomial",
+    "binomial": "infix=binomi; yli; loppu binomi",
     "limit": "prefix=raja-arvo: raja-arvo kun: raja-arvo kun",
-    "lim-sup": "prefix=lim sup as: the limit superior as: the limit superior as",
-    "lim-inf": "prefix=lim inf as: the limit inferior as : the limit inferior as",
+    "lim-sup": "prefix=supremum: supremum: supremum",
+    "lim-inf": "prefix=infimum: infimum : infimum",
     "logarithm-with-base": "prefix=log kanta",
     "minus": "infix=miinus || prefix=negatiivinen",
     "plus": "infix=plus || prefix=positiivinen",
-
+ 
     "transpose": "postfix=transpoosi || function=transpoosi",
     "norm": "function=; normi; loppu normi",
     "trace": "function=;jälki; loppu jälki",
@@ -36,40 +36,39 @@
     "homomorphism": "function= ; homomorfismi; loppu homomorfismi",
     "kernel": "function= ; ydin; loppu ydin",
     "vector": "function= ; vektori || prefix=vektori",
-    "cross-product": "infix=cross: cross product: cross product",
-    "dot-product": "infix=dot: dot product: dot:dot product",
-
-    "divergence": "function= ; div: divergence: divergence; end divergence",
-    "curl": "function= ; curl; end curl",
-    "gradient": "function= ; grad: gradient: gradient; end gradient",
-    "laplacian": "function=lahplahsian",   # speech engines don't do a good job with "laplacian"
+    "cross-product": "infix=risti: ristitulo: ristitulo",
+    "dot-product": "infix=piste: pistetulo: piste:pistetulo",
+ 
+    "divergence": "function= ; div: divergenssi: divergenssi; loppu divergenssi",
+    "curl": "function= ; roottori; loppu roottori",
+    "gradient": "function= ; grad: gradientti: gradientti; loppu gradientti",
+    "laplacian": "function=laplasen",   # speech engines don't do a good job with "laplacian"
   }
-
+ 
 - NavigationParts: {
-    "large-op": "base, lower limit, upper limit",
-    "mfrac": "numerator;denominator",
-    "fraction": "numerator;denominator",
-    "msqrt": "root",
-    "square-root": "root",
-    "mroot": "root;root index",
-    "root": "root;root index",
-    "msub": "base;subscript",
-    "sub": "base;subscript",
-    "msup": "base;superscript",
-    "say-super": "base;superscript",
-    "skip-super": "base;superscript",
-    "power": "base;exponent",
-    "msubsup": "base;subscript;superscript",
-    "munder": "base;under limit",
-    "mover": "base;upper limit",
-    "munderover": "base;under limit;upper limit",
-
+    "large-op": "kanta; alaraja; yläraja",
+    "mfrac": "osoittaja;nimittäjä",
+    "fraction": "osoittaja;nimittäjä",
+    "msqrt": "juuri",
+    "square-root": "juuri",
+    "mroot": "juuri;juuren indeksi",
+    "root": "juuri;juuren indeksi",
+    "msub": "kanta;alaindeksi",
+    "sub": "kanta;alaindeksi",
+    "msup": "kanta;yläindeksi",
+    "say-super": "kanta;yläindeksi",
+    "skip-super": "kanta;yläindeksi",
+    "power": "kanta;eksponentti",
+    "msubsup": "kanta;alaindeksi;yläindeksi",
+    "munder": "kanta;alla",
+    "mover": "kanta;yllä",
+    "munderover": "kanta;alla;yllä",
+ 
     # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
     # it's a hack to put them here, but at least they are grouped with the other navigation parts
-    "in": "in",
-    "out": "out of",
+    "in": "sisään",
+    "out": "ulos",
   }
-
 
 - SIPrefixes: {
     "Q": "kvetta", "R": "ronna", "Y": "jotta", "Z": "tsetta", "E": "eksa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hehto", "da": "deka",
