@@ -45,7 +45,7 @@
   }
 
 - NavigationParts: {
-    "large-op": "bas, undre gräns, övre gräns",
+    "large-op": "bas; undre gräns; övre gräns",
     "mfrac": "täljare;nämnare",
     "fraction": "täljare;nämnare",
     "msqrt": "rot",
