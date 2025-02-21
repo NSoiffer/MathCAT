@@ -100,7 +100,8 @@ impl Preferences{
         prefs.insert("CapitalLetters_Pitch".to_string(), Yaml::Real("0.0".to_string()));
         prefs.insert("CapitalLetters_Beep".to_string(), Yaml::Boolean(false));
         prefs.insert("IntentErrorRecovery".to_string(), Yaml::String("IgnoreIntent".to_string()));    // also Error
-        prefs.insert("CheckRuleFiles".to_string(), Yaml::String("Prefs".to_string()));    // avoid checking for rule files being changed (40% speedup!) (All, Prefs, None)
+        prefs.insert("CheckRuleFiles".to_string(), Yaml::String(
+                    (if cfg!(target_family = "wasm") {"None"} else {"Prefs"}).to_string()));    // avoid checking for rule files being changed (40% speedup!) (All, Prefs, None)
         return Preferences{ prefs };
     }
 
@@ -734,6 +735,9 @@ impl PreferenceManager {
                 self.set_speech_files(&language_dir, changed_value, None)?
             },
             "SpeechStyle" => {
+                if changed_value == "MathSpeak" {
+                    self.reset_files_from_preference_change("BrailleCode", "Nemeth")?;
+                }
                 let language = self.pref_to_string("Language");
                 let language = if language.as_str() == "Auto" {"en"} else {language.as_str()};       // avoid 'temp value dropped while borrowed' error
                 self.set_style_file(&language_dir, language, changed_value)?
