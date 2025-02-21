@@ -100,7 +100,8 @@ impl Preferences{
         prefs.insert("CapitalLetters_Pitch".to_string(), Yaml::Real("0.0".to_string()));
         prefs.insert("CapitalLetters_Beep".to_string(), Yaml::Boolean(false));
         prefs.insert("IntentErrorRecovery".to_string(), Yaml::String("IgnoreIntent".to_string()));    // also Error
-        prefs.insert("CheckRuleFiles".to_string(), Yaml::String("Prefs".to_string()));    // avoid checking for rule files being changed (40% speedup!) (All, Prefs, None)
+        prefs.insert("CheckRuleFiles".to_string(), Yaml::String(
+                    (if cfg!(target_family = "wasm") {"None"} else {"Prefs"}).to_string()));    // avoid checking for rule files being changed (40% speedup!) (All, Prefs, None)
         return Preferences{ prefs };
     }
 
