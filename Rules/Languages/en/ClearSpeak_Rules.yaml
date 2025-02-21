@@ -696,7 +696,7 @@
   tag: mo
   match:
   - ".='⁡' and $ClearSpeak_Functions = 'None' and"
-  - "not(preceding-sibling::*[1][IsInDefinition(., 'TrigFunctionNames')])" # Functions=None does not apply to "trig" functions
+  - "not(preceding-sibling::*[1][IsInDefinition(., 'Speech', 'TrigFunctionNames')])" # Functions=None does not apply to "trig" functions
   replace:
     test:
       if: "$ClearSpeak_ImpliedTimes = 'None'"
