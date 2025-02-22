@@ -129,8 +129,9 @@ fn equation_none() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "None", expr, "\
-                2, x plus y, is equal to 7; \
+   test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "None", expr,
+        "2 lines; \
+                x plus y, is equal to 7; \
                 2 x plus 3 y; is equal to 17");
 }
 

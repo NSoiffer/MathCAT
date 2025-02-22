@@ -637,14 +637,14 @@
   - NextLineIsContinuedRow: "false()"   # default value
   - IsColumnSilent: true()
   replace:
-  - x: "$LineCount"
   - test:
     - if: $ClearSpeak_MultiLineOverview = 'Auto'
       then:
+      - x: "$LineCount"
       - test:
         - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
           then: [t: "case"]      # phrase(this is the first 'case' of three cases)
-        - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line' or $ClearSpeak_MultiLineLabel = 'None'" # already dealt with Auto/Case
           then: [t: "line"]      # phrase(this is the first 'line' of three lines)
         - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
           then: [t: "constraint"]      # phrase(this is the first 'constraint' of three constraints)
@@ -656,7 +656,7 @@
           then: [t: "step"]      # phrase(this is the first 'step' of three steps)
           # else 'None -- don't say anything'
       - test:
-        - if: "$LineCount != 1 and $ClearSpeak_MultiLineLabel != 'None'"
+        - if: "$LineCount != 1"
           then: [ct: "s"] # plural      # phrase(shown by the letter 's')
       - pause: short
   - x: "*"
@@ -668,7 +668,7 @@
   variables: [NextLineIsContinuedRow: "following-sibling::*[1][contains(@data-intent-property, ':continued-row:')]"]
   replace:
   - test:
-      if: "not($LineCount=1 or contains(@data-intent-property, ':continued-row:'))"
+      if: "not($LineCount=1 or $ClearSpeak_MultiLineLabel='None' or contains(@data-intent-property, ':continued-row:'))"
       then:
       - test:
         - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
@@ -685,13 +685,15 @@
           then: [t: "step"]      # phrase(this is a 'step' by step process)
           # else 'None -- don't say anything'
       - x: "count(preceding-sibling::*[not(contains(@data-intent-property, ':continued-row:'))]) + 1"
+      - test:
+          if: "self::m:mlabeledtr"
+          then:
+          - t: "with label"      # phrase(the diagram is complete 'with label')
+          - x: "*[1]/*"
   - test:
-      if: "$ClearSpeak_MultiLineLabel != 'None' and self::m:mlabeledtr"
-      then:
-      - t: "with label"      # phrase(the diagram is complete 'with label')
-      - x: "*[1]/*"
-  - test:
-      if: "not(contains(@data-intent-property, ':continued-row:'))"
+    - if: "$ClearSpeak_MultiLineLabel='None'"
+      then: [pause: long, pause: long]   # need a very long pause with no line labels
+    - else_if: "not(contains(@data-intent-property, ':continued-row:'))"
       then: [pause: medium]
   - test:
       if: "self::m:mlabeledtr"
