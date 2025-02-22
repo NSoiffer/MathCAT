@@ -680,13 +680,14 @@
   - test:
       if: "$ClearSpeak_MultiLineLabel != 'None'"
       then:
-      - x: "count(preceding-sibling::*)+1"
-      - test:
-          if: .[self::m:mlabeledtr]
-          then:
-          - t: "with label"      # phrase(the item 'with label' complete)
-          - x: "*[1]/*"
-      - pause: medium
+  - test:
+      if: .[self::m:mlabeledtr]
+      then:
+      - t: "with label"      # phrase(the diagram is complete 'with label')
+      - x: "*[1]/*"
+  - test:
+      if: "not(contains(@data-intent-property, ':continued-row:'))"
+      then: [pause: medium]
   - test:
       if: .[self::m:mlabeledtr]
       then: [x: "*[position()>1]"]

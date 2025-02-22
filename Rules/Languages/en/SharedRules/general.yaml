@@ -482,7 +482,6 @@
           then: [t: "equation"] # phrase('equation' 1 of 10 equations)
           else: [t: "line"]     # phrase('line 1 of 10 lines)
       - x: "count(preceding-sibling::*[not(contains(@data-intent-property, ':continued-row:'))]) + 1"
-
   - test:
       if: .[self::m:mlabeledtr]
       then:
