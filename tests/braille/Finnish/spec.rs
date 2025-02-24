@@ -1253,6 +1253,7 @@ fn p41_function_with_parts_with_arrow() {
     test_braille("Finnish", expr, "⠋⠒⠀⠭⠀⠤⠱ ⠫⠤⠼⠁⠂⠀⠭⠀⠣⠶⠀⠤⠼⠁⠀⠐⠐⠀⠭⠬⠀⠖⠼⠃⠀⠭⠂⠀⠤⠼⠁⠀⠣⠀⠭⠀⠣⠶⠀⠼⠁⠀⠐⠐⠀⠤⠭⠀⠖⠼⠉⠂⠀⠭⠀⠱⠀⠼⠁⠻");
 }
 
+#[test]
 // Two 5-dots separate the rows in the 2D math. Format: [whitespace][dot 5][dot 5][whitespace]. This is not an operator.
 fn function_with_parts() {
   let expr = "<math>
@@ -1592,7 +1593,7 @@ fn p50_cube_root() {
 
 #[test]
 fn p50_binomial_with_factorial() {
-    let expr = "<math>
+    let expr = r#"<math>
   <mrow>
     <mrow>
       <mo>(</mo>
@@ -1622,7 +1623,7 @@ fn p50_binomial_with_factorial() {
       </mrow>
     </mfrac>
   </mrow>
-</math>";
+</math>"#;
     test_braille("Finnish", expr, "⠦⠼⠋⠯⠀⠼⠙⠴⠀⠶⠼⠋⠠⠲⠀⠌⠷⠼⠙⠠⠲⠀⠦⠼⠋⠀⠤⠼⠙⠠⠴⠠⠲⠾");
 }
 
@@ -1727,19 +1728,19 @@ fn p51_set_with_closure() {
 #[test]
 fn p51_normal_distribution() {
     let expr = "<math>
-  <mrow>
-    <mi>p</mi>
-    <mo>~</mo>
-  </mrow>
-  <mrow>
-    <mi>N</mi>
-    <mo>(</mo>
-    <mn>58</mn>
-    <mo>,</mo>
-    <mn>2</mo>
-    <mo>)</mo>
-  </mrow>
-</math>";
+      <mrow>
+        <mi>p</mi>
+        <mo>~</mo>
+      </mrow>
+      <mrow>
+        <mi>N</mi>
+        <mo>(</mo>
+        <mn>58</mn>
+        <mo>,</mo>
+        <mn>2</mn>
+        <mo>)</mo>
+      </mrow>
+    </math>";
     test_braille("Finnish", expr, "⠏⠀⠨⠶⠠⠝⠦⠼⠑⠓⠂⠀⠼⠃⠴");
 }
 
