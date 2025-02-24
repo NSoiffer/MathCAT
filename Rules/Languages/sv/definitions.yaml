@@ -20,53 +20,53 @@
     "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
 
     "absolute-value": "function= ; absolutbeloppet; slut absolutbelopp",
-    "binomial": "infix=binomial; över; end binomial",
+    "binomial": "infix=binomial; över; slut binomial",
     "limit": "prefix=gränsvärdet då",
-    "lim-sup": "prefix=lim sup as: the limit superior as: the limit superior as",
-    "lim-inf": "prefix=lim inf as: the limit inferior as : the limit inferior as",
+    "lim-sup": "prefix=lim sup då: övre gränsvärdet då: det övre gränsvärdet då", 
+    "lim-inf": "prefix=lim inf då: undre gränsvärdet då : det undre gränsvärdet då", 
     "logarithm-with-base": "prefix=logg bas: logaritmen med bas: logaritmen med bas",
     "minus": "infix=minus || prefix=minus",
     "plus": "infix=plus || prefix=positivt",
 
     "transpose": "postfix=transponat || function=transponat",
     "norm": "function=; normen; slut norm",
-    "trace": "function=;spåret; slut spåret",
-    "dimension": "function=; dimensionen; slut dimensionen",
+    "trace": "function=;spåret; slut spår",
+    "dimension": "function=; dimensionen; slut dimension",
     # "homomorphism": "function= ; homomorfism; slut homomorfism",                                # doesn't fit function pattern
     # "kernel": "function= ; noll-rummet : noll-rummet till: noll-rummet till; slut noll-rummet", # doesn't fit function pattern
     "vector": "function= ; vektor: vektorn: vektorn || prefix=vektor: vektorn: vektorn",
-    "cross-product": "infix=cross: cross product: cross product",
-    "dot-product": "infix=dot: dot product: dot:dot product",
+    "cross-product": "infix=kryss: kryssprodukt: kryssprodukt",
+    "dot-product": "infix=skalärt: skalärprodukt: skalärprodukt",
 
-    "divergence": "function= ; div: divergence: divergence; end divergence",
-    "curl": "function= ; curl; end curl",
-    "gradient": "function= ; grad: gradient: gradient; end gradient",
-    "laplacian": "function=lahplahsian",   # speech engines don't do a good job with "laplacian"
+    "divergence": "function= ; div: divergens: divergens; slut divergens",
+    "curl": "function= ; rotation; slut rotation",
+    "gradient": "function= ; grad: gradient: gradient; slut gradient",
+    "laplacian": "function=laplacian",   # speech engines don't do a good job with "laplacian" (swedish ones might)
   }
 
 - NavigationParts: {
-    "large-op": "base; lower limit; upper limit",
-    "mfrac": "numerator;denominator",
-    "fraction": "numerator;denominator",
-    "msqrt": "root",
-    "square-root": "root",
-    "mroot": "root;root index",
-    "root": "root;root index",
-    "msub": "base;subscript",
-    "sub": "base;subscript",
-    "msup": "base;superscript",
-    "say-super": "base;superscript",
-    "skip-super": "base;superscript",
-    "power": "base;exponent",
-    "msubsup": "base;subscript;superscript",
-    "munder": "base;under limit",
-    "mover": "base;upper limit",
-    "munderover": "base;under limit;upper limit",
+    "large-op": "bas; undre gräns; övre gräns",
+    "mfrac": "täljare;nämnare",
+    "fraction": "täljare;nämnare",
+    "msqrt": "rot",
+    "square-root": "rot",
+    "mroot": "rot;rot index",
+    "root": "rot;rot index",
+    "msub": "bas;nedre index",
+    "sub": "bas;nedre index",
+    "msup": "bas;övre index",
+    "say-super": "bas;upphöjt",
+    "skip-super": "bas;upphöjt",
+    "power": "bas;exponent",
+    "msubsup": "bas;nedre index;övre index",
+    "munder": "bas;undre gräns",
+    "mover": "bas;övre gräns",
+    "munderover": "bas;undre gräns;övre gräns",
 
     # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
     # it's a hack to put them here, but at least they are grouped with the other navigation parts
-    "in": "in",
-    "out": "out of",
+    "in": "i",
+    "out": "ut ur",
   }
 
 - SIPrefixes: {

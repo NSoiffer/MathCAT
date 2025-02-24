@@ -85,9 +85,9 @@ fn tensor_mmultiscripts() {
             <mi>R</mi> <mi>i</mi><none/> <none/><mi>j</mi> <mi>k</mi><none/> <mi>l</mi><none/> 
         </mmultiscripts></math>";
     test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-            "versal r med 4 höger índex, nedsänkt i upphöjt j nedsänkt k nedsänkt l");
+            "versal r med 4 höger index, nedsänkt i upphöjt j nedsänkt k nedsänkt l");
     test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
-            "versal r med 4 höger índex, nedsänkt i upphöjt j nedsänkt k nedsänkt l");
+            "versal r med 4 höger index, nedsänkt i upphöjt j nedsänkt k nedsänkt l");
 }
 
 #[test]
@@ -97,7 +97,7 @@ fn huge_num_mmultiscripts() {
             <mprescripts/> <mi>I</mi><none/> <none/><mi>J</mi> <mi>K</mi><none/> <mi>L</mi><none/>
         </mmultiscripts></math>";
     test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-            "versal r med 4 vänster index, nedsänkt versal i, upphöjt versal j och resterande vänster index versal k none versal l none slut vänster index och med 5 höger índex, nedsänkt i upphöjt j nedsänkt k nedsänkt l och resterande höger index m none slut index");
+            "versal r med 4 vänster index, nedsänkt versal i, upphöjt versal j och resterande vänster index versal k none versal l none slut vänster index och med 5 höger index, nedsänkt i upphöjt j nedsänkt k nedsänkt l och resterande höger index m none slut index");
 }
 
 #[test]
