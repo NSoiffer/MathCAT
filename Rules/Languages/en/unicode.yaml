@@ -287,16 +287,17 @@
  - "‖": [t: "double vertical line"]                # 0x2016
  - "…":                                          # 0x2026
     test:
-        if:
-            - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
-               # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
-               # speak '…' as 'and so on...' unless expr starts with '…'
-            - "../*[1][.='…']"
+      - if: "$SpeechStyle = 'MathSpeak' or ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+        then: [t: "ellipsis"]
+      - else_if:
+        - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
+            # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
+            # speak '…' as 'and so on...' unless expr starts with '…'
+        - "../*[1][.='…']"
         then: [t: "dot dot dot"]
-        else_test:  # must have $ClearSpeak_Ellipses = 'AndSoOn'
-            if: "count(following-sibling::*) = 0"
-            then: [t: "and so on"]
-            else: [t: "and so on up to"]
+      - else_if: "count(following-sibling::*) = 0"  # must have $ClearSpeak_Ellipses = 'AndSoOn'
+        then: [t: "and so on"]
+        else: [t: "and so on up to"]
 
  - "⁡":                                          # 0x2061
     - test:
