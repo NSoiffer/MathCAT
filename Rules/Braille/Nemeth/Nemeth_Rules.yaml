@@ -94,7 +94,7 @@
 - name: default
   tag: mfrac
   match: "."
-  variables: [NestingChars: "NestingChars(., '⠠')"]
+  variables: [NestingChars: "NestingChars(., 'Braille', '⠠')"]
   replace:
      - x: $NestingChars # start fraction indicator(s)
      - t: "⠹"

@@ -342,7 +342,6 @@ fn mn_with_block_and_decimal_separators() {
 
 #[test]
 fn divergence() {
-  init_logger();
   let expr = "<math><mo>&#x2207;</mo><mo>&#xB7;</mo><mi mathvariant='normal'>F</mi></math>";                                       // may want to change this for another language
   test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "dihv cap f");
   test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr, "divergence of cap f");

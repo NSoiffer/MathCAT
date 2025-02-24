@@ -31,4 +31,5 @@ mod chemistry;
 mod alphabets;
 mod intent;
 mod mtable;
+mod mathspeak;
 

@@ -1,0 +1,1032 @@
+---
+-
+  name: whitespace-omission
+  tag: "!*"
+  match: "not(self::m:math) and not($MatchingWhitespace) and (@data-previous-space-width >= 0.7 or @data-following-space-width >= 0.7)"
+  replace:
+   - with:
+      variables: [MatchingWhitespace: "true()"]
+      replace:
+      - test:
+        - if: "@data-previous-space-width > 1.1"
+          then: [t: "fill in the blank"]
+
+-
+   name: omission-intent
+   tag: "!*"
+   match: "contains(@intent, ':blank')"
+   replace: 
+   - t: "fill in the blank"
+
+-
+   name: default
+   tag: [msqrt, square-root]
+   match: "."
+   replace:
+   - x: $NewRadicalContext # start root indicator(s)
+   - x: "IfThenElse($Verbosity='Terse', 'root ', 'start root')"
+   - with:
+      variables: [NewRadicalContext: "concat($NewRadicalContext, IfThenElse($Verbosity='Verbose', 'nested ', 'nest '))"]
+      replace: [x: "*[1]"]
+   - x: $NewRadicalContext # end root indicator(s)
+   - t: "end root"
+
+-
+   name: default
+   tag: [mroot, root]
+   match: "."
+   replace:
+   - x: $NewRadicalContext # start root indicator(s)
+   - x: "IfThenElse($Verbosity='Terse', 'index ', 'root index')"
+   - x: "*[2]"
+   - x: "IfThenElse($Verbosity='Terse', 'root ', 'start root')"
+   - with:
+      variables: [NewRadicalContext: "concat($NewRadicalContext, IfThenElse($Verbosity='Verbose', 'nested ', 'nest '))"]
+      replace: [x: "*[1]"]
+   - x: $NewRadicalContext # end root indicator(s)
+   - t: "end root"
+
+
+# Fraction rules
+# The fraction part of a mixed number is always simple
+# They also differ because a two character sequence is needed to bracket the fraction
+# The invisible plus should produce an empty string
+
+
+- name: common-fraction
+  # The numerator must be an integer in the range of 1 to 9 the denominator must be an integer in the range of 1 to 99.
+  tag: fraction
+  match:
+  - "*[1][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or text()<10)]   and"
+  - "*[2][self::m:mn][not(contains(., '.')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<100))]"
+  variables: [IsPlural: "*[1]!=1"]
+  replace:
+  - x: "*[1]"
+  - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
+# Mixed numbers can also use linear form. E.g., 3 1/2
+- name: linear-mixed-number
+  tag: mrow
+  match:
+     - "preceding-sibling::*[1][self::m:mo][.='\u2064'] and" # preceding element is invisible plus
+     - "*[2][self::m:mo][.='/']" # not really needed because invisible plus added only if true, but checking
+  replace:
+     - t: "⠸⠹"
+     - x: "*"
+     - t: "⠸⠼"
+
+- name: common-fraction-mixed-number
+  tag: [mfrac, fraction]
+  match:
+     - "preceding-sibling::*[1][self::m:mo][.='\u2064'] and" # preceding element is invisible plus
+     - "*[1][self::m:mn][not(contains(., '.'))]   and"
+     - "*[2][self::m:mn][not(contains(., '.'))]"
+  replace:
+     - t: "⠸⠹"
+     - x: "*[1]"
+     - test:
+          if: "@bevelled"
+          then: [t: "⠸⠌"]
+          else: [t: "⠌"]
+     - x: "*[2]"
+     - t: "⠸⠼"
+
+- name: default
+  tag: [mfrac, fraction]
+  match: "."
+  replace:
+  - x: "NestingChars(., 'Speech', IfThenElse($Verbosity='Terse', 'nest 0', 'start '))"
+  - x: "IfThenElse($Verbosity='Verbose',
+          'start fraction',
+          IfThenElse($Verbosity='Medium','start frac', 'frac'))"
+  - x: "*[1]"
+  - x: "NestingChars(., 'Speech', IfThenElse($Verbosity='Terse', 'nest 0', 'over '))"
+  - t: "over"
+  - x: "*[2]"
+  - x: "NestingChars(., 'Speech', IfThenElse($Verbosity='Terse', 'nest 0', 'end '))"
+  - x: "IfThenElse($Verbosity='Verbose', 'end fraction', 'end frac' )"
+
+- name: binomial-table
+  tag: mrow
+  match: "IsBracketed(., '(', ')') and *[2][self::m:mtable][count(*)=2 and count(*[1])=1] and contains(@intent, 'binomial(')"
+  replace:
+     - x: "*[1]"
+     - x: "*[2]/*[1]/*[1]/*[1]"
+     - t: "⠩"
+     - x: "*[2]/*[2]/*[1]/*[1]"
+     - x: "*[3]"
+
+#
+# Matrix/Determinant rules
+# matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
+# we don't do spatial layout, instead the beginning/ending of each row uses the enlarged bracketing chars
+- 
+   name: default-matrix
+   tag: mrow
+   variables:
+   - RowStart: "*[1]"
+   - RowEnd: "*[3]"
+   match:
+   - "*[2][self::m:mtable] and"
+   - (IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))
+   replace:
+   - test:
+      if: "count(*[2]/*) > 1"
+      then: [t: "⠠"]
+   - x: "*[1]"       # open paren, etc  -- no space is used between this and the first row entry
+   - x: "*[2]"
+   - test:
+      if: "count(*[2]/*) > 1"
+      then: [t: "⠠"]
+   - x: "*[3]"       # close paren, etc  -- no space is used between this and the last row entry
+
+-
+   name: default-mtable
+   tag: mtable
+   match: "."
+   replace: [x: "*"]
+
+-
+   name: default
+   tag: [mtr, mlabeledtr]
+   match: "."
+   replace:
+   - test:
+      if: "preceding-sibling::*"
+      then: [t: "W⣍"]     # github.com/NSoiffer/MathCAT/issues/43#issuecomment-1297048039
+   - test:
+      if: .[self::m:mlabeledtr]
+      then: [x: "*[position()>1]"]
+      else: [x: "*"]
+   - test:              # put row label at end so it doesn't interfere with column counts
+      if: .[self::m:mlabeledtr]
+      then:
+      - t: "⠗⠕⠺W⠇⠁⠃⠑⠇⠸⠒" # "row label:"   # FIX: what should be used?
+      - x: "*[1]/*" # contents of row label
+
+-
+   name: default
+   tag: mtd
+   match: "."
+   replace:
+   - test:
+      if: "preceding-sibling::*"
+      then: [t: "W"]
+   - test:
+      if: "*"
+      then: [x: "*"]
+      else: [t: "W"]  # put something out so the reader can tell there was a column
+
+- 
+   name: no-content
+   tag: math
+   match: "not(*)" # empty
+   replace: [t: "W"] # not sure that is right, but this shouldn't happen
+
+- name: binomial-frac
+  tag: mrow
+  match: "IsBracketed(., '(', ')') and *[2][self::m:mfrac][@linethickness=0]"
+  replace:
+     - x: "*[1]"
+     - x: "*[2]/*[1]"
+     - t: "⠩"
+     - x: "*[2]/*[2]"
+     - x: "*[3]"
+
+- name: vertical bars
+  # 177.vii requires a multipurpose indicator between consecutive vertical bars
+  tag: mrow
+  match:
+     - "( IsBracketed(., '', '|') or IsBracketed(., '', '‖') or IsBracketed(., '', '⦀') ) and " # ends with single, double, or triple vertical bar
+     - "following-sibling::*[1][self::m:mo and .='\u2062'] and"
+     - "(  following-sibling::*[2][IsBracketed(., '|', '')] or " # starts with ... vertical bar
+     - "   following-sibling::*[2][IsBracketed(., '‖', '')] or "
+     - "   following-sibling::*[2][IsBracketed(., '⦀', '')] "
+     - ")"
+  replace:
+     - x: "*"
+     - t: "m"
+
+
+# this is a weird case of Rule 82b -- adding a multipurpose indicator between staggered scripts
+# normally this happens for a script inside of a script.
+# in this rare case (ex: {NH_2}^+), the base of the doesn't have bracketing chars, so the script is at the end and the rule applies
+- name: last-is-script
+  tag: mrow
+  match: "(parent::m:msub or parent::m:msup) and *[last()][self::m:msub or self::m:msup]"
+  replace:
+  - x: "*"
+  - t: "m"
+
+# triple bonds have a special two char code (chem 2.5.4)
+# it would be more efficient to put this on ":", but only outputting for one of the chars is hard
+# note: "⋮⋮" (another form of triple bond) is handled in the Unicode file
+- name: chemistry-colon-triple-bond
+  tag: mrow
+  match: "count(*)=5 and *[2][@data-chemical-bond and .=':'] and *[3][.=':'] and *[4][.=':']" # could test the others for being bonds
+  replace:
+  - x: "*[1]"
+  - t: "⠨⠹"
+  - x: "*[5]"
+
+# rule 57 -- there is no way to get this rule completely right because some require knowing what the omitted symbol should to get spacing right (e.g., 57(3): "7×2?14") 
+#  Here we pick off cases that seem likely and doable
+#  Note: '?' is sometimes used with mover/munder and '=' or other chars, so we need to make sure the parent is mrow
+- name: omissions
+  tag: [mo, mtext]
+  match:
+  - "((.='?' or .='-?-') and parent::*[1][self::m:mrow]) or .='\u00A0'"
+  variables:
+  # guess whether this needs spacing or not
+  - IsComparisonOp: "not(
+        preceding-sibling::*[1][self::m:mo] or
+        following-sibling::*[1][self::m:mo]
+      )"
+  replace:
+  # "?" is punctuation and so won't get spaced, but the omission symbols should get spacing if it is a comparison operators. Here we test and add it in.
+  - test:
+      if: "$IsComparisonOp"
+      then: [t: "W"]
+  - t: "⠿"
+  - test:
+      if: "$IsComparisonOp"
+      then: [t: "W"]
+
+- name: omissions
+  tag: menclose
+  match: "*[1][.='?'] and (@notation='bottom' or @notation='box')"
+  replace: [t: "⠿"]
+
+
+- # add space after these ops when they are prefix operators
+  # note: other shapes are <mi>s and canonicalization turns them into function calls (which will include spaces after them)
+  name: prefix-geometry-ops
+  tag: mo
+  match:
+     - "..[self::m:mrow and count(*) = 2] and not(preceding-sibling::*) and"
+     - "IsInDefinition(., 'Braille', 'GeometryPrefixOperators')"
+  replace:
+     - x: "text()"
+     - t: "w"
+
+- # In Nemeth code "∼" can be a prefix *operator* or an infix comparison -- they have different spacing. We catch the prefix version here
+  # Note: ASCII "~" has been canonicalized to occur only in a diacritical position
+  name: prefix-tilde
+  tag: mo
+  match: ".='∼' and not(preceding-sibling::*) and parent::m:mrow"
+  replace:
+  - x: "text()"
+  - test:    # if there is a following tilde, it is buried in an mrow
+      if: "following-sibling::*[1][name(.)='mrow' and *[1][.='∼']]"
+      then: [t: "m"]     # add multipurpose indicator (177_9)
+
+- name: default
+  tag: mstyle
+  match: "."
+  replace:
+     - test:
+          if: "*"
+          then: [x: "*"]
+          # else do nothing -- no content
+
+-
+  # primes don't get a superscript indicator
+  name: squared-or-cubed
+  tag: [msup, power]
+  match: "*[2][self::m:mn][.=2 or .=3]"
+  replace:
+  - x: "*[1]"
+  - test:
+      if: "*[2][.=2]"
+      then: [t: "squared"]
+      else: [t: "cubed"]
+  
+
+-
+   # primes don't get a superscript indicator
+  name: skip-super
+  tag: msup
+  match: "*[2][self::m:mo][string-length(.)=1 and translate(., '′″‴⁗', '')='']"
+  replace:
+  - x: "*"
+
+-
+  # primes don't get a superscript indicator
+  name: chem-skip-super
+  tag: msup
+  match: "@data-chem-formula and *[2][self::m:mo][string-length(.)=1 and translate(., '∙•', '')='']"
+  replace:
+  - x: "*"
+
+-
+  # chemistry rule -- multiple charges (e.g., "--") are brailled as 'count charge' (e.g., "2-")
+  # because it is chemistry, we simplify the rule knowing it is on the baseline
+  name: chem-charge
+  tag: msup
+  match: "@data-chem-formula and 
+          *[2][@ data-chem-formula and (self::m:mrow or self::m:mi or self::m:mtext) and (translate(., '+', '') = '' or translate(., '-', '') = '')]"
+  replace:
+  - x: "*[1]"
+  - t: "↑"
+  - test:
+      if: "*[2][self::m:mrow]"
+      then:
+      - x: "count(*[2]/*)"
+      - x: "*[2]/*[1]"
+      else:      # mi or mtext
+      - x: "string-length(*[2])"
+      - x: "substring(*[2],1,1)"
+  - t: "b"
+
+-
+  name: default
+  tag: [msup, power]
+  match: "."
+  variables:
+  - OldScriptContext: "$NewScriptContext"
+
+  # primes don't get a superscript indicator -- sometimes (e.g., WIRIS) prime is in an mrow (see 83_b_2)
+  # here, we peel off the first prime -- the hack won't work if there are multiple primes, but that is HIGHLY unlikely
+  - PrimeHack: "*[2][self::m:mrow]/*[1][self::m:mo and .='′' or .='″' or .='‴' or .='⁗']"
+  replace:
+  - x: "*[1]"
+  - with:
+      variables: [NewScriptContext: "concat($OldScriptContext, IfThenElse($Verbosity='Verbose', 'super ', 'soup '))"]
+      replace:
+      - test:
+          if: "$PrimeHack"
+          then:
+          - x: "*[2]/*[1]"
+          - x: "$NewScriptContext"
+          - x: "*[2]/*[position()>1]"
+          else:
+          - x: "IfThenElse($Verbosity='Verbose', concat($OldScriptContext, 'superscript'), $NewScriptContext)"
+          - x: "*[2]"
+  - test:
+      # emit level indicator if something follows or the closest non-mrow is an element with a close tag [80(a)]
+      # if: "count(following-sibling::*) > 0 or ancestor::*[name() != 'mrow'][1]/.[self::m:mfrac or self::m:msqrt or self::m:mroot]"
+      # if: "not( (parent::m:msubsup and count(following-sibling::*)=1) or 
+      #     following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
+      # then_test:
+      #     if: "$OldScriptContext != ''"
+      #     then: [x: "$OldScriptContext"]
+      #     else_test:
+      #         # if: "not( parent::*[self::m:msubsup] )" # msupsup will generate baseline indicator
+      #         if: "EdgeNode(., 'right', '2D')/@id = @id"
+      #         then: [x: "IfThenElse($Verbosity='Verbose', 'baseline', 'base')"]
+      if: "EdgeNode(., 'right', '2D')/@id = @id"
+      then_test:
+          if: "$NewScriptContext !=''"
+          then: [x: "$NewScriptContext"]
+          else: [x: "IfThenElse($Verbosity='Verbose', 'baseline', 'base')"]
+
+-
+  # From the chemistry guide, move the state from the subscript to after the script (5.3.2)
+  # Because this is chemistry, we know the scripts are at level 1
+  name: subscript-is-state
+  tag: msubsup
+  match: "*[2][@data-chem-state or (IsBracketed(., '(', ')') and *[2][@data-chem-state])]"
+  replace:
+  - x: "*[1]"
+  - t: "↑"
+  - x: "*[3]"
+  - t: "b"   # chemistry -- returning to baseline
+  - test:
+      if: "*[2][@data-chem-state]"
+      then:   # add the parens -- I didn't see this case in the chemistry guidelines, but this follows their idea
+      - t: "("
+      - x: "*[2]"
+      - t: ")"
+      else:
+      - x: "*[2]"
+
+-
+  # implement rule 77 -- simple numeric (non-nested) subscript: don't use a subscript indicator
+  #   must be a subscript at level 1
+  # also rule 177.3 for multipurpose indicator (might be removed)
+  name: numeric-sub
+  tag: [msub, indexed-by]
+  variables:
+    # we include ∑ and ∏ because Nemeth uses the look-alike Greek letters for them, and hence considers the large ops to be Greek letters
+  - BaseOkForNumericScript: "*[1][BaseNode(.)[
+          (self::m:mi and (string-length()=1 or @data-chem-element or IsInDefinition(., 'Braille', 'FunctionNames'))) or
+          (self::m:mo and (.='∑' or .='∏'))]
+        ]"
+  match: "*[2][self::m:mn] and ($NewScriptContext = '') and $BaseOkForNumericScript"
+  replace:
+  - x: "*"
+  - test:
+      # emit level indicator if something follows or the closest non-mrow is an element with a close tag [80(a)]
+      if: "EdgeNode(., 'right', '2D')/@id = @id"
+      then_test:
+          if: "$NewScriptContext !=''"
+          then: [x: "$NewScriptContext"]
+          else: [x: "IfThenElse($Verbosity='Verbose', 'baseline', 'base')"]
+
+- name: default
+  tag: [msub, indexed-by]
+  match: "."
+  variables: [OldScriptContext: "$NewScriptContext"]
+  replace:
+  - x: "*[1]"
+  - with:
+      variables: [NewScriptContext: "concat($OldScriptContext, IfThenElse($Verbosity='Verbose', 'subscript ', 'sub '))"]
+      replace:
+      - x: "$NewScriptContext"
+      - x: "*[2]"
+      - test:
+          # emit level indicator if something follows or the closest non-mrow is an element with a close tag [80(a)]
+          if: "EdgeNode(., 'right', '2D')/@id = @id"
+          then_test:
+              if: "$OldScriptContext !=''"
+              then: [x: "$OldScriptContext"]
+              else: [x: "IfThenElse($Verbosity='Verbose', 'baseline', 'base')"]
+
+- # primes don't get a superscript indicator and come before the subscript
+  name: skip-super
+  tag: msubsup
+  variables:
+  - OldScriptContext: "$NewScriptContext"
+  - PrimeHack: "*[3][self::m:mrow]/*[1][self::m:mo and translate(., '′″‴⁗', '')='']"
+  match: "*[3][self::m:mo][translate(., '′″‴⁗', '')=''] or $PrimeHack or
+          @data-chem-formula and *[2][self::m:mo][string-length(.)=1 and translate(., '∙•', '')='']"
+  replace:
+  - x: "*[1]"
+  - test:
+      if: "$PrimeHack"
+      then: [x: "*[3]/*[1]"]
+      else: [x: "*[3]"]
+  - test:
+      if: "*[2][self::m:mn] and ($NewScriptContext = '') and *[1][BaseNode(.)[self::m:mi]]"
+      then:
+      - x: "*[2]"
+      - test:
+          if: "count(following-sibling::*) > 0 and not($NewScriptContext)"
+          then: [t: "M"]
+      else:
+      - with:
+          variables: [NewScriptContext: "concat($OldScriptContext, '↓')"]
+          replace:
+          - x: "$NewScriptContext"
+          - x: "*[2]"
+  - test:
+      if: "$PrimeHack"
+      then:
+      - with:
+          variables: [NewScriptContext: "concat($OldScriptContext, '↑')"]
+          replace:
+          - x: "$NewScriptContext"
+          - x: "*[3]/*[position()>1]"
+  - test:
+      # emit level indicator if something follows or the closest non-mrow is an element with a close tag [80(a)]
+      if: "not( (parent::m:msubsup and count(following-sibling::*)=1) or following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]] )" # first child is likely invisible times
+      then_test:
+          if: "$OldScriptContext != ''"
+          then: [x: "$OldScriptContext"]
+          else: [t: "b"]
+
+-
+  # Implement rules 75 - 83 for some general cases 
+  # In general, we need to keep track of how we got to that script and put out the indicator(s)
+  #   E.g, x^k_i has super, sub indicators in front of the 'i')
+  # In general, the subscript comes before the superscript
+  # After the last script, we need to indicate the initial script level except in certain cases
+  # Exceptions to the above:
+  #  primes always come before the subscript
+  #  numeric subscripts associated with "simple" bases don't get a subscript indicator and hence don't need to reestablish the script level
+  #   they do need a multipurpose indicator afterwards though so a following number isn't confused with the subscript (177.iiiG)
+  #   subsequent rust code will eliminate unneeded multipurpose indicators
+  # Prescripts differ from the above in the following ways:
+  #   they need to establish their level before each prescript
+  #   the number subscript simplification doesn't apply to prescripts
+  # There is (currently) no way in MathCAT to deal with n-ary arguments other than "all" ('*') or an individual entry ('*[1]').
+  #   Here we support up to 2 prescripts and up to 4 postscripts -- that should cover all reasonable cases
+  #   If there are more, we just dump them out without regard to sup/super :-(
+  #   Using variables makes the ugly code smaller/simpler
+  name: default
+  tag: [msubsup, mmultiscripts]
+  match: "."
+  variables:
+  - OldScriptContext: "$NewScriptContext"
+  # we include ∑ and ∏ because Nemeth uses the look-alike Greek letters for them, and hence considers the large ops to be Greek letters
+  - BaseOkForNumericScript: "*[1][BaseNode(.)[(self::m:mi and (string-length()=1 or IsInDefinition(., 'Braille', 'FunctionNames'))) or
+                                              (self::m:mo and (.='∑' or .='∏'))]]"
+  # computing the number of postscripts is messy because of <mprescripts> being optionally present -- we use "mod" to get the count right
+  - Prescripts: "m:mprescripts/following-sibling::*"
+  - NumChildren: "count(*)"       # need to stash this since the count is wrong inside '*[...]' below
+  - Postscripts: "*[position()>1 and position() < (last() + ($NumChildren mod 2) -count($Prescripts))]"
+  replace:
+  - test:  # prescripts first
+      if: "$Prescripts"
+      then:
+      - test:
+          if: "not($Prescripts[1][self::m:none])"
+          then:
+          - with:
+              variables:
+              - OldScriptContext: "$NewScriptContext"
+              - NewScriptContext: "concat($OldScriptContext, '↓')"
+              replace:
+              - test:
+                # avoid repeating level indicator
+                  if: "not($Prescripts[1][self::m:mmultiscripts])" 
+                  then: [x: "$NewScriptContext"]
+              - x: "$Prescripts[1]"
+      - test:
+          if: "not($Prescripts[2][self::m:none])"
+          then:
+          - with:
+              variables: [NewScriptContext: "concat($OldScriptContext, '↑')"]
+              replace:
+              - test:
+                # avoid repeating level indicator or putting one out if a chemistry dot
+                  if: "not($Prescripts[2][self::m:mmultiscripts or
+                          (self::m:mo and @data-chem-formula-op and string-length(.)=1 and translate(., '∙•', '')='') ])" 
+                  then: [x: "$NewScriptContext"]
+              - x: "$Prescripts[2]"
+      - test:
+        - if: "$Prescripts[1][self::m:none] and $Prescripts[2][self::m:mo and @data-chem-formula-op and string-length(.)=1 and translate(., '∙•', '')='']"
+          then: []  # do nothing
+        - else_if: "$OldScriptContext != ''"
+          then: [x: "$OldScriptContext"]
+          else: [t: "b"]
+      - test:
+          if: "count($Prescripts) > 2"    # second set of prescripts
+          then:
+          - test:
+              if: "not($Prescripts[3][self::m:none])"
+              then:
+              - with:
+                  variables:
+                  - OldScriptContext: "$NewScriptContext"
+                  - NewScriptContext: "concat($OldScriptContext, '↓')"
+                  replace:
+                  - test:
+                      if: "not($Prescripts[3][self::m:mmultiscripts])" # avoid repeating level indicator
+                      then: [x: "$NewScriptContext"]
+                  - x: "$Prescripts[3]"
+          - test:
+              if: "not($Prescripts[4][self::m:none])"
+              then:
+              - with:
+                  variables: [NewScriptContext: "concat($OldScriptContext, '↑')"]
+                  replace:
+                  - test:
+                      if: "not($Prescripts[4][self::m:mmultiscripts])" # avoid repeating level indicator
+                      then: [x: "$NewScriptContext"]
+                  - x: "$Prescripts[4]"
+          - test:
+              if: "count($Prescripts) > 4"   # give up and just dump them out so at least the content is there
+              then: [x: "$Prescripts[position() > 4]"]
+          - test:
+              if: "$OldScriptContext != ''"    # indicate the level of the base of the mmultiscripts
+              then: [x: "$OldScriptContext"]
+              else: [t: "b"]
+
+  - t: "M" # multipurpose indicator prevents the 'letter digit' substitution (177.2) from kicking in
+  - x: "*[1]"
+  - test:
+      if: "$Postscripts"
+      then:
+      - with:
+          variables:
+          - IsNumericSubscript: "$Postscripts[1][self::m:mn] and $NewScriptContext = '' and $BaseOkForNumericScript"
+          - IsPrimeSuperscript: "$Postscripts[2][self::m:mo][.='′' or .='″' or .='‴' or .='⁗']"
+          # chem 5.3.1 says some superscripts come first (u2B96 is proposed char for standard state) -- not enough to trigger chemistry we look for the '∆'
+          - IsSuperscriptFirst: "$Postscripts[2][self::m:mo][.='°' or .='\u2B96' or .='″' or .='*' or .='⋆'] and *[1]/*[1]='∆'"
+          replace:
+          - test:
+            - if: "$IsPrimeSuperscript"
+              then: [x: "$Postscripts[2]"]
+            - else_if: "$IsSuperscriptFirst"
+              then:
+              - with:
+                  variables:
+                  - NewScriptContext: "concat($OldScriptContext, '↑')"
+                  replace:
+                  - x: "$NewScriptContext"
+                  - x: "$Postscripts[2]"
+          - test:
+            - if: "$IsNumericSubscript"
+              then:
+              - t: "M"    # prevent 177.2 (see regex replacement MULTI_177_2 in code)
+              - x: "$Postscripts[1]"
+            - else_if: "not($Postscripts[1][self::m:none])"
+              then:
+              - with:
+                  variables:
+                  - OldScriptContext: "$NewScriptContext"
+                  - NewScriptContext: "concat($OldScriptContext, '↓')"
+                  replace:
+                  - x: "$NewScriptContext"
+                  - x: "$Postscripts[1]"
+          - test:
+              if: "not($IsPrimeSuperscript or $IsSuperscriptFirst or $Postscripts[2][self::m:none])"
+              then_test:
+                  if: "$Postscripts[2][self::m:mo and @data-chem-formula-op and string-length(.)=1 and translate(., '∙•', '')='']"
+                  then: [x: "$Postscripts[2]"]
+                  else:
+                  - with:
+                      variables:
+                      - OldScriptContext: "$NewScriptContext"
+                      - NewScriptContext: "concat($OldScriptContext, '↑')"
+                      replace:
+                      - x: "$NewScriptContext"
+                      - x: "$Postscripts[2]"
+          - test:
+              if: "count($Postscripts) > 2"
+              then:
+              - with:
+                  variables:
+                  # generate a numeric shortcut if previous was only a prime 
+                  - IsNumericSubscript2: "$IsPrimeSuperscript and $Postscripts[1][self::m:none] and
+                                          $Postscripts[3][self::m:mn] and $NewScriptContext = '' and $BaseOkForNumericScript"
+                  replace:
+                  - test:
+                      # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts
+                      # The exception is if there was only a prime and/or we used a numeric shortcut for the first script pair or for here
+                      if: "not( ($Postscripts[1][self::m:none] and $IsPrimeSuperscript) or
+                                $Postscripts[2][self::m:mo and @data-chem-formula-op and string-length(.)=1 and translate(., '∙•', '')=''])"
+                      then: [t: "b"]
+                  - test:
+                      if: "not($Postscripts[3][self::m:none])"
+                      then:
+                      - test:
+                          if: "$IsNumericSubscript2"
+                          then: [x: "$Postscripts[3]"]    # numeric shortcut -- note 177.2 can't happen because must be a prime symbol before the number
+                          else:
+                          - with:
+                              variables:
+                              - OldScriptContext: "$NewScriptContext"
+                              - NewScriptContext: "concat($OldScriptContext, '↓')"
+                              replace:
+                              - x: "$NewScriptContext"
+                              - x: "$Postscripts[3]"
+                  - test:
+                      if: "not($Postscripts[4][self::m:none])"
+                      then:
+                      - with:
+                          variables:
+                          - OldScriptContext: "$NewScriptContext"
+                          - NewScriptContext: "concat($OldScriptContext, '↑')"
+                          replace:
+                          - x: "$NewScriptContext"
+                          - x: "$Postscripts[4]"
+              - test:
+                  if: "count($Postscripts) > 4"
+                  then:
+                  - t: "b"
+                  - test:
+                      if: "not($Postscripts[5][self::m:none])"
+                      then:
+                      - with:
+                          variables:
+                          - OldScriptContext: "$NewScriptContext"
+                          - NewScriptContext: "concat($OldScriptContext, '↓')"
+                          replace:
+                          - x: "$NewScriptContext"
+                          - x: "$Postscripts[5]"
+                  - test:
+                      if: "not($Postscripts[6][self::m:none])"
+                      then:
+                      - with:
+                          variables:
+                          - OldScriptContext: "$NewScriptContext"
+                          - NewScriptContext: "concat($OldScriptContext, '↑')"
+                          replace:
+                          - x: "$NewScriptContext"
+                          - x: "$Postscripts[6]"
+                  - test:
+                      if: "count($Postscripts) > 6"
+                      then:
+                      - t: "b"    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (assumes one of sub/super is not 'none')
+                      - test:
+                          if: "not($Postscripts[7][self::m:none])"
+                          then:
+                          - with:
+                              variables:
+                              - OldScriptContext: "$NewScriptContext"
+                              - NewScriptContext: "concat($OldScriptContext, '↓')"
+                              replace:
+                              - x: "$NewScriptContext"
+                              - x: "$Postscripts[7]"
+                      - test:
+                          if: "not($Postscripts[8][self::m:none])"
+                          then:
+                          - with:
+                              variables:
+                              - OldScriptContext: "$NewScriptContext"
+                              - NewScriptContext: "concat($OldScriptContext, '↑')"
+                              replace:
+                              - x: "$NewScriptContext"
+                              - x: "$Postscripts[8]"
+                          - test:
+                              if: "count($Postscripts) > 8"   # give up and just dump them out so at least the content is there
+                              then:
+                              - t: "b"    # 82.b -- need to add level indicator between adjacent (not simultaneous) scripts (assumes one of sub/super is not 'none')
+                              - x: "$Postscripts[position() > 8]"
+  - test:
+    # emit level indicator if not numeric subscript, something follows or the closest non-mrow is an element with a close tag [80(a)]
+      if: "$Postscripts and
+            not( ($Postscripts[last()][self::m:none] and $Postscripts[last()-1][self::m:mn] and $BaseOkForNumericScript) or
+                (parent::m:msubsup and count(following-sibling::*)=1) or
+                following-sibling::*[2][self::m:mmultiscripts and *[self::m:mprescripts]]
+              )" # first child is likely invisible times
+      then_test:
+          if: "$OldScriptContext != ''"
+          then: [x: "$OldScriptContext"]
+          else: [t: "b"]
+
+-
+  name: contracted-form # NFB Lesson 12.5.1.b
+  tag: munder
+  match: "*[1][(self::m:mi or self::m:mn or self::m:mtext) and string-length(text())=1] and *[2][.='¯']"
+  replace:
+  - x: "*[1]"
+  - t: "⠩⠱"
+
+-
+  name: contracted-form #rule 86.b
+  tag: mover
+  match: "*[1][(self::m:mi or self::m:mn or self::m:mtext) and string-length(text())=1] and *[2][.='¯']"
+  replace:
+  - x: "*"
+
+-
+  name: subsequent-dots #rule 99.a -- only one dot used for series of dots over digits
+  tag: mover
+  match:
+  - "*[1][self::m:mn and string-length(text())=1 and translate(.,'1234567890', '') = ''] and"  # digit as base
+  - "*[2][self::m:mo and .='˙']"                                                           # dot above
+  variables:
+  - OldOverContext: "$NewOverContext"
+  - NewOverContext: "concat($NewOverContext, '⠣')"
+  replace:
+  - test:   # '2' -- skip over added invisible times
+      if: "not(preceding-sibling::*[2][
+                self::m:mover and
+                *[1][self::m:mn and string-length(text())=1 and translate(.,'1234567890', '') = ''] and
+                *[2][self::m:mo and .='˙']])" 
+      then: [t: "m"]            # first one
+  - x: "*[1]"
+  - test:   # '2' -- skip over added invisible times
+      if: "not(following-sibling::*[2][
+                self::m:mover and
+                *[1][self::m:mn and string-length(text())=1 and translate(.,'1234567890', '') = ''] and
+                *[2][self::m:mo and .='˙']])"
+      then:            # last one
+      - x: "$NewOverContext"
+      - x: "*[2]"
+      - t: "⠻"
+
+-
+  # this captures the output for the mhchem's "<=>", "<<=>", and "<=>>" output (there are no Unicode arrows for them)
+  # this isn't a perfect match, but should be good enough and allows merging all three (see github.com/NSoiffer/MathCAT/issues/60)
+  name: chemistry-mhchem-equilibrium-arrow
+  tag: mover
+  match:
+  -    "*[1][substring(., 1, 1)='↽'] and"
+  -    "*[2][substring(., string-length(), 1)='⇀']"
+  replace:
+  - test:
+      if: "*[1][self::m:mrow]"
+      then_test:
+          # there is a bug in the xpath package so \u1f8d2 (etc) aren't read properly, so we need to use the actual char
+          if: "*[2][self::m:mrow]"
+          then: [x: "'🣑'"]    # 0x1f8d1 -- this is currently unassigned and may get used by UTC at some point (<=>)
+          else: [x: "'🣓'"]    # 0x1f8d3 -- this is currently unassigned and may get used by UTC at some point (<<=>)
+      else: [x: "'🣒'"]        # 0x1f8d2 -- this is currently unassigned and may get used by UTC at some point (<=>>)
+
+-
+  name: default
+  tag: [munder, mover]
+  match: "."
+  variables:
+  - NotNested: "$NewUnderContext='' and $NewOverContext=''"
+  - AddSpaces: "IsInDefinition(BaseNode(.), 'Braille', 'NemethComparisonOperators')"
+  replace:
+  - test:
+      if: "$AddSpaces"
+      then: [t: "w"]
+  - test:
+      if: "$NotNested"
+      then:
+      - test:
+          # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
+          if: "parent::*[self::m:mrow] and
+            ancestor-or-self::*[not(preceding-sibling::*)][1]
+            [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts]"
+          then: [x: "$NewScriptContext"]
+      - t: "m"
+  - x: "*[1]"
+  # create the new context only after the base is generated
+  - test:
+      if: "self::m:munder"
+      then:
+      - with:
+         variables:
+         - OldUnderContext: "$NewUnderContext"
+         - NewUnderContext: "concat($NewUnderContext, '⠩')"
+         replace:
+         - x: "$NewUnderContext"
+         - x: "*[2]"
+      else:
+      - with:
+         variables:
+         - OldOverContext: "$NewOverContext"
+         - NewOverContext: "concat($NewOverContext, '⠣')"
+         replace:
+         - x: "$NewOverContext"
+         - x: "*[2]"
+  - test:
+      if: "$NotNested"
+      then: [t: "⠻"]
+  - test:
+      if: "$AddSpaces"
+      then: [t: "w"]
+
+-
+  name: default
+  tag: munderover
+  match: "."
+  replace:
+  - test:
+      # Rule 80b -- if in a script and not first item (could be nested mrows), restate the scriptlevel
+      if: "parent::*[self::m:mrow] and
+         ancestor-or-self::*[not(preceding-sibling::*)][1]
+         [self::m:msup or self::m:msub or self::m:msubsup or self::m:mmultiscripts]"
+      then: [x: "$NewScriptContext"]
+  - t: "m"
+  - x: "*[1]"
+  # create the new context only after the base is generated
+  - with:
+      variables:
+      - OldUnderContext: "$NewUnderContext"
+      - NewUnderContext: "concat($NewUnderContext, '⠩')"
+      replace:
+      - x: "$NewUnderContext"
+      - x: "*[2]"
+  - with:
+      variables:
+      - OldOverContext: "$NewOverContext"
+      - NewOverContext: "concat($NewOverContext, '⠣')"
+      replace:
+      - x: "$NewOverContext"
+      - x: "*[3]"
+  - test:
+      if: "$NewUnderContext='' and $NewOverContext=''"   # only generate a single terminator (when at baseline)
+      then: [t: "⠻"]
+
+- # Note: @notation can contain more than one value
+  # I don't think Nemeth has a good way to represent all notations, especially when in combination
+  # Note:
+  #   Shape indicator: ⠫
+  #   Interior of shape-modification indicator: ⠸⠫
+  #   Termination indicator: ⠻
+  #
+  # We place left and right outside of other notations
+  # top and bottom also get special treatment
+
+  name: default
+  tag: menclose
+  match: "."
+  variables:
+     [
+        AddSpaces: "parent::*[self::m:mrow] and *[1][ self::m:mo and IsInDefinition(., 'Braille', 'Braille', 'NemethComparisonOperators')]",
+     ]
+  replace:
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' left ')" #avoid 'leftarrow'
+      then: [t: "⠳"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' box ')" # box, not roundedbox
+      then:
+      - test:
+          if: "$AddSpaces"
+          then: [t: "w"]
+      - test:
+          if: "*[1][self::m:mrow]"
+          then: [t: "⠫⠗⠸⠫"] # rectangle
+          else: [t: "⠫⠲⠸⠫"] # square
+  - test:
+      if: "contains(@notation,'circle')"
+      then:
+      - test:
+          if: "$AddSpaces"
+          then: [t: "w"]
+      - test:
+          if: "*[1][self::m:mrow]"
+          then: [t: "⠫⠑⠸⠫"] # ellipse
+          else: [t: "⠫⠉⠸⠫"] # circle
+  - test:
+      if: "contains(@notation,'phasorangle')"
+      then: [t: "⠫⠪⠸⠫"]
+  - test:
+      # going out on a limb and considering this used for keyboard indicator (NFB lesson 11.23)
+      if: "contains(@notation,'roundedbox')"
+      then: [t: "⠫⠅"]
+  - test:
+      if: "contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or
+           contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike')"
+      then:
+      - t: "⠪" # start cancellation
+  - test:     # NFB lesson 12.5.2 adds under bars to rule 86.b
+      if: "(contains(@notation,'bottom') or contains(@notation,'top')) and
+            not(*[1][IsNode(., 'leaf') and string-length(text())=1])" # not contracted-form #rule 86.b (equiv to mover with "¯")
+      then: [t: "m"]
+  - test:
+      if: "contains(@notation,'uparrow')"
+      then: [t: up arrow, pause: short]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')"
+      then: [t: down arrow, pause: short]
+
+  # ??? What should happen with arrow?
+  #  If there is a box/circle with arrows only and an empty child,
+  #     then it acts like the arrow is the child
+  #  If there are only arrows for 'notation', then maybe rule 112 applies (superposition),
+  #     but the examples aren't similar. In that case, the arrow acts like 'box' and the child is the content... maybe
+  #
+  #  - test:
+  #      if: "contains(@notation,'leftarrow')"
+  #      then: [t: left arrow, pause: short]
+  #  - test:
+  #      if: "contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')"
+  #      then: [t: right arrow, pause: short]
+  #  - test:
+  #      if: "contains(@notation,'northeastarrow')"
+  #      then: [t: northeast arrow, pause: short]
+  #  - test:
+  #      if: "contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')"
+  #      then: [t: southeast arrow, pause: short]
+  #  - test:
+  #      if: "contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')"
+  #      then: [t: southwest arrow, pause: short]
+  #  - test:
+  #      if: "contains(@notation,'northwestarrow')"
+  #      then: [t: northwest arrow, pause: short]
+  #  - test:
+  #      if: "contains(@notation,'updownarrow')"
+  #      then: [t: double ended vertical arrow, pause: short]
+  #  - test:
+  #      if: "contains(@notation,'leftrightarrow')"
+  #      then: [t: double ended horizontal arrow, pause: short]
+  #  - test:
+  #      if: "contains(@notation,'northeastsouthwestarrow')"
+  #      then: [t: double ended up diagonal arrow, pause: short]
+  #  - test:
+  #      if: "contains(@notation,'northwestsoutheastarrow')"
+  #      then: [t: double ended down diagonal arrow, pause: short]
+  #  - test:
+  #      if: ".[contains(@notation,'actuarial')]"
+  #      then: [t: actuarial symbol, pause: short]
+  #  - test:
+  #      if: ".[contains(@notation,'madrub')]"
+  #      then: [t: arabic factorial symbol, pause: short]
+  #  - test:
+  #      if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']"      # default
+  #      then: [t: long division symbol, pause: short]
+  #  - test:
+  #      if: ".[contains(@notation,'radical')]"
+  #      then: [t: square root, pause: short]
+
+  - x: "*"
+
+  - test:
+      if: "contains(@notation,'bottom')" # bar underneath
+      then_test:
+          if: "*[1][not(self::m:mrow) and string-length(text())=1]" # bar over
+          then: [t: "⠩⠱"]
+          else: [t: "⠩⠱"]
+  - test:
+      if: "contains(@notation,'top')"
+      then_test:
+          if: "*[1][not(self::m:mrow) and string-length(text())=1]" # bar over
+          then: [t: "⠱"]
+          else: [t: "⠣⠱"]
+  - test:   # NFB lesson 12.5.2 adds under bars to rule 86.b
+      if: "(contains(@notation,'bottom') or contains(@notation,'top')) and
+            not(*[1][IsNode(., 'leaf') and string-length(text())=1])" # not contracted-form #rule 86.b (equiv to mover with "¯")
+      then: [t: "⠻"] # only emit once for top and bottom
+  - test:
+      if: "contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or
+           contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike')"
+      then:
+      - t: "⠻" # end cancellation
+  - test:
+      if: "contains(@notation,'box') or contains(@notation,'circle') or contains(@notation,'phasorangle')" #both box and roundedbox
+      then:
+      - t: "⠻" # terminate shape
+      - test:
+          if: "$AddSpaces"
+          then: [t: "w"]
+  - test:
+      if: "contains(concat(' ', normalize-space(@notation), ' '), ' right ')" #avoid 'rightarrow'
+      then: [t: "⠳"]
+
+- name: default
+  tag: semantics
+  match: "."
+  replace:
+  - x: "*[1]" #/ FIX: should prioritize @encoding="MathML-Presentation" and @encoding="application/mathml-presentation+xml"
+
+- include: "SharedRules/default.yaml"

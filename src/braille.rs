@@ -2134,7 +2134,6 @@ fn ASCIIMath_cleanup(_pref_manager: Ref<PreferenceManager>, raw_braille: String)
 /************** Braille xpath functionality ***************/
 use crate::canonicalize::{name, as_element, as_text};
 use crate::xpath_functions::{is_leaf, IsBracketed, validate_one_node};
-use sxd_document::dom::ParentOfChild;
 use sxd_xpath::{Value, context, nodeset::*};
 use sxd_xpath::function::{Function, Args};
 use sxd_xpath::function::Error as XPathError;
@@ -2143,67 +2142,115 @@ use std::result::Result as StdResult;
 pub struct NemethNestingChars;
 const NEMETH_FRAC_LEVEL: &str = "data-nemeth-frac-level";    // name of attr where value is cached
 const FIRST_CHILD_ONLY: &[&str] = &["mroot", "msub", "msup", "msubsup", "munder", "mover", "munderover", "mmultiscripts"];
+
+#[derive(Debug, Display)]
+enum NumOrString {
+    Num(usize),
+    Str(String),
+}
+
+impl NumOrString {
+    fn new(value: &str) -> NumOrString {
+        if value.ends_with(|c: char| c.is_ascii_digit()) {
+            NumOrString::Num(value[value.len()-1..].parse::<usize>().unwrap())
+        } else {
+            NumOrString::Str(value.to_string())
+        }
+    }
+    
+    fn max(ns1: NumOrString, ns2: NumOrString) -> NumOrString {
+        match (&ns1, &ns2) {
+            (NumOrString::Num(n1), NumOrString::Num(n2)) => if n1 > n2 {ns1} else {ns2},
+            (NumOrString::Str(s1), NumOrString::Str(s2)) => if s1.len() > s2.len() {ns1} else {ns2},
+            _ => {  // shouldn't happen
+                error!("NumOrString::match: values are of different types. ns1={}, ns2={}", ns1, ns2);
+                ns1
+            },
+        }
+    }
+
+    fn append(&mut self, extra: &NumOrString) -> &Self {
+        match self {
+            NumOrString::Num(n) => *n += 1,
+            NumOrString::Str(s) => s.push_str(
+                match extra {NumOrString::Str(s) => s, NumOrString::Num(_) => ""}),
+        };
+        return self;
+    }
+
+    fn default(&self) -> NumOrString {
+        match self {
+            NumOrString::Num(_) => NumOrString::Num(0),
+            NumOrString::Str(_) => NumOrString::Str(String::default()),
+        }
+    }
+}
+
 impl NemethNestingChars {
-    // returns a 'repeat_char' corresponding to the Nemeth rules for nesting
-    // note: this value is likely one char too long because the starting fraction is counted
-    fn nemeth_frac_value(node: Element, repeat_char: &str) -> String {
+    /// returns a 'repeat_char' corresponding to the Nemeth rules for nesting
+    /// note: this value is likely one 'repeat_str' too long because the starting fraction is counted
+    fn nemeth_frac_value(node: Element, repeat_str: &NumOrString, is_braille: bool) -> NumOrString {
+        // Note: we cache the value as an attr for Nemeth because the same char is used for start/middle/end.
+        //   However, for MathSpeak, the start/middle/end differThe node attr NEMETH_FRAC_LEVEL is used to cache the value
         let children = node.children();
         let name = name(node);
         if is_leaf(node) {
-            return "".to_string();
-        } else if name == "mfrac" {
+            return repeat_str.default();
+        } else if name == "mfrac" || name == "fraction" {
             // have we already computed the value?
-            if let Some(value) = node.attribute_value(NEMETH_FRAC_LEVEL) {
-                return value.to_string();
+            if is_braille {
+                if let Some(value) = node.attribute_value(NEMETH_FRAC_LEVEL) {
+                    return NumOrString::Str(value.to_string());
+                }
             }
 
-            let num_value = NemethNestingChars::nemeth_frac_value(as_element(children[0]), repeat_char);
-            let denom_value = NemethNestingChars::nemeth_frac_value(as_element(children[1]), repeat_char);
-            let mut max_value = if num_value.len() > denom_value.len() {num_value} else {denom_value};
-            max_value += repeat_char;
-            node.set_attribute_value(NEMETH_FRAC_LEVEL, &max_value);
-            return max_value;
+            let num_value = NemethNestingChars::nemeth_frac_value(as_element(children[0]), repeat_str, is_braille);
+            let denom_value = NemethNestingChars::nemeth_frac_value(as_element(children[1]), repeat_str, is_braille);
+            let mut result = NumOrString::max(num_value, denom_value);
+            result.append(repeat_str);
+            if is_braille {
+                node.set_attribute_value(NEMETH_FRAC_LEVEL, &result.to_string());
+            }
+            return result;
         } else if FIRST_CHILD_ONLY.contains(&name) {
             // only look at the base -- ignore scripts/index
-            return NemethNestingChars::nemeth_frac_value(as_element(children[0]), repeat_char);
+            return NemethNestingChars::nemeth_frac_value(as_element(children[0]), repeat_str, is_braille);
         } else {
-            let mut result = "".to_string();
+            let mut result = repeat_str.default();
             for child in children {
-                let value = NemethNestingChars::nemeth_frac_value(as_element(child), repeat_char);
-                if value.len() > result.len() {
-                    result = value;
-                }
+                let value = NemethNestingChars::nemeth_frac_value(as_element(child), repeat_str, is_braille);
+                result = NumOrString::max(result, value);
             }
             return result;
         }
     }
 
-    fn nemeth_root_value(node: Element, repeat_char: &str) -> StdResult<String, XPathError> {
-        // returns the correct number of repeat_chars to use
-        // note: because the highest count is toward the leaves and
-        //    because this is a loop and not recursive, caching doesn't work without a lot of overhead
-        let parent = node.parent().unwrap();
-        if let ParentOfChild::Element(e) =  parent {
-            let mut parent = e;
-            let mut result = "".to_string();
-            loop {
-                let name = name(parent);
-                if name == "math" {
-                    return Ok( result );
-                }
-                if name == "msqrt" || name == "mroot" {
-                    result += repeat_char;
-                }
-                let parent_of_child = parent.parent().unwrap();
-                if let ParentOfChild::Element(e) =  parent_of_child {
-                    parent = e;
-                } else {
-                    return Err( sxd_xpath::function::Error::Other("Internal error in nemeth_root_value: didn't find 'math' tag".to_string()) );
-                }
-            }
-        }
-        return Err( XPathError::Other("Internal error in nemeth_root_value: didn't find 'math' tag".to_string()) );
-    }
+    // fn nemeth_root_value(node: Element, repeat_char: &str) -> StdResult<String, XPathError> {
+    //     // returns the correct number of repeat_chars to use
+    //     // note: because the highest count is toward the leaves and
+    //     //    because this is a loop and not recursive, caching doesn't work without a lot of overhead
+    //     let parent = node.parent().unwrap();
+    //     if let ParentOfChild::Element(e) =  parent {
+    //         let mut parent = e;
+    //         let mut result = "".to_string();
+    //         loop {
+    //             let name = name(parent);
+    //             if name == "math" {
+    //                 return Ok( result );
+    //             }
+    //             if name == "msqrt" || name == "mroot" {
+    //                 result += repeat_char;
+    //             }
+    //             let parent_of_child = parent.parent().unwrap();
+    //             if let ParentOfChild::Element(e) =  parent_of_child {
+    //                 parent = e;
+    //             } else {
+    //                 return Err( sxd_xpath::function::Error::Other("Internal error in nemeth_root_value: didn't find 'math' tag".to_string()) );
+    //             }
+    //         }
+    //     }
+    //     return Err( XPathError::Other("Internal error in nemeth_root_value: didn't find 'math' tag".to_string()) );
+    // }
 }
 
 impl Function for NemethNestingChars {
@@ -2219,19 +2266,44 @@ impl Function for NemethNestingChars {
                         -> StdResult<Value<'d>, XPathError>
     {
         let mut args = Args(args);
-        args.exactly(2)?;
-        let repeat_char = args.pop_string()?;
+        args.exactly(3)?;
+        let repeat_str = args.pop_string()?;
+        let repeat_part = NumOrString::new(&repeat_str);
+        let is_braille = args.pop_string()? == "Braille";
         let node = crate::xpath_functions::validate_one_node(args.pop_nodeset()?, "NestingChars")?;
         if let Node::Element(el) = node {
             let name = name(el);
             // it is likely a bug to call this one a non mfrac
-            if name == "mfrac" {
+            if name == "mfrac" || name == "fraction" {
                 // because it is called on itself, the fraction is counted one too many times -- chop one off
                 // this is slightly messy because we are chopping off a char, not a byte
                 const BRAILLE_BYTE_LEN: usize = "⠹".len();      // all Unicode braille symbols have the same number of bytes
-                return Ok( Value::String( NemethNestingChars::nemeth_frac_value(el, &repeat_char)[BRAILLE_BYTE_LEN..].to_string() ) );
-            } else if name == "msqrt" || name == "mroot" {
-                return Ok( Value::String( NemethNestingChars::nemeth_root_value(el, &repeat_char)? ) );
+                let i_start = if is_braille {BRAILLE_BYTE_LEN} else {repeat_str.len()};
+                let result = match NemethNestingChars::nemeth_frac_value(el, &repeat_part, is_braille) {
+                    NumOrString::Num(n) => {
+                        let str_without_digit = &repeat_str[..repeat_str.len()-1];
+                        match n {
+                            0 | 1 => {
+                                str_without_digit.to_string()
+                            },
+                            2 => {
+                                format!("{}{}", str_without_digit, str_without_digit)
+                            },
+                            3 => {
+                                format!("{}{} twice", str_without_digit, str_without_digit)
+                            },
+                            _ => {
+                                format!("{}{} {}", str_without_digit, str_without_digit, n-1)
+
+                            },
+                        }
+                    },
+                    NumOrString::Str(s) => s,
+                };
+                debug!("NemethNestingChars: repeat_char='{}', i_start={}, result={}", &repeat_str, i_start, result);
+                return Ok( Value::String( result.to_string()[i_start-1..].to_string() ) );
+            // } else if name == "msqrt" || name == "mroot" {
+            //     return Ok( Value::String( NemethNestingChars::nemeth_root_value(el, &repeat_part)? ) );
             } else {
                 panic!("NestingChars chars should be used only on 'mfrac'. '{}' was passed in", name);
             }

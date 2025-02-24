@@ -1082,3 +1082,103 @@ fn diagonal_matrix() {
   // test_prefs("en", "SimpleSpeak", vec![("Verbosity", "Verbose")],
   //     expr, "the 3 by 3 diagonal matrix; row 1, column 1, 2; row 2, column 2, 1; row 3, column 3, x squared");
 }
+
+#[test]
+fn equation_label_property_from_issue_525() {
+  let expr = r#"<math display="block">
+    <mtable intent=':system-of-equations'>
+      <mtr>
+        <mtd intent=":equation-label"><mtext>(1)</mtext></mtd>
+        <mtd><mi>x</mi><mo>+</mo><mi>y</mi></mtd>
+        <mtd><mo>=</mo></mtd>
+        <mtd><mn>2</mn></mtd>
+      </mtr>
+      <mtr>
+        <mtd intent=":equation-label"><mtext>(2)</mtext></mtd>
+        <mtd><mi>x</mi><mo>&#x2212;</mo><mi>y</mi></mtd>
+        <mtd><mo>=</mo></mtd>
+        <mtd><mn>0</mn></mtd>
+      </mtr>
+    </mtable>
+  </math>"#;
+  test("en", "SimpleSpeak", expr,
+      "2 equations, equation 1 with label 1; x plus y, is equal to 2; equation 2 with label 2; x minus y, is equal to 0");
+}
+
+#[test]
+fn equation_label_property_2_lines() {
+  let expr = r#"<math>
+        <mtable columnalign="right left" columnspacing="0" displaystyle="true">
+            <mtr>
+                <mtd intent=":equation-label"><mtext>(1)</mtext></mtd>
+                <mtd><mi>𝑎</mi><mo lspace="0.222em" rspace="0.222em">+</mo><mi>𝑏</mi></mtd>
+                <mtd><mo lspace="0.278em" rspace="0.278em">=</mo><msup><mi>𝑥</mi><mn>2</mn></msup>
+                    <mo lspace="0.222em" rspace="0.222em">+</mo><mi>𝑥</mi><mo lspace="0.222em" rspace="0.222em">+</mo><mn>2</mn></mtd>
+            </mtr>
+            <mtr>
+                <mtd intent=":equation-label"><mtext>(2)</mtext></mtd>
+                <mtd><mi>𝑏</mi></mtd>
+                <mtd><mo lspace="0.278em" rspace="0.278em">=</mo><mi>𝑥</mi></mtd>
+            </mtr>
+        </mtable>
+    </math>"#;
+  test("en", "SimpleSpeak", expr,
+      "2 equations, equation 1 with label 1; eigh plus b; is equal to, x squared plus x plus 2; equation 2 with label 2; b is equal to x");
+}
+
+#[test]
+fn no_equation_label_property_2_lines() {
+  let expr = r#"<math>
+        <mtable columnalign="right left" columnspacing="0" displaystyle="true">
+            <mtr>
+                <mtd intent=":noequationlabel"/>
+                <mtd><mi>𝑐</mi><mo lspace="0.222em" rspace="0.222em">+</mo><mi>𝑑</mi></mtd>
+                <mtd><mo lspace="0.278em" rspace="0.278em">=</mo><msup><mi>𝑥</mi><mn>2</mn></msup>
+                    <mo lspace="0.222em" rspace="0.222em">+</mo><mi>𝑥</mi><mo lspace="0.222em" rspace="0.222em">+</mo><mn>2</mn></mtd>
+            </mtr>
+            <mtr>
+                <mtd intent=":noequationlabel"/>
+                <mtd><mi>𝑑</mi></mtd>
+                <mtd><mo lspace="0.278em" rspace="0.278em">=</mo><mi>𝑥</mi></mtd>
+            </mtr>
+        </mtable>
+    </math>"#;
+  test("en", "SimpleSpeak", expr,
+      "2 equations, equation 1; c plus d; is equal to, x squared plus x plus 2; equation 2; d is equal to x");
+}
+
+#[test]
+fn equation_label_nested_table() {
+  let expr = r#"<math>
+        <mtable columnalign="right left" columnspacing="0" displaystyle="true">
+            <mtr>
+                <mtd intent=":equation-label"><mtext>(4)</mtext></mtd>
+                <mtd><mtext/></mtd>
+                <mtd>
+                    <mtable columnalign="right left" displaystyle="true">
+                        <mtr>
+                            <mtd><mi>𝑥</mi></mtd>
+                            <mtd><mo lspace="0.278em" rspace="0.278em">=</mo><mi>𝑎</mi><mo lspace="0.222em" rspace="0.222em">+</mo><mi>𝑏</mi></mtd>
+                        </mtr>
+                        <mtr>
+                            <mtd/>
+                            <mtd><mspace width="9.963pt"/><mo lspace="0.222em" rspace="0.222em">+</mo><mi>𝑐</mi></mtd>
+                        </mtr>
+                    </mtable>
+                </mtd>
+            </mtr>
+            <mtr>
+                <mtd intent=":equation-label"><mtext>(5)</mtext></mtd>
+                <mtd><mi>𝑦</mi></mtd>
+                <mtd><mo lspace="0.278em" rspace="0.278em">=</mo><mi>𝑑</mi></mtd>
+            </mtr>
+            <mtr>
+                <mtd intent=":equation-label"><mtext>(6)</mtext></mtd>
+                <mtd/>
+                <mtd/>
+            </mtr>
+        </mtable>
+    </math>"#;
+  test("en", "SimpleSpeak", expr,
+      "3 equations, equation 1 with label 4; 2 equations, equation 1; x is equal to eigh plus b; equation 2; plus c; equation 2 with label 5; y is equal to d; equation 3 with label 6");
+}
