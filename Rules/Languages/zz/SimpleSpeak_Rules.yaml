@@ -1,0 +1,82 @@
+---
+
+-
+  name: default
+  tag: math
+  match: "."
+  replace: [x: "*"]
+-
+  name: default
+  tag: mrow
+  match: "."
+  replace: [x: "*"]
+-
+  name: default
+  tag: mi
+  match: "."
+  replace: [x: "text()"]
+-
+  name: default
+  tag: mn
+  match: "."
+  replace: [x: "text()"]
+-
+  name: default
+  tag: mo
+  match: "."
+  replace: [x: "text()"]
+-
+  name: squared
+  tag: msup
+  match: "*[2][self::mn][.='2']"
+  replace: [x: "*[1]", t: "squared"]
+-
+  name: default
+  tag: indexed-by
+  match: "."
+  replace:
+    - x: "*[1]"
+    - t: raised to the
+    - x: "*[2]"
+    - t: power
+-
+  name: default
+  tag: square-root
+  match: "."
+  replace:
+    - test:
+        if: "$Verbosity!='Terse'"
+        then: [t: the]
+    - t: square root of
+    - x: "*[1]"
+    - test:
+        if: "$Blind"
+        then: [t: end square root]
+
+-
+  name: positive
+  tag: positive
+  match: "."
+  replace:
+  - t: "SimpleSpeak positive from zz"
+  - x: "*[1]"
+
+
+- name: function-intent
+  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  tag: "*"
+  match: count(*)>0
+  replace:
+  - x: "translate(name(.), '-_', '  ')"
+  - t: "of"      # phrase(sine 'of' 5)
+  - pause: short
+  - insert:
+      nodes: "*"
+      replace: [t: "comma", pause: auto]      # phrase(f of x 'comma' y)
+
+- name: default-text
+  # unknown leaf -- just speak the text -- could be a literal intent
+  tag: "*"
+  match: "."
+  replace:
+  - x: "translate(name(), '-_', ' ')"

@@ -1,0 +1,492 @@
+---
+ - "a-z": 
+    - test: 
+        if: "$TTS='none'"
+        then: [T: "."]                          	# 	(en: '.', google translation)
+        else: [SPELL: "'.'"]   # Meaning?                    
+
+ # Capital letters are a little tricky: users can pick their favorite word (something that was requested) and 
+ # screen readers have options to use pitch changes or beeps instead of or in addition to say "cap"
+ # Also, if a user can see the screen, they probably don't need to hear "cap", but if they specified an override, they must want to hear the override.
+
+ - "A-Z":
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [T: "iso"]         	# 	(en: 'cap', google translation)
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
+        # note: is there a need for Å/Ä/Ö here?
+        replace: [SPELL: "translate('.', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"]
+
+ - "0-9": [T: "."]                          	    # 	(en: '.', google: 'A')
+
+ - "!":                                         	#  0x21
+    - test:
+        if: "ancestor-or-self::*[contains(@data-intent-property, ':structure:')]"
+        then_test:
+            if: "$Verbosity = 'Terse'"
+            then: [T: "huuto"]                #  0x21	(en: 'bang', google translation)
+            else: [T: "huutomerkki"]                #  0x21	(en: 'exclamation point', google: 'huutomerkki'); might be obsolete
+        else: [T: "kertoma"]                    	#  0x21	(en: 'factorial', google: 'tekijä')
+          
+ - "\"": [T: "lainaus"]                             #  0x22	(en: 'quotation mark', google: 'lainausmerkki'); could also be "sitaatti"
+ - "#": [T: "numero"]                   	#  0x23	(en: 'number', google: 'määrä'); could also be "ruutu" but "ristikkomerkki" is more clear
+ - "$": [T: "dollaria"]                         	#  0x24	(en: 'dollars', google: 'dollarit')
+ - "%": [T: "prosenttia"]                       	#  0x25	(en: 'percent')
+ - "&": [T: "et-merkki"]                        	#  0x26	(en: 'ampersand', google: 'ampersand')
+ - "'": [T: "heittomerkki"]                     	#  0x27	(en: 'apostrophe')
+ - "(":                                         	#  0x28
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then_test:
+            if: "$Verbosity='Terse'"
+            then: [T: "auki"]                  	    #  0x28	(en: 'open', google translation)
+            else: [T: "auki sulku"]             	#  0x28	(en: 'open paren', google: 'avoin sulku')
+        else: [T: "vasen sulku"]                    #  0x28	(en: 'left paren', google: 'vasen sulku')
+ - ")":                                         	#  0x29
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then_test:
+            if: "$Verbosity='Terse'"
+            then: [T: "kiinni"]                 	#  0x29	(en: 'close', google translation)
+            else: [T: "kiinni sulku"]           	#  0x29	(en: 'close paren', google: 'sulje sulku')
+        else: [T: "oikea sulku"]               	    #  0x29	(en: 'right paren', google: 'oikea sulku')
+
+ - "*":                                         	#  0x2a
+    test:
+        if: "parent::*[name(.)='msup' or name(.)='msubsup' or name(.)='skip-super']"
+        then: [T: "tähti"]                      	#  0x2a	(en: 'star', google translation)
+        else: [T: "kertaa"]                     	#  0x2a	(en: 'times', google: 'ajat')
+ - "+": [T: "plus"]                             	#  0x2b
+ - ",":                                         	#  0x2c
+    # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
+    # that this test is here and not with "…" is not ideal, but seems simplest
+     test:
+        if:
+            - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or "
+               # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
+               # speak "comma" when not adjacent to '…'
+            - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
+               # except if expression starts with '…'
+            - "../*[1][.='…'] "
+        then: 
+        - T: "pilkku"                     	# 	(en: 'comma', google translation)
+        - test:
+            if: "$Verbosity != Terse"
+            then: [pause: short]
+      # else silent
+
+ - "-": [T: "miinus"]                           	#  0x2d	(en: 'minus')
+ - ".":                                         	#  0x2e
+    - test:
+        if: "parent::*[1][self::m:mn]"
+        then: [T: "piste"]                      	# 	(en: 'point', google translation)
+        else: [T: "piste"]                      	# 	(en: 'dot'); possibly obsolete if-else
+ - "/": [T: "jaettuna"]                        	    #  0x2f	(en: 'divided by', google: 'jaettuna')
+ - ":": [T: "kaksoispiste"]                     	#  0x3a	(en: 'colon')
+ - ";": [T: "puolipiste"]                       	#  0x3b	(en: 'semicolon')
+ - "<":                                         	#  0x3c
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: "on"]                        	# 	(en: 'is', google translation)
+     - T: "pienempi kuin"                    	    # 	(en: 'less than', google: 'vähemmän kuin')
+ - "=":                                         	#  0x3d
+    - test: 
+        if: "$Verbosity!='Terse'"
+        then: [T: "on yhtä suuri kuin"]         	# 	(en: 'is equal to', google translation)
+        else: [T: "on"]               	# 	(en: 'equals', google: 'yhtä suuri')
+
+ - ">":                                         	#  0x3e
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: "on"]                        	# 	(en: 'is', google translation)
+     - T: "suurempi kuin"                    	    # 	(en: 'greater than', google: 'suurempi kuin')
+ - "?": [T: "kysymysmerkki"]                    	#  0x3f	(en: 'question mark')
+ - "@": [T: "ät-merkki"]                        	#  0x40	(en: 'at sign', google: 'kylttiä')
+ - "[":                                         	#  0x5b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: "auki hakasulku"]             	# 	(en: 'open bracket', google translation)
+        else: [T: "vasen hakasulku"]             	# 	(en: 'left bracket', google: 'vasen kiinnike')
+ - "\\": [T: "kenoviiva"]                  	        #  0x5c	(en: 'back slash', google: 'takaviiva')
+ - "]":                                         	#  0x5d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: "kiinni hakasulku"]             	# 	(en: 'close bracket', google translation)
+        else: [T: "oikea hakasulku"]            	# 	(en: 'right bracket', google: 'oikea kiinnike')
+ - "^": [T: "hattu"]                     	#  0x5e	(en: 'hat', google: 'hattu')
+ - "_": [T: "alaviiva"]                         	#  0x5f	(en: 'under bar', google: 'baarin alla')
+ - "`": [T: "gravis"]                           	#  0x60	(en: 'grave', google: 'hauta') # FI: not sure
+ - "{":                                         	#  0x7b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: "auki aaltosulku"]                # 	(en: 'open brace', google translation)
+        else: [T: "vasen aaltosulku"]            	# 	(en: 'left brace', google: 'vasen ahdin')
+ - "|":                                         	#  0x7c
+    # note: for ClearSpeak and SimpleSpeak, "|" inside of sets is handled at the mrow level, same for 'sets'
+     - test:
+        - if: "$SpeechStyle != 'ClearSpeak' or not(preceding-sibling::*) or not(following-sibling::*)"
+          then: [T: "pystysuora viiva"]         	# 	(en: 'vertical line', google translation)
+        - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+          then: [T: "siten että"]                	# 	(en: 'such that', google translation)
+        - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
+          then: [T: "ehdolla"]                  	# 	(en: 'given', google translation)
+        - else: [T: "jakaa"]               	        # 	(en: 'divides', google: 'jakaa')
+
+ - "}":                                         	#  0x7d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [T: "kiinni aaltosulku"]              # 	(en: 'close brace', google translation)
+        else: [T: "oikea aaltosulku"]          	    # 	(en: 'right brace', google: 'oikea ahdin')
+
+ - "~": [T: "tilde"]                            	#  0x7e
+ - " ":                                         	#  0xa0
+    - test:
+        if: "@data-empty-in-2D and ../../../../*[name(.)!='system-of-equations']"
+        then: [T: "tyhjä"]                      	#  want to say something for fraction (etc) with empty child	(en: 'empty', google translation)
+        else: [T: ""]                            
+
+ - "¬": [T: "ei"]                         	#  0xac	(en: 'not', google: 'ei') # Terse logic?
+ - "°": [T: "astetta"]                    	        #  0xb0	(en: 'degrees', google: 'asteet')
+ - "±": [T: "plus-miinus"]                       	#  0xb1	(en: 'plus or minus', google: 'plus tai miinus')
+ - "´": [T: "akuutti"]                          	#  0xb4	(en: 'acute')
+ - "·":                                         	#  0xB7
+    - test:
+        if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
+        then: [T: "kertaa"]                       	# 	(en: 'times', google translation)
+        else: [T: "piste"]        	                # 	(en: 'dot', google: 'piste')
+ - "×":                                         	#  0xd7
+    - test:
+        if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
+        then: [T: "kertaa"]                       	# 	(en: 'times', google translation)
+        else_test:
+            if: $ClearSpeak_MultSymbolX = 'By'
+            then: [T: "kertaa"]                     	# (en: 2 'by' 2 matrice) fi: (2 kertaa 2 matriisi) translator's note
+            else: [T: "risti"]                 	    # 	(en: 'cross', google: 'ylittää')
+ - "÷": [T: "jaettuna"]                         	#  0xf7	(en: 'divided by')
+ - "̀": [T: "gravis korostus"]                           	 #  0x300	(en: 'grave accent embellishment', google: 'vakava korostuskoriste')
+ - "́": [T: "akuutti korostus"]                          	 #  0x301	(en: 'acute accent embellishment', google: 'akuutti korostuskoriste')
+ - "̂": [T: "sirkumfleksi korostus"]                     	 #  0x302	(en: 'circumflex accent embellishment', google: 'ympyräkorotuskoriste')
+ - "̃": [T: "tilde"]                            	 #  0x303	(en: 'tilde embellishment', google: 'tilde -koriste')
+ - "̄": [T: "pituusmerkki"]                     	 #  0x304	(en: 'macron embellishment', google: 'macronin koriste')
+ - "̅": [T: "yläviiva"]                         	 #  0x305	(en: 'overbar embellishment', google: 'ylipalkin koriste')
+ - "̆": [T: "lyhyysmerkki"]                     	 #  0x306	(en: 'breve', google: 'breve')
+ - "̇": [T: "piste"]                	 #  0x307	(en: 'dot above embellishment', google: 'piste koristelun yläpuolella')
+
+   # Note: ClearSpeak has pref TriangleSymbol for "Δ", but that is wrong
+ - "Α-Ω": 
+    - test: 
+        if: "$CapitalLetters_Beep"
+        then:
+        - audio:
+            value: "beep.mp4"
+            replace: []
+    - test: 
+        if: "$CapitalLetters_UseWord"
+        then_test:
+          if: "$SpeechOverrides_CapitalLetters = ''"
+          then_test:
+            if: "$Impairment = 'Blindness'"
+            then: [T: "iso"]         	# 	(en: 'cap', google translation)
+          else: [x: "$SpeechOverrides_CapitalLetters"] 
+    - pitch:
+        value: "$CapitalLetters_Pitch"
+        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
+        replace: [SPELL: "translate('.', 'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡ΢ΣΤΥΦΧΨΩ', 'αβγδεζηθικλμνξοπρςστυφχψω')"]
+
+ - "α": [T: "alfa"]                             	#  0x3b1	(en: 'alpha')
+ - "β": [T: "beeta"]                            	#  0x3b2	(en: 'beta')
+ - "γ": [T: "gamma"]                            	#  0x3b3
+ - "δ": [T: "delta"]                            	#  0x3b4
+ - "ε": [T: "epsilon"]                          	#  0x3b5
+ - "ζ": [T: "zeeta"]                            	#  0x3b6	(en: 'zeta', google: 'zeta')
+ - "η": [T: "eeta"]                             	#  0x3b7	(en: 'eta', google: 'eta')
+ - "θ": [T: "theeta"]                           	#  0x3b8	(en: 'theta', google: 'theta')
+ - "ι": [T: "ioota"]                            	#  0x3b9	(en: 'iota', google: 'iota')
+ - "κ": [T: "kappa"]                            	#  0x3ba
+ - "λ": [T: "lambda"]                           	#  0x3bb
+ - "μ": [T: "myy"]                              	#  0x3bc	(en: 'mu', google: 'mu')
+ - "ν": [T: "nyy"]                              	#  0x3bd	(en: 'nu', google: 'nu')
+ - "ξ": [T: "ksii"]                             	#  0x3be	(en: 'zai', google: 'zai')
+ - "ο": [T: "omikron"]                          	#  0x3bf	(en: 'omicron', google: 'omicron')
+ - "π": [T: "pii"]                              	#  0x3c0	(en: 'pi', google: 'pi')
+ - "ρ": [T: "rhoo"]                             	#  0x3c1	(en: 'rho', google: 'rho')
+ - "ς": [T: "loppu-sigma"]                      	#  0x3c2	(en: 'final sigma', google: 'viimeinen sigma')
+ - "σ": [T: "sigma"]                            	#  0x3c3
+ - "τ": [T: "tau"]                              	#  0x3c4
+ - "υ": [T: "ypsilon"]                          	#  0x3c5	(en: 'upsilon', google: 'upsilon')
+ - "φ": [T: "fii"]                              	#  0x3c6	(en: 'phi', google: 'phi')
+ - "χ": [T: "khii"]                             	#  0x3c7	(en: 'chi', google: 'chi')
+ - "ψ": [T: "psii"]                             	#  0x3c8	(en: 'psi', google: 'psi')
+ - "ω": [T: "oomega"]                           	#  0x3c9	(en: 'omega', google: 'omega')
+ - "ϕ": [T: "suora fii"]                        	#  0x3d5	(en: 'phi', google: 'phi')
+ - "ϖ": [T: "kreikkalainen pii"]                	#  0x3d6	(en: 'pi', google: 'pi')
+ - "ϵ": [T: "epsilon"]                          	#  0x3f5
+ - "϶": [T: "käännetty epsilon"]                	#  0x3f6	(en: 'reversed epsilon', google: 'kääntynyt epsilon')
+
+ - "–": [T: "lyhyt ajatusviiva"]                	#  0x2013	(en: 'en dash', google: 'fi dash')
+ - "—": [T: "pitkä ajatusviiva"]                	#  0x2014	(en: 'em dash', google: 'em dash')
+ - "―": [T: "vaakaviiva"]                      	    #  0x2015	(en: 'horizontal bar', google: 'vaakasuora viiva')
+ - "‖": [T: "kaksinkertainen pystyviiva"]       	#  0x2016	(en: 'double vertical line', google: 'kaksinkertainen pystysuora viiva')
+ - "…":                                         	#  0x2026
+    test:
+        if:
+            - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
+               # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
+               # speak '…' as 'and so on...' unless expr starts with '…'
+            - "../*[1][.='…']"
+        then: [T: "piste piste piste"]              # 	(google translation)
+        else_test:                              	#  must have $ClearSpeak_Ellipses = 'AndSoOn'
+            if: "count(following-sibling::*) = 0"
+            then: [T: "ja niin edelleen"]       	# 	(en: 'and so on', google translation)
+            else: [T: "ja niin edelleen kunnes"]      	# 	(en: 'and so on up to', google: 'ja niin edelleen'); possibly obsolete if-else
+
+ - "⁡":                                         	#  0x2061, function application
+    - test:
+        # skip saying "of" when Terse and a trig function, when it is a shape (does this happen?), or we are in :literal mode
+        if: "not($Verbosity='Terse' and preceding-sibling::*[1][IsInDefinition(., 'TrigFunctionNames')]) and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')]) and
+             not(@data-changed='added' and ancestor-or-self::*[contains(@data-intent-property, ':literal:')])"
+        then: [T: "arvolla"]                     
+ - "⁢": [T: ""]                                 	#  0x2062 # invisible 'times', fi: should this have a value?
+ - "⁣": [T: ""]                                 	#  0x2063 # invisible 'separator', fi: should this have a value?
+ - "⁤": [T: "ja"]                               	#  0x2064	(en: 'and', google translation)
+ - "′": [T: "pilkku"]    	#  0x2032	(en: 'prime', google: 'ensisijainen')
+ - "″": [T: "pilkku pilkku"]	#  0x2033	(en: 'double prime', google: 'kaksinkertainen prime')
+ - "‴": [T: "pilkku pilkku pilkku"]	#  0x2034	(en: 'triple prime', google: 'kolminkertainen')
+
+ - "ℂℕℚℝℤ":                                     	#  here we rely on this running through the table again to speak "cap xxx"
+    - T: "kaksoisviivainen"	# 	(en: 'double-struck', google: 'kaksinkertainen') # not satisfied
+    - SPELL: "translate('.', 'ℂℕℚℝℤ', 'CNQRZ')"
+
+ - "℃": [T: "astetta celsiusta"]                	#  0x2103	(en: 'degrees celsius', google: 'celsius astetta')
+ - "℉": [T: "astetta fahrenheitia"]             	#  0x2109	(en: 'degrees fahrenheit', google: 'fahrenheit-astetta')
+ - "ℋℛℓ":                                       	#  0x210b
+    - T: "skripti"                 	# 	(en: 'script', google: 'käsikirjoitus') # not satisfied
+    - SPELL: "translate('.', 'ℋℛℓ', 'HRl')"
+ - "ℎ": [T: "planckin vakio"]                   	#  0x210e	(en: 'planck constant', google: 'planck constant')
+ - "ℜ":                                         	#  0x211c
+    - T: "fraktuura iso r"                      	# 	(en: 'fraktur', google: 'fraktur')
+    - SPELL: "'R'"
+
+ - "Ω": [T: "ohmia"]                            	#  0x2126	(en: 'ohms', google: 'ohmit')
+ - "K": [T: "astetta kelviniä"]                 	#  0x212a	(en: 'kelvin', google: 'kelvin')
+ - "Å": [T: "ångströmiä"]                       	#  0x212b	(en: 'angstroms', google: 'angstroms')
+ - "ⅆⅇⅈⅉ":                                      	#  0x2146-9
+    - T: "kaksoisviivainen kursiivi"                           	# 	(en: 'double-struck italic', google: 'kaksinkertainen kursivoitu')
+    - SPELL: "translate('.', 'ⅆⅇⅈⅉ', 'deij')"
+
+ - "←": [T: "nuoli vasemmalle"]                 	#  0x2190	(en: 'leftwards arrow', google: 'vasen nuoli')
+ - "↑": [T: "nuoli ylös"]                       	#  0x2191	(en: 'upwards arrow', google: 'ylöspäin nuoli')
+ - "→":                                         	#  0x2192
+     - test:
+        if: "ancestor::*[2][self::m:limit]"
+        then: [T: "lähestyy"]            	        # 	(en: 'approaches', google translation)
+        else: [T: "nuoli oikealle"]             	# 	(en: 'right arrow', google: 'oikea nuoli')
+
+ - "↓": [T: "nuoli alas"]                       	#  0x2193	(en: 'downwards arrow', google: 'alaspäin nuoli')
+ - "⇒": [T: "kaksiviivainen nuoli oikealle"]    	#  0x21d2	(en: 'rightwards double arrow', google: 'oikealla kaksinkertaisella nuolella')
+ - "∀": [T: "kaikille"]                         	#  0x2200	(en: 'for all')
+ - "∂":                                         	#  0x2202
+     - test: 
+         if: "$Verbosity='Terse'"
+         then: [T: "osittaisderivaatta"]                	# 	(en: 'partial', google translation) # might be other possibilities
+         else: [T: "osittaisderivaatta"]        	# 	(en: 'partial derivative', google: 'osittainen johdannainen')
+ - "∃": [T: "on olemassa"]                      	#  0x2203	(en: 'there exists')
+ - "∄": [T: "ei ole olemassa"]                  	#  0x2204	(en: 'there does not exist', google: 'ei ole')
+ - "∅": [T: "tyhjä joukko"]                     	#  0x2205	(en: 'empty set', google: 'tyhjä sarja')
+ - "∆":                                         	#  0x2206
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]                       	    # 	(google translation)
+     - T: "Laplacen operaattori"                    # 	(en: 'laplacian of', google: 'laplacian of')
+ - "∈":                                         	#  0x2208 # fi: some elements (pun) of this translation has to be tested
+     - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [T: "kuuluu"]                  	# 	(en: 'an element of', google translation)
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "../../self::m:set or ../../../self::m:set"	#  inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "kuuluu"]             	# 	(en: 'in', google translation)
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "kuuluu"]       	# 	(en: 'member of', google translation)
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "kuuluu"]          	# 	(en: 'element of', google translation)
+              - else: [T: "kuuluu joukkoon"]    	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belonging to', google: 'kuulua')
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "kuuluu"]           	# 	(en: 'is a member of', google translation)
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "kuuluu"]       	# 	(en: 'is an element of', google translation)
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "kuuluu"]          	# 	(en: 'is in', google translation)
+              - else: [T: "kuuluu joukkoon"]    	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belongs to', google: 'kuuluu')
+ - "∉":                                         	#  0x2209 # fi: some elements (pun) of this translation has to be tested
+    # rule is identical to 0x2208
+     - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [T: "ei kuulu"]           	# 	(en: 'is not an element of', google translation)
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "../../self::m:set or ../../../self::m:set"	#  inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "ei kuulu"]          	# 	(en: 'not in', google translation)
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "ei kuulu"]           	# 	(en: 'not member of', google translation)
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "ei kuulu"]       	# 	(en: 'not element of', google translation)
+              - else: [T: "ei kuulu joukkoon"]  	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'not belonging to', google: 'ei kuulu')
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "ei kuulu"]       	# 	(en: 'is not a member of', google translation)
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "ei kuulu"]   	# 	(en: 'is not an element of', google translation)
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "ei ole joukossa"]             	# 	(en: 'is not in', google translation)
+              - else: [T: "ei kuulu joukkoon"]  	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'does not belong to', google: 'ei kuulu')
+ - "∊":                                         	#  0x220a # fi: some elements (pun) of this translation has to be tested
+     - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [T: "kuuluu"]               	# 	(en: 'is an element of', google translation)
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "../../self::m:set or ../../../self::m:set"	#  inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "kuuluu"]             	# 	(en: 'in', google translation)
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "kuuluu"]       	# 	(en: 'member of', google translation)
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "kuuluu"]          	# 	(en: 'element of', google translation)
+              - else: [T: "kuuluu joukkoon"]	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belonging to', google: 'kuulua')
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [T: "kuuluu"]           	# 	(en: 'is a member of', google translation)
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [T: "kuuluu"]       	# 	(en: 'is an element of', google translation)
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [T: "kuuluu"]          	# 	(en: 'is in', google translation)
+              - else: [T: "kuuluu joukkoon"]	#  $ClearSpeak_SetMemberSymbol = 'Belongs'	(en: 'belongs to', google: 'kuuluu')
+ - "∏": [T: "tulo"]                             	#  0x220f	(en: 'product', google: 'tuote')
+ - "∐": [T: "kotulo"]                        	#  0x2210	(en: 'co-product', google: 'yhteistuote')
+ - "∑": [T: "summa"]                            	#  0x2211	(en: 'sum')
+ - "−": [T: "miinus"]                           	#  0x2212	(en: 'minus')
+ - "∓": [T: "miinus-plus"]                  	    #  0x2213	(en: 'minus or plus')
+ - "∗": [T: "kertaa"]             	            #  0x2217	(en: 'times', google: 'ajat')
+ - "∘": [T: "yhdistetty"]                	#  0x2218	(en: 'composed with', google: 'koostuu') #fi: is this composite function?
+ - "√":                                         	#  0x221a
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]                       	    # 	(google translation)
+     - T: "neliöjuuri"                          	# 	(en: 'square root of')
+ - "∝":                                         	#  0x221d
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: "on"]                        	# 	(en: 'is', google translation)
+     - T: "verrannollinen"                   	    # 	(en: 'proportional to', google: 'suhteessa')
+ - "∞": [T: "ääretön"]                          	#  0x221e	(en: 'infinity')
+ - "∟": [T: "suora kulma"]                      	#  0x221f	(en: 'right angle', google: 'oikea kulma')
+ - "∠": [T: "kulma"]                            	#  0x2220	(en: 'angle')
+ - "∡": [T: "mitattu kulma"]                    	#  0x2221	(en: 'measured angle')
+ - "∣": [T: "jakaa"]                            	#  0x2223	(en: 'divides')
+ - "∤": [T: "ei jaa"]                           	#  0x2224	(en: 'does not divide')
+ - "∥":                                         	#  0x2225
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: "on"]                        	# 	(en: 'is', google translation)
+     - T: "yhdensuuntainen"                   	    # 	(en: 'parallel to', google: 'samansuuntainen')
+ - "∦":                                         	#  0x2226
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]                        	    # 	(en: 'is', google translation)
+     - T: "ei ole yhdensuuntainen"              	# 	(en: 'not parallel to', google: 'ei rinnakkain')
+ - "∧": [T: "looginen ja"]                      	#  0x2227	(en: 'and', google: 'ja') # should there be logic for "logical and" and "logical or"?
+ - "∨": [T: "looginen tai"]                     	#  0x2228	(en: 'or', google: 'tai')
+ - "∩": [T: "leikkaus"]                         	#  0x2229	(en: 'intersection', google: 'risteys')
+ - "∪": [T: "yhdiste"]                          	#  0x222a	(en: 'union', google: 'liitto')
+ - "∫": [T: "integraali"]                       	#  0x222b	(en: 'integral', google: 'olennainen')
+ - "∬": [T: "kaksoisintegraali"]                	#  0x222c	(en: 'double integral', google: 'kaksinkertainen integraali')
+ - "∭": [T: "kolmoisintegraali"]                	#  0x222d	(en: 'triple integral', google: 'kolminkertainen integraali')
+ - "∮": [T: "suljettu polkuintegraali"]         	#  0x222e	(en: 'contour integral', google: 'muoto -integraali')
+ - "∶":                                         	#  0x2236
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]                        	    # 	(en: 'is', google translation)
+     - T: "suhde"                               	# 	(en: 'to', google: 'to')
+ - "∷": [T: "kuten"]                         	#  0x2237	(en: 'as', google: 'kuten')
+ - "∼": [T: "jakautunut"]                	        #  0x223c	(en: 'varies with', google: 'vaihtelee')
+ - "∽": [T: "käännetty tilde"]                  	#  0x223d	(en: 'reversed tilde', google: 'kääntynyt tilde')
+ - "∾":                                         	#  0x223e
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]                        	# 	(en: 'is', google translation)
+     - T: "käännetty kaatunut S-kirjain"        	# 	(en: 'most positive', google: 'positiivisin') # fi: no good translation
+ - "∿": [T: "sinikäyrä"]                        	#  0x223f	(en: 'sine wave', google: 'siniaalto')
+ - "≠":                                         	#  0x2260
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]                        	    # 	(en: 'is', google translation)
+     - T: "ei ole yhtä suuri kuin"                    	# 	(en: 'not equal to', google: 'ei yhtä suuri kuin')
+ - "≡":                                         	#  0x2261
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: "on"]                        	    # 	(en: 'is', google translation)
+     - T: "identtinen"                       	# 	(en: 'identical to', google: 'yhtäläinen')
+ - "≤":                                         	#  0x2264
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: "on"]                        	# 	(en: 'is', google translation)
+     - T:  "pienempi tai yhtä suuri kuin"
+ - "≥":                                         	#  0x2265
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: "on"]                        	# 	(en: 'is', google translation)
+     - T: "suurempi tai yhtä suuri kuin"         	# 	(en: 'greater than or equal to', google: 'suurempi tai yhtä suuri kuin')
+ - "≦": [T: "pienempi tai yhtä suuri kuin"]  	#  0x2266	(en: 'less than over equal to', google: 'vähemmän kuin yli yhtä suuri kuin') # based on https://jkorpela.fi/merkkien-nimet.html#, the meaning is the same as with =< 
+ - "≧": [T: "suurempi tai yhtä suuri kuin"]  	#  0x2267	(en: 'greater than over equal to', google: 'suurempi kuin yli yhtä suuri kuin')
+ - "≺": [T: "edeltää"]                          	#  0x227a	(en: 'precedes')
+ - "≻": [T: "seuraa"]                           	#  0x227b	(en: 'succeeds', google: 'onnistuu')
+ - "⊂":                                         	#  0x2282
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: "on"]                        	    # 	(en: 'is a', google translation)
+     - T: "osajoukko"                        	# 	(en: 'subset of', google: 'alajoukko')
+ - "⊃":                                         	#  0x2283
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: "on"]                        	    # 	(en: 'is a', google translation)
+     - T: "ylijoukko"                  	# 	(en: 'superset of', google: 'superset of') # fi: not common, source for Finnish: https://fi.wikibooks.org/wiki/Diskreetti_matematiikka/Joukko-oppi
+ - "⊄":                                         	#  0x2284
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]                        	    # 	(en: 'is', google translation)
+     - T: "ei ole osajoukko"                    	# 	(en: 'not a subset of', google: 'ei osa')
+ - "⊅":                                         	#  0x2285
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: ""]                        	    # 	(en: 'is', google translation)
+     - T: "ei ole ylijoukko"               	# 	(en: 'not a superset of', google: 'ei ylimääräistä') # fi: not common, source for Finnish: https://fi.wikibooks.org/wiki/Diskreetti_matematiikka/Joukko-oppi
+ - "⊆":                                         	#  0x2286
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: "on"]                        	    # 	(en: 'is a', google translation)
+     - T: "osajoukko tai yhtä kuin"          	# 	(en: 'subset of or equal to', google: 'alajoukko tai yhtä suuri kuin')
+ - "⊇":                                         	#  0x2287
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [T: "on"]                        	    # 	(en: 'is a', google translation)
+     - T: "ylijoukko tai yhtä kuin" 	# 	(en: 'superset of or equal to', google: 'superset tai yhtä suuri kuin')

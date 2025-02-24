@@ -1,27 +1,36 @@
 ---
 # Each definition in this file is of the form
-#   name: [ "...", "..." "..." ]
+# - name: { "...", "..." "..." }
+# For numbers, 
+# - name: [] "...", "..." "..." ]
 
-[
+- IntentMappings: {
+    # this should be defined for each translation; a default empty value is here to ensure the mapping exists
+  }
+
+- NavigationParts: {
+    # this should be defined for each translation; a default empty value is here to ensure the mapping exists
+  }
+
   # ---------------- Large Operators  ----------------------------------
-  LargeOperators: [
+- LargeOperators: {
     "⅀", # double struck
     "∏", "∐", "∑", "⋀", "⋁", "⋂", "⋃", "⨀", "⨁", "⨂", "⨃", "⨄", "⨅",
     "⨆", "⨇", "⨈", "⨉", "⨊", "⨋", "⫼", "⫿",
     "∫", "∬", "∭", "∮", "∯", "∰", "∱", "∲", "∳", "⨌", "⨍", "⨎", "⨏",
     "⨐", "⨑", "⨒", "⨓", "⨔", "⨕", "⨖", "⨗", "⨘", "⨙", "⨚", "⨛", "⨜"
-  ],
+  }
 
 
   # ----------------  Function Names  ------------------------------------
   # these are always considered to be function names, so "sin x" will be interpreted as "sin" applied to "x", not times
   # Note: the log functions follow the same syntax rules as trig functions, so they are included here
-  TrigFunctionNames: [
+- TrigFunctionNames: {
     "cos", "cosec", "cosech", "cosh", "cot", "cotan", "cotanh", "coth", "csc", "csch",
     "sec", "sech", "sin", "sinh", "tan", "tang", "tanh", "tg", "ln", "log", "lg"    
-  ],
+  }
 
-  AdditionalFunctionNames: [
+- AdditionalFunctionNames: {
     // the arcXXX functions aren't really trig functions (they are inverse functions)
     "arccos", "arccosec", "arccosech", "arccosh",
     "arccot", "arccotan", "arccotanh", "arccoth",
@@ -32,14 +41,14 @@
     "min", "max", "deg", "det",
     "dim", "hom", "ker", "tr",
     "Dim", "Hom", "Ker", "Tr",
-    "inf", "lim", "liminf", "limsup", "max", "min", "sup",
+    "inf", "lim", "liminf", "limsup", "sup",
     "injlim", "projlim", "inj lim", "proj lim",
 
     # these come from the nemeth book (Rule XVII)
     "arc",
     "amp", "amplitude",
     "antilog", "antilogarithm",
-    "arg", "argument",
+    "argument",
     "colog", "cologarithm",
     "cosine",
     "hyperbolic cosine",
@@ -72,34 +81,39 @@
     "tangent",
     "hyperbolic tangent",
     "vers", "versine"
-  ],
+  }
 
   # common names of functions along with a capital letter followed more one or more letters
   # these will be interpreted as functions when followed by parens as in f(x+y)
   # other variables will be interpreted as functions when there is a "," in the parens as in t(x,a)
   # FIX: Also useful to define are multi-letter function names that start with a capital letter: "[A-Za-z]+"
   # FIX: That's not currently possible, so the canonicalize function builds that in. Should be externally-definable
-  LikelyFunctionNames: [
+- LikelyFunctionNames: {
       "f", "g", "h", "F", "G", "H"
-  ],
+  }
+
+  # Names of functions that in terse mode don't say "of" (or it's equivalent in other languages)
+  # make sure it is defined -- override in the language-specific file
+- TerseFunctionNames: {
+  }
 
   # probably need to expand, but these are ones that have braille codes and are in the op dict
-  GeometryPrefixOperators: [
+- GeometryPrefixOperators: {
       "∟", "∠", "∡", "∢", "⊾", "⊿",
-  ],
+  }
 
   # note: the u+2500 are shapes, but they should be <mi>s that will potentially make use of invisible function application
   # so that △ABC makes sense since △ and the other shapes are not in the operator dictionary.
-  GeometryShapes: [
+- GeometryShapes: {
     "■","□","▢","▣","▤","▥","▦","▧","▨","▩","▪","▫","▬","▭","▮","▯",
     "▰","▱","▲","△","▴","▵","▶","▷","▸","▹","►","▻","▼","▽","▾","▿",
     "◀","◁","◂","◃","◄","◅","◆","◇","◈","◉","◊","○","◌","◍","◎","●",
     "◐","◑","◒","◓","◔","◕","◖","◗","◘","◙","◚","◛","◜","◝","◞","◟",
     "◠","◡","◢","◣","◤","◥","◧","◨","◩","◪","◫","◬","◭","◮","◯",
     "◰","◱","◲","◳","◴","◵","◶","◷","◸","◹","◺","◻","◼","◽","◾", "◿",
-  ],
+  }
 
-  SubsetOperators: [
+- SubsetOperators: {
     "⋢", "⋣", "⋤", "⋥", "⊂", "⊃", "⊄", "⊅", "⊆", "⊇", "⊈", "⊉", "⊊", "⊋",
     "⊏", "⊐", "⊑", "⊒", "⪽", "⪾", "⪿", "⫀", "⫁", "⫂", "⫃", "⫄", "⫅", "⫆",
     "⫇", "⫈", "⫉", "⫊", "⫋", "⫌", "⫍", "⫎", "⫏", "⫐", "⫑", "⫒", "⫓", "⫔",
@@ -108,9 +122,9 @@
     "∈", "∊", "⋲", "⋳", "⋴", "⋵", "⋶", "⋷", "⋸", "⋹", "⋿",
 
     "∋", "∍", "⋺", "⋻", "⋼", "⋽", "⋾",
-  ],
+  }
 
-  Arrows: [
+- Arrows: {
     "←", "↑", "→", "↓", "↔", "↕", "↖", "↗", "↘", "↙", "↚", "↛", "↜", "↝", "↞",
     "↟", "↠", "↡", "↢", "↣", "↤", "↥", "↦", "↧", "↨", "↩", "↪", "↫", "↬", "↭",
     "↮", "↯", "↰", "↱", "↲", "↳", "↴", "↵", "↶", "↷", "↸", "↹", "↺", "↻", "⇄",
@@ -137,15 +151,14 @@
     "⥏", "⥐", "⥑", "⥒", "⥓", "⥔", "⥕", "⥖", "⥗", "⥘", "⥙", "⥚", "⥛", "⥜", "⥝",
     "⥞", "⥟", "⥠", "⥡", "⥢", "⥣", "⥤", "⥥", "⥦", "⥧", "⥨", "⥩", "⥪", "⥫", "⥬",
     "🣒", "🣓", "🣔",                         # 0x1f8d2 - 0x1f8d4 (Unicode 17 equilibrium arrows
-
-  ],
+  }
 
   # these come from SRE's ts\semantic_tree\semantic_attr.ts file
-  NemethComparisonOperators: [
+- ComparisonOperators: {
     "=", "⁼", "₌", "∼", "∽", "≃", "≅",  "≈",  "≊", "≋", "≌", "≍", "≎",
     "≑", "≒", "≓", "≔", "≕", "≖", "≗", "≘",  "≙",  "≚", "≛", "≜", "≝", "≞",
     "≟", "≡", "≣", "⧤", "⩦", "⩮", "⩯", "⩰",  "⩱",  "⩲", "⩳", "⩴", "⩵", "⩶",
-    "⩷", "⩸", "⋕", "⩭", "⩪", "⩫", "⩬", "﹦", "＝", "⩬", "⊜", "∷",
+    "⩷", "⩸", "⋕", "⩭", "⩪", "⩫", "⩬", "﹦", "＝", "⊜", "∷",
 
     "<", ">", "≁", "≂", "≄", "≆", "≇",  "≉",  "≏",  "≐", "≠", "≢", "≤", "≥",
     "≦", "≧", "≨", "≩", "≪", "≫", "≬",  "≭",  "≮",  "≯", "≰", "≱", "≲", "≳",
@@ -162,100 +175,5 @@
     "⊏", "⊐", "⊑", "⊒", "⪽", "⪾", "⪿", "⫀", "⫁", "⫂", "⫃", "⫄", "⫅", "⫆",
     "⫇", "⫈", "⫉", "⫊", "⫋", "⫌", "⫍", "⫎", "⫏", "⫐", "⫑", "⫒", "⫓", "⫔",
     "⫕", "⫖", "⫗", "⫘", "⋐", "⋑", "⋪", "⋫", "⋬", "⋭", "⊲", "⊳", "⊴", "⊵",
+  }
 
-    "∈", "∊", "⋲", "⋳", "⋴", "⋵", "⋶", "⋷", "⋸", "⋹", "⋿",
-
-    "∋", "∍", "⋺", "⋻", "⋼", "⋽", "⋾",
-
-    "⊢", "⊣", "⊦", "⊧", "⊨", "⊩", "⊪", "⊫", "⊬", "⊭", "⊮", "⊯", "⫞", "⫟",
-    "⫠", "⫡", "⫢", "⫣", "⫤", "⫥", "⫦", "⫧", "⫨", "⫩", "⫪", "⫫", "⫬", "⫭",
-
-    "←", "↑", "→", "↓", "↔", "↕", "↖", "↗", "↘", "↙", "↚", "↛", "↜", "↝", "↞",
-    "↟", "↠", "↡", "↢", "↣", "↤", "↥", "↦", "↧", "↨", "↩", "↪", "↫", "↬", "↭",
-    "↮", "↯", "↰", "↱", "↲", "↳", "↴", "↵", "↶", "↷", "↸", "↹", "↺", "↻", "⇄",
-    "⇅", "⇆", "⇇", "⇈", "⇉", "⇊", "⇍", "⇎", "⇏", "⇐", "⇑", "⇒", "⇓", "⇔", "⇕",
-    "⇖", "⇗", "⇘", "⇙", "⇚", "⇛", "⇜", "⇝", "⇞", "⇟", "⇠", "⇡", "⇢", "⇣", "⇤",
-    "⇥", "⇦", "⇧", "⇨", "⇩", "⇪", "⇫", "⇬", "⇭", "⇮", "⇯", "⇰", "⇱", "⇲", "⇳",
-    "⇴", "⇵", "⇶", "⇷", "⇸", "⇹", "⇺", "⇻", "⇼", "⇽", "⇾", "⇿", "⌁", "⌃", "⌄",
-    "⌤", "⎋", "➔", "➘", "➙", "➚", "➛", "➜", "➝", "➞", "➟", "➠", "➡", "➢", "➣",
-    "➤", "➥", "➦", "➧", "➨", "➩", "➪", "➫", "➬", "➭", "➮", "➯", "➱", "➲", "➳",
-    "➴", "➵", "➶", "➷", "➸", "➹", "➺", "➻", "➼", "➽", "➾", "⟰", "⟱", "⟲", "⟳",
-    "⟴", "⟵", "⟶", "⟷", "⟸", "⟹", "⟺", "⟻", "⟼", "⟽", "⟾", "⟿", "⤀", "⤁", "⤂",
-    "⤃", "⤄", "⤅", "⤆", "⤇", "⤈", "⤉", "⤊", "⤋", "⤌", "⤍", "⤎", "⤏", "⤐", "⤑",
-    "⤒", "⤓", "⤔", "⤕", "⤖", "⤗", "⤘", "⤙", "⤚", "⤛", "⤜", "⤝", "⤞", "⤟", "⤠",
-    "⤡", "⤢", "⤣", "⤤", "⤥", "⤦", "⤧", "⤨", "⤩", "⤪", "⤭", "⤮", "⤯", "⤰", "⤱",
-    "⤲", "⤳", "⤴", "⤵", "⤶", "⤷", "⤸", "⤹", "⤺", "⤻", "⤼", "⤽", "⤾", "⤿", "⥀",
-    "⥁", "⥂", "⥃", "⥄", "⥅", "⥆", "⥇", "⥈", "⥉", "⥰", "⥱", "⥲", "⥳", "⥴", "⥵",
-    "⥶", "⥷", "⥸", "⥹", "⥺", "⥻", "⦳", "⦴", "⦽", "⧪", "⧬", "⧭", "⨗", "⬀", "⬁",
-    "⬂", "⬃", "⬄", "⬅", "⬆", "⬇", "⬈", "⬉", "⬊", "⬋", "⬌", "⬍", "⬎", "⬏", "⬐",
-    "⬑", "⬰", "⬱", "⬲", "⬳", "⬴", "⬵", "⬶", "⬷", "⬸", "⬹", "⬺", "⬻", "⬼", "⬽",
-    "⬾", "⬿", "⭀", "⭁", "⭂", "⭃", "⭄", "⭅", "⭆", "⭇", "⭈", "⭉", "⭊", "⭋", "⭌",
-    "￩", "￪", "￫", "￬",
-    # Harpoons
-    "↼", "↽", "↾", "↿", "⇀", "⇁", "⇂", "⇃", "⇋", "⇌", "⥊", "⥋", "⥌", "⥍", "⥎",
-    "⥏", "⥐", "⥑", "⥒", "⥓", "⥔", "⥕", "⥖", "⥗", "⥘", "⥙", "⥚", "⥛", "⥜", "⥝",
-    "⥞", "⥟", "⥠", "⥡", "⥢", "⥣", "⥤", "⥥", "⥦", "⥧", "⥨", "⥩", "⥪", "⥫", "⥬",
-    "⥭", "⥮", "⥯", "⥼", "⥽", "⥾", "⥿",
-
-    # chars not from SRE
-    "∝", "∉", "∶",
-
-    "∥", "⟂", "⊥",
-  ],
-
-  # no space is used when these chars "apply" to ellipsis or long dash (lesson 2.13, differs slightly from rule 42)
-  # can't do 42(ii) which is braille indicators because they are not input (they are output) -- handle by regexp later
-  # also used for comparison operators (Rule 151)
-  NemethPunctAndOpenBeforeSymbols: [
-    "‘", "“", ",",                                                   # punctuation -- 42(i)
-    "(", "[", "{", "⟨", "⟦", "⦃", "⟪", "⌈", "⌊",                      # 42(iii) open
-  ],
-
-  NemethPunctAndOpenAfterSymbols: [
-    "'", ":", ",", "!", ".", "?", "’", "”", ";",                    # punctuation -- 42(i)
-    ")", "]", "}", "⟩", "⟧", "⦄", "⟫", "⌉", "⌋",                      # 42(iii) close
-  ],
-
-  NemethCurrencyBeforeSymbols: [
-    "$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿" # 42(iv) could add more currencies...
-  ],
-
-  NemethCurrencyAfterSymbols: [
-    "$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿", # 42(iv) most are dubious as applying after...
-    "%", "′", "″", "‴", "⁗"
-  ],
-
-  CMUCharsWithDotsOnLeft: [
-    # The caps indicator has no dots in left half, so cap letters are not included
-    "a", "b", "c", "d", "e", "f","g", "h", "i", "j", "k", "i", "j", "k", "l",
-    "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
-    "1", "2", "3", "4", "5", "6", "7", "8", "9", "0",
-    "=", "<", "≤", ">", "≦", "≪", "≫", "×", "÷", "±",
-    "(", ")", "[", "]", "〈", "〉", "!", "*",
-    ";", "?", "¿", "_", "—", "²", "³",
-    "⩽", "⩾", "©", "®",
-    "\"", "'", "“", "”", "‘", "’", "«", "»",
-    ",", ".", ":", "-",
-  ],
-
-  # These get a '.' after them (an abbreviation). From 7.2, 7.5.2, 7.5.3
-  CMUFunctionNames: [
-    "Dom", "Or", "Img", "Im", "conc", "conv", "crec", "dec", "arg", "rot",
-    "div", "grad", "Re", "Im", "Rec",
-    "máx", "mín", "mcd", "mcm", "ínf", "sup",   # from 5.5.3
-    "lim", "exp", 
-    "Antilog", "antilog", "Alog", "alog", "Colog", "colog", "Ln", "Aln", "aln", 
-    "cos", "cosec", "cosech", "cosh", "cot", "cotan", "cotanh", "coth", "csc", "csch",
-    "sec", "sech", "sin", "sinh", "tan", "tang", "tanh", "tg", "ln", "log", "lg",
-    "sen", "cotg", "tn", "senh", "tgh", "ctgh", 
-    "arccos", "arccosec", "arccosech", "arccosh",
-    "arccot", "arccotan", "arccotanh", "arccoth",
-    "arccsc", "arccsch", "arcsec", "arcsech", "arcsin", "arcsinh",
-    "arctan", "arctang", "arctanh", "csech", 
-    "arcsen", "arctn", "arccotg", "asin", "acos", "atan",
-    "versin", "versen", "coversin", "coversen", "semiversin", "semiversen", "semicoversin", "semicoversen", 
-    "argsinh", "argsenh", "argcosh", "argtanh", "argtgh", "argcoth", "argcotgh", "argsech", "argcsch", "argcosech",
-    "int", "dec", "sgn", "abs", "Re", "Im", "rg", "Adj",
-  ]
-  
-]

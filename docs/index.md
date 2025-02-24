@@ -28,10 +28,12 @@ MathCAT is written in Rust and can be built to interface with many languages. To
 
 MathCAT uses a number of heuristics that try to repair poor MathML and put it in a recommended format. For example, TeX converters and WYSIWYG editors will take "1,234+1" and break the number "1,234" apart at the comma. MathCAT recognizes that and folds the number into a single `mn`. Other repairs are structural such as creating `mrow`s based on information from MathML's operator dictionary and adding invisible function application, multiplication, addition (mixed fractions), and separators (e.g, between the $i$ and $j$ in $a\_{ij}$) when it seems appropriate. This simplifies speech and Nemeth generation and may be useful to other apps. Currently the cleanup is not exposed in an API, but potentially it could be another service of MathCAT. In general, MathCAT is somewhat conservative in its repair. However, it likely will do the wrong thing in some cases, but the hope is it does the right thing much, much more frequently. Finding common mistakes of translators to MathML and patching up the poor MathML is an ongoing project.
 
-## Current Status (updated 8/14/23)
-MathCAT is under active development. Initial speech, navigation, and braille (Nemeth, UEB) generation is complete and [NVDA add-on](https://addons.nvda-project.org/addons/MathCAT.en.html) now exists. It should be usable as a MathPlayer replacement for those using the English version or one of the supported translations. It is not as complete or polished in some ways as MathPlayer though. However, it supports both Nemeth and UEB technical braille generation. The Nemeth braille is substantially better than that provided by MathPlayer and other MathML → Nemeth translators. It also includes integration with navigation (uses dots 7 and 8 to indicate the navigation node). Because of the high quality braille output, [BrailleBlaster](https://www.brailleblaster.org/) uses MathCAT for braille generation from MathML.
+## Current Status (updated 4/3/24)
+MathCAT is under active development. Initial speech (English, Spanish, Indonesian, Vietnamese, Chinese(Traditional)), navigation, and braille (Nemeth, UEB, CMU, Vietnamese, German LaTeX) generation is complete and [NVDA add-on](https://addons.nvda-project.org/addons/MathCAT.en.html) now exists. It should be usable as a MathPlayer replacement for those using the English version or one of the supported translations. It is not as complete or polished in some ways as MathPlayer though. However, it supports both Nemeth and UEB technical braille generation. The Nemeth braille is substantially better than that provided by MathPlayer and other MathML → Nemeth translators. It also includes integration with navigation (uses dots 7 and 8 to indicate the navigation node) along with braille cursor routing during navigation. Because of the high quality braille output, [BrailleBlaster](https://www.brailleblaster.org/) uses MathCAT for braille generation from MathML.
 
-A number of other AT are working to incorporate MathCAT into their products. Notable among these groups is Vispero/JAWS. No release date for a version of JAWS with MathCAT has been announced yet. [Other companies: if you have incorporated MathCAT into your product and would like to be mentioned here, please contact me by email or add an issue to update the documentation]
+A number of other AT are working to incorporate MathCAT into their products. Notable among these groups is Vispero/JAWS. To use MathCAT in JAWS 2024 ([What's New in JAWS 2024 Screen Reading Software (freedomscientific.com)](https://support.freedomscientific.com/downloads/jaws/JAWSWhatsNew)), enable it through the Early Adopter Program. Open the JAWS Menu with Insert + J, navigate to Options, select Early Adopter Program, check the MathCAT checkbox, and restart JAWS to use it. You can send Freedom Scientific feedback about their MathCat implementation by going back to the Early Adopter Program dialog and selecting the Send Feedback button, located after the MathCat checkbox. JAWS currently supports MathCat in English, with Nemeth Braille. UEB is on the way, so stay tuned. You can use all speech, navigation and Braille navigation command that MathCat provides from within the JAWS Math Viewer. MathCat Settings are available through the JAWS Settings Center.
+
+[_Other companies_: if you have incorporated MathCAT into your product and would like to be mentioned here, please contact me by email or add an issue to update the documentation]
 
 A demo to show off some of MathCAT's features and also as an aid for debugging was developed. [Visit the demo](https://nsoiffer.github.io/MathCATDemo/) and please report any bugs you find. This demo is _not_ how AT users will typically interact with MathCAT but does show features that AT can potentially expose to end users such as highlighting of the speech, navigation, and braille.
 
@@ -51,20 +53,34 @@ Timeline:
 * ✓ Nov/Dec: Work on at least one translation of MathCAT to another language (pushed back from late spring). Have Indonesian and Vietnamese translations.
 
 2023
-* Spring 2023: add more inference/speech rules (at least units and currency) [on hold due to Math WG intent discussions continuing]
-* Spring 2023: analyze books to better determine what should be in the Unicode short file (hopefully get someone to help with this)
 * Spring 2023: translation work
   * ✓ Create some tools to simplify generation of the Unicode files in different languages
   * Create some tools to help update other languages when the English version changes (adds new rules) [critical]
   * ✓ Add phrases so better starting points for translations can be generated
-  * Work with translators and fix any problems they might turn up
+  * ✓ Work with translators and fix any problems they might turn up
   * Work with translators to hopefully add many languages (added Spanish translation)
 * ✓ (mostly) Summer 2023: Vietnamese braille code 
-* August: maybe Spanish braille code (potentially French and Portuguese also as they are supposedly similar)
-* Early 2024: work on UEB → MathML translation and explore UEB → Nemeth math translator
-* Fall 2023: potentially work on 2D Nemeth generation along with Nemeth input
-* Early 2024: work on UEB → MathML translation and explore UEB → Nemeth math translator
+* ✓August/Sept: Add CMU braille code (Spanish and Portuguese standard)
 
+2024
+* ✓ Jan: Automatic builds for the various repos
+* Jan: Portuguese translation
+* Winter-Spring: More translations (Swedish and Finnish speech and braille)
+* Feb: Units and Currency
+* Spring: add more inference/speech rules based on W3C's Math WG core list
+* Spring: analyze books to better determine what should be in the Unicode short file (hopefully get someone to help with this)
+* Spring: more translations
+* ✓ (added) German LaTeX braille 
+* ✓ (added) ASCIIMath (braille) 
+* ✓ (added) Copy as options: LaTeX, ASCIIMath
+* Spring/Summer/Fall: work on tools to help maintain translations
+* Summer: explore adding ASCIIMath and LaTeX importers (there are Rust packages for these, but I haven't checked quality and completeness)
+* July: vacation 😎 and ICCHP conference
+* Fall: potentially work on UEB → MathML translation and explore UEB → Nemeth math translator
+
+Longer term
+* other braille input
+* potentially work on 2D Nemeth generation along with other braille codes
 
 
 These plans are very tentative and will likely change based on feedback from users and AT developers.
@@ -112,7 +128,7 @@ Rust is quite efficient. On a Core I7-770K machine (higher end processor circa 2
 </math>
 takes about 4ms to generate the ClearSpeak string
 "_e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren squared, end exponent_" along with the Nemeth braille string "⠑⠘⠤⠹⠂⠌⠆⠼⠈⠡⠷⠹⠭⠤⠨⠍⠌⠨⠎⠼⠾⠘⠘⠆".
-This time is split approximately: 2ms to cleanup the MathML + 1ms for speech generation + 1ms for braille generation.
+This time is split approximately: 2ms to cleanup the MathML + 1ms for speech generation + 1ms for braille generation. This includes time to make sure all the rule files are up to date, which turns out is quite expensive. A preference can be set to turn the checks off (the file checks are mainly useful for debugging). With the check turned off, the time drops to 2.3ms.
 <details>
 <summary>Click to see the MathML for this expression</summary>
 <pre>
@@ -178,6 +194,9 @@ Translators:
 * Vietnamese -- Dang Hoai Phúc and Trang Pham
 * Others??? -- please volunteer so I can list you here...
 
+The initial translation of many braille characters for braille codes developed in 2024 and beyond was greatly helped by a spreadsheet given to me by Georgious Kouroupetroglou and is the work of a larger team. For more details, see:
+* [MathBrailleCodes Repository](https://access.uoa.gr/mathbraille/index.php/en/), Speech and Accessibility Lab, National and Kapodistrian University of Athens, Greece: P. Riga, T. Antonakopoulou, D. Kouvaras, S. Lentas and G. Kouroupetroglou (2021) “[The BrailleMathCodes Repository](https://access.uoa.gr/mathbraille/index.php/en/)”, Proceedings of the 4th International Workshop on “[Digitization and e-Inclusion in Mathematics and Science 2021](https://workshop.sciaccess.net/deims2021/DEIMS2021_Proceedings.zip)” DEIMS2021, February 18-19, 2021, Tokyo, pp. 105-114. 
+
 Thanks to everyone who volunteered!
 
 # About me
@@ -189,4 +208,4 @@ For more information about what happened to MathPlayer and how MathCAT came to b
 
 All along, I've been pushing to make math work on the web and make it accessible. While at Wolfram Research, I helped get the W3C MathML effort started and have been involved with the working group ever since. I currently chair the W3C Math Working Group. I've been a member on several other committees over the years pushing strongly to make sure they incorporated math accessibility into their standards. Some of the these groups include NIMAS, EPUB, and PDF/UA.
 
-I'm very honored that in 2023, the National Federation of the Blind gave me the $25,000 Jacob Bolotin award. In part, that was due to my work on MathCAT. I plan to give most of that money back to blind programmers who help out with MathCAT. MathCAT should not just be _for_ the blind community, it should also be _by_ the blind community. Stay tuned for details.
+I'm very honored that in 2023, the National Federation of the Blind gave me the <span>$</span>25,000 Jacob Bolotin award. I donated <span>$</span>15,000 of that to the _open collective_ to improve MathML support in browsers. [Click this link for how you can help improve MathML support in browsers](https://opencollective.com/mathml-core-support).

@@ -1,0 +1,25 @@
+---
+- NoSpacesBefore: {
+  #FIX: this needs expanding
+    "(", ")", "[", "]", "{", "}", "|",
+    ",", ";",
+    "%", "!", "/",
+    "⁡", "⁢", "⁣","⁤",          # 0x2061 - 0x2064 (invisible chars)
+  }
+
+- LateXFunctionNames: {
+    "sin", "cos", "tan",  "arcsin", "arccos", "arctan",
+    "csc", "sec", "cot", "arccsc", "arcsec", "arccot", 
+    "sinh", "cosh", "tanh",  "arcsinh", "arccosh", "arctanh",
+    "csch", "sech", "coth", "arccsch", "arcsech", "arccoth", 
+    "deg", "det", "dim", "exp", "gcd", "hom", "inf",
+    "ker", "lg", "lim", "liminf", "limsup", "ln", "log", "max",
+    "min", "Pr", "sup",    
+  }
+
+- MovableLimitsLargeOps: {
+    "⨜", "⨛", "⨚", "⨙", "⨘", "⨗", "⨖", "⨕", "⨔", "⨓", "⨒", "⨑", "⨐", "⨏", "⨎", "⨍",
+    "⨌", "∳", "∲", "∱", "∰", "∯", "∮", "∭", "∬", "∫",
+    "⨋", "∐", "∏", "⫿", "⫼", "⨉", "⨈", "⨇", "⨆", "⨅",
+    "⨂", "⨀", "⋂", "⋁", "⋀", "⨄", "⨃", "⋃", "⨁", "⨞", "⨝", "⨊", "∑",
+  }

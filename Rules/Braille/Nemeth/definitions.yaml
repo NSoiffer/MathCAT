@@ -1,0 +1,13 @@
+---
+- include: "../definitions.yaml"
+
+
+- NemethCurrencyBeforeSymbols: {
+    "$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿" # 42(iv) could add more currencies...
+  }
+
+- NemethCurrencyAfterSymbols: {
+    "$", "¢", "€", "£", "₡", "₤", "₨", "₩", "₪", "₱", "₹", "₺", "₿", # 42(iv) most are dubious as applying after...
+    "%", "′", "″", "‴", "⁗"
+  }
+

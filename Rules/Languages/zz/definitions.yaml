@@ -1,11 +1,65 @@
 ---
-[
+- include: "../../definitions.yaml"
 # Lines starting with "#" are a comment
 # Each definition in this file is of the form
-#   name: [ "...", "..." "..." ],
+# - name: { "...", "..." "..." }
+# For numbers, 
+# - name: [] "...", "..." "..." ]
 
 
-# ----------------  Cardinal and Oridnal Numbers  --------------------------
+# If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here for a prefix||infix||postfix||function fixity
+# If only one ":" is used, it the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
+# If no ":"s are used, the same speech is used for all forms
+# If bracketing words make sense, they are separated with ";"s
+# Intent mappings must specify whether they are "prefix", "infix", "postfix", or "function" with an "=" sign
+# If there are multiple fixities (e.g., see transpose), they are separated with "||
+#   for readability, spaces can be used around any of the delimiter characters
+# Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
+- IntentMappings: {
+    "absolute-value": "function=absolute value",
+    "binomial": "infix=binomial; choose; end binomial",
+    "closed-interval": "other=closed-interval;from,to;end closed-interval",
+    "dot-product": "infix=dot:dot product:dot product",
+    "greatest-common-divisor": "function=gcd: the gcd: the greatest common divisor",
+    "imaginary-part": "function=imaginary part, the imaginary part, the imaginary part",
+    "least-common-multiple": "function=lcm:the lcm:the least common multiple",
+    "large-op:2": "infix=over",
+    "large-op:3": "other=from,to",
+    "real-part": "function=the real part",
+    "transpose": "postfix=transpose || function=transpose",
+
+    "divergence": "function= ; div: divergence: divergence; end divergence",
+    "curl": "function= ; curl; end curl",
+    "gradient": "function= ; grad: gradient: gradient; end gradient",
+    "laplacian": "function=lahplahsian",   # speech engines don't do a good job with "laplacian"
+  }
+
+- NavigationParts: {
+    "large-op": "base; lower limit; upper limit",
+    "mfrac": "numerator;denominator",
+    "fraction": "numerator;denominator",
+    "msqrt": "root",
+    "square-root": "root",
+    "mroot": "root;root index",
+    "root": "root;root index",
+    "msub": "base;subscript",
+    "sub": "base;subscript",
+    "msup": "base;superscript",
+    "say-super": "base;superscript",
+    "skip-super": "base;superscript",
+    "power": "base;exponent",
+    "msubsup": "base;subscript;superscript",
+    "munder": "base;under limit",
+    "mover": "base;upper limit",
+    "munderover": "base;under limit;upper limit",
+
+    # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
+    # it's a hack to put them here, but at least they are grouped with the other navigation parts
+    "in": "in",
+    "out": "out of",
+  }
+
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
 # The following definitions are used to convert numbers to words
 # The are mainly used for ordinals, of which there are two cases:
 # 1. Regular ordinals: first, second, third, ...
@@ -24,76 +78,77 @@
 #   The minimum length is 10.
 
 # For English, a regular pattern starts at twenty
-    NumbersOnes: [
+- NumbersOnes: [
         "zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
         "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
         "seventeen", "eighteen", "nineteen"
-    ],
+    ]
 
-    NumbersOrdinalOnes: [
+- NumbersOrdinalOnes: [
         "zeroth", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth",
         "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth", "fifteenth", "sixteenth",
         "seventeenth", "eighteenth", "nineteenth"
-    ],
+    ]
 
-    NumbersOrdinalPluralOnes: [
+- NumbersOrdinalPluralOnes: [
         "zeroth", "first", "seconds", "thirds", "fourths", "fifths", "sixths", "sevenths", "eights", "ninths",
         "tenths", "elevenths", "twelfths", "thirteenths", "fourteenths", "fifteenths", "sixteenths",
         "seventeenths", "eighteenths", "nineteenths"
-    ],
+    ]
 
     # stop when regularity begins
-    NumbersOrdinalFractionalOnes: [
+- NumbersOrdinalFractionalOnes: [
         "zero", "first", "half"
-    ],
+    ]
 
     # stop when regularity begins
-    NumbersOrdinalFractionalPluralOnes: [
+- NumbersOrdinalFractionalPluralOnes: [
         "zeros", "firsts", "halves"
-    ],
+    ]
 
 
     # What to use for multiples of 10
-    NumbersTens: [
+- NumbersTens: [
         "", "ten", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"
-    ],
+    ]
 
-    NumbersOrdinalTens: [
+- NumbersOrdinalTens: [
         "", "tenth", "twentieth", "thirtieth", "fortieth", "fiftieth", "sixtieth", "seventieth", "eightieth", "ninetieth"
-    ],
+    ]
 
-    NumbersOrdinalPluralTens: [
+- NumbersOrdinalPluralTens: [
         "", "tenths", "twentieths", "thirtieths", "fortieths", "fiftieths", "sixtieths", "seventieths", "eightieths", "ninetieths"
-    ],
+    ]
 
 
-    NumbersHundreds: ["", "one hundred", "two hundred", "three hundred", "four hundred", "five hundred",
+- NumbersHundreds: [
+      "", "one hundred", "two hundred", "three hundred", "four hundred", "five hundred",
         "six hundred", "seven hundred", "eight hundred", "nine hundred"
-    ],
+    ]
 
-    NumbersOrdinalHundreds: ["", "one hundredth", "two hundredth", "three hundredth", "four hundredth", "five hundredth",
+- NumbersOrdinalHundreds: [
+      "", "one hundredth", "two hundredth", "three hundredth", "four hundredth", "five hundredth",
         "six hundredth", "seven hundredth", "eight hundredth", "nine hundredth"
-    ],
+    ]
 
-    NumbersOrdinalPluralHundreds: ["", "one hundredths", "two hundredths", "three hundredths", "four hundredths", "five hundredths",
+- NumbersOrdinalPluralHundreds: [
+      "", "one hundredths", "two hundredths", "three hundredths", "four hundredths", "five hundredths",
         "six hundredths", "seven hundredths", "eight hundredths", "nine hundredths"
-    ],
+    ]
       
 
     # At this point, hopefully the language is regular. If not, code needs to be written
-    NumbersLarge: [
+- NumbersLarge: [
         "", "thousand", "million", "billion", "trillion", "quadrillion",
         "quintillion", "sextillion", "septillion", "octillion", "nonillion",
-    ],
+    ]
       
-    NumbersOrdinalLarge: [
+- NumbersOrdinalLarge: [
         "", "thousandth", "millionth", "billionth", "trillionth", "quadrillionth",
         "quintillionth", "sextillionth", "septillionth", "octillionth", "nonillionth"
-    ],
+    ]
       
-    NumbersOrdinalPluralLarge: [
+- NumbersOrdinalPluralLarge: [
         "", "thousandths", "millionths", "billionths", "trillionths", "quadrillionths",
         "quintillionths", "sextillionths", "septillionths", "octillionths", "nonillionths"
     ]
-
-]

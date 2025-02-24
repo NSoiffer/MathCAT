@@ -68,12 +68,13 @@ def translate_phrases(phrases_to_translate: list[str], lang) -> list[str]:
         # translate doesn't handle a list properly -- use ".\n" to separate phrases
         phrases_string = ".\n".join(phrases)
         # print("***Phrases to translate: {}\n".format(phrases))
-        translated_phrases_str = GoogleTranslate.translate(phrases_string, src='en', dest=lang).text.lower()
+        translated_phrases_str: str = GoogleTranslate.translate(phrases_string, src='en', dest=lang).text
         translated_phrases_str = translated_phrases_str.replace('。', '.')   # happens for Chinese
 
         translated_phrases_str = translated_phrases_str.replace('"', "'").replace("“", "'").replace("”", "'")    # google occasionally changes quotes
         translated_phrases_str = translated_phrases_str.replace("«", "'").replace("»", "'")    # google occasionally changes quotes to this form
         translated_phrases_str = translated_phrases_str.replace("、", ",")   # Chinese comma
+        translated_phrases_str = translated_phrases_str.lower()
 
         translated_phrases_list = translated_phrases_str.split('.\n')
         if len(translated_phrases_list) != len(phrases):
@@ -105,7 +106,7 @@ def translate_phrases(phrases_to_translate: list[str], lang) -> list[str]:
             time.sleep(TIMEOUT)       # try to avoid google banning us
     return translations + do_translation_chunk(phrases_chunks_to_translate)
 
-argetWord = re.compile(r"'([^']+)'")
+TargetWord = re.compile(r"'([^']+)'")
 TextString = re.compile(r'([ \[{][oc]?t: )"([^"]+)"')
 def substitute_in_translated_phrase(line, translated_phrase, translated_word) -> str:
     has_phrase = PhraseToTranslate.search(line)

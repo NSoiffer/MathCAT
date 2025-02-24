@@ -18,20 +18,6 @@
 
  - "*": [T: kali]                                # 0x2a
  - "+": [T: tambah]                              # 0x2b
- - ",":                                          # 0x2c
-    # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
-    # that this test is here and not with "…" is not ideal, but seems simplest
-     test:
-        if:
-            - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or "
-               # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
-               # speak "comma" when not adjacent to '…'
-            - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
-               # except if expression starts with '…'
-            - " ../*[1][text()='…'] "
-        then: [T: koma]
-        # else silent
-
  - "-": [T: kurang]                              # 0x2d
  - ".": [T: titik]                               # 0x2e
  - "/": [T: per]                                 # 0x2f
@@ -655,7 +641,7 @@
             - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
-            - "../*[1][text()='…']"
+            - "../*[1][.='…']"
         then: [T: titik titik titik]
         else_test:  # must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"

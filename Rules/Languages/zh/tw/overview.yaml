@@ -12,17 +12,9 @@
 # There is a balance that you want to maximize the info given, so 10 words is likely better then 3.
 #   That might mean that at the top level, we may want to allow the first few children to expand
 
-- name: default
-  tag: math
-  match: "."
-  replace: [{x: "*[1]"}]
+- include: "SimpleSpeak_Rules.yaml"
 
-- name: default
-  tag: [mi, mn, mo, mtext]
-  match: "."
-  replace: [{x: text()}]
-
-- name: default
+- name: overview-default
   tag: mfrac
   match: "."
   replace:
@@ -35,7 +27,7 @@
       else:
       - T: "分數"
 
-- name: default
+- name: overview-default
   tag: msqrt
   match: "."
   replace:
@@ -48,24 +40,24 @@
           then: {T: ""}
       - x: "*[1]"
 
-- name: default
+- name: overview-default
   tag: mroot
   match: "."
   replace:
   - T: "根號"
   - x: "*[1]"
   - test:
-    if: "IsNode(*[1], 'simple')"
-    then:
-    - test:
-        if: "$Verbosity!='Terse'"
-        then: {T: "的"}
+      if: "IsNode(*[1], 'simple')"
+      then:
+      - test:
+          if: "$Verbosity!='Terse'"
+          then: {T: "的"}
   - test:
       if: "*[2][self::m:mn]"
       then_test:
-      - if: "*[2][text()='2']"
+      - if: "*[2][.='2']"
         then: {T: "平方根"}
-      - else_if: "*[2][text()='3']"
+      - else_if: "*[2][.='3']"
         then: {T: "立方根"}
       - else_if: "*[2][not(contains(., '.'))]"
         then: [{x: "*[2]"}, {T: "次方根"}]
@@ -79,8 +71,8 @@
           else: {x: "*[2]"}
       - T: "次方根"
 
-- name: default
-  tag: mtable
+- name: matrix-override
+  tag: mrow
   match:
   - "*[2][self::m:mtable] and"
   - "(IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|'))"
@@ -90,11 +82,11 @@
   - T: "乘"
   - x: count(*[2]/*[self::m:mtr][1]/*)
   - test:
-      if: "*[1][text()='|']" # just need to check the first bracket since we know it must be (, [, or |
+      if: "*[1][.='|']" # just need to check the first bracket since we know it must be (, [, or |
       then: {T: "行列式"}
       else: {T: "矩陣"}
 
-- name: default
+- name: overview-default
   tag: mtable
   match: "."
   replace:
@@ -127,5 +119,3 @@
   - x: "*[5]"
   - pause: auto
   - T: "等等"
-
-- include: "SimpleSpeak_Rules.yaml"
