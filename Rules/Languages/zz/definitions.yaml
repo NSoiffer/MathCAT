@@ -35,7 +35,7 @@
   }
 
 - NavigationParts: {
-    "large-op": "base, lower limit, upper limit",
+    "large-op": "base; lower limit; upper limit",
     "mfrac": "numerator;denominator",
     "fraction": "numerator;denominator",
     "msqrt": "root",

@@ -54,7 +54,7 @@
   }
 
 - NavigationParts: {
-    "large-op": "base, lower limit, upper limit",
+    "large-op": "base; lower limit; upper limit",
     "mfrac": "numerator;denominator",
     "fraction": "numerator;denominator",
     "msqrt": "root",
@@ -311,7 +311,7 @@
     ]
 
 - NumbersOrdinalPluralOnes: [
-        "zeroth", "first", "seconds", "thirds", "fourths", "fifths", "sixths", "sevenths", "eights", "ninths",
+        "zeroth", "first", "seconds", "thirds", "fourths", "fifths", "sixths", "sevenths", "eighths", "ninths",
         "tenths", "elevenths", "twelfths", "thirteenths", "fourteenths", "fifteenths", "sixteenths",
         "seventeenths", "eighteenths", "nineteenths"
     ]

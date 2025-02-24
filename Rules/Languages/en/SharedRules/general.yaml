@@ -482,9 +482,8 @@
           then: [t: "equation"] # phrase('equation' 1 of 10 equations)
           else: [t: "line"]     # phrase('line 1 of 10 lines)
       - x: "count(preceding-sibling::*[not(contains(@data-intent-property, ':continued-row:'))]) + 1"
-
   - test:
-      if: .[self::m:mlabeledtr]
+      if: "self::m:mlabeledtr"
       then:
       - t: "with label"      # phrase(the diagram is complete 'with label')
       - x: "*[1]/*"
@@ -492,9 +491,9 @@
       if: "not(contains(@data-intent-property, ':continued-row:'))"
       then: [pause: medium]
   - test:
-      if: .[self::m:mlabeledtr]
+      if: "self::m:mlabeledtr"
       then: [x: "*[position()>1]"]
-      else: {x: "*"}
+      else: [x: "*"]
 
 - name: default-multiline
   tag: mtd

@@ -777,8 +777,41 @@
 
 -
   # merge all the mtd into a single mtd
+  name: consolidate-labeled-mtd-entries
+  tag: [mlabeledtr, mtr]
+  # Note: child hasn't been processed, so 'intent' hasn't been processed/turned into data-intent-property
+  match: "count(*) > 1 and
+          ($TableProperty = 'piecewise' or $TableProperty = 'system-of-equations' or $TableProperty = 'lines') and
+          (self::m:mlabeledtr or *[1][contains(@intent, ':equation-label')])"
+  replace:
+  - intent:
+      name: "mlabeledtr"
+      children:
+      - x: "*[1]"
+      - intent:
+          name: "mtd"
+          attrs: "id='*[2]/@id'"
+          children: 
+          - intent:
+              name: "mrow"
+              attrs: "id='*[2]/*[1]/@id'"
+              children: [x: "*[position()>1]/*"]
+
+-
+  # convert a mtr to a mlabeledtr
+  name: mlabeledtr
+  tag: mtr
+  # Note: child hasn't been processed, so 'intent' hasn't been processed/turned into data-intent-property
+  match: "count(*) > 1 and *[1][contains(@intent, ':equation-label')]"
+  replace:
+  - intent:
+      name: "mlabeledtr"
+      children: [x: "*"]
+
+-
+  # merge all the mtd into a single mtd
   name: consolidate-mtd-entries
-  tag: mtr  # Fix: add support for mlabeledtr
+  tag: mtr
   match: "count(*) > 1 and
           ($TableProperty = 'piecewise' or $TableProperty = 'system-of-equations' or $TableProperty = 'lines')"
   replace:

@@ -631,16 +631,20 @@
 - name: ClearSpeak-multi-line
   tag: [piecewise, system-of-equations, lines] # these are ignored in favor of the ClearSpeak prefs
   match: "."
-  variables: [IsColumnSilent: true()]
+  variables:
+    # Wikipedia has some tables where all the entire first column is empty (e.g., https://en.wikipedia.org/wiki/List_of_trigonometric_identities)
+  - LineCount: "count(*[not(contains(@data-intent-property, ':continued-row:'))])"
+  - NextLineIsContinuedRow: "false()"   # default value
+  - IsColumnSilent: true()
   replace:
-  - x: "count(*)"
   - test:
     - if: $ClearSpeak_MultiLineOverview = 'Auto'
       then:
+      - x: "$LineCount"
       - test:
         - if: "($ClearSpeak_MultiLineLabel = 'Auto' and self::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
           then: [t: "case"]      # phrase(this is the first 'case' of three cases)
-        - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line' or $ClearSpeak_MultiLineLabel = 'None'" # already dealt with Auto/Case
           then: [t: "line"]      # phrase(this is the first 'line' of three lines)
         - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
           then: [t: "constraint"]      # phrase(this is the first 'constraint' of three constraints)
@@ -652,7 +656,7 @@
           then: [t: "step"]      # phrase(this is the first 'step' of three steps)
           # else 'None -- don't say anything'
       - test:
-        - if: "count(*) > 1 and $ClearSpeak_MultiLineLabel != 'None'"
+        - if: "$LineCount != 1"
           then: [ct: "s"] # plural      # phrase(shown by the letter 's')
       - pause: short
   - x: "*"
@@ -664,33 +668,37 @@
   variables: [NextLineIsContinuedRow: "following-sibling::*[1][contains(@data-intent-property, ':continued-row:')]"]
   replace:
   - test:
-    - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
-      then: [t: "case"]      # phrase(in this  'case' x is not equal to y)
-    - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
-      then: [t: "line"]      # phrase(the straight 'line' between x and y)
-    - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
-      then: [t: "constraint"]      # phrase(there is a 'constraint' on possible values)
-    - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
-      then: [t: "equation"]      # phrase(the 'equation' pi r squared gives the area of a circle)
-    - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
-      then: [t: "row"]      # phrase(the values on the top 'row' are relevant)
-    - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
-      then: [t: "step"]      # phrase(this is a 'step' by step process)
-      # else 'None -- don't say anything'
-  - test:
-      if: "$ClearSpeak_MultiLineLabel != 'None'"
+      if: "not($LineCount=1 or $ClearSpeak_MultiLineLabel='None' or contains(@data-intent-property, ':continued-row:'))"
       then:
-      - x: "count(preceding-sibling::*)+1"
       - test:
-          if: .[self::m:mlabeledtr]
+        - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
+          then: [t: "case"]      # phrase(in this  'case' x is not equal to y)
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Auto' or $ClearSpeak_MultiLineLabel = 'Line'" # already dealt with Auto/Case
+          then: [t: "line"]      # phrase(the straight 'line' between x and y)
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Constraint'"
+          then: [t: "constraint"]      # phrase(there is a 'constraint' on possible values)
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Equation'"
+          then: [t: "equation"]      # phrase(the 'equation' pi r squared gives the area of a circle)
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Row'"
+          then: [t: "row"]      # phrase(the values on the top 'row' are relevant)
+        - else_if: "$ClearSpeak_MultiLineLabel = 'Step'"
+          then: [t: "step"]      # phrase(this is a 'step' by step process)
+          # else 'None -- don't say anything'
+      - x: "count(preceding-sibling::*[not(contains(@data-intent-property, ':continued-row:'))]) + 1"
+      - test:
+          if: "self::m:mlabeledtr"
           then:
-          - t: "with label"      # phrase(the item 'with label' complete)
+          - t: "with label"      # phrase(the diagram is complete 'with label')
           - x: "*[1]/*"
-      - pause: medium
   - test:
-      if: .[self::m:mlabeledtr]
+    - if: "$ClearSpeak_MultiLineLabel='None'"
+      then: [pause: long, pause: long]   # need a very long pause with no line labels
+    - else_if: "not(contains(@data-intent-property, ':continued-row:'))"
+      then: [pause: medium]
+  - test:
+      if: "self::m:mlabeledtr"
       then: [x: "*[position()>1]"]
-      else: {x: "*"}
+      else: [x: "*"]
 
 - name: ClearSpeak_Functions_None
   tag: mo
