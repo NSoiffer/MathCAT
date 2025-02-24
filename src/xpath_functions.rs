@@ -1453,7 +1453,7 @@ mod tests {
 
         assert_eq!("tenths", ToOrdinal::convert("10", false, true).unwrap());
         assert_eq!("sixteenths", ToOrdinal::convert("16", false, true).unwrap());
-        assert_eq!("eighty eights", ToOrdinal::convert("88", false, true).unwrap());
+        assert_eq!("eighty eighths", ToOrdinal::convert("88", false, true).unwrap());
         assert_eq!("fiftieths", ToOrdinal::convert("50", false, true).unwrap());
 
         assert_eq!("eleventh", ToOrdinal::convert("11", true, false).unwrap());
