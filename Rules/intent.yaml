@@ -8,7 +8,8 @@
 -
   name: turn-off
   tag: "!*"     # turn off matching -- runs before specific rules
-  match: "$SpeechStyle = 'LiteralSpeak' or ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
+  match: "$SpeechStyle = 'LiteralSpeak' or $SpeechStyle = 'MathSpeak' or
+          ancestor-or-self::*[contains(@data-intent-property, ':literal:')]"
   replace:
   - test:
       - if: "*"

@@ -98,6 +98,7 @@
   }
 
   # probably need to expand, but these are ones that have braille codes and are in the op dict
+  # Note: needed for canonicalization, so they need to be defined for both braille and speech (hence in this file)
 - GeometryPrefixOperators: {
       "∟", "∠", "∡", "∢", "⊾", "⊿",
   }

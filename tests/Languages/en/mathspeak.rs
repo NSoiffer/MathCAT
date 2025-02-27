@@ -92,13 +92,69 @@ fn rule_8_1_1() {
 }
 
 #[test]
+fn rule_8_2_1() {
+    let expr = r#"<math><msup><mi>x</mi><mi>a</mi></msup></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr, "x soup eigh");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr, "x soup eigh");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr, "x superscript eigh");
+}
+
+#[test]
+fn rule_8_2_2() {
+    let expr = r#"<math><msub><mi>x</mi><mi>n</mi></msub></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr, "x sub n");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr, "x sub n");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr, "x subscript n");
+}
+
+#[test]
+fn rule_8_2_3() {
+    let expr = r#"<math><msup><mi>x</mi><mfrac><mn>1</mn><mn>2</mn></mfrac></msup></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr, "x soup 1 half");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr, "x soup 1 half");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr, "x superscript 1 half");
+}
+
+#[test]
+fn rule_8_3_1() {
+    let expr = r#"<math><msup><mi>x</mi><mrow><mi>m</mi><mo>+</mo><mi>n</mi></mrow></msup></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr, "x soup m plus n");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr, "x soup m plus n");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr, "x superscript m plus n");
+}
+
+#[test]
+fn rule_8_3_2() {
+    let expr = r#"<math><msub><mi>T</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub>
+                            <mo>+</mo><mn>5</mn><mo>=</mo><mn>0</mn></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr,
+                "upper t sub n minus 1 base, plus 5; equals 0");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr,
+                "upper t sub n minus 1 base, plus 5; is equal to 0");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr,
+                "upper t subscript n minus 1 baseline; plus 5; is equal to 0");
+}
+
+#[test]
+fn rule_8_3_3() {
+    let expr = r#"<math><msup><mi>x</mi><mrow><mi>m</mi><mo>+</mo><mi>n</mi></mrow></msup>
+                            <mo>=</mo><msup><mi>x</mi><mi>m</mi></msup><msup><mi>x</mi><mi>n</mi></msup></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr,
+                "x soup m plus n base, equals, x soup m base x soup n");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr,
+                "x soup m plus n base, is equal to, x soup m base x soup n");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr,
+                "x superscript m plus n baseline; is equal to, x superscript m baseline, x superscript n");
+}
+
+#[test]
 fn rule_8_4_1() {
     let expr = r#"<math><msup><mi>x</mi><mrow>
                         <msub><mi>a</mi><mi>n</mi></msub><mo>+</mo><msub><mi>a</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow></msub></mrow></msup></math>"#;
     test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr,
-                "x soup eigh soup sub n soup, plus eigh soup sub n minus 1");
+                "x soup eigh soup sub n soup plus eigh soup sub n minus 1");
     test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr,
-                "x soup eigh soup sub n soup, plus eigh soup sub n minus 1");
+                "x soup eigh soup sub n soup plus eigh soup sub n minus 1");
     test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr,
                 "x superscript eigh super subscript n superscript plus eigh super subscript n minus 1");
 }
@@ -112,11 +168,115 @@ fn rule_8_4_3() {
 }
 
 #[test]
+fn rule_8_4_4() {
+    let expr = r#"<math><msub><mi>x</mi><msub><mi>a</mi><mi>b</mi></msub></msub></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr, "x sub eigh sub sub b");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr, "x sub eigh sub sub b");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr, "x subscript eigh sub subscript b");
+}
+
+#[test]
+fn rule_8_4_5() {
+    let expr = r#"<math><msub><mi>x</mi><msup><mi>a</mi><mi>b</mi></msup></msub></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr, "x sub eigh sub soup b");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr, "x sub eigh sub soup b");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr, "x subscript eigh sub superscript b");
+}
+
+#[test]
+fn rule_8_4_6() {
+    let expr = r#"<math><msup><mi>x</mi><msub><mi>a</mi><mi>b</mi></msub></msup></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr, "x soup eigh soup sub b");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr, "x soup eigh soup sub b");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr, "x superscript eigh super subscript b");
+}
+
+#[test]
+fn rule_8_4_7() {
+    let expr = r#"<math><msup><mi>y</mi><msup><mi>a</mi><msub><mi>b</mi><mi>c</mi></msub></msup></msup><mo>&#x2260;</mo>
+            <msup><mi>y</mi><mrow><msup><mi>a</mi><mi>b</mi></msup><mi>c</mi></mrow></msup></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr,
+                "y soup eigh soup soup b soup soup sub c base; not equal to, y soup eigh soup soup b soup, c");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr,
+                "y soup eigh soup soup b soup soup sub c base; is not equal to, y soup eigh soup soup b soup, c");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr,
+                "y superscript eigh super superscript b super super subscript c baseline; is not equal to; y superscript eigh super superscript b superscript, c");
+}
+
+#[test]
+fn rule_8_4_8() {
+    let expr = r#"<math><msup><mi>T</mi>
+            <mrow><mo>(</mo><msup><mi>x</mi><mi>a</mi></msup><mo>+</mo><msup><mi>y</mi><mi>b</mi></msup><mo>)</mo></mrow>
+        </msup></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr,
+                "upper t soup l paren, x soup soup eigh soup, plus y soup soup b soup; r paren");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr,
+                "upper t soup left paren, x soup soup eigh soup, plus y soup soup b soup; right paren");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr,
+                "upper t superscript left parenthesis; x super superscript eigh superscript, plus y super superscript b superscript; right parenthesis");
+}
+
+#[test]
 fn rule_8_5_1() {
     let expr = r#"<math><msub><mi>x</mi><mn>1</mn></msub></math>"#;
     test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr, "x 1");
     test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr, "x 1");
     test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr, "x 1");
+}
+
+#[test]
+fn rule_8_5_2() {
+    let expr = r#"<math><msub><mi>T</mi>
+                <mrow><msub><mi>n</mi><mn>1</mn></msub><mo>+</mo><msub><mi>n</mi><mn>0</mn></msub></mrow>
+            </msub></math>"#;
+    // MathSpeak spec has the following, but that is not right as the numeric subscript rule only applies to a base that is not nested
+    // test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr,
+    //             "upper t sub n 1 plus n 0");
+    // test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr,
+    //             "upper t sub n 1 plus n 0");
+    // test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr,
+    //             "upper t subscript n 1 plus n 0");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr,
+                "upper t sub n sub sub 1 sub plus n sub sub 0");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr,
+                "upper t sub n sub sub 1 sub plus n sub sub 0");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr,
+                "upper t subscript n sub subscript 1 subscript plus n sub subscript 0");
+}
+
+#[test]
+fn rule_8_8_2() {
+    let expr = r#"<math><msubsup><mi>T</mi><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow><mn>2</mn></msubsup></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr,
+                "upper t sub n minus 1 soup 2");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr,
+                "upper t sub n minus 1 soup 2");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr,
+                "upper t subscript n minus 1 superscript 2");
+}
+
+#[test]
+fn rule_8_9_2() {
+    let expr = r#"<math><msup><mi>x</mi><mo>′</mo></msup></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr, "x prime");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr, "x prime");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr, "x prime");
+}
+
+#[test]
+fn rule_8_10_1() {
+    let expr = r#"<math><msubsup><mi>T</mi><mi>n</mi><mo>'</mo></msubsup></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr, "upper t prime sub n");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr, "upper t prime sub n");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr, "upper t prime subscript n");
+}
+
+#[test]
+fn rule_8_10_2() {
+    let expr = r#"<math><msubsup><mi>x</mi><mn>10</mn><mo>'</mo></msubsup></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr, "x prime 10");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr, "x prime 10");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr, "x prime 10");
 }
 
 #[test]
@@ -185,11 +345,17 @@ fn rule_9_3_1() {
             <mo>,</mo><mo>&#xA0;</mo><mi>x</mi><mo>&#x2208;</mo><mi mathvariant="normal">&#x211D;</mi>
         </math>"#;
     test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr,
-                "x soup e minus 2 base, equals; nest 3 root x; nest twice index 3 nest twice root x Nestindex 4 nest root x index 5 root x ellipsis end root nest end root nest twice end root nest 3  end root; comma; x element of double-struck upper R");
+                "x soup e minus 2 base, equals; nest 3 root x; nest twice index 3 nest twice root x; \
+                        nest index 4 nest root x, index 5 root x ellipsis end root nest end root \
+                        nest twice end root nest 3 end root; comma; x an element of, double-struck upper r");
     test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr,
-                "x soup e minus 2 base, is equal to; nest 3 start root x nest twice root index 3 nest twice start root x nest root index 4 nest start root x root index 5 start root x ellipsis end root nest end root nest twice end root nest 3  end root; comma; x Element-of double-struck upper R");
+                "x soup e minus 2 base, is equal to; nest 3 start root x; nest twice root index 3 nest twice start root x; \
+                        nest root index 4 nest start root x, root index 5 start root x ellipsis end root nest end root \
+                        nest twice end root nest 3 end root; comma; x is an element of, double-struck upper r");
     test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr,
-                "x superscript e minus 2 baseline, is equal to; nested 3 start root x nested twice root index 3 nested twice start root x nested root index 4 nested start root x root index 5 start root x ellipsis end root nested end root nested twice end root nested 3end root; comma; x Element-of double-struck upper R");
+                "x superscript e minus 2 baseline; is equal to; nested 3 start root x; nested twice root index 3 nested twice start root x; \
+                        nested root index 4 nested start root x, root index 5 start root x ellipsis end root nested \
+                        end root nested twice end root nested 3 end root; comma; x is an element of, double-struck upper r");
 }
 
 #[test]
@@ -197,7 +363,25 @@ fn rule_9_3_2() {
     let expr = r#"<math><msqrt>
             <msqrt><mi>x</mi><mo>+</mo><mn>1</mn></msqrt><mo>+</mo>
             <msqrt><mi>y</mi><mo>+</mo><mn>1</mn></msqrt></msqrt></math>"#;
-    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr, "nest root root x plus 1 end root plus root y plus 1 end root nest end root");
-    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr, "nest start root start root x plus 1 end root plus start root y plus 1 end root nest end root");
-    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr, "nested start root start root x plus 1 end root plus start root y plus 1 end root nested end root");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr,
+                    "nest root root x plus 1 end root, plus root y plus 1 end root nest end root");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr,
+                "nest start root start root x plus 1 end root, plus, start root y plus 1 end root nest end root");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr,
+                "nested start root start root x plus 1 end root, plus, start root y plus 1 end root nested end root");
+}
+
+#[test]
+fn rule_9_3_3() {
+    let expr = r#"<math><mroot><mroot><mi>x</mi><mi>m</mi></mroot><mi>n</mi></mroot><mo>=</mo>
+                        <mroot><mroot><mi>x</mi><mi>n</mi></mroot><mi>m</mi></mroot></math>"#;
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Terse")], expr,
+                "nest index n nest root index m root x end root nest end root; equals, \
+                        nest index m nest root index n root x end root nest end root");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Medium")], expr,
+                "nest root index n nest start root root index m start root x end root nest end root; is equal to; \
+                        nest root index m nest start root root index n start root x end root nest end root");
+    test_prefs("en", "MathSpeak", vec![("Verbosity", "Verbose")], expr,
+                "nested root index n nested start root root index m start root x end root nested end root; is equal to; \
+                        nested root index m nested start root root index n start root x end root nested end root");
 }

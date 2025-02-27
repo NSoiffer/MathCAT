@@ -174,12 +174,8 @@ fn main() {
   //   </math>";
 
   let expr = r#"
-<math>
-                    <mi>sinh</mi>
-                    <mo>(</mo>
-                    <mfrac> <mn arg='n'>7</mn> <mn arg='k'>3</mn> </mfrac>
-                    <mo>)</mo>
-                </math>
+<math><mn>2</mn><mspace intent="_(_,_)" width="3em"/> 
+    <mi>t</mi></math>
           "#;
   // let expr= "<math><mrow><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>";
   let instant = Instant::now();
@@ -207,7 +203,7 @@ fn main() {
   // set_preference("MathRate".to_string(), "77".to_string()).unwrap();
   
   set_preference("Bookmark".to_string(), "false".to_string()).unwrap();
-  set_preference("SpeechStyle".to_string(), "ClearSpeak".to_string()).unwrap();
+  set_preference("SpeechStyle".to_string(), "MathSpeak".to_string()).unwrap();
   // set_preference("DecimalSeparators".to_string(), ",".to_string()).unwrap();
   // set_preference("BlockSeparators".to_string(), ". ".to_string()).unwrap();
   if let Err(e) = set_mathml(expr.to_string()) {

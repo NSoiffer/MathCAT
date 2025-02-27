@@ -2175,6 +2175,7 @@ impl SpeechRules {
     }
 
     pub fn read_files(&mut self) -> Result<()> {
+        use crate::definitions::{SPEECH_DEFINITIONS, BRAILLE_DEFINITIONS};
         let check_rule_files = self.pref_manager.borrow().pref_to_string("CheckRuleFiles");
         if check_rule_files != "None" {  // "Prefs" or "All" are other values
             self.pref_manager.borrow_mut().set_preference_files()?;
@@ -2199,7 +2200,33 @@ impl SpeechRules {
                             pref_manager.get_definitions_file(self.name != RulesFor::Braille),
                             should_ignore_file_time
         ) {
-            self.definitions_files.borrow_mut().set_files_and_times(read_definitions_file(self.name != RulesFor::Braille)?);
+            let definitions = if self.name == RulesFor::Speech {&SPEECH_DEFINITIONS} else {&BRAILLE_DEFINITIONS};
+            return definitions.with(|defs| {
+                let new_files = read_definitions_file(
+                    pref_manager.get_definitions_file(self.name != RulesFor::Braille),
+                    defs
+                )?;
+                self.definitions_files.borrow_mut().set_files_and_times(new_files);
+                return Ok( () );
+            });
+        }
+        return Ok( () );
+    }
+
+
+    /// Reads the braille definition file -- this is a hack to support MathSpeak which needs the braille definition file
+    pub fn read_braille_definition_file(&mut self, pref_manager: &PreferenceManager) -> Result<()> {
+        let should_ignore_file_time = pref_manager.pref_to_string("CheckRuleFiles") != "All";     // ignore for "None", "Prefs"
+        if self.definitions_files.borrow().ft.is_empty() || !self.definitions_files.borrow().is_file_up_to_date(
+                            pref_manager.get_definitions_file(self.name != RulesFor::Braille),
+                            should_ignore_file_time
+        ) {
+            return crate::definitions::BRAILLE_DEFINITIONS.with(|defs| {
+                let new_files = read_definitions_file(
+                    pref_manager.get_definitions_file(false), defs)?;
+                self.definitions_files.borrow_mut().set_files_and_times(new_files);
+                return Ok( () );
+            });
         }
         return Ok( () );
     }

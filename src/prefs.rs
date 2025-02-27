@@ -736,7 +736,10 @@ impl PreferenceManager {
             },
             "SpeechStyle" => {
                 if changed_value == "MathSpeak" {
+                    // need to get braille definitions
+                    // this could change the BrailleCode, which is bad, but someone using MathSpeak should be using Nemeth
                     self.reset_files_from_preference_change("BrailleCode", "Nemeth")?;
+                    crate::speech::BRAILLE_RULES.with_borrow_mut(|rules| rules.read_braille_definition_file(self))?;
                 }
                 let language = self.pref_to_string("Language");
                 let language = if language.as_str() == "Auto" {"en"} else {language.as_str()};       // avoid 'temp value dropped while borrowed' error

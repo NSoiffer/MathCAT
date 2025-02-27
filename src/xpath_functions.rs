@@ -987,6 +987,8 @@ impl IsInDefinition {
         } else {
             &SPEECH_DEFINITIONS
         };
+        debug!("definitions_files: empty={}", definitions.with_borrow(|def| def.name_to_var_mapping.is_empty()));
+
         match &args[0] {
             Value::String(str) => return match IsInDefinition::is_defined_in(str, definitions, &set_name) {
                 Ok(result) => Ok( Value::Boolean( result ) ),
@@ -1174,7 +1176,8 @@ impl EdgeNode {
 
         // at an edge -- check to see the parent is desired root
         if parent_name == stop_node_name || 
-           (stop_node_name == "2D" && IsNode::is_2D(parent)) {
+           (stop_node_name == "2D" && IsNode::is_2D(parent)) ||
+           (stop_node_name == "script" && IsNode::is_scripted(parent)) {
             return Some(parent);
         };
         
@@ -1416,10 +1419,15 @@ mod tests {
 
     fn init_word_list() {
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
-        let result = crate::definitions::read_definitions_file(true);
-        if let Err(e) = result {
-            panic!("unable to read 'Rules/Languages/en/definitions.yaml\n{}", e.to_string());
-        }
+        let pref_manager = crate::prefs::PreferenceManager::get();
+        let pref_manager = pref_manager.borrow();
+        let file_path = pref_manager.get_definitions_file(true);
+        SPEECH_DEFINITIONS.with(|defs| {
+            let result = crate::definitions::read_definitions_file(file_path, defs);
+            if let Err(e) = result {
+                panic!("unable to read 'Rules/Languages/en/definitions.yaml\n{}", e.to_string());
+            }
+        })
     }
 
     #[test]
