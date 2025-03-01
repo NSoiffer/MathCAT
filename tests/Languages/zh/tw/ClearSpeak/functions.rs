@@ -217,7 +217,7 @@ fn no_times_sqrt() {
         <mo>=</mo>
         <msqrt> <mrow>  <mi>a</mi><mi>b</mi></mrow> </msqrt>
         </mrow></math>";
-    test("en", "ClearSpeak", expr, "the square root of eigh; the square root of b; is equal to, the square root of eigh b,");
+    test("en", "ClearSpeak", expr, "the square root of eigh; times the square root of b; is equal to, the square root of eigh b,");
 }
 
 #[test]
