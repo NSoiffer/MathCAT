@@ -1,4 +1,5 @@
 target
+build.rs.orig
 Python/libmathcat.pyd
 Cargo.lock
 src-pest.7z
@@ -11,6 +12,9 @@ src/*.bak
 *.swp
 */*.swp
 */*/*.swp
+*.sleepy
+*.txt
+*.zip
 __pycache__
 PythonScripts/__pycache__
 PythonScripts/cachedir
@@ -37,6 +41,11 @@ src/pattern.pest
 src/read_speech_rules.rs
 src/rules.pest
 src/.tmp.driveupload
+src/lib.rs-nozip
+src/lib.rs.zip
+src/shim_filesystem.rs-nozip
+src/shim_filesystem.rs.zip
+src/speech-bak
 
 Rules/*/*/*.zip
 .vs
