@@ -1670,10 +1670,15 @@ impl fmt::Display for ContextStack<'_> {
 impl<'c, 'r> ContextStack<'c> {
     fn new<'a,>(pref_manager: &'a PreferenceManager) -> ContextStack<'c> {
         let prefs = pref_manager.merge_prefs();
-        let context_stack = ContextStack {
+        let mut context_stack = ContextStack {
             base: ContextStack::base_context(prefs),
             old_values: Vec::with_capacity(31)      // should avoid allocations
         };
+        // FIX: the list of variables to set should come from definitions.yaml
+        // These can't be set on the <math> tag because of the "translate" command which starts speech at an 'id'
+        context_stack.base.set_variable("MatchingPause", Value::Boolean(false));
+        context_stack.base.set_variable("IsColumnSilent", Value::Boolean(false));
+
 
         return context_stack;
     }

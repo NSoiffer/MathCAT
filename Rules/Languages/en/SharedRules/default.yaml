@@ -10,6 +10,8 @@
       - ClearSpeak_AbsoluteValue: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_AbsoluteValue='Auto', 'AbsEnd', $ClearSpeak_AbsoluteValue)"
       - ClearSpeak_Roots: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Roots='Auto', 'RootEnd', $ClearSpeak_Roots)"
       - ClearSpeak_Matrix: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Matrix='Auto', 'EndMatrix', $ClearSpeak_Matrix)"
+
+      - MatchingPause: false()
       # should be set at mtable level, but unknown intents make that impossible to know
       - IsColumnSilent: false()
       replace:
