@@ -8,7 +8,7 @@ repository = "https://github.com/NSoiffer/MathCAT"
 homepage = "https://nsoiffer.github.io/MathCAT/"
 documentation = "https://nsoiffer.github.io/MathCAT/"
 edition = "2018"
-exclude = ["src/main.rs"]    # should have "Rules/", but then one can't run build.rs to build the zip file
+exclude = ["src/main.rs", "docs", "PythonScripts"]    # should have "Rules/", but then one can't run build.rs to build the zip file
 
 
 [features]
@@ -38,10 +38,10 @@ unicode-script = "0.5"
 log = "0.4"
 env_logger = "0.11"
 cfg-if = "1.0"
-# [target.'cfg(target_family = "wasm")'.dependencies]
+[target.'cfg(target_family = "wasm")'.dependencies]
 zip = { version = "2.1", default-features = false, features = ["deflate"] }
-# [target.'cfg(not(target_family = "wasm"))'.dependencies]
-# zip = { version = "2.1", default-features = false, features = ["bzip2"] }
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+zip = { version = "2.1", default-features = false, features = ["bzip2"] }
 
 [dependencies.getrandom]
 version = "0.2"
