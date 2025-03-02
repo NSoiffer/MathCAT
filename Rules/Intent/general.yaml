@@ -795,7 +795,7 @@
           - intent:
               name: "mrow"
               attrs: "id='*[2]/*[1]/@id'"
-              children: [x: "*[position()>1]/*"]
+              children: [x: "*[position()>1]"]
 
 -
   # convert a mtr to a mlabeledtr
@@ -826,4 +826,20 @@
           - intent:
               name: "mrow"
               attrs: "id='*[2]/@id'"
-              children: [x: "*/*"]
+              children: [x: "*"]
+
+-
+  # We need to preserve any intent properties that are on the mtd (e.g., :pause)
+  name: mtd-to-mrow
+  tag: mtd
+  match: "$TableProperty = 'piecewise' or $TableProperty = 'system-of-equations' or $TableProperty = 'lines'"
+  replace:
+  - test:
+      if: "@data-intent-property"
+      then:
+      - intent:
+          name: "mrow"
+          attrs: "id=@id data-intent-property=@ddata-intent-property"
+          children: [x: "*"]
+      else:
+      - x: "*"
