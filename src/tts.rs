@@ -79,9 +79,10 @@ use regex::Regex;
 use sxd_xpath::Value;
 
 const MIN_PAUSE:f64 = 50.0;         // ms -- avoids clutter of putting out pauses that probably can't be heard
-const PAUSE_SHORT:f64 = 150.0;  // ms
-const PAUSE_MEDIUM:f64 = 300.0; // ms
-const PAUSE_LONG:f64 = 600.0;   // ms
+const PAUSE_SHORT:f64 = 200.0;  // ms
+const PAUSE_MEDIUM:f64 = 400.0; // ms
+const PAUSE_LONG:f64 = 800.0;   // ms
+const PAUSE_XLONG:f64 = 1600.0;   // ms
 const PAUSE_AUTO:f64 = 987654321.5;   // ms -- hopefully unique
 pub const PAUSE_AUTO_STR: &str = "\u{F8FA}\u{F8FA}";
 const RATE_FROM_CONTEXT:f64 = 987654321.5;   // hopefully unique
@@ -295,10 +296,11 @@ impl TTS {
             TTSCommand::Pause | TTSCommand::Rate | TTSCommand::Volume | TTSCommand::Pitch => {
                 // these strings are almost always what the value will be, so we try them first
                 let val = match tts_str_value {
+                    "auto" => Ok( PAUSE_AUTO ),
                     "short" => Ok( PAUSE_SHORT ),
                     "medium" => Ok( PAUSE_MEDIUM ),
                     "long" => Ok( PAUSE_LONG ),
-                    "auto" => Ok( PAUSE_AUTO ),
+                    "xlong" => Ok( PAUSE_XLONG ),
                     "$MathRate" => Ok( RATE_FROM_CONTEXT ), // special case hack -- value determined in replace
                     _ => tts_str_value.parse::<f64>()
                 };
