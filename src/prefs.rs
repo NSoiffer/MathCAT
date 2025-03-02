@@ -392,6 +392,7 @@ impl PreferenceManager {
     fn set_style_file(&mut self, language_dir: &Path, language: &str, style_file_name: &str) -> Result<()> {
         let style_file_name = style_file_name.to_string() + "_Rules.yaml";
         self.speech = PreferenceManager::find_file(language_dir, language, Some("en"), &style_file_name)?;
+      
         return Ok( () );
     }
 
@@ -581,7 +582,7 @@ impl PreferenceManager {
             // we find the first file because this is the deepest (most language specific) speech rule file
             match find_file_in_dir_that_ends_with_shim(path, "_Rules.yaml") {
                 None => bail!{"didn't find file"},
-                Some(file_name) => return Ok(path.to_path_buf().join(file_name)),
+                Some(file_name) => return Ok(file_name.into()),
             }
         }
     }
