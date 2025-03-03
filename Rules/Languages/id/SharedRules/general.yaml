@@ -494,6 +494,7 @@
   tag: [mtr, mlabeledtr]
   match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
   replace:
+  - pause: medium
   - test:
     - if: "parent::m:piecewise"
       then: [{T: 'kasus'}]

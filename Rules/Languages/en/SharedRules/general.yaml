@@ -475,6 +475,7 @@
   - test:
       if: "not($LineCount=1 or contains(@data-intent-property, ':continued-row:'))"
       then:
+      - pause: medium
       - test:
         - if: "parent::m:piecewise"
           then: [t: "case"]     # phrase('case' 1 of 10 cases)

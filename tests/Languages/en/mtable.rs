@@ -1033,7 +1033,7 @@ fn unknown_mtable_property() {
       </mtable>
     </math>";
     test("en", "ClearSpeak",  expr,
-         "2 lines, line 1; eigh is equal to, b plus c minus d; line 2; plus e minus f");
+         "2 lines; line 1; eigh is equal to, b plus c minus d; line 2; plus e minus f");
 }
 
 

@@ -425,6 +425,7 @@
   tag: [mtr, mlabeledtr]
   match: "."
   replace:
+  - pause: medium
   - T: "列"      # phrase(the first 'row' of a matrix)
   - x: "count(preceding-sibling::*)+1"
   - test:

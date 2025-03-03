@@ -21,7 +21,7 @@ fn case_1() {
   </math>
    ";
    test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Auto", expr,
-    "f of x is equal to; 3 cases, \
+    "f of x is equal to; 3 cases; \
                 case 1; negative 1 if x is less than 0; \
                 case 2; 0 if x is equal to 0; \
                 case 3; 1 if x is greater than 0"
@@ -39,7 +39,7 @@ fn equation_auto() {
     </math>
    ";
    test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Auto", expr,
-                "2 lines, \
+                "2 lines; \
                 line 1; x plus y, is equal to 7; \
                 line 2; 2 x plus 3 y; is equal to 17");
 }
@@ -55,7 +55,7 @@ fn equation_plus_at_start() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Auto", expr, "2 lines, \
+   test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Auto", expr, "2 lines; \
                 line 1; x plus y is equal to 7; \
                 line 2; 2 x, plus 3 y, is equal to 17");
 }
@@ -71,7 +71,7 @@ fn equation_case() {
     </math>
    ";
    test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Case", expr, 
-   "2 cases, case 1; x plus y, is equal to 7; case 2; 2 x plus 3 y; is equal to 17");
+   "2 cases; case 1; x plus y, is equal to 7; case 2; 2 x plus 3 y; is equal to 17");
 }
 
 #[test]
@@ -84,7 +84,7 @@ fn equation_constraint() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Constraint", expr, "2 constraints, \
+   test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Constraint", expr, "2 constraints; \
                 constraint 1; x plus y, is equal to 7; \
                 constraint 2; 2 x plus 3 y; is equal to 17");
 }
@@ -99,7 +99,7 @@ fn equation_equation() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Equation", expr, "2 equations, \
+   test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Equation", expr, "2 equations; \
                 equation 1; x plus y, is equal to 7; \
                 equation 2; 2 x plus 3 y; is equal to 17");
 }
@@ -114,7 +114,7 @@ fn equation_line() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Line", expr, "2 lines, \
+   test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Line", expr, "2 lines; \
                 line 1; x plus y, is equal to 7; \
                 line 2; 2 x plus 3 y; is equal to 17");
 }
@@ -145,7 +145,7 @@ fn equation_row() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Row", expr, "2 rows, \
+   test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Row", expr, "2 rows; \
                 row 1; x plus y, is equal to 7; \
                 row 2; 2 x plus 3 y; is equal to 17");
 }
@@ -160,7 +160,7 @@ fn equation_step() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Step", expr, "2 steps, \
+   test_ClearSpeak("en", "ClearSpeak_MultiLineLabel", "Step", expr, "2 steps; \
                 step 1; x plus y, is equal to 7; \
                 step 2; 2 x plus 3 y; is equal to 17");
 }
@@ -175,5 +175,5 @@ fn continued_row() {
   </mtable>
 </math>";
 test("en", "SimpleSpeak", expr,
-     "2 equations, equation 1; x is equal to y plus 1; equation 2; y is equal to 1");
+     "2 equations; equation 1; x is equal to y plus 1; equation 2; y is equal to 1");
 }

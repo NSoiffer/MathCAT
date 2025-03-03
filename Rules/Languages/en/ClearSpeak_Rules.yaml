@@ -598,6 +598,7 @@
   match: "parent::m:matrix or parent::m:determinant"
   variables: [NextLineIsContinuedRow: "following-sibling::*[1][contains(@data-intent-property, ':continued-row:')]"]
   replace:
+  - pause: medium
   - t: "row"      # phrase(the first 'row' of a matrix)
   - x: "count(preceding-sibling::*)+1"
   - test:
@@ -685,6 +686,7 @@
   - test:
       if: "not($LineCount=1 or $ClearSpeak_MultiLineLabel='None' or contains(@data-intent-property, ':continued-row:'))"
       then:
+      - pause: medium
       - test:
         - if: "($ClearSpeak_MultiLineLabel = 'Auto' and parent::m:piecewise) or $ClearSpeak_MultiLineLabel = 'Case'"
           then: [t: "case"]      # phrase(in this  'case' x is not equal to y)
@@ -707,7 +709,7 @@
           - x: "*[1]/*"
   - test:
     - if: "$ClearSpeak_MultiLineLabel='None'"
-      then: [pause: long, pause: long]   # need a very long pause with no line labels
+      then: [pause: xlong]   # need a very long pause with no line labels
     - else_if: "not(contains(@data-intent-property, ':continued-row:'))"
       then: [pause: medium]
   - test:
