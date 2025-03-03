@@ -19,6 +19,7 @@ use regex::Regex;
 use std::fmt;
 use crate::chemistry::*;
 use unicode_script::Script;
+use roman_numerals_rs::RomanNumeral;
 
 // FIX: DECIMAL_SEPARATOR should be set by env, or maybe language
 const DECIMAL_SEPARATOR: &str = ".";
@@ -708,9 +709,9 @@ impl CanonicalizeContext {
 		assert!(is_leaf(leaf));
 		set_mathml_name(leaf, "mn");
 		leaf.set_attribute_value("data-roman-numeral", "true");	// mark for easy detection
-		let as_number = match roman::from(&as_text(leaf).to_ascii_uppercase()) {
-			Some(i) => i.to_string(),
-			None => as_text(leaf).to_string(),
+		let as_number = match as_text(leaf).parse::<RomanNumeral>() {
+			Ok(roman) => roman.as_u16().to_string(),
+			Err(_) => as_text(leaf).to_string(),
 		};
 		leaf.set_attribute_value("data-number", &as_number);
 	}
