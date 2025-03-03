@@ -100,7 +100,7 @@ fn p9_units_percent() {
 #[test]
 fn p9_units_permille() {
     let expr = "<math><mn>9</mn><mi>‰</mi></math>";
-    test_braille("Finnish", expr, "⠼⠁⠁⠑⠀⠒⠹");
+    test_braille("Finnish", expr, "⠼⠊⠀⠒⠹");
 }
 
 #[test]
@@ -159,7 +159,7 @@ fn p13_plus() {
 
 #[test]
 fn p13_minus_not_equal() {
-    let expr = "<math><mn>5</mn><mo>−</mo><mn>4</mn><mo>≠</mo><mn>2</mn></math>";
+    let expr = "<math><mn>5</mn><mo>−</mo><mn>2</mn><mo>≠</mo><mn>2</mn></math>";
     test_braille("Finnish", expr, "⠼⠑⠀⠤⠼⠃⠀⠐⠶⠼⠃");
 }
 
@@ -244,7 +244,7 @@ fn p15_fractions_minus() {
       <mn>2</mn>
       <mn>5</mn>
     </mfrac>
-    <mo>−</mo>
+    <mo>+</mo>
     <mfrac>
       <mn>1</mn>
       <mn>3</mn>
@@ -299,7 +299,7 @@ fn p16_absolute_value() {
     <mo>(</mo>
     <mn>2</mn>
     <mo>+</mo>
-    <mn>3</mn>
+    <mn>5</mn>
     <mo>)</mo>
     <mi>|</mi>
     <mo>=</mo>
@@ -317,7 +317,7 @@ fn p16_absolute_value() {
     <mn>7</mn>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠸⠤⠦⠼⠃⠀⠖⠼⠑⠴⠸⠀⠶⠸⠤⠼⠛⠸⠀⠶⠼⠛");
+    test_braille("Finnish", expr, "⠸⠤⠦⠼⠃⠀⠖⠼⠑⠸⠀⠶⠸⠤⠼⠛⠸⠀⠶⠼⠛");
 }
 
 #[test]
@@ -453,7 +453,7 @@ fn p19_fractions_mixed_operations() {
 
 // This is Finnish notation where the numerator and denomator is multiplied by the same expression that is in the pre-supercript. Structure is always: [multiplicator][parenthesis]
 #[test]
-fn p19_fraction_multiplication_Finnish_notation_multiscripts() {
+fn p21_fraction_multiplication_Finnish_notation_multiscripts() {
     let expr = "<math>
   <mrow>
     <mmultiscripts>
@@ -483,11 +483,11 @@ fn p19_fraction_multiplication_Finnish_notation_multiscripts() {
     </mfrac>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠃⠜⠀⠁⠀⠌⠉⠀⠶⠁⠃⠀⠌⠃⠉");
+    test_braille("Finnish", expr, "⠃⠜⠀⠁⠀⠌⠉⠀⠶⠁⠃⠀⠌⠦⠃⠉⠴");
 }
 
 #[test]
-fn p19_fraction_multiplication_Finnish_notation_multiscripts_2() {
+fn p21_fraction_multiplication_Finnish_notation_multiscripts_2() {
     let expr = "<math>
   <mrow>
     <mmultiscripts>
@@ -507,7 +507,7 @@ fn p19_fraction_multiplication_Finnish_notation_multiscripts_2() {
     test_braille("Finnish", expr, "⠼⠋⠜⠼⠁⠆");
 }
 
-// This is Finnish notation for dividing the numerator and denominator by the same expression. It is always of the form: [parenthesis][divisor]
+// This is Finnish notation for dividing the numerator and denominator by the same expression. It is always of the form: [parenthesis][whitespace][divisor], whitespace when the numerator is 'complicated' as in more than one element.
 #[test]
 fn p22_fraction_division_Finnish_notation_msup() {
     let expr = "<math>
@@ -541,7 +541,7 @@ fn p22_fraction_division_Finnish_notation_msup() {
     </mfrac>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠁⠃⠉⠀⠌⠁⠙⠀⠣⠁⠀⠶⠃⠉⠀⠌⠙");
+    test_braille("Finnish", expr, "⠁⠃⠉⠀⠌⠦⠁⠙⠴⠀⠣⠁⠀⠶⠃⠉⠀⠌⠙");
 }
 
 #[test]
@@ -575,7 +575,7 @@ fn p23_equation_1_no_invisible_multiplication() {
     <mo>−</mo>
     <mn>7</mn>
 </math>";
-    test_braille("Finnish", expr, "⠼⠃⠀⠁⠉⠀⠌⠦⠼⠃⠀⠙⠴⠀⠣⠼⠃⠀⠶⠁⠉⠀⠌⠙");
+    test_braille("Finnish", expr, "⠼⠃⠀⠭⠀⠖⠼⠉⠀⠶⠤⠼⠉⠀⠭⠀⠤⠼⠛");
 }
 
 #[test]
@@ -594,7 +594,7 @@ fn p23_equation_1_with_invisible_multiplication() {
     <mo>−</mo>
     <mn>7</mn>
 </math>";
-    test_braille("Finnish", expr, "⠼⠃⠀⠁⠉⠀⠌⠦⠼⠃⠀⠙⠴⠀⠣⠼⠃⠀⠶⠁⠉⠀⠌⠙");
+    test_braille("Finnish", expr, "⠼⠃⠀⠭⠀⠖⠼⠉⠀⠶⠤⠼⠉⠀⠭⠀⠤⠼⠛");
 }
 
 #[test]
@@ -628,7 +628,7 @@ fn p24_fraction() {
     </mrow>
   </mfrac>
 </math>";
-    test_braille("Finnish", expr, "⠼⠉⠀⠽⠀⠌⠼⠙⠀⠶⠼⠉⠲⠀⠽");
+    test_braille("Finnish", expr, "⠦⠼⠑⠀⠖⠼⠛⠴⠀⠌⠦⠼⠃⠀⠄⠼⠉⠴");
 }
 
 #[test]
@@ -651,7 +651,7 @@ fn p24_fraction_2() {
     </mrow>
   </mfrac>
 </math>";
-    test_braille("Finnish", expr, "⠼⠙⠀⠭⠀⠌⠦⠼⠋⠀⠦⠼⠁⠀⠤⠭⠴⠴");
+    test_braille("Finnish", expr, "⠼⠙⠀⠭⠀⠌⠦⠼⠃⠀⠦⠼⠁⠀⠤⠭⠴⠴");
 }
 
 #[test]
@@ -853,7 +853,7 @@ fn p27_sqrt() {
     <mn>2</mn>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠼⠙⠬⠼⠁⠰⠀⠶⠩⠼⠙⠀⠶⠼⠃");
+    test_braille("Finnish", expr, "⠼⠙⠬⠼⠁⠆⠀⠶⠩⠼⠙⠀⠶⠼⠃");
 }
 
 #[test]
@@ -984,7 +984,7 @@ fn p34_vector_dot_product() {
     </mover>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠧⠱⠀⠠⠥⠱");
+    test_braille("Finnish", expr, "⠧⠱⠀⠄⠥⠱");
 }
 
 #[test]
@@ -1425,7 +1425,7 @@ fn p42_determinant() {
 <mi>a</mi>
 <mi>b</mi>
 </math>";
-    test_braille("Finnish", expr, "⠸⠁⠀⠖⠃⠀⠀⠁⠀⠤⠃⠸⠀⠐⠐⠀⠸⠁⠀⠤⠃⠀⠀⠁⠀⠖⠃⠸⠀⠶⠼⠙⠀⠁⠃");
+    test_braille("Finnish", expr, "⠸⠁⠀⠖⠃⠀⠁⠀⠤⠃⠸⠀⠐⠐⠀⠸⠁⠀⠤⠃⠀⠁⠀⠖⠃⠸⠀⠶⠼⠙⠀⠁⠃");
 }
 
 // Dots 156 to signify the bar over "arc"
@@ -1563,7 +1563,7 @@ fn p50_such_that_y_greater_than_x() {
     <mi>ℝ</mi>
     <mo>,</mo>
     <mi>∃</mi>
-    <mi>𝑦</mi>
+    <mi>y</mi>
     <mo>∈</mo>
     <mi>ℝ</mi>
     <mi>y</mi>
@@ -1623,7 +1623,7 @@ fn p50_binomial_with_factorial() {
     </mfrac>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠦⠼⠋⠯⠀⠼⠙⠴⠀⠶⠼⠋⠠⠲⠀⠌⠷⠼⠙⠠⠲⠀⠦⠼⠋⠀⠤⠼⠙⠠⠴⠠⠲⠾");
+    test_braille("Finnish", expr, "⠦⠼⠋⠯⠀⠼⠙⠴⠀⠶⠼⠋⠠⠲⠀⠌⠦⠼⠙⠠⠲⠀⠦⠼⠋⠀⠤⠼⠙⠠⠴⠠⠲⠴");
 }
 
 #[test]
@@ -1675,7 +1675,7 @@ fn p50_alternative_derivative_1() {
     </mrow>
   </mfrac>
 </math>";
-    test_braille("Finnish", expr, "⠙⠇⠝⠭⠀⠌⠙⠭");
+    test_braille("Finnish", expr, "⠙⠇⠝⠭⠀⠌⠦⠙⠭⠴");
 }
 
 // Not sure about this MathML markup.
@@ -1694,7 +1694,7 @@ fn p50_alternative_derivative_2() {
     <mi>x</mi>
   </mrow>
 </math>";
-    test_braille("Finnish", expr, "⠙⠀⠌⠙⠭⠀⠇⠝⠭");
+    test_braille("Finnish", expr, "⠙⠀⠌⠦⠙⠭⠴⠀⠇⠝⠭");
 }
 
 
