@@ -393,7 +393,12 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                     Ok( (speech, done)) => {
                         cumulative_speech = cumulative_speech + if loop_count==0 {""} else {" "} + speech.trim();
                         if done {
-                            return Ok(cumulative_speech);
+                            return Ok( rules.pref_manager.borrow().get_tts()
+                                            .merge_pauses(crate::speech::remove_optional_indicators(
+                                                &cumulative_speech.replace(CONCAT_STRING, "")
+                                                                    .replace(CONCAT_INDICATOR, "")                            
+                                                            )
+                                            .trim_start().trim_end_matches([' ', ',', ';'])) );
                         }
                     },
                     Err(e) => {
@@ -1923,7 +1928,7 @@ mod tests {
             let speech = test_command("MoveNext", mathml, "row-2");
             assert_eq!(speech, "move right; case 2; positive x comma; if x, is greater than or equal to 0");
             let speech = test_command("ZoomOut", mathml, "table");
-            assert_eq!(speech, "zoom out; 2 cases, case 1; negative x comma; if x is less than 0; case 2; positive x comma; if x, is greater than or equal to 0");
+            assert_eq!(speech, "zoom out; 2 cases; case 1; negative x comma; if x is less than 0; case 2; positive x comma; if x, is greater than or equal to 0");
             let speech = test_command("ZoomIn", mathml, "row-1");
             assert_eq!(speech, "zoom in; case 1; negative x comma; if x is less than 0");
             set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
