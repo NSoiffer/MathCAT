@@ -176,8 +176,7 @@ fn main() {
   let expr = r#"
 <math xmlns="http://www.w3.org/1998/Math/MathML">
     <mrow><mi>t</mi><mrow intent=":pause-long"/><mo>+</mo><mi>a</mi>
-    </mrow>
-</math>
+    </mrow></math>
           "#;
   // let expr= "<math><mrow><mi>sin</mi><mo>(</mo><mi>x</mi><mo>)</mo><mo>+</mo><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow></math>";
   let instant = Instant::now();
@@ -188,7 +187,7 @@ fn main() {
     panic!("Error: exiting -- {}", errors_to_string(&e));  }
 
   info!("Version = '{}'", get_version());
-  set_preference("Language".to_string(), "en-gb".to_string()).unwrap();
+  set_preference("Language".to_string(), "en".to_string()).unwrap();
   set_preference("DecimalSeparator".to_string(), "Auto".to_string()).unwrap();
   set_preference("BrailleCode".to_string(), "Nemeth".to_string()).unwrap();
   set_preference("TTS".to_string(), "None".to_string()).unwrap();
