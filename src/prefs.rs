@@ -546,6 +546,7 @@ impl PreferenceManager {
             if is_file_shim(&path) {
                 // we make an exception for definitions.yaml -- there a language specific checks for Hundreds, etc
                 if !(file_name == "definitions.yaml" && os_path.ends_with("Rules")) {
+                    // debug!("find_file -- found={}", path.to_string_lossy());
                     return Ok(path);
                 }
             };
@@ -582,7 +583,7 @@ impl PreferenceManager {
             // we find the first file because this is the deepest (most language specific) speech rule file
             match find_file_in_dir_that_ends_with_shim(path, "_Rules.yaml") {
                 None => bail!{"didn't find file"},
-                Some(file_name) => return Ok(file_name.into()),
+                Some(file_name) => return Ok(path.join(file_name)),
             }
         }
     }
