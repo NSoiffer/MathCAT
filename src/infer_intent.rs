@@ -223,7 +223,7 @@ pub fn intent_speech_for_name(intent_name: &str, verbosity: &str, fixity: &str) 
                 }
             }
         };
-        return intent_name.to_string();
+        return intent_name.replace(&['_', '-'], " ").trim().to_string();
     })
 }
 
