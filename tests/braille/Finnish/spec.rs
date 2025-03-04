@@ -13,7 +13,7 @@
 use crate::common::*;
 
 // Finnish spec tests
-// Page and some other identification has been added to the function name, so you can figure out which expression the test in based on. Some tests are variations of the "official" test.
+// Page and some other identification has been added to the function name, so you can figure out which expression the test in based on. Some tests are variations and can't be found in the specs.
 
 // Grouping numbers
 
@@ -48,7 +48,7 @@ fn p7_decimal_comma() {
     test_braille("Finnish", expr, "⠼⠑⠂⠁⠃⠑⠄⠛⠑");
 }
 
-// Now the point is transformed to comma. Maybe it should follow the text.
+// Now the point is transformed to comma. It should follow the text.
 #[test]
 fn p7_decimal_point() {
     let expr = "<math><mn>5.12575</mn></math>";
