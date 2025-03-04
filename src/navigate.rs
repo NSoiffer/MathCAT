@@ -19,7 +19,6 @@ use crate::errors::*;
 use phf::phf_set;
 
 
-
 const MAX_PLACE_MARKERS: usize = 10;
 
 thread_local!{
@@ -393,7 +392,23 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
                     Ok( (speech, done)) => {
                         cumulative_speech = cumulative_speech + if loop_count==0 {""} else {" "} + speech.trim();
                         if done {
-                            return Ok( rules.pref_manager.borrow().get_tts()
+                            let (tts, rate) = {
+                                let prefs = rules.pref_manager.borrow();
+                                (prefs.pref_to_string("TTS"), prefs.pref_to_string("MathRate"))
+                            };
+                            if rate != "100" {
+                                match tts.as_str() {
+                                    "SSML" => if !cumulative_speech.starts_with("<prosody rate") {
+                                        cumulative_speech = format!("<prosody rate='{}%'>{}</prosody>", &rate, &cumulative_speech);
+                                    }, 
+                                    "SAPI5" => if !cumulative_speech.starts_with("<rate speed") {
+                                        cumulative_speech = format!("<rate speed='{:.1}'>{}</rate>'>",
+                                        10.0*(0.01*rate.parse::<f32>().unwrap_or(100.0)).log(3.0), cumulative_speech);
+                                    },
+                                    _ => (),  // do nothing
+                                }
+                            }
+                                                return Ok( rules.pref_manager.borrow().get_tts()
                                             .merge_pauses(crate::speech::remove_optional_indicators(
                                                 &cumulative_speech.replace(CONCAT_STRING, "")
                                                                     .replace(CONCAT_INDICATOR, "")                            
