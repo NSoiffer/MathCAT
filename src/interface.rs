@@ -543,7 +543,7 @@ pub fn errors_to_string(e: &Error) -> String {
 fn add_ids(mathml: Element) -> Element {
     use std::time::SystemTime;
     let time = if cfg!(target_family = "wasm") {
-        rand::random::<usize>()
+        fastrand::usize(..)
     } else {
         SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
@@ -551,7 +551,7 @@ fn add_ids(mathml: Element) -> Element {
             .as_millis() as usize
     };
     let time_part = radix_fmt::radix(time, 36).to_string();
-    let random_part = radix_fmt::radix(rand::random::<usize>(), 36).to_string();
+    let random_part = radix_fmt::radix(fastrand::u32(..), 36).to_string();
     let prefix = "M".to_string() + &time_part[time_part.len() - 3..] + &random_part[random_part.len() - 4..] + "-"; // begin with letter
     add_ids_to_all(mathml, &prefix, 0);
     return mathml;

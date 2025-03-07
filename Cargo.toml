@@ -24,14 +24,13 @@ sxd-document = "0.3"
 sxd-xpath = "0.4"
 yaml-rust = "0.4"
 lazy_static = "1.4"
-strum = "0.26"
-strum_macros = "0.26"
+strum = "0.27.1"
+strum_macros = "0.27.1"
 error-chain = "0.12.4"
 regex = "1.10"
 dirs = "6.0"
 bitflags = "2.5"
 phf = { version = "0.11", features = ["macros"] }
-rand = "0.8"
 roman-numerals-rs = "3.1.0"
 radix_fmt = "1.0"
 unicode-script = "0.5"
@@ -40,15 +39,13 @@ env_logger = "0.11"
 cfg-if = "1.0"
 [target.'cfg(target_family = "wasm")'.dependencies]
 zip = { version = "2.1", default-features = false, features = ["deflate"] }
+fastrand = { version = "2.3.0", features = ["js"] }
+
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 zip = { version = "2.1", default-features = false, features = ["bzip2"] }
+fastrand = { version = "2.3.0" }
 
-[dependencies.getrandom]
-version = "0.2"
-features = ["js"]
-
-[target.'cfg(target_os = "android")'.dependencies]
-android_logger = {version = "0.14.1", optional = true}
+android_logger = {version = "0.15.0", optional = true}
 
 # # dependencies because of need to build wasm version for file i/o
 # yew = "0.18.0"
