@@ -189,6 +189,14 @@
   - t: "of"      # phrase(the square root 'of' 25 equals 5)
   - x: "*[2]"
 
+- name: repeating-decimal
+  tag: repeating-decimal
+  match: "."
+  replace:
+  - x: "*[1]"
+  - t: "with repeating digits"      # phrase('with repeating digits')
+  - spell: "*[2]"
+
 - name: msubsup-skip-super
   # handles single, double, etc., prime
   tag: [skip-super, say-super]

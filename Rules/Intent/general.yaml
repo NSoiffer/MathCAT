@@ -334,6 +334,18 @@
       attrs: "data-intent-property='concat(data-intent-property, \":prefix:\")'"
       children: [x: "*[2]"]
 
+- name: repeating-decimal
+  tag: mrow
+  match: "count(*)=3 and *[1][self::m:mn] and 
+          *[2][.='\u2062'] and
+          *[3][self::m:mover][*[1][self::m:mn] and *[2][.='\u00AF']]"
+  replace:
+  - intent:
+      name: "repeating-decimal"
+      children:
+      - x: "*[1]"
+      - x: "*[3]/*[1]"
+
 -
   name: modified-var
   tag: mover
