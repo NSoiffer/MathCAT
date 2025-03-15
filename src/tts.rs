@@ -372,6 +372,12 @@ impl TTS {
                             let node = nodes.iter().next().unwrap();
                             if let Some(text) = node.text() {
                                 text.text().to_string()
+                            } else if let Some(el) = node.element() {
+                                if crate::xpath_functions::is_leaf(el) {
+                                    crate::canonicalize::as_text(el).to_string()
+                                } else {
+                                    bail!("in 'spell': value returned from xpath '{}' does not evaluate to a string",  &xpath.to_string());
+                                }
                             } else {
                                 bail!("in 'spell': value returned from xpath '{}' does not evaluate to a string, it is {} nodes",
                                         &xpath.to_string(), nodes.size());
