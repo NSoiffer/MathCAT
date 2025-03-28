@@ -1128,7 +1128,7 @@ impl CanonicalizeContext {
 						// mhchem emits some cases that boil down to a completely empty script -- see test mhchem_beta_decay
 						let mut is_empty_script = CanonicalizeContext::is_empty_element(as_element(children[0])) &&
 						   								CanonicalizeContext::is_empty_element(as_element(children[1]));
-						if element_name == "msubsup" {
+						if element_name == "msubsup" && is_empty_script {
 							is_empty_script = CanonicalizeContext::is_empty_element(as_element(children[2]));
 						}
 						if is_empty_script {
