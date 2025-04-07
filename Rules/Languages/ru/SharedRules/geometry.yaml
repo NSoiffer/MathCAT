@@ -1,0 +1,79 @@
+---
+
+- name: line-segment
+  tag: line-segment
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "линейный сегмент от"      # phrase('the line segment from' A to B)
+      - x: "*[1]"
+      - t: "до"                         # phrase(the line segment from A 'to' B)
+      - x: "*[2]"
+      else:
+      - t: "линейный сегмент"               # phrase(the 'line segment' A  B)
+      - x: "*[1]"
+      - x: "*[2]"
+
+- name: geometry-ray
+  tag: ray
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "луч от "             # phrase('the ray from' A to B)
+      - x: "*[1]"
+      - t: "до"                       # phrase(the ray from A 'to' B)
+      - x: "*[2]"
+      else:
+      - t: "луча"                      # phrase(the 'ray'A  B)
+      - x: "*[1]"
+      - x: "*[2]"
+
+- name: geometry-arc
+  tag: arc
+  match: "count(*)=2"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [t: "а"]            # phrase('the' arc A B C)
+  - t: "дуга"                        # phrase(the 'arc' A B C)
+  - x: "*[1]"
+  - x: "*[2]"
+
+- name: measure-of-angle
+  tag: measure-of-angle
+  match: "count(*)=3"
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "мера угла"      # phrase('the measure of the angle' ABC)
+      else:
+      - t: "мера угла"      # phrase('measure of angle' ABC)
+  - x: "*[1]"
+  - x: "*[2]"
+  - x: "*[3]"
+
+
+- name: coordinate
+  tag: coordinate
+  match: "."
+  replace:
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [t: "а"]      # phrase('the' point at 1, 2)
+  - t: "точка"      # phrase(the 'point' at 1, 2)
+  - test:
+      if: "$Verbosity='Verbose'"
+      then: [t: "в"]      # phrase('the' point at 1, 2)
+  - pause: short
+  - insert:
+      nodes: "*"
+      replace: [t: "comma", pause: auto]      # phrase(f of x 'comma' y)
+  - pause: short
+  - test:
+      if: "($SpeechStyle='ClearSpeak' and $Verbosity='Verbose') or not(IsNode(*[last()],'leaf'))"
+      then: [t: "конечная точка"]      # phrase(start point, 'end point')
