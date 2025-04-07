@@ -31,7 +31,7 @@
   }
 
 - AdditionalFunctionNames: {
-    // the arcXXX functions aren't really trig functions (they are inverse functions)
+    # the arcXXX functions aren't really trig functions (they are inverse functions)
     "arccos", "arccosec", "arccosech", "arccosh",
     "arccot", "arccotan", "arccotanh", "arccoth",
     "arccsc", "arccsch", "arcsec", "arcsech", "arcsin", "arcsinh",

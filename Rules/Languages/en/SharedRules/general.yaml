@@ -957,8 +957,6 @@
           then: [pause: medium]
 
 - name: chemistry
-
-
   tag: chemical-equation
   match: "."
   replace:

@@ -44,6 +44,8 @@
     "curl": "function= ; curl; end curl",
     "gradient": "function= ; grad: gradient: gradient; end gradient",
     "laplacian": "function=lahplahsian",   # speech engines don't do a good job with "laplacian"
+
+    "chemistry-concentration": "function= ; concentración: concentración de: la concentración de; fin de la concentración",
   }
 
 - NavigationParts: {

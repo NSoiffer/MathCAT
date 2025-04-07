@@ -425,7 +425,7 @@ pub fn scan_and_mark_chemistry(mathml: Element) -> bool {
             set_marked_chemistry_attr(child, CHEM_FORMULA);
         }
 
-        if name(child) == "mrow" && child.attribute(CHEM_FORMULA).is_none() {
+        if child.attribute(CHEM_FORMULA).is_none() {
             // can't be both an equation and a formula...
             let likelihood = likely_chem_equation(child);
             if is_chemistry || likelihood >= CHEMISTRY_THRESHOLD {
@@ -480,6 +480,15 @@ fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
                     if base_name == "mi" || base_name == "mtext" {
                         chem_name = CHEM_FORMULA;
                     }
+                } else if chem == CHEM_EQUATION && IsBracketed::is_bracketed(mathml, "[", "]", false, true) {
+                    let preceding = mathml.preceding_siblings();
+                    let following = mathml.following_siblings();
+                    if (!preceding.is_empty() && as_element(preceding[preceding.len()-1]).attribute(CHEM_EQUATION_OPERATOR).is_some()) ||
+                       (!following.is_empty() && as_element(following[0]).attribute(CHEM_EQUATION_OPERATOR).is_some()) ||
+                       name(get_parent(mathml)) == "mfrac" {
+                        // this is a chemical equation -- it is bracketed and has chemistry on either side
+                        mathml.set_attribute_value(CHEM_EQUATION, maybe_attr.value());
+                    }
                 }
 
                 if mathml.attribute(CHEM_FORMULA).is_none() {
@@ -489,6 +498,15 @@ fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
                 for child in mathml.children() {
                     set_marked_chemistry_attr(as_element(child), chem);
                 };
+            }
+            "mfrac" => {
+                let children = mathml.children();
+                debug!("mfrac children: {}", mml_to_string(mathml));
+                let numerator_is_chem_equation = IsBracketed::is_bracketed(as_element(children[0]), "[", "]", false, true);
+                let denominator_is_chem_equation = IsBracketed::is_bracketed(as_element(children[1]), "[", "]", false, true);
+                if  numerator_is_chem_equation && denominator_is_chem_equation {
+                    mathml.set_attribute_value(CHEM_EQUATION, "true");
+                }
             }
             _ => error!("Internal error: {} should not be marked as 'MAYBE_CHEMISTRY'", tag_name),
         }
@@ -769,7 +787,8 @@ fn is_chemistry_sanity_check(mathml: Element) -> bool {
 /// Looks at the children of the element and uses heuristics to decide whether this is a chemical equation.
 /// This assumes canonicalization of characters has happened
 fn likely_chem_equation(mathml: Element) -> isize {
-    if name(mathml) != "mrow" && name(mathml) != "mtd" {
+    // mfrac -- could be a ratio of concentrations
+    if name(mathml) != "mrow" && name(mathml) != "mtd" && name(mathml) != "mfrac" {
         return NOT_CHEMISTRY;
     }
 
@@ -981,7 +1000,7 @@ fn likely_chem_superscript(sup: Element) -> isize {
 /// * fences around a chemical formula
 /// * an mrow made up of only chemical formulas
 fn likely_chem_formula(mathml: Element) -> isize {
-    // debug!("start likely_chem_formula:\n{}", mml_to_string(mathml));
+    debug!("start likely_chem_formula:\n{}", mml_to_string(mathml));
     if let Some(value) = get_marked_value(mathml) {
         return value;       // already marked
     }
@@ -1005,6 +1024,20 @@ fn likely_chem_formula(mathml: Element) -> isize {
                 likely_mrow_chem_formula(mathml)
             }
         },
+        "mfrac" => {
+            let children = mathml.children();
+            let num_likely = likely_chem_formula(as_element(children[0]));
+            let denom_likely = likely_chem_formula(as_element(children[1]));
+            let likely = num_likely.max(denom_likely);
+            if likely < CHEMISTRY_THRESHOLD {NOT_CHEMISTRY} else {likely}
+        }
+        "mtd" => {
+            let mut likely = likely_chem_formula(as_element(mathml.children()[0]));
+            if likely < CHEMISTRY_THRESHOLD {
+                likely = likely_chem_equation(mathml);
+            }
+            likely
+        }
         "mtable" => {
             for mrow in mathml.children() {
                 let mrow = as_element(mrow);
@@ -1042,7 +1075,7 @@ fn likely_chem_formula(mathml: Element) -> isize {
     if likelihood >= 0 {
         mathml.set_attribute_value(MAYBE_CHEMISTRY, &likelihood.to_string());
     }
-    // debug!("likely_chem_formula {}:\n{}", likelihood, mml_to_string(mathml));
+    debug!("likely_chem_formula {}:\n{}", likelihood, mml_to_string(mathml));
 
     return likelihood;
 
@@ -1502,7 +1535,7 @@ fn likely_chem_equation_operator(mathml: Element) -> isize {
     // mostly from chenzhijin.com/en/article/Useful%20Unicode%20for%20Chemists (Arrows and Other)
     static CHEM_EQUATION_OPERATORS: phf::Set<char> = phf_set! {
         '+', '=', '-',
-        '·', '℃', '°', '‡', '∆', '×',
+        '·', '℃', '°', '‡', '∆', '×', '\u{2062}' // invisible times
     };
 
     let elem_name = name(mathml);

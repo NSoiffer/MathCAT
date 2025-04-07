@@ -7,9 +7,13 @@ The unicode files are not built here because they are large enough to seem to oc
 See the end of this file how this is used (typically change 'language' and just run the file)
 """
 import re
+import time
 import os
 import sys
 sys.stdout.reconfigure(encoding='utf-8')
+
+# try to avoid google banning us
+TIMEOUT = 2
 
 
 # Translate text in rules into the target language
@@ -35,8 +39,9 @@ GoogleTranslate = Translator(service_urls=["translate.google.us"])
 PhraseToTranslate = re.compile(r'phrase\(([^)]+)\)')
 WordToTranslate = re.compile(r't: "([^"]+)"')
 
+
 # run over the file and figure out what words need to be translated
-def collect_phrases_to_translate(file_to_translate: str) -> (list[str], list[str]):
+def collect_phrases_to_translate(file_to_translate: str) -> tuple[list[str], list[str]]:
     with open(file_to_translate, 'r', encoding='utf8') as in_stream:
         phrases = []
         words = []
@@ -51,15 +56,13 @@ def collect_phrases_to_translate(file_to_translate: str) -> (list[str], list[str
         print(f"#phrases={len(phrases)}, #words={len(words)}")
         return (phrases, words)
 
+
 # break up the words into chunks to make google translate happy (and to run faster) and return a dictionary of word: translation
 MAX_CHARS_IN_CHUNK = 4500  # 4500 sometimes failed (language code "no")
 
-# try to avoid google banning us
-TIMEOUT = 2
-import time
 
 def translate_phrases(phrases_to_translate: list[str], lang) -> list[str]:
-    if lang=='nb' or lang=='nn':
+    if lang == 'nb' or lang == 'nn':
         lang = 'no'  # google doesn't know those variants, but SRE uses them
 
     def do_translation_chunk(phrases: list[str]):
@@ -78,13 +81,14 @@ def translate_phrases(phrases_to_translate: list[str], lang) -> list[str]:
 
         translated_phrases_list = translated_phrases_str.split('.\n')
         if len(translated_phrases_list) != len(phrases):
-            print("\n!!!Problem in translation: size of translations ({}) differs from phrases to translate ({})\n".format(len(translated_phrases_list), len(phrases)))
+            print("\n!!!Problem in translation: size of translations ({}) differs from phrases to translate ({})\n"
+                  .format(len(translated_phrases_list), len(phrases)))
             print("English phrases: {}\n".format(phrases))
             print("Truncated translated phrases: {}\n".format(translated_phrases_list))
             # The Finnish translation (at least) for some reason has a few failures where ".\n" is only "\n" (and translation failed)
             # We try a last attempt by deleting the '.' and splitting at the newline
             print("Retrying by assuming '.' is missing...")
-            translated_phrases_list = translated_phrases_str.replace('.','').split('\n')
+            translated_phrases_list = translated_phrases_str.replace('.', '').split('\n')
             if len(translated_phrases_list) != len(phrases):
                 print("!!!***Retry failed: size of translations ({}) differs from phrases to translate ({})\n".format(len(translated_phrases_list), len(phrases)))
             print("Phrases to translate:\n{}".format(list(phrases)))
@@ -106,14 +110,17 @@ def translate_phrases(phrases_to_translate: list[str], lang) -> list[str]:
             time.sleep(TIMEOUT)       # try to avoid google banning us
     return translations + do_translation_chunk(phrases_chunks_to_translate)
 
+
 TargetWord = re.compile(r"'([^']+)'")
 TextString = re.compile(r'([ \[{][oc]?t: )"([^"]+)"')
+
+
 def substitute_in_translated_phrase(line, translated_phrase, translated_word) -> str:
     has_phrase = PhraseToTranslate.search(line)
     target_words = TargetWord.search(translated_phrase)
     text_words = TextString.search(line)
     new_line = line
-    if has_phrase and target_words and text_words: # test for text_words handles "variables: [....]"
+    if has_phrase and target_words and text_words:  # test for text_words handles "variables: [....]"
         try:
             replacement = text_words.group(1) + '"' + target_words.group(1) + '"'    # add the surrounding context back
         except AttributeError:
@@ -148,6 +155,7 @@ def create_new_file(file_to_translate: str, output_file: str,
                 if WordToTranslate.search(line):
                     iWordTranslation += 1
 
+
 def build_new_translation(path_to_mathcat: str, lang: str, rule_file_name: str) -> None:
     print("build_new_translation: rule_file_name=", rule_file_name)
     file_to_translate = "{}/Rules/Languages/en/{}".format(path_to_mathcat, rule_file_name)
@@ -159,19 +167,19 @@ def build_new_translation(path_to_mathcat: str, lang: str, rule_file_name: str) 
     create_new_file(file_to_translate, os.path.join(lang, rule_file_name), phrase_translations, word_translations)
     print("done\n")
 
+
 def build_all_translations(path_to_mathcat: str, lang: str, subdir="") -> None:
     dir_to_translate = os.path.join(path_to_mathcat, "Rules", "Languages", "en", subdir)
     entries = os.listdir(dir_to_translate)
     for entry in entries:
         if os.path.isdir(os.path.join(dir_to_translate, entry)):
             build_all_translations(path_to_mathcat, lang, os.path.join(subdir, entry))
-        elif entry.endswith('.yaml') and not(entry=="definitions.yaml" or entry=="unicode.yaml" or entry=="unicode-full.yaml"):
+        elif entry.endswith('.yaml') and not (entry == "definitions.yaml" or entry == "unicode.yaml" or entry == "unicode-full.yaml"):
             # the excluded files are built in translate-unicode.py and need some manual checking so not included here
-            build_new_translation(path_to_mathcat, lang, os.path.join(subdir, entry))            
+            build_new_translation(path_to_mathcat, lang, os.path.join(subdir, entry))
 
 
-
-language = 'el'
+language = 'ru'
 if not os.path.exists(language):
     os.makedirs(language)
 if not os.path.exists(language+"/SharedRules"):

@@ -499,6 +499,17 @@
       - x: "text()"
 
 -
+  name: chemistry-concentration
+  tag: mrow
+  match: "ancestor-or-self::*[@data-chem-formula] and IsBracketed(., '[', ']')"
+  replace:
+  - intent:
+      name: "chemistry-concentration"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
+      children:
+      - x: "*[2]"
+
+-
   name: chemistry-state
   tag: mrow
   match:
@@ -851,7 +862,7 @@
       then:
       - intent:
           name: "mrow"
-          attrs: "id=@id data-intent-property=@ddata-intent-property"
+          attrs: "id=@id data-intent-property=@data-intent-property"
           children: [x: "*"]
       else:
       - x: "*"

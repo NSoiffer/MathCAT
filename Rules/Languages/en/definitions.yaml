@@ -46,6 +46,8 @@
     "curl": "function= ; curl; end curl",
     "gradient": "function= ; del: gradient: gradient; end gradient",
     "laplacian": "function=lahplahsian",   # speech engines don't do a good job with "laplacian"
+
+    "chemistry-concentration": "function= ; concentration: concentration of: the concentration of; end concentration",
   }
   # Names of functions that in terse mode don't say "of" (or it's equivalent in other languages)
 
