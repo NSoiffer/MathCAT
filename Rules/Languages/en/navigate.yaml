@@ -91,6 +91,20 @@
 
 
 # Rules for speaking what happens when moving into or out of a notation
+- name: into-or-out-of-intent
+  tag: "*"
+  match: "$Move2D != '' and DEBUG(@data-from-mathml != name(.))"
+  replace:
+  - x: "$Move2D"
+  - test:
+      if: "count($Child2D/preceding-sibling::*)=0 or count($Child2D/following-sibling::*)=0"
+      then:
+      - x: "SpeakIntentName(name(.), $Verbosity, 'function')"
+      else:
+      - t: "part"
+      - x: "count($Child2D/preceding-sibling::*)"
+  - pause: "medium"
+
 - name: into-or-out-of-mfrac
   tag: "*"
   match: "$Move2D != '' and (@data-from-mathml='mfrac' or self::m:mfrac)"
@@ -314,7 +328,7 @@
 - name: zoom-in-mrow-in-math
   # Moving to first or last is meaningless the 'math' has only an 'mrow' inside -- dig inside and do it again 
   tag: math
-  match: "count(*)=1 and ($NavCommand = 'ZoomIn' or $NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom')"
+  match: "count(*)=1 and DEBUG(name(*[1])) = 'mrow' and ($NavCommand = 'ZoomIn' or $NavCommand = 'MoveNextZoom' or $NavCommand = 'MovePreviousZoom')"
   replace:
   - test:
       if: "$NavCommand = 'MovePreviousZoom'"
@@ -335,6 +349,12 @@
   - with:
       variables: [SayCommand: "string($NavVerbosity = 'Verbose')"]
       replace: [x: "."]
+  - test:
+      if: "name(*[1]) != 'mrow'"
+      then:
+      - with:
+          variables: [Move2D: "'in'", Child2D: "IfThenElse(count(*)=0, $Move2D, $Move2D)"]   # phrase('in' the denominator)
+          replace: [x: "IfThenElse($NavCommand = 'MovePreviousZoom', 1, $Child2D)"]
   - test:
       if: "$NavCommand = 'MovePreviousZoom'"
       then: [x: "*[last()]"]
