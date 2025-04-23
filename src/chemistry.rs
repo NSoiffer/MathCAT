@@ -480,15 +480,6 @@ fn set_marked_chemistry_attr(mathml: Element, chem: &str) {
                     if base_name == "mi" || base_name == "mtext" {
                         chem_name = CHEM_FORMULA;
                     }
-                } else if chem == CHEM_EQUATION && IsBracketed::is_bracketed(mathml, "[", "]", false, true) {
-                    let preceding = mathml.preceding_siblings();
-                    let following = mathml.following_siblings();
-                    if (!preceding.is_empty() && as_element(preceding[preceding.len()-1]).attribute(CHEM_EQUATION_OPERATOR).is_some()) ||
-                       (!following.is_empty() && as_element(following[0]).attribute(CHEM_EQUATION_OPERATOR).is_some()) ||
-                       name(get_parent(mathml)) == "mfrac" {
-                        // this is a chemical equation -- it is bracketed and has chemistry on either side
-                        mathml.set_attribute_value(CHEM_EQUATION, maybe_attr.value());
-                    }
                 }
 
                 if mathml.attribute(CHEM_FORMULA).is_none() {
@@ -795,6 +786,15 @@ fn likely_chem_equation(mathml: Element) -> isize {
     // debug!("start likely_chem_equation:\n{}", mml_to_string(mathml));
 	// mrow -- check the children to see if we are likely to be a chemical equation
 
+    // concentrations should either be unscripted or have a superscript
+    // they occur in mrows or mfracs
+    if IsBracketed::is_bracketed(mathml, "[", "]", false, true) {
+        let parent_name = name(get_parent(mathml));
+        if parent_name == "mfrac" || parent_name == "mrow" || parent_name == "msup" || parent_name == "math" {
+            return if as_element(mathml.children()[0]).attribute(CHEM_FORMULA).is_some() {CHEMISTRY_THRESHOLD}  else {NOT_CHEMISTRY};
+        }
+    }
+    
     // possible improvement -- give bonus points for consecutive (not counting invisible separators) chemical elements on top of the existing points
 	let mut likelihood = 0;						// indicator of likely match
 	let mut has_equilibrium_constant = false;
@@ -1080,13 +1080,24 @@ fn likely_chem_formula(mathml: Element) -> isize {
     return likelihood;
 
     fn likely_mrow_chem_formula(mrow: Element) -> isize {
-        // check if it is bracketed -- doesn't add much info
+        // check if it is bracketed
+        // For parens, the only reason to add them is to group the children and then indicate that there is more than one molecule
         let outer_mrow = mrow;
         let mut mrow = mrow;
-        if (IsBracketed::is_bracketed(mrow, "(", ")", false, false) ||
-            IsBracketed::is_bracketed(mrow, "[", "]", false, false)) &&
-           name(as_element(mrow.children()[1]))  == "mrow" {
-            mrow = as_element(mrow.children()[1]);
+        if IsBracketed::is_bracketed(mrow, "(", ")", false, false) ||
+           IsBracketed::is_bracketed(mrow, "[", "]", false, false) {
+            // If it is bracketed, it should have a subscript to indicate the number of the element.
+            // We give a pass to undorned bracketing chars
+            assert!( mrow.children().len() == 1 );
+            let likely = likely_chem_formula(as_element(mrow.children()[0]));
+            let parent = get_parent(mrow);
+            if name(parent) == "msub" {
+                return likely + 3;
+            } else if name(parent) == "mrow" {
+                return likely;
+            } else {
+                return NOT_CHEMISTRY;
+            }
         }
 
         let mut likelihood = if is_order_ok(mrow) {0} else {-4};
