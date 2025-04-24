@@ -2477,7 +2477,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
             for ch in rev_chars {
                 let modified_ch = add_dots_to_braille_char(ch, baseline_indicator_hack);
                 i_end -= ch.len_utf8();
-                if ch !=  modified_ch {
+                if ch !=  modified_ch && ch != 'b' {
                     break;
                 }
             }
