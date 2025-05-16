@@ -5373,7 +5373,7 @@ mod canonicalize_tests {
         let target_str = "<math>
 			<mrow data-changed='added'>
 			<mi>arccos</mi>
-			<mo data-changed='added'>&#x2062;</mo>
+			<mo data-changed='added'>&#x2061;</mo>
 			<mi>x</mi>
 			</mrow>
 		</math>";
@@ -5386,7 +5386,7 @@ mod canonicalize_tests {
         let target_str = "<math>
 			<mrow data-changed='added'>
 			<mi>arccos</mi>
-			<mo data-changed='added'>&#x2062;</mo>
+			<mo data-changed='added'>&#x2061;</mo>
 			<mi>x</mi>
 			</mrow>
 		</math>";
