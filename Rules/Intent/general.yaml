@@ -805,31 +805,33 @@
   # Note: child hasn't been processed, so 'intent' hasn't been processed/turned into data-intent-property
   match: "count(*) > 1 and
           ($TableProperty = 'piecewise' or $TableProperty = 'system-of-equations' or $TableProperty = 'lines') and
-          (self::m:mlabeledtr or *[1][contains(@intent, ':equation-label')])"
+          (self::m:mlabeledtr or *[contains(@intent, ':equation-label')])"
   replace:
   - intent:
       name: "mlabeledtr"
       children:
-      - x: "*[1]"
+      - x: "*[contains(@intent, ':equation-label')]"
       - intent:
           name: "mtd"
-          attrs: "id='*[2]/@id'"
+          attrs: "id=*[not(contains(@intent, ':equation-label'))][1]/*[1]/@id"
           children: 
           - intent:
               name: "mrow"
-              attrs: "id='*[2]/*[1]/@id'"
-              children: [x: "*[position()>1]"]
+              attrs: "id=*[not(contains(@intent, ':equation-label'))][1]/*[1]/@id"
+              children: [x: "*[not(contains(@intent, ':equation-label'))]"]
 
 -
   # convert a mtr to a mlabeledtr
   name: mlabeledtr
   tag: mtr
   # Note: child hasn't been processed, so 'intent' hasn't been processed/turned into data-intent-property
-  match: "count(*) > 1 and *[1][contains(@intent, ':equation-label')]"
+  match: "count(*) > 1 and *[contains(@intent, ':equation-label')]"
   replace:
   - intent:
       name: "mlabeledtr"
-      children: [x: "*"]
+      children:
+      - x: "*[contains(@intent, ':equation-label')]"
+      - x: "*[not(contains(@intent, ':equation-label'))]"
 
 -
   # merge all the mtd into a single mtd
@@ -853,9 +855,11 @@
 
 -
   # We need to preserve any intent properties that are on the mtd (e.g., :pause)
+  # Note: at this point "intent" has been processed so we look at @data-intent-property
   name: mtd-to-mrow
   tag: mtd
-  match: "$TableProperty = 'piecewise' or $TableProperty = 'system-of-equations' or $TableProperty = 'lines'"
+  match: "($TableProperty = 'piecewise' or $TableProperty = 'system-of-equations' or $TableProperty = 'lines') and
+          not(contains(@data-intent-property, ':equation-label'))"
   replace:
   - test:
       if: "@data-intent-property"

@@ -294,7 +294,9 @@
 
 - name: default
   tag: mtable
-  variables: [{IsColumnSilent: false()}]
+  variables:
+  - IsColumnSilent: "false()"
+  - NumColumns: "count(*[1]/*) - IfThenElse(*/self::m:mlabeledtr, 1, 0)"
   match: "."
   replace:
   - T: 'tabel dengan'
@@ -304,9 +306,9 @@
       then: {T: 'baris'}
       else: {T: 'baris'}
   - T: dan
-  - x: "count(*[1]/*)"
+  - x: "$NumColumns"
   - test:
-      if: "count(*[1]/*)=1"
+      if: "$NumColumns"
       then: {T: 'kolom'}
       else: {T: 'kolom'}
   - pause: long

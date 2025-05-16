@@ -702,11 +702,11 @@
           then: [t: "step"]      # phrase(this is a 'step' by step process)
           # else 'None -- don't say anything'
       - x: "count(preceding-sibling::*[not(contains(@data-intent-property, ':continued-row:'))]) + 1"
-      - test:
-          if: "self::m:mlabeledtr"
-          then:
-          - t: "with label"      # phrase(the diagram is complete 'with label')
-          - x: "*[1]/*"
+  - test:
+      if: "self::m:mlabeledtr"
+      then:
+      - t: "with label"      # phrase(the diagram is complete 'with label')
+      - x: "*[1]/*"
   - test:
     - if: "$ClearSpeak_MultiLineLabel='None'"
       then: [pause: xlong]   # need a very long pause with no line labels

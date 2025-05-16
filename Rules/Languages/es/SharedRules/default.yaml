@@ -358,7 +358,9 @@
 
 - name: default
   tag: mtable
-  variables: [IsColumnSilent: false()]
+  variables:
+  - IsColumnSilent: "false()"
+  - NumColumns: "count(*[1]/*) - IfThenElse(*/self::m:mlabeledtr, 1, 0)"
   match: "."
   replace:
   - T: "tabla con"
@@ -368,9 +370,9 @@
       then: [T: "fila"]
       else: [T: "filas"]
   - T: y
-  - x: "count(*[1]/*)"
+  - x: "$NumColumns"
   - test:
-      if: "count(*[1]/*)=1"
+      if: "$NumColumns"
       then: [T: "columna"]
       else: [t: "columnas"]
   - pause: long
@@ -389,7 +391,7 @@
   match: "."
   replace:
   - T: "columna"
-  - x: "count(preceding-sibling::*)+1"
+  - x: "count(preceding-sibling::*)+IfThenElse(parent::m:mlabeledtr, 0, 1)"
   - pause: medium
   - x: "*" # speak the entry
   - pause: long

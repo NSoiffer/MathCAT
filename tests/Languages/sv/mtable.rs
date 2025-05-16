@@ -258,9 +258,9 @@ fn matrix_2x3_labeled() {
     </math>
                                 ";
     test("sv", "ClearSpeak",  expr,
-        "2 gånger 3 matris; rad 1 med etiketten (3 punkt 1); kolumn 2; 3, kolumn 3; 1, kolumn 4; 4; rad 2; kolumn 1; 0, kolumn 2; 2, kolumn 3; 6");
+        "2 gånger 3 matris; rad 1 med etiketten (3 punkt 1); kolumn 1; 3, kolumn 2; 1, kolumn 3; 4; rad 2; kolumn 1; 0, kolumn 2; 2, kolumn 3; 6");
     test("sv", "SimpleSpeak", expr,
-        "2 gånger 3 matris; rad 1 med etiketten (3 punkt 1); kolumn 2; 3, kolumn 3; 1, kolumn 4; 4; rad 2; kolumn 1; 0, kolumn 2; 2, kolumn 3; 6");
+        "2 gånger 3 matris; rad 1 med etiketten (3 punkt 1); kolumn 1; 3, kolumn 2; 1, kolumn 3; 4; rad 2; kolumn 1; 0, kolumn 2; 2, kolumn 3; 6");
 }
 
 #[test]
