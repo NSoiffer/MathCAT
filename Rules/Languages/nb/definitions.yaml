@@ -4,6 +4,70 @@
 # Each definition in this file is of the form
 #   name: [ "...", "..." "..." ],
 
+# If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here for a prefix||infix||postfix||function fixity
+# If only one ":" is used, it the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
+# If no ":"s are used, the same speech is used for all forms
+# If bracketing words make sense, they are separated with ";"s
+# Intent mappings must specify whether they are "prefix", "infix", "postfix", or "function" with an "=" sign
+# If there are multiple fixities (e.g., see transpose), they are separated with "||
+#   for readability, spaces can be used around any of the delimiter characters
+# Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
+- IntentMappings: {
+    "indexed-by": "infix= ; senket: senket: nedre indeks; slutt senket: slutt senket: slutt nedre indeks",
+    "modified-variable": "silent= ",
+    "say-super": "infix=opphøyd: øvre indeks: øvre indeks",   # used with 'mo' for superscripts (e.g, "<")
+    "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
+
+    "absolute-value": "function= ; absoluttverdien; slutt absoluttverdi",
+    "binomial": "infix=binomial; over; slutt binomial",
+    "limit": "prefix=grenseverdien når",
+    "lim-sup": "prefix=den øvre grenseverdien når", 
+    "lim-inf": "prefix=den nedre grenseverdien når", 
+    "logarithm-with-base": "prefix=log med grunntall: logaritmen med grunntall: logaritmen med grunntall",
+    "minus": "infix=minus || prefix=minus",
+    "plus": "infix=pluss || prefix=positiv",
+
+    "transpose": "postfix=transponert || function=transponert",
+    #"norm": "function=; normen; slutt norm",
+    "trace": "function=;sporet; slutt spor",
+    #"dimension": "function=; dimensjonen; slutt dimensjon",
+    # "homomorphism": "function= ; homomorfism; slut homomorfism",                                # doesn't fit function pattern
+    # "kernel": "function= ; noll-rummet : noll-rummet till: noll-rummet till; slut noll-rummet", # doesn't fit function pattern
+    "vector": "function= ; vektor: vektoren: vektoren || prefix=vektor: vektoren: vektoren",
+    "cross-product": "infix=kryss: kryssprodukt: kryssprodukt",
+    "dot-product": "infix=prikk: skalarprodukt: skalarprodukt",
+
+    "divergence": "function= ; div: divergens: divergens; slutt divergens",
+    "curl": "function= ; curl; slutt curl",
+    "gradient": "function= ; grad: gradient: gradient; slutt gradient",
+    "laplacian": "function=laplace",   # speech engines don't do a good job with "laplacian" (swedish ones might)
+  }
+
+- NavigationParts: {
+    "large-op": "base; nedre grense; øvre grense",
+    "mfrac": "teller;nevner",
+    "fraction": "teller;nevner",
+    "msqrt": "rot",
+    "square-root": "rot",
+    "mroot": "rot;rot indeks",
+    "root": "rot;rot indeks",
+    "msub": "base;nedre indeks",
+    "sub": "base;nedre indeks",
+    "msup": "base;øvre indeks",
+    "say-super": "base;opphøyd",
+    "skip-super": "base;opphøyd",
+    "power": "base;eksponent",
+    "msubsup": "base;nedre indeks;øvre indeks",
+    "munder": "base;nedre grense",
+    "mover": "base;øvre grense",
+    "munderover": "base;nedre grense;øvre grense",
+
+    # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
+    # it's a hack to put them here, but at least they are grouped with the other navigation parts
+    "in": "i",
+    "out": "ut av",
+  }
+
 - SIPrefixes: {
     "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hekto", "da": "deka",
     "d": "desi", "c": "centi", "m": "milli", "µ": "mikro", "n": "nano", "p": "piko", "f": "femto", "a": "atto", "z": "zepto", "y": "yokto", "r": "ronto", "q": "quecto"
@@ -94,7 +158,7 @@
     # others
     "ha": "hektar",
     # "B": "bel",    # "B" more commonly means bytes
-    "dB": "desibel", # already loglogarithmic, so not used with SI prefixes
+    "dB": "desibel", # already logarithmic, so not used with SI prefixes
 
     "amu": "atommasseenhet",                               #Sjekk ut symbol for enhet
     "atm": "atmosfære",
@@ -104,7 +168,7 @@
     "grad": "gon",                                        #Sjekk ut symbol for enhet. I følge SNL skal det være g, men dette er det samme som for gram
     "M": "molar",
     "R": "røntgen",
-    "rpm": "omdreininger per minutt",
+    "rpm": "omdreining per minutt",
     "℧": "m-h-o",
     "dyn": "dyn",
     "erg": "erg",
@@ -232,6 +296,7 @@
     "tomme": "tommer",
     "kvadrattomme": "kvadrattommer",
     "kubikktomme": "kubikktommer",
+    "omdreining per minutt": "omdreininger per minutt",
     
   }
 

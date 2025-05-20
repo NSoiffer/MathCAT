@@ -6,9 +6,8 @@
   replace:
   - test:
       if: "$Verbosity='Verbose'"
-      then: [t: "divergence"]      # phrase('divergence' from the mean)
-      else: [t: "div"]      # phrase('divergence' from the mean)
-  - t: "of"      # phrase(systems 'of' linear equations)
+      then: [T: "divergensen til"]      # phrase('divergence' from the mean)
+      else: [T: "div"]      # phrase('divergence' from the mean)
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [pause: short]
@@ -18,7 +17,10 @@
   tag: curl
   match: "."
   replace:
-  - t: "curl of"      # phrase(the 'curl of' a field)
+  - test: 
+      if: "$Verbosity='Verbose'"
+      then: [T: "curlen til"]
+      else: [T: "curl"]
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [pause: short]
@@ -28,10 +30,7 @@
   tag: gradient
   match: "."
   replace:
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [t: "gradient of"]      # phrase('divergence' from the mean)
-      else: [t: "del"]      # phrase('divergence' from the mean)
+  - T: "gradienten til"
   - test:
       if: "not(IsNode(*[1], 'leaf'))"
       then: [pause: short]

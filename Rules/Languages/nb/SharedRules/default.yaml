@@ -143,9 +143,18 @@
 
 
 - name: simple-sub
-  tag: particular-value-of
-  # invisible comma -- want "x sub 1 1" without "end sub"
-  match: "count(*)=2 and (IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][text()='⁣']])"
+  tag: indexed-by
+  # invisible comma -- want "x 1 when subscript is an integer"
+  match: "count(*)=2 and $Verbosity='Terse' and *[2][self::m:mn and translate(., '.,', '')=.]"
+  replace:
+  - x: "*[1]"
+  - x: "*[2]"
+  - pause: "short"
+
+- name: no-end-sub
+  tag: indexed-by
+  # invisible comma -- want "x 1 when subscript is an integer"
+  match: "count(*)=2 and (IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][.='⁣']])"
   replace:
   - x: "*[1]"
   - pause: short
@@ -153,16 +162,6 @@
       if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
       then: [T: "senket"]      # phrase(x 'sub' 2)
   - x: "*[2]"
-
-- name: default
-  tag: particular-value-of
-  match: "count(*)=2"
-  replace:
-  - x: "*[1]"
-  - T: "senket"               # phrase(x 'sub' 2)
-  - x: "*[2]"
-  - T: "slutt senket"           # phrase(x sub 2 'end of sub')
-  - pause: short
 
 
 - name: structure
@@ -216,7 +215,7 @@
 
 - name: diacriticals
   tag: mover
-  match: "*[1][self::m:mi] and *[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^~→¯_', '')='']"
+  match: "*[1][self::m:mi] and *[2][translate(., '\u0306\u030c.\u00A8\u02D9\u20DB\u20DC`^ˇ~→¯_', '')='']"
   replace:
   - x: "*[1]"
   - x: "*[2]"
@@ -289,6 +288,7 @@
               then:
               - x: "$PreSubscript"
               - x: "$Prescripts[1]"
+              - pause: short
           - test:
               if: "not($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none])"
               then: [T: "og"]      # phrase(10 is greater than 8 'and' less than 15)
@@ -306,6 +306,7 @@
                   then:
                   - x: "$PreSubscript"
                   - x: "$Prescripts[3]"
+                  - pause: short
               - test:
                   if: "not($Prescripts[3][self::m:none] or $Prescripts[4][self::m:none])"
                   then: [T: "og"]      # phrase(10 is grater than 8 'and' less than 15)
@@ -314,6 +315,7 @@
                   then:
                   - x: "$PreSuperscript"
                   - x: "$Prescripts[4]"
+                  - pause: short
               - test:
                   if: "count($Prescripts) > 4" # give up and just dump them out so at least the content is there
                   then:
@@ -343,6 +345,7 @@
               then:
               - x: "$PostSubscript"
               - x: "$Postscripts[1]"
+              - pause: short
           - test:
               if: "not($Postscripts[1][self::m:none] or $Postscripts[2][self::m:none])"
               then: [T: "og"]      # phrase(10 is greater than 8 'and' less than 15)
@@ -351,6 +354,7 @@
               then:
               - x: "$PostSuperscript"
               - x: "$Postscripts[2]"
+              - pause: short
           - test:
               if: "count($Postscripts) > 2"
               then:
@@ -359,6 +363,7 @@
                   then:
                   - x: "$PostSubscript"
                   - x: "$Postscripts[3]"
+                  - pause: short
               - test:
                   if: "not($Postscripts[3][self::m:none] or $Postscripts[4][self::m:none])"
                   then: [T: "og"]      # phrase(10 is greater than 8 'and' less than 15)
@@ -367,6 +372,7 @@
                   then:
                   - x: "$PostSuperscript"
                   - x: "$Postscripts[4]"
+                  - pause: short
               - test:
                   if: "count($Postscripts) > 4"
                   then:
@@ -375,6 +381,7 @@
                       then:
                       - x: "$PostSubscript"
                       - x: "$Postscripts[5]"
+                      - pause: short
                   - test:
                       if: "not($Postscripts[5][self::m:none] or $Postscripts[6][self::m:none])"
                       then: [T: "og"]      # phrase(10 is greater than 8 'and' less than 15)
@@ -383,6 +390,7 @@
                       then:
                       - x: "$PostSuperscript"
                       - x: "$Postscripts[6]"
+                      - pause: short
                   - test:
                       if: "count($Postscripts) > 6"
                       then:
@@ -391,6 +399,7 @@
                           then:
                           - x: "$PostSubscript"
                           - x: "$Postscripts[7]"
+                          - pause: short
                       - test:
                           if: "not($Postscripts[7][self::m:none] or $Postscripts[8][self::m:none])"
                           then: [T: "og"]      # phrase(10 is less than 15 'and' greater than 5)
@@ -399,6 +408,7 @@
                           then:
                           - x: "$PostSuperscript"
                           - x: "$Postscripts[8]"
+                          - pause: short
                       - test:
                           if: "count($Postscripts) > 8" # give up and just dump them out so at least the content is there
                           then:
@@ -473,7 +483,7 @@
   # The ordering below is the order in which words come out when there is more than one value
   # Note: @notation can contain more than one value
   tag: menclose
-  match: "@notation='box' and *[self::m:mtext and text()=' ']"
+  match: "@notation='box' and *[self::m:mtext and .=' ']"
   replace:
   - T: "tom rute"      # phrase(the 'empty box' contains no values)
   # SWEDISH: Find a better translation than "ruta".
@@ -556,7 +566,7 @@
       then: [T: "nordvest-pil", pause: short]      # phrase(direction is shown by the 'northwest arrow')
   - test:
       if: ".[contains(@notation,'updownarrow')]"
-      then: [T: "dobbetendet vertikal pil", pause: short]      # phrase(upward movement is indicated by the 'double ended vertical arrow')
+      then: [T: "dobbelendet vertikal pil", pause: short]      # phrase(upward movement is indicated by the 'double ended vertical arrow')
   - test:
       if: ".[contains(@notation,'leftrightarrow')]"
       then: [T: "dobbelendet horisontal pil", pause: short]      # phrase(progress is indicated by the 'double ended horizontal arrow')
@@ -583,7 +593,7 @@
       then: [T: "kvadratrot", pause: short]      # phrase(5 is the 'square root' of 25)
   - T: "omslutter"      # phrase(parentheses are 'enclosing' part of the equation)
   - test:
-      if: "*[self::m:mtext and text()=' ']"
+      if: "*[self::m:mtext and .=' ']"
       then: [T: "mellomrom"]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)   # SWEDISH: is this reasonable?
       else: [x: "*"]
   - test:
@@ -614,55 +624,94 @@
 
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: silent-intent
-  # uncaught intent -- speak as arg1 arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':silent:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':silent:')"
   replace:
   - x: "*"
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: prefix-intent
-  # uncaught intent -- speak as arg1 arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':prefix:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':prefix:')"
   replace:
-  - x: "translate(name(.), '-_', '  ')"
+  - x: "SpeakIntentName(name(.), $Verbosity, 'prefix')"
   - x: "*"
-  - pause: short
+  - test:
+      if: "not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'prefix', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: postfix-intent
-  # uncaught intent -- speak as arg1 arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':postfix:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':postfix:')"
   replace:
-  - pause: short
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'postfix', 'start')"]
   - x: "*"
-  - x: "translate(name(.), '-_', '  ')"
+  - x: "SpeakIntentName(name(.), $Verbosity, 'postfix')"
 
 
 - name: infix-intent
-  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':infix:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':infix:')"
   replace:
-  - pause: short
-  - insert:
-      nodes: "*"
-      replace: [x: "translate(name(.), '-_', '  ')", pause: auto]
-  - pause: short
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'infix', 'start')"]
+  - test:
+      if: "count(*) = 1"  # in cases such as continued-row, plus/minus might have just one child
+      then:
+      - x: "SpeakIntentName(name(.), $Verbosity, 'infix')"
+      - pause: auto
+      - x: "*[1]"
+      else:
+      - insert:
+          nodes: "*"
+          replace: [x: "SpeakIntentName(name(.), $Verbosity, 'infix')", pause: auto]
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'infix', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"   # add (probably) a slightly longer pause if this came from a 2D node
+      then: [pause: short]
+      else: [pause: auto]
 
 
 - name: function-intent
-  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  # uncaught intent -- speak as foo of arg1 comma arg2 .... The MathML spec requires arguments to functions
   tag: "*"
-  match: count(*)>0
+  match: "count(*)>0"
   replace:
-  - x: "translate(name(.), '-_', '  ')"
-  - T: "av"      # phrase(sine 'of' 5)
-  - pause: short
+  - x: "SpeakIntentName(name(.), $Verbosity, 'function')"
+  - test:
+      if: "not(contains(@data-intent-property, ':literal:')) and
+           not(count(*)=2 and (IsInDefinition(*[1], 'TrigFunctionNames') or IsInDefinition(name(.), 'TerseFunctionNames')) and IsNode(*[2], 'simple'))"
+      then: [T: "av", pause: auto]      # phrase(sine 'of' 5)
   - insert:
       nodes: "*"
-      replace: [T: "", pause: short]      # phrase(f of x 'comma' y)
-      # SWEDISH: After correspondance with a mathematician we have decided to not have any punctuation between variables, but a short pause. Length of pause needs to be tested.
+      replace: [T: "", pause: short]
+      # - test:
+      #     if: "not(contains(@data-intent-property, ':literal:'))"
+      #     then: [x: "','"]
+      # SWEDISH: After correspondence with a mathematician we have decided to not have any punctuation between variables, but a short pause. Length of pause needs to be tested.
+  - test:
+      if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'function', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: default-text
   # unknown leaf -- just speak the text -- could be a literal intent

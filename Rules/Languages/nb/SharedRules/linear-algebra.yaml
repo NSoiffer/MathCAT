@@ -5,83 +5,78 @@
   match: "count(*)=1 and not(*[1][self::m:mtr])"
   replace:
   - T: "determinanten"      # phrase(the 'determinant' of a matrix)
-  - test:
-      if: "$Verbosity!='Terse'"
-      then:
-      - T: "av"      # phrase(systems 'of' linear equations)
+  #- test:
+      #if: "$Verbosity!='Terse'"
+      #then:
+  - T: "av"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple'))"
       then: [T: "slutt determinant"]      # phrase('end determinant' of a matrix)
 
-- name: norm
-  tag: norm
-  match: "count(*)=1 and not(@data-intent-property)"
+
+- name: subscripted-norm
+  tag: subscripted-norm
+  match: "count(*)=2"
   replace:
+  - x: "*[2]"
   - T: "normen"      # phrase(the 'norm' can be a measure of distance)
+  #- test:
+      #if: "$Verbosity!='Terse'"
+      #then:
+  - T: "til"      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+
+- name: homomorphism
+  # can't use IntentMappings because this doesn't fit the function pattern
+  tag: homomorphism
+  match: "count(*)=1"
+  replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then:
-      - T: "av"      # phrase(this is the mean 'of' the data)
+      then: [T: "mengden av endomorfier på"]
+      else: [T: "endomorfiene på"]
+  - x: "*[1]"
+  - test:
+      if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
+      then: [T: "slutt endomorfier"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
+
+- name: kernel
+  # can't use IntentMappings because this doesn't fit the function pattern
+  tag: kernel
+  match: "count(*)=1"
+  replace:
+  - T: "nullrommet"      # phrase(this is the 'kernel' of the function)
+  - T: "til"      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+  - test:
+      if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
+      then: [T: "slutt nullrommet"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
+
+
+- name: dimension
+  tag: dimension
+  match: "count(*)=1"
+  replace:
+  - T: "dimensjonen"      # phrase(the 'dimension' of the matrix)
+  - T: "til"      # phrase(systems 'of' linear equations)
+  - x: "*[1]"
+
+- name: norm
+  tag: norm
+  match: "count(*)=1"
+  replace:
+  - T: "normen"      # phrase(the 'norm' can be a measure of distance)
+  - T: "til"      # phrase(this is the mean 'of' the data)
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple'))"
       then: [T: "slutt norm"]      # phrase('end norm' that is a measure of distance)
-
-
-- name: subscripted-norm
-  tag: subscripted-norm
-  match: count(*)=2 and "not(@data-intent-property)"
-  replace:
-  - x: "*[2]"
-  - T: "normen"      # phrase(the 'norm' can be a measure of distance)
-  - test:
-      if: "$Verbosity!='Terse'"
-      then:
-      - T: "av"      # phrase(systems 'of' linear equations)
-  - x: "*[1]"
-
-- name: transpose
-  tag: transpose
-  match: "count(*)=1 and not(@data-intent-property)"
-  replace:
-  - x: "*[1]"
-  - T: "transponert"      # phrase(this will 'transpose' the values)
-  
-- name: trace
-  tag: trace
-  match: "not(@data-intent-property)"
-  replace:
-  - T: "trasen av"      # phrase('trace' of a matrix)
- # SWEDISH: 'av' behövs även i Terse
-  - x: "*[1]"
-
-- name: dimension
-  tag: dimension
-  match: "count(*)=1 and not(@data-intent-property)"
-  replace:
-  - T: "dimensjonen"      # phrase(the 'dimension' of the matrix)
-  - test:
-      if: "$Verbosity!='Terse'"
-      then:
-      - T: "av"      # phrase(systems 'of' linear equations)
-  - x: "*[1]"
-
-- name: homomorphism
-  tag: homomorphism
-  match: "count(*)=1 and not(@data-intent-property)"
-  replace:
-  - T: "homomorfisme"      # phrase('homomorphism' indicates similarity of form)
-  - x: "*[1]"
-
-- name: kernel
-  tag: kernel
-  match: "count(*)=1 and not(@data-intent-property)"
-  replace:
-  - T: "null-rommet"      # phrase(this is the 'kernel' of the function)
-  - test:
-      if: "$Verbosity!='Terse'"
-      then:
-      - T: "til"      # phrase(systems 'of' linear equations)
-  - x: "*[1]"
-

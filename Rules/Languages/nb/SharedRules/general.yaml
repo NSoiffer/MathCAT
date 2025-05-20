@@ -5,35 +5,35 @@
   match: "contains(., '.')"
   replace:
   - x: "substring-before(., '.')"
-  - T: "punkt"
+  - T: "punktum"
   - x: "substring-after(., '.')"
 
 # number-sets are a little messy in that the base was converted to a number-set, so we have to match that (simple) case last
 - name: pos-neg-number-sets
   tag: number-sets
-  match: "count(*)=2 and *[2][text()='+' or text()='-']"
+  match: "count(*)=2 and *[2][.='+' or .='-']"
   replace:
   # SWEDISH: This test, to see if "the" is supposed to be added or not, is removed from the Swedish translations, as it is not applicable.
-  - test:
-      if: "$Verbosity!='Terse'"
-      then:
-      - T: "de"      # phrase('the' square root of 25 equals 5)
+  #- test:
+      #if: "$Verbosity!='Terse'"
+      #then:
+  - T: "de"      # phrase('the' square root of 25 equals 5)
   - bookmark: "*[2]/@id"
   - test:
-    - if: "*[2][text()='+']"
+    - if: "*[2][.='+']"
       then: [{T: "positive"}]      # phrase(set of all 'positive' integers less than 10)
       else: [{T: "negative"}]      # phrase(set of all 'negative' integers less than minus 10)
   - bookmark: "*[1]/@id"
   - test:
-    - if: "*[1][text()='ℂ']"
+    - if: "*[1][.='ℂ']"
       then: [{T: "komplekse tallene"}]      # phrase('complex numbers' consist of two parts)
-    - else_if: "*[1][text()='ℕ']"
+    - else_if: "*[1][.='ℕ']"
       then: [{T: "naturlige tallene"}]      # phrase('natural numbers' are numbers from 1 to infinity)
-    - else_if: "*[1][text()='ℚ']"
+    - else_if: "*[1][.='ℚ']"
       then: [{T: "rasjonale tallene"}]      # phrase('rational numbers' are the fraction of 2 integers)
-    - else_if: "*[1][text()='ℝ']"
+    - else_if: "*[1][.='ℝ']"
       then: [{T: "reelle tallene"}]      # phrase('real numbers' can be both positive and negative)
-    - else_if: "*[1][text()='ℤ']"
+    - else_if: "*[1][.='ℤ']"
       then: [{T: "heltallene"}]      # phrase(positive 'integers' are natural numbers above 0)
       else: [{x: "*[1][text()]"}] # shouldn't happen
 
@@ -43,15 +43,15 @@
   replace:
   - bookmark: "*[1]/@id"
   - test:
-    - if: "*[1][text()='ℂ']"
+    - if: "*[1][.='ℂ']"
       then: [{T: "C"}]      # phrase(the letter 'C' used to represent complex number)
-    - else_if: "*[1][text()='ℕ']"
+    - else_if: "*[1][.='ℕ']"
       then: [{T: "N"}]      # phrase(the letter 'N' may represent natural numbers)
-    - else_if: "*[1][text()='ℚ']"
+    - else_if: "*[1][.='ℚ']"
       then: [{T: "Q"}]      # phrase(the letter 'Q' may represent rational numbers)
-    - else_if: "*[1][text()='ℝ']"
+    - else_if: "*[1][.='ℝ']"
       then: [{T: "R"}]      # phrase(the letter 'R' may represent real numbers)
-    - else_if: "*[1][text()='ℤ']"
+    - else_if: "*[1][.='ℤ']"
       then: [{T: "Z"}]      # phrase(the letter 'Z' may represent integers)
       else: [{x: "*[1][text()]"}] # shouldn't happen
   - bookmark: "*[2]/@id"
@@ -63,15 +63,15 @@
   replace:
   - bookmark: "@id"
   - test:
-    - if: "text()='ℂ'"
+    - if: ".='ℂ'"
       then: [{T: "de komplekse tallene"}]      # phrase('the complex numbers' include 2 parts)
-    - else_if: "text()='ℕ'"
+    - else_if: ".='ℕ'"
       then: [{T: "de naturlige tallene"}]      # phrase('the natural numbers' begin at 1)
-    - else_if: "text()='ℚ'"
+    - else_if: ".='ℚ'"
       then: [{T: "de rasjonale tallene"}]      # phrase('the rational numbers' are the fraction of 2 integers)
-    - else_if: "text()='ℝ'"
+    - else_if: ".='ℝ'"
       then: [{T: "de reelle tallene"}]      # phrase('the real numbers' can be both positive and negative)
-    - else_if: "text()='ℤ'"
+    - else_if: ".='ℤ'"
       then: [{T: "heltallene"}]      # phrase('the integers' are natural numbers above 0)
       else: [x: "text()"] # shouldn't happen
 
@@ -127,27 +127,18 @@
   # SWEDISH: Added a verbosity setting test to allow a shorter form.
   - x: "*[2]"
 
-- name: binomial
-  tag: binomial
-  match: "count(*)=2 and not(@data-intent-property)"
-  replace:
-  - pause: short
-  - x: "*[1]"
-  - T: "over"      # phrase(you can 'choose' a number at random)
-  - x: "*[2]"
-
-- name: permutation
-  tag: permutation-symbol
-  match: "count(*)=2 and not(@data-intent-property)"
+- name: permutation  #Marthe: Different in English
+  tag: pochhammer
+  match: "count(*)=2"
   replace:
   - T: "antallet permutasjoner av"
   - x: "*[2]"
-  - T: "element av"      # phrase(the solution  involves several 'permutations of' values)
+  - T: "elementer av"      # phrase(the solution  involves several 'permutations of' values)
   - x: "*[1]"
 
-- name: intervals
+- name: intervals   #Marthe: Different in English
   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
-  match: "count(*)=2 and not(@data-intent-property)"
+  match: "count(*)=2"
   replace:
   #- test:
       #if: "$Verbosity!='Terse'"
@@ -180,65 +171,12 @@
 
 - name: default-point
   tag: point
-  match: "count(*)=2 and not(@data-intent-property)"
+  match: "count(*)=2"
   replace:
   - T: "punkt"      # phrase(a decimal 'point' indicates the fraction component of a number)
   - x: "*[1]"
   - T: "komma"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
   - x: "*[2]"
-
-- name: absolute-value
-  tag: absolute-value
-  match: "count(*)=1 and not(@data-intent-property)"
-  replace:
-  - test:
-      if: "$Verbosity='Terse'"
-      then: [{T: "absoluttverdien"}]      # phrase(the 'absolute value' of a number represents its distance from 0)
-      else: [{T: "absoluttverdien av"}]      # phrase('the absolute value of' a number represents its distance from 0)
-  - x: "*[1]"
-  - test:
-      if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
-      then: [{pause: short}]
-      else: [{pause: short}, {T: "slutt absoluttverdi"}, {pause: short}]      # phrase(show 'end absolute value' position)
-
-- name: negative
-  tag: negative
-  match: "count(*)=1 and not(@data-intent-property)"
-  replace:
-  - bookmark: "./@id"
-  - T: "minus"      # phrase('negative' numbers are those less than 0)
-  - x: "*[1]"
-
-- name: positive
-  tag: positive
-  match: "count(*)=1 and not(@data-intent-property)"
-  replace:
-  - bookmark: "./@id"
-  - T: "positivt"      # phrase(multiplying two negatives results in a 'positive' number)
-  - x: "*[1]"
-
-- name: subscript
-  tag: sub
-  match: "count(*)=2 and not(@data-intent-property)"
-  replace:
-  - x: "*[1]"
-  - test:
-      if: "$Verbosity='Verbose'"
-      then: {T: "nedre indeks"}
-      else: {T: "senket"}
-  # SWEDISH: Added verbosity test for the start announcement.
-  - x: "*[2]"
-  - test:
-      if: "not(IsNode(*[2],'leaf'))"
-      then:
-      - test:
-          if: "$Verbosity='Verbose'"
-          then: {T: "slutt nedre indeks"}      # phrase(this is the 'end subscript' position)
-          else: {T: "slutt senket"}      # phrase(this is the 'end sub' position)
-      - pause: short
-      else_test:
-          if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
-          then: [pause: short]
 
 - name: bigop-both
   tag: large-op
@@ -258,7 +196,7 @@
 
 - name: bigop-under
   tag: large-op
-  match: "count(*)=2 and not(@data-intent-property)"
+  match: "count(*)=2"
   replace:
   - x: "*[1]"
   - T: "over"      # phrase(2 'over' 3 equals two thirds)
@@ -276,45 +214,6 @@
   - T: "av"      # phrase(the square root 'of' 25 equals 5)
   - pause: short
   - x: "*[2]"
-  
-
-- name: limit
-  tag: limit
-  match: "count(*)=2 and not(@data-intent-property)"
-  replace:
-  - T: "grenseverdien når"                 # phrase(the 'limit as' indicated by this result)
-  - x: "*[2]"
-  - pause: short
-
-- name: vector
-  tag: modified-variable
-  match: "count(*)=2 and *[2][text()='→']"
-  replace:
-  - T: "vektoren"      # phrase(the 'vector' reflects size and direction)
-  - x: "*[1]"
-
-- name: default
-  tag: modified-variable
-  match: "count(*)=2 and not(@data-intent-property)"
-  replace:
-  - x: "*[1]"
-  - x: "*[2]"
-  - pause: short
-
-- name: default
-  # handles single, double, etc., prime
-  tag: [skip-super, say-super]
-  match: "count(*)=2"
-  replace:
-  - x: "*[1]"
-  - test:
-      if: "name(.)='say-super'"
-      then_test:
-        if: "$Verbosity='Terse'"
-        then: {T: "hevet"}            # phrase(this is a 'super' set of numbers)
-        else: {T: "øvre indeks"}      # phrase(a 'superscript' number indicates raised to a power)
-  - x: "*[2]"
-  - pause: short
 
 - name: msubsup-skip-super
   # handles single, double, etc., prime
@@ -427,7 +326,7 @@
 
 - name: sin
   tag: mi
-  match: "text()='sin'"
+  match: ".='sin'"
   replace:
   - bookmark: "@id"
   - test:
@@ -438,7 +337,7 @@
 
 - name: cos
   tag: mi
-  match: "text()='cos'"
+  match: ".='cos'"
   replace:
   - bookmark: "@id"
   - test:
@@ -448,7 +347,7 @@
 
 - name: tan
   tag: mi
-  match: "text()='tan' or text()='tg'"
+  match: ".='tan' or .='tg'"
   replace:
   - bookmark: "@id"
   - test:
@@ -458,7 +357,7 @@
 
 - name: sec
   tag: mi
-  match: "text()='sec'"
+  match: ".='sec'"
   replace:
   - bookmark: "@id"
   - test:
@@ -468,7 +367,7 @@
 
 - name: csc
   tag: mi
-  match: "text()='csc'"
+  match: ".='csc'"
   replace:
   - bookmark: "@id"
   - test:
@@ -478,7 +377,7 @@
 
 - name: cot
   tag: mi
-  match: "text()='cot'"
+  match: ".='cot'"
   replace:
   - bookmark: "@id"
   - test:
@@ -488,7 +387,7 @@
 
 - name: sinh
   tag: mi
-  match: "text()='sinh'"
+  match: ".='sinh'"
   replace:
   - bookmark: "@id"
   - T: "sinus hyperbolicus"
@@ -499,7 +398,7 @@
 
 - name: cosh
   tag: mi
-  match: "text()='cosh'"
+  match: ".='cosh'"
   replace:
   - bookmark: "@id"
   - T: "cosinus hyperbolicus"
@@ -510,7 +409,7 @@
 
 - name: tanh
   tag: mi
-  match: "text()='tanh'"
+  match: ".='tanh'"
   replace:
   - bookmark: "@id"
   - T: "tangens hyperbolicus"
@@ -521,7 +420,7 @@
 
 - name: sech
   tag: mi
-  match: "text()='sech'"
+  match: ".='sech'"
   replace:
   - bookmark: "@id"
   - T: "sekans hyperbolicus"
@@ -532,7 +431,7 @@
 
 - name: csch
   tag: mi
-  match: "text()='csch'"
+  match: ".='csch'"
   replace:
   - bookmark: "@id"
   - T: "cosekans hyperbolicus"
@@ -543,7 +442,7 @@
 
 - name: coth
   tag: mi
-  match: "text()='coth'"
+  match: ".='coth'"
   replace:
   - bookmark: "@id"
   - T: "cotangens hyperbolicus"
@@ -558,16 +457,16 @@
   variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
   match:
   - "count(*)=3 and"
-  - "*[1][self::m:mi][text()='log' or text()='ln' or text()='lg'] and"
-  - "*[2][self::m:mo][text()='⁡']"
+  - "*[1][self::m:mi][.='log' or .='ln' or .='lg'] and"
+  - "*[2][self::m:mo][.='⁡']"
   replace:
   - bookmark: "*[1]/@id"
   - test:
       if: "$log_is_simple"
       then_test:
-      - if: "*[1][text()='log']"
+      - if: "*[1][.='log']"
         then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
-      - else_if: "*[1][text()='lg']"
+      - else_if: "*[1][.='lg']"
         then_test:
         - if: "$Verbosity!='Verbose'"
           then: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
@@ -575,52 +474,22 @@
       # SWEDISH: We have added the term "lg" for the logarithm with base 10. Also added a verbosity test for long and short form.
       - else_if: "$Verbosity!='Verbose'"
         then: [{spell: "'ln'"}]
-        else: [{T: "naturlige logaritmen"}]      # phrase(the 'natural log' function is used in mathematics)
+        else: [{T: "den naturlige logaritmen"}]      # phrase(the 'natural log' function is used in mathematics)
       else:
       - test:
-        - if: "*[1][text()='log']"
-          then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
-        - else_if: "*[1][text()='lg']"
+        - if: "*[1][.='log']"
+          then_test: 
+          - if: "$Verbosity!='Verbose'"
+            then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
+            else: [{T: "logaritmen"}]
+        - else_if: "*[1][.='lg']"
           then: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
         - else_if: "$Verbosity='Terse'"
           then: [{spell: "'ln'"}]
-          else: [{T: "naturlige logaritmen"}]      # phrase(the 'natural log' function is used in mathematics)
-      - T: "av"      # phrase(5 is the square root 'of' 25)
-      - pause: short
+          else: [{T: "den naturlige logaritmen"}]      # phrase(the 'natural log' function is used in mathematics)
+  - T: "av"      # phrase(5 is the square root 'of' 25)
+  #- pause: short
   - x: "*[3]"
-
-- name: log-base
-  tag: log-base
-  match: "not(@data-intent-property)"
-  replace:
-  - bookmark: "@id"
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: {T: "logaritmen med grunntall"}      # phrase(the 'log base' is often base 10)
-      else: {T: "log grunntall"}             # phrase(the 'log base' is often base 10)
-  - x: "*[1]"
-  - pause: medium
-
-- name: log-base-power
-  tag: log-base-power
-  match: "not(@data-intent-property)"
-  replace:
-  - bookmark: "@id"
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: {T: "logaritmen med grunntall"}      # phrase(the 'log base' is often base 10)
-      else: {T: "log grunntall"}             # phrase(the 'log base' is often base 10)
-  - x: "*[1]"
-  - pause: medium
-  - test:
-      - if: "*[2][text()=2]"
-        then: [T: "kvadrert"]     
-      - else_if: "*[2][text()=3]"
-        then: [T: "i tredje"]
-        else:  # don't bother with special cases as this isn't likely to happen
-        - T: "opphøyd i"      # phrase(x 'raised to the' second power)
-        - x: "*[2]"
-  - pause: short
 
 - name: multi-line
   #   that eliminates the need for the if: else_if: ...
@@ -639,7 +508,7 @@
       then:
         - test:
           - if: "$LineCount != 1"
-            then: [{T: "tilfelle"}]
+            then: [{T: "tilfeller"}]
             else: [{T: "tilfellet"}]      # phrase(this is the first 'case' of three cases)
     - else_if: "self::m:system-of-equations"
       then:
@@ -659,6 +528,7 @@
   tag: [mtr, mlabeledtr]
   match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
   replace:
+  - pause: medium
   - test:
       if: "parent::m:system-of-equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
            count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']]) != 0"
@@ -850,7 +720,7 @@
 - name: default-matrix
   tag: [matrix, determinant]
   variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
-  match: "not(@data-intent-property)"
+  match: "."
   replace:
   - x: "count(*)"
   - T: "ganger"      # phrase(the 1 'by' 2 matrix)
@@ -872,7 +742,7 @@
 
 - name: chemistry-msub
   tag: [chemical-formula]
-  match: "*[1][text()='msub']"
+  match: "*[1][.='msub']"
   replace:
   - x: "*[2]"
   - test:
@@ -885,7 +755,7 @@
 
 - name: chemistry-msup
   tag: [chemical-formula]
-  match: "count(*)=3 and *[1][text()='msup']"
+  match: "count(*)=3 and *[1][.='msup']"
   replace:
   - x: "*[2]"
   - test:
@@ -896,7 +766,7 @@
         then: [{T: "hevet"}]      # phrase(H 'super' 2)
   - x: "*[3]"
   - test:
-      if: "following-sibling::*[1][text()='+' or text()='-']" # a little lazy -- assumes chemistry superscripts end with + or -
+      if: "following-sibling::*[1][.='+' or .='-']" # a little lazy -- assumes chemistry superscripts end with + or -
       then: [{pause: medium}]
 
 -
@@ -1065,7 +935,7 @@
                       - x: "$Postscripts[8]"
                       - pause: "short"
       - test:
-          if: "$Postscripts[last()][not(self::m:none)] and following-sibling::*[1][text()='+' or text()='-']"
+          if: "$Postscripts[last()][not(self::m:none)] and following-sibling::*[1][.='+' or .='-']"
           then: [{pause: medium}]
 
 - name: chemistry
@@ -1074,6 +944,7 @@
   replace:
   - x: "*"
 
+#Gjør at det f.eks. NaCl blir lest N a, C l
 - name: chemical-element
   tag: chemical-element
   match: "."
@@ -1094,7 +965,7 @@
       then: [{T: "flytende"}]      # phrase(water is a 'liquid')
     - else_if: ".='g'"
       then: [{T: "gass"}]      # phrase(hydrogen is a 'gass' )
-      else: [{T: "vannløsning"}]      # phrase(an 'aqueous' solution is contained in water)
+      else: [{T: "løst i vann"}]      # phrase(an 'aqueous' solution is contained in water)
   - pause: short
 
 - name: chemical-formula-operator-bond
@@ -1104,13 +975,13 @@
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
   - test:
-    - if: "text()='-' or text() = ':'"
+    - if: ".='-' or .= ':'"
       then: [{T: "enkeltbinding"}]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
-    - else_if: "text()='=' or text() = '∷'"
+    - else_if: ".='=' or .= '∷'"
       then: [{T: "dobbeltbinding"}]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
-    - else_if: "text()='≡'"
+    - else_if: ".='≡'"
       then: [{T: "trippelbindning"}]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
-    - else_if: "text()='≣'"
+    - else_if: ".='≣'"
       then: [{T: "firdobbel binding"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
       else: [{x: "text()"}]
 

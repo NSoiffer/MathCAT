@@ -22,9 +22,9 @@
       then:
       - bookmark: "*[1]/@id"
       - test:
-          if: parent::*[self::m:negative]
-          then: [{T: "negativt"}]      # phrase(minus 4 is a 'negative' number)
-          else: [{T: "positivt"}]      # phrase(10 is a 'positive' number)
+          if: parent::*[self::m:minus and count(*)=1]
+          then: [{T: "den negative"}]      # phrase(minus 4 is a 'negative' number)
+          else: [{T: "den positive"}]      # phrase(10 is a 'positive' number)
   - test:
       if: "$Verbosity!='Terse'"
       then: {T: "kvadratroten av"}      # phrase(the square root 'of' 5)
@@ -48,24 +48,25 @@
       if: $ClearSpeak_Roots = 'PosNegSqRoot' or $ClearSpeak_Roots = 'PosNegSqRootEnd'
       then:
       - test:
-          if: "parent::m:negative or parent::m:positive"
+          if: "parent::*[(self::m:minus or self::m:plus) and count(*)=1]"
           then: [{bookmark: "parent/@id"}]
       - test:
-          if: parent::m:negative
-          then: [{T: "negativt"}]      # phrase(minus 6 is a 'negative' number)
-          else: [{T: "positivt"}]      # phrase(10 is a 'positive' number)
+          if: parent::m:minus
+          then: [{T: "den negative"}]      # phrase(minus 6 is a 'negative' number)
+          else: [{T: "den positive"}]      # phrase(10 is a 'positive' number)
   - test:
       if: "*[2][self::m:mn]"
       then_test:
-      - if: "*[2][text()='2']"
+      - if: "*[2][.='2']"
         then: {T: "kvadratroten"}      # phrase(5 is the 'square root' of 25)
-      - else_if: "*[2][text()='3']"
+      - else_if: "*[2][.='3']"
         then: {T: "kubikkroten"}        # phrase(5 is the 'cube root' of 625)
       - else_if: "*[2][not(contains(., ','))]"   # SWEDISH: Changed decimal point to comma.
         then: [{x: "ToOrdinal(*[2])"}, {T: "roten"}]      # phrase(the square 'root' of 25)
       else:
       - T: "roten av grad"      # phrase(the square 'root' of 36)
       - x: "*[2]"
+      - pause: short
   # SWEDISH: Removed verbosity settings.
   - T: "av"      # phrase(the square root 'of' 36)
   - x: "*[1]"
@@ -82,8 +83,8 @@
 
 # The 'negative' rule interacts with the msqrt/mroot rules as those might pick off this case ("the negative square root of x")
 - name: negative_and_positive
-  tag: [negative, positive]
-  match: "."
+  tag: [plus, minus]
+  match: "count(*)=1 and contains(@data-intent-property, ':prefix:')"
   replace:
   - test:
       if:
@@ -93,7 +94,7 @@
       else:
       - bookmark: "@id"
       - test:
-          if: "self::m:negative"
+          if: "self::m:minus"
           then: [{T: "minus"}]      # phrase(minus 5 is a 'negative' number)
           else: [{T: "pluss"}]      # phrase(7 is a 'positive' number)
   - x: "*[1]"
@@ -104,7 +105,9 @@
 # Units (e.g., meters per second)
 - name: per-fraction
   tag: fraction
-  match: "$ClearSpeak_Fractions='Per'"
+  match: "$ClearSpeak_Fractions='Per' or
+          BaseNode(*[1])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])] and
+          BaseNode(*[1])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])]"
   replace:
   - x: "*[1]"
   - T: "per"      # phrase('5 meters 'per' second)
@@ -119,28 +122,30 @@
   # SWEDISH: Alternative logic for handling correct reading out of common fractions.
   variables: [IsPlural: "*[1]!=1"]
   replace:
-  - pause: short
-  - test:
-      if: "*[1]=1"
-      then: [T: "en"]
-      else: [x: "*[1]"]
+  #- pause: short
+  #- test:
+      #if: "*[1]=1"
+      #then: [T: "en"]
+      #else: [x: "*[1]"]
+  - x: "*[1]"
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 - name: common-fraction-mixed-number
   tag: fraction
   match:
-  - "preceding-sibling::*[1][self::m:mo][text()='⁤'] and" # preceding element is invisible plus
+  - "preceding-sibling::*[1][self::m:mo][.='⁤'] and" # preceding element is invisible plus
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
   - "*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
   - "*[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
   # SWEDISH: Alternative logic for handling correct reading out of common fractions.
   variables: [IsPlural: "*[1]!=1"]
   replace:
-  - pause: short
-  - test:
-      if: "*[1]=1"
-      then: [T: "en"]
-      else: [x: "*[1]"]
+  #- pause: short
+  #- test:
+      #if: "*[1]=1"
+      #then: [T: "en"]
+      #else: [x: "*[1]"]
+  - x: "*[1]"
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 - name: fraction-over-simple
@@ -177,12 +182,12 @@
   - "  ((*[1][self::m:mi or self::m:mtext][string-length(.)>1]) or " # fractions with text
   - "   (*[1][self::m:mrow][count(*)=3][ "
   - "        *[1][self::m:mn] and "
-  - "        *[2][self::m:mo][text()='⁢'] and " # invisible times
+  - "        *[2][self::m:mo][.='⁢'] and " # invisible times
   - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) ) and"
   - "  ((*[2][self::m:mi or self::m:mtext][string-length(.)>1]) or " # fractions with text
   - "   (*[2][self::m:mrow][count(*)=3][ "
   - "        *[1][self::m:mn] and "
-  - "        *[2][self::m:mo][text()='⁢'] and " # invisible times
+  - "        *[2][self::m:mo][.='⁢'] and " # invisible times
   - "        *[3][self::m:mi or self::m:mtext][string-length(.)>1] ]) )"
   - ")"
   replace:
@@ -229,27 +234,27 @@
       then: [{x: "*[1]"}, {bookmark: "*[2]/@id"}, {T: "invers"}]      # phrase(8 over 5 is the 'inverse' of 5 over 8)
       else_test:
         if: $ClearSpeak_Trig = 'ArcTrig'
-        then: [{bookmark: "*[2]/@id"}, {T: "buelenge"}, {x: "*[1]"}]      # phrase(the 'buelenge' of a circle)
+        then: [{bookmark: "*[2]/@id"}, {T: "arcus"}, {x: "*[1]"}]      # phrase(the 'buelenge' of a circle)
         else: [{bookmark: "*[2]/@id"}, {T: "invers"}, {x: "*[1]"}] # default/Auto      # phrase(8 over 5 is the 'inverse' of 5 over 8)
 
 
 - name: function-squared-or-cubed
   tag: power
   match:
-  - "*[2][self::m:mn][text()='2' or text()='3'] and"
-  - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
+  - "*[2][self::m:mn][.='2' or .='3'] and"
+  - "following-sibling::*[1][self::m:mo][.='⁡']" #invisible function apply
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
   - test:
-      if: "*[2][text()='2']"
+      if: "*[2][.='2']"
       then: {T: "i andre"}      # phrase(25 equals 5 'squared') #Marthe: "sin^2x sin kvadrert av x"
       else: {T: "i tredje"}      # phrase(625 equals 5 'cubed')
 
 - name: function-power
   tag: power
   match:
-  - "following-sibling::*[1][self::m:mo][text()='⁡']" #invisible function apply
+  - "following-sibling::*[1][self::m:mo][.='⁡']" #invisible function apply
   replace:
   - x: "*[1]"
   - T: "opphøyd i"
@@ -281,7 +286,7 @@
 
 - name: squared
   tag: power
-  match: "*[2][self::m:mn][text()='2'] and $ClearSpeak_Exponents = 'Auto'"
+  match: "*[2][self::m:mn][.='2'] and $ClearSpeak_Exponents = 'Auto'"
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
@@ -289,7 +294,7 @@
 
 - name: cubed
   tag: power
-  match: "*[2][self::m:mn][text()='3'] and $ClearSpeak_Exponents = 'Auto'"
+  match: "*[2][self::m:mn][.='3'] and $ClearSpeak_Exponents = 'Auto'"
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
@@ -308,7 +313,7 @@
 - name: simple-negative-integer
   tag: power
   match:
-  - "*[2][self::m:negative and"
+  - "*[2][self::m:minus and count(*)=1 and"
   - "     *[1][self::m:mn][not(contains(., ','))]"
   - "    ]"
   replace:
@@ -342,7 +347,7 @@
   match:
   - "$ClearSpeak_Exponents = 'Auto' and"
   - "*[2][self::m:power]["
-  - "     *[2][self::m:mn][text()='2' or text()='3'] and " # exp is 2 or 3
+  - "     *[2][self::m:mn][.='2' or .='3'] and " # exp is 2 or 3
   # base is mn, mi, common fraction ([xxx] case)
   - "     *[1][self::m:mn or self::m:mi or "
   - "          self::m:fraction[*[1][self::m:mn][not(contains(., ',')) and text()<20]   and"
@@ -359,9 +364,9 @@
   tag: power
   match:
   - "$ClearSpeak_Exponents = 'Auto' and"
-  - " *[2][self::m:negative and "
+  - " *[2][self::m:minus and count(*)=1 and "
   - "      *[1]/*[1][self::m:power]["
-  - "                *[2][self::m:mn][text()='2' or text()='3'] and " # exp is 2 or 3"
+  - "                *[2][self::m:mn][.='2' or .='3'] and " # exp is 2 or 3"
   # base is mn, mi, common fraction ([xxx] case)
   - "                *[1][self::m:mn or self::m:mi or "
   - "                     self::m:fraction[*[1][self::m:mn][not(contains(., ',')) and text()<20]   and"
@@ -381,10 +386,10 @@
   - "$ClearSpeak_Exponents = 'Auto' and"
   - "  *[2][self::m:mrow][count(*)=3][ "
   - "       *[3][self::m:power]["
-  - "            *[2][self::m:mn][text()='2' or text()='3'] and " # exp is 2 or 3
+  - "            *[2][self::m:mn][.='2' or .='3'] and " # exp is 2 or 3
   - "            *[1][self::m:mi]"
   - "           ] and "
-  - "       *[2][self::m:mo][text()='⁢'] and " # invisible times
+  - "       *[2][self::m:mo][.='⁢'] and " # invisible times
   # base is mn, or common fraction ([xxx] case)
   - "       *[1][self::m:mn or "
   - "            self::m:fraction[*[1][self::m:mn][not(contains(., ',')) and text()<20]   and"
@@ -403,11 +408,11 @@
   - "$ClearSpeak_Exponents = 'Auto' and"
   - "  *[2][self::m:mrow][count(*)=3][ "
   - "       *[3][self::m:power]["
-  - "            *[2][self::m:mn][text()='2' or text()='3'] and " # exp is 2 or 3
+  - "            *[2][self::m:mn][.='2' or .='3'] and " # exp is 2 or 3
   - "            *[1][self::m:mi]"
   - "           ] and "
-  - "       *[2][self::m:mo][text()='⁢'] and " # invisible times
-  - "       *[1][self::m:negative and "
+  - "       *[2][self::m:mo][.='⁢'] and " # invisible times
+  - "       *[1][self::m:minus and count(*)=1 and "
   # base is mn, or common fraction ([xxx] case)
   - "            *[1][self::m:mn or "
   - "                 self::m:fraction[*[1][self::m:mn][not(contains(., ',')) and text()<20]   and"
@@ -476,7 +481,7 @@
           if: "$Verbosity!='Terse'"
           then: {T: "den"}      # phrase('the' empty set)
       - T: "tomme mengden"      # phrase(the 'empty set')
-    - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][text()=':' or text()='|' or text()='∣']"
+    - else_if: "count(*[1]/*)=3 and *[1]/*[2][self::m:mo][.=':' or .='|' or .='∣']"
       then:
       - T: "mengden av"      # phrase(this is a 'set of' numbers)
       - test:
@@ -501,8 +506,8 @@
  # SWEDISH: rewrote the intervals function to better deal with Swedish convention of speaking intervals
 - name: ClearSpeak-intervals # avoid overriding with default "intervals" name
   variables:
-  - is_intervals_start_infinity: "*[1][self::m:negative and *[1][text()='∞']]"
-  - is_intervals_end_infinity: "*[2][text()='∞'or (self::m:positive and *[1][text()='∞'])]"
+  - is_intervals_start_infinity: "*[1][self::m:minus and count(*)=1 and *[1][.='∞']]"
+  - is_intervals_end_infinity: "*[2][text()='∞'or (self::m:plus and count(*)=1 and *[1][.='∞'])]"
   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
   match: "."
   replace:
@@ -562,28 +567,28 @@
   variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
   match:
   - "count(*)=3 and"
-  - "*[1][self::m:mi][text()='log' or text()='ln' or text()='lg'] and"
-  - "*[2][self::m:mo][text()='⁡']"
+  - "*[1][self::m:mi][.='log' or .='ln' or .='lg'] and"
+  - "*[2][self::m:mo][.='⁡']"
   replace:
   - test:
       if: "$log_is_simple"
       then_test:
-      - if: "*[1][text()='log']"
+      - if: "*[1][.='log']"
         then: [{T: "log"}]      # phrase(the 'log' of x)
-      - else_if: "*[1][text()='lg']"
+      - else_if: "*[1][.='lg']"
         then: [{spell: "'lg'"}]      # phrase(the 'lg' of x)
       - else_if: $ClearSpeak_Log = 'LnAsNaturalLog'
         then: [{T: "den naturlige logaritmen"}]      # phrase(the 'natural log' of the product of 2 numbers)
         else: [{spell: "'ln'"}]
       else:
       - test:
-        - if: "*[1][text()='log']"
+        - if: "*[1][.='log']"
           then:
           - test:
             - if: "$Verbosity='Verbose'"
               then: [{T: "logaritmen"}]
               else: [{T: "log"}]
-        - else_if: "*[1][text()='lg']"
+        - else_if: "*[1][.='lg']"
           then:
           - test:
             - if: "$Verbosity='Verbose'"
@@ -592,9 +597,10 @@
         - else_if: $ClearSpeak_Log = 'LnAsNaturalLog' or $Verbosity='Verbose'
           then: [{T: "den naturlige logaritmen"}]      # phrase(the 'natural log' of x)
           else: [{spell: "'ln'"}]
-      - test:
-        - if: "$Verbosity='Verbose'"
-          then: [{T: "av"}]      # phrase(the natural log 'of' x)
+      #- test:
+        #- if: "$Verbosity='Verbose'"
+          #then: [{T: "av"}]      # phrase(the natural log 'of' x)
+      - T: "av"
       - pause: short
   - x: "*[3]"
 
@@ -687,7 +693,7 @@
 - name: ClearSpeak_Functions_None
   tag: mo
   match:
-  - "text()='⁡' and $ClearSpeak_Functions = 'None' and"
+  - ".='⁡' and $ClearSpeak_Functions = 'None' and"
   - "not(preceding-sibling::*[1][IsInDefinition(., 'TrigFunctionNames')])" # Functions=None does not apply to "trig" functions
   replace:
     test:
@@ -699,7 +705,7 @@
   tag: mo
   match:
   # Note: this rule is also part of the paren rule so that the parens speak
-  - "text()='⁢' and $ClearSpeak_ImpliedTimes = 'None'"
+  - ".='⁢' and $ClearSpeak_ImpliedTimes = 'None'"
   replace:
   - T: ""
 
@@ -708,13 +714,14 @@
   match:
   # say "times" when invisible times is followed by parens or a superscript that has a base with parens or "|"s
   # if we aren't sure if it is times or not, don't say anything
-  - "text()='⁢' and (not(@data-function-guess) or $ClearSpeak_Functions = 'None') and"
+  - ".='⁢' and (not(@data-function-guess) or $ClearSpeak_Functions = 'None') and"
   - "not(ancestor-or-self::*[contains(@data-intent-property, ':structure:')]) and ("
   - "  $ClearSpeak_ImpliedTimes = 'MoreImpliedTimes'"
   - " or "
   - "  following-sibling::*[1]["
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|') or "
   - "    self::m:matrix or self::m:determinant or self::m:binomial or" # followed by parens
+  - "    self::m:square-root or self::m:msqrt or self::m:root or self::m:mroot or"
   - "    ( (self::m:msup or self::m:msub or self::m:msubsup or self::m:power) and " # followed by msup, etc.
   - "       *[1][self::m:mrow[IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')] or "
   - "            self::m:matrix or self::m:determinant]" # base has parens
@@ -736,9 +743,9 @@
   - "          not(self::m:math) ] and "       # rule out [x] standing alone
   - "( IsBracketed(., '(', ')') or IsBracketed(., '[', ']') ) and "
   - "not( $ClearSpeak_Functions = 'None' and "
-  - "     (preceding-sibling::*[1][text()='⁡'] or following-sibling::*[1][text()='⁡']) ) and "
+  - "     (preceding-sibling::*[1][.='⁡'] or following-sibling::*[1][.='⁡']) ) and "
   - "not( $ClearSpeak_ImpliedTimes = 'None' and "
-  - "     (preceding-sibling::*[1][text()='⁢'] or following-sibling::*[1][text()='⁢']) ) and "
+  - "     (preceding-sibling::*[1][.='⁢'] or following-sibling::*[1][.='⁢']) ) and "
   - "IsNode(*[2], 'simple') and"
   - "not(ancestor-or-self::*[contains(@data-intent-property, ':structure:')])"
   # missing clause: 'a positive fraction that is spoken as an ordinal
