@@ -165,7 +165,7 @@
     "bar": "bar",
     "cal": "kalori",
     "Ci": "curie",
-    "grad": "gon",                                        #Sjekk ut symbol for enhet. I følge SNL skal det være g, men dette er det samme som for gram
+    "grad": "gon",                                        
     "M": "molar",
     "R": "røntgen",
     "rpm": "omdreining per minutt",
