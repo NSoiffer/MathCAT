@@ -12,11 +12,11 @@
     //mod multiline;
 //}
 
-//mod SimpleSpeak {
+mod SimpleSpeak {
     //mod functions;
     //mod large_ops;
     // mod menclose;
-    //mod mfrac;
+    mod mfrac;
     // mod mroot;
     //mod msup;
     //mod sets;
@@ -24,9 +24,9 @@
     //mod linear_algebra;
     //mod multiline;
     //mod subscripts;
-//}
+}
 //mod shared;
-mod units;
+//mod units;
 //mod chemistry;
 //mod alphabets;
 //mod intent;

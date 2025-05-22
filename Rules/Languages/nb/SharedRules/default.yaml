@@ -149,7 +149,7 @@
   replace:
   - x: "*[1]"
   - x: "*[2]"
-  - pause: "short"
+  - pause: short
 
 - name: no-end-sub
   tag: indexed-by
@@ -162,6 +162,7 @@
       if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
       then: [T: "senket"]      # phrase(x 'sub' 2)
   - x: "*[2]"
+  - pause: short
 
 
 - name: structure

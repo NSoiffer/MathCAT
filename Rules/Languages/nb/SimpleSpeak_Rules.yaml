@@ -85,6 +85,16 @@
       else: [x: "*[1]"]
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
+# Units (e.g., meters per second)
+- name: per-fraction
+  tag: fraction
+  match: "BaseNode(*[1])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])] and
+          BaseNode(*[1])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])]"
+  replace:
+  - x: "*[1]"
+  - t: "per"      # phrase('5 meters 'per' second)
+  - x: "*[2]"
+  
 - name: simple
   # don't include nested fractions. E.g, fraction a plus b over c + 1 end fraction" is ambiguous
   # by simplistic SimpleSpeak's rules "b over c" is a fraction, but if we say nested fractions
@@ -260,12 +270,13 @@
   - "  following-sibling::*[1]["
   - "    IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|') or "
   - "    self::m:matrix or self::m:determinant or self::m:binomial or" # followed by parens
-  - "    ( (self::m:msub or self::m:msubsup or
-           ((self::m:msup or self::m:power) and not(IsNode(*[1], 'leaf') and *[2][self::m:mn and (.=2 or '.=3')]))) and " # followed by msup, etc.
+  - "    self::m:square-root or self::m:msqrt or self::m:root or self::m:mroot or"
+  - "    (self::m:msub or self::m:msubsup or"
+  - "    ((self::m:msup or self::m:power) and not(IsNode(*[1], 'leaf') and *[2][self::m:mn and (.=2 or '.=3')]))) and " # followed by msup, etc.
   - "       (*[1][self::m:mrow[IsBracketed(., '(', ')') or IsBracketed(., '[', ']') or IsBracketed(., '|', '|')] or "
   - "            self::m:matrix or self::m:determinant] or" # base has parens
   - "        not(IsNode(*[2], 'simple')) or "
-  - "        (self::m:msubsup and not(IsNode(*[3], 'simple'))))"
+  - "        (self::m:msubsup and not(IsNode(*[3], 'simple')))"
   - "    )"
   - "  ]"
   # other possibility is the preceding element has parens (but not the following)

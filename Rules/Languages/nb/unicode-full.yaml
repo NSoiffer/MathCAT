@@ -1430,10 +1430,9 @@
  - "⒅": [T: "atten i parentes"]          #  0x2485    (en: 'parenthesized eighteen', google translation)
  - "⒆": [T: "nitten i parentes"]              #  0x2486    (en: 'parenthesized nineteen', google translation)
  - "⒇": [T: "tjue i parentes"]               #  0x2487    (en: 'parenthesized twenty', google translation)
- - "⒉-⒐":                                           #  0x2488 - 0x2491
-    - spell: "translate('.', '⒉⒊⒋⒌⒍⒎⒏⒐', '23456789')"
+ - "⒈-⒐":                                           #  0x2488 - 0x2491
+    - spell: "translate('.', '⒈⒉⒊⒋⒌⒍⒎⒏⒐', '123456789')"
     - T: "med punktum"                               #     (en: 'with period', google translation)
- - "⒈": [T: "én med punktum"]
  - "⒑": [T: "ti med punktum"]                       #  0x2491    (en: 'ten with period', google translation)
  - "⒒": [T: "elleve med punktum"]                      #  0x2492    (en: 'eleven with period', google translation)
  - "⒓": [T: "tolv med punktum"]                      #  0x2493    (en: 'twelve with period', google translation)

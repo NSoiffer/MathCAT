@@ -19,7 +19,7 @@
     "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
 
     "absolute-value": "function= ; absoluttverdien; slutt absoluttverdi",
-    "binomial": "infix=binomial; over; slutt binomial",
+    "binomial": "infix=binomialkoeffisient; over; slutt binomialkoeffisient",
     "limit": "prefix=grenseverdien når",
     "lim-sup": "prefix=den øvre grenseverdien når", 
     "lim-inf": "prefix=den nedre grenseverdien når", 

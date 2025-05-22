@@ -459,7 +459,7 @@ fn si_other_numbers() {
                             <mn>1235</mn><mi intent=":unit">daN</mi><mo>,</mo>
                             <mn>2,5</mn><mi intent=":unit">&#xB5;sek</mi><mo>,</mo>
                             <mn>32,34</mn><mi intent=":unit">mol</mi></math>"#;
-    test("nb", "SimpleSpeak", expr, 
+    test_prefs("nb", "SimpleSpeak", vec![("DecimalSeparators", ","), ("BlockSeparators", ".")], expr, 
         "1,0 liter, komma, 2,0 meter, komma; x milli-sekunder, komma; y mikro-sekunder, komma, deka-gram komma; 1235 deka-newton, komma; 2,5 mikro-sekunder, komma, 32,34 mol");
 }
 

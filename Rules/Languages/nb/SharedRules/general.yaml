@@ -451,6 +451,27 @@
       #then: {T: "cotan hype"}                  # phrase('cotanch' is shorthand for hyperbolic cotangent)
       #else: {T: "cotangens hyperbolicus"}      # phrase(the 'hyperbolic cotangent' is a mathematical function) 
 
+- name: exponential
+  tag: mi
+  match: ".='exp'"
+  replace:
+  - bookmark: "@id"
+  - test:
+      if: "$Verbosity='Terse'"
+      then: [T: "exp"]      # phrase('exp' means exponential function)
+      else: [T: "eksponentialfunksjonen"]      # phrase('exponential' function)
+      
+- name: covariance
+  tag: mi
+  match: ".='Cov'"
+  replace:
+  - bookmark: "@id"
+  - T: "kovarians"
+  #- test:
+      #if: "$Verbosity='Terse'"
+      #then: [t: "Cov"]      # phrase('Cov' is shorthand for the covariance function)
+      #else: [t: "covariance"]      # phrase('covariance' function)
+
 - # handle both log and ln
   name: log
   tag: mrow
@@ -584,7 +605,7 @@
   variables: [{IsColumnSilent: true()}]
   match: "count(*)=1 and *[self::m:mtr][count(*) = 1]"
   replace:
-  - T: "én-ganger-én"      # phrase(the '1 by 1' matrix)
+  - T: "1 ganger 1"      # phrase(the '1 by 1' matrix)
   - test:
       if: "self::m:determinant" # just need to check the first bracket since we know it must be (, [, or |
       then: {T: "determinant"}      # phrase(the 2 by 2 'determinant'))
@@ -592,6 +613,58 @@
       
   - T: "med element"      # phrase(the 2 by 2 matrix 'with entry' x)
   - x: "*[1]/*"
+
+
+# simpler reading methods for special case matrices
+- name: zero-matrix
+  tag: matrix
+  # select all the non-zero entries -- if there are none of them, then it is a zero matrix
+  match: "not( */*/*[not(self::m:mn and .= 0)] )"
+  replace:
+  - x: count(*)
+  - T: "ganger"       # phrase(the 1 'by' 2 matrix)
+  - x: count(*[self::m:mtr][1]/*)
+  - T: "null-matrise"   # phrase(the 2 by 2 'zero matrix')
+  - pause: long
+
+- name: identity-matrix
+  tag: matrix
+  # select all the non-zero entries...if they are not on the diagonal, or are != 1
+  #   if there are any of them, then this isn't an identity matrix
+  match:
+  - "count(*) = count(*[1]/*) and "
+  - "not( */*/*[not(self::m:mn and .= 0)]"
+  - "          [count(../preceding-sibling::*)!=count(../../preceding-sibling::*) or .!= 1]"
+  - "    )"
+  replace:
+  - x: count(*)
+  - T: "ganger"       # phrase(the 1 'by' 2 matrix)
+  - x: count(*[self::m:mtr][1]/*)
+  - T: "identitetsmatrise"   # phrase(the 2 by 2 'identity matrix')
+  - pause: long
+
+- name: diagonal-matrix
+  tag: matrix
+  # select all the non-zero entries...if they are not on the diagonal
+  #   if there are any of them, then this isn't an identity matrix
+  match:
+  - "count(*) = count(*[1]/*) and "
+  - "not( */*/*[not(self::m:mn and .= 0)]"
+  - "          [count(../preceding-sibling::*)!=count(../../preceding-sibling::*)]"
+  - "    )"
+  replace:
+  - x: count(*)
+  - T: "ganger"       # phrase(the 1 'by' 2 matrix)
+  - x: count(*[self::m:mtr][1]/*)
+  - t: "diagonalmatrise"   # phrase(the 2 by 2 'diagonal matrix')
+  - pause: long
+  - insert:
+      # this lists the diagonal 'mtd's to be read, and they say "column nnn" before reading the contents
+      # there seems to be an xpath bug -- without the parens, the match fails for the
+      #   test Languages::en::mtable::diagonal_matrix due to match failure (the third matching element seems to be missing)
+      nodes: "(*/*/*[not(self::m:mn and .= 0)]/..)"
+      replace: [pause: auto]
+  - pause: long
 
 # simpler reading methods for smaller matrices if the entries are simple
 - name: 2-or-3x1-matrix
@@ -604,7 +677,7 @@
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   replace:
   - x: count(*)
-  - T: "ganger én"      # phrase(the 2 'by 1 column' matrix)
+  - T: "ganger 1"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: {T: "kolonne-vektor"}      # phrase(the 2 by 2 'vector')
@@ -626,7 +699,7 @@
   match: "*[self::m:mtr][count(*) = 1]"
   replace:
   - x: "count(*)"
-  - T: "ganger én"      # phrase(the 2 'by 1 column' matrix)
+  - T: "ganger 1"      # phrase(the 2 'by 1 column' matrix)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
       then: {T: "kolonne-vektor"}      # phrase(the 2 column 'vector')
@@ -651,7 +724,7 @@
   - count(*[1]/*)<=3 and # at least two cols
   - IsNode(*/*/*,'simple') # IsNode() returns true if all the nodes are simple
   replace:
-  - T: "én ganger"      # phrase('the 1 by' 2 matrix)
+  - T: "1 ganger"      # phrase('the 1 by' 2 matrix)
   - x: count(*/*)
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
@@ -673,7 +746,7 @@
   variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
   match: "count(*)=1" # one row
   replace:
-  - T: "én ganger"      # phrase('the 1 by' 2 matrix)
+  - T: "1 ganger"      # phrase('the 1 by' 2 matrix)
   - x: "count(*/*)"
   - test:
       if: "$ClearSpeak_Matrix = 'Vector' or $ClearSpeak_Matrix = 'EndVector'"
