@@ -702,7 +702,7 @@
  - "∅": [T: "den tomme mengden"]                        #  0x2205    (en: 'empty set')
  - "∆":                                             #  0x2206
      - T: "laplace av"                               #     (en: 'laplacian of')   #Sjekk ut boka Kalkulus og lineær algebra!
- - "∇": [T: "gradienten til"]                     # 0x2207 (en: 'gradient of', google: 'lutning av')   #Sjekk ut boka Kalkulus og lineær algebra
+ - "∇": [T: "nabla"]                     # 0x2207 (en: 'gradient of', google: 'lutning av')   #Sjekk ut boka Kalkulus og lineær algebra
  - "∈":                                          #  0x2208
     - test:
         if: "$SpeechStyle != 'ClearSpeak'"

@@ -349,7 +349,7 @@ fn explicit_times_none_superscript() {
             <mfrac> <mn>1</mn><mn>2</mn></mfrac>
             <mo>)</mo></mrow></mrow>
     </mrow></math>";
-        test("nb", "ClearSpeak", expr, "2 pluss en halv");
+        test("nb", "ClearSpeak", expr, "2 pluss 1 halv");
     }
 
 

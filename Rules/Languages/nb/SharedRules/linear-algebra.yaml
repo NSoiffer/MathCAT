@@ -34,12 +34,12 @@
   replace:
   - test:
       if: "$Verbosity!='Terse'"
-      then: [T: "mengden av endomorfier på"]
-      else: [T: "endomorfiene på"]
+      then: [T: "mengden av homomorfier på"]
+      else: [T: "homomorfiene på"]
   - x: "*[1]"
   - test:
       if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
-      then: [T: "slutt endomorfier"]
+      then: [T: "slutt homomorfier"]
   - test:
       if: "IsNode(., '2D')"
       then: [pause: short]

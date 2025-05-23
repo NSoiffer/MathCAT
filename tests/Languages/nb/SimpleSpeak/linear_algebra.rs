@@ -3,31 +3,31 @@ use crate::common::*;
 #[test]
 fn transpose() {
   let expr = "<math> <msup><mi>M</mi><mi>T</mi></msup> </math>";
-  test("en", "SimpleSpeak", expr, "cap m transpose");
+  test("nb", "SimpleSpeak", expr, "stor m transponert");
 }
 
 #[test]
 fn trace() {
   let expr = "<math> <mi>Tr</mi><mi>M</mi> </math>";
-  test("en", "SimpleSpeak", expr, "trace of cap m");
+  test("nb", "SimpleSpeak", expr, "sporet av stor m");
 }
 
 #[test]
 fn dimension() {
   let expr = "<math> <mi>Dim</mi><mi>M</mi> </math>";
-  test("en", "SimpleSpeak", expr, "dimension of cap m");
+  test("nb", "SimpleSpeak", expr, "dimensjonen til stor m");
 }
 
 #[test]
 fn homomorphism() {
   let expr = "<math> <mi>Hom</mi><mo>(</mo><mi>M</mi><mo>)</mo> </math>";
-  test("en", "SimpleSpeak", expr, "homomorphism of cap m");
+  test("nb", "SimpleSpeak", expr, "mengden av homomorfier på stor m");
 }
 
 #[test]
 fn kernel() {
   let expr = "<math> <mi>ker</mi><mrow><mo>(</mo><mi>L</mi><mo>)</mo></mrow> </math>";
-  test("en", "SimpleSpeak", expr, "kernel of cap l");
+  test("nb", "SimpleSpeak", expr, "nullrommet til stor l");
 }
 
 #[test]
@@ -40,7 +40,7 @@ fn norm() {
     </mrow>
 </math>
 ";
-  test("en", "SimpleSpeak", expr, "norm of f");
+  test("nb", "SimpleSpeak", expr, "normen til f");
 }
 
 #[test]
@@ -55,7 +55,7 @@ fn norm_non_simple() {
     </mrow>
 </math>
 ";
-  test("en", "SimpleSpeak", expr, "norm of x plus y end norm");
+  test("nb", "SimpleSpeak", expr, "normen til x pluss y slutt norm");
 }
 
 #[test]
@@ -71,7 +71,7 @@ fn norm_subscripted() {
     </msub>
 </math>
 ";
-  test("en", "SimpleSpeak", expr, "p norm of f");
+  test("nb", "SimpleSpeak", expr, "p normen til f");
 }
 
 #[test]
@@ -88,5 +88,5 @@ fn not_gradient() {
   <mi>a</mi>
 </math>
 "#;
-  test("en", "SimpleSpeak", expr, "open paren, b times nahblah, close paren; times eigh");
+  test("nb", "SimpleSpeak", expr, ", startparentes; b ganger nabla; sluttparentes; ganger a");
 }
