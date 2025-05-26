@@ -21,7 +21,7 @@ fn case_1() {
   </math>
    ";
    test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Auto", expr,
-    "f av x er lik; 3 tilfeller, \
+    "f av x er lik; 3 tilfeller; \
                 tilfelle 1; minus 1 if x er mindre enn 0; \
                 tilfelle 2; 0 if x er lik 0; \
                 tilfelle 3; 1 if x er større enn 0"
@@ -39,7 +39,7 @@ fn equation_auto() {
     </math>
    ";
    test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Auto", expr,
-                "2 rader, \
+                "2 rader; \
                 rad 1; x pluss y er lik 7; \
                 rad 2; 2 x pluss 3 y; er lik 17");
 }
@@ -55,7 +55,7 @@ fn equation_plus_at_start() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Auto", expr, "2 rader, \
+   test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Auto", expr, "2 rader; \
                 rad 1; x pluss y er lik 7; \
                 rad 2; 2 x, pluss 3 y, er lik 17");
 }
@@ -71,7 +71,7 @@ fn equation_case() {
     </math>
    ";
    test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Case", expr, 
-   "2 tilfeller, tilfelle 1; x pluss y er lik 7; tilfelle 2; 2 x pluss 3 y; er lik 17");
+   "2 tilfeller; tilfelle 1; x pluss y er lik 7; tilfelle 2; 2 x pluss 3 y; er lik 17");
 }
 
 #[test]
@@ -84,7 +84,7 @@ fn equation_constraint() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Constraint", expr, "2 betingelser, \
+   test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Constraint", expr, "2 betingelser; \
                 betingelse 1; x pluss y er lik 7; \
                 betingelse 2; 2 x pluss 3 y; er lik 17");
 }
@@ -99,7 +99,7 @@ fn equation_equation() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Equation", expr, "2 likninger, \
+   test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Equation", expr, "2 likninger; \
                 likning 1; x pluss y er lik 7; \
                 likning 2; 2 x pluss 3 y; er lik 17");
 }
@@ -114,7 +114,7 @@ fn equation_line() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Line", expr, "2 rader, \
+   test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Line", expr, "2 rader; \
                 rad 1; x pluss y er lik 7; \
                 rad 2; 2 x pluss 3 y; er lik 17");
 }
@@ -145,7 +145,7 @@ fn equation_row() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Row", expr, "2 rader, \
+   test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Row", expr, "2 rader; \
                 rad 1; x pluss y er lik 7; \
                 rad 2; 2 x pluss 3 y; er lik 17");
 }
@@ -160,7 +160,7 @@ fn equation_step() {
       </mtable></mrow>
     </math>
    ";
-   test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Step", expr, "2 steg, \
+   test_ClearSpeak("nb", "ClearSpeak_MultiLineLabel", "Step", expr, "2 steg; \
                 steg 1; x pluss y er lik 7; \
                 steg 2; 2 x pluss 3 y; er lik 17");
 }

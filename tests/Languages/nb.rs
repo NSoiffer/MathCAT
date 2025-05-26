@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-mod ClearSpeak {
+//mod ClearSpeak {
     //mod functions;
     //mod large_ops;
     //mod menclose;
@@ -10,7 +10,7 @@ mod ClearSpeak {
     //mod sets;
     //mod symbols_and_adornments;
     //mod multiline;
-}
+//}
 
 //mod SimpleSpeak {
     //mod functions;
@@ -26,7 +26,7 @@ mod ClearSpeak {
     //mod subscripts;
 //}
 //mod shared;
-//mod units;
+mod units;
 //mod chemistry;
 //mod alphabets;
 //mod intent;

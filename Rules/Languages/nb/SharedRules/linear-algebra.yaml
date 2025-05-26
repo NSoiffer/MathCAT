@@ -79,4 +79,4 @@
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple'))"
-      then: [T: "slutt norm"]      # phrase('end norm' that is a measure of distance)
+      then: [{pause: short}, {T: "slutt norm"}]      # phrase('end norm' that is a measure of distance)

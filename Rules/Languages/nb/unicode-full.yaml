@@ -3650,14 +3650,14 @@
             - if: "$SpeechStyle != 'ClearSpeak'"
               then_test:
                   if: "$DefaultToGiven"
-                  then: [T: "gitt"]
+                  then: [{pause: short}, {T: "gitt"}]
                   else: [T: "vertikal strek"]
             - else_if: "not(preceding-sibling::*) or not(following-sibling::*)"
               then: [T: "vertikal strek"]
             - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
               then: [T: "slik at"]
             - else_if: "$ClearSpeak_VerticalLine = 'Given' or $DefaultToGiven"
-              then: [T: "gitt"] 
+              then: [{pause: short}, {T: "gitt"}] 
             - else: [T: "deler"]                   
  - "～": [T: "tilde"]                               # 0xff5e
  - "￢": [T: "ikke"]                                 # 0xffe2

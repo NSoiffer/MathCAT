@@ -258,9 +258,9 @@ fn matrix_2x3_labeled() {
     </math>
                                 ";
     test("nb", "ClearSpeak",  expr,
-        "2 ganger 3 matrise; rad 1 med etiketten (3 punktum 1); kolonne 2; 3, kolonne 3; 1, kolonne 4; 4; rad 2; kolonne 1; 0, kolonne 2; 2, kolonne 3; 6");
+        "2 ganger 3 matrise; rad 1 med etiketten (3 punktum 1); kolonne 1; 3, kolonne 2; 1, kolonne 3; 4; rad 2; kolonne 1; 0, kolonne 2; 2, kolonne 3; 6");
     test("nb", "SimpleSpeak", expr,
-        "2 ganger 3 matrise; rad 1 med etiketten (3 punktum 1); kolonne 2; 3, kolonne 3; 1, kolonne 4; 4; rad 2; kolonne 1; 0, kolonne 2; 2, kolonne 3; 6");
+        "2 ganger 3 matrise; rad 1 med etiketten (3 punktum 1); kolonne 1; 3, kolonne 2; 1, kolonne 3; 4; rad 2; kolonne 1; 0, kolonne 2; 2, kolonne 3; 6");
 }
 
 #[test]
@@ -1026,7 +1026,7 @@ fn unknown_mtable_property() {
       </mtable>
     </math>";
     test("nb", "ClearSpeak",  expr,
-         "2 rader, rad 1; a er lik, b pluss c minus d; rad 2; pluss e minus f");
+         "2 rader; rad 1; a er lik, b pluss c minus d; rad 2; pluss e minus f");
 }
 
 

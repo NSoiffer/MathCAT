@@ -154,7 +154,7 @@ fn vertical_line_divides() {
             <mn>3</mn><mo>|</mo><mn>6</mn>
         </math>";
         test_ClearSpeak("nb", "ClearSpeak_VerticalLine", "Given", expr,
-                "3 gitt 6");
+                "3, gitt 6");
     }
 
     #[test]

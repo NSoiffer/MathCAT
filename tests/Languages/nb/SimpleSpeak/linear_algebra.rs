@@ -55,7 +55,7 @@ fn norm_non_simple() {
     </mrow>
 </math>
 ";
-  test("nb", "SimpleSpeak", expr, "normen til x pluss y slutt norm");
+  test("nb", "SimpleSpeak", expr, "normen til x pluss y, slutt norm");
 }
 
 #[test]

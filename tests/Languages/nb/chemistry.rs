@@ -11,7 +11,7 @@ fn salt() {
 #[test]
 fn water() {
   let expr = "<math><msub><mi>H</mi><mn>2</mn></msub><mi>O</mi></math>";
-  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "stor h, 2 stor o");
+  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "stor h, 2, stor o");
   test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "stor h, senket 2, stor o");
   test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "stor h, nedre indeks 2, stor o");
 }
@@ -54,7 +54,7 @@ fn ethanol_bonds() {
               <mi>H</mi>
           </mrow>
       </math>";
-  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "stor c, stor h, 3 enkeltbinding stor c, stor h, 2 enkeltbinding stor o, stor h");
+  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "stor c, stor h, 3; enkeltbinding stor c, stor h, 2; enkeltbinding stor o, stor h");
 
 }
 
@@ -89,7 +89,7 @@ fn ethylene_with_bond() {
           <mo>=</mo>
           <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
       </mrow></math>";
-  test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "stor h, 2 stor c, dobbeltbinding stor c, stor h, 2");
+  test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "stor h, 2, stor c, dobbeltbinding stor c, stor h, 2");
 }
 
 #[test]
@@ -99,7 +99,7 @@ fn ferric_chloride_aq() {
         <msub><mi>Cl</mi><mn>3</mn></msub>
         <mrow><mo>(</mo><mrow><mi>aq</mi></mrow><mo>)</mo></mrow>
     </mrow></math>";
-  test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "stor f e, stor c l, 3 løst i vann");
+  test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "stor f e, stor c l, 3; løst i vann");
   }
 
 #[test]
@@ -109,7 +109,7 @@ fn ethylene_with_colon_bond() {
           <mo>::</mo>
           <mi>C</mi><msub><mi>H</mi><mn>2</mn></msub>
       </mrow></math>";
-  test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "stor h, 2 stor c, dobbeltbinding stor c, stor h, 2");
+  test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Terse")], expr, "stor h, 2, stor c, dobbeltbinding stor c, stor h, 2");
 }
 
 #[test]
@@ -726,7 +726,7 @@ fn dropped_msubsup_bug_358() {
           </mrow>
       </math>"#;
   test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Terse")],
-      expr, "2, stor s, stor o, 2; pluss; stor o, 2 er i likevekt med 2, stor s, stor o, 3");
+      expr, "2, stor s, stor o, 2; pluss; stor o, 2, er i likevekt med 2, stor s, stor o, 3");
 }
 
 

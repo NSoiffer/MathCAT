@@ -548,53 +548,56 @@
 - name: default-multiline
   tag: [mtr, mlabeledtr]
   match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
+  variables: [NextLineIsContinuedRow: "following-sibling::*[1][contains(@data-intent-property, ':continued-row:')]"]
   replace:
-  - pause: medium
   - test:
-      if: "parent::m:system-of-equations and *[1][count(*)=1 and *[1][@data-added='missing-content']] and
-           count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']]) != 0"
+      if: "not($LineCount=1 or contains(@data-intent-property, ':continued-row:'))"
       then:
-      - T: "neste rad"
-      else_test:
-        if: "$LineCount != 1"
-        then:
-        - test:
-          - if: "parent::m:piecewise"
-            then: [{T: "tilfelle"}]     # phrase('case' 1 of 10 cases)
-          - else_if: "parent::m:system-of-equations"
-            then: [{T: "likning"}] # phrase('equation' 1 of 10 equations)
-            else: [{T: "rad"}]     # phrase('line 1 of 10 lines)
-        - x: "count(preceding-sibling::*)+1"
+      - pause: medium
+      - test:
+        - if: "parent::m:piecewise"
+          then: [T: "tilfelle"]     # phrase('case' 1 of 10 cases)
+        - else_if: "parent::m:system-of-equations"
+          then: [T: "likning"] # phrase('equation' 1 of 10 equations)
+          else: [t: "rad"]     # phrase('line 1 of 10 lines)
+      - x: "count(preceding-sibling::*[not(contains(@data-intent-property, ':continued-row:'))]) + 1"
   - test:
-      if: .[self::m:mlabeledtr]
+      if: "self::m:mlabeledtr"
       then:
-      - T: "med etiketten"      # phrase(the diagram is complete 'with label')
+      - t: "med etiketten"      # phrase(the diagram is complete 'with label')
       - x: "*[1]/*"
-  - pause: medium
   - test:
-      if: .[self::m:mlabeledtr]
-      then: [{x: "*[position()>1]"}]
-      else: {x: "*"}
+      if: "not(contains(@data-intent-property, ':continued-row:'))"
+      then: [pause: medium]
+  - test:
+      if: "self::m:mlabeledtr"
+      then: [x: "*[position()>1]"]
+      else: [x: "*"]
 
 - name: default-multiline
   tag: mtd
   match: "parent::*[parent::m:piecewise or parent::m:system-of-equations or parent::m:lines]"
   variables: [LongPause: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_MultiLinePausesBetweenColumns = 'Long'"]
   replace:
-  - x: "*"
   - test:
-    # short pause after each element; medium pause if last element in a row; long pause for last element in matrix unless ClearSpeak override
-    - if: "count(following-sibling::*) > 0"
+      if: "IsInDefinition(*[1], 'ComparisonOperators')"
+      then: [pause: short]
+  - test:
+      if: "*[1][@data-added!='missing-content']"
+      then: [x: "*"]
+  - test:
+    # no pause after each element; medium pause if last element in a row; long pause for last element in matrix unless ClearSpeak override
+    - if: "count(following-sibling::*) = 0 and not($NextLineIsContinuedRow)"
       then_test:
-        if: "$LongPause"
-        then: {pause: medium}
-        else: {pause: short}
-    - else_if: "count(../following-sibling::*) > 0"
-      then_test:
-        if: "$LongPause"
-        then: {pause: long}
-        else: {pause: medium}
-      else: {pause: long}
+          if: "count(../following-sibling::*) > 0"
+          then_test:
+              if: "$LongPause"
+              then: [pause: long]
+              else: [pause: medium]
+      else_test:
+          if: "IsInDefinition(*[1], 'ComparisonOperators')"
+          then: [pause: short]
+          else: [pause: auto]
 
 # Matrix/Determinant rules
 # matrix and determinant are the same other than "matrix"/"determinant" based on the bracketing chars
@@ -825,6 +828,10 @@
         if: "$Verbosity='Medium'"
         then: [{T: "senket"}]      # phrase(H 'sub' 2)
   - x: "*[3]"
+  - test: 
+      if: "$Verbosity='Terse'"
+      then: [{pause: short}]
+  
 
 - name: chemistry-msup
   tag: [chemical-formula]

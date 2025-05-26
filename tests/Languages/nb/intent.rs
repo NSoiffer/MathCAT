@@ -111,7 +111,7 @@ fn intent_prob_x() {
     let expr = "<math>
     <msup intent='$op($arg)'>
         <mi arg='arg'>x</mi>
-        <mi arg='op' intent='probability' mathvariant='normal'>P</mi>
+        <mi arg='op' intent='sannsynligheten' mathvariant='normal'>P</mi>
     </msup></math>";
-    test("nb", "ClearSpeak", expr, "probability av x");
+    test("nb", "ClearSpeak", expr, "sannsynligheten av x");
 }

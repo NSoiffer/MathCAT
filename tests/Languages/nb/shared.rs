@@ -337,8 +337,8 @@ fn mn_with_space() {
 
 #[test]
 fn mn_with_block_and_decimal_separators() {
-  let expr = "<math><mn>1,234.56</mn></math>";                                       // may want to change this for another language
-  test_prefs("nb", "SimpleSpeak", vec![("DecimalSeparators", "."), ("BlockSeparators", " ,")], expr, "1234.56");
+  let expr = "<math><mn>1.234,56</mn></math>";                                       // may want to change this for another language
+  test_prefs("nb", "SimpleSpeak", vec![("DecimalSeparators", ","), ("BlockSeparators", " .")], expr, "1234,56");
 }
 
 #[test]

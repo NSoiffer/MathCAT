@@ -11,13 +11,13 @@ fn msub_simple() {
 #[test]
 fn msub_not_simple() {
     let expr = "<math> <msub> <mi>x</mi> <mn>1,2</mn> </msub> </math>";
-    test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Terse"), ("DecimalSeparators", ","), ("BlockSeparators", ".")], expr, "x, 1,2");
+    test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Terse"), ("DecimalSeparators", ","), ("BlockSeparators", ".")], expr, "x, senket 1,2");
   }
 
 #[test]
 fn msubsup_not_simple() {
     let expr = "<math> <msubsup> <mi>x</mi> <mn>1,2</mn> <mn>3</mn></msubsup> </math>";
-    test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Terse"), ("DecimalSeparators", ","), ("BlockSeparators", ".")], expr, "x, 1,2, i tredje");
+    test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Terse"), ("DecimalSeparators", ","), ("BlockSeparators", ".")], expr, "x, senket 1,2, i tredje");
   }
 
 #[test]

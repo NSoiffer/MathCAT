@@ -158,9 +158,10 @@
   replace:
   - x: "*[1]"
   - pause: short
-  - test:
-      if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
-      then: [T: "senket"]      # phrase(x 'sub' 2)
+  #- test:
+      #if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
+      #then: [T: "senket"]      # phrase(x 'sub' 2)
+  - T: "senket"
   - x: "*[2]"
   - pause: short
 
@@ -419,7 +420,9 @@
 
 - name: default
   tag: mtable
-  variables: [IsColumnSilent: false()]
+  variables:
+  - IsColumnSilent: "false()"
+  - NumColumns: "count(*[1]/*) - IfThenElse(*/self::m:mlabeledtr, 1, 0)"
   match: "."
   replace:
   - T: "tabell med"      # phrase(the 'table with' 3 rows)
@@ -429,9 +432,9 @@
       then: [T: "rad"]      # phrase(the table with 1 'row')
       else: [T: "rader"]      # phrase(the table with 3 'rows')
   - T: "og"      # phrase(the table with 3 rows 'and' 4 columns)
-  - x: "count(*[1]/*)"
+  - x: "$NumColumns"
   - test:
-      if: "count(*[1]/*)=1"
+      if: "NumColumns=1"
       then: [T: "kolonne"]      # phrase(the table with 3 rows and 1 'column')
       else: [T: "kolonner"]      # phrase(the table with 3 rows and 4 'columns')
   - pause: long
@@ -446,14 +449,14 @@
   - T: "rad"      # phrase(the first 'row' of a matrix)
   - x: "count(preceding-sibling::*)+1"
   - test:
-      if: .[self::m:mlabeledtr]
+      if: self::m:mlabeledtr
       then:
       - T: "med etiketten"      # phrase(the line 'with label' first equation)
       - x: "*[1]/*"
       - pause: short
   - pause: medium
   - test:
-      if: .[self::m:mlabeledtr]
+      if: self::m:mlabeledtr
       then: [{x: "*[position()>1]"}]
       else: {x: "*"}
 
@@ -468,7 +471,7 @@
       if: "not($IsColumnSilent)"
       then:
       - T: "kolonne"      # phrase(the first 'column' of the matrix)
-      - x: "count(preceding-sibling::*)+1"
+      - x: "count(preceding-sibling::*)+IfThenElse(parent::m:mlabeledtr, 0, 1)"
       - pause: medium
   - x: "*"
   - test:
