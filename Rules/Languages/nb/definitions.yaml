@@ -120,7 +120,7 @@
     "sr": "steradian",          # should only take negative powers      
   
     # others that take a prefix
-    "a": "annum",               # should only take positive powers
+    "a": "annuum",               # should only take positive powers
     "as": "buesekund",          # see en.wikipedia.org/wiki/Minute_and_second_of_arc
 
     # technically wrong, but used in practice with SI Units
@@ -133,34 +133,35 @@
 - UnitsWithoutPrefixes: {
     # time
     "″": "sekund", "\"": "sekund",
-    "′": "minutt", "'": "minutt","min": "minutt",
-    "h": "time", "hr": "time", "Hr": "time", "t": "time",   #Sjekk ut symbol for enhet
-    "d": "dag", "dy": "dag",                                #Sjekk ut symbol for enhet
-    "w": "uke", "wk": "uke", "v": "uke",                    #Sjekk ut symbol for enhet
-    "y": "år", "yr": "år",                                  #Sjekk ut symbol for enhet
+    "′": "minutt", "'": "minutt", "min": "minutt",
+    "h": "time", "hr": "time", "Hr": "time", "t": "time",     #t used often for hour in Norwegian, but t is officially the symbol for "tonn"
+    "d": "dag", "dy": "dag",                                
+    "w": "uke", "wk": "uke",                    
+    "y": "år", "yr": "år",                                  
 
     # angles
     "°": "grad", "deg": "grad", # should only take negative powers
-    "arcmin": "bueminutt",                                  #Sjekk ut symbol for enhet
-    "amin": "bueminutt",                                    #Sjekk ut symbol for enhet
-    "am": "bueminutt",                                      #Dette kan brukes som symbol for enhet (SNL)
-    "MOA": "bueminutt",                                     #Sjekk ut symbol for enhet
-    "arcsec": "buesekund",                                  #Sjekk ut symbolf for enhet
-    "asec": "buesekund",                                    #Sjekk ut symbol for enhet. as kan brukes (SNL)
+    "arcmin": "bueminutt",                                  
+    "amin": "bueminutt",                                   
+    "am": "bueminutt",                                      
+    "MOA": "bueminutt",                                    
+    "arcsec": "buesekund",
+    "asec": "buesekund",
+    "as": "buesekund",           #Also a used symbol in Norwegian
 
     # distance
-    "au": "astronomisk enhet", "AU": "astronomisk enhet",
-    "ltyr": "lysår", "ly": "lysår",                         #Sjekk ut symbolene for enhet. ly og l.y. kan brukes (SNL)
+    "au": "astronomisk enhet", "AU": "astronomisk enhet", "a.u.": "astronomisk enhet",
+    "ltyr": "lysår", "ly": "lysår", "l.y.": "lysår",
     "pc": "parsec",
     "Å": "ångstrøm", "Å": "ångstrøm",           # U+00C5 and U+212B
-    "fm": "fermi",
+    "fm": "fermi",                              #Norwegian: F is the official symbol for "fermi", but this is also the symbol for Farad...
 
     # others
     "ha": "hektar",
     # "B": "bel",    # "B" more commonly means bytes
     "dB": "desibel", # already logarithmic, so not used with SI prefixes
 
-    "amu": "atommasseenhet",                               #Sjekk ut symbol for enhet
+    "amu": "atommasseenhet",
     "atm": "atmosfære",
     "bar": "bar",
     "cal": "kalori",
@@ -204,7 +205,7 @@
     "bbl": "fat", "BBL": "fat",
     "pk": "peck",
     "bu": "bushel",
-    "tsp": "teskje", "tsk": "teskje",
+    "tsp": "teskje", "tsk": "teskje", "ts": "teskje",
     "tbl": "spiseskje", "tbsp": "spiseskje", "ss": "spiseskje",
 
     # liquid
@@ -244,9 +245,9 @@
     "radian": "radianer",
     "steradian": "steradianer",
     "buesekund": "buesekunder",
-    "bit": "bits",
-    "byte": "bytes",
-    "baud": "bauds",
+    #"bit": "bits",
+    #"byte": "bytes",
+    "baud": "bauder",
     "minutt": "minutter",
     "time": "timer",
     "dag": "dager",
@@ -256,39 +257,40 @@
     "astronomisk enhet": "astronomiske enheter",
     "atmosfære": "atmosfærer",
     "kalori": "kalorier",
-    "kibibit": "kibibits", 
-    "mebibit": "mebibits", 
-    "gibibit": "gibibits", 
-    "tebibit": "tebibits",
-    "pebibit": "pebibits",
-    "exbibit": "exbibits", 
-    "zebibit": "zebibits", 
-    "yobibit": "yobibits",
-    "kibibyte": "kibibytes",
-    "mebibyte": "mebibytes",
-    "gibibyte": "gibibytes", 
-    "tebibyte": "tebibytes",
-    "pebibyte": "pebibytes", 
-    "exbibyte": "exbibytes", 
-    "zebibyte": "zebibytes",
-    "yobibyte": "yobibytes",
+    #"kibibit": "kibibits", 
+    #"mebibit": "mebibits", 
+    #"gibibit": "gibibits", 
+    #"tebibit": "tebibits",
+    #"pebibit": "pebibits",
+    #"exbibit": "exbibits", 
+    #"zebibit": "zebibits", 
+    #"yobibit": "yobibits",
+    #"kibibyte": "kibibytes",
+    #"mebibyte": "mebibytes",
+    #"gibibyte": "gibibytes", 
+    #"tebibyte": "tebibytes",
+    #"pebibyte": "pebibytes", 
+    #"exbibyte": "exbibytes", 
+    #"zebibyte": "zebibytes",
+    #"yobibyte": "yobibytes",
     "mile": "miles",
     "rod": "rods",
     "link": "links",
     "chain": "chains",
     "kvadratmile": "kvadratmiles",
     "engelsk acre": "engelske acre",
-    "bushel": "bushel",
+    "bushel": "bushels",
     "teskje": "tesskjeer",
     "spiseskje": "spiseskjeer",
-    "fluid dram": "fluid drams",
-    "fluid ounce": "fluid ounces",
+    #"fluid dram": "fluid drams",
+    "fluid ounce": "fluid ouncer",
+    "ounce": "ouncer",
     "kopp": "kopper",
     "pint": "pints",
     "quart": "quarts",
     "grain": "grains",
-    "hundredweight": "hundredweights",
-    "pennyweight": "pennyweights",
+    #"hundredweight": "hundredweights",
+    #"pennyweight": "pennyweights",
     "hestekraft": "hestekrefter",
     "grad fahrenheit": "grader fahrenheit",
     "mile per hour": "miles per hour",
@@ -297,6 +299,8 @@
     "kvadrattomme": "kvadrattommer",
     "kubikktomme": "kubikktommer",
     "omdreining per minutt": "omdreininger per minutt",
+    "curie": "curier",
+    "annuum": "annua",
     
   }
 

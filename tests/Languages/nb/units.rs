@@ -257,7 +257,7 @@ fn si_accepted() {
         <mn>1</mn><mi intent=":unit">Bd</mi><mo>,</mo><mn>2</mn><mi intent=":unit">Bd</mi>
     </math>"#;
     test("nb", "SimpleSpeak", expr, 
-        "1 liter, komma, 2 liter, komma, 1 liter, komma, 2 liter, komma, 1 liter, komma, 2 liter, komma, 1 tonn, komma, 2 tonn, komma, 1 dalton, komma, 2 dalton, komma, 1 neper, komma, 2 neper, komma; 1 atommasseenhet, komma; 2 atommasseenheter, komma; 1 elektronvolt, komma; 2 elektronvolt, komma, 1 radian, komma, 2 radianer, komma, 1 steradian, komma, 2 steradianer, komma, 1 annum, komma, 2 annum, komma, 1 buesekund, komma, 2 buesekunder, komma, 1 bit, komma, 2 bits, komma, 1 byte, komma, 2 bytes, komma, 1 baud, komma, 2 bauds");
+        "1 liter, komma, 2 liter, komma, 1 liter, komma, 2 liter, komma, 1 liter, komma, 2 liter, komma, 1 tonn, komma, 2 tonn, komma, 1 dalton, komma, 2 dalton, komma, 1 neper, komma, 2 neper, komma; 1 atommasseenhet, komma; 2 atommasseenheter, komma; 1 elektronvolt, komma; 2 elektronvolt, komma, 1 radian, komma, 2 radianer, komma, 1 steradian, komma, 2 steradianer, komma, 1 annuum, komma, 2 annua, komma, 1 buesekund, komma, 2 buesekunder, komma, 1 bit, komma, 2 bit, komma, 1 byte, komma, 2 byte, komma, 1 baud, komma, 2 bauder");
 }
 
 #[test]
@@ -290,11 +290,11 @@ fn si_accepted_with_prefixes() {
                 1 milli-elektronvolt, komma; 2 mikro-elektronvolt, komma; \
                 1 nano-radian, komma; 2 piko-radianer, komma; \
                 1 femto-steradian, komma; 2 atto-steradianer, komma; \
-                1 giga-annum, komma; 2 mega-annum, komma; \
+                1 giga-annuum, komma; 2 mega-annua, komma; \
                 1 zepto-buesekund, komma; 2 yokto-buesekunder, komma; \
-                1 kilo-bit, komma; 2 mega-bits, komma; \
-                1 giga-byte, komma; 2 tera-bytes, komma; \
-                1 tera-baud, komma; 2 exa-bauds");
+                1 kilo-bit, komma; 2 mega-bit, komma; \
+                1 giga-byte, komma; 2 tera-byte, komma; \
+                1 tera-baud, komma; 2 exa-bauder");
 }
 
 #[test]
@@ -399,7 +399,7 @@ fn without_prefix_other() {
                 1 atommasseenhet, komma; 2 atommasseenheter, komma, \
                 1 bar, komma, 2 bar, komma, \
                 1 kalori, komma, 2 kalorier, komma, \
-                1 curie, komma, 2 curie, komma, \
+                1 curie, komma, 2 curier, komma, \
                 1 gon, komma, 2 gon, komma, \
                 1 molar, komma, 2 molar, komma, \
                 1 røntgen, komma, 2 røntgen, komma; \
@@ -430,22 +430,22 @@ fn without_prefix_powers_of_2() {
         <mn>1</mn><mi intent=":unit">YiB</mi><mo>,</mo><mn>2</mn><mi intent=":unit">YiB</mi>
     </math>"#;
     test("nb", "SimpleSpeak", expr, 
-        "1 kibibit, komma, 2 kibibits, komma, \
-                1 mebibit, komma, 2 mebibits, komma, \
-                1 gibibit, komma, 2 gibibits, komma, \
-                1 tebibit, komma, 2 tebibits, komma, \
-                1 pebibit, komma, 2 pebibits, komma, \
-                1 exbibit, komma, 2 exbibits, komma, \
-                1 zebibit, komma, 2 zebibits, komma, \
-                1 yobibit, komma, 2 yobibits, komma, \
-                1 kibibyte, komma, 2 kibibytes, komma, \
-                1 mebibyte, komma, 2 mebibytes, komma, \
-                1 gibibyte, komma, 2 gibibytes, komma, \
-                1 tebibyte, komma, 2 tebibytes, komma, \
-                1 pebibyte, komma, 2 pebibytes, komma, \
-                1 exbibyte, komma, 2 exbibytes, komma, \
-                1 zebibyte, komma, 2 zebibytes, komma, \
-                1 yobibyte, komma, 2 yobibytes");
+        "1 kibibit, komma, 2 kibibit, komma, \
+                1 mebibit, komma, 2 mebibit, komma, \
+                1 gibibit, komma, 2 gibibit, komma, \
+                1 tebibit, komma, 2 tebibit, komma, \
+                1 pebibit, komma, 2 pebibit, komma, \
+                1 exbibit, komma, 2 exbibit, komma, \
+                1 zebibit, komma, 2 zebibit, komma, \
+                1 yobibit, komma, 2 yobibit, komma, \
+                1 kibibyte, komma, 2 kibibyte, komma, \
+                1 mebibyte, komma, 2 mebibyte, komma, \
+                1 gibibyte, komma, 2 gibibyte, komma, \
+                1 tebibyte, komma, 2 tebibyte, komma, \
+                1 pebibyte, komma, 2 pebibyte, komma, \
+                1 exbibyte, komma, 2 exbibyte, komma, \
+                1 zebibyte, komma, 2 zebibyte, komma, \
+                1 yobibyte, komma, 2 yobibyte");
 }
 
 
