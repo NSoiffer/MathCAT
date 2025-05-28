@@ -83,7 +83,7 @@
   - "not(ancestor::*[name() != 'mrow'][1]/self::m:fraction)" # FIX: can't test for mrow -- what should be used???
   replace:
   - x: "*[1]"
-  - T: "gjennom"               # phrase("the fraction x 'over' y")
+  - T: "over"               # phrase("the fraction x 'over' y")
   - x: "*[2]"
   - pause: short
 
@@ -97,7 +97,7 @@
   - test:
       if: "not(IsNode(*[1],'leaf'))"
       then: [{pause: short}]
-  - T: "gjennom"               # phrase("the fraction x 'over' y")
+  - T: "over"               # phrase("the fraction x 'over' y")
   - test:
       if: "not(IsNode(*[2],'leaf'))"
       then: [{pause: short}]
@@ -159,7 +159,7 @@
   - x: "*[1]"
   - pause: short
   #- test:
-      #if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
+      #if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"        
       #then: [T: "senket"]      # phrase(x 'sub' 2)
   - T: "senket"
   - x: "*[2]"
@@ -490,7 +490,6 @@
   match: "@notation='box' and *[self::m:mtext and .=' ']"
   replace:
   - T: "tom rute"      # phrase(the 'empty box' contains no values)
-  # SWEDISH: Find a better translation than "ruta".
 
 - name: default
   # The ordering below is the order in which words come out when there is more than one value
