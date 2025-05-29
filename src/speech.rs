@@ -2492,7 +2492,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         }
 
         let result = chars.into_iter().collect::<String>(); 
-        debug!("                           result={}", result);
+        // debug!("                           result={}", result);
         return result;
 
         fn add_dots_to_braille_char(ch: char, baseline_indicator_hack: bool) -> char {
