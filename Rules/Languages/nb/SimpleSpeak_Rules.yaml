@@ -14,6 +14,7 @@
   - T: "minus"        # phrase(x 'minus' y)
   - x: "translate(text(), '-_', '')"
 
+# NORWEGIAN: Removed test for Verbosity
 - name: default
   tag: square-root
   match: "."
@@ -86,6 +87,7 @@
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 # Units (e.g., meters per second)
+# NORWEGIAN: Added this rule from English version
 - name: per-fraction
   tag: fraction
   match: "BaseNode(*[1])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])] and
@@ -258,7 +260,8 @@
       - T: "mengden"      # phrase(here is a 'set' of numbers)
       - x: "*[1]"
 
-- name: times     #Marthe: Different in English
+# NORWEGIAN: Added sqrt, so it for examples says "sqrt a times sqrt b"
+- name: times
   tag: mo
   match:
   # say "times" when invisible times is followed by parens or a superscript that has a base with parens or "|"s

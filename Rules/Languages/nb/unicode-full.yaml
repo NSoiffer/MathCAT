@@ -27,7 +27,7 @@
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
         then: [T: "ganger"]                          #     (en: 'times', google translation)
-        else: [T: "midtstilt punkt"]                  #     (en: 'dot', MathPlayer: 'mellanpunkt', google: 'punkt')
+        else: [T: "midtstilt prikk"]                  #     (en: 'dot', MathPlayer: 'mellanpunkt', google: 'punkt')
  - "×":                                             #  0xd7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
@@ -138,7 +138,7 @@
  - "˻": [T: "start lav tone"]           #  0x2fb    (en: 'modifier begin low tone', google translation)
  - "˼": [T: "slutt lav tone"]             #  0x2fc    (en: 'modifier end low tone', google translation)
  - "˽": [T: "lav hylle"]                        #  0x2fd    (en: 'modifier shelf', google translation)
- - "˾": [t: "lav åpen hylle"]              #  0x2fe    (en: 'modifier open shelf', google translation)
+ - "˾": [T: "lav åpen hylle"]              #  0x2fe    (en: 'modifier open shelf', google translation)
  - "˿": [T: "lav venstrepil"]             #  0x2ff    (en: 'modifier low left arrow', google translation)
  #---------------------------------------------------------------------------------------------------------
  #Combining Diacritical Marks 
@@ -412,13 +412,13 @@
  - "₯": [T: "drakmer"]                              #  0x20af    (google: 'drakma')
  - "₰": [T: "pfenniger"]                       #  0x20b0    (google: 'tyska pennies')
  - "₱": [T: "peso"]                                #  0x20b1
- - "₲": [t: "guaranier"]                             #  0x20b2
- - "₳": [t: "australes"]                             #  0x20b3    (google: 'österral')
- - "₴": [t: "hryvnjaer"]                             #  0x20b4
- - "₵": [t: "cedi"]                                #  0x20b5
+ - "₲": [T: "guaranier"]                             #  0x20b2
+ - "₳": [T: "australes"]                             #  0x20b3    (google: 'österral')
+ - "₴": [T: "hryvnjaer"]                             #  0x20b4
+ - "₵": [T: "cedi"]                                #  0x20b5
  - "₶": [T: "livre tournois"]                       #  0x20b6    (google translation)
  - "₷": [T: "spesmilo"]                            #  0x20b7    (google translation)
- - "₸": [t: "tenge"]                               #  0x20b8    (google translation)
+ - "₸": [T: "tenge"]                               #  0x20b8    (google translation)
  - "₹": [T: "indiske rupi"]                       #  0x20b9    (en: 'indian rupees', google translation)
  - "₺": [T: "tyrkiske lira"]                       #  0x20ba    (en: 'turkish liras', google translation)
  #--------------------------------------------------------------------------------------------------------------
@@ -447,12 +447,12 @@
  - "⃥": [T: "omvendt skråstrek"]    #  0x20e5    (en: 'reverse solidus overlay embellishment', google translation)
  - "⃦": [T: "dobbel loddrett strek"]      #  0x20e6    (en: 'double verticle stroke embellishment', google translation)
  - "⃧": [T: "livrentesymbol"]          #  0x20e7    (en: 'annuity symbol embellishment', google translation)
- - "⃨": [t: "trippel prikk"]                     #  0x20e8    (en: 'triple underdot', google translation)
- - "⃩": [t: "bred bro"]            #  0x20e9    (en: 'wide bridge above embellishment', google translation)
+ - "⃨": [T: "trippel prikk"]                     #  0x20e8    (en: 'triple underdot', google translation)
+ - "⃩": [T: "bred bro"]            #  0x20e9    (en: 'wide bridge above embellishment', google translation)
  - "⃪": [T: "venstrepil"]     #  0x20ea    (en: 'leftwards arrow overlay embellishment', google translation)
  - "⃫": [T: "lang dobbel skråstrek"]    #  0x20eb    (en: 'long double solidus overlay embellishment', google translation)
  - "⃬": [T: "høyre-harpun mothake ned"]    #  0x20ec    (en: 'rightwards harpoon with barb downwards embellishment', google translation)
- - "⃭": [t: "venstre-harpun mothake ned"]    #  0x20ed    (en: 'leftwards harpoon with barb downwards embellishment', google translation)
+ - "⃭": [T: "venstre-harpun mothake ned"]    #  0x20ed    (en: 'leftwards harpoon with barb downwards embellishment', google translation)
  - "⃮": [T: "venstrepil under"]      #  0x20ee    (en: 'left arrow below embellishment', google translation)
  - "⃯": [T: "høyrepil under"]           #  0x20ef    (en: 'right arrow below embellishment', google translation)
  - "⃰": [T: "asterisk"]         #  0x20f0    (en: 'asterisk above embellishment', google translation)
@@ -505,10 +505,10 @@
     - spell: "translate('.', 'Ⅎ℺⅁⅂⅃⅄', 'FQGLLY')"
 
  - "ℴ": [T: "skrifttype o"]                             #  0x2134    (en: 'script o')
- - "ℵ": [t: "alef"]                                 #  0x2135    (en: 'first transfinite cardinal')
- - "ℶ": [t: "bet"]                                  #  0x2136    (en: 'second transfinite cardinal')
- - "ℷ": [t: "gimel"]                                #  0x2137    (en: 'third transfinite cardinal')
- - "ℸ": [t: "dalet"]                                #  0x2138    (en: 'fourth transfinite cardinal')
+ - "ℵ": [T: "alef"]                                 #  0x2135    (en: 'first transfinite cardinal')
+ - "ℶ": [T: "bet"]                                  #  0x2136    (en: 'second transfinite cardinal')
+ - "ℷ": [T: "gimel"]                                #  0x2137    (en: 'third transfinite cardinal')
+ - "ℸ": [T: "dalet"]                                #  0x2138    (en: 'fourth transfinite cardinal')
  - "ℼ": [T: "dobbeltstreket pi"]                  #  0x213c    (en: 'double struck pi', google: 'dobbelslaget pi')
  - "ℽ": [T: "dobbeltstreket gamma"]               #  0x213d    (en: 'double struck gamma', google: 'dobbelslaget gamma')
  - "⅀": [T: "dobbeltstreket summetegn"]         #  0x2140    (en: 'double struck n-ary summation', google: 'dubbelslaget n-ary-sammanfattning')
@@ -1140,7 +1140,7 @@
  - "⊖": [T: "symmetrisk differanse"]                         #  0x2296    (en: 'circled minus') 
  - "⊗": [T: "tensorprodukt"]                         #  0x2297    (en: 'circled times') 
  - "⊘": [T: "divisjon i sirkel"]                         #  0x2298    (en: 'circled slash')
- - "⊙": [t: "direkte produkt"]                           #  0x2299    (en: 'circled dot operator')                   
+ - "⊙": [T: "direkte produkt"]                           #  0x2299    (en: 'circled dot operator')                   
  - "⊚": [T: "ring-operator i sirkel"]                          #  0x229a    (en: 'circled ring')
  - "⊛": [T: "asteriskoperator i sirkel"]                      #  0x229b    (en: 'circled asterisk')
  - "⊜": [T: "likhetstegn i sirkel"]                        #  0x229c    (en: 'circled equals')
@@ -1148,10 +1148,10 @@
  - "⊞": [T: "plusstegn i kvadrat"]                          #  0x229e    (en: 'squared plus')
  - "⊟": [T: "minustegn i kvadrat"]                         #  0x229f    (en: 'squared minus')
  - "⊠": [T: "multiplikasjonstegn i kvadrat"]                         #  0x22a0    (en: 'squared times')
- - "⊡": [t: "dot-operator i kvadrat"]                           #  0x22a1    (en: 'squared dot operator') 
+ - "⊡": [T: "dot-operator i kvadrat"]                           #  0x22a1    (en: 'squared dot operator') 
  - "⊢": [T: "beviser"]                           #  0x22a2    (en: 'proves')
  - "⊣": [T: "beviser ikke"]                         #  0x22a3    (en: 'does not yield')
- - "⊤": [t: "topp"]                             #  0x22a4    (en: 'top')
+ - "⊤": [T: "topp"]                             #  0x22a4    (en: 'top')
  - "⊥":                                             #  0x22a5
      - T: "bunn"                       #     (en: 'bottom', MathPlayer: 'up tack', google: 'botten')
  - "⊦": [T: "reduseres til"]                            #  0x22a6    (en: 'reduces to')
@@ -1196,7 +1196,7 @@
          if: "$Verbosity!='Terse'"
          then: [T: "er"]                            #     (en: 'is', google translation)
      - T: "verdimengden til"                              #     (en: 'an image of', MathPlayer: 'image of', google: 'en bild av')
- - "⊸": [t: "multimap"]                             #  0x22b8    (SRE: 'multimatris')
+ - "⊸": [T: "multimap"]                             #  0x22b8    (SRE: 'multimatris')
  - "⊹": [T: "hermitisk matrise"]           #  0x22b9    (SRE: 'hermetisk konjugatmatris')
  - "⊺": [T: "innskudd"]                          #  0x22ba    (en: 'intercalate', MathPlayer: 'intercalate', google: 'interkalat')
  - "⊻": [T: "eksklusiv eller"]                                 #  0x22bb    (en: 'xor')
@@ -1341,7 +1341,7 @@
  #-------------------------------------------------------------------------------------------------------------
  #Miscellaneous Technical OK
  - "⌀": [T: "diameter"]                             #  0x2300
- - "⌁": [t: "elektrisk pil"]                        #  0x2301    (en: 'electric arrow')
+ - "⌁": [T: "elektrisk pil"]                        #  0x2301    (en: 'electric arrow')
  - "⌂": [T: "hus"]                                  #  0x2302    (en: 'house')
  - "⌃": [T: "pilspiss opp"]                       #  0x2303    (en: 'up arrowhead', google: 'upp pilspetsen')
  - "⌄": [T: "pilspiss ned"]                       #  0x2304    (en: 'down arrowhead', google: 'ner pilspetsen')
@@ -1372,8 +1372,8 @@
  - "⌝": [T: "øvre høyre hjørne"]                      #  0x231d    (en: 'top right corner')
  - "⌞": [T: "nedre venstre hjørne"]                   #  0x231e    (en: 'bottom left corner')
  - "⌟": [T: "nedre høyre hjørne"]                   #  0x231f    (en: 'bottom right corner')
- - "⌠": [t: "øvre halvdel integral"]                #  0x2320    (en: 'top half integral')
- - "⌡": [t: "nedre halvdel integral"]               #  0x2321    (en: 'bottom half integral')
+ - "⌠": [T: "øvre halvdel integral"]                #  0x2320    (en: 'top half integral')
+ - "⌡": [T: "nedre halvdel integral"]               #  0x2321    (en: 'bottom half integral')
  - "⌢": [T: "rynke"]                        #  0x2322    (en: 'frown', google: 'rynka pannan')
  - "⌣": [T: "smil"]                               #  0x2323    (en: 'smile')
  - "⌤": [T: "enter"]    #  0x2324    (en: 'up arrowhead between two horizontal bars', google: 'upp pilspetsen mellan två horisontella staplar')
@@ -1517,12 +1517,12 @@
  - "◆": [T: "svart diamant"]                        #  0x25c6    (en: 'black diamond')
  - "◇": [T: "hvit diamant"]                          #  0x25c7    (en: 'white diamond')
  - "◈": [T: "svart diamant i hvit diamant"]    #  0x25c8    (en: 'white diamond containing black small diamond')
- - "◉": [t: "fiskeøye"]                              #  0x25c9    (en: 'fisheye')
+ - "◉": [T: "fiskeøye"]                              #  0x25c9    (en: 'fisheye')
  - "◊": [T: "rombe"]                                 #  0x25ca    (en: 'lozenge')
  - "○": [T: "hvit sirkel"]                           #  0x25cb    (en: 'white circle')
  - "◌": [T: "stiplet sirkel"]                       #  0x25cc    (en: 'dotted circle')
  - "◍": [T: "sirkel med vertikalt fyll"]          #  0x25cd    (en: 'circle with vertical fill')
- - "◎": [t: "bullseye"]                             #  0x25ce    (SRE: 'mitt-i-prick')
+ - "◎": [T: "bullseye"]                             #  0x25ce    (SRE: 'mitt-i-prick')
  - "●": [T: "svart sirkel"]                         #  0x25cf    (en: 'black circle')
  - "◐": [T: "sirkel med venstre halvdel fylt"]       #  0x25d0    (en: 'circle with left half black')
  - "◑": [T: "sirkel med høyre halvdel fylt"]         #  0x25d1    (en: 'circle with right half black')
@@ -1595,8 +1595,8 @@
  - "❯": [T: "fet høyre anførselstegn"]    #  0x276f    (en: 'heavy right-pointing angle quotation mark ornament', google: 'tung högerpekande vinkelcitationsmärke prydnad')
  - "❰": [T: "fet venstre vinkel-parentes"]    #  0x2770    (en: 'heavy left-pointing angle bracket ornament', google: 'tung vänsterpekande vinkelfäste prydnad')
  - "❱": [T: "fet høyre vinkel-parentes"]    #  0x2771    (en: 'heavy right-pointing angle bracket ornament', google: 'tung högerpekande vinkelfäste prydnad')
- - "❲": [t: "venstre skilpaddeskall-parentes"]    #  0x2772    (en: 'light left tortoise shell bracket ornament', google: 'ljus vänster sköldpaddsskalfäste prydnad')
- - "❳": [t: "høyre skilpaddeskall-parentes"]    #  0x2773    (en: 'light right tortoise shell bracket ornament', google: 'lätt höger sköldpaddsskalfäste prydnad')
+ - "❲": [T: "venstre skilpaddeskall-parentes"]    #  0x2772    (en: 'light left tortoise shell bracket ornament', google: 'ljus vänster sköldpaddsskalfäste prydnad')
+ - "❳": [T: "høyre skilpaddeskall-parentes"]    #  0x2773    (en: 'light right tortoise shell bracket ornament', google: 'lätt höger sköldpaddsskalfäste prydnad')
  - "❴": [T: "fet venstre krøllparentes"]    #  0x2774    (en: 'medium left brace ornament', google: 'medium vänster stagprydnad')
  - "❵": [T: "fet høyre krøllparentes"]    #  0x2775    (en: 'medium right brace ornament', google: 'medium höger stagprydnad')
  - "❶": [T: "én i fylt sirkel"]                    #  0x2776    (en: 'black circled one', google translation)
@@ -1865,7 +1865,7 @@
  - "⥭": [T: "høyre-harpun mothake ned under strek"]         #  0x296d    (en: 'rightwards harpoon with barb down below long dash')
  - "⥮": [T: "opp-harpun mothake venstre ved siden av ned-harpun mothake høyre"]    #  0x296e    (en: 'upwards harpoon with barb left beside downwards harpoon with barb right')
  - "⥯": [T: "ned-harpun mothake venstre ved siden av opp-harpun mothake høyre"]    #  0x296f    (en: 'downwards harpoon with barb left beside upwards harpoon with barb right')
- - "⥰": [t: "dobbeltstreket høyrepil med avrundet spiss"]                        #  0x2970    (en: 'right double arrow with rounded head')
+ - "⥰": [T: "dobbeltstreket høyrepil med avrundet spiss"]                        #  0x2970    (en: 'right double arrow with rounded head')
  - "⥱": [T: "lik over høyrepil"]           #  0x2971    (en: 'equals above rightwards arrow')
  - "⥲": [T: "tilde over høyrepil"]              #  0x2972    (en: 'tilde operator above rightwards arrow')
  - "⥳": [T: "venstrepil over tilde"]           #  0x2973    (en: 'leftwards arrow above tilde operator')
@@ -1893,7 +1893,7 @@
  - "⦇": [T: "venstre bilde-parentes z-notasjon"]    #  0x2987    (en: 'z notation left image bracket', google: 'z notation vänster bildfäste')
  - "⦈": [T: "høyre bilde-parentes z-notasjon"]    #  0x2988    (en: 'z notation right image bracket', google: 'z notation rätt bildfäste')
  - "⦉": [T: "venstre bindende parentes z-notasjon"]    #  0x2989    (en: 'z notation left binding bracket')
- - "⦊": [t: "høyre bindende parentes z-notasjon"]     #  0x298a    (en: 'z notation right binding bracket')
+ - "⦊": [T: "høyre bindende parentes z-notasjon"]     #  0x298a    (en: 'z notation right binding bracket')
  - "⦋": [T: "venstre hakeparentes med strek under"]    #  0x298b    (en: 'left square bracket with underbar')
  - "⦌": [T: "høyre hakeparentes med strek under"]    #  0x298c    (en: 'right square bracket with underbar')
  - "⦍": [T: "venstre hakeparentes med strek i øvre hjørne"]    #  0x298d    (en: 'left square bracket with tick in top corner')
@@ -1907,7 +1907,7 @@
  - "⦕": [T: "venstre dobbel større enn parentes"]    #  0x2995    (en: 'double left arc greater than bracket')
  - "⦖": [T: "høyre dobbel mindre enn parentes"]      #  0x2996    (en: 'double right arc less than bracket')
  - "⦗": [T: "venstre skilpaddeskall-parentes"]    #  0x2997    (en: 'left black tortoise shell bracket', google: 'vänster svart sköldpaddsskalfäste')
- - "⦘": [t: "høyre skilpaddeskall-parentes"]    #  0x2998    (en: 'right black tortoise shell bracket', google: 'höger svart sköldpaddsskalfäste')
+ - "⦘": [T: "høyre skilpaddeskall-parentes"]    #  0x2998    (en: 'right black tortoise shell bracket', google: 'höger svart sköldpaddsskalfäste')
  - "⦙": [T: "prikket loddrett strek"]                     #  0x2999    (en: 'dotted fence', google: 'prickat staket')
  - "⦚": [T: "sikksakk loddrett strek"]              #  0x299a    (en: 'vertical zigzag line')
  - "⦛": [T: "målt vinkel til venstre"]    #  0x299b    (en: 'measured angle opening left', google: 'uppmätt vinkelöppning vänster')
@@ -1985,8 +1985,8 @@
  - "⧣": [T: "likhetstegn og skråstilt parallell"]    #  0x29e3    (en: 'equals sign and slanted parallel')
  - "⧤": [T: "likhetstegn og skråstilt parallell med tilde over"]    #  0x29e4    (en: 'equals sign and slanted parallel with tilde above')
  - "⧥": [T: "identisk med og skråstilt parallell"]        #  0x29e5    (en: 'identical to and slanted parallel')
- - "⧦": [t: "gleich stark"]                         #  0x29e6
- - "⧧": [t: "termodynamisk"]                         #  0x29e7    (en: 'thermodynamic', google: 'termodynamisk')
+ - "⧦": [T: "gleich stark"]                         #  0x29e6
+ - "⧧": [T: "termodynamisk"]                         #  0x29e7    (en: 'thermodynamic', google: 'termodynamisk')
  - "⧨": [T: "trekant nedover venstre halvdel fylt"]    #  0x29e8    (en: 'down pointing triangle with left half black', google: 'ner pekande triangel med vänster halvsvart')
  - "⧩": [T: "trekant nedover høyre halvdel fylt"]    #  0x29e9    (en: 'down pointing triangle with right half black', google: 'ner pekande triangel med höger halvsvart')
  - "⧪": [T: "fylt diamant med pil ned"]           #  0x29ea    (en: 'black diamond with down arrow', google: 'svart diamant med nedpil')
@@ -2042,12 +2042,12 @@
  - "⨙": [T: "integral med snitt"]                    #  0x2a19    (en: 'integral with intersection', google: 'integrerad med korsning')
  - "⨚": [T: "integral med union"]                   #  0x2a1a    (en: 'integral with union', google: 'integrerad med unionen')
  - "⨛": [T: "integral med horisontal strek over"]              #  0x2a1b    (en: 'integral with overbar', google: 'integrerad med overbar')
- - "⨜": [t: "integral med horisontal strek under"]             #  0x2a1c    (en: 'integral with underbar', google: 'integrerad med underbar')
+ - "⨜": [T: "integral med horisontal strek under"]             #  0x2a1c    (en: 'integral with underbar', google: 'integrerad med underbar')
  - "⨝": [T: "join"]                        #  0x2a1d    (en: 'join', google: 'ansluta sig')
  - "⨞": [T: "stor venstre trekant"]             #  0x2a1e    (en: 'large left triangle operator', google: 'stor vänster triangeloperatör')
  - "⨟": [T: "skjema-sammensetning z-notasjon"]    #  0x2a1f    (en: 'z notation schema composition', google: 'z notationsschema komposition')
- - "⨠": [t: "skjema-sluse z-notasjon"]    #  0x2a20    (en: 'z notation schema piping', google: 'z notation schema piping')
- - "⨡": [t: "skjema-projeksjon z-notasjon"]    #  0x2a21    (en: 'z notation schema projection', google: 'z notation schema projection')
+ - "⨠": [T: "skjema-sluse z-notasjon"]    #  0x2a20    (en: 'z notation schema piping', google: 'z notation schema piping')
+ - "⨡": [T: "skjema-projeksjon z-notasjon"]    #  0x2a21    (en: 'z notation schema projection', google: 'z notation schema projection')
  - "⨢": [T: "pluss med sirkel over"]                   #  0x2a22    (en: 'plus sign with circle above', MathPlayer: 'plustecken med ring över', google: 'plus skylt med cirkel ovan')
  - "⨣": [T: "pluss med cirkumfleks over"]      #  0x2a23    (en: 'plus sign with circumflex accent above', MathPlayer: 'plustecken med cirkumflex accent över', google: 'plus -tecken med circumflex -accent ovan')
  - "⨤": [T: "pluss med tilde over"]                 #  0x2a24    (en: 'plus sign with tilde above')
@@ -2186,7 +2186,7 @@
  - "⪪": [T: "mindre enn"]                            #  0x2aaa    (en: 'smaller than')
  - "⪫": [T: "større enn"]                            #  0x2aab    (en: 'larger than')
  - "⪬": [T: "mindre enn eller lik"]             #  0x2aac    (en: 'smaller than or equal to')
- - "⪭": [T: "større en eller lik"]             #  0x2aad    (en: 'larger than or equal to')
+ - "⪭": [T: "større enn eller lik"]             #  0x2aad    (en: 'larger than or equal to')
  - "⪮": [T: "lik med hump over"]    #  0x2aae    (en: 'equals sign with bumpy above', MathPlayer: 'difference between (grav accentnt)', google: 'är lika med tecken med ojämn ovan')
  - "⪯": [T: "foregår over likhetsstrek"]    #  0x2aaf    (en: 'precedes above single line equals sign')
  - "⪰": [T: "følger over likhetsstrek"]    #  0x2ab0    (en: 'succeeds above single line equals sign', google: 'lyckas över enstaka linjen är lika med tecken')
@@ -2219,7 +2219,7 @@
  - "⫋": [T: "delmengde av over ikke lik"]             #  0x2acb    (en: 'subset above not equal to', google: 'delmängd ovan inte lika med')
  - "⫌": [T: "overmengde av over ikke lik"]            #  0x2acc    (en: 'superset of above not equal to', google: 'superset av ovan inte lika med')
  - "⫍": [T: "venstre kvadratisk åpen boks"]        #  0x2acd    (en: 'square left open box operator', google: 'square left open box operator')
- - "⫎": [t: "høyre kvadratisk åpen boks"]          #  0x2ace    (en: 'square right open box operator', google: 'square right open box operator')
+ - "⫎": [T: "høyre kvadratisk åpen boks"]          #  0x2ace    (en: 'square right open box operator', google: 'square right open box operator')
  - "⫏": [T: "lukket delmengde"]                      #  0x2acf    (en: 'closed subset')
  - "⫐": [T: "lukket overmengde"]                      #  0x2ad0    (en: 'closed superset')
  - "⫑": [T: "lukket delmengde eller lik"]       #  0x2ad1    (en: 'closed subset or equal to')
@@ -2411,7 +2411,7 @@
  - "⸰": [T: "ringpunkt"]                            #  0x2e30    (en: 'ring point', google translation)
  - "⸱": [T: "ordskille-punkt"]            #  0x2e31    (google translation)
  - "⸲": [T: "rotert komma"]                          #  0x2e32    (en: 'turned comma', google translation)
- - "⸳": [T: "hevet punkt"]                        #  0x2e33    (en: 'raised dot', google translation)
+ - "⸳": [T: "hevet prikk"]                        #  0x2e33    (en: 'raised dot', google translation)
  - "⸴": [T: "hevet komma"]                        #  0x2e34    (en: 'raised comma', google translation)
  - "⸵": [T: "rotert semikolon"]                      #  0x2e35    (en: 'turned semicolon', google translation)
  - "⸶": [T: "dolk med venstre vaktstang"]                #  0x2e36    (en: 'dagger with left guard', google translation)
@@ -2472,7 +2472,7 @@
  - "㋌": [T: "kvikksølv"]                          #  0x32cc    (en: 'mercury', google translation)
  - "㋍": [T: "erg"]                                 #  0x32cd    (google translation)
  - "㋎": [T: "elektronvolt"]                        #  0x32ce    (en: 'electron volts', google translation)
- - "㋏": [t: "begrenset ansvar"]               #  0x32cf    (en: 'limited liability sign', google translation)
+ - "㋏": [T: "begrenset ansvar"]               #  0x32cf    (en: 'limited liability sign', google translation)
  #-----------------------------------------------------------------------------------------------------------------------
  # CJK compatibility OK
  - "㍱": [T: "hektopascal"]                         #  0x3371    (en: 'hectopascals', google translation)
@@ -2598,7 +2598,7 @@
  - "": [T: "tilhører eller lik"]            #  0xe912    (en: 'element of or equal to', google translation)
  - "": [T: "lik eller større enn"]             #  0xe913    (en: 'equal to or greater than', google translation)
  - "": [T: "tilnærmet overmengde av"]               #  0xe914    (en: 'approximate superset of', google translation)
- - "": [t: "tilnærmet delmengde av"]               #  0xe915    (en: 'approximate subset of', google translation)
+ - "": [T: "tilnærmet delmengde av"]               #  0xe915    (en: 'approximate subset of', google translation)
  - "": [T: "overmengde av med prikk inkluderer som underrelasjon"]    #  0xe916    (en: 'superset of with dot includes as sub relation', google translation)
  - "": [T: "delmengde av med prikk inkluderes i som underrelasjon"]    #  0xe917    (en: 'subset of with dot is included in as sub relation', google translation)
  - "": [T: "lik med prikk under"]                 #  0xe918    (en: 'equal with dot below', google translation)
@@ -3615,9 +3615,9 @@
  - "︡": [T: "ligatur høyre halvdel"]    #  0xfe21    (en: 'ligature right half embellishment', google translation)
  - "︢": [T: "dobbel tilde venstre halvdel"]    #  0xfe22    (en: 'double tilde left half embellishment', google translation)
  - "︣": [T: "dobbel tilde høyre halvdel"]    #  0xfe23    (en: 'double tilde right half embellishment', google translation)
- - "︤": [t: "makron venstre halvdel"]    #  0xfe24    (en: 'macron left half embellishment', google translation)
- - "︥": [t: "makron høyre halvdel"]       #  0xfe25    (en: 'macron right half embellishment', google translation)
- - "︦": [t: "sammenkoblet makron"]        #  0xfe26    (en: 'conjoining macron embellishment', google translation)
+ - "︤": [T: "makron venstre halvdel"]    #  0xfe24    (en: 'macron left half embellishment', google translation)
+ - "︥": [T: "makron høyre halvdel"]       #  0xfe25    (en: 'macron right half embellishment', google translation)
+ - "︦": [T: "sammenkoblet makron"]        #  0xfe26    (en: 'conjoining macron embellishment', google translation)
  #-----------------------------------------------------------------------------------------------------------------
  #CJK compatibility forms
  - "︵": [T: "parentes over"]                           #  0xfe35
@@ -3666,8 +3666,8 @@
  - "￬": [T: "nedoverpil"]                           # 0xffec
  #--------------------------------------------------------------------------------------------------------------------
  #Small form variants
- - "﹨": [t: "liten speilvendt skråstrek"]                       #  0xfe68
+ - "﹨": [T: "liten speilvendt skråstrek"]                       #  0xfe68
  #---------------------------------------------------------------------------------------------------------------------
  #Specials
- - "￼": [t: "ukjent eller savnet objekt"]            #  0xfffc    (en: 'unknown or missing object', google translation)
+ - "￼": [T: "ukjent eller savnet objekt"]            #  0xfffc    (en: 'unknown or missing object', google translation)
  - "�": [T: "ukjent eller savnet tegn"]         #  0xfffd    (google: 'okänd eller saknad karaktär')

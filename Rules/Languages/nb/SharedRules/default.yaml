@@ -151,6 +151,7 @@
   - x: "*[2]"
   - pause: short
 
+# NORWEGIAN: Removed test for Verbosity.
 - name: no-end-sub
   tag: indexed-by
   # invisible comma -- want "x 1 when subscript is an integer"
@@ -418,6 +419,7 @@
                           - x: "$Postscripts[position() > 8]"
                           - T: "slutt indeks"      # phrase(At this point 'end scripts' occurs)
 
+# NORWEGIAN: Changed to English version
 - name: default
   tag: mtable
   variables:

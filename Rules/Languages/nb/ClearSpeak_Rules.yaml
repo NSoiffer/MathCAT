@@ -103,6 +103,7 @@
 # Mixed numbers mostly "just work" because the invisible char reads as "and" and other parts read properly on their own
 
 # Units (e.g., meters per second)
+#NORWEGIAN: Changed to the English version.
 - name: per-fraction
   tag: fraction
   match: "$ClearSpeak_Fractions='Per' or
@@ -119,14 +120,8 @@
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
   - "*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
   - "*[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
-  # SWEDISH: Alternative logic for handling correct reading out of common fractions.
   variables: [IsPlural: "*[1]!=1"]
   replace:
-  #- pause: short
-  #- test:
-      #if: "*[1]=1"
-      #then: [T: "en"]
-      #else: [x: "*[1]"]
   - x: "*[1]"
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
@@ -137,17 +132,12 @@
   - "($ClearSpeak_Fractions='Auto' or $ClearSpeak_Fractions='Ordinal' or $ClearSpeak_Fractions='EndFrac') and"
   - "*[1][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or text()<20)]   and"
   - "*[2][self::m:mn][not(contains(., ',')) and ($ClearSpeak_Fractions='Ordinal' or (2<= text() and text()<=10))]"
-  # SWEDISH: Alternative logic for handling correct reading out of common fractions.
   variables: [IsPlural: "*[1]!=1"]
   replace:
-  #- pause: short
-  #- test:
-      #if: "*[1]=1"
-      #then: [T: "en"]
-      #else: [x: "*[1]"]
   - x: "*[1]"
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
+#NORWEGIAN: Changed from Swedish to English version
 - name: fraction-over-simple
   tag: fraction
   match:
@@ -202,6 +192,7 @@
       - T: "slutt brøk"      # phrase(7 over 8 'end fraction')
       - pause: short
 
+#NORWEGIAN: Changed from Swedish to English version
 - name: default
   tag: fraction
   match: "."
@@ -248,7 +239,7 @@
   - bookmark: "*[2]/@id"
   - test:
       if: "*[2][.='2']"
-      then: {T: "i andre"}      # phrase(25 equals 5 'squared') #Marthe: "sin^2x sin kvadrert av x"
+      then: {T: "i andre"}      # phrase(25 equals 5 'squared')
       else: {T: "i tredje"}      # phrase(625 equals 5 'cubed')
 
 - name: function-power
@@ -290,7 +281,7 @@
   replace:
   - x: "*[1]"
   - bookmark: "*[2]/@id"
-  - T: "i andre"      # phrase(7 'squared' equals 49) #Marthe: "7 kvadrert, 7^2"
+  - T: "i andre"      # phrase(7 'squared' equals 49)
 
 - name: cubed
   tag: power
@@ -305,7 +296,7 @@
   match: "*[2][self::m:mn][not(contains(., ','))]"
   replace:
   - x: "*[1]"
-  - T: "opphøyd i"                 #Marthe: "7 opphøyd i 4, 7^4"
+  - T: "opphøyd i"                 
   - bookmark: "*[2]/@id"
   - x: "*[2]"
   - pause: short
@@ -452,7 +443,8 @@
   name: ClearSpeak-absolute-value
   tag: absolute-value
   match: "."
-  # SWEDISH: Differentiate between the initial and ending declaration of the terms.
+  # SWEDISH/NORWEGIAN: Differentiate between the initial and ending declaration of the terms.
+  # NORWEGIAN: Say "kardinaliteten til", but "absoluttverdien av"
   variables:
   - WordToSay: "IFTHENELSE($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinaliteten til', 'absoluttverdien av')"
   - EndToSay: "IFTHENELSE($ClearSpeak_AbsoluteValue = 'Cardinality', 'kardinalitet', 'absoluttverdi')"
@@ -504,6 +496,7 @@
     # onto the [not] [including]... part
 
  # SWEDISH: rewrote the intervals function to better deal with Swedish convention of speaking intervals
+ # NORWEGIAN: Removed test for verbosity, cause you should always say "det åpne"
 - name: ClearSpeak-intervals # avoid overriding with default "intervals" name
   variables:
   - is_intervals_start_infinity: "*[1][self::m:minus and count(*)=1 and *[1][.='∞']]"
@@ -604,6 +597,7 @@
       - pause: short
   - x: "*[3]"
 
+#NORWEGIAN: Changed from Swedish to English version
 - name: ClearSpeak-multi-line
   tag: [piecewise, system-of-equations, lines] # these are ignored in favor of the ClearSpeak prefs
   match: "."
@@ -657,6 +651,7 @@
       - pause: short
   - x: "*"
 
+#NORWEGIAN: Changed from Swedish to English version
 - name: ClearSpeak-default-multiline
   tag: [mtr, mlabeledtr]
   match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
@@ -684,7 +679,7 @@
   - test:
       if: "self::m:mlabeledtr"
       then:
-      - t: "med etiketten"      # phrase(the diagram is complete 'with label')
+      - T: "med etiketten"      # phrase(the diagram is complete 'with label')
       - x: "*[1]/*"
   - test:
     - if: "$ClearSpeak_MultiLineLabel='None'"

@@ -182,7 +182,7 @@
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
         then: [T: "ganger"]                       #  (en: 'times', google translation)                        
-        else: [T: "midtstilt punkt"]               #  (en: 'dot', MathPlayer: 'mellanpunkt', google: 'punkt')             
+        else: [T: "midtstilt prikk"]               #  (en: 'dot', MathPlayer: 'mellanpunkt', google: 'punkt')             
  - "×":                                          #  0xd7
     - test:
         if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"

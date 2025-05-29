@@ -127,7 +127,7 @@
   # SWEDISH: Added a verbosity setting test to allow a shorter form.
   - x: "*[2]"
 
-- name: permutation  #Marthe: Different in English
+- name: permutation
   tag: pochhammer
   match: "count(*)=2"
   replace:
@@ -136,7 +136,8 @@
   - T: "elementer av"      # phrase(the solution  involves several 'permutations of' values)
   - x: "*[1]"
 
-- name: intervals   #Marthe: Different in English
+# NORWEGIAN: Removed test for Verbosity
+- name: intervals
   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
   match: "count(*)=2"
   replace:
@@ -173,7 +174,7 @@
   tag: point
   match: "count(*)=2"
   replace:
-  - T: "punkt"      # phrase(a decimal 'point' indicates the fraction component of a number)
+  - T: "punkt"      # phrase(a decimal 'point' indicates the fraction component of a number) #NORWEGIAN: This should possibly be "punktum"
   - x: "*[1]"
   - T: "komma"      # phrase(use a 'comma' to divide large numbers or as a decimal point)
   - x: "*[2]"
@@ -385,6 +386,7 @@
       then: {T: "cotan"}          # phrase(find the 'cotangent' in a right-angle triangle)
       else: {T: "cotangens"}      # phrase(the 'cotangent' is the reciprocal of the tangent)
 
+# NORWEGIAN: Removed tests for Verbosity.
 - name: sinh
   tag: mi
   match: ".='sinh'"
@@ -451,6 +453,7 @@
       #then: {T: "cotan hype"}                  # phrase('cotanch' is shorthand for hyperbolic cotangent)
       #else: {T: "cotangens hyperbolicus"}      # phrase(the 'hyperbolic cotangent' is a mathematical function) 
 
+# NORWEGIAN: Added this rule from English version
 - name: exponential
   tag: mi
   match: ".='exp'"
@@ -460,7 +463,8 @@
       if: "$Verbosity='Terse'"
       then: [T: "exp"]      # phrase('exp' means exponential function)
       else: [T: "eksponentialfunksjonen"]      # phrase('exponential' function)
-      
+
+# NORWEGIAN: Added this rule from English version, but removed test for Verbosity.    
 - name: covariance
   tag: mi
   match: ".='Cov'"
@@ -512,6 +516,8 @@
   #- pause: short
   - x: "*[3]"
 
+
+# NORWEGIAN: Changed from Swedish to English version.
 - name: multi-line
   #   that eliminates the need for the if: else_if: ...
   # IDEA:  set a variable with the word to say for the row (e.g., RowLabel = Row/Case/Line/...)
@@ -519,8 +525,8 @@
   match: "."
   variables:
     # Wikipedia has some tables where all the entire first column is empty (e.g., https://en.wikipedia.org/wiki/List_of_trigonometric_identities)
-  - LineCountTry: "count(*/*[1][count(*)=1 and *[1][@data-added!='missing-content']])"
-  - LineCount: "IFTHENELSE($LineCountTry=0, count(*/*[1]), $LineCountTry)"
+  - LineCount: "count(*[not(contains(@data-intent-property, ':continued-row:'))])"
+  - NextLineIsContinuedRow: "false()"   # default value
   - IsColumnSilent: true()
   replace:
   - x: "$LineCount"
@@ -545,6 +551,7 @@
   - pause: short
   - x: "*"
 
+# NORWEGIAN: Changed from Swedish to English version.
 - name: default-multiline
   tag: [mtr, mlabeledtr]
   match: "parent::m:piecewise or parent::m:system-of-equations or parent::m:lines"
@@ -559,12 +566,12 @@
           then: [T: "tilfelle"]     # phrase('case' 1 of 10 cases)
         - else_if: "parent::m:system-of-equations"
           then: [T: "likning"] # phrase('equation' 1 of 10 equations)
-          else: [t: "rad"]     # phrase('line 1 of 10 lines)
+          else: [T: "rad"]     # phrase('line 1 of 10 lines)
       - x: "count(preceding-sibling::*[not(contains(@data-intent-property, ':continued-row:'))]) + 1"
   - test:
       if: "self::m:mlabeledtr"
       then:
-      - t: "med etiketten"      # phrase(the diagram is complete 'with label')
+      - T: "med etiketten"      # phrase(the diagram is complete 'with label')
       - x: "*[1]/*"
   - test:
       if: "not(contains(@data-intent-property, ':continued-row:'))"
@@ -574,6 +581,7 @@
       then: [x: "*[position()>1]"]
       else: [x: "*"]
 
+# NORWEGIAN: Changed from Swedish to English version.
 - name: default-multiline
   tag: mtd
   match: "parent::*[parent::m:piecewise or parent::m:system-of-equations or parent::m:lines]"
@@ -619,6 +627,7 @@
 
 
 # simpler reading methods for special case matrices
+# NORWEGIAN: Added these tests from the English version.
 - name: zero-matrix
   tag: matrix
   # select all the non-zero entries -- if there are none of them, then it is a zero matrix
@@ -659,7 +668,7 @@
   - x: count(*)
   - T: "ganger"       # phrase(the 1 'by' 2 matrix)
   - x: count(*[self::m:mtr][1]/*)
-  - t: "diagonalmatrise"   # phrase(the 2 by 2 'diagonal matrix')
+  - T: "diagonalmatrise"   # phrase(the 2 by 2 'diagonal matrix')
   - pause: long
   - insert:
       # this lists the diagonal 'mtd's to be read, and they say "column nnn" before reading the contents
@@ -1024,7 +1033,7 @@
   replace:
   - x: "*"
 
-#Gjør at det f.eks. NaCl blir lest N a, C l
+
 - name: chemical-element
   tag: chemical-element
   match: "."
@@ -1062,7 +1071,7 @@
     - else_if: ".='≡'"
       then: [{T: "trippelbindning"}]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
     - else_if: ".='≣'"
-      then: [{T: "firdobbel binding"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
+      then: [{T: "firedobbel binding"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
       else: [{x: "text()"}]
 
 - name: chemical-formula-operator

@@ -1,5 +1,5 @@
 ---
-
+# NORWEGIAN: Removed test for Verbosity
 - name: scalar-determinant
   tag: determinant
   match: "count(*)=1 and not(*[1][self::m:mtr])"
@@ -8,13 +8,13 @@
   #- test:
       #if: "$Verbosity!='Terse'"
       #then:
-  - T: "av"      # phrase(systems 'of' linear equations)
+  - T: "til"      # phrase(systems 'of' linear equations)
   - x: "*[1]"
   - test:
       if: "not(IsNode(*[1], 'simple'))"
       then: [T: "slutt determinant"]      # phrase('end determinant' of a matrix)
 
-
+# NORWEGIAN: Removed test for Verbosity
 - name: subscripted-norm
   tag: subscripted-norm
   match: "count(*)=2"
@@ -45,6 +45,7 @@
       then: [pause: short]
       else: [pause: auto]
 
+# NORWEGIAN: Removed test for Verbosity
 - name: kernel
   # can't use IntentMappings because this doesn't fit the function pattern
   tag: kernel
@@ -61,7 +62,7 @@
       then: [pause: short]
       else: [pause: auto]
 
-
+# NORWEGIAN: Kept these rules here, cause we say "dimensjonen til" and "normen til" instead of "dimensjonen av" and "normen av".
 - name: dimension
   tag: dimension
   match: "count(*)=1"
