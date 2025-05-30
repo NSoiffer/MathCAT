@@ -47,9 +47,9 @@ fn zero_power() {
 #[test]
 fn decimal_power() {
     let expr = "<math>
-                    <msup> <mi>x</mi> <mn>2.0</mn> </msup>
+                    <msup> <mi>x</mi> <mn>2,0</mn> </msup>
                 </math>";
-    test("nb", "SimpleSpeak", expr, "x opphøyd i 2.0");
+    test("nb", "SimpleSpeak", expr, "x opphøyd i 2,0");
 }
 
 #[test]
@@ -85,7 +85,7 @@ fn simple_fraction_power() {
                       <mfrac><mn>1</mn><mn>3</mn></mfrac>
                   </msup>
               </math>";
-  test("nb", "SimpleSpeak", expr, "x opphøyd i en tredjedel");
+  test("nb", "SimpleSpeak", expr, "x opphøyd i 1 tredjedel");
 }
 
 #[test]
@@ -178,7 +178,7 @@ fn nested_number_times_squared() {
         </msup>
         </mrow>
         </math>";
-  test("nb", "SimpleSpeak", expr, "e opphøyd i en halv x i andre");
+  test("nb", "SimpleSpeak", expr, "e opphøyd i 1 halv x i andre");
 }
 
 #[test]
@@ -200,7 +200,7 @@ fn nested_negative_number_times_squared() {
     </msup>
     </mrow>
     </math>";
-  test("nb", "SimpleSpeak", expr, "e opphøyd i minus en halv x i andre");
+  test("nb", "SimpleSpeak", expr, "e opphøyd i minus 1 halv x i andre");
 }
 
 #[test]

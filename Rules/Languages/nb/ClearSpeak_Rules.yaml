@@ -137,7 +137,7 @@
   - x: "*[1]"
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
-#NORWEGIAN: Changed from Swedish to English version
+#NORWEGIAN: Changed to English version
 - name: fraction-over-simple
   tag: fraction
   match:
@@ -192,7 +192,7 @@
       - T: "slutt brøk"      # phrase(7 over 8 'end fraction')
       - pause: short
 
-#NORWEGIAN: Changed from Swedish to English version
+#NORWEGIAN: Changed to English version
 - name: default
   tag: fraction
   match: "."
@@ -500,7 +500,7 @@
 - name: ClearSpeak-intervals # avoid overriding with default "intervals" name
   variables:
   - is_intervals_start_infinity: "*[1][self::m:minus and count(*)=1 and *[1][.='∞']]"
-  - is_intervals_end_infinity: "*[2][text()='∞'or (self::m:plus and count(*)=1 and *[1][.='∞'])]"
+  - is_intervals_end_infinity: "*[2][.='∞'or (self::m:plus and count(*)=1 and *[1][.='∞'])]"
   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
   match: "."
   replace:
@@ -597,7 +597,7 @@
       - pause: short
   - x: "*[3]"
 
-#NORWEGIAN: Changed from Swedish to English version
+#NORWEGIAN: Changed to English version
 - name: ClearSpeak-multi-line
   tag: [piecewise, system-of-equations, lines] # these are ignored in favor of the ClearSpeak prefs
   match: "."
@@ -710,6 +710,7 @@
   replace:
   - T: ""
 
+# NORWEGIAN: Added msqrt, so it e.g. says "root a times root b"
 - name: ClearSpeak-times
   tag: mo
   match:

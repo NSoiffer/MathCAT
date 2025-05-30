@@ -8,7 +8,7 @@ fn common_fraction_half() {
     let expr = "<math>
                     <mfrac> <mn>1</mn> <mn>2</mn> </mfrac>
                 </math>";
-    test("nb", "SimpleSpeak", expr, "en halv");
+    test("nb", "SimpleSpeak", expr, "1 halv");
 }
 
 #[test]
@@ -168,7 +168,7 @@ fn mixed_number() {
                     <mn>3</mn>
                     <mfrac> <mn>1</mn> <mn>2</mn> </mfrac>
                 </math>";
-    test("nb", "SimpleSpeak", expr, "3 og en halv");
+    test("nb", "SimpleSpeak", expr, "3 og 1 halv");
 }
 
 #[test]
@@ -178,7 +178,7 @@ fn explicit_mixed_number() {
                     <mo>&#x2064;</mo>
                     <mfrac> <mn>1</mn> <mn>8</mn> </mfrac>
                 </math>";
-    test("nb", "SimpleSpeak", expr, "3 og en åttedel");
+    test("nb", "SimpleSpeak", expr, "3 og 1 åttedel");
 }
 
 #[test]
@@ -232,7 +232,7 @@ fn nested_simple_fractions() {
                 </mfrac>
                 </mrow>
             </math>";
-    test("nb", "SimpleSpeak", expr, "brøk, en halv, over, 2 tredjedeler, slutt brøk");
+    test("nb", "SimpleSpeak", expr, "brøk, 1 halv, over, 2 tredjedeler, slutt brøk");
 }
 
 #[test]

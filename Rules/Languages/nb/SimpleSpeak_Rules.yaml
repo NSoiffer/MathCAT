@@ -62,13 +62,9 @@
   match:
   - "*[1][self::m:mn][not(contains(., '.')) and text()<20]   and"
   - "*[2][self::m:mn][not(contains(., '.')) and 2<= text() and text()<=10]"
-  # SWEDISH: Alternative logic for handling correct reading out of common fractions.
   variables: [IsPlural: "*[1]!=1"]
   replace:
-  - test:
-      if: "*[1]=1"
-      then: [T: "en"]
-      else: [x: "*[1]"]
+  - x: "*[1]"
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 - name: common-fraction-mixed-number
@@ -77,13 +73,9 @@
   - "preceding-sibling::*[1][self::m:mo][.='⁤'] and" # preceding element is invisible plus
   - "*[1][self::m:mn][not(contains(., '.'))]   and"
   - "*[2][self::m:mn][not(contains(., '.')) and text()<=10]"
-  # SWEDISH: Alternative logic for handling correct reading out of common fractions.
   variables: [IsPlural: "*[1]!=1"]
   replace:
-  - test:
-      if: "*[1]=1"
-      then: [T: "en"]
-      else: [x: "*[1]"]
+  - x: "*[1]"
   - x: "ToOrdinal(*[2], true(), $IsPlural)"   # extra args specify fractional ordinal and whether it is plural
 
 # Units (e.g., meters per second)
@@ -94,7 +86,7 @@
           BaseNode(*[1])[contains(@data-intent-property, ':unit') or (self::m:mrow and self::*[3][contains(@data-intent-property, ':unit')])]"
   replace:
   - x: "*[1]"
-  - t: "per"      # phrase('5 meters 'per' second)
+  - T: "per"      # phrase('5 meters 'per' second)
   - x: "*[2]"
   
 - name: simple

@@ -100,6 +100,7 @@
       else: [T: "øvre indeks"]      # phrase(x with 'superscript' 2)  # FIX: it would be better to use the word used when reading (power, exponent, ...)
   - pause: "medium"
 
+# NORWEGIAN: We say "grunntallet" for things like the "base" with lower index, but for munder and mover "basen" is a more appropriate word.
 - name: into-or-out-of
   tag: munder
   match: "$Move2D != ''"
@@ -107,7 +108,7 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [T: "grunntallet"]          # phrase(the 'base' of the power)
+      then: [T: "basen"]          # phrase(the 'base' of the power)
       else: [T: "nedre indeks"]   # phrase(the 'lower limit' of the function is zero)
   - pause: "medium"
 
@@ -118,7 +119,7 @@
   - x: "$Move2D"
   - test:
       if: "count($Child2D/preceding-sibling::*)=0"
-      then: [T: "grunntallet"]         # phrase(the 'base' of the power)
+      then: [T: "basen"]         # phrase(the 'base' of the power)
       else: [T: "øvre indeks"]  # phrase(the 'upper limit' of the function is zero)
   - pause: "medium"
 
@@ -129,7 +130,7 @@
   - x: "$Move2D"
   - test:
     - if: "count($Child2D/preceding-sibling::*)=0"
-      then: [T: "grunntallet"]           # phrase(the 'base' of the power)
+      then: [T: "basen"]           # phrase(the 'base' of the power)
     - else_if: "count($Child2D/preceding-sibling::*)=1"
       then: [T: "nedre indeks"]    # phrase(the 'lower limit' of the function is zero)
       else: [T: "øvre indeks"]   # phrase(the 'upper limit' of the function is zero)
@@ -203,9 +204,9 @@
         - else_if: "$PreviousNavCommand = 'ZoomOut'"
           then: [T: "angre utzooming"]                      # phrase('undo zoom out')
         - else_if: "$PreviousNavCommand = 'ZoomInAll'"
-          then: [T: "angre innzooming hele vegen"]        # phrase('undo zooming in all the way')
+          then: [T: "angre innzooming hele veien"]        # phrase('undo zooming in all the way')
         - else_if: "$PreviousNavCommand = 'ZoomOutAll'"
-          then: [T: "angre utzooming hele vegen"]       # phrase('undo zooming out all the way')
+          then: [T: "angre utzooming hele veien"]       # phrase('undo zooming out all the way')
         - else_if: "$PreviousNavCommand = 'MovePrevious' or $PreviousNavCommand = 'MovePreviousZoom'"
           then: [T: "angre gå venstre"]                     # phrase('undo move left')
         - else_if: "$PreviousNavCommand = 'MoveNext' or $PreviousNavCommand = 'MoveNextZoom'"
@@ -234,7 +235,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
-      then: [T: "innzoomet hele vegen", pause: "long"]    # phrase('zoomed in all of the way')
+      then: [T: "innzoomet hele veien", pause: "long"]    # phrase('zoomed in all of the way')
   - test:
       if: "$ReadZoomLevel!=-1"
       then:
@@ -367,7 +368,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity = 'Verbose'"
-      then: [T: "zoom inn hele vegen", pause: "medium"]                 # phrase('zoom in all the way')
+      then: [T: "zoom inn hele veien", pause: "medium"]                 # phrase('zoom in all the way')
   - with:
       variables: [Move2D: "'i'", Child2D: "*[1]"]              # phrase('in' the denominator)
       replace: [x: "."]
@@ -381,7 +382,7 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
-      then: [T: "utzoomet hele vegen", pause: "long"]        # phrase('zoomed out all the the way')
+      then: [T: "utzoomet hele veien", pause: "long"]        # phrase('zoomed out all the the way')
   - set_variables: [NavNode: "*[1]/@id"] # no-op for $NavCommand = 'ZoomOut'
 
 - name: zoom-out-top
@@ -407,9 +408,9 @@
   replace:
   - test:
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
-      then: [T: "utzoomet hele vegen", pause: "medium"]            # phrase('zoomed out all the the way')
+      then: [T: "utzoomet hele veien", pause: "medium"]            # phrase('zoomed out all the the way')
   - with:
-      variables: [Move2D: "'lämnar'", Child2D: "."]
+      variables: [Move2D: "'forlater'", Child2D: "."]
       replace: [x: ".."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1"]
@@ -504,7 +505,7 @@
           then: [x: ".."] # auto-zoom: move out a level and retry
           else:
           - with:
-              variables: [Move2D: "'lämnar'", Child2D: "."]
+              variables: [Move2D: "'forlater'", Child2D: "."]
               replace: [x: ".."]
           - test:
               if: "parent::m:mtd"
@@ -1166,8 +1167,8 @@
         - if: "$NavCommand = 'MoveNext'"
           then: [T: "gå"]                                  # phrase('move' to next entry in table)     
         - else_if: "$NavCommand = 'ReadNext'"
-          then: [T: "les"]                                  # phrase('read' next entry in table)     
-          else: [T: "beskriv"]                              # phrase('describe' next entry in table)     
+          then: [T: "lese"]                                  # phrase('read' next entry in table)     
+          else: [T: "beskrive"]                              # phrase('describe' next entry in table)     
       - T: "høyre, slutt matematikk"                              # phrase(move 'right, end of math')
       - pause: long
   - set_variables: [SpeakExpression: "'false'"]
@@ -1206,7 +1207,7 @@
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'lämnar'", Child2D: "."]
+              variables: [Move2D: "'forlater'", Child2D: "."]
               replace: [x: ".."]
       - test:
           if: "following-sibling::*"
@@ -1310,7 +1311,7 @@
       if: "preceding-sibling::* and following-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'lämnar'", Child2D: "."]
+          variables: [Move2D: "'forlater'", Child2D: "."]
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
@@ -1448,7 +1449,7 @@
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'lämnar'", Child2D: "."]
+              variables: [Move2D: "'forlater'", Child2D: "."]
               replace: [x: ".."]
       - test:
           if: "preceding-sibling::*"
@@ -1555,7 +1556,7 @@
       if: "count(preceding-sibling::*) > 2 and preceding-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'lämnar'", Child2D: "."]
+          variables: [Move2D: "'forlater'", Child2D: "."]
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
