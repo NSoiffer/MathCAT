@@ -2933,7 +2933,7 @@ impl NeedsToBeGrouped {
     /// FIX: what needs to be implemented?
     fn needs_grouping_for_french(mathml: Element, is_base: bool) -> bool {
         use crate::xpath_functions::IsInDefinition;
-        let mut node_name = name(&mathml);
+        let mut node_name = name(mathml);
         if mathml.attribute_value("data-roman-numeral").is_some() {
             node_name = "mi";           // roman numerals don't follow number rules
         }
@@ -2946,8 +2946,8 @@ impl NeedsToBeGrouped {
                 }                                                                                        // clause 1
                 // two 'mn's can be adjacent, in which case we need to group the 'mn' to make it clear it is separate (see bug #204)
                 let parent = get_parent(mathml);   // there is always a "math" node
-                let grandparent = if name(&parent) == "math" {parent} else {get_parent(parent)};
-                if name(&grandparent) != "mrow" {
+                let grandparent = if name(parent) == "math" {parent} else {get_parent(parent)};
+                if name(grandparent) != "mrow" {
                     return false;
                 }
                 let preceding = parent.preceding_siblings();
@@ -2956,9 +2956,9 @@ impl NeedsToBeGrouped {
                 }
                 // any 'mn' would be separated from this node by invisible times
                 let previous_child = as_element(preceding[preceding.len()-1]);
-                if name(&previous_child) == "mo" && as_text(previous_child) == "\u{2062}" {
+                if name(previous_child) == "mo" && as_text(previous_child) == "\u{2062}" {
                     let previous_child = as_element(preceding[preceding.len()-2]);
-                    return name(&previous_child) == "mn"
+                    return name(previous_child) == "mn"
                 } else {
                     return false;
                 }
@@ -2969,7 +2969,7 @@ impl NeedsToBeGrouped {
             "mi" | "mtext" => {
                 let text = as_text(mathml);
                 let parent = get_parent(mathml);   // there is always a "math" node
-                let parent_name = name(&parent);
+                let parent_name = name(parent);
                 return text.chars().count() > 1 &&
                        parent_name != "mrow" &&
                        !IsInDefinition::is_defined_in(text, &BRAILLE_DEFINITIONS, "FunctionNames").unwrap();
@@ -2984,7 +2984,7 @@ impl NeedsToBeGrouped {
                 // example 7.12 has "2-" in superscript and is grouped, so we don't consider postfix ops
                 let children = mathml.children();
                 if children.len() == 2 &&
-                    (name( &as_element(children[0])) == "mo") {
+                    (name( as_element(children[0])) == "mo") {
                     return false;
                 }
 
@@ -2992,8 +2992,8 @@ impl NeedsToBeGrouped {
                     let child0 = as_element(children[0]);
                     let operator = as_element(children[1]);   // invisible function op?
                     // debug!("needs_grouping_for_french: child0 =");
-                    if name(&operator) == "mo" && as_text(operator) == "\u{2061}" &&
-                       (name(&child0) == "mi" || name(&child0) == "mtext") && 
+                    if name(operator) == "mo" && as_text(operator) == "\u{2061}" &&
+                       (name(child0) == "mi" || name(child0) == "mtext") && 
                        IsInDefinition::is_defined_in(as_text(child0), &BRAILLE_DEFINITIONS, "TrigFunctionNames").unwrap() {
                         return false;
                        }
