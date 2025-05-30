@@ -162,7 +162,7 @@ fn multiple_element_set() {
     let expr = "<math>
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-    test("sv", "SimpleSpeak", expr, "mängden 5 komma 10 komma 15");
+    test("sv", "SimpleSpeak", expr, "mängden 5 komma, 10 komma, 15");
 }
 
 #[test]
@@ -202,7 +202,7 @@ fn element_under_sum() {
             </mfrac>
         </math>";
     test("sv", "SimpleSpeak", expr,
-                    "summa över i tillhörande heltalen, av; division, 1 genom, i kvadrat, slut division;");
+                    "summa över i tillhörande heltalen, av; division, 1 genom, i kvadrat, slut division");
 }
 
 #[test]

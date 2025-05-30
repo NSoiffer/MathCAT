@@ -33,7 +33,7 @@ fn not_SimpleSpeak_common_fraction_tenths() {
     let expr = "<math>
                     <mfrac> <mn>89</mn> <mn>10</mn> </mfrac>
                 </math>";
-    test("fi", "SimpleSpeak", expr, "89 per 10,");
+    test("fi", "SimpleSpeak", expr, "89 per 10");
 }
 
 #[test]
@@ -49,7 +49,7 @@ fn non_simple_fraction() {
         </mrow>
     </math>
                             ";
-    test("fi", "SimpleSpeak", expr, "murtoluku, x plus y, per, x miinus y, loppu murtoluku;");
+    test("fi", "SimpleSpeak", expr, "murtoluku, x plus y, per, x miinus y, loppu murtoluku");
 }
 
 #[test]
@@ -65,7 +65,7 @@ fn nested_fraction() {
         </mrow>
     </math>
                             ";
-    test("fi", "SimpleSpeak", expr, "murtoluku, x plus, murtoluku, 1 per y, loppu murtoluku; per, x miinus y, loppu murtoluku;");
+    test("fi", "SimpleSpeak", expr, "murtoluku, x plus, murtoluku, 1 per y, loppu murtoluku; per, x miinus y, loppu murtoluku");
 }
 
 
@@ -82,7 +82,7 @@ fn deeply_nested_fraction_msqrt() {
         </mrow>
     </math>
                             ";
-    test("fi", "SimpleSpeak", expr, "murtoluku, x plus, neliöjuuri 1 per y, loppu juuri; per, x miinus y, loppu murtoluku;");
+    test("fi", "SimpleSpeak", expr, "murtoluku, x plus, neliöjuuri 1 per y, loppu juuri; per, x miinus y, loppu murtoluku");
 }
 
 #[test]
@@ -98,7 +98,7 @@ fn deeply_nested_fraction_mrow_msqrt() {
         </mrow>
     </math>
                             ";
-    test("fi", "SimpleSpeak", expr, "murtoluku, x plus, neliöjuuri 2 plus 1 per y, loppu juuri; per, x miinus y, loppu murtoluku;");
+    test("fi", "SimpleSpeak", expr, "murtoluku, x plus, neliöjuuri 2 plus 1 per y, loppu juuri; per, x miinus y, loppu murtoluku");
 }
 
 #[test]
@@ -114,7 +114,7 @@ fn numerator_simple_fraction() {
         </mrow>
     </math>
                             ";
-    test("fi", "SimpleSpeak", expr, "murtoluku, x per, x miinus y, loppu murtoluku;");
+    test("fi", "SimpleSpeak", expr, "murtoluku, x per, x miinus y, loppu murtoluku");
 }
 
 #[test]
@@ -127,7 +127,7 @@ fn denominator_simple_fraction() {
         </mfrac>
     </math>
                             ";
-    test("fi", "SimpleSpeak", expr, "murtoluku, x miinus y, per x, loppu murtoluku;");
+    test("fi", "SimpleSpeak", expr, "murtoluku, x miinus y, per x, loppu murtoluku");
 }
 
 
@@ -164,7 +164,7 @@ fn simple_text() {
     let expr = "<math>
     <mfrac> <mi>osoittaja</mi> <mi>nimittäjä</mi> </mfrac>
                 </math>";
-    test("fi", "SimpleSpeak", expr, "osoittaja per nimittäjä,");
+    test("fi", "SimpleSpeak", expr, "osoittaja per nimittäjä");
 }
 
 #[test]
@@ -177,7 +177,7 @@ fn number_and_text() {
                 <mn>3</mn><mtext>gallonaa</mtext></mrow>
             </mfrac>
         </math>";
-    test("fi", "SimpleSpeak", expr, "murtoluku, 2 mailia, per, 3 gallonaa, loppu murtoluku;");
+    test("fi", "SimpleSpeak", expr, "murtoluku, 2 mailia, per, 3 gallonaa, loppu murtoluku");
 }
 
 
@@ -201,7 +201,7 @@ fn nested_simple_fractions() {
                 </mfrac>
                 </mrow>
             </math>";
-    test("fi", "SimpleSpeak", expr, "murtoluku, 1 kahdesosa, per, 2 kolmasosaa, loppu murtoluku;");
+    test("fi", "SimpleSpeak", expr, "murtoluku, 1 kahdesosa, per, 2 kolmasosaa, loppu murtoluku");
 }
 
 #[test]

@@ -1,0 +1,60 @@
+---
+-
+  name: "laplacian"
+  tag: mrow
+  match: "count(*)=2 and
+          *[1][self::m:msup and
+               *[1][ self::m:mo[.='∇' or .='𝛁'] or self::m:mover[*[1][.='∇'] and *[2][.='→' or .='⇀']] ] and
+               *[2][self::m:mn[.='2']]]"
+  replace:
+  - intent:
+      name: "laplacian"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
+      children: [x: "*[2]"]
+
+-
+  # could be stand alone operator -- catch this case
+  name: "laplacian"
+  tag: msup
+  match: "*[1][ self::m:mo[.='∇' or .='𝛁'] or self::m:mover[*[1][.='∇'] and *[2][.='→' or .='⇀']] ] and
+          *[2][self::m:mn[.='2']]"
+  replace:
+  - intent:
+      name: "laplacian"
+      attrs: "id='@id'"
+      children: []
+
+-
+  name: divergence-and-curl
+  tag: mrow
+  match: "count(*)=2 and *[1][@data-acts_as_operator[.='∇' or .='𝛁']]"
+  replace:
+  - intent:
+      xpath-name: "IfThenElse(*[1]/*[2][.='×'] , 'curl', 'divergence')"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
+      children: [x: "*[2]"]
+
+-
+  name: gradient
+  tag: mrow
+  match: "count(*)=2 and 
+          *[1][ self::m:mo[.='∇' or .='𝛁'] or self::m:mover[*[1][.='∇'] and *[2][.='→' or .='⇀']] ] and
+          name(BaseNode(*[2])) != 'mo'"
+  replace:
+  - intent:
+      name: "gradient"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
+      children: [x: "*[2]"]
+
+-
+  name: vector-nabla
+  tag: mover
+  # normal modified-variable rule is only for "mi"
+  match: "*[1][self::m:mo[.='∇' or .='𝛁']]  and *[2][.='→' or .='⇀']"
+  replace:
+  - intent:
+      name: "modified-variable"
+      attrs: "data-intent-property='concat(data-intent-property, \":function:\")'"
+      children:
+      - x: "*[1]"
+      - x: "*[2]"

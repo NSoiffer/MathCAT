@@ -10,6 +10,8 @@
       - ClearSpeak_AbsoluteValue: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_AbsoluteValue='Auto', 'AbsEnd', $ClearSpeak_AbsoluteValue)"
       - ClearSpeak_Roots: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Roots='Auto', 'RootEnd', $ClearSpeak_Roots)"
       - ClearSpeak_Matrix: "IfThenElse($Verbosity='Verbose' and $ClearSpeak_Matrix='Auto', 'EndMatrix', $ClearSpeak_Matrix)"
+      # should be set at mtable level, but unknown intents make that impossible to know
+      - IsColumnSilent: false()
       replace:
       - test:
           if: "$MathRate = 100"
@@ -146,27 +148,25 @@
       if: "not(IsNode(*[2],'leaf'))"
       then: [T: "loppu juuri"] # phrase("root of x 'end root symbol'")
 
-
 - name: simple-sub
-  tag: particular-value-of
-  # invisible comma -- want "x sub 1 1" without "end sub"
-  match: "count(*)=2 and (IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][text()='⁣']])"
+  tag: indexed-by
+  # invisible comma -- want "x 1 when subscript is an integer"
+  match: "count(*)=2 and $Verbosity='Terse' and *[2][self::m:mn and translate(., '.,', '')=.]"
+  replace:
+  - x: "*[1]"
+  - x: "*[2]"
+  - pause: short
+
+- name: no-end-sub
+  tag: indexed-by
+  # invisible comma -- want "x 1 when subscript is an integer"
+  match: "count(*)=2 and (IsNode(*[2], 'leaf') or *[2][self::m:mrow][*[2][.='⁣']])"
   replace:
   - x: "*[1]"
   - test:
       if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
       then: [T: "ala"]      # phrase(x 'sub' 2)
   - x: "*[2]"
-
-- name: default
-  tag: particular-value-of
-  match: "count(*)=2"
-  replace:
-  - x: "*[1]"
-  - T: "ala"               # phrase(x 'sub' 2)
-  - x: "*[2]"
-  - T: "loppu ala"           # phrase(x sub 2 'end of sub')
-  - pause: short
 
 
 - name: structure
@@ -401,7 +401,9 @@
 
 - name: default
   tag: mtable
-  variables: [IsColumnSilent: false()]
+  variables:
+  - IsColumnSilent: "false()"
+  - NumColumns: "count(*[1]/*) - IfThenElse(*/self::m:mlabeledtr, 1, 0)"
   match: "."
   replace:
   - T: "taulukko, jossa"      # phrase(the 'table with' 3 rows)
@@ -411,9 +413,9 @@
       then: [T: "rivi"]      # phrase(the table with 1 'row') # FI: singular
       else: [T: "riviä"]      # phrase(the table with 3 'rows') # FI: plural
   - T: "ja"      # phrase(the table with 3 rows 'and' 4 columns)
-  - x: "count(*[1]/*)"
+  - x: "$NumColumns"
   - test:
-      if: "count(*[1]/*)=1"
+      if: "$NumColumns"
       then: [T: "sarake"]      # phrase(the table with 3 rows and 1 'column') # FI: singular
       else: [T: "saraketta"]      # phrase(the table with 3 rows and 4 'columns') # FI: plural
   - pause: long
@@ -425,17 +427,18 @@
   tag: [mtr, mlabeledtr]
   match: "."
   replace:
+  - pause: medium
   - T: "rivi"      # phrase(the first 'row' of a matrix)
   - x: "count(preceding-sibling::*)+1"
   - test:
-      if: .[self::m:mlabeledtr]
+      if: self::m:mlabeledtr
       then:
       - T: "merkinnällä"      # phrase(the line 'with label' first equation)
       - x: "*[1]/*"
       - pause: short
   - pause: medium
   - test:
-      if: .[self::m:mlabeledtr]
+      if: self::m:mlabeledtr
       then: [{x: "*[position()>1]"}]
       else: {x: "*"}
 
@@ -450,7 +453,7 @@
       if: "not($IsColumnSilent)"
       then:
       - T: "sarake"      # phrase(the first 'column' of the matrix)
-      - x: "count(preceding-sibling::*)+1"
+      - x: "count(preceding-sibling::*)+IfThenElse(parent::m:mlabeledtr, 0, 1)"
       - pause: medium
   - x: "*"
   - test:
@@ -466,7 +469,7 @@
   # The ordering below is the order in which words come out when there is more than one value
   # Note: @notation can contain more than one value
   tag: menclose
-  match: "@notation='box' and *[self::m:mtext and text()=' ']"
+  match: "@notation='box' and *[self::m:mtext and .=' ']"
   replace:
   - T: "tyhjä laatikko"      # phrase(the 'empty box' contains no values)
 
@@ -575,7 +578,7 @@
       then: [T: "neliöjuuri", pause: short]      # phrase(5 is the 'square root' of 25)
   - T: "rajaus"      # phrase(parentheses are 'enclosing' part of the equation)
   - test:
-      if: "*[self::m:mtext and text()=' ']"
+      if: "*[self::m:mtext and .=' ']"
       then: [T: "tyhjää tilaa"]     # otherwise there is complete silence      # phrase(there is a 'space' between the words)
       else: [x: "*"]
   - test:
@@ -603,57 +606,94 @@
   - T: "arvolla"      # phrase(the function sine 'applied to' x plus y) # FI: could also be 'sovelletaan'
   - x: "*[2]"
 
-
 # Here are the intent hints that need to be handled: 'prefix' | 'infix' | 'postfix' | 'function' | 'silent'
 - name: silent-intent
-  # uncaught intent -- speak as arg1 arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':silent:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':silent:')"
   replace:
   - x: "*"
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: prefix-intent
-  # uncaught intent -- speak as arg1 arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':prefix:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':prefix:')"
   replace:
-  - x: "translate(name(.), '-_', '  ')"
+  - x: "SpeakIntentName(name(.), $Verbosity, 'prefix')"
   - x: "*"
-  - pause: short
+  - test:
+      if: "not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'prefix', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: postfix-intent
-  # uncaught intent -- speak as arg1 arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':postfix:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':postfix:')"
   replace:
-  - pause: short
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'postfix', 'start')"]
   - x: "*"
-  - x: "translate(name(.), '-_', '  ')"
-
+  - x: "SpeakIntentName(name(.), $Verbosity, 'postfix')"
 
 - name: infix-intent
-  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  # uncaught intent -- the args have been inserted in the order of speech 
   tag: "*"
-  match: "contains(@data-intent-property, ':infix:') and count(*)>0"
+  match: "count(*)>0 and contains(@data-intent-property, ':infix:')"
   replace:
-  - pause: short
-  - insert:
-      nodes: "*"
-      replace: [x: "translate(name(.), '-_', '  ')", pause: auto]
-  - pause: short
-
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[1], 'simple') )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'infix', 'start')"]
+  - test:
+      if: "count(*) = 1"  # in cases such as continued-row, plus/minus might have just one child
+      then:
+      - x: "SpeakIntentName(name(.), $Verbosity, 'infix')"
+      - pause: auto
+      - x: "*[1]"
+      else:
+      - insert:
+          nodes: "*"
+          replace: [x: "SpeakIntentName(name(.), $Verbosity, 'infix')", pause: auto]
+  - test:
+      if: "$Impairment = 'Blindness' and not( IsBracketed(., '', '') or IsNode(*[last()], 'simple') )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'infix', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"   # add (probably) a slightly longer pause if this came from a 2D node
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: function-intent
-  # uncaught intent -- speak as foo of arg1 comma arg2 ....
+  # uncaught intent -- speak as foo of arg1 comma arg2 .... The MathML spec requires arguments to functions
   tag: "*"
-  match: count(*)>0
+  match: "count(*)>0"
   replace:
-  - x: "translate(name(.), '-_', '  ')"
-  - T: ""      # phrase(sine 'of' 5)
-  - pause: short
+  - x: "SpeakIntentName(name(.), $Verbosity, 'function')"
+  - test:
+      if: "not(contains(@data-intent-property, ':literal:')) and
+           not(count(*)=2 and (IsInDefinition(*[1], 'TrigFunctionNames') or IsInDefinition(name(.), 'TerseFunctionNames')) and IsNode(*[2], 'simple'))"
+      then: [T: "", pause: auto]      # phrase(sine 'of' 5)
   - insert:
       nodes: "*"
-      replace: [T: "pilkku", pause: auto]      # phrase(f of x 'comma' y)
+      replace:
+      - test:
+          if: "not(contains(@data-intent-property, ':literal:'))"
+          then: [x: "','"]
+      - pause: auto
+  - test:
+      if: "$Impairment = 'Blindness' and not(*[last()][IsBracketed(., '', '') or IsNode(., 'simple')] )"
+      then: [x: "SpeakBracketingIntentName(name(.), $Verbosity, 'function', 'end')"]
+  - test:
+      if: "IsNode(., '2D')"
+      then: [pause: short]
+      else: [pause: auto]
 
 - name: default-text
   # unknown leaf -- just speak the text -- could be a literal intent

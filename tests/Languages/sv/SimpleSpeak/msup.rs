@@ -24,7 +24,7 @@ fn cubed() {
         let expr = "<math>
                         <msup> <mi>x</mi> <mn>4</mn> </msup>
                     </math>";
-        test("sv", "SimpleSpeak", expr, "x upphöjt till 4,");
+        test("sv", "SimpleSpeak", expr, "x upphöjt till 4");
     }
 
 #[test]
@@ -32,7 +32,7 @@ fn simple_mi_power() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mi>n</mi> </msup>
                 </math>";
-  test("sv", "SimpleSpeak", expr, "x upphöjt till n,");
+  test("sv", "SimpleSpeak", expr, "x upphöjt till n");
 }
 
 #[test]
@@ -40,7 +40,7 @@ fn zero_power() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>0</mn> </msup>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "x upphöjt till 0,");
+    test("sv", "SimpleSpeak", expr, "x upphöjt till 0");
 }
 
 
@@ -49,7 +49,7 @@ fn decimal_power() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>2,0</mn> </msup>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "x upphöjt till 2,0,");
+    test("sv", "SimpleSpeak", expr, "x upphöjt till 2,0");
 }
 
 #[test]
@@ -74,7 +74,7 @@ fn negative_power() {
                         <mrow> <mo>-</mo> <mn>2</mn> </mrow>
                     </msup>
                 </math>";
-    test("sv", "SimpleSpeak", expr, "x upphöjt till minus 2,");
+    test("sv", "SimpleSpeak", expr, "x upphöjt till minus 2");
 }
 
 #[test]
@@ -219,7 +219,7 @@ fn nested_expr_to_tenth() {
       </msup>
       </mrow>
       </math>";
-  test("sv", "SimpleSpeak", expr, "3 upphöjt till 3 upphöjt till 10,");
+  test("sv", "SimpleSpeak", expr, "3 upphöjt till 3 upphöjt till 10");
 }
 
 #[test]
@@ -255,7 +255,7 @@ fn nested_simple_power() {
       </msup>
     </msup>
   </math>";
-  test("sv", "SimpleSpeak", expr, "t upphöjt till 4 femtedelar upphöjt till n,");
+  test("sv", "SimpleSpeak", expr, "t upphöjt till 4 femtedelar upphöjt till n");
 }
 
 #[test]
@@ -328,5 +328,5 @@ fn default_power() {
       </mfrac>
     </msup>
   </math>";
-  test("sv", "SimpleSpeak", expr, "t upphöjt till division, b plus 1, genom 3, slut division;");
+  test("sv", "SimpleSpeak", expr, "t upphöjt till division, b plus 1, genom 3, slut division");
 }

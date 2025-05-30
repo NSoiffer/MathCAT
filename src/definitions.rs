@@ -78,7 +78,6 @@ type VariableDefHashMap = HashMap<String, CollectionFromFile>;
 /// naming conventions, snake case is used (e.g, "function_names").
 ///
 /// There should only be one instance of this structure ([`DEFINITIONS`])
-
 // FIX: this probably can done with a macro to remove all the repetition
 pub struct Definitions {
     pub name_to_var_mapping: VariableDefHashMap,

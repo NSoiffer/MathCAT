@@ -39,5 +39,5 @@ fn intent_prob_x() {
         <mi arg='arg'>x</mi>
         <mi arg='op' intent='probability' mathvariant='normal'>P</mi>
     </msup></math>";
-    test("en", "ClearSpeak", expr, "probability of, x");
+    test("en", "ClearSpeak", expr, "probability of x");
 }

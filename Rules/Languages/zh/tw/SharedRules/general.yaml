@@ -3,7 +3,7 @@
 # number-sets are a little messy in that the base was converted to a number-set, so we have to match that (simple) case last
 - name: pos-neg-number-sets
   tag: number-sets
-  match: "count(*)=2 and *[2][text()='+' or text()='-']"
+  match: "count(*)=2 and *[2][.='+' or .='-']"
   replace:
   - test:
       if: "$Verbosity!='Terse'"
@@ -11,20 +11,20 @@
       - T: ""      # phrase('the' square root of 25 equals 5)
   - bookmark: "*[2]/@id"
   - test:
-    - if: "*[2][text()='+']"
+    - if: "*[2][.='+']"
       then: [{T: "正"}]      # phrase(set of all 'positive' integers less than 10)
       else: [{T: "負"}]      # phrase(set of all 'negative' integers less than minus 10)
   - bookmark: "*[1]/@id"
   - test:
-    - if: "*[1][text()='ℂ']"
+    - if: "*[1][.='ℂ']"
       then: [{T: "複數集"}]      # phrase('complex numbers' consist of two parts)
-    - else_if: "*[1][text()='ℕ']"
+    - else_if: "*[1][.='ℕ']"
       then: [{T: "自然數集"}]      # phrase('natural numbers' are numbers from 1 to infinity)
-    - else_if: "*[1][text()='ℚ']"
+    - else_if: "*[1][.='ℚ']"
       then: [{T: "有理數集"}]      # phrase('rational numbers' are the fraction of 2 integers)
-    - else_if: "*[1][text()='ℝ']"
+    - else_if: "*[1][.='ℝ']"
       then: [{T: "實數集"}]      # phrase('real numbers' can be both positive and negative)
-    - else_if: "*[1][text()='ℤ']"
+    - else_if: "*[1][.='ℤ']"
       then: [{T: "整數集"}]      # phrase(positive 'integers' are natural numbers above 0)
       else: [{x: "*[1][text()]"}] # shouldn't happen
 
@@ -36,15 +36,15 @@
   replace:
   - bookmark: "*[1]/@id"
   - test:
-    - if: "*[1][text()='ℂ']"
+    - if: "*[1][.='ℂ']"
       then: [{T: "C"}]      # phrase(the letter 'C' used to represent complex number)
-    - else_if: "*[1][text()='ℕ']"
+    - else_if: "*[1][.='ℕ']"
       then: [{T: "N"}]      # phrase(the letter 'N' may represent natural numbers)
-    - else_if: "*[1][text()='ℚ']"
+    - else_if: "*[1][.='ℚ']"
       then: [{T: "Q"}]      # phrase(the letter 'Q' may represent rational numbers)
-    - else_if: "*[1][text()='ℝ']"
+    - else_if: "*[1][.='ℝ']"
       then: [{T: "R"}]      # phrase(the letter 'R' may represent real numbers)
-    - else_if: "*[1][text()='ℤ']"
+    - else_if: "*[1][.='ℤ']"
       then: [{T: "Z"}]      # phrase(the letter 'Z' may represent integers)
       else: [{x: "*[1][text()]"}] # shouldn't happen
   - bookmark: "*[2]/@id"
@@ -56,15 +56,15 @@
   replace:
   - bookmark: "@id"
   - test:
-    - if: "text()='ℂ'"
+    - if: ".='ℂ'"
       then: [{T: "複數集"}]      # phrase('the complex numbers' include 2 parts)
-    - else_if: "text()='ℕ'"
+    - else_if: ".='ℕ'"
       then: [{T: "自然數集"}]      # phrase('the natural numbers' begin at 1)
-    - else_if: "text()='ℚ'"
+    - else_if: ".='ℚ'"
       then: [{T: "有理數集"}]      # phrase('the rational numbers' are the fraction of 2 integers)
-    - else_if: "text()='ℝ'"
+    - else_if: ".='ℝ'"
       then: [{T: "實數集"}]      # phrase('the real numbers' can be both positive and negative)
-    - else_if: "text()='ℤ'"
+    - else_if: ".='ℤ'"
       then: [{T: "整數集"}]      # phrase('the integers' are natural numbers above 0)
       else: [x: "text()"] # shouldn't happen
 
@@ -105,17 +105,10 @@
   - T: "減去相同的式子取值在"      # phrase(this result is 'minus the same expression evaluated at' an earlier point)
   - x: "*[2]"
 
-- name: binomial
-  tag: binomial
-  match: "count(*)=2 and not(@data-intent-property)"
-  replace:
-  - x: "*[1]"
-  - T: "選"      # phrase(you can 'choose' a number at random)
-  - x: "*[2]"
-
 - name: permutation
-  tag: permutation-symbol
-  match: "count(*)=2 and not(@data-intent-property)"
+  # Not a default because the order of the args is reversed
+  tag: pochhammer
+  match: "count(*)=2 and contains(@data-intent-property, ':infix:')"
   replace:
   - x: "*[1]"
   - T: "排列"      # phrase(the solution  involves several 'permutations of' values)
@@ -123,7 +116,7 @@
 
 - name: intervals
   tag: [open-interval, open-closed-interval, closed-interval, closed-open-interval]
-  match: "count(*)=2 and not(@data-intent-property)"
+  match: "count(*)=2"
   replace:
   - test:
       if: "$Verbosity!='Terse'"
@@ -160,7 +153,7 @@
 
 - name: default-point
   tag: point
-  match: "count(*)=2 and not(@data-intent-property)"
+  match: "count(*)=2"
   replace:
   - test:
       if: "$Verbosity!='Terse'"
@@ -172,54 +165,12 @@
   - x: "*[2]"
 
 - name: absolute-value
+  # order of speech is different from 'function'
   tag: absolute-value
-  match: "count(*)=1 and not(@data-intent-property)"
+  match: "count(*)=1"
   replace:
   - x: "*[1]"
-  - T: "的"
-  - test:
-      if: "$Verbosity='Terse'"
-      then: [{T: "絕對值"}]      # phrase(the 'absolute value' of a number represents its distance from 0)
-      else: [{T: "絕對值"}]      # phrase('the absolute value of' a number represents its distance from 0)
-  #- test:
-  #    if: "IsNode(*[1], 'leaf') or $Impairment != 'Blindness'"
-  #    then: [{pause: short}]
-  #    else: [{pause: short}, {t: "結束絕對值"}, {pause: short}]      # phrase(show 'end absolute value' position)
-
-- name: negative
-  tag: negative
-  match: "count(*)=1 and not(@data-intent-property)"
-  replace:
-  - bookmark: "./@id"
-  - T: "負"      # phrase('negative' numbers are those less than 0)
-  - x: "*[1]"
-
-- name: positive
-  tag: positive
-  match: "count(*)=1 and not(@data-intent-property)"
-  replace:
-  - bookmark: "./@id"
-  - T: "正"      # phrase(multiplying two negatives results in a 'positive' number)
-  - x: "*[1]"
-
-- name: subscript
-  tag: sub
-  match: "count(*)=2 and not(@data-intent-property)"
-  replace:
-  - x: "*[1]"
-  - T: "下標"      # phrase(the subscripted variable a 'sub' i)
-  - x: "*[2]"
-  - test:
-      if: "not(IsNode(*[2],'leaf'))"
-      then:
-      - test:
-          if: "$Verbosity='Verbose'"
-          then: {T: "結束下標"}      # phrase(this is the 'end subscript' position)
-          else: {T: "結束下標"}      # phrase(this is the 'end sub' position)
-      - pause: short
-      else_test:
-          if: "*[2][self::m:mi]"   # need a pause in "x sub k prime" so the prime is not associated with the 'k'
-          then: [pause: short]
+  - T: "的 絕對值"
 
 - name: bigop-both
   tag: large-op
@@ -239,7 +190,7 @@
 
 - name: bigop-under
   tag: large-op
-  match: "count(*)=2 and not(@data-intent-property)"
+  match: "count(*)=2"
   replace:
   - test:
       if: "$Verbosity!='Terse'"
@@ -261,48 +212,6 @@
   - x: "*[1]"
   - T: "項目"      # phrase(the square root 'of' 25 equals 5)
   - x: "*[2]"
-
-- name: limit
-  tag: limit
-  match: "count(*)=2 and not(@data-intent-property)"
-  replace:
-  - test:
-      if: "$Verbosity!='Terse'"
-      then: [{T: "極限"}]      # phrase('the limit as' indicated by this result)
-      else: [{T: "極限"}]      # phrase(the 'limit as' indicated by this result)
-  - x: "*[2]"
-  - pause: short
-
-- name: vector
-  tag: modified-variable
-  match: "count(*)=2 and *[2][text()='→']"
-  replace:
-  - T: "向量"      # phrase(the 'vector' reflects size and direction)
-  - x: "*[1]"
-
-- name: default
-
-  tag: modified-variable
-  match: "count(*)=2 and not(@data-intent-property)"
-  replace:
-  - x: "*[1]"
-  - x: "*[2]"
-  - pause: short
-
-- name: default
-  # handles single, double, etc., prime
-  tag: [skip-super, say-super]
-  match: "count(*)=2"
-  replace:
-  - x: "*[1]"
-  - test:
-      if: "name(.)='say-super'"
-      then_test:
-        if: "$Verbosity='Terse'"
-        then: {T: "上標"}      # phrase(this is a 'super' set of numbers)
-        else: {T: "上標"}      # phrase(a 'superscript' number indicates raised to a power)
-  - x: "*[2]"
-  - pause: short
 
 - name: msubsup-skip-super
   # handles single, double, etc., prime
@@ -335,15 +244,92 @@
   - x: "*[3]"
   - pause: short
 
+
+# the order of matching is
+# 1. does it match the base of an SI unit
+# 2. does it match an English unit (if in an English language)
+# 3. does it match an SI prefix followed by an SI that accepts SI prefixes
+# Due to this order, some things like "ft" and "cd" mean "feet" vs "femto-tonnes" and "pints" vs "pico-tonnes"
+- name: unit
+  tag: unit
+  match: "$Verbosity != 'Terse' and contains(@data-intent-property, ':unit')"
+  variables:
+    # we need to look at preceding-sibling::*[2] because invisible times should have been added
+    # if in a fraction, only count if we are in the numerator
+  - IsSingular: "(parent::m:mrow and preceding-sibling::*[2][self::m:mn and . = 1]) or  
+                 (ancestor::*[2][self::m:mrow] and parent::m:fraction and
+                  (preceding-sibling::* or parent::*[preceding-sibling::*[2][self::m:mn and . = 1]])
+                 )"
+  - Prefix: "''"
+  - Word: "''"  
+  replace:
+  - bookmark: "@id"
+  - test:
+    # is the whole string match a SI Unit without a prefix?
+    - if: "DefinitionValue(., 'Speech', 'SIUnits') != ''"
+      then:
+      - set_variables: [Word: "DefinitionValue(., 'Speech', 'SIUnits')"]
+    - else_if: "DefinitionValue(., 'Speech', 'UnitsWithoutPrefixes') != ''"
+      then:
+      - set_variables: [Word: "DefinitionValue(., 'Speech', 'UnitsWithoutPrefixes')"]
+    - else_if: "DefinitionValue(., 'Speech', 'EnglishUnits') != ''"
+      then:
+      - set_variables: [Word: "DefinitionValue(., 'Speech', 'EnglishUnits')"]
+
+    # do the first two chars match "da" and the remainder match an SIUnit
+    - else_if: "string-length(.) >= 3 and 
+                substring(., 1, 2) = 'da' and
+                DefinitionValue(substring(., 3), 'Speech', 'SIUnits') != ''"
+      then:
+      - set_variables:
+        - Prefix: "DefinitionValue('da', 'Speech', 'SIPrefixes')"
+        - Word: "DefinitionValue(substring(., 3), 'Speech', 'SIUnits')"
+
+    # does the first char match a prefix and the remainder match an SIUnit
+    - else_if: "string-length(.) >= 2 and 
+                DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes') != ''  and
+                DefinitionValue(substring(., 2), 'Speech', 'SIUnits') != ''"
+      then:
+      - set_variables:
+        - Prefix: "DefinitionValue(substring(., 1, 1), 'Speech', 'SIPrefixes')"
+        - Word: "DefinitionValue(substring(., 2), 'Speech', 'SIUnits')"
+
+    # not a known unit -- just speak the text, possibly as a plural
+    - else:
+      - set_variables:
+        - Word: "text()"
+
+  # somewhat complicated logic to avoid spaces around "-" as in "centi-grams" vs "centi - grams" -- probably doesn't matter
+  - test:
+      if: "$Prefix = ''"
+      then:
+      - test:
+        - if: "$IsSingular"
+          # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets the prefix concatinated to the base
+          then: [x: "$Word"]
+        - else_if: "DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
+          then: [x: "DefinitionValue($Word, 'Speech', 'PluralForms')"]
+          else: [x: "$Word"]
+      else:
+      - x: "$Prefix"
+      - ct: "-"
+      - test:
+        - if: "$IsSingular"
+          # HACK: '\uF8FE' is used internally for the concatenation char by 'ct' -- this gets the prefix concatinated to the base
+          then: [x: "concat('\uF8FE', $Word)"]
+        - else_if: "DefinitionValue($Word, 'Speech', 'PluralForms') != ''"
+          then: [x: "concat('\uF8FE', DefinitionValue($Word, 'Speech', 'PluralForms'))"]
+          else: [x: "concat('\uF8FE', $Word)"]
+
 - name: sin
   tag: mi
-  match: "text()='sin'"
+  match: ".='sin'"
   replace:
   - bookmark: "@id"
   - T: "sine"      # phrase(the 'sine' of the angle)
 - name: cos
   tag: mi
-  match: "text()='cos'"
+  match: ".='cos'"
   replace:
   - bookmark: "@id"
   - test:
@@ -352,7 +338,7 @@
       else: {T: "cosine"}      # phrase(find the 'cosine' in a right-angle triangle)
 - name: tan
   tag: mi
-  match: "text()='tan' or text()='tg'"
+  match: ".='tan' or .='tg'"
   replace:
   - bookmark: "@id"
   - test:
@@ -361,7 +347,7 @@
       else: {T: "tangent"}      # phrase(a 'tangent' is a straight line that touches a curve)
 - name: sec
   tag: mi
-  match: "text()='sec'"
+  match: ".='sec'"
   replace:
   - bookmark: "@id"
   - test:
@@ -370,7 +356,7 @@
       else: {T: "secant"}      # phrase(a 'secant' intersects a curve at two or more points)
 - name: csc
   tag: mi
-  match: "text()='csc'"
+  match: ".='csc'"
   replace:
   - bookmark: "@id"
   - test:
@@ -379,7 +365,7 @@
       else: {T: "cosecant"}      # phrase(the 'cosecant' is the reciprocal of the secant)
 - name: cot
   tag: mi
-  match: "text()='cot'"
+  match: ".='cot'"
   replace:
   - bookmark: "@id"
   - test:
@@ -389,7 +375,7 @@
 
 - name: sinh
   tag: mi
-  match: "text()='sinh'"
+  match: ".='sinh'"
   replace:
   - bookmark: "@id"
   - test:
@@ -398,7 +384,7 @@
       else: {T: "hyperbolic sine"}      # phrase(the 'hyperbolic sine' is used in mathematics)
 - name: cosh
   tag: mi
-  match: "text()='cosh'"
+  match: ".='cosh'"
   replace:
   - bookmark: "@id"
   - test:
@@ -407,7 +393,7 @@
       else: {T: "hyperbolic cosine"}      # phrase(the 'hyperbolic cosine' is a mathematical function)
 - name: tanh
   tag: mi
-  match: "text()='tanh'"
+  match: ".='tanh'"
   replace:
   - bookmark: "@id"
   - test:
@@ -416,7 +402,7 @@
       else: {T: "hyperbolic tangent"}      # phrase('hyperbolic tangent' is a mathematical function)
 - name: sech
   tag: mi
-  match: "text()='sech'"
+  match: ".='sech'"
   replace:
   - bookmark: "@id"
   - test:
@@ -425,7 +411,7 @@
       else: {T: "hyperbolic secant"}      # phrase('hyperbolic secant' is a mathematical function)
 - name: csch
   tag: mi
-  match: "text()='csch'"
+  match: ".='csch'"
   replace:
   - bookmark: "@id"
   - test:
@@ -434,7 +420,7 @@
       else: {T: "hyperbolic cosecant"}      # phrase('hyperbolic cosecant' is a mathematical function)
 - name: coth
   tag: mi
-  match: "text()='coth'"
+  match: ".='coth'"
   replace:
   - bookmark: "@id"
   - test:
@@ -442,70 +428,21 @@
       then: {T: "cotanch"}      # phrase('cotanch' is shorthand for hyperbolic cotangent)
       else: {T: "hyperbolic cotangent"}      # phrase(the 'hyperbolic cotangent' is a mathematical function)
 
-- # handle both log and ln
-  name: log
-  tag: mrow
-  variables: [{log_is_simple: "IsNode(*[3],'simple')"}]
-  match:
-  - "count(*)=3 and"
-  - "*[1][self::m:mi][text()='log' or text()='ln'] and"
-  - "*[2][self::m:mo][text()='⁡']"
-  replace:
-  - bookmark: "*[1]/@id"
-  - test:
-      if: "$log_is_simple"
-      then_test:
-      - if: "*[1][text()='log']"
-        then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
-      - else_if: "$Verbosity='Terse'"
-        then: [{SPELL: "'ln'"}]
-        else: [{SPELL: "'ln'"}]      # phrase(the 'natural log' function is used in mathematics)
-      else:
-      - test:
-          if: "$Verbosity!='Terse' and not(log_is_simple)"
-          then: {T: ""}      # phrase('the' square root of 25 equals 5)
-      - test:
-        - if: "*[1][text()='log']"
-          then: [{T: "log"}]      # phrase(the 'log' function is used in mathematics)
-        - else_if: "$Verbosity='Terse'"
-          then: [{SPELL: "'ln'"}]
-          else: [{SPELL: "'ln'"}]      # phrase(the 'natural log' function is used in mathematics)
-      - T: ""      # phrase(5 is the square root 'of' 25)
-      - pause: short
-  - x: "*[3]"
-
-- name: log-base
-  tag: log-base
-  match: "not(@data-intent-property)"
+-
+  name: log    # handle both log and ln (if in an mrow, 'intents' are used)
+  tag: mi
+  match: ".= 'log' or .= 'ln'"
   replace:
   - bookmark: "@id"
   - test:
-      if: "$Verbosity!='Terse'"
-      then: {T: ""}      # phrase('the' square root of 25 equals 5)
-  - T: "log 底"      # phrase(the 'log base' is often base 10)
-  - x: "*[1]"
-
-- name: log-base-power
-  tag: log-base-power
-  match: "not(@data-intent-property)"
-  replace:
-  - bookmark: "@id"
+    - if: "$Verbosity!='Terse'"
+      then: [T: ""]      # phrase('the' logarithm function is used in mathematics)
   - test:
-      if: "$Verbosity!='Terse'"
-      then: {T: ""}      # phrase('the' square root of 25 equals 5)
-  - T: "log 底"      # phrase(the 'log base' is often base 10)
-  - x: "*[1]"
-  - pause: medium
-  - test:
-      - if: "*[2][text()=2]"
-        then: [T: "平方"]     
-      - else_if: "*[2][text()=3]"
-        then: [T: "立方"]
-        else:  # don't bother with special cases as this isn't likely to happen
-        - T: "的"      # phrase(x 'raised to the' second power)
-        - x: "*[2]"
-        - T: "次方"      # phrase(x raised to the second 'power')
-  - pause: short
+    - if: ".= 'log'"
+      then: [T: "log"]      # phrase(the 'log' function is used in mathematics)
+    - else_if: "$Verbosity='Terse'"
+      then: [{SPELL: "'ln'"}]
+      else: [{SPELL: "'ln'"}]      # phrase(the 'natural log' function is used in mathematics)
 
 - name: multi-line
   #   that eliminates the need for the if: else_if: ...
@@ -542,6 +479,7 @@
       else_test:
         if: "$LineCount != 1"
         then:
+        - pause: medium
         - test:
           - if: "parent::m:piecewise"
             then: [{T: "情況"}]     # phrase('case' 1 of 10 cases)
@@ -727,7 +665,7 @@
 - name: default-matrix
   tag: [matrix, determinant]
   variables: [{IsColumnSilent: "$SpeechStyle = 'ClearSpeak' and $ClearSpeak_Matrix = 'SilentColNum'"}]
-  match: "not(@data-intent-property)"
+  match: "."
   replace:
   - T: ""      # phrase('the' 1 by 2 matrix M)
   - x: "count(*)"
@@ -751,7 +689,7 @@
 - name: chemistry-msub
 
   tag: [chemical-formula]
-  match: "*[1][text()='msub']"
+  match: "*[1][.='msub']"
   replace:
   - x: "*[2]"
   - test:
@@ -764,7 +702,7 @@
 
 - name: chemistry-msup
   tag: [chemical-formula]
-  match: "count(*)=3 and *[1][text()='msup']"
+  match: "count(*)=3 and *[1][.='msup']"
   replace:
   - x: "*[2]"
   - test:
@@ -775,7 +713,7 @@
         then: [{T: "上標"}]      # phrase(H 'super' 2)
   - x: "*[3]"
   - test:
-      if: "following-sibling::*[1][text()='+' or text()='-']" # a little lazy -- assumes chemistry superscripts end with + or -
+      if: "following-sibling::*[1][.='+' or .='-']" # a little lazy -- assumes chemistry superscripts end with + or -
       then: [{pause: medium}]
 
 -
@@ -944,7 +882,7 @@
                       - x: "$Postscripts[8]"
                       - pause: "short"
       - test:
-          if: "$Postscripts[last()][not(self::m:none)] and following-sibling::*[1][text()='+' or text()='-']"
+          if: "$Postscripts[last()][not(self::m:none)] and following-sibling::*[1][.='+' or .='-']"
           then: [{pause: medium}]
 
 - name: chemistry
@@ -985,13 +923,13 @@
   # FIX: this might be better/more efficient if in unicode.yaml
   - bookmark: "@id"
   - test:
-    - if: "text()='-' or text() = ':'"
+    - if: ".='-' or .=':'"
       then: [{T: "單鍵"}]      # phrase(a 'single bond' is formed when two atoms share one pair of electrons)
-    - else_if: "text()='=' or text() = '∷'"
+    - else_if: ".='=' or .='∷'"
       then: [{T: "雙鍵"}]      # phrase(a 'double bond' may occur when two atoms share two pairs of electrons)
-    - else_if: "text()='≡'"
+    - else_if: ".='≡'"
       then: [{T: "三鍵"}]      # phrase(a 'triple bond' occurs when two atoms share three pairs of electrons)
-    - else_if: "text()='≣'"
+    - else_if: ".='≣'"
       then: [{T: "四鍵"}]      # phrase(a 'quadruple bond' occurs when two atoms share four pairs of electrons)
       else: [{x: "text()"}]
 

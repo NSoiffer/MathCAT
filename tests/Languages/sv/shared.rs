@@ -36,7 +36,7 @@ fn limit() {
             </mfrac>
             </mrow>
         </math>";
-    test("sv", "SimpleSpeak", expr, "gränsvärdet då x går mot 0, av, division, sinus av x, genom x, slut division;");
+    test("sv", "SimpleSpeak", expr, "gränsvärdet då x går mot 0, av, division, sinus av x, genom x, slut division");
 }
 
 #[test]
@@ -57,7 +57,7 @@ fn limit_from_below() {
 #[test]
 fn binomial_mmultiscripts() {
     let expr = "<math><mmultiscripts><mi>C</mi><mi>m</mi><none/><mprescripts/><mi>n</mi><none/></mmultiscripts></math>";
-    test("sv", "SimpleSpeak", expr, ", n över m");
+    test("sv", "SimpleSpeak", expr, "n över m");
 }
 
 
@@ -85,9 +85,9 @@ fn tensor_mmultiscripts() {
             <mi>R</mi> <mi>i</mi><none/> <none/><mi>j</mi> <mi>k</mi><none/> <mi>l</mi><none/> 
         </mmultiscripts></math>";
     test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-            "versal r med 4 höger índex, nedsänkt i upphöjt j nedsänkt k nedsänkt l");
+            "versal r med 4 höger index, nedsänkt i upphöjt j nedsänkt k nedsänkt l");
     test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Medium")], expr,
-            "versal r med 4 höger índex, nedsänkt i upphöjt j nedsänkt k nedsänkt l");
+            "versal r med 4 höger index, nedsänkt i upphöjt j nedsänkt k nedsänkt l");
 }
 
 #[test]
@@ -97,13 +97,13 @@ fn huge_num_mmultiscripts() {
             <mprescripts/> <mi>I</mi><none/> <none/><mi>J</mi> <mi>K</mi><none/> <mi>L</mi><none/>
         </mmultiscripts></math>";
     test_prefs("sv", "SimpleSpeak", vec![("Verbosity", "Verbose")], expr,
-            "versal r med 4 vänster index, nedsänkt versal i, upphöjt versal j och resterande vänster index versal k none versal l none slut vänster index och med 5 höger índex, nedsänkt i upphöjt j nedsänkt k nedsänkt l och resterande höger index m none slut index");
+            "versal r med 4 vänster index, nedsänkt versal i, upphöjt versal j och resterande vänster index versal k none versal l none slut vänster index och med 5 höger index, nedsänkt i upphöjt j nedsänkt k nedsänkt l och resterande höger index m none slut index");
 }
 
 #[test]
 fn prime() {
     let expr = "<math> <msup><mi>x</mi><mo >&#x2032;</mo></msup> </math>";
-    test("sv", "SimpleSpeak", expr, "x prim,");
+    test("sv", "SimpleSpeak", expr, "x prim");
 }
 
 #[test]
@@ -128,14 +128,14 @@ fn simple_msubsup() {
             </msubsup>
             </mstyle>
         </math>";
-    test("sv", "ClearSpeak", expr, "x nedsänkt k, upphöjt till i,");
+    test("sv", "ClearSpeak", expr, "x nedsänkt k upphöjt till i");
 }
 
 #[test]
 fn non_simple_msubsup() {
     let expr = "<math><msubsup><mi>i</mi><mrow><mi>j</mi><mo>&#x2212;</mo><mn>2</mn></mrow><mi>k</mi></msubsup></math>";
-    test("sv", "SimpleSpeak", expr, "i nedsänkt j minus 2 slut nedsänkt, upphöjt till k,");
-    test("sv", "ClearSpeak", expr, "i nedsänkt j minus 2 slut nedsänkt, upphöjt till k,");
+    test("sv", "SimpleSpeak", expr, "i nedsänkt j minus 2 slut nedsänkt, upphöjt till k");
+    test("sv", "ClearSpeak", expr, "i nedsänkt j minus 2 slut nedsänkt, upphöjt till k");
 }
 
 #[test]
@@ -156,7 +156,7 @@ fn presentation_mathml_in_semantics() {
             </annotation-xml>
         </semantics>
     </math>";
-    test("sv", "ClearSpeak", expr, "x nedsänkt k, upphöjt till i,");
+    test("sv", "ClearSpeak", expr, "x nedsänkt k upphöjt till i");
 }
 
 #[test]
@@ -243,7 +243,7 @@ fn ignore_comma() {
       </mstyle>
     </mrow>
 </math>";
-    test("sv", "SimpleSpeak", expr, "fi av x lika med, c, e upphöjt till minus h kvadrat x kvadrat");
+    test("sv", "SimpleSpeak", expr, "fi av x lika med; c gånger, e upphöjt till minus h kvadrat, x kvadrat");
 }
 
 #[test]

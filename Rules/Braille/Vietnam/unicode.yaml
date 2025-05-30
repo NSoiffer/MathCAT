@@ -87,7 +87,7 @@
  - "%": [T: "⠼⠚⠴"]                # 0x25 (Percent sign) No dots 46 before as in UEB
  - "&": [t: "⠈⠯"]               # 0x26 (Ampersand)
  - "*": [T: "⠐⠦"]               # 0x002A (Asterisk)
- - "/": [T: "⠐⠌"]               # 0x002F (Solidus (slash))
+ - "/": [T: "⠐⠲"]               # 0x002F (Solidus (slash))
  - ";": [t: "c⠆"]               # 0x003B (Semicolon)
  - "?": [T: "c⠢"]               # 0x003F (Question mark)
  - "@": [T: "⠈⠁"]               # 0x0040 (Commercial at sign)
@@ -289,7 +289,7 @@
     - test:
         if:
         - "ancestor::*[2][IsBracketed(., '{', '}')] or "       # field extension
-        - "preceding-sibling::*[2][text()=':'] or following-sibling::*[2][text()=':'] or"  # trilinear form
+        - "preceding-sibling::*[2][.=':'] or following-sibling::*[2][.=':'] or"  # trilinear form
           # ratios tend to have similar left and right sides
         - "name(preceding-sibling::*[1]) = name(following-sibling::*[1]) or"
           # am/pm test
@@ -322,7 +322,7 @@
         #- "           (self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '') or "
         #- "           (self::m:mrow and translate(*[last()], 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ', '') = '')] and"
         #- "  following::*[1][self::m:mrow and count(*)=3 and "   # look for function apply
-        #- "     *[2][text()='⁡'] and *[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']]" 
+        #- "     *[2][.='⁡'] and *[1][self::m:mi and translate(., 'abcdefghijklmnopqrstuvwxyz', '') = '']]" 
         #then: [t: "W"]
         #else: [t: ""]
  - "⁣": [t: ""]                 # 0x2063⁡ (invisible separator)
@@ -605,7 +605,8 @@
  - "≊": [T: "⠐⠢⠢⠶"]
  - "⋮": [T: "⠣⠴⠜"]          # 0x22ee (vertical ellipsis used to indicate dividable)
  - "⧵": [T: "⠸⠡"]          
- - "∕": [T: "⠐⠌"]
- - "⊘": [T: "⠐⠌"]
+ - "∕": [T: "⠐⠲"]
+ - "⊘": [T: "⠐⠲"]
+ - "⁄": [T: "⠐⠲"]
  - "℃": [T: "⠔⠚⠀⠨⠉"]
  - "℉": [T: "⠔⠚⠀⠨⠋"]

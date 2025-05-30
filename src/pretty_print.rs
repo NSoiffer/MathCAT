@@ -3,7 +3,7 @@
 
 use sxd_document::dom::*;
 
-#[allow(dead_code)]
+// #[allow(dead_code)]
 // pub fn pp_doc(doc: &Document) {
 //     for root_child in doc.root().children() {
 //         if let ChildOfRoot::Element(e) = root_child {
@@ -14,13 +14,13 @@ use sxd_document::dom::*;
 // }
 
 /// Pretty-print the MathML represented by `element`.
-pub fn mml_to_string(e: &Element) -> String {
+pub fn mml_to_string(e: Element) -> String {
     return format_element(e, 0);
 }
 
 /// Pretty-print the MathML represented by `element`.
 /// * `indent` -- the amount of indentation to start with
-pub fn format_element(e: &Element, indent: usize) -> String {
+pub fn format_element(e: Element, indent: usize) -> String {
     // let namespace = match e.name().namespace_uri() {
     //     None => "".to_string(),
     //     Some(prefix) => prefix.to_string() + ":",
@@ -47,7 +47,7 @@ pub fn format_element(e: &Element, indent: usize) -> String {
         // recurse on each Element child
         for c in e.children() {
             if let ChildOfElement::Element(e) = c {
-                answer += &format_element(&e, indent+1);
+                answer += &format_element(e, indent+1);
             }
         }
     }
@@ -83,8 +83,8 @@ fn handle_special_chars(text: &str) -> String {
 }
 
 
-/// Pretty print an xpath value.
-/// If the value is a `NodeSet`, the MathML for the node/element is returned.
+// /// Pretty print an xpath value.
+// /// If the value is a `NodeSet`, the MathML for the node/element is returned.
 // pub fn pp_xpath_value(value: Value) {
 //     use sxd_xpath::Value;
 //     use sxd_xpath::nodeset::Node;
@@ -271,7 +271,7 @@ fn escape_str(wr: &mut dyn fmt::Write, v: &str) -> Result<(), fmt::Error> {
 }
 
 impl<'a> YamlEmitter<'a> {
-    pub fn new(writer: &'a mut dyn fmt::Write) -> YamlEmitter {
+    pub fn new(writer: &'a mut dyn fmt::Write) -> YamlEmitter<'a> {
         YamlEmitter {
             writer,
             best_indent: 2,
@@ -476,8 +476,7 @@ fn need_quotes(string: &str) -> bool {
 
     string.is_empty()
         || need_quotes_spaces(string)
-        || string.starts_with(|character: char| matches!(character,
-            '&' | '*' | '?' | '|' | '-' | '<' | '>' | '=' | '!' | '%' | '@') )
+        || string.starts_with(['&', '*', '?', '|', '-', '<', '>', '=', '!', '%', '@'])
         || string.contains(|character: char| matches!(character,
             ':'
             | '{'

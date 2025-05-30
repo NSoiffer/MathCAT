@@ -7,6 +7,262 @@
 # - name: [] "...", "..." "..." ]
 
 
+# If an "intent" is used, the 'terse:medium:verbose' speech for the intent name is given here for a prefix||infix||postfix||function fixity
+# If only one ":" is used, it the first part is used for 'terse' and the second part is used for 'medium' and 'verbose'
+# If no ":"s are used, the same speech is used for all forms
+# If bracketing words make sense, they are separated with ";"s
+# Intent mappings must specify whether they are "prefix", "infix", "postfix", or "function" with an "=" sign
+# If there are multiple fixities (e.g., see transpose), they are separated with "||
+#   for readability, spaces can be used around any of the delimiter characters
+# Note: if there are multiple fixities, the first one is used if the fixity is not given in the intent
+- IntentMappings: {
+    "indexed-by": "infix= ; subíndice; final del subíndice",
+    "modified-variable": "silent= ",
+    "say-super": "infix=superíndice",   # used with 'mo' for superscripts (e.g, "<")
+    "skip-super": "silent=",   # used with 'mo' for superscripts (e.g, "*")
+
+    "absolute-value": "function= ; valor absoluto: el valor absoluto de: el valor absoluto de; final del valor absoluto",
+    "binomial": "infix=binomial; elegir; end binomial",
+    "limit": "prefix=límite cuando",
+    "lim-sup": "prefix=lim sup as: the limit superior as: the limit superior as",
+    "lim-inf": "prefix=lim inf as: the limit inferior as : the limit inferior as",
+    "logarithm-with-base": "prefix=log base: el log base: el log base",
+    "minus": "infix=menos || prefix=negativo",
+    "plus": "infix=más || prefix=positivo",
+
+    "transpose": "postfix=intercambiar || function=intercambiar",
+    "norm": "function=; regla: regla: la regla; fin de la regla",
+    "trace": "function=;traza : traza de: la traza de; fin de la traza",
+    "dimension": "function=; dimensión : dimensión de: la dimensión de; fin de la dimensión",
+    "homomorphism": "function= ; homomorfismo : homomorfismo de: el homomorfismo de; find de el homomorfismo",
+    "kernel": "function= ; núcleo : núcleo de: el núcleo de; fin de el núcleo",
+    "vector": "function= ; vector || prefix=vector",
+    "cross-product": "infix=cross: cross product: cross product",
+    "dot-product": "infix=dot: dot product: dot:dot product",
+
+    "divergence": "function= ; div: divergence: divergence; end divergence",
+    "curl": "function= ; curl; end curl",
+    "gradient": "function= ; grad: gradient: gradient; end gradient",
+    "laplacian": "function=lahplahsian",   # speech engines don't do a good job with "laplacian"
+
+    "chemistry-concentration": "function= ; concentración: concentración de: la concentración de; fin de la concentración",
+  }
+
+- NavigationParts: {
+    "large-op": "base; lower limit; upper limit",
+    "mfrac": "numerator;denominator",
+    "fraction": "numerator;denominator",
+    "msqrt": "root",
+    "square-root": "root",
+    "mroot": "root;root index",
+    "root": "root;root index",
+    "msub": "base;subscript",
+    "sub": "base;subscript",
+    "msup": "base;superscript",
+    "say-super": "base;superscript",
+    "skip-super": "base;superscript",
+    "power": "base;exponent",
+    "msubsup": "base;subscript;superscript",
+    "munder": "base;under limit",
+    "mover": "base;upper limit",
+    "munderover": "base;under limit;upper limit",
+
+    # words for moving into and out of one of the parts (e.g., "move right 'out of' numerator, 'in' denominator")
+    # it's a hack to put them here, but at least they are grouped with the other navigation parts
+    "in": "in",
+    "out": "out of",
+  }
+
+- SIPrefixes: {
+    "Q": "quetta", "R": "ronna", "Y": "yotta", "Z": "zetta", "E": "exa", "P": "peta", "T": "tera", "G": "giga", "M": "mega", "k": "kilo", "h": "hecto", "da": "deka",
+    "d": "deci", "c": "centi", "m": "mili", "µ": "micro", "n": "nano", "p": "pico", "f": "femto", "a": "atto", "z": "zepto", "y": "yocto", "r": "ronto", "q": "quecto"
+  }
+
+# this is a list of all units that accept SIPrefixes
+# from www.bipm.org/documents/20126/41483022/SIBrochure-9-EN.pdf
+#   Prefixes may be used with any of the 29 SI units with special names
+#   The SI prefixes can be used with several of accepted units, but not, for example, with the non-SI units of time.
+- SIUnits: {
+    # base units
+    "A": "amperio",
+    "cd": "candela",
+    "K": "grado kelvin", "K": "grado kelvin", # U+212A
+    "g": "gramo",
+    "m": "metro",     # British spelling works for US also
+    "mol": "mol",
+    "s": "segundo", "sec": "segundo",  # "sec" not actually legal
+
+    # derived units
+    "Bq": "becquerel",
+    "C": "culombio",
+    "°C": "grado Celsius", "℃": "grado Celsius",  # should only take negative powers
+    "F": "faradio",
+    "Gy": "gray",
+    "H": "henrio",
+    "Hz": "hercio",
+    "J": "julio",
+    "kat": "katal",
+    "lm": "lumen",
+    "lx": "lux",
+    "N": "newton",
+    "Ω": "ohmio", "Ω": "ohmio",       # Greek Cap letter, U+2126 OHM SIGN
+    "Pa": "pascal",
+    "S": "siemens",
+    "Sv": "sievert",
+    "T": "tesla",
+    "V": "voltio",
+    "W": "vatio",
+    "Wb": "weber",
+
+    # accepted (plus a few variants) that take SI prefixes
+    "l": "litro", "L": "litro", "ℓ": "litro", # Should only take negative powers; British spelling works for US also
+    "t": "tonelada",             # should only take positive powers
+    "Da": "dalton",
+    "Np": "néper",               # should only take negative powers
+    "u": "unidad de masa atómica",     # 'u' is correct: https://en.wikipedia.org/wiki/Dalton_(unit)
+    "eV": "electronvoltio",
+    "rad": "radián",             # should only take negative powers
+    "sr": "estereorradián",      # should only take negative powers
+
+    # others that take a prefix
+    "a": "año",                 # should only take positive powers
+    "as": "segundo de arco",    # see en.wikipedia.org/wiki/Minute_and_second_of_arc
+
+    # technically wrong, but used in practice with SI Units (and only positive powers)
+    "b": "bit",                 # should only take positive powers
+    "B": "byte",                # should only take positive powers
+    "Bd": "baudio",             # should only take positive powers
+  }
+
+
+- UnitsWithoutPrefixes: {
+    # time
+    "″": "segundo", "\"": "segundo", 
+    "′": "minuto", "'": "minuto","min": "minuto",
+    "h": "hora", "hr": "hora", "Hr": "hora",
+    "d": "día", "dy": "día",
+    "w": "semana", "wk": "semana",
+    "y": "año", "yr": "año",    
+
+    # angles
+    "°": "grado", "deg": "grado", # should only take negative powers
+    "arcmin": "minuto de arco",
+    "amin": "minuto de arco",
+    "am": "minuto de arco",
+    "MOA": "minuto de arco",
+    "arcsec": "segundo de arco",
+    "asec": "segundo de arco",
+
+    # distance
+    "au": "unidad astronómica", "AU": "unidad astronómica",
+    "ltyr": "año luz", "ly": "año luz",
+    "pc": "parsec",
+    "Å": "ángstrom", "Å": "ángstrom",           # U+00C5 and U+212B
+    "fm": "fermio",
+
+    # others
+    "ha": "hectárea",
+    # "B": "belio",    # "B" more commonly means bytes
+    "dB": "decibelio", # already logarithmic, so not used with SI prefixes
+
+    "atm": "atmósfera",
+    "amu": "unidad de masa atómica",
+    "bar": "bar",
+    "cal": "caloría",
+    "Ci": "curio",
+    "grad": "gradián",
+    "M": "molar",
+    "R": "roentgen",
+    "rpm": "revolución por minuto",
+    "℧": "mho",
+    "dyn": "dina",
+    "erg": "ergio",
+
+    # special case overrides because prefixes with the base "metro" all get accents
+    "Qm": "quettámetro", "Rm": "ronnámetro", "Ym": "yottámetro", "Zm": "zettámetro", "Em": "exámetro", "Pm": "petámetro",
+      "Tm": "terámetro", "Gm": "gigámetro", "Mm": "megámetro", "km": "kilómetro", "hm": "hectómetro", "dam": "dekámetro",
+    "dm": "decímetro", "cm": "centímetro", "mm": "milímetro", "µm": "micrómetro", "nm": "nanómetro", "pm": "picómetro",
+    #  conflicts: "fm": "femtómetro", "am": "attómetro",
+    "zm": "zeptómetro", "ym": "yoctómetro", "rm": "rontómetro", "qm": "quectómetro",
+  
+    # powers of 2 used with bits and bytes
+    "Kib": "kibibit", "Mib": "mebibit", "Gib": "gibibit", "Tib": "tebibit", "Pib": "pebibit", "Eib": "exbibit", "Zib": "zebibit", "Yib": "yobibit",
+    "KiB": "kibibyte", "MiB": "mebibyte", "GiB": "gibibyte", "TiB": "tebibyte", "PiB": "pebibyte", "EiB": "exbibyte", "ZiB": "zebibyte", "YiB": "yobibyte",
+  }
+
+
+  # this will only be used if the language is English, so it can be empty for other countries
+- EnglishUnits: {
+    # length
+    "in": "inch",
+    "ft": "foot",
+    "mi": "mile",
+    "rd": "rod",
+    "li": "link",
+    "ch": "chain",
+
+    # area
+    "sq in": "square inch", "sq. in": "square inch", "sq. in.": "square inch",
+    "sq ft": "square foot", "sq. ft": "square foot", "sq. ft.": "square foot",
+    "sq yd": "square yard", "sq. yd": "square yard", "sq. yd.": "square yard",
+    "sq mi": "square mile", "sq. mi": "square mile", "sq. mi.": "square mile",
+    "ac": "acre",
+    "FBM": "board foot",
+
+    # volume
+    "cu in": "cubic inch", "cu. in": "cubic inch", "cu. in.": "cubic inch",
+    "cu ft": "cubic foot", "cu. ft": "cubic foot", "cu. ft.": "cubic foot",
+    "cu yd": "cubic yard", "cu. yd": "cubic yard", "cu. yd.": "cubic yard",
+    "bbl": "barrel", "BBL": "barrel",
+    "pk": "peck",
+    "bu": "bushel",
+    "tsp": "teaspoon",
+    "tbl": "tablespoon",
+
+    # liquid
+    "fl dr": "fluid drams",
+    "fl oz": "fluid ounce",
+    "gi": "gill",
+    "cp": "cup", "cup": "cup",
+    "pt": "pint",
+    "qt": "quart",
+    "gal": "gallon",
+
+    # weight
+    "gr": "grain",
+    "dr": "dram",
+    "oz": "ounce", "℥": "ounce",
+    "lb": "pound",
+    "cwt": "hundredweight",
+    "dwt": "pennyweight",
+    "oz t": "troy ounce",
+    "lb t": "troy pound",
+
+    # energy
+    "hp": "horsepower",
+    "BTU": "BTU",
+    "°F": "degree fahrenheit", "℉": "degree fahrenheit",
+
+    # other
+    "mph": "mile per hour",
+    "mpg": "mile per gallon",
+  }
+
+- PluralForms: {
+  # FIX: this needs to be flushed out
+    "lumen": "lúmenes",
+    "kelvin": "kelvin",
+    "grado Celsius": "grados Celsius",
+    "grado Fahrenheit": "grados Fahrenheit",
+
+    "inch": "inches", "square inch": "square inches", "cubic inch": "cubic inches",
+    "foot": "feet", "square foot": "square feet", "cubic foot": "cubic feet",
+    "board foot": "board feet",
+    "hertz": "hertz",
+    "siemens": "siemens",
+    "revolution per minute": "revolutions per minute",
+  }
+
 # ----------------  Cardinal and Ordinal Numbers  --------------------------
 # The following definitions are used to convert numbers to words
 # The are mainly used for ordinals, of which there are two cases:

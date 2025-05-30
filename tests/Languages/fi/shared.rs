@@ -36,7 +36,7 @@ fn limit() {
             </mfrac>
             </mrow>
         </math>";
-    test("fi", "SimpleSpeak", expr, "raja-arvo kun x lähestyy 0; arvolla, murtoluku, sini arvolla x, per x, loppu murtoluku;");
+    test("fi", "SimpleSpeak", expr, "raja-arvo kun x lähestyy 0; arvolla, murtoluku, sini arvolla x, per x, loppu murtoluku");
 }
 
 #[test]
@@ -103,7 +103,7 @@ fn huge_num_mmultiscripts() {
 #[test]
 fn prime() {
     let expr = "<math> <msup><mi>x</mi><mo >&#x2032;</mo></msup> </math>";
-    test("fi", "SimpleSpeak", expr, "x pilkku,");
+    test("fi", "SimpleSpeak", expr, "x pilkku");
 }
 
 #[test]
@@ -128,7 +128,7 @@ fn simple_msubsup() {
             </msubsup>
             </mstyle>
         </math>";
-    test("fi", "ClearSpeak", expr, "x ala k, potenssiin i");
+    test("fi", "ClearSpeak", expr, "x ala k potenssiin i");
 }
 
 #[test]
@@ -156,7 +156,7 @@ fn presentation_mathml_in_semantics() {
             </annotation-xml>
         </semantics>
     </math>";
-    test("fi", "ClearSpeak", expr, "x ala k, potenssiin i");
+    test("fi", "ClearSpeak", expr, "x ala k potenssiin i");
 }
 
 #[test]
@@ -243,7 +243,7 @@ fn ignore_comma() {
       </mstyle>
     </mrow>
 </math>";
-    test("fi", "SimpleSpeak", expr, "suora fii arvolla x, on yhtä suuri kuin; c, e potenssiin negatiivinen h toiseen, x toiseen");
+    test("fi", "SimpleSpeak", expr, "suora fii arvolla x, on yhtä suuri kuin; c kertaa, e potenssiin negatiivinen h toiseen, x toiseen");
 }
 
 #[test]
@@ -370,8 +370,8 @@ fn FinME_difference_quotinent() {
     </mfrac>
   </mrow>
 </math>";
-test("fi", "ClearSpeak", expr, "iso d f arvolla a; on yhtä suuri kuin, f pilkku, arvolla a, on yhtä suuri kuin; murtoluku osoittaja; f arvolla x, miinus f arvolla a; ja nimittäjä x miinus a; on yhtä suuri kuin; raja-arvo kun h lähestyy 0; arvolla; murtoluku osoittaja; f arvolla, auki sulku a plus h, kiinni sulku; miinus f arvolla a; ja nimittäjä h;");
-test("fi", "SimpleSpeak", expr, "iso d f arvolla a; on yhtä suuri kuin, f pilkku, arvolla a, on yhtä suuri kuin; raja-arvo kun x lähestyy a; arvolla; murtoluku, f arvolla x, miinus f arvolla a, per, x miinus a, loppu murtoluku; on yhtä suuri kuin; raja-arvo kun h lähestyy 0; arvolla; murtoluku, f arvolla, auki sulku a plus h, kiinni sulku; miinus f arvolla a, per h, loppu murtoluku;");
+test("fi", "ClearSpeak", expr, "iso d f arvolla a; on yhtä suuri kuin, f pilkku, arvolla a, on yhtä suuri kuin; murtoluku osoittaja; f arvolla x, miinus f arvolla a; ja nimittäjä x miinus a; on yhtä suuri kuin; raja-arvo kun h lähestyy 0; arvolla; murtoluku osoittaja; f arvolla, auki sulku a plus h, kiinni sulku; miinus f arvolla a; ja nimittäjä h");
+test("fi", "SimpleSpeak", expr, "iso d f arvolla a; on yhtä suuri kuin, f pilkku, arvolla a, on yhtä suuri kuin; raja-arvo kun x lähestyy a; arvolla; murtoluku, f arvolla x, miinus f arvolla a, per, x miinus a, loppu murtoluku; on yhtä suuri kuin; raja-arvo kun h lähestyy 0; arvolla; murtoluku, f arvolla, auki sulku a plus h, kiinni sulku; miinus f arvolla a, per h, loppu murtoluku");
 }
 
 #[test]
@@ -402,8 +402,8 @@ fn FinME_Quadratic_equation() {
     </mfrac>
   </math>
   ";
-    test("fi", "ClearSpeak", expr ,"x on yhtä suuri kuin; murtoluku osoittaja; negatiivinen b plus-miinus; neliöjuuri b toiseen miinus 4 a b; ja nimittäjä 2 a;");
-    test("fi", "SimpleSpeak", expr, "x on yhtä suuri kuin; murtoluku, negatiivinen b plus-miinus; neliöjuuri b toiseen miinus 4 a b loppu juuri; per, 2 a, loppu murtoluku;")
+    test("fi", "ClearSpeak", expr ,"x on yhtä suuri kuin; murtoluku osoittaja; negatiivinen b plus-miinus; neliöjuuri b toiseen miinus 4 a b; ja nimittäjä 2 a");
+    test("fi", "SimpleSpeak", expr, "x on yhtä suuri kuin; murtoluku, negatiivinen b plus-miinus; neliöjuuri b toiseen miinus 4 a b loppu juuri; per, 2 a, loppu murtoluku")
 }
 
 #[test]
@@ -475,8 +475,8 @@ fn FinME_triangle_inequality() {
     <mo>|</mo>
   </math>
     ";
-    test("fi", "ClearSpeak", expr, "itseisarvo itseisarvo a, miinus itseisarvo b; on pienempi tai yhtä suuri kuin; itseisarvo a plus b; on pienempi tai yhtä suuri kuin; itseisarvo a, plus itseisarvo b,");
-    test("fi", "SimpleSpeak", expr, "itseisarvo itseisarvo a, miinus itseisarvo b; loppu itseisarvo; on pienempi tai yhtä suuri kuin; itseisarvo a plus b, loppu itseisarvo; on pienempi tai yhtä suuri kuin; itseisarvo a, plus itseisarvo b,");
+    test("fi", "ClearSpeak", expr, "itseisarvo itseisarvo a, miinus itseisarvo b; on pienempi tai yhtä suuri kuin; itseisarvo a plus b; on pienempi tai yhtä suuri kuin; itseisarvo a, plus itseisarvo b");
+    test("fi", "SimpleSpeak", expr, "itseisarvo itseisarvo a, miinus itseisarvo b; loppu itseisarvo; on pienempi tai yhtä suuri kuin; itseisarvo a plus b, loppu itseisarvo; on pienempi tai yhtä suuri kuin; itseisarvo a, plus itseisarvo b");
 }
 
 #[test]
@@ -519,8 +519,8 @@ fn FinME_arithmetic_sum() {
     </mrow>
   </math>
     ";
-    test("fi", "ClearSpeak", expr, "a ala 1 plus a ala 2 plus piste piste piste plus a ala n; on yhtä suuri kuin; n; murtoluku osoittaja; a ala 1 plus a ala 2; ja nimittäjä 2;");
-    test("fi", "SimpleSpeak", expr, "a ala 1 plus a ala 2 plus piste piste piste plus a ala n; on yhtä suuri kuin; n; murtoluku, a ala 1 plus a ala 2, per 2, loppu murtoluku;")
+    test("fi", "ClearSpeak", expr, "a ala 1 plus a ala 2 plus piste piste piste plus a ala n; on yhtä suuri kuin; n; murtoluku osoittaja; a ala 1 plus a ala 2; ja nimittäjä 2");
+    test("fi", "SimpleSpeak", expr, "a ala 1 plus a ala 2 plus piste piste piste plus a ala n; on yhtä suuri kuin; n; murtoluku, a ala 1 plus a ala 2, per 2, loppu murtoluku")
 }
 
 #[test]
@@ -592,8 +592,8 @@ fn FinME_geometric_sum() {
       </mfrac>
     </math>
     ";
-    test("fi", "ClearSpeak", expr, "iso s ala n on yhtä suuri kuin; a ala 1 plus a ala 1 q plus a ala 1 q toiseen, plus piste piste piste plus, a ala 1 q potenssiin n miinus 1; on yhtä suuri kuin; a ala 1 kertaa; murtoluku osoittaja; 1 miinus q potenssiin n; ja nimittäjä 1 miinus q;");
-    test("fi", "SimpleSpeak", expr, "iso s ala n on yhtä suuri kuin; a ala 1 plus a ala 1 q plus a ala 1 q toiseen, plus piste piste piste plus, a ala 1 q potenssiin n miinus 1; on yhtä suuri kuin; a ala 1 kertaa; murtoluku, 1 miinus q potenssiin n, per, 1 miinus q, loppu murtoluku;")
+    test("fi", "ClearSpeak", expr, "iso s ala n on yhtä suuri kuin; a ala 1 plus a ala 1 q plus a ala 1 q toiseen, plus piste piste piste plus, a ala 1 q potenssiin n miinus 1; on yhtä suuri kuin; a ala 1 kertaa; murtoluku osoittaja; 1 miinus q potenssiin n; ja nimittäjä 1 miinus q");
+    test("fi", "SimpleSpeak", expr, "iso s ala n on yhtä suuri kuin; a ala 1 plus a ala 1 q plus a ala 1 q toiseen, plus piste piste piste plus, a ala 1 kertaa q potenssiin n miinus 1; on yhtä suuri kuin; a ala 1 kertaa; murtoluku, 1 miinus q potenssiin n, per, 1 miinus q, loppu murtoluku")
 }
 
 
@@ -630,8 +630,8 @@ fn FinME_absolute_value_defition() {
       </mrow>
     </mrow>
   </math>";
-  test("fi", "ClearSpeak", expr, "itseisarvo a; on yhtä suuri kuin; 2 tapausta, tapaus 1; a jos a; on suurempi tai yhtä suuri kuin 0; tapaus 2; negatiivinen a jos a; on pienempi kuin 0;");
-  test("fi", "SimpleSpeak", expr, "itseisarvo a; on yhtä suuri kuin; 2 tapausta, tapaus 1; a jos a; on suurempi tai yhtä suuri kuin 0; tapaus 2; negatiivinen a jos a; on pienempi kuin 0;")
+  test("fi", "ClearSpeak", expr, "itseisarvo a; on yhtä suuri kuin; 2 tapausta; tapaus 1; a jos a; on suurempi tai yhtä suuri kuin 0; tapaus 2; negatiivinen a jos a; on pienempi kuin 0");
+  test("fi", "SimpleSpeak", expr, "itseisarvo a; on yhtä suuri kuin; 2 tapausta; tapaus 1; a jos a; on suurempi tai yhtä suuri kuin 0; tapaus 2; negatiivinen a jos a; on pienempi kuin 0")
 }
 
 #[test]
@@ -761,8 +761,8 @@ fn FinME_newton_binomial() {
       </msup>
     </mrow>
   </math>";
-  test("fi", "ClearSpeak", expr, "auki sulku a plus b, kiinni sulku potenssiin n; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; n yli k a potenssiin n miinus k, b potenssiin k; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; murtoluku osoittaja; n kertoma; ja nimittäjä k kertoma, auki sulku n miinus k, kiinni sulku; kertoma;, a potenssiin n miinus k, b potenssiin k");
-  test("fi", "SimpleSpeak", expr, "auki sulku a plus b, kiinni sulku potenssiin n; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; n yli k a potenssiin n miinus k, b potenssiin k; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; murtoluku, n kertoma, per, k kertoma, auki sulku n miinus k, kiinni sulku; kertoma, loppu murtoluku;, a potenssiin n miinus k, b potenssiin k")
+  test("fi", "ClearSpeak", expr, "auki sulku a plus b, kiinni sulku potenssiin n; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; n yli k a potenssiin n miinus k, b potenssiin k; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; murtoluku osoittaja; n kertoma; ja nimittäjä k kertoma, auki sulku n miinus k, kiinni sulku; kertoma; a potenssiin n miinus k, b potenssiin k");
+  test("fi", "SimpleSpeak", expr, "auki sulku a plus b, kiinni sulku potenssiin n; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; n yli k kertaa a potenssiin n miinus k, b potenssiin k; on yhtä suuri kuin; summa käy, luvusta k on yhtä suuri kuin 0, lukuun n; murtoluku, n kertoma, per, k kertoma, auki sulku n miinus k, kiinni sulku; kertoma, loppu murtoluku; kertaa a potenssiin n miinus k, b potenssiin k")
 }
 
 #[test]
@@ -878,8 +878,8 @@ fn Fin_ME_law_of_sines() {
       </mrow>
     </mfrac>
   </math>";
-  test("fi", "ClearSpeak", expr, "murtoluku osoittaja a; ja nimittäjä sini arvolla alfa; on yhtä suuri kuin; murtoluku osoittaja b; ja nimittäjä sini arvolla beeta; on yhtä suuri kuin; murtoluku osoittaja c; ja nimittäjä sini arvolla gamma;");
-  test("fi", "SimpleSpeak", expr, "murtoluku, a per, sini arvolla alfa, loppu murtoluku; on yhtä suuri kuin; murtoluku, b per, sini arvolla beeta, loppu murtoluku; on yhtä suuri kuin; murtoluku, c per, sini arvolla gamma, loppu murtoluku;");
+  test("fi", "ClearSpeak", expr, "murtoluku osoittaja a; ja nimittäjä sini arvolla alfa; on yhtä suuri kuin; murtoluku osoittaja b; ja nimittäjä sini arvolla beeta; on yhtä suuri kuin; murtoluku osoittaja c; ja nimittäjä sini arvolla gamma");
+  test("fi", "SimpleSpeak", expr, "murtoluku, a per, sini arvolla alfa, loppu murtoluku; on yhtä suuri kuin; murtoluku, b per, sini arvolla beeta, loppu murtoluku; on yhtä suuri kuin; murtoluku, c per, sini arvolla gamma, loppu murtoluku");
 }
 
 #[test]
@@ -920,8 +920,8 @@ let expr = "<math>
   </mrow>
 </mrow>
 </math>";
-test("fi", "ClearSpeak", expr, "vektori v on yhtä suuri kuin; x ala 1 vektori i, plus; y ala 1 vektori j");
-test("fi", "SimpleSpeak", expr, "vektori v on yhtä suuri kuin; x ala 1 vektori i, plus; y ala 1 vektori j");
+test("fi", "ClearSpeak", expr, "vektori v, on yhtä suuri kuin; x ala 1 vektori i; plus; y ala 1 vektori j");
+test("fi", "SimpleSpeak", expr, "vektori v, on yhtä suuri kuin; x ala 1 vektori i; plus; y ala 1 vektori j");
 }
 
 #[test]
@@ -1186,8 +1186,8 @@ let expr = "<math>
   </msup>
 </mrow>
 </math>";
-test("fi", "ClearSpeak", expr, "iso p arvolla; auki sulku, iso x on pienempi tai yhtä suuri kuin k; kiinni sulku; on yhtä suuri kuin; summa käy, luvusta i on yhtä suuri kuin 0, lukuun itseisarvo k,; n yli i p potenssiin i kertaa; auki sulku 1 miinus p, kiinni sulku potenssiin n miinus i");
-test("fi", "SimpleSpeak", expr, "iso p arvolla; auki sulku, iso x on pienempi tai yhtä suuri kuin k; kiinni sulku; on yhtä suuri kuin; summa käy, luvusta i on yhtä suuri kuin 0, lukuun itseisarvo k,; n yli i p potenssiin i kertaa; auki sulku 1 miinus p, kiinni sulku potenssiin n miinus i");
+test("fi", "ClearSpeak",  expr, "iso p arvolla; auki sulku, iso x on pienempi tai yhtä suuri kuin k; kiinni sulku; on yhtä suuri kuin; summa käy, luvusta i on yhtä suuri kuin 0, lukuun itseisarvo k; n yli i p potenssiin i kertaa; auki sulku 1 miinus p, kiinni sulku potenssiin n miinus i");
+test("fi", "SimpleSpeak", expr, "iso p arvolla; auki sulku, iso x on pienempi tai yhtä suuri kuin k; kiinni sulku; on yhtä suuri kuin; summa käy, luvusta i on yhtä suuri kuin 0, lukuun itseisarvo k; n yli i p potenssiin i kertaa; auki sulku 1 miinus p, kiinni sulku potenssiin n miinus i");
 }
 
 #[test]

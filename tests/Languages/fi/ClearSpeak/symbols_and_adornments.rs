@@ -30,7 +30,7 @@ fn ellipses_auto_start() {
             <mi>…</mi><mo>,</mo>
             <mo>-</mo><mn>2</mn><mo>,</mo><mo>-</mo><mn>1</mn><mo>,</mo><mn>0</mn>
         </math>";
-    test("fi", "ClearSpeak", expr, "piste piste piste pilkku negatiivinen 2 pilkku negatiivinen 1 pilkku 0");
+    test("fi", "ClearSpeak", expr, "piste piste piste pilkku, negatiivinen 2 pilkku, negatiivinen 1 pilkku, 0");
 }
 
 #[test]
@@ -44,7 +44,7 @@ fn ellipses_auto_end() {
             <mo>,</mo>
             <mi>…</mi>
         </math>";
-    test_ClearSpeak("fi", "ClearSpeak_Ellipses", "Auto", expr, "1 pilkku 2 pilkku 3 pilkku piste piste piste");
+    test_ClearSpeak("fi", "ClearSpeak_Ellipses", "Auto", expr, "1 pilkku, 2 pilkku, 3 pilkku, piste piste piste");
 }
 
 #[test]
@@ -63,7 +63,7 @@ fn ellipses_auto_middle() {
             </mrow>
         </math>";
     test_ClearSpeak("fi", "ClearSpeak_Ellipses", "Auto", expr,
-            "1 pilkku 2 pilkku 3 pilkku piste piste piste pilkku 20");
+            "1 pilkku, 2 pilkku, 3 pilkku, piste piste piste pilkku, 20");
 }
 
 #[test]
@@ -74,7 +74,7 @@ fn ellipses_auto_both() {
             <mo>,</mo><mi>…</mi>
        </math>";
     test_ClearSpeak("fi", "ClearSpeak_Ellipses", "Auto", expr,
-            "piste piste piste pilkku negatiivinen 2 pilkku negatiivinen 1 pilkku 0 pilkku 1 pilkku 2 pilkku piste piste piste");
+            "piste piste piste pilkku, negatiivinen 2 pilkku, negatiivinen 1 pilkku, 0 pilkku, 1 pilkku, 2 pilkku, piste piste piste");
 }
 
 #[test]
@@ -83,7 +83,7 @@ fn ellipses_and_so_on_start() {
             <mi>…</mi><mo>,</mo>
             <mo>-</mo><mn>2</mn><mo>,</mo><mo>-</mo><mn>1</mn><mo>,</mo><mn>0</mn>
         </math>";
-        test_ClearSpeak("fi", "ClearSpeak_Ellipses", "AndSoOn", expr, "piste piste piste pilkku negatiivinen 2 pilkku negatiivinen 1 pilkku 0");
+        test_ClearSpeak("fi", "ClearSpeak_Ellipses", "AndSoOn", expr, "piste piste piste pilkku, negatiivinen 2 pilkku, negatiivinen 1 pilkku, 0");
 }
 
 #[test]
@@ -97,7 +97,7 @@ fn ellipses_and_so_on_end() {
             <mo>,</mo>
             <mi>…</mi>
         </math>";
-    test_ClearSpeak("fi", "ClearSpeak_Ellipses", "AndSoOn", expr, "1 pilkku 2 pilkku 3 ja niin edelleen");
+    test_ClearSpeak("fi", "ClearSpeak_Ellipses", "AndSoOn", expr, "1 pilkku, 2 pilkku, 3 ja niin edelleen");
 }
 
 #[test]
@@ -116,7 +116,7 @@ fn ellipses_and_so_on_middle() {
             </mrow>
         </math>";
     test_ClearSpeak("fi", "ClearSpeak_Ellipses", "AndSoOn", expr,
-            "1 pilkku 2 pilkku 3 ja niin edelleen kunnes, 20");
+            "1 pilkku, 2 pilkku, 3 ja niin edelleen kunnes, 20");
 }
 
 #[test]
@@ -127,7 +127,7 @@ fn ellipses_and_so_on_both() {
             <mo>,</mo><mi>…</mi>
        </math>";
     test_ClearSpeak("fi", "ClearSpeak_Ellipses", "AndSoOn", expr,
-            "piste piste piste pilkku negatiivinen 2 pilkku negatiivinen 1 pilkku 0 pilkku 1 pilkku 2 pilkku piste piste piste");
+            "piste piste piste pilkku, negatiivinen 2 pilkku, negatiivinen 1 pilkku, 0 pilkku, 1 pilkku, 2 pilkku, piste piste piste");
 }
 
 #[test]

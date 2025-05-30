@@ -162,7 +162,7 @@ fn multiple_element_set() {
     let expr = "<math>
                 <mo>{</mo> <mn>5</mn> <mo>,</mo> <mn>10</mn>  <mo>,</mo> <mn>15</mn> <mo>}</mo>
             </math>";
-    test("en", "SimpleSpeak", expr, "the set 5 comma 10 comma 15");
+    test("en", "SimpleSpeak", expr, "the set 5 comma, 10 comma, 15");
 }
 
 #[test]
@@ -202,7 +202,7 @@ fn element_under_sum() {
             </mfrac>
         </math>";
     test("en", "SimpleSpeak", expr,
-                    "the sum over i is an element of the integers of; fraction, 1 over, i squared, end fraction;");
+                    "the sum over i is an element of the integers of; fraction, 1 over, i squared, end fraction");
 }
 
 #[test]

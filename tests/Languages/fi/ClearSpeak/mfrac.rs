@@ -51,16 +51,16 @@ fn non_simple_fraction() {
         </mfrac>
         </mrow>
     </math>";
-    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y;");
-    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y;");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Ordinal")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y");
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Over")], expr, "x plus y per x miinus y");
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "FracOver")], expr, "murtoluku x plus y per x miinus y");
-    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "General")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y;");
-    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "EndFrac")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y; loppu murtoluku,");
-    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "GeneralEndFrac")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y; loppu murtoluku,");
-    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "OverEndFrac")], expr, "x plus y per x miinus y, loppu murtoluku,");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "General")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "EndFrac")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y; loppu murtoluku");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "GeneralEndFrac")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y; loppu murtoluku");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "OverEndFrac")], expr, "x plus y per x miinus y, loppu murtoluku");
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Per")], expr, "x plus y per x miinus y");
-    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose"),("ClearSpeak_Fractions", "Auto")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y; loppu murtoluku,");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose"),("ClearSpeak_Fractions", "Auto")], expr, "murtoluku osoittaja; x plus y; ja nimittäjä x miinus y; loppu murtoluku");
 }
 
 
@@ -140,12 +140,12 @@ fn nested_simple_fractions() {
     test_prefs("fi", "ClearSpeak", vec![("ClearSpeak_Fractions", "FracOver")], expr,
             "murtoluku murtoluku 1 per 2 per murtoluku 2 per 3");
     test_prefs("fi", "ClearSpeak", vec![("ClearSpeak_Fractions", "General")], expr,
-            "murtoluku osoittaja murtoluku osoittaja 1; ja nimittäjä 2; ja nimittäjä murtoluku osoittaja 2; ja nimittäjä 3;");
+            "murtoluku osoittaja murtoluku osoittaja 1; ja nimittäjä 2; ja nimittäjä murtoluku osoittaja 2; ja nimittäjä 3");
     test_prefs("fi", "ClearSpeak", vec![("ClearSpeak_Fractions", "EndFrac")], expr, "1 kahdesosa per 2 kolmasosaa");
     test_prefs("fi", "ClearSpeak", vec![("ClearSpeak_Fractions", "GeneralEndFrac")], expr,
-            "murtoluku osoittaja murtoluku osoittaja 1; ja nimittäjä 2; loppu murtoluku; ja nimittäjä murtoluku osoittaja 2; ja nimittäjä 3; loppu murtoluku; loppu murtoluku,");
+            "murtoluku osoittaja murtoluku osoittaja 1; ja nimittäjä 2; loppu murtoluku; ja nimittäjä murtoluku osoittaja 2; ja nimittäjä 3; loppu murtoluku; loppu murtoluku");
     test_prefs("fi", "ClearSpeak", vec![("ClearSpeak_Fractions", "OverEndFrac")], expr,
-    "1 per 2, loppu murtoluku, per 2 per 3, loppu murtoluku; loppu murtoluku,");
+    "1 per 2, loppu murtoluku, per 2 per 3, loppu murtoluku; loppu murtoluku");
 }
 
 
@@ -190,7 +190,7 @@ fn general_nested_fraction() {
         </mrow>
     </math>
                     ";
-    test("fi", "ClearSpeak", expr, "murtoluku osoittaja; 10 per n; ja nimittäjä 2 per n;");
+    test("fi", "ClearSpeak", expr, "murtoluku osoittaja; 10 per n; ja nimittäjä 2 per n");
 }
 
 #[test]
@@ -215,14 +215,14 @@ fn complex_nested_fraction() {
         </mrow>
     </math>
                     ";
-    test("fi", "ClearSpeak", expr, "murtoluku osoittaja; murtoluku osoittaja; n plus 10; ja nimittäjä n; ja nimittäjä 2 per n;");
+    test("fi", "ClearSpeak", expr, "murtoluku osoittaja; murtoluku osoittaja; n plus 10; ja nimittäjä n; ja nimittäjä 2 per n");
 }
 
 #[test]
 fn simple_function() {
     let expr = "<math><mfrac><mrow><mi>f</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow><mn>2</mn></mfrac></math>";
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "f arvolla x per 2");
-    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr, "f arvolla x per 2, loppu murtoluku,");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr, "f arvolla x per 2, loppu murtoluku");
 }
 
 #[test]
@@ -232,7 +232,7 @@ fn function_over_function() {
             <mrow><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
         </mfrac></math>";
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr, "f arvolla x per g arvolla x");
-    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr, "f arvolla x per g arvolla x, loppu murtoluku,");
+    test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr, "f arvolla x per g arvolla x, loppu murtoluku");
 }
 
 #[test]
@@ -242,9 +242,9 @@ fn non_simple_function_over_function() {
             <mrow><mi>g</mi><mo>(</mo><mi>x</mi><mo>)</mo></mrow>
         </mfrac></math>";
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Fractions", "Auto")], expr,
-             "murtoluku osoittaja; f arvolla, auki sulku x plus 1, kiinni sulku; ja nimittäjä g arvolla x;");
+             "murtoluku osoittaja; f arvolla, auki sulku x plus 1, kiinni sulku; ja nimittäjä g arvolla x");
     test_prefs("fi", "ClearSpeak", vec![("Verbosity", "Verbose"), ("ClearSpeak_Fractions", "Auto")], expr,
-             "murtoluku osoittaja; f arvolla, auki sulku x plus 1, kiinni sulku; ja nimittäjä g arvolla x; loppu murtoluku,");
+             "murtoluku osoittaja; f arvolla, auki sulku x plus 1, kiinni sulku; ja nimittäjä g arvolla x; loppu murtoluku");
 }
 
 #[test]

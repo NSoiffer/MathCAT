@@ -4,19 +4,12 @@
 # For numbers, 
 # - name: [] "...", "..." "..." ]
 
+- IntentMappings: {
+    # this should be defined for each translation; a default empty value is here to ensure the mapping exists
+  }
 
-- SI_Units: {
-    "A": "amp",
-    "cd": "candela",
-    "K": "kelvin",
-    "K": "kelvin",
-    "g": "gram",
-    "m": "meter",
-    "mol": "mole",
-    "s": "second",
-    "″": "second",
-    "\"": "second",
-    "sec": "second",
+- NavigationParts: {
+    # this should be defined for each translation; a default empty value is here to ensure the mapping exists
   }
 
   # ---------------- Large Operators  ----------------------------------
@@ -38,7 +31,7 @@
   }
 
 - AdditionalFunctionNames: {
-    // the arcXXX functions aren't really trig functions (they are inverse functions)
+    # the arcXXX functions aren't really trig functions (they are inverse functions)
     "arccos", "arccosec", "arccosech", "arccosh",
     "arccot", "arccotan", "arccotanh", "arccoth",
     "arccsc", "arccsch", "arcsec", "arcsech", "arcsin", "arcsinh",
@@ -97,6 +90,11 @@
   # FIX: That's not currently possible, so the canonicalize function builds that in. Should be externally-definable
 - LikelyFunctionNames: {
       "f", "g", "h", "F", "G", "H"
+  }
+
+  # Names of functions that in terse mode don't say "of" (or it's equivalent in other languages)
+  # make sure it is defined -- override in the language-specific file
+- TerseFunctionNames: {
   }
 
   # probably need to expand, but these are ones that have braille codes and are in the op dict

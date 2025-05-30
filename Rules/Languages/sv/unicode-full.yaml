@@ -294,7 +294,7 @@
             - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
                # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
                # speak '…' as 'and so on...' unless expr starts with '…'
-            - "../*[1][text()='…']"
+            - "../*[1][.='…']"
         then: [T: "punkt punkt punkt"]              #     (en: 'dot dot dot', google translation)
         else_test:                                  #  must have $ClearSpeak_Ellipses = 'AndSoOn'
             if: "count(following-sibling::*) = 0"
@@ -494,37 +494,37 @@
  - "⅝": [T: "fem åttondelar"]         #  0x215d    (en: 'five eighths')
  - "⅞": [T: "sju åttondelar"]        #  0x215e    (en: 'seven eighths')
  - "⅟": [T: "ett genom"]                          #  0x215f    (en: 'one over', google: 'en över')
- - "Ⅰ": [T: "Ⅰ"]                                    #  0x2160    (en: 'I', google translation)
+ - "Ⅰ": [T: "I"]                                    #  0x2160    (en: 'I', google translation)
  - "Ⅱ": [T: "i i"]                                  #  0x2161    (en: 'I I', google translation)
  - "Ⅲ": [T: "i i i"]                                #  0x2162    (en: 'I I I', google translation)
  - "Ⅳ": [T: "i v"]                                  #  0x2163    (en: 'I V', google translation)
- - "Ⅴ": [T: "Ⅴ"]                                    #  0x2164    (en: 'V', google translation)
+ - "Ⅴ": [T: "V"]                                    #  0x2164    (en: 'V', google translation)
  - "Ⅵ": [T: "v i"]                                  #  0x2165    (en: 'V I', google translation)
  - "Ⅶ": [T: "v i i"]                                #  0x2166    (en: 'V I I', google translation)
  - "Ⅷ": [T: "v i i i"]                              #  0x2167    (en: 'V I I I', google translation)
  - "Ⅸ": [T: "i x"]                                  #  0x2168    (en: 'I X', google translation)
- - "Ⅹ": [T: "Ⅹ"]                                    #  0x2169    (en: 'X', google translation)
+ - "Ⅹ": [T: "X"]                                    #  0x2169    (en: 'X', google translation)
  - "Ⅺ": [T: "x i"]                                  #  0x216a    (en: 'X I', google translation)
  - "Ⅻ": [T: "x i i"]                                #  0x216b    (en: 'X I I', google translation)
- - "Ⅼ": [T: "Ⅼ"]                                    #  0x216c    (en: 'L', google translation)
- - "Ⅽ": [T: "Ⅽ"]                                    #  0x216d    (en: 'C', google translation)
- - "Ⅾ": [T: "Ⅾ"]                                    #  0x216e    (en: 'D', google translation)
- - "Ⅿ": [T: "Ⅿ"]                                    #  0x216f    (en: 'M', google translation)
- - "ⅰ": [T: "ⅰ"]                                    #  0x2170    (en: 'I', google translation)
+ - "Ⅼ": [T: "L"]                                    #  0x216c    (en: 'L', google translation)
+ - "Ⅽ": [T: "C"]                                    #  0x216d    (en: 'C', google translation)
+ - "Ⅾ": [T: "D"]                                    #  0x216e    (en: 'D', google translation)
+ - "Ⅿ": [T: "M"]                                    #  0x216f    (en: 'M', google translation)
+ - "ⅰ": [T: "i"]                                    #  0x2170    (en: 'I', google translation)
  - "ⅱ": [T: "i i"]                                  #  0x2171    (en: 'I I', google translation)
  - "ⅲ": [T: "i i i"]                                #  0x2172    (en: 'I I I', google translation)
  - "ⅳ": [T: "i v"]                                  #  0x2173    (en: 'I V', google translation)
- - "ⅴ": [T: "ⅴ"]                                    #  0x2174    (en: 'V', google translation)
+ - "ⅴ": [T: "v"]                                    #  0x2174    (en: 'V', google translation)
  - "ⅵ": [T: "v i"]                                  #  0x2175    (en: 'V I', google translation)
  - "ⅶ": [T: "v i i"]                                #  0x2176    (en: 'V I I', google translation)
  - "ⅷ": [T: "v i i i"]                              #  0x2177    (en: 'V I I I', google translation)
  - "ⅸ": [T: "i x"]                                  #  0x2178    (en: 'I X', google translation)
- - "ⅹ": [T: "ⅹ"]                                    #  0x2179    (en: 'X', google translation)
+ - "ⅹ": [T: "x"]                                    #  0x2179    (en: 'X', google translation)
  - "ⅺ": [T: "x i"]                                  #  0x217a    (en: 'X I', google translation)
  - "ⅻ": [T: "x i i"]                                #  0x217b    (en: 'X I I', google translation)
- - "ⅼ": [T: "ⅼ"]                                    #  0x217c    (en: 'L', google translation)
- - "ⅽ": [T: "ⅽ"]                                    #  0x217d    (en: 'C', google translation)
- - "ⅾ": [T: "ⅾ"]                                    #  0x217e    (en: 'D', google translation)
+ - "ⅼ": [T: "l"]                                    #  0x217c    (en: 'L', google translation)
+ - "ⅽ": [T: "c"]                                    #  0x217d    (en: 'C', google translation)
+ - "ⅾ": [T: "d"]                                    #  0x217e    (en: 'D', google translation)
  - "ⅿ": [T: "ⅿ"]                                    #  0x217f    (en: 'M', google translation)
  - "↉": [T: "noll tredjedelar"]                     #  0x2189    (en: 'zero thirds')
  - "←": [T: "vänster-pil"]                       #  0x2190    (en: 'leftwards arrow')
@@ -662,11 +662,7 @@
  - "∅": [T: "tomma mängden"]                        #  0x2205    (en: 'empty set')
  - "∆":                                             #  0x2206
      - T: "laplacianen av"                               #     (en: 'laplacian of')
- - "∇":                                             #  0x2207
-     - test: 
-         if: "$Verbosity!='Terse'"
-         then: [T: "gradienten av"]
-         else: [T: "grad"]                            #     (en: 'the', google translation)
+ - "∇": [T: "gradienten av"]                     # 0x2207 (en: 'gradient of', google: 'lutning av')
  - "∈":                                             #  0x2208
      - test:
         if: "$SpeechStyle != 'ClearSpeak'"
@@ -1160,7 +1156,7 @@
  - "⋔":                                             #  0x22d4
      - T: "äkta snittet"                                #     (en: 'proper intersection of', MathPlayer: 'pitchfork', google: 'korrekt skärningspunkt av')
  - "⋕":                                             #  0x22d5
-     - T: "lika med och och parallell med"             #     (en: 'equal to and parallel to')
+     - T: "lika med och parallell med"             #     (en: 'equal to and parallel to')
  - "⋖": [T: "mindre än med punkt"]                #  0x22d6    (en: 'less than with dot')
  - "⋗": [T: "större än med punkt"]                  #  0x22d7    (en: 'greater than with dot')
  - "⋘":                                             #  0x22d8
@@ -1349,7 +1345,7 @@
  - "⒖": [T: "femton med punkt"]                    #  0x2496    (en: 'fifteen with period', google translation)
  - "⒗": [T: "sexton med punkt"]                    #  0x2497    (en: 'sixteen with period', google translation)
  - "⒘": [T: "sjutton med punkt"]                   #  0x2498    (en: 'seventeen with period', google translation)
- - "⒙": [T: "ateen med punkt"]                     #  0x2499    (en: 'eighteen with period', google translation)
+ - "⒙": [T: "arton med punkt"]                     #  0x2499    (en: 'eighteen with period', google translation)
  - "⒚": [T: "nitton med punkt"]                    #  0x249a    (en: 'nineteen with period', google translation)
  - "⒛": [T: "tjugo med punkt"]                     #  0x249b    (en: 'twenty with period', google translation)
  - "⒜-⒵":                                           #  0x249c - 0x24b5
@@ -2319,8 +2315,8 @@
  - "』": [T: "höger vit hörn-parentes"]            #  0x300f    (en: 'right white corner bracket', google: 'höger vit hörnfäste')
  - "【": [T: "vänster svart linsformad hak-parentes"]    #  0x3010    (en: 'left black lenticular bracket', google: 'vänster svart linsformell konsol')
  - "】": [T: "höger svart linsformad hak-parentes"]    #  0x3011    (en: 'right black lenticular bracket', google: 'höger svart linsformell konsol')
- - "〔": [T: "vänster tortoise shell bracket"]       #  0x3014    (en: 'left tortoise shell bracket')
- - "〕": [T: "höger tortoise shell bracket"]         #  0x3015    (en: 'right tortoise shell bracket')
+ - "〔": [T: "vänster sköldpadds-skal hak-parentes"]       #  0x3014    (en: 'left tortoise shell bracket')
+ - "〕": [T: "höger sköldpadds-skal hak-parentes"]         #  0x3015    (en: 'right tortoise shell bracket')
  - "〖": [T: "vänster vit linsformad hak-parentes"]    #  0x3016    (en: 'left white lenticular bracket', google: 'vänster vit linsformad konsol')
  - "〗": [T: "höger vit linsformad hak-parentes"]    #  0x3017    (en: 'right white lenticular bracket', google: 'höger vit linsformad konsol')
  - "〘": [T: "vänster vit sköldpadds-skal hak-parentes"]    #  0x3018    (en: 'left white tortoise shell bracket', google: 'vänster vit sköldpaddsskalfäste')
@@ -2435,7 +2431,7 @@
  - "㏁": [T: "mega-ohm"]                             #  0x33c1    (google translation)
  - "㏂": [T: "attometer"]                           #  0x33c2    (en: 'attometers', google translation)
  - "㏃": [T: "becquerel"]                           #  0x33c3    (google translation)
- - "㏄": [T: "kubikcentimeter"]                      #  0x33c4    (en: 'cubic centimeters', google translation)
+ - "㏄": [T: "kubik-centimeter"]                      #  0x33c4    (en: 'cubic centimeters', google translation)
  - "㏅": [T: "candela"]                             #  0x33c5    (google translation)
  - "㏆": [T: "coulomb per kilo"]                    #  0x33c6    (en: 'coulombs per kilogram', google translation)
  - "㏇": [T: "hjärtminutvolym"]                          #  0x33c7    (en: 'cardiac output', google translation)
@@ -3085,7 +3081,7 @@
           else: [x: "$SpeechOverrides_CapitalLetters"] 
     - pitch:
         value: "$CapitalLetters_Pitch"
-        replace: [T: "ligatur ae"]                  #     (en: 'ligature ae', google translation)
+        replace: [T: "ligatur a e"]                  #     (en: 'ligature ae', google translation)
  - "":                                             #  0xf19b
     - test: 
         if: "$CapitalLetters_Beep"

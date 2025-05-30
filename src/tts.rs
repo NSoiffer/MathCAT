@@ -79,9 +79,10 @@ use regex::Regex;
 use sxd_xpath::Value;
 
 const MIN_PAUSE:f64 = 50.0;         // ms -- avoids clutter of putting out pauses that probably can't be heard
-const PAUSE_SHORT:f64 = 150.0;  // ms
-const PAUSE_MEDIUM:f64 = 300.0; // ms
-const PAUSE_LONG:f64 = 600.0;   // ms
+const PAUSE_SHORT:f64 = 200.0;  // ms
+const PAUSE_MEDIUM:f64 = 400.0; // ms
+const PAUSE_LONG:f64 = 800.0;   // ms
+const PAUSE_XLONG:f64 = 1600.0;   // ms
 const PAUSE_AUTO:f64 = 987654321.5;   // ms -- hopefully unique
 pub const PAUSE_AUTO_STR: &str = "\u{F8FA}\u{F8FA}";
 const RATE_FROM_CONTEXT:f64 = 987654321.5;   // hopefully unique
@@ -295,10 +296,11 @@ impl TTS {
             TTSCommand::Pause | TTSCommand::Rate | TTSCommand::Volume | TTSCommand::Pitch => {
                 // these strings are almost always what the value will be, so we try them first
                 let val = match tts_str_value {
+                    "auto" => Ok( PAUSE_AUTO ),
                     "short" => Ok( PAUSE_SHORT ),
                     "medium" => Ok( PAUSE_MEDIUM ),
                     "long" => Ok( PAUSE_LONG ),
-                    "auto" => Ok( PAUSE_AUTO ),
+                    "xlong" => Ok( PAUSE_XLONG ),
                     "$MathRate" => Ok( RATE_FROM_CONTEXT ), // special case hack -- value determined in replace
                     _ => tts_str_value.parse::<f64>()
                 };
@@ -370,6 +372,12 @@ impl TTS {
                             let node = nodes.iter().next().unwrap();
                             if let Some(text) = node.text() {
                                 text.text().to_string()
+                            } else if let Some(el) = node.element() {
+                                if crate::xpath_functions::is_leaf(el) {
+                                    crate::canonicalize::as_text(el).to_string()
+                                } else {
+                                    bail!("in 'spell': value returned from xpath '{}' does not evaluate to a string",  &xpath.to_string());
+                                }
                             } else {
                                 bail!("in 'spell': value returned from xpath '{}' does not evaluate to a string, it is {} nodes",
                                         &xpath.to_string(), nodes.size());
@@ -447,7 +455,7 @@ impl TTS {
             if result.is_empty() {
                 result += " ";
             }
-            result += &command.replacements.replace::<String>(rules_with_context, mathml)?;
+            result += &command.replacements.replace::<String>(rules_with_context, mathml)?;    
         }
 
         let end_tag = match self {
@@ -610,7 +618,7 @@ impl TTS {
         if after_len < 3 {
             // hack to prevent pausing before "of" in exprs like "the fourth power of secant, of x"
             // if it should pause anywhere, it should be after the "of"
-            return "".to_string();
+            return "".to_string(); 
         }
         let pause = std::cmp::min(3000, ((2 * before_len + after_len)/48) * 128);
         // create a TTSCommandRule so we reuse code
@@ -640,19 +648,18 @@ impl TTS {
             TTS::None  => self.merge_pauses_none(str),
             TTS::SSML  => self.merge_pauses_ssml(str),
             TTS::SAPI5 => self.merge_pauses_sapi5(str),
-        };
+        };        
     }
 
     fn merge_pauses_none(&self, str: &str) -> String {
         // punctuation used for pauses is ",", ";" 
         lazy_static! {
-            static ref MULTIPLE_PAUSES: Regex = Regex::new(r"[,;][,;]+").unwrap();   // two or more pauses
+            static ref SPACES: Regex = Regex::new(r"\s+([;,])").unwrap();   // two or more pauses
+            static ref MULTIPLE_PAUSES: Regex = Regex::new(r"([,;][,;]+)").unwrap();   // two or more pauses
         }
         // we reduce all sequences of two or more pauses to a single medium pause
-        let mut merges_string = str.to_string();
-        for cap in MULTIPLE_PAUSES.captures_iter(str) {
-            merges_string = merges_string.replace(&cap[0], ";");
-        }
+        let merges_string = SPACES.replace_all(str, "$1").to_string();
+        let merges_string = MULTIPLE_PAUSES.replace_all(&merges_string, ";").to_string();
         return merges_string;
     }
 
