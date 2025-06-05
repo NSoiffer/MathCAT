@@ -5,6 +5,7 @@ use regex::Regex;
 extern crate lazy_static;
 use lazy_static::lazy_static;
 pub use libmathcat::interface::*;
+use libmathcat::element_util::*;
 
 #[allow(dead_code)] 
 pub fn init_logger() {

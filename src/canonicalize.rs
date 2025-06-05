@@ -7,6 +7,7 @@
 //! * mrows are added based on operator priorities from the MathML Operator Dictionary
 #![allow(clippy::needless_return)]
 use crate::errors::*;
+use crate::prefs::PreferenceManager;
 use std::rc::Rc;
 use std::cell::RefCell;
 use sxd_document::dom::*;
@@ -398,33 +399,6 @@ pub fn get_presentation_element(element: Element) -> (usize, Element) {
 	}
 }
 
-/// Canonicalize does several things:
-/// 1. cleans up the tree so all extra white space is removed (should only have element and text nodes)
-/// 2. normalize the characters
-/// 3. clean up "bad" MathML based on known output from some converters (TODO: still a work in progress)
-/// 4. the tree is "parsed" based on the mo (priority)/mi/mn's in an mrow
-///    *  this adds mrows mrows and some invisible operators (implied times, function app, ...)
-///    * extra mrows are removed
-///    * implicit mrows are turned into explicit mrows (e.g, there will be a single child of 'math')
-///
-/// Canonicalize is pretty conservative in adding new mrows and won't do it if:
-/// * there is an intent attr
-/// * if the mrow starts and ends with a fence (e.g, French open interval "]0,1[")
-///
-/// An mrow is never deleted unless it is redundant.
-/// 
-/// Whitespace handling:
-/// Whitespace complicates parsing and also pattern matching (e.g., is it a mixed number which tests for a number preceding a fraction)
-/// The first attempt which mostly worked was to shove whitespace into adjacent mi/mn/mtext. That has a problem with distinguish different uses for whitespace
-/// The second attempt was to leave it in the parse and make it an mo when appropriate, but there were some cases where it should be prefix and wasn't caught
-/// The third attempt (and the current one) is to make it an attribute on adjacent elements.
-///   This preserves the data-width attr (with new name) added in the second attempt that helps resolve whether something is tweaking, a real space, or an omission.
-///   It adds data-previous-space-width/data-following-space-width with values to indicate with the space was on the left or right (typically it placed on the previous token because that's easier)
-pub fn canonicalize(mathml: Element) -> Result<Element> {
-	let context = CanonicalizeContext::new();
-	return context.canonicalize(mathml);
-}
-
 #[derive(Debug, PartialEq)]
 enum FunctionNameCertainty {
 	True,
@@ -453,6 +427,20 @@ lazy_static! {
 }
 
 
+#[derive(PartialEq)]
+struct CanonicalizeContextPatternsOptions {
+	decimal_separator: String,
+	block_separator: String,
+}
+impl CanonicalizeContextPatternsOptions {
+	fn from_prefs(pref_manager: &PreferenceManager) -> CanonicalizeContextPatternsOptions {
+		return CanonicalizeContextPatternsOptions {
+			decimal_separator: pref_manager.pref_to_string("BlockSeparators"),
+			block_separator: pref_manager.pref_to_string("DecimalSeparators"),
+		}
+	}
+}
+
 struct CanonicalizeContextPatterns {
 	decimal_separator: Regex,
 	block_separator: Regex,
@@ -464,13 +452,13 @@ struct CanonicalizeContextPatterns {
 }
 
 impl CanonicalizeContextPatterns {
-	fn new(block_separator_pref: &str, decimal_separator_pref: &str) -> CanonicalizeContextPatterns {
-		let block_separator = Regex::new(&format!("[{}]", regex::escape(block_separator_pref))).unwrap();
-		let decimal_separator = Regex::new(&format!("[{}]", regex::escape(decimal_separator_pref))).unwrap();
+	fn new(options: &CanonicalizeContextPatternsOptions) -> CanonicalizeContextPatterns {
+		let block_separator = Regex::new(&format!("[{}]", regex::escape(&options.block_separator))).unwrap();
+		let decimal_separator = Regex::new(&format!("[{}]", regex::escape(&options.decimal_separator))).unwrap();
 		// allows just "." and also matches an empty string, but those are ruled out elsewhere
-		let digit_only_decimal_number = Regex::new(&format!(r"^\d*{}?\d*$", regex::escape(decimal_separator_pref))).unwrap();
-		let block_3digit_pattern = get_number_pattern_regex(block_separator_pref, decimal_separator_pref, 3, 3);
-		let block_3_5digit_pattern = get_number_pattern_regex(block_separator_pref, decimal_separator_pref, 3, 5);
+		let digit_only_decimal_number = Regex::new(&format!(r"^\d*{}?\d*$", regex::escape(&options.decimal_separator))).unwrap();
+		let block_3digit_pattern = get_number_pattern_regex(&options.block_separator, &options.decimal_separator, 3, 3);
+		let block_3_5digit_pattern = get_number_pattern_regex(&options.block_separator, &options.decimal_separator, 3, 5);
 		// Note: on en.wikipedia.org/wiki/Decimal_separator, show '3.14159 26535 89793 23846'
 		let block_4digit_hex_pattern =  Regex::new(r"^[0-9a-fA-F]{4}([ \u00A0\u202F][0-9a-fA-F]{4})*$").unwrap();
 		let block_1digit_pattern =  Regex::new(r"^((\d(\uFFFF\d)?)(\d([, \u00A0\u202F]\d){2})*)?([\.](\d(\uFFFF\d)*)?)?$").unwrap();
@@ -499,9 +487,10 @@ impl CanonicalizeContextPatterns {
 /// Profiling showed that creating new contexts was very time consuming because creating the RegExs is very expensive
 /// Profiling set_mathml (which does the canonicalization) spends 65% of the time in Regex::new, of which half of it is spent in this initialization.
 struct CanonicalizeContextPatternsCache {
-	block_separator_pref: String,
-	decimal_separator_pref: String,
 	patterns: Rc<CanonicalizeContextPatterns>,
+
+	// options act as the cache key
+	options: CanonicalizeContextPatternsOptions,
 }
 
 thread_local!{
@@ -512,12 +501,10 @@ impl CanonicalizeContextPatternsCache {
 	fn new() -> CanonicalizeContextPatternsCache {
 		let pref_manager = crate::prefs::PreferenceManager::get();
 		let pref_manager = pref_manager.borrow();
-		let block_separator_pref = pref_manager.pref_to_string("BlockSeparators");
-		let decimal_separator_pref = pref_manager.pref_to_string("DecimalSeparators");
+		let options = CanonicalizeContextPatternsOptions::from_prefs(&pref_manager);
 		return CanonicalizeContextPatternsCache {
-			patterns: Rc::new( CanonicalizeContextPatterns::new(&block_separator_pref, &decimal_separator_pref) ),
-			block_separator_pref,
-			decimal_separator_pref
+			patterns: Rc::new( CanonicalizeContextPatterns::new(&options) ),
+			options: options,
 		}
 	}
 
@@ -525,34 +512,62 @@ impl CanonicalizeContextPatternsCache {
 		return PATTERN_CACHE.with( |cache| {
 			let pref_manager_rc = crate::prefs::PreferenceManager::get();
 			let pref_manager = pref_manager_rc.borrow();
-			let block_separator_pref = pref_manager.pref_to_string("BlockSeparators");
-			let decimal_separator_pref = pref_manager.pref_to_string("DecimalSeparators");
+			let new_options = CanonicalizeContextPatternsOptions::from_prefs(&pref_manager);
 
 			let mut cache = cache.borrow_mut();
-			if block_separator_pref != cache.block_separator_pref || decimal_separator_pref != cache.decimal_separator_pref {
+			if new_options != cache.options {
 				// update the cache
-				cache.patterns = Rc::new( CanonicalizeContextPatterns::new(&block_separator_pref, &decimal_separator_pref) );
-				cache.block_separator_pref = block_separator_pref;
-				cache.decimal_separator_pref = decimal_separator_pref;
+				cache.patterns = Rc::new( CanonicalizeContextPatterns::new(&new_options) );
+				cache.options = new_options;
 			}
 			return cache.patterns.clone();
 		})
 	}
 }
 
-struct CanonicalizeContext {
+pub (crate) struct CanonicalizeContext {
 	patterns: Rc<CanonicalizeContextPatterns>,
 }
 
 
 impl CanonicalizeContext {
-	fn new() -> CanonicalizeContext {
+	pub fn new_uncached(pref_manager: &PreferenceManager) -> CanonicalizeContext {
+		return CanonicalizeContext {
+			patterns: Rc::new( CanonicalizeContextPatterns::new(
+				&CanonicalizeContextPatternsOptions::from_prefs(pref_manager)) )
+		};
+	}
+
+	/// Returns the context backed by global preferences and cache.
+	pub fn new_from_global_prefs_cached() -> CanonicalizeContext {
 		return CanonicalizeContext {
 			patterns: CanonicalizeContextPatternsCache::get(),
 		};
 	}
 
-	fn canonicalize<'a>(&self, mut mathml: Element<'a>) -> Result<Element<'a>> {
+	/// Canonicalize does several things:
+	/// 1. cleans up the tree so all extra white space is removed (should only have element and text nodes)
+	/// 2. normalize the characters
+	/// 3. clean up "bad" MathML based on known output from some converters (TODO: still a work in progress)
+	/// 4. the tree is "parsed" based on the mo (priority)/mi/mn's in an mrow
+	///    *  this adds mrows mrows and some invisible operators (implied times, function app, ...)
+	///    * extra mrows are removed
+	///    * implicit mrows are turned into explicit mrows (e.g, there will be a single child of 'math')
+	///
+	/// Canonicalize is pretty conservative in adding new mrows and won't do it if:
+	/// * there is an intent attr
+	/// * if the mrow starts and ends with a fence (e.g, French open interval "]0,1[")
+	///
+	/// An mrow is never deleted unless it is redundant.
+	/// 
+	/// Whitespace handling:
+	/// Whitespace complicates parsing and also pattern matching (e.g., is it a mixed number which tests for a number preceding a fraction)
+	/// The first attempt which mostly worked was to shove whitespace into adjacent mi/mn/mtext. That has a problem with distinguish different uses for whitespace
+	/// The second attempt was to leave it in the parse and make it an mo when appropriate, but there were some cases where it should be prefix and wasn't caught
+	/// The third attempt (and the current one) is to make it an attribute on adjacent elements.
+	///   This preserves the data-width attr (with new name) added in the second attempt that helps resolve whether something is tweaking, a real space, or an omission.
+	///   It adds data-previous-space-width/data-following-space-width with values to indicate with the space was on the left or right (typically it placed on the previous token because that's easier)
+	pub fn canonicalize<'a>(&self, mut mathml: Element<'a>) -> Result<Element<'a>> {
 		// debug!("MathML before canonicalize:\n{}", mml_to_string(mathml));
 	
 		if name(mathml) != "math" {
@@ -4392,12 +4407,15 @@ mod canonicalize_tests {
 
     #[test]
     fn illegal_mathml_element() {
-		use crate::interface::*;
+		use crate::canonicalize::CanonicalizeContext;
+		use crate::element_util::{get_element, trim_element};
         let test_str = "<math><foo><mi>f</mi></foo></math>";
         let package1 = &parser::parse(test_str).expect("Failed to parse test input");
 		let mathml = get_element(package1);
 		trim_element(mathml, false);
-		assert!(canonicalize(mathml).is_err());
+
+		let canonicalize_context = CanonicalizeContext::new_from_global_prefs_cached();
+		assert!(canonicalize_context.canonicalize(mathml).is_err());
     }
 
 
@@ -4495,9 +4513,9 @@ mod canonicalize_tests {
 
     #[test]
     fn mrow_with_intent_and_single_child() {
-		use crate::interface::*;
+		use crate::element_util::{get_element, trim_element};
 		use sxd_document::parser;
-		use crate::canonicalize::canonicalize;
+		use crate::canonicalize::CanonicalizeContext;
 		// this forces initialization
 		crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
 		crate::speech::SPEECH_RULES.with(|_| true);
@@ -4508,7 +4526,10 @@ mod canonicalize_tests {
 		let package1 = &parser::parse(test).expect("Failed to parse test input");
 		let mathml = get_element(package1);
 		trim_element(mathml, false);
-		let mathml_test = canonicalize(mathml).unwrap();
+
+	    let canonicalize_context = CanonicalizeContext::new_from_global_prefs_cached();
+		let mathml_test = canonicalize_context.canonicalize(mathml).unwrap();
+
 		let first_child = as_element( mathml_test.children()[0] );
 		assert_eq!(name(first_child), "mrow");
 		assert_eq!(first_child.children().len(), 1);
@@ -4519,9 +4540,9 @@ mod canonicalize_tests {
     #[test]
     fn empty_mrow_with_intent() {
 		// we don't want to remove the mrow because the intent on the mi would reference itself
-		use crate::interface::*;
+		use crate::element_util::{get_element, trim_element};
 		use sxd_document::parser;
-		use crate::canonicalize::canonicalize;
+		use crate::canonicalize::CanonicalizeContext;
 		// this forces initialization
 		crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
 		crate::speech::SPEECH_RULES.with(|_| true);
@@ -4532,7 +4553,10 @@ mod canonicalize_tests {
 		let package1 = &parser::parse(test).expect("Failed to parse test input");
 		let mathml = get_element(package1);
 		trim_element(mathml, false);
-		let mathml_test = canonicalize(mathml).unwrap();
+
+	    let canonicalize_context = CanonicalizeContext::new_from_global_prefs_cached();
+		let mathml_test = canonicalize_context.canonicalize(mathml).unwrap();
+
 		let first_child = as_element( mathml_test.children()[0] );
 		assert_eq!(name(first_child), "mrow");
 		assert_eq!(first_child.children().len(), 1);
