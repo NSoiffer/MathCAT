@@ -611,7 +611,8 @@ mod tests {
 
 
     fn test_intent(mathml: &str, target: &str, intent_error_recovery: &str) -> bool {
-		use crate::interface::*;
+        use crate::interface::set_preference;
+		use crate::element_util::{get_element, trim_element, is_same_element};
 		// this forces initialization
         crate::interface::set_rules_dir(super::super::abs_rules_dir_path()).unwrap();
         // crate::speech::SpeechRules::initialize_all_rules().unwrap();

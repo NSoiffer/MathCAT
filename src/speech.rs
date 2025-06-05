@@ -13,7 +13,7 @@ use sxd_xpath::{Context, Factory, Value, XPath};
 use sxd_xpath::nodeset::Node;
 use std::fmt;
 use std::time::SystemTime;
-use crate::definitions::read_definitions_file;
+use crate::definitions::{read_definitions_file, Definitions, SPEECH_DEFINITIONS};
 use crate::errors::*;
 use crate::prefs::*;
 use yaml_rust::{YamlLoader, Yaml, yaml::Hash};
@@ -58,6 +58,11 @@ pub fn unquote_string(str: &str) -> &str {
     return &str[..str.len()-N_BYTES_NO_EVAL_QUOTE_CHAR];
 }
 
+pub fn intent_from_rules_and_mathml<'m>(rules: &SpeechRules, definitions: &Definitions, mathml: Element, doc: Document<'m>) -> Result<Element<'m>> {
+    let intent_tree = apply_intent_to_mathml(rules, definitions, doc, mathml, "")?;
+    doc.root().append_child(intent_tree);
+    return Ok(intent_tree);
+}
 
 /// The main external call, `intent_from_mathml` returns a string for the speech associated with the `mathml`.
 ///   It matches against the rules that are computed by user prefs such as "Language" and "SpeechStyle".
@@ -70,9 +75,12 @@ pub fn unquote_string(str: &str) -> &str {
 /// A string is returned in call cases.
 /// If there is an error, the speech string will indicate an error.
 pub fn intent_from_mathml<'m>(mathml: Element, doc: Document<'m>) -> Result<Element<'m>> {
-    let intent_tree = intent_rules(&INTENT_RULES, doc, mathml, "")?;
-    doc.root().append_child(intent_tree);
-    return Ok(intent_tree);
+    INTENT_RULES.with_borrow_mut(|rules| rules.read_files())?;
+    return INTENT_RULES.with_borrow(|rules| {
+        return crate::definitions::SPEECH_DEFINITIONS.with_borrow(|definitions| {
+            return intent_from_rules_and_mathml(rules, definitions, mathml, doc);
+        });
+    });
 }
 
 pub fn speak_mathml(mathml: Element, nav_node_id: &str) -> Result<String> {
@@ -83,40 +91,65 @@ pub fn overview_mathml(mathml: Element, nav_node_id: &str) -> Result<String> {
     return speak_rules(&OVERVIEW_RULES, mathml, nav_node_id);
 }
 
-
-fn intent_rules<'m>(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, doc: Document<'m>, mathml: Element, nav_node_id: &'m str) -> Result<Element<'m>> {
-    rules.with(|rules| {
-        rules.borrow_mut().read_files()?;
-        let rules = rules.borrow();
-        // debug!("intent_rules:\n{}", mml_to_string(mathml));
-        let should_set_literal_intent = rules.pref_manager.borrow().pref_to_string("SpeechStyle").as_str() == "LiteralSpeak";
-        let original_intent = mathml.attribute_value("intent");
-        if should_set_literal_intent {
-            if let Some(intent) = original_intent {
-                let intent = if intent.contains('(') {intent.replace('(', ":literal(")} else {intent.to_string() + ":literal"};
-                mathml.set_attribute_value("intent", &intent);
-            } else {
-                mathml.set_attribute_value("intent", ":literal");
-            };
-        }
-        let mut rules_with_context = SpeechRulesWithContext::new(&rules, doc, nav_node_id);
-        let intent =  rules_with_context.match_pattern::<Element<'m>>(mathml)
-                    .chain_err(|| "Pattern match/replacement failure!")?;
-        let answer = if name(intent) == "TEMP_NAME" {   // unneeded extra layer
-            assert_eq!(intent.children().len(), 1);
-            as_element(intent.children()[0])
+fn apply_intent_to_mathml<'m>(
+    rules: &SpeechRules, definitions: &Definitions,
+    doc: Document<'m>, mathml: Element, nav_node_id: &'m str) -> Result<Element<'m>> {
+    let should_set_literal_intent = rules.pref_manager.borrow().pref_to_string("SpeechStyle").as_str() == "LiteralSpeak";
+    let original_intent = mathml.attribute_value("intent");
+    if should_set_literal_intent {
+        if let Some(intent) = original_intent {
+            let intent = if intent.contains('(') {intent.replace('(', ":literal(")} else {intent.to_string() + ":literal"};
+            mathml.set_attribute_value("intent", &intent);
         } else {
-            intent
+            mathml.set_attribute_value("intent", ":literal");
         };
-        if should_set_literal_intent {
-            if let Some(original_intent) = original_intent {
-                mathml.set_attribute_value("intent", original_intent);
-            } else {
-                mathml.remove_attribute("intent");
-            }
+    }
+    let mut rules_with_context = SpeechRulesWithContext::new(&rules, &definitions, doc, nav_node_id);
+    let intent =  rules_with_context.match_pattern::<Element<'m>>(mathml)
+                .chain_err(|| "Pattern match/replacement failure!")?;
+    let answer = if name(intent) == "TEMP_NAME" {   // unneeded extra layer
+        assert_eq!(intent.children().len(), 1);
+        as_element(intent.children()[0])
+    } else {
+        intent
+    };
+    if should_set_literal_intent {
+        if let Some(original_intent) = original_intent {
+            mathml.set_attribute_value("intent", original_intent);
+        } else {
+            mathml.remove_attribute("intent");
         }
-        return Ok(answer);
-    })
+    }
+    return Ok(answer);
+}
+
+/// Speak the MathML
+/// If 'nav_node_id' is not an empty string, then the element with that id will have [[...]] around it
+pub fn mathml_node_to_spoken_text(rules: &SpeechRules, definitions: &Definitions, mathml: Element, nav_node_id: &str) -> Result<String> {
+    let new_package = Package::new();
+    let mut rules_with_context = SpeechRulesWithContext::new(&rules, &definitions, new_package.as_document(), nav_node_id);
+    let mut speech_string = rules_with_context.match_pattern::<String>(mathml)
+                .chain_err(|| "Pattern match/replacement failure!")?;
+    // debug!("speak_rules: nav_node_id={}, mathml id={}, speech_string='{}'", nav_node_id, mathml.attribute_value("id").unwrap_or_default(), &speech_string);
+    // Note: [[...]] is added around a matching child, but if the "id" is on 'mathml', the whole string is used
+    if !nav_node_id.is_empty() {
+        // See https://github.com/NSoiffer/MathCAT/issues/174 for why we can just start the speech at the nav node
+        if let Some(start) = speech_string.find("[[") {
+            match speech_string[start+2..].find("]]") {
+                None => bail!("Internal error: looking for '[[...]]' during navigation -- only found '[[' in '{}'", speech_string),
+                Some(end) => speech_string = speech_string[start+2..start+2+end].to_string(),
+            }
+        } else {
+            bail!(NAV_NODE_SPEECH_NOT_FOUND); //  NAV_NODE_SPEECH_NOT_FOUND is tested for later
+        }
+    }
+    Ok(rules.pref_manager.borrow().get_tts()
+            .merge_pauses(remove_optional_indicators(
+                    &speech_string.replace(CONCAT_STRING, "")
+                                        .replace(CONCAT_INDICATOR, "")
+                                )
+            .trim_start().trim_end_matches([' ', ',', ';'])))
+
 }
 
 /// Speak the MathML
@@ -125,30 +158,10 @@ fn speak_rules(rules: &'static std::thread::LocalKey<RefCell<SpeechRules>>, math
     rules.with(|rules| {
         rules.borrow_mut().read_files()?;
         let rules = rules.borrow();
-        // debug!("speak_rules:\n{}", mml_to_string(mathml));
-        let new_package = Package::new();
-        let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), nav_node_id);
-        let mut speech_string = rules_with_context.match_pattern::<String>(mathml)
-                    .chain_err(|| "Pattern match/replacement failure!")?;
-        // debug!("speak_rules: nav_node_id={}, mathml id={}, speech_string='{}'", nav_node_id, mathml.attribute_value("id").unwrap_or_default(), &speech_string);
-        // Note: [[...]] is added around a matching child, but if the "id" is on 'mathml', the whole string is used
-        if !nav_node_id.is_empty() {
-            // See https://github.com/NSoiffer/MathCAT/issues/174 for why we can just start the speech at the nav node
-            if let Some(start) = speech_string.find("[[") {
-                match speech_string[start+2..].find("]]") {
-                    None => bail!("Internal error: looking for '[[...]]' during navigation -- only found '[[' in '{}'", speech_string),
-                    Some(end) => speech_string = speech_string[start+2..start+2+end].to_string(),
-                }
-            } else {
-                bail!(NAV_NODE_SPEECH_NOT_FOUND); //  NAV_NODE_SPEECH_NOT_FOUND is tested for later
-            }
-        }
-        return Ok( rules.pref_manager.borrow().get_tts()
-                    .merge_pauses(remove_optional_indicators(
-                        &speech_string.replace(CONCAT_STRING, "")
-                                            .replace(CONCAT_INDICATOR, "")                            
-                                    )
-                    .trim_start().trim_end_matches([' ', ',', ';'])) );
+        crate::definitions::SPEECH_DEFINITIONS.with_borrow(|definitions| 
+            // debug!("speak_rules:\n{}", mml_to_string(mathml));
+            mathml_node_to_spoken_text(&rules, definitions, mathml, nav_node_id)
+        )
     })
 }
 
@@ -1668,10 +1681,10 @@ impl fmt::Display for ContextStack<'_> {
 }
 
 impl<'c, 'r> ContextStack<'c> {
-    fn new<'a,>(pref_manager: &'a PreferenceManager) -> ContextStack<'c> {
+    fn new<'a,>(pref_manager: &'a PreferenceManager, definitions: &'a Definitions) -> ContextStack<'c> {
         let prefs = pref_manager.merge_prefs();
         let mut context_stack = ContextStack {
-            base: ContextStack::base_context(prefs),
+            base: ContextStack::base_context(pref_manager, definitions, prefs),
             old_values: Vec::with_capacity(31)      // should avoid allocations
         };
         // FIX: the list of variables to set should come from definitions.yaml
@@ -1683,10 +1696,10 @@ impl<'c, 'r> ContextStack<'c> {
         return context_stack;
     }
 
-    fn base_context(var_defs: PreferenceHashMap) -> Context<'c> {
+    fn base_context<'a>(pref_manager: &'a PreferenceManager, definitions: &'a Definitions, var_defs: PreferenceHashMap) -> Context<'c> {
         let mut context  = Context::new();
         context.set_namespace("m", "http://www.w3.org/1998/Math/MathML");
-        crate::xpath_functions::add_builtin_functions(&mut context);
+        crate::xpath_functions::add_builtin_functions(&pref_manager, &definitions, &mut context);
         for (key, value) in var_defs {
             context.set_variable(key.as_str(), yaml_to_value(&value));
             // if let Some(str_value) = value.as_str() {
@@ -2125,23 +2138,23 @@ thread_local!{
     /// The current set of speech rules
     // maybe this should be a small cache of rules in case people switch rules/prefs?
     pub static INTENT_RULES: RefCell<SpeechRules> =
-            RefCell::new( SpeechRules::new(RulesFor::Intent, true) );
+            RefCell::new( SpeechRules::new(RulesFor::Intent, true, PreferenceManager::get()) );
 
     pub static SPEECH_RULES: RefCell<SpeechRules> =
-            RefCell::new( SpeechRules::new(RulesFor::Speech, true) );
+            RefCell::new( SpeechRules::new(RulesFor::Speech, true, PreferenceManager::get()) );
 
     pub static OVERVIEW_RULES: RefCell<SpeechRules> =
-            RefCell::new( SpeechRules::new(RulesFor::OverView, true) );
+            RefCell::new( SpeechRules::new(RulesFor::OverView, true, PreferenceManager::get()) );
 
     pub static NAVIGATION_RULES: RefCell<SpeechRules> =
-            RefCell::new( SpeechRules::new(RulesFor::Navigation, true) );
+            RefCell::new( SpeechRules::new(RulesFor::Navigation, true, PreferenceManager::get()) );
 
     pub static BRAILLE_RULES: RefCell<SpeechRules> =
-            RefCell::new( SpeechRules::new(RulesFor::Braille, false) );
+            RefCell::new( SpeechRules::new(RulesFor::Braille, false, PreferenceManager::get()) );
 }
 
 impl SpeechRules {
-    pub fn new(name: RulesFor, translate_single_chars_only: bool) -> SpeechRules {
+    pub fn new(name: RulesFor, translate_single_chars_only: bool, pref_manager: Rc<RefCell<PreferenceManager>>) -> SpeechRules {
         let globals = if name == RulesFor::Braille {
             (
                 (BRAILLE_UNICODE_SHORT.with(Rc::clone), BRAILLE_UNICODE_SHORT_FILES_AND_TIMES.with(Rc::clone)),
@@ -2167,9 +2180,25 @@ impl SpeechRules {
             unicode_full_files: globals.1.1,
             definitions_files: globals.2,
             translate_single_chars_only,
-            pref_manager: PreferenceManager::get(),
+            pref_manager: pref_manager,
         };
-}
+    }
+
+    pub fn new_stateless(name: RulesFor, translate_single_chars_only: bool, pref_manager: Rc<RefCell<PreferenceManager>>) -> SpeechRules {
+        return SpeechRules {
+            error: Default::default(),
+            name,
+            rules: HashMap::with_capacity(if name == RulesFor::Intent || name == RulesFor::Speech {500} else {50}),                       // lazy load them
+            rule_files: FilesAndTimes::default(),
+            unicode_short: Rc::new(RefCell::new(HashMap::with_capacity(500))),
+            unicode_short_files: Rc::new(RefCell::new(FilesAndTimes::default())),
+            unicode_full: Rc::new(RefCell::new(HashMap::with_capacity(6500))),
+            unicode_full_files: Rc::new(RefCell::new(FilesAndTimes::default())),
+            definitions_files: Rc::new(RefCell::new(FilesAndTimes::default())),
+            translate_single_chars_only,
+            pref_manager: pref_manager,
+        };
+    }
 
     pub fn get_error(&self) -> Option<&str> {
         return if self.error.is_empty() {
@@ -2180,6 +2209,21 @@ impl SpeechRules {
     }
 
     pub fn read_files(&mut self) -> Result<()> {
+        use crate::definitions::SPEECH_DEFINITIONS;
+        use crate::definitions::BRAILLE_DEFINITIONS;
+        let definitions = if self.name != RulesFor::Braille {&SPEECH_DEFINITIONS} else {&BRAILLE_DEFINITIONS};
+        return definitions.with(|definitions| {
+            // If definitions are already borrow, we assume they've been read up the stack and skip reading them.
+            let mut try_defs = definitions.try_borrow_mut();
+            let maybe_defs: Option<&mut Definitions> = match try_defs {
+                Ok(ref mut defs) => Some(defs),
+                Err(_) => None,
+            };
+            return self.read_files_for_stateless(maybe_defs);
+        });
+    }
+
+    pub fn read_files_for_stateless(&mut self, definitions: Option<&mut Definitions>) -> Result<()> {
         let check_rule_files = self.pref_manager.borrow().pref_to_string("CheckRuleFiles");
         if check_rule_files != "None" {  // "Prefs" or "All" are other values
             self.pref_manager.borrow_mut().set_preference_files()?;
@@ -2200,14 +2244,24 @@ impl SpeechRules {
             self.unicode_short_files.borrow_mut().set_files_and_times(self.read_unicode(None, true)?);
         }
 
+        if let Some(definitions) = definitions {
+            self.read_definitions(should_ignore_file_time, definitions)?;
+        }
+        return Ok( () );
+    }
+
+    fn read_definitions(&self, should_ignore_file_time: bool, definitions: &mut Definitions) -> Result<()> {
+        let pref_manager = self.pref_manager.borrow();
         if self.definitions_files.borrow().ft.is_empty() || !self.definitions_files.borrow().is_file_up_to_date(
                             pref_manager.get_definitions_file(self.name != RulesFor::Braille),
                             should_ignore_file_time
         ) {
-            self.definitions_files.borrow_mut().set_files_and_times(read_definitions_file(self.name != RulesFor::Braille)?);
+            self.definitions_files.borrow_mut().set_files_and_times(
+                read_definitions_file(pref_manager.get_definitions_file(self.name != RulesFor::Braille), definitions)?);
         }
-        return Ok( () );
+        Ok(())
     }
+
 
     fn read_patterns(&mut self, path: &Path) -> Result<Vec<PathBuf>> {
         // info!("Reading rule file: {}", p.to_str().unwrap());
@@ -2311,13 +2365,13 @@ impl SpeechRules {
 
 /// We track three different lifetimes:
 ///   'c -- the lifetime of the context and mathml
-///   's -- the lifetime of the speech rules (which is static)
+///   's -- the lifetime of the speech rules and definitions
 ///   'r -- the lifetime of the reference (this seems to be key to keep the rust memory checker happy)
 impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
-    pub fn new(speech_rules: &'s SpeechRules, doc: Document<'m>, nav_node_id: &'m str) -> SpeechRulesWithContext<'c, 's, 'm> {
+    pub fn new(speech_rules: &'s SpeechRules, definitions: &'s Definitions, doc: Document<'m>, nav_node_id: &'m str) -> SpeechRulesWithContext<'c, 's, 'm> {
         return SpeechRulesWithContext {
             speech_rules,
-            context_stack: ContextStack::new(&speech_rules.pref_manager.borrow()),
+            context_stack: ContextStack::new(&speech_rules.pref_manager.borrow(), &definitions),
             doc,
             nav_node_id,
             inside_spell: false,
@@ -2673,12 +2727,13 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
 
 /// Hack to allow replacement of `str` with braille chars.
 pub fn braille_replace_chars(str: &str, mathml: Element) -> Result<String> {
-    return BRAILLE_RULES.with(|rules| {
-        let rules = rules.borrow();
-        let new_package = Package::new();
-        let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), "");
-        return rules_with_context.replace_chars(str, mathml);
-    })
+    return BRAILLE_RULES.with_borrow(|rules| {
+        return SPEECH_DEFINITIONS.with_borrow(|definitions| {
+            let new_package = Package::new();
+            let mut rules_with_context = SpeechRulesWithContext::new(&rules, definitions, new_package.as_document(), "");
+            return rules_with_context.replace_chars(str, mathml);
+        });
+    });
 }
 
 
@@ -2696,7 +2751,7 @@ mod tests {
         {name: default, tag: math, match: ".", replace: [x: "./*"] }"#;
         let doc = YamlLoader::load_from_str(str).unwrap();
         assert_eq!(doc.len(), 1);
-        let mut rules = SpeechRules::new(RulesFor::Speech, true);
+        let mut rules = SpeechRules::new(RulesFor::Speech, true, PreferenceManager::get());
 
         SpeechPattern::build(&doc[0], Path::new("testing"), &mut rules).unwrap();
         assert_eq!(rules.rules["math"].len(), 1, "\nshould only be one rule");
@@ -2715,7 +2770,7 @@ mod tests {
         {name: default, tag: math, match: ".", replace: [x: "./*"] }"#;
         let doc = YamlLoader::load_from_str(str).unwrap();
         assert_eq!(doc.len(), 1);
-        let mut rules = SpeechRules::new(RulesFor::Speech, true);
+        let mut rules = SpeechRules::new(RulesFor::Speech, true, PreferenceManager::get());
         SpeechPattern::build(&doc[0], Path::new("testing"), &mut rules).unwrap();
 
         let str = r#"---
@@ -2738,7 +2793,7 @@ mod tests {
         {name: default, tag: math, match: ".", replace: [x: "./*"] }"#;
         let doc = YamlLoader::load_from_str(str).unwrap();
         assert_eq!(doc.len(), 1);
-        let mut rules = SpeechRules::new(RulesFor::Speech, true);
+        let mut rules = SpeechRules::new(RulesFor::Speech, true, PreferenceManager::get());
         SpeechPattern::build(&doc[0], Path::new("testing"), &mut rules).unwrap();
 
         let str = r#"---
