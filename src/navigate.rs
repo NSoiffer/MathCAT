@@ -18,6 +18,8 @@ use std::time::Instant;
 use crate::errors::*;
 use phf::phf_set;
 
+#[cfg(test)]
+use crate::element_util::{get_element};
 
 const MAX_PLACE_MARKERS: usize = 10;
 

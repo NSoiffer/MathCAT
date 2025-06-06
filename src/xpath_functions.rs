@@ -1449,7 +1449,7 @@ pub fn add_builtin_functions(context: &mut Context) {
 mod tests {
     use super::*;
     use sxd_document::parser;
-    use crate::interface::{trim_element, get_element};
+    use crate::element_util::{trim_element, get_element};
 
 
     fn init_word_list() {

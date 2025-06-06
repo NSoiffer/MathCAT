@@ -216,10 +216,20 @@ thread_local!{
 //   Also note that if 'error' is not an empty string, SpeechRules can't work so using those requires a check.
 #[derive(Debug, Default)]
 pub struct PreferenceManager {
-    rules_dir: PathBuf,                   // full path to rules dir
-    error: String,                        // empty/default string if fields are set, otherwise error message
-    user_prefs: Preferences,              // prefs that come from reading prefs.yaml (system and user locations)
-    api_prefs: Preferences,               // prefs set by API calls (along with some defaults not in the user settings such as "pitch")
+    // Path to the rules directory.
+    rules_dir: PathBuf,
+
+    // Stateful mode: empty/default string if fields are set, otherwise error message.
+    // Stateless mode: unused.
+    error: String,
+    
+    // Stateful mode: these prefs come from reading prefs.yaml (system and user locations)
+    // Stateless mode: set explicitly when building the context.
+    user_prefs: Preferences,
+
+    // In stateful mode, prefs set by API calls (along with some defaults not in the user settings such as "pitch")
+    api_prefs: Preferences,
+
     sys_prefs_file: Option<FileAndTime>,  // the system prefs.yaml file
     user_prefs_file: Option<FileAndTime>, // the user prefs.yaml file
     intent: PathBuf,                      // the intent rule style file
@@ -255,7 +265,7 @@ impl fmt::Display for PreferenceManager {
 }
 
 impl PreferenceManager {
-    /// Initialize (the) PreferenceManager (a global var).
+    /// Initialize a PreferenceManager.
     /// 'rules_dir' is the path to "Rules" unless the env var MathCATRulesDir is set
     /// 
     /// If rules_dir is an empty PathBuf, the existing rules_dir is used (an error if it doesn't exist)
@@ -273,6 +283,7 @@ impl PreferenceManager {
     }
 
 
+    /// Returns the global preference manager.
     pub fn get() -> Rc<RefCell<PreferenceManager>> {
         return PREF_MANAGER.with( |pm| pm.clone() );
     }
@@ -835,6 +846,35 @@ impl PreferenceManager {
     }
 }
 
+
+// Builds a PreferenceManager for stateless mode.
+pub(crate) struct PreferenceManagerBuilder {
+    pref_manager: Rc<RefCell<PreferenceManager>>,
+}
+
+impl PreferenceManagerBuilder {
+    pub fn new() -> PreferenceManagerBuilder {
+        let result = PreferenceManagerBuilder {
+            pref_manager: Rc::new(RefCell::new(PreferenceManager::default())),
+        };
+        result.pref_manager.borrow_mut().user_prefs = Preferences::user_defaults();
+        return result;
+    }
+
+    pub fn set_string_pref(&mut self, key: &str, value: &str) {
+        self.pref_manager.borrow_mut().user_prefs.prefs.insert(key.to_string(), Yaml::String(value.to_string()));
+    }
+
+    pub fn build(self) -> Result<Rc<RefCell<PreferenceManager>>> {
+        {
+            let mut pref_manager = self.pref_manager.borrow_mut();
+            let language = pref_manager.user_prefs.prefs.get("Language").unwrap().clone();
+            let language = language.as_str().unwrap();
+            pref_manager.set_separators(language)?;
+        }
+        return Ok(self.pref_manager);
+    }
+}
 
 #[cfg(test)]
 mod tests {
