@@ -50,9 +50,11 @@ pub mod interface;
 pub use shim_filesystem::ZIPPED_RULE_FILES;
 
 mod canonicalize;
+pub mod element_util;
 mod infer_intent;
 pub mod speech;
 mod braille;
+mod logs;
 mod navigate;
 mod prefs;
 mod tts;
@@ -90,7 +92,7 @@ pub fn abs_rules_dir_path() -> String {
 
 #[cfg(test)]
 pub fn are_strs_canonically_equal_with_locale(test: &str, target: &str, block_separators: &str, decimal_separators: &str) -> bool {
-    use crate::{interface::*, pretty_print::mml_to_string};
+    use crate::{element_util::*, pretty_print::mml_to_string};
     use sxd_document::parser;
     use crate::canonicalize::canonicalize;
     // this forces initialization
