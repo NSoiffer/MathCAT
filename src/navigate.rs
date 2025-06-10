@@ -2,7 +2,7 @@
 //! See preference documentation for more info on navigation preferences.
 #![allow(clippy::needless_return)]
 
-use std::cell::{Ref, RefCell, RefMut};
+use std::cell::{RefCell, RefMut};
 use sxd_xpath::{Context, Factory, Value};
 use sxd_document::dom::Element;
 use sxd_document::Package;
@@ -18,6 +18,8 @@ use std::time::Instant;
 use crate::errors::*;
 use phf::phf_set;
 
+#[cfg(test)]
+use crate::element_util::{get_element};
 
 const MAX_PLACE_MARKERS: usize = 10;
 
@@ -349,9 +351,7 @@ fn do_navigate_command_and_param(mathml: Element, command: NavigationCommand, pa
 
 pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) -> Result<String> {   
     // first check to see if nav file has been changed -- don't bother checking in loop below
-    NAVIGATION_RULES.with(|rules| {
-        rules.borrow_mut().read_files()
-    })?;
+    NAVIGATION_RULES.with_borrow_mut(|rules| rules.read_files())?;
 
     if mathml.children().is_empty() {
         bail!("MathML has not been set -- can't navigate");
@@ -368,60 +368,62 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
             }, "None")
         };
 
-        return NAVIGATION_RULES.with(|rules| {
-            let rules = rules.borrow();
-            let new_package = Package::new();
-            let mut rules_with_context = SpeechRulesWithContext::new(&rules, new_package.as_document(), "");
-            
-            nav_state.mode = rules.pref_manager.as_ref().borrow().pref_to_string("NavMode");
-            nav_state.speak_overview = rules.pref_manager.as_ref().borrow().pref_to_string("Overview") == "true";
+        return NAVIGATION_RULES.with_borrow(|rules| {
+            return crate::definitions::SPEECH_DEFINITIONS.with_borrow(|definitions| {
+                let new_package = Package::new();
+                let mut rules_with_context =
+                    SpeechRulesWithContext::new(&rules, definitions, new_package.as_document(), "");
 
-            nav_state.init_navigation_context(rules_with_context.get_context(), nav_command, nav_state.top());
-            
-            // start navigation off at the right node
-            if nav_command == "MoveLastLocation" {
-                nav_state.pop();
-            }
+                nav_state.mode = rules.pref_manager.as_ref().borrow().pref_to_string("NavMode");
+                nav_state.speak_overview = rules.pref_manager.as_ref().borrow().pref_to_string("Overview") == "true";
 
-            // If no speech happened for some calls, we try the call again (e.g, no speech for invisible times).
-            // To prevent to infinite loop, we limit the number of tries
-            const LOOP_LIMIT: usize = 3;
-            let mut cumulative_speech = String::with_capacity(120);
-            for loop_count in 0..LOOP_LIMIT {
-                match apply_navigation_rules(mathml, nav_command, &rules, &mut rules_with_context, &mut nav_state, loop_count) {
-                    Ok( (speech, done)) => {
-                        cumulative_speech = cumulative_speech + if loop_count==0 {""} else {" "} + speech.trim();
-                        if done {
-                            let (tts, rate) = {
-                                let prefs = rules.pref_manager.borrow();
-                                (prefs.pref_to_string("TTS"), prefs.pref_to_string("MathRate"))
-                            };
-                            if rate != "100" {
-                                match tts.as_str() {
-                                    "SSML" => if !cumulative_speech.starts_with("<prosody rate") {
-                                        cumulative_speech = format!("<prosody rate='{}%'>{}</prosody>", &rate, &cumulative_speech);
-                                    }, 
-                                    "SAPI5" => if !cumulative_speech.starts_with("<rate speed") {
-                                        cumulative_speech = format!("<rate speed='{:.1}'>{}</rate>'>",
-                                        10.0*(0.01*rate.parse::<f32>().unwrap_or(100.0)).log(3.0), cumulative_speech);
-                                    },
-                                    _ => (),  // do nothing
+                nav_state.init_navigation_context(rules_with_context.get_context(), nav_command, nav_state.top());
+
+                // start navigation off at the right node
+                if nav_command == "MoveLastLocation" {
+                    nav_state.pop();
+                }
+
+                // If no speech happened for some calls, we try the call again (e.g, no speech for invisible times).
+                // To prevent to infinite loop, we limit the number of tries
+                const LOOP_LIMIT: usize = 3;
+                let mut cumulative_speech = String::with_capacity(120);
+                for loop_count in 0..LOOP_LIMIT {
+                    match apply_navigation_rules(mathml, nav_command, &rules, &mut rules_with_context, &mut nav_state, loop_count) {
+                        Ok( (speech, done)) => {
+                            cumulative_speech = cumulative_speech + if loop_count==0 {""} else {" "} + speech.trim();
+                            if done {
+                                let (tts, rate) = {
+                                    let prefs = rules.pref_manager.borrow();
+                                    (prefs.pref_to_string("TTS"), prefs.pref_to_string("MathRate"))
+                                };
+                                if rate != "100" {
+                                    match tts.as_str() {
+                                        "SSML" => if !cumulative_speech.starts_with("<prosody rate") {
+                                            cumulative_speech = format!("<prosody rate='{}%'>{}</prosody>", &rate, &cumulative_speech);
+                                        }, 
+                                        "SAPI5" => if !cumulative_speech.starts_with("<rate speed") {
+                                            cumulative_speech = format!("<rate speed='{:.1}'>{}</rate>'>",
+                                            10.0*(0.01*rate.parse::<f32>().unwrap_or(100.0)).log(3.0), cumulative_speech);
+                                        },
+                                        _ => (),  // do nothing
+                                    }
                                 }
+                                                    return Ok( rules.pref_manager.borrow().get_tts()
+                                                .merge_pauses(crate::speech::remove_optional_indicators(
+                                                    &cumulative_speech.replace(CONCAT_STRING, "")
+                                                                        .replace(CONCAT_INDICATOR, "")                            
+                                                                )
+                                                .trim_start().trim_end_matches([' ', ',', ';'])) );
                             }
-                                                return Ok( rules.pref_manager.borrow().get_tts()
-                                            .merge_pauses(crate::speech::remove_optional_indicators(
-                                                &cumulative_speech.replace(CONCAT_STRING, "")
-                                                                    .replace(CONCAT_INDICATOR, "")                            
-                                                            )
-                                            .trim_start().trim_end_matches([' ', ',', ';'])) );
+                        },
+                        Err(e) => {
+                            return Err(e);
                         }
-                    },
-                    Err(e) => {
-                        return Err(e);
                     }
                 }
-            }
-            bail!("Internal error: Navigation exceeded limit of number of times no speech generated.");
+                bail!("Internal error: Navigation exceeded limit of number of times no speech generated.");
+            });
         });
     });
 
@@ -443,7 +445,7 @@ pub fn do_navigate_command_string(mathml: Element, nav_command: &'static str) ->
 
 
     fn apply_navigation_rules<'c, 'm:'c>(mathml: Element<'m>, nav_command: &'static str,
-            rules: &Ref<SpeechRules>, rules_with_context: &mut SpeechRulesWithContext<'c, '_, 'm>, nav_state: &mut RefMut<NavigationState>,
+            rules: &SpeechRules, rules_with_context: &mut SpeechRulesWithContext<'c, '_, 'm>, nav_state: &mut RefMut<NavigationState>,
             loop_count: usize) -> Result<(String, bool)> {
         let context = rules_with_context.get_context();
         context.set_variable("MatchCounter", loop_count as f64);

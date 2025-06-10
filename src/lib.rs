@@ -46,13 +46,17 @@ extern crate cfg_if;
 
 
 pub mod interface;
+pub mod stateless_interface;
+
 #[cfg(feature = "include-zip")]
 pub use shim_filesystem::ZIPPED_RULE_FILES;
 
 mod canonicalize;
+pub mod element_util;
 mod infer_intent;
 pub mod speech;
 mod braille;
+mod logs;
 mod navigate;
 mod prefs;
 mod tts;
@@ -63,6 +67,7 @@ mod chemistry;
 
 pub mod shim_filesystem; // really just for override_file_for_debugging_rules, but the config seems to throw it off
 pub use interface::*;
+pub use stateless_interface::*;
 
 #[cfg(test)]
 pub fn init_logger() {
@@ -90,9 +95,9 @@ pub fn abs_rules_dir_path() -> String {
 
 #[cfg(test)]
 pub fn are_strs_canonically_equal_with_locale(test: &str, target: &str, block_separators: &str, decimal_separators: &str) -> bool {
-    use crate::{interface::*, pretty_print::mml_to_string};
+    use crate::{canonicalize::CanonicalizeContext, element_util::*, interface::*, pretty_print::mml_to_string};
+    use crate::definitions::SPEECH_DEFINITIONS;
     use sxd_document::parser;
-    use crate::canonicalize::canonicalize;
     // this forces initialization
     crate::interface::set_rules_dir(abs_rules_dir_path()).unwrap();
     crate::speech::SPEECH_RULES.with(|rules|  rules.borrow_mut().read_files().unwrap());
@@ -104,7 +109,9 @@ pub fn are_strs_canonically_equal_with_locale(test: &str, target: &str, block_se
     let mathml = get_element(package1);
     trim_element(mathml, false);
     // debug!("test:\n{}", mml_to_string(mathml));
-    let mathml_test = canonicalize(mathml).unwrap();
+
+    let canonicalize_context = CanonicalizeContext::new_from_global_prefs_cached();
+    let mathml_test = SPEECH_DEFINITIONS.with_borrow(|definitions| canonicalize_context.canonicalize(definitions, mathml)).unwrap();
    
     let package2 = &parser::parse(target).expect("Failed to parse target input");
     let mathml_target = get_element(package2);

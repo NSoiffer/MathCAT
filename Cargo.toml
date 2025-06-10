@@ -8,7 +8,7 @@ repository = "https://github.com/NSoiffer/MathCAT"
 homepage = "https://nsoiffer.github.io/MathCAT/"
 documentation = "https://nsoiffer.github.io/MathCAT/"
 edition = "2018"
-exclude = ["src/main.rs", "docs", "PythonScripts"]    # should have "Rules/", but then one can't run build.rs to build the zip file
+exclude = ["src/main.rs", "examples/**", "docs", "PythonScripts"]    # should have "Rules/", but then one can't run build.rs to build the zip file
 
 
 [features]
