@@ -2455,40 +2455,44 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         
         // FIX: this seems needlessly complex. It is much simpler if the char can be changed in place...
         // find first char that can get the dots and add them
-        let mut result = String::with_capacity(braille.len());
-        let mut i_bytes = 0;
-        let mut chars = braille.chars();
+        let mut chars = braille.chars().collect::<Vec<char>>();
 
         // the 'b' for baseline indicator is really part of the previous token, so it needs to be highlighted but isn't because it is not Unicode braille
         let baseline_indicator_hack = PreferenceManager::get().borrow().pref_to_string("BrailleCode") == "Nemeth";
-        for ch in chars.by_ref() {
+        // debug!("highlight_braille_string: braille={}", braille);
+        let mut i_first_modified = 0;
+        for i in 0..chars.len() {
+            let ch = chars[i];
             let modified_ch = add_dots_to_braille_char(ch, baseline_indicator_hack);
-            i_bytes += ch.len_utf8();
-            result.push(modified_ch);
+            chars[i] = modified_ch; 
             if ch != modified_ch {
+                i_first_modified = i;
                 break;
             };
         };
 
-        let mut i_end = braille.len();
+        let mut i_last_modified = i_first_modified;
         if &highlight_style != "FirstChar" {
             // find last char so that we know when to modify the char
-            let rev_chars = braille.chars().rev();
-            for ch in rev_chars {
+            for i in (i_first_modified..chars.len()).rev(){
+                let ch = chars[i];
                 let modified_ch = add_dots_to_braille_char(ch, baseline_indicator_hack);
-                i_end -= ch.len_utf8();
-                if ch !=  modified_ch && ch != 'b' {
-                    break;
+                chars[i] = modified_ch;
+                if ch !=  modified_ch {
+                    i_last_modified = i;
                 }
             }
         }
 
-        // finish going through the string
-        for ch in chars {
-            result.push( if i_bytes == i_end {add_dots_to_braille_char(ch, baseline_indicator_hack)} else {ch} );
-            i_bytes += ch.len_utf8();
-        };
+        if &highlight_style == "All" {
+            // finish going through the string
+            for i in i_first_modified+1..i_last_modified {
+                chars[i] = add_dots_to_braille_char(chars[i], baseline_indicator_hack);
+            };
+        }
 
+        let result = chars.into_iter().collect::<String>(); 
+        // debug!("                           result={}", result);
         return result;
 
         fn add_dots_to_braille_char(ch: char, baseline_indicator_hack: bool) -> char {
@@ -2667,7 +2671,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
     }
 }
 
-// Hack to allow replacement of `str` with braille chars.
+/// Hack to allow replacement of `str` with braille chars.
 pub fn braille_replace_chars(str: &str, mathml: Element) -> Result<String> {
     return BRAILLE_RULES.with(|rules| {
         let rules = rules.borrow();

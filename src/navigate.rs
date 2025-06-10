@@ -1341,16 +1341,16 @@ mod tests {
         return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            assert_eq!("zoomed in all the way; 1", test_command("ZoomInAll", mathml, "id-2"));
-            assert_eq!("move right; plus", test_command("MoveNext", mathml, "id-3"));
-            assert_eq!("move right; in base; x", test_command("MoveNext", mathml, "id-5"));
-            assert_eq!("move right; in subscript; 2", test_command("MoveNext", mathml, "id-6"));
-            assert_eq!("move right; in superscript; 3", test_command("MoveNext", mathml, "id-7"));
-            assert_eq!("move right; out of superscript; plus", test_command("MoveNext", mathml, "id-8"));
-            assert_eq!("move left; in superscript; 3", test_command("MovePrevious", mathml, "id-7"));
-            assert_eq!("move left; in subscript; 2", test_command("MovePrevious", mathml, "id-6"));
-            assert_eq!("move left; in base; x", test_command("MovePrevious", mathml, "id-5"));
-            assert_eq!("move left; out of base; plus", test_command("MovePrevious", mathml, "id-3"));
+            assert_eq!("zoomed in all the way, 1", test_command("ZoomInAll", mathml, "id-2"));
+            assert_eq!("move right, plus", test_command("MoveNext", mathml, "id-3"));
+            assert_eq!("move right, in base, x", test_command("MoveNext", mathml, "id-5"));
+            assert_eq!("move right, in subscript, 2", test_command("MoveNext", mathml, "id-6"));
+            assert_eq!("move right, in superscript, 3", test_command("MoveNext", mathml, "id-7"));
+            assert_eq!("move right, out of superscript, plus", test_command("MoveNext", mathml, "id-8"));
+            assert_eq!("move left, in superscript, 3", test_command("MovePrevious", mathml, "id-7"));
+            assert_eq!("move left, in subscript, 2", test_command("MovePrevious", mathml, "id-6"));
+            assert_eq!("move left, in base, x", test_command("MovePrevious", mathml, "id-5"));
+            assert_eq!("move left, out of base, plus", test_command("MovePrevious", mathml, "id-3"));
 
             return Ok( () );
         });
@@ -1380,18 +1380,18 @@ mod tests {
             return MATHML_INSTANCE.with(|package_instance| {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
-            assert_eq!("zoomed in all the way; in base; open bracket", test_command("ZoomInAll", mathml, "id-3"));
-            assert_eq!("move right; in base; cap c o", test_command("MoveNext", mathml, "id-5"));
-            assert_eq!("move right; in subscript; 6", test_command("MoveNext", mathml, "id-6"));
-            assert_eq!("move right; out of subscript; close bracket", test_command("MoveNext", mathml, "id-8"));
-            assert_eq!("move right; in superscript; 3", test_command("MoveNext", mathml, "id-11"));
-            assert_eq!("move right; plus", test_command("MoveNext", mathml, "id-12"));
+            assert_eq!("zoomed in all the way, in base, open bracket", test_command("ZoomInAll", mathml, "id-3"));
+            assert_eq!("move right, in base, cap c o", test_command("MoveNext", mathml, "id-5"));
+            assert_eq!("move right, in subscript, 6", test_command("MoveNext", mathml, "id-6"));
+            assert_eq!("move right, out of subscript, close bracket", test_command("MoveNext", mathml, "id-8"));
+            assert_eq!("move right, in superscript, 3", test_command("MoveNext", mathml, "id-11"));
+            assert_eq!("move right, plus", test_command("MoveNext", mathml, "id-12"));
             assert_eq!("cannot move right, end of math", test_command("MoveNext", mathml, "id-12"));
-            assert_eq!("move left; 3", test_command("MovePrevious", mathml, "id-11"));
-            assert_eq!("move left; in base; close bracket", test_command("MovePrevious", mathml, "id-8"));
-            assert_eq!("move left; in subscript; 6", test_command("MovePrevious", mathml, "id-6"));
-            assert_eq!("move left; in base; cap c o", test_command("MovePrevious", mathml, "id-5"));
-            assert_eq!("move left; out of base; open bracket", test_command("MovePrevious", mathml, "id-3"));
+            assert_eq!("move left, 3", test_command("MovePrevious", mathml, "id-11"));
+            assert_eq!("move left, in base, close bracket", test_command("MovePrevious", mathml, "id-8"));
+            assert_eq!("move left, in subscript, 6", test_command("MovePrevious", mathml, "id-6"));
+            assert_eq!("move left, in base, cap c o", test_command("MovePrevious", mathml, "id-5"));
+            assert_eq!("move left, out of base, open bracket", test_command("MovePrevious", mathml, "id-3"));
 
             return Ok( () );
         });
@@ -1457,10 +1457,10 @@ mod tests {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
             test_command("ZoomInAll", mathml, "id-3");
-            assert_eq!("move right; in denominator; y", test_command("MoveNext", mathml, "id-4"));
-            assert_eq!("move right; out of denominator; z", test_command("MoveNext", mathml, "id-6"));
-            assert_eq!("move left; in denominator; y", test_command("MovePrevious", mathml, "id-4"));
-            assert_eq!("move left; in numerator; x", test_command("MovePrevious", mathml, "id-3"));
+            assert_eq!("move right, in denominator, y", test_command("MoveNext", mathml, "id-4"));
+            assert_eq!("move right, out of denominator, z", test_command("MoveNext", mathml, "id-6"));
+            assert_eq!("move left, in denominator, y", test_command("MovePrevious", mathml, "id-4"));
+            assert_eq!("move left, in numerator, x", test_command("MovePrevious", mathml, "id-3"));
 
             return Ok( () );
         });
@@ -1488,10 +1488,10 @@ mod tests {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
             test_command("ZoomIn", mathml, "id-2");
-            assert_eq!("move right; times", test_command("MoveNext", mathml, "id-3"));
-            assert_eq!("move right; 1 minus x", test_command("MoveNext", mathml, "id-6"));
-            assert_eq!("move left; times", test_command("MovePrevious", mathml, "id-3"));
-            assert_eq!("move left; 2", test_command("MovePrevious", mathml, "id-2"));
+            assert_eq!("move right, times", test_command("MoveNext", mathml, "id-3"));
+            assert_eq!("move right, 1 minus x", test_command("MoveNext", mathml, "id-6"));
+            assert_eq!("move left, times", test_command("MovePrevious", mathml, "id-3"));
+            assert_eq!("move left, 2", test_command("MovePrevious", mathml, "id-2"));
 
             return Ok( () );
         });
@@ -1520,10 +1520,10 @@ mod tests {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
             test_command("ZoomIn", mathml, "id-2");
-            assert_eq!("move right; open paren", test_command("MoveNext", mathml, "id-5"));
-            assert_eq!("move right; 1", test_command("MoveNext", mathml, "id-7"));
-            assert_eq!("move left; open paren", test_command("MovePrevious", mathml, "id-5"));
-            assert_eq!("move left; 2", test_command("MovePrevious", mathml, "id-2"));
+            assert_eq!("move right, open paren", test_command("MoveNext", mathml, "id-5"));
+            assert_eq!("move right, 1", test_command("MoveNext", mathml, "id-7"));
+            assert_eq!("move left, open paren", test_command("MovePrevious", mathml, "id-5"));
+            assert_eq!("move left, 2", test_command("MovePrevious", mathml, "id-2"));
 
             return Ok( () );
         });
@@ -1597,7 +1597,7 @@ mod tests {
             test_command("MoveCellDown", mathml, "nav-20");
             test_command("MoveCellDown", mathml, "nav-27");
             let speech = test_command("MoveCellDown", mathml, "nav-39");
-            assert_eq!(speech, "move down, row 4, column 3; 2 minus y");
+            assert_eq!(speech, "move down, row 4, column 3, 2 minus y");
             let speech = test_command("MoveCellDown", mathml, "nav-39");
             assert_eq!(speech, "no next row");
             test_command("MoveCellPrevious", mathml, "nav-35");
@@ -1748,7 +1748,7 @@ mod tests {
             // WhereAmIAll doesn't change the stack
             let speech =test_command("WhereAmIAll", mathml, "exp");
             // should be 2 "inside" strings corresponding to steps to the root
-            assert_eq!(speech, "2; inside; b squared; inside; the fraction with numerator; b squared; and denominator d");
+            assert_eq!(speech, "2; inside, b squared; inside, the fraction with numerator, b squared, and denominator d");
             return Ok( () );
         });
     }
@@ -1839,10 +1839,14 @@ mod tests {
             let mathml = get_element(&*package_instance);
             test_command("ZoomIn", mathml, "row-1");
             let speech = test_command("MoveNext", mathml, "row-2");
-            assert_eq!(speech, "move right; row 2; 5, negative 6");
+            assert_eq!(speech, "move right; row 2, 5, negative 6");
             let speech = test_command("ZoomIn", mathml, "id-13");
-            assert_eq!(speech, "zoom in; column 1; 5");
-            return Ok( () );
+            assert_eq!(speech, "zoom in, column 1, 5");
+            let speech = test_command("ZoomOut", mathml, "row-2");
+            assert_eq!(speech, "zoom out; row 2, 5, negative 6");
+            let speech = test_command("ZoomOut", mathml, "table");
+            assert_eq!(speech, "zoom out, the 2 by 2 matrix; row 1, 9, negative 13; row 2, 5, negative 6");
+        return Ok( () );
         });
     }
 
@@ -1871,7 +1875,7 @@ mod tests {
             test_command("ZoomIn", mathml, "id-2");
             let speech = test_command("MoveNext", mathml, "id-6");
             // tables need to check their parent for proper speech
-            assert_eq!(speech, "move right; cap s");
+            assert_eq!(speech, "move right, cap s");
             return Ok( () );
         });
     }
@@ -1900,17 +1904,17 @@ mod tests {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
             let speech = test_command("ZoomIn", mathml, "row-1");
-            assert_eq!(speech, "zoom in; row 1; 9, negative 13");
+            assert_eq!(speech, "zoom in; row 1, 9, negative 13");
             let speech = test_command("MoveNext", mathml, "row-2");
-            assert_eq!(speech, "move right; row 2; 5, negative 6");
+            assert_eq!(speech, "move right; row 2, 5, negative 6");
             let speech = test_command("MoveNext", mathml, "row-2");
             assert_eq!(speech, "cannot move right, end of math");
             let speech = test_command("ZoomIn", mathml, "id-13");
-            assert_eq!(speech, "zoom in; column 1; 5");
+            assert_eq!(speech, "zoom in, column 1, 5");
             let speech = test_command("MoveNext", mathml, "row2-negative");
-            assert_eq!(speech, "move right; column 2, negative 6");
+            assert_eq!(speech, "move right, column 2, negative 6");
             let speech = test_command("ZoomOutAll", mathml, "table");
-            assert_eq!(speech, "zoomed out all the way; the 2 by 2 determinant; row 1; 9, negative 13; row 2; 5, negative 6");
+            assert_eq!(speech, "zoomed out all the way, the 2 by 2 determinant; row 1, 9, negative 13; row 2, 5, negative 6");
             return Ok( () );
         });
     }
@@ -1939,16 +1943,16 @@ mod tests {
             let mathml = get_element(&*package_instance);
             test_command("ZoomIn", mathml, "row-1");
             let speech = test_command("MovePrevious", mathml, "row-1");
-            assert_eq!(speech, "move left; start of math");
+            assert_eq!(speech, "move left, start of math");
             let speech = test_command("MoveNext", mathml, "row-2");
-            assert_eq!(speech, "move right; case 2; positive x comma; if x, is greater than or equal to 0");
+            assert_eq!(speech, "move right; case 2, positive x comma; if x is greater than or equal to 0");
             let speech = test_command("ZoomOut", mathml, "table");
-            assert_eq!(speech, "zoom out; 2 cases; case 1; negative x comma; if x is less than 0; case 2; positive x comma; if x, is greater than or equal to 0");
+            assert_eq!(speech, "zoom out, 2 cases; case 1, negative x comma; if x is less than 0; case 2, positive x comma; if x is greater than or equal to 0");
             let speech = test_command("ZoomIn", mathml, "row-1");
-            assert_eq!(speech, "zoom in; case 1; negative x comma; if x is less than 0");
+            assert_eq!(speech, "zoom in; case 1, negative x comma; if x is less than 0");
             set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
             let speech = test_command("MovePrevious", mathml, "open");
-            assert_eq!(speech, "move left; open brace");
+            assert_eq!(speech, "move left, open brace");
             return Ok( () );
         });
     }
@@ -1956,18 +1960,18 @@ mod tests {
     #[test]
     fn base_superscript() -> Result<()> {
         // bug #217 -- zoom into base of parenthesized script 
-        let mathml_str = "<math display='block' id='id-0' data-id-added='true'>
-            <msup data-changed='added' id='id-1' data-id-added='true'>
-                <mrow data-changed='added' id='id-2' data-id-added='true'>
-                    <mo stretchy='false' id='id-3' data-id-added='true'>(</mo>
-                    <mrow data-changed='added' id='id-4' data-id-added='true'>
-                        <mn id='id-5' data-id-added='true'>2</mn>
-                        <mo data-changed='added' id='id-6' data-id-added='true'>&#x2062;</mo>
-                        <mi id='id-7' data-id-added='true'>x</mi>
+        let mathml_str = "<math display='block' id='id-0'>
+            <msup id='id-1'>
+                <mrow id='id-2'>
+                    <mo stretchy='false' id='id-3'>(</mo>
+                    <mrow id='id-4'>
+                        <mn id='id-5'>2</mn>
+                        <mo id='id-6'>&#x2062;</mo>
+                        <mi id='id-7'>x</mi>
                     </mrow>
-                    <mo stretchy='false' id='id-8' data-id-added='true'>)</mo>
+                    <mo stretchy='false' id='id-8'>)</mo>
                 </mrow>
-                <mn id='id-9' data-id-added='true'>2</mn>
+                <mn id='id-9'>2</mn>
             </msup>
         </math>";
         init_default_prefs(mathml_str, "Enhanced");
@@ -1976,9 +1980,9 @@ mod tests {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
             let speech = test_command("ZoomIn", mathml, "id-4");
-            assert_eq!(speech, "zoom in; in base; 2 x");
+            assert_eq!(speech, "zoom in, in base, 2 x");
             let speech = test_command("MoveNext", mathml, "id-9");
-            assert_eq!(speech, "move right; in superscript; 2");
+            assert_eq!(speech, "move right, in exponent, 2");
             return Ok( () );
         });
     }
@@ -2001,20 +2005,20 @@ mod tests {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
             let speech = test_command("MoveStart", mathml, "id-2");
-            assert_eq!(speech, "move to start of math; open paren");
+            assert_eq!(speech, "move to start of math, open paren");
 
             // was on char not on intent tree
             set_preference("NavMode".to_string(), "Simple".to_string()).unwrap();
             // let speech = test_command("ReadCurrent", mathml, "id-2");
             // assert_eq!(speech, "read current; n choose k");
             let speech = test_command("ZoomIn", mathml, "id-4");
-            assert_eq!(speech, "zoom in; n");
+            assert_eq!(speech, "zoom in, in part 1, n");
             let speech = test_command("MoveNext", mathml, "id-5");
-            assert_eq!(speech, "move right; k");
+            assert_eq!(speech, "move right, in part 2, k");
             let speech = test_command("MoveNext", mathml, "id-5");
             assert_eq!(speech, "cannot move right, end of math");
             let speech = test_command("ZoomOut", mathml, "id-1");
-            assert_eq!(speech, "zoom out; n choose k");
+            assert_eq!(speech, "zoom out, out of part 2, n choose k");
             return Ok( () );
         });
     }
@@ -2037,20 +2041,20 @@ mod tests {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
             let speech = test_command("ZoomIn", mathml, "2");
-            assert_eq!(speech, "zoom in; 2");
+            assert_eq!(speech, "zoom in, 2");
             let speech = test_command("MoveNext", mathml, "abs");
-            assert_eq!(speech, "move right; the absolute value of x");
+            assert_eq!(speech, "move right, the absolute value of x");
             let speech = test_command("ZoomIn", mathml, "x");
-            assert_eq!(speech, "zoom in; x");
+            assert_eq!(speech, "zoom in, x");
             let speech = test_command("MoveNext", mathml, "x");
             assert_eq!(speech, "cannot move right, end of math");
             set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
             let speech = test_command("MoveNext", mathml, "end");
-            assert_eq!(speech, "move right; vertical line");
+            assert_eq!(speech, "move right, vertical line");
             let speech = test_command("MoveLineStart", mathml, "2");
-            assert_eq!(speech, "move to start of line; 2");
+            assert_eq!(speech, "move to start of line, 2");
             let speech = test_command("MoveNext", mathml, "start");
-            assert_eq!(speech, "move right; vertical line");
+            assert_eq!(speech, "move right, vertical line");
             return Ok( () );
         });
     }
@@ -2101,7 +2105,7 @@ mod tests {
             let package_instance = package_instance.borrow();
             let mathml = get_element(&*package_instance);
             let speech = test_command("ZoomOutAll", mathml, "mrow");
-            assert_eq!(speech, "zoomed out all the way; 1 plus 2 plus 3 plus 4 plus 5 plus 6 plus 7");
+            assert_eq!(speech, "zoomed out all the way, 1 plus 2 plus 3 plus 4 plus 5 plus 6 plus 7");
             let speech = test_command("ReadCurrent", mathml, "mrow");
             assert_eq!(speech, "read current; 1 plus 2 plus 3 plus 4 plus 5 plus 6 plus 7");
             let speech = test_command("DescribeCurrent", mathml, "mrow");

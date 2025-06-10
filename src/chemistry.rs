@@ -1080,23 +1080,25 @@ fn likely_chem_formula(mathml: Element) -> isize {
     return likelihood;
 
     fn likely_mrow_chem_formula(mrow: Element) -> isize {
-        // check if it is bracketed
         // For parens, the only reason to add them is to group the children and then indicate that there is more than one molecule
-        let outer_mrow = mrow;
-        let mut mrow = mrow;
         if IsBracketed::is_bracketed(mrow, "(", ")", false, false) ||
            IsBracketed::is_bracketed(mrow, "[", "]", false, false) {
             // If it is bracketed, it should have a subscript to indicate the number of the element.
-            // We give a pass to undorned bracketing chars
-            assert!( mrow.children().len() == 1 );
-            let likely = likely_chem_formula(as_element(mrow.children()[0]));
-            let parent = get_parent(mrow);
-            if name(parent) == "msub" {
-                return likely + 3;
-            } else if name(parent) == "mrow" {
-                return likely;
-            } else {
+            // We give a pass to unadorned bracketing chars
+            if mrow.children().len() != 3 {
                 return NOT_CHEMISTRY;
+            }
+            let contents = as_element(mrow.children()[1]);
+            let parent = get_parent(mrow);
+            let parent_is_scripted = IsNode::is_scripted(parent);
+            if name(contents) != "mrow" && !parent_is_scripted {
+                return NOT_CHEMISTRY;
+            }
+            let likely = likely_chem_formula(contents);
+            if parent_is_scripted {
+                return likely + 3;
+            } else {
+                return likely;
             }
         }
 
@@ -1132,11 +1134,6 @@ fn likely_chem_formula(mathml: Element) -> isize {
             }
             // debug!("in likely_chem_formula likelihood={}, child\n{}", likelihood, mml_to_string(child));
             // debug!("   likelihood={} (likely={})", likelihood, likely);
-        }
-
-        if mrow != outer_mrow {
-            // need to set value on inner mrow
-            mrow.set_attribute_value(MAYBE_CHEMISTRY, &likelihood.to_string());
         }
 
         if !is_chem_formula || likelihood <= NOT_CHEMISTRY {
@@ -2201,8 +2198,8 @@ mod chem_tests {
                 <mrow><mn>2</mn><mo>&#x2212;</mo></mrow>
             </msup></mrow></math>";
         let target = "<math>
-        <msup data-chem-formula='6'>
-          <mrow data-chem-formula='3'>
+        <msup data-chem-formula='9'>
+          <mrow data-chem-formula='6'>
             <mo>[</mo>
             <mrow data-changed='added' data-chem-formula='3'>
               <mi data-chem-element='1'>S</mi>
@@ -2228,14 +2225,14 @@ mod chem_tests {
         let test = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
                 <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
         let target = " <math>
-                <mrow data-chem-formula='7'>
+                <mrow data-chem-formula='10'>
                     <msub data-chem-formula='3'>
                         <mi data-chem-element='3'>Al</mi>
                         <mn>2</mn>
                     </msub>
                     <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                    <msub data-chem-formula='3'>
-                        <mrow data-chem-formula='3'>
+                    <msub data-chem-formula='6'>
+                        <mrow data-chem-formula='6'>
                         <mo>(</mo>
                         <mrow data-changed='added' data-chem-formula='3'>
                             <mi data-chem-element='1'>S</mi>
@@ -2305,9 +2302,9 @@ mod chem_tests {
             </msup>
         </mrow></math>";
         let target = "<math>
-            <mrow data-chem-formula='13'>
-                <msup data-chem-formula='6'>
-                    <mrow data-chem-formula='5'>
+            <mrow data-chem-formula='19'>
+                <msup data-chem-formula='9'>
+                    <mrow data-chem-formula='8'>
                     <mo>[</mo>
                     <mrow data-changed='added' data-chem-formula='5'>
                         <mi data-chem-element='3'>Cl</mi>
@@ -2322,8 +2319,8 @@ mod chem_tests {
                     <mo>+</mo>
                 </msup>
                 <mo data-changed='added' data-chem-formula-op='0'>&#x2063;</mo>
-                <msup data-chem-formula='6'>
-                    <mrow data-chem-formula='5'>
+                <msup data-chem-formula='9'>
+                    <mrow data-chem-formula='8'>
                     <mo>[</mo>
                     <mrow data-changed='added' data-chem-formula='5'>
                         <mi data-chem-element='3'>Cl</mi>
@@ -2838,10 +2835,10 @@ mod chem_tests {
         </mrow>
       </math>";
     let target = "<math>
-        <mmultiscripts data-chem-formula='5'>
-            <mrow data-changed='added' data-chem-formula='5'>
+        <mmultiscripts data-chem-formula='8'>
+            <mrow data-changed='added' data-chem-formula='8'>
                 <mo stretchy='false'>(</mo>
-                <mrow data-changed='added' data-chem-formula='3'>
+                <mrow data-changed='added' data-chem-formula='5'>
                 <mi mathvariant='normal' data-chem-element='1'>C</mi>
                 <mo data-changed='added'>&#x2063;</mo>
                 <mmultiscripts data-chem-formula='1'>
