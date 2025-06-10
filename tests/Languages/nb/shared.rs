@@ -124,8 +124,8 @@ fn prime() {
 #[test]
 fn given() {
     let expr = "<math><mi>P</mi><mo>(</mo><mi>A</mi><mo>|</mo><mi>B</mi><mo>)</mo></math>";
-    test("nb", "SimpleSpeak", expr, "cap p, open paren, cap eigh given cap b, close paren");
-    test("nb", "ClearSpeak", expr,  "cap p, open paren, cap eigh given cap b, close paren");  // not good, but follows the spec
+    test("nb", "SimpleSpeak", expr, "stor p; startparentes; stor a, gitt stor b; sluttparentes");
+    test("nb", "ClearSpeak", expr,  "stor p; startparentes; stor a, gitt stor b; sluttparentes");  // not good, but follows the spec
 }
 
 #[test]
@@ -217,7 +217,7 @@ fn ignore_period() {
       </annotation-xml>
     </semantics>  
   </math>";
-    test("nb", "SimpleSpeak", expr, "cap p; open paren, cap eigh and cap b; close paren; is equal to; cap p, open paren, cap eigh intersection cap b; close paren; is equal to, cap p of cap eigh, cap p of cap b");
+    test("nb", "SimpleSpeak", expr, "stor p; startparentes; stor a and stor b; sluttparentes; er lik; stor p; startparentes; stor a snitt stor b; sluttparentes; er lik, stor p av stor a, stor p av stor b");
 }
 
 #[test]

@@ -49,7 +49,7 @@ fn decimal_power() {
     let expr = "<math>
                     <msup> <mi>x</mi> <mn>2,0</mn> </msup>
                 </math>";
-    test("nb", "SimpleSpeak", expr, "x opphøyd i 2,0");
+    test_prefs("nb", "SimpleSpeak", vec![("DecimalSeparators", ","), ("BlockSeparators", ".")], expr, "x opphøyd i 2,0");
 }
 
 #[test]
@@ -241,7 +241,7 @@ fn nested_non_simple_squared_exp() {
       </msup>
       </mrow>
       </math>";
-  test("nb", "SimpleSpeak", expr, "3 raised to the open paren x plus 1, close paren squared power");
+  test("nb", "SimpleSpeak", expr, "3 opphøyd i, startparentes; x pluss 1; sluttparentes i andre");
 }
 
 #[test]
@@ -316,7 +316,7 @@ fn nested_complex_power() {
       </msup>
       </mrow>
       </math>";
-  test("nb", "SimpleSpeak", expr, "e raised to the negative 1 half times; open paren, fraction, x minus mu, over sigma, end fraction; close paren squared power");
+  test("nb", "SimpleSpeak", expr, "e opphøyd i minus 1 halv ganger; startparentes; brøk, x minus my, over sigma, slutt brøk; sluttparentes i andre");
 }
 
 #[test]

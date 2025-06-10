@@ -268,10 +268,10 @@ fn nested_non_simple_squared_exp() {
       </msup>
       </mrow>
       </math>";
-  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "3 raised to the exponent, open paren x plus 1, close paren squared, end exponent");
-  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "3 raised to the exponent, open paren x plus 1, close paren to the second, end exponent");
-  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "3 raised to the exponent, open paren x plus 1, close paren to the second power, end exponent");
-  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 raised to the exponent, open paren x plus 1, close paren raised to the power 2; end exponent");
+  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr, "3 opphøyd i eksponenten; startparentes; x pluss 1; sluttparentes i andre, slutt eksponent");
+  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr, "3 opphøyd i eksponenten; startparentes; x pluss 1; sluttparentes opphøyd i 2; slutt eksponent");
+  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr, "3 opphøyd i eksponenten; startparentes; x pluss 1; sluttparentes opphøyd i 2; slutt eksponent");
+  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr, "3 opphøyd i eksponenten; startparentes; x pluss 1; sluttparentes opphøyd i 2; slutt eksponent");
 }
 
 #[test]
@@ -317,13 +317,13 @@ fn nested_complex_power() {
       </mrow>
       </math>";
   test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Auto")], expr,
-       "e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren squared, end exponent");
+       "e opphøyd i eksponenten, minus 1 halv ganger; startparentes; brøken med teller; x minus my; og nevner sigma; sluttparentes i andre, slutt eksponent");
   test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "Ordinal")], expr,
-       "e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren to the second, end exponent");
+       "e opphøyd i eksponenten, minus 1 halv ganger; startparentes; brøken med teller; x minus my; og nevner sigma; sluttparentes opphøyd i 2; slutt eksponent");
   test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "OrdinalPower")], expr,
-       "e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren to the second power, end exponent");
+       "e opphøyd i eksponenten, minus 1 halv ganger; startparentes; brøken med teller; x minus my; og nevner sigma; sluttparentes opphøyd i 2; slutt eksponent");
   test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium"), ("ClearSpeak_Exponents", "AfterPower")], expr,
-       "e raised to the exponent, negative 1 half times; open paren; the fraction with numerator; x minus mu; and denominator sigma; close paren raised to the power 2; end exponent");
+       "e opphøyd i eksponenten, minus 1 halv ganger; startparentes; brøken med teller; x minus my; og nevner sigma; sluttparentes opphøyd i 2; slutt eksponent");
 }
 
 #[test]

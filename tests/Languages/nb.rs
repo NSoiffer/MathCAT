@@ -1,5 +1,4 @@
 #![allow(non_snake_case)]
-
 mod ClearSpeak {
     mod functions;
     mod large_ops;
@@ -25,6 +24,7 @@ mod SimpleSpeak {
     mod multiline;
     mod subscripts;
 }
+    
 mod shared;
 mod units;
 mod chemistry;

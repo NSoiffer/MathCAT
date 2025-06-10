@@ -28,16 +28,16 @@ fn sulfate() {
           <mrow><mo>[</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>]</mo></mrow>
           <mrow><mn>2</mn><mo>&#x2212;</mo></mrow>
       </msup></mrow></math>";
-  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "open bracket, cap s, cap o, sub 4; close bracket super 2 minus");
+  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "start hakeparentes; stor s, stor o, senket 4; slutt hakeparentes hevet 2 minus");
 }
 
 #[test]
 fn aluminum_sulfate() {
   let expr = "<math><mrow><msub><mi>Al</mi><mn>2</mn></msub>
           <msub><mrow><mo>(</mo><mi>S</mi><msub><mi>O</mi><mn>4</mn></msub><mo>)</mo></mrow><mn>3</mn></msub></mrow></math>";
-  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "cap eigh l, 2, open cap s, cap o, 4, close 3");
-  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "cap eigh l, sub 2; open paren, cap s, cap o, sub 4; close paren sub 3");
-  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "cap eigh l, subscript 2; open paren, cap s, cap o, subscript 4; close paren subscript 3");
+  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Terse")], expr, "stor a l, 2; startparentes; stor s, stor o, 4; sluttparentes 3");
+  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Medium")], expr, "stor a l, senket 2; startparentes; stor s, stor o, senket 4; sluttparentes senket 3");
+  test_prefs("nb", "ClearSpeak", vec![("Verbosity", "Verbose")], expr, "stor a l, nedre indeks 2; startparentes; stor s, stor o, nedre indeks 4; sluttparentes nedre indeks 3");
 }
 
 #[test]
@@ -71,14 +71,14 @@ fn dichlorine_hexoxide() {
       </msup>
     </mrow></math>";
   test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Terse")], 
-    expr, "open bracket, cap c l, cap o, 2, close bracket plus; \
-                          open bracket, cap c l, cap o, 4, close bracket minus");
+    expr, "start hakeparentes; stor c l, stor o, 2; slutt hakeparentes pluss; \
+                          start hakeparentes; stor c l, stor o, 4; slutt hakeparentes minus");
   test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Medium")], 
-    expr, "open bracket, cap c l, cap o, sub 2; close bracket super plus; \
-                          open bracket, cap c l, cap o, sub 4; close bracket super minus");
+    expr, "start hakeparentes; stor c l, stor o, senket 2; slutt hakeparentes hevet pluss; \
+                          start hakeparentes; stor c l, stor o, senket 4; slutt hakeparentes hevet minus");
   test_prefs("nb", "SimpleSpeak", vec![("Verbosity", "Verbose")], 
-    expr, "open bracket, cap c l, cap o, subscript 2; close bracket superscript plus; \
-                          open bracket, cap c l, cap o, subscript 4; close bracket superscript minus");
+    expr, "start hakeparentes; stor c l, stor o, nedre indeks 2; slutt hakeparentes øvre indeks pluss; \
+                          start hakeparentes; stor c l, stor o, nedre indeks 4; slutt hakeparentes øvre indeks minus");
 }
 
 

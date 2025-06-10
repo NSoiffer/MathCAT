@@ -473,6 +473,5 @@ fn test_mtext_inference() {
                 <mn>4.5</mn><mtext>mT</mtext>
             <mo>]</mo></math>"#;
     test("nb", "SimpleSpeak", expr, 
-        "open bracket; 1 metric ton, comma; 2 peta-amps, comma, \
-                3 pascals, comma; 4.5 milli-teslas; close bracket");
+        "start hakeparentes; 1 tonn, komma; 2 peta-ampere, komma, 3 pascal, komma; 4.5 milli-tesla; slutt hakeparentes");
 }

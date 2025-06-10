@@ -178,7 +178,7 @@ fn test_functions_none_pref_multiple_args() {
         <mi>B</mi> <mrow><mo>(</mo> <mrow> <mn>2</mn><mo>,</mo><mn>6</mn></mrow> <mo>)</mo></mrow>
     </math>";
     test_ClearSpeak("nb", "ClearSpeak_Functions", "None",expr,
-        "cap b times, open paren 2 comma, 6, close paren");
+        "stor b ganger; startparentes; 2 komma, 6; sluttparentes");
 }
 
 
@@ -234,7 +234,7 @@ fn more_implied_times() {
     </mrow>
     </mrow></math>";
     test_ClearSpeak("nb", "ClearSpeak_ImpliedTimes", "MoreImpliedTimes",expr,
-        "open paren 2 times x, close paren squared");
+        ", startparentes; 2 ganger x; sluttparentes i andre");
 }
 
 #[test]
@@ -336,7 +336,7 @@ fn explicit_times_none_superscript() {
         </msup>
         </mrow>
     </mrow></math>";
-        test("nb", "ClearSpeak", expr, "open paren 2 x close paren squared");
+        test("nb", "ClearSpeak", expr, ", startparentes; 2 x, sluttparentes i andre");
     }
 
     #[test]

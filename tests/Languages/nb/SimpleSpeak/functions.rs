@@ -251,7 +251,7 @@ fn no_times_sqrt() {
         </msup>
         </mrow>
     </mrow></math>";
-        test("nb", "SimpleSpeak", expr, "open paren 2 x close paren squared");
+        test("nb", "SimpleSpeak", expr, ", startparentes; 2 x, sluttparentes i andre");
     }
 
     #[test]
