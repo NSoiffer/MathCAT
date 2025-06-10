@@ -4392,7 +4392,7 @@ mod canonicalize_tests {
 
     #[test]
     fn illegal_mathml_element() {
-		use crate::interface::*;
+		use crate::element_util::{get_element, trim_element};
         let test_str = "<math><foo><mi>f</mi></foo></math>";
         let package1 = &parser::parse(test_str).expect("Failed to parse test input");
 		let mathml = get_element(package1);
@@ -4495,7 +4495,7 @@ mod canonicalize_tests {
 
     #[test]
     fn mrow_with_intent_and_single_child() {
-		use crate::interface::*;
+		use crate::element_util::{get_element, trim_element};
 		use sxd_document::parser;
 		use crate::canonicalize::canonicalize;
 		// this forces initialization
@@ -4519,7 +4519,7 @@ mod canonicalize_tests {
     #[test]
     fn empty_mrow_with_intent() {
 		// we don't want to remove the mrow because the intent on the mi would reference itself
-		use crate::interface::*;
+		use crate::element_util::{get_element, trim_element};
 		use sxd_document::parser;
 		use crate::canonicalize::canonicalize;
 		// this forces initialization
