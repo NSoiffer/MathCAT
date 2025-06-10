@@ -1468,8 +1468,6 @@ fn units_appendix_1_3_1_auto_intent() {
 
 // FIX: add 2.6 (Chemistry)
 
-// FIX: add 3.2.1 (repeating numbers)
-
 //  FIX: add 3.4 math variants
 
 
