@@ -128,14 +128,14 @@
   match: "."
   replace:
   - T: "rottegn"
-  - T: "med indeks"      # phrase("the root of x 'with index' 5")
-  - x: "*[1]"
+  - T: "med grad"      # phrase("the root of x 'with index' 5")
+  - x: "*[2]"
   # SWEDISH: Check if the order of base and index is correct!
   - pause: short
   - test:
       if: "$Verbosity!='Terse'"
       then: [T: "av"]   # phrase("the root 'of' x")
-  - x: "*[2]"
+  - x: "*[1]"
   - pause: short
   - test:
       if: "not(IsNode(*[2],'leaf'))"

@@ -410,7 +410,7 @@
       if: "$MatchCounter = 0 and $NavVerbosity != 'Terse'"
       then: [T: "utzoomet hele veien", pause: "medium"]            # phrase('zoomed out all the the way')
   - with:
-      variables: [Move2D: "'forlater'", Child2D: "."]
+      variables: [Move2D: "'ut av'", Child2D: "."]                 #Should it be "forlater"?
       replace: [x: ".."]
   - with:
       variables: [MatchCounter: "$MatchCounter + 1"]
@@ -505,7 +505,7 @@
           then: [x: ".."] # auto-zoom: move out a level and retry
           else:
           - with:
-              variables: [Move2D: "'forlater'", Child2D: "."]
+              variables: [Move2D: "'ut av'", Child2D: "."]                   #Should it be "forlater"?
               replace: [x: ".."]
           - test:
               if: "parent::m:mtd"
@@ -597,7 +597,7 @@
   - "$NavCommand='MoveColumnStart' or $NavCommand='MoveColumnEnd' or"
   - "$NavCommand='ReadCellCurrent'"
   replace:
-  - T: "ikke i tabellen"                               # phrase('not in table')
+  - T: "ikke i tabell"                               # phrase('not in table')
   - pause: long
   - set_variables: [SpeakExpression: "'false'"]
 
@@ -628,7 +628,7 @@
           else:
           - set_variables: [NavNode: "preceding-sibling::*[1]/*[1]/@id"]
       else:
-      - T: "ingen tidligere kolonner"                 # phrase('no previous column' in the table)
+      - T: "ingen foregående kolonner"                 # phrase('no previous column' in the table)
       - set_variables: [SpeakExpression: "'false'"]
 
 - name: move-cell-next
@@ -694,7 +694,7 @@
               else:
               - set_variables: [NavNode: "../preceding-sibling::*[1]/*[$Column]/*[1]/@id"]
       else:
-      - T: "ingen tidligere rader"                            # phrase('no previous row' in the table)
+      - T: "ingen foregående rader"                            # phrase('no previous row' in the table)
       - set_variables: [SpeakExpression: "'false'"]
 
 - name: move-cell-down
@@ -760,7 +760,7 @@
           else:
           - set_variables: [NavNode: "preceding-sibling::*[1]/@id"]
       else:
-      - T: "ingen tidligere rader"                          # phrase('no previous row' in the table)
+      - T: "ingen foregående rader"                          # phrase('no previous row' in the table)
       - set_variables: [SpeakExpression: "'false'"]
 
 - name: move-cell-down
@@ -806,7 +806,7 @@
           - test:
               if: "$NavVerbosity = 'Verbose'"
               then:
-              - T: "les aktuell verdi"                         # phrase('read current entry' in the table)
+              - T: "les nåværende verdi"                         # phrase('read current entry' in the table)
               - pause: medium
           - test:
               if: "$NavVerbosity != 'Terse'"
@@ -818,7 +818,7 @@
               - pause: short
           - set_variables: [NavNode: "$MTD[1]/*[1]/@id"]
           else:
-          - T: "ikke i tabellen"                                   # phrase('not in table' or matrix)
+          - T: "ikke i tabell"                                   # phrase('not in table' or matrix)
           - pause: long
           - set_variables: [SpeakExpression: "'false'"]
 
@@ -1058,7 +1058,7 @@
       then:
       - x: "ancestor::m:mtd[1]" # try again on an mtd node
       else:
-      - T: "ikke i tabellen"                                               # phrase('not in table' or matrix)
+      - T: "ikke i tabell"                                               # phrase('not in table' or matrix)
       - pause: long
       - set_variables: [SpeakExpression: "'false'"]
 
@@ -1147,7 +1147,7 @@
       then:
       - T: "kan ikke gå til høyre"                              # phrase('cannot move right')
   - with:
-      variables: [Move2D: "'end of'", Child2D: "$EdgeNode/*[last()]"]
+      variables: [Move2D: "'end of'", Child2D: "$EdgeNode/*[last()]"]   #Should "end of" be translated?
       replace: [x: "$EdgeNode"]
   - pause: long
   - set_variables: [SpeakExpression: "'false'"]
@@ -1207,7 +1207,7 @@
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'forlater'", Child2D: "."]
+              variables: [Move2D: "'ut av'", Child2D: "."]             #Should it be "forlater"?
               replace: [x: ".."]
       - test:
           if: "following-sibling::*"
@@ -1311,7 +1311,7 @@
       if: "preceding-sibling::* and following-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'forlater'", Child2D: "."]
+          variables: [Move2D: "'ut av'", Child2D: "."]           #Should it be "forlater"?
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
@@ -1387,7 +1387,7 @@
       then:
       - T: "kan ikke gå til venstre"                                   # phrase('cannot move left' in expression)
   - with:
-      variables: [Move2D: "'end of'", Child2D: "$EdgeNode/*[1]"]
+      variables: [Move2D: "'end of'", Child2D: "$EdgeNode/*[1]"]  #Should "end of" be translated?
       replace: [x: "$EdgeNode"]
   - pause: long
 
@@ -1449,7 +1449,7 @@
               replace: [x: ".."]
           else:
           - with:
-              variables: [Move2D: "'forlater'", Child2D: "."]
+              variables: [Move2D: "'ut av'", Child2D: "."]         #Should it be "forlater"?
               replace: [x: ".."]
       - test:
           if: "preceding-sibling::*"
@@ -1556,7 +1556,7 @@
       if: "count(preceding-sibling::*) > 2 and preceding-sibling::*[1][name(.)='none']"
       then:
       - with:
-          variables: [Move2D: "'forlater'", Child2D: "."]
+          variables: [Move2D: "'ut av'", Child2D: "."]           #Should it be "forlater"?
           replace: [x: ".."]
       - with:
           variables: [MatchCounter: "$MatchCounter + 1"]
@@ -1613,14 +1613,14 @@
   - test:
     - if: "$NavMode = 'Enhanced'"
       then:
-      - T: "symbol"                                                # phrase(a mathematical 'character')
+      - T: "symbolmodus"                                                # phrase(a mathematical 'character')
       - set_variables: [NavMode: "'Character'", ReadZoomLevel: "1"]
     - else_if: "$NavMode = 'Character'"
       then:
-      - T: "forenklet måte"                                                   # phrase(a 'simple' way to do something)
+      - T: "forenklet modus"                                                   # phrase(a 'simple' way to do something)
       - set_variables: [NavMode: "'Simple'", ReadZoomLevel: "1"]
     - else:
-      - T: "utvidet måte"                                                 # phrase(an 'enhanced' way to do something)
+      - T: "utvidet modus"                                                 # phrase(an 'enhanced' way to do something)
       - set_variables: [NavMode: "'Enhanced'", ReadZoomLevel: "-1"]
   # - T: "läge"                                                        # phrase(a simple 'mode' of use)
   # SWEDISH: Removed the ending "mode" string and added "läge" to the previous strings, for grammatical purposes.
@@ -1639,14 +1639,14 @@
   - test:
     - if: "$NavMode = 'Enhanced'"
       then:
-      - T: "forenklet måte"                                                 # phrase(an 'simple' way to do something)
+      - T: "forenklet modus"                                                 # phrase(an 'simple' way to do something)
       - set_variables: [NavMode: "'Simple'", ReadZoomLevel: "1"]
     - else_if: "$NavMode = 'Character'"
       then:
-      - T: "utvidet måte"                                               # phrase(an 'enhanced' way to do something)
+      - T: "utvidet modus"                                               # phrase(an 'enhanced' way to do something)
       - set_variables: [NavMode: "'Enhanced'", ReadZoomLevel: "-1"]
     - else:
-      - T: "symbol"                                              # phrase(a mathematical 'character')
+      - T: "symbolmodus"                                              # phrase(a mathematical 'character')
       - set_variables: [NavMode: "'Character'", ReadZoomLevel: "1"]
   # - T: "användningsläge"                                                       # phrase(a simple 'mode' of use)
   # SWEDISH: Removed the ending "mode" string and added "läge" to the previous strings, for grammatical purposes.
@@ -1683,7 +1683,7 @@
         - if: "$NavCommand = 'ReadCurrent'"
           then: [T: "les"]                                  # phrase('read' next entry in table) 
           else: [T: "beskriv"]                              # phrase('describe' next entry in table)     
-      - T: "aktuelt"                                         # phrase('current' entry in table)
+      - T: "nåværende"                                         # phrase('current' entry in table)
   - set_variables: [NavNode: "@id"]
   - pause: long
 
@@ -1719,7 +1719,7 @@
   - test:
       if: "$NavVerbosity != 'Terse'"
       then:
-      - T: "sett plassholder"                                 # phrase('set placeholder' to the value) 
+      - T: "angi plassholder"                                 # phrase('set placeholder' to the value) 
       - x: "$PlaceMarkerIndex"
       - pause: long
   - set_variables: [NavNode: "@id"]
