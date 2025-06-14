@@ -2459,7 +2459,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
 
         // the 'b' for baseline indicator is really part of the previous token, so it needs to be highlighted but isn't because it is not Unicode braille
         let baseline_indicator_hack = PreferenceManager::get().borrow().pref_to_string("BrailleCode") == "Nemeth";
-        // debug!("highlight_braille_string: braille={}", braille);
+        // debug!("highlight_braille_string: highlight_style={}\n braille={}", highlight_style, braille);
         let mut i_first_modified = 0;
         for i in 0..chars.len() {
             let ch = chars[i];
@@ -2480,6 +2480,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
                 chars[i] = modified_ch;
                 if ch !=  modified_ch {
                     i_last_modified = i;
+                    break;
                 }
             }
         }
@@ -2492,7 +2493,7 @@ impl<'c, 's:'c, 'r, 'm:'c> SpeechRulesWithContext<'c, 's,'m> {
         }
 
         let result = chars.into_iter().collect::<String>(); 
-        // debug!("                           result={}", result);
+        // debug!("    result={}", result);
         return result;
 
         fn add_dots_to_braille_char(ch: char, baseline_indicator_hack: bool) -> char {
