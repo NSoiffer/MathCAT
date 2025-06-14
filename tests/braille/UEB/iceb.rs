@@ -274,13 +274,13 @@ fn signs_2_10_16() {
 #[test]
 fn expr_3_1_1_spaces() {
     let expr = "<math><mn>3</mn><mo>+</mo><mn>5</mn><mo>=</mo><mn>8</mn></math>";
-    test_braille_prefs("UEB", vec![("UEB_UseSpacesAroundAllOperators", "true")], expr, "⠼⠉⠀⠐⠖⠀⠼⠑⠀⠐⠶⠀⠼⠓");
+    test_braille_prefs("UEB", vec![("UseSpacesAroundAllOperators", "true")], expr, "⠼⠉⠀⠐⠖⠀⠼⠑⠀⠐⠶⠀⠼⠓");
 }
 
 #[test]
 fn expr_3_1_2_spaces() {
     let expr = "<math><mn>8</mn><mo>-</mo><mn>5</mn><mo>=</mo><mn>3</mn></math>";
-    test_braille_prefs("UEB", vec![("UEB_UseSpacesAroundAllOperators", "true")], expr, "⠼⠓⠀⠐⠤⠀⠼⠑⠀⠐⠶⠀⠼⠉");
+    test_braille_prefs("UEB", vec![("UseSpacesAroundAllOperators", "true")], expr, "⠼⠓⠀⠐⠤⠀⠼⠑⠀⠐⠶⠀⠼⠉");
 }
 
 #[test]
