@@ -289,7 +289,7 @@
  - "℃": [T: "grader celsius"]                    #  0x2103 (en: 'degrees celsius')
  - "℉": [T: "grader fahrenheit"]                 #  0x2109 (en: 'degrees fahrenheit')
  - "ℋℛℓ":                                        #  0x210b
-    - T: "skriftstil"                        #  (en: 'script', google: 'manus')             
+    - T: "script font"                        #  (en: 'script', google: 'manus')             
     - spell: "translate('.', 'ℋℛℓ', 'HRl')"
  - "ℎ": [T: "plancks konstant"]                   #  0x210e
  - "ℜ":                                          #  0x211c

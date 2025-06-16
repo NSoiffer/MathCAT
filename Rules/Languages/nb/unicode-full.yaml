@@ -464,7 +464,7 @@
  - "ℇ": [T: "eulers konstant"]                       #  0x2107    (en: 'euler's constant', google: 'eulers konstant')
  - "℈": [T: "scruple"]                             #  0x2108    (en: 'scruples', google translation) 
  - "℉": [T: "grader fahrenheit"]                    #  0x2109    (en: 'degrees fahrenheit')
- - "ℊ": [T: "skriftstil g"]                             #  0x210a    (en: 'script g')
+ - "ℊ": [T: "script font g"]                             #  0x210a    (en: 'script g')
  - "ℌℑℨℭ":                                          #  0x210c, 0x2111, 0x2128, 0x212d
     - T: "fraktur"                                 #     (en: 'fraktur', google: 'fraktur')
     - spell: "translate('.', 'ℌℑℨℭ', 'HIZC')"
@@ -475,10 +475,10 @@
 
  - "ℎ": [T: "plancks konstant"]                      #  0x210e
  - "ℏ": [T: "h strek"]                                            #  0x210f
-    # SWEDISH: finns bara ett sätt att säga h streck
+    # SWEDISH: finns bara ett sätt att säga h strek
 
  - "ℐℒ℘ℬℰℱℳ":                                       #  0x2110, 0x2112, 0x2118, 0x2130, 0x2131, 0x2133
-    - T: "skriftstil"                                 #     (en: 'script')
+    - T: "script font"                                 #     (en: 'script')
     - spell: "translate('.', 'ℐℒ℘ℬℰℱℳ', 'ILPBEFM')"
 
  - "ℓ": [T: "skrifttype l"]                             #  0x2113    (en: 'script l')
@@ -691,7 +691,7 @@
  - "⇾": [T: "høyrepil med åpen spiss"]         #  0x21fe    (en: 'rightwards open headed arrow')
  - "⇿": [T: "venstre-høyre-pil med åpen spiss"]    #  0x21ff    (en: 'left right open headed arrow')
  #----------------------------------------------------------------------------------------------------------------
- #Mathematical operators GJENNOMGÅTT, MEN BØR KORREKTURLESES IGJEN - HER ER DET VIKTIGE TEGN!
+ #Mathematical operators OK
  - "∀": [T: "for alle"]                             #  0x2200    (en: 'for all')
  - "∁":                                             #  0x2201
      - T: "komplementet til"                              #     (en: 'complement of')
@@ -701,20 +701,16 @@
  - "∄": [T: "det eksisterer ikke"]                   #  0x2204    (en: 'there does not exist')
  - "∅": [T: "den tomme mengden"]                        #  0x2205    (en: 'empty set')
  - "∆":                                             #  0x2206
-     - T: "laplace av"                               #     (en: 'laplacian of')   #Sjekk ut boka Kalkulus og lineær algebra!
- - "∇": [T: "nabla"]                     # 0x2207 (en: 'gradient of', google: 'lutning av')   #Sjekk ut boka Kalkulus og lineær algebra
+     - T: "laplace av"                               #     (en: 'laplacian of')
+ - "∇": [T: "nabla"]                     # 0x2207 (en: 'gradient of', google: 'lutning av')
  - "∈":                                          #  0x2208
     - test:
         if: "$SpeechStyle != 'ClearSpeak'"
         then:
         - T: "i"
-        #- test:
-            #if: "not(ancestor::*[self::m:set])"    # "the set x is an element of ..." sounds bad"
-            #then: [T: "er"]
-        #- T: "et element i"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
-        # SWEDISH: Changed the non-ClearSpeak option to "tillhör", as that makes more sense in Swedish.
-        # SWEDISH: The word "medlem" is not commonly used in set theory, so we removed that rule. If the parsing has set the parameter to "Member" it will fall under the "else" case.
+        # NORWEGIAN: "i" sounds best in all cases for the non-ClearSpeak case
+        # SWEDISH/NORWEGIAN: The word "medlem" is not commonly used in set theory, so we removed that rule. If the parsing has set the parameter to "Member" it will fall under the "else" case.
         else_test:
             if: "../../self::m:set or ../../../self::m:set" #  inside a set
             then_test:
@@ -725,7 +721,7 @@
               - else: [T: "tilhørende"]             #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'belonging to')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
-                then: [T: "i"] # SWEDISH: using this construction instead for more correct grammar in many cases
+                then: [T: "i"] # NORWEGIAN: Set the "auto" case to be "i"
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "er et element i"]                #  (en: 'is in', google translation)
               - else: [T: "tilhører"]             #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'belongs to')
@@ -739,8 +735,7 @@
             then: [T: "er"]
         - T: "ikke et element i"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
-        # SWEDISH: Changed the non-ClearSpeak option to "tillhör", as that makes more sense in Swedish.
-        # SWEDISH: The word "medlem" is not commonly used in set theory, so we removed that rule. If the parsing has set the parameter to "Member" it will fall under the "else" case.
+        # SWEDISH/NORWEGIAN: The word "medlem" is not commonly used in set theory, so we removed that rule. If the parsing has set the parameter to "Member" it will fall under the "else" case.
         else_test:
             if: "../../self::m:set or ../../../self::m:set" #  inside a set
             then_test:
@@ -760,13 +755,9 @@
         if: "$SpeechStyle != 'ClearSpeak'"
         then:
         - T: "i"
-        #- test:
-            #if: "not(ancestor::*[self::m:set])"    # "the set x is an element of ..." sounds bad"
-            #then: [T: "er"]
-        #- T: "et element i"
         # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
-        # SWEDISH: Changed the non-ClearSpeak option to "tillhör", as that makes more sense in Swedish.
-        # SWEDISH: The word "medlem" is not commonly used in set theory, so we removed that rule. If the parsing has set the parameter to "Member" it will fall under the "else" case.
+        # NORWEGIAN: "i" sounds best in all cases for the non-ClearSpeak case
+        # SWEDISH/NORWEGIAN: The word "medlem" is not commonly used in set theory, so we removed that rule. If the parsing has set the parameter to "Member" it will fall under the "else" case.
         else_test:
             if: "../../self::m:set or ../../../self::m:set" #  inside a set
             then_test:
@@ -777,7 +768,7 @@
               - else: [T: "tilhørende"]             #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'belonging to')
             else_test:
               - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
-                then: [T: "i"]         #  (en: 'is an element of', google translation)
+                then: [T: "i"]         #  (en: 'is an element of', google translation) #NORWEGIAN: Set the "auto" case to be "i"
               - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
                 then: [T: "er et element i"]                #  (en: 'is in', google translation)
               - else: [T: "tilhører"]             #  $ClearSpeak_SetMemberSymbol = 'Belongs' (en: 'belongs to')
@@ -2604,7 +2595,6 @@
  - "": [T: "lik med prikk under"]                 #  0xe918    (en: 'equal with dot below', google translation)
  - "": [T: "venstre prikk over minus over høyre prikk"]    #  0xe919    (en: 'left dot over minus over right dot', google translation)
  - "": [T: "høyre prikk over minus over venstre prikk"]    #  0xe91a    (en: 'right dot over minus over left dot', google translation)
- #---
  - "": [T: "nesten lik minus"]                #  0xe91f    (en: 'almost equal to minus', google translation)
  - "": [T: "dobbel kvadratisk union"]                #  0xe920    (en: 'double square cup', google translation)
  - "": [T: "dobbelt kvadratisk snitt"]            #  0xe921    (en: 'double square cap', google translation)
@@ -3144,37 +3134,38 @@
  
  # script chars in math alphabetic block and also MathType private use area
  # SWEDISH: We've used "skrivstilt" instead of skript for clarity
+ # NORWEGIAN: Used "script font"
  - "𝒜-𝒵":                                           #  0x1d49c - 0x1d4b5
-    - T: "skriftstil"                                    #     (en: 'script', google translation)
+    - T: "script font"                                    #     (en: 'script', google translation)
     - spell: "translate('.', '𝒜𝒝𝒞𝒟𝒠𝒡𝒢𝒣𝒤𝒥𝒦𝒧𝒨𝒩𝒪𝒫𝒬𝒭𝒮𝒯𝒰𝒱𝒲𝒳𝒴𝒵', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                           #  0xf100 - 0xf119
-    - T: "skriftstil"                                    #     (en: 'script', google translation)
+    - T: "script font"                                    #     (en: 'script', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝒶-𝓏":                                           #  0x1d4b6 - 0x1d4cf
-    - T: "skriftstil"                                    #     (en: 'script', google translation)
+    - T: "script font"                                    #     (en: 'script', google translation)
     - spell: "translate('.', '𝒶𝒷𝒸𝒹𝒺𝒻𝒼𝒽𝒾𝒿𝓀𝓁𝓂𝓃𝓄𝓅𝓆𝓇𝓈𝓉𝓊𝓋𝓌𝓍𝓎𝓏', 'abcdefghijklmnopqrstuvwxyz')"
     
  - "-":                                           #  0xf11a - 0xf133
-    - T: "skriftstil"                                    #     (en: 'script', google translation)
+    - T: "script font"                                    #     (en: 'script', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  # bold script chars in math alphabetic block and also MathType private use area
  - "𝓐-𝓩":                                           #  0x1d4d0 - 0x1d4e9
-    - T: "skriftstil fet"                            #     (en: 'script bold', google translation)
+    - T: "script font fet"                            #     (en: 'script bold', google translation)
     - spell: "translate('.', '𝓐𝓑𝓒𝓓𝓔𝓕𝓖𝓗𝓘𝓙𝓚𝓛𝓜𝓝𝓞𝓟𝓠𝓡𝓢𝓣𝓤𝓥𝓦𝓧𝓨𝓩', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "-":                                           #  0xf140 - 0xf159
-    - T: "skriftstil fet"                            #     (en: 'script bold', google translation)
+    - T: "script font fet"                            #     (en: 'script bold', google translation)
     - spell: "translate('.', '', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')"
 
  - "𝓪-𝔃":                                           #  0x1d4ea - 0x1d503
-    - T: "skriftstil fet"                            #     (en: 'script bold', google translation)
+    - T: "script font fet"                            #     (en: 'script bold', google translation)
     - spell: "translate('.', '𝓪𝓫𝓬𝓭𝓮𝓯𝓰𝓱𝓲𝓳𝓴𝓵𝓶𝓷𝓸𝓹𝓺𝓻𝓼𝓽𝓾𝓿𝔀𝔁𝔂𝔃', 'abcdefghijklmnopqrstuvwxyz')"
     
  - "-":                                           #  0xf15a - 0xf173
-    - T: "skriftstil fet"                            #     (en: 'script bold', google translation)
+    - T: "script font fet"                            #     (en: 'script bold', google translation)
     - spell: "translate('.', '', 'abcdefghijklmnopqrstuvwxyz')"
 
  - "-":                                           #  0xf180 - 0xf199
