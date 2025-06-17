@@ -21,8 +21,9 @@ jobs:
       run: cargo test --verbose
 
   clippy:
-    name: Run Clippy/Lint
+    name: Clippy/Lint check
     runs-on: ubuntu-latest
     steps:
-    - name: clippy
+    - uses: actions/checkout@v3
+    - name: run clippy
       run: cargo clippy
