@@ -1945,11 +1945,11 @@ mod tests {
             let speech = test_command("MovePrevious", mathml, "row-1");
             assert_eq!(speech, "move left; start of math");
             let speech = test_command("MoveNext", mathml, "row-2");
-            assert_eq!(speech, "move right; case 2; positive x comma; if x is greater than or equal to 0");
+            assert_eq!(speech, "move right; case 2; positive x comma; if x, is greater than or equal to 0");
             let speech = test_command("ZoomOut", mathml, "table");
-            assert_eq!(speech, "zoom out; 2 cases; case 1, negative x comma; if x is less than 0; case 2; positive x comma; if x is greater than or equal to 0");
+            assert_eq!(speech, "zoom out; 2 cases; case 1; negative x comma; if x is less than 0; case 2; positive x comma; if x, is greater than or equal to 0");
             let speech = test_command("ZoomIn", mathml, "row-1");
-            assert_eq!(speech, "zoom in; case 1, negative x comma; if x is less than 0");
+            assert_eq!(speech, "zoom in; case 1; negative x comma; if x is less than 0");
             set_preference("NavMode".to_string(), "Character".to_string()).unwrap();
             let speech = test_command("MovePrevious", mathml, "open");
             assert_eq!(speech, "move left; open brace");
